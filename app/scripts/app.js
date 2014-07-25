@@ -122,6 +122,12 @@ angular
             controller: 'TasksCtrl',
           },
         },
+        resolve: {
+          tasks: function(pond) {
+            // TODO: scope tasks to application
+            return pond.all('task').getList();
+          },
+        },
       })
 
       .state('insight', {
@@ -260,6 +266,7 @@ angular
             };
           }
         }
-      })
-    ;
+      });
+
+
   });
