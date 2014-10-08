@@ -1,11 +1,11 @@
 'use strict';
 /* jshint camelcase:false */
 
-require('../app');
+require('../../app');
 var angular = require('angular');
 
-angular.module('deckApp')
-  .controller('ServerGroupDetailsCtrl', function ($scope, $state, application, serverGroup, orcaService, notifications,
+angular.module('deckApp.aws')
+  .controller('awsServerGroupDetailsCtrl', function ($scope, $state, application, serverGroup, orcaService, notifications,
                                                   mortService, oortService, accountService, securityGroupService,
                                                   serverGroupService, $modal, confirmationModalService, _) {
 

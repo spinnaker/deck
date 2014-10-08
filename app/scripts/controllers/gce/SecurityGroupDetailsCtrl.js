@@ -1,10 +1,10 @@
 'use strict';
 
-require('../app');
+require('../../app');
 var angular = require('angular');
 
-angular.module('deckApp')
-  .controller('SecurityGroupDetailsCtrl', function ($scope, $state, notifications, securityGroup, application, securityGroupService, $modal) {
+angular.module('deckApp.gce')
+  .controller('gceSecurityGroupDetailsCtrl', function ($scope, $state, notifications, securityGroup, application, securityGroupService, $modal) {
 
     $scope.loading = true;
 
