@@ -4,7 +4,7 @@
     <div class="row">
       <div class="rollup-summary col-sm-12">
       <a class="title-link"
-         ui-sref=".securityGroupDetails({region: securityGroup.region, accountId: securityGroup.accountName, name: securityGroup.name})">
+         ui-sref=".securityGroupDetails({region: securityGroup.region, accountId: securityGroup.accountName, name: securityGroup.name, provider: securityGroup.type})">
         <span class="glyphicon glyphicon-transfer"></span> {{securityGroup.name}}
         <account-tag account="securityGroup.account" pad="left"></account-tag>
       </a>
@@ -18,7 +18,7 @@
         <div ng-repeat="serverGroup in securityGroup.usages.serverGroups | orderBy:'name'"
              class="rollup-row">
           <a
-            ui-sref=".serverGroup({region: serverGroup.region, accountId: serverGroup.account, serverGroup: serverGroup.name})"
+            ui-sref=".serverGroup({region: serverGroup.region, accountId: serverGroup.account, serverGroup: serverGroup.name, provider: serverGroup.type})"
             ui-sref-active="active">
             <span class="glyphicon glyphicon-th"></span> {{serverGroup.name}}
           </a>
@@ -31,7 +31,7 @@
         <div ng-repeat="loadBalancer in securityGroup.usages.loadBalancers | orderBy:'name'"
              class="rollup-row">
           <a
-            ui-sref=".loadBalancerDetails({region: loadBalancer.region, accountId: loadBalancer.account, name: loadBalancer.name})"
+            ui-sref=".loadBalancerDetails({region: loadBalancer.region, accountId: loadBalancer.account, name: loadBalancer.name, provider: loadBalancer.type})"
             ui-sref-active="active">
             <span class="icon icon-elb"></span> {{loadBalancer.name}}
           </a>

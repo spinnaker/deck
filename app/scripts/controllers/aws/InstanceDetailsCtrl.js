@@ -1,11 +1,10 @@
 'use strict';
 
-require('../app');
+require('../../app');
 var angular = require('angular');
 
-angular.module('deckApp')
-  .controller('InstanceDetailsCtrl', function ($scope, $state, notifications, instance, application, orcaService, confirmationModalService) {
-
+angular.module('deckApp.aws')
+  .controller('awsInstanceDetailsCtrl', function ($scope, $state, notifications, instance, application, orcaService, confirmationModalService) {
     function extractHealthMetrics(instance) {
       if (!instance.health) {
         $scope.healthMetrics = [];

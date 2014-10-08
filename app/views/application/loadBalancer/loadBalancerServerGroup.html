@@ -1,11 +1,11 @@
 <div class="rollup-row load-balancer-server-group">
   <a
-    ui-sref=".serverGroup({region: serverGroup.region, accountId: serverGroup.account, serverGroup: serverGroup.name})"
+    ui-sref=".serverGroup({region: serverGroup.region, accountId: serverGroup.account, serverGroup: serverGroup.name, provider: serverGroup.type})"
     ui-sref-active="active">
     <span class="glyphicon glyphicon-th"></span> {{serverGroup.name}}
   </a>
   <health-counts container="serverGroup"></health-counts>
   <div ng-if="displayOptions.showInstances">
-    <instances instances="serverGroup.instances" render-instances-on-scroll="displayOptions.renderInstancesOnScroll"></instances>
+    <instances provider="serverGroup.type" instances="serverGroup.instances" render-instances-on-scroll="displayOptions.renderInstancesOnScroll"></instances>
   </div>
 </div>

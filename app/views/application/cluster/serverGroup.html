@@ -1,11 +1,11 @@
 <div class="row rollup-entry sub-group"
      ng-class="{
-        active: $state.includes('**.serverGroup', {region: serverGroup.region, accountId: serverGroup.account, serverGroup: serverGroup.name}),
+        active: $state.includes('**.serverGroup', {region: serverGroup.region, accountId: serverGroup.account, serverGroup: serverGroup.name, provider: serverGroup.type}),
         disabled: serverGroup.isDisabled
      }">
   <div class="rollup-summary">
     <a class="rollup-title-cell"
-       ui-sref=".serverGroup({region: serverGroup.region, accountId: serverGroup.account, serverGroup: serverGroup.name})">
+       ui-sref=".serverGroup({region: serverGroup.region, accountId: serverGroup.account, serverGroup: serverGroup.name, provider: serverGroup.type})">
       <span class="glyphicon glyphicon-th"></span>
       {{serverGroup.name}}
       <account-tag account="serverGroup.account" pad="both"></account-tag>
@@ -28,7 +28,7 @@
       </span>
     </div>
     <div ng-if="displayOptions.showInstances">
-      <instances highlight="displayOptions.filter" instances="serverGroup.instances" render-instances-on-scroll="displayOptions.renderInstancesOnScroll"></instances>
+      <instances highlight="displayOptions.filter" instances="serverGroup.instances" provider="serverGroup.type" render-instances-on-scroll="displayOptions.renderInstancesOnScroll"></instances>
     </div>
   </div>
 </div>

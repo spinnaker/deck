@@ -1,0 +1,101 @@
+<div class="details-panel">
+  <div class="header">
+    <div class="close-button">
+      <a class="btn btn-link"
+         ui-sref="^">
+        <span class="glyphicon glyphicon-remove"></span>
+      </a>
+    </div>
+    <div class="header-text">
+      <span class="glyphicon glyphicon-hdd {{instance.isHealthy ? 'healthy' : 'unhealthy'}}"></span>
+      <h3>
+        (GCE) {{instance.instanceId}}
+      </h3>
+    </div>
+    <div>
+      <div class="actions">
+        <div class="dropdown">
+          <button type="button" class="btn btn-sm btn-primary dropdown-toggle" ng-disabled="disabled">
+            Instance Actions <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu" role="menu">
+            <li class="dropdown-header">CONFIG</li>
+            <li><a href ng-click="ctrl.terminateInstance()">Terminate Instance</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="content">
+    <collapsible-section heading="Instance Information" expanded="true">
+      <dl>
+        <dt>Launched:</dt>
+        <dd ng-if="instance.launchTime">{{instance.launchTime | relativeTime}}</dd>
+        <dd ng-if="!instance.launchTime">(Unknown)</dd>
+        <dt>In:</dt>
+        <dd>
+          {{instance.placement.availabilityZone || '(Unknown)'}}
+          <account-tag account="instance.account" pad="left"></account-tag>
+        </dd>
+        <dt>Instance Type:</dt>
+        <dd>{{instance.instanceType || '(Unknown)'}}</dd>
+        <dt ng-if="instance.serverGroup">Server Group:</dt>
+        <dd ng-if="instance.serverGroup">{{instance.serverGroup}}</dd>
+      </dl>
+    </collapsible-section>
+    <collapsible-section heading="Status" expanded="true">
+      <dl class="dl-medium dl-horizontal">
+        <dt ng-repeat-start="metric in healthMetrics">{{metric.type | robotToHuman}}</dt>
+        <dd ng-repeat-end>
+          <span class="glyphicon glyphicon-{{metric.state.toLowerCase()}}-triangle"></span> {{metric.state}}
+        </dd>
+      </dl>
+    </collapsible-section>
+    <div class="content-section" ng-if="instance.notFound">
+      <div class="content-body">
+        <p>Could not find the instance. No other details provided.</p>
+      </div>
+    </div>
+    <collapsible-section heading="DNS" ng-if="!instance.notFound">
+      <dl>
+        <dt>Private DNS Name:</dt>
+        <dd>{{instance.privateDnsName}}</dd>
+        <dt>Private IP Address:</dt>
+        <dd><a href="http://{{instance.privateIpAddress}}" target="_blank">{{instance.privateIpAddress}}</a></dd>
+        <dt ng-if="instance.publicIpAddress">Public IP Address:</dt>
+        <dd ng-if="instance.publicIpAddress">{{instance.publicIpAddress}}</dd>
+      </dl>
+    </collapsible-section>
+    <collapsible-section ng-if="!instance.notFound" heading="Security Groups">
+        <ul>
+          <li ng-repeat="securityGroup in instance.securityGroups | orderBy:'groupName'">
+            <a ui-sref="^.securityGroupDetails({name:securityGroup.groupName, accountId: instance.account, region: instance.region})">
+              {{securityGroup.groupName}} ({{securityGroup.groupId}})
+            </a>
+          </li>
+        </ul>
+    </collapsible-section>
+    <collapsible-section heading="Logs" ng-if="!instance.notFound && instance.privateIpAddress">
+      <ul>
+        <li>
+          <a href="http://{{instance.privateIpAddress}}:7001/AdminLogs/list?view=tomcat/catalina.out" target="_blank">catalina.out</a>
+        </li>
+        <li>
+          <a href="http://{{instance.privateIpAddress}}:7001/AdminLogs/list" target="_blank">Log File Archive</a>
+        </li>
+        <li>
+          <a href="http://{{instance.privateIpAddress}}:7001/AdminLogs/threaddumps" target="_blank">Thread Dumps</a>
+        </li>
+        <li>
+          <a href="http://{{instance.privateIpAddress}}:7001/AdminProxyInfo" target="_blank">Admin Proxy Info</a>
+        </li>
+        <li>
+          <a href="http://{{instance.privateIpAddress}}:7001/AdminProxyStatus" target="_blank">Admin Proxy Status</a>
+        </li>
+        <li>
+          <a href="http://{{instance.privateIpAddress}}:7001/AdminGCViz/index" target="_blank">GC Visualization</a>
+        </li>
+      </ul>
+    </collapsible-section>
+  </div>
+</div>

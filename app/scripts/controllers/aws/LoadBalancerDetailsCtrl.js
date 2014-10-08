@@ -1,10 +1,10 @@
 'use strict';
 
-require('../app');
+require('../../app');
 var angular = require('angular');
 
-angular.module('deckApp')
-  .controller('LoadBalancerDetailsCtrl', function ($scope, $state, notifications, loadBalancer, application, securityGroupService, $modal, _, confirmationModalService, orcaService) {
+angular.module('deckApp.aws')
+  .controller('awsLoadBalancerDetailsCtrl', function ($scope, $state, notifications, loadBalancer, application, securityGroupService, $modal, _, confirmationModalService, orcaService) {
 
     function extractLoadBalancer() {
       $scope.loadBalancer = application.loadBalancers.filter(function (test) {

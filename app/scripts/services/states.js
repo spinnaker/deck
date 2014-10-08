@@ -13,11 +13,17 @@ angular.module('deckApp')
 
       var instanceDetails = {
         name: 'instanceDetails',
-        url: '/instanceDetails?instanceId',
+        url: '/instanceDetails?instanceId&provider',
         views: {
           'detail@home.applications.application.insight': {
-            templateUrl: 'views/application/instanceDetails.html',
-            controller: 'InstanceDetailsCtrl as ctrl'
+            templateUrl: function(stateParams) {
+              var provider = stateParams.provider || 'aws';
+              return 'views/' + provider + '/instanceDetails.html';
+            },
+            controllerProvider: ['$stateParams', function($stateParams) {
+              var provider = $stateParams.provider || 'aws';
+              return provider + 'InstanceDetailsCtrl as ctrl';
+            }]
           }
         },
         resolve: {
@@ -31,11 +37,17 @@ angular.module('deckApp')
 
       var serverGroupDetails = {
         name: 'serverGroup',
-        url: '/serverGroupDetails?serverGroup&accountId&region',
+        url: '/serverGroupDetails?serverGroup&accountId&region&provider',
         views: {
           'detail@home.applications.application.insight': {
-            templateUrl: 'views/application/serverGroupDetails.html',
-            controller: 'ServerGroupDetailsCtrl as ctrl'
+            templateUrl: function(stateParams) {
+              var provider = stateParams.provider || 'aws';
+              return 'views/' + provider + '/serverGroupDetails.html';
+            },
+            controllerProvider: ['$stateParams', function($stateParams) {
+              var provider = $stateParams.provider || 'aws';
+              return provider + 'ServerGroupDetailsCtrl as ctrl';
+            }]
           }
         },
         resolve: {
@@ -51,11 +63,17 @@ angular.module('deckApp')
 
       var loadBalancerDetails = {
         name: 'loadBalancerDetails',
-        url: '/loadBalancerDetails?name&accountId&region',
+        url: '/loadBalancerDetails?name&accountId&region&provider',
         views: {
           'detail@home.applications.application.insight': {
-            templateUrl: 'views/application/loadBalancer/loadBalancerDetails.html',
-            controller: 'LoadBalancerDetailsCtrl as ctrl'
+            templateUrl: function(stateParams) {
+              var provider = stateParams.provider || 'aws';
+              return 'views/' + provider + '/loadBalancerDetails.html';
+            },
+            controllerProvider: ['$stateParams', function($stateParams) {
+              var provider = $stateParams.provider || 'aws';
+              return provider + 'LoadBalancerDetailsCtrl as ctrl';
+            }]
           }
         },
         resolve: {
@@ -74,8 +92,14 @@ angular.module('deckApp')
         url: '/securityGroupDetails?name&accountId&region',
         views: {
           'detail@home.applications.application.insight': {
-            templateUrl: 'views/application/connection/securityGroupDetails.html',
-            controller: 'SecurityGroupDetailsCtrl as ctrl'
+            templateUrl: function(stateParams) {
+              var provider = stateParams.provider || 'aws';
+              return 'views/' + provider + '/securityGroupDetails.html';
+            },
+            controllerProvider: ['$stateParams', function($stateParams) {
+              var provider = $stateParams.provider || 'aws';
+              return provider + 'SecurityGroupDetailsCtrl as ctrl';
+            }]
           }
         },
         resolve: {
