@@ -2,7 +2,7 @@
 
 angular.module('deckApp')
   .constant('settings', {
-    front50Url: 'http://front50-staging.prod.netflix.net',
+    front50Url: 'http://front50-prestaging.prod.netflix.net',
     oortUrl: 'http://oort-prestaging.prod.netflix.net',
     mortUrl: 'http://mort-prestaging.prod.netflix.net',
     pondUrl: 'http://pond-prestaging.prod.netflix.net',

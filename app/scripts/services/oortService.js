@@ -2,7 +2,7 @@
 
 
 angular.module('deckApp')
-  .factory('oortService', function (searchService, settings, $q, Restangular, _, $timeout, clusterService, loadBalancerService, pond, securityGroupService, scheduler, taskTracker, $exceptionHandler/*, scheduledCache*/) {
+  .factory('oortService', function (pipelineService, searchService, settings, $q, Restangular, _, $timeout, clusterService, loadBalancerService, pond, securityGroupService, scheduler, taskTracker, $exceptionHandler/*, scheduledCache*/) {
 
     var applicationListEndpoint = Restangular.withConfig(function(RestangularConfigurer) {
       RestangularConfigurer.setBaseUrl(settings.oortUrl);
@@ -92,6 +92,7 @@ angular.module('deckApp')
       original.loadBalancers = newApplication.loadBalancers;
       original.tasks = newApplication.tasks;
       original.securityGroups = newApplication.securityGroups;
+      original.pipelines = newApplication.pipelines;
       newApplication.accounts = null;
       newApplication.clusters = null;
       newApplication.loadBalancers = null;
@@ -127,10 +128,15 @@ angular.module('deckApp')
             .all('tasks')
             .getList();
 
+          var pipelineLoader = pond.one('applications', applicationName)
+            .all('pipelines')
+            .getList();
+
           return $q.all({
             clusters: clusterLoader,
             loadBalancers: loadBalancerLoader,
             tasks: taskLoader,
+            pipelines: pipelineLoader,
             securityGroups: securityGroupLoader
           })
             .then(function(results) {
@@ -138,9 +144,11 @@ angular.module('deckApp')
               application.serverGroups = _.flatten(_.pluck(results.clusters, 'serverGroups'));
               application.loadBalancers = results.loadBalancers;
               application.tasks = angular.isArray(results.tasks) ? results.tasks : [];
+              application.pipelines = angular.isArray(results.pipelines) ? results.pipelines : [];
               loadBalancerService.normalizeLoadBalancersWithServerGroups(application);
               clusterService.normalizeServerGroupsWithLoadBalancers(application);
               securityGroupService.attachSecurityGroups(application, results.securityGroups, applicationLoader.securityGroups);
+              pipelineService.normalizePipelines(application);
 
               return application;
             }, function(err) {

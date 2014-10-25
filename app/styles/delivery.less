@@ -1,0 +1,73 @@
+@import "app/styles/imports/commonImports.less";
+
+.pipelines {
+  .title {
+    font-weight: bold;
+    font-size: 1.5em;
+    margin-bottom: 15px;
+  }
+  .pipeline {
+    display: block;
+    padding: 15px 0 15px 0;
+    border-left: 2px solid @mid_lighter_grey;
+    .exec-detail {
+      color: @mid_light_ish_grey;
+      padding-right: 0;
+      .exec-id {
+        color: @mid_grey;
+        display: block;
+        font-weight: bold;
+      }
+    }
+    .exec {
+      padding-left: 0;
+      padding-right: 0;
+      .segment {
+        padding: 0;
+        border-left: 2px solid @light_grey;
+        .bar {
+          height: 40px;
+          &.failed {
+            background-image: linear-gradient(@light_unhealthy_red, darken(@light_unhealthy_red, 30%));
+          }
+          &.completed {
+            background-image: linear-gradient(@healthy_green, darken(@healthy_green, 30%));
+          }
+          &.running {
+            background-image: linear-gradient(@spinnaker-blue, darken(@spinnaker-blue, 30%));
+          }
+          &.not_started {
+            border: 1px solid @light_grey;
+            background: linear-gradient(@dreary_grey, @mid_lighter_grey);
+          }
+        }
+        .segment-title {
+          color: @mid_light_ish_grey;
+          line-height: 10px;
+          font-size: 0.9em;
+          padding-left: 5px;
+        }
+        .stage-details-popover {
+          font-size: 0.9em;
+          width: 250px;
+          font-weight: normal;
+          >.title {
+            border-bottom: 1px solid @mid_lighter_grey;
+            display: block;
+            margin-bottom: 5px;
+          }
+          >.attr-holder {
+            margin-bottom: 10px;
+          }
+        }
+      }
+    }
+  }
+  .view-more {
+    border-left: 2px solid @mid_lighter_grey;
+    a {
+      padding-left: 15px;
+      cursor: pointer;
+    }
+  }
+}

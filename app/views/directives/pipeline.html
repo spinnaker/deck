@@ -1,0 +1,17 @@
+<h3 class="title">{{pipeline.name}}</h3>
+<div class="pipeline" ng-repeat="execution in visibleExecutions">
+  <div class="col-sm-2 exec-detail">
+    <span class="exec-id">Exec #{{execution.id}}</span>
+    <span class="date">{{pipeline.startTime | relativeTime}}</span>
+  </div>
+  <div class="col-sm-10 exec">
+    <div class="col-sm-2 segment" ng-repeat="stage in execution.stages" ng-style="getStyleForExecution(execution)">
+      <pipeline-stage-view stage="stage"></pipeline-stage-view>
+    </div>
+  </div>
+  <div class="clearfix"></div>
+</div>
+<div class="view-more" ng-if="lastVisibleExecutionIdx > 0 && executionCount > lastVisibleExecutionIdx">
+  <a ng-click="getMoreExecutions()"><i class="glyphicon glyphicon-circle-arrow-down"></i> View more builds</a>
+</div>
+

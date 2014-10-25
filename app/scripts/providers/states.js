@@ -259,6 +259,17 @@ angular.module('deckApp')
         children: [taskDetails],
       };
 
+      var delivery = {
+        name: 'delivery',
+        url: '/delivery',
+        views: {
+          'insight': {
+            templateUrl: 'views/application/delivery/delivery.html',
+            controller: 'DeliveryCtrl as ctrl'
+          }
+        }
+      };
+
       var application = {
         name: 'application',
         url: '/:application',
@@ -276,6 +287,7 @@ angular.module('deckApp')
         children: [
           insight,
           tasks,
+          delivery
         ],
       };
 
