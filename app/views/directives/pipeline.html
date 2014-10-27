@@ -11,7 +11,7 @@
   </div>
   <div class="clearfix"></div>
 </div>
-<div class="view-more" ng-if="lastVisibleExecutionIdx > 0 && executionCount > lastVisibleExecutionIdx">
+<div class="view-more" ng-if="executionCount > lastVisibleExecutionIdx+4">
   <a ng-click="getMoreExecutions()"><i class="glyphicon glyphicon-circle-arrow-down"></i> View more builds</a>
 </div>
 
