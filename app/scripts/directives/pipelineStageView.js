@@ -41,7 +41,7 @@ angular.module('deckApp')
       getTemplate(scope).then(function(template) {
         var options = {
           content: $compile($(template))(scope),
-          placement: 'bottom',
+          placement: 'top',
           html: true,
           trigger: 'hover'
         };
