@@ -26,10 +26,11 @@ describe('Filter: capitalizeFilter', function() {
   }));
 
   function buildElem(compile, scope) {
-    return compile(angular.element('<div>{{name | capitalize}}</div>'))(scope);
+    return compile(angular.element('<div>{{name | robotToHuman}}</div>'))(scope);
   }
 
   describe('the filter logic', function() {
+
     it('capitalizes the name', function() {
       var scope = this.scope,
           compile = this.compile;
@@ -41,7 +42,30 @@ describe('Filter: capitalizeFilter', function() {
       expect(el.html()).toBe('Foo');
     });
 
-    it('should title case a string', function() {
+    it('should split and title case a camel case name', function() {
+      var scope = this.scope,
+          compile = this.compile;
+
+      scope.name = 'fooBar';
+      scope.$digest();
+      var el = buildElem(compile,scope);
+      scope.$digest();
+      expect(el.html()).toBe('Foo Bar');
+    });
+
+    it('should split and title case a snake case name', function() {
+      var scope = this.scope,
+          compile = this.compile;
+
+      scope.name = 'foo_bar';
+      scope.$digest();
+      var el = buildElem(compile,scope);
+      scope.$digest();
+      expect(el.html()).toBe('Foo Bar');
+    });
+
+
+    it('should not title case a string, only capitalize the first letter', function() {
       var scope = this.scope,
           compile = this.compile;
 
@@ -49,7 +73,7 @@ describe('Filter: capitalizeFilter', function() {
       scope.$digest();
       var el = buildElem(compile,scope);
       scope.$digest();
-      expect(el.html()).toBe('Foo Bar');
+      expect(el.html()).toBe('Foo bar');
     });
   });
 });
