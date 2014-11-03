@@ -22,6 +22,7 @@ angular.module('deckApp')
 
       formattedInput = formattedInput.replace(/([A-Z])\s([A-Z])\s/g, '$1$2');
 
-      return formattedInput;
+      // trim added whitespace
+      return formattedInput.trim();
     };
   });

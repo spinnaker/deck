@@ -1,0 +1,38 @@
+<div class="stage-details-popover">
+<div class="title">Stage Details</div>
+<div class="attr-holder">
+  <div class="attr">
+    <span class="pull-left key">Name</span>
+    <span class="pull-right val">{{stage.name | capitalize}}</span>
+    <div class="clearfix"></div>
+  </div>
+  <div class="attr">
+    <span class="pull-left key">Status</span>
+    <span class="pull-right val">{{stage.status}}</span>
+    <div class="clearfix"></div>
+  </div>
+  <div class="attr">
+    <span class="pull-left key">Start Time</span>
+    <span class="pull-right val">{{stage.startTime | relativeTime}}</span>
+    <div class="clearfix"></div>
+  </div>
+  <div class="attr">
+    <span class="pull-left key">End Time</span>
+    <span class="pull-right val">{{stage.endTime | relativeTime}}</span>
+    <div class="clearfix"></div>
+  </div>
+</div>
+<div class="title">Steps</div>
+<div class="step-details" ng-repeat="step in stage.steps">
+  <div class="attr">
+    <div class="pull-left key">
+      <span class="glyphicon glyphicon-{{step.status.indexOf('FAILED') === 0 ? 'remove-circle' : step.status.indexOf('EXECUTING') == 0 ? 'asterisk' : 'ok-circle'}} {{step.status.indexOf('EXECUTING') == 0 ? 'glyphicon-spinning' : ''}}"></span>
+      <span class="step-name">{{step.name}}</span>
+    </div>
+    <div class="pull-right key">
+      <span class="pull-right step-duration" ng-if="step.endTime">{{getDuration(step) | duration}}</span>
+    </div>
+    <div class="clearfix"></div>
+  </div>
+</div>
+</div>

@@ -71,7 +71,7 @@ angular.module('deckApp')
         $scope.partiallyLoaded = true;
         $scope.applicationsLoaded = true;
       }
-    });
+    }); 
 
     this.filterApplications = function filterApplications() {
       var filtered = $filter('filter')($scope.applications, {name: $scope.applicationFilter}),

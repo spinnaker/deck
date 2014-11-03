@@ -1,0 +1,10 @@
+<div class="pipelines">
+  <div class="col-md-12" ng-if="application.pipelines.length == 0">
+    <span class="glyphicon glyphicon-warning-sign"></span>
+    There are no pipelines to display.
+  </div>
+  <div class="col-md-12" ng-repeat="pipeline in application.pipelines">
+    <pipeline-view pipeline="pipeline"></pipeline-view>
+  </div>
+  <div class="clearfix"></div>
+</div>
