@@ -9,7 +9,7 @@ angular.module('deckApp')
     });
 
     function findImages(query, region, account) {
-      return gateEndpoint.all('images/' + account).getList({provider: 'gce'}, {}).then(function(results) {
+      return gateEndpoint.all('images/find').getList({account: account, provider: 'gce'}, {}).then(function(results) {
           return results;
         },
         function() {
