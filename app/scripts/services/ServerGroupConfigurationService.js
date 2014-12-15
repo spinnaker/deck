@@ -11,7 +11,7 @@ angular.module('deckApp')
       if (command.viewState.disableImageSelection) {
         imageLoader = $q.when(null);
       } else {
-        imageLoader = command.viewState.imageId ? loadImagesFromAmi(command) : loadImagesFromApplicationName(application, command.selectedProvider);
+        imageLoader = command.viewState.imageId ? loadImagesFromAmi(command) : loadImagesFromApplicationName(application, command.selectedProvider, command.region, command.credentials);
       }
 
       return $q.all({
@@ -31,8 +31,8 @@ angular.module('deckApp')
       });
     }
 
-    function loadImagesFromApplicationName(application, provider) {
-      return imageService.findImages(provider, application.name);
+    function loadImagesFromApplicationName(application, provider, region, account) {
+      return imageService.findImages(provider, application.name, region, account);
     }
 
     function loadImagesFromAmi(command) {
@@ -44,7 +44,7 @@ angular.module('deckApp')
           var match = packageRegex.exec(namedImage.imageName);
           var packageBase = match[1];
 
-          return imageService.findImages(command.selectedProvider, packageBase);
+          return imageService.findImages(command.selectedProvider, packageBase, command.region, command.credentials);
         },
         function() {
           return [];

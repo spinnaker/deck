@@ -291,7 +291,7 @@ describe('Controller: awsCloneServerGroup', function () {
 
       expect($scope.command.viewState.useAllImageSelection).toBeFalsy();
       expect(this.imageService.getAmi).toHaveBeenCalledWith('aws', serverGroup.viewState.imageId, serverGroup.region, serverGroup.credentials);
-      expect(this.imageService.findImages).toHaveBeenCalledWith('aws', 'something');
+      expect(this.imageService.findImages).toHaveBeenCalledWith('aws', 'something', 'us-east-1', 'prod');
 
       expect($scope.command.backingData.filtered.images.length).toBe(1);
       expect($scope.command.backingData.filtered.images[0]).toEqual({imageName: 'something-packagebase', ami: 'ami-1234'});

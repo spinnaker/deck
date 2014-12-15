@@ -20,6 +20,7 @@ angular.module('deckApp')
       if (query.length < 3) {
         return $q.when([{message: 'Please enter at least 3 characters...'}]);
       }
+
       return gateEndpoint.all('images/find').withHttpConfig({cache: scheduledCache}).getList(params, {}).then(function(results) {
           return results;
         },
