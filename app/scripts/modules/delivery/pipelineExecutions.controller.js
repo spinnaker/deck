@@ -81,6 +81,13 @@ angular.module('deckApp.delivery')
     };
 
     executionsService.getAll().then(function(e) {
+      e.forEach(function(execution) {
+        execution.stages.forEach(function(stage) {
+          if (!stage.name || stage.name === 'null') {
+            stage.name = stage.type;
+          }
+        });
+      });
       $scope.filter.stage.max = e.reduce(function(acc, execution) {
         return execution.stages.length > acc ? execution.stages.length : acc;
       }, 0);
