@@ -38,7 +38,7 @@ angular.module('deckApp.gce.loadBalancer.transformer.service', [
 
     function convertLoadBalancerForEditing(loadBalancer) {
       var toEdit = {
-        providerType: 'gce',
+        provider: 'gce',
         editMode: true,
         region: loadBalancer.region,
         credentials: loadBalancer.account,
@@ -90,7 +90,7 @@ angular.module('deckApp.gce.loadBalancer.transformer.service', [
 
     function constructNewLoadBalancerTemplate() {
       return {
-        providerType: 'gce',
+        provider: 'gce',
         stack: '',
         detail: 'frontend',
         credentials: settings.defaults.account,

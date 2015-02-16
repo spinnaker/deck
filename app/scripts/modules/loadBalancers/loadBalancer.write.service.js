@@ -16,7 +16,7 @@ angular
             loadBalancerName: loadBalancer.name,
             regions: [loadBalancer.region],
             credentials: loadBalancer.accountId,
-            providerType: loadBalancer.providerType
+            providerType: loadBalancer.provider
           }
         ],
         application: application,
@@ -31,6 +31,7 @@ angular
 
     function upsertLoadBalancer(loadBalancer, application, descriptor) {
       var name = loadBalancer.clusterName || loadBalancer.name;
+      loadBalancer.providerType = loadBalancer.provider;
       if (loadBalancer.healthCheckProtocol.indexOf('HTTP') === 0) {
         loadBalancer.healthCheck = loadBalancer.healthCheckProtocol + ':' + loadBalancer.healthCheckPort + loadBalancer.healthCheckPath;
       } else {

@@ -77,7 +77,7 @@ angular.module('deckApp.loadBalancer.gce.details.controller',[
       };
 
       var submitMethod = function () {
-        loadBalancer.providerType = $scope.loadBalancer.provider;
+        loadBalancer.provider = $scope.loadBalancer.provider;
         return loadBalancerWriter.deleteLoadBalancer(loadBalancer, application);
       };
 
