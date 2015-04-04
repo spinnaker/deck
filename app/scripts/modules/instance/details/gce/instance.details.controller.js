@@ -61,14 +61,22 @@ angular.module('deckApp.instance.detail.gce.controller', [
 
       if (instanceSummary && account && region) {
         instanceReader.getInstanceDetails(account, region, instance.instanceId).then(function(details) {
+          details = details.plain();
           $scope.state.loading = false;
-          $scope.instance = angular.extend(details.plain(), instanceSummary);
           extractHealthMetrics(instanceSummary, details);
+          $scope.instance = _.defaults(details, instanceSummary);
           $scope.instance.account = account;
           $scope.instance.region = region;
           $scope.instance.vpcId = vpcId;
           $scope.instance.loadBalancers = loadBalancers;
           $scope.baseIpAddress = details.publicDnsName || details.privateIpAddress;
+
+          $scope.instance.internalDnsName = $scope.instance.instanceId;
+          $scope.instance.internalIpAddress = $scope.instance.networkInterfaces[0].networkIP;
+          $scope.instance.externalIpAddress = $scope.instance.networkInterfaces[0].accessConfigs[0].natIP;
+
+          $scope.instance.sshLink =
+            $scope.instance.selfLink.replace('www.googleapis.com/compute/v1', 'cloudssh.developers.google.com') + '?authuser=0&hl=en_US';
         },
         function() {
           // When an instance is first starting up, we may not have the details cached in oort yet, but we still
