@@ -5,10 +5,16 @@
         <dl class="dl-narrow dl-horizontal">
           <dt>Account</dt>
           <dd>
-            <account-tag account="stage.context.credentials" provider="'aws'"></account-tag>
+            <account-tag account="stage.context.credentials" provider="stage.providerType || 'aws'"></account-tag>
           </dd>
-          <dt ng-if="stage.context.regions">Region</dt>
-          <dd ng-if="stage.context.regions">{{stage.context.regions.join(', ')}}</dd>
+          <div ng-if="stage.context.regions && stage.context.regions.length > 0">
+            <dt >Region</dt>
+            <dd ng-if="stage.context.regions">{{stage.context.regions.join(', ')}}</dd>
+          </div>
+          <div ng-if="stage.context.zones && stage.context.zones.length > 0">
+            <dt>Zones</dt>
+            <dd>{{stage.context.zones.join(', ')}}</dd>
+          </div>
           <dt>Cluster</dt>
           <dd>{{stage.context.cluster}}</dd>
           <dt>Server Group</dt>
