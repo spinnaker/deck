@@ -12,16 +12,20 @@
   <div class="form-group">
     <label class="col-md-2 col-md-offset-1 sm-label-left">Account</label>
     <div class="col-md-6">
-      <account-select-field component="stage" field="credentials" accounts="accounts" provider="'aws'" on-change="resizeAsgStageCtrl.accountUpdated()" required></account-select-field>
+      <account-select-field component="stage" field="credentials" accounts="accounts" on-change="resizeAsgStageCtrl.accountUpdated()" required></account-select-field>
     </div>
   </div>
   <div class="form-group">
-    <label class="col-md-2 col-md-offset-1 sm-label-left">Regions</label>
+    <label class="col-md-2 col-md-offset-1 sm-label-left" ng-if="stage.providerType !== 'gce'">Regions</label>
+    <label class="col-md-2 col-md-offset-1 sm-label-left" ng-if="stage.providerType === 'gce'">Zones</label>
     <div class="col-md-6" ng-if="!stage.credentials">
       <p class="form-control-static">(Select an Account)</p>
     </div>
-    <div class="col-md-6" ng-if="stage.credentials">
+    <div class="col-md-6" ng-if="stage.credentials && stage.providerType !== 'gce'">
       <checklist items="regions" model="stage.regions" inline="true" include-select-all-button="true"></checklist>
+    </div>
+    <div class="col-md-6" ng-if="stage.credentials && stage.providerType === 'gce'">
+      <checklist items="zones" model="stage.zones" inline="true" include-select-all-button="false"></checklist>
     </div>
   </div>
   </div>

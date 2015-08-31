@@ -6,12 +6,24 @@
         <dl class="dl-narrow dl-horizontal">
           <dt>Account</dt>
           <dd><account-tag account="stage.context.credentials"></account-tag></dd>
-          <dt>Region</dt>
-          <dd>{{stage.context.regions.join(',')}}</dd>
+          <div ng-if="stage.context.regions && stage.context.regions.length > 0">
+            <dt >Region</dt>
+            <dd ng-if="stage.context.regions">{{stage.context.regions.join(', ')}}</dd>
+          </div>
+          <div ng-if="stage.context.zones && stage.context.zones.length > 0">
+            <dt>Zones</dt>
+            <dd>{{stage.context.zones.join(', ')}}</dd>
+          </div>
           <dt>Server Group</dt>
           <dd>{{stage.context.asgName}}</dd>
-          <dt>Capacity</dt>
-          <dd>{{stage.context.capacity.min}} / {{stage.context.capacity.desired}} / {{stage.context.capacity.max}}</dd>
+          <div ng-if="!stage.context.numReplicas">
+            <dt>Capacity</dt>
+            <dd>{{stage.context.capacity.min}} / {{stage.context.capacity.desired}} / {{stage.context.capacity.max}}</dd>
+          </div>
+          <div ng-if="stage.context.numReplicas">
+            <dt>Replicas</dt>
+            <dd>{{stage.context.numReplicas}}</dd>
+          </div>
         </dl>
       </div>
     </div>
