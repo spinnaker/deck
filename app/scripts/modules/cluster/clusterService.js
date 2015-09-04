@@ -8,7 +8,7 @@ module.exports = angular.module('spinnaker.cluster.service', [
   require('../vpc/vpc.read.service.js'),
   require('../naming/naming.service.js'),
   require('exports?"restangular"!imports?_=lodash!restangular'),
-  require('../utils/lodash.js'),
+  require('utils:lodash'),
 ])
   .factory('clusterService', function ($q, Restangular, _, vpcReader, namingService) {
 

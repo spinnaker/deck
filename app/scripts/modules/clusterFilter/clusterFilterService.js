@@ -6,7 +6,7 @@ module.exports = angular
   .module('cluster.filter.service', [
     require('angular-ui-router'),
     require('./clusterFilterModel.js'),
-    require('../utils/lodash.js'),
+    require('utils:lodash'),
     require('../utils/waypoints/waypoint.service.js'),
     require('../filterModel/filter.model.service.js'),
   ])

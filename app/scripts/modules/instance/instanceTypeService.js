@@ -4,7 +4,7 @@ let angular = require('angular');
 
 module.exports = angular.module('spinnaker.instanceType.service', [
   require('../caches/deckCacheFactory.js'),
-  require('../utils/lodash.js'),
+  require('utils:lodash'),
   require('./awsInstanceTypeService.js'),
   require('./gceInstanceTypeService.js'),
 ])

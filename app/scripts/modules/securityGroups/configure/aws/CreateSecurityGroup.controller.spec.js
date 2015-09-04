@@ -4,7 +4,7 @@ describe('Controller: CreateSecurityGroup', function () {
 
   beforeEach(
     window.module(
-      require('../../../utils/lodash.js'),
+      require('utils:lodash'),
       require('./CreateSecurityGroupCtrl.js'),
       require('./ConfigSecurityGroupMixin.controller.js')
     )

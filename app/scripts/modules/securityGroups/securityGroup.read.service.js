@@ -8,9 +8,9 @@ module.exports = angular.module('spinnaker.securityGroup.read.service', [
   require('../caches/deckCacheFactory.js'),
   require('../search/search.service.js'),
   require('../naming/naming.service.js'),
-  require('../utils/lodash.js'),
+  require('utils:lodash'),
   require('../caches/scheduledCache.js'),
-  require('../caches/infrastructureCaches.js'),
+  require('cache:infrastructure'),
   require('../vpc/vpc.read.service.js'),
 ])
   .factory('securityGroupReader', function ($q, $exceptionHandler, $log, Restangular, searchService, _, namingService,

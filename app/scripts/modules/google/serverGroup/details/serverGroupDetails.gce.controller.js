@@ -10,7 +10,7 @@ module.exports = angular.module('spinnaker.serverGroup.details.gce.controller', 
   require('../../../confirmationModal/confirmationModal.service.js'),
   require('../../../serverGroups/serverGroup.write.service.js'),
   require('../../../serverGroups/configure/common/runningExecutions.service.js'),
-  require('../../../utils/lodash.js'),
+  require('utils:lodash'),
   require('../../../insight/insightFilterState.model.js'),
 ])
   .controller('gceServerGroupDetailsCtrl', function ($scope, $state, $templateCache, $compile, app, serverGroup, InsightFilterStateModel,

@@ -60,9 +60,13 @@ module.exports = {
   resolve: {
     //root: [nodeModulePath, bowerModulePath],
     alias: {
-      //lodash: 'utils/lodash.js'
-      //angular: 'imports?window={}!exports?window.angular!angular/angular.js',
       //uiselect: 'angular-ui-select/dist/select.js'
+      'cloud:registry': path.join(__dirname, '/app/scripts/modules/core/cloudProvider/cloudProvider.registry.js'),
+      'utils:jquery': path.join(__dirname, '/app/scripts/modules/utils/jQuery.js'),
+      'utils:lodash': path.join(__dirname, '/app/scripts/modules/utils/lodash.js'),
+      'utils:moment': path.join(__dirname, '/app/scripts/modules/utils/moment.js'),
+      'cache:infrastructure': path.join(__dirname, 'app/scripts/modules/caches/infrastructureCaches.js'),
+      'reader:loadBalancer': path.join(__dirname, '/app/scripts/modules/loadBalancer/loadBalancer.read.service.js'),
     }
   },
   resolveLoader: {
