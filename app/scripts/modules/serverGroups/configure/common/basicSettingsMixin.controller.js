@@ -7,7 +7,7 @@ module.exports = angular
     require('exports?"ui.bootstrap"!angular-bootstrap'),
     require('angular-ui-router'),
     require('../../../utils/rx.js'),
-    require('../../../utils/lodash.js'),
+    require('utils:lodash'),
     require('../../../naming/naming.service.js'),
     require('../../../image/imageService.js')
   ])

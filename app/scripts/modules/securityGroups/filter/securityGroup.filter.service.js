@@ -5,7 +5,7 @@ let angular = require('angular');
 module.exports = angular
   .module('securityGroup.filter.service', [
     require('./securityGroup.filter.model.js'),
-    require('../../utils/lodash.js'),
+    require('utils:lodash'),
     require('../../utils/waypoints/waypoint.service.js'),
     require('../../filterModel/filter.model.service.js'),
   ])

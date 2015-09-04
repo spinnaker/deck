@@ -7,7 +7,7 @@ module.exports = angular
     require('./fastProperty.read.service.js'),
     require('./fastProperty.write.service.js'),
     require('./fastPropertyTransformer.service.js'),
-    require('../utils/lodash.js'),
+    require('utils:lodash'),
   ])
   .controller('FastPropertyRolloutController', function ($scope, fastPropertyReader, fastPropertyWriter, fastPropertyTransformer, _) {
     var vm = this;

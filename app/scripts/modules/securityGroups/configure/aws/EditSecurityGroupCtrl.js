@@ -5,7 +5,7 @@ let angular = require('angular');
 module.exports = angular.module('spinnaker.securityGroup.aws.edit.controller', [
   require('angular-ui-router'),
   require('../../../account/accountService.js'),
-  require('../../../caches/infrastructureCaches.js'),
+  require('cache:infrastructure'),
   require('../../../caches/cacheInitializer.js'),
   require('../../../tasks/monitor/taskMonitorService.js'),
   require('../../securityGroup.write.service.js'),

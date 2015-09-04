@@ -3,7 +3,7 @@
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.pipelines.create.controller', [
-  require('../../../../utils/lodash.js'),
+  require('utils:lodash'),
   require('../../services/pipelineConfigService.js'),
   require('../../../../utils/scrollTo/scrollTo.service.js'),
 ])

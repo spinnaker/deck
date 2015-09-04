@@ -6,7 +6,7 @@ module.exports = angular.module('spinnaker.pipelines.config.trigger.jenkins', [
   require('../trigger.directive.js'),
   require('../../../../jenkins/index.js'), //igorService BEN_TODO
   require('../../../../caches/cacheInitializer.js'),
-  require('../../../../caches/infrastructureCaches.js'),
+  require('cache:infrastructure'),
   require('../../pipelineConfigProvider.js'),
   require('../../../../utils/timeFormatters.js')
 ])

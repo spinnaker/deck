@@ -3,7 +3,7 @@
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.orchestratedItem.service', [
-  require('../utils/moment.js')
+  require('utils:moment')
 ])
   .factory('orchestratedItemTransformer', function(momentService, $log) {
     function defineProperties(item) {

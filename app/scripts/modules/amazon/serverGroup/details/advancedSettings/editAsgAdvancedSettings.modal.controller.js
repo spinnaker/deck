@@ -3,7 +3,7 @@
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.serverGroup.details.aws.advancedSettings.editAsgAdvancedSettings.modal.controller', [
-  require('../../../../utils/lodash.js'),
+  require('utils:lodash'),
   require('../../../../tasks/monitor/taskMonitor.module.js'),
   require('../../../../tasks/taskExecutor.js'),
   require('../../configure/serverGroupCommandBuilder.service.js'),

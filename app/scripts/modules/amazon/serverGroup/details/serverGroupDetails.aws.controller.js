@@ -8,7 +8,7 @@ let angular = require('angular');
 module.exports = angular.module('spinnaker.serverGroup.details.aws.controller', [
   require('../../../confirmationModal/confirmationModal.service.js'),
   require('../../../serverGroups/serverGroup.write.service.js'),
-  require('../../../utils/lodash.js'),
+  require('utils:lodash'),
   require('../../../vpc/vpcTag.directive.js'),
   require('./scalingProcesses/autoScalingProcess.service.js'),
   require('../../../serverGroups/serverGroup.read.service.js'),

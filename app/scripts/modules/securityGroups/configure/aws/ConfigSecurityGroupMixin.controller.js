@@ -10,7 +10,7 @@ module.exports = angular
     require('../../../account/accountService.js'),
     require('../../../vpc/vpc.read.service.js'),
     require('../../../modal/wizard/modalWizard.directive.js'),
-    require('../../../utils/lodash.js'),
+    require('utils:lodash'),
   ])
   .controller('ConfigSecurityGroupMixin', function ($scope,
                                                              $state,

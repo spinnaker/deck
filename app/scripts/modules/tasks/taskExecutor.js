@@ -9,7 +9,7 @@ module.exports = angular.module('spinnaker.taskExecutor.service', [
   require('../authentication/authentication.module.js'),
   require('../authentication/authenticationService.js'),
   require('../caches/scheduledCache.js'),
-  require('../caches/infrastructureCaches.js'),
+  require('cache:infrastructure'),
   require('./tasks.read.service.js'),
   require('./tasks.write.service.js'),
 ])

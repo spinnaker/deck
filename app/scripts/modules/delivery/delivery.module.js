@@ -31,7 +31,7 @@ module.exports = angular.module('spinnaker.delivery', [
 
   require('../caches/deckCacheFactory.js'),
   require('../utils/appendTransform.js'),
-  require('../utils/lodash.js'),
-  require('../utils/moment.js'),
+  require('utils:lodash'),
+  require('utils:moment'),
   require('../utils/rx.js'),
 ]).name;

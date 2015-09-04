@@ -4,7 +4,7 @@ let angular = require('angular');
 
 module.exports = angular
   .module('spinnaker.securityGroup.write.service', [
-    require('../caches/infrastructureCaches.js'),
+    require('cache:infrastructure'),
     require('../tasks/taskExecutor.js')
   ])
   .factory('securityGroupWriter', function (taskExecutor, infrastructureCaches) {

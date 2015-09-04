@@ -6,7 +6,7 @@ module.exports = angular.module('spinnaker.states', [
   require('angular-ui-router'),
   require('./stateHelper.provider.js'),
   require('../delivery/states.js'),
-  require('../core/cloudProvider/cloudProvider.registry.js'),
+  require('cloud:registry'),
 ])
   .provider('states', function($stateProvider, $urlRouterProvider, stateHelperProvider, deliveryStates) {
     this.setStates = function() {

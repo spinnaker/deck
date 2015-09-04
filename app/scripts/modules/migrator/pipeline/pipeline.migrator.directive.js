@@ -9,7 +9,7 @@ module.exports = angular
     require('../../subnet/subnet.read.service.js'),
     require('../../config/settings.js'),
     require('../migrator.service.js'),
-    require('../../utils/lodash.js'),
+    require('utils:lodash'),
     require('../../core/presentation/autoScroll/autoScroll.directive.js'),
     require('../../pipelines/config/services/pipelineConfigService.js'),
     require('../../utils/scrollTo/scrollTo.service.js'),
