@@ -4,11 +4,11 @@ describe('Controller: ServerGroupCapacitySelector', function () {
 
   beforeEach(
     window.module(
-      require('./serverGroupCapacitySelector.directive.js')
+      require('./ServerGroupCapacity.controller.js')
     )
   );
 
-  beforeEach(window.inject(function ($controller, $rootScope) {
+  beforeEach(window.inject(function ($controller, $rootScope, modalWizardService) {
     this.scope = $rootScope.$new();
 
     this.scope.command = {
@@ -22,9 +22,12 @@ describe('Controller: ServerGroupCapacitySelector', function () {
       }
     };
 
-    this.ctrl = $controller('ServerGroupCapacitySelectorCtrl', {
+    spyOn(modalWizardService, 'getWizard').and.returnValue( { markComplete: angular.noop, markClean: angular.noop });
+
+    this.ctrl = $controller('awsServerGroupCapacityCtrl', {
       $scope: this.scope,
     });
+
   }));
 
 
