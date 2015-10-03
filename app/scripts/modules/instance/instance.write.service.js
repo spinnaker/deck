@@ -39,6 +39,7 @@ module.exports = angular
                 region: instance.region,
                 credentials: instance.account,
                 providerType: instance.providerType,
+                cloudProvider: instance.providerType,
                 adjustMinIfNecessary: true,
                 setMaxToNewDesired: setMaxToNewDesired,
               }
@@ -74,6 +75,7 @@ module.exports = angular
       params.region = instance.region;
       params.credentials = instance.account;
       params.providerType = instance.providerType;
+      params.cloudProvider = instance.providerType;
 
       return taskExecutor.executeTask({
         job: [params],
@@ -89,6 +91,7 @@ module.exports = angular
       params.region = instance.region;
       params.credentials = instance.account;
       params.providerType = instance.providerType;
+      params.cloudProvider = instance.providerType;
 
       return taskExecutor.executeTask({
         job: [params],
@@ -105,7 +108,8 @@ module.exports = angular
             instanceIds: [instance.instanceId],
             region: instance.region,
             credentials: instance.account,
-            providerType: instance.providerType
+            providerType: instance.providerType,
+            cloudProvider: instance.providerType,
           }
         ],
         application: application,
@@ -121,7 +125,8 @@ module.exports = angular
             instanceIds: [instance.instanceId],
             region: instance.region,
             credentials: instance.account,
-            providerType: instance.providerType
+            providerType: instance.providerType,
+            cloudProvider: instance.providerType,
           }
         ],
         application: application,

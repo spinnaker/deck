@@ -95,6 +95,12 @@ window.spinnakerSettings = {
           'sa-east-1': ['sa-east-1a', 'sa-east-1b']
         }
       }
+    },
+    titan: {
+      defaults: {
+        account: 'titantest',
+        region: 'us-east-1'
+      }
     }
   },
   whatsNew: {

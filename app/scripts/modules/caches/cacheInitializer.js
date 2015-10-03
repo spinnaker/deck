@@ -38,18 +38,21 @@ module.exports = angular.module('spinnaker.caches.initializer', [
         setConfigDefaults(key, cacheConfig[key]);
       });
       cloudProviderRegistry.listRegisteredProviders().forEach((provider) => {
-        let providerConfig = serviceDelegate.getDelegate(provider, 'cache.configurer');
-        if (providerConfig) {
-          Object.keys(providerConfig).forEach(function(key) {
-            setConfigDefaults(key, providerConfig[key]);
-            if (!cacheConfig[key]) {
-              cacheConfig[key] = providerConfig[key];
-            }
-            cacheConfig[key].initializers = _.uniq((cacheConfig[key].initializers).concat(providerConfig[key].initializers));
-            cacheConfig[key].version = Math.max(cacheConfig[key].version, providerConfig[key].version);
-            cacheConfig[key].maxAge = Math.min(cacheConfig[key].maxAge, providerConfig[key].maxAge);
+        try {
+          let providerConfig = serviceDelegate.getDelegate(provider, 'cache.configurer');
+          if (providerConfig) {
+            Object.keys(providerConfig).forEach(function(key) {
+              setConfigDefaults(key, providerConfig[key]);
+              if (!cacheConfig[key]) {
+                cacheConfig[key] = providerConfig[key];
+              }
+              cacheConfig[key].initializers = _.uniq((cacheConfig[key].initializers).concat(providerConfig[key].initializers));
+              cacheConfig[key].version = Math.max(cacheConfig[key].version, providerConfig[key].version);
+              cacheConfig[key].maxAge = Math.min(cacheConfig[key].maxAge, providerConfig[key].maxAge);
 
-          });
+            });
+          }} catch(e) {
+          console.warn(e);
         }
       });
     }
