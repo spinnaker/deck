@@ -100,7 +100,9 @@ window.spinnakerSettings = {
       defaults: {
         account: 'titantest',
         region: 'us-east-1'
-      }
+      },
+      primaryAccounts: ['test'],
+      primaryRegions: ['us-east-1'],
     }
   },
   whatsNew: {
