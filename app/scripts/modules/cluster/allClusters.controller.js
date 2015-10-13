@@ -60,7 +60,7 @@ module.exports = angular.module('clusters.all', [
     };
 
     this.createServerGroup = function createServerGroup() {
-      providerSelectionService.selectProvider().then(function(selectedProvider) {
+      providerSelectionService.selectProvider(app).then(function(selectedProvider) {
         let provider = cloudProviderRegistry.getValue(selectedProvider, 'serverGroup');
         $modal.open({
           templateUrl: provider.cloneServerGroupTemplateUrl,
