@@ -6,7 +6,7 @@ require('./bleskOverrides.css');
 
 // TODO: Move to external plugins
 module.exports = angular.module('spinnaker.netflix.blesk', [
-  require('../../core/config/settings.js'),
+  require('../../core/featureFlags'),
 ])
   .factory('blesk', function() {
     function initialize() {
@@ -22,8 +22,8 @@ module.exports = angular.module('spinnaker.netflix.blesk', [
       initialize: initialize,
     };
   })
-  .run(function(settings, blesk, $timeout) {
-    if (settings.feature && settings.feature.blesk) {
+  .run(function(featureFlagProvider, blesk, $timeout) {
+    if (featureFlagProvider.get('blesk')) {
       // putting a delay on initialization so authentication can take place and dom can finish loading.
       $timeout(blesk.initialize, 5000);
     }

@@ -7,8 +7,9 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.canary.actions.ov
   require('../../../../../utils/lodash.js'),
   require('../../../../../delivery/details/executionDetailsSection.service.js'),
   require('../../../../../delivery/details/executionDetailsSectionNav.directive.js'),
+  require('../../../../../apiHost'),
 ])
-  .controller('EndCanaryCtrl', function ($scope, $http, $modalInstance, settings, canaryId, _) {
+  .controller('EndCanaryCtrl', function ($scope, $http, $modalInstance, apiHostProvider, canaryId, _) {
 
     $scope.command = {
       reason: null,
@@ -19,7 +20,7 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.canary.actions.ov
 
     this.endCanary = function() {
       $scope.state = 'submitting';
-      var targetUrl = [settings.gateUrl, 'canaries', canaryId, 'end'].join('/');
+      var targetUrl = [apiHostProvider.baseUrl(), 'canaries', canaryId, 'end'].join('/');
       $http.put(targetUrl, $scope.command)
         .success(function() {
           $scope.state = 'success';

@@ -9,13 +9,13 @@ module.exports = angular
     require('angular-ui-bootstrap'),
     require('../../../amazon/vpc/vpc.read.service.js'),
     require('../../../amazon/subnet/subnet.read.service.js'),
-    require('../../../core/config/settings.js'),
     require('../migrator.service.js'),
     require('../../../core/utils/lodash.js'),
     require('../../../core/presentation/autoScroll/autoScroll.directive.js'),
     require('../../../core/pipeline/config/services/pipelineConfigService.js'),
     require('../../../core/utils/scrollTo/scrollTo.service.js'),
     require('../../../core/cache/cacheInitializer.js'),
+    require('../../../core/featureFlags'),
   ])
   .directive('pipelineMigrator', function () {
     return {
@@ -30,7 +30,7 @@ module.exports = angular
       controllerAs: 'migratorActionCtrl',
     };
   })
-  .controller('PipelineMigratorActionCtrl', function ($scope, $uibModal, vpcReader, settings, subnetReader, _) {
+  .controller('PipelineMigratorActionCtrl', function ($scope, $uibModal, vpcReader, featureFlagProvider, subnetReader, _) {
 
     $scope.showAction = false;
 
@@ -63,7 +63,7 @@ module.exports = angular
       };
     }
 
-    if (settings.feature.vpcMigrator) {
+    if (featureFlagProvider.get('vpcMigrator')) {
       subnetReader.listSubnets().then(function (loadedSubnets) {
         subnets = loadedSubnets;
         var stages = $scope.pipeline.stages || [];

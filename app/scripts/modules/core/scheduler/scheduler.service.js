@@ -4,15 +4,30 @@ let angular = require('angular');
 
 module.exports = angular.module('spinnaker.core.scheduler', [
   require('../utils/rx.js'),
-  require('../config/settings.js')
 ])
-  .factory('scheduler', function(RxService, settings, $q, $log, $window, $timeout) {
+  .provider('pollScheduleProvider', function() {
+    let pollSchedule = 30000;
+    this.$get = function() {
+      return {
+        get() {
+          if (pollSchedule === null) {
+            throw ("Polling schedule not set. Set with pollScheduleProvider#set");
+          }
+          return pollSchedule;
+        },
+        set(n) {
+          pollSchedule = n;
+        },
+      };
+    };
+  })
+  .factory('scheduler', function(RxService, pollScheduleProvider, $q, $log, $window, $timeout) {
     var scheduler = new RxService.Subject();
 
     let lastRun = new Date().getTime();
 
     let source = RxService.Observable
-      .timer(0, settings.pollSchedule)
+      .timer(0, pollScheduleProvider.get())
       .pausable(scheduler);
 
     let runner = () => {
@@ -31,10 +46,10 @@ module.exports = angular.module('spinnaker.core.scheduler', [
     let resumeScheduler = () => {
       let now = new Date().getTime();
       $log.debug('auto refresh resumed');
-      if (now - lastRun > settings.pollSchedule) {
+      if (now - lastRun > pollScheduleProvider.get()) {
         source.resume();
       } else {
-        $timeout(() => source.resume(), settings.pollSchedule - (now - lastRun));
+        $timeout(() => source.resume(), pollScheduleProvider.get() - (now - lastRun));
       }
     };
 
@@ -50,7 +65,7 @@ module.exports = angular.module('spinnaker.core.scheduler', [
     let scheduleImmediate = () => {
       runner();
       source.pause();
-      $timeout(() => source.resume(), settings.pollSchedule);
+      $timeout(() => source.resume(), pollScheduleProvider.get());
     };
 
     document.addEventListener('visibilitychange', watchDocumentVisibility);

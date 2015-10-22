@@ -6,10 +6,11 @@ module.exports = angular.module('spinnaker.core.delivery.executions.service', [
   require('../scheduler/scheduler.service.js'),
   require('../cache/deckCacheFactory.js'),
   require('../utils/appendTransform.js'),
-  require('./executions.transformer.service.js')
+  require('./executions.transformer.service.js'),
+  require('../apiHost'),
 ])
   .factory('executionService', function($stateParams, $http, $timeout, $q, $log,
-                                         scheduler, settings, appendTransform, executionsTransformer) {
+                                        scheduler, apiHostProvider, appendTransform, executionsTransformer) {
 
     function getExecutions(application, transformAll) {
 
@@ -32,7 +33,7 @@ module.exports = angular.module('spinnaker.core.delivery.executions.service', [
           return executions;
         }),
         url: [
-          settings.gateUrl,
+          apiHostProvider.baseUrl(),
           'applications',
           application.name,
           'pipelines',
@@ -72,7 +73,7 @@ module.exports = angular.module('spinnaker.core.delivery.executions.service', [
       $http({
         method: 'PUT',
         url: [
-          settings.gateUrl,
+          apiHostProvider.baseUrl(),
           'applications',
           (applicationName || $stateParams.application), // TODO: remove stateParams
           'pipelines',
@@ -96,7 +97,7 @@ module.exports = angular.module('spinnaker.core.delivery.executions.service', [
       $http({
         method: 'DELETE',
         url: [
-          settings.gateUrl,
+          apiHostProvider.baseUrl(),
           'pipelines',
           executionId,
         ].join('/')
@@ -128,7 +129,7 @@ module.exports = angular.module('spinnaker.core.delivery.executions.service', [
           return executions;
         }),
         url: [
-          settings.gateUrl,
+          apiHostProvider.baseUrl(),
           'projects',
           project,
           'pipelines'

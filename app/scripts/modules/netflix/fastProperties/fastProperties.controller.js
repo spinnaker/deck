@@ -6,11 +6,12 @@ module.exports = angular
   .module('spinnaker.netflix.fastProperties.controller', [
     require('../../core/application/service/applications.read.service.js'),
     require('../../core/cache/deckCacheFactory.js'),
+    require('../../core/featureFlags'),
   ])
-  .controller('FastPropertiesController', function ($filter, applicationReader, settings) {
+  .controller('FastPropertiesController', function ($filter, applicationReader, featureFlagProvider) {
     var vm = this;
 
-    vm.isOn = settings.feature.fastProperties;
+    vm.isOn = featureFlagProvider.get('fastProperties');
 
     vm.applicationsLoaded = false;
 

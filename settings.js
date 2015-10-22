@@ -1,21 +1,8 @@
 'use strict';
 
-let feedbackUrl = process.env.FEEDBACK_URL || 'http://hootch.test.netflix.net/submit';
-let gateHost = process.env.API_HOST || 'spinnaker-api-prestaging.prod.netflix.net';
-let bakeryDetailUrl = process.env.BAKERY_DETAIL_URL || 'http://bakery.test.netflix.net/#/?region={{context.region}}&package={{context.package}}&detail=bake:{{context.status.resourceId}}';
-let authEndpoint = process.env.AUTH_ENDPOINT || 'spinnaker-api-prestaging.prod.netflix.net/auth/info';
-
-let protocol = process.env.PROTOCOL || 'https';
-
 window.spinnakerSettings = {
   defaultProviders: ['aws'],
-  feedbackUrl: feedbackUrl,
-  gateUrl: `${protocol}://${gateHost}`,
-  bakeryDetailUrl: bakeryDetailUrl,
-  authEndpoint: `${protocol}://${authEndpoint}`,
-  pollSchedule: 30000,
-  defaultTimeZone: 'America/Los_Angeles', // see http://momentjs.com/timezone/docs/#/data-utilities/
-  providers: {
+  providers: { // MOVING TO BACK END
     aws: {
       defaults: {
         account: 'test',
@@ -112,19 +99,5 @@ window.spinnakerSettings = {
       primaryAccounts: ['test'],
       primaryRegions: ['us-east-1'],
     }
-  },
-  whatsNew: {
-    gistId: '32526cd608db3d811b38',
-    fileName: 'news.md',
-  },
-  authEnabled: process.env.AUTH === 'enabled',
-  feature: {
-    pipelines: true,
-    notifications: false,
-    canary: process.env.CANARY !== 'disabled',
-    parallelPipelines: true,
-    fastProperty: true,
-    vpcMigrator: true,
-    clusterDiff: true,
   },
 };

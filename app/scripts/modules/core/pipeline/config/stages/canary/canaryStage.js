@@ -5,9 +5,10 @@ let angular = require('angular');
 module.exports = angular.module('spinnaker.core.pipeline.stage.canaryStage', [
   require('../../../../serverGroup/configure/common/serverGroupCommandBuilder.js'),
   require('../../../../cloudProvider/cloudProvider.registry.js'),
+  require('../../../../featureFlags'),
 ])
-  .config(function (pipelineConfigProvider, settings) {
-    if (settings.feature.canary === true) {
+  .config(function (pipelineConfigProvider, featureFlagProvider) {
+    if (featureFlagProvider.get('canary') === true) {
         pipelineConfigProvider.registerStage({
           label: 'Canary',
           description: 'Canary tests new changes against a baseline version',

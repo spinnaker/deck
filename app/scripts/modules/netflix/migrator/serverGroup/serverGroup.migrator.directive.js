@@ -8,7 +8,7 @@ module.exports = angular
   .module('spinnaker.migrator.directive', [
     require('angular-ui-bootstrap'),
     require('../../../amazon/vpc/vpc.read.service.js'),
-    require('../../../core/config/settings.js'),
+    require('../../../core/featureFlags'),
     require('../migrator.service.js'),
     require('../../../core/presentation/autoScroll/autoScroll.directive.js'),
   ])
@@ -25,10 +25,10 @@ module.exports = angular
       controllerAs: 'migratorActionCtrl',
     };
   })
-  .controller('MigratorActionCtrl', function ($scope, $uibModal, vpcReader, settings) {
+  .controller('MigratorActionCtrl', function ($scope, $uibModal, vpcReader, featureFlagProvider) {
 
     vpcReader.getVpcName($scope.serverGroup.vpcId).then(function (name) {
-      $scope.showAction = name === 'Main' && settings.feature.vpcMigrator;
+      $scope.showAction = name === 'Main' && featureFlagProvider.get('vpcMigrator');
     });
 
     this.previewMigration = function () {

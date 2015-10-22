@@ -55,8 +55,6 @@
     "babel-loader": "^5.1.4",
     "bower-webpack-plugin": "^0.1.8",
     "css-loader": "^0.14.5",
-    "envify": "^1.2.1",
-    "envify-loader": "^0.1.0",
     "eslint": "^0.23.0",
     "eslint-loader": "^0.14.0",
     "exports-loader": "^0.6.2",

@@ -6,8 +6,9 @@ module.exports = angular.module('spinnaker.core.delivery.execution.controller', 
   require('angular-ui-router'),
   require('../confirmationModal/confirmationModal.service.js'),
   require('./execution.service.js'),
+  require('../apiHost'),
 ])
-  .controller('execution', function($scope, $stateParams, $state, confirmationModalService, executionService, settings) {
+  .controller('execution', function($scope, $stateParams, $state, confirmationModalService, executionService, apiHostProvider) {
     var controller = this;
 
     controller.showDetails = function() {
@@ -15,7 +16,7 @@ module.exports = angular.module('spinnaker.core.delivery.execution.controller', 
         $state.includes('**.execution.**');
     };
 
-    controller.pipelinesUrl = [settings.gateUrl, 'pipelines/'].join('/');
+    controller.pipelinesUrl = [apiHostProvider.baseUrl(), 'pipelines/'].join('/');
 
     controller.executionInState = function() {
       return $stateParams.executionId && $state.includes('**.execution.**');
