@@ -277,4 +277,4 @@ module.exports = angular
     loadPromotions();
 
     return vm;
-  }).name;
+  });

@@ -55,5 +55,4 @@ module.exports = angular.module('spinnaker.core.delivery.states', [])
         }
       }
     }
-  })
-  .name;
+  });

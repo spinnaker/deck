@@ -88,4 +88,4 @@ module.exports = angular.module('spinnaker.core.projects.project.controller', [
       });
     };
 
-  }).name;
+  });

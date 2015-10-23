@@ -385,5 +385,4 @@ module.exports = angular.module('spinnaker.gce.instanceType.service', [
       getAllTypesByRegion: getAllTypesByRegion
     };
   }
-)
-.name;
+);

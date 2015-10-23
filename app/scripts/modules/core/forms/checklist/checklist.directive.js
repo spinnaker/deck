@@ -77,4 +77,4 @@ module.exports = angular.module('spinnaker.core.forms.checklist.checklist.direct
         });
       }
     };
-  }).name;
+  });

@@ -28,4 +28,4 @@ module.exports = angular.module('spinnaker.serverGroup.configure.aws.capacitySel
         $scope.command.useSourceCapacity = false;
       }
     };
-  }).name;
+  });

@@ -32,5 +32,4 @@ module.exports = angular.module('spinnaker.serverGroup.configure.cf.basicSetting
     };
 
 
-    })
-.name;
+    });

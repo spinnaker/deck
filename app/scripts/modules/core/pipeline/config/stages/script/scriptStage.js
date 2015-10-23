@@ -25,5 +25,4 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.scriptStage', [
       $scope.viewState = {
         loading: false
       };
-    })
-    .name;
+    });

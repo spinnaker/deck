@@ -15,4 +15,4 @@ module.exports = angular.module('spinnaker.core.insightMenu.directive', [])
         rightAlign: '&',
       },
     };
-  }).name;
+  });

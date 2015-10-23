@@ -12,4 +12,4 @@ module.exports = angular
     require('./securityGroup.write.service.js'),
     require('./securityGroupCounts.directive.js'),
     require('./SecurityGroupsNavCtrl.js')
-  ]).name;
+  ]);

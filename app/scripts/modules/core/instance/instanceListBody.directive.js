@@ -169,4 +169,4 @@ module.exports = angular.module('spinnaker.core.instance.instanceListBody.direct
 
       }
     };
-}).name;
+});

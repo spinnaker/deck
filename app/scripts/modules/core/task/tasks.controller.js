@@ -11,8 +11,9 @@ module.exports = angular.module('spinnaker.core.task.controller', [
   require('./displayableTasks.filter.js'),
   require('angular-ui-router'),
   require('../cache/deckCacheFactory.js'),
+  require('../apiHost'),
 ])
-  .controller('TasksCtrl', function ($scope, $state, settings, app, _, viewStateCache, taskWriter, confirmationModalService) {
+  .controller('TasksCtrl', function ($scope, $state, apiHostProvider, app, _, viewStateCache, taskWriter, confirmationModalService) {
     var controller = this;
     const application = app;
 
@@ -29,7 +30,7 @@ module.exports = angular.module('spinnaker.core.task.controller', [
       });
     }
 
-    $scope.tasksUrl = [settings.gateUrl, 'applications', application.name, 'tasks/'].join('/');
+    $scope.tasksUrl = [apiHostProvider.baseUrl(), 'applications', application.name, 'tasks/'].join('/');
     $scope.filterCountOptions = [10, 20, 30, 50, 100, 200];
 
     function initializeViewState() {
@@ -251,4 +252,4 @@ module.exports = angular.module('spinnaker.core.task.controller', [
     initializeViewState();
 
   }
-).name;
+);

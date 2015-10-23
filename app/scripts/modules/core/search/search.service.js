@@ -3,9 +3,10 @@
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.core.search.service', [
-  require('../cache/deckCacheFactory.js')
+  require('../cache/deckCacheFactory.js'),
+  require('../apiHost'),
 ])
-  .factory('searchService', function($q, $http, $log, settings) {
+  .factory('searchService', function($q, $http, $log, apiHostProvider) {
 
     var defaultPageSize = 500;
 
@@ -19,7 +20,7 @@ module.exports = angular.module('spinnaker.core.search.service', [
       };
 
       return $http({
-        url: settings.gateUrl + '/search',
+        url: apiHostProvider.baseUrl() + '/search',
         params: angular.extend(defaultParams, params)
       })
         .then(
@@ -38,4 +39,4 @@ module.exports = angular.module('spinnaker.core.search.service', [
       getFallbackResults: getFallbackResults,
       defaultPageSize: defaultPageSize,
     };
-  }).name;
+  });

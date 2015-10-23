@@ -68,6 +68,5 @@ module.exports = angular
         .then(refreshApp, refreshApp);
     };
 
-  })
-  .name;
+  });
 

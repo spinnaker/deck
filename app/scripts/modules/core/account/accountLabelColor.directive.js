@@ -19,8 +19,7 @@ module.exports = angular
         $scope.accountType = isProdAccount ? 'prod' : $scope.account;
       }
     };
-  })
-  .name;
+  });
 
 
 

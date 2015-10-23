@@ -298,4 +298,4 @@ module.exports = angular.module('spinnaker.core.pipeline.config.pipelineConfigur
 
     this.navigateTo($scope.viewState.section, $scope.viewState.stageIndex);
 
-  }).name;
+  });

@@ -173,4 +173,4 @@ module.exports = angular.module('spinnaker.core.projects.configure.modal.control
 
     this.cancel = $modalInstance.dismiss;
 
-  }).name;
+  });

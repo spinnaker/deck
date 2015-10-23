@@ -33,4 +33,4 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.canary.details.co
 
     $scope.$on('$stateChangeSuccess', initialize, true);
 
-  }).name;
+  });

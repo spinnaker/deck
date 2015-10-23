@@ -23,4 +23,4 @@ module.exports = angular.module('spinnaker.core.pipeline.stages.canary.status.di
         scope.$watch('status', applyLabel);
       }
     };
-  }).name;
+  });

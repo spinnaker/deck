@@ -33,4 +33,4 @@ module.exports = angular.module('spinnaker.core.pipeline.stages.canary.score.dir
         scope.$watch('result', applyLabel, true);
       }
     };
-  }).name;
+  });

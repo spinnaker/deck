@@ -6,8 +6,9 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.manualJudgment.ex
   require('angular-ui-router'),
   require('../../../../delivery/details/executionDetailsSection.service.js'),
   require('../../../../delivery/details/executionDetailsSectionNav.directive.js'),
+  require('../../../../apiHost'),
 ])
-  .controller('ManualJudgmentExecutionDetailsCtrl', function ($scope, $stateParams, $http, settings, executionDetailsSectionService, _) {
+  .controller('ManualJudgmentExecutionDetailsCtrl', function ($scope, $stateParams, $http, apiHostProvider, executionDetailsSectionService, _) {
     $scope.configSections = ['manualJudgment', 'taskStatus'];
 
     function initialize() {
@@ -19,7 +20,7 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.manualJudgment.ex
     $scope.$on('$stateChangeSuccess', initialize, true);
 
     function provideJudgment(judgmentStatus, executionStatus) {
-      var targetUrl = [settings.gateUrl, 'pipelines', $stateParams.executionId, 'stages', $scope.stage.id].join('/');
+      var targetUrl = [apiHostProvider.baseUrl(), 'pipelines', $stateParams.executionId, 'stages', $scope.stage.id].join('/');
       $http({
         method: 'PATCH',
         url: targetUrl,
@@ -44,4 +45,4 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.manualJudgment.ex
     this.stop = function () {
       provideJudgment('stop', 'TERMINAL');
     };
-  }).name;
+  });

@@ -6,7 +6,7 @@ describe('Service: executionService', function () {
 
   var executionService;
   var $httpBackend;
-  var settings;
+  var apiHostProvider;
 
   beforeEach(
     window.module(
@@ -15,10 +15,10 @@ describe('Service: executionService', function () {
   );
 
   beforeEach(
-    window.inject(function (_executionService_, _$httpBackend_, _settings_) {
+    window.inject(function (_executionService_, _$httpBackend_, _apiHostProvider_) {
       executionService = _executionService_;
       $httpBackend = _$httpBackend_;
-      settings = _settings_;
+      apiHostProvider = _apiHostProvider_;
     })
   );
 
@@ -35,7 +35,7 @@ describe('Service: executionService', function () {
 
     it('should resolve the promise if a 200 response is received with empty array', function(){
       let url = [
-          settings.gateUrl,
+          apiHostProvider.baseUrl(),
           'applications',
           'deck',
           'pipelines',
@@ -59,7 +59,7 @@ describe('Service: executionService', function () {
 
     it('should reject the promise if a 429 response is received', function(){
       let url = [
-        settings.gateUrl,
+        apiHostProvider.baseUrl(),
         'applications',
         'deck',
         'pipelines',

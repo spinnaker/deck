@@ -31,4 +31,4 @@ module.exports = angular.module('spinnaker.netflix.feedback.directive', [
         };
       }
     };
-  }).name;
+  });

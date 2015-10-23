@@ -87,5 +87,4 @@ module.exports = angular
       handleRoutingError: handleRoutingError
     };
 
-  })
-  .name;
+  });

@@ -7,4 +7,4 @@ module.exports = angular.module('spinnaker.core.utils.rx', [])
   .factory('RxService', function () {
     return rx;
   }
-).name;
+);

@@ -46,4 +46,4 @@ module.exports = angular.module('spinnaker.core.loadBalancer.directive', [
         };
       }
     };
-  }).name;
+  });

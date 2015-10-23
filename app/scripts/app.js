@@ -143,9 +143,10 @@ module.exports = angular.module('spinnaker', [
     require('./modules/netflix/alert/alertHandler.js'),
     require('./modules/core/account/accountLabelColor.directive.js'),
     require('./modules/core/history/recentHistory.service.js'),
+    require('./modules/core/featureFlags'),
     require('./config.js'),
 ])
-  .run(function($state, $rootScope, $log, cacheInitializer, $uibModalStack, pageTitleService, settings, recentHistoryService) {
+  .run(function($state, $rootScope, $log, cacheInitializer, $uibModalStack, pageTitleService, settings, recentHistoryService, featureFlagProvider) {
     // This can go away when the next version of ui-router is available (0.2.11+)
     // for now, it's needed because ui-sref-active does not work on parent states
     // and we have to use ng-class. It's gross.
@@ -194,7 +195,7 @@ module.exports = angular.module('spinnaker', [
       }
     });
 
-    $rootScope.feature = settings.feature;
+    $rootScope.feature = featureFlagProvider.getAll();
   })
   .config(function() {
     /*eslint-disable */

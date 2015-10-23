@@ -26,4 +26,4 @@ module.exports = angular.module('spinnaker.core.account.accountTag.directive', [
 
       },
     };
-}).name;
+});

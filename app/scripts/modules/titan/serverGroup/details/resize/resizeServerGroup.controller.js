@@ -67,4 +67,4 @@ module.exports = angular.module('spinnaker.titan.serverGroup.details.resize.cont
     this.cancel = function () {
       $modalInstance.dismiss();
     };
-  }).name;
+  });

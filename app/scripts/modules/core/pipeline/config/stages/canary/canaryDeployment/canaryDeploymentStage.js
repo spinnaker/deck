@@ -9,4 +9,4 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.canary.canaryDepl
       key: 'canaryDeployment',
       executionDetailsUrl: require('./canaryDeploymentExecutionDetails.html'),
     });
-  }).name;
+  });

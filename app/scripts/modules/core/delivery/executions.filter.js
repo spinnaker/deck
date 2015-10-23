@@ -29,4 +29,4 @@ module.exports = angular.module('spinnaker.core.delivery.executions.filter', [
           return b[filter.execution.sortBy] - a[filter.execution.sortBy];
         });
     };
-  }).name;
+  });

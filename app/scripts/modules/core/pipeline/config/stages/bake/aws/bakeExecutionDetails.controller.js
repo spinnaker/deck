@@ -6,9 +6,10 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.bake.aws.executio
   require('angular-ui-router'),
   require('../../../../../delivery/details/executionDetailsSection.service.js'),
   require('../../../../../delivery/details/executionDetailsSectionNav.directive.js'),
+  require('../../../../../../netflix/bakery/index.js'),
 ])
   .controller('awsBakeExecutionDetailsCtrl', function ($scope, $stateParams, executionDetailsSectionService, $timeout,
-                                                       $interpolate, settings) {
+                                                       $interpolate, bakeryProvider) {
 
     $scope.configSections = ['bakeConfig', 'taskStatus'];
 
@@ -22,11 +23,11 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.bake.aws.executio
         $scope.provider = $scope.stage.context.cloudProviderType || 'aws';
       });
 
-      $scope.bakeryDetailUrl = $interpolate(settings.bakeryDetailUrl);
+      $scope.bakeryDetailUrl = $interpolate(bakeryProvider.getDetailUrl());
     }
 
     initialize();
 
     $scope.$on('$stateChangeSuccess', initialize, true);
 
-  }).name;
+  });

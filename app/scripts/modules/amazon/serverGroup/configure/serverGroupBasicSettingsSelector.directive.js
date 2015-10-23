@@ -31,5 +31,4 @@ module.exports = angular
       $uibModalStack: $uibModalStack,
       $state: $state,
     }));
-  })
-  .name;
+  });

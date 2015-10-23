@@ -44,5 +44,4 @@ module.exports = angular
           window.alert(JSON.stringify(error));
         });
     };
-  })
-  .name;
+  });

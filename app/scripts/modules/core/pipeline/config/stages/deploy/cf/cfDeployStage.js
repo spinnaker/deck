@@ -109,4 +109,4 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.cf.deploy', [
 
         initializeCommand();
 
-    }).name;
+    });

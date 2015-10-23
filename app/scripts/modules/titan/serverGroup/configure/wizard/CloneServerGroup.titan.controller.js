@@ -120,4 +120,4 @@ module.exports = angular.module('spinnaker.serverGroup.configure.titan.cloneServ
       $scope.state.requiresTemplateSelection = false;
       configureCommand();
     });
-  }).name;
+  });

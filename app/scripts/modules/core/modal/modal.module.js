@@ -11,4 +11,4 @@ module.exports = angular.module('spinnaker.core.modal', [
     require('./wizard/modalWizard.service.js'),
     require('./wizard/wizardPage.directive.js'),
   ]
-).name;
+);

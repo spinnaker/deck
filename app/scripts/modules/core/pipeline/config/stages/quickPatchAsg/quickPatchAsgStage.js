@@ -51,6 +51,5 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.quickPatchAsgStag
     })();
 
     $scope.$watch('stage.credentials', $scope.accountUpdated);
-  })
-  .name;
+  });
 

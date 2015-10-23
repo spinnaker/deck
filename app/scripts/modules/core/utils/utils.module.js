@@ -11,4 +11,4 @@ module.exports = angular.module('spinnaker.utils', [
   require('./uuid.service.js'),
   require('./appendTransform.js'),
   require('./clipboard/copyToClipboard.directive.js')
-]).name;
+]);

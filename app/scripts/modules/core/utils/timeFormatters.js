@@ -4,11 +4,28 @@ let angular = require('angular');
 
 module.exports = angular.module('spinnaker.core.utils.timeFormatters', [
   require('./moment.js'),
-  require('../config/settings.js'),
 ])
-  .filter('timestamp', function(momentService, settings) {
-    return function(input) {
-      var tz = settings.defaultTimeZone || 'America/Los_Angeles';
+  .provider('defaultTimeZoneProvider', function() {
+    var defaultTimeZone = 'America/Los_Angeles';
+    this.$get = function() {
+      return {
+        set(tz) {
+          defaultTimeZone = tz;
+        },
+        get() {
+          if (defaultTimeZone === null) {
+            throw ("A default time zone has not been set. Use defaultTimeZoneProvider#set.");
+          }
+          return defaultTimeZone;
+        },
+      };
+
+    };
+
+  })
+  .filter('timestamp', function(momentService) {
+    return function(input, defaultTimeZoneProvider) {
+      var tz = defaultTimeZoneProvider.get();
       var moment = momentService.tz(isNaN(parseInt(input)) ? input : parseInt(input), tz);
       return moment.isValid() ? moment.format('YYYY-MM-DD HH:mm:ss z') : '-';
     };
@@ -63,5 +80,4 @@ module.exports = angular.module('spinnaker.core.utils.timeFormatters', [
       }
       return '-';
     };
-  })
-  .name;
+  });

@@ -46,4 +46,4 @@ module.exports = angular.module('spinnaker.core.securityGroup.navigation.control
       return securityGroup[labelFields[0].key];
     };
   }
-).name;
+);

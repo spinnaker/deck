@@ -10,5 +10,4 @@ module.exports = angular.module('applicationBootstrap', [
     restrict: 'E',
     templateUrl: require('./applicationBootstrap.directive.html'),
   };
-})
-.name;
+});

@@ -4,9 +4,8 @@ let angular = require('angular');
 module.exports = angular.module('spinnaker.netflix.feedback.modal.controller', [
   require('../../core/cache/deckCacheFactory.js'),
   require('../../core/authentication/authentication.service.js'),
-  require('../../core/config/settings.js'),
 ])
-  .controller('FeedbackModalCtrl', function($scope, $location, $http, $modalInstance, settings, authenticationService) {
+  .controller('FeedbackModalCtrl', function($scope, $location, $http, $modalInstance, feedbackUrlProvider, authenticationService) {
 
     $scope.states = {
       EDITING: 0,
@@ -58,7 +57,7 @@ module.exports = angular.module('spinnaker.netflix.feedback.modal.controller', [
 
     this.submit = function () {
       $scope.state = $scope.states.SUBMITTING;
-      $http.post(settings.feedbackUrl, buildRequestBody())
+      $http.post(feedbackUrlProvider.get(), buildRequestBody())
         .success(function(result) {
           $scope.state = $scope.states.SUBMITTED;
           $scope.issueUrl = result.url;
@@ -72,4 +71,4 @@ module.exports = angular.module('spinnaker.netflix.feedback.modal.controller', [
     this.cancel = function () {
       $modalInstance.dismiss();
     };
-  }).name;
+  });

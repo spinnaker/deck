@@ -66,4 +66,4 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.gce.bakeStage', [
     $scope.$watch('stage', deleteEmptyProperties, true);
 
     initialize();
-  }).name;
+  });

@@ -5,6 +5,7 @@ var CommonsChunkPlugin = require('webpack/lib/optimize/CommonsChunkPlugin');
 //var webpack = require('webpack');
 //var IgnorePlugin = require("webpack/lib/IgnorePlugin");
 var path = require('path');
+var webpack = require('webpack');
 
 var nodeModulePath = path.join(__dirname, 'node_modules');
 //var bowerModulePath = path.join(__dirname, 'bower_components');
@@ -18,7 +19,6 @@ module.exports = {
   output: {
     path: path.join(__dirname, 'build', 'webpack', process.env.SPINNAKER_ENV || ''),
     filename: '[name].js',
-
   },
   module: {
 
@@ -36,7 +36,7 @@ module.exports = {
       },
       {
         test: /\.js$/,
-        loader: 'ng-annotate!babel!envify!eslint',
+        loader: 'ng-annotate!babel!eslint',
         exclude: /node_modules(?!\/clipboard)/,
       },
       {
@@ -77,6 +77,16 @@ module.exports = {
       template: './app/index.html',
       favicon: 'app/favicon.ico',
       inject: true,
+    }),
+    new webpack.DefinePlugin({
+      __GATE_HOST__: process.env.API_HOST || 'spinnaker-api-prestaging.prod.netflix.net',
+      __AUTH__: null,
+      __PROTOCOL__: null,
+      __FEEDBACK_URL__: process.env.FEEDBACK_URL || 'http://hootch.test.netflix.net/submit',
+      __BAKERY_DETAILS_URL__: process.env.BAKERY_DETAIL_URL || 'http://bakery.test.netflix.net/#/?region={{context.region}}&package={{context.package}}&detail=bake:{{context.status.resourceId}}',
+      __AUTH_ENDPOINT__: process.env.AUTH_ENDPOINT || 'spinnaker-api-prestaging.prod.netflix.net/auth/info',
+      __HTTPS_ENABLED__: process.env.HTTPS !== 'disabled',
+      __DEFAULT_TIME_ZONE__: process.env.TIME_ZONE || 'America/Los_Angeles',
     }),
   ],
   devServer: {

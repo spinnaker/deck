@@ -6,9 +6,10 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.bake.gce.executio
   require('angular-ui-router'),
   require('../../../../../delivery/details/executionDetailsSection.service.js'),
   require('../../../../../delivery/details/executionDetailsSectionNav.directive.js'),
+  require('../../../../../../netflix/bakery'),
 ])
   .controller('gceBakeExecutionDetailsCtrl', function ($scope, $stateParams, executionDetailsSectionService, $timeout,
-                                                       $interpolate, settings) {
+                                                       $interpolate, bakeryProvider) {
 
     $scope.configSections = ['bakeConfig', 'taskStatus'];
 
@@ -22,11 +23,11 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.bake.gce.executio
         $scope.provider = $scope.stage.context.cloudProviderType || 'gce';
       });
 
-      $scope.bakeryDetailUrl = $interpolate(settings.bakeryDetailUrl);
+      $scope.bakeryDetailUrl = $interpolate(bakeryProvider.getDetailUrl());
     }
 
     initialize();
 
     $scope.$on('$stateChangeSuccess', initialize, true);
 
-  }).name;
+  });

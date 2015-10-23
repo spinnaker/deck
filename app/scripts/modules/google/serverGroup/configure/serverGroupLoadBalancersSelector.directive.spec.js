@@ -18,7 +18,7 @@ describe('Directive: GCE Load Balancers Selector', function() {
   var selector, element, gceServerGroupConfigurationService, expectedTime;
 
   beforeEach(window.inject(function(_gceServerGroupConfigurationService_, _infrastructureCaches_, _momentService_,
-                               settings){
+                               defaultTimeZoneProvider){
     gceServerGroupConfigurationService = _gceServerGroupConfigurationService_;
 
 
@@ -28,7 +28,7 @@ describe('Directive: GCE Load Balancers Selector', function() {
     _infrastructureCaches_.loadBalancers = {
       getStats: function() {return {ageMax: t}}
     };
-    var m = _momentService_.tz(t, settings.defaultTimeZone);
+    var m = _momentService_.tz(t, defaultTimeZoneProvider.get());
     expectedTime = m.format('YYYY-MM-DD HH:mm:ss z');
 
     selector = angular.element('<gce-server-group-load-balancers-selector command="command" />');

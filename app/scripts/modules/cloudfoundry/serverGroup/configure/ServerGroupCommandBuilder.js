@@ -208,6 +208,5 @@ module.exports = angular.module('spinnaker.cf.serverGroupCommandBuilder.service'
       buildNewServerGroupCommandForPipeline: buildNewServerGroupCommandForPipeline,
       buildServerGroupCommandFromPipeline: buildServerGroupCommandFromPipeline,
     };
-})
-.name;
+});
 

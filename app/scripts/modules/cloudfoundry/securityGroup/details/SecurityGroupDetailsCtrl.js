@@ -68,4 +68,4 @@ module.exports = angular.module('spinnaker.securityGroup.cf.details.controller',
     application.registerAutoRefreshHandler(extractSecurityGroup, $scope);
 
   }
-).name;
+);

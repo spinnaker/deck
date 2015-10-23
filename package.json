@@ -43,9 +43,9 @@
     "npm": ">=2.0.0"
   },
   "scripts": {
-    "build": "node ./node_modules/webpack/bin/webpack.js",
-    "start": "node ./node_modules/webpack-dev-server/bin/webpack-dev-server.js --devtool eval",
-    "test": "./node_modules/karma/bin/karma start",
+    "build": "$(npm bin)/webpack.js",
+    "start": "$(npm bin)/webpack-dev-server.js --devtool eval",
+    "test": "$(npm bin)/karma start",
     "preinstall": "npm install -g bower@1.4.1",
     "int": "protractor protractor.conf.js"
   },
@@ -55,8 +55,6 @@
     "babel-loader": "^5.1.4",
     "bower-webpack-plugin": "^0.1.8",
     "css-loader": "^0.14.5",
-    "envify": "^1.2.1",
-    "envify-loader": "^0.1.0",
     "eslint": "^0.23.0",
     "eslint-loader": "^0.14.0",
     "exports-loader": "^0.6.2",

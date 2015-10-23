@@ -52,4 +52,4 @@ module.exports = angular.module('spinnaker.core.account.accountSelectField.direc
       scope.$watch('accounts', groupAccounts);
     }
   };
-}).name;
+});

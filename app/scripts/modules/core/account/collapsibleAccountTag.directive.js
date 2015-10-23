@@ -22,5 +22,4 @@ module.exports = angular
         $scope.getIcon = () => $scope.state.expanded ? 'down' : 'up';
       }
     };
-  })
-  .name;
+  });

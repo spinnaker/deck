@@ -82,4 +82,4 @@ module.exports = angular.module('spinnaker.core.delivery.manualPipelineExecution
 
     $scope.triggerUpdated();
 
-  }).name;
+  });
