@@ -114,5 +114,4 @@ module.exports = angular
         return pattern.test(stack);
       }
     };
-  })
-.name;
+  });

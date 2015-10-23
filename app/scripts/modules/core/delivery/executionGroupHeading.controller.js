@@ -87,6 +87,5 @@ module.exports = angular.module('spinnaker.core.delivery.executionGroupHeading.c
         controller.toggle();
       }
     });
-  })
-  .name;
+  });
 

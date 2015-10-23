@@ -108,4 +108,4 @@ module.exports = angular.module('spinnaker.applications.controller', [
     initializeViewState();
 
   }
-).name;
+);

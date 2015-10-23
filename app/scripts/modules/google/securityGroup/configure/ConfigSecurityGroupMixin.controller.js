@@ -191,6 +191,5 @@ module.exports = angular
       ruleset.splice(index, 1);
     };
 
-  })
-  .name;
+  });
 

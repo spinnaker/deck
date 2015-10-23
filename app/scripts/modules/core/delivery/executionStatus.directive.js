@@ -15,4 +15,4 @@ module.exports = angular.module('spinnaker.core.delivery.executionStatus.directi
       templateUrl: require('./executionStatus.html'),
       controller: 'executionStatus as ctrl',
     };
-  }).name;
+  });

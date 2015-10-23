@@ -56,7 +56,6 @@ module.exports = angular
     vm.resetToolTip = () => {
       vm.toolTip = vm.tempToolTip;
     };
-  })
-  .name;
+  });
 
 

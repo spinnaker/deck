@@ -72,5 +72,5 @@ module.exports = angular.module('spinnaker.gce', [
         createSecurityGroupController: 'gceCreateSecurityGroupCtrl',
       },
     });
-  }).name;
+  });
 

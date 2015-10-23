@@ -18,4 +18,4 @@ module.exports = angular.module('spinnaker.core.instance.instanceList.directive'
         scope.applyParamsToUrl = ClusterFilterModel.applyParamsToUrl;
       }
     };
-  }).name;
+  });

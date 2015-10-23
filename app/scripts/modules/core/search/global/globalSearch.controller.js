@@ -151,4 +151,4 @@ module.exports = angular.module('spinnaker.core.search.global.controller', [
         }
       }
     };
-  }).name;
+  });

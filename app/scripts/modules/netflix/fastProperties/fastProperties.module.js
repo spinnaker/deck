@@ -18,4 +18,4 @@ module.exports = angular
     require('./strategies/scopeLadder/scopeLadder.module.js'),
     require('./strategies/aca/aca.module.js'),
     require('./fastPropertyPromotion.directive.js')
-  ]).name;
+  ]);

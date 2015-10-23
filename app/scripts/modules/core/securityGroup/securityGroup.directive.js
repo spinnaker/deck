@@ -43,4 +43,4 @@ module.exports = angular.module('spinnaker.core.securityGroup.directive', [])
       }
     };
   }
-).name;
+);

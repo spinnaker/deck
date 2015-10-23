@@ -16,5 +16,4 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.enableAsgStage', 
       label: 'Enable Server Group',
       description: 'Enables a server group'
     });
-  })
-  .name;
+  });

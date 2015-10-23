@@ -37,4 +37,4 @@ module.exports = angular.module('spinnaker.core.delivery.executionBar.controller
       updateDetails(toParams);
     });
 
-  }).name;
+  });

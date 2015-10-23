@@ -208,4 +208,4 @@ module.exports = angular.module('spinnaker.aws.cloneServerGroup.controller', [
       $scope.state.requiresTemplateSelection = false;
       configureCommand();
     });
-  }).name;
+  });

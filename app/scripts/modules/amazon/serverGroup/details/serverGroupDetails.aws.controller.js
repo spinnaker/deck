@@ -364,4 +364,4 @@ module.exports = angular.module('spinnaker.serverGroup.details.aws.controller', 
       return null;
     };
   }
-).name;
+);

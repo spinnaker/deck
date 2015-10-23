@@ -36,5 +36,5 @@ module.exports = angular.module('spinnaker.titan', [
         detailsController: 'titanInstanceDetailsCtrl'
       }
     });
-  }).name;
+  });
 

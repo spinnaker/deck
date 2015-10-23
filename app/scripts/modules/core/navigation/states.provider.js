@@ -598,5 +598,4 @@ module.exports = angular.module('spinnaker.core.navigation.states.provider', [
 
     this.$get = angular.noop;
 
-  })
-  .name;
+  });

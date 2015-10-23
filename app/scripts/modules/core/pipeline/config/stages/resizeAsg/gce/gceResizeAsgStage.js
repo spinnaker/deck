@@ -114,6 +114,5 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.gce.resizeAsgStag
       delete stage.scaleNum;
     };
 
-  })
-  .name;
+  });
 

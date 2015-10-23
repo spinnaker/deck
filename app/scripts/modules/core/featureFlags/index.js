@@ -24,5 +24,4 @@ module.exports = angular.module('spinnaker.core.featureFlags', [])
         },
       };
     };
-  })
-  .name;
+  });

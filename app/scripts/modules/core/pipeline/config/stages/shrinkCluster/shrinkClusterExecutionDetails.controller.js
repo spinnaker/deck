@@ -20,4 +20,4 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.shrinkCluster.exe
 
         $scope.$on('$stateChangeSuccess', initialize, true);
 
-    }).name;
+    });

@@ -17,4 +17,4 @@ module.exports = angular.module('spinnaker.core.delivery.executionBar.directive'
       templateUrl: require('./executionBar.html'),
       controller: 'executionBar as ctrl',
     };
-  }).name;
+  });

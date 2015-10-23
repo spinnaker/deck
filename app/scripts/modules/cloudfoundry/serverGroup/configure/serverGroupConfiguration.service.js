@@ -227,4 +227,4 @@ module.exports = angular.module('spinnaker.serverGroup.configure.cf.configuratio
     };
 
 
-  }).name;
+  });

@@ -137,4 +137,4 @@ module.exports = angular.module('spinnaker.core.delivery.pipelineExecutions.cont
       $scope.$broadcast('toggle-expansion', expand);
     };
 
-  }).name;
+  });

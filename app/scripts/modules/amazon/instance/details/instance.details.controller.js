@@ -385,4 +385,4 @@ module.exports = angular.module('spinnaker.instance.detail.aws.controller', [
     $scope.account = instance.account;
 
   }
-).name;
+);

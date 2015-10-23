@@ -32,4 +32,4 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.canary.actions.ge
 
     this.cancel = $modalInstance.dismiss;
 
-  }).name;
+  });

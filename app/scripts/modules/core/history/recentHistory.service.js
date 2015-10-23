@@ -93,4 +93,4 @@ module.exports = angular.module('spinnaker.core.history.service', [
       removeLastItem: removeLastItem,
       addExtraDataToLatest: addExtraDataToLatest,
     };
-  }).name;
+  });

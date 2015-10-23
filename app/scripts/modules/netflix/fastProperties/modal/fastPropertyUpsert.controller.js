@@ -301,5 +301,4 @@ module.exports = angular
       vm.setStrategy();
     })();
 
-  })
-  .name;
+  });

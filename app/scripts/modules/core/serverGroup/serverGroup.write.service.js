@@ -113,5 +113,4 @@ module.exports = angular
       resizeServerGroup: resizeServerGroup,
       cloneServerGroup: cloneServerGroup
     };
-  })
-  .name;
+  });

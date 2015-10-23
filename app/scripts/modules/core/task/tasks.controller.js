@@ -252,4 +252,4 @@ module.exports = angular.module('spinnaker.core.task.controller', [
     initializeViewState();
 
   }
-).name;
+);

@@ -93,6 +93,5 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.findAmiStage', []
 
 
     $scope.$watch('stage.account', $scope.accountUpdated);
-  })
-  .name;
+  });
 

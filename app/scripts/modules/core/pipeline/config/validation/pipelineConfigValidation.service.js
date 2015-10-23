@@ -126,4 +126,4 @@ module.exports = angular.module('spinnaker.core.pipeline.config.validator.servic
     return {
       validatePipeline: validatePipeline,
     };
-  }).name;
+  });

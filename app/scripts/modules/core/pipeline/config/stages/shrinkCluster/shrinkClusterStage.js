@@ -80,6 +80,5 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.shrinkClusterStag
     if (stage.retainLargerOverNewer === undefined) {
       stage.retainLargerOverNewer = "false";
     }
-  })
-  .name;
+  });
 

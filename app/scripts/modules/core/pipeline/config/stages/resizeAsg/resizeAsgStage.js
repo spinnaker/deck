@@ -12,6 +12,5 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.resizeAsgStage', 
       label: 'Resize Server Group',
       description: 'Resizes a server group'
     });
-  })
-  .name;
+  });
 

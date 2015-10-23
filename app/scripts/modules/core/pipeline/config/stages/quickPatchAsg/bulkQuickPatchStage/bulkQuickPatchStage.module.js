@@ -8,4 +8,4 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.quickPatchAsg.bul
   require('../../core/stage.core.module.js'),
   require('../../../../../account/account.module.js'),
   require('./bulkQuickPatchStageExecutionDetails.controller.js'),
-]).name;
+]);

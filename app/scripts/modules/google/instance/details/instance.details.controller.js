@@ -444,4 +444,4 @@ module.exports = angular.module('spinnaker.instance.detail.gce.controller', [
     $scope.account = instance.account;
 
   }
-).name;
+);

@@ -287,6 +287,5 @@ module.exports = angular
       overrideFiltersForUrl: overrideFiltersForUrl,
     };
   }
-)
-.name;
+);
 

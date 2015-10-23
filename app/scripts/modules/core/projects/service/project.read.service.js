@@ -34,4 +34,4 @@ module.exports = angular
       getProjectConfig: getProjectConfig,
     };
 
-  }).name;
+  });

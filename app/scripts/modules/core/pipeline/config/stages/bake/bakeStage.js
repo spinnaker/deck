@@ -12,4 +12,4 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.bakeStage', [
       description: 'Bakes an image in the specified region',
       key: 'bake',
     });
-  }).name;
+  });

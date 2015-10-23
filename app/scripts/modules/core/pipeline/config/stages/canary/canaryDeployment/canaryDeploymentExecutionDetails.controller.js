@@ -89,4 +89,4 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.canary.canaryDepl
       },
       true);
 
-  }).name;
+  });

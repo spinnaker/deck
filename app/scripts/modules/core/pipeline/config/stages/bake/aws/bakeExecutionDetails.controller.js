@@ -30,4 +30,4 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.bake.aws.executio
 
     $scope.$on('$stateChangeSuccess', initialize, true);
 
-  }).name;
+  });

@@ -18,5 +18,4 @@ module.exports = angular.module("spinnaker.netflix.bakery", [])
         }
       };
     };
-  })
-  .name;
+  });

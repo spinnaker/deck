@@ -46,4 +46,4 @@ module.exports = angular
         }
       };
     });
-  }).name;
+  });

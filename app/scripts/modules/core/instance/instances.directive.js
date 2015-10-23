@@ -89,4 +89,4 @@ module.exports = angular.module('spinnaker.core.instance.instances.directive', [
         scope.$watch('highlight', renderInstances);
       }
     };
-}).name;
+});

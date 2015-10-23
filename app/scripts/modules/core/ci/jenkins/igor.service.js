@@ -30,5 +30,4 @@ module.exports = angular.module('spinnaker.core.ci.jenkins.igor.service', [
       getJobConfig: getJobConfig,
     };
 
-})
-.name;
+});

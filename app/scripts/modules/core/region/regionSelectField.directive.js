@@ -38,4 +38,4 @@ module.exports = angular.module('spinnaker.core.region.regionSelectField.directi
         scope.$watch('regions', groupRegions);
       }
     };
-}).name;
+});

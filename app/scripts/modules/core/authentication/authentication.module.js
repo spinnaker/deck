@@ -25,5 +25,4 @@ module.exports = angular.module('spinnaker.authentication', [
         return config;
       }
     };
-  })
-  .name;
+  });

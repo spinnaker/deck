@@ -40,4 +40,4 @@ module.exports = angular.module('spinnaker.aws.instance.details.scalingPolicy.di
         policy.absAdjustment = Math.abs(policy.scalingAdjustment);
       }
     };
-  }).name;
+  });

@@ -34,5 +34,4 @@ module.exports = angular
           'to the state of the cluster caused by upstream stages.'
       }
     ]
-  })
-  .name;
+  });

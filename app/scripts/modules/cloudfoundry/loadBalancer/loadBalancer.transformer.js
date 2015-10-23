@@ -52,4 +52,4 @@ module.exports = angular.module('spinnaker.cf.loadBalancer.transformer', [
       serverGroupIsInLoadBalancer: serverGroupIsInLoadBalancer
     };
 
-  }).name;
+  });

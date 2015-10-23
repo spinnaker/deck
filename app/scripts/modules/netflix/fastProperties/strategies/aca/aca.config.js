@@ -18,5 +18,4 @@ module.exports = angular
       enabled: false,
     });
 
-  })
-  .name;
+  });

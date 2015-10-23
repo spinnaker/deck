@@ -11,4 +11,4 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.quickPatchAsg.bul
       description: 'Bulk Quick Patches an ASG',
       executionDetailsUrl: require('./bulkQuickPatchStageExecutionDetails.html'),
     });
-  }).name;
+  });
