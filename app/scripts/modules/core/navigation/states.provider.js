@@ -45,6 +45,7 @@ module.exports = angular.module('spinnaker.core.navigation.states.provider', [
           }
         },
         resolve: {
+          overrides: () => { return {}; },
           instance: ['$stateParams', function($stateParams) {
             return {
               instanceId: $stateParams.instanceId
