@@ -9,8 +9,6 @@ templates.keys().forEach(function(key) {
 });
 
 module.exports = angular.module('spinnaker.cf', [
-    require('../core/cloudProvider/cloudProvider.registry.js'),
-    require('../core/pipeline/config/stages/deploy/cf/cfDeployStage.js'),
     require('./instance/cfInstanceTypeService.js'),
     require('./serverGroup/details/serverGroupDetails.cf.controller.js'),
     require('./serverGroup/configure/ServerGroupCommandBuilder.js'),

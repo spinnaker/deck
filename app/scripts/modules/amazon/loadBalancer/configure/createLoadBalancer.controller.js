@@ -3,22 +3,10 @@
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.loadBalancer.aws.create.controller', [
-  require('../../../core/loadBalancer/loadBalancer.write.service.js'),
-  require('../../../core/loadBalancer/loadBalancer.read.service.js'),
-  require('../../../core/account/account.service.js'),
   require('../loadBalancer.transformer.js'),
-  require('../../../core/securityGroup/securityGroup.read.service.js'),
-  require('../../../core/modal/wizard/modalWizard.service.js'),
-  require('../../../core/task/monitor/taskMonitorService.js'),
   require('../../subnet/subnet.read.service.js'),
-  require('../../../core/cache/cacheInitializer.js'),
-  require('../../../core/cache/infrastructureCaches.js'),
-  require('../../../core/naming/naming.service.js'),
   require('./loadBalancerAvailabilityZoneSelector.directive.js'),
-  require('../../../core/region/regionSelectField.directive.js'),
-  require('../../../core/account/accountSelectField.directive.js'),
   require('../../subnet/subnetSelectField.directive.js'),
-  require('../../../core/config/settings.js'),
 ])
   .controller('awsCreateLoadBalancerCtrl', function($scope, $modalInstance, $state, _,
                                                     accountService, awsLoadBalancerTransformer, securityGroupReader,

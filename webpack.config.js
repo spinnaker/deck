@@ -12,7 +12,6 @@ var nodeModulePath = path.join(__dirname, 'node_modules');
 module.exports = {
   debug: true,
   entry: {
-    settings: './settings.js',
     app: './app/scripts/app.js',
   },
   output: {
@@ -37,7 +36,7 @@ module.exports = {
       {
         test: /\.js$/,
         loader: 'ng-annotate!babel!envify!eslint',
-        exclude: /node_modules(?!\/clipboard)/,
+        exclude: /node_modules(?!\/clipboard)|core/,
       },
       {
         test: /\.less$/,
@@ -74,7 +73,6 @@ module.exports = {
     ),
     new HtmlWebpackPlugin({
       title: 'Spinnaker',
-      template: './app/index.html',
       favicon: 'app/favicon.ico',
       inject: true,
     }),

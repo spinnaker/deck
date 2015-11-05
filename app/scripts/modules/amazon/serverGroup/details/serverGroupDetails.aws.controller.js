@@ -6,28 +6,19 @@ require('../configure/serverGroup.configure.aws.module.js');
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.serverGroup.details.aws.controller', [
-  require('../../../core/application/modal/platformHealthOverride.directive.js'),
-  require('../../../core/confirmationModal/confirmationModal.service.js'),
-  require('../../../core/serverGroup/serverGroup.write.service.js'),
-  require('../../../core/serverGroup/details/serverGroupWarningMessage.service.js'),
-  require('../../../core/utils/lodash.js'),
   require('../../vpc/vpcTag.directive.js'),
   require('./scalingProcesses/autoScalingProcess.service.js'),
-  require('../../../core/serverGroup/serverGroup.read.service.js'),
   require('../configure/serverGroupCommandBuilder.service.js'),
-  require('../../../core/serverGroup/configure/common/runningExecutions.service.js'),
   require('../../../netflix/migrator/serverGroup/serverGroup.migrator.directive.js'), // TODO: make actions pluggable
   require('./scalingPolicy/scalingPolicy.directive.js'),
   require('./scheduledAction/scheduledAction.directive.js'),
-  require('../../../core/insight/insightFilterState.model.js'),
   require('./scalingActivities/scalingActivities.controller.js'),
   require('./networking/networking.module.js'),
   require('./resize/resizeServerGroup.controller'),
-  require('../../../core/utils/selectOnDblClick.directive.js'),
 ])
   .controller('awsServerGroupDetailsCtrl', function ($scope, $state, $templateCache, $interpolate, app, serverGroup, InsightFilterStateModel,
                                                      serverGroupReader, awsServerGroupCommandBuilder, $uibModal, confirmationModalService, _, serverGroupWriter,
-                                                     subnetReader, autoScalingProcessService, runningExecutionsService, serverGroupWarningMessageService) {
+                                                     subnetReader, autoScalingProcessService, runningExecutionsService, serverGroupWarningMessageService, showUserDataModal) {
 
     $scope.state = {
       loading: true
@@ -319,11 +310,7 @@ module.exports = angular.module('spinnaker.serverGroup.details.aws.controller', 
 
     this.showUserData = function showScalingActivities() {
       $scope.userData = window.atob($scope.serverGroup.launchConfig.userData);
-      $uibModal.open({
-        templateUrl: require('../../../core/serverGroup/details/userData.html'),
-        controller: 'CloseableModalCtrl',
-        scope: $scope
-      });
+      showUserDataModal($scope);
     };
 
     this.buildJenkinsLink = function() {

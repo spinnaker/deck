@@ -3,13 +3,7 @@
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.loadBalancer.cf.create.controller', [
-  require('../../../core/loadBalancer/loadBalancer.write.service.js'),
-  require('../../../core/loadBalancer/loadBalancer.read.service.js'),
-  require('../../../core/account/account.service.js'),
   require('../loadBalancer.transformer.js'),
-  require('../../../core/modal/wizard/modalWizard.service.js'),
-  require('../../../core/task/monitor/taskMonitorService.js'),
-  require('../../../core/search/search.service.js'),
 ])
   .controller('cfCreateLoadBalancerCtrl', function($scope, $modalInstance, $state,
                                                  application, loadBalancer, isNew, loadBalancerReader,

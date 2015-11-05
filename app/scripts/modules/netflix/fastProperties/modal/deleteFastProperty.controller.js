@@ -5,9 +5,7 @@ let angular = require('angular');
 // delete
 module.exports = angular
   .module('spinnaker.deleteFastProperty.controller', [
-    require('../../../core/account/account.service.js'),
     require('../fastProperty.write.service.js'),
-    require('../../../core/utils/lodash.js'),
   ])
   .controller('DeleteFastPropertyModalController', function ($modalInstance, accountService, fastProperty, fastPropertyWriter, _) {
     var vm = this;

@@ -11,22 +11,11 @@ templates.keys().forEach(function(key) {
 });
 
 module.exports = angular.module('spinnaker.gce', [
-  require('../core/cloudProvider/cloudProvider.registry.js'),
   require('./serverGroup/details/serverGroupDetails.gce.controller.js'),
   require('./serverGroup/configure/ServerGroupCommandBuilder.js'),
   require('./serverGroup/configure/wizard/CloneServerGroupCtrl.js'),
   require('./serverGroup/configure/serverGroup.configure.gce.module.js'),
   require('./serverGroup/serverGroup.transformer.js'),
-  require('../core/network/network.module.js'),
-  require('../core/pipeline/config/stages/bake/docker/dockerBakeStage.js'),
-  require('../core/pipeline/config/stages/bake/gce/gceBakeStage.js'),
-  require('../core/pipeline/config/stages/destroyAsg/gce/gceDestroyAsgStage.js'),
-  require('../core/pipeline/config/stages/disableAsg/gce/gceDisableAsgStage.js'),
-  require('../core/pipeline/config/stages/disableCluster/gce/gceDisableClusterStage.js'),
-  require('../core/pipeline/config/stages/enableAsg/gce/gceEnableAsgStage.js'),
-  require('../core/pipeline/config/stages/findAmi/gce/gceFindAmiStage.js'),
-  require('../core/pipeline/config/stages/resizeAsg/gce/gceResizeAsgStage.js'),
-  require('../core/pipeline/config/stages/shrinkCluster/gce/gceShrinkClusterStage.js'),
   require('./instance/gceInstanceTypeService.js'),
   require('./loadBalancer/loadBalancer.transformer.js'),
   require('./loadBalancer/details/LoadBalancerDetailsCtrl.js'),

@@ -3,7 +3,6 @@
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.aws.loadBalancer.transformer', [
-  require('../../core/utils/lodash.js'),
   require('../vpc/vpc.read.service.js'),
 ])
   .factory('awsLoadBalancerTransformer', function (settings, _, vpcReader) {

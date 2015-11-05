@@ -4,14 +4,6 @@ let angular = require('angular');
 
 module.exports = angular.module('spinnaker.loadBalancer.aws.details.controller', [
   require('angular-ui-router'),
-  require('../../../core/securityGroup/securityGroup.read.service.js'),
-  require('../../../core/loadBalancer/loadBalancer.write.service.js'),
-  require('../../../core/loadBalancer/loadBalancer.read.service.js'),
-  require('../../../core/utils/lodash.js'),
-  require('../../../core/confirmationModal/confirmationModal.service.js'),
-  require('../../../core/insight/insightFilterState.model.js'),
-  require('../../../core/presentation/collapsibleSection/collapsibleSection.directive.js'),
-  require('../../../core/utils/selectOnDblClick.directive.js'),
 ])
   .controller('awsLoadBalancerDetailsCtrl', function ($scope, $state, $uibModal, loadBalancer, app, InsightFilterStateModel,
                                                    securityGroupReader, _, confirmationModalService, loadBalancerWriter, loadBalancerReader, $q) {

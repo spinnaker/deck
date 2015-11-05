@@ -9,13 +9,7 @@ module.exports = angular
     require('angular-ui-bootstrap'),
     require('../../../amazon/vpc/vpc.read.service.js'),
     require('../../../amazon/subnet/subnet.read.service.js'),
-    require('../../../core/config/settings.js'),
     require('../migrator.service.js'),
-    require('../../../core/utils/lodash.js'),
-    require('../../../core/presentation/autoScroll/autoScroll.directive.js'),
-    require('../../../core/pipeline/config/services/pipelineConfigService.js'),
-    require('../../../core/utils/scrollTo/scrollTo.service.js'),
-    require('../../../core/cache/cacheInitializer.js'),
   ])
   .directive('pipelineMigrator', function () {
     return {

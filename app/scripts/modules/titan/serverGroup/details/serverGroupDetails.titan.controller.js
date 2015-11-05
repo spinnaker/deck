@@ -6,16 +6,7 @@ let angular = require('angular');
 module.exports = angular.module('spinnaker.serverGroup.details.titan.controller', [
   require('angular-ui-router'),
   require('../configure/ServerGroupCommandBuilder.js'),
-  require('../../../core/serverGroup/serverGroup.read.service.js'),
-  require('../../../core/serverGroup/details/serverGroupWarningMessage.service.js'),
-  require('../../../core/confirmationModal/confirmationModal.service.js'),
-  require('../../../core/serverGroup/serverGroup.write.service.js'),
-  require('../../../core/serverGroup/configure/common/runningExecutions.service.js'),
-  require('../../../core/utils/lodash.js'),
-  require('../../../core/insight/insightFilterState.model.js'),
   require('./resize/resizeServerGroup.controller'),
-  require('../../../core/modal/closeable/closeable.modal.controller.js'),
-  require('../../../core/utils/selectOnDblClick.directive.js'),
 ])
   .controller('titanServerGroupDetailsCtrl', function ($scope, $state, $templateCache, $interpolate, app, serverGroup, InsightFilterStateModel,
                                                      titanServerGroupCommandBuilder, serverGroupReader, $uibModal, confirmationModalService, _, serverGroupWriter,

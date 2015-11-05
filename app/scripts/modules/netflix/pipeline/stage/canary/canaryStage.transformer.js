@@ -3,7 +3,6 @@
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.netflix.pipeline.stage.canary.transformer', [
-  require('../../../../core/utils/lodash.js'),
 ])
   .service('canaryStageTransformer', function($log, _) {
 

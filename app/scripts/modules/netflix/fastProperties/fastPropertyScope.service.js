@@ -4,8 +4,6 @@ let angular = require('angular');
 
 module.exports = angular
   .module('spinnaker.netflix.fastPropertiesScope.service', [
-    require('../../core/naming/naming.service.js'),
-    require('../../core/utils/lodash.js'),
   ])
   .factory('FastPropertyScopeService', function ($q, namingService, _) {
 

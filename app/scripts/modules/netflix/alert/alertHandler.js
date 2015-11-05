@@ -4,8 +4,6 @@ let angular = require('angular');
 
 module.exports = angular
   .module('spinnaker.netflix.alert.handler', [
-    require('../../core/config/settings.js'),
-    require('../../core/authentication/authentication.service.js'),
   ])
   .config(function ($provide) {
     $provide.decorator('$exceptionHandler', function($delegate, settings, authenticationService, $) {

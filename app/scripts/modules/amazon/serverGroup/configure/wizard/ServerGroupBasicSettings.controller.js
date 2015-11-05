@@ -3,7 +3,6 @@
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.serverGroup.configure.aws.basicSettings', [
-  require('../../../../core/modal/wizard/modalWizard.service.js'),
 ])
   .controller('awsServerGroupBasicSettingsCtrl', function($scope, modalWizardService) {
 

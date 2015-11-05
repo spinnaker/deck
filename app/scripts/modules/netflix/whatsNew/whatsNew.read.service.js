@@ -4,8 +4,6 @@
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.netflix.whatsNew.read.service', [
-  require('../../core/cache/deckCacheFactory.js'),
-  require('../../core/config/settings.js')
 ])
   .factory('whatsNewReader', function ($http, settings, $log) {
     function extractFileContent(data) {

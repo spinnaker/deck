@@ -7,8 +7,8 @@ global.$ = global.jQuery = require('jquery');
 let angular = require('angular');
 
 module.exports = angular.module('netflix.spinnaker', [
+  require('spinnaker-core/dist'),
   require('./modules/netflix/netflix.module.js'),
-  require('./modules/core/core.module.js'),
   require('./modules/amazon/aws.module.js'),
   require('./modules/google/gce.module.js'),
   require('./modules/cloudfoundry/cf.module.js'),

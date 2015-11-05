@@ -11,7 +11,6 @@ templates.keys().forEach(function(key) {
 });
 
 module.exports = angular.module('spinnaker.titan', [
-  require('../core/cloudProvider/cloudProvider.registry.js'),
   require('./serverGroup/details/serverGroupDetails.titan.controller.js'),
   require('./serverGroup/configure/ServerGroupCommandBuilder.js'),
   require('./serverGroup/configure/wizard/CloneServerGroup.titan.controller.js'),

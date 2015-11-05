@@ -5,8 +5,6 @@ let angular = require('angular');
 module.exports = angular
   .module('spinnaker.netflix.fastProperties.write.service', [
     require('exports?"restangular"!imports?_=lodash!restangular'),
-    require('../../core/utils/lodash.js'),
-    require('../../core/authentication/authentication.service.js')
   ])
   .factory('fastPropertyWriter', function (Restangular, authenticationService, _) {
 

@@ -3,10 +3,6 @@
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.cf.serverGroup.details.resize.controller', [
-  require('../../../../core/account/account.service.js'),
-  require('../../../../core/application/modal/platformHealthOverride.directive.js'),
-  require('../../../../core/serverGroup/serverGroup.write.service.js'),
-  require('../../../../core/task/monitor/taskMonitorService.js')
 ])
   .controller('cfResizeServerGroupCtrl', function($scope, $modalInstance, accountService, serverGroupWriter, taskMonitorService,
                                                    application, serverGroup) {

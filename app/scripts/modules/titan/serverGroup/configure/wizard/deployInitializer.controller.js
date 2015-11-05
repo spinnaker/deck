@@ -3,8 +3,6 @@
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.serverGroup.configure.titan.deployInitialization.controller', [
-  require('../../../../core/serverGroup/serverGroup.read.service.js'),
-  require('../../../../core/utils/lodash.js'),
   require('../ServerGroupCommandBuilder.js'),
 ])
   .controller('titanDeployInitializerCtrl', function($scope, titanServerGroupCommandBuilder, serverGroupReader, _) {

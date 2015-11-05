@@ -3,10 +3,6 @@
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.aws.cache.initializer', [
-  require('../../core/account/account.service.js'),
-  require('../../core/loadBalancer/loadBalancer.read.service.js'),
-  require('../../core/instance/instanceTypeService.js'),
-  require('../../core/securityGroup/securityGroup.read.service.js'),
   require('../subnet/subnet.read.service.js'),
   require('../vpc/vpc.read.service.js'),
 ])

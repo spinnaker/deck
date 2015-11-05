@@ -4,11 +4,6 @@ let angular = require('angular');
 
 module.exports = angular.module('spinnaker.titan.serverGroupCommandBuilder.service', [
   require('exports?"restangular"!imports?_=lodash!restangular'),
-  require('../../../core/cache/deckCacheFactory.js'),
-  require('../../../core/account/account.service.js'),
-  require('../../../core/naming/naming.service.js'),
-  require('../../../core/utils/dataConverter.service.js'),
-  require('../../../core/utils/lodash.js'),
 ])
   .factory('titanServerGroupCommandBuilder', function (settings, Restangular, $q,
                                                      accountService, namingService, _, dataConverterService) {

@@ -3,7 +3,6 @@
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.gce.loadBalancer.transformer', [
-  require('../../core/utils/lodash.js')
 ])
   .factory('gceLoadBalancerTransformer', function ($q, settings, _) {
 

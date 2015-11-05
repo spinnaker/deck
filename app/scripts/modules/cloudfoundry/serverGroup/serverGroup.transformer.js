@@ -4,7 +4,6 @@ let angular = require('angular');
 
 module.exports = angular
   .module('spinnaker.cf.serverGroup.transformer', [
-    require('../../core/utils/lodash.js'),
   ])
   .factory('cfServerGroupTransformer', function ($q, _) {
 

@@ -3,8 +3,6 @@
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.netflix.pipeline.stage.canaryStage', [
-  require('../../../../core/serverGroup/configure/common/serverGroupCommandBuilder.js'),
-  require('../../../../core/cloudProvider/cloudProvider.registry.js'),
 ])
   .config(function (pipelineConfigProvider) {
       pipelineConfigProvider.registerStage({

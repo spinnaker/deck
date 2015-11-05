@@ -3,7 +3,6 @@
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.netflix.fastProperties.progressBar.directive', [
-  require('../../core/utils/lodash.js'),
 ])
   .directive('fastPropertyProgressBar', function(_) {
     return {

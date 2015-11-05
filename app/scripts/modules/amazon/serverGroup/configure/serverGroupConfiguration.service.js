@@ -4,16 +4,9 @@ let angular = require('angular');
 
 module.exports = angular.module('spinnaker.aws.serverGroup.configure.service', [
   require('../../image/image.reader.js'),
-  require('../../../core/account/account.service.js'),
-  require('../../../core/diff/diff.service.js'),
-  require('../../../core/naming/naming.service.js'),
-  require('../../../core/securityGroup/securityGroup.read.service.js'),
   require('../../instance/awsInstanceType.service.js'),
   require('../../subnet/subnet.read.service.js'),
   require('../../keyPairs/keyPairs.read.service.js'),
-  require('../../../core/loadBalancer/loadBalancer.read.service.js'),
-  require('../../../core/cache/cacheInitializer.js'),
-  require('../../../core/utils/lodash.js'),
 ])
   .factory('awsServerGroupConfigurationService', function($q, awsImageReader, accountService, securityGroupReader,
                                                           awsInstanceTypeService, cacheInitializer,
