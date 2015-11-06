@@ -15,6 +15,7 @@ window.spinnakerSettings = {
   defaultTimeZone: 'America/Los_Angeles', // see http://momentjs.com/timezone/docs/#/data-utilities/
   providers: {
     aws: {
+      humanFriendlyLabel: 'Amazon',
       defaults: {
         account: 'test',
         region: 'us-east-1'
@@ -105,6 +106,7 @@ window.spinnakerSettings = {
       }
     },
     titan: {
+      humanFriendlyLabel: 'Titan',
       defaults: {
         account: 'titantest',
         region: 'us-east-1'

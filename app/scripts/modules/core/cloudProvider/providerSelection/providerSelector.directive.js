@@ -4,8 +4,10 @@ let angular = require('angular');
 
 module.exports = angular.module('spinnaker.providerSelection.directive', [
   require('../../account/account.service.js'),
+  require('../../config/settings.js'),
+  require('../../utils/lodash.js'),
 ])
-  .directive('providerSelector', function(accountService, $q) {
+  .directive('providerSelector', function(accountService, settings, _, $q) {
     return {
       restrict: 'E',
       scope: {
@@ -30,6 +32,18 @@ module.exports = angular.module('spinnaker.providerSelection.directive', [
             scope.providers = providers;
             scope.showSelector = true;
           }
+
+          scope.providerDisplayKeyMap = _.reduce(scope.providers, function(result, provider) {
+            result[provider] = settings.providers[provider] && settings.providers[provider].humanFriendlyLabel ? settings.providers[provider].humanFriendlyLabel : provider;
+            return result;
+          }, {});
+
+          scope.providers = _.map(scope.providers, function(provider) {
+            return {
+              provider: provider,
+              label: scope.providerDisplayKeyMap[provider]
+            };
+          });
         });
       },
     };
