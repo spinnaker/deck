@@ -3,7 +3,6 @@
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.aws.image.reader', [
-  require('exports?"restangular"!imports?_=lodash!restangular'),
 ])
   .factory('awsImageReader', function ($q, Restangular) {
 

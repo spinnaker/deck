@@ -3,7 +3,6 @@
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.serverGroup.configure.cf.cloneServerGroup', [
-  require('angular-ui-router'),
 ])
   .controller('cfCloneServerGroupCtrl', function($scope, $modalInstance, _, $q, $state,
                                                   serverGroupWriter, modalWizardService, taskMonitorService,

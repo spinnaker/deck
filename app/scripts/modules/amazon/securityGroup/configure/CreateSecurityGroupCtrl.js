@@ -3,7 +3,6 @@
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.amazon.securityGroup.create.controller', [
-  require('angular-ui-router'),
 ])
   .controller('awsCreateSecurityGroupCtrl', function($scope, $modalInstance, $state, $controller,
                                                   accountService, securityGroupReader,

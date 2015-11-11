@@ -4,7 +4,6 @@ let angular = require('angular');
 
 module.exports = angular
   .module('spinnaker.netflix.fastProperties.read.service', [
-    require('exports?"restangular"!imports?_=lodash!restangular'),
   ])
   .factory('fastPropertyReader', function (Restangular) {
 

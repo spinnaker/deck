@@ -19,7 +19,6 @@
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.securityGroup.gce.details.controller', [
-  require('angular-ui-router'),
   require('../clone/cloneSecurityGroup.controller.js'),
 ])
   .controller('gceSecurityGroupDetailsCtrl', function ($scope, $state, resolvedSecurityGroup, accountService, app, InsightFilterStateModel,

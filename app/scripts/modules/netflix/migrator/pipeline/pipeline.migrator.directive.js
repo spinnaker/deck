@@ -6,7 +6,6 @@ let angular = require('angular');
 
 module.exports = angular
   .module('spinnaker.migrator.pipeline.directive', [
-    require('angular-ui-bootstrap'),
     require('../../../amazon/vpc/vpc.read.service.js'),
     require('../../../amazon/subnet/subnet.read.service.js'),
     require('../migrator.service.js'),

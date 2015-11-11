@@ -3,7 +3,6 @@
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.google.securityGroup.edit.controller', [
-  require('angular-ui-router'),
 ])
   .controller('gceEditSecurityGroupCtrl', function($scope, $modalInstance, $state,
                                                    accountService,  securityGroupReader,

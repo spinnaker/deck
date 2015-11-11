@@ -3,7 +3,6 @@
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.cf.instanceType.service', [
-  require('exports?"restangular"!imports?_=lodash!restangular'),
 ])
   .factory('cfInstanceTypeService', function ($http, $q, _) {
 

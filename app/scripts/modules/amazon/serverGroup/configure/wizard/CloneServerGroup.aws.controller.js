@@ -3,7 +3,6 @@
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.aws.cloneServerGroup.controller', [
-  require('angular-ui-router'),
   require('../serverGroupConfiguration.service.js'),
 ])
   .controller('awsCloneServerGroupCtrl', function($scope, $modalInstance, _, $q, $state,

@@ -3,7 +3,6 @@
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.netflix.pipeline.stage.canary.details.controller', [
-  require('angular-ui-router'),
 ])
   .controller('CanaryExecutionDetailsCtrl', function ($scope, _, $stateParams, $timeout, executionDetailsSectionService) {
 

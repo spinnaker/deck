@@ -4,7 +4,6 @@ var angular = require('angular');
 
 module.exports = angular
   .module('spinnaker.amazon.securityGroup.baseConfig.controller', [
-    require('angular-ui-router'),
     require('../../vpc/vpc.read.service.js'),
   ])
   .controller('awsConfigSecurityGroupMixin', function ($scope,

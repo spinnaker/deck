@@ -3,8 +3,6 @@
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.instance.detail.aws.controller', [
-  require('angular-ui-router'),
-  require('angular-ui-bootstrap'),
 ])
   .controller('awsInstanceDetailsCtrl', function ($scope, $state, $uibModal, InsightFilterStateModel, settings,
                                                instanceWriter, confirmationModalService, recentHistoryService,

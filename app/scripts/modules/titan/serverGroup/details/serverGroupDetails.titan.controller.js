@@ -4,7 +4,6 @@
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.serverGroup.details.titan.controller', [
-  require('angular-ui-router'),
   require('../configure/ServerGroupCommandBuilder.js'),
   require('./resize/resizeServerGroup.controller'),
 ])

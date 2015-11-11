@@ -3,7 +3,6 @@
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.cf.serverGroupCommandBuilder.service', [
-  require('exports?"restangular"!imports?_=lodash!restangular'),
 ])
   .factory('cfServerGroupCommandBuilder', function (settings, Restangular, $q,
                                                      accountService, instanceTypeService, namingService, _) {

@@ -19,7 +19,6 @@
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.securityGroup.cf.details.controller', [
-  require('angular-ui-router'),
 ])
   .controller('cfSecurityGroupDetailsCtrl', function ($scope, $state, resolvedSecurityGroup, accountService, app, InsightFilterStateModel,
                                                     confirmationModalService, securityGroupWriter, securityGroupReader,

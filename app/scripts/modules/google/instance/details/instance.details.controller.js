@@ -3,8 +3,6 @@
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.instance.detail.gce.controller', [
-  require('angular-ui-router'),
-  require('angular-ui-bootstrap'),
 ])
   .controller('gceInstanceDetailsCtrl', function ($scope, $state, $uibModal, InsightFilterStateModel,
                                                   instanceWriter, confirmationModalService, recentHistoryService,

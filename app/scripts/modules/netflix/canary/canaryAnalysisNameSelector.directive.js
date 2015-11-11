@@ -5,7 +5,6 @@ let angular = require('angular');
 
 module.exports = angular
   .module('spinnaker.core.canary.canaryAnalysisNameSelector.directive', [
-    require('exports?"restangular"!imports?_=lodash!restangular'),
   ])
   .directive('canaryAnalysisNameSelector', (Restangular) => {
     return {

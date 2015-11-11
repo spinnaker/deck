@@ -3,7 +3,6 @@
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.aws.instanceType.service', [
-  require('exports?"restangular"!imports?_=lodash!restangular'),
 ])
   .factory('awsInstanceTypeService', function ($http, $q, settings, _, Restangular, infrastructureCaches) {
 

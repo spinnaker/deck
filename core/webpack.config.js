@@ -13,9 +13,15 @@ module.exports = {
     path: path.join(__dirname, 'dist'),
     filename: 'index.js',
   },
-  externals: {
-    angular: "angular",
-  },
+  externals: [{
+    'angular': {
+      root: 'angular',
+      amd: 'angular',
+      commonjs2: 'angular',
+      commonjs: 'angular',
+    }
+  }],
+
   module: {
     loaders: [
       {

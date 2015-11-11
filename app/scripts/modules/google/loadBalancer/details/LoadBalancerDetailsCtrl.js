@@ -3,7 +3,6 @@
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.loadBalancer.gce.details.controller', [
-  require('angular-ui-router'),
 ])
   .controller('gceLoadBalancerDetailsCtrl', function ($scope, $state, $uibModal, loadBalancer, app, InsightFilterStateModel,
                                                       _, confirmationModalService, accountService, loadBalancerWriter, loadBalancerReader, $q) {

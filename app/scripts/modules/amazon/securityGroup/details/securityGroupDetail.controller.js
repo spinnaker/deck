@@ -3,7 +3,6 @@
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.securityGroup.aws.details.controller', [
-  require('angular-ui-router'),
   require('../clone/cloneSecurityGroup.controller.js'),
 ])
   .controller('awsSecurityGroupDetailsCtrl', function ($scope, $state, resolvedSecurityGroup, app, InsightFilterStateModel,

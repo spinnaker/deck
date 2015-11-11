@@ -3,7 +3,6 @@
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.netflix.pipeline.stage.canary.summary.controller', [
-  require('angular-ui-router'),
   require('./actions/generateScore.controller.js'),
   require('./actions/endCanary.controller.js'),
 ])

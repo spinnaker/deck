@@ -4,7 +4,6 @@ let angular = require('angular');
 
 module.exports = angular
   .module('spinnaker.netflix.whatsNew.directive', [
-    require('angular-marked'),
     require('./whatsNew.read.service.js'),
   ])
   .config(function (markedProvider) {

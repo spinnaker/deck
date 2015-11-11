@@ -3,8 +3,6 @@
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.instance.detail.titan.controller', [
-  require('angular-ui-router'),
-  require('angular-ui-bootstrap'),
 ])
   .controller('titanInstanceDetailsCtrl', function ($scope, $state, $uibModal, InsightFilterStateModel,
                                                instanceWriter, confirmationModalService, recentHistoryService,

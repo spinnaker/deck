@@ -3,7 +3,6 @@
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.loadBalancer.aws.details.controller', [
-  require('angular-ui-router'),
 ])
   .controller('awsLoadBalancerDetailsCtrl', function ($scope, $state, $uibModal, loadBalancer, app, InsightFilterStateModel,
                                                    securityGroupReader, _, confirmationModalService, loadBalancerWriter, loadBalancerReader, $q) {

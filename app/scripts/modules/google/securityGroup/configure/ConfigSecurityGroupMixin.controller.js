@@ -4,7 +4,6 @@ var angular = require('angular');
 
 module.exports = angular
   .module('spinnaker.google.securityGroup.baseConfig.controller', [
-    require('angular-ui-router'),
   ])
   .controller('gceConfigSecurityGroupMixin', function ($scope,
                                                        $state,

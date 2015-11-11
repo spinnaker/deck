@@ -3,7 +3,6 @@
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.netflix.pipeline.stage.canary.actions.override.result.controller', [
-  require('angular-ui-router'),
 ])
   .controller('EndCanaryCtrl', function ($scope, $http, $modalInstance, settings, canaryId) {
 
