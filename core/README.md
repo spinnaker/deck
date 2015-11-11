@@ -1,4 +1,5 @@
 # Spinnaker Core
+window.spinnakerCore = require('spinnaker-core/dist');
 
 ## Getting started
 

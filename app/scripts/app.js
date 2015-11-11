@@ -5,7 +5,6 @@
 global.$ = global.jQuery = require('jquery');
 
 let angular = require('angular');
-window.spinnakerCore = require('spinnaker-core/dist');
 
 module.exports = angular.module('netflix.spinnaker', [
   require('spinnaker-core/dist'),

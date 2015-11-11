@@ -19,6 +19,12 @@ module.exports = {
       amd: 'angular',
       commonjs2: 'angular',
       commonjs: 'angular',
+    },
+    'jquery': {
+      root: 'jquery',
+      amd: 'jquery',
+      commonjs2: 'jquery',
+      commonjs: 'jquery',
     }
   }],
 

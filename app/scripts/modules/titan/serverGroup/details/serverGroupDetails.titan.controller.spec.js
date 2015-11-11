@@ -10,7 +10,8 @@ describe('Controller: titanServerGroupDetailsCtrl', function () {
 
   beforeEach(
     window.module(
-      require('./serverGroupDetails.titan.controller')
+      require('./serverGroupDetails.titan.controller'),
+      require('spinnaker-core/dist')
     )
   );
 
