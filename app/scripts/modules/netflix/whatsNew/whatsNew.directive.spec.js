@@ -7,6 +7,7 @@ describe('Directives: whatsNew', function () {
   beforeEach(
     window.module(
       require('./whatsNew.directive'),
+      require('spinnaker-core/dist')
     )
   );
 
