@@ -13,14 +13,18 @@ module.exports = angular
       return instanceGroups
         .filter((instanceGroup) => instanceGroup.instances.length > 0)
         .map((instanceGroup) => {
-           return {
-             type: type,
-             cloudProvider: instanceGroup.cloudProvider,
-             instanceIds: instanceGroup.instanceIds,
-             credentials: instanceGroup.account,
-             region: instanceGroup.region,
-             serverGroupName: instanceGroup.serverGroup
-           };
+          let iGroup = {
+            type: type,
+            cloudProvider: instanceGroup.cloudProvider,
+            instanceIds: instanceGroup.instanceIds,
+            credentials: instanceGroup.account,
+            region: instanceGroup.region,
+            serverGroupName: instanceGroup.serverGroup
+          };
+          if (instanceGroup.cloudProvider === 'gce') {
+            iGroup.zone = instanceGroup.instances[0].availabilityZone;
+          }
+          return iGroup;
         });
     }
 
