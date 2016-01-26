@@ -26,7 +26,7 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.modifyScalingProc
       cloudProvider: 'aws',
       strategy: true,
     });
-  }).controller('ModifyScalingProcessStageCtrl', function($scope, stage, accountService, stageConstants, appListExtractorService, _) {
+  }).controller('ModifyScalingProcessStageCtrl', function($scope, stage, accountService, stageConstants, appListExtractorService) {
     $scope.stage = stage;
 
     $scope.state = {
@@ -34,16 +34,8 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.modifyScalingProc
       regionsLoaded: false
     };
 
-    let clusterFilter = (cluster) => {
-      let acctFilter = $scope.stage.credentials ? cluster.account === $scope.stage.credentials : true;
-      let regionFilter = $scope.stage.regions && $scope.stage.regions.length
-        ? _.some( cluster.serverGroups, (sg) => _.some($scope.stage.regions, (region) => region === sg.region))
-        : true;
-
-      return acctFilter && regionFilter;
-    };
-
     let setClusterList = () => {
+      let clusterFilter = appListExtractorService.clusterFilterForCredentialsAndRegion($scope.stage.credentials, $scope.stage.regions);
       $scope.clusterList = appListExtractorService.getClusters([$scope.application], clusterFilter);
     };
 

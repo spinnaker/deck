@@ -4,7 +4,6 @@ let angular = require('angular');
 
 module.exports = angular.module('spinnaker.core.pipeline.stage.aws.scaleDownClusterStage', [
   require('../../../../../../core/application/listExtractor/listExtractor.service'),
-  require('../../../../../utils/lodash.js'),
   require('../../stageConstants.js'),
   require('./scaleDownClusterExecutionDetails.controller.js')
 ])
@@ -22,7 +21,7 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.aws.scaleDownClus
       ],
       strategy: true,
     });
-  }).controller('awsScaleDownClusterStageCtrl', function($scope, accountService, stageConstants, appListExtractorService, _) {
+  }).controller('awsScaleDownClusterStageCtrl', function($scope, accountService, stageConstants, appListExtractorService) {
     var ctrl = this;
 
     let stage = $scope.stage;
@@ -32,16 +31,8 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.aws.scaleDownClus
       regionsLoaded: false
     };
 
-    let clusterFilter = (cluster) => {
-      let acctFilter = $scope.stage.credentials ? cluster.account === $scope.stage.credentials : true;
-      let regionFilter = $scope.stage.regions && $scope.stage.regions.length
-        ? _.some( cluster.serverGroups, (sg) => _.some($scope.stage.regions, (region) => region === sg.region))
-        : true;
-
-      return acctFilter && regionFilter;
-    };
-
     let setClusterList = () => {
+      let clusterFilter = appListExtractorService.clusterFilterForCredentialsAndRegion($scope.stage.credentials, $scope.stage.regions);
       $scope.clusterList = appListExtractorService.getClusters([$scope.application], clusterFilter);
     };
 
