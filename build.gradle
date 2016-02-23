@@ -45,9 +45,14 @@ task karma(type: NodeTask) {
   args = ["start", "--single-run", "--reporters", "progress,jenkins"]
 }
 
+task bower(type: NpmTask) {
+  args = ['install', '-g', 'bower']
+}
+
 webpack.outputs.dir file('build/webpack')
 
-webpack.dependsOn 'npmInstall'
+bower.dependsOn 'npmInstall'
+webpack.dependsOn 'bower'
 karma.dependsOn 'webpack'
 test.dependsOn 'karma'
 buildDeb.dependsOn 'test'
