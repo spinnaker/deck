@@ -157,8 +157,11 @@ module.exports = angular.module('spinnaker.core.help.contents', [])
     'pipeline.config.quickPatchAsg.rollingPatch': '<p>Patch one instance at a time vs. all at once.</p>',
     'pipeline.config.quickPatchAsg.skipUpToDate': '<p>Skip instances which already have the requested version.</p>',
     'pipeline.config.jenkins.propertyFile': '<p>(Optional) Configures the name to the Jenkins artifact file used to pass in properties to later stages in the Spinnaker pipeline.</p>',
+<<<<<<< HEAD
+=======
     'pipeline.config.bake.package': '<p>The name of the package you want installed (without any version identifiers).</p>' +
       '<p>If your build produces a deb file named "myapp_1.27-h343", you would want to enter "myapp" here.</p>',
+>>>>>>> parent of a35f5a8... Updated the help message for the "Package" field of the Bake stage
     'pipeline.config.bake.baseAmi': '<p>(Optional) ami-????????</p>',
     'pipeline.config.bake.amiSuffix': '<p>(Optional) String of date in format YYYYMMDDHHmm, default is calculated from timestamp,</p>',
     'pipeline.config.bake.enhancedNetworking': '<p>(Optional) Enable enhanced networking (sr-iov) support for image (requires hvm and trusty base_os).</p>',
