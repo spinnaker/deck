@@ -26,6 +26,7 @@ window.spinnakerSettings = {
         region: 'us-east-1'
       },
       defaultSecurityGroups: ['nf-datacenter-vpc', 'nf-infrastructure-vpc', 'nf-datacenter', 'nf-infrastructure'],
+      copyUserDataOnClone: true,
     },
     gce: {
       defaults: {
