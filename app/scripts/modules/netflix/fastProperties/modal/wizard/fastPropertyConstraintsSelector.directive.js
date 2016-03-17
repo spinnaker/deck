@@ -52,9 +52,7 @@ module.exports = angular
         ];
 
         vm.isSelected = (constraintName) => {
-          let s = constraintName === vm.constraint.trim();
-          console.log('isSelected', constraintName, vm.constraint, s);
-          return s;
+          return constraintName === vm.constraint.trim();
         };
 
         vm.onChange = () => {
