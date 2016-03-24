@@ -1,72 +1,110 @@
 'use strict';
 
-var feedbackUrl = process.env.FEEDBACK_URL || 'http://hootch.test.netflix.net/submit';
-var gateHost = process.env.API_HOST || 'https://spinnaker-api-prestaging.prod.netflix.net';
-var bakeryDetailUrl = process.env.BAKERY_DETAIL_URL || 'http://bakery.test.netflix.net/#/?region={{context.region}}&package={{context.package}}&detail=bake:{{context.status.resourceId}}';
-var authEndpoint = process.env.AUTH_ENDPOINT || 'https://spinnaker-api-prestaging.prod.netflix.net/auth/info';
+
+/**
+ * This section is managed by scripts/reconfigure_spinnaker.sh
+ * If hand-editing, only add comment lines that look like
+ * '// var VARIABLE = VALUE'
+ * and let scripts/reconfigure manage the actual values.
+ */
+// BEGIN reconfigure_spinnaker
+
+// var gateUrl = ${services.gate.baseUrl};
+var gateUrl = 'http://localhost:8084';
+// var bakeryBaseUrl = ${services.bakery.baseUrl};
+var bakeryBaseUrl = 'http://localhost:8087';
+// var authEnabled = ${services.deck.auth.enabled};
+var authEnabled = false;
+// var defaultTimeZone = ${services.deck.timezone};
+var defaultTimeZone = 'America/Los_Angeles';
+// var awsDefaultRegion = ${providers.aws.defaultRegion};
+var awsDefaultRegion = 'us-west-2';
+// var awsPrimaryAccount = ${providers.aws.primaryCredentials.name};
+var awsPrimaryAccount = 'my-aws-account';
+// var googleDefaultRegion = ${providers.google.defaultRegion};
+var googleDefaultRegion = '${SPINNAKER_GOOGLE_DEFAULT_REGION}';
+// var googleDefaultZone = ${providers.google.defaultZone};
+var googleDefaultZone = '${SPINNAKER_GOOGLE_DEFAULT_ZONE}';
+// var googlePrimaryAccount = ${providers.google.primaryCredentials.name};
+var googlePrimaryAccount = 'my-google-account';
+// var azureDefaultRegion = ${providers.azure.defaultRegion};
+var azureDefaultRegion = 'West US';
+// var azurePrimaryAccount = ${providers.azure.primaryCredentials.name};
+var azurePrimaryAccount = 'my-azure-account';
+// var cfDefaultRegion = ${providers.cf.defaultOrg};
+var cfDefaultRegion = 'spinnaker-cf-org';
+// var cfDefaultZone = ${providers.cf.defaultSpace};
+var cfDefaultZone = 'spinnaker-cf-space';
+// var cfPrimaryAccount = ${providers.cf.primaryCredentials.name};
+var cfPrimaryAccount = 'my-cf-account';
+// var titanDefaultRegion = ${providers.titan.defaultRegion};
+var titanDefaultRegion = 'us-east-1';
+// var titanPrimaryAccount = ${providers.titan.primaryCredentials.name};
+var titanPrimaryAccount = 'my-titan-account';
+// var kubernetesDefaultNamespace = ${providers.kubernetes.primaryCredentials.namespace};
+var kubernetesDefaultNamespace = 'default';
+// var kubernetesPrimaryAccount = ${providers.kubernetes.primaryCredentials.name};
+var kubernetesPrimaryAccount = 'my-kubernetes-account';
+
+// END reconfigure_spinnaker
+/**
+ * Any additional custom var statements can go below without
+ * being affected by scripts/reconfigure_spinnaker.sh
+ */
 
 window.spinnakerSettings = {
-  defaultProviders: ['aws', 'gce', 'azure', 'cf', 'kubernetes', 'titan'],
-  feedbackUrl: feedbackUrl,
-  gateUrl: gateHost,
-  bakeryDetailUrl: bakeryDetailUrl,
-  authEndpoint: authEndpoint,
+  gateUrl: gateUrl,
+  bakeryDetailUrl: bakeryBaseUrl + '/api/v1/global/logs/{{context.status.id}}?html=true',
+  authEndpoint: gateUrl + '/auth/info',
   pollSchedule: 30000,
-  defaultTimeZone: process.env.TIMEZONE || 'America/Los_Angeles', // see http://momentjs.com/timezone/docs/#/data-utilities/
+  defaultTimeZone: defaultTimeZone, // see http://momentjs.com/timezone/docs/#/data-utilities/
   providers: {
     azure: {
       defaults: {
-        account: 'azure-test',
-        region: 'westus'
-      },
-    },
-    aws: {
-      defaults: {
-        account: 'test',
-        region: 'us-east-1'
-      },
-      defaultSecurityGroups: ['nf-datacenter-vpc', 'nf-infrastructure-vpc', 'nf-datacenter', 'nf-infrastructure'],
-      loadBalancers: {
-        // if true, VPC load balancers will be created as internal load balancers if the selected subnet has a purpose
-        // tag that starts with "internal"
-        inferInternalFlagFromSubnet: false,
+        account: azurePrimaryAccount,
+        region: azureDefaultRegion
       },
     },
     gce: {
       defaults: {
-        account: 'my-google-account',
-        region: 'us-central1',
-        zone: 'us-central1-f',
+        account: googlePrimaryAccount,
+        region: googleDefaultRegion,
+        zone: googleDefaultZone,
+      }
+    },
+    aws: {
+      defaults: {
+        account: awsPrimaryAccount,
+        region: awsDefaultRegion
+      }
+    },
+    cf: {
+      defaults: {
+        account: cfPrimaryAccount,
+        region: cfDefaultRegion
       },
     },
     titan: {
       defaults: {
-        account: 'titustest',
-        region: 'us-east-1'
+        account: titanPrimaryAccount,
+        region: titanDefaultRegion
       },
     },
     kubernetes: {
       defaults: {
-        account: 'my-kubernetes-account',
-        namespace: 'default'
+        account: kubernetesPrimaryAccount,
+        namespace: kubernetesDefaultNamespace
       },
     }
   },
-  whatsNew: {
-    gistId: '32526cd608db3d811b38',
-    fileName: 'news.md',
-  },
-  authEnabled: process.env.AUTH === 'enabled',
-  gitSources: ['stash', 'github'],
+  authEnabled: authEnabled,
   feature: {
     pipelines: true,
     notifications: false,
-    fastProperty: true,
-    vpcMigrator: true,
-    clusterDiff: true,
-    roscoMode: false,
+    fastProperty: false,
+    vpcMigrator: false,
+    clusterDiff: false,
+    roscoMode: true,
     netflixMode: false,
-    // whether stages affecting infrastructure (like "Create Load Balancer") should be enabled or not
-    infrastructureStages: process.env.INFRA_STAGES === 'enabled',
   },
 };
