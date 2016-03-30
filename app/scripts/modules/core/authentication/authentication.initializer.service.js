@@ -20,8 +20,12 @@ module.exports = angular.module('spinnaker.authentication.initializer.service', 
         .error(function (data, status, headers) {
           var redirect = headers('X-AUTH-REDIRECT-URL');
           if (status === 401 && redirect) {
-            var callback = encodeURIComponent($location.absUrl());
-            redirectService.redirect(settings.gateUrl + redirect + '?callback=' + callback);
+            if (settings.oauth) {
+              redirectService.redirect(redirect);
+            } else {
+              var callback = encodeURIComponent($location.absUrl());
+              redirectService.redirect(settings.gateUrl + redirect + '?callback=' + callback);
+            }
           } else {
             $rootScope.authenticating = false;
           }
