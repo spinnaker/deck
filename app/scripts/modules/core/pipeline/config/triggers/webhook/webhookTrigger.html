@@ -1,0 +1,30 @@
+<ng-form name="webhookForm">
+
+    <div class="row">
+      <div class="col-md-3 sm-label-right">
+        Webhook URL
+      </div>
+      <div class="col-md-6">{{vm.endpointUrl}}</div>
+    </div>
+
+    <div class="form-group row">
+      <label class="col-md-3 sm-label-right">
+        <b>Constraints</b>
+        <help-field key="pipeline.config.webhook.constraints"></help-field>
+      </label>
+      <div class="col-sm-9">
+        <map-editor model="trigger.constraints" add-button-label="Add New Constraint" allow-empty="true" on-change="vm.updateExamplePayload()"></map-editor>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-3 sm-label-right">
+        Example Webhook Payload
+      </div>
+      <div class="col-sm-9">
+        <pre>{{examplePayload | json}}</pre>
+      </div>
+    </div>
+
+</ng-form>
+
