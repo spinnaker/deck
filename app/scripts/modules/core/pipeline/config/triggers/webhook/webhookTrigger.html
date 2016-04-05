@@ -1,0 +1,61 @@
+<ng-form name="webhookForm">
+  <div class="form-group row">
+      <label class="col-md-3 sm-label-right">
+      Webhook Type
+      <help-field key="pipeline.config.webhook.type"></help-field>
+    </label>
+
+    <div class="col-md-3">
+      <input type="text" class="form-control input-sm"
+             ng-model="vm.trigger.webhookType"
+             ng-change="vm.compressWhitespace()"
+             name="webhookType"
+             required
+      />
+    </div>
+  </div>
+  <div class="form-group row">
+    <label class="col-md-3 sm-label-right">
+      Webhook Source
+      <help-field key="pipeline.config.webhook.source"></help-field>
+    </label>
+
+    <div class="col-md-3">
+      <input type="text" class="form-control input-sm"
+             ng-model="vm.trigger.webhookSource"
+             ng-change="vm.compressWhitespace()"
+             name="webhookSource"
+             required
+      />
+    </div>
+  </div>
+
+  <!--<div class="form-group row slide-in animated" ng-if="{viewState.exampleLoaded}">-->
+  <div class="form-group slide-in animated">
+    <div class="row">
+      <div class="col-md-3 sm-label-right">
+        Webhook URL
+      </div>
+      <div class="col-md-6">
+        http://localhost:8089/webhooks/<i>ci</i>/<i>teamcity</i><br>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-3 sm-label-right">
+        Example Webhook Payload
+      </div>
+      <div class="col-sm-9 col-sm-offset-3">
+        some json here
+      </div>
+    </div>
+  </div>
+
+
+  <div class="form-group row slide-in animated" ng-if="cronForm.cronExpression.$error.cronExpression">
+    <div class="col-sm-9 col-sm-offset-3 error-message">
+      {{vm.validationMessages.error}}
+    </div>
+  </div>
+
+</ng-form>
