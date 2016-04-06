@@ -23,12 +23,12 @@ module.exports = angular.module('spinnaker.core.pipeline.trigger.webhook', [
 
     this.trigger = trigger;
 
-    if (settings && settings.type) {
-      $scope.webhookType = settings.type;
+    if (settings && settings.category) {
+      $scope.category = settings.category;
     }
 
-    if (settings && settings.webhookSource) {
-      $scope.webhookSource = settings.source;
+    if (settings && settings.source) {
+      $scope.source = settings.source;
     }
 
 //    if ($scope.gitTriggerTypes.length == 1) {
@@ -40,7 +40,7 @@ module.exports = angular.module('spinnaker.core.pipeline.trigger.webhook', [
       //$scope.viewState.exampleLoaded = true;
     }
 
-    $scope.$watch('vm.trigger.webhookType', checkAndDisplayExamplePayload);
-    $scope.$watch('vm.trigger.webhookSource', checkAndDisplayExamplePayload);
+    $scope.$watch('vm.trigger.category', checkAndDisplayExamplePayload);
+    $scope.$watch('vm.trigger.source', checkAndDisplayExamplePayload);
 
   });

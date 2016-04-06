@@ -213,7 +213,7 @@ module.exports = angular.module('spinnaker.core.help.contents', [])
     '<p><strong>Example: every Monday at 10 am</strong></p><samp>0 0 10 ? * 2</samp>' +
     '<p><strong>Note:</strong> values for "DayOfWeek" are 1-7, where Sunday is 1, Monday is 2, etc. You can also use MON,TUE,WED, etc.',
 
-    'pipeline.config.webhook.type': '<p>A string representing a &quot;type&quot; for this webhook.<p> <p>For example: For a webhook trigger from a CI server use &quot;ci&quot;.' +
+    'pipeline.config.webhook.category': '<p>A string representing a &quot;type&quot; for this webhook.<p> <p>For example: For a webhook trigger from a CI server use &quot;ci&quot;.' +
       '<br>This forms part of the URL the webhook must POST to.',
     'pipeline.config.webhook.source': '<p>A string representing a &quot;source&quot; for this webhook.<p> <p>For example: For a webhook trigger from a TeamCity server use &quot;teamcity&quot;' +
       '<br>This forms part of the URL the webhook must POST to.',

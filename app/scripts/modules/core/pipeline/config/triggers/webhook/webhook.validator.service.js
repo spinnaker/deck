@@ -8,7 +8,6 @@ module.exports = angular.module('spinnaker.core.pipeline.trigger.webhook.validat
   .factory('webhookValidationService', function(Restangular) {
 
     function validate(expression) {
-    alert(expression);
       return expression.length > 0;
     }
 

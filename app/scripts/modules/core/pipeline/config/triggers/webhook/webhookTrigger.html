@@ -2,14 +2,14 @@
   <div class="form-group row">
       <label class="col-md-3 sm-label-right">
       Webhook Type
-      <help-field key="pipeline.config.webhook.type"></help-field>
+      <help-field key="pipeline.config.webhook.category"></help-field>
     </label>
 
     <div class="col-md-3">
       <input type="text" class="form-control input-sm"
-             ng-model="vm.trigger.webhookType"
+             ng-model="vm.trigger.category"
              ng-change="vm.compressWhitespace()"
-             name="webhookType"
+             name="category"
              required
       />
     </div>
@@ -22,9 +22,9 @@
 
     <div class="col-md-3">
       <input type="text" class="form-control input-sm"
-             ng-model="vm.trigger.webhookSource"
+             ng-model="vm.trigger.source"
              ng-change="vm.compressWhitespace()"
-             name="webhookSource"
+             name="source"
              required
       />
     </div>
@@ -37,7 +37,7 @@
         Webhook URL
       </div>
       <div class="col-md-6">
-        http://localhost:8089/webhooks/<i>ci</i>/<i>teamcity</i><br>
+        http://localhost:8089/webhooks/trigger/<i>ci</i>/<i>teamcity</i><br>
       </div>
     </div>
 
