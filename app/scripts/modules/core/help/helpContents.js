@@ -215,8 +215,10 @@ module.exports = angular.module('spinnaker.core.help.contents', [])
 
     'pipeline.config.webhook.category': '<p>A string representing a &quot;type&quot; for this webhook.<p> <p>For example: For a webhook trigger from a CI server use &quot;ci&quot;.' +
       '<br>This forms part of the URL the webhook must POST to.',
-    'pipeline.config.webhook.source': '<p>A string representing a &quot;source&quot; for this webhook.<p> <p>For example: For a webhook trigger from a TeamCity server use &quot;teamcity&quot;' +
-      '<br>This forms part of the URL the webhook must POST to.',
+    'pipeline.config.webhook.constraints': '<p>Constraints are fields and (optionally) values that must be in the webhook payload for this trigger to start a pipeline.' +
+      '<p>If only a constraint name is populated, then this field name must be present but the value can be any string (including an empty string)' +
+      '<p>If both name and value are populated, then both must match the content in the webhook for the pipeline to start.' +
+      '<br>Example:<br>&nbsp;projectName&nbsp : &nbsp; myProject',
 
     'cluster.description': '<p>A cluster is a collection of server groups with the same name (stack + detail) in the same account.</p>',
     'pipeline.config.findAmi.cluster': 'The cluster to look at when selecting the image to use in this pipeline.',

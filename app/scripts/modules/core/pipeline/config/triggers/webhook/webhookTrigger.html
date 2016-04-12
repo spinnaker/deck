@@ -1,30 +1,63 @@
 <ng-form name="webhookForm">
-  <div class="form-group row">
-    <label class="col-md-3 sm-label-right">
-      Webhook Source
-      <help-field key="pipeline.config.webhook.source"></help-field>
-    </label>
 
-    <div class="col-md-3">
-      <input type="text" class="form-control input-sm"
-             ng-model="vm.trigger.source"
-             ng-change="vm.compressWhitespace()"
-             name="source"
-             required
-      />
-    </div>
-  </div>
-
-  <!--<div class="form-group row slide-in animated" ng-if="{viewState.exampleLoaded}">-->
-  <div class="form-group slide-in animated">
     <div class="row">
       <div class="col-md-3 sm-label-right">
         Webhook URL
       </div>
       <div class="col-md-6">
-        http://localhost:8089/webhooks/trigger/<i>ci</i>/<i>teamcity</i><br>
+        http://localhost:8089/webhooks/webhook</i><br>
       </div>
     </div>
+
+
+  <div class="row" ng-show="trigger.constraints.length==0">
+    <label class="col-md-3 sm-label-right">
+      Constraints
+      <help-field key="pipeline.config.webhook.constraints"></help-field>
+    </label>
+    <div class="col-md-8">
+      No payload constraints.
+    </div>
+  </div>
+
+
+  <div class="form-group row" ng-repeat="constraint in trigger.constraints">
+
+    <label class="col-md-3 sm-label-right" ng-show="$first">
+      Constraints
+      <help-field key="pipeline.config.webhook.constraints"></help-field>
+    </label>
+
+    <div class="col-md-3" ng-show="!$first">
+    </div>
+
+    <div class="col-md-4">
+      <input type="text" class="form-control input-sm col-md-4"
+             ng-model="constraint.name"
+             ng-change="vm.compressWhitespace()"
+             placeholder="constraint name..."
+             required
+      />
+    </div>
+    <div class="col-md-4">
+      <input type="text" class="form-control input-sm col-md-4"
+             ng-model="constraint.value"
+             ng-change="vm.compressWhitespace()"
+             placeholder="constraint value (optional)..."
+      />
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <div class="col-md-3 sm-label-right"></div>
+    <div class="col-md-4">
+      <button ng-click="ctrl.add()">Add constraint</button>
+    </div>
+  </div>
+
+
+  <!--<div class="form-group row slide-in animated" ng-if="{viewState.exampleLoaded}">-->
+
 
     <div class="row">
       <div class="col-md-3 sm-label-right">
@@ -44,3 +77,4 @@
   </div>
 
 </ng-form>
+

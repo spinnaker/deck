@@ -21,27 +21,28 @@ module.exports = angular.module('spinnaker.core.pipeline.trigger.webhook', [
       exampleLoaded: false,
     };
 
-    this.trigger = trigger;
+    $scope.trigger = trigger;
 
-    this.trigger.extras = { "test": "this is a test"};
+    /* Setting constraints as a hash works. */
+    //this.trigger.constraints = { "test": "this is a test"};
 
-//    if (settings && settings.type) {
-//      $scope.type = settings.type;
-//    }
-//
-//    if (settings && settings.source) {
-//      $scope.source = settings.source;
-//    }
 
-//    if ($scope.gitTriggerTypes.length == 1) {
-//      trigger.source = $scope.gitTriggerTypes[0];
-//    }
+    /* But pushing them into an array is upsetting echo
 
-    function checkAndDisplayExamplePayload() {
+    2016-04-12 10:58:45.696  INFO 2412 --- [ool-11-thread-1] .s.e.s.a.p.i.PipelineConfigsPollingAgent : Running the pipeline configs polling agent...
+    2016-04-12 10:58:47.334 ERROR 2412 --- [  Retrofit-Idle] c.n.s.e.pipelinetriggers.PipelineCache   : Error fetching pipelines from Front50:
+        com.google.gson.JsonSyntaxException: java.lang.IllegalStateException: Expected BEGIN_ARRAY but was BEGIN_OBJECT
+        at line 145 column 24 path $[1].triggers[1].constraints[0]
 
-      //$scope.viewState.exampleLoaded = true;
+    */
+
+    if (angular.isUndefined($scope.trigger.constraints)) {
+      $scope.trigger.constraints = [];
     }
 
-    $scope.$watch('vm.trigger.source', checkAndDisplayExamplePayload);
+    this.add = function() {
+      $scope.trigger.constraints.push({name:'', value: ''});
+
+    };
 
   });
