@@ -10,12 +10,12 @@ module.exports = angular.module('spinnaker.azure.serverGroup.details.controller'
   require('../../../core/serverGroup/serverGroup.read.service.js'),
   require('../../../core/utils/selectOnDblClick.directive.js'),
   require('../../../core/confirmationModal/confirmationModal.service.js'),
-  require('../../../core/serverGroup/serverGroup.write.service.js'),
+  require('../serverGroup.write.service.js'),
   require('../../../core/utils/lodash.js'),
   require('../../../core/insight/insightFilterState.model.js'),
 ])
   .controller('azureServerGroupDetailsCtrl', function ($scope, $state, $templateCache, $compile, app, serverGroup, InsightFilterStateModel,
-                                                     serverGroupReader, azureServerGroupCommandBuilder, $uibModal, confirmationModalService, _, serverGroupWriter,
+                                                     serverGroupReader, azureServerGroupCommandBuilder, $uibModal, confirmationModalService, _, azureServerGroupWriter,
                                                      subnetReader) {
 
     $scope.state = {
@@ -111,11 +111,11 @@ module.exports = angular.module('spinnaker.azure.serverGroup.details.controller'
         title: 'Destroying ' + serverGroup.name,
         forceRefreshMessage: 'Refreshing application...',
         forceRefreshEnabled: true,
-        katoPhaseToMonitor: 'DESTROY_ASG'
+        katoPhaseToMonitor: 'DESTROY_SERVER_GROUP'
       };
 
       var submitMethod = function () {
-        return serverGroupWriter.destroyServerGroup(serverGroup, app);
+        return azureServerGroupWriter.destroyServerGroup(serverGroup, app);
       };
 
       var stateParams = {
@@ -132,7 +132,6 @@ module.exports = angular.module('spinnaker.azure.serverGroup.details.controller'
         provider: 'azure',
         taskMonitorConfig: taskMonitor,
         submitMethod: submitMethod,
-        body: this.getBodyTemplate(serverGroup, app),
         onTaskComplete: function() {
           if ($state.includes('**.serverGroup', stateParams)) {
             $state.go('^');
@@ -172,7 +171,7 @@ module.exports = angular.module('spinnaker.azure.serverGroup.details.controller'
       };
 
       var submitMethod = function () {
-        return serverGroupWriter.disableServerGroup(serverGroup, app);
+        return azureServerGroupWriter.disableServerGroup(serverGroup, app);
       };
 
       confirmationModalService.confirm({
@@ -181,6 +180,7 @@ module.exports = angular.module('spinnaker.azure.serverGroup.details.controller'
         account: serverGroup.account,
         provider: 'azure',
         taskMonitorConfig: taskMonitor,
+        body: this.getBodyTemplate(serverGroup, app),
         submitMethod: submitMethod
       });
 
@@ -195,7 +195,7 @@ module.exports = angular.module('spinnaker.azure.serverGroup.details.controller'
       };
 
       var submitMethod = function () {
-        return serverGroupWriter.enableServerGroup(serverGroup, app);
+        return azureServerGroupWriter.enableServerGroup(serverGroup, app);
       };
 
       confirmationModalService.confirm({
