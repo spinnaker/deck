@@ -31,7 +31,7 @@
           <button type="button" class="btn btn-sm btn-primary dropdown-toggle" uib-dropdown-toggle>
             Load Balancer Actions <span class="caret"></span>
           </button>
-          <ul class="uib-dropdown-menu" role="menu">
+          <ul class="dropdown-menu" uib-dropdown-menu role="menu">
             <li><a href ng-click="ctrl.editLoadBalancer()">Edit Load Balancer</a></li>
             <!--<li><a href ng-click="ctrl.cloneLoadBalancer()">Clone Load Balancer</a></li>-->
             <li ng-if="!loadBalancer.instances.length"><a href ng-click="ctrl.deleteLoadBalancer()">Delete Load Balancer</a></li>
@@ -52,6 +52,8 @@
         <dd><account-tag account="loadBalancer.account" pad="right"></account-tag> {{loadBalancer.region}}</dd>
         <dt>VPC</dt>
         <dd><vpc-tag vpc-id="loadBalancer.elb.vpcid"></vpc-tag></dd>
+        <dt>Subnet</dt>
+        <dd>{{ctrl.getFirstSubnetPurpose(loadBalancer.subnetDetails)}}</dd>
       </dl>
       <dl ng-class="InsightFilterStateModel.filtersExpanded ? '' : 'dl-horizontal dl-wide'">
         <dt>Availability Zones</dt>

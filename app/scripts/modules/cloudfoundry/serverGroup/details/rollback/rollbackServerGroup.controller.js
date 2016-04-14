@@ -9,7 +9,7 @@ module.exports = angular.module('spinnaker.cf.serverGroup.details.rollback.contr
       require('../../../../core/serverGroup/serverGroup.write.service.js'),
       require('../../../../core/task/monitor/taskMonitorService.js'),
     ])
-    .controller('cfRollbackServerGroupCtrl', function ($scope, $modalInstance, serverGroupWriter,
+    .controller('cfRollbackServerGroupCtrl', function ($scope, $uibModalInstance, serverGroupWriter,
                                                         taskMonitorService,
                                                         application, serverGroup, disabledServerGroups) {
       $scope.serverGroup = serverGroup;
@@ -21,7 +21,7 @@ module.exports = angular.module('spinnaker.cf.serverGroup.details.rollback.contr
         rollbackContext: {
           rollbackServerGroupName: serverGroup.name
         },
-        zone: serverGroup.zones[0],
+        region: serverGroup.region,
       };
 
       if (application && application.attributes) {
@@ -47,7 +47,7 @@ module.exports = angular.module('spinnaker.cf.serverGroup.details.rollback.contr
         };
 
         var taskMonitorConfig = {
-          modalInstance: $modalInstance,
+          modalInstance: $uibModalInstance,
           application: application,
           title: 'Rollback ' + serverGroup.name,
         };
@@ -58,6 +58,6 @@ module.exports = angular.module('spinnaker.cf.serverGroup.details.rollback.contr
       };
 
       this.cancel = function () {
-        $modalInstance.dismiss();
+        $uibModalInstance.dismiss();
       };
     });
