@@ -214,12 +214,10 @@ module.exports = angular.module('spinnaker.core.help.contents', [])
     '<p><strong>Example: every Monday at 10 am</strong></p><samp>0 0 10 ? * 2</samp>' +
     '<p><strong>Note:</strong> values for "DayOfWeek" are 1-7, where Sunday is 1, Monday is 2, etc. You can also use MON,TUE,WED, etc.',
 
-    'pipeline.config.webhook.category': '<p>A string representing a &quot;type&quot; for this webhook.<p> <p>For example: For a webhook trigger from a CI server use &quot;ci&quot;.' +
-      '<br>This forms part of the URL the webhook must POST to.',
-    'pipeline.config.webhook.constraints': '<p>Constraints are fields and (optionally) values that must be in the webhook payload for this trigger to start a pipeline.' +
-      '<p>If only a constraint name is populated, then this field name must be present but the value can be any string (including an empty string)' +
-      '<p>If both name and value are populated, then both must match the content in the webhook for the pipeline to start.' +
-      '<br>Example:<br>&nbsp;projectName&nbsp : &nbsp; myProject',
+    'pipeline.config.webhook.constraints': '<p><strong>Constraints</strong> are keys (and optionally values) that must be in the webhook payload for this trigger to start a pipeline.' +
+      '<p>If only a constraint key is populated, then this field name must be present but the value can be any string (including an empty string)' +
+      '<p>If both key and value are populated, then both must match the payload in the webhook for the pipeline to start.' +
+      '<br>Example:<br>&nbsp;&nbsp;&nbsp;Key: &nbsp;projectName<br>&nbsp;&nbsp;&nbsp Value: &nbsp; myProject',
 
     'cluster.description': '<p>A cluster is a collection of server groups with the same name (stack + detail) in the same account.</p>',
     'pipeline.config.findAmi.cluster': 'The cluster to look at when selecting the image to use in this pipeline.',
