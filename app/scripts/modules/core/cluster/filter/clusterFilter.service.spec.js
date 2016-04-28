@@ -620,7 +620,7 @@ describe('Service: clusterFilterService', function () {
           this.serverGroup000,
           this.serverGroup001,
           { cluster: 'cluster-b', name: 'cluster-a-v003', account: 'prod', region: 'us-east-1', stringVal: 'new', category: 'serverGroup' },
-        ]}
+        ]},
         clusters: [
           this.clusterA,
           this.clusterB,
