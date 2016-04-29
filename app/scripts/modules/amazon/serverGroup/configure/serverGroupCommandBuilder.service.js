@@ -58,6 +58,7 @@ module.exports = angular.module('spinnaker.aws.serverGroupCommandBuilder.service
             keyPair: keyPair,
             suspendedProcesses: [],
             securityGroups: [],
+            blockDevices: [],
             tags: {},
             viewState: {
               instanceProfile: 'custom',

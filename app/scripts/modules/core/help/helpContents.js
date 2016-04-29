@@ -43,6 +43,8 @@ module.exports = angular.module('spinnaker.core.help.contents', [])
     'aws.serverGroup.strategy': 'The deployment strategy tells Spinnaker what to do with the previous version of the server group.',
     'aws.serverGroup.traffic': 'Enables the "AddToLoadBalancer" scaling process, which is used by Spinnaker and ' +
     ' discovery services to determine if the server group is enabled.',
+    'aws.serverGroup.ebsVolumes': '(Optional) <b>EBS Volumes</b> is the number of devices to attach max 24. The device names will be auto generated.',
+    'aws.serverGroup.ebsVolumeSize': '<b>Volume Size(GB)</b> 1-1024 for standard volumes, 1-16384 for gp2 volumes, and 500-16384 for st1 and sc1 volumes.',
     'aws.securityGroup.vpc': '<p>The VPC to which this security group will apply.</p>' +
       '<p>If you wish to use VPC but are unsure which VPC to use, the most common one is "Main".</p>' +
       '<p>If you do not wish to use VPC, select "None".</p>',
