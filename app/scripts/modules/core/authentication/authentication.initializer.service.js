@@ -14,22 +14,24 @@ module.exports = angular.module('spinnaker.authentication.initializer.service', 
         .success(function (data) {
           if (data.email) {
             authenticationService.setAuthenticatedUser(data.email);
+          } else {
+            loginRedirect();
           }
           $rootScope.authenticating = false;
         })
-        .error(function (data, status, headers) {
-          var redirect = headers('X-AUTH-REDIRECT-URL');
-          if (status === 401 && redirect) {
-            if (settings.oauth) {
-              redirectService.redirect(redirect);
-            } else {
-              var callback = encodeURIComponent($location.absUrl());
-              redirectService.redirect(settings.gateUrl + redirect + '?callback=' + callback);
-            }
-          } else {
-            $rootScope.authenticating = false;
-          }
+        .error(function () {
+          loginRedirect();
+          $rootScope.authenticating = false;
         });
+    }
+
+    /**
+     * This function hits a protected resource endpoint specifically meant for Deck's
+     * login flow. 
+     */
+    function loginRedirect() {
+      var callback = encodeURIComponent($location.absUrl());
+      redirectService.redirect(settings.gateUrl + '/auth/redirect?to=' + callback);
     }
 
     return {
