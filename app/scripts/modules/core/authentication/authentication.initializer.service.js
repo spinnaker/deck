@@ -19,15 +19,12 @@ module.exports = angular.module('spinnaker.authentication.initializer.service', 
           }
           $rootScope.authenticating = false;
         })
-        .error(function () {
-          loginRedirect();
-          $rootScope.authenticating = false;
-        });
+        .error(loginRedirect);
     }
 
     /**
      * This function hits a protected resource endpoint specifically meant for Deck's
-     * login flow. 
+     * login flow.
      */
     function loginRedirect() {
       var callback = encodeURIComponent($location.absUrl());
