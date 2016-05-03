@@ -20,7 +20,7 @@ module.exports = angular
     };
   }).controller('BlockDevicesCtrl', function ($scope) {
     let self = this,
-        currentBlocks = this.command.blockDevices.length;
+        currentBlocks = this.command.blockDevices && this.command.blockDevices.length;
 
     this.numberOfBlockDevices = currentBlocks ? currentBlocks : '';
     this.volumeType = currentBlocks ? this.command.blockDevices[0].volumeType : 'gp2';
@@ -58,7 +58,7 @@ module.exports = angular
         this.attachDevices(newVal);
       } else {
         this.sizeRequired = false;
-        this.command.blockDevices = [];
+        delete this.command.blockDevices;
       }
     });
     $scope.$watch('blockDevicesCtrl.size', (newVal, oldVal) => {
@@ -79,6 +79,9 @@ module.exports = angular
       }
     });
     function updateValue(key, val) {
+      if (!self.command.blockDevices) {
+        return;
+      }
       self.command.blockDevices.forEach((device) => {
         device[key] = val;
       });

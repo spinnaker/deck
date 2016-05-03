@@ -13,7 +13,6 @@ describe('Controller: BlockDevicesCtrl', function () {
       $scope: scope
     },{
       command: {
-        blockDevices: []
       }
     });
     scope.blockDevicesCtrl = blockDevicesCtrl;
@@ -30,10 +29,13 @@ describe('Controller: BlockDevicesCtrl', function () {
   });
 
   it('should add and remove block devices based on number', function(){
-    expect(blockDevicesCtrl.command.blockDevices.length).toBe(0);
+    expect(blockDevicesCtrl.command.blockDevices).toBe(undefined);
     scope.blockDevicesCtrl.numberOfBlockDevices = 2;
     scope.$digest();
     expect(blockDevicesCtrl.command.blockDevices.length).toBe(2);
+    scope.blockDevicesCtrl.numberOfBlockDevices = 0;
+    scope.$digest();
+    expect(blockDevicesCtrl.command.blockDevices).toBe(undefined);
   });
 
   it('should set the correct min and max volume size based on volumeType', function(){
@@ -44,10 +46,13 @@ describe('Controller: BlockDevicesCtrl', function () {
 
   it('should update the size value on every block device', function() {
     var newValue = 2;
+    scope.blockDevicesCtrl.numberOfBlockDevices = 2;
+    scope.$digest();
     blockDevicesCtrl.command.blockDevices.forEach(function(device){
       expect(device.size).toBe('');
     });
     scope.blockDevicesCtrl.size = newValue;
+    scope.$digest();
     blockDevicesCtrl.command.blockDevices.forEach(function(device){
       expect(device.size).toBe(newValue);
     });
