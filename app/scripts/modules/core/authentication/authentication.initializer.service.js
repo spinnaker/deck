@@ -14,10 +14,10 @@ module.exports = angular.module('spinnaker.authentication.initializer.service', 
         .success(function (data) {
           if (data.email) {
             authenticationService.setAuthenticatedUser(data.email);
+            $rootScope.authenticating = false;
           } else {
             loginRedirect();
           }
-          $rootScope.authenticating = false;
         })
         .error(loginRedirect);
     }
