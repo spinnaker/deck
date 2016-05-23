@@ -72,8 +72,6 @@ module.exports = angular
     this.migrationOptions = {
       allowIngressFromClassic: true,
       subnetType: 'internal',
-      account: serverGroup.account,
-      keyName: serverGroup.launchConfig.keyName,
     };
 
     this.source = {
@@ -131,7 +129,6 @@ module.exports = angular
     };
 
     let migrationComplete = (task) => {
-      console.warn('task:', task);
       this.task = task;
       this.preview = this.task.getPreview();
       this.state = 'complete';
@@ -139,7 +136,6 @@ module.exports = angular
 
     let migrationStarted = (task) => {
       this.task = task;
-      this.state = 'migrate';
       taskReader.waitUntilTaskCompletes(application.name, task).then(migrationComplete, errorMode);
     };
 
