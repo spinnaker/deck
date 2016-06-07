@@ -2,7 +2,7 @@
 
 let angular = require('angular');
 
-module.exports = angular.module('spinnaker.opensatck.serverGroup.configure.deployInitialization.controller', [
+module.exports = angular.module('spinnaker.openstack.serverGroup.configure.deployInitialization.controller', [
   require('../../../../core/serverGroup/serverGroup.read.service.js'),
   require('../../../../core/utils/lodash.js'),
   require('../ServerGroupCommandBuilder.js'),
