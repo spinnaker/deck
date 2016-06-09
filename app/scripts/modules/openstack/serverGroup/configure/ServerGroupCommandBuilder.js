@@ -26,9 +26,6 @@ module.exports = angular.module('spinnaker.openstack.serverGroupCommandBuilder.s
           loadBalancers: [],
           securityGroups: [],
           strategy: '',
-          sku: {
-            capacity: 1,
-          },
           selectedProvider: 'openstack',
           viewState: {
             instanceProfile: 'custom',
