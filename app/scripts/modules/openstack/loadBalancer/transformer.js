@@ -14,7 +14,7 @@ module.exports = angular.module('spinnaker.openstack.loadBalancer.transformer', 
     function serverGroupIsInLoadBalancer(serverGroup, loadBalancer) {
       return serverGroup.type === 'openstack' &&
         serverGroup.account === loadBalancer.account &&
-        serverGroup.namespace === loadBalancer.namespace &&
+        serverGroup.region === loadBalancer.region &&
         serverGroup.loadBalancers.indexOf(loadBalancer.name) !== -1;
     }
 
@@ -26,8 +26,6 @@ module.exports = angular.module('spinnaker.openstack.loadBalancer.transformer', 
         detail: '',
         subnetId: '',
         floatingIpId: '',
-//TODO: is namespace needed?
-//        namespace: settings.providers.openstack ? settings.providers.openstack.defaults.namespace : null,
         protocol: 'HTTPS',
         externalPort: 443,
         internalPort: 443,
@@ -45,6 +43,11 @@ module.exports = angular.module('spinnaker.openstack.loadBalancer.transformer', 
     }
 
     function convertLoadBalancerForEditing(loadBalancer) {
+      _.defaults(loadBalancer.healthMonitor, {
+          method: 'GET',
+          url: '/healthCheck',
+          expectedStatusCodes: [200],
+      });
       return loadBalancer;
     }
 

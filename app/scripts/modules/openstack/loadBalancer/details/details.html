@@ -99,7 +99,7 @@
         <dd>{{loadBalancer.healthMonitor.maxRetries}}</dd>
       </dl>
       <dl class="dl-horizontal" ng-class="InsightFilterStateModel.filtersExpanded ? 'dl-narrow' : 'dl-wide'"
-          ng-if="loadBalancer.healthMonitor.protocol == 'HTTP' || loadBalancer.healthMonitor.protocol == 'HTTPS'">
+          ng-if="loadBalancer.healthMonitor.type == 'HTTP' || loadBalancer.healthMonitor.type == 'HTTPS'">
         <dt>Method</dt>
         <dd>{{loadBalancer.healthMonitor.method}}</dd>
         <dt>URL</dt>

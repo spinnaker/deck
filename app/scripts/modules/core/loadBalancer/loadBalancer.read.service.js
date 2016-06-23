@@ -20,7 +20,7 @@ if(applicationName == 'app1') {
       type: 'openstack',
 			region: 'region1',
 			account: 'test',
-			name: 'test-s-d',
+			name: 'app1-s-d',
 			protocol: 'HTTP',
 			method : 'ROUND_ROBIN',
 			subnetId: '4f848451-7283-481a-88b7-a9f55e925fd8',
@@ -28,10 +28,14 @@ if(applicationName == 'app1') {
 			internalPort: 8100,
 			floatingIpId: '8cfb7dd3-6767-4d07-a00f-f0ac9ce0922c',
 			healthMonitor: {
-				type: 'PING',
-				delay: 10,
-				timeout: 200,
-				maxRetries: 2
+        type: 'PING',
+//        type: 'HTTPS',
+//        method: 'GET',
+//        url: '/healthCheck',
+//        expectedStatusCodes: [200]
+        delay: 10,
+        timeout: 200,
+        maxRetries: 2,
 			}
   } );
 }
@@ -53,7 +57,7 @@ if( account == 'test' && name == 'test-s-d' ) {
     type: 'openstack',
     region: 'region1',
     account: 'test',
-    name: 'test-s-d',
+    name: 'app1-s-d',
     protocol: 'HTTP',
     method : 'ROUND_ROBIN',
     subnetId: '4f848451-7283-481a-88b7-a9f55e925fd8',
@@ -61,10 +65,13 @@ if( account == 'test' && name == 'test-s-d' ) {
     internalPort: 8100,
     floatingIpId: '8cfb7dd3-6767-4d07-a00f-f0ac9ce0922c',
     healthMonitor: {
-      type: 'PING',
+      type: 'HTTPS',
       delay: 10,
       timeout: 200,
-      maxRetries: 2
+      maxRetries: 2,
+      method: 'GET',
+      url: '/healthCheck',
+      expectedStatusCodes: [200]
     },
     serverGroups: [{name: 'sg1'}]
   } ); } );

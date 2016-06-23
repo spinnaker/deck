@@ -26,9 +26,7 @@
           <account-select-field component="loadBalancer" field="account" accounts="accounts" provider="'openstack'" on-change="ctrl.accountUpdated()"></account-select-field>
         </div>
       </div>
-<!--
-        <namespace-select-field component="loadBalancer" field="namespace" account="loadBalancer.account" namespaces="namespaces" on-change="ctrl.namespaceUpdated()"></namespace-select-field>
--->
+
       <select-field label="Region" options="regions" model="loadBalancer.region" on-change="ctrl.regionUpdated()"></select-field>
 
       <div class="form-group">

@@ -14,7 +14,7 @@ module.exports = angular.module('spinnaker.loadBalancer.openstack.details.contro
   require('../../../core/utils/selectOnDblClick.directive.js'),
 ])
   .controller('openstackLoadBalancerDetailsController', function ($scope, $state, $uibModal, loadBalancer, app, InsightFilterStateModel,
-                                                                   _, confirmationModalService, accountService, loadBalancerReader, loadBalancerWriter, subnetReader, securityGroupReader, $q) {
+                                                                   _, confirmationModalService, accountService, loadBalancerReader, loadBalancerWriter, subnetReader, $q) {
 
     let application = app;
 
@@ -23,19 +23,6 @@ module.exports = angular.module('spinnaker.loadBalancer.openstack.details.contro
     };
 
     $scope.InsightFilterStateModel = InsightFilterStateModel;
-
-    function resolveSecurityGroups() {
-      if( $scope.loadBalancer.securityGroups ) {
-        var securityGroups = [];
-        $scope.loadBalancer.securityGroups.forEach(function (securityGroupId) {
-          var match = securityGroupReader.getApplicationSecurityGroup(app, loadBalancer.accountId, loadBalancer.region, securityGroupId);
-          if (match) {
-            securityGroups.push(match);
-          }
-        });
-        $scope.securityGroups = _.sortBy(securityGroups, 'name');
-      }
-    }
 
     function resolveSubnet() {
       if ($scope.loadBalancer.subnetId) {
@@ -69,7 +56,6 @@ module.exports = angular.module('spinnaker.loadBalancer.openstack.details.contro
         $scope.loadBalancer = appLoadBalancer;
         $scope.state.loading = false;
 
-        resolveSecurityGroups();
         resolveSubnet();
         resolveFloatingIp();
       } else {

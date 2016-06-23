@@ -50,7 +50,6 @@ module.exports = angular.module('spinnaker.loadBalancer.openstack.create.control
     // initialize controller
     if (loadBalancer) {
       $scope.loadBalancer = openstackLoadBalancerTransformer.convertLoadBalancerForEditing(loadBalancer);
-      initializeEditMode();
     } else {
       $scope.loadBalancer = openstackLoadBalancerTransformer.constructNewLoadBalancerTemplate();
       initializeLoadBalancerNames();
@@ -91,9 +90,6 @@ module.exports = angular.module('spinnaker.loadBalancer.openstack.create.control
 
     var allLoadBalancerNames = {};
 
-    function initializeEditMode() {
-    }
-
     function finishInitialization() {
       accountService.listAccounts('openstack').then(function (accounts) {
         $scope.accounts = accounts;
@@ -103,9 +99,6 @@ module.exports = angular.module('spinnaker.loadBalancer.openstack.create.control
         if (accountNames.length && accountNames.indexOf($scope.loadBalancer.account) === -1) {
           $scope.loadBalancer.account = accountNames[0];
         }
-
-        //TODO: remove hard-coded value once we can get the region(s) from the account
-        $scope.loadBalancer.region = 'RegionOne';
 
         ctrl.accountUpdated();
       });
@@ -118,15 +111,18 @@ module.exports = angular.module('spinnaker.loadBalancer.openstack.create.control
           if (!allLoadBalancerNames[account]) {
             allLoadBalancerNames[account] = {};
           }
-          let namespace = loadBalancer.namespace;
-          if (!allLoadBalancerNames[account][namespace]) {
-            allLoadBalancerNames[account][namespace] = [];
+          let region = loadBalancer.region;
+          if (!allLoadBalancerNames[account][region]) {
+            allLoadBalancerNames[account][region] = [];
           }
-          allLoadBalancerNames[account][namespace].push(loadBalancer.name);
+          allLoadBalancerNames[account][region].push(loadBalancer.name);
         });
 
         updateLoadBalancerNames();
         $scope.state.loadBalancerNamesLoaded = true;
+      }, function() {
+        //TODO (jcwest): remove this... just for development
+        $scope.existingLoadBalancerNames = ['app1-s-d'];
       });
     }
 
@@ -175,11 +171,6 @@ module.exports = angular.module('spinnaker.loadBalancer.openstack.create.control
       ];
     }
 
-    this.namespaceUpdated = function() {
-      updateLoadBalancerNames();
-      ctrl.updateName();
-    };
-
     this.addStatusCode = function() {
       var newCode = parseInt(this.newStatusCode);
       if( $scope.loadBalancer.healthMonitor.expectedStatusCodes.indexOf(newCode) == -1 ) {
@@ -194,6 +185,10 @@ module.exports = angular.module('spinnaker.loadBalancer.openstack.create.control
       });
     };
 
+    this.prependForwardSlash = (text) => {
+      return text && text.indexOf('/') !== 0 ? `/${text}` : text;
+    };
+
     this.submit = function () {
       var descriptor = isNew ? 'Create' : 'Update';
 
@@ -201,9 +196,7 @@ module.exports = angular.module('spinnaker.loadBalancer.openstack.create.control
       $scope.taskMonitor.submit(
         function() {
           let params = {
-            cloudProvider: 'openstack',
-            //TODO(jcwest): remove this hard-coded value once...
-            networkId: '044e64f5-5041-4bda-a282-ce3295c27662'
+            cloudProvider: 'openstack'
           };
           return loadBalancerWriter.upsertLoadBalancer($scope.loadBalancer, application, descriptor, params);
         }

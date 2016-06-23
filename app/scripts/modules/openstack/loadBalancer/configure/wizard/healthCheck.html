@@ -12,8 +12,6 @@
                 ng-selected="loadBalancer.healthMonitor.type === protocol">{{protocol}}</option>
       </select>
     </div>
-  <!--</div>-->
-  <!--<div class="form-group">-->
     <div class="col-md-3 sm-label-right">
       Delay
       <help-field key="openstack.loadBalancer.healthCheck.delay"></help-field>
@@ -38,8 +36,6 @@
         <span class="input-group-addon">ms</span>
       </div>
     </div>
-  <!--</div>-->
-  <!--<div class="form-group">-->
     <div class="col-md-2 sm-label-right">
       Retries
       <help-field key="openstack.loadBalancer.healthCheck.maxRetries"></help-field>
@@ -69,7 +65,9 @@
       <help-field key="openstack.loadBalancer.healthCheck.url"></help-field>
     </div>
     <div class="col-md-8">
-      <input class="form-control input-sm" name="url" ng-model="loadBalancer.healthMonitor.url"/>
+      <input class="form-control input-sm" name="url" ng-model="loadBalancer.healthMonitor.url"
+             ng-change="loadBalancer.healthMonitor.url = ctrl.prependForwardSlash(loadBalancer.healthMonitor.url)"
+        />
     </div>
   </div>
   <div class="form-group" ng-if="loadBalancer.healthMonitor.type == 'HTTP' || loadBalancer.healthMonitor.type == 'HTTPS'">
@@ -78,7 +76,7 @@
       <help-field key="openstack.loadBalancer.healthCheck.statusCodes"></help-field>
     </div>
     <div class="col-md-8">
-      <div ng-repeat="statusCode in loadBalancer.healthMonitor.expectedStatusCodes" class="status-code">
+      <div ng-repeat="statusCode in loadBalancer.healthMonitor.expectedStatusCodes" class="status-code pull-left">
         {{statusCode}}
         <span class="glyphicon glyphicon-remove-circle" aria-hidden="true" ng-click="ctrl.removeStatusCode(statusCode);"></span>
       </div>
