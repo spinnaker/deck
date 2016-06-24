@@ -6,8 +6,9 @@ module.exports = angular.module('spinnaker.gce.instanceType.service', [
   require('exports?"restangular"!imports?_=lodash!restangular'),
   require('../../core/cache/deckCacheFactory.js'),
   require('../../core/utils/lodash.js'),
+  require('../instance/gceVCpuMaxByLocation.value.js'),
 ])
-  .factory('gceInstanceTypeService', function ($http, $q, _) {
+  .factory('gceInstanceTypeService', function ($http, $q, _, gceVCpuMaxByLocation) {
 
     var cachedResult = null;
 
@@ -356,6 +357,17 @@ module.exports = angular.module('spinnaker.gce.instanceType.service', [
       ]
     };
 
+    var customMachine = {
+      instanceTypes : [
+        {
+          name: 'buildCustom',
+          storage: {
+            localSSDSupported: true
+          }
+        }
+      ]
+    };
+
     var categories = [
       {
         type: 'general',
@@ -386,7 +398,13 @@ module.exports = angular.module('spinnaker.gce.instanceType.service', [
         label: 'Custom Type',
         families: [],
         icon: 'asterisk'
-      }
+      },
+      {
+        type: 'buildCustom',
+        label: 'Build Custom',
+        families: [ customMachine ],
+        icon: 'wrench',
+      },
     ];
 
     function getCategories() {
@@ -407,6 +425,7 @@ module.exports = angular.module('spinnaker.gce.instanceType.service', [
           .pluck('instanceTypes')
           .flatten()
           .pluck('name')
+          .filter(name => name !== 'buildCustom')
           .valueOf()
       );
 
@@ -414,14 +433,19 @@ module.exports = angular.module('spinnaker.gce.instanceType.service', [
 
     }
 
-    function getAvailableTypesForRegions(availableRegions, selectedRegions) {
-      if (availableRegions || selectedRegions) {
-        var availableTypes = _(categories)
+    function getAvailableTypesForLocations(instanceTypes, selectedLocations) {
+      if (instanceTypes || selectedLocations) {
+        let availableTypes = _(categories)
           .pluck('families')
           .flatten()
           .pluck('instanceTypes')
           .flatten()
           .pluck('name')
+          .filter(name => {
+            return name !== 'buildCustom' &&
+              selectedLocations
+                .every(location => parseInstanceTypeString(name).vCpuCount <= gceVCpuMaxByLocation[location]);
+          })
           .valueOf();
 
         return availableTypes.sort();
@@ -429,10 +453,24 @@ module.exports = angular.module('spinnaker.gce.instanceType.service', [
       return [];
     }
 
+    let getAvailableTypesForRegions = getAvailableTypesForLocations;
+
+    function parseInstanceTypeString(instanceType) {
+      if (_.contains(['f1-micro', 'g1-small'], instanceType)) {
+        return { family: instanceType, vCpuCount: 1 };
+      }
+
+      let [ n1, familyType, vCpuCount ] = instanceType.split('-');
+      vCpuCount = Number(vCpuCount);
+
+      return { family: n1 + familyType, vCpuCount };
+    }
+
     return {
       getCategories: getCategories,
       getAvailableTypesForRegions: getAvailableTypesForRegions,
-      getAllTypesByRegion: getAllTypesByRegion
+      getAllTypesByRegion: getAllTypesByRegion,
+      getAvailableTypesForLocations: getAvailableTypesForLocations,
     };
   }
 );

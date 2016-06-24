@@ -29,6 +29,7 @@ module.exports = angular.module('spinnaker.serverGroup.details.aws.controller', 
   require('../../../core/utils/selectOnDblClick.directive.js'),
   require('../serverGroup.transformer.js'),
   require('./scalingPolicy/addScalingPolicyButton.component.js'),
+  require('./securityGroup/editSecurityGroups.modal.controller'),
 ])
   .controller('awsServerGroupDetailsCtrl', function ($scope, $state, app, serverGroup, InsightFilterStateModel,
                                                      serverGroupReader, awsServerGroupCommandBuilder, $uibModal,
@@ -94,10 +95,6 @@ module.exports = angular.module('spinnaker.serverGroup.details.aws.controller', 
               this.serverGroup = plainDetails;
               this.applyAccountDetails(this.serverGroup);
 
-              this.runningExecutions = () => {
-                return runningExecutionsService.filterRunningExecutions(this.serverGroup.executions);
-              };
-
               if (!_.isEmpty(this.serverGroup)) {
 
                 this.image = details.image ? details.image : undefined;
@@ -133,6 +130,12 @@ module.exports = angular.module('spinnaker.serverGroup.details.aws.controller', 
                 this.disabledDate = autoScalingProcessService.getDisabledDate(this.serverGroup);
                 awsServerGroupTransformer.normalizeServerGroupDetails(this.serverGroup);
                 this.scalingPolicies = this.serverGroup.scalingPolicies;
+                this.scalingPoliciesDisabled = this.scalingPolicies.length && this.autoScalingProcesses
+                    .filter(p => !p.enabled)
+                    .some(p => ['Launch','Terminate','AlarmNotification'].indexOf(p.name) > -1);
+                this.scheduledActionsDisabled = this.serverGroup.scheduledActions.length && this.autoScalingProcesses
+                    .filter(p => !p.enabled)
+                    .some(p => ['Launch','Terminate','ScheduledAction'].indexOf(p.name) > -1);
 
               } else {
                 autoClose();
@@ -150,6 +153,22 @@ module.exports = angular.module('spinnaker.serverGroup.details.aws.controller', 
         app.serverGroups.onRefresh($scope, retrieveServerGroup);
       }
     });
+
+    this.runningExecutions = () => {
+      return runningExecutionsService.filterRunningExecutions(this.serverGroup.executions);
+    };
+
+    this.isEnableLocked = () => {
+      if (this.serverGroup.isDisabled) {
+        let resizeTasks = (this.serverGroup.runningTasks || [])
+          .filter(task => _.get(task, 'execution.stages', []).some(
+            stage => stage.type === 'resizeServerGroup'));
+        if (resizeTasks.length) {
+          return true;
+        }
+      }
+      return false;
+    };
 
     this.destroyServerGroup = () => {
       var serverGroup = this.serverGroup;
@@ -329,6 +348,18 @@ module.exports = angular.module('spinnaker.serverGroup.details.aws.controller', 
           account: () => this.serverGroup.account,
           clusterName: () => this.serverGroup.cluster,
           serverGroup: () => this.serverGroup
+        }
+      });
+    };
+
+    this.updateSecurityGroups = () => {
+      $uibModal.open({
+        templateUrl: require('./securityGroup/editSecurityGroups.modal.html'),
+        controller: 'EditSecurityGroupsCtrl as $ctrl',
+        resolve: {
+          application: () => app,
+          serverGroup: () => this.serverGroup,
+          securityGroups: () => this.securityGroups
         }
       });
     };

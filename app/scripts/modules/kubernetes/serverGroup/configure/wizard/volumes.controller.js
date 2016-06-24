@@ -40,7 +40,7 @@ module.exports = angular.module('spinnaker.serverGroup.configure.kubernetes.volu
         name: '',
         hostPath: this.defaultHostPath(),
         emptyDir: this.defaultEmptyDir(),
-        defaultPersistenVolumeClaim: this.defaultPersistentVolumeClaim(),
+        defaultPersistentVolumeClaim: this.defaultPersistentVolumeClaim(),
         secret: this.defaultSecret(),
       };
     };
@@ -68,7 +68,7 @@ module.exports = angular.module('spinnaker.serverGroup.configure.kubernetes.volu
           source.persistentVolumeClaim = this.defaultPersistentVolumeClaim();
         }
 
-        if (!source.persistentVolumeClaim) {
+        if (!source.secret) {
           source.secret = this.defaultSecret();
         }
 

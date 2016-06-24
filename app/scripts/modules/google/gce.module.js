@@ -20,6 +20,7 @@ module.exports = angular.module('spinnaker.gce', [
   require('../core/network/network.module.js'),
   require('../core/pipeline/config/stages/bake/docker/dockerBakeStage.js'),
   require('../core/pipeline/config/stages/bake/gce/gceBakeStage.js'),
+  require('../core/pipeline/config/stages/cloneServerGroup/gce/gceCloneServerGroupStage.js'),
   require('../core/pipeline/config/stages/destroyAsg/gce/gceDestroyAsgStage.js'),
   require('../core/pipeline/config/stages/disableAsg/gce/gceDisableAsgStage.js'),
   require('../core/pipeline/config/stages/disableCluster/gce/gceDisableClusterStage.js'),
@@ -30,6 +31,7 @@ module.exports = angular.module('spinnaker.gce', [
   require('../core/pipeline/config/stages/shrinkCluster/gce/gceShrinkClusterStage.js'),
   require('./instance/gceInstanceType.service.js'),
   require('./instance/gceMultiInstanceTask.transformer.js'),
+  require('./instance/custom/customInstance.filter.js'),
   require('./loadBalancer/loadBalancer.transformer.js'),
   require('./loadBalancer/details/loadBalancerDetail.controller.js'),
   require('./loadBalancer/configure/createLoadBalancer.controller.js'),
@@ -70,6 +72,7 @@ module.exports = angular.module('spinnaker.gce', [
         detailsTemplateUrl: require('./instance/details/instanceDetails.html'),
         detailsController: 'gceInstanceDetailsCtrl',
         multiInstanceTaskTransformer: 'gceMultiInstanceTaskTransformer',
+        customInstanceBuilderTemplateUrl: require('./serverGroup/configure/wizard/customInstance/customInstanceBuilder.html'),
       },
       loadBalancer: {
         transformer: 'gceLoadBalancerTransformer',

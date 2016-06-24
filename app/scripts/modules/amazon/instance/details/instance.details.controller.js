@@ -15,6 +15,7 @@ module.exports = angular.module('spinnaker.instance.detail.aws.controller', [
   require('../../../core/utils/selectOnDblClick.directive.js'),
   require('../../../core/config/settings.js'),
   require('../../../core/cloudProvider/cloudProvider.registry.js'),
+  require('../../../core/instance/details/instanceLinks.component'),
 ])
   .controller('awsInstanceDetailsCtrl', function ($scope, $state, $uibModal, InsightFilterStateModel, settings,
                                                instanceWriter, confirmationModalService, recentHistoryService,
@@ -27,9 +28,11 @@ module.exports = angular.module('spinnaker.instance.detail.aws.controller', [
     $scope.state = {
       loading: true,
       standalone: app.isStandalone,
+      instancePort: _.get(app, 'attributes.instancePort') || settings.defaultInstancePort || 80,
     };
 
     $scope.InsightFilterStateModel = InsightFilterStateModel;
+    $scope.application = app;
 
     function extractHealthMetrics(instance, latest) {
       // do not backfill on standalone instances
