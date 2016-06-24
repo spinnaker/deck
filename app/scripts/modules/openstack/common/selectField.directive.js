@@ -29,11 +29,13 @@ module.exports = angular.module('spinnaker.openstack.selectField.directive', [
           labelColumnSize: 3
         });
 
+        scope.allowNoSelection = scope.allowNoSelection && !scope.readOnly;
+
         function updateSelectedOption() {
           var previousSelection = scope.model;
 
           scope.selectedOption = undefined;
-          if( scope.options && scope.options.length ){
+          if( scope.options && scope.options.length ) {
             if( scope.component && scope.field && scope.model ) {
               scope.selectedOption = _.find(scope.options, function(o) { return o.value == scope.model; });
             }

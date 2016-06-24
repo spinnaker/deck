@@ -34,12 +34,12 @@ module.exports = angular.module('spinnaker.loadBalancer.openstack.details.contro
     }
 
     function resolveFloatingIp() {
-        //TODO (jcwest): resolve floating IP from ID
       $scope.lbLink = undefined;
       if ($scope.loadBalancer.floatingIpId ) {
-        $scope.floatingIp = {address: '172.24.4.3'};
+        //TODO (jcwest): resolve floating IP from ID... waiting for back-end API to be available
+        $scope.floatingIp = undefined;
 
-        if( $scope.loadBalancer.protocol.substring(0,4).toLowerCase() == 'http' ) {
+        if( $scope.floatingIp && $scope.loadBalancer.protocol.substring(0,4).toLowerCase() == 'http' ) {
           $scope.lbLink = $scope.loadBalancer.protocol.toLowerCase() + '://' + $scope.floatingIp.address + ':' + $scope.loadBalancer.externalPort + '/';
         }
       }

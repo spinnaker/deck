@@ -19,7 +19,7 @@ module.exports = angular.module('spinnaker.loadBalancer.openstack.create.control
   .controller('openstackUpsertLoadBalancerController', function($scope, $uibModalInstance, $state,
                                                                  application, loadBalancer, isNew, loadBalancerReader,
                                                                  accountService, openstackLoadBalancerTransformer,
-                                                                 _, searchService, v2modalWizardService, loadBalancerWriter, taskMonitorService) {
+                                                                 _, loadBalancerWriter, taskMonitorService) {
     var ctrl = this;
     $scope.isNew = isNew;
 
@@ -118,39 +118,35 @@ module.exports = angular.module('spinnaker.loadBalancer.openstack.create.control
           allLoadBalancerNames[account][region].push(loadBalancer.name);
         });
 
-        updateLoadBalancerNames();
         $scope.state.loadBalancerNamesLoaded = true;
-      }, function() {
-        //TODO (jcwest): remove this... just for development
-        $scope.existingLoadBalancerNames = ['app1-s-d'];
+        updateLoadBalancerNames();
       });
     }
 
     function updateLoadBalancerNames() {
-      var account = $scope.loadBalancer.account;
-
-      if (allLoadBalancerNames[account]) {
-        $scope.existingLoadBalancerNames = _.flatten(_.map(allLoadBalancerNames[account]));
-      } else {
-        $scope.existingLoadBalancerNames = [];
-      }
+      $scope.existingLoadBalancerNames = _.flatten(_.map(allLoadBalancerNames[$scope.loadBalancer.account || ''] || []));
     }
 
     // Controller API
     this.updateName = function() {
-      $scope.loadBalancer.name = this.getName();
-    };
-
-    this.getName = function() {
       var loadBalancer = $scope.loadBalancer;
       var loadBalancerName = [application.name, (loadBalancer.stack || ''), (loadBalancer.detail || '')].join('-');
-      return _.trimRight(loadBalancerName, '-');
+      loadBalancer.name = _.trimRight(loadBalancerName, '-');
+      return loadBalancer.name;
     };
 
+    var currentRegionRequest = 0;
     this.accountUpdated = function() {
+      updateLoadBalancerNames();
+
+      currentRegionRequest++;
+      var requestId = currentRegionRequest;
       accountService.getRegionsForAccount($scope.loadBalancer.account).then(function(regions) {
+        if( requestId != currentRegionRequest ) {
+          return;
+        }
+
         $scope.regions = _.map(regions, function(r) { return {label: r, value: r}; });
-        ctrl.regionUpdated();
       });
     };
 
@@ -164,11 +160,8 @@ module.exports = angular.module('spinnaker.loadBalancer.openstack.create.control
     };
 
     function updateFloatingIps() {
-      //TODO (jcwest): query, filter by selected subnet, and only include where port_id == None
-      $scope.floatingIps = [
-        {id: '8cfb7dd3-6767-4d07-a00f-f0ac9ce0922c', floatingIpAddress: '172.24.4.3'},
-        {id: 'invalid', floatingIpAddress: 'invalid'}
-      ];
+      //TODO (jcwest): query, filter by selected subnet, and only include only unassigned (where port_id == None?)
+      $scope.floatingIps = [];
     }
 
     this.addStatusCode = function() {

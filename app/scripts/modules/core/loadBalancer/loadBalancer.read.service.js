@@ -14,31 +14,6 @@ module.exports = angular
     function loadLoadBalancers(applicationName) {
       var loadBalancers = Restangular.one('applications', applicationName).all('loadBalancers').getList();
         return loadBalancers.then(function(results) {
-//TODO(jcwest): remove this before opening pull request. For development only.
-if(applicationName == 'app1') {
-  results.push( {
-      type: 'openstack',
-			region: 'region1',
-			account: 'test',
-			name: 'app1-s-d',
-			protocol: 'HTTP',
-			method : 'ROUND_ROBIN',
-			subnetId: '4f848451-7283-481a-88b7-a9f55e925fd8',
-			externalPort: 80,
-			internalPort: 8100,
-			floatingIpId: '8cfb7dd3-6767-4d07-a00f-f0ac9ce0922c',
-			healthMonitor: {
-        type: 'PING',
-//        type: 'HTTPS',
-//        method: 'GET',
-//        url: '/healthCheck',
-//        expectedStatusCodes: [200]
-        delay: 10,
-        timeout: 200,
-        maxRetries: 2,
-			}
-  } );
-}
           results.forEach(addStackToLoadBalancer);
           return $q.all(results.map(loadBalancerTransformer.normalizeLoadBalancer));
         });
@@ -51,31 +26,6 @@ if(applicationName == 'app1') {
     }
 
     function getLoadBalancerDetails(provider, account, region, name) {
-//HACK! (jcwest) - For development only
-if( account == 'test' && name == 'test-s-d' ) {
-  return $q(function (resolve) { resolve( {
-    type: 'openstack',
-    region: 'region1',
-    account: 'test',
-    name: 'app1-s-d',
-    protocol: 'HTTP',
-    method : 'ROUND_ROBIN',
-    subnetId: '4f848451-7283-481a-88b7-a9f55e925fd8',
-    externalPort: 80,
-    internalPort: 8100,
-    floatingIpId: '8cfb7dd3-6767-4d07-a00f-f0ac9ce0922c',
-    healthMonitor: {
-      type: 'HTTPS',
-      delay: 10,
-      timeout: 200,
-      maxRetries: 2,
-      method: 'GET',
-      url: '/healthCheck',
-      expectedStatusCodes: [200]
-    },
-    serverGroups: [{name: 'sg1'}]
-  } ); } );
-}
       return Restangular.one('loadBalancers').one(account).one(region).one(name).get({'provider': provider});
     }
 
