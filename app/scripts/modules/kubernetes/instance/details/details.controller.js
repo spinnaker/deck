@@ -242,6 +242,14 @@ module.exports = angular.module('spinnaker.instance.detail.kubernetes.controller
       return instance.healthState !== 'OutOfService';
     };
 
+    // TODO(danielpeach): remove this after terminating jobs is possible.
+    this.canTerminateInstance = () => {
+      let categoryCanTerminate = { serverGroup: true, job: false };
+      let containingServerGroupName = $scope.instance.serverGroup;
+      let containingServerGroup = _.find($scope.application.serverGroups.data, serverGroup => serverGroup.name === containingServerGroupName);
+      return categoryCanTerminate[containingServerGroup.category];
+    };
+
     this.hasHealthState = function hasHealthState(healthProviderType, state) {
       var instance = $scope.instance;
       return (instance.health.some(function (health) {

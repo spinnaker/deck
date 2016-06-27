@@ -34,7 +34,9 @@
             <li><a href ng-click="ctrl.registerInstanceWithLoadBalancer()" ng-if="ctrl.canRegisterWithLoadBalancer()">Register with Load Balancer</a></li>
             <li><a href ng-click="ctrl.deregisterInstanceFromLoadBalancer()" ng-if="ctrl.canDeregisterFromLoadBalancer()">Deregister from Load Balancer</a></li>
             <li role="presentation" class="divider" ng-if="instance.health.length > 0"></li>
-            <li><a href ng-click="ctrl.terminateInstance()">Terminate</a></li>
+            <li><a href ng-click="ctrl.terminateInstance()" ng-if="ctrl.canTerminateInstance()">Terminate</a></li>
+            <!--TODO(danielpeach): Remove this after terminating jobs is possible.-->
+            <li><a ng-if="!ctrl.canTerminateInstance()">Terminate (coming soon)</a></li>
           </ul>
         </div>
         <div class="dropdown" ng-if="instance.insightActions.length > 0" uib-dropdown dropdown-append-to-body>
