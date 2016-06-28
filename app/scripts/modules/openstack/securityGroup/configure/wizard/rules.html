@@ -1,0 +1,42 @@
+<form ng-controller="openstackSecurityGroupRulesController as rulesController" class="container-fluid form-horizontal" name="rules">
+  <div class="form-group">
+    <div class="col-md-12">
+      <table class="table table-condensed packed">
+        <thead>
+        <tr>
+          <th style="width: 15%">Protocol</th>
+          <th style="width: 15%">From Port</th>
+          <th style="width: 15%">To Port</th>
+          <th style="width: 15%">CIDR</th>
+          <th></th>
+        </tr>
+        </thead>
+        <div>
+          <tbody>
+            <tr ng-repeat="rule in securityGroup.rules">
+              <td><select class="form-control input-sm" ng-model="rule.type" ng-init="rule.type='tcp'"
+                          ng-options="protocol as protocol.toUpperCase() for protocol in ['tcp']" required></select></td>
+              <td><input class="form-control input-sm" type="number" ng-init="rule.fromPort=80" min="0" ng-model="rule.fromPort" required/></td>
+              <td><input class="form-control input-sm" type="number" ng-init="rule.toPort=80" min="0" ng-model="rule.toPort" required/></td>
+              <td><input class="form-control input-sm" type="text" ng-init="rule.cidr='0.0.0.0/0'" ng-model="rule.cidr" required/></td>
+              <td><a class="sm-label"
+                     ng-click="rulesController.removeRule($index)">
+                <span class="glyphicon glyphicon-trash"></span></a>
+              </td>
+            </tr>
+          </tbody>
+          <!--TODO: Need to do validation for Port, fromPort should be greater than or equal to toPort.-->
+          <tfoot>
+            <tr>
+              <td colspan="5">
+                <button class="add-new col-md-12" ng-click="rulesController.addRule()"><span
+                  class="glyphicon glyphicon-plus-sign"></span> Add New Rule
+                </button>
+              </td>
+            </tr>
+          </tfoot>
+        </div>
+      </table>
+    </div>
+  </div>
+</form>
