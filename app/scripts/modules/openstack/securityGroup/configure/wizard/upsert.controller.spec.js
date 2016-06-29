@@ -33,7 +33,7 @@ describe('Controller: openstackCreateSecurityGroupCtrl', function() {
     };
 
     this.securityGroupDefaults = {
-      provider: 'openstack', region: '', stack: '', detail: '', account: 'test', rules: []
+      provider: 'openstack', region: '', stack: '', detail: '', account: 'account1', rules: []
     };
 
     this.$scope = $rootScope.$new();

@@ -23,9 +23,9 @@ module.exports = angular.module('spinnaker.openstack.securityGroup.transformer',
 
     function constructNewIngressRule() {
       return {
-         fromPort: null,
-          toPort: null,
-          cidr: null,
+         fromPort: 80,
+          toPort: 80,
+          cidr: '0.0.0.0/0',
           type: null
 
       };
