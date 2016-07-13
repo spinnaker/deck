@@ -7,21 +7,36 @@ module.exports = angular.module('spinnaker.gce.loadBalancer.transformer', [
 ])
   .factory('gceLoadBalancerTransformer', function ($q, settings, _) {
 
-    function updateHealthCounts(container) {
-      var instances = container.instances;
-      var serverGroups = container.serverGroups || [container];
-      container.instanceCounts = {
+    function updateSVGHealthCounts(serverGroup) {
+      var instances = serverGroup.instances;
+      serverGroup.instanceCounts = {
         up: instances.filter(function (instance) {
           return instance.health[0].state === 'InService';
         }).length,
         down: instances.filter(function (instance) {
-          return instance.health[0].state === 'OutOfService';
+          return instance.health[0].state === 'Down';
         }).length,
-        outOfService: serverGroups.reduce(function (acc, serverGroup) {
-          return serverGroup.instances.filter(function (instance) {
-            return instance.healthState === 'OutOfService';
-          }).length + acc;
-        }, 0),
+        outOfService: instances.filter(function (instance) {
+          return instance.health[0].state === 'OutOfService';
+        }).length
+      };
+    }
+
+    function updateLBHealthCounts(loadBalancer) {
+      var serverGroups = loadBalancer.serverGroups;
+      var instances = _.flatten(serverGroups.map(function (serverGroup) {
+        return serverGroup.instances;
+      }));
+      loadBalancer.instanceCounts = {
+        up: instances.filter(function (instance) {
+          return instance.healthState === 'Up';
+        }).length,
+        down: instances.filter(function (instance) {
+          return instance.healthState === 'Down';
+        }).length,
+        outOfService: instances.filter(function (instance) {
+          return instance.healthState === 'OutOfService';
+        }).length
       };
     }
 
@@ -52,13 +67,13 @@ module.exports = angular.module('spinnaker.gce.loadBalancer.transformer', [
         serverGroup.instances.forEach(function(instance) {
           transformInstance(instance, loadBalancer);
         });
-        updateHealthCounts(serverGroup);
+        updateSVGHealthCounts(serverGroup);
       });
       var activeServerGroups = _.filter(loadBalancer.serverGroups, {isDisabled: false});
       loadBalancer.provider = loadBalancer.type;
       loadBalancer.instances = _(activeServerGroups).pluck('instances').flatten().valueOf();
       loadBalancer.detachedInstances = _(activeServerGroups).pluck('detachedInstances').flatten().valueOf();
-      updateHealthCounts(loadBalancer);
+      updateLBHealthCounts(loadBalancer);
       return $q.when(loadBalancer);
     }
 
