@@ -11,7 +11,7 @@ module.exports = angular.module('spinnaker.core.projects.configure.modal.control
   .controller('ConfigureProjectModalCtrl', function ($scope, projectConfig, $uibModalInstance, $q,
                                                      pipelineConfigService, applicationReader, projectWriter,
                                                      projectReader, accountService, taskMonitorService,
-                                                     v2modalWizardService, $timeout) {
+                                                     v2modalWizardService) {
 
     if (!projectConfig.name) {
       projectConfig.name = '';
@@ -36,10 +36,6 @@ module.exports = angular.module('spinnaker.core.projects.configure.modal.control
       clusters: require('./projectClusters.modal.html'),
       pipelines: require('./projectPipelines.modal.html'),
     };
-
-    $timeout(() => {
-      Object.keys(this.pages).forEach(v2modalWizardService.markComplete);
-    });
 
     this.addApplication = (application) => {
       $scope.viewState.pipelinesLoaded = false;
@@ -175,7 +171,18 @@ module.exports = angular.module('spinnaker.core.projects.configure.modal.control
       $scope.taskMonitor.submit(submitMethod);
     };
 
-    this.showSubmitButton = () => v2modalWizardService.allPagesVisited();
+    this.showSubmitButton = () => {
+      return v2modalWizardService.allPagesVisited()
+        && $scope.command.config.clusters.length > 0;
+    };
+
+    $scope.$watch('command.config.clusters.length', (clusterCount) => {
+      if (clusterCount > 0) {
+        v2modalWizardService.markComplete('clusters');
+      } else {
+        v2modalWizardService.markIncomplete('clusters');
+      }
+    });
 
 
     this.cancel = $uibModalInstance.dismiss;

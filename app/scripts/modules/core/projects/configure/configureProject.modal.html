@@ -1,14 +1,14 @@
 <v2-modal-wizard heading="Configure Project">
-  <v2-wizard-page key="config" label="Project Attributes">
+  <v2-wizard-page key="config" label="Project Attributes" done="true">
     <ng-include src="ctrl.pages.config"></ng-include>
   </v2-wizard-page>
-  <v2-wizard-page key="applications" label="Applications">
+  <v2-wizard-page key="applications" label="Applications" done="true">
     <ng-include src="ctrl.pages.applications"></ng-include>
   </v2-wizard-page>
-  <v2-wizard-page key="clusters" label="Clusters">
+  <v2-wizard-page key="clusters" label="Clusters" mark-complete-on-view="false">
     <ng-include src="ctrl.pages.clusters"></ng-include>
   </v2-wizard-page>
-  <v2-wizard-page key="pipelines" label="Pipelines" mandatory="false">
+  <v2-wizard-page key="pipelines" label="Pipelines" mandatory="false" done="true">
     <ng-include src="ctrl.pages.pipelines"></ng-include>
   </v2-wizard-page>
 </v2-modal-wizard>
