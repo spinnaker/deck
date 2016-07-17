@@ -7,11 +7,12 @@ module.exports = angular.module('spinnaker.core.projects.configure.modal.control
   require('../service/project.read.service.js'),
   require('../../account/account.service.js'),
   require('../../pipeline/config/services/pipelineConfigService.js'),
+  require('../../modal/wizard/wizardSubFormValidation.service.js'),
 ])
   .controller('ConfigureProjectModalCtrl', function ($scope, projectConfig, $uibModalInstance, $q,
                                                      pipelineConfigService, applicationReader, projectWriter,
                                                      projectReader, accountService, taskMonitorService,
-                                                     v2modalWizardService) {
+                                                     v2modalWizardService, wizardSubFormValidation) {
 
     if (!projectConfig.name) {
       projectConfig.name = '';
@@ -176,13 +177,26 @@ module.exports = angular.module('spinnaker.core.projects.configure.modal.control
         && $scope.command.config.clusters.length > 0;
     };
 
-    $scope.$watch('command.config.clusters.length', (clusterCount) => {
-      if (clusterCount > 0) {
-        v2modalWizardService.markComplete('clusters');
-      } else {
-        v2modalWizardService.markIncomplete('clusters');
-      }
-    });
+    wizardSubFormValidation
+      .config({ scope: $scope, form: 'projectConfigForm' })
+      .register({ subForm: 'clustersSubForm', page: 'clusters', validators: [
+        {
+          watchString: 'command.config.clusters.length',
+          validator: clusterCount => clusterCount > 0
+        }
+      ]})
+      .register({ subForm: 'pipelinesSubForm', page: 'pipelines' })
+      .register({ subForm: 'configSubForm', page: 'config' })
+      .register({ subForm: 'applicationsSubForm', page: 'applications' });
+
+    // $scope.$watch('command.config.clusters.length', (clusterCount) => {
+    //   console.log(clusterCount, 'clustercount')
+    //   if (clusterCount > 0) {
+    //     v2modalWizardService.markComplete('clusters');
+    //   } else {
+    //     v2modalWizardService.markIncomplete('clusters');
+    //   }
+    // });
 
 
     this.cancel = $uibModalInstance.dismiss;
