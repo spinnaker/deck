@@ -1,7 +1,6 @@
 'use strict';
 
 let angular = require('angular');
-let factoryName = 'wizardSubFormValidation';
 
 /**
  * Propagates standard Angular form validation to v2modalWizardService.
@@ -11,43 +10,27 @@ module.exports = angular.module('spinnaker.core.modalWizard.subFormValidation.se
     require('./v2modalWizard.service.js'),
     require('../../../core/utils/lodash.js'),
   ])
-  .factory(factoryName, function(v2modalWizardService, _) {
-    let requiredRegisterFields = ['subForm', 'page'];
-    let requiredConfigFields = ['scope', 'form'];
-    let requiredValidatorFields = ['watchString', 'validator'];
+  .factory('wizardSubFormValidation', function(v2modalWizardService, _) {
     let validatorRegistry = {};
-
-    function validateParams(options, requiredFields, functionName) {
-      let missingFields = requiredFields.filter(f => !(f in options));
-      if (missingFields.length > 0) {
-        throw new Error(`${factoryName}.${functionName} options missing the following field(s): ${missingFields.join(',')}`);
-      }
-    }
 
     function buildWatchString(form, subForm, formKey) {
       return `${form}.${subForm}.${formKey}`;
     }
 
-    this.config = (options) => {
-      validateParams(options, requiredConfigFields, 'config');
-      v2modalWizardService.addResetHook(() => validatorRegistry = {});
-      angular.extend(this, options);
+    this.config = ({ form, scope }) => {
+      this.form = form;
+      this.scope = scope;
+      this.scope.$on('destroy', this.reset);
       return this;
     };
 
-    this.register = (options) => {
-      validateParams(options, requiredRegisterFields, 'register');
-
-      let { subForm, page, allowCompletion, validators } = options;
-      allowCompletion = angular.isDefined(allowCompletion) ? allowCompletion : true;
-      validators = validators || [];
-
+    this.register = ({ subForm, page, validators = [] }) => {
       validators.push({
         watchString: buildWatchString(this.form, subForm, '$valid'),
         validator: subFormIsValid => subFormIsValid
       });
 
-      validatorRegistry[page] = validators.map(v => new Validator(v, this.scope, page, allowCompletion));
+      validatorRegistry[page] = validators.map(v => new Validator(v, this.scope, page));
 
       return this;
     };
@@ -56,14 +39,16 @@ module.exports = angular.module('spinnaker.core.modalWizard.subFormValidation.se
       return _.every(validatorRegistry, validatorsForPage => validatorsForPage.every(v => v.state.valid));
     };
 
-    class Validator {
-      constructor(validatorOptions, scope, page, allowCompletion) {
-        validateParams(validatorOptions, requiredValidatorFields, 'Validator');
+    this.reset = () => {
+      validatorRegistry = {};
+      this.scope = undefined;
+      this.form = undefined;
+    };
 
-        let { watchString, validator } = validatorOptions;
-        this.state = { valid : false };
+    class Validator {
+      constructor({ watchString, validator }, scope, page, state = { valid: false }) {
+        this.state = state;
         this.page = page;
-        this.allowCompletion = allowCompletion;
 
         scope.$watch(watchString, (value) => {
           this.state.valid = validator(value);
@@ -77,13 +62,11 @@ module.exports = angular.module('spinnaker.core.modalWizard.subFormValidation.se
       }
 
       emitValid() {
-        if (this.allowCompletion) {
-          let pageIsValid = validatorRegistry[this.page]
-            .every(v => v.state.valid);
+        let pageIsValid = validatorRegistry[this.page]
+          .every(v => v.state.valid);
 
-          if (pageIsValid) {
-            v2modalWizardService.markComplete(this.page);
-          }
+        if (pageIsValid) {
+          v2modalWizardService.markComplete(this.page);
         }
       }
 
