@@ -174,7 +174,7 @@ module.exports = angular.module('spinnaker.core.projects.configure.modal.control
 
     this.showSubmitButton = () => {
       return v2modalWizardService.allPagesVisited()
-        && $scope.command.config.clusters.length > 0;
+        && wizardSubFormValidation.subFormsAreValid();
     };
 
     wizardSubFormValidation
@@ -188,15 +188,6 @@ module.exports = angular.module('spinnaker.core.projects.configure.modal.control
       .register({ subForm: 'pipelinesSubForm', page: 'pipelines' })
       .register({ subForm: 'configSubForm', page: 'config' })
       .register({ subForm: 'applicationsSubForm', page: 'applications' });
-
-    // $scope.$watch('command.config.clusters.length', (clusterCount) => {
-    //   console.log(clusterCount, 'clustercount')
-    //   if (clusterCount > 0) {
-    //     v2modalWizardService.markComplete('clusters');
-    //   } else {
-    //     v2modalWizardService.markIncomplete('clusters');
-    //   }
-    // });
 
 
     this.cancel = $uibModalInstance.dismiss;

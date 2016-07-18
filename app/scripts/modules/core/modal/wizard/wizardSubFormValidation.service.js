@@ -9,17 +9,18 @@ let factoryName = 'wizardSubFormValidation';
 
 module.exports = angular.module('spinnaker.core.modalWizard.subFormValidation.service', [
     require('./v2modalWizard.service.js'),
+    require('../../../core/utils/lodash.js'),
   ])
-  .factory(factoryName, function(v2modalWizardService) {
+  .factory(factoryName, function(v2modalWizardService, _) {
     let requiredRegisterFields = ['subForm', 'page'];
     let requiredConfigFields = ['scope', 'form'];
     let requiredValidatorFields = ['watchString', 'validator'];
-    this.validatorRegistry = {};
+    let validatorRegistry = {};
 
-    function validateFunctionInput(options, requiredFields, functionName) {
+    function validateParams(options, requiredFields, functionName) {
       let missingFields = requiredFields.filter(f => !(f in options));
       if (missingFields.length > 0) {
-        throw new Error(`${factoryName}.${functionName} options missing the following field(s): ${ missingFields.join(',') }`);
+        throw new Error(`${factoryName}.${functionName} options missing the following field(s): ${missingFields.join(',')}`);
       }
     }
 
@@ -28,13 +29,14 @@ module.exports = angular.module('spinnaker.core.modalWizard.subFormValidation.se
     }
 
     this.config = (options) => {
-      validateFunctionInput(options, requiredConfigFields, 'config');
+      validateParams(options, requiredConfigFields, 'config');
+      validatorRegistry = {};
       angular.extend(this, options);
       return this;
     };
 
     this.register = (options) => {
-      validateFunctionInput(options, requiredRegisterFields, 'register');
+      validateParams(options, requiredRegisterFields, 'register');
 
       let { subForm, page, allowCompletion, validators } = options;
       allowCompletion = angular.isDefined(allowCompletion) ? allowCompletion : true;
@@ -45,49 +47,47 @@ module.exports = angular.module('spinnaker.core.modalWizard.subFormValidation.se
         validator: subFormIsValid => subFormIsValid
       });
 
-      this.validatorRegistry[page] = validators.map(v => new Validator(v, this, page, allowCompletion));
+      validatorRegistry[page] = validators.map(v => new Validator(v, this.scope, page, allowCompletion));
 
       return this;
     };
 
-    class Validator {
-      constructor(options, service, page, allowCompletion) {
-        validateFunctionInput(options, requiredValidatorFields, 'Validator');
-        let { watchString, validator } = options;
+    this.subFormsAreValid = () => {
+      return _.every(validatorRegistry, validatorsForPage => validatorsForPage.every(v => v.state.valid));
+    };
 
-        service.scope.$watch(watchString, (value) => {
+    class Validator {
+      constructor(validatorOptions, scope, page, allowCompletion) {
+        validateParams(validatorOptions, requiredValidatorFields, 'Validator');
+
+        let { watchString, validator } = validatorOptions;
+        this.state = { valid : false };
+        this.page = page;
+        this.allowCompletion = allowCompletion;
+
+        scope.$watch(watchString, (value) => {
           this.state.valid = validator(value);
 
           if (this.state.valid) {
             this.emitValid();
           } else {
-            this.emitInvalid()
+            this.emitInvalid();
           }
         });
-
-        this.state = { valid : false };
-        this.page = page;
-        this.allowCompletion = allowCompletion;
-        this.service = service;
       }
 
       emitValid() {
         if (this.allowCompletion) {
-          let allAreValid = this.service.validatorRegistry[this.page]
-            .reduce((acc, v) => {
-              if (v.state.valid === false) {
-                acc = false;
-              }
-              return acc;
-            }, true);
+          let pageIsValid = validatorRegistry[this.page]
+            .every(v => v.state.valid);
 
-          if (allAreValid) {
+          if (pageIsValid) {
             v2modalWizardService.markComplete(this.page);
           }
         }
       }
 
-      emitInvalid(){
+      emitInvalid() {
         v2modalWizardService.markIncomplete(this.page);
       }
     }
