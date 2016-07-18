@@ -14,6 +14,7 @@ module.exports = angular
     this.pageRegistry = [];
     this.currentPage = null;
     this.heading = null;
+    this.resetHooks = [];
 
     this.setHeading = (heading) => this.heading = heading;
 
@@ -75,9 +76,13 @@ module.exports = angular
     this.includePage = (pageKey) => this.setRendered(pageKey, true);
     this.excludePage = (pageKey) => this.setRendered(pageKey, false);
 
+    this.addResetHook = (hook) => this.resetHooks.push(hook);
+
     this.resetWizard = () => {
+      this.resetHooks.forEach(hook => hook());
       this.renderedPages.length = 0;
       this.pageRegistry.length = 0;
+      this.resetHooks.length = 0;
       this.currentPage = null;
       this.heading = null;
     };

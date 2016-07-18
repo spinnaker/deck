@@ -30,7 +30,7 @@ module.exports = angular.module('spinnaker.core.modalWizard.subFormValidation.se
 
     this.config = (options) => {
       validateParams(options, requiredConfigFields, 'config');
-      validatorRegistry = {};
+      v2modalWizardService.addResetHook(() => validatorRegistry = {});
       angular.extend(this, options);
       return this;
     };
