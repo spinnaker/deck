@@ -250,7 +250,6 @@ module.exports = angular.module('spinnaker.core.pipeline.config.graph.directive'
           // get the saved horizontal scroll position for executions
           if(scope.execution) {
             let offsetForId = pipelineGraphService.xScrollOffset[scope.execution.id] || 0;
-            console.info('offset', offsetForId);
             elem.scrollLeft(offsetForId);
           }
 
