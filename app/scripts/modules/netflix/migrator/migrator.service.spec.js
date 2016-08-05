@@ -1,6 +1,6 @@
 'use strict';
 
-describe('Service: migrator', function () {
+fdescribe('Service: migrator', function () {
 
   var service, $q, $scope, taskExecutor;
 
@@ -44,11 +44,17 @@ describe('Service: migrator', function () {
                   serverGroupNames: [ 'migrated-v001' ],
                   securityGroups: [
                     {
-                      created: { targetName: 'sg-1' }
+                      target: { targetName: 'sg-1', credentials: 'prod' },
+                      created: [{ targetName: 'sg-1', credentials: 'prod' }]
                     }
                   ],
                   loadBalancers: [
-                    { targetName: 'lb-1', securityGroups: [ {created: [{targetName: 'sg-2'}]}]}
+                    { targetName: 'lb-1', securityGroups: [
+                      {
+                        target: { targetName: 'sg-2', credentials: 'prod' },
+                        created: [{targetName: 'sg-2', credentials: 'prod' }]
+                      }
+                    ]}
                   ]
                 }
               ]}
