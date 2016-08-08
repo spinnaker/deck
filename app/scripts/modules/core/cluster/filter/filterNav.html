@@ -26,7 +26,7 @@
   </filter-section>
 
   <filter-section heading="Region" expanded="true">
-    <div class="checkbox" ng-repeat="heading in clustersFilters.getRegionHeadings() | orderBy: 'toString()' ">
+    <div class="checkbox" ng-repeat="heading in clustersFilters.regionHeadings | orderBy: 'toString()' ">
       <label>
         <input type="checkbox" ng-model="sortFilter.region[heading]" ng-change="clustersFilters.updateClusterGroups()"/>{{heading}}
       </label>
@@ -114,7 +114,7 @@
   </filter-section>
 
   <filter-section heading="Availability Zones" expanded="true">
-    <div class="checkbox" ng-repeat="heading in clustersFilters.getAvailabilityZoneHeadings() | orderBy: 'toString()' ">
+    <div class="checkbox" ng-repeat="heading in clustersFilters.availabilityZoneHeadings | orderBy: 'toString()' ">
       <label>
         <input type="checkbox" ng-model="sortFilter.availabilityZone[heading]" ng-change="clustersFilters.updateClusterGroups()"/>{{heading}}
       </label>

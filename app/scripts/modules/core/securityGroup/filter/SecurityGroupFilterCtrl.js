@@ -8,8 +8,10 @@ module.exports = angular.module('securityGroup.filter.controller', [
   require('./securityGroup.filter.service.js'),
   require('./securityGroup.filter.model.js'),
   require('../../utils/lodash.js'),
+  require('../../filterModel/dependentFilter/dependentFilter.service.js')
 ])
-  .controller('SecurityGroupFilterCtrl', function ($scope, app, _, $log, securityGroupFilterService, SecurityGroupFilterModel, $rootScope) {
+  .controller('SecurityGroupFilterCtrl', function ($scope, app, _, $log, securityGroupFilterService,
+                                                   SecurityGroupFilterModel, $rootScope, dependentFilterService) {
 
     $scope.application = app;
     $scope.sortFilter = SecurityGroupFilterModel.sortFilter;
@@ -17,6 +19,16 @@ module.exports = angular.module('securityGroup.filter.controller', [
     var ctrl = this;
 
     this.updateSecurityGroups = function() {
+      let { account, region } = dependentFilterService.digestDependentFilters({
+        sortFilter: SecurityGroupFilterModel.sortFilter,
+        dependencies: [
+          { child: 'account', parent: 'providerType', childKeyedByParent: ctrl.accountsKeyedByProvider },
+          { child: 'region', parent: 'account', childKeyedByParent: ctrl.regionsKeyedByAccount },
+        ]
+      });
+      ctrl.accountHeadings = account;
+      ctrl.regionHeadings = region;
+
       SecurityGroupFilterModel.applyParamsToUrl();
       securityGroupFilterService.updateSecurityGroups(app);
     };
@@ -25,17 +37,26 @@ module.exports = angular.module('securityGroup.filter.controller', [
       return _.compact(_.uniq(_.pluck(app.securityGroups.data, option))).sort();
     }
 
+    function getAKeyedByB(a, b) {
+      return _(app.securityGroups.data)
+        .groupBy(b)
+        .mapValues((securityGroups) => _(securityGroups).pluck(a).uniq().valueOf())
+        .valueOf();
+    }
+
     function clearFilters() {
       securityGroupFilterService.clearFilters();
       securityGroupFilterService.updateSecurityGroups(app);
+      ctrl.updateSecurityGroups();
     }
 
     this.initialize = function() {
-      ctrl.accountHeadings = getHeadingsForOption('account');
-      ctrl.regionHeadings = getHeadingsForOption('region');
+      ctrl.accountsKeyedByProvider = getAKeyedByB('account', 'provider');
+      ctrl.regionsKeyedByAccount = getAKeyedByB('region', 'account');
       ctrl.stackHeadings = ['(none)'].concat(getHeadingsForOption('stack'));
       ctrl.providerTypeHeadings = getHeadingsForOption('provider');
       ctrl.clearFilters = clearFilters;
+      ctrl.updateSecurityGroups();
     };
 
     this.initialize();
