@@ -112,9 +112,14 @@ module.exports = angular
       return baseReturn(config);
     };
 
+    var withBaseUrl = function(baseUrl) {
+      return baseReturn({url: baseUrl});
+    };
+
     return {
       one: init,
       all: init,
-      baseUrl: baseUrl
+      baseUrl: baseUrl,
+      withBaseUrl: withBaseUrl,
     };
   });
