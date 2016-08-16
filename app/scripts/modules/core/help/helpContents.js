@@ -109,6 +109,7 @@ module.exports = angular.module('spinnaker.core.help.contents', [])
     'gce.instance.customMetadata.load-balancer-names': 'This field is used to "remember" what load balancers this instance is associated with, even if it is deregistered.',
     'gce.instance.customMetadata.global-load-balancer-names': 'This field is used to "remember" what global load balancers this instance is associated with, even if it is deregistered.',
     'gce.instance.customMetadata.backend-service-names': 'This field is used to "remember" what backend services this instance is associated with, even if it is deregistered.',
+    'gce.instance.customMetadata.load-balancing-policy': 'This field is used to "remember" the load balancing policy this instance is associated with, even if it is deregistered.',
     'gce.instance.customMetadata.startup-script': 'This script will run automatically on every boot.',
     'gce.instance.storage': '<p>Storage options can be fully-configured on the <b>Advanced Settings</b> tab. These are just default settings. Please be aware of your Local SSD quotas as you provision VMs.</p>',
     'gce.instance.storage.localSSD': '<p>Local SSD disks are always 375GB. All non shared-core instance types support attaching up to 4 Local SSD disks. Please be aware of your Local SSD quotas as you provision VMs.</p>',
@@ -132,6 +133,7 @@ module.exports = angular.module('spinnaker.core.help.contents', [])
     'gce.serverGroup.customMetadata.load-balancer-names': 'This field is used to "remember" what load balancers this server group is associated with, even if the instances are deregistered.',
     'gce.serverGroup.customMetadata.global-load-balancer-names': 'This field is used to "remember" what global load balancers this server group is associated with, even if the instances are deregistered.',
     'gce.serverGroup.customMetadata.backend-service-names': 'This field is used to "remember" what backend services this server group is associated with, even if the instances are deregistered.',
+    'gce.serverGroup.customMetadata.load-balancing-policy': 'This field is used to "remember" the load balancing policy this server group is configured with, even if the server group is deregistered from the load balancer. This allows us to re-enable the server group with the same load balancing policy specified on creation.',
     'gce.serverGroup.customMetadata.startup-script': 'This script will run automatically on every boot.',
     'gce.serverGroup.preemptibility': 'A preemptible VM costs much less, but lasts only 24 hours. It can be terminated sooner due to system demands.',
     'gce.serverGroup.automaticRestart': 'Compute Engine can automatically restart VM instances if they are terminated for non-user-initiated reasons (maintenance event, hardware failure, software failure, etc.).',
@@ -160,6 +162,8 @@ module.exports = angular.module('spinnaker.core.help.contents', [])
       If you want to cut instance utilization by half, set your balancing mode to 80% max CPU utilization and your capacity to 50%. Input must be a number between 0 and 100.`,
     'gce.serverGroup.loadBalancingPolicy.listeningPort': 'A load balancer sends traffic to an instance group through a named port. Input must be a port number (i.e., between 1 and 65535).',
     'gce.serverGroup.traffic': 'Registers the server group with any associated load balancers. These registrations are used by Spinnaker to determine if the server group is enabled.',
+    'titus.serverGroup.traffic': 'Enables the "inService" property, which is used by Spinnaker and ' +
+    ' discovery services to determine if the server group is enabled.',
     'pipeline.config.optionalStage': '' +
       '<p>When this option is enabled, stage will only execute when the supplied expression evaluates true.</p>' +
       '<p>The expression <em>does not</em> need to be wrapped in ${ and }.</p>',

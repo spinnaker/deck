@@ -21,6 +21,14 @@ module.exports = angular.module('spinnaker.core.pipeline.config.pipelineConfigur
 
     this.actionsTemplateUrl = overrideRegistry.getTemplate('pipelineConfigActions', require('./actions/pipelineConfigActions.html'));
 
+    let original = _.cloneDeep($scope.pipeline);
+
+    pipelineConfigService.getHistory($scope.pipeline.id, 2).then(history => {
+      if (history && history.length > 1) {
+        $scope.viewState.hasHistory = true;
+      }
+    });
+
     var configViewStateCache = viewStateCache.pipelineConfig;
 
     function buildCacheKey() {
@@ -134,8 +142,48 @@ module.exports = angular.module('spinnaker.core.pipeline.config.pipelineConfigur
           pipeline: function() { return $scope.pipeline; },
         }
       }).result.then(function() {
-          $scope.$broadcast('pipeline-json-edited');
-        });
+        $scope.$broadcast('pipeline-json-edited');
+      });
+    };
+
+    this.enablePipeline = () => {
+      $uibModal.open({
+        templateUrl: require('./actions/enable/enablePipelineModal.html'),
+        controller: 'EnablePipelineModalCtrl as ctrl',
+        resolve: {
+          pipeline: () => original
+        }
+      }).result.then(disableToggled);
+    };
+
+    this.disablePipeline = () => {
+      $uibModal.open({
+        templateUrl: require('./actions/disable/disablePipelineModal.html'),
+        controller: 'DisablePipelineModalCtrl as ctrl',
+        resolve: {
+          pipeline: () => original
+        }
+      }).result.then(disableToggled);
+    };
+
+    function disableToggled() {
+      $scope.pipeline.disabled = !$scope.pipeline.disabled;
+    }
+
+    this.showHistory = () => {
+      $uibModal.open({
+        templateUrl: require('./actions/history/showHistory.modal.html'),
+        controller: 'ShowHistoryCtrl',
+        controllerAs: 'ctrl',
+        size: 'lg modal-fullscreen',
+        resolve: {
+          pipelineConfigId: () => $scope.pipeline.id,
+          currentConfig: () => $scope.viewState.isDirty ? JSON.parse(angular.toJson($scope.pipeline)) : null,
+        }
+      }).result.then(newConfig => {
+        $scope.pipeline = newConfig;
+        this.savePipeline();
+      });
     };
 
     this.navigateToStage = function(index, event) {
@@ -218,6 +266,7 @@ module.exports = angular.module('spinnaker.core.pipeline.config.pipelineConfigur
       $scope.pipeline.notifications = original.notifications;
       $scope.pipeline.persistedProperties = original.persistedProperties;
       $scope.pipeline.parameterConfig = original.parameterConfig;
+      $scope.pipeline.name = $scope.viewState.originalPipelineName;
 
       // if we were looking at a stage that no longer exists, move to the last stage
       if ($scope.viewState.section === 'stage') {

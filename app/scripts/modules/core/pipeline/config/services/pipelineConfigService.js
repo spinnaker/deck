@@ -18,14 +18,20 @@ module.exports = angular.module('spinnaker.core.pipeline.config.services.configS
 
     function getPipelinesForApplication(applicationName) {
       return API.one('applications').one(applicationName).all('pipelineConfigs').getList().then(function (pipelines) {
+        pipelines.forEach(p => p.stages = p.stages || []);
         return sortPipelines(pipelines);
       });
     }
 
     function getStrategiesForApplication(applicationName) {
       return API.one('applications').one(applicationName).all('strategyConfigs').getList().then(function (pipelines) {
+        pipelines.forEach(p => p.stages = p.stages || []);
         return sortPipelines(pipelines);
       });
+    }
+
+    function getHistory(id, count = 20) {
+      return API.one('pipelineConfigs', id).all('history').withParams({count: count}).getList();
     }
 
     function sortPipelines(pipelines) {
@@ -131,15 +137,16 @@ module.exports = angular.module('spinnaker.core.pipeline.config.services.configS
     }
 
     return {
-      getPipelinesForApplication: getPipelinesForApplication,
-      getStrategiesForApplication: getStrategiesForApplication,
-      savePipeline: savePipeline,
-      deletePipeline: deletePipeline,
-      renamePipeline: renamePipeline,
-      triggerPipeline: triggerPipeline,
-      buildViewStateCacheKey: buildViewStateCacheKey,
-      getDependencyCandidateStages: getDependencyCandidateStages,
-      getAllUpstreamDependencies: getAllUpstreamDependencies,
-      enableParallelExecution: enableParallelExecution,
+      getPipelinesForApplication,
+      getStrategiesForApplication,
+      getHistory,
+      savePipeline,
+      deletePipeline,
+      renamePipeline,
+      triggerPipeline,
+      buildViewStateCacheKey,
+      getDependencyCandidateStages,
+      getAllUpstreamDependencies,
+      enableParallelExecution,
     };
   });
