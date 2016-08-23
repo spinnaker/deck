@@ -77,9 +77,8 @@ module.exports = {
     new CommonsChunkPlugin('init.js'),
     new HtmlWebpackPlugin({
       title: 'Spinnaker',
-      template: './app/index.html',
+      template: './app/index.ejs',
       favicon: 'app/favicon.ico',
-      inject: true,
     }),
   ],
   devServer: {
