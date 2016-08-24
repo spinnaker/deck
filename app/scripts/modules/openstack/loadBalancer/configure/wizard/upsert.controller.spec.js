@@ -22,19 +22,25 @@ describe('Controller: openstackCreateLoadBalancerCtrl', function () {
       detail: '',
       subnetId: '',
       networkId: '',
-      protocol: 'HTTPS',
-      externalPort: 443,
-      internalPort: 443,
-      method: 'ROUND_ROBIN',
+      algorithm: 'ROUND_ROBIN',
       healthMonitor: {
         type: 'HTTPS',
         httpMethod: 'GET',
         url: '/healthCheck',
-        expectedHttpStatusCodes: [200],
+        expectedCodes: [200],
         delay: 10,
         timeout: 1,
         maxRetries: 2
-      }
+      },
+      securityGroups: [],
+      listeners: [
+        {
+          internalProtocol: 'HTTPS',
+          internalPort: 443,
+          externalProtocol: 'HTTPS',
+          externalPort: 443
+        }
+      ]
     };
 
     this.testData = {
@@ -160,13 +166,13 @@ describe('Controller: openstackCreateLoadBalancerCtrl', function () {
     it('can add and remove health check status codes', function() {
       this.ctrl.newStatusCode = 302;
       this.ctrl.addStatusCode();
-      expect(this.$scope.loadBalancer.healthMonitor.expectedHttpStatusCodes).toEqual([200,302]);
+      expect(this.$scope.loadBalancer.healthMonitor.expectedCodes).toEqual([200,302]);
       this.ctrl.addStatusCode();
-      expect(this.$scope.loadBalancer.healthMonitor.expectedHttpStatusCodes).toEqual([200,302]);
+      expect(this.$scope.loadBalancer.healthMonitor.expectedCodes).toEqual([200,302]);
       this.ctrl.removeStatusCode(102);
-      expect(this.$scope.loadBalancer.healthMonitor.expectedHttpStatusCodes).toEqual([200,302]);
+      expect(this.$scope.loadBalancer.healthMonitor.expectedCodes).toEqual([200,302]);
       this.ctrl.removeStatusCode(200);
-      expect(this.$scope.loadBalancer.healthMonitor.expectedHttpStatusCodes).toEqual([302]);
+      expect(this.$scope.loadBalancer.healthMonitor.expectedCodes).toEqual([302]);
     });
 
     describe('& account list returned', function() {
@@ -247,7 +253,8 @@ describe('Controller: openstackCreateLoadBalancerCtrl', function () {
                   this.$scope.loadBalancer, this.mockApplication, 'Create', {
                     cloudProvider: 'openstack',
                     account: 'account1',
-                    accountId: undefined
+                    accountId: undefined,
+                    securityGroups: []
                 });
               });
 
@@ -305,7 +312,8 @@ describe('Controller: openstackCreateLoadBalancerCtrl', function () {
                 this.$scope.loadBalancer, this.mockApplication, 'Create', {
                   cloudProvider: 'openstack',
                   account: 'account1',
-                  accountId: undefined
+                  accountId: undefined,
+                  securityGroups: []
               });
 
               this.taskCompletionCallback();
@@ -389,7 +397,8 @@ describe('Controller: openstackCreateLoadBalancerCtrl', function () {
           this.$scope.loadBalancer, this.mockApplication, 'Update', {
             cloudProvider: 'openstack',
             account: 'account2',
-            accountId: undefined
+            accountId: undefined,
+            securityGroups: []
         });
 
         this.taskCompletionCallback();
