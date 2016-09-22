@@ -20,7 +20,7 @@ module.exports = angular
 
       return taskExecutor.executeTask({
         application,
-        description: 'Upsert autoscaler' + serverGroup.name,
+        description: 'Upsert autoscaler ' + serverGroup.name,
         job: [job]
       });
     }
