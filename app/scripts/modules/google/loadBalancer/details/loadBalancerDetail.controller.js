@@ -38,8 +38,7 @@ module.exports = angular.module('spinnaker.loadBalancer.gce.details.controller',
       })[0];
 
       if ($scope.loadBalancer) {
-        var detailsLoader = loadBalancerReader.getLoadBalancerDetails($scope.loadBalancer.provider, loadBalancer.accountId, $scope.loadBalancer.region, $scope.loadBalancer.name);
-        return detailsLoader.then(function(details) {
+        return createDetailsLoader().then(function(details) {
           $scope.state.loading = false;
           var filtered = details.filter(function(test) {
             return test.vpcid === loadBalancer.vpcId || (!test.vpcid && !loadBalancer.vpcId);
@@ -68,6 +67,28 @@ module.exports = angular.module('spinnaker.loadBalancer.gce.details.controller',
         autoClose();
       }
       return $q.when(null);
+    }
+
+    function createDetailsLoader () {
+      if (elSevenUtils.isElSeven($scope.loadBalancer)) {
+        var detailsPromises = $scope.loadBalancer.listeners.map((listener) => {
+          return loadBalancerReader
+            .getLoadBalancerDetails($scope.loadBalancer.provider, loadBalancer.accountId, $scope.loadBalancer.region, listener.name);
+        });
+
+        return $q.all(detailsPromises)
+          .then((loadBalancers) => {
+            loadBalancers = _.flatten(loadBalancers);
+            var representativeLb = loadBalancers[0];
+            representativeLb.dnsnames = loadBalancers.map((lb) => lb.dnsname);
+            representativeLb.listenerDescriptions = _.flatten(loadBalancers.map((lb) => lb.listenerDescriptions));
+            return [representativeLb];
+          });
+
+      } else {
+        return loadBalancerReader
+          .getLoadBalancerDetails($scope.loadBalancer.provider, loadBalancer.accountId, $scope.loadBalancer.region, $scope.loadBalancer.name);
+      }
     }
 
     function autoClose() {

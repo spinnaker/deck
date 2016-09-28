@@ -7,7 +7,7 @@ module.exports = angular.module('spinnaker.deck.gce.elSevenUtils.service', [])
     const region = 'global';
 
     function isElSeven (lb) {
-      return lb.loadBalancerType === 'HTTP';
+      return lb.loadBalancerType === 'HTTP' || lb.region === region;
     }
 
     function isHttps (lb) {
