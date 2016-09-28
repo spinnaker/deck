@@ -212,5 +212,15 @@
         <li>TBD</li>
       </ul>
     </collapsible-section>
+    <collapsible-section heading="User Data">
+      <p>{{ctrl.serverGroup}}</p>
+      <dl ng-class="ctrl.InsightFilterStateModel.filtersExpanded ? '' : 'dl-horizontal dl-wide'">
+        <dt>User Data</dt>
+        <dd>{{ctrl.serverGroup.advancedConfig.userData}}</dd>
+
+        <dt>User Data Type</dt>
+        <dd>{{ctrl.serverGroup.advancedConfig.userDataType}}</dd>
+      </dl>
+    </collapsible-section>
   </div>
 </div>
