@@ -1,18 +1,19 @@
 'use strict';
 
+import _ from 'lodash';
+
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.core.securityGroup.read.service', [
   require('../cache/deckCacheFactory.js'),
   require('../search/search.service.js'),
   require('../naming/naming.service.js'),
-  require('../utils/lodash.js'),
   require('../cache/infrastructureCaches.js'),
   require('./securityGroup.transformer.js'),
   require('../cloudProvider/serviceDelegate.service.js'),
   require('../api/api.service')
 ])
-  .factory('securityGroupReader', function ($q, $log, searchService, _, namingService, API,
+  .factory('securityGroupReader', function ($q, $log, searchService, namingService, API,
                                             infrastructureCaches, securityGroupTransformer, serviceDelegate) {
 
     function loadSecurityGroups() {
@@ -216,7 +217,12 @@ module.exports = angular.module('spinnaker.core.securityGroup.read.service', [
             let inboundGroup = inboundRule.securityGroup;
             if (!inboundGroup.name) {
               let applicationSecurityGroup = getApplicationSecurityGroup(application, inboundGroup.accountName, details.region, inboundGroup.id);
-              inboundGroup.name = applicationSecurityGroup ? applicationSecurityGroup.name : inboundGroup.id;
+              if (applicationSecurityGroup) {
+                inboundGroup.name = applicationSecurityGroup.name;
+              } else {
+                inboundGroup.name = inboundGroup.id;
+                inboundGroup.inferredName = true;
+              }
             }
           });
         }

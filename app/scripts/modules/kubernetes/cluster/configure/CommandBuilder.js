@@ -1,16 +1,17 @@
 'use strict';
 
+import _ from 'lodash';
+
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.kubernetes.clusterCommandBuilder.service', [
   require('../../../core/config/settings.js'),
   require('../../../core/account/account.service.js'),
-  require('../../../core/utils/lodash.js'),
 ])
-  .factory('kubernetesClusterCommandBuilder', function (settings, accountService, _) {
+  .factory('kubernetesClusterCommandBuilder', function (settings, accountService) {
     function attemptToSetValidAccount(application, defaultAccount, command) {
       return accountService.listAccounts('kubernetes').then(function(kubernetesAccounts) {
-        var kubernetesAccountNames = _.pluck(kubernetesAccounts, 'name');
+        var kubernetesAccountNames = _.map(kubernetesAccounts, 'name');
         var firstKubernetesAccount = null;
 
         if (application.accounts.length) {
@@ -213,7 +214,8 @@ module.exports = angular.module('spinnaker.kubernetes.clusterCommandBuilder.serv
       };
     }
 
-    function buildClusterCommandFromPipeline(app, command, current, pipeline) {
+    function buildClusterCommandFromPipeline(app, originalCommand, current, pipeline) {
+      let command = _.cloneDeep(originalCommand);
       let contextImages = findUpstreamImages(current, pipeline.stages) || [];
       contextImages = contextImages.concat(findTriggerImages(pipeline.triggers));
       command.containers = reconcileUpstreamImages(command.containers, contextImages);
