@@ -65,6 +65,23 @@ module.exports = angular
       vm.state.submitting = true;
     }
 
+
+    vm.updateCloudProviderHealthWarning = (platformHealthOnlyShowOverrideClicked) => {
+      if (vm.applicationAttributes.platformHealthOnlyShowOverride
+          && (platformHealthOnlyShowOverrideClicked || vm.applicationAttributes.platformHealthOnly)) {
+        // Show the warning if platformHealthOnlyShowOverride is being disabled, or if both options are enabled and
+        // platformHealthOnly is being disabled.
+        vm.data.showOverrideWarning = `Note that disabling this setting will not have an effect on any
+          pipeline stages with the "Consider only 'platform' health?" option explicitly enabled. You will
+          need to update each of those pipeline stages individually if desired.`;
+      } else if (!vm.applicationAttributes.platformHealthOnlyShowOverride && platformHealthOnlyShowOverrideClicked) {
+        // Show the warning if platformHealthOnlyShowOverride is being enabled.
+        vm.data.showOverrideWarning = `Note that if you eventually disable this setting, it will not
+          have an effect on any pipeline stages with the "Consider only 'platform' health?" option
+          explicitly enabled. You will need to update each of those pipeline stages individually if desired.`;
+      }
+    };
+
     vm.clearEmailMsg = function() {
       vm.state.emailErrorMsg = '';
     };

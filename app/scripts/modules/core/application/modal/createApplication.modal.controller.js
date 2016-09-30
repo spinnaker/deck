@@ -87,6 +87,15 @@ module.exports = angular
         .then(waitUntilApplicationIsCreated, createApplicationFailure);
     };
 
+    this.updateCloudProviderHealthWarning = () => {
+      if (!this.application.platformHealthOnlyShowOverride) {
+        // Show the warning if platformHealthOnlyShowOverride is being enabled.
+        this.data.showOverrideWarning = `Note that if you eventually disable this setting, it will not
+          have an effect on any pipeline stages with the "Consider only 'platform' health?" option
+          explicitly enabled. You will need to update each of those pipeline stages individually if desired.`;
+      }
+    };
+
     this.submit = () => {
       submitting();
       this.application.name = this.application.name.toLowerCase();
