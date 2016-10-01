@@ -140,10 +140,6 @@ module.exports = angular.module('spinnaker.serverGroup.details.titus.controller'
         }
       };
 
-      if (app.attributes.platformHealthOnlyShowOverride && app.attributes.platformHealthOnly) {
-        confirmationModalParams.interestingHealthProviderNames = ['Titus'];
-      }
-
       confirmationModalService.confirm(confirmationModalParams);
     };
 
@@ -190,10 +186,6 @@ module.exports = angular.module('spinnaker.serverGroup.details.titus.controller'
         submitMethod: submitMethod
       };
 
-      if (app.attributes.platformHealthOnlyShowOverride && app.attributes.platformHealthOnly) {
-        confirmationModalParams.interestingHealthProviderNames = ['Titus'];
-      }
-
       confirmationModalService.confirm(confirmationModalParams);
     };
 
@@ -225,11 +217,8 @@ module.exports = angular.module('spinnaker.serverGroup.details.titus.controller'
         submitMethod: submitMethod
       };
 
-      if (app.attributes.platformHealthOnlyShowOverride && app.attributes.platformHealthOnly) {
-        confirmationModalParams.interestingHealthProviderNames = ['Titus'];
-      }
-
       confirmationModalService.confirm(confirmationModalParams);
+
     };
 
     this.resizeServerGroup = function resizeServerGroup() {
