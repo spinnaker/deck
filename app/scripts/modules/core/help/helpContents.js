@@ -129,6 +129,10 @@ module.exports = angular.module('spinnaker.core.help.contents', [])
     'gce.httpLoadBalancer.pathRule.paths': 'For example, <b>/path</b> in <b>example.com/path</b>',
     'gce.httpLoadBalancer.port': 'HTTP requests can be load balanced based on port 80 or port 8080. HTTPS requests can be load balanced on port 443.',
     'gce.httpLoadBalancer.certificate': 'The name of an SSL certificate. If specified, Spinnaker will create an HTTPS load balancer.',
+    'gce.httpLoadBalancer.namedPort': `
+      Incoming traffic is directed through a named port (for Spinnaker, the named port is <b>http</b>).
+      The mapping from named port to port number is specified per server group
+      and can be configured within the server group creation dialogue under <b>Port Name Mapping</b>.`,
     'gce.serverGroup.resizeWithAutoscalingPolicy': `
       Setting the desired instance count for a server group with an autoscaler is not supported by Spinnaker;
       if the desired instance count differs from the instance count that the autoscaler wants to maintain for its configured metrics,
@@ -181,6 +185,12 @@ module.exports = angular.module('spinnaker.core.help.contents', [])
     'titus.serverGroup.traffic': '' +
       '<p>Enables the "inService" scaling process, which is used by Spinnaker and discovery services to determine if the server group is enabled.</p>' +
       '<p>Will be automatically enabled when any non "custom" deployment strategy is selected.</p>',
+    'pipeline.config.lock.allowUnlockUi': '' +
+      '<p><strong>Checked</strong> - the pipeline can be unlocked via the Spinnaker UI.</p>' +
+      '<p><strong>Unchecked</strong> - the pipeline can only be unlocked via the Spinnaker API.</p>',
+    'pipeline.config.lock.description': '' +
+      '<p>Friendly description of why this pipeline is locked.</p>' +
+      '<p>Please include an email address or slack channel as appropriate.</p>',
     'pipeline.config.optionalStage': '' +
       '<p>When this option is enabled, stage will only execute when the supplied expression evaluates true.</p>' +
       '<p>The expression <em>does not</em> need to be wrapped in ${ and }.</p>',
