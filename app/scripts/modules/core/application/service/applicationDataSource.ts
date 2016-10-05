@@ -1,11 +1,7 @@
 import {Subject} from 'rxjs';
-import {Application} from '../application.model.ts';
+import {Application} from '../application.model';
 
 export class DataSourceConfig {
-
-  constructor(config:any) {
-    Object.assign(this, config);
-  }
 
   /**
    * unique value for this data source; the data source will be available on the Application directly via this key,
@@ -84,7 +80,7 @@ export class DataSourceConfig {
    * It does *not* automatically populate the "data" field of the data source - that is the responsibility of the
    * "onLoad" method.
    */
-  public loader: {(any): ng.IPromise<any>};
+  public loader: {(any: any): ng.IPromise<any>};
 
   /**
    * A method that is called when the "loader" method resolves. The method must return a promise. If the "loader"
@@ -94,7 +90,7 @@ export class DataSourceConfig {
    * If the onLoad method resolves with a null value, the result will be discarded and the data source's "data" field
    * will remain unchanged.
    */
-  public onLoad: {(any): ng.IPromise<any>};
+  public onLoad: {(any: any): ng.IPromise<any>};
 
   /**
    * If the data source should contribute to the application's default credentials setting, this field should be set
@@ -117,24 +113,18 @@ export class DataSourceConfig {
    * to the field name that represents the provider on each data item.
    */
   public providerField: string;
+
+  constructor(config: any) {
+    Object.assign(this, config);
+  }
 }
 
 export class ApplicationDataSource {
 
-  constructor(config: DataSourceConfig, private application: Application, private $q?: ng.IQService, private $log?: ng.ILogService, private $filter?: any) {
-    Object.assign(this, config);
-    if (!config.sref && config.visible !== false) {
-      this.sref = '.insight.' + config.key;
-    }
-
-    if (!config.label && this.$filter) {
-      this.label = this.$filter('robotToHuman')(config.key);
-    }
-
-    if (!config.activeState) {
-      this.activeState = '**' + this.sref + '.**';
-    }
-  }
+  /**
+   * Index Signature
+   */
+  [k: string]: any;
 
   /**
    * See DataSourceConfig#key
@@ -247,12 +237,16 @@ export class ApplicationDataSource {
   /**
    * See DataSourceConfig#onLoad
    */
-  public onLoad: {(Application, any): ng.IPromise<any>};
+  public onLoad: {(Application: any, any: any): ng.IPromise<any>};
 
   /**
    * See DataSourceConfig#loader
    */
-  public loader: {(any): ng.IPromise<any>};
+  public loader: {(any: any): ng.IPromise<any>};
+
+  private refreshStream: Subject<any> = new Subject();
+
+  private refreshFailureStream: Subject<any> = new Subject();
 
   /**
    * Called when a method mutates some item in the data source's data, e.g. when a running execution is updated
@@ -260,6 +254,21 @@ export class ApplicationDataSource {
    */
   public dataUpdated(): void {
     this.refreshStream.next(null);
+  }
+
+  constructor(config: DataSourceConfig, private application: Application, private $q?: ng.IQService, private $log?: ng.ILogService, private $filter?: any) {
+    Object.assign(this, config);
+    if (!config.sref && config.visible !== false) {
+      this.sref = '.insight.' + config.key;
+    }
+
+    if (!config.label && this.$filter) {
+      this.label = this.$filter('robotToHuman')(config.key);
+    }
+
+    if (!config.activeState) {
+      this.activeState = '**' + this.sref + '.**';
+    }
   }
 
   /**
@@ -392,9 +401,4 @@ export class ApplicationDataSource {
       }
     }
   }
-
-  private refreshStream: Subject<any> = new Subject();
-
-  private refreshFailureStream: Subject<any> = new Subject();
-
 }

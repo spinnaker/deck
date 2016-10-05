@@ -1,4 +1,4 @@
-import dataSourceRegistryModule from '../core/application/service/applicationDataSource.registry.ts';
+import dataSourceRegistryModule from '../core/application/service/applicationDataSource.registry';
 
 let angular = require('angular');
 
@@ -36,12 +36,10 @@ module.exports = angular
     require('./application/netflixEditApplicationModal.controller.js'),
     require('./help/netflixHelpContents.registry.js'),
 
-    require('./chaosMonkey/chaosMonkeyConfig.directive.js'),
-
     require('../core/config/settings.js'),
 
     require('./tableau/states'),
-
+    require('./ci/ci.module'),
     dataSourceRegistryModule,
   ])
   .run(function(cloudProviderRegistry, applicationDataSourceRegistry, settings) {
@@ -72,7 +70,7 @@ module.exports = angular
         'netflixTitusInstanceDetailsCtrl'
       );
       applicationDataSourceRegistry.setDataSourceOrder([
-        'executions', 'serverGroups', 'loadBalancers', 'securityGroups', 'properties', 'analytics', 'tasks', 'config',
+        'ci', 'executions', 'serverGroups', 'loadBalancers', 'securityGroups', 'properties', 'analytics', 'tasks', 'config'
       ]);
     }
   });

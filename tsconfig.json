@@ -1,9 +1,26 @@
 {
   "compilerOptions": {
+    "allowJs": false,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "moduleResolution": "node",
+    "module": "commonjs",
     "target": "es5",
-    "module": "commonjs"
+    "noImplicitAny": true,
+    "pretty": true,
+    "removeComments": true,
+    "sourceMap": true,
+    "outDir": "transpiled"
   },
   "files": [
     "typings/index.d.ts"
-  ]
+  ],
+  "exclude": [
+    "build",
+    "node",
+    "node_modules",
+    "transpiled"
+  ],
+  "compileOnSave": true,
+  "buildOnSave": false
 }

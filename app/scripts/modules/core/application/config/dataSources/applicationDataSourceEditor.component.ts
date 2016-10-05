@@ -1,5 +1,5 @@
-import {Application} from '../../application.model.ts';
-import {ApplicationDataSource} from '../../service/applicationDataSource.ts';
+import {Application} from '../../application.model';
+import {ApplicationDataSource} from '../../service/applicationDataSource';
 
 import './applicationDataSourceEditor.component.less';
 
@@ -40,7 +40,7 @@ export class DataSourceEditorController implements ng.IComponentController {
     this.original = JSON.stringify(this.model);
   }
 
-  public dataSourceChanged(key) {
+  public dataSourceChanged(key: string): void {
     if (this.model[key]) {
       if (!this.explicitlyEnabled.includes(key)) {
         this.explicitlyEnabled.push(key);

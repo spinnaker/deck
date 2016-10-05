@@ -3,7 +3,7 @@
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var CommonsChunkPlugin = require('webpack/lib/optimize/CommonsChunkPlugin');
 var HappyPack = require('happypack');
-var happyThreadPool = HappyPack.ThreadPool({ size: 6 });
+var happyThreadPool = HappyPack.ThreadPool({size: 6});
 var path = require('path');
 
 var nodeModulePath = path.join(__dirname, 'node_modules');
@@ -23,6 +23,12 @@ module.exports = {
     filename: '[name].js',
   },
   module: {
+    preLoaders: [
+      {
+        test: /\.ts$/,
+        loader: "tslint"
+      }
+    ],
     loaders: [
       {
         test: /jquery\.js$/,
@@ -59,6 +65,9 @@ module.exports = {
       }
     ],
   },
+  resolve: {
+    extensions: ['', '.js', '.ts']
+  },
   resolveLoader: {
     root: nodeModulePath
   },
@@ -73,7 +82,7 @@ module.exports = {
     }),
     new HappyPack({
       id: 'js',
-      loaders: [ 'ng-annotate!angular!babel!envify!eslint' ],
+      loaders: ['ng-annotate!angular!babel!envify!eslint'],
       threadPool: happyThreadPool,
       cacheContext: {
         env: process.env,
@@ -81,12 +90,12 @@ module.exports = {
     }),
     new HappyPack({
       id: 'html',
-      loaders: [ 'ngtemplate?relativeTo=' + (path.resolve(__dirname))  + '/!html' ],
+      loaders: ['ngtemplate?relativeTo=' + (path.resolve(__dirname)) + '/!html'],
       threadPool: happyThreadPool,
     }),
     new HappyPack({
       id: 'less',
-      loaders: [ 'style!css!less' ],
+      loaders: ['style!css!less'],
       threadPool: happyThreadPool,
     }),
   ],

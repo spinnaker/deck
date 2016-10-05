@@ -49,25 +49,19 @@
         <dd>{{loadBalancer.elb.createdTime | timestamp}}</dd>
         <dt>In</dt>
         <dd><account-tag account="loadBalancer.account" pad="right"></account-tag> {{loadBalancer.region}}</dd>
-      </dl>
-      <dl>
         <dt>Type</dt>
         <dd>
           <gce-load-balancer-type load-balancer="loadBalancer"></gce-load-balancer-type>
         </dd>
-      </dl>
-      <dl ng-class="InsightFilterStateModel.filtersExpanded ? '' : 'dl-horizontal dl-wide'">
         <dt>Zones</dt>
         <dd>
-          <ul ng-style="{'margin-left': InsightFilterStateModel.filtersExpanded ? '30px' : 0}">
+          <ul>
             <li ng-repeat="availabilityZone in loadBalancer.elb.availabilityZones">{{availabilityZone}}</li>
           </ul>
         </dd>
-      </dl>
-      <dl ng-class="InsightFilterStateModel.filtersExpanded ? '' : 'dl-horizontal dl-wide'">
-        <dt ng-if="loadBalancer.serverGroups">Server Groups</dt>
-        <dd ng-if="loadBalancer.serverGroups">
-          <ul ng-style="{'margin-left': InsightFilterStateModel.filtersExpanded ? '30px' : 0}">
+        <dt ng-if="loadBalancer.serverGroups.length">Server Groups</dt>
+        <dd ng-if="loadBalancer.serverGroups.length">
+          <ul>
             <li ng-repeat="serverGroup in loadBalancer.serverGroups | orderBy: ['isDisabled', '-name']">
               <a ui-sref="^.serverGroup({region: serverGroup.region,
                                           accountId: serverGroup.account,
@@ -78,25 +72,38 @@
             </li>
           </ul>
         </dd>
-      </dl>
-      <dl>
-        <dt ng-if="loadBalancer.elb.dnsname">DNS Name</dt>
-        <dd>
-          <a target=_blank href="//{{loadBalancer.elb.dnsname}}">{{loadBalancer.elb.dnsname}}</a>
-          <copy-to-clipboard
-              class="copy-to-clipboard copy-to-clipboard-sm"
-              text="{{loadBalancer.elb.dnsname}}"
-              tool-tip="Copy DNS Name to clipboard">
-          </copy-to-clipboard>
-        </dd>
-      </dl>
-      <dl ng-if="loadBalancer.hostRules">
-        <dd>
+        <div ng-if="!ctrl.isElSeven(loadBalancer) && loadBalancer.elb.dnsname">
+          <dt>DNS Name</dt>
+          <dd>
+            <a target=_blank href="//{{loadBalancer.elb.dnsname}}">{{loadBalancer.elb.dnsname}}</a>
+            <copy-to-clipboard
+                class="copy-to-clipboard copy-to-clipboard-sm"
+                text="{{loadBalancer.elb.dnsname}}"
+                tool-tip="Copy DNS Name to clipboard">
+            </copy-to-clipboard>
+          </dd>
+        </div>
+        <div ng-if="ctrl.isElSeven(loadBalancer)">
+          <dt>DNS Names</dt>
+          <dd>
+            <ul>
+              <li ng-repeat="dnsname in loadBalancer.elb.dnsnames">
+                <a target=_blank href="//{{dnsname}}">{{dnsname}}</a>
+                <copy-to-clipboard
+                  class="copy-to-clipboard copy-to-clipboard-sm"
+                  text="{{dnsname}}"
+                  tool-tip="Copy DNS Name to clipboard">
+                </copy-to-clipboard>
+              </li>
+            </ul>
+          </dd>
+        </div>
+        <div ng-if="ctrl.isElSeven(loadBalancer)">
           <gce-host-and-path-rules-button default-service="loadBalancer.defaultService"
                                           load-balancer-name="loadBalancer.name"
                                           host-rules="loadBalancer.hostRules">
           </gce-host-and-path-rules-button>
-        </dd>
+        </div>
       </dl>
     </collapsible-section>
     <collapsible-section heading="Status" expanded="true">
@@ -104,22 +111,36 @@
     </collapsible-section>
     <collapsible-section heading="Listeners">
       <dl>
-        <dt>Load Balancer &rarr; Instance</dt>
+        <dt>Load Balancer &rarr; Instance
+          <help-field ng-if="ctrl.isElSeven(loadBalancer)" key="gce.httpLoadBalancer.namedPort"></help-field>
+        </dt>
         <dd ng-repeat="listener in loadBalancer.elb.listenerDescriptions">
           {{listener.listener.protocol}}:{{listener.listener.loadBalancerPort}}
           &rarr;
           {{listener.listener.instanceProtocol}}:{{listener.listener.instancePort}}
-            <help-field ng-if="ctrl.isElSeven(loadBalancer)" key="gce.httpLoadBalancer.namedPort"></help-field>
         </dd>
+      </dl>
+    </collapsible-section>
+    <collapsible-section heading="Backend Services" ng-if="ctrl.isElSeven(loadBalancer)">
+      <dl ng-class="InsightFilterStateModel.filtersExpanded ? '' : 'dl-horizontal dl-wide'">
+        <div ng-repeat="service in loadBalancer.elb.backendServices">
+          <hr ng-if="$index > 0">
+          <dt>Name</dt>
+          <dd>{{service.name}}</dd>
+          <dt>Health Check</dt>
+          <dd>{{service.healthCheck.name}}</dd>
+          <dt>Session Affinity</dt>
+          <dd>{{service.sessionAffinity}}</dd>
+          <dt ng-if="service.sessionAffinity === 'GENERATED_COOKIE'">Affinity Cookie TTL</dt>
+          <dd ng-if="service.sessionAffinity === 'GENERATED_COOKIE'">{{service.affinityCookieTtlSec}}</dd>
+        </div>
       </dl>
     </collapsible-section>
     <collapsible-section heading="Health Checks">
       <dl ng-class="InsightFilterStateModel.filtersExpanded ? '' : 'dl-horizontal dl-wide'">
         <gce-health-check ng-if="!ctrl.isElSeven(loadBalancer)" health-check="loadBalancer.elb.healthCheck"></gce-health-check>
-        <div ng-if="ctrl.isElSeven(loadBalancer)" ng-repeat="(serviceName, healthCheck) in loadBalancer.elb.backendServiceHealthChecks">
+        <div ng-if="ctrl.isElSeven(loadBalancer)" ng-repeat="healthCheck in loadBalancer.elb.healthChecks">
           <hr ng-if="$index > 0">
-          <dt>Backend Service Name</dt>
-          <dd>{{ serviceName }}</dd>
           <gce-health-check health-check="healthCheck"></gce-health-check>
         </div>
       </dl>

@@ -27,12 +27,17 @@ module.exports = angular.module('spinnaker.openstack', [
   require('./loadBalancer/configure/configure.openstack.module.js'),
   require('./loadBalancer/details/details.openstack.module.js'),
   require('./loadBalancer/transformer.js'),
+  require('./instance/details/instance.details.controller.js'),
   require('../core/subnet/subnet.module.js'),
   require('./common/selectField.component.js'),
   require('./search/resultFormatter.js'),
   require('./pipeline/stages/bake/openstackBakeStage.js'),
+  require('./pipeline/stages/findAmi/openstackFindAmiStage.js'),
   require('./pipeline/stages/resizeAsg/openstackResizeAsgStage.js'),
-  require('./pipeline/stages/destroyAsg/openstackDestroyAsgStage.js')
+  require('./pipeline/stages/destroyAsg/openstackDestroyAsgStage.js'),
+  require('./pipeline/stages/disableAsg/openstackDisableAsgStage.js'),
+  require('./pipeline/stages/enableAsg/openstackEnableAsgStage.js'),
+  require('./pipeline/stages/disableCluster/openstackDisableClusterStage.js')
 ])
   .config(function(cloudProviderRegistryProvider) {
     cloudProviderRegistryProvider.registerProvider('openstack', {
@@ -51,6 +56,8 @@ module.exports = angular.module('spinnaker.openstack', [
       },
       instance: {
         instanceTypeService: 'openstackInstanceTypeService',
+        detailsTemplateUrl: require('./instance/details/instanceDetails.html'),
+        detailsController: 'openstackInstanceDetailsCtrl',
       },
       securityGroup: {
         reader: 'openstackSecurityGroupReader',

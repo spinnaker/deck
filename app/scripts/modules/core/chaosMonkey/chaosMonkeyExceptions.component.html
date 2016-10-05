@@ -1,0 +1,54 @@
+<h5>Exceptions <help-field key="chaos.exceptions"></help-field></h5>
+<div class="row">
+  <div class="col-md-10 col-md-offset-1">
+    <table class="table table-condensed">
+      <thead>
+      <tr>
+        <th>Account</th>
+        <th>Region</th>
+        <th>Stack</th>
+        <th>Detail</th>
+        <th></th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr ng-repeat="exception in $ctrl.config.exceptions">
+        <td>
+          <account-select-field
+              component="exception"
+              field="account"
+              provider="'aws'"
+              accounts="$ctrl.accounts"
+              on-change="$ctrl.configChanged()"></account-select-field>
+        </td>
+        <td>
+          <span ng-if="!exception.account">(select account)</span>
+          <select class="form-control input-sm"
+                  ng-model="exception.region"
+                  ng-change="$ctrl.configChanged()"
+                  ng-if="exception.account"
+              >
+            <option ng-repeat="region in $ctrl.regionsByAccount[exception.account]" value="{{region}}">{{region}}</option>
+          </select>
+        </td>
+        <td>
+          <input type="text" class="form-control input-sm"
+                 ng-model="exception.stack"
+                 ng-change="$ctrl.configChanged()"
+                 required/>
+        </td>
+        <td>
+          <input type="text" class="form-control input-sm"
+                 ng-model="exception.detail"
+                 ng-change="$ctrl.configChanged()"
+                 required/>
+        </td>
+        <td><a href ng-click="$ctrl.removeException($index)"><span class="glyphicon glyphicon-trash" uib-tooltip="Remove exception"></span></a></td>
+      </tr>
+      </tbody>
+    </table>
+    <button class="btn btn-block btn-add-trigger add-new" ng-click="$ctrl.addException()">
+      <span class="glyphicon glyphicon-plus-sign"></span> Add Exception
+    </button>
+  </div>
+</div>

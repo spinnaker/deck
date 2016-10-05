@@ -1,9 +1,9 @@
-import {ApplicationDataSource} from "./service/applicationDataSource";
+import {ApplicationDataSource} from './service/applicationDataSource';
 import {Subject} from 'rxjs';
 
 export class Application {
 
-  constructor(private applicationName: string, private scheduler: any, private $q: ng.IQService, private $log: ng.ILogService) {}
+  [k: string]: any;
 
   /**
    * A collection of all available data sources for the given application
@@ -59,14 +59,19 @@ export class Application {
    */
   public notFound: boolean = false;
 
+  private refreshStream: Subject<any> = new Subject();
+
+  private refreshFailureStream: Subject<any> = new Subject();
+
+  constructor(private applicationName: string, private scheduler: any, private $q: ng.IQService, private $log: ng.ILogService) {}
+
   /**
    * Returns a data source based on its key. Data sources can be accessed on the application directly via the key,
    * e.g. application.serverGroups, but this is the preferred access method, as it allows type inference
    * @param key
    */
   public getDataSource(key: string): ApplicationDataSource {
-    let [dataSource] = this.dataSources.filter(ds => ds.key === key);
-    return dataSource;
+    return this.dataSources.find(ds => ds.key === key);
   }
 
   /**
@@ -121,10 +126,6 @@ export class Application {
     });
   }
 
-  private refreshStream: Subject<any> = new Subject();
-
-  private refreshFailureStream: Subject<any> = new Subject();
-
   private applicationLoadError(err: Error): void {
     this.$log.error(err, 'Failed to load application, will retry on next scheduler execution.');
     this.refreshFailureStream.next(err);
@@ -150,7 +151,7 @@ export class Application {
     let results = new Map<string, string>();
     let sources = this.dataSources.filter(d => d[field] !== undefined);
     let providers = sources.map(ds => ds.data.map(d => d[ds.providerField])).filter(p => p.length > 0);
-    let allProviders; //typescript made me do it this way
+    let allProviders: any; // typescript made me do it this way
     allProviders = _.union<string[]>(...providers);
     allProviders.forEach((provider: string) => {
       let vals = sources
@@ -158,7 +159,7 @@ export class Application {
         .filter(v => v.length > 0);
       let allRegions = _.union(...vals);
       if (allRegions.length === 1) {
-        results[provider] = allRegions[0];
+        (<any>results)[provider] = allRegions[0];
       }
     });
     return results;
@@ -166,7 +167,6 @@ export class Application {
 
   private setDefaults(): void {
     this.defaultCredentials = this.extractProviderDefault('credentialsField');
-    this.defaultRegions = this.extractProviderDefault('regionField')
+    this.defaultRegions = this.extractProviderDefault('regionField');
   }
-
 }
