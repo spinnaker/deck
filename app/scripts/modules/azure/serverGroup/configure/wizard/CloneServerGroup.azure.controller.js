@@ -6,9 +6,9 @@ module.exports = angular.module('spinnaker.azure.cloneServerGroup.controller', [
   require('angular-ui-router'),
   require('../serverGroupConfiguration.service.js'),
   require('../../serverGroup.transformer.js'),
-  require('../../../../core/serverGroup/serverGroup.write.service.js'),
-  require('../../../../core/task/monitor/taskMonitorService.js'),
-  require('../../../../core/modal/wizard/v2modalWizard.service.js'),
+  require('core/serverGroup/serverGroup.write.service.js'),
+  require('core/task/monitor/taskMonitorService.js'),
+  require('core/modal/wizard/v2modalWizard.service.js'),
 ])
   .controller('azureCloneServerGroupCtrl', function($scope, $uibModalInstance, $q, $state,
                                                   serverGroupWriter, v2modalWizardService, taskMonitorService,

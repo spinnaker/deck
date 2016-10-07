@@ -5,7 +5,6 @@ var CommonsChunkPlugin = require('webpack/lib/optimize/CommonsChunkPlugin');
 var HappyPack = require('happypack');
 var happyThreadPool = HappyPack.ThreadPool({size: 6});
 var path = require('path');
-
 var nodeModulePath = path.join(__dirname, 'node_modules');
 
 module.exports = {
@@ -66,10 +65,11 @@ module.exports = {
     ],
   },
   resolve: {
-    extensions: ['', '.js', '.ts']
-  },
-  resolveLoader: {
-    root: nodeModulePath
+    extensions: ['', '.js', '.ts'],
+    root: [
+      path.join(__dirname, 'app', 'scripts', 'modules'),
+      nodeModulePath,
+    ]
   },
   plugins: [
     new CommonsChunkPlugin('vendor', 'vendor.bundle.js'),

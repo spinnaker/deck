@@ -5,12 +5,12 @@ require('../../loadBalancer.less');
 
 module.exports = angular.module('spinnaker.loadBalancer.openstack.create.controller', [
     require('angular-ui-router'),
-    require('../../../../core/loadBalancer/loadBalancer.write.service.js'),
-    require('../../../../core/loadBalancer/loadBalancer.read.service.js'),
-    require('../../../../core/account/account.service.js'),
-    require('../../../../core/modal/wizard/v2modalWizard.service.js'),
-    require('../../../../core/task/monitor/taskMonitorService.js'),
-    require('../../../../core/search/search.service.js'),
+    require('core/loadBalancer/loadBalancer.write.service.js'),
+    require('core/loadBalancer/loadBalancer.read.service.js'),
+    require('core/account/account.service.js'),
+    require('core/modal/wizard/v2modalWizard.service.js'),
+    require('core/task/monitor/taskMonitorService.js'),
+    require('core/search/search.service.js'),
     require('../../transformer.js'),
     require('../../../region/regionSelectField.directive.js'),
     require('../../../subnet/subnetSelectField.directive.js'),

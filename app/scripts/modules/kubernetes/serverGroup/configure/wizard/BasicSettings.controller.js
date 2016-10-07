@@ -7,10 +7,10 @@ let angular = require('angular');
 module.exports = angular.module('spinnaker.serverGroup.configure.kubernetes.basicSettings', [
   require('angular-ui-router'),
   require('angular-ui-bootstrap'),
-  require('../../../../core/serverGroup/configure/common/basicSettingsMixin.controller.js'),
-  require('../../../../core/modal/wizard/v2modalWizard.service.js'),
-  require('../../../../core/image/image.reader.js'),
-  require('../../../../core/naming/naming.service.js'),
+  require('core/serverGroup/configure/common/basicSettingsMixin.controller.js'),
+  require('core/modal/wizard/v2modalWizard.service.js'),
+  require('core/image/image.reader.js'),
+  require('core/naming/naming.service.js'),
 ])
   .controller('kubernetesServerGroupBasicSettingsController', function($scope, $controller, $uibModalStack, $state,
                                                                        v2modalWizardService, kubernetesImageReader, namingService,

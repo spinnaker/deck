@@ -3,9 +3,9 @@
 let template = require('./resizeServerGroup.html');
 
 // template dependencies
-require('../../../../core/task/monitor/taskMonitor.html');
-require('../../../../core/task/modal/reason.directive.html');
-require('../../../../core/modal/buttons/modalClose.directive.html');
+require('core/task/monitor/taskMonitor.html');
+require('core/task/modal/reason.directive.html');
+require('core/modal/buttons/modalClose.directive.html');
 require('../../../common/footer.directive.html');
 
 describe('Controller: gceResizeServerGroupCtrl', function () {
@@ -17,7 +17,7 @@ describe('Controller: gceResizeServerGroupCtrl', function () {
     window.module(
       require('./resizeServerGroup.controller'),
       require('../../../autoscalingPolicy/autoscalingPolicy.write.service.js'),
-      require('../../../../core/serverGroup/serverGroup.write.service.js')
+      require('core/serverGroup/serverGroup.write.service.js')
     )
   );
 

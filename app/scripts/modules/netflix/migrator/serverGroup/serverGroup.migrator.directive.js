@@ -10,10 +10,10 @@ module.exports = angular
   .module('spinnaker.migrator.directive', [
     require('angular-ui-bootstrap'),
     require('../../../amazon/vpc/vpc.read.service.js'),
-    require('../../../core/config/settings.js'),
-    require('../../../core/subnet/subnet.read.service'),
+    require('core/config/settings.js'),
+    require('core/subnet/subnet.read.service'),
     require('../migrator.service.js'),
-    require('../../../core/presentation/autoScroll/autoScroll.directive.js'),
+    require('core/presentation/autoScroll/autoScroll.directive.js'),
     require('../../../amazon/keyPairs/keyPairs.read.service'),
     require('../../../amazon/vpc/vpc.read.service'),
     require('../migrationWarnings.component'),

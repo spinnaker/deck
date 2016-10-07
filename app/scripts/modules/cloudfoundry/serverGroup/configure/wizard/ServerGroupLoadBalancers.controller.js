@@ -3,7 +3,7 @@
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.serverGroup.configure.cf.loadBalancers.controller', [
-        require('../../../../core/modal/wizard/v2modalWizard.service.js'),
+        require('core/modal/wizard/v2modalWizard.service.js'),
     ])
     .controller('cfServerGroupLoadBalancersCtrl', function(/*$scope, v2modalWizardService*/) {
 
