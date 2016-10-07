@@ -4,10 +4,10 @@ let angular = require('angular');
 
 module.exports = angular.module('spinnaker.openstack.serverGroup.configure.clone', [
   require('angular-ui-router'),
-  require('../../../../core/application/modal/platformHealthOverride.directive.js'),
-  require('../../../../core/serverGroup/serverGroup.write.service.js'),
-  require('../../../../core/modal/wizard/v2modalWizard.service.js'),
-  require('../../../../core/task/monitor/taskMonitorService.js'),
+  require('core/application/modal/platformHealthOverride.directive.js'),
+  require('core/serverGroup/serverGroup.write.service.js'),
+  require('core/modal/wizard/v2modalWizard.service.js'),
+  require('core/task/monitor/taskMonitorService.js'),
   require('../serverGroupConfiguration.service.js'),
 ])
   .controller('openstackCloneServerGroupCtrl', function($scope, $uibModalInstance, $q, $state,

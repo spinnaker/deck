@@ -3,10 +3,10 @@
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.azure.serverGroup.configure.loadBalancer.controller', [
-  require('../../../../../core/cache/infrastructureCaches.js'),
-  require('../../../../../core/modal/wizard/v2modalWizard.service.js'),
-  require('../../../../../core/loadBalancer/loadBalancer.read.service.js'),
-  require('../../../../../core/network/network.read.service.js'),
+  require('core/cache/infrastructureCaches.js'),
+  require('core/modal/wizard/v2modalWizard.service.js'),
+  require('core/loadBalancer/loadBalancer.read.service.js'),
+  require('core/network/network.read.service.js'),
 ])
   .controller('azureServerGroupLoadBalancersCtrl', function($scope, infrastructureCaches, loadBalancerReader, networkReader, v2modalWizardService) {
     v2modalWizardService.markClean('load-balancers');

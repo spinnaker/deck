@@ -20,7 +20,7 @@ let angular = require('angular');
 
 module.exports = angular
   .module('spinnaker.amazon.serverGroup.configure.wizard.advancedSettings.component', [
-    require('../../../../../core/modal/wizard/v2modalWizard.service.js'),
+    require('core/modal/wizard/v2modalWizard.service.js'),
   ])
   .component('awsServerGroupAdvancedSettings', {
     bindings: {

@@ -7,10 +7,10 @@ const angular = require('angular');
 module.exports = angular
   .module('spinnaker.netflix.serverGroup.configurer.service', [
     require('./../diff/diff.service.js'),
-    require('../../../core/naming/naming.service.js'),
-    require('../../../core/config/settings.js'),
-    require('../../../core/serverGroup/configure/common/serverGroupCommand.registry.js'),
-    require('../../../core/modal/wizard/v2modalWizard.service.js'),
+    require('core/naming/naming.service.js'),
+    require('core/config/settings.js'),
+    require('core/serverGroup/configure/common/serverGroupCommand.registry.js'),
+    require('core/modal/wizard/v2modalWizard.service.js'),
   ])
   .factory('netflixServerGroupCommandConfigurer', function(diffService, namingService, v2modalWizardService) {
     function configureSecurityGroupDiffs(command) {

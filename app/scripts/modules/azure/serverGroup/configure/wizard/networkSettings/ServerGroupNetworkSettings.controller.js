@@ -3,7 +3,7 @@
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.azure.serverGroup.configure.networkSettings.controller', [
-  require('../../../../../core/modal/wizard/v2modalWizard.service.js'),
+  require('core/modal/wizard/v2modalWizard.service.js'),
 ])
   .controller('azureServerGroupNetworkSettingsCtrl', function($scope, v2modalWizardService) {
     v2modalWizardService.markClean('network-settings');

@@ -9,12 +9,12 @@ var angular = require('angular');
 module.exports = angular
   .module('spinnaker.amazon.securityGroup.baseConfig.controller', [
     require('angular-ui-router'),
-    require('../../../core/task/monitor/taskMonitorService'),
-    require('../../../core/securityGroup/securityGroup.write.service'),
-    require('../../../core/account/account.service'),
+    require('core/task/monitor/taskMonitorService'),
+    require('core/securityGroup/securityGroup.write.service'),
+    require('core/account/account.service'),
     require('../../vpc/vpc.read.service'),
-    require('../../../core/modal/wizard/v2modalWizard.service'),
-    require('../../../core/config/settings'),
+    require('core/modal/wizard/v2modalWizard.service'),
+    require('core/config/settings'),
     require('./ingressRuleGroupSelector.component'),
   ])
   .controller('awsConfigSecurityGroupMixin', function ($scope,

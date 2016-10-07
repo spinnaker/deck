@@ -4,7 +4,7 @@ let angular = require('angular');
 
 module.exports = angular
   .module('spinnaker.netflix.serverGroup.diff.securityGroupDiff.directive', [
-    require('../../../core/modal/wizard/v2modalWizard.service.js'),
+    require('core/modal/wizard/v2modalWizard.service.js'),
   ])
   .directive('netflixSecurityGroupDiff', function () {
     return {
