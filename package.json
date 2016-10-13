@@ -57,7 +57,7 @@
     "int": "protractor protractor.conf.js"
   },
   "devDependencies": {
-    "angular-loader": "./angular-loader",
+    "angular-loader": "file:./angular-loader",
     "angular-mocks": "^1.5.8",
     "angulartics": "^1.1.2",
     "angulartics-google-analytics": "^0.2.0",
