@@ -82,6 +82,26 @@ module.exports = angular
         return serverGroup.vpcName.toLowerCase() === vpcName.toLowerCase();
       }
 
+      if (filter.includes('tag:')) {
+        let match = false;
+        let [, tag] = filter.split('tag:');
+        let tagKey = null;
+        let tagValue = null;
+        if (tag.includes('=')) {
+          [tagKey, tagValue] = tag.split('=');
+        }
+        _.each(serverGroup.tags || {}, function (val, key) {
+          if (tagKey) {
+            if (tagKey.toLowerCase() === key.toLowerCase() && val.toLowerCase().includes(tagValue.toLowerCase())) {
+              match = true;
+            }
+          } else if (val.toLowerCase().includes(tag.toLowerCase())) {
+            match = true;
+          }
+        });
+        return match;
+      }
+
       if (filter.includes('detail:')) {
         let [, detailName] = filter.split('detail:');
         return serverGroup.detail === detailName.toLowerCase();
