@@ -8,4 +8,19 @@
     tag="trigger.tag"
     show-registry="true"
     on-change="ctrl.onChange"></docker-image-and-tag-selector>
+
+  <div class="form-group" ng-if="vm.fiatEnabled">
+    <div class="col-md-3 sm-label-right">
+      Run As User
+      <help-field key="pipeline.config.docker.trigger.runAsUser"></help-field>
+    </div>
+    <div class="col-md-9">
+      <select
+        class="form-control input-sm"
+        ng-options="svcAcct for svcAcct in vm.serviceAccounts"
+        ng-model="vm.trigger.runAsUser">
+        <option value="">Select Run As User</option>
+      </select>
+    </div>
+  </div>
 </ng-form>
