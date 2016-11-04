@@ -58,17 +58,9 @@
   </div>
 
   <div class="form-group" ng-if="pipelineTriggerCtrl.fiatEnabled">
-    <div class="col-md-3 sm-label-right">
-      Run As User
-      <help-field key="pipeline.config.jenkins.trigger.runAsUser"></help-field>
-    </div>
-    <div class="col-md-9">
-      <select
-        class="form-control input-sm"
-        ng-options="svcAcct for svcAcct in pipelineTriggerCtrl.serviceAccounts"
-        ng-model="trigger.runAsUser">
-        <option value="">Select Run As User</option>
-      </select>
-    </div>
+    <run-as-user-selector service-accounts="pipelineTriggerCtrl.serviceAccounts"
+                          component="trigger"
+                          field="runAsUser">
+    </run-as-user-selector>
   </div>
 </div>

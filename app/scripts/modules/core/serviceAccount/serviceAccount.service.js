@@ -15,7 +15,7 @@ module.exports = angular.module('spinnaker.core.serviceAccount.service', [
         return $q.resolve([]);
       }
 
-      return API.one('auth/user/serviceAccounts').get();
+      return API.one('auth').one('user').one('serviceAccounts').get();
     };
 
     return {
