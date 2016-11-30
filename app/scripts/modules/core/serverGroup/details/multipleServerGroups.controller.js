@@ -5,7 +5,6 @@ let angular = require('angular');
 module.exports = angular.module('spinnaker.core.serverGroup.details.multipleServerGroups.controller', [
     require('angular-ui-router'),
     require('../serverGroup.write.service'),
-    require('../serverGroup.submit.service'),
     require('../../confirmationModal/confirmationModal.service'),
     require('../../insight/insightFilterState.model'),
     require('../../cluster/filter/multiselect.model'),
@@ -14,7 +13,7 @@ module.exports = angular.module('spinnaker.core.serverGroup.details.multipleServ
   ])
   .controller('MultipleServerGroupsCtrl', function ($scope, $state, InsightFilterStateModel,
                                                     confirmationModalService, MultiselectModel,
-                                                    serverGroupWriter, serverGroupSubmitter, serviceDelegate, app) {
+                                                    serverGroupWriter, serviceDelegate, app) {
 
       this.InsightFilterStateModel = InsightFilterStateModel;
       this.serverGroups = [];
@@ -36,16 +35,20 @@ module.exports = angular.module('spinnaker.core.serverGroup.details.multipleServ
             monitorInterval = this.serverGroups.length * 1000;
         let taskMonitors = this.serverGroups.map(serverGroup => {
           let provider = serverGroup.provider || serverGroup.type;
-          let submitter = serviceDelegate.hasDelegate(provider, 'serverGroup.submitter') ?
-            serviceDelegate.getDelegate(provider, 'serverGroup.submitter') :
-            serverGroupSubmitter;
+          let providerParamsMixin = serviceDelegate.hasDelegate(provider, 'serverGroup.paramsMixin') ?
+            serviceDelegate.getDelegate(provider, 'serverGroup.paramsMixin') :
+            {};
 
-          let submitMethod = submitter[submitMethodName] || serverGroupSubmitter[submitMethodName];
+          let mixinParams = {};
+          let mixinParamsFactory = providerParamsMixin[submitMethodName];
+          if (mixinParamsFactory !== undefined) {
+            mixinParams = mixinParamsFactory(serverGroup);
+          }
 
           return {
             application    : app,
             title          : serverGroup.name,
-            submitMethod   : submitMethod(serverGroup, app),
+            submitMethod   : (params) => serverGroupWriter[submitMethodName](serverGroup, app, angular.extend(params, mixinParams)),
             monitorInterval: monitorInterval,
           };
         });
