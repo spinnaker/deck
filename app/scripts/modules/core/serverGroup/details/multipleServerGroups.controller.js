@@ -5,14 +5,16 @@ let angular = require('angular');
 module.exports = angular.module('spinnaker.core.serverGroup.details.multipleServerGroups.controller', [
     require('angular-ui-router'),
     require('../serverGroup.write.service'),
+    require('../serverGroup.submit.service'),
     require('../../confirmationModal/confirmationModal.service'),
     require('../../insight/insightFilterState.model'),
     require('../../cluster/filter/multiselect.model'),
+    require('../../cloudProvider/serviceDelegate.service.js'),
     require('./multipleServerGroup.component'),
   ])
   .controller('MultipleServerGroupsCtrl', function ($scope, $state, InsightFilterStateModel,
                                                     confirmationModalService, MultiselectModel,
-                                                    serverGroupWriter, app) {
+                                                    serverGroupWriter, serverGroupSubmitter, serviceDelegate, app) {
 
       this.InsightFilterStateModel = InsightFilterStateModel;
       this.serverGroups = [];
@@ -29,14 +31,21 @@ module.exports = angular.module('spinnaker.core.serverGroup.details.multipleServ
         return descriptor;
       };
 
-      let confirm = (submitMethod, verbs) => {
+      let confirm = (submitMethodName, verbs) => {
         let descriptor = getDescriptor(),
             monitorInterval = this.serverGroups.length * 1000;
         let taskMonitors = this.serverGroups.map(serverGroup => {
+          let provider = serverGroup.provider || serverGroup.type;
+          let submitter = serviceDelegate.hasDelegate(provider, 'serverGroup.submitter') ?
+            serviceDelegate.getDelegate(provider, 'serverGroup.submitter') :
+            serverGroupSubmitter;
+
+          let submitMethod = submitter[submitMethodName] || serverGroupSubmitter[submitMethodName];
+
           return {
             application    : app,
             title          : serverGroup.name,
-            submitMethod   : (params) => submitMethod(serverGroup, app, params),
+            submitMethod   : submitMethod(serverGroup, app),
             monitorInterval: monitorInterval,
           };
         });
@@ -53,7 +62,7 @@ module.exports = angular.module('spinnaker.core.serverGroup.details.multipleServ
       };
 
       this.destroyServerGroups = () => {
-        confirm(serverGroupWriter.destroyServerGroup, {
+        confirm('destroyServerGroup', {
           presentContinuous: 'Destroying',
           simplePresent    : 'Destroy',
           futurePerfect    : 'Destroyed'
@@ -61,7 +70,7 @@ module.exports = angular.module('spinnaker.core.serverGroup.details.multipleServ
       };
 
       this.disableServerGroups = () => {
-        confirm(serverGroupWriter.disableServerGroup, {
+        confirm('disableServerGroup', {
           presentContinuous: 'Disabling',
           simplePresent    : 'Disable',
           futurePerfect    : 'Disabled'
@@ -69,7 +78,7 @@ module.exports = angular.module('spinnaker.core.serverGroup.details.multipleServ
       };
 
       this.enableServerGroups = () => {
-        confirm(serverGroupWriter.enableServerGroup, {
+        confirm('enableServerGroup', {
           presentContinuous: 'Enabling',
           simplePresent    : 'Enable',
           futurePerfect    : 'Enabled'

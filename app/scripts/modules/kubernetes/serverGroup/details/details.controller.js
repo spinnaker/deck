@@ -14,11 +14,13 @@ module.exports = angular.module('spinnaker.serverGroup.details.kubernetes.contro
   require('core/serverGroup/serverGroup.write.service.js'),
   require('core/insight/insightFilterState.model.js'),
   require('core/utils/selectOnDblClick.directive.js'),
+  require('../submitter.js'),
 ])
   .controller('kubernetesServerGroupDetailsController', function ($scope, $state, app, serverGroup, InsightFilterStateModel,
                                                                   serverGroupReader, $uibModal, serverGroupWriter,
                                                                   runningExecutionsService, serverGroupWarningMessageService,
-                                                                  kubernetesServerGroupCommandBuilder, confirmationModalService) {
+                                                                  kubernetesServerGroupCommandBuilder, kubernetesServerGroupSubmitter,
+                                                                  confirmationModalService) {
     let application = app;
 
     $scope.state = {
@@ -103,10 +105,7 @@ module.exports = angular.module('spinnaker.serverGroup.details.kubernetes.contro
         katoPhaseToMonitor: 'DESTROY_ASG'
       };
 
-      var submitMethod = (params) => serverGroupWriter.destroyServerGroup(serverGroup, application, angular.extend(params, {
-        namespace: serverGroup.namespace,
-        interestingHealthProviderNames: ['KubernetesService']
-      }));
+      var submitMethod = kubernetesServerGroupSubmitter.destroyServerGroup(serverGroup, application);
 
       var stateParams = {
         name: serverGroup.name,
@@ -159,12 +158,7 @@ module.exports = angular.module('spinnaker.serverGroup.details.kubernetes.contro
         title: 'Disabling ' + serverGroup.name
       };
 
-      var submitMethod = (params) => {
-        return serverGroupWriter.disableServerGroup(serverGroup, application, angular.extend(params, {
-          namespace: serverGroup.region,
-          interestingHealthProviderNames: ['KubernetesService']
-        }));
-      };
+      var submitMethod = kubernetesServerGroupSubmitter.disableServerGroup(serverGroup, application);
 
       var confirmationModalParams = {
         header: 'Really disable ' + serverGroup.name + '?',
@@ -188,12 +182,7 @@ module.exports = angular.module('spinnaker.serverGroup.details.kubernetes.contro
         forceRefreshMessage: 'Refreshing application...',
       };
 
-      var submitMethod = (params) => {
-        return serverGroupWriter.enableServerGroup(serverGroup, app, angular.extend(params, {
-          namespace: serverGroup.region,
-          interestingHealthProviderNames: ['KubernetesService']
-        }));
-      };
+      var submitMethod = kubernetesServerGroupSubmitter.enableServerGroup(serverGroup, application);
 
       var confirmationModalParams = {
         header: 'Really enable ' + serverGroup.name + '?',
