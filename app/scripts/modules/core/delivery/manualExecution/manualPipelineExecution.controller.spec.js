@@ -73,6 +73,11 @@ describe('Controller: ManualPipelineExecution', function () {
               triggers: [],
               stages: [ {type: 'not-a-bake'}, {type: 'bake'}]
             },
+            {
+              id: 'c',
+              triggers: [],
+              stages: [ {type: 'bake', rebake: true}]
+            }
           ]},
           executions: { data: []}
         };
@@ -81,6 +86,10 @@ describe('Controller: ManualPipelineExecution', function () {
         expect(this.ctrl.showRebakeOption).toBe(false);
         this.initializeController(application, application.pipelineConfigs.data[1]);
         expect(this.ctrl.showRebakeOption).toBe(true);
+        expect(this.ctrl.command.trigger).toBe(null);
+        this.initializeController(application, application.pipelineConfigs.data[2]);
+        expect(this.ctrl.showRebakeOption).toBe(true);
+        expect(this.ctrl.command.trigger.rebake).toBe(true);
       });
 
       it('sets parameters if present', function () {

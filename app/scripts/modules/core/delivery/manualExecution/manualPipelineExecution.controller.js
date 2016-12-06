@@ -117,7 +117,18 @@ module.exports = angular.module('spinnaker.core.delivery.manualPipelineExecution
       addTriggers();
       this.triggerUpdated();
 
-      this.showRebakeOption = pipeline.stages.some((stage) => stage.type === 'bake');
+      const bakeStages = pipeline.stages.filter(s => s.type === 'bake');
+      this.showRebakeOption = !!bakeStages.length;
+      if (bakeStages.length) {
+        const someRebake = bakeStages.filter(s => s.rebake);
+        this.showRebakeOption = true;
+        this.command.trigger = this.command.trigger || {};
+        this.command.trigger.rebake = someRebake.length > 0;
+        if (someRebake.length && someRebake.length !== bakeStages.length) {
+          this.ternaryRebakeOption = true;
+          this.command.trigger.rebake = undefined;
+        }
+      }
 
       if (pipeline.parameterConfig && pipeline.parameterConfig.length) {
         this.parameters = {};
