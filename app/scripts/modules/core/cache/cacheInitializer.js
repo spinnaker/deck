@@ -20,10 +20,10 @@ module.exports = angular.module('spinnaker.core.cache.initializer', [
                                          igorService, infrastructureCacheConfig, serviceDelegate) {
 
     var initializers = {
-      credentials: [accountService.listAccounts],
-      securityGroups: [securityGroupReader.getAllSecurityGroups],
+      credentials: [() => accountService.listAccounts()],
+      securityGroups: [() => securityGroupReader.getAllSecurityGroups()],
       applications: [() => applicationReader.listApplications()],
-      buildMasters: [igorService.listMasters],
+      buildMasters: [() => igorService.listMasters()],
     };
 
     var cacheConfig = _.cloneDeep(infrastructureCacheConfig);
@@ -39,8 +39,8 @@ module.exports = angular.module('spinnaker.core.cache.initializer', [
       Object.keys(cacheConfig).forEach((key) => {
         setConfigDefaults(key, cacheConfig[key]);
       });
-      accountService.listProviders().then((availableProviders) => {
-        cloudProviderRegistry.listRegisteredProviders().forEach((provider) => {
+      return accountService.listProviders().then((availableProviders) => {
+        return cloudProviderRegistry.listRegisteredProviders().forEach((provider) => {
           if (!availableProviders.includes(provider)) {
             return;
           }
@@ -62,12 +62,13 @@ module.exports = angular.module('spinnaker.core.cache.initializer', [
     }
 
     function initialize() {
-      extendConfig();
-      var all = [];
-      Object.keys(cacheConfig).forEach(function(key) {
-        all.push(initializeCache(key));
+      return extendConfig().then(() => {
+        var all = [];
+        Object.keys(cacheConfig).forEach(function(key) {
+          all.push(initializeCache(key));
+        });
+        return $q.all(all);
       });
-      return $q.all(all);
     }
 
     function initializeCache(key) {
