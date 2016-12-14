@@ -1,7 +1,7 @@
 import {mock} from 'angular';
 
 import {Application} from 'core/application/application.model';
-import APPLICATION_MODEL_BUILDER, {ApplicationModelBuilder} from '../../core/application/applicationModel.builder';
+import {APPLICATION_MODEL_BUILDER, ApplicationModelBuilder} from 'core/application/applicationModel.builder';
 import IProvideService = angular.auto.IProvideService;
 import {APPLICATION_DATA_SOURCE_REGISTRY} from 'core/application/service/applicationDataSource.registry';
 

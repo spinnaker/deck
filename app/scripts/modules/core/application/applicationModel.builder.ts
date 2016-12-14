@@ -28,12 +28,9 @@ export class ApplicationModelBuilder {
 
 }
 
-const moduleName = 'spinnaker.core.application.model.builder';
-
-module(moduleName, [
+export const APPLICATION_MODEL_BUILDER = 'spinnaker.core.application.model.builder';
+module(APPLICATION_MODEL_BUILDER, [
   require('../presentation/robotToHumanFilter/robotToHuman.filter'),
   require('../scheduler/scheduler.factory'),
 ])
   .service('applicationModelBuilder', ApplicationModelBuilder);
-
-export default moduleName;
