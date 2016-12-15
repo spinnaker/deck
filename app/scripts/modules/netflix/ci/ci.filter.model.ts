@@ -5,6 +5,5 @@ export class CiFilterModel {
 }
 
 export const CI_FILTER_MODEL = 'spinnaker.netflix.ci.filter.model';
-
 module(CI_FILTER_MODEL, [])
   .service('CiFilterModel', CiFilterModel);
