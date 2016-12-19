@@ -2,10 +2,10 @@
 
 let angular = require('angular');
 
+import {STATES_PROVIDER} from 'core/navigation/states.provider';
+
 module.exports = angular
-  .module('spinnaker.netflix.fastProperties.states', [
-    require('core/navigation/states.provider.js'),
-  ])
+  .module('spinnaker.netflix.fastProperties.states', [STATES_PROVIDER])
   .config(function(statesProvider) {
     var fastPropertyRollouts = {
       name: 'rollouts',
@@ -53,7 +53,6 @@ module.exports = angular
         },
       }
     };
-
 
     var mainProperty = {
       name: 'properties',

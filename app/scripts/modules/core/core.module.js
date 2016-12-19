@@ -3,6 +3,7 @@
 import {AUTHENTICATION} from 'core/authentication/authentication.module';
 import {API_SERVICE} from 'core/api/api.service';
 import {CLOUD_PROVIDER_LOGO} from 'core/cloudProvider/cloudProviderLogo.component';
+import {STATES_PROVIDER} from 'core/navigation/states.provider';
 
 import Spinner from 'spin.js';
 
@@ -82,7 +83,7 @@ module.exports = angular
 
     require('./modal/modal.module.js'),
 
-    require('./navigation/states.provider.js'),
+    STATES_PROVIDER,
     require('./notification/notifications.module.js'),
     require('./notification/types/email/email.notification.type.module.js'),
     require('./notification/types/hipchat/hipchat.notification.type.module.js'),

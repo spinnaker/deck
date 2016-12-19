@@ -2,9 +2,11 @@
 
 let angular = require('angular');
 
+import {STATES_PROVIDER} from 'core/navigation/states.provider';
+
 module.exports = angular
   .module('spinnaker.netflix.tableau.states', [
-    require('core/navigation/states.provider'),
+    STATES_PROVIDER,
     require('./application/appTableau.controller'),
     require('./summary/summaryTableau.controller'),
     require('./tableau.dataSource'),

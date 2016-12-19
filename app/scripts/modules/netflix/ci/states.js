@@ -2,9 +2,11 @@
 
 let angular = require('angular');
 
+import {STATES_PROVIDER} from 'core/navigation/states.provider';
+
 module.exports = angular
   .module('spinnaker.netflix.ci.states', [
-    require('core/navigation/states.provider.js'),
+    STATES_PROVIDER,
     require('./ci.controller'),
     require('./detail/detail.controller'),
     require('./detail/detailTab/detailTab.controller'),
