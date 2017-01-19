@@ -11,6 +11,7 @@ module.exports = angular.module('spinnaker.core.pipeline.config.trigger', [
     require('./git/gitTrigger.module.js'),
     require('./jenkins/jenkinsTrigger.module.js'),
     require('./pipeline/pipelineTrigger.module.js'),
+    require('./webhook/webhookTrigger.module.js'),
     require('./trigger.directive.js'),
     require('./triggers.directive.js'),
     RUN_AS_USER_SELECTOR_COMPONENT,
