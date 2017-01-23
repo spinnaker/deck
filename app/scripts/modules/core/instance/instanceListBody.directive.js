@@ -103,17 +103,19 @@ module.exports = angular.module('spinnaker.core.instance.instanceListBody.direct
           switch(filterType) {
             case 'id':
               return a.id.localeCompare(b.id);
-            case 'launchTime':
+            case 'launchTime': {
               return a.launchTime === b.launchTime ? a.id.localeCompare(b.id) : a.launchTime - b.launchTime;
-            case 'availabilityZone':
+            }
+            case 'availabilityZone': {
               return a.availabilityZone === b.availabilityZone ?
                 a.launchTime === b.launchTime ?
                   a.id.localeCompare(b.id) :
-                a.launchTime - b.launchTime :
+                  a.launchTime - b.launchTime :
                 a.availabilityZone.localeCompare(b.availabilityZone);
-            case 'discoveryState':
+            }
+            case 'discoveryState': {
               let aHealth = (a.health || []).filter((health) => health.type === 'Discovery'),
-                  bHealth = (b.health || []).filter((health) => health.type === 'Discovery');
+                bHealth = (b.health || []).filter((health) => health.type === 'Discovery');
               if (aHealth.length && !bHealth.length) {
                 return -1;
               }
@@ -123,13 +125,14 @@ module.exports = angular.module('spinnaker.core.instance.instanceListBody.direct
               return (!aHealth.length && !bHealth.length) || aHealth[0].state === bHealth[0].state ?
                 a.launchTime === b.launchTime ?
                   a.id.localeCompare(b.id) :
-                a.launchTime - b.launchTime :
+                  a.launchTime - b.launchTime :
                 aHealth[0].state.localeCompare(bHealth[0].state);
-            case 'loadBalancerSort':
+            }
+            case 'loadBalancerSort': {
               let aHealth2 = (a.health || []).filter((health) => health.type === 'LoadBalancer')
-                    .sort((h1, h2) => h1.name.localeCompare(h2.name)),
-                  bHealth2 = (b.health || []).filter((health) => health.type === 'LoadBalancer')
-                    .sort((h1, h2) => h1.name.localeCompare(h2.name));
+                  .sort((h1, h2) => h1.name.localeCompare(h2.name)),
+                bHealth2 = (b.health || []).filter((health) => health.type === 'LoadBalancer')
+                  .sort((h1, h2) => h1.name.localeCompare(h2.name));
               if (aHealth2.length && !bHealth2.length) {
                 return -1;
               }
@@ -137,14 +140,16 @@ module.exports = angular.module('spinnaker.core.instance.instanceListBody.direct
                 return 1;
               }
               let aHealthStr = aHealth2.map((h) => h.name + ':' + h.state).join(','),
-                  bHealthStr = bHealth2.map((h) => h.name + ':' + h.state).join(',');
+                bHealthStr = bHealth2.map((h) => h.name + ':' + h.state).join(',');
               return aHealthStr === bHealthStr ?
                 a.launchTime === b.launchTime ?
                   a.id.localeCompare(b.id) :
-                a.launchTime - b.launchTime :
+                  a.launchTime - b.launchTime :
                 aHealthStr.localeCompare(bHealthStr);
-            default:
+            }
+            default: {
               return -1;
+            }
           }
         }
 

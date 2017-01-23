@@ -1,6 +1,5 @@
 'use strict';
 
-import * as moment from 'moment';
 let angular = require('angular');
 require('./loadBalancerSelector.directive.html');
 
@@ -10,7 +9,7 @@ describe('Directive: GCE Load Balancers Selector', function() {
     window.module(
       require('./loadBalancerSelector.directive.js'),
       require('./../../serverGroupConfiguration.service.js'),
-      require('exports?"ui.select"!ui-select'),
+      require('exports-loader?"ui.select"!ui-select'),
       require('core/utils/timeFormatters.js'),
       require('core/utils/moment.js')
     )
@@ -55,8 +54,7 @@ describe('Directive: GCE Load Balancers Selector', function() {
     element = this.compile(selector)(this.scope);
     this.scope.$apply();
 
-    var a = element.find('a');
-    $(a).click().trigger('click');
+    element.find('a').click().trigger('click');
     this.scope.$apply();
     expect(gceServerGroupConfigurationService.refreshLoadBalancers).toHaveBeenCalled();
   });

@@ -98,7 +98,7 @@ describe('Directives: checklist', function () {
     scope.$digest();
 
     expect(checklist.find('input:checked').size()).toBe(3);
-    $(checklist.find('a')[0]).click();
+    checklist.find('a')[0].click();
     expect(checklist.find('input:checked').size()).toBe(4);
   });
 
@@ -117,7 +117,7 @@ describe('Directives: checklist', function () {
     scope.$digest();
 
     expect(checklist.find('input:checked').size()).toBe(4);
-    $(checklist.find('a')[0]).click();
+    checklist.find('a')[0].click();
     expect(checklist.find('input:checked').size()).toBe(0);
   });
 
@@ -138,9 +138,9 @@ describe('Directives: checklist', function () {
     var selectButton = checklist.find('a')[0];
 
     expect(selectButton.text).toBe('Select All'); // Some items selected
-    $(selectButton).click();
+    selectButton.click();
     expect(selectButton.text).toBe('Deselect All'); // All items selected
-    $(selectButton).click();
+    selectButton.click();
     expect(selectButton.text).toBe('Select All'); // No items selected
   });
 });
