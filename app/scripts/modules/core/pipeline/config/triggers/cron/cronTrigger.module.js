@@ -8,7 +8,6 @@ import './cronTrigger.less';
 module.exports = angular.module('spinnaker.core.pipeline.trigger.cron', [
     require('angular-cron-gen'),
     require('../trigger.directive.js'),
-    require('core/serviceAccount/serviceAccount.service.js'),
     require('./cron.validator.directive.js'),
   ])
   .config(function(pipelineConfigProvider) {
@@ -22,14 +21,10 @@ module.exports = angular.module('spinnaker.core.pipeline.trigger.cron', [
       popoverLabelUrl: require('./cronPopoverLabel.html'),
     });
   })
-  .controller('CronTriggerCtrl', function(trigger, settings, serviceAccountService) {
+  .controller('CronTriggerCtrl', function(trigger, settings) {
 
     this.trigger = trigger;
     this.fiatEnabled = settings.feature.fiatEnabled;
-
-    serviceAccountService.getServiceAccounts().then(accounts => {
-      this.serviceAccounts = accounts || [];
-    });
 
     this.validationMessages = {};
 
