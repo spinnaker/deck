@@ -18,3 +18,4 @@ build
 coverage/
 *~
 test/google/node_modules
+.nvmrc

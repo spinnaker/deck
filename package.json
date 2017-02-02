@@ -51,7 +51,7 @@
   },
   "scripts": {
     "build": "webpack --bail",
-    "start": "sh ./start.sh",
+    "start": "bash ./start.sh",
     "start-dev-server": "webpack-dev-server",
     "test": "karma start",
     "int": "protractor protractor.conf.js"
