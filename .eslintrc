@@ -22,7 +22,7 @@
     "no-underscore-dangle": 1,
     "no-shadow": 0, // TODO
     "no-unexpected-multiline": 1,
-    "consistent-return": 1,
+    "consistent-return": 0, // ANG, shutting this off for WP2 conversion for now....it's a bit chatty now
     "no-extend-native": 1,
     "space-before-blocks": 1,
     "semi-spacing": 1,
@@ -32,6 +32,10 @@
     "operator-assignment": [1, "always"],
     "no-const-assign": 1,
     "no-console": 1,
+    "no-control-regex": 0
+  },
+  "parserOptions": {
+    "sourceType": "module"
   },
   "env": {
     "browser": true,

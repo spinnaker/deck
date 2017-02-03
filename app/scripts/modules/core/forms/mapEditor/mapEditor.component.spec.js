@@ -32,7 +32,7 @@ describe('Component: mapEditor', function () {
       scope.model = {foo: 'bar', bah: 11};
       let dom = this.compile('<map-editor model="model"></map-editor>')(scope);
       scope.$digest();
-      $(dom.find('input')[3]).val('').change();
+      angular.element(dom.find('input')[3]).val('').change();
       scope.$digest();
       expect(scope.model.foo).toBe('bar');
       expect(scope.model.bah).toBeUndefined();
@@ -42,7 +42,7 @@ describe('Component: mapEditor', function () {
       scope.model = {foo: 'bar', bah: 11};
       let dom = this.compile('<map-editor model="model" allow-empty="true"></map-editor>')(scope);
       scope.$digest();
-      $(dom.find('input')[3]).val('').change();
+      angular.element(dom.find('input')[3]).val('').change();
       scope.$digest();
       expect(scope.model.foo).toBe('bar');
       expect(scope.model.bah).toBe('');
@@ -100,10 +100,10 @@ describe('Component: mapEditor', function () {
       expect(dom.find('input').length).toBe(4);
       expect(changeDetected).toBe(false);
 
-      $(dom.find('input')[2]).val('bah').change();
+      angular.element(dom.find('input')[2]).val('bah').change();
       scope.$digest();
       expect(changeDetected).toBe(false);
-      $(dom.find('input')[3]).val('aah').change();
+      angular.element(dom.find('input')[3]).val('aah').change();
       scope.$digest();
       expect(changeDetected).toBe(true);
     });
@@ -140,7 +140,7 @@ describe('Component: mapEditor', function () {
       scope.model = { a: '1', b: '2'};
       let dom = this.compile('<map-editor model="model"></map-editor>')(scope);
       scope.$digest();
-      $(dom.find('input')[2]).val('a').trigger('input');
+      angular.element(dom.find('input')[2]).val('a').trigger('input');
       scope.$digest();
       expect(dom.find('.error-message').length).toBe(1);
     });
@@ -149,11 +149,11 @@ describe('Component: mapEditor', function () {
       scope.model = { a: '1', b: '2'};
       let dom = this.compile('<map-editor model="model"></map-editor>')(scope);
       scope.$digest();
-      $(dom.find('input')[2]).val('a').trigger('input');
+      angular.element(dom.find('input')[2]).val('a').trigger('input');
       scope.$digest();
       expect(dom.find('input').length).toBe(4);
       expect(dom.find('.error-message').length).toBe(1);
-      $(dom.find('a')[1]).click();
+      angular.element(dom.find('a')[1]).click();
       scope.$digest();
       expect(dom.find('.error-message').length).toBe(0);
       expect(dom.find('input').length).toBe(2);
@@ -163,24 +163,20 @@ describe('Component: mapEditor', function () {
       scope.model = { a: '1', b: '2'};
       let dom = this.compile('<map-editor model="model"></map-editor>')(scope);
       scope.$digest();
-      $(dom.find('input')[0]).val('b').trigger('input');
+      angular.element(dom.find('input')[0]).val('b').trigger('input');
       scope.$digest();
       expect(dom.find('tbody tr:first-child .error-message').length).toBe(1);
       expect(dom.find('tbody tr:nth-child(2) .error-message').length).toBe(0);
 
-      $(dom.find('input')[2]).val('a').trigger('input');
+      angular.element(dom.find('input')[2]).val('a').trigger('input');
       scope.$digest();
       expect(dom.find('tbody tr:first-child .error-message').length).toBe(0);
       expect(dom.find('tbody tr:nth-child(2) .error-message').length).toBe(0);
 
-      $(dom.find('input')[2]).val('b').trigger('input');
+      angular.element(dom.find('input')[2]).val('b').trigger('input');
       scope.$digest();
       expect(dom.find('tbody tr:first-child .error-message').length).toBe(0);
       expect(dom.find('tbody tr:nth-child(2) .error-message').length).toBe(1);
-
     });
   });
-
-
-
 });

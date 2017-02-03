@@ -8,7 +8,7 @@ module.exports = angular
   .module('spinnaker.core.utils.diff.service', [])
   .factory('jsonDiffService', function () {
 
-    let DiffMatchPatch = require('expose?diff_match_patch!diff-match-patch');
+    let DiffMatchPatch = require('expose-loader?diff_match_patch!diff-match-patch');
 
     function generateDiff(left, right) {
       let dmp = new DiffMatchPatch();

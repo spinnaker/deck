@@ -28,8 +28,8 @@ describe('Directive: Titus SG Advanced Settings Selector', function() {
 
     var inputs = this.elem.find('table.metadata input');
     expect(inputs.length).toEqual(2);
-    $(inputs[0]).val('myKey').trigger('input');
-    $(inputs[1]).val('myVal').trigger('input');
+    angular.element(inputs[0]).val('myKey').trigger('input');
+    angular.element(inputs[1]).val('myVal').trigger('input');
     this.scope.$apply();
 
     expect(this.scope.command.instanceMetadata.length).toEqual(1);
@@ -45,7 +45,7 @@ describe('Directive: Titus SG Advanced Settings Selector', function() {
     var removeLinks = this.elem.find('table.metadata a');
     expect(removeLinks.length).toEqual(2);
 
-    $(removeLinks[0]).trigger('click');
+    angular.element(removeLinks[0]).trigger('click');
     this.scope.$apply();
 
     expect(this.scope.command.instanceMetadata.length).toEqual(1);
@@ -74,7 +74,7 @@ describe('Directive: Titus SG Advanced Settings Selector', function() {
     var removeLinks = this.elem.find('table.tags a');
     expect(removeLinks.length).toEqual(2);
 
-    $(removeLinks[0]).trigger('click');
+    angular.element(removeLinks[0]).trigger('click');
     this.scope.$apply();
 
     expect(this.scope.command.tags.length).toEqual(1);
