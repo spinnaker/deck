@@ -16,6 +16,9 @@ module.exports = angular.module('spinnaker.deck.gce.httpLoadBalancer.backendServ
     controller: function () {
       this.backingData = this.command.backingData;
       this.loadBalancer = this.command.loadBalancer;
+      if (!this.backendService.namedPort) {
+        this.backendService.namedPort = "http";
+      }
       let servicesByName = this.backingData.backendServicesKeyedByName;
 
       this.onBackendServiceSelect = (selectedBackendService) => {

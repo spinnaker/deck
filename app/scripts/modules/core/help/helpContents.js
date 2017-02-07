@@ -132,7 +132,7 @@ module.exports = angular.module('spinnaker.core.help.contents', [])
     'gce.httpLoadBalancer.certificate': 'The name of an SSL certificate. If specified, Spinnaker will create an HTTPS load balancer.',
     'gce.httpLoadBalancer.namedPort': `
       For HTTP(S) and SSL load balancers,
-      incoming traffic is directed through a named port (for Spinnaker, the named port is <b>http</b>).
+      incoming traffic is directed through a named port (for Spinnaker, the default named port is <b>http</b>).
       The mapping from named port to port number is specified per server group
       and can be configured within the server group creation dialogue under <b>Port Name Mapping</b>.`,
     'gce.serverGroup.resizeWithAutoscalingPolicy': `
