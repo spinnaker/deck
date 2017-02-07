@@ -4,12 +4,11 @@ COPY . deck/
 
 WORKDIR deck
 
-RUN docker/setup-apache2.sh
-
-RUN ./gradlew build -PskipTests
-
-RUN mkdir -p /opt/deck/html/
-
-RUN cp build/webpack/* /opt/deck/html/
+RUN docker/setup-apache2.sh && \
+  ./gradlew build -PskipTests && \
+  mkdir -p /opt/deck/html/ && \
+  cp build/webpack/* /opt/deck/html/ && \
+  cd .. && \
+  rm -rf deck
 
 CMD docker/run-apache2.sh
