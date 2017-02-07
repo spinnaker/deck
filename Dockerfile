@@ -5,7 +5,7 @@ COPY . deck/
 WORKDIR deck
 
 RUN docker/setup-apache2.sh && \
-  ./gradlew build -PskipTests && \
+  GRADLE_USER_HOME=cache ./gradlew build -PskipTests && \
   mkdir -p /opt/deck/html/ && \
   cp build/webpack/* /opt/deck/html/ && \
   cd .. && \
