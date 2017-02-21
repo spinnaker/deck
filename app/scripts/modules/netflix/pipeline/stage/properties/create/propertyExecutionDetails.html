@@ -48,7 +48,7 @@
         <div class="alert alert-danger" ng-if="propertyDetailsCtrl.isExecutionTerminalOrCanceled()">
           <p>This pipeline ended with a status of {{pipelineStatus}}. The property was rolled back to its original state.</p>
           <p ng-if="propertyAction && propertyDetailsCtrl.wasCreateAction()">
-            Properties that were created during this stage where deleted.
+            Properties that where created during this stage where deleted.
           </p>
           <table class="table" ng-if="propertyAction && !propertyDetailsCtrl.wasCreateAction()">
             <thead>
