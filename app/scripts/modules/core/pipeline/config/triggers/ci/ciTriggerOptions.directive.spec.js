@@ -1,12 +1,12 @@
 'use strict';
 
-describe('Jenkins Trigger: JenkinsTriggerOptionsCtrl', function() {
+describe('CI Trigger: CITriggerOptionsCtrl', function() {
 
   var $scope, igorService, ctrl, $q, command;
 
   beforeEach(
     window.module(
-      require('./jenkinsTriggerOptions.directive.js')
+      require('./ciTriggerOptions.directive.js')
     )
   );
 
@@ -17,14 +17,14 @@ describe('Jenkins Trigger: JenkinsTriggerOptionsCtrl', function() {
 
     command = {
       trigger: {
-        type: 'jenkins',
+        type: 'ci',
         master: 'a',
         job: 'b'
       }
     };
 
     this.initialize = function() {
-      ctrl = $controller('JenkinsTriggerOptionsCtrl', {
+      ctrl = $controller('CITriggerOptionsCtrl', {
         igorService: igorService,
         $scope: $scope,
       }, { command: command });
@@ -74,7 +74,7 @@ describe('Jenkins Trigger: JenkinsTriggerOptionsCtrl', function() {
   it('re-initializes when trigger changes', function () {
     let firstBuild = { number: '1', result: 'SUCCESS' },
         secondBuild = { number: '3', result: 'SUCCESS'},
-        secondTrigger = { type: 'jenkins', master: 'b', job: 'c'};
+        secondTrigger = { type: 'ci', master: 'b', job: 'c'};
 
     spyOn(igorService, 'listBuildsForJob').and.callFake((master, job) => {
       let builds = [];

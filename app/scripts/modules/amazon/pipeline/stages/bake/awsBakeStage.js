@@ -28,9 +28,9 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.aws.bakeStage', [
         { type: 'requiredField', fieldName: 'package', },
         { type: 'requiredField', fieldName: 'regions', },
         { type: 'stageOrTriggerBeforeType',
-          stageType: 'jenkins',
+          stageType: 'ci',
           checkParentTriggers: true,
-          message: 'Bake stages should always have a Jenkins stage or trigger preceding them.<br> Otherwise, ' +
+          message: 'Bake stages should always have a CI stage or trigger preceding them.<br> Otherwise, ' +
         'Spinnaker will bake and deploy the most-recently built package.'}
       ],
       restartable: true,

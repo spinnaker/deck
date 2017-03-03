@@ -3,51 +3,51 @@
 let angular = require('angular');
 import {SERVICE_ACCOUNT_SERVICE} from 'core/serviceAccount/serviceAccount.service.ts';
 
-module.exports = angular.module('spinnaker.core.pipeline.config.trigger.jenkins', [
-  require('./jenkinsTriggerOptions.directive.js'),
+module.exports = angular.module('spinnaker.core.pipeline.config.trigger.ci', [
+  require('./ciTriggerOptions.directive.js'),
   require('../trigger.directive.js'),
-  require('core/ci/jenkins/igor.service.js'),
+  require('core/ci/igor.service.js'),
   SERVICE_ACCOUNT_SERVICE,
   require('../../pipelineConfigProvider.js'),
 ])
   .config(function(pipelineConfigProvider) {
 
     pipelineConfigProvider.registerTrigger({
-      label: 'Jenkins',
-      description: 'Listens to a Jenkins job',
-      key: 'jenkins',
-      controller: 'JenkinsTriggerCtrl',
-      controllerAs: 'jenkinsTriggerCtrl',
-      templateUrl: require('./jenkinsTrigger.html'),
-      popoverLabelUrl: require('./jenkinsPopoverLabel.html'),
-      manualExecutionHandler: 'jenkinsTriggerExecutionHandler',
+      label: 'Continuous Integration',
+      description: 'Listens to a CI job (Jenkins/Travis)',
+      key: 'ci',
+      controller: 'CITriggerCtrl',
+      controllerAs: 'ciTriggerCtrl',
+      templateUrl: require('./ciTrigger.html'),
+      popoverLabelUrl: require('./ciPopoverLabel.html'),
+      manualExecutionHandler: 'ciTriggerExecutionHandler',
       validators: [
         {
           type: 'requiredField',
           fieldName: 'job',
-          message: '<strong>Job</strong> is a required field on Jenkins triggers.',
+          message: '<strong>Job</strong> is a required field on CI triggers.',
         },
         {
           type: 'serviceAccountAccess',
-          message: `You do not have access to the service account configured in this pipeline's Jenkins trigger.
+          message: `You do not have access to the service account configured in this pipeline's Continuous Integration trigger.
                     You will not be able to save your edits to this pipeline.`,
           preventSave: true,
         }
       ],
     });
   })
-  .factory('jenkinsTriggerExecutionHandler', function ($q) {
+  .factory('ciTriggerExecutionHandler', function ($q) {
     // must provide two fields:
     //   formatLabel (promise): used to supply the label for selecting a trigger when there are multiple triggers
     //   selectorTemplate: provides the HTML to show extra fields
     return {
       formatLabel: (trigger) => {
-        return $q.when(`(Jenkins) ${trigger.master}: ${trigger.job}`);
+        return $q.when(`(CI) ${trigger.master}: ${trigger.job}`);
       },
       selectorTemplate: require('./selectorTemplate.html'),
     };
   })
-  .controller('JenkinsTriggerCtrl', function($scope, trigger, igorService, settings, serviceAccountService) {
+  .controller('CITriggerCtrl', function($scope, trigger, igorService, settings, serviceAccountService) {
 
     $scope.trigger = trigger;
     this.fiatEnabled = settings.feature.fiatEnabled;

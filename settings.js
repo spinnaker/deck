@@ -101,7 +101,7 @@ window.spinnakerSettings = {
   authEnabled: authEnabled,
   authTtl: 600000,
   gitSources: ['stash', 'github', 'bitbucket'],
-  triggerTypes: ['git', 'pipeline', 'docker', 'cron', 'jenkins'],
+  triggerTypes: ['git', 'pipeline', 'docker', 'cron', 'ci'],
   feature: {
     entityTags: entityTagsEnabled,
     fiatEnabled: fiatEnabled,
@@ -117,5 +117,6 @@ window.spinnakerSettings = {
     infrastructureStages: process.env.INFRA_STAGES === 'enabled',
     jobs: false,
     snapshots: false,
+    convertCiToJenkinsOnPipelineSave: true,
   },
 };

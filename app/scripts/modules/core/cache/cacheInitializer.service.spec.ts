@@ -38,7 +38,7 @@ describe('Service: cacheInitializer', function () {
       ACCOUNT_SERVICE,
       SECURITY_GROUP_READER,
       APPLICATION_READ_SERVICE,
-      require('core/ci/jenkins/igor.service')
+      require('core/ci/igor.service')
     ));
   beforeEach(
     mock.inject(function (_$q_: ng.IQService,

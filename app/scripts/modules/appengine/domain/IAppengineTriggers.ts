@@ -5,7 +5,7 @@ export interface IAppengineGitTrigger {
   branch: string;
 }
 
-export interface IAppengineJenkinsTrigger {
+export interface IAppengineCITrigger {
   master: string;
   job: string;
   matchBranchOnRegex?: string;

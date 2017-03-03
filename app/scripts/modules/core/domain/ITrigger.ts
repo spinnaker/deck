@@ -12,10 +12,10 @@ export interface IGitTrigger extends ITrigger {
   type: 'git';
 }
 
-export interface IJenkinsTrigger extends ITrigger {
+export interface ICITrigger extends ITrigger {
   job: string;
   master: string;
-  type: 'jenkins';
+  type: 'ci';
 }
 
 export interface IPipelineTrigger extends ITrigger {

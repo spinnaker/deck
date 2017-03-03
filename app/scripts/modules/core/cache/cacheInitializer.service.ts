@@ -127,7 +127,7 @@ module(CACHE_INITIALIZER_SERVICE, [
   ACCOUNT_SERVICE,
   SECURITY_GROUP_READER,
   APPLICATION_READ_SERVICE,
-  require('../ci/jenkins/igor.service.js'),
+  require('../ci/igor.service.js'),
   INFRASTRUCTURE_CACHE_SERVICE,
   CLOUD_PROVIDER_REGISTRY,
 ])

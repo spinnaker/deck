@@ -1,9 +1,9 @@
-<div ng-controller="JenkinsExecutionDetailsCtrl">
+<div ng-controller="CIExecutionDetailsCtrl">
   <execution-details-section-nav sections="configSections"></execution-details-section-nav>
-  <div class="step-section-details" ng-if="detailsSection === 'jenkinsConfig'">
+  <div class="step-section-details" ng-if="detailsSection === 'ciConfig'">
     <div class="row">
       <div class="col-md-{{stage.context.buildInfo.testResults ? 6 : 12}}">
-        <h5>Jenkins Stage Configuration</h5>
+        <h5>Continuous Integration Stage Configuration</h5>
         <dl class="dl-narrow dl-horizontal">
           <dt>Master</dt>
           <dd>{{stage.context.master}}</dd>

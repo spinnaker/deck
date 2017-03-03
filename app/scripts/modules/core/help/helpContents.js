@@ -61,8 +61,8 @@ module.exports = angular.module('spinnaker.core.help.contents', [])
     'cluster.search': 'Quickly filter the displayed server groups by the following fields:' +
     '<ul>' +
     '<li>Build # (e.g. <samp>#337</samp>)</li>' +
-    '<li>Jenkins host</li>' +
-    '<li>Jenkins job name</li>' +
+    '<li>CI host</li>' +
+    '<li>CI job name</li>' +
     '<li>Cluster (prefixed, e.g. <samp>cluster:myapp-int</samp>)' +
     '<li>VPC (prefixed, e.g. <samp>vpc:main</samp>)' +
     '<li>Clusters (comma-separated list, e.g. <samp>clusters:myapp-int, myapp-test</samp>)' +
@@ -228,7 +228,7 @@ module.exports = angular.module('spinnaker.core.help.contents', [])
     'pipeline.config.quickPatchAsg.baseOs': '<p>The operating system running on the target instances.</p>',
     'pipeline.config.quickPatchAsg.rollingPatch': '<p>Patch one instance at a time vs. all at once.</p>',
     'pipeline.config.quickPatchAsg.skipUpToDate': '<p>Skip instances which already have the requested version.</p>',
-    'pipeline.config.jenkins.propertyFile': '<p>(Optional) Configures the name to the Jenkins artifact file used to pass in properties to later stages in the Spinnaker pipeline.</p>',
+    'pipeline.config.ci.propertyFile': '<p>(Optional) Configures the name to the Continuous Integration (CI) artifact file used to pass in properties to later stages in the Spinnaker pipeline.</p>',
     'pipeline.config.bake.package': '<p>The name of the package you want installed (without any version identifiers).</p>' +
     '<p>If your build produces a deb file named "myapp_1.27-h343", you would want to enter "myapp" here.</p>' +
     '<p>If there are multiple packages (space separated), then they will be installed in the order they are entered.</p>',
@@ -262,9 +262,9 @@ module.exports = angular.module('spinnaker.core.help.contents', [])
     'Prevents any stages that depend on this stage from running, but allows other branches of the pipeline to run. The pipeline will be marked as failed once complete.',
     'pipeline.config.ignoreFailure': '' +
     'Continues execution of downstream stages, marking this stage as failed/continuing.',
-    'pipeline.config.jenkins.markUnstableAsSuccessful.true': 'If Jenkins reports the build status as UNSTABLE, ' +
+    'pipeline.config.ci.markUnstableAsSuccessful.true': 'If the CI server reports the build status as UNSTABLE, ' +
     'Spinnaker will mark the stage as SUCCEEDED and continue execution of the pipeline.',
-    'pipeline.config.jenkins.markUnstableAsSuccessful.false': 'If Jenkins reports the build status as UNSTABLE, ' +
+    'pipeline.config.ci.markUnstableAsSuccessful.false': 'If the CI server reports the build status as UNSTABLE, ' +
     'Spinnaker will mark the stage as FAILED; subsequent execution will be determined based on the configuration of the ' +
     '<b>If build fails</b> option for this stage.',
     'pipeline.config.canary.clusterPairs': '' +
@@ -308,7 +308,7 @@ module.exports = angular.module('spinnaker.core.help.contents', [])
     '<p><b>Note:</b> this is not the overall time the stage has, but rather the time for specific tasks.</p>',
     'pipeline.config.timeout.bake': '<p>For the Bake stage, the timeout will apply to both the "Create Bake" and "Monitor Bake" tasks.</p>',
     'pipeline.config.timeout.deploy': '<p>For the Deploy stage, the timeout will apply to both the "Monitor Deploy" and "Wait For Up Instances" tasks.</p>',
-    'pipeline.config.timeout.jenkins': '<p>For the Jenkins stage, the timeout will apply to both the "Wait For Jenkins Job Start" and "Monitor Jenkins Job" tasks.</p>',
+    'pipeline.config.timeout.jenkins': '<p>For the CI stage, the timeout will apply to both the "Wait For CI Job Start" and "Monitor CI Job" tasks.</p>',
     'pipeline.config.trigger.runAsUser': 'The current user must have access to the specified service account, and the service account must have access to the current application. Otherwise, you\'ll receive an \'Access is denied\' error.',
     'pipeline.config.script.repoUrl': '<p>Path to the repo hosting the scripts in Stash. (e.g. <samp>CDL/mimir-scripts</samp>). Leave empty to use the default.</p>',
     'pipeline.config.script.path': '<p>Path to the folder hosting the scripts in Stash. (e.g. <samp>groovy</samp>, <samp>python</samp> or <samp>shell</samp>)</p>',
@@ -490,7 +490,7 @@ module.exports = angular.module('spinnaker.core.help.contents', [])
     'titus.deploy.efsId': '(Required) The EFS file system ID, e.g. <samp> fs-0208c74b</samp>.',
     'titus.job.waitForCompletion': 'if unchecked, marks the stage as successful right away without waiting for the job to complete',
     'pipeline.waitForCompletion': 'if unchecked, marks the stage as successful right away without waiting for the pipeline to complete',
-    'jenkins.waitForCompletion': 'if unchecked, marks the stage as successful right away without waiting for the jenkins job to complete',
+    'ci.waitForCompletion': 'if unchecked, marks the stage as successful right away without waiting for the CI job to complete',
     'script.waitForCompletion': 'if unchecked, marks the stage as successful right away without waiting for the script to complete',
     'titus.bake.fromGitTrigger': 'If checked, gets git details from the specified git trigger. The pipeline will fail when ran manually',
     'titus.bake.repositoryUrl': 'Url to the git repository containing the code to create the Docker image from, <samp>ssh://git@stash.corp.netflix.com:7999/SPKR/orca.git</samp> or <samp>ssh://git@github.com/spinnaker/orca.git</samp>',
