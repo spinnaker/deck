@@ -43,7 +43,7 @@ class SslLoadBalancer implements IGceLoadBalancer {
   credentials: string;
   account: string;
   certificate: string;
-  backendService: IGceBackendService = { healthCheck: { healthCheckType: 'TCP' } } as IGceBackendService;
+  backendService: IGceBackendService = { healthCheck: { healthCheckType: 'TCP' }, namedPort: 'http' } as IGceBackendService;
   cloudProvider: string;
   get name(): string { return this.loadBalancerName; }
   constructor (public region = 'global') {}
@@ -216,6 +216,7 @@ class SslLoadBalancerCtrl extends CommonGceLoadBalancerCtrl implements ng.ICompo
   private initializeEditMode (): void {
     this.loadBalancer.portRange = this.loadBalancer.portRange.split('-')[0];
     this.loadBalancer.certificate = this.loadBalancer.certificate.split('/').pop();
+    this.loadBalancer.backendService.namedPort = this.loadBalancer.backendService.namedPort ? this.loadBalancer.backendService.namedPort : 'http';
     this.viewState = new ViewState(this.sessionAffinityModelToViewMap[this.loadBalancer.backendService.sessionAffinity]);
   }
 }

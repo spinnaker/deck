@@ -5,4 +5,5 @@ export interface IGceBackendService {
   backends: any[];
   healthCheck: IGceHealthCheck;
   sessionAffinity: string;
+  namedPort: string;
 };
