@@ -1,11 +1,11 @@
 'use strict';
 
-describe('Jenkins Execution Details Controller:', function () {
+describe('CI Execution Details Controller:', function () {
   var $scope;
 
   beforeEach(
     window.module(
-      require('./jenkinsExecutionDetails.controller.js')
+      require('./ciExecutionDetails.controller.js')
     )
   );
 
@@ -13,7 +13,7 @@ describe('Jenkins Execution Details Controller:', function () {
     this.initializeController = function(stage) {
       var scope = $rootScope.$new();
       scope.stage = stage;
-      $controller('JenkinsExecutionDetailsCtrl', {
+      $controller('CIExecutionDetailsCtrl', {
         '$scope': scope,
         executionDetailsSectionService: { synchronizeSection: (a, fn) => fn(), },
       });

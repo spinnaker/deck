@@ -15,7 +15,7 @@
     </div>
     <div class="col-md-1 text-center" ng-if="!viewState.masterIsParameterized">
       <a href
-         ng-click="jenkinsStageCtrl.refreshMasters()"
+         ng-click="ciStageCtrl.refreshMasters()"
          tooltip-placement="right"
          uib-tooltip="{{viewState.mastersRefreshing ? 'Masters refreshing.' : 'Refresh masters list' }}"
         >
@@ -45,7 +45,7 @@
     </div>
     <div class="col-md-1 text-center" ng-if="!viewState.masterIsParameterized && !viewState.jobIsParameterized">
       <a href
-         ng-click="jenkinsStageCtrl.refreshJobs()"
+         ng-click="ciStageCtrl.refreshJobs()"
          tooltip-placement="right"
          uib-tooltip="{{viewState.jobsRefreshing ? 'Jobs refreshing.' : 'Refresh job list' }}"
         >
@@ -54,7 +54,7 @@
       </a>
     </div>
   </div>
-  <stage-config-field label="Property File" help-key="pipeline.config.jenkins.propertyFile">
+  <stage-config-field label="Property File" help-key="pipeline.config.ci.propertyFile">
     <input type="text" class="form-control input-sm" ng-model="stage.propertyFile"/>
   </stage-config-field>
 
@@ -71,16 +71,16 @@
       </div>
       <div class="checkbox col-md-4" ng-if="parameter.defaultValue!==null">
         <label>
-          <input type="checkbox" ng-model="useDefaultParameters[parameter.name]" ng-change="jenkinsStageCtrl.updateParam(parameter.name)">Use default
+          <input type="checkbox" ng-model="useDefaultParameters[parameter.name]" ng-change="ciStageCtrl.updateParam(parameter.name)">Use default
         </label>
       </div>
     </div>
   </div>
 
-  <stage-config-field label="Wait for results" help-key="jenkins.waitForCompletion">
+  <stage-config-field label="Wait for results" help-key="ci.waitForCompletion">
     <input type="checkbox" class="input-sm" name="waitForCompletion"
            ng-model="viewState.waitForCompletion"
-           ng-change="jenkinsStageCtrl.waitForCompletionChanged()"/>
+           ng-change="ciStageCtrl.waitForCompletionChanged()"/>
   </stage-config-field>
 
   <div class="form-group">
@@ -90,18 +90,18 @@
         <label>
           <input type="radio"
                  ng-model="viewState.markUnstableAsSuccessful"
-                 ng-change="jenkinsStageCtrl.markUnstableChanged()"
+                 ng-change="ciStageCtrl.markUnstableChanged()"
                  ng-value="false"/> fail the stage
-          <help-field key="pipeline.config.jenkins.markUnstableAsSuccessful.false"/>
+          <help-field key="pipeline.config.ci.markUnstableAsSuccessful.false"/>
         </label>
       </div>
       <div class="radio">
         <label>
           <input type="radio"
                  ng-model="viewState.markUnstableAsSuccessful"
-                 ng-change="jenkinsStageCtrl.markUnstableChanged()"
+                 ng-change="ciStageCtrl.markUnstableChanged()"
                  ng-value="true"/> consider stage successful
-          <help-field key="pipeline.config.jenkins.markUnstableAsSuccessful.true"/>
+          <help-field key="pipeline.config.ci.markUnstableAsSuccessful.true"/>
         </label>
       </div>
 

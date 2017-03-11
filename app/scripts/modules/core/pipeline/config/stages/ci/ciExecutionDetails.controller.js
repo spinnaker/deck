@@ -4,14 +4,14 @@ import {EXECUTION_DETAILS_SECTION_SERVICE} from 'core/delivery/details/execution
 
 let angular = require('angular');
 
-module.exports = angular.module('spinnaker.core.pipeline.stage.jenkins.executionDetails.controller', [
+module.exports = angular.module('spinnaker.core.pipeline.stage.ci.executionDetails.controller', [
   require('angular-ui-router'),
   EXECUTION_DETAILS_SECTION_SERVICE,
   require('core/delivery/details/executionDetailsSectionNav.directive.js'),
 ])
-  .controller('JenkinsExecutionDetailsCtrl', function ($scope, $stateParams, executionDetailsSectionService) {
+  .controller('CIExecutionDetailsCtrl', function ($scope, $stateParams, executionDetailsSectionService) {
 
-    $scope.configSections = ['jenkinsConfig', 'taskStatus'];
+    $scope.configSections = ['ciConfig', 'taskStatus'];
 
     let initialized = () => {
       $scope.detailsSection = $stateParams.details;

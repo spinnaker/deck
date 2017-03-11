@@ -2,11 +2,11 @@
 
 import _ from 'lodash';
 
-describe('Controller: jenkinsTrigger', function() {
+describe('Controller: ciTrigger', function() {
 
   beforeEach(
     window.module(
-      require('./jenkinsTrigger.module.js')
+      require('./ciTrigger.module.js')
     )
   );
 
@@ -15,7 +15,7 @@ describe('Controller: jenkinsTrigger', function() {
     this.igorService = igorService;
     this.$scope = $rootScope.$new();
     this.initializeController = function (trigger) {
-      this.controller = $controller('JenkinsTriggerCtrl', {
+      this.controller = $controller('CITriggerCtrl', {
         $scope: this.$scope,
         trigger: trigger,
         igorService: this.igorService,
@@ -28,17 +28,17 @@ describe('Controller: jenkinsTrigger', function() {
       var $q = this.$q,
           $scope = this.$scope,
           jobs = ['some_job', 'some_other_job'],
-          trigger = {master: 'jenkins', job: 'some_job'};
+          trigger = {master: 'ci', job: 'some_job'};
 
       spyOn(this.igorService, 'listJobsForMaster').and.returnValue($q.when(jobs));
-      spyOn(this.igorService, 'listMasters').and.returnValue($q.when(['jenkins']));
+      spyOn(this.igorService, 'listMasters').and.returnValue($q.when(['ci']));
       this.initializeController(trigger);
       expect($scope.viewState.jobsLoaded).toBe(false);
       expect($scope.viewState.mastersLoaded).toBe(false);
       $scope.$digest();
 
       expect($scope.jobs).toBe(jobs);
-      expect($scope.masters).toEqual(['jenkins']);
+      expect($scope.masters).toEqual(['ci']);
       expect($scope.viewState.jobsLoaded).toBe(true);
       expect($scope.viewState.mastersLoaded).toBe(true);
     });

@@ -256,8 +256,8 @@ module.exports = angular
                                   ? codedHelperParamsCopy
                                   : codedHelperParamsCopy.filter((param) => param.name !== 'parameters');
         let trigger = pipeline.trigger || {};
-        let hasJenkinsTriggerOrStage = trigger.type === 'jenkins' || pipeline.stages.some((stage) => stage.type === 'jenkins');
-        codedHelperParamsCopy = hasJenkinsTriggerOrStage
+        let hasCITriggerOrStage = trigger.type === 'ci' || pipeline.stages.some((stage) => stage.type === 'ci');
+        codedHelperParamsCopy = hasCITriggerOrStage
           ? codedHelperParamsCopy
           : codedHelperParamsCopy.filter((param) => !param.name.includes('scmInfo'));
 

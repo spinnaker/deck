@@ -3,8 +3,8 @@ import {get, intersection} from 'lodash';
 
 import {Application} from 'core/application/application.model';
 import {AccountService, ACCOUNT_SERVICE} from 'core/account/account.service';
-import {IAppengineAccount, IAppengineGitTrigger, IAppengineJenkinsTrigger, GitCredentialType, IAppengineServerGroup} from 'appengine/domain/index';
-import {IStage, IPipeline, IGitTrigger, IJenkinsTrigger} from 'core/domain/index';
+import {IAppengineAccount, IAppengineGitTrigger, IAppengineCITrigger, GitCredentialType, IAppengineServerGroup} from 'appengine/domain/index';
+import {IStage, IPipeline, IGitTrigger, ICITrigger} from 'core/domain/index';
 import {AppengineDeployDescription} from '../transformer';
 
 export interface IAppengineServerGroupCommand {
@@ -28,7 +28,7 @@ export interface IAppengineServerGroupCommand {
   strategyApplication?: string;
   strategyPipeline?: string;
   fromTrigger?: boolean;
-  trigger?: IAppengineGitTrigger | IAppengineJenkinsTrigger;
+  trigger?: IAppengineGitTrigger | IAppengineCITrigger;
   gitCredentialType?: GitCredentialType;
   interestingHealthProviderNames: string[];
 }
@@ -42,14 +42,14 @@ interface IViewState {
 export class AppengineServerGroupCommandBuilder {
   static get $inject() { return ['$q', 'accountService', 'settings']; }
 
-  private static getTriggerOptions(pipeline: IPipeline): Array<IAppengineGitTrigger | IAppengineJenkinsTrigger> {
+  private static getTriggerOptions(pipeline: IPipeline): Array<IAppengineGitTrigger | IAppengineCITrigger> {
     return (pipeline.triggers || [])
-      .filter(trigger => trigger.type === 'git' || trigger.type === 'jenkins')
-      .map((trigger: IGitTrigger | IJenkinsTrigger) => {
+      .filter(trigger => trigger.type === 'git' || trigger.type === 'ci' || trigger.type === 'jenkins')
+      .map((trigger: IGitTrigger | ICITrigger) => {
         if (trigger.type === 'git') {
           return {source: trigger.source, project: trigger.project, slug: trigger.slug, branch: trigger.branch, type: 'git'};
         } else {
-          return {master: trigger.master, job: trigger.job, type: 'jenkins'};
+          return {master: trigger.master, job: trigger.job, type: 'ci'};
         }
       });
   }
@@ -66,7 +66,7 @@ export class AppengineServerGroupCommandBuilder {
     let viewState: IViewState = {
       mode: mode,
       submitButtonLabel: this.getSubmitButtonLabel(mode),
-      disableStrategySelection: mode === 'create' ? true : false,
+      disableStrategySelection: mode === 'create',
     };
 
     return this.$q.all(dataToFetch)
@@ -95,7 +95,7 @@ export class AppengineServerGroupCommandBuilder {
       });
   }
 
-  public buildNewServerGroupCommandForPipeline(_stage: IStage, pipeline: IPipeline): {backingData: {triggerOptions: Array<IAppengineGitTrigger | IAppengineJenkinsTrigger>}} {
+  public buildNewServerGroupCommandForPipeline(_stage: IStage, pipeline: IPipeline): {backingData: {triggerOptions: Array<IAppengineGitTrigger | IAppengineCITrigger>}} {
     // We can't copy server group configuration for App Engine, and can't build the full command here because we don't have
     // access to the application.
     return {backingData: {triggerOptions: AppengineServerGroupCommandBuilder.getTriggerOptions(pipeline)}};

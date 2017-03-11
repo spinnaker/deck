@@ -3,21 +3,21 @@
 let angular = require('angular');
 
 
-module.exports = angular.module('spinnaker.core.pipeline.stage.jenkinsStage', [
-  require('core/ci/jenkins/igor.service.js'),
+module.exports = angular.module('spinnaker.core.pipeline.stage.ciStage', [
+  require('core/ci/igor.service.js'),
   require('../../pipelineConfigProvider.js'),
 ])
   .config(function(pipelineConfigProvider) {
     pipelineConfigProvider.registerStage({
-      label: 'Jenkins',
-      description: 'Runs a Jenkins job',
-      key: 'jenkins',
+      label: 'Continuous Integration (CI)',
+      description: 'Runs a CI job (Travis/Jenkins)',
+      key: 'ci',
       restartable: true,
-      controller: 'JenkinsStageCtrl',
-      controllerAs: 'jenkinsStageCtrl',
-      templateUrl: require('./jenkinsStage.html'),
-      executionDetailsUrl: require('./jenkinsExecutionDetails.html'),
-      executionLabelTemplateUrl: require('./jenkinsExecutionLabel.html'),
+      controller: 'CIStageCtrl',
+      controllerAs: 'ciStageCtrl',
+      templateUrl: require('./ciStage.html'),
+      executionDetailsUrl: require('./ciExecutionDetails.html'),
+      executionLabelTemplateUrl: require('./ciExecutionLabel.html'),
       extraLabelLines: (stage) => {
         if (!stage.masterStage.context || !stage.masterStage.context.buildInfo) {
           return 0;
@@ -31,7 +31,7 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.jenkinsStage', [
       ],
       strategy: true,
     });
-  }).controller('JenkinsStageCtrl', function($scope, stage, igorService) {
+  }).controller('CIStageCtrl', function($scope, stage, igorService) {
 
     $scope.stage = stage;
     $scope.stage.failPipeline = ($scope.stage.failPipeline === undefined ? true : $scope.stage.failPipeline);

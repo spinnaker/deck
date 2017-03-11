@@ -12,7 +12,8 @@ describe('pipelineConfigService', () => {
   let service: PipelineConfigService,
       $http: ng.IHttpBackendService,
       $scope: ng.IScope,
-      API: Api;
+      API: Api,
+      settings: any = {};
 
   let buildStage = (base: any): IStage => {
     let stageDefaults: IStage = {
@@ -56,15 +57,18 @@ describe('pipelineConfigService', () => {
   beforeEach(
     mock.module(
       PIPELINE_CONFIG_SERVICE,
-      API_SERVICE
+      API_SERVICE,
+      'spinnaker.core.config.settings'
     )
   );
 
-  beforeEach(mock.inject((pipelineConfigService: PipelineConfigService, $httpBackend: ng.IHttpBackendService, $rootScope: ng.IRootScopeService, _API_: Api) => {
+  beforeEach(mock.inject((pipelineConfigService: PipelineConfigService, $httpBackend: ng.IHttpBackendService,
+                          $rootScope: ng.IRootScopeService, _API_: Api, _settings_: any) => {
     service = pipelineConfigService;
     $http = $httpBackend;
     $scope = $rootScope.$new();
     API = _API_;
+    settings = _settings_;
   }));
 
   describe('savePipeline', () => {
@@ -89,6 +93,55 @@ describe('pipelineConfigService', () => {
       expect(pipeline.stages[0].isNew).toBeUndefined();
       expect(pipeline.stages[1].isNew).toBeUndefined();
       expect(pipeline.stages[2].isNew).toBeUndefined();
+    });
+
+    it('converts triggers and stages with type "ci" to "jenkins" if feature flag is not present', () => {
+      let pipeline: IPipeline = buildPipeline({
+        stages: [
+          { name: 'CI', type: 'ci', isNew: true},
+        ]
+      });
+
+      $http
+        .expectPOST(API.baseUrl + '/pipelines', /"stages":\[\{"name":"CI","type":"jenkins","refId":null,"requisiteStageRefIds":\[]}]/g)
+        .respond(200, '');
+
+      service.savePipeline(pipeline);
+      $scope.$digest();
+    });
+
+    it('converts triggers and stages with type "ci" to "jenkins" if feature flag is true', () => {
+      let pipeline: IPipeline = buildPipeline({
+        stages: [
+          { name: 'CI', type: 'ci', isNew: true},
+        ]
+      });
+
+      settings.feature.convertCiToJenkinsOnPipelineSave = true;
+
+      $http
+        .expectPOST(API.baseUrl + '/pipelines', /"stages":\[\{"name":"CI","type":"jenkins","refId":null,"requisiteStageRefIds":\[]}]/g)
+        .respond(200, '');
+
+      service.savePipeline(pipeline);
+      $scope.$digest();
+    });
+
+    it('does not convert triggers and stages with type "ci" to "jenkins" if feature flag is false', () => {
+      let pipeline: IPipeline = buildPipeline({
+        stages: [
+          { name: 'CI', type: 'ci', isNew: true},
+        ]
+      });
+
+      settings.feature.convertCiToJenkinsOnPipelineSave = false;
+
+      $http
+        .expectPOST(API.baseUrl + '/pipelines', /"stages":\[\{"name":"CI","type":"ci","refId":null,"requisiteStageRefIds":\[]}]/g)
+        .respond(200, '');
+
+      service.savePipeline(pipeline);
+      $scope.$digest();
     });
   });
 

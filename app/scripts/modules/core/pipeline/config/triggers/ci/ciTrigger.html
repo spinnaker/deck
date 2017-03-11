@@ -11,7 +11,7 @@
     </div>
     <div class="col-md-1 text-center">
       <a href
-         ng-click="jenkinsTriggerCtrl.refreshMasters()"
+         ng-click="ciTriggerCtrl.refreshMasters()"
          tooltip-placement="right"
          uib-tooltip="{{viewState.mastersRefreshing ? 'Masters refreshing.' : 'Refresh masters list' }}"
         >
@@ -37,7 +37,7 @@
     </div>
     <div class="col-md-1 text-center">
       <a href
-         ng-click="jenkinsTriggerCtrl.refreshJobs()"
+         ng-click="ciTriggerCtrl.refreshJobs()"
          tooltip-placement="right"
          uib-tooltip="{{viewState.jobsRefreshing ? 'Jobs refreshing.' : 'Refresh job list' }}"
         >
@@ -49,15 +49,15 @@
   <div class="form-group">
     <div class="col-md-3 sm-label-right">
       <b>Property File</b>
-      <help-field key="pipeline.config.jenkins.propertyFile"></help-field>
+      <help-field key="pipeline.config.ci.propertyFile"></help-field>
     </div>
     <div class="col-md-6">
       <input type="text" class="form-control input-sm" ng-model="trigger.propertyFile"/>
     </div>
   </div>
 
-  <div class="form-group" ng-if="jenkinsTriggerCtrl.fiatEnabled">
-    <run-as-user-selector service-accounts="jenkinsTriggerCtrl.serviceAccounts"
+  <div class="form-group" ng-if="ciTriggerCtrl.fiatEnabled">
+    <run-as-user-selector service-accounts="ciTriggerCtrl.serviceAccounts"
                           component="trigger"
                           field="runAsUser">
     </run-as-user-selector>

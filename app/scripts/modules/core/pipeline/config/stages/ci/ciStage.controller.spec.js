@@ -1,11 +1,11 @@
 'use strict';
 
-describe('Jenkins Stage Controller', function () {
+describe('CI Stage Controller', function () {
   var scope, igorService, $q;
 
   beforeEach(
     window.module(
-      require('./jenkinsStage')
+      require('./ciStage')
     )
   );
 
@@ -15,7 +15,7 @@ describe('Jenkins Stage Controller', function () {
       scope = $rootScope.$new();
       $q = _$q_;
       this.initialize = function(stage) {
-        $controller('JenkinsStageCtrl', {
+        $controller('CIStageCtrl', {
           $scope: scope,
           stage: stage,
           igorService: igorService,

@@ -6,18 +6,20 @@ import {AUTHENTICATION_SERVICE, AuthenticationService} from 'core/authentication
 import {VIEW_STATE_CACHE_SERVICE, ViewStateCacheService} from 'core/cache/viewStateCache.service';
 import {ICache} from 'core/cache/deckCache.service';
 import {IStage} from 'core/domain/IStage';
+import {ITrigger} from 'core/domain/ITrigger';
 import {IPipeline} from 'core/domain/IPipeline';
 
 export class PipelineConfigService {
 
   private configViewStateCache: ICache;
 
-  static get $inject() { return ['$q', 'API', 'authenticationService', 'viewStateCache']; }
+  static get $inject() { return ['$q', 'API', 'authenticationService', 'viewStateCache', 'settings']; }
 
   public constructor(private $q: ng.IQService,
                      private API: Api,
                      private authenticationService: AuthenticationService,
-                     viewStateCache: ViewStateCacheService) {
+                     viewStateCache: ViewStateCacheService,
+                     private settings: any) {
     this.configViewStateCache = viewStateCache.createCache('pipelineConfig', { version: 1 });
   }
 
@@ -29,6 +31,7 @@ export class PipelineConfigService {
     return this.API.one('applications').one(applicationName).all('pipelineConfigs').getList()
       .then((pipelines: IPipeline[]) => {
         pipelines.forEach(p => p.stages = p.stages || []);
+        pipelines = pipelines.map(p => this.convertPipeline(p));
         return this.sortPipelines(pipelines);
       });
   }
@@ -36,9 +39,9 @@ export class PipelineConfigService {
   public getStrategiesForApplication(applicationName: string) {
     return this.API.one('applications').one(applicationName).all('strategyConfigs').getList()
       .then((pipelines: IPipeline[]) => {
-      pipelines.forEach(p => p.stages = p.stages || []);
-      return this.sortPipelines(pipelines);
-    });
+        pipelines.forEach(p => p.stages = p.stages || []);
+        return this.sortPipelines(pipelines);
+      });
   }
 
   public getHistory(id: string, count = 20): ng.IPromise<IPipeline[]> {
@@ -57,7 +60,11 @@ export class PipelineConfigService {
         delete stage.name;
       }
     });
-    return this.API.one( pipeline.strategy ? 'strategies' : 'pipelines').data(pipeline).post();
+    if (this.settings.feature.convertCiToJenkinsOnPipelineSave == null || this.settings.feature.convertCiToJenkinsOnPipelineSave) {
+      pipeline = this.convertPipeline(pipeline, 'ci', 'jenkins');
+    }
+    return this.API.one( pipeline.strategy ? 'strategies' : 'pipelines').data(pipeline).post()
+      .then((p: IPipeline) => this.convertPipeline(p));
   }
 
   public renamePipeline(applicationName: string, pipeline: IPipeline, currentName: string, newName: string): ng.IPromise<void> {
@@ -134,6 +141,23 @@ export class PipelineConfigService {
     return this.$q.resolve(sorted);
   }
 
+  // Note: convertPipeline() and replaceType() replaces `type` on stages and triggers, to be able to update Deck
+  // independently of the backend. It happens when receiving pipeline config from the backend and before saving it.
+  // Both functions can be removed when `Jenkins` is renamed to `CI` in the rest of Spinnaker as well.
+  private convertPipeline(pipeline: IPipeline, from = 'jenkins', to = 'ci'): IPipeline {
+    return Object.assign({}, pipeline, {
+      stages: this.replaceType(pipeline.stages, from, to),
+      triggers: this.replaceType(pipeline.triggers, from, to)
+    });
+  }
+
+  private replaceType(iterable: Array<IStage | ITrigger>, from: string, to: string): any {
+    if (iterable) {
+      iterable = iterable.map(element => element.type === from ? Object.assign({}, element, {type: to}) : element);
+    }
+    return iterable;
+  }
+
 }
 
 export const PIPELINE_CONFIG_SERVICE = 'spinnaker.core.pipeline.config.service';
@@ -141,4 +165,5 @@ module(PIPELINE_CONFIG_SERVICE, [
   API_SERVICE,
   AUTHENTICATION_SERVICE,
   VIEW_STATE_CACHE_SERVICE,
+  require('../../../config/settings'),
 ]).service('pipelineConfigService', PipelineConfigService);

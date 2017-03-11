@@ -2,7 +2,7 @@ import {module} from 'angular';
 
 import {ServerGroup} from 'core/domain/index';
 import {IAppengineServerGroupCommand} from './configure/serverGroupCommandBuilder.service';
-import {IAppengineGitTrigger, IAppengineJenkinsTrigger, GitCredentialType} from 'appengine/domain/index';
+import {IAppengineGitTrigger, IAppengineCITrigger, GitCredentialType} from 'appengine/domain/index';
 
 export class AppengineDeployDescription {
   cloudProvider = 'appengine';
@@ -25,7 +25,7 @@ export class AppengineDeployDescription {
   strategyApplication?: string;
   strategyPipeline?: string;
   fromTrigger?: boolean;
-  trigger?: IAppengineGitTrigger | IAppengineJenkinsTrigger;
+  trigger?: IAppengineGitTrigger | IAppengineCITrigger;
   gitCredentialType: GitCredentialType;
   interestingHealthProviderNames: string[];
 

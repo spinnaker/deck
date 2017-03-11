@@ -3,22 +3,22 @@
 const angular = require('angular');
 
 module.exports = angular
-  .module('spinnaker.core.pipeline.config.triggers.jenkins.options.directive', [
-    require('core/ci/jenkins/igor.service.js')
+  .module('spinnaker.core.pipeline.config.triggers.ci.options.directive', [
+    require('core/ci/igor.service.js')
   ])
-  .directive('jenkinsTriggerOptions', function () {
+  .directive('ciTriggerOptions', function () {
     return {
       restrict: 'E',
-      templateUrl: require('./jenkinsTriggerOptions.directive.html'),
+      templateUrl: require('./ciTriggerOptions.directive.html'),
       bindToController: {
         command: '=',
       },
-      controller: 'JenkinsTriggerOptionsCtrl',
+      controller: 'CITriggerOptionsCtrl',
       controllerAs: 'vm',
       scope: {}
     };
   })
-  .controller('JenkinsTriggerOptionsCtrl', function ($scope, igorService) {
+  .controller('CITriggerOptionsCtrl', function ($scope, igorService) {
     // These fields will be added to the trigger when the form is submitted
     this.command.extraFields = {};
 
@@ -47,7 +47,7 @@ module.exports = angular
     let initialize = () => {
       let command = this.command;
       // do not re-initialize if the trigger has changed to some other type
-      if (command.trigger.type !== 'jenkins') {
+      if (command.trigger.type !== 'ci') {
         return;
       }
       this.viewState.buildsLoading = true;
