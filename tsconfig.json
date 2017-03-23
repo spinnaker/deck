@@ -42,6 +42,7 @@
   ],
   "include": [
     "app/scripts/modules/**/*.ts",
+    "node_modules/moment/moment.d.ts",
     "node_modules/zone.js/dist/zone.js.d.ts"
   ]
 }

@@ -61,7 +61,7 @@
       "single",
       "avoid-escape"
     ],
-    "radix": true,
+    "radix": false,
     "semicolon": [
       "always"
     ],

@@ -1,6 +1,7 @@
 import {Type} from '@angular/core';
 import {module} from 'angular';
 
+import {SYSTEM_TIMEZONE_COMPONENT} from './systemTimezone.component';
 import {UI_SELECT_COMPONENT, UiSelectComponentDirective} from './uiSelect.component';
 
 export const WIDGET_DIRECTIVE_UPGRADES: Type<any>[] = [
@@ -15,5 +16,6 @@ module(CORE_WIDGETS_MODULE, [
   require('./notifier/notifier.component.js'),
   require('./spelText/spelText.decorator'),
   require('./spelText/numberInput.component'),
+  SYSTEM_TIMEZONE_COMPONENT,
   UI_SELECT_COMPONENT
 ]);

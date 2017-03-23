@@ -1,7 +1,8 @@
-import * as momentTimezone from 'moment-timezone';
+import * as moment from 'moment';
+import 'moment-timezone';
 import {has} from 'lodash';
-import {module} from 'angular';
 import {Subject} from 'rxjs';
+import {module} from 'angular';
 
 interface IExecutionWindow {
   displayStart: Date;
@@ -253,14 +254,14 @@ class ExecutionWindowAtlasGraphController implements ng.IComponentController {
     const today = new Date();
     const zone: string = this.settings.defaultTimeZone || 'America/Los_Angeles';
 
-    const start = momentTimezone.tz(today, zone)
+    const start = moment.tz(today, zone)
         .hour(window.displayStart.getHours())
         .minute(window.displayStart.getMinutes())
         .seconds(window.displayStart.getSeconds())
         .milliseconds(window.displayStart.getMilliseconds())
         .subtract(dayOffset, 'days').toDate().getTime(),
 
-      end = momentTimezone.tz(today, zone)
+      end = moment.tz(today, zone)
         .hour(window.displayEnd.getHours())
         .minute(window.displayEnd.getMinutes())
         .seconds(window.displayEnd.getSeconds())

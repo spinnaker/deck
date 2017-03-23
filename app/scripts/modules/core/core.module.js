@@ -11,6 +11,7 @@ import {STATE_CONFIG_PROVIDER} from './navigation/state.provider';
 import {APPLICATIONS_STATE_PROVIDER} from './application/applications.state.provider';
 import {INFRASTRUCTURE_STATES} from './search/infrastructure/infrastructure.states';
 import {VERSION_CHECK_SERVICE} from './config/versionCheck.service';
+import {CORE_UTILS_MODULE} from './utils';
 import {CORE_WIDGETS_MODULE} from './widgets';
 
 require('../../../fonts/spinnaker/icons.css');
@@ -30,7 +31,7 @@ require('font-awesome/css/font-awesome.css');
 
 // load all templates into the $templateCache
 var templates = require.context('./', true, /\.html$/);
-templates.keys().forEach(function(key) {
+templates.keys().forEach(function (key) {
   templates(key);
 });
 
@@ -131,19 +132,18 @@ module.exports = angular
 
     require('./task/task.module.js'),
 
-    require('./utils/utils.module.js'),
-
+    CORE_UTILS_MODULE,
     CORE_WIDGETS_MODULE,
     require('./validation/validation.module.js'),
   ])
-  .run(function($rootScope, $log, $state, settings) {
+  .run(function ($rootScope, $log, $state, settings) {
     window.Spinner = Spinner;
 
     $rootScope.feature = settings.feature;
 
     $rootScope.$state = $state; // TODO: Do we really need this?
 
-    $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
+    $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
       $log.debug(event.name, {
         event: event,
         toState: toState,
@@ -153,7 +153,7 @@ module.exports = angular
       });
     });
 
-    $rootScope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams, error) {
+    $rootScope.$on('$stateChangeError', function (event, toState, toParams, fromState, fromParams, error) {
       $log.debug(event.name, {
         event: event,
         toState: toState,
@@ -164,7 +164,7 @@ module.exports = angular
       });
     });
 
-    $rootScope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams) {
+    $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
       $log.debug(event.name, {
         event: event,
         toState: toState,
@@ -180,7 +180,7 @@ module.exports = angular
   .config(function ($logProvider, settings) {
     $logProvider.debugEnabled(settings.debugEnabled);
   })
-  .config(function($uibTooltipProvider) {
+  .config(function ($uibTooltipProvider) {
     $uibTooltipProvider.options({
       appendToBody: true
     });
@@ -188,20 +188,20 @@ module.exports = angular
       'mouseenter focus': 'mouseleave blur'
     });
   })
-  .config(function($uibModalProvider) {
+  .config(function ($uibModalProvider) {
     $uibModalProvider.options.backdrop = 'static';
     $uibModalProvider.options.keyboard = false;
   })
-  .config(function($httpProvider) {
+  .config(function ($httpProvider) {
     $httpProvider.defaults.headers.patch = {
       'Content-Type': 'application/json;charset=utf-8'
     };
   })
-  .config(function($compileProvider) {
+  .config(function ($compileProvider) {
     $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|mailto|hipchat|slack):/);
   })
   .config(require('./forms/uiSelect.decorator.js'))
-  .config(function(uiSelectConfig) {
+  .config(function (uiSelectConfig) {
     uiSelectConfig.theme = 'select2';
     uiSelectConfig.appendToBody = true;
   });

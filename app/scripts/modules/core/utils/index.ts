@@ -1,15 +1,16 @@
-'use strict';
+import {module} from 'angular';
 
 import {RENDER_IF_FEATURE} from './renderIfFeature.component';
+import {TIME_FILTERS} from 'core/utils/filters';
 
-let angular = require('angular');
+export * from './pipes';
 
-module.exports = angular.module('spinnaker.utils', [
+export const CORE_UTILS_MODULE = 'spinnaker.utils';
+module('spinnaker.utils', [
   require('./jQuery.js'),
-  require('./moment.js'),
   require('./appendTransform.js'),
   require('./clipboard/copyToClipboard.directive.js'),
-  require('./timeFormatters.js'),
+  TIME_FILTERS,
   require('./infiniteScroll.directive.js'),
   RENDER_IF_FEATURE,
 ]);
