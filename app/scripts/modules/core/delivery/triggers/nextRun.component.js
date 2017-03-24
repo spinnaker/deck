@@ -1,19 +1,19 @@
 'use strict';
 
+import moment from 'moment';
 const angular = require('angular');
 
 import {later} from 'core/utils/later/later';
 
 module.exports = angular
   .module('spinnaker.core.deliver.triggers.nextRun', [
-    require('../../utils/moment'),
     require('../../config/settings'),
   ])
   .component('nextRunTag', {
     bindings: {
       pipeline: '<'
     },
-    controller: function (momentService, settings) {
+    controller: function (settings) {
 
       this.updateSchedule = () => {
         if (!this.pipeline) {
@@ -27,7 +27,7 @@ module.exports = angular
           if (!isNaN(parseInt(hours))) {
             let allHours = hours.split('/');
             let tz = settings.defaultTimeZone || 'America/Los_Angeles';
-            var offset = momentService.tz.zone(tz).offset(new Date());
+            var offset = moment.tz.zone(tz).offset(new Date());
             if (offset) {
               offset /= 60;
               let start = parseInt(allHours[0]);
@@ -49,7 +49,7 @@ module.exports = angular
 
       this.$onInit = this.updateSchedule;
 
-      this.getNextDuration = () => momentService(this.nextScheduled).fromNow();
+      this.getNextDuration = () => moment(this.nextScheduled).fromNow();
     },
     template: `
       <span is-visible="$ctrl.hasNextScheduled">

@@ -2,10 +2,12 @@
 
 let angular = require('angular');
 
+import {TIME_FILTERS} from 'core/utils/filters';
+
 module.exports = angular.module('spinnaker.core.deploymentStrategy.custom', [
   require('./customStrategySelector.directive.js'),
   require('./customStrategySelector.controller.js'),
-  require('core/utils/timeFormatters.js'),
+  TIME_FILTERS,
   require('core/config/settings.js'),
 ])
   .config(function(deploymentStrategyConfigProvider, settings) {

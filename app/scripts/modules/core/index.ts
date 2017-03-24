@@ -20,3 +20,5 @@ export const CORE_DIRECTIVE_UPGRADES: Type<any>[] = [
   ...HELP_DIRECTIVE_UPGRADES,
   ...WIDGET_DIRECTIVE_UPGRADES
 ];
+
+export * from './utils';

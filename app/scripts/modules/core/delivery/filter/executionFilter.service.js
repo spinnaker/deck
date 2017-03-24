@@ -1,8 +1,9 @@
 'use strict';
 
 import _ from 'lodash';
-
 let angular = require('angular');
+
+import {TIME_BOUNDARIES_SERVICE} from 'core/orchestratedItem/timeBoundaries.service';
 
 module.exports = angular
   .module('spinnaker.core.delivery.filter.executionFilter.service', [
@@ -10,7 +11,7 @@ module.exports = angular
     require('./executionFilter.model.js'),
     require('../../utils/waypoints/waypoint.service.js'),
     require('../../filterModel/filter.model.service.js'),
-    require('../../orchestratedItem/timeBoundaries.service.js'),
+    TIME_BOUNDARIES_SERVICE
   ])
   .factory('executionFilterService', function (ExecutionFilterModel, timeBoundaries, waypointService, $log,
                                                filterModelService) {

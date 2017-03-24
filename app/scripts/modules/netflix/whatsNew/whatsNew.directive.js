@@ -3,6 +3,7 @@
 require('./whatsNew.less');
 
 let angular = require('angular');
+import {TIME_FILTERS} from 'core/utils/filters';
 import {VIEW_STATE_CACHE_SERVICE} from 'core/cache/viewStateCache.service';
 
 module.exports = angular
@@ -10,7 +11,7 @@ module.exports = angular
     require('angular-marked'),
     VIEW_STATE_CACHE_SERVICE,
     require('./whatsNew.read.service.js'),
-    require('core/utils/timeFormatters.js'),
+    TIME_FILTERS
   ])
   .config(function (markedProvider) {
     markedProvider.setOptions(

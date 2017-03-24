@@ -1,11 +1,11 @@
 'use strict';
 
 import _ from 'lodash';
+let angular = require('angular');
 
+import {TIME_FILTERS} from 'core/utils/filters';
 import {CLUSTER_FILTER_SERVICE} from 'core/cluster/filter/clusterFilter.service';
 import {URL_BUILDER_SERVICE} from 'core/navigation/urlBuilder.service';
-
-let angular = require('angular');
 
 require('./projectCluster.less');
 
@@ -14,7 +14,7 @@ module.exports = angular.module('spinnaker.core.projects.dashboard.clusters.proj
   URL_BUILDER_SERVICE,
   require('core/cache/collapsibleSectionStateCache.js'),
   CLUSTER_FILTER_SERVICE,
-  require('core/utils/timeFormatters.js'),
+  TIME_FILTERS,
   require('../../../healthCounts/healthCounts.directive.js'),
   require('../regionFilter/regionFilter.service.js'),
 ])
