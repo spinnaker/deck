@@ -32,8 +32,8 @@ module.exports = angular.module('netflix.spinnaker', [
 
 const events: any = {
   'addEventListener:scroll': true,
-  'addEventListener:mouseenter': true,
-  'addEventListener:mouseleave' : true,
+  'addEventListener:mouseenter': false,
+  'addEventListener:mouseleave' : false,
   'addEventListener:mousemove': true,
 };
 

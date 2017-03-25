@@ -1,7 +1,12 @@
 import {Type} from '@angular/core';
 
 import {IDowngradeItem} from 'core/domain/IDowngradeItem';
-import {CORE_MODULE_DOWNGRADES, CORE_COMPONENT_MODULE_DOWNGRADES, CORE_DIRECTIVE_UPGRADES} from './core';
+import {
+  CORE_MODULE_DOWNGRADES,
+  CORE_COMPONENT_MODULE_DOWNGRADES,
+  CORE_DIRECTIVE_UPGRADES,
+  CORE_COMPONENTS
+} from './core';
 import {NETFLIX_COMPONENT_MODULE_DOWNGRADES} from './netflix';
 
 export const SPINNAKER_DOWNGRADES: IDowngradeItem[] = [
@@ -15,4 +20,8 @@ export const SPINNAKER_COMPONENT_DOWNGRADES: IDowngradeItem[] = [
 
 export const SPINNAKER_DIRECTIVE_UPGRADES: Type<any>[] = [
   ...CORE_DIRECTIVE_UPGRADES
+];
+
+export const SPINNAKER_COMPONENTS: Type<any>[] = [
+  ...CORE_COMPONENTS
 ];
