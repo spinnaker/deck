@@ -201,6 +201,10 @@ module.exports = angular
   })
   .config(function($compileProvider) {
     $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|mailto|hipchat|slack):/);
+    $compileProvider.preAssignBindingsEnabled(true);
+  })
+  .config(function($locationProvider) {
+    $locationProvider.hashPrefix('');
   })
   .config(require('./forms/uiSelect.decorator.js'))
   .config(function(uiSelectConfig) {
