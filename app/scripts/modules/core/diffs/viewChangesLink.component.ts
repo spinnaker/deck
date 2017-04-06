@@ -1,4 +1,5 @@
-import {IComponentController, IComponentOptions, ILogService, module} from 'angular';
+import {IComponentController, IComponentOptions, module} from 'angular';
+import {has} from 'lodash';
 import {IModalInstanceService, IModalService} from 'angular-ui-bootstrap';
 
 import {ICreationMetadata, ICreationMetadataTag} from 'core/domain';
@@ -47,11 +48,10 @@ class ViewChangesLinkController implements IComponentController {
   public jarDiffs: IJarDiff;
 
   static get $inject(): string[] {
-    return ['$log', '$uibModal', 'executionService'];
+    return ['$uibModal', 'executionService'];
   }
 
-  constructor(private $log: ILogService,
-              private $uibModal: IModalService,
+  constructor(private $uibModal: IModalService,
               private executionService: any) {}
 
   private setJarDiffs(): void {
@@ -75,8 +75,13 @@ class ViewChangesLinkController implements IComponentController {
   }
 
   public $onInit(): void {
-    if (!this.changeConfig.metadata && !this.changeConfig.commits && !this.changeConfig.jarDiffs) {
-      this.$log.error('either metadata or one or both of commits/jarDiffs must be specified in the change config');
+    if (!has(this.changeConfig, 'metadata')) {
+      this.changesAvailable = false;
+      return;
+    }
+    if (!this.changeConfig.commits && !this.changeConfig.jarDiffs) {
+      this.changesAvailable = false;
+      return;
     }
 
     if (this.changeConfig.metadata && this.changeConfig.metadata.value.executionType === 'pipeline') {
