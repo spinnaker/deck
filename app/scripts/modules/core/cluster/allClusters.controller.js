@@ -4,6 +4,8 @@ import {CLOUD_PROVIDER_REGISTRY} from 'core/cloudProvider/cloudProvider.registry
 import {CLUSTER_FILTER_SERVICE} from 'core/cluster/filter/clusterFilter.service';
 import {CLUSTER_POD_COMPONENT} from 'core/cluster/clusterPod.component';
 import {SERVER_GROUP_COMMAND_BUILDER_SERVICE} from 'core/serverGroup/configure/common/serverGroupCommandBuilder.service';
+import {CLUSTER_FILTER} from './filter/clusterFilter.component';
+import {INSIGHT_NGMODULE} from 'core/insight/insight.module';
 
 let angular = require('angular');
 
@@ -13,34 +15,40 @@ module.exports = angular.module('spinnaker.core.cluster.allClusters.controller',
   CLUSTER_FILTER_SERVICE,
   require('../cluster/filter/clusterFilter.model'),
   require('../cluster/filter/multiselect.model'),
-  require('./filter/clusterFilter.controller'),
+  CLUSTER_FILTER,
   CLUSTER_POD_COMPONENT,
   require('../account/account.module'),
   require('../cloudProvider/providerSelection/providerSelection.service'),
   SERVER_GROUP_COMMAND_BUILDER_SERVICE,
   require('../filterModel/filter.tags.directive'),
   require('../utils/waypoints/waypointContainer.directive'),
+  INSIGHT_NGMODULE.name,
   require('angular-ui-bootstrap'),
   CLOUD_PROVIDER_REGISTRY,
   require('angular-ui-router'),
 ])
   .controller('AllClustersCtrl', function($scope, app, $uibModal, $timeout, providerSelectionService, clusterFilterService, $state,
-                                          ClusterFilterModel, MultiselectModel, serverGroupCommandBuilder, cloudProviderRegistry) {
+                                          ClusterFilterModel, MultiselectModel, InsightFilterStateModel, serverGroupCommandBuilder, cloudProviderRegistry) {
 
     if (app.serverGroups.disabled) {
       $state.go('^.^' + app.dataSources.find(ds => ds.sref && !ds.disabled).sref, {}, {location: 'replace'});
       return;
     }
 
+    this.application = app;
     ClusterFilterModel.activate();
     this.initialized = false;
+    this.dataSource = app.getDataSource('serverGroups');
+    this.application = app;
 
     $scope.sortFilter = ClusterFilterModel.sortFilter;
 
-    this.groupingsTemplate = require('./groupings.html');
     this.createLabel = 'Create Server Group';
 
     let updateClusterGroups = () => {
+      if (app.getDataSource('serverGroups').fetchOnDemand) {
+        InsightFilterStateModel.filtersHidden = true;
+      }
       ClusterFilterModel.applyParamsToUrl();
       $scope.$evalAsync(() => {
           clusterFilterService.updateClusterGroups(app);
@@ -83,15 +91,22 @@ module.exports = angular.module('spinnaker.core.cluster.allClusters.controller',
 
     this.updateClusterGroups = _.debounce(updateClusterGroups, 200);
 
-    if (app.serverGroups.loaded) {
-      updateClusterGroups();
-    }
+    this.clustersLoadError = () => {
+      this.loadError = true;
+      this.initialized = true;
+    };
+
+    app.getDataSource('serverGroups').ready().then(
+      () => updateClusterGroups(),
+      () => this.clustersLoadError()
+    );
 
     app.activeState = app.serverGroups;
     app.serverGroups.onRefresh($scope, updateClusterGroups);
     $scope.$on('$destroy', () => {
       app.activeState = app;
       MultiselectModel.clearAll();
+      InsightFilterStateModel.filtersHidden = false;
     });
 
   });
