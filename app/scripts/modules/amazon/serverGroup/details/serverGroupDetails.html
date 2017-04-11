@@ -279,6 +279,8 @@
         <dd>{{ctrl.serverGroup.asg.healthCheckGracePeriod}} seconds</dd>
         <dt>Termination Policies</dt>
         <dd>{{ctrl.serverGroup.asg.terminationPolicies.join(', ')}}</dd>
+        <dt>Group Metrics</dt>
+        <dd>{{ctrl.serverGroup.asg.groupMetrics ? 'enabled' : 'disabled'}}</dd>
       </dl>
       <a href ng-click="ctrl.editAdvancedSettings()">Edit Advanced Settings</a>
     </collapsible-section>
