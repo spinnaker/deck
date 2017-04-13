@@ -19,6 +19,7 @@ export interface IPipelineValidationResults {
 
 export interface IValidatorConfig {
   type: string;
+  message?: string;
   skipValidation?: (pipeline: IPipeline, stage: IStage) => boolean;
   preventSave?: boolean;
 }
@@ -28,6 +29,7 @@ export interface ITriggerTypeConfig extends IStageOrTriggerTypeConfig {
 }
 
 export interface IStageTypeConfig extends IStageOrTriggerTypeConfig {
+  executionDetailsUrl: string;
   defaultTimeoutMs?: number;
 }
 
@@ -36,7 +38,6 @@ export interface IStageOrTriggerTypeConfig {
   description: string;
   key: string;
   templateUrl: string;
-  executionDetailsUrl: string;
   popoverLabelUrl?: string;
   controller: string;
   controllerAs: string;
@@ -78,7 +79,7 @@ export class PipelineConfigValidator implements ng.IServiceProvider {
     let preventSave = false;
 
     triggers.forEach((trigger, index) => {
-      let config: ITriggerTypeConfig = this.pipelineConfig.getTriggerConfig(trigger.type);
+      const config: ITriggerTypeConfig = this.pipelineConfig.getTriggerConfig(trigger.type);
       if (config && config.validators) {
         config.validators.forEach((validator) => {
           const typedValidator = this.getValidator(validator);
@@ -102,7 +103,7 @@ export class PipelineConfigValidator implements ng.IServiceProvider {
       }
     });
     stages.forEach((stage) => {
-      let config: IStageTypeConfig = this.pipelineConfig.getStageConfig(stage);
+      const config: IStageTypeConfig = this.pipelineConfig.getStageConfig(stage);
       if (config && config.validators) {
         config.validators.forEach((validator) => {
           if (validator.skipValidation && validator.skipValidation(pipeline, stage)) {
