@@ -11,7 +11,8 @@ import {IPagerDutyService, PagerDutyReader} from './pagerDuty.read.service';
     <div class="form-group row">
       <div class="col-sm-3 sm-label-right">
         PagerDuty *
-        <help-field [content]="helpContents"></help-field>
+        <!--<help-field [content]="helpContents"></help-field>-->
+        <deck-help-widget [content]="helpContents"></deck-help-widget>
       </div>
       <div class="col-sm-9">
         <ui-select-wrapper [items]="pagerDutyServices"

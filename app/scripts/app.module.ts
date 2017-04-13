@@ -1,9 +1,15 @@
 import {NgModule, Type} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {UpgradeModule, downgradeInjectable, downgradeComponent} from '@angular/upgrade/static';
+import {PopoverModule} from 'ng2-bootstrap';
 declare let angular: any;
 
-import {SPINNAKER_DOWNGRADES, SPINNAKER_COMPONENT_DOWNGRADES, SPINNAKER_DIRECTIVE_UPGRADES} from './modules';
+import {
+  SPINNAKER_DOWNGRADES,
+  SPINNAKER_COMPONENT_DOWNGRADES,
+  SPINNAKER_DIRECTIVE_UPGRADES,
+  SPINNAKER_COMPONENTS
+} from './modules';
 
 const providers: Type<any>[] = [];
 export const DOWNGRADED_MODULE_NAMES: string[] = [];
@@ -36,14 +42,17 @@ SPINNAKER_COMPONENT_DOWNGRADES.forEach((item) => {
 @NgModule({
   imports: [
     BrowserModule,
-    UpgradeModule
+    UpgradeModule,
+    PopoverModule.forRoot()
   ],
   declarations: [
     ...declarations,
-    ...SPINNAKER_DIRECTIVE_UPGRADES
+    ...SPINNAKER_DIRECTIVE_UPGRADES,
+    ...SPINNAKER_COMPONENTS
   ],
   entryComponents: [
-    ...declarations
+    ...declarations,
+    ...SPINNAKER_COMPONENTS
   ],
   providers: [
     ...providers
