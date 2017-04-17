@@ -1,0 +1,131 @@
+@import "../presentation/less/imports/commonImports.less";
+
+.pipelines {
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  > .header {
+    flex: none;
+  }
+
+  > .execution-groups {
+    padding: 0 0 0 10px;
+    flex: 1 0 100px;
+    overflow-y: auto;
+  }
+
+  .stage-filters {
+    label {
+      font-size: 12px;
+      vertical-align: -1px;
+      font-weight: normal;
+    }
+    border-bottom: 1px solid @mid_light_grey;
+    border-top: 1px solid @mid_light_grey;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    margin-bottom: 5px;
+    .form-group {
+      margin-right: 5px;
+    }
+    .legend.color {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+  }
+  .faded {
+    color: @mid_lighter_grey;
+  }
+}
+
+.canary-config-view {
+  h4 {
+    margin: 20px 0 20px 0px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid @mid_lighter_grey;
+  }
+  h5 {
+    margin: 20px 0 0px 30px;
+    font-weight: 600;
+  }
+  .horizontal-rule {
+    border-top:1px solid #D0D0D0;
+    margin-top: 5px;
+    margin-left: 30px;
+    margin-bottom: 10px;
+  }
+  .sm-label-right, label {
+    padding-right: 5px;
+    b {
+      font-weight: 600;
+    }
+  }
+}
+
+.canary-summary-alert {
+  padding-left: 8px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-right: 4px;
+  margin-bottom: 10px;
+  margin-top: 4px;
+}
+
+.pipeline-details {
+  @media (min-width: 992px) {
+    .details-panel {
+      /*width: 34% !important;*/
+    }
+  }
+  @media (max-width: 992px) {
+    .details-panel {
+      display: none;
+    }
+  }
+  .glyphicon-ok {
+    color: @healthy_green_icon;
+  }
+  .glyphicon-warning-sign {
+    color: @unhealthy_red;
+  }
+  dt {
+    float: left;
+    margin-right: 5px;
+  }
+}
+
+.stage-label {
+  .tests-pass-count {
+    color: @healthy_green_icon;
+  }
+  .tests-fail-count {
+    color: @unhealthy_red;
+  }
+  .tests-skip-count {
+    color: @mid_lighter_grey;
+  }
+}
+
+.execution-details {
+  .test-results {
+    .test-result-section {
+      display: inline-block;
+      text-align: right;
+      width: 65px;
+      .glyphicon-ok {
+        color: @healthy_green_icon;
+      }
+      .glyphicon-remove {
+        color: @unhealthy_red;
+        &.informational {
+          color: @unhealthy_red !important;
+          cursor: default;
+        }
+      }
+    }
+  }
+}

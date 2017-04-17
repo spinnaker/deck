@@ -1,0 +1,82 @@
+<div class="canary-details" ng-controller="PropertyExecutionDetailsCtrl as propertyDetailsCtrl">
+  <execution-details-section-nav sections="configSections"></execution-details-section-nav>
+
+  <div class="step-section-details" ng-if="detailsSection === 'propertiesConfig'">
+    <div class="row">
+      <div class="col-md-12">
+        <div ng-if="propertyAction">
+          <b>Action Taken:</b> {{propertyAction}}
+        </div>
+        <table class="table">
+          <thead>
+            <td><strong>Key</strong></td>
+            <td><strong>Value</strong></td>
+          </thead>
+          <tbody>
+          <tr ng-repeat="prop in properties">
+            <td>
+              <strong>{{ prop.key }}</strong>
+            </td>
+            <td>
+              <strong>{{ prop.value }}</strong>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="col-md-12">
+
+        <div >
+          <h5>Scope</h5>
+          <dl class="dl-horizontal dl-narrow">
+            <div ng-repeat="(key, value) in propertyDetailsCtrl.propertyScopeForDisplay()" ng-if="value !== ''">
+              <dt>{{key}}</dt>
+              <dd>{{value}}</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="row" ng-if="stage.context.exception || propertyDetailsCtrl.isExecutionTerminalOrCanceled()">
+      <div class="col-md-12">
+        <div class="alert alert-danger" ng-if="stage.context.exception" >
+          {{propertyDetailsCtrl.getErrorMessage()}}
+        </div>
+        <div class="alert alert-danger" ng-if="propertyDetailsCtrl.isExecutionTerminalOrCanceled()">
+          <p>This pipeline ended with a status of {{pipelineStatus}}. The property was rolled back to its original state.</p>
+          <p ng-if="propertyAction && propertyDetailsCtrl.wasCreateAction()">
+            Properties that where created during this stage where deleted.
+          </p>
+          <table class="table" ng-if="propertyAction && !propertyDetailsCtrl.wasCreateAction()">
+            <thead>
+            <td><strong>Key</strong></td>
+            <td><strong>Value</strong></td>
+            </thead>
+            <tbody>
+            <tr ng-repeat="prop in originalProperties">
+              <td>
+                <strong>{{ prop.key }}</strong>
+              </td>
+              <td>
+                <strong>{{ prop.value }}</strong>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+
+  <div class="step-section-details" ng-if="detailsSection === 'taskStatus'">
+    <div class="row">
+      <execution-step-details item="stage"></execution-step-details>
+    </div>
+  </div>
+
+</div>

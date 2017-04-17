@@ -1,0 +1,11 @@
+@import "../presentation/less/imports/commonImports.less";
+
+.navbar-inverse .navbar-nav > li.whats-new > a {
+  &.unread {
+    color: @unhealthy_orange;
+    @media (min-width: 768px) and (max-width: 992px) {
+      line-height: 20px;
+    }
+    font-weight: 400;
+  }
+}

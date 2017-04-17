@@ -1,0 +1,21 @@
+@import "../presentation/less/imports/commonImports.less";
+
+cloud-provider-logo {
+  display: inline-block;
+  margin-right: 3px;
+  .icon {
+    display: inline-block;
+    vertical-align: sub;
+    -webkit-filter: invert(53%) sepia(100%) hue-rotate(50deg);
+    filter: invert(53%) sepia(100%) hue-rotate(50deg);
+  }
+}
+
+.disabled {
+  cloud-provider-logo {
+    .icon {
+      -webkit-filter: opacity(64%);
+      filter: opacity(64%);
+    }
+  }
+}

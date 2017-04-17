@@ -1,0 +1,58 @@
+<div class="container-fluid form-horizontal">
+  <div class="form-group">
+    <div class="col-md-12">
+      <table class="table table-condensed packed">
+        <thead>
+        <tr>
+          <th>External Protocol</th>
+          <th>External Port</th>
+          <th></th>
+          <th>Internal Protocol</th>
+          <th>Internal Port</th>
+          <th ng-if="ctrl.showSslCertificateNameField() && ctrl.certificateTypes.length > 1" width="10%">SSL Certificate Type</th>
+          <th ng-if="ctrl.showSslCertificateNameField()" width="30%">SSL Certificate Name</th>
+          <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="listener in loadBalancer.listeners">
+          <td><select class="form-control input-sm" ng-model="listener.externalProtocol"
+                      ng-change="ctrl.listenerProtocolChanged(listener)"
+                      ng-options="protocol for protocol in ['HTTP','HTTPS','TCP','SSL']"></select></td>
+          <td><input class="form-control input-sm" type="number" min="0" ng-model="listener.externalPort"
+                     required/></td>
+          <td class="small" style="padding-top: 10px;">&rarr;</td>
+          <td><select class="form-control input-sm" ng-model="listener.internalProtocol"
+                      ng-options="protocol for protocol in ['HTTP','HTTPS','TCP','SSL']"></select></td>
+          <td><input class="form-control input-sm" type="number" min="0" ng-model="listener.internalPort"
+                     required/></td>
+          <td ng-if="ctrl.showSslCertificateNameField() && ctrl.certificateTypes.length > 1">
+            <select ng-if="(listener.externalProtocol === 'HTTPS' || listener.externalProtocol === 'SSL')"
+                    class="form-control input-sm"
+                    ng-model="listener.sslCertificateType"
+                    ng-options="certificateType for certificateType in ['iam','acm']"></select>
+          </td>
+          <td ng-if="ctrl.showSslCertificateNameField()">
+            <input ng-if="listener.externalProtocol === 'HTTPS' || listener.externalProtocol === 'SSL'"
+                   class="form-control input-sm no-spel"
+                   type="text"
+                   ng-model="listener.sslCertificateName"
+                   required/></td>
+          </td>
+          <td><a href class="sm-label" ng-click="ctrl.removeListener($index)"><span
+            class="glyphicon glyphicon-trash"></span></a></td>
+        </tr>
+        </tbody>
+        <tfoot>
+        <tr>
+          <td colspan="{{ctrl.showSslCertificateNameField() ? 7 : 5}}">
+            <button class="add-new col-md-12" ng-click="ctrl.addListener()"><span
+              class="glyphicon glyphicon-plus-sign"></span> Add new port mapping
+            </button>
+          </td>
+        </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+</div>

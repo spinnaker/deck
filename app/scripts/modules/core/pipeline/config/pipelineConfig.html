@@ -1,0 +1,23 @@
+<div ng-if="vm.pipelineConfig" style="padding-top:0">
+  <div class="row">
+    <div class="col-md-10 col-md-offset-1">
+
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-10 col-md-offset-1">
+      <pipeline-configurer pipeline="vm.pipelineConfig" application="application"></pipeline-configurer>
+    </div>
+  </div>
+</div>
+<div class="row" ng-if="!application.notFound && !vm.state.pipelinesLoaded" style="min-height: 300px">
+  <h4 class="text-center">
+    <span us-spinner="{radius:20, width:6, length: 12}"></span>
+  </h4>
+</div>
+<div class="row" ng-if="vm.state.notFound" style="min-height: 300px">
+  <h4 class="text-center">
+    No pipeline found with that name.
+  </h4>
+</div>
+

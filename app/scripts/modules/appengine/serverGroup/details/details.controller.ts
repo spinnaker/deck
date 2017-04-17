@@ -1,0 +1,457 @@
+import {module, IScope} from 'angular';
+import {IModalService} from 'angular-ui-bootstrap';
+import {cloneDeep, reduce, mapValues, get, map} from 'lodash';
+
+import {ServerGroup} from 'core/domain/index';
+import {
+  CONFIRMATION_MODAL_SERVICE, ConfirmationModalService,
+  IConfirmationModalParams
+} from 'core/confirmationModal/confirmationModal.service';
+import {SERVER_GROUP_READER, ServerGroupReader} from 'core/serverGroup/serverGroupReader.service';
+import {SERVER_GROUP_WRITER, ServerGroupWriter} from 'core/serverGroup/serverGroupWriter.service';
+import {Application} from 'core/application/application.model';
+import {IAppengineLoadBalancer, IAppengineServerGroup} from 'appengine/domain/index';
+import {SERVER_GROUP_WARNING_MESSAGE_SERVICE, ServerGroupWarningMessageService} from 'core/serverGroup/details/serverGroupWarningMessage.service';
+import {APPENGINE_SERVER_GROUP_WRITER, AppengineServerGroupWriter} from '../writer/serverGroup.write.service';
+import {RUNNING_TASKS_DETAILS_COMPONENT} from 'core/serverGroup/details/runningTasks.component';
+import {ITaskMonitorConfig} from 'core/task/monitor/taskMonitor.builder';
+import {AppengineServerGroupCommandBuilder} from '../configure/serverGroupCommandBuilder.service';
+import {AppengineHealth} from 'appengine/common/appengineHealth';
+
+interface IPrivateScope extends IScope {
+  $$destroyed: boolean;
+}
+
+interface IServerGroupFromStateParams {
+  accountId: string;
+  region: string;
+  name: string;
+}
+
+class AppengineServerGroupDetailsController {
+  public state = { loading: true };
+  public serverGroup: IAppengineServerGroup;
+
+  static get $inject () {
+    return ['$state', '$scope', '$uibModal', 'serverGroup', 'app', 'serverGroupReader', 'serverGroupWriter',
+            'serverGroupWarningMessageService', 'confirmationModalService', 'appengineServerGroupWriter',
+            'appengineServerGroupCommandBuilder'];
+  }
+
+  private static buildExpectedAllocationsTable(expectedAllocations: {[key: string]: number}): string {
+    const tableRows = map(expectedAllocations, (allocation, serverGroupName) => {
+      return `
+        <tr>
+          <td>${serverGroupName}</td>
+          <td>${allocation * 100}%</td>
+        </tr>`;
+    }).join('');
+
+    return `
+      <table class="table table-condensed">
+        <thead>
+          <tr>
+            <th>Server Group</th>
+            <th>Allocation</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${tableRows}
+        </tbody>
+      </table>`;
+  }
+
+  constructor(private $state: any,
+              private $scope: IPrivateScope,
+              private $uibModal: IModalService,
+              serverGroup: IServerGroupFromStateParams,
+              public app: Application,
+              private serverGroupReader: ServerGroupReader,
+              private serverGroupWriter: ServerGroupWriter,
+              private serverGroupWarningMessageService: ServerGroupWarningMessageService,
+              private confirmationModalService: ConfirmationModalService,
+              private appengineServerGroupWriter: AppengineServerGroupWriter,
+              private appengineServerGroupCommandBuilder: AppengineServerGroupCommandBuilder) {
+
+    this.app
+      .ready()
+      .then(() => this.extractServerGroup(serverGroup))
+      .then(() => {
+        if (!this.$scope.$$destroyed) {
+          this.app.getDataSource('serverGroups').onRefresh(this.$scope, () => this.extractServerGroup(serverGroup));
+        }
+      })
+      .catch(() => this.autoClose());
+  }
+
+  public canDisableServerGroup(): boolean {
+    if (this.serverGroup) {
+      if (this.serverGroup.disabled) {
+        return false;
+      }
+
+      const expectedAllocations = this.expectedAllocationsAfterDisableOperation(this.serverGroup, this.app);
+      if (expectedAllocations) {
+        return Object.keys(expectedAllocations).length > 0;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+
+  public canDestroyServerGroup(): boolean {
+    if (this.serverGroup) {
+      if (this.serverGroup.disabled) {
+        return true;
+      }
+
+      const expectedAllocations = this.expectedAllocationsAfterDisableOperation(this.serverGroup, this.app);
+      if (expectedAllocations) {
+        return Object.keys(expectedAllocations).length > 0;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+
+  public destroyServerGroup(): void {
+    const taskMonitor = {
+      application: this.app,
+      title: 'Destroying ' + this.serverGroup.name,
+    };
+
+    const submitMethod = (params: any) => this.serverGroupWriter.destroyServerGroup(this.serverGroup, this.app, params);
+
+    const stateParams = {
+      name: this.serverGroup.name,
+      accountId: this.serverGroup.account,
+      region: this.serverGroup.region
+    };
+
+    const confirmationModalParams = {
+      header: 'Really destroy ' + this.serverGroup.name + '?',
+      buttonText: 'Destroy ' + this.serverGroup.name,
+      account: this.serverGroup.account,
+      provider: 'appengine',
+      taskMonitorConfig: taskMonitor,
+      submitMethod: submitMethod,
+      askForReason: true,
+      platformHealthOnlyShowOverride: this.app.attributes.platformHealthOnlyShowOverride,
+      platformHealthType: AppengineHealth.PLATFORM,
+      body: this.getBodyTemplate(this.serverGroup, this.app),
+      onTaskComplete: () => {
+        if (this.$state.includes('**.serverGroup', stateParams)) {
+          this.$state.go('^');
+        }
+      },
+      interestingHealthProviderNames: [] as string[],
+    };
+
+    if (this.app.attributes.platformHealthOnlyShowOverride && this.app.attributes.platformHealthOnly) {
+      confirmationModalParams.interestingHealthProviderNames = [AppengineHealth.PLATFORM];
+    }
+
+    this.confirmationModalService.confirm(confirmationModalParams);
+  };
+
+  public enableServerGroup(): void {
+    const taskMonitor: ITaskMonitorConfig = {
+      application: this.app,
+      title: 'Enabling ' + this.serverGroup.name,
+    };
+
+    const submitMethod = (params: any) => this.serverGroupWriter.enableServerGroup(this.serverGroup, this.app, Object.assign(params));
+
+    const modalBody = `
+      <div class="well well-sm">
+        <p>
+          Enabling <b>${this.serverGroup.name}</b> will set its traffic allocation for
+          <b>${this.serverGroup.loadBalancers[0]}</b> to 100%.
+        </p>
+        <p>
+          If you would like more fine-grained control over your server groups' allocations,
+          edit <b>${this.serverGroup.loadBalancers[0]}</b> under the <b>Load Balancers</b> tab.
+        </p>
+      </div>
+    `;
+
+    const confirmationModalParams = {
+      header: 'Really enable ' + this.serverGroup.name + '?',
+      buttonText: 'Enable ' + this.serverGroup.name,
+      provider: 'appengine',
+      body: modalBody,
+      account: this.serverGroup.account,
+      taskMonitorConfig: taskMonitor,
+      platformHealthOnlyShowOverride: this.app.attributes.platformHealthOnlyShowOverride,
+      platformHealthType: AppengineHealth.PLATFORM,
+      submitMethod: submitMethod,
+      askForReason: true,
+      interestingHealthProviderNames: [] as string[],
+    };
+
+    if (this.app.attributes.platformHealthOnlyShowOverride && this.app.attributes.platformHealthOnly) {
+      confirmationModalParams.interestingHealthProviderNames = [AppengineHealth.PLATFORM];
+    }
+
+    this.confirmationModalService.confirm(confirmationModalParams);
+  }
+
+  public disableServerGroup(): void {
+    const taskMonitor = {
+      application: this.app,
+      title: 'Disabling ' + this.serverGroup.name,
+    };
+
+    const submitMethod = (params: any) => this.serverGroupWriter.disableServerGroup(this.serverGroup, this.app.name, params);
+
+    const expectedAllocations = this.expectedAllocationsAfterDisableOperation(this.serverGroup, this.app);
+    const modalBody = `
+      <div class="well well-sm">
+        <p>
+          For App Engine, a disable operation sets this server group's allocation
+          to 0% and sets the other enabled server groups' allocations to their relative proportions
+          before the disable operation. The approximate allocations that will result from this operation are shown below.
+        </p>
+        <p>
+          If you would like more fine-grained control over your server groups' allocations,
+          edit <b>${this.serverGroup.loadBalancers[0]}</b> under the <b>Load Balancers</b> tab.
+        </p>
+        <div class="row">
+          <div class="col-md-12">
+            ${AppengineServerGroupDetailsController.buildExpectedAllocationsTable(expectedAllocations)}
+          </div>
+        </div>
+      </div>
+    `;
+
+    const confirmationModalParams = {
+      header: 'Really disable ' + this.serverGroup.name + '?',
+      buttonText: 'Disable ' + this.serverGroup.name,
+      provider: 'appengine',
+      body: modalBody,
+      account: this.serverGroup.account,
+      taskMonitorConfig: taskMonitor,
+      platformHealthOnlyShowOverride: this.app.attributes.platformHealthOnlyShowOverride,
+      platformHealthType: AppengineHealth.PLATFORM,
+      submitMethod: submitMethod,
+      askForReason: true,
+      interestingHealthProviderNames: [] as string[],
+    };
+
+    if (this.app.attributes.platformHealthOnlyShowOverride && this.app.attributes.platformHealthOnly) {
+      confirmationModalParams.interestingHealthProviderNames = [AppengineHealth.PLATFORM];
+    }
+
+    this.confirmationModalService.confirm(confirmationModalParams);
+  }
+
+  public stopServerGroup(): void {
+    const taskMonitor = {
+      application: this.app,
+      title: 'Stopping ' + this.serverGroup.name,
+    };
+
+    const submitMethod = () => this.appengineServerGroupWriter.stopServerGroup(this.serverGroup, this.app);
+
+    let modalBody: string;
+    if (!this.serverGroup.disabled) {
+      modalBody = `
+        <div class="alert alert-danger">
+          <p>Stopping this server group will scale it down to zero instances.</p>
+          <p>
+            This server group is currently serving traffic from <b>${this.serverGroup.loadBalancers[0]}</b>.
+            Traffic directed to this server group after it has been stopped will not be handled.
+          </p>
+        </div>`;
+    }
+
+    const confirmationModalParams = {
+      header: 'Really stop ' + this.serverGroup.name + '?',
+      buttonText: 'Stop ' + this.serverGroup.name,
+      provider: 'appengine',
+      account: this.serverGroup.account,
+      body: modalBody,
+      platformHealthOnlyShowOverride: this.app.attributes.platformHealthOnlyShowOverride,
+      platformHealthType: AppengineHealth.PLATFORM,
+      taskMonitorConfig: taskMonitor,
+      submitMethod: submitMethod,
+      askForReason: true,
+    };
+
+    this.confirmationModalService.confirm(confirmationModalParams);
+  }
+
+  public startServerGroup(): void {
+    const taskMonitor = {
+      application: this.app,
+      title: 'Starting ' + this.serverGroup.name,
+    };
+
+    const submitMethod = () => this.appengineServerGroupWriter.startServerGroup(this.serverGroup, this.app);
+
+    const confirmationModalParams = {
+      header: 'Really start ' + this.serverGroup.name + '?',
+      buttonText: 'Start ' + this.serverGroup.name,
+      provider: 'appengine',
+      account: this.serverGroup.account,
+      platformHealthOnlyShowOverride: this.app.attributes.platformHealthOnlyShowOverride,
+      platformHealthType: AppengineHealth.PLATFORM,
+      taskMonitorConfig: taskMonitor,
+      submitMethod: submitMethod,
+      askForReason: true,
+    };
+
+    this.confirmationModalService.confirm(confirmationModalParams);
+  }
+
+  public cloneServerGroup(): void {
+    this.$uibModal.open({
+      templateUrl: require('../configure/wizard/serverGroupWizard.html'),
+      controller: 'appengineCloneServerGroupCtrl as ctrl',
+      size: 'lg',
+      resolve: {
+        title: () => 'Clone ' + this.serverGroup.name,
+        application: () => this.app,
+        serverGroup: () => this.serverGroup,
+        serverGroupCommand: () => this.appengineServerGroupCommandBuilder.buildServerGroupCommandFromExisting(this.app, this.serverGroup),
+      }
+    });
+  }
+
+  public canStartServerGroup(): boolean {
+    if (this.canStartOrStopServerGroup()) {
+      return this.serverGroup.servingStatus === 'STOPPED';
+    } else {
+      return false;
+    }
+  }
+
+  public canStopServerGroup(): boolean {
+    if (this.canStartOrStopServerGroup()) {
+      return this.serverGroup.servingStatus === 'SERVING';
+    } else {
+      return false;
+    }
+  }
+
+  private canStartOrStopServerGroup(): boolean {
+    const isFlex = this.serverGroup.env === 'FLEXIBLE';
+    const usesManualScaling = get(this.serverGroup, 'scalingPolicy.type') === 'MANUAL';
+    const usesBasicScaling = get(this.serverGroup, 'scalingPolicy.type') === 'BASIC';
+    return isFlex || usesManualScaling || usesBasicScaling;
+  }
+
+  private getBodyTemplate(serverGroup: IAppengineServerGroup, app: Application): string {
+    let template = '';
+    const params: IConfirmationModalParams = {};
+    this.serverGroupWarningMessageService.addDestroyWarningMessage(app, serverGroup, params);
+    if (params.body) {
+      template += params.body;
+    }
+
+    if (!serverGroup.disabled) {
+      const expectedAllocations = this.expectedAllocationsAfterDisableOperation(serverGroup, app);
+
+      template += `
+        <div class="well well-sm">
+          <p>
+            A destroy operation will first disable this server group.
+          </p>
+          <p>
+            For App Engine, a disable operation sets this server group's allocation
+            to 0% and sets the other enabled server groups' allocations to their relative proportions
+            before the disable operation. The approximate allocations that will result from this operation are shown below.
+          </p>
+          <p>
+            If you would like more fine-grained control over your server groups' allocations,
+            edit <b>${serverGroup.loadBalancers[0]}</b> under the <b>Load Balancers</b> tab.
+          </p>
+          <div class="row">
+            <div class="col-md-12">
+              ${AppengineServerGroupDetailsController.buildExpectedAllocationsTable(expectedAllocations)}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    return template;
+  }
+
+  private expectedAllocationsAfterDisableOperation(serverGroup: ServerGroup, app: Application): {[key: string]: number} {
+    const loadBalancer = app.getDataSource('loadBalancers').data.find((toCheck: IAppengineLoadBalancer): boolean => {
+      const allocations = get(toCheck, 'split.allocations', {});
+      const enabledServerGroups = Object.keys(allocations);
+      return enabledServerGroups.includes(serverGroup.name);
+    });
+
+    if (loadBalancer) {
+      let allocations = cloneDeep(loadBalancer.split.allocations);
+      delete allocations[serverGroup.name];
+      const denominator = reduce(allocations, (partialSum: number, allocation: number) => partialSum + allocation, 0);
+      const precision = loadBalancer.split.shardBy === 'COOKIE' ? 1000 : 100;
+      allocations = mapValues(
+        allocations,
+        (allocation) => Math.round(allocation / denominator * precision) / precision
+      );
+      return allocations;
+    } else {
+      return null;
+    }
+  }
+
+  private autoClose(): void {
+    if (this.$scope.$$destroyed) {
+      return;
+    } else {
+      this.$state.params.allowModalToStayOpen = true;
+      this.$state.go('^', null, {location: 'replace'});
+    }
+  }
+
+  private extractServerGroup(fromParams: IServerGroupFromStateParams): ng.IPromise<void> {
+    return this.serverGroupReader
+      .getServerGroup(this.app.name, fromParams.accountId, fromParams.region, fromParams.name)
+      .then((serverGroupDetails: ServerGroup) => {
+        let fromApp = this.app.getDataSource('serverGroups').data.find((toCheck: ServerGroup) => {
+          return toCheck.name === fromParams.name &&
+            toCheck.account === fromParams.accountId &&
+            toCheck.region === fromParams.region;
+        });
+
+        if (!fromApp) {
+          this.app.getDataSource('loadBalancers').data.some((loadBalancer) => {
+            if (loadBalancer.account === fromParams.accountId) {
+              return loadBalancer.serverGroups.some((toCheck: ServerGroup) => {
+                let result = false;
+                if (toCheck.name === fromParams.name) {
+                  fromApp = toCheck;
+                  result = true;
+                }
+                return result;
+              });
+            }
+          });
+        }
+
+        this.serverGroup = Object.assign(serverGroupDetails, fromApp);
+        this.state.loading = false;
+      });
+  }
+}
+
+export const APPENGINE_SERVER_GROUP_DETAILS_CTRL = 'spinnaker.appengine.serverGroup.details.controller';
+
+module(APPENGINE_SERVER_GROUP_DETAILS_CTRL, [
+    APPENGINE_SERVER_GROUP_WRITER,
+    CONFIRMATION_MODAL_SERVICE,
+    RUNNING_TASKS_DETAILS_COMPONENT,
+    SERVER_GROUP_WARNING_MESSAGE_SERVICE,
+    SERVER_GROUP_READER,
+    SERVER_GROUP_WRITER,
+  ])
+  .controller('appengineServerGroupDetailsCtrl', AppengineServerGroupDetailsController);

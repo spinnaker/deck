@@ -1,0 +1,121 @@
+@import "../presentation/less/imports/commonImports.less";
+
+.tasks-wrapper {
+  display: flex;
+}
+
+.tasks {
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+
+  @media (min-width: 768px) and (max-width: 992px) {
+    width: 768px;
+  }
+
+  @media (min-width: 992px) {
+    width: 992px;
+  }
+  @media (min-width: 1200px) {
+    width: 1200px;
+  }
+  @media (min-width: 1400px) {
+    width: 1400px;
+  }
+
+  > .tasks-header {
+    h3 {
+      margin-top: 0;
+      font-weight: 600;
+    }
+    flex: 0 0 auto;
+    z-index: 4;
+    box-shadow: 0 20px 10px -10px @lightest_grey;
+    padding-bottom: 0;
+    .btn-group {
+      a {
+        text-decoration: none;
+        color: @text-color;
+        &:active, &:focus, &:hover {
+          color: @text-color;
+        }
+      }
+    }
+  }
+
+  > .tasks-content {
+    padding: 10px 15px;
+    flex: 1 1 auto;
+    overflow-y: auto;
+  }
+
+  .pagination-footer {
+    margin-bottom: 15px;
+    margin-top: 5px;
+    .pagination {
+      margin: 0;
+    }
+    z-index: 4;
+    box-shadow: 0 -15px 8px -8px @lightest_grey;
+  }
+
+  .task-name {
+    text-indent: -14px;
+    margin-left: 20px;
+    .glyphicon {
+      font-size: 75%;
+      color: @mid_lighter_grey;
+      display: inline;
+    }
+  }
+  .task-step {
+    background-color: @lighter_grey;
+    font-size: 90%;
+  }
+
+  .task-step, .task-error-message {
+    :first-child {
+      padding-left: 20px;
+    }
+  }
+
+  .task-reason {
+    background-color: #ffffff;
+    td {
+      padding-top: 5px;
+      padding-left: 40px;
+    }
+  }
+
+  .progress {
+    height: 10px;
+    margin-bottom: 0;
+    margin-top: 5px;
+    .progress-bar-danger {
+      background-color: @unhealthy_red;
+    }
+    .progress-bar-success {
+      background-color: @healthy_green_icon;
+    }
+    .progress-bar-disabled {
+      background-color: @mid_lighter_grey;
+    }
+  }
+
+}
+
+.status-glyph {
+  &.glyphicon-ok {
+    color: @healthy_green_icon;
+  }
+  &.glyphicon-warning-sign {
+    color: @unhealthy_red;
+  }
+  &.glyphicon-play {
+    color: @spinnaker-blue;
+  }
+  &.glyphicon-stop, &.glyphicon-pause, &.glyphicon-time {
+    color: @mid_lighter_grey;
+  }
+}

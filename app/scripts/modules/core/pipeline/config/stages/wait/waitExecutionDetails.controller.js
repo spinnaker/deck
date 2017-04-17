@@ -1,0 +1,53 @@
+'use strict';
+
+import {CONFIRMATION_MODAL_SERVICE} from 'core/confirmationModal/confirmationModal.service';
+import {EXECUTION_DETAILS_SECTION_SERVICE} from 'core/delivery/details/executionDetailsSection.service';
+import {EXECUTION_SERVICE} from 'core/delivery/service/execution.service';
+
+let angular = require('angular');
+
+module.exports = angular.module('spinnaker.core.pipeline.stage.wait.executionDetails.controller', [
+  require('angular-ui-router'),
+  EXECUTION_DETAILS_SECTION_SERVICE,
+  require('core/delivery/details/executionDetailsSectionNav.directive.js'),
+  EXECUTION_SERVICE,
+  CONFIRMATION_MODAL_SERVICE,
+])
+  .controller('WaitExecutionDetailsCtrl', function ($scope, $stateParams, executionDetailsSectionService, executionService, confirmationModalService) {
+
+    $scope.configSections = ['waitConfig', 'taskStatus'];
+
+    let initialized = () => {
+      $scope.detailsSection = $stateParams.details;
+    };
+
+    this.getRemainingWait = () => {
+      return $scope.stage.context.waitTime * 1000 - $scope.stage.runningTimeInMs;
+    };
+
+    this.finishWaiting = () => {
+      let stage = $scope.stage;
+      let matcher = (execution) => {
+        let match = execution.stages.find((test) => test.id === stage.id);
+        return match.status !== 'RUNNING';
+      };
+
+      let data = { skipRemainingWait: true };
+      confirmationModalService.confirm({
+        header: 'Really skip wait?',
+        buttonText: 'Skip',
+        body: '<p>The pipeline will proceed immediately, marking this stage completed.</p>',
+        submitMethod: () => {
+          return executionService.patchExecution($scope.execution.id, $scope.stage.id, data)
+            .then(() => executionService.waitUntilExecutionMatches($scope.execution.id, matcher));
+        }
+      });
+    };
+
+    let initialize = () => executionDetailsSectionService.synchronizeSection($scope.configSections, initialized);
+
+    initialize();
+
+    $scope.$on('$stateChangeSuccess', initialize);
+
+  });

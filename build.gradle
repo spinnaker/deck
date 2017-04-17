@@ -1,0 +1,103 @@
+import java.nio.file.Paths
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+
+buildscript {
+  repositories {
+    jcenter()
+    maven { url "http://dl.bintray.com/spinnaker/gradle" }
+    maven { url "https://plugins.gradle.org/m2/" }
+  }
+  dependencies {
+    classpath 'com.netflix.spinnaker.gradle:spinnaker-gradle-project:3.12.0'
+    classpath 'com.moowork.gradle:gradle-node-plugin:1.1.1'
+  }
+}
+
+group = "com.netflix.spinnaker.deck"
+
+apply plugin: 'spinnaker.project'
+apply plugin: 'nebula.ospackage'
+apply plugin: 'com.moowork.node'
+apply plugin: 'java'
+
+jar {
+  dependsOn('webpack')
+  from(fileTree("build/webpack")) {
+    into "META-INF/resources"
+  }
+}
+
+node {
+    // Pulls node and npm versions from package.json.
+    def packageSlurper = new JsonSlurper()
+    def packageJson = packageSlurper.parse file('package.json')
+
+    version = packageJson.engines.node
+    npmVersion = packageJson.engines.npm
+    yarnVersion = packageJson.engines.yarn
+
+    // Enabled the automatic download. False is the default (for now).
+    download = true
+}
+
+task webpack(type: NodeTask) {
+  workingDir '.'
+  script = file('node_modules/webpack/bin/webpack.js')
+  environment = [
+    "GATE_HOST": "spinnaker-api-prestaging.prod.netflix.net",
+  ]
+}
+
+task karma(type: NodeTask) {
+  script = file('node_modules/karma/bin/karma')
+  args = ["start", "--single-run", "--reporters", "progress,mocha"]
+  if (project.hasProperty('skipTests')) {
+    karma.enabled = false
+  }
+}
+
+task generateVersionFile << {
+  'git update-index --assume-unchanged version.json'.execute()
+  def buildInfo = [
+    version: project.hasProperty('deckVersion') ? "${deckVersion}" : "n/a",
+    created: new Date().getTime()
+  ]
+  def buildJson = JsonOutput.prettyPrint(JsonOutput.toJson(buildInfo))
+  new File(Paths.get("build", "webpack").toString()).mkdirs()
+  new File(Paths.get("build", "webpack", "version.json").toString()).write(buildJson)
+  new File("version.json").write(buildJson)
+}
+
+webpack.outputs.dir file('build/webpack')
+
+yarn.dependsOn 'generateVersionFile'
+webpack.dependsOn 'yarn'
+karma.dependsOn 'webpack'
+test.dependsOn 'karma'
+buildDeb.dependsOn 'test'
+
+String toVers(String v) {
+  int idx = v.indexOf('-')
+  if (idx != -1) {
+    return v.substring(0, idx)
+  }
+  return v
+}
+
+ospackage {
+  packageName = "spinnaker-deck"
+  version = toVers(project.version.toString())
+  release '3'
+  into "/opt/deck/html"
+  from "build/webpack"
+  os = LINUX
+}
+
+buildRpm {
+  requires('httpd')
+}
+
+buildDeb {
+  requires('apache2')
+}

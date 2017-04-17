@@ -1,0 +1,18 @@
+[sticky-headers] {
+  .heading-sticky {
+    position: fixed;
+    z-index: 2;
+    margin: 0;
+    .sticky-only {
+      display: inline;
+    }
+  }
+  .not-sticky {
+    top: unset;
+    z-index: 3;
+  }
+}
+
+.sticky-only {
+  display: none;
+}

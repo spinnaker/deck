@@ -1,0 +1,148 @@
+@import "../../presentation/less/imports/commonImports.less";
+
+[ui-view="pipelines"] {
+  padding-top: 0 !important;
+}
+executions {
+  display: flex;
+  flex: 1 1 auto;
+  .execution-groups-header {
+    margin-left: -8px;
+    position: relative;
+    z-index: 20;
+    padding: 30px 0 0 0;
+    margin-top: -30px;
+    background-color: @lightest_grey;
+    h3 {
+      display: inline-block;
+      font-weight: 600;
+      margin-top: 0;
+    }
+    .execution-filters {
+      padding-bottom: 5px;
+    }
+    .form-group {
+      margin-right: 17px;
+      label {
+        font-weight: 600;
+      }
+    }
+    .checkbox {
+      height: 24px;
+      label {
+        font-weight: normal;
+      }
+    }
+    font-size: 90%;
+    @media (min-width: 1400px) {
+      font-size: 100%;
+    }
+  }
+}
+
+.executions {
+  padding-top: 0 !important;
+  &.showing-details {
+    execution-group {
+      .details-hidden {
+        opacity: 0.66;
+        &:hover {
+          opacity: 1;
+        }
+      }
+    }
+  }
+  .permalinks {
+    font-size: 80%;
+    flex: 0 0 100%;
+    text-align: right;
+    .permalinks-content {
+      display: inline-block;
+      width: 50%;
+      background-color: @pod_header_blue;
+    }
+  }
+
+  .execution {
+    margin-bottom: 10px;
+    background-color: @lightest_grey;
+
+    .execution-overview {
+      padding: 10px;
+      background-color: #ffffff;
+      border: 1px solid @mid_light_grey;
+      .execution-name {
+        margin-top: 0;
+        font-weight: 600;
+      }
+      &.group-by-name {
+        .execution-bar {
+          padding-top: 20px;
+        }
+      }
+    }
+  }
+}
+
+// default
+.execution-status {
+  color: @mid_lighter_grey;
+}
+
+// overrides
+.execution-status-executing, .execution-status-running {
+  color: @spinnaker-blue;
+}
+.execution-status-terminal {
+  color: @unhealthy_red;
+}
+.execution-status-succeeded {
+  color: @healthy_green_border;
+}
+
+.execution-marker {
+  fill: @stage-default;
+  background-color: @stage-default;
+  &.execution-marker-terminal {
+    fill: @stage-terminal;
+    background-color: @stage-terminal;
+  }
+  &.execution-marker-failed_continue {
+    fill: @stage-failed_continue;
+    background-color: @stage-failed_continue;
+  }
+  &.execution-marker-succeeded {
+    fill: @stage-succeeded;
+    background-color: @stage-succeeded;
+  }
+  &.execution-marker-running {
+    fill: @stage-running;
+    background-color: @stage-running;
+  }
+  &.execution-marker-stopped {
+    fill: @stage-stopped;
+    background-color: @stage-stopped;
+  }
+  &.execution-marker-not_started, &.execution-marker-canceled {
+    fill: @stage-default;
+    background-color: @stage-default;
+  }
+  &.execution-marker-paused {
+    fill: @stage-running;
+    background-color: @stage-running;
+  }
+  &.execution-marker-skipped {
+    fill: @stage-stopped-intentional;
+    background-color: @stage-stopped-intentional;
+  }
+  &.execution-marker-stopped {
+    fill: @stage-stopped;
+    background-color: @stage-stopped;
+  }
+  &.execution-marker-stopped {
+    &.stage-type-checkpreconditions, &.stage-type-manualjudgment {
+      fill: @stage-stopped-intentional;
+      background-color: @stage-stopped-intentional;
+    }
+  }
+}

@@ -1,0 +1,137 @@
+@import "../presentation/less/imports/commonImports.less";
+
+.application-header {
+  margin-top: 0;
+  margin-bottom: 0;
+  display: flex;
+  flex: 0 0 auto;
+  align-items: stretch;
+  flex-wrap: wrap;
+  padding: 15px 15px 0;
+  z-index: 5;
+  border: 0;
+  @media (max-width: 1400px) {
+    padding: 0 10px;
+  }
+  .header-right {
+    flex: 1 1 auto;
+    text-align: right;
+  }
+  .application-name {
+    margin-right: 10px;
+  }
+  .page-button {
+    display: inline-block;
+    margin-top: 15px;
+    @media (min-width: 708px) and (max-width: 1400px) {
+      margin-top: 16px;
+    }
+    .btn-danger {
+      background-color: @unhealthy_red;
+      border-color: transparent;
+      padding: 0 5px;
+      font-size: 14px;
+    }
+  }
+  .application-navigation {
+    display: flex;
+    flex: 1 0 auto;
+  }
+  h2 {
+    min-width: 200px;
+    margin-right: 50px;
+    font-weight: 700;
+    display: flex;
+    flex: 0 0 auto;
+    .fa {
+      .encircled;
+      margin-right: 5px;
+      width: 36px;
+      height: 36px;
+      line-height: 32px;
+      font-size: 16px;
+      margin-left: 0;
+    }
+    @media (min-width: 708px) and (max-width: 1400px) {
+      float: left;
+      font-size: 160%;
+      min-width: 120px;
+      margin-right: 30px;
+      margin-top: 15px;
+      .fa {
+        width: 28px;
+        height: 28px;
+        line-height: 24px;
+        font-size: 14px;
+      }
+    }
+
+    a {
+      font-size: 75%;
+      display: inline-block;
+      margin-right: 20px;
+    }
+  }
+}
+
+.glyphicon-cloud {
+  top: 4px;
+}
+
+.application-actions {
+  margin-bottom: 10px;
+  padding-top: 5px;
+  display: inline-block;
+  .pull-right;
+}
+
+.link-inverse {
+  color: @inverse-link-color;
+  &:active, &:focus, &:hover {
+    color: @inverse-link-color-active;
+    text-decoration: none;
+  }
+}
+
+.filter-tags {
+  padding: 5px 15px 0;
+  .filter-tag {
+    strong {
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    border-radius: 2px;
+    display: inline-block;
+    padding: 3px 5px;
+    margin-right: 10px;
+    margin-bottom: 5px;
+    background-color: @light_grey;
+    font-size: 90%;
+    a {
+      font-size: 90%;
+      color: @mid_grey;
+    }
+  }
+  .clear-filters {
+    display: inline-block;
+    margin-left: 5px;
+    color: @text-color;
+    font-size: 90%;
+  }
+}
+
+.select2-highlighted {
+  .icon {
+    color: inherit;
+  }
+}
+
+.glyphicon-none:before{
+  content:"\e113";
+  color: transparent !important;
+}
+
+input[type="checkbox"], input[type="radio"] {
+  cursor: pointer;
+}
+

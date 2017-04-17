@@ -1,0 +1,159 @@
+<div modal-page>
+  <task-monitor monitor="taskMonitor"></task-monitor>
+  <modal-close dismiss="$dismiss()"></modal-close>
+  <div class="modal-header">
+    <h3 ng-if="vm.command.pipeline && vm.triggers.length">Select Execution Parameters</h3>
+    <h3 ng-if="vm.command.pipeline && !vm.triggers.length">Confirm Execution</h3>
+    <h3 ng-if="!vm.command.pipeline">Select Pipeline</h3>
+  </div>
+  <form role="form">
+    <div class="modal-body container-fluid form-horizontal">
+      <div class="form-group" ng-if="vm.pipelineOptions">
+        <label class="col-md-4 sm-label-right">Pipeline</label>
+        <div class="col-md-6">
+          <ui-select ng-model="vm.command.pipeline"
+                     style="width: 250px"
+                     class="form-control input-sm"
+                     on-select="vm.pipelineSelected()">
+            <ui-select-match>
+              <strong>{{$select.selected.name}}</strong>
+            </ui-select-match>
+            <ui-select-choices repeat="pipeline as pipeline in vm.pipelineOptions | anyFieldFilter: {name: $select.search }">
+              <div><strong>{{pipeline.name}}</strong></div>
+            </ui-select-choices>
+          </ui-select>
+        </div>
+      </div>
+
+      <div class="form-group" ng-if="vm.command.pipeline">
+        <div class="col-md-10">
+          <p>This will start a new run of <strong>{{vm.command.pipeline.name}}</strong>.</p>
+        </div>
+      </div>
+
+      <div class="alert alert-warning"
+           ng-if="vm.currentlyRunningExecutions.length">
+        <p><strong>
+          <span class="glyphicon glyphicon-warning-sign"></span>
+          This pipeline is currently executing!
+        </strong></p>
+        <div ng-repeat="execution in vm.currentlyRunningExecutions" class="pad-left">
+          <strong>Execution started: </strong>{{execution.startTime | timestamp }}
+          <div>
+            <strong>Current stage:</strong>
+            <span ng-repeat="stage in execution.currentStages">
+              {{stage.name}}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div ng-if="vm.triggers.length">
+        <div class="form-group">
+          <label class="col-md-4 sm-label-right">Trigger</label>
+          <div class="col-md-6">
+            <p class="form-control-static"
+               ng-if="vm.triggers.length === 1">{{vm.command.trigger.description}}</p>
+            <select class="form-control input-sm"
+                    ng-if="vm.triggers.length > 1"
+                    ng-model="vm.command.trigger"
+                    ng-options="trigger as trigger.description for trigger in vm.triggers"
+                    ng-change="vm.triggerUpdated(trigger)">
+            </select>
+          </div>
+        </div>
+        <div ng-include="vm.triggerTemplate"></div>
+      </div>
+
+      <div class="form-group" ng-if="vm.showRebakeOption">
+        <label class="col-md-4 sm-label-right">Rebake</label>
+        <div class="checkbox col-md-6">
+          <label>
+            <input type="checkbox" ng-model="vm.command.trigger.rebake"/>
+            Force Rebake
+          </label>
+          <help-field key="execution.forceRebake"></help-field>
+        </div>
+      </div>
+
+      <div ng-if="vm.command.pipeline.parameterConfig !== undefined && vm.command.pipeline.parameterConfig.length">
+        <p class="manual-execution-parameters-description">This pipeline is parameterized. Please enter values for the parameters below.</p>
+        <div class="form-group" ng-repeat="parameter in vm.command.pipeline.parameterConfig">
+          <div class="col-md-4 sm-label-right break-word">
+            <b>{{parameter.name}}</b>
+            <help-field content="{{parameter.description}}" ng-if="parameter.description"></help-field>
+          </div>
+          <div class="col-md-6" ng-if="!parameter.hasOptions">
+            <input type="text" class="form-control input-sm" ng-model="vm.parameters[parameter.name]"/>
+          </div>
+          <div class="col-md-6" ng-if="parameter.hasOptions">
+            <ui-select ng-model="vm.parameters[parameter.name]"
+                       style="width:100%"
+                       class="form-control input-sm">
+              <ui-select-match>
+                <strong>{{$select.selected.value}}</strong>
+              </ui-select-match>
+              <ui-select-choices repeat="option.value as option in parameter.options">
+                <div><strong>{{option.value}}</strong></div>
+              </ui-select-choices>
+            </ui-select>
+          </div>
+        </div>
+      </div>
+
+      <div ng-if="vm.hasStageOf('createProperty')">
+
+        <p class="manual-execution-parameters-description">This pipeline contains <b>Persisted Property Stages</b>. Please enter the properties and values for each stage below.</p>
+
+        <div ng-repeat="stage in vm.getStagesOf('createProperty')">
+          <h4>Stage: {{stage.name}}</h4>
+          <p><b>Scope:</b> {{stage.scope | inlinePropertyScope}}</p>
+
+          <label>
+            Enable Rollback <help-field key="pipeline.config.fastProperty.rollback"></help-field>
+            <input
+              type="checkbox"
+              style="margin-top: 10px; margin-left: 10px;"
+              ng-model="stage.rollbackProperties" >
+          </label>
+
+          <persisted-property-create-list
+            stage="stage"
+            property-list="stage.persistedProperties">
+          </persisted-property-create-list>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="col-md-4 sm-label-right">Notifications</label>
+        <div class="col-md-8">
+          <div class="checkbox checkbox-notify">
+            <label>
+              <input type="checkbox" ng-model="vm.command.notificationEnabled"> Notify me when the pipeline completes
+            </label>
+          </div>
+          <div ng-if="vm.notifications.length === 1" class="small">
+            There is <a uib-popover-template="vm.notificationTooltip" popover-placement="bottom">one notification</a> configured for this pipeline
+          </div>
+          <div ng-if="vm.notifications.length > 1" class="small">
+            There are <a uib-popover-template="vm.notificationTooltip" popover-placement="bottom" popover-trigger="'mouseenter'">{{vm.notifications.length}} notifications</a> configured for this pipeline</div>
+        </div>
+      </div>
+      <div class="form-group" ng-if="vm.command.notificationEnabled">
+        <div class="col-md-8 col-md-offset-2">
+          <notification-selector notification="vm.command.notification"></notification-selector>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-default" ng-click="vm.cancel()">Cancel</button>
+      <button type="submit"
+              class="btn btn-primary"
+              ng-disabled="!vm.command.pipeline"
+              ng-click="vm.execute()">
+        <span class="glyphicon glyphicon-play"></span> Run
+      </button>
+    </div>
+  </form>
+</div>

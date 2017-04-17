@@ -1,0 +1,58 @@
+<div class="details-panel">
+  <div class="header" ng-if="state.loading">
+    <div class="close-button" ng-if="!state.standalone">
+      <a class="btn btn-link"
+         ui-sref="^">
+        <span class="glyphicon glyphicon-remove"></span>
+      </a>
+    </div>
+    <h4 class="text-center">
+      <span us-spinner="{radius:20, width:6, length: 12}"></span>
+    </h4>
+  </div>
+
+  <div class="header" ng-if="!state.loading">
+    <div class="close-button" ng-if="!state.standalone">
+      <a class="btn btn-link"
+         ui-sref="^">
+        <span class="glyphicon glyphicon-remove"></span>
+      </a>
+    </div>
+    <div class="header-text">
+      <span class="glyphicon glyphicon-hdd {{instance.healthState}}"></span>
+      <h3 select-on-dbl-click>
+        {{instance ? instance.instanceId : instanceIdNotFound}}
+      </h3>
+    </div>
+  </div>
+  <div class="content" ng-if="!state.loading && instance">
+    <collapsible-section heading="Instance Information" expanded="true">
+      <dl class="dl-horizontal dl-flex">
+        <dt>Launched</dt>
+        <dd ng-if="instance.launchTime">{{instance.launchTime | timestamp}}</dd>
+        <dd ng-if="!instance.launchTime">(Unknown)</dd>
+        <dt>In</dt>
+        <dd>
+          <account-tag account="instance.account" provider="instance.provider" pad="right"></account-tag>
+          {{instance.region || '(Unknown)'}}
+        </dd>
+        <dt>Type</dt>
+        <dd>{{instance.instanceType || '(Unknown)'}}</dd>
+        <dt ng-if="instance.serverGroup">Server Group</dt>
+        <dd ng-if="instance.serverGroup">
+          <a ui-sref="^.serverGroup({region: instance.region,
+              accountId: instance.account,
+              serverGroup: instance.serverGroup,
+              provider: instance.provider})">{{instance.serverGroup}}</a>
+        </dd>
+      </dl>
+    </collapsible-section>
+  </div>
+  <div class="content" ng-if="!state.loading && !instance">
+    <div class="content-section">
+      <div class="content-body text-center">
+        <h3>Instance not found.</h3>
+      </div>
+    </div>
+  </div>
+</div>

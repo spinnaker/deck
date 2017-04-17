@@ -1,0 +1,46 @@
+@import "../../presentation/less/imports/commonImports.less";
+
+notifier {
+  .user-notifications {
+    position: fixed;
+    width: 100%;
+    z-index: 3;
+  }
+  .user-notifications-top {
+    top: 60px;
+    .user-notification {
+      background-color: @warning-background;
+    }
+  }
+  .user-notifications-bottom {
+    bottom: 5px;
+  }
+  user-notification {
+    width: 100%;
+  }
+  .user-notification {
+    .fade-in(0.1);
+    text-align: center;
+    font-size: 120%;
+    margin: 10px;
+    padding: 10px;
+    background-color: @bootstrap_info;
+    box-shadow: 0 2px 5px @mid_lighter_grey;
+    & > .message {
+      display: inline-block;
+      padding-right: 30px;
+      .action {
+        display: inline-block;
+        padding: 0 10px;
+        font-weight: 600;
+      }
+    }
+    & > a.close-notification {
+      width: 20px;
+      position: absolute;
+      top: 16px;
+      right: 20px;
+      color: @text-color;
+    }
+  }
+}

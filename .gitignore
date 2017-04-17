@@ -1,0 +1,29 @@
+# OS Generated Files #
+*.swp
+.DS_Store
+ehthumbs.db
+Icon?
+Thumbs.db
+
+# IDE Files
+*.ipr
+*.iws
+*.iml
+.idea/
+
+# Node Files #
+npm-debug.log
+node_modules/
+test/google/node_modules/
+
+# Build Files
+.awcache/
+.gradle/
+.happypack/
+build/
+dist/
+transpiled/
+
+# Test & Coverage
+coverage/
+test-results.xml

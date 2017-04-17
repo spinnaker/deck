@@ -1,0 +1,25 @@
+<dirty-instance-type-notification command="command"></dirty-instance-type-notification>
+<div class="form-group">
+  <div class="col-md-5 sm-label-right">
+    <b>Cores</b>
+    <help-field key="gce.instance.customInstance.cores"></help-field>
+  </div>
+  <div class="col-md-3">
+    <select class="form-control input-sm"
+            ng-options="vCpuCount for vCpuCount in command.backingData.customInstanceTypes.vCpuList"
+            ng-model="command.viewState.customInstance.vCpuCount">
+    </select>
+  </div>
+</div>
+<div class="form-group">
+  <div class="col-md-5 sm-label-right">
+    <b>Memory (Gb)</b>
+    <help-field key="gce.instance.customInstance.memory"></help-field>
+  </div>
+  <div class="col-md-3">
+    <select class="form-control input-sm"
+            ng-options="memory for memory in command.backingData.customInstanceTypes.memoryList"
+            ng-model="command.viewState.customInstance.memory">
+    </select>
+  </div>
+</div>
