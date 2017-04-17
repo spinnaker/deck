@@ -74,6 +74,8 @@
         <dd ng-show="serverGroup.revision">{{serverGroup.revision}}</dd>
         <dt>Kube UI</dt>
         <dd><a href={{ctrl.uiLink()}} target="_blank">{{serverGroup.name}}</a></dd>
+        <dt>TERM Period</dt>
+        <dd>{{serverGroup.deployDescription.terminationGracePeriodSeconds}}&nbsp;second(s)</dd>
       </dl>
     </collapsible-section>
     <collapsible-section heading="Health" expanded="true">
