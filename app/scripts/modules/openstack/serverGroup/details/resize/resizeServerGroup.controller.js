@@ -19,7 +19,7 @@ module.exports = angular.module('spinnaker.openstack.serverGroup.details.resize.
       max: serverGroup.scalingConfig.maxSize,
       desired: serverGroup.scalingConfig.desiredSize
     };
-
+    
     $scope.verification = {};
 
     $scope.command = {
