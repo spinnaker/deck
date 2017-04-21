@@ -66,13 +66,35 @@
       </div>
 
       <div class="form-group" ng-if="vm.showRebakeOption">
-        <label class="col-md-4 sm-label-right">Rebake</label>
-        <div class="checkbox col-md-6">
+        <label class="col-md-4 sm-label-right">
+          Rebake
+          <help-field key="execution.forceRebake"></help-field>
+        </label>
+        <div class="col-md-6" ng-if="vm.ternaryRebakeOption">
+          <div class="radio">
+            <label>
+              <input type="radio" ng-model="vm.command.trigger.rebake" ng-value="undefined">
+              Defer to the stage configuration to determine whether to rebake
+            </label>
+          </div>
+          <div class="radio">
+            <label>
+              <input type="radio" ng-model="vm.command.trigger.rebake" ng-value="true">
+              Rebake all, even if the package hasn't changed
+            </label>
+          </div>
+          <div class="radio">
+            <label>
+              <input type="radio" ng-model="vm.command.trigger.rebake" ng-value="false">
+              Only rebake if a new package is detected
+            </label>
+          </div>
+        </div>
+        <div class="checkbox col-md-6" ng-if="!vm.ternaryRebakeOption">
           <label>
             <input type="checkbox" ng-model="vm.command.trigger.rebake"/>
             Force Rebake
           </label>
-          <help-field key="execution.forceRebake"></help-field>
         </div>
       </div>
 
