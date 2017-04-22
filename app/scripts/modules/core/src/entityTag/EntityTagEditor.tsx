@@ -18,18 +18,18 @@ import { NgReact } from 'core/reactShims/ngReact';
 import { EntityRefBuilder } from './entityRef.builder';
 import { noop } from 'core/utils';
 
-import './entityTagEditor.modal.less';
+import './EntityTagEditor.less';
 import { Form } from 'formsy-react';
 
 export interface IOwnerOption {
   label: string;
   type: string;
-  owner: any;
+  owner: IEntityRef;
   isDefault: boolean;
 }
 
 export interface IEntityTagEditorProps {
-  owner: any;
+  owner: IEntityRef;
   application: Application;
   entityType: string;
   tag: IEntityTag;
@@ -38,7 +38,7 @@ export interface IEntityTagEditorProps {
   isNew: boolean;
   show?: boolean;
   onHide?(event: any): void;
-  onUpdate?(): any;
+  onUpdate?(): void;
 }
 
 export interface IEntityTagEditorState {
@@ -47,7 +47,7 @@ export interface IEntityTagEditorState {
   show: boolean;
   isValid: boolean;
   isSubmitting: boolean;
-  owner: any;
+  owner: IEntityRef;
   entityType: string;
 }
 
@@ -72,7 +72,7 @@ export class EntityTagEditor extends React.Component<IEntityTagEditorProps, IEnt
     super(props);
 
     const { ownerOptions, tag, entityType } = this.props;
-    const owner = this.props.owner || (ownerOptions && ownerOptions.length && ownerOptions[0]);
+    const owner = this.props.owner || (ownerOptions && ownerOptions.length && ownerOptions[0].owner);
     tag.name = tag.name || `spinnaker_ui_${tag.value.type}:${UUIDGenerator.generateUuid()}`;
 
     this.state = {

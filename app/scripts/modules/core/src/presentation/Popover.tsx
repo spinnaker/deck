@@ -3,10 +3,11 @@ import { OverlayTrigger, Popover as BSPopover } from 'react-bootstrap';
 
 import { Placement } from 'core/presentation/Placement';
 
-interface IProps {
+export interface IProps {
   value?: string;
   template?: JSX.Element;
   placement?: Placement;
+  container?: any;
 }
 
 export class Popover extends React.Component<IProps, void> {
@@ -16,14 +17,15 @@ export class Popover extends React.Component<IProps, void> {
   };
 
   public render() {
-    let popover = <BSPopover id={this.props.value}>{this.props.value}</BSPopover>;
-    if (this.props.template) {
-      popover = <BSPopover id={this.props.value}>{this.props.template}</BSPopover>;
+    const { value, template, placement, container, children } = this.props;
+    let popover = <BSPopover id={value}>{value}</BSPopover>;
+    if (template) {
+      popover = <BSPopover id={value}>{template}</BSPopover>;
     }
 
     return (
-      <OverlayTrigger placement={this.props.placement} overlay={popover}>
-        {this.props.children}
+      <OverlayTrigger placement={placement} overlay={popover} container={container}>
+        {children}
       </OverlayTrigger>
     );
   }
