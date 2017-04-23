@@ -32,7 +32,17 @@
           <aws-simple-policy-action command="ctrl.command"
                                     view-state="ctrl.viewState"></aws-simple-policy-action>
         </div>
+
         <div ng-if="ctrl.command.step">
+
+          <div class="row">
+            <div class="col-md-10 col-md-offset-1">
+              <p>
+                <strong>Switch to a <a href ng-click="ctrl.switchMode()">simple policy</a>.</strong>
+              </p>
+            </div>
+          </div>
+
           <aws-step-policy-action command="ctrl.command"
                                   view-state="ctrl.viewState"
                                   bounds-changed="ctrl.boundsChanged()"></aws-step-policy-action>
