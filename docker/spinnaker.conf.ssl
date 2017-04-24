@@ -1,5 +1,10 @@
 <VirtualHost {%DECK_HOST%}:{%DECK_PORT%}>
   SSLEngine on
+  SSLProxyEngine on
+  SSLProxyVerify none
+  SSLProxyCheckPeerCN off
+  SSLProxyCheckPeerName off
+  SSLProxyCheckPeerExpire off
   SSLCertificateFile "{%DECK_CERT_PATH%}"
   SSLCertificateKeyFile "{%DECK_KEY_PATH%}"
   
