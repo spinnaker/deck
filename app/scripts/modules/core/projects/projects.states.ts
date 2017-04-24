@@ -36,6 +36,7 @@ module(PROJECTS_STATES_CONFIG, [
 
   const project: INestedState = {
     name: 'project',
+    abstract: true,
     url: '/projects/{project}',
     resolve: {
       projectConfiguration: ['$stateParams', 'projectReader', ($stateParams: IProjectStateParms, projectReader: any) => {
