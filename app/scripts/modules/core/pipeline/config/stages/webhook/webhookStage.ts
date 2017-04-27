@@ -6,12 +6,18 @@ import {PIPELINE_CONFIG_PROVIDER} from 'core/pipeline/config/pipelineConfigProvi
 interface IViewState {
   waitForCompletion?: boolean;
   statusUrlResolution: string;
+  headers: IHeader[]
 }
 
 interface ICommand {
   errorMessage?: string;
   invalid?: boolean;
   payloadJSON: string;
+}
+
+interface IHeader {
+  name?: string;
+  value?: string;
 }
 
 export class WebhookStage {
@@ -29,12 +35,15 @@ export class WebhookStage {
 
     this.viewState = {
       waitForCompletion: this.stage.waitForCompletion || false,
-      statusUrlResolution: this.stage.statusUrlResolution || 'getMethod'
+      statusUrlResolution: this.stage.statusUrlResolution || 'getMethod',
+      headers: this.stage.headers || []
     };
 
     this.command = {
       payloadJSON: this.jsonUtilityService.makeSortedStringFromObject(this.stage.payload || {}),
     };
+
+    this.stage.statusUrlResolution = this.viewState.statusUrlResolution;
   }
 
   public updatePayload(): void {
@@ -46,6 +55,16 @@ export class WebhookStage {
       this.command.invalid = true;
       this.command.errorMessage = e.message;
     }
+  }
+
+  public addHeader(): void {
+    this.viewState.headers.push({name: '', value: ''});
+    this.stage.headers = this.viewState.headers
+  }
+
+  public removeHeader(index: number): void {
+    this.viewState.headers.splice(index, 1);
+    this.stage.headers = this.viewState.headers
   }
 
   public waitForCompletionChanged(): void {

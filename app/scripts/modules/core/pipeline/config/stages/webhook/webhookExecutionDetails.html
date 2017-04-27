@@ -7,6 +7,8 @@
         <dl class="dl-narrow dl-horizontal">
           <dt>Url</dt>
           <dd>{{ctrl.stage.context.url}}</dd>
+          <dt>Headers</dt>
+          <dd ng-repeat="header in ctrl.stage.context.headers">{{header.name}}: {{header.value}}</dd>
           <dt>Payload</dt>
           <dd>{{ctrl.stage.context.payload}}</dd>
         </dl>
