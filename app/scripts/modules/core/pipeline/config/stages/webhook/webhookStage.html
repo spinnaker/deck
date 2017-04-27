@@ -2,6 +2,40 @@
   <stage-config-field label="Webhook URL">
     <input type="text" class="form-control input-sm" ng-model="$ctrl.stage.url"/>
   </stage-config-field>
+
+  <div class="container-fluid form-horizontal">
+    <div class="form-group ">
+      <div class="col-md-9 col-sm-offset-3">
+        <table class="table table-condensed packed">
+          <thead>
+          <tr>
+            <th>Headers</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr ng-repeat="header in $ctrl.viewState.headers">
+            <td>
+              <input class="form-control input-sm" type="text" placeholder="name" ng-model="header.name"  required/>
+            </td>
+            <td>
+              <input class="form-control input-sm" type="text" placeholder="value" ng-model="header.value" required/>
+            </td>
+            <td><a href class="sm-label" ng-click="$ctrl.removeHeader($index)"><span class="glyphicon glyphicon-trash"></span></a></td>
+          </tr>
+          </tbody>
+          <tfoot>
+          <tr>
+            <td colspan="9">
+              <button class="add-new col-md-9" ng-click="$ctrl.addHeader()"><span class="glyphicon glyphicon-plus-sign"></span> Add New Header
+              </button>
+            </td>
+          </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+
   <stage-config-field label="Method">
     <ui-select ng-model="$ctrl.stage.method" class="form-control input-sm">
       <ui-select-match placeholder="Select a method...">{{$select.selected}}</ui-select-match>
