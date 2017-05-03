@@ -439,5 +439,5 @@ export class UrlBuilderService {
 }
 
 export const URL_BUILDER_SERVICE = 'spinnaker.core.navigation.urlBuilder.service';
-module(URL_BUILDER_SERVICE, [require('angular-ui-router')])
+module(URL_BUILDER_SERVICE, [require('angular-ui-router').default])
   .service('urlBuilderService', UrlBuilderService);

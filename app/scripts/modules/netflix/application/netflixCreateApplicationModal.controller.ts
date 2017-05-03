@@ -60,7 +60,7 @@ class NetflixCreateApplicationModalController {
 }
 export const NETFLIX_CREATE_APPLICATION_MODAL_CONTROLLER = 'spinnaker.netflix.application.create.modal.controller';
 module(NETFLIX_CREATE_APPLICATION_MODAL_CONTROLLER, [
-  require('angular-ui-router'),
+  require('angular-ui-router').default,
   APPLICATION_WRITE_SERVICE,
   APPLICATION_READ_SERVICE,
   ACCOUNT_SERVICE,

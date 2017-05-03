@@ -469,7 +469,7 @@ export class ClusterFilterService {
 
 export const CLUSTER_FILTER_SERVICE = 'spinnaker.core.cluster.filter.service';
 module(CLUSTER_FILTER_SERVICE, [
-  require('angular-ui-router'),
+  require('angular-ui-router').default,
   require('./clusterFilter.model'),
   require('./multiselect.model'),
   require('../../utils/waypoints/waypoint.service'),

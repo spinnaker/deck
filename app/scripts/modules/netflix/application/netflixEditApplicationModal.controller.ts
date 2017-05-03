@@ -40,7 +40,7 @@ class NetflixEditApplicationModalController {
 
 export const NETFLIX_EDIT_APPLICATION_MODAL_CONTROLLER = 'spinnaker.netflix.application.edit.modal.controller';
 module(NETFLIX_EDIT_APPLICATION_MODAL_CONTROLLER, [
-  require('angular-ui-router'),
+  require('angular-ui-router').default,
   APPLICATION_WRITE_SERVICE,
   ACCOUNT_SERVICE,
   PAGER_DUTY_SELECT_FIELD_COMPONENT,

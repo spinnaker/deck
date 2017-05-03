@@ -69,7 +69,7 @@ class FastPropertyPods implements IComponentOptions {
 export const FAST_PROPERTY_PODS = 'spinnaker.netflix.globalFastProperty.pods.component';
 
 module(FAST_PROPERTY_PODS, [
-  require('angular-ui-router'),
+  require('angular-ui-router').default,
 ])
   .component('fastPropertyPods', new FastPropertyPods());
 

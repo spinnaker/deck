@@ -36,5 +36,5 @@ export class ExecutionDetailsSectionService {
 
 export const EXECUTION_DETAILS_SECTION_SERVICE = 'spinnaker.executionDetails.section.service';
 module(EXECUTION_DETAILS_SECTION_SERVICE, [
-  require('angular-ui-router'),
+  require('angular-ui-router').default,
 ]).service('executionDetailsSectionService', ExecutionDetailsSectionService);

@@ -57,7 +57,7 @@ export class StateConfigProvider implements ng.IServiceProvider {
 
 export const STATE_CONFIG_PROVIDER = 'spinnaker.core.navigation.state.config.provider';
 module(STATE_CONFIG_PROVIDER, [
-  require('angular-ui-router'),
+  require('angular-ui-router').default,
   STATE_HELPER,
 ]).provider('stateConfig', StateConfigProvider)
   .config(($urlRouterProvider: IUrlRouterProvider) => {

@@ -20,9 +20,15 @@
   dependencies:
     "@types/angular" "*"
 
-"@types/angular@*", "@types/angular@1.6.10", "@types/angular@^1.6.7", "@types/angular@^1.6.9":
+"@types/angular@*", "@types/angular@^1.6.7", "@types/angular@^1.6.9":
   version "1.6.10"
   resolved "https://registry.yarnpkg.com/@types/angular/-/angular-1.6.10.tgz#1c6a458305c85b16c98fe5173b843a836dbc2b67"
+  dependencies:
+    "@types/jquery" "*"
+
+"@types/angular@1.6.3":
+  version "1.6.3"
+  resolved "https://registry.yarnpkg.com/@types/angular/-/angular-1.6.3.tgz#48d0d86cec90ffe3fd90e134da6d54759351f799"
   dependencies:
     "@types/jquery" "*"
 
@@ -465,9 +471,9 @@ angular-messages@~1.6.3:
   version "1.6.4"
   resolved "https://registry.yarnpkg.com/angular-messages/-/angular-messages-1.6.4.tgz#9ec9c1393293b14de54161d2f849776489e980fe"
 
-angular-mocks@1.5.8:
-  version "1.5.8"
-  resolved "https://registry.yarnpkg.com/angular-mocks/-/angular-mocks-1.5.8.tgz#2e9399056669f286a681396bc35ae0d7c5c70d16"
+angular-mocks@1.6.3:
+  version "1.6.3"
+  resolved "https://registry.yarnpkg.com/angular-mocks/-/angular-mocks-1.6.3.tgz#12fafc0f1e0903f16864004ba375bf3fb9101ef1"
 
 angular-sanitize@~1.6.3:
   version "1.6.4"

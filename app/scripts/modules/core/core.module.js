@@ -50,7 +50,7 @@ module.exports = angular
   .module('spinnaker.core', [
     require('angular-messages'),
     require('angular-sanitize'),
-    require('angular-ui-router'),
+    require('angular-ui-router').default,
     require('angular-ui-bootstrap'),
     require('exports-loader?"angular.filter"!angular-filter'),
     require('exports-loader?"ui.select"!ui-select'),
