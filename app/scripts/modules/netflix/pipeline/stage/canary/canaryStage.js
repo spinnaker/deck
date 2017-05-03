@@ -3,18 +3,20 @@
 import {isString, toInteger} from 'lodash';
 let angular = require('angular');
 
+import {CanaryExecutionLabel} from './CanaryExecutionLabel';
 import {CLOUD_PROVIDER_REGISTRY} from 'core/cloudProvider/cloudProvider.registry';
 import {SERVER_GROUP_COMMAND_BUILDER_SERVICE} from 'core/serverGroup/configure/common/serverGroupCommandBuilder.service';
 import {LIST_EXTRACTOR_SERVICE} from 'core/application/listExtractor/listExtractor.service';
-import {CANARY_SCORE_CONFIG_COMPONENT} from './canaryScore.component';
+import {PIPELINE_CONFIG_PROVIDER} from 'core/pipeline/config/pipelineConfigProvider';
+import {CANARY_SCORES_CONFIG_COMPONENT} from './canaryScores.component';
 import {NetflixSettings} from '../../../netflix.settings';
 
 module.exports = angular.module('spinnaker.netflix.pipeline.stage.canaryStage', [
   LIST_EXTRACTOR_SERVICE,
   CLOUD_PROVIDER_REGISTRY,
   SERVER_GROUP_COMMAND_BUILDER_SERVICE,
-  CANARY_SCORE_CONFIG_COMPONENT,
-  require('core/pipeline/config/pipelineConfigProvider')
+  CANARY_SCORES_CONFIG_COMPONENT,
+  PIPELINE_CONFIG_PROVIDER
 ])
   .config(function (pipelineConfigProvider) {
 
@@ -43,7 +45,7 @@ module.exports = angular.module('spinnaker.netflix.pipeline.stage.canaryStage', 
         templateUrl: require('./canaryStage.html'),
         executionDetailsUrl: require('./canaryExecutionDetails.html'),
         executionSummaryUrl: require('./canaryExecutionSummary.html'),
-        executionLabelTemplateUrl: require('./canaryExecutionLabel.html'),
+        executionLabelComponent: CanaryExecutionLabel,
         stageFilter: (stage) => ['canaryDeployment', 'canary'].includes(stage.type),
         controller: 'CanaryStageCtrl',
         controllerAs: 'canaryStageCtrl',

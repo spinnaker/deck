@@ -6,6 +6,7 @@ let angular = require('angular');
 import {ACCOUNT_LABEL_COLOR_COMPONENT} from './account/accountLabelColor.component';
 import {AUTHENTICATION} from './authentication/authentication.module';
 import {API_SERVICE} from './api/api.service';
+import {CANCEL_MODAL_SERVICE} from './cancelModal/cancelModal.service';
 import {CLOUD_PROVIDER_LOGO} from './cloudProvider/cloudProviderLogo.component';
 import {CORE_DIFF_MODULE} from './diffs';
 import {HELP_FIELD_COMPONENT} from './help/helpField.component';
@@ -16,23 +17,27 @@ import {VERSION_CHECK_SERVICE} from './config/versionCheck.service';
 import {CORE_WIDGETS_MODULE} from './widgets';
 import {TRAVIS_STAGE_MODULE} from './pipeline/config/stages/travis/travisStage.module';
 import {WEBHOOK_STAGE_MODULE} from './pipeline/config/stages/webhook/webhookStage.module';
+import {UNMATCHED_STAGE_TYPE_STAGE} from './pipeline/config/stages/unmatchedStageTypeStage/unmatchedStageTypeStage';
 import {SETTINGS} from 'core/config/settings';
 import {INSIGHT_NGMODULE} from './insight/insight.module';
+import {REPLACE_FILTER} from './filter/replace.filter';
+import {PIPELINE_TEMPLATE_MODULE} from './pipeline/config/templates/pipelineTemplate.module';
 
 require('../../../fonts/spinnaker/icons.css');
 
-require('Select2');
-require('jquery-ui');
+import 'Select2';
+import 'jquery-ui';
 // Must come after jquery-ui - we want the bootstrap tooltip, JavaScript is fun
-require('bootstrap/dist/js/bootstrap.js');
-require('bootstrap/dist/css/bootstrap.css');
-require('select2-bootstrap-css/select2-bootstrap.css');
-require('Select2/select2.css');
-require('ui-select/dist/select.css');
+import 'bootstrap/dist/js/bootstrap.js';
+import 'bootstrap/dist/css/bootstrap.css';
+import 'select2-bootstrap-css/select2-bootstrap.css';
+import 'Select2/select2.css';
+import 'ui-select/dist/select.css';
 
-require('source-sans-pro');
+import 'source-sans-pro';
 
-require('font-awesome/css/font-awesome.css');
+import 'font-awesome/css/font-awesome.css';
+import 'react-select/dist/react-select.css';
 
 // load all templates into the $templateCache
 var templates = require.context('./', true, /\.html$/);
@@ -62,7 +67,9 @@ module.exports = angular
     API_SERVICE,
 
     require('./cache/caches.module.js'),
+    CANCEL_MODAL_SERVICE,
     CLOUD_PROVIDER_LOGO,
+    PIPELINE_TEMPLATE_MODULE,
     CORE_DIFF_MODULE,
     require('./cloudProvider/cloudProviderLabel.directive.js'),
     require('./cloudProvider/serviceDelegate.service.js'),
@@ -132,12 +139,15 @@ module.exports = angular
     require('./pipeline/config/preconditions/types/clusterSize/clusterSize.precondition.type.module.js'),
     require('./pipeline/config/preconditions/types/expression/expression.precondition.type.module.js'),
     require('./presentation/presentation.module.js'),
+    REPLACE_FILTER,
 
     require('./search/search.module.js'),
     require('./securityGroup/securityGroup.module.js'),
     require('./serverGroup/serverGroup.module.js'),
 
     require('./task/task.module.js'),
+
+    UNMATCHED_STAGE_TYPE_STAGE,
 
     require('./utils/utils.module.js'),
 

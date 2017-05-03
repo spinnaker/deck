@@ -2,13 +2,15 @@
 
 import _ from 'lodash';
 
+import {BakeExecutionLabel} from 'core/pipeline/config/stages/bake/BakeExecutionLabel';
 import {BAKERY_SERVICE} from 'core/pipeline/config/stages/bake/bakery.service';
+import {PIPELINE_CONFIG_PROVIDER} from 'core/pipeline/config/pipelineConfigProvider';
 import {SETTINGS} from 'core/config/settings';
 
 let angular = require('angular');
 
 module.exports = angular.module('spinnaker.core.pipeline.stage.azure.bakeStage', [
-  require('core/pipeline/config/pipelineConfigProvider.js'),
+  PIPELINE_CONFIG_PROVIDER,
   require('./bakeExecutionDetails.controller.js'),
   BAKERY_SERVICE,
   require('core/pipeline/config/stages/bake/modal/addExtendedAttribute.controller.modal.js'),
@@ -21,7 +23,7 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.azure.bakeStage',
       description: 'Bakes an image in the specified region',
       templateUrl: require('./bakeStage.html'),
       executionDetailsUrl: require('./bakeExecutionDetails.html'),
-      executionLabelTemplateUrl: require('core/pipeline/config/stages/bake/bakeExecutionLabel.html'),
+      executionLabelComponent: BakeExecutionLabel,
       extraLabelLines: (stage) => {
         return stage.masterStage.context.allPreviouslyBaked || stage.masterStage.context.somePreviouslyBaked ? 1 : 0;
       },

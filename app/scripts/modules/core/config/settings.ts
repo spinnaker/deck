@@ -35,6 +35,7 @@ export interface IFeatures {
   jobs?: boolean;
   snapshots?: boolean;
   dockerBake?: boolean;
+  pipelineTemplates?: boolean;
   [key: string]: any;
 }
 
@@ -58,7 +59,7 @@ export interface ISpinnakerSettings {
   gitSources: string[];
   triggerTypes: string[];
   analytics: {
-    ga?: boolean;
+    ga?: string;
   };
   feature: IFeatures;
   executionWindow?: {
@@ -80,6 +81,7 @@ export const SETTINGS: ISpinnakerSettings = (<any>window).spinnakerSettings;
 SETTINGS.feature = SETTINGS.feature || {};
 SETTINGS.analytics = SETTINGS.analytics || {};
 SETTINGS.providers = SETTINGS.providers || {};
+SETTINGS.defaultTimeZone = SETTINGS.defaultTimeZone || 'America/Los_Angeles';
 
 // A helper to make resetting settings to steady state after running tests easier
 const originalSettings: ISpinnakerSettings = cloneDeep(SETTINGS);

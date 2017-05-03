@@ -1,7 +1,6 @@
 const webpack = require('webpack');
 const HappyPack = require('happypack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const {CheckerPlugin} = require('awesome-typescript-loader');
 
 const path = require('path');
 const NODE_MODULE_PATH = path.join(__dirname, 'node_modules');
@@ -24,7 +23,7 @@ function configure(IS_TEST) {
         moduleExtensions: ['-loader']
       },
     resolve: {
-      extensions: ['.json', '.js', '.ts', '.css', '.less', '.html'],
+      extensions: ['.json', '.js', '.jsx', '.ts', '.tsx', '.css', '.less', '.html'],
       modules: [
         NODE_MODULE_PATH,
         path.join(__dirname, 'app', 'scripts', 'modules'),
@@ -32,10 +31,10 @@ function configure(IS_TEST) {
     },
     module: {
       rules: [
-        {enforce: 'pre', test: /\.(spec\.)?ts$/, use: 'tslint-loader'},
+        {enforce: 'pre', test: /\.(spec\.)?tsx?$/, use: 'tslint-loader'},
         {enforce: 'pre', test: /\.(spec\.)?js$/, loader: 'eslint-loader'},
         {test: /\.json$/, loader: 'json-loader'},
-        {test: /\.ts$/, use: 'awesome-typescript-loader', exclude: /node_modules/},
+        {test: /\.tsx?$/, use: 'awesome-typescript-loader', exclude: /node_modules/},
         {test: /\.(woff|otf|ttf|eot|svg|png|gif|ico)(.*)?$/, use: 'file-loader'},
         {test: /\.js$/, use: ['happypack/loader?id=js'], exclude: /node_modules(?!\/clipboard)/},
         {
@@ -67,7 +66,13 @@ function configure(IS_TEST) {
         host: process.env.DECK_HOST || 'localhost',
         https: process.env.DECK_HTTPS === 'true'
       },
-    watch: IS_TEST
+    watch: IS_TEST,
+    externals: {
+      'cheerio': 'window',
+      'react/addons': 'react',
+      'react/lib/ExecutionEnvironment': 'react',
+      'react/lib/ReactContext': 'react',
+    },
   };
 
   if (process.env.DECK_CERT) {
@@ -110,10 +115,7 @@ function configure(IS_TEST) {
       vendor: [
         'jquery', 'angular', 'angular-ui-bootstrap', 'angular-ui-router', 'source-sans-pro',
         'angular-cache', 'angular-marked', 'angular-messages', 'angular-sanitize', 'bootstrap',
-        'clipboard', 'd3', 'jquery-ui', 'moment-timezone', 'rxjs', 'reflect-metadata', 'zone.js',
-        '@angular/platform-browser', '@angular/platform-browser-dynamic', '@angular/core',
-        '@angular/common', '@angular/forms', '@angular/http', '@angular/upgrade/static',
-        'zone.js/dist/wtf'
+        'clipboard', 'd3', 'jquery-ui', 'moment-timezone', 'rxjs'
       ]
     };
 
@@ -146,8 +148,6 @@ function configure(IS_TEST) {
       })
     ]);
   }
-
-  config.plugins.push(new webpack.ContextReplacementPlugin(/angular(\\|\/)core(\\|\/)@angular/, path.resolve(__dirname, '../src')));
 
   // this is temporary and will be deprecated in WP3.  moving forward,
   // loaders will individually need to accept this as an option.

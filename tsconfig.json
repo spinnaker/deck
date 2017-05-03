@@ -6,6 +6,7 @@
     "baseUrl": "app/scripts/modules",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "jsx": "react",
     "lib": [
       "es2016",
       "dom"
@@ -41,7 +42,8 @@
     "transpiled"
   ],
   "include": [
+    "test/helpers/custom-matchers.d.ts",
     "app/scripts/modules/**/*.ts",
-    "node_modules/zone.js/dist/zone.js.d.ts"
+    "app/scripts/modules/**/*.tsx"
   ]
 }

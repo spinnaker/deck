@@ -12,62 +12,38 @@ module.exports = angular.module('spinnaker.aws.instanceType.service', [
 ])
   .factory('awsInstanceTypeService', function ($http, $q, API, infrastructureCaches) {
 
-    var m3 = {
-      type: 'm3',
-      description: 'This family includes the m3 instance types and provides a balance of compute, memory, and network resources, and it is a good choice for many applications.',
+    var m4 = {
+      type: 'm4',
+      description: 'This family includes the m4 instance types and provides a balance of compute, memory, and network resources, and it is a good choice for many applications.',
       instanceTypes: [
         {
-          name: 'm3.medium',
-          label: 'Medium',
-          cpu: 1,
-          memory: 3.75,
-          storage: {
-            type: 'SSD',
-            size: 4,
-            count: 1
-          },
+          name: 'm4.large',
+          label: 'Large',
+          cpu: 2,
+          memory: 8,
+          storage: { type: 'EBS' },
           costFactor: 1
         },
         {
-          name: 'm3.large',
-          label: 'Large',
-          cpu: 2,
-          memory: 7.5,
-          storage: {
-            type: 'SSD',
-            size: 32,
-            count: 1
-          },
-          costFactor: 2
-        },
-        {
-          name: 'm3.xlarge',
+          name: 'm4.xlarge',
           label: 'XLarge',
           cpu: 4,
-          memory: 15,
-          storage: {
-            type: 'SSD',
-            size: 40,
-            count: 2
-          },
+          memory: 16,
+          storage: { type: 'EBS' },
           costFactor: 2
         },
         {
-          name: 'm3.2xlarge',
+          name: 'm4.2xlarge',
           label: '2XLarge',
           cpu: 8,
-          memory: 30,
-          storage: {
-            type: 'SSD',
-            size: 80,
-            count: 2
-          },
-          costFactor: 3
+          memory: 32,
+          storage: { type: 'EBS' },
+          costFactor: 2
         }
       ]
     };
 
-    var t2 = {
+    var t2gp = {
       type: 't2',
       description: 't2 instances are a good choice for workloads that don’t use the full CPU often or consistently, but occasionally need to burst (e.g. web servers, developer environments and small databases).',
       instanceTypes: [
@@ -85,81 +61,78 @@ module.exports = angular.module('spinnaker.aws.instanceType.service', [
           cpu: 2,
           memory: 4,
           storage: { type: 'EBS' },
-          costFactor: 2
-        }
-      ]
-    };
-
-    var m3micro = {
-      type: 'm3',
-      description: 'This family includes the m3 instance types and provides a balance of compute, memory, and network resources, and it is a good choice for many applications.',
-      instanceTypes: [
-        {
-          name: 'm3.medium',
-          label: 'Medium',
-          cpu: 1,
-          memory: 3.75,
-          storage: {
-            type: 'SSD',
-            size: 4,
-            count: 1
-          },
           costFactor: 1
         }
       ]
     };
 
-    var r3 = {
-      type: 'r3',
-      description: 'r3 instances are optimized for memory-intensive applications and have the lowest cost per GiB of RAM among Amazon EC2 instance types.',
+    var t2 = {
+      type: 't2',
+      description: 't2 instances are a good choice for workloads that don’t use the full CPU often or consistently, but occasionally need to burst (e.g. web servers, developer environments and small databases).',
       instanceTypes: [
         {
-          name: 'r3.large',
+          name: 't2.nano',
+          label: 'Nano',
+          cpu: 1,
+          memory: 0.5,
+          storage: { type: 'EBS' },
+          costFactor: 1
+        },
+        {
+          name: 't2.micro',
+          label: 'Micro',
+          cpu: 1,
+          memory: 1,
+          storage: { type: 'EBS' },
+          costFactor: 1
+        },
+        {
+          name: 't2.small',
+          label: 'Small',
+          cpu: 1,
+          memory: 2,
+          storage: { type: 'EBS' },
+          costFactor: 1
+        }
+      ]
+    };
+
+
+    var r4 = {
+      type: 'r4',
+      description: 'r4 instances are optimized for memory-intensive applications and have the lowest cost per GiB of RAM among Amazon EC2 instance types.',
+      instanceTypes: [
+        {
+          name: 'r4.large',
           label: 'Large',
           cpu: 2,
           memory: 15.25,
-          storage: {
-            type: 'SSD',
-            size: 32,
-            count: 1
-          },
+          storage: { type: 'EBS' },
           costFactor: 1
         },
         {
-          name: 'r3.xlarge',
+          name: 'r4.xlarge',
           label: 'XLarge',
           cpu: 4,
           memory: 30.5,
-          storage: {
-            type: 'SSD',
-            size: 80,
-            count: 1
-          },
+          storage: { type: 'EBS' },
           costFactor: 2
         },
         {
-          name: 'r3.2xlarge',
+          name: 'r4.2xlarge',
           label: '2XLarge',
           cpu: 8,
           memory: 61,
-          storage: {
-            type: 'SSD',
-            size: 160,
-            count: 1
-          },
-          costFactor: 3
+          storage: { type: 'EBS' },
+          costFactor: 2
         },
         {
-          name: 'r3.4xlarge',
+          name: 'r4.4xlarge',
           label: '4XLarge',
           cpu: 16,
           memory: 122,
-          storage: {
-            type: 'SSD',
-            size: 320,
-            count: 1
-          },
-          costFactor: 4
+          storage: { type: 'EBS' },
+          costFactor: 3
         }
       ]
     };
@@ -168,19 +141,19 @@ module.exports = angular.module('spinnaker.aws.instanceType.service', [
       {
         type: 'general',
         label: 'General Purpose',
-        families: [ m3 ],
+        families: [ m4, t2gp ],
         icon: 'hdd'
       },
       {
         type: 'memory',
         label: 'High Memory',
-        families: [ r3 ],
+        families: [ r4 ],
         icon: 'hdd'
       },
       {
         type: 'micro',
         label: 'Micro Utility',
-        families: [t2, m3micro],
+        families: [t2],
         icon: 'hdd'
       },
       {

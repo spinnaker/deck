@@ -4,23 +4,15 @@ import {chain, compact, debounce, find, flattenDeep, forOwn, get, groupBy, inclu
 
 import {Application} from 'core/application/application.model';
 import {EXECUTION_FILTER_MODEL, ExecutionFilterModel} from 'core/delivery/filter/executionFilter.model';
-import {IExecution} from 'core/domain/IExecution';
-import {IPipeline} from 'core/domain/IPipeline';
-
-interface IGroup {
-  heading: string;
-  executions: IExecution[];
-  config?: any;
-  runningExecutions?: IExecution[];
-  targetAccounts?: string[];
-}
+import {IExecution, IExecutionGroup, IPipeline} from 'core/domain';
+import {PIPELINE_CONFIG_PROVIDER} from 'core/pipeline/config/pipelineConfigProvider';
 
 export class ExecutionFilterService {
   private lastApplication: Application = null;
   private isFilterable: (sortFilterModel: any[]) => boolean;
 
   // this gets called every time the URL changes, so we debounce it a tiny bit
-  public updateExecutionGroups: (application: Application) => IGroup[];
+  public updateExecutionGroups: (application: Application) => IExecutionGroup[];
 
 
 
@@ -51,6 +43,7 @@ export class ExecutionFilterService {
       waypointService.restoreToWaypoint(application.name);
       this.executionFilterModel.addTags();
       this.lastApplication = application;
+      executionFilterModel.groupsUpdated.next();
       return groups;
     }, 25);
   }
@@ -123,7 +116,7 @@ export class ExecutionFilterService {
       .value();
   }
 
-  private addEmptyPipelines(groups: IGroup[], application: Application): void {
+  private addEmptyPipelines(groups: IExecutionGroup[], application: Application): void {
     const configs = application.pipelineConfigs.data || [];
     if (!this.isFilterable(this.executionFilterModel.sortFilter.pipeline) &&
       !this.isFilterable(this.executionFilterModel.sortFilter.status) &&
@@ -158,8 +151,8 @@ export class ExecutionFilterService {
     }
   }
 
-  private groupExecutions(filteredExecutions: IExecution[], application: Application): IGroup[] {
-    const groups: IGroup[] = [];
+  private groupExecutions(filteredExecutions: IExecution[], application: Application): IExecutionGroup[] {
+    const groups: IExecutionGroup[] = [];
     // limit based on sortFilter.count
     let executions: IExecution[] = [];
     forOwn(groupBy(filteredExecutions, 'name'), (groupedExecutions) => {
@@ -207,7 +200,7 @@ export class ExecutionFilterService {
     return groups;
   }
 
-  private diffExecutionGroups(oldGroups: IGroup[], newGroups: IGroup[]): void {
+  private diffExecutionGroups(oldGroups: IExecutionGroup[], newGroups: IExecutionGroup[]): void {
     const groupsToRemove: number[] = [];
 
     oldGroups.forEach((oldGroup, idx) => {
@@ -232,7 +225,7 @@ export class ExecutionFilterService {
     oldGroups.forEach((group) => group.executions.sort((a, b) => this.executionSorter(a, b)));
   }
 
-  private diffExecutions(oldGroup: IGroup, newGroup: IGroup): void {
+  private diffExecutions(oldGroup: IExecutionGroup, newGroup: IExecutionGroup): void {
     const toRemove: number[] = [];
     oldGroup.executions.forEach((execution, idx) => {
       const newExecution = find(newGroup.executions, { id: execution.id });
@@ -258,14 +251,14 @@ export class ExecutionFilterService {
     });
   }
 
-  private applyGroupsToModel(groups: IGroup[]): void {
+  private applyGroupsToModel(groups: IExecutionGroup[]): void {
     this.diffExecutionGroups(this.executionFilterModel.groups, groups);
 
     // sort groups in place so Angular doesn't try to update the world
-    this.executionFilterModel.groups.sort((a: IGroup, b: IGroup) => this.executionGroupSorter(a, b));
+    this.executionFilterModel.groups.sort((a: IExecutionGroup, b: IExecutionGroup) => this.executionGroupSorter(a, b));
   }
 
-  public executionGroupSorter(a: IGroup, b: IGroup): number {
+  public executionGroupSorter(a: IExecutionGroup, b: IExecutionGroup): number {
     if (this.executionFilterModel.sortFilter.groupBy === 'timeBoundary') {
       return b.executions[0].startTime - a.executions[0].startTime;
     }
@@ -315,6 +308,6 @@ module (EXECUTION_FILTER_SERVICE, [
   require('core/utils/waypoints/waypoint.service'),
   require('core/filterModel/filter.model.service'),
   require('core/orchestratedItem/timeBoundaries.service'),
-  require('core/pipeline/config/pipelineConfigProvider')
+  PIPELINE_CONFIG_PROVIDER
 ]).factory('executionFilterService', (executionFilterModel: ExecutionFilterModel, timeBoundaries: any, waypointService: any, $log: ILogService, filterModelService: any, pipelineConfig: any) =>
                                       new ExecutionFilterService(executionFilterModel, timeBoundaries, waypointService, $log, filterModelService, pipelineConfig));

@@ -54,6 +54,15 @@ module.exports = angular
           this.secondaryAccounts = _.xor(accountNames, this.primaryAccounts).sort();
           this.mergedAccounts = _.flatten([this.primaryAccounts, this.secondaryAccounts]);
         }
+
+        if (this.component) {
+          var mergedAccounts = (this.mergedAccounts || []).sort();
+          var component = _.flatten([this.component[this.field]]).sort();
+
+          if (!_.isEqual(_.intersection(mergedAccounts, component), component)) {
+            this.component[this.field] = null;
+          }
+        }
       });
     };
 

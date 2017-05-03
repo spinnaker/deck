@@ -1,4 +1,5 @@
 export * from './IExecution';
+export * from './IExecutionStage';
 export * from './stageContext';
 export * from './taskStep';
 export * from './ITrigger';
@@ -16,3 +17,4 @@ export * from './instance';
 export * from './IStrategy'
 export * from './IEntityTags';
 export * from './ICluster';
+export * from './IOrchestratedItem';

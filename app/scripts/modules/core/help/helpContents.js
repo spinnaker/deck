@@ -59,6 +59,10 @@ module.exports = angular.module('spinnaker.core.help.contents', [])
     ' a simpler, combined input for the namespace and metric name fields.</p>',
     'aws.scalingPolicy.search.all': '<p>Allows you to edit the dimensions and namespace to find a specific metric for' +
     ' this alarm.</p>',
+    'aws.blockDeviceMappings.useSource': '<p>Spinnaker will use the block device mappings of the existing server group when deploying a new server group.</p>' +
+    '<p>In the event that there is no existing server group, the <a target="_blank" href="https://github.com/spinnaker/clouddriver/blob/master/clouddriver-aws/src/main/groovy/com/netflix/spinnaker/clouddriver/aws/deploy/BlockDeviceConfig.groovy">defaults</a> for the selected instance type will be used.</p>',
+    'aws.blockDeviceMappings.useAMI': '<p>Spinnaker will use the block device mappings from the selected AMI when deploying a new server group.</p>',
+    'aws.blockDeviceMappings.useDefaults': '<p>Spinnaker will use the <a target="_blank" href="https://github.com/spinnaker/clouddriver/blob/master/clouddriver-aws/src/main/groovy/com/netflix/spinnaker/clouddriver/aws/deploy/BlockDeviceConfig.groovy">default block device mappings</a> for the selected instance type when deploying a new server group.</p>',
     'cf.artifact.repository.options': '<p>You may include {job} and {buildNumber} to dynamically build a path to your artifact.</p>',
     'cluster.search': 'Quickly filter the displayed server groups by the following fields:' +
     '<ul>' +
@@ -246,7 +250,6 @@ module.exports = angular.module('spinnaker.core.help.contents', [])
     'pipeline.config.docker.bake.organization': '<p>The name of the organization or repo to use for the resulting docker image.</p>',
     'pipeline.config.bake.baseAmi': '<p>(Optional) ami-????????</p>',
     'pipeline.config.bake.amiSuffix': '<p>(Optional) String of date in format YYYYMMDDHHmm, default is calculated from timestamp,</p>',
-    'pipeline.config.bake.enhancedNetworking': '<p>(Optional) Enable enhanced networking (sr-iov) support for image (requires hvm and trusty base_os).</p>',
     'pipeline.config.bake.amiName': '<p>(Optional) Default = $package-$arch-$ami_suffix-$store_type</p>',
     'pipeline.config.bake.templateFileName': '<p>(Optional) The explicit packer template to use, instead of resolving one from rosco\'s configuration.</p>',
     'pipeline.config.bake.varFileName': '<p>(Optional) The name of a json file containing key/value pairs to add to the packer command.</p>',
@@ -375,6 +378,7 @@ module.exports = angular.module('spinnaker.core.help.contents', [])
     'kubernetes.serverGroup.detail': '(Optional) A string of free-form alphanumeric characters and hyphens to describe any other variables.',
     'kubernetes.serverGroup.containers': '(Required) Select at least one image to run in this server group (pod). ' +
     'If multiple images are selected, they will be colocated and replicated equally.',
+    'kubernetes.serverGroup.terminationGracePeriodSeconds': '(Required) Termination grace period in <b>seconds</b>. You can customize the termination grace period setting (terminationGracePeriodSeconds). Because server groups (pods) represent running processes on nodes in the cluster, it is important to allow those processes to gracefully terminate when they are no longer needed (vs. being violently killed and having no chance to clean up). Default is <b>30</b> seconds.',
     'kubernetes.serverGroup.autoscaling.enabled': 'If selected, a horizontal autoscaler will be attached to this replica set.',
     'kubernetes.serverGroup.autoscaling.min': 'The smallest number of pods to be deployed.',
     'kubernetes.serverGroup.autoscaling.max': 'The largest number of pods to be deployed.',
@@ -543,4 +547,5 @@ module.exports = angular.module('spinnaker.core.help.contents', [])
     'pipeline.config.webhook.successStatuses': 'Comma-separated list of strings that will be considered as SUCCESS status.',
     'pipeline.config.webhook.canceledStatuses': 'Comma-separated list of strings that will be considered as CANCELED status.',
     'pipeline.config.webhook.terminalStatuses': 'Comma-separated list of strings that will be considered as TERMINAL status.',
+    'pipeline.config.webhook.customHeaders': 'Key-value pairs to be sent as additional headers to the service.',
   });

@@ -18,6 +18,7 @@ export class CopyToClipboardController implements IComponentController {
               private $timeout: ITimeoutService) {}
 
   public $onInit(): void {
+    // tslint:disable:no-unused-expression
     new Clipboard('.clipboard-btn');
     this.$element.on('click', () => {
       this.isOpen = true;
@@ -43,9 +44,9 @@ export class CopyToClipboardController implements IComponentController {
 
 export class CopyToClipboardComponent implements IComponentOptions {
   public bindings: any = {
-    text: '@',
-    toolTip: '@',
-    analyticsLabel: '@'
+    text: '<',
+    toolTip: '<',
+    analyticsLabel: '<'
   };
   public controller: any = CopyToClipboardController;
   public template = `

@@ -135,6 +135,7 @@ module.exports = angular.module('spinnaker.loadBalancer.aws.create.controller', 
     }
 
     function initializeController() {
+      setSecurityGroupRefreshTime();
       if (loadBalancer) {
         if (forPipelineConfig) {
           $scope.loadBalancer = loadBalancer;
@@ -158,6 +159,12 @@ module.exports = angular.module('spinnaker.loadBalancer.aws.create.controller', 
       }
     }
 
+    function availableGroupsSorter(a, b) {
+      return $scope.loadBalancer.securityGroups.includes(a.id) ? -1 :
+        $scope.loadBalancer.securityGroups.includes(b.id) ? 1 :
+          0;
+    }
+
     function updateAvailableSecurityGroups(availableVpcIds) {
       var account = $scope.loadBalancer.credentials,
         region = $scope.loadBalancer.region;
@@ -165,7 +172,7 @@ module.exports = angular.module('spinnaker.loadBalancer.aws.create.controller', 
       if (account && region && allSecurityGroups[account] && allSecurityGroups[account].aws[region]) {
         $scope.availableSecurityGroups = _.filter(allSecurityGroups[account].aws[region], function(securityGroup) {
           return availableVpcIds.includes(securityGroup.vpcId);
-        });
+        }).sort(availableGroupsSorter); // push existing groups to top
         $scope.existingSecurityGroupNames = _.map($scope.availableSecurityGroups, 'name');
         var existingNames = defaultSecurityGroups.filter(function(defaultName) {
           return $scope.existingSecurityGroupNames.includes(defaultName);
@@ -306,15 +313,22 @@ module.exports = angular.module('spinnaker.loadBalancer.aws.create.controller', 
       $scope.state.refreshingSecurityGroups = true;
       cacheInitializer.refreshCache('securityGroups').then(function() {
         $scope.state.refreshingSecurityGroups = false;
+        setSecurityGroupRefreshTime();
         preloadSecurityGroups().then(function() {
           updateAvailableSecurityGroups($scope.loadBalancer.vpcId);
         });
       });
     };
 
-    this.getSecurityGroupRefreshTime = function() {
-      return infrastructureCaches.get('securityGroups').getStats().ageMax;
-    };
+    function setSecurityGroupRefreshTime() {
+      ctrl.securityGroupRefreshTime = infrastructureCaches.get('securityGroups').getStats().ageMax;
+    }
+
+    this.addItems = () => this.currentItems += 25;
+
+    this.resetCurrentItems = () => this.currentItems = 25;
+
+    this.currentItems = 25;
 
     this.requiresHealthCheckPath = function () {
       return $scope.loadBalancer.healthCheckProtocol && $scope.loadBalancer.healthCheckProtocol.indexOf('HTTP') === 0;

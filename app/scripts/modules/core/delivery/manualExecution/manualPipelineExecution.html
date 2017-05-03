@@ -1,6 +1,6 @@
 <div modal-page>
   <task-monitor monitor="taskMonitor"></task-monitor>
-  <modal-close (dismiss)="$dismiss()"></modal-close>
+  <modal-close dismiss="$dismiss()"></modal-close>
   <div class="modal-header">
     <h3 ng-if="vm.command.pipeline && vm.triggers.length">Select Execution Parameters</h3>
     <h3 ng-if="vm.command.pipeline && !vm.triggers.length">Confirm Execution</h3>
@@ -136,7 +136,7 @@
             There is <a uib-popover-template="vm.notificationTooltip" popover-placement="bottom">one notification</a> configured for this pipeline
           </div>
           <div ng-if="vm.notifications.length > 1" class="small">
-            There are <a uib-popover-template="vm.notificationTooltip" popover-placement="bottom" popover-trigger="mouseenter">{{vm.notifications.length}} notifications</a> configured for this pipeline</div>
+            There are <a uib-popover-template="vm.notificationTooltip" popover-placement="bottom" popover-trigger="'mouseenter'">{{vm.notifications.length}} notifications</a> configured for this pipeline</div>
         </div>
       </div>
       <div class="form-group" ng-if="vm.command.notificationEnabled">

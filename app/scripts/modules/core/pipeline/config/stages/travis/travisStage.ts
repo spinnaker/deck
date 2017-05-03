@@ -1,9 +1,11 @@
+import {PIPELINE_CONFIG_PROVIDER} from 'core/pipeline/config/pipelineConfigProvider';
 import {module, IScope} from 'angular';
 import * as moment from 'moment';
 
 import {IGOR_SERVICE, IgorService, BuildServiceType} from 'core/ci/igor.service';
 import {IJobConfig, ParameterDefinitionList} from 'core/domain/IJobConfig';
 import {IStage} from 'core/domain/IStage';
+import {TravisExecutionLabel} from './TravisExecutionLabel';
 
 interface IViewState {
   mastersLoaded: boolean;
@@ -143,7 +145,7 @@ export const TRAVIS_STAGE = 'spinnaker.core.pipeline.stage.travisStage';
 
 module(TRAVIS_STAGE, [
   IGOR_SERVICE,
-  require('../../pipelineConfigProvider.js')
+  PIPELINE_CONFIG_PROVIDER
 ]).config((pipelineConfigProvider: any) => {
   pipelineConfigProvider.registerStage({
     label: 'Travis',
@@ -154,7 +156,7 @@ module(TRAVIS_STAGE, [
     controllerAs: '$ctrl',
     templateUrl: require('./travisStage.html'),
     executionDetailsUrl: require('./travisExecutionDetails.html'),
-    executionLabelTemplateUrl: require('./travisExecutionLabel.html'),
+    executionLabelComponent: TravisExecutionLabel,
     extraLabelLines: (stage: IStage) => {
       if (!stage.masterStage.context || !stage.masterStage.context.buildInfo) {
         return 0;

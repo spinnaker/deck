@@ -1,9 +1,11 @@
 import {module} from 'angular';
 import {Subject} from 'rxjs';
 
+import {IExecutionStageSummary} from 'core/domain/index';
 import {IStage} from 'core/domain/IStage';
 import {IPipeline} from 'core/domain/IPipeline';
 import {ITrigger} from 'core/domain/ITrigger';
+import {PIPELINE_CONFIG_PROVIDER} from 'core/pipeline/config/pipelineConfigProvider';
 
 export interface IStageValidationResults {
   stage: IStage;
@@ -22,6 +24,19 @@ export interface IValidatorConfig {
   message?: string;
   skipValidation?: (pipeline: IPipeline, stage: IStage) => boolean;
   preventSave?: boolean;
+  fieldName?: string;
+  fieldLabel?: string;
+  checkParentTriggers?: boolean;
+}
+
+export interface IStageOrTriggerTypeConfig {
+  label: string;
+  description: string;
+  key: string;
+  templateUrl: string;
+  controller: string;
+  controllerAs: string;
+  validators: IValidatorConfig[];
 }
 
 export interface ITriggerTypeConfig extends IStageOrTriggerTypeConfig {
@@ -30,18 +45,20 @@ export interface ITriggerTypeConfig extends IStageOrTriggerTypeConfig {
 
 export interface IStageTypeConfig extends IStageOrTriggerTypeConfig {
   executionDetailsUrl: string;
+  executionStepLabelUrl?: string;
   defaultTimeoutMs?: number;
-}
-
-export interface IStageOrTriggerTypeConfig {
-  label: string;
-  description: string;
-  key: string;
-  templateUrl: string;
-  popoverLabelUrl?: string;
-  controller: string;
-  controllerAs: string;
-  validators: IValidatorConfig[];
+  provides?: string;
+  providesFor?: string[];
+  cloudProvider?: string;
+  cloudProviders?: string[];
+  alias?: string;
+  useBaseProvider?: boolean;
+  executionLabelComponent?: React.Component<{ stage: IExecutionStageSummary }, any>;
+  accountExtractor?: (stage: IStage) => string;
+  extraLabelLines?: (stage: IStage) => number;
+  restartable?: boolean;
+  synthetic?: boolean;
+  nameToCheckInTest?: string;
 }
 
 export interface IStageOrTriggerValidator {
@@ -179,7 +196,7 @@ export class PipelineConfigValidator implements ng.IServiceProvider {
 
 export const PIPELINE_CONFIG_VALIDATOR = 'spinnaker.core.pipeline.config.validator';
 module(PIPELINE_CONFIG_VALIDATOR, [
-  require('../pipelineConfigProvider.js'),
+  PIPELINE_CONFIG_PROVIDER,
 ]).service('pipelineConfigValidator', PipelineConfigValidator)
   .run((pipelineConfigValidator: PipelineConfigValidator) => {
     // placeholder - custom validators must implement the ICustomValidator interface

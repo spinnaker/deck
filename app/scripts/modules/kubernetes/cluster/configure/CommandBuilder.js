@@ -50,11 +50,12 @@ module.exports = angular.module('spinnaker.kubernetes.clusterCommandBuilder.serv
         volumeSources: [],
         buildImageId: buildImageId,
         groupByRegistry: groupByRegistry,
+        terminationGracePeriodSeconds: 30,
         viewState: {
           mode: defaults.mode || 'create',
           disableStrategySelection: true,
+          useAutoscaler: false,
         },
-        useAutoscaler: false,
         capacity: {
           min: 1,
           desired: 1,
@@ -103,6 +104,7 @@ module.exports = angular.module('spinnaker.kubernetes.clusterCommandBuilder.serv
 
       command.viewState = {
         mode: mode,
+        useAutoscaler: !!command.scalingPolicy,
       };
 
       if (!command.capacity) {
@@ -135,12 +137,18 @@ module.exports = angular.module('spinnaker.kubernetes.clusterCommandBuilder.serv
     }
 
     function buildImageId(image) {
-      if (image.fromContext) {
+      if (image.fromFindImage) {
         return `${image.cluster} ${image.pattern}`;
+      } else if (image.fromBake) {
+        return `${image.repository} (Baked during execution)`;
       } else if (image.fromTrigger && !image.tag) {
         return `${image.registry}/${image.repository} (Tag resolved at runtime)`;
       } else {
-        return `${image.registry}/${image.repository}:${image.tag}`;
+        if (image.registry) {
+          return `${image.registry}/${image.repository}:${image.tag}`;
+        } else {
+          return `${image.repository}:${image.tag}`;
+        }
       }
     }
 
@@ -171,7 +179,7 @@ module.exports = angular.module('spinnaker.kubernetes.clusterCommandBuilder.serv
       return result;
     }
 
-    function findUpstreamImages(current, all, visited = {}) {
+    function findContextImages(current, all, visited = {}) {
       // This actually indicates a loop in the stage dependencies.
       if (visited[current.refId]) {
         return [];
@@ -182,16 +190,25 @@ module.exports = angular.module('spinnaker.kubernetes.clusterCommandBuilder.serv
       if (current.type === 'findImage') {
         result.push({
           fromContext: true,
+          fromFindImage: true,
           cluster: current.cluster,
           pattern: current.imageNamePattern,
           repository: current.name,
+          stageId: current.refId
+        });
+      } else if (current.type === 'bake') {
+        result.push({
+          fromContext: true,
+          fromBake: true,
+          repository: current.ami_name,
+          organization: current.organization,
           stageId: current.refId
         });
       }
       current.requisiteStageRefIds.forEach(function(id) {
         let next = all.find((stage) => stage.refId === id);
         if (next) {
-          result = result.concat(findUpstreamImages(next, all, visited));
+          result = result.concat(findContextImages(next, all, visited));
         }
       });
 
@@ -214,7 +231,7 @@ module.exports = angular.module('spinnaker.kubernetes.clusterCommandBuilder.serv
     }
 
     function buildNewClusterCommandForPipeline(current, pipeline) {
-      let contextImages = findUpstreamImages(current, pipeline.stages) || [];
+      let contextImages = findContextImages(current, pipeline.stages) || [];
       contextImages = contextImages.concat(findTriggerImages(pipeline.triggers));
       return {
         strategy: '',
@@ -223,13 +240,14 @@ module.exports = angular.module('spinnaker.kubernetes.clusterCommandBuilder.serv
           mode: 'editPipeline',
           submitButtonLabel: 'Done',
           requiresTemplateSelection: true,
+          useAutoscaler: false,
         }
       };
     }
 
     function buildClusterCommandFromPipeline(app, originalCommand, current, pipeline) {
       let command = _.cloneDeep(originalCommand);
-      let contextImages = findUpstreamImages(current, pipeline.stages) || [];
+      let contextImages = findContextImages(current, pipeline.stages) || [];
       contextImages = contextImages.concat(findTriggerImages(pipeline.triggers));
       command.containers = reconcileUpstreamImages(command.containers, contextImages);
       command.containers.map((container) => {
@@ -243,6 +261,7 @@ module.exports = angular.module('spinnaker.kubernetes.clusterCommandBuilder.serv
         mode: 'editPipeline',
         contextImages: contextImages,
         submitButtonLabel: 'Done',
+        useAutoscaler: !!command.scalingPolicy,
       };
 
       if (!_.has(command, 'scalingPolicy.cpuUtilization.target')) {

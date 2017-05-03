@@ -3,7 +3,9 @@ import {IState} from 'angular-ui-router';
 import {extend} from 'lodash';
 
 import {ICache} from 'core/cache/deckCache.service';
+import {IExecutionGroup} from 'core/domain';
 import {VIEW_STATE_CACHE_SERVICE, ViewStateCacheService} from 'core/cache/viewStateCache.service';
+import {Subject} from 'rxjs/Subject';
 
 export class ExecutionFilterModel {
   // Store count globally for 180 days
@@ -17,10 +19,15 @@ export class ExecutionFilterModel {
   private filterModel: any = this;
   // The following get set in filterModelService.configureFilterModel(this, filterModelConfig);
   public sortFilter: any;
-  public groups: any;
+  public groups: IExecutionGroup[];
   public addTags: () => void;
   public clearFilters: () => void;
   public applyParamsToUrl: () => void;
+  public groupsUpdated: Subject<void> = new Subject<void>();
+
+  // This is definitely not the best way to do this, but already have a Subject in here, so just using the same
+  // mechanism for now.
+  public expandSubject: Subject<boolean> = new Subject<boolean>();
 
   static get $inject(): string[] { return ['$rootScope', 'filterModelService', 'urlParser', 'viewStateCache']; }
 
@@ -148,10 +155,12 @@ export class ExecutionFilterModel {
   }
 }
 
+export let executionFilterModel: ExecutionFilterModel = undefined;
 export const EXECUTION_FILTER_MODEL = 'spinnaker.core.delivery.filter.executionFilter.model';
 module (EXECUTION_FILTER_MODEL, [
   require('core/filterModel/filter.model.service'),
   require('core/navigation/urlParser.service'),
   VIEW_STATE_CACHE_SERVICE
 ]).factory('executionFilterModel', ($rootScope: IRootScopeService, filterModelService: any, urlParser: any, viewStateCache: ViewStateCacheService) =>
-                                    new ExecutionFilterModel($rootScope, filterModelService, urlParser, viewStateCache));
+                                    new ExecutionFilterModel($rootScope, filterModelService, urlParser, viewStateCache))
+  .run(($injector: any) => executionFilterModel = <ExecutionFilterModel>$injector.get('executionFilterModel'));

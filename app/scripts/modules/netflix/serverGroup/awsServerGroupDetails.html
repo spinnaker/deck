@@ -77,7 +77,7 @@
     Disabled {{ctrl.disabledDate | timestamp}}
   </div>
   <div class="content" ng-if="!ctrl.state.loading">
-    <server-group-running-tasks-details server-group="ctrl.serverGroup"></server-group-running-tasks-details>
+    <server-group-running-tasks-details server-group="ctrl.serverGroup" application="ctrl.application"></server-group-running-tasks-details>
     <collapsible-section heading="Server Group Information" expanded="true">
       <dl class="dl-horizontal dl-flex">
         <dt>Created</dt>
@@ -271,8 +271,8 @@
       <dl class="horizontal-when-filters-collapsed">
         <dt>Cooldown</dt>
         <dd>{{ctrl.serverGroup.asg.defaultCooldown}} seconds</dd>
-        <dt>Enabled Metrics</dt>
-        <dd>{{ctrl.serverGroup.asg.enabledMetrics.join(', ')}}</dd>
+        <dt ng-if="ctrl.enabledMetrics.length">Enabled Metrics</dt>
+        <dd ng-if="ctrl.enabledMetrics.length">{{ctrl.enabledMetrics.join(', ')}}</dd>
         <dt>Health Check Type</dt>
         <dd>{{ctrl.serverGroup.asg.healthCheckType}}</dd>
         <dt>Grace Period</dt>

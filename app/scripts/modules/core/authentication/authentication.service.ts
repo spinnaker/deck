@@ -1,6 +1,4 @@
-import {Injectable} from '@angular/core';
-
-import {IDowngradeItem} from 'core/domain/IDowngradeItem';
+import {module} from 'angular';
 
 export interface IUser {
   name: string;
@@ -9,8 +7,14 @@ export interface IUser {
   lastAuthenticated?: number;
 }
 
-@Injectable()
-export class AuthenticationService {
+interface IAuthenticationService {
+  getAuthenticatedUser: () => IUser;
+  setAuthenticatedUser: (authenticatedUser: IUser) => void;
+  onAuthentication: (event: Function) => void;
+  authenticationExpired: () => void;
+}
+
+export class AuthenticationService implements IAuthenticationService {
 
   private user: IUser = {
     name: '[anonymous]',
@@ -44,9 +48,8 @@ export class AuthenticationService {
   }
 }
 
+export let authenticationService: IAuthenticationService = undefined;
 export const AUTHENTICATION_SERVICE = 'spinnaker.authentication.service';
-export const AUTHENTICATION_SERVICE_DOWNGRADE: IDowngradeItem = {
-  moduleName: AUTHENTICATION_SERVICE,
-  injectionName: 'authenticationService',
-  moduleClass: AuthenticationService
-};
+module(AUTHENTICATION_SERVICE, [])
+  .service('authenticationService', AuthenticationService)
+  .run(($injector: any) => authenticationService = <IAuthenticationService>$injector.get('authenticationService'));

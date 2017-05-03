@@ -1,12 +1,15 @@
 'use strict';
 
 import {IGOR_SERVICE, BuildServiceType} from 'core/ci/igor.service';
+import {JenkinsExecutionLabel} from './JenkinsExecutionLabel';
+import {PIPELINE_CONFIG_PROVIDER} from 'core/pipeline/config/pipelineConfigProvider';
+
 let angular = require('angular');
 
 
 module.exports = angular.module('spinnaker.core.pipeline.stage.jenkinsStage', [
   IGOR_SERVICE,
-  require('../../pipelineConfigProvider.js'),
+  PIPELINE_CONFIG_PROVIDER,
 ])
   .config(function(pipelineConfigProvider) {
     pipelineConfigProvider.registerStage({
@@ -18,7 +21,7 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.jenkinsStage', [
       controllerAs: 'jenkinsStageCtrl',
       templateUrl: require('./jenkinsStage.html'),
       executionDetailsUrl: require('./jenkinsExecutionDetails.html'),
-      executionLabelTemplateUrl: require('./jenkinsExecutionLabel.html'),
+      executionLabelComponent: JenkinsExecutionLabel,
       extraLabelLines: (stage) => {
         if (!stage.masterStage.context || !stage.masterStage.context.buildInfo) {
           return 0;

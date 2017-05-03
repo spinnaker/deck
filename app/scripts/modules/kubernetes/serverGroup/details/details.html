@@ -57,7 +57,7 @@
   </div>
   <div class="content" ng-if="!state.loading">
     <h4 class="text-center" ng-if="serverGroup.isDisabled">[SERVER GROUP IS DISABLED]</h4>
-    <server-group-running-tasks-details server-group="serverGroup"></server-group-running-tasks-details>
+    <server-group-running-tasks-details server-group="serverGroup" application="ctrl.application"></server-group-running-tasks-details>
     <collapsible-section heading="Server Group Information" expanded="true">
       <dl class="dl-horizontal dl-flex">
         <dt>Created</dt>
@@ -139,9 +139,9 @@
           <dt>Target CPU</dt>
           <dd>{{serverGroup.deployDescription.scalingPolicy.cpuUtilization.target}}%</dd>
           <dt>Current CPU</dt>
-          <dd>{{serverGroup.autoscalerStatus.currentCpuUtilization}}%</dd>
-          <dt>Latest Rescale</dt>
-          <dd>{{serverGroup.autoscalerStatus.lastScaleTime | relativeTime}}</dd>
+          <dd>{{serverGroup.autoscalerStatus.currentCpuUtilization !== null ? serverGroup.autoscalerStatus.currentCpuUtilization : '- '}}%</dd>
+          <dt ng-if="serverGroup.autoscalerStatus.lastScaleTime">Latest Rescale</dt>
+          <dd ng-if="serverGroup.autoscalerStatus.lastScaleTime">{{serverGroup.autoscalerStatus.lastScaleTime | relativeTime}}</dd>
         </div>
       </dl>
     </collapsible-section>
@@ -244,6 +244,12 @@
       <div ng-if="!(serverGroup.events && serverGroup.events.length > 0)">
         No events.
       </div>
+    </collapsible-section>
+    <collapsible-section heading="Advanced Settings">
+      <dl>
+        <dt>Termination Grace Period</dt>
+        <dd>{{serverGroup.deployDescription.terminationGracePeriodSeconds}}&nbsp;second(s)</dd>
+      </dl>
     </collapsible-section>
   </div>
 </div>

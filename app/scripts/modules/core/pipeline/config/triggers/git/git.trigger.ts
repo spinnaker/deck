@@ -3,11 +3,12 @@ import {has, trim} from 'lodash';
 
 import {SETTINGS} from 'core/config/settings';
 import {IGitTrigger} from 'core/domain/ITrigger';
+import {PIPELINE_CONFIG_PROVIDER} from 'core/pipeline/config/pipelineConfigProvider';
 import {SERVICE_ACCOUNT_SERVICE, ServiceAccountService} from 'core/serviceAccount/serviceAccount.service';
 
 class GitTriggerController {
 
-  public fiatEnabled = false;
+  public fiatEnabled: boolean = SETTINGS.feature.fiatEnabled;
   public serviceAccounts: string[] = [];
   public gitTriggerTypes = SETTINGS.gitSources || ['stash', 'github', 'bitbucket'];
   public displayText: any = {
@@ -63,7 +64,7 @@ class GitTriggerController {
 export const GIT_TRIGGER = 'spinnaker.core.pipeline.trigger.git';
 module(GIT_TRIGGER, [
   SERVICE_ACCOUNT_SERVICE,
-  require('../../pipelineConfigProvider'),
+  PIPELINE_CONFIG_PROVIDER,
 ]).config((pipelineConfigProvider: any) => {
   pipelineConfigProvider.registerTrigger({
     label: 'Git',
@@ -72,7 +73,6 @@ module(GIT_TRIGGER, [
     controller: 'GitTriggerCtrl',
     controllerAs: 'vm',
     templateUrl: require('./gitTrigger.html'),
-    popoverLabelUrl: require('./gitPopoverLabel.html'),
     validators: [
       {
         type: 'serviceAccountAccess',

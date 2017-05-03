@@ -1,4 +1,3 @@
-import {Provider} from '@angular/core';
 import {module, IHttpService, IPromise, IQResolveReject, IQService, IRequestConfig} from 'angular';
 import {
   AUTHENTICATION_INITIALIZER_SERVICE,
@@ -48,7 +47,8 @@ export class Api {
       if (contentType) {
         const isJson = contentType.includes('application/json');
         const isZeroLengthHtml = (contentType.includes('text/html') && (result.data === ''));
-        if (!(isJson || isZeroLengthHtml)) {
+        const isZeroLengthText = (contentType.includes('text/plain') && (result.data === ''));
+        if (!(isJson || isZeroLengthHtml || isZeroLengthText)) {
           this.authenticationIntializer.reauthenticateUser();
           reject(result);
         }
@@ -190,12 +190,8 @@ export class Api {
 }
 
 const API_SERVICE_NAME = 'API';
+export let api: Api;
 export const API_SERVICE = 'spinnaker.core.api.provider';
 module(API_SERVICE, [AUTHENTICATION_INITIALIZER_SERVICE])
-  .service(API_SERVICE_NAME, Api);
-
-export const API_SERVICE_PROVIDER: Provider = {
-  provide: API_SERVICE_NAME,
-  useFactory: (i: any) => i.get(API_SERVICE_NAME),
-  deps: ['$injector']
-};
+  .service(API_SERVICE_NAME, Api)
+  .run(($injector: any) => api = <Api>$injector.get('API'));

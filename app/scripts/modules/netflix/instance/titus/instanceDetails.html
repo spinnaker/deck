@@ -24,8 +24,8 @@
       <copy-to-clipboard
         ng-if="instance"
         class="copy-to-clipboard"
-        text="ssh -t {{ctrl.bastionHost}} 'titus-ssh {{ctrl.bastionStack}} -region {{instance.region}} -id {{instance.id}}'"
-        tool-tip="Copy titus-ssh command to clipboard">
+        text="sshLink"
+        tool-tip="'Copy titus-ssh command to clipboard'">
       </copy-to-clipboard>
     </div>
     <div>
@@ -57,6 +57,14 @@
       <dl class="dl-horizontal dl-flex">
         <dt>Task Id</dt>
         <dd><a href="{{ ctrl.apiEndpoint }}v2/tasks/{{instance.id}}" target="_blank">{{instance.id}}</a></dd>
+        <dt>Instance Id</dt>
+        <dd>{{instance.instanceId}}
+          <copy-to-clipboard
+            class="copy-to-clipboard"
+            text="instance.instanceId"
+            tool-tip="'Copy instance Id to clipboard'">
+          </copy-to-clipboard>
+        </dd>
         <dt>Job Id</dt>
         <dd><a href="{{ ctrl.apiEndpoint }}v2/jobs/{{instance.jobId}}?taskState=ANY" target="_blank">{{instance.jobId}}</a></dd>
         <dt ng-if="instance.serverGroup">Job Name</dt>
@@ -84,8 +92,8 @@
         <dd ng-if="instance.placement.containerIp">{{instance.placement.containerIp}}
           <copy-to-clipboard
             class="copy-to-clipboard"
-            text="{{instance.placement.containerIp}}"
-            tool-tip="Copy container IP clipboard">
+            text="instance.placement.containerIp"
+            tool-tip="'Copy container IP clipboard'">
           </copy-to-clipboard>
         </dd>
       </dl>

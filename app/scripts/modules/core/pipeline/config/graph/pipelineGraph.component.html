@@ -17,7 +17,7 @@
     <g uib-popover-template="warningsPopover"
        popover-placement="auto"
        popover-enable="stage.hasWarnings"
-       popover-trigger="mouseenter">
+       popover-trigger="'mouseenter'">
       <circle ng-attr-r="{{::nodeRadius}}"
               class="clickable stage-type-{{::stage.masterStage.type.toLowerCase()}} execution-marker execution-marker-{{::stage.status.toLowerCase()}}"
               ng-class="{active: stage.isActive}"
@@ -61,17 +61,17 @@
     <foreignobject ng-attr-width="{{::maxLabelWidth}}" height="100"
                    ng-attr-transform="translate({{::labelOffsetX}}, {{::stage.leaf && !stage.executionStage ? -8 : labelOffsetY*-1}})">
       <div class="execution-stage-label clickable {{::stage.status.toLowerCase()}}"
-           ng-if="stage.labelTemplateUrl"
+           ng-if="stage.labelComponent"
            ng-mouseenter="highlight(stage)" ng-mouseleave="removeHighlight(stage)"
            ng-style="{height: stage.height + 'px'}"
            analytics-on="click"
            analytics-category="Pipeline Graph ({{::execution ? 'execution' : 'config'}})"
            analytics-event="Node label clicked"
            ng-click="nodeClicked(stage)">
-        <div ng-include="stage.labelTemplateUrl"></div>
+        <label-component stage="stage"></label-component>
       </div>
       <div class="label-body node clickable"
-           ng-if="!stage.labelTemplateUrl"
+           ng-if="!stage.labelComponent"
            ng-mouseenter="highlight(stage)" ng-mouseleave="removeHighlight(stage)"
            analytics-on="click"
            analytics-category="Pipeline Graph ({{::execution ? 'execution' : 'config'}})"

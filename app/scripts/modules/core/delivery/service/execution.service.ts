@@ -6,6 +6,7 @@ import {Application} from 'core/application/application.model';
 import {EXECUTION_FILTER_MODEL, ExecutionFilterModel} from 'core/delivery/filter/executionFilter.model';
 import {IExecution} from 'core/domain/IExecution';
 import {IExecutionStage} from 'core/domain/IExecutionStage';
+import {PIPELINE_CONFIG_PROVIDER} from 'core/pipeline/config/pipelineConfigProvider';
 import {SETTINGS} from 'core/config/settings';
 
 export class ExecutionService {
@@ -107,7 +108,7 @@ export class ExecutionService {
           application.executions.refresh().then(deferred.resolve);
           return deferred.promise;
         } else {
-          return this.$timeout(function() {
+          return this.$timeout(() => {
             return this.waitUntilNewTriggeredPipelineAppears(application, pipelineName, triggeredPipelineId);
           }, 1000);
         }
@@ -135,8 +136,6 @@ export class ExecutionService {
         method: 'PUT',
         url: [
           SETTINGS.gateUrl,
-          'applications',
-          application.name,
           'pipelines',
           executionId,
           'cancel',
@@ -348,11 +347,13 @@ export class ExecutionService {
     }
 }
 
+export let executionService: ExecutionService = undefined;
 export const EXECUTION_SERVICE = 'spinnaker.core.delivery.executions.service';
 module(EXECUTION_SERVICE, [
   EXECUTION_FILTER_MODEL,
   require('./executions.transformer.service.js'),
-  require('core/pipeline/config/pipelineConfigProvider.js'),
+  PIPELINE_CONFIG_PROVIDER,
   API_SERVICE
 ]).factory('executionService', ($http: IHttpService, $q: IQService, $timeout: ITimeoutService, API: Api, executionFilterModel: any, executionsTransformer: any, pipelineConfig: any) =>
-                                new ExecutionService($http, $q, $timeout, API, executionFilterModel, executionsTransformer, pipelineConfig));
+                                new ExecutionService($http, $q, $timeout, API, executionFilterModel, executionsTransformer, pipelineConfig))
+  .run(($injector: any) => executionService = <ExecutionService>$injector.get('executionService'));
