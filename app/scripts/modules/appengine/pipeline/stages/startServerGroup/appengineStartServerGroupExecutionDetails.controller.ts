@@ -22,7 +22,7 @@ class AppengineStartServerGroupExecutionDetailsCtrl extends BaseExecutionDetails
 export const APPENGINE_START_SERVER_GROUP_EXECUTION_DETAILS_CTRL = 'spinnaker.appengine.pipeline.stage.startServerGroup.executionDetails.controller';
 
 module(APPENGINE_START_SERVER_GROUP_EXECUTION_DETAILS_CTRL, [
-  require('angular-ui-router'),
+  require('angular-ui-router').default,
   EXECUTION_DETAILS_SECTION_SERVICE,
   require('core/delivery/details/executionDetailsSectionNav.directive.js'),
 ]).controller('appengineStartServerGroupExecutionDetailsCtrl', AppengineStartServerGroupExecutionDetailsCtrl);

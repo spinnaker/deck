@@ -42,5 +42,5 @@ class FastPropertyPodTable implements IComponentOptions {
 export const FAST_PROPERTY_POD_TABLE = 'spinnaker.netflix.globalFastProperty.podTable.component';
 
 module(FAST_PROPERTY_POD_TABLE, [
-  require('angular-ui-router'),
+  require('angular-ui-router').default,
 ]).component('fastPropertyPodTable', new FastPropertyPodTable());

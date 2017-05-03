@@ -22,7 +22,7 @@ class EnableAsgExecutionDetailsCtrl extends BaseExecutionDetailsCtrl {
 export const ENABLE_ASG_EXECUTION_DETAILS_CTRL = 'spinnaker.core.pipeline.stage.enableAsg.executionDetails.controller';
 
 module(ENABLE_ASG_EXECUTION_DETAILS_CTRL, [
-  require('angular-ui-router'),
+  require('angular-ui-router').default,
   EXECUTION_DETAILS_SECTION_SERVICE,
   require('core/delivery/details/executionDetailsSectionNav.directive.js'),
 ]).controller('enableAsgExecutionDetailsCtrl', EnableAsgExecutionDetailsCtrl);
