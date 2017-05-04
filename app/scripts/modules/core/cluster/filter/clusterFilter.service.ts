@@ -7,7 +7,8 @@ import { ServerGroup } from 'core/domain/serverGroup';
 import { ICluster } from 'core/domain';
 import { Instance } from 'core/domain/instance';
 import { IEntityTags } from 'core/domain/IEntityTags';
-import { CLUSTER_FILTER_MODEL} from './clusterFilter.model';
+import { CLUSTER_FILTER_MODEL } from './clusterFilter.model';
+import { WAYPOINT_SERVICE } from 'core/utils/waypoints/waypoint.service';
 
 interface IParentGrouping {
   subgroups: IClusterSubgroup[] | IServerGroupSubgroup[];
@@ -474,6 +475,6 @@ module(CLUSTER_FILTER_SERVICE, [
   require('angular-ui-router').default,
   CLUSTER_FILTER_MODEL,
   require('./multiselect.model'),
-  require('../../utils/waypoints/waypoint.service'),
+  WAYPOINT_SERVICE,
   require('../../filterModel/filter.model.service'),
 ]).service('clusterFilterService', ClusterFilterService);

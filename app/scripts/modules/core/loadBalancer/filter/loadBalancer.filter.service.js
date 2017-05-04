@@ -4,11 +4,12 @@ const angular = require('angular');
 import _ from 'lodash';
 
 import { LOAD_BALANCER_FILTER_MODEL } from './loadBalancerFilter.model';
+import { WAYPOINT_SERVICE } from 'core/utils/waypoints/waypoint.service';
 
 module.exports = angular
   .module('spinnaker.core.loadBalancer.filter.service', [
     LOAD_BALANCER_FILTER_MODEL,
-    require('../../utils/waypoints/waypoint.service.js'),
+    WAYPOINT_SERVICE,
     require('../../filterModel/filter.model.service.js'),
   ])
   .factory('loadBalancerFilterService', function (LoadBalancerFilterModel, waypointService, filterModelService,
