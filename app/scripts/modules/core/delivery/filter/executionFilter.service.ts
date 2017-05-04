@@ -1,11 +1,12 @@
 
-import {ILogService, module} from 'angular';
-import {chain, compact, debounce, find, flattenDeep, forOwn, get, groupBy, includes, uniq} from 'lodash';
+import { ILogService, module } from 'angular';
+import { chain, compact, debounce, find, flattenDeep, forOwn, get, groupBy, includes, uniq } from 'lodash';
 
-import {Application} from 'core/application/application.model';
-import {EXECUTION_FILTER_MODEL, ExecutionFilterModel} from 'core/delivery/filter/executionFilter.model';
-import {IExecution, IExecutionGroup, IPipeline} from 'core/domain';
-import {PIPELINE_CONFIG_PROVIDER} from 'core/pipeline/config/pipelineConfigProvider';
+import { Application } from 'core/application/application.model';
+import { EXECUTION_FILTER_MODEL, ExecutionFilterModel } from 'core/delivery/filter/executionFilter.model';
+import { IExecution, IExecutionGroup, IPipeline } from 'core/domain';
+import { PIPELINE_CONFIG_PROVIDER } from 'core/pipeline/config/pipelineConfigProvider';
+import { WAYPOINT_SERVICE } from 'core/utils/waypoints/waypoint.service';
 
 export class ExecutionFilterService {
   private lastApplication: Application = null;
@@ -305,7 +306,7 @@ export class ExecutionFilterService {
 export const EXECUTION_FILTER_SERVICE = 'spinnaker.core.delivery.filter.executionFilter.service';
 module (EXECUTION_FILTER_SERVICE, [
   EXECUTION_FILTER_MODEL,
-  require('core/utils/waypoints/waypoint.service'),
+  WAYPOINT_SERVICE,
   require('core/filterModel/filter.model.service'),
   require('core/orchestratedItem/timeBoundaries.service'),
   PIPELINE_CONFIG_PROVIDER
