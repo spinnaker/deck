@@ -4,15 +4,13 @@ import _ from 'lodash';
 let angular = require('angular');
 
 import { SECURITY_GROUP_FILTER_MODEL } from './securityGroupFilter.model';
-import { WAYPOINT_SERVICE } from 'core/utils/waypoints/waypoint.service';
 
 module.exports = angular
   .module('securityGroup.filter.service', [
     SECURITY_GROUP_FILTER_MODEL,
-    WAYPOINT_SERVICE,
     require('core/filterModel/filter.model.service'),
   ])
-  .factory('securityGroupFilterService', function (SecurityGroupFilterModel, waypointService, filterModelService) {
+  .factory('securityGroupFilterService', function (SecurityGroupFilterModel, filterModelService) {
 
     var lastApplication = null;
 
@@ -102,7 +100,6 @@ module.exports = angular
       });
 
       sortGroupsByHeading(groups);
-      waypointService.restoreToWaypoint(application.name);
       SecurityGroupFilterModel.addTags();
       lastApplication = application;
       return groups;

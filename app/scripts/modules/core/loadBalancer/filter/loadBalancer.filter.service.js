@@ -4,15 +4,13 @@ const angular = require('angular');
 import _ from 'lodash';
 
 import { LOAD_BALANCER_FILTER_MODEL } from './loadBalancerFilter.model';
-import { WAYPOINT_SERVICE } from 'core/utils/waypoints/waypoint.service';
 
 module.exports = angular
   .module('spinnaker.core.loadBalancer.filter.service', [
     LOAD_BALANCER_FILTER_MODEL,
-    WAYPOINT_SERVICE,
     require('../../filterModel/filter.model.service.js'),
   ])
-  .factory('loadBalancerFilterService', function (LoadBalancerFilterModel, waypointService, filterModelService,
+  .factory('loadBalancerFilterService', function (LoadBalancerFilterModel, filterModelService,
                                                   $log) {
 
     var isFilterable = filterModelService.isFilterable,
@@ -141,7 +139,6 @@ module.exports = angular
       });
 
       sortGroupsByHeading(groups);
-      waypointService.restoreToWaypoint(application.name);
       LoadBalancerFilterModel.addTags();
       lastApplication = application;
       return groups;

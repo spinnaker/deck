@@ -8,7 +8,6 @@ import { ICluster } from 'core/domain';
 import { Instance } from 'core/domain/instance';
 import { IEntityTags } from 'core/domain/IEntityTags';
 import { CLUSTER_FILTER_MODEL } from './clusterFilter.model';
-import { WAYPOINT_SERVICE } from 'core/utils/waypoints/waypoint.service';
 
 interface IParentGrouping {
   subgroups: IClusterSubgroup[] | IServerGroupSubgroup[];
@@ -102,7 +101,6 @@ export class ClusterFilterService {
     });
 
     this.sortGroupsByHeading(groups);
-    this.waypointService.restoreToWaypoint(application.name);
     this.ClusterFilterModel.addTags();
     this.lastApplication = application;
     this.addHealthFlags();
@@ -114,11 +112,10 @@ export class ClusterFilterService {
   private isFilterable: (sortFilter: any) => boolean = this.filterModelService.isFilterable;
 
   static get $inject() {
-    return ['ClusterFilterModel', 'MultiselectModel', 'waypointService', '$log', '$stateParams',
-      'filterModelService'];
+    return ['ClusterFilterModel', 'MultiselectModel', '$log', '$stateParams', 'filterModelService'];
   }
 
-  public constructor(private ClusterFilterModel: any, private MultiselectModel: any, private waypointService: any,
+  public constructor(private ClusterFilterModel: any, private MultiselectModel: any,
                      private $log: ILogService, private $stateParams: StateParams,
                      private filterModelService: any) {}
 
@@ -475,6 +472,5 @@ module(CLUSTER_FILTER_SERVICE, [
   require('angular-ui-router').default,
   CLUSTER_FILTER_MODEL,
   require('./multiselect.model'),
-  WAYPOINT_SERVICE,
   require('../../filterModel/filter.model.service'),
 ]).service('clusterFilterService', ClusterFilterService);
