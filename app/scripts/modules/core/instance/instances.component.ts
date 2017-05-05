@@ -17,15 +17,13 @@ export class InstancesController implements IComponentController {
   private activeInstance: IActiveInstance;
   private tooltipTargets: Element[] = [];
 
-  static get $inject(): string[] {
-    return ['$rootScope', '$scope', '$element', '$timeout', '$state'];
-  }
-
   public constructor(private $rootScope: IRootScopeService,
                      private $scope: IScope,
                      private $element: JQuery,
                      private $timeout: ITimeoutService,
-                     private $state: StateService) {}
+                     private $state: StateService) {
+    'ngInject';
+  }
 
   private removeTooltips(): void {
     this.tooltipTargets.forEach(target => $(target).tooltip('destroy'));
