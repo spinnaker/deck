@@ -11,9 +11,12 @@ install: gradle/installViaTravis.sh
 script: gradle/buildViaTravis.sh
 before_cache: gradle/prepCaches.sh
 cache:
+  yarn: true
   directories:
   - $HOME/.gradle
   - node_modules
+  - .happypack
+  - .awcache
 notifications:
   slack:
     secure: tiW8Hb82slR0ldYvtoTlF8HDTwrhzgtwFFbCH8yo/1bkHhv9xRK2rF68q+DNDk9+34dDlTs5oOGYHMc8Q27S+qJUWUaj3He0BJhDTnJPaaBSOrbeMbq795hfLdGJLu4sJeTcBQ09ci51/uVl9hrNRalB2pfa/aRGvbPraxS5+TPXZpJf2x4YkMs1unTWOqbF3D1ffhgvh5R7UoqAdx/xfrQsj9aSVTvc1OrwI36vEu+bUMTvSXJ7TrdZ7rb6wR5lgcGJ1Jhk9kwyC4qvXIT09IET2Ubq7lCUwU6IqL6tHh872eRz9pG/ZQMVomlnn1gIyLu/0xI8vgxMx7UJ69ZOpeGbdNuUnEu8x+LJ/qV+O8/oc8m2DnJ9xgJCokPkmL0lv76IHxlU7G4Py6V7p28Kk59h2hCw2NSfAnsnx8pFhdu9imw2QeG5p1ueLCThq6s6tEBAYjBS0uvye6Fv62EJJd5he867aeCfm9IuXUuT33HkM0AwUo3oJuErG3errvIQiuVNK8p5vbZLNp+amBtk2tcquUUbB8g7ui61M+YNKvzGJ1ugYUo3Sp3DyvD3DFIH+kP+w3Gw85c/maYEug1CiAbHn0B2fTWpkiOkRwOrAOwN2uKSVQHW7wmXSeJiU0ggMlwTiJ8LgN/6NckqM029NuRg8TskSeSwdnGMTTCEs00=
