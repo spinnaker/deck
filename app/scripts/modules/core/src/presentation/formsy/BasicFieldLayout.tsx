@@ -25,25 +25,25 @@ export class BasicFieldLayout extends React.Component<IFormFieldLayoutProps, {}>
   }
 
   public render() {
-    const { _label, _input, _help, _error, showRequired, showError } = this.props;
+    const { Label, Input, Help, Error, showRequired, showError } = this.props;
 
-    const renderedLabel = _label && <div className="col-md-3 sm-label-right"> {_label} </div>;
-    const renderedHelp = _help && <div className="small text-right"> {_help} </div>;
-    const renderedError = _error && <div className="ng-invalid"> {_error} </div>;
+    const LabelDiv = Label && <div className="col-md-3 sm-label-right"> {Label} </div>;
+    const HelpDiv = Help && <div className="small text-right"> {Help} </div>;
+    const ErrorDiv = Error && <div className="ng-invalid"> {Error} </div>;
 
-    const renderedInputGroup = _input && (
+    const InputGroup = Input && (
       <div className="col-md-9">
-        {_input}
-        {renderedHelp}
-        {renderedError}
+        {Input}
+        {HelpDiv}
+        {ErrorDiv}
       </div>
     );
 
     const className = `form-group ${showRequired || showError ? 'ng-invalid' : ''}`;
     return (
       <div className={className}>
-        {renderedLabel}
-        {renderedInputGroup}
+        {LabelDiv}
+        {InputGroup}
       </div>
     );
   }

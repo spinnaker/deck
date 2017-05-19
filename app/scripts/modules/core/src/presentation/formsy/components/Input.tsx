@@ -8,10 +8,8 @@ export interface IProps extends IFormComponentProps {
   type: string;
 }
 
-export interface IState extends IFormComponentState { }
-
 /** A simple Formsy form component for validated <input> tags (text or checkbox) */
-export class Input extends FormComponent<string, IProps, IState> {
+export class Input extends FormComponent<string, IProps, IFormComponentState> {
   public handleValueChanged(value: any) {
     this.setValue(value);
   }

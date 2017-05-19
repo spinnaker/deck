@@ -77,8 +77,15 @@ declare module 'formsy-react' {
     attachToForm(component: any): void;
     /** Method put on each input component to unregister itself from the form */
     detachFromForm(component: any): void;
-
-
   }
+
+  interface IFormsyContext {
+    attachToForm: typeof Form.attachToForm;
+    detachFromForm: typeof Form.detachFromForm;
+    validate: typeof Form.validate;
+    isFormDisabled: typeof Form.isFormDisabled;
+    isValidValue(component: any, value?: any): boolean;
+  }
+
   const Decorator: () => (target) => any;
 }

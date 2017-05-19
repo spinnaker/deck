@@ -16,7 +16,7 @@ class AddEntityTagLinksCtrl implements ng.IComponentController {
   private ownerOptions: IOwnerOption[];
 
   public addTag(tagType: string): void {
-    const _tag: IEntityTag = {
+    const tag: IEntityTag = {
       name: null,
       value: {
         message: null,
@@ -25,7 +25,7 @@ class AddEntityTagLinksCtrl implements ng.IComponentController {
     };
 
     const props: IEntityTagEditorProps = {
-      tag: _tag,
+      tag: tag,
       isNew: true,
       owner: this.component,
       entityType: this.entityType,

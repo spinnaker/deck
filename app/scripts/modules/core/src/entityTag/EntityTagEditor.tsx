@@ -16,6 +16,7 @@ import {
 import { BasicFieldLayout, TextArea, ReactModal } from 'core/presentation';
 import { NgReact } from 'core/reactShims/ngReact';
 import { EntityRefBuilder } from './entityRef.builder';
+import { noop } from 'core/utils';
 
 import './entityTagEditor.modal.less';
 import { Form } from 'formsy-react';
@@ -52,9 +53,9 @@ export interface IEntityTagEditorState {
 
 @autoBindMethods
 export class EntityTagEditor extends React.Component<IEntityTagEditorProps, IEntityTagEditorState> {
-  public static defaultProps = {
-    onHide: () => null as any,
-    onUpdate: () => null as any,
+  public static defaultProps: Partial<IEntityTagEditorProps> = {
+    onHide: noop,
+    onUpdate: noop,
   };
 
   private taskMonitorBuilder: TaskMonitorBuilder = ReactInjector.taskMonitorBuilder;
@@ -242,8 +243,8 @@ class EntityTagMessage extends React.Component<IEntityTagMessageProps, {}> {
 
           <TextArea
             label="Message"
-            _help={<div>Markdown is okay <HelpField id="markdown.examples"/></div>}
-            layout={BasicFieldLayout}
+            Help={<div>Markdown is okay <HelpField id="markdown.examples"/></div>}
+            Layout={BasicFieldLayout}
             name="message"
             required={true}
             validationErrors={{ isDefaultRequiredValue: 'Please enter a message' }}
@@ -256,7 +257,7 @@ class EntityTagMessage extends React.Component<IEntityTagMessageProps, {}> {
           { message && (
             <div className="form-group preview">
               <div className="col-md-3 sm-label-right">
-                <b>Preview</b>
+                <strong>Preview</strong>
               </div>
               <div className="col-md-9">
                 <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(marked(message)) }}/>
@@ -278,7 +279,7 @@ interface IOwnerOptionsProps {
 }
 
 @autoBindMethods
-class OwnerOptions extends React.Component<IOwnerOptionsProps, any> {
+class OwnerOptions extends React.Component<IOwnerOptionsProps, void> {
   public handleOwnerOptionChanged(option: IOwnerOption): void {
     this.props.onOwnerOptionChanged(option);
   }
