@@ -6,10 +6,11 @@ import * as React from 'react';
 import { Modal } from 'react-bootstrap';
 import { IModalServiceInstance } from 'angular-ui-bootstrap';
 import autoBindMethods from 'class-autobind-decorator';
+import * as DOMPurify from 'dompurify';
 
 import {
   UUIDGenerator, Application, EntityTagWriter, HelpField, IEntityRef, IEntityTag,
-  ReactInjector, TaskMonitor, TaskMonitorBuilder
+  ReactInjector, TaskMonitor, TaskMonitorBuilder, SubmitButton
 } from 'core';
 
 import { BasicFieldLayout, TextArea, ReactModal } from 'core/presentation';
@@ -17,6 +18,7 @@ import { NgReact } from 'core/reactShims/ngReact';
 import { EntityRefBuilder } from './entityRef.builder';
 
 import './entityTagEditor.modal.less';
+import { Form } from 'formsy-react';
 
 export interface IOwnerOption {
   label: string;
@@ -58,6 +60,7 @@ export class EntityTagEditor extends React.Component<IEntityTagEditorProps, IEnt
   private taskMonitorBuilder: TaskMonitorBuilder = ReactInjector.taskMonitorBuilder;
   private entityTagWriter: EntityTagWriter = ReactInjector.entityTagWriter;
   private $uibModalInstanceEmulation: IModalServiceInstance & { deferred?: IDeferred<any> };
+  private form: Form;
 
   /** Shows the Entity Tag Editor modal */
   public static show(props: IEntityTagEditorProps): Promise<void> {
@@ -139,6 +142,14 @@ export class EntityTagEditor extends React.Component<IEntityTagEditorProps, IEnt
     this.setState({ taskMonitor, isSubmitting: true });
   }
 
+  private refCallback(form: Form): void {
+    this.form = form;
+  }
+
+  private submit(): void {
+    this.form.submit();
+  }
+
   public render() {
     const { isNew, tag, ownerOptions } = this.props;
     const { isValid, isSubmitting } = this.state;
@@ -152,14 +163,8 @@ export class EntityTagEditor extends React.Component<IEntityTagEditorProps, IEnt
       </div>
     );
 
-    const submitButton = (
-      <button type="submit" className="btn btn-primary" disabled={!isValid || isSubmitting}>
-        <span className="glyphicon glyphicon-ok-circle" />
-        <span>{this.props.isNew ? ' Create' : ' Update'} {tag.value.type}</span>
-      </button>
-    );
-
-    const cancelButton = <button type="button" className="btn btn-default" onClick={this.onHide}>Cancel</button>
+    const submitLabel = `${isNew ? ' Create' : ' Update'} ${tag.value.type}`;
+    const cancelButton = <button type="button" className="btn btn-default" onClick={this.onHide}>Cancel</button>;
 
     const { TaskMonitorWrapper } = NgReact;
 
@@ -169,6 +174,7 @@ export class EntityTagEditor extends React.Component<IEntityTagEditorProps, IEnt
         <TaskMonitorWrapper monitor={this.state.taskMonitor} />
 
         <Formsy.Form
+          ref={this.refCallback}
           role="form"
           name="form"
           className="form-horizontal"
@@ -198,7 +204,14 @@ export class EntityTagEditor extends React.Component<IEntityTagEditorProps, IEnt
 
           <Modal.Footer>
             {cancelButton}
-            {submitButton}
+
+            <SubmitButton
+              onClick={this.submit}
+              label={submitLabel}
+              isDisabled={!isValid || isSubmitting}
+              submitting={this.state.isSubmitting}
+            />
+
           </Modal.Footer>
         </Formsy.Form>
 
