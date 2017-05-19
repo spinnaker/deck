@@ -1,8 +1,9 @@
-import { IComponentController, IComponentOptions, module } from 'angular';
+import { ITimeoutService, IComponentController, IComponentOptions, module } from 'angular';
 
 import { Application, EntityTagWriter, IEntityTag, IEntityTagEditorProps } from 'core';
 
 import { EntityTagEditor, ENTITY_TAG_WRITER } from 'core/entityTag';
+import { ConfirmationModalService } from 'core/confirmationModal';
 
 import './entityUiTags.component.less';
 import './entityUiTags.popover.less';
@@ -23,8 +24,8 @@ class EntityUiTagsCtrl implements IComponentController {
 
   private component: any;
 
-  public constructor(private $timeout: ng.ITimeoutService,
-                     private confirmationModalService: any,
+  public constructor(private $timeout: ITimeoutService,
+                     private confirmationModalService: ConfirmationModalService,
                      private entityTagWriter: EntityTagWriter) {
     'ngInject';
   }

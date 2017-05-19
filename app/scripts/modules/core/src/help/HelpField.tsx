@@ -4,7 +4,7 @@ import * as DOMPurify from 'dompurify';
 import autoBindMethods from 'class-autobind-decorator';
 import { $injector } from 'ngimport';
 
-import { HelpContentsRegistry } from 'core/help';
+import { HelpContentsRegistry, IHelpContents } from 'core/help';
 import { HoverablePopover } from 'core/presentation';
 import { Placement } from 'core/presentation/Placement';
 
@@ -28,7 +28,7 @@ export class HelpField extends React.Component<IHelpFieldProps, IState> {
   };
 
   private helpContentsRegistry: HelpContentsRegistry;
-  private helpContents: any;
+  private helpContents: IHelpContents;
   private popoverShownStart: number;
 
   constructor(props: IHelpFieldProps) {
@@ -65,7 +65,7 @@ export class HelpField extends React.Component<IHelpFieldProps, IState> {
     }
   }
 
-  public render(): React.ReactElement<any> {
+  public render() {
     const { placement, label, expand } = this.props;
     const { contents } = this.state;
 

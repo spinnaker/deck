@@ -40,7 +40,7 @@ export class TextArea extends FormComponent<string, IProps, IState> {
     this.props.onChange(event);
   }
 
-  public render(): React.ReactElement<any> {
+  public render() {
     const { label, _help, layout, name, className, rows } = this.props;
 
     const _label = label && <label htmlFor={name}>{label}</label>;

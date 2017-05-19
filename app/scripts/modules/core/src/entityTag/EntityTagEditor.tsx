@@ -60,25 +60,25 @@ export class EntityTagEditor extends React.Component<IEntityTagEditorProps, IEnt
   private $uibModalInstanceEmulation: IModalServiceInstance & { deferred?: IDeferred<any> };
 
   /** Shows the Entity Tag Editor modal */
-  public static show(props: IEntityTagEditorProps): Promise<any> {
+  public static show(props: IEntityTagEditorProps): Promise<void> {
     return ReactModal.show(React.createElement(EntityTagEditor, props));
   }
 
   constructor(props: IEntityTagEditorProps) {
     super(props);
 
-    const { ownerOptions, tag } = this.props;
+    const { ownerOptions, tag, entityType } = this.props;
     const owner = this.props.owner || (ownerOptions && ownerOptions.length && ownerOptions[0]);
     tag.name = tag.name || `spinnaker_ui_${tag.value.type}:${UUIDGenerator.generateUuid()}`;
 
     this.state = {
       taskMonitor: null,
-      message: props.tag && props.tag.value && props.tag.value.message,
+      message: tag.value && tag.value.message,
       show: true,
       isValid: false,
       isSubmitting: false,
       owner: owner,
-      entityType: this.props.entityType,
+      entityType: entityType,
     };
 
     const deferred = $q.defer();
@@ -114,7 +114,7 @@ export class EntityTagEditor extends React.Component<IEntityTagEditorProps, IEnt
   }
 
   private upsertTag(data: { message: string; }): void {
-    const { application, isNew, tag } = this.props;
+    const { application, isNew, tag, onUpdate } = this.props;
     const { owner, entityType } = this.state;
     const entityRef: IEntityRef = this.props.entityRef || EntityRefBuilder.getBuilder(entityType)(owner);
 
@@ -124,7 +124,7 @@ export class EntityTagEditor extends React.Component<IEntityTagEditorProps, IEnt
       application: application,
       title: `${isNew ? 'Create' : 'Update'} ${this.props.tag.value.type} for ${entityRef.entityId}`,
       modalInstance: this.$uibModalInstanceEmulation,
-      onTaskComplete: () => this.props.onUpdate(),
+      onTaskComplete: () => onUpdate(),
     });
 
     const submitMethod = () => {
@@ -139,8 +139,9 @@ export class EntityTagEditor extends React.Component<IEntityTagEditorProps, IEnt
     this.setState({ taskMonitor, isSubmitting: true });
   }
 
-  public render(): React.ReactElement<any> {
+  public render() {
     const { isNew, tag, ownerOptions } = this.props;
+    const { isValid, isSubmitting } = this.state;
     const message = this.state.message || '';
 
     const closeButton = (
@@ -150,6 +151,15 @@ export class EntityTagEditor extends React.Component<IEntityTagEditorProps, IEnt
         </a>
       </div>
     );
+
+    const submitButton = (
+      <button type="submit" className="btn btn-primary" disabled={!isValid || isSubmitting}>
+        <span className="glyphicon glyphicon-ok-circle" />
+        <span>{this.props.isNew ? ' Create' : ' Update'} {tag.value.type}</span>
+      </button>
+    );
+
+    const cancelButton = <button type="button" className="btn btn-default" onClick={this.onHide}>Cancel</button>
 
     const { TaskMonitorWrapper } = NgReact;
 
@@ -187,11 +197,8 @@ export class EntityTagEditor extends React.Component<IEntityTagEditorProps, IEnt
           </Modal.Body>
 
           <Modal.Footer>
-            <button type="button" className="btn btn-default" onClick={this.onHide}>Cancel</button>
-            <button type="submit" className="btn btn-primary" disabled={!this.state.isValid || this.state.isSubmitting}>
-              <span className="glyphicon glyphicon-ok-circle" />
-              <span>{this.props.isNew ? ' Create' : ' Update'} {this.props.tag.value.type}</span>
-            </button>
+            {cancelButton}
+            {submitButton}
           </Modal.Footer>
         </Formsy.Form>
 
@@ -209,11 +216,11 @@ interface IEntityTagMessageProps {
 
 @autoBindMethods
 class EntityTagMessage extends React.Component<IEntityTagMessageProps, {}> {
-  private handleTextareaChanged(event: React.FormEvent<any>): void {
+  private handleTextareaChanged(event: React.FormEvent<HTMLTextAreaElement>): void {
     this.props.onMessageChanged(event.currentTarget.value);
   }
 
-  public render(): React.ReactElement<any> {
+  public render() {
     const { message } = this.props;
 
     return (
@@ -239,7 +246,7 @@ class EntityTagMessage extends React.Component<IEntityTagMessageProps, {}> {
                 <b>Preview</b>
               </div>
               <div className="col-md-9">
-                <div dangerouslySetInnerHTML={{ __html: marked(message) }}/>
+                <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(marked(message)) }}/>
               </div>
             </div>
           ) }
@@ -263,7 +270,7 @@ class OwnerOptions extends React.Component<IOwnerOptionsProps, any> {
     this.props.onOwnerOptionChanged(option);
   }
 
-  public render(): React.ReactElement<any> {
+  public render() {
     const { ownerOptions, selectedOwner } = this.props;
 
     return (
@@ -282,7 +289,7 @@ class OwnerOptions extends React.Component<IOwnerOptionsProps, any> {
                       selectedOwner={selectedOwner}
                       onOwnerOptionChanged={this.handleOwnerOptionChanged}
                     />
-                    <span className="marked" dangerouslySetInnerHTML={{ __html: marked(option.label) }}/>
+                    <span className="marked" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(marked(option.label)) }}/>
                   </label>
                 </div>
               )) }
@@ -306,7 +313,7 @@ class OwnerOption extends React.Component<IOwnerOptionProps, any> {
     this.props.onOwnerOptionChanged(this.props.option);
   }
 
-  public render(): React.ReactElement<any> {
+  public render() {
     const { option, selectedOwner } = this.props;
     return (
       <input
@@ -319,4 +326,3 @@ class OwnerOption extends React.Component<IOwnerOptionProps, any> {
     );
   }
 }
-
