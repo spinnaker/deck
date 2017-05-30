@@ -3,15 +3,14 @@ import * as ReactGA from 'react-ga';
 import autoBindMethods from 'class-autobind-decorator';
 import { uniq } from 'lodash';
 
-import { CategorizedNotifications } from './CategorizedNotifications';
-import { IEntityTags } from 'core/domain';
-import { HoverablePopover } from 'core/presentation';
-import { Placement } from 'core/presentation/Placement';
-import { EntityTagEditor, GroupedNotificationList, IEntityTagEditorProps, NotificationList } from 'core/entityTag';
-import { IEntityTag } from 'core/domain';
 import { Application } from 'core/application';
-import { noop } from 'core/utils';
+import { IEntityTags, IEntityTag } from 'core/domain';
+import { EntityTagEditor, GroupedNotificationList, IEntityTagEditorProps, NotificationList } from 'core/entityTag';
+import { Placement, HoverablePopover } from 'core/presentation';
 import { ReactInjector } from 'core/reactShims';
+import { noop } from 'core/utils';
+import { ITaskMonitorConfig } from 'core/task';
+import { CategorizedNotifications } from './CategorizedNotifications';
 import { NotificationCategories, INotificationCategory } from './notificationCategories';
 
 import './notifications.less';
@@ -28,31 +27,33 @@ export interface INotification {
 }
 
 export interface INotificationsPopoverProps {
-  // The entity that "owns" the tags
+  /** The entity that "owns" the tags */
   entity?: any;
-  // The entity tags which contain the notifications
+  /** The entity tags which contain the notifications */
   tags: IEntityTags[];
-  // The type of notifications (which is also the JS property to use)
+  /** The type of notifications (which is also the JS property to use) */
   type?: NotificationType;
-  // The global application object
+  /** The global application object */
   application: Application;
 
-  // Group identical messages from multiple server groups together
-  // When grouped, the edit/delete controls do not render.
+  /**
+   * Group identical messages from multiple server groups together
+   * When grouped, the edit/delete controls do not render.
+   */
   grouped?: boolean;
-  // Show categories
+  /** Show categories */
   categorized?: boolean;
-  // Tooltip placement
+  /** Tooltip placement */
   placement?: Placement;
-  // horizontal offset percent string, e.g. '25%'
-  offset?: string;
-  // class for the popover span
+  /** e.g. '25%' */
+  hOffsetPercent?: string;
+  /** class for the popover span */
   className?: string;
 
-  // A function that returns the google analytics event string
+  /** A function that returns the google analytics event string */
   gaLabelFn?(props: INotificationsPopoverProps): string;
 
-  // Callback after a tag has been updated
+  /** Callback after a tag has been updated */
   onUpdate?(): void;
 }
 
@@ -104,8 +105,8 @@ export class NotificationsPopover extends React.Component<INotificationsPopoverP
     return { notifications, count, severity };
   }
 
-  public componentWillReceiveProps(newProps: INotificationsPopoverProps): void {
-    this.setState(this.getState(newProps));
+  public componentWillReceiveProps(nextProps: INotificationsPopoverProps): void {
+    this.setState(this.getState(nextProps));
   }
 
   public handleEditNotification(notification: INotification): void {
@@ -140,7 +141,7 @@ export class NotificationsPopover extends React.Component<INotificationsPopoverP
     const { entityTags, entityTag } = notification;
     const type = entityTag.value['type'];
 
-    const taskMonitorConfig: any = {
+    const taskMonitorConfig: ITaskMonitorConfig = {
       application: application,
       title: `Deleting ${type} on ${entity.name}`,
       onTaskComplete: () => onUpdate(),
@@ -177,7 +178,7 @@ export class NotificationsPopover extends React.Component<INotificationsPopoverP
   }
 
   public render() {
-    const { type, className, placement, offset } = this.props;
+    const { type, className, placement, hOffsetPercent } = this.props;
     const { count, severity } = this.state;
     if (count < 1) {
       return null;
@@ -193,7 +194,7 @@ export class NotificationsPopover extends React.Component<INotificationsPopoverP
       <span className={`tag-marker small ${className || ''}`} onMouseEnter={this.fireGAEvent}>
         <HoverablePopover
           placement={placement}
-          offset={offset}
+          hOffsetPercent={hOffsetPercent}
           template={Notifications}
           title={title}
           className={`no-padding notifications-popover ${severityClass}`}

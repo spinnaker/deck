@@ -3,10 +3,10 @@ import * as marked from 'marked';
 import * as DOMPurify from 'dompurify';
 import autoBindMethods from 'class-autobind-decorator';
 
-import { relativeTime, timestamp } from 'core/utils/timeFormatters';
+import { relativeTime, timestamp } from 'core/utils';
 import { INotification } from './NotificationsPopover';
 
-export interface IProps {
+export interface INotificationListProps {
   notifications: INotification[];
   onEditTag(notification: INotification): void;
   onDeleteTag(notification: INotification): void;
@@ -16,7 +16,7 @@ export interface IProps {
  * Renders a list of notifications.
  * Provides edit and delete buttons.
  */
-export class NotificationList extends React.Component<IProps, void> {
+export class NotificationList extends React.Component<INotificationListProps, void> {
   public render() {
     const { notifications, onEditTag, onDeleteTag } = this.props;
 

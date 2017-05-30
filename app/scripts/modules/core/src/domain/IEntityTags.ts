@@ -50,8 +50,8 @@ export interface IEntityRef {
   account?: string;
   accountId?: string;
   cloudProvider?: string;
-  entityId?: string;
-  entityType?: string;
+  entityId: string;
+  entityType: string;
   region?: string;
   vpcId?: string;
 }

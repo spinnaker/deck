@@ -6,14 +6,14 @@
       <span class="glyphicon glyphicon-transfer"></span>
       {{heading | uppercase}}
 
-      <entity-notifications-wrapper
+      <entity-notifications
         entity="securityGroup"
         application="application"
         placement="top"
         entity-type="securityGroup"
         page-location="details"
         on-update="application.securityGroups.refresh()"
-      ></entity-notifications-wrapper>
+      ></entity-notifications>
 
     </h6>
   </sticky-header>

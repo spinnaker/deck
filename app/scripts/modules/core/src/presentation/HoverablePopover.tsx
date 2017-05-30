@@ -3,32 +3,38 @@ import * as ReactDOM from 'react-dom';
 import { Overlay, Popover, PopoverProps } from 'react-bootstrap';
 import autoBindMethods from 'class-autobind-decorator';
 
-import {Placement} from 'core/presentation/Placement';
+import {Placement} from 'core/presentation';
 import {UUIDGenerator} from 'core/utils';
 
-export interface IProps {
+export interface IHoverablePopoverProps {
+  /** The popover contents (simple mode) */
   value?: string;
+  /** The popover contents (advanced mode) */
   template?: JSX.Element;
 
   placement?: Placement;
   /** a percent string between 0% and 100% */
-  offset?: string;
+  hOffsetPercent?: string;
+  /** class to put on the popover content */
   className?: string;
+
+  /** Rendered on the top of the popover content */
   title?: string;
   id?: string;
+
   onShow?: () => void;
   onHide?: () => void;
 }
 
-export interface IState {
+export interface IHoverablePopoverState {
   popoverIsOpen: boolean;
   target?: any;
   PopoverRenderer?: React.ComponentClass<PopoverProps> | React.StatelessComponent<PopoverProps>;
 }
 
 @autoBindMethods
-export class HoverablePopover extends React.Component<IProps, IState> {
-  public static defaultProps: Partial<IProps> = {
+export class HoverablePopover extends React.Component<IHoverablePopoverProps, IHoverablePopoverState> {
+  public static defaultProps: Partial<IHoverablePopoverProps> = {
     placement: 'top',
     id: UUIDGenerator.generateUuid(),
   };
@@ -45,9 +51,7 @@ export class HoverablePopover extends React.Component<IProps, IState> {
     }
 
     return class extends React.Component<PopoverProps, IOffsetState> {
-      public state: IOffsetState = {
-        offset: null,
-      };
+      public state = {} as IOffsetState;
 
       public componentDidMount() {
         this.setState(this.getState(this.props));
@@ -86,12 +90,12 @@ export class HoverablePopover extends React.Component<IProps, IState> {
     }
   }
 
-  constructor(props: IProps) {
+  constructor(props: IHoverablePopoverProps) {
     super(props);
 
     this.state = {
       popoverIsOpen: false,
-      PopoverRenderer: HoverablePopover.popoverOffsetRenderer(props.offset),
+      PopoverRenderer: HoverablePopover.popoverOffsetRenderer(props.hOffsetPercent),
     };
   }
 
@@ -125,6 +129,7 @@ export class HoverablePopover extends React.Component<IProps, IState> {
   public render() {
     const PopoverContents = this.props.template;
     const PopoverRenderer = this.state.PopoverRenderer;
+
     return (
       <span onMouseEnter={this.showPopover} onMouseLeave={this.deferHidePopover}>
         {this.props.children}

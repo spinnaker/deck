@@ -12,7 +12,7 @@ import { ReactInjector } from 'core/reactShims';
 import { HealthCounts } from 'core/healthCounts/HealthCounts';
 import { LoadBalancerClusterContainer } from './LoadBalancerClusterContainer';
 import { Sticky } from 'core/utils/stickyHeader/Sticky';
-import { EntityNotifications } from 'core/entityTag/alerts/EntityNotifications';
+import { EntityNotifications } from 'core/entityTag/notifications/EntityNotifications';
 
 export interface ILoadBalancerProps {
   application: Application;

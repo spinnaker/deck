@@ -26,15 +26,15 @@
                 {{ $ctrl.viewModel.images }}
               </span>
 
-              <entity-notifications-wrapper
+              <entity-notifications
                 entity="$ctrl.serverGroup"
                 application="$ctrl.application"
                 placement="top"
-                offset='20%'
+                h-offset-percent="20%"
                 entity-type="serverGroup"
                 page-location="pod"
                 on-update="$ctrl.application.serverGroups.refresh()"
-              ></entity-notifications-wrapper>
+              ></entity-notifications>
 
             </div>
             <div class="col-md-{{ $ctrl.viewModel.images ? 3 : 4 }} col-sm-6 text-right">

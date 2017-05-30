@@ -1,6 +1,6 @@
 const angular = require('angular');
 
-import {ENTITY_TAGS_MODULE} from 'core/entityTag/entityTags.module';
+import { ENTITY_TAGS_MODULE } from 'core/entityTag/entityTags.module';
 
 import './applicationNav.component.less';
 

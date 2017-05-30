@@ -11,11 +11,11 @@ export interface IMessageNotifications {
   notifications: INotification[];
 }
 
-export interface IProps {
+export interface IGroupedNotificationListProps {
   notifications: INotification[];
 }
 
-export interface IState {
+export interface IGroupedNotificationListState {
   alertsByMessage: IMessageNotifications[];
   collapsed: boolean;
 }
@@ -25,12 +25,12 @@ export interface IState {
  * A clickable link shows/hides the entities (server groups) affected
  */
 @autoBindMethods
-export class GroupedNotificationList extends React.Component<IProps, IState> {
-  public static defaultProps: Partial<IProps> = {
+export class GroupedNotificationList extends React.Component<IGroupedNotificationListProps, IGroupedNotificationListState> {
+  public static defaultProps: Partial<IGroupedNotificationListProps> = {
     notifications: [],
   };
 
-  constructor(props: IProps) {
+  constructor(props: IGroupedNotificationListProps) {
     super(props);
     this.state = {
       collapsed: true,
@@ -38,7 +38,7 @@ export class GroupedNotificationList extends React.Component<IProps, IState> {
     };
   }
 
-  public componentWillReceiveProps(newProps: IProps): void {
+  public componentWillReceiveProps(newProps: IGroupedNotificationListProps): void {
     this.setState({ alertsByMessage: this.getAlertsByMessage(newProps.notifications) });
   }
 

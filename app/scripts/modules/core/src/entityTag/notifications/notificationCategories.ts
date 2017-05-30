@@ -1,7 +1,6 @@
 import { Dictionary, keyBy } from 'lodash';
 
 export interface INotificationCategory {
-  [key: string]: string|number;
   id: string;
   severity: number;
   label: string;
@@ -41,19 +40,16 @@ const NOTIFICATION_CATEGORIES = [
 const BY_NAME: Dictionary<INotificationCategory> = keyBy(NOTIFICATION_CATEGORIES, 'id');
 
 export class NotificationCategories {
+  private static defineCategory(id: string, label = id, severity = 0, icon = 'fa-exclamation-circle') {
+    return BY_NAME[id] = { id, label, severity, icon };
+  }
+
   public static getCategory(categoryName: string): INotificationCategory {
     if (!categoryName) {
       return BY_NAME['default'];
     }
 
-    const buildCategory = (name: string) => ({
-      id: name,
-      label: name,
-      severity: 0,
-      icon: 'fa-exclamation-circle',
-    });
-
-    return BY_NAME[categoryName] || buildCategory(categoryName);
+    return BY_NAME[categoryName] || NotificationCategories.defineCategory(categoryName);
   }
 }
 

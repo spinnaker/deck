@@ -27,15 +27,15 @@
         {{ctrl.serverGroup.name}}
         <render-if-feature feature="entityTags">
 
-          <entity-notifications-wrapper
+          <entity-notifications
             entity="ctrl.serverGroup"
             application="ctrl.application"
             placement="bottom"
-            offset='90%'
+            h-offset-percent="90%"
             entity-type="serverGroup"
             page-location="details"
             on-update="ctrl.application.serverGroups.refresh()"
-          ></entity-notifications-wrapper>
+          ></entity-notifications>
 
         </render-if-feature>
       </h3>

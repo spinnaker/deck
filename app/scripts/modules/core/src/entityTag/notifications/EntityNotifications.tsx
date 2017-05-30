@@ -2,18 +2,20 @@ import { module } from 'angular';
 
 import { react2angular } from 'react2angular';
 import * as React from 'react';
+
 import { IEntityTags, IEntityTag } from 'core/domain';
-import { NotificationsPopover } from './NotificationsPopover';
-import { Placement } from 'core/presentation/Placement';
+import { Placement } from 'core/presentation';
 import { Application } from 'core/application';
 import { noop } from 'core/utils';
+import { NotificationsPopover } from './NotificationsPopover';
 
 interface IProps {
   entity: any;
   application: Application;
+
   placement?: Placement;
-  // a horizontal offset percent string
-  offset?: string;
+  // eg: '25%'
+  hOffsetPercent?: string;
 
   className?: string;
 
@@ -30,43 +32,50 @@ interface IProps {
 export class EntityNotifications extends React.Component<IProps, void> {
   public static defaultProps: Partial<IProps> = {
     placement: 'bottom',
-    offset: '50%',
+    hOffsetPercent: '50%',
     className: '',
     onUpdate: noop,
   };
 
-  public render() {
-    const { entity, application, placement, offset, pageLocation, className, entityType, onUpdate } = this.props;
+  private getAlertAnalyticsLabel(): string {
+    const { entity, pageLocation, entityType } = this.props;
     const entityTags: IEntityTags = entity.entityTags;
 
-    function alertAnalyticsLabel(): string {
-      const { account, region, entityId } = entityTags.entityRef;
-      const alertsStr = entityTags.alerts.map((tag: IEntityTag) => tag.name).join(',');
-      return [ pageLocation, entityType, account, region, entityId, region, alertsStr ].join(':');
-    }
+    const { account, region, entityId } = entityTags.entityRef;
+    const alertsStr = entityTags.alerts.map((tag: IEntityTag) => tag.name).join(',');
 
-    function noticeAnalyticsLabel(): string {
-      const { account, region, entityId } = entityTags.entityRef;
-      const noticesStr = entityTags.notices.map((tag: IEntityTag) => tag.name).join(',');
-      return [ pageLocation, entityType, account, region, entityId, noticesStr ].join(':');
-    }
+    return [ pageLocation, entityType, account, region, entityId, region, alertsStr ].join(':');
+  }
+
+  private getNoticeAnalyticsLabel(): string {
+    const { entity, pageLocation, entityType } = this.props;
+    const entityTags: IEntityTags = entity.entityTags;
+
+    const { account, region, entityId } = entityTags.entityRef;
+    const noticesStr = entityTags.notices.map((tag: IEntityTag) => tag.name).join(',');
+
+    return [ pageLocation, entityType, account, region, entityId, noticesStr ].join(':');
+  }
+
+  public render() {
+    const { entity, application, placement, hOffsetPercent, className, onUpdate } = this.props;
+    const entityTags: IEntityTags = entity.entityTags;
 
     const tags = entityTags ? [entityTags] : [];
 
     return (
       <div className="entity-notifications">
-
         <NotificationsPopover
           entity={entity}
           tags={tags}
           application={application}
           type="alerts"
-          gaLabelFn={alertAnalyticsLabel}
+          gaLabelFn={this.getAlertAnalyticsLabel}
           grouped={false}
           categorized={true}
           className={className}
           placement={placement}
-          offset={offset}
+          hOffsetPercent={hOffsetPercent}
           onUpdate={onUpdate}
         />
 
@@ -75,15 +84,14 @@ export class EntityNotifications extends React.Component<IProps, void> {
           tags={tags}
           application={application}
           type="notices"
-          gaLabelFn={noticeAnalyticsLabel}
+          gaLabelFn={this.getNoticeAnalyticsLabel}
           grouped={false}
           categorized={false}
           className={className}
           placement={placement}
-          offset={offset}
+          hOffsetPercent={hOffsetPercent}
           onUpdate={onUpdate}
         />
-
       </div>
     );
   }
@@ -93,29 +101,29 @@ export class EntityNotifications extends React.Component<IProps, void> {
 export const ENTITY_NOTIFICATIONS = 'spinnaker.core.entityTag.alerts.entitynotifications';
 const ngmodule = module(ENTITY_NOTIFICATIONS, []);
 
-ngmodule.component('entityNotifications', react2angular(EntityNotifications, [
-  'entity', 'application', 'placement', 'offset', 'className', 'pageLocation', 'entityType', 'onUpdate'
+ngmodule.component('entityNotificationsWrapper', react2angular(EntityNotifications, [
+  'entity', 'application', 'placement', 'hOffsetPercent', 'className', 'pageLocation', 'entityType', 'onUpdate'
 ]));
 
 
-ngmodule.component('entityNotificationsWrapper', {
+ngmodule.component('entityNotifications', {
   template: `
-    <entity-notifications
+    <entity-notifications-wrapper
       entity="$ctrl.entity"
       application="$ctrl.application"
       placement="$ctrl.placement"
-      offset="$ctrl.offset"
+      hOffsetPercent="$ctrl.hOffsetPercent"
       class-name="$ctrl.className"
       entity-type="$ctrl.entityType"
       page-location="$ctrl.pageLocation"
       on-update="$ctrl.onUpdate"
-    ></entity-notifications>
+    ></entity-notifications-wrapper>
   `,
   bindings: {
     entity: '<',
     application: '<',
     placement: '@',
-    offset: '@',
+    hOffsetPercent: '@',
     className: '@',
     entityType: '@',
     pageLocation: '@',

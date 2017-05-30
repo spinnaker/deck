@@ -25,15 +25,15 @@
         {{ctrl.loadBalancer.name}}
         <render-if-feature feature="entityTags">
 
-          <entity-notifications-wrapper
+          <entity-notifications
             entity="ctrl.loadBalancer"
             application="ctrl.application"
             placement="bottom"
-            offset='90%'
+            h-offset-percent="90%"
             entity-type="loadBalancer"
             page-location="details"
             on-update="ctrl.application.loadBalancers.refresh()"
-          ></entity-notifications-wrapper>
+          ></entity-notifications>
 
         </render-if-feature>
       </h3>

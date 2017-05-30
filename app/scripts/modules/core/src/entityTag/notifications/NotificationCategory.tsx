@@ -4,7 +4,7 @@ import autoBindMethods from 'class-autobind-decorator';
 import { INotificationCategory } from './notificationCategories';
 import { INotification } from './NotificationsPopover';
 
-export interface IProps {
+export interface INotificationCategoryProps {
   category: INotificationCategory;
   notifications: INotification[];
   isSelected: boolean;
@@ -18,7 +18,7 @@ export interface IProps {
  * +--------------------------------+
  */
 @autoBindMethods
-export class NotificationCategory extends React.Component<IProps, any> {
+export class NotificationCategory extends React.Component<INotificationCategoryProps, any> {
   public selectCategory(): void {
     this.props.onCategorySelected(this.props.category);
   }

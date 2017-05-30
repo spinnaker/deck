@@ -21,15 +21,22 @@ import { noop } from 'core/utils';
 import './EntityTagEditor.less';
 import { Form } from 'formsy-react';
 
+export interface IOwner {
+  name: string;
+  cloudProvider: string;
+  region: string;
+  account: string;
+}
+
 export interface IOwnerOption {
   label: string;
   type: string;
-  owner: IEntityRef;
+  owner: IOwner;
   isDefault: boolean;
 }
 
 export interface IEntityTagEditorProps {
-  owner: IEntityRef;
+  owner: IOwner;
   application: Application;
   entityType: string;
   tag: IEntityTag;
@@ -47,7 +54,7 @@ export interface IEntityTagEditorState {
   show: boolean;
   isValid: boolean;
   isSubmitting: boolean;
-  owner: IEntityRef;
+  owner: IOwner;
   entityType: string;
 }
 

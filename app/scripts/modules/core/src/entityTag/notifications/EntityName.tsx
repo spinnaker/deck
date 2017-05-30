@@ -1,14 +1,14 @@
 import * as React from 'react';
 
-import { IEntityTags } from 'core/domain/IEntityTags';
+import { IEntityTags } from 'core/domain';
 import { NgReact } from 'core/reactShims';
 
-export interface IProps {
+export interface IEntityNameProps {
   tag: IEntityTags;
 }
 
-/** Renders an entity name and it's account and region */
-export class EntityName extends React.Component<IProps, void> {
+/** Renders an entity name and its account and region */
+export class EntityName extends React.Component<IEntityNameProps, void> {
   public render() {
     const entityRef = this.props.tag.entityRef;
     const { AccountTag } = NgReact;

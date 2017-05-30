@@ -2,13 +2,18 @@ import * as React from 'react';
 import { uniq } from 'lodash';
 import autoBindMethods from 'class-autobind-decorator';
 
-import { NotificationCategory } from './AlertCategory';
-import { NotificationList } from './NotificationList';
 import { GroupedNotificationList } from './GroupedNotificationList';
-import { INotificationCategory, NotificationCategories } from './notificationCategories';
+import { NotificationCategory } from './NotificationCategory';
+import { NotificationList } from './NotificationList';
 import { INotification } from './NotificationsPopover';
+import { INotificationCategory, NotificationCategories } from './notificationCategories';
 
-export interface IProps {
+export interface ICategoryNotifications {
+  category: INotificationCategory;
+  notifications: INotification[];
+}
+
+export interface ICategorizedNotificationsProps {
   notifications: INotification[];
   grouped: boolean;
   title: string;
@@ -16,16 +21,10 @@ export interface IProps {
   onDeleteTag(notification: INotification): void;
 }
 
-export interface ICategoryNotifications {
-  category: INotificationCategory;
-  notifications: INotification[];
-}
-
-export interface IState {
+export interface ICategorizedNotificationsState {
   categorizedAlerts: ICategoryNotifications[];
   selectedCategory: INotificationCategory;
 }
-
 /**
  * Shows categorized notifications
  *
@@ -48,10 +47,10 @@ export interface IState {
  * +------------------+-----------------------------------+
  */
 @autoBindMethods
-export class CategorizedNotifications extends React.Component<IProps, IState> {
-  public state: IState;
+export class CategorizedNotifications extends React.Component<ICategorizedNotificationsProps, ICategorizedNotificationsState> {
+  public state: ICategorizedNotificationsState;
 
-  constructor(props: IProps) {
+  constructor(props: ICategorizedNotificationsProps) {
     super(props);
 
     const categorizedAlerts = this.categorizeNotifications(props.notifications);
@@ -61,7 +60,7 @@ export class CategorizedNotifications extends React.Component<IProps, IState> {
     };
   }
 
-  public componentWillReceiveProps(props: IProps): void {
+  public componentWillReceiveProps(props: ICategorizedNotificationsProps): void {
     const categorizedAlerts = this.categorizeNotifications(props.notifications);
     this.setState({ categorizedAlerts });
   }

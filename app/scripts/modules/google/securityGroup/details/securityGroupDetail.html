@@ -17,16 +17,16 @@
         {{securityGroup.name || '(not found)'}}
         <render-if-feature feature="entityTags">
 
-          <entity-notifications-wrapper
+          <entity-notifications
             ng-if="!state.loading"
             entity="securityGroup"
             application="ctrl.application"
             placement="bottom"
-            offset='90%'
+            h-offset-percent="90%"
             entity-type="securityGroup"
             page-location="details"
             on-update="ctrl.application.securityGroups.refresh()"
-          ></entity-notifications-wrapper>
+          ></entity-notifications>
 
         </render-if-feature>
       </h3>
