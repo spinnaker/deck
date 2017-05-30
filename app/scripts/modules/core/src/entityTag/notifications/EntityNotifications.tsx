@@ -2,6 +2,7 @@ import { module } from 'angular';
 
 import { react2angular } from 'react2angular';
 import * as React from 'react';
+import autoBindMethods from 'class-autobind-decorator';
 
 import { IEntityTags, IEntityTag } from 'core/domain';
 import { Placement } from 'core/presentation';
@@ -29,6 +30,7 @@ interface IProps {
  * A notifications popover for alerts and notices.
  * Shows the notifications for a single entity (not rolled up, and not grouped by message)
  */
+@autoBindMethods
 export class EntityNotifications extends React.Component<IProps, void> {
   public static defaultProps: Partial<IProps> = {
     placement: 'bottom',
@@ -112,7 +114,7 @@ ngmodule.component('entityNotifications', {
       entity="$ctrl.entity"
       application="$ctrl.application"
       placement="$ctrl.placement"
-      hOffsetPercent="$ctrl.hOffsetPercent"
+      h-offset-percent="$ctrl.hOffsetPercent"
       class-name="$ctrl.className"
       entity-type="$ctrl.entityType"
       page-location="$ctrl.pageLocation"
