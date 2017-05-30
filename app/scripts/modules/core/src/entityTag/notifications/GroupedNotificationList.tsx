@@ -116,7 +116,7 @@ class AlertsForMessage extends React.Component<IAlertsForMessageProps, IAlertsFo
       <div className="notification-message">
         {this.renderServerGroupNames(notifications)}
         <Markdown message={message} />
-        <Markdown message={tagline} />
+        <Markdown className="small" message={tagline} />
       </div>
     );
   }
