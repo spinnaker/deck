@@ -37,7 +37,7 @@ export interface IAmazonServerGroupCommandDirty extends IServerGroupCommandDirty
 }
 
 export interface IAmazonServerGroupCommandResult extends IServerGroupCommandResult {
-  dirty?: IAmazonServerGroupCommandDirty;
+  dirty: IAmazonServerGroupCommandDirty;
 }
 
 export interface IAmazonServerGroupCommandBackingDataFiltered extends IServerGroupCommandBackingDataFiltered {
@@ -64,7 +64,7 @@ export interface IAmazonServerGroupCommand extends IServerGroupCommand {
 
   getBlockDeviceMappingsSource: () => IBlockDeviceMappingSource;
   selectBlockDeviceMappingsSource: (selection: string) => void;
-  usePreferredZonesChanged: () => IServerGroupCommandResult;
+  usePreferredZonesChanged: () => IAmazonServerGroupCommandResult;
 }
 
 export class AwsServerGroupConfigurationService {
@@ -394,11 +394,13 @@ export class AwsServerGroupConfigurationService {
       }
     }
     command.backingData.filtered.securityGroups = newRegionalSecurityGroups.sort((a, b) => {
-      if (command.securityGroups.includes(a.id)) {
-        return -1;
-      }
-      if (command.securityGroups.includes(b.id)) {
-        return 1;
+      if (command.securityGroups) {
+        if (command.securityGroups.includes(a.id)) {
+          return -1;
+        }
+        if (command.securityGroups.includes(b.id)) {
+          return 1;
+        }
       }
       return a.name.localeCompare(b.name);
     });
@@ -441,12 +443,12 @@ export class AwsServerGroupConfigurationService {
   }
 
   public getLoadBalancerNames(command: IAmazonServerGroupCommand): string[] {
-    const loadBalancersForVpc = this.getLoadBalancerMap(command).filter((lb) => lb.loadBalancerType === 'classic' && lb.vpcId === command.vpcId);
-    return loadBalancersForVpc.map((lb) => lb.name).sort();
+    const loadBalancers = this.getLoadBalancerMap(command).filter((lb) => (!lb.loadBalancerType || lb.loadBalancerType === 'classic') && lb.vpcId === command.vpcId);
+    return loadBalancers.map((lb) => lb.name).sort();
   }
 
   public getVpcLoadBalancerNames(command: IAmazonServerGroupCommand): string[] {
-    const loadBalancersForVpc = this.getLoadBalancerMap(command).filter((lb) => lb.loadBalancerType === 'classic' && lb.vpcId);
+    const loadBalancersForVpc = this.getLoadBalancerMap(command).filter((lb) => (!lb.loadBalancerType || lb.loadBalancerType === 'classic') && lb.vpcId);
     return loadBalancersForVpc.map((lb) => lb.name).sort();
   }
 
@@ -505,7 +507,7 @@ export class AwsServerGroupConfigurationService {
     });
   }
 
-    public configureVpcId(command: IAmazonServerGroupCommand): IServerGroupCommandResult {
+    public configureVpcId(command: IAmazonServerGroupCommand): IAmazonServerGroupCommandResult {
       const result: IAmazonServerGroupCommandResult = { dirty: {} };
       if (!command.subnetType) {
         command.vpcId = null;
@@ -519,7 +521,7 @@ export class AwsServerGroupConfigurationService {
     }
 
     public attachEventHandlers(command: IAmazonServerGroupCommand): void {
-      command.usePreferredZonesChanged = (): IServerGroupCommandResult => {
+      command.usePreferredZonesChanged = (): IAmazonServerGroupCommandResult => {
         const currentZoneCount = command.availabilityZones ? command.availabilityZones.length : 0;
         const result: IAmazonServerGroupCommandResult = { dirty: {} };
         const preferredZonesForAccount = command.backingData.preferredZones[command.credentials];
