@@ -46,7 +46,7 @@ class KubernetesAnnotationConfigurer implements ng.IComponentController {
   }
 }
 
-class KubernetesAnnotationConfigurerComponent implements ng.IComponentOptions {
+export class KubernetesAnnotationConfigurerComponent implements ng.IComponentOptions {
   public bindings: any = {
     component: '<',
     field: '@',
