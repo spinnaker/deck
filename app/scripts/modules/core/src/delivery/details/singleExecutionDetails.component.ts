@@ -4,10 +4,9 @@ import { Subscription } from 'rxjs/Subscription';
 
 import { SCHEDULER_FACTORY } from 'core/scheduler';
 import { Application } from 'core/application';
-import { EXECUTION_SERVICE, ExecutionService } from 'core/delivery';
+import { ExecutionFilterModel, EXECUTION_SERVICE, ExecutionService } from 'core/delivery';
 import { SchedulerFactory, IScheduler } from 'core/scheduler';
 import { IExecution } from 'core/domain';
-import { ExecutionFilterModel } from 'core/delivery';
 
 import './singleExecutionDetails.less';
 
@@ -78,9 +77,6 @@ class SingleExecutionDetailsController {
   private execution: IExecution;
   private stateNotFound: boolean;
   private app: Application;
-
-  // Not sure if/where this is used.
-  public showDetails = () => true;
 
   constructor(private schedulerFactory: SchedulerFactory,
               private $state: StateService,
