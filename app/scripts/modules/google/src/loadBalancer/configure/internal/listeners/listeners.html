@@ -1,0 +1,29 @@
+<ng-form name="listeners">
+  <div class="form-group">
+    <div class="col-md-2 sm-label-right">Protocol </div>
+    <div class="col-md-3">
+      <select ng-disabled="!ctrl.isNew" class="form-control input-sm"
+              ng-change="ctrl.protocolUpdated()"
+              ng-model="ctrl.loadBalancer.ipProtocol"
+              ng-options="protocol for protocol in ['TCP', 'UDP']"></select>
+    </div>
+  </div>
+
+  <hr/>
+
+  <gce-internal-load-balancer-listener load-balancer="ctrl.loadBalancer" subnet-options="ctrl.subnetOptions"
+                                       delete-listener="ctrl.removeListener($index)"
+                                       protocol-updated="ctrl.protocolUpdated()"
+                                       index="$index"
+                                       application="ctrl.application"
+                                       listener="listener"
+                                       ng-repeat="listener in ctrl.loadBalancer.listeners"></gce-internal-load-balancer-listener>
+  <div class="row">
+    <div class="col-md-12">
+      <button class="add-new btn btn-block"
+              ng-click="ctrl.addListener()">
+        <span class="glyphicon glyphicon-plus-sign"></span> Add listener
+      </button>
+    </div>
+  </div>
+</ng-form>

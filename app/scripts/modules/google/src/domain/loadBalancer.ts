@@ -41,7 +41,12 @@ export interface IGcePathRule {
 
 export interface IGceListener {
   certificate: string;
+  created: boolean;
+  detail: string;
   name: string;
   port: string;
+  ports: string; // Comma-delimited list of ports.
   ipAddress: string;
+  stack: string;
+  subnet: string;
 }

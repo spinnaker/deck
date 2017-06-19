@@ -11,6 +11,11 @@ export class GceHttpLoadBalancerUtils {
       && (lb.loadBalancerType === 'HTTP' && lb.region === GceHttpLoadBalancerUtils.REGION);
   }
 
+  public isInternalLoadBalancer(lb: IGceLoadBalancer): lb is IGceHttpLoadBalancer {
+    return (lb.provider === 'gce' || lb.type === 'gce')
+        && (lb.loadBalancerType === 'INTERNAL');
+  }
+
   public normalizeLoadBalancerNamesForAccount(loadBalancerNames: string[],
                                               account: string,
                                               loadBalancers: IGceLoadBalancer[]): string[] {
@@ -23,10 +28,23 @@ export class GceHttpLoadBalancerUtils {
           this.isHttpLoadBalancer(loadBalancer) &&
           loadBalancer.listeners.map(listener => listener.name).includes(loadBalancerName);
       });
+      const matchingBackendService = loadBalancers.find(loadBalancer => {
+        return account === loadBalancer.account &&
+            this.isInternalLoadBalancer(loadBalancer) &&
+            loadBalancer.listeners.map(listener => listener.name).includes(loadBalancerName);
+      });
 
-      matchingUrlMap
-        ? normalizedLoadBalancerNames.push(matchingUrlMap.name)
-        : normalizedLoadBalancerNames.push(loadBalancerName);
+      if (matchingUrlMap && matchingBackendService) {
+        throw new TypeError('Load balancer is represented both as an HTTP and Internal load balancer.');
+      }
+
+      if (matchingUrlMap) {
+        normalizedLoadBalancerNames.push(matchingUrlMap.name)
+      } else if (matchingBackendService) {
+        normalizedLoadBalancerNames.push(matchingBackendService.name)
+      } else {
+        normalizedLoadBalancerNames.push(loadBalancerName);
+      }
     });
     return uniq(normalizedLoadBalancerNames);
   }
