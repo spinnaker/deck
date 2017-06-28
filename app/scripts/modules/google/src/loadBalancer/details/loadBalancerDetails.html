@@ -91,7 +91,7 @@
             </li>
           </ul>
         </dd>
-        <div ng-if="!ctrl.isHttpLoadBalancer(loadBalancer) && loadBalancer.elb.dnsname">
+        <div ng-if="!ctrl.isHttpLoadBalancer(loadBalancer) && !ctrl.isInternalLoadBalancer(loadBalancer) && loadBalancer.elb.dnsname">
           <dt>DNS Name</dt>
           <dd>
             <a target=_blank href="{{loadBalancer.elb.dns.protocol}}//{{loadBalancer.elb.dns.dnsname}}">{{loadBalancer.elb.dns.dnsname}}</a>
@@ -102,7 +102,7 @@
             </copy-to-clipboard>
           </dd>
         </div>
-        <div ng-if="ctrl.isHttpLoadBalancer(loadBalancer)">
+        <div ng-if="ctrl.isHttpLoadBalancer(loadBalancer) || ctrl.isInternalLoadBalancer(loadBalancer)">
           <dt>DNS Names</dt>
           <dd>
             <ul>
