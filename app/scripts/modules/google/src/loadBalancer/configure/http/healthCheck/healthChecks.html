@@ -21,11 +21,21 @@
       </p>
     </div>
   </div>
-  <gce-http-load-balancer-health-check ng-repeat="healthCheck in ctrl.command.loadBalancer.healthChecks"
-                                       index="$index"
-                                       command="ctrl.command"
-                                       delete-health-check="ctrl.remove('healthChecks', $index)"
-                                       health-check="healthCheck"></gce-http-load-balancer-health-check>
+
+  <gce-health-check-selector ng-repeat="healthCheck in ctrl.command.loadBalancer.healthChecks"
+                             health-checks-by-account-and-type="ctrl.healthChecksByAccountAndType"
+                             existing-health-check-names="ctrl.existingHealthCheckNames"
+                             credentials="ctrl.loadBalancer.credentials"
+                             health-check="healthCheck"></gce-health-check-selector>
+
+  <div class="form-group small" style="margin-top: 20px">
+    <div class="col-md-offset-2 col-md-6">
+      <gce-cache-refresh cache-key="healthChecks"
+                         cache-key-alias="health checks"
+                         on-refresh="ctrl.onHealthCheckRefresh()"></gce-cache-refresh>
+    </div>
+  </div>
+
   <div class="row">
     <div class="col-md-12">
       <button class="add-new btn btn-block"
