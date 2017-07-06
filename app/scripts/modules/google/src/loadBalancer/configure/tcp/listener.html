@@ -1,0 +1,28 @@
+<div class="container-fluid form-horizontal">
+  <ng-form name="listenerForm">
+    <div class="form-group">
+      <div class="col-md-9 col-md-offset-2">
+        <table class="table table-condensed packed" style="table-layout: fixed; width: 390px;">
+          <thead>
+          <tr>
+            <th>Port</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td>
+              <input class="form-control input-sm"
+                     readonly
+                     required ng-model="ctrl.loadBalancer.portRange"/>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </ng-form>
+  <div class="form-group small" style="margin-top: 20px;">
+    <div class="col-md-offset-2 col-md-6">
+    </div>
+  </div>
+</div>

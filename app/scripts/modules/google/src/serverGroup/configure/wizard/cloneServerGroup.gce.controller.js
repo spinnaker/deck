@@ -254,6 +254,8 @@ module.exports = angular.module('spinnaker.serverGroup.configure.gce.cloneServer
                 .concat(loadBalancerDetails.listeners.map(listener => listener.name));
           } else if (loadBalancerDetails.loadBalancerType === 'SSL') {
             metadata['global-load-balancer-names'].push(name);
+          } else if (loadBalancerDetails.loadBalancerType === 'TCP') {
+            metadata['global-load-balancer-names'].push(name);
           } else {
             metadata['load-balancer-names'].push(name);
           }
@@ -294,7 +296,16 @@ module.exports = angular.module('spinnaker.serverGroup.configure.gce.cloneServer
             : [])
         .value();
 
-      return loadBalancerNames.concat(selectedSslLoadBalancerNames);
+      var selectedTcpLoadBalancerNames = _.chain(loadBalancerIndex)
+        .filter({loadBalancerType: 'TCP'})
+        .map('name')
+        .intersection(
+          loadBalancerMetadata['global-load-balancer-names']
+            ? loadBalancerMetadata['global-load-balancer-names'].split(',')
+            : [])
+        .value();
+
+      return loadBalancerNames.concat(selectedSslLoadBalancerNames).concat(selectedTcpLoadBalancerNames);
     }
 
     this.submit = function () {
