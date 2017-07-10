@@ -74,6 +74,7 @@ class TcpLoadBalancerCtrl extends CommonGceLoadBalancerCtrl implements ng.ICompo
   public accounts: ICredentials[];
   public regions: string[];
   public healthChecksByAccountAndType: {[account: string]: {[healthCheckType: string]: IGceHealthCheck[]}};
+  public portOptions: any = ['25', '43', '110', '143', '195', '443', '465', '587', '700', '993', '995'];
 
   // The 'by account' maps populate the corresponding 'existing names' lists below.
   public existingLoadBalancerNamesByAccount: IListKeyedByAccount;
