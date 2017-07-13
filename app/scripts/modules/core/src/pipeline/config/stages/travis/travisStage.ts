@@ -1,11 +1,11 @@
-import {PIPELINE_CONFIG_PROVIDER} from 'core/pipeline/config/pipelineConfigProvider';
-import {module, IScope} from 'angular';
+import { PIPELINE_CONFIG_PROVIDER } from 'core/pipeline/config/pipelineConfigProvider';
+import { IComponentController, IScope, module } from 'angular';
 import * as moment from 'moment';
 
-import {SETTINGS} from 'core/config/settings';
-import {IGOR_SERVICE, IgorService, BuildServiceType} from 'core/ci/igor.service';
-import {IJobConfig, ParameterDefinitionList, IStage} from 'core/domain';
-import {TravisExecutionLabel} from './TravisExecutionLabel';
+import { SETTINGS } from 'core/config/settings';
+import { IGOR_SERVICE, IgorService, BuildServiceType } from 'core/ci/igor.service';
+import { IJobConfig, ParameterDefinitionList, IStage } from 'core/domain';
+import { TravisExecutionLabel } from './TravisExecutionLabel';
 
 export interface ITravisStageViewState {
   mastersLoaded: boolean;
@@ -19,7 +19,7 @@ export interface ITravisStageViewState {
   jobIsParameterized?: boolean;
 }
 
-export class TravisStage {
+export class TravisStage implements IComponentController {
   public viewState: ITravisStageViewState;
   public useDefaultParameters: any;
   public userSuppliedParameters: any;
@@ -138,6 +138,9 @@ export class TravisStage {
   public shouldFilter(): boolean {
     return this.jobs && this.jobs.length >= this.filterThreshold;
   }
+
+  // Satisfy TypeScript 2.4 breaking change: https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#weak-type-detection
+  public $onInit() {}
 }
 
 export const TRAVIS_STAGE = 'spinnaker.core.pipeline.stage.travisStage';

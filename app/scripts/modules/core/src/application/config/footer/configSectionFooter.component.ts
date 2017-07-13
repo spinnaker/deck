@@ -1,8 +1,8 @@
-import {copy, module, toJson} from 'angular';
-import {cloneDeep} from 'lodash';
+import { IComponentController, IComponentOptions, copy, module, toJson } from 'angular';
+import { cloneDeep } from 'lodash';
 
-import {APPLICATION_WRITE_SERVICE, ApplicationWriter} from 'core/application/service/application.write.service';
-import {Application} from 'core/application/application.model';
+import { APPLICATION_WRITE_SERVICE, ApplicationWriter } from 'core/application/service/application.write.service';
+import { Application } from 'core/application/application.model';
 
 import './configSectionFooter.component.less';
 
@@ -14,7 +14,7 @@ export interface IConfigSectionFooterViewState {
   isDirty: boolean;
 }
 
-export class ConfigSectionFooterController implements ng.IComponentController {
+export class ConfigSectionFooterController implements IComponentController {
 
   public viewState: IConfigSectionFooterViewState;
   public application: Application;
@@ -53,9 +53,12 @@ export class ConfigSectionFooterController implements ng.IComponentController {
 
     this.applicationWriter.updateApplication(updateCommand).then(() => this.saveSuccess(), () => this.saveError());
   }
+
+  // Satisfy TypeScript 2.4 breaking change: https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#weak-type-detection
+  public $onInit() {}
 }
 
-class ConfigSectionFooterComponent implements ng.IComponentOptions {
+class ConfigSectionFooterComponent implements IComponentOptions {
   public bindings: any = {
     application: '=',
     config: '=',

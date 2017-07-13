@@ -1,4 +1,4 @@
-import { module, IScope } from 'angular';
+import { module, IComponentController, IScope } from 'angular';
 import { IModalServiceInstance } from 'angular-ui-bootstrap';
 
 import './cancel.less';
@@ -9,7 +9,7 @@ export interface ICancelModalScope extends IScope {
   errorMessage: string;
 }
 
-export class CancelModalCtrl {
+export class CancelModalCtrl implements IComponentController {
 
   constructor(public $scope: ICancelModalScope, private $uibModalInstance: IModalServiceInstance, private params: any) {
     this.$scope.params = params;
@@ -35,6 +35,9 @@ export class CancelModalCtrl {
   };
 
   public cancel = () => this.$uibModalInstance.dismiss();
+
+  // Satisfy TypeScript 2.4 breaking change: https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#weak-type-detection
+  public $onInit() {}
 }
 
 export const CANCEL_MODAL_CONTROLLER = 'spinnaker.core.cancelModal.controller';

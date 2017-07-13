@@ -1,4 +1,4 @@
-import { IPromise, IQService, module } from 'angular';
+import { IComponentController, IPromise, IQService, module } from 'angular';
 import { cloneDeep, flattenDeep } from 'lodash';
 
 import {
@@ -27,7 +27,7 @@ interface InstanceContainer {
   instances: IAppengineInstance[];
 }
 
-class AppengineInstanceDetailsController {
+class AppengineInstanceDetailsController implements IComponentController {
   public state = {loading: true};
   public instance: IAppengineInstance;
   public instanceIdNotFound: string;
@@ -119,6 +119,9 @@ class AppengineInstanceDetailsController {
       return this.$q.reject();
     }
   }
+
+  // Satisfy TypeScript 2.4 breaking change: https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#weak-type-detection
+  public $onInit() {}
 }
 
 export const APPENGINE_INSTANCE_DETAILS_CTRL = 'spinnaker.appengine.instanceDetails.controller';

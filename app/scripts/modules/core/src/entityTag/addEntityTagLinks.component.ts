@@ -1,10 +1,10 @@
-import { module } from 'angular';
+import { IComponentController, IComponentOptions, module } from 'angular';
 
 import { Application, IEntityTag } from 'core';
 import { EntityTagEditor, IEntityTagEditorProps, IOwnerOption } from './EntityTagEditor';
 import { ENTITY_TAGS_HELP } from './entityTags.help';
 
-class AddEntityTagLinksCtrl implements ng.IComponentController {
+class AddEntityTagLinksCtrl implements IComponentController {
   public application: Application;
   public tagType: string;
 
@@ -35,9 +35,12 @@ class AddEntityTagLinksCtrl implements ng.IComponentController {
 
     EntityTagEditor.show(props);
   }
+
+  // Satisfy TypeScript 2.4 breaking change: https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#weak-type-detection
+  public $onInit() {}
 }
 
-class AddEntityTagLinksComponent implements ng.IComponentOptions {
+class AddEntityTagLinksComponent implements IComponentOptions {
   public bindings: any = {
     component: '<',
     application: '<',

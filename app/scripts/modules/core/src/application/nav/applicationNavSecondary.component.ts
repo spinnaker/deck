@@ -17,6 +17,9 @@ class ApplicationNavSecondaryComponentController implements IComponentController
   public getSecondaryDataSources(): ApplicationDataSource[] {
     return (this.application.dataSources || []).filter(ds => ds.visible !== false && !ds.disabled && !ds.primary);
   }
+
+  // Satisfy TypeScript 2.4 breaking change: https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#weak-type-detection
+  public $onInit() {}
 }
 
 export class ApplicationNavSecondaryComponent implements IComponentOptions {

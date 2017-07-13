@@ -1,4 +1,4 @@
-import { module } from 'angular';
+import { IComponentController, module } from 'angular';
 import { IModalService } from 'angular-ui-bootstrap';
 import { cloneDeep } from 'lodash';
 
@@ -7,7 +7,7 @@ import { CloudProviderRegistry, ILoadBalancer } from '@spinnaker/core';
 import { AppengineProviderSettings } from 'appengine/appengine.settings';
 import { APPENGINE_LOAD_BALANCER_CHOICE_MODAL_CTRL } from './loadBalancerChoice.modal.controller';
 
-class AppengineEditLoadBalancerStageCtrl {
+class AppengineEditLoadBalancerStageCtrl implements IComponentController {
   constructor(public $scope: any,
               private $uibModal: IModalService,
               private cloudProviderRegistry: CloudProviderRegistry) {
@@ -48,6 +48,9 @@ class AppengineEditLoadBalancerStageCtrl {
   public removeLoadBalancer(index: number): void {
     this.$scope.stage.loadBalancers.splice(index, 1);
   }
+
+  // Satisfy TypeScript 2.4 breaking change: https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#weak-type-detection
+  public $onInit() {}
 }
 
 export const APPENGINE_EDIT_LOAD_BALANCER_STAGE = 'spinnaker.appengine.pipeline.stage.editLoadBalancerStage';

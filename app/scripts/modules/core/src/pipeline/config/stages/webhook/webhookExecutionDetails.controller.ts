@@ -1,13 +1,13 @@
-import {module, IScope} from 'angular';
-import {StateParams} from '@uirouter/angularjs';
-import {get} from 'lodash';
+import { IComponentController, IScope, module } from 'angular';
+import { StateParams } from '@uirouter/angularjs';
+import { get } from 'lodash';
 
 import {
   EXECUTION_DETAILS_SECTION_SERVICE,
   ExecutionDetailsSectionService
 } from 'core/delivery/details/executionDetailsSection.service';
 
-export class WebhookExecutionDetailsCtrl {
+export class WebhookExecutionDetailsCtrl implements IComponentController {
   public configSections = ['webhookConfig', 'taskStatus'];
   public detailsSection: string;
   public failureMessage: string;
@@ -48,6 +48,9 @@ export class WebhookExecutionDetailsCtrl {
   private initialize(): void {
     this.executionDetailsSectionService.synchronizeSection(this.configSections, () => this.initialized());
   }
+
+  // Satisfy TypeScript 2.4 breaking change: https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#weak-type-detection
+  public $onInit() {}
 }
 
 export const WEBHOOK_EXECUTION_DETAILS_CONTROLLER = 'spinnaker.core.pipeline.stage.webhook.executionDetails.controller';

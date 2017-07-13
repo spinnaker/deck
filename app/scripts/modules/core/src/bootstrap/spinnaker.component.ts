@@ -1,3 +1,5 @@
+import { IComponentController } from 'angular';
+
 import { bootstrapModule } from './bootstrap.module';
 import { OverrideRegistry } from 'core/overrideRegistry';
 import { IFeatures, SETTINGS } from '@spinnaker/core';
@@ -18,7 +20,7 @@ const template = `
   <notifier></notifier>
 `;
 
-class SpinnakerController {
+class SpinnakerController implements IComponentController {
   public spinnakerHeaderTemplate: string;
   public feature: IFeatures;
   constructor (overrideRegistry: OverrideRegistry) {
@@ -26,6 +28,9 @@ class SpinnakerController {
     this.spinnakerHeaderTemplate = overrideRegistry.getTemplate('spinnakerHeader', require('./spinnakerHeader.html'));
     this.feature = SETTINGS.feature;
   }
+
+  // Satisfy TypeScript 2.4 breaking change: https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#weak-type-detection
+  public $onInit() {}
 }
 
 bootstrapModule.component('spinnaker', {

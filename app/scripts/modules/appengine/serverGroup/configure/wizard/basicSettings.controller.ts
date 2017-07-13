@@ -1,4 +1,4 @@
-import { extend, IControllerService, IScope, module } from 'angular';
+import { extend, IComponentController, IControllerService, IScope, module } from 'angular';
 import { StateService } from '@uirouter/angularjs';
 import { set } from 'lodash';
 
@@ -11,7 +11,7 @@ interface IAppengineBasicSettingsScope extends IScope {
   command: IAppengineServerGroupCommand;
 }
 
-class AppengineServerGroupBasicSettingsCtrl {
+class AppengineServerGroupBasicSettingsCtrl implements IComponentController {
   constructor(public $scope: IAppengineBasicSettingsScope,
               $state: StateService,
               $controller: IControllerService,
@@ -80,6 +80,9 @@ class AppengineServerGroupBasicSettingsCtrl {
       return this.$scope.command.credentials === account.name;
     });
   }
+
+  // Satisfy TypeScript 2.4 breaking change: https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#weak-type-detection
+  public $onInit() {}
 }
 
 export const APPENGINE_SERVER_GROUP_BASIC_SETTINGS_CTRL = 'spinnaker.appengine.basicSettings.controller';

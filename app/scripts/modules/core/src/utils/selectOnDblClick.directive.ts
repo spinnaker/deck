@@ -1,8 +1,8 @@
 /** based on http://jsfiddle.net/epinapala/WdeTM/4/  **/
-import { IComponentOptions, IDirective, IScope, module } from 'angular';
+import { IComponentController, IDirective, IScope, module } from 'angular';
 import { DirectiveFactory } from './tsDecorators/directiveFactoryDecorator';
 
-class DoubleClickController implements IComponentOptions {
+class DoubleClickController implements IComponentController {
   public $element: JQuery;
   public $scope: IScope;
   public $attrs: any;
@@ -20,6 +20,9 @@ class DoubleClickController implements IComponentOptions {
     this.$element.bind(this.BOUND_EVENT, () => this.selectText());
     this.$scope.$on('$destroy', () => this.$element.unbind(this.BOUND_EVENT));
   }
+
+  // Satisfy TypeScript 2.4 breaking change: https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#weak-type-detection
+  public $onInit() {}
 }
 
 @DirectiveFactory()

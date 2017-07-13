@@ -1,4 +1,4 @@
-import {module} from 'angular';
+import { IComponentController, IComponentOptions, module} from 'angular';
 
 import './securityContextSelector.component.less';
 import {KUBERNETES_SE_LINUX_OPTIONS_SELECTOR} from './seLinuxOptionsSelector.component';
@@ -12,7 +12,7 @@ interface ISecurityContextField {
   columns?: number;
 }
 
-class SecurityContextSelector implements ng.IComponentController {
+class SecurityContextSelector implements IComponentController {
   public component: any;
   public fields: ISecurityContextField[] = [
     {
@@ -38,9 +38,12 @@ class SecurityContextSelector implements ng.IComponentController {
       type: 'checkbox',
     },
   ];
+
+  // Satisfy TypeScript 2.4 breaking change: https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#weak-type-detection
+  public $onInit() {}
 }
 
-class SecurityContextSelectorComponent implements ng.IComponentOptions {
+class SecurityContextSelectorComponent implements IComponentOptions {
   public bindings: any = {
     component: '='
   };

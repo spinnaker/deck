@@ -1,4 +1,4 @@
-import { IScope, copy, module } from 'angular';
+import { IComponentController, IScope, copy, module } from 'angular';
 import { IModalInstanceService } from 'angular-ui-bootstrap';
 import { get, merge } from 'lodash';
 
@@ -18,7 +18,7 @@ import { APPENGINE_DYNAMIC_BRANCH_LABEL } from './dynamicBranchLabel.component';
 
 import './serverGroupWizard.less';
 
-class AppengineCloneServerGroupCtrl {
+class AppengineCloneServerGroupCtrl implements IComponentController {
   public pages: {[pageKey: string]: string} = {
     'basicSettings': require('./basicSettings.html'),
     'advancedSettings': require('./advancedSettings.html'),
@@ -82,6 +82,9 @@ class AppengineCloneServerGroupCtrl {
       this.$scope.command.interestingHealthProviderNames = [AppengineHealth.PLATFORM];
     }
   }
+
+  // Satisfy TypeScript 2.4 breaking change: https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#weak-type-detection
+  public $onInit() {}
 }
 
 export const APPENGINE_CLONE_SERVER_GROUP_CTRL = 'spinnaker.appengine.cloneServerGroup.controller';
