@@ -131,6 +131,9 @@ export class ApplicationsController implements IComponentController {
       application.accounts = application.accounts.split(',').sort().join(', ');
     }
   }
+
+  // Satisfy TypeScript 2.4 breaking change: https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#weak-type-detection
+  public $onInit() {}
 }
 
 export class ApplicationsComponent implements IComponentOptions {

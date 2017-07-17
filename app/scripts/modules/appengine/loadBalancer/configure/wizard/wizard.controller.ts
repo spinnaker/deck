@@ -1,4 +1,4 @@
-import { module } from 'angular';
+import { IComponentController, module } from 'angular';
 import { cloneDeep } from 'lodash';
 import { IModalServiceInstance } from 'angular-ui-bootstrap';
 import { StateService } from '@uirouter/angularjs';
@@ -20,7 +20,7 @@ import {
 
 import './wizard.less';
 
-class AppengineLoadBalancerWizardController {
+class AppengineLoadBalancerWizardController implements IComponentController {
   public state = {loading: true};
   public loadBalancer: AppengineLoadBalancerUpsertDescription;
   public heading: string;
@@ -136,6 +136,9 @@ class AppengineLoadBalancerWizardController {
       this.$state.go('^.loadBalancerDetails', newStateParams);
     }
   }
+
+  // Satisfy TypeScript 2.4 breaking change: https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#weak-type-detection
+  public $onInit() {}
 }
 
 export const APPENGINE_LOAD_BALANCER_WIZARD_CTRL = 'spinnaker.appengine.loadBalancer.wizard.controller';

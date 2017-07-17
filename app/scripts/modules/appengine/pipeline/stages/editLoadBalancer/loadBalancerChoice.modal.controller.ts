@@ -1,10 +1,10 @@
-import { module } from 'angular';
+import { IComponentController, module } from 'angular';
 import { IModalService, IModalServiceInstance } from 'angular-ui-bootstrap';
 import { cloneDeep } from 'lodash';
 
 import { Application, CloudProviderRegistry, ILoadBalancer } from '@spinnaker/core';
 
-class AppengineLoadBalancerChoiceModalCtrl {
+class AppengineLoadBalancerChoiceModalCtrl implements IComponentController {
   public state = {loading: true};
   public loadBalancers: ILoadBalancer[];
   public selectedLoadBalancer: ILoadBalancer;
@@ -50,6 +50,9 @@ class AppengineLoadBalancerChoiceModalCtrl {
         this.state.loading = false;
       });
   }
+
+  // Satisfy TypeScript 2.4 breaking change: https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#weak-type-detection
+  public $onInit() {}
 }
 
 export const APPENGINE_LOAD_BALANCER_CHOICE_MODAL_CTRL = 'spinnaker.appengine.loadBalancerChoiceModal.controller';

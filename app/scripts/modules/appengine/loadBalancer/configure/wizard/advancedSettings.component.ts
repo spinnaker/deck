@@ -1,7 +1,7 @@
-import {module} from 'angular';
-import {AppengineLoadBalancerUpsertDescription} from 'appengine/loadBalancer/transformer';
+import { IComponentController, IComponentOptions, module} from 'angular';
+import { AppengineLoadBalancerUpsertDescription} from 'appengine/loadBalancer/transformer';
 
-class AppengineLoadBalancerAdvancedSettingsCtrl implements ng.IComponentController {
+class AppengineLoadBalancerAdvancedSettingsCtrl implements IComponentController {
   public state = {error: false};
   public loadBalancer: AppengineLoadBalancerUpsertDescription;
 
@@ -21,9 +21,12 @@ class AppengineLoadBalancerAdvancedSettingsCtrl implements ng.IComponentControll
       }
     }
   }
+
+  // Satisfy TypeScript 2.4 breaking change: https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#weak-type-detection
+  public $onInit() {}
 }
 
-class AppengineLoadBalancerAdvancedSettingsComponent implements ng.IComponentOptions {
+class AppengineLoadBalancerAdvancedSettingsComponent implements IComponentOptions {
   public bindings: any = {loadBalancer: '=', application: '<'};
   public template = `
     <ng-form name="advancedSettingsForm">

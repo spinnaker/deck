@@ -1,8 +1,8 @@
-import {module} from 'angular';
-import {IModalService} from 'angular-ui-bootstrap';
-import {SCALING_ACTIVITIES_CTRL, ScalingActivitiesCtrl} from './scalingActivities.controller';
+import { IComponentController, IComponentOptions, module } from 'angular';
+import { IModalService } from 'angular-ui-bootstrap';
+import { SCALING_ACTIVITIES_CTRL, ScalingActivitiesCtrl } from './scalingActivities.controller';
 
-class ViewScalingActivitiesLinkCtrl implements ng.IComponentController {
+class ViewScalingActivitiesLinkCtrl implements IComponentController {
   public serverGroup: any;
 
   public constructor(private $uibModal: IModalService) { 'ngInject'; }
@@ -17,9 +17,12 @@ class ViewScalingActivitiesLinkCtrl implements ng.IComponentController {
       }
     });
   }
+
+  // Satisfy TypeScript 2.4 breaking change: https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#weak-type-detection
+  public $onInit() {}
 }
 
-class ViewScalingActivitiesLink implements ng.IComponentOptions {
+class ViewScalingActivitiesLink implements IComponentOptions {
   public bindings: any = {
     serverGroup: '='
   };

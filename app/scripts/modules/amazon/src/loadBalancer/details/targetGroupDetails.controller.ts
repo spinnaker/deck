@@ -1,4 +1,4 @@
-import { IPromise, IQService, IScope, module } from 'angular';
+import { IComponentController, IPromise, IQService, IScope, module } from 'angular';
 import { StateService } from '@uirouter/angularjs';
 
 import { Application, ILoadBalancer } from '@spinnaker/core';
@@ -13,7 +13,7 @@ export interface ITargetGroupFromStateParams {
   vpcId: string;
 }
 
-export class AwsTargetGroupDetailsController {
+export class AwsTargetGroupDetailsController implements IComponentController {
   private targetGroupFromParams: ITargetGroupFromStateParams;
   public application: Application;
   public state = { loading: true };
@@ -73,8 +73,10 @@ export class AwsTargetGroupDetailsController {
 
     return this.$q.when(null);
   }
-}
 
+  // Satisfy TypeScript 2.4 breaking change: https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#weak-type-detection
+  public $onInit() {}
+}
 
 export const AWS_TARGET_GROUP_DETAILS_CTRL = 'spinnaker.amazon.loadBalancer.details.targetGroupDetails.controller';
 module(AWS_TARGET_GROUP_DETAILS_CTRL, [

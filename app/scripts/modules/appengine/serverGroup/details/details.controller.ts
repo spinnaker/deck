@@ -1,4 +1,4 @@
-import { IScope, module } from 'angular';
+import { IComponentController, IScope, module } from 'angular';
 import { IModalService } from 'angular-ui-bootstrap';
 import { cloneDeep, get, map, mapValues, reduce } from 'lodash';
 
@@ -32,7 +32,7 @@ interface IServerGroupFromStateParams {
   name: string;
 }
 
-class AppengineServerGroupDetailsController {
+class AppengineServerGroupDetailsController implements IComponentController {
   public state = { loading: true };
   public serverGroup: IAppengineServerGroup;
 
@@ -441,6 +441,9 @@ class AppengineServerGroupDetailsController {
         this.state.loading = false;
       });
   }
+
+  // Satisfy TypeScript 2.4 breaking change: https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#weak-type-detection
+  public $onInit() {}
 }
 
 export const APPENGINE_SERVER_GROUP_DETAILS_CTRL = 'spinnaker.appengine.serverGroup.details.controller';

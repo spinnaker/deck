@@ -1,5 +1,5 @@
 import { Application, TaskMonitor, TaskMonitorBuilder } from '@spinnaker/core';
-import { module } from 'angular';
+import { IComponentController, module } from 'angular';
 import { IModalServiceInstance } from 'angular-ui-bootstrap';
 import { chain, cloneDeep, last } from 'lodash';
 
@@ -8,7 +8,7 @@ import { GCE_HEALTH_CHECK_READER, GceHealthCheckReader } from 'google/healthChec
 
 import './upsertAutoHealingPolicy.modal.less';
 
-class GceUpsertAutoHealingPolicyModalCtrl {
+class GceUpsertAutoHealingPolicyModalCtrl implements IComponentController {
   public autoHealingPolicy: IGceAutoHealingPolicy;
   public taskMonitor: TaskMonitor;
   public httpHealthChecks: string[];
@@ -69,6 +69,9 @@ class GceUpsertAutoHealingPolicyModalCtrl {
       modalInstance: this.$uibModalInstance,
     });
   }
+
+  // Satisfy TypeScript 2.4 breaking change: https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#weak-type-detection
+  public $onInit() {}
 }
 
 export const GCE_UPSERT_AUTOHEALING_POLICY_MODAL_CTRL = 'spinnaker.gce.upsertAutoHealingPolicy.modal.controller';

@@ -1,9 +1,9 @@
-import {module} from 'angular';
-import {IModalService} from 'angular-ui-bootstrap';
+import { IComponentController, module } from 'angular';
+import { IModalService } from 'angular-ui-bootstrap';
 
-import {JSON_UTILITY_SERVICE, JsonUtilityService} from 'core/utils/json/json.utility.service';
-import {PIPELINE_CONFIG_PROVIDER, PipelineConfigProvider} from 'core/pipeline/config/pipelineConfigProvider';
-import {API_SERVICE, Api} from 'core/api/api.service';
+import { JSON_UTILITY_SERVICE, JsonUtilityService } from 'core/utils/json/json.utility.service';
+import { PIPELINE_CONFIG_PROVIDER, PipelineConfigProvider } from 'core/pipeline/config/pipelineConfigProvider';
+import { API_SERVICE, Api } from 'core/api/api.service';
 
 export interface IWebhookStageViewState {
   waitForCompletion?: boolean;
@@ -30,7 +30,7 @@ interface IPreconfiguredWebhook {
   preconfiguredProperties?: string[];
 }
 
-export class WebhookStage {
+export class WebhookStage implements IComponentController {
   public command: IWebhookStageCommand;
   public viewState: IWebhookStageViewState;
   public methods: string[];
@@ -106,6 +106,9 @@ export class WebhookStage {
   public displayField(field: string): boolean {
     return !this.preconfiguredProperties || !this.preconfiguredProperties.some(property => property === field);
   }
+
+  // Satisfy TypeScript 2.4 breaking change: https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#weak-type-detection
+  public $onInit() {}
 }
 
 export const WEBHOOK_STAGE = 'spinnaker.core.pipeline.stage.webhookStage';

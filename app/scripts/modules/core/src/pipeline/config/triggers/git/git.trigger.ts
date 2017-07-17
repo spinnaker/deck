@@ -1,12 +1,12 @@
-import {IScope, module} from 'angular';
-import {has, trim} from 'lodash';
+import { IComponentController, IScope, module } from 'angular';
+import { has, trim } from 'lodash';
 
-import {SETTINGS} from 'core/config/settings';
-import {IGitTrigger} from 'core/domain/ITrigger';
-import {PIPELINE_CONFIG_PROVIDER} from 'core/pipeline/config/pipelineConfigProvider';
-import {SERVICE_ACCOUNT_SERVICE, ServiceAccountService} from 'core/serviceAccount/serviceAccount.service';
+import { SETTINGS } from 'core/config/settings';
+import { IGitTrigger } from 'core/domain/ITrigger';
+import { PIPELINE_CONFIG_PROVIDER } from 'core/pipeline/config/pipelineConfigProvider';
+import { SERVICE_ACCOUNT_SERVICE, ServiceAccountService } from 'core/serviceAccount/serviceAccount.service';
 
-class GitTriggerController {
+class GitTriggerController implements IComponentController {
 
   public fiatEnabled: boolean = SETTINGS.feature.fiatEnabled;
   public serviceAccounts: string[] = [];
@@ -59,6 +59,9 @@ class GitTriggerController {
       this.trigger.source = this.gitTriggerTypes[0];
     }
   }
+
+  // Satisfy TypeScript 2.4 breaking change: https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#weak-type-detection
+  public $onInit() {}
 }
 
 export const GIT_TRIGGER = 'spinnaker.core.pipeline.trigger.git';

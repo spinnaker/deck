@@ -1,11 +1,11 @@
-import { IPromise } from 'angular';
+import { IComponentController, IPromise } from 'angular';
 
 import { AccountService, StageConstants } from '@spinnaker/core';
 
 import { AppengineHealth } from 'appengine/common/appengineHealth';
 import { IAppengineAccount, IAppengineStageScope } from 'appengine/domain';
 
-export class AppengineStageCtrl {
+export class AppengineStageCtrl implements IComponentController {
   constructor(protected $scope: IAppengineStageScope, protected accountService: AccountService) {
     $scope.platformHealth = AppengineHealth.PLATFORM;
   }
@@ -43,4 +43,7 @@ export class AppengineStageCtrl {
       this.$scope.stage.credentials = this.$scope.application.defaultCredentials.appengine;
     }
   }
+
+  // Satisfy TypeScript 2.4 breaking change: https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#weak-type-detection
+  public $onInit() {}
 }

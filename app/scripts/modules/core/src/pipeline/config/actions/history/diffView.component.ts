@@ -16,6 +16,9 @@ class DiffViewController implements IComponentController {
     }
     $('pre.history').animate({scrollTop: (line - 3) * 15}, 200);
   }
+
+  // Satisfy TypeScript 2.4 breaking change: https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#weak-type-detection
+  public $onInit() {}
 }
 
 export const diffViewComponent: IComponentOptions = {

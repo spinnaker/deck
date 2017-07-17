@@ -1,4 +1,4 @@
-import { IPromise, IQService, IScope, module } from 'angular';
+import { IComponentController, IPromise, IQService, IScope, module } from 'angular';
 import { IModalService } from 'angular-ui-bootstrap';
 import { StateService } from '@uirouter/angularjs';
 import { cloneDeep, head, get, sortBy } from 'lodash';
@@ -37,7 +37,7 @@ export interface ILoadBalancerFromStateParams {
   name: string;
 }
 
-export class AwsLoadBalancerDetailsController {
+export class AwsLoadBalancerDetailsController implements IComponentController {
   public application: Application;
   public elbProtocol: string;
   public listeners: {in: string, target: ITargetGroup}[];
@@ -212,6 +212,9 @@ export class AwsLoadBalancerDetailsController {
   public getFirstSubnetPurpose(subnetDetailsList: ISubnet[] = []) {
     return head(subnetDetailsList.map(subnet => subnet.purpose)) || '';
   };
+
+  // Satisfy TypeScript 2.4 breaking change: https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#weak-type-detection
+  public $onInit() {}
 }
 
 

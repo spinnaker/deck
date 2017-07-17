@@ -1,11 +1,11 @@
-import { module } from 'angular';
+import { IComponentController, IComponentOptions, module } from 'angular';
 import { uniq } from 'lodash';
 
 import { Application, StageConstants } from '@spinnaker/core';
 
 import { IAppengineAllocationDescription } from 'appengine/loadBalancer/transformer';
 
-class AppengineStageAllocationLabelCtrl implements ng.IComponentController {
+class AppengineStageAllocationLabelCtrl implements IComponentController {
   public inputViewValue: string;
   private allocationDescription: IAppengineAllocationDescription;
 
@@ -45,13 +45,13 @@ class AppengineStageAllocationLabelCtrl implements ng.IComponentController {
   }
 }
 
-class AppengineStageAllocationLabel implements ng.IComponentOptions {
+class AppengineStageAllocationLabel implements IComponentOptions {
   public bindings: any = {allocationDescription: '<'};
   public controller: any = AppengineStageAllocationLabelCtrl;
   public template = `<input ng-model="$ctrl.inputViewValue" type="text" class="form-control input-sm" readonly/>`;
 }
 
-class AppengineStageAllocationConfigurationRowCtrl implements ng.IComponentController {
+class AppengineStageAllocationConfigurationRowCtrl implements IComponentController {
   public allocationDescription: IAppengineAllocationDescription;
   public serverGroupOptions: string[];
   public targets = StageConstants.TARGET_LIST;
@@ -82,9 +82,12 @@ class AppengineStageAllocationConfigurationRowCtrl implements ng.IComponentContr
     }
     this.onAllocationChange();
   }
+
+  // Satisfy TypeScript 2.4 breaking change: https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#weak-type-detection
+  public $onInit() {}
 }
 
-class AppengineStageAllocationConfigurationRow implements ng.IComponentOptions {
+class AppengineStageAllocationConfigurationRow implements IComponentOptions {
   public bindings: any = {
     application: '<',
     region: '@',

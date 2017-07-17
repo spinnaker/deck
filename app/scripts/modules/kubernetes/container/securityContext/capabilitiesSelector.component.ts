@@ -1,5 +1,5 @@
-import {module} from 'angular';
-import {set, has} from 'lodash';
+import { IComponentController, IComponentOptions, module } from 'angular';
+import { set, has } from 'lodash';
 
 interface ICapabilitiesSelectorField {
   label: string;
@@ -7,7 +7,7 @@ interface ICapabilitiesSelectorField {
   model: string;
 }
 
-class CapabilitiesSelector implements ng.IComponentController {
+class CapabilitiesSelector implements IComponentController {
   public component: any;
   public fields: ICapabilitiesSelectorField[] = [
     {
@@ -33,9 +33,12 @@ class CapabilitiesSelector implements ng.IComponentController {
   public remove (fieldModel: string, index: number): void {
     this.component.securityContext.capabilities[fieldModel].splice(index, 1);
   }
+
+  // Satisfy TypeScript 2.4 breaking change: https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#weak-type-detection
+  public $onInit() {}
 }
 
-class CapabilitiesSelectorComponent implements ng.IComponentOptions {
+class CapabilitiesSelectorComponent implements IComponentOptions {
   public bindings: any = {
     component: '=',
   };

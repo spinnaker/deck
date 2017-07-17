@@ -1,13 +1,16 @@
-import {module} from 'angular';
+import { IComponentController, IComponentOptions, module } from 'angular';
 import { IServerGroup } from 'core/domain';
-import {Application} from 'core/application/application.model';
+import { Application } from 'core/application/application.model';
 
-class ServerGroupRunningTasksCtrl implements ng.IComponentController {
+class ServerGroupRunningTasksCtrl implements IComponentController {
   public serverGroup: IServerGroup;
   public application: Application;
+
+  // Satisfy TypeScript 2.4 breaking change: https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#weak-type-detection
+  public $onInit() {}
 }
 
-class ServerGroupRunningTasksComponent implements ng.IComponentOptions {
+class ServerGroupRunningTasksComponent implements IComponentOptions {
   public bindings: any = {
     serverGroup: '<',
     application: '<',

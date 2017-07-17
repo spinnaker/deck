@@ -1,9 +1,9 @@
-import { module } from 'angular';
+import { IComponentController, IComponentOptions, module } from 'angular';
 import { IModalService } from 'angular-ui-bootstrap';
 
 import { Application, IServerGroup } from '@spinnaker/core';
 
-class GceAddAutoHealingPolicyButtonCtrl implements ng.IComponentController {
+class GceAddAutoHealingPolicyButtonCtrl implements IComponentController {
   public application: Application;
   public serverGroup: IServerGroup;
 
@@ -21,9 +21,12 @@ class GceAddAutoHealingPolicyButtonCtrl implements ng.IComponentController {
       }
     });
   }
+
+  // Satisfy TypeScript 2.4 breaking change: https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#weak-type-detection
+  public $onInit() {}
 }
 
-class GceAddAutoHealingPolicyButton implements ng.IComponentOptions {
+class GceAddAutoHealingPolicyButton implements IComponentOptions {
   public bindings: any = {
     application: '<',
     serverGroup: '<',
