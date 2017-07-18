@@ -52,7 +52,7 @@ class GceLoadBalancingPolicySelectorController implements IController {
       const hasTcp = selected.find((loadBalancer: any) => get(index[loadBalancer], 'loadBalancerType') === 'TCP');
       const hasHttp = selected.find((loadBalancer: any) => get(index[loadBalancer], 'loadBalancerType') === 'HTTP');
 
-      if (((hasSsl || hasTcp) && hasHttp)) {
+      if ((hasSsl || hasTcp) && hasHttp) {
         balancingModes = ['UTILIZATION'];
       } else if (hasSsl || hasTcp) {
         balancingModes = ['CONNECTION', 'UTILIZATION'];

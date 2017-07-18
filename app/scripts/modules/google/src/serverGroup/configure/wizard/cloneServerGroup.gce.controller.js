@@ -282,12 +282,12 @@ module.exports = angular.module('spinnaker.serverGroup.configure.gce.cloneServer
     }
 
     function collectLoadBalancerNamesForCommand (loadBalancerIndex, loadBalancerMetadata) {
-      var loadBalancerNames = [];
+      let loadBalancerNames = [];
       if (loadBalancerMetadata['load-balancer-names']) {
         loadBalancerNames = loadBalancerNames.concat(loadBalancerMetadata['load-balancer-names'].split(','));
       }
 
-      var selectedSslLoadBalancerNames = _.chain(loadBalancerIndex)
+      let selectedSslLoadBalancerNames = _.chain(loadBalancerIndex)
         .filter({loadBalancerType: 'SSL'})
         .map('name')
         .intersection(
@@ -296,7 +296,7 @@ module.exports = angular.module('spinnaker.serverGroup.configure.gce.cloneServer
             : [])
         .value();
 
-      var selectedTcpLoadBalancerNames = _.chain(loadBalancerIndex)
+      let selectedTcpLoadBalancerNames = _.chain(loadBalancerIndex)
         .filter({loadBalancerType: 'TCP'})
         .map('name')
         .intersection(
