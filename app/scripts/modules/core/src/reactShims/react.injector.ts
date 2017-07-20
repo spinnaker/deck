@@ -20,6 +20,7 @@ import { ExecutionService } from '../delivery/service/execution.service';
 import { HelpContentsRegistry } from 'core/help';
 import { IHelpContents } from 'core/help';
 import { InfrastructureSearchService } from '../search/infrastructure/infrastructureSearch.service';
+import { JsonUtilityService } from '../utils/json/json.utility.service';
 import { LoadBalancerFilterModel } from '../loadBalancer/filter/loadBalancerFilter.model';
 import { LoadBalancerFilterService } from '../loadBalancer/filter/loadBalancer.filter.service';
 import { ManualJudgmentService } from '../pipeline/config/stages/manualJudgment/manualJudgment.service';
@@ -76,6 +77,7 @@ export class CoreReactInject extends ReactInject {
   public get helpContentsRegistry() { return this.$injector.get('helpContentsRegistry') as HelpContentsRegistry; }
   public get infrastructureSearchService() { return this.$injector.get('infrastructureSearchService') as InfrastructureSearchService; }
   public get loadBalancerFilterModel() { return this.$injector.get('loadBalancerFilterModel') as LoadBalancerFilterModel; }
+  public get jsonUtilityService() { return this.$injector.get('jsonUtilityService') as JsonUtilityService; }
   public get loadBalancerFilterService() { return this.$injector.get('loadBalancerFilterService') as LoadBalancerFilterService; }
   public get manualJudgmentService() { return this.$injector.get('manualJudgmentService') as ManualJudgmentService; }
   public get modalService() { return this.$injector.get('$uibModal') as IModalService; }
