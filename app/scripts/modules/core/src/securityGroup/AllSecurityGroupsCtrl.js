@@ -18,24 +18,24 @@ module.exports = angular.module('spinnaker.core.securityGroup.all.controller', [
 ])
   .controller('AllSecurityGroupsCtrl', function($scope, app, $uibModal, $timeout,
                                                 providerSelectionService, cloudProviderRegistry,
-                                                SecurityGroupFilterModel, securityGroupFilterService) {
+                                                securityGroupFilterModel, securityGroupFilterService) {
 
     this.$onInit = () => {
       const groupsUpdatedSubscription = securityGroupFilterService.groupsUpdatedStream.subscribe(() => groupsUpdated());
 
-      SecurityGroupFilterModel.activate();
+      securityGroupFilterModel.activate();
 
       this.initialized = false;
 
       $scope.application = app;
 
-      $scope.sortFilter = SecurityGroupFilterModel.sortFilter;
+      $scope.sortFilter = securityGroupFilterModel.sortFilter;
 
       handleRefresh();
 
-      app.activeState = app.securityGroups;
+      app.setActiveState(app.securityGroups);
       $scope.$on('$destroy', () => {
-        app.activeState = app;
+        app.setActiveState();
         groupsUpdatedSubscription.unsubscribe();
       });
 
@@ -58,8 +58,8 @@ module.exports = angular.module('spinnaker.core.securityGroup.all.controller', [
 
     let groupsUpdated = () => {
       $scope.$applyAsync(() => {
-        $scope.groups = SecurityGroupFilterModel.groups;
-        $scope.tags = SecurityGroupFilterModel.tags;
+        $scope.groups = securityGroupFilterModel.groups;
+        $scope.tags = securityGroupFilterModel.tags;
       });
     };
 

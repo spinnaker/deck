@@ -1,18 +1,19 @@
-import {IComponentController, IComponentOptions, IScope, module} from 'angular';
-import {Application} from 'core/application/application.model';
-import {IClusterSummary} from 'core/domain/ICluster';
-import {CLUSTER_FILTER_MODEL} from '../filter/clusterFilter.model';
+import { IController, IComponentOptions, IScope, module } from 'angular';
+
+import { Application } from 'core/application/application.model';
+import { IClusterSummary } from 'core/domain/ICluster';
+import { CLUSTER_FILTER_MODEL, ClusterFilterModel } from '../filter/clusterFilter.model';
 
 import './onDemandClusterPicker.component.less';
 
-class OnDemandClusterPickerController implements IComponentController {
+class OnDemandClusterPickerController implements IController {
   public application: Application;
   public availableClusters: IClusterSummary[];
   public lastSelection: string;
   public totalClusterCount: number;
   public optionTemplate: string = require('./onDemandOptionTemplate.html');
 
-  constructor(private $scope: IScope, private ClusterFilterModel: any) { 'ngInject'; }
+  constructor(private $scope: IScope, private clusterFilterModel: ClusterFilterModel) { 'ngInject'; }
 
   public $onInit(): void {
     this.setAvailableClusters();
@@ -21,14 +22,14 @@ class OnDemandClusterPickerController implements IComponentController {
 
   private setAvailableClusters(): void {
     this.totalClusterCount = this.application.getDataSource('serverGroups').clusters.length;
-    const selectedClusters: string[] = Object.keys(this.ClusterFilterModel.sortFilter.clusters);
+    const selectedClusters: string[] = Object.keys(this.clusterFilterModel.asFilterModel.sortFilter.clusters);
     this.availableClusters = this.application.getDataSource('serverGroups').clusters
       .filter((cluster: IClusterSummary) => !selectedClusters.includes(this.makeKey(cluster)));
   }
 
   public selectCluster(cluster: IClusterSummary): void {
     this.lastSelection = undefined;
-    this.ClusterFilterModel.sortFilter.clusters[this.makeKey(cluster)] = true;
+    this.clusterFilterModel.asFilterModel.sortFilter.clusters[this.makeKey(cluster)] = true;
     this.application.getDataSource('serverGroups').refresh();
   }
 

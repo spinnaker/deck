@@ -1,10 +1,10 @@
-import {module, IComponentController, IComponentOptions} from 'angular';
+import {module, IController, IComponentOptions} from 'angular';
 
 import {ACCOUNT_SERVICE, AccountService} from 'core/account/account.service';
 
 import './accountTag.less';
 
-class AccountTagController implements IComponentController {
+class AccountTagController implements IController {
   public account: string;
 
   public accountType: string;
@@ -15,6 +15,10 @@ class AccountTagController implements IComponentController {
     this.accountService.challengeDestructiveActions(this.account).then((isProdAccount) => {
       this.accountType = isProdAccount ? 'prod' : this.account;
     });
+  }
+
+  public $onChanges(): void {
+    this.$onInit();
   }
 }
 

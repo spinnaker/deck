@@ -3,6 +3,7 @@ import { IModalService } from 'angular-ui-bootstrap';
 import { StateService, StateParams } from '@uirouter/angularjs';
 import { IQService, IRootScopeService } from 'angular';
 
+import { AccountService } from '../account/account.service';
 import { Api } from '../api/api.service';
 import { ApplicationModelBuilder } from '../application/applicationModel.builder';
 import { ApplicationReader } from '../application/service/application.read.service';
@@ -22,15 +23,19 @@ import { InfrastructureSearchService } from '../search/infrastructure/infrastruc
 import { LoadBalancerFilterModel } from '../loadBalancer/filter/loadBalancerFilter.model';
 import { LoadBalancerFilterService } from '../loadBalancer/filter/loadBalancer.filter.service';
 import { ManualJudgmentService } from '../pipeline/config/stages/manualJudgment/manualJudgment.service';
+import { NotifierService } from '../widgets/notifier/notifier.service';
+import { OverrideRegistry } from '../overrideRegistry/override.registry';
 import { PipelineConfigProvider } from '../pipeline/config/pipelineConfigProvider';
 import { PipelineConfigService } from '../pipeline/config/services/pipelineConfig.service';
 import { PipelineTemplateService } from '../pipeline/config/templates/pipelineTemplate.service';
 import { ProviderSelectionService } from '../cloudProvider/providerSelection/providerSelection.service';
+import { RecentHistoryService } from 'core/history/recentHistory.service'
 import { SchedulerFactory } from '../scheduler/scheduler.factory';
 import { StateEvents } from './state.events';
 import { TaskMonitorBuilder } from '../task/monitor/taskMonitor.builder';
 import { VariableInputService } from '../pipeline/config/templates/inputs/variableInput.service';
 import { VariableValidatorService } from '../pipeline/config/templates/validators/variableValidator.service';
+import { ViewStateCacheService } from '../cache/viewStateCache.service';
 import { WaypointService } from '../utils/waypoints/waypoint.service';
 
 export abstract class ReactInject {
@@ -54,6 +59,7 @@ export class CoreReactInject extends ReactInject {
   // Services
   public get $stateParams() { return this.$injector.get('$stateParams') as StateParams; }
   public get API() { return this.$injector.get('API') as Api; }
+  public get accountService() { return this.$injector.get('accountService') as AccountService; }
   public get applicationModelBuilder() { return this.$injector.get('applicationModelBuilder') as ApplicationModelBuilder; }
   public get applicationReader() { return this.$injector.get('applicationReader') as ApplicationReader; }
   public get authenticationService() { return this.$injector.get('authenticationService') as AuthenticationService; }
@@ -73,15 +79,19 @@ export class CoreReactInject extends ReactInject {
   public get loadBalancerFilterService() { return this.$injector.get('loadBalancerFilterService') as LoadBalancerFilterService; }
   public get manualJudgmentService() { return this.$injector.get('manualJudgmentService') as ManualJudgmentService; }
   public get modalService() { return this.$injector.get('$uibModal') as IModalService; }
+  public get notifierService() { return this.$injector.get('notifierService') as NotifierService; }
+  public get overrideRegistry() { return this.$injector.get('overrideRegistry') as OverrideRegistry; }
   public get pipelineConfig() { return this.$injector.get('pipelineConfig') as PipelineConfigProvider; }
   public get pipelineConfigService() { return this.$injector.get('pipelineConfigService') as PipelineConfigService; }
   public get pipelineTemplateService() { return this.$injector.get('pipelineTemplateService') as PipelineTemplateService; }
   public get providerSelectionService() { return this.$injector.get('providerSelectionService') as ProviderSelectionService; }
   public get schedulerFactory() { return this.$injector.get('schedulerFactory') as SchedulerFactory; }
+  public get recentHistoryService() { return this.$injector.get('recentHistoryService') as RecentHistoryService; }
   public get stateEvents() { return this.$injector.get('stateEvents') as StateEvents; }
   public get taskMonitorBuilder() { return this.$injector.get('taskMonitorBuilder') as TaskMonitorBuilder; }
   public get variableInputService() { return this.$injector.get('variableInputService') as VariableInputService; }
   public get variableValidatorService() { return this.$injector.get('variableValidatorService') as VariableValidatorService; }
+  public get viewStateCache() { return this.$injector.get('viewStateCache') as ViewStateCacheService; }
   public get waypointService() { return this.$injector.get('waypointService') as WaypointService; }
 
   private createStateService(): StateService {

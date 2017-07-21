@@ -12,7 +12,7 @@ module.exports = angular.module('spinnaker.serverGroup.configure.gce.cloneServer
   require('./hiddenMetadataKeys.value.js'),
   require('./securityGroups/tagManager.service.js')
 ])
-  .controller('gceCloneServerGroupCtrl', function($scope, $uibModalInstance, $q, $state,
+  .controller('gceCloneServerGroupCtrl', function($scope, $uibModalInstance, $q, $state, $log,
                                                   serverGroupWriter, v2modalWizardService, taskMonitorBuilder,
                                                   gceServerGroupConfigurationService,
                                                   serverGroupCommand, application, title,
@@ -42,6 +42,21 @@ module.exports = angular.module('spinnaker.serverGroup.configure.gce.cloneServer
       loaded: false,
       requiresTemplateSelection: !!serverGroupCommand.viewState.requiresTemplateSelection,
     };
+
+    this.templateSelectionText = {
+      copied: [
+        'account, region, subnet, cluster name (stack, details)',
+        'load balancers',
+        'security groups',
+        'instance type',
+        'all fields on the Advanced Settings page',
+      ],
+      notCopied: [],
+    };
+
+    if (!$scope.command.viewState.disableStrategySelection) {
+      this.templateSelectionText.notCopied.push('the deployment strategy (if any) used to deploy the most recent server group');
+    }
 
     function onApplicationRefresh() {
       // If the user has already closed the modal, do not navigate to the new details view
@@ -103,6 +118,8 @@ module.exports = angular.module('spinnaker.serverGroup.configure.gce.cloneServer
           .register({ page: 'zones', subForm: 'zonesSubForm' })
           .register({ page: 'load-balancers', subForm: 'loadBalancerSubForm' })
           .register({ page: 'autohealing-policy', subForm: 'autoHealingPolicySubForm' });
+      }).catch(e => {
+        $log.error('Error generating server group command: ', e);
       });
     }
 
@@ -237,6 +254,8 @@ module.exports = angular.module('spinnaker.serverGroup.configure.gce.cloneServer
                 .concat(loadBalancerDetails.listeners.map(listener => listener.name));
           } else if (loadBalancerDetails.loadBalancerType === 'SSL') {
             metadata['global-load-balancer-names'].push(name);
+          } else if (loadBalancerDetails.loadBalancerType === 'TCP') {
+            metadata['global-load-balancer-names'].push(name);
           } else {
             metadata['load-balancer-names'].push(name);
           }
@@ -263,12 +282,12 @@ module.exports = angular.module('spinnaker.serverGroup.configure.gce.cloneServer
     }
 
     function collectLoadBalancerNamesForCommand (loadBalancerIndex, loadBalancerMetadata) {
-      var loadBalancerNames = [];
+      let loadBalancerNames = [];
       if (loadBalancerMetadata['load-balancer-names']) {
         loadBalancerNames = loadBalancerNames.concat(loadBalancerMetadata['load-balancer-names'].split(','));
       }
 
-      var selectedSslLoadBalancerNames = _.chain(loadBalancerIndex)
+      let selectedSslLoadBalancerNames = _.chain(loadBalancerIndex)
         .filter({loadBalancerType: 'SSL'})
         .map('name')
         .intersection(
@@ -277,7 +296,16 @@ module.exports = angular.module('spinnaker.serverGroup.configure.gce.cloneServer
             : [])
         .value();
 
-      return loadBalancerNames.concat(selectedSslLoadBalancerNames);
+      let selectedTcpLoadBalancerNames = _.chain(loadBalancerIndex)
+        .filter({loadBalancerType: 'TCP'})
+        .map('name')
+        .intersection(
+          loadBalancerMetadata['global-load-balancer-names']
+            ? loadBalancerMetadata['global-load-balancer-names'].split(',')
+            : [])
+        .value();
+
+      return loadBalancerNames.concat(selectedSslLoadBalancerNames).concat(selectedTcpLoadBalancerNames);
     }
 
     this.submit = function () {
@@ -364,10 +392,10 @@ module.exports = angular.module('spinnaker.serverGroup.configure.gce.cloneServer
       $scope.state.loaded = true;
     }
 
-    $scope.$on('template-selected', function() {
+    this.templateSelected = () => {
       $scope.state.requiresTemplateSelection = false;
       configureCommand();
-    });
+    };
 
     $scope.$on('$destroy', gceTagManager.reset);
   });

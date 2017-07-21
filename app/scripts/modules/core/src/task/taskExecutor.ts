@@ -1,7 +1,8 @@
-import { module } from 'angular';
+import { IHttpPromiseCallbackArg, IPromise, IQService, module } from 'angular';
 
 import { ITask } from 'core/domain';
-import { TASK_READ_SERVICE, TaskReader } from 'core/task/task.read.service';
+import { TASK_READ_SERVICE, TaskReader } from './task.read.service';
+import { TASK_WRITE_SERVICE, TaskWriter } from './task.write.service';
 import { AUTHENTICATION_SERVICE, AuthenticationService } from '../authentication/authentication.service';
 
 export interface IJob {
@@ -23,12 +24,12 @@ export interface ITaskCommand {
 
 export class TaskExecutor {
 
-  public constructor(private $q: ng.IQService, private authenticationService: AuthenticationService,
-                     private taskReader: TaskReader, private taskWriter: any) {
+  public constructor(private $q: IQService, private authenticationService: AuthenticationService,
+                     private taskReader: TaskReader, private taskWriter: TaskWriter) {
     'ngInject';
   }
 
-  public executeTask(taskCommand: ITaskCommand): ng.IPromise<ITask> {
+  public executeTask(taskCommand: ITaskCommand): IPromise<ITask> {
     const owner: any = taskCommand.application || taskCommand.project || { name: 'ad-hoc'};
     if (taskCommand.application && taskCommand.application.name) {
       taskCommand.application = taskCommand.application.name;
@@ -50,7 +51,7 @@ export class TaskExecutor {
         }
         return this.taskReader.getTask(taskId);
       },
-      (response: ng.IHttpPromiseCallbackArg<any>) => {
+      (response: IHttpPromiseCallbackArg<any>) => {
         const error: any = {
           status: response.status,
           message: response.statusText
@@ -72,5 +73,5 @@ export const TASK_EXECUTOR = 'spinnaker.core.task.executor';
 module(TASK_EXECUTOR, [
   AUTHENTICATION_SERVICE,
   TASK_READ_SERVICE,
-  require('./task.write.service.js'),
+  TASK_WRITE_SERVICE,
 ]).service('taskExecutor', TaskExecutor);

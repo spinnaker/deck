@@ -2,7 +2,13 @@
 # yarn lockfile v1
 
 
-"@types/angular-mocks@1.5.9", "@types/angular-mocks@^1.5.9":
+"@types/angular-mocks@1.5.10":
+  version "1.5.10"
+  resolved "https://registry.yarnpkg.com/@types/angular-mocks/-/angular-mocks-1.5.10.tgz#bb3728bfc156a3bc35dfbfcc2d332e175284fba6"
+  dependencies:
+    "@types/angular" "*"
+
+"@types/angular-mocks@^1.5.9":
   version "1.5.9"
   resolved "https://registry.yarnpkg.com/@types/angular-mocks/-/angular-mocks-1.5.9.tgz#4d91bb71a5cfb000d02b02133bc98c20f57101fd"
   dependencies:
@@ -14,11 +20,9 @@
   dependencies:
     "@types/angular" "*"
 
-"@types/angular@*", "@types/angular@1.6.16", "@types/angular@^1.6.15", "@types/angular@^1.6.16":
-  version "1.6.16"
-  resolved "https://registry.yarnpkg.com/@types/angular/-/angular-1.6.16.tgz#f649ef28dd56311a7d8c10be19af879a2a3a9151"
-  dependencies:
-    "@types/jquery" "*"
+"@types/angular@*", "@types/angular@1.6.26", "@types/angular@^1.6.15", "@types/angular@^1.6.16":
+  version "1.6.26"
+  resolved "https://registry.yarnpkg.com/@types/angular/-/angular-1.6.26.tgz#a96cccef648de0bf7435f3b9bad13f2430719305"
 
 "@types/cheerio@*":
   version "0.22.1"
@@ -309,9 +313,9 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react@*", "@types/react@^15.0.20", "@types/react@^15.0.22", "@types/react@^15.0.23":
-  version "15.0.24"
-  resolved "https://registry.yarnpkg.com/@types/react/-/react-15.0.24.tgz#8a75299dc37906df327c18ca918bf97a55e7123b"
+"@types/react@*", "@types/react@15.0.35", "@types/react@^15.0.22", "@types/react@^15.0.23":
+  version "15.0.35"
+  resolved "https://registry.yarnpkg.com/@types/react/-/react-15.0.35.tgz#4672923cd502d03e1480d03816ebc5a719fb86da"
 
 "@types/source-map@*":
   version "0.5.0"
@@ -339,27 +343,27 @@
     "@types/tapable" "*"
     "@types/uglify-js" "*"
 
-"@uirouter/angularjs@git://github.com/angular-ui/ui-router.git#SNAPSHOT-20170629":
-  version "1.0.5"
-  resolved "git://github.com/angular-ui/ui-router.git#2c4ccc2b5f544afffa86bd9e4ac182b6907589e1"
+"@uirouter/angularjs@1.0.5-SNAPSHOT.20170711":
+  version "1.0.5-SNAPSHOT.20170711"
+  resolved "https://registry.yarnpkg.com/@uirouter/angularjs/-/angularjs-1.0.5-SNAPSHOT.20170711.tgz#6cb059062cc0c2aada6b85b820b9ef6c85eee878"
   dependencies:
     "@uirouter/core" "^5.0.5"
 
-"@uirouter/core@=5.0.5", "@uirouter/core@^5.0.5":
+"@uirouter/core@5.0.5", "@uirouter/core@^5.0.5":
   version "5.0.5"
   resolved "https://registry.yarnpkg.com/@uirouter/core/-/core-5.0.5.tgz#4fafae8b89e1bee321b0ed32e69ab66547c055c6"
 
-"@uirouter/react-hybrid@0.0.6":
-  version "0.0.6"
-  resolved "https://registry.yarnpkg.com/@uirouter/react-hybrid/-/react-hybrid-0.0.6.tgz#4fabba0600e3aa2ce93751067695349651c8c163"
+"@uirouter/react-hybrid@^0.0.12":
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/@uirouter/react-hybrid/-/react-hybrid-0.0.12.tgz#c090c3415a551b28a17dbc4b44d6ef38f9f038bf"
   dependencies:
-    "@uirouter/angularjs" "git://github.com/angular-ui/ui-router#SNAPSHOT-20170629"
-    "@uirouter/core" "=5.0.5"
-    "@uirouter/react" "git://github.com/ui-router/react#SNAPSHOT-20170629"
+    "@uirouter/angularjs" "1.0.5-SNAPSHOT.20170711"
+    "@uirouter/core" "5.0.5"
+    "@uirouter/react" "0.5.1-SNAPSHOT.20170711"
 
-"@uirouter/react@git://github.com/ui-router/react.git#SNAPSHOT-20170629":
-  version "0.5.0"
-  resolved "git://github.com/ui-router/react.git#d2f723f88ccd3e7615f5c3893e00b21b4d15c681"
+"@uirouter/react@0.5.1-SNAPSHOT.20170711":
+  version "0.5.1-SNAPSHOT.20170711"
+  resolved "https://registry.yarnpkg.com/@uirouter/react/-/react-0.5.1-SNAPSHOT.20170711.tgz#fabfceaa52de5083043f50dbad138cdbf447e92e"
   dependencies:
     "@uirouter/core" "^5.0.5"
     classnames "^2.2.5"
@@ -1460,7 +1464,7 @@ classname@^0.0.0:
   version "0.0.0"
   resolved "https://registry.yarnpkg.com/classname/-/classname-0.0.0.tgz#43d171b484e354c7a293a5b78004df6852db20d6"
 
-classnames@^2.2.4, classnames@^2.2.5:
+classnames@^2.2.3, classnames@^2.2.4, classnames@^2.2.5:
   version "2.2.5"
   resolved "https://registry.yarnpkg.com/classnames/-/classnames-2.2.5.tgz#fb3801d453467649ef3603c7d61a02bd129bde6d"
 
@@ -1574,11 +1578,15 @@ combined-stream@^1.0.5, combined-stream@~1.0.5:
   dependencies:
     delayed-stream "~1.0.0"
 
-commander@2.9.x, commander@^2.5.0:
+commander@2.9.x:
   version "2.9.0"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.9.0.tgz#9c99094176e12240cb22d6c5146098400fe0f7d4"
   dependencies:
     graceful-readlink ">= 1.0.0"
+
+commander@^2.5.0, commander@^2.9.0:
+  version "2.11.0"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-2.11.0.tgz#157152fd1e7a6c8d98a5b715cf376df928004563"
 
 commondir@^1.0.1:
   version "1.0.1"
@@ -2077,7 +2085,7 @@ dom-converter@~0.1:
   dependencies:
     utila "~0.3"
 
-dom-helpers@^3.2.0:
+"dom-helpers@^2.4.0 || ^3.0.0", dom-helpers@^3.2.0:
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/dom-helpers/-/dom-helpers-3.2.1.tgz#3203e07fed217bd1f424b019735582fc37b2825a"
 
@@ -2727,12 +2735,6 @@ find-up@^1.0.0:
     path-exists "^2.0.0"
     pinkie-promise "^2.0.0"
 
-findup-sync@~0.3.0:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/findup-sync/-/findup-sync-0.3.0.tgz#37930aa5d816b777c03445e1966cc6790a4c0b16"
-  dependencies:
-    glob "~5.0.0"
-
 flat-cache@^1.2.1:
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/flat-cache/-/flat-cache-1.2.2.tgz#fa86714e72c21db88601761ecf2f555d1abc6b96"
@@ -2886,7 +2888,7 @@ glob-parent@^2.0.0:
   dependencies:
     is-glob "^2.0.0"
 
-glob@^5.0.15, glob@~5.0.0:
+glob@^5.0.15:
   version "5.0.15"
   resolved "https://registry.yarnpkg.com/glob/-/glob-5.0.15.tgz#1bc936b9e02f4a603fcc222ecf7633d30b8b93b1"
   dependencies:
@@ -3863,7 +3865,7 @@ longest@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/longest/-/longest-1.0.1.tgz#30a0b2da38f73770e8294a0d22e6625ed77d0097"
 
-loose-envify@^1.0.0, loose-envify@^1.1.0, loose-envify@^1.3.1:
+loose-envify@^1.0.0, loose-envify@^1.1.0, loose-envify@^1.3.0, loose-envify@^1.3.1:
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/loose-envify/-/loose-envify-1.3.1.tgz#d1a8ad33fa9ce0e713d65fdd0ac8b748d478c848"
   dependencies:
@@ -3961,7 +3963,7 @@ minimalistic-crypto-utils@^1.0.0, minimalistic-crypto-utils@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/minimalistic-crypto-utils/-/minimalistic-crypto-utils-1.0.1.tgz#f6c00c1c0b082246e5c4d99dfb8c7c083b2b582a"
 
-"minimatch@2 || 3", minimatch@^3.0.0, minimatch@^3.0.2:
+"minimatch@2 || 3", minimatch@^3.0.0, minimatch@^3.0.2, minimatch@^3.0.4:
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-3.0.4.tgz#5166e286457f03306064be5497e8dbb0c3d32083"
   dependencies:
@@ -4310,7 +4312,7 @@ opn@4.0.2:
     object-assign "^4.0.1"
     pinkie-promise "^2.0.0"
 
-optimist@^0.6.1, optimist@~0.6.0, optimist@~0.6.1:
+optimist@^0.6.1, optimist@~0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/optimist/-/optimist-0.6.1.tgz#da3ea74686fa21a19a111c326e90eb15a0196686"
   dependencies:
@@ -4966,7 +4968,7 @@ react-prop-types@^0.4.0:
   dependencies:
     warning "^3.0.0"
 
-react-select@^1.0.0-rc.4:
+react-select@^1.0.0-rc.2, react-select@^1.0.0-rc.4:
   version "1.0.0-rc.4"
   resolved "https://registry.yarnpkg.com/react-select/-/react-select-1.0.0-rc.4.tgz#f28f3bab18196ff8f32337bb52ed015773c90663"
   dependencies:
@@ -4982,7 +4984,26 @@ react-test-renderer@^15.5.4:
     fbjs "^0.8.9"
     object-assign "^4.1.0"
 
-react2angular@^1.1.2:
+react-virtualized-select@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/react-virtualized-select/-/react-virtualized-select-3.1.0.tgz#968e89c4d74d98890cacf480378b6abee743c2d8"
+  dependencies:
+    babel-runtime "^6.11.6"
+    prop-types "^15.5.8"
+    react-select "^1.0.0-rc.2"
+    react-virtualized "^9.0.0"
+
+react-virtualized@^9.0.0:
+  version "9.9.0"
+  resolved "https://registry.yarnpkg.com/react-virtualized/-/react-virtualized-9.9.0.tgz#799a6f23819eeb82860d59b82fad33d1d420325e"
+  dependencies:
+    babel-runtime "^6.11.6"
+    classnames "^2.2.3"
+    dom-helpers "^2.4.0 || ^3.0.0"
+    loose-envify "^1.3.0"
+    prop-types "^15.5.4"
+
+react2angular@^1.1.3:
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/react2angular/-/react2angular-1.1.3.tgz#9d69f5277980d41af1a625b04c78a4497c641893"
   dependencies:
@@ -5347,9 +5368,9 @@ rx-lite@^3.1.2:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/rx-lite/-/rx-lite-3.1.2.tgz#19ce502ca572665f3b647b10939f97fd1615f102"
 
-rxjs@^5.1.0:
-  version "5.4.0"
-  resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-5.4.0.tgz#a7db14ab157f9d7aac6a56e655e7a3860d39bf26"
+rxjs@^5.4.2:
+  version "5.4.2"
+  resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-5.4.2.tgz#2a3236fcbf03df57bae06fd6972fd99e5c08fcf7"
   dependencies:
     symbol-observable "^1.0.1"
 
@@ -5880,9 +5901,13 @@ tryor@~0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/tryor/-/tryor-0.1.2.tgz#8145e4ca7caff40acde3ccf946e8b8bb75b4172b"
 
-tslib@^1.6.0, tslib@^1.6.1:
+tslib@^1.6.1:
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.7.0.tgz#6e8366695f72961252b35167b0dd4fbeeafba491"
+
+tslib@^1.7.1:
+  version "1.7.1"
+  resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.7.1.tgz#bc8004164691923a79fe8378bbeb3da2017538ec"
 
 tslint-loader@^3.4.3:
   version "3.5.3"
@@ -5898,24 +5923,26 @@ tslint-react@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/tslint-react/-/tslint-react-3.0.0.tgz#00c48ab7f22e91533b62bdef2c162b49447af00a"
 
-tslint@^5.2.0:
-  version "5.2.0"
-  resolved "https://registry.yarnpkg.com/tslint/-/tslint-5.2.0.tgz#16a2addf20cb748385f544e9a0edab086bc34114"
+tslint@^5.5.0:
+  version "5.5.0"
+  resolved "https://registry.yarnpkg.com/tslint/-/tslint-5.5.0.tgz#10e8dab3e3061fa61e9442e8cee3982acf20a6aa"
   dependencies:
     babel-code-frame "^6.22.0"
     colors "^1.1.2"
+    commander "^2.9.0"
     diff "^3.2.0"
-    findup-sync "~0.3.0"
     glob "^7.1.1"
-    optimist "~0.6.0"
+    minimatch "^3.0.4"
     resolve "^1.3.2"
     semver "^5.3.0"
-    tslib "^1.6.0"
-    tsutils "^1.8.0"
+    tslib "^1.7.1"
+    tsutils "^2.5.1"
 
-tsutils@^1.8.0:
-  version "1.8.0"
-  resolved "https://registry.yarnpkg.com/tsutils/-/tsutils-1.8.0.tgz#bf8118ed8e80cd5c9fc7d75728c7963d44ed2f52"
+tsutils@^2.5.1:
+  version "2.7.1"
+  resolved "https://registry.yarnpkg.com/tsutils/-/tsutils-2.7.1.tgz#411a0e9466525a2b2869260a55620d7292155e24"
+  dependencies:
+    tslib "^1.7.1"
 
 tty-browserify@0.0.0:
   version "0.0.0"
@@ -5948,9 +5975,9 @@ typedarray@^0.0.6:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
 
-typescript@^2.2.2:
-  version "2.3.2"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.3.2.tgz#f0f045e196f69a72f06b25fd3bd39d01c3ce9984"
+typescript@^2.4.1:
+  version "2.4.1"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.4.1.tgz#c3ccb16ddaa0b2314de031e7e6fee89e5ba346bc"
 
 ua-parser-js@^0.7.9:
   version "0.7.12"

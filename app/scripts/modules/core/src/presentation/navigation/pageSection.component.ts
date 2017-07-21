@@ -1,5 +1,5 @@
-import {module} from 'angular';
-import {PageNavigationState, INavigationPage} from './pageNavigationState';
+import { IController, module } from 'angular';
+import { PageNavigationState, INavigationPage } from './pageNavigationState';
 
 interface IPageSectionOnChanges extends ng.IOnChangesObject {
   visible: ng.IChangesObject<boolean>;
@@ -7,7 +7,7 @@ interface IPageSectionOnChanges extends ng.IOnChangesObject {
   badge: ng.IChangesObject<string>;
 }
 
-class PageSectionController implements ng.IComponentController {
+class PageSectionController implements IController {
   public key: string;
   public label: string;
   public badge: string;
@@ -53,9 +53,7 @@ class PageSectionComponent implements ng.IComponentOptions {
   public transclude = true;
   public template = `
     <div ng-if="$ctrl.pageConfig.visible" class="page-subheading" data-page-id="{{$ctrl.pageConfig.key}}">
-      <sticky-header>
-        <h4>{{$ctrl.pageConfig.label}}</h4>
-      </sticky-header>
+      <h4 class="sticky-header">{{$ctrl.pageConfig.label}}</h4>
       <div ng-class="$ctrl.noWrapper ? 'no-wrapper' : 'section-body'" data-page-content="{{$ctrl.pageConfig.key}}" ng-transclude></div>
     </div>
   `;

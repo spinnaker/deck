@@ -1,4 +1,4 @@
-import { module, IScope } from 'angular';
+import { module, IScope, IController } from 'angular';
 import { IModalInstanceService } from 'angular-ui-bootstrap';
 import { StateService } from '@uirouter/angularjs';
 import * as _ from 'lodash';
@@ -60,7 +60,7 @@ class SslLoadBalancer implements IGceLoadBalancer {
   constructor (public region = 'global') {}
 }
 
-class SslLoadBalancerCtrl extends CommonGceLoadBalancerCtrl implements ng.IComponentController {
+class SslLoadBalancerCtrl extends CommonGceLoadBalancerCtrl implements IController {
   public pages: any = {
     'location': require('./createLoadBalancerProperties.html'),
     'listener': require('./listener.html'),
@@ -76,6 +76,7 @@ class SslLoadBalancerCtrl extends CommonGceLoadBalancerCtrl implements ng.ICompo
   public regions: string[];
   public certificateWrappers: any[];
   public healthChecksByAccountAndType: {[account: string]: {[healthCheckType: string]: IGceHealthCheck[]}};
+  public portOptions: string[] = ['25', '43', '110', '143', '195', '443', '465', '587', '700', '993', '995'];
 
   // The 'by account' maps populate the corresponding 'existing names' lists below.
   public existingLoadBalancerNamesByAccount: IListKeyedByAccount;
