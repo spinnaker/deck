@@ -1,9 +1,11 @@
+import { IServerGroup, IInstance } from 'core/domain';
+
 export interface IInstanceListProps {
   hasDiscovery: boolean;
   hasLoadBalancers: boolean;
-  instances: any[];
+  instances: IInstance[];
   sortFilter: any;
-  serverGroup: any;
+  serverGroup: IServerGroup;
 }
 
 export const instanceListBindings: Record<keyof IInstanceListProps, string> = {

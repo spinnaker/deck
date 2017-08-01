@@ -13,7 +13,7 @@ import { EntityNotifications } from 'core/entityTag/notifications/EntityNotifica
 import { HealthCounts } from 'core/healthCounts';
 import { LoadBalancersTag } from 'core/loadBalancer/LoadBalancersTag';
 import { NamingService } from 'core/naming';
-import { NgReact, ReactInjector } from 'core/reactShims'
+import { NgReact, ReactInjector } from 'core/reactShims';
 import { Instances } from 'core/instance/Instances';
 import { ScrollToService } from 'core/utils';
 
@@ -167,12 +167,8 @@ export class ServerGroup extends React.Component<IServerGroupProps, IServerGroup
   };
 
   private handleServerGroupClicked(event: React.MouseEvent<any>) {
-    this.fireGaEvent();
-    this.loadDetails(event);
-  }
-
-  private fireGaEvent(): void {
     ReactGA.event({ category: 'Cluster Pod', action: 'Load Server Group Details' });
+    this.loadDetails(event);
   }
 
   public render() {

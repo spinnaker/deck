@@ -27,7 +27,7 @@ export class ClusterPod extends React.Component<IClusterPodProps, IClusterPodSta
     super(props);
 
     this.state = {
-      showCloseButton: props.application.getDataSource('serverGroups').fetchOnDemand === true,
+      showCloseButton: props.application.getDataSource('serverGroups').fetchOnDemand,
     };
   }
 
