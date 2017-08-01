@@ -120,6 +120,7 @@ function configure(IS_TEST) {
   ];
 
   if (!IS_TEST) {
+    config.devtool = 'cheap-source-map';
     config.entry = {
       settings: './settings.js',
       app: './app/scripts/app.ts',

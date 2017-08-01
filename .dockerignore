@@ -1,1 +1,8 @@
 node_modules
+.gradle
+.github
+.awcache
+.happypack
+.idea
+.vscode
+build
