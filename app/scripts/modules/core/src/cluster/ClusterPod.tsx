@@ -1,5 +1,6 @@
 import * as React from 'react';
 import autoBindMethods from 'class-autobind-decorator';
+import { orderBy } from 'lodash';
 
 import { NgReact, ReactInjector } from 'core/reactShims';
 import { ServerGroup } from 'core/serverGroup/ServerGroup';
@@ -72,7 +73,7 @@ export class ClusterPod extends React.Component<IClusterPodProps, IClusterPodSta
         <div className="pod-center">
           <div>
             <span className="glyphicon glyphicon-th"/>
-            {grouping.heading}
+            {' ' + grouping.heading}
           </div>
 
           <EntityNotifications
@@ -104,6 +105,7 @@ export class ClusterPod extends React.Component<IClusterPodProps, IClusterPodSta
 
   private renderSubGroup(subgroup: IServerGroupSubgroup) {
     const { grouping, application, sortFilter } = this.props;
+    const sortedServerGroups = orderBy(subgroup.serverGroups, ['name'], ['desc']);
 
     return (
       <div className="pod-subgroup" key={subgroup.key}>
@@ -121,7 +123,7 @@ export class ClusterPod extends React.Component<IClusterPodProps, IClusterPodSta
           />
         </h6>
 
-        {grouping.cluster.category === 'serverGroup' && subgroup.serverGroups.map((serverGroup: IServerGroup) => (
+        {grouping.cluster.category === 'serverGroup' && sortedServerGroups.map((serverGroup: IServerGroup) => (
           <ServerGroup
             key={serverGroup.name}
             serverGroup={serverGroup}

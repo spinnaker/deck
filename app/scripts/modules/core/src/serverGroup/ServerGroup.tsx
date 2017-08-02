@@ -118,7 +118,7 @@ export class ServerGroup extends React.Component<IServerGroupProps, IServerGroup
   }
 
   private onServerGroupsChanged() {
-    let isMultiSelected = this.isMultiSelected(this.state.multiselect, this.state.serverGroup);
+    const isMultiSelected = this.isMultiSelected(this.state.multiselect, this.state.serverGroup);
     this.setState({ isMultiSelected });
     // Enables the (angular) details pane to detect the changes
     ReactInjector.$rootScope.$applyAsync(() => false);
@@ -178,8 +178,10 @@ export class ServerGroup extends React.Component<IServerGroupProps, IServerGroup
     const { account, region, name, type } = serverGroup;
     const key = ScrollToService.toDomId(['serverGroup', account, region, name].join('-'));
 
-    const hasLoadBalancer = get(serverGroup, 'loadBalancers.length') || get(serverGroup, 'targetGroups.length');
+    const hasJenkins = !!jenkins;
+    const hasImages = !!images;
     const hasRunningExecutions = !!serverGroup.runningExecutions.length || !!serverGroup.runningTasks.length;
+    const hasLoadBalancer = !!get(serverGroup, 'loadBalancers.length') || !!get(serverGroup, 'targetGroups.length');
 
     const serverGroupClassName = classNames({
       'server-group': true,
@@ -210,9 +212,9 @@ export class ServerGroup extends React.Component<IServerGroupProps, IServerGroup
                   <CloudProviderLogo provider={type} height="16px" width="16px"/>
 
                   <span className="server-group-sequence"> {this.state.serverGroupSequence}</span>
-                  {(jenkins || images) && <span>: </span>}
-                  {jenkins && <a href={jenkins.href} target="_blank">Build: #{jenkins.number}</a>}
-                  {images && <span>{images}</span>}
+                  {(hasJenkins || hasImages) && <span>: </span>}
+                  {hasJenkins && <a href={jenkins.href} target="_blank">Build: #{jenkins.number}</a>}
+                  {hasImages && <span>{images}</span>}
 
                   <EntityNotifications
                     entity={serverGroup}
