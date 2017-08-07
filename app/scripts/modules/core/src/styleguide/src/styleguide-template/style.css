@@ -610,7 +610,7 @@ p[id] {
 .psg-ComponentList__item {
   display: block;
   color: #3f526b;
-  padding: 12px 8px;
+  padding: 12px 8px !important;
 }
 
 .psg-ComponentList__item:hover {

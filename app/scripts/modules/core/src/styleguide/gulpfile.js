@@ -18,6 +18,7 @@ gulp.task('build:styleguide', function () {
           extend,
           customProperties({ preserve: true }),
           autoprefixer,
+          scopify({scopeName: 'styleguide'}),
           styleGuide({
               project: 'Spinnaker',
               dest: './public/styleguide.html',
