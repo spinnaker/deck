@@ -8,29 +8,23 @@
         <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
     </head>
 
-    <body class="styleguide">
+    <body>
       <style>
         nav  * {
           color: black !important;
         }
       </style>
-      <div class="psg-wrapper">
+      <div class="psg-wrapper styleguide">
         <nav class="psg-menu">
-          <a href="" class="psg-logo">
-            <img
-              title="Your logo"
-              src="/public/images/logo.png">
-          </a>
-
           <ul class="psg-ComponentList">
             <% if (Array.isArray(colorPalette) && colorPalette.length !== 0) { %>
-              <a href="#color-palette" class="psg-ComponentList__item">
+              <a href="" ui-sref="home.styleguide({'#':'color-palette'})"class="psg-ComponentList__item">
                 <li>Color Palette</li>
               </a>
-            <% } %>
+            <% } %> 
             <% maps.forEach(function (map) { %>
               <% if (map.link.title !== null) { %>
-                <a href="#<%= map.link.id %>" class="psg-ComponentList__item">
+                <a href="" ui-sref="home.styleguide({'#':'<%= map.link.id %>'})" class="psg-ComponentList__item">
                   <li>
                     <%= map.link.title %>
                   </li>

@@ -11,11 +11,7 @@ function configure(IS_TEST) {
   const happyThreadPool = HappyPack.ThreadPool({size: POOL_SIZE});
 
   const config = {
-    plugins: [
-      new webpack.LoaderOptionsPlugin({
-        debug: true
-      })
-    ],
+    plugins: [],
     output: IS_TEST ? undefined : {
         path: path.join(__dirname, 'build', 'webpack', process.env.SPINNAKER_ENV || ''),
         filename: '[name].js',
