@@ -30,7 +30,6 @@ module.exports = angular.module('spinnaker.amazon.cloneServerGroup.controller', 
       templateSelection: overrideRegistry.getTemplate('aws.serverGroup.templateSelection', require('./templateSelection/templateSelection.html')),
       basicSettings: overrideRegistry.getTemplate('aws.serverGroup.basicSettings', require('./location/basicSettings.html')),
       loadBalancers: overrideRegistry.getTemplate('aws.serverGroup.loadBalancers', require('./loadBalancers/loadBalancers.html')),
-      targetGroups: overrideRegistry.getTemplate('aws.serverGroup.targetGroups', require('./targetGroups/targetGroups.html')),
       securityGroups: overrideRegistry.getTemplate('aws.serverGroup.securityGroups', require('./securityGroups/securityGroups.html')),
       instanceType: overrideRegistry.getTemplate('aws.serverGroup.instanceType', require('./instanceType/instanceType.html')),
       capacity: overrideRegistry.getTemplate('aws.serverGroup.capacity', require('./capacity/capacity.html')),
@@ -134,6 +133,7 @@ module.exports = angular.module('spinnaker.amazon.cloneServerGroup.controller', 
       $scope.$watch('command.virtualizationType', createResultProcessor($scope.command.imageChanged));
       $scope.$watch('command.stack', $scope.command.clusterChanged);
       $scope.$watch('command.freeFormDetails', $scope.command.clusterChanged);
+      $scope.$watch('command.instanceType', $scope.command.instanceTypeChanged);
 
       // if any additional watches have been configured, add them
       serverGroupCommandRegistry.getCommandOverrides('aws').forEach((override) => {
