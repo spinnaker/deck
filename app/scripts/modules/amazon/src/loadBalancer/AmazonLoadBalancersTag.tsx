@@ -13,11 +13,6 @@ import {
 import { AmazonLoadBalancerDataUtils } from 'amazon/loadBalancer/amazonLoadBalancerDataUtils';
 import { IAmazonServerGroup, ITargetGroup } from 'amazon/domain';
 
-export interface IAmazonLoadBalancersTagState {
-  loadBalancers: ILoadBalancer[];
-  targetGroups: ITargetGroup[];
-}
-
 interface ILoadBalancerListItemProps {
   loadBalancer: ILoadBalancer | ITargetGroup;
   onItemClick: (loadBalancer: ILoadBalancer | ITargetGroup) => void;
@@ -64,6 +59,11 @@ class LoadBalancerButton extends React.Component<ILoadBalancerSingleItemProps> {
       </Tooltip>
     )
   }
+}
+
+export interface IAmazonLoadBalancersTagState {
+  loadBalancers: ILoadBalancer[];
+  targetGroups: ITargetGroup[];
 }
 
 @autoBindMethods
@@ -148,7 +148,8 @@ export class AmazonLoadBalancersTag extends React.Component<ILoadBalancersTagPro
             placement="bottom"
             template={popover}
             hOffsetPercent="80%"
-            className={`no-padding menu-load-balancers`}
+            container={this.props.container}
+            className="no-padding menu-load-balancers"
           >
             <button onClick={this.handleClick} className="btn btn-link btn-multiple-load-balancers clearfix no-padding" >
               <span className="badge badge-counter">

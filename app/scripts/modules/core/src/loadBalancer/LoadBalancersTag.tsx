@@ -11,10 +11,6 @@ import { Tooltip } from 'core/presentation/Tooltip';
 import { ReactInjector } from 'core/reactShims';
 import { HoverablePopover } from 'core/presentation';
 
-export interface ILoadBalancersTagState {
-  loadBalancers: ILoadBalancer[];
-}
-
 interface ILoadBalancerListItemProps {
   loadBalancer: ILoadBalancer;
   onItemClick: (loadBalancer: ILoadBalancer) => void;
@@ -59,6 +55,10 @@ class LoadBalancerButton extends React.Component<ILoadBalancerListItemProps> {
   }
 }
 
+export interface ILoadBalancersTagState {
+  loadBalancers: ILoadBalancer[];
+}
+
 @autoBindMethods
 export class LoadBalancersTag extends React.Component<ILoadBalancersTagProps, ILoadBalancersTagState> {
   private loadBalancersRefreshUnsubscribe: () => void;
@@ -96,16 +96,20 @@ export class LoadBalancersTag extends React.Component<ILoadBalancersTagProps, IL
   }
 
   public render(): React.ReactElement<LoadBalancersTag> {
-    const { serverGroup } = this.props;
-    if (!serverGroup.loadBalancers.length) {
+    const { loadBalancers } = this.state;
+
+    const totalCount = loadBalancers.length;
+
+    if (!totalCount) {
       return null;
     }
 
-    const className = `load-balancers-tag ${serverGroup.loadBalancers.length > 1 ? 'overflowing' : ''}`;
+    const className = `load-balancers-tag ${totalCount > 1 ? 'overflowing' : ''}`;
+
     const popover = (
       <div className="menu-load-balancers">
         <div className="menu-load-balancers-header"> Load Balancers </div>
-        {sortBy(this.state.loadBalancers, 'name').map((loadBalancer) => (
+        {sortBy(loadBalancers, 'name').map((loadBalancer) => (
           <LoadBalancerListItem key={loadBalancer.name} loadBalancer={loadBalancer} onItemClick={this.showLoadBalancerDetails}/>
         ))}
       </div>
@@ -113,7 +117,7 @@ export class LoadBalancersTag extends React.Component<ILoadBalancersTagProps, IL
 
     return (
       <span className={className}>
-        {serverGroup.loadBalancers.length > 1 && (
+        {totalCount > 1 && (
           <HoverablePopover
             delayShow={100}
             delayHide={150}
@@ -121,20 +125,22 @@ export class LoadBalancersTag extends React.Component<ILoadBalancersTagProps, IL
             placement="bottom"
             template={popover}
             hOffsetPercent="80%"
-            className={`no-padding menu-load-balancers`}
+            container={this.props.container}
+            className="no-padding menu-load-balancers"
           >
             <button onClick={this.handleClick} className="btn btn-link btn-multiple-load-balancers clearfix no-padding">
               <span className="badge badge-counter">
-                <span className="icon"><span className="icon-elb"/></span> {serverGroup.loadBalancers.length}
+                <span className="icon"><span className="icon-elb"/></span> {totalCount}
               </span>
             </button>
           </HoverablePopover>
         )}
 
-        {serverGroup.loadBalancers.length === 1 && (
+        {totalCount === 1 && (
           <span className="btn-load-balancer">
-            {sortBy(this.state.loadBalancers, (lb) => lb.toString()).map((loadBalancer) => <LoadBalancerButton
-              key={loadBalancer.name} loadBalancer={loadBalancer} onItemClick={this.showLoadBalancerDetails}/>)}
+            {sortBy(loadBalancers, 'name').map((loadBalancer) => (
+              <LoadBalancerButton key={loadBalancer.name} loadBalancer={loadBalancer} onItemClick={this.showLoadBalancerDetails}/>
+            ))}
           </span>
         )}
       </span>
