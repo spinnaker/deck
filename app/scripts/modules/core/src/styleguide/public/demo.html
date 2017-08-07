@@ -1,0 +1,105 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Fragmos Demo 1</title>
+    <link href="https://fonts.googleapis.com/css?family=Droid+Serif|Lora|Open+Sans:300,400,700|Tangerine" rel="stylesheet">
+    <link rel="stylesheet" href="/public/styleguide.min.css">
+    <style>
+      .card-flip {
+        flex: 0 0 330px;
+        min-width: 330px;
+        height: 320px;
+      }
+
+      .address {
+        width: 220px;
+        margin-left: 40px;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="horizontal middle">
+      <h1 class="logo">StarterKit<span>Demo</span></h1>
+      <nav class="navbar">
+        <ul class="tabs bar">
+          <li class="selected">Home</li>
+          <li>About</li>
+          <li>Find me</li>
+          <li>Contact</li>
+        </ul>
+      </nav>
+    </header>
+    <main class="vertical center">
+      <section class="horizontal center">
+        <div class="card-basic vertical center">
+          <h2 class="headline">Content Title</h2>
+          <p>
+            Phasellus viverra nulla ut metus varius laoreet. Ut varius tincidunt libero. Quisque libero metus, condimentum nec, tempor a, commodo mollis, magna. Curabitur at lacus ac velit ornare lobortis. Sed fringilla mauris sit amet nibh. Sed hendrerit. Aenean imperdiet. Vestibulum rutrum, mi nec elementum vehicula, eros quam gravida nisl, id fringilla neque ante vel mi. Fusce commodo aliquam arcu. Vivamus aliquet elit ac nisl. Maecenas ullamcorper, dui et placerat feugiat, eros pede varius nisi, condimentum viverra felis nunc et lorem. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. Duis vel nibh at velit scelerisque suscipit. Cras ultricies mi eu turpis hendrerit fringilla. Phasellus magna.
+          </p>
+          <button class="primary">Rent the villa now!</button>
+        </div>
+        <div class="card-basic">
+          <img src="http://www.swiish.com.au/content/lifestyle/assets/blog_images/edited-amalfi-5.jpg"/>
+        </div>
+      </section>
+
+      <section class="horizontal center theme-light">
+        <div class="card-basic">
+          <img src="http://www.swiish.com.au/content/lifestyle/assets/blog_images/edited-amalfi-5.jpg"/>
+        </div>
+        <div class="card-basic vertical center">
+          <h2 class="headline">Additional Content</h2>
+          <p>
+            Libero metus, condimentum nec, tempor a, commodo mollis, magna. Curabitur at lacus ac velit ornare lobortis. Sed fringilla mauris sit amet nibh. Sed hendrerit. Aenean imperdiet. Vestibulum rutrum, mi nec elementum vehicula, eros quam gravida nisl, id fringilla neque ante vel mi. Fusce commodo aliquam arcu. Vivamus aliquet elit ac nisl. Maecenas ullamcorper, dui et placerat feugiat, eros pede varius nisi, condimentum viverra felis nunc et lorem. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. Duis vel nibh at velit scelerisque suscipit. Cras ultricies mi eu turpis hendrerit fringilla. Phasellus magna.
+          </p>
+          <div class="horizontal right">
+            <button class="passive">Contact us</button>
+            <button class="primary">Book Now</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="horizontal card" style="width: 100%;">
+        <div class="card-basic align-self-center flex-1">
+          <ul class="bulleted">
+            <li>Phasellus consectetuer vestibulum elit. </li>
+            <li>Phasellus leo dolor</li>
+            <li>Tempus non, auctor et, hendrerit quis, nisi.</li>
+            <li>Vivamus elementum semper nisi.</li>
+          </ul>
+          <div class="card-info address">
+            <div class="label">Located at</div>
+            <div class="label">345 Plymouth Street, Pittsburgh</div>
+            <div class="label">412-555-1200</div>
+          </div>
+        </div>
+        <section class="card-flip vertical align-self-right">
+          <div class="card flipping-card">
+            <div class="front-face vertical center theme-gray noborder">
+              <h1 class="display-1">Feedback</h1>
+              <form class="vertical center">
+                <label>Let us know what you think</label>
+                <textarea></textarea>
+                <button class="passive submit">Submit</button>
+              </form>
+            </div>
+            <div class="back-face vertical center middle theme-gray noborder">
+              <p className="headline color-text-secondary">Thank you for your feedback.</p>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script type="text/javascript">
+      window.addEventListener('DOMContentLoaded', function() {
+        var card = document.getElementsByClassName('flipping-card')[0];
+        document.querySelector('.submit').addEventListener('click', function() {
+          event.preventDefault();
+          card.classList.toggle('flipped')
+          return false;
+        });
+      });
+    </script>
+  </body>
+</html>

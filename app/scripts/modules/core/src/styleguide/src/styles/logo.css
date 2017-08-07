@@ -1,0 +1,12 @@
+.logo {
+  font-size: 28px;
+  letter-spacing: 0.08em;
+  font-family: 'Tangerine', cursive;
+  color: var(--color-white-g1);
+  margin: 0;
+}
+
+.logo span {
+  color: #EDEDED;
+  color: inherit;
+}
