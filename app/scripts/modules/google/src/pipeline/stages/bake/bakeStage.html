@@ -59,12 +59,12 @@
         </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="(key,value) in stage.extendedAttributes">
+        <tr ng-repeat="(key, value) in stage.extendedAttributes">
           <td>
             <strong class="small">{{key}}</strong>
           </td>
           <td>
-            <input type="text" required ng-model="stage.extendedAttributes[key]" value="{{value}}"
+            <input type="text" required ng-model="stage.extendedAttributes[key]"
                    class="form-control input-sm"/>
           </td>
           <td class="text-right">
