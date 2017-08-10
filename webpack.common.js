@@ -11,7 +11,11 @@ function configure(IS_TEST) {
   const happyThreadPool = HappyPack.ThreadPool({size: POOL_SIZE});
 
   const config = {
-    plugins: [],
+    plugins: [
+      new webpack.LoaderOptionsPlugin({
+        debug: true
+      })
+    ],
     output: IS_TEST ? undefined : {
         path: path.join(__dirname, 'build', 'webpack', process.env.SPINNAKER_ENV || ''),
         filename: '[name].js',
@@ -63,7 +67,8 @@ function configure(IS_TEST) {
           test: /\.css$/,
           use: [
             'style-loader',
-            'css-loader'
+            'css-loader',
+            'postcss-loader'
           ]
         },
         {
