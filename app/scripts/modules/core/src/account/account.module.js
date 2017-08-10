@@ -2,8 +2,6 @@
 
 import { ACCOUNT_TAG_COMPONENT } from './accountTag.component';
 
-import '../../styleguide/src/styles/app.css';
-
 const angular = require('angular');
 
 module.exports = angular.module('spinnaker.core.account', [
