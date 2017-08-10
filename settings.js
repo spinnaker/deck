@@ -12,10 +12,13 @@ var entityTagsEnabled = process.env.ENTITY_TAGS_ENABLED === 'true' ? true : fals
 var debugEnabled = process.env.DEBUG_ENABLED === 'false' ? false : true;
 var canaryEnabled = process.env.CANARY_ENABLED === 'true';
 
+// TODO: temporary until new infrastructure search is ready, default to disabled
+var infSearchEnabled = process.env.INF_SEARCH_ENABLED === 'true' ? true : false;
+
 window.spinnakerSettings = {
   checkForUpdates: true,
   debugEnabled: debugEnabled,
-  defaultProviders: ['aws', 'gce', 'azure', 'cf', 'kubernetes', 'openstack', 'oraclebmcs'],
+  defaultProviders: ['aws', 'gce', 'azure', 'cf', 'kubernetes', 'dcos', 'openstack', 'oraclebmcs'],
   feedbackUrl: feedbackUrl,
   gateUrl: gateHost,
   bakeryDetailUrl: bakeryDetailUrl,
@@ -82,6 +85,11 @@ window.spinnakerSettings = {
         instanceLinkTemplate: '{{host}}/api/v1/proxy/namespaces/{{namespace}}/pods/{{name}}',
       },
     },
+    dcos: {
+      defaults: {
+        account: 'my-dcos-account'
+      },
+    },
     appengine: {
       defaults: {
         account: 'my-appengine-account',
@@ -131,5 +139,6 @@ window.spinnakerSettings = {
     snapshots: false,
     travis: false,
     pipelineTemplates: false,
+    infSearchEnabled: infSearchEnabled // TODO: temporary until new infrastructure search is ready
   },
 };
