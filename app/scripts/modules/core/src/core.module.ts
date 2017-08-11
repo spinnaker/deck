@@ -48,7 +48,7 @@ import { REGION_MODULE } from './region/region.module';
 import { SUBNET_MODULE } from './subnet/subnet.module';
 import { WHATS_NEW_MODULE } from './whatsNew/whatsNew.module';
 import { WIDGETS_MODULE } from './widgets/widgets.module';
-import {STYLEGUIDE_MODULE} from '../styleguide/styleguide.states';
+import {STYLEGUIDE_MODULE} from '../styleguide/styleguide.module';
 
 // load all templates into the $templateCache
 const templates = require.context('./', true, /\.html$/);

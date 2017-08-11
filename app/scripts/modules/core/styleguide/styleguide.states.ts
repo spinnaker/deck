@@ -2,9 +2,9 @@ const angular = require('angular')
 
 import {STATE_CONFIG_PROVIDER, INestedState, StateConfigProvider} from 'core/navigation/state.provider';
 
-import './src/styles/app.css'
+export const STYLEGUIDE_STATES = 'spinnaker.core.styleguide.states';
 
-angular.module('spinnaker.core.styleguide.states', [STATE_CONFIG_PROVIDER])
+angular.module(STYLEGUIDE_STATES, [STATE_CONFIG_PROVIDER])
   .config((stateConfigProvider: StateConfigProvider) => {
 
   const styleguideState: INestedState = {
@@ -23,9 +23,3 @@ angular.module('spinnaker.core.styleguide.states', [STATE_CONFIG_PROVIDER])
   };
   stateConfigProvider.addToRootState(styleguideState);
 });
-
-export const STYLEGUIDE_MODULE = 'spinnaker.core.styleguide';
-
-angular
-  .module('spinnaker.core.styleguide', ['spinnaker.core.styleguide.states']);
-
