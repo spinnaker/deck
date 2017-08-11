@@ -1,0 +1,89 @@
+{
+  "_args": [
+    [
+      "psg-theme-default@^1.0.0",
+      "/Users/archanas/Documents/kala/node_modules/postcss-style-guide"
+    ]
+  ],
+  "_from": "psg-theme-default@>=1.0.0 <2.0.0",
+  "_id": "psg-theme-default@1.0.1",
+  "_inCache": true,
+  "_installable": true,
+  "_location": "/psg-theme-default",
+  "_nodeVersion": "4.2.3",
+  "_npmOperationalInternal": {
+    "host": "packages-6-west.internal.npmjs.com",
+    "tmp": "tmp/psg-theme-default-1.0.1.tgz_1455101248923_0.9757575378753245"
+  },
+  "_npmUser": {
+    "email": "morishitter@gmail.com",
+    "name": "morishitter"
+  },
+  "_npmVersion": "2.14.7",
+  "_phantomChildren": {},
+  "_requested": {
+    "name": "psg-theme-default",
+    "raw": "psg-theme-default@^1.0.0",
+    "rawSpec": "^1.0.0",
+    "scope": null,
+    "spec": ">=1.0.0 <2.0.0",
+    "type": "range"
+  },
+  "_requiredBy": [
+    "/postcss-style-guide"
+  ],
+  "_resolved": "https://registry.npmjs.org/psg-theme-default/-/psg-theme-default-1.0.1.tgz",
+  "_shasum": "f613da70af7571e52978709d7efd29dfb15b046b",
+  "_shrinkwrap": null,
+  "_spec": "psg-theme-default@^1.0.0",
+  "_where": "/Users/archanas/Documents/kala/node_modules/postcss-style-guide",
+  "author": {
+    "name": "Masaaki Morishita"
+  },
+  "dependencies": {
+    "suitcss-base": "^1.0.1"
+  },
+  "description": "Default theme of postcss-style-guide",
+  "devDependencies": {
+    "autoprefixer": "^6.3.1",
+    "cssnano": "^3.4.0",
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.0",
+    "gulp-postcss": "^6.1.0",
+    "postcss-custom-properties": "^5.0.0",
+    "postcss-flexbugs-fixes": "^2.0.0",
+    "postcss-import": "^8.0.2",
+    "postcss-style-guide": "^0.12.1",
+    "tape": "^4.0.0"
+  },
+  "directories": {},
+  "dist": {
+    "shasum": "f613da70af7571e52978709d7efd29dfb15b046b",
+    "tarball": "http://registry.npmjs.org/psg-theme-default/-/psg-theme-default-1.0.1.tgz"
+  },
+  "gitHead": "53c18f6abb5a2c54443c7f4ce8aae5e0be5e19d8",
+  "keywords": [
+    "postcss",
+    "psg-theme",
+    "style-guide"
+  ],
+  "license": "MIT",
+  "main": "index.js",
+  "maintainers": [
+    {
+      "name": "morishitter",
+      "email": "morishitter@gmail.com"
+    }
+  ],
+  "name": "psg-theme-default",
+  "optionalDependencies": {},
+  "readme": "ERROR: No README data found!",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/morishitter/psg-theme-default/git"
+  },
+  "scripts": {
+    "test": "tape test"
+  },
+  "version": "1.0.1"
+}
