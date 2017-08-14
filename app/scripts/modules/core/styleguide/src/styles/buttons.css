@@ -16,9 +16,9 @@ These are three categories for buttons based on function:
        Buttons that are used to indicate operations that can have consequences.
     5. nostyle -
        No styles attached to the button. Relies on the user to set the styles based on parent element.
-    6. buttons with icons - 
-       Buttons with icons to the left and right of the buttons 
-    7. zombie - 
+    6. buttons with icons -
+       Buttons with icons to the left and right of the buttons
+    7. zombie -
        Buttons that have a dashed border and is typically used with configurations.
 
 All buttons have a minimum width set.
@@ -68,7 +68,7 @@ All buttons have a minimum width set.
 @title Links
 
 Here are the variations:
-1. a - Default link style. 
+1. a - Default link style.
 2. a.button(.primary/.passive/.danger) - Links can also look like buttons.
 3. a.nostyle - There is also a variation of link with no styles attached.
 
@@ -128,9 +128,9 @@ button *:not(i), a.button *:not(i) {
   font-size: var(--button-font-size);
 }
 
-button.primary, a.button.primary, 
-button.passive, a.button.passive, 
-button.danger, a.button.danger, 
+button.primary, a.button.primary,
+button.passive, a.button.passive,
+button.danger, a.button.danger,
 button.zombie, a.button.zombie {
   border-radius: 3px;
 }

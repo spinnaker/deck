@@ -8,4 +8,4 @@ This is the collection of reusable spinnaker patterns.
 - Style guide template in src/styleguide-template
 
 ## Troubleshooting
-* If you are editing the styleguide template, webpack does not auto-rebuild the styleguide. Please save any CSS file under src/ directory to trigger it for now. 
+* If you are editing the styleguide template, webpack does not auto-rebuild the styleguide. Please save any CSS file under src/ directory to trigger it for now.

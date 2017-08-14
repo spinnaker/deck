@@ -31,7 +31,7 @@ Basic tabs
     </ul>
 
 
-Vertical Tabs 
+Vertical Tabs
 <ul class="tabs-vertical">
   <li><a>Item 1</a></li>
   <li class="selected"><a>Item 2</a></li>
@@ -76,12 +76,12 @@ ul.tabs-basic > li:hover, ul.tabs-basic > li:hover * {
   color: var(--color-primary);
 }
 
-ul.tabs-basic > li.selected, 
+ul.tabs-basic > li.selected,
 ul.tabs-basic > li.selected:hover {
   border-bottom: 2px solid var(--color-primary);
 }
 
-ul[class*="tabs-"] a, ul[class*="tabs-"] a:hover, 
+ul[class*="tabs-"] a, ul[class*="tabs-"] a:hover,
 ul[class*="tabs-"] a:focus, ul[class*="tabs-"] a:active {
   text-decoration: none;
 }

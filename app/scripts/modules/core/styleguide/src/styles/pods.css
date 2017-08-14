@@ -3,13 +3,13 @@
 
 @title Pods
 
-Pods are containers for content. 
+Pods are containers for content.
 
 Here are two types of pods.
-1. Default pod - Just a pod with some actions in it 
-2. Clickable pod - The entire pod is clickable to take you some where. 
-3. Open Pod - If the pod is not clickable and contains information that is large, the pod is open. 
-   The content section does  not have a box around it. 
+1. Default pod - Just a pod with some actions in it
+2. Clickable pod - The entire pod is clickable to take you some where.
+3. Open Pod - If the pod is not clickable and contains information that is large, the pod is open.
+   The content section does  not have a box around it.
 
 <section class="pod">
   <div class="header horizontal middle">

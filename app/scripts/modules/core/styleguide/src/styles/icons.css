@@ -1,9 +1,9 @@
 /*
 @styleguide
 
-@title Icons 
+@title Icons
 
-Icons can be disabled or active. Here are those two states 
+Icons can be disabled or active. Here are those two states
 
 <i class="fa fa-trash button"></i>
 
@@ -26,4 +26,3 @@ i.button:hover {
 i.disabled {
   color: var(--color-accessory);
 }
-

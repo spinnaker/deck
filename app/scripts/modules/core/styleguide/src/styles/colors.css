@@ -3,7 +3,7 @@
     /* Main colors for the app: Logo colors, banner colors, main background  */
     --color-primary: #39546A;
     --color-primary-g1: #4B7293;
-    
+
     /* Divider Colors - Used for borders and dividers*/
     --color-divider: #D6D6D6;
 
@@ -17,7 +17,7 @@
 
     --color-asparagus: #8AAD6A;
     --color-sprout: #BFDD9A;
-    --color-rose: #BB231E; 
+    --color-rose: #BB231E;
     --color-blush: #F1C0BF;
     --color-mango: #EEBB3C;
     --color-lemon: #FFE7AB;
@@ -47,35 +47,35 @@
 
 @title Colors
 
-All the colors above are exposed as CSS4 variables. 
+All the colors above are exposed as CSS4 variables.
 Some are best exposed as selectors. Here's the list:
 
-<section style="width: 400px; height: 400px;" class="theme-gray"> 
-  Gray Theme 
+<section style="width: 400px; height: 400px;" class="theme-gray">
+  Gray Theme
 </section>
 
-    <section style="width: 400px; height: 400px;" class="theme-gray"> 
-      Gray Theme 
+    <section style="width: 400px; height: 400px;" class="theme-gray">
+      Gray Theme
     </section>
 
 <div class="color-text-primary"> Primary Text Color </div>
-  
+
     <div class="color-text-primary"> Primary Text Color </div>
 
 <div class="color-text-secondary"> Secondary Text Color </div>
-  
+
     <div class="color-text-secondary"> Secondary Text Color </div>
 
 <div class="color-text-accent"> Accent Text Color </div>
-  
+
     <div class="color-text-accent"> Accent Text Color </div>
 
 <div class="color-text-caption"> Caption Text Color </div>
-  
+
     <div class="color-text-caption"> Caption Text Color </div>
 
 <div class="color-text-on-dark" style="background-color: var(--color-primary);"> Text color on dark </div>
-  
+
     <div class="color-text-accent style="background-color: var(--color-primary);"> Text color on dark </div>
 */
 
