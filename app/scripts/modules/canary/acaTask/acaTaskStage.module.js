@@ -2,8 +2,7 @@
 
 const angular = require('angular');
 
-import { ACCOUNT_SERVICE, NAMING_SERVICE } from '@spinnaker/core';
-import { CANARY_SCORE_COMPONENT } from '../canary/canaryScore.component';
+import { ACCOUNT_SERVICE, NAMING_SERVICE, CANARY_SCORE_COMPONENT } from '@spinnaker/core';
 
 module.exports = angular.module('spinnaker.canary.genericCanary', [
   require('./acaTaskStage'),
