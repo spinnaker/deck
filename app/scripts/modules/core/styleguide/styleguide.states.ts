@@ -1,6 +1,6 @@
 const angular = require('angular')
 
-import {STATE_CONFIG_PROVIDER, INestedState, StateConfigProvider} from 'core/navigation/state.provider';
+import { STATE_CONFIG_PROVIDER, INestedState, StateConfigProvider } from 'core/navigation/state.provider';
 
 export const STYLEGUIDE_STATES = 'spinnaker.core.styleguide.states';
 
