@@ -1,6 +1,7 @@
 import { module } from 'angular';
 
 import { CANARY_HELP } from './canary.help';
+import { CANARY_SCORE_COMPONENT } from './canaryScore.component';
 import { CANARY_SCORES_CONFIG_COMPONENT } from './canaryScores.component';
 
 import './canary.less';
@@ -9,5 +10,6 @@ import './canary.less';
 export const CANARY_MODULE = 'spinnaker.core.canary.module';
 module(CANARY_MODULE, [
   CANARY_HELP,
+  CANARY_SCORE_COMPONENT,
   CANARY_SCORES_CONFIG_COMPONENT,
 ]);
