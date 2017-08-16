@@ -10,6 +10,7 @@ import 'react-select/dist/react-select.css';
 import 'react-virtualized/styles.css'
 import 'react-virtualized-select/styles.css'
 import 'ui-select/dist/select.css';
+import '../styleguide/src/styles/app.css';
 
 import UI_ROUTER from '@uirouter/angularjs';
 const UI_ROUTER_STATE_EVENTS_SHIM = 'ui.router.state.events';
@@ -26,7 +27,6 @@ import { ANALYTICS_MODULE } from './analytics/analytics.module';
 import { APPLICATION_BOOTSTRAP_MODULE } from './bootstrap';
 import { APPLICATION_MODULE } from './application/application.module';
 import { AUTHENTICATION_MODULE } from './authentication/authentication.module';
-import { CANARY_MODULE } from './canary/canary.module';
 import { CANCEL_MODAL_MODULE } from './cancelModal/cancelModal.module';
 import { CLOUD_PROVIDER_MODULE } from './cloudProvider/cloudProvider.module';
 import { CLUSTER_MODULE } from './cluster/cluster.module';
@@ -48,6 +48,7 @@ import { REGION_MODULE } from './region/region.module';
 import { SUBNET_MODULE } from './subnet/subnet.module';
 import { WHATS_NEW_MODULE } from './whatsNew/whatsNew.module';
 import { WIDGETS_MODULE } from './widgets/widgets.module';
+import { STYLEGUIDE_MODULE } from '../styleguide/styleguide.module';
 
 
 // load all templates into the $templateCache
@@ -74,7 +75,6 @@ module(CORE_MODULE, [
   AUTHENTICATION_MODULE,
 
   require('./cache/caches.module'),
-  CANARY_MODULE,
   CANCEL_MODAL_MODULE,
   CLOUD_PROVIDER_MODULE,
   CONFIG_MODULE,
@@ -123,5 +123,6 @@ module(CORE_MODULE, [
   WIDGETS_MODULE,
 
   require('./validation/validation.module'),
+  STYLEGUIDE_MODULE
 ]);
 
