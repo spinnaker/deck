@@ -44,7 +44,7 @@ describe('Controller: UnmatchedStageTypeStageCtrl', () => {
       ctrl.$scope.stage = {
         refId: '1',
         requisiteStageRefIds: [],
-        failPipeline: true,
+        onFailure: 'fail',
       };
       ctrl.setStageJson();
       expect(ctrl.stageJson).toEqual('{}');
@@ -54,26 +54,26 @@ describe('Controller: UnmatchedStageTypeStageCtrl', () => {
       ctrl.$scope.stage = {
         refId: '1',
         requisiteStageRefIds: [],
-        failPipeline: true,
+        onFailure: 'fail',
       };
       ctrl.stageJson = `{"type": "upsertLoadBalancer"}`;
       ctrl.updateStage();
       expect(ctrl.$scope.stage).toEqual({
         refId: '1',
         requisiteStageRefIds: [],
-        failPipeline: true,
+        onFailure: 'fail',
         type: 'upsertLoadBalancer',
       });
     });
 
     it('overrides the omitted stage properties with properties from the JSON encoded string', () => {
       ctrl.$scope.stage = {
-        failPipeline: true,
+        onFailure: 'fail',
       };
-      ctrl.stageJson = `{"failPipeline": false, "type": "upsertLoadBalancer"}`;
+      ctrl.stageJson = `{"onFailure": "stop", "type": "upsertLoadBalancer"}`;
       ctrl.updateStage();
       expect(ctrl.$scope.stage).toEqual({
-        failPipeline: false,
+        onFailure: 'stop',
         type: 'upsertLoadBalancer',
       });
     });

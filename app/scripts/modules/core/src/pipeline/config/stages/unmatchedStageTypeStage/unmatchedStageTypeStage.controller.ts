@@ -8,8 +8,8 @@ export class UnmatchedStageTypeStageCtrl implements IController {
   public errorMessage: string;
   public textareaRows: number;
   // These values are editable with standard UI controls.
-  private keysToHide = new Set<string>(['refId', 'requisiteStageRefIds', 'failPipeline', 'continuePipeline',
-                                        'completeOtherBranchesThenFail', 'restrictExecutionDuringTimeWindow',
+  private keysToHide = new Set<string>(['refId', 'requisiteStageRefIds', 'onFailure',
+                                        'restrictExecutionDuringTimeWindow',
                                         'restrictedExecutionWindow', 'stageEnabled', 'sendNotifications',
                                         'notifications', 'comments', 'name']);
 

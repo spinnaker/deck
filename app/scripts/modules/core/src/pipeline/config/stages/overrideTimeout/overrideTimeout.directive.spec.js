@@ -54,7 +54,7 @@ describe('Directives: overrideTimeout', function () {
     });
 
     it('unsets timeout, removes contents when overrideTimeout is set to false', function () {
-      this.scope.stage.stageTimeoutMs = 30000;
+      this.scope.stage.timeoutMs = 30000;
       this.scope.stage.overrideTimeout = true;
       var domNode = this.compile('<override-timeout stage="stage"></override-timeout>')(this.scope);
       this.scope.$digest();
@@ -62,14 +62,14 @@ describe('Directives: overrideTimeout', function () {
       this.scope.stage.overrideTimeout = false;
       this.scope.$digest();
       expect(domNode.find('input[type="number"]').size()).toBe(0);
-      expect(this.scope.stage.stageTimeoutMs).toBeUndefined();
+      expect(this.scope.stage.timeoutMs).toBeUndefined();
     });
   });
 
   describe('time conversion', function () {
     it('rounds down', function() {
       this.scope.stage.overrideTimeout = true;
-      this.scope.stage.stageTimeoutMs = 30 * 60 * 1000 + 499;
+      this.scope.stage.timeoutMs = 30 * 60 * 1000 + 499;
       this.$controller('OverrideTimeoutCtrl', {
         $scope: this.scope,
         pipelineConfig: this.pipelineConfig,
@@ -81,7 +81,7 @@ describe('Directives: overrideTimeout', function () {
 
     it('rolls minutes over to hours', function() {
       this.scope.stage.overrideTimeout = true;
-      this.scope.stage.stageTimeoutMs = 95 * 60 * 1000;
+      this.scope.stage.timeoutMs = 95 * 60 * 1000;
       var ctrl = this.$controller('OverrideTimeoutCtrl', {
         $scope: this.scope,
         pipelineConfig: this.pipelineConfig,
