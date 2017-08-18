@@ -29,7 +29,6 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.manualJudgmentSta
     $scope.authEnabled = SETTINGS.authEnabled;
     $scope.stage.notifications = $scope.stage.notifications || [];
     $scope.stage.judgmentInputs = $scope.stage.judgmentInputs || [];
-    $scope.stage.onFailure = ($scope.stage.onFailure === undefined ? true : $scope.stage.onFailure);
 
     this.transformToNewStyleIfNecessary = function (notifications) {
       // If there is at least one notification, and sendNotifications is not enabled, this must be the old style; transform it.
