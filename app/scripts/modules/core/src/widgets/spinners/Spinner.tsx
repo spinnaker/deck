@@ -16,7 +16,7 @@ export class Spinner extends React.Component<ISpinnerProps, {}> {
     postnote: React.PropTypes.string
   }
 
-  getBarRows = (count: number) => {
+  public getBarRows = (count: number) => {
     const rows = [];
     let i: number;
     for (i = 0; i < count; i++) {
@@ -25,7 +25,7 @@ export class Spinner extends React.Component<ISpinnerProps, {}> {
     return rows;
   }
 
-  renderNano = () => {
+  public renderNano = () => {
     return (
       <div className="load nano">
         {this.getBarRows(1).map(bar => bar)}
@@ -33,7 +33,7 @@ export class Spinner extends React.Component<ISpinnerProps, {}> {
     )
   }
 
-  renderSmall = () => {
+  public renderSmall = () => {
     return (
       <div className="load small">
         {this.getBarRows(3).map(bar => bar)}
@@ -41,7 +41,7 @@ export class Spinner extends React.Component<ISpinnerProps, {}> {
     )
   }
 
-  renderMedium = () => {
+  public renderMedium = () => {
     const { message } = this.props;
     return (
       <div className="load medium">
@@ -55,7 +55,7 @@ export class Spinner extends React.Component<ISpinnerProps, {}> {
     )
   }
 
-  renderLarge = () => {
+  public renderLarge = () => {
     const { message } = this.props;
     return (
       <div className="load large">
@@ -69,7 +69,7 @@ export class Spinner extends React.Component<ISpinnerProps, {}> {
     )
   }
 
-  renderPageLoader = () => {
+  public renderPageLoader = () => {
     const { message, postnote } = this.props;
     return (
       <div className="styleguide">
@@ -85,7 +85,7 @@ export class Spinner extends React.Component<ISpinnerProps, {}> {
     )
   }
 
-  render() {
+  public render():React.ReactElement<Spinner> {
     switch ((this.props.size && this.props.size.toLowerCase()) || null) {
       case 'nano':
         return this.renderNano();
