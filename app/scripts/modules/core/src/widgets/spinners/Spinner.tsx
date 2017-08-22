@@ -3,18 +3,12 @@ import * as React from 'react';
 const Logo = require('./logo.svg');
 
 export interface ISpinnerProps {
-  size?: string;
+  size?: 'nano' | 'small' | 'medium' | 'large' | 'page';
   message?: string;
   postnote?: string;
 }
 
 export class Spinner extends React.Component<ISpinnerProps, {}> {
-  public static propTypes = {
-    size: React.PropTypes.oneOf(['nano', 'small', 'medium', 'large', 'page']),
-    message: React.PropTypes.string,
-    postnote: React.PropTypes.string
-  }
-
   public getBarRows = (count: number) => {
     const rows = [];
     let i: number;
@@ -27,7 +21,7 @@ export class Spinner extends React.Component<ISpinnerProps, {}> {
   public renderNano = () => {
     return (
       <div className="load nano">
-        {this.getBarRows(1).map(bar => bar)}
+        {this.getBarRows(1)}
       </div>
     )
   }
