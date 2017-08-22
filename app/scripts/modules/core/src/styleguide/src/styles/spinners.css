@@ -56,6 +56,14 @@ List of load bars for the app
 
 */
 
+:root {
+  --base-spinner-timing: 2s;
+}
+
+.load.large {
+  --base-spinner-timing: 2.2s;
+}
+
 @keyframes rollingColor {
   0% {
       opacity: 0.5;
@@ -90,13 +98,17 @@ List of load bars for the app
   margin-left: 2px;
   margin-right: 2px;
   background-color: var(--color-accent);
-  animation: rollingColor 2s infinite ease-in;
-  min-height: 15px;
+  animation: rollingColor var(--base-spinner-timing) infinite ease-in;
   display: inline-block;
 }
 
 .load.nano div.bar {
   min-width: 8px;
+  min-height: 12px;
+}
+
+.load:not(.nano) div.bar {
+  min-height: 7px;
 }
 
 .load.small div.bar {
