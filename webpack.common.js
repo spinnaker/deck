@@ -56,7 +56,13 @@ function configure(IS_TEST) {
           ]
         },
         {
-          test: /\.svg$/,
+          test: /\.svg(.*)?$/,
+          exclude: /\/app\/scripts\/modules\/core\/src\/widgets\/spinners/,
+          use: 'file-loader'
+        },
+        {
+          test: /\.svg(.*)?$/,
+          include: /\/app\/scripts\/modules\/core\/src\/widgets\/spinners/,
           use: ['svg-react-loader']
         },
         {

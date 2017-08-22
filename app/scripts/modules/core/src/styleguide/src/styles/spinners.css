@@ -141,3 +141,7 @@ List of load bars for the app
 .load .postnote {
   margin-top: 18px;
 }
+
+.load.large svg {
+  margin-bottom: 30px;
+}

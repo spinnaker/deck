@@ -10,7 +10,7 @@ export interface ISpinnerProps {
 
 @autoBindMethods
 export class Spinner extends React.Component<ISpinnerProps, {}> {
-  static propTypes = {
+  public static propTypes = {
     size: React.PropTypes.oneOf(['nano', 'small', 'medium', 'large', 'page']),
     message: React.PropTypes.string,
     postnote: React.PropTypes.string
@@ -46,7 +46,7 @@ export class Spinner extends React.Component<ISpinnerProps, {}> {
     return (
       <div className="load medium">
         <div className="message color-text-accent heading-4">
-          {message || "Loading ..."}
+          {message || 'Loading ...'}
         </div>
         <div className="bars">
           {this.getBarRows(3).map(bar => bar)}
@@ -85,7 +85,7 @@ export class Spinner extends React.Component<ISpinnerProps, {}> {
     )
   }
 
-  public render():React.ReactElement<Spinner> {
+  public render(): React.ReactElement<Spinner> {
     switch ((this.props.size && this.props.size.toLowerCase()) || null) {
       case 'nano':
         return this.renderNano();

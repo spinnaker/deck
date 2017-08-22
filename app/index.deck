@@ -60,28 +60,21 @@
   </style>
 </head>
 <body>
-  <div style="display:none">
+  <!-- The defs are expected at the root level for svgs. These are the defs for the main loader svg -->
+  <div style="width:0;height:0;">
     <svg>
       <defs>
-        <linearGradient id="layer1" gradientUnits="userSpaceOnUse" x1="685.5952" y1="262.5553" x2="887.3018" y2="262.5553" gradientTransform="matrix(-0.3568 0.9342 0.9342 0.3568 354.9241 -452.9522)">
-          <stop  offset="15%" stop-color="#1E62A7" stop-opacity="100%" />
-          <stop  offset="0%" stop-color="#2B3990" stop-opacity="100%" />
-          <stop  offset="32%" stop-color="#1485BC" stop-opacity="100%" />
-          <stop  offset="48%" stop-color="#0BA1CC" stop-opacity="100%" />
-          <stop  offset="65%" stop-color="#05B4D7" stop-opacity="100%" />
-          <stop  offset="82%" stop-color="#01C0DE" stop-opacity="100%" />
-          <stop  offset="100%" stop-color="#00C4E0" stop-opacity="100%" />
+        <linearGradient x1="82.1790632%" y1="-0.473917274%" x2="34.6134572%" y2="114.440607%" id="linearGradient-1">
+          <stop stop-color="#39546A" offset="0%"></stop>
+          <stop stop-color="#26D5F6" offset="50.8270886%"></stop>
+          <stop stop-color="#149CB5" offset="100%"></stop>
         </linearGradient>
-        <linearGradient id="layer2" gradientUnits="userSpaceOnUse" x1="695.3367" y1="245.2074" x2="813.951" y2="245.2074" gradientTransform="matrix(-0.2988 0.9543 0.9543 0.2988 303.8921 -415.4981)">
-          <stop  offset="0%" stop-color="#2B3990" stop-opacity="100%" />
-          <stop  offset="15%" stop-color="#1E62A7" stop-opacity="100%" />
-          <stop  offset="32%" stop-color="#1485BC" stop-opacity="100%" />
-          <stop  offset="48%" stop-color="#0BA1CC" stop-opacity="100%" />
-          <stop  offset="65%" stop-color="#05B4D7" stop-opacity="100%" />
-          <stop  offset="82%" stop-color="#01C0DE" stop-opacity="100%" />
-          <stop  offset="100%" stop-color="#00C4E0" stop-opacity="100%" />
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-2">
+          <stop stop-color="#39546A" offset="0%"></stop>
+          <stop stop-color="#149CB5" offset="52.5031888%"></stop>
+          <stop stop-color="#149CB5" offset="100%"></stop>
         </linearGradient>
-      </defs>
+    </defs>
     </svg>
   </div>
   <!-- Sample loading styles -->
