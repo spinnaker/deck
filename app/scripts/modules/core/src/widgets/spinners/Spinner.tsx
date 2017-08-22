@@ -1,5 +1,5 @@
 import * as React from 'react';
-import autoBindMethods from 'class-autobind-decorator';
+
 const Logo = require('./logo.svg');
 
 export interface ISpinnerProps {
@@ -8,7 +8,6 @@ export interface ISpinnerProps {
   postnote?: string;
 }
 
-@autoBindMethods
 export class Spinner extends React.Component<ISpinnerProps, {}> {
   public static propTypes = {
     size: React.PropTypes.oneOf(['nano', 'small', 'medium', 'large', 'page']),
@@ -72,15 +71,13 @@ export class Spinner extends React.Component<ISpinnerProps, {}> {
   public renderPageLoader = () => {
     const { message, postnote } = this.props;
     return (
-      <div className="styleguide">
-        <div className="load large vertical center">
-          <Logo />
-          <div className="message color-text-accent heading-2">{message || 'Loading ...'}</div>
-          <div className="bars">
-            {this.getBarRows(5).map(bar => bar)}
-          </div>
-          <div className="postnote">{postnote}</div>
+      <div className="load large vertical center">
+        <Logo />
+        <div className="message color-text-accent heading-2">{message || 'Loading ...'}</div>
+        <div className="bars">
+          {this.getBarRows(5).map(bar => bar)}
         </div>
+        <div className="postnote">{postnote}</div>
       </div>
     )
   }

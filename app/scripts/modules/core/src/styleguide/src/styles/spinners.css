@@ -95,8 +95,7 @@ List of load bars for the app
 }
 
 .load div.bar {
-  margin-left: 2px;
-  margin-right: 2px;
+  margin: 0 2px;
   background-color: var(--color-accent);
   animation: rollingColor var(--base-spinner-timing) infinite ease-in;
   display: inline-block;
