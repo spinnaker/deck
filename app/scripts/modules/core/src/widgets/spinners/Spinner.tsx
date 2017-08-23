@@ -1,4 +1,5 @@
 import * as React from 'react';
+import autoBindMethods from 'class-autobind-decorator';
 
 const Logo = require('./logo.svg');
 
@@ -8,8 +9,19 @@ export interface ISpinnerProps {
   postnote?: string;
 }
 
+@autoBindMethods
 export class Spinner extends React.Component<ISpinnerProps, {}> {
-  public getBarRows = (count: number) => {
+
+  public getBarRows(): Array<React.ReactNode> {
+    const { size } = this.props;
+    let count = 3;
+
+    if (size === 'nano') {
+      count = 1;
+    } else if (size.match(/large|page/)) {
+      count = 5;
+    }
+
     const rows = [];
     let i: number;
     for (i = 0; i < count; i++) {
@@ -18,78 +30,32 @@ export class Spinner extends React.Component<ISpinnerProps, {}> {
     return rows;
   }
 
-  public renderNano = () => {
-    return (
-      <div className="load nano">
-        {this.getBarRows(1)}
-      </div>
-    )
-  }
-
-  public renderSmall = () => {
-    return (
-      <div className="load small">
-        {this.getBarRows(3).map(bar => bar)}
-      </div>
-    )
-  }
-
-  public renderMedium = () => {
-    const { message } = this.props;
-    return (
-      <div className="load medium">
-        <div className="message color-text-accent heading-4">
-          {message || 'Loading ...'}
-        </div>
-        <div className="bars">
-          {this.getBarRows(3).map(bar => bar)}
-        </div>
-      </div>
-    )
-  }
-
-  public renderLarge = () => {
-    const { message } = this.props;
-    return (
-      <div className="load large">
-        <div className="message color-text-accent heading-2">
-          {message || 'Loading ...'}
-        </div>
-        <div className="bars">
-          {this.getBarRows(5).map(bar => bar)}
-        </div>
-      </div>
-    )
-  }
-
-  public renderPageLoader = () => {
-    const { message, postnote } = this.props;
-    return (
-      <div className="load large vertical center">
-        <Logo />
-        <div className="message color-text-accent heading-2">{message || 'Loading ...'}</div>
-        <div className="bars">
-          {this.getBarRows(5).map(bar => bar)}
-        </div>
-        <div className="postnote">{postnote}</div>
-      </div>
-    )
-  }
-
   public render(): React.ReactElement<Spinner> {
-    switch ((this.props.size && this.props.size.toLowerCase()) || null) {
-      case 'nano':
-        return this.renderNano();
-      case 'small':
-        return this.renderSmall();
-      case 'medium':
-        return this.renderMedium();
-      case 'large':
-        return this.renderLarge();
-      case 'page':
-        return this.renderPageLoader();
-      default:
-        return this.renderSmall();
-    }
+    const { size, message, postnote } = this.props;
+    const mainClassNames = `load ${size || 'small'} ${size === 'page' && 'large vertical center'}`;
+    const messageClassNames = `message color-text-accent ${size === 'medium' ? 'heading-4':'heading-2'}`;
+
+    const logo = (size === 'page' && <Logo />);
+
+    const messageNode = ['nano', 'small'].indexOf(size) < 0 &&
+      <div className={messageClassNames}>{message || 'Loading ...'}</div>;
+
+    const bars = ['nano', 'small'].indexOf(size) < 0 ?
+      (<div className="bars">
+        {this.getBarRows()}
+      </div>) :
+      this.getBarRows();
+
+    const postnoteNode = (size === 'page' &&
+      <div className="postnote">{postnote}</div>);
+
+    return (
+      <div className={mainClassNames}>
+        {logo}
+        {messageNode}
+        {bars}
+        {postnoteNode}
+      </div>
+    );
   }
 }
