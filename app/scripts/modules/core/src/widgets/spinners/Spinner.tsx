@@ -10,7 +10,7 @@ export interface ISpinnerProps {
 }
 
 @autoBindMethods
-export class Spinner extends React.Component<ISpinnerProps, {}> {
+export class Spinner extends React.Component<ISpinnerProps> {
 
   public getBarRows(): Array<React.ReactNode> {
     const { size } = this.props;
@@ -37,10 +37,10 @@ export class Spinner extends React.Component<ISpinnerProps, {}> {
 
     const logo = (size === 'page' && <Logo />);
 
-    const messageNode = ['nano', 'small'].indexOf(size) < 0 &&
+    const messageNode = ['medium', 'large', 'page'].includes(size) &&
       <div className={messageClassNames}>{message || 'Loading ...'}</div>;
 
-    const bars = ['nano', 'small'].indexOf(size) < 0 ?
+    const bars = ['medium', 'large', 'page'].includes(size) ?
       (<div className="bars">
         {this.getBarRows()}
       </div>) :
