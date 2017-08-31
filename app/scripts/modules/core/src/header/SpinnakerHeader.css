@@ -1,0 +1,24 @@
+.SpinnakerHeader .nav-layout {
+  display: flex;
+}
+
+.SpinnakerHeader .nav-items {
+  display: flex;
+  align-items: center;
+}
+
+@media (max-width: 400px) {
+  .SpinnakerHeader .nav-items {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .SpinnakerHeader .nav-container {
+    overflow: hidden;
+  }
+}
+
+@media (min-width: 400px) {
+  .SpinnakerHeader .nav-container {
+    height: auto !important;
+  }
+}

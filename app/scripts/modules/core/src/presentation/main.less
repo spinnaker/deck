@@ -543,9 +543,13 @@ body > .container {
     font-weight: 200;
     height: 100%;
     padding: 10px 30px 10px 0;
+
+    @media (max-width: 480px) {
+      padding-left: 10px;
+    }
   }
 
-  .navbar-nav > li > a {
+  .navbar-nav > li > a, .nav-items > li > a {
     color: #fff;
     font-weight: 200;
     padding: 10px 15px;
@@ -562,6 +566,9 @@ body > .container {
     }
   }
 
+  .nav-items>.active>a,
+  .nav-items>.active>a:focus,
+  .nav-items>.active>a:hover,
   .navbar-nav>.active>a,
   .navbar-nav>.active>a:focus,
   .navbar-nav>.active>a:hover
