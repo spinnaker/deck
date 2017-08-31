@@ -1,8 +1,11 @@
-import { IController } from 'angular';
+import { IController, IComponentOptions } from 'angular';
 
 import { bootstrapModule } from './bootstrap.module';
-import { OverrideRegistry } from 'core/overrideRegistry';
+// import { OverrideRegistry } from 'core/overrideRegistry';
 import { IFeatures, SETTINGS } from 'core/config/settings';
+
+import { react2angular } from 'react2angular';
+import { SpinnakerHeader } from 'core/header/SpinnakerHeader';
 
 const template = `
   <div class="spinnaker-container">
@@ -10,7 +13,7 @@ const template = `
       <h1 us-spinner="{radius:30, width:8, length: 16}"></h1>
     </div>
     <div class="spinnaker-header navbar navbar-inverse">
-      <div ng-include="$ctrl.spinnakerHeaderTemplate"></div>
+      <spinnaker-header></spinnaker-header>
     </div>
 
     <div class="spinnaker-content">
@@ -21,12 +24,12 @@ const template = `
 `;
 
 class SpinnakerController implements IController {
-  public spinnakerHeaderTemplate: string;
+  public spinnakerHeaderTemplate: IComponentOptions;
   public feature: IFeatures;
-  constructor (overrideRegistry: OverrideRegistry) {
+  constructor () {
     'ngInject';
-    this.spinnakerHeaderTemplate = overrideRegistry.getTemplate('spinnakerHeader', require('./spinnakerHeader.html'));
     this.feature = SETTINGS.feature;
+    react2angular(SpinnakerHeader);
   }
 }
 
