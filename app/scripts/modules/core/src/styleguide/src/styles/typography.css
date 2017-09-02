@@ -158,20 +158,8 @@ h1, h2, h3, h4, h5, h6, p, div, span, section, li {
   font-family: 'Source Sans Pro', sans-serif;
 }
 
-p, div {
-  line-height: 1.5em;
-}
-
 body {
   color: var(--color-text-primary);
-}
-
-code,
-kbd,
-pre,
-samp {
-  font-family: monospace, monospace;
-  font-size: 12px;
 }
 
 *[class^='headline-'] {
