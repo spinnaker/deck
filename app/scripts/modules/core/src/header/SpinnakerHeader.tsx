@@ -3,9 +3,9 @@ import autoBindMethods from 'class-autobind-decorator';
 import { UISref, UISrefActive } from '@uirouter/react';
 import { UIRouterContext } from '@uirouter/react-hybrid';
 
-import './SpinnakerHeader.css';
+import { NgReact } from 'core/reactShims';
 
-const ngReact_1 = require('core/reactShims/ngReact');
+import './SpinnakerHeader.css';
 
 export interface ISpinnakerHeaderState {
   navExpanded: boolean;
@@ -29,7 +29,7 @@ export class SpinnakerHeader extends React.Component<{}, ISpinnakerHeaderState> 
   }
 
   public render(): React.ReactElement<SpinnakerHeader> {
-    const { UserMenu, GlobalSearch, WhatsNew } = ngReact_1.NgReact;
+    const { UserMenu, GlobalSearch, WhatsNew } = NgReact;
 
     return (
       <nav className="container styleguide SpinnakerHeader">
