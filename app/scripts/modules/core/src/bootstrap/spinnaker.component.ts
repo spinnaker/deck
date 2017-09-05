@@ -12,7 +12,7 @@ const template = `
     <div class="transition-overlay" ng-if="!authenticating && routing">
       <h1 us-spinner="{radius:30, width:8, length: 16}"></h1>
     </div>
-    <div class="spinnaker-header navbar navbar-inverse">
+    <div class="navbar-inverse">
       <spinnaker-header></spinnaker-header>
     </div>
 

@@ -16,3 +16,27 @@
 body {
   font-size: 12px;
 }
+
+:root {
+  --is-phone: false;
+  --is-tablet: false;
+  --is-desktop: false;
+}
+
+@media (max-width: 420px) {
+  :root {
+    --is-phone: true;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --is-tablet: true;
+  }
+}
+
+@media (max-width: 1024px) {
+  :root {
+    --is-desktop: true;
+  }
+}

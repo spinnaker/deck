@@ -1,3 +1,14 @@
+.SpinnakerHeader {
+  border-radius: 0;
+  margin-bottom: 0;
+  z-index: 25;
+  min-height: 40px;
+}
+
+.SpinnakerHeader a {
+  color: var(--color-text-on-dark);
+}
+
 .SpinnakerHeader .nav-layout {
   display: flex;
 }
@@ -5,6 +16,13 @@
 .SpinnakerHeader .nav-items {
   display: flex;
   align-items: center;
+}
+
+.SpinnakerHeader .page-nav a.active,
+.SpinnakerHeader .page-nav a:active,
+.SpinnakerHeader .page-nav a:hover,
+.SpinnakerHeader .page-nav a:focus  {
+  background-color: var(--color-primary-g1);
 }
 
 @media (max-width: 400px) {

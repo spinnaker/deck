@@ -17,8 +17,10 @@ export class SpinnakerHeader extends React.Component<{}, ISpinnakerHeaderState> 
 
   constructor() {
     super();
+    const bodyStyles = window.getComputedStyle(document.body);
+    const isPhone = bodyStyles.getPropertyValue('--is-phone');
     this.state = {
-      navExpanded: true
+      navExpanded: isPhone === 'true' ? false : true
     };
   }
 
@@ -32,7 +34,11 @@ export class SpinnakerHeader extends React.Component<{}, ISpinnakerHeaderState> 
     const { UserMenu, GlobalSearch, WhatsNew } = NgReact;
 
     return (
-      <nav className="container styleguide SpinnakerHeader">
+      <nav
+        className="container styleguide SpinnakerHeader"
+        role="navigation"
+        aria-label="Main Menu"
+      >
         <div className="navbar-header horizontal middle">
           <a className="navbar-brand flex-1" href="#">SPINNAKER</a>
           <button type="button" className="navbar-toggle" onClick={this.toggleNavItems}>
@@ -43,8 +49,8 @@ export class SpinnakerHeader extends React.Component<{}, ISpinnakerHeaderState> 
         </div>
         {this.state.navExpanded &&
           <div className="nav-container nav-items">
-            <ul className="nav nav-items flex-1">
-              <li key="navHome">
+            <ul className="nav nav-items flex-1 page-nav">
+              <li key="navHome" className="selected">
                 <UISrefActive class="active">
                   <UISref to="home.infrastructure">
                     <a>Search</a>
