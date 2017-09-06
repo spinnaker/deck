@@ -32,7 +32,7 @@ describe('Directives: userMenu', function () {
     return domNode.next();
   }
 
-  fdescribe('user menu rendering', function() {
+  describe('user menu rendering', function() {
     it('displays nothing when auth is not enabled', function () {
       var domNode;
 
