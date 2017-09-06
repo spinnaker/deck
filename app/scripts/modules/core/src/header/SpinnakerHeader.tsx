@@ -17,17 +17,21 @@ export class SpinnakerHeader extends React.Component<{}, ISpinnakerHeaderState> 
 
   constructor() {
     super();
+    this.state = {
+      navExpanded: !this.isDevicePhoneOrSmaller()
+    };
+  }
+
+  public isDevicePhoneOrSmaller(): Boolean {
     const bodyStyles = window.getComputedStyle(document.body);
     const isPhone = bodyStyles.getPropertyValue('--is-phone');
-    this.state = {
-      navExpanded: isPhone === 'true' ? false : true
-    };
+    return isPhone.toLowerCase() === 'true';
   }
 
   public toggleNavItems(): void {
     this.setState({
       navExpanded: !this.state.navExpanded
-    })
+    });
   }
 
   public render(): React.ReactElement<SpinnakerHeader> {
@@ -50,7 +54,7 @@ export class SpinnakerHeader extends React.Component<{}, ISpinnakerHeaderState> 
         {this.state.navExpanded &&
           <div className="nav-container nav-items">
             <ul className="nav nav-items flex-1 page-nav">
-              <li key="navHome" className="selected">
+              <li key="navHome">
                 <UISrefActive class="active">
                   <UISref to="home.infrastructure">
                     <a>Search</a>
