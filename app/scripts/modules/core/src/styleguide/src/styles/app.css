@@ -23,20 +23,25 @@ body {
   --is-desktop: false;
 }
 
-@media (max-width: 480px) {
+@media only screen
+  and (min-device-width: 320px)
+  and (max-device-width: 480px) {
   :root {
     --is-phone: true;
   }
 }
 
-@media (max-width: 768px) {
+@media only screen
+  and (min-device-width: 768px)
+  and (max-device-width: 1024px)  {
   :root {
     --is-tablet: true;
   }
 }
 
-@media (max-width: 1024px) {
-  :root {
-    --is-desktop: true;
+@media screen
+  and (min-device-width: 992px) {
+    :root {
+      --is-desktop: true;
+    }
   }
-}
