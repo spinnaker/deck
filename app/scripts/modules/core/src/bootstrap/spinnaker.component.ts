@@ -1,7 +1,6 @@
-import { IController, IComponentOptions } from 'angular';
+import { IController } from 'angular';
 
 import { bootstrapModule } from './bootstrap.module';
-// import { OverrideRegistry } from 'core/overrideRegistry';
 import { IFeatures, SETTINGS } from 'core/config/settings';
 
 import { react2angular } from 'react2angular';
@@ -24,7 +23,6 @@ const template = `
 `;
 
 class SpinnakerController implements IController {
-  public spinnakerHeaderTemplate: IComponentOptions;
   public feature: IFeatures;
   constructor () {
     'ngInject';
