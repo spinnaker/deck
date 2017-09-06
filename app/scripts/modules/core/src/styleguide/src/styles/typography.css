@@ -158,10 +158,6 @@ h1, h2, h3, h4, h5, h6, p, div, span, section, li {
   font-family: 'Source Sans Pro', sans-serif;
 }
 
-body {
-  color: var(--color-text-primary);
-}
-
 *[class^='headline-'] {
   font-weight: 600;
 }
@@ -181,7 +177,7 @@ body {
   line-height: 20px;
 }
 
-.heading-4, .body-regular, body * {
+.heading-4, .body-regular {
   font-size: 14px;
   line-height: 18px;
 }
@@ -203,10 +199,6 @@ body {
 
 .body-tiny, .body-small, .body-regular, .body-large {
   font-weight: 400;
-}
-
-.caption, .label {
-  color: var(--color-text-caption);
 }
 
 .uppercase {
