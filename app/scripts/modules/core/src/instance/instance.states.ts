@@ -3,7 +3,7 @@ import {module} from 'angular';
 import {
   APPLICATION_STATE_PROVIDER, ApplicationStateProvider,
 } from 'core/application/application.state.provider';
-import {CloudProviderRegistry} from 'core/cloudProvider/cloudProvider.registry';
+import {CloudProviderRegistry, VersionedCloudProviderRegistry} from 'core/cloudProvider';
 import {INestedState, STATE_CONFIG_PROVIDER, StateConfigProvider} from 'core/navigation/state.provider';
 import {StateParams} from '@uirouter/angularjs';
 import {Application} from 'core/application/application.model';
@@ -76,10 +76,10 @@ module(INSTANCE_STATES, [
     views: {
       'main@': {
         templateUrl: require('../presentation/standalone.view.html'),
-        controllerProvider: ['$stateParams', 'cloudProviderRegistry',
+        controllerProvider: ['$stateParams', 'versionedCloudProviderRegistry',
           ($stateParams: StateParams,
-           cloudProviderRegistry: CloudProviderRegistry) => {
-            return cloudProviderRegistry.getValue($stateParams.provider, 'instance.detailsController');
+           versionedCloudProviderRegistry: VersionedCloudProviderRegistry) => {
+            return versionedCloudProviderRegistry.getValue($stateParams.provider, $stateParams.account, 'instance.detailsController');
         }],
         controllerAs: 'ctrl'
       }

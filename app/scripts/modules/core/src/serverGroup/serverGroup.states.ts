@@ -5,7 +5,7 @@ import {STATE_CONFIG_PROVIDER, INestedState, StateConfigProvider} from 'core/nav
 import {
   APPLICATION_STATE_PROVIDER, ApplicationStateProvider,
 } from 'core/application/application.state.provider';
-import {CloudProviderRegistry} from 'core/cloudProvider/cloudProvider.registry';
+import {CloudProviderRegistry, VersionedCloudProviderRegistry} from 'core/cloudProvider';
 import {Application} from 'core/application/application.model';
 import {filterModelConfig} from 'core/cluster/filter/clusterFilter.model';
 
@@ -54,11 +54,11 @@ module(SERVER_GROUP_STATES, [
     url: '/serverGroupDetails/:provider/:accountId/:region/:serverGroup',
     views: {
       'detail@../insight': {
-        templateProvider: ['$templateCache', '$stateParams', 'cloudProviderRegistry',
+        templateProvider: ['$templateCache', '$stateParams', 'versionedCloudProviderRegistry',
           ($templateCache: ng.ITemplateCacheService,
            $stateParams: StateParams,
-           cloudProviderRegistry: CloudProviderRegistry) => {
-            return $templateCache.get(cloudProviderRegistry.getValue($stateParams.provider, 'serverGroup.detailsTemplateUrl'));
+           versionedCloudProviderRegistry: VersionedCloudProviderRegistry) => {
+            return versionedCloudProviderRegistry.getValue($stateParams.provider, $stateParams.accountId, 'serverGroup.detailsTemplateUrl').then($templateCache.get);
         }],
         controllerProvider: ['$stateParams', 'cloudProviderRegistry',
           ($stateParams: StateParams,

@@ -3,7 +3,7 @@ import { StateParams } from '@uirouter/angularjs';
 
 import { INestedState, StateConfigProvider } from 'core/navigation/state.provider';
 import { APPLICATION_STATE_PROVIDER, ApplicationStateProvider } from 'core/application/application.state.provider';
-import { CloudProviderRegistry } from '../cloudProvider/cloudProvider.registry';
+import { VersionedCloudProviderRegistry } from 'core/cloudProvider';
 import { filterModelConfig } from 'core/loadBalancer/filter/loadBalancerFilter.model';
 import { LOAD_BALANCERS_COMPONENT } from 'core/loadBalancer/loadBalancers.component';
 import { LoadBalancers } from 'core/loadBalancer/LoadBalancers';
@@ -25,16 +25,16 @@ module(LOAD_BALANCER_STATES, [
     },
     views: {
       'detail@../insight': {
-        templateProvider: ['$templateCache', '$stateParams', 'cloudProviderRegistry',
+        templateProvider: ['$templateCache', '$stateParams', 'versionedCloudProviderRegistry',
           ($templateCache: ng.ITemplateCacheService,
            $stateParams: StateParams,
-           cloudProviderRegistry: CloudProviderRegistry) => {
-            return $templateCache.get(cloudProviderRegistry.getValue($stateParams.provider, 'loadBalancer.detailsTemplateUrl'));
+           versionedCloudProviderRegistry: VersionedCloudProviderRegistry) => {
+            return versionedCloudProviderRegistry.getValue($stateParams.provider, $stateParams.accountId, 'loadBalancer.detailsTemplateUrl').then($templateCache.get);
         }],
-        controllerProvider: ['$stateParams', 'cloudProviderRegistry',
+        controllerProvider: ['$stateParams', 'versionedCloudProviderRegistry',
           ($stateParams: StateParams,
-           cloudProviderRegistry: CloudProviderRegistry) => {
-            return cloudProviderRegistry.getValue($stateParams.provider, 'loadBalancer.detailsController');
+           versionedCloudProviderRegistry: VersionedCloudProviderRegistry) => {
+            return versionedCloudProviderRegistry.getValue($stateParams.provider, $stateParams.accountId, 'loadBalancer.detailsController');
         }],
         controllerAs: 'ctrl'
       }
