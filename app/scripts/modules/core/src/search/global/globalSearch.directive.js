@@ -2,9 +2,10 @@
 
 const angular = require('angular');
 const $ = require('jquery');
+const SPINNER = require('../../widgets/spinners/spinner.component').SPINNER;
 
 module.exports = angular.module('spinnaker.core.search.global.directive', [
-  require('./globalSearch.controller.js')
+  require('./globalSearch.controller.js'), SPINNER
 ])
   .directive('globalSearch', function($window) {
     return {
