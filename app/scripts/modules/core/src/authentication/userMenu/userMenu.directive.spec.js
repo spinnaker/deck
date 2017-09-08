@@ -1,7 +1,8 @@
 'use strict';
 
-import {SETTINGS} from 'core/config/settings';
-import {mock} from 'angular';
+import { mock } from 'angular';
+
+import { SETTINGS } from 'core/config/settings';
 
 describe('Directives: userMenu', function () {
   var $scope, $compile, authenticationService;
