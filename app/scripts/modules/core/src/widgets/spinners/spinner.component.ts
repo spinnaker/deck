@@ -3,7 +3,7 @@ import { react2angular } from 'react2angular';
 
 import { Spinner } from './Spinner';
 
-export const SPINNER = 'spinnaker.core.spinner.component';
+export const SPINNER_COMPONENT = 'spinnaker.core.spinner.component';
 
-module(SPINNER, [])
+module(SPINNER_COMPONENT, [])
   .component('loadingSpinner', react2angular(Spinner, ['size', 'message', 'postnote']));
