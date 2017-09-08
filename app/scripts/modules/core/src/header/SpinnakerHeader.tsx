@@ -39,7 +39,7 @@ export class SpinnakerHeader extends React.Component<{}, ISpinnakerHeaderState> 
 
     return (
       <nav
-        className="container styleguide SpinnakerHeader"
+        className="container spinnaker-header"
         role="navigation"
         aria-label="Main Menu"
       >

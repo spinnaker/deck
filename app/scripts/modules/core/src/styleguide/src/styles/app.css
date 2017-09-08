@@ -12,10 +12,6 @@
 @import 'pills.css';
 @import 'icons.css';
 
-body {
-  font-size: 12px;
-}
-
 :root {
   --is-phone: false;
   --is-tablet: false;
