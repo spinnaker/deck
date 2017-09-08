@@ -1,8 +1,8 @@
-import {AUTHENTICATION_INITIALIZER_SERVICE} from '../authentication.initializer.service';
-import {AUTHENTICATION_SERVICE} from '../authentication.service';
-import {SETTINGS} from 'core/config/settings';
-
 const angular = require('angular');
+
+import { AUTHENTICATION_INITIALIZER_SERVICE } from '../authentication.initializer.service';
+import { AUTHENTICATION_SERVICE } from '../authentication.service';
+import { SETTINGS } from 'core/config/settings';
 
 export const AUTHENTICATION_USER_MENU = 'spinnaker.core.authentication.userMenu.directive';
 
