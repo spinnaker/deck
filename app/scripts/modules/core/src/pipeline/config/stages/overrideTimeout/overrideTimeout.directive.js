@@ -46,11 +46,11 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.overrideTimeout',
       $scope.vm.defaults = toHoursAndMinutes(stageDefaults);
 
       if (stage.overrideTimeout) {
-        var overrideValue = stage.stageTimeoutMs || stageDefaults;
+        var overrideValue = stage.timeoutMs || stageDefaults;
         $scope.vm.hours = toHoursAndMinutes(overrideValue).hours;
         $scope.vm.minutes = toHoursAndMinutes(overrideValue).minutes;
       } else {
-        delete stage.stageTimeoutMs;
+        delete stage.timeoutMs;
       }
     };
 
@@ -63,7 +63,7 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.overrideTimeout',
       if (!isNaN(vm.hours)) {
         timeout += 60 * 60 * 1000 * parseInt(vm.hours);
       }
-      $scope.stage.stageTimeoutMs = timeout;
+      $scope.stage.timeoutMs = timeout;
     };
 
     $scope.$watch('stage', this.setOverrideValues, true);

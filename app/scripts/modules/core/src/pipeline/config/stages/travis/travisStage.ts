@@ -33,14 +33,11 @@ export class TravisStage implements IController {
   constructor(public stage: any,
               $scope: IScope,
               private igorService: IgorService) {
-    this.stage.failPipeline = (this.stage.failPipeline === undefined ? true : this.stage.failPipeline);
-    this.stage.continuePipeline = (this.stage.continuePipeline === undefined ? false : this.stage.continuePipeline);
     this.viewState = {
       mastersLoaded: false,
       mastersRefreshing: false,
       jobsLoaded: false,
       jobsRefreshing: false,
-      failureOption: 'fail',
       markUnstableAsSuccessful: !!this.stage.markUnstableAsSuccessful,
       waitForCompletion: this.stage.waitForCompletion || this.stage.waitForCompletion === undefined,
     };

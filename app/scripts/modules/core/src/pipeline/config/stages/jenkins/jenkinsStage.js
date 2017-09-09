@@ -38,15 +38,12 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.jenkinsStage', [
   }).controller('JenkinsStageCtrl', function($scope, stage, igorService) {
 
     $scope.stage = stage;
-    $scope.stage.failPipeline = ($scope.stage.failPipeline === undefined ? true : $scope.stage.failPipeline);
-    $scope.stage.continuePipeline = ($scope.stage.continuePipeline === undefined ? false : $scope.stage.continuePipeline);
 
     $scope.viewState = {
       mastersLoaded: false,
       mastersRefreshing: false,
       jobsLoaded: false,
       jobsRefreshing: false,
-      failureOption: 'fail',
       markUnstableAsSuccessful: !!stage.markUnstableAsSuccessful,
       waitForCompletion: stage.waitForCompletion || stage.waitForCompletion === undefined,
     };

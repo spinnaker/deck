@@ -25,7 +25,6 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.pipelineStage', [
   }).controller('pipelineStageCtrl', function($scope, stage, pipelineConfigService, applicationReader) {
 
     $scope.stage = stage;
-    $scope.stage.failPipeline = ($scope.stage.failPipeline === undefined ? true : $scope.stage.failPipeline);
     $scope.stage.waitForCompletion = ($scope.stage.waitForCompletion === undefined ? true : $scope.stage.waitForCompletion);
 
     if (!$scope.stage.application) {
