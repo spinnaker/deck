@@ -4,9 +4,6 @@
     --color-primary: #39546A;
     --color-primary-g1: #4B7293;
 
-    /* Divider Colors - Used for borders and dividers*/
-    --color-divider: #D6D6D6;
-
     /* The inevitables */
     --color-accent: #149CB5;
     --color-accent-g1: #ABD7E0;
@@ -15,26 +12,33 @@
     --color-accessory: #7E94A4;
     --color-accessory-light: #C1D4DB;
 
-    --color-asparagus: #8AAD6A;
-    --color-sprout: #BFDD9A;
-    --color-rose: #BB231E;
-    --color-blush: #F1C0BF;
-    --color-mango: #EEBB3C;
-    --color-lemon: #FFE7AB;
-    --color-copper: #EEBB3C;
-    --color-cantaloupe: #FAD6AA;
+    --color-success: #8AAD6A;
+    --color-success-light: #BFDD9A;
+    --color-danger: #BB231E;
+    --color-danger-light: #F1C0BF;
+    --color-warning: #EEBB3C;
+    --color-warning-light: #FFE7AB;
+    --color-alert: #EEBB3C;
+    --color-alert-light: #FAD6AA;
 
     --color-black: #000000;
     --color-mineshaft: #393939;
     --color-dovegray: #6A6A6A;
-    --color-dovegray: #979797;
+    --color-concrete: #979797;
     --color-titanium: #B3B3B3;
+    --color-silver: #BEBEBE;
+    --color-alto: #D6D6D6;
     --color-seashell: #E1E1E1;
     --color-cirrus: #EFEFEF;
+    --color-alabaster: #F8F8F8;
+    --color-white: #FFFFFF;
+
+    /* Divider Colors - Used for borders and dividers*/
+    --color-divider: var(--color-alto);
 
     /* Text colors */
-    --color-text-primary: #000000;
-    --color-text-secondary: var(--color-primary);
+    --color-text-primary: var(--color-primary);
+    --color-text-secondary: var(--color-black);
     --color-text-accent: var(--color-accent);
     --color-text-caption: #747474;
     --color-text-link: #478CC8;

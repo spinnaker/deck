@@ -2,13 +2,13 @@
 
 .glyphicon, .fa {
   &.healthy {
-    color: @healthy_green_border;
+    color: var(--color-success);
   }
   &.unhealthy {
-    color: @unhealthy_red;
+    color: var(--color-danger);
   }
   &.unknown {
-    color: @mid_grey;
+    color: var(--color-dovegray);
   }
 }
 
@@ -37,13 +37,13 @@ health-counts {
       top: 0;
     }
     .healthy {
-      color: #8cad6e;
+      color: var(--color-success);
     }
     .unhealthy {
-      color: @unhealthy_orange;
+      color: var(--color-alert);
     }
     .dead {
-      color: #D9534F;
+      color: var(--color-danger);
     }
   }
 }

@@ -16,16 +16,16 @@
   h4 {
     text-transform: uppercase;
     font-weight: 600;
-    background-color: @lightest_grey;
+    background-color: var(--color-alabaster);
     margin: 0;
     padding: 10px 0;
     &.heading-sticky {
-      box-shadow: 0 8px 6px -6px #999999;
+      box-shadow: 0 8px 6px -6px var(--color-concrete);
     }
   }
   .heading-sticky {
     > h4 {
-      box-shadow: 0 8px 6px -6px #999999;
+      box-shadow: 0 8px 6px -6px var(--color-concrete);
     }
   }
 }
@@ -40,14 +40,14 @@
 
   &.disabled {
     opacity: 0.4;
-    border: 1px dashed #aaaaaa;
+    border: 1px dashed var(--color-titanium);
     &:hover, &.active {
       opacity: .75;
     }
   }
 
   .glyphicon-th, .glyphicon-th-large, .icon-server-group {
-    color: @healthy_green_icon;
+    color: var(--color-success);
   }
 
   &.unhealthy {
@@ -82,27 +82,27 @@ table.instances {
     margin: 0;
     display: inline-block;
     width: @instance-width;
-    border-right: 1px solid #ffffff;
-    border-bottom: 1px solid #ffffff;
+    border-right: 1px solid var(--color-white);
+    border-bottom: 1px solid var(--color-white);
     height: @instance-height;
-    background-color: @healthy_green;
+    background-color: var(--color-success-light);
 
     &.health-status-Up {
-      background-color: @healthy_green;
+      background-color: var(--color-success-light);
     }
     &.health-status-Down {
-      background-color: @unhealthy_red;
+      background-color: var(--color-danger);
     }
     &.health-status-OutOfService {
-      background-color: @mid_lighter_grey;
+      background-color: var(--color-concrete);
     }
 
     &.health-status-Unknown {
-      background-color: @missing_health;
+      background-color: var(--color-accent-g1);
     }
 
     &.health-status-Starting {
-      background-color: @missing_health;
+      background-color: var(--color-accent-g1);
       .pulsing(1.0);
     }
 
@@ -110,25 +110,25 @@ table.instances {
       height: @instance-height - 1;
       margin-top: 0;
       margin-bottom: 1px;
-      border: 1px solid @dark_grey;
-      box-shadow: 0 0 3px 1px #999999;
+      border: 1px solid var(--color-mineshaft);
+      box-shadow: 0 0 3px 1px var(--color-concrete);
       z-index: 2;
     }
 
     &.active {
       &.health-status-Up {
-        background-color: @healthy_green_border;
+        background-color: var(--color-success);
       }
       &.health-status-Down {
-        background-color: @unhealthy_red_border;
+        background-color: var(--color-danger);
       }
       &.health-status-OutOfService {
-        background-color: @mid_grey;
-        border-color: @dark_grey;
+        background-color: var(--color-dovegray);
+        border-color: var(--color-mineshaft);
       }
 
       &.health-status-Unknown, &.health-status-Starting {
-        background-color: @missing_health_border;
+        background-color: var(--color-accent);
       }
     }
   }
@@ -138,6 +138,19 @@ table.instances {
   font-size: 110%;
   margin: 0;
   width: 100%;
+  display: flex;
+
+  .remove-button {
+    display: flex;
+    flex: 0 0 auto;
+    padding: 0 5px;
+    margin-left: 2px;
+    text-align: center;
+    button {
+      margin-right: 0;
+    }
+    background-color: var(--color-accent-g2);
+  }
 
   .tooltip {
     text-transform: none;
@@ -163,37 +176,27 @@ table.instances {
 }
 
 .rollup-title-cell {
-  .remove-button {
-    display: flex;
-    flex: 0 0 auto;
-    padding: 0 5px;
-    margin-left: 2px;
-    text-align: center;
-    button {
-      margin-right: 0;
-    }
-    background-color: @pod_header_blue;
-  }
+  flex: 1;
   display: flex;
   height: 36px;
   line-height: 36px;
   font-size: 16px;
-  color: @default_link_hover;
+  color: var(--color-primary);
   .pod-center {
     flex: 1 1 auto;
     display: flex;
     justify-content: space-between;
-    background-color: @pod_header_blue;
+    background-color: var(--color-accent-g2);
     padding: 0 10px;
-    border-right: 1px solid @lightest_grey;
-    border-left: 1px solid @lightest_grey;
+    border-right: 1px solid var(--color-alabaster);
+    border-left: 1px solid var(--color-alabaster);
     font-weight: 600;
   }
   .health-counts {
     flex: 0 0 auto;
-    background-color: @light_grey;
+    background-color: var(--color-cirrus);
     padding: 0 10px;
-    border-left: 1px solid @lightest_grey;
+    border-left: 1px solid var(--color-alabaster);
   }
   &:active, &:hover, &:focus {
     text-decoration: none;
@@ -211,7 +214,7 @@ running-tasks-tag {
   top: 2px;
   right: 5px;
   .icon-spinner {
-    color: @spinnaker-link-color;
+    color: var(--color-accent);
   }
 }
 
@@ -221,13 +224,13 @@ running-tasks-tag {
   z-index: 99999;
   top: 20px;
   right: -12px;
-  background-color: #ffffff;
+  background-color: var(--color-white);
   margin-top: 12px;
-  border: 1px solid #777777;
+  border: 1px solid var(--color-dovegray);
   padding: 5px 10px;
-  box-shadow: 0 0 2px 1px #eeeeee;
+  box-shadow: 0 0 2px 1px var(--color-cirrus);
   text-transform: none;
-  color: @text-color;
+  color: var(--color-mineshaft);
   font-weight: 400;
   font-size: 80%;
   width: 350px;
@@ -243,21 +246,21 @@ running-tasks-tag {
   }
   &::after {
     top: -10px;
-    border-bottom-color: #ffffff;
+    border-bottom-color: var(--color-white);
   }
   &::before {
     top: -11px;
-    border-bottom-color: @mid_grey;
+    border-bottom-color: var(--color-dovegray);
   }
 }
 
 .menu-load-balancers {
   &.popover.bottom div.arrow:after {
-    border-bottom-color: @mid_grey;
+    border-bottom-color: var(--color-dovegray);
   }
 
   .popover-title {
-    background-color: @mid_grey;
+    background-color: var(--color-dovegray);
     color: white;
   }
 
@@ -265,8 +268,8 @@ running-tasks-tag {
 
   .menu-load-balancers-header {
     font-weight: 600;
-    color: #eeeeee;
-    background-color: @mid_grey;
+    color: var(--color-cirrus);
+    background-color: var(--color-dovegray);
   }
   .menu-load-balancers-header, a {
     text-transform: none;
@@ -278,7 +281,7 @@ running-tasks-tag {
     cursor: pointer;
     display: flex;
     justify-content: space-between;
-    border-bottom: 1px solid #d1d1d1;
+    border-bottom: 1px solid var(--color-alto);
     white-space: nowrap;
 
     .health-counts {
@@ -292,7 +295,7 @@ running-tasks-tag {
       border-bottom-width: 0;
     }
     &:hover, &:focus {
-      background-color: #eeeeee;
+      background-color: var(--color-cirrus);
       text-decoration: none;
     }
     &:focus {
@@ -323,9 +326,9 @@ running-tasks-tag {
     width: 0;
   }
   .badge-counter {
-    color: @spinnaker-link-color;
-    background-color: #fff;
-    border: 1px solid @spinnaker-link-color;
+    color: var(--color-text-link);
+    background-color: var(--color-white);
+    border: 1px solid var(--color-accent);
     right: 0;
     font-size: 100%;
     padding: 1px 4px;
@@ -338,7 +341,7 @@ running-tasks-tag {
 
 
 .rollup-details {
-  background-color: @lightest_grey;
+  background-color: var(--color-alabaster);
   padding: 0;
 
   .section-title {
@@ -349,15 +352,15 @@ running-tasks-tag {
   }
 
   .clickable-row {
-    background-color: #ffffff;
-    border: 1px solid @mid_light_grey;
+    background-color: var(--color-white);
+    border: 1px solid var(--color-alto);
     margin: 5px 15px 0;
     &.active {
-      border-color: @glow-init;
-      background-color: @active_pod_blue;
+      border-color: var(--color-accent-g1);
+      background-color: var(--color-accent-g3);
     }
     &:hover {
-      border-color: @glow-init;
+      border-color: var(--color-accent-g1);
     }
   }
   .permalinks {
@@ -368,11 +371,11 @@ running-tasks-tag {
       text-transform: uppercase;
       margin: 0;
       padding: 10px 10px 5px;
-      background-color: fade(@lightest_grey, 90%);
+      background-color: var(--color-alabaster);
     }
     .heading-sticky {
       > h6 {
-        background-color: fade(@lightest_grey, 90%);
+        background-color: var(--color-alabaster);
       }
     }
     .rollup-pod-server-group {
@@ -380,29 +383,29 @@ running-tasks-tag {
         background-color: rgba(255, 255, 255, .90);
       }
       &.running {
-        background-color: @active_pod_blue;
+        background-color: var(--color-alabaster);
         .pulsing(1.0);
         .server-group-title {
-          background-color: @active_pod_blue;
+          background-color: var(--color-alabaster);
         }
       }
       &.failed {
-        background-color: @failed_job;
+        background-color: var(--color-cirrus);
         .server-group-title {
-          background-color: @failed_job;
+          background-color: var(--color-cirrus);
         }
       }
       &.succeeded {
-        background-color: @succeeded_job;
+        background-color: var(--color-accent-g3);
         .server-group-title {
-          background-color: @succeeded_job;
+          background-color: var(--color-accent-g3);
         }
       }
       &.active {
-        border-color: @glow-init;
-        background-color: @active_pod_blue;
+        border-color: var(--color-accent-g1);
+        background-color: var(--color-accent-g3);
         .server-group-title {
-          background-color: @active_pod_blue;
+          background-color: var(--color-accent-g3);
         }
       }
     }
@@ -429,7 +432,7 @@ running-tasks-tag {
   }
 
   .rollup-details-section {
-    border-right: 1px solid #c4c4c4;
+    border-right: 1px solid var(--color-silver);
     padding: 10px;
     &:last-child {
       border-right-width: 0;
@@ -452,7 +455,7 @@ running-tasks-tag {
       opacity: 0.4;
     }
     .icon-server-group {
-      color: @mid_grey;
+      color: var(--color-dovegray);
     }
     &:hover {
       .section-title, .health-counts, .load-balancers-tag .badge, .instances {
@@ -496,11 +499,11 @@ running-tasks-tag {
     border-bottom-width: 0;
     &.clickable {
       &:hover, &.active {
-        background-color: @lighter_grey;
+        background-color: var(--color-cirrus);
       }
     }
   }
   .heading-sticky {
-    box-shadow: 0 8px 6px -6px #999999;
+    box-shadow: 0 8px 6px -6px var(--color-concrete);
   }
 }

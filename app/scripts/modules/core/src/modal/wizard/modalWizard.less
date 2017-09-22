@@ -15,7 +15,7 @@ v2-modal-wizard {
     list-style-type: none;
     height: auto;
     position: relative;
-    background-color: #ffffff;
+    background-color: var(--color-white);
     z-index: 5;
 
     .clearfix();
@@ -26,7 +26,7 @@ v2-modal-wizard {
       padding: 0;
       position: relative;
       a {
-        color: #808080;
+        color: var(--color-dovegray);
         display: block;
         line-height: 15px;
         text-decoration: none;
@@ -52,24 +52,24 @@ v2-modal-wizard {
 
       &.done {
         a:before {
-          background-color: @healthy_green_icon;
+          background-color: var(--color-success);
         }
       }
       &.default {
         pointer-events: auto;
         a:before {
-          background-color: #808080;
+          background-color: var(--color-dovegray);
         }
       }
       &.current, &:hover, &:active {
         transition: 0.25s;
-        background-color: @lighter_grey;
+        background-color: var(--color-cirrus);
         a {
-          color: @text-color;
+          color: var(--color-mineshaft);
           font-weight: 600;
         }
         a:before {
-          background-color: @spinnaker-blue;
+          background-color: var(--color-accent);
           content: '';
         }
       }
@@ -94,8 +94,8 @@ v2-modal-wizard {
       h4 {
         padding: 10px;
         margin-bottom: 0;
-        color: @default_link_hover;
-        background-color: @pod_header_blue;
+        color: var(--color-primary);
+        background-color: var(--color-accent-g2);
         @media(max-width: 992px) {
           padding-left: 0;
           &:before {
@@ -104,13 +104,13 @@ v2-modal-wizard {
             width: @indicator-size;
             height: @indicator-size;
             border-radius: 100%;
-            background-color: #808080;
+            background-color: var(--color-dovegray);
             content: '';
             transition: 0.25s;
           }
           &.done {
             &:before {
-              background-color: @healthy_green_icon;
+              background-color: var(--color-success);
             }
           }
           &.dirty {

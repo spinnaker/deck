@@ -1,4 +1,5 @@
 @import (reference) "~core/presentation/less/imports/commonImports.less";
+@import (reference) "~bootstrap/less/variables.less";
 
 .modal-show-history {
   .modal-history-header {
@@ -30,10 +31,10 @@
         position: absolute;
         min-height: 3px;
         &.add {
-          background: @stage-succeeded;
+          background: var(--color-success);
         }
         &.remove {
-          background: @unhealthy_red;
+          background: var(--color-danger);
         }
       }
     }
@@ -48,43 +49,44 @@
     letter-spacing: -1px;
   }
   .footer-additions {
-    color: @healthy_green_border;
+    color: var(--color-success);
   }
   .footer-removals {
-    color: @unhealthy_red_border;
+    color: var(--color-danger);
     display: inline-block;
     margin-left: 5px;
   }
 }
 
 .diff {
-  color: #000000;
+  color: var(--color-black);
   font-size: 80%;
   overflow-x: visible;
   margin: 0;
   padding-bottom: 0;
   .match, .add, .remove {
+    font-family: @font-family-monospace;
     &::before {
       position: relative;
       left: 0;
     }
   }
   .match {
-    color: @mid_grey;
+    color: var(--color-dovegray);
     &::before {
       content: ' ';
     }
   }
 
   .add {
-    background-color: #eaffea; // copied from GitHub
+    background-color: var(--color-accent-g3); // copied from GitHub
     &::before {
       content: '+';
     }
   }
 
   .remove {
-    background-color: #ffecec; // also copied from GitHub
+    background-color: var(--color-cirrus); // also copied from GitHub
     &::before {
       content: '-';
     }
