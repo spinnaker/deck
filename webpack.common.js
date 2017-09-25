@@ -155,6 +155,7 @@ function configure(IS_TEST) {
   if (!IS_TEST) {
     config.entry = {
       settings: './settings.js',
+      halconfig: './halconfig/settings.js',
       app: './app/scripts/app.ts',
       vendor: [
         'jquery', 'angular', 'angular-ui-bootstrap', 'source-sans-pro',
