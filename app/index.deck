@@ -26,7 +26,7 @@
     }
 
     .loading-placeholder h1, .loading-placeholder h2 {
-      font-family: 'Helvetica Neue', Helvetica, sans-serif;
+      font-family: 'Source Sans Pro', sans-serif;
       font-weight: 400;
       margin: 8px 0;
       font-size: 18px;
