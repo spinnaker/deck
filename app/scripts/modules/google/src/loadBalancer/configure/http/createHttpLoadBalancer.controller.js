@@ -6,6 +6,7 @@ import { TASK_MONITOR_BUILDER, V2_MODAL_WIZARD_SERVICE } from '@spinnaker/core';
 
 import { GCE_CACHE_REFRESH } from 'google/cache/cacheRefresh.component';
 import { BackendServiceTemplate, HealthCheckTemplate, HostRuleTemplate, ListenerTemplate } from './templates';
+import { GCE_HEALTH_CHECK_SELECTOR_COMPONENT } from '../common/healthCheck.component';
 
 import './httpLoadBalancerWizard.component.less';
 
@@ -17,9 +18,9 @@ module.exports = angular.module('spinnaker.deck.gce.loadBalancer.createHttp.cont
   GCE_CACHE_REFRESH,
   V2_MODAL_WIZARD_SERVICE,
   TASK_MONITOR_BUILDER,
+  GCE_HEALTH_CHECK_SELECTOR_COMPONENT,
   require('./commandBuilder.service.js'),
   require('../../details/hostAndPathRules/hostAndPathRulesButton.component.js'),
-  require('./healthCheck/healthCheck.component.js'),
   require('./hostRule/hostRule.component.js'),
   require('./httpLoadBalancer.write.service.js'),
   require('./listeners/listener.component.js'),
