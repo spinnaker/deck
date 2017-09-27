@@ -1,4 +1,4 @@
-import { ICompileProvider, IHttpProvider, ILocationProvider, ILogProvider, IQProvider } from 'angular';
+import { ICompileProvider, IHttpProvider, ILocationProvider, ILogProvider } from 'angular';
 
 import { bootstrapModule } from './bootstrap.module';
 import { SETTINGS } from 'core/config';
@@ -14,13 +14,6 @@ bootstrapModule.config(($httpProvider: IHttpProvider) => {
   $httpProvider.defaults.headers.patch = {
     'Content-Type': 'application/json;charset=utf-8'
   };
-});
-
-// Angular 1.6 stops suppressing unhandle rejections on promises. This resets it back to 1.5 behavior.
-// See https://docs.angularjs.org/guide/migration#migrate1.5to1.6-ng-services-$q
-bootstrapModule.config(($qProvider: IQProvider) => {
-  'ngInject';
-  $qProvider.errorOnUnhandledRejections(false);
 });
 
 // Angular 1.6 defaults preAssignBindingsEnabled to false, reset to true to mimic 1.5 behavior.

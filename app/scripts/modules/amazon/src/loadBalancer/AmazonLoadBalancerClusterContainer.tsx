@@ -1,17 +1,17 @@
 import * as React from 'react';
-import autoBindMethods from 'class-autobind-decorator';
+import { BindAll } from 'lodash-decorators';
 
 import { ILoadBalancerClusterContainerProps, LoadBalancerClusterContainer } from '@spinnaker/core'
 
 import { IAmazonApplicationLoadBalancer } from '../domain/IAmazonLoadBalancer';
 import { TargetGroup } from './TargetGroup';
 
-@autoBindMethods
+@BindAll()
 export class AmazonLoadBalancerClusterContainer extends React.Component<ILoadBalancerClusterContainerProps> {
   public render(): React.ReactElement<AmazonLoadBalancerClusterContainer> {
     const { loadBalancer, showInstances, showServerGroups } = this.props;
 
-    if (loadBalancer.loadBalancerType === 'application') {
+    if (loadBalancer.loadBalancerType !== 'classic') {
       const alb = loadBalancer as IAmazonApplicationLoadBalancer
       const TargetGroups = alb.targetGroups.map(targetGroup => {
         return (
