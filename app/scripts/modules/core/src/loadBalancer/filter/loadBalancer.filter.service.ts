@@ -2,13 +2,13 @@ import { ILogService, module } from 'angular';
 import { chain, find, forOwn, groupBy, includes, intersection, map, some, sortBy, values, without } from 'lodash';
 import { Debounce } from 'lodash-decorators';
 import { Subject } from 'rxjs';
-import autoBindMethods from 'class-autobind-decorator';
+import { BindAll } from 'lodash-decorators';
 
 import { Application } from 'core/application/application.model';
 import { ILoadBalancer, ILoadBalancerGroup, IInstance, IServerGroup } from 'core/domain';
 import { LOAD_BALANCER_FILTER_MODEL, LoadBalancerFilterModel } from './loadBalancerFilter.model';
 
-@autoBindMethods
+@BindAll()
 export class LoadBalancerFilterService {
 
   public groupsUpdatedStream: Subject<ILoadBalancerGroup[]> = new Subject<ILoadBalancerGroup[]>();
@@ -242,6 +242,6 @@ export class LoadBalancerFilterService {
 export const LOAD_BALANCER_FILTER_SERVICE = 'spinnaker.core.loadBalancer.filter.service';
 module(LOAD_BALANCER_FILTER_SERVICE, [
   LOAD_BALANCER_FILTER_MODEL,
-  require('core/filterModel/filter.model.service.js')
+  require('core/filterModel/filter.model.service.js').name
 ]).factory('loadBalancerFilterService', (loadBalancerFilterModel: LoadBalancerFilterModel, filterModelService: any, $log: ILogService) =>
                                         new LoadBalancerFilterService(loadBalancerFilterModel, filterModelService, $log));
