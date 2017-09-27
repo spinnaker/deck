@@ -4,6 +4,7 @@ module.exports = {
   plugins: {
     'postcss-import': {},
     'postcss-extend': {},
+    'postcss-colorfix': {colors: {}},
     'autoprefixer': {},
     'postcss-style-guide': {
       project: 'Spinnaker',
