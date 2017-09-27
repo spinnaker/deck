@@ -5,7 +5,7 @@ import {INestedState, STATE_CONFIG_PROVIDER, StateConfigProvider} from 'core/nav
 import {
   APPLICATION_STATE_PROVIDER, ApplicationStateProvider,
 } from 'core/application/application.state.provider';
-import {CloudProviderRegistry} from 'core/cloudProvider/cloudProvider.registry';
+import {VersionedCloudProviderRegistry} from 'core/cloudProvider';
 import {SecurityGroupReader} from './securityGroupReader.service';
 import {APPLICATION_MODEL_BUILDER, ApplicationModelBuilder} from 'core/application/applicationModel.builder';
 import {Application} from 'core/application/application.model';
@@ -29,16 +29,16 @@ module(SECURITY_GROUP_STATES, [
     },
     views: {
       'detail@../insight': {
-        templateProvider: ['$templateCache', '$stateParams', 'cloudProviderRegistry',
+        templateProvider: ['$templateCache', '$stateParams', 'versionedCloudProviderRegistry',
           ($templateCache: ng.ITemplateCacheService,
            $stateParams: StateParams,
-           cloudProviderRegistry: CloudProviderRegistry) => {
-            return $templateCache.get(cloudProviderRegistry.getValue($stateParams.provider, 'securityGroup.detailsTemplateUrl'));
+           versionedCloudProviderRegistry: VersionedCloudProviderRegistry) => {
+            return versionedCloudProviderRegistry.getValue($stateParams.provider, $stateParams.accountId, 'securityGroup.detailsTemplateUrl').then($templateCache.get);
         }],
-        controllerProvider: ['$stateParams', 'cloudProviderRegistry',
+        controllerProvider: ['$stateParams', 'versionedCloudProviderRegistry',
           ($stateParams: StateParams,
-           cloudProviderRegistry: CloudProviderRegistry) => {
-            return cloudProviderRegistry.getValue($stateParams.provider, 'securityGroup.detailsController');
+           versionedCloudProviderRegistry: VersionedCloudProviderRegistry) => {
+            return versionedCloudProviderRegistry.getValue($stateParams.provider, $stateParams.accountId, 'securityGroup.detailsController');
         }],
         controllerAs: 'ctrl'
       }
@@ -100,10 +100,10 @@ module(SECURITY_GROUP_STATES, [
     views: {
       'main@': {
         templateUrl: require('../presentation/standalone.view.html'),
-        controllerProvider: ['$stateParams', 'cloudProviderRegistry',
+        controllerProvider: ['$stateParams', 'versionedCloudProviderRegistry',
           ($stateParams: StateParams,
-           cloudProviderRegistry: CloudProviderRegistry) => {
-            return cloudProviderRegistry.getValue($stateParams.provider, 'securityGroup.detailsController');
+           versionedCloudProviderRegistry: VersionedCloudProviderRegistry) => {
+            return versionedCloudProviderRegistry.getValue($stateParams.provider, $stateParams.accountId, 'securityGroup.detailsController');
         }],
         controllerAs: 'ctrl'
       }
