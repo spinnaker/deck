@@ -87,6 +87,7 @@ module.exports = {
     'Select2/select2.css': 'Select2/select2.css',
     'select2-bootstrap-css/select2-bootstrap.css': 'select2-bootstrap-css/select2-bootstrap.css',
     'source-sans-pro': 'source-sans-pro',
+    'spel2js': 'spel2js',
     'spin.js': 'spin.js',
     'ui-select': 'ui-select',
   },
@@ -156,7 +157,6 @@ module.exports = {
     new HappyPack({
       id: 'js',
       loaders: [
-        'angular-loader',
         'babel-loader',
         'envify-loader',
         'eslint-loader',

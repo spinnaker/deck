@@ -1,5 +1,5 @@
 import * as React from 'react';
-import autoBindMethods from 'class-autobind-decorator';
+import { BindAll } from 'lodash-decorators';
 
 import { ISearchResultFormatter, searchResultFormatterRegistry } from './searchResultFormatter.registry';
 import { SearchResultGrid } from './SearchResultGrid';
@@ -33,7 +33,7 @@ export interface ISearchResultsState {
   formatter: ISearchResultFormatter;
 }
 
-@autoBindMethods
+@BindAll()
 export class SearchResults extends React.Component<ISearchResultsProps, ISearchResultsState> {
 
   private EMPTY_RESULT: ISearchResultGroup = Object.freeze({
@@ -62,7 +62,7 @@ export class SearchResults extends React.Component<ISearchResultsProps, ISearchR
         return {
           category: category,
           count: 0,
-          iconClass: formatter.icon ? `fa fa-${formatter.icon} fa-fw` : formatter.iconClass,
+          iconClass: formatter.icon ? `fa fa-${formatter.icon}` : formatter.iconClass,
           name: formatter.displayName,
           order: formatter.order,
           results: []
