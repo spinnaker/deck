@@ -145,7 +145,6 @@
     "postcss-colorfix": "^0.0.3",
     "postcss-extend": "^1.0.5",
     "postcss-import": "^10.0.0",
-    "postcss-less": "^1.1.0",
     "postcss-loader": "^2.0.6",
     "postcss-scopeit": "^0.0.6",
     "postcss-style-guide": "^0.14.0",
