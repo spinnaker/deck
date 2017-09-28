@@ -103,9 +103,9 @@ module(HELP_CONTENTS, [])
     'pipeline.config.enableAsg.cluster': '<p>Configures the cluster upon which this enable operation will act. The <em>target</em> specifies what server group to resolve for the operation.</p>',
     'pipeline.config.disableAsg.cluster': '<p>Configures the cluster upon which this disable operation will act. The <em>target</em> specifies what server group to resolve for the operation.</p>',
     'pipeline.config.destroyAsg.cluster': '<p>Configures the cluster upon which this destroy operation will act. The <em>target</em> specifies what server group to resolve for the operation.</p>',
-    'pipeline.config.jenkins.propertyFile': '<p>(Optional) Configures the name to the Jenkins artifact file used to pass in properties to later stages in the Spinnaker pipeline.</p>',
+    'pipeline.config.jenkins.propertyFile': '<p>(Optional) Configures the name to the Jenkins artifact file used to pass in properties to later stages in the Spinnaker pipeline. The contents of this file will now be available as a map under the trigger and accessible via <em>trigger.properties</em>. See <a target="_blank" href="https://www.spinnaker.io/guides/user/pipeline-expressions/">Pipeline Expressions docs</a> for more information.</p>',
     'pipeline.config.travis.job.isFiltered': '<p>Note that for performance reasons, not all jobs are displayed. Please use the search field to limit the number of jobs.</p>',
-    'pipeline.config.travis.propertyFile': '<p>(Optional) Configures the name to the Travis artifact file used to pass in properties to later stages in the Spinnaker pipeline.</p>',
+    'pipeline.config.travis.propertyFile': '<p>(Optional) Configures the name to the Travis artifact file used to pass in properties to later stages in the Spinnaker pipeline. The contents of this file will now be available as a map under the trigger and accessible via <em>trigger.properties</em>. See <a target="_blank" href="https://www.spinnaker.io/guides/user/pipeline-expressions/">Pipeline Expressions docs</a> for more information.</p>',
     'pipeline.config.bake.package': `
         <p>The name of the package you want installed (without any version identifiers).</p>
         <p>If your build produces a deb file named "myapp_1.27-h343", you would want to enter "myapp" here.</p>
@@ -113,7 +113,7 @@ module(HELP_CONTENTS, [])
     'pipeline.config.docker.bake.targetImage': '<p>The name of the resulting docker image.</p>',
     'pipeline.config.docker.bake.targetImageTag': '<p>The tag of the resulting docker image, defaults to commit hash if available.</p>',
     'pipeline.config.docker.bake.organization': '<p>The name of the organization or repo to use for the resulting docker image.</p>',
-    'pipeline.config.bake.baseAmi': '<p>(Optional) ami-????????</p>',
+    'pipeline.config.bake.baseAmi': '<p>(Optional) If Base AMI is specified, this will be used instead of the Base OS provided',
     'pipeline.config.bake.amiSuffix': '<p>(Optional) String of date in format YYYYMMDDHHmm, default is calculated from timestamp,</p>',
     'pipeline.config.bake.amiName': '<p>(Optional) Default = $package-$arch-$ami_suffix-$store_type</p>',
     'pipeline.config.bake.templateFileName': '<p>(Optional) The explicit packer template to use, instead of resolving one from rosco\'s configuration.</p>',

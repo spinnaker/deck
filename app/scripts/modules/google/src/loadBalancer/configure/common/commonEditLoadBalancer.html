@@ -9,6 +9,12 @@
     <v2-wizard-page key="listener" label="Listener" mark-complete-on-view="false">
       <ng-include src="ctrl.pages.listener"></ng-include>
     </v2-wizard-page>
+    <v2-wizard-page key="backendService"
+                    label="Backend Service"
+                    ng-if="ctrl.hasBackendService"
+                    mark-complete-on-view="false">
+      <ng-include src="ctrl.pages.backendService"></ng-include>
+    </v2-wizard-page>
     <v2-wizard-page key="healthCheck" label="Health Check" mark-complete-on-view="false">
       <ng-include src="ctrl.pages.healthCheck"></ng-include>
     </v2-wizard-page>

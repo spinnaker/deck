@@ -144,7 +144,7 @@ module.exports = {
       mangle: false,
       beautify: true,
       comments: true,
-      sourceMap: false,
+      sourceMap: true,
     }),
     new HappyPack({
       id: 'lib-html',
@@ -157,7 +157,6 @@ module.exports = {
     new HappyPack({
       id: 'js',
       loaders: [
-        'angular-loader',
         'babel-loader',
         'envify-loader',
         'eslint-loader',
