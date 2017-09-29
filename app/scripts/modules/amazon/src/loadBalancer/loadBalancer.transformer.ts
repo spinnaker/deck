@@ -129,7 +129,6 @@ export class AwsLoadBalancerTransformer {
   }
 
   public convertClassicLoadBalancerForEditing(loadBalancer: IAmazonClassicLoadBalancer): IAmazonClassicLoadBalancerUpsertCommand {
-console.log('DEBUG: loadBalancer = ' + JSON.stringify(loadBalancer));
     const toEdit: IAmazonClassicLoadBalancerUpsertCommand = {
       availabilityZones: undefined,
       isInternal: loadBalancer.isInternal,
