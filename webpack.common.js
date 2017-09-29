@@ -58,6 +58,7 @@ function configure(IS_TEST) {
         'coreColors': path.resolve(__dirname, 'app', 'scripts', 'modules', 'core', 'src', 'presentation', 'less', 'imports', 'colors.less'),
       }
     },
+    devtool: 'source-map',
     module: {
       rules: [
         {test: /\.js$/, use: ['happypack/loader?id=js'], exclude: /node_modules(?!\/clipboard)/},
@@ -77,11 +78,11 @@ function configure(IS_TEST) {
         },
         {
           test: /\.less$/,
-          use: IS_TEST ? ['style-loader', 'css-loader', 'less-loader'] : ['happypack/loader?id=less']
+          use: IS_TEST ? ['style-loader', 'css-loader', 'postcss-loader', 'less-loader'] : ['happypack/loader?id=less']
         },
         {
           test: /\.css$/,
-          use: IS_TEST ? ['style-loader', 'css-loader'] : [
+          use: [
             'style-loader',
             'css-loader',
             'postcss-loader'
@@ -170,6 +171,7 @@ function configure(IS_TEST) {
         loaders: [
           'style-loader',
           'css-loader',
+          'postcss-loader',
           'less-loader'
         ],
         threadPool: happyThreadPool
