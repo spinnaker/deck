@@ -58,6 +58,7 @@ function configure(IS_TEST) {
         'coreColors': path.resolve(__dirname, 'app', 'scripts', 'modules', 'core', 'src', 'presentation', 'less', 'imports', 'colors.less'),
       }
     },
+    devtool: 'source-map',
     module: {
       rules: [
         {test: /\.js$/, use: ['happypack/loader?id=js'], exclude: /node_modules(?!\/clipboard)/},
@@ -77,11 +78,11 @@ function configure(IS_TEST) {
         },
         {
           test: /\.less$/,
-          use: IS_TEST ? ['style-loader', 'css-loader', 'less-loader'] : ['happypack/loader?id=less']
+          use: IS_TEST ? ['style-loader', 'css-loader', 'postcss-loader', 'less-loader'] : ['happypack/loader?id=less']
         },
         {
           test: /\.css$/,
-          use: IS_TEST ? ['style-loader', 'css-loader'] : [
+          use: [
             'style-loader',
             'css-loader',
             'postcss-loader'
@@ -154,6 +155,7 @@ function configure(IS_TEST) {
   if (!IS_TEST) {
     config.entry = {
       settings: './settings.js',
+      settingsLocal: './settings-local.js',
       app: './app/scripts/app.ts',
       vendor: [
         'jquery', 'angular', 'angular-ui-bootstrap', 'source-sans-pro',
@@ -170,6 +172,7 @@ function configure(IS_TEST) {
         loaders: [
           'style-loader',
           'css-loader',
+          'postcss-loader',
           'less-loader'
         ],
         threadPool: happyThreadPool
@@ -187,7 +190,7 @@ function configure(IS_TEST) {
         // settings.js is put at the end of the <script> blocks
         // which breaks the booting of the app.
         chunksSortMode: (a, b) => {
-          const chunks = ['init', 'vendor', 'settings', 'app'];
+          const chunks = ['init', 'vendor', 'settings', 'settingsLocal', 'app'];
           return chunks.indexOf(a.names[0]) - chunks.indexOf(b.names[0]);
         }
       })
