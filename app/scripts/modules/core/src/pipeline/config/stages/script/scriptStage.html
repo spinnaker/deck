@@ -1,7 +1,7 @@
 <div ng-if="viewState.loading">
-  <h4 ng-if="viewState.loading" class="horizontal center">
+  <div ng-if="viewState.loading" class="horizontal center">
     <loading-spinner size="'small'"></loading-spinner>
-  </h4>
+  </div>
 </div>
 <div class="form-horizontal" ng-if="!viewState.loading">
   <stage-config-field label="Repository Url" help-key="pipeline.config.script.repoUrl">

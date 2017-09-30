@@ -14,9 +14,9 @@
   </div>
 </div>
 <div class="row" ng-if="!vm.application.notFound && !vm.state.pipelinesLoaded" style="min-height: 300px">
-  <h4 class="horizontal center middle spinner-container">
+  <div class="horizontal center middle spinner-container">
     <loading-spinner size="'small'"></loading-spinner>
-  </h4>
+  </div>
 </div>
 <div class="row" ng-if="vm.state.notFound" style="min-height: 300px">
   <h4 class="text-center">
