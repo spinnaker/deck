@@ -23,10 +23,7 @@ class AwsLoadBalancerChoiceCtrl implements IController {
     this.choice = this.choices[0];
     if (this.loadBalancer) {
       // If we're editing an existing LB, preset the choice based on config,
-      const needed_type = this.loadBalancer.loadBalancerType;
-      this.choice = LoadBalancerTypes.filter(function(el) {
-        return el.type === needed_type;
-      })[0];
+      this.choice = LoadBalancerTypes.find(t => t.type === this.loadBalancer.loadBalancerType);
     }
   }
 
@@ -49,9 +46,7 @@ class AwsLoadBalancerChoiceCtrl implements IController {
           isNew: () => this.isNew || (this.loadBalancer == null),
           forPipelineConfig: () => this.forPipelineConfig,
         }
-      }).result.then(function(newLoadBalancer: any) {
-         return newLoadBalancer;
-      })
+      }).result
     );
   }
 }
