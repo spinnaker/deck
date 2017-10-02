@@ -12,7 +12,8 @@ There are three variants:
   2. categories
   3. success
   4. danger
-  5. warn
+  5. alert
+  6. warn
 
 
 <div class="pill info">Information</div>
@@ -51,6 +52,10 @@ There are three variants:
 
     <div class="pill danger">Danger</div>
 
+<div class="pill alert">Alert</div>
+
+    <div class="pill alert">Alert</div>
+
 <div class="pill warn">Warn</div>
 
     <div class="pill warn">Warn</div>
@@ -67,7 +72,8 @@ There are three variants:
   2. categories
   3. success
   4. danger
-  5. warn
+  5. alert
+  6. warn
 
 Badges are also offered in 2 sizes:
 
@@ -119,6 +125,10 @@ Badges are also offered in 2 sizes:
 <div class="sp-badge danger">Danger</div>
 
     <div class="sp-badge danger">Danger</div>
+
+<div class="sp-badge alert">Alert</div>
+
+    <div class="sp-badge alert">Alert</div>
 
 <div class="sp-badge warn">Warn</div>
 
@@ -195,6 +205,10 @@ Badges are also offered in 2 sizes:
 
 .pill.warn, .sp-badge.warn {
   background-color: var(--color-warning);
+}
+
+.pill.alert, .sp-badge.alert {
+  background-color: var(--color-alert);
 }
 
 .sp-badge.large, .sp-badge.large * {
