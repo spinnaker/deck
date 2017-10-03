@@ -17,6 +17,7 @@ const HAPPY_PACK_ENV_INVALIDATE = lodash.pick(process.env, [
   'DEBUG_ENABLED',
   'CANARY_ENABLED',
   'INF_SEARCH_ENABLED',
+  'INFRA_ENABLED',
 ]);
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
@@ -55,7 +56,6 @@ function configure(IS_TEST) {
         'google': path.join(__dirname, 'app', 'scripts', 'modules', 'google', 'src'),
         '@spinnaker/google': path.join(__dirname, 'app', 'scripts', 'modules', 'google', 'src'),
         'coreImports': path.resolve(__dirname, 'app', 'scripts', 'modules', 'core', 'src', 'presentation', 'less', 'imports', 'commonImports.less'),
-        'coreColors': path.resolve(__dirname, 'app', 'scripts', 'modules', 'core', 'src', 'presentation', 'less', 'imports', 'colors.less'),
       }
     },
     devtool: 'source-map',
