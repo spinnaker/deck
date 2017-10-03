@@ -173,7 +173,7 @@ module.exports = angular.module('spinnaker.core.pipeline.config.pipelineConfigur
         controllerAs: '$ctrl',
         size: 'lg modal-fullscreen',
         resolve: {
-          pipeline: () => $scope.pipeline,
+          pipeline: () => $scope.renderablePipeline,
         }
       }).result.then(() => {
         $scope.$broadcast('pipeline-json-edited');
@@ -254,14 +254,22 @@ module.exports = angular.module('spinnaker.core.pipeline.config.pipelineConfigur
 
     // Poor react setState
     this.setViewState = (newViewState) => {
+      Object.assign($scope.viewState, newViewState);
       const viewState = _.clone($scope.viewState);
-      Object.assign(viewState, newViewState);
       $scope.$applyAsync(() => $scope.viewState = viewState);
     };
 
     // Poor react setState
     this.updatePipeline = () => {
-      $scope.$applyAsync(() => $scope.renderablePipeline = _.clone($scope.renderablePipeline));
+      $scope.$applyAsync(() => {
+        $scope.renderablePipeline = _.clone($scope.renderablePipeline);
+        // need to ensure references are maintained
+        if ($scope.plan) {
+          $scope.plan = $scope.renderablePipeline;
+        } else {
+          $scope.pipeline = $scope.renderablePipeline;
+        }
+      });
     };
 
     this.navigateToStage = (index, event) => {
