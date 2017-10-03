@@ -1,14 +1,8 @@
-@import (reference) "~core/presentation/less/imports/colors.less";
-
 .group-execution-label-list {
-  .group-name {
-    color: @dark_blue_background_title;
-    border-bottom: 1px #7e94a4 solid;
-    margin-bottom: 7px;
-  }
-
   list-style-type: none;
   padding: 3px 10px 0 10px;
+  max-height: 185px;
+  overflow-y: scroll;
   >a, >a:hover, >a:visited {
     text-decoration: none;
     color: inherit;
@@ -20,7 +14,7 @@
     }
     font-size: 13px;
     >:hover {
-      background-color: lighten(@dark_blue_background, 10%);
+      background-color: var(--color-primary-g1);
     }
     span+span {
       padding-left: 20px;
@@ -42,19 +36,25 @@
 }
 
 .group-stages-list-popover {
-  background-color: @dark_blue_background !important;
+  background-color: var(--color-primary) !important;
   .popover-content, &.inverse {
-    background-color: @dark_blue_background;
-    color: white;
+    background-color: var(--color-primary);
+    color: var(--color-white);
     padding: 5px;
   }
 
   &.top > div.arrow:after {
-    border-top-color: @dark_blue_background;
+    border-top-color: var(--color-primary);
   }
 
   &.bottom > div.arrow:after {
-    border-bottom-color: @dark_blue_background;
+    border-bottom-color: var(--color-primary);
+  }
+
+  .group-name {
+    color: var(--color-accessory-light);
+    border-bottom: 1px var(--color-accessory-light) solid;
+    margin: 5px 10px 7px 10px;
   }
 }
 
