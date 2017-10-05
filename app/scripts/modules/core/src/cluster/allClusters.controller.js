@@ -10,6 +10,7 @@ import { INSIGHT_NGMODULE } from 'core/insight/insight.module';
 import { CLUSTER_FILTER_MODEL } from '../cluster/filter/clusterFilter.model';
 import { FILTER_TAGS_COMPONENT } from '../filterModel/filterTags.component';
 import { PROVIDER_SELECTION_SERVICE } from 'core/cloudProvider/providerSelection/providerSelection.service';
+import { VERSION_SELECTION_SERVICE } from 'core/cloudProvider/versionSelection/versionSelection.service';
 import { ScrollToService } from 'core/utils';
 
 import './rollups.less';
@@ -17,20 +18,22 @@ import './rollups.less';
 module.exports = angular.module('spinnaker.core.cluster.allClusters.controller', [
   CLUSTER_FILTER_SERVICE,
   CLUSTER_FILTER_MODEL,
-  require('../cluster/filter/multiselect.model'),
+  require('../cluster/filter/multiselect.model').name,
   CLUSTER_FILTER,
-  require('../account/account.module'),
+  require('../account/account.module').name,
   PROVIDER_SELECTION_SERVICE,
+  VERSION_SELECTION_SERVICE,
   SERVER_GROUP_COMMAND_BUILDER_SERVICE,
   FILTER_TAGS_COMPONENT,
-  require('../utils/waypoints/waypointContainer.directive'),
+  require('../utils/waypoints/waypointContainer.directive').name,
   INSIGHT_NGMODULE.name,
   require('angular-ui-bootstrap'),
   CLOUD_PROVIDER_REGISTRY,
   require('@uirouter/angularjs').default,
 ])
   .controller('AllClustersCtrl', function($scope, app, $uibModal, $timeout, providerSelectionService, clusterFilterService, $state, scrollToService, $stateParams,
-                                          clusterFilterModel, MultiselectModel, insightFilterStateModel, serverGroupCommandBuilder, cloudProviderRegistry) {
+                                          clusterFilterModel, MultiselectModel, insightFilterStateModel, serverGroupCommandBuilder, cloudProviderRegistry,
+                                          versionSelectionService) {
 
     this.$onInit = () => {
       insightFilterStateModel.filtersHidden = true; // hidden to prevent filter flashing for on-demand apps
@@ -101,18 +104,20 @@ module.exports = angular.module('spinnaker.core.cluster.allClusters.controller',
 
     this.createServerGroup = function createServerGroup() {
       providerSelectionService.selectProvider(app, 'serverGroup').then(function(selectedProvider) {
-        let provider = cloudProviderRegistry.getValue(selectedProvider, 'serverGroup');
-        $uibModal.open({
-          templateUrl: provider.cloneServerGroupTemplateUrl,
-          controller: `${provider.cloneServerGroupController} as ctrl`,
-          size: 'lg',
-          resolve: {
-            title: function() { return 'Create New Server Group'; },
-            application: function() { return app; },
-            serverGroup: function() { return null; },
-            serverGroupCommand: function() { return serverGroupCommandBuilder.buildNewServerGroupCommand(app, selectedProvider); },
-            provider: function() { return selectedProvider; }
-          }
+        versionSelectionService.selectVersion(selectedProvider).then(function(selectedVersion) {
+          let provider = cloudProviderRegistry.getValue(selectedProvider, 'serverGroup', selectedVersion);
+          $uibModal.open({
+            templateUrl: provider.cloneServerGroupTemplateUrl,
+            controller: `${provider.cloneServerGroupController} as ctrl`,
+            size: 'lg',
+            resolve: {
+              title: () => 'Create New Server Group',
+              application: () => app,
+              serverGroup: () => null,
+              serverGroupCommand: () => serverGroupCommandBuilder.buildNewServerGroupCommand(app, selectedProvider),
+              provider: () => selectedProvider,
+            }
+          });
         });
       });
     };

@@ -1,6 +1,8 @@
 import * as React from 'react';
 import * as classNames from 'classnames';
-import autoBindMethods from 'class-autobind-decorator';
+import { BindAll } from 'lodash-decorators';
+
+import { SearchService } from 'core/search/search.service';
 
 export interface ISearchResultGroup {
   category: string;
@@ -17,7 +19,7 @@ export interface ISearchResultGroupProps {
   onClick?: (group: ISearchResultGroup) => void;
 }
 
-@autoBindMethods
+@BindAll()
 export class SearchResultGroup extends React.Component<ISearchResultGroupProps> {
 
   public static defaultProps: Partial<ISearchResultGroupProps> = {
@@ -29,6 +31,16 @@ export class SearchResultGroup extends React.Component<ISearchResultGroupProps> 
     if (searchResultGroup.count > 0) {
       onClick(searchResultGroup);
     }
+  }
+
+  private getCountLabel(count: number): string {
+
+    let result = `${count}`;
+    if (count >= SearchService.DEFAULT_PAGE_SIZE) {
+      result += '+';
+    }
+
+    return result;
   }
 
   public render(): React.ReactElement<SearchResultGroup> {
@@ -45,7 +57,7 @@ export class SearchResultGroup extends React.Component<ISearchResultGroupProps> 
       <div className={className} onClick={this.handleClick}>
         <span className={`search-group-icon ${iconClass}`}/>
         <div className="search-group-name">{name}</div>
-        <div className="badge">{count}</div>
+        <div className="badge">{this.getCountLabel(count)}</div>
       </div>
     );
   }

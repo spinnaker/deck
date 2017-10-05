@@ -85,7 +85,17 @@ module(HELP_CONTENTS, [])
         the configuration based on the newest server group in the cluster.</p>
         <p>If you want to start from scratch, select "None".</p>
         <p>You can always edit the cluster configuration after you've created it.</p>`,
-
+    'pipeline.config.expectedArtifact.fieldName': `
+        <p>The Artifact field name.</p>`,
+    'pipeline.config.expectedArtifact.fieldType': `
+        <p>The Artifact field type. This must be one of 'MUST_MATCH' or 'FIND_IF_MISSING'.</p>
+        <p><strong>MUST_MATCH</strong> means the incoming Artifact's field value must match exactly with the expected value.</p>
+        <p><strong>FIND_IF_MISSING</strong> means the field is optional and a 'Missing Policy' will fire if the value is not present.</p>`,
+    'pipeline.config.expectedArtifact.missingPolicy': `
+        <p>The policy if the field type is 'FIND_IF_MISSING' and the field value is not present.</p>
+        <p><strong>FAIL_PIPELINE</strong> fails the pipeline if the field value is missing.</p>
+        <p><strong>IGNORE</strong> ignores the fact that the value is missing and runs the pipeline anyway.</p>
+        <p><strong>PRIOR_PIPELINE</strong> looks up the field's value from a prior pipeline execution.</p>`,
     'loadBalancer.advancedSettings.healthTimeout': '<p>Configures the timeout, in seconds, for reaching the healthCheck target.  Must be less than the interval.</p><p> Default: <b>5</b></p>',
     'loadBalancer.advancedSettings.healthInterval': '<p>Configures the interval, in seconds, between ELB health checks.  Must be greater than the timeout.</p><p>Default: <b>10</b></p>',
     'loadBalancer.advancedSettings.healthyThreshold': '<p>Configures the number of healthy observations before reinstituting an instance into the ELB’s traffic rotation.</p><p>Default: <b>10</b></p>',
@@ -103,9 +113,9 @@ module(HELP_CONTENTS, [])
     'pipeline.config.enableAsg.cluster': '<p>Configures the cluster upon which this enable operation will act. The <em>target</em> specifies what server group to resolve for the operation.</p>',
     'pipeline.config.disableAsg.cluster': '<p>Configures the cluster upon which this disable operation will act. The <em>target</em> specifies what server group to resolve for the operation.</p>',
     'pipeline.config.destroyAsg.cluster': '<p>Configures the cluster upon which this destroy operation will act. The <em>target</em> specifies what server group to resolve for the operation.</p>',
-    'pipeline.config.jenkins.propertyFile': '<p>(Optional) Configures the name to the Jenkins artifact file used to pass in properties to later stages in the Spinnaker pipeline.</p>',
+    'pipeline.config.jenkins.propertyFile': '<p>(Optional) Configures the name to the Jenkins artifact file used to pass in properties to later stages in the Spinnaker pipeline. The contents of this file will now be available as a map under the trigger and accessible via <em>trigger.properties</em>. See <a target="_blank" href="https://www.spinnaker.io/guides/user/pipeline-expressions/">Pipeline Expressions docs</a> for more information.</p>',
     'pipeline.config.travis.job.isFiltered': '<p>Note that for performance reasons, not all jobs are displayed. Please use the search field to limit the number of jobs.</p>',
-    'pipeline.config.travis.propertyFile': '<p>(Optional) Configures the name to the Travis artifact file used to pass in properties to later stages in the Spinnaker pipeline.</p>',
+    'pipeline.config.travis.propertyFile': '<p>(Optional) Configures the name to the Travis artifact file used to pass in properties to later stages in the Spinnaker pipeline. The contents of this file will now be available as a map under the trigger and accessible via <em>trigger.properties</em>. See <a target="_blank" href="https://www.spinnaker.io/guides/user/pipeline-expressions/">Pipeline Expressions docs</a> for more information.</p>',
     'pipeline.config.bake.package': `
         <p>The name of the package you want installed (without any version identifiers).</p>
         <p>If your build produces a deb file named "myapp_1.27-h343", you would want to enter "myapp" here.</p>
@@ -113,7 +123,7 @@ module(HELP_CONTENTS, [])
     'pipeline.config.docker.bake.targetImage': '<p>The name of the resulting docker image.</p>',
     'pipeline.config.docker.bake.targetImageTag': '<p>The tag of the resulting docker image, defaults to commit hash if available.</p>',
     'pipeline.config.docker.bake.organization': '<p>The name of the organization or repo to use for the resulting docker image.</p>',
-    'pipeline.config.bake.baseAmi': '<p>(Optional) ami-????????</p>',
+    'pipeline.config.bake.baseAmi': '<p>(Optional) If Base AMI is specified, this will be used instead of the Base OS provided',
     'pipeline.config.bake.amiSuffix': '<p>(Optional) String of date in format YYYYMMDDHHmm, default is calculated from timestamp,</p>',
     'pipeline.config.bake.amiName': '<p>(Optional) Default = $package-$arch-$ami_suffix-$store_type</p>',
     'pipeline.config.bake.templateFileName': '<p>(Optional) The explicit packer template to use, instead of resolving one from rosco\'s configuration.</p>',

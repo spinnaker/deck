@@ -1,7 +1,6 @@
 'use strict';
 
 import { PIPELINE_CONFIG_PROVIDER } from 'core/pipeline/config/pipelineConfigProvider';
-import { MissingArtifactPolicy } from 'core/domain/IExpectedArtifact';
 
 const angular = require('angular');
 
@@ -35,7 +34,7 @@ module.exports = angular.module('spinnaker.core.pipeline.config.trigger.triggers
     };
 
     this.addArtifact = () => {
-      const newArtifact = {name: '', type: '', missingPolicy: MissingArtifactPolicy.FailPipeline};
+      const newArtifact = {fields: []};
 
       if (!$scope.pipeline.expectedArtifacts) {
         $scope.pipeline.expectedArtifacts = [];

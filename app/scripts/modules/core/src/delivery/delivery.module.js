@@ -8,6 +8,7 @@ import { EXECUTION_DETAILS_CONTROLLER } from './details/executionDetails.control
 import { BUILD_DISPLAY_NAME_FILTER } from './executionBuild/buildDisplayName.filter';
 import { EXECUTION_BUILD_NUMBER_COMPONENT } from './executionBuild/executionBuildNumber.component';
 import { EXECUTION_COMPONENT } from './executionGroup/execution/execution.component';
+import { EXECUTION_FILTERS_COMPONENT } from './filter/executionFilters.component';
 import { EXECUTION_GROUPS_COMPONENT } from './executionGroup/executionGroups.component';
 import { EXECUTIONS_COMPONENT } from './executions/executions.component';
 import { STAGE_FAILURE_MESSAGE_COMPONENT } from './stageFailureMessage/stageFailureMessage.component';
@@ -22,21 +23,21 @@ module.exports = angular.module('spinnaker.delivery', [
   EXECUTION_GROUPS_COMPONENT,
   EXECUTION_DETAILS_COMPONENT,
   EXECUTIONS_COMPONENT,
-  require('./details/executionDetailsSectionNav.directive.js'),
+  require('./details/executionDetailsSectionNav.directive.js').name,
 
   BUILD_DISPLAY_NAME_FILTER,
   EXECUTION_BUILD_NUMBER_COMPONENT,
 
-  require('./filter/executionFilters.directive.js'),
+  EXECUTION_FILTERS_COMPONENT,
 
-  require('./manualExecution/manualPipelineExecution.controller.js'),
+  require('./manualExecution/manualPipelineExecution.controller.js').name,
 
   STAGE_FAILURE_MESSAGE_COMPONENT,
   EXECUTION_STATUS_COMPONENT,
 
-  require('../utils/appendTransform.js'),
-  require('../utils/moment.js'),
+  require('../utils/appendTransform.js').name,
+  require('../utils/moment.js').name,
 
-  require('./delivery.dataSource'),
+  require('./delivery.dataSource').name,
   DELIVERY_STATES,
 ]);

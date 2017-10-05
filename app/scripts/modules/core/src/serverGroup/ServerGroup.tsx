@@ -1,13 +1,12 @@
 import * as React from 'react';
 import * as ReactGA from 'react-ga';
 import { has, get } from 'lodash';
-import classNames = require('classnames');
-import autoBindMethods from 'class-autobind-decorator';
+import * as classNames from 'classnames';
+import { BindAll } from 'lodash-decorators';
 import { Subscription } from 'rxjs/Subscription';
 
 import { Application } from 'core/application';
 import { CloudProviderLogo } from 'core/cloudProvider';
-import { serverGroupSequenceFilter } from 'core/cluster/serverGroup.sequence.filter';
 import { IInstance, IServerGroup } from 'core/domain';
 import { EntityNotifications } from 'core/entityTag/notifications/EntityNotifications';
 import { HealthCounts } from 'core/healthCounts';
@@ -48,9 +47,7 @@ export interface IServerGroupState {
   isMultiSelected: boolean; // multiselect mode
 }
 
-const getSequence = serverGroupSequenceFilter(new NamingService());
-
-@autoBindMethods
+@BindAll()
 export class ServerGroup extends React.Component<IServerGroupProps, IServerGroupState> {
   private stateChangeSubscription: Subscription;
   private serverGroupsSubscription: Subscription;
@@ -64,7 +61,7 @@ export class ServerGroup extends React.Component<IServerGroupProps, IServerGroup
     const { serverGroup } = props;
     const { showAllInstances, listInstances, multiselect, filter } = props.sortFilter;
     const instances = serverGroup.instances.filter(i => ReactInjector.clusterFilterService.shouldShowInstance(i));
-    const serverGroupSequence = getSequence(serverGroup.name);
+    const serverGroupSequence = new NamingService().getSequence(serverGroup.moniker.sequence);
     const hasBuildInfo = !!serverGroup.buildInfo;
     const isSelected = this.isSelected(serverGroup);
     const isMultiSelected = this.isMultiSelected(multiselect, serverGroup);
@@ -80,7 +77,7 @@ export class ServerGroup extends React.Component<IServerGroupProps, IServerGroup
 
       jenkins = {
         number: jenkinsConfig.number,
-        href: fromHost || fromFullUrl || fromBuildInfo,
+        href: fromBuildInfo || fromFullUrl || fromHost ,
       };
     } else if (has(serverGroup, 'buildInfo.images')) {
       images = serverGroup.buildInfo.images.join(', ');

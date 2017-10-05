@@ -5,7 +5,7 @@ describe('Controller: deletePipelineModal', function() {
 
   beforeEach(
     window.module(
-      require('./delete.module.js'),
+      require('./delete.module.js').name,
       APPLICATION_MODEL_BUILDER
     )
   );
@@ -40,9 +40,9 @@ describe('Controller: deletePipelineModal', function() {
 
     beforeEach(function() {
       this.pipelines = [
-        {name: 'a', index: 0},
-        {name: 'b', index: 1},
-        {name: 'c', index: 2}
+        {name: 'a', index: 0, id: 'A'},
+        {name: 'b', index: 1, id: 'B'},
+        {name: 'c', index: 2, id: 'C'}
       ];
 
       this.application.pipelineConfigs.activate();
@@ -83,7 +83,7 @@ describe('Controller: deletePipelineModal', function() {
       expect(newStateOptions).toEqual({location: 'replace'});
     });
 
-    it('sets error flag, message when save is rejected', function() {
+    it('sets error flag, message when delete is rejected', function() {
       var $q = this.$q;
       spyOn(this.pipelineConfigService, 'deletePipeline').and.callFake(function () {
         return $q.reject({message: 'something went wrong'});
@@ -92,11 +92,11 @@ describe('Controller: deletePipelineModal', function() {
       this.controller.deletePipeline();
       this.$scope.$digest();
 
-      expect(this.$scope.viewState.saveError).toBe(true);
+      expect(this.$scope.viewState.deleteError).toBe(true);
       expect(this.$scope.viewState.errorMessage).toBe('something went wrong');
     });
 
-    it('provides default error message when none provided on failed save', function() {
+    it('provides default error message when none provided on failed delete', function() {
       var $q = this.$q;
       spyOn(this.pipelineConfigService, 'deletePipeline').and.callFake(function () {
         return $q.reject({});
@@ -106,7 +106,7 @@ describe('Controller: deletePipelineModal', function() {
       this.controller.deletePipeline();
       this.$scope.$digest();
 
-      expect(this.$scope.viewState.saveError).toBe(true);
+      expect(this.$scope.viewState.deleteError).toBe(true);
       expect(this.$scope.viewState.errorMessage).toBe('No message provided');
     });
   });

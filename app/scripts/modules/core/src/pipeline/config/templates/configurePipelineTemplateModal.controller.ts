@@ -1,7 +1,7 @@
 import { module, IController, IScope, IHttpPromiseCallbackArg, IPromise } from 'angular';
 import { IModalInstanceService } from 'angular-ui-bootstrap';
 import { load, dump } from 'js-yaml';
-import autoBindMethods from 'class-autobind-decorator';
+import { BindAll } from 'lodash-decorators';
 import { without, chain, has } from 'lodash';
 
 import { Application } from 'core/application/application.model';
@@ -27,7 +27,7 @@ export interface IState {
   planErrors: IPipelineTemplatePlanError[];
 }
 
-@autoBindMethods
+@BindAll()
 export class ConfigurePipelineTemplateModalController implements IController {
 
   public pipelineName: string;
@@ -119,6 +119,10 @@ export class ConfigurePipelineTemplateModalController implements IController {
       .map(v => {
         if (v.type === 'object') {
           v.value = load(v.value);
+        } else if (v.type === 'int') {
+          return [v.name, parseInt(v.value, 10)];
+        } else if (v.type === 'float') {
+          return [v.name, parseFloat(v.value)];
         }
         return [v.name, v.value];
       })

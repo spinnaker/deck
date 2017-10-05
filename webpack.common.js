@@ -17,6 +17,7 @@ const HAPPY_PACK_ENV_INVALIDATE = lodash.pick(process.env, [
   'DEBUG_ENABLED',
   'CANARY_ENABLED',
   'INF_SEARCH_ENABLED',
+  'INFRA_ENABLED',
 ]);
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
@@ -55,9 +56,9 @@ function configure(IS_TEST) {
         'google': path.join(__dirname, 'app', 'scripts', 'modules', 'google', 'src'),
         '@spinnaker/google': path.join(__dirname, 'app', 'scripts', 'modules', 'google', 'src'),
         'coreImports': path.resolve(__dirname, 'app', 'scripts', 'modules', 'core', 'src', 'presentation', 'less', 'imports', 'commonImports.less'),
-        'coreColors': path.resolve(__dirname, 'app', 'scripts', 'modules', 'core', 'src', 'presentation', 'less', 'imports', 'colors.less'),
       }
     },
+    devtool: 'source-map',
     module: {
       rules: [
         {test: /\.js$/, use: ['happypack/loader?id=js'], exclude: /node_modules(?!\/clipboard)/},
@@ -77,11 +78,11 @@ function configure(IS_TEST) {
         },
         {
           test: /\.less$/,
-          use: IS_TEST ? ['style-loader', 'css-loader', 'less-loader'] : ['happypack/loader?id=less']
+          use: IS_TEST ? ['style-loader', 'css-loader', 'postcss-loader', 'less-loader'] : ['happypack/loader?id=less']
         },
         {
           test: /\.css$/,
-          use: IS_TEST ? ['style-loader', 'css-loader'] : [
+          use: [
             'style-loader',
             'css-loader',
             'postcss-loader'
@@ -128,7 +129,6 @@ function configure(IS_TEST) {
     new HappyPack({
       id: 'js',
       loaders: [
-        'angular-loader',
         'babel-loader',
         'envify-loader',
         'eslint-loader'
@@ -155,6 +155,7 @@ function configure(IS_TEST) {
   if (!IS_TEST) {
     config.entry = {
       settings: './settings.js',
+      settingsLocal: './settings-local.js',
       halconfig: './halconfig/settings.js',
       app: './app/scripts/app.ts',
       vendor: [
@@ -172,6 +173,7 @@ function configure(IS_TEST) {
         loaders: [
           'style-loader',
           'css-loader',
+          'postcss-loader',
           'less-loader'
         ],
         threadPool: happyThreadPool
@@ -189,7 +191,7 @@ function configure(IS_TEST) {
         // settings.js is put at the end of the <script> blocks
         // which breaks the booting of the app.
         chunksSortMode: (a, b) => {
-          const chunks = ['init', 'vendor', 'settings', 'app'];
+          const chunks = ['init', 'vendor', 'settings', 'settingsLocal', 'app'];
           return chunks.indexOf(a.names[0]) - chunks.indexOf(b.names[0]);
         }
       })

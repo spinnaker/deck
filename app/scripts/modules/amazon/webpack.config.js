@@ -7,6 +7,7 @@ const HappyPack = require('happypack');
 const HAPPY_PACK_POOL_SIZE = process.env.HAPPY_PACK_POOL_SIZE || 3;
 const happyThreadPool = HappyPack.ThreadPool({size: HAPPY_PACK_POOL_SIZE});
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const nodeExternals = require('webpack-node-externals');
 const webpack = require('webpack');
 const exclusionPattern = /(node_modules|\.\.\/deck)/;
 
@@ -22,24 +23,11 @@ module.exports = {
     libraryTarget: 'umd',
     umdNamedDefine: true,
   },
-  externals: {
-    '@spinnaker/core': '@spinnaker/core',
-    '@uirouter/angularjs': '@uirouter/angularjs',
-    '@uirouter/core': '@uirouter/core',
-    '@uirouter/react': '@uirouter/react',
-    'angular': 'angular',
-    'angular-ui-bootstrap': 'angular-ui-bootstrap',
-    'exports-loader?"n3-line-chart"!n3-charts/build/LineChart.js': 'exports-loader?"n3-line-chart"!n3-charts/build/LineChart.js',
-    'lodash': 'lodash',
-    'prop-types': 'prop-types',
-    'rxjs': 'rxjs',
-    'react': 'react',
-    'react-bootstrap': 'react-bootstrap',
-    'react-dom': 'react-dom',
-    'react-ga': 'react-ga',
-    'react2angular': 'react2angular',
-    'react-select': 'react-select',
-  },
+  externals: [
+    '@spinnaker/core',
+    'exports-loader?"n3-line-chart"!n3-charts/build/LineChart.js',
+    nodeExternals({ modulesDir: '../../../../node_modules' }),
+  ],
   resolve: {
     extensions: ['.json', '.js', '.jsx', '.ts', '.tsx', '.css', '.less', '.html'],
     modules: [
@@ -49,7 +37,6 @@ module.exports = {
     alias: {
       '@spinnaker/amazon': path.join(__dirname, 'src'),
       'coreImports': path.resolve(basePath, 'app', 'scripts', 'modules', 'core', 'src', 'presentation', 'less', 'imports', 'commonImports.less'),
-      'coreColors': path.resolve(basePath, 'app', 'scripts', 'modules', 'core', 'src', 'presentation', 'less', 'imports', 'colors.less'),
       'amazon': path.join(__dirname, 'src')
     }
   },
@@ -92,7 +79,7 @@ module.exports = {
       mangle: false,
       beautify: true,
       comments: false,
-      sourceMap: false,
+      sourceMap: true,
     }),
     new HappyPack({
       id: 'lib-html',
@@ -105,7 +92,6 @@ module.exports = {
     new HappyPack({
       id: 'js',
       loaders: [
-        'angular-loader',
         'babel-loader',
         'envify-loader',
         'eslint-loader'

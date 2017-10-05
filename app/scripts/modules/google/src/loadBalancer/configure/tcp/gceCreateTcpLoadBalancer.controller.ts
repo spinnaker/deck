@@ -65,6 +65,7 @@ class TcpLoadBalancerCtrl extends CommonGceLoadBalancerCtrl implements ng.ICompo
     'listener': require('./listener.html'),
     'healthCheck': require('../common/commonHealthCheckPage.html'),
     'advancedSettings': require('../common/commonAdvancedSettingsPage.html'),
+    'backendService': require('./backendService.html'),
   };
   public sessionAffinityViewToModelMap: any = {
     'None': 'NONE',
@@ -85,6 +86,7 @@ class TcpLoadBalancerCtrl extends CommonGceLoadBalancerCtrl implements ng.ICompo
   public viewState: ViewState = new ViewState('None');
   public maxCookieTtl = 60 * 60 * 24; // One day.
   public taskMonitor: any;
+  public hasBackendService = true;
 
   private sessionAffinityModelToViewMap: any = _.invert(this.sessionAffinityViewToModelMap);
 

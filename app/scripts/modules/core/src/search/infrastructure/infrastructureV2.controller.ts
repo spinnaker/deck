@@ -1,4 +1,4 @@
-import autoBindMethods from 'class-autobind-decorator';
+import { BindAll } from 'lodash-decorators';
 import { isEmpty } from 'lodash';
 import { module, IController, ILocationService, IScope } from 'angular';
 import { StateService } from '@uirouter/core';
@@ -32,7 +32,7 @@ export interface IMenuItem {
   displayName: string;
 }
 
-@autoBindMethods
+@BindAll()
 export class InfrastructureV2Ctrl implements IController {
 
   public viewState: IViewState;
@@ -43,7 +43,7 @@ export class InfrastructureV2Ctrl implements IController {
               private $state: StateService, private $uibModal: IModalService,
               private infrastructureSearchService: InfrastructureSearchService,
               private cacheInitializer: CacheInitializerService, private overrideRegistry: OverrideRegistry,
-              private pageTitleService: PageTitleService) {
+              pageTitleService: PageTitleService) {
     'ngInject';
     this.$scope.categories = [];
     this.$scope.projects = [];
@@ -51,6 +51,9 @@ export class InfrastructureV2Ctrl implements IController {
     this.viewState = {
       status: SearchStatus.INITIAL
     };
+
+    // just set the page title - don't try to get fancy w/ the search terms
+    pageTitleService.handleRoutingSuccess({ pageTitleMain: { field: undefined, label: 'Infrastructure' }});
 
     this.query = UrlParser.parseLocationHash(window.location.hash);
     if (this.query.length) {
@@ -124,14 +127,6 @@ export class InfrastructureV2Ctrl implements IController {
 
       this.$scope.projects =
         result.filter((category: ISearchResultSet) => category.category === 'Projects' && category.results.length);
-      this.pageTitleService.handleRoutingSuccess(
-        {
-          pageTitleMain: {
-            field: undefined,
-            label: params ? `Search results for "${JSON.stringify(params)}"` : 'Infrastructure'
-          }
-        }
-      );
 
       if (this.$scope.categories.length || this.$scope.projects.length) {
         this.viewState.status = SearchStatus.FINISHED;

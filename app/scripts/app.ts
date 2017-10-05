@@ -6,19 +6,21 @@ import { AMAZON_MODULE } from '@spinnaker/amazon';
 import { APPENGINE_MODULE } from './modules/appengine/appengine.module';
 import { GOOGLE_MODULE } from '@spinnaker/google';
 import { CANARY_MODULE } from './modules/canary/canary.module';
+import { KUBERNETES_V2_MODULE } from './modules/kubernetes/v2/kubernetes.v2.module';
 
 module('netflix.spinnaker', [
   CORE_MODULE,
   AMAZON_MODULE,
   GOOGLE_MODULE,
-  require('./modules/ecs/ecs.module.js'),
-  require('./modules/cloudfoundry/cf.module.js'),
-  require('./modules/azure/azure.module.js'),
-  require('./modules/kubernetes/kubernetes.module.js'),
-  require('./modules/openstack/openstack.module.js'),
+  require('./modules/ecs/ecs.module.js').name,
+  require('./modules/cloudfoundry/cf.module.js').name,
+  require('./modules/azure/azure.module.js').name,
+  require('./modules/kubernetes/v1/kubernetes.v1.module.js').name,
+  require('./modules/openstack/openstack.module.js').name,
   DOCKER_MODULE,
-  require('./modules/oracle/oraclebmcs.module.js'),
-  require('./modules/dcos/dcos.module.js'),
+  require('./modules/oracle/oraclebmcs.module.js').name,
+  require('./modules/dcos/dcos.module.js').name,
   APPENGINE_MODULE,
   CANARY_MODULE,
+  KUBERNETES_V2_MODULE,
 ]);

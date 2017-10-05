@@ -9,7 +9,7 @@ module.exports = angular.module('spinnaker.serverGroup.configure.kubernetes.conf
   ACCOUNT_SERVICE,
   CACHE_INITIALIZER_SERVICE,
   LOAD_BALANCER_READ_SERVICE,
-  require('../../image/image.reader.js'),
+  require('../../image/image.reader.js').name,
 ])
   .factory('kubernetesServerGroupConfigurationService', function($q, accountService, kubernetesImageReader,
                                                                  loadBalancerReader, cacheInitializer) {
@@ -43,7 +43,7 @@ module.exports = angular.module('spinnaker.serverGroup.configure.kubernetes.conf
       }
 
       return $q.all({
-        accounts: accountService.listAccounts('kubernetes'),
+        accounts: accountService.listAccounts('kubernetes', 'v1'),
         loadBalancers: loadBalancerReader.listLoadBalancers('kubernetes'),
         allImages: imagesPromise
       }).then(function(backingData) {
