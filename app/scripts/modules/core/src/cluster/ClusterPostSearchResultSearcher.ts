@@ -14,38 +14,26 @@ import { IPostSearchResultSearcher } from 'core/search/searchResult/PostSearchRe
 
 export class ClusterPostSearchResultSearcher implements IPostSearchResultSearcher<IServerGroupSearchResult> {
 
-  private static TYPE = 'clusters';
-
   constructor(private $q: IQService, private $state: StateService) {}
 
   public getPostSearchResults(inputs: IServerGroupSearchResult[] = []): IPromise<ISearchResultSet[]> {
+    const type = 'clusters';
 
-    const clusters: IClusterSearchResult[] = uniqBy(inputs.map((serverGroup: IServerGroupSearchResult) => {
-      const { account, application, cluster, detail, region, stack } = serverGroup;
-      return {
-        account,
-        application,
-        cluster,
-        displayName: cluster,
-        href: urlBuilderRegistry.getBuilder(ClusterPostSearchResultSearcher.TYPE).build({
-          account,
-          application,
-          cluster,
-          stack,
-          detail,
-          region,
-          type: ClusterPostSearchResultSearcher.TYPE
-        }, this.$state),
-        provider: serverGroup.provider,
-        stack,
-        type: ClusterPostSearchResultSearcher.TYPE
-      }
-    }), 'cluster');
+    // create clusters based on the server group search results
+    const serverGroups = inputs.map((serverGroup: IServerGroupSearchResult) => {
+      const { account, application, cluster, provider, stack } = serverGroup;
+      const urlBuilder = urlBuilderRegistry.getBuilder(type);
+      const href = urlBuilder.build(Object.assign({ type }, serverGroup), this.$state);
 
-    const formatter: ISearchResultFormatter = searchResultFormatterRegistry.get(ClusterPostSearchResultSearcher.TYPE);
+      return { account, application, cluster, displayName: cluster, href, provider, stack, type };
+    });
+
+    const clusters: IClusterSearchResult[] = uniqBy(serverGroups, sg => `${sg.account}-${sg.cluster}`);
+    const formatter: ISearchResultFormatter = searchResultFormatterRegistry.get(type);
+
     return this.$q.when([{
-      id: ClusterPostSearchResultSearcher.TYPE,
-      category: ClusterPostSearchResultSearcher.TYPE,
+      id: type,
+      category: type,
       icon: formatter.icon,
       iconClass: '',
       order: formatter.order,
