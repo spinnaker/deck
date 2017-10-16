@@ -34,7 +34,7 @@ export class ExecutionBuildNumber extends React.Component<IExecutionBuildNumberP
   public render() {
     return (
       <span>
-        { this.props.execution.trigger.parentPipelineId && (
+        { this.props.execution.trigger && this.props.execution.trigger.parentPipelineId && (
           <a
             className="execution-build-number clickable"
             onClick={this.handleParentPipelineClick}

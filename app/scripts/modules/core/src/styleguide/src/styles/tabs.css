@@ -54,6 +54,7 @@ ul.tabs-basic {
   background-color: inherit;
   width: 100%;
   border-bottom: 1px solid var(--color-accent-g3);
+  list-style: none;
 }
 
 ul.tabs-basic > li, ul.tabs-basic > li * {

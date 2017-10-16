@@ -6,6 +6,10 @@ import {PIPELINE_TEMPLATE_SERVICE} from './templates/pipelineTemplate.service';
 
 const angular = require('angular');
 
+function containsJinja(source) {
+  return source && (source.includes('{{') || source.includes('{%'));
+}
+
 module.exports = angular.module('spinnaker.core.pipeline.config.controller', [
   require('@uirouter/angularjs').default,
   PIPELINE_TEMPLATE_SERVICE,
@@ -21,8 +25,9 @@ module.exports = angular.module('spinnaker.core.pipeline.config.controller', [
       this.pipelineConfig = _.find(app.pipelineConfigs.data, { id: $stateParams.pipelineId });
       if (this.pipelineConfig && this.pipelineConfig.type === 'templatedPipeline') {
         this.isTemplatedPipeline = true;
+        this.hasDynamicSource = containsJinja(this.pipelineConfig.config.pipeline.template.source);
         if (!this.pipelineConfig.isNew) {
-          return pipelineTemplateService.getPipelinePlan(this.pipelineConfig)
+          return pipelineTemplateService.getPipelinePlan(this.pipelineConfig, $stateParams.executionId)
             .then(plan => this.pipelinePlan = plan)
             .catch(() => this.pipelineConfig.isNew = true);
         }

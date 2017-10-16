@@ -35,7 +35,27 @@
     <div class="band band-info" ng-if="isTemplatedPipeline && !pipeline.locked">
       <span class="glyphicon glyphicon small glyphicon-lock"></span> Manual edits are not allowed on templated pipelines
     </div>
-
+    <div class="band band-info" ng-if="hasDynamicSource && pipelineExecutions && pipelineExecutions.length">
+      <span class="glyphicon glyphicon small glyphicon-wrench"></span> This template has a dynamic source. The
+      configuration is currently rendered using
+      <span ng-if="pipelineExecutions.length > 1" class="dropdown" uib-dropdown>
+        &nbsp;&nbsp;<button type="button" class="btn btn-xs btn-default dropdown-toggle" uib-dropdown-toggle>
+          {{ renderablePipeline.trigger.parentPipelineName || "Build #" + renderablePipeline.trigger.buildNumber }} <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu" uib-dropdown-menu>
+          <li ng-repeat="p in pipelineExecutions" ng-class="{disabled: p.id == renderablePipeline.executionId}">
+            <a title="{{p.startTime | date:'medium'}}" ng-click="(p.id == renderablePipeline.executionId) ? false : changePipelineExecution(p.id); true;">{{ p.trigger.parentPipelineName || "Build #" + p.trigger.buildNumber }}
+              <span class="text-muted small">({{p.startTime | relativeTime}})</span>
+              <span class="glyphicon small glyphicon-ok" ng-if="p.id == renderablePipeline.executionId"></span></a>
+          </li>
+        </ul>
+      </span>
+      <span ng-if="pipelineExecutions.length === 1">{{ renderablePipeline.trigger.parentPipelineName || "Build #" + renderablePipeline.trigger.buildNumber }}</span>
+    </div>
+    <div class="band band-warning" ng-if="pipelineExecutions && !pipelineExecutions.length">
+      <span class="glyphicon glyphicon small glyphicon-alert"></span> This template has a dynamic source. The
+      configuration cannot be rendered before the pipeline has executed at least once.
+    </div>
     <div class="config-heading-body">
       <div class="pipeline-graph-container pipeline-config-graph">
         <pipeline-graph view-state="viewState"

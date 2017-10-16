@@ -24,13 +24,14 @@ module.exports = angular.module('spinnaker.core.pipeline.config.pipelineConfigur
         application: '=',
         plan: '<',
         isTemplatedPipeline: '<',
+        hasDynamicSource: '<',
       },
       controller: 'PipelineConfigurerCtrl as pipelineConfigurerCtrl',
       templateUrl: require('./pipelineConfigurer.html'),
     };
   })
   .controller('PipelineConfigurerCtrl', function($scope, $uibModal, $timeout, $window, $q,
-                                                 pipelineConfigValidator, pipelineTemplateService,
+                                                 pipelineConfigValidator, pipelineTemplateService, executionService,
                                                  pipelineConfigService, viewStateCache, overrideRegistry, $location) {
     // For standard pipelines, a 'renderablePipeline' is just the pipeline config.
     // For templated pipelines, a 'renderablePipeline' is the pipeline template plan, and '$scope.pipeline' is the template config.
@@ -173,7 +174,8 @@ module.exports = angular.module('spinnaker.core.pipeline.config.pipelineConfigur
         controllerAs: '$ctrl',
         size: 'lg modal-fullscreen',
         resolve: {
-          pipeline: () => $scope.renderablePipeline,
+          pipeline: () => $scope.pipeline,
+          plan: () => $scope.plan,
         }
       }).result.then(() => {
         $scope.$broadcast('pipeline-json-edited');
@@ -331,6 +333,7 @@ module.exports = angular.module('spinnaker.core.pipeline.config.pipelineConfigur
           pipelineTemplateConfig: () => _.cloneDeep($scope.pipeline),
           isNew: () => $scope.pipeline.isNew,
           pipelineId: () => $scope.pipeline.id,
+          executionId: () => $scope.renderablePipeline.executionId,
         }
       }).result.then(({plan, config}) => {
         $scope.pipeline = config;
@@ -363,6 +366,19 @@ module.exports = angular.module('spinnaker.core.pipeline.config.pipelineConfigur
       msg += '.';
 
       return msg;
+    };
+
+    this.getPipelineExecutions = () => {
+      executionService.getExecutionsForConfigIds($scope.pipeline.application, $scope.pipeline.id, 5)
+        .then(executions => {
+          $scope.pipelineExecutions = executions;
+        })
+        .catch(() => $scope.pipelineExecutions = []);
+      return $scope.pipelineExecutions;
+    };
+
+    $scope.changePipelineExecution = executionId => {
+      $location.search('executionId', executionId);
     };
 
     this.revertPipelineChanges = () => {
@@ -445,7 +461,11 @@ module.exports = angular.module('spinnaker.core.pipeline.config.pipelineConfigur
       $window.onbeforeunload = undefined;
     });
 
-    if ($scope.isTemplatedPipeline && $scope.pipeline.isNew) {
+    if ($scope.isTemplatedPipeline && $scope.pipeline.isNew && !$scope.hasDynamicSource) {
       this.configureTemplate();
+    }
+
+    if ($scope.hasDynamicSource) {
+      this.getPipelineExecutions();
     }
   });
