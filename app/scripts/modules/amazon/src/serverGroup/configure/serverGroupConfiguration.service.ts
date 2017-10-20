@@ -9,6 +9,7 @@ import {
   CacheInitializerService,
   IAccountDetails,
   IDeploymentStrategy,
+  IMoniker,
   IRegion,
   ISecurityGroup,
   IServerGroupCommand,
@@ -19,6 +20,7 @@ import {
   ISubnet,
   LOAD_BALANCER_READ_SERVICE,
   LoadBalancerReader,
+  NamingService,
   SECURITY_GROUP_READER,
   SecurityGroupReader,
   SERVER_GROUP_COMMAND_REGISTRY_PROVIDER,
@@ -66,6 +68,7 @@ export interface IAmazonServerGroupCommand extends IServerGroupCommand {
   getBlockDeviceMappingsSource: () => IBlockDeviceMappingSource;
   selectBlockDeviceMappingsSource: (selection: string) => void;
   usePreferredZonesChanged: () => IAmazonServerGroupCommandResult;
+  clusterChanged: () => void;
 }
 
 export class AwsServerGroupConfigurationService {
@@ -82,6 +85,7 @@ export class AwsServerGroupConfigurationService {
               private subnetReader: SubnetReader,
               private keyPairsReader: KeyPairsReader,
               private loadBalancerReader: LoadBalancerReader,
+              private namingService: NamingService,
               private serverGroupCommandRegistry: ServerGroupCommandRegistry,
               private autoScalingProcessService: any) {
     'ngInject';
@@ -565,6 +569,17 @@ export class AwsServerGroupConfigurationService {
         }
 
         return result;
+      };
+
+      command.clusterChanged = (): void => {
+        const appName = command.application;
+        const moniker: IMoniker = {
+          app: appName,
+          stack: command.stack,
+          detail: command.freeFormDetails,
+          cluster: this.namingService.getClusterName(appName, command.stack, command.freeFormDetails)
+        };
+        command.moniker = moniker;
       };
 
       command.credentialsChanged = (): IServerGroupCommandResult => {

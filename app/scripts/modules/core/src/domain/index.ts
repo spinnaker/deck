@@ -1,5 +1,8 @@
 export * from '../search/searchResult/model/IApplicationSearchResult';
 
+export * from './IArtifact'
+export * from './IArtifactKindConfig'
+
 export * from './IBuild';
 export * from './IBuildDiffInfo';
 export * from './IBuildInfo';
@@ -40,7 +43,6 @@ export * from './IServerGroup';
 export * from './IStage';
 export * from './IStageContext';
 export * from './IStageOrTriggerTypeConfig';
-export * from './IStageStep';
 export * from './IStageTypeConfig';
 export * from './IStrategy'
 export * from './ISubnet';
