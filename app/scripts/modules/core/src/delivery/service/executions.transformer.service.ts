@@ -392,7 +392,9 @@ export class ExecutionsTransformerService {
     }, [] as IExecutionStageSummary[]);
 
     stageSummaries.forEach((summary) => {
-      if (summary.type === 'group' && summary.groupStages.length > 1) {
+      if (summary.type === 'group' && summary.groupStages.length === 1 && !summary.masterStage) {
+        summary.masterStage = summary.groupStages[0].masterStage;
+      } else if (summary.type === 'group' && summary.groupStages.length > 1) {
         const subComments: string[] = [];
         // Find the earliest startTime and latest endTime
         summary.groupStages.forEach((subStage) => {
