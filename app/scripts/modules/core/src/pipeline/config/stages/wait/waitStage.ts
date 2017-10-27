@@ -2,7 +2,7 @@ import { module } from 'angular';
 
 import { IStage } from 'core/domain';
 import { PIPELINE_CONFIG_PROVIDER, PipelineConfigProvider } from 'core/pipeline/config/pipelineConfigProvider';
-import { ExecutionDetailsTasks } from 'core/pipeline/config/stages/core';
+import { ExecutionDetailsTasks } from '../core';
 
 import { WaitExecutionDetails } from './WaitExecutionDetails';
 import { WaitExecutionLabel } from './WaitExecutionLabel';
