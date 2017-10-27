@@ -82,6 +82,34 @@
                    ng-model="envVar.envSource.fieldRef.fieldPath">
           </div>
         </div>
+        <div class="form-group" ng-switch-when="Resource Field Ref">
+          <div class="col-md-3 sm-label-right">
+            Container Name
+          </div>
+          <div class="col-md-3">
+            <select class="form-control input-sm"
+                    ng-model="envVar.envSource.resourceFieldRef.containerName"
+                    ng-options="name for name in $ctrl.containerNames"></select>
+          </div>
+          <div class="col-md-12"/>
+          <div class="col-md-3 sm-label-right">
+            Resource
+          </div>
+          <div class="col-md-3">
+            <select class="form-control input-sm"
+                    ng-model="envVar.envSource.resourceFieldRef.resource"
+                    ng-options="resource for resource in $ctrl.resourceRefFieldResourceOptions"></select>
+          </div>
+          <div class="col-md-12"/>
+          <div class="col-md-3 sm-label-right">
+            Divisor
+          </div>
+          <div class="col-md-3">
+            <select class="form-control input-sm"
+                    ng-model="envVar.envSource.resourceFieldRef.divisor"
+                    ng-options="resource for resource in $ctrl.resourceRefFieldDivisorOptions"></select>
+          </div>
+        </div>
       </div>
     </td>
   </tr>
