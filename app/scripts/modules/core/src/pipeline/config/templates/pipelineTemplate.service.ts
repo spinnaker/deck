@@ -80,7 +80,7 @@ export class PipelineTemplateService {
   }
 
   public getPipelineTemplateFromSourceUrl(source: string, executionId?: String, pipelineConfigId?: string): IPromise<IPipelineTemplate> {
-    return this.API.one('pipelineTemplates').one('resolve').withParams({ source: source, executionId: executionId, pipelineConfigId: pipelineConfigId }).get()
+    return this.API.one('pipelineTemplates').one('resolve').withParams({ source, executionId, pipelineConfigId }).get()
       .then((template: IPipelineTemplate) => {
         template.selfLink = source;
         return template;
@@ -88,7 +88,7 @@ export class PipelineTemplateService {
   }
 
   public getPipelinePlan(config: IPipelineTemplateConfig, executionId?: String): IPromise<IPipeline> {
-    return this.API.one('pipelines').one('start').post(Object.assign({}, config, { plan: true, executionId: executionId }));
+    return this.API.one('pipelines').one('start').post(Object.assign({}, config, { plan: true, executionId }));
   }
 
   public getPipelineTemplatesByScope(scope: string): IPromise<IPipelineTemplate[]> {

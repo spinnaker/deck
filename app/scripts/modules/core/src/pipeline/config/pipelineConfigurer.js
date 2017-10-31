@@ -374,11 +374,6 @@ module.exports = angular.module('spinnaker.core.pipeline.config.pipelineConfigur
           $scope.pipelineExecutions = executions;
         })
         .catch(() => $scope.pipelineExecutions = []);
-      return $scope.pipelineExecutions;
-    };
-
-    $scope.changePipelineExecution = executionId => {
-      $location.search('executionId', executionId);
     };
 
     this.revertPipelineChanges = () => {

@@ -35,7 +35,7 @@
     <div class="band band-info" ng-if="isTemplatedPipeline && !pipeline.locked">
       <span class="glyphicon glyphicon small glyphicon-lock"></span> Manual edits are not allowed on templated pipelines
     </div>
-    <div class="band band-info" ng-if="hasDynamicSource && pipelineExecutions && pipelineExecutions.length">
+    <div class="band band-info" ng-if="hasDynamicSource && pipelineExecutions.length">
       <span class="glyphicon glyphicon small glyphicon-wrench"></span> This template has a dynamic source. The
       configuration is currently rendered using
       <span ng-if="pipelineExecutions.length > 1" class="dropdown" uib-dropdown>
@@ -44,9 +44,10 @@
         </button>
         <ul class="dropdown-menu" role="menu" uib-dropdown-menu>
           <li ng-repeat="p in pipelineExecutions" ng-class="{disabled: p.id == renderablePipeline.executionId}">
-            <a title="{{p.startTime | date:'medium'}}" ng-click="(p.id == renderablePipeline.executionId) ? false : changePipelineExecution(p.id); true;">{{ p.trigger.parentPipelineName || "Build #" + p.trigger.buildNumber }}
+            <a title="{{p.startTime | date:'medium'}}" ui-sref="{ executionId: p.id }">{{ p.trigger.parentPipelineName || "Build #" + p.trigger.buildNumber }}
               <span class="text-muted small">({{p.startTime | relativeTime}})</span>
-              <span class="glyphicon small glyphicon-ok" ng-if="p.id == renderablePipeline.executionId"></span></a>
+              <span class="glyphicon small glyphicon-ok" ng-if="p.id == renderablePipeline.executionId"></span>
+            </a>
           </li>
         </ul>
       </span>
