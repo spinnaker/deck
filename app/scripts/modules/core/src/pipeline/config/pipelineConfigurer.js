@@ -4,11 +4,13 @@ import * as _ from 'lodash';
 
 const angular = require('angular');
 
+import { react2angular } from 'react2angular';
 import { OVERRIDE_REGISTRY } from 'core/overrideRegistry/override.registry';
 import { PIPELINE_CONFIG_SERVICE } from 'core/pipeline/config/services/pipelineConfig.service';
 import { EditPipelineJsonModalCtrl } from './actions/json/editPipelineJsonModal.controller';
 import { PIPELINE_CONFIG_VALIDATOR } from './validation/pipelineConfig.validator';
 import { PIPELINE_TEMPLATE_SERVICE } from './templates/pipelineTemplate.service';
+import { ExecutionBuildTitle } from "../../delivery/executionBuild/ExecutionBuildTitle";
 
 module.exports = angular.module('spinnaker.core.pipeline.config.pipelineConfigurer', [
   OVERRIDE_REGISTRY,
@@ -25,11 +27,13 @@ module.exports = angular.module('spinnaker.core.pipeline.config.pipelineConfigur
         plan: '<',
         isTemplatedPipeline: '<',
         hasDynamicSource: '<',
+        templateError: '<',
       },
       controller: 'PipelineConfigurerCtrl as pipelineConfigurerCtrl',
       templateUrl: require('./pipelineConfigurer.html'),
     };
   })
+  .component('executionBuildTitle', react2angular(ExecutionBuildTitle, ['execution', 'defaultToTimestamp']))
   .controller('PipelineConfigurerCtrl', function($scope, $uibModal, $timeout, $window, $q,
                                                  pipelineConfigValidator, pipelineTemplateService, executionService,
                                                  pipelineConfigService, viewStateCache, overrideRegistry, $location) {
@@ -372,6 +376,13 @@ module.exports = angular.module('spinnaker.core.pipeline.config.pipelineConfigur
       executionService.getExecutionsForConfigIds($scope.pipeline.application, $scope.pipeline.id, 5)
         .then(executions => {
           $scope.pipelineExecutions = executions;
+          if ($scope.plan && $scope.plan.executionId) {
+            $scope.currentExecution = _.find($scope.pipelineExecutions, { id: $scope.plan.executionId });
+          } else if ($location.search().executionId) {
+            $scope.currentExecution = _.find($scope.pipelineExecutions, { id: $location.search().executionId });
+          } else {
+            $scope.currentExecution = $scope.pipelineExecutions[0];
+          }
         })
         .catch(() => $scope.pipelineExecutions = []);
     };
