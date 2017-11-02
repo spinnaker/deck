@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { ExecutionDetailsSection, IExecutionDetailsSectionProps } from 'core/pipeline/config/stages/core';
 import { StageExecutionLogs, StageFailureMessage } from 'core/delivery/details';
-import { ExecutionWindowActions } from 'core/pipeline/config/stages/executionWindows/ExecutionWindowActions';
+import { ExecutionWindowActions } from './ExecutionWindowActions';
 
 export function ExecutionWindowExecutionDetails(props: IExecutionDetailsSectionProps) {
   return (

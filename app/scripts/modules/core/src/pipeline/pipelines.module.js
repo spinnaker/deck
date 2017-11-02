@@ -14,6 +14,7 @@ import { ENABLE_ASG_STAGE } from './config/stages/enableAsg/enableAsgStage';
 import { EXECUTION_WINDOWS_STAGE_MODULE } from './config/stages/executionWindows/executionWindowsStage.module';
 import { FIND_AMI_STAGE } from './config/stages/findAmi/findAmiStage';
 import { GROUP_STAGE_MODULE } from './config/stages/group/groupStage.module';
+import { MANUAL_JUDGMENT_STAGE_MODULE } from './config/stages/manualJudgment/manualJudgmentStage.module';
 import { RESIZE_ASG_STAGE } from './config/stages/resizeAsg/resizeAsgStage';
 import { SCALE_DOWN_CLUSTER_STAGE } from './config/stages/scaleDownCluster/scaleDownClusterStage';
 import { SCRIPT_STAGE_MODULE } from './config/stages/script/scriptStage.module';
@@ -48,7 +49,7 @@ module.exports = angular.module('spinnaker.core.pipeline', [
   FIND_AMI_STAGE,
   require('./config/stages/findImageFromTags/findImageFromTagsStage.module').name,
   require('./config/stages/jenkins/jenkinsStage.module').name,
-  require('./config/stages/manualJudgment/manualJudgmentStage.module').name,
+  MANUAL_JUDGMENT_STAGE_MODULE,
   require('./config/stages/tagImage/tagImageStage.module').name,
   require('./config/stages/pipeline/pipelineStage.module').name,
   RESIZE_ASG_STAGE,
