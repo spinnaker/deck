@@ -11,6 +11,7 @@ import { DESTROY_ASG_STAGE } from './config/stages/destroyAsg/destroyAsgStage';
 import { DISABLE_ASG_STAGE_MODULE } from './config/stages/disableAsg/disableAsgStage.module';
 import { DISABLE_CLUSTER_STAGE } from './config/stages/disableCluster/disableClusterStage';
 import { ENABLE_ASG_STAGE } from './config/stages/enableAsg/enableAsgStage';
+import { EXECUTION_WINDOWS_STAGE_MODULE } from './config/stages/executionWindows/executionWindowsStage.module';
 import { FIND_AMI_STAGE } from './config/stages/findAmi/findAmiStage';
 import { GROUP_STAGE_MODULE } from './config/stages/group/groupStage.module';
 import { RESIZE_ASG_STAGE } from './config/stages/resizeAsg/resizeAsgStage';
@@ -43,7 +44,7 @@ module.exports = angular.module('spinnaker.core.pipeline', [
   DISABLE_ASG_STAGE_MODULE,
   DISABLE_CLUSTER_STAGE,
   ENABLE_ASG_STAGE,
-  require('./config/stages/executionWindows/executionWindowsStage.module').name,
+  EXECUTION_WINDOWS_STAGE_MODULE,
   FIND_AMI_STAGE,
   require('./config/stages/findImageFromTags/findImageFromTagsStage.module').name,
   require('./config/stages/jenkins/jenkinsStage.module').name,
