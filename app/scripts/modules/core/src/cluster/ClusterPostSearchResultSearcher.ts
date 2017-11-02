@@ -4,7 +4,7 @@ import { StateService } from '@uirouter/angularjs';
 
 import { urlBuilderRegistry } from 'core/navigation/urlBuilder.registry';
 import {
-  ISearchResultFormatter,
+  ISearchResultType,
   searchResultFormatterRegistry
 } from 'core/search/searchResult/searchResultFormatter.registry';
 import { ISearchResultSet } from 'core/search/infrastructure/infrastructureSearch.service';
@@ -29,7 +29,7 @@ export class ClusterPostSearchResultSearcher implements IPostSearchResultSearche
     });
 
     const clusters: IClusterSearchResult[] = uniqBy(serverGroups, sg => `${sg.account}-${sg.cluster}`);
-    const formatter: ISearchResultFormatter = searchResultFormatterRegistry.get(type);
+    const formatter: ISearchResultType = searchResultFormatterRegistry.get(type);
 
     return this.$q.when([{
       id: type,

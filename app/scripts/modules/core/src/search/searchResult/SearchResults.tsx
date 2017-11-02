@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { BindAll } from 'lodash-decorators';
 
-import { ISearchResultFormatter, searchResultFormatterRegistry } from './searchResultFormatter.registry';
+import { ISearchResultType, searchResultFormatterRegistry } from './searchResultFormatter.registry';
 import { SearchResultGrid } from './SearchResultGrid';
 import { SearchResultGroups } from './SearchResultGroups';
 import { ISearchResultGroup } from './SearchResultGroup';
@@ -30,7 +30,7 @@ export interface ISearchResultsProps {
 export interface ISearchResultsState {
   active: ISearchResultGroup;
   searchResultGroups: ISearchResultGroup[];
-  formatter: ISearchResultFormatter;
+  formatter: ISearchResultType;
 }
 
 @BindAll()
@@ -58,7 +58,7 @@ export class SearchResults extends React.Component<ISearchResultsProps, ISearchR
     return searchResultFormatterRegistry.getSearchCategories()
       .sort((a, b) => searchResultFormatterRegistry.get(a).order - searchResultFormatterRegistry.get(b).order)
       .map((category: string) => {
-        const formatter: ISearchResultFormatter = searchResultFormatterRegistry.get(category);
+        const formatter: ISearchResultType = searchResultFormatterRegistry.get(category);
         return {
           category: category,
           count: 0,

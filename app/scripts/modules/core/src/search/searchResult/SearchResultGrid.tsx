@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { BindAll } from 'lodash-decorators';
 
-import { ISearchResultFormatter } from './searchResultFormatter.registry';
+import { ISearchResultType } from './searchResultFormatter.registry';
 import { SearchStatus } from './SearchResults';
 
 export interface ISearchResultGridProps {
   searchStatus: SearchStatus;
-  searchResultFormatter: ISearchResultFormatter;
+  searchResultFormatter: ISearchResultType;
   searchResults: any[];
 }
 

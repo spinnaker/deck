@@ -2,7 +2,7 @@ import { IPromise } from 'angular';
 
 import { $q } from 'ngimport';
 
-import { IResultRenderer, ISearchResult, ISearchResultFormatter, searchResultFormatterRegistry } from '../search';
+import { ISearchResult, ISearchResultType, searchResultFormatterRegistry } from '../search';
 import { SecurityGroupDisplayRenderer } from './SecurityGroupDisplayRenderer';
 
 export interface ISecurityGroupSearchResult extends ISearchResult {
@@ -11,16 +11,15 @@ export interface ISecurityGroupSearchResult extends ISearchResult {
   application: string;
 }
 
-export class SecurityGroupSearchResultFormatter implements ISearchResultFormatter {
+export class SecurityGroupSearchResultFormatter implements ISearchResultType {
+  public id = 'securityGroups';
+  public displayName = 'Security Groups';
+  public order = 6;
+  public icon = 'exchange';
+  public displayRenderer = SecurityGroupDisplayRenderer.renderer();
 
-  public get displayName() { return 'Security Groups'; }
-  public get order() { return 6; }
-  public get icon() { return 'exchange'; }
   public displayFormatter(searchResult: ISecurityGroupSearchResult): IPromise<string> {
     return $q.when(searchResult.name + ' (' + searchResult.region + ')');
-  }
-  public get displayRenderer(): IResultRenderer {
-    return SecurityGroupDisplayRenderer.renderer()
   }
 }
 

@@ -6,7 +6,7 @@ import { ProviderServiceDelegate, PROVIDER_SERVICE_DELEGATE } from 'core/cloudPr
 import { getFallbackResults, ISearchResult, ISearchResults, SearchService, SEARCH_SERVICE } from '../search.service';
 import {
   IResultDisplayFormatter,
-  ISearchResultFormatter,
+  ISearchResultType,
   searchResultFormatterRegistry
 } from '../searchResult/searchResultFormatter.registry';
 import { externalSearchRegistry } from '../externalSearch.registry';
@@ -78,7 +78,7 @@ export class InfrastructureSearcher {
     return this.deferred.promise;
   }
 
-  public getCategoryConfig(category: string): ISearchResultFormatter {
+  public getCategoryConfig(category: string): ISearchResultType {
     return searchResultFormatterRegistry.get(category);
   }
 

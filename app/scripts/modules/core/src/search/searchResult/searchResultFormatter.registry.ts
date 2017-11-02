@@ -10,9 +10,10 @@ export interface IResultRenderer {
   render: (items: any[]) => JSX.Element;
 }
 
-export interface ISearchResultFormatter {
+export interface ISearchResultType {
+  id: string;
+  displayName: string; // Name on tab
   displayFormatter: IResultDisplayFormatter;
-  displayName: string;
   displayRenderer?: IResultRenderer;
   hideIfEmpty?: boolean;
   icon?: string;
@@ -21,14 +22,14 @@ export interface ISearchResultFormatter {
   requiredSearchFields?: string[];
 }
 
-export class SearchResultFormatterRegistry {
-  private formatters: {[key: string]: ISearchResultFormatter} = {};
+export class SearchResultTypeRegistry {
+  private formatters: {[key: string]: ISearchResultType} = {};
 
-  public register(type: string, formatter: ISearchResultFormatter): void {
+  public register(type: string, formatter: ISearchResultType): void {
     this.formatters[type] = formatter;
   }
 
-  public get(type: string): ISearchResultFormatter {
+  public get(type: string): ISearchResultType {
     return this.formatters[type];
   }
 
@@ -37,4 +38,4 @@ export class SearchResultFormatterRegistry {
   }
 }
 
-export const searchResultFormatterRegistry = new SearchResultFormatterRegistry();
+export const searchResultFormatterRegistry = new SearchResultTypeRegistry();
