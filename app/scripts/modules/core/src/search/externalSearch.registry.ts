@@ -33,7 +33,7 @@ export class ExternalSearchRegistry {
   private registry: {[key: string]: IExternalSearchConfig} = {};
 
   public register(key: string, searchConfig: IExternalSearchConfig) {
-    searchResultFormatterRegistry.register(key, searchConfig.formatter);
+    searchResultFormatterRegistry.register(searchConfig.formatter);
     urlBuilderRegistry.register(key, searchConfig.urlBuilder);
     this.registry[key] = searchConfig;
   }

@@ -20,4 +20,4 @@ export class ClusterSearchResultFormatter implements ISearchResultType {
   }
 }
 
-searchResultFormatterRegistry.register('clusters', new ClusterSearchResultFormatter());
+searchResultFormatterRegistry.register(new ClusterSearchResultFormatter());

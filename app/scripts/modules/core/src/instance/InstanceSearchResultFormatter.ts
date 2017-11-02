@@ -25,4 +25,4 @@ export class InstanceSearchResultFormatter implements ISearchResultType {
   }
 }
 
-searchResultFormatterRegistry.register('instances', new InstanceSearchResultFormatter());
+searchResultFormatterRegistry.register(new InstanceSearchResultFormatter());

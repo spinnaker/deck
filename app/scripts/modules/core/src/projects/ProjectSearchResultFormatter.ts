@@ -27,4 +27,4 @@ export class ProjectSearchResultFormatter implements ISearchResultType {
 
 }
 
-searchResultFormatterRegistry.register('projects', new ProjectSearchResultFormatter());
+searchResultFormatterRegistry.register(new ProjectSearchResultFormatter());

@@ -25,8 +25,8 @@ export interface ISearchResultType {
 export class SearchResultTypeRegistry {
   private formatters: {[key: string]: ISearchResultType} = {};
 
-  public register(type: string, formatter: ISearchResultType): void {
-    this.formatters[type] = formatter;
+  public register(formatter: ISearchResultType): void {
+    this.formatters[formatter.id] = formatter;
   }
 
   public get(type: string): ISearchResultType {

@@ -23,4 +23,4 @@ export class LoadBalancerSearchResultFormatter implements ISearchResultType {
   }
 }
 
-searchResultFormatterRegistry.register('loadBalancers', new LoadBalancerSearchResultFormatter());
+searchResultFormatterRegistry.register(new LoadBalancerSearchResultFormatter());

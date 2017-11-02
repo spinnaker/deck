@@ -21,4 +21,4 @@ export class ServerGroupSearchResultFormatter implements ISearchResultType {
   }
 }
 
-searchResultFormatterRegistry.register('serverGroups', new ServerGroupSearchResultFormatter());
+searchResultFormatterRegistry.register(new ServerGroupSearchResultFormatter());

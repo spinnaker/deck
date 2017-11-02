@@ -23,4 +23,4 @@ export class SecurityGroupSearchResultFormatter implements ISearchResultType {
   }
 }
 
-searchResultFormatterRegistry.register('securityGroups', new SecurityGroupSearchResultFormatter());
+searchResultFormatterRegistry.register(new SecurityGroupSearchResultFormatter());

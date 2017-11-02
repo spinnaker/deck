@@ -19,4 +19,4 @@ export class ApplicationSearchResultFormatter implements ISearchResultType {
   }
 }
 
-searchResultFormatterRegistry.register('applications', new ApplicationSearchResultFormatter());
+searchResultFormatterRegistry.register(new ApplicationSearchResultFormatter());
