@@ -44,7 +44,7 @@
         </button>
         <ul class="dropdown-menu" role="menu" uib-dropdown-menu>
           <li ng-repeat="p in pipelineExecutions" ng-class="{disabled: p.id == currentExecution.id}">
-            <a title="{{p.startTime | date:'medium'}}" ui-sref="{ executionId: p.id }"><execution-build-title execution="p" default-to-timestamp="true" ></execution-build-title>
+            <a title="{{p.startTime | timestamp}}" ui-sref="{ executionId: p.id }"><execution-build-title execution="p" default-to-timestamp="true" ></execution-build-title>
               <span class="text-muted small">({{p.startTime | relativeTime}})</span>
               <span class="glyphicon small glyphicon-ok" ng-if="p.id == currentExecution.id"></span>
             </a>

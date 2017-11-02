@@ -18,7 +18,11 @@
 import * as React from 'react';
 import { BindAll } from 'lodash-decorators';
 
+import { module } from 'angular';
+import { react2angular } from 'react2angular';
+
 import { IExecutionBuildLinkProps } from './ExecutionBuildLink';
+import { timestamp } from 'core/utils'
 import { ReactInjector } from 'core/reactShims';
 
 export interface IExecutionBuildTitleProps extends IExecutionBuildLinkProps {
@@ -33,8 +37,8 @@ export class ExecutionBuildTitle extends React.Component<IExecutionBuildTitlePro
   };
 
   constructor(props: IExecutionBuildTitleProps) {
-    const { executionsTransformer } = ReactInjector;
     super(props);
+    const { executionsTransformer } = ReactInjector;
     if (!props.execution.buildInfo) {
       executionsTransformer.addBuildInfo(props.execution);
     }
@@ -50,9 +54,14 @@ export class ExecutionBuildTitle extends React.Component<IExecutionBuildTitlePro
           <span><span className="build-label">Build</span> #{this.props.execution.buildInfo.number}</span>
         }
         { this.props.defaultToTimestamp && !this.props.execution.trigger.parentPipelineName && !this.props.execution.buildInfo &&
-          <span>{new Date(this.props.execution.startTime).toLocaleString()}</span>
+          <span>{timestamp(this.props.execution.startTime)}</span>
         }
       </span>
     );
   }
 }
+
+export const EXECUTION_BUILD_TITLE = 'spinnaker.core.delivery.executionbuild.executionbuildtitle';
+const ngmodule = module(EXECUTION_BUILD_TITLE, []);
+
+ngmodule.component('executionBuildTitle', react2angular(ExecutionBuildTitle, ['execution', 'defaultToTimestamp']));
