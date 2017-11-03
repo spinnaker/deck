@@ -15,7 +15,7 @@ export interface IExternalSearchConfig {
   /**
    * Provides the display text of the search entry. Can include HTML
    */
-  formatter: ISearchResultType;
+  searchResultType: ISearchResultType;
 
   /**
    * Method to fetch search results
@@ -32,10 +32,11 @@ export interface IExternalSearchConfig {
 export class ExternalSearchRegistry {
   private registry: {[key: string]: IExternalSearchConfig} = {};
 
-  public register(key: string, searchConfig: IExternalSearchConfig) {
-    searchResultFormatterRegistry.register(searchConfig.formatter);
-    urlBuilderRegistry.register(key, searchConfig.urlBuilder);
-    this.registry[key] = searchConfig;
+  public register(searchConfig: IExternalSearchConfig) {
+    const type = searchConfig.searchResultType;
+    searchResultFormatterRegistry.register(type);
+    urlBuilderRegistry.register(type.id, searchConfig.urlBuilder);
+    this.registry[type.id] = searchConfig;
   }
 
   public search(query: string): IPromise<ISearchResult[]> {

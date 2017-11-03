@@ -2,7 +2,7 @@ import { IPromise } from 'angular';
 
 import { $q } from 'ngimport';
 
-import { ISearchResult, ISearchResultType, searchResultFormatterRegistry } from '../search';
+import { ISearchResult, searchResultFormatterRegistry } from '../search';
 import { SecurityGroupDisplayRenderer } from './SecurityGroupDisplayRenderer';
 
 export interface ISecurityGroupSearchResult extends ISearchResult {
@@ -11,16 +11,15 @@ export interface ISecurityGroupSearchResult extends ISearchResult {
   application: string;
 }
 
-export class SecurityGroupSearchResultFormatter implements ISearchResultType {
-  public id = 'securityGroups';
-  public displayName = 'Security Groups';
-  public order = 6;
-  public icon = 'exchange';
-  public displayRenderer = SecurityGroupDisplayRenderer.renderer();
+searchResultFormatterRegistry.register({
+    id: 'securityGroups',
+    displayName: 'Security Groups',
+    order: 6,
+    icon: 'exchange',
+    displayRenderer: SecurityGroupDisplayRenderer.renderer(),
 
-  public displayFormatter(searchResult: ISecurityGroupSearchResult): IPromise<string> {
-    return $q.when(searchResult.name + ' (' + searchResult.region + ')');
+    displayFormatter(searchResult: ISecurityGroupSearchResult): IPromise<string> {
+      return $q.when(searchResult.name + ' (' + searchResult.region + ')');
+    }
   }
-}
-
-searchResultFormatterRegistry.register(new SecurityGroupSearchResultFormatter());
+);

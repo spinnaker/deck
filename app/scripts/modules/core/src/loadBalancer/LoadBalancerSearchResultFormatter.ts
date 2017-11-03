@@ -1,7 +1,7 @@
 import { IPromise } from 'angular';
 import { $q } from 'ngimport';
 
-import { ISearchResult, ISearchResultType, searchResultFormatterRegistry } from '../search';
+import { ISearchResult, searchResultFormatterRegistry } from '../search';
 import { LoadBalancerDisplayRenderer } from './LoadBalancerDisplayRenderer';
 
 export interface ILoadBalancerSearchResult extends ISearchResult {
@@ -10,17 +10,15 @@ export interface ILoadBalancerSearchResult extends ISearchResult {
   region: string;
 }
 
-export class LoadBalancerSearchResultFormatter implements ISearchResultType {
-  public id = 'loadBalancers';
-  public displayName = 'Load Balancers';
-  public order = 5;
-  public icon = 'sitemap';
-  public displayRenderer = LoadBalancerDisplayRenderer.renderer();
+searchResultFormatterRegistry.register({
+  id: 'loadBalancers',
+  displayName: 'Load Balancers',
+  order: 5,
+  icon: 'sitemap',
+  displayRenderer: LoadBalancerDisplayRenderer.renderer(),
 
-  public displayFormatter(searchResult: ILoadBalancerSearchResult, fromRoute: boolean): IPromise<string> {
+  displayFormatter(searchResult: ILoadBalancerSearchResult, fromRoute: boolean): IPromise<string> {
     const name = fromRoute ? searchResult.name : searchResult.loadBalancer;
     return $q.when(name + ' (' + searchResult.region + ')');
   }
-}
-
-searchResultFormatterRegistry.register(new LoadBalancerSearchResultFormatter());
+});
