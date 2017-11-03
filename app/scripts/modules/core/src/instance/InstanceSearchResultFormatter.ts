@@ -2,7 +2,7 @@ import { IPromise } from 'angular';
 import { $q } from 'ngimport';
 
 import { SearchFilterTypeRegistry } from 'core/search/widgets/SearchFilterTypeRegistry';
-import { ISearchResult, searchResultFormatterRegistry } from '../search';
+import { ISearchResult, searchResultTypeRegistry } from '../search';
 import { InstanceDisplayRenderer } from './InstanceDisplayRenderer';
 
 export interface IInstanceSearchResult extends ISearchResult {
@@ -11,7 +11,7 @@ export interface IInstanceSearchResult extends ISearchResult {
   region: string;
 }
 
-searchResultFormatterRegistry.register({
+searchResultTypeRegistry.register({
   id: 'instances',
   displayName: 'Instances',
   order: 4,

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { BindAll } from 'lodash-decorators';
 
-import { ISearchResultType, searchResultFormatterRegistry } from './searchResultFormatter.registry';
+import { ISearchResultType, searchResultTypeRegistry } from './searchResultFormatter.registry';
 import { SearchResultGrid } from './SearchResultGrid';
 import { SearchResultGroups } from './SearchResultGroups';
 import { ISearchResultGroup } from './SearchResultGroup';
@@ -55,10 +55,10 @@ export class SearchResults extends React.Component<ISearchResultsProps, ISearchR
   }
 
   private buildSearchResultGroups(): ISearchResultGroup[] {
-    return searchResultFormatterRegistry.getSearchCategories()
-      .sort((a, b) => searchResultFormatterRegistry.get(a).order - searchResultFormatterRegistry.get(b).order)
+    return searchResultTypeRegistry.getSearchCategories()
+      .sort((a, b) => searchResultTypeRegistry.get(a).order - searchResultTypeRegistry.get(b).order)
       .map((category: string) => {
-        const formatter: ISearchResultType = searchResultFormatterRegistry.get(category);
+        const formatter: ISearchResultType = searchResultTypeRegistry.get(category);
         return {
           category: category,
           count: 0,
@@ -73,7 +73,7 @@ export class SearchResults extends React.Component<ISearchResultsProps, ISearchR
   private handleClick(group: ISearchResultGroup): void {
     this.setState({
       active: group,
-      formatter: searchResultFormatterRegistry.get(group.category)
+      formatter: searchResultTypeRegistry.get(group.category)
     });
   }
 
@@ -94,7 +94,7 @@ export class SearchResults extends React.Component<ISearchResultsProps, ISearchR
       this.state.searchResultGroups.find((group: ISearchResultGroup) => group.count > 0);
     this.setState({
       active,
-      formatter: active ? searchResultFormatterRegistry.get(active.category) : undefined
+      formatter: active ? searchResultTypeRegistry.get(active.category) : undefined
     });
   }
 

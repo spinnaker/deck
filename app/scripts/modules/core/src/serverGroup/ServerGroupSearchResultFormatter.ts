@@ -1,7 +1,7 @@
 import { IPromise } from 'angular';
 import { $q } from 'ngimport';
 
-import { ISearchResult, searchResultFormatterRegistry } from '../search';
+import { ISearchResult, searchResultTypeRegistry } from '../search';
 import { ServerGroupDisplayRenderer } from './ServerGroupDisplayRenderer';
 
 export interface IServerGroupSearchResult extends ISearchResult {
@@ -9,7 +9,7 @@ export interface IServerGroupSearchResult extends ISearchResult {
   region: string;
 }
 
-searchResultFormatterRegistry.register({
+searchResultTypeRegistry.register({
   id: 'serverGroups',
   displayName: 'Server Groups',
   order: 6,

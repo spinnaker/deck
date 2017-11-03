@@ -3,7 +3,7 @@ import { $q, $log } from 'ngimport';
 
 import { urlBuilderRegistry } from 'core/navigation/urlBuilder.registry';
 import { IUrlBuilder } from 'core/navigation/urlBuilder.service';
-import { searchResultFormatterRegistry } from './searchResult/searchResultFormatter.registry';
+import { searchResultTypeRegistry } from './searchResult/searchResultFormatter.registry';
 import { ISearchResult } from './search.service';
 import { ISearchResultType } from './searchResult/searchResultFormatter.registry';
 
@@ -34,7 +34,7 @@ export class ExternalSearchRegistry {
 
   public register(searchConfig: IExternalSearchConfig) {
     const type = searchConfig.searchResultType;
-    searchResultFormatterRegistry.register(type);
+    searchResultTypeRegistry.register(type);
     urlBuilderRegistry.register(type.id, searchConfig.urlBuilder);
     this.registry[type.id] = searchConfig;
   }

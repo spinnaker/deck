@@ -1,7 +1,7 @@
 import { IPromise } from 'angular';
 import { $q } from 'ngimport';
 
-import { ISearchResult, searchResultFormatterRegistry } from '../search';
+import { ISearchResult, searchResultTypeRegistry } from '../search';
 import { LoadBalancerDisplayRenderer } from './LoadBalancerDisplayRenderer';
 
 export interface ILoadBalancerSearchResult extends ISearchResult {
@@ -10,7 +10,7 @@ export interface ILoadBalancerSearchResult extends ISearchResult {
   region: string;
 }
 
-searchResultFormatterRegistry.register({
+searchResultTypeRegistry.register({
   id: 'loadBalancers',
   displayName: 'Load Balancers',
   order: 5,

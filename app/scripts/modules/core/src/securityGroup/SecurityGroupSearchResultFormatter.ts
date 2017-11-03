@@ -2,7 +2,7 @@ import { IPromise } from 'angular';
 
 import { $q } from 'ngimport';
 
-import { ISearchResult, searchResultFormatterRegistry } from '../search';
+import { ISearchResult, searchResultTypeRegistry } from '../search';
 import { SecurityGroupDisplayRenderer } from './SecurityGroupDisplayRenderer';
 
 export interface ISecurityGroupSearchResult extends ISearchResult {
@@ -11,7 +11,7 @@ export interface ISecurityGroupSearchResult extends ISearchResult {
   application: string;
 }
 
-searchResultFormatterRegistry.register({
+searchResultTypeRegistry.register({
     id: 'securityGroups',
     displayName: 'Security Groups',
     order: 6,

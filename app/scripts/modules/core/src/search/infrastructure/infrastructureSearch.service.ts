@@ -7,7 +7,7 @@ import { getFallbackResults, ISearchResult, ISearchResults, SearchService, SEARC
 import {
   IResultDisplayFormatter,
   ISearchResultType,
-  searchResultFormatterRegistry
+  searchResultTypeRegistry
 } from '../searchResult/searchResultFormatter.registry';
 import { externalSearchRegistry } from '../externalSearch.registry';
 
@@ -36,7 +36,7 @@ export class InfrastructureSearcher {
           return Observable.of(getFallbackResults());
         }
         return Observable.zip(
-          searchService.search({ q: query, type: searchResultFormatterRegistry.getSearchCategories() }),
+          searchService.search({ q: query, type: searchResultTypeRegistry.getSearchCategories() }),
           externalSearchRegistry.search(query),
           (s1, s2) => {
             s1.results = s1.results.concat(s2);
@@ -55,9 +55,9 @@ export class InfrastructureSearcher {
           return categories;
         }, {});
         this.deferred.resolve(Object.keys(categorizedSearchResults)
-          .filter(c => searchResultFormatterRegistry.get(c))
+          .filter(c => searchResultTypeRegistry.get(c))
           .map(category => {
-            const config = searchResultFormatterRegistry.get(category);
+            const config = searchResultTypeRegistry.get(category);
             return {
               id: category,
               category: config.displayName,
@@ -79,7 +79,7 @@ export class InfrastructureSearcher {
   }
 
   public getCategoryConfig(category: string): ISearchResultType {
-    return searchResultFormatterRegistry.get(category);
+    return searchResultTypeRegistry.get(category);
   }
 
   public formatRouteResult(category: string, entry: ISearchResult): IPromise<string> {
@@ -87,7 +87,7 @@ export class InfrastructureSearcher {
   }
 
   private formatResult(category: string, entry: ISearchResult, fromRoute = false): IPromise<string> {
-    const config = searchResultFormatterRegistry.get(category);
+    const config = searchResultTypeRegistry.get(category);
     if (!config) {
       return this.$q.when('');
     }

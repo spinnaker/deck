@@ -1,7 +1,7 @@
 import { IPromise } from 'angular';
 import { $q } from 'ngimport';
 
-import { ISearchResult, searchResultFormatterRegistry } from '../search';
+import { ISearchResult, searchResultTypeRegistry } from '../search';
 import { ProjectDisplayRenderer } from './ProjectDisplayRenderer';
 
 export interface IProjectSearchResult extends ISearchResult {
@@ -10,7 +10,7 @@ export interface IProjectSearchResult extends ISearchResult {
   config?: { applications: string[] }
 }
 
-searchResultFormatterRegistry.register({
+searchResultTypeRegistry.register({
   id: 'projects',
   displayName: 'Projects',
   order: 0,

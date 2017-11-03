@@ -38,4 +38,4 @@ export class SearchResultTypeRegistry {
   }
 }
 
-export const searchResultFormatterRegistry = new SearchResultTypeRegistry();
+export const searchResultTypeRegistry = new SearchResultTypeRegistry();
