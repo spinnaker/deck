@@ -33,8 +33,8 @@ module.exports = angular.module('spinnaker.core.pipeline.config.pipelineConfigur
       templateUrl: require('./pipelineConfigurer.html'),
     };
   })
-  .controller('PipelineConfigurerCtrl', function($scope, $uibModal, $timeout, $window, $q,
-                                                 pipelineConfigValidator, pipelineTemplateService, executionService,
+  .controller('PipelineConfigurerCtrl', function($scope, $uibModal, $timeout, $window, $q, pipelineConfigValidator,
+                                                 pipelineTemplateService, executionService, executionsTransformer,
                                                  pipelineConfigService, viewStateCache, overrideRegistry, $location) {
     // For standard pipelines, a 'renderablePipeline' is just the pipeline config.
     // For templated pipelines, a 'renderablePipeline' is the pipeline template plan, and '$scope.pipeline' is the template config.
@@ -375,6 +375,7 @@ module.exports = angular.module('spinnaker.core.pipeline.config.pipelineConfigur
     this.getPipelineExecutions = () => {
       executionService.getExecutionsForConfigIds($scope.pipeline.application, $scope.pipeline.id, 5)
         .then(executions => {
+          executions.forEach(execution => executionsTransformer.addBuildInfo(execution));
           $scope.pipelineExecutions = executions;
           if ($scope.plan && $scope.plan.executionId) {
             $scope.currentExecution = _.find($scope.pipelineExecutions, { id: $scope.plan.executionId });
