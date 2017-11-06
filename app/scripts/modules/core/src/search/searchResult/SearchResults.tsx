@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { BindAll } from 'lodash-decorators';
 
-import { ISearchResultType, searchResultTypeRegistry } from './searchResultFormatter.registry';
+import { ISearchResultType } from './searchResultFormatter.registry';
 import { SearchResultGrid } from './SearchResultGrid';
 import { SearchResultGroups } from './SearchResultGroups';
 import { ISearchResultGroup } from './SearchResultGroup';
@@ -23,6 +23,7 @@ export interface ISearchResults {
 
 export interface ISearchResultsProps {
   searchStatus: SearchStatus;
+  searchResultTypes: ISearchResultType[];
   searchResultCategories: ISearchResults[];
   searchResultProjects: ISearchResults[];
 }
@@ -30,88 +31,53 @@ export interface ISearchResultsProps {
 export interface ISearchResultsState {
   active: ISearchResultGroup;
   searchResultGroups: ISearchResultGroup[];
-  formatter: ISearchResultType;
 }
 
 @BindAll()
 export class SearchResults extends React.Component<ISearchResultsProps, ISearchResultsState> {
 
-  private EMPTY_RESULT: ISearchResultGroup = Object.freeze({
-    category: '',
-    count: 0,
-    iconClass: '',
-    name: '',
-    order: 0,
-    results: []
-  });
-
   constructor(props: ISearchResultsProps) {
     super(props);
-    this.state = {
-      active: this.EMPTY_RESULT,
-      searchResultGroups: this.buildSearchResultGroups(),
-      formatter: null
-    };
-  }
-
-  private buildSearchResultGroups(): ISearchResultGroup[] {
-    return searchResultTypeRegistry.getSearchCategories()
-      .sort((a, b) => searchResultTypeRegistry.get(a).order - searchResultTypeRegistry.get(b).order)
-      .map((category: string) => {
-        const formatter: ISearchResultType = searchResultTypeRegistry.get(category);
-        return {
-          category: category,
-          count: 0,
-          iconClass: formatter.icon ? `fa fa-${formatter.icon}` : formatter.iconClass,
-          name: formatter.displayName,
-          order: formatter.order,
-          results: []
-        };
-      });
-  }
-
-  private handleClick(group: ISearchResultGroup): void {
-    this.setState({
-      active: group,
-      formatter: searchResultTypeRegistry.get(group.category)
-    });
-  }
-
-  private transformSearchResults(searchResults: ISearchResults[]): void {
-
-    this.state.searchResultGroups.forEach((group: ISearchResultGroup) => {
-      const searchResult: ISearchResults =
-        searchResults.find((result: ISearchResults) => group.category === (result.id || result.category));
-      group.count = searchResult ? searchResult.results.length : 0;
-      group.results = searchResult ? searchResult.results : []
-    });
+    this.state = { active: null, searchResultGroups: this.buildGroups(props) };
   }
 
   public componentWillReceiveProps(newProps: ISearchResultsProps): void {
+    const searchResultGroups: ISearchResultGroup[] = this.buildGroups(newProps);
+    // Update 'active' to first group with any results
+    const firstGroupWithResults: ISearchResultGroup = searchResultGroups.find(group => group.results.length > 0);
+    this.setState({ searchResultGroups, active: firstGroupWithResults });
+  }
 
-    this.transformSearchResults([...newProps.searchResultProjects, ...newProps.searchResultCategories]);
-    const active: ISearchResultGroup =
-      this.state.searchResultGroups.find((group: ISearchResultGroup) => group.count > 0);
-    this.setState({
-      active,
-      formatter: active ? searchResultTypeRegistry.get(active.category) : undefined
+  private handleClick(clickedGroup: ISearchResultGroup): void {
+    this.setState({ active: clickedGroup });
+  }
+
+  private buildGroups(props: ISearchResultsProps): ISearchResultGroup[] {
+    const { searchResultTypes, searchResultProjects, searchResultCategories } = props;
+    const searchResults = [...searchResultProjects, ...searchResultCategories];
+
+    return searchResultTypes.map(type => {
+      const resultForGroup: ISearchResults = searchResults.find(result => (result.id || result.category) === type.id);
+      const results = (resultForGroup ? resultForGroup.results : []);
+      return { type, results };
     });
   }
 
   public render(): React.ReactElement<SearchResults> {
-
     const { searchStatus } = this.props;
-    const { active, formatter, searchResultGroups } = this.state;
+    const { active, searchResultGroups } = this.state;
+
     return (
       <div className="search-results">
         <SearchResultGroups
-          activeSearchResult={active}
           searchResultGroups={searchResultGroups}
+          activeSearchResultGroup={active}
           onClick={this.handleClick}
         />
+
         <SearchResultGrid
           searchStatus={searchStatus}
-          searchResultFormatter={formatter}
+          searchResultFormatter={active && active.type}
           searchResults={active ? active.results : []}
         />
       </div>

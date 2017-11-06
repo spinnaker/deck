@@ -34,7 +34,7 @@ export class SearchResultTypeRegistry {
   }
 
   public getAll(): ISearchResultType[] {
-    return this.formatters.slice();
+    return this.formatters.slice().sort((a, b) => a.order - b.order);
   }
 
   public getSearchCategories(): string[] {

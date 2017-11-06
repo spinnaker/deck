@@ -3,13 +3,10 @@ import * as classNames from 'classnames';
 import { BindAll } from 'lodash-decorators';
 
 import { SearchService } from 'core/search/search.service';
+import { ISearchResultType } from 'core';
 
 export interface ISearchResultGroup {
-  category: string;
-  count: number;
-  iconClass: string;
-  name: string;
-  order: number;
+  type: ISearchResultType;
   results: any[];
 }
 
@@ -28,7 +25,7 @@ export class SearchResultGroup extends React.Component<ISearchResultGroupProps> 
 
   private handleClick(): void {
     const { searchResultGroup, onClick } = this.props;
-    if (searchResultGroup.count > 0) {
+    if (searchResultGroup.results.length > 0) {
       onClick(searchResultGroup);
     }
   }
@@ -45,19 +42,21 @@ export class SearchResultGroup extends React.Component<ISearchResultGroupProps> 
 
   public render(): React.ReactElement<SearchResultGroup> {
     const { isActive, searchResultGroup } = this.props;
-    const { count, iconClass, name } = searchResultGroup;
+    const { type, results } = searchResultGroup;
+    const iconClass = type.icon ? `fa fa-${type.icon}` : type.iconClass;
+
     const className = classNames({
       'search-group': true,
       'search-group--focus': isActive,
       'search-group--blur': !isActive,
-      'faded': count === 0
+      'faded': results.length === 0
     });
 
     return (
       <div className={className} onClick={this.handleClick}>
         <span className={`search-group-icon ${iconClass}`}/>
-        <div className="search-group-name">{name}</div>
-        <div className="badge">{this.getCountLabel(count)}</div>
+        <div className="search-group-name">{type.displayName}</div>
+        <div className="badge">{this.getCountLabel(results.length)}</div>
       </div>
     );
   }
