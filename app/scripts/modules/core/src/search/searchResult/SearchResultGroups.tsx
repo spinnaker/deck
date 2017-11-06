@@ -4,9 +4,9 @@ import { BindAll } from 'lodash-decorators';
 import { ISearchResultGroup, SearchResultGroup } from './SearchResultGroup';
 
 export interface ISearchResultGroupsProps {
+  searchResultGroups: ISearchResultGroup[]
   activeSearchResult: ISearchResultGroup;
   onClick?: (group: ISearchResultGroup) => void;
-  searchResultGroups: ISearchResultGroup[]
 }
 
 @BindAll()
@@ -16,28 +16,20 @@ export class SearchResultGroups extends React.Component<ISearchResultGroupsProps
     onClick: () => {}
   };
 
-  private handleClick(group: ISearchResultGroup): void {
-    this.props.onClick(group);
-  }
-
-  private generateSearchResultGroupElement(group: ISearchResultGroup): React.ReactElement<SearchResultGroup> {
-    const { activeSearchResult } = this.props;
-    return (
-      <SearchResultGroup
-        key={group.name}
-        isActive={activeSearchResult ? (activeSearchResult.name === group.name) : false}
-        searchResultGroup={group}
-        onClick={this.handleClick}
-      />
-    );
-  }
-
   public render(): React.ReactElement<SearchResultGroups> {
+    const { searchResultGroups, activeSearchResult } = this.props;
 
-    const groups = (this.props.searchResultGroups || [])
-      .map((group: ISearchResultGroup) => this.generateSearchResultGroupElement(group));
     return (
-      <div className="search-groups">{groups}</div>
+      <div className="search-groups">
+        {searchResultGroups.map(group => (
+          <SearchResultGroup
+            key={group.name}
+            isActive={group === activeSearchResult}
+            searchResultGroup={group}
+            onClick={this.props.onClick}
+          />
+        ))}
+      </div>
     );
   }
 }

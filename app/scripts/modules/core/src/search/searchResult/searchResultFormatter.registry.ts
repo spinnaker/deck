@@ -23,18 +23,22 @@ export interface ISearchResultType {
 }
 
 export class SearchResultTypeRegistry {
-  private formatters: {[key: string]: ISearchResultType} = {};
+  private formatters: ISearchResultType[] = [];
 
   public register(formatter: ISearchResultType): void {
-    this.formatters[formatter.id] = formatter;
+    this.formatters.push(formatter);
   }
 
-  public get(type: string): ISearchResultType {
-    return this.formatters[type];
+  public get(typeId: string): ISearchResultType {
+    return this.formatters.find(f => f.id === typeId);
+  }
+
+  public getAll(): ISearchResultType[] {
+    return this.formatters.slice();
   }
 
   public getSearchCategories(): string[] {
-    return Object.keys(this.formatters);
+    return this.formatters.map(f => f.id);
   }
 }
 
