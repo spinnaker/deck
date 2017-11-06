@@ -51,16 +51,32 @@ class KubernetesServerGroupDetailsController implements IController {
     });
   }
 
+  public deleteServerGroup(): void {
+    this.$uibModal.open({
+      templateUrl: require('../../manifest/delete/delete.html'),
+      controller: 'kubernetesV2ManifestDeleteCtrl',
+      controllerAs: 'ctrl',
+      resolve: {
+        coordinates: {
+          name: this.serverGroup.name,
+          namespace: this.serverGroup.namespace,
+          account: this.serverGroup.account
+        },
+        application: this.app
+      }
+    });
+  }
+
   private autoClose(): void {
     return;
   }
 
   private transformServerGroup(serverGroupDetails: IServerGroup): IKubernetesServerGroup {
     const serverGroup = serverGroupDetails as IKubernetesServerGroup;
-    const [apiVersion, kind, name] = serverGroup.name.split('|');
+    const [kind, name] = serverGroup.name.split(' ');
     serverGroup.displayName = name;
     serverGroup.kind = kind;
-    serverGroup.apiVersion = apiVersion.replace(/\./g, '/');
+    serverGroup.namespace = serverGroupDetails.region;
     return serverGroup;
   }
 
