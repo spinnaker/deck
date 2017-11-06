@@ -8,7 +8,7 @@
     <li role="presentation" ng-class="{selected: $ctrl.mode === 'pipeline'}"><a ng-click="$ctrl.mode = 'pipeline'">Configuration</a></li>
     <li role="presentation" ng-class="{selected: $ctrl.mode === 'renderedPipeline'}"><a ng-click="$ctrl.mode = 'renderedPipeline'">Rendered pipeline</a></li>
   </ul>
-  <div class="modal-body flex-fill" ng-if="$ctrl.mode == 'pipeline'">
+  <div class="modal-body flex-fill" ng-if="$ctrl.mode === 'pipeline'">
     <div class="row">
       <div class="col-md-12">
         <p>
