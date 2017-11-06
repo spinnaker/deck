@@ -29,7 +29,7 @@ export interface ISearchResultsProps {
 }
 
 export interface ISearchResultsState {
-  active: ISearchResultGroup;
+  active: ISearchResultType;
   searchResultGroups: ISearchResultGroup[];
 }
 
@@ -44,12 +44,12 @@ export class SearchResults extends React.Component<ISearchResultsProps, ISearchR
   public componentWillReceiveProps(newProps: ISearchResultsProps): void {
     const searchResultGroups: ISearchResultGroup[] = this.buildGroups(newProps);
     // Update 'active' to first group with any results
-    const firstGroupWithResults: ISearchResultGroup = searchResultGroups.find(group => group.results.length > 0);
-    this.setState({ searchResultGroups, active: firstGroupWithResults });
+    const hasResults: ISearchResultGroup = searchResultGroups.find(group => group.results.length > 0);
+    this.setState({ searchResultGroups, active: hasResults && hasResults.type });
   }
 
-  private handleClick(clickedGroup: ISearchResultGroup): void {
-    this.setState({ active: clickedGroup });
+  private handleClick(selectedSearchResultType: ISearchResultType): void {
+    this.setState({ active: selectedSearchResultType });
   }
 
   private buildGroups(props: ISearchResultsProps): ISearchResultGroup[] {
@@ -66,19 +66,20 @@ export class SearchResults extends React.Component<ISearchResultsProps, ISearchR
   public render(): React.ReactElement<SearchResults> {
     const { searchStatus } = this.props;
     const { active, searchResultGroups } = this.state;
+    const activeGroup = active && searchResultGroups.find(group => group.type === active);
 
     return (
       <div className="search-results">
         <SearchResultGroups
           searchResultGroups={searchResultGroups}
-          activeSearchResultGroup={active}
+          activeSearchResultType={active}
           onClick={this.handleClick}
         />
 
         <SearchResultGrid
           searchStatus={searchStatus}
-          searchResultFormatter={active && active.type}
-          searchResults={active ? active.results : []}
+          searchResultFormatter={active}
+          searchResults={activeGroup && activeGroup.results}
         />
       </div>
     );

@@ -11,52 +11,36 @@ export interface ISearchResultGroup {
 }
 
 export interface ISearchResultGroupProps {
+  type: ISearchResultType;
+  resultsCount: number;
   isActive: boolean;
-  searchResultGroup: ISearchResultGroup,
-  onClick?: (group: ISearchResultGroup) => void;
+  onClick?: (group: ISearchResultType) => void;
 }
 
 @BindAll()
 export class SearchResultGroup extends React.Component<ISearchResultGroupProps> {
-
-  public static defaultProps: Partial<ISearchResultGroupProps> = {
-    onClick: () => {}
-  };
-
   private handleClick(): void {
-    const { searchResultGroup, onClick } = this.props;
-    if (searchResultGroup.results.length > 0) {
-      onClick(searchResultGroup);
-    }
-  }
-
-  private getCountLabel(count: number): string {
-
-    let result = `${count}`;
-    if (count >= SearchService.DEFAULT_PAGE_SIZE) {
-      result += '+';
-    }
-
-    return result;
+    const { type, resultsCount, onClick } = this.props;
+    resultsCount && onClick && onClick(type);
   }
 
   public render(): React.ReactElement<SearchResultGroup> {
-    const { isActive, searchResultGroup } = this.props;
-    const { type, results } = searchResultGroup;
+    const { isActive, type, resultsCount } = this.props;
     const iconClass = type.icon ? `fa fa-${type.icon}` : type.iconClass;
+    const countLabel = resultsCount < SearchService.DEFAULT_PAGE_SIZE ? `${resultsCount}` : `${resultsCount}+`;
 
     const className = classNames({
       'search-group': true,
       'search-group--focus': isActive,
       'search-group--blur': !isActive,
-      'faded': results.length === 0
+      'faded': resultsCount === 0
     });
 
     return (
       <div className={className} onClick={this.handleClick}>
         <span className={`search-group-icon ${iconClass}`}/>
         <div className="search-group-name">{type.displayName}</div>
-        <div className="badge">{this.getCountLabel(results.length)}</div>
+        <div className="badge">{countLabel}</div>
       </div>
     );
   }
