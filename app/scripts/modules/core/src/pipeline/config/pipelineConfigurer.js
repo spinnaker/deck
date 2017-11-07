@@ -468,11 +468,11 @@ module.exports = angular.module('spinnaker.core.pipeline.config.pipelineConfigur
       $window.onbeforeunload = undefined;
     });
 
-    if ($scope.isTemplatedPipeline && $scope.pipeline.isNew && !$scope.hasDynamicSource) {
-      this.configureTemplate();
-    }
-
     if ($scope.hasDynamicSource) {
       this.getPipelineExecutions();
+    }
+
+    if ($scope.isTemplatedPipeline && $scope.pipeline.isNew && !$scope.hasDynamicSource) {
+      this.configureTemplate();
     }
   });

@@ -57,9 +57,9 @@
       <span class="glyphicon glyphicon small glyphicon-alert"></span> This template has a dynamic source. The
       configuration cannot be rendered before the pipeline has executed at least once.
     </div>
-    <div class="band band-warning" ng-if="templateError && pipelineExecutions.length && !pipeline.isNew">
-    <span class="glyphicon glyphicon small glyphicon-alert"></span> Could not render the pipeline configuration because
-      of an error: {{ templateError.data.message }}
+    <div class="band band-warning" ng-if="templateError && pipelineExecutions.length && isTemplatedPipeline">
+      <span class="glyphicon glyphicon small glyphicon-alert"></span> Could not render the pipeline configuration because
+        of an error: {{ templateError.data.message }} {{ templateError.data.error }}
     </div>
     <div class="config-heading-body">
       <div class="pipeline-graph-container pipeline-config-graph">

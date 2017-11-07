@@ -27,7 +27,10 @@ module.exports = angular.module('spinnaker.core.pipeline.config.controller', [
         if (!this.pipelineConfig.isNew) {
           return pipelineTemplateService.getPipelinePlan(this.pipelineConfig, $stateParams.executionId)
             .then(plan => this.pipelinePlan = plan)
-            .catch(error => this.templateError = error);
+            .catch(error => {
+              this.templateError = error;
+              this.pipelineConfig.isNew = true;
+            });
         }
       } else if (!this.pipelineConfig) {
         this.pipelineConfig = _.find(app.strategyConfigs.data, { id: $stateParams.pipelineId });
