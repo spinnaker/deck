@@ -1,17 +1,26 @@
 import { IApplicationSearchResult } from 'core/domain';
 import {
-  AbstractBaseResultRenderer,
-  ITableColumnConfigEntry
+  AbstractBaseResultRenderer, ITableColumn, AccountCellRenderer, DefaultCellRenderer, HrefCellRenderer,
 } from 'core/search/searchResult/AbstractBaseResultRenderer';
 
 import './application.less';
 
 export class ApplicationDisplayRenderer extends AbstractBaseResultRenderer<IApplicationSearchResult> {
-
   private static instance: ApplicationDisplayRenderer = new ApplicationDisplayRenderer();
+
+  private COLS = {
+    APPLICATION: { key: 'application', label: 'Name', cellRenderer: HrefCellRenderer },
+    ACCOUNTS: { key: 'accounts', label: 'Account', cellRenderer: AccountCellRenderer },
+    EMAIL: { key: 'email', label: 'Owner Email', cellRenderer: DefaultCellRenderer }
+  };
 
   public static renderer() {
     return ApplicationDisplayRenderer.instance;
+  }
+
+  public getColumnConfig(): ITableColumn<IApplicationSearchResult>[] {
+    const { APPLICATION, ACCOUNTS, EMAIL } = this.COLS;
+    return [ APPLICATION, ACCOUNTS, EMAIL ];
   }
 
   public getRendererClass(): string {
@@ -24,13 +33,5 @@ export class ApplicationDisplayRenderer extends AbstractBaseResultRenderer<IAppl
 
   public sortItems(items: IApplicationSearchResult[]): IApplicationSearchResult[] {
     return items.sort((a, b) => a.application.localeCompare(b.application));
-  }
-
-  public getColumnConfig(): ITableColumnConfigEntry<IApplicationSearchResult>[] {
-    return [
-      { key: 'application', label: 'Name', cellRenderer: this.HrefCellRenderer },
-      { key: 'accounts', label: 'Account', cellRenderer: this.AccountCellRenderer },
-      { key: 'email', label: 'Owner Email', cellRenderer: this.DefaultCellRender }
-    ];
   }
 }

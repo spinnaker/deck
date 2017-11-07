@@ -1,7 +1,9 @@
 import {
   AbstractBaseResultRenderer,
   IProjectSearchResult,
-  ITableColumnConfigEntry
+  ITableColumn,
+  HrefCellRenderer,
+  DefaultCellRenderer,
 } from '../search';
 
 import './project.less';
@@ -26,10 +28,10 @@ export class ProjectDisplayRenderer extends AbstractBaseResultRenderer<IProjectS
     return items.sort((a, b) => a.name.localeCompare(b.name));
   }
 
-  public getColumnConfig(): ITableColumnConfigEntry<IProjectSearchResult>[] {
+  public getColumnConfig(): ITableColumn<IProjectSearchResult>[] {
     return [
-      { key: 'name', cellRenderer: this.HrefCellRenderer },
-      { key: 'email', cellRenderer: this.DefaultCellRender }
+      { key: 'name', cellRenderer: HrefCellRenderer },
+      { key: 'email', cellRenderer: DefaultCellRenderer }
     ];
   }
 }

@@ -1,7 +1,10 @@
 import {
   AbstractBaseResultRenderer,
   ILoadBalancerSearchResult,
-  ITableColumnConfigEntry
+  ITableColumn,
+  HrefCellRenderer,
+  AccountCellRenderer,
+  DefaultCellRenderer,
 } from '../search';
 
 import './loadBalancer.less';
@@ -33,12 +36,12 @@ export class LoadBalancerDisplayRenderer extends AbstractBaseResultRenderer<ILoa
     });
   }
 
-  public getColumnConfig(): ITableColumnConfigEntry<ILoadBalancerSearchResult>[] {
+  public getColumnConfig(): ITableColumn<ILoadBalancerSearchResult>[] {
     return [
-      { key: 'loadBalancer', label: 'Name', cellRenderer: this.HrefCellRenderer },
-      { key: 'account', cellRenderer: this.AccountCellRenderer },
-      { key: 'region', cellRenderer: this.DefaultCellRender },
-      { key: 'loadBalancerType', label: 'Type', cellRenderer: this.DefaultCellRender }
+      { key: 'loadBalancer', label: 'Name', cellRenderer: HrefCellRenderer },
+      { key: 'account', cellRenderer: AccountCellRenderer },
+      { key: 'region', cellRenderer: DefaultCellRenderer },
+      { key: 'loadBalancerType', label: 'Type', cellRenderer: DefaultCellRenderer }
     ];
   }
 }

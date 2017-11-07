@@ -1,7 +1,10 @@
 import {
   AbstractBaseResultRenderer,
   IServerGroupSearchResult,
-  ITableColumnConfigEntry
+  ITableColumn,
+  HrefCellRenderer,
+  AccountCellRenderer,
+  DefaultCellRenderer,
 } from '../search';
 
 import './serverGroup.less';
@@ -33,12 +36,12 @@ export class ServerGroupDisplayRenderer extends AbstractBaseResultRenderer<IServ
     });
   }
 
-  public getColumnConfig(): ITableColumnConfigEntry<IServerGroupSearchResult>[] {
+  public getColumnConfig(): ITableColumn<IServerGroupSearchResult>[] {
     return [
-      { key: 'serverGroup', label: 'Name', cellRenderer: this.HrefCellRenderer },
-      { key: 'account', cellRenderer: this.AccountCellRenderer },
-      { key: 'region', cellRenderer: this.DefaultCellRender },
-      { key: 'email', cellRenderer: this.DefaultCellRender }
+      { key: 'serverGroup', label: 'Name', cellRenderer: HrefCellRenderer },
+      { key: 'account', cellRenderer: AccountCellRenderer },
+      { key: 'region', cellRenderer: DefaultCellRenderer },
+      { key: 'email', cellRenderer: DefaultCellRenderer }
     ];
   }
 }

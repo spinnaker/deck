@@ -1,7 +1,10 @@
 import {
   AbstractBaseResultRenderer,
   ISecurityGroupSearchResult,
-  ITableColumnConfigEntry
+  ITableColumn,
+  HrefCellRenderer,
+  AccountCellRenderer,
+  DefaultCellRenderer,
 } from '../search';
 
 import './securityGroup.less';
@@ -33,11 +36,11 @@ export class SecurityGroupDisplayRenderer extends AbstractBaseResultRenderer<ISe
     });
   }
 
-  public getColumnConfig(): ITableColumnConfigEntry<ISecurityGroupSearchResult>[] {
+  public getColumnConfig(): ITableColumn<ISecurityGroupSearchResult>[] {
     return [
-      { key: 'name', cellRenderer: this.HrefCellRenderer },
-      { key: 'account', cellRenderer: this.AccountCellRenderer },
-      { key: 'region', cellRenderer: this.DefaultCellRender }
+      { key: 'name', cellRenderer: HrefCellRenderer },
+      { key: 'account', cellRenderer: AccountCellRenderer },
+      { key: 'region', cellRenderer: DefaultCellRenderer }
     ];
   }
 }

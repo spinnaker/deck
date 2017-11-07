@@ -1,7 +1,10 @@
 import {
   AbstractBaseResultRenderer,
   IClusterSearchResult,
-  ITableColumnConfigEntry
+  ITableColumn,
+  HrefCellRenderer,
+  AccountCellRenderer,
+  DefaultCellRenderer,
 } from '../search';
 
 import './cluster.less';
@@ -26,11 +29,11 @@ export class ClusterDisplayRenderer extends AbstractBaseResultRenderer<IClusterS
     return items.sort((a, b) => a.cluster.localeCompare(b.cluster));
   }
 
-  public getColumnConfig(): ITableColumnConfigEntry<IClusterSearchResult>[] {
+  public getColumnConfig(): ITableColumn<IClusterSearchResult>[] {
     return [
-      { key: 'cluster', label: 'Name', cellRenderer: this.HrefCellRenderer },
-      { key: 'account', cellRenderer: this.AccountCellRenderer },
-      { key: 'email', cellRenderer: this.DefaultCellRender }
+      { key: 'cluster', label: 'Name', cellRenderer: HrefCellRenderer },
+      { key: 'account', cellRenderer: AccountCellRenderer },
+      { key: 'email', cellRenderer: DefaultCellRenderer }
     ];
   }
 }
