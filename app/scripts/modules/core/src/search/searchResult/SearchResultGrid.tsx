@@ -10,44 +10,37 @@ export interface ISearchResultGridProps {
   searchResults: any[];
 }
 
+const NoQuery = () => (
+  <div className="flex-center">
+    <h2>Please enter a search query to get started</h2>
+  </div>
+);
+
+const NoResults = () => (
+  <div className="flex-center">
+    <h2>No results found for the specified search query</h2>
+  </div>
+);
+
+const Searching = () => (
+  <div className="load large flex-center">
+    <div className="message">Fetching search results...</div>
+    <div className="bars">
+      <div className="bar full"/>
+      <div className="bar"/>
+      <div className="bar"/>
+      <div className="bar"/>
+      <div className="bar"/>
+    </div>
+  </div>
+);
+
 @BindAll()
 export class SearchResultGrid extends React.Component<ISearchResultGridProps> {
-
-  public componentDidUpdate(): void {
-    const { searchResultsType } = this.props;
-    if (searchResultsType) {
-      searchResultsType.displayRenderer.scrollToTop();
-    }
-  }
-
   public render(): React.ReactElement<SearchResultGrid> {
-    const { searchStatus, searchResultsType, searchResults } = this.props;
+    const { searchStatus, searchResultsType: type, searchResults } = this.props;
 
-    const NoQuery = () => (
-      <div className="flex-center">
-        <h2>Please enter a search query to get started</h2>
-      </div>
-    );
-
-    const NoResults = () => (
-      <div className="flex-center">
-        <h2>No results found for the specified search query</h2>
-      </div>
-    );
-
-    const Searching = () => (
-      <div className="load large flex-center">
-        <div className="message">Fetching search results...</div>
-        <div className="bars">
-          <div className="bar full"/>
-          <div className="bar"/>
-          <div className="bar"/>
-          <div className="bar"/>
-          <div className="bar"/>
-        </div>
-      </div>
-    );
-
+    const SearchResultsRenderer = type && type.SearchResultsRenderer;
 
     switch (searchStatus) {
       case SearchStatus.INITIAL:
@@ -59,7 +52,7 @@ export class SearchResultGrid extends React.Component<ISearchResultGridProps> {
       case SearchStatus.FINISHED:
         return (
           <div className="search-result-grid flex-fill" style={{ height: 'initial' }}>
-            {searchResultsType.displayRenderer.render(searchResults)}
+            <SearchResultsRenderer type={type} results={searchResults} />
           </div>
         );
       default:
