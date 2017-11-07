@@ -4,7 +4,7 @@ import { BindAll } from 'lodash-decorators';
 import { capitalize, kebabCase } from 'lodash';
 
 import { NgReact } from 'core/reactShims';
-import { IResultRenderer } from './searchResultFormatter.registry';
+import { IResultRenderer } from './searchResultsType.registry';
 
 export interface ITableColumn<T> {
   key: string;

@@ -5,7 +5,7 @@ import { urlBuilderRegistry } from 'core/navigation/urlBuilder.registry';
 import { ApplicationReader, IApplicationSummary } from './service/application.read.service';
 import { IPostSearchResultSearcher } from 'core/search/searchResult/PostSearchResultSearcherRegistry';
 import { ISearchResult } from 'core/search/search.service';
-import { ISearchResultType, searchResultTypeRegistry } from 'core/search/searchResult/searchResultFormatter.registry';
+import { ISearchResultType, searchResultTypeRegistry } from 'core/search/searchResult/searchResultsType.registry';
 import { ISearchResultSet } from 'core/search/infrastructure/infrastructureSearch.service';
 import { IServerGroupSearchResult } from 'core/search/searchResult/model/IServerGroupSearchResult';
 

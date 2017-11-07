@@ -6,7 +6,7 @@ import { urlBuilderRegistry } from 'core/navigation/urlBuilder.registry';
 import {
   ISearchResultType,
   searchResultTypeRegistry
-} from 'core/search/searchResult/searchResultFormatter.registry';
+} from 'core/search/searchResult/searchResultsType.registry';
 import { ISearchResultSet } from 'core/search/infrastructure/infrastructureSearch.service';
 import { IClusterSearchResult } from 'core/search/searchResult/model/IClusterSearchResult';
 import { IServerGroupSearchResult } from 'core/search/searchResult/model/IServerGroupSearchResult';

@@ -12,7 +12,7 @@ import {
   SearchService,
   SEARCH_SERVICE
 } from 'core/search/search.service';
-import { searchResultTypeRegistry } from 'core/search/searchResult/searchResultFormatter.registry';
+import { searchResultTypeRegistry } from 'core/search/searchResult/searchResultsType.registry';
 import {
   ITypeMapping,
   PostSearchResultSearcherRegistry

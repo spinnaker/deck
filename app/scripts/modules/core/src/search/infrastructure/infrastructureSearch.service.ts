@@ -8,7 +8,7 @@ import {
   IResultDisplayFormatter,
   ISearchResultType,
   searchResultTypeRegistry
-} from '../searchResult/searchResultFormatter.registry';
+} from '../searchResult/searchResultsType.registry';
 import { externalSearchRegistry } from '../externalSearch.registry';
 
 export interface ISearchResultSet {

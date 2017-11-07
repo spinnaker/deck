@@ -2,7 +2,7 @@ import * as React from 'react';
 import { BindAll } from 'lodash-decorators';
 
 import { ISearchResultGroup, SearchResultGroup } from './SearchResultGroup';
-import { ISearchResultType } from './searchResultFormatter.registry';
+import { ISearchResultType } from './searchResultsType.registry';
 
 export interface ISearchResultGroupsProps {
   searchResultGroups: ISearchResultGroup[]

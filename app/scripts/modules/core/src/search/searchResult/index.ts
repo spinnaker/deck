@@ -1,3 +1,3 @@
 export * from './AbstractBaseResultRenderer';
-export * from './searchResultFormatter.registry';
+export * from './searchResultsType.registry';
 export * from './model';

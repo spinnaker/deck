@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { BindAll } from 'lodash-decorators';
 
-import { ISearchResultType } from './searchResultFormatter.registry';
+import { ISearchResultType } from './searchResultsType.registry';
 import { SearchStatus } from './SearchResults';
 
 export interface ISearchResultGridProps {
   searchStatus: SearchStatus;
-  searchResultFormatter: ISearchResultType;
+  searchResultsType: ISearchResultType;
   searchResults: any[];
 }
 
@@ -14,14 +14,14 @@ export interface ISearchResultGridProps {
 export class SearchResultGrid extends React.Component<ISearchResultGridProps> {
 
   public componentDidUpdate(): void {
-    const { searchResultFormatter } = this.props;
-    if (searchResultFormatter) {
-      searchResultFormatter.displayRenderer.scrollToTop();
+    const { searchResultsType } = this.props;
+    if (searchResultsType) {
+      searchResultsType.displayRenderer.scrollToTop();
     }
   }
 
   public render(): React.ReactElement<SearchResultGrid> {
-    const { searchStatus, searchResultFormatter, searchResults } = this.props;
+    const { searchStatus, searchResultsType, searchResults } = this.props;
 
     const NoQuery = () => (
       <div className="flex-center">
@@ -59,7 +59,7 @@ export class SearchResultGrid extends React.Component<ISearchResultGridProps> {
       case SearchStatus.FINISHED:
         return (
           <div className="search-result-grid flex-fill" style={{ height: 'initial' }}>
-            {searchResultFormatter.displayRenderer.render(searchResults)}
+            {searchResultsType.displayRenderer.render(searchResults)}
           </div>
         );
       default:

@@ -3,9 +3,9 @@ import { $q, $log } from 'ngimport';
 
 import { urlBuilderRegistry } from 'core/navigation/urlBuilder.registry';
 import { IUrlBuilder } from 'core/navigation/urlBuilder.service';
-import { searchResultTypeRegistry } from './searchResult/searchResultFormatter.registry';
+import { searchResultTypeRegistry } from './searchResult/searchResultsType.registry';
 import { ISearchResult } from './search.service';
-import { ISearchResultType } from './searchResult/searchResultFormatter.registry';
+import { ISearchResultType } from './searchResult/searchResultsType.registry';
 
 /**
  * External search registry entries add a section to the infrastructure search

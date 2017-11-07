@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { BindAll } from 'lodash-decorators';
 
-import { ISearchResultType } from './searchResultFormatter.registry';
+import { ISearchResultType } from './searchResultsType.registry';
 import { SearchResultGrid } from './SearchResultGrid';
 import { SearchResultGroups } from './SearchResultGroups';
 import { ISearchResultGroup } from './SearchResultGroup';
@@ -78,7 +78,7 @@ export class SearchResults extends React.Component<ISearchResultsProps, ISearchR
 
         <SearchResultGrid
           searchStatus={searchStatus}
-          searchResultFormatter={active}
+          searchResultsType={active}
           searchResults={activeGroup && activeGroup.results}
         />
       </div>
