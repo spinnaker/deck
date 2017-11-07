@@ -8,6 +8,7 @@ import { INestedState, STATE_CONFIG_PROVIDER, StateConfigProvider } from 'core/n
 import { StateParams } from '@uirouter/angularjs';
 import { Application } from 'core/application/application.model';
 import { ApplicationModelBuilder } from '../application/applicationModel.builder';
+import { VersionedCloudProviderService } from 'core/cloudProvider';
 
 export const INSTANCE_STATES = 'spinnaker.core.instance.states';
 module(INSTANCE_STATES, [
@@ -20,16 +21,24 @@ module(INSTANCE_STATES, [
     url: '/instanceDetails/:provider/:instanceId',
     views: {
       'detail@../insight': {
-        templateProvider: ['$templateCache', '$stateParams', 'cloudProviderRegistry',
+        templateProvider: ['$templateCache', '$stateParams', 'cloudProviderRegistry', 'versionedCloudProviderService', 'app',
           ($templateCache: ng.ITemplateCacheService,
            $stateParams: StateParams,
-           cloudProviderRegistry: CloudProviderRegistry) => {
-            return $templateCache.get(cloudProviderRegistry.getValue($stateParams.provider, 'instance.detailsTemplateUrl'));
+           cloudProviderRegistry: CloudProviderRegistry,
+           versionedCloudProviderService: VersionedCloudProviderService,
+           app: Application) => {
+            return versionedCloudProviderService.getInstanceProviderVersion($stateParams.provider, $stateParams.instanceId, app).then((providerVersion: string) =>
+              $templateCache.get(cloudProviderRegistry.getValue($stateParams.provider, 'instance.detailsTemplateUrl', providerVersion))
+            );
         }],
-        controllerProvider: ['$stateParams', 'cloudProviderRegistry',
+        controllerProvider: ['$stateParams', 'cloudProviderRegistry', 'versionedCloudProviderService', 'app',
           ($stateParams: StateParams,
-           cloudProviderRegistry: CloudProviderRegistry) => {
-            return cloudProviderRegistry.getValue($stateParams.provider, 'instance.detailsController');
+           cloudProviderRegistry: CloudProviderRegistry,
+           versionedCloudProviderService: VersionedCloudProviderService,
+           app: Application) => {
+            return versionedCloudProviderService.getInstanceProviderVersion($stateParams.provider, $stateParams.instanceId, app).then((providerVersion: string) =>
+              cloudProviderRegistry.getValue($stateParams.provider, 'instance.detailsController', providerVersion)
+            );
         }],
         controllerAs: 'ctrl'
       }
@@ -76,10 +85,10 @@ module(INSTANCE_STATES, [
     views: {
       'main@': {
         templateUrl: require('../presentation/standalone.view.html'),
-        controllerProvider: ['$stateParams', 'cloudProviderRegistry',
+        controllerProvider: ['$stateParams', 'versionedCloudProviderService',
           ($stateParams: StateParams,
-           cloudProviderRegistry: CloudProviderRegistry) => {
-            return cloudProviderRegistry.getValue($stateParams.provider, 'instance.detailsController');
+           versionedCloudProviderService: VersionedCloudProviderService) => {
+            return versionedCloudProviderService.getValue($stateParams.provider, $stateParams.account, 'instance.detailsController');
         }],
         controllerAs: 'ctrl'
       }
