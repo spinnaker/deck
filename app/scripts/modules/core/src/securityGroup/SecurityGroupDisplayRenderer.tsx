@@ -35,9 +35,9 @@ export class SecurityGroupDisplayRenderer extends AbstractBaseResultRenderer<ISe
 
   public getColumnConfig(): ITableColumnConfigEntry<ISecurityGroupSearchResult>[] {
     return [
-      { key: 'name', cellRenderer: this.hrefCellRenderer },
-      { key: 'account', cellRenderer: this.accountCellRenderer },
-      { key: 'region', cellRenderer: this.defaultCellRender }
+      { key: 'name', cellRenderer: this.HrefCellRenderer },
+      { key: 'account', cellRenderer: this.AccountCellRenderer },
+      { key: 'region', cellRenderer: this.DefaultCellRender }
     ];
   }
 }

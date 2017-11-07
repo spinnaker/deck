@@ -28,9 +28,9 @@ export class ClusterDisplayRenderer extends AbstractBaseResultRenderer<IClusterS
 
   public getColumnConfig(): ITableColumnConfigEntry<IClusterSearchResult>[] {
     return [
-      { key: 'cluster', label: 'Name', cellRenderer: this.hrefCellRenderer },
-      { key: 'account', cellRenderer: this.accountCellRenderer },
-      { key: 'email', cellRenderer: this.defaultCellRender }
+      { key: 'cluster', label: 'Name', cellRenderer: this.HrefCellRenderer },
+      { key: 'account', cellRenderer: this.AccountCellRenderer },
+      { key: 'email', cellRenderer: this.DefaultCellRender }
     ];
   }
 }

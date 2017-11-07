@@ -28,10 +28,10 @@ export class InstanceDisplayRenderer extends AbstractBaseResultRenderer<IInstanc
 
   public getColumnConfig(): ITableColumnConfigEntry<IInstanceSearchResult>[] {
     return [
-      { key: 'instanceId', label: 'Instance ID', cellRenderer: this.hrefCellRenderer },
-      { key: 'account', cellRenderer: this.accountCellRenderer },
-      { key: 'region', cellRenderer: this.defaultCellRender },
-      { key: 'serverGroup', label: 'Server Group', defaultValue: 'Standalone Instance', cellRenderer: this.valueOrDefaultCellRenderer }
+      { key: 'instanceId', label: 'Instance ID', cellRenderer: this.HrefCellRenderer },
+      { key: 'account', cellRenderer: this.AccountCellRenderer },
+      { key: 'region', cellRenderer: this.DefaultCellRender },
+      { key: 'serverGroup', label: 'Server Group', defaultValue: 'Standalone Instance', cellRenderer: this.ValueOrDefaultCellRenderer }
     ];
   }
 }

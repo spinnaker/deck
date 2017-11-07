@@ -28,9 +28,9 @@ export class ApplicationDisplayRenderer extends AbstractBaseResultRenderer<IAppl
 
   public getColumnConfig(): ITableColumnConfigEntry<IApplicationSearchResult>[] {
     return [
-      { key: 'application', label: 'Name', cellRenderer: this.hrefCellRenderer },
-      { key: 'accounts', label: 'Account', cellRenderer: this.accountCellRenderer },
-      { key: 'email', label: 'Owner Email', cellRenderer: this.defaultCellRender }
+      { key: 'application', label: 'Name', cellRenderer: this.HrefCellRenderer },
+      { key: 'accounts', label: 'Account', cellRenderer: this.AccountCellRenderer },
+      { key: 'email', label: 'Owner Email', cellRenderer: this.DefaultCellRender }
     ];
   }
 }

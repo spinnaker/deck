@@ -35,10 +35,10 @@ export class LoadBalancerDisplayRenderer extends AbstractBaseResultRenderer<ILoa
 
   public getColumnConfig(): ITableColumnConfigEntry<ILoadBalancerSearchResult>[] {
     return [
-      { key: 'loadBalancer', label: 'Name', cellRenderer: this.hrefCellRenderer },
-      { key: 'account', cellRenderer: this.accountCellRenderer },
-      { key: 'region', cellRenderer: this.defaultCellRender },
-      { key: 'loadBalancerType', label: 'Type', cellRenderer: this.defaultCellRender }
+      { key: 'loadBalancer', label: 'Name', cellRenderer: this.HrefCellRenderer },
+      { key: 'account', cellRenderer: this.AccountCellRenderer },
+      { key: 'region', cellRenderer: this.DefaultCellRender },
+      { key: 'loadBalancerType', label: 'Type', cellRenderer: this.DefaultCellRender }
     ];
   }
 }

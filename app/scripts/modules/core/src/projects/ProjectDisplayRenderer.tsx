@@ -28,8 +28,8 @@ export class ProjectDisplayRenderer extends AbstractBaseResultRenderer<IProjectS
 
   public getColumnConfig(): ITableColumnConfigEntry<IProjectSearchResult>[] {
     return [
-      { key: 'name', cellRenderer: this.hrefCellRenderer },
-      { key: 'email', cellRenderer: this.defaultCellRender }
+      { key: 'name', cellRenderer: this.HrefCellRenderer },
+      { key: 'email', cellRenderer: this.DefaultCellRender }
     ];
   }
 }

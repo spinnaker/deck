@@ -35,10 +35,10 @@ export class ServerGroupDisplayRenderer extends AbstractBaseResultRenderer<IServ
 
   public getColumnConfig(): ITableColumnConfigEntry<IServerGroupSearchResult>[] {
     return [
-      { key: 'serverGroup', label: 'Name', cellRenderer: this.hrefCellRenderer },
-      { key: 'account', cellRenderer: this.accountCellRenderer },
-      { key: 'region', cellRenderer: this.defaultCellRender },
-      { key: 'email', cellRenderer: this.defaultCellRender }
+      { key: 'serverGroup', label: 'Name', cellRenderer: this.HrefCellRenderer },
+      { key: 'account', cellRenderer: this.AccountCellRenderer },
+      { key: 'region', cellRenderer: this.DefaultCellRender },
+      { key: 'email', cellRenderer: this.DefaultCellRender }
     ];
   }
 }
