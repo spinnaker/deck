@@ -12,7 +12,6 @@ module.exports = angular.module('spinnaker.ecs.pipeline.stage.ecs.shrinkClusterS
       provides: 'shrinkCluster',
       cloudProvider: 'ecs',
       templateUrl: require('./shrinkClusterStage.html'),
-      executionDetailsUrl: PipelineTemplates.shrinkClusterExecutionDetails,
       accountExtractor: (stage) => [stage.context.credentials],
       configAccountExtractor: (stage) => [stage.credentials],
       validators: [
