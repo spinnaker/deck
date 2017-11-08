@@ -10,7 +10,7 @@ var fiatEnabled = '{%features.fiat%}' === 'true';
 var jobsEnabled = '{%features.jobs%}' === 'true';
 var pipelineTemplatesEnabled = '{%features.pipelineTemplates%}' === 'true';
 var artifactsEnabled = '{%features.artifacts%}' === 'true';
-var canaryEnabled = '{%features.legacyCanary%}' === 'true';
+var canaryEnabled = '{%features.mineCanary%}' === 'true';
 var timezone = '{%timezone%}';
 var version = '{%version%}';
 var changelogGistId = '{%changelog.gist.id%}';
@@ -131,7 +131,7 @@ window.spinnakerSettings = {
   authEnabled: authEnabled,
   authTtl: 600000,
   gitSources: ['stash', 'github', 'bitbucket'],
-  triggerTypes: ['git', 'pipeline', 'docker', 'cron', 'jenkins', 'travis'],
+  triggerTypes: ['git', 'pipeline', 'docker', 'cron', 'jenkins', 'travis', 'pubsub'],
   feature: {
     entityTags: entityTagsEnabled,
     fiatEnabled: fiatEnabled,
