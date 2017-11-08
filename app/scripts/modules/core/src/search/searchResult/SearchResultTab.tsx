@@ -5,12 +5,7 @@ import { BindAll } from 'lodash-decorators';
 import { SearchService } from 'core/search/search.service';
 import { ISearchResultType } from 'core';
 
-export interface ISearchResultGroup {
-  type: ISearchResultType;
-  results: any[];
-}
-
-export interface ISearchResultGroupProps {
+export interface ISearchResultTabProps {
   type: ISearchResultType;
   resultsCount: number;
   isActive: boolean;
@@ -18,13 +13,13 @@ export interface ISearchResultGroupProps {
 }
 
 @BindAll()
-export class SearchResultGroup extends React.Component<ISearchResultGroupProps> {
+export class SearchResultTab extends React.Component<ISearchResultTabProps> {
   private handleClick(): void {
     const { type, resultsCount, onClick } = this.props;
     resultsCount && onClick && onClick(type);
   }
 
-  public render(): React.ReactElement<SearchResultGroup> {
+  public render(): React.ReactElement<SearchResultTab> {
     const { isActive, type, resultsCount } = this.props;
     const iconClass = type.icon ? `fa fa-${type.icon}` : type.iconClass;
     const countLabel = resultsCount < SearchService.DEFAULT_PAGE_SIZE ? `${resultsCount}` : `${resultsCount}+`;
