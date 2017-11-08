@@ -1,3 +1,3 @@
-export * from './AbstractBaseResultRenderer';
+export * from './CellRenderers';
 export * from './searchResultsType.registry';
-export * from './renderer/DefaultSearchResultsRenderer';
+export * from './LayoutRenderers';

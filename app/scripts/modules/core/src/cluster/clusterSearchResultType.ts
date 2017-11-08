@@ -3,7 +3,7 @@ import { IPromise } from 'angular';
 import { $q } from 'ngimport';
 
 import {
-  searchResultTypeRegistry, DefaultSearchResultsRenderer, AccountCellRenderer, DefaultCellRenderer, HrefCellRenderer,
+  searchResultTypeRegistry, DefaultSearchResultsRenderer, AccountCellRenderer, BasicCellRenderer, HrefCellRenderer,
   ISearchResult
 } from 'core/search';
 
@@ -20,7 +20,7 @@ searchResultTypeRegistry.register({
   columns: [
     { key: 'cluster', label: 'Name', cellRenderer: HrefCellRenderer },
     { key: 'account', cellRenderer: AccountCellRenderer },
-    { key: 'email', cellRenderer: DefaultCellRenderer }
+    { key: 'email', cellRenderer: BasicCellRenderer }
   ],
   displayName: 'Clusters',
   order: 2,

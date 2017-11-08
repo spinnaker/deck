@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { HeaderCell, ISearchResultType, ISearchColumn } from 'core';
+import { HeaderCellRenderer, ISearchResultType, ISearchColumn } from 'core';
 import { BindAll } from 'lodash-decorators';
 
 export interface IDefaultSearchResultsRendererProps {
@@ -33,14 +33,22 @@ export class DefaultSearchResultsRenderer extends React.Component<IDefaultSearch
   }
 }
 
-export const DefaultTableHeader = ({ type }: { type: ISearchResultType }) => {
-  return (
-    <div className="table-header">
-      {type.columns.map(column => (
-        <HeaderCell key={column.key} col={column} />
-      ))}
-    </div>
-  );
+export interface ITableHeaderProps {
+  type: ISearchResultType;
+}
+
+export class DefaultTableHeader extends React.Component<ITableHeaderProps> {
+  render() {
+    const { type } = this.props;
+
+    return (
+      <div className="table-header">
+        {type.columns.map(column => (
+          <HeaderCellRenderer key={column.key} col={column}/>
+        ))}
+      </div>
+    );
+  }
 };
 
 export interface IDataRowProps {

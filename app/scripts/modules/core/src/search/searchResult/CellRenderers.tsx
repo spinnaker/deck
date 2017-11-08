@@ -16,7 +16,7 @@ export interface ISearchColumn {
 
 const colClass = (key: string) => `col-${kebabCase(key)}`;
 
-export const HeaderCell = ({ col }: { col: ISearchColumn }) => (
+export const HeaderCellRenderer = ({ col }: { col: ISearchColumn }) => (
   <div className={colClass(col.key)}>
     {col.label || capitalize(col.key)}
   </div>
@@ -29,7 +29,7 @@ export interface ICellRendererProps {
   col: ISearchColumn;
 }
 
-export const DefaultCellRenderer = ({ item, col }: ICellRendererProps) => (
+export const BasicCellRenderer = ({ item, col }: ICellRendererProps) => (
   <div className={colClass(col.key)}>
     {item[col.key]}
   </div>
@@ -58,11 +58,11 @@ export const AccountCellRenderer = ({ item, col }: ICellRendererProps) => {
   );
 };
 
-export interface IValueOrDefaultCellRendererProps extends ICellRendererProps {
+export interface IDefaultValueCellRendererProps extends ICellRendererProps {
   defaultValue?: string;
 }
 
-export const ValueOrDefaultCellRenderer = ({ item, col, defaultValue = '' }: IValueOrDefaultCellRendererProps) => (
+export const DefaultValueCellRenderer = ({ item, col, defaultValue = '' }: IDefaultValueCellRendererProps) => (
   <div className={colClass(col.key)}>
     {item[col.key] || defaultValue}
   </div>

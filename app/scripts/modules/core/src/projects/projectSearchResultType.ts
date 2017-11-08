@@ -2,7 +2,7 @@ import { IPromise } from 'angular';
 import { $q } from 'ngimport';
 
 import {
-  searchResultTypeRegistry, DefaultCellRenderer, DefaultSearchResultsRenderer, HrefCellRenderer, ISearchResult
+  searchResultTypeRegistry, BasicCellRenderer, DefaultSearchResultsRenderer, HrefCellRenderer, ISearchResult
 } from 'core/search';
 import { IProjectConfig } from 'core';
 
@@ -28,7 +28,7 @@ searchResultTypeRegistry.register({
   id: 'projects',
   columns: [
     { key: 'name', cellRenderer: HrefCellRenderer },
-    { key: 'email', cellRenderer: DefaultCellRenderer }
+    { key: 'email', cellRenderer: BasicCellRenderer }
   ],
   displayName: 'Projects',
   order: 0,

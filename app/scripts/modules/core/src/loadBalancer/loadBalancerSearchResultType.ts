@@ -2,7 +2,7 @@ import { IPromise } from 'angular';
 import { $q } from 'ngimport';
 
 import {
-  AccountCellRenderer, DefaultCellRenderer, DefaultSearchResultsRenderer, HrefCellRenderer, searchResultTypeRegistry,
+  AccountCellRenderer, BasicCellRenderer, DefaultSearchResultsRenderer, HrefCellRenderer, searchResultTypeRegistry,
   ISearchResult
 } from 'core/search';
 
@@ -32,8 +32,8 @@ searchResultTypeRegistry.register({
   columns: [
     { key: 'loadBalancer', label: 'Name', cellRenderer: HrefCellRenderer },
     { key: 'account', cellRenderer: AccountCellRenderer },
-    { key: 'region', cellRenderer: DefaultCellRenderer },
-    { key: 'loadBalancerType', label: 'Type', cellRenderer: DefaultCellRenderer }
+    { key: 'region', cellRenderer: BasicCellRenderer },
+    { key: 'loadBalancerType', label: 'Type', cellRenderer: BasicCellRenderer }
   ],
   displayName: 'Load Balancers',
   icon: 'sitemap',

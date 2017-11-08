@@ -3,7 +3,7 @@ import { $q } from 'ngimport';
 
 import { SearchFilterTypeRegistry } from 'core/search/widgets/SearchFilterTypeRegistry';
 import {
-  AccountCellRenderer, DefaultCellRenderer, HrefCellRenderer, ValueOrDefaultCellRenderer, searchResultTypeRegistry,
+  AccountCellRenderer, BasicCellRenderer, HrefCellRenderer, DefaultValueCellRenderer, searchResultTypeRegistry,
   DefaultSearchResultsRenderer, ISearchResult
 } from 'core/search';
 
@@ -26,8 +26,8 @@ searchResultTypeRegistry.register({
   columns: [
     { key: 'instanceId', label: 'Instance ID', cellRenderer: HrefCellRenderer },
     { key: 'account', cellRenderer: AccountCellRenderer },
-    { key: 'region', cellRenderer: DefaultCellRenderer },
-    { key: 'serverGroup', label: 'Server Group', defaultValue: 'Standalone Instance', cellRenderer: ValueOrDefaultCellRenderer }
+    { key: 'region', cellRenderer: BasicCellRenderer },
+    { key: 'serverGroup', label: 'Server Group', defaultValue: 'Standalone Instance', cellRenderer: DefaultValueCellRenderer }
   ],
   displayName: 'Instances',
   order: 4,

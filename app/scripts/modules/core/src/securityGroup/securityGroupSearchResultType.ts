@@ -3,7 +3,7 @@ import { IPromise } from 'angular';
 import { $q } from 'ngimport';
 
 import {
-  AccountCellRenderer, DefaultCellRenderer, DefaultSearchResultsRenderer, HrefCellRenderer, searchResultTypeRegistry,
+  AccountCellRenderer, BasicCellRenderer, DefaultSearchResultsRenderer, HrefCellRenderer, searchResultTypeRegistry,
   ISearchResult,
 } from 'core/search';
 
@@ -34,7 +34,7 @@ searchResultTypeRegistry.register({
   columns: [
     { key: 'name', cellRenderer: HrefCellRenderer },
     { key: 'account', cellRenderer: AccountCellRenderer },
-    { key: 'region', cellRenderer: DefaultCellRenderer }
+    { key: 'region', cellRenderer: BasicCellRenderer }
   ],
   displayName: 'Security Groups',
   icon: 'exchange',
