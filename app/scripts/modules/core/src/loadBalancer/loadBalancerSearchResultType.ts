@@ -1,9 +1,26 @@
 import { IPromise } from 'angular';
 import { $q } from 'ngimport';
 
-import { ILoadBalancerSearchResult, searchResultTypeRegistry } from '../search';
-import { AccountCellRenderer, DefaultCellRenderer, DefaultSearchResultsRenderer, HrefCellRenderer } from 'core';
+import {
+  AccountCellRenderer, DefaultCellRenderer, DefaultSearchResultsRenderer, HrefCellRenderer, searchResultTypeRegistry,
+  ISearchResult
+} from 'core/search';
 
+export interface ILoadBalancerSearchResult extends ISearchResult {
+  account: string;
+  application: string;
+  detail: string;
+  displayName: string;
+  href: string;
+  loadBalancer: string;
+  loadBalancerType: string;
+  provider: string;
+  region: string;
+  stack: string;
+  type: string;
+  url: string;
+  vpcId: string;
+}
 
 const loadBalancerSort = (a: ILoadBalancerSearchResult, b: ILoadBalancerSearchResult) => {
   const order: number = a.loadBalancer.localeCompare(b.loadBalancer);

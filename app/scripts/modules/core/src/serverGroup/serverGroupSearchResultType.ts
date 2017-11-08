@@ -1,13 +1,22 @@
 import { IPromise } from 'angular';
 import { $q } from 'ngimport';
 
-import { ISearchResult, searchResultTypeRegistry } from '../search';
-import { AccountCellRenderer, DefaultCellRenderer, DefaultSearchResultsRenderer, HrefCellRenderer } from 'core';
+import {
+  AccountCellRenderer, DefaultCellRenderer, DefaultSearchResultsRenderer, HrefCellRenderer, searchResultTypeRegistry,
+  ISearchResult
+} from 'core/search';
 
 export interface IServerGroupSearchResult extends ISearchResult {
   account: string;
+  application: string;
+  cluster: string;
+  detail: string;
+  email?: string;
   region: string;
+  sequence: string;
   serverGroup: string;
+  stack: string;
+  url: string;
 }
 
 const serverGroupSort = (a: IServerGroupSearchResult, b: IServerGroupSearchResult) => {

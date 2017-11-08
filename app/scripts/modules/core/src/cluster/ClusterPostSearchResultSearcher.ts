@@ -8,8 +8,8 @@ import {
   searchResultTypeRegistry
 } from 'core/search/searchResult/searchResultsType.registry';
 import { ISearchResultSet } from 'core/search/infrastructure/infrastructureSearch.service';
-import { IClusterSearchResult } from 'core/search/searchResult/model/IClusterSearchResult';
-import { IServerGroupSearchResult } from 'core/search/searchResult/model/IServerGroupSearchResult';
+import { IServerGroupSearchResult } from 'core/serverGroup/serverGroupSearchResultType';
+import { IClusterSearchResult } from 'core/cluster/clusterSearchResultType';
 import { IPostSearchResultSearcher } from 'core/search/searchResult/PostSearchResultSearcherRegistry';
 
 export class ClusterPostSearchResultSearcher implements IPostSearchResultSearcher<IServerGroupSearchResult> {

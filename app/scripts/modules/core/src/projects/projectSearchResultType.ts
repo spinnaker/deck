@@ -1,14 +1,27 @@
 import { IPromise } from 'angular';
 import { $q } from 'ngimport';
 
-import { ISearchResult, searchResultTypeRegistry } from '../search';
-import { DefaultCellRenderer, DefaultSearchResultsRenderer, HrefCellRenderer } from 'core';
+import {
+  searchResultTypeRegistry, DefaultCellRenderer, DefaultSearchResultsRenderer, HrefCellRenderer, ISearchResult
+} from 'core/search';
+import { IProjectConfig } from 'core';
 
 export interface IProjectSearchResult extends ISearchResult {
-  id?: string;
+  applications: string[];
+  clusters: string[];
+  config: IProjectConfig;
+  createTs: number;
+  displayName: string;
+  email: string;
+  href: string;
+  id: string;
+  lastModifiedBy: string;
   name?: string;
+  pipelineConfigId: string;
   project?: string;
-  config?: { applications: string[] }
+  type: string;
+  updateTs: number;
+  url: string;
 }
 
 searchResultTypeRegistry.register({

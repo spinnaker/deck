@@ -3,16 +3,23 @@ import { $q } from 'ngimport';
 
 import { SearchFilterTypeRegistry } from 'core/search/widgets/SearchFilterTypeRegistry';
 import {
-  AccountCellRenderer, DefaultCellRenderer, HrefCellRenderer, ValueOrDefaultCellRenderer, ISearchResult,
-  searchResultTypeRegistry
+  AccountCellRenderer, DefaultCellRenderer, HrefCellRenderer, ValueOrDefaultCellRenderer, searchResultTypeRegistry,
+  DefaultSearchResultsRenderer, ISearchResult
 } from 'core/search';
-import { DefaultSearchResultsRenderer } from 'core';
 
 export interface IInstanceSearchResult extends ISearchResult {
-  serverGroup?: string;
+  account: string;
+  application: string;
+  cluster: string;
+  displayName: string;
+  href: string;
   instanceId: string;
+  provider: string;
   region: string;
+  serverGroup: string;
+  type: string;
 }
+
 
 searchResultTypeRegistry.register({
   id: 'instances',

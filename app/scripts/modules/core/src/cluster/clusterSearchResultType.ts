@@ -3,11 +3,16 @@ import { IPromise } from 'angular';
 import { $q } from 'ngimport';
 
 import {
-  ISearchResult, searchResultTypeRegistry, DefaultSearchResultsRenderer , AccountCellRenderer, DefaultCellRenderer, HrefCellRenderer
+  searchResultTypeRegistry, DefaultSearchResultsRenderer, AccountCellRenderer, DefaultCellRenderer, HrefCellRenderer,
+  ISearchResult
 } from 'core/search';
 
 export interface IClusterSearchResult extends ISearchResult {
+  account: string;
+  application: string;
   cluster: string;
+  email?: string;
+  stack: string;
 }
 
 searchResultTypeRegistry.register({

@@ -2,16 +2,24 @@ import { IPromise } from 'angular';
 
 import { $q } from 'ngimport';
 
-import { ISearchResult, searchResultTypeRegistry } from '../search';
-import { AccountCellRenderer, DefaultCellRenderer, DefaultSearchResultsRenderer, HrefCellRenderer } from 'core';
+import {
+  AccountCellRenderer, DefaultCellRenderer, DefaultSearchResultsRenderer, HrefCellRenderer, searchResultTypeRegistry,
+  ISearchResult,
+} from 'core/search';
 
 export interface ISecurityGroupSearchResult extends ISearchResult {
   account: string;
   application: string;
+  href: string;
   id: string;
   name: string;
+  provider: string;
   region: string;
+  type: string;
+  url: string;
+  vpcId: string;
 }
+
 const securityGroupSort = (a: ISecurityGroupSearchResult, b: ISecurityGroupSearchResult) => {
   let order: number = a.name.localeCompare(b.name);
   if (order === 0) {

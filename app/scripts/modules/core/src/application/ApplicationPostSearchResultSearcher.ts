@@ -7,7 +7,7 @@ import { IPostSearchResultSearcher } from 'core/search/searchResult/PostSearchRe
 import { ISearchResult } from 'core/search/search.service';
 import { ISearchResultType, searchResultTypeRegistry } from 'core/search/searchResult/searchResultsType.registry';
 import { ISearchResultSet } from 'core/search/infrastructure/infrastructureSearch.service';
-import { IServerGroupSearchResult } from 'core/search/searchResult/model/IServerGroupSearchResult';
+import { IServerGroupSearchResult } from 'core/serverGroup/serverGroupSearchResultType';
 
 export class ApplicationPostSearchResultSearcher implements IPostSearchResultSearcher<IServerGroupSearchResult> {
 
