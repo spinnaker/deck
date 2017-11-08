@@ -9,7 +9,6 @@ module.exports = angular.module('spinnaker.ecs.pipeline.stage.scaleDownClusterSt
       provides: 'scaleDownCluster',
       cloudProvider: 'ecs',
       templateUrl: require('./scaleDownClusterStage.html'),
-      executionDetailsUrl: require('./scaleDownClusterExecutionDetails.html'),
       executionConfigSections: ['scaleDownClusterConfig', 'taskStatus'],
       accountExtractor: (stage) => [stage.context.credentials],
       configAccountExtractor: (stage) => [stage.credentials],
