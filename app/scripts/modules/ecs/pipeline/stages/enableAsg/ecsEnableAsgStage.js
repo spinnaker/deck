@@ -12,7 +12,6 @@ module.exports = angular.module('spinnaker.ecs.pipeline.stage.enableAsgStage', [
       alias: 'enableAsg',
       cloudProvider: 'ecs',
       templateUrl: require('./enableAsgStage.html'),
-      executionDetailsUrl: PipelineTemplates.enableAsgExecutionDetails,
       executionStepLabelUrl: require('./enableAsgStepLabel.html'),
       validators: [
         { type: 'requiredField', fieldName: 'cluster' },
