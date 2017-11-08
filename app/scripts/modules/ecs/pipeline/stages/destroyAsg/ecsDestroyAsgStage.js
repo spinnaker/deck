@@ -11,7 +11,6 @@ module.exports = angular.module('spinnaker.ecs.pipeline.stage.ecs.destroyAsgStag
       alias: 'destroyAsg',
       cloudProvider: 'ecs',
       templateUrl: require('./destroyAsgStage.html'),
-      executionDetailsUrl: PipelineTemplates.destroyAsgExecutionDetails,
       executionStepLabelUrl: require('./destroyAsgStepLabel.html'),
       accountExtractor: (stage) => [stage.context.credentials],
       configAccountExtractor: (stage) => [stage.credentials],
