@@ -3,6 +3,7 @@ import { BindAll } from 'lodash-decorators';
 
 import { ISearchResultType } from './searchResultsType.registry';
 import { SearchStatus } from './SearchResults';
+import { Spinner } from 'core/widgets';
 
 export interface ISearchResultGridProps {
   searchStatus: SearchStatus;
@@ -11,27 +12,14 @@ export interface ISearchResultGridProps {
 }
 
 const NoQuery = () => (
-  <div className="flex-center">
+  <div className="flex-fill vertical center middle">
     <h2>Please enter a search query to get started</h2>
   </div>
 );
 
 const NoResults = () => (
-  <div className="flex-center">
+  <div className="flex-fill vertical center middle">
     <h2>No results found for the specified search query</h2>
-  </div>
-);
-
-const Searching = () => (
-  <div className="load large flex-center">
-    <div className="message">Fetching search results...</div>
-    <div className="bars">
-      <div className="bar full"/>
-      <div className="bar"/>
-      <div className="bar"/>
-      <div className="bar"/>
-      <div className="bar"/>
-    </div>
   </div>
 );
 
@@ -44,7 +32,11 @@ export class SearchResultGrid extends React.Component<ISearchResultGridProps> {
       case SearchStatus.INITIAL:
         return <NoQuery/>;
       case SearchStatus.SEARCHING:
-        return <Searching/>;
+        return (
+          <div className="flex-fill vertical center middle">
+            <Spinner size="large" message="Fetching search results ..."/>
+          </div>
+        );
       case SearchStatus.NO_RESULTS:
         return <NoResults/>;
       case SearchStatus.FINISHED:
