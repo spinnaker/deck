@@ -51,7 +51,7 @@ searchResultTypeRegistry.register({
     const project = searchResult.name || searchResult.project;
     return $q.when(project + applications);
   },
-  renderers: {
+  components: {
     SearchResultTab: ({ ...props }) => (
       <SearchResultTab {...props} iconClass={iconClass} label={displayName} />
     ),

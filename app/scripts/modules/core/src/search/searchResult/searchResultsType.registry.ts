@@ -19,7 +19,7 @@ export interface ISearchResultType {
   iconClass: string;
   displayName: string;
 
-  renderers?: {
+  components?: {
     /** renders the tab button used to activate the search results for this ISearchResultType */
     SearchResultTab: React.ComponentType<ISearchResultTabProps>;
     /** renders the faux-table column headers */

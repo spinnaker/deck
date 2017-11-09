@@ -53,7 +53,7 @@ searchResultTypeRegistry.register({
     return $q.when(name + ' (' + searchResult.region + ')');
   },
 
-  renderers: {
+  components: {
     SearchResultTab: ({ ...props }) => (
       <SearchResultTab {...props} iconClass={iconClass} label={displayName} />
     ),

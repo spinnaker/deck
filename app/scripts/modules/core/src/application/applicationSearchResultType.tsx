@@ -47,7 +47,7 @@ searchResultTypeRegistry.register({
   displayFormatter(searchResult: IApplicationSearchResult): IPromise<string> {
     return $q.when(searchResult.application);
   },
-  renderers: {
+  components: {
     SearchResultTab: ({ ...props }) => (
       <SearchResultTab {...props} iconClass={iconClass} label={displayName} />
     ),

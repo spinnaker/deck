@@ -22,7 +22,7 @@ export class SearchResultTabs extends React.Component<ISearchResultTabsProps> {
     return (
       <div className="search-groups">
         {searchResultData.map(({ type, results }) => {
-          const { SearchResultTab } = type.renderers;
+          const { SearchResultTab } = type.components;
           return (
             <SearchResultTab
               key={type.id}

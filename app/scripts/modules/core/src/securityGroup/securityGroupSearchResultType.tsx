@@ -50,7 +50,7 @@ searchResultTypeRegistry.register({
   displayFormatter(searchResult: ISecurityGroupSearchResult): IPromise<string> {
     return $q.when(searchResult.name + ' (' + searchResult.region + ')');
   },
-  renderers: {
+  components: {
     SearchResultTab: ({ ...props }) => (
       <SearchResultTab {...props} iconClass={iconClass} label={displayName} />
     ),

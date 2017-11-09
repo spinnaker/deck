@@ -38,7 +38,7 @@ searchResultTypeRegistry.register({
   displayFormatter(searchResult: IClusterSearchResult): IPromise<string> {
     return $q.when(searchResult.cluster);
   },
-  renderers: {
+  components: {
     SearchResultTab: ({ ...props }) => (
       <SearchResultTab {...props} iconClass={iconClass} label={displayName} />
     ),

@@ -48,7 +48,7 @@ searchResultTypeRegistry.register({
     const serverGroup = searchResult.serverGroup || 'standalone instance';
     return $q.when(searchResult.instanceId + ' (' + serverGroup + ' - ' + searchResult.region + ')');
   },
-  renderers: {
+  components: {
     SearchResultTab: ({ ...props }) => (
       <SearchResultTab {...props} iconClass={iconClass} label={displayName} />
     ),

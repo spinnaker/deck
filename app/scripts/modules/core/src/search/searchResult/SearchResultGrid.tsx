@@ -48,7 +48,7 @@ export class SearchResultGrid extends React.Component<ISearchResultGridProps> {
       case SearchStatus.NO_RESULTS:
         return <NoResults/>;
       case SearchStatus.FINISHED:
-        const { SearchResultsHeader, SearchResultsData } = searchResultsType.renderers;
+        const { SearchResultsHeader, SearchResultsData } = searchResultsType.components;
 
         return (
           <div className="search-result-grid flex-fill" style={{ height: 'initial' }}>
