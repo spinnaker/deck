@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import {
-  searchResultTypeRegistry, AccountCell, BasicCell, HrefCell,
+  searchResultTypeRegistry, AccountCell, BasicCell, HrefCell, ISearchColumn,
   HeaderCell, TableBody, TableHeader, TableRow, ISearchResult, SearchResultTab,
 } from 'core/search';
 
@@ -13,10 +13,10 @@ export interface IClusterSearchResult extends ISearchResult {
   stack: string;
 }
 
-const cols = {
-  CLUSTER: { key: 'cluster', label: 'Name', cellRenderer: HrefCell },
-  ACCOUNT: { key: 'account', cellRenderer: AccountCell },
-  EMAIL: { key: 'email', cellRenderer: BasicCell }
+const cols: { [key: string]: ISearchColumn } = {
+  CLUSTER: { key: 'cluster', label: 'Name' },
+  ACCOUNT: { key: 'account' },
+  EMAIL: { key: 'email' }
 };
 
 const iconClass = 'fa fa-th';

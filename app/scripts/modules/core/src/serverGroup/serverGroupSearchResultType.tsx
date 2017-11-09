@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import {
-  AccountCell, BasicCell, HrefCell, searchResultTypeRegistry,
+  AccountCell, BasicCell, HrefCell, searchResultTypeRegistry, ISearchColumn,
   ISearchResult, HeaderCell, TableBody, TableHeader, TableRow, SearchResultTab,
 } from 'core/search';
 
@@ -18,11 +18,11 @@ export interface IServerGroupSearchResult extends ISearchResult {
   url: string;
 }
 
-const cols = {
-  SERVERGROUP: { key: 'serverGroup', label: 'Name', cellRenderer: HrefCell },
-  ACCOUNT: { key: 'account', cellRenderer: AccountCell },
-  REGION: { key: 'region', cellRenderer: BasicCell },
-  EMAIL: { key: 'email', cellRenderer: BasicCell }
+const cols: { [key: string]: ISearchColumn } = {
+  SERVERGROUP: { key: 'serverGroup', label: 'Name' },
+  ACCOUNT: { key: 'account' },
+  REGION: { key: 'region' },
+  EMAIL: { key: 'email' }
 };
 
 const iconClass = 'fa fa-th-large';

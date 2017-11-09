@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import {
   AccountCell, BasicCell, HrefCell, searchResultTypeRegistry, ISearchResult,
-  HeaderCell, TableBody, TableHeader, TableRow, SearchResultTab
+  HeaderCell, TableBody, TableHeader, TableRow, SearchResultTab, ISearchColumn,
 } from 'core/search';
 
 export interface IApplicationSearchResult extends ISearchResult {
@@ -23,10 +23,10 @@ export interface IApplicationSearchResult extends ISearchResult {
   user: string;
 }
 
-const cols = {
-  APPLICATION: { key: 'application', label: 'Name', cellRenderer: HrefCell },
-  ACCOUNT: { key: 'accounts', label: 'Account', cellRenderer: AccountCell },
-  EMAIL: { key: 'email', label: 'Owner Email', cellRenderer: BasicCell },
+const cols: { [key: string]: ISearchColumn } = {
+  APPLICATION: { key: 'application', label: 'Name' },
+  ACCOUNT: { key: 'accounts', label: 'Account' },
+  EMAIL: { key: 'email' },
 };
 
 const iconClass = 'fa fa-window-maximize';

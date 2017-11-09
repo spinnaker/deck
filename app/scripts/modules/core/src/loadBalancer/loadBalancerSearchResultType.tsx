@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import {
-  AccountCell, BasicCell, HrefCell, searchResultTypeRegistry,
+  AccountCell, BasicCell, HrefCell, searchResultTypeRegistry, ISearchColumn,
   ISearchResult, HeaderCell, TableBody, TableHeader, TableRow, SearchResultTab,
 } from 'core/search';
 
@@ -21,11 +21,11 @@ export interface ILoadBalancerSearchResult extends ISearchResult {
   vpcId: string;
 }
 
-const cols = {
-  LOADBALANCER: { key: 'loadBalancer', label: 'Name', cellRenderer: HrefCell },
-  ACCOUNT: { key: 'account', cellRenderer: AccountCell },
-  REGION: { key: 'region', cellRenderer: BasicCell },
-  TYPE: { key: 'loadBalancerType', label: 'Type', cellRenderer: BasicCell }
+const cols: { [key: string]: ISearchColumn } = {
+  LOADBALANCER: { key: 'loadBalancer', label: 'Name' },
+  ACCOUNT: { key: 'account' },
+  REGION: { key: 'region' },
+  TYPE: { key: 'loadBalancerType', label: 'Type' },
 };
 
 const iconClass = 'fa fa-sitemap';

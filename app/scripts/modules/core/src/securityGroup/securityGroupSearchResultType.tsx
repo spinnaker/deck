@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import {
-  AccountCell, BasicCell, HrefCell, searchResultTypeRegistry,
+  AccountCell, BasicCell, HrefCell, searchResultTypeRegistry, ISearchColumn,
   ISearchResult, HeaderCell, TableBody, TableHeader, TableRow, SearchResultTab,
 } from 'core/search';
 
@@ -18,10 +18,10 @@ export interface ISecurityGroupSearchResult extends ISearchResult {
   vpcId: string;
 }
 
-const cols = {
-  NAME: { key: 'name', cellRenderer: HrefCell },
-  ACCOUNT: { key: 'account', cellRenderer: AccountCell },
-  REGION: { key: 'region', cellRenderer: BasicCell }
+const cols: { [key: string]: ISearchColumn } = {
+  NAME: { key: 'name' },
+  ACCOUNT: { key: 'account' },
+  REGION: { key: 'region' }
 };
 
 const iconClass = 'fa fa-exchange';

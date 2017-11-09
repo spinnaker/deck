@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import {
   AccountCell, BasicCell, HrefCell, searchResultTypeRegistry, SearchFilterTypeRegistry,
-  ISearchResult, HeaderCell, TableBody, TableHeader, TableRow, SearchResultTab,
+  ISearchResult, HeaderCell, TableBody, TableHeader, TableRow, SearchResultTab, ISearchColumn,
 } from 'core/search';
 
 export interface IInstanceSearchResult extends ISearchResult {
@@ -18,11 +18,11 @@ export interface IInstanceSearchResult extends ISearchResult {
   type: string;
 }
 
-const cols = {
-  INSTANCE: { key: 'instanceId', label: 'Instance ID', cellRenderer: HrefCell },
-  ACCOUNT: { key: 'accounts', cellRenderer: AccountCell },
-  REGION: { key: 'region', cellRenderer: BasicCell },
-  SERVERGROUP: { key: 'serverGroup', label: 'Server Group', defaultValue: 'Standalone Instance', cellRenderer: BasicCell }
+const cols: { [key: string]: ISearchColumn } = {
+  INSTANCE: { key: 'instanceId', label: 'Instance ID' },
+  ACCOUNT: { key: 'accounts' },
+  REGION: { key: 'region' },
+  SERVERGROUP: { key: 'serverGroup' }
 };
 
 const iconClass = 'fa fa-hdd-o';

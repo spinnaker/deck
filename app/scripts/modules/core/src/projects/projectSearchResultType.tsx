@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import {
   searchResultTypeRegistry, BasicCell, HrefCell, ISearchResult, HeaderCell,
-  TableBody, TableHeader, TableRow, SearchResultTab,
+  TableBody, TableHeader, TableRow, SearchResultTab, ISearchColumn,
 } from 'core/search';
 import { IProjectConfig } from 'core/domain';
 
@@ -24,9 +24,9 @@ export interface IProjectSearchResult extends ISearchResult {
   url: string;
 }
 
-const cols = {
-  NAME: { key: 'name', cellRenderer: HrefCell },
-  EMAIL: { key: 'email', cellRenderer: BasicCell }
+const cols: { [key: string]: ISearchColumn } = {
+  NAME: { key: 'name' },
+  EMAIL: { key: 'email' },
 };
 
 const iconClass = 'fa fa-folder-o';

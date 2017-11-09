@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { capitalize, kebabCase } from 'lodash';
+import { startCase, kebabCase } from 'lodash';
 
 import { NgReact } from 'core/reactShims';
 
@@ -51,7 +51,7 @@ export class HeaderCell extends React.Component<{ col: ISearchColumn }> {
     const { col } = this.props;
     return (
       <div className={colClass(col.key)}>
-        {col.label || capitalize(col.key)}
+        {col.label || startCase(col.key)}
       </div>
     );
   }
