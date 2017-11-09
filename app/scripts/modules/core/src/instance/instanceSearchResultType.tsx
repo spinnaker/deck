@@ -23,7 +23,7 @@ export interface IInstanceSearchResult extends ISearchResult {
 
 const cols = {
   INSTANCE: { key: 'instanceId', label: 'Instance ID', cellRenderer: HrefCell },
-  ACCOUNTS: { key: 'accounts', cellRenderer: AccountCell },
+  ACCOUNT: { key: 'accounts', cellRenderer: AccountCell },
   REGION: { key: 'region', cellRenderer: BasicCell },
   SERVERGROUP: { key: 'serverGroup', label: 'Server Group', defaultValue: 'Standalone Instance', cellRenderer: BasicCell }
 };
@@ -54,7 +54,7 @@ searchResultTypeRegistry.register({
     SearchResultsHeader: () => (
       <TableHeader>
         <HeaderCell col={cols.INSTANCE}/>
-        <HeaderCell col={cols.ACCOUNTS}/>
+        <HeaderCell col={cols.ACCOUNT}/>
         <HeaderCell col={cols.REGION}/>
         <HeaderCell col={cols.SERVERGROUP}/>
       </TableHeader>
@@ -65,7 +65,7 @@ searchResultTypeRegistry.register({
         {results.slice().sort(itemSortFn).map(item => (
           <TableRow key={itemKeyFn(item)}>
             <HrefCell item={item} col={cols.INSTANCE} />
-            <AccountCell item={item} col={cols.ACCOUNTS} />
+            <AccountCell item={item} col={cols.ACCOUNT} />
             <BasicCell item={item} col={cols.REGION} />
             <BasicCell item={item} col={cols.SERVERGROUP} defaultValue="Standalone Instance" />
           </TableRow>

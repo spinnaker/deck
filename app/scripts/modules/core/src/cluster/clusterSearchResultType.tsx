@@ -17,7 +17,7 @@ export interface IClusterSearchResult extends ISearchResult {
 
 const cols = {
   CLUSTER: { key: 'cluster', label: 'Name', cellRenderer: HrefCell },
-  ACCOUNTS: { key: 'accounts', cellRenderer: AccountCell },
+  ACCOUNT: { key: 'account', cellRenderer: AccountCell },
   EMAIL: { key: 'email', cellRenderer: BasicCell }
 };
 
@@ -42,7 +42,7 @@ searchResultTypeRegistry.register({
     SearchResultsHeader: () => (
       <TableHeader>
         <HeaderCell col={cols.CLUSTER}/>
-        <HeaderCell col={cols.ACCOUNTS}/>
+        <HeaderCell col={cols.ACCOUNT}/>
         <HeaderCell col={cols.EMAIL}/>
       </TableHeader>
     ),
@@ -52,7 +52,7 @@ searchResultTypeRegistry.register({
         {results.slice().sort(itemSortFn).map(item => (
           <TableRow key={itemKeyFn(item)}>
             <HrefCell item={item} col={cols.CLUSTER} />
-            <AccountCell item={item} col={cols.ACCOUNTS} />
+            <AccountCell item={item} col={cols.ACCOUNT} />
             <BasicCell item={item} col={cols.EMAIL} />
           </TableRow>
         ))}

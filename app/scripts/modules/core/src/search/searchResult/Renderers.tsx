@@ -3,8 +3,6 @@ import { capitalize, kebabCase } from 'lodash';
 
 import { NgReact } from 'core/reactShims';
 
-export type CellRenderer = React.ComponentType<{ item: any, col: ISearchColumn, defaultValue?: string }>;
-
 export interface ISearchColumn {
   key: string;
   label?: string;
@@ -14,33 +12,50 @@ export interface ISearchColumn {
 
 /****** Layout Renderers ******/
 
-export const TableHeader: React.StatelessComponent = ({ children }) => (
-  <div className="table-header">
-    {children}
-  </div>
-);
+export class TableHeader extends React.Component {
+  public render() {
+    return (
+      <div className="table-header">
+        {this.props.children}
+      </div>
+    );
+  }
+}
 
-export const TableRow: React.StatelessComponent = ({ children }) => (
-  <div className="table-row small">
-    {children}
-  </div>
-);
+export class TableRow extends React.Component {
+  public render() {
+    return (
+      <div className="table-row small">
+        {this.props.children}
+      </div>
+    );
+  }
+}
 
-export const TableBody: React.StatelessComponent = ({ children }) => (
-  <div className="table-contents flex-fill">
-    {children}
-  </div>
-);
+export class TableBody extends React.Component {
+  public render() {
+    return (
+      <div className="table-contents flex-fill">
+        {this.props.children}
+      </div>
+    );
+  }
+}
 
 /****** Cell Renderers ******/
 
 const colClass = (key: string) => `col-${kebabCase(key)}`;
 
-export const HeaderCell = ({ col }: { col: ISearchColumn }) => (
-  <div className={colClass(col.key)}>
-    {col.label || capitalize(col.key)}
-  </div>
-);
+export class HeaderCell extends React.Component<{ col: ISearchColumn }> {
+  public render() {
+    const { col } = this.props;
+    return (
+      <div className={colClass(col.key)}>
+        {col.label || capitalize(col.key)}
+      </div>
+    );
+  }
+}
 
 export interface ICellRendererProps {
   item: any;
@@ -48,31 +63,45 @@ export interface ICellRendererProps {
   defaultValue?: string;
 }
 
-export const BasicCell = ({ item, col, defaultValue = '' }: ICellRendererProps) => (
-  <div className={colClass(col.key)}>
-    {item[col.key] || defaultValue}
-  </div>
-);
-
-export const HrefCell = ({ item, col }: ICellRendererProps) => (
-  <div className={colClass(col.key)} >
-    <a href={item.href}>{item[col.key]}</a>
-  </div>
-);
-
-export const AccountCell = ({ item, col }: ICellRendererProps) => {
-  const { AccountTag } = NgReact;
-  const value = item[col.key];
-  if (!value) {
-    return <div className={colClass(col.key)}>-</div>;
+export class BasicCell extends React.Component<ICellRendererProps> {
+  public render() {
+    const { item, col, defaultValue } = this.props;
+    return (
+      <div className={colClass(col.key)}>
+        {item[col.key] || defaultValue}
+      </div>
+    );
   }
+}
 
-  const accounts = value.split(',').sort();
-  return (
-    <div className={colClass(col.key)}>
-      {accounts.map((account: string) => (
-        <AccountTag key={account} account={account}/>
-      ))}
-    </div>
-  );
-};
+export class HrefCell extends React.Component<ICellRendererProps> {
+  public render() {
+    const { item, col } = this.props;
+    return (
+      <div className={colClass(col.key)} >
+        <a href={item.href}>{item[col.key]}</a>
+      </div>
+    )
+  }
+}
+
+export class AccountCell extends React.Component<ICellRendererProps> {
+  public render() {
+    const { AccountTag } = NgReact;
+    const { item, col } = this.props;
+
+    const value = item[col.key];
+    if (!value) {
+      return <div className={colClass(col.key)}>-</div>;
+    }
+
+    const accounts = value.split(',').sort();
+    return (
+      <div className={colClass(col.key)}>
+        {accounts.map((account: string) => (
+          <AccountTag key={account} account={account}/>
+        ))}
+      </div>
+    );
+  }
+}

@@ -26,7 +26,7 @@ export interface IApplicationSearchResult extends ISearchResult {
 
 const cols = {
   APPLICATION: { key: 'application', label: 'Name', cellRenderer: HrefCell },
-  ACCOUNTS: { key: 'accounts', label: 'Account', cellRenderer: AccountCell },
+  ACCOUNT: { key: 'accounts', label: 'Account', cellRenderer: AccountCell },
   EMAIL: { key: 'email', label: 'Owner Email', cellRenderer: BasicCell },
 };
 
@@ -51,7 +51,7 @@ searchResultTypeRegistry.register({
     SearchResultsHeader: () => (
       <TableHeader>
         <HeaderCell col={cols.APPLICATION}/>
-        <HeaderCell col={cols.ACCOUNTS}/>
+        <HeaderCell col={cols.ACCOUNT}/>
         <HeaderCell col={cols.EMAIL}/>
       </TableHeader>
     ),
@@ -61,7 +61,7 @@ searchResultTypeRegistry.register({
         { results.slice().sort(itemSortFn).map(item => (
           <TableRow key={itemKeyFn(item)}>
             <HrefCell item={item} col={cols.APPLICATION} />
-            <AccountCell item={item} col={cols.ACCOUNTS} />
+            <AccountCell item={item} col={cols.ACCOUNT} />
             <BasicCell item={item} col={cols.EMAIL} />
           </TableRow>
         ))}
