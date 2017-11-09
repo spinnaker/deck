@@ -9,7 +9,7 @@ import {
 } from 'core/search/searchResult/searchResultsType.registry';
 import { ISearchResultSet } from 'core/search/infrastructure/infrastructureSearch.service';
 import { IServerGroupSearchResult } from 'core/serverGroup/serverGroupSearchResultType';
-import { IClusterSearchResult } from 'core/cluster/clusterSearchResultType';
+import { IClusterSearchResult } from './clusterSearchResultType';
 import { IPostSearchResultSearcher } from 'core/search/searchResult/PostSearchResultSearcherRegistry';
 
 export class ClusterPostSearchResultSearcher implements IPostSearchResultSearcher<IServerGroupSearchResult> {

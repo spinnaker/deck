@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { HeaderCellRenderer, ISearchResultType, ISearchColumn } from 'core';
+import { HeaderCell, ISearchResultType, ISearchColumn } from 'core';
 import { BindAll } from 'lodash-decorators';
 
 export interface IDefaultSearchResultsRendererProps {
@@ -33,39 +33,50 @@ export class DefaultSearchResultsRenderer extends React.Component<IDefaultSearch
   }
 }
 
+export const TableHeader: React.StatelessComponent = ({ children }) => (
+  <div className="table-header">
+    {children}
+  </div>
+);
+
 export interface ITableHeaderProps {
   type: ISearchResultType;
 }
 
 export class DefaultTableHeader extends React.Component<ITableHeaderProps> {
-  render() {
+  public render() {
     const { type } = this.props;
-
     return (
-      <div className="table-header">
+      <TableHeader>
         {type.columns.map(column => (
-          <HeaderCellRenderer key={column.key} col={column}/>
+          <HeaderCell key={column.key} col={column}/>
         ))}
-      </div>
+      </TableHeader>
     );
   }
 };
 
-export interface IDataRowProps {
+export interface ITableRowProps {
   cols: ISearchColumn[],
   item: any,
 }
 
-export class DefaultTableRow extends React.Component<IDataRowProps> {
+export const TableRow: React.StatelessComponent = ({ children }) => (
+  <div className="table-row small">
+    {children}
+  </div>
+);
+
+export class DefaultTableRow extends React.Component<ITableRowProps> {
   public render() {
     const { cols, item } = this.props;
     return (
-      <div className={`table-row small`}>
+      <TableRow>
         {cols.map(col => {
           const Renderer = col.cellRenderer;
           return <Renderer key={col.key} col={col} item={item}/>
         })}
-      </div>
+      </TableRow>
     )
   }
 }
@@ -76,15 +87,22 @@ export interface IDefaultTableBodyProps {
   items: any[];
 }
 
+export const TableBody: React.StatelessComponent = ({ children }) => (
+  <div className="table-contents flex-fill">
+    {children}
+  </div>
+);
+
+
 export class DefaultTableBody extends React.Component<IDefaultTableBodyProps> {
   public render() {
     const { items, type } = this.props;
     return (
-      <div className="table-contents flex-fill">
+      <TableBody>
         {items.map(item => (
           <DefaultTableRow key={type.itemKeyFn(item)} item={item} cols={type.columns}/>
         ))}
-      </div>
+      </TableBody>
     )
   }
 }

@@ -38,9 +38,7 @@ const Searching = () => (
 @BindAll()
 export class SearchResultGrid extends React.Component<ISearchResultGridProps> {
   public render(): React.ReactElement<SearchResultGrid> {
-    const { searchStatus, searchResultsType: type, searchResults } = this.props;
-
-    const SearchResultsRenderer = type && type.SearchResultsRenderer;
+    const { searchStatus, searchResults, searchResultsType } = this.props;
 
     switch (searchStatus) {
       case SearchStatus.INITIAL:
@@ -50,9 +48,14 @@ export class SearchResultGrid extends React.Component<ISearchResultGridProps> {
       case SearchStatus.NO_RESULTS:
         return <NoResults/>;
       case SearchStatus.FINISHED:
+        const { SearchResultsHeader, SearchResultsData } = searchResultsType.renderers;
+
         return (
           <div className="search-result-grid flex-fill" style={{ height: 'initial' }}>
-            <SearchResultsRenderer type={type} results={searchResults} />
+            <div className={`table table-search-results table-search-results-${searchResultsType.id}`}>
+              <SearchResultsHeader type={searchResultsType} />
+              <SearchResultsData type={searchResultsType} results={searchResults} />
+            </div>
           </div>
         );
       default:

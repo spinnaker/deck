@@ -1,10 +1,12 @@
 import { IPromise } from 'angular';
 import { $q } from 'ngimport';
+import * as React from 'react';
 
 import {
-  AccountCellRenderer, BasicCellRenderer, HrefCellRenderer, searchResultTypeRegistry, ISearchResult,
-  DefaultSearchResultsRenderer
+  AccountCell, BasicCell, HrefCell, searchResultTypeRegistry, ISearchResult,
+  HeaderCell, TableBody, TableHeader, TableRow,
 } from 'core/search';
+import { SearchResultTab } from 'core/search/searchResult/SearchResultTab';
 
 export interface IApplicationSearchResult extends ISearchResult {
   accounts: string[];
@@ -24,21 +26,50 @@ export interface IApplicationSearchResult extends ISearchResult {
   user: string;
 }
 
+const cols = {
+  APPLICATION: { key: 'application', label: 'Name', cellRenderer: HrefCell },
+  ACCOUNTS: { key: 'accounts', label: 'Account', cellRenderer: AccountCell },
+  EMAIL: { key: 'email', label: 'Owner Email', cellRenderer: BasicCell },
+};
+
+const itemKeyFn = (item: IApplicationSearchResult) => item.application;
+const itemSortFn = (a: IApplicationSearchResult, b: IApplicationSearchResult) =>
+  a.application.localeCompare(b.application);
 
 searchResultTypeRegistry.register({
   id: 'applications',
   displayName: 'Applications',
-  columns: [
-    { key: 'application', label: 'Name', cellRenderer: HrefCellRenderer },
-    { key: 'accounts', label: 'Account', cellRenderer: AccountCellRenderer },
-    { key: 'email', label: 'Owner Email', cellRenderer: BasicCellRenderer }
-  ],
+  columns: [ cols.APPLICATION, cols.ACCOUNTS, cols.EMAIL ],
   order: 1,
   icon: 'window-maximize',
-  itemKeyFn: (item: IApplicationSearchResult) => item.application,
-  itemSortFn: (a: IApplicationSearchResult, b: IApplicationSearchResult) => a.application.localeCompare(b.application),
+  itemKeyFn: itemKeyFn,
+  itemSortFn: itemSortFn,
   displayFormatter(searchResult: IApplicationSearchResult): IPromise<string> {
     return $q.when(searchResult.application);
   },
-  SearchResultsRenderer: DefaultSearchResultsRenderer,
+  renderers: {
+    SearchResultTab: ({ ...props }) => (
+      <SearchResultTab {...props} iconClass="window-maximize" label="Applications" />
+    ),
+
+    SearchResultsHeader: () => (
+      <TableHeader>
+        <HeaderCell col={cols.APPLICATION}/>
+        <HeaderCell col={cols.ACCOUNTS}/>
+        <HeaderCell col={cols.EMAIL}/>
+      </TableHeader>
+    ),
+
+    SearchResultsData: ({ results }) => (
+      <TableBody>
+        { results.map(item => (
+          <TableRow key={itemKeyFn(item)}>
+            <HrefCell item={item} col={cols.APPLICATION} />
+            <AccountCell item={item} col={cols.ACCOUNTS} />
+            <BasicCell item={item} col={cols.EMAIL} />
+          </TableRow>
+        ))}
+      </TableBody>
+    )
+  }
 });

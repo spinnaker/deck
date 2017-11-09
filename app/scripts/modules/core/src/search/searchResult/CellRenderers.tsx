@@ -16,7 +16,7 @@ export interface ISearchColumn {
 
 const colClass = (key: string) => `col-${kebabCase(key)}`;
 
-export const HeaderCellRenderer = ({ col }: { col: ISearchColumn }) => (
+export const HeaderCell = ({ col }: { col: ISearchColumn }) => (
   <div className={colClass(col.key)}>
     {col.label || capitalize(col.key)}
   </div>
@@ -27,21 +27,22 @@ export const HeaderCellRenderer = ({ col }: { col: ISearchColumn }) => (
 export interface ICellRendererProps {
   item: any;
   col: ISearchColumn;
+  defaultValue?: string;
 }
 
-export const BasicCellRenderer = ({ item, col }: ICellRendererProps) => (
+export const BasicCell = ({ item, col, defaultValue = '' }: ICellRendererProps) => (
   <div className={colClass(col.key)}>
-    {item[col.key]}
+    {item[col.key] || defaultValue}
   </div>
 );
 
-export const HrefCellRenderer = ({ item, col }: ICellRendererProps) => (
+export const HrefCell = ({ item, col }: ICellRendererProps) => (
   <div className={colClass(col.key)} >
     <a href={item.href}>{item[col.key]}</a>
   </div>
 );
 
-export const AccountCellRenderer = ({ item, col }: ICellRendererProps) => {
+export const AccountCell = ({ item, col }: ICellRendererProps) => {
   const { AccountTag } = NgReact;
   const value = item[col.key];
   if (!value) {
@@ -57,13 +58,3 @@ export const AccountCellRenderer = ({ item, col }: ICellRendererProps) => {
     </div>
   );
 };
-
-export interface IDefaultValueCellRendererProps extends ICellRendererProps {
-  defaultValue?: string;
-}
-
-export const DefaultValueCellRenderer = ({ item, col, defaultValue = '' }: IDefaultValueCellRendererProps) => (
-  <div className={colClass(col.key)}>
-    {item[col.key] || defaultValue}
-  </div>
-);

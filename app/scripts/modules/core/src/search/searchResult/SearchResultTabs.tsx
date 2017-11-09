@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { BindAll } from 'lodash-decorators';
 
-import { SearchResultTab } from 'core/search/searchResult/SearchResultTab';
 import { ISearchResultData } from 'core/search/searchResult/SearchResults';
 import { ISearchResultType } from './searchResultsType.registry';
 
@@ -22,15 +21,18 @@ export class SearchResultTabs extends React.Component<ISearchResultTabsProps> {
 
     return (
       <div className="search-groups">
-        {searchResultData.map(group => (
-          <SearchResultTab
-            key={group.type.id}
-            type={group.type}
-            resultsCount={group.results.length}
-            isActive={group.type === activeSearchResultType}
-            onClick={this.handleClick}
-          />
-        ))}
+        {searchResultData.map(({ type, results }) => {
+          const { SearchResultTab } = type.renderers;
+          return (
+            <SearchResultTab
+              key={type.id}
+              type={type}
+              resultsCount={results.length}
+              isActive={type === activeSearchResultType}
+              onClick={this.handleClick}
+            />
+          );
+        })}
       </div>
     );
   }

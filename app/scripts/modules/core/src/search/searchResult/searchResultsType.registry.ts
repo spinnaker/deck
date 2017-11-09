@@ -1,6 +1,7 @@
 import { IPromise } from 'angular';
 import { ISearchResult } from '../search.service';
 import { ISearchColumn } from 'core';
+import { ISearchResultTabProps } from 'core/search/searchResult/SearchResultTab';
 
 export interface IResultDisplayFormatter {
   (entry: ISearchResult, fromRoute?: boolean): IPromise<string>;
@@ -30,9 +31,14 @@ export interface ISearchResultType {
   order: number;
   requiredSearchFields?: string[];
 
-  /** The component that renders the search results of this type */
-  SearchResultsRenderer: React.ComponentType<{ type: ISearchResultType, results: any[] }>;
-
+  renderers?: {
+    /** renders the tab button used to activate the search results for this ISearchResultType */
+    SearchResultTab: React.ComponentType<ISearchResultTabProps>;
+    /** renders the faux-table column headers */
+    SearchResultsHeader: React.ComponentType<{ type: ISearchResultType }>;
+    /** renders the faux-table search result data rows and cells */
+    SearchResultsData: React.ComponentType<{ type: ISearchResultType, results: any[] }>;
+  }
 }
 
 export class SearchResultTypeRegistry {

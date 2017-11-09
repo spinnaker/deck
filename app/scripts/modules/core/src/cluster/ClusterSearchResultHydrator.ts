@@ -1,7 +1,7 @@
 import { get } from 'lodash';
 
 import { ApplicationReader, IApplicationSummary } from 'core/application/service/application.read.service';
-import { IClusterSearchResult } from 'core/cluster/clusterSearchResultType';
+import { IClusterSearchResult } from './clusterSearchResultType';
 import { ISearchResultHydrator } from 'core/search/searchResult/SearchResultHydratorRegistry';
 
 export class ClusterSearchResultHydrator implements ISearchResultHydrator<IClusterSearchResult> {

@@ -9,7 +9,9 @@ export interface ISearchResultTabProps {
   type: ISearchResultType;
   resultsCount: number;
   isActive: boolean;
-  onClick?: (group: ISearchResultType) => void;
+  onClick: (group: ISearchResultType) => void;
+  iconClass?: string;
+  label?: string;
 }
 
 @BindAll()
@@ -19,7 +21,7 @@ export class SearchResultTab extends React.Component<ISearchResultTabProps> {
     resultsCount && onClick && onClick(type);
   }
 
-  public render(): React.ReactElement<SearchResultTab> {
+  public render() {
     const { isActive, type, resultsCount } = this.props;
     const iconClass = type.icon ? `fa fa-${type.icon}` : type.iconClass;
     const countLabel = resultsCount < SearchService.DEFAULT_PAGE_SIZE ? `${resultsCount}` : `${resultsCount}+`;
