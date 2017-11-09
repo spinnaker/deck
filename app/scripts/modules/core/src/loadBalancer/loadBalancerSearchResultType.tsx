@@ -1,11 +1,9 @@
 import * as React from 'react';
 
-
 import {
   AccountCell, BasicCell, HrefCell, searchResultTypeRegistry,
-  ISearchResult, HeaderCell, TableBody, TableHeader, TableRow,
+  ISearchResult, HeaderCell, TableBody, TableHeader, TableRow, SearchResultTab,
 } from 'core/search';
-import { SearchResultTab } from 'core/search/searchResult/SearchResultTab';
 
 export interface ILoadBalancerSearchResult extends ISearchResult {
   account: string;

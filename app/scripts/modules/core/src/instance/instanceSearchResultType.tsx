@@ -1,12 +1,9 @@
 import * as React from 'react';
 
-import { SearchFilterTypeRegistry } from 'core/search/widgets/SearchFilterTypeRegistry';
 import {
-  AccountCell, BasicCell, HrefCell, searchResultTypeRegistry,
-  ISearchResult
+  AccountCell, BasicCell, HrefCell, searchResultTypeRegistry, SearchFilterTypeRegistry,
+  ISearchResult, HeaderCell, TableBody, TableHeader, TableRow, SearchResultTab,
 } from 'core/search';
-import { SearchResultTab } from 'core/search/searchResult/SearchResultTab';
-import { HeaderCell, TableBody, TableHeader, TableRow } from 'core';
 
 export interface IInstanceSearchResult extends ISearchResult {
   account: string;

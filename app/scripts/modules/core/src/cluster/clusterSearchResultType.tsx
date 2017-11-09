@@ -2,10 +2,8 @@ import * as React from 'react';
 
 import {
   searchResultTypeRegistry, AccountCell, BasicCell, HrefCell,
-  ISearchResult
+  HeaderCell, TableBody, TableHeader, TableRow, ISearchResult, SearchResultTab,
 } from 'core/search';
-import { SearchResultTab } from 'core/search/searchResult/SearchResultTab';
-import { HeaderCell, TableBody, TableHeader, TableRow } from 'core';
 
 export interface IClusterSearchResult extends ISearchResult {
   account: string;

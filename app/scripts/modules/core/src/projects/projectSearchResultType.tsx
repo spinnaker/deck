@@ -2,9 +2,8 @@ import * as React from 'react';
 
 import {
   searchResultTypeRegistry, BasicCell, HrefCell, ISearchResult, HeaderCell,
-  TableBody, TableHeader, TableRow,
+  TableBody, TableHeader, TableRow, SearchResultTab,
 } from 'core/search';
-import { SearchResultTab } from 'core/search/searchResult/SearchResultTab';
 import { IProjectConfig } from 'core/domain';
 
 export interface IProjectSearchResult extends ISearchResult {

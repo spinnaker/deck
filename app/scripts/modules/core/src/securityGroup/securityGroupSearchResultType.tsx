@@ -2,9 +2,8 @@ import * as React from 'react';
 
 import {
   AccountCell, BasicCell, HrefCell, searchResultTypeRegistry,
-  ISearchResult, HeaderCell, TableBody, TableHeader, TableRow,
+  ISearchResult, HeaderCell, TableBody, TableHeader, TableRow, SearchResultTab,
 } from 'core/search';
-import { SearchResultTab } from 'core/search/searchResult/SearchResultTab';
 
 export interface ISecurityGroupSearchResult extends ISearchResult {
   account: string;
@@ -31,12 +30,8 @@ const displayName = 'Security Groups';
 const itemKeyFn = (item: ISecurityGroupSearchResult) =>
   [item.id, item.name, item.account, item.region].join('|');
 const itemSortFn = (a: ISecurityGroupSearchResult, b: ISecurityGroupSearchResult) => {
-  let order: number = a.name.localeCompare(b.name);
-  if (order === 0) {
-    order = a.region.localeCompare(b.region);
-  }
-
-  return order;
+  const order = a.name.localeCompare(b.name);
+  return order !== 0 ? order : a.region.localeCompare(b.region);
 };
 
 searchResultTypeRegistry.register({
