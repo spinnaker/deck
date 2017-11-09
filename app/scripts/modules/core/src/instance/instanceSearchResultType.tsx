@@ -1,6 +1,4 @@
-import { IPromise } from 'angular';
 import * as React from 'react';
-import { $q } from 'ngimport';
 
 import { SearchFilterTypeRegistry } from 'core/search/widgets/SearchFilterTypeRegistry';
 import {
@@ -44,9 +42,9 @@ searchResultTypeRegistry.register({
   displayName,
   requiredSearchFields: [SearchFilterTypeRegistry.KEYWORD_FILTER.key],
 
-  displayFormatter(searchResult: IInstanceSearchResult): IPromise<string> {
+  displayFormatter: (searchResult: IInstanceSearchResult) => {
     const serverGroup = searchResult.serverGroup || 'standalone instance';
-    return $q.when(searchResult.instanceId + ' (' + serverGroup + ' - ' + searchResult.region + ')');
+    return `${searchResult.instanceId} (${serverGroup} - ${searchResult.region})`;
   },
   components: {
     SearchResultTab: ({ ...props }) => (

@@ -1,5 +1,3 @@
-import { IPromise } from 'angular';
-import { $q } from 'ngimport';
 import * as React from 'react';
 
 import {
@@ -44,12 +42,12 @@ searchResultTypeRegistry.register({
   order: 0,
   iconClass,
   displayName,
-  displayFormatter(searchResult: IProjectSearchResult): IPromise<string> {
+  displayFormatter: (searchResult: IProjectSearchResult) => {
     const applications = searchResult.config && searchResult.config.applications ?
-      ' (' + searchResult.config.applications.join(', ') + ')' :
+      ` (${searchResult.config.applications.join(', ')})` :
       '';
     const project = searchResult.name || searchResult.project;
-    return $q.when(project + applications);
+    return project + applications;
   },
   components: {
     SearchResultTab: ({ ...props }) => (

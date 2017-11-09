@@ -1,6 +1,4 @@
-import { IPromise } from 'angular';
 import * as React from 'react';
-import { $q } from 'ngimport';
 
 import {
   AccountCell, BasicCell, HrefCell, searchResultTypeRegistry,
@@ -47,9 +45,7 @@ searchResultTypeRegistry.register({
   order: 6,
   iconClass,
   displayName,
-  displayFormatter(searchResult: IServerGroupSearchResult): IPromise<string> {
-    return $q.when(searchResult.serverGroup + ' (' + searchResult.region + ')');
-  },
+  displayFormatter: (searchResult: IServerGroupSearchResult) => `${searchResult.serverGroup} (${searchResult.region})`,
   components: {
     SearchResultTab: ({ ...props }) => (
       <SearchResultTab {...props} iconClass={iconClass} label={displayName} />

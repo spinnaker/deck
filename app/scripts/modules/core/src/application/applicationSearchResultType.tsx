@@ -1,5 +1,3 @@
-import { IPromise } from 'angular';
-import { $q } from 'ngimport';
 import * as React from 'react';
 
 import {
@@ -44,9 +42,7 @@ searchResultTypeRegistry.register({
   order: 1,
   displayName,
   iconClass,
-  displayFormatter(searchResult: IApplicationSearchResult): IPromise<string> {
-    return $q.when(searchResult.application);
-  },
+  displayFormatter: (searchResult: IApplicationSearchResult) => searchResult.application,
   components: {
     SearchResultTab: ({ ...props }) => (
       <SearchResultTab {...props} iconClass={iconClass} label={displayName} />

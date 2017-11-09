@@ -1,9 +1,8 @@
-import { IPromise } from 'angular';
 import { ISearchResult } from 'core/search';
 import { ISearchResultTabProps } from 'core/search/searchResult/SearchResultTab';
 
 export interface IResultDisplayFormatter {
-  (entry: ISearchResult, fromRoute?: boolean): IPromise<string>;
+  (entry: ISearchResult, fromRoute?: boolean): string;
 }
 
 export interface ISearchResultType {

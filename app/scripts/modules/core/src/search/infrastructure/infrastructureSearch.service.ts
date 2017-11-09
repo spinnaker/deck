@@ -97,7 +97,7 @@ export class InfrastructureSearcher {
         formatter = providerFormatter[category];
       }
     }
-    return formatter(entry, fromRoute);
+    return this.$q.when(formatter(entry, fromRoute));
   }
 }
 

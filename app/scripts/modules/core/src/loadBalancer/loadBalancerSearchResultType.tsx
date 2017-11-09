@@ -1,5 +1,3 @@
-import { IPromise } from 'angular';
-import { $q } from 'ngimport';
 import * as React from 'react';
 
 
@@ -48,9 +46,9 @@ searchResultTypeRegistry.register({
   displayName,
   order: 5,
 
-  displayFormatter(searchResult: ILoadBalancerSearchResult, fromRoute: boolean): IPromise<string> {
+  displayFormatter: (searchResult: ILoadBalancerSearchResult, fromRoute: boolean) => {
     const name = fromRoute ? (searchResult as any).name : searchResult.loadBalancer;
-    return $q.when(name + ' (' + searchResult.region + ')');
+    return `${name} (${searchResult.region})`;
   },
 
   components: {
