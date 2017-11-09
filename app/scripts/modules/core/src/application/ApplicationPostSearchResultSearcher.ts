@@ -40,8 +40,7 @@ export class ApplicationPostSearchResultSearcher implements IPostSearchResultSea
       return [{
         id: ApplicationPostSearchResultSearcher.TYPE,
         category: ApplicationPostSearchResultSearcher.TYPE,
-        icon: formatter.icon,
-        iconClass: '',
+        iconClass: formatter.iconClass,
         order: formatter.order,
         results
       }];

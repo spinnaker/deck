@@ -32,20 +32,18 @@ const cols = {
   EMAIL: { key: 'email', cellRenderer: BasicCell }
 };
 
+const iconClass = 'fa fa-folder-o';
+const displayName = 'Projects';
+
 const itemKeyFn = (item: IProjectSearchResult) => item.id;
 const itemSortFn = (a: IProjectSearchResult, b: IProjectSearchResult) =>
   a.name.localeCompare(b.name);
 
 searchResultTypeRegistry.register({
   id: 'projects',
-  columns: [
-  ],
-  displayName: 'Projects',
   order: 0,
-  icon: 'folder-o',
-  itemKeyFn: itemKeyFn,
-  itemSortFn: itemSortFn,
-
+  iconClass,
+  displayName,
   displayFormatter(searchResult: IProjectSearchResult): IPromise<string> {
     const applications = searchResult.config && searchResult.config.applications ?
       ' (' + searchResult.config.applications.join(', ') + ')' :
@@ -55,7 +53,7 @@ searchResultTypeRegistry.register({
   },
   renderers: {
     SearchResultTab: ({ ...props }) => (
-      <SearchResultTab {...props} iconClass="fa fa-folder-o" label="Projects" />
+      <SearchResultTab {...props} iconClass={iconClass} label={displayName} />
     ),
 
     SearchResultsHeader: () => (
@@ -67,7 +65,7 @@ searchResultTypeRegistry.register({
 
     SearchResultsData: ({ results }) => (
       <TableBody>
-        {results.map(item => (
+        {results.slice().sort(itemSortFn).map(item => (
           <TableRow key={itemKeyFn(item)}>
             <HrefCell item={item} col={cols.NAME} />
             <BasicCell item={item} col={cols.EMAIL} />

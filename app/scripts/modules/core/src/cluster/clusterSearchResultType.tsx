@@ -23,25 +23,24 @@ const cols = {
   EMAIL: { key: 'email', cellRenderer: BasicCell }
 };
 
+const iconClass = 'fa fa-th';
+const displayName = 'Clusters';
+
 const itemKeyFn = (item: IClusterSearchResult) => item.cluster;
 const itemSortFn = (a: IClusterSearchResult, b: IClusterSearchResult) =>
   a.cluster.localeCompare(b.cluster);
 
 searchResultTypeRegistry.register({
   id: 'clusters',
-  columns: [ cols.CLUSTER, cols.ACCOUNTS, cols.EMAIL ],
-  displayName: 'Clusters',
   order: 2,
-  icon: 'th',
-  itemKeyFn: itemKeyFn,
-  itemSortFn: itemSortFn,
+  iconClass,
+  displayName,
   displayFormatter(searchResult: IClusterSearchResult): IPromise<string> {
     return $q.when(searchResult.cluster);
   },
-  // SearchResultsRenderer: DefaultSearchResultsRenderer,
   renderers: {
     SearchResultTab: ({ ...props }) => (
-      <SearchResultTab {...props} iconClass="fa fa-th" label="Clusters" />
+      <SearchResultTab {...props} iconClass={iconClass} label={displayName} />
     ),
 
     SearchResultsHeader: () => (
@@ -54,7 +53,7 @@ searchResultTypeRegistry.register({
 
     SearchResultsData: ({ results }) => (
       <TableBody>
-        {results.map(item => (
+        {results.slice().sort(itemSortFn).map(item => (
           <TableRow key={itemKeyFn(item)}>
             <HrefCell item={item} col={cols.CLUSTER} />
             <AccountCell item={item} col={cols.ACCOUNTS} />

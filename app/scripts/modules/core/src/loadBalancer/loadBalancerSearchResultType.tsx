@@ -25,11 +25,6 @@ export interface ILoadBalancerSearchResult extends ISearchResult {
   vpcId: string;
 }
 
-const itemSortFn = (a: ILoadBalancerSearchResult, b: ILoadBalancerSearchResult) => {
-  const order: number = a.loadBalancer.localeCompare(b.loadBalancer);
-  return order !== 0 ? order : a.region.localeCompare(b.region);
-};
-
 const cols = {
   LOADBALANCER: { key: 'loadBalancer', label: 'Name', cellRenderer: HrefCell },
   ACCOUNT: { key: 'account', cellRenderer: AccountCell },
@@ -37,14 +32,20 @@ const cols = {
   TYPE: { key: 'loadBalancerType', label: 'Type', cellRenderer: BasicCell }
 };
 
-let itemKeyFn = (item: ILoadBalancerSearchResult) => [item.loadBalancer, item.account, item.region].join('|');
+const iconClass = 'fa fa-sitemap';
+const displayName = 'Load Balancers';
+
+const itemKeyFn = (item: ILoadBalancerSearchResult) =>
+  [item.loadBalancer, item.account, item.region].join('|');
+const itemSortFn = (a: ILoadBalancerSearchResult, b: ILoadBalancerSearchResult) => {
+  const order: number = a.loadBalancer.localeCompare(b.loadBalancer);
+  return order !== 0 ? order : a.region.localeCompare(b.region);
+};
+
 searchResultTypeRegistry.register({
   id: 'loadBalancers',
-  columns: [ ],
-  displayName: 'Load Balancers',
-  icon: 'sitemap',
-  itemKeyFn: itemKeyFn,
-  itemSortFn: itemSortFn,
+  iconClass,
+  displayName,
   order: 5,
 
   displayFormatter(searchResult: ILoadBalancerSearchResult, fromRoute: boolean): IPromise<string> {
@@ -54,7 +55,7 @@ searchResultTypeRegistry.register({
 
   renderers: {
     SearchResultTab: ({ ...props }) => (
-      <SearchResultTab {...props} iconClass="fa fa-sitemap" label="Load Balancers" />
+      <SearchResultTab {...props} iconClass={iconClass} label={displayName} />
     ),
 
     SearchResultsHeader: () => (
@@ -68,7 +69,7 @@ searchResultTypeRegistry.register({
 
     SearchResultsData: ({ results }) => (
       <TableBody>
-        {results.map(item => (
+        {results.slice().sort(itemSortFn).map(item => (
           <TableRow key={itemKeyFn(item)}>
             <HrefCell item={item} col={cols.LOADBALANCER} />
             <AccountCell item={item} col={cols.ACCOUNT} />

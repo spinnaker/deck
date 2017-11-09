@@ -14,7 +14,6 @@ import { externalSearchRegistry } from '../externalSearch.registry';
 export interface ISearchResultSet {
   id: string,
   category: string,
-  icon: string,
   iconClass: string,
   order: number,
   results: ISearchResult[]
@@ -61,7 +60,6 @@ export class InfrastructureSearcher {
             return {
               id: category,
               category: config.displayName,
-              icon: config.icon,
               iconClass: config.iconClass,
               order: config.order,
               hideIfEmpty: config.hideIfEmpty,

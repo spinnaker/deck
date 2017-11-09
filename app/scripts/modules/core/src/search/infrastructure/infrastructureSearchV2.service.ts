@@ -25,7 +25,6 @@ export class InfrastructureSearchServiceV2 {
   private static EMPTY_RESULT: ISearchResultSet[] = [{
     id: '',
     category: '',
-    icon: '',
     iconClass: '',
     order: 0,
     results: getFallbackResults().results
@@ -152,7 +151,6 @@ export class InfrastructureSearchServiceV2 {
       result = {
         id,
         category: config.displayName,
-        icon: config.icon,
         iconClass: config.iconClass,
         order: config.order,
         results

@@ -30,19 +30,18 @@ const cols = {
   SERVERGROUP: { key: 'serverGroup', label: 'Server Group', defaultValue: 'Standalone Instance', cellRenderer: BasicCell }
 };
 
+const iconClass = 'fa fa-hdd-o';
+const displayName = 'Instances';
+
 const itemKeyFn = (item: IInstanceSearchResult) => item.instanceId;
 const itemSortFn = (a: IInstanceSearchResult, b: IInstanceSearchResult) =>
   a.instanceId.localeCompare(b.instanceId);
 
 searchResultTypeRegistry.register({
   id: 'instances',
-  columns: [
-  ],
-  displayName: 'Instances',
   order: 4,
-  icon: 'hdd-o',
-  itemKeyFn: itemKeyFn,
-  itemSortFn: itemSortFn,
+  iconClass,
+  displayName,
   requiredSearchFields: [SearchFilterTypeRegistry.KEYWORD_FILTER.key],
 
   displayFormatter(searchResult: IInstanceSearchResult): IPromise<string> {
@@ -51,7 +50,7 @@ searchResultTypeRegistry.register({
   },
   renderers: {
     SearchResultTab: ({ ...props }) => (
-      <SearchResultTab {...props} iconClass="fa fa-hdd-o" label="Instances" />
+      <SearchResultTab {...props} iconClass={iconClass} label={displayName} />
     ),
 
     SearchResultsHeader: () => (
@@ -65,7 +64,7 @@ searchResultTypeRegistry.register({
 
     SearchResultsData: ({ results }) => (
       <TableBody>
-        {results.map(item => (
+        {results.slice().sort(itemSortFn).map(item => (
           <TableRow key={itemKeyFn(item)}>
             <HrefCell item={item} col={cols.INSTANCE} />
             <AccountCell item={item} col={cols.ACCOUNTS} />

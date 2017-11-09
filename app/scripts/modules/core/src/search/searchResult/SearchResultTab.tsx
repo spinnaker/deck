@@ -23,7 +23,7 @@ export class SearchResultTab extends React.Component<ISearchResultTabProps> {
 
   public render() {
     const { isActive, type, resultsCount } = this.props;
-    const iconClass = type.icon ? `fa fa-${type.icon}` : type.iconClass;
+    const iconClass = type.iconClass;
     const countLabel = resultsCount < SearchService.DEFAULT_PAGE_SIZE ? `${resultsCount}` : `${resultsCount}+`;
 
     const className = classNames({

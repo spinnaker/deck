@@ -27,9 +27,11 @@ const cols = {
   REGION: { key: 'region', cellRenderer: BasicCell }
 };
 
+const iconClass = 'fa fa-exchange';
+const displayName = 'Security Groups';
+
 const itemKeyFn = (item: ISecurityGroupSearchResult) =>
   [item.id, item.name, item.account, item.region].join('|');
-
 const itemSortFn = (a: ISecurityGroupSearchResult, b: ISecurityGroupSearchResult) => {
   let order: number = a.name.localeCompare(b.name);
   if (order === 0) {
@@ -38,14 +40,11 @@ const itemSortFn = (a: ISecurityGroupSearchResult, b: ISecurityGroupSearchResult
 
   return order;
 };
+
 searchResultTypeRegistry.register({
   id: 'securityGroups',
-  columns: [
-  ],
-  displayName: 'Security Groups',
-  icon: 'exchange',
-  itemKeyFn: itemKeyFn,
-  itemSortFn: itemSortFn,
+  iconClass,
+  displayName,
   order: 6,
 
   displayFormatter(searchResult: ISecurityGroupSearchResult): IPromise<string> {
@@ -53,7 +52,7 @@ searchResultTypeRegistry.register({
   },
   renderers: {
     SearchResultTab: ({ ...props }) => (
-      <SearchResultTab {...props} iconClass="fa fa-exchange" label="Security Groups" />
+      <SearchResultTab {...props} iconClass={iconClass} label={displayName} />
     ),
 
     SearchResultsHeader: () => (
@@ -66,7 +65,7 @@ searchResultTypeRegistry.register({
 
     SearchResultsData: ({ results }) => (
       <TableBody>
-        {results.map(item => (
+        {results.slice().sort(itemSortFn).map(item => (
           <TableRow key={itemKeyFn(item)}>
             <HrefCell item={item} col={cols.NAME} />
             <AccountCell item={item} col={cols.ACCOUNT} />
@@ -76,5 +75,4 @@ searchResultTypeRegistry.register({
       </TableBody>
     )
   }
-
 });

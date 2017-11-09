@@ -1,35 +1,23 @@
 import { IPromise } from 'angular';
-import { ISearchResult } from '../search.service';
-import { ISearchColumn } from 'core';
+import { ISearchResult } from 'core/search';
 import { ISearchResultTabProps } from 'core/search/searchResult/SearchResultTab';
 
 export interface IResultDisplayFormatter {
   (entry: ISearchResult, fromRoute?: boolean): IPromise<string>;
 }
 
-export interface IResultRenderer {
-  scrollToTop: () => void;
-  render: (items: any[]) => JSX.Element;
-}
-
 export interface ISearchResultType {
   /** The unique key for the type, i.e., 'applications', 'serverGroup' */
   id: string;
-  columns: ISearchColumn[];
-
-  /** A function that creates a unique key for each item (for React key={}) */
-  itemKeyFn: (item: any) => string;
-  itemSortFn: (a: any, b: any) => number;
-
-  /** The name to display on the grouping tab */
-  displayName: string; // Name on tab
-  displayFormatter: IResultDisplayFormatter;
-  displayRenderer?: IResultRenderer;
-  hideIfEmpty?: boolean;
-  icon?: string;
-  iconClass?: string;
   order: number;
+  /** search fields necessary when searching for this type, i.e., ['key'] for instance search */
   requiredSearchFields?: string[];
+
+  /** v1 search fields */
+  displayFormatter: IResultDisplayFormatter;
+  hideIfEmpty?: boolean;
+  iconClass: string;
+  displayName: string;
 
   renderers?: {
     /** renders the tab button used to activate the search results for this ISearchResultType */

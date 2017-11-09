@@ -34,8 +34,7 @@ export class ClusterPostSearchResultSearcher implements IPostSearchResultSearche
     return this.$q.when([{
       id: type,
       category: type,
-      icon: formatter.icon,
-      iconClass: '',
+      iconClass: formatter.iconClass,
       order: formatter.order,
       results: clusters
     }]);

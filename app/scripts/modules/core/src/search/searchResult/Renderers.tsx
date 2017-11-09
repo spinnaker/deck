@@ -8,11 +8,31 @@ export type CellRenderer = React.ComponentType<{ item: any, col: ISearchColumn, 
 export interface ISearchColumn {
   key: string;
   label?: string;
-  defaultValue?: string;
   notSortable?: boolean;
   scopeField?: boolean;
-  cellRenderer: CellRenderer;
 }
+
+/****** Layout Renderers ******/
+
+export const TableHeader: React.StatelessComponent = ({ children }) => (
+  <div className="table-header">
+    {children}
+  </div>
+);
+
+export const TableRow: React.StatelessComponent = ({ children }) => (
+  <div className="table-row small">
+    {children}
+  </div>
+);
+
+export const TableBody: React.StatelessComponent = ({ children }) => (
+  <div className="table-contents flex-fill">
+    {children}
+  </div>
+);
+
+/****** Cell Renderers ******/
 
 const colClass = (key: string) => `col-${kebabCase(key)}`;
 
@@ -21,8 +41,6 @@ export const HeaderCell = ({ col }: { col: ISearchColumn }) => (
     {col.label || capitalize(col.key)}
   </div>
 );
-
-/****** Data Cell Renderers ******/
 
 export interface ICellRendererProps {
   item: any;

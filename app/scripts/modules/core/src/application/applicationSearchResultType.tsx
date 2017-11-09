@@ -32,24 +32,24 @@ const cols = {
   EMAIL: { key: 'email', label: 'Owner Email', cellRenderer: BasicCell },
 };
 
+const iconClass = 'fa fa-window-maximize';
+const displayName = 'Applications';
+
 const itemKeyFn = (item: IApplicationSearchResult) => item.application;
 const itemSortFn = (a: IApplicationSearchResult, b: IApplicationSearchResult) =>
   a.application.localeCompare(b.application);
 
 searchResultTypeRegistry.register({
   id: 'applications',
-  displayName: 'Applications',
-  columns: [ cols.APPLICATION, cols.ACCOUNTS, cols.EMAIL ],
   order: 1,
-  icon: 'window-maximize',
-  itemKeyFn: itemKeyFn,
-  itemSortFn: itemSortFn,
+  displayName,
+  iconClass,
   displayFormatter(searchResult: IApplicationSearchResult): IPromise<string> {
     return $q.when(searchResult.application);
   },
   renderers: {
     SearchResultTab: ({ ...props }) => (
-      <SearchResultTab {...props} iconClass="window-maximize" label="Applications" />
+      <SearchResultTab {...props} iconClass={iconClass} label={displayName} />
     ),
 
     SearchResultsHeader: () => (
@@ -62,7 +62,7 @@ searchResultTypeRegistry.register({
 
     SearchResultsData: ({ results }) => (
       <TableBody>
-        { results.map(item => (
+        { results.slice().sort(itemSortFn).map(item => (
           <TableRow key={itemKeyFn(item)}>
             <HrefCell item={item} col={cols.APPLICATION} />
             <AccountCell item={item} col={cols.ACCOUNTS} />
