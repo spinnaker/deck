@@ -22,7 +22,7 @@ module(SERVER_GROUP_MANAGER_DATA_SOURCE, [
   applicationDataSourceRegistry.registerDataSource({
     key: 'serverGroupManagers',
     visible: false,
-    onLoad,
     loader,
+    onLoad,
   });
 });

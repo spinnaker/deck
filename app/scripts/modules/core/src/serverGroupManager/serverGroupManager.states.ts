@@ -28,9 +28,9 @@ module(SERVER_GROUP_MANAGER_STATES, [APPLICATION_STATE_PROVIDER])
         }
       },
       resolve: {
-        serverGroup: ['$stateParams', ($stateParams: StateParams) => {
+        serverGroupManager: ['$stateParams', ($stateParams: StateParams) => {
           return {
-            name: $stateParams.serverGroup,
+            name: $stateParams.serverGroupManager,
             accountId: $stateParams.accountId,
             region: $stateParams.region,
           };

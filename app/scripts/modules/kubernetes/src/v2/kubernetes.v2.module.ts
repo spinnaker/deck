@@ -14,6 +14,7 @@ import { KUBERNETES_V2_SERVER_GROUP_TRANSFORMER } from './serverGroup/serverGrou
 import { KUBERNETES_V2_SERVER_GROUP_DETAILS_CTRL } from './serverGroup/details/details.controller';
 import { KUBERNETES_V2_SERVER_GROUP_RESIZE_CTRL } from './serverGroup/details/resize/resize.controller';
 import { KUBERNETES_V2_SERVER_GROUP_COMMAND_BUILDER } from './serverGroup/serverGroupCommandBuilder.service';
+import { KUBERNETES_V2_SERVER_GROUP_MANAGER_DETAILS_CTRL } from './serverGroupManager/details/details.controller';
 
 // load all templates into the $templateCache
 const templates = require.context('kubernetes', true, /\.html$/);
@@ -28,9 +29,11 @@ module(KUBERNETES_V2_MODULE, [
   KUBERNETES_V2_INSTANCE_DETAILS_CTRL,
   KUBERNETES_V2_LOAD_BALANCER_DETAILS_CTRL,
   KUBERNETES_V2_SERVER_GROUP_COMMAND_BUILDER,
-  KUBERNETES_V2_SERVER_GROUP_TRANSFORMER,
   KUBERNETES_V2_SERVER_GROUP_DETAILS_CTRL,
+  KUBERNETES_V2_SERVER_GROUP_TRANSFORMER,
+  KUBERNETES_V2_SERVER_GROUP_MANAGER_DETAILS_CTRL,
   KUBERNETES_V2_SERVER_GROUP_RESIZE_CTRL,
+  KUBERNETES_V2_SERVER_GROUP_MANAGER_DETAILS_CTRL,
   KUBERNETES_MANIFEST_BASIC_SETTINGS,
   KUBERNETES_MANIFEST_COMMAND_BUILDER,
   KUBERNETES_MANIFEST_CTRL,
@@ -52,7 +55,8 @@ module(KUBERNETES_V2_MODULE, [
         detailsController: 'kubernetesV2ServerGroupDetailsCtrl',
       },
       serverGroupManager: {
-        
+        detailsTemplateUrl: require('./serverGroupManager/details/details.html'),
+        detailsController: 'kubernetesV2ServerGroupManagerDetailsCtrl',
       },
       loadBalancer: {
         detailsTemplateUrl: require('./loadBalancer/details/details.html'),
