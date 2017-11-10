@@ -51,6 +51,9 @@ module(KUBERNETES_V2_MODULE, [
         detailsTemplateUrl: require('./serverGroup/details/details.html'),
         detailsController: 'kubernetesV2ServerGroupDetailsCtrl',
       },
+      serverGroupManager: {
+        
+      },
       loadBalancer: {
         detailsTemplateUrl: require('./loadBalancer/details/details.html'),
         detailsController: 'kubernetesV2LoadBalancerDetailsCtrl',
