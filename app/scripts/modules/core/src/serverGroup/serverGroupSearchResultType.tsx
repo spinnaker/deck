@@ -23,7 +23,7 @@ export interface IServerGroupSearchResult extends ISearchResult {
   serverGroup: string;
   stack: string;
   url: string;
-  instanceCounts: IInstanceCounts;
+  instanceCounts?: IInstanceCounts;
 }
 
 const cols: { [key: string]: ISearchColumn } = {
@@ -60,7 +60,7 @@ const SearchResultsHeader: SearchResultsHeaderComponent = () => (
 
 const SearchResultsData: SearchResultsDataComponent<IServerGroupSearchResult> = ({ results }) => (
   <TableBody>
-    {results.slice().sort(itemSortFn).map(item => (
+    {results.map(item => (
       <TableRow key={itemKeyFn(item)}>
         <HrefCell item={item} col={cols.SERVERGROUP} />
         <AccountCell item={item} col={cols.ACCOUNT} />
@@ -91,7 +91,7 @@ const makeServerGroupTuples = (sgToFetch: IServerGroupSearchResult[], fetched: I
   return sgToFetch.map(toFetch => ({ toFetch, fetched: findFetchedValue(toFetch) }));
 };
 
-const fetchServerGroups = (toFetch: IServerGroupSearchResult[]) => {
+const fetchServerGroups = (toFetch: IServerGroupSearchResult[]): Observable<IServerGroupTuple[]> => {
   const fetchPromise = ReactInjector.API.one('serverGroups')
     .withParams({ serverGroupNames: toFetch.map(sg => `${sg.account}:${sg.region}:${sg.serverGroup}`) })
     .get()
@@ -101,10 +101,12 @@ const fetchServerGroups = (toFetch: IServerGroupSearchResult[]) => {
 };
 
 /**
- * Wraps a server group search results component and augments with health/instance counts
+ * HOC which provides provides server group health/instance counts
  *
- * The /search endpoints do not return instance counts.
- * This component waits until it is rendered, then starts fetching instance counts and mutating the search results.
+ * The /search endpoint does not return instance counts.
+ * This component fetches instance counts separately and provides them to the wrapped component.
+ * This component waits until it is rendered, then starts fetching instance counts.
+ * It mutates the input search results and then passes the data to the nested component.
  */
 const AddHealthCounts = (Component: SearchResultsDataComponent<IServerGroupSearchResult>): SearchResultsDataComponent<IServerGroupSearchResult> => {
   return class FetchHealthCounts extends React.Component<IServerGroupDataProps, IServerGroupDataState> {
@@ -115,11 +117,12 @@ const AddHealthCounts = (Component: SearchResultsDataComponent<IServerGroupSearc
     constructor(props: any) {
       super(props);
 
+      // results to use when a fetch has failed.
       const failedFetch = (failedFetches: IServerGroupSearchResult[]) =>
-        Observable.of(failedFetches.map(toFetch => ({ toFetch, fetched: { instanceCounts: null } })));
+        Observable.of(failedFetches.map(toFetch => ({ toFetch, fetched: { instanceCounts: null } as IServerGroup })));
 
       // fetch a batch of server groups.
-      const processBatch = (batch: IServerGroupSearchResult[]) => {
+      const processBatch = (batch: IServerGroupSearchResult[]): Observable<IServerGroupTuple[]> => {
         return fetchServerGroups(batch).catch((err: { status: number }) => {
           // In case of 404 during batch fetch, fall back to individual fetch
           if (err.status === 404) {
