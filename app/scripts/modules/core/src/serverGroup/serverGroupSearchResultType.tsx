@@ -127,7 +127,7 @@ const AddHealthCounts = (Component: SearchResultsDataComponent<IServerGroupSearc
           // In case of 404 during batch fetch, fall back to individual fetch
           if (err.status === 404) {
             // retry, but fetch each servergroup individually
-            return Observable.from(batch).flatMap(sg => {
+            return Observable.from(batch).mergeMap(sg => {
               return fetchServerGroups([sg]).catch(() => failedFetch([sg]))
             });
           }
@@ -136,7 +136,7 @@ const AddHealthCounts = (Component: SearchResultsDataComponent<IServerGroupSearc
         });
       };
 
-      this.results$.flatMap((searchResults: IServerGroupSearchResult[]) => {
+      this.results$.mergeMap((searchResults: IServerGroupSearchResult[]) => {
         return Observable.from(searchResults)
           .filter(result => result.instanceCounts === undefined)
           // Serially fetch instance counts in batches of 25
