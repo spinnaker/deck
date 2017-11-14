@@ -115,7 +115,7 @@ export class HealthCountsCell extends React.Component<ICellRendererProps> {
       case undefined:
         return <Spinner size="small"/>;
       case null:
-        return <span className="error">error</span>;
+        return <span>?</span>;
       default:
         return <HealthCounts container={instanceCounts}/>;
     }

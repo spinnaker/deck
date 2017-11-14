@@ -87,13 +87,14 @@ interface IServerGroupTuple {
 }
 
 const makeServerGroupTuples = (sgToFetch: IServerGroupSearchResult[], fetched: IServerGroup[]): IServerGroupTuple[] => {
-  const findFetchedValue = (toFetch: IServerGroupSearchResult) => fetched.find(sg => sg.name === toFetch.serverGroup);
+  const findFetchedValue = (toFetch: IServerGroupSearchResult) =>
+    fetched.find(sg => sg.name === toFetch.serverGroup && sg.account === toFetch.account && sg.region === toFetch.region);
   return sgToFetch.map(toFetch => ({ toFetch, fetched: findFetchedValue(toFetch) }));
 };
 
 const fetchServerGroups = (toFetch: IServerGroupSearchResult[]): Observable<IServerGroupTuple[]> => {
   const fetchPromise = ReactInjector.API.one('serverGroups')
-    .withParams({ serverGroupNames: toFetch.map(sg => `${sg.account}:${sg.region}:${sg.serverGroup}`) })
+    .withParams({ ids: toFetch.map(sg => `${sg.account}:${sg.region}:${sg.serverGroup}`) })
     .get()
     .then((fetched: IServerGroup[]) => makeServerGroupTuples(toFetch, fetched));
 
@@ -122,19 +123,8 @@ const AddHealthCounts = (Component: SearchResultsDataComponent<IServerGroupSearc
         Observable.of(failedFetches.map(toFetch => ({ toFetch, fetched: { instanceCounts: null } as IServerGroup })));
 
       // fetch a batch of server groups.
-      const processBatch = (batch: IServerGroupSearchResult[]): Observable<IServerGroupTuple[]> => {
-        return fetchServerGroups(batch).catch((err: { status: number }) => {
-          // In case of 404 during batch fetch, fall back to individual fetch
-          if (err.status === 404) {
-            // retry, but fetch each servergroup individually
-            return Observable.from(batch).mergeMap(sg => {
-              return fetchServerGroups([sg]).catch(() => failedFetch([sg]))
-            });
-          }
-
-          return Observable.of(failedFetch(batch))
-        });
-      };
+      const processBatch = (batch: IServerGroupSearchResult[]): Observable<IServerGroupTuple[]> =>
+        fetchServerGroups(batch).catch(() => failedFetch(batch));
 
       this.results$.mergeMap((searchResults: IServerGroupSearchResult[]) => {
         return Observable.from(searchResults)
