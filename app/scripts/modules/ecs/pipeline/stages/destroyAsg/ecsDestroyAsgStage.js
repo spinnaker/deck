@@ -2,7 +2,7 @@
 
 const angular = require('angular');
 
-import { PipelineTemplates, StageConstants } from '@spinnaker/core';
+import { StageConstants } from '@spinnaker/core';
 
 module.exports = angular.module('spinnaker.ecs.pipeline.stage.ecs.destroyAsgStage', [])
   .config(function(pipelineConfigProvider) {
