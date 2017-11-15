@@ -1,6 +1,8 @@
 'use strict';
 
 import _ from 'lodash';
+import { PIPELINE_CONFIG_SERVICE } from '@spinnaker/core';
+import { KUBERNETES_IMAGE_ID_FILTER } from 'kubernetes/presentation/imageId.filter';
 
 const angular = require('angular');
 
@@ -9,7 +11,11 @@ module.exports = angular.module('spinnaker.kubernetes.pipeline.stage.runJobStage
   require('kubernetes/container/arguments.component.js').name,
   require('kubernetes/container/environmentVariables.component.js').name,
   require('kubernetes/container/volumes.component.js').name,
-  require('./runJobExecutionDetails.controller.js').name
+  require('kubernetes/image/image.reader.js').name,
+  require('./runJobExecutionDetails.controller.js').name,
+  require('./configureJob.controller.js').name,
+  PIPELINE_CONFIG_SERVICE,
+  KUBERNETES_IMAGE_ID_FILTER,
 ])
   .config(function(pipelineConfigProvider) {
     pipelineConfigProvider.registerStage({
@@ -21,104 +27,28 @@ module.exports = angular.module('spinnaker.kubernetes.pipeline.stage.runJobStage
       validators: [
         { type: 'requiredField', fieldName: 'account' },
         { type: 'requiredField', fieldName: 'namespace' },
-        { type: 'custom', validate: (_pipeline, stage) => {
-          let response = null;
-
-          if (stage.container.imageDescription.fromTrigger === false && !stage.container.imageDescription.tag) {
-            response = '<strong>Tag</strong> is a required field for Run Job stages.';
-          } else if (stage.container.imageDescription.fromTrigger === true && !stage.container.imageDescription.registry) {
-            response = '<strong>Trigger</strong> is a required field for Run Job stages.';
-          }
-
-          return response;
-        }},
       ]
     });
-  }).controller('kubernetesRunJobStageCtrl', function($scope, accountService) {
+  }).controller('kubernetesRunJobStageCtrl', function($scope, $uibModal, accountService, kubernetesImageReader, pipelineConfigService, $filter) {
 
     this.stage = $scope.stage;
     this.pipeline = $scope.pipeline;
-    this.container = null;
-
-    this.policies = ['ClusterFirst', 'Default', 'ClusterFirstWithHostNet'];
-
-    const buildImageDescriptor = (image) => {
-      let descriptor = `${image.account}/${image.repository}`;
-      if (image.tag) {
-        descriptor += `:${image.tag}`;
-      }
-      return descriptor;
-    };
-
-    if (!_.has(this.stage, 'container.name')) {
-      _.set(this.stage, 'container.name', 'job');
-    }
-
-    if (!_.has(this.stage, 'container.imageDescription.fromTrigger')) {
-      _.set(this.stage, 'container.imageDescription.fromTrigger', false);
-    }
-
-    if (!this.stage.dnsPolicy) {
-      this.stage.dnsPolicy = 'ClusterFirst';
-    }
-
-    if (this.stage.container.imageDescription.fromTrigger === true) {
-      this.container = buildImageDescriptor(this.stage.container.imageDescription);
-    }
-
-    accountService.getUniqueAttributeForAllAccounts('kubernetes', 'namespaces')
-      .then((namespaces) => {
-        this.namespaces = namespaces;
-      });
-
-    accountService.listAccounts('kubernetes')
-      .then((accounts) => {
-        this.accounts = accounts;
-      });
-
     this.stage.cloudProvider = 'kubernetes';
     this.stage.application = $scope.application.name;
-
-    if (!this.stage.credentials && $scope.application.defaultCredentials.kubernetes) {
-      this.stage.credentials = $scope.application.defaultCredentials.kubernetes;
-    }
-
-    this.onChange = (changes) => {
-      this.stage.container.imageDescription.registry = changes.registry;
-    };
-
-    this.triggerImages = () => {
-
-      if (this.pipeline.triggers.length <= 0) {
-        return [];
-      }
-
-      return this.pipeline.triggers.filter((trigger) => {
-        return trigger.type === 'docker';
-      }).map((trigger) => {
-        return buildImageDescriptor(trigger);
-      });
-    };
-
-    this.hasDockerPipelineTriggers = () => {
-      return this.triggerImages().length > 0;
-    };
-
-    this.updateContainerImage = () => {
-
-      const trigger = this.pipeline.triggers.find((trigger) => buildImageDescriptor(trigger) === this.container);
-
-      if (trigger) {
-        this.stage.container.imageDescription.account = trigger.account;
-        this.stage.container.imageDescription.organization = trigger.organization;
-        this.stage.container.imageDescription.repository = trigger.repository;
-        this.stage.container.imageDescription.registry = trigger.registry;
-        if (trigger.tag) {
-          this.stage.container.imageDescription.tag = trigger.tag;
-        } else {
-          this.stage.container.imageDescription.tag = null;
+    
+    this.configureJob = () => {
+      return $uibModal.open({
+        templateUrl: require('./configureJob.html'),
+        controller: 'kubernetesConfigureJobController as ctrl',
+        size: 'lg',
+        resolve: {
+          stage: () => angular.copy(this.stage),
+          pipeline: () => this.pipeline,
+          application: () => $scope.application
         }
-      }
+      }).result.then((stage) => {
+        _.extend(this.stage, stage);
+      }).catch(() => {});
     };
 
   });
