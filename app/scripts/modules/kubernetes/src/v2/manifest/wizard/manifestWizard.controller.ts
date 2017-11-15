@@ -19,6 +19,7 @@ import {
 class KubernetesManifestWizardCtrl implements IController {
   public state = {
     loaded: false,
+    isNew: true,
   };
   public taskMonitor: TaskMonitor;
   public command: IKubernetesManifestCommand;

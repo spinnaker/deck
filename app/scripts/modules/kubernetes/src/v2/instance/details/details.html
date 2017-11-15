@@ -34,6 +34,9 @@
           <li>
             <a href ng-click="ctrl.deleteInstance()">Delete Instance</a>
           </li>
+          <li>
+            <a href ng-click="ctrl.editInstance()">Edit Instance</a>
+          </li>
         </ul>
       </div>
     </div>
@@ -50,6 +53,12 @@
         <dd>{{ctrl.instance.kind}}</dd>
       </dl>
     </collapsible-section>
+    <collapsible-section heading="Logs" expanded="true">
+      <div>
+        <console-output-link instance="ctrl.instance"></console-output-link>
+      </div>
+    </collapsible-section>
   </div>
+
 </div>
 

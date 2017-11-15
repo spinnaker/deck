@@ -64,6 +64,20 @@ class KubernetesInstanceDetailsController implements IController {
     });
   }
 
+  public editInstance(): void {
+    this.$uibModal.open({
+      templateUrl: require('../../manifest/wizard/manifestWizard.html'),
+      size: 'lg',
+      controller: 'kubernetesV2ManifestEditCtrl',
+      controllerAs: 'ctrl',
+      resolve: {
+        sourceManifest: this.instance.manifest,
+        sourceMoniker: this.instance.moniker,
+        application: this.app
+      }
+    });
+  }
+
   private retrieveInstance(instance: InstanceFromStateParams): IPromise<IKubernetesInstance> {
     const instanceLocatorPredicate = (dataSource: InstanceManager) => {
       return dataSource.instances.some((possibleMatch) => possibleMatch.id === instance.instanceId);
@@ -95,6 +109,8 @@ class KubernetesInstanceDetailsController implements IController {
           instanceDetails.displayName = instanceDetails.manifest.metadata.name;
           instanceDetails.kind = instanceDetails.manifest.kind;
           instanceDetails.apiVersion = instanceDetails.manifest.apiVersion;
+          instanceDetails.id = instanceDetails.name;
+          instanceDetails.provider = 'kubernetes';
           return instanceDetails;
         });
     } else {
