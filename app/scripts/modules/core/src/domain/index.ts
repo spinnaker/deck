@@ -1,5 +1,3 @@
-export * from '../search/searchResult/model/IApplicationSearchResult';
-
 export * from './IArtifact'
 export * from './IArtifactKindConfig'
 
@@ -40,6 +38,7 @@ export * from './IRegionalCluster';
 
 export * from './ISecurityGroup';
 export * from './IServerGroup';
+export * from './IServerGroupManager';
 export * from './IStage';
 export * from './IStageContext';
 export * from './IStageOrTriggerTypeConfig';
