@@ -2,7 +2,7 @@
 
 const angular = require('angular');
 
-import { PipelineTemplates, PIPELINE_CONFIG_PROVIDER } from '@spinnaker/core';
+import { PIPELINE_CONFIG_PROVIDER } from '@spinnaker/core';
 
 module.exports = angular.module('spinnaker.ecs.pipeline.stage.ecs.shrinkClusterStage', [
   PIPELINE_CONFIG_PROVIDER,
