@@ -30,11 +30,6 @@ module.exports = angular.module('spinnaker.kubernetes.pipeline.stage.runJobStage
         this.accounts = accounts;
       });
 
-
-    if (!_.has(this.stage, 'container.name')) {
-      _.set(this.stage, 'container.name', 'job');
-    }
-
     if (!this.stage.dnsPolicy) {
       this.stage.dnsPolicy = 'ClusterFirst';
     }
@@ -138,18 +133,18 @@ module.exports = angular.module('spinnaker.kubernetes.pipeline.stage.runJobStage
       }
     };
 
-    this.setPostStartHandler = (handler) => {
-      if (!this.stage.container.lifecycle) {
-        this.stage.container.lifecycle = {};
+    this.setPostStartHandler = (index, handler) => {
+      if (!this.stage.containers[index].lifecycle) {
+        this.stage.containers[index].lifecycle = {};
       }
-      this.stage.container.lifecycle.postStart = handler;
+      this.stage.containers[index].lifecycle.postStart = handler;
     };
 
-    this.setPreStopHandler = (handler) => {
-      if (!this.stage.container.lifecycle) {
-        this.stage.container.lifecycle = {};
+    this.setPreStopHandler = (index, handler) => {
+      if (!this.stage.containers[index].lifecycle) {
+        this.stage.containers[index].lifecycle = {};
       }
-      this.stage.container.lifecycle.preStop = handler;
+      this.stage.containers[index].lifecycle.preStop = handler;
     };
 
     this.submit = () => {

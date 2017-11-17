@@ -35,6 +35,11 @@ module.exports = angular.module('spinnaker.kubernetes.pipeline.stage.runJobStage
     this.pipeline = $scope.pipeline;
     this.stage.cloudProvider = 'kubernetes';
     this.stage.application = $scope.application.name;
+
+    if (this.stage.container && !this.stage.containers) {
+      this.stage.containers = [this.stage.container];
+      delete this.stage.container;
+    }
     
     this.configureJob = () => {
       return $uibModal.open({
