@@ -42,8 +42,7 @@ export class InsightFilterStateModel {
   }
 
   public triggerReflow(): void {
-    // wait 300ms to allow animation to complete
-    this.$timeout(() => this.$rootScope.$broadcast('page-reflow'), 300);
+    this.$rootScope.$broadcast('page-reflow');
   }
 }
 
