@@ -1,6 +1,6 @@
 'use strict';
 
-import {EXECUTION_SERVICE} from 'core/delivery/service/execution.service';
+import {EXECUTION_SERVICE} from 'core/pipeline/service/execution.service';
 
 const angular = require('angular');
 
@@ -54,7 +54,7 @@ module.exports = angular
         return;
       }
       this.viewState.executionsLoading = true;
-      executionService.getExecutions(command.trigger.application, {statuses: []})
+      executionService.getExecutions(command.trigger.application)
         .then(executionLoadSuccess, executionLoadFailure);
     };
 

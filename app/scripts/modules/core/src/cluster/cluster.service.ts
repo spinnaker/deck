@@ -1,14 +1,14 @@
-import {IPromise, IQService, module} from 'angular';
-import {forOwn, get, groupBy, has, head, keys, values} from 'lodash';
+import { IPromise, IQService, module } from 'angular';
+import { forOwn, get, groupBy, has, head, keys, values } from 'lodash';
 
-import {Api, API_SERVICE} from '../api/api.service';
-import {NAMING_SERVICE, NamingService} from 'core/naming/naming.service';
-import {taskMatches} from './task.matcher';
+import { Api, API_SERVICE } from '../api/api.service';
+import { NAMING_SERVICE, NamingService } from 'core/naming/naming.service';
+import { taskMatches } from './task.matcher';
 import { IServerGroup } from 'core/domain';
-import {Application} from 'core/application/application.model';
-import {ICluster, IClusterSummary} from '../domain/ICluster';
-import {IExecutionStage} from '../domain/IExecutionStage';
-import {IExecution} from '../domain/IExecution';
+import { Application } from 'core/application/application.model';
+import { ICluster, IClusterSummary } from '../domain/ICluster';
+import { IExecutionStage } from '../domain/IExecutionStage';
+import { IExecution } from '../domain/IExecution';
 import { CLUSTER_FILTER_MODEL, ClusterFilterModel } from './filter/clusterFilter.model';
 
 export class ClusterService {
@@ -179,7 +179,7 @@ export class ClusterService {
       const clusters: IClusterSummary[] = [];
       Object.keys(clustersMap).forEach(account => {
         clustersMap[account].forEach(name => {
-          clusters.push({account, name});
+          clusters.push({ account, name });
         });
       });
       return clusters;
@@ -213,10 +213,14 @@ export class ClusterService {
 
   private addNameParts(serverGroup: IServerGroup): void {
     const nameParts = this.namingService.parseServerGroupName(serverGroup.name);
-    serverGroup.app = nameParts.application;
-    serverGroup.stack = nameParts.stack;
-    serverGroup.detail = nameParts.freeFormDetails;
-    serverGroup.cluster = nameParts.cluster;
+    if (serverGroup.moniker) {
+      Object.assign(serverGroup, serverGroup.moniker);
+    } else {
+      serverGroup.app = nameParts.application;
+      serverGroup.stack = nameParts.stack;
+      serverGroup.detail = nameParts.freeFormDetails;
+      serverGroup.cluster = nameParts.cluster;
+    }
     serverGroup.category = 'serverGroup';
   }
 

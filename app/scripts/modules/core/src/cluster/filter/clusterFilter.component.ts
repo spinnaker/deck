@@ -1,11 +1,12 @@
-import {compact, uniq, map} from 'lodash';
-import {IScope, module} from 'angular';
-
-import {CLUSTER_FILTER_SERVICE, ClusterFilterService} from 'core/cluster/filter/clusterFilter.service';
-import {Application} from 'core/application/application.model';
-import { CLUSTER_FILTER_MODEL, ClusterFilterModel } from './clusterFilter.model';
+import { IScope, module } from 'angular';
+import { compact, uniq, map } from 'lodash';
 import { Subscription } from 'rxjs';
+
+import { Application } from 'core/application/application.model';
+import { CLUSTER_FILTER_MODEL, ClusterFilterModel } from './clusterFilter.model';
+import { CLUSTER_FILTER_SERVICE, ClusterFilterService } from 'core/cluster/filter/clusterFilter.service';
 import { IFilterTag } from 'core/filterModel/FilterTags';
+
 export const CLUSTER_FILTER = 'spinnaker.core.cluster.filter.component';
 
 const ngmodule = module(CLUSTER_FILTER, [
@@ -26,6 +27,7 @@ class ClusterFilterCtrl {
   public regionHeadings: string[];
   public sortFilter: any;
   public stackHeadings: string[];
+  public detailHeadings: string[];
   public tags: IFilterTag[];
   private groupsUpdatedSubscription: Subscription;
   private locationChangeUnsubscribe: () => void;
@@ -89,7 +91,7 @@ class ClusterFilterCtrl {
   }
 
   public clearFilters(): void {
-    const {clusterFilterService, app} = this;
+    const { clusterFilterService, app } = this;
     clusterFilterService.clearFilters();
     clusterFilterService.updateClusterGroups(app);
     this.updateClusterGroups(false);
@@ -97,6 +99,7 @@ class ClusterFilterCtrl {
 
   public initialize(): void {
     this.stackHeadings = ['(none)'].concat(this.getHeadingsForOption('stack'));
+    this.detailHeadings = ['(none)'].concat(this.getHeadingsForOption('detail'));
     this.categoryHeadings = this.getHeadingsForOption('category');
     this.updateClusterGroups();
   }

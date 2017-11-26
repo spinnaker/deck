@@ -1,9 +1,8 @@
-import { IExpectedArtifact } from 'core/domain/IExpectedArtifact';
 export interface ITrigger {
   enabled: boolean;
   user?: string;
   type: string;
-  expectedArtifacts?: IExpectedArtifact[];
+  expectedArtifactIds?: string[]; // uuid references to ExpectedArtifacts defined in the Pipeline.
 }
 
 export interface IGitTrigger extends ITrigger {
@@ -19,6 +18,11 @@ export interface IBuildTrigger extends ITrigger {
   job: string;
   master: string;
   type: 'jenkins' | 'travis';
+}
+
+export interface IDockerTrigger extends ITrigger {
+  tag: string;
+  repository: string;
 }
 
 export interface IPipelineTrigger extends ITrigger {

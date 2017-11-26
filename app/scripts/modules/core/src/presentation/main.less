@@ -169,7 +169,7 @@ html {
         width: 210px;
       }
       @media(min-width: 1200px) {
-        width: 240px;
+        width: 230px;
       }
       @media(min-width: 1400px) {
         width: 310px;
@@ -424,7 +424,7 @@ html {
 }
 
 dl {
-  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .dl-horizontal {
@@ -466,7 +466,7 @@ dl {
 }
 
 .tooltip-inner {
-  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .tooltip-table {
@@ -553,7 +553,7 @@ body > .container {
     color: var(--color-white);
     font-weight: 200;
     padding: 10px 15px;
-    margin: 0 10px;
+    margin: 0 5px;
     border: 0;
     @media (max-width: 992px) {
       padding: 10px;
@@ -1424,7 +1424,7 @@ div.modal-header.has-sticky-headers {
   }
 
   table.table.no-lines th {
-    border-bottom: 1px solid @table-border-color;
+    border-bottom: 1px solid var(--color-seashell);
   }
 
   table.table.no-lines tr td {
@@ -1446,4 +1446,32 @@ div.modal-header.has-sticky-headers {
 
 .spinner-container {
   height: 100px;
+}
+
+.main-footer {
+  border-top: 1px solid var(--color-alto);
+  padding-top: 10px;
+  margin-top: 10px;
+
+  .alert {
+    display: inline-block;
+    margin-bottom: 0;
+    padding: 6px 12px;
+    vertical-align: middle;
+  }
+}
+
+.fixed-footer {
+  position: fixed;
+  z-index: 4;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 5px;
+  background-color: var(--color-white);
+  margin: 0;
+  border-top: 1px solid var(--color-alto);
+  .col-md-9, .col-md-3 {
+    padding: 0;
+  }
 }

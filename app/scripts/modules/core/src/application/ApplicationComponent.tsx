@@ -71,18 +71,12 @@ export class ApplicationComponent extends React.Component<IApplicationComponentP
   }
 
   public pageApplicationOwner(): void {
-    ReactInjector.modalService.open({
-      templateUrl: require('./modal/pageApplicationOwner.html'),
-      controller: 'PageApplicationOwner as ctrl',
-      resolve: {
-        application: () => this.props.app
-      }
-    })
+    ReactInjector.pagerDutyWriter.pageApplicationOwnerModal(this.props.app);
   }
 
   public handleRefresh(): void {
     // Force set refreshing to true since we are forcing the refresh
-    this.setState({refreshing: true});
+    this.setState({ refreshing: true });
     this.props.app.refresh(true);
   }
 
@@ -95,7 +89,7 @@ export class ApplicationComponent extends React.Component<IApplicationComponentP
     const NotFound = this.props.app.notFound ? (
       <div>
         <h2 className="text-center">Application Not Found</h2>
-        <p className="text-center" style={{marginBottom: '20px'}}>Please check your URL - we can't find any data for <em>{this.props.app.name}</em>.</p>
+        <p className="text-center" style={{ marginBottom: '20px' }}>Please check your URL - we can't find any data for <em>{this.props.app.name}</em>.</p>
       </div>
     ) : null;
 

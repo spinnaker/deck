@@ -9,12 +9,14 @@ import { PIPELINE_CONFIG_SERVICE } from 'core/pipeline/config/services/pipelineC
 import { EditPipelineJsonModalCtrl } from './actions/json/editPipelineJsonModal.controller';
 import { PIPELINE_CONFIG_VALIDATOR } from './validation/pipelineConfig.validator';
 import { PIPELINE_TEMPLATE_SERVICE } from './templates/pipelineTemplate.service';
+import { EXECUTION_BUILD_TITLE } from '../executionBuild/ExecutionBuildTitle';
 
 module.exports = angular.module('spinnaker.core.pipeline.config.pipelineConfigurer', [
   OVERRIDE_REGISTRY,
   PIPELINE_CONFIG_SERVICE,
   PIPELINE_CONFIG_VALIDATOR,
   PIPELINE_TEMPLATE_SERVICE,
+  EXECUTION_BUILD_TITLE,
 ])
   .directive('pipelineConfigurer', function() {
     return {
@@ -24,13 +26,15 @@ module.exports = angular.module('spinnaker.core.pipeline.config.pipelineConfigur
         application: '=',
         plan: '<',
         isTemplatedPipeline: '<',
+        hasDynamicSource: '<',
+        templateError: '<',
       },
       controller: 'PipelineConfigurerCtrl as pipelineConfigurerCtrl',
       templateUrl: require('./pipelineConfigurer.html'),
     };
   })
-  .controller('PipelineConfigurerCtrl', function($scope, $uibModal, $timeout, $window, $q,
-                                                 pipelineConfigValidator, pipelineTemplateService,
+  .controller('PipelineConfigurerCtrl', function($scope, $uibModal, $timeout, $window, $q, pipelineConfigValidator,
+                                                 pipelineTemplateService, executionService, executionsTransformer,
                                                  pipelineConfigService, viewStateCache, overrideRegistry, $location) {
     // For standard pipelines, a 'renderablePipeline' is just the pipeline config.
     // For templated pipelines, a 'renderablePipeline' is the pipeline template plan, and '$scope.pipeline' is the template config.
@@ -41,7 +45,7 @@ module.exports = angular.module('spinnaker.core.pipeline.config.pipelineConfigur
 
     this.warningsPopover = require('./warnings.popover.html');
 
-    pipelineConfigService.getHistory($scope.pipeline.id, 2).then(history => {
+    pipelineConfigService.getHistory($scope.pipeline.id, $scope.pipeline.strategy, 2).then(history => {
       if (history && history.length > 1) {
         $scope.viewState.hasHistory = true;
         this.setViewState({ hasHistory: true, loadingHistory: false });
@@ -116,7 +120,7 @@ module.exports = angular.module('spinnaker.core.pipeline.config.pipelineConfigur
           application: () => $scope.application,
           forStrategyConfig: () => $scope.pipeline.strategy,
         }
-      }).result.then(stageTemplate => ctrl.addStage(stageTemplate));
+      }).result.then(stageTemplate => ctrl.addStage(stageTemplate)).catch(() => {});
     };
 
     var ctrl = this;
@@ -163,7 +167,7 @@ module.exports = angular.module('spinnaker.core.pipeline.config.pipelineConfigur
       }).result.then(() => {
           setOriginal($scope.pipeline);
           markDirty();
-        });
+        }).catch(() => {});
     };
 
     this.editPipelineJson = () => {
@@ -173,12 +177,13 @@ module.exports = angular.module('spinnaker.core.pipeline.config.pipelineConfigur
         controllerAs: '$ctrl',
         size: 'lg modal-fullscreen',
         resolve: {
-          pipeline: () => $scope.renderablePipeline,
+          pipeline: () => $scope.pipeline,
+          plan: () => $scope.plan,
         }
       }).result.then(() => {
         $scope.$broadcast('pipeline-json-edited');
         this.updatePipeline();
-      });
+      }).catch(() => {});
     };
 
     // Enabling a pipeline simply toggles the disabled flag - it does not save any pending changes
@@ -189,7 +194,7 @@ module.exports = angular.module('spinnaker.core.pipeline.config.pipelineConfigur
         resolve: {
           pipeline: () => getOriginal()
         }
-      }).result.then(() => disableToggled(false));
+      }).result.then(() => disableToggled(false)).catch(() => {});
     };
 
     // Disabling a pipeline also just toggles the disabled flag - it does not save any pending changes
@@ -200,7 +205,7 @@ module.exports = angular.module('spinnaker.core.pipeline.config.pipelineConfigur
         resolve: {
           pipeline: () => getOriginal()
         }
-      }).result.then(() => disableToggled(true));
+      }).result.then(() => disableToggled(true)).catch(() => {});
     };
 
     function disableToggled(isDisabled) {
@@ -218,9 +223,7 @@ module.exports = angular.module('spinnaker.core.pipeline.config.pipelineConfigur
         resolve: {
           pipeline: () => $scope.pipeline
         }
-      }).result.then(function() {
-        setOriginal($scope.pipeline);
-      });
+      }).result.then(() => setOriginal($scope.pipeline)).catch(() => {});
     };
 
     this.unlockPipeline = () => {
@@ -233,7 +236,7 @@ module.exports = angular.module('spinnaker.core.pipeline.config.pipelineConfigur
       }).result.then(function () {
         delete $scope.pipeline.locked;
         setOriginal($scope.pipeline);
-      });
+      }).catch(() => {});
     };
 
     this.showHistory = () => {
@@ -244,12 +247,13 @@ module.exports = angular.module('spinnaker.core.pipeline.config.pipelineConfigur
         size: 'lg modal-fullscreen',
         resolve: {
           pipelineConfigId: () => $scope.pipeline.id,
+          isStrategy: $scope.pipeline.strategy,
           currentConfig: () => $scope.viewState.isDirty ? JSON.parse(angular.toJson($scope.pipeline)) : null,
         }
       }).result.then(newConfig => {
         $scope.pipeline = newConfig;
         this.savePipeline();
-      });
+      }).catch(() => {});
     };
 
     // Poor react setState
@@ -333,12 +337,14 @@ module.exports = angular.module('spinnaker.core.pipeline.config.pipelineConfigur
           pipelineTemplateConfig: () => _.cloneDeep($scope.pipeline),
           isNew: () => $scope.pipeline.isNew,
           pipelineId: () => $scope.pipeline.id,
+          executionId: () => $scope.renderablePipeline.executionId,
         }
       }).result.then(({plan, config}) => {
         $scope.pipeline = config;
         delete $scope.pipeline.isNew;
         $scope.renderablePipeline = plan;
       })
+      .catch(() => {})
       .finally(() => this.setViewState({ loading: false }));
     };
 
@@ -364,6 +370,22 @@ module.exports = angular.module('spinnaker.core.pipeline.config.pipelineConfigur
       msg += '.';
 
       return msg;
+    };
+
+    this.getPipelineExecutions = () => {
+      executionService.getExecutionsForConfigIds($scope.pipeline.application, [$scope.pipeline.id], 5)
+        .then(executions => {
+          executions.forEach(execution => executionsTransformer.addBuildInfo(execution));
+          $scope.pipelineExecutions = executions;
+          if ($scope.plan && $scope.plan.executionId) {
+            $scope.currentExecution = _.find($scope.pipelineExecutions, { id: $scope.plan.executionId });
+          } else if ($location.search().executionId) {
+            $scope.currentExecution = _.find($scope.pipelineExecutions, { id: $location.search().executionId });
+          } else {
+            $scope.currentExecution = $scope.pipelineExecutions[0];
+          }
+        })
+        .catch(() => $scope.pipelineExecutions = []);
     };
 
     this.revertPipelineChanges = () => {
@@ -446,7 +468,11 @@ module.exports = angular.module('spinnaker.core.pipeline.config.pipelineConfigur
       $window.onbeforeunload = undefined;
     });
 
-    if ($scope.isTemplatedPipeline && $scope.pipeline.isNew) {
+    if ($scope.hasDynamicSource) {
+      this.getPipelineExecutions();
+    }
+
+    if ($scope.isTemplatedPipeline && $scope.pipeline.isNew && !$scope.hasDynamicSource) {
       this.configureTemplate();
     }
   });

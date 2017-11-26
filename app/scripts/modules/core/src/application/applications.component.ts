@@ -19,7 +19,7 @@ export interface IApplicationPagination {
 }
 
 export class ApplicationsController implements IController {
-  private accounts: IAccount[];
+  public accounts: IAccount[];
   public applications: IApplicationSummary[];
   private applicationsViewStateCache: ICache;
   public filteredApplications: IApplicationSummary[];
@@ -53,7 +53,7 @@ export class ApplicationsController implements IController {
             templateUrl: this.overrideRegistry.getTemplate('createApplicationModal', require('./modal/newapplication.html')),
             controller: this.overrideRegistry.getController('CreateApplicationModalCtrl'),
             controllerAs: 'newAppModal'
-          }).result.then((app) => this.routeToApplication(app));
+          }).result.then((app) => this.routeToApplication(app)).catch(() => {});
         }
       }
     ];

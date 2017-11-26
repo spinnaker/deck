@@ -19,6 +19,7 @@ import {
   ISubnet,
   LOAD_BALANCER_READ_SERVICE,
   LoadBalancerReader,
+  NamingService,
   SECURITY_GROUP_READER,
   SecurityGroupReader,
   SERVER_GROUP_COMMAND_REGISTRY_PROVIDER,
@@ -66,6 +67,7 @@ export interface IAmazonServerGroupCommand extends IServerGroupCommand {
   getBlockDeviceMappingsSource: () => IBlockDeviceMappingSource;
   selectBlockDeviceMappingsSource: (selection: string) => void;
   usePreferredZonesChanged: () => IAmazonServerGroupCommandResult;
+  clusterChanged: () => void;
 }
 
 export class AwsServerGroupConfigurationService {
@@ -82,6 +84,7 @@ export class AwsServerGroupConfigurationService {
               private subnetReader: SubnetReader,
               private keyPairsReader: KeyPairsReader,
               private loadBalancerReader: LoadBalancerReader,
+              private namingService: NamingService,
               private serverGroupCommandRegistry: ServerGroupCommandRegistry,
               private autoScalingProcessService: any) {
     'ngInject';
@@ -251,7 +254,7 @@ export class AwsServerGroupConfigurationService {
       // isDefault is imperfect, since we don't know what the previous account/region was, but probably a safe bet
       const isDefault = some<any>(command.backingData.credentialsKeyedByAccount, (c) => c.defaultKeyPair && command.keyPair && command.keyPair.indexOf(c.defaultKeyPair.replace('{{region}}', '')) === 0);
       const filtered = chain(command.backingData.keyPairs)
-        .filter({account: command.credentials, region: command.region})
+        .filter({ account: command.credentials, region: command.region })
         .map('keyName')
         .value();
       if (command.keyPair && filtered.length && !filtered.includes(command.keyPair)) {
@@ -337,7 +340,7 @@ export class AwsServerGroupConfigurationService {
 
   public configureAvailabilityZones(command: IAmazonServerGroupCommand): void {
     command.backingData.filtered.availabilityZones =
-      find<IRegion>(command.backingData.credentialsKeyedByAccount[command.credentials].regions, {name: command.region}).availabilityZones;
+      find<IRegion>(command.backingData.credentialsKeyedByAccount[command.credentials].regions, { name: command.region }).availabilityZones;
   }
 
   public configureSubnetPurposes(command: IAmazonServerGroupCommand): IServerGroupCommandResult {
@@ -347,13 +350,13 @@ export class AwsServerGroupConfigurationService {
       return result;
     }
     filteredData.subnetPurposes = chain(command.backingData.subnets)
-      .filter({account: command.credentials, region: command.region})
-      .reject({target: 'elb'})
-      .reject({purpose: null})
+      .filter({ account: command.credentials, region: command.region })
+      .reject({ target: 'elb' })
+      .reject({ purpose: null })
       .uniqBy('purpose')
       .value();
 
-    if (!chain(filteredData.subnetPurposes).some({purpose: command.subnetType}).value()) {
+    if (!chain(filteredData.subnetPurposes).some({ purpose: command.subnetType }).value()) {
       command.subnetType = null;
       result.dirty.subnetType = true;
     }
@@ -363,7 +366,7 @@ export class AwsServerGroupConfigurationService {
   public getRegionalSecurityGroups(command: IAmazonServerGroupCommand): ISecurityGroup[] {
     const newSecurityGroups = command.backingData.securityGroups[command.credentials] || { aws: {} };
     return chain(newSecurityGroups.aws[command.region])
-      .filter({vpcId: command.vpcId || null})
+      .filter({ vpcId: command.vpcId || null })
       .sortBy('name')
       .value();
   }
@@ -375,16 +378,16 @@ export class AwsServerGroupConfigurationService {
     if (currentOptions && command.securityGroups) {
       // not initializing - we are actually changing groups
       const currentGroupNames = command.securityGroups.map((groupId) => {
-        const match = find(currentOptions, {id: groupId});
+        const match = find(currentOptions, { id: groupId });
         return match ? match.name : groupId;
       });
 
       const matchedGroups = command.securityGroups.map((groupId) => {
-        const securityGroup = find(currentOptions, {id: groupId}) ||
-          find(currentOptions, {name: groupId});
+        const securityGroup = find(currentOptions, { id: groupId }) ||
+          find(currentOptions, { name: groupId });
         return securityGroup ? securityGroup.name : null;
       })
-      .map((groupName) => find(newRegionalSecurityGroups, {name: groupName}))
+      .map((groupName) => find(newRegionalSecurityGroups, { name: groupName }))
       .filter((group) => group);
 
       const matchedGroupNames = map(matchedGroups, 'name');
@@ -434,10 +437,10 @@ export class AwsServerGroupConfigurationService {
     return chain(command.backingData.loadBalancers)
       .map('accounts')
       .flattenDeep()
-      .filter({name: command.credentials})
+      .filter({ name: command.credentials })
       .map('regions')
       .flattenDeep()
-      .filter({name: command.region})
+      .filter({ name: command.region })
       .map<IAmazonLoadBalancer>('loadBalancers')
       .flattenDeep<IAmazonLoadBalancer>()
       .value()
@@ -514,7 +517,7 @@ export class AwsServerGroupConfigurationService {
         command.vpcId = null;
         result.dirty.vpcId = true;
       } else {
-        const subnet = find<ISubnet>(command.backingData.subnets, {purpose: command.subnetType, account: command.credentials, region: command.region});
+        const subnet = find<ISubnet>(command.backingData.subnets, { purpose: command.subnetType, account: command.credentials, region: command.region });
         command.vpcId = subnet ? subnet.vpcId : null;
       }
       extend(result.dirty, this.configureInstanceTypes(command).dirty);
@@ -567,13 +570,17 @@ export class AwsServerGroupConfigurationService {
         return result;
       };
 
+      command.clusterChanged = (): void => {
+        command.moniker = this.namingService.getMoniker(command.application, command.stack, command.freeFormDetails);
+      };
+
       command.credentialsChanged = (): IServerGroupCommandResult => {
         const result: IAmazonServerGroupCommandResult = { dirty: {} };
         const backingData = command.backingData;
         if (command.credentials) {
-          const regionsForAccount: IAccountDetails = backingData.credentialsKeyedByAccount[command.credentials] || {regions: [], defaultKeyPair: null} as IAccountDetails;
+          const regionsForAccount: IAccountDetails = backingData.credentialsKeyedByAccount[command.credentials] || { regions: [], defaultKeyPair: null } as IAccountDetails;
           backingData.filtered.regions = regionsForAccount.regions;
-          if (!some(backingData.filtered.regions, {name: command.region})) {
+          if (!some(backingData.filtered.regions, { name: command.region })) {
             command.region = null;
             result.dirty.region = true;
           } else {

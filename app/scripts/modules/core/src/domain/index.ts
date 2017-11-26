@@ -1,4 +1,5 @@
-export * from '../search/searchResult/model/IApplicationSearchResult';
+export * from './IArtifact'
+export * from './IArtifactKindConfig'
 
 export * from './IBuild';
 export * from './IBuildDiffInfo';
@@ -28,6 +29,8 @@ export * from '../widgets/Keys';
 
 export * from './ILoadBalancer';
 
+export * from './IManifest';
+
 export * from './IOrchestratedItem';
 
 export * from './IPipeline';
@@ -37,10 +40,10 @@ export * from './IRegionalCluster';
 
 export * from './ISecurityGroup';
 export * from './IServerGroup';
+export * from './IServerGroupManager';
 export * from './IStage';
 export * from './IStageContext';
 export * from './IStageOrTriggerTypeConfig';
-export * from './IStageStep';
 export * from './IStageTypeConfig';
 export * from './IStrategy'
 export * from './ISubnet';

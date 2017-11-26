@@ -5,7 +5,7 @@ import _ from 'lodash';
 
 import {CLUSTER_FILTER_SERVICE} from 'core/cluster/filter/clusterFilter.service';
 import {CLOUD_PROVIDER_REGISTRY} from 'core/cloudProvider/cloudProvider.registry';
-import {EXECUTION_DETAILS_SECTION_SERVICE} from 'core/delivery/details/executionDetailsSection.service';
+import {EXECUTION_DETAILS_SECTION_SERVICE} from 'core/pipeline/details/executionDetailsSection.service';
 import {NAMING_SERVICE} from 'core/naming/naming.service';
 import {SERVER_GROUP_READER} from 'core/serverGroup/serverGroupReader.service';
 import {URL_BUILDER_SERVICE} from 'core/navigation/urlBuilder.service';
@@ -91,10 +91,10 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.deploy.details.co
         const serverGroupName = context['deploy.server.groups'][context.source.region][0];
         serverGroupReader.getServerGroup(context.application, context.account, context.source.region, serverGroupName)
           .then(serverGroup => {
-            if (serverGroup.buildInfo.jenkins) {
+            if (_.has(serverGroup, 'buildInfo.jenkins')) {
               $scope.changeConfig.buildInfo.jenkins = serverGroup.buildInfo.jenkins;
             }
-          });
+          }).catch(() => {});
       }
     };
 

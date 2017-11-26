@@ -37,6 +37,7 @@ module.exports = angular
                                                        v2modalWizardService,
                                                        cacheInitializer,
                                                        infrastructureCaches,
+                                                       namingService,
                                                        vpcReader) {
 
 
@@ -304,11 +305,8 @@ module.exports = angular
     };
 
     ctrl.updateName = function () {
-      var securityGroup = $scope.securityGroup,
-        name = application.name;
-      if (securityGroup.detail) {
-        name += '-' + securityGroup.detail;
-      }
+      const { securityGroup } = $scope;
+      const name = namingService.getClusterName(application.name, securityGroup.stack, securityGroup.detail);
       securityGroup.name = name;
       $scope.namePreview = name;
     };

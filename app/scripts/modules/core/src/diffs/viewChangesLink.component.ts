@@ -5,7 +5,7 @@ import { IModalInstanceService, IModalService } from 'angular-ui-bootstrap';
 import { IBuildDiffInfo, ICreationMetadata, ICreationMetadataTag, IJenkinsInfo } from 'core/domain';
 import { ICommit } from './commitHistory.component';
 import { COMMIT_HISTORY_COMPONENT } from './commitHistory.component';
-import { EXECUTION_SERVICE, ExecutionService } from 'core/delivery/service/execution.service';
+import { EXECUTION_SERVICE, ExecutionService } from 'core/pipeline/service/execution.service';
 import { JAR_DIFF_COMPONENT, IJarDiff } from './jarDiff.component';
 
 export interface IViewChangesConfig {
@@ -97,7 +97,8 @@ class ViewChangesLinkController implements IController {
       // if the stage is still running, and we haven't found commits or changes, reload it on the next refresh cycle
       this.executionLoaded = stage.status !== 'RUNNING' || this.changesAvailable;
 
-    }).finally(() => this.loadingExecution = false);
+    }).catch(() => {})
+      .finally(() => this.loadingExecution = false);
   }
 
   public $onInit(): void {

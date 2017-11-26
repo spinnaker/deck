@@ -1,6 +1,6 @@
 import { module } from 'angular';
 
-import { ACCOUNT_SERVICE, AccountService, PipelineTemplates } from '@spinnaker/core';
+import { ACCOUNT_SERVICE, AccountService } from '@spinnaker/core';
 
 import { IAppengineStage, IAppengineStageScope } from 'appengine/domain/index';
 import { AppengineStageCtrl } from '../appengineStage.controller';
@@ -49,11 +49,10 @@ module(APPENGINE_SHRINK_CLUSTER_STAGE, [ACCOUNT_SERVICE])
       provides: 'shrinkCluster',
       cloudProvider: 'appengine',
       templateUrl: require('./shrinkClusterStage.html'),
-      executionDetailsUrl: PipelineTemplates.shrinkClusterExecutionDetails,
       validators: [
         { type: 'requiredField', fieldName: 'cluster' },
-        { type: 'requiredField', fieldName: 'shrinkToSize', fieldLabel: 'shrink to [X] Server Groups'},
-        { type: 'requiredField', fieldName: 'credentials', fieldLabel: 'account'},
+        { type: 'requiredField', fieldName: 'shrinkToSize', fieldLabel: 'shrink to [X] Server Groups' },
+        { type: 'requiredField', fieldName: 'credentials', fieldLabel: 'account' },
       ],
     });
   }).controller('appengineShrinkClusterStageCtrl', AppengineShrinkClusterStageCtrl);

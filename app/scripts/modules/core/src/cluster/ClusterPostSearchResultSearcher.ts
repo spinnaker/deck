@@ -4,50 +4,37 @@ import { StateService } from '@uirouter/angularjs';
 
 import { urlBuilderRegistry } from 'core/navigation/urlBuilder.registry';
 import {
-  ISearchResultFormatter,
-  searchResultFormatterRegistry
-} from 'core/search/searchResult/searchResultFormatter.registry';
+  ISearchResultType,
+  searchResultTypeRegistry
+} from 'core/search/searchResult/searchResultsType.registry';
 import { ISearchResultSet } from 'core/search/infrastructure/infrastructureSearch.service';
-import { IClusterSearchResult } from 'core/search/searchResult/model/IClusterSearchResult';
-import { IServerGroupSearchResult } from 'core/search/searchResult/model/IServerGroupSearchResult';
+import { IServerGroupSearchResult } from 'core/serverGroup/serverGroupSearchResultType';
+import { IClusterSearchResult } from './clusterSearchResultType';
 import { IPostSearchResultSearcher } from 'core/search/searchResult/PostSearchResultSearcherRegistry';
 
 export class ClusterPostSearchResultSearcher implements IPostSearchResultSearcher<IServerGroupSearchResult> {
 
-  private static TYPE = 'clusters';
-
   constructor(private $q: IQService, private $state: StateService) {}
 
   public getPostSearchResults(inputs: IServerGroupSearchResult[] = []): IPromise<ISearchResultSet[]> {
+    const type = 'clusters';
 
-    const clusters: IClusterSearchResult[] = uniqBy(inputs.map((serverGroup: IServerGroupSearchResult) => {
-      const { account, application, cluster, detail, region, stack } = serverGroup;
-      return {
-        account,
-        application,
-        cluster,
-        displayName: cluster,
-        href: urlBuilderRegistry.getBuilder(ClusterPostSearchResultSearcher.TYPE).build({
-          account,
-          application,
-          cluster,
-          stack,
-          detail,
-          region,
-          type: ClusterPostSearchResultSearcher.TYPE
-        }, this.$state),
-        provider: serverGroup.provider,
-        stack,
-        type: ClusterPostSearchResultSearcher.TYPE
-      }
-    }), 'cluster');
+    // create clusters based on the server group search results
+    const serverGroups = inputs.map((serverGroup: IServerGroupSearchResult) => {
+      const { account, application, cluster, provider, stack } = serverGroup;
+      const urlBuilder = urlBuilderRegistry.getBuilder(type);
+      const href = urlBuilder.build(Object.assign({ type }, serverGroup), this.$state);
 
-    const formatter: ISearchResultFormatter = searchResultFormatterRegistry.get(ClusterPostSearchResultSearcher.TYPE);
+      return { account, application, cluster, displayName: cluster, href, provider, stack, type };
+    });
+
+    const clusters: IClusterSearchResult[] = uniqBy(serverGroups, sg => `${sg.account}-${sg.cluster}`);
+    const formatter: ISearchResultType = searchResultTypeRegistry.get(type);
+
     return this.$q.when([{
-      id: ClusterPostSearchResultSearcher.TYPE,
-      category: ClusterPostSearchResultSearcher.TYPE,
-      icon: formatter.icon,
-      iconClass: '',
+      id: type,
+      category: type,
+      iconClass: formatter.iconClass,
       order: formatter.order,
       results: clusters
     }]);

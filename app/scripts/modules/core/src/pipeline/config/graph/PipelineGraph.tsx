@@ -372,13 +372,12 @@ export class PipelineGraph extends React.Component<IPipelineGraphProps, IPipelin
   }
 
   public componentDidMount() {
-    this.updateGraph(this.props);
     window.addEventListener('resize', this.windowResize);
-
     this.validationSubscription = ReactInjector.pipelineConfigValidator.subscribe((validations) => {
       this.pipelineValidations = validations;
       this.updateGraph(this.props);
     });
+    this.updateGraph(this.props);
   }
 
   private refCallback(element: HTMLDivElement): void {
@@ -387,7 +386,7 @@ export class PipelineGraph extends React.Component<IPipelineGraphProps, IPipelin
 
   @Debounce(300)
   private validatePipeline(pipeline: IPipeline): void {
-    ReactInjector.pipelineConfigValidator.validatePipeline(pipeline);
+    ReactInjector.pipelineConfigValidator.validatePipeline(pipeline).catch(() => {});
   }
 
   public componentWillReceiveProps(nextProps: IPipelineGraphProps) {
@@ -431,7 +430,7 @@ export class PipelineGraph extends React.Component<IPipelineGraphProps, IPipelin
       <div className="pipeline-graph" ref={this.refCallback} onWheel={this.handleWheel}>
         <svg
           className="pipeline-graph"
-          style={{height: graphHeight, width: graphWidth, padding: this.graphVerticalPadding + 'px ' + nodeRadius * 2 + 'px ' + '0 ' + nodeRadius * 2 + 'px'}}
+          style={{ height: graphHeight, width: graphWidth, padding: this.graphVerticalPadding + 'px ' + nodeRadius * 2 + 'px ' + '0 ' + nodeRadius * 2 + 'px' }}
         >
           <g className="placeholder">
             <foreignObject width={maxLabelWidth > 0 ? maxLabelWidth : 1} height="200">
@@ -442,7 +441,7 @@ export class PipelineGraph extends React.Component<IPipelineGraphProps, IPipelin
               !node.placeholder && (
                 <g
                   key={node.id}
-                  className={classNames({'has-status': !!node.status, active: node.isActive, highlighted: node.isHighlighted, warning: node.hasWarnings})}
+                  className={classNames({ 'has-status': !!node.status, active: node.isActive, highlighted: node.isHighlighted, warning: node.hasWarnings })}
                   transform={`translate(${node.x},${node.y})`}
                 >
                   {node.childLinks.map((link) => <PipelineGraphLink key={link.child.name + link.parent.name} link={link} x={node.x} y={node.y} />)}

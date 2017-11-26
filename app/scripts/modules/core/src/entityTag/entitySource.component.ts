@@ -2,7 +2,7 @@ import { IController, module } from 'angular';
 
 import { ICreationMetadataTag } from 'core/domain/IEntityTags';
 import { IExecution } from '../domain/IExecution';
-import { EXECUTION_SERVICE, ExecutionService } from 'core/delivery/service/execution.service';
+import { EXECUTION_SERVICE, ExecutionService } from 'core/pipeline/service/execution.service';
 import { HtmlRenderer, Parser } from 'commonmark';
 
 class EntitySourceCtrl implements IController {
@@ -31,9 +31,9 @@ class EntitySourceCtrl implements IController {
       this.executionType = 'Pipeline';
       this.loadingExecution = true;
       this.executionService.getExecution(this.metadata.value.executionId).then(
-        (execution: IExecution) => this.execution = execution,
-        () => this.executionNotFound = true
-      ).finally(() => this.loadingExecution = false);
+        (execution: IExecution) => this.execution = execution
+      ).catch(() => this.executionNotFound = true)
+      .finally(() => this.loadingExecution = false);
     }
   }
 

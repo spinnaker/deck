@@ -5,8 +5,9 @@ import { DOCKER_MODULE } from '@spinnaker/docker';
 import { AMAZON_MODULE } from '@spinnaker/amazon';
 import { APPENGINE_MODULE } from './modules/appengine/appengine.module';
 import { GOOGLE_MODULE } from '@spinnaker/google';
+import { OPENSTACK_MODULE } from '@spinnaker/openstack';
 import { CANARY_MODULE } from './modules/canary/canary.module';
-import { KUBERNETES_V2_MODULE } from './modules/kubernetes/v2/kubernetes.v2.module';
+import { KUBERNETES_V1_MODULE, KUBERNETES_V2_MODULE } from '@spinnaker/kubernetes';
 
 module('netflix.spinnaker', [
   CORE_MODULE,
@@ -15,8 +16,8 @@ module('netflix.spinnaker', [
   require('./modules/ecs/ecs.module.js').name,
   require('./modules/cloudfoundry/cf.module.js').name,
   require('./modules/azure/azure.module.js').name,
-  require('./modules/kubernetes/v1/kubernetes.v1.module.js').name,
-  require('./modules/openstack/openstack.module.js').name,
+  KUBERNETES_V1_MODULE,
+  OPENSTACK_MODULE,
   DOCKER_MODULE,
   require('./modules/oracle/oraclebmcs.module.js').name,
   require('./modules/dcos/dcos.module.js').name,
