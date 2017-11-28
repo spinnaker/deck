@@ -1,10 +1,9 @@
 import { IScope, IController } from 'angular';
+import { load } from 'js-yaml';
 
 import {
   KubernetesManifestCommandBuilder
 } from '../../../manifest/manifestCommandBuilder.service';
-
-import { load } from 'js-yaml'
 
 export class KubernetesV2DeployManifestConfigCtrl implements IController {
 
@@ -24,5 +23,11 @@ export class KubernetesV2DeployManifestConfigCtrl implements IController {
         this.$scope.stage.manifest = load(this.$scope.stage.manifestText);
         this.state.loaded = true;
       });
+  }
+
+  public change() {
+    try {
+      this.$scope.stage.manifest = load(this.$scope.stage.manifestText);
+    } catch (e) {}
   }
 }

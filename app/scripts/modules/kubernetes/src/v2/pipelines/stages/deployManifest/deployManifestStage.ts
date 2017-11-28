@@ -7,7 +7,6 @@ import {
 } from '@spinnaker/core';
 
 import { KubernetesV2DeployManifestConfigCtrl } from './deployManifestConfig.controller';
-
 import {
   KUBERNETES_MANIFEST_COMMAND_BUILDER
 } from '../../../manifest/manifestCommandBuilder.service';
