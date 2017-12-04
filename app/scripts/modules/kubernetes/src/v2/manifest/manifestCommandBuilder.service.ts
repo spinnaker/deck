@@ -17,7 +17,7 @@ export interface IKubernetesManifestCommand {
   moniker: IMoniker;
   manifestArtifactId?: string;
   source?: string;
-  versioned: boolean;
+  versioned?: boolean;
 }
 
 export interface IKubernetesManifestCommandMetadata {
@@ -84,7 +84,7 @@ export class KubernetesManifestCommandBuilder {
           securityGroups: [] as string[],
         };
 
-        const versioned = true;
+        const versioned: any = null;
 
         return {
           command: {
