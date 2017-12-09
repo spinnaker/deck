@@ -16,7 +16,8 @@ module.exports = angular.module('spinnaker.serverGroup.configure.kubernetes.conf
     function configureCommand(application, command, query = '') {
 
       // this ensures we get the images we need when cloning or copying a server group template.
-      let queries = command.containers
+      const containers = command.containers.concat(command.initContainers);
+      let queries = containers
          .filter(c => {
           return !c.imageDescription.fromContext;
          })
@@ -152,12 +153,9 @@ module.exports = angular.module('spinnaker.serverGroup.configure.kubernetes.conf
       return results;
     }
 
-    function configureContainers(command) {
-      var result = { dirty : {} };
-      angular.extend(result.dirty, configureImages(command).dirty);
-      command.backingData.filtered.containers = _.map(command.backingData.filtered.images, mapImageToContainer(command));
-      var validContainers = [];
-      command.containers.forEach(function(container) {
+    function getValidContainers(command, containers, result) {
+      const validContainers = [];
+      containers.forEach(function(container) {
         if (container.imageDescription.fromContext || container.imageDescription.fromTrigger) {
           validContainers.push(container);
         } else {
@@ -172,12 +170,20 @@ module.exports = angular.module('spinnaker.serverGroup.configure.kubernetes.conf
           if (matchingContainers.length === 1) {
             validContainers.push(container);
           } else {
-            result.dirty.containers = result.dirty.containers || [];
-            result.dirty.containers.push(container.image);
+            result = result || [];
+            result.push(container.image);
           }
         }
       });
-      command.containers = validContainers;
+      return validContainers;
+    }
+
+    function configureContainers(command) {
+      var result = { dirty : {} };
+      angular.extend(result.dirty, configureImages(command).dirty);
+      command.backingData.filtered.containers = _.map(command.backingData.filtered.images, mapImageToContainer(command));
+      command.containers = getValidContainers(command, command.containers, result.dirty.containers);
+      command.initContainers = getValidContainers(command, command.initContainers, result.dirty.initContainers);
       return result;
     }
 
