@@ -102,7 +102,7 @@ module.exports = angular.module('spinnaker.kubernetes.clusterCommandBuilder.serv
       command.containers.forEach((container) => {
         container.imageDescription.imageId = buildImageId(container.imageDescription);
       });
-      
+
       command.initContainers.forEach((container) => {
         container.imageDescription.imageId = buildImageId(container.imageDescription);
       });

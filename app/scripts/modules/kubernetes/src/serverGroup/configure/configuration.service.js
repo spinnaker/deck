@@ -16,7 +16,7 @@ module.exports = angular.module('spinnaker.serverGroup.configure.kubernetes.conf
     function configureCommand(application, command, query = '') {
 
       // this ensures we get the images we need when cloning or copying a server group template.
-      const containers = command.containers.concat(command.initContainers);
+      const containers = command.containers.concat(command.initContainers || []);
       let queries = containers
          .filter(c => {
           return !c.imageDescription.fromContext;
@@ -153,8 +153,9 @@ module.exports = angular.module('spinnaker.serverGroup.configure.kubernetes.conf
       return results;
     }
 
-    function getValidContainers(command, containers, result) {
+    function getValidContainers(command, containers) {
       const validContainers = [];
+      const invalidContainers = [];
       containers.forEach(function(container) {
         if (container.imageDescription.fromContext || container.imageDescription.fromTrigger) {
           validContainers.push(container);
@@ -170,20 +171,29 @@ module.exports = angular.module('spinnaker.serverGroup.configure.kubernetes.conf
           if (matchingContainers.length === 1) {
             validContainers.push(container);
           } else {
-            result = result || [];
-            result.push(container.image);
+            invalidContainers.push(container.image);
           }
         }
       });
-      return validContainers;
+      return [ validContainers, invalidContainers ];
     }
 
     function configureContainers(command) {
       var result = { dirty : {} };
       angular.extend(result.dirty, configureImages(command).dirty);
       command.backingData.filtered.containers = _.map(command.backingData.filtered.images, mapImageToContainer(command));
-      command.containers = getValidContainers(command, command.containers, result.dirty.containers);
-      command.initContainers = getValidContainers(command, command.initContainers, result.dirty.initContainers);
+
+      const [ validContainers, invalidContainers ] = getValidContainers(command, command.containers);
+      command.containers = validContainers;
+      if (invalidContainers.length > 0) {
+        result.dirty.containers = invalidContainers;
+      }
+
+      const [ validInitContainers, invalidInitContainers ] = getValidContainers(command, command.initContainers);
+      command.initContainers = validInitContainers;
+      if (invalidInitContainers.length > 0) {
+        result.dirty.initContainers = invalidInitContainers;
+      }
       return result;
     }
 
