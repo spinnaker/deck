@@ -7,15 +7,18 @@ export class KubernetesV2ResizeManifestConfigCtrl implements IController {
     'ngInject';
     if (this.$scope.stage.isNew) {
       const defaultSelection: IManifestSelector = {
-        manifestName: '',
         location: '',
         account: '',
         kinds: [],
         labelSelectors: {
-          selectors: [],
+          selectors: []
         }
       };
       Object.assign(this.$scope.stage, defaultSelection);
+      const defaultOptions: any = {
+        replicas: 0
+      };
+      Object.assign(this.$scope.stage, defaultOptions);
     }
   }
 }

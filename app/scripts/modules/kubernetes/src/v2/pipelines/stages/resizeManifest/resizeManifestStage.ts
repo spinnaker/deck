@@ -28,8 +28,9 @@ module(KUBERNETES_RESIZE_MANIFEST_STAGE, [
       controller: 'KubernetesV2ResizeManifestConfigCtrl',
       controllerAs: 'ctrl',
       validators: [
-        { type: 'requiredField', fieldName: 'location', fieldLabel: 'Location' },
+        { type: 'requiredField', fieldName: 'location', fieldLabel: 'Namespace' },
         { type: 'requiredField', fieldName: 'account', fieldLabel: 'Account' },
+        { type: 'requiredField', fieldName: 'kinds', fieldLabel: 'Kinds' },
       ],
     });
   }

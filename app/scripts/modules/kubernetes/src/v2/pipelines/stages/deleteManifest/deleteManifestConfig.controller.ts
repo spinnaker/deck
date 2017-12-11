@@ -8,12 +8,11 @@ export class KubernetesV2DeleteManifestConfigCtrl implements IController {
     'ngInject';
     if (this.$scope.stage.isNew) {
       const defaultSelection: IManifestSelector = {
-        manifestName: '',
         location: '',
         account: '',
         kinds: [],
         labelSelectors: {
-          selectors: [],
+          selectors: []
         }
       };
       Object.assign(this.$scope.stage, defaultSelection);
