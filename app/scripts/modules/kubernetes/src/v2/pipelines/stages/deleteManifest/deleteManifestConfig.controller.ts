@@ -21,6 +21,7 @@ export class KubernetesV2DeleteManifestConfigCtrl implements IController {
         cascading: true,
       }
       this.$scope.stage.options = defaultOptions;
+      this.$scope.stage.cloudProvider = 'kubernetes';
     }
   }
 }

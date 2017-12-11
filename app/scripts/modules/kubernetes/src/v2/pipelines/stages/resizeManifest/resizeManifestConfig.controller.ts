@@ -19,6 +19,7 @@ export class KubernetesV2ResizeManifestConfigCtrl implements IController {
         replicas: 0
       };
       Object.assign(this.$scope.stage, defaultOptions);
+      this.$scope.stage.cloudProvider = 'kubernetes';
     }
   }
 }
