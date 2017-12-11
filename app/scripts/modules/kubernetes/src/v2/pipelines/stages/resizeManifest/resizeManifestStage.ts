@@ -22,7 +22,7 @@ module(KUBERNETES_RESIZE_MANIFEST_STAGE, [
     pipelineConfigProvider.registerStage({
       label: 'Resize (Manifest)',
       description: 'Resize a Kubernetes object created from a manifest.',
-      key: 'resizeManifest',
+      key: 'scaleManifest',
       cloudProvider: 'kubernetes',
       templateUrl: require('./resizeManifestConfig.html'),
       controller: 'KubernetesV2ResizeManifestConfigCtrl',
