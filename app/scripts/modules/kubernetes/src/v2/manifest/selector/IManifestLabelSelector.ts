@@ -1,14 +1,14 @@
-export interface ILabelSelector {
+export interface IManifestLabelSelector {
   key: string;
   kind: string;
   values: string[];
 }
 
-export interface ILabelSelectors {
-  selectors: ILabelSelector[];
+export interface IManifestLabelSelectors {
+  selectors: IManifestLabelSelector[];
 }
 
-export const LabelKinds: string[] = [
+export const LABEL_KINDS: string[] = [
   'ANY',
   'EQUALS',
   'NOT_EQUALS',

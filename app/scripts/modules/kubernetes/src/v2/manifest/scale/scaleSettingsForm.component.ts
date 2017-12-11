@@ -1,18 +1,8 @@
-import { IComponentOptions, IController, module } from 'angular';
-
-interface IScaleManifestSettings {
-  replicas: number,
-}
-
-class KubernetesScaleManifestSettingsFormCtrl implements IController {
-  public settings: IScaleManifestSettings;
-}
+import { IComponentOptions, module } from 'angular';
 
 class KubernetesScaleManifestSettingsFormComponent implements IComponentOptions {
   public bindings: any = { settings: '=' };
-  public controller: any = KubernetesScaleManifestSettingsFormCtrl;
   public controllerAs = 'ctrl';
-
   public template = `
     <div class="form-horizontal">
       <div class="form-group form-inline">

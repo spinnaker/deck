@@ -1,27 +1,32 @@
-import { IComponentOptions, IQService, IController, module } from 'angular';
+import { IComponentOptions, IController, module } from 'angular';
 
-import { AccountService, IAccountDetails } from '@spinnaker/core';
+import { AccountService, IAccountDetails, SETTINGS } from '@spinnaker/core';
 import { KUBERNETES_MANIFEST_LABEL_EDITOR } from './labelEditor/labelEditor.component';
 import { IManifestSelector } from './IManifestSelector';
 
 class KubernetesManifestSelectorCtrl implements IController {
   public selector: IManifestSelector;
-  public accounts: IAccountDetails;
+  public accounts: IAccountDetails[];
   public kindsMetadata: string;
 
-  constructor(private $q: IQService, private accountService: AccountService) {
+  constructor(private accountService: AccountService) {
     'ngInject';
-    const dataToFetch = {
-      accounts: this.accountService.getAllAccountDetailsForProvider('kubernetes', 'v2'),
-    };
-    this.$q.all(dataToFetch)
-      .then((fetchedData: any) => {
-        this.accounts = fetchedData.accounts;
+    this.accountService.getAllAccountDetailsForProvider('kubernetes', 'v2').then(accounts => {
+      this.accounts = accounts;
+      if (!this.selector.account) {
+        if (this.accounts.length) {
+          if (this.accounts.map(e => e.name).includes(SETTINGS.providers.kubernetes.defaults.account)) {
+            this.selector.account = SETTINGS.providers.kubernetes.defaults.account;
+          } else {
+            this.selector.account = this.accounts[0].name;
+          }
+        }
+      }
     });
     this.kindsMetadata = this.selector.kinds.join(', ');
   }
 
-  public stringToArray() {
+  public stringToArray(): void {
     this.selector.kinds = this.kindsMetadata.split(',').map( e => e.trim() );
   }
 }

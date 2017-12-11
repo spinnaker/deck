@@ -1,32 +1,30 @@
 import { IComponentOptions, IController, module } from 'angular';
 
-import { ILabelSelector, LabelKinds } from '../IManifestLabelSelector';
+import { IManifestLabelSelector, LABEL_KINDS } from '../IManifestLabelSelector';
 
 class KubernetesManifestLabelEditorCtrl implements IController {
+  public selectors: IManifestLabelSelector[];
+  public valueMetadata: string[] = []; // the index of 'selectors' and 'valueMetadata' align.
+  public kinds: string[] = LABEL_KINDS;
 
-  public selectors: ILabelSelector[];
-  public valueMetadata: string[]; // the index of 'selectors' and 'valueMetadata' align.
-  public kinds: string[] = LabelKinds;
-
-  constructor() {
-    this.valueMetadata = [];
+  public $onInit() {
     this.selectors.forEach(e => {
       this.valueMetadata.push(e.values.join(', '));
     });
   }
 
-  public addField() {
-    this.selectors.push({ key: '', kind: '', values: [] });
+  public addField(): void {
+    this.selectors.push({ key: '', kind: 'EQUALS', values: [] });
     this.valueMetadata.push('');
   }
 
-  public removeField(index: number) {
+  public removeField(index: number): void {
     this.selectors.splice(index, 1);
     this.valueMetadata.splice(index, 1);
   }
 
-  public convertValueStringToArray(index: number) {
-    this.selectors[index].values = this.valueMetadata[index].split(',').map( e => e.trim() );
+  public convertValueStringToArray(index: number): void {
+    this.selectors[index].values = this.valueMetadata[index].split(',').map(e => e.trim());
   }
 }
 
@@ -49,8 +47,8 @@ class KubernetesManifestLabelEditorComponent implements IComponentOptions {
         <tr ng-repeat="selector in ctrl.selectors">
           <td>
             <input class="form-control input input-sm" type="text"
-                    name="{{$index}}"
-                    ng-model="selector.key">
+                   name="{{$index}}"
+                   ng-model="selector.key">
           </td>
           <td>
             <select class="form-control input input-sm" ng-model="selector.kind" ng-options="v for v in ctrl.kinds">
@@ -58,7 +56,7 @@ class KubernetesManifestLabelEditorComponent implements IComponentOptions {
           </td>
           <td>
             <input class="form-control input input-sm" type="text" placeholder="Comma seperated values"
-                    ng-model="ctrl.valueMetadata[$index]" ng-change="ctrl.convertValueStringToArray($index)">
+                   ng-model="ctrl.valueMetadata[$index]" ng-change="ctrl.convertValueStringToArray($index)">
           </td>
           <td>
             <div class="form-control-static">
