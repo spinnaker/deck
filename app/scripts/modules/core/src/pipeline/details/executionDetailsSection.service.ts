@@ -11,8 +11,8 @@ export class ExecutionDetailsSectionService {
     'ngInject';
   }
 
-  private sectionIsValid(availableSections: string[]): boolean {
-    return availableSections.includes(this.$stateParams.details);
+  private sectionIsValid(section: string, availableSections: string[]): boolean {
+    return availableSections.includes(section);
   }
 
   public synchronizeSection(availableSections: string[], onComplete?: () => any): void {
@@ -20,13 +20,13 @@ export class ExecutionDetailsSectionService {
     if (!this.$state.includes('**.execution')) {
       return;
     }
-    let details: any = this.$stateParams.details || availableSections[0];
-    if (!availableSections.includes(details)) {
-      details = availableSections[0];
+    let detailsSection: string = this.$stateParams.details || availableSections[0];
+    if (!availableSections.includes(detailsSection)) {
+      detailsSection = availableSections[0];
     }
-    if (!this.sectionIsValid(availableSections)) {
+    if (!this.sectionIsValid(detailsSection, availableSections)) {
       // use { location: 'replace' } to overwrite the invalid browser history state
-      this.$state.go('.', { details: details }, { location: 'replace' });
+      this.$state.go('.', { details: detailsSection }, { location: 'replace' });
     }
     if (onComplete) {
       this.pendingOnComplete = this.$timeout(onComplete);
