@@ -133,6 +133,7 @@ function configure(IS_TEST) {
     devServer: IS_TEST ? {
       stats: 'errors-only',
     } : {
+      disableHostCheck: true,
       port: process.env.DECK_PORT || 9000,
       host: process.env.DECK_HOST || 'localhost',
       https: process.env.DECK_HTTPS === 'true',
@@ -175,10 +176,6 @@ function configure(IS_TEST) {
 
     config.plugins.push(...[
       new webpack.EnvironmentPlugin({
-        ENTITY_TAGS_ENABLED: 'true',
-        FIAT_ENABLED: 'false',
-        INFRA_STAGES: 'false',
-        TIMEZONE: 'America/Los_Angeles',
         NODE_ENV: 'development',
       }),
       new webpack.optimize.CommonsChunkPlugin({name: 'vendor', filename: 'vendor.bundle.js'}),
