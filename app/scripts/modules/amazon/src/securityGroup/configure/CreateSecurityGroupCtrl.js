@@ -2,36 +2,49 @@
 
 const angular = require('angular');
 
-import { CACHE_INITIALIZER_SERVICE, INFRASTRUCTURE_CACHE_SERVICE } from '@spinnaker/core';
+import {
+    CACHE_INITIALIZER_SERVICE,
+    INFRASTRUCTURE_CACHE_SERVICE,
+    SETTINGS
+} from '@spinnaker/core';
 
-module.exports = angular.module('spinnaker.amazon.securityGroup.create.controller', [
-  require('@uirouter/angularjs').default,
-  INFRASTRUCTURE_CACHE_SERVICE,
-  CACHE_INITIALIZER_SERVICE,
-])
-  .controller('awsCreateSecurityGroupCtrl', function($scope, $uibModalInstance, $state, $controller,
-                                                     cacheInitializer, infrastructureCaches,
-                                                     application, securityGroup) {
+module.exports = angular
+    .module('spinnaker.amazon.securityGroup.create.controller', [
+        require('@uirouter/angularjs').default,
+        INFRASTRUCTURE_CACHE_SERVICE,
+        CACHE_INITIALIZER_SERVICE
+    ])
+    .controller('awsCreateSecurityGroupCtrl', function(
+        $scope,
+        $uibModalInstance,
+        $state,
+        $controller,
+        cacheInitializer,
+        infrastructureCaches,
+        application,
+        securityGroup
+    ) {
+        $scope.pages = {
+            location: require('./createSecurityGroupProperties.html'),
+            ingress: require('./createSecurityGroupIngress.html')
+        };
 
-    $scope.pages = {
-      location: require('./createSecurityGroupProperties.html'),
-      ingress: require('./createSecurityGroupIngress.html'),
-    };
+        var ctrl = this;
 
-    var ctrl = this;
+        angular.extend(
+            this,
+            $controller('awsConfigSecurityGroupMixin', {
+                $scope: $scope,
+                $uibModalInstance: $uibModalInstance,
+                infrastructureCaches: infrastructureCaches,
+                application: application,
+                securityGroup: securityGroup
+            })
+        );
 
-    angular.extend(this, $controller('awsConfigSecurityGroupMixin', {
-      $scope: $scope,
-      $uibModalInstance: $uibModalInstance,
-      infrastructureCaches: infrastructureCaches,
-      application: application,
-      securityGroup: securityGroup
-    }));
+        $scope.state.isNew = true;
 
-    $scope.state.isNew = true;
+        ctrl.upsert = () => ctrl.mixinUpsert('Create');
 
-    ctrl.upsert = () => ctrl.mixinUpsert('Create');
-
-    ctrl.initializeSecurityGroups().then(ctrl.initializeAccounts);
-
-  });
+        ctrl.initializeSecurityGroups().then(ctrl.initializeAccounts);
+    });
