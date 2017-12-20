@@ -10,99 +10,128 @@ import { SECURITY_GROUP_FILTER_MODEL } from './filter/securityGroupFilter.model'
 
 const angular = require('angular');
 
-module.exports = angular.module('spinnaker.core.securityGroup.all.controller', [
-  require('./filter/securityGroup.filter.service.js').name,
-  SECURITY_GROUP_FILTER_MODEL,
-  PROVIDER_SELECTION_SERVICE,
-  VERSION_SELECTION_SERVICE,
-  require('angular-ui-bootstrap'),
-  CLOUD_PROVIDER_REGISTRY,
-])
-  .controller('AllSecurityGroupsCtrl', function($scope, app, $uibModal, $timeout, versionSelectionService,
-                                                providerSelectionService, cloudProviderRegistry,
-                                                securityGroupFilterModel, securityGroupFilterService) {
+module.exports = angular
+    .module('spinnaker.core.securityGroup.all.controller', [
+        require('./filter/securityGroup.filter.service.js').name,
+        SECURITY_GROUP_FILTER_MODEL,
+        PROVIDER_SELECTION_SERVICE,
+        VERSION_SELECTION_SERVICE,
+        require('angular-ui-bootstrap'),
+        CLOUD_PROVIDER_REGISTRY
+    ])
+    .controller('AllSecurityGroupsCtrl', function(
+        $scope,
+        app,
+        $uibModal,
+        $timeout,
+        versionSelectionService,
+        providerSelectionService,
+        cloudProviderRegistry,
+        securityGroupFilterModel,
+        securityGroupFilterService
+    ) {
+        this.$onInit = () => {
+            const groupsUpdatedSubscription = securityGroupFilterService.groupsUpdatedStream.subscribe(
+                () => groupsUpdated()
+            );
 
-    this.$onInit = () => {
-      const groupsUpdatedSubscription = securityGroupFilterService.groupsUpdatedStream.subscribe(() => groupsUpdated());
+            securityGroupFilterModel.activate();
 
-      securityGroupFilterModel.activate();
+            this.initialized = false;
 
-      this.initialized = false;
+            $scope.application = app;
 
-      $scope.application = app;
+            $scope.sortFilter = securityGroupFilterModel.sortFilter;
 
-      $scope.sortFilter = securityGroupFilterModel.sortFilter;
+            $scope.securityGroupFlags = {
+                readOnly: SETTINGS.securityGroupsReadOnly
+            };
 
-      handleRefresh();
+            handleRefresh();
 
-      app.setActiveState(app.securityGroups);
-      $scope.$on('$destroy', () => {
-        app.setActiveState();
-        groupsUpdatedSubscription.unsubscribe();
-      });
+            app.setActiveState(app.securityGroups);
+            $scope.$on('$destroy', () => {
+                app.setActiveState();
+                groupsUpdatedSubscription.unsubscribe();
+            });
 
-      app.securityGroups.ready().then(() => updateSecurityGroups());
+            app.securityGroups.ready().then(() => updateSecurityGroups());
 
-      app.securityGroups.onRefresh($scope, handleRefresh);
+            app.securityGroups.onRefresh($scope, handleRefresh);
+        };
 
-    };
+        this.groupingsTemplate = require('./groupings.html');
 
-    this.groupingsTemplate = require('./groupings.html');
+        let updateSecurityGroups = () => {
+            $scope.$evalAsync(() => {
+                securityGroupFilterService.updateSecurityGroups(app);
+                groupsUpdated();
+                // Timeout because the updateSecurityGroups method is debounced by 25ms
+                $timeout(() => {
+                    this.initialized = true;
+                }, 50);
+            });
+        };
 
-    let updateSecurityGroups = () => {
-      $scope.$evalAsync(() => {
-        securityGroupFilterService.updateSecurityGroups(app);
-        groupsUpdated();
-        // Timeout because the updateSecurityGroups method is debounced by 25ms
-        $timeout(() => { this.initialized = true; }, 50);
-      });
-    };
+        let groupsUpdated = () => {
+            $scope.$applyAsync(() => {
+                $scope.groups = securityGroupFilterModel.groups;
+                $scope.tags = securityGroupFilterModel.tags;
+            });
+        };
 
-    let groupsUpdated = () => {
-      $scope.$applyAsync(() => {
-        $scope.groups = securityGroupFilterModel.groups;
-        $scope.tags = securityGroupFilterModel.tags;
-      });
-    };
+        this.clearFilters = function() {
+            securityGroupFilterService.clearFilters();
+            updateSecurityGroups();
+        };
 
-    this.clearFilters = function() {
-      securityGroupFilterService.clearFilters();
-      updateSecurityGroups();
-    };
+        this.createSecurityGroup = function createSecurityGroup() {
+            providerSelectionService
+                .selectProvider(app, 'securityGroup')
+                .then(selectedProvider => {
+                    versionSelectionService
+                        .selectVersion(selectedProvider)
+                        .then(selectedVersion => {
+                            let provider = cloudProviderRegistry.getValue(
+                                selectedProvider,
+                                'securityGroup',
+                                selectedVersion
+                            );
+                            var defaultCredentials =
+                                    app.defaultCredentials[selectedProvider] ||
+                                    SETTINGS.providers[selectedProvider]
+                                        .defaults.account,
+                                defaultRegion =
+                                    app.defaultRegions[selectedProvider] ||
+                                    SETTINGS.providers[selectedProvider]
+                                        .defaults.region;
+                            $uibModal.open({
+                                templateUrl:
+                                    provider.createSecurityGroupTemplateUrl,
+                                controller: `${provider.createSecurityGroupController} as ctrl`,
+                                size: 'lg',
+                                resolve: {
+                                    securityGroup: () => {
+                                        return {
+                                            credentials: defaultCredentials,
+                                            subnet: 'none',
+                                            regions: [defaultRegion],
+                                            vpcId: null,
+                                            securityGroupIngress: []
+                                        };
+                                    },
+                                    application: () => {
+                                        return app;
+                                    }
+                                }
+                            });
+                        });
+                });
+        };
 
-    this.createSecurityGroup = function createSecurityGroup() {
-      providerSelectionService.selectProvider(app, 'securityGroup').then((selectedProvider) => {
-        versionSelectionService.selectVersion(selectedProvider).then((selectedVersion) => {
-          let provider = cloudProviderRegistry.getValue(selectedProvider, 'securityGroup', selectedVersion);
-          var defaultCredentials = app.defaultCredentials[selectedProvider] || SETTINGS.providers[selectedProvider].defaults.account,
-            defaultRegion = app.defaultRegions[selectedProvider] || SETTINGS.providers[selectedProvider].defaults.region;
-          $uibModal.open({
-            templateUrl: provider.createSecurityGroupTemplateUrl,
-            controller: `${provider.createSecurityGroupController} as ctrl`,
-            size: 'lg',
-            resolve: {
-              securityGroup: () => {
-                return {
-                  credentials: defaultCredentials,
-                  subnet: 'none',
-                  regions: [defaultRegion],
-                  vpcId: null,
-                  securityGroupIngress: []
-                };
-              },
-              application: () => {
-                return app;
-              }
-            }
-          });
-        });
-      });
-    };
+        this.updateSecurityGroups = _.debounce(updateSecurityGroups, 200);
 
-    this.updateSecurityGroups = _.debounce(updateSecurityGroups, 200);
-
-    let handleRefresh = () => {
-      this.updateSecurityGroups();
-    };
-  }
-);
+        let handleRefresh = () => {
+            this.updateSecurityGroups();
+        };
+    });
