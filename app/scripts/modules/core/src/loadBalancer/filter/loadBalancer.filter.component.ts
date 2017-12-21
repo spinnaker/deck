@@ -24,6 +24,7 @@ class LoadBalancerFilterCtrl {
   public regionHeadings: string[];
   public sortFilter: any;
   public stackHeadings: string[];
+  public detailHeadings: string[];
   public tags: IFilterTag[];
   private groupsUpdatedSubscription: Subscription;
   private locationChangeUnsubscribe: () => void;
@@ -50,7 +51,7 @@ class LoadBalancerFilterCtrl {
         $scope.$applyAsync(() => this.tags = filterModel.tags);
       });
 
-    if (app.loadBalancers.loaded) {
+    if (app.loadBalancers && app.loadBalancers.loaded) {
       this.initialize();
     }
 
@@ -101,6 +102,7 @@ class LoadBalancerFilterCtrl {
 
   public initialize(): void {
     this.stackHeadings = ['(none)'].concat(this.getHeadingsForOption('stack'));
+    this.detailHeadings = ['(none)'].concat(this.getHeadingsForOption('detail'));
     this.providerTypeHeadings = this.getHeadingsForOption('type');
     this.updateLoadBalancerGroups();
   }

@@ -4,11 +4,13 @@ var feedbackUrl = '';
 var gateHost = '{%gate.baseUrl%}';
 var bakeryDetailUrl = (gateHost + '/bakery/logs/{{context.region}}/{{context.status.resourceId}}');
 var authEndpoint = (gateHost + '/auth/user');
-var authEnabled = {%features.auth%};
-var chaosEnabled = {%features.chaos%};
-var fiatEnabled = {%features.fiat%};
-var jobsEnabled = {%features.jobs%};
-var pipelineTemplatesEnabled = {%features.pipelineTemplates%};
+var authEnabled = '{%features.auth%}' === 'true';
+var chaosEnabled = '{%features.chaos%}' === 'true';
+var fiatEnabled = '{%features.fiat%}' === 'true';
+var jobsEnabled = '{%features.jobs%}' === 'true';
+var pipelineTemplatesEnabled = '{%features.pipelineTemplates%}' === 'true';
+var artifactsEnabled = '{%features.artifacts%}' === 'true';
+var canaryEnabled = '{%features.mineCanary%}' === 'true';
 var timezone = '{%timezone%}';
 var version = '{%version%}';
 var changelogGistId = '{%changelog.gist.id%}';
@@ -33,7 +35,7 @@ var kubernetes = {
 var appengine = {
   defaults: {
     account: '{%appengine.default.account%}',
-    editLoadBalancerStageEnabled: {%appengine.enabled%}
+    editLoadBalancerStageEnabled: '{%appengine.enabled%}' === 'true'
   }
 };
 var openstack = {
@@ -61,7 +63,7 @@ var dcos = {
 };
 var entityTagsEnabled = false;
 var netflixMode = false;
-var notifications = '{%notifications.enabled%}' === 'true'
+var notificationsEnabled = '{%notifications.enabled%}' === 'true';
 var slack = {
   enabled: '{%notifications.slack.enabled%}' === 'true',
   botName: '{%notifications.slack.botName%}'
@@ -129,7 +131,7 @@ window.spinnakerSettings = {
   authEnabled: authEnabled,
   authTtl: 600000,
   gitSources: ['stash', 'github', 'bitbucket'],
-  triggerTypes: ['git', 'pipeline', 'docker', 'cron', 'jenkins', 'travis'],
+  triggerTypes: ['git', 'pipeline', 'docker', 'cron', 'jenkins', 'travis', 'pubsub', 'webhook'],
   feature: {
     entityTags: entityTagsEnabled,
     fiatEnabled: fiatEnabled,
@@ -137,8 +139,10 @@ window.spinnakerSettings = {
     chaosMonkey: chaosEnabled,
     jobs: jobsEnabled,
     pipelineTemplates: pipelineTemplatesEnabled,
+    notifications: notificationsEnabled,
+    artifacts: artifactsEnabled,
+    canary: canaryEnabled,
     pipelines: true,
-    notifications: notifications,
     fastProperty: true,
     vpcMigrator: true,
     clusterDiff: false,
@@ -146,5 +150,6 @@ window.spinnakerSettings = {
     infrastructureStages: false,
     snapshots: false,
     travis: false,
+    versionedProviders: true,
   },
 };

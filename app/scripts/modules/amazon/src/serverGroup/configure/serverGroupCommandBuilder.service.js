@@ -188,6 +188,18 @@ module.exports = angular.module('spinnaker.amazon.serverGroupCommandBuilder.serv
         var applicationAwsSettings = _.get(application, 'attributes.providerSettings.aws', {});
         var useAmiBlockDeviceMappings = applicationAwsSettings.useAmiBlockDeviceMappings || false;
 
+        const existingTags = {};
+        // These tags are applied by Clouddriver (if configured to do so), regardless of what the user might enter
+        // Might be worth feature flagging this if it turns out other folks are hard-coding these values
+        const reservedTags = [ 'spinnaker:application', 'spinnaker:stack', 'spinnaker:details' ];
+        if (serverGroup.asg.tags) {
+          serverGroup.asg.tags
+            .filter(t => !reservedTags.includes(t.key))
+            .forEach(tag => {
+              existingTags[tag.key] = tag.value;
+            });
+        }
+
         var command = {
           application: application.name,
           strategy: '',
@@ -218,7 +230,7 @@ module.exports = angular.module('spinnaker.amazon.serverGroupCommandBuilder.serv
           suspendedProcesses: (serverGroup.asg.suspendedProcesses || [])
             .map((process) => process.processName)
             .filter((name) => !enabledProcesses.includes(name)),
-          tags: serverGroup.tags || {},
+          tags: Object.assign({}, serverGroup.tags, existingTags),
           targetGroups: serverGroup.targetGroups,
           useAmiBlockDeviceMappings: useAmiBlockDeviceMappings,
           copySourceCustomBlockDeviceMappings: !useAmiBlockDeviceMappings,
@@ -237,12 +249,9 @@ module.exports = angular.module('spinnaker.amazon.serverGroupCommandBuilder.serv
           command.interestingHealthProviderNames = ['Amazon'];
         }
 
-        if (mode === 'clone' || mode === 'editPipeline') {
+        if (mode === 'editPipeline') {
           command.useSourceCapacity = true;
           command.viewState.useSimpleCapacity = false;
-        }
-
-        if (mode === 'editPipeline') {
           command.strategy = 'redblack';
           command.suspendedProcesses = [];
         }

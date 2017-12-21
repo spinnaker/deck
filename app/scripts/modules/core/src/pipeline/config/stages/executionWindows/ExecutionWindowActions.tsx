@@ -1,12 +1,13 @@
 import * as React from 'react';
+import { get } from 'lodash'
 import { BindAll } from 'lodash-decorators';
 
-import {IExecution, IExecutionStage} from 'core/domain';
-import {Application} from 'core/application/application.model';
-import {ReactInjector} from 'core/reactShims';
-import {timePickerTime} from 'core/utils/timeFormatters';
-import {SystemTimezone} from 'core/utils/SystemTimezone';
-import {DAYS_OF_WEEK} from './daysOfWeek';
+import { IExecution, IExecutionStage } from 'core/domain';
+import { Application } from 'core/application/application.model';
+import { ReactInjector } from 'core/reactShims';
+import { timePickerTime } from 'core/utils/timeFormatters';
+import { SystemTimezone } from 'core/utils/SystemTimezone';
+import { DAYS_OF_WEEK } from './daysOfWeek';
 
 export interface IExecutionWindowActionsProps {
   execution: IExecution;
@@ -50,7 +51,7 @@ export class ExecutionWindowActions extends React.Component<IExecutionWindowActi
       return match.status !== 'RUNNING';
     };
 
-    const data = {skipRemainingWait: true};
+    const data = { skipRemainingWait: true };
     confirmationModalService.confirm({
       header: 'Really skip execution window?',
       buttonText: 'Skip',
@@ -68,20 +69,20 @@ export class ExecutionWindowActions extends React.Component<IExecutionWindowActi
   }
 
   public render() {
-    const stage = this.props.stage;
+    const { stage } = this.props;
     return (
       <div>
         <h5>Execution Windows Configuration</h5>
         <strong>Stage execution can only run:</strong>
         <dl className="dl-narrow dl-horizontal">
-          {stage.context.restrictedExecutionWindow.whitelist.map((entry: IExecutionWindowWhitelistEntry, index: number) => {
+          {get(stage, 'context.restrictedExecutionWindow.whitelist', []).map((entry: IExecutionWindowWhitelistEntry, index: number) => {
             return (
               <div key={index}>
                 <dt>From</dt>
                 <dd>
-                  {timePickerTime({hours: entry.startHour, minutes: entry.startMin})}
-                  <strong style={{display: 'inline-block', margin: '0 5px'}}> to </strong>
-                  {timePickerTime({hours: entry.endHour, minutes: entry.endMin})}
+                  {timePickerTime({ hours: entry.startHour, minutes: entry.startMin })}
+                  <strong style={{ display: 'inline-block', margin: '0 5px' }}> to </strong>
+                  {timePickerTime({ hours: entry.endHour, minutes: entry.endMin })}
                   <strong> <SystemTimezone/> </strong>
                 </dd>
               </div>
@@ -102,7 +103,7 @@ export class ExecutionWindowActions extends React.Component<IExecutionWindowActi
         {stage.isSuspended && (
           <div className="action-buttons">
             <button className="btn btn-xs btn-primary" onClick={this.finishWaiting}>
-              <span style={{marginRight: '5px'}} className="small glyphicon glyphicon-fast-forward"/>
+              <span style={{ marginRight: '5px' }} className="small glyphicon glyphicon-fast-forward"/>
               Skip remaining window
             </button>
           </div>

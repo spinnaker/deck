@@ -85,17 +85,46 @@ module(HELP_CONTENTS, [])
         the configuration based on the newest server group in the cluster.</p>
         <p>If you want to start from scratch, select "None".</p>
         <p>You can always edit the cluster configuration after you've created it.</p>`,
-    'pipeline.config.expectedArtifact.fieldName': `
-        <p>The Artifact field name.</p>`,
-    'pipeline.config.expectedArtifact.fieldType': `
-        <p>The Artifact field type. This must be one of 'MUST_MATCH' or 'FIND_IF_MISSING'.</p>
-        <p><strong>MUST_MATCH</strong> means the incoming Artifact's field value must match exactly with the expected value.</p>
-        <p><strong>FIND_IF_MISSING</strong> means the field is optional and a 'Missing Policy' will fire if the value is not present.</p>`,
-    'pipeline.config.expectedArtifact.missingPolicy': `
-        <p>The policy if the field type is 'FIND_IF_MISSING' and the field value is not present.</p>
-        <p><strong>FAIL_PIPELINE</strong> fails the pipeline if the field value is missing.</p>
-        <p><strong>IGNORE</strong> ignores the fact that the value is missing and runs the pipeline anyway.</p>
-        <p><strong>PRIOR_PIPELINE</strong> looks up the field's value from a prior pipeline execution.</p>`,
+    'pipeline.config.expectedArtifact.matchArtifact': `
+        <p>This specifies which fields in your incoming artifact to match against. Every field that you supply will be used to match against all incoming artifacts. If all fields specified match, the incoming artifact is bound to your pipeline context.</p>
+        <p>For example, if you want to match against any GCS object, only supply <b>type</b> = gcs/object. If you also want to restrict the matches by other fields, include those as well.</p>
+        <p>Regex is accepted, so you could for example match on a filepath like so <b>name</b> = .*\\.yaml to match all incoming YAML files.</p>`,
+    'pipeline.config.expectedArtifact.ifMissing': `
+        <p>If no artifact was supplied by your trigger to match against this expected artifact, you have a few options:
+          <ol>
+            <li>Attempt to match against an artifact in the prior pipeline execution's context. This ensures that you will always be using the most recently supplied artifact to this pipeline, and is generally a safe choice.</li>
+            <li>If option 1 fails, or isn't specified, you can provide a default artifact with all required fields specified to use instead.</li>
+            <li>Fail the pipeline if options 1 or 2 fail or aren't selected.</li>
+          </ol>
+        </p>`,
+    'pipeline.config.expectedArtifact.defaultArtifact': `
+        <p>If your artifact either wasn't supplied from a trigger, or it wasn't found in a prior execution, the artifact specified below will end up in your pipeline's execution context.</p>`,
+    'pipeline.config.expectedArtifact.gcs.name': `
+        <p>The GCS object name, in the form 'gs://bucket/path/to/file.yml'.</p>`,
+    'pipeline.config.expectedArtifact.docker.name': `
+        <p>The Docker image name you want to trigger on changes to. If you are treating a tag as a release stream, you should include the image tag in the name. An example is 'gcr.io/project/image:stable', where all changes to the 'stable' tag will result in triggering this pipeline.</p>`,
+    'pipeline.config.expectedArtifact.git.name': `
+        <p>The file's path from the git root, in the form 'path/to/file.json'</p>`,
+    'pipeline.config.trigger.webhook.source': `
+        <p>Determines the target URL required to trigger this pipeline, as well as how the payload can be transformed into artifacts.</p>
+    `,
+    'pipeline.config.trigger.webhook.payloadConstraints': `
+        <p>When provided, only a webhook with a payload containing at least the specified key/value pairs will be allowed to trigger this pipeline. For example, if you wanted to lockdown the systems/users that can trigger this pipeline via this webhook, you could require the key "secret" and value "something-secret" as a constraint.</p>
+        <p>The constraint values may be supplied as regex.</p>
+    `,
+    'pipeline.config.trigger.pubsub.attributeConstraints': `
+        <p>Pubsub mesages can have system-specific metadata accompanying the payload called <b>attributes</b>.</p>
+        <p>When provided, only a pubsub message with attributes containing at least the specified key/value pairs will be allowed to trigger this pipeline.</p>
+        <p>The constraint values may be supplied as regex.</p>
+    `,
+    'pipeline.config.trigger.pubsub.payloadConstraints': `
+        <p>When provided, only a pubsub message with a payload containing at least the specified key/value pairs will be allowed to trigger this pipeline. For example, if you wanted to lockdown the systems/users that can trigger this pipeline via this pubsub subscription, you could require the key "secret" and value "something-secret" as a constraint.</p>
+        <p>The constraint values may be supplied as regex.</p>
+    `,
+    'pipeline.config.findArtifactFromExecution.considerExecutions': `
+        <p>Select the types of executions to consider. When no selection is made, the default is "any execution".</p>
+        <p>This will always evaluate to the most recent execution matching your provided criteria.</p>
+    `,
     'loadBalancer.advancedSettings.healthTimeout': '<p>Configures the timeout, in seconds, for reaching the healthCheck target.  Must be less than the interval.</p><p> Default: <b>5</b></p>',
     'loadBalancer.advancedSettings.healthInterval': '<p>Configures the interval, in seconds, between ELB health checks.  Must be greater than the timeout.</p><p>Default: <b>10</b></p>',
     'loadBalancer.advancedSettings.healthyThreshold': '<p>Configures the number of healthy observations before reinstituting an instance into the ELB’s traffic rotation.</p><p>Default: <b>10</b></p>',
@@ -157,6 +186,13 @@ module(HELP_CONTENTS, [])
     '<p><strong>Note:</strong> values for "DayOfWeek" are 1-7, where Sunday is 1, Monday is 2, etc. You can also use MON,TUE,WED, etc.',
 
     'cluster.description': '<p>A cluster is a collection of server groups with the same name (stack + detail) in the same account.</p>',
+    'cluster.rollback.explicit': `
+        <p>A server group running the previous build will be enabled and appropriately resized.</p>
+        <p>The current server group will be disabled after the resize completes.</p>
+    `,
+    'cluster.rollback.previous_image': `
+        <p>The current server group will be cloned with the previous build.</p>
+    `,
     'pipeline.config.findAmi.cluster': 'The cluster to look at when selecting the image to use in this pipeline.',
     'pipeline.config.findAmi.imageNamePattern': 'A regex used to match the name of the image. Must result in exactly one match to succeed. Empty is treated as match any.',
     'pipeline.config.dependsOn': 'Declares which stages must be run <em>before</em> this stage begins.',

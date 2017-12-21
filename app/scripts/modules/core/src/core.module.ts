@@ -26,6 +26,7 @@ require('root/app/fonts/spinnaker/icons.css');
 import { ANALYTICS_MODULE } from './analytics/analytics.module';
 import { APPLICATION_BOOTSTRAP_MODULE } from './bootstrap';
 import { APPLICATION_MODULE } from './application/application.module';
+import { ARTIFACT_MODULE } from './artifact/artifact.module';
 import { AUTHENTICATION_MODULE } from './authentication/authentication.module';
 import { CANCEL_MODAL_MODULE } from './cancelModal/cancelModal.module';
 import { CLOUD_PROVIDER_MODULE } from './cloudProvider/cloudProvider.module';
@@ -41,15 +42,21 @@ import { HELP_MODULE } from './help/help.module';
 import { INSIGHT_NGMODULE } from './insight/insight.module';
 import { INTERCEPTOR_MODULE } from './interceptor/interceptor.module';
 import { LOAD_BALANCER_MODULE } from './loadBalancer/loadBalancer.module';
+import { MANIFEST_MODULE } from 'core/manifest/manifestWriter.module';
+
+import { NETWORK_INTERCEPTOR } from './api/network.interceptor';
+
 import { PAGE_TITLE_MODULE } from './pageTitle/pageTitle.module';
+import { PIPELINE_MODULE } from './pipeline/pipeline.module';
 import { PIPELINE_TEMPLATE_MODULE } from './pipeline/config/templates/pipelineTemplate.module';
 import { REACT_MODULE } from './reactShims';
 import { REGION_MODULE } from './region/region.module';
 import { SERVERGROUP_MODULE } from './serverGroup/serverGroup.module';
+import { SERVER_GROUP_MANAGER_MODULE } from './serverGroupManager/serverGroupManager.module';
+import { STYLEGUIDE_MODULE } from './styleguide/styleguide.module';
 import { SUBNET_MODULE } from './subnet/subnet.module';
 import { WHATS_NEW_MODULE } from './whatsNew/whatsNew.module';
 import { WIDGETS_MODULE } from './widgets/widgets.module';
-import { STYLEGUIDE_MODULE } from './styleguide/styleguide.module';
 
 
 // load all templates into the $templateCache
@@ -73,6 +80,7 @@ module(CORE_MODULE, [
   ANALYTICS_MODULE,
   APPLICATION_MODULE,
   APPLICATION_BOOTSTRAP_MODULE,
+  ARTIFACT_MODULE,
   AUTHENTICATION_MODULE,
 
   require('./cache/caches.module').name,
@@ -83,7 +91,6 @@ module(CORE_MODULE, [
 
   DEBUG_WINDOW,
   DEPLOYMENT_STRATEGY_MODULE,
-  require('./delivery/delivery.module').name,
   DIFF_MODULE,
 
   ENTITY_TAGS_MODULE,
@@ -99,13 +106,17 @@ module(CORE_MODULE, [
 
   LOAD_BALANCER_MODULE,
 
+  MANIFEST_MODULE,
+
   require('./modal/modal.module').name,
+
+  NETWORK_INTERCEPTOR,
 
   require('./notification/notifications.module').name,
 
   PAGE_TITLE_MODULE,
   PIPELINE_TEMPLATE_MODULE,
-  require('./pipeline/pipelines.module').name,
+  PIPELINE_MODULE,
   require('./presentation/presentation.module').name,
   require('./projects/projects.module').name,
 
@@ -114,6 +125,7 @@ module(CORE_MODULE, [
   require('./search/search.module').name,
   require('./securityGroup/securityGroup.module').name,
   SERVERGROUP_MODULE,
+  SERVER_GROUP_MANAGER_MODULE,
   SUBNET_MODULE,
 
   require('./task/task.module').name,

@@ -148,6 +148,7 @@ module.exports = angular.module('spinnaker.canary.canaryStage', [
                                            namingService, providerSelectionService,
                                            authenticationService, cloudProviderRegistry,
                                            serverGroupCommandBuilder, awsServerGroupTransformer, accountService, appListExtractorService) {
+    'ngInject';
 
     $scope.isExpression = function(value) {
       return isString(value) && value.includes('${');
@@ -364,6 +365,7 @@ module.exports = angular.module('spinnaker.canary.canaryStage', [
         cluster.freeFormDetails += '-';
       }
       cluster.freeFormDetails += type.toLowerCase();
+      cluster.moniker = namingService.getMoniker(cluster.application, cluster.stack, cluster.freeFormDetails);
     }
 
     function configureServerGroupCommandForEditing(command) {
@@ -412,7 +414,7 @@ module.exports = angular.module('spinnaker.canary.canaryStage', [
           cleanupClusterConfig(baselineCluster, 'baseline');
           cleanupClusterConfig(canaryCluster, 'canary');
           $scope.stage.clusterPairs.push({baseline: baselineCluster, canary: canaryCluster});
-        });
+        }).catch(() => {});
       });
     };
 
@@ -447,7 +449,7 @@ module.exports = angular.module('spinnaker.canary.canaryStage', [
         var stageCluster = awsServerGroupTransformer.convertServerGroupCommandToDeployConfiguration(command);
         cleanupClusterConfig(stageCluster, type);
         $scope.stage.clusterPairs[index][type.toLowerCase()] = stageCluster;
-      });
+      }).catch(() => {});
     };
 
     this.deleteClusterPair = function(index) {

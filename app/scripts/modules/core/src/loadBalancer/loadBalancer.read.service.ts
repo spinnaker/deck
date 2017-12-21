@@ -5,14 +5,15 @@ import { INFRASTRUCTURE_CACHE_SERVICE, InfrastructureCacheService } from 'core/c
 import { NAMING_SERVICE, NamingService, IComponentName } from 'core/naming/naming.service';
 import { ILoadBalancer, ILoadBalancerSourceData } from 'core/domain';
 
-export interface ILoadBalancersByRegion {
-  name: string;
-  loadBalancers: ILoadBalancerSourceData[];
-}
-
 export interface ILoadBalancersByAccount {
   name: string;
-  accounts: ILoadBalancersByRegion[];
+  accounts: {
+    name: string;
+    regions: {
+      name: string;
+      loadBalancers: ILoadBalancerSourceData[];
+    }[];
+  }[];
 }
 
 export class LoadBalancerReader {
@@ -31,13 +32,13 @@ export class LoadBalancerReader {
   }
 
   public getLoadBalancerDetails(cloudProvider: string, account: string, region: string, name: string): IPromise<ILoadBalancerSourceData[]> {
-    return this.API.all('loadBalancers').all(account).all(region).all(name).withParams({'provider': cloudProvider}).get();
+    return this.API.all('loadBalancers').all(account).all(region).all(name).withParams({ 'provider': cloudProvider }).get();
   }
 
   public listLoadBalancers(cloudProvider: string): IPromise<ILoadBalancersByAccount[]> {
     return this.API.all('loadBalancers')
       .useCache(this.infrastructureCaches.get('loadBalancers'))
-      .withParams({provider: cloudProvider})
+      .withParams({ provider: cloudProvider })
       .getList();
   }
 

@@ -1,6 +1,6 @@
 import { module } from 'angular';
 
-import { ACCOUNT_SERVICE, AccountService, PipelineTemplates } from '@spinnaker/core';
+import { ACCOUNT_SERVICE, AccountService } from '@spinnaker/core';
 
 import { AppengineHealth } from 'appengine/common/appengineHealth';
 import { IAppengineStageScope } from 'appengine/domain/index';
@@ -38,7 +38,6 @@ module(APPENGINE_DISABLE_ASG_STAGE, [
       provides: 'disableServerGroup',
       cloudProvider: 'appengine',
       templateUrl: require('./disableAsgStage.html'),
-      executionDetailsUrl: PipelineTemplates.disableAsgExecutionDetails,
       executionStepLabelUrl: require('./disableAsgStepLabel.html'),
       validators: [
         {
@@ -47,7 +46,7 @@ module(APPENGINE_DISABLE_ASG_STAGE, [
         },
         { type: 'requiredField', fieldName: 'cluster' },
         { type: 'requiredField', fieldName: 'target', },
-        { type: 'requiredField', fieldName: 'credentials', fieldLabel: 'account'},
+        { type: 'requiredField', fieldName: 'credentials', fieldLabel: 'account' },
       ],
     });
   }).controller('appengineDisableAsgStageCtrl', AppengineDisableAsgStageCtrl);

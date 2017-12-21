@@ -15,13 +15,13 @@ module(GROUP_STAGE, [
   pipelineConfigProvider.registerStage({
     controller: 'GroupStageCtrl',
     description: 'A group of stages',
-    executionDetailsUrl: require('core/delivery/details/executionDetails.html'),
     executionLabelComponent: GroupExecutionLabel,
     markerIcon: GroupMarkerIcon,
     key: 'group',
     label: 'Group',
     templateUrl: require('./groupStage.html'),
     useCustomTooltip: true,
+    synthetic: true,
     validators: [],
   });
 })

@@ -2,7 +2,8 @@ import { module } from 'angular';
 
 import { SERVER_GROUP_CONFIGURATION_SERVICE } from 'core/serverGroup/configure/common/serverGroupConfiguration.service';
 import { SERVER_GROUP_STATES } from './serverGroup.states';
-import './ServerGroupSearchResultFormatter';
+import { SERVER_GROUP_DATA_SOURCE } from './serverGroup.dataSource';
+import './serverGroupSearchResultType';
 import { VIEW_SCALING_ACTIVITIES_LINK } from './details/scalingActivities/viewScalingActivitiesLink.component';
 import { DEPLOY_INITIALIZER_COMPONENT } from './configure/common/deployInitializer.component';
 import { SearchResultHydratorRegistry } from 'core/search/searchResult/SearchResultHydratorRegistry';
@@ -17,10 +18,13 @@ module(SERVERGROUP_MODULE, [
   require('./configure/common/v2InstanceTypeSelector.directive').name,
   require('./pod/runningTasksTag.directive').name,
   require('./details/multipleServerGroups.controller').name,
-  require('./serverGroup.dataSource').name,
+  SERVER_GROUP_DATA_SOURCE,
   require('./configure/common/basicSettingsMixin.controller').name,
   SERVER_GROUP_STATES,
   VIEW_SCALING_ACTIVITIES_LINK,
   DEPLOY_INITIALIZER_COMPONENT
 ])
-  .run((applicationReader: ApplicationReader) => SearchResultHydratorRegistry.register('serverGroups', new ServerGroupSearchResultHydrator(applicationReader)));
+  .run((applicationReader: ApplicationReader) => {
+    'ngInject';
+    SearchResultHydratorRegistry.register('serverGroups', new ServerGroupSearchResultHydrator(applicationReader))
+  });

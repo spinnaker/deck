@@ -100,7 +100,7 @@ export class WebhookStage implements IController {
       controllerAs: 'addCustomHeader',
     }).result.then((customHeader: ICustomHeader) => {
       this.stage.customHeaders[customHeader.key] = customHeader.value;
-    });
+    }).catch(() => {});
   }
 
   public displayField(field: string): boolean {
@@ -125,7 +125,8 @@ module(WEBHOOK_STAGE, [
     templateUrl: require('./webhookStage.html'),
     executionDetailsUrl: require('./webhookExecutionDetails.html'),
     validators: [
-      {type: 'requiredField', fieldName: 'url'},
+      { type: 'requiredField', fieldName: 'url' },
+      { type: 'requiredField', fieldName: 'method' }
     ]
   });
 }).run((pipelineConfig: PipelineConfigProvider, API: Api) => {

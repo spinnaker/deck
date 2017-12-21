@@ -46,8 +46,15 @@ task webpack(type: NodeTask) {
   workingDir '.'
   script = file('node_modules/webpack/bin/webpack.js')
   environment = [
+    "NODE_ENV": "production",
     "GATE_HOST": "spinnaker-api-prestaging.prod.netflix.net",
   ]
+}
+
+task copyFavicon(type: Copy) {
+  from "app/prod-favicon.ico"
+  into "build/webpack"
+  rename "prod-favicon.ico", "favicon.ico"
 }
 
 task karma(type: NodeTask) {
@@ -76,7 +83,8 @@ yarn.dependsOn 'generateVersionFile'
 webpack.dependsOn 'yarn'
 karma.dependsOn 'webpack'
 test.dependsOn 'karma'
-buildDeb.dependsOn 'test'
+copyFavicon.dependsOn 'test'
+buildDeb.dependsOn 'copyFavicon'
 buildRpm.dependsOn 'webpack'
 
 String toVers(String v) {

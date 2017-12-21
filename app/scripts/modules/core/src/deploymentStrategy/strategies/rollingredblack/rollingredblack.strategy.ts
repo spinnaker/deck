@@ -1,4 +1,4 @@
-import {DeploymentStrategyRegistry} from 'core/deploymentStrategy/deploymentStrategy.registry';
+import { DeploymentStrategyRegistry } from 'core/deploymentStrategy/deploymentStrategy.registry';
 
 DeploymentStrategyRegistry.registerStrategy({
   label: 'Rolling Red/Black (Experimental)',
@@ -10,6 +10,12 @@ DeploymentStrategyRegistry.registerStrategy({
   initializationMethod: (command) => {
     if (!command.targetPercentages) {
       command.targetPercentages = [50, 100];
+    }
+
+    if (!command.pipelineBeforeCleanup) {
+      command.beforeCleanupPipeline = {
+        application: command.application
+      }
     }
   }
 });

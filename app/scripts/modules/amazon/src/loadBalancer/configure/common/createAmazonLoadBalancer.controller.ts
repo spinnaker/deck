@@ -1,7 +1,7 @@
 import { IScope, IPromise } from 'angular';
 import { IModalInstanceService } from 'angular-ui-bootstrap';
 import { StateService } from '@uirouter/angularjs';
-import { chain, clone, cloneDeep, find, filter, map, trimEnd, uniq, values } from 'lodash';
+import { chain, clone, cloneDeep, find, filter, isNil, map, trimEnd, uniq, values } from 'lodash';
 
 import {
   AccountService,
@@ -10,6 +10,7 @@ import {
   IAccount,
   ISecurityGroupsByAccountSourceData,
   InfrastructureCacheService,
+  IMoniker,
   IRegion,
   ISecurityGroup,
   ISubnet,
@@ -54,10 +55,10 @@ export abstract class CreateAmazonLoadBalancerCtrl {
   public certificates: { [accountId: number]: IAmazonCertificate[] };
   public existingLoadBalancerNames: string[];
   public viewState: ICreateAmazonLoadBalancerViewState;
-  private accounts: IAccount[];
+  public accounts: IAccount[];
   private allSecurityGroups: ISecurityGroupsByAccountSourceData;
   public availableSecurityGroups: ISecurityGroup[];
-  private availabilityZones: string[];
+  public availabilityZones: string[];
   protected certificateTypes: string[];
   public defaultSecurityGroups: string[] = [];
   private existingSecurityGroupNames: string[];
@@ -142,9 +143,14 @@ export abstract class CreateAmazonLoadBalancerCtrl {
   }
 
   protected buildName(): void {
-    const nameParts = this.namingService.parseLoadBalancerName(this.loadBalancerCommand.name);
-    this.loadBalancerCommand.stack = nameParts.stack;
-    this.loadBalancerCommand.detail = nameParts.freeFormDetails;
+    if (isNil(this.loadBalancerCommand.moniker)) {
+      const nameParts = this.namingService.parseLoadBalancerName(this.loadBalancerCommand.name);
+      this.loadBalancerCommand.stack = nameParts.stack;
+      this.loadBalancerCommand.detail = nameParts.freeFormDetails;
+    } else {
+      this.loadBalancerCommand.stack = this.loadBalancerCommand.moniker.stack;
+      this.loadBalancerCommand.detail = this.loadBalancerCommand.moniker.detail;
+    }
     delete this.loadBalancerCommand.name;
   }
 
@@ -221,7 +227,7 @@ export abstract class CreateAmazonLoadBalancerCtrl {
       const existingNames = this.defaultSecurityGroups.filter((name) => this.existingSecurityGroupNames.includes(name));
       this.loadBalancerCommand.securityGroups.forEach((securityGroup) => {
         if (!this.existingSecurityGroupNames.includes(securityGroup)) {
-          const matches = filter(this.availableSecurityGroups, {id: securityGroup});
+          const matches = filter(this.availableSecurityGroups, { id: securityGroup });
           if (matches.length) {
             existingNames.push(matches[0].name);
           } else {
@@ -264,8 +270,8 @@ export abstract class CreateAmazonLoadBalancerCtrl {
           region = this.loadBalancerCommand.region;
     return this.subnetReader.listSubnets().then((subnets) => {
       return chain(subnets)
-        .filter({account: account, region: region})
-        .reject({target: 'ec2'})
+        .filter({ account: account, region: region })
+        .reject({ target: 'ec2' })
         .value();
     });
   }
@@ -356,6 +362,14 @@ export abstract class CreateAmazonLoadBalancerCtrl {
   }
 
   private updateName(): void {
+    const elb = this.loadBalancerCommand;
+    const moniker: IMoniker = {
+        app: this.application.name,
+        cluster: this.getName(),
+        stack: elb.stack,
+        detail: elb.detail
+    };
+    this.loadBalancerCommand.moniker = moniker;
     this.loadBalancerCommand.name = this.getName();
   };
 
@@ -419,7 +433,6 @@ export abstract class CreateAmazonLoadBalancerCtrl {
   public submit(): void {
     const descriptor = this.isNew ? 'Create' : 'Update';
     const loadBalancerCommandFormatted = cloneDeep(this.loadBalancerCommand);
-
     if (this.forPipelineConfig) {
       // don't submit to backend for creation. Just return the loadBalancerCommand object
       this.formatListeners(loadBalancerCommandFormatted).then(() => {

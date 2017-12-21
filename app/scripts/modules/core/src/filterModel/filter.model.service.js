@@ -50,9 +50,25 @@ module.exports = angular
         if (isFilterable(model.sortFilter.stack)) {
           var checkedStacks = getCheckValues(model.sortFilter.stack);
           if (checkedStacks.includes('(none)')) {
-            checkedStacks.push('');
+            checkedStacks.push(''); // TODO: remove when moniker is source of truth for naming
+            checkedStacks.push(null);
           }
           return _.includes(checkedStacks, target.stack);
+        } else {
+          return true;
+        }
+      };
+    }
+
+    function checkDetailFilters(model) {
+      return function(target) {
+        if (isFilterable(model.sortFilter.detail)) {
+          var checkedDetails = getCheckValues(model.sortFilter.detail);
+          if (checkedDetails.includes('(none)')) {
+            checkedDetails.push(''); // TODO: remove when moniker is source of truth for naming
+            checkedDetails.push(null);
+          }
+          return _.includes(checkedDetails, target.detail);
         } else {
           return true;
         }
@@ -319,15 +335,16 @@ module.exports = angular
     }
 
     return {
-      configureFilterModel: configureFilterModel,
-      isFilterable: isFilterable,
-      getCheckValues: getCheckValues,
-      checkAccountFilters: checkAccountFilters,
-      checkRegionFilters: checkRegionFilters,
-      checkStackFilters: checkStackFilters,
-      checkStatusFilters: checkStatusFilters,
-      checkProviderFilters: checkProviderFilters,
-      checkCategoryFilters: checkCategoryFilters,
+      configureFilterModel,
+      isFilterable,
+      getCheckValues,
+      checkAccountFilters,
+      checkRegionFilters,
+      checkStackFilters,
+      checkDetailFilters,
+      checkStatusFilters,
+      checkProviderFilters,
+      checkCategoryFilters,
     };
 
   });

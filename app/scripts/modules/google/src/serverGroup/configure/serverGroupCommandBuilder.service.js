@@ -246,6 +246,14 @@ module.exports = angular.module('spinnaker.gce.serverGroupCommandBuilder.service
     function populateLabels(instanceTemplateLabels, command) {
       if (instanceTemplateLabels) {
         Object.assign(command.labels, instanceTemplateLabels);
+
+        if (command.labels['spinnaker-region']) {
+          delete command.labels['spinnaker-region'];
+        }
+
+        if (command.labels['spinnaker-server-group']) {
+          delete command.labels['spinnaker-server-group'];
+        }
       }
     }
 
@@ -263,18 +271,12 @@ module.exports = angular.module('spinnaker.gce.serverGroupCommandBuilder.service
     function attemptToSetValidCredentials(application, defaultCredentials, command) {
       return accountService.listAccounts('gce').then(function(gceAccounts) {
         var gceAccountNames = _.map(gceAccounts, 'name');
-        var firstGCEAccount = null;
-
-        if (application.accounts.length) {
-          firstGCEAccount = _.find(application.accounts, function (applicationAccount) {
-            return gceAccountNames.includes(applicationAccount);
-          });
-        }
+        var firstGCEAccount = gceAccountNames[0];
 
         var defaultCredentialsAreValid = defaultCredentials && gceAccountNames.includes(defaultCredentials);
 
         command.credentials =
-          defaultCredentialsAreValid ? defaultCredentials : (firstGCEAccount ? firstGCEAccount : 'my-account-name');
+          defaultCredentialsAreValid ? defaultCredentials : (firstGCEAccount || 'my-account-name');
       });
     }
 
@@ -293,6 +295,8 @@ module.exports = angular.module('spinnaker.gce.serverGroupCommandBuilder.service
         region: defaultRegion,
         zone: defaultZone,
         regional: false, // TODO(duftler): Externalize this default alongside defaultRegion and defaultZone.
+        selectZones: false, // Explicitly select zones for regional server groups.
+        distributionPolicy: { zones: [] },
         network: 'default',
         associatePublicIpAddress: associatePublicIpAddress,
         canIpForward: false,
@@ -388,6 +392,8 @@ module.exports = angular.module('spinnaker.gce.serverGroupCommandBuilder.service
         enableTraffic: true,
         cloudProvider: 'gce',
         selectedProvider: 'gce',
+        distributionPolicy: serverGroup.distributionPolicy,
+        selectZones: serverGroup.selectZones,
         source: {
           account: serverGroup.account,
           region: serverGroup.region,

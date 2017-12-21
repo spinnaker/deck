@@ -1,5 +1,5 @@
-import {module} from 'angular';
-import {HELP_CONTENTS_REGISTRY, HelpContentsRegistry} from '@spinnaker/core';
+import { module } from 'angular';
+import { HELP_CONTENTS_REGISTRY, HelpContentsRegistry } from '@spinnaker/core';
 
 const helpContents: {[key: string]: string} = {
   'aws.associateElasticIp.elasticIp':
@@ -33,6 +33,7 @@ const helpContents: {[key: string]: string} = {
      <p>However, if your stack name needs to be longer (load balancer names are limited to 32 characters), consider changing it to "elb", or omit it altogether.</p>`,
   'aws.loadBalancer.internal': 'Controls the load balancer scheme, <strong>not</strong> the subnet. By default, load balancers are created with a DNS name that resolves to public IP addresses. Specify internal to create a load balancer with a DNS name that resolves to private IP addresses.',
   'aws.loadBalancer.stack': '(Optional) <b>Stack</b> is one of the core naming components of a cluster, used to create vertical stacks of dependent services for integration testing.',
+  'aws.loadBalancer.name': '<p>The load balancer name is formed by combining the application name, the <b>Stack</b> field, and the <b>Detail</b> field.</p>',
   'aws.loadBalancer.targetGroups': 'Add a target group if you want to associate this with an Application Load Balancer (ALB)',
   'aws.loadBalancer.loadBalancers': 'And a load balancer directly if you created a Classic Load Balancer (a classic load balancer does not have target groups)',
   'aws.loadBalancer.ruleCondition.host':
@@ -78,6 +79,7 @@ const helpContents: {[key: string]: string} = {
     <p>The VPC to which this security group will apply.</p>
     <p>If you wish to use VPC but are unsure which VPC to use, the most common one is "Main".</p>
     <p>If you do not wish to use VPC, select "None".</p>`,
+  'aws.securityGroup.name': '<p>The security group name is formed by combining the application name, the <b>Stack</b> field, and the <b>Detail</b> field.</p>',
   'aws.scalingPolicy.search.restricted':
     `<p>Resets dimensions to "AutoScalingGroupName: {name of the ASG}" and provides
         a simpler, combined input for the namespace and metric name fields.</p>`,
@@ -93,7 +95,11 @@ const helpContents: {[key: string]: string} = {
   'aws.targetGroup.attributes.deregistrationDelay': 'The amount of time for Elastic Load Balancing to wait before changing the state of a deregistering target from draining to unused. The range is 0-3600 seconds. The default value is 300 seconds.',
   'aws.targetGroup.attributes.stickinessEnabled': ' Indicates whether sticky sessions are enabled.',
   'aws.targetGroup.attributes.stickinessType': 'The type of sticky sessions. The only current possible value is <code>lb_cookie</code>.',
-  'aws.targetGroup.attributes.stickinessDuration': 'The time period, in seconds, during which requests from a client should be routed to the same target. After this time period expires, the load balancer-generated cookie is considered stale. The range is 1 second to 1 week (604800 seconds). The default value is 1 day (86400 seconds).'
+  'aws.targetGroup.attributes.stickinessDuration': 'The time period, in seconds, during which requests from a client should be routed to the same target. After this time period expires, the load balancer-generated cookie is considered stale. The range is 1 second to 1 week (604800 seconds). The default value is 1 day (86400 seconds).',
+  'aws.serverGroup.capacityConstraint': `
+      <p>Ensures that the capacity of this server group has not changed in the background (i.e. due to autoscaling activity).</p>
+      <p>If the capacity has changed, this resize operation will be rejected.</p>`,
+
 };
 
 export const AMAZON_HELP = 'spinnaker.amazon.help.contents';

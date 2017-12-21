@@ -1,11 +1,13 @@
 import { IPromise, IQService, module } from 'angular';
-import { intersection } from 'lodash';
 
 import {
   ACCOUNT_SERVICE,
   AccountService,
+  STORAGE_ACCOUNT_SERVICE,
+  StorageAccountService,
   Application,
   IBuildTrigger,
+  IExpectedArtifact,
   IGitTrigger,
   IPipeline,
   IStage
@@ -45,7 +47,17 @@ export interface IAppengineServerGroupCommand {
   fromTrigger?: boolean;
   trigger?: IAppengineGitTrigger | IAppengineJenkinsTrigger;
   gitCredentialType?: GitCredentialType;
+  storageAccountName?: string; // GCS only
   interestingHealthProviderNames: string[];
+  fromArtifact: boolean;
+  expectedArtifactId: string;
+  sourceType: string;
+}
+
+export enum AppengineSourceType {
+  GCS = 'gcs',
+  GIT = 'git',
+  ARTIFACT = 'artifact'
 }
 
 interface IViewState {
@@ -60,37 +72,45 @@ export class AppengineServerGroupCommandBuilder {
       .filter(trigger => trigger.type === 'git' || trigger.type === 'jenkins' || trigger.type === 'travis')
       .map((trigger: IGitTrigger | IBuildTrigger) => {
         if (trigger.type === 'git') {
-          return {source: trigger.source, project: trigger.project, slug: trigger.slug, branch: trigger.branch, type: 'git'};
+          return { source: trigger.source, project: trigger.project, slug: trigger.slug, branch: trigger.branch, type: 'git' };
         } else {
-          return {master: trigger.master, job: trigger.job, type: trigger.type};
+          return { master: trigger.master, job: trigger.job, type: trigger.type };
         }
       });
   }
 
-  constructor(private $q: IQService, private accountService: AccountService) { 'ngInject'; }
+  private static getExpectedArtifacts(pipeline: IPipeline): IExpectedArtifact[] {
+    return pipeline.expectedArtifacts || [];
+  }
+
+  constructor(private $q: IQService,
+              private accountService: AccountService,
+              private storageAccountService: StorageAccountService) { 'ngInject'; }
 
   public buildNewServerGroupCommand(app: Application,
                                     selectedProvider = 'appengine',
                                     mode = 'create'): IPromise<IAppengineServerGroupCommand> {
     const dataToFetch = {
       accounts: this.accountService.getAllAccountDetailsForProvider('appengine'),
+      storageAccounts: this.storageAccountService.getStorageAccounts()
     };
 
     const viewState: IViewState = {
       mode: mode,
       submitButtonLabel: this.getSubmitButtonLabel(mode),
-      disableStrategySelection: mode === 'create' ? true : false,
+      disableStrategySelection: mode === 'create',
     };
 
     return this.$q.all(dataToFetch)
       .then((backingData: any) => {
-        const credentials: string = this.getCredentials(backingData.accounts, app);
-        const region: string = this.getRegion(backingData.accounts, credentials);
+        const credentials = this.getCredentials(backingData.accounts);
+        const region = this.getRegion(backingData.accounts, credentials);
 
         return {
           application: app.name,
           backingData,
           viewState,
+          fromArtifact: false,
           credentials,
           region,
           selectedProvider,
@@ -108,10 +128,16 @@ export class AppengineServerGroupCommandBuilder {
       });
   }
 
-  public buildNewServerGroupCommandForPipeline(_stage: IStage, pipeline: IPipeline): {backingData: {triggerOptions: Array<IAppengineGitTrigger | IAppengineJenkinsTrigger>}} {
+  public buildNewServerGroupCommandForPipeline(_stage: IStage, pipeline: IPipeline):
+  {backingData: {triggerOptions: Array<IAppengineGitTrigger | IAppengineJenkinsTrigger>, expectedArtifacts: IExpectedArtifact[]}} {
     // We can't copy server group configuration for App Engine, and can't build the full command here because we don't have
     // access to the application.
-    return {backingData: {triggerOptions: AppengineServerGroupCommandBuilder.getTriggerOptions(pipeline)}};
+    return {
+      backingData: {
+        triggerOptions: AppengineServerGroupCommandBuilder.getTriggerOptions(pipeline),
+        expectedArtifacts: AppengineServerGroupCommandBuilder.getExpectedArtifacts(pipeline)
+      }
+    };
   }
 
   public buildServerGroupCommandFromPipeline(app: Application,
@@ -120,20 +146,26 @@ export class AppengineServerGroupCommandBuilder {
                                              pipeline: IPipeline): ng.IPromise<IAppengineServerGroupCommand> {
     return this.buildNewServerGroupCommand(app, 'appengine', 'editPipeline')
       .then((command: IAppengineServerGroupCommand) => {
-        Object.assign(command, cluster);
-        command.backingData.triggerOptions = AppengineServerGroupCommandBuilder.getTriggerOptions(pipeline);
+        command = {
+          ...command,
+          ...cluster,
+          backingData: {
+            ...command.backingData,
+            triggerOptions: AppengineServerGroupCommandBuilder.getTriggerOptions(pipeline),
+            expectedArtifacts: AppengineServerGroupCommandBuilder.getExpectedArtifacts(pipeline)
+          }
+        } as IAppengineServerGroupCommand;
         return command;
       });
   }
 
-  private getCredentials(accounts: IAppengineAccount[], application: Application): string {
+  private getCredentials(accounts: IAppengineAccount[]): string {
     const accountNames: string[] = (accounts || []).map((account) => account.name);
     const defaultCredentials: string = AppengineProviderSettings.defaults.account;
-    const firstApplicationAccount: string = intersection(application.accounts || [], accountNames)[0];
 
-    return accountNames.includes(defaultCredentials) ?
-      defaultCredentials :
-      (firstApplicationAccount || 'my-appengine-account');
+    return accountNames.includes(defaultCredentials)
+      ? defaultCredentials
+      : accountNames[0];
   }
 
   private getRegion(accounts: IAppengineAccount[], credentials: string): string {
@@ -159,4 +191,5 @@ export const APPENGINE_SERVER_GROUP_COMMAND_BUILDER = 'spinnaker.appengine.serve
 
 module(APPENGINE_SERVER_GROUP_COMMAND_BUILDER, [
   ACCOUNT_SERVICE,
+  STORAGE_ACCOUNT_SERVICE,
 ]).service('appengineServerGroupCommandBuilder', AppengineServerGroupCommandBuilder);

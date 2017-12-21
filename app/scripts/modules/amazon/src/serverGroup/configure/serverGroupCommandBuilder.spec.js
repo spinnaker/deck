@@ -141,6 +141,46 @@ describe('awsServerGroupCommandBuilder', function() {
 
       expect(command.suspendedProcesses).toEqual([]);
     });
+
+    it('copies tags not in the reserved list:', function () {
+      spyOn(this.instanceTypeService, 'getCategoryForInstanceType').and.returnValue(this.$q.when('selectedProfile'));
+
+      const baseServerGroup = {
+        account: 'prod',
+        region: 'us-west-1',
+        tags: null,
+        asg: {
+          availabilityZones: ['g', 'h', 'i'],
+          vpczoneIdentifier: '',
+          tags: [
+            {
+              key: 'some-key',
+              propagateAtLaunch: true,
+              resourceId: 'some-resource-id',
+              resourceType: 'auto-scaling-group',
+              value: 'some-value'
+            },
+            {
+              key: 'spinnaker:application',
+              value: 'n/a'
+            }
+          ]
+        },
+        launchConfig: {
+          instanceType: 'something-custom',
+          instanceMonitoring: {},
+          securityGroups: [],
+        },
+      };
+      let command = null;
+
+      this.awsServerGroupCommandBuilder.buildServerGroupCommandFromExisting({name: 'appo'}, baseServerGroup)
+        .then((result) => command = result);
+
+      this.$scope.$digest();
+
+      expect(command.tags).toEqual({'some-key': 'some-value'});
+    });
   });
 
 });

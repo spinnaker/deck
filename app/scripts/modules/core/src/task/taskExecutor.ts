@@ -6,13 +6,14 @@ import { TASK_WRITE_SERVICE, TaskWriter } from './task.write.service';
 import { AUTHENTICATION_SERVICE, AuthenticationService } from '../authentication/authentication.service';
 
 export interface IJob {
+  [attribute: string]: any;
   account?: string;
-  application?: any;
+  applications?: string[];
+  keys?: string[];
   providerType?: string;
   source?: any;
   type?: string;
   user?: string;
-  [attribute: string]: any;
 }
 
 export interface ITaskCommand {
@@ -30,7 +31,7 @@ export class TaskExecutor {
   }
 
   public executeTask(taskCommand: ITaskCommand): IPromise<ITask> {
-    const owner: any = taskCommand.application || taskCommand.project || { name: 'ad-hoc'};
+    const owner: any = taskCommand.application || taskCommand.project || { name: 'ad-hoc' };
     if (taskCommand.application && taskCommand.application.name) {
       taskCommand.application = taskCommand.application.name;
     }

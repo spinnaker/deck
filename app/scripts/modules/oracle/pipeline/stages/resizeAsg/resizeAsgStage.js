@@ -16,9 +16,7 @@ module.exports = angular.module('spinnaker.oraclebmcs.pipeline.stage.resizeAsgSt
       provides: 'resizeServerGroup',
       cloudProvider: 'oraclebmcs',
       templateUrl: require('./resizeAsgStage.html'),
-      executionDetailsUrl: require('./resizeAsgExecutionDetails.html'),
       executionStepLabelUrl: require('./resizeAsgStepLabel.html'),
-      executionConfigSections: ['resizeServerGroupConfig', 'taskStatus'],
       validators: [
         {
           type: 'targetImpedance',

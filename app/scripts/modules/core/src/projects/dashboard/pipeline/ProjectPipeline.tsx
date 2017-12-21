@@ -3,8 +3,8 @@ import { has } from 'lodash';
 import { BindAll } from 'lodash-decorators';
 
 import { Application } from 'core/application/application.model';
-import { ExecutionBuildNumber } from 'core/delivery/executionBuild/ExecutionBuildNumber';
-import { ExecutionMarker } from 'core/delivery/executionGroup/execution/ExecutionMarker';
+import { ExecutionBuildLink } from 'core/pipeline/executionBuild/ExecutionBuildLink';
+import { ExecutionMarker } from 'core/pipeline/executions/execution/ExecutionMarker';
 import { IExecution } from 'core/domain';
 import { ReactInjector } from 'core/reactShims';
 import { timestamp } from 'core/utils/timeFormatters';
@@ -34,11 +34,11 @@ export class ProjectPipeline extends React.Component<IProjectPipelineProps, IPro
   }
 
   private handleExecutionTitleClick(): void {
-    ReactInjector.$state.go('^.application.pipelines.executions.execution', {application: this.props.execution.application, executionId: this.props.execution.id});
+    ReactInjector.$state.go('^.application.pipelines.executions.execution', { application: this.props.execution.application, executionId: this.props.execution.id });
   }
 
   private handleStageClick(stageIndex: number) {
-    ReactInjector.$state.go('^.application.pipelines.executionDetails.execution', {application: this.props.execution.application, executionId: this.props.execution.id, stage: stageIndex})
+    ReactInjector.$state.go('^.application.pipelines.executionDetails.execution', { application: this.props.execution.application, executionId: this.props.execution.id, stage: stageIndex })
   }
 
   public render() {
@@ -53,7 +53,7 @@ export class ProjectPipeline extends React.Component<IProjectPipelineProps, IPro
             {`${execution.application.toUpperCase()}: ${execution.name}`}
           </a>
         </h5>
-        &nbsp;(<ExecutionBuildNumber execution={execution}/>{this.state.hasBuildInfo && (<span>, </span>)}started {timestamp(this.props.execution.startTime)})
+        &nbsp;(<ExecutionBuildLink execution={execution}/>{this.state.hasBuildInfo && (<span>, </span>)}started {timestamp(this.props.execution.startTime)})
         <div className="execution-bar">
           {stages}
         </div>
