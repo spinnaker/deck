@@ -39,3 +39,7 @@
       --is-desktop: true;
     }
   }
+
+  .break-words {
+    word-break: break-word;
+  }
