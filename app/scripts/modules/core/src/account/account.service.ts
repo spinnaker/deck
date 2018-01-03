@@ -5,6 +5,7 @@ import { Application } from 'core/application/application.model';
 import { API_SERVICE, Api } from 'core/api/api.service';
 import { CLOUD_PROVIDER_REGISTRY, CloudProviderRegistry } from '../cloudProvider/cloudProvider.registry';
 import { SETTINGS } from 'core/config/settings';
+import { NOTIFIER_SERVICE, NotifierService } from 'core/widgets/notifier/notifier.service';
 
 export interface IRegion {
   account?: string;
@@ -22,6 +23,7 @@ export interface IAccount {
   requiredGroupMembership: string[];
   type: string;
   providerVersion?: string;
+  enabled?: boolean;
 }
 
 export interface IAccountDetails extends IAccount {
@@ -54,7 +56,8 @@ export class AccountService {
   constructor(private $log: ng.ILogService,
               private $q: ng.IQService,
               private cloudProviderRegistry: CloudProviderRegistry,
-              private API: Api) {
+              private API: Api,
+              private notifierService: NotifierService) {
     'ngInject';
   }
 
@@ -183,6 +186,12 @@ export class AccountService {
       result = result.then((accounts) => accounts.filter((account) => account.providerVersion === providerVersion));
     }
 
+    result.then(accounts => accounts.forEach(account => {
+      if (account.enabled !== undefined && !account.enabled) {
+        this.warn(account);
+      }
+    })).catch(() => []);
+
     return result;
   }
 
@@ -211,11 +220,20 @@ export class AccountService {
         return result.sort();
       });
   }
+
+  private warn(account: IAccount): void {
+    this.notifierService.publish({
+      key: `accountDisabledWarning_${account.type}_${account.name}`,
+      position: 'top',
+      body: `Spinnaker is unable to connect to ${account.type} account <b>${account.name}</b> (id: ${account.accountId}).`
+    });
+  }
 }
 
 export const ACCOUNT_SERVICE = 'spinnaker.core.account.service';
 module(ACCOUNT_SERVICE, [
   CLOUD_PROVIDER_REGISTRY,
-  API_SERVICE
+  API_SERVICE,
+  NOTIFIER_SERVICE
 ])
   .service('accountService', AccountService);
