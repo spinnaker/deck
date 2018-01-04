@@ -5,6 +5,7 @@ import * as classNames from 'classnames';
 import { BindAll } from 'lodash-decorators';
 import { Subscription } from 'rxjs/Subscription';
 
+import './serverGroup.less';
 import { Application } from 'core/application';
 import { CloudProviderLogo } from 'core/cloudProvider';
 import { IInstance, IServerGroup } from 'core/domain';
@@ -46,6 +47,7 @@ export interface IServerGroupState {
   multiselect: boolean;
   isSelected: boolean; // single select mode
   isMultiSelected: boolean; // multiselect mode
+  applicationView: boolean;
 }
 
 @BindAll()
@@ -60,7 +62,7 @@ export class ServerGroup extends React.Component<IServerGroupProps, IServerGroup
 
   private getState(props: IServerGroupProps): IServerGroupState {
     const { serverGroup } = props;
-    const { showAllInstances, listInstances, multiselect, filter } = props.sortFilter;
+    const { showAllInstances, listInstances, multiselect, filter, applicationView } = props.sortFilter;
     const instances = serverGroup.instances.filter(i => ReactInjector.clusterFilterService.shouldShowInstance(i));
     const serverGroupSequence = new NamingService().getSequence(serverGroup.moniker.sequence);
     const hasBuildInfo = !!serverGroup.buildInfo;
@@ -97,6 +99,7 @@ export class ServerGroup extends React.Component<IServerGroupProps, IServerGroup
       multiselect,
       isSelected,
       isMultiSelected,
+      applicationView: applicationView,
     };
   }
 
@@ -171,7 +174,7 @@ export class ServerGroup extends React.Component<IServerGroupProps, IServerGroup
 
   public render() {
     const { InstanceList, RunningTasksTag } = NgReact;
-    const { filter, instances, images, jenkins, isSelected, multiselect, isMultiSelected, showAllInstances, listInstances } = this.state;
+    const { filter, instances, images, jenkins, isSelected, multiselect, isMultiSelected, showAllInstances, listInstances, applicationView } = this.state;
     const { serverGroup, application, sortFilter, hasDiscovery, hasLoadBalancers } = this.props;
     const { account, region, name, type } = serverGroup;
     const key = ScrollToService.toDomId(['serverGroup', account, region, name].join('-'));
@@ -181,19 +184,25 @@ export class ServerGroup extends React.Component<IServerGroupProps, IServerGroup
     const hasRunningExecutions = !!serverGroup.runningExecutions.length || !!serverGroup.runningTasks.length;
     const hasLoadBalancer = !!get(serverGroup, 'loadBalancers.length') || !!get(serverGroup, 'targetGroups.length');
 
-    const serverGroupClassName = classNames({
-      'server-group': true,
-      'rollup-pod-server-group': true,
-      'clickable': true,
-      'clickable-row': true,
-      'disabled': serverGroup.isDisabled,
-      'active': isSelected,
-    });
+    const serverGroupClassName = classNames(
+      'server-group',
+      'rollup-pod-server-group',
+      'clickable',
+      'clickable-row',
+      {
+        'disabled': serverGroup.isDisabled,
+        'active': isSelected,
+        'application-view': applicationView
+      }
+    );
 
-    const headerClassName = classNames({
-      'server-group-title': true,
-      'sticky-header-3': this.headerIsSticky(),
-    });
+    const headerClassName = classNames(
+      'server-group-title',
+      {
+        'sticky-header-3': this.headerIsSticky(),
+        'no-padding vertical space-between section-title': applicationView
+      }
+    );
 
     const col1ClassName = `col-md-${images ? 9 : 8 } col-sm-6 section-title`;
     const col2ClassName = `col-md-${images ? 3 : 4 } col-sm-6 text-right`;
@@ -201,69 +210,118 @@ export class ServerGroup extends React.Component<IServerGroupProps, IServerGroup
     return (
       <div key={key} id={key} className={serverGroupClassName} onClick={this.handleServerGroupClicked}>
         <div className="cluster-container">
-          <div className={headerClassName}>
-            <div className="container-fluid no-padding">
-              <div className="row">
-                <div className={col1ClassName}>
-                  {multiselect && <input type="checkbox" checked={isMultiSelected}/>}
+          {!applicationView && (
+            <div>
+              <div className={headerClassName}>
+                <div className="container-fluid no-padding">
+                  <div className="row">
+                    <div className={col1ClassName}>
+                      {multiselect && <input type="checkbox" checked={isMultiSelected}/>}
 
-                  <CloudProviderLogo provider={type} height="16px" width="16px"/>
+                      <CloudProviderLogo provider={type} height="16px" width="16px"/>
 
-                  <span className="server-group-sequence"> {this.state.serverGroupSequence}</span>
-                  {(hasJenkins || hasImages) && <span>: </span>}
-                  {hasJenkins && <a href={jenkins.href} target="_blank">Build: #{jenkins.number}</a>}
-                  {hasImages && <span>{images}</span>}
+                      <span className="server-group-sequence"> {this.state.serverGroupSequence}</span>
+                      {(hasJenkins || hasImages) && <span>: </span>}
+                      {hasJenkins && <a href={jenkins.href} target="_blank">Build: #{jenkins.number}</a>}
+                      {hasImages && <span>{images}</span>}
 
-                  <EntityNotifications
-                    entity={serverGroup}
-                    application={application}
-                    placement="top"
-                    hOffsetPercent="20%"
-                    entityType="serverGroup"
-                    pageLocation="pod"
-                    onUpdate={application.serverGroups.refresh}
-                  />
-                </div>
+                      <EntityNotifications
+                        entity={serverGroup}
+                        application={application}
+                        placement="top"
+                        hOffsetPercent="20%"
+                        entityType="serverGroup"
+                        pageLocation="pod"
+                        onUpdate={application.serverGroups.refresh}
+                      />
+                    </div>
 
-                <div className={col2ClassName}>
-                  <HealthCounts container={serverGroup.instanceCounts}/>
+                    <div className={col2ClassName}>
+                      <HealthCounts container={serverGroup.instanceCounts}/>
 
-                  {hasRunningExecutions && (
-                    <RunningTasksTag
-                      application={application}
-                      tasks={serverGroup.runningTasks}
-                      executions={serverGroup.runningExecutions}
-                    />
-                  )}
+                      {hasRunningExecutions && (
+                        <RunningTasksTag
+                          application={application}
+                          tasks={serverGroup.runningTasks}
+                          executions={serverGroup.runningExecutions}
+                        />
+                      )}
 
-                  {hasLoadBalancer && <LoadBalancersTagWrapper application={application} serverGroup={serverGroup}/>}
-                  <ServerGroupManagerTag application={application} serverGroup={serverGroup}/>
+                      {hasLoadBalancer &&
+                      <LoadBalancersTagWrapper application={application} serverGroup={serverGroup}/>}
+                      <ServerGroupManagerTag application={application} serverGroup={serverGroup}/>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
 
-          {showAllInstances && (
-            <div className="instance-list">
-              {listInstances ? (
-                <div>
-                  <InstanceList
-                    serverGroup={serverGroup}
-                    instances={instances}
-                    sortFilter={sortFilter}
-                    hasDiscovery={hasDiscovery}
-                    hasLoadBalancers={hasLoadBalancers}
-                  />
-                </div>
-              ) : (
-                <div>
-                  <Instances highlight={filter} instances={instances}/>
+              {showAllInstances && (
+                <div className="instance-list">
+                  {listInstances ? (
+                    <div>
+                      <InstanceList
+                        serverGroup={serverGroup}
+                        instances={instances}
+                        sortFilter={sortFilter}
+                        hasDiscovery={hasDiscovery}
+                        hasLoadBalancers={hasLoadBalancers}
+                      />
+                    </div>
+                  ) : (
+                    <div>
+                      <Instances highlight={filter} instances={instances}/>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
           )}
+          {applicationView && (
+            <div className={headerClassName}>
+              <div className="horizontal">
+                <div className="flex-1">
+                  {multiselect && <input type="checkbox" checked={isMultiSelected}/>}
+                  <CloudProviderLogo provider={type} height="16px" width="16px"/>
+                  <span className="server-group-sequence"> {this.state.serverGroupSequence}</span>
+                </div>
+                <div className="flex-1">
+                  <div className="pull-right">
+                    {serverGroup.region} <span className="glyphicon glyphicon-globe"/>
+                  </div>
+                </div>
+              </div>
+              <div className="horizontal">
+                <div className="flex-1">
+                  {hasJenkins && <a href={jenkins.href} target="_blank">Build: #{jenkins.number}</a>}
+                  {hasImages && <span>{images}</span>}
+                </div>
+                <EntityNotifications
+                  entity={serverGroup}
+                  application={application}
+                  placement="top"
+                  hOffsetPercent="20%"
+                  entityType="serverGroup"
+                  pageLocation="pod"
+                  onUpdate={application.serverGroups.refresh}
+                />
+              </div>
+              <div className="horizontal">
+                <div className="flex-1">
+                  <RunningTasksTag
+                    application={application}
+                    tasks={serverGroup.runningTasks}
+                    executions={serverGroup.runningExecutions}
+                  />
+                  {hasLoadBalancer &&
+                  <LoadBalancersTagWrapper application={application} serverGroup={serverGroup}/>}
+                  <ServerGroupManagerTag application={application} serverGroup={serverGroup}/>
+                  <HealthCounts container={serverGroup.instanceCounts}/>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
-    )
+    );
   }
 }

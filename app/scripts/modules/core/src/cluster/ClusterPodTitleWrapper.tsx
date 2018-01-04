@@ -10,6 +10,7 @@ export interface IClusterPodTitleProps {
   grouping: IClusterSubgroup;
   application: Application;
   parentHeading: string;
+  sortFilter: any;
 }
 
 @BindAll()

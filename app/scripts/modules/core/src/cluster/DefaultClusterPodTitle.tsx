@@ -11,13 +11,13 @@ export class DefaultClusterPodTitle extends React.Component<IClusterPodTitleProp
 
   public render(): React.ReactElement<DefaultClusterPodTitle> {
     const { AccountTag } = NgReact;
-    const { grouping, application, parentHeading } = this.props;
+    const { grouping, application, parentHeading, sortFilter } = this.props;
 
     return (
       <div className="rollup-title-cell">
-        <div className="heading-tag">
+        {!sortFilter.applicationView && <div className="heading-tag">
           <AccountTag account={parentHeading} />
-        </div>
+        </div>}
 
         <div className="pod-center">
           <div>

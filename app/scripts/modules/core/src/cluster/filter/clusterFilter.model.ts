@@ -23,6 +23,7 @@ export const filterModelConfig: IFilterConfig[] = [
   { model: 'instanceSort', displayOption: true, type: 'sortKey', defaultValue: 'launchTime' },
   { model: 'multiselect', displayOption: true, type: 'boolean', },
   { model: 'clusters', type: 'trueKeyObject' },
+  { model: 'applicationView', displayOption: true, type: 'boolean', },
 ];
 
 export class ClusterFilterModel {
