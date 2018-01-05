@@ -20,7 +20,7 @@
   </div>
   <div class="container">
     <h2 ng-if="!$ctrl.applicationsLoaded" class="text-center" style="margin-bottom: 250px">
-      <span class="fa fa-cog fa-3x fa-spin"></span>
+      <loading-spinner size="'small'"></loading-spinner>
     </h2>
     <div class="infrastructure-section">
       <table ng-if="$ctrl.applicationsLoaded" class="table table-hover small">
