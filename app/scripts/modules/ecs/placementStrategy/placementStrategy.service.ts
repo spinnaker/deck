@@ -1,17 +1,17 @@
 import { module } from 'angular';
 
-import { PlacementStrategy } from './PlacementStrategy';
+import { IPlacementStrategy } from './IPlacementStrategy';
 
 export class PlacementStrategyService {
 
-  public getPredefinedStrategy(strategyName: string): PlacementStrategy[] {
-    if ( strategyName === 'AZ Balanced Spread' ) {
+  public getPredefinedStrategy(strategyName: string): IPlacementStrategy[] {
+    if ( strategyName === 'AZ Balanced Spread') {
       return this.getAzBalancedSpreadStrategy();
-    } else if ( strategyName === 'AZ Balanced BinPack' ) {
+    } else if (strategyName === 'AZ Balanced BinPack') {
       return this.getAzBalancedBinPackStrategy();
-    } else if ( strategyName === 'BinPack' ) {
+    } else if (strategyName === 'BinPack') {
       return this.getBinPackStrategy();
-    } else if ( strategyName === 'One Task Per Host' ) {
+    } else if (strategyName === 'One Task Per Host') {
       return this.getOneTaskPerHostStrategy();
     } else {
       // TODO: Add support for custom placement strategy.
@@ -19,27 +19,27 @@ export class PlacementStrategyService {
     }
   }
 
-  public getAzBalancedSpreadStrategy(): PlacementStrategy[] {
+  public getAzBalancedSpreadStrategy(): IPlacementStrategy[] {
     return [
       { type: 'spread', field: 'attribute:ecs.availability-zone' },
       { type: 'spread', field: 'instanceId' }
     ];
   }
 
-  public getAzBalancedBinPackStrategy(): PlacementStrategy[] {
+  public getAzBalancedBinPackStrategy(): IPlacementStrategy[] {
     return [
       { type: 'spread', field: 'attribute:ecs.availability-zone' },
       { type: 'binpack', field: 'memory' }
     ];
   }
 
-  public getBinPackStrategy(): PlacementStrategy[] {
+  public getBinPackStrategy(): IPlacementStrategy[] {
     return [
       { type: 'binpack', field: 'memory' }
     ];
   }
 
-  public getOneTaskPerHostStrategy(): PlacementStrategy[] {
+  public getOneTaskPerHostStrategy(): IPlacementStrategy[] {
     return [
       { type: 'spread', field: 'instanceId' }
     ];
