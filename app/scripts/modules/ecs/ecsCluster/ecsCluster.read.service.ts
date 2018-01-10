@@ -1,17 +1,18 @@
 import { module } from 'angular';
 
 import { API_SERVICE, Api } from 'core/api/api.service';
-import { EcsClusterDescriptor } from './EcsCluster';
+import { IEcsClusterDescriptor } from './IEcsCluster';
 
 export class EscClusterReader {
-public constructor(private API: Api) { 'ngInject'; }
 
-  public listClusters(): ng.IPromise<EcsClusterDescriptor[]> {
-    return this.API.all('ecs').all('ecsClusters').getList();
+  public constructor(private API: Api) {
+    'ngInject';
   }
 
+  public listClusters(): ng.IPromise<IEcsClusterDescriptor[]> {
+    return this.API.all('ecs').all('ecsClusters').getList();
+  }
 }
-
 
 export const ECS_CLUSTER_READ_SERVICE = 'spinnaker.ecs.ecsCluster.read.service';
 
