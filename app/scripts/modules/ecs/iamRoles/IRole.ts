@@ -4,4 +4,3 @@ export interface IRoleDescriptor {
   id: string;
   accountName: string;
 }
-
