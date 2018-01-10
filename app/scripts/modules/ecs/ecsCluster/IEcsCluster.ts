@@ -3,4 +3,3 @@ export interface IEcsClusterDescriptor {
   region: string;
   name: string;
 }
-
