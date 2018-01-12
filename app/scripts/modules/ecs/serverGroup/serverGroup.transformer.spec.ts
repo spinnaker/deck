@@ -4,8 +4,8 @@ import {
   ECS_SERVER_GROUP_TRANSFORMER,
   EcsServerGroupTransformer
 } from './serverGroup.transformer';
-import { IScalingPolicyAlarmView, IAmazonServerGroup, IStepAdjustment } from '../../amazon/src/domain';
-import { VPC_READ_SERVICE, VpcReader } from '../../amazon/src/vpc/vpc.read.service';
+import { IScalingPolicyAlarmView, IAmazonServerGroup, IStepAdjustment } from '@spinnaker/amazon';
+import { VPC_READ_SERVICE, VpcReader } from '@spinnaker/amazon';
 
 describe('ecsServerGroupTransformer', () => {
 

@@ -6,8 +6,8 @@ import { IVpc } from '@spinnaker/core';
 import {
   IScalingAdjustmentView, IScalingPolicyView, IScalingPolicyAlarmView, IAmazonServerGroup, IStepAdjustmentView,
   IScalingPolicy, IAmazonServerGroupView
-} from '../../amazon/src/domain';
-import { VPC_READ_SERVICE, VpcReader } from '../../amazon/src/vpc/vpc.read.service';
+} from '@spinnaker/amazon';
+import { VPC_READ_SERVICE, VpcReader } from '@spinnaker/amazon';
 
 export class EcsServerGroupTransformer {
   public constructor(private vpcReader: VpcReader) { 'ngInject'; }
