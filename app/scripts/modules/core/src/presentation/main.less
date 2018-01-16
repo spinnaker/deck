@@ -248,7 +248,7 @@ html {
       width: 390px;
     }
     @media(min-width: 1400px) {
-      width: 540px;
+      width: 530px;
     }
   }
   .nav-content {
@@ -731,6 +731,18 @@ tfoot .add-new {
         @shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px var(--color-danger-light);
         .box-shadow(@shadow);
       }
+    }
+  }
+}
+
+.highlight-pristine {
+  .ng-invalid {
+    border-color: var(--color-danger);
+    .box-shadow(inset 0 1px 1px rgba(0, 0, 0, .075)); // Redeclare so transitions work
+    &:focus {
+      border-color: var(--color-danger);
+      @shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px var(--color-danger-light);
+      .box-shadow(@shadow);
     }
   }
 }

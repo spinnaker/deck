@@ -1,4 +1,5 @@
 import { IPromise } from 'angular';
+import { CreatePipelineButton } from 'core/pipeline/create/CreatePipelineButton';
 import * as React from 'react';
 import * as ReactGA from 'react-ga';
 import { Transition } from '@uirouter/core';
@@ -45,17 +46,7 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
   constructor(props: IExecutionsProps) {
     super(props);
 
-    const { app } = props;
     const { executionFilterModel } = ReactInjector;
-    if (executionFilterModel.mostRecentApplication !== app.name) {
-      executionFilterModel.asFilterModel.groups = [];
-      executionFilterModel.mostRecentApplication = app.name;
-    }
-
-    if (app.notFound) { return; }
-
-    app.setActiveState(app.executions);
-
     this.state = {
       filtersExpanded: this.insightFilterStateModel.filtersExpanded,
       loading: true,
@@ -64,6 +55,18 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
       triggeringExecution: false,
     };
 
+  }
+
+  public componentWillMount(): void {
+    const { app } = this.props;
+    const { executionFilterModel } = ReactInjector;
+    if (executionFilterModel.mostRecentApplication !== app.name) {
+      executionFilterModel.asFilterModel.groups = [];
+      executionFilterModel.mostRecentApplication = app.name;
+    }
+
+    if (app.notFound) { return; }
+    app.setActiveState(app.executions);
     app.executions.activate();
     app.pipelineConfigs.activate();
   }
@@ -250,6 +253,14 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
     const hasPipelines = !!(get(app, 'executions.data', []).length || get(app, 'pipelineConfigs.data', []).length);
 
     if (!app.notFound) {
+      if (!hasPipelines && !loading) {
+        return (
+          <div className="text-center full-width">
+            <h3>No pipelines configured for this application.</h3>
+            <h4><CreatePipelineButton application={app} asLink={true}/></h4>
+          </div>
+        );
+      }
       return (
         <div className="executions-section">
           <div className={`insight ${filtersExpanded ? 'filters-expanded' : 'filters-collapsed'}`}>
