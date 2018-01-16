@@ -21,7 +21,7 @@ module.exports = angular.module('spinnaker.google.serverGroup.configure.wizard.b
     function searchImages(q) {
       $scope.command.backingData.filtered.images = [
         {
-          message: `<loading-spinner size="'nano'"></loading-spinner> Finding results matching "  ${q}  "...`
+          message: `<loading-spinner size="'nano'"></loading-spinner> Finding results matching "${q}"...`
         }
       ];
       return Observable.fromPromise(
