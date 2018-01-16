@@ -1,0 +1,139 @@
+/*
+@styleguide
+
+@title Grids
+
+Offers a skeleton grid system with header, navigation and area for contents.
+Once this is set up, the contents area is also divided as a grid with 12 columns and 1 row.
+
+For setting up the main grid system for the page use the following: E.g.
+<div class="styleguide-grid-cover">
+  <main class="main-container">
+    <header>Header</header>
+    <div class="secondary-nav">Secondary Nav </div>
+    <div class="tertiary-nav">Tertiary Nav </div>
+    <section class="contents content-container with-filter with-inspector">
+      <div class="filter-area">Filters</div>
+      <div class="contents-area">Contents</div>
+      <div class="inspector-area">Inspector</div>
+    </section>
+  </main>
+</div>
+
+    <div class="styleguide-grid-cover">
+      <main class="main-container">
+        <header>Header</header>
+        <div class="secondary-nav">Secondary Nav </div>
+        <div class="tertiary-nav">Tertiary Nav </div>
+        <section class="contents content-container with-filter with-inspector">
+          <div class="filter-area">Filters</div>
+          <div class="contents-area">Contents</div>
+          <div class="inspector-area">Inspector</div>
+        </section>
+      </main>
+    </div>
+*/
+
+.main-container {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
+
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 42px 80px 68px 1fr;
+  grid-template-areas:
+    "header"
+    "secondarynav"
+    "tertiarynav"
+    "contents";
+}
+
+.main-container > header, .main-container > .header {
+  grid-area: header;
+}
+
+.main-container > .secondary-nav {
+  grid-area: secondarynav;
+}
+
+.main-container > .tertiary-nav {
+  grid-area: tertiarynav;
+}
+
+.main-container > .contents {
+  grid-area: contents;
+}
+
+/* has 12 columns which can be grouped together to create any layouts */
+.content-container {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+}
+
+.content-container:not(.with-filter):not(.with-inspector) {
+  grid-column-start: 1;
+  overflow-y: auto;
+}
+
+/* View with filter and inspector */
+.content-container.with-filter .filter-area {
+  grid-column-start: 1;
+  grid-column-end: 4;
+}
+
+.content-container.with-inspector .inspector-area{
+  grid-column-start: 10;
+  grid-column-end: 13;
+}
+
+.content-container.with-filter .contents-area{
+  grid-column-start: 4;
+}
+
+.content-container.with-inspector .contents-area {
+  grid-column-end: 10;
+}
+
+.content-container:not(.with-inspector) .contents-area {
+  grid-column-end: 13;
+}
+
+.main-container .filter-area, .main-container .inspector-area {
+  overflow-y: auto;
+}
+
+/* Colors & borders for marking */
+main > * {
+  padding: 10px;
+}
+
+header {
+  background-color: #3A5469;
+  color: white;
+}
+
+.secondary-nav {
+  background-color: #D8E8ED;
+}
+
+.tertiary-nav {
+  border-bottom: 1px solid #CCC;
+}
+
+.contents {
+  background-color: #F3F3F3;
+}
+
+.filter-area, .inspector-area {
+  border: 1px solid #CCC;
+}
+
+.styleguide-grid-cover {
+  position: relative;
+  width: 800px;
+  height: 500px;
+  border: 1px solid;
+}
