@@ -52,7 +52,6 @@ export class LoadBalancers extends React.Component<ILoadBalancersProps, ILoadBal
   }
 
   public componentWillUnmount(): void {
-    this.props.app.setActiveState();
     this.groupsUpdatedListener.unsubscribe();
     this.loadBalancersRefreshUnsubscribe();
   }
