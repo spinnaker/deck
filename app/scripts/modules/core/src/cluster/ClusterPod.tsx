@@ -1,8 +1,9 @@
 import * as React from 'react';
+import * as classNames from 'classnames';
 import { BindAll } from 'lodash-decorators';
 import { orderBy } from 'lodash';
 
-import { ReactInjector } from 'core/reactShims';
+import { ReactInjector, NgReact } from 'core/reactShims';
 import { ServerGroup } from 'core/serverGroup/ServerGroup';
 import { Application } from 'core/application';
 import { EntityNotifications } from 'core/entityTag/notifications/EntityNotifications';
@@ -70,7 +71,9 @@ export class ClusterPod extends React.Component<IClusterPodProps, IClusterPodSta
   }
 
   private renderSubGroup(subgroup: IServerGroupSubgroup) {
+    const { AccountTag } = NgReact;
     const { grouping, application, sortFilter } = this.props;
+    const applicationView = sortFilter.applicationView;
     const hasMoniker = subgroup.serverGroups.every((sg) => { return !!sg.moniker });
     let iteratee;
     if (hasMoniker) {
@@ -81,10 +84,17 @@ export class ClusterPod extends React.Component<IClusterPodProps, IClusterPodSta
 
     const sortedServerGroups = orderBy(subgroup.serverGroups, [iteratee], ['desc']);
 
+
+
     return (
-      <div className="pod-subgroup" key={subgroup.key}>
+      <div className={classNames('pod-subgroup', { 'pod-warning': subgroup.warning, 'pod-error': subgroup.error })} key={subgroup.key}>
         <h6 className="sticky-header-2 subgroup-title">
-          {subgroup.heading}
+          {applicationView && <div>
+            <AccountTag account={subgroup.heading} />&nbsp;
+            {subgroup.warning && <span className="pill warn"><span className="glyphicon glyphicon-warning-sign"/>&nbsp;&nbsp;{subgroup.warning}</span>}
+            {subgroup.error && <span className="pill danger"><span className="glyphicon glyphicon-alert"/>&nbsp;&nbsp;{subgroup.error}</span>}
+          </div>}
+          {!applicationView && subgroup.heading}
 
           <EntityNotifications
             entity={subgroup}
@@ -96,18 +106,19 @@ export class ClusterPod extends React.Component<IClusterPodProps, IClusterPodSta
             onUpdate={application.serverGroups.refresh}
           />
         </h6>
-
-        {grouping.cluster.category === 'serverGroup' && sortedServerGroups.map((serverGroup: IServerGroup) => (
-          <ServerGroup
-            key={serverGroup.name}
-            serverGroup={serverGroup}
-            cluster={serverGroup.cluster}
-            application={application}
-            sortFilter={sortFilter}
-            hasDiscovery={grouping.hasDiscovery}
-            hasLoadBalancers={grouping.hasLoadBalancers}
-          />
-        ))}
+        <div className={classNames({ 'horizontal wrap': applicationView })}>
+          {grouping.cluster.category === 'serverGroup' && sortedServerGroups.map((serverGroup: IServerGroup) => (
+            <ServerGroup
+              key={serverGroup.name}
+              serverGroup={serverGroup}
+              cluster={serverGroup.cluster}
+              application={application}
+              sortFilter={sortFilter}
+              hasDiscovery={grouping.hasDiscovery}
+              hasLoadBalancers={grouping.hasLoadBalancers}
+            />
+          ))}
+        </div>
       </div>
     )
   }

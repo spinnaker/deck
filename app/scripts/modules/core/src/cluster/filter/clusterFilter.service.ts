@@ -1,11 +1,11 @@
 import { ILogService, module } from 'angular';
-import { each, forOwn, groupBy, sortBy } from 'lodash';
+import { each, forOwn, groupBy, sortBy, uniq } from 'lodash';
 import { Debounce } from 'lodash-decorators';
 import { StateParams } from '@uirouter/angularjs';
 import { Subject } from 'rxjs';
 
 import { Application } from 'core/application/application.model';
-import { ICluster, IEntityTags, IInstance, IServerGroup } from 'core/domain';
+import { ICluster, IEntityTags, IInstance, IInstanceCounts, IServerGroup } from 'core/domain';
 import { CLUSTER_FILTER_MODEL, ClusterFilterModel } from './clusterFilter.model';
 
 export interface IParentGrouping {
@@ -36,6 +36,8 @@ export interface IServerGroupSubgroup {
   category: string;
   serverGroups: IServerGroup[];
   entityTags: IEntityTags;
+  warning?: string;
+  error?: string;
 }
 
 export type Grouping = IClusterGroup | IClusterSubgroup | IServerGroupSubgroup;
@@ -68,31 +70,46 @@ export class ClusterFilterService {
     const groups: IClusterGroup[] = [];
     const serverGroups: IServerGroup[] = this.filterServerGroupsForDisplay(application.getDataSource('serverGroups').data);
 
-    const accountGroupings = groupBy(serverGroups, 'account');
+    if (this.clusterFilterModel.asFilterModel.sortFilter.applicationView) {
+      const numberOfAccounts = uniq(serverGroups.map((sg: IServerGroup) => sg.account)).length;
+      const numberOfRegions = uniq(serverGroups.map((sg: IServerGroup) => sg.region)).length;
+      const clusterGroupings = groupBy(serverGroups, 'cluster');
 
-    forOwn(accountGroupings, (accountGroup: IServerGroup[], account: string) => {
-      const categoryGroupings = groupBy(accountGroup, 'category'),
-            clusterGroups: IClusterSubgroup[] = [];
+      forOwn(clusterGroupings, (clusterGroup: IServerGroup[], cluster: string) => {
+        const categoryGroupings = groupBy(clusterGroup, 'category'), clusterGroups: IClusterSubgroup[] = [];
 
-      forOwn(categoryGroupings, (categoryGroup: IServerGroup[], category: string) => {
-        const clusterGroupings = groupBy(categoryGroup, 'cluster');
+        forOwn(categoryGroupings, (categoryGroups: IServerGroup[], category: string) => {
+          const accountGroupings = groupBy(categoryGroups, (numberOfAccounts === 1 && numberOfRegions > 1) ? 'region' : 'account'), accountGroups: IServerGroupSubgroup[] = [];
 
-        forOwn(clusterGroupings, (clusterGroup: IServerGroup[], cluster: string) => {
-          const regionGroupings = groupBy(clusterGroup, 'region'),
-                regionGroups: IServerGroupSubgroup[] = [];
-
-          forOwn(regionGroupings, (regionGroup: IServerGroup[], region: string) => {
-            regionGroups.push({
-              heading: region,
-              category: category,
-              serverGroups: regionGroup,
-              key: `${region}:${category}`,
-              entityTags: (regionGroup[0].clusterEntityTags || []).find(t => t.entityRef['region'] === region),
+          forOwn(accountGroupings, (accGroup: IServerGroup[], account: string) => {
+            const accountGroupsByRegion = groupBy(accGroup, 'region');
+            forOwn(accountGroupsByRegion, (accountGroup: IServerGroup[]) => {
+              const activeServerGroups = accountGroup.filter((ag: IServerGroup) => !ag.isDisabled);
+              const runningExecutions = !!activeServerGroups.filter((ag: IServerGroup) => !!ag.runningExecutions.length || !!ag.runningTasks.length).length;
+              accountGroups.push({
+                heading: account,
+                category: category,
+                serverGroups: accGroup,
+                key: `${cluster}:${account}`,
+                entityTags: (accountGroup[0].clusterEntityTags || []).find(t => t.entityRef['account'] === account),
+                warning: activeServerGroups.length > 1 && runningExecutions ? `${activeServerGroups.length} server groups are active simultaneously` : undefined,
+                error: activeServerGroups.length > 1 && !runningExecutions ? `${activeServerGroups.length} server groups are active simultaneously` : undefined
+              });
             });
           });
 
-          const appCluster: ICluster = (application.clusters || [])
-            .find((c: ICluster) => c.account === account && c.name === cluster && c.category === category);
+          const appClusters: ICluster[] = (application.clusters || [])
+            .filter((c: ICluster) => c.name === cluster && c.category === category);
+          const instanceCounts: IInstanceCounts = appClusters.map((c: ICluster) => c.instanceCounts)
+            .reduce((accumulator: IInstanceCounts, currentValue: IInstanceCounts) => {
+              forOwn(currentValue, (value: number, key: string) => accumulator[key] = value + (accumulator[key] ? accumulator[key] : 0));
+              return accumulator;
+            }, {} as IInstanceCounts);
+          // The application view doesn't really fit with the ICluster model, so we just mock it with the required info:
+          const appCluster: ICluster = {
+            category: category,
+            instanceCounts: instanceCounts
+          } as ICluster;
 
           if (appCluster) {
             clusterGroups.push({
@@ -100,20 +117,64 @@ export class ClusterFilterService {
               category: category,
               key: `${cluster}:${category}`,
               cluster: appCluster,
-              subgroups: sortBy(regionGroups, 'heading'),
+              subgroups: sortBy(accountGroups, 'heading'),
               entityTags: (clusterGroup[0].clusterEntityTags || []).find(t => t.entityRef['region'] === '*'),
             });
           }
         });
+        groups.push({
+          heading: cluster,
+          key: cluster,
+          subgroups: sortBy(clusterGroups, ['heading', 'category']),
+        });
       });
+    } else {
+      const accountGroupings = groupBy(serverGroups, 'account');
 
-      groups.push({
-        heading: account,
-        key: account,
-        subgroups: sortBy(clusterGroups, ['heading', 'category']),
+      forOwn(accountGroupings, (accountGroup: IServerGroup[], account: string) => {
+        const categoryGroupings = groupBy(accountGroup, 'category'),
+          clusterGroups: IClusterSubgroup[] = [];
+
+        forOwn(categoryGroupings, (categoryGroup: IServerGroup[], category: string) => {
+          const clusterGroupings = groupBy(categoryGroup, 'cluster');
+
+          forOwn(clusterGroupings, (clusterGroup: IServerGroup[], cluster: string) => {
+            const regionGroupings = groupBy(clusterGroup, 'region'),
+              regionGroups: IServerGroupSubgroup[] = [];
+
+            forOwn(regionGroupings, (regionGroup: IServerGroup[], region: string) => {
+              regionGroups.push({
+                heading: region,
+                category: category,
+                serverGroups: regionGroup,
+                key: `${region}:${category}`,
+                entityTags: (regionGroup[0].clusterEntityTags || []).find(t => t.entityRef['region'] === region),
+              });
+            });
+
+            const appCluster: ICluster = (application.clusters || [])
+              .find((c: ICluster) => c.account === account && c.name === cluster && c.category === category);
+
+            if (appCluster) {
+              clusterGroups.push({
+                heading: cluster,
+                category: category,
+                key: `${cluster}:${category}`,
+                cluster: appCluster,
+                subgroups: sortBy(regionGroups, 'heading'),
+                entityTags: (clusterGroup[0].clusterEntityTags || []).find(t => t.entityRef['region'] === '*'),
+              });
+            }
+          });
+        });
+
+        groups.push({
+          heading: account,
+          key: account,
+          subgroups: sortBy(clusterGroups, ['heading', 'category']),
+        });
       });
-    });
-
+    }
     this.sortGroupsByHeading(groups);
     this.clusterFilterModel.asFilterModel.addTags();
     this.lastApplication = application;
@@ -407,6 +468,7 @@ export class ClusterFilterService {
           this.diffSubgroups((oldGroup as IParentGrouping).subgroups, (newGroup as IParentGrouping).subgroups);
         }
         if (newGroup.hasOwnProperty('serverGroups')) {
+
           this.diffServerGroups(oldGroup as IServerGroupSubgroup, newGroup as IServerGroupSubgroup);
         }
         if (oldGroup.entityTags || newGroup.entityTags) {
@@ -429,6 +491,8 @@ export class ClusterFilterService {
     if (oldGroup.category !== newGroup.category) {
       return;
     }
+    oldGroup.warning = newGroup.warning;
+    oldGroup.error = newGroup.error;
 
     const toRemove: number[] = [];
     oldGroup.serverGroups.forEach((serverGroup: IServerGroup, idx: number) => {
