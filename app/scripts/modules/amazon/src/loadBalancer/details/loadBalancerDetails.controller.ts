@@ -98,10 +98,15 @@ export class AwsLoadBalancerDetailsController implements IController {
       this.$uibModal.open(modalOptions);
     } else {
       // Load balancer a part of a different application
-      this.applicationReader.getApplication(loadBalancerAppName).then((loadBalancerApp) => {
-        application = loadBalancerApp;
-        this.$uibModal.open(modalOptions);
-      });
+      this.applicationReader.getApplication(loadBalancerAppName)
+        .then((loadBalancerApp) => {
+          application = loadBalancerApp;
+          this.$uibModal.open(modalOptions);
+        })
+        .catch(() => {
+          // If the application can't be found, just use the old one
+          this.$uibModal.open(modalOptions);
+        });
     }
   }
 
@@ -127,7 +132,7 @@ export class AwsLoadBalancerDetailsController implements IController {
     const submitMethod = () => this.loadBalancerWriter.deleteLoadBalancer(command, this.app);
 
     this.confirmationModalService.confirm({
-      header: `Really delete ${this.loadBalancerFromParams.name}?`,
+      header: `Really delete ${this.loadBalancerFromParams.name} in ${this.loadBalancerFromParams.region}: ${this.loadBalancerFromParams.accountId}?`,
       buttonText: `Delete ${this.loadBalancerFromParams.name}`,
       provider: 'aws',
       account: this.loadBalancerFromParams.accountId,
