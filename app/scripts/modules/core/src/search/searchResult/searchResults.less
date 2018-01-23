@@ -4,6 +4,9 @@
 @import "~core/search/searchResult/baseTable.less";
 
 .search-results {
+  .faded {
+    opacity: 0.2;
+  }
 
   display: flex;
   margin-top: 10px;
@@ -16,17 +19,9 @@
     width: 275px;
 
     .search-group {
-
-      align-items: baseline;
       .clickable();
-      display: flex;
       padding: 10px;
       margin-bottom: 1px;
-
-      &.faded {
-        opacity: 0.2;
-        cursor: not-allowed;
-      }
 
       .search-group-icon {
         background-color: var(--color-primary);
@@ -43,10 +38,12 @@
 
       .search-group-name {
         color: var(--color-primary);
-        flex: 1 0 auto;
         font-size: 110%;
         font-weight: 600;
         text-transform: uppercase;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
       }
 
       .badge {
@@ -65,6 +62,7 @@
       &:hover {
         background-color: var(--color-accent-g2);
         transition: all 0.15s ease-in-out;
+
         &.faded {
           background-color: var(--color-alabaster);
         }
@@ -73,8 +71,6 @@
   }
 
   .search-result-grid {
-
-    flex: 1 0 auto;
     padding-left: 15px;
 
     .small {
