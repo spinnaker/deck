@@ -77,6 +77,7 @@ const helpContents: {[key: string]: string} = {
   'kubernetes.containers.probes.failureThreshold': 'How many executions need to fail before the probe is declared unhealthy.',
   'kubernetes.containers.volumemounts.name': 'The <b>Volume Source</b> configured above to claim.',
   'kubernetes.containers.volumemounts.mountPath': 'The directory to mount the specified <b>Volume Source</b> to.',
+  'kubernetes.containers.volumemounts.subPath': 'This will mount the sub path in the referenced volume rather than the root path.',
   'kubernetes.namespace': 'The namespace you have configured with the above selected account. This will often be referred to as <b>Region</b> in Spinnaker.',
   'kubernetes.loadBalancer.detail': '(Optional) A string of free-form alphanumeric characters; by convention, we recommend using "frontend".',
   'kubernetes.loadBalancer.stack': '(Optional) One of the core naming components of a cluster, used to create vertical stacks of dependent services for integration testing.',
@@ -163,6 +164,8 @@ const helpContents: {[key: string]: string} = {
         <b>artifact:</b> The manifest is read from an artifact supplied/created upstream. The expected artifact must be referenced here, and will be bound at runtime.
       </p>
   `,
+  'kubernetes.manifest.expectedArtifact': 'The artifact that is to be applied to the Kubernetes account for this stage.  The artifact should represent a valid Kubernetes manifest.',
+  'kubernetes.manifest.requiredArtifactsToBind': 'These artifacts must be present in the context for this stage to successfully complete. Artifacts specfied will be <a href="https://www.spinnaker.io/reference/artifacts/in-kubernetes-v2/#binding-artifacts-in-manifests">bound to the deployed manfiest.</a>',
   'kubernetes.manifest.undoRollout.revisionsBack': `
       <p>How many revisions to rollback from the current active revision. This is not a hard-coded revision to rollout.</p>
       <p>For example: If you specify "1", and this stage executes, the prior revision will be active upon success.</p>
