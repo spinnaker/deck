@@ -9,7 +9,7 @@ import { Api } from '../api/api.service';
 import { ApplicationModelBuilder } from '../application/applicationModel.builder';
 import { ApplicationReader } from '../application/service/application.read.service';
 import { AuthenticationService } from '../authentication/authentication.service';
-import { CacheInitializerService } from 'core/cache';
+import { CacheInitializerService } from '../cache/cacheInitializer.service';
 import { CancelModalService } from '../cancelModal/cancelModal.service';
 import { CloudProviderRegistry } from '../cloudProvider/cloudProvider.registry';
 import { ClusterFilterModel } from 'core/cluster/filter/clusterFilter.model';
@@ -23,6 +23,7 @@ import { ExecutionFilterService } from '../pipeline/filter/executionFilter.servi
 import { ExecutionService } from '../pipeline/service/execution.service';
 import { ExecutionsTransformerService } from '../pipeline/service/executions.transformer.service';
 import { HelpContentsRegistry, IHelpContents } from 'core/help';
+import { InfrastructureCacheService } from '../cache/infrastructureCaches.service';
 import { InfrastructureSearchService } from '../search/infrastructure/infrastructureSearch.service';
 import { InfrastructureSearchServiceV2 } from 'core/search/infrastructure/infrastructureSearchV2.service';
 import { InsightFilterStateModel } from '../insight/insightFilterState.model';
@@ -44,7 +45,9 @@ import { ProviderSelectionService } from '../cloudProvider/providerSelection/pro
 import { RecentHistoryService } from 'core/history/recentHistory.service'
 import { SchedulerFactory } from '../scheduler/scheduler.factory';
 import { ScrollToService } from '../utils/scrollTo/scrollTo.service';
+import { SecurityGroupReader } from '../securityGroup/securityGroupReader.service';
 import { StateEvents } from './state.events';
+import { SubnetReader } from '../subnet/subnet.read.service';
 import { TaskExecutor } from '../task/taskExecutor';
 import { TaskMonitorBuilder } from '../task/monitor/taskMonitor.builder';
 import { TaskReader } from '../task/task.read.service';
@@ -52,6 +55,7 @@ import { UrlBuilderService } from 'core/navigation/urlBuilder.service';
 import { VariableInputService } from '../pipeline/config/templates/inputs/variableInput.service';
 import { VariableValidatorService } from '../pipeline/config/templates/validators/variableValidator.service';
 import { VersionSelectionService } from '../cloudProvider/versionSelection/versionSelection.service';
+import { VersionedCloudProviderService } from '../cloudProvider/versionedCloudProvider.service';
 import { ViewStateCacheService } from '../cache/viewStateCache.service';
 import { WaypointService } from '../utils/waypoints/waypoint.service';
 
@@ -98,6 +102,7 @@ export class CoreReactInject extends ReactInject {
   public get executionsTransformer() { return this.$injector.get('executionsTransformer') as ExecutionsTransformerService; }
   public get helpContents() { return this.$injector.get('helpContents') as IHelpContents }
   public get helpContentsRegistry() { return this.$injector.get('helpContentsRegistry') as HelpContentsRegistry; }
+  public get infrastructureCaches() { return this.$injector.get('infrastructureCaches') as InfrastructureCacheService; }
   public get infrastructureSearchService() { return this.$injector.get('infrastructureSearchService') as InfrastructureSearchService; }
   public get infrastructureSearchServiceV2() { return this.$injector.get('infrastructureSearchServiceV2') as InfrastructureSearchServiceV2; }
   public get insightFilterStateModel() { return this.$injector.get('insightFilterStateModel') as InsightFilterStateModel; }
@@ -120,6 +125,8 @@ export class CoreReactInject extends ReactInject {
   public get providerSelectionService() { return this.$injector.get('providerSelectionService') as ProviderSelectionService; }
   public get schedulerFactory() { return this.$injector.get('schedulerFactory') as SchedulerFactory; }
   public get scrollToService() { return this.$injector.get('scrollToService') as ScrollToService; }
+  public get securityGroupReader() { return this.$injector.get('securityGroupReader') as SecurityGroupReader; }
+  public get subnetReader() { return this.$injector.get('subnetReader') as SubnetReader; }
   public get recentHistoryService() { return this.$injector.get('recentHistoryService') as RecentHistoryService; }
   public get stateEvents() { return this.$injector.get('stateEvents') as StateEvents; }
   public get taskExecutor() { return this.$injector.get('taskExecutor') as TaskExecutor; }
@@ -129,6 +136,7 @@ export class CoreReactInject extends ReactInject {
   public get variableInputService() { return this.$injector.get('variableInputService') as VariableInputService; }
   public get variableValidatorService() { return this.$injector.get('variableValidatorService') as VariableValidatorService; }
   public get versionSelectionService() { return this.$injector.get('versionSelectionService') as VersionSelectionService; }
+  public get versionedCloudProviderService() { return this.$injector.get('versionedCloudProviderService') as VersionedCloudProviderService; }
   public get viewStateCache() { return this.$injector.get('viewStateCache') as ViewStateCacheService; }
   public get waypointService() { return this.$injector.get('waypointService') as WaypointService; }
 
