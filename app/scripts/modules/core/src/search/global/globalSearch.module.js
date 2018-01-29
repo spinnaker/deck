@@ -2,8 +2,10 @@
 
 const angular = require('angular');
 
+import { GLOBAL_SEARCH } from './globalSearch.component';
+
 import './globalSearch.less';
 
 module.exports = angular.module('spinnaker.core.search.global', [
-  require('./globalSearch.directive.js').name,
+  GLOBAL_SEARCH,
 ]);
