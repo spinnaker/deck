@@ -95,6 +95,8 @@ export class RecentlyViewedItems extends React.Component<IRecentlyViewedItemsPro
           onRemoveProject={this.handleRemoveProject}
         />
        ) : (
+        // Once RecentlyViewedItems is no longer rendered as part of any angular
+        // templates, we can stop defaulting to SearchResultPods and require a component.
         <SearchResultPods
           results={this.state.recentItems}
           onRemoveItem={this.handleRemoveItem}

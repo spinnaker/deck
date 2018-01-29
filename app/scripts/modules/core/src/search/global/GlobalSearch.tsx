@@ -5,6 +5,7 @@ import * as ReactGA from 'react-ga';
 import { UISref } from '@uirouter/react';
 import { UIRouterContext } from '@uirouter/react-hybrid';
 
+import { SETTINGS } from 'core/config/settings';
 import { ISearchResultSet } from 'core/search/infrastructure/infrastructureSearch.service';
 import { ISearchResult } from 'core/search/search.service';
 import { ReactInjector } from 'core/reactShims';
@@ -170,7 +171,7 @@ export class GlobalSearch extends React.Component<{}, IGlobalSearchState> {
     }
   }
 
-  @Debounce(200)
+  @Debounce(300)
   private executeQuery() {
     const { infrastructureSearchService } = ReactInjector;
     const search = infrastructureSearchService.getSearcher();
@@ -200,7 +201,7 @@ export class GlobalSearch extends React.Component<{}, IGlobalSearchState> {
     });
   }
 
-  @Debounce(200)
+  @Debounce(300)
   private considerMinLengthWarning() {
     const { query } = this.state;
     this.setState({ showMinLengthWarning: !!query && query.length < 3 });
@@ -256,6 +257,8 @@ export class GlobalSearch extends React.Component<{}, IGlobalSearchState> {
       querying,
       categories
     } = this.state;
+
+    const { searchVersion } = SETTINGS;
 
     return (
       <li
@@ -371,6 +374,7 @@ export class GlobalSearch extends React.Component<{}, IGlobalSearchState> {
                         this.resultRefs[categoryIndex][index] = ref;
                       }
                     }}
+                    // TODO: probably worth moving these (and the href for 'see more results') over to a UISRef at some point
                     href={result.href}
                   >
                     <SearchResult displayName={result.displayName} account={(result as any).account} />
@@ -382,7 +386,7 @@ export class GlobalSearch extends React.Component<{}, IGlobalSearchState> {
               <li key="divider" className="divider"/>,
               <li key="seeMore" className="result">
                 <a
-                  href={`#/infrastructure?q=${query}`}
+                  href={searchVersion === 2 ? `#/search?key=${query}` : `#/infrastructure?q=${query}`}
                   className="expand-results"
                   onClick={() => {
                     ReactGA.event({ category: 'Global Search', action: 'See more results selected' });
