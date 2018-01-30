@@ -361,7 +361,7 @@ export class GlobalSearch extends React.Component<{}, IGlobalSearchState> {
                 <div className="category-heading">{category.type.displayName}</div>
               </li>,
               category.results.map((result, index) => (
-                <li className="result">
+                <li key={result.id} className="result">
                   <a
                     onKeyDown={this.navigateResult}
                     onClick={() => {
