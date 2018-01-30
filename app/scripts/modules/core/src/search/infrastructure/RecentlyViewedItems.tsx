@@ -11,8 +11,8 @@ import { ISearchResult, ISearchResultPodData, SearchResultPods } from './SearchR
 
 export interface IChildComponentProps {
   results: ISearchResultPodData[];
-  onRemoveItem: (categoryName: string, itemId: string) => void;
-  onRemoveProject: (projectId: string) => void;
+  onRemoveItem?: (categoryName: string, itemId: string) => void;
+  onRemoveProject?: (projectId: string) => void;
 }
 
 export interface IRecentlyViewedItemsProps {

@@ -188,7 +188,7 @@ export class GlobalSearch extends React.Component<{}, IGlobalSearchState> {
           ...category,
           results: searchRank(category.results).slice(0, 5)
         }))
-        .sort((a, b) => a.order - b.order);
+        .sort((a, b) => a.type.order - b.type.order);
 
       this.resultRefs = range(categories.length).map(() => []);
 
@@ -357,8 +357,8 @@ export class GlobalSearch extends React.Component<{}, IGlobalSearchState> {
         {!!query && !querying && showSearchResults &&
           <ul className="dropdown-menu" role="menu">
             {categories.map((category, categoryIndex) => ([
-              <li key={category.id} className="category-heading">
-                <div className="category-heading">{category.category}</div>
+              <li key={category.type.id} className="category-heading">
+                <div className="category-heading">{category.type.displayName}</div>
               </li>,
               category.results.map((result, index) => (
                 <li className="result">
