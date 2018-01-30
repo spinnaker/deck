@@ -10,8 +10,8 @@ import { ISearchResultSet } from 'core/search/infrastructure/infrastructureSearc
 import { ISearchResult } from 'core/search/search.service';
 import { ReactInjector } from 'core/reactShims';
 import { Tooltip } from '../../presentation/Tooltip';
-import { Spinner } from 'core/widgets/spinners/spinner';
-import { SearchResult } from 'core/search/infrastructure/searchResult';
+import { Spinner } from 'core/widgets/spinners/Spinner';
+import { SearchResult } from 'core/search/infrastructure/SearchResult';
 import { searchRank } from 'core/search/searchRank.filter';
 import { RecentlyViewedItems } from 'core/search/infrastructure/RecentlyViewedItems';
 
