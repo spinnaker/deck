@@ -16,7 +16,7 @@ export interface IChildComponentProps {
 }
 
 export interface IRecentlyViewedItemsProps {
-  Component: React.ComponentClass<IChildComponentProps> | React.StatelessComponent<IChildComponentProps>;
+  Component: React.ComponentType<IChildComponentProps>;
   limit?: number;
 }
 
