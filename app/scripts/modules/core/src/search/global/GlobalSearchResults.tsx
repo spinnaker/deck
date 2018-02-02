@@ -9,14 +9,14 @@ import { SearchResult } from 'core/search/infrastructure/SearchResult';
 export interface IGlobalSearchResultsProps {
   categories: ISearchResultSet[];
   query: string;
-  onItemKeyDown: (event: React.KeyboardEvent<HTMLAnchorElement>) => any;
+  onItemKeyDown: React.EventHandler<React.KeyboardEvent<HTMLAnchorElement>>;
   onResultClick: (result: ISearchResult) => any;
-  onSeeMoreClick: Function;
+  onSeeMoreClick: React.EventHandler<React.MouseEvent<HTMLAnchorElement>>;
   resultRef: (categoryIndex: number, resultIndex: number, ref: HTMLAnchorElement) => any;
   seeMoreRef: (ref: HTMLAnchorElement) => any;
 }
 
-export function GlobalSearchResults({
+export const GlobalSearchResults = ({
   categories,
   query,
   onItemKeyDown,
@@ -24,7 +24,7 @@ export function GlobalSearchResults({
   onSeeMoreClick,
   resultRef,
   seeMoreRef
-}: IGlobalSearchResultsProps) {
+}: IGlobalSearchResultsProps) => {
   const { searchVersion } = SETTINGS;
 
   if (!categories.length) {
@@ -68,7 +68,7 @@ export function GlobalSearchResults({
             className="expand-results"
             ref={seeMoreRef}
             onKeyDown={onItemKeyDown}
-            onClick={() => onSeeMoreClick()}
+            onClick={onSeeMoreClick}
           >
             See more results
           </a>
