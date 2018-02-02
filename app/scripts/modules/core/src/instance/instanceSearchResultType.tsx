@@ -26,7 +26,7 @@ class InstancesSearchResultType extends SearchResultType<IInstanceSearchResult> 
 
   private cols: { [key: string]: ISearchColumn } = {
     INSTANCE: { key: 'instanceId', label: 'Instance ID' },
-    ACCOUNT: { key: 'accounts' },
+    ACCOUNT: { key: 'account' },
     REGION: { key: 'region' },
     SERVERGROUP: { key: 'serverGroup' }
   };
