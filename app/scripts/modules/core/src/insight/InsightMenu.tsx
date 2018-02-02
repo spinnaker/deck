@@ -2,10 +2,11 @@ import * as React from 'react';
 import { IScope } from 'angular';
 import { BindAll } from 'lodash-decorators';
 import { ButtonToolbar, DropdownButton, MenuItem } from 'react-bootstrap';
+import { StateService } from '@uirouter/core';
+import { IModalService } from 'angular-ui-bootstrap';
 
 import { Application } from 'core/application';
 import { IProject } from 'core/domain';
-import { StateService } from '@uirouter/core';
 import { ReactInjector } from 'core/reactShims';
 import { OverrideRegistry } from 'core/overrideRegistry';
 import { CacheInitializerService } from 'core/cache';
@@ -25,7 +26,7 @@ export class InsightMenu extends React.Component<IInsightMenuProps, IInsightMenu
   public static defaultProps: IInsightMenuProps = { createApp: true, createProject: true, refreshCaches: true };
 
   private $rootScope: IScope;
-  private $uibModal: any;
+  private $uibModal: IModalService;
   private $state: StateService;
   private overrideRegistry: OverrideRegistry;
   private cacheInitializer: CacheInitializerService;

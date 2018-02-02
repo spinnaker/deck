@@ -7,8 +7,8 @@ import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { IAccount } from 'core/account';
 import { ICache } from 'core/cache';
 import { IApplicationSummary } from 'core/application';
-import { ApplicationTable } from 'core/application/search/ApplicationsTable';
-import { PaginationControls } from 'core/application/search/PaginationControls';
+import { ApplicationTable } from './ApplicationsTable';
+import { PaginationControls } from './PaginationControls';
 import { InsightMenu } from 'core/insight/InsightMenu';
 import { ReactInjector } from 'core/reactShims';
 import { Spinner } from 'core/widgets';
@@ -67,9 +67,9 @@ export class Applications extends React.Component<{}, IApplicationsState> {
     };
 
     const appSort = (column: string, a: any, b: any) => {
-      const key = column.slice(1);
-      const direction = (column[0] === '+' ? 1 : -1);
-      return ((a[key] || '').localeCompare(b[key] || '')) * direction;
+      const reverse = column[0] === '-';
+      const key = reverse ? column.slice(1) : column;
+      return ((a[key] || '').localeCompare(b[key] || '')) * (reverse ? -1 : 1);
     };
 
     Observable.fromPromise(ReactInjector.applicationReader.listApplications())
@@ -106,7 +106,7 @@ export class Applications extends React.Component<{}, IApplicationsState> {
 
   private toggleSort(column: string): void {
     const current = this.sort$.getValue();
-    const newSort = (current === `+${column}`) ? `-${column}` : `+${column}`;
+    const newSort = (current === column) ? `-${column}` : column;
     this.sort$.next(newSort);
   }
 
@@ -167,7 +167,7 @@ export class Applications extends React.Component<{}, IApplicationsState> {
           {applications && (
             <div className="infrastructure-section">
               <ApplicationTable currentSort={currentSort} applications={applications} toggleSort={(column) => this.toggleSort(column)}/>
-              <PaginationControls onSelect={changePage} activePage={currentPage} totalPages={Math.ceil(maxSize / itemsPerPage)} />
+              <PaginationControls onPageChanged={changePage} activePage={currentPage} totalPages={Math.ceil(maxSize / itemsPerPage)} />
             </div>
           )}
         </div>
@@ -175,9 +175,3 @@ export class Applications extends React.Component<{}, IApplicationsState> {
     );
   }
 }
-
-
-
-
-
-

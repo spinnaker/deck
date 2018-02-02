@@ -2,12 +2,12 @@ import * as React from 'react';
 import { SelectCallback, Pagination } from 'react-bootstrap';
 
 export interface IPaginationControlsProps {
-  onSelect: SelectCallback;
+  onPageChanged: SelectCallback;
   activePage: number;
   totalPages: number;
 }
 
-export const PaginationControls = ({ onSelect, activePage, totalPages }: IPaginationControlsProps) => {
+export const PaginationControls = ({ onPageChanged, activePage, totalPages }: IPaginationControlsProps) => {
   const ButtonComponent = (props: any) => {
     const { eventKey, children, ...restProps } = props;
     return <a {...restProps}>{children}</a>
@@ -20,7 +20,7 @@ export const PaginationControls = ({ onSelect, activePage, totalPages }: IPagina
       ellipsis={true}
       next={true}
       prev={true}
-      onSelect={onSelect}
+      onSelect={onPageChanged}
       activePage={activePage}
       items={totalPages}
       maxButtons={10}

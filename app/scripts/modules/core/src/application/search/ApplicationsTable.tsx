@@ -3,8 +3,7 @@ import { UISref } from '@uirouter/react';
 
 import { timestamp } from 'core/utils';
 import { IApplicationSummary } from 'core/application';
-
-import { ColHeader } from './ColHeader';
+import { SortToggle } from 'core/presentation';
 
 export interface IApplicationTableProps {
   applications: IApplicationSummary[];
@@ -15,17 +14,17 @@ export interface IApplicationTableProps {
 export const ApplicationTable = ({ currentSort, toggleSort, applications }: IApplicationTableProps) => (
   <table className="table table-hover">
     <thead>
-    <tr>
-      <ColHeader toggleSort={toggleSort} currentSort={currentSort} width="18%" label="Name" column="name"/>
-      <ColHeader toggleSort={toggleSort} currentSort={currentSort} width="15%" label="Created" column="createTs"/>
-      <ColHeader toggleSort={toggleSort} currentSort={currentSort} width="15%" label="Updated" column="updateTs"/>
-      <ColHeader toggleSort={toggleSort} currentSort={currentSort} width="15%" label="Owner" column="email"/>
-      <ColHeader toggleSort={toggleSort} currentSort={currentSort} label="Account(s)" column="accounts"/>
-      <th style={{ width: '22%' }}>Description</th>
-    </tr>
+      <tr>
+        <th style={{ width: '18%' }}><SortToggle model={{ key: currentSort }} onChange={toggleSort} label="Name" sortKey="name"/></th>
+        <th style={{ width: '15%' }}><SortToggle model={{ key: currentSort }} onChange={toggleSort} label="Created" sortKey="createTs"/></th>
+        <th style={{ width: '15%' }}><SortToggle model={{ key: currentSort }} onChange={toggleSort} label="Updated" sortKey="updateTs"/></th>
+        <th style={{ width: '15%' }}><SortToggle model={{ key: currentSort }} onChange={toggleSort} label="Owner" sortKey="email"/></th>
+        <th><SortToggle model={{ key: currentSort }} onChange={toggleSort} label="Account(s)" sortKey="accounts"/></th>
+        <th style={{ width: '22%' }}>Description</th>
+      </tr>
     </thead>
-    <tbody>
 
+    <tbody>
     {applications.map(app => {
       const appName = app.name.toLowerCase();
 
