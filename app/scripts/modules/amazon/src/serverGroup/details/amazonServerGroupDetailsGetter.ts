@@ -35,8 +35,8 @@ function extractServerGroupSummary(props: IServerGroupDetailsProps): IPromise<IA
         });
       }
       return summary;
-    }
-  );
+    })
+    .catch(() => {});
 }
 
 export function amazonServerGroupDetailsGetter(props: IServerGroupDetailsProps, autoClose: () => void): Observable<IAmazonServerGroup> {
@@ -55,7 +55,10 @@ export function amazonServerGroupDetailsGetter(props: IServerGroupDetailsProps, 
               .then((accountDetails) => {
                 serverGroup.accountDetails = accountDetails;
                 observer.next(serverGroup);
-              });
+              })
+                .catch(() => {
+                  // If the accounts failed to be retrieved... oh well
+                });
 
             if (!isEmpty(serverGroup)) {
 
@@ -68,7 +71,10 @@ export function amazonServerGroupDetailsGetter(props: IServerGroupDetailsProps, 
                   const subnet = subnets.find((s) => s.id === subnetId);
                   serverGroup.subnetType = subnet.purpose;
                   observer.next(serverGroup);
-                });
+                })
+                  .catch(() => {
+                    // If the subnets failed to be retrieved... oh well
+                  });
               }
 
               serverGroup.disabledDate = AwsReactInjector.autoScalingProcessService.getDisabledDate(serverGroup);
@@ -77,8 +83,10 @@ export function amazonServerGroupDetailsGetter(props: IServerGroupDetailsProps, 
             } else {
               autoClose();
             }
-          }, autoClose);
-        }, autoClose
-      );
-  });
+          })
+          .catch(() => autoClose());
+        })
+          .catch(() => autoClose());
+      }
+    );
 }
