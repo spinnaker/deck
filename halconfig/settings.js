@@ -72,7 +72,7 @@ var slack = {
 window.spinnakerSettings = {
   version: version,
   checkForUpdates: false,
-  defaultProviders: ['aws', 'gce', 'azure', 'cf', 'kubernetes', 'titus', 'openstack', 'oraclebmcs', 'dcos'],
+  defaultProviders: ['aws', 'gce', 'azure', 'cf', 'kubernetes', 'titus', 'openstack', 'oraclebmcs', 'dcos', 'ecs'],
   feedbackUrl: feedbackUrl,
   gateUrl: gateHost,
   bakeryDetailUrl: bakeryDetailUrl,
@@ -96,6 +96,14 @@ window.spinnakerSettings = {
         inferInternalFlagFromSubnet: false,
       },
       useAmiBlockDeviceMappings: false,
+    },
+    ecs: {
+      defaults: {
+        account: 'test',
+        region: 'us-east-1',
+        iamRole: 'BaseIAMRole',
+      },
+      defaultSecurityGroups: [],
     },
     gce: gce,
     titus: {
