@@ -55,6 +55,7 @@ module(HELP_CONTENTS, [])
           <li>Trigger</li>
           <li>Context - server groups, bakery results, etc.</li>
         </ul>`,
+    'pipeline.config.expectedArtifact': 'Artifacts required for trigger to execute.  Only one of the artifacts need to be present for the trigger to execute',
     'pipeline.config.artifact.help': `
         <p>There are certain types of triggers (e.g. Pub/Sub triggers) that can produce artifacts and inject them into the execution context for a pipeline.</p>
         <p>You can specify artifacts that your pipeline expects to be present in the execution context in this section.</p>`,
@@ -97,7 +98,8 @@ module(HELP_CONTENTS, [])
           the pub/sub -> Spinnaker artifact translation.
         </p>
         <p>For example, if you want to match against any GCS object, only supply <b>type</b> = gcs/object. If you also want to restrict the matches by other fields, include those as well.</p>
-        <p>Regex is accepted, so you could for example match on a filepath like so <b>name</b> = .*\\.yaml to match all incoming YAML files.</p>`,
+        <p>Regex is accepted, so you could for example match on a filepath like so <b>name</b> = .*\\.yaml to match all incoming YAML files.</p>
+        <p>See the <a href="https://www.spinnaker.io/reference/artifacts/">reference</a> for more information.</p>`,
     'pipeline.config.expectedArtifact.ifMissing': `
         <p>If no artifact was supplied by your trigger to match against this expected artifact, you have a few options:
           <ol>
@@ -105,15 +107,26 @@ module(HELP_CONTENTS, [])
             <li>If option 1 fails, or isn't specified, you can provide a default artifact with the required fields to use instead.</li>
             <li>Fail the pipeline if options 1 or 2 fail or aren't selected.</li>
           </ol>
-        </p>`,
+        </p>
+        <p>See the <a href="https://www.spinnaker.io/reference/artifacts/in-pipelines">reference</a> for more information.</p>`,
     'pipeline.config.expectedArtifact.defaultArtifact': `
-        <p>If your artifact either wasn't supplied from a trigger, or it wasn't found in a prior execution, the artifact specified below will end up in your pipeline's execution context.</p>`,
+        <p>If your artifact either wasn't supplied from a trigger, or it wasn't found in a prior execution, the artifact specified below will end up in your pipeline's execution context.</p>
+        <p>See the <a href="https://www.spinnaker.io/reference/artifacts/in-pipelines">reference</a> for more information.</p>`,
     'pipeline.config.expectedArtifact.gcs.name': `
-        <p>The GCS object name, in the form 'gs://bucket/path/to/file.yml'.</p>`,
+        <p>The GCS object name, in the form <code>gs://bucket/path/to/file.yml</code>.</p>`,
+    'pipeline.config.expectedArtifact.defaultGcs.reference': `
+        <p>The GCS object name, <i>optionally</i> appending the version. An example: <code>gs://bucket/file.yml#123948581</code></p>`,
     'pipeline.config.expectedArtifact.docker.name': `
-        <p>The Docker image name you want to trigger on changes to. If you are treating a tag as a release stream, you should include the image tag in the name. An example is 'gcr.io/project/image:stable', where all changes to the 'stable' tag will result in triggering this pipeline.</p>`,
+        <p>The Docker image name you want to trigger on changes to. By default, this does <i>not</i> include the image tag or digest, only the registry and image repository.</p>`,
+    'pipeline.config.expectedArtifact.defaultDocker.reference': `
+        <p>The fully-qualified docker image to deploy. An example: <code>gcr.io/project/image@sha256:59bb771c86</code></p>`,
     'pipeline.config.expectedArtifact.git.name': `
         <p>The file's path from the git root, in the form 'path/to/file.json'</p>`,
+    'pipeline.config.expectedArtifact.defaultGithub.version': `
+        <p>Either the commit or branch to checkout.</p>`,
+    'pipeline.config.expectedArtifact.defaultGithub.reference': `
+        <p>The GitHub API content url the artifact lives under. The domain name may change if you're running GHE.</p>
+        <p>An example is <code>https://api.github.com/repos/$ORG/$REPO/contents/$FILEPATH</code>. See <a href="https://www.spinnaker.io/reference/artifacts/types/github-file/#fields">our docs</a> for more info.</p>`,
     'pipeline.config.trigger.webhook.source': `
         <p>Determines the target URL required to trigger this pipeline, as well as how the payload can be transformed into artifacts.</p>
     `,
@@ -214,7 +227,7 @@ module(HELP_CONTENTS, [])
     'pipeline.config.findAmi.cluster': 'The cluster to look at when selecting the image to use in this pipeline.',
     'pipeline.config.findAmi.imageNamePattern': 'A regex used to match the name of the image. Must result in exactly one match to succeed. Empty is treated as match any.',
     'pipeline.config.dependsOn': 'Declares which stages must be run <em>before</em> this stage begins.',
-    'pipeline.config.parallel.cancel.queue': '<p>If concurrent pipeline execution is disabled, then the pipelines that are in the waiting queue will get canceled by default. <br><br>Check this box if you want to keep them in the queue.</p>',
+    'pipeline.config.parallel.cancel.queue': '<p>If concurrent pipeline execution is disabled, then the pipelines that are in the waiting queue will get canceled when the next execution starts. <br><br>Check this box if you want to keep them in the queue.</p>',
     'pipeline.config.timeout': `
         <p>Allows you to override the amount of time the stage can run before failing.</p>
         <p><b>Note:</b> this represents the overall time the stage has to complete (the sum of all the task times).</p>`,
@@ -273,6 +286,9 @@ module(HELP_CONTENTS, [])
         <p>By default, the bakery will <b>not</b> create a new image if the contents of the package have not changed;
           instead, it will return the previously baked image.</p>
         <p>Select this option to force the bakery to create a new image, regardless of whether or not the selected package exists.</p>`,
+    'execution.dryRun': `
+        <p>Select this option to run the pipeline without <em>really</em> executing anything.</p>
+        <p>This is a good way to test parameter-driven behavior, expressions, optional stages, etc.</p>`,
     'user.verification': `
         Typing into this verification field is annoying! But it serves as a reminder that you are
         changing something in an account deemed important, and prevents you from accidentally changing something

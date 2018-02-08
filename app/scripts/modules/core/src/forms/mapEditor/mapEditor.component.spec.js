@@ -26,7 +26,7 @@ describe('Component: mapEditor', function () {
     let dom = this.compile('<map-editor model="model"></map-editor>')(scope);
     scope.$digest();
 
-    expect(dom.find('input').size()).toBe(4);
+    expect(dom.find('input').length).toBe(4);
     expect(dom.find('input').get(0).value).toBe('foo');
     expect(dom.find('input').get(1).value).toBe('bar');
     expect(dom.find('input').get(2).value).toBe('bah');
@@ -187,6 +187,16 @@ describe('Component: mapEditor', function () {
     });
   });
 
-
+  describe('hidden keys', function() {
+    it('does not render key if included in `hiddenKeys`', function() {
+      scope.model = { a: '1', b: '2' };
+      scope.hiddenKeys = ['a'];
+      const dom = this.compile('<map-editor model="model" hidden-keys="hiddenKeys"></map-editor>')(scope);
+      scope.$digest();
+      expect($(dom.find('tbody tr')).length).toBe(1);
+      expect(dom.find('input').get(0).value).toBe('b');
+      expect(dom.find('input').get(1).value).toBe('2');
+    });
+  });
 
 });

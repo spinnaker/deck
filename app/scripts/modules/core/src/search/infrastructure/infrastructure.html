@@ -79,14 +79,14 @@
                   <i ng-if="category.icon" class="fa fa-{{category.icon}}"></i>
                   <span ng-if="category.iconClass" class="{{category.iconClass}}"></span>
                 </span>
-                {{ category.category }} ({{category.results.length}})
+                {{ category.type.displayName }} ({{category.results.length}})
               </div>
               <div class="details-container list-group">
                 <a class="list-group-item"
                    ng-repeat="result in ::category.results | searchRank: query"
                    ng-click="ctrl.clearFilters(result)"
                    href="{{ ::result.href }}">
-                  <search-result item="::result"></search-result>
+                  <search-result display-name="::result.displayName" account="::result.account"></search-result>
                 </a>
               </div>
             </div>

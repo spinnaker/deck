@@ -182,18 +182,13 @@ export class ExecutionService {
     }
 
     public waitUntilNewTriggeredPipelineAppears(application: Application, triggeredPipelineId: string): IPromise<any> {
-      return this.getRunningExecutions(application.name).then((executions: IExecution[]) => {
-        const match = executions.find((execution) => execution.id === triggeredPipelineId);
-        const deferred = this.$q.defer();
-        if (match) {
-          application.executions.refresh().then(deferred.resolve);
-          return deferred.promise;
-        } else {
-          return this.$timeout(() => {
-            return this.waitUntilNewTriggeredPipelineAppears(application, triggeredPipelineId);
-          }, 1000);
-        }
-      });
+      return this.getExecution(triggeredPipelineId).then(() => {
+        return application.executions.refresh();
+      }).catch(() => {
+        return this.$timeout(() => {
+          return this.waitUntilNewTriggeredPipelineAppears(application, triggeredPipelineId);
+        }, 1000);
+      })
     }
 
     private waitUntilPipelineIsCancelled(application: Application, executionId: string): IPromise<any> {

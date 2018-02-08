@@ -1,14 +1,12 @@
 import * as React from 'react';
 import { Observable, Subject, BehaviorSubject } from 'rxjs';
 
-import {
-  AccountCell, BasicCell, HrefCell, HealthCountsCell, searchResultTypeRegistry, ISearchColumn, ISearchResultType,
-  SearchResultTabComponent, SearchResultsHeaderComponent, SearchResultsDataComponent, DefaultSearchResultTab,
-  ISearchResult, HeaderCell, TableBody, TableHeader, TableRow,
-} from 'core/search';
-
-import { ReactInjector } from 'core/reactShims';
 import { IServerGroup, IInstanceCounts } from 'core/domain';
+import { ReactInjector } from 'core/reactShims';
+import {
+  AccountCell, BasicCell, HrefCell, HealthCountsCell, searchResultTypeRegistry, ISearchColumn, DefaultSearchResultTab,
+  ISearchResult, HeaderCell, TableBody, TableHeader, TableRow, SearchResultType, ISearchResultSet,
+} from 'core/search';
 
 import './serverGroup.less';
 
@@ -26,59 +24,12 @@ export interface IServerGroupSearchResult extends ISearchResult {
   instanceCounts?: IInstanceCounts;
 }
 
-const cols: { [key: string]: ISearchColumn } = {
-  SERVERGROUP: { key: 'serverGroup', label: 'Name' },
-  ACCOUNT: { key: 'account' },
-  REGION: { key: 'region' },
-  EMAIL: { key: 'email' },
-  HEALTH: { key: 'instanceCounts', label: 'Health' },
-};
-
-const iconClass = 'fa fa-th-large';
-const displayName = 'Server Groups';
-
-const itemKeyFn = (item: IServerGroupSearchResult) =>
-  [item.serverGroup, item.account, item.region].join('|');
-const itemSortFn = (a: IServerGroupSearchResult, b: IServerGroupSearchResult) => {
-  const order = a.serverGroup.localeCompare(b.serverGroup);
-  return order !== 0 ? order : a.region.localeCompare(b.region);
-};
-
-const SearchResultTab: SearchResultTabComponent = ({ ...props }) => (
-  <DefaultSearchResultTab {...props} iconClass={iconClass} label={displayName} />
-);
-
-const SearchResultsHeader: SearchResultsHeaderComponent = () => (
-  <TableHeader>
-    <HeaderCell col={cols.SERVERGROUP}/>
-    <HeaderCell col={cols.ACCOUNT}/>
-    <HeaderCell col={cols.REGION}/>
-    <HeaderCell col={cols.EMAIL}/>
-    <HeaderCell col={cols.HEALTH}/>
-  </TableHeader>
-);
-
-const SearchResultsData: SearchResultsDataComponent<IServerGroupSearchResult> = ({ results }) => (
-  <TableBody>
-    {results.map(item => (
-      <TableRow key={itemKeyFn(item)}>
-        <HrefCell item={item} col={cols.SERVERGROUP} />
-        <AccountCell item={item} col={cols.ACCOUNT} />
-        <BasicCell item={item} col={cols.REGION} />
-        <BasicCell item={item} col={cols.EMAIL} />
-        <HealthCountsCell item={item} col={cols.HEALTH} />
-      </TableRow>
-    ))}
-  </TableBody>
-);
-
 interface IServerGroupDataProps {
-  type: ISearchResultType;
-  results: IServerGroupSearchResult[],
+  resultSet: ISearchResultSet<IServerGroupSearchResult>;
 }
 
 interface IServerGroupDataState {
-  serverGroups: IServerGroupSearchResult[],
+  resultSet: ISearchResultSet<IServerGroupSearchResult>;
 }
 
 interface IServerGroupTuple {
@@ -109,7 +60,7 @@ const fetchServerGroups = (toFetch: IServerGroupSearchResult[]): Observable<ISer
  * This component waits until it is rendered, then starts fetching instance counts.
  * It mutates the input search results and then passes the data to the nested component.
  */
-const AddHealthCounts = (Component: SearchResultsDataComponent<IServerGroupSearchResult>): SearchResultsDataComponent<IServerGroupSearchResult> => {
+const AddHealthCounts = (RawComponent: React.ComponentType<IServerGroupDataProps>): React.ComponentType<IServerGroupDataProps> => {
   return class FetchHealthCounts extends React.Component<IServerGroupDataProps, IServerGroupDataState> {
     public state = { serverGroups: [] } as any;
     private results$ = new BehaviorSubject<IServerGroupSearchResult[]>([]);
@@ -136,22 +87,28 @@ const AddHealthCounts = (Component: SearchResultsDataComponent<IServerGroupSearc
       .takeUntil(this.stop$)
       .subscribe((tuples: IServerGroupTuple[]) => {
         tuples.forEach(result => result.toFetch.instanceCounts = result.fetched.instanceCounts);
-        this.setState({ serverGroups: this.results$.value.slice() });
+        const resultSet = { ...this.props.resultSet, results: this.results$.value.slice() };
+        this.setState({ resultSet });
       });
     }
 
-    private applyServerGroups(serverGroups: IServerGroupSearchResult[]) {
-      serverGroups = serverGroups.sort(itemSortFn);
+    private applyServerGroups(resultSet: ISearchResultSet<IServerGroupSearchResult>) {
+      const itemSortFn = (a: IServerGroupSearchResult, b: IServerGroupSearchResult) => {
+        const order = a.serverGroup.localeCompare(b.serverGroup);
+        return order !== 0 ? order : a.region.localeCompare(b.region);
+      };
+
+      const serverGroups = resultSet.results.slice().sort(itemSortFn);
       this.results$.next(serverGroups);
-      this.setState({ serverGroups })
+      this.setState({ resultSet: { ...resultSet, results: serverGroups } })
     }
 
     public componentDidMount() {
-      this.applyServerGroups(this.props.results);
+      this.applyServerGroups(this.props.resultSet);
     }
 
     public componentWillReceiveProps(nextProps: IServerGroupDataProps) {
-      this.applyServerGroups(nextProps.results);
+      this.applyServerGroups(nextProps.resultSet);
     }
 
     public componentWillUnmount() {
@@ -160,22 +117,64 @@ const AddHealthCounts = (Component: SearchResultsDataComponent<IServerGroupSearc
     }
 
     public render() {
-      return <Component type={this.props.type} results={this.state.serverGroups} />
+      return <RawComponent resultSet={this.props.resultSet} />
     }
   }
 };
 
-const serverGroupSearchResultType: ISearchResultType = {
-  id: 'serverGroups',
-  order: 6,
-  iconClass,
-  displayName,
-  displayFormatter: (searchResult: IServerGroupSearchResult) => `${searchResult.serverGroup} (${searchResult.region})`,
-  components: {
-    SearchResultTab,
-    SearchResultsHeader,
-    SearchResultsData: AddHealthCounts(SearchResultsData),
-  },
-};
+class ServerGroupSearchResultType extends SearchResultType<IServerGroupSearchResult> {
+  public id = 'serverGroups';
+  public order = 3;
+  public displayName = 'Server Groups';
+  public iconClass = 'fa fa-th-large';
 
-searchResultTypeRegistry.register(serverGroupSearchResultType);
+  private cols: { [key: string]: ISearchColumn } = {
+    SERVERGROUP: { key: 'serverGroup', label: 'Name' },
+    ACCOUNT: { key: 'account' },
+    REGION: { key: 'region' },
+    EMAIL: { key: 'email' },
+    HEALTH: { key: 'instanceCounts', label: 'Health' },
+  };
+
+  public TabComponent = DefaultSearchResultTab;
+
+  public HeaderComponent = () => (
+    <TableHeader>
+      <HeaderCell col={this.cols.SERVERGROUP}/>
+      <HeaderCell col={this.cols.ACCOUNT}/>
+      <HeaderCell col={this.cols.REGION}/>
+      <HeaderCell col={this.cols.EMAIL}/>
+      <HeaderCell col={this.cols.HEALTH}/>
+    </TableHeader>
+  );
+
+  private RawDataComponent = ({ resultSet }: { resultSet: ISearchResultSet<IServerGroupSearchResult> }) => {
+    const itemKeyFn = (item: IServerGroupSearchResult) =>
+      [item.serverGroup, item.account, item.region].join('|');
+
+    const results = resultSet.results.slice();
+
+    return (
+      <TableBody>
+        {results.map(item => (
+          <TableRow key={itemKeyFn(item)}>
+            <HrefCell item={item} col={this.cols.SERVERGROUP} />
+            <AccountCell item={item} col={this.cols.ACCOUNT} />
+            <BasicCell item={item} col={this.cols.REGION} />
+            <BasicCell item={item} col={this.cols.EMAIL} />
+            <HealthCountsCell item={item} col={this.cols.HEALTH} />
+          </TableRow>
+        ))}
+      </TableBody>
+    );
+  };
+
+  // tslint:disable-next-line:member-ordering
+  public DataComponent = AddHealthCounts(this.RawDataComponent);
+
+  public displayFormatter(searchResult: IServerGroupSearchResult) {
+    return `${searchResult.serverGroup} (${searchResult.region})`;
+  }
+}
+
+searchResultTypeRegistry.register(new ServerGroupSearchResultType());

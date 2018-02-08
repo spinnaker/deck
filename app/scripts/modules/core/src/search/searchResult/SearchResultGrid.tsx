@@ -1,56 +1,76 @@
 import * as React from 'react';
-import { BindAll } from 'lodash-decorators';
 import { kebabCase } from 'lodash';
 
-import { ISearchResultType } from './searchResultsType.registry';
-import { SearchStatus } from './SearchResults';
 import { Spinner } from 'core/widgets';
 
+import { ISearchResultSet } from '../infrastructure/infrastructureSearch.service';
+import { SearchStatus } from './SearchResults';
+
 export interface ISearchResultGridProps {
-  searchStatus: SearchStatus;
-  searchResultsType: ISearchResultType;
-  searchResults: any[];
+  resultSet: ISearchResultSet;
 }
 
 const NoQuery = () => (
-  <div className="flex-fill vertical center middle">
+  <div className="flex-grow vertical center middle">
     <h2>Please enter a search query to get started</h2>
   </div>
 );
 
-const NoResults = () => (
-  <div className="flex-fill vertical center middle">
-    <h2>No results found for the specified search query</h2>
+export const Searching = () => (
+  <div className="flex-grow vertical center middle">
+    <Spinner size="large" message="Fetching search results ..."/>
   </div>
 );
 
-@BindAll()
+const NoResults = ({ resultSet }: { resultSet: ISearchResultSet }) => (
+  <div className="flex-grow vertical center middle">
+    <h3>No {resultSet.type.displayName} found for the specified search query</h3>
+  </div>
+);
+
+const Results = ({ resultSet }: { resultSet: ISearchResultSet }) => {
+  const { type } = resultSet;
+  const { HeaderComponent, DataComponent } = type;
+
+  return (
+    <div className="search-result-grid flex-fill" style={{ height: 'initial' }}>
+      <div className={`table table-search-results table-search-results-${kebabCase(type.id)}`}>
+        <HeaderComponent resultSet={resultSet}/>
+        <DataComponent resultSet={resultSet}/>
+      </div>
+    </div>
+  )
+};
+
+const FetchError = ({ resultSet }: { resultSet: ISearchResultSet }) => (
+  <div className="flex-grow vertical center middle">
+    <h4 className="error-message">Could not fetch {resultSet.type.displayName}</h4>
+    <div className="error-message">{resultSet && resultSet.error && resultSet.error.toString()}</div>
+  </div>
+);
+
 export class SearchResultGrid extends React.Component<ISearchResultGridProps> {
   public render(): React.ReactElement<SearchResultGrid> {
-    const { searchStatus, searchResults, searchResultsType } = this.props;
+    const resultSet = this.props.resultSet || {} as ISearchResultSet;
+    const { status, results } = resultSet;
 
-    switch (searchStatus) {
+    switch (status) {
       case SearchStatus.INITIAL:
+      case undefined:
         return <NoQuery/>;
-      case SearchStatus.SEARCHING:
-        return (
-          <div className="flex-fill vertical center middle">
-            <Spinner size="large" message="Fetching search results ..."/>
-          </div>
-        );
-      case SearchStatus.NO_RESULTS:
-        return <NoResults/>;
-      case SearchStatus.FINISHED:
-        const { SearchResultsHeader, SearchResultsData } = searchResultsType.components;
 
-        return (
-          <div className="search-result-grid flex-fill" style={{ height: 'initial' }}>
-            <div className={`table table-search-results table-search-results-${kebabCase(searchResultsType.id)}`}>
-              <SearchResultsHeader type={searchResultsType} />
-              <SearchResultsData type={searchResultsType} results={searchResults} />
-            </div>
-          </div>
-        );
+      case SearchStatus.ERROR:
+        return <FetchError resultSet={resultSet}/>;
+
+      case SearchStatus.SEARCHING:
+        return <Searching/>;
+
+      case SearchStatus.FINISHED:
+        if (!results.length) {
+          return <NoResults resultSet={resultSet}/>;
+        }
+
+        return <Results resultSet={resultSet}/>;
       default:
         return null;
     }

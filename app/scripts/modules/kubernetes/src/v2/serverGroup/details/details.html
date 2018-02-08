@@ -31,7 +31,7 @@
           Server Group Actions <span class="caret"></span>
         </button>
         <ul class="dropdown-menu" uib-dropdown-menu role="menu">
-          <li>
+          <li ng-if="ctrl.canEditServerGroup()">
             <a href ng-click="ctrl.editServerGroup()">
               Edit
             </a>
@@ -48,10 +48,8 @@
           </li>
         </ul>
       </div>
-      <div class="clearfix"></div>
     </div>
   </div>
-
   <div class="content" ng-if="!ctrl.state.loading">
     <kubernetes-manifest-status status="ctrl.manifest.status"></kubernetes-manifest-status>
     <server-group-running-tasks-details server-group="ctrl.serverGroup" application="ctrl.serverGroup.moniker.app"></server-group-running-tasks-details>
@@ -65,7 +63,23 @@
         <dd>{{ctrl.serverGroup.namespace}}</dd>
         <dt>Kind</dt>
         <dd>{{ctrl.serverGroup.kind}}</dd>
+        <dt ng-if="ctrl.manifestController()">Controller</dt>
+        <dd>
+          <a ui-sref="^.serverGroupManager({
+                        accountId: ctrl.serverGroup.account,
+                        region: ctrl.serverGroup.region,
+                        serverGroupManager: ctrl.manifestController(),
+                        provider: 'kubernetes'})">
+            {{ctrl.manifestController() | robotToHuman }}
+          </a>
+        </dd>
       </dl>
+    </collapsible-section>
+    <collapsible-section heading="Labels" expanded="true">
+      <kubernetes-manifest-labels manifest="ctrl.serverGroup.manifest"></kubernetes-manifest-labels>
+    </collapsible-section>
+    <collapsible-section heading="Annotations" expanded="true">
+      <kubernetes-manifest-annotations manifest="ctrl.serverGroup.manifest"></kubernetes-manifest-annotations>
     </collapsible-section>
     <collapsible-section heading="Size" expanded="true">
       <dl class="dl-horizontal dl-flex"

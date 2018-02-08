@@ -4,6 +4,7 @@ import { UISref, UISrefActive } from '@uirouter/react';
 import { UIRouterContext } from '@uirouter/react-hybrid';
 
 import { NgReact } from 'core/reactShims';
+import { GlobalSearch } from 'core/search/global/GlobalSearch';
 
 import './SpinnakerHeader.css';
 
@@ -35,7 +36,7 @@ export class SpinnakerHeader extends React.Component<{}, ISpinnakerHeaderState> 
   }
 
   public render(): React.ReactElement<SpinnakerHeader> {
-    const { UserMenu, GlobalSearch, WhatsNew } = NgReact;
+    const { UserMenu, WhatsNew } = NgReact;
 
     return (
       <nav

@@ -17,6 +17,7 @@ import {
   IALBListenerCertificate,
   IAmazonClassicLoadBalancer,
   IAmazonLoadBalancer,
+  IAmazonServerGroup,
   IApplicationLoadBalancerSourceData,
   IClassicListenerDescription,
   IClassicLoadBalancerSourceData,
@@ -117,7 +118,7 @@ export class AwsLoadBalancerTransformer {
     if ((loadBalancer as IAmazonApplicationLoadBalancer).targetGroups) {
       const appLoadBalancer = loadBalancer as IAmazonApplicationLoadBalancer;
       appLoadBalancer.targetGroups.forEach((targetGroup) => this.normalizeTargetGroup(targetGroup));
-      serverGroups = flatten<IServerGroup>(map(appLoadBalancer.targetGroups, 'serverGroups'));
+      serverGroups = flatten<IAmazonServerGroup>(map(appLoadBalancer.targetGroups, 'serverGroups'));
     }
 
     const activeServerGroups = filter(serverGroups, { isDisabled: false });
@@ -246,14 +247,18 @@ export class AwsLoadBalancerTransformer {
           }
 
           (listener.defaultActions || []).forEach((action) => {
-            action.targetGroupName = action.targetGroupName.replace(`${applicationName}-`, '');
+            if (action.targetGroupName) {
+              action.targetGroupName = action.targetGroupName.replace(`${applicationName}-`, '');
+            }
           });
 
           // Remove the default rule because it already exists in defaultActions
           listener.rules = (listener.rules || []).filter((l) => !l.default);
           listener.rules.forEach((rule) => {
             (rule.actions || []).forEach((action) => {
-              action.targetGroupName = action.targetGroupName.replace(`${applicationName}-`, '');
+              if (action.targetGroupName) {
+                action.targetGroupName = action.targetGroupName.replace(`${applicationName}-`, '');
+              }
             });
             rule.conditions = rule.conditions || [];
           });

@@ -11,8 +11,16 @@ module(INFRASTRUCTURE_STATES, [
 
   stateConfigProvider.addToRootState({
     name: 'search',
-    url: '/search?q',
-    reloadOnSearch: false,
+    url: '/search?q&key&tab&name&account&region&stack',
+    params: {
+      account: { dynamic: true, value: null },
+      key:     { dynamic: true, value: null },
+      name:    { dynamic: true, value: null },
+      q:       { dynamic: true, value: null },
+      region:  { dynamic: true, value: null },
+      stack:   { dynamic: true, value: null },
+      tab:     { dynamic: true, value: null },
+    },
     views: {
       'main@': {
         template: `

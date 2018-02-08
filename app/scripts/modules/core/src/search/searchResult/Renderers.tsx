@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { startCase, kebabCase } from 'lodash';
 
-import { NgReact } from 'core/reactShims';
+import { AccountTag } from 'core/account';
 import { Spinner } from 'core/widgets';
 import { IInstanceCounts } from 'core/domain';
 import { HealthCounts } from 'core/healthCounts';
@@ -90,15 +90,14 @@ export class HrefCell extends React.Component<ICellRendererProps> {
 
 export class AccountCell extends React.Component<ICellRendererProps> {
   public render() {
-    const { AccountTag } = NgReact;
     const { item, col } = this.props;
 
-    const value = item[col.key];
+    const value: string | string[] = item[col.key];
     if (!value) {
       return <div className={colClass(col.key)}>-</div>;
     }
 
-    const accounts = value.split(',').sort();
+    const accounts = (Array.isArray(value) ? value : value.split(',')).sort();
     return (
       <div className={colClass(col.key)}>
         {accounts.map((account: string) => (

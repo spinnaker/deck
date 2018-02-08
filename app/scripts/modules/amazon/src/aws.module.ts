@@ -10,6 +10,7 @@ import { AMAZON_APPLICATION_NAME_VALIDATOR } from './validation/applicationName.
 import { VPC_MODULE } from './vpc/vpc.module';
 import { SUBNET_RENDERER } from './subnet/subnet.renderer';
 import { SERVER_GROUP_DETAILS_MODULE } from './serverGroup/details/serverGroupDetails.module';
+import { SERVER_GROUP_CONFIGURE_MODULE } from './serverGroup/configure/serverGroup.configure.aws.module';
 import { COMMON_MODULE } from './common/common.module';
 import { AMAZON_HELP } from './help/amazon.help';
 
@@ -19,6 +20,25 @@ import { AmazonLoadBalancersTag } from './loadBalancer/AmazonLoadBalancersTag';
 import './deploymentStrategy/rollingPush.strategy';
 
 import './logo/aws.logo.less';
+import { AmazonLoadBalancerChoiceModal } from './loadBalancer/configure/AmazonLoadBalancerChoiceModal';
+
+import { AmazonServerGroupActions } from './serverGroup/details/AmazonServerGroupActions';
+import { amazonServerGroupDetailsGetter } from './serverGroup/details/amazonServerGroupDetailsGetter';
+
+import {
+  AdvancedSettingsDetailsSection,
+  AmazonInfoDetailsSection,
+  CapacityDetailsSection,
+  HealthDetailsSection,
+  LaunchConfigDetailsSection,
+  LogsDetailsSection,
+  PackageDetailsSection,
+  ScalingPoliciesDetailsSection,
+  ScalingProcessesDetailsSection,
+  ScheduledActionsDetailsSection,
+  SecurityGroupsDetailsSection,
+  TagsDetailsSection,
+} from './serverGroup/details/sections';
 
 // load all templates into the $templateCache
 const templates = require.context('./', true, /\.html$/);
@@ -54,6 +74,7 @@ module(AMAZON_MODULE, [
   AWS_LOAD_BALANCER_MODULE,
   require('./instance/details/instance.details.controller').name,
   AWS_SECURITY_GROUP_MODULE,
+  SERVER_GROUP_CONFIGURE_MODULE,
   SUBNET_RENDERER,
   VPC_MODULE,
   require('./image/image.reader').name,
@@ -73,8 +94,22 @@ module(AMAZON_MODULE, [
     },
     serverGroup: {
       transformer: 'awsServerGroupTransformer',
-      detailsTemplateUrl: require('./serverGroup/details/serverGroupDetails.html'),
-      detailsController: 'awsServerGroupDetailsCtrl',
+      detailsActions: AmazonServerGroupActions,
+      detailsGetter: amazonServerGroupDetailsGetter,
+      detailsSections: [
+        AmazonInfoDetailsSection,
+        CapacityDetailsSection,
+        HealthDetailsSection,
+        LaunchConfigDetailsSection,
+        SecurityGroupsDetailsSection,
+        ScalingProcessesDetailsSection,
+        ScalingPoliciesDetailsSection,
+        ScheduledActionsDetailsSection,
+        TagsDetailsSection,
+        PackageDetailsSection,
+        AdvancedSettingsDetailsSection,
+        LogsDetailsSection,
+      ],
       cloneServerGroupTemplateUrl: require('./serverGroup/configure/wizard/serverGroupWizard.html'),
       cloneServerGroupController: 'awsCloneServerGroupCtrl',
       commandBuilder: 'awsServerGroupCommandBuilder',
@@ -90,8 +125,7 @@ module(AMAZON_MODULE, [
       transformer: 'awsLoadBalancerTransformer',
       detailsTemplateUrl: require('./loadBalancer/details/loadBalancerDetails.html'),
       detailsController: 'awsLoadBalancerDetailsCtrl',
-      createLoadBalancerTemplateUrl: require('./loadBalancer/configure/choice/awsLoadBalancerChoice.modal.html'),
-      createLoadBalancerController: 'awsLoadBalancerChoiceCtrl',
+      CreateLoadBalancerModal: AmazonLoadBalancerChoiceModal,
       targetGroupDetailsTemplateUrl: require('./loadBalancer/details/targetGroupDetails.html'),
       targetGroupDetailsController: 'awsTargetGroupDetailsCtrl',
       ClusterContainer: AmazonLoadBalancerClusterContainer,

@@ -16,7 +16,7 @@ import { Tooltip } from 'core/presentation/Tooltip';
 import { CreatePipeline } from 'core/pipeline/config/CreatePipeline';
 import { ExecutionFilters } from 'core/pipeline/filter/ExecutionFilters';
 import { ExecutionGroups } from './executionGroup/ExecutionGroups';
-import { FilterTags } from 'core/filterModel';
+import { FilterTags, IFilterTag } from 'core/filterModel';
 import { Spinner } from 'core/widgets/spinners/Spinner';
 
 import './executions.less';
@@ -30,7 +30,7 @@ export interface IExecutionsState {
   filtersExpanded: boolean;
   loading: boolean;
   sortFilter: any;
-  tags: any[];
+  tags: IFilterTag[];
   triggeringExecution: boolean;
 }
 
@@ -294,9 +294,15 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
                     style={{ pointerEvents: triggeringExecution ? 'none' : 'auto' }}
                   >
                     {triggeringExecution && (
-                      <span className="pulsing">
-                        <Tooltip value="Starting Execution"><span className="fa fa-cog fa-spin visible-md-inline visible-sm-inline"/></Tooltip>
-                        <span className="fa fa-cog fa-spin visible-lg-inline"/>
+                      <span>
+                        <Tooltip value="Starting Execution">
+                          <span className="visible-md-inline visible-sm-inline">
+                            <Spinner size="nano" />
+                          </span>
+                        </Tooltip>
+                        <span className="visible-lg-inline">
+                          <Spinner size="nano" />
+                        </span>
                         <span className="visible-xl-inline">Starting Execution</span>&hellip;
                       </span>
                     )}

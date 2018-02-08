@@ -20,10 +20,14 @@ export * from './entityTag';
 // TODO: try pushing this export back down; for some unknown reason, it causes grief with the library (the export
 // is found by the TS compiler, but not at runtime)
 export * from './entityTag/notifications/EntityNotifications';
+export * from './artifact';
+
+export * from './diffs';
 
 export * from './event/EventBus';
 
 export * from './filterModel';
+export * from './forms';
 
 export * from './healthCounts';
 export * from './help';
@@ -53,6 +57,7 @@ export * from './presentation';
 export * from './pubsub';
 
 export * from './reactShims';
+export * from './region';
 export * from './retry';
 
 export * from './scheduler';
@@ -67,6 +72,8 @@ export * from './subnet';
 export * from './task';
 
 export * from './utils';
+
+export * from './validation';
 
 export * from './widgets';
 

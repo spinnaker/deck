@@ -148,6 +148,7 @@ describe('Controller: ManualPipelineExecution', function () {
         }
       };
     });
+
     it('adds a placeholder trigger if none present', function () {
       let application = {
         pipelineConfigs: { data: [
@@ -158,7 +159,21 @@ describe('Controller: ManualPipelineExecution', function () {
       this.initializeController(application, application.pipelineConfigs.data[0], this.modalInstance);
 
       this.ctrl.execute();
-      expect(this.command.trigger).toEqual({type: 'manual'});
+      expect(this.command.trigger).toEqual({type: 'manual', dryRun: false});
+    });
+
+    it('performs a dry run if option is selected', function () {
+      let application = {
+        pipelineConfigs: { data: [
+          { id: 'a', name: 'aa', triggers: [], stages: []},
+        ]},
+        executions: { data: []}
+      };
+      this.initializeController(application, application.pipelineConfigs.data[0], this.modalInstance);
+
+      this.ctrl.command.dryRun = true;
+      this.ctrl.execute();
+      expect(this.command.trigger).toEqual({type: 'manual', dryRun: true});
     });
 
     it('adds parameters if configured', function () {

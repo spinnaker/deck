@@ -12,7 +12,9 @@ import { IExecution, IExecutionGroup, IPipeline, IPipelineCommand } from 'core/d
 import { NextRunTag } from 'core/pipeline/triggers/NextRunTag';
 import { Tooltip } from 'core/presentation/Tooltip';
 import { TriggersTag } from 'core/pipeline/triggers/TriggersTag';
-import { NgReact, ReactInjector } from 'core/reactShims';
+import { AccountTag } from 'core/account';
+import { ReactInjector } from 'core/reactShims';
+import { Spinner } from 'core/widgets/spinners/Spinner'
 
 import './executionGroup.less';
 
@@ -101,7 +103,11 @@ export class ExecutionGroup extends React.Component<IExecutionGroupProps, IExecu
         monitor.then(() => this.setState({ triggeringExecution: false }));
         this.setState({ poll: monitor });
       },
-      () => this.setState({ triggeringExecution: false }));
+      () => {
+        const monitor = this.props.application.executions.refresh();
+        monitor.then(() => this.setState({ triggeringExecution: false }));
+        this.setState({ poll: monitor });
+      });
   }
 
   public triggerPipeline(): void {
@@ -161,7 +167,6 @@ export class ExecutionGroup extends React.Component<IExecutionGroupProps, IExecu
   }
 
   public render(): React.ReactElement<ExecutionGroup> {
-    const { AccountTag } = NgReact;
     const group = this.props.group;
     const pipelineConfig = this.state.pipelineConfig;
     const pipelineDisabled = pipelineConfig && pipelineConfig.disabled;
@@ -184,6 +189,7 @@ export class ExecutionGroup extends React.Component<IExecutionGroupProps, IExecu
                   {groupTargetAccountLabels}
                 </div>
                 <h4 className="execution-group-title">
+                  {group.fromTemplate && <i className="from-template fa fa-table" title="Pipeline from template" />}
                   {group.heading}
                   {pipelineDescription && <span> <Tooltip value={pipelineDescription}><span className="glyphicon glyphicon-info-sign"/></Tooltip></span>}
                   {pipelineDisabled && <span> (disabled)</span>}
@@ -203,7 +209,7 @@ export class ExecutionGroup extends React.Component<IExecutionGroupProps, IExecu
                       <h4 style={{ visibility: pipelineDisabled ? 'hidden' : 'visible' }}>
                         <a className="btn btn-xs btn-link" onClick={this.handleTriggerClicked}>
                           { this.state.triggeringExecution ?
-                            <span><span className="fa fa-cog fa-spin"/> Starting Manual Execution&hellip;</span> :
+                            <span><Spinner size="nano" /> Starting Manual Execution&hellip;</span> :
                             <span><span className="glyphicon glyphicon-play"/> Start Manual Execution</span>
                           }
                         </a>

@@ -12,6 +12,8 @@ module(GCS_ARTIFACT, [
     label: 'GCS',
     description: 'A GCS object.',
     key: 'gcs',
+    isDefault: false,
+    isMatch: true,
     controller(artifact: IArtifact) {
       'ngInject';
       this.artifact = artifact;
