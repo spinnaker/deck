@@ -10,8 +10,9 @@ These are three categories for buttons based on function:
     3. passive(default) - Buttons that are used in the page which do not immediately call for action. They are not the primary action for the page.
     4. danger - Buttons that are used to indicate operations that can have consequences.
     5. nostyle - No styles attached to the button. Relies on the user to set the styles based on parent element.
-    6. buttons with icons - Buttons with icons to the left and right of the buttons
-    7. zombie - Buttons that have a dashed border and is typically used with configurations.
+    6. underline only - Same as nostyle, but adds a text underline on hover to suggest interactivity. 
+    7. buttons with icons - Buttons with icons to the left and right of the buttons
+    8. zombie - Buttons that have a dashed border and is typically used with configurations.
 
 All buttons have a minimum width set.
 
@@ -86,6 +87,7 @@ Here are the variations:
 1. a - Default link style.
 2. a.button(.primary/.passive/.danger) - Links can also look like buttons.
 3. a.nostyle - There is also a variation of link with no styles attached.
+4. a.underline-only - same as nostyle, but adds a text underline on hover to suggest interactivity.
 
 <a>Link</a>
 
@@ -240,14 +242,19 @@ a.default:hover, a.default:active, a.default:focus {
   color: var(--color-text-link);
 }
 
-button.nostyle {
+button.nostyle, button.underline-only {
   background-color: transparent;
   border: none;
 }
 
-a.nostyle, a.nostyle:hover, a.nostyle:active, a.nostyle:focus {
+a.nostyle, a.nostyle:hover, a.nostyle:active, a.nostyle:focus, a.underline-only {
   text-decoration: none;
   color: inherit;
+}
+
+a.underline-only:hover, a.underline-only:active, a.underline-only:focus,
+button.underline-only:hover, button.underline-only:active, button.underline-only:focus {
+  text-decoration: underline;
 }
 
 /* Area to put all buttons */
