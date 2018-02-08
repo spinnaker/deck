@@ -16,7 +16,7 @@ const NoQuery = () => (
   </div>
 );
 
-const Searching = () => (
+export const Searching = () => (
   <div className="flex-grow vertical center middle">
     <Spinner size="large" message="Fetching search results ..."/>
   </div>
@@ -29,14 +29,14 @@ const NoResults = ({ resultSet }: { resultSet: ISearchResultSet }) => (
 );
 
 const Results = ({ resultSet }: { resultSet: ISearchResultSet }) => {
-  const { results, type } = resultSet;
-  const { SearchResultsHeader, SearchResultsData } = type.components;
+  const { type } = resultSet;
+  const { HeaderComponent, DataComponent } = type;
 
   return (
     <div className="search-result-grid flex-fill" style={{ height: 'initial' }}>
       <div className={`table table-search-results table-search-results-${kebabCase(type.id)}`}>
-        <SearchResultsHeader type={type}/>
-        <SearchResultsData type={type} results={results}/>
+        <HeaderComponent resultSet={resultSet}/>
+        <DataComponent resultSet={resultSet}/>
       </div>
     </div>
   )
