@@ -5,13 +5,14 @@ import { Subject } from 'rxjs';
 import { IServerGroup, IInstance } from 'core/domain';
 import { InstanceListBody } from 'core/instance/InstanceListBody';
 import { SortToggle } from 'core/presentation/sortToggle/SortToggle';
+import { ISortFilter } from 'core/filterModel';
 import { ReactInjector } from 'core/reactShims';
 
 export interface IInstanceListProps {
   hasDiscovery: boolean;
   hasLoadBalancers: boolean;
   instances: IInstance[];
-  sortFilter: any;
+  sortFilter: ISortFilter;
   serverGroup: IServerGroup;
 }
 
@@ -128,6 +129,7 @@ export class InstanceList extends React.Component<IInstanceListProps, IInstanceL
   private renderHeader(): JSX.Element {
     const { hasDiscovery, hasLoadBalancers } = this.props;
     const { sortFilter } = this.clusterFilterModel;
+    const sortKey = sortFilter.instanceSort;
     const showProviderHealth = !hasDiscovery && !hasLoadBalancers;
     const columnWidths = this.getColumnWidths();
 
@@ -145,27 +147,27 @@ export class InstanceList extends React.Component<IInstanceListProps, IInstanceL
             </th>
           )}
           <th style={{ width: columnWidths.id + '%' }}>
-            <SortToggle currentSort="id" label="Instance" sortKey={sortFilter.instanceSort} onChange={this.toggleSort}/>
+            <SortToggle currentSort={sortKey} onChange={this.toggleSort} sortKey="id" label="Instance"/>
           </th>
           <th style={{ width: columnWidths.launchTime + '%' }}>
-            <SortToggle currentSort="launchTime" label="Launch Time" sortKey={sortFilter.instanceSort} onChange={this.toggleSort}/>
+            <SortToggle currentSort={sortKey} onChange={this.toggleSort} sortKey="launchTime" label="Launch Time"/>
           </th>
           <th style={{ width: columnWidths.zone + '%' }}>
-            <SortToggle currentSort="availabilityZone" label="Zone" sortKey={sortFilter.instanceSort} onChange={this.toggleSort}/>
+            <SortToggle currentSort={sortKey} onChange={this.toggleSort} sortKey="availabilityZone" label="Zone"/>
           </th>
           {hasDiscovery && (
             <th style={{ width: columnWidths.discovery + '%' }} className="text-center">
-              <SortToggle currentSort="discoveryState" label="Discovery" sortKey={sortFilter.instanceSort} onChange={this.toggleSort}/>
+              <SortToggle currentSort={sortKey} onChange={this.toggleSort} sortKey="discoveryState" label="Discovery"/>
             </th>
           )}
           {hasLoadBalancers && (
             <th style={{ width: columnWidths.loadBalancers + '%' }}>
-              <SortToggle currentSort="loadBalancerSort" label="Load Balancers" sortKey={sortFilter.instanceSort} onChange={this.toggleSort}/>
+              <SortToggle currentSort={sortKey} onChange={this.toggleSort} sortKey="loadBalancerSort" label="Load Balancers"/>
             </th>
           )}
           {showProviderHealth && (
             <th style={{ width: columnWidths.cloudProvider + '%' }} className="text-center">
-              <SortToggle currentSort="providerHealth" label="Provider" sortKey={sortFilter.instanceSort} onChange={this.toggleSort}/>
+              <SortToggle currentSort={sortKey} onChange={this.toggleSort} sortKey="providerHealth" label="Provider"/>
             </th>
           )}
           </tr>
