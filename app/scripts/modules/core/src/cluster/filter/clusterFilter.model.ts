@@ -1,8 +1,7 @@
 import { IAngularEvent, IRootScopeService, module } from 'angular';
 import { Ng1StateDeclaration, StateParams } from '@uirouter/angularjs';
-import { FILTER_MODEL_SERVICE } from 'core/filterModel';
 
-import { IFilterConfig, IFilterModel } from 'core/filterModel/IFilterModel';
+import { FILTER_MODEL_SERVICE, IFilterConfig, IFilterModel } from 'core/filterModel';
 import { UrlParser } from 'core/navigation/urlParser';
 
 export const CLUSTER_FILTER_MODEL = 'cluster.filter.model';

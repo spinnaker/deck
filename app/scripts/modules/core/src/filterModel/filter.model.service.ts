@@ -1,6 +1,6 @@
 import { ILocationService, ITimeoutService, extend, copy, module } from 'angular';
 import { StateService, StateParams } from '@uirouter/core';
-import * as _ from 'lodash';
+import { cloneDeep, size, some, reduce, forOwn, includes, chain } from 'lodash';
 
 import { IFilterModel, IFilterConfig, ISortFilter } from './IFilterModel';
 
@@ -56,7 +56,7 @@ export class FilterModelService {
         const currentParams = $location.search();
         // clear any shared params between states, e.g. previous state set 'acct', which this state also uses,
         // but this state does not have that field set, so angular.extend will not overwrite it
-        _.forOwn(currentParams, function (_val, key) {
+        forOwn(currentParams, function (_val, key) {
           if (savedState.filters.hasOwnProperty(key)) {
             delete currentParams[key];
           }
@@ -96,10 +96,10 @@ export class FilterModelService {
           if (converted === null || converted === undefined) {
             acc[paramName] = null;
           } else {
-            acc[paramName] = _.cloneDeep(filterModel.sortFilter[modelConfig.model]);
+            acc[paramName] = cloneDeep(filterModel.sortFilter[modelConfig.model]);
           }
         } else {
-          acc[paramName] = _.cloneDeep($stateParams[paramName]);
+          acc[paramName] = cloneDeep($stateParams[paramName]);
         }
         return acc;
       }, {} as StateParams);
@@ -111,11 +111,11 @@ export class FilterModelService {
   }
 
   public isFilterable(sortFilterModel: { [key: string]: boolean }): boolean {
-    return _.size(sortFilterModel) > 0 && _.some(sortFilterModel);
+    return size(sortFilterModel) > 0 && some(sortFilterModel);
   }
 
   public getCheckValues(sortFilterModel: { [key: string]: boolean }) {
-    return _.reduce(sortFilterModel, function(acc, val, key) {
+    return reduce(sortFilterModel, function(acc, val, key) {
       if (val) {
         acc.push(key);
       }
@@ -128,7 +128,7 @@ export class FilterModelService {
     return (target: any) => {
       if (this.isFilterable(model.sortFilter.account)) {
         const checkedAccounts = this.getCheckValues(model.sortFilter.account);
-        return _.includes(checkedAccounts, target.account);
+        return includes(checkedAccounts, target.account);
       } else {
         return true;
       }
@@ -139,7 +139,7 @@ export class FilterModelService {
     return (target: any) => {
       if (this.isFilterable(model.sortFilter.region)) {
         const checkedRegions = this.getCheckValues(model.sortFilter.region);
-        return _.includes(checkedRegions, target.region);
+        return includes(checkedRegions, target.region);
       } else {
         return true;
       }
@@ -154,7 +154,7 @@ export class FilterModelService {
           checkedStacks.push(''); // TODO: remove when moniker is source of truth for naming
           checkedStacks.push(null);
         }
-        return _.includes(checkedStacks, target.stack);
+        return includes(checkedStacks, target.stack);
       } else {
         return true;
       }
@@ -169,7 +169,7 @@ export class FilterModelService {
           checkedDetails.push(''); // TODO: remove when moniker is source of truth for naming
           checkedDetails.push(null);
         }
-        return _.includes(checkedDetails, target.detail);
+        return includes(checkedDetails, target.detail);
       } else {
         return true;
       }
@@ -180,12 +180,12 @@ export class FilterModelService {
     return (target: any) => {
       if (this.isFilterable(model.sortFilter.status)) {
         const checkedStatus = this.getCheckValues(model.sortFilter.status);
-        return _.includes(checkedStatus, 'Up') && target.instanceCounts.down === 0 ||
-          _.includes(checkedStatus, 'Down') && target.instanceCounts.down > 0 ||
-          _.includes(checkedStatus, 'OutOfService') && target.instanceCounts.outOfService > 0 ||
-          _.includes(checkedStatus, 'Starting') && target.instanceCounts.starting > 0 ||
-          _.includes(checkedStatus, 'Disabled') && target.isDisabled ||
-          _.includes(checkedStatus, 'Unknown') && target.instanceCounts.unknown > 0;
+        return includes(checkedStatus, 'Up') && target.instanceCounts.down === 0 ||
+          includes(checkedStatus, 'Down') && target.instanceCounts.down > 0 ||
+          includes(checkedStatus, 'OutOfService') && target.instanceCounts.outOfService > 0 ||
+          includes(checkedStatus, 'Starting') && target.instanceCounts.starting > 0 ||
+          includes(checkedStatus, 'Disabled') && target.isDisabled ||
+          includes(checkedStatus, 'Unknown') && target.instanceCounts.unknown > 0;
       }
       return true;
     };
@@ -195,7 +195,7 @@ export class FilterModelService {
     return (target: any) => {
       if (this.isFilterable(model.sortFilter.providerType)) {
         const checkedProviderTypes = this.getCheckValues(model.sortFilter.providerType);
-        return _.includes(checkedProviderTypes, target.type) || _.includes(checkedProviderTypes, target.provider);
+        return includes(checkedProviderTypes, target.type) || includes(checkedProviderTypes, target.provider);
       } else {
         return true;
       }
@@ -206,7 +206,7 @@ export class FilterModelService {
     return (target: any) => {
       if (this.isFilterable(model.sortFilter.category)) {
         const checkedCategories = this.getCheckValues(model.sortFilter.category);
-        return _.includes(checkedCategories, target.type) || _.includes(checkedCategories, target.category);
+        return includes(checkedCategories, target.type) || includes(checkedCategories, target.category);
       } else {
         return true;
       }
@@ -222,7 +222,7 @@ export class FilterModelService {
     const modelVal = model.sortFilter[key];
 
     if (property.type === 'trueKeyObject') {
-      _.forOwn(modelVal, (isActive, value) => {
+      forOwn(modelVal, (isActive, value) => {
         if (isActive) {
           tags.push({
             key: key,
@@ -256,7 +256,7 @@ export class FilterModelServiceConverters {
   public trueKeyObject: IParamConverter = {
     toParam: (filterModel: IFilterModel, property: IFilterConfig) => {
       const obj = filterModel.sortFilter[property.model];
-      return _.chain(obj || {})
+      return chain(obj || {})
         .map(function (val: any, key: string) {
           if (val) {
             // replace any commas in the string with their uri-encoded version ('%2c'), since
@@ -273,7 +273,7 @@ export class FilterModelServiceConverters {
     toModel: (_filterModel: IFilterModel, property: IFilterConfig) => {
       const paramList = this.getParamVal(property);
       if (paramList) {
-        return _.reduce(paramList.split(','), function (acc, value: string) {
+        return reduce(paramList.split(','), function (acc, value: string) {
           // replace any uri-encoded commas in the string ('%2c') with actual commas, since
           // we use commas as our separator in the URL
           acc[value.replace(/%2c/g, ',')] = true;

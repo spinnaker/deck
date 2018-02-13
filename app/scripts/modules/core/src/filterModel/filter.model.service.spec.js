@@ -1,4 +1,5 @@
 'use strict';
+import { FILTER_MODEL_SERVICE } from './filter.model.service';
 
 describe('Service: FilterModelService', function () {
 
@@ -19,7 +20,7 @@ describe('Service: FilterModelService', function () {
 
   beforeEach(
     window.module(
-      require('./filter.model.service.ts').FILTER_MODEL_SERVICE
+      FILTER_MODEL_SERVICE
     )
   );
 

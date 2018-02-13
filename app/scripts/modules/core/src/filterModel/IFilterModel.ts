@@ -13,6 +13,11 @@ export interface IFilterConfig {
   array?: boolean;
 }
 
+// The sortFilter objects are generated, so leaving all fields as required
+// In addition, there should technically be a few different ISortFilter
+// sub-interfaces (Clusters, Pipeline, Load Balancer, etc)
+// but I want to delete all this stuff in favor of router params eventually
+// anyway, so keeping the interface consolidated for now.
 export interface ISortFilter {
   account: { [key: string]: boolean },
   availabilityZone: { [key: string]: boolean },
