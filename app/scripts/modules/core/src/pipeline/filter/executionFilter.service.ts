@@ -7,6 +7,7 @@ import * as moment from 'moment';
 import { Application } from 'core/application/application.model';
 import { EXECUTION_FILTER_MODEL, ExecutionFilterModel } from 'core/pipeline';
 import { IExecution, IExecutionGroup, IPipeline } from 'core/domain';
+import { FILTER_MODEL_SERVICE } from 'core/filterModel';
 import { PIPELINE_CONFIG_PROVIDER, PipelineConfigProvider } from 'core/pipeline/config/pipelineConfigProvider';
 
 const boundaries = [
@@ -24,7 +25,7 @@ export class ExecutionFilterService {
   public groupsUpdatedStream: Subject<IExecutionGroup[]> = new Subject<IExecutionGroup[]>();
 
   private lastApplication: Application = null;
-  private isFilterable: (sortFilterModel: any[]) => boolean;
+  private isFilterable: (sortFilterModel: { [key: string]: boolean }) => boolean;
 
   constructor(private executionFilterModel: ExecutionFilterModel,
               private $log: ILogService,
@@ -322,7 +323,7 @@ export class ExecutionFilterService {
 export const EXECUTION_FILTER_SERVICE = 'spinnaker.core.pipeline.filter.executionFilter.service';
 module (EXECUTION_FILTER_SERVICE, [
   EXECUTION_FILTER_MODEL,
-  require('core/filterModel/filter.model.service').name,
-  PIPELINE_CONFIG_PROVIDER
+  FILTER_MODEL_SERVICE,
+  PIPELINE_CONFIG_PROVIDER,
 ]).factory('executionFilterService', (executionFilterModel: ExecutionFilterModel, $log: ILogService, filterModelService: any, pipelineConfig: any) =>
                                       new ExecutionFilterService(executionFilterModel, $log, filterModelService, pipelineConfig));

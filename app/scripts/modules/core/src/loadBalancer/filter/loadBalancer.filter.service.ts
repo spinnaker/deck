@@ -6,6 +6,7 @@ import { BindAll } from 'lodash-decorators';
 
 import { Application } from 'core/application/application.model';
 import { ILoadBalancer, ILoadBalancerGroup, IInstance, IServerGroup } from 'core/domain';
+import { FILTER_MODEL_SERVICE } from 'core/filterModel';
 import { LOAD_BALANCER_FILTER_MODEL, LoadBalancerFilterModel } from './loadBalancerFilter.model';
 
 @BindAll()
@@ -243,6 +244,6 @@ export class LoadBalancerFilterService {
 export const LOAD_BALANCER_FILTER_SERVICE = 'spinnaker.core.loadBalancer.filter.service';
 module(LOAD_BALANCER_FILTER_SERVICE, [
   LOAD_BALANCER_FILTER_MODEL,
-  require('core/filterModel/filter.model.service.js').name
+  FILTER_MODEL_SERVICE,
 ]).factory('loadBalancerFilterService', (loadBalancerFilterModel: LoadBalancerFilterModel, filterModelService: any, $log: ILogService) =>
                                         new LoadBalancerFilterService(loadBalancerFilterModel, filterModelService, $log));

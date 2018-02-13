@@ -7,6 +7,7 @@ import { Subject } from 'rxjs';
 import { Application } from 'core/application/application.model';
 import { ICluster, IEntityTags, IInstance, IServerGroup } from 'core/domain';
 import { CLUSTER_FILTER_MODEL, ClusterFilterModel } from './clusterFilter.model';
+import { FILTER_MODEL_SERVICE } from 'core/filterModel';
 
 export interface IParentGrouping {
   subgroups: IClusterSubgroup[] | IServerGroupSubgroup[];
@@ -473,5 +474,5 @@ module(CLUSTER_FILTER_SERVICE, [
   require('@uirouter/angularjs').default,
   CLUSTER_FILTER_MODEL,
   require('./multiselect.model').name,
-  require('core/filterModel/filter.model.service').name,
+  FILTER_MODEL_SERVICE,
 ]).service('clusterFilterService', ClusterFilterService);

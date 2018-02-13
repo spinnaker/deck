@@ -5,10 +5,10 @@ import { BindAll } from 'lodash-decorators';
 import { noop } from 'core/utils';
 
 export interface ISortToggleProps {
-  sortKey: string;
+  currentSort: string;
   label: string;
   onChange?: (newVal: string) => void;
-  model: { key: string };
+  sortKey: string;
 }
 
 @BindAll()
@@ -18,20 +18,20 @@ export class SortToggle extends React.Component<ISortToggleProps> {
   };
 
   private isSortKey(): boolean {
-    const { model, sortKey } = this.props;
-    const field = model.key;
-    return field === sortKey || field === '-' + sortKey;
+    const { sortKey, currentSort } = this.props;
+    const field = sortKey;
+    return field === currentSort || field === '-' + currentSort;
   }
 
   private isReverse(): boolean {
-    return this.props.model.key && this.props.model.key.startsWith('-');
+    return this.props.sortKey && this.props.sortKey.startsWith('-');
   }
 
   private setSortKey(event: React.MouseEvent<HTMLElement>): void {
-    const { sortKey, onChange } = this.props;
+    const { currentSort, onChange } = this.props;
     event.preventDefault();
     const predicate = this.isSortKey() && this.isReverse() ? '' : '-';
-    onChange(predicate + sortKey);
+    onChange(predicate + currentSort);
   }
 
   public render() {

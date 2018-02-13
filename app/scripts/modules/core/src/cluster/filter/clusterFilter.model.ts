@@ -1,5 +1,6 @@
 import { IAngularEvent, IRootScopeService, module } from 'angular';
 import { Ng1StateDeclaration, StateParams } from '@uirouter/angularjs';
+import { FILTER_MODEL_SERVICE } from 'core/filterModel';
 
 import { IFilterConfig, IFilterModel } from 'core/filterModel/IFilterModel';
 import { UrlParser } from 'core/navigation/urlParser';
@@ -20,7 +21,7 @@ export const filterModelConfig: IFilterConfig[] = [
   { model: 'maxInstances', type: 'int', filterLabel: 'instance count (max)', },
   { model: 'showAllInstances', param: 'hideInstances', displayOption: true, type: 'inverse-boolean', },
   { model: 'listInstances', displayOption: true, type: 'boolean', },
-  { model: 'instanceSort', displayOption: true, type: 'sortKey', defaultValue: 'launchTime' },
+  { model: 'instanceSort', displayOption: true, type: 'string', defaultValue: 'launchTime' },
   { model: 'multiselect', displayOption: true, type: 'boolean', },
   { model: 'clusters', type: 'trueKeyObject' },
 ];
@@ -106,5 +107,5 @@ export class ClusterFilterModel {
 }
 
 module(CLUSTER_FILTER_MODEL, [
-  require('core/filterModel/filter.model.service').name,
+  FILTER_MODEL_SERVICE,
 ]).service('clusterFilterModel', ClusterFilterModel);
