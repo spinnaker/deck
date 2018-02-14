@@ -117,10 +117,15 @@ Here are the variations:
 */
 
 :root {
-  --button-background-color: white;
+  --button-default-background-color: white;
   --button-font-size: 12px;
   --button-solid-padding: 6px 14px;
   --button-hollow-padding: 6px 14px;
+  --button-border-radius: 3px;
+  --button-letter-spacing: 0.04em;
+  --button-font-family: 'Source Sans Pro', sans-serif;
+  --button-primary-hover-bg: #1d8499;
+  --button-passive-hover-bg: #e6e6e6;
 }
 
 button.primary:disabled, button.passive:disabled,
@@ -151,9 +156,9 @@ button.primary, a.button.primary,
 button.passive, a.button.passive,
 button.danger, a.button.danger,
 button.zombie, a.button.zombie {
-  border-radius: 3px;
-  font-family: 'Source Sans Pro', sans-serif;
-  letter-spacing: 0.04em;
+  border-radius: var(--button-border-radius);
+  font-family: var(--button-font-family);
+  letter-spacing: var(--button-letter-spacing);
   font-size: var(--button-font-size);
   box-shadow: none;
   border: none;
@@ -176,11 +181,11 @@ button.zombie, a.button.zombie {
 
 button.primary:hover:not(:disabled),
 a.button.primary:hover:not(:disabled) {
-  background-color: #1d8499;
+  background-color: var(--button-primary-hover-bg);
 }
 
 button.passive, a.button.passive, button.danger, a.button.danger {
-  background-color: var(--button-background-color);
+  background-color: var(--button-default-background-color);
   border: 1px solid var(--color-divider);
 }
 
@@ -194,7 +199,7 @@ button.passive i, a.button.passive i {
 
 button.passive:hover:not(:disabled),
 a.button.passive:hover:not(:disabled) {
-  background-color: #e6e6e6;
+  background-color: var(--button-passive-hover-bg);
 }
 
 button.danger, a.button.danger {
