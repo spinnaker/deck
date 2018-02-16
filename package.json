@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@spinnaker/kayenta": "0.0.23",
+    "@spinnaker/styleguide": "^1.0.0",
     "@uirouter/react-hybrid": "0.0.14",
     "@uirouter/rx": "0.4.5",
     "@uirouter/visualizer": "5.1.3",
