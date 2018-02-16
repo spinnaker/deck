@@ -6600,16 +6600,6 @@ postcss-filter-plugins@^2.0.0:
     postcss "^5.0.4"
     uniqid "^4.0.0"
 
-postcss-import@^10.0.0:
-  version "10.0.0"
-  resolved "https://registry.yarnpkg.com/postcss-import/-/postcss-import-10.0.0.tgz#4c85c97b099136cc5ea0240dc1dfdbfde4e2ebbe"
-  dependencies:
-    object-assign "^4.0.1"
-    postcss "^6.0.1"
-    postcss-value-parser "^3.2.3"
-    read-cache "^1.0.0"
-    resolve "^1.1.7"
-
 postcss-import@^11.1.0:
   version "11.1.0"
   resolved "https://registry.yarnpkg.com/postcss-import/-/postcss-import-11.1.0.tgz#55c9362c9192994ec68865d224419df1db2981f0"
@@ -6787,12 +6777,6 @@ postcss-safe-parser@^2.0.0:
   resolved "https://registry.yarnpkg.com/postcss-safe-parser/-/postcss-safe-parser-2.0.1.tgz#3b3d1c4b43a24c3942e2f0be7961382b348b3b13"
   dependencies:
     postcss "^5.2.16"
-
-postcss-scopeit@^0.0.6:
-  version "0.0.6"
-  resolved "https://registry.yarnpkg.com/postcss-scopeit/-/postcss-scopeit-0.0.6.tgz#db2ebdda28bdf731fc78e34b16b810d5c17add7e"
-  dependencies:
-    postcss "^6.0.1"
 
 postcss-selector-parser@^2.0.0, postcss-selector-parser@^2.2.2:
   version "2.2.3"
