@@ -166,14 +166,24 @@ Here's the styleguide template for this project: ../styleguide_template/template
 */
 
 :root {
-  /* alter the display start size to appropriate value for desktop and mobile and all the
-   * display sizes will be adjusted appropriately */
-  --display-start-font-size: 16px;
-
-  --display-4-font-size: calc(var(--display-start-font-size) * 1.8);
-  --display-3-font-size: calc(var(--display-start-font-size) * 1.5);
-  --display-2-font-size: calc(var(--display-start-font-size) * 1.32);
-  --display-1-font-size: var(--display-start-font-size);
+  --heading-font-weight: 600;
+  --heading-1-font-size: 22px;
+  --heading-1-line-height: 28px;
+  --heading-2-font-size: 18px;
+  --heading-2-line-height: 23px;
+  --heading-3-font-size: 16px;
+  --heading-3-line-height: 20px;
+  --heading-4-font-size: 14px;
+  --heading-4-line-height: 18px;
+  --heading-5-font-size: 13px;
+  --heading-5-line-height: 17px;
+  --heading-6-font-size: 12px;
+  --heading-6-line-height: 15px;
+  --heading-7-font-size: 10px;
+  --heading-7-line-height: 13px;
+  --body-font-weight: 400;
+  --heading-bold-font-weight: 600;
+  --body-bold-font-weight: 700;
 }
 
 @media only screen and (max-device-width: 480px) {
@@ -187,46 +197,46 @@ h1, h2, h3, h4, h5, h6, p, div, span, section, li {
 }
 
 *[class^='headline-'] {
-  font-weight: 600;
+  font-weight: var(--heading-font-weight);
 }
 
 .heading-1 {
-  font-size: 22px;
-  line-height: 28px;
+  font-size: var(--heading-1-font-size);
+  line-height: var(--heading-1-font-size);
 }
 
 .heading-2 {
-  font-size: 18px;
-  line-height: 23px;
+  font-size: var(--heading-2-font-size);
+  line-height: var(--heading-2-line-height);
 }
 
 .heading-3, .body-large {
-  font-size: 16px;
-  line-height: 20px;
+  font-size: var(--heading-3-font-size);
+  line-height: var(--heading-3-line-height);
 }
 
 .heading-4, .body-regular {
-  font-size: 14px;
-  line-height: 18px;
+  font-size: var(--heading-4-font-size);
+  line-height: var(--heading-4-line-height);
 }
 
 .heading-5 {
-  font-size: 13px;
-  line-height: 17px;
+  font-size: var(--heading-5-font-size);
+  line-height: var(--heading-5-line-height);
 }
 
 .heading-6, .body-small {
-  font-size: 12px;
-  line-height: 15px;
+  font-size: var(--heading-6-font-size);
+  line-height: var(--heading-6-line-height);
 }
 
 .heading-7, .body-tiny {
-  font-size: 10px;
-  line-height: 13px;
+  font-size: var(--heading-7-font-size);
+  line-height: var(--heading-7-line-height);
 }
 
 .body-tiny, .body-small, .body-regular, .body-large {
-  font-weight: 400;
+  font-weight: var(--body-font-weight);
 }
 
 .uppercase {
@@ -234,9 +244,9 @@ h1, h2, h3, h4, h5, h6, p, div, span, section, li {
 }
 
 .bold[class*="heading-"] {
-  font-weight: 600;
+  font-weight: var(--heading-bold-font-weight);
 }
 
 .bold:not([class*="heading-"]) {
-  font-weight: 700;
+  font-weight: var(--body-bold-font-weight);
 }

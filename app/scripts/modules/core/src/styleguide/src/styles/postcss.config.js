@@ -11,6 +11,10 @@ module.exports = {
       showCode: false,
       themePath: path.join(__dirname, '..', '..', 'src', 'styleguide-template')
     },
+    'postcss-export-vars': {
+      file: path.join(__dirname, '..', '..', 'public', 'css-variables.json'),
+      type: 'json',
+    },
     'cssnano': {}
   }
 };
