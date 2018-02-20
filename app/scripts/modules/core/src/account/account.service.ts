@@ -1,4 +1,4 @@
-import { chain, intersection, zipObject } from 'lodash';
+import { chain, intersection, zipObject, uniq } from 'lodash';
 import { ILogService, IPromise, IQResolveReject, IQService, module } from 'angular';
 import { Observable } from 'rxjs';
 
@@ -58,7 +58,7 @@ export class AccountService {
   }).publishReplay(1).refCount();
 
   public providers$ = this.accounts$.map((accounts: IAccountDetails[]) => {
-    const providersFromAccounts: string[] = Array.from(new Set(accounts.map((account: IAccount) => account.type)));
+    const providersFromAccounts: string[] = uniq(accounts.map(account => account.type));
     return intersection(providersFromAccounts, this.cloudProviderRegistry.listRegisteredProviders());
   });
 
