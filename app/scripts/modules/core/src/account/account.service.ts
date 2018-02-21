@@ -1,4 +1,4 @@
-import { chain, intersection, zipObject, uniq } from 'lodash';
+import { chain, intersection, zipObject } from 'lodash';
 import { ILogService, IPromise, IQResolveReject, IQService, module } from 'angular';
 
 import { Application } from 'core/application/application.model';
@@ -51,11 +51,6 @@ export interface IAccountZone {
 }
 
 export class AccountService {
-
-  public providers$ = this.accounts$.map((accounts: IAccountDetails[]) => {
-    const providersFromAccounts: string[] = uniq(accounts.map(account => account.type));
-    return intersection(providersFromAccounts, this.cloudProviderRegistry.listRegisteredProviders());
-  });
 
   constructor(private $log: ILogService,
               private $q: IQService,
@@ -174,24 +169,30 @@ export class AccountService {
     });
   }
 
-  public listProviders$(application: Application = null): Observable<string[]> {
-    return this.providers$
-      .map((available: string[]) => {
-        if (!application) {
-          return available;
-        } else if (application.attributes.cloudProviders.length) {
-          return intersection(available, application.attributes.cloudProviders);
-        } else if (SETTINGS.defaultProviders) {
-          return intersection(available, SETTINGS.defaultProviders)
-        } else {
-          return available;
-        }
-      })
-      .map(results => results.sort());
-  }
-
   public listProviders(application: Application = null): IPromise<string[]> {
-    return this.$q.when(this.listProviders$(application).toPromise());
+    return this.listAllAccounts()
+      .then((accounts: IAccount[]) => {
+        const all: string[] = Array.from(new Set(accounts.map((account: IAccount) => account.type)));
+        const available: string[] = intersection(all, this.cloudProviderRegistry.listRegisteredProviders());
+        let result: string[];
+        if (application) {
+          if (application.attributes.cloudProviders.length) {
+            result = application.attributes.cloudProviders;
+          } else {
+            if (SETTINGS.defaultProviders) {
+              result = SETTINGS.defaultProviders;
+            } else {
+              result = available;
+            }
+          }
+
+          result = intersection(available, result);
+        } else {
+          result = available;
+        }
+
+        return result.sort();
+      });
   }
 }
 
