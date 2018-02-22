@@ -4,6 +4,7 @@ import { IExpectedArtifact } from 'core/domain/IExpectedArtifact';
 
 export interface IPipeline {
   application: string;
+  dataSource?: string;
   description?: string;
   id: string;
   index: number;
