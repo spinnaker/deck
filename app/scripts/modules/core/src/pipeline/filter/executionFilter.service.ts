@@ -132,8 +132,7 @@ export class ExecutionFilterService {
       .value();
   }
 
-  private addEmptyPipelines(groups: IExecutionGroup[], application: Application): void {
-    const configs = application.pipelineConfigs.data || [];
+  private addEmptyPipelines(groups: IExecutionGroup[], configs: IPipeline[]): void {
     const sortFilter: ISortFilter = this.executionFilterModel.asFilterModel.sortFilter;
     if (!this.isFilterable(sortFilter.pipeline) &&
       !this.isFilterable(sortFilter.status) &&
@@ -175,8 +174,17 @@ export class ExecutionFilterService {
       executions = executions.concat(groupedExecutions.sort((a, b) => this.executionSorter(a, b)));
     });
 
+    // filter any executions that are part of some other data source
+    const displayableConfigs = (application.pipelineConfigs.data || [])
+      .filter((d: IPipeline) => !d.dataSource || d.dataSource === 'executions');
+    const hiddenConfigIds = (application.pipelineConfigs.data || [])
+      .filter((c: IPipeline) => !displayableConfigs.includes(c))
+      .map((c: IPipeline) => c.id);
+
+    executions = executions.filter(e => !hiddenConfigIds.includes(e.pipelineConfigId));
+
     executions.forEach((execution: IExecution) => {
-      const config: IPipeline = find<IPipeline>(application.pipelineConfigs.data, { id: execution.pipelineConfigId });
+      const config: IPipeline = find<IPipeline>(displayableConfigs, { id: execution.pipelineConfigId });
       if (config != null && config.type === 'templatedPipeline') {
         execution.fromTemplate = true;
       }
@@ -198,7 +206,7 @@ export class ExecutionFilterService {
           fromTemplate: config.type === 'templatedPipeline',
         });
       });
-      this.addEmptyPipelines(groups, application);
+      this.addEmptyPipelines(groups, displayableConfigs);
     }
 
     if (sortFilter.groupBy === 'timeBoundary') {
