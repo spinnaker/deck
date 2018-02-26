@@ -85,7 +85,7 @@ export class ClusterPod extends React.Component<IClusterPodProps, IClusterPodSta
     return (
       <div className="pod-subgroup" key={subgroup.key}>
         <h6 className="sticky-header-2 subgroup-title horizontal middle">
-          <div className="flex-1">{subgroup.heading}</div>
+          <div>{subgroup.heading}</div>
           <EntityNotifications
             entity={subgroup}
             application={application}
