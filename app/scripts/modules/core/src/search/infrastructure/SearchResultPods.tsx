@@ -33,7 +33,7 @@ export class SearchResultPods extends React.Component<ISearchResultPodsProps> {
     const projects: ISearchResultPodData = results.find(x => x.category === 'projects');
     const otherCategories: ISearchResultPodData[] = results.filter(x => x.category !== 'projects')
       .sort((a, b) => a.category.localeCompare(b.category));
-    
+
     return (
       <div className="infrastructure-section container">
         <div className="recent-items">
