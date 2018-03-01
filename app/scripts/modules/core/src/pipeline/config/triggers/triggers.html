@@ -80,4 +80,13 @@
       </div>
     </div>
   </page-section>
+  <page-section key="skippedStages" label="Skipped Stages">
+    <div class="checkbox">
+      <label>
+        <input type="checkbox"
+               ng-model="pipeline.hideSkippedStages"/>
+        If conditional stages are skipped, do not show them in the pipeline graph
+      </label>
+    </div>
+  </page-section>
 </page-navigator>
