@@ -80,7 +80,8 @@
     "source-sans-pro": "^2.0.10",
     "spel2js": "^0.2.1",
     "spin.js": "git://github.com/fgnass/spin.js.git#2.3.1",
-    "ui-select": "^0.19.6"
+    "ui-select": "^0.19.6",
+    "worker-loader": "^1.1.1"
   },
   "devDependencies": {
     "@types/angular": "1.6.26",
@@ -116,7 +117,7 @@
     "angulartics-google-analytics": "^0.2.0",
     "autoprefixer": "^7.1.2",
     "babel-core": "^6.21.1",
-    "babel-loader": "^7.1.2",
+    "babel-loader": "^7.1.3",
     "babel-plugin-angularjs-annotate": "^0.8.0",
     "cache-loader": "^1.1.0",
     "css-loader": "^0.28.1",
