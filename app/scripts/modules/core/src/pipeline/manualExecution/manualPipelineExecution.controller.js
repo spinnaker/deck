@@ -6,6 +6,7 @@ import _ from 'lodash';
 import { AUTHENTICATION_SERVICE } from 'core/authentication/authentication.service';
 import { PIPELINE_CONFIG_PROVIDER } from 'core/pipeline/config/pipelineConfigProvider';
 import { SETTINGS } from 'core/config/settings';
+import { evaluate } from 'core/utils/sandbox/sandbox.evaluator';
 
 import './manualPipelineExecution.less';
 
@@ -15,11 +16,13 @@ module.exports = angular.module('spinnaker.core.pipeline.manualPipelineExecution
   require('../../notification/notification.service').name,
   AUTHENTICATION_SERVICE
 ])
-  .controller('ManualPipelineExecutionCtrl', function ($uibModalInstance, pipeline, application, pipelineConfig,
+  .controller('ManualPipelineExecutionCtrl', function ($uibModalInstance, pipeline, application, pipelineConfig, $q,
                                                        trigger, notificationService, authenticationService) {
 
     let applicationNotifications = [];
     let pipelineNotifications = [];
+
+    this.hiddenParameters = new Set();
 
     this.notificationTooltip = require('./notifications.tooltip.html');
 
@@ -112,8 +115,7 @@ module.exports = angular.module('spinnaker.core.pipeline.manualPipelineExecution
 
     this.pipelineSelected = () => {
       const pipeline = this.command.pipeline,
-            executions = application.executions.data || [],
-            parameters = trigger ? trigger.parameters : {};
+            executions = application.executions.data || [];
 
       pipelineNotifications = pipeline.notifications || [];
       synchronizeNotifications();
@@ -129,12 +131,35 @@ module.exports = angular.module('spinnaker.core.pipeline.manualPipelineExecution
       if (pipeline.parameterConfig && pipeline.parameterConfig.length) {
         this.parameters = {};
         this.hasRequiredParameters = pipeline.parameterConfig.some(p => p.required);
-        pipeline.parameterConfig.forEach((parameter) => {
-          const { name } = parameter;
-          this.parameters[name] = parameters[name] !== undefined ? parameters[name] : parameter.default;
-        });
+        pipeline.parameterConfig.forEach((p) => this.addParameter(p));
+        this.updateParameters();
       }
 
+    };
+
+    this.addParameter = (parameterConfig) => {
+      const { name } = parameterConfig;
+      const parameters = trigger ? trigger.parameters : {};
+      if (this.parameters[name] === undefined) {
+        this.parameters[name] = parameters[name] !== undefined ? parameters[name] : parameterConfig.default;
+      }
+    };
+
+    this.updateParameters = () => {
+      const context = { parameters: this.parameters, trigger: this.command.trigger };
+      this.command.pipeline.parameterConfig.forEach(p => {
+        if (p.conditional) {
+          $q.when(evaluate(p.conditional, context)).then(result => {
+            if (!result) {
+              delete this.parameters[p.name];
+              this.hiddenParameters.add(p.name);
+            } else {
+              this.hiddenParameters.delete(p.name);
+              this.addParameter(p);
+            }
+          });
+        }
+      });
     };
 
     this.execute = () => {
