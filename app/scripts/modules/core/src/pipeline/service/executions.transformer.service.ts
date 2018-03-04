@@ -185,8 +185,19 @@ export class ExecutionsTransformerService {
     }
   }
 
-  private addStageWidths(execution: IExecution): void {
-    execution.stageWidth = 100 / execution.stageSummaries.length + '%';
+  // remove any skipped stages, setting any children as dependent on its parents
+  private removeSkippedStages(execution: IExecution) {
+    const { stages } = execution;
+    const skippedAndHidden = stages.filter(s => !get(s, 'context.stageEnabled.expression', true));
+    skippedAndHidden.forEach((stage) => {
+      stages
+        .filter(s => (s.requisiteStageRefIds || []).includes(stage.refId))
+        .forEach(s => s.requisiteStageRefIds = s.requisiteStageRefIds
+          .concat(stage.requisiteStageRefIds)
+          .filter(id => id !== stage.refId)
+        );
+    });
+    execution.stages = stages.filter(s => !skippedAndHidden.includes(s));
   }
 
   private styleStage(stage: IExecutionStageSummary, styleStage?: IExecutionStageSummary): void {
@@ -272,6 +283,9 @@ export class ExecutionsTransformerService {
   public transformExecution(application: Application, execution: IExecution): void {
     if (execution.trigger) {
       execution.isStrategy = execution.trigger.isPipeline === false && execution.trigger.type === 'pipeline';
+    }
+    if (execution.hideSkippedStages) {
+      this.removeSkippedStages(execution);
     }
     this.applyPhasesAndLink(execution);
     this.pipelineConfig.getExecutionTransformers().forEach((transformer) => {
@@ -446,7 +460,6 @@ export class ExecutionsTransformerService {
     stageSummaries.forEach((summary, index) => this.transformStageSummary(summary, index));
     execution.stageSummaries = stageSummaries;
     execution.currentStages = this.getCurrentStages(execution);
-    this.addStageWidths(execution);
     this.addBuildInfo(execution);
     this.addDeploymentTargets(execution);
   }

@@ -21,12 +21,12 @@ export interface IExecution extends IOrchestratedItem {
   pipelineConfigId?: string;
   searchField?: string;
   stageSummaries?: IExecutionStageSummary[]; // added by transformer
-  stageWidth?: string; // added by transformer
   stages: IExecutionStage[];
   stringVal?: string;
   trigger: IExecutionTrigger;
   user: string;
   fromTemplate?: boolean;
+  hideSkippedStages?: boolean;
 }
 
 export interface IExecutionGroup {
