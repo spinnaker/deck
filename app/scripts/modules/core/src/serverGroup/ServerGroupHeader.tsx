@@ -33,6 +33,7 @@ export class LoadBalancers extends React.Component<IServerGroupHeaderProps> {
 
 export class MultiSelectCheckbox extends React.Component<IServerGroupHeaderProps> {
   public render() {
+    // ServerGroup.tsx handles multi-select events and state
     const { isMultiSelected, sortFilter: { multiselect } } = this.props;
     return multiselect && <input type="checkbox" checked={isMultiSelected}/>;
   }
@@ -116,24 +117,11 @@ export class ServerGroupManager extends React.Component<IServerGroupHeaderProps>
 
 @Overridable('serverGroups.pod.header')
 export class ServerGroupHeader extends React.Component<IServerGroupHeaderProps> {
-  public headerIsSticky(): boolean {
-    const { serverGroup, sortFilter } = this.props;
-    const { showAllInstances, listInstances } = sortFilter;
-
-    if (!showAllInstances) {
-      return false;
-    }
-
-    const instances = serverGroup.instances.filter(i => ReactInjector.clusterFilterService.shouldShowInstance(i));
-    return listInstances ? instances.length > 1 : instances.length > 20;
-  }
-
   public render() {
     const props = this.props;
-    const stickyClass = this.headerIsSticky() ? 'sticky-header-3' : '';
 
     return (
-      <div className={`flex-container-h baseline server-group-title ${stickyClass}`}>
+      <div className={`flex-container-h baseline server-group-title sticky-header-3`}>
         <div className="flex-container-h baseline section-title">
           <MultiSelectCheckbox {...props}/>
           <CloudProviderIcon {...props}/>
