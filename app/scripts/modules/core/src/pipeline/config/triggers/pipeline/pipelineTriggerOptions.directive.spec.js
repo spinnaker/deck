@@ -43,7 +43,7 @@ describe('Pipeline Trigger: PipelineTriggerOptionsCtrl', function() {
   it('loads executions on initialization, setting state flags', function () {
     let executions = [];
     spyOn(executionService, 'getExecutionsForConfigIds').and.returnValue($q.when(executions));
-    spyOn(executionsTransformer, "addBuildInfo");
+    spyOn(executionsTransformer, 'addBuildInfo');
 
     this.initialize();
     expect(ctrl.viewState.executionsLoading).toBe(true);
@@ -60,7 +60,7 @@ describe('Pipeline Trigger: PipelineTriggerOptionsCtrl', function() {
       { pipelineConfigId: 'b', buildTime: 1, id: 'b-1', application: 'a' },
     ];
     spyOn(executionService, 'getExecutionsForConfigIds').and.returnValue($q.when(executions));
-    spyOn(executionsTransformer, "addBuildInfo");
+    spyOn(executionsTransformer, 'addBuildInfo');
 
     this.initialize();
     expect(ctrl.viewState.executionsLoading).toBe(true);
@@ -75,7 +75,7 @@ describe('Pipeline Trigger: PipelineTriggerOptionsCtrl', function() {
 
   it('sets flags when execution load fails', function () {
     spyOn(executionService, 'getExecutionsForConfigIds').and.returnValue($q.reject('does not matter'));
-    spyOn(executionsTransformer, "addBuildInfo");
+    spyOn(executionsTransformer, 'addBuildInfo');
 
     this.initialize();
     expect(ctrl.viewState.executionsLoading).toBe(true);
