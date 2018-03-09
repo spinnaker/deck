@@ -22,8 +22,7 @@
               <span>
                 <strong><execution-build-title execution="execution" default-to-timestamp="false" ></execution-build-title></strong>
                 {{execution.buildTime | timestamp}} ({{execution.status}})
-                <br />
-                <span ng-if="execution.buildInfo.scm">{{execution.buildInfo.scm[0].branch}} ({{execution.buildInfo.scm[0].sha1 | limitTo:6}}): {{execution.buildInfo.scm[0].message | limitTo:30}}<span ng-if="execution.buildInfo.scm[0].message.length > 30">…</span></span></span>
+                <span ng-if="execution.buildInfo.scm"><br />{{execution.buildInfo.scm[0].branch}} ({{execution.buildInfo.scm[0].sha1 | limitTo:6}}): {{execution.buildInfo.scm[0].message | limitTo:30}}<span ng-if="execution.buildInfo.scm[0].message.length > 30">…</span></span></span>
               </span>
       </ui-select-choices>
     </ui-select>
