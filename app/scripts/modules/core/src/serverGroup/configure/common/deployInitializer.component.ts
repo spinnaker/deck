@@ -77,13 +77,17 @@ export class DeployInitializerController implements IController {
   private applyCommandToScope(command: any) {
     const { viewState } = command;
     const baseCommand = this.command;
+
     viewState.disableImageSelection = true;
+    viewState.showImageSourceSelector = true;
     viewState.disableStrategySelection = baseCommand.viewState.disableStrategySelection || false;
+    viewState.expectedArtifacts = baseCommand.viewState.expectedArtifacts || [];
     viewState.imageId = null;
     viewState.readOnlyFields = baseCommand.viewState.readOnlyFields || {};
     viewState.submitButtonLabel = 'Add';
     viewState.hideClusterNamePreview = baseCommand.viewState.hideClusterNamePreview || false;
     viewState.templatingEnabled = true;
+    
     Object.assign(command, baseCommand.viewState.overrides || {});
     Object.assign(baseCommand, command);
   }

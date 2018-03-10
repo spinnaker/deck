@@ -33,6 +33,7 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.deployStage', [
             }
             return stage.clusters.every(cluster =>
               cloudProviderRegistryProvider.$get().getValue(cluster.provider, 'serverGroup.skipUpstreamStageCheck')
+              || cluster.imageSource === 'artifact'
             );
           }
         },
