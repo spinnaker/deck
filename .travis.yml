@@ -15,10 +15,10 @@ after_install:
 - yarn
 script: gradle/buildViaTravis.sh
 before_cache: gradle/prepCaches.sh
-cache:
-  directories:
-  - $HOME/.gradle
-  - node_modules
+#cache:
+#  directories:
+#  - $HOME/.gradle
+#  - node_modules
 notifications:
   slack:
     rooms:
