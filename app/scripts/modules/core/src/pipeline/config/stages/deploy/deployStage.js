@@ -12,7 +12,7 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.deployStage', [
   SERVER_GROUP_COMMAND_BUILDER_SERVICE,
   CLUSTER_SERVICE,
 ])
-  .config(function ($injector, pipelineConfigProvider, cloudProviderRegistryProvider, clusterServiceProvider) {
+  .config(function (pipelineConfigProvider, cloudProviderRegistryProvider, clusterServiceProvider) {
     pipelineConfigProvider.registerStage({
       label: 'Deploy',
       description: 'Deploys the previously baked or found image',

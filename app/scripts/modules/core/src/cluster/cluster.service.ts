@@ -177,7 +177,7 @@ export class ClusterService {
   }
 
   public isDeployingArtifact(cluster: ICluster): boolean {
-    return (cluster.imageSource === 'artifact');
+    return cluster.imageSource === 'artifact';
   }
 
   private getClusters(application: string): IPromise<IClusterSummary[]> {
