@@ -36,7 +36,7 @@ class ExpectedArtifactSelectorComponent implements IComponentOptions {
               </ui-select>
             </div>
           </div>
-          <div ng-if="ctrl.account-field" class="form-group">
+          <div ng-if="ctrl.accountField" class="form-group">
             <label class="col-md-3 sm-label-right">Artifact Account</label>
             <div class="col-md-7">
               <ui-select ng-model="ctrl.command[ctrl.accountField]"

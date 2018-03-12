@@ -16,7 +16,7 @@ const helpContents: {[key: string]: string} = {
   'gce.image.artifact': 'The artifact that is to be deployed to this cluster.  The artifact should represent a deployable image.',
   'gce.image.source': `
       <p>Where the image to deploy is read from.</p>
-            <p>
+      <p>
         <b>Artifact:</b> Deploy an artifact that was supplied/created upstream. The expected artifact must be referenced here, and will be bound at runtime.
       </p>
       <p>

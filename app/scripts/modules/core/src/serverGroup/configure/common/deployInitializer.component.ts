@@ -87,7 +87,7 @@ export class DeployInitializerController implements IController {
     viewState.submitButtonLabel = 'Add';
     viewState.hideClusterNamePreview = baseCommand.viewState.hideClusterNamePreview || false;
     viewState.templatingEnabled = true;
-    
+
     Object.assign(command, baseCommand.viewState.overrides || {});
     Object.assign(baseCommand, command);
   }
