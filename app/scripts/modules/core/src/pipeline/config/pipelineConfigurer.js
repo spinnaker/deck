@@ -7,6 +7,7 @@ const angular = require('angular');
 import { OVERRIDE_REGISTRY } from 'core/overrideRegistry/override.registry';
 import { PIPELINE_CONFIG_SERVICE } from 'core/pipeline/config/services/pipelineConfig.service';
 import { EditPipelineJsonModalCtrl } from './actions/json/editPipelineJsonModal.controller';
+import { ConvertToTemplateModalCtrl } from './actions/json/convertToTemplateModal.controller';
 import { PIPELINE_CONFIG_VALIDATOR } from './validation/pipelineConfig.validator';
 import { PIPELINE_TEMPLATE_SERVICE } from './templates/pipelineTemplate.service';
 import { EXECUTION_BUILD_TITLE } from '../executionBuild/ExecutionBuildTitle';
@@ -183,6 +184,19 @@ module.exports = angular.module('spinnaker.core.pipeline.config.pipelineConfigur
       }).result.then(() => {
         $scope.$broadcast('pipeline-json-edited');
         this.updatePipeline();
+      }).catch(() => {});
+    };
+
+    this.convertToTemplate = () => {
+      $uibModal.open({
+        templateUrl: require('./actions/json/convertToTemplateModal.html'),
+        controller: ConvertToTemplateModalCtrl,
+        controllerAs: '$ctrl',
+        size: 'lg modal-fullscreen',
+        resolve: {
+          pipeline: () => $scope.pipeline,
+        }
+      }).result.then(() => {
       }).catch(() => {});
     };
 
