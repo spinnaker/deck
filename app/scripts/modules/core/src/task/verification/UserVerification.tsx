@@ -45,7 +45,7 @@ export class UserVerification extends React.Component<IUserVerificationProps, IU
           <div className="form-inline">
             <div className="form-group">
               <div className="form-control-static">{label || defaultLabel}</div>
-              <HelpField id="user.verification"/>
+              {' '}<HelpField id="user.verification"/>
               <input type="text" className={className} value={value} onChange={this.handleChange} />
             </div>
           </div>
