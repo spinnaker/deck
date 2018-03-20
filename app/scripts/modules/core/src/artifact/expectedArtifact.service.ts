@@ -1,4 +1,5 @@
 import { copy, module } from 'angular';
+import { isString } from 'lodash';
 
 import { IArtifact, IExpectedArtifact, IPipeline, IStage } from 'core/domain';
 import { PIPELINE_CONFIG_SERVICE, PipelineConfigService } from 'core/pipeline/config/services/pipelineConfig.service';
@@ -27,8 +28,10 @@ export class ExpectedArtifactService {
 }
 
 export function summarizeExpectedArtifact() {
-  return function (expected: IExpectedArtifact): string {
-    if (!expected) {
+  return function (expected: (IExpectedArtifact|string)): string {
+    // `expected` is a string only if an expected artifact has been deleted
+    // and a stale uuid still exists as a reference somewhere
+    if (!expected || isString(expected)) {
       return '';
     }
 
