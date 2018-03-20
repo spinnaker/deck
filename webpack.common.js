@@ -22,6 +22,10 @@ function configure(env, webpackOpts) {
 
   const WEBPACK_THREADS = Math.max(require('physical-cpu-count') - 1, 1);
 
+  console.log('os.cpus().length: ' + require('os').cpus().length);
+  console.log('physical-cpu-count: ' + require('physical-cpu-count'));
+  console.log({ WEBPACK_THREADS });
+
   const config = {
     context: __dirname,
     mode: WEBPACK_MODE,

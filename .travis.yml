@@ -9,9 +9,8 @@ before_install:
 - sh -e /etc/init.d/xvfb start
 install: gradle/installViaTravis.sh
 script: gradle/buildViaTravis.sh
-#before_cache: gradle/prepCaches.sh
 cache:
-  yarn: true
+#  yarn: true
   directories:
   - node_modules
   - .cache-loader

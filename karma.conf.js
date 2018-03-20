@@ -74,7 +74,7 @@ module.exports = function (config) {
     logLevel: config.DEBUG,
 
     // jUnit Report output
-    reporters: [process.env.TRAVIS ? 'dots': 'travis'],
+    reporters: [process.env.TRAVIS ? 'dots': 'nyan'],
 
     // the default configuration
     junitReporter: {
