@@ -25,7 +25,7 @@ function configure(env, webpackOpts) {
   const LOCAL_THREADS = Math.max(require('physical-cpu-count') - 1, 1);
   // When running on travis, use max of 2 threads
   // https://docs.travis-ci.com/user/reference/overview/#Virtualization-environments
-  const TRAVIS_THREADS = Math.min(require('physical-cpu-count'), 2);
+  const TRAVIS_THREADS = Math.min(require('physical-cpu-count'), 3);
   const WEBPACK_THREADS = IS_TRAVIS ? TRAVIS_THREADS : LOCAL_THREADS;
 
   console.log(`INFO: cpus: ${require('os').cpus().length} physical: ${require('physical-cpu-count')} thread-loader threads: ${WEBPACK_THREADS}`);
