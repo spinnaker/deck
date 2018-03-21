@@ -1,6 +1,6 @@
 language: node_js
 node_js: 8.9.0
-sudo: true
+sudo: false
 before_install:
 - export CHROME_BIN=chromium-browser
 - export DISPLAY=:99.0
@@ -12,7 +12,7 @@ script: gradle/buildViaTravis.sh
 cache:
   directories:
   - node_modules
-#  - .cache-loader
+  - .cache-loader
 notifications:
   slack:
     rooms:
