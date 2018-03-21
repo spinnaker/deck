@@ -21,7 +21,7 @@ function configure(env, webpackOpts) {
   const IS_PRODUCTION = WEBPACK_MODE === 'production';
 
   // const WEBPACK_THREADS = Math.max(require('physical-cpu-count') - 1, 1);
-  const WEBPACK_THREADS = 1;
+  const WEBPACK_THREADS = 2;
 
   console.log('os.cpus().length: ' + require('os').cpus().length);
   console.log('physical-cpu-count: ' + require('physical-cpu-count'));
