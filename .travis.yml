@@ -12,7 +12,7 @@ script: gradle/buildViaTravis.sh
 cache:
 #  yarn: true
   directories:
-  - node_modules
+#  - node_modules
 #  - .cache-loader
 notifications:
   slack:
