@@ -26,7 +26,8 @@ function configure(env, webpackOpts) {
   // When running on travis, use max of 2 threads
   // https://docs.travis-ci.com/user/reference/overview/#Virtualization-environments
   const TRAVIS_THREADS = Math.min(require('physical-cpu-count'), 2);
-  const WEBPACK_THREADS = IS_TRAVIS ? TRAVIS_THREADS : LOCAL_THREADS;
+  const WEBPACK_THREADS = 1;
+  // const WEBPACK_THREADS = IS_TRAVIS ? TRAVIS_THREADS : LOCAL_THREADS;
 
   console.log(`INFO: cpus: ${require('os').cpus().length} physical: ${require('physical-cpu-count')} thread-loader threads: ${WEBPACK_THREADS}`);
 
@@ -91,8 +92,8 @@ function configure(env, webpackOpts) {
         {
           test: /\.js$/,
           use: [
-            { loader: 'cache-loader', options: { cacheIdentifier: CACHE_INVALIDATE } },
-            { loader: 'thread-loader', options: { workers: WEBPACK_THREADS } },
+            // { loader: 'cache-loader', options: { cacheIdentifier: CACHE_INVALIDATE } },
+            // { loader: 'thread-loader', options: { workers: WEBPACK_THREADS } },
             { loader: 'babel-loader' },
             { loader: 'eslint-loader' },
           ],
@@ -101,8 +102,8 @@ function configure(env, webpackOpts) {
         {
           test: /\.tsx?$/,
           use: [
-            { loader: 'cache-loader', options: { cacheIdentifier: CACHE_INVALIDATE } },
-            { loader: 'thread-loader', options: { workers: WEBPACK_THREADS } },
+            // { loader: 'cache-loader', options: { cacheIdentifier: CACHE_INVALIDATE } },
+            // { loader: 'thread-loader', options: { workers: WEBPACK_THREADS } },
             { loader: 'babel-loader' },
             { loader: 'ts-loader', options: { happyPackMode: true } },
             { loader: 'tslint-loader' },
