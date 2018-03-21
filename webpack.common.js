@@ -6,6 +6,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+const IS_TRAVIS = !!process.env.TRAVIS;
 
 function configure(env, webpackOpts) {
   // invalidate webpack cache when webpack config is changed or cache-loader is updated,
@@ -20,12 +21,14 @@ function configure(env, webpackOpts) {
   const WEBPACK_MODE = (webpackOpts && webpackOpts.mode) || 'development';
   const IS_PRODUCTION = WEBPACK_MODE === 'production';
 
-  // const WEBPACK_THREADS = Math.max(require('physical-cpu-count') - 1, 1);
-  const WEBPACK_THREADS = 2;
+  // When running locally, use one less than the physical number of cpus
+  const LOCAL_THREADS = Math.max(require('physical-cpu-count') - 1, 1);
+  // When running on travis, use max of 2 threads
+  // https://docs.travis-ci.com/user/reference/overview/#Virtualization-environments
+  const TRAVIS_THREADS = Math.min(require('physical-cpu-count'), 2);
+  const WEBPACK_THREADS = IS_TRAVIS ? TRAVIS_THREADS : LOCAL_THREADS;
 
-  console.log('os.cpus().length: ' + require('os').cpus().length);
-  console.log('physical-cpu-count: ' + require('physical-cpu-count'));
-  console.log({ WEBPACK_THREADS });
+  console.log(`INFO: cpus: ${require('os').cpus().length} physical: ${require('physical-cpu-count')} thread-loader threads: ${WEBPACK_THREADS}`);
 
   const config = {
     context: __dirname,
