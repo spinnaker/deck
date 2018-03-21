@@ -6,29 +6,15 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
-const IS_TRAVIS = !!process.env.TRAVIS;
+
+const CACHE_INVALIDATE = getCacheInvalidateString();
+const NODE_MODULE_PATH = path.join(__dirname, 'node_modules');
+const SETTINGS_PATH = process.env.SETTINGS_PATH || './settings.js';
+const THREADS = getThreadLoaderThreads();
 
 function configure(env, webpackOpts) {
-  // invalidate webpack cache when webpack config is changed or cache-loader is updated,
-  const CACHE_INVALIDATE = JSON.stringify({
-    CACHE_LOADER: require('cache-loader/package.json').version,
-    WEBPACK_CONFIG: md5(fs.readFileSync(__filename)),
-  });
-
-  const NODE_MODULE_PATH = path.join(__dirname, 'node_modules');
-  const SETTINGS_PATH = process.env.SETTINGS_PATH || './settings.js';
-
   const WEBPACK_MODE = (webpackOpts && webpackOpts.mode) || 'development';
   const IS_PRODUCTION = WEBPACK_MODE === 'production';
-
-  // When running locally, use one less than the physical number of cpus
-  const LOCAL_THREADS = Math.max(require('physical-cpu-count') - 1, 1);
-  // When running on travis, use max of 2 threads
-  // https://docs.travis-ci.com/user/reference/overview/#Virtualization-environments
-  const TRAVIS_THREADS = Math.min(require('physical-cpu-count'), 2);
-  const WEBPACK_THREADS = IS_TRAVIS ? TRAVIS_THREADS : LOCAL_THREADS;
-
-  console.log(`INFO: cpus: ${require('os').cpus().length} physical: ${require('physical-cpu-count')} thread-loader threads: ${WEBPACK_THREADS}`);
 
   const config = {
     context: __dirname,
@@ -92,7 +78,7 @@ function configure(env, webpackOpts) {
           test: /\.js$/,
           use: [
             { loader: 'cache-loader', options: { cacheIdentifier: CACHE_INVALIDATE } },
-            { loader: 'thread-loader', options: { workers: WEBPACK_THREADS } },
+            { loader: 'thread-loader', options: { workers: THREADS } },
             { loader: 'babel-loader' },
             { loader: 'eslint-loader' },
           ],
@@ -102,7 +88,7 @@ function configure(env, webpackOpts) {
           test: /\.tsx?$/,
           use: [
             { loader: 'cache-loader', options: { cacheIdentifier: CACHE_INVALIDATE } },
-            { loader: 'thread-loader', options: { workers: WEBPACK_THREADS } },
+            { loader: 'thread-loader', options: { workers: THREADS } },
             { loader: 'babel-loader' },
             { loader: 'ts-loader', options: { happyPackMode: true } },
             { loader: 'tslint-loader' },
@@ -191,6 +177,29 @@ function configure(env, webpackOpts) {
   }
 
   return config;
+}
+
+// invalidate webpack cache when webpack config is changed or cache-loader is updated,
+function getCacheInvalidateString() {
+  return JSON.stringify({
+    CACHE_LOADER: require('cache-loader/package.json').version,
+    WEBPACK_CONFIG: md5(fs.readFileSync(__filename)),
+  });
+}
+
+
+// When running locally, use one less than the physical number of cpus
+// When running on travis, use max of 2 threads
+// https://docs.travis-ci.com/user/reference/overview/#Virtualization-environments
+function getThreadLoaderThreads() {
+  const bareMetalThreads = Math.max(require('physical-cpu-count') - 1, 1);
+  const travisThreads = Math.min(require('physical-cpu-count'), 2);
+  const autoThreads = !!process.env.TRAVIS ? travisThreads : bareMetalThreads;
+  const threads = process.env.THREADS || autoThreads;
+
+  console.log(`INFO: cpus: ${require('os').cpus().length} physical: ${require('physical-cpu-count')} thread-loader threads: ${threads}`);
+
+  return threads;
 }
 
 module.exports = configure;
