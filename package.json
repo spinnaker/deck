@@ -17,7 +17,7 @@
   },
   "scripts": {
     "clean": "rimraf .awcache .cache-loader build node_modules transpiled",
-    "build": "webpack --bail --mode=production",
+    "build": "webpack --bail --progress --mode=production",
     "eslint": "eslint -c .eslintrc app/scripts/modules",
     "start": "sh ./start.sh",
     "start-dev-server": "webpack-dev-server --progress --mode=development",
@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free-webfonts": "^1.0.4",
-    "@spinnaker/kayenta": "0.0.29",
+    "@spinnaker/kayenta": "0.0.33",
     "@spinnaker/styleguide": "^1.0.0",
     "@uirouter/react-hybrid": "0.1.0",
     "@uirouter/rx": "0.4.5",
