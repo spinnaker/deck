@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { IScope } from 'angular';
 import { BindAll } from 'lodash-decorators';
-import { ButtonToolbar, DropdownButton, MenuItem } from 'react-bootstrap';
+import { DropdownButton, MenuItem } from 'react-bootstrap';
 import { StateService } from '@uirouter/core';
 import { IModalService } from 'angular-ui-bootstrap';
 
@@ -87,17 +87,15 @@ export class InsightMenu extends React.Component<IInsightMenuProps, IInsightMenu
   public render() {
     const { createApp, createProject, refreshCaches } = this.props;
     const refreshMarkup = this.state.refreshingCache ?
-      <span><span className="fa fa-refresh fa-spin"/> Refreshing...</span> :
+      <span><span className="fa fa-sync-alt fa-spin"/> Refreshing...</span> :
       <span>Refresh all caches</span>;
 
     return (
-      <ButtonToolbar bsSize="small">
-        <DropdownButton pullRight={true} title="Actions" id="insight-menu">
-          {createApp && <MenuItem href="javascript:void(0)" onClick={this.createApplication}>Create Application</MenuItem>}
-          {createProject && <MenuItem href="javascript:void(0)" onClick={this.createProject}>Create Project</MenuItem>}
-          {refreshCaches && <MenuItem href="javascript:void(0)" onClick={this.refreshAllCaches}>{refreshMarkup}</MenuItem>}
-        </DropdownButton>
-      </ButtonToolbar>
+      <DropdownButton pullRight={true} title="Actions" id="insight-menu">
+        {createApp && <MenuItem href="javascript:void(0)" onClick={this.createApplication}>Create Application</MenuItem>}
+        {createProject && <MenuItem href="javascript:void(0)" onClick={this.createProject}>Create Project</MenuItem>}
+        {refreshCaches && <MenuItem href="javascript:void(0)" onClick={this.refreshAllCaches}>{refreshMarkup}</MenuItem>}
+      </DropdownButton>
     )
   };
 }

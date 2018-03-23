@@ -1,15 +1,22 @@
 'use strict';
 
-const path = require('path');
-const webpackCommon = require('./webpack.common');
-const webpackConfig = webpackCommon(true);
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const prodWebpackConfig = require('./webpack.config')();
+const webpackConfig = {
+  mode: 'development',
+  module: prodWebpackConfig.module,
+  resolve: prodWebpackConfig.resolve,
+  plugins: [
+    new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true, tslint: true }),
+  ]
+};
 
 module.exports = function (config) {
   config.set({
     autoWatch: true,
 
     // base path, that will be used to resolve files and exclude
-    basePath: '',
+    basePath: '.',
 
     // testing framework to use (jasmine/mocha/qunit/...)
     frameworks: ['jasmine'],
@@ -20,13 +27,13 @@ module.exports = function (config) {
     ],
 
     preprocessors: {
-      './karma-shim.js': ['webpack']
+      './karma-shim.js': ['webpack', 'sourcemap']
     },
 
     webpack: webpackConfig,
 
     webpackMiddleware: {
-      noInfo: true,
+      stats: 'minimal',
     },
 
     customLaunchers: {
@@ -45,7 +52,7 @@ module.exports = function (config) {
       require('karma-jasmine'),
       require('karma-chrome-launcher'),
       require('karma-junit-reporter'),
-      require('karma-mocha-reporter'),
+      require('karma-sourcemap-loader'),
     ],
 
     // list of files / patterns to exclude
@@ -65,15 +72,11 @@ module.exports = function (config) {
     logLevel: config.DEBUG,
 
     // jUnit Report output
-    reporters: ['progress', 'mocha'],
+    reporters: ['junit', 'dots'],
 
     // the default configuration
     junitReporter: {
      outputFile: 'test-results.xml'
-    },
-
-    mochaReporter: {
-     ignoreSkipped: true,
     },
 
     client: {

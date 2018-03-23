@@ -143,7 +143,7 @@ export class Applications extends React.Component<{}, IApplicationsState> {
     return (
       <div className="infrastructure">
         <div className="infrastructure-section search-header">
-          <div className="container" style={{ overflowY: 'auto' }}>
+          <div className="container">
             <h2 className="header-section">
               <span className="search-label">Applications</span>
               <input
@@ -161,10 +161,13 @@ export class Applications extends React.Component<{}, IApplicationsState> {
           </div>
         </div>
 
-        <div className="container">
+        <div className="infrastructure-section container">
           {!applications && <LoadingSpinner/>}
 
-          {applications && (
+          {applications && applications.length === 0 && (
+            <h4>No matches found for '{this.filter$.value}'</h4>
+          )}
+          {applications && applications.length > 0 && (
             <div className="infrastructure-section">
               <ApplicationTable currentSort={currentSort} applications={applications} toggleSort={(column) => this.toggleSort(column)}/>
               <PaginationControls onPageChanged={changePage} activePage={currentPage} totalPages={Math.ceil(maxSize / itemsPerPage)} />

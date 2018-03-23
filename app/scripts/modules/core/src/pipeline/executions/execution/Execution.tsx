@@ -355,7 +355,7 @@ export class Execution extends React.Component<IExecutionProps, IExecutionState>
                 {this.props.onRerun && (
                   <Tooltip value="Re-run execution with same parameters">
                     <button className="link" onClick={this.handleRerunClick}>
-                      <i className="fa fa-repeat"/>
+                      <i className="fa fa-redo"/>
                     </button>
                   </Tooltip>
                 )}
@@ -369,7 +369,7 @@ export class Execution extends React.Component<IExecutionProps, IExecutionState>
             { execution.isActive && (
               <Tooltip value="Cancel execution">
                 <button className="link" onClick={this.handleCancelClick}>
-                  <i className="fa fa-times-circle-o"/>
+                  <i className="far fa-times-circle"/>
                 </button>
               </Tooltip>
             )}

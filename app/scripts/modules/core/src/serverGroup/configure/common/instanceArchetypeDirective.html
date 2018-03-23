@@ -6,7 +6,7 @@
           ng-class="{active: command.viewState.instanceProfile === instanceProfile.type}"
           ng-click="instanceArchetypeCtrl.selectInstanceType(instanceProfile.type)">
         <span is-visible="command.viewState.instanceProfile === instanceProfile.type"
-              class="fa fa-check-circle-o selected-indicator"></span>
+              class="far fa-check-circle selected-indicator"></span>
     <div class="panel-heading">
       <h4><span class="glyphicon glyphicon-{{instanceProfile.icon}}"></span><br/> {{instanceProfile.label}}</h4>
     </div>
@@ -43,7 +43,7 @@
   <div class="form-group small" style="margin-top: 20px">
     <div class="col-md-9 col-md-offset-1">
       <p>
-        <span ng-if="instanceArchetypeCtrl.refreshing"><span class="fa fa-refresh fa-spin"></span></span>
+        <span ng-if="instanceArchetypeCtrl.refreshing"><span class="fa fa-sync-alt fa-spin"></span></span>
         Instance types
         <span ng-if="!instanceArchetypeCtrl.refreshing">last refreshed {{ instanceArchetypeCtrl.getInstanceTypeRefreshTime() | timestamp }}</span>
         <span ng-if="instanceArchetypeCtrl.refreshing"> refreshing...</span>

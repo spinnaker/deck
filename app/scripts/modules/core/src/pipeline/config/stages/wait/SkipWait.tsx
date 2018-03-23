@@ -92,3 +92,4 @@ export class SkipWait extends React.Component<ISkipWaitProps, ISkipWaitState> {
     )
   }
 }
+

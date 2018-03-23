@@ -25,6 +25,9 @@ module.exports = angular.module('spinnaker.core.serverGroup.transformer', [
     }
 
     function normalizeServerGroupForProviderVersion(serverGroup, application, providerVersion) {
+      if (!providerServiceDelegate.hasDelegate(serverGroup.provider || serverGroup.type, 'serverGroup.transformer', providerVersion)) {
+        return null;
+      }
       return providerServiceDelegate
         .getDelegate(serverGroup.provider || serverGroup.type, 'serverGroup.transformer', providerVersion)
         .normalizeServerGroup(serverGroup, application);
