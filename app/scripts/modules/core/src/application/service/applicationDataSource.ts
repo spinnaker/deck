@@ -287,7 +287,7 @@ export class ApplicationDataSource implements IDataSourceConfig {
       this.label = this.$filter('robotToHuman')(config.key);
     }
 
-    if (!config.activeState) {
+    if (!config.activeState && this.sref) {
       this.activeState = '**' + this.sref + '.**';
     }
 
