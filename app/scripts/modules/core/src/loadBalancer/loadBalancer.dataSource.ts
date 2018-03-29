@@ -27,9 +27,10 @@ module(LOAD_BALANCER_DATA_SOURCE, [
 
   applicationDataSourceRegistry.registerDataSource({
     key: 'loadBalancers',
+    sref: '.insight.loadBalancers',
     category: INFRASTRUCTURE_KEY,
     optional: true,
-    icon: 'fa fa-xs fa-fw fa-sitemap',
+    icon: 'fa fa-xs fa-fw icon-sitemap',
     loader: loadLoadBalancers,
     onLoad: addLoadBalancers,
     afterLoad: addTags,
