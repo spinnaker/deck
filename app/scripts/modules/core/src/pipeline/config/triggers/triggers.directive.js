@@ -50,9 +50,35 @@ module.exports = angular.module('spinnaker.core.pipeline.config.trigger.triggers
         return;
       }
 
-      pipeline.triggers
-        .forEach(t => t.expectedArtifactIds = t.expectedArtifactIds
-          .filter(eid => expectedArtifact.id !== eid));
+      pipeline.triggers.forEach(t => {
+        if (t.expectedArtifactIds) {
+          t.expectedArtifactIds = t.expectedArtifactIds.filter(id => id !== expectedArtifact.id);
+        }
+      });
+
+      if (!pipeline.stages || pipeline.stages.length === 0) {
+        return;
+      }
+
+      pipeline.stages.forEach(stage => {
+        if (stage.manifestArtifactId && stage.manifestArtifactId === expectedArtifact.id) {
+          delete stage.manifestArtifactId;
+        }
+        if (stage.requiredArtifactIds && stage.requiredArtifactIds.length > 0) {
+          stage.requiredArtifactIds = stage.requiredArtifactIds.filter(id => id !== expectedArtifact.id);
+        }
+        if (stage.clusters && stage.clusters.length > 0) {
+          stage.clusters.forEach(cluster => {
+            if (cluster.imageArtifactId === expectedArtifact.id) {
+              delete cluster.imageArtifactId;
+
+              if (cluster.imageSource === 'artifact') {
+                delete cluster.imageSource;
+              }
+            }
+          });
+        }
+      });
     };
 
     this.addArtifact = () => {
