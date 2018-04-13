@@ -2,25 +2,26 @@
 
 const angular = require('angular');
 
-import {
-  ACCOUNT_SERVICE,
-  INFRASTRUCTURE_CACHE_SERVICE,
-  SECURITY_GROUP_WRITER,
-  TASK_MONITOR_BUILDER
-} from '@spinnaker/core';
+import { ACCOUNT_SERVICE, InfrastructureCaches, SECURITY_GROUP_WRITER, TASK_MONITOR_BUILDER } from '@spinnaker/core';
 
-module.exports = angular.module('spinnaker.google.securityGroup.edit.controller', [
-  require('@uirouter/angularjs').default,
-  ACCOUNT_SERVICE,
-  INFRASTRUCTURE_CACHE_SERVICE,
-  TASK_MONITOR_BUILDER,
-  SECURITY_GROUP_WRITER
-])
-  .controller('gceEditSecurityGroupCtrl', function($scope, $uibModalInstance, $state,
-                                                   accountService,
-                                                   taskMonitorBuilder, infrastructureCaches,
-                                                   application, securityGroup, securityGroupWriter, $controller) {
-
+module.exports = angular
+  .module('spinnaker.google.securityGroup.edit.controller', [
+    require('@uirouter/angularjs').default,
+    ACCOUNT_SERVICE,
+    TASK_MONITOR_BUILDER,
+    SECURITY_GROUP_WRITER,
+  ])
+  .controller('gceEditSecurityGroupCtrl', function(
+    $scope,
+    $uibModalInstance,
+    $state,
+    accountService,
+    taskMonitorBuilder,
+    application,
+    securityGroup,
+    securityGroupWriter,
+    $controller,
+  ) {
     $scope.pages = {
       targets: require('./createSecurityGroupTargets.html'),
       sourceFilters: require('./createSecurityGroupSourceFilters.html'),
@@ -33,13 +34,16 @@ module.exports = angular.module('spinnaker.google.securityGroup.edit.controller'
       refreshingSecurityGroups: false,
     };
 
-    angular.extend(this, $controller('gceConfigSecurityGroupMixin', {
-      $scope: $scope,
-      $uibModalInstance: $uibModalInstance,
-      application: application,
-      securityGroup: securityGroup,
-      mode: 'edit',
-    }));
+    angular.extend(
+      this,
+      $controller('gceConfigSecurityGroupMixin', {
+        $scope: $scope,
+        $uibModalInstance: $uibModalInstance,
+        application: application,
+        securityGroup: securityGroup,
+        mode: 'edit',
+      }),
+    );
 
     $scope.isNew = false;
 
@@ -51,13 +55,13 @@ module.exports = angular.module('spinnaker.google.securityGroup.edit.controller'
     });
 
     securityGroup.sourceRanges = _.map(securityGroup.sourceRanges, function(sourceRange) {
-      return {value: sourceRange};
+      return { value: sourceRange };
     });
 
     securityGroup.ipIngress = _.chain(securityGroup.ipIngressRules)
       .map(function(rule) {
         if (rule.portRanges && rule.portRanges.length > 0) {
-          return rule.portRanges.map(function (portRange) {
+          return rule.portRanges.map(function(portRange) {
             return {
               type: rule.protocol,
               startPort: portRange.startPort,
@@ -65,9 +69,11 @@ module.exports = angular.module('spinnaker.google.securityGroup.edit.controller'
             };
           });
         } else {
-          return [{
-            type: rule.protocol,
-          }];
+          return [
+            {
+              type: rule.protocol,
+            },
+          ];
         }
       })
       .flatten()
@@ -76,11 +82,11 @@ module.exports = angular.module('spinnaker.google.securityGroup.edit.controller'
     securityGroup.sourceTags = securityGroup.sourceTags || [];
 
     this.getSecurityGroupRefreshTime = function() {
-      return infrastructureCaches.get('securityGroups').getStats().ageMax;
+      return InfrastructureCaches.get('securityGroups').getStats().ageMax;
     };
 
     this.addSourceCIDR = function(sourceRanges) {
-      sourceRanges.push({value: '0.0.0.0/0'});
+      sourceRanges.push({ value: '0.0.0.0/0' });
     };
 
     this.removeSourceCIDR = function(sourceRanges, index) {
@@ -99,34 +105,32 @@ module.exports = angular.module('spinnaker.google.securityGroup.edit.controller'
       ruleset.splice(index, 1);
     };
 
-    this.upsert = function () {
-      $scope.taskMonitor.submit(
-        function() {
-          var allowed = _.map($scope.securityGroup.ipIngress, function(ipIngressRule) {
-            var rule = {
-              ipProtocol: ipIngressRule.type,
-            };
+    this.upsert = function() {
+      $scope.taskMonitor.submit(function() {
+        var allowed = _.map($scope.securityGroup.ipIngress, function(ipIngressRule) {
+          var rule = {
+            ipProtocol: ipIngressRule.type,
+          };
 
-            if (ipIngressRule.startPort && ipIngressRule.endPort) {
-              rule.portRanges = [ipIngressRule.startPort + '-' + ipIngressRule.endPort];
-            }
+          if (ipIngressRule.startPort && ipIngressRule.endPort) {
+            rule.portRanges = [ipIngressRule.startPort + '-' + ipIngressRule.endPort];
+          }
 
-            return rule;
-          });
+          return rule;
+        });
 
-          return securityGroupWriter.upsertSecurityGroup($scope.securityGroup, application, 'Update', {
-            cloudProvider: 'gce',
-            securityGroupName: $scope.securityGroup.name,
-            sourceRanges: _.uniq(_.map($scope.securityGroup.sourceRanges, 'value')),
-            allowed: allowed,
-            targetTags: $scope.securityGroup.targetTags || [],
-            region: 'global',
-          });
-        }
-      );
+        return securityGroupWriter.upsertSecurityGroup($scope.securityGroup, application, 'Update', {
+          cloudProvider: 'gce',
+          securityGroupName: $scope.securityGroup.name,
+          sourceRanges: _.uniq(_.map($scope.securityGroup.sourceRanges, 'value')),
+          allowed: allowed,
+          targetTags: $scope.securityGroup.targetTags || [],
+          region: 'global',
+        });
+      });
     };
 
-    this.cancel = function () {
+    this.cancel = function() {
       $uibModalInstance.dismiss();
     };
   });

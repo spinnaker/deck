@@ -3,10 +3,10 @@ import { set } from 'lodash';
 import { IGceAutoHealingPolicy } from 'google/domain/autoHealingPolicy';
 
 class GceAutoHealingPolicySelector implements IController {
-  public httpHealthChecks: string[];
+  public healthChecks: string[];
   public autoHealingPolicy: IGceAutoHealingPolicy;
   public enabled: boolean;
-  public viewState: {maxUnavailableMetric: 'percent' | 'fixed'};
+  public viewState: { maxUnavailableMetric: 'percent' | 'fixed' };
   private setAutoHealingPolicy: Function;
 
   public $onInit(): void {
@@ -42,7 +42,7 @@ class GceAutoHealingPolicySelectorComponent implements IComponentOptions {
   public bindings: any = {
     onHealthCheckRefresh: '&',
     setAutoHealingPolicy: '&',
-    httpHealthChecks: '<',
+    healthChecks: '<',
     autoHealingPolicy: '<',
     enabled: '<',
     labelColumns: '@?',
@@ -52,6 +52,7 @@ class GceAutoHealingPolicySelectorComponent implements IComponentOptions {
 }
 
 export const GCE_AUTOHEALING_POLICY_SELECTOR = 'spinnaker.gce.autoHealingPolicy.selector.component';
-module(GCE_AUTOHEALING_POLICY_SELECTOR, [])
-  .component('gceAutoHealingPolicySelector', new GceAutoHealingPolicySelectorComponent());
-
+module(GCE_AUTOHEALING_POLICY_SELECTOR, []).component(
+  'gceAutoHealingPolicySelector',
+  new GceAutoHealingPolicySelectorComponent(),
+);

@@ -1,6 +1,4 @@
-import { module } from 'angular';
-
-import { IComponentOptions } from 'angular';
+import { module, IComponentOptions } from 'angular';
 
 export interface ICommit {
   authorDisplayName: string;
@@ -13,7 +11,7 @@ export interface ICommit {
 
 class CommitHistoryComponent implements IComponentOptions {
   public bindings: any = {
-    commits: '<'
+    commits: '<',
   };
   public template = `
   <div ng-if="$ctrl.commits && $ctrl.commits.length">

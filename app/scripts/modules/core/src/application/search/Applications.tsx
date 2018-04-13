@@ -5,7 +5,7 @@ import { SelectCallback } from 'react-bootstrap';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 
 import { IAccount } from 'core/account';
-import { ICache } from 'core/cache';
+import { ICache, ViewStateCache } from 'core/cache';
 import { IApplicationSummary } from 'core/application';
 import { ApplicationTable } from './ApplicationsTable';
 import { PaginationControls } from './PaginationControls';
@@ -53,8 +53,8 @@ export class Applications extends React.Component<{}, IApplicationsState> {
   }
 
   private applyCachedViewState() {
-    const { viewStateCache } = ReactInjector;
-    this.applicationsCache = viewStateCache.get('applications') || viewStateCache.createCache('applications', { version: 2 });
+    this.applicationsCache =
+      ViewStateCache.get('applications') || ViewStateCache.createCache('applications', { version: 2 });
     const viewState: IViewState = this.applicationsCache.get('#global') || { filter: '', sort: '+name' };
     this.filter$.next(viewState.filter);
     this.sort$.next(viewState.sort);
@@ -62,14 +62,16 @@ export class Applications extends React.Component<{}, IApplicationsState> {
 
   public componentDidMount() {
     const appMatchesQuery = (query: string, app: IApplicationSummary) => {
-      const searchableValues = [app.name, app.email, app.accounts, app.description].filter(f => !!f).map(f => f.toLowerCase());
+      const searchableValues = [app.name, app.email, app.accounts, app.description]
+        .filter(f => !!f)
+        .map(f => f.toLowerCase());
       return searchableValues.some(value => value.includes(query));
     };
 
     const appSort = (column: string, a: any, b: any) => {
       const reverse = column[0] === '-';
       const key = reverse ? column.slice(1) : column;
-      return ((a[key] || '').localeCompare(b[key] || '')) * (reverse ? -1 : 1);
+      return (a[key] || '').localeCompare(b[key] || '') * (reverse ? -1 : 1);
     };
 
     Observable.fromPromise(ReactInjector.applicationReader.listApplications())
@@ -80,8 +82,7 @@ export class Applications extends React.Component<{}, IApplicationsState> {
       .map(([apps, filter, sort]) => {
         const viewState: IViewState = { filter, sort };
         this.applicationsCache.put('#global', viewState);
-        return apps.filter(app => appMatchesQuery(filter, app))
-          .sort((a, b) => appSort(sort, a, b));
+        return apps.filter(app => appMatchesQuery(filter, app)).sort((a, b) => appSort(sort, a, b));
       })
 
       // validate and update pagination
@@ -100,19 +101,22 @@ export class Applications extends React.Component<{}, IApplicationsState> {
         const { currentPage, itemsPerPage } = pagination;
         const start = (currentPage - 1) * itemsPerPage;
         const end = start + itemsPerPage;
-        this.setState({ applications: applications.slice(start, end), pagination })
+        this.setState({ applications: applications.slice(start, end), pagination });
       });
   }
 
   private toggleSort(column: string): void {
     const current = this.sort$.getValue();
-    const newSort = (current === column) ? `-${column}` : column;
+    const newSort = current === column ? `-${column}` : column;
     this.sort$.next(newSort);
   }
 
   private fixAccount(application: IApplicationSummary): IApplicationSummary {
     if (application.accounts) {
-      application.accounts = application.accounts.split(',').sort().join(', ');
+      application.accounts = application.accounts
+        .split(',')
+        .sort()
+        .join(', ');
     }
     return application;
   }
@@ -121,7 +125,7 @@ export class Applications extends React.Component<{}, IApplicationsState> {
     return {
       currentPage: 1,
       itemsPerPage: 12,
-      maxSize: 12
+      maxSize: 12,
     };
   }
 
@@ -132,7 +136,7 @@ export class Applications extends React.Component<{}, IApplicationsState> {
 
     const LoadingSpinner = () => (
       <div className="horizontal middle center" style={{ marginBottom: '250px', height: '150px' }}>
-        <Spinner size="medium"/>
+        <Spinner size="medium" />
       </div>
     );
 
@@ -162,17 +166,24 @@ export class Applications extends React.Component<{}, IApplicationsState> {
         </div>
 
         <div className="infrastructure-section container">
-          {!applications && <LoadingSpinner/>}
+          {!applications && <LoadingSpinner />}
 
-          {applications && applications.length === 0 && (
-            <h4>No matches found for '{this.filter$.value}'</h4>
-          )}
-          {applications && applications.length > 0 && (
-            <div className="infrastructure-section">
-              <ApplicationTable currentSort={currentSort} applications={applications} toggleSort={(column) => this.toggleSort(column)}/>
-              <PaginationControls onPageChanged={changePage} activePage={currentPage} totalPages={Math.ceil(maxSize / itemsPerPage)} />
-            </div>
-          )}
+          {applications && applications.length === 0 && <h4>No matches found for '{this.filter$.value}'</h4>}
+          {applications &&
+            applications.length > 0 && (
+              <div className="infrastructure-section">
+                <ApplicationTable
+                  currentSort={currentSort}
+                  applications={applications}
+                  toggleSort={column => this.toggleSort(column)}
+                />
+                <PaginationControls
+                  onPageChanged={changePage}
+                  activePage={currentPage}
+                  totalPages={Math.ceil(maxSize / itemsPerPage)}
+                />
+              </div>
+            )}
         </div>
       </div>
     );

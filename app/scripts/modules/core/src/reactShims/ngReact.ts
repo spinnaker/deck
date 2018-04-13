@@ -6,7 +6,7 @@ import { AccountSelectFieldWrapperComponent } from '../account/accountSelectFiel
 import { AddEntityTagLinksWrapperComponent } from 'core/entityTag/addEntityTagLinks.component';
 import { ButtonBusyIndicatorComponent } from '../forms/buttonBusyIndicator/buttonBusyIndicator.component';
 import { CopyToClipboardComponent } from '../utils/clipboard/copyToClipboard.component';
-import { DiffViewProps } from '../pipeline/config/actions/history/DiffView';
+import { IDiffViewProps } from '../pipeline/config/actions/history/DiffView';
 import { EntitySourceComponent } from 'core/entityTag/entitySource.component';
 import { HelpFieldWrapperComponent } from '../help/helpField.component';
 import { IAccountSelectFieldProps } from 'core/account/AccountSelectField';
@@ -33,8 +33,8 @@ import { ViewChangesLinkWrapper } from 'core/diffs/viewChangesLink.component';
 import { ViewScalingActivitiesLink } from 'core/serverGroup/details/scalingActivities/viewScalingActivitiesLink.component';
 import { diffViewComponent } from '../pipeline/config/actions/history/diffView.component';
 
+// prettier-ignore
 export class NgReactInjector extends ReactInject {
-
   public $injectorProxy = {} as IInjectorService;
 
   // Reactified components
@@ -42,7 +42,7 @@ export class NgReactInjector extends ReactInject {
   public AddEntityTagLinks: React.ComponentClass<IAddEntityTagLinksProps>                     = angular2react('addEntityTagLinksWrapper', new AddEntityTagLinksWrapperComponent(), this.$injectorProxy) as any;
   public ButtonBusyIndicator: React.ComponentClass<IButtonBusyIndicatorProps>                 = angular2react('buttonBusyIndicator', new ButtonBusyIndicatorComponent(), this.$injectorProxy) as any;
   public CopyToClipboard: React.ComponentClass<ICopyToClipboardProps>                         = angular2react('copyToClipboard', new CopyToClipboardComponent(), this.$injectorProxy) as any;
-  public DiffView: React.ComponentClass<DiffViewProps>                                        = angular2react('diffView', diffViewComponent, this.$injectorProxy) as any;
+  public DiffView: React.ComponentClass<IDiffViewProps>                                        = angular2react('diffView', diffViewComponent, this.$injectorProxy) as any;
   public EntitySource: React.ComponentClass<IEntitySourceProps>                               = angular2react('entitySource', new EntitySourceComponent(), this.$injectorProxy) as any;
   public HelpField: React.ComponentClass<IHelpFieldProps>                                     = angular2react('helpFieldWrapper', new HelpFieldWrapperComponent(), this.$injectorProxy) as any;
   public InsightLayout: React.ComponentClass<IInsightLayoutProps>                             = angular2react('insightLayout', new InsightLayoutComponent(), this.$injectorProxy) as any;
@@ -63,7 +63,7 @@ export class NgReactInjector extends ReactInject {
 
     Object.keys($injector)
       .filter(key => typeof realInjector[key] === 'function')
-      .forEach(key => proxyInjector[key] = realInjector[key].bind(realInjector));
+      .forEach(key => (proxyInjector[key] = realInjector[key].bind(realInjector)));
   }
 }
 

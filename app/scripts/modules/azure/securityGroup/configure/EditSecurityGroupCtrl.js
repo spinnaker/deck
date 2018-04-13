@@ -5,30 +5,38 @@ const angular = require('angular');
 import {
   ACCOUNT_SERVICE,
   CACHE_INITIALIZER_SERVICE,
-  INFRASTRUCTURE_CACHE_SERVICE,
-  SECURITY_GROUP_READER,
-  TASK_MONITOR_BUILDER
-} from '@spinnaker/core';
-
-module.exports = angular.module('spinnaker.azure.securityGroup.azure.edit.controller', [
-  require('@uirouter/angularjs').default,
-  ACCOUNT_SERVICE,
-  INFRASTRUCTURE_CACHE_SERVICE,
-  CACHE_INITIALIZER_SERVICE,
+  InfrastructureCaches,
   SECURITY_GROUP_READER,
   TASK_MONITOR_BUILDER,
-  require('../securityGroup.write.service.js').name,
-])
-  .controller('azureEditSecurityGroupCtrl', function($scope, $uibModalInstance, $exceptionHandler, $state,
-                                                     accountService, securityGroupReader,
-                                                     taskMonitorBuilder, cacheInitializer, infrastructureCaches,
-                                                     application, securityGroup, azureSecurityGroupWriter) {
+} from '@spinnaker/core';
 
+module.exports = angular
+  .module('spinnaker.azure.securityGroup.azure.edit.controller', [
+    require('@uirouter/angularjs').default,
+    ACCOUNT_SERVICE,
+    CACHE_INITIALIZER_SERVICE,
+    SECURITY_GROUP_READER,
+    TASK_MONITOR_BUILDER,
+    require('../securityGroup.write.service.js').name,
+  ])
+  .controller('azureEditSecurityGroupCtrl', function(
+    $scope,
+    $uibModalInstance,
+    $exceptionHandler,
+    $state,
+    accountService,
+    securityGroupReader,
+    taskMonitorBuilder,
+    cacheInitializer,
+    application,
+    securityGroup,
+    azureSecurityGroupWriter,
+  ) {
     $scope.pages = {
       ingress: require('./createSecurityGroupIngress.html'),
     };
 
-    securityGroup.securityRules = _.map(securityGroup.securityRules,function(rule) {
+    securityGroup.securityRules = _.map(securityGroup.securityRules, function(rule) {
       var temp = rule.destinationPortRange.split('-');
       rule.startPort = Number(temp[0]);
       rule.endPort = Number(temp[1]);
@@ -49,7 +57,7 @@ module.exports = angular.module('spinnaker.azure.securityGroup.azure.edit.contro
     });
 
     this.getSecurityGroupRefreshTime = function() {
-      return infrastructureCaches.get('securityGroups').getStats().ageMax;
+      return InfrastructureCaches.get('securityGroups').getStats().ageMax;
     };
 
     this.refreshSecurityGroups = function() {
@@ -62,10 +70,12 @@ module.exports = angular.module('spinnaker.azure.securityGroup.azure.edit.contro
     };
 
     function initializeSecurityGroups() {
-      return securityGroupReader.getAllSecurityGroups().then(function (securityGroups) {
+      return securityGroupReader.getAllSecurityGroups().then(function(securityGroups) {
         var account = securityGroup.accountName,
           region = securityGroup.region,
-          availableGroups = _.filter(securityGroups[account].azure[region], { /*vpcId: vpcId*/ });
+          availableGroups = _.filter(securityGroups[account].azure[region], {
+            /*vpcId: vpcId*/
+          });
         $scope.availableSecurityGroups = _.map(availableGroups, 'name');
       });
     }
@@ -82,7 +92,7 @@ module.exports = angular.module('spinnaker.azure.securityGroup.azure.edit.contro
         destinationAddressPrefix: '*',
         destinationPortRange: '7001-7001',
         startPort: 7001,
-        endPort: 7001
+        endPort: 7001,
       });
     };
 
@@ -110,10 +120,8 @@ module.exports = angular.module('spinnaker.azure.securityGroup.azure.edit.contro
       application.securityGroups.onNextRefresh($scope, onApplicationRefresh);
     }
 
-    this.portUpdated = function(ruleset, index)
-    {
-        ruleset[index].destinationPortRange =
-            ruleset[index].startPort + '-' + ruleset[index].endPort;
+    this.portUpdated = function(ruleset, index) {
+      ruleset[index].destinationPortRange = ruleset[index].startPort + '-' + ruleset[index].endPort;
     };
 
     this.removeRule = function(ruleset, index) {
@@ -121,13 +129,11 @@ module.exports = angular.module('spinnaker.azure.securityGroup.azure.edit.contro
     };
 
     this.moveUp = function(ruleset, index) {
-      if(index === 0)
-        return;
+      if (index === 0) return;
       swapRules(ruleset, index, index - 1);
     };
     this.moveDown = function(ruleset, index) {
-      if(index === ruleset.length - 1)
-        return;
+      if (index === ruleset.length - 1) return;
       swapRules(ruleset, index, index + 1);
     };
 
@@ -146,25 +152,23 @@ module.exports = angular.module('spinnaker.azure.securityGroup.azure.edit.contro
 
     $scope.taskMonitor.onTaskComplete = $uibModalInstance.dismiss;
 
-    this.upsert = function () {
-      $scope.taskMonitor.submit(
-        function() {
-          let params = {
-            cloudProvider: 'azure',
-            appName: application.name,
-            securityGroupName: $scope.securityGroup.name,
-            region: $scope.securityGroup.region,
-            subnet : 'none',
-            vpcId: 'null'
-            };
-          $scope.securityGroup.type = 'upsertSecurityGroup';
+    this.upsert = function() {
+      $scope.taskMonitor.submit(function() {
+        let params = {
+          cloudProvider: 'azure',
+          appName: application.name,
+          securityGroupName: $scope.securityGroup.name,
+          region: $scope.securityGroup.region,
+          subnet: 'none',
+          vpcId: 'null',
+        };
+        $scope.securityGroup.type = 'upsertSecurityGroup';
 
-          return azureSecurityGroupWriter.upsertSecurityGroup($scope.securityGroup, application, 'Update', params);
-        }
-      );
+        return azureSecurityGroupWriter.upsertSecurityGroup($scope.securityGroup, application, 'Update', params);
+      });
     };
 
-    this.cancel = function () {
+    this.cancel = function() {
       $uibModalInstance.dismiss();
     };
   });

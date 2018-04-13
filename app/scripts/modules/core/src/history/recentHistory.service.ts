@@ -3,7 +3,7 @@ import * as moment from 'moment';
 import { omit, omitBy, isUndefined, sortBy, find } from 'lodash';
 
 import { UUIDGenerator } from 'core/utils/uuid.service';
-import { DECK_CACHE_SERVICE, ICache, DeckCacheService } from 'core/cache/deckCache.service';
+import { ICache, DeckCacheFactory } from 'core/cache';
 import { Ng1StateDeclaration } from '@uirouter/angularjs';
 import IAngularEvent = angular.IAngularEvent;
 
@@ -25,16 +25,14 @@ export interface IRecentHistoryEntry {
 const MAX_ITEMS = 5;
 
 export class RecentHistoryService {
-
   private cache: ICache;
 
-  constructor(deckCacheFactory: DeckCacheService) {
-    'ngInject';
-    deckCacheFactory.createCache('history', 'user', {
+  constructor() {
+    DeckCacheFactory.createCache('history', 'user', {
       version: 3,
       maxAge: moment.duration(90, 'days').asMilliseconds(),
     });
-    this.cache = deckCacheFactory.getCache('history', 'user');
+    this.cache = DeckCacheFactory.getCache('history', 'user');
   }
 
   public getItems(type: any): IRecentHistoryEntry[] {
@@ -58,14 +56,14 @@ export class RecentHistoryService {
 
   public addItem(type: string, state: string, params: any, keyParams: string[] = []) {
     const items: IRecentHistoryEntry[] = this.getItems(type).slice(0, MAX_ITEMS),
-          existing: IRecentHistoryEntry = this.getExisting(items, params, keyParams),
-          entry = {
-            params: params,
-            state: state,
-            accessTime: new Date().getTime(),
-            extraData: {},
-            id: UUIDGenerator.generateUuid(),
-          };
+      existing: IRecentHistoryEntry = this.getExisting(items, params, keyParams),
+      entry = {
+        params,
+        state,
+        accessTime: new Date().getTime(),
+        extraData: {},
+        id: UUIDGenerator.generateUuid(),
+      };
     if (existing) {
       items.splice(items.indexOf(existing), 1);
     }
@@ -78,7 +76,7 @@ export class RecentHistoryService {
 
   public removeItem(type: string, id: string): void {
     const items: IRecentHistoryEntry[] = this.getItems(type),
-          existing: IRecentHistoryEntry = items.find(i => i.id === id);
+      existing: IRecentHistoryEntry = items.find(i => i.id === id);
 
     if (existing) {
       items.splice(items.indexOf(existing), 1);
@@ -116,7 +114,7 @@ export class RecentHistoryService {
   public removeByAppName(appName: string) {
     const type = 'applications';
     const items: IRecentHistoryEntry[] = this.getItems(type);
-    const remaining: IRecentHistoryEntry[] = items.filter((item) => item.params.application !== appName);
+    const remaining: IRecentHistoryEntry[] = items.filter(item => item.params.application !== appName);
     if (remaining) {
       this.cache.put(type, remaining);
     }
@@ -131,9 +129,8 @@ export class RecentHistoryService {
 }
 
 export const RECENT_HISTORY_SERVICE = 'spinnaker.core.history.recentHistory.service';
-module(RECENT_HISTORY_SERVICE, [
-  DECK_CACHE_SERVICE,
-]).service('recentHistoryService', RecentHistoryService)
+module(RECENT_HISTORY_SERVICE, [])
+  .service('recentHistoryService', RecentHistoryService)
   .run(($rootScope: ng.IRootScopeService, recentHistoryService: RecentHistoryService) => {
     $rootScope.$on('$stateChangeSuccess', (_event: IAngularEvent, toState: Ng1StateDeclaration, toParams: any) => {
       if (toState.data && toState.data.history) {

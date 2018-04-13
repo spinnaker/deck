@@ -122,7 +122,6 @@ export interface IDataSourceConfig {
    * (Optional) The application has potentially two default fields for each provider: region and credentials. These fields will
    * only have a value if every data source that contributes values has just one unique value for each provider. Useful
    * for setting initial values in modal dialogs when creating new server groups, load balancers, etc.
-
    * If the data source should contribute to the application's default region or credentials, this field should be set
    * to the field name that represents the provider on each data item.
    */
@@ -263,7 +262,7 @@ export class ApplicationDataSource implements IDataSourceConfig {
    * Dumb queue to fire when the most recent refresh call finishes
    * (will go away when we switch from Promises to Observables)
    */
-  private refreshQueue: IDeferred<void>[] = [];
+  private refreshQueue: Array<IDeferred<void>> = [];
 
   /**
    * Called when a method mutates some item in the data source's data, e.g. when a running execution is updated
@@ -275,12 +274,14 @@ export class ApplicationDataSource implements IDataSourceConfig {
     }
   }
 
-  constructor(config: IDataSourceConfig,
-              private application: Application,
-              private $q: IQService,
-              private $log: ILogService,
-              private $filter: any,
-              $uiRouter: UIRouter) {
+  constructor(
+    config: IDataSourceConfig,
+    private application: Application,
+    private $q: IQService,
+    private $log: ILogService,
+    private $filter: any,
+    $uiRouter: UIRouter,
+  ) {
     Object.assign(this, config);
 
     if (!config.label && this.$filter) {
@@ -424,7 +425,7 @@ export class ApplicationDataSource implements IDataSourceConfig {
     this.currentLoadCall += 1;
     const loadCall = this.currentLoadCall;
     this.loader(this.application)
-      .then((result) => {
+      .then(result => {
         if (loadCall < this.currentLoadCall) {
           // discard, more recent call has come in
           // TODO: this will all be cleaner with Observables
@@ -448,7 +449,7 @@ export class ApplicationDataSource implements IDataSourceConfig {
         this.refreshQueue.forEach(d => d.resolve());
         this.refreshQueue.length = 0;
       })
-      .catch((rejection) => {
+      .catch(rejection => {
         if (loadCall === this.currentLoadCall) {
           this.$log.warn(`Error retrieving ${this.key}`, rejection);
           this.loading = false;

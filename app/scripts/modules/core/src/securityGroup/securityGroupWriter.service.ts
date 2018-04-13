@@ -1,7 +1,7 @@
 import { IPromise, module } from 'angular';
 
 import { Application } from 'core/application/application.model';
-import { INFRASTRUCTURE_CACHE_SERVICE, InfrastructureCacheService } from 'core/cache/infrastructureCaches.service';
+import { InfrastructureCaches } from 'core/cache/infrastructureCaches';
 import { ISecurityGroup, ITask } from 'core/domain';
 
 import { IJob, TASK_EXECUTOR, TaskExecutor } from 'core/task/taskExecutor';
@@ -12,16 +12,15 @@ export interface ISecurityGroupJob extends IJob {
   securityGroupName: string;
 }
 export class SecurityGroupWriter {
-
-  constructor(private infrastructureCaches: InfrastructureCacheService,
-              private taskExecutor: TaskExecutor) {
+  constructor(private taskExecutor: TaskExecutor) {
     'ngInject';
   }
 
-  public deleteSecurityGroup(securityGroup: ISecurityGroup,
-                             application: Application,
-                             params: ISecurityGroupJob): IPromise<ITask> {
-
+  public deleteSecurityGroup(
+    securityGroup: ISecurityGroup,
+    application: Application,
+    params: ISecurityGroupJob,
+  ): IPromise<ITask> {
     params.type = 'deleteSecurityGroup';
     params.securityGroupName = securityGroup.name;
     params.regions = [securityGroup.region];
@@ -29,35 +28,35 @@ export class SecurityGroupWriter {
 
     const operation: IPromise<ITask> = this.taskExecutor.executeTask({
       job: [params],
-      application: application,
-      description: `Delete Security Group: ${securityGroup.name}`
+      application,
+      description: `Delete Security Group: ${securityGroup.name}`,
     });
-    this.infrastructureCaches.clearCache('securityGroups');
+    InfrastructureCaches.clearCache('securityGroups');
 
     return operation;
   }
 
-  public upsertSecurityGroup(securityGroup: ISecurityGroup,
-                             application: Application,
-                             description: string,
-                             params: any = {}): IPromise<ITask> {
-
+  public upsertSecurityGroup(
+    securityGroup: ISecurityGroup,
+    application: Application,
+    description: string,
+    params: any = {},
+  ): IPromise<ITask> {
     params.type = 'upsertSecurityGroup';
     params.credentials = securityGroup.credentials || securityGroup.accountName;
-    const job: ISecurityGroupJob = Object.assign(securityGroup, params);
+    const job: ISecurityGroupJob = { ...securityGroup, ...params };
 
     const operation: IPromise<ITask> = this.taskExecutor.executeTask({
       job: [job],
-      application: application,
-      description: `${description} Security Group: ${securityGroup.name}`
+      application,
+      description: `${description} Security Group: ${securityGroup.name}`,
     });
 
-    this.infrastructureCaches.clearCache('securityGroups');
+    InfrastructureCaches.clearCache('securityGroups');
 
     return operation;
   }
 }
 
 export const SECURITY_GROUP_WRITER = 'spinnaker.core.securityGroup.write.service';
-module(SECURITY_GROUP_WRITER, [TASK_EXECUTOR, INFRASTRUCTURE_CACHE_SERVICE])
-  .service('securityGroupWriter', SecurityGroupWriter);
+module(SECURITY_GROUP_WRITER, [TASK_EXECUTOR]).service('securityGroupWriter', SecurityGroupWriter);

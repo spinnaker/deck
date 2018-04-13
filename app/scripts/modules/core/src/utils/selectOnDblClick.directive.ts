@@ -1,4 +1,4 @@
-/** based on http://jsfiddle.net/epinapala/WdeTM/4/  **/
+/** based on http://jsfiddle.net/epinapala/WdeTM/4/ */
 import { IController, IDirective, IScope, module } from 'angular';
 import { DirectiveFactory } from './tsDecorators/directiveFactoryDecorator';
 
@@ -37,5 +37,4 @@ class DoubleClickDirective implements IDirective {
 }
 
 export const SELECT_ON_DOUBLE_CLICK_DIRECTIVE = 'spinnaker.core.utils.selectOnDblClick';
-module(SELECT_ON_DOUBLE_CLICK_DIRECTIVE, [])
-  .directive('selectOnDblClick', <any>DoubleClickDirective);
+module(SELECT_ON_DOUBLE_CLICK_DIRECTIVE, []).directive('selectOnDblClick', DoubleClickDirective as any);

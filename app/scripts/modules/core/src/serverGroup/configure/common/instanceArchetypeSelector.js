@@ -2,11 +2,14 @@
 
 const angular = require('angular');
 
-module.exports = angular.module('spinnaker.core.serverGroup.configure.common.instanceArchetypeSelector', [
-  require('./costFactor.js').name,
-  require('../../../presentation/isVisible/isVisible.directive.js').name,
-  require('./dirtyInstanceTypeNotification.component.js').name
-])
+import { InfrastructureCaches } from 'core/cache';
+
+module.exports = angular
+  .module('spinnaker.core.serverGroup.configure.common.instanceArchetypeSelector', [
+    require('./costFactor.js').name,
+    require('../../../presentation/isVisible/isVisible.directive.js').name,
+    require('./dirtyInstanceTypeNotification.component.js').name,
+  ])
   .directive('instanceArchetypeSelector', function() {
     return {
       restrict: 'E',
@@ -15,10 +18,10 @@ module.exports = angular.module('spinnaker.core.serverGroup.configure.common.ins
       },
       templateUrl: require('./instanceArchetypeDirective.html'),
       controller: 'InstanceArchetypeSelectorCtrl',
-      controllerAs: 'instanceArchetypeCtrl'
+      controllerAs: 'instanceArchetypeCtrl',
     };
   })
-  .controller('InstanceArchetypeSelectorCtrl', function($scope, instanceTypeService, infrastructureCaches, serverGroupConfigurationService) {
+  .controller('InstanceArchetypeSelectorCtrl', function($scope, instanceTypeService, serverGroupConfigurationService) {
     var controller = this;
     instanceTypeService.getCategories($scope.command.selectedProvider).then(function(categories) {
       $scope.instanceProfiles = categories;
@@ -34,7 +37,7 @@ module.exports = angular.module('spinnaker.core.serverGroup.configure.common.ins
       controller.selectInstanceType($scope.command.viewState.instanceProfile);
     });
 
-    this.selectInstanceType = function (type) {
+    this.selectInstanceType = function(type) {
       if ($scope.selectedInstanceProfile && $scope.selectedInstanceProfile.type === type) {
         type = null;
         $scope.selectedInstanceProfile = null;
@@ -48,9 +51,11 @@ module.exports = angular.module('spinnaker.core.serverGroup.configure.common.ins
     };
 
     this.updateInstanceTypeDetails = function() {
-      instanceTypeService.getInstanceTypeDetails($scope.command.selectedProvider, $scope.command.instanceType).then(function(instanceTypeDetails) {
-        $scope.command.viewState.instanceTypeDetails = instanceTypeDetails;
-      });
+      instanceTypeService
+        .getInstanceTypeDetails($scope.command.selectedProvider, $scope.command.instanceType)
+        .then(function(instanceTypeDetails) {
+          $scope.command.viewState.instanceTypeDetails = instanceTypeDetails;
+        });
     };
 
     if ($scope.command.region && $scope.command.instanceType && !$scope.command.viewState.instanceProfile) {
@@ -58,14 +63,16 @@ module.exports = angular.module('spinnaker.core.serverGroup.configure.common.ins
     }
 
     this.getInstanceTypeRefreshTime = function() {
-      return infrastructureCaches.get('instanceTypes').getStats().ageMax;
+      return InfrastructureCaches.get('instanceTypes').getStats().ageMax;
     };
 
     this.refreshInstanceTypes = function() {
       controller.refreshing = true;
-      serverGroupConfigurationService.refreshInstanceTypes($scope.command.selectedProvider, $scope.command).then(function() {
-        controller.refreshing = false;
-      });
+      serverGroupConfigurationService
+        .refreshInstanceTypes($scope.command.selectedProvider, $scope.command)
+        .then(function() {
+          controller.refreshing = false;
+        });
     };
 
     // if there are no instance types in the cache, try to reload them
@@ -76,14 +83,16 @@ module.exports = angular.module('spinnaker.core.serverGroup.configure.common.ins
     });
 
     this.getInstanceTypeRefreshTime = function() {
-      return infrastructureCaches.get('instanceTypes').getStats().ageMax;
+      return InfrastructureCaches.get('instanceTypes').getStats().ageMax;
     };
 
     this.refreshInstanceTypes = function() {
       controller.refreshing = true;
-      serverGroupConfigurationService.refreshInstanceTypes($scope.command.selectedProvider, $scope.command).then(function() {
-        controller.refreshing = false;
-      });
+      serverGroupConfigurationService
+        .refreshInstanceTypes($scope.command.selectedProvider, $scope.command)
+        .then(function() {
+          controller.refreshing = false;
+        });
     };
 
     // if there are no instance types in the cache, try to reload them
@@ -92,5 +101,4 @@ module.exports = angular.module('spinnaker.core.serverGroup.configure.common.ins
         controller.refreshInstanceTypes();
       }
     });
-
   });

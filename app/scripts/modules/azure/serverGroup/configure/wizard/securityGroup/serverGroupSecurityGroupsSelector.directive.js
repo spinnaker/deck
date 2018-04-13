@@ -2,8 +2,11 @@
 
 const angular = require('angular');
 
-module.exports = angular.module('spinnaker.azure.serverGroup.configure.securityGroupSelector.directive', [])
-  .directive('azureServerGroupSecurityGroupsSelector', function(azureServerGroupConfigurationService, infrastructureCaches) {
+import { InfrastructureCaches } from '@spinnaker/core';
+
+module.exports = angular
+  .module('spinnaker.azure.serverGroup.configure.securityGroupSelector.directive', [])
+  .directive('azureServerGroupSecurityGroupsSelector', function(azureServerGroupConfigurationService) {
     return {
       restrict: 'E',
       scope: {
@@ -11,9 +14,8 @@ module.exports = angular.module('spinnaker.azure.serverGroup.configure.securityG
       },
       templateUrl: require('./serverGroupSecurityGroupsSelector.directive.html'),
       link: function(scope) {
-
         scope.getSecurityGroupRefreshTime = function() {
-          return infrastructureCaches.get('securityGroups').getStats().ageMax;
+          return InfrastructureCaches.get('securityGroups').getStats().ageMax;
         };
 
         scope.refreshSecurityGroups = function() {
@@ -22,6 +24,6 @@ module.exports = angular.module('spinnaker.azure.serverGroup.configure.securityG
             scope.refreshing = false;
           });
         };
-      }
+      },
     };
   });

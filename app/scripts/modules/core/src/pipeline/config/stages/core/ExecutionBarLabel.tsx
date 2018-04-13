@@ -1,16 +1,53 @@
 import * as React from 'react';
+import { BindAll } from 'lodash-decorators';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 import { IExecutionStageLabelComponentProps } from 'core/domain';
 import { ExecutionWindowActions } from 'core/pipeline/config/stages/executionWindows/ExecutionWindowActions';
 import { HoverablePopover } from 'core/presentation/HoverablePopover';
 import { ReactInjector } from 'core/reactShims';
+import { Spinner } from 'core/widgets';
 
 export interface IExecutionBarLabelProps extends IExecutionStageLabelComponentProps {
   tooltip?: JSX.Element;
 }
 
-export class ExecutionBarLabel extends React.Component<IExecutionBarLabelProps> {
+export interface IExecutionBarLabelState {
+  hydrated: boolean;
+}
+
+@BindAll()
+export class ExecutionBarLabel extends React.Component<IExecutionBarLabelProps, IExecutionBarLabelState> {
+
+  private mounted = false;
+
+  constructor(props: IExecutionBarLabelProps) {
+    super(props);
+    this.state = {
+      hydrated: props.execution && props.execution.hydrated
+    };
+  }
+
+  private hydrate(): void {
+    const { execution, application } = this.props;
+    if (!execution) {
+      return;
+    }
+    ReactInjector.executionService.hydrate(application, execution).then(() => {
+      if (this.mounted) {
+        this.setState({ hydrated: true });
+      }
+    });
+  }
+
+  public componentDidMount() {
+    this.mounted = true;
+  }
+
+  public componentWillUnmount() {
+    this.mounted = false;
+  }
+
   public render() {
     const { stage, application, execution, executionMarker } = this.props;
     const inSuspendedExecutionWindow = stage.inSuspendedExecutionWindow;
@@ -18,21 +55,29 @@ export class ExecutionBarLabel extends React.Component<IExecutionBarLabelProps> 
       const executionWindowStage = stage.stages.find(s => s.type === 'restrictExecutionDuringTimeWindow');
       const template = (
         <div>
-          <div><b>{stage.name}</b> (waiting for execution window)</div>
-          <ExecutionWindowActions application={application} execution={execution} stage={executionWindowStage}/>
+          <div>
+            <b>{stage.name}</b> (waiting for execution window)
+          </div>
+          <ExecutionWindowActions application={application} execution={execution} stage={executionWindowStage} />
         </div>
       );
-      return (
-        <HoverablePopover template={template}>
-          {this.props.children}
-        </HoverablePopover>
-      );
+      return <HoverablePopover template={template}>{this.props.children}</HoverablePopover>;
     }
     if (executionMarker) {
       const LabelComponent = stage.labelComponent;
+      if (LabelComponent !== ExecutionBarLabel && !this.state.hydrated) {
+        const loadingTooltip = (<Tooltip id={stage.id}><Spinner size="small"/></Tooltip>);
+        return (
+          <span onMouseEnter={this.hydrate}>
+            <OverlayTrigger placement="top" overlay={loadingTooltip}>
+              {this.props.children}
+            </OverlayTrigger>
+          </span>
+        );
+      }
       const tooltip = (
         <Tooltip id={stage.id}>
-          <LabelComponent application={application} execution={execution} stage={stage}/>
+          <LabelComponent application={application} execution={execution} stage={stage} />
         </Tooltip>
       );
       return (
@@ -53,8 +98,6 @@ export class ExecutionBarLabel extends React.Component<IExecutionBarLabelProps> 
         }
       }
     }
-    return (
-      <span>{stageName}</span>
-    )
+    return <span>{stageName}</span>;
   }
 }

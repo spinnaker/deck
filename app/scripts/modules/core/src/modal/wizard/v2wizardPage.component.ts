@@ -16,7 +16,7 @@ import { V2_MODAL_WIZARD_SERVICE } from './v2modalWizard.service';
  *     scrolled into view
  */
 
-export interface WizardPageState {
+export interface IWizardPageState {
   rendered: boolean;
   done: boolean;
   dirty: boolean;
@@ -68,9 +68,11 @@ export class WizardPageController implements IController {
   /**
    * Internal state of the page, initialized based on other public fields
    */
-  public state: WizardPageState;
+  public state: IWizardPageState;
 
-  public constructor(private $scope: ng.IScope, private v2modalWizardService: any) { 'ngInject'; }
+  public constructor(private $scope: ng.IScope, private v2modalWizardService: any) {
+    'ngInject';
+  }
 
   public $onInit() {
     this.render = this.render !== false;
@@ -81,7 +83,7 @@ export class WizardPageController implements IController {
       done: this.done || !this.mandatory,
       dirty: false,
       required: this.mandatory,
-      markCompleteOnView: this.markCompleteOnView
+      markCompleteOnView: this.markCompleteOnView,
     };
     this.v2modalWizardService.registerPage(this.key, this.label, this.state);
     this.$scope.$on('$destroy', () => this.v2modalWizardService.setRendered(this.key, false));
@@ -103,5 +105,4 @@ class WizardPageComponent implements ng.IComponentOptions {
 }
 
 export const V2_WIZARD_PAGE_COMPONENT = 'spinnaker.core.modal.wizard.wizardPage.component';
-module(V2_WIZARD_PAGE_COMPONENT, [V2_MODAL_WIZARD_SERVICE])
-  .component('v2WizardPage', new WizardPageComponent());
+module(V2_WIZARD_PAGE_COMPONENT, [V2_MODAL_WIZARD_SERVICE]).component('v2WizardPage', new WizardPageComponent());

@@ -15,8 +15,6 @@ import { CancelModalService } from '../cancelModal/cancelModal.service';
 import { CloudProviderRegistry } from '../cloudProvider/cloudProvider.registry';
 import { ClusterFilterModel } from 'core/cluster/filter/clusterFilter.model';
 import { ClusterFilterService } from '../cluster/filter/clusterFilter.service';
-import { ClusterTargetBuilder } from '../entityTag/clusterTargetBuilder.service';
-import { CollapsibleSectionStateCache } from '../cache/collapsibleSectionStateCache';
 import { ConfirmationModalService } from '../confirmationModal/confirmationModal.service';
 import { EntityTagWriter } from '../entityTag';
 import { ExecutionDetailsSectionService } from 'core/pipeline/details/executionDetailsSection.service';
@@ -25,7 +23,6 @@ import { ExecutionFilterService } from '../pipeline/filter/executionFilter.servi
 import { ExecutionService } from '../pipeline/service/execution.service';
 import { ExecutionsTransformerService } from '../pipeline/service/executions.transformer.service';
 import { HelpContentsRegistry, IHelpContents } from 'core/help';
-import { InfrastructureCacheService } from '../cache/infrastructureCaches.service';
 import { InfrastructureSearchService } from '../search/infrastructure/infrastructureSearch.service';
 import { InfrastructureSearchServiceV2 } from 'core/search/infrastructure/infrastructureSearchV2.service';
 import { InsightFilterStateModel } from '../insight/insightFilterState.model';
@@ -33,7 +30,6 @@ import { LoadBalancerFilterModel } from '../loadBalancer/filter/loadBalancerFilt
 import { LoadBalancerFilterService } from '../loadBalancer/filter/loadBalancer.filter.service';
 import { LoadBalancerWriter } from '../loadBalancer/loadBalancer.write.service';
 import { ManualJudgmentService } from '../pipeline/config/stages/manualJudgment/manualJudgment.service';
-import { NamingService } from '../naming/naming.service';
 import { NotifierService } from '../widgets/notifier/notifier.service';
 import { OverrideRegistry } from '../overrideRegistry/override.registry';
 import { PageTitleService } from 'core/pageTitle';
@@ -44,7 +40,7 @@ import { PipelineConfigService } from '../pipeline/config/services/pipelineConfi
 import { PipelineConfigValidator } from '../pipeline/config/validation/pipelineConfig.validator';
 import { PipelineTemplateService } from '../pipeline/config/templates/pipelineTemplate.service';
 import { ProviderSelectionService } from '../cloudProvider/providerSelection/providerSelection.service';
-import { RecentHistoryService } from 'core/history/recentHistory.service'
+import { RecentHistoryService } from 'core/history/recentHistory.service';
 import { SearchService } from '../search/search.service';
 import { SchedulerFactory } from '../scheduler/scheduler.factory';
 import { ScrollToService } from '../utils/scrollTo/scrollTo.service';
@@ -62,7 +58,6 @@ import { VariableInputService } from '../pipeline/config/templates/inputs/variab
 import { VariableValidatorService } from '../pipeline/config/templates/validators/variableValidator.service';
 import { SkinSelectionService } from '../cloudProvider/skinSelection/skinSelection.service';
 import { SkinService } from '../cloudProvider/skin.service';
-import { ViewStateCacheService } from '../cache/viewStateCache.service';
 import { WaypointService } from '../utils/waypoints/waypoint.service';
 
 export abstract class ReactInject {
@@ -71,8 +66,8 @@ export abstract class ReactInject {
   public abstract initialize($injector: IInjectorService): void;
 }
 
+// prettier-ignore
 export class CoreReactInject extends ReactInject {
-
   // weird service because we wrap it
   private wrappedState: StateService;
 
@@ -99,8 +94,6 @@ export class CoreReactInject extends ReactInject {
   public get cloudProviderRegistry() { return this.$injector.get('cloudProviderRegistry') as CloudProviderRegistry; }
   public get clusterFilterModel() { return this.$injector.get('clusterFilterModel') as ClusterFilterModel; }
   public get clusterFilterService() { return this.$injector.get('clusterFilterService') as ClusterFilterService; }
-  public get clusterTargetBuilder() { return this.$injector.get('clusterTargetBuilder') as ClusterTargetBuilder; }
-  public get collapsibleSectionStateCache() { return this.$injector.get('collapsibleSectionStateCache') as CollapsibleSectionStateCache; }
   public get confirmationModalService() { return this.$injector.get('confirmationModalService') as ConfirmationModalService; }
   public get entityTagWriter() { return this.$injector.get('entityTagWriter') as EntityTagWriter; }
   public get executionDetailsSectionService() { return this.$injector.get('executionDetailsSectionService') as ExecutionDetailsSectionService; }
@@ -110,7 +103,6 @@ export class CoreReactInject extends ReactInject {
   public get executionsTransformer() { return this.$injector.get('executionsTransformer') as ExecutionsTransformerService; }
   public get helpContents() { return this.$injector.get('helpContents') as IHelpContents }
   public get helpContentsRegistry() { return this.$injector.get('helpContentsRegistry') as HelpContentsRegistry; }
-  public get infrastructureCaches() { return this.$injector.get('infrastructureCaches') as InfrastructureCacheService; }
   public get infrastructureSearchService() { return this.$injector.get('infrastructureSearchService') as InfrastructureSearchService; }
   public get infrastructureSearchServiceV2() { return this.$injector.get('infrastructureSearchServiceV2') as InfrastructureSearchServiceV2; }
   public get insightFilterStateModel() { return this.$injector.get('insightFilterStateModel') as InsightFilterStateModel; }
@@ -120,7 +112,6 @@ export class CoreReactInject extends ReactInject {
   public get manualJudgmentService() { return this.$injector.get('manualJudgmentService') as ManualJudgmentService; }
   public get modalService(): IModalService { return this.$injector.get('$uibModal') as IModalService; }
   public get MultiselectModel() { return this.$injector.get('MultiselectModel') as any; }
-  public get namingService() { return this.$injector.get('namingService') as NamingService; }
   public get notifierService() { return this.$injector.get('notifierService') as NotifierService; }
   public get overrideRegistry() { return this.$injector.get('overrideRegistry') as OverrideRegistry; }
   public get pagerDutyReader() { return this.$injector.get('pagerDutyReader') as PagerDutyReader; }
@@ -149,7 +140,6 @@ export class CoreReactInject extends ReactInject {
   public get variableValidatorService() { return this.$injector.get('variableValidatorService') as VariableValidatorService; }
   public get skinSelectionService() { return this.$injector.get('skinSelectionService') as SkinSelectionService; }
   public get skinService() { return this.$injector.get('skinService') as SkinService; }
-  public get viewStateCache() { return this.$injector.get('viewStateCache') as ViewStateCacheService; }
   public get waypointService() { return this.$injector.get('waypointService') as WaypointService; }
 
   private createStateService(): StateService {

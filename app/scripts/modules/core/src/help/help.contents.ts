@@ -5,6 +5,7 @@ export interface IHelpContents {
 }
 
 export const HELP_CONTENTS = 'spinnaker.core.help.contents';
+// prettier-ignore
 module(HELP_CONTENTS, [])
   .constant('helpContents', {
     'core.serverGroup.strategy': 'The deployment strategy tells Spinnaker what to do with the previous version of the server group.',
@@ -117,6 +118,10 @@ module(HELP_CONTENTS, [])
         <p>The GCS object name, in the form <code>gs://bucket/path/to/file.yml</code>.</p>`,
     'pipeline.config.expectedArtifact.defaultGcs.reference': `
         <p>The GCS object name, <i>optionally</i> appending the version. An example: <code>gs://bucket/file.yml#123948581</code></p>`,
+    'pipeline.config.expectedArtifact.s3.name': `
+        <p>The S3 object name, in the form <code>s3://bucket/path/to/file.yml</code>.</p>`,
+    'pipeline.config.expectedArtifact.defaultS3.reference': `
+        <p>The S3 object name, <i>optionally</i> appending the version. An example: <code>s3://bucket/file.yml#123948581</code></p>`,
     'pipeline.config.expectedArtifact.docker.name': `
         <p>The Docker image name you want to trigger on changes to. By default, this does <i>not</i> include the image tag or digest, only the registry and image repository.</p>`,
     'pipeline.config.expectedArtifact.defaultDocker.reference': `
@@ -198,6 +203,7 @@ module(HELP_CONTENTS, [])
         <p>The selected value can be used in a subsequent <strong>Check Preconditions</strong> stage to determine branching.</p>
         <p>For example, if the user selects "rollback" from this list of options, that branch can be activated by using the expression:
           <samp class="small">execution.stages[n].context.judgmentInput=="rollback"</samp></p>`,
+    'pipeline.config.bake.manifest.expectedArtifact': '<p>This is the template you want to render.</p>',
     'pipeline.config.haltPipelineOnFailure': 'Immediately halts execution of all running stages and fails the entire execution.',
     'pipeline.config.haltBranchOnFailure': 'Prevents any stages that depend on this stage from running, but allows other branches of the pipeline to run.',
     'pipeline.config.haltBranchOnFailureFailPipeline': 'Prevents any stages that depend on this stage from running, but allows other branches of the pipeline to run. The pipeline will be marked as failed once complete.',

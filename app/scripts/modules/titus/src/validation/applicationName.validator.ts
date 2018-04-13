@@ -28,17 +28,14 @@ class TitusApplicationNameValidator implements IApplicationNameValidator {
 
   public validate(name = '') {
     const warnings: string[] = [],
-          errors: string[] = [];
+      errors: string[] = [];
 
     if (name && name.length) {
       this.validateSpecialCharacters(name, errors);
       this.validateLength(name, warnings, errors);
     }
 
-    return {
-      warnings: warnings,
-      errors: errors,
-    };
+    return { warnings, errors };
   }
 }
 
@@ -46,6 +43,8 @@ export const TITUS_APPLICATION_NAME_VALIDATOR = 'spinnaker.titus.validation.appl
 
 module(TITUS_APPLICATION_NAME_VALIDATOR, [APPLICATION_NAME_VALIDATOR])
   .service('titusApplicationNameValidator', TitusApplicationNameValidator)
-  .run((applicationNameValidator: ApplicationNameValidator, titusApplicationNameValidator: IApplicationNameValidator) => {
-    applicationNameValidator.registerValidator('titus', titusApplicationNameValidator);
-  });
+  .run(
+    (applicationNameValidator: ApplicationNameValidator, titusApplicationNameValidator: IApplicationNameValidator) => {
+      applicationNameValidator.registerValidator('titus', titusApplicationNameValidator);
+    },
+  );

@@ -35,9 +35,11 @@ export class ScalingActivitiesCtrl implements IController {
   public viewState: IScalingActivitiesViewState;
   public activities: IScalingEventSummary[] = [];
 
-  public constructor(private $uibModalInstance: IModalServiceInstance,
-                     private serverGroupReader: ServerGroupReader,
-                     public serverGroup: IServerGroup) {
+  public constructor(
+    private $uibModalInstance: IModalServiceInstance,
+    private serverGroupReader: ServerGroupReader,
+    public serverGroup: IServerGroup,
+  ) {
     'ngInject';
     this.serverGroup = serverGroup;
   }
@@ -56,11 +58,11 @@ export class ScalingActivitiesCtrl implements IController {
           } catch (e) {
             // I don't imagine this would happen but let's not blow up the world if it does.
           }
-          events.push({ description: entry.description, availabilityZone: availabilityZone });
+          events.push({ description: entry.description, availabilityZone });
         });
         results.push({
           cause: group[0].cause,
-          events: events,
+          events,
           startTime: group[0].startTime,
           statusCode: group[0].statusCode,
           isSuccessful: group[0].statusCode === 'Successful',
@@ -75,16 +77,15 @@ export class ScalingActivitiesCtrl implements IController {
       loading: true,
       error: false,
     };
-    this.serverGroupReader.getScalingActivities(this.serverGroup)
-      .then(
-        (activities: IRawScalingActivity[]) => {
-          this.viewState.loading = false;
-          this.groupActivities(activities);
-        },
-        () => {
-          this.viewState.error = true;
-        }
-      );
+    this.serverGroupReader.getScalingActivities(this.serverGroup).then(
+      (activities: IRawScalingActivity[]) => {
+        this.viewState.loading = false;
+        this.groupActivities(activities);
+      },
+      () => {
+        this.viewState.error = true;
+      },
+    );
   }
 
   public close(): void {
@@ -93,5 +94,4 @@ export class ScalingActivitiesCtrl implements IController {
 }
 
 export const SCALING_ACTIVITIES_CTRL = 'spinnaker.core.serverGroup.scalingActivities.controller';
-module(SCALING_ACTIVITIES_CTRL, [SERVER_GROUP_READER])
-  .controller('ScalingActivitiesCtrl', ScalingActivitiesCtrl);
+module(SCALING_ACTIVITIES_CTRL, [SERVER_GROUP_READER]).controller('ScalingActivitiesCtrl', ScalingActivitiesCtrl);

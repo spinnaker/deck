@@ -3,7 +3,15 @@ import { BindAll } from 'lodash-decorators';
 import { Dropdown, Tooltip } from 'react-bootstrap';
 import { get, find, filter, orderBy } from 'lodash';
 
-import { IOwnerOption, IServerGroupActionsProps, IServerGroupJob, NgReact, ReactInjector, SETTINGS } from '@spinnaker/core';
+import {
+  ClusterTargetBuilder,
+  IOwnerOption,
+  IServerGroupActionsProps,
+  IServerGroupJob,
+  NgReact,
+  ReactInjector,
+  SETTINGS,
+} from '@spinnaker/core';
 
 import { IAmazonServerGroup, IAmazonServerGroupView } from 'amazon/domain';
 import { AwsReactInjector } from 'amazon/reactShims';
@@ -16,9 +24,9 @@ export interface IAmazonServerGroupActionsProps extends IServerGroupActionsProps
 export class AmazonServerGroupActions extends React.Component<IAmazonServerGroupActionsProps> {
   private isEnableLocked(): boolean {
     if (this.props.serverGroup.isDisabled) {
-      const resizeTasks = (this.props.serverGroup.runningTasks || [])
-        .filter(task => get(task, 'execution.stages', []).some(
-          stage => stage.type === 'resizeServerGroup'));
+      const resizeTasks = (this.props.serverGroup.runningTasks || []).filter(task =>
+        get(task, 'execution.stages', []).some(stage => stage.type === 'resizeServerGroup'),
+      );
       if (resizeTasks.length) {
         return true;
       }
@@ -35,18 +43,20 @@ export class AmazonServerGroupActions extends React.Component<IAmazonServerGroup
     }
 
     // if the server group selected for rollback is disabled, ensure that at least one enabled server group exists
-    return app.getDataSource('serverGroups').data.some((g: IAmazonServerGroup) =>
-      g.cluster === serverGroup.cluster &&
-      g.region === serverGroup.region &&
-      g.account === serverGroup.account &&
-      !g.isDisabled
-    );
+    return app
+      .getDataSource('serverGroups')
+      .data.some(
+        (g: IAmazonServerGroup) =>
+          g.cluster === serverGroup.cluster &&
+          g.region === serverGroup.region &&
+          g.account === serverGroup.account &&
+          !g.isDisabled,
+      );
   }
-
 
   private hasDisabledInstances(): boolean {
     // server group may have disabled instances (out of service) but NOT itself be disabled
-    return this.props.serverGroup.isDisabled || (get(this.props.serverGroup, 'instanceCounts.outOfService', 0) > 0);
+    return this.props.serverGroup.isDisabled || get(this.props.serverGroup, 'instanceCounts.outOfService', 0) > 0;
   }
 
   private destroyServerGroup(): void {
@@ -57,12 +67,13 @@ export class AmazonServerGroupActions extends React.Component<IAmazonServerGroup
       title: 'Destroying ' + serverGroup.name,
     };
 
-    const submitMethod = (params: IServerGroupJob) => ReactInjector.serverGroupWriter.destroyServerGroup(serverGroup, app, params);
+    const submitMethod = (params: IServerGroupJob) =>
+      ReactInjector.serverGroupWriter.destroyServerGroup(serverGroup, app, params);
 
     const stateParams = {
       name: serverGroup.name,
       accountId: serverGroup.account,
-      region: serverGroup.region
+      region: serverGroup.region,
     };
 
     const confirmationModalParams = {
@@ -72,7 +83,7 @@ export class AmazonServerGroupActions extends React.Component<IAmazonServerGroup
       provider: 'aws',
       taskMonitorConfig: taskMonitor,
       interestingHealthProviderNames: undefined as string[],
-      submitMethod: submitMethod,
+      submitMethod,
       askForReason: true,
       platformHealthOnlyShowOverride: app.attributes.platformHealthOnlyShowOverride,
       platformHealthType: 'Amazon',
@@ -80,7 +91,7 @@ export class AmazonServerGroupActions extends React.Component<IAmazonServerGroup
         if (ReactInjector.$state.includes('**.serverGroup', stateParams)) {
           ReactInjector.$state.go('^');
         }
-      }
+      },
     };
 
     ReactInjector.serverGroupWarningMessageService.addDestroyWarningMessage(app, serverGroup, confirmationModalParams);
@@ -97,7 +108,7 @@ export class AmazonServerGroupActions extends React.Component<IAmazonServerGroup
 
     const taskMonitor = {
       application: app,
-      title: 'Disabling ' + serverGroup.name
+      title: 'Disabling ' + serverGroup.name,
     };
 
     const submitMethod = (params: IServerGroupJob) => {
@@ -113,8 +124,8 @@ export class AmazonServerGroupActions extends React.Component<IAmazonServerGroup
       taskMonitorConfig: taskMonitor,
       platformHealthOnlyShowOverride: app.attributes.platformHealthOnlyShowOverride,
       platformHealthType: 'Amazon',
-      submitMethod: submitMethod,
-      askForReason: true
+      submitMethod,
+      askForReason: true,
     };
 
     ReactInjector.serverGroupWarningMessageService.addDisableWarningMessage(app, serverGroup, confirmationModalParams);
@@ -127,6 +138,31 @@ export class AmazonServerGroupActions extends React.Component<IAmazonServerGroup
   }
 
   private enableServerGroup(): void {
+    if (!this.isRollbackEnabled()) {
+      this.showEnableServerGroupModal();
+      return;
+    }
+
+    const confirmationModalParams = {
+      header: 'Rolling back?',
+      body: `Spinnaker provides an orchestrated rollback feature to carefully restore a different version of this
+             server group. Do you want to use the orchestrated rollback?`,
+      buttonText: `Yes, let's start the orchestrated rollback`,
+      cancelButtonText: 'No, I just want to enable the server group',
+    };
+
+    ReactInjector.confirmationModalService
+      .confirm(confirmationModalParams)
+      .then(() => this.rollbackServerGroup())
+      .catch(({ source }) => {
+        // don't show the enable modal if the user cancels with the header button
+        if (source === 'footer') {
+          this.showEnableServerGroupModal();
+        }
+      });
+  }
+
+  private showEnableServerGroupModal(): void {
     const { app, serverGroup } = this.props;
 
     const taskMonitor = {
@@ -146,8 +182,8 @@ export class AmazonServerGroupActions extends React.Component<IAmazonServerGroup
       taskMonitorConfig: taskMonitor,
       platformHealthOnlyShowOverride: app.attributes.platformHealthOnlyShowOverride,
       platformHealthType: 'Amazon',
-      submitMethod: submitMethod,
-      askForReason: true
+      submitMethod,
+      askForReason: true,
     };
 
     if (app.attributes.platformHealthOnlyShowOverride && app.attributes.platformHealthOnly) {
@@ -155,18 +191,19 @@ export class AmazonServerGroupActions extends React.Component<IAmazonServerGroup
     }
 
     ReactInjector.confirmationModalService.confirm(confirmationModalParams);
-  };
+  }
 
   private rollbackServerGroup(): void {
     const { app } = this.props;
 
     let serverGroup: IAmazonServerGroup = this.props.serverGroup;
     let previousServerGroup: IAmazonServerGroup;
-    let allServerGroups = app.getDataSource('serverGroups').data.filter((g: IAmazonServerGroup) =>
-      g.cluster === serverGroup.cluster &&
-      g.region === serverGroup.region &&
-      g.account === serverGroup.account
-    );
+    let allServerGroups = app
+      .getDataSource('serverGroups')
+      .data.filter(
+        (g: IAmazonServerGroup) =>
+          g.cluster === serverGroup.cluster && g.region === serverGroup.region && g.account === serverGroup.account,
+      );
 
     if (serverGroup.isDisabled) {
       // if the selected server group is disabled, it represents the server group that should be _rolled back to_
@@ -179,7 +216,8 @@ export class AmazonServerGroupActions extends React.Component<IAmazonServerGroup
        */
       serverGroup = orderBy(
         allServerGroups.filter((g: IAmazonServerGroup) => g.name !== previousServerGroup.name && !g.isDisabled),
-        ['instanceCounts.total', 'createdTime'], ['desc', 'desc']
+        ['instanceCounts.total', 'createdTime'],
+        ['desc', 'desc'],
       )[0] as IAmazonServerGroup;
     }
 
@@ -192,29 +230,39 @@ export class AmazonServerGroupActions extends React.Component<IAmazonServerGroup
     }
 
     ReactInjector.modalService.open({
-      templateUrl: ReactInjector.overrideRegistry.getTemplate('aws.rollback.modal', require('./rollback/rollbackServerGroup.html')),
+      templateUrl: ReactInjector.overrideRegistry.getTemplate(
+        'aws.rollback.modal',
+        require('./rollback/rollbackServerGroup.html'),
+      ),
       controller: 'awsRollbackServerGroupCtrl as ctrl',
       resolve: {
         serverGroup: () => serverGroup,
         previousServerGroup: () => previousServerGroup,
         disabledServerGroups: () => {
-          const cluster = find(app.clusters, { name: serverGroup.cluster, account: serverGroup.account, serverGroups: [] });
+          const cluster = find(app.clusters, {
+            name: serverGroup.cluster,
+            account: serverGroup.account,
+            serverGroups: [],
+          });
           return filter(cluster.serverGroups, { isDisabled: true, region: serverGroup.region });
         },
         allServerGroups: () => allServerGroups,
-        application: () => app
-      }
+        application: () => app,
+      },
     });
-  };
+  }
 
   private resizeServerGroup(): void {
     ReactInjector.modalService.open({
-      templateUrl: ReactInjector.overrideRegistry.getTemplate('aws.resize.modal', require('./resize/resizeServerGroup.html')),
+      templateUrl: ReactInjector.overrideRegistry.getTemplate(
+        'aws.resize.modal',
+        require('./resize/resizeServerGroup.html'),
+      ),
       controller: 'awsResizeServerGroupCtrl as ctrl',
       resolve: {
         serverGroup: () => this.props.serverGroup,
-        application: () => this.props.app
-      }
+        application: () => this.props.app,
+      },
     });
   }
 
@@ -227,8 +275,9 @@ export class AmazonServerGroupActions extends React.Component<IAmazonServerGroup
       resolve: {
         title: () => 'Clone ' + serverGroup.name,
         application: () => app,
-        serverGroupCommand: () => AwsReactInjector.awsServerGroupCommandBuilder.buildServerGroupCommandFromExisting(app, serverGroup),
-      }
+        serverGroupCommand: () =>
+          AwsReactInjector.awsServerGroupCommandBuilder.buildServerGroupCommandFromExisting(app, serverGroup),
+      },
     });
   }
 
@@ -237,28 +286,59 @@ export class AmazonServerGroupActions extends React.Component<IAmazonServerGroup
 
     const { AddEntityTagLinks } = NgReact;
     const showEntityTags = SETTINGS.feature && SETTINGS.feature.entityTags;
-    const entityTagTargets: IOwnerOption[] = ReactInjector.clusterTargetBuilder.buildClusterTargets(serverGroup);
+    const entityTagTargets: IOwnerOption[] = ClusterTargetBuilder.buildClusterTargets(serverGroup);
 
     return (
       <Dropdown className="dropdown" id="server-group-actions-dropdown">
-        <Dropdown.Toggle className="btn btn-sm btn-primary dropdown-toggle">
-          Server Group Actions
-        </Dropdown.Toggle>
+        <Dropdown.Toggle className="btn btn-sm btn-primary dropdown-toggle">Server Group Actions</Dropdown.Toggle>
         <Dropdown.Menu className="dropdown-menu">
-          {this.isRollbackEnabled() && <li><a className="clickable" onClick={this.rollbackServerGroup}>Rollback</a></li>}
-          {this.isRollbackEnabled() && <li role="presentation" className="divider"/>}
-          <li><a className="clickable" onClick={this.resizeServerGroup}>Resize</a></li>
-          {!serverGroup.isDisabled && <li><a className="clickable" onClick={this.disableServerGroup}>Disable</a></li>}
-          {this.hasDisabledInstances() && !this.isEnableLocked() && <li><a className="clickable" onClick={this.enableServerGroup}>Enable</a></li>}
+          {this.isRollbackEnabled() && (
+            <li>
+              <a className="clickable" onClick={this.rollbackServerGroup}>
+                Rollback
+              </a>
+            </li>
+          )}
+          {this.isRollbackEnabled() && <li role="presentation" className="divider" />}
+          <li>
+            <a className="clickable" onClick={this.resizeServerGroup}>
+              Resize
+            </a>
+          </li>
+          {!serverGroup.isDisabled && (
+            <li>
+              <a className="clickable" onClick={this.disableServerGroup}>
+                Disable
+              </a>
+            </li>
+          )}
+          {this.hasDisabledInstances() &&
+            !this.isEnableLocked() && (
+              <li>
+                <a className="clickable" onClick={this.enableServerGroup}>
+                  Enable
+                </a>
+              </li>
+            )}
           {this.isEnableLocked() && (
             <li className="disabled">
               <Tooltip value="Cannot enable this server group until resize operation completes" placement="left">
-                <a><span className="small glyphicon glyphicon-lock"/>{' '}Enable</a>
+                <a>
+                  <span className="small glyphicon glyphicon-lock" /> Enable
+                </a>
               </Tooltip>
             </li>
           )}
-          <li><a className="clickable" onClick={this.destroyServerGroup}>Destroy</a></li>
-          <li><a className="clickable" onClick={this.cloneServerGroup}>Clone</a></li>
+          <li>
+            <a className="clickable" onClick={this.destroyServerGroup}>
+              Destroy
+            </a>
+          </li>
+          <li>
+            <a className="clickable" onClick={this.cloneServerGroup}>
+              Clone
+            </a>
+          </li>
           {showEntityTags && (
             <AddEntityTagLinks
               component={serverGroup}

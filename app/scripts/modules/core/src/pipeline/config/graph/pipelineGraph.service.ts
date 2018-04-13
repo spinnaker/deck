@@ -23,11 +23,11 @@ export interface IPipelineGraphNode {
   children: IPipelineGraphNode[];
   color?: string;
   height?: number; // Added after the fact in PipelineGraphDirective
-  id: (string | number);
+  id: string | number;
   index?: number;
   leaf?: boolean;
   name: string;
-  parentIds: (string | number)[];
+  parentIds: Array<string | number>;
   parentLinks: IPipelineGraphLink[];
   parents: IPipelineGraphNode[];
   placeholder?: boolean;
@@ -63,6 +63,7 @@ export class PipelineGraphService {
   public static generateExecutionGraph(execution: IExecution, viewState: IExecutionViewState) {
     const nodes: IPipelineGraphNode[] = [];
     (execution.stageSummaries || []).forEach((stage: IExecutionStageSummary, idx: number) => {
+      const parentIds = (stage.requisiteStageRefIds || []).slice();
       const node: IPipelineGraphNode = {
         childLinks: [],
         children: [],
@@ -77,10 +78,10 @@ export class PipelineGraphService {
         labelComponent: stage.labelComponent,
         masterStage: stage.masterStage,
         name: stage.name,
-        parentIds: Object.assign([], (stage.requisiteStageRefIds || [])),
+        parentIds,
         parentLinks: [],
         parents: [],
-        stage: stage,
+        stage,
         status: stage.status,
       };
       if (!node.parentIds.length) {
@@ -96,25 +97,26 @@ export class PipelineGraphService {
     const nodes: IPipelineGraphNode[] = [];
     const configWarnings = pipelineValidations.pipeline;
     const configNode: IPipelineGraphNode = {
-          childLinks: [],
-          children: [],
-          hasWarnings: !!configWarnings.length,
-          id: -1,
-          isActive: viewState.section === 'triggers',
-          isHighlighted: false,
-          name: 'Configuration',
-          parentIds: [],
-          parentLinks: [],
-          parents: [],
-          phase: 0,
-          root: true,
-          section: 'triggers',
-          warnings: configWarnings.length ? { messages: configWarnings } : null,
-        };
+      childLinks: [],
+      children: [],
+      hasWarnings: !!configWarnings.length,
+      id: -1,
+      isActive: viewState.section === 'triggers',
+      isHighlighted: false,
+      name: 'Configuration',
+      parentIds: [],
+      parentLinks: [],
+      parents: [],
+      phase: 0,
+      root: true,
+      section: 'triggers',
+      warnings: configWarnings.length ? { messages: configWarnings } : null,
+    };
     nodes.push(configNode);
 
     pipeline.stages.forEach(function(stage: IExecutionStageSummary, idx: number) {
       const warnings = pipelineValidations.stages.find((e: any) => e.stage === stage);
+      const parentIds = (stage.requisiteStageRefIds || []).slice();
       const node: IPipelineGraphNode = {
         childLinks: [],
         children: [],
@@ -124,12 +126,12 @@ export class PipelineGraphService {
         isActive: viewState.stageIndex === idx && viewState.section === 'stage',
         isHighlighted: false,
         name: stage.name || '[new stage]',
-        parentIds: Object.assign([], (stage.requisiteStageRefIds || [])),
+        parentIds,
         parentLinks: [],
         parents: [],
         root: false,
         section: 'stage',
-        warnings: warnings,
+        warnings,
       };
       if (!node.parentIds.length) {
         node.parentIds.push(configNode.id);

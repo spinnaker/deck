@@ -1,14 +1,14 @@
 import { IController, IComponentOptions, module } from 'angular';
 import './numberList.component.less';
 
-export interface NumberListConstraints {
+export interface INumberListConstraints {
   min: number;
   max: number;
 }
 
 export class NumberListController implements IController {
   public model: number[] | string;
-  public constraints: NumberListConstraints;
+  public constraints: INumberListConstraints;
   public label: string;
   public backingModel: number[];
   public parameterized: boolean;
@@ -17,10 +17,10 @@ export class NumberListController implements IController {
   public synchronize(): void {
     const model: number[] | string = this.model; // typescript union type woes
     if (model instanceof Array) {
-      (<number[]> model).length = 0;
+      (model as number[]).length = 0;
       this.backingModel.forEach(num => {
         if (num !== null) {
-          (<number[]> model).push(num);
+          (model as number[]).push(num);
         }
       });
       model.sort((a, b) => a - b);
@@ -75,7 +75,7 @@ export class NumberListController implements IController {
     if (!this.constraints) {
       this.constraints = {
         min: Number.NEGATIVE_INFINITY,
-        max: Number.POSITIVE_INFINITY
+        max: Number.POSITIVE_INFINITY,
       };
     }
     if (isNaN(this.constraints.min)) {
@@ -141,5 +141,4 @@ class NumberListComponent implements IComponentOptions {
 }
 
 export const NUMBER_LIST_COMPONENT = 'spinnaker.core.forms.numberList';
-module(NUMBER_LIST_COMPONENT, [])
-  .component('numberList', new NumberListComponent());
+module(NUMBER_LIST_COMPONENT, []).component('numberList', new NumberListComponent());

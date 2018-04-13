@@ -2,28 +2,31 @@
 
 import { PIPELINE_CONFIG_PROVIDER } from 'core/pipeline/config/pipelineConfigProvider';
 import { UUIDGenerator } from 'core/utils/uuid.service';
+import { ARTIFACT_REFERENCE_SERVICE_PROVIDER } from 'core/artifact/ArtifactReferenceService';
 
 const angular = require('angular');
 
-module.exports = angular.module('spinnaker.core.pipeline.config.trigger.triggersDirective', [
-  PIPELINE_CONFIG_PROVIDER,
-])
+module.exports = angular
+  .module('spinnaker.core.pipeline.config.trigger.triggersDirective', [
+    PIPELINE_CONFIG_PROVIDER,
+    ARTIFACT_REFERENCE_SERVICE_PROVIDER,
+  ])
   .directive('triggers', function() {
     return {
       restrict: 'E',
       scope: {
         pipeline: '=',
-        application: '='
+        application: '=',
       },
       controller: 'triggersCtrl',
       controllerAs: 'triggersCtrl',
-      templateUrl: require('./triggers.html')
+      templateUrl: require('./triggers.html'),
     };
   })
-  .controller('triggersCtrl', function($scope, pipelineConfig) {
+  .controller('triggersCtrl', function($scope, pipelineConfig, artifactReferenceService) {
     this.addTrigger = function() {
       var triggerTypes = pipelineConfig.getTriggerTypes(),
-          newTrigger = {enabled: true};
+        newTrigger = { enabled: true };
       if (!$scope.pipeline.triggers) {
         $scope.pipeline.triggers = [];
       }
@@ -35,7 +38,7 @@ module.exports = angular.module('spinnaker.core.pipeline.config.trigger.triggers
     };
 
     this.defaultArtifact = () => ({
-      kind: 'custom'
+      kind: 'custom',
     });
 
     this.removeExpectedArtifact = (pipeline, expectedArtifact) => {
@@ -43,16 +46,19 @@ module.exports = angular.module('spinnaker.core.pipeline.config.trigger.triggers
         return;
       }
 
-      pipeline.expectedArtifacts = pipeline.expectedArtifacts
-        .filter(a => a.id !== expectedArtifact.id);
+      pipeline.expectedArtifacts = pipeline.expectedArtifacts.filter(a => a.id !== expectedArtifact.id);
 
       if (!pipeline.triggers) {
         return;
       }
 
-      pipeline.triggers
-        .forEach(t => t.expectedArtifactIds = t.expectedArtifactIds
-          .filter(eid => expectedArtifact.id !== eid));
+      pipeline.triggers.forEach(t => {
+        if (t.expectedArtifactIds) {
+          t.expectedArtifactIds = t.expectedArtifactIds.filter(eid => expectedArtifact.id !== eid);
+        }
+      });
+
+      artifactReferenceService.removeReferenceFromStages(expectedArtifact.id, pipeline.stages);
     };
 
     this.addArtifact = () => {
@@ -61,7 +67,7 @@ module.exports = angular.module('spinnaker.core.pipeline.config.trigger.triggers
         usePriorExecution: false,
         useDefaultArtifact: false,
         defaultArtifact: this.defaultArtifact(),
-        id: UUIDGenerator.generateUuid()
+        id: UUIDGenerator.generateUuid(),
       };
 
       if (!$scope.pipeline.expectedArtifacts) {
@@ -69,5 +75,4 @@ module.exports = angular.module('spinnaker.core.pipeline.config.trigger.triggers
       }
       $scope.pipeline.expectedArtifacts.push(newArtifact);
     };
-
   });

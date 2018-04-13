@@ -7,8 +7,8 @@ import {
   CacheInitializerService,
   IAccountDetails,
   IAggregatedAccounts,
-  INFRASTRUCTURE_CACHE_SERVICE,
-  InfrastructureCacheService, LoadBalancerReader,
+  InfrastructureCaches,
+  LoadBalancerReader,
 } from '@spinnaker/core';
 
 import { Subscription } from 'rxjs/Subscription';
@@ -26,27 +26,32 @@ class LoadBalancerSelectorController implements IController {
   public loadBalancers: IAmazonLoadBalancer[];
   private subscriptions: Subscription[];
 
-  constructor(private $q: ng.IQService,
-              private infrastructureCaches: InfrastructureCacheService,
-              private accountService: AccountService,
-              private cacheInitializer: CacheInitializerService,
-              private loadBalancerReader: LoadBalancerReader) {
+  constructor(
+    private $q: ng.IQService,
+    private accountService: AccountService,
+    private cacheInitializer: CacheInitializerService,
+    private loadBalancerReader: LoadBalancerReader,
+  ) {
     'ngInject';
 
     this.setLoadBalancerRefreshTime();
   }
 
   public $onInit(): void {
-    const credentialLoader: ng.IPromise<void> = this.accountService.getCredentialsKeyedByAccount('titus').then((credentials: IAggregatedAccounts) => {
-      this.credentials = credentials;
-    });
-    const loadBalancerLoader: ng.IPromise<void> = this.loadBalancerReader.listLoadBalancers('aws').then((loadBalancers: any[]) => {
-      this.loadBalancers = loadBalancers;
-    });
+    const credentialLoader: ng.IPromise<void> = this.accountService
+      .getCredentialsKeyedByAccount('titus')
+      .then((credentials: IAggregatedAccounts) => {
+        this.credentials = credentials;
+      });
+    const loadBalancerLoader: ng.IPromise<void> = this.loadBalancerReader
+      .listLoadBalancers('aws')
+      .then((loadBalancers: any[]) => {
+        this.loadBalancers = loadBalancers;
+      });
     this.$q.all([credentialLoader, loadBalancerLoader]).then(() => this.configureLoadBalancerOptions());
     this.subscriptions = [
       this.command.viewState.accountChangedStream.subscribe(() => this.configureLoadBalancerOptions()),
-      this.command.viewState.regionChangedStream.subscribe(() => this.configureLoadBalancerOptions())
+      this.command.viewState.regionChangedStream.subscribe(() => this.configureLoadBalancerOptions()),
     ];
   }
 
@@ -67,9 +72,13 @@ class LoadBalancerSelectorController implements IController {
   }
 
   public getTargetGroupNames(): string[] {
-    const loadBalancersV2 = this.getLoadBalancerMap().filter((lb) => lb.loadBalancerType !== 'classic') as IAmazonApplicationLoadBalancer[];
-    const instanceTargetGroups = flatten(loadBalancersV2.map<any>((lb) => lb.targetGroups.filter((tg) => tg.targetType === 'ip')));
-    return instanceTargetGroups.map((tg) => tg.name).sort();
+    const loadBalancersV2 = this.getLoadBalancerMap().filter(
+      lb => lb.loadBalancerType !== 'classic',
+    ) as IAmazonApplicationLoadBalancer[];
+    const instanceTargetGroups = flatten(
+      loadBalancersV2.map<any>(lb => lb.targetGroups.filter(tg => tg.targetType === 'ip')),
+    );
+    return instanceTargetGroups.map(tg => tg.name).sort();
   }
 
   private getLoadBalancerMap(): IAmazonLoadBalancer[] {
@@ -82,7 +91,7 @@ class LoadBalancerSelectorController implements IController {
       .filter({ name: this.getRegion() })
       .map<IAmazonLoadBalancer>('loadBalancers')
       .flattenDeep<IAmazonLoadBalancer>()
-      .value()
+      .value();
   }
 
   public configureLoadBalancerOptions() {
@@ -99,12 +108,12 @@ class LoadBalancerSelectorController implements IController {
   }
 
   public setLoadBalancerRefreshTime(): void {
-    this.refreshTime = this.infrastructureCaches.get('loadBalancers').getStats().ageMax;
+    this.refreshTime = InfrastructureCaches.get('loadBalancers').getStats().ageMax;
   }
 
   public refreshLoadBalancers(): void {
     this.cacheInitializer.refreshCache('loadBalancers').then(() => {
-      return this.loadBalancerReader.listLoadBalancers('aws').then((loadBalancers) => {
+      return this.loadBalancerReader.listLoadBalancers('aws').then(loadBalancers => {
         this.command.backingData.loadBalancers = loadBalancers;
         this.refreshing = false;
         this.configureLoadBalancerOptions();
@@ -115,14 +124,12 @@ class LoadBalancerSelectorController implements IController {
 
 export class LoadBalancerSelectorComponent implements IComponentOptions {
   public bindings: any = {
-    command: '='
+    command: '=',
   };
   public controller: any = LoadBalancerSelectorController;
   public templateUrl = require('./loadBalancerSelector.component.html');
 }
 
-export const TITUS_LOAD_BALANCER_SELECTOR = 'spinnaker.titus.serverGroup.configure.wizard.loadBalancers.selector.component';
-module(TITUS_LOAD_BALANCER_SELECTOR, [
-  INFRASTRUCTURE_CACHE_SERVICE
-])
-  .component('titusLoadBalancerSelector', new LoadBalancerSelectorComponent());
+export const TITUS_LOAD_BALANCER_SELECTOR =
+  'spinnaker.titus.serverGroup.configure.wizard.loadBalancers.selector.component';
+module(TITUS_LOAD_BALANCER_SELECTOR, []).component('titusLoadBalancerSelector', new LoadBalancerSelectorComponent());
