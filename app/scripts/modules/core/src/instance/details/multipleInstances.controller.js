@@ -2,6 +2,7 @@
 
 import { CONFIRMATION_MODAL_SERVICE } from 'core/confirmationModal/confirmationModal.service';
 import { INSTANCE_WRITE_SERVICE } from 'core/instance/instance.write.service';
+import { ClusterState } from 'core/state';
 
 const angular = require('angular');
 
@@ -10,17 +11,9 @@ module.exports = angular
     require('@uirouter/angularjs').default,
     INSTANCE_WRITE_SERVICE,
     CONFIRMATION_MODAL_SERVICE,
-    require('../../cluster/filter/multiselect.model').name,
     require('./multipleInstanceServerGroup.directive').name,
   ])
-  .controller('MultipleInstancesCtrl', function(
-    $scope,
-    $state,
-    confirmationModalService,
-    MultiselectModel,
-    instanceWriter,
-    app,
-  ) {
+  .controller('MultipleInstancesCtrl', function($scope, $state, confirmationModalService, instanceWriter, app) {
     this.selectedGroups = [];
 
     /**
@@ -245,23 +238,23 @@ module.exports = angular
     };
 
     let countInstances = () => {
-      return MultiselectModel.instanceGroups.reduce((acc, group) => acc + group.instanceIds.length, 0);
+      return ClusterState.multiselectModel.instanceGroups.reduce((acc, group) => acc + group.instanceIds.length, 0);
     };
 
     let retrieveInstances = () => {
       this.instancesCount = countInstances();
-      this.selectedGroups = MultiselectModel.instanceGroups
+      this.selectedGroups = ClusterState.multiselectModel.instanceGroups
         .filter(group => group.instanceIds.length)
         .map(makeServerGroupModel);
     };
 
-    let multiselectWatcher = MultiselectModel.instancesStream.subscribe(retrieveInstances);
+    let multiselectWatcher = ClusterState.multiselectModel.instancesStream.subscribe(retrieveInstances);
     app.serverGroups.onRefresh($scope, retrieveInstances);
 
     retrieveInstances();
 
     $scope.$on('$destroy', () => {
-      MultiselectModel.deselectAllInstances();
+      ClusterState.multiselectModel.deselectAllInstances();
       multiselectWatcher.unsubscribe();
     });
   });

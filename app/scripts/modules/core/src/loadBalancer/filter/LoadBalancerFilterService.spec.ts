@@ -3,31 +3,20 @@ import { mock } from 'angular';
 import { Application } from 'core/application/application.model';
 import { APPLICATION_MODEL_BUILDER, ApplicationModelBuilder } from 'core/application/applicationModel.builder';
 import { ILoadBalancer, IServerGroup, ILoadBalancerGroup } from 'core/domain';
-import { LOAD_BALANCER_FILTER_SERVICE, LoadBalancerFilterService } from './loadBalancer.filter.service';
-import { LoadBalancerFilterModel } from './loadBalancerFilter.model';
+import { LoadBalancerState } from 'core/state';
 
 // Most of this logic has been moved to filter.model.service.js, so these act more as integration tests
 describe('Service: loadBalancerFilterService', function() {
   const debounceTimeout = 30;
 
-  let service: LoadBalancerFilterService,
-    loadBalancerFilterModel: LoadBalancerFilterModel,
-    app: Application,
-    resultJson: any,
-    modelBuilder: ApplicationModelBuilder;
+  let app: Application, resultJson: any, modelBuilder: ApplicationModelBuilder;
 
   beforeEach(() => {
-    mock.module(APPLICATION_MODEL_BUILDER, LOAD_BALANCER_FILTER_SERVICE);
-    mock.inject(function(
-      applicationModelBuilder: ApplicationModelBuilder,
-      loadBalancerFilterService: LoadBalancerFilterService,
-      _loadBalancerFilterModel_: LoadBalancerFilterModel,
-    ) {
+    mock.module(APPLICATION_MODEL_BUILDER);
+    mock.inject(function(applicationModelBuilder: ApplicationModelBuilder) {
       modelBuilder = applicationModelBuilder;
-      service = loadBalancerFilterService;
-      loadBalancerFilterModel = _loadBalancerFilterModel_;
-      loadBalancerFilterModel.asFilterModel.groups = [];
     });
+    LoadBalancerState.filterModel.asFilterModel.groups = [];
   });
 
   beforeEach(function() {
@@ -67,7 +56,7 @@ describe('Service: loadBalancerFilterService', function() {
       { heading: 'us-west-1', loadBalancer: app.loadBalancers.data[1], serverGroups: [] },
       { heading: 'us-east-1', loadBalancer: app.loadBalancers.data[2], serverGroups: [] },
     ];
-    loadBalancerFilterModel.asFilterModel.clearFilters();
+    LoadBalancerState.filterModel.asFilterModel.clearFilters();
   });
 
   describe('Updating the load balancer group', function() {
@@ -82,10 +71,10 @@ describe('Service: loadBalancerFilterService', function() {
           subgroups: [{ heading: 'elb-1', subgroups: [resultJson[0], resultJson[1]] }],
         },
       ];
-      service.updateLoadBalancerGroups(app);
+      LoadBalancerState.filterService.updateLoadBalancerGroups(app);
 
       setTimeout(() => {
-        expect(loadBalancerFilterModel.asFilterModel.groups).toEqual(expected);
+        expect(LoadBalancerState.filterModel.asFilterModel.groups).toEqual(expected);
         done();
       }, debounceTimeout);
     });
@@ -96,8 +85,8 @@ describe('Service: loadBalancerFilterService', function() {
         app.loadBalancers.data.forEach((group: ILoadBalancerGroup) => {
           expect(group.searchField).toBeUndefined();
         });
-        loadBalancerFilterModel.asFilterModel.sortFilter.filter = 'main';
-        service.updateLoadBalancerGroups(app);
+        LoadBalancerState.filterModel.asFilterModel.sortFilter.filter = 'main';
+        LoadBalancerState.filterService.updateLoadBalancerGroups(app);
 
         setTimeout(() => {
           app.loadBalancers.data.forEach((group: ILoadBalancerGroup) => {
@@ -110,11 +99,11 @@ describe('Service: loadBalancerFilterService', function() {
 
     describe('filter by vpc', function() {
       it('should filter by vpc name as an exact match', function(done) {
-        loadBalancerFilterModel.asFilterModel.sortFilter.filter = 'vpc:main';
-        service.updateLoadBalancerGroups(app);
+        LoadBalancerState.filterModel.asFilterModel.sortFilter.filter = 'vpc:main';
+        LoadBalancerState.filterService.updateLoadBalancerGroups(app);
 
         setTimeout(() => {
-          expect(loadBalancerFilterModel.asFilterModel.groups).toEqual([
+          expect(LoadBalancerState.filterModel.asFilterModel.groups).toEqual([
             {
               heading: 'test',
               subgroups: [{ heading: 'elb-1', subgroups: [resultJson[1]] }],
@@ -125,10 +114,10 @@ describe('Service: loadBalancerFilterService', function() {
       });
 
       it('should not match on partial vpc name', function(done) {
-        loadBalancerFilterModel.asFilterModel.sortFilter.filter = 'vpc:main-old';
-        service.updateLoadBalancerGroups(app);
+        LoadBalancerState.filterModel.asFilterModel.sortFilter.filter = 'vpc:main-old';
+        LoadBalancerState.filterService.updateLoadBalancerGroups(app);
         setTimeout(() => {
-          expect(loadBalancerFilterModel.asFilterModel.groups).toEqual([]);
+          expect(LoadBalancerState.filterModel.asFilterModel.groups).toEqual([]);
           done();
         }, debounceTimeout);
       });
@@ -136,11 +125,11 @@ describe('Service: loadBalancerFilterService', function() {
 
     describe('filtering by account type', function() {
       it('1 account filter: should be transformed showing only prod accounts', function(done) {
-        loadBalancerFilterModel.asFilterModel.sortFilter.account = { prod: true };
-        service.updateLoadBalancerGroups(app);
+        LoadBalancerState.filterModel.asFilterModel.sortFilter.account = { prod: true };
+        LoadBalancerState.filterService.updateLoadBalancerGroups(app);
 
         setTimeout(() => {
-          expect(loadBalancerFilterModel.asFilterModel.groups).toEqual([
+          expect(LoadBalancerState.filterModel.asFilterModel.groups).toEqual([
             {
               heading: 'prod',
               subgroups: [{ heading: 'elb-2', subgroups: [resultJson[2]] }],
@@ -151,11 +140,11 @@ describe('Service: loadBalancerFilterService', function() {
       });
 
       it('All account filters: should show all accounts', function(done) {
-        loadBalancerFilterModel.asFilterModel.sortFilter.account = { prod: true, test: true };
-        service.updateLoadBalancerGroups(app);
+        LoadBalancerState.filterModel.asFilterModel.sortFilter.account = { prod: true, test: true };
+        LoadBalancerState.filterService.updateLoadBalancerGroups(app);
 
         setTimeout(() => {
-          expect(loadBalancerFilterModel.asFilterModel.groups).toEqual([
+          expect(LoadBalancerState.filterModel.asFilterModel.groups).toEqual([
             {
               heading: 'prod',
               subgroups: [{ heading: 'elb-2', subgroups: [resultJson[2]] }],
@@ -173,11 +162,11 @@ describe('Service: loadBalancerFilterService', function() {
 
   describe('filter by region', function() {
     it('1 region: should filter by that region', function(done) {
-      loadBalancerFilterModel.asFilterModel.sortFilter.region = { 'us-east-1': true };
-      service.updateLoadBalancerGroups(app);
+      LoadBalancerState.filterModel.asFilterModel.sortFilter.region = { 'us-east-1': true };
+      LoadBalancerState.filterService.updateLoadBalancerGroups(app);
 
       setTimeout(() => {
-        expect(loadBalancerFilterModel.asFilterModel.groups).toEqual([
+        expect(LoadBalancerState.filterModel.asFilterModel.groups).toEqual([
           {
             heading: 'prod',
             subgroups: [{ heading: 'elb-2', subgroups: [resultJson[2]] }],
@@ -192,11 +181,11 @@ describe('Service: loadBalancerFilterService', function() {
     });
 
     it('All regions: should show all load balancers', function(done) {
-      loadBalancerFilterModel.asFilterModel.sortFilter.region = { 'us-east-1': true, 'us-west-1': true };
-      service.updateLoadBalancerGroups(app);
+      LoadBalancerState.filterModel.asFilterModel.sortFilter.region = { 'us-east-1': true, 'us-west-1': true };
+      LoadBalancerState.filterService.updateLoadBalancerGroups(app);
 
       setTimeout(() => {
-        expect(loadBalancerFilterModel.asFilterModel.groups).toEqual([
+        expect(LoadBalancerState.filterModel.asFilterModel.groups).toEqual([
           {
             heading: 'prod',
             subgroups: [{ heading: 'elb-2', subgroups: [resultJson[2]] }],
@@ -212,15 +201,15 @@ describe('Service: loadBalancerFilterService', function() {
   });
   describe('filter by healthy state', function() {
     it('should filter any load balancers with down instances (based on down) if "Up" checked', function(done) {
-      loadBalancerFilterModel.asFilterModel.sortFilter.status = { Up: true };
+      LoadBalancerState.filterModel.asFilterModel.sortFilter.status = { Up: true };
       app.loadBalancers.data[0].instanceCounts.down = 1;
       app.loadBalancers.data.forEach((loadBalancer: ILoadBalancer) => {
         loadBalancer.instances = [{ id: 'foo', healthState: 'Up', health: [], launchTime: 0, zone: 'us-east-1a' }];
       });
-      service.updateLoadBalancerGroups(app);
+      LoadBalancerState.filterService.updateLoadBalancerGroups(app);
 
       setTimeout(() => {
-        expect(loadBalancerFilterModel.asFilterModel.groups).toEqual([
+        expect(LoadBalancerState.filterModel.asFilterModel.groups).toEqual([
           {
             heading: 'prod',
             subgroups: [{ heading: 'elb-2', subgroups: [resultJson[2]] }],
@@ -235,15 +224,15 @@ describe('Service: loadBalancerFilterService', function() {
     });
 
     it('should filter any load balancers without down instances (based on down) if "Down" checked', function(done) {
-      loadBalancerFilterModel.asFilterModel.sortFilter.status = { Down: true };
+      LoadBalancerState.filterModel.asFilterModel.sortFilter.status = { Down: true };
       app.loadBalancers.data[0].instanceCounts.down = 1;
       app.loadBalancers.data.forEach((loadBalancer: ILoadBalancer) => {
         loadBalancer.instances = [{ id: 'foo', healthState: 'Down', health: [], launchTime: 0, zone: 'us-east-1a' }];
       });
-      service.updateLoadBalancerGroups(app);
+      LoadBalancerState.filterService.updateLoadBalancerGroups(app);
 
       setTimeout(() => {
-        expect(loadBalancerFilterModel.asFilterModel.groups).toEqual([
+        expect(LoadBalancerState.filterModel.asFilterModel.groups).toEqual([
           {
             heading: 'test',
             subgroups: [{ heading: 'elb-1', subgroups: [resultJson[0]] }],
@@ -254,17 +243,17 @@ describe('Service: loadBalancerFilterService', function() {
     });
 
     it('should filter any load balancers with starting instances (based on starting) if "Starting" checked', function(done) {
-      loadBalancerFilterModel.asFilterModel.sortFilter.status = { Starting: true };
+      LoadBalancerState.filterModel.asFilterModel.sortFilter.status = { Starting: true };
       app.loadBalancers.data[0].instanceCounts.starting = 1;
       app.loadBalancers.data.forEach((loadBalancer: ILoadBalancer) => {
         loadBalancer.instances = [
           { id: 'foo', healthState: 'Starting', health: [], launchTime: 0, zone: 'us-east-1a' },
         ];
       });
-      service.updateLoadBalancerGroups(app);
+      LoadBalancerState.filterService.updateLoadBalancerGroups(app);
 
       setTimeout(() => {
-        expect(loadBalancerFilterModel.asFilterModel.groups).toEqual([
+        expect(LoadBalancerState.filterModel.asFilterModel.groups).toEqual([
           {
             heading: 'test',
             subgroups: [{ heading: 'elb-1', subgroups: [resultJson[0]] }],
@@ -282,11 +271,11 @@ describe('Service: loadBalancerFilterService', function() {
       app.loadBalancers.data[2].type = 'aws';
     });
     it('should filter by aws if checked', function(done) {
-      loadBalancerFilterModel.asFilterModel.sortFilter.providerType = { aws: true };
-      service.updateLoadBalancerGroups(app);
+      LoadBalancerState.filterModel.asFilterModel.sortFilter.providerType = { aws: true };
+      LoadBalancerState.filterService.updateLoadBalancerGroups(app);
 
       setTimeout(() => {
-        expect(loadBalancerFilterModel.asFilterModel.groups).toEqual([
+        expect(LoadBalancerState.filterModel.asFilterModel.groups).toEqual([
           {
             heading: 'prod',
             subgroups: [{ heading: 'elb-2', subgroups: [resultJson[2]] }],
@@ -301,11 +290,11 @@ describe('Service: loadBalancerFilterService', function() {
     });
 
     it('should not filter if no provider type is selected', function(done) {
-      loadBalancerFilterModel.asFilterModel.sortFilter.providerType = undefined;
-      service.updateLoadBalancerGroups(app);
+      LoadBalancerState.filterModel.asFilterModel.sortFilter.providerType = undefined;
+      LoadBalancerState.filterService.updateLoadBalancerGroups(app);
 
       setTimeout(() => {
-        expect(loadBalancerFilterModel.asFilterModel.groups).toEqual([
+        expect(LoadBalancerState.filterModel.asFilterModel.groups).toEqual([
           {
             heading: 'prod',
             subgroups: [{ heading: 'elb-2', subgroups: [resultJson[2]] }],
@@ -320,11 +309,11 @@ describe('Service: loadBalancerFilterService', function() {
     });
 
     it('should not filter if all provider are selected', function(done) {
-      loadBalancerFilterModel.asFilterModel.sortFilter.providerType = { aws: true, gce: true };
-      service.updateLoadBalancerGroups(app);
+      LoadBalancerState.filterModel.asFilterModel.sortFilter.providerType = { aws: true, gce: true };
+      LoadBalancerState.filterService.updateLoadBalancerGroups(app);
 
       setTimeout(() => {
-        expect(loadBalancerFilterModel.asFilterModel.groups).toEqual([
+        expect(LoadBalancerState.filterModel.asFilterModel.groups).toEqual([
           {
             heading: 'prod',
             subgroups: [{ heading: 'elb-2', subgroups: [resultJson[2]] }],
@@ -343,7 +332,7 @@ describe('Service: loadBalancerFilterService', function() {
     beforeEach(function() {
       app.loadBalancers.data[0].stringVal = 'original';
       app.loadBalancers.data[1].stringVal = 'should be deleted';
-      loadBalancerFilterModel.asFilterModel.groups = [
+      LoadBalancerState.filterModel.asFilterModel.groups = [
         {
           heading: 'prod',
           subgroups: [{ heading: 'elb-2', subgroups: [resultJson[2]] }],
@@ -374,10 +363,10 @@ describe('Service: loadBalancerFilterService', function() {
           },
         ],
       };
-      service.updateLoadBalancerGroups(app);
+      LoadBalancerState.filterService.updateLoadBalancerGroups(app);
 
       setTimeout(() => {
-        expect(loadBalancerFilterModel.asFilterModel.groups).toEqual([
+        expect(LoadBalancerState.filterModel.asFilterModel.groups).toEqual([
           newGroup,
           {
             heading: 'prod',
@@ -406,10 +395,10 @@ describe('Service: loadBalancerFilterService', function() {
           { heading: 'eu-west-1', loadBalancer: app.loadBalancers.data[3], serverGroups: [] as IServerGroup[] },
         ],
       };
-      service.updateLoadBalancerGroups(app);
+      LoadBalancerState.filterService.updateLoadBalancerGroups(app);
 
       setTimeout(() => {
-        expect(loadBalancerFilterModel.asFilterModel.groups).toEqual([
+        expect(LoadBalancerState.filterModel.asFilterModel.groups).toEqual([
           {
             heading: 'prod',
             subgroups: [{ heading: 'elb-2', subgroups: [resultJson[2]] }, newSubGroup],
@@ -436,10 +425,10 @@ describe('Service: loadBalancerFilterService', function() {
         loadBalancer: app.loadBalancers.data[3],
         serverGroups: [] as IServerGroup[],
       };
-      service.updateLoadBalancerGroups(app);
+      LoadBalancerState.filterService.updateLoadBalancerGroups(app);
 
       setTimeout(() => {
-        expect(loadBalancerFilterModel.asFilterModel.groups).toEqual([
+        expect(LoadBalancerState.filterModel.asFilterModel.groups).toEqual([
           {
             heading: 'prod',
             subgroups: [{ heading: 'elb-2', subgroups: [resultJson[2]] }],

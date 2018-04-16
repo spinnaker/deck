@@ -1,47 +1,32 @@
 import { mock } from 'angular';
 import * as _ from 'lodash';
-import { CLUSTER_FILTER_SERVICE, ClusterFilterService } from 'core/cluster/filter/clusterFilter.service';
 import { CLUSTER_SERVICE } from 'core/cluster/cluster.service';
 import { Application } from 'core/application/application.model';
 import { APPLICATION_MODEL_BUILDER, ApplicationModelBuilder } from 'core/application/applicationModel.builder';
-import { CLUSTER_FILTER_MODEL, ClusterFilterModel } from './clusterFilter.model';
+import * as State from 'core/state';
+
+const ClusterState = State.ClusterState;
 
 // Most of this logic has been moved to filter.model.service.js, so these act more as integration tests now
 describe('Service: clusterFilterService', function() {
   const debounceTimeout = 30;
 
-  let service: ClusterFilterService;
   let clusterService: any;
-  let clusterFilterModel: ClusterFilterModel;
-  let MultiselectModel: any;
   let applicationJSON: any;
   let groupedJSON: any;
   let applicationModelBuilder: ApplicationModelBuilder;
   let application: Application;
 
   beforeEach(function() {
-    mock.module(
-      CLUSTER_FILTER_SERVICE,
-      APPLICATION_MODEL_BUILDER,
-      CLUSTER_FILTER_MODEL,
-      CLUSTER_SERVICE,
-      require('./mockApplicationData.js').name,
-    );
+    mock.module(APPLICATION_MODEL_BUILDER, CLUSTER_SERVICE, require('./mockApplicationData.js').name, 'ui.router');
     mock.inject(function(
-      clusterFilterService: ClusterFilterService,
-      _clusterFilterModel_: ClusterFilterModel,
-      _MultiselectModel_: any,
       _applicationJSON_: any,
       _groupedJSON_: any,
       _clusterService_: any,
       _applicationModelBuilder_: ApplicationModelBuilder,
     ) {
-      service = clusterFilterService;
       clusterService = _clusterService_;
-      clusterFilterModel = _clusterFilterModel_;
-      MultiselectModel = _MultiselectModel_;
       applicationModelBuilder = _applicationModelBuilder_;
-      clusterFilterModel.asFilterModel.groups = [];
 
       applicationJSON = _applicationJSON_;
       groupedJSON = _groupedJSON_;
@@ -61,7 +46,7 @@ describe('Service: clusterFilterService', function() {
     };
 
     this.verifyTags = function(expectedTags: any[]) {
-      const actual: any = clusterFilterModel.asFilterModel.tags;
+      const actual: any = ClusterState.filterModel.asFilterModel.tags;
       expect(actual.length).toBe(expectedTags.length);
       expectedTags.forEach(function(expected: any) {
         expect(
@@ -73,33 +58,34 @@ describe('Service: clusterFilterService', function() {
     };
 
     application = this.buildApplication(applicationJSON);
+    State.initialize();
   });
 
   describe('Updating the cluster group', function() {
     it('no filter: should be transformed', function(done) {
-      service.updateClusterGroups(application);
+      ClusterState.filterService.updateClusterGroups(application);
       setTimeout(() => {
-        expect(clusterFilterModel.asFilterModel.groups).toEqual(groupedJSON);
+        expect(ClusterState.filterModel.asFilterModel.groups).toEqual(groupedJSON);
         done();
       }, debounceTimeout);
     });
 
     describe('filter by cluster', function() {
       it('should filter by cluster name as an exact match', function(done) {
-        clusterFilterModel.asFilterModel.sortFilter.filter = 'cluster:in-us-west-1-only';
+        ClusterState.filterModel.asFilterModel.sortFilter.filter = 'cluster:in-us-west-1-only';
         const expected: any = _.filter(groupedJSON, { subgroups: [{ heading: 'in-us-west-1-only' }] });
-        service.updateClusterGroups(application);
+        ClusterState.filterService.updateClusterGroups(application);
         setTimeout(() => {
-          expect(clusterFilterModel.asFilterModel.groups).toEqual(expected);
+          expect(ClusterState.filterModel.asFilterModel.groups).toEqual(expected);
           done();
         }, debounceTimeout);
       });
 
       it('should not match on partial cluster name', function(done) {
-        clusterFilterModel.asFilterModel.sortFilter.filter = 'cluster:in-us-west-1';
-        service.updateClusterGroups(application);
+        ClusterState.filterModel.asFilterModel.sortFilter.filter = 'cluster:in-us-west-1';
+        ClusterState.filterService.updateClusterGroups(application);
         setTimeout(() => {
-          expect(clusterFilterModel.asFilterModel.groups).toEqual([]);
+          expect(ClusterState.filterModel.asFilterModel.groups).toEqual([]);
           done();
         }, debounceTimeout);
       });
@@ -107,20 +93,20 @@ describe('Service: clusterFilterService', function() {
 
     describe('filter by vpc', function() {
       it('should filter by vpc name as an exact match', function(done) {
-        clusterFilterModel.asFilterModel.sortFilter.filter = 'vpc:main';
+        ClusterState.filterModel.asFilterModel.sortFilter.filter = 'vpc:main';
         const expected: any = _.filter(groupedJSON, { subgroups: [{ heading: 'in-us-west-1-only' }] });
-        service.updateClusterGroups(application);
+        ClusterState.filterService.updateClusterGroups(application);
         setTimeout(() => {
-          expect(clusterFilterModel.asFilterModel.groups).toEqual(expected);
+          expect(ClusterState.filterModel.asFilterModel.groups).toEqual(expected);
           done();
         }, debounceTimeout);
       });
 
       it('should not match on partial vpc name', function(done) {
-        clusterFilterModel.asFilterModel.sortFilter.filter = 'vpc:main-old';
-        service.updateClusterGroups(application);
+        ClusterState.filterModel.asFilterModel.sortFilter.filter = 'vpc:main-old';
+        ClusterState.filterService.updateClusterGroups(application);
         setTimeout(() => {
-          expect(clusterFilterModel.asFilterModel.groups).toEqual([]);
+          expect(ClusterState.filterModel.asFilterModel.groups).toEqual([]);
           done();
         }, debounceTimeout);
       });
@@ -128,29 +114,29 @@ describe('Service: clusterFilterService', function() {
 
     describe('filter by clusters', function() {
       it('should filter by cluster names as an exact match', function(done) {
-        clusterFilterModel.asFilterModel.sortFilter.filter = 'clusters:in-us-west-1-only';
+        ClusterState.filterModel.asFilterModel.sortFilter.filter = 'clusters:in-us-west-1-only';
         const expected: any = _.filter(groupedJSON, { subgroups: [{ heading: 'in-us-west-1-only' }] });
-        service.updateClusterGroups(application);
+        ClusterState.filterService.updateClusterGroups(application);
         setTimeout(() => {
-          expect(clusterFilterModel.asFilterModel.groups).toEqual(expected);
+          expect(ClusterState.filterModel.asFilterModel.groups).toEqual(expected);
           done();
         }, debounceTimeout);
       });
 
       it('should not match on partial cluster name', function(done) {
-        clusterFilterModel.asFilterModel.sortFilter.filter = 'clusters:in-us-west-1';
-        service.updateClusterGroups(application);
+        ClusterState.filterModel.asFilterModel.sortFilter.filter = 'clusters:in-us-west-1';
+        ClusterState.filterService.updateClusterGroups(application);
         setTimeout(() => {
-          expect(clusterFilterModel.asFilterModel.groups).toEqual([]);
+          expect(ClusterState.filterModel.asFilterModel.groups).toEqual([]);
           done();
         }, debounceTimeout);
       });
 
       it('should perform an OR match on comma separated list, ignoring spaces', function(done) {
-        clusterFilterModel.asFilterModel.sortFilter.filter = 'clusters:in-us-west-1-only, in-eu-east-2-only';
-        service.updateClusterGroups(application);
+        ClusterState.filterModel.asFilterModel.sortFilter.filter = 'clusters:in-us-west-1-only, in-eu-east-2-only';
+        ClusterState.filterService.updateClusterGroups(application);
         setTimeout(() => {
-          expect(clusterFilterModel.asFilterModel.groups).toEqual(groupedJSON);
+          expect(ClusterState.filterModel.asFilterModel.groups).toEqual(groupedJSON);
           done();
         }, debounceTimeout);
       });
@@ -158,21 +144,21 @@ describe('Service: clusterFilterService', function() {
 
     describe('filtering by account type', function() {
       it('1 account filter: should be transformed showing only prod accounts', function(done) {
-        clusterFilterModel.asFilterModel.sortFilter.account = { prod: true };
+        ClusterState.filterModel.asFilterModel.sortFilter.account = { prod: true };
         const expectedProd: any = _.filter(groupedJSON, { heading: 'prod' });
-        service.updateClusterGroups(application);
+        ClusterState.filterService.updateClusterGroups(application);
         setTimeout(() => {
-          expect(clusterFilterModel.asFilterModel.groups).toEqual(expectedProd);
+          expect(ClusterState.filterModel.asFilterModel.groups).toEqual(expectedProd);
           this.verifyTags([{ key: 'account', label: 'account', value: 'prod' }]);
           done();
         }, debounceTimeout);
       });
 
       it('All account filters: should show all accounts', function(done) {
-        clusterFilterModel.asFilterModel.sortFilter.account = { prod: true, test: true };
-        service.updateClusterGroups(application);
+        ClusterState.filterModel.asFilterModel.sortFilter.account = { prod: true, test: true };
+        ClusterState.filterService.updateClusterGroups(application);
         setTimeout(() => {
-          expect(clusterFilterModel.asFilterModel.groups).toEqual(groupedJSON);
+          expect(ClusterState.filterModel.asFilterModel.groups).toEqual(groupedJSON);
           this.verifyTags([
             { key: 'account', label: 'account', value: 'prod' },
             { key: 'account', label: 'account', value: 'test' },
@@ -185,11 +171,11 @@ describe('Service: clusterFilterService', function() {
 
   describe('filter by region', function() {
     it('1 region: should filter by that region ', function(done) {
-      clusterFilterModel.asFilterModel.sortFilter.region = { 'us-west-1': true };
+      ClusterState.filterModel.asFilterModel.sortFilter.region = { 'us-west-1': true };
       const expected: any = _.filter(groupedJSON, { subgroups: [{ heading: 'in-us-west-1-only' }] });
-      service.updateClusterGroups(application);
+      ClusterState.filterService.updateClusterGroups(application);
       setTimeout(() => {
-        expect(clusterFilterModel.asFilterModel.groups).toEqual(expected);
+        expect(ClusterState.filterModel.asFilterModel.groups).toEqual(expected);
         this.verifyTags([{ key: 'region', label: 'region', value: 'us-west-1' }]);
         done();
       }, debounceTimeout);
@@ -198,7 +184,7 @@ describe('Service: clusterFilterService', function() {
 
   describe('filter by healthy status', function() {
     it('should filter by health if checked', function(done) {
-      clusterFilterModel.asFilterModel.sortFilter.status = { healthy: true };
+      ClusterState.filterModel.asFilterModel.sortFilter.status = { healthy: true };
       const expected: any = _.filter(groupedJSON, {
         subgroups: [
           {
@@ -214,19 +200,19 @@ describe('Service: clusterFilterService', function() {
           },
         ],
       });
-      service.updateClusterGroups(application);
+      ClusterState.filterService.updateClusterGroups(application);
       setTimeout(() => {
-        expect(clusterFilterModel.asFilterModel.groups).toEqual(expected);
+        expect(ClusterState.filterModel.asFilterModel.groups).toEqual(expected);
         this.verifyTags([{ key: 'status', label: 'status', value: 'healthy' }]);
         done();
       }, debounceTimeout);
     });
 
     it('should not filter by healthy if unchecked', function(done) {
-      clusterFilterModel.asFilterModel.sortFilter.status = { healthy: false };
-      service.updateClusterGroups(application);
+      ClusterState.filterModel.asFilterModel.sortFilter.status = { healthy: false };
+      ClusterState.filterService.updateClusterGroups(application);
       setTimeout(() => {
-        expect(clusterFilterModel.asFilterModel.groups).toEqual(groupedJSON);
+        expect(ClusterState.filterModel.asFilterModel.groups).toEqual(groupedJSON);
         this.verifyTags([]);
         done();
       }, debounceTimeout);
@@ -235,7 +221,7 @@ describe('Service: clusterFilterService', function() {
 
   describe('filter by unhealthy status', function() {
     it('should filter by unhealthy status if checked', function(done) {
-      clusterFilterModel.asFilterModel.sortFilter.status = { unhealthy: true };
+      ClusterState.filterModel.asFilterModel.sortFilter.status = { unhealthy: true };
       const expected: any = _.filter(groupedJSON, {
         subgroups: [
           {
@@ -252,19 +238,19 @@ describe('Service: clusterFilterService', function() {
         ],
       });
 
-      service.updateClusterGroups(application);
+      ClusterState.filterService.updateClusterGroups(application);
       setTimeout(() => {
-        expect(clusterFilterModel.asFilterModel.groups).toEqual(expected);
+        expect(ClusterState.filterModel.asFilterModel.groups).toEqual(expected);
         this.verifyTags([{ key: 'status', label: 'status', value: 'unhealthy' }]);
         done();
       }, debounceTimeout);
     });
 
     it('should not filter by unhealthy if unchecked', function(done) {
-      clusterFilterModel.asFilterModel.sortFilter.status = { unhealthy: false };
-      service.updateClusterGroups(application);
+      ClusterState.filterModel.asFilterModel.sortFilter.status = { unhealthy: false };
+      ClusterState.filterService.updateClusterGroups(application);
       setTimeout(() => {
-        expect(clusterFilterModel.asFilterModel.groups).toEqual(groupedJSON);
+        expect(ClusterState.filterModel.asFilterModel.groups).toEqual(groupedJSON);
         this.verifyTags([]);
         done();
       }, debounceTimeout);
@@ -273,7 +259,7 @@ describe('Service: clusterFilterService', function() {
 
   describe('filter by both healthy and unhealthy status', function() {
     it('should not filter by healthy if unchecked', function(done) {
-      clusterFilterModel.asFilterModel.sortFilter.status = { unhealthy: true, healthy: true };
+      ClusterState.filterModel.asFilterModel.sortFilter.status = { unhealthy: true, healthy: true };
       const expected: any = _.filter(groupedJSON, {
         subgroups: [
           {
@@ -289,9 +275,9 @@ describe('Service: clusterFilterService', function() {
           },
         ],
       });
-      service.updateClusterGroups(application);
+      ClusterState.filterService.updateClusterGroups(application);
       setTimeout(() => {
-        expect(clusterFilterModel.asFilterModel.groups).toEqual(expected);
+        expect(ClusterState.filterModel.asFilterModel.groups).toEqual(expected);
         this.verifyTags([
           { key: 'status', label: 'status', value: 'healthy' },
           { key: 'status', label: 'status', value: 'unhealthy' },
@@ -303,7 +289,7 @@ describe('Service: clusterFilterService', function() {
 
   describe('filter by disabled status', function() {
     it('should filter by disabled status if checked', function(done) {
-      clusterFilterModel.asFilterModel.sortFilter.status = { Disabled: true };
+      ClusterState.filterModel.asFilterModel.sortFilter.status = { Disabled: true };
       const expected: any = _.filter(groupedJSON, {
         subgroups: [
           {
@@ -319,19 +305,19 @@ describe('Service: clusterFilterService', function() {
           },
         ],
       });
-      service.updateClusterGroups(application);
+      ClusterState.filterService.updateClusterGroups(application);
       setTimeout(() => {
-        expect(clusterFilterModel.asFilterModel.groups).toEqual(expected);
+        expect(ClusterState.filterModel.asFilterModel.groups).toEqual(expected);
         this.verifyTags([{ key: 'status', label: 'status', value: 'Disabled' }]);
         done();
       }, debounceTimeout);
     });
 
     it('should not filter if the status is unchecked', function(done) {
-      clusterFilterModel.asFilterModel.sortFilter.status = { Disabled: false };
-      service.updateClusterGroups(application);
+      ClusterState.filterModel.asFilterModel.sortFilter.status = { Disabled: false };
+      ClusterState.filterService.updateClusterGroups(application);
       setTimeout(() => {
-        expect(clusterFilterModel.asFilterModel.groups).toEqual(groupedJSON);
+        expect(ClusterState.filterModel.asFilterModel.groups).toEqual(groupedJSON);
         this.verifyTags([]);
         done();
       }, debounceTimeout);
@@ -344,17 +330,17 @@ describe('Service: clusterFilterService', function() {
         serverGroup = application.getDataSource('serverGroups').data[0];
       serverGroup.instances.push(starting);
 
-      clusterFilterModel.asFilterModel.sortFilter.status = { Starting: true };
-      service.updateClusterGroups(application);
+      ClusterState.filterModel.asFilterModel.sortFilter.status = { Starting: true };
+      ClusterState.filterService.updateClusterGroups(application);
 
       setTimeout(() => {
-        expect(clusterFilterModel.asFilterModel.groups).toEqual([]);
+        expect(ClusterState.filterModel.asFilterModel.groups).toEqual([]);
 
         starting.healthState = 'Starting';
         serverGroup.instanceCounts.starting = 1;
-        service.updateClusterGroups(application);
+        ClusterState.filterService.updateClusterGroups(application);
         setTimeout(() => {
-          expect(clusterFilterModel.asFilterModel.groups.length).toBe(1);
+          expect(ClusterState.filterModel.asFilterModel.groups.length).toBe(1);
           this.verifyTags([{ key: 'status', label: 'status', value: 'Starting' }]);
           done();
         }, debounceTimeout);
@@ -368,10 +354,10 @@ describe('Service: clusterFilterService', function() {
         serverGroup = application.getDataSource('serverGroups').data[0];
       serverGroup.instances.push(starting);
 
-      clusterFilterModel.asFilterModel.sortFilter.status = { OutOfService: true };
-      service.updateClusterGroups(application);
+      ClusterState.filterModel.asFilterModel.sortFilter.status = { OutOfService: true };
+      ClusterState.filterService.updateClusterGroups(application);
       setTimeout(() => {
-        expect(clusterFilterModel.asFilterModel.groups).toEqual([]);
+        expect(ClusterState.filterModel.asFilterModel.groups).toEqual([]);
         done();
       }, debounceTimeout);
     });
@@ -383,10 +369,10 @@ describe('Service: clusterFilterService', function() {
         serverGroup = application.getDataSource('serverGroups').data[0];
       serverGroup.instances.push(starting);
 
-      clusterFilterModel.asFilterModel.sortFilter.status = { Unknown: true };
-      service.updateClusterGroups(application);
+      ClusterState.filterModel.asFilterModel.sortFilter.status = { Unknown: true };
+      ClusterState.filterService.updateClusterGroups(application);
       setTimeout(() => {
-        expect(clusterFilterModel.asFilterModel.groups).toEqual([]);
+        expect(ClusterState.filterModel.asFilterModel.groups).toEqual([]);
         done();
       }, debounceTimeout);
     });
@@ -394,7 +380,7 @@ describe('Service: clusterFilterService', function() {
 
   describe('filtered by provider type', function() {
     it('should filter by aws if checked', function(done) {
-      clusterFilterModel.asFilterModel.sortFilter.providerType = { aws: true };
+      ClusterState.filterModel.asFilterModel.sortFilter.providerType = { aws: true };
       const expected: any = _.filter(groupedJSON, {
         subgroups: [
           {
@@ -410,29 +396,29 @@ describe('Service: clusterFilterService', function() {
           },
         ],
       });
-      service.updateClusterGroups(application);
+      ClusterState.filterService.updateClusterGroups(application);
       setTimeout(() => {
-        expect(clusterFilterModel.asFilterModel.groups).toEqual(expected);
+        expect(ClusterState.filterModel.asFilterModel.groups).toEqual(expected);
         this.verifyTags([{ key: 'providerType', label: 'provider', value: 'aws' }]);
         done();
       }, debounceTimeout);
     });
 
     it('should not filter if no provider type is selected', function(done) {
-      clusterFilterModel.asFilterModel.sortFilter.providerType = undefined;
-      service.updateClusterGroups(application);
+      ClusterState.filterModel.asFilterModel.sortFilter.providerType = undefined;
+      ClusterState.filterService.updateClusterGroups(application);
       setTimeout(() => {
-        expect(clusterFilterModel.asFilterModel.groups).toEqual(groupedJSON);
+        expect(ClusterState.filterModel.asFilterModel.groups).toEqual(groupedJSON);
         this.verifyTags([]);
         done();
       }, debounceTimeout);
     });
 
     it('should not filter if all provider are selected', function(done) {
-      clusterFilterModel.asFilterModel.sortFilter.providerType = { aws: true, gce: true };
-      service.updateClusterGroups(application);
+      ClusterState.filterModel.asFilterModel.sortFilter.providerType = { aws: true, gce: true };
+      ClusterState.filterService.updateClusterGroups(application);
       setTimeout(() => {
-        expect(clusterFilterModel.asFilterModel.groups).toEqual(groupedJSON);
+        expect(ClusterState.filterModel.asFilterModel.groups).toEqual(groupedJSON);
         this.verifyTags([
           { key: 'providerType', label: 'provider', value: 'aws' },
           { key: 'providerType', label: 'provider', value: 'gce' },
@@ -444,7 +430,7 @@ describe('Service: clusterFilterService', function() {
 
   describe('filtered by instance type', function() {
     it('should filter by m3.large if checked', function(done) {
-      clusterFilterModel.asFilterModel.sortFilter.instanceType = { 'm3.large': true };
+      ClusterState.filterModel.asFilterModel.sortFilter.instanceType = { 'm3.large': true };
       const expected: any = _.filter(groupedJSON, {
         subgroups: [
           {
@@ -460,29 +446,29 @@ describe('Service: clusterFilterService', function() {
           },
         ],
       });
-      service.updateClusterGroups(application);
+      ClusterState.filterService.updateClusterGroups(application);
       setTimeout(() => {
-        expect(clusterFilterModel.asFilterModel.groups).toEqual(expected);
+        expect(ClusterState.filterModel.asFilterModel.groups).toEqual(expected);
         this.verifyTags([{ key: 'instanceType', label: 'instance type', value: 'm3.large' }]);
         done();
       }, debounceTimeout);
     });
 
     it('should not filter if no instance type selected', function(done) {
-      clusterFilterModel.asFilterModel.sortFilter.instanceType = undefined;
-      service.updateClusterGroups(application);
+      ClusterState.filterModel.asFilterModel.sortFilter.instanceType = undefined;
+      ClusterState.filterService.updateClusterGroups(application);
       setTimeout(() => {
-        expect(clusterFilterModel.asFilterModel.groups).toEqual(groupedJSON);
+        expect(ClusterState.filterModel.asFilterModel.groups).toEqual(groupedJSON);
         this.verifyTags([]);
         done();
       }, debounceTimeout);
     });
 
     it('should not filter if the instance type is unchecked', function(done) {
-      clusterFilterModel.asFilterModel.sortFilter.instanceType = { 'm3.large': false };
-      service.updateClusterGroups(application);
+      ClusterState.filterModel.asFilterModel.sortFilter.instanceType = { 'm3.large': false };
+      ClusterState.filterService.updateClusterGroups(application);
       setTimeout(() => {
-        expect(clusterFilterModel.asFilterModel.groups).toEqual(groupedJSON);
+        expect(ClusterState.filterModel.asFilterModel.groups).toEqual(groupedJSON);
         this.verifyTags([]);
         done();
       }, debounceTimeout);
@@ -491,20 +477,20 @@ describe('Service: clusterFilterService', function() {
 
   describe('filter by instance counts', function() {
     it('should filter by min instances', function(done) {
-      clusterFilterModel.asFilterModel.sortFilter.minInstances = 1;
-      service.updateClusterGroups(application);
+      ClusterState.filterModel.asFilterModel.sortFilter.minInstances = 1;
+      ClusterState.filterService.updateClusterGroups(application);
       setTimeout(() => {
-        expect(clusterFilterModel.asFilterModel.groups).toEqual([groupedJSON[1]]);
+        expect(ClusterState.filterModel.asFilterModel.groups).toEqual([groupedJSON[1]]);
         this.verifyTags([{ key: 'minInstances', label: 'instance count (min)', value: 1 }]);
         done();
       }, debounceTimeout);
     });
 
     it('should filter by max instances', function(done) {
-      clusterFilterModel.asFilterModel.sortFilter.maxInstances = 0;
-      service.updateClusterGroups(application);
+      ClusterState.filterModel.asFilterModel.sortFilter.maxInstances = 0;
+      ClusterState.filterService.updateClusterGroups(application);
       setTimeout(() => {
-        expect(clusterFilterModel.asFilterModel.groups).toEqual([groupedJSON[0]]);
+        expect(ClusterState.filterModel.asFilterModel.groups).toEqual([groupedJSON[0]]);
         this.verifyTags([{ key: 'maxInstances', label: 'instance count (max)', value: 0 }]);
         done();
       }, debounceTimeout);
@@ -514,26 +500,26 @@ describe('Service: clusterFilterService', function() {
   describe('multiInstance filtering', function() {
     beforeEach(function() {
       this.navigationSynced = false;
-      clusterFilterModel.asFilterModel.sortFilter.multiselect = true;
-      spyOn(MultiselectModel, 'syncNavigation').and.callFake(() => (this.navigationSynced = true));
+      ClusterState.filterModel.asFilterModel.sortFilter.multiselect = true;
+      spyOn(ClusterState.multiselectModel, 'syncNavigation').and.callFake(() => (this.navigationSynced = true));
     });
 
     it('should remove all instanceIds if server group is no longer visible, and add back when visible again', function(done) {
-      clusterFilterModel.asFilterModel.sortFilter.listInstances = true;
+      ClusterState.filterModel.asFilterModel.sortFilter.listInstances = true;
       const serverGroup = application.getDataSource('serverGroups').data[0],
-        multiselectGroup = MultiselectModel.getOrCreateInstanceGroup(serverGroup);
+        multiselectGroup = ClusterState.multiselectModel.getOrCreateInstanceGroup(serverGroup);
 
       serverGroup.instances.push({ id: 'i-1234' });
-      MultiselectModel.toggleSelectAll(serverGroup, ['i-1234']);
+      ClusterState.multiselectModel.toggleSelectAll(serverGroup, ['i-1234']);
       expect(multiselectGroup.instanceIds).toEqual(['i-1234']);
 
-      clusterFilterModel.asFilterModel.sortFilter.region['us-east-3'] = true;
-      service.updateClusterGroups(application);
+      ClusterState.filterModel.asFilterModel.sortFilter.region['us-east-3'] = true;
+      ClusterState.filterService.updateClusterGroups(application);
       setTimeout(() => {
         expect(multiselectGroup.instanceIds).toEqual([]);
 
-        clusterFilterModel.asFilterModel.sortFilter.region['us-east-3'] = false;
-        service.updateClusterGroups(application);
+        ClusterState.filterModel.asFilterModel.sortFilter.region['us-east-3'] = false;
+        ClusterState.filterService.updateClusterGroups(application);
 
         setTimeout(() => {
           expect(multiselectGroup.instanceIds).toEqual(['i-1234']);
@@ -543,21 +529,21 @@ describe('Service: clusterFilterService', function() {
     });
 
     it('should remove instances that are no longer visible', function(done) {
-      clusterFilterModel.asFilterModel.sortFilter.listInstances = true;
+      ClusterState.filterModel.asFilterModel.sortFilter.listInstances = true;
       const serverGroup = application.getDataSource('serverGroups').data[0];
 
-      MultiselectModel.toggleInstance(serverGroup, 'i-1234');
-      MultiselectModel.toggleInstance(serverGroup, 'i-2345');
+      ClusterState.multiselectModel.toggleInstance(serverGroup, 'i-1234');
+      ClusterState.multiselectModel.toggleInstance(serverGroup, 'i-2345');
       serverGroup.instances.push({ id: 'i-1234' });
 
-      expect(MultiselectModel.instanceIsSelected(serverGroup, 'i-1234')).toBe(true);
-      expect(MultiselectModel.instanceIsSelected(serverGroup, 'i-2345')).toBe(true);
+      expect(ClusterState.multiselectModel.instanceIsSelected(serverGroup, 'i-1234')).toBe(true);
+      expect(ClusterState.multiselectModel.instanceIsSelected(serverGroup, 'i-2345')).toBe(true);
 
-      service.updateClusterGroups(application);
+      ClusterState.filterService.updateClusterGroups(application);
 
       setTimeout(() => {
-        expect(MultiselectModel.instanceIsSelected(serverGroup, 'i-1234')).toBe(true);
-        expect(MultiselectModel.instanceIsSelected(serverGroup, 'i-2345')).toBe(false);
+        expect(ClusterState.multiselectModel.instanceIsSelected(serverGroup, 'i-1234')).toBe(true);
+        expect(ClusterState.multiselectModel.instanceIsSelected(serverGroup, 'i-2345')).toBe(false);
 
         expect(this.navigationSynced).toBe(true);
         done();
@@ -565,19 +551,19 @@ describe('Service: clusterFilterService', function() {
     });
 
     it('should add all instances when selectAll is selected and new instances appear in server group', function(done) {
-      clusterFilterModel.asFilterModel.sortFilter.listInstances = true;
+      ClusterState.filterModel.asFilterModel.sortFilter.listInstances = true;
       const serverGroup = application.getDataSource('serverGroups').data[0];
 
-      MultiselectModel.getOrCreateInstanceGroup(serverGroup).selectAll = true;
-      MultiselectModel.toggleInstance(serverGroup, 'i-1234');
+      ClusterState.multiselectModel.getOrCreateInstanceGroup(serverGroup).selectAll = true;
+      ClusterState.multiselectModel.toggleInstance(serverGroup, 'i-1234');
       serverGroup.instances.push({ id: 'i-1234' });
       serverGroup.instances.push({ id: 'i-2345' });
 
-      service.updateClusterGroups(application);
+      ClusterState.filterService.updateClusterGroups(application);
 
       setTimeout(() => {
-        expect(MultiselectModel.instanceIsSelected(serverGroup, 'i-1234')).toBe(true);
-        expect(MultiselectModel.instanceIsSelected(serverGroup, 'i-2345')).toBe(true);
+        expect(ClusterState.multiselectModel.instanceIsSelected(serverGroup, 'i-1234')).toBe(true);
+        expect(ClusterState.multiselectModel.instanceIsSelected(serverGroup, 'i-2345')).toBe(true);
 
         expect(this.navigationSynced).toBe(true);
         done();
@@ -585,16 +571,16 @@ describe('Service: clusterFilterService', function() {
     });
 
     it('should remove all instance groups when listInstances is false', function(done) {
-      clusterFilterModel.asFilterModel.sortFilter.listInstances = false;
+      ClusterState.filterModel.asFilterModel.sortFilter.listInstances = false;
       const serverGroup = application.getDataSource('serverGroups').data[0];
 
-      MultiselectModel.toggleInstance(serverGroup, 'i-1234');
+      ClusterState.multiselectModel.toggleInstance(serverGroup, 'i-1234');
 
-      expect(MultiselectModel.instanceGroups.length).toBe(1);
-      service.updateClusterGroups(application);
+      expect(ClusterState.multiselectModel.instanceGroups.length).toBe(1);
+      ClusterState.filterService.updateClusterGroups(application);
 
       setTimeout(() => {
-        expect(MultiselectModel.instanceGroups.length).toBe(0);
+        expect(ClusterState.multiselectModel.instanceGroups.length).toBe(0);
         expect(this.navigationSynced).toBe(true);
         done();
       }, debounceTimeout);
@@ -603,10 +589,10 @@ describe('Service: clusterFilterService', function() {
 
   describe('clear all filters', function() {
     it('should clear set providerType filter', function() {
-      clusterFilterModel.asFilterModel.sortFilter.providerType = { aws: true };
-      expect(clusterFilterModel.asFilterModel.sortFilter.providerType).toBeDefined();
-      service.clearFilters();
-      expect(clusterFilterModel.asFilterModel.sortFilter.providerType).toBeUndefined();
+      ClusterState.filterModel.asFilterModel.sortFilter.providerType = { aws: true };
+      expect(ClusterState.filterModel.asFilterModel.sortFilter.providerType).toBeDefined();
+      ClusterState.filterService.clearFilters();
+      expect(ClusterState.filterModel.asFilterModel.sortFilter.providerType).toBeUndefined();
       this.verifyTags([]);
     });
   });
@@ -633,7 +619,7 @@ describe('Service: clusterFilterService', function() {
         category: 'serverGroup',
         instances: [],
       };
-      clusterFilterModel.asFilterModel.groups = [
+      ClusterState.filterModel.asFilterModel.groups = [
         {
           heading: 'prod',
           key: 'prod',
@@ -675,17 +661,17 @@ describe('Service: clusterFilterService', function() {
         },
         clusters: [this.clusterA, { name: 'cluster-a', account: 'test', category: 'serverGroup' }],
       });
-      service.updateClusterGroups(application);
+      ClusterState.filterService.updateClusterGroups(application);
 
       setTimeout(() => {
-        expect(clusterFilterModel.asFilterModel.groups.length).toBe(2);
-        expect(clusterFilterModel.asFilterModel.groups[1].heading).toBe('test');
-        expect(clusterFilterModel.asFilterModel.groups[1].subgroups.length).toBe(1);
-        expect(clusterFilterModel.asFilterModel.groups[1].subgroups[0].heading).toBe('cluster-a');
-        expect(clusterFilterModel.asFilterModel.groups[1].subgroups[0].subgroups.length).toBe(1);
-        expect(clusterFilterModel.asFilterModel.groups[1].subgroups[0].subgroups[0].heading).toBe('us-east-1');
-        expect(clusterFilterModel.asFilterModel.groups[1].subgroups[0].subgroups[0].serverGroups.length).toBe(1);
-        expect(clusterFilterModel.asFilterModel.groups[1].subgroups[0].subgroups[0].serverGroups[0].name).toBe(
+        expect(ClusterState.filterModel.asFilterModel.groups.length).toBe(2);
+        expect(ClusterState.filterModel.asFilterModel.groups[1].heading).toBe('test');
+        expect(ClusterState.filterModel.asFilterModel.groups[1].subgroups.length).toBe(1);
+        expect(ClusterState.filterModel.asFilterModel.groups[1].subgroups[0].heading).toBe('cluster-a');
+        expect(ClusterState.filterModel.asFilterModel.groups[1].subgroups[0].subgroups.length).toBe(1);
+        expect(ClusterState.filterModel.asFilterModel.groups[1].subgroups[0].subgroups[0].heading).toBe('us-east-1');
+        expect(ClusterState.filterModel.asFilterModel.groups[1].subgroups[0].subgroups[0].serverGroups.length).toBe(1);
+        expect(ClusterState.filterModel.asFilterModel.groups[1].subgroups[0].subgroups[0].serverGroups[0].name).toBe(
           'cluster-a-v003',
         );
         done();
@@ -710,15 +696,15 @@ describe('Service: clusterFilterService', function() {
         },
         clusters: [this.clusterA, this.clusterB],
       });
-      service.updateClusterGroups(application);
+      ClusterState.filterService.updateClusterGroups(application);
       setTimeout(() => {
-        expect(clusterFilterModel.asFilterModel.groups.length).toBe(1);
-        expect(clusterFilterModel.asFilterModel.groups[0].subgroups.length).toBe(2);
-        expect(clusterFilterModel.asFilterModel.groups[0].subgroups[1].heading).toBe('cluster-b');
-        expect(clusterFilterModel.asFilterModel.groups[0].subgroups[1].subgroups.length).toBe(1);
-        expect(clusterFilterModel.asFilterModel.groups[0].subgroups[1].subgroups[0].heading).toBe('us-east-1');
-        expect(clusterFilterModel.asFilterModel.groups[0].subgroups[1].subgroups[0].serverGroups.length).toBe(1);
-        expect(clusterFilterModel.asFilterModel.groups[0].subgroups[1].subgroups[0].serverGroups[0].name).toBe(
+        expect(ClusterState.filterModel.asFilterModel.groups.length).toBe(1);
+        expect(ClusterState.filterModel.asFilterModel.groups[0].subgroups.length).toBe(2);
+        expect(ClusterState.filterModel.asFilterModel.groups[0].subgroups[1].heading).toBe('cluster-b');
+        expect(ClusterState.filterModel.asFilterModel.groups[0].subgroups[1].subgroups.length).toBe(1);
+        expect(ClusterState.filterModel.asFilterModel.groups[0].subgroups[1].subgroups[0].heading).toBe('us-east-1');
+        expect(ClusterState.filterModel.asFilterModel.groups[0].subgroups[1].subgroups[0].serverGroups.length).toBe(1);
+        expect(ClusterState.filterModel.asFilterModel.groups[0].subgroups[1].subgroups[0].serverGroups[0].name).toBe(
           'cluster-a-v003',
         );
         done();
@@ -744,14 +730,14 @@ describe('Service: clusterFilterService', function() {
         },
       });
       application.clusters = clusterService.createServerGroupClusters(application.getDataSource('serverGroups').data);
-      service.updateClusterGroups(application);
+      ClusterState.filterService.updateClusterGroups(application);
       setTimeout(() => {
-        expect(clusterFilterModel.asFilterModel.groups.length).toBe(1);
-        expect(clusterFilterModel.asFilterModel.groups[0].subgroups.length).toBe(1);
-        expect(clusterFilterModel.asFilterModel.groups[0].subgroups[0].subgroups.length).toBe(2);
-        expect(clusterFilterModel.asFilterModel.groups[0].subgroups[0].subgroups[1].heading).toBe('us-west-1');
-        expect(clusterFilterModel.asFilterModel.groups[0].subgroups[0].subgroups[1].serverGroups.length).toBe(1);
-        expect(clusterFilterModel.asFilterModel.groups[0].subgroups[0].subgroups[1].serverGroups[0].name).toBe(
+        expect(ClusterState.filterModel.asFilterModel.groups.length).toBe(1);
+        expect(ClusterState.filterModel.asFilterModel.groups[0].subgroups.length).toBe(1);
+        expect(ClusterState.filterModel.asFilterModel.groups[0].subgroups[0].subgroups.length).toBe(2);
+        expect(ClusterState.filterModel.asFilterModel.groups[0].subgroups[0].subgroups[1].heading).toBe('us-west-1');
+        expect(ClusterState.filterModel.asFilterModel.groups[0].subgroups[0].subgroups[1].serverGroups.length).toBe(1);
+        expect(ClusterState.filterModel.asFilterModel.groups[0].subgroups[0].subgroups[1].serverGroups[0].name).toBe(
           'cluster-a-v003',
         );
         done();
@@ -777,13 +763,13 @@ describe('Service: clusterFilterService', function() {
         },
       });
       application.clusters = clusterService.createServerGroupClusters(application.getDataSource('serverGroups').data);
-      service.updateClusterGroups(application);
+      ClusterState.filterService.updateClusterGroups(application);
       setTimeout(() => {
-        expect(clusterFilterModel.asFilterModel.groups.length).toBe(1);
-        expect(clusterFilterModel.asFilterModel.groups[0].subgroups.length).toBe(1);
-        expect(clusterFilterModel.asFilterModel.groups[0].subgroups[0].subgroups.length).toBe(1);
-        expect(clusterFilterModel.asFilterModel.groups[0].subgroups[0].subgroups[0].serverGroups.length).toBe(3);
-        expect(clusterFilterModel.asFilterModel.groups[0].subgroups[0].subgroups[0].serverGroups[2].name).toBe(
+        expect(ClusterState.filterModel.asFilterModel.groups.length).toBe(1);
+        expect(ClusterState.filterModel.asFilterModel.groups[0].subgroups.length).toBe(1);
+        expect(ClusterState.filterModel.asFilterModel.groups[0].subgroups[0].subgroups.length).toBe(1);
+        expect(ClusterState.filterModel.asFilterModel.groups[0].subgroups[0].subgroups[0].serverGroups.length).toBe(3);
+        expect(ClusterState.filterModel.asFilterModel.groups[0].subgroups[0].subgroups[0].serverGroups[2].name).toBe(
           'cluster-a-v003',
         );
         done();
@@ -809,16 +795,16 @@ describe('Service: clusterFilterService', function() {
         },
       });
       application.clusters = clusterService.createServerGroupClusters(application.getDataSource('serverGroups').data);
-      service.updateClusterGroups(application);
+      ClusterState.filterService.updateClusterGroups(application);
 
       setTimeout(() => {
-        expect(clusterFilterModel.asFilterModel.groups.length).toBe(2);
+        expect(ClusterState.filterModel.asFilterModel.groups.length).toBe(2);
         application.getDataSource('serverGroups').data.splice(0, 2);
-        service.updateClusterGroups(application);
+        ClusterState.filterService.updateClusterGroups(application);
 
         setTimeout(() => {
-          expect(clusterFilterModel.asFilterModel.groups.length).toBe(1);
-          expect(clusterFilterModel.asFilterModel.groups[0].heading).toBe('test');
+          expect(ClusterState.filterModel.asFilterModel.groups.length).toBe(1);
+          expect(ClusterState.filterModel.asFilterModel.groups[0].heading).toBe('test');
           done();
         }, debounceTimeout);
       }, debounceTimeout);
@@ -843,19 +829,19 @@ describe('Service: clusterFilterService', function() {
         },
       });
       application.clusters = clusterService.createServerGroupClusters(application.getDataSource('serverGroups').data);
-      service.updateClusterGroups(application);
+      ClusterState.filterService.updateClusterGroups(application);
 
       setTimeout(() => {
-        expect(clusterFilterModel.asFilterModel.groups.length).toBe(1);
-        expect(clusterFilterModel.asFilterModel.groups[0].subgroups.length).toBe(2);
+        expect(ClusterState.filterModel.asFilterModel.groups.length).toBe(1);
+        expect(ClusterState.filterModel.asFilterModel.groups[0].subgroups.length).toBe(2);
 
         application.getDataSource('serverGroups').data.splice(0, 2);
-        service.updateClusterGroups(application);
+        ClusterState.filterService.updateClusterGroups(application);
 
         setTimeout(() => {
-          expect(clusterFilterModel.asFilterModel.groups.length).toBe(1);
-          expect(clusterFilterModel.asFilterModel.groups[0].subgroups.length).toBe(1);
-          expect(clusterFilterModel.asFilterModel.groups[0].subgroups[0].heading).toBe('cluster-b');
+          expect(ClusterState.filterModel.asFilterModel.groups.length).toBe(1);
+          expect(ClusterState.filterModel.asFilterModel.groups[0].subgroups.length).toBe(1);
+          expect(ClusterState.filterModel.asFilterModel.groups[0].subgroups[0].heading).toBe('cluster-b');
           done();
         }, debounceTimeout);
       }, debounceTimeout);
@@ -880,21 +866,21 @@ describe('Service: clusterFilterService', function() {
         },
       });
       application.clusters = clusterService.createServerGroupClusters(application.getDataSource('serverGroups').data);
-      service.updateClusterGroups(application);
+      ClusterState.filterService.updateClusterGroups(application);
 
       setTimeout(() => {
-        expect(clusterFilterModel.asFilterModel.groups.length).toBe(1);
-        expect(clusterFilterModel.asFilterModel.groups[0].subgroups.length).toBe(1);
-        expect(clusterFilterModel.asFilterModel.groups[0].subgroups[0].subgroups.length).toBe(2);
+        expect(ClusterState.filterModel.asFilterModel.groups.length).toBe(1);
+        expect(ClusterState.filterModel.asFilterModel.groups[0].subgroups.length).toBe(1);
+        expect(ClusterState.filterModel.asFilterModel.groups[0].subgroups[0].subgroups.length).toBe(2);
 
         application.getDataSource('serverGroups').data.splice(0, 2);
-        service.updateClusterGroups(application);
+        ClusterState.filterService.updateClusterGroups(application);
 
         setTimeout(() => {
-          expect(clusterFilterModel.asFilterModel.groups.length).toBe(1);
-          expect(clusterFilterModel.asFilterModel.groups[0].subgroups.length).toBe(1);
-          expect(clusterFilterModel.asFilterModel.groups[0].subgroups[0].subgroups.length).toBe(1);
-          expect(clusterFilterModel.asFilterModel.groups[0].subgroups[0].subgroups[0].heading).toBe('us-west-1');
+          expect(ClusterState.filterModel.asFilterModel.groups.length).toBe(1);
+          expect(ClusterState.filterModel.asFilterModel.groups[0].subgroups.length).toBe(1);
+          expect(ClusterState.filterModel.asFilterModel.groups[0].subgroups[0].subgroups.length).toBe(1);
+          expect(ClusterState.filterModel.asFilterModel.groups[0].subgroups[0].subgroups[0].heading).toBe('us-west-1');
           done();
         }, debounceTimeout);
       }, debounceTimeout);
@@ -907,14 +893,14 @@ describe('Service: clusterFilterService', function() {
         },
       });
       application.clusters = clusterService.createServerGroupClusters(application.getDataSource('serverGroups').data);
-      service.updateClusterGroups(application);
+      ClusterState.filterService.updateClusterGroups(application);
 
       setTimeout(() => {
-        expect(clusterFilterModel.asFilterModel.groups.length).toBe(1);
-        expect(clusterFilterModel.asFilterModel.groups[0].subgroups.length).toBe(1);
-        expect(clusterFilterModel.asFilterModel.groups[0].subgroups[0].subgroups.length).toBe(1);
-        expect(clusterFilterModel.asFilterModel.groups[0].subgroups[0].subgroups[0].serverGroups.length).toBe(1);
-        expect(clusterFilterModel.asFilterModel.groups[0].subgroups[0].subgroups[0].serverGroups[0].name).toBe(
+        expect(ClusterState.filterModel.asFilterModel.groups.length).toBe(1);
+        expect(ClusterState.filterModel.asFilterModel.groups[0].subgroups.length).toBe(1);
+        expect(ClusterState.filterModel.asFilterModel.groups[0].subgroups[0].subgroups.length).toBe(1);
+        expect(ClusterState.filterModel.asFilterModel.groups[0].subgroups[0].subgroups[0].serverGroups.length).toBe(1);
+        expect(ClusterState.filterModel.asFilterModel.groups[0].subgroups[0].subgroups[0].serverGroups[0].name).toBe(
           'cluster-a-v001',
         );
         done();
@@ -947,13 +933,13 @@ describe('Service: clusterFilterService', function() {
         },
       });
       application.clusters = clusterService.createServerGroupClusters(application.getDataSource('serverGroups').data);
-      service.updateClusterGroups(application);
+      ClusterState.filterService.updateClusterGroups(application);
 
       setTimeout(() => {
-        expect(clusterFilterModel.asFilterModel.groups[0].subgroups[0].subgroups[0].serverGroups[0]).toBe(
+        expect(ClusterState.filterModel.asFilterModel.groups[0].subgroups[0].subgroups[0].serverGroups[0]).toBe(
           this.serverGroup000,
         );
-        expect(clusterFilterModel.asFilterModel.groups[0].subgroups[0].subgroups[0].serverGroups[1]).toBe(
+        expect(ClusterState.filterModel.asFilterModel.groups[0].subgroups[0].subgroups[0].serverGroups[1]).toBe(
           this.serverGroup001,
         );
         done();
@@ -986,16 +972,16 @@ describe('Service: clusterFilterService', function() {
         },
       });
       application.clusters = clusterService.createServerGroupClusters(application.getDataSource('serverGroups').data);
-      service.updateClusterGroups(application);
+      ClusterState.filterService.updateClusterGroups(application);
 
       setTimeout(() => {
-        expect(clusterFilterModel.asFilterModel.groups[0].subgroups[0].subgroups[0].serverGroups[0]).not.toBe(
+        expect(ClusterState.filterModel.asFilterModel.groups[0].subgroups[0].subgroups[0].serverGroups[0]).not.toBe(
           this.serverGroup000,
         );
-        expect(clusterFilterModel.asFilterModel.groups[0].subgroups[0].subgroups[0].serverGroups[0]).toBe(
+        expect(ClusterState.filterModel.asFilterModel.groups[0].subgroups[0].subgroups[0].serverGroups[0]).toBe(
           application.getDataSource('serverGroups').data[0],
         );
-        expect(clusterFilterModel.asFilterModel.groups[0].subgroups[0].subgroups[0].serverGroups[1]).toBe(
+        expect(ClusterState.filterModel.asFilterModel.groups[0].subgroups[0].subgroups[0].serverGroups[1]).toBe(
           this.serverGroup001,
         );
         done();
@@ -1023,17 +1009,17 @@ describe('Service: clusterFilterService', function() {
       application.getDataSource('serverGroups').data[0].runningTasks = runningTasks;
       application.getDataSource('serverGroups').data[0].runningExecutions = executions;
       application.clusters = clusterService.createServerGroupClusters(application.getDataSource('serverGroups').data);
-      service.updateClusterGroups(application);
+      ClusterState.filterService.updateClusterGroups(application);
 
       setTimeout(() => {
-        expect(clusterFilterModel.asFilterModel.groups[0].subgroups[0].subgroups[0].serverGroups[0]).toBe(
+        expect(ClusterState.filterModel.asFilterModel.groups[0].subgroups[0].subgroups[0].serverGroups[0]).toBe(
           this.serverGroup001,
         );
-        expect(clusterFilterModel.asFilterModel.groups[0].subgroups[0].subgroups[0].serverGroups[0].runningTasks).toBe(
-          runningTasks,
-        );
         expect(
-          clusterFilterModel.asFilterModel.groups[0].subgroups[0].subgroups[0].serverGroups[0].runningExecutions,
+          ClusterState.filterModel.asFilterModel.groups[0].subgroups[0].subgroups[0].serverGroups[0].runningTasks,
+        ).toBe(runningTasks);
+        expect(
+          ClusterState.filterModel.asFilterModel.groups[0].subgroups[0].subgroups[0].serverGroups[0].runningExecutions,
         ).toBe(executions);
         done();
       }, debounceTimeout);

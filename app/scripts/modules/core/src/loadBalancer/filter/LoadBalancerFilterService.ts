@@ -1,12 +1,12 @@
-import { ILogService, module } from 'angular';
 import { chain, find, forOwn, groupBy, includes, intersection, map, some, sortBy, values, without } from 'lodash';
 import { Debounce, BindAll } from 'lodash-decorators';
+import { $log } from 'ngimport';
 import { Subject } from 'rxjs';
 
 import { Application } from 'core/application/application.model';
+import { FilterModelService, ISortFilter } from 'core/filterModel';
 import { ILoadBalancer, ILoadBalancerGroup, IInstance, IServerGroup } from 'core/domain';
-import { FILTER_MODEL_SERVICE, ISortFilter } from 'core/filterModel';
-import { LOAD_BALANCER_FILTER_MODEL, LoadBalancerFilterModel } from './loadBalancerFilter.model';
+import { LoadBalancerState } from 'core/state';
 
 @BindAll()
 export class LoadBalancerFilterService {
@@ -16,14 +16,9 @@ export class LoadBalancerFilterService {
   private getCheckValues: (object: any) => string[];
   private lastApplication: Application;
 
-  constructor(
-    private loadBalancerFilterModel: LoadBalancerFilterModel,
-    private filterModelService: any,
-    private $log: ILogService,
-  ) {
-    'ngInject';
-    this.isFilterable = filterModelService.isFilterable;
-    this.getCheckValues = filterModelService.getCheckValues;
+  constructor() {
+    this.isFilterable = FilterModelService.isFilterable;
+    this.getCheckValues = FilterModelService.getCheckValues;
   }
 
   private addSearchFields(loadBalancer: ILoadBalancer): void {
@@ -39,7 +34,7 @@ export class LoadBalancerFilterService {
   }
 
   private checkSearchTextFilter(loadBalancer: ILoadBalancer): boolean {
-    const filter = this.loadBalancerFilterModel.asFilterModel.sortFilter.filter;
+    const filter = LoadBalancerState.filterModel.asFilterModel.sortFilter.filter;
     if (!filter) {
       return true;
     }
@@ -57,12 +52,12 @@ export class LoadBalancerFilterService {
   public filterLoadBalancersForDisplay(loadBalancers: ILoadBalancer[]): ILoadBalancer[] {
     return chain(loadBalancers)
       .filter(lb => this.checkSearchTextFilter(lb))
-      .filter(lb => this.filterModelService.checkAccountFilters(this.loadBalancerFilterModel)(lb))
-      .filter(lb => this.filterModelService.checkRegionFilters(this.loadBalancerFilterModel)(lb))
-      .filter(lb => this.filterModelService.checkStackFilters(this.loadBalancerFilterModel)(lb))
-      .filter(lb => this.filterModelService.checkDetailFilters(this.loadBalancerFilterModel)(lb))
-      .filter(lb => this.filterModelService.checkStatusFilters(this.loadBalancerFilterModel)(lb))
-      .filter(lb => this.filterModelService.checkProviderFilters(this.loadBalancerFilterModel)(lb))
+      .filter(lb => FilterModelService.checkAccountFilters(LoadBalancerState.filterModel.asFilterModel)(lb))
+      .filter(lb => FilterModelService.checkRegionFilters(LoadBalancerState.filterModel.asFilterModel)(lb))
+      .filter(lb => FilterModelService.checkStackFilters(LoadBalancerState.filterModel.asFilterModel)(lb))
+      .filter(lb => FilterModelService.checkDetailFilters(LoadBalancerState.filterModel.asFilterModel)(lb))
+      .filter(lb => FilterModelService.checkStatusFilters(LoadBalancerState.filterModel.asFilterModel)(lb))
+      .filter(lb => FilterModelService.checkProviderFilters(LoadBalancerState.filterModel.asFilterModel)(lb))
       .filter(lb => this.instanceFilters(lb))
       .value();
   }
@@ -72,12 +67,12 @@ export class LoadBalancerFilterService {
   }
 
   private shouldFilterInstances(): boolean {
-    const sortFilter: ISortFilter = this.loadBalancerFilterModel.asFilterModel.sortFilter;
+    const sortFilter: ISortFilter = LoadBalancerState.filterModel.asFilterModel.sortFilter;
     return this.isFilterable(sortFilter.status) || this.isFilterable(sortFilter.availabilityZone);
   }
 
   public shouldShowInstance(instance: IInstance): boolean {
-    const sortFilter: ISortFilter = this.loadBalancerFilterModel.asFilterModel.sortFilter;
+    const sortFilter: ISortFilter = LoadBalancerState.filterModel.asFilterModel.sortFilter;
     if (this.isFilterable(sortFilter.availabilityZone)) {
       const checkedAvailabilityZones = this.getCheckValues(sortFilter.availabilityZone);
       if (!checkedAvailabilityZones.includes(instance.zone)) {
@@ -135,7 +130,7 @@ export class LoadBalancerFilterService {
         region: serverGroup.region,
       });
       if (!newServerGroup) {
-        this.$log.debug(
+        $log.debug(
           'server group no longer found, removing:',
           serverGroup.name,
           serverGroup.account,
@@ -145,7 +140,7 @@ export class LoadBalancerFilterService {
       } else {
         newServerGroup.stringVal = newServerGroup.stringVal || JSON.stringify(newServerGroup, this.jsonReplacer);
         if (serverGroup.stringVal !== newServerGroup.stringVal) {
-          this.$log.debug(
+          $log.debug(
             'change detected, updating server group:',
             serverGroup.name,
             serverGroup.account,
@@ -165,17 +160,17 @@ export class LoadBalancerFilterService {
         region: serverGroup.region,
       });
       if (!oldServerGroup) {
-        this.$log.debug('new server group found, adding', serverGroup.name, serverGroup.account, serverGroup.region);
+        $log.debug('new server group found, adding', serverGroup.name, serverGroup.account, serverGroup.region);
         oldGroup.serverGroups.push(serverGroup);
       }
     });
   }
 
   public sortGroupsByHeading(groups: ILoadBalancerGroup[]): void {
-    this.diffSubgroups(this.loadBalancerFilterModel.asFilterModel.groups, groups);
+    this.diffSubgroups(LoadBalancerState.filterModel.asFilterModel.groups, groups);
 
     // sort groups in place so Angular doesn't try to update the world
-    this.loadBalancerFilterModel.asFilterModel.groups.sort((a, b) => {
+    LoadBalancerState.filterModel.asFilterModel.groups.sort((a, b) => {
       if (a.heading < b.heading) {
         return -1;
       }
@@ -187,8 +182,8 @@ export class LoadBalancerFilterService {
   }
 
   public clearFilters(): void {
-    this.loadBalancerFilterModel.asFilterModel.clearFilters();
-    this.loadBalancerFilterModel.asFilterModel.applyParamsToUrl();
+    LoadBalancerState.filterModel.asFilterModel.clearFilters();
+    LoadBalancerState.filterModel.asFilterModel.applyParamsToUrl();
   }
 
   private filterServerGroups(loadBalancer: ILoadBalancer): IServerGroup[] {
@@ -255,15 +250,8 @@ export class LoadBalancerFilterService {
     });
 
     this.sortGroupsByHeading(groups);
-    this.loadBalancerFilterModel.asFilterModel.addTags();
+    LoadBalancerState.filterModel.asFilterModel.addTags();
     this.lastApplication = application;
     this.groupsUpdatedStream.next(groups);
   }
 }
-
-export const LOAD_BALANCER_FILTER_SERVICE = 'spinnaker.core.loadBalancer.filter.service';
-module(LOAD_BALANCER_FILTER_SERVICE, [LOAD_BALANCER_FILTER_MODEL, FILTER_MODEL_SERVICE]).factory(
-  'loadBalancerFilterService',
-  (loadBalancerFilterModel: LoadBalancerFilterModel, filterModelService: any, $log: ILogService) =>
-    new LoadBalancerFilterService(loadBalancerFilterModel, filterModelService, $log),
-);

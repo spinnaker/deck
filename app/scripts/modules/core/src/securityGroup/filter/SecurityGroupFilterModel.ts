@@ -1,71 +1,62 @@
-import { IAngularEvent, IRootScopeService, module } from 'angular';
+import { IAngularEvent, module } from 'angular';
 import { Ng1StateDeclaration, StateParams } from '@uirouter/angularjs';
+import { $rootScope } from 'ngimport';
 
-import { ILoadBalancerGroup } from 'core/domain';
 import { IFilterConfig, IFilterModel } from 'core/filterModel/IFilterModel';
-import { FILTER_MODEL_SERVICE } from 'core/filterModel';
 import { UrlParser } from 'core/navigation/urlParser';
+import { FilterModelService } from 'core/filterModel';
 
+export const SECURITY_GROUP_FILTER_MODEL = 'spinnaker.core.securityGroup.filter.model';
 export const filterModelConfig: IFilterConfig[] = [
   { model: 'account', param: 'acct', type: 'trueKeyObject' },
-  { model: 'availabilityZone', param: 'zone', type: 'trueKeyObject', filterLabel: 'availability zone' },
   { model: 'detail', param: 'detail', type: 'trueKeyObject' },
   { model: 'filter', param: 'q', clearValue: '', type: 'string', filterLabel: 'search' },
   { model: 'providerType', type: 'trueKeyObject', filterLabel: 'provider' },
   { model: 'region', param: 'reg', type: 'trueKeyObject' },
-  { model: 'showInstances', displayOption: true, type: 'boolean' },
+  { model: 'showLoadBalancers', param: 'hideLoadBalancers', displayOption: true, type: 'inverse-boolean' },
   { model: 'showServerGroups', param: 'hideServerGroups', displayOption: true, type: 'inverse-boolean' },
   { model: 'stack', param: 'stack', type: 'trueKeyObject' },
-  {
-    model: 'status',
-    type: 'trueKeyObject',
-    filterTranslator: { Up: 'Healthy', Down: 'Unhealthy', OutOfService: 'Out of Service' },
-  },
 ];
 
-export interface ILoadBalancerFilterModel extends IFilterModel {
-  groups: ILoadBalancerGroup[];
-}
-
-export class LoadBalancerFilterModel {
+export class SecurityGroupFilterModel {
   private mostRecentParams: any;
-  public asFilterModel: ILoadBalancerFilterModel;
+  public asFilterModel: IFilterModel;
 
-  constructor(private $rootScope: IRootScopeService, private filterModelService: any) {
+  constructor() {
     'ngInject';
-    this.asFilterModel = this.filterModelService.configureFilterModel(this, filterModelConfig);
+    this.asFilterModel = FilterModelService.configureFilterModel(this as any, filterModelConfig);
     this.bindEvents();
     this.asFilterModel.activate();
   }
 
-  private isLoadBalancerState(stateName: string) {
-    return stateName === 'home.applications.application.insight.loadBalancers';
+  private isSecurityGroupState(stateName: string) {
+    return stateName === 'home.applications.application.insight.securityGroups';
   }
 
-  private isLoadBalancerStateOrChild(stateName: string) {
-    return this.isLoadBalancerState(stateName) || this.isChildState(stateName);
+  private isSecurityGroupStateOrChild(stateName: string) {
+    return this.isSecurityGroupState(stateName) || this.isChildState(stateName);
   }
 
   private isChildState(stateName: string) {
-    return stateName.includes('loadBalancers.');
+    return stateName.includes('securityGroups.');
   }
 
-  private movingToLoadBalancerState(toState: Ng1StateDeclaration) {
-    return this.isLoadBalancerStateOrChild(toState.name);
+  private movingToSecurityGroupState(toState: Ng1StateDeclaration) {
+    return this.isSecurityGroupStateOrChild(toState.name);
   }
 
-  private movingFromLoadBalancerState(toState: Ng1StateDeclaration, fromState: Ng1StateDeclaration) {
-    return this.isLoadBalancerStateOrChild(fromState.name) && !this.isLoadBalancerStateOrChild(toState.name);
+  private movingFromSecurityGroupState(toState: Ng1StateDeclaration, fromState: Ng1StateDeclaration) {
+    return this.isSecurityGroupStateOrChild(fromState.name) && !this.isSecurityGroupStateOrChild(toState.name);
   }
 
   private shouldRouteToSavedState(toParams: StateParams, fromState: Ng1StateDeclaration) {
-    return this.asFilterModel.hasSavedState(toParams) && !this.isLoadBalancerStateOrChild(fromState.name);
+    return this.asFilterModel.hasSavedState(toParams) && !this.isSecurityGroupStateOrChild(fromState.name);
   }
 
-  private fromLoadBalancersState(fromState: Ng1StateDeclaration) {
+  private fromSecurityGroupsState(fromState: Ng1StateDeclaration) {
     return (
       fromState.name.indexOf('home.applications.application.insight') === 0 &&
-      !fromState.name.includes('home.applications.application.insight.loadBalancers')
+      !fromState.name.includes('home.applications.application.insight.securityGroups')
     );
   }
 
@@ -74,7 +65,7 @@ export class LoadBalancerFilterModel {
     // params are on the route we are going to, so if the user is using the back button, for example, to go to the
     // Infrastructure page with a search already entered, we'll pick up whatever search was entered there, and if we
     // come back to this application, we'll get whatever that search was.
-    this.$rootScope.$on('$locationChangeStart', (_event: IAngularEvent, toUrl: string, fromUrl: string) => {
+    $rootScope.$on('$locationChangeStart', (_event: IAngularEvent, toUrl: string, fromUrl: string) => {
       const [oldBase, oldQuery] = fromUrl.split('?'),
         [newBase, newQuery] = toUrl.split('?');
 
@@ -85,7 +76,7 @@ export class LoadBalancerFilterModel {
       }
     });
 
-    this.$rootScope.$on(
+    $rootScope.$on(
       '$stateChangeStart',
       (
         _event: IAngularEvent,
@@ -94,25 +85,25 @@ export class LoadBalancerFilterModel {
         fromState: Ng1StateDeclaration,
         fromParams: StateParams,
       ) => {
-        if (this.movingFromLoadBalancerState(toState, fromState)) {
+        if (this.movingFromSecurityGroupState(toState, fromState)) {
           this.asFilterModel.saveState(fromState, fromParams, this.mostRecentParams);
         }
       },
     );
 
-    this.$rootScope.$on(
+    $rootScope.$on(
       '$stateChangeSuccess',
       (_event: IAngularEvent, toState: Ng1StateDeclaration, toParams: StateParams, fromState: Ng1StateDeclaration) => {
-        if (this.isLoadBalancerStateOrChild(toState.name) && this.isLoadBalancerStateOrChild(fromState.name)) {
+        if (this.isSecurityGroupStateOrChild(toState.name) && this.isSecurityGroupStateOrChild(fromState.name)) {
           this.asFilterModel.applyParamsToUrl();
           return;
         }
-        if (this.movingToLoadBalancerState(toState)) {
+        if (this.movingToSecurityGroupState(toState)) {
           if (this.shouldRouteToSavedState(toParams, fromState)) {
             this.asFilterModel.restoreState(toParams);
           }
 
-          if (this.fromLoadBalancersState(fromState) && !this.asFilterModel.hasSavedState(toParams)) {
+          if (this.fromSecurityGroupsState(fromState) && !this.asFilterModel.hasSavedState(toParams)) {
             this.asFilterModel.clearFilters();
           }
         }
@@ -121,5 +112,4 @@ export class LoadBalancerFilterModel {
   }
 }
 
-export const LOAD_BALANCER_FILTER_MODEL = 'spinnaker.core.loadBalancer.filter.model';
-module(LOAD_BALANCER_FILTER_MODEL, [FILTER_MODEL_SERVICE]).service('loadBalancerFilterModel', LoadBalancerFilterModel);
+module(SECURITY_GROUP_FILTER_MODEL, []).service('securityGroupFilterModel', SecurityGroupFilterModel);

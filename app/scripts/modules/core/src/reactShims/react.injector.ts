@@ -13,12 +13,9 @@ import { AuthenticationService } from '../authentication/authentication.service'
 import { CacheInitializerService } from '../cache/cacheInitializer.service';
 import { CancelModalService } from '../cancelModal/cancelModal.service';
 import { CloudProviderRegistry } from '../cloudProvider/cloudProvider.registry';
-import { ClusterFilterModel } from 'core/cluster/filter/clusterFilter.model';
-import { ClusterFilterService } from '../cluster/filter/clusterFilter.service';
 import { ConfirmationModalService } from '../confirmationModal/confirmationModal.service';
 import { EntityTagWriter } from '../entityTag';
 import { ExecutionDetailsSectionService } from 'core/pipeline/details/executionDetailsSection.service';
-import { ExecutionFilterModel } from '../pipeline/filter/executionFilter.model';
 import { ExecutionFilterService } from '../pipeline/filter/executionFilter.service';
 import { ExecutionService } from '../pipeline/service/execution.service';
 import { ExecutionsTransformerService } from '../pipeline/service/executions.transformer.service';
@@ -26,8 +23,6 @@ import { HelpContentsRegistry, IHelpContents } from 'core/help';
 import { InfrastructureSearchService } from '../search/infrastructure/infrastructureSearch.service';
 import { InfrastructureSearchServiceV2 } from 'core/search/infrastructure/infrastructureSearchV2.service';
 import { InsightFilterStateModel } from '../insight/insightFilterState.model';
-import { LoadBalancerFilterModel } from '../loadBalancer/filter/loadBalancerFilter.model';
-import { LoadBalancerFilterService } from '../loadBalancer/filter/loadBalancer.filter.service';
 import { LoadBalancerWriter } from '../loadBalancer/loadBalancer.write.service';
 import { ManualJudgmentService } from '../pipeline/config/stages/manualJudgment/manualJudgment.service';
 import { NotifierService } from '../widgets/notifier/notifier.service';
@@ -92,12 +87,9 @@ export class CoreReactInject extends ReactInject {
   public get cacheInitializer() { return this.$injector.get('cacheInitializer') as CacheInitializerService; }
   public get cancelModalService() { return this.$injector.get('cancelModalService') as CancelModalService; }
   public get cloudProviderRegistry() { return this.$injector.get('cloudProviderRegistry') as CloudProviderRegistry; }
-  public get clusterFilterModel() { return this.$injector.get('clusterFilterModel') as ClusterFilterModel; }
-  public get clusterFilterService() { return this.$injector.get('clusterFilterService') as ClusterFilterService; }
   public get confirmationModalService() { return this.$injector.get('confirmationModalService') as ConfirmationModalService; }
   public get entityTagWriter() { return this.$injector.get('entityTagWriter') as EntityTagWriter; }
   public get executionDetailsSectionService() { return this.$injector.get('executionDetailsSectionService') as ExecutionDetailsSectionService; }
-  public get executionFilterModel() { return this.$injector.get('executionFilterModel') as ExecutionFilterModel; }
   public get executionFilterService() { return this.$injector.get('executionFilterService') as ExecutionFilterService; }
   public get executionService() { return this.$injector.get('executionService') as ExecutionService; }
   public get executionsTransformer() { return this.$injector.get('executionsTransformer') as ExecutionsTransformerService; }
@@ -106,12 +98,9 @@ export class CoreReactInject extends ReactInject {
   public get infrastructureSearchService() { return this.$injector.get('infrastructureSearchService') as InfrastructureSearchService; }
   public get infrastructureSearchServiceV2() { return this.$injector.get('infrastructureSearchServiceV2') as InfrastructureSearchServiceV2; }
   public get insightFilterStateModel() { return this.$injector.get('insightFilterStateModel') as InsightFilterStateModel; }
-  public get loadBalancerFilterModel() { return this.$injector.get('loadBalancerFilterModel') as LoadBalancerFilterModel; }
-  public get loadBalancerFilterService() { return this.$injector.get('loadBalancerFilterService') as LoadBalancerFilterService; }
   public get loadBalancerWriter() { return this.$injector.get('loadBalancerWriter') as LoadBalancerWriter; }
   public get manualJudgmentService() { return this.$injector.get('manualJudgmentService') as ManualJudgmentService; }
   public get modalService(): IModalService { return this.$injector.get('$uibModal') as IModalService; }
-  public get MultiselectModel() { return this.$injector.get('MultiselectModel') as any; }
   public get notifierService() { return this.$injector.get('notifierService') as NotifierService; }
   public get overrideRegistry() { return this.$injector.get('overrideRegistry') as OverrideRegistry; }
   public get pagerDutyReader() { return this.$injector.get('pagerDutyReader') as PagerDutyReader; }
