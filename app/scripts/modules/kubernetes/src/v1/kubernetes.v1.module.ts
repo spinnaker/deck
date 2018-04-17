@@ -3,6 +3,7 @@ import { module } from 'angular';
 import { CLOUD_PROVIDER_REGISTRY, CloudProviderRegistry, DeploymentStrategyRegistry } from '@spinnaker/core';
 
 import { KUBERNETES_KEY_VALUE_DETAILS } from '../common/keyValueDetails.component';
+import { KUBERNETES_TOLERATIONS } from '../common/tolerations/tolerations.component';
 import { KUBERNETES_SECURITY_CONTEXT_SELECTOR } from '../container/securityContext/securityContextSelector.component';
 import { KUBERNETES_HELP } from '../help/kubernetes.help';
 import { KubernetesProviderSettings } from '../kubernetes.settings';
@@ -54,6 +55,7 @@ module(KUBERNETES_V1_MODULE, [
   require('../serverGroup/paramsMixin.js').name,
   require('../serverGroup/transformer.js').name,
   require('../validation/applicationName.validator.js').name,
+  KUBERNETES_TOLERATIONS,
 ]).config((cloudProviderRegistryProvider: CloudProviderRegistry) => {
   cloudProviderRegistryProvider.registerProvider('kubernetes', {
     name: 'Kubernetes',
