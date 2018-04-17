@@ -7,8 +7,6 @@ import { Application } from 'core/application';
 import { APPLICATION_MODEL_BUILDER, ApplicationModelBuilder } from 'core/application/applicationModel.builder';
 import { EXECUTION_FILTER_MODEL } from 'core/pipeline';
 import { EXECUTION_FILTER_SERVICE } from 'core/pipeline/filter/executionFilter.service';
-import { HELP_CONTENTS_REGISTRY } from 'core/help/helpContents.registry';
-import { HELP_CONTENTS } from 'core/help/help.contents';
 import { INSIGHT_FILTER_STATE_MODEL } from 'core/insight/insightFilterState.model';
 import { REACT_MODULE, ReactInjector } from 'core/reactShims';
 import { SCROLL_TO_SERVICE } from 'core/utils';
@@ -40,8 +38,6 @@ describe('<Executions/>', () => {
       APPLICATION_MODEL_BUILDER,
       EXECUTION_FILTER_MODEL,
       EXECUTION_FILTER_SERVICE,
-      HELP_CONTENTS_REGISTRY,
-      HELP_CONTENTS,
       INSIGHT_FILTER_STATE_MODEL,
       REACT_MODULE,
       SCROLL_TO_SERVICE,
