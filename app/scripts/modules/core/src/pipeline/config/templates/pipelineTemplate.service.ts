@@ -52,7 +52,10 @@ export interface IPipelineTemplateConfig extends Partial<IPipeline> {
         source: string;
       }
       variables?: { [key: string]: any };
-    }
+    };
+    configuration?: {
+      inherit?: string[];
+    };
   }
 }
 

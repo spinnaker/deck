@@ -38,6 +38,7 @@ export interface ICreatePipelineModalState {
   loadingTemplateFromSource: boolean;
   loadingTemplateFromSourceError: boolean;
   templateSourceUrl: string;
+  inheritTemplateParameters: boolean;
 }
 
 export interface ICreatePipelineCommand {
@@ -106,6 +107,7 @@ export class CreatePipelineModal extends React.Component<ICreatePipelineModalPro
       loadingTemplateFromSource: false,
       loadingTemplateFromSourceError: false,
       templateSourceUrl: '',
+      inheritTemplateParameters: true,
     };
   }
 
@@ -145,7 +147,7 @@ export class CreatePipelineModal extends React.Component<ICreatePipelineModalPro
           name: this.state.command.name,
           application: this.props.application.name,
           template: { source: this.state.command.template.selfLink },
-        }
+        },
       }
     };
     this.setState({ submitting: true });
