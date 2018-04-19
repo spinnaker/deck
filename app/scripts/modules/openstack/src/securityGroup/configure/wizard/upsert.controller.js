@@ -2,21 +2,37 @@
 
 const angular = require('angular');
 
-import { ACCOUNT_SERVICE, SECURITY_GROUP_READER, SECURITY_GROUP_WRITER, TASK_MONITOR_BUILDER } from '@spinnaker/core';
-
-module.exports = angular.module('spinnaker.securityGroup.openstack.create.controller', [
-  require('@uirouter/angularjs').default,
+import {
+  ACCOUNT_SERVICE,
+  NameUtils,
   SECURITY_GROUP_READER,
   SECURITY_GROUP_WRITER,
-  ACCOUNT_SERVICE,
   TASK_MONITOR_BUILDER,
-  require('../../../region/regionSelectField.directive.js').name,
-  require('../../transformer.js').name,
-])
-  .controller('openstackUpsertSecurityGroupController', function($q, $scope, $uibModalInstance, $state,
-                                                                 application, securityGroup,
-                                                                 accountService, openstackSecurityGroupTransformer, securityGroupReader,
-                                                                 securityGroupWriter, taskMonitorBuilder, namingService) {
+} from '@spinnaker/core';
+
+module.exports = angular
+  .module('spinnaker.securityGroup.openstack.create.controller', [
+    require('@uirouter/angularjs').default,
+    SECURITY_GROUP_READER,
+    SECURITY_GROUP_WRITER,
+    ACCOUNT_SERVICE,
+    TASK_MONITOR_BUILDER,
+    require('../../../region/regionSelectField.directive.js').name,
+    require('../../transformer.js').name,
+  ])
+  .controller('openstackUpsertSecurityGroupController', function(
+    $q,
+    $scope,
+    $uibModalInstance,
+    $state,
+    application,
+    securityGroup,
+    accountService,
+    openstackSecurityGroupTransformer,
+    securityGroupReader,
+    securityGroupWriter,
+    taskMonitorBuilder,
+  ) {
     var ctrl = this;
     $scope.isNew = !securityGroup.edit;
     $scope.securityGroup = securityGroup;
@@ -29,7 +45,7 @@ module.exports = angular.module('spinnaker.securityGroup.openstack.create.contro
     $scope.state = {
       accountsLoaded: false,
       securityGroupNamesLoaded: false,
-      submitting: false
+      submitting: false,
     };
 
     function onApplicationRefresh() {
@@ -75,23 +91,25 @@ module.exports = angular.module('spinnaker.securityGroup.openstack.create.contro
     }
 
     function initializeCreateMode() {
-      return $q.all({
-        accounts: accountService.listAccounts('openstack'),
-      }).then(function(backingData) {
-        $scope.accounts = backingData.accounts;
-        var accountNames = _.map($scope.accounts, 'name');
-        if (accountNames.length && !accountNames.includes($scope.securityGroup.account)) {
-          $scope.securityGroup.account = accountNames[0];
-        }
+      return $q
+        .all({
+          accounts: accountService.listAccounts('openstack'),
+        })
+        .then(function(backingData) {
+          $scope.accounts = backingData.accounts;
+          var accountNames = _.map($scope.accounts, 'name');
+          if (accountNames.length && !accountNames.includes($scope.securityGroup.account)) {
+            $scope.securityGroup.account = accountNames[0];
+          }
 
-        $scope.loadBalancers = getLoadBalancerNames(backingData.loadBalancers);
+          $scope.loadBalancers = getLoadBalancerNames(backingData.loadBalancers);
 
-        ctrl.accountUpdated();
-      });
+          ctrl.accountUpdated();
+        });
     }
 
     function initializeSecurityGroupNames() {
-      securityGroupReader.loadSecurityGroups('openstack').then(function (securityGroups) {
+      securityGroupReader.loadSecurityGroups('openstack').then(function(securityGroups) {
         for (var account in securityGroups) {
           if (!allSecurityGroupNames[account]) {
             allSecurityGroupNames[account] = {};
@@ -126,15 +144,14 @@ module.exports = angular.module('spinnaker.securityGroup.openstack.create.contro
     }
 
     if ($scope.isNew) {
-        $scope.securityGroup = openstackSecurityGroupTransformer.constructNewSecurityGroupTemplate();
-        $scope.securityGroup.application = application.name;
-        initializeCreateMode();
-        $scope.state.accountsLoaded = true;
-    }
-    else {
+      $scope.securityGroup = openstackSecurityGroupTransformer.constructNewSecurityGroupTemplate();
+      $scope.securityGroup.application = application.name;
+      initializeCreateMode();
+      $scope.state.accountsLoaded = true;
+    } else {
       $scope.securityGroup = openstackSecurityGroupTransformer.prepareForEdit(securityGroup);
 
-      var result = namingService.parseServerGroupName($scope.securityGroup.name);
+      var result = NameUtils.parseServerGroupName($scope.securityGroup.name);
       $scope.securityGroup.application = result.application;
       $scope.securityGroup.stack = result.stack;
       $scope.securityGroup.detail = result.freeFormDetails;
@@ -151,35 +168,34 @@ module.exports = angular.module('spinnaker.securityGroup.openstack.create.contro
 
     this.getName = function() {
       var securityGroup = $scope.securityGroup;
-      var securityGroupName = _.compact([securityGroup.application, (securityGroup.stack), (securityGroup.detail)]).join('-');
+      var securityGroupName = _.compact([securityGroup.application, securityGroup.stack, securityGroup.detail]).join(
+        '-',
+      );
       return _.trimEnd(securityGroupName, '-');
     };
 
-    this.accountUpdated = function() {
-    };
+    this.accountUpdated = function() {};
     this.onRegionChanged = function(region) {
       $scope.securityGroup.region = region;
     };
 
-    this.submit = function () {
+    this.submit = function() {
       var descriptor = $scope.isNew ? 'Create' : 'Update';
 
       this.updateName();
-      $scope.taskMonitor.submit(
-        function() {
-          let params = {
-            cloudProvider: 'openstack',
-          };
+      $scope.taskMonitor.submit(function() {
+        let params = {
+          cloudProvider: 'openstack',
+        };
 
-          var copyOfSG = angular.copy($scope.securityGroup);
-          copyOfSG = openstackSecurityGroupTransformer.prepareForSaving(copyOfSG);
+        var copyOfSG = angular.copy($scope.securityGroup);
+        copyOfSG = openstackSecurityGroupTransformer.prepareForSaving(copyOfSG);
 
-          return securityGroupWriter.upsertSecurityGroup(copyOfSG, application, descriptor, params);
-        }
-      );
+        return securityGroupWriter.upsertSecurityGroup(copyOfSG, application, descriptor, params);
+      });
     };
 
-    this.cancel = function () {
+    this.cancel = function() {
       $uibModalInstance.dismiss();
     };
   });

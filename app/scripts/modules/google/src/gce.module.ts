@@ -7,7 +7,7 @@ import { GCE_INTERNAL_LOAD_BALANCER_CTRL } from './loadBalancer/configure/intern
 import { GCE_SSL_LOAD_BALANCER_CTRL } from './loadBalancer/configure/ssl/gceCreateSslLoadBalancer.controller';
 import { GCE_TCP_LOAD_BALANCER_CTRL } from './loadBalancer/configure/tcp/gceCreateTcpLoadBalancer.controller';
 import { LOAD_BALANCER_SET_TRANSFORMER } from './loadBalancer/loadBalancer.setTransformer';
-import { GCE_HELP } from './help/gce.help';
+import './help/gce.help';
 
 import './logo/gce.logo.less';
 
@@ -25,7 +25,6 @@ module(GOOGLE_MODULE, [
   GCE_LOAD_BALANCER_CHOICE_MODAL,
   GCE_SSL_LOAD_BALANCER_CTRL,
   GCE_TCP_LOAD_BALANCER_CTRL,
-  GCE_HELP,
   require('./serverGroup/details/serverGroup.details.gce.module.js').name,
   require('./serverGroup/configure/serverGroupCommandBuilder.service.js').name,
   require('./serverGroup/configure/wizard/cloneServerGroup.gce.controller.js').name,
@@ -61,59 +60,58 @@ module(GOOGLE_MODULE, [
   require('./image/image.reader.js').name,
   require('./cache/cacheConfigurer.service.js').name,
   require('./common/xpnNaming.gce.service.js').name,
-])
-  .config((cloudProviderRegistryProvider: CloudProviderRegistry) => {
-    cloudProviderRegistryProvider.registerProvider('gce', {
-      name: 'Google',
-      logo: {
-        path: require('./logo/gce.logo.png'),
-      },
-      cache: {
-        configurer: 'gceCacheConfigurer',
-      },
-      image: {
-        reader: 'gceImageReader',
-      },
-      serverGroup: {
-        transformer: 'gceServerGroupTransformer',
-        detailsTemplateUrl: require('./serverGroup/details/serverGroupDetails.html'),
-        detailsController: 'gceServerGroupDetailsCtrl',
-        cloneServerGroupTemplateUrl: require('./serverGroup/configure/wizard/serverGroupWizard.html'),
-        cloneServerGroupController: 'gceCloneServerGroupCtrl',
-        commandBuilder: 'gceServerGroupCommandBuilder',
-        configurationService: 'gceServerGroupConfigurationService',
-      },
-      instance: {
-        instanceTypeService: 'gceInstanceTypeService',
-        detailsTemplateUrl: require('./instance/details/instanceDetails.html'),
-        detailsController: 'gceInstanceDetailsCtrl',
-        multiInstanceTaskTransformer: 'gceMultiInstanceTaskTransformer',
-        customInstanceBuilderTemplateUrl: require('./serverGroup/configure/wizard/customInstance/customInstanceBuilder.html'),
-      },
-      loadBalancer: {
-        transformer: 'gceLoadBalancerTransformer',
-        setTransformer: 'gceLoadBalancerSetTransformer',
-        detailsTemplateUrl: require('./loadBalancer/details/loadBalancerDetails.html'),
-        detailsController: 'gceLoadBalancerDetailsCtrl',
-        createLoadBalancerTemplateUrl: require('./loadBalancer/configure/choice/gceLoadBalancerChoice.modal.html'),
-        createLoadBalancerController: 'gceLoadBalancerChoiceCtrl',
-      },
-      securityGroup: {
-        transformer: 'gceSecurityGroupTransformer',
-        reader: 'gceSecurityGroupReader',
-        detailsTemplateUrl: require('./securityGroup/details/securityGroupDetail.html'),
-        detailsController: 'gceSecurityGroupDetailsCtrl',
-        createSecurityGroupTemplateUrl: require('./securityGroup/configure/createSecurityGroup.html'),
-        createSecurityGroupController: 'gceCreateSecurityGroupCtrl',
-      },
-      subnet: {
-        renderer: 'gceSubnetRenderer',
-      },
-      snapshotsEnabled: true,
-      applicationProviderFields: {
-        templateUrl: require('./applicationProviderFields/gceFields.html'),
-      },
-    });
+]).config((cloudProviderRegistryProvider: CloudProviderRegistry) => {
+  cloudProviderRegistryProvider.registerProvider('gce', {
+    name: 'Google',
+    logo: {
+      path: require('./logo/gce.logo.png'),
+    },
+    cache: {
+      configurer: 'gceCacheConfigurer',
+    },
+    image: {
+      reader: 'gceImageReader',
+    },
+    serverGroup: {
+      transformer: 'gceServerGroupTransformer',
+      detailsTemplateUrl: require('./serverGroup/details/serverGroupDetails.html'),
+      detailsController: 'gceServerGroupDetailsCtrl',
+      cloneServerGroupTemplateUrl: require('./serverGroup/configure/wizard/serverGroupWizard.html'),
+      cloneServerGroupController: 'gceCloneServerGroupCtrl',
+      commandBuilder: 'gceServerGroupCommandBuilder',
+      configurationService: 'gceServerGroupConfigurationService',
+    },
+    instance: {
+      instanceTypeService: 'gceInstanceTypeService',
+      detailsTemplateUrl: require('./instance/details/instanceDetails.html'),
+      detailsController: 'gceInstanceDetailsCtrl',
+      multiInstanceTaskTransformer: 'gceMultiInstanceTaskTransformer',
+      customInstanceBuilderTemplateUrl: require('./serverGroup/configure/wizard/customInstance/customInstanceBuilder.html'),
+    },
+    loadBalancer: {
+      transformer: 'gceLoadBalancerTransformer',
+      setTransformer: 'gceLoadBalancerSetTransformer',
+      detailsTemplateUrl: require('./loadBalancer/details/loadBalancerDetails.html'),
+      detailsController: 'gceLoadBalancerDetailsCtrl',
+      createLoadBalancerTemplateUrl: require('./loadBalancer/configure/choice/gceLoadBalancerChoice.modal.html'),
+      createLoadBalancerController: 'gceLoadBalancerChoiceCtrl',
+    },
+    securityGroup: {
+      transformer: 'gceSecurityGroupTransformer',
+      reader: 'gceSecurityGroupReader',
+      detailsTemplateUrl: require('./securityGroup/details/securityGroupDetail.html'),
+      detailsController: 'gceSecurityGroupDetailsCtrl',
+      createSecurityGroupTemplateUrl: require('./securityGroup/configure/createSecurityGroup.html'),
+      createSecurityGroupController: 'gceCreateSecurityGroupCtrl',
+    },
+    subnet: {
+      renderer: 'gceSubnetRenderer',
+    },
+    snapshotsEnabled: true,
+    applicationProviderFields: {
+      templateUrl: require('./applicationProviderFields/gceFields.html'),
+    },
   });
+});
 
 DeploymentStrategyRegistry.registerProvider('gce', ['custom', 'redblack']);

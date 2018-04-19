@@ -12,16 +12,17 @@ import { InstanceList } from 'core/instance/InstanceList';
 import { Instances } from 'core/instance/Instances';
 import { ScrollToService } from 'core/utils';
 import { ISortFilter } from 'core/filterModel';
+import { ClusterState } from 'core/state';
 
 import { ServerGroupHeader } from './ServerGroupHeader';
 import { SETTINGS } from 'core';
 
-export interface JenkinsViewModel {
+export interface IJenkinsViewModel {
   number: number;
   href?: string;
 }
 
-export interface DockerViewModel {
+export interface IDockerViewModel {
   image: string;
   tag: string;
   href?: string;
@@ -37,8 +38,8 @@ export interface IServerGroupProps {
 }
 
 export interface IServerGroupState {
-  jenkins: JenkinsViewModel;
-  docker: DockerViewModel;
+  jenkins: IJenkinsViewModel;
+  docker: IDockerViewModel;
   instances: IInstance[];
   images?: string;
 
@@ -58,18 +59,19 @@ export class ServerGroup extends React.Component<IServerGroupProps, IServerGroup
 
   private getState(props: IServerGroupProps): IServerGroupState {
     const { serverGroup } = props;
-    const instances = serverGroup.instances.filter(i => ReactInjector.clusterFilterService.shouldShowInstance(i));
+    const instances = serverGroup.instances.filter(i => ClusterState.filterService.shouldShowInstance(i));
     const isSelected = this.isSelected(serverGroup);
     const isMultiSelected = this.isMultiSelected(props.sortFilter.multiselect, serverGroup);
     const jenkinsConfig = serverGroup.buildInfo && serverGroup.buildInfo.jenkins;
     const dockerConfig = serverGroup.buildInfo && serverGroup.buildInfo.docker;
 
-    let jenkins: JenkinsViewModel = null;
+    let jenkins: IJenkinsViewModel = null;
     let images: string = null;
-    let docker: DockerViewModel = null;
+    let docker: IDockerViewModel = null;
 
     if (jenkinsConfig && (jenkinsConfig.host || jenkinsConfig.fullUrl || serverGroup.buildInfo.buildInfoUrl)) {
-      const fromHost = jenkinsConfig.host && [jenkinsConfig.host + 'job', jenkinsConfig.name, jenkinsConfig.number, ''].join('/');
+      const fromHost =
+        jenkinsConfig.host && [jenkinsConfig.host + 'job', jenkinsConfig.name, jenkinsConfig.number, ''].join('/');
       const fromFullUrl = jenkinsConfig.fullUrl;
       const fromBuildInfo = serverGroup.buildInfo.buildInfoUrl;
 
@@ -81,7 +83,8 @@ export class ServerGroup extends React.Component<IServerGroupProps, IServerGroup
       docker = {
         tag: dockerConfig.tag,
         image: dockerConfig.image,
-        href: SETTINGS.dockerInsights.url + 'image/' + encodeURIComponent(dockerConfig.image) + '/tag/' + dockerConfig.tag
+        href:
+          SETTINGS.dockerInsights.url + 'image/' + encodeURIComponent(dockerConfig.image) + '/tag/' + dockerConfig.tag,
       };
     } else if (has(serverGroup, 'buildInfo.images')) {
       images = serverGroup.buildInfo.images.join(', ');
@@ -109,7 +112,7 @@ export class ServerGroup extends React.Component<IServerGroupProps, IServerGroup
   }
 
   private isMultiSelected(multiselect: boolean, serverGroup: IServerGroup) {
-    return multiselect && ReactInjector.MultiselectModel.serverGroupIsSelected(serverGroup);
+    return multiselect && ClusterState.multiselectModel.serverGroupIsSelected(serverGroup);
   }
 
   private onServerGroupsChanged() {
@@ -124,7 +127,7 @@ export class ServerGroup extends React.Component<IServerGroupProps, IServerGroup
   }
 
   public componentDidMount(): void {
-    const { serverGroupsStream, instancesStream } = ReactInjector.MultiselectModel;
+    const { serverGroupsStream, instancesStream } = ClusterState.multiselectModel;
 
     this.serverGroupsSubscription = serverGroupsStream.merge(instancesStream).subscribe(this.onServerGroupsChanged);
     this.stateChangeSubscription = ReactInjector.$uiRouter.globals.success$.subscribe(this.onStateChanged);
@@ -147,10 +150,10 @@ export class ServerGroup extends React.Component<IServerGroupProps, IServerGroup
       if (event.isDefaultPrevented() || event.nativeEvent.defaultPrevented) {
         return;
       }
-      ReactInjector.MultiselectModel.toggleServerGroup(this.props.serverGroup);
+      ClusterState.multiselectModel.toggleServerGroup(this.props.serverGroup);
       event.preventDefault();
-    })
-  };
+    });
+  }
 
   private handleServerGroupClicked(event: React.MouseEvent<any>) {
     ReactGA.event({ category: 'Cluster Pod', action: 'Load Server Group Details' });
@@ -167,10 +170,10 @@ export class ServerGroup extends React.Component<IServerGroupProps, IServerGroup
     const serverGroupClassName = classNames({
       'server-group': true,
       'rollup-pod-server-group': true,
-      'clickable': true,
+      clickable: true,
       'clickable-row': true,
-      'disabled': serverGroup.isDisabled,
-      'active': isSelected,
+      disabled: serverGroup.isDisabled,
+      active: isSelected,
     });
 
     return (
@@ -200,13 +203,13 @@ export class ServerGroup extends React.Component<IServerGroupProps, IServerGroup
                 </div>
               ) : (
                 <div>
-                  <Instances highlight={sortFilter.filter} instances={instances}/>
+                  <Instances highlight={sortFilter.filter} instances={instances} />
                 </div>
               )}
             </div>
           )}
         </div>
       </div>
-    )
+    );
   }
 }

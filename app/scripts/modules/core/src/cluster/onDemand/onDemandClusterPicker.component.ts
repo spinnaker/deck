@@ -2,7 +2,7 @@ import { IController, IComponentOptions, IScope, module } from 'angular';
 
 import { Application } from 'core/application/application.model';
 import { IClusterSummary } from 'core/domain/ICluster';
-import { CLUSTER_FILTER_MODEL, ClusterFilterModel } from '../filter/clusterFilter.model';
+import { ClusterState } from 'core/state';
 
 import './onDemandClusterPicker.component.less';
 
@@ -13,7 +13,9 @@ class OnDemandClusterPickerController implements IController {
   public totalClusterCount: number;
   public optionTemplate: string = require('./onDemandOptionTemplate.html');
 
-  constructor(private $scope: IScope, private clusterFilterModel: ClusterFilterModel) { 'ngInject'; }
+  constructor(private $scope: IScope) {
+    'ngInject';
+  }
 
   public $onInit(): void {
     this.setAvailableClusters();
@@ -22,15 +24,16 @@ class OnDemandClusterPickerController implements IController {
 
   private setAvailableClusters(): void {
     this.totalClusterCount = this.application.getDataSource('serverGroups').clusters.length;
-    const selectedClusters: string[] = Object.keys(this.clusterFilterModel.asFilterModel.sortFilter.clusters);
-    this.availableClusters = this.application.getDataSource('serverGroups').clusters
-      .filter((cluster: IClusterSummary) => !selectedClusters.includes(this.makeKey(cluster)));
+    const selectedClusters: string[] = Object.keys(ClusterState.filterModel.asFilterModel.sortFilter.clusters);
+    this.availableClusters = this.application
+      .getDataSource('serverGroups')
+      .clusters.filter((cluster: IClusterSummary) => !selectedClusters.includes(this.makeKey(cluster)));
   }
 
   public selectCluster(cluster: IClusterSummary): void {
     this.lastSelection = undefined;
-    this.clusterFilterModel.asFilterModel.sortFilter.clusters[this.makeKey(cluster)] = true;
-    this.clusterFilterModel.asFilterModel.applyParamsToUrl();
+    ClusterState.filterModel.asFilterModel.sortFilter.clusters[this.makeKey(cluster)] = true;
+    ClusterState.filterModel.asFilterModel.applyParamsToUrl();
     this.application.getDataSource('serverGroups').refresh();
   }
 
@@ -53,7 +56,7 @@ const template = `
 `;
 
 const onDemandClusterPickerComponent: IComponentOptions = {
-  template: template,
+  template,
   controller: OnDemandClusterPickerController,
   bindings: {
     application: '<',
@@ -61,6 +64,4 @@ const onDemandClusterPickerComponent: IComponentOptions = {
 };
 
 export const ON_DEMAND_CLUSTER_PICKER_COMPONENT = 'spinnaker.core.cluster.onDemandClusterPicker.component';
-module(ON_DEMAND_CLUSTER_PICKER_COMPONENT, [
-  CLUSTER_FILTER_MODEL,
-]).component('onDemandClusterPicker', onDemandClusterPickerComponent);
+module(ON_DEMAND_CLUSTER_PICKER_COMPONENT, []).component('onDemandClusterPicker', onDemandClusterPickerComponent);

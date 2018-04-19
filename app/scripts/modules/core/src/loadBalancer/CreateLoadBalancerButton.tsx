@@ -26,8 +26,10 @@ export interface ICreateLoadBalancerButtonState {
 }
 
 @BindAll()
-export class CreateLoadBalancerButton extends React.Component<ICreateLoadBalancerButtonProps, ICreateLoadBalancerButtonState> {
-
+export class CreateLoadBalancerButton extends React.Component<
+  ICreateLoadBalancerButtonProps,
+  ICreateLoadBalancerButtonState
+> {
   constructor(props: ICreateLoadBalancerButtonProps) {
     super(props);
     this.state = {
@@ -37,28 +39,30 @@ export class CreateLoadBalancerButton extends React.Component<ICreateLoadBalance
   }
 
   private createLoadBalancer(): void {
-    const { providerSelectionService, cloudProviderRegistry, versionSelectionService } = ReactInjector;
+    const { providerSelectionService, cloudProviderRegistry, skinSelectionService } = ReactInjector;
     const { app } = this.props;
-    providerSelectionService.selectProvider(app, 'loadBalancer').then((selectedProvider) => {
-      versionSelectionService.selectVersion(selectedProvider).then((selectedVersion) => {
-        const provider = cloudProviderRegistry.getValue(selectedProvider, 'loadBalancer', selectedVersion);
+    providerSelectionService.selectProvider(app, 'loadBalancer').then(selectedProvider => {
+      skinSelectionService.selectSkin(selectedProvider).then(selectedSkin => {
+        const provider = cloudProviderRegistry.getValue(selectedProvider, 'loadBalancer', selectedSkin);
 
         if (provider.CreateLoadBalancerModal) {
           // react
           this.setState({ Modal: provider.CreateLoadBalancerModal, showModal: true });
         } else {
           // angular
-          ReactInjector.modalService.open({
-            templateUrl: provider.createLoadBalancerTemplateUrl,
-            controller: `${provider.createLoadBalancerController} as ctrl`,
-            size: 'lg',
-            resolve: {
-              application: () => this.props.app,
-              loadBalancer: (): ILoadBalancer => null,
-              isNew: () => true,
-              forPipelineConfig: () => false
-            }
-          }).result.catch(() => {});
+          ReactInjector.modalService
+            .open({
+              templateUrl: provider.createLoadBalancerTemplateUrl,
+              controller: `${provider.createLoadBalancerController} as ctrl`,
+              size: 'lg',
+              resolve: {
+                application: () => this.props.app,
+                loadBalancer: (): ILoadBalancer => null,
+                isNew: () => true,
+                forPipelineConfig: () => false,
+              },
+            })
+            .result.catch(() => {});
         }
       });
     });
@@ -75,13 +79,21 @@ export class CreateLoadBalancerButton extends React.Component<ICreateLoadBalance
     return (
       <div>
         <button className="btn btn-sm btn-default" onClick={this.createLoadBalancer}>
-          <span className="glyphicon glyphicon-plus-sign visible-lg-inline"/>
+          <span className="glyphicon glyphicon-plus-sign visible-lg-inline" />
           <Tooltip value="Create Load Balancer">
-            <span className="glyphicon glyphicon-plus-sign visible-md-inline visible-sm-inline"/>
+            <span className="glyphicon glyphicon-plus-sign visible-md-inline visible-sm-inline" />
           </Tooltip>
           <span className="visible-lg-inline"> Create Load Balancer</span>
         </button>
-        {Modal && <Modal app={app} forPipelineConfig={false} loadBalancer={null} show={showModal} showCallback={this.showModal} />}
+        {Modal && (
+          <Modal
+            app={app}
+            forPipelineConfig={false}
+            loadBalancer={null}
+            show={showModal}
+            showCallback={this.showModal}
+          />
+        )}
       </div>
     );
   }

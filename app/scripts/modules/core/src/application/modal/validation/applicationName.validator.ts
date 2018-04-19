@@ -64,20 +64,19 @@ export class ApplicationNameValidator {
         if (this.providerMap.has(provider)) {
           this.providerMap.get(provider).forEach(validator => {
             const results = validator.validate(applicationName);
-            results.warnings.forEach(message => warnings.push({ cloudProvider: provider, message: message }));
-            results.errors.forEach(message => errors.push({ cloudProvider: provider, message: message }));
+            results.warnings.forEach(message => warnings.push({ cloudProvider: provider, message }));
+            results.errors.forEach(message => errors.push({ cloudProvider: provider, message }));
           });
         }
       });
       return { errors, warnings };
     });
   }
-
 }
 
 export const APPLICATION_NAME_VALIDATOR = 'spinnaker.core.application.name.validator';
 
-module(APPLICATION_NAME_VALIDATOR, [
-  CLOUD_PROVIDER_REGISTRY,
-  ACCOUNT_SERVICE,
-]).service('applicationNameValidator', ApplicationNameValidator);
+module(APPLICATION_NAME_VALIDATOR, [CLOUD_PROVIDER_REGISTRY, ACCOUNT_SERVICE]).service(
+  'applicationNameValidator',
+  ApplicationNameValidator,
+);

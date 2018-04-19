@@ -4,52 +4,50 @@ import { IMultiInstanceGroup, INSTANCE_WRITE_SERVICE, InstanceWriter } from 'cor
 import { Application } from 'core/application/application.model';
 import { APPLICATION_MODEL_BUILDER, ApplicationModelBuilder } from '../application/applicationModel.builder';
 import { IInstance, IServerGroup } from 'core/domain';
+import * as State from 'core/state';
+
 import { ServerGroupReader } from '../serverGroup/serverGroupReader.service';
 import { IJob, ITaskCommand, TaskExecutor } from '../task/taskExecutor';
 
-describe('Service: instance writer', function () {
+describe('Service: instance writer', function() {
   let service: InstanceWriter,
     serverGroupReader: ServerGroupReader,
     taskExecutor: TaskExecutor,
     $q: ng.IQService,
     $scope: ng.IScope,
-    applicationModelBuilder: ApplicationModelBuilder,
-    MultiselectModel: any;
+    applicationModelBuilder: ApplicationModelBuilder;
+
+  beforeEach(() => State.initialize());
+
+  beforeEach(mock.module(INSTANCE_WRITE_SERVICE, APPLICATION_MODEL_BUILDER));
 
   beforeEach(
-    mock.module(
-      INSTANCE_WRITE_SERVICE,
-      APPLICATION_MODEL_BUILDER,
-      require('../cluster/filter/multiselect.model').name
-    )
-  );
-
-  beforeEach(
-    mock.inject((instanceWriter: InstanceWriter,
-                 _taskExecutor_: TaskExecutor,
-                 _serverGroupReader_: ServerGroupReader,
-                 _$q_: ng.IQService,
-                 $rootScope: ng.IRootScopeService,
-                 _applicationModelBuilder_: ApplicationModelBuilder,
-                 _MultiselectModel_: any) => {
-      service = instanceWriter;
-      taskExecutor = _taskExecutor_;
-      serverGroupReader = _serverGroupReader_;
-      $q = _$q_;
-      $scope = $rootScope.$new();
-      applicationModelBuilder = _applicationModelBuilder_;
-      MultiselectModel = _MultiselectModel_;
-    })
+    mock.inject(
+      (
+        instanceWriter: InstanceWriter,
+        _taskExecutor_: TaskExecutor,
+        _serverGroupReader_: ServerGroupReader,
+        _$q_: ng.IQService,
+        $rootScope: ng.IRootScopeService,
+        _applicationModelBuilder_: ApplicationModelBuilder,
+      ) => {
+        service = instanceWriter;
+        taskExecutor = _taskExecutor_;
+        serverGroupReader = _serverGroupReader_;
+        $q = _$q_;
+        $scope = $rootScope.$new();
+        applicationModelBuilder = _applicationModelBuilder_;
+      },
+    ),
   );
 
   describe('terminate and decrement server group', () => {
-
-    it('should set setMaxToNewDesired flag based on current server group capacity', function () {
+    it('should set setMaxToNewDesired flag based on current server group capacity', function() {
       const serverGroup = {
         asg: {
           minSize: 4,
-          maxSize: 4
-        }
+          maxSize: 4,
+        },
       };
       const instance: IInstance = {
         id: 'i-123456',
@@ -60,16 +58,17 @@ describe('Service: instance writer', function () {
         healthState: 'Up',
         zone: 'a',
         launchTime: 2,
-
       };
-      const application: Application = applicationModelBuilder.createApplication('app', { key: 'serverGroups', lazy: true });
+      const application: Application = applicationModelBuilder.createApplication('app', {
+        key: 'serverGroups',
+        lazy: true,
+      });
       let executedTask: IJob = null;
 
       spyOn(taskExecutor, 'executeTask').and.callFake((task: ITaskCommand) => {
         executedTask = task.job[0];
       });
       spyOn(serverGroupReader, 'getServerGroup').and.returnValue($q.when(serverGroup));
-
 
       service.terminateInstanceAndShrinkServerGroup(instance, application, {});
       $scope.$digest();
@@ -78,17 +77,13 @@ describe('Service: instance writer', function () {
       expect(taskExecutor.executeTask).toHaveBeenCalled();
       expect(executedTask['setMaxToNewDesired']).toBe(true);
     });
-
   });
 
   describe('multi-instance operations', () => {
-
-    let task: ITaskCommand,
-        serverGroupA: IServerGroup,
-        serverGroupB: IServerGroup;
+    let task: ITaskCommand, serverGroupA: IServerGroup, serverGroupB: IServerGroup;
 
     function getInstanceGroup(serverGroup: IServerGroup): IMultiInstanceGroup {
-      return MultiselectModel.getOrCreateInstanceGroup(serverGroup);
+      return State.ClusterState.multiselectModel.getOrCreateInstanceGroup(serverGroup);
     }
 
     function addInstance(serverGroup: IServerGroup, instance: IInstance) {
@@ -97,21 +92,37 @@ describe('Service: instance writer', function () {
       instanceGroup.instances.push(instance);
     }
 
-    beforeEach(function () {
+    beforeEach(function() {
       task = null;
-      serverGroupA = { type: 'aws', cloudProvider: 'aws', name: 'asg-v001', account: 'prod', region: 'us-east-1', cluster: 'asg', instanceCounts: null, instances: [] };
-      serverGroupB = { type: 'gce', cloudProvider: 'gce', name: 'asg-v002', account: 'test', region: 'us-west-1', cluster: 'asg', instanceCounts: null, instances: [] };
+      serverGroupA = {
+        type: 'aws',
+        cloudProvider: 'aws',
+        name: 'asg-v001',
+        account: 'prod',
+        region: 'us-east-1',
+        cluster: 'asg',
+        instanceCounts: null,
+        instances: [],
+      };
+      serverGroupB = {
+        type: 'gce',
+        cloudProvider: 'gce',
+        name: 'asg-v002',
+        account: 'test',
+        region: 'us-west-1',
+        cluster: 'asg',
+        instanceCounts: null,
+        instances: [],
+      };
 
-      spyOn(taskExecutor, 'executeTask').and.callFake((command: ITaskCommand) => task = command);
+      spyOn(taskExecutor, 'executeTask').and.callFake((command: ITaskCommand) => (task = command));
     });
 
     it('only sends jobs for groups with instances', () => {
       const application: Application = applicationModelBuilder.createApplication('app');
       addInstance(serverGroupB, { id: 'i-234', health: [], healthState: 'Up', zone: 'a', launchTime: 2 });
       addInstance(serverGroupB, { id: 'i-345', health: [], healthState: 'Up', zone: 'a', launchTime: 2 });
-      service.terminateInstances(
-        [getInstanceGroup(serverGroupA), getInstanceGroup(serverGroupB)],
-        application);
+      service.terminateInstances([getInstanceGroup(serverGroupA), getInstanceGroup(serverGroupB)], application);
 
       expect(task.job.length).toBe(1);
 
@@ -129,9 +140,7 @@ describe('Service: instance writer', function () {
       const application: Application = applicationModelBuilder.createApplication('app');
       addInstance(serverGroupA, { id: 'i-234', health: [], healthState: 'Up', zone: 'a', launchTime: 2 });
       addInstance(serverGroupA, { id: 'i-345', health: [], healthState: 'Up', zone: 'a', launchTime: 2 });
-      service.terminateInstancesAndShrinkServerGroups(
-        [getInstanceGroup(serverGroupA)],
-        application);
+      service.terminateInstancesAndShrinkServerGroups([getInstanceGroup(serverGroupA)], application);
 
       expect(task.job.length).toBe(1);
 
@@ -159,7 +168,7 @@ describe('Service: instance writer', function () {
       expect(task.description).toBe('Terminate 2 instances');
     });
 
-    it('includes a useful descriptor on reboot instances', function () {
+    it('includes a useful descriptor on reboot instances', function() {
       const application: Application = applicationModelBuilder.createApplication('app');
       addInstance(serverGroupA, { id: 'i-123', health: [], healthState: 'Up', zone: 'a', launchTime: 2 });
 
@@ -171,7 +180,7 @@ describe('Service: instance writer', function () {
       expect(task.description).toBe('Reboot 2 instances');
     });
 
-    it('includes a useful descriptor on disable in discovery', function () {
+    it('includes a useful descriptor on disable in discovery', function() {
       const application: Application = applicationModelBuilder.createApplication('app');
       addInstance(serverGroupA, { id: 'i-123', health: [], healthState: 'Up', zone: 'a', launchTime: 2 });
 
@@ -183,7 +192,7 @@ describe('Service: instance writer', function () {
       expect(task.description).toBe('Disable 2 instances in discovery');
     });
 
-    it('includes a useful descriptor on enable in discovery', function () {
+    it('includes a useful descriptor on enable in discovery', function() {
       const application: Application = applicationModelBuilder.createApplication('app');
       addInstance(serverGroupA, { id: 'i-123', health: [], healthState: 'Up', zone: 'a', launchTime: 2 });
 
@@ -195,5 +204,4 @@ describe('Service: instance writer', function () {
       expect(task.description).toBe('Enable 2 instances in discovery');
     });
   });
-
 });

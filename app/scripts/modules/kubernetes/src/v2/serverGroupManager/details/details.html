@@ -97,6 +97,12 @@
       </ul>
     </collapsible-section>
 
+    <kubernetes-annotation-custom-sections manifest="ctrl.serverGroupManager.manifest" resource="ctrl.serverGroupManager"></kubernetes-annotation-custom-sections>
+
+    <collapsible-section heading="Events" expanded="true">
+      <kubernetes-manifest-events manifest="ctrl.manifest"></kubernetes-manifest-events>
+    </collapsible-section>
+
     <collapsible-section heading="Labels" expanded="true">
       <kubernetes-manifest-labels manifest="ctrl.serverGroupManager.manifest"></kubernetes-manifest-labels>
     </collapsible-section>

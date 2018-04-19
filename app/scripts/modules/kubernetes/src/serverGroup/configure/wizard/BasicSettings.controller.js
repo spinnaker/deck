@@ -3,27 +3,31 @@
 const angular = require('angular');
 import { Observable, Subject } from 'rxjs';
 
-import { NAMING_SERVICE, V2_MODAL_WIZARD_SERVICE } from '@spinnaker/core';
+import { V2_MODAL_WIZARD_SERVICE } from '@spinnaker/core';
 
-module.exports = angular.module('spinnaker.serverGroup.configure.kubernetes.basicSettings', [
-  require('@uirouter/angularjs').default,
-  require('angular-ui-bootstrap'),
-  V2_MODAL_WIZARD_SERVICE,
-  NAMING_SERVICE,
-])
-  .controller('kubernetesServerGroupBasicSettingsController', function($scope, $controller, $uibModalStack, $state,
-                                                                       v2modalWizardService, kubernetesImageReader, namingService,
-                                                                       kubernetesServerGroupConfigurationService) {
-
+module.exports = angular
+  .module('spinnaker.serverGroup.configure.kubernetes.basicSettings', [
+    require('@uirouter/angularjs').default,
+    require('angular-ui-bootstrap'),
+    V2_MODAL_WIZARD_SERVICE,
+  ])
+  .controller('kubernetesServerGroupBasicSettingsController', function(
+    $scope,
+    $controller,
+    $uibModalStack,
+    $state,
+    v2modalWizardService,
+    kubernetesImageReader,
+    kubernetesServerGroupConfigurationService,
+  ) {
     function searchImages(q) {
       $scope.command.backingData.filtered.images = [
         {
-          message: `<loading-spinner size="'nano'"></loading-spinner> Finding results matching "${q}"...`
-        }
+          message: `<loading-spinner size="'nano'"></loading-spinner> Finding results matching "${q}"...`,
+        },
       ];
       return Observable.fromPromise(
-        kubernetesServerGroupConfigurationService
-          .configureCommand($scope.application, $scope.command, q)
+        kubernetesServerGroupConfigurationService.configureCommand($scope.application, $scope.command, q),
       );
     }
 
@@ -38,11 +42,13 @@ module.exports = angular.module('spinnaker.serverGroup.configure.kubernetes.basi
       imageSearchResultsStream.next(q);
     };
 
-    angular.extend(this, $controller('BasicSettingsMixin', {
-      $scope: $scope,
-      imageReader: kubernetesImageReader,
-      namingService: namingService,
-      $uibModalStack: $uibModalStack,
-      $state: $state,
-    }));
+    angular.extend(
+      this,
+      $controller('BasicSettingsMixin', {
+        $scope: $scope,
+        imageReader: kubernetesImageReader,
+        $uibModalStack: $uibModalStack,
+        $state: $state,
+      }),
+    );
   });

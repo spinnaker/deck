@@ -5,7 +5,7 @@ import { module } from 'angular';
 import { react2angular } from 'react2angular';
 
 import { IExecutionBuildLinkProps } from './ExecutionBuildLink';
-import { timestamp } from 'core/utils'
+import { timestamp } from 'core/utils';
 
 export interface IExecutionBuildTitleProps extends IExecutionBuildLinkProps {
   defaultToTimestamp?: boolean;
@@ -13,9 +13,8 @@ export interface IExecutionBuildTitleProps extends IExecutionBuildLinkProps {
 
 @BindAll()
 export class ExecutionBuildTitle extends React.Component<IExecutionBuildTitleProps, {}> {
-
   public static defaultProps: Partial<IExecutionBuildTitleProps> = {
-    defaultToTimestamp: false
+    defaultToTimestamp: false,
   };
 
   private hasParentPipeline: boolean;
@@ -23,22 +22,23 @@ export class ExecutionBuildTitle extends React.Component<IExecutionBuildTitlePro
 
   constructor(props: IExecutionBuildTitleProps) {
     super(props);
-    this.hasParentPipeline = !!props.execution.trigger.parentPipelineName;
-    this.hasBuildNumber = !!(props.execution.buildInfo && props.execution.buildInfo.number);
+    this.hasParentPipeline = !!props.execution && !!props.execution.trigger.parentPipelineName;
+    this.hasBuildNumber = !!props.execution && !!(props.execution.buildInfo && props.execution.buildInfo.number);
   }
 
   public render() {
     return (
       <span>
-        { this.hasParentPipeline && (
-          <span>{this.props.execution.trigger.parentPipelineName}</span>
-        )}
-        { this.hasBuildNumber && !this.hasParentPipeline && (
-          <span><span className="build-label">Build</span> #{this.props.execution.buildInfo.number}</span>
-        )}
-        { this.props.defaultToTimestamp && !this.hasParentPipeline && !this.hasBuildNumber && (
-          <span>{timestamp(this.props.execution.startTime)}</span>
-        )}
+        {this.hasParentPipeline && <span>{this.props.execution.trigger.parentPipelineName}</span>}
+        {this.hasBuildNumber &&
+          !this.hasParentPipeline && (
+            <span>
+              <span className="build-label">Build</span> #{this.props.execution.buildInfo.number}
+            </span>
+          )}
+        {this.props.defaultToTimestamp &&
+          !this.hasParentPipeline &&
+          !this.hasBuildNumber && <span>{timestamp(this.props.execution.startTime)}</span>}
       </span>
     );
   }

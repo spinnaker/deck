@@ -48,7 +48,7 @@ export class Instances extends React.Component<IInstancesProps, IInstancesState>
   }
 
   public shouldComponentUpdate(nextProps: IInstancesProps, nextState: IInstancesState) {
-    const propsKeys: (keyof IInstancesProps)[] = ['instances', 'highlight'];
+    const propsKeys: Array<keyof IInstancesProps> = ['instances', 'highlight'];
     if (propsKeys.some(key => this.props[key] !== nextProps[key])) {
       return true;
     }
@@ -109,6 +109,6 @@ export class Instances extends React.Component<IInstancesProps, IInstancesState>
           </span>
         ))}
       </div>
-    )
+    );
   }
 }

@@ -2,28 +2,29 @@
 
 const angular = require('angular');
 
-import { NAMING_SERVICE, V2_MODAL_WIZARD_SERVICE } from '@spinnaker/core';
+import { V2_MODAL_WIZARD_SERVICE } from '@spinnaker/core';
 
-module.exports = angular.module('spinnaker.ecs.serverGroup.configure.basicSettings', [
-  require('@uirouter/angularjs').default,
-  require('angular-ui-bootstrap'),
-  V2_MODAL_WIZARD_SERVICE,
-  NAMING_SERVICE,
-])
-  .controller('ecsServerGroupBasicSettingsCtrl', function($scope,
-                                                          $controller,
-                                                          $uibModalStack,
-                                                          $state,
-                                                          v2modalWizardService,
-                                                          namingService
+module.exports = angular
+  .module('spinnaker.ecs.serverGroup.configure.basicSettings', [
+    require('@uirouter/angularjs').default,
+    require('angular-ui-bootstrap'),
+    V2_MODAL_WIZARD_SERVICE,
+  ])
+  .controller('ecsServerGroupBasicSettingsCtrl', function(
+    $scope,
+    $controller,
+    $uibModalStack,
+    $state,
+    v2modalWizardService,
   ) {
-
-    angular.extend(this, $controller('BasicSettingsMixin', {
-      $scope: $scope,
-      namingService: namingService,
-      $uibModalStack: $uibModalStack,
-      $state: $state,
-    }));
+    angular.extend(
+      this,
+      $controller('BasicSettingsMixin', {
+        $scope: $scope,
+        $uibModalStack: $uibModalStack,
+        $state: $state,
+      }),
+    );
 
     $scope.$watch('form.$valid', function(newVal) {
       if (newVal) {
@@ -33,5 +34,4 @@ module.exports = angular.module('spinnaker.ecs.serverGroup.configure.basicSettin
         v2modalWizardService.markIncomplete('location');
       }
     });
-
   });

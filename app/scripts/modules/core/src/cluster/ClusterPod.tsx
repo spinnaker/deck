@@ -2,13 +2,13 @@ import * as React from 'react';
 import { BindAll } from 'lodash-decorators';
 import { orderBy } from 'lodash';
 
-import { ReactInjector } from 'core/reactShims';
+import { ClusterState } from 'core/state';
 import { ServerGroup } from 'core/serverGroup/ServerGroup';
 import { Application } from 'core/application';
 import { EntityNotifications } from 'core/entityTag/notifications/EntityNotifications';
 import { IServerGroup } from 'core/domain';
 import { Tooltip } from 'core/presentation';
-import { IClusterSubgroup, IServerGroupSubgroup } from './filter/clusterFilter.service';
+import { IClusterSubgroup, IServerGroupSubgroup } from './filter/ClusterFilterService';
 import { ISortFilter } from 'core/filterModel';
 import { ClusterPodTitleWrapper } from 'core/cluster/ClusterPodTitleWrapper';
 
@@ -34,11 +34,10 @@ export class ClusterPod extends React.Component<IClusterPodProps, IClusterPodSta
   }
 
   public close(): void {
-    const { clusterFilterModel } = ReactInjector;
     const { parentHeading, grouping, application } = this.props;
 
-    delete clusterFilterModel.asFilterModel.sortFilter.clusters[`${parentHeading}:${grouping.heading}`];
-    clusterFilterModel.asFilterModel.applyParamsToUrl();
+    delete ClusterState.filterModel.asFilterModel.sortFilter.clusters[`${parentHeading}:${grouping.heading}`];
+    ClusterState.filterModel.asFilterModel.applyParamsToUrl();
     application.getDataSource('serverGroups').refresh();
   }
 
@@ -55,7 +54,7 @@ export class ClusterPod extends React.Component<IClusterPodProps, IClusterPodSta
               <div className="remove-button">
                 <Tooltip value="Remove cluster from view">
                   <button className="btn btn-link" onClick={this.close}>
-                    <span className="glyphicon glyphicon-remove"/>
+                    <span className="glyphicon glyphicon-remove" />
                   </button>
                 </Tooltip>
               </div>
@@ -63,21 +62,21 @@ export class ClusterPod extends React.Component<IClusterPodProps, IClusterPodSta
           </div>
         </div>
 
-        <div className="rollup-details">
-          {grouping.subgroups.map(this.renderSubGroup)}
-        </div>
+        <div className="rollup-details">{grouping.subgroups.map(this.renderSubGroup)}</div>
       </div>
     );
   }
 
   private renderSubGroup(subgroup: IServerGroupSubgroup) {
     const { grouping, application, sortFilter } = this.props;
-    const hasMoniker = subgroup.serverGroups.every((sg) => { return !!sg.moniker });
+    const hasMoniker = subgroup.serverGroups.every(sg => {
+      return !!sg.moniker;
+    });
     let iteratee;
     if (hasMoniker) {
-      iteratee = 'moniker.sequence'
+      iteratee = 'moniker.sequence';
     } else {
-      iteratee = 'name'
+      iteratee = 'name';
     }
 
     const sortedServerGroups = orderBy(subgroup.serverGroups, [iteratee], ['desc']);
@@ -97,18 +96,19 @@ export class ClusterPod extends React.Component<IClusterPodProps, IClusterPodSta
           />
         </h6>
 
-        {grouping.cluster.category === 'serverGroup' && sortedServerGroups.map((serverGroup: IServerGroup) => (
-          <ServerGroup
-            key={serverGroup.name}
-            serverGroup={serverGroup}
-            cluster={serverGroup.cluster}
-            application={application}
-            sortFilter={sortFilter}
-            hasDiscovery={grouping.hasDiscovery}
-            hasLoadBalancers={grouping.hasLoadBalancers}
-          />
-        ))}
+        {grouping.cluster.category === 'serverGroup' &&
+          sortedServerGroups.map((serverGroup: IServerGroup) => (
+            <ServerGroup
+              key={serverGroup.name}
+              serverGroup={serverGroup}
+              cluster={serverGroup.cluster}
+              application={application}
+              sortFilter={sortFilter}
+              hasDiscovery={grouping.hasDiscovery}
+              hasLoadBalancers={grouping.hasLoadBalancers}
+            />
+          ))}
       </div>
-    )
+    );
   }
 }

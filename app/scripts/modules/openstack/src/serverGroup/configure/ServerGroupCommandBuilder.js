@@ -4,40 +4,48 @@ import _ from 'lodash';
 
 const angular = require('angular');
 
-import {OpenStackProviderSettings} from '../../openstack.settings';
+import { NameUtils } from '@spinnaker/core';
 
-module.exports = angular.module('spinnaker.openstack.serverGroupCommandBuilder.service', [
-  require('../../image/image.reader.js').name,
-])
-  .factory('openstackServerGroupCommandBuilder', function ($q, openstackImageReader, subnetReader, loadBalancerReader, namingService, applicationReader) {
+import { OpenStackProviderSettings } from '../../openstack.settings';
 
+module.exports = angular
+  .module('spinnaker.openstack.serverGroupCommandBuilder.service', [require('../../image/image.reader.js').name])
+  .factory('openstackServerGroupCommandBuilder', function(
+    $q,
+    openstackImageReader,
+    subnetReader,
+    loadBalancerReader,
+    applicationReader,
+  ) {
     function buildNewServerGroupCommand(application, defaults) {
       defaults = defaults || {};
 
-      var defaultCredentials = defaults.account || application.defaultCredentials.openstack || OpenStackProviderSettings.defaults.account;
-      var defaultRegion = defaults.region || application.defaultRegions.openstack || OpenStackProviderSettings.defaults.region;
+      var defaultCredentials =
+        defaults.account || application.defaultCredentials.openstack || OpenStackProviderSettings.defaults.account;
+      var defaultRegion =
+        defaults.region || application.defaultRegions.openstack || OpenStackProviderSettings.defaults.region;
 
       return $q.when({
-          selectedProvider: 'openstack',
-          application: application.name,
-          credentials: defaultCredentials,
-          region: defaultRegion,
-          associatePublicIpAddress: false,
-          strategy: '',
-          stack: '',
-          freeFormDetails: '',
-          minSize: 1,
-          desiredSize: 1,
-          maxSize: 1,
-          loadBalancers: [],
-          securityGroups: [],
-          tags: {},
-          viewState: {
-            mode: defaults.mode || 'create',
-            disableStrategySelection: true,
-            loadBalancersConfigured: false,
-            securityGroupsConfigured: false,
-          },
+        selectedProvider: 'openstack',
+        application: application.name,
+        credentials: defaultCredentials,
+        region: defaultRegion,
+        associatePublicIpAddress: false,
+        strategy: '',
+        stack: '',
+        freeFormDetails: '',
+        minSize: 1,
+        desiredSize: 1,
+        maxSize: 1,
+        loadBalancers: [],
+        securityGroups: [],
+        tags: {},
+        viewState: {
+          mode: defaults.mode || 'create',
+          disableStrategySelection: true,
+          loadBalancersConfigured: false,
+          securityGroupsConfigured: false,
+        },
       });
     }
 
@@ -54,16 +62,16 @@ module.exports = angular.module('spinnaker.openstack.serverGroupCommandBuilder.s
 
     function buildServerGroupCommandFromExisting(application, serverGroup, mode = 'clone') {
       var subnetsLoader = subnetReader.listSubnetsByProvider('openstack');
-      var serverGroupName = namingService.parseServerGroupName(serverGroup.name);
+      var serverGroupName = NameUtils.parseServerGroupName(serverGroup.name);
       var asyncLoader = $q.all({
         subnets: subnetsLoader,
-        loadBalancers: loadBalancerReader.listLoadBalancers('openstack')
+        loadBalancers: loadBalancerReader.listLoadBalancers('openstack'),
       });
 
       return asyncLoader.then(function(asyncData) {
         var loadBalancers = {};
         _.forEach(asyncData.loadBalancers, lb => {
-            loadBalancers[lb.name] = lb.id;
+          loadBalancers[lb.name] = lb.id;
         });
 
         var command = {
@@ -71,7 +79,9 @@ module.exports = angular.module('spinnaker.openstack.serverGroupCommandBuilder.s
           stack: serverGroupName.stack,
           freeFormDetails: serverGroupName.freeFormDetails,
           credentials: serverGroup.account,
-          loadBalancers: serverGroup.loadBalancers.map((lbName) => /^openstack:/.test(lbName) ? lbName.split(':')[4] : loadBalancers[lbName]),
+          loadBalancers: serverGroup.loadBalancers.map(
+            lbName => (/^openstack:/.test(lbName) ? lbName.split(':')[4] : loadBalancers[lbName]),
+          ),
           region: serverGroup.region,
           minSize: parseInt(serverGroup.scalingConfig.minSize),
           maxSize: parseInt(serverGroup.scalingConfig.maxSize),
@@ -86,7 +96,7 @@ module.exports = angular.module('spinnaker.openstack.serverGroupCommandBuilder.s
             account: serverGroup.account,
             region: serverGroup.region,
             asgName: serverGroup.name,
-            serverGroupName: serverGroup.name
+            serverGroupName: serverGroup.name,
           },
           viewState: {
             mode: mode,
@@ -102,13 +112,15 @@ module.exports = angular.module('spinnaker.openstack.serverGroupCommandBuilder.s
         }
 
         command.subnetId = serverGroup.subnetId;
-        command.subnet = _.chain(asyncData.subnets).find({'id': serverGroup.subnetId}).valueOf();
+        command.subnet = _.chain(asyncData.subnets)
+          .find({ id: serverGroup.subnetId })
+          .valueOf();
 
         if (serverGroup.launchConfig) {
           angular.extend(command, {
             instanceType: serverGroup.launchConfig.instanceType,
             associatePublicIpAddress: serverGroup.launchConfig.associatePublicIpAddress,
-            floatingNetworkId: serverGroup.launchConfig.floatingNetworkId
+            floatingNetworkId: serverGroup.launchConfig.floatingNetworkId,
           });
 
           command.securityGroups = serverGroup.launchConfig.securityGroups || [];
@@ -120,26 +132,25 @@ module.exports = angular.module('spinnaker.openstack.serverGroupCommandBuilder.s
 
     function buildServerGroupCommandFromPipeline(application, originalCluster) {
       var command = _.cloneDeep(originalCluster);
-      if( !command.credentials ) {
+      if (!command.credentials) {
         command.credentials = command.account;
       }
       var params = command.serverGroupParameters;
       delete command.serverGroupParameters;
       return _.extend(command, params, {
-          selectedProvider: 'openstack',
-          viewState: {
-            disableImageSelection: true,
-            mode: 'editPipeline',
-            dirty: {},
-          },
+        selectedProvider: 'openstack',
+        viewState: {
+          disableImageSelection: true,
+          mode: 'editPipeline',
+          dirty: {},
+        },
       });
     }
-
 
     return {
       buildNewServerGroupCommand: buildNewServerGroupCommand,
       buildServerGroupCommandFromExisting: buildServerGroupCommandFromExisting,
       buildNewServerGroupCommandForPipeline: buildNewServerGroupCommandForPipeline,
-      buildServerGroupCommandFromPipeline: buildServerGroupCommandFromPipeline
+      buildServerGroupCommandFromPipeline: buildServerGroupCommandFromPipeline,
     };
   });

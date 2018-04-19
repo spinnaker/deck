@@ -12,9 +12,7 @@ export interface IApplicationAttributes {
 }
 
 export class ApplicationWriter {
-
-  public constructor(private taskExecutor: TaskExecutor,
-                     private recentHistoryService: RecentHistoryService) {
+  public constructor(private taskExecutor: TaskExecutor, private recentHistoryService: RecentHistoryService) {
     'ngInject';
   }
 
@@ -22,7 +20,7 @@ export class ApplicationWriter {
     const jobs: IJob[] = this.buildJobs(application, 'createApplication', cloneDeep);
     return this.taskExecutor.executeTask({
       job: jobs,
-      application: application,
+      application,
       description: 'Create Application: ' + application.name,
     });
   }
@@ -31,18 +29,21 @@ export class ApplicationWriter {
     const jobs: IJob[] = this.buildJobs(application, 'updateApplication', cloneDeep);
     return this.taskExecutor.executeTask({
       job: jobs,
-      application: application,
+      application,
       description: 'Update Application: ' + application.name,
     });
   }
 
   public deleteApplication(application: IApplicationAttributes): IPromise<any> {
-    const jobs: IJob[] = this.buildJobs(application, 'deleteApplication', (app: IApplicationAttributes): any => { return { name: app.name }; });
-    return this.taskExecutor.executeTask({
-      job: jobs,
-      application: application,
-      description: 'Deleting Application: ' + application.name
-    })
+    const jobs: IJob[] = this.buildJobs(application, 'deleteApplication', (app: IApplicationAttributes): any => {
+      return { name: app.name };
+    });
+    return this.taskExecutor
+      .executeTask({
+        job: jobs,
+        application,
+        description: 'Deleting Application: ' + application.name,
+      })
       .then((task: any): any => {
         this.recentHistoryService.removeByAppName(application.name);
         return task;
@@ -58,7 +59,7 @@ export class ApplicationWriter {
     }
     delete command.accounts;
     jobs.push({
-      type: type,
+      type,
       application: command,
     });
     return jobs;
@@ -67,7 +68,7 @@ export class ApplicationWriter {
 
 export const APPLICATION_WRITE_SERVICE = 'spinnaker.core.application.write.service';
 
-module(APPLICATION_WRITE_SERVICE, [
-  TASK_EXECUTOR,
-  RECENT_HISTORY_SERVICE,
-]).service('applicationWriter', ApplicationWriter);
+module(APPLICATION_WRITE_SERVICE, [TASK_EXECUTOR, RECENT_HISTORY_SERVICE]).service(
+  'applicationWriter',
+  ApplicationWriter,
+);

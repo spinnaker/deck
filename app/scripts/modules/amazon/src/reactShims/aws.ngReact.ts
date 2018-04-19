@@ -9,8 +9,8 @@ import { ReactInject } from '@spinnaker/core';
 import { ScalingPolicyDetailsSummary } from 'amazon/serverGroup/details/scalingPolicy/detailsSummary.component';
 import { IScalingPolicySummaryProps } from 'amazon/serverGroup/details/scalingPolicy/ScalingPolicySummary';
 
+// prettier-ignore
 export class AwsNgReactInjector extends ReactInject {
-
   public $injectorProxy = {} as IInjectorService;
 
   // Reactified components

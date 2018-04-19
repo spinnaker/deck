@@ -3,8 +3,19 @@ import { uniq, isNil, cloneDeep, intersection, memoize } from 'lodash';
 import { $log } from 'ngimport';
 
 import { Application } from 'core/application/application.model';
-import { IExecution, IStage, ITriggerTypeConfig, IStageTypeConfig, IArtifactKindConfig, IStageOrTriggerTypeConfig } from 'core/domain';
-import { CLOUD_PROVIDER_REGISTRY, CloudProviderRegistry, ICloudProviderConfig } from 'core/cloudProvider/cloudProvider.registry';
+import {
+  IExecution,
+  IStage,
+  ITriggerTypeConfig,
+  IStageTypeConfig,
+  IArtifactKindConfig,
+  IStageOrTriggerTypeConfig,
+} from 'core/domain';
+import {
+  CLOUD_PROVIDER_REGISTRY,
+  CloudProviderRegistry,
+  ICloudProviderConfig,
+} from 'core/cloudProvider/cloudProvider.registry';
 import { SETTINGS } from 'core/config/settings';
 
 import { IAccountDetails } from 'core/account/account.service';
@@ -22,15 +33,18 @@ export class PipelineConfigProvider implements IServiceProvider {
   private artifactKinds: IArtifactKindConfig[] = [];
 
   constructor(private cloudProviderRegistryProvider: CloudProviderRegistry) {
-    this.getStageConfig = memoize(this.getStageConfig.bind(this),
-      (stage: IStage) => [stage ? stage.type : '', stage ? stage.cloudProvider || stage.cloudProviderType || 'aws' : ''].join(':'));
+    this.getStageConfig = memoize(this.getStageConfig.bind(this), (stage: IStage) =>
+      [stage ? stage.type : '', stage ? stage.cloudProvider || stage.cloudProviderType || 'aws' : ''].join(':'),
+    );
   }
 
   private normalizeStageTypes(): void {
     this.stageTypes
-      .filter((stageType) => { return stageType.provides; })
-      .forEach((stageType) => {
-        const parent = this.stageTypes.find((parentType) => {
+      .filter(stageType => {
+        return stageType.provides;
+      })
+      .forEach(stageType => {
+        const parent = this.stageTypes.find(parentType => {
           return parentType.key === stageType.provides && !parentType.provides;
         });
         if (parent) {
@@ -92,40 +106,45 @@ export class PipelineConfigProvider implements IServiceProvider {
     return cloneDeep(this.artifactKinds);
   }
 
-  private getCloudProvidersForStage(type: IStageTypeConfig, allStageTypes: IStageTypeConfig[], accounts: IAccountDetails[]): string[] {
-    let providers = Array.from(new Set(accounts.map(acc => acc.cloudProvider)));
-    let cloudProviders: string[] = [];
+  private getCloudProvidersForStage(
+    type: IStageTypeConfig,
+    allStageTypes: IStageTypeConfig[],
+    accounts: IAccountDetails[],
+  ): string[] {
+    const providersFromAccounts = uniq(accounts.map(acc => acc.cloudProvider));
+    let providersFromStage: string[] = [];
     if (type.providesFor) {
-      cloudProviders = type.providesFor;
+      providersFromStage = type.providesFor;
     } else if (type.cloudProvider) {
-      cloudProviders = [type.cloudProvider];
+      providersFromStage = [type.cloudProvider];
     } else if (type.useBaseProvider) {
       const stageProviders: IStageTypeConfig[] = allStageTypes.filter(s => s.provides === type.key);
       stageProviders.forEach(sp => {
         if (sp.providesFor) {
-          cloudProviders = cloudProviders.concat(sp.providesFor);
+          providersFromStage = providersFromStage.concat(sp.providesFor);
         } else {
-          cloudProviders.push(sp.cloudProvider);
+          providersFromStage.push(sp.cloudProvider);
         }
       });
     } else {
-      cloudProviders = uniq(accounts.reduce((memo, acc) => {
-        const p = this.cloudProviderRegistryProvider.getProvider(acc.cloudProvider, acc.providerVersion);
-        if (!isExcludedStageType(type, p)) {
-          memo.push(acc.cloudProvider);
-        }
-        return memo;
-      }, []));
+      providersFromStage = providersFromAccounts.slice(0);
     }
+
+    // Remove a provider if none of the given accounts support the stage type.
+    providersFromStage = providersFromStage.filter((providerKey: string) => {
+      const providerAccounts = accounts.filter(acc => acc.cloudProvider === providerKey);
+      return !!providerAccounts.find(acc => {
+        const provider = this.cloudProviderRegistryProvider.getProvider(acc.cloudProvider, acc.skin);
+        return !isExcludedStageType(type, provider);
+      });
+    });
+
     // Docker Bake is wedged in here because it doesn't really fit our existing cloud provider paradigm
-    const dockerBakeEnabled = SETTINGS.feature.dockerBake && type.key === 'bake';
-
-    if (dockerBakeEnabled) {
-      providers = cloneDeep(providers);
-      providers.push('docker');
+    if (SETTINGS.feature.dockerBake && type.key === 'bake') {
+      providersFromAccounts.push('docker');
     }
 
-    return intersection(providers, cloudProviders);
+    return intersection(providersFromAccounts, providersFromStage);
   }
 
   public getConfigurableStageTypes(accounts?: IAccountDetails[]): IStageTypeConfig[] {
@@ -135,10 +154,12 @@ export class PipelineConfigProvider implements IServiceProvider {
     if (providers.length === 0) {
       return configurableStageTypes;
     }
-    configurableStageTypes.forEach(type => type.cloudProviders = this.getCloudProvidersForStage(type, allStageTypes, accounts));
+    configurableStageTypes.forEach(
+      type => (type.cloudProviders = this.getCloudProvidersForStage(type, allStageTypes, accounts)),
+    );
     configurableStageTypes = configurableStageTypes.filter(type => {
       return !accounts.every(a => {
-        const p = this.cloudProviderRegistryProvider.getProvider(a.cloudProvider, a.providerVersion);
+        const p = this.cloudProviderRegistryProvider.getProvider(a.cloudProvider, a.skin);
         return isExcludedStageType(type, p);
       });
     });
@@ -157,13 +178,13 @@ export class PipelineConfigProvider implements IServiceProvider {
     if (candidates.length) {
       baseKey = candidates[0].provides;
     }
-    return this.getStageTypes().filter((stageType) => {
+    return this.getStageTypes().filter(stageType => {
       return stageType.provides && stageType.provides === baseKey;
     });
   }
 
   public getTriggerConfig(type: string): ITriggerTypeConfig {
-    return this.getTriggerTypes().find((triggerType) => triggerType.key === type);
+    return this.getTriggerTypes().find(triggerType => triggerType.key === type);
   }
 
   public overrideManualExecutionHandler(triggerType: string, handlerName: string): void {
@@ -177,7 +198,7 @@ export class PipelineConfigProvider implements IServiceProvider {
     if (!stage || !stage.type) {
       return null;
     }
-    const matches = this.getStageTypes().filter((stageType) => {
+    const matches = this.getStageTypes().filter(stageType => {
       return stageType.key === stage.type || stageType.provides === stage.type || stageType.alias === stage.type;
     });
 
@@ -193,9 +214,11 @@ export class PipelineConfigProvider implements IServiceProvider {
         });
 
         if (!matchesForStageCloudProvider.length) {
-          return matches.find(stageType => {
-            return !!stageType.cloudProvider;
-          }) || null;
+          return (
+            matches.find(stageType => {
+              return !!stageType.cloudProvider;
+            }) || null
+          );
         } else {
           return matchesForStageCloudProvider[0];
         }

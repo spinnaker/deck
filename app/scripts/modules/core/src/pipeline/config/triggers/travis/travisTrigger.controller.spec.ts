@@ -6,33 +6,33 @@ import { IBuildTrigger } from 'core/domain/ITrigger';
 import { TRAVIS_TRIGGER, TravisTrigger } from './travisTrigger.module';
 
 describe('Controller: travisTrigger', () => {
-  let $scope: IScope,
-    igorService: IgorService,
-    $q: IQService,
-    $ctrl: IControllerService;
+  let $scope: IScope, igorService: IgorService, $q: IQService, $ctrl: IControllerService;
 
   beforeEach(mock.module(TRAVIS_TRIGGER));
 
   beforeEach(
-    mock.inject(($controller: IControllerService, $rootScope: IRootScopeService, _$q_: IQService, _igorService_: IgorService) => {
-      $ctrl = $controller;
-      $q = _$q_;
-      igorService = _igorService_;
-      $scope = $rootScope.$new();
-    }));
+    mock.inject(
+      ($controller: IControllerService, $rootScope: IRootScopeService, _$q_: IQService, _igorService_: IgorService) => {
+        $ctrl = $controller;
+        $q = _$q_;
+        igorService = _igorService_;
+        $scope = $rootScope.$new();
+      },
+    ),
+  );
 
   const initializeController = (trigger: IBuildTrigger): TravisTrigger => {
     return $ctrl(TravisTrigger, {
       trigger,
       $scope,
-      igorService
+      igorService,
     });
   };
 
   describe('updateJobsList', () => {
     it('gets list of jobs when initialized with a trigger with a master and sets loading states', () => {
       const jobs = ['some_job', 'some_other_job'],
-        trigger = <IBuildTrigger>{ master: 'travis', job: 'some_job' };
+        trigger = { master: 'travis', job: 'some_job' } as IBuildTrigger;
 
       spyOn(igorService, 'listJobsForMaster').and.returnValue($q.when(jobs));
       spyOn(igorService, 'listMasters').and.returnValue($q.when(['travis']));
@@ -49,16 +49,16 @@ describe('Controller: travisTrigger', () => {
     it('updates jobs list when master changes, preserving job if present in both masters', () => {
       const masterA = {
           name: 'masterA',
-          jobs: ['a', 'b']
+          jobs: ['a', 'b'],
         },
         masterB = {
           name: 'masterB',
-          jobs: ['b', 'c']
+          jobs: ['b', 'c'],
         },
-        trigger = <IBuildTrigger>{
+        trigger = {
           master: 'masterA',
-          job: 'a'
-        };
+          job: 'a',
+        } as IBuildTrigger;
 
       spyOn(igorService, 'listJobsForMaster').and.callFake((master: string) => {
         return $q.when(find([masterA, masterB], { name: master }).jobs);
@@ -90,10 +90,10 @@ describe('Controller: travisTrigger', () => {
     });
 
     it('retains current job if no jobs found in master because that is probably a server-side issue', () => {
-      const trigger = <IBuildTrigger>{
+      const trigger = {
         master: 'masterA',
-        job: 'a'
-      };
+        job: 'a',
+      } as IBuildTrigger;
 
       spyOn(igorService, 'listJobsForMaster').and.callFake(() => {
         return $q.when([]);

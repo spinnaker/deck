@@ -9,22 +9,25 @@ import { WaitExecutionLabel } from './WaitExecutionLabel';
 
 export const WAIT_STAGE = 'spinnaker.core.pipeline.stage.waitStage';
 
-module(WAIT_STAGE, [
-  PIPELINE_CONFIG_PROVIDER,
-])
+export const DEFAULT_SKIP_WAIT_TEXT = 'The pipeline will proceed immediately, marking this stage completed.';
+
+module(WAIT_STAGE, [PIPELINE_CONFIG_PROVIDER])
   .config((pipelineConfigProvider: PipelineConfigProvider) => {
     pipelineConfigProvider.registerStage({
       label: 'Wait',
       description: 'Waits a specified period of time',
       key: 'wait',
       templateUrl: require('./waitStage.html'),
-      executionDetailsSections: [ WaitExecutionDetails, ExecutionDetailsTasks ],
+      executionDetailsSections: [WaitExecutionDetails, ExecutionDetailsTasks],
       executionLabelComponent: WaitExecutionLabel,
       useCustomTooltip: true,
       strategy: true,
-      controller: 'WaitStageCtrl',
-      validators: [
-        { type: 'requiredField', fieldName: 'waitTime' },
-      ],
+      controller: 'WaitStageCtrl as ctrl',
+      validators: [{ type: 'requiredField', fieldName: 'waitTime' }],
     });
-  }).controller('WaitStageCtrl', (stage: IStage) => stage.waitTime = stage.waitTime || 30);
+  })
+  .controller('WaitStageCtrl', function(stage: IStage) {
+    stage.waitTime = stage.waitTime || 30;
+    this.enableCustomSkipWaitText = !!stage.skipWaitText;
+    this.defaultSkipWaitText = DEFAULT_SKIP_WAIT_TEXT;
+  });

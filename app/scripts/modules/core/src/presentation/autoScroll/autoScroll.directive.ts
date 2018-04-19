@@ -3,7 +3,7 @@ import { Subject } from 'rxjs';
 
 import { DirectiveFactory } from 'core/utils/tsDecorators/directiveFactoryDecorator';
 
-export interface AutoScrollAttrs extends IAttributes {
+export interface IAutoScrollAttrs extends IAttributes {
   autoScrollEnabled: string;
   autoScroll: string;
 }
@@ -14,7 +14,7 @@ export class AutoScrollController implements IController {
   public onScroll: (event: Event) => void;
   public scrollToTop: Subject<boolean>;
   public $element: JQuery;
-  public $attrs: AutoScrollAttrs;
+  public $attrs: IAutoScrollAttrs;
   public $scope: IScope;
 
   private scrollableContainer: JQuery;
@@ -36,7 +36,9 @@ export class AutoScrollController implements IController {
   }
 
   public initialize(): void {
-    this.scrollableContainer = this.autoScrollParent ? this.$element.closest(this.autoScrollParent) : this.$element.parent();
+    this.scrollableContainer = this.autoScrollParent
+      ? this.$element.closest(this.autoScrollParent)
+      : this.$element.parent();
     if (this.onScroll) {
       this.scrollableContainer.on(this.containerEvent, (event: Event) => {
         this.$timeout(() => this.onScroll(event));
@@ -66,7 +68,7 @@ class AutoScrollDirective implements IDirective {
     scrollToTop: '=?',
   };
 
-  public link($scope: IScope, $element: JQuery, $attrs: AutoScrollAttrs, ctrl: AutoScrollController) {
+  public link($scope: IScope, $element: JQuery, $attrs: IAutoScrollAttrs, ctrl: AutoScrollController) {
     ctrl.$scope = $scope;
     ctrl.$element = $element;
     ctrl.$attrs = $attrs;
@@ -76,5 +78,4 @@ class AutoScrollDirective implements IDirective {
 
 export const AUTO_SCROLL_DIRECTIVE = 'spinnaker.core.autoScroll';
 
-module(AUTO_SCROLL_DIRECTIVE, [])
-  .directive('autoScroll', <any>AutoScrollDirective);
+module(AUTO_SCROLL_DIRECTIVE, []).directive('autoScroll', AutoScrollDirective as any);

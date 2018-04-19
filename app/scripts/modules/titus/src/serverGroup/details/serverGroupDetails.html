@@ -18,9 +18,9 @@
         <span class="glyphicon glyphicon-remove"></span>
       </a>
     </div>
-    <div class="header-text">
+    <div class="header-text horizontal middle">
       <cloud-provider-logo provider="serverGroup.type" height="'36px'" width="'36px'"></cloud-provider-logo>
-      <h3 select-on-dbl-click>
+      <h3 class="horizontal middle space-between flex-1" select-on-dbl-click>
         {{serverGroup.name}}
         <render-if-feature feature="entityTags">
           <entity-notifications
@@ -42,8 +42,8 @@
             Titus Job Actions <span class="caret"></span>
           </button>
           <ul class="dropdown-menu" uib-dropdown-menu role="menu">
-            <li><a href ng-if=" !serverGroup.isDisabled" ng-click="ctrl.rollbackServerGroup()">Rollback</a></li>
-            <li role="presentation" class="divider" ng-if="!serverGroup.isDisabled"></li>
+            <li><a href ng-if="ctrl.isRollbackEnabled()" ng-click="ctrl.rollbackServerGroup()">Rollback</a></li>
+            <li role="presentation" class="divider" ng-if="ctrl.isRollbackEnabled()"></li>
             <li><a href ng-click="ctrl.resizeServerGroup()">Resize</a></li>
             <li><a href ng-if="!serverGroup.isDisabled" ng-click="ctrl.disableServerGroup()">Disable</a></li>
             <li><a href ng-if="serverGroup.isDisabled" ng-click="ctrl.enableServerGroup()">Enable</a></li>
@@ -145,10 +145,10 @@
     </collapsible-section>
     <collapsible-section heading="Security Groups">
       <ul>
-        <li ng-repeat="securityGroup in serverGroup.securityGroupDetails | orderBy:'groupName'">
+        <li ng-repeat="securityGroup in securityGroups | orderBy:'name'">
           <a
-            ui-sref="^.securityGroupDetails({name: securityGroup.groupName, accountId: securityGroup.awsAccount, region: serverGroup.placement.region, vpcId: securityGroup.awsVpcId, provider: 'aws'})">
-            {{securityGroup.groupName}} ({{securityGroup.groupId}})
+            ui-sref="^.securityGroupDetails({name: securityGroup.name, accountId: securityGroup.account, region: serverGroup.placement.region, vpcId: securityGroup.vpcId, provider: 'aws'})">
+            {{securityGroup.name}} ({{securityGroup.id}})
           </a>
         </li>
       </ul>
@@ -187,19 +187,19 @@
         <dd>{{serverGroup.resources.networkMbps}} Mbps</dd>
       </dl>
     </collapsible-section>
-    <collapsible-section heading="Environment">
-      <div ng-if="!serverGroup.env">No environment parameters associated with this
-        server group</div>
-      <dl ng-if="serverGroup.env">
-        <dt ng-repeat-start="(key, val) in serverGroup.env">{{key}}</dt>
-        <dd ng-repeat-end>{{val}}</dd>
-      </dl>
-    </collapsible-section>
-    <collapsible-section heading="Labels">
-      <div ng-if="!serverGroup.labels">No labels associated with this
+    <collapsible-section heading="Job Attributes">
+      <div ng-if="!serverGroup.labels">No job attributes associated with this
         server group</div>
       <dl ng-if="labels">
         <dt ng-repeat-start="(key, val) in labels">{{key}}</dt>
+        <dd ng-repeat-end>{{val}}</dd>
+      </dl>
+    </collapsible-section>
+    <collapsible-section heading="Environment Variables">
+      <div ng-if="!serverGroup.env">No environment variables associated with this
+        server group</div>
+      <dl ng-if="serverGroup.env">
+        <dt ng-repeat-start="(key, val) in serverGroup.env">{{key}}</dt>
         <dd ng-repeat-end>{{val}}</dd>
       </dl>
     </collapsible-section>

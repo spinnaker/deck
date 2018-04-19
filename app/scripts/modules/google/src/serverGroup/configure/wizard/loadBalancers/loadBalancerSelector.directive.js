@@ -3,17 +3,16 @@
 const angular = require('angular');
 import _ from 'lodash';
 
-import { INFRASTRUCTURE_CACHE_SERVICE } from '@spinnaker/core';
+import { InfrastructureCaches } from '@spinnaker/core';
 import { GCE_HTTP_LOAD_BALANCER_UTILS } from 'google/loadBalancer/httpLoadBalancerUtils.service';
 
 module.exports = angular
   .module('spinnaker.google.serverGroup.configure.wizard.loadBalancers.selector.directive', [
-    INFRASTRUCTURE_CACHE_SERVICE,
     GCE_HTTP_LOAD_BALANCER_UTILS,
     require('./elSevenOptions/elSevenOptionsGenerator.component.js').name,
     require('../../serverGroupConfiguration.service.js').name,
   ])
-  .directive('gceServerGroupLoadBalancerSelector', function () {
+  .directive('gceServerGroupLoadBalancerSelector', function() {
     return {
       restrict: 'E',
       templateUrl: require('./loadBalancerSelector.directive.html'),
@@ -24,11 +23,13 @@ module.exports = angular
       controllerAs: 'vm',
       controller: 'gceServerGroupLoadBalancerSelectorCtrl',
     };
-  }).controller('gceServerGroupLoadBalancerSelectorCtrl', function (gceHttpLoadBalancerUtils,
-                                                                    gceServerGroupConfigurationService,
-                                                                    infrastructureCaches) {
+  })
+  .controller('gceServerGroupLoadBalancerSelectorCtrl', function(
+    gceHttpLoadBalancerUtils,
+    gceServerGroupConfigurationService,
+  ) {
     this.getLoadBalancerRefreshTime = () => {
-      return infrastructureCaches.get('loadBalancers').getStats().ageMax;
+      return InfrastructureCaches.get('loadBalancers').getStats().ageMax;
     };
 
     this.refreshLoadBalancers = () => {
@@ -43,11 +44,18 @@ module.exports = angular
         let index = this.command.backingData.filtered.loadBalancerIndex;
         let selected = this.command.loadBalancers;
 
-        return angular.isDefined(selected) && _.some(selected, s => {
-            return index[s].loadBalancerType === 'HTTP' || index[s].loadBalancerType === 'SSL' || index[s].loadBalancerType === 'TCP';
-          });
+        return (
+          angular.isDefined(selected) &&
+          _.some(selected, s => {
+            return (
+              index[s].loadBalancerType === 'HTTP' ||
+              index[s].loadBalancerType === 'SSL' ||
+              index[s].loadBalancerType === 'TCP'
+            );
+          })
+        );
       }
     };
 
-    this.isHttpLoadBalancer = (lb) => gceHttpLoadBalancerUtils.isHttpLoadBalancer(lb);
+    this.isHttpLoadBalancer = lb => gceHttpLoadBalancerUtils.isHttpLoadBalancer(lb);
   });

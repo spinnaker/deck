@@ -2,8 +2,9 @@
 
 var feedbackUrl = process.env.FEEDBACK_URL;
 var gateHost = process.env.API_HOST || 'http://localhost:8084';
-var bakeryDetailUrl = process.env.BAKERY_DETAIL_URL || (gateHost + '/bakery/logs/{{context.region}}/{{context.status.resourceId}}');
-var authEndpoint = process.env.AUTH_ENDPOINT || (gateHost + '/auth/user');
+var bakeryDetailUrl =
+  process.env.BAKERY_DETAIL_URL || gateHost + '/bakery/logs/{{context.region}}/{{context.status.resourceId}}';
+var authEndpoint = process.env.AUTH_ENDPOINT || gateHost + '/auth/user';
 var authEnabled = process.env.AUTH_ENABLED === 'false' ? false : true;
 var netflixMode = process.env.NETFLIX_MODE === 'true' ? true : false;
 var chaosEnabled = netflixMode || process.env.CHAOS_ENABLED === 'true' ? true : false;
@@ -13,6 +14,13 @@ var debugEnabled = process.env.DEBUG_ENABLED === 'false' ? false : true;
 var canaryEnabled = process.env.CANARY_ENABLED === 'true';
 var infrastructureEnabled = process.env.INFRA_ENABLED === 'true' ? true : false;
 var dryRunEnabled = process.env.DRYRUN_ENABLED === 'true' ? true : false;
+var reduxLoggerEnabled = process.env.REDUX_LOGGER === 'true';
+var defaultMetricStore = process.env.METRIC_STORE || 'atlas';
+var canaryStagesEnabled = process.env.CANARY_STAGES_ENABLED === 'true';
+var templatesEnabled = process.env.TEMPLATES_ENABLED === 'true';
+var atlasWebComponentsUrl = process.env.ATLAS_WEB_COMPONENTS_URL;
+var canaryAccount = process.env.CANARY_ACCOUNT || '';
+var canaryFeatureDisabled = process.env.CANARY_FEATURE_ENABLED !== 'true';
 
 window.spinnakerSettings = {
   checkForUpdates: true,
@@ -30,7 +38,7 @@ window.spinnakerSettings = {
     azure: {
       defaults: {
         account: 'azure-test',
-        region: 'westus'
+        region: 'westus',
       },
     },
     aws: {
@@ -74,13 +82,13 @@ window.spinnakerSettings = {
       defaults: {
         account: 'DEFAULT',
         region: 'us-phoenix-1',
-        bakeryRegions: ['us-phoenix-1']
-      }
+        bakeryRegions: ['us-phoenix-1'],
+      },
     },
     openstack: {
       defaults: {
         account: 'test',
-        region: 'us-west-1'
+        region: 'us-west-1',
       },
     },
     kubernetes: {
@@ -95,7 +103,7 @@ window.spinnakerSettings = {
     },
     dcos: {
       defaults: {
-        account: 'my-dcos-account'
+        account: 'my-dcos-account',
       },
     },
     appengine: {
@@ -103,7 +111,7 @@ window.spinnakerSettings = {
         account: 'my-appengine-account',
         containerImageUrlDeployments: false,
       },
-    }
+    },
   },
   whatsNew: {
     gistId: '32526cd608db3d811b38',
@@ -115,15 +123,18 @@ window.spinnakerSettings = {
     },
     hipchat: {
       enabled: true,
-      botName: 'Skynet T-800'
+      botName: 'Skynet T-800',
     },
     sms: {
       enabled: true,
     },
     slack: {
       enabled: true,
-      botName: 'spinnakerbot'
-    }
+      botName: 'spinnakerbot',
+    },
+  },
+  pagerDuty: {
+    required: false,
   },
   authEnabled: authEnabled,
   authTtl: 600000,
@@ -131,6 +142,18 @@ window.spinnakerSettings = {
   pubsubProviders: ['google', 'kafka'],
   triggerTypes: ['git', 'pipeline', 'docker', 'cron', 'jenkins', 'travis', 'pubsub'],
   searchVersion: 1,
+  canary: {
+    reduxLogger: reduxLoggerEnabled,
+    metricsAccountName: canaryAccount,
+    storageAccountName: canaryAccount,
+    defaultJudge: 'NetflixACAJudge-v1.0',
+    metricStore: defaultMetricStore,
+    stagesEnabled: canaryStagesEnabled,
+    atlasWebComponentsUrl: atlasWebComponentsUrl,
+    templatesEnabled: templatesEnabled,
+    showAllConfigs: true,
+    featureDisabled: canaryFeatureDisabled,
+  },
   feature: {
     artifacts: false,
     canary: canaryEnabled,
@@ -145,6 +168,7 @@ window.spinnakerSettings = {
     jobs: false,
     netflixMode: netflixMode,
     notifications: false,
+    pagerDuty: false,
     pipelineTemplates: false,
     pipelines: true,
     roscoMode: false,

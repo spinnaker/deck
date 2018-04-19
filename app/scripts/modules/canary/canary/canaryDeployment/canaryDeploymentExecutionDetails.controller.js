@@ -2,26 +2,28 @@
 
 const angular = require('angular');
 
-import { CLUSTER_FILTER_SERVICE, URL_BUILDER_SERVICE } from '@spinnaker/core';
+import { ClusterState, URL_BUILDER_SERVICE } from '@spinnaker/core';
 
-module.exports = angular.module('spinnaker.canary.canaryDeployment.details.controller', [
-  require('@uirouter/angularjs').default,
-  CLUSTER_FILTER_SERVICE,
-  URL_BUILDER_SERVICE,
-  require('./canaryDeploymentHistory.service.js').name
-])
-  .controller('CanaryDeploymentExecutionDetailsCtrl', function ($scope, $stateParams,
-                                                                executionDetailsSectionService,
-                                                                canaryDeploymentHistoryService, urlBuilderService,
-                                                                clusterFilterService) {
-
+module.exports = angular
+  .module('spinnaker.canary.canaryDeployment.details.controller', [
+    require('@uirouter/angularjs').default,
+    URL_BUILDER_SERVICE,
+    require('./canaryDeploymentHistory.service.js').name,
+  ])
+  .controller('CanaryDeploymentExecutionDetailsCtrl', function(
+    $scope,
+    $stateParams,
+    executionDetailsSectionService,
+    canaryDeploymentHistoryService,
+    urlBuilderService,
+  ) {
     $scope.configSections = ['canaryDeployment', 'canaryAnalysisHistory'];
 
     let initialized = () => {
       $scope.detailsSection = $stateParams.details;
 
       if ($scope.stage.context && $scope.stage.context.commits && $scope.stage.context.commits.length > 0) {
-        if(!$scope.configSections.includes('codeChanges')) {
+        if (!$scope.configSections.includes('codeChanges')) {
           $scope.configSections.push('codeChanges');
         }
       }
@@ -59,20 +61,20 @@ module.exports = angular.module('spinnaker.canary.canaryDeployment.details.contr
       }
     };
 
-    $scope.loadHistory = function () {
+    $scope.loadHistory = function() {
       if ($scope.deployment.canaryDeploymentId) {
         $scope.viewState.loadingHistory = true;
         $scope.viewState.loadingHistoryError = false;
 
         canaryDeploymentHistoryService.getAnalysisHistory($scope.deployment.canaryDeploymentId).then(
-          function (results) {
+          function(results) {
             $scope.analysisHistory = results;
             $scope.viewState.loadingHistory = false;
           },
-          function () {
+          function() {
             $scope.viewState.loadingHistory = false;
             $scope.viewState.loadingHistoryError = true;
-          }
+          },
         );
       } else {
         $scope.analysisHistory = [];
@@ -80,12 +82,11 @@ module.exports = angular.module('spinnaker.canary.canaryDeployment.details.contr
       }
     };
 
-    this.overrideFiltersForUrl = r => clusterFilterService.overrideFiltersForUrl(r);
+    this.overrideFiltersForUrl = r => ClusterState.filterService.overrideFiltersForUrl(r);
 
     let initialize = () => executionDetailsSectionService.synchronizeSection($scope.configSections, initialized);
 
     initialize();
 
     $scope.$on('$stateChangeSuccess', initialize);
-
   });

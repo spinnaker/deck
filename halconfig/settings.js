@@ -8,6 +8,7 @@ var authEnabled = '{%features.auth%}' === 'true';
 var chaosEnabled = '{%features.chaos%}' === 'true';
 var fiatEnabled = '{%features.fiat%}' === 'true';
 var jobsEnabled = '{%features.jobs%}' === 'true';
+var infrastructureStagesEnabled = "{%features.infrastructureStages%}" === "true";
 var pipelineTemplatesEnabled = '{%features.pipelineTemplates%}' === 'true';
 var artifactsEnabled = '{%features.artifacts%}' === 'true';
 var mineCanaryEnabled = '{%features.mineCanary%}' === 'true';
@@ -25,6 +26,7 @@ var timezone = '{%timezone%}';
 var version = '{%version%}';
 var changelogGistId = '{%changelog.gist.id%}';
 var changelogGistName = '{%changelog.gist.name%}';
+var appengineContainerImageUrlDeploymentsEnabled = '{%features.appengineContainerImageUrlDeployments%}' === 'true';
 var gce = {
   defaults: {
     account: '{%google.default.account%}',
@@ -45,7 +47,8 @@ var kubernetes = {
 var appengine = {
   defaults: {
     account: '{%appengine.default.account%}',
-    editLoadBalancerStageEnabled: '{%appengine.enabled%}' === 'true'
+    editLoadBalancerStageEnabled: '{%appengine.enabled%}' === 'true',
+    containerImageUrlDeployments: appengineContainerImageUrlDeploymentsEnabled,
   }
 };
 var openstack = {
@@ -71,6 +74,11 @@ var dcos = {
     account: '{%dcos.default.account%}'
   }
 };
+var ecs = {
+  defaults: {
+    account: '{%ecs.default.account%}'
+  }
+};
 var entityTagsEnabled = false;
 var netflixMode = false;
 var notificationsEnabled = '{%notifications.enabled%}' === 'true';
@@ -82,7 +90,7 @@ var slack = {
 window.spinnakerSettings = {
   version: version,
   checkForUpdates: false,
-  defaultProviders: ['aws', 'gce', 'azure', 'cf', 'kubernetes', 'titus', 'openstack', 'oraclebmcs', 'dcos'],
+  defaultProviders: ['aws', 'ecs', 'gce', 'azure', 'cf', 'kubernetes', 'titus', 'openstack', 'oraclebmcs', 'dcos'],
   feedbackUrl: feedbackUrl,
   gateUrl: gateHost,
   bakeryDetailUrl: bakeryDetailUrl,
@@ -107,6 +115,7 @@ window.spinnakerSettings = {
       },
       useAmiBlockDeviceMappings: false,
     },
+    ecs: ecs,
     gce: gce,
     titus: {
       defaults: {
@@ -138,6 +147,9 @@ window.spinnakerSettings = {
     },
     slack: slack
   },
+  pagerDuty: {
+    required: false
+  },
   authEnabled: authEnabled,
   authTtl: 600000,
   gitSources: ['stash', 'github', 'bitbucket'],
@@ -164,9 +176,11 @@ window.spinnakerSettings = {
     notifications: notificationsEnabled,
     artifacts: artifactsEnabled,
     canary: mineCanaryEnabled,
+    infrastructureStages: infrastructureStagesEnabled,
     pipelines: true,
     fastProperty: true,
     vpcMigrator: true,
+    pagerDuty: false,
     clusterDiff: false,
     roscoMode: true,
     infrastructureStages: false,

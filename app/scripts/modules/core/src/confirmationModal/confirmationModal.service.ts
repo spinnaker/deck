@@ -25,7 +25,6 @@ export interface IConfirmationModalParams {
 }
 
 export class ConfirmationModalService {
-
   private defaults: IConfirmationModalParams = {
     buttonText: 'Confirm',
     cancelButtonText: 'Cancel',
@@ -34,7 +33,7 @@ export class ConfirmationModalService {
   public constructor(private $uibModal: IModalService, private $sce: ng.ISCEService) {}
 
   public confirm(params: IConfirmationModalParams): ng.IPromise<any> {
-    const extendedParams: IConfirmationModalParams = Object.assign({}, this.defaults, params);
+    const extendedParams: IConfirmationModalParams = { ...this.defaults, ...params };
 
     if (extendedParams.body) {
       extendedParams.body = this.$sce.trustAsHtml(extendedParams.body);
@@ -44,8 +43,8 @@ export class ConfirmationModalService {
       templateUrl: require('./confirm.html'),
       controller: 'ConfirmationModalCtrl as ctrl',
       resolve: {
-        params: () => extendedParams
-      }
+        params: () => extendedParams,
+      },
     };
 
     if (params.size) {
@@ -58,7 +57,6 @@ export class ConfirmationModalService {
 
     return result;
   }
-
 }
 
 export const CONFIRMATION_MODAL_SERVICE = 'spinnaker.core.confirmationModal.service';

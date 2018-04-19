@@ -3,11 +3,11 @@ import { IController, module } from 'angular';
 import { Application } from '../../application.model';
 import { ApplicationDataSource } from '../../service/applicationDataSource';
 import { APPLICATION_WRITE_SERVICE, ApplicationWriter } from 'core/application/service/application.write.service';
+import { APPLICATION_READ_SERVICE, ApplicationReader } from 'core/application/service/application.read.service';
 
 import './applicationDataSourceEditor.component.less';
 
 export class DataSourceEditorController implements IController {
-
   public application: Application;
 
   public model: any = {};
@@ -20,7 +20,9 @@ export class DataSourceEditorController implements IController {
 
   public dataSources: ApplicationDataSource[];
 
-  constructor(private applicationWriter: ApplicationWriter) { 'ngInject'; }
+  constructor(private applicationWriter: ApplicationWriter, private applicationReader: ApplicationReader) {
+    'ngInject';
+  }
 
   public $onInit() {
     if (this.application.notFound) {
@@ -54,50 +56,49 @@ export class DataSourceEditorController implements IController {
       this.explicitlyEnabled = this.explicitlyEnabled.filter(s => s !== key);
     }
     this.isDirty = JSON.stringify(this.model) !== this.original;
-  };
+  }
 
   public revert() {
     this.$onInit();
-  };
+  }
 
   public save() {
     this.saving = true;
     this.saveError = false;
     const newDataSources = { enabled: this.explicitlyEnabled, disabled: this.explicitlyDisabled };
-    this.applicationWriter.updateApplication({
-      name: this.application.name,
-      accounts: this.application.attributes.accounts,
-      dataSources: newDataSources,
-    })
-      .then(() => {
-        this.application.attributes.dataSources = newDataSources;
-        this.explicitlyEnabled
-          .filter(k => this.application.getDataSource(k))
-          .forEach(key => this.application.getDataSource(key).disabled = false);
-        this.explicitlyDisabled
-          .filter(k => this.application.getDataSource(k))
-          .forEach(key => this.application.getDataSource(key).disabled = true);
-        this.application.refresh(true);
-        this.saving = false;
-        this.isDirty = false;
-        this.$onInit();
-      }, () => {
-        this.saving = false;
-        this.saveError = true;
-      });
+    this.applicationWriter
+      .updateApplication({
+        name: this.application.name,
+        accounts: this.application.attributes.accounts,
+        dataSources: newDataSources,
+      })
+      .then(
+        () => {
+          this.application.attributes.dataSources = newDataSources;
+          this.applicationReader.setDisabledDataSources(this.application);
+          this.application.refresh(true);
+          this.saving = false;
+          this.isDirty = false;
+          this.$onInit();
+        },
+        () => {
+          this.saving = false;
+          this.saveError = true;
+        },
+      );
   }
 }
 
 class ApplicationDataSourceEditorComponent implements ng.IComponentOptions {
   public bindings: any = {
-    application: '='
+    application: '=',
   };
   public controller: any = DataSourceEditorController;
   public templateUrl: string = require('./applicationDataSourceEditor.component.html');
 }
 
 export const APPLICATION_DATA_SOURCE_EDITOR = 'spinnaker.core.application.config.applicationDataSourceEditor';
-module(APPLICATION_DATA_SOURCE_EDITOR, [
-  APPLICATION_WRITE_SERVICE
-])
-  .component('applicationDataSourceEditor', new ApplicationDataSourceEditorComponent());
+module(APPLICATION_DATA_SOURCE_EDITOR, [APPLICATION_READ_SERVICE, APPLICATION_WRITE_SERVICE]).component(
+  'applicationDataSourceEditor',
+  new ApplicationDataSourceEditorComponent(),
+);

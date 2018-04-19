@@ -5,6 +5,7 @@ import { Application } from 'core/application/application.model';
 import { ExecutionGroup } from './ExecutionGroup';
 import { IExecutionGroup } from 'core/domain';
 import { ReactInjector } from 'core/reactShims';
+import { ExecutionState } from 'core/state';
 
 import './executionGroups.less';
 
@@ -24,14 +25,18 @@ export class ExecutionGroups extends React.Component<IExecutionGroupsProps, IExe
 
   constructor(props: IExecutionGroupsProps) {
     super(props);
-    const { executionFilterModel, executionFilterService, stateEvents } = ReactInjector;
+    const { executionFilterService, stateEvents } = ReactInjector;
     this.state = {
-      groups: executionFilterModel.asFilterModel.groups.slice(),
-      showingDetails: this.showingDetails()
+      groups: ExecutionState.filterModel.asFilterModel.groups.slice(),
+      showingDetails: this.showingDetails(),
     };
 
-    this.applicationRefreshUnsubscribe = this.props.application.executions.onRefresh(null, () => { this.forceUpdate(); });
-    this.groupsUpdatedSubscription = executionFilterService.groupsUpdatedStream.subscribe(() => { this.setState({ groups: executionFilterModel.asFilterModel.groups.slice() }); });
+    this.applicationRefreshUnsubscribe = this.props.application.executions.onRefresh(null, () => {
+      this.forceUpdate();
+    });
+    this.groupsUpdatedSubscription = executionFilterService.groupsUpdatedStream.subscribe(() => {
+      this.setState({ groups: ExecutionState.filterModel.asFilterModel.groups.slice() });
+    });
     this.stateChangeSuccessSubscription = stateEvents.stateChangeSuccess.subscribe(() => {
       const detailsShown = this.showingDetails();
       if (detailsShown !== this.state.showingDetails) {
@@ -64,19 +69,19 @@ export class ExecutionGroups extends React.Component<IExecutionGroupsProps, IExe
   public render(): React.ReactElement<ExecutionGroups> {
     const hasGroups = this.state.groups && this.state.groups.length > 0;
     const className = `row pipelines executions ${this.state.showingDetails ? 'showing-details' : ''}`;
-    const executionGroups = (this.state.groups || []).map((group: IExecutionGroup) => <ExecutionGroup key={group.heading} group={group} application={this.props.application}/>);
+    const executionGroups = (this.state.groups || []).map((group: IExecutionGroup) => (
+      <ExecutionGroup key={group.heading} group={group} application={this.props.application} />
+    ));
 
     return (
       <div className="execution-groups-section">
         <div className={className}>
-            { !hasGroups && (
-              <div className="text-center">
-                <h4>No executions match the filters you've selected.</h4>
-              </div>
-            )}
-            <div className="execution-groups all-execution-groups">
-              {executionGroups}
+          {!hasGroups && (
+            <div className="text-center">
+              <h4>No executions match the filters you've selected.</h4>
             </div>
+          )}
+          <div className="execution-groups all-execution-groups">{executionGroups}</div>
         </div>
       </div>
     );

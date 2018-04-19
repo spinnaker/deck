@@ -1,28 +1,29 @@
-import {APPLICATION_MODEL_BUILDER} from 'core/application/applicationModel.builder';
-import {APPLICATION_READ_SERVICE} from 'core/application/service/application.read.service';
+import { APPLICATION_MODEL_BUILDER } from 'core/application/applicationModel.builder';
+import { APPLICATION_READ_SERVICE } from 'core/application/service/application.read.service';
+import { ClusterState } from 'core/state';
+import * as State from 'core/state';
 
-describe('Controller: MultipleServerGroups', function () {
-
+describe('Controller: MultipleServerGroups', function() {
   var controller;
   var scope;
-  var MultiselectModel;
 
   beforeEach(
     window.module(
       require('./multipleServerGroups.controller').name,
       APPLICATION_READ_SERVICE,
-      APPLICATION_MODEL_BUILDER
-    )
+      APPLICATION_MODEL_BUILDER,
+    ),
   );
 
-  beforeEach(
-    window.inject(function ($rootScope, $controller, _$q_, _MultiselectModel_, clusterFilterModel, applicationModelBuilder) {
-      scope = $rootScope.$new();
-      MultiselectModel = _MultiselectModel_;
-      clusterFilterModel.sortFilter.multiselect = true;
+  beforeEach(() => State.initialize());
 
-      this.createController = function (serverGroups) {
-        let application = applicationModelBuilder.createApplication('app', {key: 'serverGroups', lazy: true});
+  beforeEach(
+    window.inject(function($rootScope, $controller, _$q_, applicationModelBuilder) {
+      scope = $rootScope.$new();
+      ClusterState.filterModel.sortFilter.multiselect = true;
+
+      this.createController = function(serverGroups) {
+        let application = applicationModelBuilder.createApplication('app', { key: 'serverGroups', lazy: true });
         application.serverGroups.data = serverGroups;
         application.serverGroups.loaded = true;
         this.application = application;
@@ -32,21 +33,39 @@ describe('Controller: MultipleServerGroups', function () {
           app: application,
         });
       };
-    })
+    }),
   );
 
-  beforeEach(function () {
-    this.serverGroupA = { type: 'aws', name: 'asg-v001', account: 'prod', region: 'us-east-1', instanceCounts: { a: 1}};
-    this.serverGroupB = { type: 'gce', name: 'asg-v002', account: 'test', region: 'us-west-1', isDisabled: true, instanceCounts: { b: 2}};
-    this.serverGroupC = { type: 'gce', name: 'asg-v003', account: 'test', region: 'us-west-1', instanceCounts: { c: 3}};
-    MultiselectModel.clearAll();
-    spyOn(MultiselectModel, 'syncNavigation').and.callFake(angular.noop);
+  beforeEach(function() {
+    this.serverGroupA = {
+      type: 'aws',
+      name: 'asg-v001',
+      account: 'prod',
+      region: 'us-east-1',
+      instanceCounts: { a: 1 },
+    };
+    this.serverGroupB = {
+      type: 'gce',
+      name: 'asg-v002',
+      account: 'test',
+      region: 'us-west-1',
+      isDisabled: true,
+      instanceCounts: { b: 2 },
+    };
+    this.serverGroupC = {
+      type: 'gce',
+      name: 'asg-v003',
+      account: 'test',
+      region: 'us-west-1',
+      instanceCounts: { c: 3 },
+    };
+    ClusterState.multiselectModel.clearAll();
+    spyOn(ClusterState.multiselectModel, 'syncNavigation').and.callFake(angular.noop);
   });
 
-  describe('server group retrieval', function () {
-
-    it('adds copies of server groups, not the server groups themselves', function () {
-      MultiselectModel.toggleServerGroup(this.serverGroupB);
+  describe('server group retrieval', function() {
+    it('adds copies of server groups, not the server groups themselves', function() {
+      ClusterState.multiselectModel.toggleServerGroup(this.serverGroupB);
       this.createController([this.serverGroupA, this.serverGroupB, this.serverGroupC]);
 
       expect(controller.serverGroups[0].name).toBe(this.serverGroupB.name);
@@ -55,16 +74,16 @@ describe('Controller: MultipleServerGroups', function () {
       expect(controller.serverGroups[0].instanceCounts).not.toBe(this.serverGroupB.instanceCounts);
     });
 
-    it('gets details for each server group and adds model to scope', function () {
-      MultiselectModel.toggleServerGroup(this.serverGroupA);
-      MultiselectModel.toggleServerGroup(this.serverGroupB);
+    it('gets details for each server group and adds model to scope', function() {
+      ClusterState.multiselectModel.toggleServerGroup(this.serverGroupA);
+      ClusterState.multiselectModel.toggleServerGroup(this.serverGroupB);
       this.createController([this.serverGroupA, this.serverGroupB, this.serverGroupC]);
 
-      expect(MultiselectModel.serverGroups.length).toBe(2);
+      expect(ClusterState.multiselectModel.serverGroups.length).toBe(2);
       expect(controller.serverGroups.length).toBe(2);
 
       let groupA = controller.serverGroups[0],
-          groupB = controller.serverGroups[1];
+        groupB = controller.serverGroups[1];
 
       expect(groupA.instanceCounts.a).toBe(1);
       expect(groupA.disabled).toBeFalsy();
@@ -73,9 +92,9 @@ describe('Controller: MultipleServerGroups', function () {
       expect(groupB.disabled).toBe(true);
     });
 
-    it('re-retrieves details when serverGroups refresh', function () {
-      MultiselectModel.toggleServerGroup(this.serverGroupA);
-      MultiselectModel.toggleServerGroup(this.serverGroupB);
+    it('re-retrieves details when serverGroups refresh', function() {
+      ClusterState.multiselectModel.toggleServerGroup(this.serverGroupA);
+      ClusterState.multiselectModel.toggleServerGroup(this.serverGroupB);
 
       this.createController([this.serverGroupA, this.serverGroupB, this.serverGroupC]);
 
@@ -86,13 +105,12 @@ describe('Controller: MultipleServerGroups', function () {
       expect(controller.serverGroups[0].disabled).toBe(true);
       expect(controller.serverGroups[1].instanceCounts.d).toBe(3);
     });
-
   });
 
-  describe('actions', function () {
-    it('can disable when all groups are enabled', function () {
-      MultiselectModel.toggleServerGroup(this.serverGroupA);
-      MultiselectModel.toggleServerGroup(this.serverGroupB);
+  describe('actions', function() {
+    it('can disable when all groups are enabled', function() {
+      ClusterState.multiselectModel.toggleServerGroup(this.serverGroupA);
+      ClusterState.multiselectModel.toggleServerGroup(this.serverGroupB);
       this.createController([this.serverGroupA, this.serverGroupB]);
       expect(controller.canDisable()).toBe(false);
 
@@ -101,9 +119,9 @@ describe('Controller: MultipleServerGroups', function () {
       expect(controller.canDisable()).toBe(true);
     });
 
-    it('can enable when all groups are disabled', function () {
-      MultiselectModel.toggleServerGroup(this.serverGroupA);
-      MultiselectModel.toggleServerGroup(this.serverGroupB);
+    it('can enable when all groups are disabled', function() {
+      ClusterState.multiselectModel.toggleServerGroup(this.serverGroupA);
+      ClusterState.multiselectModel.toggleServerGroup(this.serverGroupB);
       this.createController([this.serverGroupA, this.serverGroupB]);
       expect(controller.canEnable()).toBe(false);
 
@@ -112,5 +130,4 @@ describe('Controller: MultipleServerGroups', function () {
       expect(controller.canEnable()).toBe(true);
     });
   });
-
 });

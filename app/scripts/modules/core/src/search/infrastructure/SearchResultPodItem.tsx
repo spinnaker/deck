@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { MouseEvent } from 'react';
 import { UISref } from '@uirouter/react';
 import { BindAll } from 'lodash-decorators';
 import { UIRouterContext } from '@uirouter/react-hybrid';
@@ -19,7 +18,7 @@ export interface ISearchResultPodItemProps {
 @UIRouterContext
 @BindAll()
 export class SearchResultPodItem extends React.Component<ISearchResultPodItemProps> {
-  private handleRemoveClicked(evt: MouseEvent<any>, categoryName: string, itemId: string) {
+  private handleRemoveClicked(evt: React.MouseEvent<any>, categoryName: string, itemId: string) {
     evt.preventDefault();
     this.props.onRemoveItem(categoryName, itemId);
   }
@@ -40,12 +39,15 @@ export class SearchResultPodItem extends React.Component<ISearchResultPodItemPro
       <UISref to={result.state} params={result.params}>
         <a target="_self" className="list-group-item">
           <span onClick={this.handleResultClick}>
-            <SearchResult displayName={result.displayName} account={account}/>
+            <SearchResult displayName={result.displayName} account={account} />
 
             {showRemoveButton && (
-              <span className="small clickable remove-result-link" onClick={evt => this.handleRemoveClicked(evt, categoryName, result.id)} >
+              <span
+                className="small clickable remove-result-link"
+                onClick={evt => this.handleRemoveClicked(evt, categoryName, result.id)}
+              >
                 <Tooltip value="remove from history" placement="left" delayShow={300}>
-                  <span className="glyphicon glyphicon-remove"/>
+                  <span className="glyphicon glyphicon-remove" />
                 </Tooltip>
               </span>
             )}

@@ -3,28 +3,31 @@
 import moment from 'moment';
 import _ from 'lodash';
 
-import {CLUSTER_FILTER_SERVICE} from 'core/cluster/filter/clusterFilter.service';
-import {CLOUD_PROVIDER_REGISTRY} from 'core/cloudProvider/cloudProvider.registry';
-import {EXECUTION_DETAILS_SECTION_SERVICE} from 'core/pipeline/details/executionDetailsSection.service';
-import {NAMING_SERVICE} from 'core/naming/naming.service';
-import {SERVER_GROUP_READER} from 'core/serverGroup/serverGroupReader.service';
-import {URL_BUILDER_SERVICE} from 'core/navigation/urlBuilder.service';
+import { CLOUD_PROVIDER_REGISTRY } from 'core/cloudProvider/cloudProvider.registry';
+import { NameUtils } from 'core/naming';
+import { EXECUTION_DETAILS_SECTION_SERVICE } from 'core/pipeline/details/executionDetailsSection.service';
+import { SERVER_GROUP_READER } from 'core/serverGroup/serverGroupReader.service';
+import { URL_BUILDER_SERVICE } from 'core/navigation/urlBuilder.service';
+import { ClusterState } from 'core/state';
 
 let angular = require('angular');
 
-module.exports = angular.module('spinnaker.core.pipeline.stage.deploy.details.controller', [
-  require('@uirouter/angularjs').default,
-  CLUSTER_FILTER_SERVICE,
-  EXECUTION_DETAILS_SECTION_SERVICE,
-  URL_BUILDER_SERVICE,
-  CLOUD_PROVIDER_REGISTRY,
-  NAMING_SERVICE,
-  SERVER_GROUP_READER
-])
-  .controller('DeployExecutionDetailsCtrl', function ($scope, $stateParams, executionDetailsSectionService,
-                                                      urlBuilderService, clusterFilterService, cloudProviderRegistry,
-                                                      namingService, serverGroupReader) {
-
+module.exports = angular
+  .module('spinnaker.core.pipeline.stage.deploy.details.controller', [
+    require('@uirouter/angularjs').default,
+    EXECUTION_DETAILS_SECTION_SERVICE,
+    URL_BUILDER_SERVICE,
+    CLOUD_PROVIDER_REGISTRY,
+    SERVER_GROUP_READER,
+  ])
+  .controller('DeployExecutionDetailsCtrl', function(
+    $scope,
+    $stateParams,
+    executionDetailsSectionService,
+    urlBuilderService,
+    cloudProviderRegistry,
+    serverGroupReader,
+  ) {
     $scope.configSections = ['deploymentConfig', 'taskStatus'];
 
     function areJarDiffsEmpty() {
@@ -39,7 +42,10 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.deploy.details.co
     }
 
     if ($scope.stage.context) {
-      if (($scope.stage.context.commits && $scope.stage.context.commits.length > 0) || !areJarDiffsEmpty($scope.stage.context.jarDiffs)) {
+      if (
+        ($scope.stage.context.commits && $scope.stage.context.commits.length > 0) ||
+        !areJarDiffsEmpty($scope.stage.context.jarDiffs)
+      ) {
         $scope.configSections.push('changes');
       }
     }
@@ -53,7 +59,7 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.deploy.details.co
       function addDeployedArtifacts(key) {
         var deployedArtifacts = _.find(resultObjects, key);
         if (deployedArtifacts) {
-          _.forEach(deployedArtifacts[key], function (serverGroupName, region) {
+          _.forEach(deployedArtifacts[key], function(serverGroupName, region) {
             var result = {
               type: 'serverGroups',
               application: context.application,
@@ -84,17 +90,19 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.deploy.details.co
       $scope.changeConfig = {
         buildInfo: context.buildInfo || {},
         commits: $scope.stage.context.commits,
-        jarDiffs: $scope.stage.context.jarDiffs
+        jarDiffs: $scope.stage.context.jarDiffs,
       };
 
       if (_.has(context, 'source.region') && context['deploy.server.groups']) {
         const serverGroupName = context['deploy.server.groups'][context.source.region][0];
-        serverGroupReader.getServerGroup(context.application, context.account, context.source.region, serverGroupName)
+        serverGroupReader
+          .getServerGroup(context.application, context.account, context.source.region, serverGroupName)
           .then(serverGroup => {
             if (_.has(serverGroup, 'buildInfo.jenkins')) {
               $scope.changeConfig.buildInfo.jenkins = serverGroup.buildInfo.jenkins;
             }
-          }).catch(() => {});
+          })
+          .catch(() => {});
       }
     };
 
@@ -110,14 +118,22 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.deploy.details.co
       const deployed = deployedArtifacts[0];
       const stage = $scope.stage;
 
-      const activeWaitTask = (stage.tasks || []).find(t => ['RUNNING', 'TERMINAL'].includes(t.status) && t.name === 'waitForUpInstances');
+      const activeWaitTask = (stage.tasks || []).find(
+        t => ['RUNNING', 'TERMINAL'].includes(t.status) && t.name === 'waitForUpInstances',
+      );
 
       if (activeWaitTask && stage.context.lastCapacityCheck) {
         $scope.showWaitingMessage = true;
         $scope.waitingForUpInstances = activeWaitTask.status === 'RUNNING';
         const lastCapacity = stage.context.lastCapacityCheck;
         const waitDurationExceeded = activeWaitTask.runningTimeInMs > moment.duration(5, 'minutes').asMilliseconds();
-        lastCapacity.total = lastCapacity.up + lastCapacity.down + lastCapacity.outOfService + lastCapacity.unknown + lastCapacity.succeeded + lastCapacity.failed;
+        lastCapacity.total =
+          lastCapacity.up +
+          lastCapacity.down +
+          lastCapacity.outOfService +
+          lastCapacity.unknown +
+          lastCapacity.succeeded +
+          lastCapacity.failed;
 
         if (cloudProviderRegistry.getValue(stage.context.cloudProvider, 'serverGroup.scalingActivitiesEnabled')) {
           // after three minutes, if desired capacity is less than total number of instances,
@@ -129,23 +145,25 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.deploy.details.co
               app: deployed.application,
               account: deployed.account,
               region: deployed.region,
-              cluster: namingService.getClusterNameFromServerGroupName(deployed.serverGroup),
+              cluster: NameUtils.getClusterNameFromServerGroupName(deployed.serverGroup),
               cloudProvider: deployed.cloudProvider,
             };
           }
         }
         // Also show platform health warning after three minutes if instances are in an unknown state
-        if (waitDurationExceeded &&
+        if (
+          waitDurationExceeded &&
           stage.context.lastCapacityCheck.unknown > 0 &&
           stage.context.lastCapacityCheck.unknown === stage.context.lastCapacityCheck.total &&
           !stage.context.interestingHealthProviderNames &&
-          !_.get($scope.application.attributes, 'platformHealthOverride', false)) {
-            $scope.showPlatformHealthOverrideMessage = true;
+          !_.get($scope.application.attributes, 'platformHealthOverride', false)
+        ) {
+          $scope.showPlatformHealthOverrideMessage = true;
         }
       }
     }
 
-    this.overrideFiltersForUrl = r => clusterFilterService.overrideFiltersForUrl(r);
+    this.overrideFiltersForUrl = r => ClusterState.filterService.overrideFiltersForUrl(r);
 
     let initialize = () => executionDetailsSectionService.synchronizeSection($scope.configSections, initialized);
 
@@ -155,5 +173,4 @@ module.exports = angular.module('spinnaker.core.pipeline.stage.deploy.details.co
     if (_.hasIn($scope.application, 'executions.onRefresh')) {
       $scope.application.executions.onRefresh($scope, initialize);
     }
-
   });

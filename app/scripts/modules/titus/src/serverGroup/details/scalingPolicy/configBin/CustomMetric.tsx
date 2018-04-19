@@ -16,7 +16,6 @@ export interface ICustomMetricState {
 
 @BindAll()
 export class CustomMetric extends React.Component<ICustomMetricProps, ICustomMetricState> {
-
   constructor(props: ICustomMetricProps) {
     super(props);
     this.state = {
@@ -27,12 +26,12 @@ export class CustomMetric extends React.Component<ICustomMetricProps, ICustomMet
 
   private metricNameUpdated(e: React.ChangeEvent<HTMLInputElement>): void {
     this.setState({ name: e.target.value });
-    this.props.metricUpdated(this.props.metric, Object.assign({}, this.props.metric, { metricName: e.target.value }));
+    this.props.metricUpdated(this.props.metric, { ...this.props.metric, metricName: e.target.value });
   }
 
   private metricUriUpdated(e: React.ChangeEvent<HTMLTextAreaElement>): void {
     this.setState({ uri: e.target.value });
-    this.props.metricUpdated(this.props.metric, Object.assign({}, this.props.metric, { atlasUri: e.target.value }));
+    this.props.metricUpdated(this.props.metric, { ...this.props.metric, atlasUri: e.target.value });
   }
 
   private removeMetric(): void {
@@ -46,11 +45,7 @@ export class CustomMetric extends React.Component<ICustomMetricProps, ICustomMet
         <dl className="dl-horizontal dl-narrow">
           <dt>Name</dt>
           <dd style={{ marginBottom: '10px' }}>
-            <input
-              className="form-control input-sm"
-              value={metric.metricName}
-              onChange={this.metricNameUpdated}
-            />
+            <input className="form-control input-sm" value={metric.metricName} onChange={this.metricNameUpdated} />
           </dd>
           <dt>Atlas URI</dt>
           <dd>
@@ -61,14 +56,14 @@ export class CustomMetric extends React.Component<ICustomMetricProps, ICustomMet
               onChange={this.metricUriUpdated}
             />
           </dd>
-          <dt/>
+          <dt />
           <dd className="text-right">
             <a className="clickable" onClick={this.removeMetric}>
-              <i className="fa fa-trash"/> Remove
+              <i className="fa fa-trash" /> Remove
             </a>
           </dd>
         </dl>
       </div>
-    )
+    );
   }
 }

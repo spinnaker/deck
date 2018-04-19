@@ -3,16 +3,19 @@
 const angular = require('angular');
 import _ from 'lodash';
 
-import { CLUSTER_FILTER_SERVICE, URL_BUILDER_SERVICE } from '@spinnaker/core';
+import { ClusterState, URL_BUILDER_SERVICE } from '@spinnaker/core';
 
-module.exports = angular.module('spinnaker.titus.pipeline.stage.cloneServerGroup.executionDetails.controller', [
-  require('@uirouter/angularjs').default,
-  CLUSTER_FILTER_SERVICE,
-  URL_BUILDER_SERVICE
-])
-  .controller('titusCloneServerGroupExecutionDetailsCtrl', function ($scope, $stateParams, executionDetailsSectionService,
-                                                                   urlBuilderService, clusterFilterService) {
-
+module.exports = angular
+  .module('spinnaker.titus.pipeline.stage.cloneServerGroup.executionDetails.controller', [
+    require('@uirouter/angularjs').default,
+    URL_BUILDER_SERVICE,
+  ])
+  .controller('titusCloneServerGroupExecutionDetailsCtrl', function(
+    $scope,
+    $stateParams,
+    executionDetailsSectionService,
+    urlBuilderService,
+  ) {
     $scope.configSections = ['cloneServerGroupConfig', 'taskStatus'];
 
     let initialized = () => {
@@ -24,7 +27,7 @@ module.exports = angular.module('spinnaker.titus.pipeline.stage.cloneServerGroup
       function addDeployedArtifacts(key) {
         let deployedArtifacts = _.find(resultObjects, key);
         if (deployedArtifacts) {
-          _.forEach(deployedArtifacts[key], (serverGroupNameAndRegion) => {
+          _.forEach(deployedArtifacts[key], serverGroupNameAndRegion => {
             if (serverGroupNameAndRegion.includes(':')) {
               let [region, serverGroupName] = serverGroupNameAndRegion.split(':');
               let result = {
@@ -52,12 +55,11 @@ module.exports = angular.module('spinnaker.titus.pipeline.stage.cloneServerGroup
       $scope.deployed = results;
     };
 
-    this.overrideFiltersForUrl = r => clusterFilterService.overrideFiltersForUrl(r);
+    this.overrideFiltersForUrl = r => ClusterState.filterService.overrideFiltersForUrl(r);
 
     let initialize = () => executionDetailsSectionService.synchronizeSection($scope.configSections, initialized);
 
     initialize();
 
     $scope.$on('$stateChangeSuccess', initialize);
-
   });

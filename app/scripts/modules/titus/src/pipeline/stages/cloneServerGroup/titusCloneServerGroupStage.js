@@ -3,13 +3,13 @@
 const angular = require('angular');
 import _ from 'lodash';
 
-import { ACCOUNT_SERVICE, NAMING_SERVICE, StageConstants } from '@spinnaker/core';
+import { ACCOUNT_SERVICE, NameUtils, StageConstants } from '@spinnaker/core';
 
-module.exports = angular.module('spinnaker.titus.pipeline.stage.cloneServerGroupStage', [
-  ACCOUNT_SERVICE,
-  NAMING_SERVICE,
-  require('./cloneServerGroupExecutionDetails.controller.js').name,
-])
+module.exports = angular
+  .module('spinnaker.titus.pipeline.stage.cloneServerGroupStage', [
+    ACCOUNT_SERVICE,
+    require('./cloneServerGroupExecutionDetails.controller.js').name,
+  ])
   .config(function(pipelineConfigProvider) {
     pipelineConfigProvider.registerStage({
       provides: 'cloneServerGroup',
@@ -20,19 +20,19 @@ module.exports = angular.module('spinnaker.titus.pipeline.stage.cloneServerGroup
       validators: [
         { type: 'requiredField', fieldName: 'targetCluster', fieldLabel: 'cluster' },
         { type: 'requiredField', fieldName: 'target' },
-        { type: 'requiredField', fieldName: 'region', },
-        { type: 'requiredField', fieldName: 'credentials', fieldLabel: 'account'}
+        { type: 'requiredField', fieldName: 'region' },
+        { type: 'requiredField', fieldName: 'credentials', fieldLabel: 'account' },
       ],
     });
-  }).controller('titusCloneServerGroupStageCtrl', function($scope, accountService, namingService) {
-
+  })
+  .controller('titusCloneServerGroupStageCtrl', function($scope, accountService) {
     let stage = $scope.stage;
 
     $scope.viewState = {
       accountsLoaded: false,
     };
 
-    accountService.listAccounts('titus').then((accounts) => {
+    accountService.listAccounts('titus').then(accounts => {
       $scope.accounts = accounts;
       $scope.viewState.accountsLoaded = true;
     });
@@ -43,7 +43,11 @@ module.exports = angular.module('spinnaker.titus.pipeline.stage.cloneServerGroup
     stage.cloudProvider = 'titus';
     stage.cloudProviderType = 'titus';
 
-    if (stage.isNew && $scope.application.attributes.platformHealthOnlyShowOverride && $scope.application.attributes.platformHealthOnly) {
+    if (
+      stage.isNew &&
+      $scope.application.attributes.platformHealthOnlyShowOverride &&
+      $scope.application.attributes.platformHealthOnly
+    ) {
       stage.interestingHealthProviderNames = ['Titus'];
     }
 
@@ -53,7 +57,7 @@ module.exports = angular.module('spinnaker.titus.pipeline.stage.cloneServerGroup
 
     this.targetClusterUpdated = () => {
       if (stage.targetCluster) {
-        let clusterName = namingService.parseServerGroupName(stage.targetCluster);
+        let clusterName = NameUtils.parseServerGroupName(stage.targetCluster);
         stage.stack = clusterName.stack;
         stage.freeFormDetails = clusterName.freeFormDetails;
       } else {
@@ -72,7 +76,7 @@ module.exports = angular.module('spinnaker.titus.pipeline.stage.cloneServerGroup
       stage.useSourceCapacity = true;
     }
 
-    this.toggleSuspendedProcess = (process) => {
+    this.toggleSuspendedProcess = process => {
       stage.suspendedProcesses = stage.suspendedProcesses || [];
       var processIndex = stage.suspendedProcesses.indexOf(process);
       if (processIndex === -1) {
@@ -82,8 +86,7 @@ module.exports = angular.module('spinnaker.titus.pipeline.stage.cloneServerGroup
       }
     };
 
-    this.processIsSuspended = (process) => {
+    this.processIsSuspended = process => {
       return stage.suspendedProcesses && stage.suspendedProcesses.includes(process);
     };
   });
-

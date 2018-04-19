@@ -3,44 +3,47 @@
 const angular = require('angular');
 import _ from 'lodash';
 
-import { ACCOUNT_SERVICE, INSTANCE_TYPE_SERVICE, NAMING_SERVICE } from '@spinnaker/core';
+import { ACCOUNT_SERVICE, INSTANCE_TYPE_SERVICE, NameUtils } from '@spinnaker/core';
 
 import { ECS_SERVER_GROUP_CONFIGURATION_SERVICE } from './serverGroupConfiguration.service';
 
-module.exports = angular.module('spinnaker.ecs.serverGroupCommandBuilder.service', [
-  ACCOUNT_SERVICE,
-  INSTANCE_TYPE_SERVICE,
-  NAMING_SERVICE,
-  ECS_SERVER_GROUP_CONFIGURATION_SERVICE,
-])
-  .factory('ecsServerGroupCommandBuilder', function ($q,
-                                                     accountService,
-                                                     namingService,
-                                                     instanceTypeService,
-                                                     ecsServerGroupConfigurationService) {
-
+module.exports = angular
+  .module('spinnaker.ecs.serverGroupCommandBuilder.service', [
+    ACCOUNT_SERVICE,
+    INSTANCE_TYPE_SERVICE,
+    ECS_SERVER_GROUP_CONFIGURATION_SERVICE,
+  ])
+  .factory('ecsServerGroupCommandBuilder', function(
+    $q,
+    accountService,
+    instanceTypeService,
+    ecsServerGroupConfigurationService,
+  ) {
     const CLOUD_PROVIDER = 'ecs';
 
-    function buildNewServerGroupCommand (application, defaults) {
+    function buildNewServerGroupCommand(application, defaults) {
       defaults = defaults || {};
       var credentialsLoader = accountService.getCredentialsKeyedByAccount('ecs');
 
       var defaultCredentials = defaults.account || application.defaultCredentials.ecs;
       var defaultRegion = defaults.region || application.defaultRegions.ecs;
 
-      var preferredZonesLoader = accountService.getAvailabilityZonesForAccountAndRegion('ecs', defaultCredentials, defaultRegion);
+      var preferredZonesLoader = accountService.getAvailabilityZonesForAccountAndRegion(
+        'ecs',
+        defaultCredentials,
+        defaultRegion,
+      );
 
-
-      return $q.all({
-        preferredZones: preferredZonesLoader,
-        credentialsKeyedByAccount: credentialsLoader,
-      })
-        .then(function (asyncData) {
+      return $q
+        .all({
+          preferredZones: preferredZonesLoader,
+          credentialsKeyedByAccount: credentialsLoader,
+        })
+        .then(function(asyncData) {
           var availabilityZones = asyncData.preferredZones;
 
           var defaultIamRole = 'None (No IAM role)';
           defaultIamRole = defaultIamRole.replace('{{application}}', application.name);
-
 
           var command = {
             application: application.name,
@@ -50,7 +53,7 @@ module.exports = angular.module('spinnaker.ecs.serverGroupCommandBuilder.service
             capacity: {
               min: 1,
               max: 1,
-              desired: 1
+              desired: 1,
             },
             healthCheckType: 'EC2',
             selectedProvider: 'ecs',
@@ -71,7 +74,11 @@ module.exports = angular.module('spinnaker.ecs.serverGroupCommandBuilder.service
             },
           };
 
-          if (application.attributes && application.attributes.platformHealthOnlyShowOverride && application.attributes.platformHealthOnly) {
+          if (
+            application.attributes &&
+            application.attributes.platformHealthOnlyShowOverride &&
+            application.attributes.platformHealthOnly
+          ) {
             command.interestingHealthProviderNames = ['ecs'];
           }
 
@@ -80,12 +87,11 @@ module.exports = angular.module('spinnaker.ecs.serverGroupCommandBuilder.service
     }
 
     function buildServerGroupCommandFromPipeline(application, originalCluster) {
-
       var pipelineCluster = _.cloneDeep(originalCluster);
       var region = Object.keys(pipelineCluster.availabilityZones)[0];
       // var instanceTypeCategoryLoader = instanceTypeService.getCategoryForInstanceType('ecs', pipelineCluster.instanceType);
       var commandOptions = { account: pipelineCluster.account, region: region };
-      var asyncLoader = $q.all({command: buildNewServerGroupCommand(application, commandOptions)});
+      var asyncLoader = $q.all({ command: buildNewServerGroupCommand(application, commandOptions) });
 
       return asyncLoader.then(function(asyncData) {
         var command = asyncData.command;
@@ -95,7 +101,8 @@ module.exports = angular.module('spinnaker.ecs.serverGroupCommandBuilder.service
         var viewState = {
           instanceProfile: asyncData.instanceProfile,
           disableImageSelection: true,
-          useSimpleCapacity: pipelineCluster.capacity.min === pipelineCluster.capacity.max && pipelineCluster.useSourceCapacity !== true,
+          useSimpleCapacity:
+            pipelineCluster.capacity.min === pipelineCluster.capacity.max && pipelineCluster.useSourceCapacity !== true,
           usePreferredZones: usePreferredZones,
           mode: 'editPipeline',
           submitButtonLabel: 'Done',
@@ -115,7 +122,6 @@ module.exports = angular.module('spinnaker.ecs.serverGroupCommandBuilder.service
 
         return angular.extend({}, command, pipelineCluster, viewOverrides);
       });
-
     }
 
     // Only used to prepare view requiring template selecting
@@ -123,18 +129,16 @@ module.exports = angular.module('spinnaker.ecs.serverGroupCommandBuilder.service
       return $q.when({
         viewState: {
           requiresTemplateSelection: true,
-        }
+        },
       });
     }
 
     function buildUpdateServerGroupCommand(serverGroup) {
       var command = {
         type: 'modifyAsg',
-        asgs: [
-          { asgName: serverGroup.name, region: serverGroup.region }
-        ],
+        asgs: [{ asgName: serverGroup.name, region: serverGroup.region }],
         healthCheckType: serverGroup.asg.healthCheckType,
-        credentials: serverGroup.account
+        credentials: serverGroup.account,
       };
       ecsServerGroupConfigurationService.configureUpdateCommand(command);
       return command;
@@ -143,7 +147,7 @@ module.exports = angular.module('spinnaker.ecs.serverGroupCommandBuilder.service
     function buildServerGroupCommandFromExisting(application, serverGroup, mode = 'clone') {
       var preferredZonesLoader = accountService.getPreferredZonesByAccount('ecs');
 
-      var serverGroupName = namingService.parseServerGroupName(serverGroup.asg.autoScalingGroupName);
+      var serverGroupName = NameUtils.parseServerGroupName(serverGroup.asg.autoScalingGroupName);
 
       var asyncLoader = $q.all({
         preferredZones: preferredZonesLoader,
@@ -172,9 +176,9 @@ module.exports = angular.module('spinnaker.ecs.serverGroupCommandBuilder.service
           region: serverGroup.region,
           useSourceCapacity: false,
           capacity: {
-            'min': serverGroup.asg.minSize,
-            'max': serverGroup.asg.maxSize,
-            'desired': serverGroup.asg.desiredCapacity
+            min: serverGroup.asg.minSize,
+            max: serverGroup.asg.maxSize,
+            desired: serverGroup.asg.desiredCapacity,
           },
           availabilityZones: zones,
           selectedProvider: CLOUD_PROVIDER,
@@ -184,8 +188,8 @@ module.exports = angular.module('spinnaker.ecs.serverGroupCommandBuilder.service
             asgName: serverGroup.asg.autoScalingGroupName,
           },
           suspendedProcesses: (serverGroup.asg.suspendedProcesses || [])
-            .map((process) => process.processName)
-            .filter((name) => !enabledProcesses.includes(name)),
+            .map(process => process.processName)
+            .filter(name => !enabledProcesses.includes(name)),
           targetGroup: serverGroup.targetGroup,
           viewState: {
             instanceProfile: asyncData.instanceProfile,
@@ -228,4 +232,4 @@ module.exports = angular.module('spinnaker.ecs.serverGroupCommandBuilder.service
       buildServerGroupCommandFromPipeline: buildServerGroupCommandFromPipeline,
       buildUpdateServerGroupCommand: buildUpdateServerGroupCommand,
     };
-});
+  });

@@ -3,23 +3,22 @@
 const angular = require('angular');
 import _ from 'lodash';
 
-import { COLLAPSIBLE_SECTION_STATE_CACHE } from 'core/cache/collapsibleSectionStateCache';
-import { CLUSTER_FILTER_SERVICE } from 'core/cluster/filter/clusterFilter.service';
+import { CollapsibleSectionStateCache } from 'core/cache';
 import { HEALTH_COUNTS_COMPONENT } from 'core/healthCounts/healthCounts.component';
 import { URL_BUILDER_SERVICE } from 'core/navigation/urlBuilder.service';
+import { ClusterState } from 'core/state';
 import { TIME_FORMATTERS } from 'core/utils/timeFormatters';
 
 import './projectCluster.less';
 
-module.exports = angular.module('spinnaker.core.projects.dashboard.clusters.projectCluster.directive', [
-  URL_BUILDER_SERVICE,
-  COLLAPSIBLE_SECTION_STATE_CACHE,
-  CLUSTER_FILTER_SERVICE,
-  TIME_FORMATTERS,
-  HEALTH_COUNTS_COMPONENT,
-  require('../regionFilter/regionFilter.service.js').name,
-])
-  .directive('projectCluster', function () {
+module.exports = angular
+  .module('spinnaker.core.projects.dashboard.clusters.projectCluster.directive', [
+    URL_BUILDER_SERVICE,
+    TIME_FORMATTERS,
+    HEALTH_COUNTS_COMPONENT,
+    require('../regionFilter/regionFilter.service.js').name,
+  ])
+  .directive('projectCluster', function() {
     return {
       restrict: 'E',
       templateUrl: require('./projectCluster.directive.html'),
@@ -32,14 +31,12 @@ module.exports = angular.module('spinnaker.core.projects.dashboard.clusters.proj
       controllerAs: 'vm',
     };
   })
-  .controller('ProjectClusterCtrl', function($scope, urlBuilderService, collapsibleSectionStateCache,
-                                             clusterFilterService, regionFilterService) {
-
-    let stateCache = collapsibleSectionStateCache;
+  .controller('ProjectClusterCtrl', function($scope, urlBuilderService, regionFilterService) {
+    let stateCache = CollapsibleSectionStateCache;
 
     let getCacheKey = () => [this.project.name, this.cluster.account, this.cluster.stack].join(':');
 
-    this.clearFilters = r => clusterFilterService.overrideFiltersForUrl(r);
+    this.clearFilters = r => ClusterState.filterService.overrideFiltersForUrl(r);
 
     this.refreshTooltipTemplate = require('./projectClusterRefresh.tooltip.html');
     this.inconsistentBuildsTemplate = require('./inconsistentBuilds.tooltip.html');
@@ -49,12 +46,12 @@ module.exports = angular.module('spinnaker.core.projects.dashboard.clusters.proj
       stateCache.setExpanded(getCacheKey(), this.state.expanded);
     };
 
-    let getMetadata = (application) => {
+    let getMetadata = application => {
       let stack = this.cluster.stack,
-          detail = this.cluster.detail,
-          clusterParam = !stack && !detail ? application.name : null,
-          stackParam = stack && stack !== '*' ? stack : null,
-          detailParam = detail && detail !== '*' ? detail : null;
+        detail = this.cluster.detail,
+        clusterParam = !stack && !detail ? application.name : null,
+        stackParam = stack && stack !== '*' ? stack : null,
+        detailParam = detail && detail !== '*' ? detail : null;
 
       return {
         type: 'clusters',
@@ -67,11 +64,11 @@ module.exports = angular.module('spinnaker.core.projects.dashboard.clusters.proj
       };
     };
 
-    let addMetadata = (application) => {
+    let addMetadata = application => {
       let baseMetadata = getMetadata(application);
       application.metadata = baseMetadata;
       application.metadata.href = urlBuilderService.buildFromMetadata(baseMetadata);
-      application.clusters.forEach((cluster) => {
+      application.clusters.forEach(cluster => {
         let clusterMetadata = getMetadata(application);
         clusterMetadata.region = cluster.region;
         clusterMetadata.href = urlBuilderService.buildFromMetadata(clusterMetadata);
@@ -79,49 +76,49 @@ module.exports = angular.module('spinnaker.core.projects.dashboard.clusters.proj
       });
     };
 
-    let getBuildUrl = (build) => [build.host + 'job', build.job, build.buildNumber, ''].join('/');
+    let getBuildUrl = build => [build.host + 'job', build.job, build.buildNumber, ''].join('/');
 
-    let addApplicationBuild = (application) => {
-      let allBuilds = _.chain((application.clusters || [])
-        .map((cluster) => cluster.builds))
+    let addApplicationBuild = application => {
+      let allBuilds = _.chain((application.clusters || []).map(cluster => cluster.builds))
         .flatten()
         .compact()
-        .uniqBy((build) => build.buildNumber)
+        .uniqBy(build => build.buildNumber)
         .value();
       if (allBuilds.length) {
-        application.build = _.maxBy(allBuilds, (build) => Number(build.buildNumber));
+        application.build = _.maxBy(allBuilds, build => Number(build.buildNumber));
         application.build.url = getBuildUrl(application.build);
         application.hasInconsistentBuilds = allBuilds.length > 1;
       }
     };
 
-    let applyInconsistentBuildFlag = (application) => {
-      application.clusters.forEach((cluster) => {
+    let applyInconsistentBuildFlag = application => {
+      application.clusters.forEach(cluster => {
         let builds = cluster.builds || [];
         if (builds.length && (builds.length > 1 || builds[0].buildNumber !== application.build.buildNumber)) {
           application.hasInconsistentBuilds = true;
           cluster.inconsistentBuilds = cluster.builds.filter(
-            (build) => build.buildNumber !== application.build.buildNumber);
+            build => build.buildNumber !== application.build.buildNumber,
+          );
         }
       });
     };
 
     let mapClustersToRegions = (cluster, application) => {
       application.regions = {};
-      cluster.regions.forEach((region) => {
-        application.regions[region] = _.find(application.clusters, (regionCluster) => regionCluster.region === region);
+      cluster.regions.forEach(region => {
+        application.regions[region] = _.find(application.clusters, regionCluster => regionCluster.region === region);
       });
     };
 
-    let addRegions = (cluster) => {
-      cluster.regions = _.uniq(_.flatten(
-        cluster.applications.map((application) =>
-         application.clusters.map((regionCluster) => regionCluster.region)
-        )
-      )).sort();
+    let addRegions = cluster => {
+      cluster.regions = _.uniq(
+        _.flatten(
+          cluster.applications.map(application => application.clusters.map(regionCluster => regionCluster.region)),
+        ),
+      ).sort();
     };
 
-    let setViewRegions = (updatedFilter) => {
+    let setViewRegions = updatedFilter => {
       let unfilteredRegions = this.cluster.regions;
       if (Object.keys(_.filter(updatedFilter)).length) {
         this.regions = unfilteredRegions.filter(region => updatedFilter[region]);
@@ -130,7 +127,7 @@ module.exports = angular.module('spinnaker.core.projects.dashboard.clusters.proj
       }
     };
 
-    let setViewInstanceCounts = (updatedFilter) => {
+    let setViewInstanceCounts = updatedFilter => {
       if (Object.keys(_.filter(updatedFilter)).length) {
         this.instanceCounts = _.chain(this.cluster.applications)
           .map('clusters')
@@ -163,15 +160,16 @@ module.exports = angular.module('spinnaker.core.projects.dashboard.clusters.proj
       });
       addRegions(this.cluster);
       regionFilterService.runCallbacks();
-      this.cluster.applications.forEach((application) => {
+      this.cluster.applications.forEach(application => {
         mapClustersToRegions(this.cluster, application);
         addApplicationBuild(application);
         applyInconsistentBuildFlag(application);
         addMetadata(application);
       });
-      this.clusterLabel = this.cluster.detail ? [this.cluster.stack, this.cluster.detail].join('-') : this.cluster.stack;
+      this.clusterLabel = this.cluster.detail
+        ? [this.cluster.stack, this.cluster.detail].join('-')
+        : this.cluster.stack;
     };
 
     this.$onInit = () => initialize();
-
   });

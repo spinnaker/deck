@@ -5,6 +5,7 @@ import { Application } from 'core/application/application.model';
 import { ReactInjector } from 'core/reactShims';
 import { duration } from 'core/utils/timeFormatters';
 import { OrchestratedItemRunningTime } from 'core/pipeline/executions/execution/OrchestratedItemRunningTime';
+import { DEFAULT_SKIP_WAIT_TEXT } from './waitStage';
 
 export interface ISkipWaitProps {
   execution: IExecution;
@@ -22,7 +23,7 @@ export class SkipWait extends React.Component<ISkipWaitProps, ISkipWaitState> {
   constructor(props: ISkipWaitProps) {
     super(props);
     this.state = {
-      remainingWait: null
+      remainingWait: null,
     };
   }
 
@@ -33,9 +34,9 @@ export class SkipWait extends React.Component<ISkipWaitProps, ISkipWaitState> {
   private skipRemainingWait = (e: React.MouseEvent<HTMLElement>): void => {
     const { confirmationModalService, executionService } = ReactInjector;
     (e.target as HTMLElement).blur(); // forces closing of the popover when the modal opens
-    const stage = this.props.stage;
+    const { stage, application } = this.props;
     const matcher = (execution: IExecution) => {
-      const match = execution.stages.find((test) => test.id === stage.id);
+      const match = execution.stages.find(test => test.id === stage.id);
       return match.status !== 'RUNNING';
     };
 
@@ -43,11 +44,13 @@ export class SkipWait extends React.Component<ISkipWaitProps, ISkipWaitState> {
     confirmationModalService.confirm({
       header: 'Really skip wait?',
       buttonText: 'Skip',
-      body: '<p>The pipeline will proceed immediately, marking this stage completed.</p>',
+      body: stage.context.skipWaitText || DEFAULT_SKIP_WAIT_TEXT,
       submitMethod: () => {
-        return executionService.patchExecution(this.props.execution.id, stage.id, data)
-          .then(() => executionService.waitUntilExecutionMatches(this.props.execution.id, matcher));
-      }
+        return executionService
+          .patchExecution(this.props.execution.id, stage.id, data)
+          .then(() => executionService.waitUntilExecutionMatches(this.props.execution.id, matcher))
+          .then(updated => executionService.updateExecution(application, updated));
+      },
     });
   };
 
@@ -70,11 +73,9 @@ export class SkipWait extends React.Component<ISkipWaitProps, ISkipWaitState> {
         <div>
           <b>Wait time: </b>
           {stage.context.waitTime} seconds
-          { stage.context.skipRemainingWait && (
-            <span>(skipped after {duration(stage.runningTimeInMs)})</span>
-          )}
+          {stage.context.skipRemainingWait && <span>(skipped after {duration(stage.runningTimeInMs)})</span>}
         </div>
-        { stage.isRunning && (
+        {stage.isRunning && (
           <div>
             <div>
               <b>Remaining: </b>
@@ -82,14 +83,13 @@ export class SkipWait extends React.Component<ISkipWaitProps, ISkipWaitState> {
             </div>
             <div className="action-buttons">
               <button className="btn btn-xs btn-primary" onClick={this.skipRemainingWait}>
-                <span style={{ marginRight: '5px' }} className="small glyphicon glyphicon-fast-forward"/>
+                <span style={{ marginRight: '5px' }} className="small glyphicon glyphicon-fast-forward" />
                 Skip remaining wait
               </button>
             </div>
           </div>
         )}
       </div>
-    )
+    );
   }
 }
-

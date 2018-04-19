@@ -1,5 +1,6 @@
 import { IPromise } from 'angular';
 import { CreatePipelineButton } from 'core/pipeline/create/CreatePipelineButton';
+import { IScheduler } from 'core/scheduler/scheduler.factory';
 import * as React from 'react';
 import * as ReactGA from 'react-ga';
 import { Transition } from '@uirouter/core';
@@ -18,6 +19,7 @@ import { ExecutionFilters } from 'core/pipeline/filter/ExecutionFilters';
 import { ExecutionGroups } from './executionGroup/ExecutionGroups';
 import { FilterTags, IFilterTag, ISortFilter } from 'core/filterModel';
 import { Spinner } from 'core/widgets/spinners/Spinner';
+import { ExecutionState } from 'core/state';
 
 import './executions.less';
 
@@ -40,35 +42,39 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
   private groupsUpdatedSubscription: Subscription;
   private locationChangeUnsubscribe: Function;
   private insightFilterStateModel = ReactInjector.insightFilterStateModel;
+  private activeRefresher: IScheduler;
 
   private filterCountOptions = [1, 2, 5, 10, 20, 30, 40, 50];
 
   constructor(props: IExecutionsProps) {
     super(props);
 
-    const { executionFilterModel } = ReactInjector;
     this.state = {
       filtersExpanded: this.insightFilterStateModel.filtersExpanded,
       loading: true,
-      sortFilter: executionFilterModel.asFilterModel.sortFilter,
+      sortFilter: ExecutionState.filterModel.asFilterModel.sortFilter,
       tags: [],
       triggeringExecution: false,
     };
-
   }
 
   public componentWillMount(): void {
     const { app } = this.props;
-    const { executionFilterModel } = ReactInjector;
-    if (executionFilterModel.mostRecentApplication !== app.name) {
-      executionFilterModel.asFilterModel.groups = [];
-      executionFilterModel.mostRecentApplication = app.name;
+    if (ExecutionState.filterModel.mostRecentApplication !== app.name) {
+      ExecutionState.filterModel.asFilterModel.groups = [];
+      ExecutionState.filterModel.mostRecentApplication = app.name;
     }
 
-    if (app.notFound) { return; }
+    if (app.notFound) {
+      return;
+    }
     app.setActiveState(app.executions);
     app.executions.activate();
     app.pipelineConfigs.activate();
+    this.activeRefresher = ReactInjector.schedulerFactory.createScheduler(5000);
+    this.activeRefresher.subscribe(() => {
+      app.getDataSource('runningExecutions').refresh();
+    });
   }
 
   private clearFilters(): void {
@@ -90,12 +96,14 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
       ReactInjector.executionFilterService.updateExecutionGroups(app);
       this.groupsUpdated();
       // updateExecutionGroups is debounced by 25ms, so we need to delay setting the loading flag a bit
-      $timeout(() => { this.setState({ loading: false }) }, 50);
+      $timeout(() => {
+        this.setState({ loading: false });
+      }, 50);
     }
   }
 
   private groupsUpdated(): void {
-    this.setState({ tags: ReactInjector.executionFilterModel.asFilterModel.tags });
+    this.setState({ tags: ExecutionState.filterModel.asFilterModel.tags });
   }
 
   private dataInitializationFailure(): void {
@@ -121,24 +129,29 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
 
   private expand(): void {
     ReactGA.event({ category: 'Pipelines', action: 'Expand All' });
-    ReactInjector.executionFilterModel.expandSubject.next(true);
+    ExecutionState.filterModel.expandSubject.next(true);
   }
 
   private collapse(): void {
     ReactGA.event({ category: 'Pipelines', action: 'Collapse All' });
-    ReactInjector.executionFilterModel.expandSubject.next(false);
+    ExecutionState.filterModel.expandSubject.next(false);
   }
 
   private startPipeline(command: IPipelineCommand): IPromise<void> {
     this.setState({ triggeringExecution: true });
-    return ReactInjector.pipelineConfigService.triggerPipeline(this.props.app.name, command.pipelineName, command.trigger).then(
-      (newPipelineId: string) => {
-        const monitor = ReactInjector.executionService.waitUntilNewTriggeredPipelineAppears(this.props.app, newPipelineId);
-        monitor.then(() => this.setState({ triggeringExecution: false }));
-      },
-      () => this.setState({ triggeringExecution: false })
-    );
-  };
+    return ReactInjector.pipelineConfigService
+      .triggerPipeline(this.props.app.name, command.pipelineName, command.trigger)
+      .then(
+        (newPipelineId: string) => {
+          const monitor = ReactInjector.executionService.waitUntilNewTriggeredPipelineAppears(
+            this.props.app,
+            newPipelineId,
+          );
+          monitor.then(() => this.setState({ triggeringExecution: false }));
+        },
+        () => this.setState({ triggeringExecution: false }),
+      );
+  }
 
   private startManualExecutionClicked(): void {
     this.triggerPipeline();
@@ -147,26 +160,32 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
   private triggerPipeline(pipeline: IPipeline = null): void {
     ReactGA.event({ category: 'Pipelines', action: 'Trigger Pipeline (top level)' });
     // TODO: Convert the modal to react
-    ReactInjector.modalService.open({
-      templateUrl: require('../manualExecution/manualPipelineExecution.html'),
-      controller: 'ManualPipelineExecutionCtrl as vm',
-      resolve: {
-        pipeline: () => pipeline,
-        trigger: () => null as any,
-        application: () => this.props.app,
-      }
-    }).result
-      .then((command) => this.startPipeline(command))
+    ReactInjector.modalService
+      .open({
+        templateUrl: require('../manualExecution/manualPipelineExecution.html'),
+        controller: 'ManualPipelineExecutionCtrl as vm',
+        resolve: {
+          pipeline: () => pipeline,
+          trigger: () => null as any,
+          application: () => this.props.app,
+        },
+      })
+      .result.then(command => this.startPipeline(command))
       .catch(() => {})
       .finally(() => this.clearManualExecutionParam());
-  };
+  }
 
   private clearManualExecutionParam(): void {
     ReactInjector.$state.go('.', { startManualExecution: null }, { inherit: true, location: 'replace' });
   }
 
   private scrollIntoView(delay = 200): void {
-    ReactInjector.scrollToService.scrollTo('#execution-' + ReactInjector.$stateParams.executionId, '.all-execution-groups', 225, delay);
+    ReactInjector.scrollToService.scrollTo(
+      '#execution-' + ReactInjector.$stateParams.executionId,
+      '.all-execution-groups',
+      225,
+      delay,
+    );
   }
 
   public handleTransitionSuccess(transition: Transition): void {
@@ -176,10 +195,18 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
     // or, if we are navigating back to the same execution after scrolling down the page, scroll it into view
     // but don't scroll it into view if we're navigating to a different stage in the same execution
     let shouldScroll = false;
-    if (transition.to.name.indexOf(transition.from.name) === 0 && toParams.application === fromParams.application && toParams.executionId) {
+    if (
+      transition.to.name.indexOf(transition.from.name) === 0 &&
+      toParams.application === fromParams.application &&
+      toParams.executionId
+    ) {
       shouldScroll = true;
       if (toParams.executionId === fromParams.executionId && toParams.details) {
-        if (toParams.stage !== fromParams.stage || toParams.step !== fromParams.step || toParams.details !== fromParams.details) {
+        if (
+          toParams.stage !== fromParams.stage ||
+          toParams.step !== fromParams.step ||
+          toParams.details !== fromParams.details
+        ) {
           shouldScroll = false;
         }
       }
@@ -190,21 +217,29 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
   }
 
   public componentDidMount(): void {
-    this.groupsUpdatedSubscription = ReactInjector.executionFilterService.groupsUpdatedStream.subscribe(() => this.groupsUpdated());
-    this.locationChangeUnsubscribe = ReactInjector.$uiRouter.transitionService.onSuccess({}, (t) => this.handleTransitionSuccess(t));
+    this.groupsUpdatedSubscription = ReactInjector.executionFilterService.groupsUpdatedStream.subscribe(() =>
+      this.groupsUpdated(),
+    );
+    this.locationChangeUnsubscribe = ReactInjector.$uiRouter.transitionService.onSuccess({}, t =>
+      this.handleTransitionSuccess(t),
+    );
 
     const { app } = this.props;
-    this.executionsRefreshUnsubscribe = app.executions.onRefresh(null, () => {
-      this.normalizeExecutionNames();
+    this.executionsRefreshUnsubscribe = app.executions.onRefresh(
+      null,
+      () => {
+        this.normalizeExecutionNames();
 
-      // if an execution was selected but is no longer present, navigate up
-      const { $state } = ReactInjector;
-      if ($state.params.executionId) {
-        if (app.getDataSource('executions').data.every(e => e.id !== $state.params.executionId)) {
-          $state.go('.^');
+        // if an execution was selected but is no longer present, navigate up
+        const { $state } = ReactInjector;
+        if ($state.params.executionId) {
+          if (app.getDataSource('executions').data.every(e => e.id !== $state.params.executionId)) {
+            $state.go('.^');
+          }
         }
-      }
-    }, () => this.dataInitializationFailure());
+      },
+      () => this.dataInitializationFailure(),
+    );
 
     $q.all([app.executions.ready(), app.pipelineConfigs.ready()]).then(() => {
       this.updateExecutionGroups();
@@ -231,6 +266,7 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
     this.executionsRefreshUnsubscribe();
     this.groupsUpdatedSubscription.unsubscribe();
     this.locationChangeUnsubscribe();
+    this.activeRefresher && this.activeRefresher.unsubscribe();
   }
 
   private showFilters(): void {
@@ -278,7 +314,9 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
         return (
           <div className="text-center full-width">
             <h3>No pipelines configured for this application.</h3>
-            <h4><CreatePipelineButton application={app} asLink={true}/></h4>
+            <h4>
+              <CreatePipelineButton application={app} asLink={true} />
+            </h4>
           </div>
         );
       }
@@ -289,7 +327,7 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
               <h3 className="filters-placeholder">
                 <Tooltip value="Show filters">
                   <a className="btn btn-xs btn-default pin clickable" onClick={this.showFilters}>
-                    <i className="fa fa-forward"/>
+                    <i className="fa fa-forward" />
                   </a>
                 </Tooltip>
               </h3>
@@ -299,104 +337,126 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
                 onClick={this.hideFilters}
               >
                 <Tooltip value="Hide filters">
-                  <i className="fa fa-backward"/>
+                  <i className="fa fa-backward" />
                 </Tooltip>
               </a>
-              {!loading && <ExecutionFilters application={app}/>}
+              {!loading && <ExecutionFilters application={app} />}
             </div>
-            <div className={`full-content ${filtersExpanded ? 'filters-expanded' : ''} ${sortFilter.showStageDuration ? 'show-durations' : ''}`} data-scroll-id="nav-content">
+            <div
+              className={`full-content ${filtersExpanded ? 'filters-expanded' : ''} ${
+                sortFilter.showStageDuration ? 'show-durations' : ''
+              }`}
+              data-scroll-id="nav-content"
+            >
               {!loading && (
                 <div className="execution-groups-header">
-                <h3>Pipelines</h3>
-                <div className="form-group pull-right">
-                  <a
-                    className="btn btn-sm btn-primary clickable"
-                    onClick={this.startManualExecutionClicked}
-                    style={{ pointerEvents: triggeringExecution ? 'none' : 'auto' }}
-                  >
-                    {triggeringExecution && (
-                      <span>
-                        <Tooltip value="Starting Execution">
-                          <span className="visible-md-inline visible-sm-inline">
+                  <div className="form-group pull-right">
+                    <a
+                      className="btn btn-sm btn-primary clickable"
+                      onClick={this.startManualExecutionClicked}
+                      style={{ pointerEvents: triggeringExecution ? 'none' : 'auto' }}
+                    >
+                      {triggeringExecution && (
+                        <span>
+                          <Tooltip value="Starting Execution">
+                            <span className="visible-md-inline visible-sm-inline">
+                              <Spinner size="nano" />
+                            </span>
+                          </Tooltip>
+                          <span className="visible-lg-inline">
                             <Spinner size="nano" />
                           </span>
-                        </Tooltip>
-                        <span className="visible-lg-inline">
-                          <Spinner size="nano" />
+                          <span className="visible-xl-inline">Starting Execution</span>&hellip;
                         </span>
-                        <span className="visible-xl-inline">Starting Execution</span>&hellip;
-                      </span>
+                      )}
+                      {!triggeringExecution && (
+                        <span>
+                          <span className="glyphicon glyphicon-play visible-lg-inline" />
+                          <Tooltip value="Start Manual Execution">
+                            <span className="glyphicon glyphicon-play visible-md-inline visible-sm-inline" />
+                          </Tooltip>
+                          <span className="visible-xl-inline"> Start Manual Execution</span>
+                        </span>
+                      )}
+                    </a>
+                  </div>
+                  <div className="pull-right">
+                    <CreatePipeline application={app} />
+                  </div>
+                  <form className="form-inline" style={{ marginBottom: '5px' }}>
+                    {sortFilter.groupBy && (
+                      <div className="form-group" style={{ marginRight: '20px' }}>
+                        <Tooltip value="expand all">
+                          <a className="btn btn-xs btn-default clickable" onClick={this.expand}>
+                            <span className="glyphicon glyphicon-plus" />
+                          </a>
+                        </Tooltip>
+                        <Tooltip value="collapse all">
+                          <a className="btn btn-xs btn-default clickable" onClick={this.collapse}>
+                            <span className="glyphicon glyphicon-minus" />
+                          </a>
+                        </Tooltip>
+                      </div>
                     )}
-                    {!triggeringExecution && (
-                      <span>
-                        <span className="glyphicon glyphicon-play visible-lg-inline"/>
-                        <Tooltip value="Start Manual Execution"><span className="glyphicon glyphicon-play visible-md-inline visible-sm-inline"/></Tooltip>
-                        <span className="visible-xl-inline"> Start Manual Execution</span>
-                      </span>
-                    )}
-                  </a>
-                </div>
-                <div className="pull-right">
-                  <CreatePipeline application={app}/>
-                </div>
-                <form className="form-inline" style={{ marginBottom: '5px' }}>
-                  {sortFilter.groupBy && (
-                    <div className="form-group" style={{ marginRight: '20px' }}>
-                      <Tooltip value="expand all">
-                        <a className="btn btn-xs btn-default clickable" onClick={this.expand}>
-                          <span className="glyphicon glyphicon-plus"/>
-                        </a>
-                      </Tooltip>
-                      <Tooltip value="collapse all">
-                        <a className="btn btn-xs btn-default clickable" onClick={this.collapse}>
-                          <span className="glyphicon glyphicon-minus"/>
-                        </a>
-                      </Tooltip>
+                    <div className="form-group">
+                      <label>Group by</label>
+                      <select
+                        className="form-control input-sm"
+                        value={sortFilter.groupBy}
+                        onChange={this.groupByChanged}
+                      >
+                        <option value="none">None</option>
+                        <option value="name">Pipeline</option>
+                        <option value="timeBoundary">Time Boundary</option>
+                      </select>
                     </div>
-                  )}
-                  <div className="form-group">
-                    <label>Group by</label>
-                    <select
-                      className="form-control input-sm"
-                      value={sortFilter.groupBy}
-                      onChange={this.groupByChanged}
-                    >
-                      <option value="none">None</option>
-                      <option value="name">Pipeline</option>
-                      <option value="timeBoundary">Time Boundary</option>
-                    </select>
-                  </div>
-                  <div className="form-group">
-                    <label>Show </label>
-                    <select
-                      className="form-control input-sm"
-                      value={sortFilter.count}
-                      onChange={this.showCountChanged}
-                    >
-                      {this.filterCountOptions.map((count) => <option key={count} value={count}>{count}</option>)}
-                    </select>
-                    <span> executions per pipeline</span>
-                  </div>
-                  <div className="form-group checkbox">
-                    <label>
-                      <input
-                        type="checkbox"
-                        checked={sortFilter.showStageDuration}
-                        onChange={this.showDurationsChanged}
-                      /> stage durations
-                    </label>
-                  </div>
-                </form>
-                <FilterTags tags={tags} tagCleared={this.forceUpdateExecutionGroups} clearFilters={this.clearFilters}/>
-              </div>
-              )}
-              {loading && <div className="horizontal center middle spinner-container"><Spinner size="medium"/></div>}
-              {app.executions.reloadingForFilters && <div className="text-center transition-overlay" style={{ marginLeft: '-25px' }} />}
-              {!loading && !hasPipelines && (
-                <div className="text-center">
-                  <h4>No pipelines configured for this application.</h4>
+                    <div className="form-group">
+                      <label>Show </label>
+                      <select
+                        className="form-control input-sm"
+                        value={sortFilter.count}
+                        onChange={this.showCountChanged}
+                      >
+                        {this.filterCountOptions.map(count => (
+                          <option key={count} value={count}>
+                            {count}
+                          </option>
+                        ))}
+                      </select>
+                      <span> executions per pipeline</span>
+                    </div>
+                    <div className="form-group checkbox">
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={sortFilter.showStageDuration}
+                          onChange={this.showDurationsChanged}
+                        />{' '}
+                        stage durations
+                      </label>
+                    </div>
+                  </form>
+                  <FilterTags
+                    tags={tags}
+                    tagCleared={this.forceUpdateExecutionGroups}
+                    clearFilters={this.clearFilters}
+                  />
                 </div>
               )}
+              {loading && (
+                <div className="horizontal center middle spinner-container">
+                  <Spinner size="medium" />
+                </div>
+              )}
+              {app.executions.reloadingForFilters && (
+                <div className="text-center transition-overlay" style={{ marginLeft: '-25px' }} />
+              )}
+              {!loading &&
+                !hasPipelines && (
+                  <div className="text-center">
+                    <h4>No pipelines configured for this application.</h4>
+                  </div>
+                )}
               {app.executions.loadFailure && (
                 <div className="text-center">
                   <h4>There was an error loading executions. We'll try again shortly.</h4>

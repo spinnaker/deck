@@ -1,19 +1,18 @@
 'use strict';
 
-import { COLLAPSIBLE_SECTION_STATE_CACHE } from 'core/cache/collapsibleSectionStateCache';
-
 const angular = require('angular');
 
-module.exports = angular.module('spinnaker.core.presentation.collapsibleSection.directive', [
-  COLLAPSIBLE_SECTION_STATE_CACHE
-])
-  .directive('collapsibleSection', function(collapsibleSectionStateCache) {
+import { CollapsibleSectionStateCache } from 'core/cache';
+
+module.exports = angular
+  .module('spinnaker.core.presentation.collapsibleSection.directive', [])
+  .directive('collapsibleSection', function() {
     return {
       restrict: 'E',
       replace: true,
       transclude: {
         heading: '?sectionHeading',
-        body: '?sectionBody'
+        body: '?sectionBody',
       },
       scope: {
         heading: '@',
@@ -28,11 +27,11 @@ module.exports = angular.module('spinnaker.core.presentation.collapsibleSection.
         let cacheKey = scope.cacheKey || scope.heading;
         let expanded = true;
         if (cacheKey) {
-          expanded = collapsibleSectionStateCache.isSet(cacheKey) ?
-            collapsibleSectionStateCache.isExpanded(cacheKey) :
-          scope.expanded === 'true';
+          expanded = CollapsibleSectionStateCache.isSet(cacheKey)
+            ? CollapsibleSectionStateCache.isExpanded(cacheKey)
+            : scope.expanded === 'true';
         }
-        scope.state = {expanded: expanded};
+        scope.state = { expanded: expanded };
         scope.getIcon = function() {
           return scope.state.expanded ? 'down' : 'right';
         };
@@ -44,9 +43,9 @@ module.exports = angular.module('spinnaker.core.presentation.collapsibleSection.
         scope.toggle = function() {
           scope.state.expanded = !scope.state.expanded;
           if (cacheKey) {
-            collapsibleSectionStateCache.setExpanded(cacheKey, scope.state.expanded);
+            CollapsibleSectionStateCache.setExpanded(cacheKey, scope.state.expanded);
           }
         };
-      }
+      },
     };
-});
+  });

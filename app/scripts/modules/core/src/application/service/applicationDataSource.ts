@@ -122,7 +122,6 @@ export interface IDataSourceConfig {
    * (Optional) The application has potentially two default fields for each provider: region and credentials. These fields will
    * only have a value if every data source that contributes values has just one unique value for each provider. Useful
    * for setting initial values in modal dialogs when creating new server groups, load balancers, etc.
-
    * If the data source should contribute to the application's default region or credentials, this field should be set
    * to the field name that represents the provider on each data item.
    */
@@ -148,7 +147,7 @@ export interface IDataSourceConfig {
    * the link in the application's header.
    *
    * If the "visible" field is set to false, this value is ignored; if "visible" is true and this field is omitted, the
-   * tab will use ".insight.{key}" as the sref value in the application header tab
+   * data source will not generate any navigation elements
    */
   sref?: string;
 
@@ -158,6 +157,11 @@ export interface IDataSourceConfig {
    * Default: true
    */
   visible?: boolean;
+
+  /**
+   * (Optional) a data source that will only be available and visible if this data source (by key) is enabled
+   */
+  requiresDataSource?: string;
 
   /**
    * (Optional) Determines which second-level navigation menu this data source will belong to
@@ -192,6 +196,7 @@ export class ApplicationDataSource implements IDataSourceConfig {
   public sref: string;
   public visible = true;
   public hidden = false;
+  public requiresDataSource: string;
 
   /**
    * State flag that indicates whether the data source has been loaded. If the data source does not have a declared
@@ -257,7 +262,7 @@ export class ApplicationDataSource implements IDataSourceConfig {
    * Dumb queue to fire when the most recent refresh call finishes
    * (will go away when we switch from Promises to Observables)
    */
-  private refreshQueue: IDeferred<void>[] = [];
+  private refreshQueue: Array<IDeferred<void>> = [];
 
   /**
    * Called when a method mutates some item in the data source's data, e.g. when a running execution is updated
@@ -269,23 +274,21 @@ export class ApplicationDataSource implements IDataSourceConfig {
     }
   }
 
-  constructor(config: IDataSourceConfig,
-              private application: Application,
-              private $q: IQService,
-              private $log: ILogService,
-              private $filter: any,
-              $uiRouter: UIRouter) {
+  constructor(
+    config: IDataSourceConfig,
+    private application: Application,
+    private $q: IQService,
+    private $log: ILogService,
+    private $filter: any,
+    $uiRouter: UIRouter,
+  ) {
     Object.assign(this, config);
-
-    if (!config.sref && config.visible !== false) {
-      this.sref = '.insight.' + config.key;
-    }
 
     if (!config.label && this.$filter) {
       this.label = this.$filter('robotToHuman')(config.key);
     }
 
-    if (!config.activeState) {
+    if (!config.activeState && this.sref) {
       this.activeState = '**' + this.sref + '.**';
     }
 
@@ -422,7 +425,7 @@ export class ApplicationDataSource implements IDataSourceConfig {
     this.currentLoadCall += 1;
     const loadCall = this.currentLoadCall;
     this.loader(this.application)
-      .then((result) => {
+      .then(result => {
         if (loadCall < this.currentLoadCall) {
           // discard, more recent call has come in
           // TODO: this will all be cleaner with Observables
@@ -446,7 +449,7 @@ export class ApplicationDataSource implements IDataSourceConfig {
         this.refreshQueue.forEach(d => d.resolve());
         this.refreshQueue.length = 0;
       })
-      .catch((rejection) => {
+      .catch(rejection => {
         if (loadCall === this.currentLoadCall) {
           this.$log.warn(`Error retrieving ${this.key}`, rejection);
           this.loading = false;

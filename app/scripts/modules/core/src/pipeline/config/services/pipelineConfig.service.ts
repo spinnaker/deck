@@ -3,8 +3,7 @@ import { sortBy, uniq } from 'lodash';
 
 import { API_SERVICE, Api } from 'core/api/api.service';
 import { AUTHENTICATION_SERVICE, AuthenticationService } from 'core/authentication/authentication.service';
-import { VIEW_STATE_CACHE_SERVICE, ViewStateCacheService } from 'core/cache/viewStateCache.service';
-import { ICache } from 'core/cache/deckCache.service';
+import { ICache, ViewStateCache } from 'core/cache';
 import { IStage } from 'core/domain/IStage';
 import { IPipeline } from 'core/domain/IPipeline';
 
@@ -12,15 +11,11 @@ export interface ITriggerPipelineResponse {
   ref: string;
 }
 export class PipelineConfigService {
-
   private configViewStateCache: ICache;
 
-  public constructor(private $q: IQService,
-                     private API: Api,
-                     private authenticationService: AuthenticationService,
-                     viewStateCache: ViewStateCacheService) {
+  public constructor(private $q: IQService, private API: Api, private authenticationService: AuthenticationService) {
     'ngInject';
-    this.configViewStateCache = viewStateCache.createCache('pipelineConfig', { version: 2 });
+    this.configViewStateCache = ViewStateCache.createCache('pipelineConfig', { version: 2 });
   }
 
   private buildViewStateCacheKey(applicationName: string, pipelineName: string): string {
@@ -28,28 +23,39 @@ export class PipelineConfigService {
   }
 
   public getPipelinesForApplication(applicationName: string): IPromise<IPipeline[]> {
-    return this.API.one('applications').one(applicationName).all('pipelineConfigs').getList()
+    return this.API.one('applications')
+      .one(applicationName)
+      .all('pipelineConfigs')
+      .getList()
       .then((pipelines: IPipeline[]) => {
-        pipelines.forEach(p => p.stages = p.stages || []);
+        pipelines.forEach(p => (p.stages = p.stages || []));
         return this.sortPipelines(pipelines);
       });
   }
 
   public getStrategiesForApplication(applicationName: string): IPromise<IPipeline[]> {
-    return this.API.one('applications').one(applicationName).all('strategyConfigs').getList()
+    return this.API.one('applications')
+      .one(applicationName)
+      .all('strategyConfigs')
+      .getList()
       .then((pipelines: IPipeline[]) => {
-      pipelines.forEach(p => p.stages = p.stages || []);
-      return this.sortPipelines(pipelines);
-    });
+        pipelines.forEach(p => (p.stages = p.stages || []));
+        return this.sortPipelines(pipelines);
+      });
   }
 
   public getHistory(id: string, isStrategy: boolean, count = 20): IPromise<IPipeline[]> {
     const endpoint = isStrategy ? 'strategyConfigs' : 'pipelineConfigs';
-    return this.API.one(endpoint, id).all('history').withParams({ count: count }).getList();
+    return this.API.one(endpoint, id)
+      .all('history')
+      .withParams({ count })
+      .getList();
   }
 
   public deletePipeline(applicationName: string, pipeline: IPipeline, pipelineName: string): IPromise<void> {
-    return this.API.one(pipeline.strategy ? 'strategies' : 'pipelines').one(applicationName, pipelineName.trim()).remove();
+    return this.API.one(pipeline.strategy ? 'strategies' : 'pipelines')
+      .one(applicationName, pipelineName.trim())
+      .remove();
   }
 
   public savePipeline(pipeline: IPipeline): IPromise<void> {
@@ -62,32 +68,45 @@ export class PipelineConfigService {
         }
       });
     }
-    return this.API.one( pipeline.strategy ? 'strategies' : 'pipelines').data(pipeline).post();
+    return this.API.one(pipeline.strategy ? 'strategies' : 'pipelines')
+      .data(pipeline)
+      .post();
   }
 
-  public renamePipeline(applicationName: string, pipeline: IPipeline, currentName: string, newName: string): IPromise<void> {
+  public renamePipeline(
+    applicationName: string,
+    pipeline: IPipeline,
+    currentName: string,
+    newName: string,
+  ): IPromise<void> {
     this.configViewStateCache.remove(this.buildViewStateCacheKey(applicationName, currentName));
     pipeline.name = newName;
-    return this.API.one(pipeline.strategy ? 'strategies' : 'pipelines').one(pipeline.id).data(pipeline).put();
+    return this.API.one(pipeline.strategy ? 'strategies' : 'pipelines')
+      .one(pipeline.id)
+      .data(pipeline)
+      .put();
   }
 
   public triggerPipeline(applicationName: string, pipelineName: string, body: any = {}): IPromise<string> {
     body.user = this.authenticationService.getAuthenticatedUser().name;
-    return this.API.one('pipelines').one(applicationName).one(pipelineName).data(body).post()
+    return this.API.one('pipelines')
+      .one(applicationName)
+      .one(pipelineName)
+      .data(body)
+      .post()
       .then((result: ITriggerPipelineResponse) => {
         return result.ref.split('/').pop();
-    });
+      });
   }
 
-  public getDownstreamStageIds(pipeline: IPipeline, stage: IStage): (string | number)[] {
-    let downstream: (string | number)[] = [];
+  public getDownstreamStageIds(pipeline: IPipeline, stage: IStage): Array<string | number> {
+    let downstream: Array<string | number> = [];
     const children = pipeline.stages.filter((stageToTest: IStage) => {
-      return stageToTest.requisiteStageRefIds &&
-        stageToTest.requisiteStageRefIds.includes(stage.refId);
+      return stageToTest.requisiteStageRefIds && stageToTest.requisiteStageRefIds.includes(stage.refId);
     });
     if (children.length) {
       downstream = children.map(c => c.refId);
-      children.forEach((child) => {
+      children.forEach(child => {
         downstream = downstream.concat(this.getDownstreamStageIds(pipeline, child));
       });
     }
@@ -95,12 +114,14 @@ export class PipelineConfigService {
   }
 
   public getDependencyCandidateStages(pipeline: IPipeline, stage: IStage): IStage[] {
-    const downstreamIds: (string | number)[] = this.getDownstreamStageIds(pipeline, stage);
+    const downstreamIds: Array<string | number> = this.getDownstreamStageIds(pipeline, stage);
     return pipeline.stages.filter((stageToTest: IStage) => {
-      return stage !== stageToTest &&
+      return (
+        stage !== stageToTest &&
         stageToTest.requisiteStageRefIds &&
         !downstreamIds.includes(stageToTest.refId) &&
-        !stage.requisiteStageRefIds.includes(stageToTest.refId);
+        !stage.requisiteStageRefIds.includes(stageToTest.refId)
+      );
     });
   }
 
@@ -119,17 +140,20 @@ export class PipelineConfigService {
 
   public startAdHocPipeline(body: any): IPromise<string> {
     body.user = this.authenticationService.getAuthenticatedUser().name;
-    return this.API.one('pipelines').one('start').data(body).post().then((result: ITriggerPipelineResponse) => {
-      return result.ref.split('/').pop();
-    });
+    return this.API.one('pipelines')
+      .one('start')
+      .data(body)
+      .post()
+      .then((result: ITriggerPipelineResponse) => {
+        return result.ref.split('/').pop();
+      });
   }
 
   private sortPipelines(pipelines: IPipeline[]): IPromise<IPipeline[]> {
-
     const sorted = sortBy(pipelines, ['index', 'name']);
 
     // if there are pipelines with a bad index, fix that
-    const toReindex: IPromise<void>[] = [];
+    const toReindex: Array<IPromise<void>> = [];
     if (sorted && sorted.length) {
       sorted.forEach((pipeline, index) => {
         if (pipeline.index !== index) {
@@ -143,12 +167,10 @@ export class PipelineConfigService {
     }
     return this.$q.resolve(sorted);
   }
-
 }
 
 export const PIPELINE_CONFIG_SERVICE = 'spinnaker.core.pipeline.config.service';
-module(PIPELINE_CONFIG_SERVICE, [
-  API_SERVICE,
-  AUTHENTICATION_SERVICE,
-  VIEW_STATE_CACHE_SERVICE,
-]).service('pipelineConfigService', PipelineConfigService);
+module(PIPELINE_CONFIG_SERVICE, [API_SERVICE, AUTHENTICATION_SERVICE]).service(
+  'pipelineConfigService',
+  PipelineConfigService,
+);
