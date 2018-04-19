@@ -71,18 +71,6 @@ export class ExecutionService {
       if (data) {
         data.forEach((execution: IExecution) => {
           execution.hydrated = expand;
-          // TODO: remove this code once the filtering takes place on Orca
-          if (!expand) {
-            execution.stages.forEach(s => {
-              s.context = {};
-              s.outputs = {};
-              s.tasks = [];
-            });
-          }
-          // TODO: Remove this, too, once the filtering takes place on Orca
-          if (execution.trigger.parentExecution) {
-            execution.trigger.parentExecution.stages = [];
-          }
           return this.cleanExecutionForDiffing(execution);
         });
         return data;
@@ -415,6 +403,13 @@ export class ExecutionService {
         application.executions.data.push(re);
       }
     });
+    application.executions.data.forEach((execution: IExecution) => {
+      if (execution.isActive && application.runningExecutions.data.every((e: IExecution) => e.id !== execution.id)) {
+        this.getExecution(execution.id).then(updatedExecution => {
+          this.updateExecution(application, updatedExecution);
+        });
+      }
+    });
     if (updated && !application.executions.reloadingForFilters) {
       application.executions.dataUpdated();
     }
@@ -450,7 +445,7 @@ export class ExecutionService {
       }
     });
     current.stringVal = updated.stringVal;
-    current.hydrated = updated.hydrated;
+    current.hydrated = current.hydrated || updated.hydrated;
     current.graphStatusHash = this.calculateGraphStatusHash(current);
   }
 
