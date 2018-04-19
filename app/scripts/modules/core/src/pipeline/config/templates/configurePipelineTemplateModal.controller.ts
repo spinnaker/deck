@@ -28,6 +28,7 @@ export interface IState {
   loadingError: boolean;
   noVariables: boolean;
   planErrors: IPipelineTemplatePlanError[];
+  inheritTemplateParameters: boolean;
 }
 
 @BindAll()
@@ -35,7 +36,7 @@ export class ConfigurePipelineTemplateModalController implements IController {
   public pipelineName: string;
   public variableMetadataGroups: IVariableMetadataGroup[];
   public variables: IVariable[];
-  public state: IState = { loading: true, error: false, planErrors: null, loadingError: false, noVariables: false };
+  public state: IState = { loading: true, error: false, planErrors: null, loadingError: false, noVariables: false, inheritTemplateParameters: true };
   private template: IPipelineTemplate;
   private source: string;
 
@@ -110,6 +111,9 @@ export class ConfigurePipelineTemplateModalController implements IController {
           pipelineConfigId: this.pipelineId,
           template: { source: this.source },
           variables: this.transformVariablesForPipelinePlan(),
+        },
+        configuration: {
+          inherit: this.state.inheritTemplateParameters ? ['parameters'] : [],
         },
       },
     };
