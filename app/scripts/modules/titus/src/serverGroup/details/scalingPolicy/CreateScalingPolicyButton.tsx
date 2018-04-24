@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { BindAll } from 'lodash-decorators';
 
-import { Application, IServerGroup, ReactInjector } from '@spinnaker/core';
+import { AccountService, Application, IServerGroup, ModalInjector } from '@spinnaker/core';
 
 import { PolicyTypeSelectionModal } from './upsert/PolicyTypeSelectionModal';
 import { UpsertTargetTrackingController } from './targetTracking/upsertTargetTracking.controller';
@@ -32,7 +32,7 @@ export class CreateScalingPolicyButton extends React.Component<
       typeSelection: null,
       awsAccount: null,
     };
-    ReactInjector.accountService.getAccountDetails(props.serverGroup.account).then(details => {
+    AccountService.getAccountDetails(props.serverGroup.account).then(details => {
       this.setState({ awsAccount: details.awsAccount });
     });
   }
@@ -44,7 +44,7 @@ export class CreateScalingPolicyButton extends React.Component<
   public createStepPolicy(): void {
     const { serverGroup, application } = this.props;
 
-    ReactInjector.modalService
+    ModalInjector.modalService
       .open({
         templateUrl: require('./upsert/upsertScalingPolicy.modal.html'),
         controller: 'titusUpsertScalingPolicyCtrl',
@@ -69,7 +69,7 @@ export class CreateScalingPolicyButton extends React.Component<
   public createTargetTrackingPolicy(): void {
     const { serverGroup, application } = this.props;
 
-    ReactInjector.modalService
+    ModalInjector.modalService
       .open({
         templateUrl: require('./targetTracking/upsertTargetTracking.modal.html'),
         controller: UpsertTargetTrackingController,

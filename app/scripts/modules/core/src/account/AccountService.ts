@@ -1,10 +1,11 @@
 import { chain, intersection, zipObject, uniq } from 'lodash';
-import { ILogService, IPromise, IQResolveReject, IQService, module } from 'angular';
+import { IPromise, IQResolveReject } from 'angular';
+import { $log, $q } from 'ngimport';
 import { Observable } from 'rxjs';
 
 import { Application } from 'core/application/application.model';
-import { API_SERVICE, Api } from 'core/api/api.service';
-import { CLOUD_PROVIDER_REGISTRY, CloudProviderRegistry } from '../cloudProvider/cloudProvider.registry';
+import { API } from 'core/api/ApiService';
+import { CloudProviderRegistry } from '../cloudProvider/CloudProviderRegistry';
 import { SETTINGS } from 'core/config/settings';
 
 export interface IRegion {
@@ -53,32 +54,28 @@ export interface IAccountZone {
 }
 
 export class AccountService {
-  public accounts$: Observable<IAccountDetails[]> = Observable.defer(() => {
-    const promise = this.API.one('credentials')
-      .useCache()
-      .withParams({ expand: true })
-      .get();
-    return Observable.fromPromise<IAccountDetails[]>(promise);
-  })
-    .publishReplay(1)
-    .refCount();
+  public static accounts$: Observable<IAccountDetails[]>;
+  public static providers$: Observable<string[]>;
 
-  public providers$ = this.accounts$.map((accounts: IAccountDetails[]) => {
-    const providersFromAccounts: string[] = uniq(accounts.map(account => account.type));
-    return intersection(providersFromAccounts, this.cloudProviderRegistry.listRegisteredProviders());
-  });
+  public static initialize(): void {
+    this.accounts$ = Observable.defer(() => {
+      const promise = API.one('credentials')
+        .useCache()
+        .withParams({ expand: true })
+        .get();
+      return Observable.fromPromise<IAccountDetails[]>(promise);
+    })
+      .publishReplay(1)
+      .refCount();
 
-  constructor(
-    private $log: ILogService,
-    private $q: IQService,
-    private cloudProviderRegistry: CloudProviderRegistry,
-    private API: Api,
-  ) {
-    'ngInject';
+    this.providers$ = AccountService.accounts$.map((accounts: IAccountDetails[]) => {
+      const providersFromAccounts: string[] = uniq(accounts.map(account => account.type));
+      return intersection(providersFromAccounts, CloudProviderRegistry.listRegisteredProviders());
+    });
   }
 
-  public challengeDestructiveActions(account: string): IPromise<boolean> {
-    return this.$q((resolve: IQResolveReject<boolean>) => {
+  public static challengeDestructiveActions(account: string): IPromise<boolean> {
+    return $q((resolve: IQResolveReject<boolean>) => {
       if (account) {
         this.getAccountDetails(account)
           .then((details: IAccountDetails) => {
@@ -95,28 +92,28 @@ export class AccountService {
     });
   }
 
-  public getArtifactAccounts(): IPromise<IAccount[]> {
-    return this.API.one('artifacts')
+  public static getArtifactAccounts(): IPromise<IAccount[]> {
+    return API.one('artifacts')
       .one('credentials')
       .useCache()
       .get();
   }
 
-  public getAccountDetails(account: string): IPromise<IAccountDetails> {
+  public static getAccountDetails(account: string): IPromise<IAccountDetails> {
     return this.listAllAccounts().then(accounts => accounts.find(a => a.name === account));
   }
 
-  public getAllAccountDetailsForProvider(
+  public static getAllAccountDetailsForProvider(
     provider: string,
     providerVersion: string = null,
   ): IPromise<IAccountDetails[]> {
     return this.listAllAccounts(provider, providerVersion).catch((error: any) => {
-      this.$log.warn(`Failed to load accounts for provider "${provider}"; exception:`, error);
+      $log.warn(`Failed to load accounts for provider "${provider}"; exception:`, error);
       return [];
     });
   }
 
-  public getAvailabilityZonesForAccountAndRegion(
+  public static getAvailabilityZonesForAccountAndRegion(
     provider: string,
     account: string,
     region: string,
@@ -126,14 +123,14 @@ export class AccountService {
     );
   }
 
-  public getCredentialsKeyedByAccount(provider: string = null): IPromise<IAggregatedAccounts> {
+  public static getCredentialsKeyedByAccount(provider: string = null): IPromise<IAggregatedAccounts> {
     return this.listAllAccounts(provider).then((accounts: IAccountDetails[]) => {
       const names: string[] = accounts.map((account: IAccount) => account.name);
       return zipObject<IAccountDetails, IAggregatedAccounts>(names, accounts);
     });
   }
 
-  public getPreferredZonesByAccount(provider: string): IPromise<IAccountZone> {
+  public static getPreferredZonesByAccount(provider: string): IPromise<IAccountZone> {
     const preferred: IAccountZone = {};
     return this.getAllAccountDetailsForProvider(provider).then((accounts: IAccountDetails[]) => {
       accounts.forEach((account: IAccountDetails) => {
@@ -152,11 +149,11 @@ export class AccountService {
     });
   }
 
-  public getRegionsForAccount(account: string): IPromise<IRegion[]> {
+  public static getRegionsForAccount(account: string): IPromise<IRegion[]> {
     return this.getAccountDetails(account).then((details: IAccountDetails) => (details ? details.regions : []));
   }
 
-  public getUniqueAttributeForAllAccounts(provider: string, attribute: string): IPromise<string[]> {
+  public static getUniqueAttributeForAllAccounts(provider: string, attribute: string): IPromise<string[]> {
     return this.getCredentialsKeyedByAccount(provider).then((credentials: IAggregatedAccounts) => {
       return chain(credentials)
         .map(attribute)
@@ -168,8 +165,8 @@ export class AccountService {
     });
   }
 
-  public listAllAccounts(provider: string = null, providerVersion: string = null): IPromise<IAccountDetails[]> {
-    return this.$q
+  public static listAllAccounts(provider: string = null, providerVersion: string = null): IPromise<IAccountDetails[]> {
+    return $q
       .when(this.accounts$.toPromise())
       .then((accounts: IAccountDetails[]) => accounts.filter(account => !provider || account.type === provider))
       .then((accounts: IAccountDetails[]) =>
@@ -177,14 +174,14 @@ export class AccountService {
       );
   }
 
-  public listAccounts(provider: string = null, providerVersion: string = null): IPromise<IAccountDetails[]> {
+  public static listAccounts(provider: string = null, providerVersion: string = null): IPromise<IAccountDetails[]> {
     return this.listAllAccounts(provider, providerVersion).then(accounts =>
       accounts.filter(account => account.authorized !== false),
     );
   }
 
-  public applicationAccounts(application: Application = null): IPromise<IAccountDetails[]> {
-    return this.$q.all([this.listProviders(application), this.listAccounts()]).then(([providers, accounts]) => {
+  public static applicationAccounts(application: Application = null): IPromise<IAccountDetails[]> {
+    return $q.all([this.listProviders(application), this.listAccounts()]).then(([providers, accounts]) => {
       return providers.reduce(
         (memo, p) => {
           return memo.concat(accounts.filter(acc => acc.cloudProvider === p));
@@ -194,7 +191,7 @@ export class AccountService {
     });
   }
 
-  public listProviders$(application: Application = null): Observable<string[]> {
+  public static listProviders$(application: Application = null): Observable<string[]> {
     return this.providers$
       .map((available: string[]) => {
         if (!application) {
@@ -210,10 +207,9 @@ export class AccountService {
       .map(results => results.sort());
   }
 
-  public listProviders(application: Application = null): IPromise<string[]> {
-    return this.$q.when(this.listProviders$(application).toPromise());
+  public static listProviders(application: Application = null): IPromise<string[]> {
+    return $q.when(this.listProviders$(application).toPromise());
   }
 }
 
-export const ACCOUNT_SERVICE = 'spinnaker.core.account.service';
-module(ACCOUNT_SERVICE, [CLOUD_PROVIDER_REGISTRY, API_SERVICE]).service('accountService', AccountService);
+AccountService.initialize();

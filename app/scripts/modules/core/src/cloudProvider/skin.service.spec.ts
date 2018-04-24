@@ -1,14 +1,12 @@
 import { mock, IRootScopeService, IScope, IQService } from 'angular';
 
-import { CLOUD_PROVIDER_REGISTRY } from './cloudProvider.registry';
-import { ACCOUNT_SERVICE } from 'core/account/account.service';
 import { SKIN_SERVICE, SkinService } from './skin.service';
 import { APPLICATION_MODEL_BUILDER, ApplicationModelBuilder } from 'core/application';
 
 describe('Service: skinService', () => {
   let service: SkinService, appBuilder: ApplicationModelBuilder, scope: IScope, $q: IQService;
 
-  beforeEach(mock.module(SKIN_SERVICE, APPLICATION_MODEL_BUILDER, CLOUD_PROVIDER_REGISTRY, ACCOUNT_SERVICE));
+  beforeEach(mock.module(SKIN_SERVICE, APPLICATION_MODEL_BUILDER));
 
   beforeEach(
     mock.inject(
