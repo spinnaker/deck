@@ -4,8 +4,8 @@ const angular = require('angular');
 import _ from 'lodash';
 
 import {
-  ACCOUNT_SERVICE,
-  CLOUD_PROVIDER_REGISTRY,
+  AccountService,
+  CloudProviderRegistry,
   CONFIRMATION_MODAL_SERVICE,
   SECURITY_GROUP_READER,
   SECURITY_GROUP_WRITER,
@@ -16,32 +16,28 @@ import { GCE_SECURITY_GROUP_HELP_TEXT_SERVICE } from '../securityGroupHelpText.s
 module.exports = angular
   .module('spinnaker.securityGroup.gce.details.controller', [
     require('@uirouter/angularjs').default,
-    ACCOUNT_SERVICE,
     SECURITY_GROUP_READER,
     SECURITY_GROUP_WRITER,
     CONFIRMATION_MODAL_SERVICE,
     require('../clone/cloneSecurityGroup.controller.js').name,
-    CLOUD_PROVIDER_REGISTRY,
     GCE_SECURITY_GROUP_HELP_TEXT_SERVICE,
   ])
   .controller('gceSecurityGroupDetailsCtrl', function(
     $scope,
     $state,
     resolvedSecurityGroup,
-    accountService,
     app,
     confirmationModalService,
     securityGroupWriter,
     securityGroupReader,
     $uibModal,
-    cloudProviderRegistry,
     gceSecurityGroupHelpTextService,
   ) {
     const application = (this.application = app);
     const securityGroup = resolvedSecurityGroup;
 
     // needed for standalone instances
-    $scope.detailsTemplateUrl = cloudProviderRegistry.getValue('gce', 'securityGroup.detailsTemplateUrl');
+    $scope.detailsTemplateUrl = CloudProviderRegistry.getValue('gce', 'securityGroup.detailsTemplateUrl');
 
     $scope.state = {
       loading: true,
@@ -129,7 +125,7 @@ module.exports = angular
               return ipIngressRule.portRanges.length > 1 ? ipIngressRule.portRanges.length : 1;
             });
 
-            accountService.getAccountDetails(securityGroup.accountId).then(function(accountDetails) {
+            AccountService.getAccountDetails(securityGroup.accountId).then(function(accountDetails) {
               $scope.securityGroup.logsLink =
                 'https://console.developers.google.com/project/' +
                 accountDetails.project +

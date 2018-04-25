@@ -3,8 +3,8 @@ import { cloneDeep, uniq } from 'lodash';
 import { module, noop } from 'angular';
 
 import { APPLICATION_READ_SERVICE, ApplicationReader } from 'core/application/service/application.read.service';
-import { ACCOUNT_SERVICE, AccountService } from 'core/account/account.service';
-import { CLOUD_PROVIDER_REGISTRY, CloudProviderRegistry } from 'core/cloudProvider/cloudProvider.registry';
+import { AccountService } from 'core/account/AccountService';
+import { CloudProviderRegistry } from 'core/cloudProvider';
 import { INFRASTRUCTURE_CACHE_CONFIG, IInfrastructureCacheConfig } from './infrastructureCacheConfig';
 import { InfrastructureCaches } from './infrastructureCaches';
 import { ICacheConfig } from './deckCacheFactory';
@@ -23,7 +23,7 @@ export class CacheInitializerService {
   private cacheConfig: IInfrastructureCacheConfig = cloneDeep<IInfrastructureCacheConfig>(INFRASTRUCTURE_CACHE_CONFIG);
 
   private initializers: IInitializers = {
-    credentials: [() => this.accountService.listAccounts()],
+    credentials: [() => AccountService.listAccounts()],
     securityGroups: [() => this.securityGroupReader.getAllSecurityGroups()],
     applications: [() => this.applicationReader.listApplications()],
     buildMasters: [() => this.igorService.listMasters()],
@@ -41,8 +41,8 @@ export class CacheInitializerService {
       this.setConfigDefaults(key, this.cacheConfig[key]);
     });
 
-    return this.accountService.listProviders().then((availableProviders: string[]) => {
-      return this.cloudProviderRegistry.listRegisteredProviders().forEach((provider: string) => {
+    return AccountService.listProviders().then((availableProviders: string[]) => {
+      return CloudProviderRegistry.listRegisteredProviders().forEach((provider: string) => {
         if (!availableProviders.includes(provider)) {
           return;
         }
@@ -84,9 +84,7 @@ export class CacheInitializerService {
   constructor(
     private $q: ng.IQService,
     private applicationReader: ApplicationReader,
-    private accountService: AccountService,
     private securityGroupReader: SecurityGroupReader,
-    private cloudProviderRegistry: CloudProviderRegistry,
     private igorService: IgorService,
     private providerServiceDelegate: any,
   ) {}
@@ -118,10 +116,7 @@ export class CacheInitializerService {
 }
 
 export const CACHE_INITIALIZER_SERVICE = 'spinnaker.core.cache.initializer';
-module(CACHE_INITIALIZER_SERVICE, [
-  ACCOUNT_SERVICE,
-  SECURITY_GROUP_READER,
-  APPLICATION_READ_SERVICE,
-  IGOR_SERVICE,
-  CLOUD_PROVIDER_REGISTRY,
-]).service('cacheInitializer', CacheInitializerService);
+module(CACHE_INITIALIZER_SERVICE, [SECURITY_GROUP_READER, APPLICATION_READ_SERVICE, IGOR_SERVICE]).service(
+  'cacheInitializer',
+  CacheInitializerService,
+);

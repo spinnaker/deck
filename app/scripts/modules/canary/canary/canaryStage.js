@@ -4,7 +4,9 @@ const angular = require('angular');
 import { isString, toInteger } from 'lodash';
 
 import {
-  CLOUD_PROVIDER_REGISTRY,
+  AccountService,
+  AuthenticationService,
+  CloudProviderRegistry,
   LIST_EXTRACTOR_SERVICE,
   NameUtils,
   PIPELINE_CONFIG_PROVIDER,
@@ -18,7 +20,6 @@ import { CANARY_ANALYSIS_NAME_SELECTOR_COMPONENT } from './canaryAnalysisNameSel
 module.exports = angular
   .module('spinnaker.canary.canaryStage', [
     LIST_EXTRACTOR_SERVICE,
-    CLOUD_PROVIDER_REGISTRY,
     SERVER_GROUP_COMMAND_BUILDER_SERVICE,
     CANARY_ANALYSIS_NAME_SELECTOR_COMPONENT,
     PIPELINE_CONFIG_PROVIDER,
@@ -186,11 +187,8 @@ module.exports = angular
     $uibModal,
     stage,
     providerSelectionService,
-    authenticationService,
-    cloudProviderRegistry,
     serverGroupCommandBuilder,
     awsServerGroupTransformer,
-    accountService,
     appListExtractorService,
   ) {
     'ngInject';
@@ -199,7 +197,7 @@ module.exports = angular
       return isString(value) && value.includes('${');
     };
 
-    const user = authenticationService.getAuthenticatedUser();
+    const user = AuthenticationService.getAuthenticatedUser();
     $scope.stage = stage;
     stage.baseline = stage.baseline || {};
     stage.scaleUp = stage.scaleUp || { enabled: false };
@@ -266,7 +264,7 @@ module.exports = angular
         },
       };
 
-      accountService.listProviders($scope.application).then(function(providers) {
+      AccountService.listProviders($scope.application).then(function(providers) {
         if (providers.length === 1) {
           overriddenCloudProvider = providers[0];
         } else if (!$scope.stage.cloudProviderType && $scope.stage.cloudProvider) {
@@ -321,7 +319,7 @@ module.exports = angular
     };
 
     let filterServerGroups = () => {
-      accountService.listAccounts(this.getCloudProvider()).then(accounts => ($scope.accounts = accounts));
+      AccountService.listAccounts(this.getCloudProvider()).then(accounts => ($scope.accounts = accounts));
       setClusterList();
     };
 
@@ -422,7 +420,7 @@ module.exports = angular
     this.addClusterPair = function() {
       $scope.stage.clusterPairs = $scope.stage.clusterPairs || [];
       providerSelectionService.selectProvider($scope.application).then(function(selectedProvider) {
-        let config = cloudProviderRegistry.getValue(getCloudProvider(), 'serverGroup');
+        let config = CloudProviderRegistry.getValue(getCloudProvider(), 'serverGroup');
         $uibModal
           .open({
             templateUrl: config.cloneServerGroupTemplateUrl,
@@ -471,7 +469,7 @@ module.exports = angular
 
     this.editCluster = function(cluster, index, type) {
       cluster.provider = cluster.provider || getCloudProvider() || 'aws';
-      let config = cloudProviderRegistry.getValue(cluster.provider, 'serverGroup');
+      let config = CloudProviderRegistry.getValue(cluster.provider, 'serverGroup');
       $uibModal
         .open({
           templateUrl: config.cloneServerGroupTemplateUrl,

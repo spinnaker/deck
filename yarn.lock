@@ -77,9 +77,9 @@
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-0.7.0.tgz#9a06f4f137ee84d7df0460c1fdb1135ffa6c50fd"
 
-"@spinnaker/kayenta@0.0.42":
-  version "0.0.42"
-  resolved "https://registry.yarnpkg.com/@spinnaker/kayenta/-/kayenta-0.0.42.tgz#b859690a70e8cd7b6ef04ed311ee84d0615e20d1"
+"@spinnaker/kayenta@0.0.45":
+  version "0.0.45"
+  resolved "https://registry.yarnpkg.com/@spinnaker/kayenta/-/kayenta-0.0.45.tgz#f6444e06374b26c8692a9e2aca41427c55668529"
   dependencies:
     "@fortawesome/fontawesome-free-webfonts" "^1.0.4"
     "@types/plotly.js" "^1.28.12"
@@ -91,6 +91,7 @@
     angular-ui-router "1.0.0"
     angular-ui-sortable "^0.17.0"
     bootstrap "3.3.7"
+    cachefactory "^3.0.0"
     chart.js "^2.7.0"
     class-autobind-decorator "^2.2.1"
     classnames "^2.2.5"
