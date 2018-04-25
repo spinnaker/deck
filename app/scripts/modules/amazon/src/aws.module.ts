@@ -1,6 +1,6 @@
 import { module } from 'angular';
 
-import { CLOUD_PROVIDER_REGISTRY, CloudProviderRegistry, DeploymentStrategyRegistry } from '@spinnaker/core';
+import { CloudProviderRegistry, DeploymentStrategyRegistry } from '@spinnaker/core';
 
 import { AWS_LOAD_BALANCER_MODULE } from './loadBalancer/loadBalancer.module';
 import { AWS_REACT_MODULE } from './reactShims/aws.react.module';
@@ -12,7 +12,7 @@ import { SUBNET_RENDERER } from './subnet/subnet.renderer';
 import { SERVER_GROUP_DETAILS_MODULE } from './serverGroup/details/serverGroupDetails.module';
 import { SERVER_GROUP_CONFIGURE_MODULE } from './serverGroup/configure/serverGroup.configure.aws.module';
 import { COMMON_MODULE } from './common/common.module';
-import { AMAZON_HELP } from './help/amazon.help';
+import './help/amazon.help';
 
 import { AmazonLoadBalancerClusterContainer } from './loadBalancer/AmazonLoadBalancerClusterContainer';
 import { AmazonLoadBalancersTag } from './loadBalancer/AmazonLoadBalancersTag';
@@ -49,8 +49,6 @@ templates.keys().forEach(function(key) {
 export const AMAZON_MODULE = 'spinnaker.amazon';
 module(AMAZON_MODULE, [
   AWS_REACT_MODULE,
-  CLOUD_PROVIDER_REGISTRY,
-  AMAZON_HELP,
   AMAZON_APPLICATION_NAME_VALIDATOR,
   require('./pipeline/stages/bake/awsBakeStage').name,
   require('./pipeline/stages/cloneServerGroup/awsCloneServerGroupStage').name,
@@ -80,8 +78,8 @@ module(AMAZON_MODULE, [
   require('./image/image.reader').name,
   require('./cache/cacheConfigurer.service').name,
   require('./search/searchResultFormatter').name,
-]).config((cloudProviderRegistryProvider: CloudProviderRegistry) => {
-  cloudProviderRegistryProvider.registerProvider('aws', {
+]).config(() => {
+  CloudProviderRegistry.registerProvider('aws', {
     name: 'Amazon',
     logo: {
       path: require('./logo/amazon.logo.svg'),

@@ -2,8 +2,9 @@ import { Spinner } from 'core';
 import * as React from 'react';
 import { Subject, Observable } from 'rxjs';
 
+import { CloudProviderRegistry } from 'core/cloudProvider';
 import { ReactInjector, AngularJSAdapter } from 'core/reactShims';
-import { IAccountDetails } from 'core/account';
+import { AccountService, IAccountDetails } from 'core/account/AccountService';
 
 export interface IOverridableProps {
   accountId?: string;
@@ -60,7 +61,6 @@ export function overridableComponent<P extends IOverridableProps, T extends Reac
     constructor(props: P) {
       super(props);
 
-      const { accountService } = ReactInjector;
       let constructing = true;
 
       this.account$
@@ -69,7 +69,7 @@ export function overridableComponent<P extends IOverridableProps, T extends Reac
             return Observable.of(null);
           }
 
-          return accountService.accounts$.map(accts => accts.find(acct => acct.name === accountName));
+          return AccountService.accounts$.map(accts => accts.find(acct => acct.name === accountName));
         })
         .map((accountDetails: IAccountDetails) => this.getComponent(accountDetails))
         .takeUntil(this.destroy$)
@@ -100,19 +100,18 @@ export function overridableComponent<P extends IOverridableProps, T extends Reac
 
     private getComponentFromCloudProvider(accountDetails: IAccountDetails): T {
       const { cloudProvider, skin } = accountDetails;
-      const { cloudProviderRegistry } = ReactInjector;
       if (!cloudProvider) {
         return null;
       }
 
-      const CloudProviderComponentOverride = cloudProviderRegistry.getValue(cloudProvider, key, skin);
+      const CloudProviderComponentOverride = CloudProviderRegistry.getValue(cloudProvider, key, skin);
       if (CloudProviderComponentOverride) {
         return CloudProviderComponentOverride as T;
       }
 
-      const cloudProviderTemplateOverride = cloudProviderRegistry.getValue(cloudProvider, key + 'TemplateUrl', skin);
+      const cloudProviderTemplateOverride = CloudProviderRegistry.getValue(cloudProvider, key + 'TemplateUrl', skin);
       if (cloudProviderTemplateOverride) {
-        const cloudProviderController = cloudProviderRegistry.getValue(cloudProvider, key + 'Controller', skin);
+        const cloudProviderController = CloudProviderRegistry.getValue(cloudProvider, key + 'Controller', skin);
         const controllerAs = cloudProviderController && cloudProviderController.includes(' as ') ? undefined : 'ctrl';
         const Component = (props: any) => (
           <AngularJSAdapter

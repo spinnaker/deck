@@ -1,10 +1,10 @@
 import { module } from 'angular';
 
-import { CLOUD_PROVIDER_REGISTRY, CloudProviderRegistry, DeploymentStrategyRegistry } from '@spinnaker/core';
+import { CloudProviderRegistry, DeploymentStrategyRegistry } from '@spinnaker/core';
 
 import { TITUS_MIGRATION_CONFIG_COMPONENT } from './migration/titusMigrationConfig.component';
 import { TITUS_APPLICATION_NAME_VALIDATOR } from './validation/applicationName.validator';
-import { TITUS_HELP } from './help/titus.help';
+import './help/titus.help';
 import { TITUS_REACT_MODULE } from './reactShims/titus.react.module';
 
 import { AmazonLoadBalancersTag } from '@spinnaker/amazon';
@@ -20,7 +20,6 @@ templates.keys().forEach(function(key) {
 export const TITUS_MODULE = 'spinnaker.titus';
 module(TITUS_MODULE, [
   TITUS_REACT_MODULE,
-  CLOUD_PROVIDER_REGISTRY,
   require('./securityGroup/securityGroup.read.service').name,
   require('./serverGroup/details/serverGroupDetails.titus.controller.js').name,
   require('./serverGroup/configure/ServerGroupCommandBuilder.js').name,
@@ -29,7 +28,6 @@ module(TITUS_MODULE, [
   require('./serverGroup/serverGroup.transformer.js').name,
   require('./instance/details/instance.details.controller.js').name,
   TITUS_APPLICATION_NAME_VALIDATOR,
-  TITUS_HELP,
   require('./pipeline/stages/findAmi/titusFindAmiStage.js').name,
   require('./pipeline/stages/runJob/titusRunJobStage.js').name,
   require('./pipeline/stages/enableAsg/titusEnableAsgStage.js').name,
@@ -42,8 +40,8 @@ module(TITUS_MODULE, [
   require('./pipeline/stages/shrinkCluster/titusShrinkClusterStage.js').name,
   require('./pipeline/stages/scaleDownCluster/titusScaleDownClusterStage.js').name,
   TITUS_MIGRATION_CONFIG_COMPONENT,
-]).config((cloudProviderRegistryProvider: CloudProviderRegistry) => {
-  cloudProviderRegistryProvider.registerProvider('titus', {
+]).config(() => {
+  CloudProviderRegistry.registerProvider('titus', {
     name: 'Titus',
     logo: {
       path: require('./logo/titus.logo.png'),

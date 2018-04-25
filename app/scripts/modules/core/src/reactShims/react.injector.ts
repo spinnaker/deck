@@ -1,18 +1,13 @@
 import { IQService, IRootScopeService, IScope } from 'angular';
 import IInjectorService = angular.auto.IInjectorService;
 
-import { IModalService } from 'angular-ui-bootstrap';
 import { StateParams, StateService, UIRouter } from '@uirouter/core';
 import { ApplicationDataSourceRegistry } from 'core/application/service/applicationDataSource.registry';
 
-import { AccountService } from '../account/account.service';
-import { Api } from '../api/api.service';
 import { ApplicationModelBuilder } from '../application/applicationModel.builder';
 import { ApplicationReader } from '../application/service/application.read.service';
-import { AuthenticationService } from '../authentication/authentication.service';
 import { CacheInitializerService } from '../cache/cacheInitializer.service';
 import { CancelModalService } from '../cancelModal/cancelModal.service';
-import { CloudProviderRegistry } from '../cloudProvider/cloudProvider.registry';
 import { ConfirmationModalService } from '../confirmationModal/confirmationModal.service';
 import { EntityTagWriter } from '../entityTag';
 import { ExecutionDetailsSectionService } from 'core/pipeline/details/executionDetailsSection.service';
@@ -78,15 +73,11 @@ export class CoreReactInject extends ReactInject {
   public get $rootScope() { return this.$injector.get('$rootScope') as IScope; }
   public get $stateParams() { return this.$injector.get('$stateParams') as StateParams; }
   public get $uiRouter() { return this.$injector.get('$uiRouter') as UIRouter; }
-  public get API() { return this.$injector.get('API') as Api; }
-  public get accountService() { return this.$injector.get('accountService') as AccountService; }
   public get applicationDataSourceRegistry() { return this.$injector.get('applicationDataSourceRegistry') as ApplicationDataSourceRegistry; }
   public get applicationModelBuilder() { return this.$injector.get('applicationModelBuilder') as ApplicationModelBuilder; }
   public get applicationReader() { return this.$injector.get('applicationReader') as ApplicationReader; }
-  public get authenticationService() { return this.$injector.get('authenticationService') as AuthenticationService; }
   public get cacheInitializer() { return this.$injector.get('cacheInitializer') as CacheInitializerService; }
   public get cancelModalService() { return this.$injector.get('cancelModalService') as CancelModalService; }
-  public get cloudProviderRegistry() { return this.$injector.get('cloudProviderRegistry') as CloudProviderRegistry; }
   public get confirmationModalService() { return this.$injector.get('confirmationModalService') as ConfirmationModalService; }
   public get entityTagWriter() { return this.$injector.get('entityTagWriter') as EntityTagWriter; }
   public get executionDetailsSectionService() { return this.$injector.get('executionDetailsSectionService') as ExecutionDetailsSectionService; }
@@ -100,7 +91,6 @@ export class CoreReactInject extends ReactInject {
   public get insightFilterStateModel() { return this.$injector.get('insightFilterStateModel') as InsightFilterStateModel; }
   public get loadBalancerWriter() { return this.$injector.get('loadBalancerWriter') as LoadBalancerWriter; }
   public get manualJudgmentService() { return this.$injector.get('manualJudgmentService') as ManualJudgmentService; }
-  public get modalService(): IModalService { return this.$injector.get('$uibModal') as IModalService; }
   public get notifierService() { return this.$injector.get('notifierService') as NotifierService; }
   public get overrideRegistry() { return this.$injector.get('overrideRegistry') as OverrideRegistry; }
   public get pagerDutyReader() { return this.$injector.get('pagerDutyReader') as PagerDutyReader; }

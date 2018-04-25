@@ -4,8 +4,7 @@ const angular = require('angular');
 import _ from 'lodash';
 
 import {
-  ACCOUNT_SERVICE,
-  CLOUD_PROVIDER_REGISTRY,
+  CloudProviderRegistry,
   CONFIRMATION_MODAL_SERVICE,
   SECURITY_GROUP_READER,
   SECURITY_GROUP_WRITER,
@@ -15,29 +14,25 @@ import {
 module.exports = angular
   .module('spinnaker.securityGroup.kubernetes.details.controller', [
     require('@uirouter/angularjs').default,
-    ACCOUNT_SERVICE,
     SECURITY_GROUP_READER,
     SECURITY_GROUP_WRITER,
     CONFIRMATION_MODAL_SERVICE,
-    CLOUD_PROVIDER_REGISTRY,
   ])
   .controller('kubernetesSecurityGroupDetailsController', function(
     $scope,
     $state,
     resolvedSecurityGroup,
-    accountService,
     app,
     confirmationModalService,
     securityGroupWriter,
     securityGroupReader,
     $uibModal,
-    cloudProviderRegistry,
   ) {
     const application = app;
     const securityGroup = resolvedSecurityGroup;
 
     // needed for standalone instances
-    $scope.detailsTemplateUrl = cloudProviderRegistry.getValue('kubernetes', 'securityGroup.detailsTemplateUrl');
+    $scope.detailsTemplateUrl = CloudProviderRegistry.getValue('kubernetes', 'securityGroup.detailsTemplateUrl');
 
     $scope.state = {
       loading: true,
