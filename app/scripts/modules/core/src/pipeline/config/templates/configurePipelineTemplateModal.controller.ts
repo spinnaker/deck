@@ -109,14 +109,12 @@ export class ConfigurePipelineTemplateModalController implements IController {
   }
 
   public buildConfig(): IPipelineTemplateConfig {
-    let inheritConfig = [];
-    if (this.state.inheritTemplateParameters) {
-      inheritConfig.push('parameters');
-    } else if (this.state.inheritTemplateExpectedArtifacts) {
-      inheritConfig.push('expectedArtifacts');
-    } else if (this.state.inheritTemplateTriggers) {
-      inheritConfig.push('triggers');
-    }
+    const inheritConfig = [
+      ...(this.state.inheritTemplateParameters ? ['parameters'] : []),
+      ...(this.state.inheritTemplateExpectedArtifacts ? ['expectedArtifacts'] : []),
+      ...(this.state.inheritTemplateTriggers ? ['triggers'] : []),
+    ];
+
     return {
       ...(this.pipelineTemplateConfig || {}),
       type: 'templatedPipeline',
