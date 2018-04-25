@@ -2,14 +2,14 @@
 
 const angular = require('angular');
 
-import { ACCOUNT_SERVICE } from 'core/account/account.service';
-import { CLOUD_PROVIDER_REGISTRY } from 'core/cloudProvider/cloudProvider.registry';
+import { AccountService } from 'core/account/AccountService';
+import { CloudProviderRegistry } from 'core/cloudProvider';
 
 import './providerSelection.modal.less';
 
 module.exports = angular
-  .module('spinnaker.providerSelection.directive', [ACCOUNT_SERVICE, CLOUD_PROVIDER_REGISTRY])
-  .directive('providerSelector', function(accountService, $q) {
+  .module('spinnaker.providerSelection.directive', [])
+  .directive('providerSelector', function($q) {
     return {
       restrict: 'E',
       scope: {
@@ -21,7 +21,7 @@ module.exports = angular
       templateUrl: require('./providerSelector.html'),
       link: function(scope) {
         scope.initialized = false;
-        var getProviderList = scope.providers ? $q.when(scope.providers.sort()) : accountService.listProviders();
+        var getProviderList = scope.providers ? $q.when(scope.providers.sort()) : AccountService.listProviders();
         getProviderList.then(function(providers) {
           scope.initialized = true;
           if (!providers.length) {
@@ -38,13 +38,13 @@ module.exports = angular
       },
     };
   })
-  .controller('ProviderSelectCtrl', function($scope, $uibModalInstance, cloudProviderRegistry, providerOptions) {
+  .controller('ProviderSelectCtrl', function($scope, $uibModalInstance, providerOptions) {
     $scope.command = {
       provider: '',
     };
 
     $scope.getImage = function(provider) {
-      return cloudProviderRegistry.getValue(provider, 'logo.path');
+      return CloudProviderRegistry.getValue(provider, 'logo.path');
     };
 
     $scope.providerOptions = providerOptions;

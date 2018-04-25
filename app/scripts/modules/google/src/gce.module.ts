@@ -1,13 +1,13 @@
 import { module } from 'angular';
 
-import { CLOUD_PROVIDER_REGISTRY, DeploymentStrategyRegistry, CloudProviderRegistry } from '@spinnaker/core';
+import { CloudProviderRegistry, DeploymentStrategyRegistry } from '@spinnaker/core';
 
 import { GCE_LOAD_BALANCER_CHOICE_MODAL } from './loadBalancer/configure/choice/gceLoadBalancerChoice.modal';
 import { GCE_INTERNAL_LOAD_BALANCER_CTRL } from './loadBalancer/configure/internal/gceCreateInternalLoadBalancer.controller';
 import { GCE_SSL_LOAD_BALANCER_CTRL } from './loadBalancer/configure/ssl/gceCreateSslLoadBalancer.controller';
 import { GCE_TCP_LOAD_BALANCER_CTRL } from './loadBalancer/configure/tcp/gceCreateTcpLoadBalancer.controller';
 import { LOAD_BALANCER_SET_TRANSFORMER } from './loadBalancer/loadBalancer.setTransformer';
-import { GCE_HELP } from './help/gce.help';
+import './help/gce.help';
 
 import './logo/gce.logo.less';
 
@@ -19,13 +19,11 @@ templates.keys().forEach(function(key) {
 
 export const GOOGLE_MODULE = 'spinnaker.gce';
 module(GOOGLE_MODULE, [
-  CLOUD_PROVIDER_REGISTRY,
   LOAD_BALANCER_SET_TRANSFORMER,
   GCE_INTERNAL_LOAD_BALANCER_CTRL,
   GCE_LOAD_BALANCER_CHOICE_MODAL,
   GCE_SSL_LOAD_BALANCER_CTRL,
   GCE_TCP_LOAD_BALANCER_CTRL,
-  GCE_HELP,
   require('./serverGroup/details/serverGroup.details.gce.module.js').name,
   require('./serverGroup/configure/serverGroupCommandBuilder.service.js').name,
   require('./serverGroup/configure/wizard/cloneServerGroup.gce.controller.js').name,
@@ -61,8 +59,8 @@ module(GOOGLE_MODULE, [
   require('./image/image.reader.js').name,
   require('./cache/cacheConfigurer.service.js').name,
   require('./common/xpnNaming.gce.service.js').name,
-]).config((cloudProviderRegistryProvider: CloudProviderRegistry) => {
-  cloudProviderRegistryProvider.registerProvider('gce', {
+]).config(() => {
+  CloudProviderRegistry.registerProvider('gce', {
     name: 'Google',
     logo: {
       path: require('./logo/gce.logo.png'),

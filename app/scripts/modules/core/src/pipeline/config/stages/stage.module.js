@@ -2,8 +2,8 @@
 
 const angular = require('angular');
 
-import { ACCOUNT_SERVICE } from 'core/account/account.service';
-import { API_SERVICE } from 'core/api/api.service';
+import { AccountService } from 'core/account/AccountService';
+import { API } from 'core/api';
 import { BASE_EXECUTION_DETAILS_CTRL } from './core/baseExecutionDetails.controller';
 import { CONFIRMATION_MODAL_SERVICE } from 'core/confirmationModal/confirmationModal.service';
 import { EDIT_STAGE_JSON_CONTROLLER } from './core/editStageJson.controller';
@@ -13,8 +13,6 @@ import { PIPELINE_BAKE_STAGE_CHOOSE_OS } from 'core/pipeline/config/stages/bake/
 
 module.exports = angular
   .module('spinnaker.core.pipeline.config.stage', [
-    ACCOUNT_SERVICE,
-    API_SERVICE,
     BASE_EXECUTION_DETAILS_CTRL,
     EDIT_STAGE_JSON_CONTROLLER,
     PIPELINE_CONFIG_PROVIDER,
@@ -52,7 +50,6 @@ module.exports = angular
     $uibModal,
     pipelineConfigService,
     pipelineConfig,
-    accountService,
   ) {
     var lastStageScope;
 
@@ -61,7 +58,7 @@ module.exports = angular
       selectedStageType: null,
     };
 
-    accountService.applicationAccounts($scope.application).then(accounts => {
+    AccountService.applicationAccounts($scope.application).then(accounts => {
       $scope.options.stageTypes = pipelineConfig.getConfigurableStageTypes(accounts);
       $scope.showProviders = new Set(accounts.map(a => a.cloudProvider)).size > 1;
     });
@@ -230,7 +227,7 @@ module.exports = angular
     $scope.$watch('viewState.stageIndex', this.selectStage);
     $scope.$watch('stage.refId', this.selectStage);
   })
-  .controller('RestartStageCtrl', function($scope, $stateParams, $http, API, confirmationModalService) {
+  .controller('RestartStageCtrl', function($scope, $stateParams, $http, confirmationModalService) {
     var restartStage = function() {
       return API.one('pipelines')
         .one($stateParams.executionId)

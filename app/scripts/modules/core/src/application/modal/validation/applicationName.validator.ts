@@ -1,6 +1,6 @@
 import { module } from 'angular';
-import { CLOUD_PROVIDER_REGISTRY, CloudProviderRegistry } from 'core/cloudProvider/cloudProvider.registry';
-import { ACCOUNT_SERVICE, AccountService } from 'core/account/account.service';
+import { CloudProviderRegistry } from 'core/cloudProvider';
+import { AccountService } from 'core/account/AccountService';
 
 export interface IApplicationNameValidationMessage {
   cloudProvider?: string;
@@ -28,17 +28,13 @@ export interface IApplicationNameValidator {
 export class ApplicationNameValidator {
   private providerMap: Map<string, IApplicationNameValidator[]> = new Map<string, IApplicationNameValidator[]>();
 
-  public constructor(private cloudProviderRegistry: CloudProviderRegistry, private accountService: AccountService) {
-    'ngInject';
-  }
-
   /**
    * Registers a validator for a cloud provider.
    * @param cloudProvider the key of the cloud provider, e.g. "aws", "gce"
    * @param validator the actual validator
    */
   public registerValidator(cloudProvider: string, validator: IApplicationNameValidator) {
-    if (this.cloudProviderRegistry.getProvider(cloudProvider)) {
+    if (CloudProviderRegistry.getProvider(cloudProvider)) {
       if (!this.providerMap.has(cloudProvider)) {
         this.providerMap.set(cloudProvider, []);
       }
@@ -54,7 +50,7 @@ export class ApplicationNameValidator {
    * @returns {{errors: Array, warnings: Array}}
    */
   public validate(applicationName: string, providersToTest: string[]): ng.IPromise<IApplicationNameValidationResult> {
-    return this.accountService.listProviders().then((availableProviders: string[]) => {
+    return AccountService.listProviders().then((availableProviders: string[]) => {
       const toCheck = providersToTest && providersToTest.length ? providersToTest : availableProviders;
 
       const errors: IApplicationNameValidationMessage[] = [],
@@ -76,7 +72,4 @@ export class ApplicationNameValidator {
 
 export const APPLICATION_NAME_VALIDATOR = 'spinnaker.core.application.name.validator';
 
-module(APPLICATION_NAME_VALIDATOR, [CLOUD_PROVIDER_REGISTRY, ACCOUNT_SERVICE]).service(
-  'applicationNameValidator',
-  ApplicationNameValidator,
-);
+module(APPLICATION_NAME_VALIDATOR, []).service('applicationNameValidator', ApplicationNameValidator);

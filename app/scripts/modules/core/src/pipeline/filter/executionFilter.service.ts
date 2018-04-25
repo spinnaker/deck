@@ -5,10 +5,10 @@ import { Subject } from 'rxjs';
 import * as moment from 'moment';
 
 import { Application } from 'core/application/application.model';
-import { EXECUTION_FILTER_MODEL, ExecutionFilterModel } from 'core/pipeline';
 import { IExecution, IExecutionGroup, IPipeline } from 'core/domain';
-import { FILTER_MODEL_SERVICE, ISortFilter } from 'core/filterModel';
+import { FilterModelService, ISortFilter } from 'core/filterModel';
 import { PIPELINE_CONFIG_PROVIDER, PipelineConfigProvider } from 'core/pipeline/config/pipelineConfigProvider';
+import { ExecutionState } from 'core/state';
 
 const boundaries = [
   { name: 'Today', after: () => moment().startOf('day') },
@@ -38,14 +38,9 @@ export class ExecutionFilterService {
   private lastApplication: Application = null;
   private isFilterable: (sortFilterModel: { [key: string]: boolean }) => boolean;
 
-  constructor(
-    private executionFilterModel: ExecutionFilterModel,
-    private $log: ILogService,
-    private filterModelService: any,
-    private pipelineConfig: PipelineConfigProvider,
-  ) {
+  constructor(private $log: ILogService, private pipelineConfig: PipelineConfigProvider) {
     'ngInject';
-    this.isFilterable = filterModelService.isFilterable;
+    this.isFilterable = FilterModelService.isFilterable;
   }
 
   private groupByTimeBoundary(executions: IExecution[]): { [boundaryName: string]: IExecution[] } {
@@ -74,15 +69,15 @@ export class ExecutionFilterService {
     const groups = this.groupExecutions(filtered, application);
     this.applyGroupsToModel(groups);
 
-    this.executionFilterModel.asFilterModel.addTags();
+    ExecutionState.filterModel.asFilterModel.addTags();
     this.lastApplication = application;
     this.groupsUpdatedStream.next(groups);
   }
 
   private pipelineNameFilter(execution: IExecution): boolean {
-    const sortFilter: ISortFilter = this.executionFilterModel.asFilterModel.sortFilter;
+    const sortFilter: ISortFilter = ExecutionState.filterModel.asFilterModel.sortFilter;
     if (this.isFilterable(sortFilter.pipeline)) {
-      const checkedPipelineNames = this.filterModelService.getCheckValues(sortFilter.pipeline);
+      const checkedPipelineNames = FilterModelService.getCheckValues(sortFilter.pipeline);
       return includes(checkedPipelineNames, execution.name);
     } else {
       return true;
@@ -127,7 +122,7 @@ export class ExecutionFilterService {
   }
 
   private textFilter(execution: IExecution): boolean {
-    const filter = this.executionFilterModel.asFilterModel.sortFilter.filter.toLowerCase();
+    const filter = ExecutionState.filterModel.asFilterModel.sortFilter.filter.toLowerCase();
     if (!filter) {
       return true;
     }
@@ -136,9 +131,9 @@ export class ExecutionFilterService {
   }
 
   private statusFilter(execution: IExecution): boolean {
-    const sortFilter: ISortFilter = this.executionFilterModel.asFilterModel.sortFilter;
+    const sortFilter: ISortFilter = ExecutionState.filterModel.asFilterModel.sortFilter;
     if (this.isFilterable(sortFilter.status)) {
-      const checkedStatus = this.filterModelService.getCheckValues(sortFilter.status);
+      const checkedStatus = FilterModelService.getCheckValues(sortFilter.status);
       return includes(checkedStatus, execution.status);
     } else {
       return true;
@@ -155,7 +150,7 @@ export class ExecutionFilterService {
 
   private addEmptyPipelines(groups: IExecutionGroup[], application: Application): void {
     const configs = application.pipelineConfigs.data || [];
-    const sortFilter: ISortFilter = this.executionFilterModel.asFilterModel.sortFilter;
+    const sortFilter: ISortFilter = ExecutionState.filterModel.asFilterModel.sortFilter;
     if (!this.isFilterable(sortFilter.pipeline) && !this.isFilterable(sortFilter.status) && !sortFilter.filter) {
       configs.filter((config: any) => !groups[config.name]).forEach((config: any) =>
         groups.push({
@@ -214,7 +209,7 @@ export class ExecutionFilterService {
       }
     });
 
-    const sortFilter: ISortFilter = this.executionFilterModel.asFilterModel.sortFilter;
+    const sortFilter: ISortFilter = ExecutionState.filterModel.asFilterModel.sortFilter;
 
     if (sortFilter.groupBy === 'name') {
       const executionGroups = groupBy(executions, 'name');
@@ -312,16 +307,16 @@ export class ExecutionFilterService {
   }
 
   private applyGroupsToModel(groups: IExecutionGroup[]): void {
-    this.diffExecutionGroups(this.executionFilterModel.asFilterModel.groups, groups);
+    this.diffExecutionGroups(ExecutionState.filterModel.asFilterModel.groups, groups);
 
     // sort groups in place so Angular doesn't try to update the world
-    this.executionFilterModel.asFilterModel.groups.sort((a: IExecutionGroup, b: IExecutionGroup) =>
+    ExecutionState.filterModel.asFilterModel.groups.sort((a: IExecutionGroup, b: IExecutionGroup) =>
       this.executionGroupSorter(a, b),
     );
   }
 
   public executionGroupSorter(a: IExecutionGroup, b: IExecutionGroup): number {
-    if (this.executionFilterModel.asFilterModel.sortFilter.groupBy === 'timeBoundary') {
+    if (ExecutionState.filterModel.asFilterModel.sortFilter.groupBy === 'timeBoundary') {
       return b.executions[0].startTime - a.executions[0].startTime;
     }
     if (a.config && b.config) {
@@ -359,14 +354,13 @@ export class ExecutionFilterService {
   }
 
   public clearFilters(): void {
-    this.executionFilterModel.asFilterModel.clearFilters();
-    this.executionFilterModel.asFilterModel.applyParamsToUrl();
+    ExecutionState.filterModel.asFilterModel.clearFilters();
+    ExecutionState.filterModel.asFilterModel.applyParamsToUrl();
   }
 }
 
 export const EXECUTION_FILTER_SERVICE = 'spinnaker.core.pipeline.filter.executionFilter.service';
-module(EXECUTION_FILTER_SERVICE, [EXECUTION_FILTER_MODEL, FILTER_MODEL_SERVICE, PIPELINE_CONFIG_PROVIDER]).factory(
+module(EXECUTION_FILTER_SERVICE, [PIPELINE_CONFIG_PROVIDER]).factory(
   'executionFilterService',
-  (executionFilterModel: ExecutionFilterModel, $log: ILogService, filterModelService: any, pipelineConfig: any) =>
-    new ExecutionFilterService(executionFilterModel, $log, filterModelService, pipelineConfig),
+  ($log: ILogService, pipelineConfig: any) => new ExecutionFilterService($log, pipelineConfig),
 );

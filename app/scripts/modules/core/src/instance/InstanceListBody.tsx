@@ -7,6 +7,7 @@ import { IServerGroup, IInstance, ILoadBalancerHealth } from 'core/domain';
 import { ReactInjector } from 'core/reactShims';
 import { timestamp } from 'core/utils/timeFormatters';
 import { Tooltip } from 'core/presentation';
+import { ClusterState } from 'core/state';
 
 export interface IInstanceListBodyProps {
   serverGroup: IServerGroup;
@@ -23,8 +24,7 @@ export interface IInstanceListBodyState {
 
 @BindAll()
 export class InstanceListBody extends React.Component<IInstanceListBodyProps, IInstanceListBodyState> {
-  private clusterFilterModel = ReactInjector.clusterFilterModel.asFilterModel;
-  private MultiselectModel = ReactInjector.MultiselectModel;
+  private clusterFilterModel = ClusterState.filterModel.asFilterModel;
   private $uiRouter = ReactInjector.$uiRouter;
   private $state = ReactInjector.$state;
   private destroy$ = new Subject();
@@ -39,7 +39,7 @@ export class InstanceListBody extends React.Component<IInstanceListBodyProps, II
   }
 
   public componentDidMount() {
-    this.MultiselectModel.instancesStream.takeUntil(this.destroy$).subscribe(() => {
+    ClusterState.multiselectModel.instancesStream.takeUntil(this.destroy$).subscribe(() => {
       this.setState({ selectedInstanceIds: this.getSelectedInstanceIds() });
     });
 
@@ -58,7 +58,7 @@ export class InstanceListBody extends React.Component<IInstanceListBodyProps, II
   private getSelectedInstanceIds(): string[] {
     const { instances, serverGroup } = this.props;
     if (this.clusterFilterModel.sortFilter.multiselect) {
-      return instances.filter(i => this.MultiselectModel.instanceIsSelected(serverGroup, i.id)).map(i => i.id);
+      return instances.filter(i => ClusterState.multiselectModel.instanceIsSelected(serverGroup, i.id)).map(i => i.id);
     }
     return [];
   }
@@ -217,7 +217,7 @@ export class InstanceListBody extends React.Component<IInstanceListBodyProps, II
     if (!targetRow) {
       return;
     }
-    this.MultiselectModel.toggleInstance(this.props.serverGroup, targetRow.getAttribute('data-instance-id'));
+    ClusterState.multiselectModel.toggleInstance(this.props.serverGroup, targetRow.getAttribute('data-instance-id'));
     event.stopPropagation();
   }
 

@@ -1,26 +1,17 @@
-import { module } from 'angular';
-import { FilterModelService } from 'core/filterModel/filter.model.service';
 import { chain, find, forOwn, groupBy, map, sortBy } from 'lodash';
 import { Subject } from 'rxjs';
 import { BindAll } from 'lodash-decorators';
 
 import { Application } from 'core/application/application.model';
 import { ISecurityGroup, ISecurityGroupGroup } from 'core/domain';
-import { SECURITY_GROUP_FILTER_MODEL, SecurityGroupFilterModel } from './securityGroupFilter.model';
-import { FILTER_MODEL_SERVICE } from 'core/filterModel';
+import { FilterModelService } from 'core/filterModel';
+import { SecurityGroupState } from 'core/state';
 
 @BindAll()
 export class SecurityGroupFilterService {
   public groupsUpdatedStream: Subject<ISecurityGroupGroup[]> = new Subject<ISecurityGroupGroup[]>();
 
   private lastApplication: Application;
-
-  constructor(
-    private securityGroupFilterModel: SecurityGroupFilterModel,
-    private filterModelService: FilterModelService,
-  ) {
-    'ngInject';
-  }
 
   private addSearchFields(securityGroup: ISecurityGroup): void {
     if (!securityGroup.searchField) {
@@ -38,7 +29,7 @@ export class SecurityGroupFilterService {
   }
 
   private checkSearchTextFilter(securityGroup: ISecurityGroup): boolean {
-    const filter = this.securityGroupFilterModel.asFilterModel.sortFilter.filter;
+    const filter = SecurityGroupState.filterModel.asFilterModel.sortFilter.filter;
     if (!filter) {
       return true;
     }
@@ -54,9 +45,14 @@ export class SecurityGroupFilterService {
     });
   }
 
+  public clearFilters(): void {
+    SecurityGroupState.filterModel.asFilterModel.clearFilters();
+    SecurityGroupState.filterModel.asFilterModel.applyParamsToUrl();
+  }
+
   public filterSecurityGroupsForDisplay(securityGroups: ISecurityGroup[]): ISecurityGroup[] {
-    const service = this.filterModelService;
-    const model = this.securityGroupFilterModel.asFilterModel;
+    const service = FilterModelService;
+    const model = SecurityGroupState.filterModel.asFilterModel;
     return chain(securityGroups)
       .filter(sg => this.checkSearchTextFilter(sg))
       .filter(sg => service.checkAccountFilters(model)(sg))
@@ -68,7 +64,7 @@ export class SecurityGroupFilterService {
   }
 
   public sortGroupsByHeading(groups: ISecurityGroupGroup[]): void {
-    const currentGroups: ISecurityGroupGroup[] = this.securityGroupFilterModel.asFilterModel.groups;
+    const currentGroups: ISecurityGroupGroup[] = SecurityGroupState.filterModel.asFilterModel.groups;
     this.diffSubgroups(currentGroups, groups);
 
     // sort groups in place so Angular doesn't try to update the world
@@ -149,14 +145,8 @@ export class SecurityGroupFilterService {
     });
 
     this.sortGroupsByHeading(groups);
-    this.securityGroupFilterModel.asFilterModel.addTags();
+    SecurityGroupState.filterModel.asFilterModel.addTags();
     this.lastApplication = application;
     this.groupsUpdatedStream.next(groups);
   }
 }
-
-export const SECURITY_GROUP_FILTER_SERVICE = 'spinnaker.core.securityGroup.filter.service';
-module(SECURITY_GROUP_FILTER_SERVICE, [SECURITY_GROUP_FILTER_MODEL, FILTER_MODEL_SERVICE]).service(
-  'securityGroupFilterService',
-  SecurityGroupFilterService,
-);

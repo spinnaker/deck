@@ -1,12 +1,12 @@
-import { IAngularEvent, IRootScopeService, module } from 'angular';
 import { Ng1StateDeclaration, StateParams } from '@uirouter/angularjs';
 import { extend } from 'lodash';
 import { Subject } from 'rxjs';
+import { $rootScope } from 'ngimport';
 
 import { ICache, ViewStateCache } from 'core/cache';
 import { IExecutionGroup } from 'core/domain';
 import { IFilterConfig, IFilterModel } from 'core/filterModel/IFilterModel';
-import { FILTER_MODEL_SERVICE } from 'core/filterModel';
+import { FilterModelService } from 'core/filterModel';
 import { UrlParser } from 'core/navigation/urlParser';
 
 export const filterModelConfig: IFilterConfig[] = [
@@ -33,24 +33,20 @@ export class ExecutionFilterModel {
   // mechanism for now.
   public expandSubject: Subject<boolean> = new Subject<boolean>();
 
-  constructor($rootScope: IRootScopeService, filterModelService: any) {
-    'ngInject';
+  constructor() {
     this.configViewStateCache = ViewStateCache.createCache('executionFilters', {
-      version: 1,
-      maxAge: 180 * 24 * 60 * 60 * 1000,
+      version: 2,
+      maxAge: 14 * 24 * 60 * 60 * 1000,
     });
-    this.groupCount = this.getCachedViewState().count;
-    this.groupBy = this.getCachedViewState().groupBy;
-    this.showStageDuration = this.getCachedViewState().showStageDuration;
 
-    this.asFilterModel = filterModelService.configureFilterModel(this, filterModelConfig);
+    this.asFilterModel = FilterModelService.configureFilterModel(this as any, filterModelConfig);
 
     let mostRecentParams: any = null;
     // WHY??? Because, when the stateChangeStart event fires, the $location.search() will return whatever the query
     // params are on the route we are going to, so if the user is using the back button, for example, to go to the
     // Infrastructure page with a search already entered, we'll pick up whatever search was entered there, and if we
     // come back to this application's clusters view, we'll get whatever that search was.
-    $rootScope.$on('$locationChangeStart', (_event: IAngularEvent, toUrl: string, fromUrl: string) => {
+    $rootScope.$on('$locationChangeStart', (_event, toUrl: string, fromUrl: string) => {
       const [oldBase, oldQuery] = fromUrl.split('?'),
         [newBase, newQuery] = toUrl.split('?');
 
@@ -64,7 +60,7 @@ export class ExecutionFilterModel {
     $rootScope.$on(
       '$stateChangeStart',
       (
-        _event: IAngularEvent,
+        _event,
         toState: Ng1StateDeclaration,
         _toParams: StateParams,
         fromState: Ng1StateDeclaration,
@@ -78,7 +74,11 @@ export class ExecutionFilterModel {
 
     $rootScope.$on(
       '$stateChangeSuccess',
-      (_event: IAngularEvent, toState: Ng1StateDeclaration, toParams: StateParams, fromState: Ng1StateDeclaration) => {
+      (_event, toState: Ng1StateDeclaration, toParams: StateParams, fromState: Ng1StateDeclaration) => {
+        if (this.movingToExecutionsState(toState)) {
+          this.mostRecentApplication = toParams.application;
+          this.assignViewStateFromCache();
+        }
         if (this.movingToExecutionsState(toState) && this.isExecutionStateOrChild(fromState.name)) {
           this.asFilterModel.applyParamsToUrl();
           return;
@@ -122,18 +122,30 @@ export class ExecutionFilterModel {
     this.asFilterModel.activate();
   }
 
+  private assignViewStateFromCache(): void {
+    const viewState = this.getCachedViewState();
+    this.groupCount = viewState.count;
+    this.groupBy = viewState.groupBy;
+    this.showStageDuration = viewState.showStageDuration;
+  }
+
   private getCachedViewState(): { count: number; groupBy: string; showDurations: boolean; showStageDuration: boolean } {
-    const cached = this.configViewStateCache.get('#global') || {},
+    const key = this.mostRecentApplication || '#global';
+    const cached = this.configViewStateCache.get(key) || {},
       defaults = { count: 2, groupBy: 'name', showDurations: false };
+    this.configViewStateCache.touch(key); // prevents cache from expiring just because it hasn't been changed
     return extend(defaults, cached);
   }
 
   private cacheConfigViewState(): void {
-    this.configViewStateCache.put('#global', {
-      count: this.groupCount,
-      groupBy: this.groupBy,
-      showStageDuration: this.showStageDuration,
-    });
+    // don't cache if viewing only a subset of pipelines
+    if (!Object.keys(this.asFilterModel.sortFilter.pipeline).length) {
+      this.configViewStateCache.put(this.mostRecentApplication || '#global', {
+        count: this.groupCount,
+        groupBy: this.groupBy,
+        showStageDuration: this.showStageDuration,
+      });
+    }
   }
 
   private isExecutionState(stateName: string): boolean {
@@ -167,9 +179,3 @@ export class ExecutionFilterModel {
     return this.asFilterModel.hasSavedState(toParams) && !this.isExecutionStateOrChild(fromState.name);
   }
 }
-
-export const EXECUTION_FILTER_MODEL = 'spinnaker.core.pipeline.filter.executionFilter.model';
-module(EXECUTION_FILTER_MODEL, [FILTER_MODEL_SERVICE]).factory(
-  'executionFilterModel',
-  ($rootScope: IRootScopeService, filterModelService: any) => new ExecutionFilterModel($rootScope, filterModelService),
-);

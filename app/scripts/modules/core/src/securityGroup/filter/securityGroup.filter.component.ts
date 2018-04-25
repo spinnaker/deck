@@ -1,20 +1,28 @@
 import { IScope, module } from 'angular';
-import { compact, uniq, map } from 'lodash';
+import { chain, compact, uniq, map } from 'lodash';
 import { Subscription } from 'rxjs';
 
 import { Application } from 'core/application/application.model';
 import { IFilterTag, ISortFilter } from 'core/filterModel';
-import { SECURITY_GROUP_FILTER_MODEL, SecurityGroupFilterModel } from './securityGroupFilter.model';
-import { SECURITY_GROUP_FILTER_SERVICE } from './securityGroupFilter.service';
+import { SecurityGroupState } from 'core/state';
 
 export const SECURITY_GROUP_FILTER = 'securityGroup.filter.controller';
 
 const ngmodule = module(SECURITY_GROUP_FILTER, [
-  SECURITY_GROUP_FILTER_SERVICE,
-  SECURITY_GROUP_FILTER_MODEL,
   require('core/filterModel/dependentFilter/dependentFilter.service').name,
-  require('./securityGroupDependentFilterHelper.service').name,
 ]);
+
+interface IPoolItem {
+  providerType: string;
+  account: string;
+  region: string;
+}
+
+const poolValueCoordinates = [
+  { filterField: 'providerType', on: 'securityGroup', localField: 'provider' },
+  { filterField: 'account', on: 'securityGroup', localField: 'account' },
+  { filterField: 'region', on: 'securityGroup', localField: 'region' },
+];
 
 export class SecurityGroupFilterCtrl {
   public app: Application;
@@ -28,33 +36,26 @@ export class SecurityGroupFilterCtrl {
   private groupsUpdatedSubscription: Subscription;
   private locationChangeUnsubscribe: () => void;
 
-  constructor(
-    private securityGroupFilterService: any,
-    private securityGroupFilterModel: SecurityGroupFilterModel,
-    private dependentFilterService: any,
-    private securityGroupDependentFilterHelper: any,
-    private $scope: IScope,
-    private $rootScope: IScope,
-  ) {
+  constructor(private dependentFilterService: any, private $scope: IScope, private $rootScope: IScope) {
     'ngInject';
   }
 
   public $onInit(): void {
-    const { $scope, $rootScope, app, securityGroupFilterModel, securityGroupFilterService } = this;
+    const { $scope, $rootScope, app } = this;
 
-    this.sortFilter = securityGroupFilterModel.asFilterModel.sortFilter;
-    this.tags = securityGroupFilterModel.asFilterModel.tags;
+    this.sortFilter = SecurityGroupState.filterModel.asFilterModel.sortFilter;
+    this.tags = SecurityGroupState.filterModel.asFilterModel.tags;
 
-    this.groupsUpdatedSubscription = securityGroupFilterService.groupsUpdatedStream.subscribe(
-      () => (this.tags = securityGroupFilterModel.asFilterModel.tags),
+    this.groupsUpdatedSubscription = SecurityGroupState.filterService.groupsUpdatedStream.subscribe(
+      () => (this.tags = SecurityGroupState.filterModel.asFilterModel.tags),
     );
 
     this.initialize();
     app.securityGroups.onRefresh($scope, () => this.initialize());
 
     this.locationChangeUnsubscribe = $rootScope.$on('$locationChangeSuccess', () => {
-      securityGroupFilterModel.asFilterModel.activate();
-      securityGroupFilterService.updateSecurityGroups(app);
+      SecurityGroupState.filterModel.asFilterModel.activate();
+      SecurityGroupState.filterService.updateSecurityGroups(app);
     });
 
     $scope.$on('$destroy', () => {
@@ -63,20 +64,36 @@ export class SecurityGroupFilterCtrl {
     });
   }
 
+  private poolBuilder(securityGroups: any[]): IPoolItem[] {
+    const pool = securityGroups.map(sg => {
+      const poolUnit = chain(poolValueCoordinates)
+        .filter({ on: 'securityGroup' })
+        .reduce((poolUnitTemplate: any, coordinate) => {
+          poolUnitTemplate[coordinate.filterField] = sg[coordinate.localField];
+          return poolUnitTemplate;
+        }, {})
+        .value();
+
+      return poolUnit;
+    });
+
+    return pool;
+  }
+
   private updateSecurityGroups(applyParamsToUrl = true): void {
-    const { dependentFilterService, securityGroupFilterModel, securityGroupDependentFilterHelper, app } = this;
+    const { dependentFilterService, app } = this;
 
     const { account, region } = dependentFilterService.digestDependentFilters({
-      sortFilter: securityGroupFilterModel.asFilterModel.sortFilter,
+      sortFilter: SecurityGroupState.filterModel.asFilterModel.sortFilter,
       dependencyOrder: ['providerType', 'account', 'region'],
-      pool: securityGroupDependentFilterHelper.poolBuilder(app.securityGroups.data),
+      pool: this.poolBuilder(app.securityGroups.data),
     });
 
     this.accountHeadings = account;
     this.regionHeadings = region;
 
     if (applyParamsToUrl) {
-      securityGroupFilterModel.asFilterModel.applyParamsToUrl();
+      SecurityGroupState.filterModel.asFilterModel.applyParamsToUrl();
     }
   }
 
@@ -85,9 +102,8 @@ export class SecurityGroupFilterCtrl {
   }
 
   public clearFilters(): void {
-    const { securityGroupFilterService } = this;
-    securityGroupFilterService.clearFilters();
-    securityGroupFilterService.updateSecurityGroups(this.app);
+    SecurityGroupState.filterService.clearFilters();
+    SecurityGroupState.filterService.updateSecurityGroups(this.app);
     this.updateSecurityGroups(false);
   }
 

@@ -3,22 +3,20 @@
 import moment from 'moment';
 import _ from 'lodash';
 
-import { CLUSTER_FILTER_SERVICE } from 'core/cluster/filter/clusterFilter.service';
-import { CLOUD_PROVIDER_REGISTRY } from 'core/cloudProvider/cloudProvider.registry';
+import { CloudProviderRegistry } from 'core/cloudProvider';
 import { NameUtils } from 'core/naming';
 import { EXECUTION_DETAILS_SECTION_SERVICE } from 'core/pipeline/details/executionDetailsSection.service';
 import { SERVER_GROUP_READER } from 'core/serverGroup/serverGroupReader.service';
 import { URL_BUILDER_SERVICE } from 'core/navigation/urlBuilder.service';
+import { ClusterState } from 'core/state';
 
 let angular = require('angular');
 
 module.exports = angular
   .module('spinnaker.core.pipeline.stage.deploy.details.controller', [
     require('@uirouter/angularjs').default,
-    CLUSTER_FILTER_SERVICE,
     EXECUTION_DETAILS_SECTION_SERVICE,
     URL_BUILDER_SERVICE,
-    CLOUD_PROVIDER_REGISTRY,
     SERVER_GROUP_READER,
   ])
   .controller('DeployExecutionDetailsCtrl', function(
@@ -26,8 +24,6 @@ module.exports = angular
     $stateParams,
     executionDetailsSectionService,
     urlBuilderService,
-    clusterFilterService,
-    cloudProviderRegistry,
     serverGroupReader,
   ) {
     $scope.configSections = ['deploymentConfig', 'taskStatus'];
@@ -137,7 +133,7 @@ module.exports = angular
           lastCapacity.succeeded +
           lastCapacity.failed;
 
-        if (cloudProviderRegistry.getValue(stage.context.cloudProvider, 'serverGroup.scalingActivitiesEnabled')) {
+        if (CloudProviderRegistry.getValue(stage.context.cloudProvider, 'serverGroup.scalingActivitiesEnabled')) {
           // after three minutes, if desired capacity is less than total number of instances,
           // show the scaling activities link
           if (waitDurationExceeded && lastCapacity.total < stage.context.capacity.desired) {
@@ -165,7 +161,7 @@ module.exports = angular
       }
     }
 
-    this.overrideFiltersForUrl = r => clusterFilterService.overrideFiltersForUrl(r);
+    this.overrideFiltersForUrl = r => ClusterState.filterService.overrideFiltersForUrl(r);
 
     let initialize = () => executionDetailsSectionService.synchronizeSection($scope.configSections, initialized);
 

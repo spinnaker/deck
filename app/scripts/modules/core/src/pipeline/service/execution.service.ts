@@ -2,9 +2,8 @@ import { IHttpService, IPromise, IQService, ITimeoutService, module } from 'angu
 import { get, identity, pickBy } from 'lodash';
 import { StateService } from '@uirouter/core';
 
-import { API_SERVICE, Api } from 'core/api/api.service';
+import { API } from 'core/api/ApiService';
 import { Application } from 'core/application/application.model';
-import { EXECUTION_FILTER_MODEL, ExecutionFilterModel } from 'core/pipeline/filter/executionFilter.model';
 import {
   EXECUTIONS_TRANSFORMER_SERVICE,
   ExecutionsTransformerService,
@@ -17,6 +16,7 @@ import { ApplicationDataSource } from 'core/application/service/applicationDataS
 import { DebugWindow } from 'core/utils/consoleDebug';
 import { IPipeline } from 'core/domain/IPipeline';
 import { ISortFilter } from 'core/filterModel';
+import { ExecutionState } from 'core/state';
 
 export class ExecutionService {
   public get activeStatuses(): string[] {
@@ -41,8 +41,6 @@ export class ExecutionService {
     private $q: IQService,
     private $state: StateService,
     private $timeout: ITimeoutService,
-    private API: Api,
-    private executionFilterModel: ExecutionFilterModel,
     private executionsTransformer: ExecutionsTransformerService,
     private pipelineConfig: PipelineConfigProvider,
     private jsonUtilityService: JsonUtilityService,
@@ -63,8 +61,8 @@ export class ExecutionService {
   ): IPromise<IExecution[]> {
     const statusString = statuses.map(status => status.toUpperCase()).join(',') || null;
     const call = pipelineConfigIds
-      ? this.API.all('executions').getList({ limit, pipelineConfigIds, statuses })
-      : this.API.one('applications', applicationName)
+      ? API.all('executions').getList({ limit, pipelineConfigIds, statuses })
+      : API.one('applications', applicationName)
           .all('pipelines')
           .getList({ limit, statuses: statusString, pipelineConfigIds, expand });
 
@@ -72,18 +70,6 @@ export class ExecutionService {
       if (data) {
         data.forEach((execution: IExecution) => {
           execution.hydrated = expand;
-          // TODO: remove this code once the filtering takes place on Orca
-          if (!expand) {
-            execution.stages.forEach(s => {
-              s.context = {};
-              s.outputs = {};
-              s.tasks = [];
-            });
-          }
-          // TODO: Remove this, too, once the filtering takes place on Orca
-          if (execution.trigger.parentExecution) {
-            execution.trigger.parentExecution.stages = [];
-          }
           return this.cleanExecutionForDiffing(execution);
         });
         return data;
@@ -106,7 +92,7 @@ export class ExecutionService {
     application: Application = null,
     expand = false,
   ): IPromise<IExecution[]> {
-    const sortFilter: ISortFilter = this.executionFilterModel.asFilterModel.sortFilter;
+    const sortFilter: ISortFilter = ExecutionState.filterModel.asFilterModel.sortFilter;
     const pipelines = Object.keys(sortFilter.pipeline);
     const statuses = Object.keys(pickBy(sortFilter.status || {}, identity));
     const limit = sortFilter.count;
@@ -119,7 +105,7 @@ export class ExecutionService {
   }
 
   public getExecution(executionId: string): IPromise<IExecution> {
-    return this.API.one('pipelines', executionId)
+    return API.one('pipelines', executionId)
       .get()
       .then((execution: IExecution) => {
         execution.hydrated = true;
@@ -148,7 +134,7 @@ export class ExecutionService {
   }
 
   private getConfigIdsFromFilterModel(application: Application): IPromise<string[]> {
-    const pipelines = Object.keys(this.executionFilterModel.asFilterModel.sortFilter.pipeline);
+    const pipelines = Object.keys(ExecutionState.filterModel.asFilterModel.sortFilter.pipeline);
     application.pipelineConfigs.activate();
     return application.pipelineConfigs.ready().then(() => {
       const data = application.pipelineConfigs.data.concat(application.strategyConfigs.data);
@@ -346,7 +332,7 @@ export class ExecutionService {
   }
 
   public getProjectExecutions(project: string, limit = 1): IPromise<IExecution[]> {
-    return this.API.one('projects', project)
+    return API.one('projects', project)
       .all('pipelines')
       .getList({ limit })
       .then((executions: IExecution[]) => {
@@ -416,6 +402,13 @@ export class ExecutionService {
         application.executions.data.push(re);
       }
     });
+    application.executions.data.forEach((execution: IExecution) => {
+      if (execution.isActive && application.runningExecutions.data.every((e: IExecution) => e.id !== execution.id)) {
+        this.getExecution(execution.id).then(updatedExecution => {
+          this.updateExecution(application, updatedExecution);
+        });
+      }
+    });
     if (updated && !application.executions.reloadingForFilters) {
       application.executions.dataUpdated();
     }
@@ -451,7 +444,7 @@ export class ExecutionService {
       }
     });
     current.stringVal = updated.stringVal;
-    current.hydrated = updated.hydrated;
+    current.hydrated = current.hydrated || updated.hydrated;
     current.graphStatusHash = this.calculateGraphStatusHash(current);
   }
 
@@ -540,7 +533,7 @@ export class ExecutionService {
     options: { limit?: number; statuses?: string; transform?: boolean; application?: Application } = {},
   ): IPromise<IExecution[]> {
     const { limit, statuses, transform, application } = options;
-    return this.API.all('executions')
+    return API.all('executions')
       .getList({ limit, pipelineConfigIds: (pipelineConfigIds || []).join(','), statuses })
       .then((data: IExecution[]) => {
         if (data) {
@@ -577,36 +570,17 @@ export class ExecutionService {
 }
 
 export const EXECUTION_SERVICE = 'spinnaker.core.pipeline.executions.service';
-module(EXECUTION_SERVICE, [
-  EXECUTION_FILTER_MODEL,
-  EXECUTIONS_TRANSFORMER_SERVICE,
-  PIPELINE_CONFIG_PROVIDER,
-  API_SERVICE,
-  JSON_UTILITY_SERVICE,
-]).factory(
+module(EXECUTION_SERVICE, [EXECUTIONS_TRANSFORMER_SERVICE, PIPELINE_CONFIG_PROVIDER, JSON_UTILITY_SERVICE]).factory(
   'executionService',
   (
     $http: IHttpService,
     $q: IQService,
     $state: StateService,
     $timeout: ITimeoutService,
-    API: Api,
-    executionFilterModel: any,
     executionsTransformer: any,
     pipelineConfig: any,
     jsonUtilityService: JsonUtilityService,
-  ) =>
-    new ExecutionService(
-      $http,
-      $q,
-      $state,
-      $timeout,
-      API,
-      executionFilterModel,
-      executionsTransformer,
-      pipelineConfig,
-      jsonUtilityService,
-    ),
+  ) => new ExecutionService($http, $q, $state, $timeout, executionsTransformer, pipelineConfig, jsonUtilityService),
 );
 
 DebugWindow.addInjectable('executionService');

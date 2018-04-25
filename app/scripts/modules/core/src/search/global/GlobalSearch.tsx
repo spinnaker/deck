@@ -13,6 +13,7 @@ import { Tooltip } from 'core/presentation/Tooltip';
 import { Spinner } from 'core/widgets/spinners/Spinner';
 import { searchRank } from 'core/search/searchRank.filter';
 import { RecentlyViewedItems, IChildComponentProps } from 'core/search/infrastructure/RecentlyViewedItems';
+import { ClusterState } from 'core/state';
 
 import { GlobalSearchResults } from './GlobalSearchResults';
 import { GlobalSearchRecentItems } from './GlobalSearchRecentItems';
@@ -70,7 +71,7 @@ export class GlobalSearch extends React.Component<{}, IGlobalSearchState> {
           .filter(({ results }) => results.length)
           .map(category => ({
             ...category,
-            results: searchRank(category.results).slice(0, 5),
+            results: searchRank(category.results, category.query).slice(0, 5),
           }))
           .sort((a, b) => a.type.order - b.type.order),
       )
@@ -249,7 +250,7 @@ export class GlobalSearch extends React.Component<{}, IGlobalSearchState> {
   }
 
   private clearFilters(result: ISearchResult) {
-    ReactInjector.clusterFilterService.overrideFiltersForUrl(result);
+    ClusterState.filterService.overrideFiltersForUrl(result);
   }
 
   private renderDropdown() {

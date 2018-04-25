@@ -2,7 +2,7 @@
 
 const angular = require('angular');
 
-import { CLOUD_PROVIDER_REGISTRY, DeploymentStrategyRegistry } from '@spinnaker/core';
+import { CloudProviderRegistry, DeploymentStrategyRegistry } from '@spinnaker/core';
 
 import { ECS_SERVER_GROUP_TRANSFORMER } from './serverGroup/serverGroup.transformer';
 import { ECS_LOAD_BALANCER_SELECTOR } from './serverGroup/configure/wizard/loadBalancers/loadBalancerSelector.component';
@@ -11,7 +11,7 @@ import { IAM_ROLE_READ_SERVICE } from './iamRoles/iamRole.read.service';
 import { ECS_CLUSTER_READ_SERVICE } from './ecsCluster/ecsCluster.read.service';
 import { METRIC_ALARM_READ_SERVICE } from './metricAlarm/metricAlarm.read.service';
 import { PLACEMENT_STRATEGY_SERVICE } from './placementStrategy/placementStrategy.service';
-import { ECS_HELP } from './ecs.help';
+import './ecs.help';
 import { COMMON_MODULE } from './common/common.module';
 
 import './logo/ecs.logo.less';
@@ -28,7 +28,6 @@ module.exports = angular
   .module('spinnaker.ecs', [
     require('./serverGroup/configure/wizard/CloneServerGroup.ecs.controller').name,
     SERVER_GROUP_DETAILS_MODULE,
-    CLOUD_PROVIDER_REGISTRY,
     IAM_ROLE_READ_SERVICE,
     ECS_SERVER_GROUP_TRANSFORMER,
     // require('./pipeline/stages/cloneServerGroup/ecsCloneServerGroupStage').name,  // TODO(Bruno Carrier): We should enable this on Clouddriver before revealing this stage
@@ -39,7 +38,6 @@ module.exports = angular
     ECS_CLUSTER_READ_SERVICE,
     METRIC_ALARM_READ_SERVICE,
     PLACEMENT_STRATEGY_SERVICE,
-    ECS_HELP,
     COMMON_MODULE,
     require('./serverGroup/configure/wizard/location/ServerGroupBasicSettings.controller').name,
     require('./serverGroup/configure/serverGroupCommandBuilder.service').name,
@@ -53,8 +51,8 @@ module.exports = angular
     require('./pipeline/stages/scaleDownCluster/ecsScaleDownClusterStage').name,
     require('./pipeline/stages/shrinkCluster/ecsShrinkClusterStage').name,
   ])
-  .config(function(cloudProviderRegistryProvider) {
-    cloudProviderRegistryProvider.registerProvider('ecs', {
+  .config(function() {
+    CloudProviderRegistry.registerProvider('ecs', {
       name: 'EC2 Container Service',
       logo: { path: require('./logo/ecs.logo.svg') },
       serverGroup: {

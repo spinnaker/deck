@@ -1,5 +1,6 @@
 import { IPromise } from 'angular';
 import { CreatePipelineButton } from 'core/pipeline/create/CreatePipelineButton';
+import { IScheduler } from 'core/scheduler/scheduler.factory';
 import * as React from 'react';
 import * as ReactGA from 'react-ga';
 import { Transition } from '@uirouter/core';
@@ -10,7 +11,7 @@ import { Subscription } from 'rxjs';
 
 import { Application } from 'core/application';
 import { IPipeline, IPipelineCommand } from 'core/domain';
-import { ReactInjector } from 'core/reactShims';
+import { ModalInjector, ReactInjector } from 'core/reactShims';
 import { Tooltip } from 'core/presentation/Tooltip';
 
 import { CreatePipeline } from 'core/pipeline/config/CreatePipeline';
@@ -18,6 +19,7 @@ import { ExecutionFilters } from 'core/pipeline/filter/ExecutionFilters';
 import { ExecutionGroups } from './executionGroup/ExecutionGroups';
 import { FilterTags, IFilterTag, ISortFilter } from 'core/filterModel';
 import { Spinner } from 'core/widgets/spinners/Spinner';
+import { ExecutionState } from 'core/state';
 
 import './executions.less';
 
@@ -40,17 +42,17 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
   private groupsUpdatedSubscription: Subscription;
   private locationChangeUnsubscribe: Function;
   private insightFilterStateModel = ReactInjector.insightFilterStateModel;
+  private activeRefresher: IScheduler;
 
   private filterCountOptions = [1, 2, 5, 10, 20, 30, 40, 50];
 
   constructor(props: IExecutionsProps) {
     super(props);
 
-    const { executionFilterModel } = ReactInjector;
     this.state = {
       filtersExpanded: this.insightFilterStateModel.filtersExpanded,
       loading: true,
-      sortFilter: executionFilterModel.asFilterModel.sortFilter,
+      sortFilter: ExecutionState.filterModel.asFilterModel.sortFilter,
       tags: [],
       triggeringExecution: false,
     };
@@ -58,10 +60,9 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
 
   public componentWillMount(): void {
     const { app } = this.props;
-    const { executionFilterModel } = ReactInjector;
-    if (executionFilterModel.mostRecentApplication !== app.name) {
-      executionFilterModel.asFilterModel.groups = [];
-      executionFilterModel.mostRecentApplication = app.name;
+    if (ExecutionState.filterModel.mostRecentApplication !== app.name) {
+      ExecutionState.filterModel.asFilterModel.groups = [];
+      ExecutionState.filterModel.mostRecentApplication = app.name;
     }
 
     if (app.notFound) {
@@ -70,6 +71,10 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
     app.setActiveState(app.executions);
     app.executions.activate();
     app.pipelineConfigs.activate();
+    this.activeRefresher = ReactInjector.schedulerFactory.createScheduler(5000);
+    this.activeRefresher.subscribe(() => {
+      app.getDataSource('runningExecutions').refresh();
+    });
   }
 
   private clearFilters(): void {
@@ -98,7 +103,7 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
   }
 
   private groupsUpdated(): void {
-    this.setState({ tags: ReactInjector.executionFilterModel.asFilterModel.tags });
+    this.setState({ tags: ExecutionState.filterModel.asFilterModel.tags });
   }
 
   private dataInitializationFailure(): void {
@@ -124,12 +129,12 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
 
   private expand(): void {
     ReactGA.event({ category: 'Pipelines', action: 'Expand All' });
-    ReactInjector.executionFilterModel.expandSubject.next(true);
+    ExecutionState.filterModel.expandSubject.next(true);
   }
 
   private collapse(): void {
     ReactGA.event({ category: 'Pipelines', action: 'Collapse All' });
-    ReactInjector.executionFilterModel.expandSubject.next(false);
+    ExecutionState.filterModel.expandSubject.next(false);
   }
 
   private startPipeline(command: IPipelineCommand): IPromise<void> {
@@ -155,7 +160,7 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
   private triggerPipeline(pipeline: IPipeline = null): void {
     ReactGA.event({ category: 'Pipelines', action: 'Trigger Pipeline (top level)' });
     // TODO: Convert the modal to react
-    ReactInjector.modalService
+    ModalInjector.modalService
       .open({
         templateUrl: require('../manualExecution/manualPipelineExecution.html'),
         controller: 'ManualPipelineExecutionCtrl as vm',
@@ -261,6 +266,7 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
     this.executionsRefreshUnsubscribe();
     this.groupsUpdatedSubscription.unsubscribe();
     this.locationChangeUnsubscribe();
+    this.activeRefresher && this.activeRefresher.unsubscribe();
   }
 
   private showFilters(): void {
