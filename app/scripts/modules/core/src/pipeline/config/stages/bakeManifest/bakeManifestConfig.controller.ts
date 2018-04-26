@@ -1,6 +1,7 @@
 import { IController, IScope } from 'angular';
 
 import { AccountService, ExpectedArtifactService, IAccount, IExpectedArtifact } from 'core';
+import { UUIDGenerator } from 'core/utils';
 
 export class BakeManifestConfigCtrl implements IController {
   public expectedArtifacts: IExpectedArtifact[];
@@ -14,7 +15,7 @@ export class BakeManifestConfigCtrl implements IController {
     }
   }
 
-  constructor(public $scope: IScope, expectedArtifactService: ExpectedArtifactService ) {
+  constructor(public $scope: IScope, expectedArtifactService: ExpectedArtifactService) {
     'ngInject';
     if (this.$scope.stage.isNew) {
       const defaultSelection = {
@@ -22,10 +23,14 @@ export class BakeManifestConfigCtrl implements IController {
         expectedArtifacts: [{
           matchArtifact: {
             type: 'embedded/base64',
+            kind: 'base64',
             name: ''
-          }
+          },
+          id: UUIDGenerator.generateUuid(),
+          defaultArtifact: {},
+          useDefaultArtifact: false,
         }],
-        inputArtifacts: [  BakeManifestConfigCtrl.defaultInputArtifact() ]
+        inputArtifacts: [ BakeManifestConfigCtrl.defaultInputArtifact() ]
       };
 
       Object.assign(this.$scope.stage, defaultSelection);
@@ -39,6 +44,14 @@ export class BakeManifestConfigCtrl implements IController {
       this.$scope.stage,
       this.$scope.$parent.pipeline,
     );
+  }
+
+  public hasValueArtifacts(): boolean {
+    if (!this.$scope.stage.inputArtifacts) {
+      this.$scope.stage.inputArtifacts = [ BakeManifestConfigCtrl.defaultInputArtifact() ];
+    }
+
+    return this.$scope.stage.inputArtifacts.length > 1;
   }
 
   public addInputArtifact() {
