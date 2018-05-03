@@ -7,6 +7,7 @@ import {
   AuthenticationService,
   BakeExecutionLabel,
   BAKERY_SERVICE,
+  EXPECTED_ARTIFACT_SERVICE,
   PIPELINE_CONFIG_PROVIDER,
   PipelineTemplates,
   SETTINGS,
@@ -17,6 +18,7 @@ module.exports = angular
     PIPELINE_CONFIG_PROVIDER,
     require('./bakeExecutionDetails.controller.js').name,
     BAKERY_SERVICE,
+    EXPECTED_ARTIFACT_SERVICE,
   ])
   .config(function(pipelineConfigProvider) {
     pipelineConfigProvider.registerStage({
@@ -36,7 +38,7 @@ module.exports = angular
       restartable: true,
     });
   })
-  .controller('gceBakeStageCtrl', function($scope, bakeryService, $q, $uibModal) {
+  .controller('gceBakeStageCtrl', function($scope, bakeryService, $q, $uibModal, expectedArtifactService) {
     $scope.stage.extendedAttributes = $scope.stage.extendedAttributes || {};
     $scope.stage.region = 'global';
 
@@ -58,10 +60,15 @@ module.exports = angular
         .all({
           baseOsOptions: bakeryService.getBaseOsOptions('gce'),
           baseLabelOptions: bakeryService.getBaseLabelOptions(),
+          expectedArtifacts: expectedArtifactService.getExpectedArtifactsAvailableToStage(
+            $scope.stage,
+            $scope.pipeline,
+          ),
         })
         .then(function(results) {
           $scope.baseOsOptions = results.baseOsOptions.baseImages;
           $scope.baseLabelOptions = results.baseLabelOptions;
+          $scope.viewState.expectedArtifacts = results.expectedArtifacts;
 
           if (!$scope.stage.baseOs && $scope.baseOsOptions && $scope.baseOsOptions.length) {
             $scope.stage.baseOs = $scope.baseOsOptions[0].id;
