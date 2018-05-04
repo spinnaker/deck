@@ -4,6 +4,7 @@ const angular = require('angular');
 import _ from 'lodash';
 
 import {
+  ArtifactReferenceServiceProvider,
   AuthenticationService,
   BakeExecutionLabel,
   BAKERY_SERVICE,
@@ -20,7 +21,7 @@ module.exports = angular
     BAKERY_SERVICE,
     EXPECTED_ARTIFACT_SERVICE,
   ])
-  .config(function(pipelineConfigProvider) {
+  .config(function(pipelineConfigProvider, artifactReferenceServiceProvider) {
     pipelineConfigProvider.registerStage({
       provides: 'bake',
       cloudProvider: 'gce',
@@ -37,6 +38,7 @@ module.exports = angular
       validators: [{ type: 'requiredField', fieldName: 'package' }],
       restartable: true,
     });
+    artifactReferenceServiceProvider.registerReference('stage', () => [['packageArtifactIds']]);
   })
   .controller('gceBakeStageCtrl', function($scope, bakeryService, $q, $uibModal, expectedArtifactService) {
     $scope.stage.extendedAttributes = $scope.stage.extendedAttributes || {};
