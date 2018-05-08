@@ -8,8 +8,9 @@ import { IPubsubTrigger } from 'core/domain';
 import { ServiceAccountService } from 'core';
 
 class PubsubTriggerController implements IController {
-  public pubsubSystems = SETTINGS.pubsubProviders || ['google', 'kafka'];
-  public pubsubSubscriptions: string[];
+  public pubsubSystems = SETTINGS.pubsubProviders || ['google']; // TODO: Add amazon once it is confirmed that amazon pub/sub works.
+  private pubsubSubscriptions: IPubsubSubscription[];
+  public filteredPubsubSubscriptions: string[];
   public subscriptionsLoaded = false;
   public serviceAccounts: string[];
 
@@ -21,14 +22,28 @@ class PubsubTriggerController implements IController {
     'ngInject';
 
     this.subscriptionsLoaded = false;
+    this.refreshPubsubSubscriptions();
+    this.serviceAccountService.getServiceAccounts().then(accounts => {
+      this.serviceAccounts = accounts || [];
+    });
+  }
+
+  // If we ever need a refresh button in pubsubTrigger.html, call this function.
+  public refreshPubsubSubscriptions(): void {
     this.pubsubSubscriptionService
       .getPubsubSubscriptions()
       .then(subscriptions => (this.pubsubSubscriptions = subscriptions))
       .catch(() => (this.pubsubSubscriptions = []))
-      .finally(() => (this.subscriptionsLoaded = true));
-    this.serviceAccountService.getServiceAccounts().then(accounts => {
-      this.serviceAccounts = accounts || [];
-    });
+      .finally(() => {
+        this.subscriptionsLoaded = true;
+        this.updateFilteredPubsubSubscriptions();
+      });
+  }
+
+  public updateFilteredPubsubSubscriptions(): void {
+    this.filteredPubsubSubscriptions = this.pubsubSubscriptions
+      .filter(subscription => subscription.pubsubSystem === this.trigger.pubsubSystem)
+      .map(subscription => subscription.subscriptionName);
   }
 }
 

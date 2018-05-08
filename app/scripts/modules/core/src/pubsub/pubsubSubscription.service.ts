@@ -1,9 +1,10 @@
 import { module, IPromise } from 'angular';
 
 import { API } from 'core/api/ApiService';
+import { IPubsubSubscription } from 'core/domain';
 
 export class PubsubSubscriptionService {
-  public getPubsubSubscriptions(): IPromise<string[]> {
+  public getPubsubSubscriptions(): IPromise<IPubsubSubscription[]> {
     return API.one('pubsub')
       .one('subscriptions')
       .get();
