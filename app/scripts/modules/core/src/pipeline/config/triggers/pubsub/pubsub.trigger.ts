@@ -1,14 +1,18 @@
 import { IController, module } from 'angular';
 
-import { SETTINGS } from 'core/config/settings';
-
-import { PIPELINE_CONFIG_PROVIDER, PipelineConfigProvider } from 'core/pipeline/config/pipelineConfigProvider';
-import { PUBSUB_SUBSCRIPTION_SERVICE, PubsubSubscriptionService } from 'core/pubsub';
-import { IPubsubTrigger } from 'core/domain';
-import { ServiceAccountService } from 'core';
+import {
+  IPubsubSubscription,
+  IPubsubTrigger,
+  PIPELINE_CONFIG_PROVIDER,
+  PipelineConfigProvider,
+  PUBSUB_SUBSCRIPTION_SERVICE,
+  PubsubSubscriptionService,
+  ServiceAccountService,
+  SETTINGS,
+} from '@spinnaker/core';
 
 class PubsubTriggerController implements IController {
-  public pubsubSystems = SETTINGS.pubsubProviders || ['google']; // TODO: Add amazon once it is confirmed that amazon pub/sub works.
+  public pubsubSystems = SETTINGS.pubsubProviders || ['google']; // TODO(joonlim): Add amazon once it is confirmed that amazon pub/sub works.
   private pubsubSubscriptions: IPubsubSubscription[];
   public filteredPubsubSubscriptions: string[];
   public subscriptionsLoaded = false;
