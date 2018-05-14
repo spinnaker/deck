@@ -1,5 +1,4 @@
 import { module } from 'angular';
-import { map, some } from 'lodash';
 
 import { IPipeline, IStage, IStageOrTriggerTypeConfig, ITrigger } from 'core/domain';
 import { BaseRequiredFieldValidator, IRequiredField } from './baseRequiredField.validator';
@@ -18,7 +17,7 @@ export class AnyFieldRequiredValidator extends BaseRequiredFieldValidator {
     stage: IStage | ITrigger,
     validationConfig: IAnyFieldRequiredValidationConfig,
   ): boolean {
-    return some(validationConfig.fields, (requiredField: IRequiredField) => {
+    return validationConfig.fields.some((requiredField: IRequiredField) => {
       return this.fieldIsValid(pipeline, stage, requiredField.fieldName);
     });
   }
@@ -27,9 +26,9 @@ export class AnyFieldRequiredValidator extends BaseRequiredFieldValidator {
     validationConfig: IAnyFieldRequiredValidationConfig,
     config: IStageOrTriggerTypeConfig,
   ): string {
-    let fieldString: string = map(validationConfig.fields, (requiredField: IRequiredField) =>
-      this.printableFieldLabel(requiredField),
-    ).join(', ');
+    const fieldString: string = validationConfig.fields
+      .map((requiredField: IRequiredField) => this.printableFieldLabel(requiredField))
+      .join(', ');
     return (
       validationConfig.message ||
       `At least one of the following fields must be supplied for ${

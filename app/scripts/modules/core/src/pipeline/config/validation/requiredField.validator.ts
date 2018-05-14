@@ -25,7 +25,7 @@ export class RequiredFieldValidator extends BaseRequiredFieldValidator {
     validationConfig: IRequiredFieldValidationConfig,
     config: IStageOrTriggerTypeConfig,
   ): string {
-    let fieldLabel: string = this.printableFieldLabel(validationConfig);
+    const fieldLabel: string = this.printableFieldLabel(validationConfig);
     return validationConfig.message || `<strong>${fieldLabel}</strong> is a required field for ${config.label} stages.`;
   }
 }

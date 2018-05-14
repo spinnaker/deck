@@ -37,7 +37,7 @@ export abstract class BaseRequiredFieldValidator implements IStageOrTriggerValid
   ): string;
 
   protected printableFieldLabel(field: IRequiredField): string {
-    let fieldLabel: string = field.fieldLabel || field.fieldName;
+    const fieldLabel: string = field.fieldLabel || field.fieldName;
     return upperFirst(fieldLabel);
   }
 
@@ -49,8 +49,6 @@ export abstract class BaseRequiredFieldValidator implements IStageOrTriggerValid
     const fieldExists = has(stage, fieldName);
     const field: any = get(stage, fieldName);
 
-    return fieldExists && (field || field === 0) && !(field instanceof Array && field.length === 0);
+    return fieldExists && (field || field === 0) && !(Array.isArray(field) && field.length === 0);
   }
 }
-
-export const BASE_REQUIRED_FIELD_VALIDATOR = 'spinnaker.core.pipeline.config.validation.baseRequiredField';
