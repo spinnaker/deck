@@ -1,4 +1,4 @@
-import { get, has } from 'lodash';
+import { get, has, upperFirst } from 'lodash';
 
 import { IPipeline, IStage, IStageOrTriggerTypeConfig, ITrigger } from 'core/domain';
 import { IStageOrTriggerValidator, IValidatorConfig } from './pipelineConfig.validator';
@@ -38,7 +38,7 @@ export abstract class BaseRequiredFieldValidator implements IStageOrTriggerValid
 
   protected printableFieldLabel(field: IRequiredField): string {
     let fieldLabel: string = field.fieldLabel || field.fieldName;
-    return fieldLabel.charAt(0).toUpperCase() + fieldLabel.substr(1);
+    return upperFirst(fieldLabel);
   }
 
   protected fieldIsValid(pipeline: IPipeline, stage: IStage | ITrigger, fieldName: string): boolean {
