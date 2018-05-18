@@ -4,25 +4,24 @@ const angular = require('angular');
 import _ from 'lodash';
 
 import {
-  ArtifactReferenceServiceProvider,
+  ARTIFACT_REFERENCE_SERVICE_PROVIDER,
   AuthenticationService,
   BakeExecutionLabel,
   BAKERY_SERVICE,
-  EXPECTED_ARTIFACT_SERVICE,
-  PIPELINE_CONFIG_PROVIDER,
+  ExpectedArtifactService,
   PipelineTemplates,
+  Registry,
   SETTINGS,
 } from '@spinnaker/core';
 
 module.exports = angular
   .module('spinnaker.gce.pipeline.stage..bakeStage', [
-    PIPELINE_CONFIG_PROVIDER,
+    ARTIFACT_REFERENCE_SERVICE_PROVIDER,
     require('./bakeExecutionDetails.controller.js').name,
     BAKERY_SERVICE,
-    EXPECTED_ARTIFACT_SERVICE,
   ])
-  .config(function(pipelineConfigProvider, artifactReferenceServiceProvider) {
-    pipelineConfigProvider.registerStage({
+  .config(function(artifactReferenceServiceProvider) {
+    Registry.pipeline.registerStage({
       provides: 'bake',
       cloudProvider: 'gce',
       label: 'Bake',
@@ -48,7 +47,7 @@ module.exports = angular
     });
     artifactReferenceServiceProvider.registerReference('stage', () => [['packageArtifactIds']]);
   })
-  .controller('gceBakeStageCtrl', function($scope, bakeryService, $q, $uibModal, expectedArtifactService) {
+  .controller('gceBakeStageCtrl', function($scope, bakeryService, $q, $uibModal) {
     $scope.stage.extendedAttributes = $scope.stage.extendedAttributes || {};
     $scope.stage.region = 'global';
 
@@ -70,7 +69,7 @@ module.exports = angular
         .all({
           baseOsOptions: bakeryService.getBaseOsOptions('gce'),
           baseLabelOptions: bakeryService.getBaseLabelOptions(),
-          expectedArtifacts: expectedArtifactService.getExpectedArtifactsAvailableToStage(
+          expectedArtifacts: ExpectedArtifactService.getExpectedArtifactsAvailableToStage(
             $scope.stage,
             $scope.pipeline,
           ),
