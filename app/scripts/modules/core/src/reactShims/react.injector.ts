@@ -98,7 +98,6 @@ export class CoreReactInject extends ReactInject {
   public get serverGroupWarningMessageService() { return this.$injector.get('serverGroupWarningMessageService') as ServerGroupWarningMessageService; }
   public get serverGroupWriter() { return this.$injector.get('serverGroupWriter') as ServerGroupWriter; }
   public get subnetReader() { return this.$injector.get('subnetReader') as SubnetReader; }
-  public get recentHistoryService() { return this.$injector.get('recentHistoryService') as RecentHistoryService; }
   public get stateEvents() { return this.$injector.get('stateEvents') as StateEvents; }
   public get urlBuilderService() { return this.$injector.get('urlBuilderService') as UrlBuilderService; }
   public get skinSelectionService() { return this.$injector.get('skinSelectionService') as SkinSelectionService; }

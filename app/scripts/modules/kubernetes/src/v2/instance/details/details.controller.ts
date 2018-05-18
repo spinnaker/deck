@@ -7,7 +7,6 @@ import {
   CONFIRMATION_MODAL_SERVICE,
   INSTANCE_READ_SERVICE,
   InstanceReader,
-  RECENT_HISTORY_SERVICE,
   RecentHistoryService,
   IManifest,
 } from '@spinnaker/core';
@@ -40,7 +39,6 @@ class KubernetesInstanceDetailsController implements IController {
     private app: Application,
     private kubernetesManifestService: KubernetesManifestService,
     private instanceReader: InstanceReader,
-    private recentHistoryService: RecentHistoryService,
   ) {
     'ngInject';
 
@@ -120,7 +118,7 @@ class KubernetesInstanceDetailsController implements IController {
         recentHistoryExtraData.serverGroup = instanceManager.name;
       }
 
-      this.recentHistoryService.addExtraDataToLatest('instances', recentHistoryExtraData);
+      RecentHistoryService.addExtraDataToLatest('instances', recentHistoryExtraData);
       return this.instanceReader
         .getInstanceDetails(instanceManager.account, instanceManager.region, instance.instanceId)
         .then((instanceDetails: IKubernetesInstance) => {
@@ -141,8 +139,7 @@ class KubernetesInstanceDetailsController implements IController {
 
 export const KUBERNETES_V2_INSTANCE_DETAILS_CTRL = 'spinnaker.kubernetes.v2.instanceDetails.controller';
 
-module(KUBERNETES_V2_INSTANCE_DETAILS_CTRL, [
-  CONFIRMATION_MODAL_SERVICE,
-  INSTANCE_READ_SERVICE,
-  RECENT_HISTORY_SERVICE,
-]).controller('kubernetesV2InstanceDetailsCtrl', KubernetesInstanceDetailsController);
+module(KUBERNETES_V2_INSTANCE_DETAILS_CTRL, [CONFIRMATION_MODAL_SERVICE, INSTANCE_READ_SERVICE]).controller(
+  'kubernetesV2InstanceDetailsCtrl',
+  KubernetesInstanceDetailsController,
+);
