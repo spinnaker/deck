@@ -1,4 +1,4 @@
-import { IHttpPromiseCallbackArg, IPromise, IQService, module } from 'angular';
+import { IHttpPromiseCallbackArg, IPromise } from 'angular';
 
 import { ITask } from 'core/domain';
 import { TaskReader } from './task.read.service';

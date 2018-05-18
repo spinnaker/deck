@@ -2,19 +2,11 @@
 
 const angular = require('angular');
 
-import { TaskExecutor, TASK_MONITOR_BUILDER } from '@spinnaker/core';
+import { TaskExecutor, TaskMonitor } from '@spinnaker/core';
 
 module.exports = angular
-  .module('spinnaker.amazon.serverGroup.details.scheduledActions.editScheduledActions.modal.controller', [
-    TASK_MONITOR_BUILDER,
-  ])
-  .controller('EditScheduledActionsCtrl', function(
-    $scope,
-    $uibModalInstance,
-    taskMonitorBuilder,
-    application,
-    serverGroup,
-  ) {
+  .module('spinnaker.amazon.serverGroup.details.scheduledActions.editScheduledActions.modal.controller', [])
+  .controller('EditScheduledActionsCtrl', function($scope, $uibModalInstance, application, serverGroup) {
     $scope.command = {
       scheduledActions: serverGroup.scheduledActions.map(action => {
         return {
@@ -36,7 +28,7 @@ module.exports = angular
       $scope.command.scheduledActions.splice(index, 1);
     };
 
-    $scope.taskMonitor = taskMonitorBuilder.buildTaskMonitor({
+    $scope.taskMonitor = new TaskMonitor({
       application: application,
       title: 'Update Scheduled Actions for ' + serverGroup.name,
       modalInstance: $uibModalInstance,

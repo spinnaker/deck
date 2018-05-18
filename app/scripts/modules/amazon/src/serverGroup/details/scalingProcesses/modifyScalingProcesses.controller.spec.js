@@ -8,21 +8,19 @@ describe('Controller: modifyScalingProcesses', function() {
   beforeEach(window.module(require('./modifyScalingProcesses.controller.js').name));
 
   beforeEach(
-    window.inject(function($controller, $rootScope) {
-      this.$uibModalInstance = { close: angular.noop };
-      this.taskMonitorBuilder = { buildTaskMonitor: angular.noop };
+    window.inject(function($controller, $rootScope, $q) {
+      this.$uibModalInstance = { close: angular.noop, result: { then: angular.noop } };
       this.$scope = $rootScope.$new();
 
       this.initializeController = function(serverGroup, processes) {
         this.processes = processes;
-        spyOn(TaskExecutor, 'executeTask').and.callFake(angular.noop);
+        spyOn(TaskExecutor, 'executeTask').and.returnValue($q.when(null));
 
         this.controller = $controller('ModifyScalingProcessesCtrl', {
           $scope: this.$scope,
           serverGroup: serverGroup,
           processes: this.processes,
           application: { serverGroups: { refresh: angular.noop } },
-          taskMonitorBuilder: this.taskMonitorBuilder,
           $uibModalInstance: this.$uibModalInstance,
         });
       };
@@ -65,11 +63,6 @@ describe('Controller: modifyScalingProcesses', function() {
         { name: 'Terminate', enabled: true },
         { name: 'AddToLoadBalancer', enabled: false },
       ];
-      this.taskMonitor = { submit: angular.noop };
-      spyOn(this.taskMonitorBuilder, 'buildTaskMonitor').and.returnValue(this.taskMonitor);
-      spyOn(this.taskMonitor, 'submit').and.callFake(function(method) {
-        method();
-      });
     });
 
     it('sends a resume job when processes are enabled', function() {

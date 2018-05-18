@@ -1,5 +1,6 @@
-import { module, noop, IPromise, ITimeoutService } from 'angular';
+import { noop, IPromise } from 'angular';
 import { IModalServiceInstance } from 'angular-ui-bootstrap';
+import { $timeout } from 'ngimport';
 
 import { Application } from 'core/application/application.model';
 import { ITask } from 'core/domain';
@@ -28,7 +29,7 @@ export class TaskMonitor {
   private onTaskComplete: () => any;
   private onTaskRetry: () => void;
 
-  constructor(public config: ITaskMonitorConfig, private $timeout: ITimeoutService) {
+  constructor(public config: ITaskMonitorConfig) {
     this.title = config.title;
     this.application = config.application;
     this.modalInstance = config.modalInstance;
@@ -42,7 +43,7 @@ export class TaskMonitor {
 
   public onModalClose(): void {
     if (this.task && this.task.poller) {
-      this.$timeout.cancel(this.task.poller);
+      $timeout.cancel(this.task.poller);
     }
   }
 
@@ -89,12 +90,12 @@ export class TaskMonitor {
     }
   }
 
-  public submit(submitMethod?: () => IPromise<ITask>) {
+  public submit = (submitMethod?: () => IPromise<ITask>) => {
     this.startSubmit();
     (submitMethod || this.submitMethod)()
       .then((task: ITask) => this.handleTaskSuccess(task))
       .catch((task: ITask) => this.setError(task));
-  }
+  };
 
   public callPreconfiguredSubmit(params: any) {
     this.startSubmit();
@@ -103,16 +104,3 @@ export class TaskMonitor {
       .catch((task: ITask) => this.setError(task));
   }
 }
-
-export class TaskMonitorBuilder {
-  constructor(private $timeout: ITimeoutService) {
-    'ngInject';
-  }
-
-  public buildTaskMonitor(config: ITaskMonitorConfig) {
-    return new TaskMonitor(config, this.$timeout);
-  }
-}
-
-export const TASK_MONITOR_BUILDER = 'spinnaker.core.task.monitor.builder';
-module(TASK_MONITOR_BUILDER, []).service('taskMonitorBuilder', TaskMonitorBuilder);

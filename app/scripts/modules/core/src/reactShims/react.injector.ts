@@ -39,7 +39,6 @@ import { ServerGroupWarningMessageService } from '../serverGroup/details/serverG
 import { ServerGroupWriter } from '../serverGroup/serverGroupWriter.service';
 import { StateEvents } from './state.events';
 import { SubnetReader } from '../subnet/subnet.read.service';
-import { TaskMonitorBuilder } from '../task/monitor/taskMonitor.builder';
 import { UrlBuilderService } from 'core/navigation/urlBuilder.service';
 import { VariableInputService } from '../pipeline/config/templates/inputs/variableInput.service';
 import { VariableValidatorService } from '../pipeline/config/templates/validators/variableValidator.service';
@@ -107,7 +106,6 @@ export class CoreReactInject extends ReactInject {
   public get recentHistoryService() { return this.$injector.get('recentHistoryService') as RecentHistoryService; }
   public get searchService() { return this.$injector.get('searchService') as SearchService; }
   public get stateEvents() { return this.$injector.get('stateEvents') as StateEvents; }
-  public get taskMonitorBuilder() { return this.$injector.get('taskMonitorBuilder') as TaskMonitorBuilder; }
   public get urlBuilderService() { return this.$injector.get('urlBuilderService') as UrlBuilderService; }
   public get variableInputService() { return this.$injector.get('variableInputService') as VariableInputService; }
   public get variableValidatorService() { return this.$injector.get('variableValidatorService') as VariableValidatorService; }
