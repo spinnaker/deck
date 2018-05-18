@@ -6,7 +6,7 @@ import { cloneDeep, partition } from 'lodash';
 import { $q } from 'ngimport';
 import { IModalServiceInstance } from 'angular-ui-bootstrap';
 
-import { Application, HelpField, NgReact, ReactInjector, TaskMonitor } from '@spinnaker/core';
+import { Application, HelpField, NgReact, ReactInjector, TaskExecutor, TaskMonitor } from '@spinnaker/core';
 
 import { metricOptions } from './metricOptions';
 import { IClusterConfig, IClusterConfigExpression } from './configBin.reader';
@@ -155,7 +155,7 @@ export class ConfigBinModal extends React.Component<IConfigBinModalProps, IConfi
     );
 
     const submitMethod = () => {
-      const promise = ReactInjector.taskExecutor.executeTask({
+      const promise = TaskExecutor.executeTask({
         application,
         description: `Update Config Bin metric forwarding for ${clusterName}`,
         job: [
