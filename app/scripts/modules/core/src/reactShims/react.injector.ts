@@ -40,11 +40,7 @@ import { ServerGroupWriter } from '../serverGroup/serverGroupWriter.service';
 import { StateEvents } from './state.events';
 import { SubnetReader } from '../subnet/subnet.read.service';
 import { UrlBuilderService } from 'core/navigation/urlBuilder.service';
-import { VariableInputService } from '../pipeline/config/templates/inputs/variableInput.service';
-import { VariableValidatorService } from '../pipeline/config/templates/validators/variableValidator.service';
 import { SkinSelectionService } from '../cloudProvider/skinSelection/skinSelection.service';
-import { SkinService } from '../cloudProvider/skin.service';
-import { WaypointService } from '../utils/waypoints/waypoint.service';
 
 export abstract class ReactInject {
   protected $injector: IInjectorService;
@@ -107,11 +103,7 @@ export class CoreReactInject extends ReactInject {
   public get searchService() { return this.$injector.get('searchService') as SearchService; }
   public get stateEvents() { return this.$injector.get('stateEvents') as StateEvents; }
   public get urlBuilderService() { return this.$injector.get('urlBuilderService') as UrlBuilderService; }
-  public get variableInputService() { return this.$injector.get('variableInputService') as VariableInputService; }
-  public get variableValidatorService() { return this.$injector.get('variableValidatorService') as VariableValidatorService; }
   public get skinSelectionService() { return this.$injector.get('skinSelectionService') as SkinSelectionService; }
-  public get skinService() { return this.$injector.get('skinService') as SkinService; }
-  public get waypointService() { return this.$injector.get('waypointService') as WaypointService; }
 
   private createStateService(): StateService {
     const wrappedState = Object.create(this.$injector.get('$state')) as StateService;
