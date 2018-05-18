@@ -37,7 +37,6 @@ module.exports = angular
     infrastructureSearchService,
     $stateParams,
     $location,
-    searchService,
     cacheInitializer,
     overrideRegistry,
     pageTitleService,
