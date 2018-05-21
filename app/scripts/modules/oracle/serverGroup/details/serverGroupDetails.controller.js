@@ -5,7 +5,7 @@ const angular = require('angular');
 import {
   CONFIRMATION_MODAL_SERVICE,
   NETWORK_READ_SERVICE,
-  SERVER_GROUP_READER,
+  ServerGroupReader,
   ServerGroupWarningMessageService,
   SERVER_GROUP_WRITER,
   SubnetReader,
@@ -14,7 +14,6 @@ import {
 module.exports = angular
   .module('spinnaker.oraclebmcs.serverGroup.details.controller', [
     require('@uirouter/angularjs').default,
-    SERVER_GROUP_READER,
     CONFIRMATION_MODAL_SERVICE,
     SERVER_GROUP_WRITER,
     NETWORK_READ_SERVICE,
@@ -29,7 +28,6 @@ module.exports = angular
     app,
     serverGroup,
     confirmationModalService,
-    serverGroupReader,
     serverGroupWriter,
     networkReader,
     oraclebmcsImageReader,
@@ -48,16 +46,19 @@ module.exports = angular
     /////////////////////////////////////////////////////////
 
     let retrieveServerGroup = () => {
-      return serverGroupReader
-        .getServerGroup(app.name, serverGroup.accountId, serverGroup.region, serverGroup.name)
-        .then(details => {
-          cancelLoader();
-          details.account = serverGroup.accountId;
-          this.serverGroup = details;
-          retrieveNetwork();
-          retrieveSubnet();
-          retrieveImage();
-        });
+      return ServerGroupReader.getServerGroup(
+        app.name,
+        serverGroup.accountId,
+        serverGroup.region,
+        serverGroup.name,
+      ).then(details => {
+        cancelLoader();
+        details.account = serverGroup.accountId;
+        this.serverGroup = details;
+        retrieveNetwork();
+        retrieveSubnet();
+        retrieveImage();
+      });
     };
 
     let retrieveNetwork = () => {

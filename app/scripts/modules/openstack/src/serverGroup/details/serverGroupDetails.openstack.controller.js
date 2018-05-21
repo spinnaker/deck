@@ -9,7 +9,7 @@ import {
   FirewallLabels,
   OVERRIDE_REGISTRY,
   SECURITY_GROUP_READER,
-  SERVER_GROUP_READER,
+  ServerGroupReader,
   ServerGroupWarningMessageService,
   SERVER_GROUP_WRITER,
   SubnetReader,
@@ -24,7 +24,6 @@ module.exports = angular
     SERVER_GROUP_WRITER,
     SECURITY_GROUP_READER,
     OVERRIDE_REGISTRY,
-    SERVER_GROUP_READER,
     require('../configure/ServerGroupCommandBuilder.js').name,
     require('../serverGroup.transformer.js').name,
   ])
@@ -33,7 +32,6 @@ module.exports = angular
     $state,
     app,
     serverGroup,
-    serverGroupReader,
     openstackServerGroupCommandBuilder,
     $uibModal,
     confirmationModalService,
@@ -93,31 +91,34 @@ module.exports = angular
     let retrieveServerGroup = () => {
       return extractServerGroupSummary()
         .then(summary => {
-          return serverGroupReader
-            .getServerGroup(app.name, serverGroup.accountId, serverGroup.region, serverGroup.name)
-            .then(details => {
-              cancelLoader();
+          return ServerGroupReader.getServerGroup(
+            app.name,
+            serverGroup.accountId,
+            serverGroup.region,
+            serverGroup.name,
+          ).then(details => {
+            cancelLoader();
 
-              angular.extend(details, summary);
+            angular.extend(details, summary);
 
-              // it's possible the summary was not found because the clusters are still loading
-              if (!details.account) {
-                details.account = serverGroup.accountId;
-              }
+            // it's possible the summary was not found because the clusters are still loading
+            if (!details.account) {
+              details.account = serverGroup.accountId;
+            }
 
-              openstackServerGroupTransformer.normalizeServerGroup(details);
+            openstackServerGroupTransformer.normalizeServerGroup(details);
 
-              this.serverGroup = details;
-              this.applyAccountDetails(this.serverGroup);
-              this.applySubnetDetails();
-              this.applyFloatingIpDetails();
-              this.applySecurityGroupDetails(this.serverGroup);
-              this.applyLoadBalancerDetails(this.serverGroup);
+            this.serverGroup = details;
+            this.applyAccountDetails(this.serverGroup);
+            this.applySubnetDetails();
+            this.applyFloatingIpDetails();
+            this.applySecurityGroupDetails(this.serverGroup);
+            this.applyLoadBalancerDetails(this.serverGroup);
 
-              if (_.isEmpty(this.serverGroup)) {
-                autoClose();
-              }
-            });
+            if (_.isEmpty(this.serverGroup)) {
+              autoClose();
+            }
+          });
         })
         .catch(autoClose);
     };

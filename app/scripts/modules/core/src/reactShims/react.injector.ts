@@ -32,8 +32,6 @@ import { ProviderSelectionService } from '../cloudProvider/providerSelection/pro
 import { SchedulerFactory } from '../scheduler/scheduler.factory';
 import { ScrollToService } from '../utils/scrollTo/scrollTo.service';
 import { SecurityGroupReader } from '../securityGroup/securityGroupReader.service';
-import { ServerGroupReader } from '../serverGroup/serverGroupReader.service';
-import { ServerGroupWarningMessageService } from '../serverGroup/details/serverGroupWarningMessage.service';
 import { ServerGroupWriter } from '../serverGroup/serverGroupWriter.service';
 import { StateEvents } from './state.events';
 import { UrlBuilderService } from 'core/navigation/urlBuilder.service';
@@ -92,7 +90,6 @@ export class CoreReactInject extends ReactInject {
   public get schedulerFactory() { return this.$injector.get('schedulerFactory') as SchedulerFactory; }
   public get scrollToService() { return this.$injector.get('scrollToService') as ScrollToService; }
   public get securityGroupReader() { return this.$injector.get('securityGroupReader') as SecurityGroupReader; }
-  public get serverGroupReader() { return this.$injector.get('serverGroupReader') as ServerGroupReader; }
   public get serverGroupWriter() { return this.$injector.get('serverGroupWriter') as ServerGroupWriter; }
   public get stateEvents() { return this.$injector.get('stateEvents') as StateEvents; }
   public get urlBuilderService() { return this.$injector.get('urlBuilderService') as UrlBuilderService; }

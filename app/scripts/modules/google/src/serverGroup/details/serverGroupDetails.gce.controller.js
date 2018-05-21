@@ -8,7 +8,7 @@ import {
   ClusterTargetBuilder,
   FirewallLabels,
   NETWORK_READ_SERVICE,
-  SERVER_GROUP_READER,
+  ServerGroupReader,
   ServerGroupWarningMessageService,
   SERVER_GROUP_WRITER,
   ServerGroupTemplates,
@@ -22,7 +22,6 @@ module.exports = angular
   .module('spinnaker.serverGroup.details.gce.controller', [
     require('@uirouter/angularjs').default,
     require('../configure/serverGroupCommandBuilder.service.js').name,
-    SERVER_GROUP_READER,
     CONFIRMATION_MODAL_SERVICE,
     NETWORK_READ_SERVICE,
     SERVER_GROUP_WRITER,
@@ -40,7 +39,6 @@ module.exports = angular
     app,
     serverGroup,
     gceServerGroupCommandBuilder,
-    serverGroupReader,
     $uibModal,
     confirmationModalService,
     serverGroupWriter,
@@ -92,57 +90,60 @@ module.exports = angular
 
     let retrieveServerGroup = () => {
       var summary = extractServerGroupSummary();
-      return serverGroupReader
-        .getServerGroup(app.name, serverGroup.accountId, serverGroup.region, serverGroup.name)
-        .then(details => {
-          cancelLoader();
+      return ServerGroupReader.getServerGroup(
+        app.name,
+        serverGroup.accountId,
+        serverGroup.region,
+        serverGroup.name,
+      ).then(details => {
+        cancelLoader();
 
-          angular.extend(details, summary);
-          // it's possible the summary was not found because the clusters are still loading
-          details.account = serverGroup.accountId;
+        angular.extend(details, summary);
+        // it's possible the summary was not found because the clusters are still loading
+        details.account = serverGroup.accountId;
 
-          this.serverGroup = details;
+        this.serverGroup = details;
 
-          if (!_.isEmpty(this.serverGroup)) {
-            if (details.securityGroups) {
-              this.securityGroups = _.chain(details.securityGroups)
-                .map(id => {
-                  return (
-                    _.find(app.securityGroups.data, { accountName: serverGroup.accountId, region: 'global', id: id }) ||
-                    _.find(app.securityGroups.data, { accountName: serverGroup.accountId, region: 'global', name: id })
-                  );
-                })
-                .compact()
-                .value();
-            }
-
-            this.serverGroup.zones.sort();
-
-            var projectId = gceXpnNamingService.deriveProjectId(this.serverGroup.launchConfig.instanceTemplate);
-            this.serverGroup.logsLink =
-              'https://console.developers.google.com/project/' +
-              projectId +
-              '/logs?advancedFilter=resource.type=(gce_instance_group_manager OR gce_instance OR gce_autoscaler)%0A"' +
-              this.serverGroup.name +
-              '"';
-
-            this.serverGroup.network = getNetwork(projectId);
-            retrieveSubnet(projectId);
-            determineAssociatePublicIPAddress();
-
-            findStartupScript();
-            prepareDiskDescriptions();
-            prepareAvailabilityPolicies();
-            prepareAutoHealingPolicy();
-            prepareAuthScopes();
-            prepareCurrentActions();
-            augmentTagsWithHelp();
-            configureEntityTagTargets();
-            processLabels();
-          } else {
-            autoClose();
+        if (!_.isEmpty(this.serverGroup)) {
+          if (details.securityGroups) {
+            this.securityGroups = _.chain(details.securityGroups)
+              .map(id => {
+                return (
+                  _.find(app.securityGroups.data, { accountName: serverGroup.accountId, region: 'global', id: id }) ||
+                  _.find(app.securityGroups.data, { accountName: serverGroup.accountId, region: 'global', name: id })
+                );
+              })
+              .compact()
+              .value();
           }
-        }, autoClose);
+
+          this.serverGroup.zones.sort();
+
+          var projectId = gceXpnNamingService.deriveProjectId(this.serverGroup.launchConfig.instanceTemplate);
+          this.serverGroup.logsLink =
+            'https://console.developers.google.com/project/' +
+            projectId +
+            '/logs?advancedFilter=resource.type=(gce_instance_group_manager OR gce_instance OR gce_autoscaler)%0A"' +
+            this.serverGroup.name +
+            '"';
+
+          this.serverGroup.network = getNetwork(projectId);
+          retrieveSubnet(projectId);
+          determineAssociatePublicIPAddress();
+
+          findStartupScript();
+          prepareDiskDescriptions();
+          prepareAvailabilityPolicies();
+          prepareAutoHealingPolicy();
+          prepareAuthScopes();
+          prepareCurrentActions();
+          augmentTagsWithHelp();
+          configureEntityTagTargets();
+          processLabels();
+        } else {
+          autoClose();
+        }
+      }, autoClose);
     };
 
     let findStartupScript = () => {

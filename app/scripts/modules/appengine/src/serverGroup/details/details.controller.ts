@@ -9,7 +9,6 @@ import {
   IConfirmationModalParams,
   IServerGroup,
   ITaskMonitorConfig,
-  SERVER_GROUP_READER,
   SERVER_GROUP_WRITER,
   ServerGroupReader,
   ServerGroupWarningMessageService,
@@ -64,7 +63,6 @@ class AppengineServerGroupDetailsController implements IController {
     private $uibModal: IModalService,
     serverGroup: IServerGroupFromStateParams,
     public app: Application,
-    private serverGroupReader: ServerGroupReader,
     private serverGroupWriter: ServerGroupWriter,
     private confirmationModalService: ConfirmationModalService,
     private appengineServerGroupWriter: AppengineServerGroupWriter,
@@ -416,35 +414,38 @@ class AppengineServerGroupDetailsController implements IController {
   }
 
   private extractServerGroup(fromParams: IServerGroupFromStateParams): ng.IPromise<void> {
-    return this.serverGroupReader
-      .getServerGroup(this.app.name, fromParams.accountId, fromParams.region, fromParams.name)
-      .then((serverGroupDetails: IServerGroup) => {
-        let fromApp = this.app.getDataSource('serverGroups').data.find((toCheck: IServerGroup) => {
-          return (
-            toCheck.name === fromParams.name &&
-            toCheck.account === fromParams.accountId &&
-            toCheck.region === fromParams.region
-          );
-        });
-
-        if (!fromApp) {
-          this.app.getDataSource('loadBalancers').data.some(loadBalancer => {
-            if (loadBalancer.account === fromParams.accountId) {
-              return loadBalancer.serverGroups.some((toCheck: IServerGroup) => {
-                let result = false;
-                if (toCheck.name === fromParams.name) {
-                  fromApp = toCheck;
-                  result = true;
-                }
-                return result;
-              });
-            }
-          });
-        }
-
-        this.serverGroup = { ...serverGroupDetails, ...fromApp };
-        this.state.loading = false;
+    return ServerGroupReader.getServerGroup(
+      this.app.name,
+      fromParams.accountId,
+      fromParams.region,
+      fromParams.name,
+    ).then((serverGroupDetails: IServerGroup) => {
+      let fromApp = this.app.getDataSource('serverGroups').data.find((toCheck: IServerGroup) => {
+        return (
+          toCheck.name === fromParams.name &&
+          toCheck.account === fromParams.accountId &&
+          toCheck.region === fromParams.region
+        );
       });
+
+      if (!fromApp) {
+        this.app.getDataSource('loadBalancers').data.some(loadBalancer => {
+          if (loadBalancer.account === fromParams.accountId) {
+            return loadBalancer.serverGroups.some((toCheck: IServerGroup) => {
+              let result = false;
+              if (toCheck.name === fromParams.name) {
+                fromApp = toCheck;
+                result = true;
+              }
+              return result;
+            });
+          }
+        });
+      }
+
+      this.serverGroup = { ...serverGroupDetails, ...fromApp };
+      this.state.loading = false;
+    });
   }
 }
 
@@ -453,6 +454,5 @@ export const APPENGINE_SERVER_GROUP_DETAILS_CTRL = 'spinnaker.appengine.serverGr
 module(APPENGINE_SERVER_GROUP_DETAILS_CTRL, [
   APPENGINE_SERVER_GROUP_WRITER,
   CONFIRMATION_MODAL_SERVICE,
-  SERVER_GROUP_READER,
   SERVER_GROUP_WRITER,
 ]).controller('appengineServerGroupDetailsCtrl', AppengineServerGroupDetailsController);
