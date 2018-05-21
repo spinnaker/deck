@@ -77,7 +77,6 @@ export abstract class CreateAmazonLoadBalancerCtrl {
     protected cacheInitializer: CacheInitializerService,
     protected v2modalWizardService: any,
     protected loadBalancerWriter: LoadBalancerWriter,
-    protected subnetReader: SubnetReader,
     protected application: Application,
     protected isNew: boolean,
     protected forPipelineConfig: boolean,
@@ -278,7 +277,7 @@ export abstract class CreateAmazonLoadBalancerCtrl {
   private getAvailableSubnets(): IPromise<ISubnet[]> {
     const account = this.loadBalancerCommand.credentials,
       region = this.loadBalancerCommand.region;
-    return this.subnetReader.listSubnets().then(subnets => {
+    return SubnetReader.listSubnets().then(subnets => {
       return chain(subnets)
         .filter({ account, region })
         .reject({ target: 'ec2' })

@@ -18,7 +18,6 @@ module.exports = angular
     app,
     confirmationModalService,
     loadBalancerWriter,
-    subnetReader,
     $q,
   ) {
     let application = app;

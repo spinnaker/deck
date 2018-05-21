@@ -8,7 +8,7 @@ import {
   SERVER_GROUP_READER,
   SERVER_GROUP_WARNING_MESSAGE_SERVICE,
   SERVER_GROUP_WRITER,
-  SUBNET_READ_SERVICE,
+  SubnetReader,
 } from '@spinnaker/core';
 
 module.exports = angular
@@ -19,7 +19,6 @@ module.exports = angular
     SERVER_GROUP_WRITER,
     SERVER_GROUP_WARNING_MESSAGE_SERVICE,
     NETWORK_READ_SERVICE,
-    SUBNET_READ_SERVICE,
     require('../../image/image.reader.js').name,
     require('./resize/resizeServerGroup.controller.js').name,
     require('./rollback/rollbackServerGroup.controller.js').name,
@@ -34,7 +33,6 @@ module.exports = angular
     serverGroupReader,
     serverGroupWriter,
     networkReader,
-    subnetReader,
     oraclebmcsImageReader,
     serverGroupWarningMessageService,
   ) {
@@ -74,7 +72,7 @@ module.exports = angular
     };
 
     let retrieveSubnet = () => {
-      subnetReader.getSubnetByIdAndProvider(this.serverGroup.launchConfig.subnetId, provider).then(subnet => {
+      SubnetReader.getSubnetByIdAndProvider(this.serverGroup.launchConfig.subnetId, provider).then(subnet => {
         this.serverGroup.subnet = subnet;
       });
     };

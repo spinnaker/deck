@@ -2,7 +2,7 @@ import { IPromise } from 'angular';
 import { isEmpty } from 'lodash';
 import { Observable } from 'rxjs';
 
-import { AccountService, IServerGroupDetailsProps, ISubnet, ReactInjector } from '@spinnaker/core';
+import { AccountService, IServerGroupDetailsProps, ISubnet, ReactInjector, SubnetReader } from '@spinnaker/core';
 
 import { AwsReactInjector } from 'amazon/reactShims';
 import { IAmazonLoadBalancer, IAmazonServerGroup, IAmazonServerGroupView } from 'amazon/domain';
@@ -60,7 +60,7 @@ export function amazonServerGroupDetailsGetter(
 
             if (vpc !== '') {
               const subnetId = vpc.split(',')[0];
-              ReactInjector.subnetReader.listSubnets().then((subnets: ISubnet[]) => {
+              SubnetReader.listSubnets().then((subnets: ISubnet[]) => {
                 const subnet = subnets.find(s => s.id === subnetId);
                 serverGroup.subnetType = subnet.purpose;
                 observer.next(serverGroup);

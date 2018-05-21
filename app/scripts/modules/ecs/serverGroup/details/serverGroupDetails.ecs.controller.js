@@ -13,6 +13,7 @@ import {
   SERVER_GROUP_READER,
   SERVER_GROUP_WARNING_MESSAGE_SERVICE,
   SERVER_GROUP_WRITER,
+  SubnetReader,
 } from '@spinnaker/core';
 
 module.exports = angular
@@ -38,7 +39,6 @@ module.exports = angular
     $uibModal,
     confirmationModalService,
     serverGroupWriter,
-    subnetReader,
     ecsServerGroupTransformer,
     serverGroupWarningMessageService,
     overrideRegistry,
@@ -109,7 +109,7 @@ module.exports = angular
 
                 if (vpc !== '') {
                   var subnetId = vpc.split(',')[0];
-                  subnetReader.listSubnets().then(subnets => {
+                  SubnetReader.listSubnets().then(subnets => {
                     var subnet = chain(subnets)
                       .find({ id: subnetId })
                       .value();

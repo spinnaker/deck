@@ -36,7 +36,6 @@ import { ServerGroupReader } from '../serverGroup/serverGroupReader.service';
 import { ServerGroupWarningMessageService } from '../serverGroup/details/serverGroupWarningMessage.service';
 import { ServerGroupWriter } from '../serverGroup/serverGroupWriter.service';
 import { StateEvents } from './state.events';
-import { SubnetReader } from '../subnet/subnet.read.service';
 import { UrlBuilderService } from 'core/navigation/urlBuilder.service';
 import { SkinSelectionService } from '../cloudProvider/skinSelection/skinSelection.service';
 
@@ -96,7 +95,6 @@ export class CoreReactInject extends ReactInject {
   public get serverGroupReader() { return this.$injector.get('serverGroupReader') as ServerGroupReader; }
   public get serverGroupWarningMessageService() { return this.$injector.get('serverGroupWarningMessageService') as ServerGroupWarningMessageService; }
   public get serverGroupWriter() { return this.$injector.get('serverGroupWriter') as ServerGroupWriter; }
-  public get subnetReader() { return this.$injector.get('subnetReader') as SubnetReader; }
   public get stateEvents() { return this.$injector.get('stateEvents') as StateEvents; }
   public get urlBuilderService() { return this.$injector.get('urlBuilderService') as UrlBuilderService; }
   public get skinSelectionService() { return this.$injector.get('skinSelectionService') as SkinSelectionService; }

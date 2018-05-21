@@ -12,6 +12,7 @@ import {
   SERVER_GROUP_READER,
   SERVER_GROUP_WARNING_MESSAGE_SERVICE,
   SERVER_GROUP_WRITER,
+  SubnetReader,
 } from '@spinnaker/core';
 
 require('../configure/serverGroup.configure.openstack.module.js');
@@ -38,7 +39,6 @@ module.exports = angular
     $uibModal,
     confirmationModalService,
     serverGroupWriter,
-    subnetReader,
     networkReader,
     securityGroupReader,
     loadBalancerReader,
@@ -344,7 +344,7 @@ module.exports = angular
     };
 
     this.applySubnetDetails = () => {
-      return subnetReader.getSubnetByIdAndProvider(this.serverGroup.subnetId, 'openstack').then(details => {
+      return SubnetReader.getSubnetByIdAndProvider(this.serverGroup.subnetId, 'openstack').then(details => {
         ctrl.subnetName = (details || {}).name;
       });
     };
