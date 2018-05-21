@@ -1,4 +1,3 @@
-import { module } from 'angular';
 import { has } from 'lodash';
 
 import { Application } from 'core/application/application.model';

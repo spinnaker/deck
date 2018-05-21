@@ -1,4 +1,4 @@
-import { ILogService, IPromise } from 'angular';
+import { IPromise } from 'angular';
 
 import { $log } from 'ngimport';
 

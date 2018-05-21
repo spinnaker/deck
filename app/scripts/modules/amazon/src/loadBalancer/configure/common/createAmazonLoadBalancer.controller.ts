@@ -76,7 +76,6 @@ export abstract class CreateAmazonLoadBalancerCtrl {
     protected amazonCertificateReader: AmazonCertificateReader,
     protected cacheInitializer: CacheInitializerService,
     protected v2modalWizardService: any,
-    protected loadBalancerWriter: LoadBalancerWriter,
     protected application: Application,
     protected isNew: boolean,
     protected forPipelineConfig: boolean,
@@ -467,7 +466,7 @@ export abstract class CreateAmazonLoadBalancerCtrl {
       this.taskMonitor.submit(() => {
         return this.formatListeners(loadBalancerCommandFormatted).then(() => {
           this.formatCommand(loadBalancerCommandFormatted);
-          return this.loadBalancerWriter.upsertLoadBalancer(loadBalancerCommandFormatted, this.application, descriptor);
+          return LoadBalancerWriter.upsertLoadBalancer(loadBalancerCommandFormatted, this.application, descriptor);
         });
       });
     }
