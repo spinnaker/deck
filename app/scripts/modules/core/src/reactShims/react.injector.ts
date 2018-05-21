@@ -10,7 +10,6 @@ import { CacheInitializerService } from '../cache/cacheInitializer.service';
 import { CancelModalService } from '../cancelModal/cancelModal.service';
 import { ConfirmationModalService } from '../confirmationModal/confirmationModal.service';
 import { ExecutionDetailsSectionService } from 'core/pipeline/details/executionDetailsSection.service';
-import { ExecutionFilterService } from '../pipeline/filter/executionFilter.service';
 import { ExecutionService } from '../pipeline/service/execution.service';
 import { ExecutionsTransformerService } from '../pipeline/service/executions.transformer.service';
 import { HelpContentsRegistry, IHelpContents } from 'core/help';
@@ -61,7 +60,6 @@ export class CoreReactInject extends ReactInject {
   public get cancelModalService() { return this.$injector.get('cancelModalService') as CancelModalService; }
   public get confirmationModalService() { return this.$injector.get('confirmationModalService') as ConfirmationModalService; }
   public get executionDetailsSectionService() { return this.$injector.get('executionDetailsSectionService') as ExecutionDetailsSectionService; }
-  public get executionFilterService() { return this.$injector.get('executionFilterService') as ExecutionFilterService; }
   public get executionService() { return this.$injector.get('executionService') as ExecutionService; }
   public get executionsTransformer() { return this.$injector.get('executionsTransformer') as ExecutionsTransformerService; }
   public get helpContents() { return this.$injector.get('helpContents') as IHelpContents }

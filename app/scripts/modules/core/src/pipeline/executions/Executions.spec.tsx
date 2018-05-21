@@ -5,7 +5,6 @@ import { IScope, ITimeoutService, mock, noop } from 'angular';
 
 import { Application } from 'core/application';
 import { APPLICATION_MODEL_BUILDER, ApplicationModelBuilder } from 'core/application/applicationModel.builder';
-import { EXECUTION_FILTER_SERVICE } from 'core/pipeline/filter/executionFilter.service';
 import { INSIGHT_FILTER_STATE_MODEL } from 'core/insight/insightFilterState.model';
 import { REACT_MODULE, ReactInjector } from 'core/reactShims';
 import { ScrollToService } from 'core/utils';
@@ -32,9 +31,7 @@ describe('<Executions/>', () => {
     component = mount(<Executions app={application} />);
   }
 
-  beforeEach(
-    mock.module(APPLICATION_MODEL_BUILDER, EXECUTION_FILTER_SERVICE, INSIGHT_FILTER_STATE_MODEL, REACT_MODULE),
-  );
+  beforeEach(mock.module(APPLICATION_MODEL_BUILDER, INSIGHT_FILTER_STATE_MODEL, REACT_MODULE));
   beforeEach(
     mock.inject((_$timeout_: ITimeoutService, $rootScope: IScope, applicationModelBuilder: ApplicationModelBuilder) => {
       scope = $rootScope.$new();

@@ -15,6 +15,7 @@ import { Tooltip } from 'core/presentation/Tooltip';
 
 import { CreatePipeline } from 'core/pipeline/config/CreatePipeline';
 import { ExecutionFilters } from 'core/pipeline/filter/ExecutionFilters';
+import { ExecutionFilterService } from 'core/pipeline/filter/executionFilter.service';
 import { ExecutionGroups } from './executionGroup/ExecutionGroups';
 import { FilterTags, IFilterTag, ISortFilter } from 'core/filterModel';
 import { PipelineConfigService } from 'core/pipeline/config/services/PipelineConfigService';
@@ -78,7 +79,7 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
   }
 
   private clearFilters = (): void => {
-    ReactInjector.executionFilterService.clearFilters();
+    ExecutionFilterService.clearFilters();
     this.updateExecutionGroups(true);
   };
 
@@ -93,7 +94,7 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
       app.executions.refresh(true);
       app.executions.reloadingForFilters = true;
     } else {
-      ReactInjector.executionFilterService.updateExecutionGroups(app);
+      ExecutionFilterService.updateExecutionGroups(app);
       this.groupsUpdated();
       // updateExecutionGroups is debounced by 25ms, so we need to delay setting the loading flag a bit
       $timeout(() => {
@@ -215,9 +216,7 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
   }
 
   public componentDidMount(): void {
-    this.groupsUpdatedSubscription = ReactInjector.executionFilterService.groupsUpdatedStream.subscribe(() =>
-      this.groupsUpdated(),
-    );
+    this.groupsUpdatedSubscription = ExecutionFilterService.groupsUpdatedStream.subscribe(() => this.groupsUpdated());
     this.locationChangeUnsubscribe = ReactInjector.$uiRouter.transitionService.onSuccess({}, t =>
       this.handleTransitionSuccess(t),
     );
