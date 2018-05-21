@@ -37,7 +37,6 @@ class KubernetesInstanceDetailsController implements IController {
     private $q: IQService,
     private $scope: IScope,
     private app: Application,
-    private kubernetesManifestService: KubernetesManifestService,
     private instanceReader: InstanceReader,
   ) {
     'ngInject';
@@ -48,9 +47,8 @@ class KubernetesInstanceDetailsController implements IController {
       .then(instanceDetails => {
         this.instance = instanceDetails;
 
-        this.kubernetesManifestService.makeManifestRefresher(
+        const unsubscribe = KubernetesManifestService.makeManifestRefresher(
           this.app,
-          this.$scope,
           {
             account: this.instance.account,
             location: this.instance.namespace,
@@ -58,6 +56,9 @@ class KubernetesInstanceDetailsController implements IController {
           },
           this,
         );
+        this.$scope.$on('$destroy', () => {
+          unsubscribe();
+        });
         this.state.loading = false;
       })
       .catch(() => {
