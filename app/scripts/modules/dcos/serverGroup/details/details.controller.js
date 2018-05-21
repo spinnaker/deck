@@ -5,7 +5,7 @@ import _ from 'lodash';
 
 import {
   CONFIRMATION_MODAL_SERVICE,
-  SERVER_GROUP_WARNING_MESSAGE_SERVICE,
+  ServerGroupWarningMessageService,
   SERVER_GROUP_READER,
   SERVER_GROUP_WRITER,
   ServerGroupTemplates,
@@ -15,7 +15,6 @@ module.exports = angular
   .module('spinnaker.dcos.serverGroup.details.controller', [
     require('../configure/configure.dcos.module.js').name,
     CONFIRMATION_MODAL_SERVICE,
-    SERVER_GROUP_WARNING_MESSAGE_SERVICE,
     SERVER_GROUP_READER,
     SERVER_GROUP_WRITER,
     require('../paramsMixin.js').name,
@@ -28,7 +27,6 @@ module.exports = angular
     serverGroupReader,
     $uibModal,
     serverGroupWriter,
-    serverGroupWarningMessageService,
     dcosServerGroupCommandBuilder,
     dcosServerGroupParamsMixin,
     confirmationModalService,
@@ -170,7 +168,7 @@ module.exports = angular
         },
       };
 
-      serverGroupWarningMessageService.addDestroyWarningMessage(app, serverGroup, confirmationModalParams);
+      ServerGroupWarningMessageService.addDestroyWarningMessage(app, serverGroup, confirmationModalParams);
 
       confirmationModalService.confirm(confirmationModalParams);
     };

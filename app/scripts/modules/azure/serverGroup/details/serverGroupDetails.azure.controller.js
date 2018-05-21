@@ -6,7 +6,7 @@ import _ from 'lodash';
 import {
   CONFIRMATION_MODAL_SERVICE,
   SERVER_GROUP_READER,
-  SERVER_GROUP_WARNING_MESSAGE_SERVICE,
+  ServerGroupWarningMessageService,
   SERVER_GROUP_WRITER,
   FirewallLabels,
 } from '@spinnaker/core';
@@ -20,7 +20,6 @@ module.exports = angular
     SERVER_GROUP_READER,
     CONFIRMATION_MODAL_SERVICE,
     SERVER_GROUP_WRITER,
-    SERVER_GROUP_WARNING_MESSAGE_SERVICE,
   ])
   .controller('azureServerGroupDetailsCtrl', function(
     $scope,
@@ -28,7 +27,6 @@ module.exports = angular
     $templateCache,
     app,
     serverGroup,
-    serverGroupWarningMessageService,
     serverGroupReader,
     azureServerGroupCommandBuilder,
     $uibModal,
@@ -162,7 +160,7 @@ module.exports = angular
         },
       };
 
-      serverGroupWarningMessageService.addDestroyWarningMessage(app, serverGroup, confirmationModalParams);
+      ServerGroupWarningMessageService.addDestroyWarningMessage(app, serverGroup, confirmationModalParams);
 
       confirmationModalService.confirm(confirmationModalParams);
     };
@@ -185,7 +183,7 @@ module.exports = angular
         submitMethod: submitMethod,
       };
 
-      serverGroupWarningMessageService.addDisableWarningMessage(app, serverGroup, confirmationModalParams);
+      ServerGroupWarningMessageService.addDisableWarningMessage(app, serverGroup, confirmationModalParams);
 
       confirmationModalService.confirm(confirmationModalParams);
     };

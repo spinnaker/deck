@@ -11,8 +11,8 @@ import {
   CONFIRMATION_MODAL_SERVICE,
   OVERRIDE_REGISTRY,
   SERVER_GROUP_READER,
-  SERVER_GROUP_WARNING_MESSAGE_SERVICE,
   SERVER_GROUP_WRITER,
+  ServerGroupWarningMessageService,
   SubnetReader,
 } from '@spinnaker/core';
 
@@ -23,7 +23,6 @@ module.exports = angular
     CONFIRMATION_MODAL_SERVICE,
     OVERRIDE_REGISTRY,
     SERVER_GROUP_READER,
-    SERVER_GROUP_WARNING_MESSAGE_SERVICE,
     SERVER_GROUP_WRITER,
     require('../configure/serverGroupCommandBuilder.service.js').name,
     require('./resize/resizeServerGroup.controller').name,
@@ -40,7 +39,6 @@ module.exports = angular
     confirmationModalService,
     serverGroupWriter,
     ecsServerGroupTransformer,
-    serverGroupWarningMessageService,
     overrideRegistry,
   ) {
     this.state = {
@@ -204,7 +202,7 @@ module.exports = angular
         },
       };
 
-      serverGroupWarningMessageService.addDestroyWarningMessage(app, serverGroup, confirmationModalParams);
+      ServerGroupWarningMessageService.addDestroyWarningMessage(app, serverGroup, confirmationModalParams);
 
       if (app.attributes.platformHealthOnlyShowOverride && app.attributes.platformHealthOnly) {
         confirmationModalParams.interestingHealthProviderNames = ['Ecs'];
@@ -237,7 +235,7 @@ module.exports = angular
         askForReason: true,
       };
 
-      serverGroupWarningMessageService.addDisableWarningMessage(app, serverGroup, confirmationModalParams);
+      ServerGroupWarningMessageService.addDisableWarningMessage(app, serverGroup, confirmationModalParams);
 
       if (app.attributes.platformHealthOnlyShowOverride && app.attributes.platformHealthOnly) {
         confirmationModalParams.interestingHealthProviderNames = ['Ecs'];

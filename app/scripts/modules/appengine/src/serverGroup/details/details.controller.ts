@@ -10,7 +10,6 @@ import {
   IServerGroup,
   ITaskMonitorConfig,
   SERVER_GROUP_READER,
-  SERVER_GROUP_WARNING_MESSAGE_SERVICE,
   SERVER_GROUP_WRITER,
   ServerGroupReader,
   ServerGroupWarningMessageService,
@@ -67,7 +66,6 @@ class AppengineServerGroupDetailsController implements IController {
     public app: Application,
     private serverGroupReader: ServerGroupReader,
     private serverGroupWriter: ServerGroupWriter,
-    private serverGroupWarningMessageService: ServerGroupWarningMessageService,
     private confirmationModalService: ConfirmationModalService,
     private appengineServerGroupWriter: AppengineServerGroupWriter,
     private appengineServerGroupCommandBuilder: AppengineServerGroupCommandBuilder,
@@ -352,7 +350,7 @@ class AppengineServerGroupDetailsController implements IController {
   private getBodyTemplate(serverGroup: IAppengineServerGroup, app: Application): string {
     let template = '';
     const params: IConfirmationModalParams = {};
-    this.serverGroupWarningMessageService.addDestroyWarningMessage(app, serverGroup, params);
+    ServerGroupWarningMessageService.addDestroyWarningMessage(app, serverGroup, params);
     if (params.body) {
       template += params.body;
     }
@@ -455,7 +453,6 @@ export const APPENGINE_SERVER_GROUP_DETAILS_CTRL = 'spinnaker.appengine.serverGr
 module(APPENGINE_SERVER_GROUP_DETAILS_CTRL, [
   APPENGINE_SERVER_GROUP_WRITER,
   CONFIRMATION_MODAL_SERVICE,
-  SERVER_GROUP_WARNING_MESSAGE_SERVICE,
   SERVER_GROUP_READER,
   SERVER_GROUP_WRITER,
 ]).controller('appengineServerGroupDetailsCtrl', AppengineServerGroupDetailsController);

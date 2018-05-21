@@ -93,7 +93,6 @@ export class CoreReactInject extends ReactInject {
   public get scrollToService() { return this.$injector.get('scrollToService') as ScrollToService; }
   public get securityGroupReader() { return this.$injector.get('securityGroupReader') as SecurityGroupReader; }
   public get serverGroupReader() { return this.$injector.get('serverGroupReader') as ServerGroupReader; }
-  public get serverGroupWarningMessageService() { return this.$injector.get('serverGroupWarningMessageService') as ServerGroupWarningMessageService; }
   public get serverGroupWriter() { return this.$injector.get('serverGroupWriter') as ServerGroupWriter; }
   public get stateEvents() { return this.$injector.get('stateEvents') as StateEvents; }
   public get urlBuilderService() { return this.$injector.get('urlBuilderService') as UrlBuilderService; }

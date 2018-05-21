@@ -6,7 +6,7 @@ import _ from 'lodash';
 import {
   CONFIRMATION_MODAL_SERVICE,
   SERVER_GROUP_READER,
-  SERVER_GROUP_WARNING_MESSAGE_SERVICE,
+  ServerGroupWarningMessageService,
   SERVER_GROUP_WRITER,
   ServerGroupTemplates,
 } from '@spinnaker/core';
@@ -16,7 +16,6 @@ module.exports = angular
     require('@uirouter/angularjs').default,
     require('../configure/configure.kubernetes.module.js').name,
     CONFIRMATION_MODAL_SERVICE,
-    SERVER_GROUP_WARNING_MESSAGE_SERVICE,
     SERVER_GROUP_READER,
     SERVER_GROUP_WRITER,
     require('../paramsMixin.js').name,
@@ -29,7 +28,6 @@ module.exports = angular
     serverGroupReader,
     $uibModal,
     serverGroupWriter,
-    serverGroupWarningMessageService,
     kubernetesServerGroupCommandBuilder,
     kubernetesServerGroupParamsMixin,
     confirmationModalService,
@@ -161,7 +159,7 @@ module.exports = angular
         },
       };
 
-      serverGroupWarningMessageService.addDestroyWarningMessage(app, serverGroup, confirmationModalParams);
+      ServerGroupWarningMessageService.addDestroyWarningMessage(app, serverGroup, confirmationModalParams);
 
       confirmationModalService.confirm(confirmationModalParams);
     };
@@ -191,7 +189,7 @@ module.exports = angular
         askForReason: true,
       };
 
-      serverGroupWarningMessageService.addDisableWarningMessage(app, serverGroup, confirmationModalParams);
+      ServerGroupWarningMessageService.addDisableWarningMessage(app, serverGroup, confirmationModalParams);
 
       confirmationModalService.confirm(confirmationModalParams);
     };

@@ -10,7 +10,7 @@ import {
   OVERRIDE_REGISTRY,
   SECURITY_GROUP_READER,
   SERVER_GROUP_READER,
-  SERVER_GROUP_WARNING_MESSAGE_SERVICE,
+  ServerGroupWarningMessageService,
   SERVER_GROUP_WRITER,
   SubnetReader,
 } from '@spinnaker/core';
@@ -23,7 +23,6 @@ module.exports = angular
     CONFIRMATION_MODAL_SERVICE,
     SERVER_GROUP_WRITER,
     SECURITY_GROUP_READER,
-    SERVER_GROUP_WARNING_MESSAGE_SERVICE,
     OVERRIDE_REGISTRY,
     SERVER_GROUP_READER,
     require('../configure/ServerGroupCommandBuilder.js').name,
@@ -42,7 +41,6 @@ module.exports = angular
     networkReader,
     securityGroupReader,
     loadBalancerReader,
-    serverGroupWarningMessageService,
     openstackServerGroupTransformer,
     overrideRegistry,
   ) {
@@ -180,7 +178,7 @@ module.exports = angular
         confirmationModalParams.interestingHealthProviderNames = ['Openstack'];
       }
 
-      serverGroupWarningMessageService.addDestroyWarningMessage(app, serverGroup, confirmationModalParams);
+      ServerGroupWarningMessageService.addDestroyWarningMessage(app, serverGroup, confirmationModalParams);
 
       confirmationModalService.confirm(confirmationModalParams);
     };
@@ -213,7 +211,7 @@ module.exports = angular
         confirmationModalParams.interestingHealthProviderNames = ['Openstack'];
       }
 
-      serverGroupWarningMessageService.addDisableWarningMessage(app, serverGroup, confirmationModalParams);
+      ServerGroupWarningMessageService.addDisableWarningMessage(app, serverGroup, confirmationModalParams);
 
       confirmationModalService.confirm(confirmationModalParams);
     };

@@ -10,7 +10,7 @@ import {
   FirewallLabels,
   NameUtils,
   SERVER_GROUP_READER,
-  SERVER_GROUP_WARNING_MESSAGE_SERVICE,
+  ServerGroupWarningMessageService,
   SERVER_GROUP_WRITER,
   SETTINGS,
 } from '@spinnaker/core';
@@ -25,7 +25,6 @@ module.exports = angular
     require('../../securityGroup/securityGroup.read.service').name,
     require('@uirouter/angularjs').default,
     require('../configure/ServerGroupCommandBuilder.js').name,
-    SERVER_GROUP_WARNING_MESSAGE_SERVICE,
     SERVER_GROUP_READER,
     CONFIG_BIN_LINK_COMPONENT,
     CONFIRMATION_MODAL_SERVICE,
@@ -47,7 +46,6 @@ module.exports = angular
     confirmationModalService,
     serverGroupWriter,
     awsServerGroupTransformer,
-    serverGroupWarningMessageService,
     titusSecurityGroupReader,
   ) {
     let application = app;
@@ -258,7 +256,7 @@ module.exports = angular
         },
       };
 
-      serverGroupWarningMessageService.addDestroyWarningMessage(app, serverGroup, confirmationModalParams);
+      ServerGroupWarningMessageService.addDestroyWarningMessage(app, serverGroup, confirmationModalParams);
 
       confirmationModalService.confirm(confirmationModalParams);
     };
@@ -290,7 +288,7 @@ module.exports = angular
         submitMethod: submitMethod,
       };
 
-      serverGroupWarningMessageService.addDisableWarningMessage(app, serverGroup, confirmationModalParams);
+      ServerGroupWarningMessageService.addDisableWarningMessage(app, serverGroup, confirmationModalParams);
 
       confirmationModalService.confirm(confirmationModalParams);
     };

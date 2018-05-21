@@ -7,7 +7,6 @@ import {
   IManifest,
   IServerGroup,
   SERVER_GROUP_READER,
-  SERVER_GROUP_WARNING_MESSAGE_SERVICE,
   SERVER_GROUP_WRITER,
   ServerGroupReader,
 } from '@spinnaker/core';
@@ -169,7 +168,6 @@ export const KUBERNETES_V2_SERVER_GROUP_DETAILS_CTRL = 'spinnaker.kubernetes.v2.
 
 module(KUBERNETES_V2_SERVER_GROUP_DETAILS_CTRL, [
   CONFIRMATION_MODAL_SERVICE,
-  SERVER_GROUP_WARNING_MESSAGE_SERVICE,
   SERVER_GROUP_READER,
   SERVER_GROUP_WRITER,
 ]).controller('kubernetesV2ServerGroupDetailsCtrl', KubernetesServerGroupDetailsController);

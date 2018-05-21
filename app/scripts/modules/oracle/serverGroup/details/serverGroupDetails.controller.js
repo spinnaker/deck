@@ -6,7 +6,7 @@ import {
   CONFIRMATION_MODAL_SERVICE,
   NETWORK_READ_SERVICE,
   SERVER_GROUP_READER,
-  SERVER_GROUP_WARNING_MESSAGE_SERVICE,
+  ServerGroupWarningMessageService,
   SERVER_GROUP_WRITER,
   SubnetReader,
 } from '@spinnaker/core';
@@ -17,7 +17,6 @@ module.exports = angular
     SERVER_GROUP_READER,
     CONFIRMATION_MODAL_SERVICE,
     SERVER_GROUP_WRITER,
-    SERVER_GROUP_WARNING_MESSAGE_SERVICE,
     NETWORK_READ_SERVICE,
     require('../../image/image.reader.js').name,
     require('./resize/resizeServerGroup.controller.js').name,
@@ -34,7 +33,6 @@ module.exports = angular
     serverGroupWriter,
     networkReader,
     oraclebmcsImageReader,
-    serverGroupWarningMessageService,
   ) {
     const provider = 'oraclebmcs';
 
@@ -180,7 +178,7 @@ module.exports = angular
         askForReason: true,
       };
 
-      serverGroupWarningMessageService.addDisableWarningMessage(app, serverGroup, confirmationModalParams);
+      ServerGroupWarningMessageService.addDisableWarningMessage(app, serverGroup, confirmationModalParams);
 
       if (app.attributes.platformHealthOnlyShowOverride && app.attributes.platformHealthOnly) {
         confirmationModalParams.interestingHealthProviderNames = ['Oracle'];

@@ -9,7 +9,7 @@ import {
   FirewallLabels,
   NETWORK_READ_SERVICE,
   SERVER_GROUP_READER,
-  SERVER_GROUP_WARNING_MESSAGE_SERVICE,
+  ServerGroupWarningMessageService,
   SERVER_GROUP_WRITER,
   ServerGroupTemplates,
 } from '@spinnaker/core';
@@ -22,7 +22,6 @@ module.exports = angular
   .module('spinnaker.serverGroup.details.gce.controller', [
     require('@uirouter/angularjs').default,
     require('../configure/serverGroupCommandBuilder.service.js').name,
-    SERVER_GROUP_WARNING_MESSAGE_SERVICE,
     SERVER_GROUP_READER,
     CONFIRMATION_MODAL_SERVICE,
     NETWORK_READ_SERVICE,
@@ -45,7 +44,6 @@ module.exports = angular
     $uibModal,
     confirmationModalService,
     serverGroupWriter,
-    serverGroupWarningMessageService,
     networkReader,
     gceXpnNamingService,
   ) {
@@ -394,7 +392,7 @@ module.exports = angular
         },
       };
 
-      serverGroupWarningMessageService.addDestroyWarningMessage(app, serverGroup, confirmationModalParams);
+      ServerGroupWarningMessageService.addDestroyWarningMessage(app, serverGroup, confirmationModalParams);
 
       if (app.attributes.platformHealthOnlyShowOverride && app.attributes.platformHealthOnly) {
         confirmationModalParams.interestingHealthProviderNames = ['Google'];
@@ -424,7 +422,7 @@ module.exports = angular
         askForReason: true,
       };
 
-      serverGroupWarningMessageService.addDisableWarningMessage(app, serverGroup, confirmationModalParams);
+      ServerGroupWarningMessageService.addDisableWarningMessage(app, serverGroup, confirmationModalParams);
 
       if (app.attributes.platformHealthOnlyShowOverride && app.attributes.platformHealthOnly) {
         confirmationModalParams.interestingHealthProviderNames = ['Google'];
