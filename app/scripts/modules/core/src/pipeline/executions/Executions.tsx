@@ -20,6 +20,7 @@ import { FilterTags, IFilterTag, ISortFilter } from 'core/filterModel';
 import { PipelineConfigService } from 'core/pipeline/config/services/PipelineConfigService';
 import { Spinner } from 'core/widgets/spinners/Spinner';
 import { ExecutionState } from 'core/state';
+import { ScrollToService } from 'core/utils';
 
 import './executions.less';
 
@@ -177,7 +178,7 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
   }
 
   private scrollIntoView(delay = 200): void {
-    ReactInjector.scrollToService.scrollTo(
+    ScrollToService.scrollTo(
       '#execution-' + ReactInjector.$stateParams.executionId,
       '.all-execution-groups',
       225,

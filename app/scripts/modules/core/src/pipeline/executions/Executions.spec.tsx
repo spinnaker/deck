@@ -8,7 +8,7 @@ import { APPLICATION_MODEL_BUILDER, ApplicationModelBuilder } from 'core/applica
 import { EXECUTION_FILTER_SERVICE } from 'core/pipeline/filter/executionFilter.service';
 import { INSIGHT_FILTER_STATE_MODEL } from 'core/insight/insightFilterState.model';
 import { REACT_MODULE, ReactInjector } from 'core/reactShims';
-import { SCROLL_TO_SERVICE } from 'core/utils';
+import { ScrollToService } from 'core/utils';
 import { IExecutionsProps, IExecutionsState, Executions } from './Executions';
 
 describe('<Executions/>', () => {
@@ -33,13 +33,7 @@ describe('<Executions/>', () => {
   }
 
   beforeEach(
-    mock.module(
-      APPLICATION_MODEL_BUILDER,
-      EXECUTION_FILTER_SERVICE,
-      INSIGHT_FILTER_STATE_MODEL,
-      REACT_MODULE,
-      SCROLL_TO_SERVICE,
-    ),
+    mock.module(APPLICATION_MODEL_BUILDER, EXECUTION_FILTER_SERVICE, INSIGHT_FILTER_STATE_MODEL, REACT_MODULE),
   );
   beforeEach(
     mock.inject((_$timeout_: ITimeoutService, $rootScope: IScope, applicationModelBuilder: ApplicationModelBuilder) => {
@@ -66,7 +60,7 @@ describe('<Executions/>', () => {
 
   describe('auto-scrolling behavior', function() {
     beforeEach(function() {
-      spyOn(ReactInjector.scrollToService, 'scrollTo');
+      spyOn(ScrollToService, 'scrollTo');
     });
 
     it('should scroll execution into view on initialization if an execution is present in state params', function() {
@@ -75,14 +69,14 @@ describe('<Executions/>', () => {
       initializeApplication({ pipelineConfigs: [], executions: [] });
       scope.$digest();
 
-      expect((ReactInjector.scrollToService.scrollTo as any).calls.count()).toBe(1);
+      expect((ScrollToService.scrollTo as any).calls.count()).toBe(1);
     });
 
     it('should NOT scroll execution into view on initialization if none present in state params', function() {
       initializeApplication();
       scope.$digest();
 
-      expect((ReactInjector.scrollToService.scrollTo as any).calls.count()).toBe(0);
+      expect((ScrollToService.scrollTo as any).calls.count()).toBe(0);
     });
 
     // TODO: Figure out how to test transitions

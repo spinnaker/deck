@@ -30,7 +30,6 @@ import { PipelineConfigValidator } from '../pipeline/config/validation/pipelineC
 import { PipelineTemplateService } from '../pipeline/config/templates/pipelineTemplate.service';
 import { ProviderSelectionService } from '../cloudProvider/providerSelection/providerSelection.service';
 import { SchedulerFactory } from '../scheduler/scheduler.factory';
-import { ScrollToService } from '../utils/scrollTo/scrollTo.service';
 import { SecurityGroupReader } from '../securityGroup/securityGroupReader.service';
 import { ServerGroupWriter } from '../serverGroup/serverGroupWriter.service';
 import { StateEvents } from './state.events';
@@ -88,7 +87,6 @@ export class CoreReactInject extends ReactInject {
   public get pipelineTemplateService() { return this.$injector.get('pipelineTemplateService') as PipelineTemplateService; }
   public get providerSelectionService() { return this.$injector.get('providerSelectionService') as ProviderSelectionService; }
   public get schedulerFactory() { return this.$injector.get('schedulerFactory') as SchedulerFactory; }
-  public get scrollToService() { return this.$injector.get('scrollToService') as ScrollToService; }
   public get securityGroupReader() { return this.$injector.get('securityGroupReader') as SecurityGroupReader; }
   public get serverGroupWriter() { return this.$injector.get('serverGroupWriter') as ServerGroupWriter; }
   public get stateEvents() { return this.$injector.get('stateEvents') as StateEvents; }
