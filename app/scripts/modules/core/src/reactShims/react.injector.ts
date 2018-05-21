@@ -9,7 +9,6 @@ import { ApplicationReader } from '../application/service/application.read.servi
 import { CacheInitializerService } from '../cache/cacheInitializer.service';
 import { CancelModalService } from '../cancelModal/cancelModal.service';
 import { ConfirmationModalService } from '../confirmationModal/confirmationModal.service';
-import { EntityTagWriter } from '../entityTag';
 import { ExecutionDetailsSectionService } from 'core/pipeline/details/executionDetailsSection.service';
 import { ExecutionFilterService } from '../pipeline/filter/executionFilter.service';
 import { ExecutionService } from '../pipeline/service/execution.service';
@@ -62,7 +61,6 @@ export class CoreReactInject extends ReactInject {
   public get cacheInitializer() { return this.$injector.get('cacheInitializer') as CacheInitializerService; }
   public get cancelModalService() { return this.$injector.get('cancelModalService') as CancelModalService; }
   public get confirmationModalService() { return this.$injector.get('confirmationModalService') as ConfirmationModalService; }
-  public get entityTagWriter() { return this.$injector.get('entityTagWriter') as EntityTagWriter; }
   public get executionDetailsSectionService() { return this.$injector.get('executionDetailsSectionService') as ExecutionDetailsSectionService; }
   public get executionFilterService() { return this.$injector.get('executionFilterService') as ExecutionFilterService; }
   public get executionService() { return this.$injector.get('executionService') as ExecutionService; }
