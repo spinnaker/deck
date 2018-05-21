@@ -1,10 +1,11 @@
 import { IComponentOptions, IController, module } from 'angular';
 import { has, get, includes } from 'lodash';
-import { ARTIFACT_ICON_LIST, IArtifact, IExpectedArtifact, IExecution, IStage } from '@spinnaker/core';
+import { ARTIFACT_ICON_LIST } from './artifactIconList';
+import { IArtifact, IExpectedArtifact, IExecution, IStage } from 'core/domain';
 
 import './artifactTab.less';
 
-class KubernetesExecutionArtifactTabController implements IController {
+class ExecutionArtifactTabController implements IController {
   private _stage: IStage;
   private _execution: IExecution;
 
@@ -58,9 +59,9 @@ class KubernetesExecutionArtifactTabController implements IController {
   }
 }
 
-class KubernetesExecutionArtifactTabComponent implements IComponentOptions {
+class ExecutionArtifactTabComponent implements IComponentOptions {
   public bindings: any = { stage: '<', execution: '<' };
-  public controller: any = KubernetesExecutionArtifactTabController;
+  public controller: any = ExecutionArtifactTabController;
   public controllerAs = 'ctrl';
   public template = `
 <div class="row execution-artifacts">
@@ -80,10 +81,9 @@ class KubernetesExecutionArtifactTabComponent implements IComponentOptions {
 `;
 }
 
-export const KUBERNETES_EXECUTION_ARTIFACT_TAB =
-  'spinnaker.kubernetes.v2.kubernetes.deployManifest.artifactTab.component';
+export const EXECUTION_ARTIFACT_TAB = 'spinnaker.core.artifact.artifactTab.component';
 
-module(KUBERNETES_EXECUTION_ARTIFACT_TAB, [ARTIFACT_ICON_LIST]).component(
-  'kubernetesExecutionArtifactTab',
-  new KubernetesExecutionArtifactTabComponent(),
+module(EXECUTION_ARTIFACT_TAB, [ARTIFACT_ICON_LIST]).component(
+  'executionArtifactTab',
+  new ExecutionArtifactTabComponent(),
 );

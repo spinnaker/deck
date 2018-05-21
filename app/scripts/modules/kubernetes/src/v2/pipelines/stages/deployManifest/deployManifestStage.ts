@@ -1,16 +1,15 @@
 import { module } from 'angular';
 
-import { ArtifactReferenceService, Registry, SETTINGS } from '@spinnaker/core';
+import { ArtifactReferenceService, EXECUTION_ARTIFACT_TAB, Registry, SETTINGS } from '@spinnaker/core';
 
 import { KubernetesV2DeployManifestConfigCtrl } from './deployManifestConfig.controller';
 import { KUBERNETES_DEPLOY_MANIFEST_DEPLOY_STATUS_MANIFEST_SUMMARY } from './deployStatusManifestSummary';
-import { KUBERNETES_EXECUTION_ARTIFACT_TAB } from './artifactTab';
 
 export const KUBERNETES_DEPLOY_MANIFEST_STAGE = 'spinnaker.kubernetes.v2.pipeline.stage.deployManifestStage';
 
 module(KUBERNETES_DEPLOY_MANIFEST_STAGE, [
+  EXECUTION_ARTIFACT_TAB,
   KUBERNETES_DEPLOY_MANIFEST_DEPLOY_STATUS_MANIFEST_SUMMARY,
-  KUBERNETES_EXECUTION_ARTIFACT_TAB,
 ])
   .config(() => {
     // Todo: replace feature flag with proper versioned provider mechanism once available.
