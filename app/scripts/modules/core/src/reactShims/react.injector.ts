@@ -24,8 +24,6 @@ import { ManualJudgmentService } from '../pipeline/config/stages/manualJudgment/
 import { NotifierService } from '../widgets/notifier/notifier.service';
 import { OverrideRegistry } from '../overrideRegistry/override.registry';
 import { PageTitleService } from 'core/pageTitle';
-import { PagerDutyReader } from '../pagerDuty/pagerDuty.read.service';
-import { PagerDutyWriter } from '../pagerDuty/pagerDuty.write.service';
 import { PipelineConfigValidator } from '../pipeline/config/validation/pipelineConfig.validator';
 import { PipelineTemplateService } from '../pipeline/config/templates/pipelineTemplate.service';
 import { ProviderSelectionService } from '../cloudProvider/providerSelection/providerSelection.service';
@@ -80,8 +78,6 @@ export class CoreReactInject extends ReactInject {
   public get manualJudgmentService() { return this.$injector.get('manualJudgmentService') as ManualJudgmentService; }
   public get notifierService() { return this.$injector.get('notifierService') as NotifierService; }
   public get overrideRegistry() { return this.$injector.get('overrideRegistry') as OverrideRegistry; }
-  public get pagerDutyReader() { return this.$injector.get('pagerDutyReader') as PagerDutyReader; }
-  public get pagerDutyWriter() { return this.$injector.get('pagerDutyWriter') as PagerDutyWriter; }
   public get pageTitleService() { return this.$injector.get('pageTitleService') as PageTitleService; }
   public get pipelineConfigValidator() { return this.$injector.get('pipelineConfigValidator') as PipelineConfigValidator; }
   public get pipelineTemplateService() { return this.$injector.get('pipelineTemplateService') as PipelineTemplateService; }
