@@ -1,6 +1,6 @@
 'use strict';
 
-import { APPLICATION_MODEL_BUILDER, AccountService } from '@spinnaker/core';
+import { APPLICATION_MODEL_BUILDER, AccountService, SearchService } from '@spinnaker/core';
 
 /*
  This is more of an integration test between awsServerGroupConfigurationService and awsCloneServerGroupCtrl.
@@ -19,11 +19,9 @@ describe('Controller: awsCloneServerGroup', function() {
       $rootScope,
       serverGroupWriter,
       awsImageReader,
-      searchService,
       awsInstanceTypeService,
       v2modalWizardService,
       securityGroupReader,
-      taskMonitorBuilder,
       awsServerGroupConfigurationService,
       $q,
       subnetReader,
@@ -34,12 +32,10 @@ describe('Controller: awsCloneServerGroup', function() {
       this.$scope = $rootScope.$new();
       this.serverGroupWriter = serverGroupWriter;
       this.awsImageReader = awsImageReader;
-      this.searchService = searchService;
       this.awsInstanceTypeService = awsInstanceTypeService;
       this.v2modalWizardService = v2modalWizardService;
       this.securityGroupReader = securityGroupReader;
       this.awsServerGroupConfigurationService = awsServerGroupConfigurationService;
-      this.taskMonitorBuilder = taskMonitorBuilder;
       this.subnetReader = subnetReader;
       this.keyPairsReader = keyPairsReader;
       this.loadBalancerReader = loadBalancerReader;
@@ -111,12 +107,10 @@ describe('Controller: awsCloneServerGroup', function() {
           $uibModalInstance: this.modalInstance,
           serverGroupWriter: this.serverGroupWriter,
           awsImageReader: this.awsImageReader,
-          searchService: this.searchService,
           awsInstanceTypeService: this.awsInstanceTypeService,
           v2modalWizardService: this.v2modalWizardService,
           securityGroupReader: this.securityGroupReader,
           awsServerGroupConfigurationService: this.awsServerGroupConfigurationService,
-          taskMonitorBuilder: this.taskMonitorBuilder,
           serverGroupCommand: serverGroupCommand,
           application: this.applicationModelBuilder.createApplication('x', { key: 'loadBalancers', lazy: true }),
           title: 'n/a',
@@ -143,7 +137,7 @@ describe('Controller: awsCloneServerGroup', function() {
         resolve([{ attributes: { virtualizationType: 'hvm' }, amis: { 'us-east-1': [] } }]),
       );
 
-      spyOn(this.searchService, 'search').and.callFake(resolve({ results: [] }));
+      spyOn(SearchService, 'search').and.callFake(resolve({ results: [] }));
       spyOn(this.v2modalWizardService, 'markComplete').and.stub();
       spyOn(this.v2modalWizardService, 'markDirty').and.stub();
       spyOn(this.awsInstanceTypeService, 'getAllTypesByRegion').and.callFake(resolve([]));
@@ -236,7 +230,6 @@ describe('Controller: awsCloneServerGroup', function() {
           serverGroupWriter: this.serverGroupWriter,
           awsInstanceTypeService: this.awsInstanceTypeService,
           v2modalWizardService: this.v2modalWizardService,
-          taskMonitorBuilder: this.taskMonitorBuilder,
           serverGroupCommand: serverGroupCommand,
           application: this.applicationModelBuilder.createApplication('x', { key: 'loadBalancers', lazy: true }),
           title: 'n/a',
@@ -261,7 +254,7 @@ describe('Controller: awsCloneServerGroup', function() {
       );
       spyOn(this.loadBalancerReader, 'listLoadBalancers').and.callFake(resolve([]));
 
-      spyOn(this.searchService, 'search').and.callFake(resolve({ results: [] }));
+      spyOn(SearchService, 'search').and.callFake(resolve({ results: [] }));
       spyOn(this.v2modalWizardService, 'markComplete').and.stub();
       spyOn(this.awsInstanceTypeService, 'getAllTypesByRegion').and.callFake(resolve([]));
       spyOn(this.awsInstanceTypeService, 'getAvailableTypesForRegions').and.returnValue([]);
@@ -418,7 +411,6 @@ describe('Controller: awsCloneServerGroup', function() {
           serverGroupWriter: this.serverGroupWriter,
           awsInstanceTypeService: this.awsInstanceTypeService,
           v2modalWizardService: this.v2modalWizardService,
-          taskMonitorBuilder: this.taskMonitorBuilder,
           serverGroupCommand: serverGroup,
           application: this.applicationModelBuilder.createApplication('x', { key: 'loadBalancers', lazy: true }),
           title: 'n/a',
@@ -443,7 +435,7 @@ describe('Controller: awsCloneServerGroup', function() {
       );
       spyOn(this.loadBalancerReader, 'listLoadBalancers').and.callFake(resolve([]));
 
-      spyOn(this.searchService, 'search').and.callFake(resolve({ results: [] }));
+      spyOn(SearchService, 'search').and.callFake(resolve({ results: [] }));
       spyOn(this.v2modalWizardService, 'markComplete').and.stub();
       spyOn(this.awsInstanceTypeService, 'getAllTypesByRegion').and.callFake(resolve([]));
       spyOn(this.awsInstanceTypeService, 'getAvailableTypesForRegions').and.returnValue([]);

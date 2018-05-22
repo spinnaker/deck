@@ -1,30 +1,25 @@
-import { module } from 'angular';
 import { IStage } from 'core/domain';
 import { isEmpty, get } from 'lodash';
 
 export type SupportedStage = 'stage';
 
-type IWalker = (refContainer: any) => Array<Array<string | number>>;
+export type IWalker = (refContainer: any) => Array<Array<string | number>>;
 
 interface IReference {
   category: SupportedStage;
   walker: IWalker;
 }
 
-export class ArtifactReferenceServiceProvider {
-  private references: IReference[] = [];
+export class ArtifactReferenceService {
+  private static references: IReference[] = [];
 
-  public $get() {
-    return this;
+  public static registerReference(category: SupportedStage, walker: IWalker) {
+    ArtifactReferenceService.references.push({ category, walker });
   }
 
-  public registerReference(category: SupportedStage, walker: any) {
-    this.references.push({ category, walker });
-  }
-
-  public removeReferenceFromStages(reference: string, stages: IStage[]) {
+  public static removeReferenceFromStages(reference: string, stages: IStage[]) {
     (stages || []).forEach(stage => {
-      this.references.forEach(ref => {
+      ArtifactReferenceService.references.forEach(ref => {
         const paths: Array<Array<string | number>> = ref.walker(stage).filter(path => !isEmpty(path));
         paths.map(p => p.slice(0)).forEach(path => {
           let tail = path.pop();
@@ -48,7 +43,8 @@ export class ArtifactReferenceServiceProvider {
       });
     });
   }
-}
 
-export const ARTIFACT_REFERENCE_SERVICE_PROVIDER = 'spinnaker.core.artifacts.referenceServiceProvider';
-module(ARTIFACT_REFERENCE_SERVICE_PROVIDER, []).provider('artifactReferenceService', ArtifactReferenceServiceProvider);
+  public static deregisterAll() {
+    ArtifactReferenceService.references = [];
+  }
+}

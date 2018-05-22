@@ -7,8 +7,7 @@ import {
   LOAD_BALANCER_READ_SERVICE,
   LOAD_BALANCER_WRITE_SERVICE,
   V2_MODAL_WIZARD_SERVICE,
-  TASK_MONITOR_BUILDER,
-  SEARCH_SERVICE,
+  TaskMonitor,
 } from '@spinnaker/core';
 
 module.exports = angular
@@ -16,8 +15,6 @@ module.exports = angular
     LOAD_BALANCER_WRITE_SERVICE,
     LOAD_BALANCER_READ_SERVICE,
     V2_MODAL_WIZARD_SERVICE,
-    TASK_MONITOR_BUILDER,
-    SEARCH_SERVICE,
     require('../../transformer.js').name,
   ])
   .controller('dcosUpsertLoadBalancerController', function(
@@ -29,10 +26,8 @@ module.exports = angular
     isNew,
     loadBalancerReader,
     dcosLoadBalancerTransformer,
-    searchService,
     v2modalWizardService,
     loadBalancerWriter,
-    taskMonitorBuilder,
   ) {
     var ctrl = this;
     $scope.isNew = isNew;
@@ -72,7 +67,7 @@ module.exports = angular
       application.loadBalancers.onNextRefresh($scope, onApplicationRefresh);
     }
 
-    $scope.taskMonitor = taskMonitorBuilder.buildTaskMonitor({
+    $scope.taskMonitor = new TaskMonitor({
       application: application,
       title: (isNew ? 'Creating ' : 'Updating ') + 'your load balancer',
       modalInstance: $uibModalInstance,

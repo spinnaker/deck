@@ -23,6 +23,7 @@ import { UI_ROUTER_REACT_HYBRID } from '@uirouter/react-hybrid';
 require('Select2/select2.css');
 require('select2-bootstrap-css/select2-bootstrap.css');
 import 'source-sans-pro';
+import { RECENT_HISTORY_SERVICE } from 'core/history';
 require('root/app/fonts/spinnaker/icons.css');
 
 import { ANALYTICS_MODULE } from './analytics/analytics.module';
@@ -54,6 +55,7 @@ import { PIPELINE_MODULE } from './pipeline/pipeline.module';
 import { PIPELINE_TEMPLATE_MODULE } from './pipeline/config/templates/pipelineTemplate.module';
 import { REACT_MODULE } from './reactShims';
 import { REGION_MODULE } from './region/region.module';
+import { REGISTRY_MODULE } from './registry/registry.module';
 import { SERVERGROUP_MODULE } from './serverGroup/serverGroup.module';
 import { SERVER_GROUP_MANAGER_MODULE } from './serverGroupManager/serverGroupManager.module';
 import { STYLEGUIDE_MODULE } from './styleguide/styleguide.module';
@@ -74,6 +76,9 @@ templates.keys().forEach(function(key) {
 
 export const CORE_MODULE = 'spinnaker.core';
 module(CORE_MODULE, [
+  // This must be here first so its config block is run and it's initialized before other components try to register
+  REGISTRY_MODULE,
+
   require('angular-messages'),
   require('angular-sanitize'),
   UI_ROUTER,
@@ -128,6 +133,7 @@ module(CORE_MODULE, [
   require('./presentation/presentation.module').name,
   require('./projects/projects.module').name,
 
+  RECENT_HISTORY_SERVICE,
   REGION_MODULE,
 
   require('./search/search.module').name,
