@@ -22,6 +22,7 @@ module(KUBERNETES_DEPLOY_MANIFEST_STAGE, [
         templateUrl: require('./deployManifestConfig.html'),
         controller: 'KubernetesV2DeployManifestConfigCtrl',
         controllerAs: 'ctrl',
+        artifactFields: ['manifestArtifactId', 'requiredArtifactIds'],
         executionDetailsUrl: require('./deployManifestExecutionDetails.html'),
         executionConfigSections: ['deployStatus', 'taskStatus', 'artifactStatus'],
         producesArtifacts: true,

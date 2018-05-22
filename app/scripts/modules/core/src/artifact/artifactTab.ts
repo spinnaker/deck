@@ -8,6 +8,7 @@ import './artifactTab.less';
 class ExecutionArtifactTabController implements IController {
   private _stage: IStage;
   private _execution: IExecution;
+  private _artifactFields: String[];
 
   public consumedArtifacts: IArtifact[] = [];
   public producedArtifacts: IArtifact[] = [];
@@ -30,6 +31,15 @@ class ExecutionArtifactTabController implements IController {
     this.populateArtifactLists();
   }
 
+  get artifactFields(): String[] {
+    return this._artifactFields;
+  }
+
+  set artifactFields(artifactFields: String[]) {
+    this._artifactFields = artifactFields || [];
+    this.populateArtifactLists();
+  }
+
   private extractBoundArtifactsFromExecution(execution: IExecution): IExpectedArtifact[] {
     const triggerArtifacts = get(execution, ['trigger', 'resolvedExpectedArtifacts'], []);
     const stageOutputArtifacts = get(execution, 'stages', []).reduce((out, stage) => {
@@ -41,14 +51,17 @@ class ExecutionArtifactTabController implements IController {
   }
 
   public populateArtifactLists() {
-    const requiredArtifactIds = get(this.stage, ['context', 'requiredArtifactIds'], []);
-    const manifestArtifactId = get(this.stage, ['context', 'manifestArtifactId'], null);
-    const boundArtifacts = this.extractBoundArtifactsFromExecution(this.execution);
+    const accumulateArtifacts = (artifacts: String[], field: String) => {
+      // fieldValue will be either a string with a single artifact id, or an array of artifact ids
+      // In either case, concatenate the value(s) onto the array of artifacts; the one exception
+      // is that we don't want to include an empty string in the artifact list, so concatenate
+      // an empty array (ie, no-op) if fieldValue is falsey.
+      const fieldValue: String | String[] = get(this.stage, ['context', field], []);
+      return artifacts.concat(fieldValue || []);
+    };
 
-    const consumedIds = requiredArtifactIds.slice();
-    if (manifestArtifactId) {
-      consumedIds.push(manifestArtifactId);
-    }
+    const consumedIds = this.artifactFields.reduce(accumulateArtifacts, []);
+    const boundArtifacts = this.extractBoundArtifactsFromExecution(this.execution);
 
     this.consumedArtifacts = boundArtifacts
       .filter(rea => includes(consumedIds, rea.id))
@@ -60,7 +73,7 @@ class ExecutionArtifactTabController implements IController {
 }
 
 class ExecutionArtifactTabComponent implements IComponentOptions {
-  public bindings: any = { stage: '<', execution: '<' };
+  public bindings: any = { artifactFields: '<', execution: '<', stage: '<' };
   public controller: any = ExecutionArtifactTabController;
   public controllerAs = 'ctrl';
   public template = `
