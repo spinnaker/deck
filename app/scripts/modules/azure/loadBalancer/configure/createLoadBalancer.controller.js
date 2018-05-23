@@ -8,7 +8,7 @@ import {
   InfrastructureCaches,
   LoadBalancerWriter,
   NameUtils,
-  NETWORK_READ_SERVICE,
+  NetworkReader,
   TaskMonitor,
   V2_MODAL_WIZARD_SERVICE,
 } from '@spinnaker/core';
@@ -18,14 +18,12 @@ module.exports = angular
     require('@uirouter/angularjs').default,
     require('../loadBalancer.transformer.js').name,
     V2_MODAL_WIZARD_SERVICE,
-    NETWORK_READ_SERVICE,
   ])
   .controller('azureCreateLoadBalancerCtrl', function(
     $scope,
     $uibModalInstance,
     $state,
     azureLoadBalancerTransformer,
-    networkReader,
     v2modalWizardService,
     application,
     loadBalancer,
@@ -165,7 +163,7 @@ module.exports = angular
       ctrl.selectedVnets = [];
       InfrastructureCaches.clearCache('networks');
 
-      networkReader.listNetworks().then(function(vnets) {
+      NetworkReader.listNetworks().then(function(vnets) {
         if (vnets.azure) {
           vnets.azure.forEach(vnet => {
             if (vnet.account === account && vnet.region === region) {

@@ -14,7 +14,6 @@ module.exports = angular
     $scope,
     loadBalancerReader,
     securityGroupReader,
-    networkReader,
     v2modalWizardService,
   ) {
     $scope.firewallsLabel = FirewallLabels.get('Firewalls');

@@ -5,7 +5,7 @@ const angular = require('angular');
 import {
   InfrastructureCaches,
   LOAD_BALANCER_READ_SERVICE,
-  NETWORK_READ_SERVICE,
+  NetworkReader,
   V2_MODAL_WIZARD_SERVICE,
 } from '@spinnaker/core';
 
@@ -13,14 +13,8 @@ module.exports = angular
   .module('spinnaker.azure.serverGroup.configure.loadBalancer.controller', [
     V2_MODAL_WIZARD_SERVICE,
     LOAD_BALANCER_READ_SERVICE,
-    NETWORK_READ_SERVICE,
   ])
-  .controller('azureServerGroupLoadBalancersCtrl', function(
-    $scope,
-    loadBalancerReader,
-    networkReader,
-    v2modalWizardService,
-  ) {
+  .controller('azureServerGroupLoadBalancersCtrl', function($scope, loadBalancerReader, v2modalWizardService) {
     v2modalWizardService.markClean('load-balancers');
 
     this.loadBalancerChanged = function(item) {
@@ -34,7 +28,7 @@ module.exports = angular
         .then(function(LBs) {
           if (LBs && LBs.length === 1) {
             var selectedLoadBalancer = LBs[0];
-            networkReader.listNetworks().then(function(vnets) {
+            NetworkReader.listNetworks().then(function(vnets) {
               if (vnets.azure) {
                 vnets.azure.forEach(selectedVnet => {
                   if (

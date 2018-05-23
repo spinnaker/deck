@@ -8,7 +8,7 @@ import {
   AccountService,
   AuthenticationService,
   BAKERY_SERVICE,
-  NETWORK_READ_SERVICE,
+  NetworkReader,
   Registry,
   SubnetReader,
 } from '@spinnaker/core';
@@ -17,7 +17,6 @@ module.exports = angular
   .module('spinnaker.oraclebmcs.pipeline.stage.bakeStage', [
     require('./bakeExecutionDetails.controller.js').name,
     BAKERY_SERVICE,
-    NETWORK_READ_SERVICE,
   ])
   .config(function() {
     Registry.pipeline.registerStage({
@@ -51,7 +50,7 @@ module.exports = angular
       restartable: true,
     });
   })
-  .controller('oraclebmcsBakeStageCtrl', function($scope, bakeryService, networkReader, $q) {
+  .controller('oraclebmcsBakeStageCtrl', function($scope, bakeryService, $q) {
     const provider = 'oraclebmcs';
 
     if (!$scope.stage.cloudProvider) {
@@ -134,7 +133,7 @@ module.exports = angular
     };
 
     $scope.getNetworks = function(provider) {
-      return networkReader.listNetworksByProvider(provider).then(networks => networks.sort());
+      return NetworkReader.listNetworksByProvider(provider).then(networks => networks.sort());
     };
 
     $scope.getSubNetworks = function(provider) {

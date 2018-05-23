@@ -5,6 +5,7 @@ import { map } from 'lodash';
 import { AccountService, InfrastructureCaches } from '@spinnaker/core';
 
 import { AWSProviderSettings } from 'amazon/aws.settings';
+import { VpcReader } from 'amazon/vpc';
 
 describe('Controller: CreateSecurityGroup', function() {
   beforeEach(
@@ -41,20 +42,18 @@ describe('Controller: CreateSecurityGroup', function() {
         securityGroupReader,
         v2modalWizardService,
         securityGroupWriter,
-        vpcReader,
       ) {
         this.$scope = $rootScope.$new();
         this.$q = $q;
         this.securityGroupReader = securityGroupReader;
         this.v2modalWizardService = v2modalWizardService;
         this.securityGroupWriter = securityGroupWriter;
-        this.vpcReader = vpcReader;
 
         spyOn(AccountService, 'listAccounts').and.returnValue($q.when(['prod', 'test']));
 
         spyOn(AccountService, 'getRegionsForAccount').and.returnValue($q.when(['us-east-1', 'us-west-1']));
 
-        spyOn(this.vpcReader, 'listVpcs').and.returnValue(
+        spyOn(VpcReader, 'listVpcs').and.returnValue(
           $q.when([
             { id: 'vpc1-pe', name: 'vpc 1', account: 'prod', region: 'us-east-1', deprecated: false, label: 'vpc 1' },
             { id: 'vpc2-pw', name: 'vpc 2', account: 'prod', region: 'us-west-1', deprecated: false, label: 'vpc 2' },
@@ -102,7 +101,6 @@ describe('Controller: CreateSecurityGroup', function() {
             securityGroupReader: this.securityGroupReader,
             v2modalWizardService: this.v2modalWizardService,
             securityGroupWriter: this.securityGroupWriter,
-            vpcReader: this.vpcReader,
             application: this.application || { attributes: {} },
             securityGroup: { regions: [], securityGroupIngress: [] },
           });

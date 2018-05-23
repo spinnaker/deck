@@ -5,7 +5,7 @@ import _ from 'lodash';
 
 import {
   FirewallLabels,
-  NETWORK_READ_SERVICE,
+  NetworkReader,
   SECURITY_GROUP_READER,
   SECURITY_GROUP_WRITER,
   TaskMonitor,
@@ -19,7 +19,6 @@ import './securityGroup.configure.less';
 module.exports = angular
   .module('spinnaker.google.securityGroup.baseConfig.controller', [
     require('@uirouter/angularjs').default,
-    NETWORK_READ_SERVICE,
     V2_MODAL_WIZARD_SERVICE,
     SECURITY_GROUP_READER,
     SECURITY_GROUP_WRITER,
@@ -35,7 +34,6 @@ module.exports = angular
     securityGroupWriter,
     v2modalWizardService,
     cacheInitializer,
-    networkReader,
     gceSecurityGroupHelpTextService,
     mode,
   ) {
@@ -230,7 +228,7 @@ module.exports = angular
     };
 
     ctrl.updateNetworks = function() {
-      networkReader.listNetworksByProvider('gce').then(function(gceNetworks) {
+      NetworkReader.listNetworksByProvider('gce').then(function(gceNetworks) {
         var account = $scope.securityGroup.credentials || $scope.securityGroup.accountName;
         $scope.securityGroup.backingData.networks = _(gceNetworks)
           .filter(n => n.account === account && !n.id.includes('/'))

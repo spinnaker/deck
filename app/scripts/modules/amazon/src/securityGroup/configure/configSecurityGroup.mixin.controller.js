@@ -16,14 +16,13 @@ import {
 } from '@spinnaker/core';
 
 import { AWSProviderSettings } from 'amazon/aws.settings';
-import { VPC_READ_SERVICE } from 'amazon/vpc/vpc.read.service';
+import { VpcReader } from 'amazon/vpc/VpcReader';
 
 module.exports = angular
   .module('spinnaker.amazon.securityGroup.baseConfig.controller', [
     require('@uirouter/angularjs').default,
     SECURITY_GROUP_READER,
     SECURITY_GROUP_WRITER,
-    VPC_READ_SERVICE,
     V2_MODAL_WIZARD_SERVICE,
   ])
   .controller('awsConfigSecurityGroupMixin', function(
@@ -36,7 +35,6 @@ module.exports = angular
     securityGroupWriter,
     v2modalWizardService,
     cacheInitializer,
-    vpcReader,
   ) {
     var ctrl = this;
 
@@ -126,7 +124,7 @@ module.exports = angular
     ctrl.regionUpdated = function() {
       var account = getAccount(),
         regions = $scope.securityGroup.regions || [];
-      vpcReader.listVpcs().then(function(vpcs) {
+      VpcReader.listVpcs().then(function(vpcs) {
         var vpcsByName = _.groupBy(vpcs.filter(vpc => vpc.account === account), 'label');
         $scope.allVpcs = vpcs;
         var available = [];
