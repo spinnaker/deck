@@ -1,4 +1,4 @@
-import { module, IPromise } from 'angular';
+import { IPromise } from 'angular';
 
 import { $q } from 'ngimport';
 

@@ -22,7 +22,7 @@ import {
   FirewallLabels,
 } from '@spinnaker/core';
 
-import { AmazonCertificateReader, IAmazonCertificate } from 'amazon/certificates/amazon.certificate.read.service';
+import { AmazonCertificateReader, IAmazonCertificate } from 'amazon/certificates/AmazonCertificateReader';
 import { AWSProviderSettings } from 'amazon/aws.settings';
 import { IAmazonLoadBalancerUpsertCommand } from 'amazon/domain';
 
@@ -192,7 +192,7 @@ export abstract class CreateAmazonLoadBalancerCtrl {
   }
 
   private loadCertificates(): IPromise<void> {
-    return this.amazonCertificateReader.listCertificates().then(certificates => {
+    return AmazonCertificateReader.listCertificates().then(certificates => {
       this.certificates = certificates;
     });
   }

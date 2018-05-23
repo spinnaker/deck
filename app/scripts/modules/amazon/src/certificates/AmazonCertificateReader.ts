@@ -1,4 +1,4 @@
-import { module, IPromise } from 'angular';
+import { IPromise } from 'angular';
 import { groupBy, sortBy } from 'lodash';
 
 import { AccountService, ICertificate, CertificateReader } from '@spinnaker/core';
@@ -30,6 +30,3 @@ export class AmazonCertificateReader {
     });
   }
 }
-
-export const AMAZON_CERTIFICATE_READ_SERVICE = 'spinnaker.amazon.certificate.read.service';
-module(AMAZON_CERTIFICATE_READ_SERVICE, []).service('amazonCertificateReader', AmazonCertificateReader);

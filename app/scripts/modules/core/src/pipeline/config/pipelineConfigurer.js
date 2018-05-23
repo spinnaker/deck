@@ -8,7 +8,7 @@ const angular = require('angular');
 
 import { OVERRIDE_REGISTRY } from 'core/overrideRegistry/override.registry';
 import { EditPipelineJsonModalCtrl } from './actions/json/editPipelineJsonModal.controller';
-import { PIPELINE_CONFIG_VALIDATOR } from './validation/pipelineConfig.validator';
+import { PipelineConfigValidator } from './validation/PipelineConfigValidator';
 import { PIPELINE_TEMPLATE_SERVICE } from './templates/pipelineTemplate.service';
 import { EXECUTION_BUILD_TITLE } from '../executionBuild/ExecutionBuildTitle';
 import { PipelineConfigService } from 'core/pipeline/config/services/PipelineConfigService';
@@ -16,7 +16,6 @@ import { PipelineConfigService } from 'core/pipeline/config/services/PipelineCon
 module.exports = angular
   .module('spinnaker.core.pipeline.config.pipelineConfigurer', [
     OVERRIDE_REGISTRY,
-    PIPELINE_CONFIG_VALIDATOR,
     PIPELINE_TEMPLATE_SERVICE,
     EXECUTION_BUILD_TITLE,
   ])
@@ -41,7 +40,6 @@ module.exports = angular
     $timeout,
     $window,
     $q,
-    pipelineConfigValidator,
     pipelineTemplateService,
     executionService,
     executionsTransformer,
@@ -508,7 +506,7 @@ module.exports = angular
       }
     });
 
-    const validationSubscription = pipelineConfigValidator.subscribe(validations => {
+    const validationSubscription = PipelineConfigValidator.subscribe(validations => {
       this.validations = validations;
       this.preventSave = validations.preventSave;
     });

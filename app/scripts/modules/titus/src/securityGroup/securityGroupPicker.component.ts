@@ -48,7 +48,7 @@ class SecurityGroupPickerController implements ng.IComponentController {
     const groupLoader: ng.IPromise<void> = this.securityGroupReader.getAllSecurityGroups().then((groups: any[]) => {
       this.securityGroups = groups;
     });
-    const vpcLoader: ng.IPromise<void> = VpcReader.listVpcs().then((vpcs: IVpc[]) => (this.vpcs = vpcs));
+    const vpcLoader = VpcReader.listVpcs().then((vpcs: IVpc[]) => (this.vpcs = vpcs));
     this.$q.all([credentialLoader, groupLoader, vpcLoader]).then(() => this.configureSecurityGroupOptions());
     this.subscriptions = [
       this.accountChanged.subscribe(() => this.configureSecurityGroupOptions()),
