@@ -17,7 +17,6 @@ import { InfrastructureSearchService } from '../search/infrastructure/infrastruc
 import { InfrastructureSearchServiceV2 } from 'core/search/infrastructure/infrastructureSearchV2.service';
 import { InsightFilterStateModel } from '../insight/insightFilterState.model';
 import { ManualJudgmentService } from '../pipeline/config/stages/manualJudgment/manualJudgment.service';
-import { NotifierService } from '../widgets/notifier/notifier.service';
 import { OverrideRegistry } from '../overrideRegistry/override.registry';
 import { PageTitleService } from 'core/pageTitle';
 import { PipelineConfigValidator } from '../pipeline/config/validation/pipelineConfig.validator';
@@ -68,7 +67,6 @@ export class CoreReactInject extends ReactInject {
   public get infrastructureSearchServiceV2() { return this.$injector.get('infrastructureSearchServiceV2') as InfrastructureSearchServiceV2; }
   public get insightFilterStateModel() { return this.$injector.get('insightFilterStateModel') as InsightFilterStateModel; }
   public get manualJudgmentService() { return this.$injector.get('manualJudgmentService') as ManualJudgmentService; }
-  public get notifierService() { return this.$injector.get('notifierService') as NotifierService; }
   public get overrideRegistry() { return this.$injector.get('overrideRegistry') as OverrideRegistry; }
   public get pageTitleService() { return this.$injector.get('pageTitleService') as PageTitleService; }
   public get pipelineConfigValidator() { return this.$injector.get('pipelineConfigValidator') as PipelineConfigValidator; }
