@@ -9,16 +9,11 @@ const angular = require('angular');
 import { OVERRIDE_REGISTRY } from 'core/overrideRegistry/override.registry';
 import { EditPipelineJsonModalCtrl } from './actions/json/editPipelineJsonModal.controller';
 import { PipelineConfigValidator } from './validation/PipelineConfigValidator';
-import { PIPELINE_TEMPLATE_SERVICE } from './templates/pipelineTemplate.service';
 import { EXECUTION_BUILD_TITLE } from '../executionBuild/ExecutionBuildTitle';
 import { PipelineConfigService } from 'core/pipeline/config/services/PipelineConfigService';
 
 module.exports = angular
-  .module('spinnaker.core.pipeline.config.pipelineConfigurer', [
-    OVERRIDE_REGISTRY,
-    PIPELINE_TEMPLATE_SERVICE,
-    EXECUTION_BUILD_TITLE,
-  ])
+  .module('spinnaker.core.pipeline.config.pipelineConfigurer', [OVERRIDE_REGISTRY, EXECUTION_BUILD_TITLE])
   .directive('pipelineConfigurer', function() {
     return {
       restrict: 'E',
@@ -40,7 +35,6 @@ module.exports = angular
     $timeout,
     $window,
     $q,
-    pipelineTemplateService,
     executionService,
     executionsTransformer,
     overrideRegistry,
