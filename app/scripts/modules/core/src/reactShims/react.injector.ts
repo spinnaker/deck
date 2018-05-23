@@ -12,7 +12,6 @@ import { ConfirmationModalService } from '../confirmationModal/confirmationModal
 import { ExecutionDetailsSectionService } from 'core/pipeline/details/executionDetailsSection.service';
 import { ExecutionService } from '../pipeline/service/execution.service';
 import { ExecutionsTransformerService } from '../pipeline/service/executions.transformer.service';
-import { HelpContentsRegistry, IHelpContents } from 'core/help';
 import { InfrastructureSearchService } from '../search/infrastructure/infrastructureSearch.service';
 import { InfrastructureSearchServiceV2 } from 'core/search/infrastructure/infrastructureSearchV2.service';
 import { InsightFilterStateModel } from '../insight/insightFilterState.model';
@@ -60,8 +59,6 @@ export class CoreReactInject extends ReactInject {
   public get executionDetailsSectionService() { return this.$injector.get('executionDetailsSectionService') as ExecutionDetailsSectionService; }
   public get executionService() { return this.$injector.get('executionService') as ExecutionService; }
   public get executionsTransformer() { return this.$injector.get('executionsTransformer') as ExecutionsTransformerService; }
-  public get helpContents() { return this.$injector.get('helpContents') as IHelpContents }
-  public get helpContentsRegistry() { return this.$injector.get('helpContentsRegistry') as HelpContentsRegistry; }
   public get infrastructureSearchService() { return this.$injector.get('infrastructureSearchService') as InfrastructureSearchService; }
   public get infrastructureSearchServiceV2() { return this.$injector.get('infrastructureSearchServiceV2') as InfrastructureSearchServiceV2; }
   public get insightFilterStateModel() { return this.$injector.get('insightFilterStateModel') as InsightFilterStateModel; }
