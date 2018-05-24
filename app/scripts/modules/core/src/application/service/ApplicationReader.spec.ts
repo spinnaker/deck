@@ -1,13 +1,9 @@
 import { mock } from 'angular';
 
 import Spy = jasmine.Spy;
-import {
-  IApplicationDataSourceAttribute,
-  ApplicationReader,
-  APPLICATION_READ_SERVICE,
-} from './application.read.service';
+import { IApplicationDataSourceAttribute, ApplicationReader } from './ApplicationReader';
 import { API } from 'core/api/ApiService';
-import { ApplicationDataSourceRegistry } from './applicationDataSource.registry';
+import { ApplicationDataSourceRegistry } from './ApplicationDataSourceRegistry';
 import { Application } from '../application.model';
 import { LOAD_BALANCER_DATA_SOURCE } from 'core/loadBalancer/loadBalancer.dataSource';
 import { LOAD_BALANCER_READ_SERVICE, LoadBalancerReader } from 'core/loadBalancer/loadBalancer.read.service';
@@ -16,18 +12,17 @@ import { CLUSTER_SERVICE, ClusterService } from 'core/cluster/cluster.service';
 import { SERVER_GROUP_DATA_SOURCE } from 'core/serverGroup/serverGroup.dataSource';
 import { SECURITY_GROUP_DATA_SOURCE } from 'core/securityGroup/securityGroup.dataSource';
 
-describe('Service: applicationReader', function() {
-  let applicationReader: ApplicationReader;
+describe('ApplicationReader', function() {
   let securityGroupReader: SecurityGroupReader;
   let loadBalancerReader: any;
   let clusterService: ClusterService;
   let $q: ng.IQService;
   let $scope: ng.IScope;
-  let applicationDataSourceRegistry: ApplicationDataSourceRegistry;
+
+  beforeEach(() => ApplicationDataSourceRegistry.clearDataSources());
 
   beforeEach(
     mock.module(
-      APPLICATION_READ_SERVICE,
       SECURITY_GROUP_DATA_SOURCE,
       SERVER_GROUP_DATA_SOURCE,
       LOAD_BALANCER_DATA_SOURCE,
@@ -39,21 +34,17 @@ describe('Service: applicationReader', function() {
 
   beforeEach(
     mock.inject(function(
-      _applicationReader_: ApplicationReader,
       _securityGroupReader_: SecurityGroupReader,
       _clusterService_: ClusterService,
       _$q_: ng.IQService,
       _loadBalancerReader_: LoadBalancerReader,
       $rootScope: ng.IRootScopeService,
-      _applicationDataSourceRegistry_: ApplicationDataSourceRegistry,
     ) {
-      applicationReader = _applicationReader_;
       securityGroupReader = _securityGroupReader_;
       clusterService = _clusterService_;
       loadBalancerReader = _loadBalancerReader_;
       $q = _$q_;
       $scope = $rootScope.$new();
-      applicationDataSourceRegistry = _applicationDataSourceRegistry_;
     }),
   );
 
@@ -81,7 +72,7 @@ describe('Service: applicationReader', function() {
         return $q.when(groupsByName || []);
       });
 
-      applicationReader.getApplication('deck').then(app => {
+      ApplicationReader.getApplication('deck').then(app => {
         application = app;
       });
       $scope.$digest();
@@ -116,7 +107,7 @@ describe('Service: applicationReader', function() {
 
     describe('opt-in data sources', function() {
       beforeEach(function() {
-        applicationDataSourceRegistry.registerDataSource({
+        ApplicationDataSourceRegistry.registerDataSource({
           key: 'optInSource',
           visible: true,
           optional: true,

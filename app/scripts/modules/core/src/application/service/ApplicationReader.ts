@@ -1,17 +1,12 @@
-import { IFilterService, ILogService, IPromise, IQService, module } from 'angular';
-
-import { UIRouter } from '@uirouter/core';
+import { IPromise } from 'angular';
+import { $q, $log, $filter } from 'ngimport';
 
 import { API } from 'core/api/ApiService';
-import { SCHEDULER_FACTORY, SchedulerFactory } from 'core/scheduler/scheduler.factory';
+import { SchedulerFactory } from 'core/scheduler/SchedulerFactory';
 import { Application } from '../application.model';
 import { ApplicationDataSource, IDataSourceConfig } from '../service/applicationDataSource';
-import { APPLICATION_DATA_SOURCE_REGISTRY, ApplicationDataSourceRegistry } from './applicationDataSource.registry';
-import { ROBOT_TO_HUMAN_FILTER } from 'core/presentation/robotToHumanFilter/robotToHuman.filter';
-import {
-  INFERRED_APPLICATION_WARNING_SERVICE,
-  InferredApplicationWarningService,
-} from './inferredApplicationWarning.service';
+import { ApplicationDataSourceRegistry } from './ApplicationDataSourceRegistry';
+import { InferredApplicationWarningService } from './InferredApplicationWarningService';
 
 export interface IApplicationDataSourceAttribute {
   enabled: string[];
@@ -31,21 +26,9 @@ export interface IApplicationSummary {
 }
 
 export class ApplicationReader {
-  private applicationMap: Map<string, IApplicationSummary> = new Map<string, IApplicationSummary>();
+  private static applicationMap: Map<string, IApplicationSummary> = new Map<string, IApplicationSummary>();
 
-  public constructor(
-    private $q: IQService,
-    private $log: ILogService,
-    private $filter: IFilterService,
-    private $uiRouter: UIRouter,
-    private schedulerFactory: SchedulerFactory,
-    private inferredApplicationWarningService: InferredApplicationWarningService,
-    private applicationDataSourceRegistry: ApplicationDataSourceRegistry,
-  ) {
-    'ngInject';
-  }
-
-  public listApplications(populateMap = false): IPromise<IApplicationSummary[]> {
+  public static listApplications(populateMap = false): IPromise<IApplicationSummary[]> {
     return API.all('applications')
       .useCache()
       .getList()
@@ -59,17 +42,12 @@ export class ApplicationReader {
       });
   }
 
-  public getApplication(name: string, expand = true): IPromise<Application> {
+  public static getApplication(name: string, expand = true): IPromise<Application> {
     return API.one('applications', name)
       .withParams({ expand: expand })
       .get()
       .then((fromServer: Application) => {
-        const application: Application = new Application(
-          fromServer.name,
-          this.schedulerFactory.createScheduler(),
-          this.$q,
-          this.$log,
-        );
+        const application: Application = new Application(fromServer.name, SchedulerFactory.createScheduler(), $q, $log);
         application.attributes = fromServer.attributes;
         this.splitAttributes(application.attributes, ['accounts', 'cloudProviders']);
         this.addDataSources(application);
@@ -78,11 +56,11 @@ export class ApplicationReader {
       });
   }
 
-  public getApplicationMap(): Map<string, IApplicationSummary> {
+  public static getApplicationMap(): Map<string, IApplicationSummary> {
     return this.applicationMap;
   }
 
-  private splitAttributes(attributes: any, fields: string[]) {
+  private static splitAttributes(attributes: any, fields: string[]) {
     fields.forEach(field => {
       if (attributes[field]) {
         if (!Array.isArray(attributes[field])) {
@@ -94,29 +72,22 @@ export class ApplicationReader {
     });
   }
 
-  private addDataSources(application: Application): void {
-    const dataSources: IDataSourceConfig[] = this.applicationDataSourceRegistry.getDataSources();
+  private static addDataSources(application: Application): void {
+    const dataSources: IDataSourceConfig[] = ApplicationDataSourceRegistry.getDataSources();
     dataSources.forEach((ds: IDataSourceConfig) => {
-      const dataSource: ApplicationDataSource = new ApplicationDataSource(
-        ds,
-        application,
-        this.$q,
-        this.$log,
-        this.$filter,
-        this.$uiRouter,
-      );
+      const dataSource: ApplicationDataSource = new ApplicationDataSource(ds, application, $q, $log, $filter);
       application.dataSources.push(dataSource);
       application[ds.key] = dataSource;
     });
     this.setDisabledDataSources(application);
   }
 
-  public setDisabledDataSources(application: Application) {
+  public static setDisabledDataSources(application: Application) {
     const allDataSources: ApplicationDataSource[] = application.dataSources,
       appDataSources: IApplicationDataSourceAttribute = application.attributes.dataSources;
     if (!appDataSources) {
       allDataSources.filter(ds => ds.optIn).forEach(ds => this.setDataSourceDisabled(ds, application, true));
-      if (this.inferredApplicationWarningService.isInferredApplication(application)) {
+      if (InferredApplicationWarningService.isInferredApplication(application)) {
         allDataSources
           .filter(ds => ds.requireConfiguredApp)
           .forEach(ds => this.setDataSourceDisabled(ds, application, true));
@@ -140,20 +111,10 @@ export class ApplicationReader {
     });
   }
 
-  private setDataSourceDisabled(dataSource: ApplicationDataSource, application: Application, disabled: boolean) {
+  private static setDataSourceDisabled(dataSource: ApplicationDataSource, application: Application, disabled: boolean) {
     dataSource.disabled = disabled;
     if (dataSource.badge) {
       application.dataSources.find(ds => ds.key === dataSource.badge).disabled = disabled;
     }
   }
 }
-
-export const APPLICATION_READ_SERVICE = 'spinnaker.core.application.read.service';
-
-module(APPLICATION_READ_SERVICE, [
-  SCHEDULER_FACTORY,
-  APPLICATION_DATA_SOURCE_REGISTRY,
-  INFERRED_APPLICATION_WARNING_SERVICE,
-  ROBOT_TO_HUMAN_FILTER,
-  require('@uirouter/angularjs').default,
-]).service('applicationReader', ApplicationReader);

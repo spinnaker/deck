@@ -2,10 +2,8 @@ import { IQService, IRootScopeService, IScope } from 'angular';
 import IInjectorService = angular.auto.IInjectorService;
 
 import { StateParams, StateService, UIRouter } from '@uirouter/core';
-import { ApplicationDataSourceRegistry } from 'core/application/service/applicationDataSource.registry';
 
 import { ApplicationModelBuilder } from '../application/applicationModel.builder';
-import { ApplicationReader } from '../application/service/application.read.service';
 import { CacheInitializerService } from '../cache/cacheInitializer.service';
 import { CancelModalService } from '../cancelModal/cancelModal.service';
 import { ConfirmationModalService } from '../confirmationModal/confirmationModal.service';
@@ -19,7 +17,6 @@ import { ManualJudgmentService } from '../pipeline/config/stages/manualJudgment/
 import { OverrideRegistry } from '../overrideRegistry/override.registry';
 import { PageTitleService } from 'core/pageTitle';
 import { ProviderSelectionService } from '../cloudProvider/providerSelection/providerSelection.service';
-import { SchedulerFactory } from '../scheduler/scheduler.factory';
 import { SecurityGroupReader } from '../securityGroup/securityGroupReader.service';
 import { ServerGroupWriter } from '../serverGroup/serverGroupWriter.service';
 import { StateEvents } from './state.events';
@@ -49,9 +46,7 @@ export class CoreReactInject extends ReactInject {
   public get $rootScope() { return this.$injector.get('$rootScope') as IScope; }
   public get $stateParams() { return this.$injector.get('$stateParams') as StateParams; }
   public get $uiRouter() { return this.$injector.get('$uiRouter') as UIRouter; }
-  public get applicationDataSourceRegistry() { return this.$injector.get('applicationDataSourceRegistry') as ApplicationDataSourceRegistry; }
   public get applicationModelBuilder() { return this.$injector.get('applicationModelBuilder') as ApplicationModelBuilder; }
-  public get applicationReader() { return this.$injector.get('applicationReader') as ApplicationReader; }
   public get cacheInitializer() { return this.$injector.get('cacheInitializer') as CacheInitializerService; }
   public get cancelModalService() { return this.$injector.get('cancelModalService') as CancelModalService; }
   public get confirmationModalService() { return this.$injector.get('confirmationModalService') as ConfirmationModalService; }
@@ -65,7 +60,6 @@ export class CoreReactInject extends ReactInject {
   public get overrideRegistry() { return this.$injector.get('overrideRegistry') as OverrideRegistry; }
   public get pageTitleService() { return this.$injector.get('pageTitleService') as PageTitleService; }
   public get providerSelectionService() { return this.$injector.get('providerSelectionService') as ProviderSelectionService; }
-  public get schedulerFactory() { return this.$injector.get('schedulerFactory') as SchedulerFactory; }
   public get securityGroupReader() { return this.$injector.get('securityGroupReader') as SecurityGroupReader; }
   public get serverGroupWriter() { return this.$injector.get('serverGroupWriter') as ServerGroupWriter; }
   public get stateEvents() { return this.$injector.get('stateEvents') as StateEvents; }
