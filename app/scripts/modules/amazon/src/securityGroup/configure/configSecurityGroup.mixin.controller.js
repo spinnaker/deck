@@ -12,7 +12,7 @@ import {
   SECURITY_GROUP_WRITER,
   FirewallLabels,
   TaskMonitor,
-  V2_MODAL_WIZARD_SERVICE,
+  ModalWizard,
 } from '@spinnaker/core';
 
 import { AWSProviderSettings } from 'amazon/aws.settings';
@@ -23,7 +23,6 @@ module.exports = angular
     require('@uirouter/angularjs').default,
     SECURITY_GROUP_READER,
     SECURITY_GROUP_WRITER,
-    V2_MODAL_WIZARD_SERVICE,
   ])
   .controller('awsConfigSecurityGroupMixin', function(
     $scope,
@@ -33,7 +32,6 @@ module.exports = angular
     securityGroup,
     securityGroupReader,
     securityGroupWriter,
-    v2modalWizardService,
     cacheInitializer,
   ) {
     var ctrl = this;
@@ -49,7 +47,7 @@ module.exports = angular
     };
 
     $scope.allVpcs = [];
-    $scope.wizard = v2modalWizardService;
+    $scope.wizard = ModalWizard;
     $scope.hideClassic = false;
 
     ctrl.addMoreItems = function() {
@@ -241,7 +239,7 @@ module.exports = angular
         return true;
       });
       if (removed.length) {
-        v2modalWizardService.markDirty('Ingress');
+        ModalWizard.markDirty('Ingress');
       }
     }
 
@@ -322,8 +320,8 @@ module.exports = angular
 
     ctrl.dismissRemovedRules = function() {
       $scope.state.removedRules = [];
-      v2modalWizardService.markClean('Ingress');
-      v2modalWizardService.markComplete('Ingress');
+      ModalWizard.markClean('Ingress');
+      ModalWizard.markComplete('Ingress');
     };
 
     var classicPattern = /^[\x00-\x7F]+$/;

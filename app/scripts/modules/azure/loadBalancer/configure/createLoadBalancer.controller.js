@@ -10,21 +10,18 @@ import {
   NameUtils,
   NetworkReader,
   TaskMonitor,
-  V2_MODAL_WIZARD_SERVICE,
 } from '@spinnaker/core';
 
 module.exports = angular
   .module('spinnaker.azure.loadBalancer.create.controller', [
     require('@uirouter/angularjs').default,
     require('../loadBalancer.transformer.js').name,
-    V2_MODAL_WIZARD_SERVICE,
   ])
   .controller('azureCreateLoadBalancerCtrl', function(
     $scope,
     $uibModalInstance,
     $state,
     azureLoadBalancerTransformer,
-    v2modalWizardService,
     application,
     loadBalancer,
     isNew,
