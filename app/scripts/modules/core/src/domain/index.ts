@@ -42,6 +42,7 @@ export * from './IRegionalCluster';
 export * from './ISecurityGroup';
 export * from './IServerGroup';
 export * from './IServerGroupManager';
+export * from './ISnapshot';
 export * from './IStage';
 export * from './IStageContext';
 export * from './IStageOrTriggerTypeConfig';
