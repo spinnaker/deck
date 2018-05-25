@@ -42,6 +42,7 @@ import {
 
 import { IKeyPair, IAmazonLoadBalancerSourceData, IApplicationLoadBalancerSourceData } from 'amazon/domain';
 import { KeyPairsReader } from 'amazon/keyPairs';
+import { AutoScalingProcessService } from '../details/scalingProcesses/AutoScalingProcessService';
 
 export type IBlockDeviceMappingSource = 'source' | 'ami' | 'default';
 
@@ -113,7 +114,6 @@ export class AwsServerGroupConfigurationService {
     private cacheInitializer: CacheInitializerService,
     private loadBalancerReader: LoadBalancerReader,
     private serverGroupCommandRegistry: ServerGroupCommandRegistry,
-    private autoScalingProcessService: any,
   ) {
     'ngInject';
   }
@@ -206,7 +206,7 @@ export class AwsServerGroupConfigurationService {
         let instanceTypeReloader = this.$q.when();
         backingData.accounts = keys(backingData.credentialsKeyedByAccount);
         backingData.filtered = {} as IAmazonServerGroupCommandBackingDataFiltered;
-        backingData.scalingProcesses = this.autoScalingProcessService.listProcesses();
+        backingData.scalingProcesses = AutoScalingProcessService.listProcesses();
         backingData.appLoadBalancers = application.getDataSource('loadBalancers').data;
         command.backingData = backingData as IAmazonServerGroupCommandBackingData;
         this.configureVpcId(command);
@@ -698,5 +698,4 @@ module(AWS_SERVER_GROUP_CONFIGURATION_SERVICE, [
   LOAD_BALANCER_READ_SERVICE,
   CACHE_INITIALIZER_SERVICE,
   SERVER_GROUP_COMMAND_REGISTRY_PROVIDER,
-  require('../details/scalingProcesses/autoScalingProcess.service.js').name,
 ]).service('awsServerGroupConfigurationService', AwsServerGroupConfigurationService);
