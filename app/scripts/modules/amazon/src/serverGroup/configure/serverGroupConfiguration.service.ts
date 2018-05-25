@@ -41,7 +41,7 @@ import {
 } from '@spinnaker/core';
 
 import { IKeyPair, IAmazonLoadBalancerSourceData, IApplicationLoadBalancerSourceData } from 'amazon/domain';
-import { KEY_PAIRS_READ_SERVICE, KeyPairsReader } from 'amazon/keyPairs/keyPairs.read.service';
+import { KeyPairsReader } from 'amazon/keyPairs';
 
 export type IBlockDeviceMappingSource = 'source' | 'ami' | 'default';
 
@@ -111,7 +111,6 @@ export class AwsServerGroupConfigurationService {
     private securityGroupReader: SecurityGroupReader,
     private awsInstanceTypeService: any,
     private cacheInitializer: CacheInitializerService,
-    private keyPairsReader: KeyPairsReader,
     private loadBalancerReader: LoadBalancerReader,
     private serverGroupCommandRegistry: ServerGroupCommandRegistry,
     private autoScalingProcessService: any,
@@ -194,7 +193,7 @@ export class AwsServerGroupConfigurationService {
         securityGroups: this.securityGroupReader.getAllSecurityGroups(),
         subnets: SubnetReader.listSubnets(),
         preferredZones: AccountService.getPreferredZonesByAccount('aws'),
-        keyPairs: this.keyPairsReader.listKeyPairs(),
+        keyPairs: KeyPairsReader.listKeyPairs(),
         packageImages: imageLoader,
         instanceTypes: this.awsInstanceTypeService.getAllTypesByRegion(),
         enabledMetrics: this.$q.when(clone(this.enabledMetrics)),
@@ -696,7 +695,6 @@ module(AWS_SERVER_GROUP_CONFIGURATION_SERVICE, [
   require('amazon/image/image.reader.js').name,
   SECURITY_GROUP_READER,
   require('amazon/instance/awsInstanceType.service.js').name,
-  KEY_PAIRS_READ_SERVICE,
   LOAD_BALANCER_READ_SERVICE,
   CACHE_INITIALIZER_SERVICE,
   SERVER_GROUP_COMMAND_REGISTRY_PROVIDER,
