@@ -1,3 +1,4 @@
+export * from './IAppNotification';
 export * from './IArtifact';
 export * from './IArtifactKindConfig';
 
