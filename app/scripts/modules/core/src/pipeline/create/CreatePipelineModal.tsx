@@ -36,10 +36,12 @@ export interface ICreatePipelineModalState {
   configOptions: Option[];
   templates: IPipelineTemplate[];
   useTemplate: boolean;
-  useManagedTemplate: boolean;
+  templateOrigin: string;
   loadingTemplateFromSource: boolean;
   loadingTemplateFromSourceError: boolean;
   templateSourceUrl: string;
+  templateArtifactName: string;
+  templateArtifactType: string;
   inheritTemplateParameters: boolean;
   inheritTemplateExpectedArtifacts: boolean;
   inheritTemplateTriggers: boolean;
@@ -105,10 +107,12 @@ export class CreatePipelineModal extends React.Component<ICreatePipelineModalPro
       existingNames,
       command: { strategy: false, name: '', config: defaultConfig, template: null },
       useTemplate: false,
-      useManagedTemplate: true,
+      templateOrigin: 'managed',
       loadingTemplateFromSource: false,
       loadingTemplateFromSourceError: false,
       templateSourceUrl: '',
+      templateArtifactName: 'pipeline',
+      templateArtifactType: 'spinnaker-pac',
       inheritTemplateParameters: true,
       inheritTemplateExpectedArtifacts: true,
       inheritTemplateTriggers: true,
@@ -232,10 +236,10 @@ export class CreatePipelineModal extends React.Component<ICreatePipelineModalPro
     return () => this.setState({ useTemplate });
   }
 
-  private handleUseManagedTemplateSelection(useManagedTemplate: boolean): () => void {
+  private handleUseManagedTemplateSelection(templateOrigin: string): () => void {
     return () => {
       this.setState({
-        useManagedTemplate,
+        templateOrigin: templateOrigin,
         templateSourceUrl: '',
         loadingTemplateFromSourceError: false,
         command: { ...this.state.command, template: null },
@@ -247,6 +251,20 @@ export class CreatePipelineModal extends React.Component<ICreatePipelineModalPro
     const templateSourceUrl = e.target.value;
     this.setState({ templateSourceUrl });
     this.loadPipelineTemplateFromSource(templateSourceUrl);
+  };
+
+  public handleArtifactTypeChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const templateArtifactType = e.target.value;
+    const templateArtifactName = this.state.templateArtifactName;
+    this.setState({ templateArtifactType });
+    this.createPipelineFromArtifact(templateArtifactType, templateArtifactName);
+  };
+
+  public handleArtifactNameChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const templateArtifactType = this.state.templateArtifactType;
+    const templateArtifactName = e.target.value;
+    this.setState({ templateArtifactName });
+    this.createPipelineFromArtifact(templateArtifactType, templateArtifactName);
   };
 
   private configOptionRenderer = (option: Option) => {
@@ -289,7 +307,7 @@ export class CreatePipelineModal extends React.Component<ICreatePipelineModalPro
         })
         .finally(() => {
           if (!this.state.templates.length) {
-            this.setState({ useManagedTemplate: false });
+            this.setState({ templateOrigin: 'url' });
           }
         });
     }
@@ -306,6 +324,28 @@ export class CreatePipelineModal extends React.Component<ICreatePipelineModalPro
     }
   }
 
+  private createPipelineFromArtifact(templateArtifactType: string, templateArtifactName: string): void {
+    if (templateArtifactType && templateArtifactName) {
+      const selfLink =
+        '{% for artifact in trigger.artifacts %}{% if artifact.name ==  "' +
+        templateArtifactName +
+        '" && artifact.type == "' +
+        templateArtifactType +
+        '" %}http://{{artifact.reference}}{% endif %}{% endfor %}';
+      const template: IPipelineTemplate = {
+        id: '',
+        selfLink: selfLink,
+        metadata: null,
+        protect: null,
+        schema: null,
+        source: null,
+        stages: null,
+        variables: null,
+      };
+      this.state.command.template = template;
+    }
+  }
+
   public render() {
     const nameHasError: boolean = !this.validateNameCharacters();
     const nameIsNotUnique: boolean = !this.validateNameIsUnique();
@@ -313,7 +353,9 @@ export class CreatePipelineModal extends React.Component<ICreatePipelineModalPro
       !nameHasError &&
       !nameIsNotUnique &&
       this.state.command.name.length > 0 &&
-      (!this.state.useTemplate || !!this.state.command.template);
+      (!this.state.useTemplate ||
+        !!this.state.command.template ||
+        (this.state.useTemplate && this.state.command.template));
 
     return (
       <Modal
@@ -462,30 +504,38 @@ export class CreatePipelineModal extends React.Component<ICreatePipelineModalPro
                             <label className="radio-inline">
                               <input
                                 type="radio"
-                                checked={this.state.useManagedTemplate}
-                                onChange={this.handleUseManagedTemplateSelection(true)}
+                                checked={this.state.templateOrigin === 'managed'}
+                                onChange={this.handleUseManagedTemplateSelection('managed')}
                               />
                               Managed Templates
                             </label>
                             <label className="radio-inline">
                               <input
                                 type="radio"
-                                checked={!this.state.useManagedTemplate}
-                                onChange={this.handleUseManagedTemplateSelection(false)}
+                                checked={this.state.templateOrigin === 'url'}
+                                onChange={this.handleUseManagedTemplateSelection('url')}
                               />
                               URL
+                            </label>
+                            <label className="radio-inline">
+                              <input
+                                type="radio"
+                                checked={this.state.templateOrigin === 'build'}
+                                onChange={this.handleUseManagedTemplateSelection('build')}
+                              />
+                              Build
                             </label>
                           </div>
                         </div>
                       )}
-                      {this.state.useManagedTemplate && (
+                      {this.state.templateOrigin === 'managed' && (
                         <ManagedTemplateSelector
                           templates={this.state.templates}
                           onChange={this.handleTemplateSelection}
                           selectedTemplate={this.state.command.template}
                         />
                       )}
-                      {!this.state.useManagedTemplate && (
+                      {this.state.templateOrigin === 'url' && (
                         <div className="form-group clearfix">
                           {this.state.templates.length === 0 && (
                             <div className="col-md-3 sm-label-right">Source URL</div>
@@ -500,11 +550,45 @@ export class CreatePipelineModal extends React.Component<ICreatePipelineModalPro
                           </div>
                         </div>
                       )}
-                      <TemplateDescription
-                        loading={this.state.loadingTemplateFromSource}
-                        loadingError={this.state.loadingTemplateFromSourceError}
-                        template={this.state.command.template}
-                      />
+                      {this.state.templateOrigin === 'build' && (
+                        <div className="form-group clearfix">
+                          <div className={this.state.templates.length ? 'col-md-7 col-md-offset-3' : 'col-md-7'}>
+                            <div className="form-group clearfix">
+                              <div className="col-md-3 sm-label-right">
+                                <strong>Type</strong>
+                              </div>
+                              <div className="col-md-9">
+                                <input
+                                  type="text"
+                                  className="form-control"
+                                  value={this.state.templateArtifactType}
+                                  onChange={this.handleArtifactTypeChange}
+                                />
+                              </div>
+                            </div>
+                            <div className="form-group clearfix">
+                              <div className="col-md-3 sm-label-right">
+                                <strong>Name</strong>
+                              </div>
+                              <div className="col-md-9">
+                                <input
+                                  type="text"
+                                  className="form-control"
+                                  value={this.state.templateArtifactName}
+                                  onChange={this.handleArtifactNameChange}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      {this.state.templateOrigin !== 'build' && (
+                        <TemplateDescription
+                          loading={this.state.loadingTemplateFromSource}
+                          loadingError={this.state.loadingTemplateFromSourceError}
+                          template={this.state.command.template}
+                        />
+                      )}
                     </div>
                   )}
               </form>
