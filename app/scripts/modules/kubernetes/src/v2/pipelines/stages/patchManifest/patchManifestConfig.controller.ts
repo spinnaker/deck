@@ -30,6 +30,7 @@ export class KubernetesV2PatchManifestConfigCtrl implements IController {
 
     const defaultOptions: IPatchOptions = {
       mergeStrategy: MergeStrategy.strategic,
+      record: true,
     };
 
     if (this.$scope.stage.isNew) {

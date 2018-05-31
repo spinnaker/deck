@@ -1,7 +1,8 @@
 import { IComponentOptions, IController, module } from 'angular';
 
 export interface IPatchOptions {
-  mergeStrategy?: MergeStrategy;
+  mergeStrategy: MergeStrategy;
+  record: boolean;
 }
 
 export enum MergeStrategy {
@@ -23,8 +24,21 @@ class KubernetesPatchManifestOptionsFormComponent implements IComponentOptions {
     <div class="form-horizontal">
       <div class="form-group form-inline">
         <div class="col-md-3 sm-label-right">
+          Record Patch Annotation
+          <help-field key="kubernetes.manifest.patch.record"></help-field>
+        </div>
+        <div class="col-md-3">
+          <div class="input-group">
+            <input type="checkbox"
+                  ng-model="ctrl.options.record"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group form-inline">
+        <div class="col-md-3 sm-label-right">
           Merge Strategy
-          <!--<help-field key="kubernetes"></help-field>  TODO Help field-->
+          <help-field key="kubernetes.manifest.patch.mergeStrategy"></help-field>
         </div>
         <div class="col-md-4">
           <div class="input-group">
