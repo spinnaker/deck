@@ -11,6 +11,8 @@ import { KubernetesV2PatchManifestConfigCtrl } from '../patchManifest/patchManif
 import { KUBERNETES_PATCH_MANIFEST_OPTIONS_FORM } from '../../../manifest/patch/patchOptionsForm.component';
 import { KUBERNETES_MANIFEST_SELECTOR } from '../../../manifest/selector/selector.component';
 import { DeployStatus } from '../deployManifest/react/DeployStatus';
+import { IPipeline, IStage } from '../../../../../../core/src/domain';
+import { ICustomValidator } from '../../../../../../core/src/pipeline/config/validation/PipelineConfigValidator';
 
 export const KUBERNETES_PATCH_MANIFEST_STAGE = 'spinnaker.kubernetes.v2.pipeline.stage.patchManifestStage';
 
@@ -37,7 +39,20 @@ module(KUBERNETES_PATCH_MANIFEST_STAGE, [KUBERNETES_PATCH_MANIFEST_OPTIONS_FORM,
           { type: 'requiredField', fieldName: 'location', fieldLabel: 'Namespace' },
           { type: 'requiredField', fieldName: 'account', fieldLabel: 'Account' },
           { type: 'requiredField', fieldName: 'kind', fieldLabel: 'Kind' },
-          { type: 'requiredField', fieldName: 'name', fieldLabel: 'Name' },
+          {
+            type: 'custom',
+            fieldLabel: 'Name',
+            validate: (_pipeline: IPipeline, stage: IStage) => {
+              let result = null;
+              if (stage.manifestName) {
+                const split = stage.manifestName.split(' ');
+                if (split.length < 2 || split[1] === '' || split[1] === 'undefined') {
+                  result = `<strong>Name</strong> is a required field for ${stage.name} stage`;
+                }
+              }
+              return result;
+            },
+          } as ICustomValidator,
         ],
       });
 
