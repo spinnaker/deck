@@ -1,5 +1,5 @@
 import { IController, IScope } from 'angular';
-import { IPatchOptions, MergeStrategy } from '../../../manifest/patch/patchOptionsForm.component';
+import { IPatchOptions, MergeStrategy } from './patchOptionsForm.component';
 import {
   IKubernetesManifestCommandData,
   IKubernetesManifestCommandMetadata,
@@ -23,6 +23,19 @@ export class KubernetesV2PatchManifestConfigCtrl implements IController {
   constructor(private $scope: IScope) {
     'ngInject';
 
+    this.expectedArtifacts = ExpectedArtifactService.getExpectedArtifactsAvailableToStage(
+      $scope.stage,
+      $scope.$parent.pipeline,
+    );
+
+    const defaultOptions: IPatchOptions = {
+      mergeStrategy: MergeStrategy.strategic,
+    };
+
+    if (this.$scope.stage.isNew) {
+      this.$scope.stage.options = defaultOptions;
+    }
+
     KubernetesManifestCommandBuilder.buildNewManifestCommand(
       this.$scope.application,
       this.$scope.stage.patchBody,
@@ -43,17 +56,6 @@ export class KubernetesV2PatchManifestConfigCtrl implements IController {
       this.metadata = builtCommand.metadata;
       this.state.loaded = true;
     });
-
-    this.expectedArtifacts = ExpectedArtifactService.getExpectedArtifactsAvailableToStage(
-      $scope.stage,
-      $scope.$parent.pipeline,
-    );
-
-    const defaultOptions: IPatchOptions = {
-      mergeStrategy: MergeStrategy.strategic,
-    };
-
-    Object.assign(this.$scope.stage, defaultOptions);
   }
 
   public change() {

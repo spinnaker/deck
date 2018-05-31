@@ -1,13 +1,5 @@
 import { IComponentOptions, IController, module } from 'angular';
 
-export interface IPatchCommand {
-  manifestName: string;
-  location: string;
-  account: string;
-  reason: string;
-  options: IPatchOptions;
-}
-
 export interface IPatchOptions {
   mergeStrategy?: MergeStrategy;
 }
@@ -19,7 +11,6 @@ export enum MergeStrategy {
 }
 class KubernetesPatchManifestOptionsFormCtrl implements IController {
   public options: IPatchOptions;
-  // TODO(dibyom) Link to kubernetes documentation for each fields
   public mergeStrategies = MergeStrategy;
 }
 
@@ -38,8 +29,7 @@ class KubernetesPatchManifestOptionsFormComponent implements IComponentOptions {
         <div class="col-md-4">
           <div class="input-group">
             <select class="form-control input-sm" ng-model="ctrl.options.mergeStrategy">
-              <option ng-repeat="strategy in ctrl.mergeStrategies"
-                value="{{strategy}}"
+              <option ng-repeat="strategy in ctrl.mergeStrategies" value="{{strategy}}"
                 ng-selected="ctrl.options.mergeStrategy === strategy">{{strategy}}</option>
             </select>
           </div>

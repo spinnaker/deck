@@ -8,7 +8,7 @@ import {
   SETTINGS,
 } from '@spinnaker/core';
 import { KubernetesV2PatchManifestConfigCtrl } from '../patchManifest/patchManifestConfig.controller';
-import { KUBERNETES_PATCH_MANIFEST_OPTIONS_FORM } from '../../../manifest/patch/patchOptionsForm.component';
+import { KUBERNETES_PATCH_MANIFEST_OPTIONS_FORM } from './patchOptionsForm.component';
 import { KUBERNETES_MANIFEST_SELECTOR } from '../../../manifest/selector/selector.component';
 import { DeployStatus } from '../deployManifest/react/DeployStatus';
 import { IPipeline, IStage } from '../../../../../../core/src/domain';
