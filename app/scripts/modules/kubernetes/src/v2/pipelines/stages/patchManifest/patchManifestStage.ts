@@ -4,15 +4,16 @@ import {
   ArtifactReferenceService,
   ExecutionArtifactTab,
   ExecutionDetailsTasks,
+  ICustomValidator,
+  IPipeline,
+  IStage,
   Registry,
   SETTINGS,
 } from '@spinnaker/core';
 import { KubernetesV2PatchManifestConfigCtrl } from '../patchManifest/patchManifestConfig.controller';
 import { KUBERNETES_PATCH_MANIFEST_OPTIONS_FORM } from './patchOptionsForm.component';
-import { KUBERNETES_MANIFEST_SELECTOR } from '../../../manifest/selector/selector.component';
+import { KUBERNETES_MANIFEST_SELECTOR } from 'kubernetes/v2/manifest/selector/selector.component';
 import { DeployStatus } from '../deployManifest/react/DeployStatus';
-import { IPipeline, IStage } from '../../../../../../core/src/domain';
-import { ICustomValidator } from '../../../../../../core/src/pipeline/config/validation/PipelineConfigValidator';
 
 export const KUBERNETES_PATCH_MANIFEST_STAGE = 'spinnaker.kubernetes.v2.pipeline.stage.patchManifestStage';
 
@@ -25,7 +26,7 @@ module(KUBERNETES_PATCH_MANIFEST_STAGE, [KUBERNETES_PATCH_MANIFEST_OPTIONS_FORM,
     if (SETTINGS.feature.versionedProviders) {
       Registry.pipeline.registerStage({
         label: 'Patch (Manifest)',
-        description: 'Patch a kubernetes object in place.',
+        description: 'Patch a Kubernetes object in place.',
         key: 'patchManifest',
         cloudProvider: 'kubernetes',
         templateUrl: require('./patchManifestConfig.html'),
@@ -41,13 +42,12 @@ module(KUBERNETES_PATCH_MANIFEST_STAGE, [KUBERNETES_PATCH_MANIFEST_OPTIONS_FORM,
           { type: 'requiredField', fieldName: 'kind', fieldLabel: 'Kind' },
           {
             type: 'custom',
-            fieldLabel: 'Name',
             validate: (_pipeline: IPipeline, stage: IStage) => {
               let result = null;
               if (stage.manifestName) {
-                const split = stage.manifestName.split(' ');
-                if (split.length < 2 || split[1] === '' || split[1] === 'undefined') {
-                  result = `<strong>Name</strong> is a required field for ${stage.name} stage`;
+                const [, name] = stage.manifestName.split(' ');
+                if (!name) {
+                  result = `<strong>Name</strong> is a required field for ${stage.name} stages`;
                 }
               }
               return result;

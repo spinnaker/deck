@@ -10,6 +10,7 @@ export enum MergeStrategy {
   json = 'json',
   merge = 'merge',
 }
+
 class KubernetesPatchManifestOptionsFormCtrl implements IController {
   public options: IPatchOptions;
   public mergeStrategies = MergeStrategy;
@@ -29,8 +30,7 @@ class KubernetesPatchManifestOptionsFormComponent implements IComponentOptions {
         </div>
         <div class="col-md-3">
           <div class="input-group">
-            <input type="checkbox"
-                  ng-model="ctrl.options.record"/>
+            <input type="checkbox" ng-model="ctrl.options.record"/>
           </div>
         </div>
       </div>
@@ -44,7 +44,9 @@ class KubernetesPatchManifestOptionsFormComponent implements IComponentOptions {
           <div class="input-group">
             <select class="form-control input-sm" ng-model="ctrl.options.mergeStrategy">
               <option ng-repeat="strategy in ctrl.mergeStrategies" value="{{strategy}}"
-                ng-selected="ctrl.options.mergeStrategy === strategy">{{strategy}}</option>
+                      ng-selected="ctrl.options.mergeStrategy === strategy">
+                {{strategy}}
+              </option>
             </select>
           </div>
         </div>
@@ -53,8 +55,7 @@ class KubernetesPatchManifestOptionsFormComponent implements IComponentOptions {
   `;
 }
 
-export const KUBERNETES_PATCH_MANIFEST_OPTIONS_FORM =
-  'spinnaker.kubernetes.v2.kubernetes.manifest.patch.options.component';
+export const KUBERNETES_PATCH_MANIFEST_OPTIONS_FORM = 'spinnaker.kubernetes.v2.manifest.patch.options.component';
 module(KUBERNETES_PATCH_MANIFEST_OPTIONS_FORM, []).component(
   'kubernetesPatchManifestOptionsForm',
   new KubernetesPatchManifestOptionsFormComponent(),
