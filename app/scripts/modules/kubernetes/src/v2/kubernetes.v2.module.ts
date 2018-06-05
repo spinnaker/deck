@@ -3,7 +3,6 @@ import { module } from 'angular';
 import { CloudProviderRegistry } from '@spinnaker/core';
 
 import '../logo/kubernetes.logo.less';
-import { KUBERNETES_MANIFEST_COMMAND_BUILDER } from './manifest/manifestCommandBuilder.service';
 import { KUBERNETES_MANIFEST_BASIC_SETTINGS } from './manifest/wizard/basicSettings.component';
 import { KUBERNETES_MANIFEST_CTRL } from './manifest/wizard/manifestWizard.controller';
 import { KUBERNETES_EDIT_MANIFEST_CTRL } from './manifest/edit/editManifestWizard.controller';
@@ -27,7 +26,6 @@ import { KUBERNETES_MANIFEST_UNDO_ROLLOUT_CTRL } from './manifest/rollout/undo.c
 import { KUBERNETES_MANIFEST_PAUSE_ROLLOUT_CTRL } from './manifest/rollout/pause.controller';
 import { KUBERNETES_MANIFEST_RESUME_ROLLOUT_CTRL } from './manifest/rollout/resume.controller';
 import { KUBERNETES_MANIFEST_STATUS } from './manifest/status/status.component';
-import { KUBERNETES_MANIFEST_SERVICE } from './manifest/manifest.service';
 import { KUBERNETES_MANIFEST_CONDITION } from './manifest/status/condition.component';
 import { KUBERNETES_MANIFEST_ARTIFACT } from './manifest/artifact/artifact.component';
 import { KUBERNETES_MANIFEST_SELECTOR } from './manifest/selector/selector.component';
@@ -35,8 +33,6 @@ import { KUBERNETES_MANIFEST_LABELS } from './manifest/manifestLabels.component'
 import { KUBERNETES_MANIFEST_ANNOTATIONS } from './manifest/manifestAnnotations.component';
 import { KUBERNETES_MANIFEST_EVENTS } from './manifest/manifestEvents.component';
 import { KUBERNETES_MULTI_MANIFEST_SELECTOR } from './manifest/selector/multiSelector.component';
-import { KUBERNETES_SHOW_MANIFEST_YAML } from './manifest/showManifestYaml.component';
-import { KUBERNETES_SHOW_MANIFEST_DETAILS } from './manifest/showManifestDetails.component';
 import { KUBERNETES_V2_LOAD_BALANCER_TRANSFORMER } from './loadBalancer/transformer';
 import { KUBERNETES_V2_SECURITY_GROUP_TRANSFORMER } from './securityGroup/transformer';
 import { KUBERNETES_ANNOTATION_CUSTOM_SECTIONS } from './manifest/annotationCustomSections.component';
@@ -60,7 +56,6 @@ module(KUBERNETES_V2_MODULE, [
   KUBERNETES_V2_SERVER_GROUP_RESIZE_CTRL,
   KUBERNETES_V2_SERVER_GROUP_MANAGER_DETAILS_CTRL,
   KUBERNETES_MANIFEST_BASIC_SETTINGS,
-  KUBERNETES_MANIFEST_COMMAND_BUILDER,
   KUBERNETES_MANIFEST_CTRL,
   KUBERNETES_EDIT_MANIFEST_CTRL,
   KUBERNETES_MANIFEST_DELETE_CTRL,
@@ -71,7 +66,6 @@ module(KUBERNETES_V2_MODULE, [
   KUBERNETES_MANIFEST_ENTRY,
   KUBERNETES_MANIFEST_STATUS,
   KUBERNETES_MANIFEST_CONDITION,
-  KUBERNETES_MANIFEST_SERVICE,
   KUBERNETES_MANIFEST_ARTIFACT,
   KUBERNETES_V2_LOAD_BALANCER_TRANSFORMER,
   KUBERNETES_V2_SECURITY_GROUP_TRANSFORMER,
@@ -86,8 +80,6 @@ module(KUBERNETES_V2_MODULE, [
   KUBERNETES_MANIFEST_LABELS,
   KUBERNETES_MANIFEST_ANNOTATIONS,
   KUBERNETES_MANIFEST_EVENTS,
-  KUBERNETES_SHOW_MANIFEST_YAML,
-  KUBERNETES_SHOW_MANIFEST_DETAILS,
   KUBERNETES_ANNOTATION_CUSTOM_SECTIONS,
 ]).config(() => {
   CloudProviderRegistry.registerProvider('kubernetes', {

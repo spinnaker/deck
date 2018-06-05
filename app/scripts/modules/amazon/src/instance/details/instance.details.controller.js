@@ -6,8 +6,8 @@ import _ from 'lodash';
 import {
   CloudProviderRegistry,
   CONFIRMATION_MODAL_SERVICE,
-  INSTANCE_READ_SERVICE,
-  RECENT_HISTORY_SERVICE,
+  InstanceReader,
+  RecentHistoryService,
   SETTINGS,
   FirewallLabels,
 } from '@spinnaker/core';
@@ -19,10 +19,8 @@ module.exports = angular
     require('@uirouter/angularjs').default,
     require('angular-ui-bootstrap'),
     AMAZON_INSTANCE_WRITE_SERVICE,
-    INSTANCE_READ_SERVICE,
     require('../../vpc/vpcTag.directive.js').name,
     CONFIRMATION_MODAL_SERVICE,
-    RECENT_HISTORY_SERVICE,
   ])
   .controller('awsInstanceDetailsCtrl', function(
     $scope,
@@ -30,10 +28,10 @@ module.exports = angular
     $uibModal,
     amazonInstanceWriter,
     confirmationModalService,
-    recentHistoryService,
-    instanceReader,
     instance,
     app,
+    moniker,
+    environment,
     $q,
     overrides,
   ) {
@@ -47,6 +45,8 @@ module.exports = angular
     };
 
     $scope.application = app;
+    $scope.moniker = moniker;
+    $scope.environment = environment;
 
     $scope.securityGroupsLabel = FirewallLabels.get('Firewalls');
 
@@ -173,8 +173,8 @@ module.exports = angular
       if (instanceSummary && account && region) {
         extraData.account = account;
         extraData.region = region;
-        recentHistoryService.addExtraDataToLatest('instances', extraData);
-        return instanceReader.getInstanceDetails(account, region, instance.instanceId).then(details => {
+        RecentHistoryService.addExtraDataToLatest('instances', extraData);
+        return InstanceReader.getInstanceDetails(account, region, instance.instanceId).then(details => {
           if ($scope.$$destroyed) {
             return;
           }
@@ -217,7 +217,7 @@ module.exports = angular
         $scope.state.loading = false;
         $scope.instanceIdNotFound = instance.instanceId;
         $scope.state.notFoundStandalone = true;
-        recentHistoryService.removeLastItem('instances');
+        RecentHistoryService.removeLastItem('instances');
       } else {
         $state.params.allowModalToStayOpen = true;
         $state.go('^', null, { location: 'replace' });

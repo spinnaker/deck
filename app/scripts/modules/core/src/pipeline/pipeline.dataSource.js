@@ -1,20 +1,15 @@
 const angular = require('angular');
 
-import { APPLICATION_DATA_SOURCE_REGISTRY } from 'core/application/service/applicationDataSource.registry';
+import { ApplicationDataSourceRegistry } from 'core/application/service/ApplicationDataSourceRegistry';
 import { DELIVERY_KEY } from 'core/application/nav/defaultCategories';
 import { EXECUTION_SERVICE } from './service/execution.service';
-import { PIPELINE_CONFIG_SERVICE } from 'core/pipeline/config/services/pipelineConfig.service';
+import { PipelineConfigService } from 'core/pipeline/config/services/PipelineConfigService';
 import { SETTINGS } from 'core/config/settings';
 import { CLUSTER_SERVICE } from 'core/cluster/cluster.service';
 
 module.exports = angular
-  .module('spinnaker.core.pipeline.dataSource', [
-    APPLICATION_DATA_SOURCE_REGISTRY,
-    EXECUTION_SERVICE,
-    PIPELINE_CONFIG_SERVICE,
-    CLUSTER_SERVICE,
-  ])
-  .run(function($q, applicationDataSourceRegistry, executionService, pipelineConfigService, clusterService) {
+  .module('spinnaker.core.pipeline.dataSource', [EXECUTION_SERVICE, CLUSTER_SERVICE])
+  .run(function($q, executionService, clusterService) {
     let addExecutions = (application, executions) => {
       executionService.transformExecutions(application, executions, application.executions.data);
       return $q.when(executionService.addExecutionsToApplication(application, executions));
@@ -25,8 +20,8 @@ module.exports = angular
     };
 
     let loadPipelineConfigs = application => {
-      let pipelineLoader = pipelineConfigService.getPipelinesForApplication(application.name),
-        strategyLoader = pipelineConfigService.getStrategiesForApplication(application.name);
+      let pipelineLoader = PipelineConfigService.getPipelinesForApplication(application.name),
+        strategyLoader = PipelineConfigService.getStrategiesForApplication(application.name);
       return $q.all({ pipelineConfigs: pipelineLoader, strategyConfigs: strategyLoader });
     };
 
@@ -55,7 +50,7 @@ module.exports = angular
     };
 
     if (SETTINGS.feature.pipelines !== false) {
-      applicationDataSourceRegistry.registerDataSource({
+      ApplicationDataSourceRegistry.registerDataSource({
         optional: true,
         primary: true,
         icon: 'fa fa-xs fa-fw fa-list',
@@ -72,7 +67,7 @@ module.exports = angular
         description: 'Orchestrated deployment management',
       });
 
-      applicationDataSourceRegistry.registerDataSource({
+      ApplicationDataSourceRegistry.registerDataSource({
         key: 'pipelineConfigs',
         loader: loadPipelineConfigs,
         onLoad: addPipelineConfigs,
@@ -80,7 +75,7 @@ module.exports = angular
         visible: false,
       });
 
-      applicationDataSourceRegistry.registerDataSource({
+      ApplicationDataSourceRegistry.registerDataSource({
         key: 'runningExecutions',
         visible: false,
         loader: loadRunningExecutions,

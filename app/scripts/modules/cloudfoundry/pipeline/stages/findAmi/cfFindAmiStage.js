@@ -2,14 +2,14 @@
 
 const angular = require('angular');
 
-import { AccountService, LIST_EXTRACTOR_SERVICE } from '@spinnaker/core';
+import { AccountService, Registry, AppListExtractor } from '@spinnaker/core';
 
 import { CloudFoundryProviderSettings } from 'cloudfoundry/cf.settings';
 
 module.exports = angular
-  .module('spinnaker.cf.pipeline.stage.findAmiStage', [LIST_EXTRACTOR_SERVICE])
-  .config(function(pipelineConfigProvider) {
-    pipelineConfigProvider.registerStage({
+  .module('spinnaker.cf.pipeline.stage.findAmiStage', [])
+  .config(function() {
+    Registry.pipeline.registerStage({
       provides: 'findImage',
       cloudProvider: 'cf',
       templateUrl: require('./findAmiStage.html'),
@@ -20,7 +20,7 @@ module.exports = angular
       ],
     });
   })
-  .controller('cfFindAmiStageCtrl', function($scope, appListExtractorService) {
+  .controller('cfFindAmiStageCtrl', function($scope) {
     var ctrl = this;
 
     let stage = $scope.stage;
@@ -30,8 +30,8 @@ module.exports = angular
     };
 
     let setClusterList = () => {
-      let clusterFilter = appListExtractorService.clusterFilterForCredentials($scope.stage.credentials);
-      $scope.clusterList = appListExtractorService.getClusters([$scope.application], clusterFilter);
+      let clusterFilter = AppListExtractor.clusterFilterForCredentials($scope.stage.credentials);
+      $scope.clusterList = AppListExtractor.getClusters([$scope.application], clusterFilter);
     };
 
     ctrl.resetSelectedCluster = () => {

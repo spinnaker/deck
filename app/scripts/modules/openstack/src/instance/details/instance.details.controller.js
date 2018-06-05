@@ -6,21 +6,19 @@ import _ from 'lodash';
 import {
   CloudProviderRegistry,
   CONFIRMATION_MODAL_SERVICE,
-  INSTANCE_READ_SERVICE,
+  FirewallLabels,
+  InstanceReader,
   INSTANCE_WRITE_SERVICE,
-  RECENT_HISTORY_SERVICE,
+  RecentHistoryService,
   SETTINGS,
 } from '@spinnaker/core';
-import { FirewallLabels } from 'root/app/scripts/modules/core/src';
 
 module.exports = angular
   .module('spinnaker.instance.detail.openstack.controller', [
     require('@uirouter/angularjs').default,
     require('angular-ui-bootstrap'),
     INSTANCE_WRITE_SERVICE,
-    INSTANCE_READ_SERVICE,
     CONFIRMATION_MODAL_SERVICE,
-    RECENT_HISTORY_SERVICE,
   ])
   .controller('openstackInstanceDetailsCtrl', function(
     $scope,
@@ -28,10 +26,10 @@ module.exports = angular
     $uibModal,
     instanceWriter,
     confirmationModalService,
-    recentHistoryService,
-    instanceReader,
     instance,
     app,
+    moniker,
+    environment,
     $q,
     overrides,
   ) {
@@ -47,6 +45,8 @@ module.exports = angular
     $scope.firewallsLabel = FirewallLabels.get('Firewalls');
 
     $scope.application = app;
+    $scope.moniker = moniker;
+    $scope.environment = environment;
 
     function extractHealthMetrics(instance, latest) {
       // do not backfill on standalone instances
@@ -136,8 +136,8 @@ module.exports = angular
       if (instanceSummary && account && region) {
         extraData.account = account;
         extraData.region = region;
-        recentHistoryService.addExtraDataToLatest('instances', extraData);
-        return instanceReader.getInstanceDetails(account, region, instance.instanceId).then(details => {
+        RecentHistoryService.addExtraDataToLatest('instances', extraData);
+        return InstanceReader.getInstanceDetails(account, region, instance.instanceId).then(details => {
           if ($scope.$$destroyed) {
             return;
           }

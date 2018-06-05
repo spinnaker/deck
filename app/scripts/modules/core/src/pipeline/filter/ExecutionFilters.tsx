@@ -10,8 +10,10 @@ import { Application } from 'core/application';
 import { FilterSection } from 'core/cluster/filter/FilterSection';
 import { IFilterTag } from 'core/filterModel';
 import { IPipeline } from 'core/domain';
+import { PipelineConfigService } from 'core/pipeline/config/services/PipelineConfigService';
 import { ReactInjector } from 'core/reactShims';
 import { ExecutionState } from 'core/state';
+import { ExecutionFilterService } from './executionFilter.service';
 
 import './executionFilters.less';
 
@@ -47,12 +49,11 @@ export class ExecutionFilters extends React.Component<IExecutionFiltersProps, IE
 
   public componentDidMount(): void {
     const { application } = this.props;
-    const { executionFilterService } = ReactInjector;
 
     this.executionsRefreshUnsubscribe = application.executions.onRefresh(null, () => {
       this.refreshPipelines();
     });
-    this.groupsUpdatedSubscription = executionFilterService.groupsUpdatedStream.subscribe(() =>
+    this.groupsUpdatedSubscription = ExecutionFilterService.groupsUpdatedStream.subscribe(() =>
       this.setState({ tags: ExecutionState.filterModel.asFilterModel.tags }),
     );
     this.pipelineConfigsRefreshUnsubscribe = application.pipelineConfigs.onRefresh(null, () => {
@@ -62,7 +63,7 @@ export class ExecutionFilters extends React.Component<IExecutionFiltersProps, IE
     this.initialize();
     this.locationChangeUnsubscribe = ReactInjector.$uiRouter.transitionService.onSuccess({}, () => {
       ExecutionState.filterModel.asFilterModel.activate();
-      executionFilterService.updateExecutionGroups(application);
+      ExecutionFilterService.updateExecutionGroups(application);
     });
   }
 
@@ -78,7 +79,7 @@ export class ExecutionFilters extends React.Component<IExecutionFiltersProps, IE
 
   private updateExecutionGroups(): void {
     ExecutionState.filterModel.asFilterModel.applyParamsToUrl();
-    ReactInjector.executionFilterService.updateExecutionGroups(this.props.application);
+    ExecutionFilterService.updateExecutionGroups(this.props.application);
   }
 
   private refreshExecutions = (): void => {
@@ -89,7 +90,7 @@ export class ExecutionFilters extends React.Component<IExecutionFiltersProps, IE
 
   private clearFilters = (): void => {
     ReactGA.event({ category: 'Pipelines', action: `Filter: clear all (side nav)` });
-    ReactInjector.executionFilterService.clearFilters();
+    ExecutionFilterService.clearFilters();
     this.refreshExecutions();
   };
 
@@ -140,7 +141,7 @@ export class ExecutionFilters extends React.Component<IExecutionFiltersProps, IE
   };
 
   private updatePipelines(pipelines: IPipeline[]): void {
-    $q.all(pipelines.map(pipeline => ReactInjector.pipelineConfigService.savePipeline(pipeline)));
+    $q.all(pipelines.map(pipeline => PipelineConfigService.savePipeline(pipeline)));
   }
 
   private handleSortEnd = (sortEnd: SortEnd): void => {
@@ -223,6 +224,7 @@ export class ExecutionFilters extends React.Component<IExecutionFiltersProps, IE
                 <FilterStatus status="NOT_STARTED" label="Not Started" refresh={this.refreshExecutions} />
                 <FilterStatus status="CANCELED" label="Canceled" refresh={this.refreshExecutions} />
                 <FilterStatus status="STOPPED" label="Stopped" refresh={this.refreshExecutions} />
+                <FilterStatus status="BUFFERED" label="Buffered" refresh={this.refreshExecutions} />
               </div>
             </FilterSection>
           </div>

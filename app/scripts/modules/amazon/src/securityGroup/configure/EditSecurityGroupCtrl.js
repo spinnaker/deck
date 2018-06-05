@@ -3,22 +3,16 @@
 const angular = require('angular');
 import _ from 'lodash';
 
-import { SECURITY_GROUP_WRITER, TASK_MONITOR_BUILDER, FirewallLabels } from '@spinnaker/core';
+import { SecurityGroupWriter, TaskMonitor, FirewallLabels } from '@spinnaker/core';
 
 module.exports = angular
-  .module('spinnaker.amazon.securityGroup.edit.controller', [
-    require('@uirouter/angularjs').default,
-    TASK_MONITOR_BUILDER,
-    SECURITY_GROUP_WRITER,
-  ])
+  .module('spinnaker.amazon.securityGroup.edit.controller', [require('@uirouter/angularjs').default])
   .controller('awsEditSecurityGroupCtrl', function(
     $scope,
     $uibModalInstance,
     $state,
-    taskMonitorBuilder,
     application,
     securityGroup,
-    securityGroupWriter,
     $controller,
   ) {
     $scope.pages = {
@@ -46,7 +40,7 @@ module.exports = angular
 
     $scope.state.isNew = false;
 
-    $scope.taskMonitor = taskMonitorBuilder.buildTaskMonitor({
+    $scope.taskMonitor = new TaskMonitor({
       application: application,
       title: `Updating your ${FirewallLabels.get('firewall')}`,
       modalInstance: $uibModalInstance,
@@ -104,7 +98,7 @@ module.exports = angular
       };
 
       $scope.taskMonitor.submit(function() {
-        return securityGroupWriter.upsertSecurityGroup(command, application, 'Update');
+        return SecurityGroupWriter.upsertSecurityGroup(command, application, 'Update');
       });
     };
 

@@ -1,11 +1,12 @@
-import { IController, IQService, IScope, module } from 'angular';
+import { IController, IScope, module } from 'angular';
 
-import { IGOR_SERVICE, IgorService, BuildServiceType } from 'core/ci/igor.service';
-import { PIPELINE_CONFIG_PROVIDER, PipelineConfigProvider } from 'core/pipeline/config/pipelineConfigProvider';
-import { SERVICE_ACCOUNT_SERVICE, ServiceAccountService } from 'core/serviceAccount/serviceAccount.service';
+import { IgorService, BuildServiceType } from 'core/ci/igor.service';
+import { Registry } from 'core/registry';
+import { ServiceAccountReader } from 'core/serviceAccount/ServiceAccountReader';
 import { IBuildTrigger } from 'core/domain/ITrigger';
-import { TRAVIS_TRIGGER_OPTIONS_COMPONENT } from './travisTriggerOptions.component';
 import { SETTINGS } from 'core/config/settings';
+
+import { TravisTriggerTemplate } from './TravisTriggerTemplate';
 
 export interface ITravisTriggerViewState {
   mastersLoaded: boolean;
@@ -23,15 +24,10 @@ export class TravisTrigger implements IController {
   public fiatEnabled: boolean;
   public serviceAccounts: string[];
 
-  constructor(
-    $scope: IScope,
-    public trigger: IBuildTrigger,
-    private igorService: IgorService,
-    serviceAccountService: ServiceAccountService,
-  ) {
+  constructor($scope: IScope, public trigger: IBuildTrigger) {
     'ngInject';
     this.fiatEnabled = SETTINGS.feature.fiatEnabled;
-    serviceAccountService.getServiceAccounts().then(accounts => {
+    ServiceAccountReader.getServiceAccounts().then(accounts => {
       this.serviceAccounts = accounts || [];
     });
     this.viewState = {
@@ -59,7 +55,7 @@ export class TravisTrigger implements IController {
   }
 
   private initializeMasters(): void {
-    this.igorService.listMasters(BuildServiceType.Travis).then((masters: string[]) => {
+    IgorService.listMasters(BuildServiceType.Travis).then((masters: string[]) => {
       this.masters = masters;
       this.viewState.mastersLoaded = true;
       this.viewState.mastersRefreshing = false;
@@ -70,7 +66,7 @@ export class TravisTrigger implements IController {
     if (this.trigger && this.trigger.master) {
       this.viewState.jobsLoaded = false;
       this.jobs = [];
-      this.igorService.listJobsForMaster(this.trigger.master).then(jobs => {
+      IgorService.listJobsForMaster(this.trigger.master).then(jobs => {
         this.viewState.jobsLoaded = true;
         this.viewState.jobsRefreshing = false;
         this.jobs = jobs;
@@ -83,22 +79,16 @@ export class TravisTrigger implements IController {
 }
 
 export const TRAVIS_TRIGGER = 'spinnaker.core.pipeline.config.trigger.travis';
-module(TRAVIS_TRIGGER, [
-  TRAVIS_TRIGGER_OPTIONS_COMPONENT,
-  require('../trigger.directive.js').name,
-  IGOR_SERVICE,
-  SERVICE_ACCOUNT_SERVICE,
-  PIPELINE_CONFIG_PROVIDER,
-])
-  .config((pipelineConfigProvider: PipelineConfigProvider) => {
-    pipelineConfigProvider.registerTrigger({
+module(TRAVIS_TRIGGER, [require('../trigger.directive.js').name])
+  .config(() => {
+    Registry.pipeline.registerTrigger({
       label: 'Travis',
       description: 'Listens to a Travis job',
       key: 'travis',
       controller: 'TravisTriggerCtrl',
       controllerAs: '$ctrl',
       templateUrl: require('./travisTrigger.html'),
-      manualExecutionHandler: 'travisTriggerExecutionHandler',
+      manualExecutionComponent: TravisTriggerTemplate,
       validators: [
         {
           type: 'requiredField',
@@ -113,16 +103,5 @@ module(TRAVIS_TRIGGER, [
         },
       ],
     });
-  })
-  .factory('travisTriggerExecutionHandler', ($q: IQService) => {
-    // must provide two fields:
-    //   formatLabel (promise): used to supply the label for selecting a trigger when there are multiple triggers
-    //   selectorTemplate: provides the HTML to show extra fields
-    return {
-      formatLabel: (trigger: IBuildTrigger) => {
-        return $q.when(`(Travis) ${trigger.master}: ${trigger.job}`);
-      },
-      selectorTemplate: require('./selectorTemplate.html'),
-    };
   })
   .controller('TravisTriggerCtrl', TravisTrigger);

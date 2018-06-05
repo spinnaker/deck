@@ -2,27 +2,22 @@
 
 const angular = require('angular');
 
-import { SERVICE_ACCOUNT_SERVICE, SETTINGS } from '@spinnaker/core';
+import { Registry, ServiceAccountReader, SETTINGS } from '@spinnaker/core';
 
-import { DOCKER_IMAGE_READER } from 'docker/image/docker.image.reader.service';
 import { DOCKER_IMAGE_AND_TAG_SELECTOR_COMPONENT } from 'docker/image/dockerImageAndTagSelector.component';
+import { DockerTriggerTemplate } from './DockerTriggerTemplate';
 
 module.exports = angular
-  .module('spinnaker.docker.pipeline.trigger', [
-    SERVICE_ACCOUNT_SERVICE,
-    DOCKER_IMAGE_READER,
-    require('./dockerTriggerOptions.directive.js').name,
-    DOCKER_IMAGE_AND_TAG_SELECTOR_COMPONENT,
-  ])
-  .config(function(pipelineConfigProvider) {
-    pipelineConfigProvider.registerTrigger({
+  .module('spinnaker.docker.pipeline.trigger', [DOCKER_IMAGE_AND_TAG_SELECTOR_COMPONENT])
+  .config(function() {
+    Registry.pipeline.registerTrigger({
       label: 'Docker Registry',
       description: 'Executes the pipeline on an image update',
       key: 'docker',
       controller: 'DockerTriggerCtrl as ctrl',
       controllerAs: 'vm',
       templateUrl: require('./dockerTrigger.html'),
-      manualExecutionHandler: 'dockerTriggerExecutionHandler',
+      manualExecutionComponent: DockerTriggerTemplate,
       validators: [
         {
           type: 'requiredField',
@@ -43,19 +38,11 @@ module.exports = angular
       ],
     });
   })
-  .factory('dockerTriggerExecutionHandler', function($q) {
-    return {
-      formatLabel: trigger => {
-        return $q.when(`(Docker Registry) ${trigger.account ? trigger.account + ':' : ''} ${trigger.repository || ''}`);
-      },
-      selectorTemplate: require('./selectorTemplate.html'),
-    };
-  })
-  .controller('DockerTriggerCtrl', function(trigger, serviceAccountService) {
+  .controller('DockerTriggerCtrl', function(trigger) {
     this.trigger = trigger;
     this.fiatEnabled = SETTINGS.feature.fiatEnabled;
 
-    serviceAccountService.getServiceAccounts().then(accounts => {
+    ServiceAccountReader.getServiceAccounts().then(accounts => {
       this.serviceAccounts = accounts || [];
     });
 

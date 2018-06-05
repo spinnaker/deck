@@ -1,15 +1,11 @@
-import { IPromise, module } from 'angular';
+import { IPromise } from 'angular';
 
 import { Application } from 'core/application';
 import { ModalInjector } from 'core/reactShims';
-import { TASK_EXECUTOR, IJob, TaskExecutor, ITaskCommand } from 'core/task/taskExecutor';
+import { IJob, TaskExecutor, ITaskCommand } from 'core/task/taskExecutor';
 
 export class PagerDutyWriter {
-  public constructor(private taskExecutor: TaskExecutor) {
-    'ngInject';
-  }
-
-  public pageApplicationOwnerModal(app: Application): void {
+  public static pageApplicationOwnerModal(app: Application): void {
     ModalInjector.modalService
       .open({
         templateUrl: require('./pageApplicationOwner.html'),
@@ -21,7 +17,7 @@ export class PagerDutyWriter {
       .result.catch(() => {});
   }
 
-  public sendPage(
+  public static sendPage(
     applications: Application[],
     keys: string[],
     reason: string,
@@ -51,13 +47,10 @@ export class PagerDutyWriter {
       task.application = applications[0];
     }
 
-    return this.taskExecutor.executeTask(task);
+    return TaskExecutor.executeTask(task);
   }
 
-  public pageApplicationOwner(application: Application, reason: string, details?: string): IPromise<any> {
+  public static pageApplicationOwner(application: Application, reason: string, details?: string): IPromise<any> {
     return this.sendPage([application], undefined, reason, { details });
   }
 }
-
-export const PAGER_DUTY_WRITE_SERVICE = 'spinnaker.core.pagerDuty.write.service';
-module(PAGER_DUTY_WRITE_SERVICE, [TASK_EXECUTOR]).service('pagerDutyWriter', PagerDutyWriter);

@@ -1,7 +1,9 @@
 'use strict';
 
 import _ from 'lodash';
-import { PIPELINE_CONFIG_SERVICE } from '@spinnaker/core';
+
+import { Registry } from '@spinnaker/core';
+
 import { KUBERNETES_IMAGE_ID_FILTER } from 'kubernetes/presentation/imageId.filter';
 
 const angular = require('angular');
@@ -15,11 +17,10 @@ module.exports = angular
     require('kubernetes/image/image.reader.js').name,
     require('./runJobExecutionDetails.controller.js').name,
     require('./configureJob.controller.js').name,
-    PIPELINE_CONFIG_SERVICE,
     KUBERNETES_IMAGE_ID_FILTER,
   ])
-  .config(function(pipelineConfigProvider) {
-    pipelineConfigProvider.registerStage({
+  .config(function() {
+    Registry.pipeline.registerStage({
       provides: 'runJob',
       cloudProvider: 'kubernetes',
       templateUrl: require('./runJobStage.html'),

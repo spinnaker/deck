@@ -17,35 +17,32 @@ import {
   IAmazonClassicLoadBalancerUpsertCommand,
   ITargetGroup,
 } from 'amazon/domain';
-import { VPC_READ_SERVICE, VpcReader } from 'amazon/vpc/vpc.read.service';
+import { VpcReader } from 'amazon/vpc/VpcReader';
 
 export class AwsLoadBalancerTransformer {
-  public constructor(private vpcReader: VpcReader) {
-    'ngInject';
-  }
+  private updateHealthCounts(container: IServerGroup | ITargetGroup | IAmazonLoadBalancer): void {
+    const instances = container.instances;
 
-  private updateHealthCounts(serverGroup: IServerGroup | ITargetGroup | IAmazonLoadBalancer): void {
-    const instances = serverGroup.instances;
-    let serverGroups: IServerGroup[] = [serverGroup] as IServerGroup[];
-    if ((serverGroup as ITargetGroup | IAmazonLoadBalancer).serverGroups) {
-      const container = serverGroup as ITargetGroup;
-      serverGroups = container.serverGroups;
-    }
-    serverGroup.instanceCounts = {
+    container.instanceCounts = {
       up: instances.filter(instance => instance.health[0].state === 'InService').length,
-      down: instances.filter(instance => instance.health[0].state === 'OutOfService').length,
-      outOfService: serverGroups.reduce((acc, sg): number => {
-        return (
-          sg.instances.filter((instance): boolean => {
-            return instance.healthState === 'OutOfService';
-          }).length + acc
-        );
-      }, 0),
+      down: instances.filter(instance => instance.healthState === 'Down').length,
+      outOfService: instances.filter(instance => instance.healthState === 'OutOfService').length,
       starting: undefined,
       succeeded: undefined,
       failed: undefined,
       unknown: undefined,
     };
+
+    if ((container as ITargetGroup | IAmazonLoadBalancer).serverGroups) {
+      const serverGroupInstances = flatten((container as ITargetGroup).serverGroups.map(sg => sg.instances));
+      container.instanceCounts.up = serverGroupInstances.filter(
+        instance => instance.health[0].state === 'InService',
+      ).length;
+      container.instanceCounts.down = serverGroupInstances.filter(instance => instance.healthState === 'Down').length;
+      container.instanceCounts.outOfService = serverGroupInstances.filter(
+        instance => instance.healthState === 'OutOfService',
+      ).length;
+    }
   }
 
   private transformInstance(instance: IInstance, provider: string, account: string, region: string): void {
@@ -117,9 +114,7 @@ export class AwsLoadBalancerTransformer {
       .value();
     this.updateHealthCounts(targetGroup);
 
-    return this.vpcReader
-      .listVpcs()
-      .then((vpcs: IVpc[]) => this.addVpcNameToContainer(targetGroup)(vpcs) as ITargetGroup);
+    return VpcReader.listVpcs().then((vpcs: IVpc[]) => this.addVpcNameToContainer(targetGroup)(vpcs) as ITargetGroup);
   }
 
   public normalizeLoadBalancer(loadBalancer: IAmazonLoadBalancer): IPromise<IAmazonLoadBalancer> {
@@ -143,9 +138,9 @@ export class AwsLoadBalancerTransformer {
       .flatten<IInstance>()
       .value();
     this.updateHealthCounts(loadBalancer);
-    return this.vpcReader
-      .listVpcs()
-      .then((vpcs: IVpc[]) => this.addVpcNameToContainer(loadBalancer)(vpcs) as IAmazonLoadBalancer);
+    return VpcReader.listVpcs().then(
+      (vpcs: IVpc[]) => this.addVpcNameToContainer(loadBalancer)(vpcs) as IAmazonLoadBalancer,
+    );
   }
 
   public convertClassicLoadBalancerForEditing(
@@ -426,7 +421,4 @@ export class AwsLoadBalancerTransformer {
 }
 
 export const AWS_LOAD_BALANCER_TRANSFORMER = 'spinnaker.amazon.loadBalancer.transformer';
-module(AWS_LOAD_BALANCER_TRANSFORMER, [VPC_READ_SERVICE]).service(
-  'awsLoadBalancerTransformer',
-  AwsLoadBalancerTransformer,
-);
+module(AWS_LOAD_BALANCER_TRANSFORMER, []).service('awsLoadBalancerTransformer', AwsLoadBalancerTransformer);

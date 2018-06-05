@@ -1,8 +1,8 @@
 import { IController, IComponentOptions, module } from 'angular';
 
-import { APPLICATION_READ_SERVICE, ApplicationReader } from 'core/application/service/application.read.service';
-import { PIPELINE_CONFIG_SERVICE, PipelineConfigService } from 'core/pipeline/config/services/pipelineConfig.service';
+import { ApplicationReader } from 'core/application/service/ApplicationReader';
 import { IParameter, IPipeline } from 'core/domain';
+import { PipelineConfigService } from 'core/pipeline/config/services/PipelineConfigService';
 
 interface IPipelineSelectorState {
   pipelinesLoaded: boolean;
@@ -32,12 +32,8 @@ class PipelineSelectorController implements IController {
     currentApplicationCount: 20,
   };
 
-  constructor(private applicationReader: ApplicationReader, private pipelineConfigService: PipelineConfigService) {
-    'ngInject';
-  }
-
   public $onInit() {
-    this.applicationReader.listApplications().then(applications => {
+    ApplicationReader.listApplications().then(applications => {
       this.state.applications = applications.map(a => a.name).sort();
       this.initializePipelines();
     });
@@ -49,7 +45,7 @@ class PipelineSelectorController implements IController {
 
   public initializePipelines(): void {
     if (this.command.application) {
-      this.pipelineConfigService.getPipelinesForApplication(this.command.application).then(pipelines => {
+      PipelineConfigService.getPipelinesForApplication(this.command.application).then(pipelines => {
         this.state.pipelines = pipelines;
         if (pipelines.every(p => p.id !== this.command.pipelineId)) {
           this.command.pipelineId = null;
@@ -117,7 +113,4 @@ const pipelineSelectorComponent: IComponentOptions = {
 };
 
 export const PIPELINE_SELECTOR_COMPONENT = 'spinnaker.core.deploymentStrategy.rollingredblack.pipelineSelector';
-module(PIPELINE_SELECTOR_COMPONENT, [APPLICATION_READ_SERVICE, PIPELINE_CONFIG_SERVICE]).component(
-  'pipelineSelector',
-  pipelineSelectorComponent,
-);
+module(PIPELINE_SELECTOR_COMPONENT, []).component('pipelineSelector', pipelineSelectorComponent);

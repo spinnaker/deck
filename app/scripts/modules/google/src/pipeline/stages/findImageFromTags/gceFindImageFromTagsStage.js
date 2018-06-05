@@ -2,12 +2,12 @@
 
 const angular = require('angular');
 
-import { BAKERY_SERVICE, PIPELINE_CONFIG_PROVIDER } from '@spinnaker/core';
+import { BakeryReader, Registry } from '@spinnaker/core';
 
 module.exports = angular
-  .module('spinnaker.gce.pipeline.stage..findImageFromTagsStage', [BAKERY_SERVICE, PIPELINE_CONFIG_PROVIDER])
-  .config(function(pipelineConfigProvider) {
-    pipelineConfigProvider.registerStage({
+  .module('spinnaker.gce.pipeline.stage..findImageFromTagsStage', [])
+  .config(function() {
+    Registry.pipeline.registerStage({
       provides: 'findImageFromTags',
       cloudProvider: 'gce',
       templateUrl: require('./findImageFromTagsStage.html'),
@@ -20,12 +20,12 @@ module.exports = angular
       ],
     });
   })
-  .controller('gceFindImageFromTagsStageCtrl', function($scope, bakeryService) {
+  .controller('gceFindImageFromTagsStageCtrl', function($scope) {
     $scope.stage.tags = $scope.stage.tags || {};
     $scope.stage.regions = $scope.stage.regions || [];
     $scope.stage.cloudProvider = $scope.stage.cloudProvider || 'gce';
 
-    bakeryService.getRegions('gce').then(function(regions) {
+    BakeryReader.getRegions('gce').then(function(regions) {
       $scope.regions = regions;
     });
   });

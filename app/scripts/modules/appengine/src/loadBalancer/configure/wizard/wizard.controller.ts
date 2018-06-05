@@ -3,14 +3,7 @@ import { cloneDeep } from 'lodash';
 import { IModalServiceInstance } from 'angular-ui-bootstrap';
 import { StateService } from '@uirouter/angularjs';
 
-import {
-  Application,
-  LOAD_BALANCER_WRITE_SERVICE,
-  LoadBalancerWriter,
-  TASK_MONITOR_BUILDER,
-  TaskMonitor,
-  TaskMonitorBuilder,
-} from '@spinnaker/core';
+import { Application, LoadBalancerWriter, TaskMonitor } from '@spinnaker/core';
 
 import {
   AppengineLoadBalancerTransformer,
@@ -36,8 +29,6 @@ class AppengineLoadBalancerWizardController implements IController {
     public isNew: boolean,
     private forPipelineConfig: boolean,
     private appengineLoadBalancerTransformer: AppengineLoadBalancerTransformer,
-    private taskMonitorBuilder: TaskMonitorBuilder,
-    private loadBalancerWriter: LoadBalancerWriter,
     private wizardSubFormValidation: any,
   ) {
     'ngInject';
@@ -81,7 +72,7 @@ class AppengineLoadBalancerWizardController implements IController {
       return this.$uibModalInstance.close(description);
     } else {
       return this.taskMonitor.submit(() => {
-        return this.loadBalancerWriter.upsertLoadBalancer(description, this.application, 'Update');
+        return LoadBalancerWriter.upsertLoadBalancer(description, this.application, 'Update');
       });
     }
   }
@@ -95,7 +86,7 @@ class AppengineLoadBalancerWizardController implements IController {
   }
 
   private setTaskMonitor(): void {
-    this.taskMonitor = this.taskMonitorBuilder.buildTaskMonitor({
+    this.taskMonitor = new TaskMonitor({
       application: this.application,
       title: 'Updating your load balancer',
       modalInstance: this.$uibModalInstance,
@@ -157,7 +148,7 @@ class AppengineLoadBalancerWizardController implements IController {
 
 export const APPENGINE_LOAD_BALANCER_WIZARD_CTRL = 'spinnaker.appengine.loadBalancer.wizard.controller';
 
-module(APPENGINE_LOAD_BALANCER_WIZARD_CTRL, [TASK_MONITOR_BUILDER, LOAD_BALANCER_WRITE_SERVICE]).controller(
+module(APPENGINE_LOAD_BALANCER_WIZARD_CTRL, []).controller(
   'appengineLoadBalancerWizardCtrl',
   AppengineLoadBalancerWizardController,
 );

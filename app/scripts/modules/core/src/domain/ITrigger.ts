@@ -1,5 +1,8 @@
+import { IExecution } from 'core/domain';
+
 export interface ITrigger {
   enabled: boolean;
+  rebake?: boolean;
   user?: string;
   type: string;
   expectedArtifactIds?: string[]; // uuid references to ExpectedArtifacts defined in the Pipeline.
@@ -15,18 +18,24 @@ export interface IGitTrigger extends ITrigger {
 }
 
 export interface IBuildTrigger extends ITrigger {
+  buildInfo?: any;
+  buildNumber?: number;
   job: string;
   master: string;
   type: 'jenkins' | 'travis';
 }
 
 export interface IDockerTrigger extends ITrigger {
+  account?: string;
   tag: string;
+  registry?: string;
   repository: string;
 }
 
 export interface IPipelineTrigger extends ITrigger {
   application: string;
+  parentExecution?: IExecution;
+  parentPipelineId?: string;
   pipeline: string;
 }
 

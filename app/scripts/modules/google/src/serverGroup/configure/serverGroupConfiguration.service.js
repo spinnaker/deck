@@ -7,9 +7,9 @@ import {
   AccountService,
   CACHE_INITIALIZER_SERVICE,
   LOAD_BALANCER_READ_SERVICE,
-  NETWORK_READ_SERVICE,
+  NetworkReader,
   SECURITY_GROUP_READER,
-  SUBNET_READ_SERVICE,
+  SubnetReader,
 } from '@spinnaker/core';
 
 import { GCEProviderSettings } from 'google/gce.settings';
@@ -23,8 +23,6 @@ module.exports = angular
     SECURITY_GROUP_READER,
     CACHE_INITIALIZER_SERVICE,
     LOAD_BALANCER_READ_SERVICE,
-    NETWORK_READ_SERVICE,
-    SUBNET_READ_SERVICE,
     require('../../image/image.reader.js').name,
     require('../../instance/gceInstanceType.service.js').name,
     require('./../../instance/custom/customInstanceBuilder.gce.service.js').name,
@@ -39,8 +37,6 @@ module.exports = angular
     cacheInitializer,
     $q,
     loadBalancerReader,
-    networkReader,
-    subnetReader,
     gceCustomInstanceBuilderService,
     gceHttpLoadBalancerUtils,
     gceHealthCheckReader,
@@ -88,8 +84,8 @@ module.exports = angular
         .all({
           credentialsKeyedByAccount: AccountService.getCredentialsKeyedByAccount('gce'),
           securityGroups: securityGroupReader.getAllSecurityGroups(),
-          networks: networkReader.listNetworksByProvider('gce'),
-          subnets: subnetReader.listSubnetsByProvider('gce'),
+          networks: NetworkReader.listNetworksByProvider('gce'),
+          subnets: SubnetReader.listSubnetsByProvider('gce'),
           loadBalancers: loadBalancerReader.listLoadBalancers('gce'),
           packageImages: imageLoader,
           allImages: loadAllImages(),
@@ -600,7 +596,7 @@ module.exports = angular
     }
 
     function refreshNetworks(command) {
-      networkReader.listNetworksByProvider('gce').then(function(gceNetworks) {
+      NetworkReader.listNetworksByProvider('gce').then(function(gceNetworks) {
         command.backingData.networks = gceNetworks;
       });
     }

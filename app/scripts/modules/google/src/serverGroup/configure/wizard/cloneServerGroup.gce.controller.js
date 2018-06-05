@@ -3,7 +3,7 @@
 const angular = require('angular');
 import _ from 'lodash';
 
-import { FirewallLabels, INSTANCE_TYPE_SERVICE } from '@spinnaker/core';
+import { FirewallLabels, INSTANCE_TYPE_SERVICE, ModalWizard, TaskMonitor } from '@spinnaker/core';
 
 module.exports = angular
   .module('spinnaker.serverGroup.configure.gce.cloneServerGroup', [
@@ -20,8 +20,6 @@ module.exports = angular
     $state,
     $log,
     serverGroupWriter,
-    v2modalWizardService,
-    taskMonitorBuilder,
     gceServerGroupConfigurationService,
     serverGroupCommand,
     application,
@@ -113,7 +111,7 @@ module.exports = angular
       application.serverGroups.onNextRefresh($scope, onApplicationRefresh);
     }
 
-    $scope.taskMonitor = taskMonitorBuilder.buildTaskMonitor({
+    $scope.taskMonitor = new TaskMonitor({
       application: application,
       title: 'Creating your server group',
       modalInstance: $uibModalInstance,
@@ -181,16 +179,16 @@ module.exports = angular
 
     function processCommandUpdateResult(result) {
       if (result.dirty.loadBalancers) {
-        v2modalWizardService.markDirty('load-balancers');
+        ModalWizard.markDirty('load-balancers');
       }
       if (result.dirty.securityGroups) {
-        v2modalWizardService.markDirty('security-groups');
+        ModalWizard.markDirty('security-groups');
       }
       if (result.dirty.availabilityZones) {
-        v2modalWizardService.markDirty('capacity');
+        ModalWizard.markDirty('capacity');
       }
       if (result.dirty.instanceType) {
-        v2modalWizardService.markDirty('instance-type');
+        ModalWizard.markDirty('instance-type');
       }
     }
 
@@ -248,12 +246,12 @@ module.exports = angular
         $scope.command.capacity.desired !== null &&
         (!$scope.command.selectZones || selectedZones) &&
         $scope.form.$valid &&
-        v2modalWizardService.isComplete()
+        ModalWizard.isComplete()
       );
     };
 
     this.showSubmitButton = function() {
-      return v2modalWizardService.allPagesVisited();
+      return ModalWizard.allPagesVisited();
     };
 
     function buildLoadBalancerMetadata(loadBalancerNames, loadBalancerIndex, backendServices) {

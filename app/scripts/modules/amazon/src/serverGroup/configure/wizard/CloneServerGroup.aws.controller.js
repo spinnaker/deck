@@ -6,8 +6,8 @@ import {
   OVERRIDE_REGISTRY,
   SERVER_GROUP_COMMAND_REGISTRY_PROVIDER,
   SERVER_GROUP_WRITER,
-  TASK_MONITOR_BUILDER,
-  V2_MODAL_WIZARD_SERVICE,
+  TaskMonitor,
+  ModalWizard,
   FirewallLabels,
 } from '@spinnaker/core';
 
@@ -18,8 +18,6 @@ module.exports = angular
     require('@uirouter/angularjs').default,
     AWS_SERVER_GROUP_CONFIGURATION_SERVICE,
     SERVER_GROUP_WRITER,
-    TASK_MONITOR_BUILDER,
-    V2_MODAL_WIZARD_SERVICE,
     OVERRIDE_REGISTRY,
     SERVER_GROUP_COMMAND_REGISTRY_PROVIDER,
   ])
@@ -29,8 +27,6 @@ module.exports = angular
     $q,
     $state,
     serverGroupWriter,
-    v2modalWizardService,
-    taskMonitorBuilder,
     overrideRegistry,
     awsServerGroupConfigurationService,
     serverGroupCommandRegistry,
@@ -138,7 +134,7 @@ module.exports = angular
       application.serverGroups.onNextRefresh($scope, onApplicationRefresh);
     }
 
-    $scope.taskMonitor = taskMonitorBuilder.buildTaskMonitor({
+    $scope.taskMonitor = new TaskMonitor({
       application: application,
       title: 'Creating your server group',
       modalInstance: $uibModalInstance,
@@ -198,20 +194,20 @@ module.exports = angular
 
     function processCommandUpdateResult(result) {
       if (result.dirty.loadBalancers || result.dirty.targetGroups) {
-        v2modalWizardService.markDirty('load-balancers');
+        ModalWizard.markDirty('load-balancers');
       }
       if (result.dirty.securityGroups) {
-        v2modalWizardService.markDirty('security-groups');
+        ModalWizard.markDirty('security-groups');
       }
       if (result.dirty.availabilityZones) {
-        v2modalWizardService.markDirty('capacity');
+        ModalWizard.markDirty('capacity');
       }
       if (result.dirty.instanceType) {
-        v2modalWizardService.markDirty('instance-type');
+        ModalWizard.markDirty('instance-type');
       }
       if (result.dirty.keyPair) {
-        v2modalWizardService.markDirty('advanced');
-        v2modalWizardService.markIncomplete('advanced');
+        ModalWizard.markDirty('advanced');
+        ModalWizard.markIncomplete('advanced');
       }
     }
 
@@ -242,12 +238,12 @@ module.exports = angular
         $scope.command.capacity.max >= 0 &&
         $scope.command.capacity.desired >= 0 &&
         $scope.form.$valid &&
-        v2modalWizardService.isComplete()
+        ModalWizard.isComplete()
       );
     };
 
     this.showSubmitButton = function() {
-      return v2modalWizardService.allPagesVisited();
+      return ModalWizard.allPagesVisited();
     };
 
     this.submit = function() {

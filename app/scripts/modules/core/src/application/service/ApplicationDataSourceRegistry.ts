@@ -1,0 +1,47 @@
+import { cloneDeep } from 'lodash';
+
+import { IDataSourceConfig } from './applicationDataSource';
+
+export class ApplicationDataSourceRegistry {
+  private static defaultDataSourceOrder: string[] = [
+    'executions',
+    'serverGroups',
+    'loadBalancers',
+    'securityGroups',
+    'tasks',
+    'config',
+  ];
+  private static dataSources: IDataSourceConfig[] = [];
+  private static dataSourceOrder: string[] = [];
+
+  public static setDataSourceOrder(keys: string[]): void {
+    this.dataSourceOrder = keys;
+    this.sortDataSources();
+  }
+
+  private static sortDataSources(): void {
+    let order = this.defaultDataSourceOrder;
+    if (this.dataSourceOrder.length) {
+      order = this.dataSourceOrder;
+    }
+    this.dataSources.forEach(ds => {
+      if (!order.includes(ds.key)) {
+        order.push(ds.key);
+      }
+    });
+    this.dataSources.sort((a, b) => order.indexOf(a.key) - order.indexOf(b.key));
+  }
+
+  public static registerDataSource(config: IDataSourceConfig): void {
+    this.dataSources.push(config);
+    this.sortDataSources();
+  }
+
+  public static getDataSources(): IDataSourceConfig[] {
+    return cloneDeep(this.dataSources);
+  }
+
+  public static clearDataSources(): void {
+    this.dataSources.length = 0;
+  }
+}

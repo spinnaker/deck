@@ -60,7 +60,7 @@
           <label class="col-md-4 sm-label-right">Trigger</label>
           <div class="col-md-6">
             <p class="form-control-static"
-               ng-if="vm.triggers.length === 1">{{vm.command.trigger.description}}</p>
+               ng-if="vm.triggers.length === 1">{{vm.triggers[0].description}}</p>
             <select class="form-control input-sm"
                     ng-if="vm.triggers.length > 1"
                     ng-model="vm.command.trigger"
@@ -69,7 +69,7 @@
             </select>
           </div>
         </div>
-        <div ng-include="vm.triggerTemplate"></div>
+        <trigger-template component="vm.triggerComponent" command="vm.command"/>
       </div>
 
       <div ng-if="vm.command.pipeline.parameterConfig !== undefined && vm.command.pipeline.parameterConfig.length">
@@ -108,9 +108,7 @@
         </div>
       </div>
 
-      <div ng-repeat="template in vm.stageTemplates">
-        <div ng-include="template"></div>
-      </div>
+      <stage-manual-components ng-if="vm.stageComponents" command="vm.command" components="vm.stageComponents" />
 
       <div class="form-group">
         <label class="col-md-4 sm-label-right">Notifications</label>

@@ -2,23 +2,19 @@
 
 const angular = require('angular');
 
-import { PIPELINE_CONFIG_SERVICE } from 'core/pipeline/config/services/pipelineConfig.service';
-import { JSON_UTILITY_SERVICE } from 'core/utils/json/json.utility.service';
+import { JsonUtils } from 'core/utils';
 import { DIFF_VIEW_COMPONENT } from './diffView.component';
+import { PipelineConfigService } from 'core/pipeline/config/services/PipelineConfigService';
 
 import './showHistory.less';
 
 module.exports = angular
   .module('spinnaker.core.pipeline.config.actions.history.controller', [
-    PIPELINE_CONFIG_SERVICE,
-    JSON_UTILITY_SERVICE,
     require('./diffSummary.component').name,
     DIFF_VIEW_COMPONENT,
   ])
   .controller('ShowHistoryCtrl', function(
     $window,
-    pipelineConfigService,
-    jsonUtilityService,
     pipelineConfigId,
     currentConfig,
     isStrategy,
@@ -72,7 +68,7 @@ module.exports = angular
           this.left = this.history[this.version + 1].contents;
         }
       }
-      this.diff = jsonUtilityService.diff(this.left, this.right, true);
+      this.diff = JsonUtils.diff(this.left, this.right, true);
     };
 
     this.close = $uibModalInstance.dismiss;
@@ -81,5 +77,5 @@ module.exports = angular
       $uibModalInstance.close(this.history[this.version].json);
     };
 
-    pipelineConfigService.getHistory(pipelineConfigId, isStrategy, 100).then(historyLoaded, loadError);
+    PipelineConfigService.getHistory(pipelineConfigId, isStrategy, 100).then(historyLoaded, loadError);
   });

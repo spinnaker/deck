@@ -5,16 +5,15 @@ import _ from 'lodash';
 
 import { CONFIRMATION_MODAL_SERVICE } from 'core/confirmationModal/confirmationModal.service';
 import { DIFF_VIEW_COMPONENT } from 'core/pipeline/config/actions/history/diffView.component';
-import { JSON_UTILITY_SERVICE } from 'core/utils/json/json.utility.service';
+import { JsonUtils } from 'core/utils/json/JsonUtils';
+import { SnapshotReader } from '../SnapshotReader';
+import { SnapshotWriter } from '../SnapshotWriter';
 
 import './snapshotDiff.modal.less';
 
 module.exports = angular
   .module('spinnaker.deck.core.snapshot.diff.modal.controller', [
-    require('../snapshot.read.service.js').name,
-    require('../snapshot.write.service.js').name,
     CONFIRMATION_MODAL_SERVICE,
-    JSON_UTILITY_SERVICE,
     require('../../pipeline/config/actions/history/diffSummary.component.js').name,
     DIFF_VIEW_COMPONENT,
   ])
@@ -23,9 +22,6 @@ module.exports = angular
     application,
     $filter,
     $uibModalInstance,
-    snapshotReader,
-    snapshotWriter,
-    jsonUtilityService,
     confirmationModalService,
   ) {
     this.availableAccounts = availableAccounts;
@@ -48,7 +44,7 @@ module.exports = angular
         loading: true,
         error: false,
       };
-      this.diff = jsonUtilityService.diff([], []);
+      this.diff = JsonUtils.diff([], []);
       this.snapshots = [];
       this.version = 0;
     };
@@ -86,7 +82,7 @@ module.exports = angular
     this.getSnapshotHistoryForAccount = account => {
       resetView();
       if (account) {
-        snapshotReader.getSnapshotHistory(application.name, account).then(loadSuccess, loadError);
+        SnapshotReader.getSnapshotHistory(application.name, account).then(loadSuccess, loadError);
       } else {
         loadSuccess([]);
       }
@@ -94,7 +90,7 @@ module.exports = angular
 
     this.restoreSnapshot = () => {
       let submitMethod = () => {
-        return snapshotWriter.restoreSnapshot(
+        return SnapshotWriter.restoreSnapshot(
           application,
           this.selectedAccount,
           this.snapshots[this.version].timestamp,
@@ -125,7 +121,7 @@ module.exports = angular
 
       this.right = this.snapshots[this.version].contents;
       this.left = this.findLeftMap[this.compareTo](this.right, this.version);
-      this.diff = jsonUtilityService.diff(this.left, this.right);
+      this.diff = JsonUtils.diff(this.left, this.right);
     };
 
     this.getSnapshotHistoryForAccount(this.selectedAccount);

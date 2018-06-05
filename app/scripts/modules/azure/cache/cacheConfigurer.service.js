@@ -2,16 +2,11 @@
 
 const angular = require('angular');
 
-import {
-  AccountService,
-  INSTANCE_TYPE_SERVICE,
-  LOAD_BALANCER_READ_SERVICE,
-  SUBNET_READ_SERVICE,
-} from '@spinnaker/core';
+import { AccountService, INSTANCE_TYPE_SERVICE, LOAD_BALANCER_READ_SERVICE, SubnetReader } from '@spinnaker/core';
 
 module.exports = angular
-  .module('spinnaker.azure.cache.initializer', [LOAD_BALANCER_READ_SERVICE, INSTANCE_TYPE_SERVICE, SUBNET_READ_SERVICE])
-  .factory('azureCacheConfigurer', function($q, instanceTypeService, subnetReader, keyPairsReader, loadBalancerReader) {
+  .module('spinnaker.azure.cache.initializer', [LOAD_BALANCER_READ_SERVICE, INSTANCE_TYPE_SERVICE])
+  .factory('azureCacheConfigurer', function($q, instanceTypeService, loadBalancerReader) {
     let config = Object.create(null);
 
     config.credentials = {
@@ -28,11 +23,7 @@ module.exports = angular
 
     config.subnets = {
       version: 2,
-      initializers: [() => subnetReader.listSubnets()],
-    };
-
-    config.keyPairs = {
-      initializers: [() => keyPairsReader.listKeyPairs()],
+      initializers: [() => SubnetReader.listSubnets()],
     };
 
     return config;

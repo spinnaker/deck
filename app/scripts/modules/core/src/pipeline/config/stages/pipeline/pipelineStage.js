@@ -2,13 +2,14 @@
 
 const angular = require('angular');
 
-import { APPLICATION_READ_SERVICE } from 'core/application/service/application.read.service';
-import { PIPELINE_CONFIG_SERVICE } from 'core/pipeline/config/services/pipelineConfig.service';
+import { ApplicationReader } from 'core/application/service/ApplicationReader';
+import { PipelineConfigService } from 'core/pipeline/config/services/PipelineConfigService';
+import { Registry } from 'core/registry';
 
 module.exports = angular
-  .module('spinnaker.core.pipeline.stage.pipelineStage', [PIPELINE_CONFIG_SERVICE, APPLICATION_READ_SERVICE])
-  .config(function(pipelineConfigProvider) {
-    pipelineConfigProvider.registerStage({
+  .module('spinnaker.core.pipeline.stage.pipelineStage', [])
+  .config(function() {
+    Registry.pipeline.registerStage({
       label: 'Pipeline',
       description: 'Runs a pipeline',
       key: 'pipeline',
@@ -22,7 +23,7 @@ module.exports = angular
       validators: [{ type: 'requiredField', fieldName: 'pipeline' }],
     });
   })
-  .controller('pipelineStageCtrl', function($scope, stage, pipelineConfigService, applicationReader) {
+  .controller('pipelineStageCtrl', function($scope, stage) {
     $scope.stage = stage;
     $scope.stage.failPipeline = $scope.stage.failPipeline === undefined ? true : $scope.stage.failPipeline;
     $scope.stage.waitForCompletion =
@@ -49,14 +50,14 @@ module.exports = angular
       $scope.viewState.infiniteScroll.currentItems += $scope.viewState.infiniteScroll.numToAdd;
     };
 
-    applicationReader.listApplications().then(function(applications) {
+    ApplicationReader.listApplications().then(function(applications) {
       $scope.applications = _.map(applications, 'name').sort();
       initializeMasters();
     });
 
     function initializeMasters() {
       if ($scope.stage.application && !$scope.stage.application.includes('${')) {
-        pipelineConfigService.getPipelinesForApplication($scope.stage.application).then(function(pipelines) {
+        PipelineConfigService.getPipelinesForApplication($scope.stage.application).then(function(pipelines) {
           $scope.pipelines = _.filter(pipelines, function(pipeline) {
             return pipeline.id !== $scope.pipeline.id;
           });

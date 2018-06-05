@@ -3,13 +3,15 @@
 const angular = require('angular');
 
 import { AccountService } from 'core/account/AccountService';
-import { PIPELINE_CONFIG_SERVICE } from 'core/pipeline/config/services/pipelineConfig.service';
+import { ApplicationReader } from 'core/application';
+import { PipelineConfigService } from 'core/pipeline/config/services/PipelineConfigService';
+import { TaskMonitor } from 'core/task';
+import { ModalWizard } from 'core/modal/wizard/ModalWizard';
+import { ProjectReader } from '../service/ProjectReader';
+import { ProjectWriter } from '../service/ProjectWriter';
 
 module.exports = angular
   .module('spinnaker.core.projects.configure.modal.controller', [
-    require('../service/project.write.service.js').name,
-    require('../service/project.read.service.js').name,
-    PIPELINE_CONFIG_SERVICE,
     require('../../modal/wizard/wizardSubFormValidation.service.js').name,
   ])
   .controller('ConfigureProjectModalCtrl', function(
@@ -17,12 +19,6 @@ module.exports = angular
     projectConfig,
     $uibModalInstance,
     $q,
-    pipelineConfigService,
-    applicationReader,
-    projectWriter,
-    projectReader,
-    taskMonitorBuilder,
-    v2modalWizardService,
     wizardSubFormValidation,
   ) {
     if (!projectConfig.name) {
@@ -51,7 +47,7 @@ module.exports = angular
 
     this.addApplication = application => {
       $scope.viewState.pipelinesLoaded = false;
-      let retriever = pipelineConfigService.getPipelinesForApplication(application);
+      let retriever = PipelineConfigService.getPipelinesForApplication(application);
       retriever.then(
         pipelines => {
           $scope.pipelineConfigOptions[application] = pipelines;
@@ -133,7 +129,7 @@ module.exports = angular
       $scope.viewState.pipelinesLoaded = true;
     });
 
-    applicationReader.listApplications().then(applications => {
+    ApplicationReader.listApplications().then(applications => {
       $scope.applications = applications.map(application => application.name).sort();
       $scope.viewState.applicationsLoaded = true;
     });
@@ -142,21 +138,21 @@ module.exports = angular
       $scope.accounts = accounts;
     });
 
-    $scope.taskMonitor = taskMonitorBuilder.buildTaskMonitor({
+    $scope.taskMonitor = new TaskMonitor({
       application: null,
       title: null, // will be configured by delete/update call
       modalInstance: $uibModalInstance,
     });
 
     this.deleteProject = () => {
-      var submitMethod = () => projectWriter.deleteProject($scope.command);
+      var submitMethod = () => ProjectWriter.deleteProject($scope.command);
 
       $scope.taskMonitor.onTaskComplete = () => $uibModalInstance.close({ action: 'delete' });
       $scope.taskMonitor.title = 'Deleting ' + $scope.command.name;
       $scope.taskMonitor.submit(submitMethod);
     };
 
-    projectReader.listProjects().then(projects => {
+    ProjectReader.listProjects().then(projects => {
       $scope.projectNames = projects
         .map(project => project.name.toLowerCase())
         .filter(projectName => projectName !== projectConfig.name.toLowerCase());
@@ -164,7 +160,7 @@ module.exports = angular
     });
 
     this.updateProject = () => {
-      var submitMethod = () => projectWriter.upsertProject($scope.command);
+      var submitMethod = () => ProjectWriter.upsertProject($scope.command);
       let descriptor = $scope.command.id ? 'Updating ' : 'Creating ';
 
       $scope.taskMonitor.onTaskComplete = () =>
@@ -175,7 +171,7 @@ module.exports = angular
     };
 
     this.showSubmitButton = () => {
-      return v2modalWizardService.allPagesVisited() && wizardSubFormValidation.subFormsAreValid();
+      return ModalWizard.allPagesVisited() && wizardSubFormValidation.subFormsAreValid();
     };
 
     wizardSubFormValidation

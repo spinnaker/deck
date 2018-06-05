@@ -10,12 +10,7 @@ import { ServerGroupReader } from '../serverGroup/serverGroupReader.service';
 import { IJob, ITaskCommand, TaskExecutor } from '../task/taskExecutor';
 
 describe('Service: instance writer', function() {
-  let service: InstanceWriter,
-    serverGroupReader: ServerGroupReader,
-    taskExecutor: TaskExecutor,
-    $q: ng.IQService,
-    $scope: ng.IScope,
-    applicationModelBuilder: ApplicationModelBuilder;
+  let service: InstanceWriter, $q: ng.IQService, $scope: ng.IScope, applicationModelBuilder: ApplicationModelBuilder;
 
   beforeEach(() => State.initialize());
 
@@ -25,15 +20,11 @@ describe('Service: instance writer', function() {
     mock.inject(
       (
         instanceWriter: InstanceWriter,
-        _taskExecutor_: TaskExecutor,
-        _serverGroupReader_: ServerGroupReader,
         _$q_: ng.IQService,
         $rootScope: ng.IRootScopeService,
         _applicationModelBuilder_: ApplicationModelBuilder,
       ) => {
         service = instanceWriter;
-        taskExecutor = _taskExecutor_;
-        serverGroupReader = _serverGroupReader_;
         $q = _$q_;
         $scope = $rootScope.$new();
         applicationModelBuilder = _applicationModelBuilder_;
@@ -65,16 +56,16 @@ describe('Service: instance writer', function() {
       });
       let executedTask: IJob = null;
 
-      spyOn(taskExecutor, 'executeTask').and.callFake((task: ITaskCommand) => {
+      spyOn(TaskExecutor, 'executeTask').and.callFake((task: ITaskCommand) => {
         executedTask = task.job[0];
       });
-      spyOn(serverGroupReader, 'getServerGroup').and.returnValue($q.when(serverGroup));
+      spyOn(ServerGroupReader, 'getServerGroup').and.returnValue($q.when(serverGroup));
 
       service.terminateInstanceAndShrinkServerGroup(instance, application, {});
       $scope.$digest();
       $scope.$digest();
 
-      expect(taskExecutor.executeTask).toHaveBeenCalled();
+      expect(TaskExecutor.executeTask).toHaveBeenCalled();
       expect(executedTask['setMaxToNewDesired']).toBe(true);
     });
   });
@@ -115,7 +106,7 @@ describe('Service: instance writer', function() {
         instances: [],
       };
 
-      spyOn(taskExecutor, 'executeTask').and.callFake((command: ITaskCommand) => (task = command));
+      spyOn(TaskExecutor, 'executeTask').and.callFake((command: ITaskCommand) => (task = command));
     });
 
     it('only sends jobs for groups with instances', () => {

@@ -1,5 +1,7 @@
 import { ClusterFilterModel } from 'core/cluster/filter/ClusterFilterModel';
 import { ClusterFilterService } from 'core/cluster/filter/ClusterFilterService';
+import { SETTINGS } from 'core/config/settings';
+import { VersionChecker } from 'core/config/VersionChecker';
 import { ExecutionFilterModel } from 'core/pipeline/filter/ExecutionFilterModel';
 import { LoadBalancerFilterModel } from 'core/loadBalancer/filter/LoadBalancerFilterModel';
 import { LoadBalancerFilterService } from 'core/loadBalancer/filter/LoadBalancerFilterService';
@@ -7,30 +9,30 @@ import { MultiselectModel } from 'core/cluster/filter/MultiselectModel';
 import { SecurityGroupFilterModel } from 'core/securityGroup/filter/SecurityGroupFilterModel';
 import { SecurityGroupFilterService } from 'core/securityGroup/filter/SecurityGroupFilterService';
 
-export interface IClusterState {
+export interface IStateCluster {
   filterModel: ClusterFilterModel;
   filterService: ClusterFilterService;
   multiselectModel: MultiselectModel;
 }
 
-export interface IExecutionState {
+export interface IStateExecution {
   filterModel: ExecutionFilterModel;
 }
 
-export interface ILoadBalancersState {
+export interface IStateLoadBalancers {
   filterModel: LoadBalancerFilterModel;
   filterService: LoadBalancerFilterService;
 }
 
-export interface ISecurityGroupState {
+export interface IStateSecurityGroup {
   filterModel: SecurityGroupFilterModel;
   filterService: SecurityGroupFilterService;
 }
 
-export const ClusterState: IClusterState = {} as any;
-export const ExecutionState: IExecutionState = {} as any;
-export const LoadBalancerState: ILoadBalancersState = {} as any;
-export const SecurityGroupState: ISecurityGroupState = {} as any;
+export const ClusterState = {} as IStateCluster;
+export const ExecutionState = {} as IStateExecution;
+export const LoadBalancerState = {} as IStateLoadBalancers;
+export const SecurityGroupState = {} as IStateSecurityGroup;
 
 export function initialize(): void {
   ClusterState.filterModel = new ClusterFilterModel();
@@ -44,4 +46,7 @@ export function initialize(): void {
 
   SecurityGroupState.filterModel = new SecurityGroupFilterModel();
   SecurityGroupState.filterService = new SecurityGroupFilterService();
+  if (SETTINGS.checkForUpdates) {
+    VersionChecker.initialize();
+  }
 }

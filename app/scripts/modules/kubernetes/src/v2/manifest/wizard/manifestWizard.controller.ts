@@ -1,19 +1,11 @@
 import { IController, module } from 'angular';
 import { IModalInstanceService } from 'angular-ui-bootstrap';
 
-import {
-  Application,
-  SERVER_GROUP_WRITER,
-  TASK_MONITOR_BUILDER,
-  TaskMonitor,
-  TaskMonitorBuilder,
-  ManifestWriter,
-} from '@spinnaker/core';
+import { Application, SERVER_GROUP_WRITER, TaskMonitor, ManifestWriter } from '@spinnaker/core';
 
 import {
   IKubernetesManifestCommand,
   IKubernetesManifestCommandMetadata,
-  KUBERNETES_MANIFEST_COMMAND_BUILDER,
   KubernetesManifestCommandBuilder,
 } from '../manifestCommandBuilder.service';
 
@@ -26,15 +18,9 @@ class KubernetesManifestWizardCtrl implements IController {
   public command: IKubernetesManifestCommand;
   public metadata: IKubernetesManifestCommandMetadata;
 
-  constructor(
-    private $uibModalInstance: IModalInstanceService,
-    private application: Application,
-    private manifestWriter: ManifestWriter,
-    private taskMonitorBuilder: TaskMonitorBuilder,
-    private kubernetesManifestCommandBuilder: KubernetesManifestCommandBuilder,
-  ) {
+  constructor(private $uibModalInstance: IModalInstanceService, private application: Application) {
     'ngInject';
-    this.kubernetesManifestCommandBuilder.buildNewManifestCommand(application).then(builtCommand => {
+    KubernetesManifestCommandBuilder.buildNewManifestCommand(application).then(builtCommand => {
       const { command, metadata } = builtCommand;
       this.command = command;
       this.metadata = metadata;
@@ -49,13 +35,13 @@ class KubernetesManifestWizardCtrl implements IController {
   }
 
   public submit(): void {
-    const command = this.kubernetesManifestCommandBuilder.copyAndCleanCommand(this.metadata, this.command);
-    const submitMethod = () => this.manifestWriter.deployManifest(command, this.application);
+    const command = KubernetesManifestCommandBuilder.copyAndCleanCommand(this.metadata, this.command);
+    const submitMethod = () => ManifestWriter.deployManifest(command, this.application);
     this.taskMonitor.submit(submitMethod);
   }
 
   private initialize(): void {
-    this.taskMonitor = this.taskMonitorBuilder.buildTaskMonitor({
+    this.taskMonitor = new TaskMonitor({
       application: this.application,
       title: 'Deploying your manifest',
       modalInstance: this.$uibModalInstance,
@@ -67,13 +53,12 @@ class KubernetesManifestWizardCtrl implements IController {
   }
 
   public isValid(): boolean {
-    return this.kubernetesManifestCommandBuilder.manifestCommandIsValid(this.command);
+    return KubernetesManifestCommandBuilder.manifestCommandIsValid(this.command);
   }
 }
 
 export const KUBERNETES_MANIFEST_CTRL = 'spinnaker.kubernetes.v2.manifest.wizard.controller';
-module(KUBERNETES_MANIFEST_CTRL, [
-  SERVER_GROUP_WRITER,
-  TASK_MONITOR_BUILDER,
-  KUBERNETES_MANIFEST_COMMAND_BUILDER,
-]).controller('kubernetesManifestWizardCtrl', KubernetesManifestWizardCtrl);
+module(KUBERNETES_MANIFEST_CTRL, [SERVER_GROUP_WRITER]).controller(
+  'kubernetesManifestWizardCtrl',
+  KubernetesManifestWizardCtrl,
+);

@@ -63,6 +63,7 @@ export * from './pubsub';
 
 export * from './reactShims';
 export * from './region';
+export * from './registry';
 export * from './retry';
 
 export * from './scheduler';
@@ -71,6 +72,7 @@ export * from './securityGroup';
 export * from './serverGroup';
 export * from './serverGroupManager';
 export * from './serviceAccount';
+export * from './state';
 export * from './storage';
 export * from './subnet';
 

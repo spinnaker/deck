@@ -3,8 +3,8 @@ import { has, trim } from 'lodash';
 
 import { SETTINGS } from 'core/config/settings';
 import { IGitTrigger } from 'core/domain/ITrigger';
-import { PIPELINE_CONFIG_PROVIDER, PipelineConfigProvider } from 'core/pipeline/config/pipelineConfigProvider';
-import { SERVICE_ACCOUNT_SERVICE, ServiceAccountService } from 'core/serviceAccount/serviceAccount.service';
+import { Registry } from 'core/registry';
+import { ServiceAccountReader } from 'core/serviceAccount/ServiceAccountReader';
 
 class GitTriggerController implements IController {
   public fiatEnabled: boolean = SETTINGS.feature.fiatEnabled;
@@ -33,11 +33,7 @@ class GitTriggerController implements IController {
     },
   };
 
-  constructor(
-    public trigger: IGitTrigger,
-    private $scope: IScope,
-    private serviceAccountService: ServiceAccountService,
-  ) {
+  constructor(public trigger: IGitTrigger, private $scope: IScope) {
     'ngInject';
     this.initialize();
   }
@@ -55,7 +51,7 @@ class GitTriggerController implements IController {
       this.trigger.project = attributes.repoProjectKey;
       this.trigger.slug = attributes.repoSlug;
     }
-    this.serviceAccountService.getServiceAccounts().then(accounts => {
+    ServiceAccountReader.getServiceAccounts().then(accounts => {
       this.serviceAccounts = accounts || [];
     });
     if (this.gitTriggerTypes.length === 1) {
@@ -65,9 +61,9 @@ class GitTriggerController implements IController {
 }
 
 export const GIT_TRIGGER = 'spinnaker.core.pipeline.trigger.git';
-module(GIT_TRIGGER, [SERVICE_ACCOUNT_SERVICE, PIPELINE_CONFIG_PROVIDER])
-  .config((pipelineConfigProvider: PipelineConfigProvider) => {
-    pipelineConfigProvider.registerTrigger({
+module(GIT_TRIGGER, [])
+  .config(() => {
+    Registry.pipeline.registerTrigger({
       label: 'Git',
       description: 'Executes the pipeline on a git push',
       key: 'git',

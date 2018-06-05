@@ -23,6 +23,7 @@ import { UI_ROUTER_REACT_HYBRID } from '@uirouter/react-hybrid';
 require('Select2/select2.css');
 require('select2-bootstrap-css/select2-bootstrap.css');
 import 'source-sans-pro';
+import { RECENT_HISTORY_SERVICE } from 'core/history';
 require('root/app/fonts/spinnaker/icons.css');
 
 import { ANALYTICS_MODULE } from './analytics/analytics.module';
@@ -33,7 +34,6 @@ import { AUTHENTICATION_MODULE } from './authentication/authentication.module';
 import { CANCEL_MODAL_MODULE } from './cancelModal/cancelModal.module';
 import { CLOUD_PROVIDER_MODULE } from './cloudProvider/cloudProvider.module';
 import { CLUSTER_MODULE } from './cluster/cluster.module';
-import { CONFIG_MODULE } from './config/config.module';
 
 import { DEBUG_WINDOW } from './utils/consoleDebug';
 import { DEPLOYMENT_STRATEGY_MODULE } from './deploymentStrategy/deploymentStrategy.module';
@@ -44,7 +44,6 @@ import { HELP_MODULE } from './help/help.module';
 import { INSIGHT_NGMODULE } from './insight/insight.module';
 import { INTERCEPTOR_MODULE } from './interceptor/interceptor.module';
 import { LOAD_BALANCER_MODULE } from './loadBalancer/loadBalancer.module';
-import { MANIFEST_MODULE } from 'core/manifest/manifestWriter.module';
 
 import { NETWORK_INTERCEPTOR } from './api/network.interceptor';
 
@@ -92,7 +91,6 @@ module(CORE_MODULE, [
 
   CANCEL_MODAL_MODULE,
   CLOUD_PROVIDER_MODULE,
-  CONFIG_MODULE,
   CLUSTER_MODULE,
 
   DEBUG_WINDOW,
@@ -113,8 +111,6 @@ module(CORE_MODULE, [
 
   LOAD_BALANCER_MODULE,
 
-  MANIFEST_MODULE,
-
   require('./modal/modal.module').name,
 
   NETWORK_INTERCEPTOR,
@@ -128,6 +124,7 @@ module(CORE_MODULE, [
   require('./presentation/presentation.module').name,
   require('./projects/projects.module').name,
 
+  RECENT_HISTORY_SERVICE,
   REGION_MODULE,
 
   require('./search/search.module').name,

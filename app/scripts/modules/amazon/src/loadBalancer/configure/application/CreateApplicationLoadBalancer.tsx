@@ -5,7 +5,14 @@ import { IDeferred, IPromise } from 'angular';
 import { IModalServiceInstance } from 'angular-ui-bootstrap';
 import { $q } from 'ngimport';
 
-import { AccountService, ILoadBalancerModalProps, ReactInjector, TaskMonitor, WizardModal } from '@spinnaker/core';
+import {
+  AccountService,
+  ILoadBalancerModalProps,
+  LoadBalancerWriter,
+  ReactInjector,
+  TaskMonitor,
+  WizardModal,
+} from '@spinnaker/core';
 
 import { AWSProviderSettings } from 'amazon/aws.settings';
 import { IAmazonApplicationLoadBalancer, IAmazonApplicationLoadBalancerUpsertCommand } from 'amazon/domain';
@@ -198,7 +205,7 @@ export class CreateApplicationLoadBalancer extends React.Component<
         onComplete && onComplete(loadBalancerCommandFormatted);
       });
     } else {
-      const taskMonitor = ReactInjector.taskMonitorBuilder.buildTaskMonitor({
+      const taskMonitor = new TaskMonitor({
         application: app,
         title: `${isNew ? 'Creating' : 'Updating'} your load balancer`,
         modalInstance: this.$uibModalInstanceEmulation,
@@ -208,7 +215,7 @@ export class CreateApplicationLoadBalancer extends React.Component<
       taskMonitor.submit(() => {
         return this.formatListeners(loadBalancerCommandFormatted).then(() => {
           this.formatCommand(loadBalancerCommandFormatted);
-          return ReactInjector.loadBalancerWriter.upsertLoadBalancer(loadBalancerCommandFormatted, app, descriptor);
+          return LoadBalancerWriter.upsertLoadBalancer(loadBalancerCommandFormatted, app, descriptor);
         });
       });
 

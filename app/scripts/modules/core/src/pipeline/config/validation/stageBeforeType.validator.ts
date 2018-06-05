@@ -1,14 +1,7 @@
-import { module } from 'angular';
-
 import { IPipeline, IStage, IStageOrTriggerTypeConfig } from 'core/domain';
 
-import { PIPELINE_CONFIG_SERVICE, PipelineConfigService } from '../services/pipelineConfig.service';
-import {
-  IStageOrTriggerValidator,
-  IValidatorConfig,
-  PIPELINE_CONFIG_VALIDATOR,
-  PipelineConfigValidator,
-} from './pipelineConfig.validator';
+import { PipelineConfigService } from 'core/pipeline/config/services/PipelineConfigService';
+import { IStageOrTriggerValidator, IValidatorConfig, PipelineConfigValidator } from './PipelineConfigValidator';
 
 export interface IStageBeforeTypeValidationConfig extends IValidatorConfig {
   stageTypes?: string[];
@@ -17,10 +10,6 @@ export interface IStageBeforeTypeValidationConfig extends IValidatorConfig {
 }
 
 export class StageBeforeTypeValidator implements IStageOrTriggerValidator {
-  constructor(private pipelineConfigService: PipelineConfigService) {
-    'ngInject';
-  }
-
   public validate(
     pipeline: IPipeline,
     stage: IStage,
@@ -32,7 +21,7 @@ export class StageBeforeTypeValidator implements IStageOrTriggerValidator {
     }
 
     const stageTypes: string[] = validator.stageTypes || [validator.stageType];
-    const stagesToTest = this.pipelineConfigService.getAllUpstreamDependencies(pipeline, stage);
+    const stagesToTest = PipelineConfigService.getAllUpstreamDependencies(pipeline, stage);
     if (stagesToTest.every(test => !stageTypes.includes(test.type))) {
       return validator.message;
     }
@@ -40,9 +29,4 @@ export class StageBeforeTypeValidator implements IStageOrTriggerValidator {
   }
 }
 
-export const STAGE_BEFORE_TYPE_VALIDATOR = 'spinnaker.core.pipeline.validation.config.stageBeforeType';
-module(STAGE_BEFORE_TYPE_VALIDATOR, [PIPELINE_CONFIG_SERVICE, PIPELINE_CONFIG_VALIDATOR])
-  .service('stageBeforeTypeValidator', StageBeforeTypeValidator)
-  .run((pipelineConfigValidator: PipelineConfigValidator, stageBeforeTypeValidator: StageBeforeTypeValidator) => {
-    pipelineConfigValidator.registerValidator('stageBeforeType', stageBeforeTypeValidator);
-  });
+PipelineConfigValidator.registerValidator('stageBeforeType', new StageBeforeTypeValidator());

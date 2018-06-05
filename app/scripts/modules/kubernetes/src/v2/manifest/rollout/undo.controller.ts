@@ -1,14 +1,7 @@
 import { copy, IController, module } from 'angular';
 import { IModalServiceInstance } from 'angular-ui-bootstrap';
 
-import {
-  Application,
-  MANIFEST_WRITER,
-  ManifestWriter,
-  TASK_MONITOR_BUILDER,
-  TaskMonitor,
-  TaskMonitorBuilder,
-} from '@spinnaker/core';
+import { Application, ManifestWriter, TaskMonitor } from '@spinnaker/core';
 import { IManifestCoordinates } from '../IManifestCoordinates';
 
 interface IUndoRolloutCommand {
@@ -33,15 +26,13 @@ class KubernetesManifestUndoRolloutController implements IController {
 
   constructor(
     coordinates: IManifestCoordinates,
-    taskMonitorBuilder: TaskMonitorBuilder,
     public revisions: IRolloutRevision[],
     private $uibModalInstance: IModalServiceInstance,
-    private manifestWriter: ManifestWriter,
     private application: Application,
   ) {
     'ngInject';
 
-    this.taskMonitor = taskMonitorBuilder.buildTaskMonitor({
+    this.taskMonitor = new TaskMonitor({
       title: `Undo rollout of ${coordinates.name} in ${coordinates.namespace}`,
       application,
       modalInstance: $uibModalInstance,
@@ -69,14 +60,14 @@ class KubernetesManifestUndoRolloutController implements IController {
       const payload = copy(this.command) as any;
       payload.cloudProvider = 'kubernetes';
 
-      return this.manifestWriter.undoRolloutManifest(payload, this.application);
+      return ManifestWriter.undoRolloutManifest(payload, this.application);
     });
   }
 }
 
 export const KUBERNETES_MANIFEST_UNDO_ROLLOUT_CTRL = 'spinnaker.kubernetes.v2.manifest.undoRollout.controller';
 
-module(KUBERNETES_MANIFEST_UNDO_ROLLOUT_CTRL, [TASK_MONITOR_BUILDER, MANIFEST_WRITER]).controller(
+module(KUBERNETES_MANIFEST_UNDO_ROLLOUT_CTRL, []).controller(
   'kubernetesV2ManifestUndoRolloutCtrl',
   KubernetesManifestUndoRolloutController,
 );

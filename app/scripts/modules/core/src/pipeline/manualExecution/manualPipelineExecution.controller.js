@@ -4,25 +4,22 @@ const angular = require('angular');
 import _ from 'lodash';
 
 import { AuthenticationService } from 'core/authentication';
-import { PIPELINE_CONFIG_PROVIDER } from 'core/pipeline/config/pipelineConfigProvider';
+import { Registry } from 'core/registry';
 import { SETTINGS } from 'core/config/settings';
+import { AppNotificationsService } from 'core/notification/AppNotificationsService';
+
+import { STAGE_MANUAL_COMPONENTS } from './stageManualComponents.component';
+import { TRIGGER_TEMPLATE } from './triggerTemplate.component';
 
 import './manualPipelineExecution.less';
 
 module.exports = angular
   .module('spinnaker.core.pipeline.manualPipelineExecution.controller', [
     require('angular-ui-bootstrap'),
-    PIPELINE_CONFIG_PROVIDER,
-    require('../../notification/notification.service').name,
+    TRIGGER_TEMPLATE,
+    STAGE_MANUAL_COMPONENTS,
   ])
-  .controller('ManualPipelineExecutionCtrl', function(
-    $uibModalInstance,
-    pipeline,
-    application,
-    pipelineConfig,
-    trigger,
-    notificationService,
-  ) {
+  .controller('ManualPipelineExecutionCtrl', function($scope, $uibModalInstance, pipeline, application, trigger) {
     let applicationNotifications = [];
     let pipelineNotifications = [];
 
@@ -30,7 +27,7 @@ module.exports = angular
 
     this.notificationTooltip = require('./notifications.tooltip.html');
 
-    notificationService.getNotificationsForApplication(application.name).then(notifications => {
+    AppNotificationsService.getNotificationsForApplication(application.name).then(notifications => {
       Object.keys(notifications)
         .sort()
         .filter(k => Array.isArray(notifications[k]))
@@ -70,20 +67,28 @@ module.exports = angular
 
     this.dryRunEnabled = SETTINGS.feature.dryRunEnabled;
 
+    // Poor react setState
+    const updateCommand = () => {
+      $scope.$applyAsync(() => {
+        this.command = _.cloneDeep(this.command);
+      });
+    };
+
     let addTriggers = () => {
       let pipeline = this.command.pipeline;
       if (!pipeline || !pipeline.triggers || !pipeline.triggers.length) {
+        this.triggers = null;
         this.command.trigger = null;
         return;
       }
 
       this.triggers = pipeline.triggers
-        .filter(t => pipelineConfig.hasManualExecutionHandlerForTriggerType(t.type))
+        .filter(t => Registry.pipeline.hasManualExecutionComponentForTriggerType(t.type))
         .map(t => {
           let copy = _.clone(t);
           copy.description = '...'; // placeholder
-          pipelineConfig
-            .getManualExecutionHandlerForTriggerType(t.type)
+          Registry.pipeline
+            .getManualExecutionComponentForTriggerType(t.type)
             .formatLabel(t)
             .then(label => (copy.description = label));
           return copy;
@@ -94,10 +99,10 @@ module.exports = angular
       }
 
       const suppliedTriggerCanBeInvoked =
-        trigger && pipelineConfig.hasManualExecutionHandlerForTriggerType(trigger.type);
+        trigger && Registry.pipeline.hasManualExecutionComponentForTriggerType(trigger.type);
       if (suppliedTriggerCanBeInvoked) {
-        pipelineConfig
-          .getManualExecutionHandlerForTriggerType(trigger.type)
+        Registry.pipeline
+          .getManualExecutionComponentForTriggerType(trigger.type)
           .formatLabel(trigger)
           .then(label => (trigger.description = label));
       }
@@ -115,11 +120,12 @@ module.exports = angular
         command.trigger = trigger;
       }
 
-      if (command.trigger && pipelineConfig.hasManualExecutionHandlerForTriggerType(command.trigger.type)) {
-        this.triggerTemplate = pipelineConfig.getManualExecutionHandlerForTriggerType(
-          command.trigger.type,
-        ).selectorTemplate;
+      if (command.trigger && Registry.pipeline.hasManualExecutionComponentForTriggerType(command.trigger.type)) {
+        this.triggerComponent = Registry.pipeline.getManualExecutionComponentForTriggerType(command.trigger.type);
+      } else {
+        this.triggerComponent = null;
       }
+      updateCommand();
     };
 
     this.pipelineSelected = () => {
@@ -135,8 +141,10 @@ module.exports = angular
       addTriggers();
       this.triggerUpdated();
 
-      const additionalTemplates = pipeline.stages.map(stage => pipelineConfig.getManualExecutionHandlerForStage(stage));
-      this.stageTemplates = _.uniq(_.compact(additionalTemplates));
+      const additionalComponents = pipeline.stages.map(stage =>
+        Registry.pipeline.getManualExecutionComponentForStage(stage),
+      );
+      this.stageComponents = _.uniq(_.compact(additionalComponents));
 
       if (pipeline.parameterConfig && pipeline.parameterConfig.length) {
         this.parameters = {};
@@ -193,7 +201,9 @@ module.exports = angular
 
     this.execute = () => {
       let selectedTrigger = this.command.trigger || {},
-        command = { trigger: selectedTrigger },
+        command = {
+          trigger: selectedTrigger,
+        },
         pipeline = this.command.pipeline;
 
       if (this.command.notificationEnabled && this.command.notification.address) {
