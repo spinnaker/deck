@@ -5,8 +5,9 @@ import _ from 'lodash';
 
 import { EXECUTION_SERVICE } from 'core/pipeline/service/execution.service';
 import { RecentHistoryService } from 'core/history/recentHistory.service';
-import { SCHEDULER_FACTORY } from 'core/scheduler/scheduler.factory';
+import { SchedulerFactory } from 'core/scheduler/SchedulerFactory';
 import { PROJECT_PIPELINE_COMPONENT } from './pipeline/projectPipeline.component';
+import { ProjectReader } from '../service/ProjectReader';
 
 import './dashboard.less';
 
@@ -14,9 +15,7 @@ module.exports = angular
   .module('spinnaker.core.projects.dashboard.controller', [
     require('./cluster/projectCluster.directive.js').name,
     PROJECT_PIPELINE_COMPONENT,
-    require('../service/project.read.service.js').name,
     EXECUTION_SERVICE,
-    SCHEDULER_FACTORY,
     require('./regionFilter/regionFilter.component.js').name,
     require('./regionFilter/regionFilter.service.js').name,
   ])
@@ -25,9 +24,7 @@ module.exports = angular
     $rootScope,
     projectConfiguration,
     executionService,
-    projectReader,
     regionFilterService,
-    schedulerFactory,
     $q,
   ) {
     this.project = projectConfiguration;
@@ -72,7 +69,7 @@ module.exports = angular
       let clustersPromise;
 
       if (clusterCount > 0) {
-        clustersPromise = projectReader.getProjectClusters(projectConfiguration.name);
+        clustersPromise = ProjectReader.getProjectClusters(projectConfiguration.name);
       } else if (clusterCount === 0) {
         clustersPromise = $q.when([]);
       } else {
@@ -129,8 +126,8 @@ module.exports = angular
         .value();
     };
 
-    let clusterScheduler = schedulerFactory.createScheduler(),
-      executionScheduler = schedulerFactory.createScheduler();
+    let clusterScheduler = SchedulerFactory.createScheduler(),
+      executionScheduler = SchedulerFactory.createScheduler();
 
     let clusterLoader = clusterScheduler.subscribe(getClusters);
 

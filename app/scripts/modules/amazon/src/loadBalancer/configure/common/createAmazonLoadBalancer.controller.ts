@@ -15,6 +15,7 @@ import {
   ISecurityGroup,
   ISubnet,
   LoadBalancerWriter,
+  ModalWizard,
   NameUtils,
   SecurityGroupReader,
   SubnetReader,
@@ -22,7 +23,7 @@ import {
   FirewallLabels,
 } from '@spinnaker/core';
 
-import { AmazonCertificateReader, IAmazonCertificate } from 'amazon/certificates/amazon.certificate.read.service';
+import { AmazonCertificateReader, IAmazonCertificate } from 'amazon/certificates/AmazonCertificateReader';
 import { AWSProviderSettings } from 'amazon/aws.settings';
 import { IAmazonLoadBalancerUpsertCommand } from 'amazon/domain';
 
@@ -75,9 +76,6 @@ export abstract class CreateAmazonLoadBalancerCtrl {
     protected securityGroupReader: SecurityGroupReader,
     protected amazonCertificateReader: AmazonCertificateReader,
     protected cacheInitializer: CacheInitializerService,
-    protected v2modalWizardService: any,
-    protected loadBalancerWriter: LoadBalancerWriter,
-    protected subnetReader: SubnetReader,
     protected application: Application,
     protected isNew: boolean,
     protected forPipelineConfig: boolean,
@@ -194,7 +192,7 @@ export abstract class CreateAmazonLoadBalancerCtrl {
   }
 
   private loadCertificates(): IPromise<void> {
-    return this.amazonCertificateReader.listCertificates().then(certificates => {
+    return AmazonCertificateReader.listCertificates().then(certificates => {
       this.certificates = certificates;
     });
   }
@@ -248,7 +246,7 @@ export abstract class CreateAmazonLoadBalancerCtrl {
       });
       this.loadBalancerCommand.securityGroups = uniq(existingNames);
       if (this.viewState.removedSecurityGroups.length) {
-        this.v2modalWizardService.markDirty(FirewallLabels.get('Firewalls'));
+        ModalWizard.markDirty(FirewallLabels.get('Firewalls'));
       }
     } else {
       this.clearSecurityGroups();
@@ -278,7 +276,7 @@ export abstract class CreateAmazonLoadBalancerCtrl {
   private getAvailableSubnets(): IPromise<ISubnet[]> {
     const account = this.loadBalancerCommand.credentials,
       region = this.loadBalancerCommand.region;
-    return this.subnetReader.listSubnets().then(subnets => {
+    return SubnetReader.listSubnets().then(subnets => {
       return chain(subnets)
         .filter({ account, region })
         .reject({ target: 'ec2' })
@@ -438,11 +436,11 @@ export abstract class CreateAmazonLoadBalancerCtrl {
       this.availabilityZones = this.subnets
         .find(o => o.purpose === this.loadBalancerCommand.subnetType)
         .availabilityZones.sort();
-      this.v2modalWizardService.includePage(FirewallLabels.get('Firewalls'));
+      ModalWizard.includePage(FirewallLabels.get('Firewalls'));
     } else {
       this.updateAvailabilityZones();
       this.loadBalancerCommand.vpcId = null;
-      this.v2modalWizardService.excludePage(FirewallLabels.get('Firewalls'));
+      ModalWizard.excludePage(FirewallLabels.get('Firewalls'));
     }
   }
 
@@ -468,7 +466,7 @@ export abstract class CreateAmazonLoadBalancerCtrl {
       this.taskMonitor.submit(() => {
         return this.formatListeners(loadBalancerCommandFormatted).then(() => {
           this.formatCommand(loadBalancerCommandFormatted);
-          return this.loadBalancerWriter.upsertLoadBalancer(loadBalancerCommandFormatted, this.application, descriptor);
+          return LoadBalancerWriter.upsertLoadBalancer(loadBalancerCommandFormatted, this.application, descriptor);
         });
       });
     }

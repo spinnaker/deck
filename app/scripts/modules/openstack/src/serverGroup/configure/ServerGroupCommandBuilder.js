@@ -4,19 +4,13 @@ import _ from 'lodash';
 
 const angular = require('angular');
 
-import { NameUtils } from '@spinnaker/core';
+import { ApplicationReader, NameUtils, SubnetReader } from '@spinnaker/core';
 
 import { OpenStackProviderSettings } from '../../openstack.settings';
 
 module.exports = angular
   .module('spinnaker.openstack.serverGroupCommandBuilder.service', [require('../../image/image.reader.js').name])
-  .factory('openstackServerGroupCommandBuilder', function(
-    $q,
-    openstackImageReader,
-    subnetReader,
-    loadBalancerReader,
-    applicationReader,
-  ) {
+  .factory('openstackServerGroupCommandBuilder', function($q, openstackImageReader, loadBalancerReader) {
     function buildNewServerGroupCommand(application, defaults) {
       defaults = defaults || {};
 
@@ -51,7 +45,7 @@ module.exports = angular
 
     // Only used to prepare view requiring template selecting
     function buildNewServerGroupCommandForPipeline(stage, pipeline) {
-      return applicationReader.getApplication(pipeline.application).then(function(application) {
+      return ApplicationReader.getApplication(pipeline.application).then(function(application) {
         return buildNewServerGroupCommand(application).then(function(command) {
           command.viewState.requiresTemplateSelection = true;
           command.viewState.disableStrategySelection = false;
@@ -61,7 +55,7 @@ module.exports = angular
     }
 
     function buildServerGroupCommandFromExisting(application, serverGroup, mode = 'clone') {
-      var subnetsLoader = subnetReader.listSubnetsByProvider('openstack');
+      var subnetsLoader = SubnetReader.listSubnetsByProvider('openstack');
       var serverGroupName = NameUtils.parseServerGroupName(serverGroup.name);
       var asyncLoader = $q.all({
         subnets: subnetsLoader,

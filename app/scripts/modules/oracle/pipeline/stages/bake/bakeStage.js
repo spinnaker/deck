@@ -7,19 +7,14 @@ import _ from 'lodash';
 import {
   AccountService,
   AuthenticationService,
-  BAKERY_SERVICE,
-  NETWORK_READ_SERVICE,
+  BakeryReader,
+  NetworkReader,
   Registry,
-  SUBNET_READ_SERVICE,
+  SubnetReader,
 } from '@spinnaker/core';
 
 module.exports = angular
-  .module('spinnaker.oraclebmcs.pipeline.stage.bakeStage', [
-    require('./bakeExecutionDetails.controller.js').name,
-    BAKERY_SERVICE,
-    NETWORK_READ_SERVICE,
-    SUBNET_READ_SERVICE,
-  ])
+  .module('spinnaker.oraclebmcs.pipeline.stage.bakeStage', [require('./bakeExecutionDetails.controller.js').name])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'bake',
@@ -52,7 +47,7 @@ module.exports = angular
       restartable: true,
     });
   })
-  .controller('oraclebmcsBakeStageCtrl', function($scope, bakeryService, networkReader, subnetReader, $q) {
+  .controller('oraclebmcsBakeStageCtrl', function($scope, $q) {
     const provider = 'oraclebmcs';
 
     if (!$scope.stage.cloudProvider) {
@@ -76,8 +71,8 @@ module.exports = angular
 
       $q
         .all({
-          baseOsOptions: bakeryService.getBaseOsOptions(provider),
-          regions: bakeryService.getRegions(provider),
+          baseOsOptions: BakeryReader.getBaseOsOptions(provider),
+          regions: BakeryReader.getRegions(provider),
           availabilityDomains: $scope.getZones(provider),
           networks: $scope.getNetworks(provider),
           subnets: $scope.getSubNetworks(provider),
@@ -135,11 +130,11 @@ module.exports = angular
     };
 
     $scope.getNetworks = function(provider) {
-      return networkReader.listNetworksByProvider(provider).then(networks => networks.sort());
+      return NetworkReader.listNetworksByProvider(provider).then(networks => networks.sort());
     };
 
     $scope.getSubNetworks = function(provider) {
-      return subnetReader.listSubnetsByProvider(provider).then(subnets => subnets.sort());
+      return SubnetReader.listSubnetsByProvider(provider).then(subnets => subnets.sort());
     };
 
     /**

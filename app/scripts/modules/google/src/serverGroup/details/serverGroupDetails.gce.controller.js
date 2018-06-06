@@ -7,9 +7,9 @@ import {
   CONFIRMATION_MODAL_SERVICE,
   ClusterTargetBuilder,
   FirewallLabels,
-  NETWORK_READ_SERVICE,
-  SERVER_GROUP_READER,
-  SERVER_GROUP_WARNING_MESSAGE_SERVICE,
+  NetworkReader,
+  ServerGroupReader,
+  ServerGroupWarningMessageService,
   SERVER_GROUP_WRITER,
   ServerGroupTemplates,
 } from '@spinnaker/core';
@@ -22,10 +22,7 @@ module.exports = angular
   .module('spinnaker.serverGroup.details.gce.controller', [
     require('@uirouter/angularjs').default,
     require('../configure/serverGroupCommandBuilder.service.js').name,
-    SERVER_GROUP_WARNING_MESSAGE_SERVICE,
-    SERVER_GROUP_READER,
     CONFIRMATION_MODAL_SERVICE,
-    NETWORK_READ_SERVICE,
     SERVER_GROUP_WRITER,
     require('google/common/xpnNaming.gce.service.js').name,
     require('./resize/resizeServerGroup.controller').name,
@@ -41,12 +38,9 @@ module.exports = angular
     app,
     serverGroup,
     gceServerGroupCommandBuilder,
-    serverGroupReader,
     $uibModal,
     confirmationModalService,
     serverGroupWriter,
-    serverGroupWarningMessageService,
-    networkReader,
     gceXpnNamingService,
   ) {
     this.state = {
@@ -94,57 +88,60 @@ module.exports = angular
 
     let retrieveServerGroup = () => {
       var summary = extractServerGroupSummary();
-      return serverGroupReader
-        .getServerGroup(app.name, serverGroup.accountId, serverGroup.region, serverGroup.name)
-        .then(details => {
-          cancelLoader();
+      return ServerGroupReader.getServerGroup(
+        app.name,
+        serverGroup.accountId,
+        serverGroup.region,
+        serverGroup.name,
+      ).then(details => {
+        cancelLoader();
 
-          angular.extend(details, summary);
-          // it's possible the summary was not found because the clusters are still loading
-          details.account = serverGroup.accountId;
+        angular.extend(details, summary);
+        // it's possible the summary was not found because the clusters are still loading
+        details.account = serverGroup.accountId;
 
-          this.serverGroup = details;
+        this.serverGroup = details;
 
-          if (!_.isEmpty(this.serverGroup)) {
-            if (details.securityGroups) {
-              this.securityGroups = _.chain(details.securityGroups)
-                .map(id => {
-                  return (
-                    _.find(app.securityGroups.data, { accountName: serverGroup.accountId, region: 'global', id: id }) ||
-                    _.find(app.securityGroups.data, { accountName: serverGroup.accountId, region: 'global', name: id })
-                  );
-                })
-                .compact()
-                .value();
-            }
-
-            this.serverGroup.zones.sort();
-
-            var projectId = gceXpnNamingService.deriveProjectId(this.serverGroup.launchConfig.instanceTemplate);
-            this.serverGroup.logsLink =
-              'https://console.developers.google.com/project/' +
-              projectId +
-              '/logs?advancedFilter=resource.type=(gce_instance_group_manager OR gce_instance OR gce_autoscaler)%0A"' +
-              this.serverGroup.name +
-              '"';
-
-            this.serverGroup.network = getNetwork(projectId);
-            retrieveSubnet(projectId);
-            determineAssociatePublicIPAddress();
-
-            findStartupScript();
-            prepareDiskDescriptions();
-            prepareAvailabilityPolicies();
-            prepareAutoHealingPolicy();
-            prepareAuthScopes();
-            prepareCurrentActions();
-            augmentTagsWithHelp();
-            configureEntityTagTargets();
-            processLabels();
-          } else {
-            autoClose();
+        if (!_.isEmpty(this.serverGroup)) {
+          if (details.securityGroups) {
+            this.securityGroups = _.chain(details.securityGroups)
+              .map(id => {
+                return (
+                  _.find(app.securityGroups.data, { accountName: serverGroup.accountId, region: 'global', id: id }) ||
+                  _.find(app.securityGroups.data, { accountName: serverGroup.accountId, region: 'global', name: id })
+                );
+              })
+              .compact()
+              .value();
           }
-        }, autoClose);
+
+          this.serverGroup.zones.sort();
+
+          var projectId = gceXpnNamingService.deriveProjectId(this.serverGroup.launchConfig.instanceTemplate);
+          this.serverGroup.logsLink =
+            'https://console.developers.google.com/project/' +
+            projectId +
+            '/logs?advancedFilter=resource.type=(gce_instance_group_manager OR gce_instance OR gce_autoscaler)%0A"' +
+            this.serverGroup.name +
+            '"';
+
+          this.serverGroup.network = getNetwork(projectId);
+          retrieveSubnet(projectId);
+          determineAssociatePublicIPAddress();
+
+          findStartupScript();
+          prepareDiskDescriptions();
+          prepareAvailabilityPolicies();
+          prepareAutoHealingPolicy();
+          prepareAuthScopes();
+          prepareCurrentActions();
+          augmentTagsWithHelp();
+          configureEntityTagTargets();
+          processLabels();
+        } else {
+          autoClose();
+        }
+      }, autoClose);
     };
 
     let findStartupScript = () => {
@@ -328,7 +325,7 @@ module.exports = angular
     };
 
     let retrieveSubnet = projectId => {
-      networkReader.listNetworksByProvider('gce').then(networks => {
+      NetworkReader.listNetworksByProvider('gce').then(networks => {
         let autoCreateSubnets = _.chain(networks)
           .filter({ account: this.serverGroup.account, id: this.serverGroup.network })
           .map('autoCreateSubnets')
@@ -394,7 +391,7 @@ module.exports = angular
         },
       };
 
-      serverGroupWarningMessageService.addDestroyWarningMessage(app, serverGroup, confirmationModalParams);
+      ServerGroupWarningMessageService.addDestroyWarningMessage(app, serverGroup, confirmationModalParams);
 
       if (app.attributes.platformHealthOnlyShowOverride && app.attributes.platformHealthOnly) {
         confirmationModalParams.interestingHealthProviderNames = ['Google'];
@@ -424,7 +421,7 @@ module.exports = angular
         askForReason: true,
       };
 
-      serverGroupWarningMessageService.addDisableWarningMessage(app, serverGroup, confirmationModalParams);
+      ServerGroupWarningMessageService.addDisableWarningMessage(app, serverGroup, confirmationModalParams);
 
       if (app.attributes.platformHealthOnlyShowOverride && app.attributes.platformHealthOnly) {
         confirmationModalParams.interestingHealthProviderNames = ['Google'];

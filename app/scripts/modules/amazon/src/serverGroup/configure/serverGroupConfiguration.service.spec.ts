@@ -10,7 +10,7 @@ import {
   SubnetReader,
 } from '@spinnaker/core';
 
-import { KeyPairsReader } from 'amazon/keyPairs/keyPairs.read.service';
+import { KeyPairsReader } from 'amazon/keyPairs';
 import {
   AWS_SERVER_GROUP_CONFIGURATION_SERVICE,
   AwsServerGroupConfigurationService,
@@ -22,8 +22,6 @@ describe('Service: awsServerGroupConfiguration', function() {
     securityGroupReader: SecurityGroupReader,
     awsInstanceTypeService: any,
     cacheInitializer: CacheInitializerService,
-    subnetReader: SubnetReader,
-    keyPairsReader: KeyPairsReader,
     loadBalancerReader: LoadBalancerReader,
     applicationModelBuilder: ApplicationModelBuilder,
     $scope: IScope;
@@ -37,8 +35,6 @@ describe('Service: awsServerGroupConfiguration', function() {
       _securityGroupReader_: SecurityGroupReader,
       _awsInstanceTypeService_: any,
       _cacheInitializer_: CacheInitializerService,
-      _subnetReader_: SubnetReader,
-      _keyPairsReader_: KeyPairsReader,
       _loadBalancerReader_: LoadBalancerReader,
       _applicationModelBuilder_: ApplicationModelBuilder,
       $rootScope: IRootScopeService,
@@ -48,8 +44,6 @@ describe('Service: awsServerGroupConfiguration', function() {
       securityGroupReader = _securityGroupReader_;
       awsInstanceTypeService = _awsInstanceTypeService_;
       cacheInitializer = _cacheInitializer_;
-      subnetReader = _subnetReader_;
-      keyPairsReader = _keyPairsReader_;
       loadBalancerReader = _loadBalancerReader_;
       applicationModelBuilder = _applicationModelBuilder_;
       $scope = $rootScope.$new();
@@ -98,9 +92,9 @@ describe('Service: awsServerGroupConfiguration', function() {
       const listLoadBalancersSpy = spyOn(loadBalancerReader, 'listLoadBalancers').and.returnValue(
         $q.when(this.allLoadBalancers),
       );
-      spyOn(subnetReader, 'listSubnets').and.returnValue($q.when([]));
+      spyOn(SubnetReader, 'listSubnets').and.returnValue($q.when([]));
       spyOn(AccountService, 'getPreferredZonesByAccount').and.returnValue($q.when([]));
-      spyOn(keyPairsReader, 'listKeyPairs').and.returnValue($q.when([]));
+      spyOn(KeyPairsReader, 'listKeyPairs').and.returnValue($q.when([]));
       spyOn(awsInstanceTypeService, 'getAllTypesByRegion').and.returnValue($q.when([]));
       const refreshCacheSpy = spyOn(cacheInitializer, 'refreshCache').and.returnValue($q.when(null));
 
@@ -131,9 +125,9 @@ describe('Service: awsServerGroupConfiguration', function() {
       spyOn(AccountService, 'getCredentialsKeyedByAccount').and.returnValue($q.when([]));
       const getAllSecurityGroupsSpy = spyOn(securityGroupReader, 'getAllSecurityGroups').and.returnValue($q.when([]));
       spyOn(loadBalancerReader, 'listLoadBalancers').and.returnValue($q.when(this.allLoadBalancers));
-      spyOn(subnetReader, 'listSubnets').and.returnValue($q.when([]));
+      spyOn(SubnetReader, 'listSubnets').and.returnValue($q.when([]));
       spyOn(AccountService, 'getPreferredZonesByAccount').and.returnValue($q.when([]));
-      spyOn(keyPairsReader, 'listKeyPairs').and.returnValue($q.when([]));
+      spyOn(KeyPairsReader, 'listKeyPairs').and.returnValue($q.when([]));
       spyOn(awsInstanceTypeService, 'getAllTypesByRegion').and.returnValue($q.when([]));
       const refreshCacheSpy = spyOn(cacheInitializer, 'refreshCache').and.returnValue($q.when(null));
 
@@ -165,9 +159,9 @@ describe('Service: awsServerGroupConfiguration', function() {
       spyOn(AccountService, 'getCredentialsKeyedByAccount').and.returnValue($q.when([]));
       spyOn(securityGroupReader, 'getAllSecurityGroups').and.returnValue($q.when([]));
       spyOn(loadBalancerReader, 'listLoadBalancers').and.returnValue($q.when([]));
-      spyOn(subnetReader, 'listSubnets').and.returnValue($q.when([]));
+      spyOn(SubnetReader, 'listSubnets').and.returnValue($q.when([]));
       spyOn(AccountService, 'getPreferredZonesByAccount').and.returnValue($q.when([]));
-      spyOn(keyPairsReader, 'listKeyPairs').and.returnValue($q.when([]));
+      spyOn(KeyPairsReader, 'listKeyPairs').and.returnValue($q.when([]));
       const getAllTypesByRegionSpy = spyOn(awsInstanceTypeService, 'getAllTypesByRegion').and.returnValue(
         $q.when({
           'us-east-1': [{ name: 'm4.tiny' }],

@@ -1,19 +1,20 @@
 import { module } from 'angular';
 
-import { ArtifactReferenceService, Registry, SETTINGS } from '@spinnaker/core';
+import {
+  ArtifactReferenceService,
+  ExecutionDetailsTasks,
+  EXECUTION_ARTIFACT_TAB,
+  Registry,
+  SETTINGS,
+  ExecutionArtifactTab,
+} from '@spinnaker/core';
 
 import { KubernetesV2DeployManifestConfigCtrl } from './deployManifestConfig.controller';
-import { KUBERNETES_MANIFEST_COMMAND_BUILDER } from '../../../manifest/manifestCommandBuilder.service';
-import { KUBERNETES_DEPLOY_MANIFEST_DEPLOY_STATUS_MANIFEST_SUMMARY } from './deployStatusManifestSummary';
-import { KUBERNETES_EXECUTION_ARTIFACT_TAB } from './artifactTab';
+import { DeployStatus } from './react/DeployStatus';
 
 export const KUBERNETES_DEPLOY_MANIFEST_STAGE = 'spinnaker.kubernetes.v2.pipeline.stage.deployManifestStage';
 
-module(KUBERNETES_DEPLOY_MANIFEST_STAGE, [
-  KUBERNETES_MANIFEST_COMMAND_BUILDER,
-  KUBERNETES_DEPLOY_MANIFEST_DEPLOY_STATUS_MANIFEST_SUMMARY,
-  KUBERNETES_EXECUTION_ARTIFACT_TAB,
-])
+module(KUBERNETES_DEPLOY_MANIFEST_STAGE, [EXECUTION_ARTIFACT_TAB])
   .config(() => {
     // Todo: replace feature flag with proper versioned provider mechanism once available.
     if (SETTINGS.feature.versionedProviders) {
@@ -25,8 +26,8 @@ module(KUBERNETES_DEPLOY_MANIFEST_STAGE, [
         templateUrl: require('./deployManifestConfig.html'),
         controller: 'KubernetesV2DeployManifestConfigCtrl',
         controllerAs: 'ctrl',
-        executionDetailsUrl: require('./deployManifestExecutionDetails.html'),
-        executionConfigSections: ['deployStatus', 'taskStatus', 'artifactStatus'],
+        artifactFields: ['manifestArtifactId', 'requiredArtifactIds'],
+        executionDetailsSections: [DeployStatus, ExecutionDetailsTasks, ExecutionArtifactTab],
         producesArtifacts: true,
         defaultTimeoutMs: 30 * 60 * 1000, // 30 minutes
         validators: [],

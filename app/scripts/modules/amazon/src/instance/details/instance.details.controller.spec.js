@@ -1,26 +1,26 @@
-import { APPLICATION_MODEL_BUILDER } from '@spinnaker/core';
+import { APPLICATION_MODEL_BUILDER, InstanceReader } from '@spinnaker/core';
 
 describe('Controller: awsInstanceDetailsCtrl', function() {
   var controller;
   var scope;
-  var instanceReader;
   var $q;
   var application;
 
   beforeEach(window.module(require('./instance.details.controller').name, APPLICATION_MODEL_BUILDER));
 
   beforeEach(
-    window.inject(function($rootScope, $controller, _instanceReader_, _$q_, applicationModelBuilder) {
+    window.inject(function($rootScope, $controller, _$q_, applicationModelBuilder) {
       scope = $rootScope.$new();
-      instanceReader = _instanceReader_;
       $q = _$q_;
 
       this.createController = function(application, instance) {
         controller = $controller('awsInstanceDetailsCtrl', {
           $scope: scope,
-          instance: instance,
           app: application,
           overrides: {},
+          moniker: {},
+          environment: 'test',
+          instance,
         });
       };
 
@@ -43,7 +43,7 @@ describe('Controller: awsInstanceDetailsCtrl', function() {
         account: 'test',
       };
 
-      spyOn(instanceReader, 'getInstanceDetails').and.returnValue($q.when(details));
+      spyOn(InstanceReader, 'getInstanceDetails').and.returnValue($q.when(details));
 
       application.loadBalancers.loaded = true;
 
@@ -80,7 +80,7 @@ describe('Controller: awsInstanceDetailsCtrl', function() {
         account: 'test',
       };
 
-      spyOn(instanceReader, 'getInstanceDetails').and.returnValue(
+      spyOn(InstanceReader, 'getInstanceDetails').and.returnValue(
         $q.when({
           plain: function() {
             return details;

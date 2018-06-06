@@ -7,7 +7,7 @@ import {
   CloudProviderRegistry,
   CONFIRMATION_MODAL_SERVICE,
   FirewallLabels,
-  INSTANCE_READ_SERVICE,
+  InstanceReader,
   INSTANCE_WRITE_SERVICE,
   RecentHistoryService,
   SETTINGS,
@@ -18,7 +18,6 @@ module.exports = angular
     require('@uirouter/angularjs').default,
     require('angular-ui-bootstrap'),
     INSTANCE_WRITE_SERVICE,
-    INSTANCE_READ_SERVICE,
     CONFIRMATION_MODAL_SERVICE,
   ])
   .controller('openstackInstanceDetailsCtrl', function(
@@ -27,9 +26,10 @@ module.exports = angular
     $uibModal,
     instanceWriter,
     confirmationModalService,
-    instanceReader,
     instance,
     app,
+    moniker,
+    environment,
     $q,
     overrides,
   ) {
@@ -45,6 +45,8 @@ module.exports = angular
     $scope.firewallsLabel = FirewallLabels.get('Firewalls');
 
     $scope.application = app;
+    $scope.moniker = moniker;
+    $scope.environment = environment;
 
     function extractHealthMetrics(instance, latest) {
       // do not backfill on standalone instances
@@ -135,7 +137,7 @@ module.exports = angular
         extraData.account = account;
         extraData.region = region;
         RecentHistoryService.addExtraDataToLatest('instances', extraData);
-        return instanceReader.getInstanceDetails(account, region, instance.instanceId).then(details => {
+        return InstanceReader.getInstanceDetails(account, region, instance.instanceId).then(details => {
           if ($scope.$$destroyed) {
             return;
           }

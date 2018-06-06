@@ -6,8 +6,8 @@ import {
   AccountService,
   INSTANCE_TYPE_SERVICE,
   LOAD_BALANCER_READ_SERVICE,
-  NETWORK_READ_SERVICE,
-  SUBNET_READ_SERVICE,
+  NetworkReader,
+  SubnetReader,
 } from '@spinnaker/core';
 
 import { GCE_ADDRESS_READER } from 'google/address/address.reader';
@@ -20,8 +20,6 @@ module.exports = angular
     GCE_HEALTH_CHECK_READER,
     INSTANCE_TYPE_SERVICE,
     LOAD_BALANCER_READ_SERVICE,
-    NETWORK_READ_SERVICE,
-    SUBNET_READ_SERVICE,
   ])
   .factory('gceCacheConfigurer', function(
     gceAddressReader,
@@ -30,8 +28,6 @@ module.exports = angular
     gceHealthCheckReader,
     instanceTypeService,
     loadBalancerReader,
-    networkReader,
-    subnetReader,
   ) {
     let config = Object.create(null);
 
@@ -64,11 +60,11 @@ module.exports = angular
     };
 
     config.networks = {
-      initializers: [() => networkReader.listNetworksByProvider('gce')],
+      initializers: [() => NetworkReader.listNetworksByProvider('gce')],
     };
 
     config.subnets = {
-      initializers: [() => subnetReader.listSubnetsByProvider('gce')],
+      initializers: [() => SubnetReader.listSubnetsByProvider('gce')],
     };
 
     return config;

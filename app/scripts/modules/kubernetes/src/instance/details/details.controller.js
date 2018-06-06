@@ -6,7 +6,7 @@ import _ from 'lodash';
 import {
   CloudProviderRegistry,
   CONFIRMATION_MODAL_SERVICE,
-  INSTANCE_READ_SERVICE,
+  InstanceReader,
   INSTANCE_WRITE_SERVICE,
   RecentHistoryService,
   ServerGroupTemplates,
@@ -17,7 +17,6 @@ module.exports = angular
     require('@uirouter/angularjs').default,
     require('angular-ui-bootstrap'),
     INSTANCE_WRITE_SERVICE,
-    INSTANCE_READ_SERVICE,
     CONFIRMATION_MODAL_SERVICE,
   ])
   .controller('kubernetesInstanceDetailsController', function(
@@ -26,9 +25,10 @@ module.exports = angular
     $uibModal,
     instanceWriter,
     confirmationModalService,
-    instanceReader,
     instance,
     app,
+    moniker,
+    environment,
     kubernetesProxyUiService,
     $q,
   ) {
@@ -41,6 +41,8 @@ module.exports = angular
     };
 
     this.application = app;
+    $scope.moniker = moniker;
+    $scope.environment = environment;
 
     this.uiLink = function uiLink() {
       return kubernetesProxyUiService.buildLink(
@@ -121,7 +123,7 @@ module.exports = angular
         extraData.account = account;
         extraData.namespace = namespace;
         RecentHistoryService.addExtraDataToLatest('instances', extraData);
-        return instanceReader.getInstanceDetails(account, namespace, instance.instanceId).then(function(details) {
+        return InstanceReader.getInstanceDetails(account, namespace, instance.instanceId).then(function(details) {
           $scope.state.loading = false;
           $scope.instance = _.defaults(details, instanceSummary);
           $scope.instance.account = account;

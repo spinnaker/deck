@@ -71,7 +71,6 @@ export interface IServerGroupCommandBackingData {
       [region: string]: string[];
     };
   };
-  scalingProcesses: string[];
   securityGroups: ISecurityGroupsByAccountSourceData;
 }
 

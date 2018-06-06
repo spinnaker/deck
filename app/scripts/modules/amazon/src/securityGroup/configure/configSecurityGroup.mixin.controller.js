@@ -9,22 +9,19 @@ import {
   InfrastructureCaches,
   NameUtils,
   SECURITY_GROUP_READER,
-  SECURITY_GROUP_WRITER,
+  SecurityGroupWriter,
   FirewallLabels,
   TaskMonitor,
-  V2_MODAL_WIZARD_SERVICE,
+  ModalWizard,
 } from '@spinnaker/core';
 
 import { AWSProviderSettings } from 'amazon/aws.settings';
-import { VPC_READ_SERVICE } from 'amazon/vpc/vpc.read.service';
+import { VpcReader } from 'amazon/vpc/VpcReader';
 
 module.exports = angular
   .module('spinnaker.amazon.securityGroup.baseConfig.controller', [
     require('@uirouter/angularjs').default,
     SECURITY_GROUP_READER,
-    SECURITY_GROUP_WRITER,
-    VPC_READ_SERVICE,
-    V2_MODAL_WIZARD_SERVICE,
   ])
   .controller('awsConfigSecurityGroupMixin', function(
     $scope,
@@ -33,10 +30,7 @@ module.exports = angular
     application,
     securityGroup,
     securityGroupReader,
-    securityGroupWriter,
-    v2modalWizardService,
     cacheInitializer,
-    vpcReader,
   ) {
     var ctrl = this;
 
@@ -51,7 +45,7 @@ module.exports = angular
     };
 
     $scope.allVpcs = [];
-    $scope.wizard = v2modalWizardService;
+    $scope.wizard = ModalWizard;
     $scope.hideClassic = false;
 
     ctrl.addMoreItems = function() {
@@ -103,7 +97,7 @@ module.exports = angular
 
     ctrl.upsert = function() {
       $scope.taskMonitor.submit(function() {
-        return securityGroupWriter.upsertSecurityGroup($scope.securityGroup, application, 'Create');
+        return SecurityGroupWriter.upsertSecurityGroup($scope.securityGroup, application, 'Create');
       });
     };
 
@@ -126,7 +120,7 @@ module.exports = angular
     ctrl.regionUpdated = function() {
       var account = getAccount(),
         regions = $scope.securityGroup.regions || [];
-      vpcReader.listVpcs().then(function(vpcs) {
+      VpcReader.listVpcs().then(function(vpcs) {
         var vpcsByName = _.groupBy(vpcs.filter(vpc => vpc.account === account), 'label');
         $scope.allVpcs = vpcs;
         var available = [];
@@ -225,7 +219,7 @@ module.exports = angular
 
     ctrl.mixinUpsert = function(descriptor) {
       $scope.taskMonitor.submit(function() {
-        return securityGroupWriter.upsertSecurityGroup($scope.securityGroup, application, descriptor);
+        return SecurityGroupWriter.upsertSecurityGroup($scope.securityGroup, application, descriptor);
       });
     };
 
@@ -243,7 +237,7 @@ module.exports = angular
         return true;
       });
       if (removed.length) {
-        v2modalWizardService.markDirty('Ingress');
+        ModalWizard.markDirty('Ingress');
       }
     }
 
@@ -324,8 +318,8 @@ module.exports = angular
 
     ctrl.dismissRemovedRules = function() {
       $scope.state.removedRules = [];
-      v2modalWizardService.markClean('Ingress');
-      v2modalWizardService.markComplete('Ingress');
+      ModalWizard.markClean('Ingress');
+      ModalWizard.markComplete('Ingress');
     };
 
     var classicPattern = /^[\x00-\x7F]+$/;

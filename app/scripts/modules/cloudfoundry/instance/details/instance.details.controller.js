@@ -6,7 +6,7 @@ import _ from 'lodash';
 import {
   CloudProviderRegistry,
   CONFIRMATION_MODAL_SERVICE,
-  INSTANCE_READ_SERVICE,
+  InstanceReader,
   INSTANCE_WRITE_SERVICE,
   RecentHistoryService,
 } from '@spinnaker/core';
@@ -16,7 +16,6 @@ module.exports = angular
     require('@uirouter/angularjs').default,
     require('angular-ui-bootstrap'),
     INSTANCE_WRITE_SERVICE,
-    INSTANCE_READ_SERVICE,
     CONFIRMATION_MODAL_SERVICE,
   ])
   .controller('cfInstanceDetailsCtrl', function(
@@ -26,9 +25,10 @@ module.exports = angular
     $uibModal,
     instanceWriter,
     confirmationModalService,
-    instanceReader,
     instance,
     app,
+    moniker,
+    environment,
   ) {
     // needed for standalone instances
     $scope.detailsTemplateUrl = CloudProviderRegistry.getValue('cf', 'instance.detailsTemplateUrl');
@@ -39,6 +39,8 @@ module.exports = angular
     };
 
     $scope.application = app;
+    $scope.moniker = moniker;
+    $scope.environment = environment;
 
     function extractHealthMetrics(instance, latest) {
       // do not backfill on standalone instances
@@ -128,7 +130,7 @@ module.exports = angular
         extraData.account = account;
         extraData.region = region;
         RecentHistoryService.addExtraDataToLatest('instances', extraData);
-        return instanceReader.getInstanceDetails(account, region, instance.instanceId).then(function(details) {
+        return InstanceReader.getInstanceDetails(account, region, instance.instanceId).then(function(details) {
           $scope.state.loading = false;
           extractHealthMetrics(instanceSummary, details);
           $scope.instance = _.defaults(details, instanceSummary);

@@ -8,7 +8,7 @@ import {
   CloudProviderRegistry,
   CONFIRMATION_MODAL_SERVICE,
   FirewallLabels,
-  INSTANCE_READ_SERVICE,
+  InstanceReader,
   INSTANCE_WRITE_SERVICE,
   RecentHistoryService,
   SETTINGS,
@@ -19,7 +19,6 @@ module.exports = angular
     require('@uirouter/angularjs').default,
     require('angular-ui-bootstrap'),
     INSTANCE_WRITE_SERVICE,
-    INSTANCE_READ_SERVICE,
     CONFIRMATION_MODAL_SERVICE,
     require('../../securityGroup/securityGroup.read.service').name,
   ])
@@ -30,9 +29,10 @@ module.exports = angular
     $uibModal,
     instanceWriter,
     confirmationModalService,
-    instanceReader,
     instance,
     app,
+    moniker,
+    environment,
     titusSecurityGroupReader,
   ) {
     // needed for standalone instances
@@ -45,6 +45,8 @@ module.exports = angular
     $scope.firewallsLabel = FirewallLabels.get('Firewalls');
 
     $scope.application = app;
+    $scope.moniker = moniker;
+    $scope.environment = environment;
     $scope.gateUrl = SETTINGS.gateUrl;
 
     function extractHealthMetrics(instance, latest) {
@@ -92,7 +94,7 @@ module.exports = angular
         extraData.account = account;
         extraData.region = region;
         RecentHistoryService.addExtraDataToLatest('instances', extraData);
-        return instanceReader.getInstanceDetails(account, region, instance.instanceId).then(function(details) {
+        return InstanceReader.getInstanceDetails(account, region, instance.instanceId).then(function(details) {
           $scope.state.loading = false;
           extractHealthMetrics(instanceSummary, details);
           $scope.instance = defaults(details, instanceSummary);
