@@ -9,6 +9,9 @@ export interface INotificationSettings {
   email: {
     enabled: boolean;
   };
+  bearychat: {
+    enabled: boolean;
+  };
   hipchat: {
     enabled: boolean;
     botName: string;
@@ -26,6 +29,7 @@ export interface IFeatures {
   canary?: boolean;
   entityTags?: boolean;
   fiatEnabled?: boolean;
+  iapRefresherEnabled?: boolean;
   pipelines?: boolean;
   notifications?: boolean;
   clusterDiff?: boolean;
