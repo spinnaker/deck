@@ -5,10 +5,11 @@ import { SETTINGS } from 'core/config/settings';
 import { IGitTrigger } from 'core/domain/ITrigger';
 import { Registry } from 'core/registry';
 import { ServiceAccountReader } from 'core/serviceAccount/ServiceAccountReader';
+import { IServiceAccount } from 'core';
 
 class GitTriggerController implements IController {
   public fiatEnabled: boolean = SETTINGS.feature.fiatEnabled;
-  public serviceAccounts: string[] = [];
+  public serviceAccounts: IServiceAccount[] = [];
   public gitTriggerTypes = SETTINGS.gitSources || ['stash', 'github', 'bitbucket', 'gitlab'];
   public displayText: any = {
     'pipeline.config.git.project': {

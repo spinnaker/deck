@@ -4,10 +4,11 @@ import { IWebhookTrigger } from 'core/domain';
 import { Registry } from 'core/registry';
 import { ServiceAccountReader } from 'core/serviceAccount/ServiceAccountReader';
 import { SETTINGS } from 'core/config/settings';
+import { IServiceAccount } from 'core';
 
 class WebhookTriggerController implements IController {
   public fiatEnabled: boolean;
-  public serviceAccounts: string[];
+  public serviceAccounts: IServiceAccount[];
 
   constructor(public trigger: IWebhookTrigger) {
     'ngInject';

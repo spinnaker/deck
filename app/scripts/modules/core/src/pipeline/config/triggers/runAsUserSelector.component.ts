@@ -14,7 +14,7 @@ class RunAsUserSelectorComponent implements ng.IComponentOptions {
     <div class="col-md-9">
       <select
         class="form-control input-sm"
-        ng-options="svcAcct for svcAcct in $ctrl.serviceAccounts"
+        ng-options="svcAcct.name  as svcAcct.name for svcAcct in $ctrl.serviceAccounts"
         ng-model="$ctrl.component[$ctrl.field]">
         <option value="">Select Run As User</option>
       </select>

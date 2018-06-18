@@ -5,13 +5,14 @@ import { PubsubSubscriptionReader } from 'core/pubsub';
 import { Registry } from 'core/registry';
 import { ServiceAccountReader } from 'core/serviceAccount';
 import { SETTINGS } from 'core/config/settings';
+import { IServiceAccount } from 'core';
 
 class PubsubTriggerController implements IController {
   public pubsubSystems = SETTINGS.pubsubProviders || ['google']; // TODO(joonlim): Add amazon once it is confirmed that amazon pub/sub works.
   private pubsubSubscriptions: IPubsubSubscription[];
   public filteredPubsubSubscriptions: string[];
   public subscriptionsLoaded = false;
-  public serviceAccounts: string[];
+  public serviceAccounts: IServiceAccount[];
 
   constructor(public trigger: IPubsubTrigger) {
     'ngInject';
