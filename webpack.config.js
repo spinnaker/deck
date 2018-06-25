@@ -30,7 +30,7 @@ function configure(env, webpackOpts) {
     },
     output: {
       path: path.join(__dirname, 'build', 'webpack', process.env.SPINNAKER_ENV || ''),
-      filename: `[name]${IS_PRODUCTION ? '.[chunkhash]' : ''}.js`,
+      filename: '[name].js',
     },
     devtool: IS_PRODUCTION ? 'source-map' : 'eval',
     optimization: {
@@ -150,6 +150,7 @@ function configure(env, webpackOpts) {
         template: './app/index.deck',
         favicon: process.env.NODE_ENV === 'production' ? 'app/prod-favicon.ico' : 'app/dev-favicon.ico',
         inject: true,
+        hash: IS_PRODUCTION,
       }),
     ],
     devServer: {
