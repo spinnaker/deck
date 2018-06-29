@@ -39,7 +39,7 @@ export class ExecutionFilterModel {
   constructor() {
     this.configViewStateCache = ViewStateCache.createCache('executionFilters', {
       version: 2,
-      maxAge: SETTINGS.maxPipelineAge * 24 * 60 * 60 * 1000,
+      maxAge: SETTINGS.maxPipelineAgeDays * 24 * 60 * 60 * 1000,
     });
 
     this.asFilterModel = FilterModelService.configureFilterModel(this as any, filterModelConfig);
