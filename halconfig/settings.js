@@ -99,7 +99,7 @@ window.spinnakerSettings = {
   defaultTimeZone: timezone, // see http://momentjs.com/timezone/docs/#/data-utilities/
   defaultCategory: 'serverGroup',
   defaultInstancePort: 80,
-  maxPipelineAgeDays: 14,
+  maxPipelineAgeDays: maxPipelineAgeDays,
   providers: {
     azure: azure,
     aws: {
