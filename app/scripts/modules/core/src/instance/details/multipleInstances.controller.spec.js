@@ -34,8 +34,8 @@ describe('Controller: MultipleInstances', function() {
       account: 'prod',
       region: 'us-east-1',
       instances: [
-        { id: 'i-123', availabilityZone: 'c', launchTime: 1, healthState: 'Up' },
-        { id: 'i-234', availabilityZone: 'd', launchTime: 2, healthState: 'Up' },
+        { uid: 'i-123', id: 'i-123', availabilityZone: 'c', launchTime: 1, healthState: 'Up' },
+        { uid: 'i-234', id: 'i-234', availabilityZone: 'd', launchTime: 2, healthState: 'Up' },
       ],
     };
     this.serverGroupB = {
@@ -43,14 +43,14 @@ describe('Controller: MultipleInstances', function() {
       name: 'asg-v002',
       account: 'test',
       region: 'us-west-1',
-      instances: [{ id: 'g-234', availabilityZone: 'e', launchTime: 2, healthState: 'Up' }],
+      instances: [{ uid: 'g-234', id: 'g-234', availabilityZone: 'e', launchTime: 2, healthState: 'Up' }],
     };
     this.serverGroupC = {
       type: 'gce',
       name: 'asg-v003',
       account: 'test',
       region: 'us-west-1',
-      instances: [{ id: 'g-234', availabilityZone: 'f', launchTime: 2, healthState: 'Up' }],
+      instances: [{ uid: 'g-234', id: 'g-234', availabilityZone: 'f', launchTime: 2, healthState: 'Up' }],
     };
 
     this.getInstanceGroup = serverGroup => {

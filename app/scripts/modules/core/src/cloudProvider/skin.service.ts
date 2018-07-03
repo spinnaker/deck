@@ -39,14 +39,14 @@ export class SkinService {
         for (const serverGroup of app.getDataSource('serverGroups').data as IServerGroup[]) {
           if (
             serverGroup.cloudProvider === cloudProvider &&
-            (serverGroup.instances || []).some(instance => instance.id === instanceId)
+            (serverGroup.instances || []).some(instance => instance.uid === instanceId)
           ) {
             return this.mapAccountToSkin(serverGroup.account);
           }
         }
         for (const loadBalancer of app.getDataSource('loadBalancers').data as ILoadBalancer[]) {
           if (loadBalancer.cloudProvider === cloudProvider) {
-            if ((loadBalancer.instances || []).some(instance => instance.id === instanceId)) {
+            if ((loadBalancer.instances || []).some(instance => instance.uid === instanceId)) {
               return this.mapAccountToSkin(loadBalancer.account);
             }
             // Hit a crazy Babel bug - can't return from a nested for...of loop.
@@ -54,7 +54,7 @@ export class SkinService {
               const serverGroup = loadBalancer.serverGroups[i];
               if (
                 serverGroup.isDisabled &&
-                (serverGroup.instances || []).some(instance => instance.id === instanceId)
+                (serverGroup.instances || []).some(instance => instance.uid === instanceId)
               ) {
                 return this.mapAccountToSkin(loadBalancer.account);
               }
@@ -74,7 +74,7 @@ export class SkinService {
 
       const hasInstance = (obj: IServerGroup | ILoadBalancer) => {
         return (
-          obj.cloudProvider === cloudProvider && (obj.instances || []).some(instance => instance.id === instanceId)
+          obj.cloudProvider === cloudProvider && (obj.instances || []).some(instance => instance.uid === instanceId)
         );
       };
 
@@ -95,7 +95,7 @@ export class SkinService {
 
       const hasInstance = (obj: IServerGroup | ILoadBalancer) => {
         return (
-          obj.cloudProvider === cloudProvider && (obj.instances || []).some(instance => instance.id === instanceId)
+          obj.cloudProvider === cloudProvider && (obj.instances || []).some(instance => instance.uid === instanceId)
         );
       };
 

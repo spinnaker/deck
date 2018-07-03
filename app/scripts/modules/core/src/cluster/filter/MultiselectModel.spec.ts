@@ -225,9 +225,9 @@ describe('Multiselect Model', () => {
         expect(test).not.toBe(original);
       });
 
-      it('includes instance id if present in state params', () => {
+      it('includes instance uid if present in state params', () => {
         currentParams = { provider: 'aws', instanceId: 'i-123' };
-        serverGroup.instances = [{ id: 'i-123', provider: 'aws' }];
+        serverGroup.instances = [{ uid: 'i-123', id: 'i-123', provider: 'aws' }];
         serverGroup.name = 'asg-v002';
         const test = multiselectModel.getOrCreateInstanceGroup(serverGroup);
         expect(test.instanceIds).toEqual(['i-123']);

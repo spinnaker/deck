@@ -220,11 +220,11 @@ export class ClusterFilterService {
         } else {
           const filteredInstances = match.instances.filter(i => this.shouldShowInstance(i));
           if (instanceGroup.selectAll) {
-            instanceGroup.instanceIds = filteredInstances.map(i => i.id);
+            instanceGroup.instanceIds = filteredInstances.map(i => i.uid);
           } else {
             instanceGroup.instanceIds = filteredInstances
-              .filter(instance => instanceGroup.instanceIds.includes(instance.id))
-              .map(instance => instance.id);
+              .filter(instance => instanceGroup.instanceIds.includes(instance.uid))
+              .map(instance => instance.uid);
           }
         }
       });

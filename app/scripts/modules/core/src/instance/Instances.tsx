@@ -8,6 +8,7 @@ import { Instance } from './Instance';
 
 export interface IInstancesProps {
   instances: IInstance[];
+  cloudProvider?: string;
   highlight?: string;
 }
 
@@ -52,7 +53,7 @@ export class Instances extends React.Component<IInstancesProps, IInstancesState>
     }
 
     if (this.state.detailsInstanceId !== nextState.detailsInstanceId) {
-      const ids = nextProps.instances.map(x => x.id);
+      const ids = nextProps.instances.map(x => x.uid);
       if (ids.includes(this.state.detailsInstanceId) || ids.includes(nextState.detailsInstanceId)) {
         return true;
       }
@@ -63,7 +64,10 @@ export class Instances extends React.Component<IInstancesProps, IInstancesState>
 
   private handleInstanceClicked = (instance: IInstance) => {
     const { router, parentUIViewAddress } = this.context;
-    const params = { instanceId: instance.id, provider: instance.provider };
+    const params = {
+      instanceId: instance.uid,
+      provider: instance.provider || this.props.cloudProvider,
+    };
     const options = { relative: parentUIViewAddress.context };
 
     router.stateService.go('.instanceDetails', params, options);
@@ -99,9 +103,9 @@ export class Instances extends React.Component<IInstancesProps, IInstancesState>
           <span key={i} className={`instance-group instance-group-${p[0].healthState}`}>
             {p.map(instance => (
               <Instance
-                key={instance.id}
+                key={instance.uid || instance.id}
                 instance={instance}
-                active={this.state.detailsInstanceId === instance.id}
+                active={this.state.detailsInstanceId === instance.uid}
                 highlight={this.props.highlight}
                 onInstanceClicked={this.handleInstanceClicked}
               />
