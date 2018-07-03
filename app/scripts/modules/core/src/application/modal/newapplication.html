@@ -6,7 +6,13 @@
   <div ng-if="newAppModal.state.initializing" style="height: 200px">
     <loading-spinner size="'medium'"></loading-spinner>
   </div>
-  <form role="form" class="container-fluid" novalidate name="newApplicationForm" ng-if="!newAppModal.state.initializing">
+  <div ng-if="newAppModal.state.initializeFailed" style="...">
+    <div class="horizontal middle center heading-4" style="margin-bottom: 250px; height: 150px;">
+      <i class="fa fa-exclamation-triangle" style="padding-right: 4px"></i>
+      Error initializing dialog. Ensure that your gate endpoint is accessible.
+    </div>
+  </div>
+  <form role="form" class="container-fluid" novalidate name="newApplicationForm" ng-if="!(newAppModal.state.initializing || newAppModal.state.initializeFailed)">
     <div class="modal-body">
       <div class="form-group row">
         <div class="col-sm-3 sm-label-right">Name *</div>
