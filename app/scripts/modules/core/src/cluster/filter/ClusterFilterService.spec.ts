@@ -509,7 +509,7 @@ describe('Service: clusterFilterService', function() {
       const serverGroup = application.getDataSource('serverGroups').data[0],
         multiselectGroup = ClusterState.multiselectModel.getOrCreateInstanceGroup(serverGroup);
 
-      serverGroup.instances.push({ id: 'i-1234' });
+      serverGroup.instances.push({ uid: 'i-1234', id: 'i-1234' });
       ClusterState.multiselectModel.toggleSelectAll(serverGroup, ['i-1234']);
       expect(multiselectGroup.instanceIds).toEqual(['i-1234']);
 
@@ -534,7 +534,7 @@ describe('Service: clusterFilterService', function() {
 
       ClusterState.multiselectModel.toggleInstance(serverGroup, 'i-1234');
       ClusterState.multiselectModel.toggleInstance(serverGroup, 'i-2345');
-      serverGroup.instances.push({ id: 'i-1234' });
+      serverGroup.instances.push({ uid: 'i-1234', id: 'i-1234' });
 
       expect(ClusterState.multiselectModel.instanceIsSelected(serverGroup, 'i-1234')).toBe(true);
       expect(ClusterState.multiselectModel.instanceIsSelected(serverGroup, 'i-2345')).toBe(true);
@@ -556,8 +556,8 @@ describe('Service: clusterFilterService', function() {
 
       ClusterState.multiselectModel.getOrCreateInstanceGroup(serverGroup).selectAll = true;
       ClusterState.multiselectModel.toggleInstance(serverGroup, 'i-1234');
-      serverGroup.instances.push({ id: 'i-1234' });
-      serverGroup.instances.push({ id: 'i-2345' });
+      serverGroup.instances.push({ uid: 'i-1234', id: 'i-1234' });
+      serverGroup.instances.push({ uid: 'i-2345', id: 'i-2345' });
 
       ClusterState.filterService.updateClusterGroups(application);
 

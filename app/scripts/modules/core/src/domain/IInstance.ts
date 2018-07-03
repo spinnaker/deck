@@ -7,12 +7,13 @@ export interface IInstance {
   hasHealthStatus?: boolean;
   health: IHealth[];
   healthState?: string;
-  id: string;
+  id: string; // this is the instance's name; not necessarily unique
   launchTime: number;
   loadBalancers?: string[];
   provider?: string;
   region?: string;
   serverGroup?: string;
+  uid: string;
   vpcId?: string;
   zone: string;
 }

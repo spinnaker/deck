@@ -95,9 +95,9 @@ class KubernetesInstanceDetailsController implements IController {
     });
   }
 
-  private retrieveInstance(instance: InstanceFromStateParams): IPromise<IKubernetesInstance> {
+  private retrieveInstance(instanceFromState: InstanceFromStateParams): IPromise<IKubernetesInstance> {
     const instanceLocatorPredicate = (dataSource: InstanceManager) => {
-      return dataSource.instances.some(possibleMatch => possibleMatch.id === instance.instanceId);
+      return dataSource.instances.some(possibleMatch => possibleMatch.uid === instanceFromState.instanceId);
     };
 
     const dataSources: InstanceManager[] = flattenDeep([
@@ -117,21 +117,21 @@ class KubernetesInstanceDetailsController implements IController {
         recentHistoryExtraData.serverGroup = instanceManager.name;
       }
 
+      const instance = instanceManager.instances.find(i => i.uid === instanceFromState.instanceId);
+
       RecentHistoryService.addExtraDataToLatest('instances', recentHistoryExtraData);
-      return InstanceReader.getInstanceDetails(
-        instanceManager.account,
-        instanceManager.region,
-        instance.instanceId,
-      ).then((instanceDetails: IKubernetesInstance) => {
-        instanceDetails.account = instanceManager.account;
-        instanceDetails.namespace = instanceDetails.manifest.metadata.namespace;
-        instanceDetails.displayName = instanceDetails.manifest.metadata.name;
-        instanceDetails.kind = instanceDetails.manifest.kind;
-        instanceDetails.apiVersion = instanceDetails.manifest.apiVersion;
-        instanceDetails.id = instanceDetails.name;
-        instanceDetails.provider = 'kubernetes';
-        return instanceDetails;
-      });
+      return InstanceReader.getInstanceDetails(instanceManager.account, instanceManager.region, instance.id).then(
+        (instanceDetails: IKubernetesInstance) => {
+          instanceDetails.account = instanceManager.account;
+          instanceDetails.namespace = instanceDetails.manifest.metadata.namespace;
+          instanceDetails.displayName = instanceDetails.manifest.metadata.name;
+          instanceDetails.kind = instanceDetails.manifest.kind;
+          instanceDetails.apiVersion = instanceDetails.manifest.apiVersion;
+          instanceDetails.id = instanceDetails.name;
+          instanceDetails.provider = 'kubernetes';
+          return instanceDetails;
+        },
+      );
     } else {
       return this.$q.reject();
     }

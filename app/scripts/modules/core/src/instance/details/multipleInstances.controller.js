@@ -209,7 +209,7 @@ module.exports = angular
         return null;
       }
 
-      return serverGroup.instances.find(instance => instance.id === instanceId) || {};
+      return serverGroup.instances.find(instance => instance.uid === instanceId) || {};
     }
 
     let makeInstanceModel = (group, instanceId) => {

@@ -56,7 +56,9 @@ export class InstanceListBody extends React.Component<IInstanceListBodyProps, II
   private getSelectedInstanceIds(): string[] {
     const { instances, serverGroup } = this.props;
     if (this.clusterFilterModel.sortFilter.multiselect) {
-      return instances.filter(i => ClusterState.multiselectModel.instanceIsSelected(serverGroup, i.id)).map(i => i.id);
+      return instances
+        .filter(i => ClusterState.multiselectModel.instanceIsSelected(serverGroup, i.uid))
+        .map(i => i.uid);
     }
     return [];
   }
@@ -71,11 +73,11 @@ export class InstanceListBody extends React.Component<IInstanceListBodyProps, II
     }
     if (
       this.props.instances
-        .map(i => i.id)
+        .map(i => i.uid)
         .sort()
         .join(',') !==
       nextProps.instances
-        .map(i => i.id)
+        .map(i => i.uid)
         .sort()
         .join(',')
     ) {
@@ -164,17 +166,17 @@ export class InstanceListBody extends React.Component<IInstanceListBodyProps, II
       }
     });
 
-    const isActive = this.state.activeInstanceId === instance.id;
+    const isActive = this.state.activeInstanceId === instance.uid;
     const rowClass = classNames({
       clickable: true,
       active: isActive,
     });
 
     return (
-      <tr key={instance.id} data-instance-id={instance.id} className={rowClass}>
+      <tr key={instance.uid} data-instance-id={instance.uid} className={rowClass}>
         {this.$state.params.multiselect && (
           <td className="no-hover">
-            <input type="checkbox" checked={this.state.selectedInstanceIds.includes(instance.id)} />
+            <input type="checkbox" checked={this.state.selectedInstanceIds.includes(instance.uid)} />
           </td>
         )}
         <td>

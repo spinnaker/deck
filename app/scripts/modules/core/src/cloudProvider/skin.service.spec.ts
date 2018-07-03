@@ -50,7 +50,7 @@ describe('Service: SkinService', () => {
               name: 'myServerGroup',
               account: 'v2-k8s-account',
               cloudProvider: 'kubernetes',
-              instances: [{ id: 'my-instance-id' }],
+              instances: [{ uid: 'my-instance-id' }],
               serverGroups: [],
             },
           ],
@@ -77,7 +77,7 @@ describe('Service: SkinService', () => {
               name: 'myLoadBalancer',
               account: 'v2-k8s-account',
               cloudProvider: 'kubernetes',
-              instances: [{ id: 'my-instance-id' }],
+              instances: [{ uid: 'my-instance-id' }],
             },
           ],
         },
@@ -107,7 +107,7 @@ describe('Service: SkinService', () => {
               serverGroups: [
                 {
                   isDisabled: true,
-                  instances: [{ id: 'my-instance-id' }],
+                  instances: [{ uid: 'my-instance-id' }],
                 },
               ],
             },

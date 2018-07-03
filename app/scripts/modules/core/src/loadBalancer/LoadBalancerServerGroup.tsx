@@ -73,7 +73,7 @@ export class LoadBalancerServerGroup extends React.Component<
             </div>
             {showInstances && (
               <div className="instance-list">
-                <Instances instances={this.state.instances} />
+                <Instances cloudProvider={cloudProvider} instances={this.state.instances} />
               </div>
             )}
           </div>

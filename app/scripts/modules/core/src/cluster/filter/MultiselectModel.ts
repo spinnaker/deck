@@ -114,8 +114,8 @@ export class MultiselectModel {
       // when creating a new group, include an instance ID if we're deep-linked into the details view
       const params = ReactInjector.$state.params;
       const instanceIds = (serverGroup.instances || [])
-        .filter(instance => instance.provider === params.provider && instance.id === params.instanceId)
-        .map(instance => instance.id);
+        .filter(instance => instance.provider === params.provider && instance.uid === params.instanceId)
+        .map(instance => instance.uid);
       result = {
         serverGroup: serverGroupName,
         account,
