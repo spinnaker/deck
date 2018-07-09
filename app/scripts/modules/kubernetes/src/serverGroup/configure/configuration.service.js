@@ -22,7 +22,7 @@ module.exports = angular
       const containers = command.containers.concat(command.initContainers || []);
       let queries = containers
         .filter(c => {
-          return !c.imageDescription.fromContext;
+          return !c.imageDescription.fromContext && !c.imageDescription.fromArtifact;
         })
         .map(c => {
           if (c.imageDescription.fromTrigger) {
@@ -95,15 +95,17 @@ module.exports = angular
         }
 
         return {
-          name: image.repository
+          name: (image.repository || image.name.replace(/[.]/, '-'))
             .replace(/_/g, '')
             .replace(/[\/ ]/g, '-')
             .toLowerCase(),
           imageDescription: {
             repository: image.repository,
             tag: image.tag,
+            artifactId: image.artifactId,
             imageId: command.buildImageId(image),
             registry: image.registry,
+            fromArtifact: image.fromArtifact,
             fromContext: image.fromContext,
             fromTrigger: image.fromTrigger,
             cluster: image.cluster,
@@ -172,7 +174,11 @@ module.exports = angular
       const validContainers = [];
       const invalidContainers = [];
       containers.forEach(function(container) {
-        if (container.imageDescription.fromContext || container.imageDescription.fromTrigger) {
+        if (
+          container.imageDescription.fromContext ||
+          container.imageDescription.fromTrigger ||
+          container.imageDescription.fromArtifact
+        ) {
           validContainers.push(container);
         } else {
           let matchingContainers = command.backingData.filtered.containers.filter(test => {
@@ -275,7 +281,13 @@ module.exports = angular
           },
         );
         command.backingData.filtered.images = _.filter(command.backingData.allImages, function(image) {
-          return image.fromContext || image.fromTrigger || _.includes(accounts, image.account) || image.message;
+          return (
+            image.fromContext ||
+            image.fromTrigger ||
+            image.fromArtifact ||
+            _.includes(accounts, image.account) ||
+            image.message
+          );
         });
       }
       return result;
