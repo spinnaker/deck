@@ -90,7 +90,6 @@ export class Applications extends React.Component<{}, IApplicationsState> {
         const currentPage = Math.min(pagination.currentPage, lastPage);
         const maxSize = applications.length;
         const validatedPagination = { ...pagination, currentPage, maxSize } as IApplicationPagination;
-
         return { applications, pagination: validatedPagination };
       })
 
@@ -102,8 +101,9 @@ export class Applications extends React.Component<{}, IApplicationsState> {
           const end = start + itemsPerPage;
           this.setState({ applications: applications.slice(start, end), pagination });
         },
-        () => {
+        error => {
           this.setState({ errorState: true });
+          throw error;
         },
       );
   }
