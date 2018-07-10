@@ -7,6 +7,7 @@ import { IBuildTrigger } from 'core/domain/ITrigger';
 import { SETTINGS } from 'core/config/settings';
 
 import { TravisTriggerTemplate } from './TravisTriggerTemplate';
+import { IServiceAccount } from 'core';
 
 export interface ITravisTriggerViewState {
   mastersLoaded: boolean;
@@ -22,7 +23,7 @@ export class TravisTrigger implements IController {
   public filterLimit = 100;
   private filterThreshold = 500;
   public fiatEnabled: boolean;
-  public serviceAccounts: string[];
+  public serviceAccounts: IServiceAccount[];
 
   constructor($scope: IScope, public trigger: IBuildTrigger) {
     'ngInject';

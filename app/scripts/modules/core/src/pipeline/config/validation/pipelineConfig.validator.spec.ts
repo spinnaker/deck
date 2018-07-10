@@ -861,7 +861,9 @@ describe('pipelineConfigValidator', () => {
         return buildStageTypeConfig();
       });
 
-      spyOn(ServiceAccountReader, 'getServiceAccounts').and.returnValue($q.resolve(['my-account']));
+      spyOn(ServiceAccountReader, 'getServiceAccounts').and.returnValue(
+        $q.resolve([{ name: 'my-account', roles: ['abc'] }]),
+      );
     });
 
     it('calls service account access validator', () => {
