@@ -174,11 +174,8 @@ module.exports = angular
       const validContainers = [];
       const invalidContainers = [];
       containers.forEach(function(container) {
-        if (
-          container.imageDescription.fromContext ||
-          container.imageDescription.fromTrigger ||
-          container.imageDescription.fromArtifact
-        ) {
+        const { fromContext, fromTrigger, fromArtifact } = container.imageDescription;
+        if (fromContext || fromTrigger || fromArtifact) {
           validContainers.push(container);
         } else {
           let matchingContainers = command.backingData.filtered.containers.filter(test => {
@@ -281,13 +278,8 @@ module.exports = angular
           },
         );
         command.backingData.filtered.images = _.filter(command.backingData.allImages, function(image) {
-          return (
-            image.fromContext ||
-            image.fromTrigger ||
-            image.fromArtifact ||
-            _.includes(accounts, image.account) ||
-            image.message
-          );
+          const { fromContext, fromTrigger, fromArtifact, account, message } = image;
+          return fromContext || fromTrigger || fromArtifact || _.includes(accounts, account) || message;
         });
       }
       return result;
