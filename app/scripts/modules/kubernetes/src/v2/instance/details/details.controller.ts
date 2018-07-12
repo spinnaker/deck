@@ -25,10 +25,18 @@ interface InstanceManager {
   instances: IKubernetesInstance[];
 }
 
+interface IConsoleOutputInstance {
+  account: string;
+  region: string;
+  id: string;
+  provider: string;
+}
+
 class KubernetesInstanceDetailsController implements IController {
   public state = { loading: true };
   public instance: IKubernetesInstance;
   public manifest: IManifest;
+  public consoleOutputInstance: IConsoleOutputInstance;
 
   constructor(
     instance: InstanceFromStateParams,
@@ -44,6 +52,12 @@ class KubernetesInstanceDetailsController implements IController {
       .then(() => this.retrieveInstance(instance))
       .then(instanceDetails => {
         this.instance = instanceDetails;
+        this.consoleOutputInstance = {
+          account: instanceDetails.account,
+          region: instanceDetails.region,
+          id: instanceDetails.humanReadableName,
+          provider: instanceDetails.provider,
+        };
 
         const unsubscribe = KubernetesManifestService.makeManifestRefresher(
           this.app,
@@ -95,9 +109,9 @@ class KubernetesInstanceDetailsController implements IController {
     });
   }
 
-  private retrieveInstance(instance: InstanceFromStateParams): IPromise<IKubernetesInstance> {
+  private retrieveInstance(instanceFromState: InstanceFromStateParams): IPromise<IKubernetesInstance> {
     const instanceLocatorPredicate = (dataSource: InstanceManager) => {
-      return dataSource.instances.some(possibleMatch => possibleMatch.id === instance.instanceId);
+      return dataSource.instances.some(possibleMatch => possibleMatch.id === instanceFromState.instanceId);
     };
 
     const dataSources: InstanceManager[] = flattenDeep([
@@ -117,21 +131,26 @@ class KubernetesInstanceDetailsController implements IController {
         recentHistoryExtraData.serverGroup = instanceManager.name;
       }
 
+      const instance = instanceManager.instances.find(i => i.id === instanceFromState.instanceId);
+
+      if (!instance) {
+        return this.$q.reject();
+      }
+
       RecentHistoryService.addExtraDataToLatest('instances', recentHistoryExtraData);
-      return InstanceReader.getInstanceDetails(
-        instanceManager.account,
-        instanceManager.region,
-        instance.instanceId,
-      ).then((instanceDetails: IKubernetesInstance) => {
-        instanceDetails.account = instanceManager.account;
-        instanceDetails.namespace = instanceDetails.manifest.metadata.namespace;
-        instanceDetails.displayName = instanceDetails.manifest.metadata.name;
-        instanceDetails.kind = instanceDetails.manifest.kind;
-        instanceDetails.apiVersion = instanceDetails.manifest.apiVersion;
-        instanceDetails.id = instanceDetails.name;
-        instanceDetails.provider = 'kubernetes';
-        return instanceDetails;
-      });
+      return InstanceReader.getInstanceDetails(instanceManager.account, instanceManager.region, instance.name).then(
+        (instanceDetails: IKubernetesInstance) => {
+          instanceDetails.account = instanceManager.account;
+          instanceDetails.namespace = instanceDetails.manifest.metadata.namespace;
+          instanceDetails.displayName = instanceDetails.manifest.metadata.name;
+          instanceDetails.kind = instanceDetails.manifest.kind;
+          instanceDetails.apiVersion = instanceDetails.manifest.apiVersion;
+          instanceDetails.id = instance.id;
+          instanceDetails.name = instance.name;
+          instanceDetails.provider = 'kubernetes';
+          return instanceDetails;
+        },
+      );
     } else {
       return this.$q.reject();
     }
