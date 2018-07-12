@@ -148,8 +148,11 @@ export class Applications extends React.Component<{}, IApplicationsState> {
 
     const ErrorIndicator = () => (
       <div className="horizontal middle center heading-4" style={{ marginBottom: '250px', height: '150px' }}>
-        <i className="fa fa-exclamation-triangle" style={{ paddingRight: '4px' }} />
-        Error fetching applications. Ensure that your gate endpoint is accessible.
+        <i className="fa fa-exclamation-triangle" style={{ paddingRight: '8px' }} />
+        <span>
+          Error fetching applications. Check that your gate endpoint is accessible. Further information on
+          troubleshooting this error is available <a href="https://www.spinnaker.io/setup/quickstart/faq/">here</a>.
+        </span>
       </div>
     );
 
