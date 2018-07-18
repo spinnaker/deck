@@ -5,7 +5,7 @@ import { IPromise } from 'angular';
 
 import { IBuild, IBuildInfo, IBuildTrigger } from 'core/domain';
 import { ITriggerTemplateComponentProps } from 'core/pipeline/manualExecution/TriggerTemplate';
-import { IgorService } from 'core/ci';
+import { IgorService, BuildServiceType } from 'core/ci';
 import { Spinner } from 'core/widgets/spinners/Spinner';
 import { buildDisplayName } from 'core/pipeline/executionBuild/buildDisplayName.filter';
 import { timestamp } from 'core/utils/timeFormatters';
@@ -84,7 +84,7 @@ export class WerckerTriggerTemplate extends React.Component<
     }
 
     // do not re-initialize if the trigger has changed to some other type
-    if (trigger.type !== 'wercker') {
+    if (trigger.type !== BuildServiceType.Wercker) {
       return;
     }
 

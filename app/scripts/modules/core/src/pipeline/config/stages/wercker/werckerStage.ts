@@ -3,7 +3,6 @@ import { IModalService } from 'angular-ui-bootstrap';
 import * as moment from 'moment';
 
 import { Registry } from 'core/registry';
-// import { SETTINGS } from 'core/config/settings';
 import { IgorService, BuildServiceType } from 'core/ci/igor.service';
 import { IJobConfig, IParameterDefinitionList, IStage } from 'core/domain';
 import { WerckerExecutionLabel } from './WerckerExecutionLabel';
