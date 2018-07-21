@@ -2,9 +2,11 @@ import * as React from 'react';
 import { get } from 'lodash';
 import * as moment from 'moment';
 import { IManifest, IManifestEvent, relativeTime } from '@spinnaker/core';
+import { JobManifestPodLogs } from './JobManifestPodLogs';
 
 export interface IManifestEventsProps {
   manifest: IManifest;
+  accountId: string;
 }
 
 export class ManifestEvents extends React.Component<IManifestEventsProps> {
@@ -66,6 +68,14 @@ export class ManifestEvents extends React.Component<IManifestEventsProps> {
             </div>
           )}
           <div>{e.message}</div>
+          <div>
+            <JobManifestPodLogs
+              manifest={this.props.manifest}
+              manifestEvent={e}
+              accountId={this.props.accountId}
+              linkName="Console Output (Raw)"
+            />
+          </div>
           {i !== events.length - 1 && <br />}
         </div>
       );

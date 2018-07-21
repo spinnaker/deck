@@ -105,7 +105,7 @@ export class KubernetesResourceDetails extends React.Component<
               </ul>
             </CollapsibleSection>
             <CollapsibleSection key="events" heading="events" defaultExpanded={true}>
-              <ManifestEvents manifest={manifest} />
+              <ManifestEvents manifest={manifest} accountId={this.props.kubernetesResource.accountId} />
             </CollapsibleSection>
             <CollapsibleSection key="labels" heading="labels" defaultExpanded={true}>
               <ManifestLabels manifest={get(manifest, ['manifest'], {})} />
