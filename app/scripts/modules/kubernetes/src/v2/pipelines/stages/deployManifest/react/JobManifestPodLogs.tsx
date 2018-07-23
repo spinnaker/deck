@@ -11,8 +11,8 @@ export interface IJobManifestPodLogsProps {
 }
 
 export interface IJobManifestPodLogsState {
-  showModal?: boolean;
-  output?: string;
+  showModal: boolean;
+  output: string;
 }
 
 // JobManifestPodLogs exposes pod logs for Job type manifests in the deploy manifest stage
@@ -43,6 +43,10 @@ export class JobManifestPodLogs extends React.Component<IJobManifestPodLogsProps
     );
   }
 
+  private podName(): string {
+    return `pod ${trim(this.props.manifestEvent.message.split(':')[1])}`;
+  }
+
   public close() {
     this.setState({ showModal: false });
   }
@@ -52,11 +56,9 @@ export class JobManifestPodLogs extends React.Component<IJobManifestPodLogsProps
   }
 
   public onClick() {
-    const { manifestEvent, manifest } = this.props;
-    // NOTE(benjaminws): This is not great, but can't get the pod name from the event data
-    const podName = `pod ${trim(manifestEvent.message.split(':')[1])}`;
+    const { manifest } = this.props;
     const region = this.resourceRegion();
-    InstanceReader.getConsoleOutput(manifest.account, region, podName, 'kubernetes')
+    InstanceReader.getConsoleOutput(manifest.account, region, this.podName(), 'kubernetes')
       .then((response: any) => {
         this.setState({ output: response.output });
         this.open();
@@ -78,7 +80,7 @@ export class JobManifestPodLogs extends React.Component<IJobManifestPodLogsProps
           </a>
           <Modal show={showModal} onHide={this.close}>
             <Modal.Header closeButton={true}>
-              <Modal.Title>Console Output</Modal.Title>
+              <Modal.Title>Console Output: {this.podName()} </Modal.Title>
             </Modal.Header>
             <Modal.Body>
               <pre>{output}</pre>
