@@ -20,18 +20,6 @@ module.exports = angular
         { type: 'requiredField', fieldName: 'credentials', fieldLabel: 'account' },
       ],
     });
-
-    ArtifactReferenceService.registerReference('stage', obj => {
-      const paths = [];
-      if (obj.type === 'deploy' && Array.isArray(obj.clusters)) {
-        obj.clusters.forEach((cluster, i) => {
-          if (cluster.cloudProvider === 'gce') {
-            paths.push(['clusters', i, 'imageArtifactId']);
-          }
-        });
-      }
-      return paths;
-    });
   })
   .controller('gceCloneServerGroupStageCtrl', function($scope) {
     let stage = $scope.stage;
