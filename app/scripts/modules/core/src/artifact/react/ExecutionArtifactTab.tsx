@@ -1,12 +1,6 @@
 import * as React from 'react';
-import { get, has, includes, uniq } from 'lodash';
-import {
-  ExpectedArtifactService,
-  IExpectedArtifact,
-  IExecution,
-  IExecutionDetailsSectionProps,
-  ExecutionDetailsSection,
-} from 'core';
+import { get, has } from 'lodash';
+import { IExpectedArtifact, IExecution, IExecutionDetailsSectionProps, ExecutionDetailsSection } from 'core';
 import { ArtifactIconList } from './ArtifactIconList';
 
 import '../artifactTab.less';
@@ -30,21 +24,14 @@ export class ExecutionArtifactTab extends React.Component<IExecutionDetailsSecti
     const stageConfig = Registry.pipeline.getStageConfig(stage);
     const stageContext = get(stage, ['context'], {});
 
-    const artifactFields = get(this.props, ['config', 'artifactFields'], []);
-    const inputArtifactIds = get(stage, ['context', 'inputArtifacts'], []).map(a => a.id);
-    const extractedArtifactIds =
-      stageConfig && stageConfig.artifactExtractor ? stageConfig.artifactExtractor(stageContext) : [];
-    const consumedIds = uniq(
-      ExpectedArtifactService.accumulateArtifacts(artifactFields)(stage.context).concat(
-        inputArtifactIds,
-        extractedArtifactIds,
-      ),
+    const consumedIds = new Set(
+      stageConfig && stageConfig.artifactExtractor ? stageConfig.artifactExtractor(stageContext) : []
     );
 
     const boundArtifacts = this.extractBoundArtifactsFromExecution(execution);
 
     const consumedArtifacts = boundArtifacts
-      .filter(rea => includes(consumedIds, rea.id))
+      .filter(rea => consumedIds.has(rea.id))
       .map(rea => rea.boundArtifact)
       .filter(({ name, type }) => name && type);
 
