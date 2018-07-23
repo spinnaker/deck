@@ -31,7 +31,7 @@ export class ManifestStatus extends React.Component<IManifestStatusProps> {
         <ManifestDetailsLink linkName="Details" manifest={manifest} application={application} accountId={account} />
       </div>,
       <div className="manifest-events pad-left" key="manifest-events">
-        <ManifestEvents manifest={manifest} accountId={account} />
+        <ManifestEvents manifest={manifest} />
       </div>,
     ];
   }

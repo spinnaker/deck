@@ -6,7 +6,6 @@ import { JobManifestPodLogs } from './JobManifestPodLogs';
 
 export interface IManifestEventsProps {
   manifest: IManifest;
-  accountId: string;
 }
 
 export class ManifestEvents extends React.Component<IManifestEventsProps> {
@@ -69,12 +68,7 @@ export class ManifestEvents extends React.Component<IManifestEventsProps> {
           )}
           <div>{e.message}</div>
           <div>
-            <JobManifestPodLogs
-              manifest={this.props.manifest}
-              manifestEvent={e}
-              accountId={this.props.accountId}
-              linkName="Console Output (Raw)"
-            />
+            <JobManifestPodLogs manifest={this.props.manifest} manifestEvent={e} linkName="Console Output (Raw)" />
           </div>
           {i !== events.length - 1 && <br />}
         </div>

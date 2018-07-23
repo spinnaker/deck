@@ -1,37 +1,39 @@
 import * as React from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import { IManifest, IManifestEvent, InstanceReader } from '@spinnaker/core';
-import { get, trim } from 'lodash';
+import { get, trim, bindAll } from 'lodash';
 
 // IJobManifestPodLogs is the data needed to get logs
-export interface IJobManifestPodLogs {
+export interface IJobManifestPodLogsProps {
   manifest: IManifest;
   manifestEvent: IManifestEvent;
   linkName: string;
-  accountId: string;
+}
+
+export interface IJobManifestPodLogsState {
   showModal?: boolean;
   output?: string;
 }
 
 // JobManifestPodLogs exposes pod logs for Job type manifests in the deploy manifest stage
-export class JobManifestPodLogs extends React.Component<IJobManifestPodLogs, IJobManifestPodLogs> {
-  constructor(props: IJobManifestPodLogs) {
+export class JobManifestPodLogs extends React.Component<IJobManifestPodLogsProps, IJobManifestPodLogsState> {
+  constructor(props: IJobManifestPodLogsProps) {
     super(props);
     this.state = {
       output: '',
       showModal: false,
-      ...props,
     };
-    this.open = this.open.bind(this);
-    this.close = this.close.bind(this);
-    this.onClick = this.onClick.bind(this);
+    bindAll(this, ['open', 'close', 'onClick']);
   }
 
   private canShow(): boolean {
+    const { manifest, manifestEvent } = this.props;
     return (
-      !!this.props.manifest.manifest &&
-      !!this.props.manifestEvent.message.startsWith('Created pod') &&
-      this.props.manifest.manifest.kind.toLowerCase() === 'job'
+      !!manifest.manifest &&
+      !!manifest.manifest.status &&
+      !!manifestEvent &&
+      !!manifestEvent.message.startsWith('Created pod') &&
+      manifest.manifest.kind.toLowerCase() === 'job'
     );
   }
 
@@ -50,11 +52,11 @@ export class JobManifestPodLogs extends React.Component<IJobManifestPodLogs, IJo
   }
 
   public onClick() {
-    const { manifestEvent, accountId } = this.props;
+    const { manifestEvent, manifest } = this.props;
     // NOTE(benjaminws): This is not great, but can't get the pod name from the event data
     const podName = `pod ${trim(manifestEvent.message.split(':')[1])}`;
     const region = this.resourceRegion();
-    InstanceReader.getConsoleOutput(accountId, region, podName, 'kubernetes')
+    InstanceReader.getConsoleOutput(manifest.account, region, podName, 'kubernetes')
       .then((response: any) => {
         this.setState({ output: response.output });
         this.open();
@@ -66,12 +68,7 @@ export class JobManifestPodLogs extends React.Component<IJobManifestPodLogs, IJo
   }
 
   public render() {
-    const { manifestEvent, manifest } = this.props;
     const { showModal, output } = this.state;
-
-    if (manifest == null || manifest.status == null || manifestEvent == null) {
-      return null;
-    }
 
     if (this.canShow()) {
       return (
