@@ -36,7 +36,7 @@ describe('ArtifactReferenceService', () => {
 
     it('doesnt delete reference from stage if reference doesnt match', () => {
       registerTestStage(['foo']);
-      const stages = [stage({ type: 'testStage', foo: 'ref1' }), stage({ key: 'testStage', foo: 'ref2' })];
+      const stages = [stage({ type: 'testStage', foo: 'ref1' }), stage({ type: 'testStage', foo: 'ref2' })];
       ArtifactReferenceService.removeReferenceFromStages('ref1', stages);
       expect(stages[0].foo).toBe(undefined);
       expect(stages[1].foo).toBe('ref2');
@@ -68,7 +68,7 @@ describe('ArtifactReferenceService', () => {
       expect(stages[0].foo[2]).toBe('ref3');
     });
 
-    it('calls a custom artifact remover if defiend', () => {
+    it('calls a custom artifact remover if defined', () => {
       const remover = jasmine.createSpy('remover').and.stub();
       Registry.pipeline.registerStage({
         key: 'testStage',
