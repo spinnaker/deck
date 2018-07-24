@@ -197,9 +197,7 @@ export class ClusterService {
     return {
       extractArtifacts: (cluster: ICluster) => (this.isDeployingArtifact(cluster) ? [cluster.imageArtifactId] : []),
       removeArtifact: (cluster: ICluster, artifactId: string) => {
-        if (cluster.cloudProvider === 'gce') {
-          ArtifactReferenceService.removeArtifactFromField('imageArtifactId', cluster, artifactId);
-        }
+        ArtifactReferenceService.removeArtifactFromField('imageArtifactId', cluster, artifactId);
       },
     };
   }

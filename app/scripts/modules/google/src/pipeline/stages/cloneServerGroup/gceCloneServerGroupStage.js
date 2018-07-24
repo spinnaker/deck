@@ -3,7 +3,7 @@
 const angular = require('angular');
 import _ from 'lodash';
 
-import { AccountService, ArtifactReferenceService, NameUtils, Registry, StageConstants } from '@spinnaker/core';
+import { AccountService, NameUtils, Registry, StageConstants } from '@spinnaker/core';
 
 module.exports = angular
   .module('spinnaker.gce.pipeline.stage..cloneServerGroupStage', [])
