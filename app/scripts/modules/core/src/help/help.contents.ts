@@ -257,6 +257,12 @@ const helpContents: { [key: string]: string } = {
       If Travis reports the build status as UNSTABLE,
       Spinnaker will mark the stage as TERMINAL; subsequent execution will be determined based on the configuration of the
       <b>If build fails</b> option for this stage.`,
+  'pipeline.config.wercker.markUnstableAsSuccessful.true':
+    'If Wercker reports the build status as UNSTABLE, Spinnaker will mark the stage as SUCCEEDED and continue execution of the pipeline.',
+  'pipeline.config.wercker.markUnstableAsSuccessful.false': `
+      If Wercker reports the build status as UNSTABLE,
+      Spinnaker will mark the stage as FAILED; subsequent execution will be determined based on the configuration of the
+      <b>If build fails</b> option for this stage.`,
   'pipeline.config.cron.expression':
     '<strong>Format (Year is optional)</strong><p><samp>Seconds  Minutes  Hour  DayOfMonth  Month  DayOfWeek  (Year)</samp></p>' +
     '<p><strong>Example: every 30 minutes</strong></p><samp>0 0/30 * * * ?</samp>' +
@@ -373,6 +379,8 @@ const helpContents: { [key: string]: string } = {
     'if unchecked, marks the stage as successful right away without waiting for the jenkins job to complete',
   'travis.waitForCompletion':
     'if unchecked, marks the stage as successful right away without waiting for the Travis job to complete',
+  'wercker.waitForCompletion':
+    'if unchecked, marks the stage as successful right away without waiting for the Wercker job to complete',
   'script.waitForCompletion':
     'if unchecked, marks the stage as successful right away without waiting for the script to complete',
   'markdown.examples':
@@ -402,6 +410,17 @@ const helpContents: { [key: string]: string } = {
   'pipeline.config.parameter.description': `(Optional): if supplied, will be displayed to users as a tooltip
       when triggering the pipeline manually. You can include HTML in this field.`,
   'pipeline.config.failOnFailedExpressions': `When this option is enabled, the stage will be marked as failed if it contains any failed expressions`,
+  'pipeline.config.roles.help': `
+    <p> When the pipeline is triggered using an automated trigger, these roles will be used to decide if the pipeline has permissions to access a protected application or account.</p>
+    <ul>
+    <li>
+    To read from a protected application or account, the pipeline must have at least one role that has read access to the application or account.
+    </li>
+    <li>
+    To write to a protected application or account, the pipeline must have at least one role that has write access to the application or account.
+    </li>
+    </ul>
+    <p><strong>Note:</strong> To prevent privilege escalation vulnerabilities, a user must be a member of <strong>all</strong> of the groups specified here in order to view, modify, and execute the pipeline.</p>`,
 };
 
 Object.keys(helpContents).forEach(key => HelpContentsRegistry.register(key, helpContents[key]));

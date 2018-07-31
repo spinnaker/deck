@@ -23,6 +23,7 @@ var canaryAccount = process.env.CANARY_ACCOUNT || '';
 var canaryFeatureDisabled = process.env.CANARY_FEATURE_ENABLED !== 'true';
 var useClassicFirewallLabels = process.env.USE_CLASSIC_FIREWALL_LABELS === 'true';
 var artifactsEnabled = process.env.ARTIFACTS_ENABLED === 'true';
+var managedServiceAccountsEnabled = process.env.MANAGED_SERVICE_ACCOUNTS_ENABLED === 'true';
 
 window.spinnakerSettings = {
   checkForUpdates: true,
@@ -155,7 +156,7 @@ window.spinnakerSettings = {
   authTtl: 600000,
   gitSources: ['stash', 'github', 'bitbucket', 'gitlab'],
   pubsubProviders: ['google'], // TODO(joonlim): Add amazon once it is confirmed that amazon pub/sub works.
-  triggerTypes: ['git', 'pipeline', 'docker', 'cron', 'jenkins', 'travis', 'pubsub'],
+  triggerTypes: ['git', 'pipeline', 'docker', 'cron', 'jenkins', 'wercker', 'travis', 'pubsub'],
   searchVersion: 1,
   useClassicFirewallLabels: useClassicFirewallLabels,
   canary: {
@@ -193,5 +194,6 @@ window.spinnakerSettings = {
     travis: false,
     versionedProviders: true,
     vpcMigrator: true,
+    managedServiceAccounts: managedServiceAccountsEnabled,
   },
 };

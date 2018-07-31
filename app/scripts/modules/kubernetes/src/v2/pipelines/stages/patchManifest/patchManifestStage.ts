@@ -4,6 +4,7 @@ import {
   ArtifactReferenceService,
   ExecutionArtifactTab,
   ExecutionDetailsTasks,
+  ExpectedArtifactService,
   ICustomValidator,
   IPipeline,
   IStage,
@@ -32,7 +33,6 @@ module(KUBERNETES_PATCH_MANIFEST_STAGE, [KUBERNETES_PATCH_MANIFEST_OPTIONS_FORM,
         templateUrl: require('./patchManifestConfig.html'),
         controller: 'KubernetesV2PatchManifestConfigCtrl',
         controllerAs: 'ctrl',
-        artifactFields: ['manifestArtifactId', 'requiredArtifactIds'],
         executionDetailsSections: [PatchStatus, ExecutionDetailsTasks, ExecutionArtifactTab],
         producesArtifacts: true,
         defaultTimeoutMs: 30 * 60 * 1000, // 30 minutes
@@ -54,9 +54,12 @@ module(KUBERNETES_PATCH_MANIFEST_STAGE, [KUBERNETES_PATCH_MANIFEST_OPTIONS_FORM,
             },
           } as ICustomValidator,
         ],
+        artifactExtractor: ExpectedArtifactService.accumulateArtifacts(['manifestArtifactId', 'requiredArtifactIds']),
+        artifactRemover: ArtifactReferenceService.removeArtifactFromFields([
+          'manifestArtifactId',
+          'requiredArtifactIds',
+        ]),
       });
-
-      ArtifactReferenceService.registerReference('stage', () => [['manifestArtifactId'], ['requiredArtifactIds']]);
     }
   })
   .controller('KubernetesV2PatchManifestConfigCtrl', KubernetesV2PatchManifestConfigCtrl);
