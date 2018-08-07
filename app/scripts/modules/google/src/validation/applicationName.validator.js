@@ -8,11 +8,11 @@ module.exports = angular
   .module('spinnaker.gce.validation.applicationName', [])
   .factory('gceApplicationNameValidator', function() {
     function validateSpecialCharacters(name, errors) {
-      let pattern = /^([a-zA-Z][a-zA-Z0-9]*)?$/;
-      if (!pattern.test(name)) {
+      const alphanumWithDashPattern = /^([a-zA-Z][a-zA-Z0-9-]*)?$/;
+      if (!alphanumWithDashPattern.test(name)) {
         errors.push(
-          'The application name must begin with a letter and must contain only letters or digits. No ' +
-            'special characters are allowed.',
+          'The application name must begin with a letter and must contain only letters, digits' +
+            'or dashes. No other special characters are allowed.',
         );
       }
     }

@@ -8,17 +8,12 @@ module.exports = angular
   .module('spinnaker.kubernetes.validation.applicationName', [])
   .factory('kubernetesApplicationNameValidator', function() {
     function validateSpecialCharacters(name, warnings, errors) {
-      const alphanumPattern = /^([a-zA-Z][a-zA-Z0-9]*)?$/;
-      if (!alphanumPattern.test(name)) {
-        const alphanumWithDashPattern = /^([a-zA-Z][a-zA-Z0-9-]*)?$/;
-        if (alphanumWithDashPattern.test(name)) {
-          warnings.push('Dashes should only be used in application names when using the Kubernetes v2 provider.');
-        } else {
-          errors.push(
-            'The application name must begin with a letter and must contain only letters or digits. ' +
-              'No special characters are allowed.',
-          );
-        }
+      const alphanumWithDashPattern = /^([a-zA-Z][a-zA-Z0-9-]*)?$/;
+      if (!alphanumWithDashPattern.test(name)) {
+        errors.push(
+          'The application name must begin with a letter and must contain only letters, digits' +
+            'or dashes. No other special characters are allowed.',
+        );
       }
     }
 
