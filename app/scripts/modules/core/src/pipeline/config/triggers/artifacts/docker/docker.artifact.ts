@@ -1,13 +1,13 @@
 import { module } from 'angular';
 
-import { PIPELINE_CONFIG_PROVIDER } from 'core/pipeline/config/pipelineConfigProvider';
 import { IArtifact } from 'core/domain/IArtifact';
-import { PipelineConfigProvider } from 'core/pipeline';
+import { Registry } from 'core/registry';
 
 export const DOCKER_ARTIFACT = 'spinnaker.core.pipeline.trigger.artifact.docker';
-module(DOCKER_ARTIFACT, [PIPELINE_CONFIG_PROVIDER]).config((pipelineConfigProvider: PipelineConfigProvider) => {
-  pipelineConfigProvider.registerArtifactKind({
+module(DOCKER_ARTIFACT, []).config(() => {
+  Registry.pipeline.registerArtifactKind({
     label: 'Docker',
+    type: 'docker/image',
     isDefault: false,
     isMatch: true,
     description: 'A Docker image to be deployed.',

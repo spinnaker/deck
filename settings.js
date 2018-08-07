@@ -1,6 +1,5 @@
 'use strict';
 
-var feedbackUrl = process.env.FEEDBACK_URL;
 var gateHost = process.env.API_HOST || 'http://localhost:8084';
 var bakeryDetailUrl =
   process.env.BAKERY_DETAIL_URL || gateHost + '/bakery/logs/{{context.region}}/{{context.status.resourceId}}';
@@ -9,6 +8,7 @@ var authEnabled = process.env.AUTH_ENABLED === 'false' ? false : true;
 var netflixMode = process.env.NETFLIX_MODE === 'true' ? true : false;
 var chaosEnabled = netflixMode || process.env.CHAOS_ENABLED === 'true' ? true : false;
 var fiatEnabled = process.env.FIAT_ENABLED === 'true' ? true : false;
+var iapRefresherEnabled = process.env.IAP_REFRESHER_ENABLED === 'true' ? true : false;
 var entityTagsEnabled = process.env.ENTITY_TAGS_ENABLED === 'true' ? true : false;
 var debugEnabled = process.env.DEBUG_ENABLED === 'false' ? false : true;
 var canaryEnabled = process.env.CANARY_ENABLED === 'true';
@@ -22,16 +22,18 @@ var atlasWebComponentsUrl = process.env.ATLAS_WEB_COMPONENTS_URL;
 var canaryAccount = process.env.CANARY_ACCOUNT || '';
 var canaryFeatureDisabled = process.env.CANARY_FEATURE_ENABLED !== 'true';
 var useClassicFirewallLabels = process.env.USE_CLASSIC_FIREWALL_LABELS === 'true';
+var artifactsEnabled = process.env.ARTIFACTS_ENABLED === 'true';
+var managedServiceAccountsEnabled = process.env.MANAGED_SERVICE_ACCOUNTS_ENABLED === 'true';
 
 window.spinnakerSettings = {
   checkForUpdates: true,
   debugEnabled: debugEnabled,
-  defaultProviders: ['aws', 'gce', 'azure', 'cf', 'kubernetes', 'dcos', 'openstack', 'oraclebmcs', 'ecs'],
-  feedbackUrl: feedbackUrl,
+  defaultProviders: ['aws', 'gce', 'azure', 'cf', 'kubernetes', 'dcos', 'openstack', 'oracle', 'ecs'],
   gateUrl: gateHost,
   bakeryDetailUrl: bakeryDetailUrl,
   authEndpoint: authEndpoint,
   pollSchedule: 30000,
+  maxPipelineAgeDays: 14,
   defaultTimeZone: process.env.TIMEZONE || 'America/Los_Angeles', // see http://momentjs.com/timezone/docs/#/data-utilities/
   defaultCategory: 'serverGroup',
   defaultInstancePort: 80,
@@ -92,7 +94,7 @@ window.spinnakerSettings = {
         iamProfile: '{{application}}InstanceProfile',
       },
     },
-    oraclebmcs: {
+    oracle: {
       defaults: {
         account: 'DEFAULT',
         region: 'us-phoenix-1',
@@ -154,7 +156,7 @@ window.spinnakerSettings = {
   authTtl: 600000,
   gitSources: ['stash', 'github', 'bitbucket', 'gitlab'],
   pubsubProviders: ['google'], // TODO(joonlim): Add amazon once it is confirmed that amazon pub/sub works.
-  triggerTypes: ['git', 'pipeline', 'docker', 'cron', 'jenkins', 'travis', 'pubsub'],
+  triggerTypes: ['git', 'pipeline', 'docker', 'cron', 'jenkins', 'wercker', 'travis', 'pubsub'],
   searchVersion: 1,
   useClassicFirewallLabels: useClassicFirewallLabels,
   canary: {
@@ -170,7 +172,7 @@ window.spinnakerSettings = {
     featureDisabled: canaryFeatureDisabled,
   },
   feature: {
-    artifacts: false,
+    artifacts: artifactsEnabled,
     canary: canaryEnabled,
     chaosMonkey: chaosEnabled,
     clusterDiff: false,
@@ -178,6 +180,7 @@ window.spinnakerSettings = {
     entityTags: entityTagsEnabled,
     fastProperty: true,
     fiatEnabled: fiatEnabled,
+    iapRefresherEnabled: iapRefresherEnabled,
     // whether stages affecting infrastructure (like "Create Load Balancer") should be enabled or not
     infrastructureStages: infrastructureEnabled,
     jobs: false,
@@ -191,5 +194,6 @@ window.spinnakerSettings = {
     travis: false,
     versionedProviders: true,
     vpcMigrator: true,
+    managedServiceAccounts: managedServiceAccountsEnabled,
   },
 };

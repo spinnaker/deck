@@ -1,28 +1,29 @@
 'use strict';
 
 const angular = require('angular');
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 
 import { AccountService } from 'core/account/AccountService';
 import { API } from 'core/api';
 import { BASE_EXECUTION_DETAILS_CTRL } from './core/baseExecutionDetails.controller';
 import { CONFIRMATION_MODAL_SERVICE } from 'core/confirmationModal/confirmationModal.service';
 import { EDIT_STAGE_JSON_CONTROLLER } from './core/editStageJson.controller';
-import { PIPELINE_CONFIG_PROVIDER } from 'core/pipeline/config/pipelineConfigProvider';
-import { PIPELINE_BAKE_STAGE_CHOOSE_OS } from 'core/pipeline/config/stages/bake/bakeStageChooseOs.component';
+import { STAGE_NAME } from './StageName';
 import { PipelineConfigService } from 'core/pipeline/config/services/PipelineConfigService';
+import { Registry } from 'core/registry';
 
 module.exports = angular
   .module('spinnaker.core.pipeline.config.stage', [
     BASE_EXECUTION_DETAILS_CTRL,
     EDIT_STAGE_JSON_CONTROLLER,
-    PIPELINE_CONFIG_PROVIDER,
+    STAGE_NAME,
     require('./overrideTimeout/overrideTimeout.directive.js').name,
     require('./overrideFailure/overrideFailure.component.js').name,
     require('./optionalStage/optionalStage.directive.js').name,
+    require('./failOnFailedExpressions/failOnFailedExpressions.directive.js').name,
     CONFIRMATION_MODAL_SERVICE,
-    PIPELINE_BAKE_STAGE_CHOOSE_OS,
     require('./core/stageConfigField/stageConfigField.directive.js').name,
-    require('./bake/bakeStage.module').name,
   ])
   .directive('pipelineConfigStage', function() {
     return {
@@ -32,6 +33,7 @@ module.exports = angular
         viewState: '=',
         application: '=',
         pipeline: '=',
+        stageFieldUpdated: '<',
       },
       controller: 'StageConfigCtrl as stageConfigCtrl',
       templateUrl: require('./stage.html'),
@@ -40,16 +42,8 @@ module.exports = angular
       },
     };
   })
-  .controller('StageConfigCtrl', function(
-    $scope,
-    $element,
-    $compile,
-    $controller,
-    $templateCache,
-    $uibModal,
-    pipelineConfig,
-  ) {
-    var lastStageScope;
+  .controller('StageConfigCtrl', function($scope, $element, $compile, $controller, $templateCache, $uibModal) {
+    var lastStageScope, reactComponentMounted;
 
     $scope.options = {
       stageTypes: [],
@@ -57,7 +51,7 @@ module.exports = angular
     };
 
     AccountService.applicationAccounts($scope.application).then(accounts => {
-      $scope.options.stageTypes = pipelineConfig.getConfigurableStageTypes(accounts);
+      $scope.options.stageTypes = Registry.pipeline.getConfigurableStageTypes(accounts);
       $scope.showProviders = new Set(accounts.map(a => a.cloudProvider)).size > 1;
     });
 
@@ -68,7 +62,7 @@ module.exports = angular
     }
 
     function getConfig(stage) {
-      return pipelineConfig.getStageConfig(stage);
+      return Registry.pipeline.getStageConfig(stage);
     }
 
     $scope.groupDependencyOptions = function(stage) {
@@ -85,7 +79,7 @@ module.exports = angular
         return false;
       }
 
-      const stageConfig = pipelineConfig.getStageConfig($scope.stage);
+      const stageConfig = Registry.pipeline.getStageConfig($scope.stage);
 
       if (!stageConfig) {
         return false;
@@ -139,6 +133,7 @@ module.exports = angular
     };
 
     this.selectStage = function(newVal, oldVal) {
+      const stageDetailsNode = $element.find('.stage-details').get(0);
       if ($scope.viewState.stageIndex >= $scope.pipeline.stages.length) {
         $scope.viewState.stageIndex = $scope.pipeline.stages.length - 1;
       }
@@ -159,7 +154,13 @@ module.exports = angular
         stageScope = $scope.$new();
 
       // clear existing contents
-      $element.find('.stage-details').html('');
+      if (reactComponentMounted) {
+        ReactDOM.unmountComponentAtNode(stageDetailsNode);
+        reactComponentMounted = false;
+      } else {
+        $element.find('.stage-details').html('');
+      }
+
       $scope.description = '';
       if (lastStageScope) {
         lastStageScope.$destroy();
@@ -170,7 +171,7 @@ module.exports = angular
         stageScope.$destroy();
       });
 
-      if (type) {
+      if (type && stageDetailsNode) {
         let config = getConfig($scope.stage);
         if (config) {
           $scope.canConfigureNotifications = !$scope.pipeline.strategy && !config.disableNotifications;
@@ -184,9 +185,16 @@ module.exports = angular
           updateStageName(config, oldVal);
           applyConfigController(config, stageScope);
 
-          let template = $templateCache.get(config.templateUrl);
-          let templateBody = $compile(template)(stageScope);
-          $element.find('.stage-details').html(templateBody);
+          if (config.component) {
+            const StageConfig = config.component;
+            const props = { stageFieldUpdated: $scope.stageFieldUpdated, stage: $scope.stage };
+            ReactDOM.render(React.createElement(StageConfig, props), stageDetailsNode);
+          } else {
+            const template = $templateCache.get(config.templateUrl);
+            const templateBody = $compile(template)(stageScope);
+            $element.find('.stage-details').html(templateBody);
+          }
+          reactComponentMounted = !!config.component;
         }
       } else {
         $scope.label = null;
@@ -227,7 +235,7 @@ module.exports = angular
     $scope.$watch('viewState.stageIndex', this.selectStage);
     $scope.$watch('stage.refId', this.selectStage);
   })
-  .controller('RestartStageCtrl', function($scope, $stateParams, $http, confirmationModalService) {
+  .controller('RestartStageCtrl', function($scope, $stateParams, confirmationModalService) {
     var restartStage = function() {
       return API.one('pipelines')
         .one($stateParams.executionId)

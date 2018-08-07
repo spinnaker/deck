@@ -1,21 +1,19 @@
 import { IController, IPromise, IQService, IScope, module } from 'angular';
 import { StateService } from '@uirouter/angularjs';
-import { head, sortBy, uniq } from 'lodash';
+import { head, sortBy } from 'lodash';
 
 import {
   Application,
-  APPLICATION_READ_SERVICE,
   CONFIRMATION_MODAL_SERVICE,
   IApplicationSecurityGroup,
   ILoadBalancer,
   ISecurityGroup,
   ISubnet,
   LOAD_BALANCER_READ_SERVICE,
-  LOAD_BALANCER_WRITE_SERVICE,
   LoadBalancerReader,
+  SETTINGS,
   SECURITY_GROUP_READER,
   SecurityGroupReader,
-  SUBNET_READ_SERVICE,
   SubnetReader,
   FirewallLabels,
 } from '@spinnaker/core';
@@ -26,6 +24,7 @@ import {
   IAmazonLoadBalancerSourceData,
   IApplicationLoadBalancerSourceData,
   IClassicLoadBalancerSourceData,
+  IListenerAction,
   ITargetGroup,
 } from 'amazon';
 
@@ -37,16 +36,21 @@ export interface ILoadBalancerFromStateParams {
   name: string;
 }
 
+export interface IActionDetails extends IListenerAction {
+  targetGroup: ITargetGroup;
+}
+
 export class AwsLoadBalancerDetailsController implements IController {
   public application: Application;
   public elbProtocol: string;
-  public listeners: Array<{ in: string; targets: ITargetGroup[] }>;
+  public listeners: Array<{ in: string; actions: IActionDetails[] }>;
   public loadBalancerFromParams: ILoadBalancerFromStateParams;
   public loadBalancer: IAmazonLoadBalancer;
   public securityGroups: ISecurityGroup[];
   public ipAddressTypeDescription: string;
   public state = { loading: true };
   public firewallsLabel = FirewallLabels.get('Firewalls');
+  public oidcConfigPath = SETTINGS.oidcConfigPath;
 
   constructor(
     private $scope: IScope,
@@ -56,7 +60,6 @@ export class AwsLoadBalancerDetailsController implements IController {
     private app: Application,
     private securityGroupReader: SecurityGroupReader,
     private loadBalancerReader: LoadBalancerReader,
-    private subnetReader: SubnetReader,
   ) {
     'ngInject';
     this.application = app;
@@ -119,21 +122,37 @@ export class AwsLoadBalancerDetailsController implements IController {
                 }
 
                 this.listeners = [];
-                elb.listeners.forEach(listener => {
-                  const inPort = `${listener.protocol}:${listener.port}`;
-                  const targets = uniq(
-                    listener.rules.map(rule => {
-                      const name = rule.actions[0].targetGroupName;
-                      // TODO: Support target groups outside of this application...
-                      return (
-                        (this.loadBalancer as IAmazonApplicationLoadBalancer).targetGroups.find(
-                          tg => tg.name === name,
-                        ) || ({ name } as ITargetGroup)
-                      );
-                    }),
-                  );
 
-                  this.listeners.push({ in: inPort, targets });
+                // Sort the actions by the order specified since amazon does not return them in order of order
+                elb.listeners.forEach(l => {
+                  l.defaultActions.sort((a, b) => a.order - b.order);
+                  l.rules.forEach(r => r.actions.sort((a, b) => a.order - b.order));
+                });
+
+                elb.listeners.forEach(listener => {
+                  listener.rules.map(rule => {
+                    let inMatch = [
+                      listener.protocol,
+                      (rule.conditions.find(c => c.field === 'host-header') || { values: [''] }).values[0],
+                      listener.port,
+                    ]
+                      .filter(f => f)
+                      .join(':');
+                    const path = (rule.conditions.find(c => c.field === 'path-pattern') || { values: [] }).values[0];
+                    if (path) {
+                      inMatch = `${inMatch}${path}`;
+                    }
+                    const actions = rule.actions.map(a => {
+                      const action = { ...a } as IActionDetails;
+                      if (action.type === 'forward') {
+                        action.targetGroup = (this.loadBalancer as IAmazonApplicationLoadBalancer).targetGroups.find(
+                          tg => tg.name === action.targetGroupName,
+                        );
+                      }
+                      return action;
+                    });
+                    this.listeners.push({ in: inMatch, actions });
+                  });
                 });
               }
 
@@ -170,11 +189,11 @@ export class AwsLoadBalancerDetailsController implements IController {
             if (this.loadBalancer.subnets) {
               this.loadBalancer.subnetDetails = this.loadBalancer.subnets.reduce(
                 (subnetDetails: ISubnet[], subnetId: string) => {
-                  this.subnetReader
-                    .getSubnetByIdAndProvider(subnetId, this.loadBalancer.provider)
-                    .then((subnetDetail: ISubnet) => {
+                  SubnetReader.getSubnetByIdAndProvider(subnetId, this.loadBalancer.provider).then(
+                    (subnetDetail: ISubnet) => {
                       subnetDetails.push(subnetDetail);
-                    });
+                    },
+                  );
 
                   return subnetDetails;
                 },
@@ -203,11 +222,8 @@ export class AwsLoadBalancerDetailsController implements IController {
 export const AWS_LOAD_BALANCER_DETAILS_CTRL = 'spinnaker.amazon.loadBalancer.details.controller';
 module(AWS_LOAD_BALANCER_DETAILS_CTRL, [
   require('@uirouter/angularjs').default,
-  APPLICATION_READ_SERVICE,
   SECURITY_GROUP_READER,
   LOAD_BALANCER_ACTIONS,
-  LOAD_BALANCER_WRITE_SERVICE,
   LOAD_BALANCER_READ_SERVICE,
   CONFIRMATION_MODAL_SERVICE,
-  SUBNET_READ_SERVICE,
 ]).controller('awsLoadBalancerDetailsCtrl', AwsLoadBalancerDetailsController);

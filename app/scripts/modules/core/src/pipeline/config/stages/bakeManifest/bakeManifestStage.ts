@@ -1,33 +1,46 @@
 import { module } from 'angular';
+import { get } from 'lodash';
 
 import {
-  ArtifactReferenceServiceProvider,
-  PIPELINE_CONFIG_PROVIDER,
-  PipelineConfigProvider,
-  SETTINGS
+  ArtifactReferenceService,
+  ExecutionArtifactTab,
+  ExecutionDetailsTasks,
+  ExpectedArtifactService,
+  IArtifact,
+  IStage,
+  Registry,
+  SETTINGS,
 } from 'core';
 
 import { BakeManifestConfigCtrl } from './bakeManifestConfig.controller';
 
 export const BAKE_MANIFEST_STAGE = 'spinnaker.core.pipeline.stage.bakeManifestStage';
 
-module(BAKE_MANIFEST_STAGE, [
-  PIPELINE_CONFIG_PROVIDER,
-]).config((pipelineConfigProvider: PipelineConfigProvider, artifactReferenceServiceProvider: ArtifactReferenceServiceProvider) => {
-  if (SETTINGS.feature.versionedProviders) {
-    pipelineConfigProvider.registerStage({
-      label: 'Bake (Manifest)',
-      description: 'Bake a manifest (or multi-doc manifest set) using a template renderer such as Helm.',
-      key: 'bakeManifest',
-      templateUrl: require('./bakeManifestConfig.html'),
-      controller: 'BakeManifestConfigCtrl',
-      producesArtifacts: true,
-      cloudProvider: 'kubernetes',
-      controllerAs: 'ctrl',
-    });
+module(BAKE_MANIFEST_STAGE, [])
+  .config(() => {
+    if (SETTINGS.feature.versionedProviders) {
+      Registry.pipeline.registerStage({
+        label: 'Bake (Manifest)',
+        description: 'Bake a manifest (or multi-doc manifest set) using a template renderer such as Helm.',
+        key: 'bakeManifest',
+        templateUrl: require('./bakeManifestConfig.html'),
+        controller: 'BakeManifestConfigCtrl',
+        producesArtifacts: true,
+        cloudProvider: 'kubernetes',
+        controllerAs: 'ctrl',
+        executionDetailsSections: [ExecutionDetailsTasks, ExecutionArtifactTab],
+        artifactExtractor: (fields: string[]) =>
+          ExpectedArtifactService.accumulateArtifacts<IArtifact>(['inputArtifacts'])(fields).map(
+            (a: IArtifact) => a.id,
+          ),
+        artifactRemover: (stage: IStage, artifactId: string) => {
+          ArtifactReferenceService.removeArtifactFromFields(['expectedArtifactId'])(stage, artifactId);
 
-    artifactReferenceServiceProvider.registerReference('stage', () => [
-      ['expectedArtifactId'],
-    ]);
-  }
-}).controller('BakeManifestConfigCtrl', BakeManifestConfigCtrl);
+          const artifactMatches = (artifact: IArtifact) => artifact.id === artifactId;
+          stage.expectedArtifacts = get(stage, 'expectedArtifacts', []).filter(a => !artifactMatches(a));
+          stage.inputArtifacts = get(stage, 'inputArtifacts', []).filter(a => !artifactMatches(a));
+        },
+      });
+    }
+  })
+  .controller('BakeManifestConfigCtrl', BakeManifestConfigCtrl);

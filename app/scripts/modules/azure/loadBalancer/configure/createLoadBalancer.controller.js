@@ -6,31 +6,22 @@ import _ from 'lodash';
 import {
   AccountService,
   InfrastructureCaches,
-  LOAD_BALANCER_WRITE_SERVICE,
+  LoadBalancerWriter,
   NameUtils,
-  NETWORK_READ_SERVICE,
-  TASK_MONITOR_BUILDER,
-  V2_MODAL_WIZARD_SERVICE,
+  NetworkReader,
+  TaskMonitor,
 } from '@spinnaker/core';
 
 module.exports = angular
   .module('spinnaker.azure.loadBalancer.create.controller', [
     require('@uirouter/angularjs').default,
-    LOAD_BALANCER_WRITE_SERVICE,
     require('../loadBalancer.transformer.js').name,
-    V2_MODAL_WIZARD_SERVICE,
-    TASK_MONITOR_BUILDER,
-    NETWORK_READ_SERVICE,
   ])
   .controller('azureCreateLoadBalancerCtrl', function(
     $scope,
     $uibModalInstance,
     $state,
     azureLoadBalancerTransformer,
-    networkReader,
-    v2modalWizardService,
-    loadBalancerWriter,
-    taskMonitorBuilder,
     application,
     loadBalancer,
     isNew,
@@ -75,7 +66,7 @@ module.exports = angular
       application.loadBalancers.onNextRefresh($scope, onApplicationRefresh);
     }
 
-    $scope.taskMonitor = taskMonitorBuilder.buildTaskMonitor({
+    $scope.taskMonitor = new TaskMonitor({
       application: application,
       title: (isNew ? 'Creating ' : 'Updating ') + 'your load balancer',
       modalInstance: $uibModalInstance,
@@ -169,7 +160,7 @@ module.exports = angular
       ctrl.selectedVnets = [];
       InfrastructureCaches.clearCache('networks');
 
-      networkReader.listNetworks().then(function(vnets) {
+      NetworkReader.listNetworks().then(function(vnets) {
         if (vnets.azure) {
           vnets.azure.forEach(vnet => {
             if (vnet.account === account && vnet.region === region) {
@@ -259,7 +250,7 @@ module.exports = angular
           $scope.loadBalancer.probes[0].probePath = undefined;
         }
 
-        return loadBalancerWriter.upsertLoadBalancer($scope.loadBalancer, application, descriptor, params);
+        return LoadBalancerWriter.upsertLoadBalancer($scope.loadBalancer, application, descriptor, params);
       });
     };
 

@@ -1,19 +1,24 @@
 import { IPromise, IQService, module } from 'angular';
-import { forOwn, get, groupBy, has, head, keys, values } from 'lodash';
+import { flatten, forOwn, get, groupBy, has, head, keys, values } from 'lodash';
 
 import { API } from 'core/api/ApiService';
 import { Application } from 'core/application/application.model';
 import { NameUtils } from 'core/naming';
 import { FilterModelService } from 'core/filterModel';
-import { ICluster, IClusterSummary, IExecution, IExecutionStage, IServerGroup } from 'core/domain';
+import { IArtifactExtractor, ICluster, IClusterSummary, IExecution, IExecutionStage, IServerGroup } from 'core/domain';
 import { ClusterState } from 'core/state';
-
+import { ProviderServiceDelegate } from 'core/cloudProvider/providerService.delegate';
 import { taskMatcher } from './task.matcher';
+import { ArtifactReferenceService } from 'core';
 
 export class ClusterService {
   public static ON_DEMAND_THRESHOLD = 350;
 
-  constructor(private $q: IQService, private serverGroupTransformer: any) {
+  constructor(
+    private $q: IQService,
+    private serverGroupTransformer: any,
+    private providerServiceDelegate: ProviderServiceDelegate,
+  ) {
     'ngInject';
   }
 
@@ -153,11 +158,10 @@ export class ClusterService {
           const stageServerGroup = stage ? this.extractServerGroupNameFromContext(stage.context) : '';
           const stageAccount = stage && stage.context ? stage.context.account || stage.context.credentials : '';
           const stageRegion = stage ? this.extractRegionFromContext(stage.context) : '';
-
           if (
             stageServerGroup.includes(serverGroup.name) &&
             stageAccount === serverGroup.account &&
-            stageRegion === serverGroup.region
+            (stageRegion === serverGroup.region || stageRegion === serverGroup.namespace)
           ) {
             serverGroup.runningExecutions.push(execution);
           }
@@ -189,6 +193,29 @@ export class ClusterService {
     return cluster.imageSource === 'artifact';
   }
 
+  public defaultArtifactExtractor(): IArtifactExtractor {
+    return {
+      extractArtifacts: (cluster: ICluster) => (this.isDeployingArtifact(cluster) ? [cluster.imageArtifactId] : []),
+      removeArtifact: (cluster: ICluster, artifactId: string) => {
+        ArtifactReferenceService.removeArtifactFromField('imageArtifactId', cluster, artifactId);
+      },
+    };
+  }
+
+  public getArtifactExtractor(cloudProvider: string): IArtifactExtractor {
+    return this.providerServiceDelegate.hasDelegate(cloudProvider, 'serverGroup.artifactExtractor')
+      ? this.providerServiceDelegate.getDelegate<IArtifactExtractor>(cloudProvider, 'serverGroup.artifactExtractor')
+      : this.defaultArtifactExtractor();
+  }
+
+  public extractArtifacts(cluster: ICluster): string[] {
+    return this.getArtifactExtractor(cluster.cloudProvider).extractArtifacts(cluster);
+  }
+
+  public removeArtifact(cluster: ICluster, artifactId: string): void {
+    this.getArtifactExtractor(cluster.cloudProvider).removeArtifact(cluster, artifactId);
+  }
+
   private getClusters(application: string): IPromise<IClusterSummary[]> {
     return API.one('applications')
       .one(application)
@@ -206,13 +233,19 @@ export class ClusterService {
   }
 
   private extractServerGroupNameFromContext(context: any): string {
-    return head(values(context['deploy.server.groups'])) || context['targetop.asg.disableAsg.name'] || '';
+    return (
+      head(values(context['deploy.server.groups'])) ||
+      context['targetop.asg.disableAsg.name'] ||
+      flatten(values(context['outputs.manifestNamesByNamespace'])) ||
+      ''
+    );
   }
 
   public extractRegionFromContext(context: any): string {
     return (
       head(keys(context['deploy.server.groups'] as string)) ||
       head(context['targetop.asg.disableAsg.regions'] as string) ||
+      head(keys(context['outputs.manifestNamesByNamespace'])) ||
       ''
     );
   }
@@ -222,7 +255,8 @@ export class ClusterService {
       stage =>
         (['createServerGroup', 'deploy', 'destroyAsg', 'resizeAsg'].includes(stage.type) &&
           has(stage.context, 'deploy.server.groups')) ||
-        (stage.type === 'disableAsg' && has(stage.context, 'targetop.asg.disableAsg.name')),
+        (stage.type === 'disableAsg' && has(stage.context, 'targetop.asg.disableAsg.name')) ||
+        has(stage.context, 'outputs.manifestNamesByNamespace'),
     );
   }
 

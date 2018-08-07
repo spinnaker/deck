@@ -2,9 +2,7 @@
 
 const angular = require('angular');
 
-import { AccountService, CONFIRMATION_MODAL_SERVICE, TASK_EXECUTOR } from '@spinnaker/core';
-
-import { SCALING_POLICY_WRITE_SERVICE } from '@spinnaker/amazon';
+import { AccountService, CONFIRMATION_MODAL_SERVICE, TaskExecutor } from '@spinnaker/core';
 
 import './scalingPolicySummary.component.less';
 
@@ -12,8 +10,6 @@ module.exports = angular
   .module('spinnaker.titus.serverGroup.details.scalingPolicy.alarmBasedSummary.component', [
     require('./upsert/upsertScalingPolicy.controller').name,
     CONFIRMATION_MODAL_SERVICE,
-    SCALING_POLICY_WRITE_SERVICE,
-    TASK_EXECUTOR,
   ])
   .component('titusAlarmBasedSummary', {
     bindings: {
@@ -22,7 +18,7 @@ module.exports = angular
       application: '=',
     },
     templateUrl: require('./alarmBasedSummary.component.html'),
-    controller: function($uibModal, scalingPolicyWriter, confirmationModalService, taskExecutor) {
+    controller: function($uibModal, confirmationModalService) {
       this.$onInit = () => {
         AccountService.getAccountDetails(this.serverGroup.account).then(details => {
           // alarmServerGroup is used to trick the chart rendering into using AWS metrics
@@ -60,7 +56,7 @@ module.exports = angular
         };
 
         const submitMethod = () =>
-          taskExecutor.executeTask({
+          TaskExecutor.executeTask({
             application,
             description: 'Delete scaling policy ' + policy.id,
             job: [

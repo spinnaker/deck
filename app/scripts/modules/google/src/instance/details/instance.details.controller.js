@@ -6,13 +6,13 @@ import _ from 'lodash';
 import {
   CloudProviderRegistry,
   CONFIRMATION_MODAL_SERVICE,
-  INSTANCE_READ_SERVICE,
+  FirewallLabels,
+  InstanceReader,
   INSTANCE_WRITE_SERVICE,
-  RECENT_HISTORY_SERVICE,
+  RecentHistoryService,
 } from '@spinnaker/core';
 
 import { GCE_HTTP_LOAD_BALANCER_UTILS } from 'google/loadBalancer/httpLoadBalancerUtils.service';
-import { FirewallLabels } from 'root/app/scripts/modules/core/src';
 
 module.exports = angular
   .module('spinnaker.instance.detail.gce.controller', [
@@ -20,9 +20,7 @@ module.exports = angular
     require('angular-ui-bootstrap'),
     require('google/common/xpnNaming.gce.service.js').name,
     INSTANCE_WRITE_SERVICE,
-    INSTANCE_READ_SERVICE,
     CONFIRMATION_MODAL_SERVICE,
-    RECENT_HISTORY_SERVICE,
     GCE_HTTP_LOAD_BALANCER_UTILS,
   ])
   .controller('gceInstanceDetailsCtrl', function(
@@ -31,10 +29,10 @@ module.exports = angular
     $uibModal,
     instanceWriter,
     confirmationModalService,
-    recentHistoryService,
-    instanceReader,
     instance,
     app,
+    moniker,
+    environment,
     $q,
     gceHttpLoadBalancerUtils,
     gceXpnNamingService,
@@ -50,6 +48,8 @@ module.exports = angular
     };
 
     $scope.application = app;
+    $scope.moniker = moniker;
+    $scope.environment = environment;
 
     function extractHealthMetrics(instance, latest) {
       // do not backfill on standalone instances
@@ -138,8 +138,8 @@ module.exports = angular
       if (instanceSummary && account && region) {
         extraData.account = account;
         extraData.region = region;
-        recentHistoryService.addExtraDataToLatest('instances', extraData);
-        return instanceReader.getInstanceDetails(account, region, instance.instanceId).then(function(details) {
+        RecentHistoryService.addExtraDataToLatest('instances', extraData);
+        return InstanceReader.getInstanceDetails(account, region, instance.instanceId).then(function(details) {
           $scope.state.loading = false;
           extractHealthMetrics(instanceSummary, details);
           $scope.instance = _.defaults(details, instanceSummary);

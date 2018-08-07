@@ -15,17 +15,17 @@ import {
   IWizardPageProps,
   NameUtils,
   NgReact,
-  ReactInjector,
   RegionSelectField,
   Spinner,
-  ValidationError,
+  SubnetReader,
+  ValidationMessage,
   wizardPage,
 } from '@spinnaker/core';
 
 import { AWSProviderSettings } from 'amazon/aws.settings';
 import { AwsNgReact } from 'amazon/reactShims';
 import { IAmazonLoadBalancer, IAmazonLoadBalancerUpsertCommand } from 'amazon/domain';
-import { LoadBalancerAvailabilityZoneSelector } from './LoadBalancerAvailabilityZoneSelector';
+import { AvailabilityZoneSelector } from 'amazon/serverGroup/AvailabilityZoneSelector';
 
 export interface ISubnetOption {
   availabilityZones: string[];
@@ -163,7 +163,7 @@ class LoadBalancerLocationImpl extends React.Component<
   private getAvailableSubnets(): IPromise<ISubnet[]> {
     const account = this.props.values.credentials,
       region = this.props.values.region;
-    return ReactInjector.subnetReader.listSubnets().then(subnets => {
+    return SubnetReader.listSubnets().then(subnets => {
       return chain(subnets)
         .filter({ account, region })
         .reject({ target: 'ec2' })
@@ -343,7 +343,7 @@ class LoadBalancerLocationImpl extends React.Component<
                 <span>{values.name}</span>
                 <HelpField id="aws.loadBalancer.name" />
                 <Field type="text" style={{ display: 'none' }} className="form-control input-sm no-spel" name="name" />
-                {errors.name && <ValidationError message={errors.name} />}
+                {errors.name && <ValidationMessage type="error" message={errors.name} />}
               </div>
             </div>
             <div className="form-group">
@@ -395,17 +395,17 @@ class LoadBalancerLocationImpl extends React.Component<
               </div>
               {errors.stack && (
                 <div className="col-md-7 col-md-offset-3">
-                  <ValidationError message={errors.stack} />
+                  <ValidationMessage type="error" message={errors.stack} />
                 </div>
               )}
               {errors.detail && (
                 <div className="col-md-7 col-md-offset-3">
-                  <ValidationError message={errors.detail} />
+                  <ValidationMessage type="error" message={errors.detail} />
                 </div>
               )}
             </div>
 
-            <LoadBalancerAvailabilityZoneSelector
+            <AvailabilityZoneSelector
               credentials={values.credentials}
               region={values.region}
               onChange={this.handleAvailabilityZonesChanged}

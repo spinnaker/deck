@@ -7,7 +7,6 @@ export * from './artifact';
 export * from './authentication';
 
 export * from './cache';
-export * from './cancelModal';
 export * from './certificates';
 export * from './ci';
 export * from './cloudProvider';
@@ -63,6 +62,7 @@ export * from './pubsub';
 
 export * from './reactShims';
 export * from './region';
+export * from './registry';
 export * from './retry';
 
 export * from './scheduler';

@@ -3,19 +3,20 @@
 const angular = require('angular');
 
 import { UUIDGenerator } from 'core/utils/uuid.service';
-import { SERVICE_ACCOUNT_SERVICE } from 'core/serviceAccount/serviceAccount.service.ts';
+import { Registry } from 'core/registry';
+import { ServiceAccountReader } from 'core/serviceAccount/ServiceAccountReader';
 import { SETTINGS } from 'core/config/settings';
+
 import './cronTrigger.less';
 
 module.exports = angular
   .module('spinnaker.core.pipeline.trigger.cron', [
     require('angular-cron-gen'),
     require('../trigger.directive.js').name,
-    SERVICE_ACCOUNT_SERVICE,
     require('./cron.validator.directive.js').name,
   ])
-  .config(function(pipelineConfigProvider) {
-    pipelineConfigProvider.registerTrigger({
+  .config(function() {
+    Registry.pipeline.registerTrigger({
       label: 'CRON',
       description: 'Executes the pipeline on a CRON schedule',
       key: 'cron',
@@ -32,11 +33,11 @@ module.exports = angular
       ],
     });
   })
-  .controller('CronTriggerCtrl', function(trigger, serviceAccountService) {
+  .controller('CronTriggerCtrl', function(trigger) {
     this.trigger = trigger;
     this.fiatEnabled = SETTINGS.feature.fiatEnabled;
 
-    serviceAccountService.getServiceAccounts().then(accounts => {
+    ServiceAccountReader.getServiceAccounts().then(accounts => {
       this.serviceAccounts = accounts || [];
     });
 

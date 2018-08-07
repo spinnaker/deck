@@ -3,7 +3,7 @@ import * as React from 'react';
 import { CollapsibleSection, ModalInjector, Tooltip } from '@spinnaker/core';
 
 import { IScalingProcess } from 'amazon/domain';
-import { AwsReactInjector } from 'amazon/reactShims';
+import { AutoScalingProcessService } from '../scalingProcesses/AutoScalingProcessService';
 
 import { IAmazonServerGroupDetailsSectionProps } from './IAmazonServerGroupDetailsSectionProps';
 import { ScheduledAction } from '../scheduledAction/ScheduledAction';
@@ -25,9 +25,7 @@ export class ScheduledActionsDetailsSection extends React.Component<
   private getState(props: IAmazonServerGroupDetailsSectionProps): IScheduledActionsDetailsSectionState {
     const { serverGroup } = props;
 
-    const autoScalingProcesses: IScalingProcess[] = AwsReactInjector.autoScalingProcessService.normalizeScalingProcesses(
-      serverGroup,
-    );
+    const autoScalingProcesses: IScalingProcess[] = AutoScalingProcessService.normalizeScalingProcesses(serverGroup);
     const scheduledActionsDisabled =
       serverGroup.scheduledActions.length > 0 &&
       autoScalingProcesses
@@ -59,15 +57,18 @@ export class ScheduledActionsDetailsSection extends React.Component<
     return (
       <CollapsibleSection
         cacheKey="Scheduled Actions"
-        heading={() => (
-          <span>
-            {scheduledActionsDisabled && (
-              <Tooltip value="Some scaling processes are disabled that may prevent scheduled actions from working">
-                <span className="fa fa-exclamation-circle warning-text" />
-              </Tooltip>
-            )}
-            Scheduled Actions
-          </span>
+        heading={({ chevron }) => (
+          <h4 className="collapsible-heading">
+            {chevron}
+            <span>
+              {scheduledActionsDisabled && (
+                <Tooltip value="Some scaling processes are disabled that may prevent scheduled actions from working">
+                  <span className="fa fa-exclamation-circle warning-text" />
+                </Tooltip>
+              )}
+              Scheduled Actions
+            </span>
+          </h4>
         )}
       >
         {serverGroup.scheduledActions.map((action, index) => <ScheduledAction key={index} action={action} />)}

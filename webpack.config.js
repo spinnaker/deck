@@ -64,6 +64,8 @@ function configure(env, webpackOpts) {
         '@spinnaker/kubernetes': path.join(__dirname, 'app', 'scripts', 'modules', 'kubernetes', 'src'),
         openstack: path.join(__dirname, 'app', 'scripts', 'modules', 'openstack', 'src'),
         '@spinnaker/openstack': path.join(__dirname, 'app', 'scripts', 'modules', 'openstack', 'src'),
+        ecs: path.join(__dirname, 'app', 'scripts', 'modules', 'ecs', 'src'),
+        '@spinnaker/ecs': path.join(__dirname, 'app', 'scripts', 'modules', 'ecs', 'src'),
         coreImports: path.resolve(
           __dirname,
           'app',
@@ -150,6 +152,7 @@ function configure(env, webpackOpts) {
         template: './app/index.deck',
         favicon: process.env.NODE_ENV === 'production' ? 'app/prod-favicon.ico' : 'app/dev-favicon.ico',
         inject: true,
+        hash: IS_PRODUCTION,
       }),
     ],
     devServer: {

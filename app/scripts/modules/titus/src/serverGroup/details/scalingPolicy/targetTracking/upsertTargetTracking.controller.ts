@@ -4,7 +4,7 @@ import { cloneDeep } from 'lodash';
 import { Subject } from 'rxjs';
 import { IModalServiceInstance } from 'angular-ui-bootstrap';
 
-import { Application, IServerGroup, TaskMonitorBuilder, TaskMonitor } from '@spinnaker/core';
+import { Application, IServerGroup, TaskMonitor } from '@spinnaker/core';
 
 import {
   ITargetTrackingConfiguration,
@@ -42,8 +42,6 @@ export class UpsertTargetTrackingController implements IComponentController {
 
   constructor(
     private $uibModalInstance: IModalServiceInstance,
-    private scalingPolicyWriter: ScalingPolicyWriter,
-    private taskMonitorBuilder: TaskMonitorBuilder,
     public policy: ITitusTargetTrackingPolicy,
     public serverGroup: ITitusServerGroup,
     public alarmServerGroup: IAlarmRenderingServerGroup,
@@ -71,11 +69,11 @@ export class UpsertTargetTrackingController implements IComponentController {
   public save(): void {
     const action = this.policy.id ? 'Update' : 'Create';
     const command = cloneDeep(this.command);
-    this.taskMonitor = this.taskMonitorBuilder.buildTaskMonitor({
+    this.taskMonitor = new TaskMonitor({
       application: this.application,
       title: `${action} scaling policy for ${this.serverGroup.name}`,
       modalInstance: this.$uibModalInstance,
-      submitMethod: () => this.scalingPolicyWriter.upsertScalingPolicy(this.application, command),
+      submitMethod: () => ScalingPolicyWriter.upsertScalingPolicy(this.application, command),
     });
 
     this.taskMonitor.submit();

@@ -9,11 +9,10 @@ import {
   Application,
   IPagerDutyService,
   NgReact,
-  ReactInjector,
+  PagerDutyWriter,
   SETTINGS,
   SubmitButton,
   TaskMonitor,
-  TaskMonitorBuilder,
 } from '@spinnaker/core';
 
 import { IPageButtonProps } from './PageButton';
@@ -35,7 +34,6 @@ export interface IPageModalState {
 }
 
 export class PageModal extends React.Component<IPageModalProps, IPageModalState> {
-  private taskMonitorBuilder: TaskMonitorBuilder = ReactInjector.taskMonitorBuilder;
   private $uibModalInstanceEmulation: IModalServiceInstance & { deferred?: IDeferred<any> };
 
   constructor(props: IPageModalProps) {
@@ -89,8 +87,7 @@ export class PageModal extends React.Component<IPageModalProps, IPageModalState>
   };
 
   public sendPage = (): void => {
-    const { pagerDutyWriter } = ReactInjector;
-    const taskMonitor = this.taskMonitorBuilder.buildTaskMonitor({
+    const taskMonitor = new TaskMonitor({
       title: `Sending page to ${this.state.pageCount} policies`,
       modalInstance: this.$uibModalInstanceEmulation,
       onTaskComplete: () => this.props.closeCallback(true),
@@ -100,7 +97,7 @@ export class PageModal extends React.Component<IPageModalProps, IPageModalState>
       const { applications, services } = this.props;
       const { subject, details } = this.state;
 
-      return pagerDutyWriter.sendPage(applications, services.map(s => s.integration_key), subject, { details });
+      return PagerDutyWriter.sendPage(applications, services.map(s => s.integration_key), subject, { details });
     };
 
     taskMonitor.submit(submitMethod);

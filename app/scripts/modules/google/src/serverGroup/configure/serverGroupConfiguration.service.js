@@ -7,9 +7,9 @@ import {
   AccountService,
   CACHE_INITIALIZER_SERVICE,
   LOAD_BALANCER_READ_SERVICE,
-  NETWORK_READ_SERVICE,
+  NetworkReader,
   SECURITY_GROUP_READER,
-  SUBNET_READ_SERVICE,
+  SubnetReader,
 } from '@spinnaker/core';
 
 import { GCEProviderSettings } from 'google/gce.settings';
@@ -23,8 +23,6 @@ module.exports = angular
     SECURITY_GROUP_READER,
     CACHE_INITIALIZER_SERVICE,
     LOAD_BALANCER_READ_SERVICE,
-    NETWORK_READ_SERVICE,
-    SUBNET_READ_SERVICE,
     require('../../image/image.reader.js').name,
     require('../../instance/gceInstanceType.service.js').name,
     require('./../../instance/custom/customInstanceBuilder.gce.service.js').name,
@@ -39,8 +37,6 @@ module.exports = angular
     cacheInitializer,
     $q,
     loadBalancerReader,
-    networkReader,
-    subnetReader,
     gceCustomInstanceBuilderService,
     gceHttpLoadBalancerUtils,
     gceHealthCheckReader,
@@ -88,8 +84,8 @@ module.exports = angular
         .all({
           credentialsKeyedByAccount: AccountService.getCredentialsKeyedByAccount('gce'),
           securityGroups: securityGroupReader.getAllSecurityGroups(),
-          networks: networkReader.listNetworksByProvider('gce'),
-          subnets: subnetReader.listSubnetsByProvider('gce'),
+          networks: NetworkReader.listNetworksByProvider('gce'),
+          subnets: SubnetReader.listSubnetsByProvider('gce'),
           loadBalancers: loadBalancerReader.listLoadBalancers('gce'),
           packageImages: imageLoader,
           allImages: loadAllImages(),
@@ -600,7 +596,7 @@ module.exports = angular
     }
 
     function refreshNetworks(command) {
-      networkReader.listNetworksByProvider('gce').then(function(gceNetworks) {
+      NetworkReader.listNetworksByProvider('gce').then(function(gceNetworks) {
         command.backingData.networks = gceNetworks;
       });
     }
@@ -614,8 +610,8 @@ module.exports = angular
       });
     }
 
-    function attachEventHandlers(command) {
-      command.regionalChanged = function regionalChanged() {
+    function attachEventHandlers(cmd) {
+      cmd.regionalChanged = function regionalChanged(command) {
         var result = { dirty: {} };
         var filteredData = command.backingData.filtered;
         var defaults = GCEProviderSettings.defaults;
@@ -636,7 +632,7 @@ module.exports = angular
         return result;
       };
 
-      command.regionChanged = function regionChanged() {
+      cmd.regionChanged = function regionChanged(command) {
         var result = { dirty: {} };
         var filteredData = command.backingData.filtered;
         angular.extend(result.dirty, configureSubnets(command).dirty);
@@ -656,7 +652,7 @@ module.exports = angular
         return result;
       };
 
-      command.credentialsChanged = function credentialsChanged() {
+      cmd.credentialsChanged = function credentialsChanged(command) {
         var result = { dirty: {} };
         var backingData = command.backingData;
         if (command.credentials) {
@@ -671,7 +667,7 @@ module.exports = angular
             command.region = null;
             result.dirty.region = true;
           } else {
-            angular.extend(result.dirty, command.regionChanged().dirty);
+            angular.extend(result.dirty, command.regionChanged(command).dirty);
           }
 
           backingData.filtered.networks = getNetworkNames(command);
@@ -679,7 +675,7 @@ module.exports = angular
             command.network = null;
             result.dirty.network = true;
           } else {
-            angular.extend(result.dirty, command.networkChanged().dirty);
+            angular.extend(result.dirty, command.networkChanged(command).dirty);
           }
 
           angular.extend(result.dirty, configureHealthChecks(command).dirty);
@@ -694,7 +690,7 @@ module.exports = angular
         return result;
       };
 
-      command.networkChanged = function networkChanged() {
+      cmd.networkChanged = function networkChanged(command) {
         var result = { dirty: {} };
 
         command.viewState.autoCreateSubnets = _.chain(command.backingData.networks)
@@ -720,7 +716,7 @@ module.exports = angular
         return result;
       };
 
-      command.zoneChanged = function zoneChanged() {
+      cmd.zoneChanged = function zoneChanged(command) {
         var result = { dirty: {} };
         if (command.zone === undefined && !command.regional) {
           result.dirty.zone = true;
@@ -732,7 +728,7 @@ module.exports = angular
         return result;
       };
 
-      command.customInstanceChanged = function customInstanceChanged() {
+      cmd.customInstanceChanged = function customInstanceChanged(command) {
         var result = { dirty: {} };
 
         command.viewState.dirty = command.viewState.dirty || {};

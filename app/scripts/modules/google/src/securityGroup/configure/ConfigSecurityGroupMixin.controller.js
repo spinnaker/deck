@@ -5,11 +5,11 @@ import _ from 'lodash';
 
 import {
   FirewallLabels,
-  NETWORK_READ_SERVICE,
+  NetworkReader,
   SECURITY_GROUP_READER,
-  SECURITY_GROUP_WRITER,
-  TASK_MONITOR_BUILDER,
-  V2_MODAL_WIZARD_SERVICE,
+  SecurityGroupWriter,
+  TaskMonitor,
+  ModalWizard,
 } from '@spinnaker/core';
 
 import { GCE_SECURITY_GROUP_HELP_TEXT_SERVICE } from '../securityGroupHelpText.service';
@@ -19,25 +19,17 @@ import './securityGroup.configure.less';
 module.exports = angular
   .module('spinnaker.google.securityGroup.baseConfig.controller', [
     require('@uirouter/angularjs').default,
-    TASK_MONITOR_BUILDER,
-    NETWORK_READ_SERVICE,
-    V2_MODAL_WIZARD_SERVICE,
     SECURITY_GROUP_READER,
-    SECURITY_GROUP_WRITER,
     GCE_SECURITY_GROUP_HELP_TEXT_SERVICE,
   ])
   .controller('gceConfigSecurityGroupMixin', function(
     $scope,
     $state,
     $uibModalInstance,
-    taskMonitorBuilder,
     application,
     securityGroup,
     securityGroupReader,
-    securityGroupWriter,
-    v2modalWizardService,
     cacheInitializer,
-    networkReader,
     gceSecurityGroupHelpTextService,
     mode,
   ) {
@@ -58,7 +50,7 @@ module.exports = angular
       targetOptions: null,
     };
 
-    $scope.wizard = v2modalWizardService;
+    $scope.wizard = ModalWizard;
 
     ctrl.getTagHelpText = function(tag, tagType) {
       return gceSecurityGroupHelpTextService.getHelpTextForTag(tag, tagType);
@@ -151,7 +143,7 @@ module.exports = angular
       application.securityGroups.onNextRefresh($scope, onApplicationRefresh);
     }
 
-    $scope.taskMonitor = taskMonitorBuilder.buildTaskMonitor({
+    $scope.taskMonitor = new TaskMonitor({
       application: application,
       title: `Creating your ${FirewallLabels.get('firewall')}`,
       modalInstance: $uibModalInstance,
@@ -166,7 +158,7 @@ module.exports = angular
 
     ctrl.upsert = function() {
       $scope.taskMonitor.submit(function() {
-        return securityGroupWriter.upsertSecurityGroup($scope.securityGroup, application, 'Create');
+        return SecurityGroupWriter.upsertSecurityGroup($scope.securityGroup, application, 'Create');
       });
     };
 
@@ -184,7 +176,7 @@ module.exports = angular
           return rule;
         });
 
-        return securityGroupWriter.upsertSecurityGroup($scope.securityGroup, application, descriptor, {
+        return SecurityGroupWriter.upsertSecurityGroup($scope.securityGroup, application, descriptor, {
           cloudProvider: 'gce',
           securityGroupName: $scope.securityGroup.name,
           sourceRanges: _.uniq(_.map($scope.securityGroup.sourceRanges, 'value')),
@@ -232,7 +224,7 @@ module.exports = angular
     };
 
     ctrl.updateNetworks = function() {
-      networkReader.listNetworksByProvider('gce').then(function(gceNetworks) {
+      NetworkReader.listNetworksByProvider('gce').then(function(gceNetworks) {
         var account = $scope.securityGroup.credentials || $scope.securityGroup.accountName;
         $scope.securityGroup.backingData.networks = _(gceNetworks)
           .filter(n => n.account === account && !n.id.includes('/'))
@@ -284,8 +276,8 @@ module.exports = angular
 
     ctrl.dismissRemovedRules = function() {
       $scope.state.removedRules = [];
-      v2modalWizardService.markClean('Ingress');
-      v2modalWizardService.markComplete('Ingress');
+      ModalWizard.markClean('Ingress');
+      ModalWizard.markComplete('Ingress');
     };
 
     ctrl.isValid = function() {

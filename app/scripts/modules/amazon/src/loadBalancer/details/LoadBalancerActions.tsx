@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Dropdown } from 'react-bootstrap';
 import { get } from 'lodash';
 
-import { Application, SETTINGS, NgReact, ReactInjector } from '@spinnaker/core';
+import { Application, ApplicationReader, LoadBalancerWriter, SETTINGS, NgReact, ReactInjector } from '@spinnaker/core';
 
 import { IAmazonLoadBalancer, IAmazonLoadBalancerDeleteCommand } from 'amazon';
 
@@ -17,7 +17,6 @@ export interface ILoadBalancerActionsProps {
 
 export interface ILoadBalancerActionsState {
   application: Application;
-  showEditModal: boolean;
 }
 
 export class LoadBalancerActions extends React.Component<ILoadBalancerActionsProps, ILoadBalancerActionsState> {
@@ -34,8 +33,7 @@ export class LoadBalancerActions extends React.Component<ILoadBalancerActionsPro
       application = app;
     } else {
       // Load balancer is a part of a different application
-      ReactInjector.applicationReader
-        .getApplication(loadBalancerAppName)
+      ApplicationReader.getApplication(loadBalancerAppName)
         .then(loadBalancerApp => {
           this.setState({ application: loadBalancerApp });
         })
@@ -47,12 +45,13 @@ export class LoadBalancerActions extends React.Component<ILoadBalancerActionsPro
 
     this.state = {
       application,
-      showEditModal: false,
     };
   }
 
   public editLoadBalancer = (): void => {
-    this.setState({ showEditModal: true });
+    const { app, loadBalancer } = this.props;
+    const LoadBalancerModal = LoadBalancerTypes.find(t => t.type === loadBalancer.loadBalancerType).component;
+    LoadBalancerModal.show({ app, loadBalancer });
   };
 
   public deleteLoadBalancer = (): void => {
@@ -76,7 +75,7 @@ export class LoadBalancerActions extends React.Component<ILoadBalancerActionsPro
       vpcId: get(loadBalancer, 'elb.vpcId', null),
     };
 
-    const submitMethod = () => ReactInjector.loadBalancerWriter.deleteLoadBalancer(command, app);
+    const submitMethod = () => LoadBalancerWriter.deleteLoadBalancer(command, app);
 
     ReactInjector.confirmationModalService.confirm({
       header: `Really delete ${loadBalancerFromParams.name} in ${loadBalancerFromParams.region}: ${
@@ -95,17 +94,11 @@ export class LoadBalancerActions extends React.Component<ILoadBalancerActionsPro
     this.props.app.loadBalancers.refresh();
   };
 
-  private showEditCallback = (show: boolean): void => {
-    this.setState({ showEditModal: show });
-  };
-
   public render() {
     const { app, loadBalancer } = this.props;
-    const { application, showEditModal } = this.state;
+    const { application } = this.state;
 
     const { AddEntityTagLinks } = NgReact;
-
-    const LoadBalancerModal = LoadBalancerTypes.find(t => t.type === loadBalancer.loadBalancerType).component;
 
     return (
       <div style={{ display: 'inline-block' }}>
@@ -147,15 +140,6 @@ export class LoadBalancerActions extends React.Component<ILoadBalancerActionsPro
               )}
           </Dropdown.Menu>
         </Dropdown>
-        {application &&
-          showEditModal && (
-            <LoadBalancerModal
-              app={application}
-              loadBalancer={loadBalancer}
-              show={showEditModal}
-              showCallback={this.showEditCallback}
-            />
-          )}
       </div>
     );
   }

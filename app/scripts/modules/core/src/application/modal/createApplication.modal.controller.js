@@ -2,10 +2,10 @@
 
 import _ from 'lodash';
 import { AccountService } from 'core/account/AccountService';
-import { APPLICATION_READ_SERVICE } from 'core/application/service/application.read.service';
-import { APPLICATION_WRITE_SERVICE } from 'core/application/service/application.write.service';
+import { ApplicationReader } from 'core/application/service/ApplicationReader';
+import { ApplicationWriter } from 'core/application/service/ApplicationWriter';
 import { APPLICATION_NAME_VALIDATION_MESSAGES } from './validation/applicationNameValidationMessages.component';
-import { TASK_READ_SERVICE } from 'core/task/task.read.service';
+import { TaskReader } from 'core/task/task.read.service';
 import { VALIDATE_APPLICATION_NAME } from './validation/validateApplicationName.directive';
 import { CHAOS_MONKEY_NEW_APPLICATION_CONFIG_COMPONENT } from 'core/chaosMonkey/chaosMonkeyNewApplicationConfig.component';
 import { SETTINGS } from 'core/config/settings';
@@ -15,35 +15,29 @@ const angular = require('angular');
 module.exports = angular
   .module('spinnaker.application.create.modal.controller', [
     require('@uirouter/angularjs').default,
-    APPLICATION_WRITE_SERVICE,
-    APPLICATION_READ_SERVICE,
-    TASK_READ_SERVICE,
     APPLICATION_NAME_VALIDATION_MESSAGES,
     VALIDATE_APPLICATION_NAME,
     require('./applicationProviderFields.component.js').name,
     CHAOS_MONKEY_NEW_APPLICATION_CONFIG_COMPONENT,
   ])
-  .controller('CreateApplicationModalCtrl', function(
-    $scope,
-    $q,
-    $log,
-    $state,
-    $uibModalInstance,
-    applicationWriter,
-    applicationReader,
-    taskReader,
-    $timeout,
-  ) {
-    let applicationLoader = applicationReader.listApplications();
+  .controller('CreateApplicationModalCtrl', function($scope, $q, $log, $state, $uibModalInstance, $timeout) {
+    let applicationLoader = ApplicationReader.listApplications();
     applicationLoader.then(applications => (this.data.appNameList = _.map(applications, 'name')));
 
     let providerLoader = AccountService.listProviders();
     providerLoader.then(providers => (this.data.cloudProviders = providers));
 
-    $q.all([applicationLoader, providerLoader]).then(() => (this.state.initializing = false));
+    $q
+      .all([applicationLoader, providerLoader])
+      .catch(error => {
+        this.state.initializeFailed = true;
+        throw error;
+      })
+      .finally(() => (this.state.initializing = false));
 
     this.state = {
       initializing: true,
+      initializeFailed: false,
       submitting: false,
       errorMessages: [],
       permissionsInvalid: false,
@@ -78,7 +72,7 @@ module.exports = angular
     $scope.$on('$destroy', () => $timeout.cancel(navigateTimeout));
 
     let waitUntilApplicationIsCreated = task => {
-      return taskReader.waitUntilTaskCompletes(task).then(routeToApplication, () => {
+      return TaskReader.waitUntilTaskCompletes(task).then(routeToApplication, () => {
         this.state.errorMessages.push('Could not create application: ' + task.failureMessage);
         goIdle();
       });
@@ -90,9 +84,10 @@ module.exports = angular
     };
 
     this.createApplication = () => {
-      return applicationWriter
-        .createApplication(this.application)
-        .then(waitUntilApplicationIsCreated, createApplicationFailure);
+      return ApplicationWriter.createApplication(this.application).then(
+        waitUntilApplicationIsCreated,
+        createApplicationFailure,
+      );
     };
 
     this.updateCloudProviderHealthWarning = () => {

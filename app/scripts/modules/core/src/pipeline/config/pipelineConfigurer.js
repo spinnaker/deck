@@ -8,18 +8,13 @@ const angular = require('angular');
 
 import { OVERRIDE_REGISTRY } from 'core/overrideRegistry/override.registry';
 import { EditPipelineJsonModalCtrl } from './actions/json/editPipelineJsonModal.controller';
-import { PIPELINE_CONFIG_VALIDATOR } from './validation/pipelineConfig.validator';
-import { PIPELINE_TEMPLATE_SERVICE } from './templates/pipelineTemplate.service';
+import { PipelineConfigValidator } from './validation/PipelineConfigValidator';
 import { EXECUTION_BUILD_TITLE } from '../executionBuild/ExecutionBuildTitle';
 import { PipelineConfigService } from 'core/pipeline/config/services/PipelineConfigService';
+import { ExecutionsTransformer } from 'core/pipeline/service/ExecutionsTransformer';
 
 module.exports = angular
-  .module('spinnaker.core.pipeline.config.pipelineConfigurer', [
-    OVERRIDE_REGISTRY,
-    PIPELINE_CONFIG_VALIDATOR,
-    PIPELINE_TEMPLATE_SERVICE,
-    EXECUTION_BUILD_TITLE,
-  ])
+  .module('spinnaker.core.pipeline.config.pipelineConfigurer', [OVERRIDE_REGISTRY, EXECUTION_BUILD_TITLE])
   .directive('pipelineConfigurer', function() {
     return {
       restrict: 'E',
@@ -41,10 +36,7 @@ module.exports = angular
     $timeout,
     $window,
     $q,
-    pipelineConfigValidator,
-    pipelineTemplateService,
     executionService,
-    executionsTransformer,
     overrideRegistry,
     $location,
   ) {
@@ -311,7 +303,7 @@ module.exports = angular
       $scope.$applyAsync(() => {
         $scope.renderablePipeline = _.clone($scope.renderablePipeline);
         // need to ensure references are maintained
-        if ($scope.plan) {
+        if ($scope.isTemplatedPipeline) {
           $scope.plan = $scope.renderablePipeline;
         } else {
           $scope.pipeline = $scope.renderablePipeline;
@@ -433,7 +425,7 @@ module.exports = angular
           application: $scope.pipeline.application,
         })
         .then(executions => {
-          executions.forEach(execution => executionsTransformer.addBuildInfo(execution));
+          executions.forEach(execution => ExecutionsTransformer.addBuildInfo(execution));
           $scope.pipelineExecutions = executions;
           if ($scope.plan && $scope.plan.executionId) {
             $scope.currentExecution = _.find($scope.pipelineExecutions, { id: $scope.plan.executionId });
@@ -483,6 +475,9 @@ module.exports = angular
       this.setViewState({ isDirty: $scope.viewState.original !== angular.toJson($scope.pipeline) });
     };
 
+    // Poor bridge to update dirty flag when React stage field is updated
+    this.stageFieldUpdated = () => markDirty();
+
     function cacheViewState() {
       const toCache = { section: $scope.viewState.section, stageIndex: $scope.viewState.stageIndex };
       configViewStateCache.put(buildCacheKey(), toCache);
@@ -508,7 +503,7 @@ module.exports = angular
       }
     });
 
-    const validationSubscription = pipelineConfigValidator.subscribe(validations => {
+    const validationSubscription = PipelineConfigValidator.subscribe(validations => {
       this.validations = validations;
       this.preventSave = validations.preventSave;
     });

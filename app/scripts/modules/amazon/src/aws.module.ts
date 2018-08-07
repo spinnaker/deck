@@ -6,11 +6,11 @@ import { AWS_LOAD_BALANCER_MODULE } from './loadBalancer/loadBalancer.module';
 import { AWS_REACT_MODULE } from './reactShims/aws.react.module';
 import { AWS_SECURITY_GROUP_MODULE } from './securityGroup/securityGroup.module';
 import { AWS_SERVER_GROUP_TRANSFORMER } from './serverGroup/serverGroup.transformer';
-import { AMAZON_APPLICATION_NAME_VALIDATOR } from './validation/applicationName.validator';
+import './validation/ApplicationNameValidator';
 import { VPC_MODULE } from './vpc/vpc.module';
 import { SUBNET_RENDERER } from './subnet/subnet.renderer';
+import { SUBNET_SELECT_FIELD_COMPONENT } from './subnet/subnetSelectField.component';
 import { SERVER_GROUP_DETAILS_MODULE } from './serverGroup/details/serverGroupDetails.module';
-import { SERVER_GROUP_CONFIGURE_MODULE } from './serverGroup/configure/serverGroup.configure.aws.module';
 import { COMMON_MODULE } from './common/common.module';
 import './help/amazon.help';
 
@@ -20,6 +20,7 @@ import { AmazonLoadBalancersTag } from './loadBalancer/AmazonLoadBalancersTag';
 import './deploymentStrategy/rollingPush.strategy';
 
 import './logo/aws.logo.less';
+import { AmazonCloneServerGroupModal } from './serverGroup/configure/wizard/AmazonCloneServerGroupModal';
 import { AmazonLoadBalancerChoiceModal } from './loadBalancer/configure/AmazonLoadBalancerChoiceModal';
 
 import { AmazonServerGroupActions } from './serverGroup/details/AmazonServerGroupActions';
@@ -49,7 +50,6 @@ templates.keys().forEach(function(key) {
 export const AMAZON_MODULE = 'spinnaker.amazon';
 module(AMAZON_MODULE, [
   AWS_REACT_MODULE,
-  AMAZON_APPLICATION_NAME_VALIDATOR,
   require('./pipeline/stages/bake/awsBakeStage').name,
   require('./pipeline/stages/cloneServerGroup/awsCloneServerGroupStage').name,
   require('./pipeline/stages/destroyAsg/awsDestroyAsgStage').name,
@@ -67,13 +67,12 @@ module(AMAZON_MODULE, [
   SERVER_GROUP_DETAILS_MODULE,
   COMMON_MODULE,
   AWS_SERVER_GROUP_TRANSFORMER,
-  require('./serverGroup/configure/wizard/CloneServerGroup.aws.controller').name,
   require('./instance/awsInstanceType.service').name,
   AWS_LOAD_BALANCER_MODULE,
   require('./instance/details/instance.details.controller').name,
   AWS_SECURITY_GROUP_MODULE,
-  SERVER_GROUP_CONFIGURE_MODULE,
   SUBNET_RENDERER,
+  SUBNET_SELECT_FIELD_COMPONENT,
   VPC_MODULE,
   require('./image/image.reader').name,
   require('./cache/cacheConfigurer.service').name,
@@ -108,8 +107,7 @@ module(AMAZON_MODULE, [
         AdvancedSettingsDetailsSection,
         LogsDetailsSection,
       ],
-      cloneServerGroupTemplateUrl: require('./serverGroup/configure/wizard/serverGroupWizard.html'),
-      cloneServerGroupController: 'awsCloneServerGroupCtrl',
+      CloneServerGroupModal: AmazonCloneServerGroupModal,
       commandBuilder: 'awsServerGroupCommandBuilder',
       configurationService: 'awsServerGroupConfigurationService',
       scalingActivitiesEnabled: true,

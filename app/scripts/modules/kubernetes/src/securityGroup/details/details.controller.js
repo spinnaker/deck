@@ -6,17 +6,16 @@ import _ from 'lodash';
 import {
   CloudProviderRegistry,
   CONFIRMATION_MODAL_SERVICE,
+  FirewallLabels,
   SECURITY_GROUP_READER,
-  SECURITY_GROUP_WRITER,
+  SecurityGroupWriter,
   ServerGroupTemplates,
 } from '@spinnaker/core';
-import { FirewallLabels } from 'root/app/scripts/modules/core/src';
 
 module.exports = angular
   .module('spinnaker.securityGroup.kubernetes.details.controller', [
     require('@uirouter/angularjs').default,
     SECURITY_GROUP_READER,
-    SECURITY_GROUP_WRITER,
     CONFIRMATION_MODAL_SERVICE,
   ])
   .controller('kubernetesSecurityGroupDetailsController', function(
@@ -25,7 +24,6 @@ module.exports = angular
     resolvedSecurityGroup,
     app,
     confirmationModalService,
-    securityGroupWriter,
     securityGroupReader,
     $uibModal,
   ) {
@@ -120,7 +118,7 @@ module.exports = angular
       };
 
       var submitMethod = function() {
-        return securityGroupWriter.deleteSecurityGroup(securityGroup, application, {
+        return SecurityGroupWriter.deleteSecurityGroup(securityGroup, application, {
           cloudProvider: $scope.securityGroup.type,
           securityGroupName: securityGroup.name,
           namespace: $scope.securityGroup.region,

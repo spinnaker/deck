@@ -7,24 +7,18 @@ import _ from 'lodash';
 import {
   AccountService,
   AuthenticationService,
-  PIPELINE_CONFIG_PROVIDER,
-  BAKERY_SERVICE,
-  NETWORK_READ_SERVICE,
-  SUBNET_READ_SERVICE,
+  BakeryReader,
+  NetworkReader,
+  Registry,
+  SubnetReader,
 } from '@spinnaker/core';
 
 module.exports = angular
-  .module('spinnaker.oraclebmcs.pipeline.stage.bakeStage', [
-    require('./bakeExecutionDetails.controller.js').name,
-    PIPELINE_CONFIG_PROVIDER,
-    BAKERY_SERVICE,
-    NETWORK_READ_SERVICE,
-    SUBNET_READ_SERVICE,
-  ])
-  .config(function(pipelineConfigProvider) {
-    pipelineConfigProvider.registerStage({
+  .module('spinnaker.oracle.pipeline.stage.bakeStage', [require('./bakeExecutionDetails.controller.js').name])
+  .config(function() {
+    Registry.pipeline.registerStage({
       provides: 'bake',
-      cloudProvider: 'oraclebmcs',
+      cloudProvider: 'oracle',
       label: 'Bake',
       description: 'Bakes an image in the specified region',
       templateUrl: require('./bakeStage.html'),
@@ -53,8 +47,8 @@ module.exports = angular
       restartable: true,
     });
   })
-  .controller('oraclebmcsBakeStageCtrl', function($scope, bakeryService, networkReader, subnetReader, $q) {
-    const provider = 'oraclebmcs';
+  .controller('oracleBakeStageCtrl', function($scope, $q) {
+    const provider = 'oracle';
 
     if (!$scope.stage.cloudProvider) {
       $scope.stage.cloudProvider = provider;
@@ -77,15 +71,15 @@ module.exports = angular
 
       $q
         .all({
-          baseOsOptions: bakeryService.getBaseOsOptions(provider),
-          regions: bakeryService.getRegions(provider),
+          baseOsOptions: BakeryReader.getBaseOsOptions(provider),
+          regions: BakeryReader.getRegions(provider),
           availabilityDomains: $scope.getZones(provider),
           networks: $scope.getNetworks(provider),
           subnets: $scope.getSubNetworks(provider),
         })
         .then(results => {
-          if (!$scope.account && $scope.application.defaultCredentials.oraclebmcs) {
-            $scope.account = $scope.application.defaultCredentials.oraclebmcs;
+          if (!$scope.account && $scope.application.defaultCredentials.oracle) {
+            $scope.account = $scope.application.defaultCredentials.oracle;
           }
           if (results.baseOsOptions.baseImages.length > 0) {
             $scope.baseOsOptions = results.baseOsOptions;
@@ -136,11 +130,11 @@ module.exports = angular
     };
 
     $scope.getNetworks = function(provider) {
-      return networkReader.listNetworksByProvider(provider).then(networks => networks.sort());
+      return NetworkReader.listNetworksByProvider(provider).then(networks => networks.sort());
     };
 
     $scope.getSubNetworks = function(provider) {
-      return subnetReader.listSubnetsByProvider(provider).then(subnets => subnets.sort());
+      return SubnetReader.listSubnetsByProvider(provider).then(subnets => subnets.sort());
     };
 
     /**

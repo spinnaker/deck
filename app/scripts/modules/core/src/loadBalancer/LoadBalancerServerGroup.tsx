@@ -52,9 +52,9 @@ export class LoadBalancerServerGroup extends React.Component<
 
     const params = {
       region: serverGroup.region || region,
-      accountId: account,
+      accountId: serverGroup.account || account,
       serverGroup: serverGroup.name,
-      provider: cloudProvider,
+      provider: serverGroup.cloudProvider || cloudProvider,
     };
 
     return (
@@ -73,7 +73,7 @@ export class LoadBalancerServerGroup extends React.Component<
             </div>
             {showInstances && (
               <div className="instance-list">
-                <Instances instances={this.state.instances} />
+                <Instances cloudProvider={this.props.cloudProvider} instances={this.state.instances} />
               </div>
             )}
           </div>

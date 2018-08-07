@@ -4,25 +4,20 @@ const angular = require('angular');
 import _ from 'lodash';
 
 import {
-  ArtifactReferenceServiceProvider,
+  ArtifactReferenceService,
   AuthenticationService,
   BakeExecutionLabel,
-  BAKERY_SERVICE,
-  EXPECTED_ARTIFACT_SERVICE,
-  PIPELINE_CONFIG_PROVIDER,
+  BakeryReader,
+  ExpectedArtifactService,
   PipelineTemplates,
+  Registry,
   SETTINGS,
 } from '@spinnaker/core';
 
 module.exports = angular
-  .module('spinnaker.gce.pipeline.stage..bakeStage', [
-    PIPELINE_CONFIG_PROVIDER,
-    require('./bakeExecutionDetails.controller.js').name,
-    BAKERY_SERVICE,
-    EXPECTED_ARTIFACT_SERVICE,
-  ])
-  .config(function(pipelineConfigProvider, artifactReferenceServiceProvider) {
-    pipelineConfigProvider.registerStage({
+  .module('spinnaker.gce.pipeline.stage..bakeStage', [require('./bakeExecutionDetails.controller.js').name])
+  .config(function() {
+    Registry.pipeline.registerStage({
       provides: 'bake',
       cloudProvider: 'gce',
       label: 'Bake',
@@ -45,10 +40,11 @@ module.exports = angular
         },
       ],
       restartable: true,
+      artifactExtractor: ExpectedArtifactService.accumulateArtifacts(['packageArtifactIds']),
+      artifactRemover: ArtifactReferenceService.removeArtifactFromFields(['packageArtifactIds']),
     });
-    artifactReferenceServiceProvider.registerReference('stage', () => [['packageArtifactIds']]);
   })
-  .controller('gceBakeStageCtrl', function($scope, bakeryService, $q, $uibModal, expectedArtifactService) {
+  .controller('gceBakeStageCtrl', function($scope, $q, $uibModal) {
     $scope.stage.extendedAttributes = $scope.stage.extendedAttributes || {};
     $scope.stage.region = 'global';
 
@@ -68,9 +64,9 @@ module.exports = angular
       $scope.viewState.providerSelected = true;
       $q
         .all({
-          baseOsOptions: bakeryService.getBaseOsOptions('gce'),
-          baseLabelOptions: bakeryService.getBaseLabelOptions(),
-          expectedArtifacts: expectedArtifactService.getExpectedArtifactsAvailableToStage(
+          baseOsOptions: BakeryReader.getBaseOsOptions('gce'),
+          baseLabelOptions: BakeryReader.getBaseLabelOptions(),
+          expectedArtifacts: ExpectedArtifactService.getExpectedArtifactsAvailableToStage(
             $scope.stage,
             $scope.pipeline,
           ),

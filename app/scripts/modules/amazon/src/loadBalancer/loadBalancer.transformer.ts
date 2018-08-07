@@ -1,51 +1,50 @@
-import { IPromise, module } from 'angular';
-import { chain, filter, flatten, map } from 'lodash';
-
-import { Application, IHealth, IServerGroup, IInstance, IVpc, NameUtils } from '@spinnaker/core';
-
+import { AccountService, Application, IHealth, IInstance, IServerGroup, IVpc, NameUtils } from '@spinnaker/core';
 import { AWSProviderSettings } from 'amazon/aws.settings';
 import {
-  IAmazonApplicationLoadBalancer,
   IALBListenerCertificate,
+  IAmazonApplicationLoadBalancer,
+  IAmazonApplicationLoadBalancerUpsertCommand,
   IAmazonClassicLoadBalancer,
+  IAmazonClassicLoadBalancerUpsertCommand,
   IAmazonLoadBalancer,
   IAmazonServerGroup,
   IApplicationLoadBalancerSourceData,
   IClassicListenerDescription,
   IClassicLoadBalancerSourceData,
-  IAmazonApplicationLoadBalancerUpsertCommand,
-  IAmazonClassicLoadBalancerUpsertCommand,
+  INetworkLoadBalancerSourceData,
+  IAmazonNetworkLoadBalancerUpsertCommand,
   ITargetGroup,
 } from 'amazon/domain';
-import { VPC_READ_SERVICE, VpcReader } from 'amazon/vpc/vpc.read.service';
+import { VpcReader } from 'amazon/vpc/VpcReader';
+import { IPromise, module } from 'angular';
+import { chain, filter, flatten, map } from 'lodash';
+
+import { $q } from 'ngimport';
 
 export class AwsLoadBalancerTransformer {
-  public constructor(private vpcReader: VpcReader) {
-    'ngInject';
-  }
+  private updateHealthCounts(container: IServerGroup | ITargetGroup | IAmazonLoadBalancer): void {
+    const instances = container.instances;
 
-  private updateHealthCounts(serverGroup: IServerGroup | ITargetGroup | IAmazonLoadBalancer): void {
-    const instances = serverGroup.instances;
-    let serverGroups: IServerGroup[] = [serverGroup] as IServerGroup[];
-    if ((serverGroup as ITargetGroup | IAmazonLoadBalancer).serverGroups) {
-      const container = serverGroup as ITargetGroup;
-      serverGroups = container.serverGroups;
-    }
-    serverGroup.instanceCounts = {
+    container.instanceCounts = {
       up: instances.filter(instance => instance.health[0].state === 'InService').length,
-      down: instances.filter(instance => instance.health[0].state === 'OutOfService').length,
-      outOfService: serverGroups.reduce((acc, sg): number => {
-        return (
-          sg.instances.filter((instance): boolean => {
-            return instance.healthState === 'OutOfService';
-          }).length + acc
-        );
-      }, 0),
+      down: instances.filter(instance => instance.healthState === 'Down').length,
+      outOfService: instances.filter(instance => instance.healthState === 'OutOfService').length,
       starting: undefined,
       succeeded: undefined,
       failed: undefined,
       unknown: undefined,
     };
+
+    if ((container as ITargetGroup | IAmazonLoadBalancer).serverGroups) {
+      const serverGroupInstances = flatten((container as ITargetGroup).serverGroups.map(sg => sg.instances));
+      container.instanceCounts.up = serverGroupInstances.filter(
+        instance => instance.health[0].state === 'InService',
+      ).length;
+      container.instanceCounts.down = serverGroupInstances.filter(instance => instance.healthState === 'Down').length;
+      container.instanceCounts.outOfService = serverGroupInstances.filter(
+        instance => instance.healthState === 'OutOfService',
+      ).length;
+    }
   }
 
   private transformInstance(instance: IInstance, provider: string, account: string, region: string): void {
@@ -82,8 +81,8 @@ export class AwsLoadBalancerTransformer {
     healthType: string,
   ): void {
     serverGroups.forEach(serverGroup => {
-      serverGroup.account = container.account;
-      serverGroup.region = container.region;
+      serverGroup.account = serverGroup.account || container.account;
+      serverGroup.region = serverGroup.region || container.region;
       if (serverGroup.detachedInstances) {
         serverGroup.detachedInstances = (serverGroup.detachedInstances as any).map((instanceId: string) => {
           return { id: instanceId } as IInstance;
@@ -117,9 +116,29 @@ export class AwsLoadBalancerTransformer {
       .value();
     this.updateHealthCounts(targetGroup);
 
-    return this.vpcReader
-      .listVpcs()
-      .then((vpcs: IVpc[]) => this.addVpcNameToContainer(targetGroup)(vpcs) as ITargetGroup);
+    return $q.all([VpcReader.listVpcs(), AccountService.listAllAccounts()]).then(([vpcs, accounts]) => {
+      const tg = this.addVpcNameToContainer(targetGroup)(vpcs) as ITargetGroup;
+
+      tg.serverGroups = tg.serverGroups.map(serverGroup => {
+        const account = accounts.find(x => x.name === serverGroup.account);
+        const cloudProvider = serverGroup.cloudProvider || (account && account.cloudProvider);
+        return { ...serverGroup, cloudProvider };
+      });
+
+      return tg;
+    });
+  }
+
+  public normalizeActions(loadBalancer: IAmazonApplicationLoadBalancer) {
+    if (loadBalancer.loadBalancerType === 'application') {
+      const alb = loadBalancer as IAmazonApplicationLoadBalancer;
+
+      // Sort the actions by the order specified since amazon does not return them in order of order
+      alb.listeners.forEach(l => {
+        l.defaultActions.sort((a, b) => a.order - b.order);
+        l.rules.forEach(r => r.actions.sort((a, b) => a.order - b.order));
+      });
+    }
   }
 
   public normalizeLoadBalancer(loadBalancer: IAmazonLoadBalancer): IPromise<IAmazonLoadBalancer> {
@@ -132,8 +151,12 @@ export class AwsLoadBalancerTransformer {
       serverGroups = flatten<IAmazonServerGroup>(map(appLoadBalancer.targetGroups, 'serverGroups'));
     }
 
-    const activeServerGroups = filter(serverGroups, { isDisabled: false });
+    loadBalancer.loadBalancerType = loadBalancer.loadBalancerType || 'classic';
     loadBalancer.provider = loadBalancer.type;
+
+    this.normalizeActions(loadBalancer as IAmazonApplicationLoadBalancer);
+
+    const activeServerGroups = filter(serverGroups, { isDisabled: false });
     loadBalancer.instances = chain(activeServerGroups)
       .map('instances')
       .flatten<IInstance>()
@@ -143,9 +166,9 @@ export class AwsLoadBalancerTransformer {
       .flatten<IInstance>()
       .value();
     this.updateHealthCounts(loadBalancer);
-    return this.vpcReader
-      .listVpcs()
-      .then((vpcs: IVpc[]) => this.addVpcNameToContainer(loadBalancer)(vpcs) as IAmazonLoadBalancer);
+    return VpcReader.listVpcs().then(
+      (vpcs: IVpc[]) => this.addVpcNameToContainer(loadBalancer)(vpcs) as IAmazonLoadBalancer,
+    );
   }
 
   public convertClassicLoadBalancerForEditing(
@@ -328,6 +351,104 @@ export class AwsLoadBalancerTransformer {
     return toEdit;
   }
 
+  public convertNetworkLoadBalancerForEditing(
+    loadBalancer: IAmazonApplicationLoadBalancer,
+  ): IAmazonNetworkLoadBalancerUpsertCommand {
+    const applicationName = NameUtils.parseLoadBalancerName(loadBalancer.name).application;
+
+    // Since we build up toEdit as we go, much easier to declare as any, then cast at return time.
+    const toEdit: IAmazonNetworkLoadBalancerUpsertCommand = {
+      availabilityZones: undefined,
+      isInternal: loadBalancer.isInternal,
+      region: loadBalancer.region,
+      loadBalancerType: 'network',
+      cloudProvider: loadBalancer.cloudProvider,
+      credentials: loadBalancer.account || loadBalancer.credentials,
+      listeners: [],
+      targetGroups: [],
+      name: loadBalancer.name,
+      regionZones: loadBalancer.availabilityZones,
+      securityGroups: [],
+      subnetType: loadBalancer.subnetType,
+      vpcId: undefined,
+    };
+
+    if (loadBalancer.elb) {
+      const elb = loadBalancer.elb as INetworkLoadBalancerSourceData;
+      toEdit.securityGroups = elb.securityGroups;
+      toEdit.vpcId = elb.vpcid || elb.vpcId;
+
+      // Convert listeners
+      if (elb.listeners) {
+        toEdit.listeners = elb.listeners.map(listener => {
+          const certificates: IALBListenerCertificate[] = [];
+          if (listener.certificates) {
+            listener.certificates.forEach(cert => {
+              const certArnParts = cert.certificateArn.split(':');
+              const certParts = certArnParts[5].split('/');
+              certificates.push({
+                certificateArn: cert.certificateArn,
+                type: certArnParts[2],
+                name: certParts[1],
+              });
+            });
+          }
+
+          (listener.defaultActions || []).forEach(action => {
+            if (action.targetGroupName) {
+              action.targetGroupName = action.targetGroupName.replace(`${applicationName}-`, '');
+            }
+          });
+
+          // Remove the default rule because it already exists in defaultActions
+          listener.rules = (listener.rules || []).filter(l => !l.default);
+          listener.rules.forEach(rule => {
+            (rule.actions || []).forEach(action => {
+              if (action.targetGroupName) {
+                action.targetGroupName = action.targetGroupName.replace(`${applicationName}-`, '');
+              }
+            });
+            rule.conditions = rule.conditions || [];
+          });
+
+          // Sort listener.rules by priority.
+          listener.rules.sort((a, b) => (a.priority as number) - (b.priority as number));
+
+          return {
+            protocol: listener.protocol,
+            port: listener.port,
+            defaultActions: listener.defaultActions,
+            certificates,
+            rules: listener.rules || [],
+            sslPolicy: listener.sslPolicy,
+          };
+        });
+      }
+
+      // Convert target groups
+      if (elb.targetGroups) {
+        toEdit.targetGroups = elb.targetGroups.map((targetGroup: any) => {
+          return {
+            name: targetGroup.targetGroupName.replace(`${applicationName}-`, ''),
+            protocol: targetGroup.protocol,
+            port: targetGroup.port,
+            targetType: targetGroup.targetType,
+            healthCheckProtocol: targetGroup.healthCheckProtocol,
+            healthCheckPort: targetGroup.healthCheckPort,
+            healthCheckTimeout: targetGroup.healthCheckTimeoutSeconds,
+            healthCheckInterval: targetGroup.healthCheckIntervalSeconds,
+            healthyThreshold: targetGroup.healthyThresholdCount,
+            unhealthyThreshold: targetGroup.unhealthyThresholdCount,
+            attributes: {
+              deregistrationDelay: Number(targetGroup.attributes['deregistration_delay.timeout_seconds']),
+            },
+          };
+        });
+      }
+    }
+    return toEdit;
+  }
+
   public constructNewClassicLoadBalancerTemplate(application: Application): IAmazonClassicLoadBalancerUpsertCommand {
     const defaultCredentials = application.defaultCredentials.aws || AWSProviderSettings.defaults.account,
       defaultRegion = application.defaultRegions.aws || AWSProviderSettings.defaults.region,
@@ -423,10 +544,60 @@ export class AwsLoadBalancerTransformer {
       ],
     };
   }
+
+  public constructNewNetworkLoadBalancerTemplate(application: Application): IAmazonNetworkLoadBalancerUpsertCommand {
+    const defaultCredentials = application.defaultCredentials.aws || AWSProviderSettings.defaults.account,
+      defaultRegion = application.defaultRegions.aws || AWSProviderSettings.defaults.region,
+      defaultSubnetType = AWSProviderSettings.defaults.subnetType,
+      defaultTargetGroupName = `targetgroup`;
+    return {
+      name: undefined,
+      availabilityZones: undefined,
+      stack: '',
+      detail: '',
+      loadBalancerType: 'network',
+      isInternal: false,
+      cloudProvider: 'aws',
+      credentials: defaultCredentials,
+      region: defaultRegion,
+      vpcId: null,
+      subnetType: defaultSubnetType,
+      securityGroups: [],
+      targetGroups: [
+        {
+          name: defaultTargetGroupName,
+          protocol: 'TCP',
+          port: 7001,
+          targetType: 'instance',
+          healthCheckProtocol: 'TCP',
+          healthCheckPort: '7001',
+          healthCheckTimeout: 5,
+          healthCheckInterval: 10,
+          healthyThreshold: 10,
+          unhealthyThreshold: 10,
+          attributes: {
+            deregistrationDelay: 600,
+          },
+        },
+      ],
+      regionZones: [],
+      listeners: [
+        {
+          certificates: [],
+          protocol: 'TCP',
+          port: 80,
+          defaultActions: [
+            {
+              type: 'forward',
+              targetGroupName: defaultTargetGroupName,
+            },
+          ],
+          rules: [],
+        },
+      ],
+    };
+  }
 }
 
 export const AWS_LOAD_BALANCER_TRANSFORMER = 'spinnaker.amazon.loadBalancer.transformer';
-module(AWS_LOAD_BALANCER_TRANSFORMER, [VPC_READ_SERVICE]).service(
-  'awsLoadBalancerTransformer',
-  AwsLoadBalancerTransformer,
-);
+module(AWS_LOAD_BALANCER_TRANSFORMER, []).service('awsLoadBalancerTransformer', AwsLoadBalancerTransformer);

@@ -6,9 +6,9 @@ import _ from 'lodash';
 import {
   CloudProviderRegistry,
   CONFIRMATION_MODAL_SERVICE,
-  RECENT_HISTORY_SERVICE,
+  RecentHistoryService,
   SECURITY_GROUP_READER,
-  SECURITY_GROUP_WRITER,
+  SecurityGroupWriter,
   FirewallLabels,
 } from '@spinnaker/core';
 
@@ -16,10 +16,8 @@ module.exports = angular
   .module('spinnaker.amazon.securityGroup.details.controller', [
     require('@uirouter/angularjs').default,
     SECURITY_GROUP_READER,
-    SECURITY_GROUP_WRITER,
     CONFIRMATION_MODAL_SERVICE,
     require('../clone/cloneSecurityGroup.controller.js').name,
-    RECENT_HISTORY_SERVICE,
   ])
   .controller('awsSecurityGroupDetailsCtrl', function(
     $scope,
@@ -27,9 +25,7 @@ module.exports = angular
     resolvedSecurityGroup,
     app,
     confirmationModalService,
-    securityGroupWriter,
     securityGroupReader,
-    recentHistoryService,
     $uibModal,
   ) {
     this.application = app;
@@ -120,7 +116,7 @@ module.exports = angular
         $scope.group = securityGroup.name;
         $scope.state.notFound = true;
         $scope.state.loading = false;
-        recentHistoryService.removeLastItem('securityGroups');
+        RecentHistoryService.removeLastItem('securityGroups');
       } else {
         $state.params.allowModalToStayOpen = true;
         $state.go('^', null, { location: 'replace' });
@@ -191,7 +187,7 @@ module.exports = angular
         if (isRetry) {
           Object.assign(params, retryParams);
         }
-        return securityGroupWriter.deleteSecurityGroup(securityGroup, application, params);
+        return SecurityGroupWriter.deleteSecurityGroup(securityGroup, application, params);
       };
 
       confirmationModalService.confirm({

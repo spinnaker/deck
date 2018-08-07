@@ -47,7 +47,7 @@ export class InstanceListBody extends React.Component<IInstanceListBodyProps, II
       .takeUntil(this.destroy$)
       .subscribe(() => {
         this.setState({
-          activeInstanceId: this.$state.params.activeInstanceId,
+          activeInstanceId: this.$state.params.instanceId,
           multiselect: this.$state.params.multiselect,
         });
       });
@@ -179,7 +179,7 @@ export class InstanceListBody extends React.Component<IInstanceListBodyProps, II
         )}
         <td>
           <span className={`glyphicon glyphicon-${instance.healthState}-triangle`} />
-          {instance.id}
+          {instance.name || instance.id}
         </td>
         <td>{timestamp(instance.launchTime)}</td>
         <td>{instance.availabilityZone}</td>

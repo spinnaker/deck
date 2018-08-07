@@ -1,32 +1,20 @@
 import { mock } from 'angular';
-import {
-  ServerGroupWarningMessageService,
-  SERVER_GROUP_WARNING_MESSAGE_SERVICE,
-} from './serverGroupWarningMessage.service';
+import { ServerGroupWarningMessageService } from './serverGroupWarningMessage.service';
 import { ApplicationModelBuilder, APPLICATION_MODEL_BUILDER } from 'core/application/applicationModel.builder';
 import { IServerGroup } from 'core/domain';
 import { Application } from 'core/application/application.model';
 import { IConfirmationModalParams } from 'core/confirmationModal/confirmationModal.service';
 
-describe('serverGroupWarningMessageService', () => {
-  let service: ServerGroupWarningMessageService,
-    applicationModelBuilder: ApplicationModelBuilder,
-    app: Application,
-    serverGroup: IServerGroup;
+describe('ServerGroupWarningMessageService', () => {
+  let applicationModelBuilder: ApplicationModelBuilder, app: Application, serverGroup: IServerGroup;
 
-  beforeEach(mock.module(SERVER_GROUP_WARNING_MESSAGE_SERVICE, APPLICATION_MODEL_BUILDER));
+  beforeEach(mock.module(APPLICATION_MODEL_BUILDER));
 
   beforeEach(
-    mock.inject(
-      (
-        serverGroupWarningMessageService: ServerGroupWarningMessageService,
-        _applicationModelBuilder_: ApplicationModelBuilder,
-      ) => {
-        service = serverGroupWarningMessageService;
-        applicationModelBuilder = _applicationModelBuilder_;
-        app = applicationModelBuilder.createApplication('app');
-      },
-    ),
+    mock.inject((_applicationModelBuilder_: ApplicationModelBuilder) => {
+      applicationModelBuilder = _applicationModelBuilder_;
+      app = applicationModelBuilder.createApplication('app');
+    }),
   );
 
   describe('addDestroyWarningMessage', () => {
@@ -64,7 +52,7 @@ describe('serverGroupWarningMessageService', () => {
         },
       ];
       const params: IConfirmationModalParams = {};
-      service.addDestroyWarningMessage(app, serverGroup, params);
+      ServerGroupWarningMessageService.addDestroyWarningMessage(app, serverGroup, params);
       expect(params.body).toBeUndefined();
     });
 
@@ -90,7 +78,7 @@ describe('serverGroupWarningMessageService', () => {
         },
       ];
       const params: IConfirmationModalParams = {};
-      service.addDestroyWarningMessage(app, serverGroup, params);
+      ServerGroupWarningMessageService.addDestroyWarningMessage(app, serverGroup, params);
       expect(params.body).toBeDefined();
       expect(params.body.includes('You are destroying the last Server Group in the Cluster')).toBe(true);
       expect(params.body.includes('test')).toBe(true);
@@ -122,7 +110,7 @@ describe('serverGroupWarningMessageService', () => {
         },
       ];
       const params: IConfirmationModalParams = {};
-      service.addDisableWarningMessage(app, serverGroup, params);
+      ServerGroupWarningMessageService.addDisableWarningMessage(app, serverGroup, params);
       expect(params.body).toBeUndefined();
     });
 
@@ -132,7 +120,7 @@ describe('serverGroupWarningMessageService', () => {
         cloudProvider: 'aws',
         cluster: 'foo',
         instanceCounts: { up: 1, down: 0, succeeded: 0, failed: 0, unknown: 0, outOfService: 0, starting: 0 },
-        instances: [{ id: 'a', launchTime: 1, zone: 'b', health: null }],
+        instances: [{ name: 'a', id: 'a', launchTime: 1, zone: 'b', health: null }],
         name: 'foo-v000',
         region: 'us-east-1',
         type: 'a',
@@ -142,7 +130,7 @@ describe('serverGroupWarningMessageService', () => {
         cloudProvider: 'aws',
         cluster: 'foo',
         instanceCounts: { up: 0, down: 1, succeeded: 0, failed: 0, unknown: 0, outOfService: 0, starting: 0 },
-        instances: [{ id: 'a', launchTime: 1, zone: 'b', health: null }],
+        instances: [{ name: 'a', id: 'a', launchTime: 1, zone: 'b', health: null }],
         name: 'foo-v001',
         region: 'us-east-1',
         type: 'a',
@@ -158,7 +146,7 @@ describe('serverGroupWarningMessageService', () => {
         },
       ];
       const params: IConfirmationModalParams = { account: 'prod' };
-      service.addDisableWarningMessage(app, serverGroup, params);
+      ServerGroupWarningMessageService.addDisableWarningMessage(app, serverGroup, params);
       expect(params.body).toBeDefined();
       expect(params.body.includes('<li>')).toBe(false);
       expect(params.textToVerify).toBe('0');
@@ -171,7 +159,7 @@ describe('serverGroupWarningMessageService', () => {
         cloudProvider: 'aws',
         cluster: 'foo',
         instanceCounts: { up: 1, down: 0, succeeded: 0, failed: 0, unknown: 0, outOfService: 0, starting: 0 },
-        instances: [{ id: 'a', launchTime: 1, zone: 'b', health: null }],
+        instances: [{ name: 'a', id: 'a', launchTime: 1, zone: 'b', health: null }],
         name: 'foo-v000',
         region: 'us-east-1',
         type: 'a',
@@ -187,7 +175,7 @@ describe('serverGroupWarningMessageService', () => {
         },
       ];
       const params: IConfirmationModalParams = { account: 'prod' };
-      service.addDisableWarningMessage(app, serverGroup, params);
+      ServerGroupWarningMessageService.addDisableWarningMessage(app, serverGroup, params);
       expect(params.body).toBeDefined();
       expect(params.body.includes('<li>')).toBe(false);
       expect(params.textToVerify).toBe('0');
@@ -200,7 +188,7 @@ describe('serverGroupWarningMessageService', () => {
         cloudProvider: 'aws',
         cluster: 'foo',
         instanceCounts: { up: 1, down: 0, succeeded: 0, failed: 0, unknown: 0, outOfService: 0, starting: 0 },
-        instances: [{ id: 'a', launchTime: 1, zone: 'b', health: null }],
+        instances: [{ name: 'a', id: 'a', launchTime: 1, zone: 'b', health: null }],
         name: 'foo-v000',
         region: 'us-east-1',
         type: 'a',
@@ -221,7 +209,7 @@ describe('serverGroupWarningMessageService', () => {
         cloudProvider: 'aws',
         cluster: 'foo',
         instanceCounts: { up: 1, down: 0, succeeded: 0, failed: 0, unknown: 0, outOfService: 0, starting: 0 },
-        instances: [{ id: 'b', launchTime: 1, zone: 'b', health: null }],
+        instances: [{ name: 'b', id: 'b', launchTime: 1, zone: 'b', health: null }],
         name: 'foo-v002',
         region: 'us-east-1',
         type: 'a',
@@ -237,7 +225,7 @@ describe('serverGroupWarningMessageService', () => {
         },
       ];
       const params: IConfirmationModalParams = { account: 'prod' };
-      service.addDisableWarningMessage(app, serverGroup, params);
+      ServerGroupWarningMessageService.addDisableWarningMessage(app, serverGroup, params);
       expect(params.body).toBeDefined();
       expect(params.body.includes('foo-v000')).toBe(false); // this is the target, so should not be included
       expect(params.body.includes('foo-v001')).toBe(false);

@@ -1,24 +1,22 @@
 'use strict';
 
-import { PIPELINE_CONFIG_PROVIDER } from 'core/pipeline/config/pipelineConfigProvider';
+import { ManualExecutionBake } from './ManualExecutionBake';
+import { Registry } from 'core/registry';
 
 const angular = require('angular');
 
 module.exports = angular
-  .module('spinnaker.core.pipeline.stage.bakeStage', [
-    PIPELINE_CONFIG_PROVIDER,
-    require('./bakeStage.transformer.js').name,
-  ])
-  .config(function(pipelineConfigProvider) {
-    pipelineConfigProvider.registerStage({
+  .module('spinnaker.core.pipeline.stage.bakeStage', [require('./bakeStage.transformer.js').name])
+  .config(function() {
+    Registry.pipeline.registerStage({
       useBaseProvider: true,
       label: 'Bake',
       description: 'Bakes an image in the specified region',
       key: 'bake',
       restartable: true,
-      manualExecutionHandler: require('./bakeExecutionHandler.html'),
+      manualExecutionComponent: ManualExecutionBake,
     });
   })
-  .run(function(pipelineConfig, bakeStageTransformer) {
-    pipelineConfig.registerTransformer(bakeStageTransformer);
+  .run(function(bakeStageTransformer) {
+    Registry.pipeline.registerTransformer(bakeStageTransformer);
   });

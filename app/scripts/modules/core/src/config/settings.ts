@@ -9,6 +9,12 @@ export interface INotificationSettings {
   email: {
     enabled: boolean;
   };
+  bearychat: {
+    enabled: boolean;
+  };
+  googlechat: {
+    enabled: boolean;
+  };
   hipchat: {
     enabled: boolean;
     botName: string;
@@ -26,6 +32,7 @@ export interface IFeatures {
   canary?: boolean;
   entityTags?: boolean;
   fiatEnabled?: boolean;
+  iapRefresherEnabled?: boolean;
   pipelines?: boolean;
   notifications?: boolean;
   clusterDiff?: boolean;
@@ -40,6 +47,7 @@ export interface IFeatures {
   pipelineTemplates?: boolean;
   versionedProviders?: boolean;
   travis?: boolean;
+  managedServiceAccounts?: boolean;
   [key: string]: any;
 }
 
@@ -78,8 +86,14 @@ export interface ISpinnakerSettings {
     };
   };
   feature: IFeatures;
+  feedback?: {
+    url: string;
+    text?: string;
+    icon?: string;
+  };
   gateUrl: string;
   gitSources: string[];
+  maxPipelineAgeDays: number;
   notifications: INotificationSettings;
   pagerDuty?: {
     accountName?: string;

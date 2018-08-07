@@ -2,20 +2,13 @@
 
 const angular = require('angular');
 
-import { TASK_MONITOR_BUILDER } from '@spinnaker/core';
-import { SCALING_POLICY_WRITE_SERVICE } from '@spinnaker/amazon';
-
-// import { STEP_POLICY_ACTION } from './step/stepPolicyAction.component';
+import { TaskMonitor } from '@spinnaker/core';
+import { ScalingPolicyWriter } from '@spinnaker/amazon';
 
 module.exports = angular
-  .module('spinnaker.titus.serverGroup.details.scalingPolicy.upsertScalingPolicy.controller', [
-    SCALING_POLICY_WRITE_SERVICE,
-    TASK_MONITOR_BUILDER,
-  ])
+  .module('spinnaker.titus.serverGroup.details.scalingPolicy.upsertScalingPolicy.controller', [])
   .controller('titusUpsertScalingPolicyCtrl', function(
     $uibModalInstance,
-    scalingPolicyWriter,
-    taskMonitorBuilder,
     alarmServerGroup,
     serverGroup,
     application,
@@ -150,7 +143,7 @@ module.exports = angular
       return command;
     };
 
-    this.taskMonitor = taskMonitorBuilder.buildTaskMonitor({
+    this.taskMonitor = new TaskMonitor({
       application: application,
       title: this.action + ' scaling policy for ' + serverGroup.name,
       modalInstance: $uibModalInstance,
@@ -158,7 +151,7 @@ module.exports = angular
 
     this.save = () => {
       const command = prepareCommandForSubmit();
-      const submitMethod = () => scalingPolicyWriter.upsertScalingPolicy(application, command);
+      const submitMethod = () => ScalingPolicyWriter.upsertScalingPolicy(application, command);
 
       this.taskMonitor.submit(submitMethod);
     };

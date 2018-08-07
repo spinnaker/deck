@@ -4,21 +4,17 @@ const angular = require('angular');
 
 import {
   AccountService,
-  LOAD_BALANCER_WRITE_SERVICE,
+  FirewallLabels,
+  LoadBalancerWriter,
   SECURITY_GROUP_READER,
-  TASK_MONITOR_BUILDER,
-  V2_MODAL_WIZARD_SERVICE,
+  TaskMonitor,
 } from '@spinnaker/core';
 
 import '../../loadBalancer.less';
-import { FirewallLabels } from 'root/app/scripts/modules/core/src';
 
 module.exports = angular
   .module('spinnaker.loadBalancer.openstack.create.controller', [
     require('@uirouter/angularjs').default,
-    LOAD_BALANCER_WRITE_SERVICE,
-    V2_MODAL_WIZARD_SERVICE,
-    TASK_MONITOR_BUILDER,
     require('../../transformer.js').name,
     require('../../../region/regionSelectField.directive.js').name,
     require('../../../subnet/subnetSelectField.directive.js').name,
@@ -34,8 +30,6 @@ module.exports = angular
     loadBalancer,
     isNew,
     openstackLoadBalancerTransformer,
-    loadBalancerWriter,
-    taskMonitorBuilder,
     securityGroupReader,
   ) {
     var ctrl = this;
@@ -106,7 +100,7 @@ module.exports = angular
       application.loadBalancers.onNextRefresh($scope, onApplicationRefresh);
     }
 
-    $scope.taskMonitor = taskMonitorBuilder.buildTaskMonitor({
+    $scope.taskMonitor = new TaskMonitor({
       application: application,
       title: (isNew ? 'Creating ' : 'Updating ') + 'your load balancer',
       modalInstance: $uibModalInstance,
@@ -258,7 +252,7 @@ module.exports = angular
           accountId: $scope.loadBalancer.accountId,
           securityGroups: $scope.loadBalancer.securityGroups,
         };
-        return loadBalancerWriter.upsertLoadBalancer(
+        return LoadBalancerWriter.upsertLoadBalancer(
           _.omit($scope.loadBalancer, 'accountId'),
           application,
           descriptor,

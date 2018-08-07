@@ -10,11 +10,14 @@ import {
   ModalInjector,
   NgReact,
   ReactInjector,
+  ServerGroupWarningMessageService,
   SETTINGS,
 } from '@spinnaker/core';
 
 import { IAmazonServerGroup, IAmazonServerGroupView } from 'amazon/domain';
+import { AmazonCloneServerGroupModal } from 'amazon/serverGroup/configure/wizard/AmazonCloneServerGroupModal';
 import { AwsReactInjector } from 'amazon/reactShims';
+import { IAmazonServerGroupCommand } from '../configure';
 
 export interface IAmazonServerGroupActionsProps extends IServerGroupActionsProps {
   serverGroup: IAmazonServerGroupView;
@@ -93,7 +96,7 @@ export class AmazonServerGroupActions extends React.Component<IAmazonServerGroup
       },
     };
 
-    ReactInjector.serverGroupWarningMessageService.addDestroyWarningMessage(app, serverGroup, confirmationModalParams);
+    ServerGroupWarningMessageService.addDestroyWarningMessage(app, serverGroup, confirmationModalParams);
 
     if (app.attributes.platformHealthOnlyShowOverride && app.attributes.platformHealthOnly) {
       confirmationModalParams.interestingHealthProviderNames = ['Amazon'];
@@ -127,7 +130,7 @@ export class AmazonServerGroupActions extends React.Component<IAmazonServerGroup
       askForReason: true,
     };
 
-    ReactInjector.serverGroupWarningMessageService.addDisableWarningMessage(app, serverGroup, confirmationModalParams);
+    ServerGroupWarningMessageService.addDisableWarningMessage(app, serverGroup, confirmationModalParams);
 
     if (app.attributes.platformHealthOnlyShowOverride && app.attributes.platformHealthOnly) {
       confirmationModalParams.interestingHealthProviderNames = ['Amazon'];
@@ -267,17 +270,12 @@ export class AmazonServerGroupActions extends React.Component<IAmazonServerGroup
 
   private cloneServerGroup = (): void => {
     const { app, serverGroup } = this.props;
-    ModalInjector.modalService.open({
-      templateUrl: require('../configure/wizard/serverGroupWizard.html'),
-      controller: 'awsCloneServerGroupCtrl as ctrl',
-      size: 'lg',
-      resolve: {
-        title: () => 'Clone ' + serverGroup.name,
-        application: () => app,
-        serverGroupCommand: () =>
-          AwsReactInjector.awsServerGroupCommandBuilder.buildServerGroupCommandFromExisting(app, serverGroup),
-      },
-    });
+    AwsReactInjector.awsServerGroupCommandBuilder
+      .buildServerGroupCommandFromExisting(app, serverGroup)
+      .then((command: IAmazonServerGroupCommand) => {
+        const title = `Clone ${serverGroup.name}`;
+        AmazonCloneServerGroupModal.show({ title, application: app, command });
+      });
   };
 
   public render(): JSX.Element {

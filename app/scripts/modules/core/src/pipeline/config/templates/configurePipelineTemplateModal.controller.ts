@@ -4,16 +4,16 @@ import { load, dump } from 'js-yaml';
 import { without, chain, has } from 'lodash';
 
 import { Application } from 'core/application/application.model';
-import { ReactInjector } from 'core/reactShims';
+import { VariableValidatorService } from './validators/variableValidator.service';
 
 import {
-  PIPELINE_TEMPLATE_SERVICE,
+  PipelineTemplateReader,
   IVariableMetadata,
   IPipelineTemplateConfig,
   IPipelineTemplatePlanResponse,
   IPipelineTemplate,
   IPipelineTemplatePlanError,
-} from './pipelineTemplate.service';
+} from './PipelineTemplateReader';
 import { IVariable } from './inputs/variableInput.service';
 
 export interface IVariableMetadataGroup {
@@ -92,8 +92,7 @@ export class ConfigurePipelineTemplateModalController implements IController {
 
   public submit(): IPromise<void> {
     const config = this.buildConfig();
-    return ReactInjector.pipelineTemplateService
-      .getPipelinePlan(config)
+    return PipelineTemplateReader.getPipelinePlan(config)
       .then(plan => {
         this.$uibModalInstance.close({ plan, config });
       })
@@ -135,11 +134,11 @@ export class ConfigurePipelineTemplateModalController implements IController {
   }
 
   private loadTemplate(): IPromise<void> {
-    return ReactInjector.pipelineTemplateService
-      .getPipelineTemplateFromSourceUrl(this.source, this.executionId, this.pipelineId)
-      .then(template => {
+    return PipelineTemplateReader.getPipelineTemplateFromSourceUrl(this.source, this.executionId, this.pipelineId).then(
+      template => {
         this.template = template;
-      });
+      },
+    );
   }
 
   private transformVariablesForPipelinePlan(): { [key: string]: any } {
@@ -161,7 +160,7 @@ export class ConfigurePipelineTemplateModalController implements IController {
 
   public handleVariableChange = (newVariable: IVariable): void => {
     const oldVariable = this.getVariable(newVariable.name);
-    newVariable.errors = ReactInjector.variableValidatorService.validate(newVariable);
+    newVariable.errors = VariableValidatorService.validate(newVariable);
     this.variables = without(this.variables, oldVariable).concat([newVariable]);
 
     // `handleVariableChange` is passed to a React component, and Angular has no idea when it has been called.
@@ -202,7 +201,7 @@ export class ConfigurePipelineTemplateModalController implements IController {
         hideErrors: true,
       };
     });
-    this.variables.forEach(v => (v.errors = ReactInjector.variableValidatorService.validate(v)));
+    this.variables.forEach(v => (v.errors = VariableValidatorService.validate(v)));
   }
 
   private getInitialVariableValue(variable: IVariableMetadata): any {
@@ -221,7 +220,7 @@ export class ConfigurePipelineTemplateModalController implements IController {
 }
 
 export const CONFIGURE_PIPELINE_TEMPLATE_MODAL_CTRL = 'spinnaker.core.pipeline.configureTemplate.modal.controller';
-module(CONFIGURE_PIPELINE_TEMPLATE_MODAL_CTRL, [PIPELINE_TEMPLATE_SERVICE]).controller(
+module(CONFIGURE_PIPELINE_TEMPLATE_MODAL_CTRL, []).controller(
   'ConfigurePipelineTemplateModalCtrl',
   ConfigurePipelineTemplateModalController,
 );

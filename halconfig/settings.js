@@ -1,12 +1,12 @@
 'use strict';
 
-var feedbackUrl = '';
 var gateHost = '{%gate.baseUrl%}';
 var bakeryDetailUrl = gateHost + '/bakery/logs/{{context.region}}/{{context.status.resourceId}}';
 var authEndpoint = gateHost + '/auth/user';
 var authEnabled = '{%features.auth%}' === 'true';
 var chaosEnabled = '{%features.chaos%}' === 'true';
 var fiatEnabled = '{%features.fiat%}' === 'true';
+var iapRefresherEnabled = '{%features.iapRefresherEnabled}' === 'true';
 var jobsEnabled = '{%features.jobs%}' === 'true';
 var infrastructureStagesEnabled = '{%features.infrastructureStages%}' === 'true';
 var pipelineTemplatesEnabled = '{%features.pipelineTemplates%}' === 'true';
@@ -22,6 +22,7 @@ var atlasWebComponentsUrl = '{%canary.atlasWebComponentsUrl%}';
 var templatesEnabled = '{%canary.templatesEnabled%}' === 'true';
 var showAllConfigsEnabled = '{%canary.showAllCanaryConfigs%}' === 'true';
 var canaryFeatureDisabled = '{%canary.featureEnabled%}' !== 'true';
+var maxPipelineAgeDays = '{%maxPipelineAgeDays%}';
 var timezone = '{%timezone%}';
 var version = '{%version%}';
 var changelogGistId = '{%changelog.gist.id%}';
@@ -63,10 +64,10 @@ var azure = {
     region: '{%azure.default.region%}',
   },
 };
-var oraclebmcs = {
+var oracle = {
   defaults: {
-    account: '{%oraclebmcs.default.account%}',
-    region: '{%oraclebmcs.default.region%}',
+    account: '{%oracle.default.account%}',
+    region: '{%oracle.default.region%}',
   },
 };
 var dcos = {
@@ -90,8 +91,7 @@ var slack = {
 window.spinnakerSettings = {
   version: version,
   checkForUpdates: false,
-  defaultProviders: ['aws', 'ecs', 'gce', 'azure', 'cf', 'kubernetes', 'titus', 'openstack', 'oraclebmcs', 'dcos'],
-  feedbackUrl: feedbackUrl,
+  defaultProviders: ['aws', 'ecs', 'gce', 'azure', 'cf', 'kubernetes', 'titus', 'openstack', 'oracle', 'dcos'],
   gateUrl: gateHost,
   bakeryDetailUrl: bakeryDetailUrl,
   authEndpoint: authEndpoint,
@@ -99,6 +99,7 @@ window.spinnakerSettings = {
   defaultTimeZone: timezone, // see http://momentjs.com/timezone/docs/#/data-utilities/
   defaultCategory: 'serverGroup',
   defaultInstancePort: 80,
+  maxPipelineAgeDays: maxPipelineAgeDays,
   providers: {
     azure: azure,
     aws: {
@@ -127,7 +128,7 @@ window.spinnakerSettings = {
     openstack: openstack,
     kubernetes: kubernetes,
     appengine: appengine,
-    oraclebmcs: oraclebmcs,
+    oracle: oracle,
     dcos: dcos,
   },
   changelog: {
@@ -154,7 +155,7 @@ window.spinnakerSettings = {
   authTtl: 600000,
   gitSources: ['stash', 'github', 'bitbucket', 'gitlab'],
   pubsubProviders: ['google'], // TODO(joonlim): Add amazon once it is confirmed that amazon pub/sub works.
-  triggerTypes: ['git', 'pipeline', 'docker', 'cron', 'jenkins', 'travis', 'pubsub', 'webhook'],
+  triggerTypes: ['git', 'pipeline', 'docker', 'cron', 'jenkins', 'wercker', 'travis', 'pubsub', 'webhook'],
   canary: {
     reduxLogger: reduxLoggerEnabled,
     metricsAccountName: defaultMetricsAccountName,
@@ -170,6 +171,7 @@ window.spinnakerSettings = {
   feature: {
     entityTags: entityTagsEnabled,
     fiatEnabled: fiatEnabled,
+    iapRefresherEnabled: iapRefresherEnabled,
     netflixMode: netflixMode,
     chaosMonkey: chaosEnabled,
     jobs: jobsEnabled,
@@ -184,7 +186,6 @@ window.spinnakerSettings = {
     pagerDuty: false,
     clusterDiff: false,
     roscoMode: true,
-    infrastructureStages: false,
     snapshots: false,
     travis: false,
     versionedProviders: true,

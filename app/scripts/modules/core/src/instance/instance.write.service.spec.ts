@@ -10,12 +10,7 @@ import { ServerGroupReader } from '../serverGroup/serverGroupReader.service';
 import { IJob, ITaskCommand, TaskExecutor } from '../task/taskExecutor';
 
 describe('Service: instance writer', function() {
-  let service: InstanceWriter,
-    serverGroupReader: ServerGroupReader,
-    taskExecutor: TaskExecutor,
-    $q: ng.IQService,
-    $scope: ng.IScope,
-    applicationModelBuilder: ApplicationModelBuilder;
+  let service: InstanceWriter, $q: ng.IQService, $scope: ng.IScope, applicationModelBuilder: ApplicationModelBuilder;
 
   beforeEach(() => State.initialize());
 
@@ -25,15 +20,11 @@ describe('Service: instance writer', function() {
     mock.inject(
       (
         instanceWriter: InstanceWriter,
-        _taskExecutor_: TaskExecutor,
-        _serverGroupReader_: ServerGroupReader,
         _$q_: ng.IQService,
         $rootScope: ng.IRootScopeService,
         _applicationModelBuilder_: ApplicationModelBuilder,
       ) => {
         service = instanceWriter;
-        taskExecutor = _taskExecutor_;
-        serverGroupReader = _serverGroupReader_;
         $q = _$q_;
         $scope = $rootScope.$new();
         applicationModelBuilder = _applicationModelBuilder_;
@@ -50,6 +41,7 @@ describe('Service: instance writer', function() {
         },
       };
       const instance: IInstance = {
+        name: 'i-123456',
         id: 'i-123456',
         account: 'test',
         region: 'us-east-1',
@@ -65,16 +57,16 @@ describe('Service: instance writer', function() {
       });
       let executedTask: IJob = null;
 
-      spyOn(taskExecutor, 'executeTask').and.callFake((task: ITaskCommand) => {
+      spyOn(TaskExecutor, 'executeTask').and.callFake((task: ITaskCommand) => {
         executedTask = task.job[0];
       });
-      spyOn(serverGroupReader, 'getServerGroup').and.returnValue($q.when(serverGroup));
+      spyOn(ServerGroupReader, 'getServerGroup').and.returnValue($q.when(serverGroup));
 
       service.terminateInstanceAndShrinkServerGroup(instance, application, {});
       $scope.$digest();
       $scope.$digest();
 
-      expect(taskExecutor.executeTask).toHaveBeenCalled();
+      expect(TaskExecutor.executeTask).toHaveBeenCalled();
       expect(executedTask['setMaxToNewDesired']).toBe(true);
     });
   });
@@ -115,13 +107,27 @@ describe('Service: instance writer', function() {
         instances: [],
       };
 
-      spyOn(taskExecutor, 'executeTask').and.callFake((command: ITaskCommand) => (task = command));
+      spyOn(TaskExecutor, 'executeTask').and.callFake((command: ITaskCommand) => (task = command));
     });
 
     it('only sends jobs for groups with instances', () => {
       const application: Application = applicationModelBuilder.createApplication('app');
-      addInstance(serverGroupB, { id: 'i-234', health: [], healthState: 'Up', zone: 'a', launchTime: 2 });
-      addInstance(serverGroupB, { id: 'i-345', health: [], healthState: 'Up', zone: 'a', launchTime: 2 });
+      addInstance(serverGroupB, {
+        name: 'i-234',
+        id: 'i-234',
+        health: [],
+        healthState: 'Up',
+        zone: 'a',
+        launchTime: 2,
+      });
+      addInstance(serverGroupB, {
+        name: 'i-345',
+        id: 'i-345',
+        health: [],
+        healthState: 'Up',
+        zone: 'a',
+        launchTime: 2,
+      });
       service.terminateInstances([getInstanceGroup(serverGroupA), getInstanceGroup(serverGroupB)], application);
 
       expect(task.job.length).toBe(1);
@@ -138,8 +144,22 @@ describe('Service: instance writer', function() {
 
     it('includes additional job properties for terminate and shrink', () => {
       const application: Application = applicationModelBuilder.createApplication('app');
-      addInstance(serverGroupA, { id: 'i-234', health: [], healthState: 'Up', zone: 'a', launchTime: 2 });
-      addInstance(serverGroupA, { id: 'i-345', health: [], healthState: 'Up', zone: 'a', launchTime: 2 });
+      addInstance(serverGroupA, {
+        name: 'i-234',
+        id: 'i-234',
+        health: [],
+        healthState: 'Up',
+        zone: 'a',
+        launchTime: 2,
+      });
+      addInstance(serverGroupA, {
+        name: 'i-345',
+        id: 'i-345',
+        health: [],
+        healthState: 'Up',
+        zone: 'a',
+        launchTime: 2,
+      });
       service.terminateInstancesAndShrinkServerGroups([getInstanceGroup(serverGroupA)], application);
 
       expect(task.job.length).toBe(1);
@@ -158,48 +178,104 @@ describe('Service: instance writer', function() {
 
     it('includes a useful descriptor on terminate instances', () => {
       const application: Application = applicationModelBuilder.createApplication('app');
-      addInstance(serverGroupA, { id: 'i-123', health: [], healthState: 'Up', zone: 'a', launchTime: 2 });
+      addInstance(serverGroupA, {
+        name: 'i-123',
+        id: 'i-123',
+        health: [],
+        healthState: 'Up',
+        zone: 'a',
+        launchTime: 2,
+      });
 
       service.terminateInstances([getInstanceGroup(serverGroupA)], application);
       expect(task.description).toBe('Terminate 1 instance');
 
-      addInstance(serverGroupA, { id: 'i-1234', health: [], healthState: 'Up', zone: 'a', launchTime: 1 });
+      addInstance(serverGroupA, {
+        name: 'i-1234',
+        id: 'i-1234',
+        health: [],
+        healthState: 'Up',
+        zone: 'a',
+        launchTime: 1,
+      });
       service.terminateInstances([getInstanceGroup(serverGroupA)], application);
       expect(task.description).toBe('Terminate 2 instances');
     });
 
     it('includes a useful descriptor on reboot instances', function() {
       const application: Application = applicationModelBuilder.createApplication('app');
-      addInstance(serverGroupA, { id: 'i-123', health: [], healthState: 'Up', zone: 'a', launchTime: 2 });
+      addInstance(serverGroupA, {
+        name: 'i-123',
+        id: 'i-123',
+        health: [],
+        healthState: 'Up',
+        zone: 'a',
+        launchTime: 2,
+      });
 
       service.rebootInstances([getInstanceGroup(serverGroupA)], application);
       expect(task.description).toBe('Reboot 1 instance');
 
-      addInstance(serverGroupA, { id: 'i-1234', health: [], healthState: 'Up', zone: 'a', launchTime: 1 });
+      addInstance(serverGroupA, {
+        name: 'i-1234',
+        id: 'i-1234',
+        health: [],
+        healthState: 'Up',
+        zone: 'a',
+        launchTime: 1,
+      });
       service.rebootInstances([getInstanceGroup(serverGroupA)], application);
       expect(task.description).toBe('Reboot 2 instances');
     });
 
     it('includes a useful descriptor on disable in discovery', function() {
       const application: Application = applicationModelBuilder.createApplication('app');
-      addInstance(serverGroupA, { id: 'i-123', health: [], healthState: 'Up', zone: 'a', launchTime: 2 });
+      addInstance(serverGroupA, {
+        name: 'i-123',
+        id: 'i-123',
+        health: [],
+        healthState: 'Up',
+        zone: 'a',
+        launchTime: 2,
+      });
 
       service.disableInstancesInDiscovery([getInstanceGroup(serverGroupA)], application);
       expect(task.description).toBe('Disable 1 instance in discovery');
 
-      addInstance(serverGroupA, { id: 'i-1234', health: [], healthState: 'Up', zone: 'a', launchTime: 1 });
+      addInstance(serverGroupA, {
+        name: 'i-1234',
+        id: 'i-1234',
+        health: [],
+        healthState: 'Up',
+        zone: 'a',
+        launchTime: 1,
+      });
       service.disableInstancesInDiscovery([getInstanceGroup(serverGroupA)], application);
       expect(task.description).toBe('Disable 2 instances in discovery');
     });
 
     it('includes a useful descriptor on enable in discovery', function() {
       const application: Application = applicationModelBuilder.createApplication('app');
-      addInstance(serverGroupA, { id: 'i-123', health: [], healthState: 'Up', zone: 'a', launchTime: 2 });
+      addInstance(serverGroupA, {
+        name: 'i-123',
+        id: 'i-123',
+        health: [],
+        healthState: 'Up',
+        zone: 'a',
+        launchTime: 2,
+      });
 
       service.enableInstancesInDiscovery([getInstanceGroup(serverGroupA)], application);
       expect(task.description).toBe('Enable 1 instance in discovery');
 
-      addInstance(serverGroupA, { id: 'i-1234', health: [], healthState: 'Up', zone: 'a', launchTime: 1 });
+      addInstance(serverGroupA, {
+        name: 'i-1234',
+        id: 'i-1234',
+        health: [],
+        healthState: 'Up',
+        zone: 'a',
+        launchTime: 1,
+      });
       service.enableInstancesInDiscovery([getInstanceGroup(serverGroupA)], application);
       expect(task.description).toBe('Enable 2 instances in discovery');
     });

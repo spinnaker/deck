@@ -21,6 +21,11 @@
              ng-change="ctrl.outputNameChange()">
       </input>
     </stage-config-field>
+    <stage-config-field label="Namespace" field-columns="3">
+      <input type="text" class="form-control input-sm"
+             ng-model="ctrl.$scope.stage.namespace">
+      </input>
+    </stage-config-field>
 
     <h4>Template Artifact</h4>
     <expected-artifact-selector command="ctrl.$scope.stage"
@@ -28,7 +33,8 @@
                                 account="ctrl.$scope.stage.inputArtifacts[0].account"
                                 accounts="ctrl.artifactAccounts"
                                 expected-artifacts="ctrl.expectedArtifacts"
-                                help-field-key="pipeline.config.bake.manifest.expectedArtifact">
+                                help-field-key="pipeline.config.bake.manifest.expectedArtifact"
+                                show-icons="true">
     </expected-artifact-selector>
 
     <h4>Overrides</h4>
@@ -38,7 +44,8 @@
                                     id="artifact.id"
                                     account="artifact.account"
                                     accounts="ctrl.artifactAccounts"
-                                    expected-artifacts="ctrl.expectedArtifacts">
+                                    expected-artifacts="ctrl.expectedArtifacts"
+                                    show-icons="true">
         </expected-artifact-selector>
       </div>
       <div class="col-md-1">

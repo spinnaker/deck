@@ -1,16 +1,16 @@
 import { module, IScope } from 'angular';
-import { PIPELINE_CONFIG_PROVIDER, PipelineConfigProvider } from 'core/pipeline';
 
+import { AuthenticationService } from 'core/authentication/AuthenticationService';
 import { IStage } from 'core/domain';
+import { Registry } from 'core/registry';
 
 import { ExecutionDetailsTasks } from '../core';
 import { ScriptExecutionDetails } from '../script/ScriptExecutionDetails';
-import { AuthenticationService } from 'core/authentication/AuthenticationService';
 
 export const SCRIPT_STAGE = 'spinnaker.core.pipeline.stage.scriptStage';
-module(SCRIPT_STAGE, [PIPELINE_CONFIG_PROVIDER])
-  .config((pipelineConfigProvider: PipelineConfigProvider) => {
-    pipelineConfigProvider.registerStage({
+module(SCRIPT_STAGE, [])
+  .config(() => {
+    Registry.pipeline.registerStage({
       label: 'Script',
       description: 'Runs a script',
       defaultTimeoutMs: 1000 * 60 * 60 * 2, // 2 hours
@@ -21,6 +21,7 @@ module(SCRIPT_STAGE, [PIPELINE_CONFIG_PROVIDER])
       templateUrl: require('./scriptStage.html'),
       executionDetailsSections: [ScriptExecutionDetails, ExecutionDetailsTasks],
       strategy: true,
+      validators: [{ type: 'requiredField', fieldName: 'command' }],
     });
   })
   .controller('ScriptStageCtrl', function($scope: IScope, stage: IStage) {

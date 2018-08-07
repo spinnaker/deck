@@ -2,13 +2,11 @@
 
 const angular = require('angular');
 
-import { V2_MODAL_WIZARD_SERVICE, SERVER_GROUP_WRITER, TASK_MONITOR_BUILDER } from '@spinnaker/core';
+import { ModalWizard, SERVER_GROUP_WRITER, TaskMonitor } from '@spinnaker/core';
 
 module.exports = angular
   .module('spinnaker.dcos.serverGroup.configure.clone', [
     SERVER_GROUP_WRITER,
-    V2_MODAL_WIZARD_SERVICE,
-    TASK_MONITOR_BUILDER,
     require('../configuration.service.js').name,
   ])
   .controller('dcosCloneServerGroupController', function(
@@ -17,8 +15,6 @@ module.exports = angular
     $q,
     $state,
     serverGroupWriter,
-    v2modalWizardService,
-    taskMonitorBuilder,
     dcosServerGroupConfigurationService,
     serverGroupCommand,
     application,
@@ -56,7 +52,7 @@ module.exports = angular
       notCopied: [],
     };
 
-    $scope.taskMonitor = taskMonitorBuilder.buildTaskMonitor({
+    $scope.taskMonitor = new TaskMonitor({
       application: application,
       title: 'Creating your server group',
       modalInstance: $uibModalInstance,
@@ -90,13 +86,11 @@ module.exports = angular
     }
 
     this.isValid = function() {
-      return (
-        $scope.command && $scope.command.account !== null && $scope.form.$valid && v2modalWizardService.isComplete()
-      );
+      return $scope.command && $scope.command.account !== null && $scope.form.$valid && ModalWizard.isComplete();
     };
 
     this.showSubmitButton = function() {
-      return v2modalWizardService.allPagesVisited();
+      return ModalWizard.allPagesVisited();
     };
 
     this.clone = function() {

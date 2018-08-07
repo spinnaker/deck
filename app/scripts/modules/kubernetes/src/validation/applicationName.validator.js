@@ -2,10 +2,10 @@
 
 const angular = require('angular');
 
-import { APPLICATION_NAME_VALIDATOR } from '@spinnaker/core';
+import { ApplicationNameValidator } from '@spinnaker/core';
 
 module.exports = angular
-  .module('spinnaker.kubernetes.validation.applicationName', [APPLICATION_NAME_VALIDATOR])
+  .module('spinnaker.kubernetes.validation.applicationName', [])
   .factory('kubernetesApplicationNameValidator', function() {
     function validateSpecialCharacters(name, warnings, errors) {
       const alphanumWithDashPattern = /^([a-zA-Z][a-zA-Z0-9-]*)?$/;
@@ -65,6 +65,6 @@ module.exports = angular
       validate: validate,
     };
   })
-  .run(function(applicationNameValidator, kubernetesApplicationNameValidator) {
-    applicationNameValidator.registerValidator('kubernetes', kubernetesApplicationNameValidator);
+  .run(function(kubernetesApplicationNameValidator) {
+    ApplicationNameValidator.registerValidator('kubernetes', kubernetesApplicationNameValidator);
   });

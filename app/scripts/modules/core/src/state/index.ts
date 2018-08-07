@@ -1,5 +1,7 @@
 import { ClusterFilterModel } from 'core/cluster/filter/ClusterFilterModel';
 import { ClusterFilterService } from 'core/cluster/filter/ClusterFilterService';
+import { SETTINGS } from 'core/config/settings';
+import { VersionChecker } from 'core/config/VersionChecker';
 import { ExecutionFilterModel } from 'core/pipeline/filter/ExecutionFilterModel';
 import { LoadBalancerFilterModel } from 'core/loadBalancer/filter/LoadBalancerFilterModel';
 import { LoadBalancerFilterService } from 'core/loadBalancer/filter/LoadBalancerFilterService';
@@ -27,10 +29,10 @@ export interface IStateSecurityGroup {
   filterService: SecurityGroupFilterService;
 }
 
-export const ClusterState: IStateCluster = {} as any;
-export const ExecutionState: IStateExecution = {} as any;
-export const LoadBalancerState: IStateLoadBalancers = {} as any;
-export const SecurityGroupState: IStateSecurityGroup = {} as any;
+export const ClusterState = {} as IStateCluster;
+export const ExecutionState = {} as IStateExecution;
+export const LoadBalancerState = {} as IStateLoadBalancers;
+export const SecurityGroupState = {} as IStateSecurityGroup;
 
 export function initialize(): void {
   ClusterState.filterModel = new ClusterFilterModel();
@@ -44,4 +46,7 @@ export function initialize(): void {
 
   SecurityGroupState.filterModel = new SecurityGroupFilterModel();
   SecurityGroupState.filterService = new SecurityGroupFilterService();
+  if (SETTINGS.checkForUpdates) {
+    VersionChecker.initialize();
+  }
 }

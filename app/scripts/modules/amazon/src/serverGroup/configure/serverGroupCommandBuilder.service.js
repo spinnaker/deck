@@ -3,23 +3,17 @@
 const angular = require('angular');
 import _ from 'lodash';
 
-import { AccountService, INSTANCE_TYPE_SERVICE, NameUtils, SUBNET_READ_SERVICE } from '@spinnaker/core';
+import { AccountService, INSTANCE_TYPE_SERVICE, NameUtils, SubnetReader } from '@spinnaker/core';
 
 import { AWSProviderSettings } from 'amazon/aws.settings';
 import { AWS_SERVER_GROUP_CONFIGURATION_SERVICE } from 'amazon/serverGroup/configure/serverGroupConfiguration.service';
 
 module.exports = angular
   .module('spinnaker.amazon.serverGroupCommandBuilder.service', [
-    SUBNET_READ_SERVICE,
     INSTANCE_TYPE_SERVICE,
     AWS_SERVER_GROUP_CONFIGURATION_SERVICE,
   ])
-  .factory('awsServerGroupCommandBuilder', function(
-    $q,
-    subnetReader,
-    instanceTypeService,
-    awsServerGroupConfigurationService,
-  ) {
+  .factory('awsServerGroupCommandBuilder', function($q, instanceTypeService, awsServerGroupConfigurationService) {
     function buildNewServerGroupCommand(application, defaults) {
       defaults = defaults || {};
       var credentialsLoader = AccountService.getCredentialsKeyedByAccount('aws');
@@ -78,6 +72,8 @@ module.exports = angular
             keyPair: keyPair,
             suspendedProcesses: [],
             securityGroups: [],
+            stack: '',
+            freeFormDetails: '',
             spotPrice: '',
             tags: {},
             useAmiBlockDeviceMappings: useAmiBlockDeviceMappings,
@@ -90,6 +86,7 @@ module.exports = angular
               mode: defaults.mode || 'create',
               disableStrategySelection: true,
               dirty: {},
+              submitButtonLabel: getSubmitButtonLabel(defaults.mode || 'create'),
             },
           };
 
@@ -158,6 +155,19 @@ module.exports = angular
       });
     }
 
+    function getSubmitButtonLabel(mode) {
+      switch (mode) {
+        case 'createPipeline':
+          return 'Add';
+        case 'editPipeline':
+          return 'Done';
+        case 'clone':
+          return 'Clone';
+        default:
+          return 'Create';
+      }
+    }
+
     function buildUpdateServerGroupCommand(serverGroup) {
       var command = {
         type: 'modifyAsg',
@@ -175,7 +185,7 @@ module.exports = angular
 
     function buildServerGroupCommandFromExisting(application, serverGroup, mode = 'clone') {
       var preferredZonesLoader = AccountService.getPreferredZonesByAccount('aws');
-      var subnetsLoader = subnetReader.listSubnets();
+      var subnetsLoader = SubnetReader.listSubnets();
 
       var serverGroupName = NameUtils.parseServerGroupName(serverGroup.asg.autoScalingGroupName);
 

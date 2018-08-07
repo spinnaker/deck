@@ -8,9 +8,9 @@ import {
   CloudProviderRegistry,
   CONFIRMATION_MODAL_SERVICE,
   FirewallLabels,
-  INSTANCE_READ_SERVICE,
+  InstanceReader,
   INSTANCE_WRITE_SERVICE,
-  RECENT_HISTORY_SERVICE,
+  RecentHistoryService,
   SETTINGS,
 } from '@spinnaker/core';
 
@@ -19,9 +19,7 @@ module.exports = angular
     require('@uirouter/angularjs').default,
     require('angular-ui-bootstrap'),
     INSTANCE_WRITE_SERVICE,
-    INSTANCE_READ_SERVICE,
     CONFIRMATION_MODAL_SERVICE,
-    RECENT_HISTORY_SERVICE,
     require('../../securityGroup/securityGroup.read.service').name,
   ])
   .controller('titusInstanceDetailsCtrl', function(
@@ -31,10 +29,10 @@ module.exports = angular
     $uibModal,
     instanceWriter,
     confirmationModalService,
-    recentHistoryService,
-    instanceReader,
     instance,
     app,
+    moniker,
+    environment,
     titusSecurityGroupReader,
   ) {
     // needed for standalone instances
@@ -47,6 +45,8 @@ module.exports = angular
     $scope.firewallsLabel = FirewallLabels.get('Firewalls');
 
     $scope.application = app;
+    $scope.moniker = moniker;
+    $scope.environment = environment;
     $scope.gateUrl = SETTINGS.gateUrl;
 
     function extractHealthMetrics(instance, latest) {
@@ -93,8 +93,8 @@ module.exports = angular
       if (instanceSummary && account && region) {
         extraData.account = account;
         extraData.region = region;
-        recentHistoryService.addExtraDataToLatest('instances', extraData);
-        return instanceReader.getInstanceDetails(account, region, instance.instanceId).then(function(details) {
+        RecentHistoryService.addExtraDataToLatest('instances', extraData);
+        return InstanceReader.getInstanceDetails(account, region, instance.instanceId).then(function(details) {
           $scope.state.loading = false;
           extractHealthMetrics(instanceSummary, details);
           $scope.instance = defaults(details, instanceSummary);
@@ -286,17 +286,14 @@ module.exports = angular
         this.bastionHost = details.bastionHost || 'unknown';
 
         const discoveryHealth = $scope.instance.health.find(m => m.type === 'Discovery');
-
         if (discoveryHealth) {
-          this.discoveryInfoLink = `http://discoveryreadonly.${$scope.instance.region}.dyn${
-            details.environment
-          }.netflix.net:7001/discovery/v2/apps/${discoveryHealth.application}/${$scope.instance.instanceId}`;
+          this.discoveryInfoLink =
+            `http://discoveryreadonly.${region}.dyn${details.environment}` +
+            `.netflix.net:7001/discovery/v2/apps/${discoveryHealth.application}/${$scope.instance.instanceId}`;
         }
 
         this.titusUiEndpoint = filter(details.regions, { name: region })[0].endpoint;
-        $scope.sshLink = `ssh -t ${this.bastionHost} 'titus-ssh -region ${$scope.instance.region} -id ${
-          $scope.instance.id
-        }'`;
+        $scope.sshLink = `ssh -t ${this.bastionHost} 'titus-ssh -region ${region} ${$scope.instance.id}'`;
       });
     };
 

@@ -5,9 +5,7 @@ import { flattenDeep } from 'lodash';
 import {
   Application,
   CONFIRMATION_MODAL_SERVICE,
-  INSTANCE_READ_SERVICE,
   InstanceReader,
-  RECENT_HISTORY_SERVICE,
   RecentHistoryService,
   IManifest,
 } from '@spinnaker/core';
@@ -27,10 +25,18 @@ interface InstanceManager {
   instances: IKubernetesInstance[];
 }
 
+interface IConsoleOutputInstance {
+  account: string;
+  region: string;
+  id: string;
+  provider: string;
+}
+
 class KubernetesInstanceDetailsController implements IController {
   public state = { loading: true };
   public instance: IKubernetesInstance;
   public manifest: IManifest;
+  public consoleOutputInstance: IConsoleOutputInstance;
 
   constructor(
     instance: InstanceFromStateParams,
@@ -38,9 +44,6 @@ class KubernetesInstanceDetailsController implements IController {
     private $q: IQService,
     private $scope: IScope,
     private app: Application,
-    private kubernetesManifestService: KubernetesManifestService,
-    private instanceReader: InstanceReader,
-    private recentHistoryService: RecentHistoryService,
   ) {
     'ngInject';
 
@@ -49,10 +52,15 @@ class KubernetesInstanceDetailsController implements IController {
       .then(() => this.retrieveInstance(instance))
       .then(instanceDetails => {
         this.instance = instanceDetails;
+        this.consoleOutputInstance = {
+          account: instanceDetails.account,
+          region: instanceDetails.region,
+          id: instanceDetails.humanReadableName,
+          provider: instanceDetails.provider,
+        };
 
-        this.kubernetesManifestService.makeManifestRefresher(
+        const unsubscribe = KubernetesManifestService.makeManifestRefresher(
           this.app,
-          this.$scope,
           {
             account: this.instance.account,
             location: this.instance.namespace,
@@ -60,6 +68,9 @@ class KubernetesInstanceDetailsController implements IController {
           },
           this,
         );
+        this.$scope.$on('$destroy', () => {
+          unsubscribe();
+        });
         this.state.loading = false;
       })
       .catch(() => {
@@ -98,9 +109,9 @@ class KubernetesInstanceDetailsController implements IController {
     });
   }
 
-  private retrieveInstance(instance: InstanceFromStateParams): IPromise<IKubernetesInstance> {
+  private retrieveInstance(instanceFromState: InstanceFromStateParams): IPromise<IKubernetesInstance> {
     const instanceLocatorPredicate = (dataSource: InstanceManager) => {
-      return dataSource.instances.some(possibleMatch => possibleMatch.id === instance.instanceId);
+      return dataSource.instances.some(possibleMatch => possibleMatch.id === instanceFromState.instanceId);
     };
 
     const dataSources: InstanceManager[] = flattenDeep([
@@ -120,19 +131,26 @@ class KubernetesInstanceDetailsController implements IController {
         recentHistoryExtraData.serverGroup = instanceManager.name;
       }
 
-      this.recentHistoryService.addExtraDataToLatest('instances', recentHistoryExtraData);
-      return this.instanceReader
-        .getInstanceDetails(instanceManager.account, instanceManager.region, instance.instanceId)
-        .then((instanceDetails: IKubernetesInstance) => {
+      const instance = instanceManager.instances.find(i => i.id === instanceFromState.instanceId);
+
+      if (!instance) {
+        return this.$q.reject();
+      }
+
+      RecentHistoryService.addExtraDataToLatest('instances', recentHistoryExtraData);
+      return InstanceReader.getInstanceDetails(instanceManager.account, instanceManager.region, instance.name).then(
+        (instanceDetails: IKubernetesInstance) => {
           instanceDetails.account = instanceManager.account;
           instanceDetails.namespace = instanceDetails.manifest.metadata.namespace;
           instanceDetails.displayName = instanceDetails.manifest.metadata.name;
           instanceDetails.kind = instanceDetails.manifest.kind;
           instanceDetails.apiVersion = instanceDetails.manifest.apiVersion;
-          instanceDetails.id = instanceDetails.name;
+          instanceDetails.id = instance.id;
+          instanceDetails.name = instance.name;
           instanceDetails.provider = 'kubernetes';
           return instanceDetails;
-        });
+        },
+      );
     } else {
       return this.$q.reject();
     }
@@ -141,8 +159,7 @@ class KubernetesInstanceDetailsController implements IController {
 
 export const KUBERNETES_V2_INSTANCE_DETAILS_CTRL = 'spinnaker.kubernetes.v2.instanceDetails.controller';
 
-module(KUBERNETES_V2_INSTANCE_DETAILS_CTRL, [
-  CONFIRMATION_MODAL_SERVICE,
-  INSTANCE_READ_SERVICE,
-  RECENT_HISTORY_SERVICE,
-]).controller('kubernetesV2InstanceDetailsCtrl', KubernetesInstanceDetailsController);
+module(KUBERNETES_V2_INSTANCE_DETAILS_CTRL, [CONFIRMATION_MODAL_SERVICE]).controller(
+  'kubernetesV2InstanceDetailsCtrl',
+  KubernetesInstanceDetailsController,
+);

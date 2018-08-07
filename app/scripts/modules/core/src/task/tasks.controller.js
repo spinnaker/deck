@@ -8,17 +8,16 @@ import { CONFIRMATION_MODAL_SERVICE } from 'core/confirmationModal/confirmationM
 import { ViewStateCache } from 'core/cache';
 import { DISPLAYABLE_TASKS_FILTER } from './displayableTasks.filter';
 import { SETTINGS } from 'core/config/settings';
-import { TASK_WRITE_SERVICE } from './task.write.service';
+import { TaskWriter } from './task.write.service';
 
 module.exports = angular
   .module('spinnaker.core.task.controller', [
     require('@uirouter/angularjs').default,
     require('./taskProgressBar.directive.js').name,
-    TASK_WRITE_SERVICE,
     CONFIRMATION_MODAL_SERVICE,
     DISPLAYABLE_TASKS_FILTER,
   ])
-  .controller('TasksCtrl', function($scope, $state, $stateParams, $q, app, taskWriter, confirmationModalService) {
+  .controller('TasksCtrl', function($scope, $state, $stateParams, $q, app, confirmationModalService) {
     if (app.notFound) {
       return;
     }
@@ -124,19 +123,22 @@ module.exports = angular
       controller.nameFilterUpdated();
     };
 
-    controller.nameFilterUpdated = function() {
+    controller.nameFilterUpdated = _.debounce(() => {
+      const params = { q: $scope.viewState.nameFilter };
       if ($state.includes('**.taskDetails')) {
-        $state.go('^');
+        $state.go('^', params);
+      } else {
+        $state.go('.', params);
       }
       controller.sortTasksAndResetPaginator();
-    };
+    }, 300);
 
     controller.cancelTask = function(taskId) {
       var task = application.tasks.data.filter(function(task) {
         return task.id === taskId;
       })[0];
       var submitMethod = function() {
-        return taskWriter.cancelTask(application.name, taskId).then(() => application.tasks.refresh());
+        return TaskWriter.cancelTask(application.name, taskId).then(() => application.tasks.refresh());
       };
 
       confirmationModalService.confirm({
@@ -152,7 +154,7 @@ module.exports = angular
         return task.id === taskId;
       })[0];
       var submitMethod = function() {
-        return taskWriter.deleteTask(taskId).then(() => application.tasks.refresh());
+        return TaskWriter.deleteTask(taskId).then(() => application.tasks.refresh());
       };
 
       confirmationModalService.confirm({
@@ -290,6 +292,15 @@ module.exports = angular
       application.setActiveState();
       application.tasks.deactivate();
     });
+
+    this.stateChanged = q => {
+      if ($scope.viewState.nameFilter !== q) {
+        $scope.viewState.nameFilter = q;
+        this.sortTasksAndResetPaginator();
+      }
+    };
+
+    $scope.$on('$stateChangeSuccess', (_event, _toState, toParams) => this.stateChanged(toParams.q));
 
     this.application.tasks.onRefresh($scope, this.sortTasks);
   });

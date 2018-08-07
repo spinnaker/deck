@@ -5,7 +5,16 @@ import { IDeferred, IPromise } from 'angular';
 import { IModalServiceInstance } from 'angular-ui-bootstrap';
 import { $q } from 'ngimport';
 
-import { AccountService, ILoadBalancerModalProps, ReactInjector, TaskMonitor, WizardModal } from '@spinnaker/core';
+import {
+  AccountService,
+  LoadBalancerWriter,
+  ReactInjector,
+  TaskMonitor,
+  WizardModal,
+  noop,
+  ReactModal,
+  ILoadBalancerModalProps,
+} from '@spinnaker/core';
 
 import { AWSProviderSettings } from 'amazon/aws.settings';
 import { IAmazonApplicationLoadBalancer, IAmazonApplicationLoadBalancerUpsertCommand } from 'amazon/domain';
@@ -36,9 +45,19 @@ export class CreateApplicationLoadBalancer extends React.Component<
   ICreateApplicationLoadBalancerProps,
   ICreateApplicationLoadBalancerState
 > {
+  public static defaultProps: Partial<ICreateApplicationLoadBalancerProps> = {
+    closeModal: noop,
+    dismissModal: noop,
+  };
+
   private refreshUnsubscribe: () => void;
   private certificateTypes = get(AWSProviderSettings, 'loadBalancers.certificateTypes', ['iam', 'acm']);
   private $uibModalInstanceEmulation: IModalServiceInstance & { deferred?: IDeferred<any> };
+
+  public static show(props: ICreateApplicationLoadBalancerProps): Promise<IAmazonApplicationLoadBalancerUpsertCommand> {
+    const modalProps = { dialogClassName: 'wizard-modal modal-lg' };
+    return ReactModal.show(CreateApplicationLoadBalancer, props, modalProps);
+  }
 
   constructor(props: ICreateApplicationLoadBalancerProps) {
     super(props);
@@ -58,16 +77,11 @@ export class CreateApplicationLoadBalancer extends React.Component<
     const promise = deferred.promise;
     this.$uibModalInstanceEmulation = {
       result: promise,
-      close: () => this.props.showCallback(false),
-      dismiss: () => this.props.showCallback(false),
+      close: () => this.props.dismissModal(),
+      dismiss: () => this.props.dismissModal(),
     } as IModalServiceInstance;
     Object.assign(this.$uibModalInstanceEmulation, { deferred });
   }
-
-  private dismiss = (): void => {
-    this.props.showCallback(false);
-    // no idea
-  };
 
   protected certificateIdAsARN(
     accountId: string,
@@ -158,7 +172,7 @@ export class CreateApplicationLoadBalancer extends React.Component<
 
   protected onApplicationRefresh(values: IAmazonApplicationLoadBalancerUpsertCommand): void {
     this.refreshUnsubscribe = undefined;
-    this.props.showCallback(false);
+    this.props.dismissModal();
     this.setState({ taskMonitor: undefined });
     const newStateParams = {
       name: values.name,
@@ -187,18 +201,37 @@ export class CreateApplicationLoadBalancer extends React.Component<
   }
 
   private submit = (values: IAmazonApplicationLoadBalancerUpsertCommand): void => {
-    const { app, forPipelineConfig, onComplete } = this.props;
+    const { app, forPipelineConfig, closeModal } = this.props;
     const { isNew } = this.state;
 
     const descriptor = isNew ? 'Create' : 'Update';
     const loadBalancerCommandFormatted = cloneDeep(values);
+
+    // replace all authenticateOidcConfig with authenticateOidcActionConfig because aws
+    loadBalancerCommandFormatted.listeners.forEach(listener => {
+      listener.defaultActions.forEach((a: any) => {
+        if (a.authenticateOidcConfig) {
+          a.authenticateOidcActionConfig = a.authenticateOidcConfig;
+          delete a.authenticateOidcConfig;
+        }
+      });
+      listener.rules.forEach(r =>
+        r.actions.forEach((a: any) => {
+          if (a.authenticateOidcConfig) {
+            a.authenticateOidcActionConfig = a.authenticateOidcConfig;
+            delete a.authenticateOidcConfig;
+          }
+        }),
+      );
+    });
+
     if (forPipelineConfig) {
       // don't submit to backend for creation. Just return the loadBalancerCommand object
       this.formatListeners(loadBalancerCommandFormatted).then(() => {
-        onComplete && onComplete(loadBalancerCommandFormatted);
+        closeModal && closeModal(loadBalancerCommandFormatted);
       });
     } else {
-      const taskMonitor = ReactInjector.taskMonitorBuilder.buildTaskMonitor({
+      const taskMonitor = new TaskMonitor({
         application: app,
         title: `${isNew ? 'Creating' : 'Updating'} your load balancer`,
         modalInstance: this.$uibModalInstanceEmulation,
@@ -208,7 +241,7 @@ export class CreateApplicationLoadBalancer extends React.Component<
       taskMonitor.submit(() => {
         return this.formatListeners(loadBalancerCommandFormatted).then(() => {
           this.formatCommand(loadBalancerCommandFormatted);
-          return ReactInjector.loadBalancerWriter.upsertLoadBalancer(loadBalancerCommandFormatted, app, descriptor);
+          return LoadBalancerWriter.upsertLoadBalancer(loadBalancerCommandFormatted, app, descriptor);
         });
       });
 
@@ -222,13 +255,9 @@ export class CreateApplicationLoadBalancer extends React.Component<
     return errors;
   };
 
-  public render(): React.ReactElement<CreateApplicationLoadBalancer> {
-    const { app, forPipelineConfig, loadBalancer, show } = this.props;
+  public render() {
+    const { app, dismissModal, forPipelineConfig, loadBalancer } = this.props;
     const { includeSecurityGroups, isNew, loadBalancerCommand, taskMonitor } = this.state;
-
-    if (!show) {
-      return null;
-    }
 
     const hideSections = new Set<string>();
 
@@ -250,9 +279,8 @@ export class CreateApplicationLoadBalancer extends React.Component<
         heading={heading}
         initialValues={loadBalancerCommand}
         taskMonitor={taskMonitor}
-        dismiss={this.dismiss}
-        show={show}
-        submit={this.submit}
+        dismissModal={dismissModal}
+        closeModal={this.submit}
         submitButtonLabel={forPipelineConfig ? (isNew ? 'Add' : 'Done') : isNew ? 'Create' : 'Update'}
         validate={this.validate}
         hideSections={hideSections}
@@ -265,7 +293,7 @@ export class CreateApplicationLoadBalancer extends React.Component<
         />
         <SecurityGroups done={true} />
         <TargetGroups app={app} isNew={isNew} loadBalancer={loadBalancer} done={true} />
-        <ALBListeners done={true} />
+        <ALBListeners app={app} done={true} />
       </ApplicationLoadBalancerModal>
     );
   }

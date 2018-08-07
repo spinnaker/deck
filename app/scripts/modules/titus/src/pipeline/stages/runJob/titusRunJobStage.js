@@ -3,13 +3,13 @@
 const angular = require('angular');
 import { Subject } from 'rxjs';
 
-import { AccountService, ExecutionDetailsTasks, FirewallLabels } from '@spinnaker/core';
+import { AccountService, ExecutionDetailsTasks, FirewallLabels, Registry } from '@spinnaker/core';
 import { RunJobExecutionDetails } from './RunJobExecutionDetails';
 
 module.exports = angular
   .module('spinnaker.titus.pipeline.stage.runJobStage', [])
-  .config(function(pipelineConfigProvider) {
-    pipelineConfigProvider.registerStage({
+  .config(function() {
+    Registry.pipeline.registerStage({
       provides: 'runJob',
       useBaseProvider: true,
       restartable: true,
@@ -142,7 +142,8 @@ module.exports = angular
     stage.cluster.runtimeLimitSecs = stage.cluster.runtimeLimitSecs || 3600;
     stage.cluster.resources.gpu = stage.cluster.resources.gpu || 0;
     stage.cluster.resources.cpu = stage.cluster.resources.cpu || 1;
-    stage.cluster.resources.disk = stage.cluster.resources.disk || 512;
+    stage.cluster.resources.disk = stage.cluster.resources.disk || 10000;
+    stage.cluster.retries = stage.cluster.retries || 0;
     stage.cluster.resources.memory = stage.cluster.resources.memory || 512;
     stage.cluster.resources.networkMbps = stage.cluster.resources.networkMbps || 128;
 

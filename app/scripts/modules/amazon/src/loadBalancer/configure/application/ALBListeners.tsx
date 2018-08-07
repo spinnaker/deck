@@ -1,50 +1,107 @@
 import * as React from 'react';
 import Select, { Option } from 'react-select';
+import { $q } from 'ngimport';
 import { SortableContainer, SortableElement, SortableHandle, arrayMove, SortEnd } from 'react-sortable-hoc';
 import { difference, flatten, get, uniq } from 'lodash';
 import { FormikErrors, FormikProps } from 'formik';
 
-import { HelpField, IWizardPageProps, Tooltip, ValidationError, wizardPage } from '@spinnaker/core';
+import {
+  Application,
+  CustomLabels,
+  HelpField,
+  IWizardPageProps,
+  ReactInjector,
+  Tooltip,
+  ValidationMessage,
+  wizardPage,
+} from '@spinnaker/core';
 
 import { AWSProviderSettings } from 'amazon/aws.settings';
-import { AwsReactInjector } from 'amazon/reactShims';
 import {
   ALBListenerProtocol,
   IALBListenerCertificate,
-  IALBListenerDescription,
+  IListenerDescription,
   IALBTargetGroupDescription,
   IAmazonApplicationLoadBalancerUpsertCommand,
+  IListenerAction,
   IListenerRule,
   IListenerRuleCondition,
   ListenerRuleConditionField,
 } from 'amazon/domain';
-import { IAmazonCertificate } from 'amazon/certificates/amazon.certificate.read.service';
+import { AmazonCertificateReader, IAmazonCertificate } from 'amazon/certificates/AmazonCertificateReader';
+import { IAuthenticateOidcActionConfig, OidcConfigReader } from 'amazon/loadBalancer/OidcConfigReader';
+
+import { ConfigureOidcConfigModal } from './ConfigureOidcConfigModal';
 
 export interface IALBListenersState {
   certificates: { [accountId: number]: IAmazonCertificate[] };
   certificateTypes: string[];
+  oidcConfigs: IAuthenticateOidcActionConfig[];
 }
 
 const DragHandle = SortableHandle(() => (
   <span className="pipeline-drag-handle clickable glyphicon glyphicon-resize-vertical" />
 ));
+export interface IAuthenticateOidcActionConfig {
+  authorizationEndpoint: string;
+  clientId: string;
+  issuer: string;
+  scope: string;
+  sessionCookieName: string;
+  tokenEndpoint: string;
+  userInfoEndpoint: string;
+}
+
+const defaultAuthAction = {
+  authenticateOidcConfig: {
+    authorizationEndpoint: '',
+    clientId: '',
+    issuer: '',
+    scope: 'openid',
+    sessionCookieName: 'AWSELBAuthSessionCookie',
+    tokenEndpoint: '',
+    userInfoEndpoint: '',
+  },
+  type: 'authenticate-oidc',
+} as IListenerAction;
+
+export interface IALBListenersProps {
+  app: Application;
+}
 
 class ALBListenersImpl extends React.Component<
-  IWizardPageProps & FormikProps<IAmazonApplicationLoadBalancerUpsertCommand>,
+  IALBListenersProps & IWizardPageProps & FormikProps<IAmazonApplicationLoadBalancerUpsertCommand>,
   IALBListenersState
 > {
   public static LABEL = 'Listeners';
   public protocols = ['HTTP', 'HTTPS'];
 
-  constructor(props: IWizardPageProps & FormikProps<IAmazonApplicationLoadBalancerUpsertCommand>) {
+  private initialActionsWithAuth: Set<IListenerAction[]> = new Set();
+  private initialListenersWithDefaultAuth: Set<IListenerDescription> = new Set();
+  private removedAuthActions: Map<IListenerDescription, { [key: number]: IListenerAction }> = new Map();
+
+  constructor(props: IALBListenersProps & IWizardPageProps & FormikProps<IAmazonApplicationLoadBalancerUpsertCommand>) {
     super(props);
     this.state = {
       certificates: [],
       certificateTypes: get(AWSProviderSettings, 'loadBalancers.certificateTypes', ['iam', 'acm']),
+      oidcConfigs: undefined,
     };
+
+    this.props.initialValues.listeners.forEach(l => {
+      const hasDefaultAuth = l.defaultActions[0].type === 'authenticate-oidc';
+      if (hasDefaultAuth) {
+        this.initialListenersWithDefaultAuth.add(l);
+      }
+      l.rules.forEach(r => {
+        if (r.actions[0].type === 'authenticate-oidc') {
+          this.initialActionsWithAuth.add(r.actions);
+        }
+      });
+    });
   }
 
-  private getAllTargetGroupsFromListeners(listeners: IALBListenerDescription[]): string[] {
+  private getAllTargetGroupsFromListeners(listeners: IListenerDescription[]): string[] {
     const actions = flatten(listeners.map(l => l.defaultActions));
     const rules = flatten(listeners.map(l => l.rules));
     actions.push(...flatten(rules.map(r => r.actions)));
@@ -68,12 +125,17 @@ class ALBListenersImpl extends React.Component<
 
     const missingRuleFields = values.listeners.find(l => {
       const defaultActionsHaveMissingTarget = !!l.defaultActions.find(
-        da => !da.targetGroupName || da.targetGroupName === '',
+        da =>
+          (da.type === 'forward' && !da.targetGroupName) ||
+          (da.type === 'authenticate-oidc' && !da.authenticateOidcConfig.clientId),
       );
       const rulesHaveMissingFields = !!l.rules.find(rule => {
-        const missingTargets = !!rule.actions.find(a => !a.targetGroupName || a.targetGroupName === '');
+        const missingTargets = !!rule.actions.find(a => a.type === 'forward' && !a.targetGroupName);
+        const missingAuth = !!rule.actions.find(
+          a => a.type === 'authenticate-oidc' && !a.authenticateOidcConfig.clientId,
+        );
         const missingValue = !!rule.conditions.find(c => c.values.includes(''));
-        return missingTargets || missingValue;
+        return missingTargets || missingAuth || missingValue;
       });
       return defaultActionsHaveMissingTarget || rulesHaveMissingFields;
     });
@@ -87,27 +149,56 @@ class ALBListenersImpl extends React.Component<
 
   public componentDidMount(): void {
     this.loadCertificates();
+    this.loadOidcClients();
   }
 
   private loadCertificates(): void {
-    AwsReactInjector.amazonCertificateReader.listCertificates().then(certificates => {
+    AmazonCertificateReader.listCertificates().then(certificates => {
       this.setState({ certificates });
     });
+  }
+
+  private attachClientSecret = (action: IListenerAction, oidcConfigs: IAuthenticateOidcActionConfig[]) => {
+    if (action.type === 'authenticate-oidc') {
+      const config = oidcConfigs.find(c => c.clientId === action.authenticateOidcConfig.clientId);
+      if (config) {
+        action.authenticateOidcConfig.clientSecret = config.clientSecret;
+      }
+    }
+  };
+
+  private loadOidcClients(): void {
+    OidcConfigReader.getOidcConfigsByApp(this.props.app.name)
+      .then(oidcConfigs => {
+        // make sure we have all the secrets for listener actions that need them
+        if (oidcConfigs && oidcConfigs.length) {
+          this.props.values.listeners.forEach(listener => {
+            listener.defaultActions.forEach(action => this.attachClientSecret(action, oidcConfigs));
+            listener.rules.forEach(rule =>
+              rule.actions.forEach(action => this.attachClientSecret(action, oidcConfigs)),
+            );
+          });
+        }
+
+        this.setState({ oidcConfigs });
+        this.updateListeners();
+      })
+      .catch(() => {});
   }
 
   private updateListeners(): void {
     this.props.setFieldValue('listeners', this.props.values.listeners);
   }
 
-  private needsCert(): boolean {
-    return this.props.values.listeners.some(listener => listener.protocol === 'HTTPS');
+  private needsCert(listener: IListenerDescription): boolean {
+    return listener.protocol === 'HTTPS';
   }
 
   private showCertificateSelect(certificate: IALBListenerCertificate): boolean {
     return certificate.type === 'iam' && this.state.certificates && Object.keys(this.state.certificates).length > 0;
   }
 
-  private addListenerCertificate(listener: IALBListenerDescription): void {
+  private addListenerCertificate(listener: IListenerDescription): void {
     listener.certificates = listener.certificates || [];
     listener.certificates.push({
       certificateArn: undefined,
@@ -116,22 +207,54 @@ class ALBListenersImpl extends React.Component<
     });
   }
 
-  private listenerProtocolChanged(listener: IALBListenerDescription, newProtocol: ALBListenerProtocol): void {
+  private removeAuthActions(listener: IListenerDescription): void {
+    const authIndex = listener.defaultActions.findIndex(a => a.type === 'authenticate-oidc');
+    if (authIndex !== -1) {
+      this.removeAuthAction(listener, listener.defaultActions, authIndex, -1);
+    }
+    listener.rules.forEach((rule, ruleIndex) => {
+      const index = rule.actions.findIndex(a => a.type === 'authenticate-oidc');
+      if (index !== -1) {
+        this.removeAuthAction(listener, rule.actions, index, ruleIndex);
+      }
+    });
+    this.updateListeners();
+  }
+
+  private reenableAuthActions(listener: IListenerDescription): void {
+    const removedAuthActions = this.removedAuthActions.has(listener) ? this.removedAuthActions.get(listener) : [];
+    const existingDefaultAuthAction = removedAuthActions[-1];
+    if (existingDefaultAuthAction) {
+      removedAuthActions[-1] = undefined;
+      listener.defaultActions.unshift({ ...existingDefaultAuthAction });
+    }
+    listener.rules.forEach((rule, ruleIndex) => {
+      const existingAuthAction = removedAuthActions[ruleIndex];
+      removedAuthActions[ruleIndex] = undefined;
+      if (existingAuthAction) {
+        rule.actions.unshift({ ...existingAuthAction });
+      }
+    });
+  }
+
+  private listenerProtocolChanged(listener: IListenerDescription, newProtocol: ALBListenerProtocol): void {
     listener.protocol = newProtocol;
     if (listener.protocol === 'HTTPS') {
       listener.port = 443;
       if (!listener.certificates || listener.certificates.length === 0) {
         this.addListenerCertificate(listener);
       }
+      this.reenableAuthActions(listener);
     }
     if (listener.protocol === 'HTTP') {
       listener.port = 80;
       listener.certificates.length = 0;
+      this.removeAuthActions(listener);
     }
     this.updateListeners();
   }
 
-  private listenerPortChanged(listener: IALBListenerDescription, newPort: string): void {
+  private listenerPortChanged(listener: IListenerDescription, newPort: string): void {
     listener.port = Number.parseInt(newPort, 10);
     this.updateListeners();
   }
@@ -167,7 +290,7 @@ class ALBListenersImpl extends React.Component<
     this.updateListeners();
   };
 
-  private addRule = (listener: IALBListenerDescription): void => {
+  private addRule = (listener: IListenerDescription): void => {
     const newRule: IListenerRule = {
       priority: null,
       actions: [
@@ -188,13 +311,8 @@ class ALBListenersImpl extends React.Component<
     this.updateListeners();
   };
 
-  public removeRule = (listener: IALBListenerDescription, index: number): void => {
+  public removeRule = (listener: IListenerDescription, index: number): void => {
     listener.rules.splice(index, 1);
-    this.updateListeners();
-  };
-
-  private handleDefaultTargetChanged = (listener: IALBListenerDescription, newTarget: string): void => {
-    listener.defaultActions[0].targetGroupName = newTarget;
     this.updateListeners();
   };
 
@@ -224,19 +342,96 @@ class ALBListenersImpl extends React.Component<
     this.updateListeners();
   };
 
-  private handleRuleActionTargetChanged = (rule: IListenerRule, newTarget: string): void => {
-    rule.actions[0].targetGroupName = newTarget;
+  private handleRuleActionTargetChanged = (action: IListenerAction, newTarget: string): void => {
+    action.targetGroupName = newTarget;
     this.updateListeners();
   };
 
-  private handleSortEnd = (sortEnd: SortEnd, listener: IALBListenerDescription): void => {
+  private handleSortEnd = (sortEnd: SortEnd, listener: IListenerDescription): void => {
     listener.rules = arrayMove(listener.rules, sortEnd.oldIndex, sortEnd.newIndex);
+    this.updateListeners();
+  };
+
+  private configureOidcClient = (action: IListenerAction): void => {
+    ConfigureOidcConfigModal.show({ config: action.authenticateOidcConfig })
+      .then((config: any) => {
+        action.authenticateOidcConfig = config;
+      })
+      .catch(() => {});
+  };
+
+  private removeAuthActionInternal(
+    listener: IListenerDescription,
+    actions: IListenerAction[],
+    authIndex: number,
+    ruleIndex = -1,
+  ): void {
+    const removedAuthAction = actions.splice(authIndex, 1)[0];
+    if (!this.removedAuthActions.has(listener)) {
+      this.removedAuthActions.set(listener, []);
+    }
+    this.removedAuthActions.get(listener)[ruleIndex || -1] = removedAuthAction;
+    this.updateListeners();
+  }
+
+  private removeAuthAction(
+    listener: IListenerDescription,
+    actions: IListenerAction[],
+    authIndex: number,
+    ruleIndex = -1,
+  ): void {
+    // TODO: Check if initial is true.
+    const confirmDefaultRemove = ruleIndex === -1 && this.initialListenersWithDefaultAuth.has(listener);
+    const confirmRemove = ruleIndex > -1 && this.initialActionsWithAuth.has(actions);
+
+    if (confirmDefaultRemove || confirmRemove) {
+      // TODO: Confirmation Dialog first.
+      ReactInjector.confirmationModalService.confirm({
+        header: 'Really remove authentication?',
+        buttonText: `Remove Auth`,
+        submitMethod: () => {
+          this.removeAuthActionInternal(listener, actions, authIndex, ruleIndex);
+          if (confirmDefaultRemove) {
+            this.initialListenersWithDefaultAuth.delete(listener);
+          }
+          if (confirmRemove) {
+            this.initialActionsWithAuth.delete(actions);
+          }
+          return $q.resolve();
+        },
+        windowClass: 'zindex-top',
+      });
+    } else {
+      this.removeAuthActionInternal(listener, actions, authIndex, ruleIndex);
+    }
+  }
+
+  private authenticateRuleToggle = (listener: IListenerDescription, ruleIndex: number) => {
+    const rules = listener.rules[ruleIndex];
+    const actions = (rules && rules.actions) || listener.defaultActions;
+    if (actions) {
+      const authIndex = actions.findIndex(a => a.type === 'authenticate-oidc');
+      if (authIndex !== -1) {
+        this.removeAuthAction(listener, actions, authIndex, ruleIndex);
+      } else {
+        const removedAction = this.removedAuthActions.has(listener)
+          ? this.removedAuthActions.get(listener)[ruleIndex || -1]
+          : undefined;
+        const newAuthAction = removedAction || { ...defaultAuthAction };
+        actions.unshift({ ...newAuthAction });
+      }
+      this.updateListeners();
+    }
+  };
+
+  private oidcConfigChanged = (action: IListenerAction, config: IAuthenticateOidcActionConfig) => {
+    action.authenticateOidcConfig = { ...config };
     this.updateListeners();
   };
 
   public render() {
     const { errors, values } = this.props;
-    const { certificates, certificateTypes } = this.state;
+    const { certificates, certificateTypes, oidcConfigs } = this.state;
 
     const certificatesForAccount = certificates[values.credentials as any] || [];
     const certificateOptions = certificatesForAccount.map(cert => {
@@ -287,7 +482,7 @@ class ALBListenersImpl extends React.Component<
                       </div>
                     </div>
                   </div>
-                  {this.needsCert() && (
+                  {this.needsCert(listener) && (
                     <div className="wizard-pod-row">
                       <div className="wizard-pod-row-title">Certificate</div>
                       <div className="wizard-pod-row-contents">
@@ -329,34 +524,33 @@ class ALBListenersImpl extends React.Component<
                     </div>
                   )}
                   <div className="wizard-pod-row">
-                    <div className="wizard-pod-row-title" style={{ height: '30px' }}>
-                      Rules
-                    </div>
                     <div className="wizard-pod-row-contents" style={{ padding: '0' }}>
                       <table className="table table-condensed packed rules-table">
                         <thead>
                           <tr>
-                            <th style={{ width: '10px', padding: '0' }} />
-                            <th style={{ width: '226px' }}>If</th>
-                            <th style={{ width: '75px' }}>Then</th>
-                            <th>Target</th>
-                            <th style={{ width: '30px' }} />
+                            <th style={{ width: '15px', padding: '0' }} />
+                            <th>If</th>
+                            <th style={{ width: '315px' }}>Then</th>
+                            <th style={{ width: '45px' }} />
                           </tr>
                         </thead>
                         <Rules
                           addCondition={this.addCondition}
                           addRule={this.addRule}
+                          authenticateRuleToggle={this.authenticateRuleToggle}
                           distance={10}
                           handleConditionFieldChanged={this.handleConditionFieldChanged}
                           handleConditionValueChanged={this.handleConditionValueChanged}
-                          handleDefaultTargetChanged={this.handleDefaultTargetChanged}
                           handleRuleActionTargetChanged={this.handleRuleActionTargetChanged}
                           listener={listener}
                           helperClass="rule-sortable-helper"
                           removeRule={this.removeRule}
                           removeCondition={this.removeCondition}
                           targetGroups={values.targetGroups}
+                          oidcConfigs={oidcConfigs}
+                          oidcConfigChanged={this.oidcConfigChanged}
                           onSortEnd={sortEnd => this.handleSortEnd(sortEnd, listener)}
+                          configureOidcClient={this.configureOidcClient}
                         />
                       </table>
                     </div>
@@ -366,7 +560,7 @@ class ALBListenersImpl extends React.Component<
             ))}
             {errors.listeners && (
               <div className="wizard-pod-row-errors">
-                <ValidationError message={errors.listeners} />
+                <ValidationMessage type="error" message={errors.listeners} />
               </div>
             )}
             <table className="table table-condensed packed">
@@ -391,15 +585,20 @@ class ALBListenersImpl extends React.Component<
 
 interface IRuleProps {
   rule: IListenerRule;
-  listener: IALBListenerDescription;
+  listener: IListenerDescription;
   index: number;
   targetGroups: IALBTargetGroupDescription[];
-  removeRule: (listener: IALBListenerDescription, index: number) => void;
-  handleRuleActionTargetChanged: (rule: IListenerRule, newTarget: string) => void;
+  oidcConfigChanged: (action: IListenerAction, config: IAuthenticateOidcActionConfig) => void;
+  oidcConfigs: IAuthenticateOidcActionConfig[];
+  ruleIndex: number;
+  authenticateRuleToggle: (listener: IListenerDescription, index: number) => void;
+  removeRule: (listener: IListenerDescription, index: number) => void;
+  handleRuleActionTargetChanged: (action: IListenerAction, newTarget: string) => void;
   addCondition: (rule: IListenerRule) => void;
   removeCondition: (rule: IListenerRule, index: number) => void;
   handleConditionFieldChanged: (condition: IListenerRuleCondition, newField: ListenerRuleConditionField) => void;
   handleConditionValueChanged: (condition: IListenerRuleCondition, newValue: string) => void;
+  configureOidcClient: (action: IListenerAction) => void;
 }
 
 const Rule = SortableElement((props: IRuleProps) => (
@@ -462,43 +661,151 @@ const Rule = SortableElement((props: IRuleProps) => (
         </div>
       )}
     </td>
-    <td>forward to</td>
     <td>
-      <select
-        className="form-control input-sm"
-        value={props.rule.actions[0].targetGroupName}
-        onChange={event => props.handleRuleActionTargetChanged(props.rule, event.target.value)}
-        required={true}
-      >
-        <option value="" />
-        {uniq(props.targetGroups.map(tg => tg.name)).map(name => <option key={name}>{name}</option>)}
-      </select>
+      {props.rule.actions.map((action, index) => (
+        <Action
+          key={index}
+          action={action}
+          oidcConfigChanged={config => props.oidcConfigChanged(action, config)}
+          targetChanged={target => props.handleRuleActionTargetChanged(action, target)}
+          targetGroups={props.targetGroups}
+          oidcConfigs={props.oidcConfigs}
+          configureOidcClient={props.configureOidcClient}
+        />
+      ))}
     </td>
     <td>
-      <a
-        className="btn btn-sm btn-link clickable"
-        onClick={() => props.removeRule(props.listener, props.index)}
-        style={{ padding: '0' }}
-      >
-        <Tooltip value="Remove Rule">
-          <span className="glyphicon glyphicon-trash" />
-        </Tooltip>
-      </a>
+      <RuleActions
+        ruleIndex={props.ruleIndex}
+        listener={props.listener}
+        authenticateRuleToggle={props.authenticateRuleToggle}
+        removeRule={props.removeRule}
+        actions={props.rule.actions}
+      />
     </td>
   </tr>
 ));
 
+const Action = (props: {
+  action: IListenerAction;
+  oidcConfigChanged: (config: IAuthenticateOidcActionConfig) => void;
+  targetChanged: (newTarget: string) => void;
+  targetGroups: IALBTargetGroupDescription[];
+  oidcConfigs: IAuthenticateOidcActionConfig[];
+  configureOidcClient: (action: IListenerAction) => void;
+}) => {
+  if (props.action.type === 'forward') {
+    return (
+      <div className="horizontal middle" style={{ height: '30px' }}>
+        <span style={{ whiteSpace: 'pre' }}>forward to </span>
+        <select
+          className="form-control input-sm"
+          value={props.action.targetGroupName}
+          onChange={event => props.targetChanged(event.target.value)}
+          required={true}
+        >
+          <option value="" />
+          {uniq(props.targetGroups.map(tg => tg.name)).map(name => <option key={name}>{name}</option>)}
+        </select>
+      </div>
+    );
+  }
+  if (props.action.type === 'authenticate-oidc') {
+    const clientId = props.action.authenticateOidcConfig.clientId;
+
+    const showOidcConfigs =
+      props.oidcConfigs &&
+      props.oidcConfigs.length > 0 &&
+      (!clientId || props.oidcConfigs.find(c => c.clientId === clientId));
+    return (
+      <div className="horizontal middle" style={{ height: '30px' }}>
+        <span style={{ whiteSpace: 'pre' }}>auth with {CustomLabels.get('OIDC client')} </span>
+
+        {showOidcConfigs && (
+          <select
+            className="form-control input-sm"
+            value={clientId}
+            onChange={event => props.oidcConfigChanged(props.oidcConfigs.find(c => c.clientId === event.target.value))}
+            required={true}
+          >
+            <option value="" />
+            {(props.oidcConfigs || []).map(config => <option key={config.clientId}>{config.clientId}</option>)}
+          </select>
+        )}
+        {!showOidcConfigs && (
+          // a link text to open an oidc modal that is labeled with the client_id
+          <a onClick={() => props.configureOidcClient(props.action)} className="clickable">
+            {clientId || 'Configure...'}
+          </a>
+        )}
+        <span style={{ whiteSpace: 'pre' }}>
+          <em> and then</em>
+        </span>
+      </div>
+    );
+  }
+
+  return null;
+};
+
+const RuleActions = (props: {
+  ruleIndex?: number;
+  actions: IListenerAction[];
+  listener: IListenerDescription;
+  authenticateRuleToggle: (listener: IListenerDescription, index: number) => void;
+  removeRule?: (listener: IListenerDescription, index: number) => void;
+}) => {
+  const hasAuth = Boolean(props.actions.find(a => a.type === 'authenticate-oidc'));
+  const allowAuth = props.listener.protocol === 'HTTPS';
+  const tooltip = hasAuth ? 'Remove authentication from rule' : 'Authenticate rule';
+  const icon = hasAuth ? 'fas fa-fw fa-lock-open' : 'fas fa-fw fa-user-lock';
+  return (
+    <span>
+      {allowAuth && (
+        <>
+          <a
+            className="btn btn-sm btn-link clickable"
+            onClick={() => props.authenticateRuleToggle(props.listener, props.ruleIndex)}
+            style={{ padding: '0' }}
+          >
+            <Tooltip value={tooltip}>
+              <i className={icon} />
+            </Tooltip>
+          </a>
+          <HelpField id="aws.loadBalancer.oidcAuthentication" />
+        </>
+      )}
+      {props.ruleIndex !== undefined &&
+        props.ruleIndex >= 0 &&
+        props.removeRule && (
+          <a
+            className="btn btn-sm btn-link clickable"
+            onClick={() => props.removeRule(props.listener, props.ruleIndex)}
+            style={{ padding: '0' }}
+          >
+            <Tooltip value="Remove Rule">
+              <i className="far fa-fw fa-trash-alt" />
+            </Tooltip>
+          </a>
+        )}
+    </span>
+  );
+};
+
 interface IRulesProps {
-  addRule: (listener: IALBListenerDescription) => void;
-  removeRule: (listener: IALBListenerDescription, index: number) => void;
-  handleRuleActionTargetChanged: (rule: IListenerRule, newTarget: string) => void;
+  addRule: (listener: IListenerDescription) => void;
+  authenticateRuleToggle: (listener: IListenerDescription, index: number) => void;
+  removeRule: (listener: IListenerDescription, index: number) => void;
+  handleRuleActionTargetChanged: (action: IListenerAction, newTarget: string) => void;
   addCondition: (rule: IListenerRule) => void;
   removeCondition: (rule: IListenerRule, index: number) => void;
   handleConditionFieldChanged: (condition: IListenerRuleCondition, newField: ListenerRuleConditionField) => void;
   handleConditionValueChanged: (condition: IListenerRuleCondition, newValue: string) => void;
-  listener: IALBListenerDescription;
+  listener: IListenerDescription;
   targetGroups: IALBTargetGroupDescription[];
-  handleDefaultTargetChanged: (listener: IALBListenerDescription, newTarget: string) => void;
+  oidcConfigChanged: (action: IListenerAction, config: IAuthenticateOidcActionConfig) => void;
+  oidcConfigs: IAuthenticateOidcActionConfig[];
+  configureOidcClient: (action: IListenerAction) => void;
 }
 
 const Rules = SortableContainer((props: IRulesProps) => (
@@ -506,19 +813,26 @@ const Rules = SortableContainer((props: IRulesProps) => (
     <tr className="not-sortable">
       <td />
       <td>Default</td>
-      <td>forward to</td>
       <td>
-        <select
-          className="form-control input-sm"
-          value={props.listener.defaultActions[0].targetGroupName}
-          onChange={event => props.handleDefaultTargetChanged(props.listener, event.target.value)}
-          required={true}
-        >
-          <option value="" />
-          {uniq(props.targetGroups.map(tg => tg.name)).map(name => <option key={name}>{name}</option>)}
-        </select>
+        {props.listener.defaultActions.map((action, index) => (
+          <Action
+            key={index}
+            action={action}
+            targetChanged={target => props.handleRuleActionTargetChanged(action, target)}
+            targetGroups={props.targetGroups}
+            oidcConfigs={props.oidcConfigs}
+            oidcConfigChanged={config => props.oidcConfigChanged(action, config)}
+            configureOidcClient={props.configureOidcClient}
+          />
+        ))}
       </td>
-      <td />
+      <td>
+        <RuleActions
+          listener={props.listener}
+          actions={props.listener.defaultActions}
+          authenticateRuleToggle={props.authenticateRuleToggle}
+        />
+      </td>
     </tr>
     {props.listener.rules.map((rule, index) => (
       <Rule
@@ -528,11 +842,16 @@ const Rules = SortableContainer((props: IRulesProps) => (
         handleConditionFieldChanged={props.handleConditionFieldChanged}
         handleConditionValueChanged={props.handleConditionValueChanged}
         handleRuleActionTargetChanged={props.handleRuleActionTargetChanged}
+        oidcConfigChanged={props.oidcConfigChanged}
         removeCondition={props.removeCondition}
+        authenticateRuleToggle={props.authenticateRuleToggle}
         removeRule={props.removeRule}
         targetGroups={props.targetGroups}
+        oidcConfigs={props.oidcConfigs}
         listener={props.listener}
         index={index}
+        ruleIndex={index}
+        configureOidcClient={props.configureOidcClient}
       />
     ))}
     <tr className="not-sortable">
@@ -547,4 +866,4 @@ const Rules = SortableContainer((props: IRulesProps) => (
   </tbody>
 ));
 
-export const ALBListeners = wizardPage(ALBListenersImpl);
+export const ALBListeners = wizardPage<IALBListenersProps>(ALBListenersImpl);

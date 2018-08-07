@@ -7,16 +7,14 @@ import {
   FirewallLabels,
   NameUtils,
   SECURITY_GROUP_READER,
-  SECURITY_GROUP_WRITER,
-  TASK_MONITOR_BUILDER,
+  SecurityGroupWriter,
+  TaskMonitor,
 } from '@spinnaker/core';
 
 module.exports = angular
   .module('spinnaker.securityGroup.openstack.create.controller', [
     require('@uirouter/angularjs').default,
     SECURITY_GROUP_READER,
-    SECURITY_GROUP_WRITER,
-    TASK_MONITOR_BUILDER,
     require('../../../region/regionSelectField.directive.js').name,
     require('../../transformer.js').name,
   ])
@@ -29,8 +27,6 @@ module.exports = angular
     securityGroup,
     openstackSecurityGroupTransformer,
     securityGroupReader,
-    securityGroupWriter,
-    taskMonitorBuilder,
   ) {
     var ctrl = this;
     $scope.firewallLabel = FirewallLabels.get('Firewall');
@@ -73,7 +69,7 @@ module.exports = angular
       application.securityGroups.onNextRefresh($scope, onApplicationRefresh);
     }
 
-    $scope.taskMonitor = taskMonitorBuilder.buildTaskMonitor({
+    $scope.taskMonitor = new TaskMonitor({
       application: application,
       title: `${$scope.isNew ? 'Creating ' : 'Updating '} your ${FirewallLabels.get('firewall')}`,
       modalInstance: $uibModalInstance,
@@ -192,7 +188,7 @@ module.exports = angular
         var copyOfSG = angular.copy($scope.securityGroup);
         copyOfSG = openstackSecurityGroupTransformer.prepareForSaving(copyOfSG);
 
-        return securityGroupWriter.upsertSecurityGroup(copyOfSG, application, descriptor, params);
+        return SecurityGroupWriter.upsertSecurityGroup(copyOfSG, application, descriptor, params);
       });
     };
 

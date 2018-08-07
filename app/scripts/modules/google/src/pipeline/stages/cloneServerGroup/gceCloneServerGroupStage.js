@@ -3,12 +3,12 @@
 const angular = require('angular');
 import _ from 'lodash';
 
-import { AccountService, ARTIFACT_REFERENCE_SERVICE_PROVIDER, NameUtils, StageConstants } from '@spinnaker/core';
+import { AccountService, NameUtils, Registry, StageConstants } from '@spinnaker/core';
 
 module.exports = angular
-  .module('spinnaker.gce.pipeline.stage..cloneServerGroupStage', [ARTIFACT_REFERENCE_SERVICE_PROVIDER])
-  .config(function(pipelineConfigProvider, artifactReferenceServiceProvider) {
-    pipelineConfigProvider.registerStage({
+  .module('spinnaker.gce.pipeline.stage..cloneServerGroupStage', [])
+  .config(function() {
+    Registry.pipeline.registerStage({
       provides: 'cloneServerGroup',
       cloudProvider: 'gce',
       templateUrl: require('./cloneServerGroupStage.html'),
@@ -19,18 +19,6 @@ module.exports = angular
         { type: 'requiredField', fieldName: 'region' },
         { type: 'requiredField', fieldName: 'credentials', fieldLabel: 'account' },
       ],
-    });
-
-    artifactReferenceServiceProvider.registerReference('stage', obj => {
-      const paths = [];
-      if (obj.type === 'deploy' && Array.isArray(obj.clusters)) {
-        obj.clusters.forEach((cluster, i) => {
-          if (cluster.cloudProvider === 'gce') {
-            paths.push(['clusters', i, 'imageArtifactId']);
-          }
-        });
-      }
-      return paths;
     });
   })
   .controller('gceCloneServerGroupStageCtrl', function($scope) {

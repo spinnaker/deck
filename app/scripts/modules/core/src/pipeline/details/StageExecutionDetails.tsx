@@ -4,6 +4,8 @@ import { Subscription } from 'rxjs';
 import { Application } from 'core/application/application.model';
 import { IExecution, IExecutionStage, IExecutionStageSummary, IStageTypeConfig } from 'core/domain';
 import { ReactInjector } from 'core/reactShims';
+import { ExecutionFilterService } from 'core/pipeline/filter/executionFilter.service';
+import { Registry } from 'core/registry';
 import { StepDetails } from './StepDetails';
 import { StageSummary } from './StageSummary';
 
@@ -170,14 +172,14 @@ export class StageExecutionDetails extends React.Component<IStageExecutionDetail
   private getDetailsStageConfig(stageSummary: IExecutionStageSummary): IStageTypeConfig {
     if (stageSummary && ReactInjector.$stateParams.step !== undefined) {
       const step = stageSummary.stages[this.getCurrentStep()] || stageSummary.masterStage;
-      return ReactInjector.pipelineConfig.getStageConfig(step);
+      return Registry.pipeline.getStageConfig(step);
     }
     return null;
   }
 
   private getSummaryStageConfig(stageSummary: IExecutionStageSummary): IStageTypeConfig {
     if (stageSummary && ReactInjector.$stateParams.stage !== undefined) {
-      return ReactInjector.pipelineConfig.getStageConfig(stageSummary);
+      return Registry.pipeline.getStageConfig(stageSummary);
     }
     return {} as IStageTypeConfig;
   }
@@ -200,9 +202,7 @@ export class StageExecutionDetails extends React.Component<IStageExecutionDetail
   public componentDidMount(): void {
     this.locationChangeUnsubscribe = ReactInjector.$uiRouter.transitionService.onSuccess({}, () => this.updateStage());
     // Since stages and tasks can get updated without the reference to the execution changing, subscribe to the execution updated stream here too
-    this.groupsUpdatedSubscription = ReactInjector.executionFilterService.groupsUpdatedStream.subscribe(() =>
-      this.updateStage(),
-    );
+    this.groupsUpdatedSubscription = ExecutionFilterService.groupsUpdatedStream.subscribe(() => this.updateStage());
 
     this.updateStage();
   }

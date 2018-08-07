@@ -11,9 +11,10 @@ import {
   ISecurityGroup,
   IVpc,
   SECURITY_GROUP_READER,
+  FirewallLabels,
 } from '@spinnaker/core';
 
-import { VPC_READ_SERVICE } from '@spinnaker/amazon';
+import { VpcReader } from '@spinnaker/amazon';
 
 class SecurityGroupPickerController implements ng.IComponentController {
   public securityGroups: any;
@@ -27,15 +28,16 @@ class SecurityGroupPickerController implements ng.IComponentController {
   public regionChanged: Subject<void>;
   public groupsRemoved: Subject<string[]>;
   public hideLabel: boolean;
+  public amazonAccount: string;
   public loaded = false;
   private vpcs: IVpc[];
   private subscriptions: Subscription[];
+  public firewallsLabel: string;
 
   public constructor(
     private $q: ng.IQService,
     private securityGroupReader: any,
     private cacheInitializer: CacheInitializerService,
-    private vpcReader: any,
   ) {
     'ngInject';
   }
@@ -49,12 +51,14 @@ class SecurityGroupPickerController implements ng.IComponentController {
     const groupLoader: ng.IPromise<void> = this.securityGroupReader.getAllSecurityGroups().then((groups: any[]) => {
       this.securityGroups = groups;
     });
-    const vpcLoader: ng.IPromise<void> = this.vpcReader.listVpcs().then((vpcs: IVpc[]) => (this.vpcs = vpcs));
+    const vpcLoader = VpcReader.listVpcs().then((vpcs: IVpc[]) => (this.vpcs = vpcs));
     this.$q.all([credentialLoader, groupLoader, vpcLoader]).then(() => this.configureSecurityGroupOptions());
     this.subscriptions = [
       this.accountChanged.subscribe(() => this.configureSecurityGroupOptions()),
       this.regionChanged.subscribe(() => this.configureSecurityGroupOptions()),
     ];
+
+    this.firewallsLabel = FirewallLabels.get('firewalls');
   }
 
   public $onDestroy(): void {
@@ -153,6 +157,7 @@ class SecurityGroupPickerComponent implements ng.IComponentOptions {
     removedGroups: '<',
     groupsToEdit: '=',
     hideLabel: '<',
+    amazonAccount: '<',
   };
   public controller: any = SecurityGroupPickerController;
   public template = `
@@ -163,12 +168,16 @@ class SecurityGroupPickerComponent implements ng.IComponentOptions {
           refresh="$ctrl.refreshSecurityGroups()"
           help-key="titus.deploy.securityGroups"
           available-groups="$ctrl.availableGroups"></server-group-security-group-selector>
+
+      <div class="small" ng-class="{ 'col-md-9': !$ctrl.hideLabel, 'col-md-offset-3': !$ctrl.hideLabel }" ng-if="$ctrl.amazonAccount && $ctrl.command.credentials !== undefined">
+        Uses {{$ctrl.firewallsLabel}} from the Amazon account <account-tag account="$ctrl.amazonAccount" pad="right"></account-tag>
+      </div>
     </div>
 `;
 }
 
 export const TITUS_SECURITY_GROUP_PICKER = 'spinnaker.titus.securityGroup.picker.component';
-module(TITUS_SECURITY_GROUP_PICKER, [SECURITY_GROUP_READER, CACHE_INITIALIZER_SERVICE, VPC_READ_SERVICE]).component(
+module(TITUS_SECURITY_GROUP_PICKER, [SECURITY_GROUP_READER, CACHE_INITIALIZER_SERVICE]).component(
   'titusSecurityGroupPicker',
   new SecurityGroupPickerComponent(),
 );

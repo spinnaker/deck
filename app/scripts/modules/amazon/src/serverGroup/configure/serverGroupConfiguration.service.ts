@@ -37,12 +37,18 @@ import {
   SecurityGroupReader,
   SERVER_GROUP_COMMAND_REGISTRY_PROVIDER,
   ServerGroupCommandRegistry,
-  SUBNET_READ_SERVICE,
   SubnetReader,
+  IServerGroupCommandViewState,
 } from '@spinnaker/core';
 
-import { IKeyPair, IAmazonLoadBalancerSourceData, IApplicationLoadBalancerSourceData } from 'amazon/domain';
-import { KEY_PAIRS_READ_SERVICE, KeyPairsReader } from 'amazon/keyPairs/keyPairs.read.service';
+import {
+  IKeyPair,
+  IAmazonLoadBalancerSourceData,
+  IApplicationLoadBalancerSourceData,
+  IScalingProcess,
+} from 'amazon/domain';
+import { KeyPairsReader } from 'amazon/keyPairs';
+import { AutoScalingProcessService } from '../details/scalingProcesses/AutoScalingProcessService';
 
 export type IBlockDeviceMappingSource = 'source' | 'ami' | 'default';
 
@@ -64,26 +70,35 @@ export interface IAmazonServerGroupCommandBackingData extends IServerGroupComman
   filtered: IAmazonServerGroupCommandBackingDataFiltered;
   keyPairs: IKeyPair[];
   targetGroups: string[];
+  scalingProcesses: IScalingProcess[];
+}
+
+export interface IAmazonServerGroupCommandViewState extends IServerGroupCommandViewState {
+  dirty: IAmazonServerGroupCommandDirty;
 }
 
 export interface IAmazonServerGroupCommand extends IServerGroupCommand {
+  associatePublicIpAddress: boolean;
   backingData: IAmazonServerGroupCommandBackingData;
   copySourceCustomBlockDeviceMappings: boolean;
   ebsOptimized: boolean;
   healthCheckGracePeriod: number;
   instanceMonitoring: boolean;
   keyPair: string;
+  legacyUdf?: boolean;
   spotPrice: string;
   targetHealthyDeployPercentage: number;
   useAmiBlockDeviceMappings: boolean;
   targetGroups: string[];
   spelTargetGroups: string[];
   spelLoadBalancers: string[];
+  viewState: IAmazonServerGroupCommandViewState;
 
-  getBlockDeviceMappingsSource: () => IBlockDeviceMappingSource;
-  selectBlockDeviceMappingsSource: (selection: string) => void;
-  usePreferredZonesChanged: () => IAmazonServerGroupCommandResult;
-  clusterChanged: () => void;
+  getBlockDeviceMappingsSource: (command: IServerGroupCommand) => IBlockDeviceMappingSource;
+  selectBlockDeviceMappingsSource: (command: IServerGroupCommand, selection: string) => void;
+  usePreferredZonesChanged: (command: IServerGroupCommand) => IAmazonServerGroupCommandResult;
+  clusterChanged: (command: IServerGroupCommand) => void;
+  regionIsDeprecated: (command: IServerGroupCommand) => boolean;
 }
 
 export class AwsServerGroupConfigurationService {
@@ -112,11 +127,8 @@ export class AwsServerGroupConfigurationService {
     private securityGroupReader: SecurityGroupReader,
     private awsInstanceTypeService: any,
     private cacheInitializer: CacheInitializerService,
-    private subnetReader: SubnetReader,
-    private keyPairsReader: KeyPairsReader,
     private loadBalancerReader: LoadBalancerReader,
     private serverGroupCommandRegistry: ServerGroupCommandRegistry,
-    private autoScalingProcessService: any,
   ) {
     'ngInject';
   }
@@ -129,17 +141,19 @@ export class AwsServerGroupConfigurationService {
     } as IAmazonServerGroupCommandBackingData;
   }
 
-  public configureCommand(application: Application, command: IAmazonServerGroupCommand): IPromise<void> {
-    this.applyOverrides('beforeConfiguration', command);
+  public configureCommand(application: Application, cmd: IAmazonServerGroupCommand): IPromise<void> {
+    this.applyOverrides('beforeConfiguration', cmd);
     let imageLoader;
-    if (command.viewState.disableImageSelection) {
+    if (cmd.viewState.disableImageSelection) {
       imageLoader = this.$q.when(null);
     } else {
-      imageLoader = command.viewState.imageId
-        ? this.loadImagesFromAmi(command)
-        : this.loadImagesFromApplicationName(application, command.selectedProvider);
+      imageLoader = cmd.viewState.imageId
+        ? this.loadImagesFromAmi(cmd)
+        : this.loadImagesFromApplicationName(application, cmd.selectedProvider);
     }
-    command.toggleSuspendedProcess = (process: string): void => {
+
+    // TODO: Instead of attaching these to the command itself, they could be static methods
+    cmd.toggleSuspendedProcess = (command: IAmazonServerGroupCommand, process: string): void => {
       command.suspendedProcesses = command.suspendedProcesses || [];
       const processIndex = command.suspendedProcesses.indexOf(process);
       if (processIndex === -1) {
@@ -149,16 +163,17 @@ export class AwsServerGroupConfigurationService {
       }
     };
 
-    command.processIsSuspended = (process: string): boolean => command.suspendedProcesses.includes(process);
+    cmd.processIsSuspended = (command: IAmazonServerGroupCommand, process: string): boolean =>
+      command.suspendedProcesses.includes(process);
 
-    command.onStrategyChange = (strategy: IDeploymentStrategy): void => {
+    cmd.onStrategyChange = (command: IAmazonServerGroupCommand, strategy: IDeploymentStrategy): void => {
       // Any strategy other than None or Custom should force traffic to be enabled
       if (strategy.key !== '' && strategy.key !== 'custom') {
         command.suspendedProcesses = (command.suspendedProcesses || []).filter(p => p !== 'AddToLoadBalancer');
       }
     };
 
-    command.getBlockDeviceMappingsSource = (): IBlockDeviceMappingSource => {
+    cmd.getBlockDeviceMappingsSource = (command: IAmazonServerGroupCommand): IBlockDeviceMappingSource => {
       if (command.copySourceCustomBlockDeviceMappings) {
         return 'source';
       } else if (command.useAmiBlockDeviceMappings) {
@@ -167,7 +182,7 @@ export class AwsServerGroupConfigurationService {
       return 'default';
     };
 
-    command.selectBlockDeviceMappingsSource = (selection: string): void => {
+    cmd.selectBlockDeviceMappingsSource = (command: IAmazonServerGroupCommand, selection: string): void => {
       if (selection === 'source') {
         // copy block device mappings from source asg
         command.copySourceCustomBlockDeviceMappings = true;
@@ -183,7 +198,7 @@ export class AwsServerGroupConfigurationService {
       }
     };
 
-    command.regionIsDeprecated = (): boolean => {
+    cmd.regionIsDeprecated = (command: IAmazonServerGroupCommand): boolean => {
       return (
         has(command, 'backingData.filtered.regions') &&
         command.backingData.filtered.regions.some(region => region.name === command.region && region.deprecated)
@@ -194,9 +209,9 @@ export class AwsServerGroupConfigurationService {
       .all({
         credentialsKeyedByAccount: AccountService.getCredentialsKeyedByAccount('aws'),
         securityGroups: this.securityGroupReader.getAllSecurityGroups(),
-        subnets: this.subnetReader.listSubnets(),
+        subnets: SubnetReader.listSubnets(),
         preferredZones: AccountService.getPreferredZonesByAccount('aws'),
-        keyPairs: this.keyPairsReader.listKeyPairs(),
+        keyPairs: KeyPairsReader.listKeyPairs(),
         packageImages: imageLoader,
         instanceTypes: this.awsInstanceTypeService.getAllTypesByRegion(),
         enabledMetrics: this.$q.when(clone(this.enabledMetrics)),
@@ -209,35 +224,35 @@ export class AwsServerGroupConfigurationService {
         let instanceTypeReloader = this.$q.when();
         backingData.accounts = keys(backingData.credentialsKeyedByAccount);
         backingData.filtered = {} as IAmazonServerGroupCommandBackingDataFiltered;
-        backingData.scalingProcesses = this.autoScalingProcessService.listProcesses();
+        backingData.scalingProcesses = AutoScalingProcessService.listProcesses();
         backingData.appLoadBalancers = application.getDataSource('loadBalancers').data;
-        command.backingData = backingData as IAmazonServerGroupCommandBackingData;
-        this.configureVpcId(command);
-        backingData.filtered.securityGroups = this.getRegionalSecurityGroups(command);
-        if (command.viewState.disableImageSelection) {
-          this.configureInstanceTypes(command);
+        cmd.backingData = backingData as IAmazonServerGroupCommandBackingData;
+        this.configureVpcId(cmd);
+        backingData.filtered.securityGroups = this.getRegionalSecurityGroups(cmd);
+        if (cmd.viewState.disableImageSelection) {
+          this.configureInstanceTypes(cmd);
         }
 
-        if (command.loadBalancers && command.loadBalancers.length) {
+        if (cmd.loadBalancers && cmd.loadBalancers.length) {
           // verify all load balancers are accounted for; otherwise, try refreshing load balancers cache
-          const loadBalancerNames = this.getLoadBalancerNames(command);
-          if (intersection(loadBalancerNames, command.loadBalancers).length < command.loadBalancers.length) {
-            loadBalancerReloader = this.refreshLoadBalancers(command, true);
+          const loadBalancerNames = this.getLoadBalancerNames(cmd);
+          if (intersection(loadBalancerNames, cmd.loadBalancers).length < cmd.loadBalancers.length) {
+            loadBalancerReloader = this.refreshLoadBalancers(cmd, true);
           }
         }
-        if (command.securityGroups && command.securityGroups.length) {
-          const regionalSecurityGroupIds = map(this.getRegionalSecurityGroups(command), 'id');
-          if (intersection(command.securityGroups, regionalSecurityGroupIds).length < command.securityGroups.length) {
-            securityGroupReloader = this.refreshSecurityGroups(command, true);
+        if (cmd.securityGroups && cmd.securityGroups.length) {
+          const regionalSecurityGroupIds = map(this.getRegionalSecurityGroups(cmd), 'id');
+          if (intersection(cmd.securityGroups, regionalSecurityGroupIds).length < cmd.securityGroups.length) {
+            securityGroupReloader = this.refreshSecurityGroups(cmd, true);
           }
         }
-        if (command.instanceType) {
-          instanceTypeReloader = this.refreshInstanceTypes(command, true);
+        if (cmd.instanceType) {
+          instanceTypeReloader = this.refreshInstanceTypes(cmd, true);
         }
 
         return this.$q.all([loadBalancerReloader, securityGroupReloader, instanceTypeReloader]).then(() => {
-          this.applyOverrides('afterConfiguration', command);
-          this.attachEventHandlers(command);
+          this.applyOverrides('afterConfiguration', cmd);
+          this.attachEventHandlers(cmd);
         });
       });
   }
@@ -510,7 +525,8 @@ export class AwsServerGroupConfigurationService {
         .value();
     }
 
-    return command.backingData.appLoadBalancers || [];
+    const appLoadBalancers = command.backingData.appLoadBalancers || [];
+    return appLoadBalancers.filter(lb => lb.region === command.region && lb.account === command.credentials);
   }
 
   public getLoadBalancerNames(command: IAmazonServerGroupCommand): string[] {
@@ -610,8 +626,9 @@ export class AwsServerGroupConfigurationService {
     return result;
   }
 
-  public attachEventHandlers(command: IAmazonServerGroupCommand): void {
-    command.usePreferredZonesChanged = (): IAmazonServerGroupCommandResult => {
+  // TODO: Instead of attaching these to the command itself, they could be static methods
+  public attachEventHandlers(cmd: IAmazonServerGroupCommand): void {
+    cmd.usePreferredZonesChanged = (command: IAmazonServerGroupCommand): IAmazonServerGroupCommandResult => {
       const currentZoneCount = command.availabilityZones ? command.availabilityZones.length : 0;
       const result: IAmazonServerGroupCommandResult = { dirty: {} };
       const preferredZonesForAccount = command.backingData.preferredZones[command.credentials];
@@ -630,7 +647,7 @@ export class AwsServerGroupConfigurationService {
       return result;
     };
 
-    command.subnetChanged = (): IServerGroupCommandResult => {
+    cmd.subnetChanged = (command: IAmazonServerGroupCommand): IServerGroupCommandResult => {
       const result = this.configureVpcId(command);
       extend(result.dirty, this.configureSecurityGroupOptions(command).dirty);
       extend(result.dirty, this.configureLoadBalancerOptions(command).dirty);
@@ -639,16 +656,16 @@ export class AwsServerGroupConfigurationService {
       return result;
     };
 
-    command.regionChanged = (): IServerGroupCommandResult => {
+    cmd.regionChanged = (command: IAmazonServerGroupCommand): IServerGroupCommandResult => {
       const result: IAmazonServerGroupCommandResult = { dirty: {} };
       const filteredData = command.backingData.filtered;
       extend(result.dirty, this.configureSubnetPurposes(command).dirty);
       if (command.region) {
-        extend(result.dirty, command.subnetChanged().dirty);
+        extend(result.dirty, command.subnetChanged(command).dirty);
         extend(result.dirty, this.configureInstanceTypes(command).dirty);
 
         this.configureAvailabilityZones(command);
-        extend(result.dirty, command.usePreferredZonesChanged().dirty);
+        extend(result.dirty, command.usePreferredZonesChanged(command).dirty);
 
         extend(result.dirty, this.configureImages(command).dirty);
         extend(result.dirty, this.configureKeyPairs(command).dirty);
@@ -659,11 +676,11 @@ export class AwsServerGroupConfigurationService {
       return result;
     };
 
-    command.clusterChanged = (): void => {
+    cmd.clusterChanged = (command: IAmazonServerGroupCommand): void => {
       command.moniker = NameUtils.getMoniker(command.application, command.stack, command.freeFormDetails);
     };
 
-    command.credentialsChanged = (): IServerGroupCommandResult => {
+    cmd.credentialsChanged = (command: IAmazonServerGroupCommand): IServerGroupCommandResult => {
       const result: IAmazonServerGroupCommandResult = { dirty: {} };
       const backingData = command.backingData;
       if (command.credentials) {
@@ -675,7 +692,7 @@ export class AwsServerGroupConfigurationService {
           command.region = null;
           result.dirty.region = true;
         } else {
-          extend(result.dirty, command.regionChanged().dirty);
+          extend(result.dirty, command.regionChanged(command).dirty);
         }
       } else {
         command.region = null;
@@ -683,13 +700,14 @@ export class AwsServerGroupConfigurationService {
       return result;
     };
 
-    command.imageChanged = (): IServerGroupCommandResult => this.configureInstanceTypes(command);
+    cmd.imageChanged = (command: IAmazonServerGroupCommand): IServerGroupCommandResult =>
+      this.configureInstanceTypes(command);
 
-    command.instanceTypeChanged = (): void => {
+    cmd.instanceTypeChanged = (command: IAmazonServerGroupCommand): void => {
       command.ebsOptimized = this.awsInstanceTypeService.isEbsOptimized(command.instanceType);
     };
 
-    this.applyOverrides('attachEventHandlers', command);
+    this.applyOverrides('attachEventHandlers', cmd);
   }
 }
 
@@ -697,11 +715,8 @@ export const AWS_SERVER_GROUP_CONFIGURATION_SERVICE = 'spinnaker.amazon.serverGr
 module(AWS_SERVER_GROUP_CONFIGURATION_SERVICE, [
   require('amazon/image/image.reader.js').name,
   SECURITY_GROUP_READER,
-  SUBNET_READ_SERVICE,
   require('amazon/instance/awsInstanceType.service.js').name,
-  KEY_PAIRS_READ_SERVICE,
   LOAD_BALANCER_READ_SERVICE,
   CACHE_INITIALIZER_SERVICE,
   SERVER_GROUP_COMMAND_REGISTRY_PROVIDER,
-  require('../details/scalingProcesses/autoScalingProcess.service.js').name,
 ]).service('awsServerGroupConfigurationService', AwsServerGroupConfigurationService);

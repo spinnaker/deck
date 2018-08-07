@@ -40,7 +40,7 @@ export interface IServerGroupState {
   jenkins: IJenkinsViewModel;
   docker: IDockerViewModel;
   instances: IInstance[];
-  images?: string;
+  images?: string[];
 
   isSelected: boolean; // single select mode
   isMultiSelected: boolean; // multiselect mode
@@ -64,7 +64,7 @@ export class ServerGroup extends React.Component<IServerGroupProps, IServerGroup
     const dockerConfig = serverGroup.buildInfo && serverGroup.buildInfo.docker;
 
     let jenkins: IJenkinsViewModel = null;
-    let images: string = null;
+    let images: string[] = null;
     let docker: IDockerViewModel = null;
 
     if (jenkinsConfig && (jenkinsConfig.host || jenkinsConfig.fullUrl || serverGroup.buildInfo.buildInfoUrl)) {
@@ -81,11 +81,10 @@ export class ServerGroup extends React.Component<IServerGroupProps, IServerGroup
       docker = {
         tag: dockerConfig.tag,
         image: dockerConfig.image,
-        href:
-          SETTINGS.dockerInsights.url + 'image/' + encodeURIComponent(dockerConfig.image) + '/tag/' + dockerConfig.tag,
+        href: SETTINGS.dockerInsights.url + 'images/' + encodeURIComponent(dockerConfig.image) + '/' + dockerConfig.tag,
       };
     } else if (has(serverGroup, 'buildInfo.images')) {
-      images = serverGroup.buildInfo.images.join(', ');
+      images = serverGroup.buildInfo.images;
     }
 
     return {

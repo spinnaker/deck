@@ -54,7 +54,7 @@ const helpContents: { [key: string]: string } = {
         <li>Context - server groups, bakery results, etc.</li>
       </ul>`,
   'pipeline.config.expectedArtifact':
-    'Artifacts required for trigger to execute.  Only one of the artifacts need to be present for the trigger to execute',
+    'Artifacts required for trigger to execute.  Only one of the artifacts needs to be present for the trigger to execute.',
   'pipeline.config.artifact.help': `
       <p>There are certain types of triggers (e.g. Pub/Sub triggers) that can produce artifacts and inject them into the execution context for a pipeline.</p>
       <p>You can specify artifacts that your pipeline expects to be present in the execution context in this section.</p>`,
@@ -131,6 +131,14 @@ const helpContents: { [key: string]: string } = {
   'pipeline.config.expectedArtifact.defaultGithub.reference': `
       <p>The GitHub API content url the artifact lives under. The domain name may change if you're running GHE.</p>
       <p>An example is <code>https://api.github.com/repos/$ORG/$REPO/contents/$FILEPATH</code>. See <a href="https://www.spinnaker.io/reference/artifacts/types/github-file/#fields">our docs</a> for more info.</p>`,
+  'pipeline.config.expectedArtifact.defaultGitlab.version': `
+      <p>Either the commit or branch to checkout.</p>`,
+  'pipeline.config.expectedArtifact.defaultGitlab.reference': `
+      <p>The Gitlab API file url the artifact lives under. The domain name may change if you're running your own Gitlab server. The repository and path to files must be URL encoded.</p>
+      <p>An example is <code>https://gitlab.com/api/v4/projects/$ORG%2F$REPO/repository/files/path%2Fto%2Ffile.yml/raw</code>. See <a href="https://www.spinnaker.io/reference/artifacts/types/gitlab-file/#fields">our docs</a> for more info.</p>`,
+  'pipeline.config.expectedArtifact.defaultBitbucket.reference': `
+      <p>The Bitbucket API file url the artifact lives under. The domain name may change if you're running your own Bitbucket server. The repository and path to files must be URL encoded.</p>
+      <p>An example is <code>https://api.bitbucket.org/1.0/repositories/$ORG/$REPO/raw/$VERSION/$FILEPATH</code>. See <a href="https://www.spinnaker.io/reference/artifacts/types/bitbucket-file/#fields">our docs</a> for more info.</p>`,
   'pipeline.config.trigger.webhook.source': `
       <p>Determines the target URL required to trigger this pipeline, as well as how the payload can be transformed into artifacts.</p>
   `,
@@ -141,7 +149,7 @@ const helpContents: { [key: string]: string } = {
   'pipeline.config.trigger.pubsub.attributeConstraints': `
       <p>Pubsub mesages can have system-specific metadata accompanying the payload called <b>attributes</b>.</p>
       <p>When provided, only a pubsub message with attributes containing at least the specified key/value pairs will be allowed to trigger this pipeline.</p>
-      <p>The constraint values may be supplied as regex.</p>
+      <p>The constraint value is a java regex string.</p>
   `,
   'pipeline.config.trigger.pubsub.payloadConstraints': `
       <p>
@@ -154,7 +162,7 @@ const helpContents: { [key: string]: string } = {
         The key/value pairs are matched against the unprocessed payload body, prior to any
         transformation using, for example, a Jinja template in a pubsub subscription configuration.
       </p>
-      <p>The constraint values may be supplied as regex.</p>
+      <p>The constraint value is a java regex string.</p>
   `,
   'pipeline.config.findArtifactFromExecution.considerExecutions': `
       <p>Select the types of executions to consider. When no selection is made, the default is "any execution".</p>
@@ -186,12 +194,16 @@ const helpContents: { [key: string]: string } = {
     '<p>Configures the cluster upon which this disable operation will act. The <em>target</em> specifies what server group to resolve for the operation.</p>',
   'pipeline.config.destroyAsg.cluster':
     '<p>Configures the cluster upon which this destroy operation will act. The <em>target</em> specifies what server group to resolve for the operation.</p>',
-  'pipeline.config.jenkins.propertyFile':
+  'pipeline.config.jenkins.trigger.propertyFile':
     '<p>(Optional) Configures the name to the Jenkins artifact file used to pass in properties to later stages in the Spinnaker pipeline. The contents of this file will now be available as a map under the trigger and accessible via <em>trigger.properties</em>. See <a target="_blank" href="https://www.spinnaker.io/guides/user/pipeline-expressions/">Pipeline Expressions docs</a> for more information.</p>',
+  'pipeline.config.jenkins.propertyFile':
+    '<p>(Optional) Configures the name to the Jenkins artifact file used to pass in properties to later stages in the Spinnaker pipeline. The contents of this file will now be available as a map under the stage context. See <a target="_blank" href="https://www.spinnaker.io/guides/user/pipeline-expressions/">Pipeline Expressions docs</a> for more information.</p>',
   'pipeline.config.travis.job.isFiltered':
     '<p>Note that for performance reasons, not all jobs are displayed. Please use the search field to limit the number of jobs.</p>',
-  'pipeline.config.travis.propertyFile':
+  'pipeline.config.travis.trigger.propertyFile':
     '<p>(Optional) Configures the name to the Travis artifact file used to pass in properties to later stages in the Spinnaker pipeline. The contents of this file will now be available as a map under the trigger and accessible via <em>trigger.properties</em>. See <a target="_blank" href="https://www.spinnaker.io/guides/user/pipeline-expressions/">Pipeline Expressions docs</a> for more information.</p>',
+  'pipeline.config.travis.propertyFile':
+    '<p>(Optional) Configures the name to the Travis artifact file used to pass in properties to later stages in the Spinnaker pipeline. The contents of this file will now be available as a map under the stage context. See <a target="_blank" href="https://www.spinnaker.io/guides/user/pipeline-expressions/">Pipeline Expressions docs</a> for more information.</p>',
   'pipeline.config.bake.package': `
       <p>The name of the package you want installed (without any version identifiers).</p>
       <p>If your build produces a deb file named "myapp_1.27-h343", you would want to enter "myapp" here.</p>
@@ -244,6 +256,12 @@ const helpContents: { [key: string]: string } = {
   'pipeline.config.travis.markUnstableAsSuccessful.false': `
       If Travis reports the build status as UNSTABLE,
       Spinnaker will mark the stage as TERMINAL; subsequent execution will be determined based on the configuration of the
+      <b>If build fails</b> option for this stage.`,
+  'pipeline.config.wercker.markUnstableAsSuccessful.true':
+    'If Wercker reports the build status as UNSTABLE, Spinnaker will mark the stage as SUCCEEDED and continue execution of the pipeline.',
+  'pipeline.config.wercker.markUnstableAsSuccessful.false': `
+      If Wercker reports the build status as UNSTABLE,
+      Spinnaker will mark the stage as FAILED; subsequent execution will be determined based on the configuration of the
       <b>If build fails</b> option for this stage.`,
   'pipeline.config.cron.expression':
     '<strong>Format (Year is optional)</strong><p><samp>Seconds  Minutes  Hour  DayOfMonth  Month  DayOfWeek  (Year)</samp></p>' +
@@ -361,6 +379,8 @@ const helpContents: { [key: string]: string } = {
     'if unchecked, marks the stage as successful right away without waiting for the jenkins job to complete',
   'travis.waitForCompletion':
     'if unchecked, marks the stage as successful right away without waiting for the Travis job to complete',
+  'wercker.waitForCompletion':
+    'if unchecked, marks the stage as successful right away without waiting for the Wercker job to complete',
   'script.waitForCompletion':
     'if unchecked, marks the stage as successful right away without waiting for the script to complete',
   'markdown.examples':
@@ -389,6 +409,18 @@ const helpContents: { [key: string]: string } = {
   'pipeline.config.parameter.label': '(Optional): a label to display when users are triggering the pipeline manually',
   'pipeline.config.parameter.description': `(Optional): if supplied, will be displayed to users as a tooltip
       when triggering the pipeline manually. You can include HTML in this field.`,
+  'pipeline.config.failOnFailedExpressions': `When this option is enabled, the stage will be marked as failed if it contains any failed expressions`,
+  'pipeline.config.roles.help': `
+    <p> When the pipeline is triggered using an automated trigger, these roles will be used to decide if the pipeline has permissions to access a protected application or account.</p>
+    <ul>
+    <li>
+    To read from a protected application or account, the pipeline must have at least one role that has read access to the application or account.
+    </li>
+    <li>
+    To write to a protected application or account, the pipeline must have at least one role that has write access to the application or account.
+    </li>
+    </ul>
+    <p><strong>Note:</strong> To prevent privilege escalation vulnerabilities, a user must be a member of <strong>all</strong> of the groups specified here in order to modify, and execute the pipeline.</p>`,
 };
 
 Object.keys(helpContents).forEach(key => HelpContentsRegistry.register(key, helpContents[key]));

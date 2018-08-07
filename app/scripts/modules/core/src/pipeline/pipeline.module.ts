@@ -1,7 +1,7 @@
 import { module } from 'angular';
 
 import { APPLY_SOURCE_SERVER_GROUP_CAPACITY_STAGE } from './config/stages/applySourceServerGroupCapacity/applySourceServerGroupCapacityStage.module';
-import { BAKE_MANIFEST_STAGE } from './config/stages/bakeManifest/bakeManifestStage'
+import { BAKE_MANIFEST_STAGE } from './config/stages/bakeManifest/bakeManifestStage';
 import { CHECK_PRECONDITIONS_STAGE_MODULE } from './config/stages/checkPreconditions/checkPreconditionsStage.module';
 import { CLONE_SERVER_GROUP_STAGE } from './config/stages/cloneServerGroup/cloneServerGroupStage.module';
 import { COPY_STAGE_MODAL_CONTROLLER } from './config/copyStage/copyStage.modal.controller';
@@ -22,13 +22,13 @@ import { SCRIPT_STAGE } from './config/stages/script/scriptStage';
 import { SHRINK_CLUSTER_STAGE } from './config/stages/shrinkCluster/shrinkClusterStage';
 import { STAGE_CORE_MODULE } from './config/stages/core/stage.core.module';
 import { TRAVIS_STAGE_MODULE } from './config/stages/travis/travisStage.module';
+import { WERCKER_STAGE_MODULE } from './config/stages/wercker/werckerStage.module';
 import { UNMATCHED_STAGE_TYPE_STAGE } from './config/stages/unmatchedStageTypeStage/unmatchedStageTypeStage';
-import { WAIT_STAGE } from './config/stages/wait/waitStage';
+import './config/stages/wait/waitStage';
 import { WEBHOOK_STAGE_MODULE } from './config/stages/webhook/webhookStage.module';
 import { PIPELINE_STATES } from './pipeline.states';
 import { BUILD_DISPLAY_NAME_FILTER } from './executionBuild/buildDisplayName.filter';
 import { EXECUTION_DETAILS_SECTION_NAV } from './details/executionDetailsSectionNav.component';
-import { EXECUTION_FILTER_SERVICE } from 'core/pipeline/filter/executionFilter.service';
 import { STAGE_FAILURE_MESSAGE_COMPONENT } from './details/stageFailureMessage.component';
 import { STEP_EXECUTION_DETAILS_COMPONENT } from './details/stepExecutionDetails.component';
 import { STAGE_SUMMARY_COMPONENT } from './details/stageSummary.component';
@@ -42,7 +42,6 @@ export const PIPELINE_MODULE = 'spinnaker.core.pipeline';
 module(PIPELINE_MODULE, [
   'ui.sortable',
   EXECUTION_DETAILS_SECTION_NAV,
-  EXECUTION_FILTER_SERVICE,
 
   BUILD_DISPLAY_NAME_FILTER,
 
@@ -52,14 +51,13 @@ module(PIPELINE_MODULE, [
   STEP_EXECUTION_DETAILS_COMPONENT,
   STAGE_SUMMARY_COMPONENT,
 
-  require('../utils/appendTransform.js').name,
-
   require('./pipeline.dataSource').name,
   PIPELINE_STATES,
   require('./config/pipelineConfig.module').name,
   COPY_STAGE_MODAL_CONTROLLER,
   GROUP_STAGE_MODULE,
   TRAVIS_STAGE_MODULE,
+  WERCKER_STAGE_MODULE,
   WEBHOOK_STAGE_MODULE,
   UNMATCHED_STAGE_TYPE_STAGE,
   require('./config/stages/bake/bakeStage.module').name,
@@ -87,7 +85,6 @@ module(PIPELINE_MODULE, [
   SCALE_DOWN_CLUSTER_STAGE,
   SCRIPT_STAGE,
   SHRINK_CLUSTER_STAGE,
-  WAIT_STAGE,
   require('./config/stages/waitForParentTasks/waitForParentTasks').name,
   CREATE_LOAD_BALANCER_STAGE,
   APPLY_SOURCE_SERVER_GROUP_CAPACITY_STAGE,

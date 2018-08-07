@@ -1,6 +1,6 @@
 import { IController, module } from 'angular';
 
-import { V2_MODAL_WIZARD_SERVICE } from './v2modalWizard.service';
+import { ModalWizard, IWizardPageState } from './ModalWizard';
 /**
  * Wizard page directive
  * possible attributes:
@@ -16,14 +16,6 @@ import { V2_MODAL_WIZARD_SERVICE } from './v2modalWizard.service';
  *     scrolled into view
  */
 
-export interface IWizardPageState {
-  rendered: boolean;
-  done: boolean;
-  dirty: boolean;
-  required: boolean;
-  markCompleteOnView: boolean;
-}
-
 export class WizardPageController implements IController {
   /**
    * when set to false, the wizard will not consider this page when isComplete is called
@@ -38,6 +30,13 @@ export class WizardPageController implements IController {
    * @type {boolean}
    */
   public done: boolean;
+
+  /**
+   * when set to false, the page will not be marked clean when scrolled into view
+   * default: true
+   * @type {boolean}
+   */
+  public markCleanOnView: boolean;
 
   /**
    * when set to false, the page will not be marked complete when scrolled into view
@@ -70,23 +69,27 @@ export class WizardPageController implements IController {
    */
   public state: IWizardPageState;
 
-  public constructor(private $scope: ng.IScope, private v2modalWizardService: any) {
+  public constructor(private $scope: ng.IScope) {
     'ngInject';
   }
 
   public $onInit() {
     this.render = this.render !== false;
+    this.markCleanOnView = this.markCleanOnView !== false;
     this.markCompleteOnView = this.markCompleteOnView !== false;
 
     this.state = {
+      blocked: false,
+      current: false,
       rendered: this.render,
       done: this.done || !this.mandatory,
       dirty: false,
       required: this.mandatory,
+      markCleanOnView: this.markCleanOnView,
       markCompleteOnView: this.markCompleteOnView,
     };
-    this.v2modalWizardService.registerPage(this.key, this.label, this.state);
-    this.$scope.$on('$destroy', () => this.v2modalWizardService.setRendered(this.key, false));
+    ModalWizard.registerPage(this.key, this.label, this.state);
+    this.$scope.$on('$destroy', () => ModalWizard.setRendered(this.key, false));
   }
 }
 
@@ -94,6 +97,7 @@ class WizardPageComponent implements ng.IComponentOptions {
   public bindings: any = {
     mandatory: '<',
     done: '<',
+    markCleanOnView: '<',
     markCompleteOnView: '<',
     key: '@',
     label: '@',
@@ -105,4 +109,4 @@ class WizardPageComponent implements ng.IComponentOptions {
 }
 
 export const V2_WIZARD_PAGE_COMPONENT = 'spinnaker.core.modal.wizard.wizardPage.component';
-module(V2_WIZARD_PAGE_COMPONENT, [V2_MODAL_WIZARD_SERVICE]).component('v2WizardPage', new WizardPageComponent());
+module(V2_WIZARD_PAGE_COMPONENT, []).component('v2WizardPage', new WizardPageComponent());

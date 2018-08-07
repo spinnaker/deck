@@ -4,41 +4,33 @@ const angular = require('angular');
 
 import {
   CONFIRMATION_MODAL_SERVICE,
-  NETWORK_READ_SERVICE,
-  SERVER_GROUP_READER,
-  SERVER_GROUP_WARNING_MESSAGE_SERVICE,
+  NetworkReader,
+  ServerGroupReader,
+  ServerGroupWarningMessageService,
   SERVER_GROUP_WRITER,
-  SUBNET_READ_SERVICE,
+  SubnetReader,
 } from '@spinnaker/core';
 
 module.exports = angular
-  .module('spinnaker.oraclebmcs.serverGroup.details.controller', [
+  .module('spinnaker.oracle.serverGroup.details.controller', [
     require('@uirouter/angularjs').default,
-    SERVER_GROUP_READER,
     CONFIRMATION_MODAL_SERVICE,
     SERVER_GROUP_WRITER,
-    SERVER_GROUP_WARNING_MESSAGE_SERVICE,
-    NETWORK_READ_SERVICE,
-    SUBNET_READ_SERVICE,
     require('../../image/image.reader.js').name,
     require('./resize/resizeServerGroup.controller.js').name,
     require('./rollback/rollbackServerGroup.controller.js').name,
   ])
-  .controller('oraclebmcsServerGroupDetailsCtrl', function(
+  .controller('oracleServerGroupDetailsCtrl', function(
     $scope,
     $state,
     $uibModal,
     app,
     serverGroup,
     confirmationModalService,
-    serverGroupReader,
     serverGroupWriter,
-    networkReader,
-    subnetReader,
-    oraclebmcsImageReader,
-    serverGroupWarningMessageService,
+    oracleImageReader,
   ) {
-    const provider = 'oraclebmcs';
+    const provider = 'oracle';
 
     this.application = app;
     this.serverGroup = serverGroup;
@@ -52,20 +44,23 @@ module.exports = angular
     /////////////////////////////////////////////////////////
 
     let retrieveServerGroup = () => {
-      return serverGroupReader
-        .getServerGroup(app.name, serverGroup.accountId, serverGroup.region, serverGroup.name)
-        .then(details => {
-          cancelLoader();
-          details.account = serverGroup.accountId;
-          this.serverGroup = details;
-          retrieveNetwork();
-          retrieveSubnet();
-          retrieveImage();
-        });
+      return ServerGroupReader.getServerGroup(
+        app.name,
+        serverGroup.accountId,
+        serverGroup.region,
+        serverGroup.name,
+      ).then(details => {
+        cancelLoader();
+        details.account = serverGroup.accountId;
+        this.serverGroup = details;
+        retrieveNetwork();
+        retrieveSubnet();
+        retrieveImage();
+      });
     };
 
     let retrieveNetwork = () => {
-      networkReader.listNetworksByProvider(provider).then(networks => {
+      NetworkReader.listNetworksByProvider(provider).then(networks => {
         this.serverGroup.network = _.chain(networks)
           .filter({ account: this.serverGroup.account, id: this.serverGroup.launchConfig.vpcId })
           .head()
@@ -74,13 +69,13 @@ module.exports = angular
     };
 
     let retrieveSubnet = () => {
-      subnetReader.getSubnetByIdAndProvider(this.serverGroup.launchConfig.subnetId, provider).then(subnet => {
+      SubnetReader.getSubnetByIdAndProvider(this.serverGroup.launchConfig.subnetId, provider).then(subnet => {
         this.serverGroup.subnet = subnet;
       });
     };
 
     let retrieveImage = () => {
-      oraclebmcsImageReader
+      oracleImageReader
         .getImage(this.serverGroup.launchConfig.imageId, this.serverGroup.region, this.serverGroup.account)
         .then(image => {
           if (!image) {
@@ -129,7 +124,7 @@ module.exports = angular
     this.resizeServerGroup = () => {
       $uibModal.open({
         templateUrl: require('./resize/resizeServerGroup.html'),
-        controller: 'oraclebmcsResizeServerGroupCtrl as ctrl',
+        controller: 'oracleResizeServerGroupCtrl as ctrl',
         resolve: {
           serverGroup: () => {
             return this.serverGroup;
@@ -144,7 +139,7 @@ module.exports = angular
     this.rollbackServerGroup = () => {
       $uibModal.open({
         templateUrl: require('./rollback/rollbackServerGroup.html'),
-        controller: 'oraclebmcsRollbackServerGroupCtrl as ctrl',
+        controller: 'oracleRollbackServerGroupCtrl as ctrl',
         resolve: {
           serverGroup: () => this.serverGroup,
           disabledServerGroups: () => {
@@ -182,7 +177,7 @@ module.exports = angular
         askForReason: true,
       };
 
-      serverGroupWarningMessageService.addDisableWarningMessage(app, serverGroup, confirmationModalParams);
+      ServerGroupWarningMessageService.addDisableWarningMessage(app, serverGroup, confirmationModalParams);
 
       if (app.attributes.platformHealthOnlyShowOverride && app.attributes.platformHealthOnly) {
         confirmationModalParams.interestingHealthProviderNames = ['Oracle'];

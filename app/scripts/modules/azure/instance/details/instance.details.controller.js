@@ -6,10 +6,10 @@ import _ from 'lodash';
 import {
   CloudProviderRegistry,
   CONFIRMATION_MODAL_SERVICE,
-  INSTANCE_READ_SERVICE,
+  InstanceReader,
   INSTANCE_WRITE_SERVICE,
   InstanceTemplates,
-  RECENT_HISTORY_SERVICE,
+  RecentHistoryService,
 } from '@spinnaker/core';
 
 module.exports = angular
@@ -17,9 +17,7 @@ module.exports = angular
     require('@uirouter/angularjs').default,
     require('angular-ui-bootstrap'),
     INSTANCE_WRITE_SERVICE,
-    INSTANCE_READ_SERVICE,
     CONFIRMATION_MODAL_SERVICE,
-    RECENT_HISTORY_SERVICE,
   ])
   .controller('azureInstanceDetailsCtrl', function(
     $scope,
@@ -27,8 +25,6 @@ module.exports = angular
     $uibModal,
     instanceWriter,
     confirmationModalService,
-    recentHistoryService,
-    instanceReader,
     instance,
     app,
     $q,
@@ -129,8 +125,8 @@ module.exports = angular
       if (instanceSummary && account && region) {
         extraData.account = account;
         extraData.region = region;
-        recentHistoryService.addExtraDataToLatest('instances', extraData);
-        return instanceReader.getInstanceDetails(account, region, instance.instanceId).then(
+        RecentHistoryService.addExtraDataToLatest('instances', extraData);
+        return InstanceReader.getInstanceDetails(account, region, instance.instanceId).then(
           function(details) {
             $scope.state.loading = false;
             extractHealthMetrics(instanceSummary, details);

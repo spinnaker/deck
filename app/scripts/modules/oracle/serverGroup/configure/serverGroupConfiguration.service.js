@@ -3,23 +3,13 @@
 const angular = require('angular');
 import _ from 'lodash';
 
-import { AccountService, NETWORK_READ_SERVICE, SECURITY_GROUP_READER, SUBNET_READ_SERVICE } from '@spinnaker/core';
-import { OracleBMCSProviderSettings } from '../../oraclebmcs.settings';
+import { AccountService, NetworkReader, SECURITY_GROUP_READER, SubnetReader } from '@spinnaker/core';
+import { OracleProviderSettings } from '../../oracle.settings';
 
 module.exports = angular
-  .module('spinnaker.oraclebmcs.serverGroup.configure.configuration.service', [
-    NETWORK_READ_SERVICE,
-    SUBNET_READ_SERVICE,
-    SECURITY_GROUP_READER,
-  ])
-  .factory('oraclebmcsServerGroupConfigurationService', function(
-    $q,
-    networkReader,
-    subnetReader,
-    oraclebmcsImageReader,
-    securityGroupReader,
-  ) {
-    let oracle = 'oraclebmcs';
+  .module('spinnaker.oracle.serverGroup.configure.configuration.service', [SECURITY_GROUP_READER])
+  .factory('oracleServerGroupConfigurationService', function($q, oracleImageReader, securityGroupReader) {
+    let oracle = 'oracle';
 
     let getShapes = image => {
       if (!image || !image.compatibleShapes) {
@@ -33,15 +23,15 @@ module.exports = angular
     function configureCommand(application, command) {
       let defaults = command || {};
       let defaultCredentials =
-        defaults.account || application.defaultCredentials.oraclebmcs || OracleBMCSProviderSettings.defaults.account;
+        defaults.account || application.defaultCredentials.oracle || OracleProviderSettings.defaults.account;
       let defaultRegion =
-        defaults.region || application.defaultRegions.oraclebmcs || OracleBMCSProviderSettings.defaults.region;
+        defaults.region || application.defaultRegions.oracle || OracleProviderSettings.defaults.region;
 
       return $q
         .all({
           credentialsKeyedByAccount: AccountService.getCredentialsKeyedByAccount(oracle),
-          networks: networkReader.listNetworksByProvider(oracle),
-          subnets: subnetReader.listSubnetsByProvider(oracle),
+          networks: NetworkReader.listNetworksByProvider(oracle),
+          subnets: SubnetReader.listSubnetsByProvider(oracle),
           securityGroups: securityGroupReader.getAllSecurityGroups(),
           images: loadImages(),
           availDomains: AccountService.getAvailabilityZonesForAccountAndRegion(
@@ -112,7 +102,7 @@ module.exports = angular
     }
 
     function loadImages() {
-      return oraclebmcsImageReader.findImages({ provider: oracle });
+      return oracleImageReader.findImages({ provider: oracle });
     }
 
     return {

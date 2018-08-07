@@ -10,9 +10,9 @@ import {
   SECURITY_GROUP_TRANSFORMER_SERVICE,
   SecurityGroupTransformerService,
 } from './securityGroupTransformer.service';
-import { ENTITY_TAGS_READ_SERVICE, EntityTagsReader } from 'core/entityTag/entityTags.read.service';
+import { EntityTagsReader } from 'core/entityTag/EntityTagsReader';
 import { SETTINGS } from 'core/config/settings';
-import { SEARCH_SERVICE, SearchService, ISearchResults } from 'core/search/search.service';
+import { SearchService, ISearchResults } from 'core/search/search.service';
 import { ISecurityGroupSearchResult } from './securityGroupSearchResultType';
 import { ProviderServiceDelegate, PROVIDER_SERVICE_DELEGATE } from 'core/cloudProvider/providerService.delegate';
 import { IMoniker } from 'core/naming/IMoniker';
@@ -185,11 +185,8 @@ export class SecurityGroupReader {
             );
             SecurityGroupReader.attachUsageFields(securityGroup);
             if (!securityGroup.usages.serverGroups.some((sg: IServerGroupUsage) => sg.name === serverGroup.name)) {
-              securityGroup.usages.serverGroups.push({
-                name: serverGroup.name,
-                isDisabled: serverGroup.isDisabled,
-                region: serverGroup.region,
-              });
+              const { account, isDisabled, name, cloudProvider, region } = serverGroup;
+              securityGroup.usages.serverGroups.push({ account, isDisabled, name, cloudProvider, region });
             }
             securityGroups.push(securityGroup);
           } catch (e) {
@@ -276,10 +273,8 @@ export class SecurityGroupReader {
   constructor(
     private $log: ILogService,
     private $q: IQService,
-    private searchService: SearchService,
     private securityGroupTransformer: SecurityGroupTransformerService,
     private providerServiceDelegate: ProviderServiceDelegate,
-    private entityTagsReader: EntityTagsReader,
   ) {
     'ngInject';
   }
@@ -378,7 +373,7 @@ export class SecurityGroupReader {
           });
         }
         if (SETTINGS.feature.entityTags && application.isStandalone) {
-          return this.entityTagsReader.getEntityTagsForId('securitygroup', details.name).then(tags => {
+          return EntityTagsReader.getEntityTagsForId('securitygroup', details.name).then(tags => {
             details.entityTags = tags.find(
               t =>
                 t.entityRef.entityId === details.name &&
@@ -412,29 +407,25 @@ export class SecurityGroupReader {
   }
 
   public loadSecurityGroupsByApplicationName(applicationName: string): IPromise<ISecurityGroup[]> {
-    return this.searchService
-      .search<ISecurityGroupSearchResult>({
-        q: applicationName,
-        type: 'securityGroups',
-        pageSize: 1000,
-      })
-      .then((searchResults: ISearchResults<ISecurityGroupSearchResult>) => {
-        let result: ISecurityGroup[] = [];
-        if (!searchResults || !searchResults.results) {
-          this.$log.warn('WARNING: Gate firewall endpoint appears to be down.');
-        } else {
-          result = filter(searchResults.results, { application: applicationName });
-        }
+    return SearchService.search<ISecurityGroupSearchResult>({
+      q: applicationName,
+      type: 'securityGroups',
+      pageSize: 1000,
+    }).then((searchResults: ISearchResults<ISecurityGroupSearchResult>) => {
+      let result: ISecurityGroup[] = [];
+      if (!searchResults || !searchResults.results) {
+        this.$log.warn('WARNING: Gate firewall endpoint appears to be down.');
+      } else {
+        result = filter(searchResults.results, { application: applicationName });
+      }
 
-        return result;
-      });
+      return result;
+    });
   }
 }
 
 export const SECURITY_GROUP_READER = 'spinnaker.core.securityGroup.read.service';
-module(SECURITY_GROUP_READER, [
-  SEARCH_SERVICE,
-  SECURITY_GROUP_TRANSFORMER_SERVICE,
-  PROVIDER_SERVICE_DELEGATE,
-  ENTITY_TAGS_READ_SERVICE,
-]).service('securityGroupReader', SecurityGroupReader);
+module(SECURITY_GROUP_READER, [SECURITY_GROUP_TRANSFORMER_SERVICE, PROVIDER_SERVICE_DELEGATE]).service(
+  'securityGroupReader',
+  SecurityGroupReader,
+);

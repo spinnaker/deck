@@ -2,14 +2,14 @@ import * as moment from 'moment';
 import { cloneDeep, uniq } from 'lodash';
 import { module, noop } from 'angular';
 
-import { APPLICATION_READ_SERVICE, ApplicationReader } from 'core/application/service/application.read.service';
+import { ApplicationReader } from 'core/application/service/ApplicationReader';
 import { AccountService } from 'core/account/AccountService';
 import { CloudProviderRegistry } from 'core/cloudProvider';
 import { INFRASTRUCTURE_CACHE_CONFIG, IInfrastructureCacheConfig } from './infrastructureCacheConfig';
 import { InfrastructureCaches } from './infrastructureCaches';
 import { ICacheConfig } from './deckCacheFactory';
 import { SECURITY_GROUP_READER, SecurityGroupReader } from 'core/securityGroup/securityGroupReader.service';
-import { IGOR_SERVICE, IgorService } from 'core/ci/igor.service';
+import { IgorService } from 'core/ci/igor.service';
 
 interface IInitializers {
   [key: string]: any[];
@@ -25,8 +25,8 @@ export class CacheInitializerService {
   private initializers: IInitializers = {
     credentials: [() => AccountService.listAccounts()],
     securityGroups: [() => this.securityGroupReader.getAllSecurityGroups()],
-    applications: [() => this.applicationReader.listApplications()],
-    buildMasters: [() => this.igorService.listMasters()],
+    applications: [() => ApplicationReader.listApplications()],
+    buildMasters: [() => IgorService.listMasters()],
   };
 
   private setConfigDefaults(key: string, config: ICacheConfig) {
@@ -83,9 +83,7 @@ export class CacheInitializerService {
 
   constructor(
     private $q: ng.IQService,
-    private applicationReader: ApplicationReader,
     private securityGroupReader: SecurityGroupReader,
-    private igorService: IgorService,
     private providerServiceDelegate: any,
   ) {}
 
@@ -116,7 +114,4 @@ export class CacheInitializerService {
 }
 
 export const CACHE_INITIALIZER_SERVICE = 'spinnaker.core.cache.initializer';
-module(CACHE_INITIALIZER_SERVICE, [SECURITY_GROUP_READER, APPLICATION_READ_SERVICE, IGOR_SERVICE]).service(
-  'cacheInitializer',
-  CacheInitializerService,
-);
+module(CACHE_INITIALIZER_SERVICE, [SECURITY_GROUP_READER]).service('cacheInitializer', CacheInitializerService);

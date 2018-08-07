@@ -2,9 +2,10 @@
 
 import { map } from 'lodash';
 
-import { AccountService, InfrastructureCaches } from '@spinnaker/core';
+import { AccountService, InfrastructureCaches, ModalWizard } from '@spinnaker/core';
 
 import { AWSProviderSettings } from 'amazon/aws.settings';
+import { VpcReader } from 'amazon/vpc';
 
 describe('Controller: CreateSecurityGroup', function() {
   beforeEach(
@@ -34,29 +35,16 @@ describe('Controller: CreateSecurityGroup', function() {
 
     // Initialize the controller and a mock scope
     beforeEach(
-      window.inject(function(
-        $controller,
-        $rootScope,
-        $q,
-        securityGroupReader,
-        v2modalWizardService,
-        taskMonitorBuilder,
-        securityGroupWriter,
-        vpcReader,
-      ) {
+      window.inject(function($controller, $rootScope, $q, securityGroupReader) {
         this.$scope = $rootScope.$new();
         this.$q = $q;
         this.securityGroupReader = securityGroupReader;
-        this.v2modalWizardService = v2modalWizardService;
-        this.taskMonitorBuilder = taskMonitorBuilder;
-        this.securityGroupWriter = securityGroupWriter;
-        this.vpcReader = vpcReader;
 
         spyOn(AccountService, 'listAccounts').and.returnValue($q.when(['prod', 'test']));
 
         spyOn(AccountService, 'getRegionsForAccount').and.returnValue($q.when(['us-east-1', 'us-west-1']));
 
-        spyOn(this.vpcReader, 'listVpcs').and.returnValue(
+        spyOn(VpcReader, 'listVpcs').and.returnValue(
           $q.when([
             { id: 'vpc1-pe', name: 'vpc 1', account: 'prod', region: 'us-east-1', deprecated: false, label: 'vpc 1' },
             { id: 'vpc2-pw', name: 'vpc 2', account: 'prod', region: 'us-west-1', deprecated: false, label: 'vpc 2' },
@@ -102,10 +90,6 @@ describe('Controller: CreateSecurityGroup', function() {
             $scope: this.$scope,
             $uibModalInstance: { result: this.$q.when(null) },
             securityGroupReader: this.securityGroupReader,
-            v2modalWizardService: this.v2modalWizardService,
-            taskMonitorBuilder: this.taskMonitorBuilder,
-            securityGroupWriter: this.securityGroupWriter,
-            vpcReader: this.vpcReader,
             application: this.application || { attributes: {} },
             securityGroup: { regions: [], securityGroupIngress: [] },
           });
@@ -181,7 +165,7 @@ describe('Controller: CreateSecurityGroup', function() {
 
     describe('firewall removal', function() {
       beforeEach(function() {
-        spyOn(this.v2modalWizardService, 'markDirty').and.returnValue(null);
+        spyOn(ModalWizard, 'markDirty').and.returnValue(null);
         this.initializeCtrl();
         let securityGroup = this.$scope.securityGroup;
         securityGroup.credentials = 'prod';
@@ -199,7 +183,7 @@ describe('Controller: CreateSecurityGroup', function() {
         this.ctrl.accountUpdated();
         this.$scope.$digest();
         expect(this.$scope.state.removedRules.length).toBe(1);
-        expect(this.v2modalWizardService.markDirty).toHaveBeenCalledWith('Ingress');
+        expect(ModalWizard.markDirty).toHaveBeenCalledWith('Ingress');
       });
 
       it('does not repeatedly add removed rule warnings when multiple rules for the same group are removed', function() {
@@ -214,7 +198,7 @@ describe('Controller: CreateSecurityGroup', function() {
         this.ctrl.accountUpdated();
         this.$scope.$digest();
         expect(this.$scope.state.removedRules).toEqual(['group2']);
-        expect(this.v2modalWizardService.markDirty).toHaveBeenCalledWith('Ingress');
+        expect(ModalWizard.markDirty).toHaveBeenCalledWith('Ingress');
       });
     });
 

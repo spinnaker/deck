@@ -1,11 +1,12 @@
 import * as React from 'react';
-import { Subject } from 'rxjs';
+import { Subject, Observable } from 'rxjs';
 
 import { Overridable, IOverridableProps } from 'core/overrideRegistry';
-import { ReactInjector } from 'core/reactShims';
 import { Application } from 'core/application';
+import { AccountService } from 'core/account/AccountService';
 import { Spinner } from 'core/widgets';
-import { Observable } from 'rxjs/Observable';
+import { SkinService } from 'core/cloudProvider/skin.service';
+import { IMoniker } from 'core/naming';
 
 export interface IInstanceDetailsProps extends IOverridableProps {
   $stateParams: {
@@ -13,15 +14,21 @@ export interface IInstanceDetailsProps extends IOverridableProps {
     instanceId: string;
   };
   app: Application;
+  moniker: IMoniker;
+  environment: string;
 }
 export interface IInstanceDetailsState {
   accountId: string;
+  moniker: IMoniker;
+  environment: string;
   loading: boolean;
 }
 
 export class InstanceDetails extends React.Component<IInstanceDetailsProps, IInstanceDetailsState> {
   public state = {
     accountId: null,
+    moniker: null,
+    environment: null,
     loading: false,
   } as IInstanceDetailsState;
 
@@ -29,17 +36,21 @@ export class InstanceDetails extends React.Component<IInstanceDetailsProps, IIns
   private props$ = new Subject<IInstanceDetailsProps>();
 
   public componentDidMount() {
-    const { skinService } = ReactInjector;
-
     this.props$
-      .do(() => this.setState({ loading: true, accountId: null }))
+      .do(() => this.setState({ loading: true, accountId: null, moniker: null, environment: null }))
       .switchMap(({ app, $stateParams }) => {
-        const acct = skinService.getAccountForInstance($stateParams.provider, $stateParams.instanceId, app);
-        return Observable.fromPromise(acct);
+        const accountId = SkinService.getAccountForInstance($stateParams.provider, $stateParams.instanceId, app);
+        return Observable.fromPromise(
+          Promise.all([
+            accountId,
+            SkinService.getMonikerForInstance($stateParams.provider, $stateParams.instanceId, app),
+            accountId.then(id => AccountService.getAccountDetails(id)),
+          ]),
+        );
       })
       .takeUntil(this.destroy$)
-      .subscribe((accountId: string) => {
-        this.setState({ accountId, loading: false });
+      .subscribe(([accountId, moniker, { environment }]) => {
+        this.setState({ accountId, moniker, environment, loading: false });
       });
 
     this.props$.next(this.props);
@@ -54,12 +65,16 @@ export class InstanceDetails extends React.Component<IInstanceDetailsProps, IIns
   }
 
   public render() {
-    const { accountId, loading } = this.state;
+    const { accountId, moniker, environment, loading } = this.state;
     if (loading) {
-      return <Spinner />;
+      return (
+        <div className="full-width text-center">
+          <Spinner size="medium" message=" " />
+        </div>
+      );
     }
 
-    return <InstanceDetailsCmp {...this.props} accountId={accountId} />;
+    return <InstanceDetailsCmp {...this.props} accountId={accountId} moniker={moniker} environment={environment} />;
   }
 }
 

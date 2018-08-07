@@ -7,22 +7,12 @@ import { AuthenticationService } from '@spinnaker/core';
 
 import { AWSProviderSettings } from 'amazon/aws.settings';
 
-import {
-  PipelineTemplates,
-  BakeExecutionLabel,
-  BAKERY_SERVICE,
-  PIPELINE_CONFIG_PROVIDER,
-  SETTINGS,
-} from '@spinnaker/core';
+import { PipelineTemplates, BakeExecutionLabel, BakeryReader, Registry, SETTINGS } from '@spinnaker/core';
 
 module.exports = angular
-  .module('spinnaker.amazon.pipeline.stage.bakeStage', [
-    PIPELINE_CONFIG_PROVIDER,
-    require('./bakeExecutionDetails.controller.js').name,
-    BAKERY_SERVICE,
-  ])
-  .config(function(pipelineConfigProvider) {
-    pipelineConfigProvider.registerStage({
+  .module('spinnaker.amazon.pipeline.stage.bakeStage', [require('./bakeExecutionDetails.controller.js').name])
+  .config(function() {
+    Registry.pipeline.registerStage({
       provides: 'bake',
       cloudProvider: 'aws',
       label: 'Bake',
@@ -49,7 +39,7 @@ module.exports = angular
       restartable: true,
     });
   })
-  .controller('awsBakeStageCtrl', function($scope, bakeryService, $q, $uibModal) {
+  .controller('awsBakeStageCtrl', function($scope, $q, $uibModal) {
     $scope.stage.extendedAttributes = $scope.stage.extendedAttributes || {};
     $scope.stage.regions = $scope.stage.regions || [];
 
@@ -66,11 +56,11 @@ module.exports = angular
     function initialize() {
       $q
         .all({
-          regions: bakeryService.getRegions('aws'),
-          baseOsOptions: bakeryService.getBaseOsOptions('aws'),
-          baseLabelOptions: bakeryService.getBaseLabelOptions(),
-          vmTypes: bakeryService.getVmTypes(),
-          storeTypes: bakeryService.getStoreTypes(),
+          regions: BakeryReader.getRegions('aws'),
+          baseOsOptions: BakeryReader.getBaseOsOptions('aws'),
+          baseLabelOptions: BakeryReader.getBaseLabelOptions(),
+          vmTypes: ['hvm', 'pv'],
+          storeTypes: ['ebs', 's3', 'docker'],
         })
         .then(function(results) {
           $scope.regions = results.regions;

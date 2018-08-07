@@ -1,46 +1,28 @@
-import { mock } from 'angular';
+import { mock, IQService } from 'angular';
 
 import { Application } from 'core/application/application.model';
 import { APPLICATION_MODEL_BUILDER } from 'core/application/applicationModel.builder';
-import { APPLICATION_DATA_SOURCE_REGISTRY } from '../application/service/applicationDataSource.registry';
-import { TASK_READ_SERVICE, TaskReader } from 'core/task/task.read.service';
+import { ApplicationDataSourceRegistry } from '../application/service/ApplicationDataSourceRegistry';
+import { TaskReader } from 'core/task/task.read.service';
 
 describe('Task Data Source', function() {
-  let application: Application,
-    taskReader: TaskReader,
-    $scope: any,
-    applicationModelBuilder: any,
-    applicationDataSourceRegistry: any,
-    $q: ng.IQService;
+  let application: Application, $scope: any, applicationModelBuilder: any, $q: IQService;
+
+  beforeEach(() => ApplicationDataSourceRegistry.clearDataSources());
+
+  beforeEach(mock.module(require('./task.dataSource').name, APPLICATION_MODEL_BUILDER));
 
   beforeEach(
-    mock.module(
-      require('./task.dataSource').name,
-      TASK_READ_SERVICE,
-      APPLICATION_DATA_SOURCE_REGISTRY,
-      APPLICATION_MODEL_BUILDER,
-    ),
-  );
-
-  beforeEach(
-    mock.inject(function(
-      _taskReader_: TaskReader,
-      _$q_: any,
-      $rootScope: any,
-      _applicationModelBuilder_: any,
-      _applicationDataSourceRegistry_: any,
-    ) {
+    mock.inject(function(_$q_: any, $rootScope: any, _applicationModelBuilder_: any) {
       $q = _$q_;
       $scope = $rootScope.$new();
-      taskReader = _taskReader_;
       applicationModelBuilder = _applicationModelBuilder_;
-      applicationDataSourceRegistry = _applicationDataSourceRegistry_;
     }),
   );
 
   function configureApplication() {
-    applicationDataSourceRegistry.registerDataSource({ key: 'serverGroups' });
-    application = applicationModelBuilder.createApplication('app', applicationDataSourceRegistry.getDataSources());
+    ApplicationDataSourceRegistry.registerDataSource({ key: 'serverGroups' });
+    application = applicationModelBuilder.createApplication('app', ApplicationDataSourceRegistry.getDataSources());
     application.refresh();
     application.getDataSource('tasks').activate();
     $scope.$digest();
@@ -48,11 +30,11 @@ describe('Task Data Source', function() {
 
   describe('loading tasks', function() {
     beforeEach(function() {
-      spyOn(taskReader, 'getRunningTasks').and.returnValue($q.when([]));
+      spyOn(TaskReader, 'getRunningTasks').and.returnValue($q.when([]));
     });
 
     it('loads tasks and sets appropriate flags', function() {
-      spyOn(taskReader, 'getTasks').and.returnValue($q.when([]));
+      spyOn(TaskReader, 'getTasks').and.returnValue($q.when([]));
       configureApplication();
       expect(application.getDataSource('tasks').loaded).toBe(true);
       expect(application.getDataSource('tasks').loading).toBe(false);
@@ -60,7 +42,7 @@ describe('Task Data Source', function() {
     });
 
     it('sets appropriate flags when task load fails', function() {
-      spyOn(taskReader, 'getTasks').and.returnValue($q.reject(null));
+      spyOn(TaskReader, 'getTasks').and.returnValue($q.reject(null));
       configureApplication();
       expect(application.getDataSource('tasks').loaded).toBe(false);
       expect(application.getDataSource('tasks').loading).toBe(false);
@@ -70,12 +52,12 @@ describe('Task Data Source', function() {
 
   describe('reload tasks', function() {
     beforeEach(function() {
-      spyOn(taskReader, 'getRunningTasks').and.returnValue($q.when([]));
+      spyOn(TaskReader, 'getRunningTasks').and.returnValue($q.when([]));
     });
 
     it('reloads tasks and sets appropriate flags', function() {
       let nextCalls = 0;
-      spyOn(taskReader, 'getTasks').and.returnValue($q.when([]));
+      spyOn(TaskReader, 'getTasks').and.returnValue($q.when([]));
       configureApplication();
       application.getDataSource('tasks').onRefresh($scope, () => nextCalls++);
       expect(application.getDataSource('tasks').loaded).toBe(true);
@@ -94,7 +76,7 @@ describe('Task Data Source', function() {
     });
 
     it('sets appropriate flags when task reload fails; subscriber is responsible for error checking', function() {
-      spyOn(taskReader, 'getTasks').and.returnValue($q.reject(null));
+      spyOn(TaskReader, 'getTasks').and.returnValue($q.reject(null));
       let errorsHandled = 0,
         successesHandled = 0;
       configureApplication();

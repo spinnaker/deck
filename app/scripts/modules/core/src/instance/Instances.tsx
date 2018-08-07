@@ -9,6 +9,7 @@ import { Instance } from './Instance';
 export interface IInstancesProps {
   instances: IInstance[];
   highlight?: string;
+  cloudProvider?: string;
 }
 
 export interface IInstancesState {
@@ -63,7 +64,7 @@ export class Instances extends React.Component<IInstancesProps, IInstancesState>
 
   private handleInstanceClicked = (instance: IInstance) => {
     const { router, parentUIViewAddress } = this.context;
-    const params = { instanceId: instance.id, provider: instance.provider };
+    const params = { instanceId: instance.id, provider: instance.provider || this.props.cloudProvider };
     const options = { relative: parentUIViewAddress.context };
 
     router.stateService.go('.instanceDetails', params, options);
@@ -71,7 +72,9 @@ export class Instances extends React.Component<IInstancesProps, IInstancesState>
 
   private partitionInstances(): IInstance[][] {
     const partitions: IInstance[][] = [];
-    const instances = (this.props.instances || []).sort((a, b) => a.launchTime - b.launchTime);
+    const instances = (this.props.instances || []).sort(
+      (a, b) => a.launchTime - b.launchTime || a.id.localeCompare(b.id),
+    );
     if (!instances.length) {
       return partitions;
     }

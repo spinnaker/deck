@@ -292,12 +292,12 @@ describe('Service: Cluster', function() {
           it('finds instance within server group (' + name + ')', () => {
             const serverGroups: IServerGroup[] = application.serverGroups.data;
             serverGroups[2].instances = [
-              { id: 'in-1', health: null, launchTime: 1, zone: null },
-              { id: 'in-2', health: null, launchTime: 1, zone: null },
+              { name: 'in-1', id: 'in-1', health: null, launchTime: 1, zone: null },
+              { name: 'in-2', id: 'in-2', health: null, launchTime: 1, zone: null },
             ];
             serverGroups[4].instances = [
-              { id: 'in-3', health: null, launchTime: 1, zone: null },
-              { id: 'in-2', health: null, launchTime: 1, zone: null },
+              { name: 'in-3', id: 'in-3', health: null, launchTime: 1, zone: null },
+              { name: 'in-2', id: 'in-2', health: null, launchTime: 1, zone: null },
             ];
             application.runningTasks.data = [
               buildTask({
@@ -547,6 +547,87 @@ describe('Service: Cluster', function() {
                   'targetop.asg.disableAsg.name': 'foo-v001',
                   'targetop.asg.disableAsg.regions': ['us-west-1'],
                   credentials: 'prod',
+                },
+              },
+            ],
+          },
+        ];
+
+        application.runningExecutions.data = executions;
+        clusterService.addExecutionsToServerGroups(application);
+
+        expect(application.serverGroups.data[0].runningExecutions.length).toBe(0);
+      });
+    });
+
+    describe('adding executions to server group for deployManifest stage', () => {
+      beforeEach(() => {
+        application.serverGroups.data = [
+          {
+            name: 'deployment my-k8s-object',
+            account: 'prod',
+            region: 'default',
+          },
+        ];
+      });
+
+      it('should add a matched execution to a server group', () => {
+        const executions = [
+          {
+            stages: [
+              {
+                type: 'deployManifest',
+                context: {
+                  'outputs.manifestNamesByNamespace': {
+                    default: ['deployment my-k8s-object'],
+                  },
+                  account: 'prod',
+                },
+              },
+            ],
+          },
+        ];
+
+        application.runningExecutions.data = executions;
+        clusterService.addExecutionsToServerGroups(application);
+
+        expect(application.serverGroups.data[0].runningExecutions.length).toBe(1);
+      });
+
+      it('should NOT add a matched execution if the account does not match', () => {
+        const executions = [
+          {
+            stages: [
+              {
+                type: 'deployManifest',
+                context: {
+                  'outputs.manifestNamesByNamespace': {
+                    default: ['deployment my-k8s-object'],
+                  },
+                  account: 'test',
+                },
+              },
+            ],
+          },
+        ];
+
+        application.runningExecutions.data = executions;
+        clusterService.addExecutionsToServerGroups(application);
+
+        expect(application.serverGroups.data[0].runningExecutions.length).toBe(0);
+      });
+
+      it('should NOT add a matched execution if the server group name does not match', () => {
+        const executions = [
+          {
+            stages: [
+              {
+                type: 'deployManifest',
+                context: {
+                  'outputs.manifestNamesByNamespace': {
+                    default: ['deployment my-other-k8s-object'],
+                  },
+                  account: 'test',
                 },
               },
             ],
