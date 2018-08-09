@@ -68,6 +68,7 @@ export interface IEcsServerGroupCommand extends IServerGroupCommand {
   placementStrategyName: string;
   placementStrategySequence: IPlacementStrategy[];
 
+  subnetTypeChanged: (command: IEcsServerGroupCommand) => IServerGroupCommandResult;
   placementStrategyNameChanged: (command: IEcsServerGroupCommand) => IServerGroupCommandResult;
   // subnetTypeChanged: (command: IEcsServerGroupCommand) => IServerGroupCommandResult;
   regionIsDeprecated: (command: IEcsServerGroupCommand) => boolean;
@@ -225,7 +226,7 @@ export class EcsServerGroupConfigurationService {
         region: command.region,
         purpose: command.subnetType,
       })
-      .reject({ purpose: null })
+      .compact()
       .uniqBy('purpose')
       .map('vpcId')
       .value()[0];
@@ -243,7 +244,7 @@ export class EcsServerGroupConfigurationService {
         account: command.credentials,
         region: command.region,
       })
-      .reject({ purpose: null })
+      .compact()
       .uniqBy('purpose')
       .map('purpose')
       .value();
