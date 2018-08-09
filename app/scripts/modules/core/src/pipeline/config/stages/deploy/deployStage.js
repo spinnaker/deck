@@ -126,7 +126,7 @@ module.exports = angular
           const handleResult = function(command) {
             // If we don't set the provider, the serverGroupTransformer won't know which provider to delegate to.
             command.provider = selectedProvider;
-            var stageCluster = serverGroupTransformer.convertServerGroupCommandToDeployConfiguration(command);
+            const stageCluster = serverGroupTransformer.convertServerGroupCommandToDeployConfiguration(command);
             delete stageCluster.credentials;
             $scope.stage.clusters.push(stageCluster);
           };
@@ -162,34 +162,38 @@ module.exports = angular
     this.editCluster = function(cluster, index) {
       cluster.provider = cluster.cloudProvider || cluster.providerType || 'aws';
       let providerConfig = CloudProviderRegistry.getProvider(cluster.provider);
-      return $uibModal
-        .open({
-          templateUrl: providerConfig.serverGroup.cloneServerGroupTemplateUrl,
-          controller: `${providerConfig.serverGroup.cloneServerGroupController} as ctrl`,
-          size: 'lg',
-          resolve: {
-            title: function() {
-              return 'Configure Deployment Cluster';
-            },
-            application: function() {
-              return $scope.application;
-            },
-            serverGroupCommand: function() {
-              return serverGroupCommandBuilder.buildServerGroupCommandFromPipeline(
-                $scope.application,
-                cluster,
-                $scope.stage,
-                $scope.$parent.pipeline,
-              );
-            },
-          },
-        })
-        .result.then(function(command) {
-          var stageCluster = serverGroupTransformer.convertServerGroupCommandToDeployConfiguration(command);
-          delete stageCluster.credentials;
-          $scope.stage.clusters[index] = stageCluster;
-        })
-        .catch(() => {});
+
+      const handleResult = function(command) {
+        const stageCluster = serverGroupTransformer.convertServerGroupCommandToDeployConfiguration(command);
+        delete stageCluster.credentials;
+        $scope.stage.clusters[index] = stageCluster;
+      };
+
+      const title = 'Configure Deployment Cluster';
+      const application = $scope.application;
+      serverGroupCommandBuilder
+        .buildServerGroupCommandFromPipeline(application, cluster, $scope.stage, $scope.$parent.pipeline)
+        .then(command => {
+          if (providerConfig.serverGroup.CloneServerGroupModal) {
+            // react
+            return providerConfig.serverGroup.CloneServerGroupModal.show({ title, application, command });
+          } else {
+            // angular
+            return $uibModal
+              .open({
+                templateUrl: providerConfig.serverGroup.cloneServerGroupTemplateUrl,
+                controller: `${providerConfig.serverGroup.cloneServerGroupController} as ctrl`,
+                size: 'lg',
+                resolve: {
+                  title: () => title,
+                  application: () => application,
+                  serverGroupCommand: () => command,
+                },
+              })
+              .result.then(handleResult)
+              .catch(() => {});
+          }
+        });
     };
 
     this.copyCluster = function(index) {
