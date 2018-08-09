@@ -1,15 +1,21 @@
 import { IPromise } from 'angular';
-
 import { $log } from 'ngimport';
 
-import { API } from 'core/api/ApiService';
-import { IServerGroup } from 'core/domain';
+import { API, IServerGroup } from '@spinnaker/core';
+
+export interface IEventDescription {
+  createdAt: number;
+  message: string;
+  id: string;
+  status: string;
+}
 
 export class ServerGroupEventsReader {
-  public static getEvents(serverGroup: IServerGroup): IPromise<any[]> {
+  public static getEvents(serverGroup: IServerGroup): IPromise<IEventDescription[]> {
     return API.one('applications')
       .one(serverGroup.app)
       .all(serverGroup.account)
+      .one('serverGroups')
       .one(serverGroup.name)
       .all('events')
       .withParams({

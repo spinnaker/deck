@@ -1,19 +1,12 @@
 import { IController, module } from 'angular';
 import { IModalServiceInstance } from 'angular-ui-bootstrap';
 
-import { ServerGroupEventsReader } from './serverGroupEventsReader.service';
-import { IServerGroup } from '../../../../core/src/domain/index';
+import { IEventDescription, ServerGroupEventsReader } from './serverGroupEventsReader.service';
+import { IServerGroup } from '@spinnaker/core';
 
 export interface IScalingActivitiesViewState {
   loading: boolean;
   error: boolean;
-}
-
-export interface IEventDescription {
-  createdAt: number;
-  message: string;
-  id: string;
-  status: string;
 }
 
 export class EventsController implements IController {
@@ -22,7 +15,6 @@ export class EventsController implements IController {
 
   public constructor(private $uibModalInstance: IModalServiceInstance, public serverGroup: IServerGroup) {
     'ngInject';
-    this.serverGroup = serverGroup;
   }
 
   public $onInit(): void {
