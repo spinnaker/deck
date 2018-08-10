@@ -138,24 +138,23 @@ module.exports = angular
             .then(command => {
               if (config.CloneServerGroupModal) {
                 // react
-                config.CloneServerGroupModal.show({ title, application, command });
+                return config.CloneServerGroupModal.show({ title, application, command });
               } else {
                 // angular
-                $uibModal
-                  .open({
-                    templateUrl: config.cloneServerGroupTemplateUrl,
-                    controller: `${config.cloneServerGroupController} as ctrl`,
-                    size: 'lg',
-                    resolve: {
-                      title: () => title,
-                      application: () => application,
-                      serverGroupCommand: () => command,
-                    },
-                  })
-                  .result.then(handleResult)
-                  .catch(() => {});
+                return $uibModal.open({
+                  templateUrl: config.cloneServerGroupTemplateUrl,
+                  controller: `${config.cloneServerGroupController} as ctrl`,
+                  size: 'lg',
+                  resolve: {
+                    title: () => title,
+                    application: () => application,
+                    serverGroupCommand: () => command,
+                  },
+                }).result;
               }
-            });
+            })
+            .then(handleResult)
+            .catch(() => {});
         });
     };
 
@@ -179,21 +178,20 @@ module.exports = angular
             return providerConfig.serverGroup.CloneServerGroupModal.show({ title, application, command });
           } else {
             // angular
-            return $uibModal
-              .open({
-                templateUrl: providerConfig.serverGroup.cloneServerGroupTemplateUrl,
-                controller: `${providerConfig.serverGroup.cloneServerGroupController} as ctrl`,
-                size: 'lg',
-                resolve: {
-                  title: () => title,
-                  application: () => application,
-                  serverGroupCommand: () => command,
-                },
-              })
-              .result.then(handleResult)
-              .catch(() => {});
+            return $uibModal.open({
+              templateUrl: providerConfig.serverGroup.cloneServerGroupTemplateUrl,
+              controller: `${providerConfig.serverGroup.cloneServerGroupController} as ctrl`,
+              size: 'lg',
+              resolve: {
+                title: () => title,
+                application: () => application,
+                serverGroupCommand: () => command,
+              },
+            }).result;
           }
-        });
+        })
+        .then(handleResult)
+        .catch(() => {});
     };
 
     this.copyCluster = function(index) {
