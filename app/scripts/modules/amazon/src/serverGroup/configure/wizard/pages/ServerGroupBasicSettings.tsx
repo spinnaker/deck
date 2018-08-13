@@ -161,6 +161,7 @@ class ServerGroupBasicSettingsImpl extends React.Component<
 
   private accountUpdated = (account: string): void => {
     const { setFieldValue, values } = this.props;
+    values.credentials = account;
     values.credentialsChanged(values);
     values.subnetChanged(values);
     setFieldValue('credentials', account);
@@ -168,6 +169,7 @@ class ServerGroupBasicSettingsImpl extends React.Component<
 
   private regionUpdated = (region: string): void => {
     const { values, setFieldValue } = this.props;
+    values.region = region;
     values.regionChanged(values);
     setFieldValue('region', region);
   };
