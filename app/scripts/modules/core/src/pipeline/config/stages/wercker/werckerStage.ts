@@ -6,7 +6,6 @@ import { Registry } from 'core/registry';
 import { IgorService, BuildServiceType } from 'core/ci/igor.service';
 import { IJobConfig, IParameterDefinitionList, IStage } from 'core/domain';
 import { SETTINGS } from 'core/config/settings';
-
 import { WerckerExecutionLabel } from './WerckerExecutionLabel';
 
 export interface IWerckerStageViewState {
