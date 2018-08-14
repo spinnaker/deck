@@ -2,11 +2,11 @@ import * as React from 'react';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 export interface InstanceLoadBalancer {
-  healthState?: string;
-  state?: string;
-  name?: string;
-  description?: string;
-  loadBalancerName?: string;
+  healthState?: string; // (usually present but) optional because there's a fallback
+  state?: string; // (usually present but) optional because it is the fallback
+  name?: string; // optional because there's a fallback (depends on source of data)
+  loadBalancerName?: string; // optional because it is the fallback (depends on source of data)
+  description?: string; // optional because there usually isn't a useful description when things are healthy
 }
 
 export interface IInstanceLoadBalancerHealthProps {
