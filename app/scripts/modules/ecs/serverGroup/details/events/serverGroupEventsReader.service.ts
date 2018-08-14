@@ -14,8 +14,8 @@ export class ServerGroupEventsReader {
   public static getEvents(serverGroup: IServerGroup): IPromise<IEventDescription[]> {
     return API.one('applications')
       .one(serverGroup.app)
-      .all(serverGroup.account)
       .one('serverGroups')
+      .all(serverGroup.account)
       .one(serverGroup.name)
       .all('events')
       .withParams({
