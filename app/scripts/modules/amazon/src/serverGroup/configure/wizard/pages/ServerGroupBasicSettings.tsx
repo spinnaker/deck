@@ -54,10 +54,22 @@ class ServerGroupBasicSettingsImpl extends React.Component<
     super(props);
     const { disableImageSelection } = props.values.viewState;
     this.state = {
-      images: disableImageSelection ? [] : props.values.backingData.filtered.images,
+      images: disableImageSelection
+        ? []
+        : props.values.backingData.filtered.images.map(i => {
+            i.label = this.getImageLabel(i);
+            return i;
+          }),
       isLoadingImages: false,
       ...this.getStateFromProps(props),
     };
+  }
+
+  private getImageLabel(image: any) {
+    if (image.label) {
+      return image.label;
+    }
+    return `${image.message || ''}${image.imageName || ''} ${image.ami ? `(${image.ami})` : ''}`;
   }
 
   private getStateFromProps(
@@ -112,11 +124,14 @@ class ServerGroupBasicSettingsImpl extends React.Component<
             return image;
           }
 
-          return {
+          const i = {
             imageName: image.imageName,
             ami: image.amis && image.amis[values.region] ? image.amis[values.region][0] : null,
             virtualizationType: image.attributes ? image.attributes.virtualizationType : null,
+            label: '',
           };
+          i.label = this.getImageLabel(i);
+          return i;
         });
 
         values.backingData.filtered.images = images;
@@ -144,7 +159,6 @@ class ServerGroupBasicSettingsImpl extends React.Component<
         record.amis[region] = [q];
         result = [record];
       }
-
       return result;
     });
   };
@@ -169,6 +183,7 @@ class ServerGroupBasicSettingsImpl extends React.Component<
 
   private accountUpdated = (account: string): void => {
     const { setFieldValue, values } = this.props;
+    values.credentials = account;
     values.credentialsChanged(values);
     values.subnetChanged(values);
     setFieldValue('credentials', account);
@@ -176,6 +191,7 @@ class ServerGroupBasicSettingsImpl extends React.Component<
 
   private regionUpdated = (region: string): void => {
     const { values, setFieldValue } = this.props;
+    values.region = region;
     values.regionChanged(values);
     setFieldValue('region', region);
   };
