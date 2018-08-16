@@ -112,8 +112,7 @@
         <dt ng-if="instance.subnetId">Subnet</dt>
         <dd ng-if="instance.subnetId"><subnet-tag subnet-id="instance.subnetId"></subnet-tag></dd>
 
-        <!-- TODO  - support ENIs here -->
-        <dt ng-if="instance.privateAddress || instance.networkInterface">IP</dt> <!-- TODO  - Add an OR statement on the condition -->
+        <dt ng-if="instance.privateAddress || instance.networkInterface">IP</dt>
         <dd ng-if="instance.networkInterface.privateIpv4Address">
           Private address (ENI): <a href="http://{{instance.networkInterface.privateIpv4Address}}" target="_blank">{{instance.networkInterface.privateIpv4Address}}</a>
           <copy-to-clipboard
