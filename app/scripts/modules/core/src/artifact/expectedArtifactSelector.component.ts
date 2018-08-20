@@ -6,6 +6,8 @@ import { ArtifactIconService } from './ArtifactIconService';
 
 import './artifactSelector.less';
 
+type IExpectedArtifactFilter = (ea: IExpectedArtifact, a: IArtifact) => boolean;
+
 class ExpectedArtifactSelectorCtrl implements IController {
   public command: any;
   public id: string;
@@ -15,14 +17,20 @@ class ExpectedArtifactSelectorCtrl implements IController {
   public helpFieldKey: string;
   public showIcons: boolean;
   public fieldColumns: number;
+  public offeredArtifactTypes: RegExp[];
+  public excludedArtifactTypes: RegExp[];
 
-  private selectedArtifact(): IArtifact | null {
-    const expected = this.expectedArtifacts.find(ea => ea.id === this.id);
+  private artifactFromExpected(expected: IExpectedArtifact): IArtifact | null {
     if (expected) {
       return expected.matchArtifact || expected.defaultArtifact;
     } else {
       return null;
     }
+  }
+
+  private selectedArtifact(): IArtifact | null {
+    const expected = (this.expectedArtifacts || []).find(ea => ea.id === this.id);
+    return this.artifactFromExpected(expected);
   }
 
   private selectedArtifactAccounts(): IArtifactAccount[] {
@@ -34,12 +42,22 @@ class ExpectedArtifactSelectorCtrl implements IController {
     return filteredAccounts;
   }
 
+  private filterExpectedArtifacts(fn: IExpectedArtifactFilter): IExpectedArtifact[] {
+    return (this.expectedArtifacts || []).filter(ea => {
+      const artifact = this.artifactFromExpected(ea);
+      if (!artifact) {
+        return false;
+      }
+      return fn(ea, artifact);
+    });
+  }
+
   public $onInit() {
     this.fieldColumns = this.fieldColumns || 8;
   }
 
   public iconPath(expected: IExpectedArtifact): string {
-    const artifact = expected && (expected.matchArtifact || expected.defaultArtifact);
+    const artifact = this.artifactFromExpected(expected);
     if (artifact == null) {
       return '';
     }
@@ -56,6 +74,20 @@ class ExpectedArtifactSelectorCtrl implements IController {
   public showArtifactAccountSelect(): boolean {
     return this.selectedArtifactAccounts().length > 1;
   }
+
+  public getExpectedArtifacts(): IExpectedArtifact[] {
+    return this.filterExpectedArtifacts((_expectedArtifact, artifact) => {
+      let isIncluded = true;
+      let isExcluded = false;
+      if (this.offeredArtifactTypes && this.offeredArtifactTypes.length > 0) {
+        isIncluded = !!this.offeredArtifactTypes.find(patt => patt.test(artifact.type));
+      }
+      if (this.excludedArtifactTypes && this.excludedArtifactTypes.length > 0) {
+        isExcluded = !!this.excludedArtifactTypes.find(patt => patt.test(artifact.type));
+      }
+      return isIncluded && !isExcluded;
+    });
+  }
 }
 
 class ExpectedArtifactSelectorComponent implements IComponentOptions {
@@ -68,6 +100,8 @@ class ExpectedArtifactSelectorComponent implements IComponentOptions {
     helpFieldKey: '@',
     showIcons: '<',
     fieldColumns: '@',
+    offeredArtifactTypes: '<',
+    excludedArtifactTypes: '<',
   };
   public controller: any = ExpectedArtifactSelectorCtrl;
   public controllerAs = 'ctrl';
@@ -88,7 +122,7 @@ class ExpectedArtifactSelectorComponent implements IComponentOptions {
                 ng-src="{{ ctrl.iconPath($select.selected) }}" />
               {{ $select.selected | summarizeExpectedArtifact }}
             </ui-select-match>
-            <ui-select-choices repeat="expected.id as expected in ctrl.expectedArtifacts">
+            <ui-select-choices repeat="expected.id as expected in ctrl.getExpectedArtifacts()">
               <img
                 ng-if="ctrl.showIcons && ctrl.iconPath(expected)"
                 width="16"

@@ -66,8 +66,13 @@ export class ConfigurePipelineTemplateModalController implements IController {
   }
 
   public initialize(): void {
-    this.pipelineName = this.pipelineTemplateConfig.config.pipeline.name;
-    this.source = this.pipelineTemplateConfig.config.pipeline.template.source;
+    const { config } = this.pipelineTemplateConfig;
+    const inherit: string[] = (config.configuration || { inherit: [] }).inherit;
+    this.state.inheritTemplateExpectedArtifacts = inherit.includes('expectedArtifacts');
+    this.state.inheritTemplateParameters = inherit.includes('parameters');
+    this.state.inheritTemplateTriggers = inherit.includes('triggers');
+    this.pipelineName = config.pipeline.name;
+    this.source = config.pipeline.template.source;
     this.loadTemplate()
       .then(() => {
         this.groupVariableMetadata();
@@ -94,7 +99,14 @@ export class ConfigurePipelineTemplateModalController implements IController {
     const config = this.buildConfig();
     return PipelineTemplateReader.getPipelinePlan(config)
       .then(plan => {
-        this.$uibModalInstance.close({ plan, config });
+        const { parameterConfig, expectedArtifacts, triggers } = plan;
+        const inherited = {
+          ...config,
+          ...(this.state.inheritTemplateParameters && parameterConfig ? { parameterConfig } : {}),
+          ...(this.state.inheritTemplateExpectedArtifacts && expectedArtifacts ? { expectedArtifacts } : {}),
+          ...(this.state.inheritTemplateTriggers && triggers ? { triggers } : {}),
+        };
+        this.$uibModalInstance.close({ plan, config: inherited });
       })
       .catch((response: IHttpPromiseCallbackArg<IPipelineTemplatePlanResponse>) => {
         Object.assign(this.state, { loading: false, error: true, planErrors: response.data && response.data.errors });
