@@ -231,11 +231,17 @@ export class EcsServerGroupConfigurationService {
       .map('vpcId')
       .value()[0];
 
-    const allSecurityGroups = command.backingData.securityGroups[command.credentials]['ecs'][command.region];
-    command.backingData.filtered.securityGroupNames = chain(allSecurityGroups)
-      .filter({ vpcId: vpcId })
-      .map('name')
-      .value();
+    if (
+      command.backingData.securityGroups[command.credentials] &&
+      command.backingData.securityGroups[command.credentials]['ecs'] &&
+      command.backingData.securityGroups[command.credentials]['ecs'][command.region]
+    ) {
+      const allSecurityGroups = command.backingData.securityGroups[command.credentials]['ecs'][command.region];
+      command.backingData.filtered.securityGroupNames = chain(allSecurityGroups)
+        .filter({ vpcId: vpcId })
+        .map('name')
+        .value();
+    }
   }
 
   public configureAvailableSubnetTypes(command: IEcsServerGroupCommand): void {
