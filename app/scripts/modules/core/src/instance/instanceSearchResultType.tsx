@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Observable } from 'rxjs';
 
 import {
   AccountCell,
@@ -13,6 +14,8 @@ import {
   TableRow,
   ISearchColumn,
   SearchResultType,
+  ISearchParams,
+  ISearchResults,
   ISearchResultSet,
 } from 'core/search';
 
@@ -75,6 +78,18 @@ class InstancesSearchResultType extends SearchResultType<IInstanceSearchResult> 
       </TableBody>
     );
   };
+
+  public search(
+    params: ISearchParams,
+    _otherResults: Observable<ISearchResultSet>,
+  ): Observable<ISearchResults<IInstanceSearchResult>> {
+    const { cloudProvider, key, ...otherParams } = params;
+    // Because the instance search is an exact match, we can detect when an aws search is missing 'i-' and prepend it
+    if (cloudProvider === 'aws' && key.match(new RegExp('^[A-Fa-f0-9]{17}$'))) {
+      return super.search({ ...otherParams, key: `i-${key}` }, _otherResults);
+    }
+    return super.search(params, _otherResults);
+  }
 
   public displayFormatter(searchResult: IInstanceSearchResult) {
     const serverGroup = searchResult.serverGroup || 'standalone instance';
