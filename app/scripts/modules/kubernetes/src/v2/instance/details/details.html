@@ -32,10 +32,10 @@
         </button>
         <ul class="dropdown-menu" uib-dropdown-menu role="menu">
           <li>
-            <a href ng-click="ctrl.deleteInstance()">Delete Instance</a>
+            <a href ng-click="ctrl.deleteInstance()">Delete</a>
           </li>
           <li>
-            <a href ng-click="ctrl.editInstance()">Edit Instance</a>
+            <a href ng-click="ctrl.editInstance()">Edit</a>
           </li>
         </ul>
       </div>
@@ -53,6 +53,10 @@
         <dd>{{ctrl.instance.namespace}}</dd>
         <dt>Kind</dt>
         <dd>{{ctrl.instance.kind}}</dd>
+        <dt>QOS Class</dt>
+        <dd><kubernetes-manifest-qos manifest="ctrl.instance.manifest"></kubernetes-manifest-qos></dd>
+        <dt>Logs</dt>
+        <dd><console-output-link instance="ctrl.consoleOutputInstance"></console-output-link></dd>
       </dl>
     </collapsible-section>
     <collapsible-section heading="Status" expanded="true">
@@ -67,16 +71,13 @@
       <kubernetes-manifest-events manifest="ctrl.manifest"></kubernetes-manifest-events>
     </collapsible-section>
 
+    <collapsible-section heading="Resources" expanded="true">
+      <kubernetes-manifest-resources manifest="ctrl.instance.manifest" metrics="ctrl.manifest.metrics"></kubernetes-manifest-resources>
+    </collapsible-section>
+
     <collapsible-section heading="Labels" expanded="true">
       <kubernetes-manifest-labels manifest="ctrl.instance.manifest"></kubernetes-manifest-labels>
     </collapsible-section>
-
-    <collapsible-section heading="Logs" expanded="true">
-      <div>
-        <console-output-link instance="ctrl.consoleOutputInstance"></console-output-link>
-      </div>
-    </collapsible-section>
   </div>
-
 </div>
 
