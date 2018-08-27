@@ -158,6 +158,7 @@ module.exports = angular
       // Inject the default value into the options list if it is absent
       if (
         parameterConfig.default &&
+        parameterConfig.options &&
         !parameterConfig.options.some(option => option.value === parameterConfig.default)
       ) {
         parameterConfig.options.unshift({ value: parameterConfig.default });
