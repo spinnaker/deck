@@ -57,6 +57,7 @@ export interface IEcsServerGroupCommandBackingData extends IServerGroupCommandBa
   ecsClusters: IEcsClusterDescriptor[];
   iamRoles: IRoleDescriptor[];
   metricAlarms: IMetricAlarmDescriptor[];
+  launchTypes: string[];
   // subnetTypes: string;
   // securityGroups: string[]
 }
