@@ -86,7 +86,7 @@ class InstancesSearchResultType extends SearchResultType<IInstanceSearchResult> 
     const { cloudProvider, key, ...otherParams } = params;
     // Because the instance search is an exact match, we can detect when an aws search is missing 'i-' and prepend it
     if (cloudProvider === 'aws' && key.match(new RegExp('^[A-Fa-f0-9]{17}$'))) {
-      return super.search({ ...otherParams, key: `i-${key}` }, _otherResults);
+      return super.search({ ...otherParams, cloudProvider, key: `i-${key}` }, _otherResults);
     }
     return super.search(params, _otherResults);
   }
