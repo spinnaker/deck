@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free-webfonts": "^1.0.9",
-    "@spinnaker/kayenta": "0.0.54",
+    "@spinnaker/kayenta": "0.0.56",
     "@spinnaker/styleguide": "^1.0.0",
     "@types/react-tether": "^0.5.3",
     "@uirouter/react-hybrid": "0.3.3",
@@ -67,6 +67,7 @@
     "ngimport": "^0.6.0",
     "prop-types": "15.6.1",
     "react": "16.3.2",
+    "react-ace": "^6.1.4",
     "react-bootstrap": "^0.32.1",
     "react-dom": "16.3.2",
     "react-ga": "^2.4.1",
