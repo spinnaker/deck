@@ -12,12 +12,12 @@ export interface ICapacitySelectorProps {
 }
 
 export class CapacitySelector extends React.Component<ICapacitySelectorProps> {
-  public preferSourceCapacityOptions = [
-    { label: 'fail the stage', value: undefined },
+  private preferSourceCapacityOptions = [
+    { label: 'fail the stage', value: false },
     { label: 'use fallback values', value: true },
   ];
 
-  public useSourceCapacityUpdated(event: React.ChangeEvent<HTMLInputElement>): void {
+  private useSourceCapacityUpdated = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const value = event.target.value === 'true';
     const { command } = this.props;
     this.props.setFieldValue('useSourceCapacity', value);
@@ -27,9 +27,9 @@ export class CapacitySelector extends React.Component<ICapacitySelectorProps> {
       this.props.setFieldValue('preferSourceCapacity', undefined);
     }
     this.setState({});
-  }
+  };
 
-  public setSimpleCapacity(simpleCapacity: boolean) {
+  private setSimpleCapacity(simpleCapacity: boolean) {
     const { command } = this.props;
     command.viewState.useSimpleCapacity = simpleCapacity;
     this.props.setFieldValue('useSourceCapacity', false);
@@ -37,33 +37,34 @@ export class CapacitySelector extends React.Component<ICapacitySelectorProps> {
     this.setState({});
   }
 
-  public simpleInstancesChanged(event: React.ChangeEvent<HTMLInputElement>) {
+  private simpleInstancesChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = Number.parseInt(event.target.value, 10);
     this.setMinMax(value);
-  }
+  };
 
-  public setMinMax(value: number) {
+  private setMinMax(value: number) {
     const { command } = this.props;
     if (command.viewState.useSimpleCapacity) {
       command.capacity.min = value;
       command.capacity.max = value;
+      command.capacity.desired = value;
       this.props.setFieldValue('useSourceCapacity', false);
       this.props.setFieldValue('capacity', command.capacity);
     }
     this.setState({});
   }
 
-  public preferSourceCapacityChanged(option: Option<boolean>) {
-    this.props.setFieldValue('preferSourceCapacity', option.value);
+  private preferSourceCapacityChanged = (option: Option<boolean>) => {
+    this.props.setFieldValue('preferSourceCapacity', option.value ? true : undefined);
     this.setState({});
-  }
+  };
 
-  private capacityFieldChanged(fieldName: 'min' | 'max' | 'desired', value: string) {
+  private capacityFieldChanged = (fieldName: 'min' | 'max' | 'desired', value: string) => {
     const { command, setFieldValue } = this.props;
     const num = Number.parseInt(value, 10);
     command.capacity[fieldName] = num;
     setFieldValue('capacity', command.capacity);
-  }
+  };
 
   public render() {
     const { command, MinMaxDesired } = this.props;
@@ -95,6 +96,7 @@ export class CapacitySelector extends React.Component<ICapacitySelectorProps> {
                     <input
                       type="radio"
                       checked={command.useSourceCapacity}
+                      value="true"
                       id="useSourceCapacityTrue"
                       onChange={this.useSourceCapacityUpdated}
                     />
@@ -107,7 +109,7 @@ export class CapacitySelector extends React.Component<ICapacitySelectorProps> {
                     <div>
                       If no current server group is found,
                       <Select
-                        value={command.preferSourceCapacity}
+                        value={!!command.preferSourceCapacity}
                         options={this.preferSourceCapacityOptions}
                         onChange={this.preferSourceCapacityChanged}
                       />
@@ -125,7 +127,8 @@ export class CapacitySelector extends React.Component<ICapacitySelectorProps> {
                   <label>
                     <input
                       type="radio"
-                      checked={command.useSourceCapacity}
+                      checked={!command.useSourceCapacity}
+                      value="false"
                       id="useSourceCapacityFalse"
                       onChange={this.useSourceCapacityUpdated}
                     />
