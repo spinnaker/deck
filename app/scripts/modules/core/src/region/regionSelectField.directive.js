@@ -8,7 +8,7 @@ import { RegionSelectField } from './RegionSelectField';
 module.exports = angular
   .module('spinnaker.core.region.regionSelectField.directive', [])
   .component(
-    'reactRegionSelectField',
+    'regionSelectFieldWrapper',
     react2angular(RegionSelectField, [
       'regions',
       'component',
@@ -21,23 +21,23 @@ module.exports = angular
       'readOnly',
     ]),
   )
-  .component('regionSelectFieldProxy', {
+  .component('regionSelectField', {
     controllerAs: 'vm',
     template: `
-      <react-region-select-field regions="vm.regions"
-                                 component="vm.component"
-                                 field="vm.field"
-                                 account="vm.account"
-                                 provider="vm.provider"
-                                 on-change="vm.propagate"
-                                 label-columns="vm.labelColumns"
-                                 field-columns="vm.fieldColumns"
-                                 read-only="vm.readOnly"></react-region-select-field>
+      <region-select-field-wrapper regions="vm.regions"
+                                   component="vm.component"
+                                   field="vm.field"
+                                   account="vm.account"
+                                   provider="vm.provider"
+                                   on-change="vm.propagate"
+                                   label-columns="vm.labelColumns"
+                                   field-columns="vm.fieldColumns"
+                                   read-only="vm.readOnly"></react-region-select-field>
     `,
     bindings: {
       regions: '=',
       component: '=',
-      field: '<',
+      field: '@',
       account: '=',
       provider: '=',
       onChange: '&',
@@ -52,31 +52,4 @@ module.exports = angular
         vm.onChange();
       };
     },
-  })
-  .directive('regionSelectField', function() {
-    return {
-      restrict: 'E',
-      template: `
-        <region-select-field-proxy regions="regions"
-                                   component="component"
-                                   field="field"
-                                   account="account"
-                                   provider="provider"
-                                   on-change="onChange()"
-                                   label-columns="labelColumns"
-                                   field-columns="fieldColumns"
-                                   read-only="readOnly"></region-select-field-proxy>
-      `,
-      scope: {
-        regions: '=',
-        component: '=',
-        field: '@',
-        account: '=',
-        provider: '=',
-        onChange: '&',
-        labelColumns: '@',
-        fieldColumns: '@',
-        readOnly: '=',
-      },
-    };
   });
