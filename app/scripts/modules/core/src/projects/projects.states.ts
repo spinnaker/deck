@@ -2,6 +2,7 @@ import { module } from 'angular';
 import { StateParams } from '@uirouter/angularjs';
 import { APPLICATION_STATE_PROVIDER, ApplicationStateProvider } from 'core/application/application.state.provider';
 import { INestedState, STATE_CONFIG_PROVIDER, StateConfigProvider } from 'core/navigation/state.provider';
+import { ProjectHeader } from 'core/projects/ProjectHeader';
 import { IProject } from '../domain/IProject';
 import { ProjectReader } from './service/ProjectReader';
 
@@ -58,9 +59,8 @@ module(PROJECTS_STATES_CONFIG, [
     },
     views: {
       'main@': {
-        templateUrl: require('../projects/project.html'),
-        controller: 'ProjectCtrl',
-        controllerAs: 'vm',
+        component: ProjectHeader,
+        $type: 'react',
       },
     },
     data: {
