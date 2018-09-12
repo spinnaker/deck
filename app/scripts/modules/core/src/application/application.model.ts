@@ -2,8 +2,8 @@ import { IPromise, IScope } from 'angular';
 import { map, union, uniq } from 'lodash';
 import { $log, $q } from 'ngimport';
 import { Observable, ReplaySubject, Subject, Subscription } from 'rxjs';
-import { ICluster } from 'core/domain';
 
+import { ICluster } from 'core/domain';
 import { ApplicationDataSource, IDataSourceConfig, IFetchStatus } from './service/applicationDataSource';
 
 export class Application {
@@ -105,14 +105,16 @@ export class Application {
     const FETCHING_STATUS = statuses.some(({ status }) => status === 'FETCHING') ? 'FETCHING' : undefined;
     const FETCHED_STATUS = statuses.some(({ status }) => status === 'FETCHED') ? 'FETCHED' : undefined;
 
-    const rolledUpStatus: IFetchStatus['status'] = ERROR_STATUS || FETCHING_STATUS || FETCHED_STATUS;
+    const rolledUpStatus: IFetchStatus['status'] =
+      ERROR_STATUS || FETCHING_STATUS || FETCHED_STATUS || 'NOT_INITIALIZED';
 
     const allFetched = statuses.every(({ status }) => status === 'FETCHED');
-    const lastFetch = statuses.reduce((latest, status) => Math.max(latest, status.lastFetchTimestamp || 0), 0);
+    const lastFetch = statuses.reduce((latest, status) => Math.max(latest, status.lastRefresh || 0), 0);
 
     return {
       status: rolledUpStatus,
-      lastFetchTimestamp: allFetched ? lastFetch : this.lastRefresh,
+      lastRefresh: allFetched ? lastFetch : this.lastRefresh,
+      data: undefined,
     };
   }
 

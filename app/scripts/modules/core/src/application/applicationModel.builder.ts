@@ -1,5 +1,4 @@
 import { module } from 'angular';
-
 import { ROBOT_TO_HUMAN_FILTER } from 'core/presentation/robotToHumanFilter/robotToHuman.filter';
 import { OVERRIDE_REGISTRY } from 'core/overrideRegistry';
 import { SchedulerFactory } from 'core/scheduler/SchedulerFactory';

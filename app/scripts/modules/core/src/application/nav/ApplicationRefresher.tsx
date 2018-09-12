@@ -54,7 +54,7 @@ export class ApplicationRefresher extends React.Component<IApplicationRefresherP
     if (fetchStatus.status === 'FETCHING') {
       this.setState({ refreshing: true });
     } else if (fetchStatus.status === 'FETCHED') {
-      this.setState({ refreshing: false, lastRefresh: fetchStatus.lastFetchTimestamp });
+      this.setState({ refreshing: false, lastRefresh: fetchStatus.lastRefresh });
     } else {
       this.setState({ refreshing: false });
     }
