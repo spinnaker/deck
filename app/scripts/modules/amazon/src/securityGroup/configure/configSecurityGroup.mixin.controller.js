@@ -169,7 +169,7 @@ module.exports = angular
         }
       }
 
-      const match = (available || []).find(vpc => vpc.label === $scope.securityGroup.vpcName);
+      const match = (available || []).find(vpc => vpc.ids.includes($scope.securityGroup.vpcId));
       $scope.securityGroup.vpcId = match ? match.ids[0] : null;
       this.vpcUpdated();
     };
