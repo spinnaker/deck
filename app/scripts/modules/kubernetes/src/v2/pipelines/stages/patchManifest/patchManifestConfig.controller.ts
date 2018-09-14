@@ -1,5 +1,6 @@
 import { IController, IScope } from 'angular';
-import { ExpectedArtifactService, IExpectedArtifact } from '@spinnaker/core';
+import { get, defaults } from 'lodash';
+import { ExpectedArtifactSelectorViewController, NgManifestArtifactDelegate } from '@spinnaker/core';
 import { IPatchOptions, MergeStrategy } from './patchOptionsForm.component';
 import {
   IKubernetesManifestCommandMetadata,
@@ -16,15 +17,11 @@ export class KubernetesV2PatchManifestConfigCtrl implements IController {
   public artifactSource = 'artifact';
   public sources = [this.textSource, this.artifactSource];
 
-  public expectedArtifacts: IExpectedArtifact[];
+  private manifestArtifactDelegate: NgManifestArtifactDelegate;
+  private manifestArtifactController: ExpectedArtifactSelectorViewController;
 
   constructor(private $scope: IScope) {
     'ngInject';
-
-    this.expectedArtifacts = ExpectedArtifactService.getExpectedArtifactsAvailableToStage(
-      $scope.stage,
-      $scope.$parent.pipeline,
-    );
 
     const defaultOptions: IPatchOptions = {
       mergeStrategy: MergeStrategy.strategic,
@@ -35,13 +32,16 @@ export class KubernetesV2PatchManifestConfigCtrl implements IController {
       this.$scope.stage.options = defaultOptions;
     }
 
+    this.manifestArtifactDelegate = new NgManifestArtifactDelegate($scope);
+    this.manifestArtifactController = new ExpectedArtifactSelectorViewController(this.manifestArtifactDelegate);
+
     KubernetesManifestCommandBuilder.buildNewManifestCommand(
       this.$scope.application,
       this.$scope.stage.patchBody,
       this.$scope.stage.moniker,
     ).then(builtCommand => {
       if (this.$scope.stage.isNew) {
-        Object.assign(this.$scope.stage, {
+        defaults(this.$scope.stage, {
           account: builtCommand.command.account,
           manifestArtifactId: builtCommand.command.manifestArtifactId,
           manifestArtifactAccount: builtCommand.command.manifestArtifactAccount,
@@ -51,9 +51,10 @@ export class KubernetesV2PatchManifestConfigCtrl implements IController {
           cloudProvider: 'kubernetes',
         });
       }
-
       this.metadata = builtCommand.metadata;
       this.state.loaded = true;
+      this.manifestArtifactDelegate.setAccounts(get(this, ['metadata', 'backingData', 'artifactAccounts']));
+      this.manifestArtifactController.updateAccounts(this.manifestArtifactDelegate.getSelectedExpectedArtifact());
     });
   }
 
@@ -62,4 +63,12 @@ export class KubernetesV2PatchManifestConfigCtrl implements IController {
     // Called from a React component.
     this.$scope.$applyAsync();
   };
+
+  public canShowAccountSelect() {
+    return (
+      this.$scope.showCreateArtifactForm &&
+      this.manifestArtifactController.accountsForArtifact.length > 1 &&
+      this.manifestArtifactDelegate.getSelectedExpectedArtifact() != null
+    );
+  }
 }

@@ -41,7 +41,7 @@ describe('Component: Application Data Source Editor', () => {
   );
 
   beforeEach(() => {
-    application = applicationModelBuilder.createApplication(
+    application = applicationModelBuilder.createApplicationForTests(
       'app',
       {
         key: 'optionalSource',
@@ -61,9 +61,9 @@ describe('Component: Application Data Source Editor', () => {
         optional: true,
         visible: true,
         optIn: true,
-        disabled: true,
       },
     );
+    application.getDataSource('optInSource').disabled = true;
     application.attributes = { accounts: ['test'] };
   });
 

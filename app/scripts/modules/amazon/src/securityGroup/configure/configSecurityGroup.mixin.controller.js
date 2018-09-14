@@ -169,7 +169,9 @@ module.exports = angular
         }
       }
 
-      const match = (available || []).find(vpc => vpc.ids.includes($scope.securityGroup.vpcId));
+      // When cloning a security group, if a user chooses a different account to clone to, but wants to retain the same VPC in this new account, it was not possible.
+      // We matched the vpc ids from one account to another but they are never the same. In order to ensure that users still retain their VPC choice, irrespective of the account, we switched to using vpc names instead of vpc ids
+      const match = (available || []).find(vpc => vpc.label === $scope.securityGroup.vpcName);
       $scope.securityGroup.vpcId = match ? match.ids[0] : null;
       this.vpcUpdated();
     };
@@ -214,6 +216,7 @@ module.exports = angular
 
       $scope.availableSecurityGroups = availableSecurityGroups;
       $scope.existingSecurityGroupNames = existingSecurityGroupNames;
+      $scope.state.securityGroupsLoaded = true;
       clearInvalidSecurityGroups();
     }
 
@@ -227,7 +230,11 @@ module.exports = angular
       var removed = $scope.state.removedRules,
         securityGroup = $scope.securityGroup;
       $scope.securityGroup.securityGroupIngress = securityGroup.securityGroupIngress.filter(rule => {
-        if (rule.accountName !== securityGroup.accountName || (rule.vpcId && rule.vpcId !== securityGroup.vpcId)) {
+        if (
+          rule.accountName &&
+          rule.vpcId &&
+          (rule.accountName !== securityGroup.accountName || rule.vpcId !== securityGroup.vpcId)
+        ) {
           return true;
         }
         if (rule.name && !$scope.availableSecurityGroups.includes(rule.name) && !removed.includes(rule.name)) {
@@ -264,7 +271,6 @@ module.exports = angular
     ctrl.initializeSecurityGroups = function() {
       return securityGroupReader.getAllSecurityGroups().then(function(securityGroups) {
         setSecurityGroupRefreshTime();
-        $scope.state.securityGroupsLoaded = true;
         allSecurityGroups = securityGroups;
         var account = $scope.securityGroup.credentials || $scope.securityGroup.accountName;
         var region = $scope.securityGroup.regions[0];

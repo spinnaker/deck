@@ -28,6 +28,7 @@ const helpContents: { [key: string]: string } = {
     '<p>The strategy the container scheduler will be using.  See <a href="http://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-placement-strategies.html" target="_blank">AWS documentation</a> for more details. </p><p>You should at least balance across availability zones</p><p>Custom placement strategies have not been implemented yet.</p>',
   'ecs.capacity.autoscalingPolicies':
     '<p>A predefined MetricAlarm and Autoscaling policy with an Action must exist.</p><p>There is a delay in MetricAlarm recognizing the Autoscaling policy.</p>',
+  'ecs.launchtype': '<p>Launch service tasks on your own EC2 instances or on Fargate.</p>',
   'ecs.healthgraceperiod':
     '<p>How long a container will be kept alive despite the load balancer health checks, in seconds.</p>',
   'ecs.publicip': '<p>Assign a public IP address to each task.</p>',
@@ -35,6 +36,14 @@ const helpContents: { [key: string]: string } = {
     '<p>awsvpc is the only networking mode that allows you to use Elastic Network Interfaces (ENI).  The default value converts to Bridge on Linux, and NAT on Windows.</p>',
   'ecs.subnet': '<p>The subnet group on which your server group will be deployed.</p>',
   'ecs.securityGroups': '<p>The security group(s) name(s) your containers are deployed with.</p>',
+  'ecs.dockerLabels':
+    '<p>Additional labels applied to your Docker container.  This metadata can be used to identify your containers, or in conjunction with logging options.  Maps directly to the <a href="https://docs.docker.com/engine/reference/commandline/run/#set-metadata-on-container--l---label---label-file"><b>--label</b> Docker flag</a>.</p> <p>Spinnaker will automatically add the spinnaker.servergroup, spinnaker.stack, spinnaker.detail labels for non-null values.</p>',
+  'ecs.logDriver':
+    '<p>The container\'s logging driver.  This directly maps to the <a href="https://docs.docker.com/config/containers/logging/configure/#configure-the-default-logging-driver"><b>--log-driver</b> Docker flag.</a></p>',
+  'ecs.logOptions':
+    '<p>A map of log options.  This directly maps with the <a href="https://docs.docker.com/config/containers/logging/log_tags/"><b>--log-opt</b> Docker flag  </a></p>',
+  'ecs.environmentVariables':
+    '<p>The environment variable(s) your container are deployed with. SERVER_GROUP, CLOUD_STACK and CLOUD_DETAIL environment variables are used during deployment to identify the task and cannot be set here.</p>',
 };
 
 Object.keys(helpContents).forEach(key => HelpContentsRegistry.register(key, helpContents[key]));

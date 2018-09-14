@@ -48,12 +48,14 @@ describe('Controller: ChaosMonkeyExceptions', () => {
       spyOn(AccountService, 'listAllAccounts').and.returnValue($q.when(accounts));
 
       initializeController(null);
-      $ctrl.application = applicationBuilder.createApplication('app', {
+      $ctrl.application = applicationBuilder.createApplicationForTests('app', {
         key: 'serverGroups',
-        data: [],
-        ready: () => $q.when(null),
-        loaded: true,
+        loader: () => $q.resolve([]),
+        onLoad: (_app, data) => $q.resolve(data),
       });
+      $ctrl.application.serverGroups.refresh();
+      $scope.$digest();
+
       $ctrl.config = new ChaosMonkeyConfig($ctrl.application.attributes.chaosMonkey || {});
 
       $ctrl.$onInit();

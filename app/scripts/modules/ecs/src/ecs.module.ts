@@ -36,6 +36,7 @@ angular
     require('./serverGroup/configure/wizard/advancedSettings/advancedSettings.component').name,
     require('./serverGroup/configure/wizard/verticalScaling/verticalScaling.component').name,
     require('./serverGroup/configure/wizard/horizontalScaling/horizontalScaling.component').name,
+    require('./serverGroup/configure/wizard/logging/logging.component').name,
     ECS_NETWORKING_SECTION,
     ECS_CLUSTER_READ_SERVICE,
     METRIC_ALARM_READ_SERVICE,
@@ -52,6 +53,7 @@ angular
     require('./pipeline/stages/resizeAsg/ecsResizeAsgStage').name,
     require('./pipeline/stages/scaleDownCluster/ecsScaleDownClusterStage').name,
     require('./pipeline/stages/shrinkCluster/ecsShrinkClusterStage').name,
+    require('./securityGroup/securityGroup.transformer.js').name,
     ECS_SERVERGROUP_MODULE,
   ])
   .config(function() {
@@ -71,6 +73,9 @@ angular
       instance: {
         detailsTemplateUrl: require('./instance/details/instanceDetails.html'),
         detailsController: 'ecsInstanceDetailsCtrl',
+      },
+      securityGroup: {
+        transformer: 'ecsSecurityGroupTransformer',
       },
     });
   });
