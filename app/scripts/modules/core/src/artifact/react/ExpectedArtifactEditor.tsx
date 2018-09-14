@@ -22,8 +22,11 @@ export interface IExpectedArtifactEditorProps {
   sources: IExpectedArtifactSourceOption[];
   accounts: IArtifactAccount[];
   onSave: (e: IExpectedArtifactEditorSaveEvent) => void;
-  showIcons: boolean;
+  showIcons?: boolean;
+  showAccounts?: boolean;
   className?: string;
+  fieldColumns: number;
+  singleColumn: boolean;
 }
 
 interface IExpectedArtifactEditorState {
@@ -42,6 +45,13 @@ export class ExpectedArtifactEditor extends React.Component<
   IExpectedArtifactEditorProps,
   IExpectedArtifactEditorState
 > {
+  public static defaultProps = {
+    showIcons: true,
+    showAccounts: true,
+    fieldColumns: 8,
+    singleColumn: false,
+  };
+
   constructor(props: IExpectedArtifactEditorProps) {
     super(props);
     this.state = {
@@ -61,7 +71,7 @@ export class ExpectedArtifactEditor extends React.Component<
 
   private accountsForExpectedArtifact(expectedArtifact: IExpectedArtifact): IArtifactAccount[] {
     const artifact = ExpectedArtifactService.artifactFromExpected(expectedArtifact);
-    if (!artifact) {
+    if (!artifact || !this.props.accounts) {
       return [];
     }
     return this.props.accounts.filter(a => a.types.includes(artifact.type));
@@ -94,12 +104,17 @@ export class ExpectedArtifactEditor extends React.Component<
   };
 
   private availableKinds = () => {
-    const { kinds, accounts } = this.props;
-    return kinds.filter(k => k.key === 'custom' || accounts.find(a => a.types.includes(k.type)));
+    const kinds = this.props.kinds || [];
+    const accounts = this.props.accounts || [];
+    if (this.props.showAccounts) {
+      return kinds.filter(k => k.key === 'custom' || accounts.find(a => a.types.includes(k.type)));
+    } else {
+      return kinds.slice(0);
+    }
   };
 
   public render() {
-    const { sources } = this.props;
+    const { sources, showIcons, showAccounts, fieldColumns, singleColumn } = this.props;
     const { expectedArtifact, source, account } = this.state;
     const accounts = this.accountsForExpectedArtifact(expectedArtifact);
     const artifact = ExpectedArtifactService.artifactFromExpected(expectedArtifact);
@@ -108,17 +123,32 @@ export class ExpectedArtifactEditor extends React.Component<
     const EditCmp = kind && kind.editCmp;
     return (
       <>
-        <StageConfigField label="Artifact Source" fieldColumns={8}>
+        <StageConfigField label="Artifact Source" fieldColumns={fieldColumns}>
           <ExpectedArtifactSourceSelector sources={sources} selected={source} onChange={this.onSourceChange} />
         </StageConfigField>
-        <StageConfigField label="Artifact Type" fieldColumns={8}>
-          <ExpectedArtifactKindSelector kinds={kinds} selected={kind} onChange={this.onKindChange} />
+        <StageConfigField label="Artifact Kind" fieldColumns={fieldColumns}>
+          <ExpectedArtifactKindSelector
+            kinds={kinds}
+            selected={kind}
+            onChange={this.onKindChange}
+            showIcons={showIcons}
+          />
         </StageConfigField>
-        <StageConfigField label="Artifact Account" fieldColumns={8}>
-          <ArtifactAccountSelector accounts={accounts} selected={account} onChange={this.onAccountChange} />
-        </StageConfigField>
-        {EditCmp && <EditCmp artifact={artifact} onChange={this.onArtifactEdit} labelColumns={3} fieldColumns={3} />}
-        <StageConfigField label="" fieldColumns={8}>
+        {showAccounts && (
+          <StageConfigField label="Artifact Account" fieldColumns={fieldColumns}>
+            <ArtifactAccountSelector accounts={accounts} selected={account} onChange={this.onAccountChange} />
+          </StageConfigField>
+        )}
+        {EditCmp && (
+          <EditCmp
+            artifact={artifact}
+            onChange={this.onArtifactEdit}
+            labelColumns={3}
+            fieldColumns={fieldColumns}
+            singleColumn={singleColumn}
+          />
+        )}
+        <StageConfigField label="" fieldColumns={fieldColumns}>
           <button onClick={this.onSave} className="btn btn-block btn-primary btn-sm">
             Confirm
           </button>
@@ -141,6 +171,9 @@ module(EXPECTED_ARTIFACT_EDITOR_COMPONENT_REACT, [
     'accounts',
     'onSave',
     'showIcons',
+    'showAccounts',
     'className',
+    'fieldColumns',
+    'singleColumn',
   ]),
 );
