@@ -1,13 +1,13 @@
 import { IPromise, IScope } from 'angular';
+import { get } from 'lodash';
+import { $log, $q } from 'ngimport';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 
 import { IEntityTags } from 'core/domain';
 import { robotToHuman } from 'core/presentation';
 import { ReactInjector } from 'core/reactShims';
 import { FirewallLabels } from 'core/securityGroup';
 import { toIPromise } from 'core/utils';
-import { get } from 'lodash';
-import { $log, $q } from 'ngimport';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
 
 import { Application } from '../application.model';
 
