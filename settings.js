@@ -28,7 +28,7 @@ var managedServiceAccountsEnabled = process.env.MANAGED_SERVICE_ACCOUNTS_ENABLED
 window.spinnakerSettings = {
   checkForUpdates: true,
   debugEnabled: debugEnabled,
-  defaultProviders: ['aws', 'gce', 'azure', 'kubernetes', 'dcos', 'openstack', 'oracle', 'ecs'],
+  defaultProviders: ['aws', 'gce', 'azure', 'cloudfoundry', 'kubernetes', 'dcos', 'openstack', 'oracle', 'ecs'],
   gateUrl: gateHost,
   bakeryDetailUrl: bakeryDetailUrl,
   authEndpoint: authEndpoint,
@@ -55,8 +55,14 @@ window.spinnakerSettings = {
         // if true, VPC load balancers will be created as internal load balancers if the selected subnet has a purpose
         // tag that starts with "internal"
         inferInternalFlagFromSubnet: false,
+        disableManualOidcDialog: false,
       },
       useAmiBlockDeviceMappings: false,
+    },
+    cloudfoundry: {
+      defaults: {
+        account: 'my-cloudfoundry-account',
+      },
     },
     ecs: {
       defaults: {
