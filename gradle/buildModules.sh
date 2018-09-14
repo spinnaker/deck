@@ -9,7 +9,7 @@ PROJECT_ROOT=$(pwd)
 
 # go find all the modules and add them
 if [[ ${#MODULES_TO_BE_BUILT[0]} -eq 0 ]]; then
-  SKIPPED_MODULES=("dcos")  # skip modules if no list of modules to build is provided
+  SKIPPED_MODULES=("dcos" "azure" "canary" "oracle")  # skipped modules that are not following the module format
 
   for MODULE_PATH in app/scripts/modules/* ; do
     MODULE=$(basename ${MODULE_PATH})
@@ -27,6 +27,7 @@ if [[ ${#MODULES_TO_BE_BUILT[0]} -eq 0 ]]; then
   done
 fi
 
+echo
 echo "Modules found: ${MODULES_TO_BE_BUILT[@]}"
 
 # make sure each module is buildable (which lints)
