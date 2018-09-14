@@ -22,7 +22,10 @@ describe('Task Data Source', function() {
 
   function configureApplication() {
     ApplicationDataSourceRegistry.registerDataSource({ key: 'serverGroups' });
-    application = applicationModelBuilder.createApplication('app', ...ApplicationDataSourceRegistry.getDataSources());
+    application = applicationModelBuilder.createApplicationForTests(
+      'app',
+      ...ApplicationDataSourceRegistry.getDataSources(),
+    );
     application.refresh().catch(() => {});
     application.getDataSource('tasks').activate();
     $scope.$digest();
@@ -42,7 +45,7 @@ describe('Task Data Source', function() {
     });
 
     it('sets appropriate flags when task load fails', function() {
-      spyOn(TaskReader, 'getTasks').and.returnValue($q.reject(null));
+      spyOn(TaskReader, 'getTasks').and.callFake(() => $q.reject(null));
       configureApplication();
       expect(application.getDataSource('tasks').loaded).toBe(false);
       expect(application.getDataSource('tasks').loading).toBe(false);
@@ -76,7 +79,7 @@ describe('Task Data Source', function() {
     });
 
     it('sets appropriate flags when task reload fails; subscriber is responsible for error checking', function() {
-      spyOn(TaskReader, 'getTasks').and.returnValue($q.reject(null));
+      spyOn(TaskReader, 'getTasks').and.callFake(() => $q.reject(null));
       let errorsHandled = 0,
         successesHandled = 0;
       configureApplication();

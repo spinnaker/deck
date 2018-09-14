@@ -26,19 +26,19 @@ xdescribe('CreatePipelineModal', () => {
       $q = _$q_;
       $scope = $rootScope.$new();
       initializeComponent = (configs = []) => {
-        application = applicationModelBuilder.createApplication(
+        application = applicationModelBuilder.createApplicationForTests(
           'app',
           {
             key: 'pipelineConfigs',
             lazy: true,
-            loader: () => $q.when(null),
-            onLoad: () => $q.when(null),
+            loader: () => $q.resolve(application.pipelineConfigs.data),
+            onLoad: (_app, data) => $q.resolve(data),
           },
           {
             key: 'strategyConfigs',
             lazy: true,
-            loader: () => $q.when(null),
-            onLoad: () => $q.when(null),
+            loader: () => $q.resolve(application.strategyConfigs.data),
+            onLoad: (_app, data) => $q.resolve(data),
           },
         );
         application.pipelineConfigs.data = configs;

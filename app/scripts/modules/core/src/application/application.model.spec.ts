@@ -61,7 +61,10 @@ describe('Application Model', function() {
     ) {
       return $q.when(groupsByName || []);
     });
-    application = applicationModelBuilder.createApplication('app', ...ApplicationDataSourceRegistry.getDataSources());
+    application = applicationModelBuilder.createApplicationForTests(
+      'app',
+      ...ApplicationDataSourceRegistry.getDataSources(),
+    );
     application.refresh();
     $scope.$digest();
   }
@@ -71,11 +74,8 @@ describe('Application Model', function() {
       ApplicationDataSourceRegistry.registerDataSource({
         key: 'lazySource',
         lazy: true,
-        loader: () => {
-          application.getDataSource('lazySource').data = ['a'];
-          return $q.when(null);
-        },
-        onLoad: () => $q.when(null),
+        loader: () => $q.resolve(['a']),
+        onLoad: (_app, data) => $q.resolve(data),
       });
     });
 
