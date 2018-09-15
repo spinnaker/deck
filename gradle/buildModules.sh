@@ -6,6 +6,9 @@ MODULES_TO_BE_BUILT=("$@")  # optional, if no list of modules are provided, we'l
 cd "$(dirname "$0")/.."
 PROJECT_ROOT=$(pwd)
 
+source ~/.nvm/nvm.sh
+NODE_JS_VERSION=`node -e 'console.log(require("./package.json").engines.node.replace(/[^\d\.]/g, ""))'`;
+nvm use ${NODE_JS_VERSION}
 
 # go find all the modules and add them
 if [[ ${#MODULES_TO_BE_BUILT[0]} -eq 0 ]]; then
