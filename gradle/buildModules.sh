@@ -14,6 +14,8 @@ nvm use ${NODE_JS_VERSION}
 if [[ ${#MODULES_TO_BE_BUILT[0]} -eq 0 ]]; then
   SKIPPED_MODULES=("dcos" "azure" "canary" "oracle")  # skipped modules that are not following the module format
 
+  MODULES_TO_BE_BUILT=("core") # enforce module build order
+
   for MODULE_PATH in app/scripts/modules/* ; do
     MODULE=$(basename ${MODULE_PATH})
 
@@ -26,7 +28,10 @@ if [[ ${#MODULES_TO_BE_BUILT[0]} -eq 0 ]]; then
       continue
     fi
 
-    MODULES_TO_BE_BUILT+=("${MODULE}")
+    # only add the to the list if if it's not already in there
+    if [[ ! " ${MODULES_TO_BE_BUILT[@]} " =~ " ${MODULE} " ]]; then
+      MODULES_TO_BE_BUILT+=("${MODULE}")
+    fi
   done
 fi
 
