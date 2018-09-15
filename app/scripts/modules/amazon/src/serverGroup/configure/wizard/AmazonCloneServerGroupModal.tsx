@@ -193,6 +193,7 @@ export class AmazonCloneServerGroupModal extends React.Component<
       );
     }
 
+    debugger;
     return (
       <WizardModal<IAmazonServerGroupCommand>
         heading={title}

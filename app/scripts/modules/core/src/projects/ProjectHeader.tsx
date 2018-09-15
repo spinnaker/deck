@@ -83,7 +83,7 @@ export class ProjectHeader extends React.Component<IProjectHeaderProps, IProject
   public render() {
     const { projectConfiguration: project } = this.props;
     const { application, state } = this.state;
-    const { applications } = project.config;
+    const config = project.config;
 
     const isDashboard = state === 'home.project.dashboard';
     const title = isDashboard ? 'Project Dashboard' : application;
@@ -137,11 +137,12 @@ export class ProjectHeader extends React.Component<IProjectHeaderProps, IProject
                       <MenuItem onClick={closeDropdown}>Project Dashboard</MenuItem>
                     </UISref>
                     <MenuItem divider={true} />
-                    {applications.map(application => (
-                      <UISref key={application} to=".application" params={{ application }}>
-                        <MenuItem onClick={closeDropdown}> {application} </MenuItem>
-                      </UISref>
-                    ))}
+                    {config.applications &&
+                      config.applications.map(application => (
+                        <UISref key={application} to=".application" params={{ application }}>
+                          <MenuItem onClick={closeDropdown}> {application} </MenuItem>
+                        </UISref>
+                      ))}
                   </Dropdown.Menu>
                 </Dropdown>
               </div>
