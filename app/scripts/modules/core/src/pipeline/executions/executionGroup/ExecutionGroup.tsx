@@ -12,7 +12,10 @@ import { IExecution, IExecutionGroup, IExecutionTrigger, IPipeline, IPipelineCom
 import { NextRunTag } from 'core/pipeline/triggers/NextRunTag';
 import { Popover } from 'core/presentation/Popover';
 import { ExecutionState } from 'core/state';
-import { PipelineConfigService } from 'core/pipeline/config/services/PipelineConfigService';
+import {
+  IEchoTriggerPipelineResponse,
+  PipelineConfigService,
+} from 'core/pipeline/config/services/PipelineConfigService';
 
 import { TriggersTag } from 'core/pipeline/triggers/TriggersTag';
 import { AccountTag } from 'core/account';
@@ -20,6 +23,7 @@ import { ModalInjector, ReactInjector } from 'core/reactShims';
 import { Spinner } from 'core/widgets/spinners/Spinner';
 
 import './executionGroup.less';
+import { SETTINGS } from 'core';
 
 const ACCOUNT_TAG_OVERFLOW_LIMIT = 2;
 
@@ -114,13 +118,21 @@ export class ExecutionGroup extends React.Component<IExecutionGroupProps, IExecu
   private startPipeline(command: IPipelineCommand): IPromise<void> {
     const { executionService } = ReactInjector;
     this.setState({ triggeringExecution: true });
-    return PipelineConfigService.triggerPipeline(
-      this.props.application.name,
-      command.pipelineName,
-      command.trigger,
-    ).then(
-      newPipelineId => {
-        const monitor = executionService.waitUntilNewTriggeredPipelineAppears(this.props.application, newPipelineId);
+
+    let triggerFunction: (a: string, b: string, c: any) => IPromise<string>;
+    let monitorFunction: (a: string) => IPromise<any>;
+    if (SETTINGS.feature.triggerViaEcho) {
+      triggerFunction = PipelineConfigService.triggerPipelineViaEcho;
+      monitorFunction = eventId => executionService.waitUntilPipelineAppearsForEventId(this.props.application, eventId);
+    } else {
+      triggerFunction = PipelineConfigService.triggerPipeline;
+      monitorFunction = newPipelineId =>
+        executionService.waitUntilNewTriggeredPipelineAppears(this.props.application, newPipelineId);
+    }
+
+    return triggerFunction(this.props.application.name, command.pipelineName, command.trigger).then(
+      triggerResult => {
+        const monitor = monitorFunction(triggerResult);
         monitor.then(() => this.setState({ triggeringExecution: false }));
         this.setState({ poll: monitor });
       },

@@ -108,6 +108,21 @@ export class ExecutionService {
       });
   }
 
+  public getExecutionByEventId(application: string, eventId: string): IPromise<IExecution> {
+    return API.all('applications', application, 'executions', 'search')
+      .get({ eventId })
+      .then((data: IExecution[]) => {
+        if (data.length > 0) {
+          let execution = data[0];
+          execution.hydrated = true;
+          this.cleanExecutionForDiffing(execution);
+          return execution;
+        } else {
+          throw 'No execution found for event id: ' + eventId;
+        }
+      });
+  }
+
   public transformExecution(application: Application, execution: IExecution): void {
     ExecutionsTransformer.transformExecution(application, execution);
   }
@@ -208,6 +223,18 @@ export class ExecutionService {
         });
       }
     }
+  }
+
+  public waitUntilPipelineAppearsForEventId(application: Application, eventId: string): IPromise<any> {
+    return this.getExecutionByEventId(application.name, eventId)
+      .then(() => {
+        return application.executions.refresh();
+      })
+      .catch(() => {
+        return this.$timeout(() => {
+          return this.waitUntilPipelineAppearsForEventId(application, eventId);
+        }, 1000);
+      });
   }
 
   public waitUntilNewTriggeredPipelineAppears(application: Application, triggeredPipelineId: string): IPromise<any> {
