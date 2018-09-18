@@ -17,19 +17,8 @@ jobs:
     - stage: tests
       name: run tests for deck
       script: gradle/buildViaTravis.sh
-
-    # these modules have a specific build order because of dependancies
-    - name: build the core, amazon, ecs, and titus module
-      script: gradle/buildModules.sh core amazon ecs titus
-
-    # these modules do not depend on anything besides "core".
-    # Let's group together just to take advantage of travis's parallel job limit (5) to speed up builds
-    - name: build the core, appengine, and cloudfoundry module
-      script: gradle/buildModules.sh core appengine cloudfoundry
-    - name: build the core, google, and kubernetes module
-      script: gradle/buildModules.sh core google kubernetes
-    - name: build the core, docker, and openstack module
-      script: gradle/buildModules.sh core docker openstack
+    - name: build the all module libs
+      script: gradle/buildModules.sh
 
 before_cache: gradle/prepCaches.sh
 cache:
