@@ -11,9 +11,34 @@ before_install:
 - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.5.1
 - sh -e /etc/init.d/xvfb start
 install: gradle/installViaTravis.sh
-script:
-  - gradle/buildViaTravis.sh
-  - gradle/buildModules.sh
+
+jobs:
+  include:
+    - stage: tests
+      name: run tests for deck
+      script: gradle/buildViaTravis.sh
+    # there's no need to build "core" since it's being built by each other module as a dependancy
+    # - name: build the "core" module
+    #   script: gradle/buildModules.sh core
+    - name: build the "amazon" module
+      script: gradle/buildModules.sh core amazon
+    - name: build the "ecs" module
+      script: gradle/buildModules.sh core amazon ecs
+    - name: build the "titus" module
+      script: gradle/buildModules.sh core amazon titus
+    - name: build the "appengine" module
+      script: gradle/buildModules.sh core appengine
+    - name: build the "cloudfoundry" module
+      script: gradle/buildModules.sh core cloudfoundry
+    - name: build the "docker" module
+      script: gradle/buildModules.sh core docker
+    - name: build the "google" module
+      script: gradle/buildModules.sh core google
+    - name: build the "kubernetes" module
+      script: gradle/buildModules.sh core kubernetes
+    - name: build the "openstack" module
+      script: gradle/buildModules.sh core openstack
+
 before_cache: gradle/prepCaches.sh
 cache:
   directories:
