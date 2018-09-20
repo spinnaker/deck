@@ -24,7 +24,8 @@
     "test": "karma start",
     "tslint": "tslint --project tsconfig.json",
     "int": "protractor protractor.conf.js",
-    "precommit": "pretty-quick --staged"
+    "precommit": "pretty-quick --staged",
+    "modules": "./gradle/buildModules.sh"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free-webfonts": "^1.0.9",
@@ -160,7 +161,7 @@
     "physical-cpu-count": "^2.0.0",
     "postcss-colorfix": "^0.0.4",
     "postcss-loader": "^2.1.2",
-    "prettier": "^1.12.1",
+    "prettier": "^1.14.3",
     "pretty-quick": "^1.4.1",
     "react-addons-test-utils": "15.6.2",
     "react-test-renderer": "16.3.2",
