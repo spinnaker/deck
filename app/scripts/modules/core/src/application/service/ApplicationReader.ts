@@ -2,6 +2,8 @@ import { IPromise } from 'angular';
 
 import { API } from 'core/api';
 import { SchedulerFactory } from 'core/scheduler';
+import { SETTINGS } from '@spinnaker/core';
+
 import { Application } from '../application.model';
 import { ApplicationDataSource, IDataSourceConfig } from '../service/applicationDataSource';
 import { ApplicationDataSourceRegistry } from './ApplicationDataSourceRegistry';
@@ -54,6 +56,14 @@ export class ApplicationReader {
         application.refresh();
         return application;
       });
+  }
+
+  public static async getPipelineConfigsForApp(name: string) {
+    const response = await fetch(`${SETTINGS.gateUrl}/applications/${name}/pipelineConfigs`, {
+      credentials: 'include',
+    });
+    const pipelineConfigs = await response.json();
+    return pipelineConfigs;
   }
 
   public static getApplicationMap(): Map<string, IApplicationSummary> {

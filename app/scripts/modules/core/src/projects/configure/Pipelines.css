@@ -1,0 +1,15 @@
+.Pipelines button.zombie {
+  width: 80%;
+}
+
+.Pipelines table td {
+  padding: 4px 8px;
+}
+
+.Pipeline table thead td {
+  border-bottom: 1px solid var(--color-divider);
+}
+
+.Pipelines table td:nth-child(3) {
+  width: 24px;
+}

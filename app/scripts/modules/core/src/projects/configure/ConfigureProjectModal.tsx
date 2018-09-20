@@ -1,14 +1,14 @@
 import { ProjectAttributes } from 'core/projects/configure/ProjectAttributes';
 import { Applications } from 'core/projects/configure/Applications';
+import { Pipelines } from 'core/projects/configure/Pipelines';
 import * as React from 'react';
 import { ProjectReader } from '../service/ProjectReader';
 import { ProjectWriter } from '../service/ProjectWriter';
+import { ApplicationReader } from 'core/application/service/ApplicationReader';
 import { StateService } from '@uirouter/core';
 
 import {
-  Application,
   ReactInjector,
-  TaskMonitor,
   WizardModal,
   IModalComponentProps,
   noop,
@@ -16,17 +16,30 @@ import {
   IProject,
   IProjectPipeline,
 } from '@spinnaker/core';
+import { IApplicationSummary } from 'application';
+import { IPipelineTemplateConfig } from 'pipeline/config/templates/PipelineTemplateReader';
+
+import './ConfigureProjectModal.css';
 
 export interface IConfigureProjectModalProps extends IModalComponentProps {
   title: string;
   projectConfiguration: IProject;
-  command: any;
+  command: {
+    viewState: {
+      applications: string[];
+      pipelineConfigs: { app: string; pipelineConfigId: string }[];
+      attributes: { name: string; email: string };
+    };
+  };
 }
 
 export interface IConfigureProjectModalState {
   loaded: boolean;
   existingProjectNames: string[];
-  // taskMonitor: TaskMonitor;
+  appPipelines: Map<string, string[]>;
+  allApplications: IApplicationSummary[];
+  selectedApplications: string[];
+  selectedPipelines: { app: string; pipelines: string[] }[];
 }
 
 export interface IUpsertProjectCommand {
@@ -57,34 +70,79 @@ export class ConfigureProjectModal extends React.Component<IConfigureProjectModa
     super(props);
     this.$state = ReactInjector.$state;
 
+    // TODO(archana): Set pipelines for app once you get existing apps
     this.state = {
       loaded: false,
       existingProjectNames: [],
+      appPipelines: new Map(),
+      allApplications: [],
+      selectedApplications: [],
+      selectedPipelines: [],
     };
   }
 
   componentWillMount() {
     this.fetchData();
+    this.fetchApplicationsList();
   }
 
-  private submit = (command: IAmazonServerGroupCommand): void => {
-    // const forPipelineConfig = command.viewState.mode === 'editPipeline' || command.viewState.mode === 'createPipeline';
-    // if (forPipelineConfig) {
-    //   this.props.closeModal && this.props.closeModal(command);
-    // } else {
-    //   this.state.taskMonitor.submit(() =>
-    //     ReactInjector.serverGroupWriter.cloneServerGroup(command, this.props.application),
-    //   );
+  private submit = (command): void => {
+    const { projectConfiguration } = this.props;
+    debugger;
+    // const project = {
+    //   id: projectConfiguration.id,
+    //   name: projectConfiguration.name
     // }
   };
 
-  private validate = () => {};
+  private validate = () => {
+    return {};
+  };
 
   private fetchData = async () => {
     let projects = await ProjectReader.listProjects();
     this.setState({
       existingProjectNames: projects.map((project: IProject) => project.name),
       loaded: true,
+    });
+  };
+
+  private fetchApplicationsList = async () => {
+    const applications = await ApplicationReader.listApplications();
+    this.setState({
+      allApplications: applications,
+    });
+  };
+
+  private onAppsChange = async (selectedApplications: string[]) => {
+    this.setState(
+      {
+        selectedApplications,
+      },
+      () => {
+        this.fetchPipelinesForApps();
+      },
+    );
+  };
+
+  private fetchPipelinesForApps = async () => {
+    const { selectedApplications, appPipelines } = this.state;
+    selectedApplications.forEach(async (app: string) => {
+      if (!Object.keys(appPipelines).includes(app)) {
+        const pipelineConfigs = await ApplicationReader.getPipelineConfigsForApp(app);
+        this.setState({
+          appPipelines: this.state.appPipelines.set(
+            app,
+            pipelineConfigs.map((config: IPipelineTemplateConfig) => config.name),
+          ),
+        });
+      }
+    });
+  };
+
+  private onPipelinesChange = async (selectedPipelines: { app: string; pipelines: string[] }[]) => {
+    this.setState({
+      selectedPipelines,
     });
   };
 
@@ -99,8 +157,8 @@ export class ConfigureProjectModal extends React.Component<IConfigureProjectModa
   };
 
   public render() {
-    const { application, dismissModal, title, projectConfiguration } = this.props;
-    const { loaded, taskMonitor } = this.state;
+    const { dismissModal, title, projectConfiguration } = this.props;
+    const { allApplications, appPipelines, loaded, taskMonitor } = this.state;
 
     return (
       <WizardModal
@@ -121,7 +179,12 @@ export class ConfigureProjectModal extends React.Component<IConfigureProjectModa
             email: projectConfiguration && projectConfiguration.email,
           }}
         />
-        <Applications />
+        <Applications
+          applications={projectConfiguration ? projectConfiguration.config.applications : []}
+          onChange={this.onAppsChange}
+          allApplications={allApplications.map(app => app.name)}
+        />
+        <Pipelines appsPipelinesMap={appPipelines} onChange={this.onPipelinesChange} />
       </WizardModal>
     );
   }

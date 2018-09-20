@@ -1,7 +1,9 @@
 import * as React from 'react';
 import { FormikProps } from 'formik';
 import { IWizardPageProps, wizardPage } from '@spinnaker/core';
-import Select, { Option } from 'react-select';
+import VirtualizedSelect from 'react-virtualized-select';
+
+import './Applications.css';
 
 interface IApplications {
   applications: string[];
@@ -12,8 +14,9 @@ interface IApplicationsState {
 }
 
 export interface IApplicationsProps extends FormikProps<IApplications> {
-  addApplication: Function;
-  removeApplication: Function;
+  applications?: string[];
+  onChange: Function;
+  allApplications: string[];
 }
 
 class ApplicationsImpl extends React.Component<
@@ -25,53 +28,58 @@ class ApplicationsImpl extends React.Component<
   constructor(props: IApplicationsProps & IWizardPageProps & FormikProps<IApplications>) {
     super(props);
     this.state = {
-      applications: [],
+      applications: this.props.applications || [],
     };
   }
 
-  private addApplication = (app: string) => {
-    this.setState({
-      applications: this.state.applications.push(app),
+  private addApplication = async (app: string) => {
+    await this.setState({
+      applications: this.state.applications.concat(app),
     });
-    this.props.addApplication(app);
+    this.props.onChange(this.state.applications);
   };
 
   private removeApplication = (app: string) => {
     this.setState({
       applications: this.state.applications.filter(application => application !== app),
     });
-    this.props.removeApplication(app);
+  };
+
+  private validate = (values: IApplications) => {
+    return {};
   };
 
   public render() {
     const { applications } = this.state;
-
     return (
-      <div>
+      <div className="Applications vertical center">
         <ul className="nostyle">
           {applications &&
             applications.map((app: string) => (
-              <li>
-                <span>{app}</span>
+              <li key={app} style={{ width: '100%' }} className="horizontal">
+                <div className="body-small zombie-label flex-1 sp-padding-xs-yaxis sp-padding-s-xaxis sp-margin-xs-yaxis">
+                  {app}
+                </div>{' '}
                 <button
                   onClick={() => {
                     this.removeApplication(app);
                   }}
+                  className="nostyle"
                 >
-                  <i className="fa fa-trash" />
+                  <i className="fas fa-trash-alt" />
                 </button>
               </li>
             ))}
         </ul>
-        <Select
-          options={[
-            { value: 'test2', label: 'test2' },
-            { value: 'test2', label: 'test2' },
-            { value: 'test3', label: 'test3' },
-          ]}
-          onChange={(evt: React.ChangeEvent<HTMLInputElement>) => {
-            this.addApplication('test');
+        <VirtualizedSelect
+          options={this.props.allApplications.map(app => ({
+            value: app,
+            label: app,
+          }))}
+          onChange={(item: { value: string; label: string }) => {
+            this.addApplication(item.value);
           }}
+          className="body-small"
         />
       </div>
     );

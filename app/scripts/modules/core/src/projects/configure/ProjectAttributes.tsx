@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { FormikProps, Field } from 'formik';
-import { IWizardPageProps, wizardPage, IProjectConfig } from '@spinnaker/core';
+import { IWizardPageProps, wizardPage } from '@spinnaker/core';
 
 interface IProjectAttributes {
   name?: string;
