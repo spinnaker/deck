@@ -1,19 +1,22 @@
 import * as React from 'react';
 import * as classNames from 'classnames';
+import { FormikProps } from 'formik';
 
 import { noop } from 'core/utils';
 
-export interface IWizardPageProps {
-  mandatory?: boolean;
-  dirty?: boolean;
-  dontMarkCompleteOnView?: boolean;
-  done?: boolean;
-  onMount?: (self: IWrappedWizardPage) => void;
-  dirtyCallback?: (name: string, dirty: boolean) => void;
-  ref?: () => void;
-  revalidate?: () => void;
-  setWaiting?: (section: string, isWaiting: boolean) => void;
-}
+export type IWizardPageProps<T = any> = Partial<{
+  formik: FormikProps<T>;
+  mandatory: boolean;
+  dirty: boolean;
+  dontMarkCompleteOnView: boolean;
+  done: boolean;
+  onMount: (self: IWrappedWizardPage) => void;
+  dirtyCallback: (name: string, dirty: boolean) => void;
+  ref: () => void;
+  revalidate: () => void;
+  setWaiting: (section: string, isWaiting: boolean) => void;
+  note: React.ReactElement<any>;
+}>;
 
 export interface IWizardPageState {
   hasErrors: boolean;
@@ -77,7 +80,7 @@ export function wizardPage<P = {}>(
     };
 
     public render() {
-      const { done, mandatory } = this.props;
+      const { done, mandatory, note } = this.props;
       const { hasErrors, isDirty, label } = this.state;
       const showDone = done || !mandatory;
       const className = classNames({
@@ -93,6 +96,7 @@ export function wizardPage<P = {}>(
           </div>
           <div className="wizard-page-body">
             <WrappedComponent {...this.props} dirtyCallback={this.dirtyCallback} ref={this.handleWrappedRef} />
+            {note && <div className="row">{note}</div>}
           </div>
         </div>
       );
