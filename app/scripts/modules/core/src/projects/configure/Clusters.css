@@ -1,0 +1,7 @@
+.Clusters table td {
+  padding: 4px;
+}
+
+.Clusters table td.accounts {
+  width: 200px;
+}

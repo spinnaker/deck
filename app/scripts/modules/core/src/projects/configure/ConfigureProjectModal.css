@@ -2,3 +2,13 @@
 .Pipelines i {
   color: var(--color-accent);
 }
+
+.Pipelines table thead td,
+.Clusters table thead td {
+  border-bottom: 1px solid var(--color-divider);
+}
+
+.Pipelines button.zombie,
+.Clusters button.zombie {
+  width: 80%;
+}

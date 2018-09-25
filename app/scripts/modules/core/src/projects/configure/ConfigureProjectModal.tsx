@@ -1,6 +1,7 @@
 import { ProjectAttributes } from 'core/projects/configure/ProjectAttributes';
 import { Applications } from 'core/projects/configure/Applications';
 import { Pipelines } from 'core/projects/configure/Pipelines';
+import { Clusters } from 'core/projects/configure/Clusters';
 import * as React from 'react';
 import { ProjectReader } from '../service/ProjectReader';
 import { ProjectWriter } from '../service/ProjectWriter';
@@ -88,7 +89,6 @@ export class ConfigureProjectModal extends React.Component<IConfigureProjectModa
 
   private submit = (command): void => {
     const { projectConfiguration } = this.props;
-    debugger;
     // const project = {
     //   id: projectConfiguration.id,
     //   name: projectConfiguration.name
@@ -184,6 +184,7 @@ export class ConfigureProjectModal extends React.Component<IConfigureProjectModa
           onChange={this.onAppsChange}
           allApplications={allApplications.map(app => app.name)}
         />
+        <Clusters />
         <Pipelines appsPipelinesMap={appPipelines} onChange={this.onPipelinesChange} />
       </WizardModal>
     );
