@@ -1,11 +1,9 @@
 import * as React from 'react';
-import { FormikProps } from 'formik';
-import { IWizardPageProps, wizardPage } from '@spinnaker/core';
 import Select from 'react-select';
 import { NgReact } from 'core/reactShims';
-import { Field } from 'formik';
+import { Field, FormikProps } from 'formik';
 
-import { AccountService, IAccountDetails } from '@spinnaker/core';
+import { AccountService, IAccountDetails, IWizardPageProps, wizardPage } from '@spinnaker/core';
 
 import { IProjectCluster } from 'domain/IProject';
 
@@ -15,7 +13,6 @@ interface IClustersState {
   clusterEntries: IProjectCluster[];
   showNewRow: boolean;
   accounts: IAccountDetails[];
-  showAppTextbox: boolean[];
 }
 
 export interface IClustersProps extends FormikProps<{}> {
@@ -32,7 +29,6 @@ class ClustersImpl extends React.Component<IClustersProps & IWizardPageProps & F
       clusterEntries: props.entries || [],
       showNewRow: false,
       accounts: [],
-      showAppTextbox: [],
     };
     this.loadAccounts();
   }
@@ -45,14 +41,6 @@ class ClustersImpl extends React.Component<IClustersProps & IWizardPageProps & F
 
   public validate = (): { [key: string]: string } => {
     return {};
-  };
-
-  private toggleAppField = (idx: number) => {
-    const { showAppTextbox } = this.state;
-    showAppTextbox[idx] = true;
-    this.setState({
-      showAppTextbox,
-    });
   };
 
   private entryChanged = (type: string, value: string, i: number, appIdx: number = -1) => {
@@ -70,7 +58,22 @@ class ClustersImpl extends React.Component<IClustersProps & IWizardPageProps & F
 
   private addNewApplication = (idx: number) => {
     const { clusterEntries } = this.state;
-    clusterEntries[idx].applications.push('');
+    if (clusterEntries[idx].applications === null) {
+      clusterEntries[idx].applications = [''];
+    } else {
+      clusterEntries[idx].applications.push('');
+    }
+    this.setState({
+      clusterEntries,
+    });
+  };
+
+  private deleteApplication = (idx: number, appIdx: number) => {
+    const { clusterEntries } = this.state;
+    clusterEntries[idx].applications.splice(appIdx, 1);
+    this.setState({
+      clusterEntries,
+    });
   };
 
   private createNewClusterEntry = () => {
@@ -97,15 +100,15 @@ class ClustersImpl extends React.Component<IClustersProps & IWizardPageProps & F
     const { HelpField } = NgReact;
     const { accounts } = this.state;
     const { applications } = this.props;
-    const { clusterEntries, showAppTextbox } = this.state;
+    const { clusterEntries } = this.state;
 
     return (
       <section className="Clusters vertical center">
         <table style={{ width: '100%' }}>
           <thead>
             <tr>
-              <td>Application</td>
-              <td className="accounts">Account</td>
+              <td className="wide">Application</td>
+              <td className="wide">Account</td>
               <td>
                 Stack <HelpField id="project.cluster.stack" />
               </td>
@@ -124,32 +127,37 @@ class ClustersImpl extends React.Component<IClustersProps & IWizardPageProps & F
                       <Field
                         name="applications"
                         type="checkbox"
-                        onChange={() => this.toggleAppField(idx)}
+                        onChange={() => this.addNewApplication(idx)}
                         checked={!entry.applications || !entry.applications.length}
                       />
                       <span>All</span>
                     </label>
-                    {!!((entry.applications && entry.applications.length) || showAppTextbox[idx]) && (
-                      <section>
-                        <ul className="nostyle">
-                          {entry.applications.map((app, appIdx) => (
-                            <Select
-                              value={app}
-                              options={applications.map(appName => ({
-                                label: appName,
-                                value: appName,
-                              }))}
-                              className="body-small"
-                              onChange={(evt: React.ChangeEvent<HTMLInputElement>) =>
-                                this.entryChanged('applications', evt.target.value, idx, appIdx)
-                              }
-                            />
+                    {!!(entry.applications && entry.applications.length) && (
+                      <div>
+                        <ul className="nostyle sp-group-margin-xs-yaxis">
+                          {entry.applications.map((app: string, appIdx: number) => (
+                            <li key={`${app}~${appIdx}`} className="horizontal middle">
+                              <Select
+                                value={app}
+                                options={applications.map(appName => ({
+                                  label: appName,
+                                  value: appName,
+                                }))}
+                                className="body-small flex-1"
+                                onChange={(option: { value: string }) =>
+                                  this.entryChanged('applications', option.value, idx, appIdx)
+                                }
+                              />
+                              <div className="nostyle" onClick={() => this.deleteApplication(idx, appIdx)}>
+                                <i className="fas fa-trash-alt" />
+                              </div>
+                            </li>
                           ))}
                         </ul>
-                        <a className="button zombie" onClick={() => this.addNewApplication(idx)}>
+                        <a className="button zombie sp-margin-xs-top" onClick={() => this.addNewApplication(idx)}>
                           <i className="fas fa-plus-circle" /> Add App
                         </a>
-                      </section>
+                      </div>
                     )}
                   </td>
                   <td>
@@ -186,9 +194,9 @@ class ClustersImpl extends React.Component<IClustersProps & IWizardPageProps & F
                     />
                   </td>
                   <td>
-                    <button className="nostyle" onClick={() => this.deleteClusterEntry(idx)}>
+                    <div className="nostyle" onClick={() => this.deleteClusterEntry(idx)}>
                       <i className="fas fa-trash-alt" />
-                    </button>
+                    </div>
                   </td>
                 </tr>
               ))}

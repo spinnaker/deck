@@ -133,28 +133,28 @@ class ProjectAttributesImpl extends React.Component<
                 </div>
                 <div className="form-group">
                   <div className="sp-group-margin-xs-xaxis">
-                    <button className="passive" ng-click="viewState.deleteProject = false">
+                    <a className="button passive" ng-click="viewState.deleteProject = false">
                       Cancel
-                    </button>
+                    </a>
                     {this.props.values.name && (
-                      <button
-                        className="primary"
+                      <a
+                        className="button primary"
                         disabled={
                           !values.projectNameForDeletion || values.projectNameForDeletion !== this.props.values.name
                         }
                         onClick={() => onDelete()}
                       >
                         <span className="glyphicon glyphicon-trash" /> Delete project
-                      </button>
+                      </a>
                     )}
                   </div>
                 </div>
               </div>
             </div>
           ) : (
-            <button className="btn btn-default btn-sm" onClick={() => this.setState({ showProjectDeleteForm: true })}>
+            <a className="btn btn-default btn-sm" onClick={() => this.setState({ showProjectDeleteForm: true })}>
               <span className="glyphicon glyphicon-trash" /> Delete Project
-            </button>
+            </a>
           )}
         </div>
       </div>

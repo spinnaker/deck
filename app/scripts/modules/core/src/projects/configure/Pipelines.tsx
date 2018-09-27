@@ -46,7 +46,6 @@ class PipelinesImpl extends React.Component<IPipelinesProps & IWizardPageProps &
   };
 
   private addNewRow = () => {
-    debugger;
     const appToShow = this.props.appsPipelinesMap.size && Array.from(this.props.appsPipelinesMap.keys())[0];
 
     const { pipelines } = this.state;
@@ -159,30 +158,6 @@ class PipelinesImpl extends React.Component<IPipelinesProps & IWizardPageProps &
                         </td>
                       </tr>
                     ))}
-                  {/* {!!showNewRow && (
-                    <tr>
-                      <td>
-                        <Select
-                          options={Array.from(appsPipelinesMap.keys()).map(appName => ({
-                            label: appName,
-                            value: appName,
-                          }))}
-                          onChange={(item: { value: string }) => this.setPipelinesForApp(item.value)}
-                          className="body-small"
-                        />
-                      </td>
-                      <td>
-                        <Select
-                          options={pipelinesToShowForSelectedApp.map(entry => ({
-                            label: entry.name,
-                            value: entry.id,
-                          }))}
-                          onChange={(item: { value: string, label: string }) => this.addNewPipelineEntry(item.value, item.label)}
-                          className="body-small"
-                        />
-                      </td>
-                    </tr>
-                  )} */}
                 </tbody>
               </table>
             )}

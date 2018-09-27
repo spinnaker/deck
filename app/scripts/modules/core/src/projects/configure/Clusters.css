@@ -1,7 +1,12 @@
 .Clusters table td {
-  padding: 4px;
+  padding: 6px 4px;
+  vertical-align: top;
 }
 
-.Clusters table td.accounts {
+.Clusters table td.wide {
   width: 200px;
+}
+
+.Clusters a.button {
+  display: inline-block;
 }
