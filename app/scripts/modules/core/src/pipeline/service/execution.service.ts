@@ -14,6 +14,7 @@ import { DebugWindow } from 'core/utils/consoleDebug';
 import { IPipeline } from 'core/domain/IPipeline';
 import { ISortFilter } from 'core/filterModel';
 import { ExecutionState } from 'core/state';
+import { Error } from 'tslint/lib/error';
 
 export class ExecutionService {
   public get activeStatuses(): string[] {
@@ -113,12 +114,12 @@ export class ExecutionService {
       .get({ eventId })
       .then((data: IExecution[]) => {
         if (data.length > 0) {
-          let execution = data[0];
+          const execution = data[0];
           execution.hydrated = true;
           this.cleanExecutionForDiffing(execution);
           return execution;
         } else {
-          throw 'No execution found for event id: ' + eventId;
+          throw new Error('No execution found for event id: ' + eventId);
         }
       });
   }
