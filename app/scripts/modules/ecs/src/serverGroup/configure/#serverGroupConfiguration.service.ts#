@@ -232,7 +232,7 @@ export class EcsServerGroupConfigurationService {
     }
 
     const vpcId = chain(command.backingData.subnets)
-      .filter({
+          .filter({
         account: command.credentials,
         region: command.region,
         purpose: command.subnetType,
