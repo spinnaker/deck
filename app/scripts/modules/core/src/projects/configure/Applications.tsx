@@ -15,8 +15,8 @@ interface IApplicationsState {
 
 export interface IApplicationsProps extends FormikProps<IApplications> {
   applications?: string[];
-  onChange: Function;
   allApplications: string[];
+  onChange: Function;
 }
 
 class ApplicationsImpl extends React.Component<
@@ -36,16 +36,18 @@ class ApplicationsImpl extends React.Component<
     await this.setState({
       applications: this.state.applications.concat(app),
     });
+    this.props.setFieldValue('applications', this.state.applications);
     this.props.onChange(this.state.applications);
   };
 
-  private removeApplication = (app: string) => {
-    this.setState({
+  private removeApplication = async (app: string) => {
+    await this.setState({
       applications: this.state.applications.filter(application => application !== app),
     });
+    this.props.setFieldValue('applications', this.state.applications);
   };
 
-  private validate = (values: IApplications) => {
+  public validate = (): { [key: string]: string } => {
     return {};
   };
 

@@ -1,5 +1,6 @@
 .Applications i,
-.Pipelines i {
+.Pipelines i,
+.Clusters i {
   color: var(--color-accent);
 }
 
@@ -8,7 +9,7 @@
   border-bottom: 1px solid var(--color-divider);
 }
 
-.Pipelines button.zombie,
-.Clusters button.zombie {
+.Pipelines .button.zombie,
+.Clusters .button.zombie {
   width: 80%;
 }

@@ -6,7 +6,6 @@ import { NgReact } from 'core/reactShims';
 import { Field } from 'formik';
 
 import { AccountService, IAccountDetails } from '@spinnaker/core';
-import { TextField } from 'core/presentation';
 
 import { IProjectCluster } from 'domain/IProject';
 
@@ -20,8 +19,8 @@ interface IClustersState {
 }
 
 export interface IClustersProps extends FormikProps<{}> {
-  onChange: Function;
-  selectedClusterEntries: IProjectCluster[];
+  entries: IProjectCluster[];
+  applications: string[];
 }
 
 class ClustersImpl extends React.Component<IClustersProps & IWizardPageProps & FormikProps<{}>, IClustersState> {
@@ -30,7 +29,7 @@ class ClustersImpl extends React.Component<IClustersProps & IWizardPageProps & F
   constructor(props: IClustersProps & IWizardPageProps & FormikProps<{}>) {
     super(props);
     this.state = {
-      clusterEntries: [],
+      clusterEntries: props.entries || [],
       showNewRow: false,
       accounts: [],
       showAppTextbox: [],
@@ -44,7 +43,7 @@ class ClustersImpl extends React.Component<IClustersProps & IWizardPageProps & F
     });
   }
 
-  private validate = (values: {}) => {
+  public validate = (): { [key: string]: string } => {
     return {};
   };
 
@@ -56,12 +55,22 @@ class ClustersImpl extends React.Component<IClustersProps & IWizardPageProps & F
     });
   };
 
-  private entryChanged = (type: string, value: string | string[], i: number) => {
+  private entryChanged = (type: string, value: string, i: number, appIdx: number = -1) => {
     const { clusterEntries } = this.state;
-    clusterEntries[i][type] = value;
+    if (appIdx > -1 && type === 'applications') {
+      clusterEntries[i].applications.splice(appIdx, 1, value);
+    } else {
+      clusterEntries[i][type] = value;
+    }
     this.setState({
       clusterEntries,
     });
+    this.props.setFieldValue('clusters', clusterEntries);
+  };
+
+  private addNewApplication = (idx: number) => {
+    const { clusterEntries } = this.state;
+    clusterEntries[idx].applications.push('');
   };
 
   private createNewClusterEntry = () => {
@@ -75,9 +84,19 @@ class ClustersImpl extends React.Component<IClustersProps & IWizardPageProps & F
     });
   };
 
+  private deleteClusterEntry = (idx: number) => {
+    const { clusterEntries } = this.state;
+    clusterEntries.splice(idx, 1);
+    this.setState({
+      clusterEntries,
+    });
+    this.props.setFieldValue('clusters', clusterEntries);
+  };
+
   public render() {
     const { HelpField } = NgReact;
     const { accounts } = this.state;
+    const { applications } = this.props;
     const { clusterEntries, showAppTextbox } = this.state;
 
     return (
@@ -93,71 +112,91 @@ class ClustersImpl extends React.Component<IClustersProps & IWizardPageProps & F
               <td>
                 Detail <HelpField id="project.cluster.detail" />
               </td>
+              <td />
             </tr>
           </thead>
           <tbody>
-            {clusterEntries.map((entry, idx) => (
-              <tr key={idx}>
-                <td className="vertical">
-                  <label className="sp-group-margin-s-xaxis">
-                    <Field
-                      name="applications"
-                      type="checkbox"
-                      onChange={() => this.toggleAppField(idx)}
-                      checked={!entry.applications.length}
+            {clusterEntries &&
+              clusterEntries.map((entry, idx) => (
+                <tr key={idx}>
+                  <td className="vertical">
+                    <label className="sp-group-margin-s-xaxis">
+                      <Field
+                        name="applications"
+                        type="checkbox"
+                        onChange={() => this.toggleAppField(idx)}
+                        checked={!entry.applications || !entry.applications.length}
+                      />
+                      <span>All</span>
+                    </label>
+                    {!!((entry.applications && entry.applications.length) || showAppTextbox[idx]) && (
+                      <section>
+                        <ul className="nostyle">
+                          {entry.applications.map((app, appIdx) => (
+                            <Select
+                              value={app}
+                              options={applications.map(appName => ({
+                                label: appName,
+                                value: appName,
+                              }))}
+                              className="body-small"
+                              onChange={(evt: React.ChangeEvent<HTMLInputElement>) =>
+                                this.entryChanged('applications', evt.target.value, idx, appIdx)
+                              }
+                            />
+                          ))}
+                        </ul>
+                        <a className="button zombie" onClick={() => this.addNewApplication(idx)}>
+                          <i className="fas fa-plus-circle" /> Add App
+                        </a>
+                      </section>
+                    )}
+                  </td>
+                  <td>
+                    <Select
+                      value={entry.account}
+                      options={accounts.map(account => ({
+                        label: account.name,
+                        value: account.name,
+                      }))}
+                      className="body-small"
+                      onChange={(option: { value: string }) => this.entryChanged('account', option.value, idx)}
                     />
-                    <span>All</span>
-                  </label>
-                  {!!(entry.applications.length || showAppTextbox[idx]) && (
+                  </td>
+                  <td>
                     <Field
-                      name="applications"
-                      value={entry.applications.join(',')}
+                      name="stack"
+                      type="text"
+                      value={entry.stack}
                       onChange={(evt: React.ChangeEvent<HTMLInputElement>) =>
-                        this.entryChanged('applications', evt.target.value.split(','), idx)
+                        this.entryChanged('stack', evt.target.value, idx)
                       }
+                      className="sp-padding-xs-xaxis"
                     />
-                  )}
-                </td>
-                <td>
-                  <Select
-                    value={entry.account}
-                    options={accounts.map(account => ({
-                      label: account.name,
-                      value: account.accountId,
-                    }))}
-                    className="body-small"
-                    onChange={(option: { value: string }) => this.entryChanged('account', option.value, idx)}
-                  />
-                </td>
-                <td>
-                  <Field
-                    name="stack"
-                    type="text"
-                    value={entry.stack}
-                    onChange={(evt: React.ChangeEvent<HTMLInputElement>) =>
-                      this.entryChanged('stack', evt.target.value, idx)
-                    }
-                    className="sp-padding-xs-xaxis"
-                  />
-                </td>
-                <td>
-                  <Field
-                    name="detail"
-                    type="text"
-                    value={entry.detail}
-                    onChange={(evt: React.ChangeEvent<HTMLInputElement>) =>
-                      this.entryChanged('detail', evt.target.value, idx)
-                    }
-                    className="sp-padding-xs-xaxis"
-                  />
-                </td>
-              </tr>
-            ))}
+                  </td>
+                  <td>
+                    <Field
+                      name="detail"
+                      type="text"
+                      value={entry.detail}
+                      onChange={(evt: React.ChangeEvent<HTMLInputElement>) =>
+                        this.entryChanged('detail', evt.target.value, idx)
+                      }
+                      className="sp-padding-xs-xaxis"
+                    />
+                  </td>
+                  <td>
+                    <button className="nostyle" onClick={() => this.deleteClusterEntry(idx)}>
+                      <i className="fas fa-trash-alt" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </table>
-        <button className="zombie sp-margin-m" onClick={this.createNewClusterEntry}>
+        <a className="button zombie sp-margin-m horizontal middle center" onClick={this.createNewClusterEntry}>
           <i className="fas fa-plus-circle" /> Add Cluster
-        </button>
+        </a>
       </section>
     );
   }

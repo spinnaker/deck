@@ -109,6 +109,7 @@ export class TaskMonitor {
   }
 
   public submit = (submitMethod?: () => IPromise<ITask>) => {
+    debugger;
     this.startSubmit();
     (submitMethod || this.submitMethod)()
       .then((task: ITask) => this.handleTaskSuccess(task))
@@ -116,6 +117,7 @@ export class TaskMonitor {
   };
 
   public callPreconfiguredSubmit(params: any) {
+    debugger;
     this.startSubmit();
     this.submitMethod(params)
       .then((task: ITask) => this.handleTaskSuccess(task))

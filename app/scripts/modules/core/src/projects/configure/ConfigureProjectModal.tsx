@@ -16,11 +16,13 @@ import {
   ReactModal,
   IProject,
   IProjectPipeline,
+  IProjectCluster,
 } from '@spinnaker/core';
 import { IApplicationSummary } from 'application';
 import { IPipelineTemplateConfig } from 'pipeline/config/templates/PipelineTemplateReader';
 
 import './ConfigureProjectModal.css';
+import { STAGE_FAILURE_MESSAGE_COMPONENT } from 'pipeline/details/stageFailureMessage.component';
 
 export interface IConfigureProjectModalProps extends IModalComponentProps {
   title: string;
@@ -28,7 +30,8 @@ export interface IConfigureProjectModalProps extends IModalComponentProps {
   command: {
     viewState: {
       applications: string[];
-      pipelineConfigs: { app: string; pipelineConfigId: string }[];
+      pipelineConfigs: IProjectPipeline[];
+      clusters: IProjectCluster[];
       attributes: { name: string; email: string };
     };
   };
@@ -37,10 +40,8 @@ export interface IConfigureProjectModalProps extends IModalComponentProps {
 export interface IConfigureProjectModalState {
   loaded: boolean;
   existingProjectNames: string[];
-  appPipelines: Map<string, string[]>;
+  appPipelines: Map<string, { name: string; id: string }[]>;
   allApplications: IApplicationSummary[];
-  selectedApplications: string[];
-  selectedPipelines: { app: string; pipelines: string[] }[];
 }
 
 export interface IUpsertProjectCommand {
@@ -71,35 +72,49 @@ export class ConfigureProjectModal extends React.Component<IConfigureProjectModa
     super(props);
     this.$state = ReactInjector.$state;
 
-    // TODO(archana): Set pipelines for app once you get existing apps
     this.state = {
       loaded: false,
       existingProjectNames: [],
       appPipelines: new Map(),
       allApplications: [],
-      selectedApplications: [],
-      selectedPipelines: [],
     };
   }
 
-  componentWillMount() {
-    this.fetchData();
+  componentDidMount() {
+    const { projectConfiguration } = this.props;
+    const applications = projectConfiguration && projectConfiguration.config.applications;
+    if (applications.length) {
+      this.fetchPipelinesForApps(applications);
+    }
+    this.fetchProjects();
     this.fetchApplicationsList();
   }
 
-  private submit = (command): void => {
-    const { projectConfiguration } = this.props;
-    // const project = {
-    //   id: projectConfiguration.id,
-    //   name: projectConfiguration.name
+  private submit = async (values: any) => {
+    debugger;
+    // const { projectConfiguration } = this.props;
+    // const { applications, pipelineConfigs, clusters, name, email } = values;
+    // const config = {
+    //   applications,
+    //   pipelineConfigs,
+    //   clusters
     // }
+
+    // const project = {
+    //   name,
+    //   id: projectConfiguration.id || null,
+    //   email,
+    //   config,
+    //   notFound: false
+    // }
+    // const result = await ProjectWriter.upsertProject(project);
   };
 
   private validate = () => {
     return {};
   };
 
-  private fetchData = async () => {
+  private fetchProjects = async () => {
     let projects = await ProjectReader.listProjects();
     this.setState({
       existingProjectNames: projects.map((project: IProject) => project.name),
@@ -114,35 +129,18 @@ export class ConfigureProjectModal extends React.Component<IConfigureProjectModa
     });
   };
 
-  private onAppsChange = async (selectedApplications: string[]) => {
-    this.setState(
-      {
-        selectedApplications,
-      },
-      () => {
-        this.fetchPipelinesForApps();
-      },
-    );
-  };
-
-  private fetchPipelinesForApps = async () => {
-    const { selectedApplications, appPipelines } = this.state;
-    selectedApplications.forEach(async (app: string) => {
+  private fetchPipelinesForApps = async (applications: string[]) => {
+    const { appPipelines } = this.state;
+    applications.forEach(async (app: string) => {
       if (!Object.keys(appPipelines).includes(app)) {
         const pipelineConfigs = await ApplicationReader.getPipelineConfigsForApp(app);
         this.setState({
           appPipelines: this.state.appPipelines.set(
             app,
-            pipelineConfigs.map((config: IPipelineTemplateConfig) => config.name),
+            pipelineConfigs.map((config: IPipelineTemplateConfig) => ({ name: config.name, id: config.id })),
           ),
         });
       }
-    });
-  };
-
-  private onPipelinesChange = async (selectedPipelines: { app: string; pipelines: string[] }[]) => {
-    this.setState({
-      selectedPipelines,
     });
   };
 
@@ -160,10 +158,20 @@ export class ConfigureProjectModal extends React.Component<IConfigureProjectModa
     const { dismissModal, title, projectConfiguration } = this.props;
     const { allApplications, appPipelines, loaded, taskMonitor } = this.state;
 
+    const initialValues =
+      (projectConfiguration && {
+        name: projectConfiguration.name,
+        email: projectConfiguration.email,
+        applications: projectConfiguration.config.applications,
+        pipelineConfigs: projectConfiguration.config.pipelineConfigs,
+        clusters: projectConfiguration.config.clusters,
+      }) ||
+      {};
+
     return (
       <WizardModal
         heading="Configure Project"
-        initialValues={{}}
+        initialValues={initialValues}
         loading={!loaded}
         taskMonitor={taskMonitor}
         dismissModal={dismissModal}
@@ -174,18 +182,24 @@ export class ConfigureProjectModal extends React.Component<IConfigureProjectModa
         <ProjectAttributes
           onDelete={this.onDelete}
           existingProjectNames={this.state.existingProjectNames}
-          configuration={{
-            name: projectConfiguration && projectConfiguration.name,
-            email: projectConfiguration && projectConfiguration.email,
-          }}
+          isNewProject={!projectConfiguration.id}
         />
+
         <Applications
           applications={projectConfiguration ? projectConfiguration.config.applications : []}
-          onChange={this.onAppsChange}
           allApplications={allApplications.map(app => app.name)}
+          onChange={this.fetchPipelinesForApps}
         />
-        <Clusters />
-        <Pipelines appsPipelinesMap={appPipelines} onChange={this.onPipelinesChange} />
+
+        <Clusters
+          entries={projectConfiguration ? projectConfiguration.config.clusters : []}
+          applications={Array.from(appPipelines.keys())}
+        />
+
+        <Pipelines
+          appsPipelinesMap={appPipelines}
+          entries={projectConfiguration ? projectConfiguration.config.pipelineConfigs : []}
+        />
       </WizardModal>
     );
   }

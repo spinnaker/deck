@@ -3,6 +3,7 @@ export interface IProjectCluster {
   stack: string;
   detail: string;
   applications: string[];
+  [key: string]: string | string[];
 }
 
 export interface IProjectPipeline {

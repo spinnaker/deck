@@ -17,10 +17,7 @@ interface IProjectAttributesState {
 export interface IProjectAttributesProps extends FormikProps<IProjectAttributes> {
   onDelete?: Function;
   existingProjectNames?: string[];
-  configuration?: {
-    name?: string;
-    email?: string;
-  };
+  isNewProject: boolean;
 }
 
 class ProjectAttributesImpl extends React.Component<
@@ -32,8 +29,8 @@ class ProjectAttributesImpl extends React.Component<
   constructor(props: IProjectAttributesProps & IWizardPageProps & FormikProps<IProjectAttributes>) {
     super(props);
     this.state = {
-      name: null,
-      email: null,
+      name: props.values ? props.values.name : null,
+      email: props.values ? props.values.email : null,
       showProjectDeleteForm: false,
     };
   }
@@ -50,11 +47,11 @@ class ProjectAttributesImpl extends React.Component<
 
   public validate(values: IProjectAttributes): { [key: string]: string } {
     const errors: { [key: string]: string } = {};
-    const { existingProjectNames } = this.props;
+    const { existingProjectNames, isNewProject } = this.props;
 
     if (values.name && !this.isValidName(values.name)) {
       errors.name = 'Project name cannot contain any of the following characters:  / % #';
-    } else if (values.name && existingProjectNames.includes(values.name)) {
+    } else if (values.name && existingProjectNames.includes(values.name) && isNewProject) {
       errors.name = 'Project name already exists.';
     }
 
@@ -62,7 +59,7 @@ class ProjectAttributesImpl extends React.Component<
       errors.email = 'Please enter a valid email address';
     }
 
-    if (values.projectNameForDeletion && values.projectNameForDeletion !== this.props.configuration.name) {
+    if (values.projectNameForDeletion && values.projectNameForDeletion !== this.props.values.name) {
       errors.projectNameForDeletion = 'Please enter the correct project name.';
     }
 
@@ -84,7 +81,7 @@ class ProjectAttributesImpl extends React.Component<
                 <Field
                   type="text"
                   name="name"
-                  value={this.props.configuration.name && this.props.configuration.name}
+                  value={values.name && values.name}
                   className={`form-control input-sm ${errors.name && 'error'}`}
                   required={true}
                   placeholder="Project Name"
@@ -105,7 +102,7 @@ class ProjectAttributesImpl extends React.Component<
                 <Field
                   type="email"
                   name="email"
-                  value={this.props.configuration.email && this.props.configuration.email}
+                  value={values.email && values.email}
                   className={`form-control input-sm ${errors.email && 'error'}`}
                   placeholder="Enter an email address"
                   required={true}
@@ -139,12 +136,11 @@ class ProjectAttributesImpl extends React.Component<
                     <button className="passive" ng-click="viewState.deleteProject = false">
                       Cancel
                     </button>
-                    {this.props.configuration.name && (
+                    {this.props.values.name && (
                       <button
                         className="primary"
                         disabled={
-                          !values.projectNameForDeletion ||
-                          values.projectNameForDeletion !== this.props.configuration.name
+                          !values.projectNameForDeletion || values.projectNameForDeletion !== this.props.values.name
                         }
                         onClick={() => onDelete()}
                       >
