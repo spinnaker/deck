@@ -1,11 +1,11 @@
 import * as React from 'react';
 import Select from 'react-select';
+import { Field, FormikErrors } from 'formik';
+
 import { NgReact } from 'core/reactShims';
-import { Field, FormikProps } from 'formik';
-
-import { AccountService, IAccountDetails, IWizardPageProps, wizardPage } from '@spinnaker/core';
-
-import { IProjectCluster } from 'domain/IProject';
+import { AccountService, IAccountDetails } from 'core/account';
+import { IWizardPageProps, wizardPage } from 'core/modal';
+import { IProjectCluster } from 'core/domain';
 
 import './Clusters.css';
 
@@ -15,15 +15,15 @@ interface IClustersState {
   accounts: IAccountDetails[];
 }
 
-export interface IClustersProps extends FormikProps<{}> {
+export interface IClustersProps extends IWizardPageProps<any> {
   entries: IProjectCluster[];
   applications: string[];
 }
 
-class ClustersImpl extends React.Component<IClustersProps & IWizardPageProps & FormikProps<{}>, IClustersState> {
+class ClustersImpl extends React.Component<IClustersProps, IClustersState> {
   public static LABEL = 'Clusters';
 
-  constructor(props: IClustersProps & IWizardPageProps & FormikProps<{}>) {
+  constructor(props: IClustersProps) {
     super(props);
     this.state = {
       clusterEntries: props.entries || [],
@@ -39,11 +39,11 @@ class ClustersImpl extends React.Component<IClustersProps & IWizardPageProps & F
     });
   }
 
-  public validate = (): { [key: string]: string } => {
-    return {};
+  public validate = () => {
+    return {} as FormikErrors<any>;
   };
 
-  private entryChanged = (type: string, value: string, i: number, appIdx: number = -1) => {
+  private entryChanged = (type: string, value: string, i: number, appIdx = -1) => {
     const { clusterEntries } = this.state;
     if (appIdx > -1 && type === 'applications') {
       clusterEntries[i].applications.splice(appIdx, 1, value);
@@ -53,7 +53,7 @@ class ClustersImpl extends React.Component<IClustersProps & IWizardPageProps & F
     this.setState({
       clusterEntries,
     });
-    this.props.setFieldValue('clusters', clusterEntries);
+    this.props.formik.setFieldValue('clusters', clusterEntries);
   };
 
   private addNewApplication = (idx: number) => {
@@ -93,7 +93,7 @@ class ClustersImpl extends React.Component<IClustersProps & IWizardPageProps & F
     this.setState({
       clusterEntries,
     });
-    this.props.setFieldValue('clusters', clusterEntries);
+    this.props.formik.setFieldValue('clusters', clusterEntries);
   };
 
   public render() {
@@ -210,4 +210,4 @@ class ClustersImpl extends React.Component<IClustersProps & IWizardPageProps & F
   }
 }
 
-export const Clusters = wizardPage<IClustersProps>(ClustersImpl);
+export const Clusters = wizardPage(ClustersImpl);

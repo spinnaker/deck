@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { FormikProps, Field } from 'formik';
+import * as classNames from 'classnames';
+import { Field, FormikErrors } from 'formik';
 import { IWizardPageProps, wizardPage } from '@spinnaker/core';
 
 interface IProjectAttributes {
@@ -14,23 +15,22 @@ interface IProjectAttributesState {
   showProjectDeleteForm: boolean;
 }
 
-export interface IProjectAttributesProps extends FormikProps<IProjectAttributes> {
+export interface IProjectAttributesProps extends IWizardPageProps<IProjectAttributes> {
   onDelete?: Function;
   existingProjectNames?: string[];
   isNewProject: boolean;
 }
 
-class ProjectAttributesImpl extends React.Component<
-  IProjectAttributesProps & IWizardPageProps & FormikProps<IProjectAttributes>,
-  IProjectAttributesState
-> {
+class ProjectAttributesImpl extends React.Component<IProjectAttributesProps, IProjectAttributesState> {
   public static LABEL = 'Project Attributes';
 
-  constructor(props: IProjectAttributesProps & IWizardPageProps & FormikProps<IProjectAttributes>) {
+  constructor(props: IProjectAttributesProps) {
     super(props);
+    const { values } = props.formik;
+
     this.state = {
-      name: props.values ? props.values.name : null,
-      email: props.values ? props.values.email : null,
+      name: values ? values.name : null,
+      email: values ? values.email : null,
       showProjectDeleteForm: false,
     };
   }
@@ -45,8 +45,8 @@ class ProjectAttributesImpl extends React.Component<
     return email.match(emailPattern);
   };
 
-  public validate(values: IProjectAttributes): { [key: string]: string } {
-    const errors: { [key: string]: string } = {};
+  public validate(values: IProjectAttributes) {
+    const errors: FormikErrors<IProjectAttributes> = {};
     const { existingProjectNames, isNewProject } = this.props;
 
     if (values.name && !this.isValidName(values.name)) {
@@ -59,7 +59,7 @@ class ProjectAttributesImpl extends React.Component<
       errors.email = 'Please enter a valid email address';
     }
 
-    if (values.projectNameForDeletion && values.projectNameForDeletion !== this.props.values.name) {
+    if (values.projectNameForDeletion && values.projectNameForDeletion !== values.name) {
       errors.projectNameForDeletion = 'Please enter the correct project name.';
     }
 
@@ -67,7 +67,14 @@ class ProjectAttributesImpl extends React.Component<
   }
 
   public render() {
-    const { errors, setFieldValue, values, onDelete } = this.props;
+    const { onDelete } = this.props;
+    const { errors, setFieldValue, values } = this.props.formik;
+
+    const deleteButtonClassName = classNames({
+      button: true,
+      primary: true,
+      disabled: !values.projectNameForDeletion || values.projectNameForDeletion !== values.name,
+    });
 
     return (
       <div className="form-horizontal">
@@ -136,16 +143,10 @@ class ProjectAttributesImpl extends React.Component<
                     <a className="button passive" ng-click="viewState.deleteProject = false">
                       Cancel
                     </a>
-                    {this.props.values.name && (
-                      <a
-                        className="button primary"
-                        disabled={
-                          !values.projectNameForDeletion || values.projectNameForDeletion !== this.props.values.name
-                        }
-                        onClick={() => onDelete()}
-                      >
+                    {values.name && (
+                      <button className={deleteButtonClassName} onClick={() => onDelete()}>
                         <span className="glyphicon glyphicon-trash" /> Delete project
-                      </a>
+                      </button>
                     )}
                   </div>
                 </div>
@@ -162,4 +163,4 @@ class ProjectAttributesImpl extends React.Component<
   }
 }
 
-export const ProjectAttributes = wizardPage<IProjectAttributesProps>(ProjectAttributesImpl);
+export const ProjectAttributes = wizardPage(ProjectAttributesImpl);

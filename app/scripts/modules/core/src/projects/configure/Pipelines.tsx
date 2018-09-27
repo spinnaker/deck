@@ -1,30 +1,31 @@
 import * as React from 'react';
-import { FormikProps } from 'formik';
-import { IWizardPageProps, wizardPage } from '@spinnaker/core';
 import Select from 'react-select';
+import { FormikErrors } from 'formik';
+
+import { IWizardPageProps, wizardPage } from 'core/modal';
+import { IProjectPipeline } from 'core/domain';
 
 import './Pipelines.css';
-import { IProjectPipeline } from 'domain/IProject';
 
 interface IProjectPipelineWithName extends IProjectPipeline {
   pipelineName: string;
 }
 
-interface IPipelinesState {
-  pipelines: IProjectPipelineWithName[];
-  pipelinesToShowForSelectedApp: { name: string; id: string }[];
-  selectedApp: string;
-}
-
-export interface IPipelinesProps extends FormikProps<{}> {
-  appsPipelinesMap?: Map<string, { name: string; id: string }[]>;
+export interface IPipelinesProps extends IWizardPageProps<{}> {
+  appsPipelinesMap?: Map<string, Array<{ name: string; id: string }>>;
   entries?: IProjectPipeline[];
 }
 
-class PipelinesImpl extends React.Component<IPipelinesProps & IWizardPageProps & FormikProps<{}>, IPipelinesState> {
+interface IPipelinesState {
+  pipelines: IProjectPipelineWithName[];
+  pipelinesToShowForSelectedApp: Array<{ name: string; id: string }>;
+  selectedApp: string;
+}
+
+class PipelinesImpl extends React.Component<IPipelinesProps, IPipelinesState> {
   public static LABEL = 'Pipelines';
 
-  constructor(props: IPipelinesProps & IWizardPageProps & FormikProps<{}>) {
+  constructor(props: IPipelinesProps) {
     super(props);
     this.state = {
       pipelines: props.entries ? this.hydrateEntriesWithPipelineNames(props.entries) : [],
@@ -38,6 +39,7 @@ class PipelinesImpl extends React.Component<IPipelinesProps & IWizardPageProps &
       const pipelineName = this.props.appsPipelinesMap
         .get(entry.application)
         .filter(pipeline => pipeline.id === entry.pipelineConfigId)[0].name;
+
       return {
         ...entry,
         pipelineName,
@@ -90,7 +92,7 @@ class PipelinesImpl extends React.Component<IPipelinesProps & IWizardPageProps &
     this.setState({
       pipelines,
     });
-    this.props.setFieldValue('pipelineConfigs', pipelines);
+    this.props.formik.setFieldValue('pipelineConfigs', pipelines);
   };
 
   private removePipelineEntry = (idx: number) => {
@@ -99,11 +101,11 @@ class PipelinesImpl extends React.Component<IPipelinesProps & IWizardPageProps &
     this.setState({
       pipelines,
     });
-    this.props.setFieldValue('pipelineConfigs', pipelines);
+    this.props.formik.setFieldValue('pipelineConfigs', pipelines);
   };
 
-  public validate = (): { [key: string]: string } => {
-    return {};
+  public validate = () => {
+    return {} as FormikErrors<{}>;
   };
 
   public render() {
@@ -174,4 +176,4 @@ class PipelinesImpl extends React.Component<IPipelinesProps & IWizardPageProps &
   }
 }
 
-export const Pipelines = wizardPage<IPipelinesProps>(PipelinesImpl);
+export const Pipelines = wizardPage(PipelinesImpl);

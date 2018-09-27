@@ -6,21 +6,14 @@ import * as React from 'react';
 import { ProjectReader } from '../service/ProjectReader';
 import { ProjectWriter } from '../service/ProjectWriter';
 import { ApplicationReader } from 'core/application/service/ApplicationReader';
-import { StateService } from '@uirouter/core';
 
-import {
-  ReactInjector,
-  WizardModal,
-  IModalComponentProps,
-  noop,
-  ReactModal,
-  IProject,
-  IProjectPipeline,
-  IProjectCluster,
-  TaskMonitor,
-} from '@spinnaker/core';
-import { IApplicationSummary } from 'application';
-import { IPipelineTemplateConfig } from 'pipeline/config/templates/PipelineTemplateReader';
+import { WizardModal } from 'core/modal';
+import { IModalComponentProps, ReactModal } from 'core/presentation';
+import { noop } from 'core/utils';
+import { IProject, IProjectPipeline, IProjectCluster } from 'core/domain';
+import { TaskMonitor } from 'core/task';
+import { IApplicationSummary } from 'core/application';
+import { IPipelineTemplateConfig } from 'core/pipeline/config/templates/PipelineTemplateReader';
 
 import './ConfigureProjectModal.css';
 
@@ -40,7 +33,7 @@ export interface IConfigureProjectModalProps extends IModalComponentProps {
 export interface IConfigureProjectModalState {
   loaded: boolean;
   existingProjectNames: string[];
-  appPipelines: Map<string, { name: string; id: string }[]>;
+  appPipelines: Map<string, Array<{ name: string; id: string }>>;
   allApplications: IApplicationSummary[];
   taskMonitor: TaskMonitor;
 }
@@ -83,7 +76,7 @@ export class ConfigureProjectModal extends React.Component<IConfigureProjectModa
     };
   }
 
-  componentDidMount() {
+  public componentDidMount() {
     const { projectConfiguration } = this.props;
     const applications = projectConfiguration && projectConfiguration.config.applications;
     if (applications.length) {
@@ -120,7 +113,7 @@ export class ConfigureProjectModal extends React.Component<IConfigureProjectModa
   };
 
   private fetchProjects = async () => {
-    let projects = await ProjectReader.listProjects();
+    const projects = await ProjectReader.listProjects();
     this.setState({
       existingProjectNames: projects.map((project: IProject) => project.name),
       loaded: true,

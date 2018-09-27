@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { FormikProps } from 'formik';
+import { FormikErrors } from 'formik';
 import { IWizardPageProps, wizardPage } from '@spinnaker/core';
 import VirtualizedSelect from 'react-virtualized-select';
 
@@ -13,19 +13,16 @@ interface IApplicationsState {
   applications: string[];
 }
 
-export interface IApplicationsProps extends FormikProps<IApplications> {
+export interface IApplicationsProps extends IWizardPageProps<IApplications> {
   applications?: string[];
   allApplications: string[];
   onChange: Function;
 }
 
-class ApplicationsImpl extends React.Component<
-  IApplicationsProps & IWizardPageProps & FormikProps<IApplications>,
-  IApplicationsState
-> {
+class ApplicationsImpl extends React.Component<IApplicationsProps, IApplicationsState> {
   public static LABEL = 'Applications';
 
-  constructor(props: IApplicationsProps & IWizardPageProps & FormikProps<IApplications>) {
+  constructor(props: IApplicationsProps) {
     super(props);
     this.state = {
       applications: this.props.applications || [],
@@ -36,7 +33,7 @@ class ApplicationsImpl extends React.Component<
     await this.setState({
       applications: this.state.applications.concat(app),
     });
-    this.props.setFieldValue('applications', this.state.applications);
+    this.props.formik.setFieldValue('applications', this.state.applications);
     this.props.onChange(this.state.applications);
   };
 
@@ -44,12 +41,12 @@ class ApplicationsImpl extends React.Component<
     await this.setState({
       applications: this.state.applications.filter(application => application !== app),
     });
-    this.props.setFieldValue('applications', this.state.applications);
+    this.props.formik.setFieldValue('applications', this.state.applications);
   };
 
-  public validate = (): { [key: string]: string } => {
-    return {};
-  };
+  public validate(_values: IApplications) {
+    return {} as FormikErrors<IApplications>;
+  }
 
   public render() {
     const { applications } = this.state;
@@ -88,4 +85,4 @@ class ApplicationsImpl extends React.Component<
   }
 }
 
-export const Applications = wizardPage<IApplicationsProps>(ApplicationsImpl);
+export const Applications = wizardPage(ApplicationsImpl);

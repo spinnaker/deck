@@ -1,16 +1,17 @@
+import * as React from 'react';
+
+import '@uirouter/rx';
 import { Transition } from '@uirouter/core';
 import { UISref, UIView } from '@uirouter/react';
-import '@uirouter/rx';
 import { IModalService } from 'angular-ui-bootstrap';
-import { ReactInjector } from 'core';
-import { IProject } from 'core/domain';
-
-import { SpanDropdownTrigger } from 'core/presentation';
-import { ConfigureProjectModal } from 'core/projects/configure/ConfigureProjectModal';
-import * as React from 'react';
 import { Dropdown, MenuItem } from 'react-bootstrap';
 import { Subject } from 'rxjs';
 import { $injector } from 'ngimport';
+
+import { ReactInjector } from 'core/reactShims';
+import { IProject } from 'core/domain';
+import { SpanDropdownTrigger } from 'core/presentation';
+import { ConfigureProjectModal } from 'core/projects/configure/ConfigureProjectModal';
 
 export interface IProjectHeaderProps {
   projectConfiguration: IProject;
@@ -28,7 +29,8 @@ export class ProjectHeader extends React.Component<IProjectHeaderProps, IProject
   private destroy$ = new Subject();
 
   public componentDidMount() {
-    this.props.transition.router.globals.success$.takeUntil(this.destroy$).subscribe(success => {
+    const { success$ } = this.props.transition.router.globals;
+    success$.takeUntil(this.destroy$).subscribe(success => {
       const state = success.to().name;
       const application = success.params().application;
       this.setState({ state, application });
@@ -71,7 +73,8 @@ export class ProjectHeader extends React.Component<IProjectHeaderProps, IProject
     const { $state } = ReactInjector;
     const title = 'Configure project';
 
-    ConfigureProjectModal.show({ title, projectConfiguration }).then(result => {
+    // TODO: pass a command, I guess?
+    ConfigureProjectModal.show({ title, projectConfiguration, command: null }).then(result => {
       if (result.action === 'delete') {
         $state.go('home.infrastructure');
       } else if (result.action === 'upsert') {
@@ -138,9 +141,9 @@ export class ProjectHeader extends React.Component<IProjectHeaderProps, IProject
                     </UISref>
                     <MenuItem divider={true} />
                     {config.applications &&
-                      config.applications.map(application => (
-                        <UISref key={application} to=".application" params={{ application }}>
-                          <MenuItem onClick={closeDropdown}> {application} </MenuItem>
+                      config.applications.map(app => (
+                        <UISref key={app} to=".application" params={{ application: app }}>
+                          <MenuItem onClick={closeDropdown}> {app} </MenuItem>
                         </UISref>
                       ))}
                   </Dropdown.Menu>
