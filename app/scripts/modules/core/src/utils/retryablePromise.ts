@@ -1,4 +1,5 @@
 import { IPromise } from 'angular';
+import { $timeout } from 'ngimport';
 
 export interface IRetryablePromise<T> {
   cancel: () => void;
@@ -12,14 +13,14 @@ export const retryablePromise: <T>(closure: () => IPromise<T>, interval?: number
   let currentTimeout: IPromise<T>;
   const retryPromise: () => IPromise<T> = () =>
     closure().catch(() => {
-      currentTimeout = this.$timeout(retryPromise, interval);
+      currentTimeout = $timeout(retryPromise, interval);
       return currentTimeout;
     });
 
   const promise = retryPromise();
   const cancel = () => {
     if (currentTimeout) {
-      this.$timeout.cancel(currentTimeout);
+      $timeout.cancel(currentTimeout);
     }
   };
   return { promise, cancel };
