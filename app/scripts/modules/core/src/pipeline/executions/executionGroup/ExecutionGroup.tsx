@@ -14,6 +14,7 @@ import { Popover } from 'core/presentation/Popover';
 import { ExecutionState } from 'core/state';
 import { PipelineConfigService } from 'core/pipeline/config/services/PipelineConfigService';
 
+import { SETTINGS } from 'core';
 import { TriggersTag } from 'core/pipeline/triggers/TriggersTag';
 import { AccountTag } from 'core/account';
 import { ModalInjector, ReactInjector } from 'core/reactShims';
@@ -114,13 +115,21 @@ export class ExecutionGroup extends React.Component<IExecutionGroupProps, IExecu
   private startPipeline(command: IPipelineCommand): IPromise<void> {
     const { executionService } = ReactInjector;
     this.setState({ triggeringExecution: true });
-    return PipelineConfigService.triggerPipeline(
-      this.props.application.name,
-      command.pipelineName,
-      command.trigger,
-    ).then(
-      newPipelineId => {
-        const monitor = executionService.waitUntilNewTriggeredPipelineAppears(this.props.application, newPipelineId);
+
+    let triggerFunction: (app: string, pipeline: string, trigger: any) => IPromise<string>;
+    let monitorFunction: (id: string) => IPromise<any>;
+    if (SETTINGS.feature.triggerViaEcho) {
+      triggerFunction = PipelineConfigService.triggerPipelineViaEcho.bind(PipelineConfigService);
+      monitorFunction = eventId => executionService.waitUntilPipelineAppearsForEventId(this.props.application, eventId);
+    } else {
+      triggerFunction = PipelineConfigService.triggerPipeline.bind(PipelineConfigService);
+      monitorFunction = newPipelineId =>
+        executionService.waitUntilNewTriggeredPipelineAppears(this.props.application, newPipelineId);
+    }
+
+    return triggerFunction(this.props.application.name, command.pipelineName, command.trigger).then(
+      triggerResult => {
+        const monitor = monitorFunction(triggerResult);
         monitor.then(() => this.setState({ triggeringExecution: false }));
         this.setState({ poll: monitor });
       },
@@ -217,12 +226,12 @@ export class ExecutionGroup extends React.Component<IExecutionGroupProps, IExecu
     );
     const groupTargetAccountLabels: React.ReactNode[] = [];
     let groupTargetAccountLabelsExtra: React.ReactNode[] = [];
-    if (group.targetAccounts.length > 0) {
+    if (group.targetAccounts && group.targetAccounts.length > 0) {
       group.targetAccounts.slice(0, ACCOUNT_TAG_OVERFLOW_LIMIT).map(account => {
         groupTargetAccountLabels.push(<AccountTag key={account} account={account} />);
       });
     }
-    if (group.targetAccounts.length > ACCOUNT_TAG_OVERFLOW_LIMIT) {
+    if (group.targetAccounts && group.targetAccounts.length > ACCOUNT_TAG_OVERFLOW_LIMIT) {
       groupTargetAccountLabels.push(
         <span
           key="foo"
