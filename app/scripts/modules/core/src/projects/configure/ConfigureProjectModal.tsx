@@ -124,11 +124,7 @@ export class ConfigureProjectModal extends React.Component<IConfigureProjectModa
         submitButtonLabel="Save"
         validate={this.validate}
       >
-        <ProjectAttributes
-          onDelete={this.onDelete}
-          allProjects={this.state.allProjects}
-          done={!!(projectConfiguration.name && projectConfiguration.email)}
-        />
+        <ProjectAttributes allProjects={this.state.allProjects} onDelete={this.onDelete} done={true} />
 
         <Applications
           applications={projectConfiguration ? projectConfiguration.config.applications : []}

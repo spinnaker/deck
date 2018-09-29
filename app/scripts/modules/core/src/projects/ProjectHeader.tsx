@@ -73,8 +73,7 @@ export class ProjectHeader extends React.Component<IProjectHeaderProps, IProject
     const { $state } = ReactInjector;
     const title = 'Configure project';
 
-    // TODO: pass a command, I guess?
-    ConfigureProjectModal.show({ title, projectConfiguration, command: null }).then(result => {
+    ConfigureProjectModal.show({ title, projectConfiguration }).then(result => {
       if (result.action === 'delete') {
         $state.go('home.infrastructure');
       } else if (result.action === 'upsert') {

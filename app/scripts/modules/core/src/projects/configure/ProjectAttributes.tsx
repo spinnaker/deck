@@ -1,164 +1,130 @@
 import * as React from 'react';
-import * as classNames from 'classnames';
-import { Field, FormikErrors } from 'formik';
-import { IWizardPageProps, wizardPage } from '@spinnaker/core';
+import { FormikErrors } from 'formik';
+import { IProject } from 'core/domain';
+import { IWizardPageProps, wizardPage } from 'core/modal';
+import { FormField, FormikFormField, TextInput } from 'core/presentation';
 
-interface IProjectAttributes {
-  name?: string;
-  email?: string;
-  projectNameForDeletion?: string;
+export interface IProjectAttributesProps extends IWizardPageProps<IProject> {
+  onDelete?: Function;
+  allProjects: IProject[];
 }
 
 interface IProjectAttributesState {
-  name?: string;
-  email?: string;
   showProjectDeleteForm: boolean;
-}
-
-export interface IProjectAttributesProps extends IWizardPageProps<IProjectAttributes> {
-  onDelete?: Function;
-  existingProjectNames?: string[];
-  isNewProject: boolean;
+  projectNameForDeletion: string;
 }
 
 class ProjectAttributesImpl extends React.Component<IProjectAttributesProps, IProjectAttributesState> {
   public static LABEL = 'Project Attributes';
 
-  constructor(props: IProjectAttributesProps) {
-    super(props);
-    const { values } = props.formik;
+  public state = {
+    showProjectDeleteForm: false,
+    projectNameForDeletion: null as string,
+  };
 
-    this.state = {
-      name: values ? values.name : null,
-      email: values ? values.email : null,
-      showProjectDeleteForm: false,
+  public validate(values: IProject) {
+    const errors: FormikErrors<IProject> = {};
+
+    const isValidName = (name: string) => {
+      const namePattern = /^[^\\\^/^?^%^#]*$/;
+      return name.match(namePattern);
     };
-  }
 
-  private isValidName = (name: string) => {
-    const namePattern = /^[^\\\^/^?^%^#]*$/;
-    return name.match(namePattern);
-  };
+    const isValidEmail = (email: string) => {
+      const emailPattern = /^(.+)\@(.+).([A-Za-z]{2,6})/;
+      return email.match(emailPattern);
+    };
 
-  private isValidEmail = (email: string) => {
-    const emailPattern = /^(.+)\@(.+).([A-Za-z]{2,6})/;
-    return email.match(emailPattern);
-  };
+    const { allProjects } = this.props;
+    const allProjectNames = allProjects.map(project => project.name.toLowerCase());
 
-  public validate(values: IProjectAttributes) {
-    const errors: FormikErrors<IProjectAttributes> = {};
-    const { existingProjectNames, isNewProject } = this.props;
-
-    if (values.name && !this.isValidName(values.name)) {
+    if (!values.name) {
+      errors.name = 'Please enter a project name';
+    } else if (!isValidName(values.name)) {
       errors.name = 'Project name cannot contain any of the following characters:  / % #';
-    } else if (values.name && existingProjectNames.includes(values.name) && isNewProject) {
-      errors.name = 'Project name already exists.';
+    } else if (allProjectNames.includes(values.name.toLowerCase())) {
+      errors.name = 'There is already a project with that name';
     }
 
-    if (values.email && !this.isValidEmail(values.email)) {
+    if (!values.email) {
+      errors.email = 'Please enter an email address';
+    } else if (values.email && !isValidEmail(values.email)) {
       errors.email = 'Please enter a valid email address';
-    }
-
-    if (values.projectNameForDeletion && values.projectNameForDeletion !== values.name) {
-      errors.projectNameForDeletion = 'Please enter the correct project name.';
     }
 
     return errors;
   }
 
-  public render() {
+  private DeleteConfirmation = ({ projectName }: { projectName: string }) => {
     const { onDelete } = this.props;
-    const { errors, setFieldValue, values } = this.props.formik;
+    const { projectNameForDeletion } = this.state;
+    const matchError = projectNameForDeletion !== projectName;
 
-    const deleteButtonClassName = classNames({
-      button: true,
-      primary: true,
-      disabled: !values.projectNameForDeletion || values.projectNameForDeletion !== values.name,
-    });
+    const handleCancelClicked = () => this.setState({ showProjectDeleteForm: false, projectNameForDeletion: null });
 
     return (
-      <div className="form-horizontal">
-        <div className="modal-body">
-          <div className="form-group">
-            <div className="col-md-3 sm-label-right">
-              <b>Project Name</b>
-            </div>
-            <div className="col-md-7 sp-form">
-              <div className="field">
-                <Field
-                  type="text"
-                  name="name"
-                  value={values.name && values.name}
-                  className={`form-control input-sm ${errors.name && 'error'}`}
-                  required={true}
-                  placeholder="Project Name"
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFieldValue('name', e.target.value)}
-                />
-                {errors.name && <div className="error sp-message">{errors.name}</div>}
-              </div>
-            </div>
-          </div>
+      <div className="well">
+        <p>{`Type the name of the project (${projectName}) below to continue.`}</p>
 
-          <div className="form-group">
-            <div className="col-md-3 sm-label-right">
-              <b>Owner Email</b>
-            </div>
+        <FormField
+          input={inputProps => <TextInput {...inputProps} id="projectNameForDeletion" placeholder="Project Name" />}
+          value={projectNameForDeletion || ''}
+          onChange={evt => this.setState({ projectNameForDeletion: evt.target.value })}
+          validate={() => matchError && 'Project name does not match'}
+          touched={projectNameForDeletion != null}
+          required={true}
+        />
 
-            <div className="col-md-7 sp-form">
-              <div className="field">
-                <Field
-                  type="email"
-                  name="email"
-                  value={values.email && values.email}
-                  className={`form-control input-sm ${errors.email && 'error'}`}
-                  placeholder="Enter an email address"
-                  required={true}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFieldValue('email', e.target.value)}
-                />
-                {errors.email && <div className="error sp-message">Please enter a valid email address.</div>}
-              </div>
-            </div>
-          </div>
-        </div>
+        <div className="sp-margin-m-top sp-group-margin-s-xaxis">
+          <button type="button" className="passive" onClick={handleCancelClicked}>
+            Cancel
+          </button>
 
-        <div className="sp-margin-l-xaxis">
-          {this.state.showProjectDeleteForm ? (
-            <div className="form-group well" ng-if="viewState.deleteProject">
-              <div className="col-md-12">
-                <p>{`Type the name of the project (${values.name}) below to continue.`}</p>
-                <div className="form-group">
-                  <Field
-                    type="text"
-                    name="projectNameForDeletion"
-                    className={`form-control input-sm highlight-pristine ${errors.email && 'error'}`}
-                    placeholder="Project Name"
-                    required={true}
-                  />
-                  {errors.projectNameForDeletion && (
-                    <div className="error sp-message">{errors.projectNameForDeletion}</div>
-                  )}
-                </div>
-                <div className="form-group">
-                  <div className="sp-group-margin-xs-xaxis">
-                    <a className="button passive" ng-click="viewState.deleteProject = false">
-                      Cancel
-                    </a>
-                    {values.name && (
-                      <button className={deleteButtonClassName} onClick={() => onDelete()}>
-                        <span className="glyphicon glyphicon-trash" /> Delete project
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <a className="btn btn-default btn-sm" onClick={() => this.setState({ showProjectDeleteForm: true })}>
-              <span className="glyphicon glyphicon-trash" /> Delete Project
-            </a>
-          )}
+          <button type="button" className="primary" disabled={matchError} onClick={() => onDelete()}>
+            <span className="glyphicon glyphicon-trash" /> Delete project
+          </button>
         </div>
       </div>
+    );
+  };
+
+  private DeleteButton = () => {
+    const handleDeleteClicked = () => {
+      this.setState({ showProjectDeleteForm: true }, () => document.getElementById('projectNameForDeletion').focus());
+    };
+    return (
+      <button className="btn btn-default btn-sm" onClick={handleDeleteClicked}>
+        <span className="glyphicon glyphicon-trash" /> Delete Project
+      </button>
+    );
+  };
+
+  public render() {
+    const { formik } = this.props;
+    const { DeleteConfirmation, DeleteButton } = this;
+
+    return (
+      <>
+        <div className="sp-margin-m-bottom">
+          <FormikFormField
+            input={props => <TextInput {...props} placeholder="Project Name" />}
+            name="name"
+            label="Project Name"
+            required={true}
+          />
+        </div>
+
+        <div className="sp-margin-m-bottom">
+          <FormikFormField
+            input={props => <TextInput {...props} placeholder="Enter an email address" />}
+            name="email"
+            label="Owner Email"
+            required={true}
+          />
+        </div>
+
+        {this.state.showProjectDeleteForm ? <DeleteConfirmation projectName={formik.values.name} /> : <DeleteButton />}
+      </>
     );
   }
 }
