@@ -1,9 +1,9 @@
-import * as React from 'react';
-import Select from 'react-select';
-import { FormikErrors } from 'formik';
+import { IPipeline, IProjectPipeline } from 'core/domain';
 
 import { IWizardPageProps, wizardPage } from 'core/modal';
-import { IProjectPipeline } from 'core/domain';
+import { FormikErrors } from 'formik';
+import * as React from 'react';
+import Select from 'react-select';
 
 import './Pipelines.css';
 
@@ -12,7 +12,9 @@ interface IProjectPipelineWithName extends IProjectPipeline {
 }
 
 export interface IPipelinesProps extends IWizardPageProps<{}> {
-  appsPipelinesMap?: Map<string, Array<{ name: string; id: string }>>;
+  appsPipelines: {
+    [appName: string]: IPipeline[];
+  };
   entries?: IProjectPipeline[];
 }
 
@@ -36,50 +38,40 @@ class PipelinesImpl extends React.Component<IPipelinesProps, IPipelinesState> {
 
   private hydrateEntriesWithPipelineNames = (entries: IProjectPipeline[]): IProjectPipelineWithName[] => {
     return entries.map(entry => {
-      const pipelineName = this.props.appsPipelinesMap
-        .get(entry.application)
-        .filter(pipeline => pipeline.id === entry.pipelineConfigId)[0].name;
-
-      return {
-        ...entry,
-        pipelineName,
-      };
+      const appPipelines = this.props.appsPipelines[entry.application];
+      const foundPipeline = appPipelines.find(pipeline => pipeline.id === entry.pipelineConfigId);
+      const pipelineName = foundPipeline && foundPipeline.name;
+      return { ...entry, pipelineName };
     });
   };
 
   private addNewRow = () => {
-    const appToShow = this.props.appsPipelinesMap.size && Array.from(this.props.appsPipelinesMap.keys())[0];
+    const { appsPipelines } = this.props;
+    const selectedApp = Object.keys(appsPipelines)[0];
 
-    const { pipelines } = this.state;
-
-    pipelines.push({
-      application: appToShow,
+    const newRow: IProjectPipelineWithName = {
+      application: selectedApp,
       pipelineConfigId: null,
       pipelineName: null,
-    });
+    };
+    const pipelines = this.state.pipelines.concat(newRow);
 
-    this.setState({
-      pipelinesToShowForSelectedApp: this.props.appsPipelinesMap
-        .get(appToShow)
-        .map(item => ({ name: item.name, id: item.id })),
-      selectedApp: appToShow,
-      pipelines,
-    });
+    const pipelinesToShowForSelectedApp = appsPipelines[selectedApp].map(item => ({ name: item.name, id: item.id }));
+
+    this.setState({ pipelinesToShowForSelectedApp, selectedApp, pipelines });
   };
 
-  private setPipelinesForApp = (app: string, idx: number) => {
-    const listOfPipelinesForApp = this.props.appsPipelinesMap.get(app);
+  private setPipelinesForApp = (selectedApp: string, idx: number) => {
+    const listOfPipelinesForApp = this.props.appsPipelines[selectedApp];
     const { pipelines } = this.state;
-    pipelines[idx].application = app;
+    pipelines[idx].application = selectedApp;
 
-    this.setState({
-      pipelinesToShowForSelectedApp: listOfPipelinesForApp.map(({ name, id }) => ({
-        name,
-        id,
-      })),
-      selectedApp: app,
-      pipelines,
-    });
+    const pipelinesToShowForSelectedApp = listOfPipelinesForApp.map(({ name, id }) => ({
+      name,
+      id,
+    }));
+
+    this.setState({ pipelinesToShowForSelectedApp, selectedApp, pipelines });
   };
 
   private updatePipelineEntry = (idx: number, application: string, pipelineConfigId: string, pipelineName: string) => {
@@ -109,12 +101,13 @@ class PipelinesImpl extends React.Component<IPipelinesProps, IPipelinesState> {
   };
 
   public render() {
-    const { appsPipelinesMap } = this.props;
+    const { appsPipelines } = this.props;
     const { pipelines } = this.state;
+    const hasAppsPipelines = Object.keys(appsPipelines).length;
 
     return (
       <div className="Pipelines vertical center">
-        {appsPipelinesMap.size ? (
+        {hasAppsPipelines ? (
           <div className="vertical center" style={{ width: '100%' }}>
             {pipelines.length && (
               <table style={{ width: '100%' }}>
@@ -131,7 +124,7 @@ class PipelinesImpl extends React.Component<IPipelinesProps, IPipelinesState> {
                       <tr key={`${pipelineEntry.application}~${pipelineEntry.pipelineConfigId}`}>
                         <td>
                           <Select
-                            options={Array.from(appsPipelinesMap.keys()).map(appName => ({
+                            options={Object.keys(appsPipelines).map(appName => ({
                               label: appName,
                               value: appName,
                             }))}
@@ -142,7 +135,7 @@ class PipelinesImpl extends React.Component<IPipelinesProps, IPipelinesState> {
                         </td>
                         <td>
                           <Select
-                            options={appsPipelinesMap.get(pipelineEntry.application).map(pipeline => ({
+                            options={appsPipelines[pipelineEntry.application].map(pipeline => ({
                               label: pipeline.name,
                               value: pipeline.id,
                             }))}
