@@ -4,7 +4,7 @@ import { Creatable, Option } from 'react-select';
 import { $q } from 'ngimport';
 import Spy = jasmine.Spy;
 
-import { AccountService, noop, NgReact } from 'core';
+import { AccountService, noop, AccountSelectField } from 'core';
 
 import { ManifestKindSearchService } from 'kubernetes/v2/manifest/ManifestKindSearch';
 import { ManifestSelector } from 'kubernetes/v2/manifest/selector/ManifestSelector';
@@ -105,7 +105,7 @@ describe('<ManifestSelector />', () => {
         ],
       });
 
-      const account = wrapper.find(NgReact.AccountSelectField).first();
+      const account = wrapper.find(AccountSelectField).first();
       account.props().onChange('my-other-account');
       expect(wrapper.instance().state.selector.location).toBeFalsy();
     });
