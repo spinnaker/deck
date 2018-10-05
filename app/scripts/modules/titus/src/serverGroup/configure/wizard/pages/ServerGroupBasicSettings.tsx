@@ -101,6 +101,7 @@ class ServerGroupBasicSettingsImpl extends React.Component<
     const { setFieldValue, values } = this.props.formik;
     values.credentials = account;
     values.credentialsChanged(values);
+    setFieldValue('account', account);
     setFieldValue('credentials', account);
   };
 
@@ -163,10 +164,8 @@ class ServerGroupBasicSettingsImpl extends React.Component<
   };
 
   public componentWillReceiveProps(nextProps: IServerGroupBasicSettingsProps) {
-    const { values, touched } = nextProps.formik;
-    if (touched.repository || touched.tag) {
-      this.updateImageId(values.repository, values.tag);
-    }
+    const { values } = nextProps.formik;
+    this.updateImageId(values.repository, values.tag);
     this.setState(this.getStateFromProps(nextProps));
   }
 
