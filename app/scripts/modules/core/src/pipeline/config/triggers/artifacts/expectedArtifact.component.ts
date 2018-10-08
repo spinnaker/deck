@@ -1,6 +1,7 @@
 import { IAttributes, IComponentController, IComponentOptions, module } from 'angular';
 
 import { IExpectedArtifact } from 'core/domain';
+import { Registry } from 'core/registry';
 
 class ExpectedArtifactController implements IComponentController {
   public expectedArtifact: IExpectedArtifact;
@@ -12,6 +13,23 @@ class ExpectedArtifactController implements IComponentController {
     'nginject';
 
     this.usePriorExecution = this.$attrs.$attr.hasOwnProperty('usePriorExecution');
+  }
+
+  public onUseDefaultArtifactChanged() {
+    const {
+      expectedArtifact: { useDefaultArtifact, defaultArtifact, matchArtifact },
+    } = this;
+    if (useDefaultArtifact && defaultArtifact.type == null) {
+      const defaultKey = 'default.' + matchArtifact.kind;
+      const defaultKindConfig = Registry.pipeline.getArtifactKinds().find(kind => kind.key === defaultKey);
+      if (defaultKindConfig) {
+        defaultArtifact.type = defaultKindConfig.type;
+        defaultArtifact.kind = defaultKindConfig.key;
+      } else {
+        defaultArtifact.type = matchArtifact.type;
+        defaultArtifact.kind = matchArtifact.kind;
+      }
+    }
   }
 }
 
@@ -48,7 +66,7 @@ class ExpectedArtifactComponent implements IComponentOptions {
         <label class="col-md-4 sm-label-right">
           Use Default Artifact
         </label>
-        <input class="col-md-1" type="checkbox" ng-model="ctrl.expectedArtifact.useDefaultArtifact">
+        <input class="col-md-1" type="checkbox" ng-model="ctrl.expectedArtifact.useDefaultArtifact" ng-change="ctrl.onUseDefaultArtifactChanged()">
       </div>
       <div class="form-group row" ng-show="ctrl.expectedArtifact.useDefaultArtifact" style="height: 30px">
         <div class="col-md-3">

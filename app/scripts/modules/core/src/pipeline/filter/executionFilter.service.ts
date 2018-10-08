@@ -36,9 +36,8 @@ export class ExecutionFilterService {
   public static groupsUpdatedStream: Subject<IExecutionGroup[]> = new Subject<IExecutionGroup[]>();
 
   private static lastApplication: Application = null;
-  private static isFilterable: (
-    sortFilterModel: { [key: string]: boolean },
-  ) => boolean = FilterModelService.isFilterable;
+  private static isFilterable: (sortFilterModel: { [key: string]: boolean }) => boolean =
+    FilterModelService.isFilterable;
 
   private static groupByTimeBoundary(executions: IExecution[]): { [boundaryName: string]: IExecution[] } {
     return groupBy(
@@ -155,6 +154,7 @@ export class ExecutionFilterService {
           config,
           executions: [],
           targetAccounts: this.extractAccounts(config),
+          fromTemplate: (config && config.type === 'templatedPipeline') || false,
         }),
       );
     } else {
@@ -166,6 +166,7 @@ export class ExecutionFilterService {
             config,
             executions: [],
             targetAccounts: this.extractAccounts(config),
+            fromTemplate: (config && config.type === 'templatedPipeline') || false,
           });
         });
     }
@@ -221,7 +222,7 @@ export class ExecutionFilterService {
           executions: groupExecutions,
           runningExecutions: groupExecutions.filter((execution: IExecution) => execution.isActive),
           targetAccounts: this.extractAccounts(config),
-          fromTemplate: config.type === 'templatedPipeline',
+          fromTemplate: (config && config.type === 'templatedPipeline') || false,
         });
       });
       this.addEmptyPipelines(groups, application);

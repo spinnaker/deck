@@ -1,12 +1,12 @@
 import { mock, IQService } from 'angular';
 
 import { Application } from 'core/application/application.model';
-import { APPLICATION_MODEL_BUILDER } from 'core/application/applicationModel.builder';
+import { APPLICATION_MODEL_BUILDER, ApplicationModelBuilder } from 'core/application/applicationModel.builder';
 import { ApplicationDataSourceRegistry } from '../application/service/ApplicationDataSourceRegistry';
 import { TaskReader } from 'core/task/task.read.service';
 
 describe('Task Data Source', function() {
-  let application: Application, $scope: any, applicationModelBuilder: any, $q: IQService;
+  let application: Application, $scope: any, applicationModelBuilder: ApplicationModelBuilder, $q: IQService;
 
   beforeEach(() => ApplicationDataSourceRegistry.clearDataSources());
 
@@ -22,8 +22,11 @@ describe('Task Data Source', function() {
 
   function configureApplication() {
     ApplicationDataSourceRegistry.registerDataSource({ key: 'serverGroups' });
-    application = applicationModelBuilder.createApplication('app', ApplicationDataSourceRegistry.getDataSources());
-    application.refresh();
+    application = applicationModelBuilder.createApplicationForTests(
+      'app',
+      ...ApplicationDataSourceRegistry.getDataSources(),
+    );
+    application.refresh().catch(() => {});
     application.getDataSource('tasks').activate();
     $scope.$digest();
   }
@@ -42,7 +45,7 @@ describe('Task Data Source', function() {
     });
 
     it('sets appropriate flags when task load fails', function() {
-      spyOn(TaskReader, 'getTasks').and.returnValue($q.reject(null));
+      spyOn(TaskReader, 'getTasks').and.callFake(() => $q.reject(null));
       configureApplication();
       expect(application.getDataSource('tasks').loaded).toBe(false);
       expect(application.getDataSource('tasks').loading).toBe(false);
@@ -76,7 +79,7 @@ describe('Task Data Source', function() {
     });
 
     it('sets appropriate flags when task reload fails; subscriber is responsible for error checking', function() {
-      spyOn(TaskReader, 'getTasks').and.returnValue($q.reject(null));
+      spyOn(TaskReader, 'getTasks').and.callFake(() => $q.reject(null));
       let errorsHandled = 0,
         successesHandled = 0;
       configureApplication();

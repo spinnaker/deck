@@ -5,6 +5,8 @@ import { BAKE_MANIFEST_STAGE } from './config/stages/bakeManifest/bakeManifestSt
 import { CHECK_PRECONDITIONS_STAGE_MODULE } from './config/stages/checkPreconditions/checkPreconditionsStage.module';
 import { CLONE_SERVER_GROUP_STAGE } from './config/stages/cloneServerGroup/cloneServerGroupStage.module';
 import { COPY_STAGE_MODAL_CONTROLLER } from './config/copyStage/copyStage.modal.controller';
+import { DEPLOY_SERVICE_STAGE } from './config/stages/deployService/deployServiceStage';
+import { DELETE_SERVICE_STAGE } from './config/stages/deleteService/deleteServiceStage';
 import { CREATE_LOAD_BALANCER_STAGE } from './config/stages/createLoadBalancer/createLoadBalancerStage.module';
 import { DESTROY_ASG_STAGE } from './config/stages/destroyAsg/destroyAsgStage';
 import { DISABLE_ASG_STAGE_MODULE } from './config/stages/disableAsg/disableAsgStage.module';
@@ -22,6 +24,7 @@ import { SCRIPT_STAGE } from './config/stages/script/scriptStage';
 import { SHRINK_CLUSTER_STAGE } from './config/stages/shrinkCluster/shrinkClusterStage';
 import { STAGE_CORE_MODULE } from './config/stages/core/stage.core.module';
 import { TRAVIS_STAGE_MODULE } from './config/stages/travis/travisStage.module';
+import { WERCKER_STAGE_MODULE } from './config/stages/wercker/werckerStage.module';
 import { UNMATCHED_STAGE_TYPE_STAGE } from './config/stages/unmatchedStageTypeStage/unmatchedStageTypeStage';
 import './config/stages/wait/waitStage';
 import { WEBHOOK_STAGE_MODULE } from './config/stages/webhook/webhookStage.module';
@@ -56,6 +59,7 @@ module(PIPELINE_MODULE, [
   COPY_STAGE_MODAL_CONTROLLER,
   GROUP_STAGE_MODULE,
   TRAVIS_STAGE_MODULE,
+  WERCKER_STAGE_MODULE,
   WEBHOOK_STAGE_MODULE,
   UNMATCHED_STAGE_TYPE_STAGE,
   require('./config/stages/bake/bakeStage.module').name,
@@ -64,6 +68,8 @@ module(PIPELINE_MODULE, [
   CLONE_SERVER_GROUP_STAGE,
   STAGE_CORE_MODULE,
   require('./config/stages/deploy/deployStage.module').name,
+  DEPLOY_SERVICE_STAGE,
+  DELETE_SERVICE_STAGE,
   DESTROY_ASG_STAGE,
   DISABLE_ASG_STAGE_MODULE,
   DISABLE_CLUSTER_STAGE,

@@ -11,6 +11,8 @@ var jobsEnabled = '{%features.jobs%}' === 'true';
 var infrastructureStagesEnabled = '{%features.infrastructureStages%}' === 'true';
 var pipelineTemplatesEnabled = '{%features.pipelineTemplates%}' === 'true';
 var artifactsEnabled = '{%features.artifacts%}' === 'true';
+var travisEnabled = '{%features.travis%}' === 'true';
+var werckerEnabled = '{%features.wercker%}' === 'true';
 var mineCanaryEnabled = '{%features.mineCanary%}' === 'true';
 var reduxLoggerEnabled = '{%canary.reduxLogger%}' === 'true';
 var defaultMetricsAccountName = '{%canary.defaultMetricsAccount%}';
@@ -75,6 +77,20 @@ var dcos = {
     account: '{%dcos.default.account%}',
   },
 };
+var aws = {
+  defaults: {
+    account: '{%aws.default.account%}',
+    region: '{%aws.default.region%}',
+    iamRole: 'BaseIAMRole',
+  },
+  defaultSecurityGroups: [],
+  loadBalancers: {
+    // if true, VPC load balancers will be created as internal load balancers if the selected subnet has a purpose
+    // tag that starts with "internal"
+    inferInternalFlagFromSubnet: false,
+  },
+  useAmiBlockDeviceMappings: false,
+};
 var ecs = {
   defaults: {
     account: '{%ecs.default.account%}',
@@ -91,7 +107,18 @@ var slack = {
 window.spinnakerSettings = {
   version: version,
   checkForUpdates: false,
-  defaultProviders: ['aws', 'ecs', 'gce', 'azure', 'cf', 'kubernetes', 'titus', 'openstack', 'oracle', 'dcos'],
+  defaultProviders: [
+    'aws',
+    'ecs',
+    'gce',
+    'azure',
+    'cloudfoundry',
+    'kubernetes',
+    'titus',
+    'openstack',
+    'oracle',
+    'dcos',
+  ],
   gateUrl: gateHost,
   bakeryDetailUrl: bakeryDetailUrl,
   authEndpoint: authEndpoint,
@@ -102,20 +129,7 @@ window.spinnakerSettings = {
   maxPipelineAgeDays: maxPipelineAgeDays,
   providers: {
     azure: azure,
-    aws: {
-      defaults: {
-        account: 'test',
-        region: 'us-east-1',
-        iamRole: 'BaseIAMRole',
-      },
-      defaultSecurityGroups: [],
-      loadBalancers: {
-        // if true, VPC load balancers will be created as internal load balancers if the selected subnet has a purpose
-        // tag that starts with "internal"
-        inferInternalFlagFromSubnet: false,
-      },
-      useAmiBlockDeviceMappings: false,
-    },
+    aws: aws,
     ecs: ecs,
     gce: gce,
     titus: {
@@ -155,7 +169,7 @@ window.spinnakerSettings = {
   authTtl: 600000,
   gitSources: ['stash', 'github', 'bitbucket', 'gitlab'],
   pubsubProviders: ['google'], // TODO(joonlim): Add amazon once it is confirmed that amazon pub/sub works.
-  triggerTypes: ['git', 'pipeline', 'docker', 'cron', 'jenkins', 'travis', 'pubsub', 'webhook'],
+  triggerTypes: ['git', 'pipeline', 'docker', 'cron', 'jenkins', 'wercker', 'travis', 'pubsub', 'webhook'],
   canary: {
     reduxLogger: reduxLoggerEnabled,
     metricsAccountName: defaultMetricsAccountName,
@@ -187,7 +201,8 @@ window.spinnakerSettings = {
     clusterDiff: false,
     roscoMode: true,
     snapshots: false,
-    travis: false,
+    travis: travisEnabled,
+    wercker: werckerEnabled,
     versionedProviders: true,
   },
 };

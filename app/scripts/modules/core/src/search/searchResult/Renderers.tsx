@@ -52,8 +52,8 @@ export interface ICellRendererProps {
 
 export class BasicCell extends React.Component<ICellRendererProps> {
   public render() {
-    const { item, col, defaultValue } = this.props;
-    return <div className={colClass(col.key)}>{item[col.key] || defaultValue}</div>;
+    const { item, col, defaultValue, children } = this.props;
+    return <div className={colClass(col.key)}>{children || item[col.key] || defaultValue}</div>;
   }
 }
 
@@ -80,7 +80,9 @@ export class AccountCell extends React.Component<ICellRendererProps> {
     const accounts = (Array.isArray(value) ? value : value.split(',')).sort();
     return (
       <div className={colClass(col.key)}>
-        {accounts.map((account: string) => <AccountTag key={account} account={account} />)}
+        {accounts.map((account: string) => (
+          <AccountTag key={account} account={account} />
+        ))}
       </div>
     );
   }

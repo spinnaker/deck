@@ -1,9 +1,18 @@
 import { IController, IScope, module } from 'angular';
 import { IModalService } from 'angular-ui-bootstrap';
+import { orderBy } from 'lodash';
 
-import { Application, IManifest, IServerGroupManager, IServerGroupManagerStateParams } from '@spinnaker/core';
-import { IKubernetesServerGroupManager } from '../IKubernetesServerGroupManager';
-import { KubernetesManifestService } from '../../manifest/manifest.service';
+import {
+  NameUtils,
+  Application,
+  IManifest,
+  IServerGroupManager,
+  IServerGroupManagerStateParams,
+} from '@spinnaker/core';
+import { IKubernetesServerGroupManager } from 'kubernetes/v2/serverGroupManager/IKubernetesServerGroupManager';
+import { KubernetesManifestService } from 'kubernetes/v2/manifest/manifest.service';
+import { KubernetesManifestCommandBuilder } from 'kubernetes/v2/manifest/manifestCommandBuilder.service';
+import { ManifestWizard } from 'kubernetes/v2/manifest/wizard/ManifestWizard';
 
 class KubernetesServerGroupManagerDetailsController implements IController {
   public serverGroupManager: IKubernetesServerGroupManager;
@@ -77,7 +86,7 @@ class KubernetesServerGroupManagerDetailsController implements IController {
 
   public undoRolloutServerGroupManager(): void {
     this.$uibModal.open({
-      templateUrl: require('../../manifest/rollout/undo.html'),
+      templateUrl: require('kubernetes/v2/manifest/rollout/undo.html'),
       controller: 'kubernetesV2ManifestUndoRolloutCtrl',
       controllerAs: 'ctrl',
       resolve: {
@@ -86,13 +95,13 @@ class KubernetesServerGroupManagerDetailsController implements IController {
           namespace: this.serverGroupManager.namespace,
           account: this.serverGroupManager.account,
         },
-        revisions: () =>
-          this.serverGroupManager.serverGroups.map(sg => {
-            return {
-              name: sg.name,
-              revision: sg.moniker.sequence,
-            };
-          }),
+        revisions: () => {
+          const [, ...rest] = orderBy(this.serverGroupManager.serverGroups, ['moniker.sequence'], ['desc']);
+          return rest.map((serverGroup, index) => ({
+            label: `${NameUtils.getSequence(serverGroup.moniker.sequence)}${index > 0 ? '' : ' - previous revision'}`,
+            revision: serverGroup.moniker.sequence,
+          }));
+        },
         application: this.app,
       },
     });
@@ -116,16 +125,13 @@ class KubernetesServerGroupManagerDetailsController implements IController {
   }
 
   public editServerGroupManager(): void {
-    this.$uibModal.open({
-      templateUrl: require('../../manifest/wizard/manifestWizard.html'),
-      size: 'lg',
-      controller: 'kubernetesV2ManifestEditCtrl',
-      controllerAs: 'ctrl',
-      resolve: {
-        sourceManifest: this.serverGroupManager.manifest,
-        sourceMoniker: this.serverGroupManager.moniker,
-        application: this.app,
-      },
+    KubernetesManifestCommandBuilder.buildNewManifestCommand(
+      this.app,
+      this.serverGroupManager.manifest,
+      this.serverGroupManager.moniker,
+      this.serverGroupManager.account,
+    ).then(builtCommand => {
+      ManifestWizard.show({ title: 'Edit Manifest', application: this.app, command: builtCommand });
     });
   }
 

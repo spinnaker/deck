@@ -27,10 +27,16 @@ module.exports = angular
     let providerLoader = AccountService.listProviders();
     providerLoader.then(providers => (this.data.cloudProviders = providers));
 
-    $q.all([applicationLoader, providerLoader]).then(() => (this.state.initializing = false));
+    $q.all([applicationLoader, providerLoader])
+      .catch(error => {
+        this.state.initializeFailed = true;
+        throw error;
+      })
+      .finally(() => (this.state.initializing = false));
 
     this.state = {
       initializing: true,
+      initializeFailed: false,
       submitting: false,
       errorMessages: [],
       permissionsInvalid: false,
@@ -76,7 +82,7 @@ module.exports = angular
       goIdle();
     };
 
-    this.createApplication = () => {
+    this.createApplicationForTests = () => {
       return ApplicationWriter.createApplication(this.application).then(
         waitUntilApplicationIsCreated,
         createApplicationFailure,
@@ -114,6 +120,6 @@ module.exports = angular
       if (this.data.cloudProviders.length === 1) {
         this.application.cloudProviders = this.data.cloudProviders;
       }
-      this.createApplication();
+      this.createApplicationForTests();
     };
   });

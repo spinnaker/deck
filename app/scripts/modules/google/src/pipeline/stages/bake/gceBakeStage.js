@@ -18,7 +18,6 @@ module.exports = angular
   .module('spinnaker.gce.pipeline.stage..bakeStage', [require('./bakeExecutionDetails.controller.js').name])
   .config(function() {
     Registry.pipeline.registerStage({
-      artifactFields: ['packageArtifactIds'],
       provides: 'bake',
       cloudProvider: 'gce',
       label: 'Bake',
@@ -41,8 +40,9 @@ module.exports = angular
         },
       ],
       restartable: true,
+      artifactExtractor: ExpectedArtifactService.accumulateArtifacts(['packageArtifactIds']),
+      artifactRemover: ArtifactReferenceService.removeArtifactFromFields(['packageArtifactIds']),
     });
-    ArtifactReferenceService.registerReference('stage', () => [['packageArtifactIds']]);
   })
   .controller('gceBakeStageCtrl', function($scope, $q, $uibModal) {
     $scope.stage.extendedAttributes = $scope.stage.extendedAttributes || {};
@@ -84,7 +84,7 @@ module.exports = angular
     }
 
     function showAdvanced() {
-      let stage = $scope.stage;
+      const stage = $scope.stage;
       return !!(
         stage.templateFileName ||
         (stage.extendedAttributes && _.size(stage.extendedAttributes) > 0) ||

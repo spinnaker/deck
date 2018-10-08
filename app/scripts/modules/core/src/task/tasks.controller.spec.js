@@ -13,7 +13,7 @@ describe('Controller: tasks', function() {
       $q = _$q_;
 
       this.initializeController = tasks => {
-        let application = applicationModelBuilder.createApplication('app', { key: 'tasks', lazy: true });
+        let application = applicationModelBuilder.createApplicationForTests('app', { key: 'tasks', lazy: true });
         application.tasks.activate = angular.noop;
         application.tasks.data = tasks || [];
         application.tasks.loaded = true;
@@ -60,27 +60,6 @@ describe('Controller: tasks', function() {
       scope.$digest();
 
       expect(controller.sortedTasks.length).toBe(1);
-    });
-  });
-
-  describe('deleting tasks', function() {
-    it('should confirm delete, then perform delete, then reload tasks', function() {
-      var taskReloadCalls = 0,
-        tasks = [{ id: 'a', name: 'resize something' }];
-      spyOn(TaskWriter, 'deleteTask').and.returnValue($q.when(null));
-
-      this.initializeController(tasks);
-      spyOn(controller.application.tasks, 'refresh').and.callFake(() => taskReloadCalls++);
-      scope.$digest();
-
-      expect(taskReloadCalls).toBe(0);
-      expect(TaskWriter.deleteTask.calls.count()).toBe(0);
-
-      controller.deleteTask('a');
-
-      scope.$digest();
-      expect(TaskWriter.deleteTask.calls.count()).toBe(1);
-      expect(taskReloadCalls).toBe(1);
     });
   });
 

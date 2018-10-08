@@ -2,6 +2,7 @@ import { module } from 'angular';
 
 import { IArtifact } from 'core/domain/IArtifact';
 import { Registry } from 'core/registry';
+import { DockerArtifactEditor } from './DockerArtifactEditor';
 
 export const DOCKER_ARTIFACT = 'spinnaker.core.pipeline.trigger.artifact.docker';
 module(DOCKER_ARTIFACT, []).config(() => {
@@ -10,6 +11,8 @@ module(DOCKER_ARTIFACT, []).config(() => {
     type: 'docker/image',
     isDefault: false,
     isMatch: true,
+    // docker hub image artifacts can be bound to manifests without an associated artifact-account
+    isPubliclyAccessible: true,
     description: 'A Docker image to be deployed.',
     key: 'docker',
     controller: function(artifact: IArtifact) {
@@ -18,6 +21,7 @@ module(DOCKER_ARTIFACT, []).config(() => {
       this.artifact.type = 'docker/image';
     },
     controllerAs: 'ctrl',
+    editCmp: DockerArtifactEditor,
     template: `
 <div class="col-md-12">
   <div class="form-group row">

@@ -1,17 +1,17 @@
 import * as React from 'react';
 import { cloneDeep, get } from 'lodash';
 import { FormikErrors } from 'formik';
-import { IDeferred, IPromise } from 'angular';
-import { IModalServiceInstance } from 'angular-ui-bootstrap';
-import { $q } from 'ngimport';
+import { IPromise } from 'angular';
 
 import {
   AccountService,
-  ILoadBalancerModalProps,
   LoadBalancerWriter,
   ReactInjector,
   TaskMonitor,
   WizardModal,
+  noop,
+  ReactModal,
+  ILoadBalancerModalProps,
 } from '@spinnaker/core';
 
 import { AWSProviderSettings } from 'amazon/aws.settings';
@@ -34,16 +34,23 @@ export interface ICreateApplicationLoadBalancerState {
   taskMonitor: TaskMonitor;
 }
 
-type NetworkLoadBalancerModal = new () => WizardModal<IAmazonNetworkLoadBalancerUpsertCommand>;
-const NetworkLoadBalancerModal = WizardModal as NetworkLoadBalancerModal;
-
 export class CreateNetworkLoadBalancer extends React.Component<
   ICreateNetworkLoadBalancerProps,
   ICreateApplicationLoadBalancerState
 > {
+  public static defaultProps: Partial<ICreateNetworkLoadBalancerProps> = {
+    closeModal: noop,
+    dismissModal: noop,
+  };
+
+  private _isUnmounted = false;
   private refreshUnsubscribe: () => void;
   private certificateTypes = get(AWSProviderSettings, 'loadBalancers.certificateTypes', ['iam', 'acm']);
-  private $uibModalInstanceEmulation: IModalServiceInstance & { deferred?: IDeferred<any> };
+
+  public static show(props: ICreateNetworkLoadBalancerProps): Promise<IAmazonNetworkLoadBalancerUpsertCommand> {
+    const modalProps = { dialogClassName: 'wizard-modal modal-lg' };
+    return ReactModal.show(CreateNetworkLoadBalancer, props, modalProps);
+  }
 
   constructor(props: ICreateNetworkLoadBalancerProps) {
     super(props);
@@ -57,21 +64,7 @@ export class CreateNetworkLoadBalancer extends React.Component<
       loadBalancerCommand,
       taskMonitor: null,
     };
-
-    const deferred = $q.defer();
-    const promise = deferred.promise;
-    this.$uibModalInstanceEmulation = {
-      result: promise,
-      close: () => this.props.showCallback(false),
-      dismiss: () => this.props.showCallback(false),
-    } as IModalServiceInstance;
-    Object.assign(this.$uibModalInstanceEmulation, { deferred });
   }
-
-  private dismiss = (): void => {
-    this.props.showCallback(false);
-    // no idea
-  };
 
   protected certificateIdAsARN(
     accountId: string,
@@ -161,8 +154,12 @@ export class CreateNetworkLoadBalancer extends React.Component<
   }
 
   protected onApplicationRefresh(values: IAmazonNetworkLoadBalancerUpsertCommand): void {
+    if (this._isUnmounted) {
+      return;
+    }
+
     this.refreshUnsubscribe = undefined;
-    this.props.showCallback(false);
+    this.props.dismissModal();
     this.setState({ taskMonitor: undefined });
     const newStateParams = {
       name: values.name,
@@ -180,6 +177,7 @@ export class CreateNetworkLoadBalancer extends React.Component<
   }
 
   public componentWillUnmount(): void {
+    this._isUnmounted = true;
     if (this.refreshUnsubscribe) {
       this.refreshUnsubscribe();
     }
@@ -191,7 +189,7 @@ export class CreateNetworkLoadBalancer extends React.Component<
   }
 
   private submit = (values: IAmazonNetworkLoadBalancerUpsertCommand): void => {
-    const { app, forPipelineConfig, onComplete } = this.props;
+    const { app, forPipelineConfig, closeModal } = this.props;
     const { isNew } = this.state;
 
     const descriptor = isNew ? 'Create' : 'Update';
@@ -199,13 +197,13 @@ export class CreateNetworkLoadBalancer extends React.Component<
     if (forPipelineConfig) {
       // don't submit to backend for creation. Just return the loadBalancerCommand object
       this.formatListeners(loadBalancerCommandFormatted).then(() => {
-        onComplete && onComplete(loadBalancerCommandFormatted);
+        closeModal && closeModal(loadBalancerCommandFormatted);
       });
     } else {
       const taskMonitor = new TaskMonitor({
         application: app,
         title: `${isNew ? 'Creating' : 'Updating'} your load balancer`,
-        modalInstance: this.$uibModalInstanceEmulation,
+        modalInstance: TaskMonitor.modalInstanceEmulation(() => this.props.dismissModal()),
         onTaskComplete: () => this.onTaskComplete(loadBalancerCommandFormatted),
       });
 
@@ -227,12 +225,8 @@ export class CreateNetworkLoadBalancer extends React.Component<
   };
 
   public render(): React.ReactElement<ICreateNetworkLoadBalancerProps> {
-    const { app, forPipelineConfig, loadBalancer, show } = this.props;
+    const { app, dismissModal, forPipelineConfig, loadBalancer } = this.props;
     const { isNew, loadBalancerCommand, taskMonitor } = this.state;
-
-    if (!show) {
-      return null;
-    }
 
     const hideSections = new Set<string>();
 
@@ -246,13 +240,12 @@ export class CreateNetworkLoadBalancer extends React.Component<
     }
 
     return (
-      <NetworkLoadBalancerModal
+      <WizardModal<IAmazonNetworkLoadBalancerUpsertCommand>
         heading={heading}
         initialValues={loadBalancerCommand}
         taskMonitor={taskMonitor}
-        dismiss={this.dismiss}
-        show={show}
-        submit={this.submit}
+        dismissModal={dismissModal}
+        closeModal={this.submit}
         submitButtonLabel={forPipelineConfig ? (isNew ? 'Add' : 'Done') : isNew ? 'Create' : 'Update'}
         validate={this.validate}
         hideSections={hideSections}
@@ -265,7 +258,7 @@ export class CreateNetworkLoadBalancer extends React.Component<
         />
         <TargetGroups app={app} isNew={isNew} loadBalancer={loadBalancer} done={true} />
         <NLBListeners done={true} />
-      </NetworkLoadBalancerModal>
+      </WizardModal>
     );
   }
 }

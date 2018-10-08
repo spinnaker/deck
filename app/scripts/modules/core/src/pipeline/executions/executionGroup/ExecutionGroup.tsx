@@ -1,6 +1,5 @@
 import * as React from 'react';
 import * as ReactGA from 'react-ga';
-import { $timeout } from 'ngimport';
 import { IPromise } from 'angular';
 import { Subscription } from 'rxjs';
 import { find, flatten, uniq, without } from 'lodash';
@@ -12,7 +11,7 @@ import { IExecution, IExecutionGroup, IExecutionTrigger, IPipeline, IPipelineCom
 import { NextRunTag } from 'core/pipeline/triggers/NextRunTag';
 import { Popover } from 'core/presentation/Popover';
 import { ExecutionState } from 'core/state';
-import { PipelineConfigService } from 'core/pipeline/config/services/PipelineConfigService';
+import { IRetryablePromise } from 'core/utils/retryablePromise';
 
 import { TriggersTag } from 'core/pipeline/triggers/TriggersTag';
 import { AccountTag } from 'core/account';
@@ -20,6 +19,8 @@ import { ModalInjector, ReactInjector } from 'core/reactShims';
 import { Spinner } from 'core/widgets/spinners/Spinner';
 
 import './executionGroup.less';
+
+const ACCOUNT_TAG_OVERFLOW_LIMIT = 2;
 
 export interface IExecutionGroupProps {
   group: IExecutionGroup;
@@ -31,10 +32,11 @@ export interface IExecutionGroupState {
   pipelineConfig: IPipeline;
   triggeringExecution: boolean;
   open: boolean;
-  poll: IPromise<any>;
+  poll: IRetryablePromise<any>;
   canTriggerPipelineManually: boolean;
   canConfigure: boolean;
   showAccounts: boolean;
+  showOverflowAccountTags: boolean;
 }
 
 export class ExecutionGroup extends React.Component<IExecutionGroupProps, IExecutionGroupState> {
@@ -66,6 +68,7 @@ export class ExecutionGroup extends React.Component<IExecutionGroupProps, IExecu
       canConfigure: !!(pipelineConfig || this.strategyConfig),
       showAccounts: ExecutionState.filterModel.asFilterModel.sortFilter.groupBy === 'name',
       pipelineConfig,
+      showOverflowAccountTags: false,
     };
   }
 
@@ -110,31 +113,24 @@ export class ExecutionGroup extends React.Component<IExecutionGroupProps, IExecu
   private startPipeline(command: IPipelineCommand): IPromise<void> {
     const { executionService } = ReactInjector;
     this.setState({ triggeringExecution: true });
-    return PipelineConfigService.triggerPipeline(
-      this.props.application.name,
-      command.pipelineName,
-      command.trigger,
-    ).then(
-      newPipelineId => {
-        const monitor = executionService.waitUntilNewTriggeredPipelineAppears(this.props.application, newPipelineId);
-        monitor.then(() => this.setState({ triggeringExecution: false }));
+    return executionService.startAndMonitorPipeline(this.props.application, command.pipelineName, command.trigger).then(
+      monitor => {
         this.setState({ poll: monitor });
+        monitor.promise.then(() => this.setState({ triggeringExecution: false }));
       },
       () => {
-        const monitor = this.props.application.executions.refresh();
-        monitor.then(() => this.setState({ triggeringExecution: false }));
-        this.setState({ poll: monitor });
+        this.props.application.executions.refresh().then(() => this.setState({ triggeringExecution: false }));
       },
     );
   }
 
-  public triggerPipeline(trigger: IExecutionTrigger = null): void {
+  public triggerPipeline(trigger: IExecutionTrigger = null, config = this.state.pipelineConfig): void {
     ModalInjector.modalService
       .open({
         templateUrl: require('../../manualExecution/manualPipelineExecution.html'),
         controller: 'ManualPipelineExecutionCtrl as vm',
         resolve: {
-          pipeline: () => this.state.pipelineConfig,
+          pipeline: () => config,
           application: () => this.props.application,
           currentlyRunningExecutions: () => this.props.group.runningExecutions,
           trigger: () => trigger,
@@ -161,7 +157,7 @@ export class ExecutionGroup extends React.Component<IExecutionGroupProps, IExecu
 
   public componentWillUnmount(): void {
     if (this.state.poll) {
-      $timeout.cancel(this.state.poll);
+      this.state.poll.cancel();
     }
     if (this.expandUpdatedSubscription) {
       this.expandUpdatedSubscription.unsubscribe();
@@ -196,9 +192,9 @@ export class ExecutionGroup extends React.Component<IExecutionGroupProps, IExecu
     e.stopPropagation();
   };
 
-  private rerunExecutionClicked = (execution: IExecution): void => {
-    ReactGA.event({ category: 'Pipeline', action: 'Rerun pipeline button clicked', label: this.props.group.heading });
-    this.triggerPipeline(execution.trigger);
+  private rerunExecutionClicked = (execution: IExecution, config: IPipeline): void => {
+    ReactGA.event({ category: 'Pipeline', action: 'Rerun pipeline button clicked', label: config.name });
+    this.triggerPipeline(execution.trigger, config);
   };
 
   public render(): React.ReactElement<ExecutionGroup> {
@@ -211,9 +207,32 @@ export class ExecutionGroup extends React.Component<IExecutionGroupProps, IExecu
     const deploymentAccountLabels = without(this.state.deploymentAccounts || [], ...(group.targetAccounts || [])).map(
       (account: string) => <AccountTag key={account} account={account} />,
     );
-    const groupTargetAccountLabels = (group.targetAccounts || []).map((account: string) => (
-      <AccountTag key={account} account={account} />
-    ));
+    const groupTargetAccountLabels: React.ReactNode[] = [];
+    let groupTargetAccountLabelsExtra: React.ReactNode[] = [];
+    if (group.targetAccounts && group.targetAccounts.length > 0) {
+      group.targetAccounts.slice(0, ACCOUNT_TAG_OVERFLOW_LIMIT).map(account => {
+        groupTargetAccountLabels.push(<AccountTag key={account} account={account} />);
+      });
+    }
+    if (group.targetAccounts && group.targetAccounts.length > ACCOUNT_TAG_OVERFLOW_LIMIT) {
+      groupTargetAccountLabels.push(
+        <span
+          key="foo"
+          onMouseEnter={() => this.setState({ showOverflowAccountTags: true })}
+          onMouseLeave={() => this.setState({ showOverflowAccountTags: false })}
+        >
+          <AccountTag
+            className="overflow-marker"
+            account={`(+ ${group.targetAccounts.length - ACCOUNT_TAG_OVERFLOW_LIMIT} more)`}
+          />
+        </span>,
+      );
+      groupTargetAccountLabelsExtra = groupTargetAccountLabelsExtra.concat(
+        group.targetAccounts.slice(ACCOUNT_TAG_OVERFLOW_LIMIT).map(account => {
+          return <AccountTag key={account} account={account} />;
+        }),
+      );
+    }
     const executions = (group.executions || []).map((execution: IExecution) => (
       <Execution
         key={execution.id}
@@ -229,8 +248,11 @@ export class ExecutionGroup extends React.Component<IExecutionGroupProps, IExecu
           <div className="clickable sticky-header" onClick={this.handleHeadingClicked}>
             <div className={`execution-group-heading ${pipelineDisabled ? 'inactive' : 'active'}`}>
               <span className={`glyphicon pipeline-toggle glyphicon-chevron-${this.state.open ? 'down' : 'right'}`} />
-              <div className="shadowed">
-                <div className="heading-tag">
+              <div className="shadowed" style={{ position: 'relative' }}>
+                <div className={`heading-tag-overflow-group ${this.state.showOverflowAccountTags ? 'shown' : ''}`}>
+                  {groupTargetAccountLabelsExtra}
+                </div>
+                <div className="heading-tag collapsing-heading-tags">
                   {this.state.showAccounts && deploymentAccountLabels}
                   {groupTargetAccountLabels}
                 </div>

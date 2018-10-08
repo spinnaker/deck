@@ -6,11 +6,12 @@ import {
   IControllerService,
   IRootElementService,
   IRootScopeService,
+  IScope,
   module,
 } from 'angular';
 import { IArtifact, IArtifactKindConfig } from 'core/domain';
 import { Registry } from 'core/registry';
-import { ArtifactIconService } from 'core';
+import { AccountService, ArtifactIconService, IArtifactAccount } from 'core';
 
 class ArtifactCtrl implements IController {
   public artifact: IArtifact;
@@ -20,6 +21,7 @@ class ArtifactCtrl implements IController {
   private isMatch: boolean;
   public selectedLabel: string;
   public selectedIcon: string;
+  private artifactAccounts?: IArtifactAccount[];
 
   constructor(
     private $attrs: IAttributes,
@@ -27,6 +29,7 @@ class ArtifactCtrl implements IController {
     private $compile: ICompileService,
     private $element: IRootElementService,
     private $rootScope: IRootScopeService,
+    private $scope: IScope,
   ) {
     'ngInject';
     if (this.$attrs.$attr.hasOwnProperty('isDefault')) {
@@ -55,11 +58,26 @@ class ArtifactCtrl implements IController {
   }
 
   public $onInit(): void {
+    // Explicitly watch the artifact's kind so that external changes to it are correctly
+    // reflected in the ui-select and artifact's editable form.
+    this.$scope.$watch(() => this.artifact.kind, () => this.loadArtifactKind());
     this.loadArtifactKind();
+    AccountService.getArtifactAccounts().then(accounts => {
+      this.artifactAccounts = accounts;
+    });
   }
 
   public getOptions(): IArtifactKindConfig[] {
-    return this.options.filter(o => o.isDefault === this.isDefault || o.isMatch === this.isMatch);
+    let options = this.options.filter(o => o.isDefault === this.isDefault || o.isMatch === this.isMatch);
+    if (this.artifactAccounts) {
+      options = options.filter(o => {
+        const isCustomArtifact = o.type == null;
+        const isPublic = !!o.isPubliclyAccessible;
+        const hasCredential = this.artifactAccounts.find(a => a.types.includes(o.type));
+        return isCustomArtifact || isPublic || hasCredential;
+      });
+    }
+    return options.sort((a, b) => a.label.localeCompare(b.label));
   }
 
   public loadArtifactKind(): void {
@@ -94,8 +112,7 @@ class ArtifactComponent implements IComponentOptions {
   <div class="col-md-4 col-md-offset-1">
     <ui-select class="form-control input-sm"
                required
-               ng-model="ctrl.artifact.kind"
-               on-select="ctrl.loadArtifactKind()">
+               ng-model="ctrl.artifact.kind">
       <ui-select-match>
         <img width="20" height="20" ng-if="ctrl.selectedIcon" ng-src="{{ ctrl.selectedIcon }}" />
         {{ ctrl.selectedLabel }}

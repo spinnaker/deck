@@ -5,10 +5,12 @@ import { Subject, Observable } from 'rxjs';
 import { CloudProviderRegistry } from 'core/cloudProvider';
 import { ReactInjector, AngularJSAdapter } from 'core/reactShims';
 import { AccountService, IAccountDetails } from 'core/account/AccountService';
+import { get } from 'lodash';
 
 export interface IOverridableProps {
   accountId?: string;
-  OriginalComponent?: React.ComponentType;
+  forwardedRef?: React.Ref<any>;
+  OriginalComponent?: React.ComponentClass;
 }
 
 /**
@@ -168,14 +170,21 @@ export function overridableComponent<P extends IOverridableProps, T extends Reac
       const isOverridden = Component && Component !== OriginalComponent;
       const props = { ...(this.props as any), ...(isOverridden ? { OriginalComponent } : {}) };
 
-      return Component ? <Component {...props} /> : <Spinner />;
+      if (!Component) {
+        return <Spinner />;
+      }
+
+      const isClassComponent = ['render', 'prototype.render'].some(prop => typeof get(Component, prop) === 'function');
+      return isClassComponent ? <Component {...props} ref={this.props.forwardedRef} /> : <Component {...props} />;
     }
   }
+
+  const forwardRef = React.forwardRef((props, ref) => <OverridableComponent {...props} forwardedRef={ref} />) as T;
 
   // Copy static properties
   Object.getOwnPropertyNames(OriginalComponent)
     .filter(propName => propName !== 'constructor' && !OverridableComponent.hasOwnProperty(propName))
-    .forEach(propName => ((OverridableComponent as any)[propName] = (OriginalComponent as any)[propName]));
+    .forEach(propName => ((forwardRef as any)[propName] = (OriginalComponent as any)[propName]));
 
-  return (OverridableComponent as any) as T;
+  return forwardRef;
 }

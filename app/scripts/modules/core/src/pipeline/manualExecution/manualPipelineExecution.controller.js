@@ -155,6 +155,14 @@ module.exports = angular
     };
 
     this.addParameter = parameterConfig => {
+      // Inject the default value into the options list if it is absent
+      if (
+        parameterConfig.default &&
+        parameterConfig.options &&
+        !parameterConfig.options.some(option => option.value === parameterConfig.default)
+      ) {
+        parameterConfig.options.unshift({ value: parameterConfig.default });
+      }
       const { name } = parameterConfig;
       const parameters = trigger ? trigger.parameters : {};
       if (this.parameters[name] === undefined) {
@@ -216,6 +224,8 @@ module.exports = angular
       command.pipelineName = pipeline.name;
       selectedTrigger.type = 'manual';
       selectedTrigger.dryRun = this.command.dryRun;
+      // The description is not part of the trigger spec, so don't send it
+      delete selectedTrigger.description;
 
       if (pipeline.parameterConfig && pipeline.parameterConfig.length) {
         selectedTrigger.parameters = this.parameters;

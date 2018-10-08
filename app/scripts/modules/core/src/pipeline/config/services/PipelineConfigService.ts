@@ -11,6 +11,9 @@ import { IPipeline } from 'core/domain/IPipeline';
 export interface ITriggerPipelineResponse {
   ref: string;
 }
+export interface IEchoTriggerPipelineResponse {
+  eventId: string;
+}
 export class PipelineConfigService {
   private static configViewStateCache = ViewStateCache.createCache('pipelineConfig', { version: 2 });
 
@@ -96,6 +99,23 @@ export class PipelineConfigService {
       });
   }
 
+  public static triggerPipelineViaEcho(
+    applicationName: string,
+    pipelineName: string,
+    body: any = {},
+  ): IPromise<string> {
+    body.user = AuthenticationService.getAuthenticatedUser().name;
+    return API.one('pipelines')
+      .one('v2')
+      .one(applicationName)
+      .one(pipelineName)
+      .data(body)
+      .post()
+      .then((result: IEchoTriggerPipelineResponse) => {
+        return result.eventId;
+      });
+  }
+
   public static getDownstreamStageIds(pipeline: IPipeline, stage: IStage): Array<string | number> {
     let downstream: Array<string | number> = [];
     const children = pipeline.stages.filter((stageToTest: IStage) => {
@@ -123,6 +143,9 @@ export class PipelineConfigService {
   }
 
   public static getAllUpstreamDependencies(pipeline: IPipeline, stage: IStage): IStage[] {
+    if (!pipeline || !stage) {
+      return [];
+    }
     let upstreamStages: IStage[] = [];
     if (stage.requisiteStageRefIds && stage.requisiteStageRefIds.length) {
       pipeline.stages.forEach((stageToTest: IStage) => {

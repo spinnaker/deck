@@ -1,7 +1,7 @@
 'use strict';
 
 import { ArtifactReferenceService } from 'core/artifact/ArtifactReferenceService';
-import { UUIDGenerator } from 'core/utils/uuid.service';
+import { ExpectedArtifactService } from 'core/artifact/expectedArtifact.service';
 import { Registry } from 'core/registry';
 
 const angular = require('angular');
@@ -14,6 +14,7 @@ module.exports = angular
       scope: {
         pipeline: '=',
         application: '=',
+        fieldUpdated: '<',
       },
       controller: 'triggersCtrl',
       controllerAs: 'triggersCtrl',
@@ -33,10 +34,6 @@ module.exports = angular
       }
       $scope.pipeline.triggers.push(newTrigger);
     };
-
-    this.defaultArtifact = () => ({
-      kind: 'custom',
-    });
 
     this.removeExpectedArtifact = (pipeline, expectedArtifact) => {
       if (!pipeline.expectedArtifacts) {
@@ -59,17 +56,6 @@ module.exports = angular
     };
 
     this.addArtifact = () => {
-      const newArtifact = {
-        matchArtifact: this.defaultArtifact(),
-        usePriorExecution: false,
-        useDefaultArtifact: false,
-        defaultArtifact: this.defaultArtifact(),
-        id: UUIDGenerator.generateUuid(),
-      };
-
-      if (!$scope.pipeline.expectedArtifacts) {
-        $scope.pipeline.expectedArtifacts = [];
-      }
-      $scope.pipeline.expectedArtifacts.push(newArtifact);
+      ExpectedArtifactService.addNewArtifactTo($scope.pipeline);
     };
   });

@@ -47,6 +47,9 @@ export interface IFeatures {
   pipelineTemplates?: boolean;
   versionedProviders?: boolean;
   travis?: boolean;
+  managedServiceAccounts?: boolean;
+  wercker?: boolean;
+  triggerViaEcho?: boolean;
   [key: string]: any;
 }
 

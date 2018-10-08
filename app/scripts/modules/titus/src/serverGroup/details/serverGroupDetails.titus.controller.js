@@ -15,10 +15,14 @@ import {
   SETTINGS,
 } from '@spinnaker/core';
 
+import { TitusReactInjector } from 'titus/reactShims';
+
 import { SCALING_POLICY_MODULE } from './scalingPolicy/scalingPolicy.module';
 
 import { configBinService } from './scalingPolicy/configBin/configBin.reader';
 import { CONFIG_BIN_LINK_COMPONENT } from './scalingPolicy/configBin/configBinLink.component';
+
+import { TitusCloneServerGroupModal } from '../configure/wizard/TitusCloneServerGroupModal';
 
 module.exports = angular
   .module('spinnaker.serverGroup.details.titus.controller', [
@@ -92,8 +96,6 @@ module.exports = angular
         delete labels['name'];
         delete labels['source'];
         delete labels['spinnakerAccount'];
-        delete labels['NETFLIX_APP_METADATA'];
-        delete labels['NETFLIX_APP_METADATA_SIG'];
 
         Object.keys(labels).forEach(key => {
           if (key.startsWith('titus.')) {
@@ -304,7 +306,7 @@ module.exports = angular
         header: 'Rolling back?',
         body: `Spinnaker provides an orchestrated rollback feature to carefully restore a different version of this
              server group. Do you want to use the orchestrated rollback?`,
-        buttonText: `Yes, let's start the orchestrated rollback`,
+        buttonText: `Yes, take me to the rollback settings modal`,
         cancelButtonText: 'No, I just want to enable the server group',
       };
 
@@ -365,26 +367,12 @@ module.exports = angular
     };
 
     this.cloneServerGroup = function cloneServerGroup() {
-      var serverGroup = $scope.serverGroup;
-      $uibModal.open({
-        templateUrl: require('../configure/wizard/serverGroupWizard.html'),
-        controller: 'titusCloneServerGroupCtrl as ctrl',
-        size: 'lg',
-        resolve: {
-          title: function() {
-            return 'Clone ' + serverGroup.name;
-          },
-          application: function() {
-            return application;
-          },
-          serverGroup: function() {
-            return serverGroup;
-          },
-          serverGroupCommand: function() {
-            return titusServerGroupCommandBuilder.buildServerGroupCommandFromExisting(application, serverGroup);
-          },
-        },
-      });
+      TitusReactInjector.titusServerGroupCommandBuilder
+        .buildServerGroupCommandFromExisting(application, $scope.serverGroup)
+        .then(command => {
+          const title = `Clone ${serverGroup.name}`;
+          TitusCloneServerGroupModal.show({ title, application, command });
+        });
     };
 
     this.isRollbackEnabled = function rollbackServerGroup() {

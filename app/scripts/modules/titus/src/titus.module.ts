@@ -2,12 +2,15 @@ import { module } from 'angular';
 
 import { CloudProviderRegistry, DeploymentStrategyRegistry } from '@spinnaker/core';
 
+import { AmazonLoadBalancersTag } from '@spinnaker/amazon';
+
 import { TITUS_MIGRATION_CONFIG_COMPONENT } from './migration/titusMigrationConfig.component';
 import './validation/ApplicationNameValidator';
 import './help/titus.help';
 import { TITUS_REACT_MODULE } from './reactShims/titus.react.module';
+import './pipeline/stages/runJob/titusRunJobStage';
 
-import { AmazonLoadBalancersTag } from '@spinnaker/amazon';
+import { TitusCloneServerGroupModal } from './serverGroup/configure/wizard/TitusCloneServerGroupModal';
 
 import './logo/titus.logo.less';
 
@@ -23,12 +26,10 @@ module(TITUS_MODULE, [
   require('./securityGroup/securityGroup.read.service').name,
   require('./serverGroup/details/serverGroupDetails.titus.controller.js').name,
   require('./serverGroup/configure/ServerGroupCommandBuilder.js').name,
-  require('./serverGroup/configure/wizard/CloneServerGroup.titus.controller.js').name,
   require('./serverGroup/configure/serverGroup.configure.titus.module.js').name,
   require('./serverGroup/serverGroup.transformer.js').name,
   require('./instance/details/instance.details.controller.js').name,
   require('./pipeline/stages/findAmi/titusFindAmiStage.js').name,
-  require('./pipeline/stages/runJob/titusRunJobStage.js').name,
   require('./pipeline/stages/enableAsg/titusEnableAsgStage.js').name,
   require('./pipeline/stages/disableAsg/titusDisableAsgStage.js').name,
   require('./pipeline/stages/destroyAsg/titusDestroyAsgStage.js').name,
@@ -49,8 +50,7 @@ module(TITUS_MODULE, [
       transformer: 'titusServerGroupTransformer',
       detailsTemplateUrl: require('./serverGroup/details/serverGroupDetails.html'),
       detailsController: 'titusServerGroupDetailsCtrl',
-      cloneServerGroupTemplateUrl: require('./serverGroup/configure/wizard/serverGroupWizard.html'),
-      cloneServerGroupController: 'titusCloneServerGroupCtrl',
+      CloneServerGroupModal: TitusCloneServerGroupModal,
       commandBuilder: 'titusServerGroupCommandBuilder',
       configurationService: 'titusServerGroupConfigurationService',
       skipUpstreamStageCheck: true,

@@ -1,13 +1,12 @@
 import { IController, IScope } from 'angular';
-import { loadAll } from 'js-yaml';
+import { get, defaults } from 'lodash';
+import { ExpectedArtifactSelectorViewController, NgManifestArtifactDelegate, IManifest } from '@spinnaker/core';
 
 import {
   IKubernetesManifestCommandMetadata,
   IKubernetesManifestCommandData,
   KubernetesManifestCommandBuilder,
-} from '../../../manifest/manifestCommandBuilder.service';
-
-import { ExpectedArtifactService, IExpectedArtifact } from '@spinnaker/core';
+} from 'kubernetes/v2/manifest/manifestCommandBuilder.service';
 
 export class KubernetesV2DeployManifestConfigCtrl implements IController {
   public state = {
@@ -19,7 +18,8 @@ export class KubernetesV2DeployManifestConfigCtrl implements IController {
   public artifactSource = 'artifact';
   public sources = [this.textSource, this.artifactSource];
 
-  public expectedArtifacts: IExpectedArtifact[];
+  public manifestArtifactDelegate: NgManifestArtifactDelegate;
+  public manifestArtifactController: ExpectedArtifactSelectorViewController;
 
   constructor(private $scope: IScope) {
     'ngInject';
@@ -29,37 +29,32 @@ export class KubernetesV2DeployManifestConfigCtrl implements IController {
       this.$scope.stage.moniker,
     ).then((builtCommand: IKubernetesManifestCommandData) => {
       if (this.$scope.stage.isNew) {
-        Object.assign(this.$scope.stage, builtCommand.command);
-        this.$scope.stage.source = this.textSource;
+        defaults(this.$scope.stage, builtCommand.command, {
+          manifestArtifactAccount: '',
+          source: this.textSource,
+        });
       }
-
-      if (!this.$scope.stage.manifestArtifactAccount) {
-        this.$scope.stage.manifestArtifactAccount = '';
-      }
-
       this.metadata = builtCommand.metadata;
       this.state.loaded = true;
+      this.manifestArtifactDelegate.setAccounts(get(this, ['metadata', 'backingData', 'artifactAccounts'], []));
+      this.manifestArtifactController.updateAccounts(this.manifestArtifactDelegate.getSelectedExpectedArtifact());
     });
 
-    this.expectedArtifacts = ExpectedArtifactService.getExpectedArtifactsAvailableToStage(
-      $scope.stage,
-      $scope.$parent.pipeline,
+    this.manifestArtifactDelegate = new NgManifestArtifactDelegate($scope);
+    this.manifestArtifactController = new ExpectedArtifactSelectorViewController(this.manifestArtifactDelegate);
+  }
+
+  public canShowAccountSelect() {
+    return (
+      !this.$scope.showCreateArtifactForm &&
+      (this.manifestArtifactController.accountsForArtifact.length > 1 &&
+        this.manifestArtifactDelegate.getSelectedExpectedArtifact() != null)
     );
   }
 
-  public change() {
-    this.$scope.ctrl.metadata.yamlError = false;
-    try {
-      this.$scope.stage.manifests = [];
-      loadAll(this.metadata.manifestText, doc => {
-        if (Array.isArray(doc)) {
-          doc.forEach(d => this.$scope.stage.manifests.push(d));
-        } else {
-          this.$scope.stage.manifests.push(doc);
-        }
-      });
-    } catch (e) {
-      this.$scope.ctrl.metadata.yamlError = true;
-    }
-  }
+  public handleCopy = (manifest: IManifest) => {
+    this.$scope.stage.manifests = [manifest];
+    // This method is called from a React component.
+    this.$scope.$applyAsync();
+  };
 }

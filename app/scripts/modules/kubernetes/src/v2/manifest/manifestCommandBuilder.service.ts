@@ -1,6 +1,11 @@
-import { cloneDeep } from 'lodash';
-import { dump, loadAll } from 'js-yaml';
-import { AccountService, Application, IMoniker } from '@spinnaker/core';
+import { cloneDeep, has } from 'lodash';
+import { $q } from 'ngimport';
+import { IPromise } from 'angular';
+import { load } from 'js-yaml';
+
+import { AccountService, Application, IMoniker, IArtifactAccount, IAccountDetails } from '@spinnaker/core';
+
+const LAST_APPLIED_CONFIGURATION = 'kubectl.kubernetes.io/last-applied-configuration';
 
 export interface IKubernetesManifestCommandData {
   command: IKubernetesManifestCommand;
@@ -21,8 +26,6 @@ export interface IKubernetesManifestCommand {
 }
 
 export interface IKubernetesManifestCommandMetadata {
-  manifestText: string;
-  yamlError: boolean;
   backingData: any;
 }
 
@@ -45,13 +48,8 @@ export class KubernetesManifestCommandBuilder {
     return true;
   }
 
-  public static copyAndCleanCommand(
-    metadata: IKubernetesManifestCommandMetadata,
-    input: IKubernetesManifestCommand,
-  ): IKubernetesManifestCommand {
+  public static copyAndCleanCommand(input: IKubernetesManifestCommand): IKubernetesManifestCommand {
     const command = cloneDeep(input);
-    command.manifests = [];
-    loadAll(metadata.manifestText, doc => command.manifests.push(doc));
     delete command.source;
     return command;
   }
@@ -60,60 +58,67 @@ export class KubernetesManifestCommandBuilder {
     app: Application,
     sourceManifest?: any,
     sourceMoniker?: IMoniker,
-  ): Promise<IKubernetesManifestCommandData> {
-    const dataToFetch = [
-      AccountService.getAllAccountDetailsForProvider('kubernetes', 'v2'),
-      AccountService.getArtifactAccounts(),
-    ];
+    sourceAccount?: string,
+  ): IPromise<IKubernetesManifestCommandData> {
+    if (sourceManifest != null && has(sourceManifest, ['metadata', 'annotations', LAST_APPLIED_CONFIGURATION])) {
+      sourceManifest = load(sourceManifest.metadata.annotations[LAST_APPLIED_CONFIGURATION]);
+    }
 
-    return Promise.all(dataToFetch).then(([accounts, artifactAccounts]) => {
-      const backingData = {
-        accounts,
-        artifactAccounts,
-      };
-      const accountData = backingData.accounts[0];
-      let account: string = null;
-      if (accountData) {
-        account = accountData.name;
-      }
+    const dataToFetch = {
+      accounts: AccountService.getAllAccountDetailsForProvider('kubernetes', 'v2'),
+      artifactAccounts: AccountService.getArtifactAccounts(),
+    };
 
-      let manifestArtifactAccount: string = null;
-      const artifactAccountData = backingData.artifactAccounts[0];
-      if (artifactAccountData) {
-        manifestArtifactAccount = artifactAccountData.name;
-      }
+    // TODO(dpeach): if no callers of this method are Angular controllers,
+    // $q.all may be safely replaced with Promise.all.
+    return $q
+      .all(dataToFetch)
+      .then((backingData: { accounts: IAccountDetails[]; artifactAccounts: IArtifactAccount[] }) => {
+        const { accounts, artifactAccounts } = backingData;
 
-      const manifest: any = null;
-      const manifests: any = null;
-      const manifestText = !sourceManifest ? '' : dump(sourceManifest);
-      const cloudProvider = 'kubernetes';
-      const moniker = sourceMoniker || {
-        app: app.name,
-      };
+        const account = accounts.some(a => a.name === sourceAccount)
+          ? accounts.find(a => a.name === sourceAccount).name
+          : accounts.length
+            ? accounts[0].name
+            : null;
 
-      const relationships = {
-        loadBalancers: [] as string[],
-        securityGroups: [] as string[],
-      };
+        let manifestArtifactAccount: string = null;
+        const [artifactAccountData] = artifactAccounts;
+        if (artifactAccountData) {
+          manifestArtifactAccount = artifactAccountData.name;
+        }
 
-      const versioned: any = null;
+        const cloudProvider = 'kubernetes';
+        const moniker = sourceMoniker || {
+          app: app.name,
+        };
 
-      return {
-        command: {
-          cloudProvider,
-          manifest,
-          manifests,
-          relationships,
-          moniker,
-          account,
-          versioned,
-          manifestArtifactAccount,
-        },
-        metadata: {
-          backingData,
-          manifestText,
-        },
-      } as IKubernetesManifestCommandData;
-    });
+        const relationships = {
+          loadBalancers: [] as string[],
+          securityGroups: [] as string[],
+        };
+
+        const versioned: any = null;
+
+        return {
+          command: {
+            cloudProvider,
+            manifest: null,
+            manifests: Array.isArray(sourceManifest)
+              ? sourceManifest
+              : sourceManifest != null
+                ? [sourceManifest]
+                : null,
+            relationships,
+            moniker,
+            account,
+            versioned,
+            manifestArtifactAccount,
+          },
+          metadata: {
+            backingData,
+          },
+        } as IKubernetesManifestCommandData;
+      });
   }
 }

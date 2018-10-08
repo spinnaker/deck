@@ -259,7 +259,11 @@ export class CreatePipelineModal extends React.Component<ICreatePipelineModalPro
         {config.stages.length > 0 && (
           <div className="small">
             <b>Stages: </b>
-            <ul>{config.stages.map(stage => <li key={stage.refId}>{stage.name || stage.type}</li>)}</ul>
+            <ul>
+              {config.stages.map(stage => (
+                <li key={stage.refId}>{stage.name || stage.type}</li>
+              ))}
+            </ul>
           </div>
         )}
       </div>
@@ -448,6 +452,7 @@ export class CreatePipelineModal extends React.Component<ICreatePipelineModalPro
                             value={{ value: this.state.command.config.name, label: this.state.command.config.name }}
                             optionRenderer={this.configOptionRenderer}
                             onChange={this.handleConfigChange}
+                            onSelectResetsInput={false}
                           />
                         </div>
                       </div>

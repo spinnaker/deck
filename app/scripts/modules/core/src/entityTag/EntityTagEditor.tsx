@@ -1,9 +1,6 @@
 import * as React from 'react';
-import { IDeferred } from 'angular';
-import { $q } from 'ngimport';
-import { Field, FieldProps, Form, Formik, FormikErrors, FormikProps } from 'formik';
+import { Field, FieldProps, Form, Formik, FormikErrors } from 'formik';
 import { Modal } from 'react-bootstrap';
-import { IModalServiceInstance } from 'angular-ui-bootstrap';
 
 import {
   UUIDGenerator,
@@ -68,8 +65,6 @@ export class EntityTagEditor extends React.Component<IEntityTagEditorProps, IEnt
     onUpdate: noop,
   };
 
-  private $uibModalInstanceEmulation: IModalServiceInstance & { deferred?: IDeferred<any> };
-
   /** Shows the Entity Tag Editor modal */
   public static show(props: IEntityTagEditorProps): Promise<void> {
     return ReactModal.show(EntityTagEditor, props);
@@ -90,15 +85,6 @@ export class EntityTagEditor extends React.Component<IEntityTagEditorProps, IEnt
       },
       isSubmitting: false,
     };
-
-    const deferred = $q.defer();
-    const promise = deferred.promise;
-    this.$uibModalInstanceEmulation = {
-      result: promise,
-      close: (result: any) => this.props.closeModal(result),
-      dismiss: (error: any) => this.props.dismissModal(error),
-    } as IModalServiceInstance;
-    Object.assign(this.$uibModalInstanceEmulation, { deferred });
   }
 
   private validate = (values: IEntityTagEditorValues): Partial<FormikErrors<IEntityTagEditorValues>> => {
@@ -111,7 +97,6 @@ export class EntityTagEditor extends React.Component<IEntityTagEditorProps, IEnt
 
   private close = (args?: any): void => {
     this.props.dismissModal.apply(null, args);
-    this.$uibModalInstanceEmulation.deferred.resolve();
   };
 
   private upsertTag = (values: IEntityTagEditorValues): void => {
@@ -126,10 +111,13 @@ export class EntityTagEditor extends React.Component<IEntityTagEditorProps, IEnt
 
     tag.value.message = values.message;
 
+    const onClose = (result: any) => this.props.closeModal(result);
+    const onDismiss = (result: any) => this.props.dismissModal(result);
+    const modalInstance = TaskMonitor.modalInstanceEmulation(onClose, onDismiss);
     const taskMonitor = new TaskMonitor({
       application,
+      modalInstance,
       title: `${isNew ? 'Create' : 'Update'} ${this.props.tag.value.type} for ${entityRef.entityId}`,
-      modalInstance: this.$uibModalInstanceEmulation,
       onTaskComplete: () => application.entityTags.refresh().then(() => onUpdate()),
     });
 
@@ -165,11 +153,11 @@ export class EntityTagEditor extends React.Component<IEntityTagEditorProps, IEnt
       <div>
         <TaskMonitorWrapper monitor={this.state.taskMonitor} />
 
-        <Formik
+        <Formik<{}, IEntityTagEditorValues>
           initialValues={initialValues}
           onSubmit={this.upsertTag}
           validate={this.validate}
-          render={(props: FormikProps<IEntityTagEditorValues>) => (
+          render={({ isValid, values }) => (
             <Form className="form-horizontal">
               <Modal.Header>
                 <h3>
@@ -197,13 +185,13 @@ export class EntityTagEditor extends React.Component<IEntityTagEditorProps, IEnt
                         </div>
                       </div>
                     </div>
-                    {props.values.message && (
+                    {values.message && (
                       <div className="form-group preview">
                         <div className="col-md-3 sm-label-right">
                           <strong>Preview</strong>
                         </div>
                         <div className="col-md-9">
-                          <Markdown message={props.values.message} />
+                          <Markdown message={values.message} />
                         </div>
                       </div>
                     )}
@@ -226,7 +214,7 @@ export class EntityTagEditor extends React.Component<IEntityTagEditorProps, IEnt
                                     name="ownerIndex"
                                     type="radio"
                                     value={index}
-                                    checked={index === Number(props.values.ownerIndex)}
+                                    checked={index === Number(values.ownerIndex)}
                                   />
                                   <span className="marked">
                                     <Markdown message={option.label} />
@@ -245,7 +233,7 @@ export class EntityTagEditor extends React.Component<IEntityTagEditorProps, IEnt
                   Cancel
                 </button>
                 <SubmitButton
-                  isDisabled={!props.isValid || isSubmitting}
+                  isDisabled={!isValid || isSubmitting}
                   submitting={isSubmitting}
                   isFormSubmit={true}
                   label={submitLabel}

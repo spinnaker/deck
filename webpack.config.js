@@ -57,13 +57,14 @@ function configure(env, webpackOpts) {
         '@spinnaker/docker': path.join(__dirname, 'app', 'scripts', 'modules', 'docker', 'src'),
         amazon: path.join(__dirname, 'app', 'scripts', 'modules', 'amazon', 'src'),
         '@spinnaker/amazon': path.join(__dirname, 'app', 'scripts', 'modules', 'amazon', 'src'),
-        '@spinnaker/titus': path.join(__dirname, 'app', 'scripts', 'modules', 'titus', 'src'),
         google: path.join(__dirname, 'app', 'scripts', 'modules', 'google', 'src'),
         '@spinnaker/google': path.join(__dirname, 'app', 'scripts', 'modules', 'google', 'src'),
         kubernetes: path.join(__dirname, 'app', 'scripts', 'modules', 'kubernetes', 'src'),
         '@spinnaker/kubernetes': path.join(__dirname, 'app', 'scripts', 'modules', 'kubernetes', 'src'),
         openstack: path.join(__dirname, 'app', 'scripts', 'modules', 'openstack', 'src'),
         '@spinnaker/openstack': path.join(__dirname, 'app', 'scripts', 'modules', 'openstack', 'src'),
+        ecs: path.join(__dirname, 'app', 'scripts', 'modules', 'ecs', 'src'),
+        '@spinnaker/ecs': path.join(__dirname, 'app', 'scripts', 'modules', 'ecs', 'src'),
         coreImports: path.resolve(
           __dirname,
           'app',
@@ -78,6 +79,12 @@ function configure(env, webpackOpts) {
         ),
         appengine: path.join(__dirname, 'app', 'scripts', 'modules', 'appengine', 'src'),
         '@spinnaker/appengine': path.join(__dirname, 'app', 'scripts', 'modules', 'appengine', 'src'),
+        oracle: path.join(__dirname, 'app', 'scripts', 'modules', 'oracle', 'src'),
+        '@spinnaker/oracle': path.join(__dirname, 'app', 'scripts', 'modules', 'oracle', 'src'),
+        cloudfoundry: path.join(__dirname, 'app', 'scripts', 'modules', 'cloudfoundry', 'src'),
+        '@spinnaker/cloudfoundry': path.join(__dirname, 'app', 'scripts', 'modules', 'cloudfoundry', 'src'),
+        titus: path.join(__dirname, 'app', 'scripts', 'modules', 'titus', 'src'),
+        '@spinnaker/titus': path.join(__dirname, 'app', 'scripts', 'modules', 'titus', 'src'),
       },
     },
     module: {
@@ -171,7 +178,7 @@ function configure(env, webpackOpts) {
     config.devServer.cert = fs.readFileSync(process.env.DECK_CERT);
     config.devServer.key = fs.readFileSync(process.env.DECK_KEY);
     if (process.env.DECK_CA_CERT) {
-      config.devServer.cacert = fs.readFileSync(process.env.DECK_CA_CERT);
+      config.devServer.ca = fs.readFileSync(process.env.DECK_CA_CERT);
     }
   }
 

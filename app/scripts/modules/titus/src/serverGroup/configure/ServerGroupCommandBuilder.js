@@ -27,7 +27,7 @@ module.exports = angular
         resources: {
           cpu: 1,
           networkMbps: 128,
-          disk: 512,
+          disk: 10000,
           memory: 512,
           gpu: 0,
         },
@@ -56,6 +56,10 @@ module.exports = angular
         securityGroups: [],
         imageId: defaults.imageId,
         migrationPolicy: { type: 'systemDefault' },
+        organization: '',
+        tag: '',
+        registry: '',
+        repository: '',
       };
 
       return $q.when(command);
@@ -118,6 +122,10 @@ module.exports = angular
           useSimpleCapacity: serverGroup.capacity.min === serverGroup.capacity.max,
           mode: mode,
         },
+        organization: '',
+        tag: '',
+        registry: '',
+        repository: '',
       };
 
       if (serverGroup.efs) {

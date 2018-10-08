@@ -4,9 +4,7 @@ import {
   ArtifactReferenceService,
   ExecutionArtifactTab,
   ExecutionDetailsTasks,
-  ICustomValidator,
-  IPipeline,
-  IStage,
+  ExpectedArtifactService,
   Registry,
   SETTINGS,
 } from '@spinnaker/core';
@@ -32,31 +30,20 @@ module(KUBERNETES_PATCH_MANIFEST_STAGE, [KUBERNETES_PATCH_MANIFEST_OPTIONS_FORM,
         templateUrl: require('./patchManifestConfig.html'),
         controller: 'KubernetesV2PatchManifestConfigCtrl',
         controllerAs: 'ctrl',
-        artifactFields: ['manifestArtifactId', 'requiredArtifactIds'],
         executionDetailsSections: [PatchStatus, ExecutionDetailsTasks, ExecutionArtifactTab],
         producesArtifacts: true,
         defaultTimeoutMs: 30 * 60 * 1000, // 30 minutes
         validators: [
           { type: 'requiredField', fieldName: 'location', fieldLabel: 'Namespace' },
           { type: 'requiredField', fieldName: 'account', fieldLabel: 'Account' },
-          { type: 'requiredField', fieldName: 'kind', fieldLabel: 'Kind' },
-          {
-            type: 'custom',
-            validate: (_pipeline: IPipeline, stage: IStage) => {
-              let result = null;
-              if (stage.manifestName) {
-                const [, name] = stage.manifestName.split(' ');
-                if (!name) {
-                  result = `<strong>Name</strong> is a required field for ${stage.name} stages`;
-                }
-              }
-              return result;
-            },
-          } as ICustomValidator,
+          { type: 'manifestSelector' },
         ],
+        artifactExtractor: ExpectedArtifactService.accumulateArtifacts(['manifestArtifactId', 'requiredArtifactIds']),
+        artifactRemover: ArtifactReferenceService.removeArtifactFromFields([
+          'manifestArtifactId',
+          'requiredArtifactIds',
+        ]),
       });
-
-      ArtifactReferenceService.registerReference('stage', () => [['manifestArtifactId'], ['requiredArtifactIds']]);
     }
   })
   .controller('KubernetesV2PatchManifestConfigCtrl', KubernetesV2PatchManifestConfigCtrl);

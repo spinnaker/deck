@@ -1,10 +1,20 @@
 import * as React from 'react';
 import Select, { Option } from 'react-select';
+import { $q } from 'ngimport';
 import { SortableContainer, SortableElement, SortableHandle, arrayMove, SortEnd } from 'react-sortable-hoc';
 import { difference, flatten, get, uniq } from 'lodash';
-import { FormikErrors, FormikProps } from 'formik';
+import { FormikErrors } from 'formik';
 
-import { Application, HelpField, IWizardPageProps, Tooltip, ValidationMessage, wizardPage } from '@spinnaker/core';
+import {
+  Application,
+  CustomLabels,
+  HelpField,
+  IWizardPageProps,
+  ReactInjector,
+  Tooltip,
+  ValidationMessage,
+  wizardPage,
+} from '@spinnaker/core';
 
 import { AWSProviderSettings } from 'amazon/aws.settings';
 import {
@@ -55,26 +65,37 @@ const defaultAuthAction = {
   type: 'authenticate-oidc',
 } as IListenerAction;
 
-export interface IALBListenersProps {
+export interface IALBListenersProps extends IWizardPageProps<IAmazonApplicationLoadBalancerUpsertCommand> {
   app: Application;
 }
 
-class ALBListenersImpl extends React.Component<
-  IALBListenersProps & IWizardPageProps & FormikProps<IAmazonApplicationLoadBalancerUpsertCommand>,
-  IALBListenersState
-> {
+class ALBListenersImpl extends React.Component<IALBListenersProps, IALBListenersState> {
   public static LABEL = 'Listeners';
   public protocols = ['HTTP', 'HTTPS'];
 
-  private removedAuthActions: { [key: number]: IListenerAction } = {};
+  private initialActionsWithAuth: Set<IListenerAction[]> = new Set();
+  private initialListenersWithDefaultAuth: Set<IListenerDescription> = new Set();
+  private removedAuthActions: Map<IListenerDescription, { [key: number]: IListenerAction }> = new Map();
 
-  constructor(props: IALBListenersProps & IWizardPageProps & FormikProps<IAmazonApplicationLoadBalancerUpsertCommand>) {
+  constructor(props: IALBListenersProps) {
     super(props);
     this.state = {
       certificates: [],
       certificateTypes: get(AWSProviderSettings, 'loadBalancers.certificateTypes', ['iam', 'acm']),
       oidcConfigs: undefined,
     };
+
+    this.props.formik.initialValues.listeners.forEach(l => {
+      const hasDefaultAuth = l.defaultActions[0].type === 'authenticate-oidc';
+      if (hasDefaultAuth) {
+        this.initialListenersWithDefaultAuth.add(l);
+      }
+      l.rules.forEach(r => {
+        if (r.actions[0].type === 'authenticate-oidc') {
+          this.initialActionsWithAuth.add(r.actions);
+        }
+      });
+    });
   }
 
   private getAllTargetGroupsFromListeners(listeners: IListenerDescription[]): string[] {
@@ -148,7 +169,7 @@ class ALBListenersImpl extends React.Component<
       .then(oidcConfigs => {
         // make sure we have all the secrets for listener actions that need them
         if (oidcConfigs && oidcConfigs.length) {
-          this.props.values.listeners.forEach(listener => {
+          this.props.formik.values.listeners.forEach(listener => {
             listener.defaultActions.forEach(action => this.attachClientSecret(action, oidcConfigs));
             listener.rules.forEach(rule =>
               rule.actions.forEach(action => this.attachClientSecret(action, oidcConfigs)),
@@ -163,7 +184,7 @@ class ALBListenersImpl extends React.Component<
   }
 
   private updateListeners(): void {
-    this.props.setFieldValue('listeners', this.props.values.listeners);
+    this.props.formik.setFieldValue('listeners', this.props.formik.values.listeners);
   }
 
   private needsCert(listener: IListenerDescription): boolean {
@@ -186,26 +207,27 @@ class ALBListenersImpl extends React.Component<
   private removeAuthActions(listener: IListenerDescription): void {
     const authIndex = listener.defaultActions.findIndex(a => a.type === 'authenticate-oidc');
     if (authIndex !== -1) {
-      this.removeAuthAction(listener.defaultActions, authIndex, -1);
+      this.removeAuthAction(listener, listener.defaultActions, authIndex, -1);
     }
     listener.rules.forEach((rule, ruleIndex) => {
       const index = rule.actions.findIndex(a => a.type === 'authenticate-oidc');
       if (index !== -1) {
-        this.removeAuthAction(rule.actions, index, ruleIndex);
+        this.removeAuthAction(listener, rule.actions, index, ruleIndex);
       }
     });
     this.updateListeners();
   }
 
   private reenableAuthActions(listener: IListenerDescription): void {
-    const existingDefaultAuthAction = this.removedAuthActions[-1];
-    this.removedAuthActions[-1] = undefined;
+    const removedAuthActions = this.removedAuthActions.has(listener) ? this.removedAuthActions.get(listener) : [];
+    const existingDefaultAuthAction = removedAuthActions[-1];
     if (existingDefaultAuthAction) {
+      removedAuthActions[-1] = undefined;
       listener.defaultActions.unshift({ ...existingDefaultAuthAction });
     }
     listener.rules.forEach((rule, ruleIndex) => {
-      const existingAuthAction = this.removedAuthActions[ruleIndex];
-      this.removedAuthActions[ruleIndex] = undefined;
+      const existingAuthAction = removedAuthActions[ruleIndex];
+      removedAuthActions[ruleIndex] = undefined;
       if (existingAuthAction) {
         rule.actions.unshift({ ...existingAuthAction });
       }
@@ -245,12 +267,12 @@ class ALBListenersImpl extends React.Component<
   }
 
   private removeListener(index: number): void {
-    this.props.values.listeners.splice(index, 1);
+    this.props.formik.values.listeners.splice(index, 1);
     this.updateListeners();
   }
 
   private addListener = (): void => {
-    this.props.values.listeners.push({
+    this.props.formik.values.listeners.push({
       certificates: [],
       protocol: 'HTTP',
       port: 80,
@@ -335,9 +357,50 @@ class ALBListenersImpl extends React.Component<
       .catch(() => {});
   };
 
-  private removeAuthAction(actions: IListenerAction[], authIndex: number, ruleIndex: number): void {
+  private removeAuthActionInternal(
+    listener: IListenerDescription,
+    actions: IListenerAction[],
+    authIndex: number,
+    ruleIndex = -1,
+  ): void {
     const removedAuthAction = actions.splice(authIndex, 1)[0];
-    this.removedAuthActions[ruleIndex || -1] = removedAuthAction;
+    if (!this.removedAuthActions.has(listener)) {
+      this.removedAuthActions.set(listener, []);
+    }
+    this.removedAuthActions.get(listener)[ruleIndex || -1] = removedAuthAction;
+    this.updateListeners();
+  }
+
+  private removeAuthAction(
+    listener: IListenerDescription,
+    actions: IListenerAction[],
+    authIndex: number,
+    ruleIndex = -1,
+  ): void {
+    // TODO: Check if initial is true.
+    const confirmDefaultRemove = ruleIndex === -1 && this.initialListenersWithDefaultAuth.has(listener);
+    const confirmRemove = ruleIndex > -1 && this.initialActionsWithAuth.has(actions);
+
+    if (confirmDefaultRemove || confirmRemove) {
+      // TODO: Confirmation Dialog first.
+      ReactInjector.confirmationModalService.confirm({
+        header: 'Really remove authentication?',
+        buttonText: `Remove Auth`,
+        submitMethod: () => {
+          this.removeAuthActionInternal(listener, actions, authIndex, ruleIndex);
+          if (confirmDefaultRemove) {
+            this.initialListenersWithDefaultAuth.delete(listener);
+          }
+          if (confirmRemove) {
+            this.initialActionsWithAuth.delete(actions);
+          }
+          return $q.resolve();
+        },
+        windowClass: 'zindex-top',
+      });
+    } else {
+      this.removeAuthActionInternal(listener, actions, authIndex, ruleIndex);
+    }
   }
 
   private authenticateRuleToggle = (listener: IListenerDescription, ruleIndex: number) => {
@@ -346,9 +409,12 @@ class ALBListenersImpl extends React.Component<
     if (actions) {
       const authIndex = actions.findIndex(a => a.type === 'authenticate-oidc');
       if (authIndex !== -1) {
-        this.removeAuthAction(actions, authIndex, ruleIndex);
+        this.removeAuthAction(listener, actions, authIndex, ruleIndex);
       } else {
-        const newAuthAction = this.removedAuthActions[ruleIndex || -1] || { ...defaultAuthAction };
+        const removedAction = this.removedAuthActions.has(listener)
+          ? this.removedAuthActions.get(listener)[ruleIndex || -1]
+          : undefined;
+        const newAuthAction = removedAction || { ...defaultAuthAction };
         actions.unshift({ ...newAuthAction });
       }
       this.updateListeners();
@@ -361,7 +427,7 @@ class ALBListenersImpl extends React.Component<
   };
 
   public render() {
-    const { errors, values } = this.props;
+    const { errors, values } = this.props.formik;
     const { certificates, certificateTypes, oidcConfigs } = this.state;
 
     const certificatesForAccount = certificates[values.credentials as any] || [];
@@ -390,7 +456,9 @@ class ALBListenersImpl extends React.Component<
                               this.listenerProtocolChanged(listener, event.target.value as ALBListenerProtocol)
                             }
                           >
-                            {this.protocols.map(p => <option key={p}>{p}</option>)}
+                            {this.protocols.map(p => (
+                              <option key={p}>{p}</option>
+                            ))}
                           </select>
                         </span>
                         <span className="wizard-pod-content">
@@ -425,7 +493,9 @@ class ALBListenersImpl extends React.Component<
                               value={certificate.type}
                               onChange={event => this.certificateTypeChanged(certificate, event.target.value)}
                             >
-                              {certificateTypes.map(t => <option key={t}>{t}</option>)}
+                              {certificateTypes.map(t => (
+                                <option key={t}>{t}</option>
+                              ))}
                             </select>
                             {this.showCertificateSelect(certificate) && (
                               <Select
@@ -636,7 +706,9 @@ const Action = (props: {
           required={true}
         >
           <option value="" />
-          {uniq(props.targetGroups.map(tg => tg.name)).map(name => <option key={name}>{name}</option>)}
+          {uniq(props.targetGroups.map(tg => tg.name)).map(name => (
+            <option key={name}>{name}</option>
+          ))}
         </select>
       </div>
     );
@@ -644,13 +716,15 @@ const Action = (props: {
   if (props.action.type === 'authenticate-oidc') {
     const clientId = props.action.authenticateOidcConfig.clientId;
 
+    const disableManualOidcDialog = get(AWSProviderSettings, 'loadBalancers.disableManualOidcDialog', false);
     const showOidcConfigs =
-      props.oidcConfigs &&
-      props.oidcConfigs.length > 0 &&
-      (!clientId || props.oidcConfigs.find(c => c.clientId === clientId));
+      disableManualOidcDialog ||
+      (props.oidcConfigs &&
+        props.oidcConfigs.length > 0 &&
+        (!clientId || props.oidcConfigs.find(c => c.clientId === clientId)));
     return (
       <div className="horizontal middle" style={{ height: '30px' }}>
-        <span style={{ whiteSpace: 'pre' }}>auth with OIDC client </span>
+        <span style={{ whiteSpace: 'pre' }}>auth with {CustomLabels.get('OIDC client')} </span>
 
         {showOidcConfigs && (
           <select
@@ -660,7 +734,9 @@ const Action = (props: {
             required={true}
           >
             <option value="" />
-            {(props.oidcConfigs || []).map(config => <option key={config.clientId}>{config.clientId}</option>)}
+            {(props.oidcConfigs || []).map(config => (
+              <option key={config.clientId}>{config.clientId}</option>
+            ))}
           </select>
         )}
         {!showOidcConfigs && (
@@ -693,15 +769,18 @@ const RuleActions = (props: {
   return (
     <span>
       {allowAuth && (
-        <a
-          className="btn btn-sm btn-link clickable"
-          onClick={() => props.authenticateRuleToggle(props.listener, props.ruleIndex)}
-          style={{ padding: '0' }}
-        >
-          <Tooltip value={tooltip}>
-            <i className={icon} />
-          </Tooltip>
-        </a>
+        <>
+          <a
+            className="btn btn-sm btn-link clickable"
+            onClick={() => props.authenticateRuleToggle(props.listener, props.ruleIndex)}
+            style={{ padding: '0' }}
+          >
+            <Tooltip value={tooltip}>
+              <i className={icon} />
+            </Tooltip>
+          </a>
+          <HelpField id="aws.loadBalancer.oidcAuthentication" />
+        </>
       )}
       {props.ruleIndex !== undefined &&
         props.ruleIndex >= 0 &&
@@ -794,4 +873,4 @@ const Rules = SortableContainer((props: IRulesProps) => (
   </tbody>
 ));
 
-export const ALBListeners = wizardPage<IALBListenersProps>(ALBListenersImpl);
+export const ALBListeners = wizardPage(ALBListenersImpl);

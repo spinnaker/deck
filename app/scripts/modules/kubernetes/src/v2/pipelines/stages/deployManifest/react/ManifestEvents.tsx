@@ -2,6 +2,7 @@ import * as React from 'react';
 import { get } from 'lodash';
 import * as moment from 'moment';
 import { IManifest, IManifestEvent, relativeTime } from '@spinnaker/core';
+import { JobManifestPodLogs } from './JobManifestPodLogs';
 
 export interface IManifestEventsProps {
   manifest: IManifest;
@@ -22,8 +23,8 @@ export class ManifestEvents extends React.Component<IManifestEventsProps> {
     if (!this.props.manifest) {
       return null;
     }
-    if (this.props.manifest && !this.props.manifest.events) {
-      return <div>No events found - Kubernetes does not store events for long.</div>;
+    if (this.props.manifest && (!this.props.manifest.events || this.props.manifest.events.length === 0)) {
+      return <div>No recent events found - Kubernetes does not store events for long.</div>;
     }
     const { events } = this.props.manifest;
     return events.map((e, i) => {
@@ -66,6 +67,9 @@ export class ManifestEvents extends React.Component<IManifestEventsProps> {
             </div>
           )}
           <div>{e.message}</div>
+          <div>
+            <JobManifestPodLogs manifest={this.props.manifest} manifestEvent={e} linkName="Console Output (Raw)" />
+          </div>
           {i !== events.length - 1 && <br />}
         </div>
       );

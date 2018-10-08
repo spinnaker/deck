@@ -28,7 +28,7 @@
     <div class="actions">
       <div class="dropdown" uib-dropdown dropdown-append-to-body>
         <button type="button" class="btn btn-sm btn-primary dropdown-toggle" uib-dropdown-toggle>
-          Server Group Actions <span class="caret"></span>
+          {{ctrl.serverGroup.kind | robotToHuman}} Actions <span class="caret"></span>
         </button>
         <ul class="dropdown-menu" uib-dropdown-menu role="menu">
           <li ng-if="ctrl.canEditServerGroup()">
@@ -78,18 +78,24 @@
 
     <kubernetes-annotation-custom-sections manifest="ctrl.serverGroup.manifest" resource="ctrl.serverGroup"></kubernetes-annotation-custom-sections>
 
+    <collapsible-section heading="Images" expanded="true">
+      <kubernetes-manifest-image-details manifest="ctrl.serverGroup.manifest"></kubernetes-manifest-image-details>
+    </collapsible-section>
+
     <collapsible-section heading="Events" expanded="true">
       <kubernetes-manifest-events manifest="ctrl.manifest"></kubernetes-manifest-events>
     </collapsible-section>
     <collapsible-section heading="Labels" expanded="true">
       <kubernetes-manifest-labels manifest="ctrl.serverGroup.manifest"></kubernetes-manifest-labels>
     </collapsible-section>
-    <collapsible-section heading="Annotations" expanded="true">
-      <kubernetes-manifest-annotations manifest="ctrl.serverGroup.manifest"></kubernetes-manifest-annotations>
-    </collapsible-section>
     <collapsible-section heading="Size" expanded="true">
       <dl class="dl-horizontal dl-flex"
-          ng-if="ctrl.serverGroup.capacity.min === ctrl.serverGroup.capacity.max">
+          ng-if="ctrl.serverGroup.capacity.min == null">
+        <dt>Current</dt>
+        <dd>{{ctrl.serverGroup.instances.length}}</dd>
+      </dl>
+      <dl class="dl-horizontal dl-flex"
+          ng-if="ctrl.serverGroup.capacity.min != null && ctrl.serverGroup.capacity.min === ctrl.serverGroup.capacity.max">
         <dt>Min/Max</dt>
         <dd>{{ctrl.serverGroup.capacity.min}}</dd>
         <dt>Current</dt>

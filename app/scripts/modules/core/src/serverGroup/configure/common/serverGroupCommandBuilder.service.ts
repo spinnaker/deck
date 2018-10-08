@@ -2,12 +2,13 @@ import { module } from 'angular';
 
 import { Application } from 'core/application/application.model';
 import { IMoniker } from 'core/naming/IMoniker';
-import { ILoadBalancer, ISecurityGroup, ISubnet, IEntityTags } from 'core/domain';
+import { ILoadBalancer, ISecurityGroup, ISubnet, IEntityTags, IPipeline, IStage } from 'core/domain';
 import { ICapacity } from 'core/serverGroup/serverGroupWriter.service';
 import { IDeploymentStrategy } from 'core/deploymentStrategy';
 import { ISecurityGroupsByAccountSourceData } from 'core/securityGroup/securityGroupReader.service';
 import { IRegion, IAggregatedAccounts } from 'core/account/AccountService';
 import { PROVIDER_SERVICE_DELEGATE, ProviderServiceDelegate } from 'core/cloudProvider';
+import { IPreferredInstanceType } from 'core/instance';
 
 export interface IServerGroupCommandBuilderOptions {
   account: string;
@@ -32,15 +33,29 @@ export interface IServerGroupCommandResult {
 }
 
 export interface IServerGroupCommandViewState {
+  customTemplateMessage: string;
   dirty?: IServerGroupCommandDirty;
   disableImageSelection: boolean;
+  expectedArtifacts: any[];
   imageId?: string;
   instanceProfile: string;
+  instanceTypeDetails?: IPreferredInstanceType;
+  disableNoTemplateSelection?: boolean;
+  disableStrategySelection?: boolean;
+  hideClusterNamePreview?: boolean;
+  imageSourceText?: string;
+  overrides: any;
+  overriddenStorageDescription?: string;
+  readOnlyFields: { [field: string]: boolean };
+  requiresTemplateSelection?: boolean;
+  submitButtonLabel?: string;
   showImageSourceSelector: true;
   useAllImageSelection: boolean;
   useSimpleCapacity: boolean;
   usePreferredZones: boolean;
   mode: string;
+  pipeline?: IPipeline;
+  stage?: IStage;
 }
 
 export interface IServerGroupCommandBackingDataFiltered {
@@ -80,15 +95,21 @@ export interface IServerGroupCommand extends IServerGroupCommandResult {
   availabilityZones: string[];
   backingData: IServerGroupCommandBackingData;
   capacity: ICapacity;
+  cloudProvider: string;
   cooldown: number;
   credentials: string;
+  disableNoTemplateSelection?: boolean;
   enabledMetrics: string[];
   freeFormDetails?: string;
   healthCheckType: string;
   iamRole: string;
+  imageArtifactId?: string;
   instanceType: string;
+  interestingHealthProviderNames: string[];
   loadBalancers: string[];
   vpcLoadBalancers: string[];
+  preferSourceCapacity?: boolean;
+  reason?: string;
   region: string;
   securityGroups: string[];
   selectedProvider: string;
@@ -104,24 +125,24 @@ export interface IServerGroupCommand extends IServerGroupCommandResult {
   tags: IEntityTags;
   terminationPolicies: string[];
   type?: string;
+  useSourceCapacity?: boolean;
   viewState: IServerGroupCommandViewState;
   virtualizationType: string;
   vpcId: string;
 
-  processIsSuspended: (process: string) => boolean;
-  toggleSuspendedProcess: (process: string) => void;
-  onStrategyChange: (strategy: IDeploymentStrategy) => void;
-  regionIsDeprecated: () => boolean;
-  subnetChanged: () => IServerGroupCommandResult;
-  regionChanged: () => IServerGroupCommandResult;
-  credentialsChanged: () => IServerGroupCommandResult;
-  imageChanged: () => IServerGroupCommandResult;
-  instanceTypeChanged: () => void;
+  processIsSuspended: (command: IServerGroupCommand, process: string) => boolean;
+  toggleSuspendedProcess: (command: IServerGroupCommand, process: string) => void;
+  onStrategyChange: (command: IServerGroupCommand, strategy: IDeploymentStrategy) => void;
+  subnetChanged: (command: IServerGroupCommand) => IServerGroupCommandResult;
+  regionChanged: (command: IServerGroupCommand) => IServerGroupCommandResult;
+  credentialsChanged: (command: IServerGroupCommand) => IServerGroupCommandResult;
+  imageChanged: (command: IServerGroupCommand) => IServerGroupCommandResult;
+  instanceTypeChanged: (command: IServerGroupCommand) => void;
 }
 
 export class ServerGroupCommandBuilderService {
-  private getDelegate(provider: string): any {
-    return this.providerServiceDelegate.getDelegate(provider, 'serverGroup.commandBuilder');
+  private getDelegate(provider: string, skin?: string): any {
+    return this.providerServiceDelegate.getDelegate(provider, 'serverGroup.commandBuilder', skin);
   }
 
   constructor(private providerServiceDelegate: ProviderServiceDelegate) {
@@ -132,8 +153,9 @@ export class ServerGroupCommandBuilderService {
     application: Application,
     provider: string,
     options: IServerGroupCommandBuilderOptions,
+    skin?: string,
   ): any {
-    return this.getDelegate(provider).buildNewServerGroupCommand(application, options);
+    return this.getDelegate(provider, skin).buildNewServerGroupCommand(application, options);
   }
 
   public buildServerGroupCommandFromExisting(application: Application, serverGroup: any, mode: string): any {

@@ -1,8 +1,7 @@
 import * as React from 'react';
-import * as PropTypes from 'prop-types';
 import { Transition } from '@uirouter/core';
+import { UIRouterConsumer, UIRouterReact, UIViewConsumer, UIViewAddress } from '@uirouter/react';
 import { Subscription } from 'rxjs';
-
 import { IInstance } from 'core/domain';
 import { Instance } from './Instance';
 
@@ -15,16 +14,25 @@ export interface IInstancesState {
   detailsInstanceId: string;
 }
 
-export class Instances extends React.Component<IInstancesProps, IInstancesState> {
-  // context from enclosing UIView
-  public static contextTypes = {
-    router: PropTypes.object,
-    parentUIViewAddress: PropTypes.object,
-  };
+export const Instances = (props: IInstancesProps) => (
+  <UIRouterConsumer>
+    {(router: UIRouterReact) => (
+      <UIViewConsumer>
+        {(uiview: UIViewAddress) => <InstancesInternal {...props} router={router} uiview={uiview} />}
+      </UIViewConsumer>
+    )}
+  </UIRouterConsumer>
+);
 
+export interface IInstancesInternalProps extends IInstancesProps {
+  router: UIRouterReact;
+  uiview: UIViewAddress;
+}
+
+class InstancesInternal extends React.Component<IInstancesInternalProps, IInstancesState> {
   private subscription: Subscription;
 
-  constructor(props: IInstancesProps) {
+  constructor(props: IInstancesInternalProps) {
     super(props);
     this.state = {
       detailsInstanceId: null,
@@ -32,7 +40,7 @@ export class Instances extends React.Component<IInstancesProps, IInstancesState>
   }
 
   public componentDidMount() {
-    this.subscription = this.context.router.globals.success$.subscribe(this.onStateChange);
+    this.subscription = this.props.router.globals.success$.subscribe(this.onStateChange);
   }
 
   public componentWillUnmount() {
@@ -45,8 +53,8 @@ export class Instances extends React.Component<IInstancesProps, IInstancesState>
     this.setState({ detailsInstanceId });
   };
 
-  public shouldComponentUpdate(nextProps: IInstancesProps, nextState: IInstancesState) {
-    const propsKeys: Array<keyof IInstancesProps> = ['instances', 'highlight'];
+  public shouldComponentUpdate(nextProps: IInstancesInternalProps, nextState: IInstancesState) {
+    const propsKeys: Array<keyof IInstancesInternalProps> = ['instances', 'highlight'];
     if (propsKeys.some(key => this.props[key] !== nextProps[key])) {
       return true;
     }
@@ -62,9 +70,9 @@ export class Instances extends React.Component<IInstancesProps, IInstancesState>
   }
 
   private handleInstanceClicked = (instance: IInstance) => {
-    const { router, parentUIViewAddress } = this.context;
-    const params = { instanceId: instance.id, provider: instance.provider };
-    const options = { relative: parentUIViewAddress.context };
+    const { router, uiview } = this.props;
+    const params = { instanceId: instance.id, provider: instance.cloudProvider || instance.provider };
+    const options = { relative: uiview.context };
 
     router.stateService.go('.instanceDetails', params, options);
   };

@@ -27,7 +27,7 @@
     <div class="actions">
       <div class="dropdown" uib-dropdown dropdown-append-to-body>
         <button type="button" class="btn btn-sm btn-primary dropdown-toggle" uib-dropdown-toggle>
-          Server Group Manager Actions <span class="caret"></span>
+          {{ctrl.serverGroupManager.kind | robotToHuman}} Actions <span class="caret"></span>
         </button>
         <ul class="dropdown-menu" uib-dropdown-menu role="menu">
           <li>
@@ -105,10 +105,6 @@
 
     <collapsible-section heading="Labels" expanded="true">
       <kubernetes-manifest-labels manifest="ctrl.serverGroupManager.manifest"></kubernetes-manifest-labels>
-    </collapsible-section>
-
-    <collapsible-section heading="Annotations" expanded="true">
-      <kubernetes-manifest-annotations manifest="ctrl.serverGroupManager.manifest"></kubernetes-manifest-annotations>
     </collapsible-section>
 
     <collapsible-section heading="Artifacts" expanded="true">

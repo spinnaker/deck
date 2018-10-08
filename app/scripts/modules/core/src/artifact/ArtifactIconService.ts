@@ -1,3 +1,5 @@
+import { ArtifactTypePatterns } from './ArtifactTypes';
+
 const unknownArtifactPath = require('./icons/unknown-type-artifact.svg');
 
 interface IArtifactIcon {
@@ -25,11 +27,11 @@ export class ArtifactIconService {
   }
 }
 
-ArtifactIconService.registerType(/docker\/image/, require('./icons/docker-image-artifact.svg'));
-ArtifactIconService.registerType(/kubernetes\/.*/, require('./icons/kubernetes-artifact.svg'));
-ArtifactIconService.registerType(/embedded\/base64/, require('./icons/embedded-base64-artifact.svg'));
-ArtifactIconService.registerType(/gcs\/object/, require('./icons/gcs-file-artifact.svg'));
-ArtifactIconService.registerType(/github\/file/, require('./icons/github-file-artifact.svg'));
-ArtifactIconService.registerType(/gitlab\/file/, require('./icons/gitlab-file-artifact.svg'));
-ArtifactIconService.registerType(/bitbucket\/file/, require('./icons/bitbucket-file-artifact.svg'));
-ArtifactIconService.registerType(/s3\/object/, require('./icons/s3-object-artifact.svg'));
+ArtifactIconService.registerType(ArtifactTypePatterns.DOCKER_IMAGE, require('./icons/docker-image-artifact.svg'));
+ArtifactIconService.registerType(ArtifactTypePatterns.KUBERNETES, require('./icons/kubernetes-artifact.svg'));
+ArtifactIconService.registerType(ArtifactTypePatterns.EMBEDDED_BASE64, require('./icons/embedded-base64-artifact.svg'));
+ArtifactIconService.registerType(ArtifactTypePatterns.GCS_OBJECT, require('./icons/gcs-file-artifact.svg'));
+ArtifactIconService.registerType(ArtifactTypePatterns.GITHUB_FILE, require('./icons/github-file-artifact.svg'));
+ArtifactIconService.registerType(ArtifactTypePatterns.GITLAB_FILE, require('./icons/gitlab-file-artifact.svg'));
+ArtifactIconService.registerType(ArtifactTypePatterns.BITBUCKET_FILE, require('./icons/bitbucket-file-artifact.svg'));
+ArtifactIconService.registerType(ArtifactTypePatterns.S3_OBJECT, require('./icons/s3-object-artifact.svg'));

@@ -5,15 +5,20 @@ import { API } from 'core/api/ApiService';
 import { Application } from 'core/application/application.model';
 import { NameUtils } from 'core/naming';
 import { FilterModelService } from 'core/filterModel';
-import { ICluster, IClusterSummary, IExecution, IExecutionStage, IServerGroup } from 'core/domain';
+import { IArtifactExtractor, ICluster, IClusterSummary, IExecution, IExecutionStage, IServerGroup } from 'core/domain';
 import { ClusterState } from 'core/state';
-
+import { ProviderServiceDelegate } from 'core/cloudProvider/providerService.delegate';
 import { taskMatcher } from './task.matcher';
+import { ArtifactReferenceService } from 'core';
 
 export class ClusterService {
   public static ON_DEMAND_THRESHOLD = 350;
 
-  constructor(private $q: IQService, private serverGroupTransformer: any) {
+  constructor(
+    private $q: IQService,
+    private serverGroupTransformer: any,
+    private providerServiceDelegate: ProviderServiceDelegate,
+  ) {
     'ngInject';
   }
 
@@ -186,6 +191,29 @@ export class ClusterService {
 
   public isDeployingArtifact(cluster: ICluster): boolean {
     return cluster.imageSource === 'artifact';
+  }
+
+  public defaultArtifactExtractor(): IArtifactExtractor {
+    return {
+      extractArtifacts: (cluster: ICluster) => (this.isDeployingArtifact(cluster) ? [cluster.imageArtifactId] : []),
+      removeArtifact: (cluster: ICluster, artifactId: string) => {
+        ArtifactReferenceService.removeArtifactFromField('imageArtifactId', cluster, artifactId);
+      },
+    };
+  }
+
+  public getArtifactExtractor(cloudProvider: string): IArtifactExtractor {
+    return this.providerServiceDelegate.hasDelegate(cloudProvider, 'serverGroup.artifactExtractor')
+      ? this.providerServiceDelegate.getDelegate<IArtifactExtractor>(cloudProvider, 'serverGroup.artifactExtractor')
+      : this.defaultArtifactExtractor();
+  }
+
+  public extractArtifacts(cluster: ICluster): string[] {
+    return this.getArtifactExtractor(cluster.cloudProvider).extractArtifacts(cluster);
+  }
+
+  public removeArtifact(cluster: ICluster, artifactId: string): void {
+    this.getArtifactExtractor(cluster.cloudProvider).removeArtifact(cluster, artifactId);
   }
 
   private getClusters(application: string): IPromise<IClusterSummary[]> {

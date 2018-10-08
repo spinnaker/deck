@@ -83,6 +83,8 @@ export class AwsLoadBalancerTransformer {
     serverGroups.forEach(serverGroup => {
       serverGroup.account = serverGroup.account || container.account;
       serverGroup.region = serverGroup.region || container.region;
+      serverGroup.cloudProvider = serverGroup.cloudProvider || container.cloudProvider;
+
       if (serverGroup.detachedInstances) {
         serverGroup.detachedInstances = (serverGroup.detachedInstances as any).map((instanceId: string) => {
           return { id: instanceId } as IInstance;
@@ -121,7 +123,14 @@ export class AwsLoadBalancerTransformer {
 
       tg.serverGroups = tg.serverGroups.map(serverGroup => {
         const account = accounts.find(x => x.name === serverGroup.account);
-        const cloudProvider = serverGroup.cloudProvider || (account && account.cloudProvider);
+        const cloudProvider = (account && account.cloudProvider) || serverGroup.cloudProvider;
+
+        serverGroup.cloudProvider = cloudProvider;
+        serverGroup.instances.forEach(instance => {
+          instance.cloudProvider = cloudProvider;
+          instance.provider = cloudProvider;
+        });
+
         return { ...serverGroup, cloudProvider };
       });
 
@@ -203,23 +212,25 @@ export class AwsLoadBalancerTransformer {
       toEdit.vpcId = elb.vpcid || elb.vpcId;
 
       if (elb.listenerDescriptions) {
-        toEdit.listeners = elb.listenerDescriptions.map((description: any): IClassicListenerDescription => {
-          const listener = description.listener;
-          if (listener.sslcertificateId) {
-            const splitCertificateId = listener.sslcertificateId.split('/');
-            listener.sslcertificateId = splitCertificateId[1];
-            listener.sslCertificateType = splitCertificateId[0].split(':')[2];
-          }
-          return {
-            internalProtocol: listener.instanceProtocol,
-            internalPort: listener.instancePort,
-            externalProtocol: listener.protocol,
-            externalPort: listener.loadBalancerPort,
-            sslCertificateId: listener.sslcertificateId,
-            sslCertificateName: listener.sslcertificateId,
-            sslCertificateType: listener.sslCertificateType,
-          };
-        });
+        toEdit.listeners = elb.listenerDescriptions.map(
+          (description: any): IClassicListenerDescription => {
+            const listener = description.listener;
+            if (listener.sslcertificateId) {
+              const splitCertificateId = listener.sslcertificateId.split('/');
+              listener.sslcertificateId = splitCertificateId[1];
+              listener.sslCertificateType = splitCertificateId[0].split(':')[2];
+            }
+            return {
+              internalProtocol: listener.instanceProtocol,
+              internalPort: listener.instancePort,
+              externalProtocol: listener.protocol,
+              externalPort: listener.loadBalancerPort,
+              sslCertificateId: listener.sslcertificateId,
+              sslCertificateName: listener.sslcertificateId,
+              sslCertificateType: listener.sslCertificateType,
+            };
+          },
+        );
       }
 
       if (elb.healthCheck && elb.healthCheck.target) {
