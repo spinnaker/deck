@@ -17,7 +17,7 @@ module.exports = angular
       provides: 'bake',
       cloudProvider: 'docker',
       label: 'Bake',
-      description: 'Bakes an image in the specified region',
+      description: 'Bakes an image',
       templateUrl: require('./bakeStage.html'),
       executionDetailsUrl: require('./bakeExecutionDetails.html'),
       executionLabelComponent: BakeExecutionLabel,
@@ -44,23 +44,21 @@ module.exports = angular
 
     function initialize() {
       $scope.viewState.providerSelected = true;
-      $q
-        .all({
-          baseOsOptions: BakeryReader.getBaseOsOptions('docker'),
-          baseLabelOptions: BakeryReader.getBaseLabelOptions(),
-        })
-        .then(function(results) {
-          $scope.baseOsOptions = results.baseOsOptions.baseImages;
-          $scope.baseLabelOptions = results.baseLabelOptions;
+      $q.all({
+        baseOsOptions: BakeryReader.getBaseOsOptions('docker'),
+        baseLabelOptions: BakeryReader.getBaseLabelOptions(),
+      }).then(function(results) {
+        $scope.baseOsOptions = results.baseOsOptions.baseImages;
+        $scope.baseLabelOptions = results.baseLabelOptions;
 
-          if (!$scope.stage.baseOs && $scope.baseOsOptions && $scope.baseOsOptions.length) {
-            $scope.stage.baseOs = $scope.baseOsOptions[0].id;
-          }
-          if (!$scope.stage.baseLabel && $scope.baseLabelOptions && $scope.baseLabelOptions.length) {
-            $scope.stage.baseLabel = $scope.baseLabelOptions[0];
-          }
-          $scope.viewState.loading = false;
-        });
+        if (!$scope.stage.baseOs && $scope.baseOsOptions && $scope.baseOsOptions.length) {
+          $scope.stage.baseOs = $scope.baseOsOptions[0].id;
+        }
+        if (!$scope.stage.baseLabel && $scope.baseLabelOptions && $scope.baseLabelOptions.length) {
+          $scope.stage.baseLabel = $scope.baseLabelOptions[0];
+        }
+        $scope.viewState.loading = false;
+      });
     }
 
     function deleteEmptyProperties() {
