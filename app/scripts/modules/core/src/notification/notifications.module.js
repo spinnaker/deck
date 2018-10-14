@@ -15,4 +15,5 @@ module.exports = angular.module('spinnaker.core.notifications', [
   require('./types/hipchat/hipchat.notification.type.module').name,
   require('./types/slack/slack.notification.type.module').name,
   require('./types/sms/sms.notification.type.module').name,
+  require('./types/githubstatus/githubstatus.notification.type.module').name,
 ]);
