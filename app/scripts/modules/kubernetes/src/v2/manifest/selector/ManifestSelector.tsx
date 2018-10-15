@@ -87,7 +87,13 @@ export class ManifestSelector extends React.Component<IManifestSelectorProps, IM
     if (namespaces.every(ns => ns !== this.state.selector.location)) {
       this.state.selector.location = null;
     }
+    this.state.selector.account = selectedAccount;
 
+    this.search$.next({
+      kind: this.parseSpinnakerName(this.state.selector.manifestName).kind,
+      namespace: this.state.selector.location,
+      account: this.state.selector.account,
+    });
     this.setState({
       namespaces,
       kinds,

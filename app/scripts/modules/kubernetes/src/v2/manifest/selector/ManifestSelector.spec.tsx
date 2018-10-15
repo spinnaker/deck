@@ -92,6 +92,24 @@ describe('<ManifestSelector />', () => {
       expect(searchService).toHaveBeenCalledWith('configMap', 'kube-system', 'my-account');
     });
 
+    it('calls the search service after updating the `Account` field', () => {
+      const wrapper = component({
+        manifestName: 'configMap my-config-map',
+        account: 'my-account',
+        location: 'default',
+      });
+      wrapper.setState({
+        accounts: [
+          { name: 'my-account', namespaces: ['default'] },
+          { name: 'my-other-account', namespaces: ['default'] },
+        ],
+      });
+
+      const account = wrapper.find(AccountSelectField).first();
+      account.props().onChange('my-other-account');
+      expect(searchService).toHaveBeenCalledWith('configMap', 'default', 'my-other-account');
+    });
+
     it('clears namespace when changing account if account does not have selected namespace', () => {
       const wrapper = component({
         manifestName: 'configMap my-config-map',
