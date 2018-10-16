@@ -132,6 +132,17 @@ module.exports = angular
       const pipeline = this.command.pipeline,
         executions = application.executions.data || [];
 
+      if (
+        pipeline.type === 'templatedPipeline' &&
+        executions.length > 0 &&
+        (pipeline.stages === undefined || pipeline.stages.length === 0)
+      ) {
+        const previousSuccessfulExecution = executions.find(e => e.stages.length > 0);
+        if (previousSuccessfulExecution) {
+          pipeline.stages = previousSuccessfulExecution.stages;
+        }
+      }
+
       pipelineNotifications = pipeline.notifications || [];
       synchronizeNotifications();
 
