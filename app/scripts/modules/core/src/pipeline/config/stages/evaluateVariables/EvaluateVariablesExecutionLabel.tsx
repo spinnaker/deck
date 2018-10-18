@@ -5,21 +5,23 @@ import { IExecutionStageSummary, IExecution } from 'core/domain';
 import { Application } from 'core/application/application.model';
 import { HoverablePopover } from 'core/presentation/HoverablePopover';
 import { ExecutionBarLabel } from 'core/pipeline/config/stages/core/ExecutionBarLabel';
-import { SkipWait } from './SkipWait';
 
-export interface IWaitExecutionLabelProps {
+export interface IEvaluateVariablesExecutionLabelProps {
   stage: IExecutionStageSummary;
   execution: IExecution;
   application: Application;
   executionMarker: boolean;
 }
 
-export interface IWaitExecutionLabelState {
+export interface IEvaluateVariablesExecutionLabelState {
   target?: any;
 }
 
-export class WaitExecutionLabel extends React.Component<IWaitExecutionLabelProps, IWaitExecutionLabelState> {
-  constructor(props: IWaitExecutionLabelProps) {
+export class EvaluateVariablesExecutionLabel extends React.Component<
+  IEvaluateVariablesExecutionLabelProps,
+  IEvaluateVariablesExecutionLabelState
+> {
+  constructor(props: IEvaluateVariablesExecutionLabelProps) {
     super(props);
     this.state = {};
   }
@@ -35,7 +37,6 @@ export class WaitExecutionLabel extends React.Component<IWaitExecutionLabelProps
           <div>
             <b>{stage.name}</b>
           </div>
-          <SkipWait stage={stage.masterStage} application={this.props.application} execution={this.props.execution} />
         </div>
       );
       return <HoverablePopover template={template}>{this.props.children}</HoverablePopover>;

@@ -1,9 +1,8 @@
 import { IStageConfigProps } from 'core/pipeline/config/stages/core/IStageConfigProps';
 import * as React from 'react';
-import { defaultsDeep, set } from 'lodash';
+import { set } from 'lodash';
 
 import { StageConfigField } from '../core/stageConfigField/StageConfigField';
-import { SpelNumberInput } from 'core/widgets/spelText/SpelNumberInput';
 import { IStage } from 'core/domain';
 import { MapEditor } from '@spinnaker/core';
 
@@ -11,15 +10,13 @@ export interface IEvaluateVariablesStageConfigState {
   variables: any;
 }
 
-export const DEFAULT_SKIP_WAIT_TEXT = 'The pipeline will proceed immediately, marking this stage completed.';
-
 export class EvaluateVariablesStageConfig extends React.Component<
   IStageConfigProps,
   IEvaluateVariablesStageConfigState
 > {
   public static getDerivedStateFromProps(
     props: IStageConfigProps,
-    state: IEvaluateVariablesStageConfigState,
+    // state: IEvaluateVariablesStageConfigState,
   ): IEvaluateVariablesStageConfigState {
     const { stage } = props;
     const { variables } = stage;
@@ -53,7 +50,6 @@ export class EvaluateVariablesStageConfig extends React.Component<
   }
 
   private stageFieldChanged = (fieldIndex: string, value: any) => {
-    console.log(value);
     set(this.props.stage, fieldIndex, this.transform(value));
     this.props.stageFieldUpdated();
     this.forceUpdate();
