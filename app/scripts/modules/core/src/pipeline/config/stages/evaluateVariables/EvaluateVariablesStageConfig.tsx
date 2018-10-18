@@ -14,15 +14,12 @@ export class EvaluateVariablesStageConfig extends React.Component<
   IStageConfigProps,
   IEvaluateVariablesStageConfigState
 > {
-  public static getDerivedStateFromProps(
-    props: IStageConfigProps,
-    // state: IEvaluateVariablesStageConfigState,
-  ): IEvaluateVariablesStageConfigState {
+  public static getDerivedStateFromProps(props: IStageConfigProps): IEvaluateVariablesStageConfigState {
     const { stage } = props;
     const { variables } = stage;
 
     return {
-      variables: variables || [],
+      variables: EvaluateVariablesStageConfig.compress(variables || []),
     };
   }
 
@@ -33,13 +30,19 @@ export class EvaluateVariablesStageConfig extends React.Component<
 
   private getState(stage: IStage): IEvaluateVariablesStageConfigState {
     const { variables } = stage;
-
     return {
-      variables,
+      variables: EvaluateVariablesStageConfig.compress(variables),
     };
   }
 
-  private transform(value: any) {
+  private static compress(variables: any) {
+    return variables.reduce((acc: any, curr: any) => {
+      acc[curr.key] = curr.value;
+      return acc;
+    }, {});
+  }
+
+  private static expand(value: any) {
     return Object.keys(value).reduce((acc, curr) => {
       acc.push({
         key: curr,
@@ -50,7 +53,7 @@ export class EvaluateVariablesStageConfig extends React.Component<
   }
 
   private stageFieldChanged = (fieldIndex: string, value: any) => {
-    set(this.props.stage, fieldIndex, this.transform(value));
+    set(this.props.stage, fieldIndex, EvaluateVariablesStageConfig.expand(value));
     this.props.stageFieldUpdated();
     this.forceUpdate();
   };
