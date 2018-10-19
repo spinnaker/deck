@@ -2,8 +2,9 @@ import * as React from 'react';
 import * as classNames from 'classnames';
 import { Formik, Form, FormikValues } from 'formik';
 import { Modal } from 'react-bootstrap';
+import { merge } from 'lodash';
 
-import { TaskMonitor } from 'core';
+import { TaskMonitor } from 'core/task';
 import { IModalComponentProps, Tooltip } from 'core/presentation';
 import { NgReact } from 'core/reactShims';
 import { Spinner } from 'core/widgets';
@@ -149,9 +150,9 @@ export class WizardModal<T = {}> extends React.Component<IWizardModalProps<T>, I
       errors.push(pageErrors);
     });
     errors.push(this.props.validate(values));
-    const flattenedErrors = Object.assign({}, ...errors);
-    this.setState({ pageErrors: newPageErrors, formInvalid: Object.keys(flattenedErrors).length > 0 });
-    return flattenedErrors;
+    const mergedErrors = errors.reduce((mergeTarget, errorObj) => merge(mergeTarget, errorObj), {});
+    this.setState({ pageErrors: newPageErrors, formInvalid: Object.keys(mergedErrors).length > 0 });
+    return mergedErrors;
   };
 
   private revalidate = () => this.formikRef.current.getFormikBag().validateForm();
