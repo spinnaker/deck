@@ -15,11 +15,11 @@ export class EvaluateVariablesStageConfig extends React.Component<
   IEvaluateVariablesStageConfigState
 > {
   public static getDerivedStateFromProps(props: IStageConfigProps): IEvaluateVariablesStageConfigState {
-    const { stage } = props;
-    const { variables } = stage;
-
+    const {
+      stage: { variables = [] },
+    } = props;
     return {
-      variables: EvaluateVariablesStageConfig.compress(variables || []),
+      variables: EvaluateVariablesStageConfig.compress(variables),
     };
   }
 
