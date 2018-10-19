@@ -30,8 +30,8 @@ export class EvaluateVariablesStageConfig extends React.Component<
     }, {});
   }
 
-  private static expand(value: any) {
-    return Object.keys(value).reduce((acc, curr) => {
+  private static expand(variables: any) {
+    return Object.keys(variables).reduce((acc, curr) => {
       acc.push({
         key: curr,
         value: value[curr],
