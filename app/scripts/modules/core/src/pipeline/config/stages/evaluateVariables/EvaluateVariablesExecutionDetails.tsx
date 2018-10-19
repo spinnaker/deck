@@ -9,19 +9,6 @@ export interface IEvaluatedVariables {
 }
 
 export function EvaluateVariablesExecutionDetails(props: IExecutionDetailsSectionProps) {
-  // const sampleData = [
-  //   {
-  //      'key' : 'testing',
-  //      'value' : 'EMILY'
-  //   },
-  //   {
-  //      'value' : 'blah',
-  //      'key' : 'second'
-  //   }
-  // ]
-
-  // props.stage.context.variables = props.stage.context.variables || sampleData;
-
   const {
     stage: { context = {}, outputs = {} },
   } = props;
