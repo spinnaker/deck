@@ -34,7 +34,7 @@ export class EvaluateVariablesStageConfig extends React.Component<
     return Object.keys(variables).reduce((acc, curr) => {
       acc.push({
         key: curr,
-        value: value[curr],
+        value: variables[curr],
       });
       return acc;
     }, []);
