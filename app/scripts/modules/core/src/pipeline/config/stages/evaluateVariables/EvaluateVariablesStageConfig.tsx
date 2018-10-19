@@ -23,18 +23,6 @@ export class EvaluateVariablesStageConfig extends React.Component<
     };
   }
 
-  constructor(props: IStageConfigProps) {
-    super(props);
-    this.state = this.getState(props.stage);
-  }
-
-  private getState(stage: IStage): IEvaluateVariablesStageConfigState {
-    const { variables } = stage;
-    return {
-      variables: EvaluateVariablesStageConfig.compress(variables),
-    };
-  }
-
   private static compress(variables: any) {
     return variables.reduce((acc: any, curr: any) => {
       acc[curr.key] = curr.value;
@@ -50,6 +38,18 @@ export class EvaluateVariablesStageConfig extends React.Component<
       });
       return acc;
     }, []);
+  }
+
+  constructor(props: IStageConfigProps) {
+    super(props);
+    this.state = this.getState(props.stage);
+  }
+
+  private getState(stage: IStage): IEvaluateVariablesStageConfigState {
+    const { variables } = stage;
+    return {
+      variables: EvaluateVariablesStageConfig.compress(variables),
+    };
   }
 
   private stageFieldChanged = (fieldIndex: string, value: any) => {
