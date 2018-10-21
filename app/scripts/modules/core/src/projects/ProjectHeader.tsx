@@ -3,15 +3,15 @@ import * as React from 'react';
 import '@uirouter/rx';
 import { Transition } from '@uirouter/core';
 import { UISref, UIView } from '@uirouter/react';
-import { IModalService } from 'angular-ui-bootstrap';
 import { Dropdown, MenuItem } from 'react-bootstrap';
 import { Subject } from 'rxjs';
-import { $injector } from 'ngimport';
 
 import { ReactInjector } from 'core/reactShims';
 import { IProject } from 'core/domain';
 import { SpanDropdownTrigger } from 'core/presentation';
-import { ConfigureProjectModal } from 'core/projects/configure/ConfigureProjectModal';
+import { ConfigureProjectModal } from 'core/projects';
+
+import './project.less';
 
 export interface IProjectHeaderProps {
   projectConfiguration: IProject;
@@ -42,31 +42,6 @@ export class ProjectHeader extends React.Component<IProjectHeaderProps, IProject
   }
 
   private handleDropdownToggle = (isOpen: boolean) => this.setState({ isOpen });
-
-  private configureProjectNg = () => {
-    const { projectConfiguration } = this.props;
-    const $state = ReactInjector.$state;
-    const $uibModal: IModalService = $injector.get('$uibModal');
-
-    $uibModal
-      .open({
-        templateUrl: require('./configure/configureProject.modal.html'),
-        controller: 'ConfigureProjectModalCtrl',
-        controllerAs: 'ctrl',
-        size: 'lg',
-        resolve: {
-          projectConfig: () => projectConfiguration,
-        },
-      })
-      .result.then(result => {
-        if (result.action === 'delete') {
-          $state.go('home.infrastructure');
-        } else if (result.action === 'upsert') {
-          $state.go($state.current, { project: result.name }, { location: 'replace', reload: true });
-        }
-      })
-      .catch(() => {});
-  };
 
   private configureProject = () => {
     const { projectConfiguration } = this.props;
@@ -114,9 +89,6 @@ export class ProjectHeader extends React.Component<IProjectHeaderProps, IProject
 
     const projectConfiguration = (
       <div className="pull-right" ng-if="vm.viewState.dashboard">
-        <button className="passive medium btn-configure configure-project-link" onClick={this.configureProjectNg}>
-          <span className="glyphicon glyphicon-cog" /> Project Configuration (ng)
-        </button>
         <button className="passive medium btn-configure configure-project-link" onClick={this.configureProject}>
           <span className="glyphicon glyphicon-cog" /> Project Configuration
         </button>

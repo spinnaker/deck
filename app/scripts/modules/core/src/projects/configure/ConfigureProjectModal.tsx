@@ -53,13 +53,14 @@ export class ConfigureProjectModal extends React.Component<IConfigureProjectModa
     configuredApps: [],
   };
 
-  public static show(props: IConfigureProjectModalProps): Promise<any> {
+  public static show(props?: IConfigureProjectModalProps): Promise<any> {
     const modalProps = { dialogClassName: 'wizard-modal modal-lg' };
-    if (props.projectConfiguration) {
+    if (props) {
       return ReactModal.show(ConfigureProjectModal, props, modalProps);
     }
 
-    const newProject: Partial<IProject> = {
+    const title = 'Create Project';
+    const projectConfiguration = {
       config: {
         applications: [],
         clusters: [],
@@ -67,9 +68,10 @@ export class ConfigureProjectModal extends React.Component<IConfigureProjectModa
       },
       email: '',
       name: '',
-    };
+    } as IProject;
 
-    return ReactModal.show(ConfigureProjectModal, { ...props, projectConfiguration: newProject }, modalProps);
+    const projectProps = { title, projectConfiguration } as IConfigureProjectModalProps;
+    return ReactModal.show(ConfigureProjectModal, projectProps, modalProps);
   }
 
   private handleApplicationsChanged = (configuredApps: string[]) => {

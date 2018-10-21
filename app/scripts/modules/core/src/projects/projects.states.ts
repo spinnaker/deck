@@ -12,7 +12,6 @@ export interface IProjectStateParms extends StateParams {
 
 export const PROJECTS_STATES_CONFIG = 'spinnaker.core.projects.state.config';
 module(PROJECTS_STATES_CONFIG, [
-  require('./project.controller').name,
   require('./projects.controller').name,
   require('./dashboard/dashboard.controller').name,
   APPLICATION_STATE_PROVIDER,
