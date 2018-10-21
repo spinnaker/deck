@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as classNames from 'classnames';
 import { Formik, Form, FormikValues } from 'formik';
 import { Modal } from 'react-bootstrap';
-import { merge } from 'lodash';
+import { merge, isArray, isObject, isString } from 'lodash';
 
 import { TaskMonitor } from 'core/task';
 import { IModalComponentProps, Tooltip } from 'core/presentation';
@@ -257,6 +257,21 @@ interface IWizardStepLabelProps<T> {
 }
 
 class WizardStepLabel<T> extends React.Component<IWizardStepLabelProps<T>> {
+  private flattenErrors(errors: any) {
+    const traverse = (obj: any, path: string, flattenedErrors: { [key: string]: any }): any => {
+      if (isArray(obj)) {
+        obj.forEach((elem, idx) => traverse(elem, `${path}[${idx}]`, flattenedErrors));
+      } else if (isString(obj)) {
+        flattenedErrors[path] = obj;
+      } else if (isObject(obj)) {
+        Object.keys(obj).forEach(key => traverse(obj[key], `${path}.${key}`, flattenedErrors));
+      }
+
+      return flattenedErrors;
+    };
+
+    return traverse(errors, 'errors', {});
+  }
   public render() {
     const { current, dirty, errors, onClick, pageState, waiting } = this.props;
 
@@ -276,13 +291,14 @@ class WizardStepLabel<T> extends React.Component<IWizardStepLabelProps<T>> {
       </li>
     );
 
-    if (errors) {
+    const flattenedErrors = this.flattenErrors(errors);
+    const errorKeys = Object.keys(flattenedErrors);
+    if (errorKeys.length) {
       const Errors = (
         <span>
-          {Object.keys(errors).map(key => (
+          {errorKeys.map(key => (
             <span key={key}>
-              {errors[key]}
-              <br />
+              {flattenedErrors[key]} <br />
             </span>
           ))}
         </span>
