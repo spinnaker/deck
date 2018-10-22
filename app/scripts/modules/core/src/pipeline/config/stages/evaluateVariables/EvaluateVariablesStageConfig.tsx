@@ -1,10 +1,7 @@
-import { IStageConfigProps } from 'core/pipeline/config/stages/core/IStageConfigProps';
 import * as React from 'react';
-import { set } from 'lodash';
+import { map, set } from 'lodash';
 
-import { StageConfigField } from '../core/stageConfigField/StageConfigField';
-import { IStage } from 'core/domain';
-import { MapEditor } from '@spinnaker/core';
+import { IStageConfigProps, StageConfigField, MapEditor } from '@spinnaker/core';
 
 export interface IEvaluateVariablesStageConfigState {
   variables: any;
@@ -14,46 +11,12 @@ export class EvaluateVariablesStageConfig extends React.Component<
   IStageConfigProps,
   IEvaluateVariablesStageConfigState
 > {
-  public static getDerivedStateFromProps(props: IStageConfigProps): IEvaluateVariablesStageConfigState {
-    const {
-      stage: { variables = [] },
-    } = props;
-    return {
-      variables: EvaluateVariablesStageConfig.compress(variables),
-    };
-  }
-
-  private static compress(variables: any) {
-    return variables.reduce((acc: any, curr: any) => {
-      acc[curr.key] = curr.value;
-      return acc;
-    }, {});
-  }
-
-  private static expand(variables: any) {
-    return Object.keys(variables).reduce((acc, curr) => {
-      acc.push({
-        key: curr,
-        value: variables[curr],
-      });
-      return acc;
-    }, []);
-  }
-
-  constructor(props: IStageConfigProps) {
-    super(props);
-    this.state = this.getState(props.stage);
-  }
-
-  private getState(stage: IStage): IEvaluateVariablesStageConfigState {
-    const { variables } = stage;
-    return {
-      variables: EvaluateVariablesStageConfig.compress(variables),
-    };
+  private expand(variables: any) {
+    return map(variables, (value, key) => ({ key, value }));
   }
 
   private stageFieldChanged = (fieldIndex: string, value: any) => {
-    set(this.props.stage, fieldIndex, EvaluateVariablesStageConfig.expand(value));
+    set(this.props.stage, fieldIndex, this.expand(value));
     this.props.stageFieldUpdated();
     this.forceUpdate();
   };
@@ -63,11 +26,20 @@ export class EvaluateVariablesStageConfig extends React.Component<
   };
 
   public render() {
-    const { variables } = this.state;
+    const {
+      stage: { variables = [] },
+    } = this.props;
+
+    // Flattens an array of objects {key, value} into a single object with the respective keys/values
+    const variablesObject = variables.reduce(
+      (acc: any, { key, value }: any) => Object.assign(acc, { [key]: value }),
+      {},
+    );
+
     return (
       <div className="form-horizontal">
         <StageConfigField label="Variables to evaluate">
-          <MapEditor model={variables} allowEmpty={true} onChange={(v: any) => this.mapChanged('variables', v)} />
+          <MapEditor model={variablesObject} allowEmpty={true} onChange={(v: any) => this.mapChanged('variables', v)} />
         </StageConfigField>
       </div>
     );

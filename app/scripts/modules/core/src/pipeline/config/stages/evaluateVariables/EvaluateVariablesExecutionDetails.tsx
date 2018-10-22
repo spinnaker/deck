@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { StageExecutionLogs, StageFailureMessage } from 'core/pipeline/details';
+import { StageExecutionLogs, StageFailureMessage } from 'core/pipeline';
 import { ExecutionDetailsSection, IExecutionDetailsSectionProps } from 'core/pipeline/config/stages/core';
 
 export interface IEvaluatedVariables {
@@ -11,15 +11,18 @@ export interface IEvaluatedVariables {
 export function EvaluateVariablesExecutionDetails(props: IExecutionDetailsSectionProps) {
   const {
     stage: { context = {}, outputs = {} },
+    stage,
+    name,
+    current,
   } = props;
 
   const evaluatedVariables = context.variables ? (
     <div>
       <dl>
-        {context.variables.map((evalPair: IEvaluatedVariables) => (
-          <React.Fragment key={evalPair.key}>
-            <dt>{evalPair.key}</dt>
-            <dd>{outputs[evalPair.key] || '-'}</dd>
+        {context.variables.map(({ key }: IEvaluatedVariables) => (
+          <React.Fragment key={key}>
+            <dt>{key}</dt>
+            <dd>{outputs[key] || '-'}</dd>
           </React.Fragment>
         ))}
       </dl>
@@ -31,10 +34,10 @@ export function EvaluateVariablesExecutionDetails(props: IExecutionDetailsSectio
   );
 
   return (
-    <ExecutionDetailsSection name={props.name} current={props.current}>
+    <ExecutionDetailsSection name={name} current={current}>
       {evaluatedVariables}
-      <StageFailureMessage stage={props.stage} message={props.stage.failureMessage} />
-      <StageExecutionLogs stage={props.stage} />
+      <StageFailureMessage stage={stage} message={stage.failureMessage} />
+      <StageExecutionLogs stage={stage} />
     </ExecutionDetailsSection>
   );
 }
