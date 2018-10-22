@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { StageExecutionLogs, StageFailureMessage } from 'core/pipeline';
-import { ExecutionDetailsSection, IExecutionDetailsSectionProps } from 'core/pipeline/config/stages/core';
+import { ExecutionDetailsSection, IExecutionDetailsSectionProps } from 'core/pipeline';
 
 export interface IEvaluatedVariables {
   key: string;
