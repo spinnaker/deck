@@ -155,7 +155,7 @@ export class WizardModal<T = {}> extends React.Component<IWizardModalProps<T>, I
     return mergedErrors;
   };
 
-  private revalidate = () => this.formikRef.current.getFormikBag().validateForm();
+  private revalidate = () => this.formikRef.current && this.formikRef.current.getFormikBag().validateForm();
 
   private setWaiting = (section: string, isWaiting: boolean): void => {
     const waiting = new Set(this.state.waiting);
