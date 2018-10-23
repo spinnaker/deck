@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { map, set } from 'lodash';
 
-import { IStageConfigProps, StageConfigField, MapEditor } from '@spinnaker/core';
+import { IStageConfigProps, StageConfigField, MapEditor } from 'core';
 
 export interface IEvaluateVariablesStageConfigState {
   variables: any;
