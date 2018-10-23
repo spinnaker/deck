@@ -1,170 +1,140 @@
-import { IPipeline, IProjectPipeline } from 'core/domain';
-
-import { IWizardPageProps, wizardPage } from 'core/modal';
-import { FormikErrors } from 'formik';
 import * as React from 'react';
-import Select from 'react-select';
+import { FieldArray, FormikErrors, getIn } from 'formik';
+
+import { FormikFormField, ReactSelectInput, StringsAsOptions } from 'core/presentation';
+import { Spinner } from 'core/widgets';
+import { IPipeline, IProject, IProjectPipeline } from 'core/domain';
+import { IWizardPageProps, wizardPage } from 'core/modal';
 
 import './Pipelines.css';
-
-interface IProjectPipelineWithName extends IProjectPipeline {
-  pipelineName: string;
-}
 
 export interface IPipelinesProps extends IWizardPageProps<{}> {
   appsPipelines: {
     [appName: string]: IPipeline[];
   };
-  entries?: IProjectPipeline[];
 }
 
-interface IPipelinesState {
-  pipelines: IProjectPipelineWithName[];
-  pipelinesToShowForSelectedApp: Array<{ name: string; id: string }>;
-  selectedApp: string;
-}
-
-class PipelinesImpl extends React.Component<IPipelinesProps, IPipelinesState> {
+class PipelinesImpl extends React.Component<IPipelinesProps> {
   public static LABEL = 'Pipelines';
 
-  constructor(props: IPipelinesProps) {
-    super(props);
-    this.state = {
-      pipelines: props.entries ? this.hydrateEntriesWithPipelineNames(props.entries) : [],
-      pipelinesToShowForSelectedApp: [],
-      selectedApp: null,
-    };
-  }
-
-  private hydrateEntriesWithPipelineNames = (entries: IProjectPipeline[]): IProjectPipelineWithName[] => {
-    return entries.map(entry => {
-      const appPipelines = this.props.appsPipelines[entry.application];
-      const foundPipeline = appPipelines.find(pipeline => pipeline.id === entry.pipelineConfigId);
-      const pipelineName = foundPipeline && foundPipeline.name;
-      return { ...entry, pipelineName };
-    });
-  };
-
-  private addNewRow = () => {
+  public validate = (value: IProject): FormikErrors<IProject> | void => {
+    const projectApplications = (value.config && value.config.applications) || [];
     const { appsPipelines } = this.props;
-    const selectedApp = Object.keys(appsPipelines)[0];
 
-    const newRow: IProjectPipelineWithName = {
-      application: selectedApp,
-      pipelineConfigId: null,
-      pipelineName: null,
-    };
-    const pipelines = this.state.pipelines.concat(newRow);
+    if (value.config && value.config.pipelineConfigs && value.config.pipelineConfigs.length) {
+      const pipelineConfigErrors = value.config.pipelineConfigs.map(config => {
+        const pipelineIdsForApp = (appsPipelines[config.application] || []).map(p => p.id);
 
-    const pipelinesToShowForSelectedApp = appsPipelines[selectedApp].map(item => ({ name: item.name, id: item.id }));
+        if (!config.application) {
+          return { application: 'Application must be specified' };
+        } else if (!projectApplications.includes(config.application)) {
+          return { application: 'This application is not part of the project' };
+        } else if (!config.pipelineConfigId) {
+          return { pipelineConfigId: 'Pipeline must be specified' };
+        } else if (!pipelineIdsForApp.includes(config.pipelineConfigId)) {
+          return { pipelineConfigId: `Pipeline does not exist in ${config.application}` };
+        }
 
-    this.setState({ pipelinesToShowForSelectedApp, selectedApp, pipelines });
-  };
+        return null;
+      });
 
-  private setPipelinesForApp = (selectedApp: string, idx: number) => {
-    const listOfPipelinesForApp = this.props.appsPipelines[selectedApp];
-    const { pipelines } = this.state;
-    pipelines[idx].application = selectedApp;
+      if (pipelineConfigErrors.some(val => !!val)) {
+        return {
+          config: {
+            pipelineConfigs: pipelineConfigErrors,
+          },
+        };
+      }
+    }
 
-    const pipelinesToShowForSelectedApp = listOfPipelinesForApp.map(({ name, id }) => ({
-      name,
-      id,
-    }));
-
-    this.setState({ pipelinesToShowForSelectedApp, selectedApp, pipelines });
-  };
-
-  private updatePipelineEntry = (idx: number, application: string, pipelineConfigId: string, pipelineName: string) => {
-    const { pipelines } = this.state;
-    pipelines[idx] = {
-      application,
-      pipelineConfigId,
-      pipelineName,
-    };
-    this.setState({
-      pipelines,
-    });
-    this.props.formik.setFieldValue('pipelineConfigs', pipelines);
-  };
-
-  private removePipelineEntry = (idx: number) => {
-    const { pipelines } = this.state;
-    pipelines.splice(idx, 1);
-    this.setState({
-      pipelines,
-    });
-    this.props.formik.setFieldValue('pipelineConfigs', pipelines);
-  };
-
-  public validate = () => {
-    return {} as FormikErrors<{}>;
+    return {};
   };
 
   public render() {
     const { appsPipelines } = this.props;
-    const { pipelines } = this.state;
-    const hasAppsPipelines = Object.keys(appsPipelines).length;
+
+    const tableHeader = (
+      <tr>
+        <td>App</td>
+        <td>Pipeline</td>
+        <td />
+      </tr>
+    );
+
+    const pipelineConfigsPath = 'config.pipelineConfigs';
 
     return (
-      <div className="Pipelines vertical center">
-        {hasAppsPipelines ? (
-          <div className="vertical center" style={{ width: '100%' }}>
-            {pipelines.length && (
-              <table style={{ width: '100%' }}>
-                <thead>
-                  <tr>
-                    <td>App</td>
-                    <td>Pipeline</td>
-                    <td />
-                  </tr>
-                </thead>
-                <tbody>
-                  {!!pipelines.length &&
-                    pipelines.map((pipelineEntry, idx) => (
-                      <tr key={`${pipelineEntry.application}~${pipelineEntry.pipelineConfigId}`}>
-                        <td>
-                          <Select
-                            options={Object.keys(appsPipelines).map(appName => ({
-                              label: appName,
-                              value: appName,
-                            }))}
-                            onChange={(item: { value: string }) => this.setPipelinesForApp(item.value, idx)}
-                            value={pipelineEntry.application}
-                            className="body-small"
-                          />
-                        </td>
-                        <td>
-                          <Select
-                            options={appsPipelines[pipelineEntry.application].map(pipeline => ({
-                              label: pipeline.name,
-                              value: pipeline.id,
-                            }))}
-                            className="body-small"
-                            onChange={(item: { label: string; value: string }) =>
-                              this.updatePipelineEntry(idx, pipelineEntry.application, item.value, item.label)
-                            }
-                            value={pipelineEntry.pipelineConfigId}
-                          />
-                        </td>
-                        <td>
-                          <button className="nostyle" onClick={() => this.removePipelineEntry(idx)}>
-                            <i className="fas fa-trash-alt" />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
-            )}
+      <FieldArray
+        name={pipelineConfigsPath}
+        render={pipelinesArrayHelper => {
+          const project: IProject = pipelinesArrayHelper.form.values;
+          const configs: IProjectPipeline[] = getIn(project, pipelineConfigsPath);
+          const apps: string[] = getIn(project, 'config.applications');
 
-            <a className="button zombie sp-margin-m horizontal middle center" onClick={this.addNewRow}>
-              <i className="fas fa-plus-circle" /> Add Pipeline
-            </a>
-          </div>
-        ) : (
-          <div className="body-small">Select Applications</div>
-        )}
-      </div>
+          return (
+            <div className="Pipelines vertical center">
+              <div className="vertical center" style={{ width: '100%' }}>
+                <table style={{ width: '100%' }}>
+                  <thead>{tableHeader}</thead>
+                  <tbody>
+                    {configs.map((config, idx) => {
+                      const pipelinePath = `${pipelineConfigsPath}[${idx}]`;
+                      const application = config && config.application;
+                      const appPipelines = application && appsPipelines[application];
+                      const pipelineOptions = appPipelines && appPipelines.map(p => ({ label: p.name, value: p.id }));
+
+                      const key = `${application}-${config && config.pipelineConfigId}-${idx}`;
+
+                      return (
+                        <tr key={key}>
+                          <td>
+                            <FormikFormField
+                              name={`${pipelinePath}.application`}
+                              layout={({ input }) => <div>{input}</div>}
+                              input={props => (
+                                <StringsAsOptions strings={apps}>
+                                  {options => <ReactSelectInput {...props} clearable={false} options={options} />}
+                                </StringsAsOptions>
+                              )}
+                            />
+                          </td>
+
+                          <td>
+                            {!application ? null : !pipelineOptions ? (
+                              <Spinner />
+                            ) : (
+                              <FormikFormField
+                                name={`${pipelinePath}.pipelineConfigId`}
+                                layout={({ input }) => <div>{input}</div>}
+                                input={props => (
+                                  <ReactSelectInput {...props} clearable={false} options={pipelineOptions} />
+                                )}
+                              />
+                            )}
+                          </td>
+
+                          <td>
+                            <button className="nostyle" onClick={() => pipelinesArrayHelper.remove(idx)}>
+                              <i className="fas fa-trash-alt" />
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+
+                <a
+                  className="button zombie sp-margin-m horizontal middle center"
+                  onClick={() => pipelinesArrayHelper.push({})}
+                >
+                  <i className="fas fa-plus-circle" /> Add Pipeline
+                </a>
+              </div>
+            </div>
+          );
+        }}
+      />
     );
   }
 }

@@ -138,11 +138,7 @@ export class ConfigureProjectModal extends React.Component<IConfigureProjectModa
 
         <Clusters accounts={allAccounts} done={true} />
 
-        <Pipelines
-          appsPipelines={appPipelines}
-          entries={projectConfiguration ? projectConfiguration.config.pipelineConfigs : []}
-          done={!!(projectConfiguration && projectConfiguration.config.pipelineConfigs.length)}
-        />
+        <Pipelines appsPipelines={appPipelines} done={true} />
       </WizardModal>
     );
   }
