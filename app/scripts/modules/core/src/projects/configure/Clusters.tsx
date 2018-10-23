@@ -1,211 +1,161 @@
 import * as React from 'react';
-import Select from 'react-select';
-import { Field, FormikErrors } from 'formik';
+import { FieldArray, FormikErrors, FormikProps, getIn } from 'formik';
 
-import { NgReact } from 'core/reactShims';
-import { AccountService, IAccountDetails } from 'core/account';
+import { IAccount } from 'core/account';
+import { IProject, IProjectCluster } from 'core/domain';
 import { IWizardPageProps, wizardPage } from 'core/modal';
-import { IProjectCluster } from 'core/domain';
+import { FormikFormField, ReactSelectInput, TextInput, StringsAsOptions } from 'core/presentation';
+import { NgReact } from 'core/reactShims';
+
+import { FormikApplicationsPicker } from './FormikApplicationsPicker';
 
 import './Clusters.css';
 
-interface IClustersState {
-  clusterEntries: IProjectCluster[];
-  showNewRow: boolean;
-  accounts: IAccountDetails[];
+export interface IClustersProps extends IWizardPageProps<IProject> {
+  accounts: IAccount[];
 }
 
-export interface IClustersProps extends IWizardPageProps<any> {
-  entries: IProjectCluster[];
-  applications: string[];
-}
-
-class ClustersImpl extends React.Component<IClustersProps, IClustersState> {
+class ClustersImpl extends React.Component<IClustersProps> {
   public static LABEL = 'Clusters';
 
-  constructor(props: IClustersProps) {
-    super(props);
-    this.state = {
-      clusterEntries: props.entries || [],
-      showNewRow: false,
-      accounts: [],
-    };
-    this.loadAccounts();
-  }
+  public validate = (value: IProject): FormikErrors<IProject> => {
+    const applications = value.config.applications || [];
+    if (value.config.clusters && value.config.clusters.length) {
+      const clusterErrors = value.config.clusters.map(cluster => {
+        const errors: any = {};
+        if (!cluster.account) {
+          errors.account = 'Account must be specified';
+        }
 
-  private loadAccounts(): void {
-    AccountService.listAccounts('aws').then(accounts => {
-      this.setState({ accounts });
-    });
-  }
+        const apps = cluster.applications || [];
+        const applicationErrors = apps.map(app => !applications.includes(app) && 'This app is not in the project');
 
-  public validate = () => {
-    return {} as FormikErrors<any>;
-  };
+        if (applicationErrors.some(val => !!val)) {
+          errors.applications = applicationErrors;
+        }
 
-  private entryChanged = (type: string, value: string, i: number, appIdx = -1) => {
-    const { clusterEntries } = this.state;
-    if (appIdx > -1 && type === 'applications') {
-      clusterEntries[i].applications.splice(appIdx, 1, value);
-    } else {
-      clusterEntries[i][type] = value;
+        return Object.keys(errors).length ? errors : null;
+      });
+
+      if (clusterErrors.some(val => !!val)) {
+        return {
+          config: {
+            clusters: clusterErrors,
+          },
+        };
+      }
     }
-    this.setState({
-      clusterEntries,
-    });
-    this.props.formik.setFieldValue('clusters', clusterEntries);
+
+    return {};
   };
 
-  private addNewApplication = (idx: number) => {
-    const { clusterEntries } = this.state;
-    if (clusterEntries[idx].applications === null) {
-      clusterEntries[idx].applications = [''];
-    } else {
-      clusterEntries[idx].applications.push('');
-    }
-    this.setState({
-      clusterEntries,
-    });
-  };
-
-  private deleteApplication = (idx: number, appIdx: number) => {
-    const { clusterEntries } = this.state;
-    clusterEntries[idx].applications.splice(appIdx, 1);
-    this.setState({
-      clusterEntries,
-    });
-  };
-
-  private createNewClusterEntry = () => {
-    this.setState({
-      clusterEntries: this.state.clusterEntries.concat({
-        applications: [],
-        account: null,
-        stack: '*',
-        detail: '*',
-      }),
-    });
-  };
-
-  private deleteClusterEntry = (idx: number) => {
-    const { clusterEntries } = this.state;
-    clusterEntries.splice(idx, 1);
-    this.setState({
-      clusterEntries,
-    });
-    this.props.formik.setFieldValue('clusters', clusterEntries);
-  };
+  private toggleAllApps(formik: FormikProps<any>, path: string) {
+    const isChecked = !getIn(formik.values, path);
+    formik.setFieldValue(path, isChecked ? [] : null);
+  }
 
   public render() {
     const { HelpField } = NgReact;
-    const { accounts } = this.state;
-    const { applications } = this.props;
-    const { clusterEntries } = this.state;
+    const { accounts } = this.props;
+
+    const tableHeader = (
+      <tr>
+        <td className="wide">Application</td>
+        <td className="wide">Account</td>
+        <td>
+          Stack <HelpField id="project.cluster.stack" />
+        </td>
+        <td>
+          Detail <HelpField id="project.cluster.detail" />
+        </td>
+        <td />
+      </tr>
+    );
 
     return (
-      <section className="Clusters vertical center">
-        <table style={{ width: '100%' }}>
-          <thead>
-            <tr>
-              <td className="wide">Application</td>
-              <td className="wide">Account</td>
-              <td>
-                Stack <HelpField id="project.cluster.stack" />
-              </td>
-              <td>
-                Detail <HelpField id="project.cluster.detail" />
-              </td>
-              <td />
-            </tr>
-          </thead>
-          <tbody>
-            {clusterEntries &&
-              clusterEntries.map((entry, idx) => (
-                <tr key={idx}>
-                  <td className="vertical">
-                    <label className="sp-group-margin-s-xaxis">
-                      <Field
-                        name="applications"
-                        type="checkbox"
-                        onChange={() => this.addNewApplication(idx)}
-                        checked={!entry.applications || !entry.applications.length}
-                      />
-                      <span>All</span>
-                    </label>
-                    {!!(entry.applications && entry.applications.length) && (
-                      <div>
-                        <ul className="nostyle sp-group-margin-xs-yaxis">
-                          {entry.applications.map((app: string, appIdx: number) => (
-                            <li key={`${app}~${appIdx}`} className="horizontal middle">
-                              <Select
-                                value={app}
-                                options={applications.map(appName => ({
-                                  label: appName,
-                                  value: appName,
-                                }))}
-                                className="body-small flex-1"
-                                onChange={(option: { value: string }) =>
-                                  this.entryChanged('applications', option.value, idx, appIdx)
-                                }
-                              />
-                              <div className="nostyle" onClick={() => this.deleteApplication(idx, appIdx)}>
-                                <i className="fas fa-trash-alt" />
-                              </div>
-                            </li>
-                          ))}
-                        </ul>
-                        <a className="button zombie sp-margin-xs-top" onClick={() => this.addNewApplication(idx)}>
-                          <i className="fas fa-plus-circle" /> Add App
-                        </a>
-                      </div>
-                    )}
-                  </td>
-                  <td>
-                    <Select
-                      value={entry.account}
-                      options={accounts.map(account => ({
-                        label: account.name,
-                        value: account.name,
-                      }))}
-                      className="body-small"
-                      onChange={(option: { value: string }) => this.entryChanged('account', option.value, idx)}
-                    />
-                  </td>
-                  <td>
-                    <Field
-                      name="stack"
-                      type="text"
-                      value={entry.stack}
-                      onChange={(evt: React.ChangeEvent<HTMLInputElement>) =>
-                        this.entryChanged('stack', evt.target.value, idx)
-                      }
-                      className="sp-padding-xs-xaxis"
-                    />
-                  </td>
-                  <td>
-                    <Field
-                      name="detail"
-                      type="text"
-                      value={entry.detail}
-                      onChange={(evt: React.ChangeEvent<HTMLInputElement>) =>
-                        this.entryChanged('detail', evt.target.value, idx)
-                      }
-                      className="sp-padding-xs-xaxis"
-                    />
-                  </td>
-                  <td>
-                    <div className="nostyle" onClick={() => this.deleteClusterEntry(idx)}>
-                      <i className="fas fa-trash-alt" />
-                    </div>
-                  </td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
-        <a className="button zombie sp-margin-m horizontal middle center" onClick={this.createNewClusterEntry}>
-          <i className="fas fa-plus-circle" /> Add Cluster
-        </a>
-      </section>
+      <FieldArray
+        name="config.clusters"
+        render={clustersArrayHelpers => {
+          const formik = clustersArrayHelpers.form;
+          const values: IProject = formik.values;
+          const clusters: IProjectCluster[] = values.config.clusters || [];
+          const applications: string[] = values.config.applications || [];
+          const accountNames = accounts.map(account => account.name);
+
+          return (
+            <section className="Clusters vertical center">
+              <table style={{ width: '100%' }}>
+                <thead>{tableHeader}</thead>
+
+                <tbody>
+                  {clusters.map((cluster, idx) => {
+                    const clusterPath = `config.clusters[${idx}]`;
+                    const applicationsPath = `${clusterPath}.applications`;
+
+                    return (
+                      <tr key={idx}>
+                        <td className="vertical">
+                          <label className="sp-group-margin-s-xaxis">
+                            <input
+                              type="checkbox"
+                              onChange={() => this.toggleAllApps(formik, applicationsPath)}
+                              checked={!Array.isArray(cluster.applications)}
+                            />
+                            <span>All</span>
+                          </label>
+
+                          {!!cluster.applications && (
+                            <FormikApplicationsPicker name={`${applicationsPath}`} applications={applications} />
+                          )}
+                        </td>
+
+                        <td>
+                          <FormikFormField
+                            name={`${clusterPath}.account`}
+                            layout={({ input }) => <div>{input}</div>}
+                            input={props => (
+                              <StringsAsOptions strings={accountNames}>
+                                {options => <ReactSelectInput {...props} clearable={false} options={options} />}
+                              </StringsAsOptions>
+                            )}
+                          />
+                        </td>
+
+                        <td>
+                          <FormikFormField
+                            name={`${clusterPath}.stack`}
+                            input={props => <TextInput {...props} inputClassName="sp-padding-xs-xaxis" />}
+                          />
+                        </td>
+
+                        <td>
+                          <FormikFormField
+                            name={`${clusterPath}.detail`}
+                            input={props => <TextInput {...props} inputClassName="sp-padding-xs-xaxis" />}
+                          />
+                        </td>
+
+                        <td>
+                          <button className="nostyle" onClick={() => clustersArrayHelpers.remove(idx)}>
+                            <i className="fas fa-trash-alt" />
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+
+              <a
+                className="button zombie sp-margin-m horizontal middle center"
+                onClick={() => clustersArrayHelpers.push({ stack: '*', detail: '*' })}
+              >
+                <i className="fas fa-plus-circle" /> Add Cluster
+              </a>
+            </section>
+          );
+        }}
+      />
     );
   }
 }

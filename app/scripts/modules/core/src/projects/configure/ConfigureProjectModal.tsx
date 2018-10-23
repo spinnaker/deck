@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { FormikErrors } from 'formik';
 
+import { AccountService, IAccount } from 'core/account';
 import { ApplicationReader, IApplicationSummary } from 'core/application';
 import { IPipeline, IProject } from 'core/domain';
 import { WizardModal } from 'core/modal';
@@ -21,6 +22,7 @@ export interface IConfigureProjectModalProps extends IModalComponentProps {
 }
 
 export interface IConfigureProjectModalState {
+  allAccounts: IAccount[];
   allProjects: IProject[];
   allApplications: IApplicationSummary[];
   appPipelines: {
@@ -39,6 +41,7 @@ export class ConfigureProjectModal extends React.Component<IConfigureProjectModa
 
   public state: IConfigureProjectModalState = {
     loading: true,
+    allAccounts: [],
     allProjects: [],
     allApplications: [],
     appPipelines: {},
@@ -76,13 +79,16 @@ export class ConfigureProjectModal extends React.Component<IConfigureProjectModa
   };
 
   private initialFetch(): Promise<any> {
-    const fetchProjects = ProjectReader.listProjects();
+    const fetchAccounts = AccountService.listAccounts();
     const fetchApps = ApplicationReader.listApplications();
+    const fetchProjects = ProjectReader.listProjects();
     const currentProject = this.props.projectConfiguration.name;
-    return Promise.all([fetchProjects, fetchApps]).then(([allProjects, allApplications]) => {
-      allProjects = allProjects.filter(project => project.name !== currentProject);
-      this.setState({ allProjects, allApplications });
-    });
+    return Promise.all([fetchAccounts, fetchApps, fetchProjects]).then(
+      ([allAccounts, allApplications, allProjects]) => {
+        allProjects = allProjects.filter(project => project.name !== currentProject);
+        this.setState({ allAccounts, allApplications, allProjects });
+      },
+    );
   }
 
   private fetchPipelinesForApps = (applications: string[]) => {
@@ -109,11 +115,10 @@ export class ConfigureProjectModal extends React.Component<IConfigureProjectModa
 
   public render() {
     const { dismissModal, projectConfiguration } = this.props;
-    const { allApplications, appPipelines, loading, taskMonitor } = this.state;
+    const { allAccounts, allApplications, appPipelines, loading, taskMonitor } = this.state;
 
     return (
       <WizardModal<IProject>
-        formClassName="sp-form"
         heading="Configure Project"
         initialValues={projectConfiguration}
         loading={loading}
@@ -131,11 +136,7 @@ export class ConfigureProjectModal extends React.Component<IConfigureProjectModa
           done={!!this.state.configuredApps.length}
         />
 
-        <Clusters
-          entries={projectConfiguration ? projectConfiguration.config.clusters : []}
-          applications={Object.keys(appPipelines)}
-          done={!!(projectConfiguration && projectConfiguration.config.clusters.length)}
-        />
+        <Clusters accounts={allAccounts} done={true} />
 
         <Pipelines
           appsPipelines={appPipelines}
