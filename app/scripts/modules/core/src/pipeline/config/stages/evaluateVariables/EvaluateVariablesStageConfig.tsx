@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { map, set } from 'lodash';
 
-import { IStageConfigProps, StageConfigField, MapEditor } from 'core';
+import { IStageConfigProps, StageConfigField } from 'core/pipeline';
+import { MapEditor } from 'core/forms';
 
 export interface IEvaluateVariablesStageConfigState {
   variables: any;
