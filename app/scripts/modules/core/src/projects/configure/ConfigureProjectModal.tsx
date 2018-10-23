@@ -7,12 +7,17 @@ import { IPipeline, IProject } from 'core/domain';
 import { WizardModal } from 'core/modal';
 import { PipelineConfigService } from 'core/pipeline';
 import { IModalComponentProps, ReactModal } from 'core/presentation';
-import { Applications, Clusters, Pipelines, ProjectAttributes } from 'core/projects';
 import { TaskMonitor } from 'core/task';
 import { noop } from 'core/utils';
+import { ReactInjector } from 'core/reactShims';
 
 import { ProjectReader } from '../service/ProjectReader';
 import { ProjectWriter } from '../service/ProjectWriter';
+
+import { Applications } from './Applications';
+import { Clusters } from './Clusters';
+import { Pipelines } from './Pipelines';
+import { ProjectAttributes } from './ProjectAttributes';
 
 import './ConfigureProjectModal.css';
 
@@ -30,7 +35,7 @@ export interface IConfigureProjectModalState {
   };
   configuredApps: string[];
   loading: boolean;
-  taskMonitor: TaskMonitor;
+  taskMonitor?: TaskMonitor;
 }
 
 export class ConfigureProjectModal extends React.Component<IConfigureProjectModalProps, IConfigureProjectModalState> {
@@ -46,16 +51,25 @@ export class ConfigureProjectModal extends React.Component<IConfigureProjectModa
     allApplications: [],
     appPipelines: {},
     configuredApps: [],
-    taskMonitor: new TaskMonitor({
-      title: 'Updating Project',
-      onTaskComplete: () => null,
-      modalInstance: TaskMonitor.modalInstanceEmulation(() => this.props.dismissModal()),
-    }),
   };
 
   public static show(props: IConfigureProjectModalProps): Promise<any> {
     const modalProps = { dialogClassName: 'wizard-modal modal-lg' };
-    return ReactModal.show(ConfigureProjectModal, props, modalProps);
+    if (props.projectConfiguration) {
+      return ReactModal.show(ConfigureProjectModal, props, modalProps);
+    }
+
+    const newProject: Partial<IProject> = {
+      config: {
+        applications: [],
+        clusters: [],
+        pipelineConfigs: [],
+      },
+      email: '',
+      name: '',
+    };
+
+    return ReactModal.show(ConfigureProjectModal, { ...props, projectConfiguration: newProject }, modalProps);
   }
 
   private handleApplicationsChanged = (configuredApps: string[]) => {
@@ -64,14 +78,23 @@ export class ConfigureProjectModal extends React.Component<IConfigureProjectModa
   };
 
   public componentDidMount() {
-    const applications = (this.props.projectConfiguration && this.props.projectConfiguration.config.applications) || [];
-    Promise.all([this.fetchPipelinesForApps(applications), this.initialFetch()]).then(() =>
-      this.setState({ loading: false }),
+    const { projectConfiguration } = this.props;
+    const configuredApps = (projectConfiguration && projectConfiguration.config.applications) || [];
+    Promise.all([this.fetchPipelinesForApps(configuredApps), this.initialFetch()]).then(() =>
+      this.setState({ loading: false, configuredApps }),
     );
   }
 
   private submit = (project: IProject) => {
-    this.state.taskMonitor.submit(() => ProjectWriter.upsertProject(project));
+    const taskMonitor = new TaskMonitor({
+      title: 'Updating Project',
+      onTaskComplete: () => ReactInjector.$state.go('home.project', { project: project.name }),
+      modalInstance: TaskMonitor.modalInstanceEmulation(() => this.props.dismissModal()),
+    });
+
+    this.setState({ taskMonitor });
+
+    taskMonitor.submit(() => ProjectWriter.upsertProject(project));
   };
 
   public validate = (): FormikErrors<IProject> => {
@@ -109,7 +132,15 @@ export class ConfigureProjectModal extends React.Component<IConfigureProjectModa
   private onDelete = () => {
     const { projectConfiguration } = this.props;
     if (projectConfiguration) {
-      this.state.taskMonitor.submit(() => ProjectWriter.deleteProject(projectConfiguration));
+      const taskMonitor = new TaskMonitor({
+        title: 'Deleting Project',
+        onTaskComplete: () => ReactInjector.$state.go('home.search'),
+        modalInstance: TaskMonitor.modalInstanceEmulation(() => this.props.dismissModal()),
+      });
+
+      this.setState({ taskMonitor });
+
+      taskMonitor.submit(() => ProjectWriter.deleteProject(projectConfiguration));
     }
   };
 
@@ -133,7 +164,7 @@ export class ConfigureProjectModal extends React.Component<IConfigureProjectModa
         <Applications
           allApplications={allApplications.map(app => app.name)}
           onApplicationsChanged={this.handleApplicationsChanged}
-          done={!!this.state.configuredApps.length}
+          done={true}
         />
 
         <Clusters accounts={allAccounts} done={true} />
