@@ -2,7 +2,7 @@ import * as React from 'react';
 import { FormikErrors } from 'formik';
 
 import { ApplicationReader, IApplicationSummary } from 'core/application';
-import { IPipeline, IProject, IProjectCluster, IProjectPipeline } from 'core/domain';
+import { IPipeline, IProject } from 'core/domain';
 import { WizardModal } from 'core/modal';
 import { PipelineConfigService } from 'core/pipeline';
 import { IModalComponentProps, ReactModal } from 'core/presentation';
@@ -18,14 +18,6 @@ import './ConfigureProjectModal.css';
 export interface IConfigureProjectModalProps extends IModalComponentProps {
   title: string;
   projectConfiguration: IProject;
-  command: {
-    viewState: {
-      applications: string[];
-      pipelineConfigs: IProjectPipeline[];
-      clusters: IProjectCluster[];
-      attributes: { name: string; email: string };
-    };
-  };
 }
 
 export interface IConfigureProjectModalState {
@@ -34,6 +26,7 @@ export interface IConfigureProjectModalState {
   appPipelines: {
     [appName: string]: IPipeline[];
   };
+  configuredApps: string[];
   loading: boolean;
   taskMonitor: TaskMonitor;
 }
@@ -49,6 +42,7 @@ export class ConfigureProjectModal extends React.Component<IConfigureProjectModa
     allProjects: [],
     allApplications: [],
     appPipelines: {},
+    configuredApps: [],
     taskMonitor: new TaskMonitor({
       title: 'Updating Project',
       onTaskComplete: () => null,
@@ -60,6 +54,11 @@ export class ConfigureProjectModal extends React.Component<IConfigureProjectModa
     const modalProps = { dialogClassName: 'wizard-modal modal-lg' };
     return ReactModal.show(ConfigureProjectModal, props, modalProps);
   }
+
+  private handleApplicationsChanged = (configuredApps: string[]) => {
+    this.setState({ configuredApps });
+    this.fetchPipelinesForApps(configuredApps);
+  };
 
   public componentDidMount() {
     const applications = (this.props.projectConfiguration && this.props.projectConfiguration.config.applications) || [];
@@ -127,10 +126,9 @@ export class ConfigureProjectModal extends React.Component<IConfigureProjectModa
         <ProjectAttributes allProjects={this.state.allProjects} onDelete={this.onDelete} done={true} />
 
         <Applications
-          applications={projectConfiguration ? projectConfiguration.config.applications : []}
           allApplications={allApplications.map(app => app.name)}
-          onChange={this.fetchPipelinesForApps}
-          done={!!(projectConfiguration && projectConfiguration.config.applications.length)}
+          onApplicationsChanged={this.handleApplicationsChanged}
+          done={!!this.state.configuredApps.length}
         />
 
         <Clusters

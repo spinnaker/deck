@@ -1,86 +1,57 @@
 import * as React from 'react';
-import { FormikErrors } from 'formik';
-import { IWizardPageProps, wizardPage } from '@spinnaker/core';
-import VirtualizedSelect from 'react-virtualized-select';
+import { FormikErrors, getIn } from 'formik';
+import { Effect } from 'formik-effect';
+import { isEqual } from 'lodash';
+
+import { IProject } from 'core/domain';
+import { IWizardPageProps, wizardPage } from 'core/modal';
+import { FormikApplicationsPicker } from 'core/projects/configure/FormikApplicationsPicker';
 
 import './Applications.css';
 
-interface IApplications {
-  applications: string[];
-}
-
-interface IApplicationsState {
-  applications: string[];
-}
-
-export interface IApplicationsProps extends IWizardPageProps<IApplications> {
-  applications?: string[];
+export interface IApplicationsProps extends IWizardPageProps<IProject> {
   allApplications: string[];
-  onChange: Function;
+  onApplicationsChanged: (applications: string[]) => void;
 }
 
-class ApplicationsImpl extends React.Component<IApplicationsProps, IApplicationsState> {
+class ApplicationsImpl extends React.Component<IApplicationsProps> {
   public static LABEL = 'Applications';
 
-  constructor(props: IApplicationsProps) {
-    super(props);
-    this.state = {
-      applications: this.props.applications || [],
+  public validate(project: IProject): FormikErrors<IProject> {
+    const configuredApps = (project.config && project.config.applications) || [];
+    const getApplicationError = (app: string) =>
+      this.props.allApplications.includes(app) ? undefined : `Application '${app}' does not exist.`;
+
+    const applicationErrors = configuredApps.map(getApplicationError);
+    if (!applicationErrors.some(err => !!err)) {
+      return {};
+    }
+
+    return {
+      config: {
+        applications: applicationErrors,
+      },
     };
   }
 
-  private addApplication = async (app: string) => {
-    await this.setState({
-      applications: this.state.applications.concat(app),
-    });
-    this.props.formik.setFieldValue('applications', this.state.applications);
-    this.props.onChange(this.state.applications);
-  };
-
-  private removeApplication = async (app: string) => {
-    await this.setState({
-      applications: this.state.applications.filter(application => application !== app),
-    });
-    this.props.formik.setFieldValue('applications', this.state.applications);
-  };
-
-  public validate(_values: IApplications) {
-    return {} as FormikErrors<IApplications>;
-  }
-
   public render() {
-    const { applications } = this.state;
+    const { allApplications } = this.props;
+
     return (
-      <div className="Applications vertical center">
-        <ul className="nostyle">
-          {applications &&
-            applications.map((app: string) => (
-              <li key={app} style={{ width: '100%' }} className="horizontal">
-                <div className="body-small zombie-label flex-1 sp-padding-xs-yaxis sp-padding-s-xaxis sp-margin-xs-yaxis">
-                  {app}
-                </div>{' '}
-                <button
-                  onClick={() => {
-                    this.removeApplication(app);
-                  }}
-                  className="nostyle"
-                >
-                  <i className="fas fa-trash-alt" />
-                </button>
-              </li>
-            ))}
-        </ul>
-        <VirtualizedSelect
-          options={this.props.allApplications.map(app => ({
-            value: app,
-            label: app,
-          }))}
-          onChange={(item: { value: string; label: string }) => {
-            this.addApplication(item.value);
+      <>
+        <Effect<IProject>
+          onChange={(prev, next) => {
+            const prevApps = getIn(prev.values, 'config.applications', []);
+            const nextApps = getIn(next.values, 'config.applications', []);
+
+            if (!isEqual(prevApps, nextApps)) {
+              this.props.onApplicationsChanged && this.props.onApplicationsChanged(nextApps);
+            }
           }}
-          className="body-small"
         />
-      </div>
+
+        <FormikApplicationsPicker applications={allApplications} name="config.applications" />
+      </>
     );
   }
 }
