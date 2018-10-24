@@ -9,7 +9,7 @@ Registry.pipeline.registerStage({
   description:
     'Evaluates variables for use in SpEL expressions in downstream stages. Variables can be accessed by their key.',
   key: 'evaluateVariables',
-  configuration: {
+  defaults: {
     failOnFailedExpressions: true,
   },
   component: EvaluateVariablesStageConfig,
