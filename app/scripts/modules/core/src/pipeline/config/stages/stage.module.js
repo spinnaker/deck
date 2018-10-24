@@ -178,6 +178,9 @@ module.exports = angular
           $scope.description = config.description;
           $scope.extendedDescription = config.extendedDescription;
           $scope.label = config.label;
+          if (config.configuration && config.configuration.failOnFailedExpressions) {
+            $scope.stage.failOnFailedExpressions = config.configuration.failOnFailedExpressions;
+          }
           if (config.useBaseProvider || config.provides) {
             config.templateUrl = require('./baseProviderStage/baseProviderStage.html');
             config.controller = 'BaseProviderStageCtrl as baseProviderStageCtrl';
