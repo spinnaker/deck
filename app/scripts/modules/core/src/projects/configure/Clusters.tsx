@@ -105,7 +105,7 @@ class ClustersImpl extends React.Component<IClustersProps> {
                           </label>
 
                           {!!cluster.applications && (
-                            <FormikApplicationsPicker name={`${applicationsPath}`} applications={applications} />
+                            <FormikApplicationsPicker name={applicationsPath} applications={applications} />
                           )}
                         </td>
 
