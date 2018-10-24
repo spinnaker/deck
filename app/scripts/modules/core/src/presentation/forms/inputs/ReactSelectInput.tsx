@@ -1,8 +1,8 @@
-import { IControlledInputProps, TetheredSelect } from 'core/presentation';
-
-import { noop } from 'core/utils';
 import * as React from 'react';
 import Select, { Option, ReactSelectProps } from 'react-select';
+
+import { IControlledInputProps, TetheredSelect } from 'core/presentation';
+import { noop } from 'core/utils';
 
 import { IFormInputProps } from '../interface';
 
