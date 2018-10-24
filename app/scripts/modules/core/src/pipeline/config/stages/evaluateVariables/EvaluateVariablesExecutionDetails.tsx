@@ -7,10 +7,7 @@ import {
   StageFailureMessage,
 } from 'core/pipeline';
 
-export interface IEvaluatedVariables {
-  key: string;
-  value: string;
-}
+import { IEvaluatedVariable } from './EvaluateVariablesStageConfig';
 
 export function EvaluateVariablesExecutionDetails(props: IExecutionDetailsSectionProps) {
   const {
@@ -23,7 +20,7 @@ export function EvaluateVariablesExecutionDetails(props: IExecutionDetailsSectio
   const evaluatedVariables = context.variables ? (
     <div>
       <dl>
-        {context.variables.map(({ key }: IEvaluatedVariables) => (
+        {context.variables.map(({ key }: IEvaluatedVariable) => (
           <React.Fragment key={key}>
             <dt>{key}</dt>
             <dd>{outputs[key] || '-'}</dd>

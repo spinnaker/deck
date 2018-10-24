@@ -4,12 +4,17 @@ import { map, set } from 'lodash';
 import { IStageConfigProps, StageConfigField } from 'core/pipeline';
 import { MapEditor } from 'core/forms';
 
+export interface IEvaluatedVariable {
+  key: string;
+  value: string;
+}
+
 export class EvaluateVariablesStageConfig extends React.Component<IStageConfigProps> {
-  private expand(variables: any) {
-    return map(variables, (value, key) => ({ key, value }));
+  private expand(variables: { [key: string]: string }): IEvaluatedVariable[] {
+    return map(variables, (value, key): IEvaluatedVariable => ({ key, value }));
   }
 
-  private stageFieldChanged = (fieldIndex: string, value: any) => {
+  private stageFieldChanged = (fieldIndex: string, value: { [key: string]: string }) => {
     set(this.props.stage, fieldIndex, this.expand(value));
     this.props.stageFieldUpdated();
     this.forceUpdate();
@@ -26,7 +31,7 @@ export class EvaluateVariablesStageConfig extends React.Component<IStageConfigPr
 
     // Flattens an array of objects {key, value} into a single object with the respective keys/values
     const variablesObject = variables.reduce(
-      (acc: any, { key, value }: any) => Object.assign(acc, { [key]: value }),
+      (acc: any, { key, value }: IEvaluatedVariable) => Object.assign(acc, { [key]: value }),
       {},
     );
 
