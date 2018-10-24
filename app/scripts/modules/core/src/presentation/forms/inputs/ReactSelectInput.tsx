@@ -52,9 +52,7 @@ export const reactSelectOnBlurAdapter = (field: IControlledInputProps) => {
 /**
  * A react-select Input
  *
- * This input supports error validation state rendering
- * It also has a simplified stringOptions prop for when Option interface is overkill.
- * It adapts the onChange event to a controlled input event
+ * This input supports error validation state rendering. It adapts the onChange event to a controlled input event.
  *
  * This component does not attempt to support async loading
  */
