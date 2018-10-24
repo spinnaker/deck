@@ -3,7 +3,7 @@ import { Option } from 'react-select';
 import VirtualizedSelect from 'react-virtualized-select';
 import { ArrayHelpers, FieldArray, getIn } from 'formik';
 
-import { FormikFormField, IFormInputProps, StandardFieldLayout, TextInput } from 'core/presentation';
+import { FormikFormField, IFormInputProps, StandardFieldLayout, StringsAsOptions, TextInput } from 'core/presentation';
 
 import './Applications.css';
 
@@ -12,8 +12,6 @@ export interface IApplicationsPickerProps {
   name: string; // path to formik array
   applications: string[];
 }
-
-const makeOption = (app: string) => ({ value: app, label: app });
 
 /**
  * This component supports multiple selection of applications.
@@ -29,7 +27,7 @@ export class FormikApplicationsPicker extends React.Component<IApplicationsPicke
       </button>
     );
 
-    const Application = (props: IFormInputProps) => {
+    const ReadOnlyApplicationInput = (props: IFormInputProps) => {
       const appClassName = 'body-small zombie-label flex-1 sp-padding-xs-yaxis sp-padding-s-xaxis sp-margin-xs-yaxis';
       const isError = props.validation.validationStatus === 'error';
       // When there is an error, render a disabled TextInput with failed validation, else render the weird box ui
@@ -42,7 +40,7 @@ export class FormikApplicationsPicker extends React.Component<IApplicationsPicke
         render={arrayHelpers => {
           const selectedApplications: string[] = getIn(arrayHelpers.form.values, name) || [];
           const isAppSelected = (app: string) => !selectedApplications.includes(app);
-          const options: Array<Option<string>> = applications.filter(isAppSelected).map(makeOption);
+          const apps = applications.filter(isAppSelected);
 
           return (
             <div className="Applications">
@@ -51,7 +49,7 @@ export class FormikApplicationsPicker extends React.Component<IApplicationsPicke
                   key={app}
                   name={`${name}[${index}]`}
                   label={label}
-                  input={Application}
+                  input={ReadOnlyApplicationInput}
                   actions={<TrashButton arrayHelpers={arrayHelpers} index={index} />}
                   touched={true}
                 />
@@ -60,12 +58,16 @@ export class FormikApplicationsPicker extends React.Component<IApplicationsPicke
               <StandardFieldLayout
                 label={label}
                 input={
-                  <VirtualizedSelect
-                    ignoreAccents={false} /* for typeahead performance with long lists */
-                    options={options}
-                    onChange={(item: Option<string>) => arrayHelpers.push(item.value)}
-                    className="body-small"
-                  />
+                  <StringsAsOptions strings={apps}>
+                    {options => (
+                      <VirtualizedSelect
+                        ignoreAccents={false} /* for typeahead performance with long lists */
+                        options={options}
+                        onChange={(item: Option<string>) => arrayHelpers.push(item.value)}
+                        className="body-small"
+                      />
+                    )}
+                  </StringsAsOptions>
                 }
               />
             </div>
