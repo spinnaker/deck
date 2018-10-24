@@ -4,14 +4,7 @@ import { map, set } from 'lodash';
 import { IStageConfigProps, StageConfigField } from 'core/pipeline';
 import { MapEditor } from 'core/forms';
 
-export interface IEvaluateVariablesStageConfigState {
-  variables: any;
-}
-
-export class EvaluateVariablesStageConfig extends React.Component<
-  IStageConfigProps,
-  IEvaluateVariablesStageConfigState
-> {
+export class EvaluateVariablesStageConfig extends React.Component<IStageConfigProps> {
   private expand(variables: any) {
     return map(variables, (value, key) => ({ key, value }));
   }

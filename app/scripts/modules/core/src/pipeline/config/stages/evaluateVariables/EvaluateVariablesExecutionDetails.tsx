@@ -12,7 +12,7 @@ export interface IEvaluatedVariables {
   value: string;
 }
 
-export const EvaluateVariablesExecutionDetails = (props: IExecutionDetailsSectionProps) => {
+export function EvaluateVariablesExecutionDetails(props: IExecutionDetailsSectionProps) {
   const {
     stage: { context = {}, outputs = {} },
     stage,
