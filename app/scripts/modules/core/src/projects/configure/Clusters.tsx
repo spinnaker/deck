@@ -9,8 +9,6 @@ import { NgReact } from 'core/reactShims';
 
 import { FormikApplicationsPicker } from './FormikApplicationsPicker';
 
-import './Clusters.css';
-
 export interface IClustersProps extends IWizardPageProps<IProject> {
   accounts: IAccount[];
 }
@@ -60,15 +58,15 @@ class ClustersImpl extends React.Component<IClustersProps> {
 
     const tableHeader = (
       <tr>
-        <td className="wide">Application</td>
-        <td className="wide">Account</td>
+        <td style={{ width: '200px' }}>Application</td>
+        <td style={{ width: '200px' }}>Account</td>
         <td>
           Stack <HelpField id="project.cluster.stack" />
         </td>
         <td>
           Detail <HelpField id="project.cluster.detail" />
         </td>
-        <td />
+        <td style={{ width: '30px' }} />
       </tr>
     );
 
@@ -83,8 +81,8 @@ class ClustersImpl extends React.Component<IClustersProps> {
           const accountNames = accounts.map(account => account.name);
 
           return (
-            <section className="Clusters vertical center">
-              <table style={{ width: '100%' }}>
+            <section className="ConfigureProject-Clusters vertical center">
+              <table style={{ width: '100%' }} className="table-condensed">
                 <thead>{tableHeader}</thead>
 
                 <tbody>

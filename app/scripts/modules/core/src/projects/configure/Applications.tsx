@@ -7,8 +7,6 @@ import { IProject } from 'core/domain';
 import { IWizardPageProps, wizardPage } from 'core/modal';
 import { FormikApplicationsPicker } from 'core/projects/configure/FormikApplicationsPicker';
 
-import './Applications.css';
-
 export interface IApplicationsProps extends IWizardPageProps<IProject> {
   allApplications: string[];
   onApplicationsChanged: (applications: string[]) => void;
@@ -50,7 +48,11 @@ class ApplicationsImpl extends React.Component<IApplicationsProps> {
           }}
         />
 
-        <FormikApplicationsPicker applications={allApplications} name="config.applications" />
+        <FormikApplicationsPicker
+          className="ConfigureProject-Applications"
+          applications={allApplications}
+          name="config.applications"
+        />
       </>
     );
   }

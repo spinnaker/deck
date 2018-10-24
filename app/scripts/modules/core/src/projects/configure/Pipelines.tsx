@@ -6,8 +6,6 @@ import { Spinner } from 'core/widgets';
 import { IPipeline, IProject, IProjectPipeline } from 'core/domain';
 import { IWizardPageProps, wizardPage } from 'core/modal';
 
-import './Pipelines.css';
-
 export interface IPipelinesProps extends IWizardPageProps<{}> {
   appsPipelines: {
     [appName: string]: IPipeline[];
@@ -57,7 +55,7 @@ class PipelinesImpl extends React.Component<IPipelinesProps> {
       <tr>
         <td>App</td>
         <td>Pipeline</td>
-        <td />
+        <td style={{ width: '30px' }} />
       </tr>
     );
 
@@ -72,9 +70,9 @@ class PipelinesImpl extends React.Component<IPipelinesProps> {
           const apps: string[] = getIn(project, 'config.applications');
 
           return (
-            <div className="Pipelines vertical center">
+            <div className="ConfigureProject-Pipelines vertical center">
               <div className="vertical center" style={{ width: '100%' }}>
-                <table style={{ width: '100%' }}>
+                <table style={{ width: '100%' }} className="table-condensed">
                   <thead>{tableHeader}</thead>
                   <tbody>
                     {configs.map((config, idx) => {
