@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { FormikErrors, getIn } from 'formik';
-import { Effect } from 'formik-effect';
 import { isEqual } from 'lodash';
 
 import { IProject } from 'core/domain';
@@ -29,7 +28,7 @@ class ApplicationsImpl extends React.Component<IApplicationsProps> {
       config: {
         applications: applicationErrors,
       },
-    };
+    } as any;
   }
 
   public componentDidMount() {
