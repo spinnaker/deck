@@ -1,3 +1,4 @@
+export type ValidationFunctionFactory = (message?: string) => ValidationFunction;
 export type ValidationFunction = (value: any) => string | Function | Promise<any>;
 
 export class Validation {
@@ -5,7 +6,7 @@ export class Validation {
     return (value: any) => validationFns.reduce((error, validationFn) => error || validationFn(value), null);
   };
 
-  public static isRequired: ValidationFunction = (val: any) => {
-    return (val === undefined || val === null || val === '') && 'This field is required';
+  public static isRequired: ValidationFunctionFactory = (message = 'This field is required') => (val: any) => {
+    return (val === undefined || val === null || val === '') && message;
   };
 }
