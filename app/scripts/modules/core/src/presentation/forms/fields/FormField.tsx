@@ -33,8 +33,14 @@ export class FormField extends React.Component<IFormFieldProps> {
   };
 
   /** Returns validation function composed of all the `validate` functions (and `isRequired` if `required` is truthy) */
-  private composedValidation(required: boolean, validate: IFormFieldValidationProps['validate']): ValidationFunction {
-    const requiredFn = !!required && Validation.isRequired;
+  /** Returns validation function composed of all the `validate` functions (and `isRequired` if `required` is truthy) */
+  private composedValidation(
+    label: IFormFieldProps['label'],
+    required: boolean,
+    validate: IFormFieldProps['validate'],
+  ): ValidationFunction {
+    const labelStr = typeof label === 'string' ? label : 'This Field';
+    const requiredFn = !!required && Validation.isRequired(`${labelStr} is required`);
     const validationFns = [requiredFn].concat(validate).filter(x => !!x);
 
     return validationFns.length ? Validation.compose(...validationFns) : null;
@@ -50,7 +56,7 @@ export class FormField extends React.Component<IFormFieldProps> {
     const fieldLayoutPropsWithoutInput: IFieldLayoutPropsWithoutInput = { label, help, required, actions };
     const controlledInputProps: IControlledInputProps = { onChange, onBlur, value, name };
 
-    const validationMessage = message || this.composedValidation(required, validate)(value);
+    const validationMessage = message || this.composedValidation(label, required, validate)(value);
     const validationStatus = status || !!validationMessage ? 'error' : null;
     const validationProps: IValidationProps = { touched, validationMessage, validationStatus };
 

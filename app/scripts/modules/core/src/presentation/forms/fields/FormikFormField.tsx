@@ -20,8 +20,13 @@ export class FormikFormField extends React.Component<IFormikFormFieldProps> {
   };
 
   /** Returns validation function composed of all the `validate` functions (and `isRequired` if `required` is truthy) */
-  private composedValidation(required: boolean, validate: IFormikFieldProps['validate']): ValidationFunction {
-    const requiredFn = !!required && Validation.isRequired;
+  private composedValidation(
+    label: IFormikFormFieldProps['label'],
+    required: boolean,
+    validate: IFormikFieldProps['validate'],
+  ): ValidationFunction {
+    const labelStr = typeof label === 'string' ? label : 'This Field';
+    const requiredFn = !!required && Validation.isRequired(`${labelStr} is required`);
     const validationFns = [requiredFn].concat(validate).filter(x => !!x);
 
     return validationFns.length ? Validation.compose(...validationFns) : null;
@@ -36,7 +41,7 @@ export class FormikFormField extends React.Component<IFormikFormFieldProps> {
     return (
       <Field
         name={name}
-        validate={this.composedValidation(required, validate)}
+        validate={this.composedValidation(label, required, validate)}
         render={(props: FieldProps<any>) => {
           const { field, form } = props;
 
