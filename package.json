@@ -108,7 +108,7 @@
     "@types/js-yaml": "3.5.30",
     "@types/lodash": "^4.14.64",
     "@types/marked": "^0.0.28",
-    "@types/moment-timezone": "^0.2.34",
+    "@types/moment-timezone": "^0.5.9",
     "@types/node": "7.0.5",
     "@types/prop-types": "^15.5.2",
     "@types/react": "^16.4.18",
