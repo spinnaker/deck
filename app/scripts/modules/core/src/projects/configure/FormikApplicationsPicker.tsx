@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Option } from 'react-select';
 import VirtualizedSelect from 'react-virtualized-select';
-import { ArrayHelpers, FieldArray, getIn } from 'formik';
+import { FieldArray, getIn } from 'formik';
 
 import { FormikFormField, IFormInputProps, StandardFieldLayout, StringsAsOptions, TextInput } from 'core/presentation';
 
@@ -26,8 +26,8 @@ export class FormikApplicationsPicker extends React.Component<IFormikApplication
   public render() {
     const { label, applications, name, className } = this.props;
 
-    const TrashButton = ({ arrayHelpers, index }: { arrayHelpers: ArrayHelpers; index: number }) => (
-      <button type="button" onClick={() => arrayHelpers.remove(index)} className="nostyle">
+    const TrashButton = ({ onClick }: { onClick: () => void }) => (
+      <button type="button" onClick={onClick} className="nostyle">
         <i className="fas fa-trash-alt" />
       </button>
     );
@@ -55,7 +55,7 @@ export class FormikApplicationsPicker extends React.Component<IFormikApplication
                   name={`${name}[${index}]`}
                   label={label}
                   input={ReadOnlyApplicationInput}
-                  actions={<TrashButton arrayHelpers={arrayHelpers} index={index} />}
+                  actions={<TrashButton onClick={() => arrayHelpers.remove(index)} />}
                   touched={true}
                 />
               ))}
@@ -66,7 +66,7 @@ export class FormikApplicationsPicker extends React.Component<IFormikApplication
                   <StringsAsOptions strings={apps}>
                     {options => (
                       <VirtualizedSelect
-                        style={{ flex: '1 1 auto', marginRigh: '1em' }}
+                        style={{ flex: '1 1 auto', marginRight: '1em' }}
                         ignoreAccents={false} /* for typeahead performance with long lists */
                         options={options}
                         onChange={(item: Option<string>) => arrayHelpers.push(item.value)}

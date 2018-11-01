@@ -132,7 +132,6 @@ window.spinnakerSettings = {
     appengine: {
       defaults: {
         account: 'my-appengine-account',
-        containerImageUrlDeployments: false,
       },
     },
   },
@@ -204,5 +203,6 @@ window.spinnakerSettings = {
     vpcMigrator: true,
     wercker: false,
     managedServiceAccounts: managedServiceAccountsEnabled,
+    quietPeriod: false,
   },
 };
