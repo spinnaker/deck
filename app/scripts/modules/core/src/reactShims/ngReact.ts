@@ -5,14 +5,12 @@ import IInjectorService = angular.auto.IInjectorService;
 import { AddEntityTagLinksWrapperComponent } from 'core/entityTag/addEntityTagLinks.component';
 import { ButtonBusyIndicatorComponent } from '../forms/buttonBusyIndicator/buttonBusyIndicator.component';
 import { CopyToClipboardComponent } from '../utils/clipboard/copyToClipboard.component';
-import { DeploymentStrategySelectorWrapper } from 'core/deploymentStrategy/deploymentStrategySelector.component';
 import { IDiffViewProps } from '../pipeline/config/actions/history/DiffView';
 import { EntitySourceComponent } from 'core/entityTag/entitySource.component';
 import { HelpFieldWrapperComponent } from '../help/helpField.component';
 import { IAddEntityTagLinksProps } from 'core/entityTag/AddEntityTagLinks';
 import { IButtonBusyIndicatorProps } from '../forms/buttonBusyIndicator/ButtonBusyIndicator';
 import { ICopyToClipboardProps } from '../utils/clipboard/CopyToClipboard';
-import { IDeploymentStrategySelectorProps } from 'core/deploymentStrategy/DeploymentStrategySelector';
 import { IEntitySourceProps } from 'core/entityTag/EntitySource';
 import { IHelpFieldProps } from '../help/HelpField';
 import { IInsightLayoutProps } from 'core/insight/InsightLayout';
@@ -35,6 +33,8 @@ import { IInstanceArchetypeSelectorProps } from 'core/serverGroup/configure/comm
 import { IInstanceTypeSelectorProps } from 'core/serverGroup/configure/common/InstanceTypeSelector';
 import { V2InstanceArchetypeSelector } from 'core/serverGroup/configure/common/v2instanceArchetypeSelector.component';
 import { V2InstanceTypeSelector } from 'core/serverGroup/configure/common/v2InstanceTypeSelector.component';
+import { INumberListProps } from 'core/forms/numberList/NumberList';
+import { NumberListWrapperComponent } from 'core/forms/numberList/numberList.component';
 
 // prettier-ignore
 export class NgReactInjector extends ReactInject {
@@ -44,7 +44,6 @@ export class NgReactInjector extends ReactInject {
   public AddEntityTagLinks: React.ComponentClass<IAddEntityTagLinksProps>                     = angular2react('addEntityTagLinksWrapper', new AddEntityTagLinksWrapperComponent(), this.$injectorProxy) as any;
   public ButtonBusyIndicator: React.ComponentClass<IButtonBusyIndicatorProps>                 = angular2react('buttonBusyIndicator', new ButtonBusyIndicatorComponent(), this.$injectorProxy) as any;
   public CopyToClipboard: React.ComponentClass<ICopyToClipboardProps>                         = angular2react('copyToClipboard', new CopyToClipboardComponent(), this.$injectorProxy) as any;
-  public DeploymentStrategySelector: React.ComponentClass<IDeploymentStrategySelectorProps>   = angular2react('deploymentStrategySelectorWrapper', new DeploymentStrategySelectorWrapper(), this.$injectorProxy) as any;
   public DiffView: React.ComponentClass<IDiffViewProps>                                       = angular2react('diffView', diffViewComponent, this.$injectorProxy) as any;
   public EntitySource: React.ComponentClass<IEntitySourceProps>                               = angular2react('entitySource', new EntitySourceComponent(), this.$injectorProxy) as any;
   public HelpField: React.ComponentClass<IHelpFieldProps>                                     = angular2react('helpFieldWrapper', new HelpFieldWrapperComponent(), this.$injectorProxy) as any;
@@ -52,6 +51,7 @@ export class NgReactInjector extends ReactInject {
   public InstanceArchetypeSelector: React.ComponentClass<IInstanceArchetypeSelectorProps>     = angular2react('v2InstanceArchetypeSelector', new V2InstanceArchetypeSelector(), this.$injectorProxy) as any;
   public InstanceTypeSelector: React.ComponentClass<IInstanceTypeSelectorProps>               = angular2react('v2InstanceTypeSelector', new V2InstanceTypeSelector(), this.$injectorProxy);
   public LegacySpinner: React.ComponentClass<ILegacySpinnerProps>                             = angular2react('spinnerWrapper', new SpinnerWrapperComponent(), this.$injectorProxy) as any;
+  public NumberList: React.ComponentClass<INumberListProps>                                   = angular2react('numberListWrapper', new NumberListWrapperComponent(), this.$injectorProxy) as any;
   public RunningTasksTag: React.ComponentClass<IRunningTasksTagProps>                         = angular2react('runningTasksTag', { bindings: runningTasksTagBindings }, this.$injectorProxy) as any;
   public StageSummaryWrapper: React.ComponentClass<IStageSummaryWrapperProps>                 = angular2react('stageSummary', new StageSummaryComponent(), this.$injectorProxy) as any;
   public StepExecutionDetailsWrapper: React.ComponentClass<IStepExecutionDetailsWrapperProps> = angular2react('stepExecutionDetails', new StepExecutionDetailsComponent(), this.$injectorProxy) as any;
