@@ -12691,6 +12691,15 @@ react-sortable-hoc@^0.6.8:
     lodash "^4.12.0"
     prop-types "^15.5.7"
 
+react-sortable-hoc@^0.8.3:
+  version "0.8.3"
+  resolved "https://registry.yarnpkg.com/react-sortable-hoc/-/react-sortable-hoc-0.8.3.tgz#8537e8ab8d6bad6829885755a0f847817ed78648"
+  integrity sha512-vt2qQ9DnPLjGZ9osM2jBULdi7WfFXtYVuHvjHX8o2em7Rcla9FXIG60aWFbvvpFC1iXyATw5PWZX0B57EUOYfQ==
+  dependencies:
+    babel-runtime "^6.11.6"
+    invariant "^2.2.1"
+    prop-types "^15.5.7"
+
 react-test-renderer@16.3.2:
   version "16.3.2"
   resolved "https://registry.yarnpkg.com/react-test-renderer/-/react-test-renderer-16.3.2.tgz#3d1ed74fda8db42521fdf03328e933312214749a"
@@ -12770,7 +12779,7 @@ react2angular@^3.2.1:
     lodash.frompairs "^4.0.1"
     ngcomponent "^4.1.0"
 
-react@16.3.2, "react@^15.6.2 || ^16.0":
+react@16.3.2:
   version "16.3.2"
   resolved "https://registry.yarnpkg.com/react/-/react-16.3.2.tgz#fdc8420398533a1e58872f59091b272ce2f91ea9"
   integrity sha512-o5GPdkhciQ3cEph6qgvYB7LTOHw/GB0qRI6ZFNugj49qJCFfgHwVNjZ5u+b7nif4vOeMIOuYj3CeYe2IBD74lg==
@@ -12780,7 +12789,7 @@ react@16.3.2, "react@^15.6.2 || ^16.0":
     object-assign "^4.1.1"
     prop-types "^15.6.0"
 
-react@16.6.0:
+react@16.6.0, "react@^15.6.2 || ^16.0":
   version "16.6.0"
   resolved "https://registry.yarnpkg.com/react/-/react-16.6.0.tgz#b34761cfaf3e30f5508bc732fb4736730b7da246"
   integrity sha512-zJPnx/jKtuOEXCbQ9BKaxDMxR0001/hzxXwYxG8septeyYGfsgAei6NgfbVgOhbY1WOP2o3VPs/E9HaN+9hV3Q==
