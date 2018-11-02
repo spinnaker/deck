@@ -59,6 +59,7 @@ export * from './pagerDuty';
 export * from './pipeline';
 export * from './presentation';
 export * from './pubsub';
+export * from './projects';
 
 export * from './reactShims';
 export * from './region';

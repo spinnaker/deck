@@ -24,6 +24,7 @@ import './ConfigureProjectModal.css';
 export interface IConfigureProjectModalProps extends IModalComponentProps {
   title: string;
   projectConfiguration: IProject;
+  isTeams?: boolean;
 }
 
 export interface IConfigureProjectModalState {
@@ -88,9 +89,15 @@ export class ConfigureProjectModal extends React.Component<IConfigureProjectModa
   }
 
   private submit = (project: IProject) => {
+    const onTaskComplete = () => {
+      if (!this.props.isTeams) {
+        ReactInjector.$state.go('home.project', { project: project.name });
+      }
+    };
+
     const taskMonitor = new TaskMonitor({
       title: 'Updating Project',
-      onTaskComplete: () => ReactInjector.$state.go('home.project', { project: project.name }),
+      onTaskComplete,
       modalInstance: TaskMonitor.modalInstanceEmulation(() => this.props.dismissModal()),
     });
 
@@ -147,12 +154,12 @@ export class ConfigureProjectModal extends React.Component<IConfigureProjectModa
   };
 
   public render() {
-    const { dismissModal, projectConfiguration } = this.props;
+    const { dismissModal, projectConfiguration, isTeams, title } = this.props;
     const { allAccounts, allApplications, appPipelines, loading, taskMonitor } = this.state;
 
     return (
       <WizardModal<IProject>
-        heading="Configure Project"
+        heading={title}
         initialValues={projectConfiguration}
         loading={loading}
         taskMonitor={taskMonitor}
@@ -161,7 +168,7 @@ export class ConfigureProjectModal extends React.Component<IConfigureProjectModa
         submitButtonLabel="Save"
         validate={this.validate}
       >
-        <ProjectAttributes allProjects={this.state.allProjects} onDelete={this.onDelete} done={true} />
+        {!isTeams && <ProjectAttributes allProjects={this.state.allProjects} onDelete={this.onDelete} done={true} />}
 
         <Applications
           allApplications={allApplications.map(app => app.name)}
@@ -169,7 +176,7 @@ export class ConfigureProjectModal extends React.Component<IConfigureProjectModa
           done={true}
         />
 
-        <Clusters accounts={allAccounts} done={true} />
+        {!isTeams && <Clusters accounts={allAccounts} done={true} />}
 
         <Pipelines appsPipelines={appPipelines} done={true} />
       </WizardModal>
