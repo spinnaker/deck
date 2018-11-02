@@ -105,7 +105,7 @@
     "@types/jasmine": "2.5.47",
     "@types/jquery": "^2.0.34",
     "@types/jqueryui": "^1.11.32",
-    "@types/js-yaml": "3.5.30",
+    "@types/js-yaml": "3.11.2",
     "@types/lodash": "^4.14.64",
     "@types/marked": "^0.0.28",
     "@types/moment-timezone": "^0.2.34",
