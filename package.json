@@ -40,7 +40,7 @@
     "angular": "~1.6.3",
     "angular-cron-gen": "0.0.21",
     "angular-messages": "~1.6.3",
-    "angular-sanitize": "~1.6.3",
+    "angular-sanitize": "~1.7.5",
     "angular-spinner": "^1.0.1",
     "angular-ui-bootstrap": "^2.5.0",
     "angular-ui-sortable": "^0.17.0",
