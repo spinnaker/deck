@@ -12718,6 +12718,14 @@ react-tether@^0.6.1:
     prop-types "^15.5.8"
     tether "^1.4.3"
 
+react-tether@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/react-tether/-/react-tether-1.0.2.tgz#3851d76049a12475204b913469e9fb8377234cf4"
+  integrity sha512-tp+exTal7FjTNaHF+SGUEGTu+NHT0NU7rLkvb86UvWyd8sQtlir12ymAPJR0Sie42JEi1lKfN1q0I1O7o86GBA==
+  dependencies:
+    prop-types "^15.5.8"
+    tether "^1.4.3"
+
 react-transition-group@^2.0.0, react-transition-group@^2.2.0:
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/react-transition-group/-/react-transition-group-2.2.1.tgz#e9fb677b79e6455fd391b03823afe84849df4a10"
@@ -12770,7 +12778,7 @@ react2angular@^3.2.1:
     lodash.frompairs "^4.0.1"
     ngcomponent "^4.1.0"
 
-react@16.3.2, "react@^15.6.2 || ^16.0":
+react@16.3.2:
   version "16.3.2"
   resolved "https://registry.yarnpkg.com/react/-/react-16.3.2.tgz#fdc8420398533a1e58872f59091b272ce2f91ea9"
   integrity sha512-o5GPdkhciQ3cEph6qgvYB7LTOHw/GB0qRI6ZFNugj49qJCFfgHwVNjZ5u+b7nif4vOeMIOuYj3CeYe2IBD74lg==
@@ -12780,7 +12788,7 @@ react@16.3.2, "react@^15.6.2 || ^16.0":
     object-assign "^4.1.1"
     prop-types "^15.6.0"
 
-react@16.6.0:
+react@16.6.0, "react@^15.6.2 || ^16.0":
   version "16.6.0"
   resolved "https://registry.yarnpkg.com/react/-/react-16.6.0.tgz#b34761cfaf3e30f5508bc732fb4736730b7da246"
   integrity sha512-zJPnx/jKtuOEXCbQ9BKaxDMxR0001/hzxXwYxG8septeyYGfsgAei6NgfbVgOhbY1WOP2o3VPs/E9HaN+9hV3Q==
