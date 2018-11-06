@@ -53,6 +53,8 @@ const helpContents: { [key: string]: string } = {
         <li>Trigger</li>
         <li>Context - server groups, bakery results, etc.</li>
       </ul>`,
+  'pipeline.config.triggers.respectQuietPeriod': `
+      <p>The quiet period is a system operator designated period of time when automated pipelines and deploys should not run.</p>`,
   'pipeline.config.expectedArtifact':
     'Artifacts required for trigger to execute.  Only one of the artifacts needs to be present for the trigger to execute.',
   'pipeline.config.artifact.help': `
@@ -136,6 +138,12 @@ const helpContents: { [key: string]: string } = {
   'pipeline.config.expectedArtifact.defaultGitlab.reference': `
       <p>The Gitlab API file url the artifact lives under. The domain name may change if you're running your own Gitlab server. The repository and path to files must be URL encoded.</p>
       <p>An example is <code>https://gitlab.com/api/v4/projects/$ORG%2F$REPO/repository/files/path%2Fto%2Ffile.yml/raw</code>. See <a href="https://www.spinnaker.io/reference/artifacts/types/gitlab-file/#fields">our docs</a> for more info.</p>`,
+  'pipeline.config.expectedArtifact.helm.account': `
+      <p>The account contains url the charts can be found</p>`,
+  'pipeline.config.expectedArtifact.helm.name': `
+      <p>The name of chart you want to trigger on changes to</p>`,
+  'pipeline.config.expectedArtifact.helm.version': `
+      <p>The version of chart you want to trigger on changes to</p>`,
   'pipeline.config.expectedArtifact.defaultBitbucket.reference': `
       <p>The Bitbucket API file url the artifact lives under. The domain name may change if you're running your own Bitbucket server. The repository and path to files must be URL encoded.</p>
       <p>An example is <code>https://api.bitbucket.org/1.0/repositories/$ORG/$REPO/raw/$VERSION/$FILEPATH</code>. See <a href="https://www.spinnaker.io/reference/artifacts/types/bitbucket-file/#fields">our docs</a> for more info.</p>`,

@@ -24,7 +24,7 @@ if [ "$CURRENTBRANCH" == "master" ] ; then
     while git show-ref --verify --quiet refs/heads/package-bump$COUNT ; do
       let COUNT=COUNT+1;
     done
-    git co -b package-bump$COUNT;
+    git checkout -b package-bump$COUNT;
   fi
 fi
 CURRENTBRANCH=`git branch | grep \* | cut -d ' ' -f2`;
@@ -54,6 +54,6 @@ if [ "$CURRENTBRANCH" != "master" ] ; then
   read -p "Push current branch ${CURRENTBRANCH} to 'origin'? (y/n) " -n 1 -r
   echo "";
   if [ "$REPLY" == "y" ] ; then
-    git push origin $CURRENTBRANCH;
+    git push --set-upstream origin $CURRENTBRANCH;
   fi
 fi
