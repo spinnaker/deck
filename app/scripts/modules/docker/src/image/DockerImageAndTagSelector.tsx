@@ -246,9 +246,9 @@ export class DockerImageAndTagSelector extends React.Component<
       });
   }
 
-  public handleRefreshImages(): void {
+  public handleRefreshImages = (): void => {
     this.refreshImages(this.props);
-  }
+  };
 
   public refreshImages(props: IDockerImageAndTagSelectorProps): void {
     this.initializeImages(props, true);
