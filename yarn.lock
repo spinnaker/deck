@@ -208,10 +208,10 @@
   resolved "https://registry.yarnpkg.com/@types/clipboard/-/clipboard-1.5.33.tgz#add44ab691a2d64c79100c8d29c0bd303828636c"
   integrity sha1-rdRKtpGi1kx5EAyNKcC9MDgoY2w=
 
-"@types/commonmark@^0.27.0":
-  version "0.27.0"
-  resolved "https://registry.yarnpkg.com/@types/commonmark/-/commonmark-0.27.0.tgz#48e68555bc9d17a6901f3741f4f01a990e3e3d35"
-  integrity sha512-YXJ3f7C6epX698cV4pzqW1K11gzlQGrOqw/8CHTTzirpKmxgP0/afzczicOs9PV0ae11VCoRe7yJ21l/g1PQYA==
+"@types/commonmark@^0.27.1":
+  version "0.27.1"
+  resolved "https://registry.yarnpkg.com/@types/commonmark/-/commonmark-0.27.1.tgz#d40637518c557ceaa5006149b6a0a044a3dffe29"
+  integrity sha512-3K97drCi/zJB1nExp2fx0L50FVyOUXqAlrcUwfXr2pCbR6S67iPv2bPplVaN21osWZcVBPHU1dIk5XVC4JNRqQ==
 
 "@types/d3-array@*":
   version "1.2.0"

@@ -98,7 +98,7 @@
     "@types/angular-ui-bootstrap": "^0.13.41",
     "@types/classnames": "^2.2.0",
     "@types/clipboard": "^1.5.33",
-    "@types/commonmark": "^0.27.0",
+    "@types/commonmark": "^0.27.1",
     "@types/d3": "^5.0.0",
     "@types/dompurify": "^0.0.29",
     "@types/enzyme": "^3.1.10",
