@@ -20,7 +20,7 @@ export class Validation {
 
   public static minValue: ValidatorFactory = (minValue: number, message?: string) => {
     return (val: number, label?: string) => {
-      const validationText = minValue === 0 ? 'cannot be negative' : `cannot be less tihan ${minValue}`;
+      const validationText = minValue === 0 ? 'cannot be negative' : `cannot be less than ${minValue}`;
       message = message || `${label || 'This field'} ${validationText}`;
       return val < minValue && message;
     };
