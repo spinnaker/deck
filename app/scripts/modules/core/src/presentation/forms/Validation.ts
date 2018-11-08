@@ -42,7 +42,6 @@ export const composeValidators = (...validators: Validator[]): Validator => {
     // Or return the first rejected promise (thrown/rejected by an async validator)
     return Promise.all(validatorResults)
       .then((errors: string[]) => {
-        // console.log('composedValidators, errors: ', errors)
         return errors.find(error => !!error);
       })
       .catch((error: string) => error);
