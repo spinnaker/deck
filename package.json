@@ -163,7 +163,7 @@
     "node-libs-browser": "^2.0.0",
     "physical-cpu-count": "^2.0.0",
     "postcss-colorfix": "^0.0.4",
-    "postcss-loader": "^2.1.2",
+    "postcss-loader": "^3.0.0",
     "prettier": "^1.14.3",
     "pretty-quick": "^1.4.1",
     "react-addons-test-utils": "15.6.2",
