@@ -17,7 +17,7 @@
   },
   "scripts": {
     "clean": "rimraf .awcache .cache-loader build node_modules transpiled",
-    "build": "webpack --bail --progress --mode=production",
+    "build": "NODE_OPTIONS=--max_old_space_size=8192 webpack --bail --progress --mode=production",
     "eslint": "eslint -c .eslintrc app/scripts/modules",
     "start": "sh ./start.sh",
     "start-dev-server": "webpack-dev-server --progress --mode=development",
@@ -29,11 +29,11 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free-webfonts": "^1.0.9",
-    "@spinnaker/kayenta": "0.0.62",
+    "@spinnaker/kayenta": "0.0.63",
     "@spinnaker/styleguide": "^1.0.10",
     "@types/memoize-one": "^3.1.1",
     "@types/react-tether": "^0.5.3",
-    "@uirouter/react-hybrid": "0.3.3",
+    "@uirouter/react-hybrid": "0.3.6",
     "@uirouter/rx": "0.4.5",
     "@uirouter/visualizer": "6.0.2",
     "Select2": "git://github.com/select2/select2.git#3.4.8",
@@ -190,9 +190,9 @@
   },
   "resolutionsPurpose": "This temporarily chooses the right versions of these libs, which are specified in both deck AND deck-kayenta",
   "resolutions": {
-    "@uirouter/react-hybrid": "0.3.3",
-    "@uirouter/react": "0.8.5",
-    "@uirouter/angularjs": "1.0.19",
-    "@uirouter/core": "5.0.20"
+    "@uirouter/react-hybrid": "0.3.6",
+    "@uirouter/react": "0.8.7",
+    "@uirouter/angularjs": "1.0.20",
+    "@uirouter/core": "5.0.21"
   }
 }

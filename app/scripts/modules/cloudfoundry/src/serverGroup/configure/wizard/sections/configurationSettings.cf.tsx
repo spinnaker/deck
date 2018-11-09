@@ -364,7 +364,7 @@ class ConfigurationSettingsImpl extends React.Component<ICloudFoundryServerGroup
 
           <div className="form-group">
             <div className="col-md-12">
-              <b>Services</b>
+              <b>Bind Services</b>
               <table className="table table-condensed packed metadata">
                 <tbody>
                   {manifest.services &&
@@ -394,7 +394,7 @@ class ConfigurationSettingsImpl extends React.Component<ICloudFoundryServerGroup
                   <tr>
                     <td colSpan={1}>
                       <button type="button" className="add-new col-md-12" onClick={addServicesVariable}>
-                        <span className="glyphicon glyphicon-plus-sign" /> Add New Service
+                        <span className="glyphicon glyphicon-plus-sign" /> Bind Service
                       </button>
                     </td>
                   </tr>
@@ -654,6 +654,14 @@ class ConfigurationSettingsImpl extends React.Component<ICloudFoundryServerGroup
             errors.manifest = errors.manifest || {};
             errors.manifest.env = `An environment variable was not set`;
           } else {
+            if (e.key) {
+              const validKeyRegex = /^\w+$/g;
+              if (!validKeyRegex.exec(e.key)) {
+                errors.manifest = errors.manifest || {};
+                errors.manifest.env =
+                  `'` + e.key + `' is an invalid environment variable name and must be alphanumeric`;
+              }
+            }
             const value = existingKeys[e.key];
             if (!value) {
               existingKeys[e.key] = e.value;
