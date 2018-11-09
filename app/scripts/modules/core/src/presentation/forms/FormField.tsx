@@ -4,17 +4,17 @@ import { Subject } from 'rxjs';
 import { noop } from 'core/utils';
 
 import { createFieldValidator } from './FormikFormField';
-import { renderContent } from './renderContent';
-import { StandardFieldLayout } from '../layouts';
-import { Validator } from '../Validation';
-import { WatchValue } from '../../WatchValue';
+import { renderContent } from './fields/renderContent';
+import { StandardFieldLayout } from './layouts/index';
+import { Validator } from './Validation';
+import { WatchValue } from '../WatchValue';
 import {
   ICommonFormFieldProps,
   IControlledInputProps,
   IFieldLayoutPropsWithoutInput,
   IFieldValidationStatus,
   IValidationProps,
-} from '../interface';
+} from './interface';
 
 export interface IFormFieldValidationProps {
   validate?: Validator | Validator[];
@@ -26,7 +26,11 @@ export type IFormFieldProps = IFormFieldValidationProps &
   IFieldLayoutPropsWithoutInput &
   IValidationProps;
 
-type IFormFieldState = Pick<IValidationProps, 'validationMessage' | 'validationStatus'>;
+interface IFormFieldState {
+  validationMessage: IValidationProps['validationMessage'];
+  validationStatus: IValidationProps['validationStatus'];
+  internalValidators: Validator[];
+}
 
 export class FormField extends React.Component<IFormFieldProps, IFormFieldState> {
   public static defaultProps: Partial<IFormFieldProps> = {
@@ -40,10 +44,23 @@ export class FormField extends React.Component<IFormFieldProps, IFormFieldState>
   public state: IFormFieldState = {
     validationMessage: undefined,
     validationStatus: undefined,
+    internalValidators: [],
   };
 
   private destroy$ = new Subject();
   private value$ = new Subject();
+
+  private addValidator = (internalValidator: Validator) => {
+    this.setState(prevState => ({
+      internalValidators: prevState.internalValidators.concat(internalValidator),
+    }));
+  };
+
+  private removeValidator = (internalValidator: Validator) => {
+    this.setState(prevState => ({
+      internalValidators: prevState.internalValidators.filter(x => x !== internalValidator),
+    }));
+  };
 
   public componentDidMount() {
     this.value$
@@ -51,7 +68,8 @@ export class FormField extends React.Component<IFormFieldProps, IFormFieldState>
       .takeUntil(this.destroy$)
       .subscribe(value => {
         const { label, required, validate } = this.props;
-        const validator = createFieldValidator(label, required, validate);
+        const { internalValidators } = this.state;
+        const validator = createFieldValidator(label, required, [].concat(validate).concat(internalValidators));
         Promise.resolve(validator(value)).then(error => {
           const validationMessage: string = !!error ? error : undefined;
           const validationStatus: IFieldValidationStatus = !!validationMessage ? 'error' : undefined;
@@ -75,7 +93,13 @@ export class FormField extends React.Component<IFormFieldProps, IFormFieldState>
 
     const validationMessage = message || this.state.validationMessage;
     const validationStatus = status || this.state.validationStatus;
-    const validationProps: IValidationProps = { touched, validationMessage, validationStatus };
+    const validationProps: IValidationProps = {
+      touched,
+      validationMessage,
+      validationStatus,
+      addValidator: this.addValidator,
+      removeValidator: this.removeValidator,
+    };
 
     const inputElement = renderContent(input, { field: controlledInputProps, validation: validationProps });
 
