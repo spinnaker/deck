@@ -106,13 +106,12 @@ export function createFieldValidator<T>(
   required: boolean,
   validate: Validator[],
 ): Validator {
-  const validators = [!!required && Validation.isRequired()].concat(validate).filter(x => !!x);
+  const validator = composeValidators([!!required && Validation.isRequired()].concat(validate));
 
-  if (!validators.length) {
+  if (!validator) {
     return null;
   }
 
-  const validator = composeValidators(...validators);
   const labelString = isString(label) ? label : undefined;
   return (value: any) => validator(value, labelString);
 }

@@ -19,15 +19,8 @@ export class NumberInput extends React.Component<INumberInputProps> {
 
   private validator: Validator = (val: any, label?: string) => {
     const { min, max } = this.props;
-    const validators = [this.getMinValidator(min), this.getMaxValidator(max)].filter(x => !!x);
-
-    if (validators.length === 1) {
-      return validators[0](val, label);
-    } else if (validators.length > 1) {
-      return composeValidators(...validators)(val, label);
-    }
-
-    return undefined;
+    const validator = composeValidators([this.getMinValidator(min), this.getMaxValidator(max)]);
+    return validator ? validator(val, label) : null;
   };
 
   public componentDidMount() {
