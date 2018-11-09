@@ -27,7 +27,7 @@ class AdvancedSettingsImpl extends React.Component<IAdvancedSettingsProps> {
           fastField={false} /* This field depends on  healthInterval */
           help={<HelpField id="loadBalancer.advancedSettings.healthTimeout" />}
           input={props => <NumberInput {...props} min={0} max={values.healthInterval} />}
-          validate={Validation.maxValue(values.healthInterval, 'Timeout must be less than the health Interval.')}
+          validate={Validation.maxValue(values.healthInterval, 'Timeout must be less than the health interval.')}
         />
 
         <FormikFormField
