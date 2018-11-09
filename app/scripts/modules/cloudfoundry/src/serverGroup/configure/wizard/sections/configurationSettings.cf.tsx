@@ -1,7 +1,6 @@
 import * as React from 'react';
 
 import Select, { Option } from 'react-select';
-import { FormikErrors } from 'formik';
 
 import { IArtifactAccount, IWizardPageProps, wizardPage, ValidationMessage, HelpField } from '@spinnaker/core';
 
@@ -39,12 +38,6 @@ function isManifestTriggerSource(
 
 class ConfigurationSettingsImpl extends React.Component<ICloudFoundryServerGroupConfigurationSettingsProps> {
   public static LABEL = 'Configuration';
-
-  private startApplicationUpdated = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    const startApplication = event.target.checked;
-    this.props.formik.values.startApplication = startApplication;
-    this.props.formik.setFieldValue('startApplication', startApplication);
-  };
 
   private memoryUpdated = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const { manifest } = this.props.formik.values;
@@ -97,7 +90,7 @@ class ConfigurationSettingsImpl extends React.Component<ICloudFoundryServerGroup
           instances: 1,
           buildpack: undefined,
           routes: [],
-          env: [],
+          environment: [],
           services: [],
         };
         break;
@@ -135,35 +128,35 @@ class ConfigurationSettingsImpl extends React.Component<ICloudFoundryServerGroup
   private addEnvironmentVariable = (): void => {
     const { manifest } = this.props.formik.values;
     if (isManifestDirectSource(manifest)) {
-      if (manifest.env === undefined) {
-        manifest.env = [];
+      if (manifest.environment === undefined) {
+        manifest.environment = [];
       }
-      manifest.env.push({ key: '', value: '' });
-      this.props.formik.setFieldValue('manifest.env', manifest.env);
+      manifest.environment.push({ key: '', value: '' });
+      this.props.formik.setFieldValue('manifest.env', manifest.environment);
     }
   };
 
   private removeEnvironmentVariable = (index: number): void => {
     const { manifest } = this.props.formik.values;
     if (isManifestDirectSource(manifest)) {
-      manifest.env.splice(index, 1);
-      this.props.formik.setFieldValue('manifest.env', manifest.env);
+      manifest.environment.splice(index, 1);
+      this.props.formik.setFieldValue('manifest.env', manifest.environment);
     }
   };
 
   private environmentKeyUpdated = (index: number, event: React.ChangeEvent<HTMLInputElement>): void => {
     const { manifest } = this.props.formik.values;
     if (isManifestDirectSource(manifest)) {
-      manifest.env[index].key = event.target.value;
-      this.props.formik.setFieldValue('manifest.env', manifest.env);
+      manifest.environment[index].key = event.target.value;
+      this.props.formik.setFieldValue('manifest.env', manifest.environment);
     }
   };
 
   private environmentValueUpdated = (index: number, event: React.ChangeEvent<HTMLInputElement>): void => {
     const { manifest } = this.props.formik.values;
     if (isManifestDirectSource(manifest)) {
-      manifest.env[index].value = event.target.value;
-      this.props.formik.setFieldValue('manifest.env', manifest.env);
+      manifest.environment[index].value = event.target.value;
+      this.props.formik.setFieldValue('manifest.env', manifest.environment);
     }
   };
 
@@ -239,7 +232,7 @@ class ConfigurationSettingsImpl extends React.Component<ICloudFoundryServerGroup
       addServicesVariable,
       removeServicesVariable,
     } = this;
-    const { errors } = this.props.formik;
+    const { errors } = this.props.formik as any;
     if (isManifestDirectSource(manifest)) {
       return (
         <div>
@@ -322,15 +315,15 @@ class ConfigurationSettingsImpl extends React.Component<ICloudFoundryServerGroup
                   </tr>
                 </thead>
                 <tbody>
-                  {manifest.env &&
-                    manifest.env.map(function(env, index) {
+                  {manifest.environment &&
+                    manifest.environment.map(function(environment, index) {
                       return (
                         <tr key={index}>
                           <td>
                             <input
                               className="form-control input-sm"
                               type="text"
-                              value={env.key}
+                              value={environment.key}
                               required={true}
                               onChange={event => environmentKeyUpdated(index, event)}
                             />
@@ -339,7 +332,7 @@ class ConfigurationSettingsImpl extends React.Component<ICloudFoundryServerGroup
                             <input
                               className="form-control input-sm"
                               type="text"
-                              value={env.value}
+                              value={environment.value}
                               required={true}
                               onChange={event => environmentValueUpdated(index, event)}
                             />
@@ -371,7 +364,7 @@ class ConfigurationSettingsImpl extends React.Component<ICloudFoundryServerGroup
 
           <div className="form-group">
             <div className="col-md-12">
-              <b>Services</b>
+              <b>Bind Services</b>
               <table className="table table-condensed packed metadata">
                 <tbody>
                   {manifest.services &&
@@ -401,7 +394,7 @@ class ConfigurationSettingsImpl extends React.Component<ICloudFoundryServerGroup
                   <tr>
                     <td colSpan={1}>
                       <button type="button" className="add-new col-md-12" onClick={addServicesVariable}>
-                        <span className="glyphicon glyphicon-plus-sign" /> Add New Service
+                        <span className="glyphicon glyphicon-plus-sign" /> Bind Service
                       </button>
                     </td>
                   </tr>
@@ -448,7 +441,7 @@ class ConfigurationSettingsImpl extends React.Component<ICloudFoundryServerGroup
 
   private triggerConfiguration = (manifest: ICloudFoundryManifestSource): JSX.Element => {
     const { artifactAccounts } = this.props;
-    const { errors } = this.props.formik;
+    const { errors } = this.props.formik as any;
 
     return (
       <div>
@@ -499,7 +492,7 @@ class ConfigurationSettingsImpl extends React.Component<ICloudFoundryServerGroup
 
   private artifactConfiguration = (manifest: ICloudFoundryManifestSource): JSX.Element => {
     const { artifactAccounts } = this.props;
-    const { errors } = this.props.formik;
+    const { errors } = this.props.formik as any;
 
     if (isManifestArtifactSource(manifest)) {
       return (
@@ -570,18 +563,6 @@ class ConfigurationSettingsImpl extends React.Component<ICloudFoundryServerGroup
     }
     return (
       <div>
-        <div className="form-group">
-          <div className="col-md-3 sm-label-right">
-            Start on creation <HelpField id="cf.serverGroup.startApplication" />
-          </div>
-          <div className="checkbox checkbox-inline">
-            <input
-              type="checkbox"
-              checked={this.props.formik.values.startApplication}
-              onChange={this.startApplicationUpdated}
-            />
-          </div>
-        </div>
         <div className="form-group row">
           <label className="col-md-3 sm-label-right">Source Type</label>
           <div className="col-md-7">
@@ -603,10 +584,10 @@ class ConfigurationSettingsImpl extends React.Component<ICloudFoundryServerGroup
                 <input
                   type="radio"
                   value="droplet"
-                  checked={manifest.type === 'direct'}
-                  onChange={() => this.manifestTypeUpdated('direct')}
+                  checked={manifest.type === 'artifact'}
+                  onChange={() => this.manifestTypeUpdated('artifact')}
                 />{' '}
-                Direct
+                Artifact
               </label>
             </div>
             <div className="radio radio-inline">
@@ -614,10 +595,10 @@ class ConfigurationSettingsImpl extends React.Component<ICloudFoundryServerGroup
                 <input
                   type="radio"
                   value="droplet"
-                  checked={manifest.type === 'artifact'}
-                  onChange={() => this.manifestTypeUpdated('artifact')}
+                  checked={manifest.type === 'direct'}
+                  onChange={() => this.manifestTypeUpdated('direct')}
                 />{' '}
-                Artifact
+                Form
               </label>
             </div>
           </div>
@@ -627,10 +608,8 @@ class ConfigurationSettingsImpl extends React.Component<ICloudFoundryServerGroup
     );
   }
 
-  public validate(
-    values: ICloudFoundryServerGroupConfigurationSettingsProps,
-  ): FormikErrors<ICloudFoundryCreateServerGroupCommand> {
-    const errors = {} as FormikErrors<ICloudFoundryCreateServerGroupCommand>;
+  public validate(values: ICloudFoundryServerGroupConfigurationSettingsProps) {
+    const errors = {} as any;
     const isStorageSize = (value: string) => /\d+[MG]/.test(value);
     if (isManifestDirectSource(values.manifest)) {
       if (!isStorageSize(values.manifest.memory)) {
@@ -650,7 +629,7 @@ class ConfigurationSettingsImpl extends React.Component<ICloudFoundryServerGroup
           const regex = /^([a-zA-Z0-9_-]+)\.([a-zA-Z0-9_.-]+)(\:[0-9]+)?([\/a-zA-Z0-9_-]+)?$/gm;
           if (route && regex.exec(route) === null) {
             errors.manifest = errors.manifest || {};
-            errors.manifest.routes = `A route did not match the expected format (host.some.domain[:9999][/some/path]`;
+            errors.manifest.routes = `A route did not match the expected format "host.some.domain[:9999][/some/path]"`;
           }
         });
       }
@@ -668,13 +647,21 @@ class ConfigurationSettingsImpl extends React.Component<ICloudFoundryServerGroup
           existingServices[service] = service;
         });
       }
-      if (values.manifest.env) {
+      if (values.manifest.environment) {
         const existingKeys: any = {};
-        values.manifest.env.forEach(function(e) {
+        values.manifest.environment.forEach(function(e) {
           if (!e.key || !e.value) {
             errors.manifest = errors.manifest || {};
             errors.manifest.env = `An environment variable was not set`;
           } else {
+            if (e.key) {
+              const validKeyRegex = /^\w+$/g;
+              if (!validKeyRegex.exec(e.key)) {
+                errors.manifest = errors.manifest || {};
+                errors.manifest.env =
+                  `'` + e.key + `' is an invalid environment variable name and must be alphanumeric`;
+              }
+            }
             const value = existingKeys[e.key];
             if (!value) {
               existingKeys[e.key] = e.value;
@@ -712,6 +699,4 @@ class ConfigurationSettingsImpl extends React.Component<ICloudFoundryServerGroup
   }
 }
 
-export const CloudFoundryServerGroupConfigurationSettings = wizardPage<
-  ICloudFoundryServerGroupConfigurationSettingsProps
->(ConfigurationSettingsImpl);
+export const CloudFoundryServerGroupConfigurationSettings = wizardPage(ConfigurationSettingsImpl);

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Field, FormikErrors } from 'formik';
 
 import {
-  NgReact,
+  DeploymentStrategySelector,
   HelpField,
   IWizardPageProps,
   wizardPage,
@@ -11,10 +11,11 @@ import {
   Application,
   ReactInjector,
   IServerGroup,
+  AccountSelectField,
   AccountTag,
 } from '@spinnaker/core';
 
-import { DockerImageAndTagSelector } from '@spinnaker/docker';
+import { DockerImageAndTagSelector, DockerImageUtils } from '@spinnaker/docker';
 
 import { ITitusServerGroupCommand } from '../../../configure/serverGroupConfiguration.service';
 
@@ -22,7 +23,7 @@ const isNotExpressionLanguage = (field: string) => field && !field.includes('${'
 const isStackPattern = (stack: string) =>
   isNotExpressionLanguage(stack) ? /^([a-zA-Z_0-9._${}]*(\${.+})*)*$/.test(stack) : true;
 const isDetailPattern = (detail: string) =>
-  isNotExpressionLanguage(detail) ? /^([a-zA-Z_0-9._${}-]*(\${.+})*)*$/.test(detail) : true;
+  isNotExpressionLanguage(detail) ? /^([a-zA-Z_0-9._$-{}\\\^~]*(\${.+})*)*$/.test(detail) : true;
 
 export interface IServerGroupBasicSettingsProps extends IWizardPageProps<ITitusServerGroupCommand> {
   app: Application;
@@ -45,14 +46,9 @@ class ServerGroupBasicSettingsImpl extends React.Component<
     super(props);
 
     const { values, setFieldValue } = this.props.formik;
-    if (values.imageId) {
-      const image = values.imageId;
-      const parts = image.split('/');
-      const organization = parts.length > 1 ? parts.shift() : '';
-      const rest = parts.shift().split(':');
-      const repository = organization ? `${organization}/${rest.shift()}` : rest.shift();
-      const tag = rest.shift();
-
+    if (values.imageId && !values.imageId.includes('${')) {
+      const { digest, organization, repository, tag } = DockerImageUtils.splitImageId(values.imageId);
+      setFieldValue('digest', digest);
       setFieldValue('organization', organization);
       setFieldValue('repository', repository);
       setFieldValue('tag', tag);
@@ -61,13 +57,6 @@ class ServerGroupBasicSettingsImpl extends React.Component<
     this.state = {
       ...this.getStateFromProps(props),
     };
-  }
-
-  private updateImageId(repository: string, tag: string) {
-    const imageId = repository && tag ? `${repository}:${tag}` : '';
-    if (this.props.formik.values.imageId !== imageId) {
-      this.props.formik.setFieldValue('imageId', imageId);
-    }
   }
 
   private getStateFromProps(props: IServerGroupBasicSettingsProps) {
@@ -96,6 +85,7 @@ class ServerGroupBasicSettingsImpl extends React.Component<
     const { setFieldValue, values } = this.props.formik;
     values.credentials = account;
     values.credentialsChanged(values);
+    setFieldValue('account', account);
     setFieldValue('credentials', account);
   };
 
@@ -115,7 +105,7 @@ class ServerGroupBasicSettingsImpl extends React.Component<
 
     if (!isDetailPattern(values.freeFormDetails)) {
       errors.freeFormDetails =
-        'Only dot(.), underscore(_), and dash(-) special characters are allowed in the Detail field.';
+        'Only dot(.), underscore(_), caret (^), tilde (~), and dash(-) special characters are allowed in the Detail field.';
     }
 
     if (!values.viewState.disableImageSelection) {
@@ -158,8 +148,6 @@ class ServerGroupBasicSettingsImpl extends React.Component<
   };
 
   public componentWillReceiveProps(nextProps: IServerGroupBasicSettingsProps) {
-    const { values } = nextProps.formik;
-    this.updateImageId(values.repository, values.tag);
     this.setState(this.getStateFromProps(nextProps));
   }
 
@@ -174,10 +162,13 @@ class ServerGroupBasicSettingsImpl extends React.Component<
     });
   };
 
+  private onStrategyFieldChange = (key: string, value: any) => {
+    this.props.formik.setFieldValue(key, value);
+  };
+
   public render() {
     const { errors, setFieldValue, values } = this.props.formik;
     const { createsNewCluster, latestServerGroup, namePreview, showPreviewAsWarning } = this.state;
-    const { AccountSelectField, DeploymentStrategySelector } = NgReact;
 
     const accounts = values.backingData.accounts;
     const readOnlyFields = values.viewState.readOnlyFields || {};
@@ -257,10 +248,12 @@ class ServerGroupBasicSettingsImpl extends React.Component<
           <DockerImageAndTagSelector
             specifyTagByRegex={false}
             account={values.credentials}
+            digest={values.digest}
+            imageId={values.imageId}
             organization={values.organization}
             registry={values.registry}
             repository={values.repository}
-            tag={values.tag || ''}
+            tag={values.tag}
             showRegistry={false}
             deferInitialization={values.deferredInitialization}
             labelClass="col-md-3"
@@ -297,7 +290,11 @@ class ServerGroupBasicSettingsImpl extends React.Component<
         </div>
         {!values.viewState.disableStrategySelection &&
           values.selectedProvider && (
-            <DeploymentStrategySelector command={values} onStrategyChange={this.strategyChanged} />
+            <DeploymentStrategySelector
+              command={values}
+              onFieldChange={this.onStrategyFieldChange}
+              onStrategyChange={this.strategyChanged}
+            />
           )}
         {!values.viewState.hideClusterNamePreview && (
           <div className="form-group">
@@ -341,4 +338,4 @@ class ServerGroupBasicSettingsImpl extends React.Component<
   }
 }
 
-export const ServerGroupBasicSettings = wizardPage<IServerGroupBasicSettingsProps>(ServerGroupBasicSettingsImpl);
+export const ServerGroupBasicSettings = wizardPage(ServerGroupBasicSettingsImpl);
