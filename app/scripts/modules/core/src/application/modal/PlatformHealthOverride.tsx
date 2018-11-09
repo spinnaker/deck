@@ -1,14 +1,17 @@
 import * as React from 'react';
 import { isEqual } from 'lodash';
 
-import { IServerGroupCommand } from 'core/serverGroup';
 import { HelpField } from 'core/help/HelpField';
 
 export interface IPlatformHealthOverrideProps {
-  command: IServerGroupCommand;
+  command: IPlatformHealthOverrideCommand;
   onChange: (healthProviderNames: string[]) => void;
   platformHealthType: string;
   showHelpDetails?: boolean;
+}
+
+export interface IPlatformHealthOverrideCommand {
+  interestingHealthProviderNames: string[];
 }
 
 export class PlatformHealthOverride extends React.Component<IPlatformHealthOverrideProps> {
