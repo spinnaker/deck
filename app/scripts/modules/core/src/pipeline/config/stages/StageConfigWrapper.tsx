@@ -3,7 +3,7 @@ import * as React from 'react';
 import { IStageConfigProps } from 'core/pipeline';
 
 export interface IStageConfigWrapperProps extends IStageConfigProps {
-  component: typeof React.Component;
+  component: React.ComponentType<any>;
 }
 
 /* This wrapper component exists so that StageConfig components don't have to manually
