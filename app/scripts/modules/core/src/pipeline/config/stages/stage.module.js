@@ -13,7 +13,6 @@ import { EDIT_STAGE_JSON_CONTROLLER } from './core/editStageJson.controller';
 import { STAGE_NAME } from './StageName';
 import { PipelineConfigService } from 'core/pipeline/config/services/PipelineConfigService';
 import { Registry } from 'core/registry';
-import { wrapStageConfig } from './wrapStageConfig';
 import { StageConfigWrapper } from './StageConfigWrapper';
 
 module.exports = angular
