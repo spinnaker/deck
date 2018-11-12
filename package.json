@@ -133,7 +133,7 @@
     "cssnano": "^3.10.0",
     "envify": "^4.1.0",
     "envify-loader": "^0.1.0",
-    "enzyme": "^3.3.0",
+    "enzyme": "^3.7.0",
     "enzyme-adapter-react-16": "1.6.0",
     "eslint": "^3.17.0",
     "eslint-loader": "^2.0.0",
