@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { isUndefined } from 'lodash';
-import { FastField, Field, FieldProps, getIn } from 'formik';
+import { isString, isUndefined } from 'lodash';
+import { Field, FastField, FieldProps, getIn } from 'formik';
 
-import { ICommonFormFieldProps, IFieldLayoutPropsWithoutInput, IValidationProps } from '../interface';
-import { StandardFieldLayout } from '../layouts';
-import { Validation, ValidationFunction } from '../Validation';
-import { renderContent } from './renderContent';
-import { WatchValue } from '../../WatchValue';
+import { WatchValue } from '../WatchValue';
+import { ICommonFormFieldProps, IFieldLayoutPropsWithoutInput, IValidationProps } from './interface';
+import { StandardFieldLayout } from './layouts/index';
+import { composeValidators, Validator, Validation } from './Validation';
+import { renderContent } from './fields/renderContent';
 
 export interface IFormikFieldProps<T> {
   /**
@@ -21,35 +21,43 @@ export interface IFormikFieldProps<T> {
    * Use `fastField={false}` if the field depends on other fields.
    * See: https://jaredpalmer.com/formik/docs/api/fastfield#when-to-use-fastfield
    */
-  fastField: boolean;
+  fastField?: boolean;
   /** Inline validation function or functions */
-  validate?: ValidationFunction | ValidationFunction[];
+  validate?: Validator | Validator[];
   /** A callback that is invoked whenever the field value changes */
   onChange?: (value: T, prevValue: T) => void;
 }
 
+export interface IFormikFormFieldState {
+  internalValidators: Validator[];
+}
+
 export type IFormikFormFieldProps<T> = IFormikFieldProps<T> & ICommonFormFieldProps & IFieldLayoutPropsWithoutInput;
 
-export class FormikFormField<T = any> extends React.Component<IFormikFormFieldProps<T>> {
+export class FormikFormField<T = any> extends React.Component<IFormikFormFieldProps<T>, IFormikFormFieldState> {
   public static defaultProps: Partial<IFormikFormFieldProps<any>> = {
     layout: StandardFieldLayout,
     fastField: true,
   };
 
-  /** Returns validation function composed of all the `validate` functions (and `isRequired` if `required` is truthy) */
-  private composedValidation(
-    label: IFormikFormFieldProps<T>['label'],
-    required: boolean,
-    validate: IFormikFieldProps<T>['validate'],
-  ): ValidationFunction {
-    const labelStr = typeof label === 'string' ? label : 'This field';
-    const requiredFn = !!required && Validation.isRequired(`${labelStr} is required`);
-    const validationFns = [requiredFn].concat(validate).filter(x => !!x);
+  public state: IFormikFormFieldState = {
+    internalValidators: [],
+  };
 
-    return validationFns.length ? Validation.compose(...validationFns) : null;
-  }
+  private addValidator = (internalValidator: Validator) => {
+    this.setState(prevState => ({
+      internalValidators: prevState.internalValidators.concat(internalValidator),
+    }));
+  };
+
+  private removeValidator = (internalValidator: Validator) => {
+    this.setState(prevState => ({
+      internalValidators: prevState.internalValidators.filter(x => x !== internalValidator),
+    }));
+  };
 
   public render() {
+    const { internalValidators } = this.state;
     const { name, validate, onChange } = this.props; // IFormikFieldProps
     const { input, layout } = this.props; // ICommonFieldProps
     const { label, help, required, actions } = this.props; // IFieldLayoutPropsWithoutInput
@@ -69,6 +77,8 @@ export class FormikFormField<T = any> extends React.Component<IFormikFormFieldPr
         validationMessage: message,
         validationStatus: status,
         touched: isTouched,
+        addValidator: this.addValidator,
+        removeValidator: this.removeValidator,
       };
 
       const inputElement = renderContent(input, { field, validation: validationProps });
@@ -80,7 +90,7 @@ export class FormikFormField<T = any> extends React.Component<IFormikFormFieldPr
       );
     };
 
-    const validator = this.composedValidation(label, required, validate);
+    const validator = createFieldValidator(label, required, [].concat(validate).concat(internalValidators));
 
     if (this.props.fastField) {
       return <FastField name={name} validate={validator} render={render} />;
@@ -88,4 +98,20 @@ export class FormikFormField<T = any> extends React.Component<IFormikFormFieldPr
 
     return <Field name={name} validate={validator} render={render} />;
   }
+}
+
+/** Returns a Validator composed of all the `validate` functions (and `isRequired` if `required` is truthy) */
+export function createFieldValidator<T>(
+  label: IFormikFormFieldProps<T>['label'],
+  required: boolean,
+  validate: Validator[],
+): Validator {
+  const validator = composeValidators([!!required && Validation.isRequired()].concat(validate));
+
+  if (!validator) {
+    return null;
+  }
+
+  const labelString = isString(label) ? label : undefined;
+  return (value: any) => validator(value, labelString);
 }
