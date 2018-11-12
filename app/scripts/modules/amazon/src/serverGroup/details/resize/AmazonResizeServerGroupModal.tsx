@@ -21,8 +21,7 @@ import {
   ICapacity,
 } from '@spinnaker/core';
 
-import { AwsModalFooter } from 'amazon/common';
-import { IAmazonServerGroup } from 'amazon/domain';
+import { AwsModalFooter, IAmazonServerGroup } from 'amazon';
 
 export interface IAmazonResizeServerGroupModalProps extends IModalComponentProps {
   application: Application;
@@ -397,7 +396,7 @@ export class AmazonResizeServerGroupModal extends React.Component<
                       <div className="form-group">
                         <div className="col-md-8 col-md-offset-3">
                           <PlatformHealthOverride
-                            command={this.state}
+                            interestingHealthProviderNames={this.state.interestingHealthProviderNames}
                             platformHealthType="Amazon"
                             onChange={this.platformHealthOverrideChanged}
                             showHelpDetails={true}
