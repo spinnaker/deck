@@ -166,12 +166,23 @@ export class AmazonResizeServerGroupModal extends React.Component<
     const { advancedMode, interestingHealthProviderNames } = this.state;
     const { serverGroup, application } = this.props;
     const { asg } = serverGroup;
+    const capacity: Partial<ICapacity> = {
+      min: advancedMode ? min : desired,
+      max: advancedMode ? max : desired,
+      desired,
+    };
+    // only send changed capacity values
+    if (capacity.min === asg.minSize) {
+      delete capacity.min;
+    }
+    if (capacity.max === asg.maxSize) {
+      delete capacity.max;
+    }
+    if (capacity.desired === asg.desiredCapacity) {
+      delete capacity.desired;
+    }
     const command: IResizeJob = {
-      capacity: {
-        min: advancedMode ? min : desired,
-        max: advancedMode ? max : desired,
-        desired,
-      },
+      capacity,
       reason,
       interestingHealthProviderNames,
     };
