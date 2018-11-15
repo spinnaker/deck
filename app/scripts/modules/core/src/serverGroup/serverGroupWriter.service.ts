@@ -125,7 +125,7 @@ export class ServerGroupWriter {
     params.credentials = serverGroup.account;
     params.cloudProvider = serverGroup.type || serverGroup.provider;
     const newSize: string = Object.keys(params.capacity)
-      .map(k => `${k}: ${(params.capacity as any)[k]}`)
+      .map((k: keyof ICapacity) => `${k}: ${params.capacity[k]}`)
       .join(', ');
 
     return TaskExecutor.executeTask({
