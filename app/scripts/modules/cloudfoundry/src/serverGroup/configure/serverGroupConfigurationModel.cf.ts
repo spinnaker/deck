@@ -38,6 +38,8 @@ export interface ICloudFoundryManifestDirectSource {
   diskQuota: string;
   instances: number;
   buildpack: string;
+  healthCheckType: string;
+  healthCheckEndpoint: string;
   routes: string[];
   environment: ICloudFoundryEnvVar[];
   services: string[];
