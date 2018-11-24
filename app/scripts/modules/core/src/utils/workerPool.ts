@@ -60,9 +60,7 @@ export class WorkerPool<T = any> {
 
   private runTask(worker: Worker<T>) {
     this.runningTasks.push(worker);
-    const done = () => {
-      return this.completeTask(worker);
-    };
+    const done = () => this.completeTask(worker);
     worker.run().then(done, done);
   }
 }
