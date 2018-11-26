@@ -208,15 +208,7 @@ export class CreateClassicLoadBalancer extends React.Component<
     const { app, dismissModal, forPipelineConfig, loadBalancer } = this.props;
     const { includeSecurityGroups, isNew, loadBalancerCommand, taskMonitor } = this.state;
 
-    const hideSections = new Set<string>();
-
-    if (!isNew && !forPipelineConfig) {
-      hideSections.add(LoadBalancerLocation.label);
-    }
-
-    if (!includeSecurityGroups) {
-      hideSections.add(SecurityGroups.label);
-    }
+    const showLocationSection = isNew || forPipelineConfig;
 
     let heading = forPipelineConfig ? 'Configure Classic Load Balancer' : 'Create New Classic Load Balancer';
     if (!isNew) {
@@ -232,15 +224,16 @@ export class CreateClassicLoadBalancer extends React.Component<
         closeModal={this.submit}
         submitButtonLabel={forPipelineConfig ? (isNew ? 'Add' : 'Done') : isNew ? 'Create' : 'Update'}
         validate={this.validate}
-        hideSections={hideSections}
       >
-        <LoadBalancerLocation
-          app={app}
-          isNew={isNew}
-          forPipelineConfig={forPipelineConfig}
-          loadBalancer={loadBalancer}
-        />
-        <SecurityGroups done={true} isNew={isNew} />
+        {showLocationSection && (
+          <LoadBalancerLocation
+            app={app}
+            isNew={isNew}
+            forPipelineConfig={forPipelineConfig}
+            loadBalancer={loadBalancer}
+          />
+        )}
+        {includeSecurityGroups && <SecurityGroups done={true} isNew={isNew} />}
         <Listeners done={true} />
         <HealthCheck done={true} />
         <AdvancedSettings done={true} />

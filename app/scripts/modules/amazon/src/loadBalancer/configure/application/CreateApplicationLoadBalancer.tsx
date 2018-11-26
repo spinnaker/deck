@@ -252,20 +252,12 @@ export class CreateApplicationLoadBalancer extends React.Component<
     const { app, dismissModal, forPipelineConfig, loadBalancer } = this.props;
     const { includeSecurityGroups, isNew, loadBalancerCommand, taskMonitor } = this.state;
 
-    const hideSections = new Set<string>();
-
-    if (!isNew && !forPipelineConfig) {
-      hideSections.add(LoadBalancerLocation.label);
-    }
-
-    if (!includeSecurityGroups) {
-      hideSections.add(SecurityGroups.label);
-    }
-
     let heading = forPipelineConfig ? 'Configure Application Load Balancer' : 'Create New Application Load Balancer';
     if (!isNew) {
       heading = `Edit ${loadBalancerCommand.name}: ${loadBalancerCommand.region}: ${loadBalancerCommand.credentials}`;
     }
+
+    const showLocationSection = isNew || forPipelineConfig;
 
     return (
       <WizardModal<IAmazonApplicationLoadBalancerUpsertCommand>
@@ -276,15 +268,16 @@ export class CreateApplicationLoadBalancer extends React.Component<
         closeModal={this.submit}
         submitButtonLabel={forPipelineConfig ? (isNew ? 'Add' : 'Done') : isNew ? 'Create' : 'Update'}
         validate={this.validate}
-        hideSections={hideSections}
       >
-        <LoadBalancerLocation
-          app={app}
-          isNew={isNew}
-          forPipelineConfig={forPipelineConfig}
-          loadBalancer={loadBalancer}
-        />
-        <SecurityGroups done={true} isNew={isNew} />
+        {showLocationSection && (
+          <LoadBalancerLocation
+            app={app}
+            isNew={isNew}
+            forPipelineConfig={forPipelineConfig}
+            loadBalancer={loadBalancer}
+          />
+        )}
+        {includeSecurityGroups && <SecurityGroups done={true} isNew={isNew} />}
         <TargetGroups app={app} isNew={isNew} loadBalancer={loadBalancer} done={true} />
         <ALBListeners app={app} done={true} />
         <ALBAdvancedSettings done={true} />

@@ -229,16 +229,12 @@ export class CreateNetworkLoadBalancer extends React.Component<
     const { app, dismissModal, forPipelineConfig, loadBalancer } = this.props;
     const { isNew, loadBalancerCommand, taskMonitor } = this.state;
 
-    const hideSections = new Set<string>();
-
-    if (!isNew && !forPipelineConfig) {
-      hideSections.add(LoadBalancerLocation.label);
-    }
-
     let heading = forPipelineConfig ? 'Configure Network Load Balancer' : 'Create New Network Load Balancer';
     if (!isNew) {
       heading = `Edit ${loadBalancerCommand.name}: ${loadBalancerCommand.region}: ${loadBalancerCommand.credentials}`;
     }
+
+    const showLocationSection = isNew || forPipelineConfig;
 
     return (
       <WizardModal<IAmazonNetworkLoadBalancerUpsertCommand>
@@ -249,14 +245,15 @@ export class CreateNetworkLoadBalancer extends React.Component<
         closeModal={this.submit}
         submitButtonLabel={forPipelineConfig ? (isNew ? 'Add' : 'Done') : isNew ? 'Create' : 'Update'}
         validate={this.validate}
-        hideSections={hideSections}
       >
-        <LoadBalancerLocation
-          app={app}
-          isNew={isNew}
-          forPipelineConfig={forPipelineConfig}
-          loadBalancer={loadBalancer}
-        />
+        {showLocationSection && (
+          <LoadBalancerLocation
+            app={app}
+            isNew={isNew}
+            forPipelineConfig={forPipelineConfig}
+            loadBalancer={loadBalancer}
+          />
+        )}
         <TargetGroups app={app} isNew={isNew} loadBalancer={loadBalancer} done={true} />
         <NLBListeners done={true} />
         <NLBAdvancedSettings done={true} />

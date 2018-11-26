@@ -125,7 +125,6 @@ export class CloudFoundryLoadBalancerCreateModal extends React.Component<
   public render() {
     const { app, forPipelineConfig } = this.props;
     const { isNew, loadBalancerCommand, taskMonitor } = this.state;
-    const hideSections = new Set<string>();
 
     return (
       <WizardModal<ICloudFoundryLoadBalancerUpsertCommand>
@@ -136,7 +135,6 @@ export class CloudFoundryLoadBalancerCreateModal extends React.Component<
         closeModal={this.submit}
         submitButtonLabel={forPipelineConfig ? (isNew ? 'Add' : 'Done') : isNew ? 'Create' : 'Update'}
         validate={this.validate}
-        hideSections={hideSections}
       >
         <LoadBalancerDetails app={app} isNew={isNew} />
       </WizardModal>

@@ -98,7 +98,6 @@ export class CloudFoundryCreateServerGroupModal extends React.Component<
   };
 
   public render(): React.ReactElement<CloudFoundryCreateServerGroupModal> {
-    const hideSections = new Set<string>();
     const { artifactAccounts, requiresTemplateSelection, taskMonitor } = this.state;
     const { application, command, dismissModal, isSourceConstant, serverGroup, title } = this.props;
 
@@ -122,7 +121,6 @@ export class CloudFoundryCreateServerGroupModal extends React.Component<
         closeModal={this.submit}
         submitButtonLabel={command.viewState.submitButtonLabel}
         validate={this.validate}
-        hideSections={hideSections}
       >
         <CloudFoundryServerGroupBasicSettings />
         {isSourceConstant && <CloudFoundryServerGroupConstantArtifactSettings serverGroup={serverGroup} />}

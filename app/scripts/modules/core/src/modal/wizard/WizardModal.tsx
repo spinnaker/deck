@@ -24,7 +24,6 @@ export interface IWizardPageData<T> {
 export interface IWizardModalProps<T> extends IModalComponentProps {
   formClassName?: string;
   heading: string;
-  hideSections?: Set<string>;
   initialValues: T;
   loading?: boolean;
   submitButtonLabel: string;
@@ -125,12 +124,7 @@ export class WizardModal<T = {}> extends React.Component<IWizardModalProps<T>, I
 
   private getFilteredChildren(): React.ReactChild[] {
     return React.Children.toArray(this.props.children).filter(
-      (child: any): boolean => {
-        if (!child || !child.type || !child.type.label) {
-          return false;
-        }
-        return !this.props.hideSections || !this.props.hideSections.has(child.type.label);
-      },
+      (child: any) => !(!child || !child.type || !child.type.label),
     );
   }
 
@@ -166,11 +160,11 @@ export class WizardModal<T = {}> extends React.Component<IWizardModalProps<T>, I
   };
 
   public render() {
-    const { formClassName, heading, hideSections, initialValues, loading, submitButtonLabel, taskMonitor } = this.props;
+    const { formClassName, heading, initialValues, loading, submitButtonLabel, taskMonitor } = this.props;
     const { currentPage, dirtyPages, pageErrors, formInvalid, pages, waiting } = this.state;
     const { TaskMonitorWrapper } = NgReact;
 
-    const pagesToShow = pages.filter(page => (!hideSections || !hideSections.has(page)) && this.pages[page]);
+    const pagesToShow = pages.filter(page => this.pages[page]);
 
     const submitting = taskMonitor && taskMonitor.submitting;
 
