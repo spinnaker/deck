@@ -39,7 +39,7 @@
     "Select2": "git://github.com/select2/select2.git#3.4.8",
     "angular": "~1.6.3",
     "angular-cron-gen": "0.0.21",
-    "angular-messages": "~1.6.3",
+    "angular-messages": "~1.7.5",
     "angular-sanitize": "~1.6.3",
     "angular-spinner": "^1.0.1",
     "angular-ui-bootstrap": "^2.5.0",
