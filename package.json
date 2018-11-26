@@ -129,7 +129,7 @@
     "babel-plugin-angularjs-annotate": "^0.8.2",
     "cache-loader": "^1.2.2",
     "copy-webpack-plugin": "4.5.1",
-    "css-loader": "^0.28.11",
+    "css-loader": "^1.0.1",
     "cssnano": "^3.10.0",
     "envify": "^4.1.0",
     "envify-loader": "^0.1.0",
