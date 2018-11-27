@@ -1,13 +1,11 @@
 import * as React from 'react';
 
-import { FormikErrors } from 'formik';
-import Select, { Option } from 'react-select';
+import { Field, FormikErrors } from 'formik';
 
 import {
   AccountSelectField,
   AccountService,
   IAccount,
-  IDeploymentStrategy,
   IRegion,
   IWizardPageProps,
   wizardPage,
@@ -17,6 +15,7 @@ import {
 } from '@spinnaker/core';
 
 import { ICloudFoundryCreateServerGroupCommand } from '../../serverGroupConfigurationModel.cf';
+import { CloudFoundryDeploymentStrategySelector } from 'cloudfoundry/deploymentStrategy/DeploymentStrategySelector';
 
 export type ICloudFoundryServerGroupBasicSettingsProps = IWizardPageProps<ICloudFoundryCreateServerGroupCommand>;
 
@@ -29,26 +28,6 @@ class BasicSettingsImpl extends React.Component<
   ICloudFoundryServerGroupBasicSettingsProps,
   ICloudFoundryServerGroupLocationSettingsState
 > {
-  private deploymentStrategies: IDeploymentStrategy[] = [
-    {
-      label: 'Red/Black',
-      description:
-        'Disables <i>all</i> previous server groups in the cluster as soon as new server group passes health checks',
-      key: 'redblack',
-    },
-    {
-      label: 'Highlander',
-      description:
-        'Destroys <i>all</i> previous server groups in the cluster as soon as new server group passes health checks',
-      key: 'highlander',
-    },
-    {
-      label: 'None',
-      description: 'Creates the next server group with no impact on existing server groups',
-      key: '',
-      providerRestricted: false,
-    },
-  ];
   public static get LABEL() {
     return 'Basic Settings';
   }
@@ -64,12 +43,6 @@ class BasicSettingsImpl extends React.Component<
       this.accountChanged();
     });
   }
-
-  private startApplicationUpdated = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    const startApplication = event.target.checked;
-    this.props.formik.values.startApplication = startApplication;
-    this.props.formik.setFieldValue('startApplication', startApplication);
-  };
 
   private accountUpdated = (account: string): void => {
     this.props.formik.values.credentials = account;
@@ -91,21 +64,12 @@ class BasicSettingsImpl extends React.Component<
     this.props.formik.setFieldValue('region', region);
   };
 
-  private stackUpdated = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    const stack = event.target.value;
-    this.props.formik.values.stack = stack;
-    this.props.formik.setFieldValue('stack', stack);
+  private strategyChanged = (_values: ICloudFoundryCreateServerGroupCommand, strategy: any) => {
+    this.props.formik.setFieldValue('strategy', strategy.key);
   };
 
-  private detailUpdated = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    const freeFormDetails = event.target.value;
-    this.props.formik.values.freeFormDetails = freeFormDetails;
-    this.props.formik.setFieldValue('freeFormDetails', freeFormDetails);
-  };
-
-  private deploymentStrategyUpdated = (option: Option<string>): void => {
-    this.props.formik.values.strategy = option.value;
-    this.props.formik.setFieldValue('strategy', option.value);
+  private onStrategyFieldChange = (key: string, value: any) => {
+    this.props.formik.setFieldValue(key, value);
   };
 
   public render(): JSX.Element {
@@ -138,7 +102,7 @@ class BasicSettingsImpl extends React.Component<
             Stack <HelpField id="cf.serverGroup.stack" />
           </div>
           <div className="col-md-7">
-            <input className="form-control input-sm" type="text" value={values.stack} onChange={this.stackUpdated} />
+            <Field className="form-control input-sm" type="text" name="stack" />
           </div>
         </div>
         <div className="form-group">
@@ -146,12 +110,7 @@ class BasicSettingsImpl extends React.Component<
             Detail <HelpField id="cf.serverGroup.detail" />
           </div>
           <div className="col-md-7">
-            <input
-              className="form-control input-sm"
-              type="text"
-              value={values.freeFormDetails}
-              onChange={this.detailUpdated}
-            />
+            <Field className="form-control input-sm" type="text" name="freeFormDetails" />
           </div>
         </div>
         <div className="form-group">
@@ -159,28 +118,15 @@ class BasicSettingsImpl extends React.Component<
             Start on creation <HelpField id="cf.serverGroup.startApplication" />
           </div>
           <div className="checkbox checkbox-inline">
-            <input
-              type="checkbox"
-              checked={this.props.formik.values.startApplication}
-              onChange={this.startApplicationUpdated}
-            />
+            <Field type="checkbox" name="startApplication" checked={values.startApplication} />
           </div>
         </div>
         {(values.viewState.mode === 'editPipeline' || values.viewState.mode === 'createPipeline') && (
-          <div className="form-group row">
-            <label className="col-md-3 sm-label-right">Deployment Strategy</label>
-            <div className="col-md-7">
-              <Select
-                options={this.deploymentStrategies.map((deploymentStrategy: IDeploymentStrategy) => ({
-                  label: deploymentStrategy.label,
-                  value: deploymentStrategy.key,
-                }))}
-                clearable={false}
-                value={values.strategy}
-                onChange={this.deploymentStrategyUpdated}
-              />
-            </div>
-          </div>
+          <CloudFoundryDeploymentStrategySelector
+            onFieldChange={this.onStrategyFieldChange}
+            onStrategyChange={this.strategyChanged}
+            command={values}
+          />
         )}
         {errors.credentials && (
           <div className="wizard-pod-row-errors">

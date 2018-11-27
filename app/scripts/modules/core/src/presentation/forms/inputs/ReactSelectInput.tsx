@@ -1,12 +1,14 @@
 import * as React from 'react';
 import Select, { Option, ReactSelectProps } from 'react-select';
 
-import { IControlledInputProps, TetheredSelect } from 'core/presentation';
+import { IControlledInputProps, StringsAsOptions, TetheredSelect } from 'core/presentation';
 import { noop } from 'core/utils';
 
+import { isStringArray, orEmptyString } from './utils';
 import { IFormInputProps } from '../interface';
 
 interface IReactSelectInputProps extends IFormInputProps, ReactSelectProps {
+  stringOptions?: string[];
   tethered?: boolean;
 }
 
@@ -62,17 +64,35 @@ export class ReactSelectInput extends React.Component<IReactSelectInputProps> {
   };
 
   public render() {
-    const { tethered, field, validation, inputClassName, ...otherProps } = this.props;
+    const {
+      tethered,
+      field,
+      validation,
+      stringOptions,
+      options: optionOptions,
+      inputClassName,
+      ...otherProps
+    } = this.props;
 
     const onChange = reactSelectOnChangeAdapter(field);
     const onBlur = reactSelectOnBlurAdapter(field);
-    const fieldProps = { name: field.name, value: field.value || '', onBlur, onChange };
+    const fieldProps = { name: field.name, value: orEmptyString(field.value), onBlur, onChange };
+    const className = orEmptyString(inputClassName);
     const style = validation.validationStatus === 'error' ? reactSelectValidationErrorStyle : {};
 
-    return tethered ? (
-      <TetheredSelect className={inputClassName} style={style} {...fieldProps} {...otherProps} />
-    ) : (
-      <Select className={inputClassName} style={style} {...fieldProps} {...otherProps} />
-    );
+    const SelectElement = ({ options }: { options: IReactSelectInputProps['options'] }) =>
+      tethered ? (
+        <TetheredSelect className={className} style={style} options={options} {...fieldProps} {...otherProps} />
+      ) : (
+        <Select className={className} style={style} options={options} {...fieldProps} {...otherProps} />
+      );
+
+    if (isStringArray(stringOptions)) {
+      return (
+        <StringsAsOptions strings={stringOptions}>{options => <SelectElement options={options} />}</StringsAsOptions>
+      );
+    } else {
+      return <SelectElement options={optionOptions} />;
+    }
   }
 }

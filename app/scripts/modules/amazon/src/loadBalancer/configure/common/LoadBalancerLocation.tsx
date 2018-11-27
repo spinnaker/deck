@@ -271,7 +271,7 @@ class LoadBalancerLocationImpl extends React.Component<ILoadBalancerLocationProp
 
   private accountUpdated = (account: string): void => {
     this.props.formik.setFieldValue('credentials', account);
-    AccountService.getRegionsForAccount(this.props.formik.values.credentials).then(regions => {
+    AccountService.getRegionsForAccount(account).then(regions => {
       const availabilityZones = this.getAvailabilityZones(regions);
       this.setState({ availabilityZones, regions });
       this.updateExistingLoadBalancerNames();
@@ -282,7 +282,7 @@ class LoadBalancerLocationImpl extends React.Component<ILoadBalancerLocationProp
 
   private regionUpdated = (region: string): void => {
     this.props.formik.setFieldValue('region', region);
-    const availabilityZones = this.getAvailabilityZones(this.state.regions);
+    const availabilityZones = this.getAvailabilityZones(this.state.regions.filter(r => r.name === region));
     this.setState({ availabilityZones });
     this.updateExistingLoadBalancerNames();
     this.updateSubnets();
