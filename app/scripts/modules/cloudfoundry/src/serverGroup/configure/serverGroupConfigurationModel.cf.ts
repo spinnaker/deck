@@ -4,7 +4,10 @@ import { ICloudFoundryCluster, ICloudFoundryEnvVar } from 'cloudfoundry/domain';
 
 export interface ICloudFoundryCreateServerGroupCommand extends IServerGroupCommand {
   artifact: ICloudFoundryBinarySource;
+  delayBeforeDisableSec?: number;
   manifest: ICloudFoundryManifestSource;
+  maxRemainingAsgs?: number;
+  rollback?: boolean;
   startApplication: boolean;
 }
 
@@ -35,8 +38,10 @@ export interface ICloudFoundryManifestDirectSource {
   diskQuota: string;
   instances: number;
   buildpack: string;
+  healthCheckType: string;
+  healthCheckHttpEndpoint: string;
   routes: string[];
-  env: ICloudFoundryEnvVar[];
+  environment: ICloudFoundryEnvVar[];
   services: string[];
 }
 
@@ -59,8 +64,11 @@ export interface ICloudFoundryDeployConfiguration {
   account: string;
   application: string;
   artifact: ICloudFoundryBinarySource;
+  delayBeforeDisableSec?: number;
   manifest: ICloudFoundryManifestSource;
+  maxRemainingAsgs?: number;
   region: string;
+  rollback?: boolean;
   stack?: string;
   freeFormDetails?: string;
   strategy?: string;

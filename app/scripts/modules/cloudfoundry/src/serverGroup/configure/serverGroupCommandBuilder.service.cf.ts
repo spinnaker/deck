@@ -2,18 +2,29 @@ import { IPromise, IQService, module } from 'angular';
 
 import { IStage, IPipeline } from '@spinnaker/core';
 
-import { ICloudFoundryApplication, ICloudFoundryServerGroup } from 'cloudfoundry/domain';
+import { ICloudFoundryApplication, ICloudFoundryEnvVar, ICloudFoundryServerGroup } from 'cloudfoundry/domain';
 import {
   ICloudFoundryCreateServerGroupCommand,
   ICloudFoundryDeployConfiguration,
 } from './serverGroupConfigurationModel.cf';
 
 export class CloudFoundryServerGroupCommandBuilder {
-  constructor(private $q: IQService) {
-    'ngInject';
+  public static buildUpdateServerGroupCommand(_originalServerGroup: any) {
+    throw new Error('Implement me!');
   }
 
-  private getSubmitButtonLabel(mode: string) {
+  private static envVarsFromObject(someObject: any): ICloudFoundryEnvVar[] {
+    const envVars = [];
+    for (const property in someObject) {
+      if (someObject.hasOwnProperty(property)) {
+        const envVar = { key: property, value: someObject[property] };
+        envVars.push(envVar);
+      }
+    }
+    return envVars;
+  }
+
+  private static getSubmitButtonLabel(mode: string) {
     switch (mode) {
       case 'createPipeline':
         return 'Add';
@@ -24,6 +35,10 @@ export class CloudFoundryServerGroupCommandBuilder {
       default:
         return 'Create';
     }
+  }
+
+  constructor(private $q: IQService) {
+    'ngInject';
   }
 
   public buildNewServerGroupCommand(
@@ -40,7 +55,7 @@ export class CloudFoundryServerGroupCommandBuilder {
       credentials: '',
       viewState: {
         mode: defaults.mode || 'create',
-        submitButtonLabel: this.getSubmitButtonLabel(defaults.mode || 'create'),
+        submitButtonLabel: CloudFoundryServerGroupCommandBuilder.getSubmitButtonLabel(defaults.mode || 'create'),
       },
       artifact: {
         type: 'artifact',
@@ -52,6 +67,7 @@ export class CloudFoundryServerGroupCommandBuilder {
         reference: '',
         account: '',
       },
+      selectedProvider: 'cloudfoundry',
       startApplication: true,
     } as ICloudFoundryCreateServerGroupCommand);
   }
@@ -70,12 +86,15 @@ export class CloudFoundryServerGroupCommandBuilder {
       };
       command.manifest = {
         type: 'direct',
-        memory: serverGroup.memory + 'M',
-        diskQuota: serverGroup.diskQuota + 'M',
-        buildpack: serverGroup.droplet.buildpacks.length > 0 ? serverGroup.droplet.buildpacks[0].name : '',
-        instances: serverGroup.instances.length,
+        memory: serverGroup.memory ? serverGroup.memory + 'M' : '1024M',
+        diskQuota: serverGroup.diskQuota ? serverGroup.diskQuota + 'M' : '1024M',
+        buildpack:
+          serverGroup.droplet && serverGroup.droplet.buildpacks.length > 0
+            ? serverGroup.droplet.buildpacks[0].name
+            : '',
+        instances: serverGroup.instances ? serverGroup.instances.length : 1,
         routes: serverGroup.loadBalancers,
-        env: serverGroup.env,
+        environment: CloudFoundryServerGroupCommandBuilder.envVarsFromObject(serverGroup.env),
         services: (serverGroup.serviceInstances || []).map(serviceInstance => serviceInstance.name),
         reference: '',
         account: '',
@@ -107,8 +126,11 @@ export class CloudFoundryServerGroupCommandBuilder {
     return this.buildNewServerGroupCommand(application, { mode: 'editPipeline' }).then(app => {
       app.credentials = originalCluster.account;
       app.artifact = originalCluster.artifact;
+      app.delayBeforeDisableSec = originalCluster.delayBeforeDisableSec;
       app.manifest = originalCluster.manifest;
+      app.maxRemainingAsgs = originalCluster.maxRemainingAsgs;
       app.region = originalCluster.region;
+      app.rollback = originalCluster.rollback;
       app.strategy = originalCluster.strategy;
       app.startApplication = originalCluster.startApplication;
       if (originalCluster.stack) {
@@ -121,10 +143,6 @@ export class CloudFoundryServerGroupCommandBuilder {
 
       return app;
     });
-  }
-
-  public buildUpdateServerGroupCommand(_originalServerGroup: any) {
-    throw new Error('Implement me!');
   }
 }
 

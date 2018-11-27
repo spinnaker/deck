@@ -23,6 +23,19 @@
       <cloud-provider-logo provider="ctrl.serverGroup.cloudProvider" height="'36px'" width="'36px'"></cloud-provider-logo>
       <h3 class="horizontal middle space-between flex-1" select-on-dbl-click>
         {{ctrl.serverGroup.displayName}}
+        <render-if-feature feature="entityTags">
+
+          <entity-notifications
+            entity="ctrl.serverGroup"
+            application="ctrl.app"
+            placement="bottom"
+            h-offset-percent="90%"
+            entity-type="serverGroup"
+            page-location="details"
+            on-update="ctrl.app.serverGroups.refresh()"
+          ></entity-notifications>
+
+        </render-if-feature>
       </h3>
     </div>
     <div class="actions">
@@ -41,18 +54,36 @@
               Scale
             </a>
           </li>
+          <li ng-if="ctrl.canEnable()">
+            <a href ng-click="ctrl.enableServerGroup()">
+              Enable
+            </a>
+          </li>
+          <li ng-if="ctrl.canDisable()">
+            <a href ng-click="ctrl.disableServerGroup()">
+              Disable
+            </a>
+          </li>
           <li>
             <a href ng-click="ctrl.deleteServerGroup()">
               Delete
             </a>
           </li>
+          <render-if-feature feature="entityTags">
+            <add-entity-tag-links component="ctrl.serverGroup"
+                                  application="ctrl.app"
+                                  entity-type="serverGroup"
+                                  owner-options="ctrl.entityTagTargets"
+                                  on-update="ctrl.app.serverGroups.refresh()"></add-entity-tag-links>
+          </render-if-feature>
         </ul>
       </div>
     </div>
   </div>
   <div class="content" ng-if="!ctrl.state.loading">
     <kubernetes-manifest-status status="ctrl.manifest.status"></kubernetes-manifest-status>
-    <server-group-running-tasks-details server-group="ctrl.serverGroup" application="ctrl.serverGroup.moniker.app"></server-group-running-tasks-details>
+    <div class="band band-info" ng-if="ctrl.serverGroup.isDisabled || ctrl.serverGroup.disabled">Disabled</div>
+    <server-group-running-tasks-details server-group="ctrl.serverGroup" application="ctrl.app"></server-group-running-tasks-details>
     <collapsible-section heading="Information" expanded="true">
       <dl class="dl-horizontal dl-flex">
         <dt>Created</dt>

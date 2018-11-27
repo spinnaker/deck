@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { Field, FormikErrors } from 'formik';
+import { FormikErrors } from 'formik';
 
-import { IWizardPageProps, wizardPage } from '@spinnaker/core';
+import { FormikFormField, SelectInput, TextInput, NumberInput, IWizardPageProps, wizardPage } from '@spinnaker/core';
 
 import { IAmazonClassicLoadBalancerUpsertCommand } from 'amazon/domain';
 
@@ -19,9 +19,10 @@ class HealthCheckImpl extends React.Component<IHealthCheckProps> {
     return values.healthCheckProtocol && values.healthCheckProtocol.indexOf('HTTP') === 0;
   }
 
-  private healthCheckPathChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = event.target;
-    this.props.formik.setFieldValue('healthCheckPath', value && value.indexOf('/') !== 0 ? `/${value}` : value);
+  private healthCheckPathChanged = (value: string) => {
+    if (value && value.indexOf('/') !== 0) {
+      this.props.formik.setFieldValue('healthCheckPath', `/${value}`);
+    }
   };
 
   public render() {
@@ -40,35 +41,26 @@ class HealthCheckImpl extends React.Component<IHealthCheckProps> {
             <tbody>
               <tr>
                 <td>
-                  <Field
-                    className="form-control input-sm"
-                    component="select"
+                  <FormikFormField
                     name="healthCheckProtocol"
                     required={true}
-                  >
-                    <option>HTTP</option>
-                    <option>HTTPS</option>
-                    <option>SSL</option>
-                    <option>TCP</option>
-                  </Field>
+                    input={props => <SelectInput {...props} options={['HTTP', 'HTTPS', 'SSL', 'TCP']} />}
+                  />
                 </td>
                 <td>
-                  <Field
-                    className="form-control input-sm"
-                    type="number"
+                  <FormikFormField
                     name="healthCheckPort"
                     required={true}
-                    min="0"
+                    input={props => <NumberInput {...props} min={1} max={65534} />}
                   />
                 </td>
                 <td>
                   {this.requiresHealthCheckPath() && (
-                    <Field
-                      className="form-control input-sm no-spel"
-                      type="text"
-                      onChange={this.healthCheckPathChanged}
+                    <FormikFormField
                       name="healthCheckPath"
+                      input={TextInput}
                       required={true}
+                      onChange={this.healthCheckPathChanged}
                     />
                   )}
                 </td>

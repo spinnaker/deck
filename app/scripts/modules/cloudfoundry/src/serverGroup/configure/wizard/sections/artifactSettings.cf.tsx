@@ -1,9 +1,9 @@
 import * as React from 'react';
 
-import { FormikErrors } from 'formik';
 import Select, { Option } from 'react-select';
 
 import {
+  AccountSelectField,
   AccountService,
   HelpField,
   IAccountDetails,
@@ -12,7 +12,6 @@ import {
   IRegion,
   wizardPage,
   RegionSelectField,
-  NgReact,
   ValidationMessage,
 } from '@spinnaker/core';
 
@@ -25,6 +24,7 @@ import {
 } from '../../serverGroupConfigurationModel.cf';
 import { CloudFoundryImageReader } from 'cloudfoundry/image/image.reader.cf';
 import { ICloudFoundryCluster, ICloudFoundryServerGroup } from 'cloudfoundry/domain';
+import { Field } from 'formik';
 
 export interface ICloudFoundryCreateServerGroupArtifactSettingsProps
   extends IWizardPageProps<ICloudFoundryCreateServerGroupCommand> {
@@ -180,28 +180,11 @@ class ArtifactSettingsImpl extends React.Component<
     }
   };
 
-  private artifactReferenceUpdated = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    const reference = event.target.value;
-    const { artifact } = this.props.formik.values;
-    if (isArtifactSource(artifact)) {
-      artifact.reference = reference;
-      this.props.formik.setFieldValue('artifact.reference', reference);
-    }
-  };
-
-  private artifactPatternUpdater = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    const pattern = event.target.value;
-    const { artifact } = this.props.formik.values;
-    if (isTriggerSource(artifact)) {
-      artifact.pattern = pattern;
-      this.props.formik.setFieldValue('artifact.pattern', pattern);
-    }
-  };
-
   private getArtifactInput = (): JSX.Element => {
     const { artifactAccounts } = this.props;
-    const { values, errors } = this.props.formik;
+    const { values, errors: _errors } = this.props.formik;
     const { artifact } = values;
+    const errors = _errors as any;
 
     return (
       <div>
@@ -225,13 +208,7 @@ class ArtifactSettingsImpl extends React.Component<
         <div className="form-group">
           <div className="col-md-3 sm-label-right">Reference</div>
           <div className="col-md-7">
-            <input
-              type="text"
-              required={true}
-              className="form-control input-sm"
-              value={isArtifactSource(artifact) && artifact.reference}
-              onChange={this.artifactReferenceUpdated}
-            />
+            <Field type="text" required={true} className="form-control input-sm" name="artifact.reference" />
           </div>
         </div>
         {errors.artifact &&
@@ -251,10 +228,10 @@ class ArtifactSettingsImpl extends React.Component<
   };
 
   private getPackageInput = (): JSX.Element => {
-    const { values, errors } = this.props.formik;
+    const { values, errors: _errors } = this.props.formik;
     const { artifact } = values;
     const { regions, filteredClusters, serverGroups, allCloudFoundryCredentials } = this.state;
-    const { AccountSelectField } = NgReact;
+    const errors = _errors as any;
 
     return (
       <div>
@@ -334,19 +311,16 @@ class ArtifactSettingsImpl extends React.Component<
 
   private getTriggerInput = (): JSX.Element => {
     const { artifactAccounts } = this.props;
-    const { errors, values } = this.props.formik;
+    const { errors: _errors, values } = this.props.formik;
     const { artifact } = values;
+    const errors = _errors as any;
 
     return (
       <div>
         <div className="form-group">
           <div className="col-md-3 sm-label-right">Artifact Pattern</div>
           <div className="col-md-7">
-            <input
-              className="form-control input-sm no-spel"
-              value={isTriggerSource(artifact) && artifact.pattern}
-              onChange={this.artifactPatternUpdater}
-            />
+            <Field className="form-control input-sm no-spel" type="text" name="artifact.pattern" />
           </div>
         </div>
         <div className="form-group row">
@@ -403,7 +377,19 @@ class ArtifactSettingsImpl extends React.Component<
         <div className="form-group row">
           <label className="col-md-3 sm-label-right">Source Type</label>
           <div className="col-md-7">
-            {this.props.formik.values.viewState.mode === 'pipeline' && (
+            <div className="radio radio-inline">
+              <label>
+                <input
+                  type="radio"
+                  value="artifact"
+                  checked={artifact.type === 'artifact'}
+                  onChange={() => this.artifactTypeUpdated('artifact')}
+                />{' '}
+                Artifact
+              </label>
+            </div>
+            {(this.props.formik.values.viewState.mode === 'editPipeline' ||
+              this.props.formik.values.viewState.mode === 'createPipeline') && (
               <div className="radio radio-inline">
                 <label>
                   <input
@@ -416,17 +402,6 @@ class ArtifactSettingsImpl extends React.Component<
                 </label>
               </div>
             )}
-            <div className="radio radio-inline">
-              <label>
-                <input
-                  type="radio"
-                  value="artifact"
-                  checked={artifact.type === 'artifact'}
-                  onChange={() => this.artifactTypeUpdated('artifact')}
-                />{' '}
-                Artifact
-              </label>
-            </div>
             <div className="radio radio-inline">
               <label>
                 <input
@@ -446,7 +421,7 @@ class ArtifactSettingsImpl extends React.Component<
   }
 
   public validate(values: ICloudFoundryCreateServerGroupArtifactSettingsProps) {
-    const errors = {} as FormikErrors<ICloudFoundryCreateServerGroupCommand>;
+    const errors = {} as any;
     if (values.artifact.type === 'trigger') {
       if (!values.artifact.account) {
         errors.artifact = errors.artifact || {};

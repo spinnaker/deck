@@ -26,7 +26,9 @@ export class DockerTriggerConfig extends React.Component<IDockerTriggerConfigPro
   }
 
   private dockerChanged = (changes: IDockerImageAndTagChanges) => {
-    Object.assign(this.props.trigger, changes);
+    // Trigger doesn't use imageId.
+    const { imageId, ...rest } = changes;
+    Object.assign(this.props.trigger, rest);
     this.props.fieldUpdated();
     this.setState({});
   };
@@ -44,18 +46,25 @@ export class DockerTriggerConfig extends React.Component<IDockerTriggerConfigPro
       <div className="form-horizontal">
         <DockerImageAndTagSelector
           specifyTagByRegex={true}
-          account={trigger.account || ''}
-          organization={trigger.organization || ''}
-          registry={trigger.registry || ''}
-          repository={trigger.repository || ''}
-          tag={trigger.tag || ''}
+          account={trigger.account}
+          organization={trigger.organization}
+          registry={trigger.registry}
+          repository={trigger.repository}
+          tag={trigger.tag}
           showRegistry={true}
           onChange={this.dockerChanged}
+          showDigest={false}
         />
 
         {fiatEnabled && (
           <div className="form-group">
-            <RunAsUser serviceAccounts={serviceAccounts} value={trigger.runAsUser} onChange={this.runAsUserChanged} />
+            <RunAsUser
+              serviceAccounts={serviceAccounts}
+              value={trigger.runAsUser}
+              onChange={this.runAsUserChanged}
+              selectClasses=""
+              selectColumns={8}
+            />
           </div>
         )}
       </div>
