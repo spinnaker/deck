@@ -457,10 +457,10 @@
   resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-2.0.43.tgz#e30d971d56dce22bf0d62e02bd4b28a7ffdba076"
   integrity sha1-4w2XHVbc4ivw1i4CvUsop//boHY=
 
-"@types/jqueryui@^1.11.32":
-  version "1.11.32"
-  resolved "https://registry.yarnpkg.com/@types/jqueryui/-/jqueryui-1.11.32.tgz#5a21bdedd6517c21baef754889931b7d27b5fb3e"
-  integrity sha1-WiG97dZRfCG673VIiZMbfSe1+z4=
+"@types/jqueryui@^1.12.6":
+  version "1.12.6"
+  resolved "https://registry.yarnpkg.com/@types/jqueryui/-/jqueryui-1.12.6.tgz#71bb4154c11d3d7048264b935965adfc5a6c5a50"
+  integrity sha512-lF4aIWtQ3Xbd6J+9WXz/day1pyf39ZMO/KUrigFAuMQ6FFVw2xZBIRCUwA7/CEnab1Bb7b4ko304Lxrp2xw8hQ==
   dependencies:
     "@types/jquery" "*"
 
