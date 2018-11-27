@@ -7,6 +7,8 @@ export interface ICloudFoundryServerGroup extends IServerGroup {
   appsManagerUri: string;
   memory: number;
   diskQuota: number;
+  healthCheckType: string;
+  healthCheckHttpEndpoint: string;
   state: 'STARTED' | 'STOPPED';
   instances: ICloudFoundryInstance[];
   space: ICloudFoundrySpace;
@@ -19,6 +21,7 @@ export interface ICloudFoundryServiceInstance {
   name: string;
   plan: string;
   service: string;
+  tags?: string[];
 }
 
 export interface ICloudFoundryEnvVar {
