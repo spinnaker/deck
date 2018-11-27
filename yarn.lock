@@ -96,10 +96,10 @@
   resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-0.7.0.tgz#9a06f4f137ee84d7df0460c1fdb1135ffa6c50fd"
   integrity sha512-ONhaKPIufzzrlNbqtWFFd+jlnemX6lJAgq9ZeiZtS7I1PIf/la7CW4m83rTXRnVnsMbW2k56pGYu7AUFJD9Pow==
 
-"@spinnaker/kayenta@0.0.63":
-  version "0.0.63"
-  resolved "https://registry.yarnpkg.com/@spinnaker/kayenta/-/kayenta-0.0.63.tgz#09448a2fc7c5c68463bdee50d3352bc80cd5b4b0"
-  integrity sha512-bDWVCoLuH6zOJ+EXvn4Y/pjqYEAi1zKEjN+PQorF0szmIqJlP9sndrpVKaYUqja5BqE76usQK5Me/X3eX8meSw==
+"@spinnaker/kayenta@0.0.64":
+  version "0.0.64"
+  resolved "https://registry.yarnpkg.com/@spinnaker/kayenta/-/kayenta-0.0.64.tgz#b96b183ad380100aeb3a42352b8ae21494c478a8"
+  integrity sha512-KPstpIaVq6CH4nrCb14sA8P5r6BtKXzAEvcapwKcTJGg0tqQrERJHe8nfBXjxDk4m03jaTFXCUzxDb/uA9w4jA==
   dependencies:
     "@fortawesome/fontawesome-free-webfonts" "^1.0.4"
     "@types/plotly.js" "^1.28.12"
@@ -8796,6 +8796,14 @@ js-yaml@^3.7.0:
   version "3.10.0"
   resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.10.0.tgz#2e78441646bd4682e963f22b6e92823c309c62dc"
   integrity sha512-O2v52ffjLa9VeM43J4XocZE//WT9N0IiwDa3KSHH7Tu8CtH+1qM8SIZvnsTh6v+4yFy5KUY3BHUVwjpfAWsjIA==
+  dependencies:
+    argparse "^1.0.7"
+    esprima "^4.0.0"
+
+js-yaml@^3.9.0:
+  version "3.12.0"
+  resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.12.0.tgz#eaed656ec8344f10f527c6bfa1b6e2244de167d1"
+  integrity sha512-PIt2cnwmPfL4hKNwqeiuz4bKfnzHTBv6HyVgjahA6mPLwPDzjDWrplJBMjHUFxku/N3FlmrbyPclad+I+4mJ3A==
   dependencies:
     argparse "^1.0.7"
     esprima "^4.0.0"
