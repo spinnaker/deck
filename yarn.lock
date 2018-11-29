@@ -176,22 +176,22 @@
   dependencies:
     "@types/angular" "*"
 
-"@types/angular-ui-bootstrap@^0.13.41":
-  version "0.13.41"
-  resolved "https://registry.yarnpkg.com/@types/angular-ui-bootstrap/-/angular-ui-bootstrap-0.13.41.tgz#dfbe5e6171a8255d7a220bc63baec0f854822d84"
-  integrity sha1-375eYXGoJV16IgvGO67A+FSCLYQ=
+"@types/angular-ui-bootstrap@^0.13.47":
+  version "0.13.47"
+  resolved "https://registry.yarnpkg.com/@types/angular-ui-bootstrap/-/angular-ui-bootstrap-0.13.47.tgz#e9fd4baf09dd98ff2b868ed00474310b2a66fa37"
+  integrity sha512-8HMw2MR9lPZt8+A4Kf6BFT2JK+0/ERcpM88k/kewPBOXdXVzkQmcJ08tNPhFIPLF89diKfA6X3HZKTBJr6PMoQ==
   dependencies:
     "@types/angular" "*"
 
-"@types/angular@*", "@types/angular@1.6.26", "@types/angular@^1.6.16":
-  version "1.6.26"
-  resolved "https://registry.yarnpkg.com/@types/angular/-/angular-1.6.26.tgz#a96cccef648de0bf7435f3b9bad13f2430719305"
-  integrity sha512-PdoZ2kKe2AytqVSReTdqYV1Wxqf70zREnys+kCeAh0wUMXOZboA1IFzqcKOxUMRGEL2npbfCCiv2FJBOaOCdNA==
-
-"@types/angular@>=1.5", "@types/angular@^1.6.34", "@types/angular@^1.6.39":
+"@types/angular@*", "@types/angular@>=1.5", "@types/angular@^1.6.16", "@types/angular@^1.6.34", "@types/angular@^1.6.39":
   version "1.6.43"
   resolved "https://registry.yarnpkg.com/@types/angular/-/angular-1.6.43.tgz#6235ef416053a86302970717510a936d889cbb9a"
   integrity sha512-3GrHCRZS62ruJjHMtOx3WYsS0I8i0FRcIqOwqIfWXnlR9g2FebEhUNdMk3LZIvfhZ08xe+S1x2iwP1t9vKCHag==
+
+"@types/angular@1.6.26":
+  version "1.6.26"
+  resolved "https://registry.yarnpkg.com/@types/angular/-/angular-1.6.26.tgz#a96cccef648de0bf7435f3b9bad13f2430719305"
+  integrity sha512-PdoZ2kKe2AytqVSReTdqYV1Wxqf70zREnys+kCeAh0wUMXOZboA1IFzqcKOxUMRGEL2npbfCCiv2FJBOaOCdNA==
 
 "@types/cheerio@*":
   version "0.22.1"
@@ -982,15 +982,10 @@ angular2react@^3.0.2:
     lodash.kebabcase "^4.1.1"
     ngimport "^1.0.0"
 
-angular@>=1.5:
+angular@>=1.5, angular@>=1.5.0, angular@^1.4.0, angular@~1.6.3:
   version "1.6.9"
   resolved "https://registry.yarnpkg.com/angular/-/angular-1.6.9.tgz#bc812932e18909038412d594a5990f4bb66c0619"
   integrity sha512-6igWH2GIsxV+J38wNWCh8oyjaZsrIPIDO35twloIUyjlF2Yit6UyLAWujHP05ma/LFxTsx4NtYibRoMNBXPR1A==
-
-angular@>=1.5.0, angular@^1.4.0, angular@~1.6.3:
-  version "1.6.4"
-  resolved "https://registry.yarnpkg.com/angular/-/angular-1.6.4.tgz#03b7b15c01a0802d7e2cf593240e604054dc77fb"
-  integrity sha1-A7exXAGggC1+LPWTJA5gQFTcd/s=
 
 angulartics-google-analytics@^0.2.0:
   version "0.2.1"
