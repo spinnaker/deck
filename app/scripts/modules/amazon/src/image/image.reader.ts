@@ -1,4 +1,4 @@
-import { IPromise, module } from 'angular';
+import { IPromise } from 'angular';
 import { $q } from 'ngimport';
 
 import { API } from '@spinnaker/core';
@@ -44,6 +44,3 @@ export class AwsImageReader {
       .catch(() => null as IAmazonImage);
   }
 }
-
-export const AWS_IMAGE_READER = 'spinnaker.amazon.image.reader';
-module(AWS_IMAGE_READER, []).factory('awsImageReader', AwsImageReader);
