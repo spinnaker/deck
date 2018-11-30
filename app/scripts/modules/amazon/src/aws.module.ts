@@ -2,6 +2,7 @@ import { module } from 'angular';
 
 import { CloudProviderRegistry, DeploymentStrategyRegistry } from '@spinnaker/core';
 
+import { AWS_IMAGE_READER } from './image/image.reader';
 import { AWS_LOAD_BALANCER_MODULE } from './loadBalancer/loadBalancer.module';
 import { AWS_REACT_MODULE } from './reactShims/aws.react.module';
 import { AWS_SECURITY_GROUP_MODULE } from './securityGroup/securityGroup.module';
@@ -74,7 +75,7 @@ module(AMAZON_MODULE, [
   SUBNET_RENDERER,
   SUBNET_SELECT_FIELD_COMPONENT,
   VPC_MODULE,
-  require('./image/image.reader').name,
+  AWS_IMAGE_READER,
   require('./cache/cacheConfigurer.service').name,
   require('./search/searchResultFormatter').name,
 ]).config(() => {

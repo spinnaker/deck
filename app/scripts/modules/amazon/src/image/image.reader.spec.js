@@ -1,11 +1,12 @@
 'use strict';
 
 import { API } from '@spinnaker/core';
+import { AWS_IMAGE_READER } from './image.reader';
 
 describe('Service: aws Image Reader', function() {
   var service, $http, scope;
 
-  beforeEach(window.module(require('./image.reader.js').name));
+  beforeEach(window.module(AWS_IMAGE_READER));
 
   beforeEach(
     window.inject(function(awsImageReader, $httpBackend, $rootScope) {

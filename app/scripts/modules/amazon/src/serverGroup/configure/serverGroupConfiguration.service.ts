@@ -42,6 +42,7 @@ import {
   IServerGroupCommandViewState,
 } from '@spinnaker/core';
 
+import { AWS_IMAGE_READER } from 'amazon/image';
 import {
   IKeyPair,
   IAmazonLoadBalancerSourceData,
@@ -708,7 +709,7 @@ export class AwsServerGroupConfigurationService {
 
 export const AWS_SERVER_GROUP_CONFIGURATION_SERVICE = 'spinnaker.amazon.serverGroup.configure.service';
 module(AWS_SERVER_GROUP_CONFIGURATION_SERVICE, [
-  require('amazon/image/image.reader.js').name,
+  AWS_IMAGE_READER,
   SECURITY_GROUP_READER,
   require('amazon/instance/awsInstanceType.service.js').name,
   LOAD_BALANCER_READ_SERVICE,
