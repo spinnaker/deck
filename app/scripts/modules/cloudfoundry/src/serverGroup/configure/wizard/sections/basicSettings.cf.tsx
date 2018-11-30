@@ -76,7 +76,7 @@ class BasicSettingsImpl extends React.Component<
     const { accounts, regions } = this.state;
     const { values, errors } = this.props.formik;
     return (
-      <div>
+      <div className="cloudfoundry-settings">
         <div className="form-group">
           <div className="col-md-3 sm-label-right">Account</div>
           <div className="col-md-7">

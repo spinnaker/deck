@@ -471,7 +471,7 @@ class ConfigurationSettingsImpl extends React.Component<ICloudFoundryServerGroup
         manifestInput = this.artifactConfiguration(manifest);
     }
     return (
-      <div>
+      <div className="cloudfoundry-settings">
         <div className="form-group row">
           <label className="col-md-3 sm-label-right">Source Type</label>
           <div className="col-md-7">

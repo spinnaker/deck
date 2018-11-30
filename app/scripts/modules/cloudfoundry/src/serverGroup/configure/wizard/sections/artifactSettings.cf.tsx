@@ -26,6 +26,8 @@ import { CloudFoundryImageReader } from 'cloudfoundry/image/image.reader.cf';
 import { ICloudFoundryCluster, ICloudFoundryServerGroup } from 'cloudfoundry/domain';
 import { Field } from 'formik';
 
+import 'cloudfoundry/common/cloudFoundryReact.less';
+
 export interface ICloudFoundryCreateServerGroupArtifactSettingsProps
   extends IWizardPageProps<ICloudFoundryCreateServerGroupCommand> {
   artifactAccounts: IArtifactAccount[];
@@ -373,7 +375,7 @@ class ArtifactSettingsImpl extends React.Component<
         artifactInput = this.getArtifactInput();
     }
     return (
-      <div>
+      <div className="cloudfoundry-settings">
         <div className="form-group row">
           <label className="col-md-3 sm-label-right">Source Type</label>
           <div className="col-md-7">
