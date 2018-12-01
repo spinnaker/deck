@@ -12,6 +12,8 @@ import {
   ICloudFoundryManifestTriggerSource,
 } from '../../serverGroupConfigurationModel.cf';
 
+import { Field, FieldArray } from 'formik';
+
 export interface ICloudFoundryServerGroupConfigurationSettingsProps
   extends IWizardPageProps<ICloudFoundryCreateServerGroupCommand> {
   artifactAccounts: IArtifactAccount[];
@@ -39,39 +41,6 @@ function isManifestTriggerSource(
 class ConfigurationSettingsImpl extends React.Component<ICloudFoundryServerGroupConfigurationSettingsProps> {
   public static LABEL = 'Configuration';
 
-  private memoryUpdated = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    const { manifest } = this.props.formik.values;
-    if (isManifestDirectSource(manifest)) {
-      manifest.memory = event.target.value;
-      this.props.formik.setFieldValue('manifest.memory', event.target.value);
-    }
-  };
-
-  private diskQuotaUpdated = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    const { manifest } = this.props.formik.values;
-    if (isManifestDirectSource(manifest)) {
-      manifest.diskQuota = event.target.value;
-      this.props.formik.setFieldValue('manifest.diskQuota', event.target.value);
-    }
-  };
-
-  private instancesUpdated = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    const { manifest } = this.props.formik.values;
-    if (isManifestDirectSource(manifest)) {
-      manifest.instances = Number(event.target.value);
-      this.props.formik.setFieldValue('manifest.instances', event.target.value);
-      this.capacityUpdated(event.target.value);
-    }
-  };
-
-  private buildpackUpdated = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    const { manifest } = this.props.formik.values;
-    if (isManifestDirectSource(manifest)) {
-      manifest.buildpack = event.target.value;
-      this.props.formik.setFieldValue('manifest.buildpack', event.target.value);
-    }
-  };
-
   private manifestTypeUpdated = (type: string): void => {
     switch (type) {
       case 'artifact':
@@ -89,6 +58,8 @@ class ConfigurationSettingsImpl extends React.Component<ICloudFoundryServerGroup
           diskQuota: '1024M',
           instances: 1,
           buildpack: undefined,
+          healthCheckType: 'port',
+          healthCheckHttpEndpoint: undefined,
           routes: [],
           environment: [],
           services: [],
@@ -96,95 +67,6 @@ class ConfigurationSettingsImpl extends React.Component<ICloudFoundryServerGroup
         break;
     }
     this.props.formik.setFieldValue('manifest', this.props.formik.values.manifest);
-  };
-
-  private routeUpdated = (index: number, event: React.ChangeEvent<HTMLInputElement>): void => {
-    const { manifest } = this.props.formik.values;
-    if (isManifestDirectSource(manifest)) {
-      manifest.routes[index] = event.target.value;
-      this.props.formik.setFieldValue('manifest.routes', manifest.routes);
-    }
-  };
-
-  private addRoutesVariable = (): void => {
-    const { manifest } = this.props.formik.values;
-    if (isManifestDirectSource(manifest)) {
-      if (manifest.routes === undefined) {
-        manifest.routes = [];
-      }
-      manifest.routes.push('');
-      this.props.formik.setFieldValue('manifest.routes', manifest.routes);
-    }
-  };
-
-  private removeRoutesVariable = (index: number): void => {
-    const { manifest } = this.props.formik.values;
-    if (isManifestDirectSource(manifest)) {
-      manifest.routes.splice(index, 1);
-      this.props.formik.setFieldValue('manifest.routes', manifest.routes);
-    }
-  };
-
-  private addEnvironmentVariable = (): void => {
-    const { manifest } = this.props.formik.values;
-    if (isManifestDirectSource(manifest)) {
-      if (manifest.environment === undefined) {
-        manifest.environment = [];
-      }
-      manifest.environment.push({ key: '', value: '' });
-      this.props.formik.setFieldValue('manifest.env', manifest.environment);
-    }
-  };
-
-  private removeEnvironmentVariable = (index: number): void => {
-    const { manifest } = this.props.formik.values;
-    if (isManifestDirectSource(manifest)) {
-      manifest.environment.splice(index, 1);
-      this.props.formik.setFieldValue('manifest.env', manifest.environment);
-    }
-  };
-
-  private environmentKeyUpdated = (index: number, event: React.ChangeEvent<HTMLInputElement>): void => {
-    const { manifest } = this.props.formik.values;
-    if (isManifestDirectSource(manifest)) {
-      manifest.environment[index].key = event.target.value;
-      this.props.formik.setFieldValue('manifest.env', manifest.environment);
-    }
-  };
-
-  private environmentValueUpdated = (index: number, event: React.ChangeEvent<HTMLInputElement>): void => {
-    const { manifest } = this.props.formik.values;
-    if (isManifestDirectSource(manifest)) {
-      manifest.environment[index].value = event.target.value;
-      this.props.formik.setFieldValue('manifest.env', manifest.environment);
-    }
-  };
-
-  private serviceUpdated = (index: number, event: React.ChangeEvent<HTMLInputElement>): void => {
-    const { manifest } = this.props.formik.values;
-    if (isManifestDirectSource(manifest)) {
-      manifest.services[index] = event.target.value;
-      this.props.formik.setFieldValue('manifest.services', manifest.services);
-    }
-  };
-
-  private addServicesVariable = (): void => {
-    const { manifest } = this.props.formik.values;
-    if (isManifestDirectSource(manifest)) {
-      if (manifest.services === undefined) {
-        manifest.services = [];
-      }
-      manifest.services.push('');
-      this.props.formik.setFieldValue('manifest.services', manifest.services);
-    }
-  };
-
-  private removeServicesVariable = (index: number): void => {
-    const { manifest } = this.props.formik.values;
-    if (isManifestDirectSource(manifest)) {
-      manifest.services.splice(index, 1);
-      this.props.formik.setFieldValue('manifest.services', manifest.services);
-    }
   };
 
   private artifactAccountUpdated = (option: Option<string>): void => {
@@ -195,43 +77,17 @@ class ConfigurationSettingsImpl extends React.Component<ICloudFoundryServerGroup
     }
   };
 
-  private artifactReferenceUpdated = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    const reference = event.target.value;
-    const { manifest } = this.props.formik.values;
-    if (isManifestArtifactSource(manifest)) {
-      manifest.reference = reference;
-      this.props.formik.setFieldValue('manifest.reference', reference);
-    }
-  };
-
-  private manifestPatternUpdater = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    const pattern = event.target.value;
-    const { manifest } = this.props.formik.values;
-    if (isManifestTriggerSource(manifest)) {
-      manifest.pattern = pattern;
-      this.props.formik.setFieldValue('manifest.pattern', pattern);
-    }
-  };
-
   private capacityUpdated = (capacity: string): void => {
     this.props.formik.setFieldValue('capacity.min', capacity);
     this.props.formik.setFieldValue('capacity.max', capacity);
     this.props.formik.setFieldValue('capacity.desired', capacity);
   };
 
+  private healthCheckTypeUpdated = (healthCheckType: string): void => {
+    this.props.formik.setFieldValue('manifest.healthCheckType', healthCheckType);
+  };
+
   private directConfiguration = (manifest: ICloudFoundryManifestSource): JSX.Element => {
-    const {
-      routeUpdated,
-      removeRoutesVariable,
-      addRoutesVariable,
-      addEnvironmentVariable,
-      removeEnvironmentVariable,
-      environmentKeyUpdated,
-      environmentValueUpdated,
-      serviceUpdated,
-      addServicesVariable,
-      removeServicesVariable,
-    } = this;
     const { errors } = this.props.formik as any;
     if (isManifestDirectSource(manifest)) {
       return (
@@ -239,167 +95,227 @@ class ConfigurationSettingsImpl extends React.Component<ICloudFoundryServerGroup
           <div className="form-group">
             <div className="col-md-3 sm-label-right">Memory</div>
             <div className="col-md-7">
-              <input type="text" value={manifest.memory} onChange={this.memoryUpdated} />
+              <Field type="text" name="manifest.memory" />
             </div>
           </div>
           <div className="form-group">
             <div className="col-md-3 sm-label-right">Disk Quota</div>
             <div className="col-md-7">
-              <input type="text" value={manifest.diskQuota} onChange={this.diskQuotaUpdated} />
+              <Field type="text" name="manifest.diskQuota" />
             </div>
           </div>
           <div className="form-group">
             <div className="col-md-3 sm-label-right">Instances</div>
             <div className="col-md-7">
-              <input type="number" value={manifest.instances} onChange={this.instancesUpdated} />
+              <Field type="number" name="manifest.instances" />
             </div>
           </div>
           <div className="form-group">
             <div className="col-md-3 sm-label-right">Buildpack</div>
             <div className="col-md-7">
-              <input type="text" value={manifest.buildpack} onChange={this.buildpackUpdated} />
+              <Field type="text" name="manifest.buildpack" />
             </div>
           </div>
+
+          <div>
+            <div className="form-group row">
+              <label className="col-md-3 sm-label-right">Health Check Type</label>
+              <div className="col-md-7">
+                <div className="radio radio-inline">
+                  <label>
+                    <input
+                      type="radio"
+                      value="port"
+                      checked={manifest.healthCheckType === 'port'}
+                      onChange={() => this.healthCheckTypeUpdated('port')}
+                    />{' '}
+                    port
+                  </label>
+                </div>
+                <div className="radio radio-inline">
+                  <label>
+                    <input
+                      type="radio"
+                      value="http"
+                      checked={manifest.healthCheckType === 'http'}
+                      onChange={() => this.healthCheckTypeUpdated('http')}
+                    />{' '}
+                    HTTP
+                  </label>
+                </div>
+                <div className="radio radio-inline">
+                  <label>
+                    <input
+                      type="radio"
+                      value="process"
+                      checked={manifest.healthCheckType === 'process'}
+                      onChange={() => this.healthCheckTypeUpdated('process')}
+                    />{' '}
+                    process
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+          {manifest.healthCheckType === 'http' && (
+            <div className="form-group">
+              <div className="col-md-3 sm-label-right">Health Check Endpoint</div>
+              <div className="col-md-7">
+                <Field type="text" name="manifest.healthCheckHttpEndpoint" />
+              </div>
+            </div>
+          )}
 
           <div className="form-group">
             <div className="col-md-12">
               <b>Routes</b>
               &nbsp;
               <HelpField id="cf.serverGroup.routes" />
-              <table className="table table-condensed packed metadata">
-                <tbody>
-                  {manifest.routes &&
-                    manifest.routes.map(function(route, index) {
-                      return (
-                        <tr key={index}>
-                          <td>
-                            <input
-                              className="form-control input-sm"
-                              value={route}
-                              type="text"
-                              ng-model="command.services[$index]"
-                              required={true}
-                              onChange={event => routeUpdated(index, event)}
-                            />
-                          </td>
-                          <td>
-                            <a className="btn btn-link sm-label" onClick={() => removeRoutesVariable(index)}>
-                              <span className="glyphicon glyphicon-trash" />
-                            </a>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                </tbody>
-                <tfoot>
-                  <tr>
-                    <td colSpan={1}>
-                      <button type="button" className="add-new col-md-12" onClick={addRoutesVariable}>
-                        <span className="glyphicon glyphicon-plus-sign" /> Add New Route
-                      </button>
-                    </td>
-                  </tr>
-                </tfoot>
-              </table>
+              <FieldArray
+                name="manifest.routes"
+                render={arrayHelpers => (
+                  <table className="table table-condensed packed metadata">
+                    <tbody>
+                      {manifest.routes &&
+                        manifest.routes.map((_, index) => (
+                          <tr key={index}>
+                            <td>
+                              <Field
+                                className="form-control input-sm"
+                                name={`manifest.routes.${index}`}
+                                type="text"
+                                required={true}
+                              />
+                            </td>
+                            <td>
+                              <a className="btn btn-link sm-label" onClick={() => arrayHelpers.remove(index)}>
+                                <span className="glyphicon glyphicon-trash" />
+                              </a>
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                    <tfoot>
+                      <tr>
+                        <td colSpan={1}>
+                          <button type="button" className="add-new col-md-12" onClick={() => arrayHelpers.push('')}>
+                            <span className="glyphicon glyphicon-plus-sign" /> Add New Route
+                          </button>
+                        </td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                )}
+              />
             </div>
           </div>
 
           <div className="form-group">
             <div className="col-md-12">
               <b>Environment Variables</b>
-              <table className="table table-condensed packed tags">
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Value</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {manifest.environment &&
-                    manifest.environment.map(function(environment, index) {
-                      return (
-                        <tr key={index}>
-                          <td>
-                            <input
-                              className="form-control input-sm"
-                              type="text"
-                              value={environment.key}
-                              required={true}
-                              onChange={event => environmentKeyUpdated(index, event)}
-                            />
-                          </td>
-                          <td>
-                            <input
-                              className="form-control input-sm"
-                              type="text"
-                              value={environment.value}
-                              required={true}
-                              onChange={event => environmentValueUpdated(index, event)}
-                            />
-                          </td>
-                          <td>
-                            <a className="btn btn-link sm-label">
-                              <span
-                                className="glyphicon glyphicon-trash"
-                                onClick={() => removeEnvironmentVariable(index)}
-                              />
-                            </a>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                </tbody>
-                <tfoot>
-                  <tr>
-                    <td colSpan={2}>
-                      <button type="button" className="add-new col-md-12" onClick={addEnvironmentVariable}>
-                        <span className="glyphicon glyphicon-plus-sign" /> Add New Environment Variable
-                      </button>
-                    </td>
-                  </tr>
-                </tfoot>
-              </table>
+              <FieldArray
+                name="manifest.environment"
+                render={arrayHelpers => (
+                  <table className="table table-condensed packed tags">
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Value</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {manifest.environment &&
+                        manifest.environment.map(function(_, index) {
+                          return (
+                            <tr key={index}>
+                              <td>
+                                <Field
+                                  className="form-control input-sm"
+                                  type="text"
+                                  name={`manifest.environment.${index}.key`}
+                                  required={true}
+                                />
+                              </td>
+                              <td>
+                                <Field
+                                  className="form-control input-sm"
+                                  type="text"
+                                  name={`manifest.environment.${index}.value`}
+                                  required={true}
+                                />
+                              </td>
+                              <td>
+                                <a className="btn btn-link sm-label">
+                                  <span
+                                    className="glyphicon glyphicon-trash"
+                                    onClick={() => arrayHelpers.remove(index)}
+                                  />
+                                </a>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                    </tbody>
+                    <tfoot>
+                      <tr>
+                        <td colSpan={2}>
+                          <button
+                            type="button"
+                            className="add-new col-md-12"
+                            onClick={() => arrayHelpers.push({ key: '', value: '' })}
+                          >
+                            <span className="glyphicon glyphicon-plus-sign" /> Add New Environment Variable
+                          </button>
+                        </td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                )}
+              />
             </div>
           </div>
 
           <div className="form-group">
             <div className="col-md-12">
-              <b>Services</b>
-              <table className="table table-condensed packed metadata">
-                <tbody>
-                  {manifest.services &&
-                    manifest.services.map(function(service, index) {
-                      return (
-                        <tr key={index}>
-                          <td>
-                            <input
-                              className="form-control input-sm"
-                              value={service}
-                              type="text"
-                              ng-model="command.services[$index]"
-                              required={true}
-                              onChange={event => serviceUpdated(index, event)}
-                            />
-                          </td>
-                          <td>
-                            <a className="btn btn-link sm-label" onClick={() => removeServicesVariable(index)}>
-                              <span className="glyphicon glyphicon-trash" />
-                            </a>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                </tbody>
-                <tfoot>
-                  <tr>
-                    <td colSpan={1}>
-                      <button type="button" className="add-new col-md-12" onClick={addServicesVariable}>
-                        <span className="glyphicon glyphicon-plus-sign" /> Add New Service
-                      </button>
-                    </td>
-                  </tr>
-                </tfoot>
-              </table>
+              <b>Bind Services</b>
+              <FieldArray
+                name="manifest.services"
+                render={arrayHelpers => (
+                  <table className="table table-condensed packed metadata">
+                    <tbody>
+                      {manifest.services &&
+                        manifest.services.map(function(_, index) {
+                          return (
+                            <tr key={index}>
+                              <td>
+                                <Field
+                                  className="form-control input-sm"
+                                  name={`manifest.services.${index}`}
+                                  type="text"
+                                  required={true}
+                                />
+                              </td>
+                              <td>
+                                <a className="btn btn-link sm-label" onClick={() => arrayHelpers.remove(index)}>
+                                  <span className="glyphicon glyphicon-trash" />
+                                </a>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                    </tbody>
+                    <tfoot>
+                      <tr>
+                        <td colSpan={1}>
+                          <button type="button" className="add-new col-md-12" onClick={() => arrayHelpers.push('')}>
+                            <span className="glyphicon glyphicon-plus-sign" /> Bind Service
+                          </button>
+                        </td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                )}
+              />
             </div>
           </div>
           {errors.manifest &&
@@ -415,23 +331,26 @@ class ConfigurationSettingsImpl extends React.Component<ICloudFoundryServerGroup
               </div>
             )}
           {errors.manifest &&
-            errors.manifest.routes && (
+            errors.manifest.routes &&
+            errors.manifest.routes.map((routeError: string) => (
               <div className="wizard-pod-row-errors">
-                <ValidationMessage message={errors.manifest.routes} type={'error'} />
+                <ValidationMessage message={routeError} type={'error'} />
               </div>
-            )}
+            ))}
           {errors.manifest &&
-            errors.manifest.env && (
+            errors.manifest.environment &&
+            errors.manifest.environment.map((environmentError: string) => (
               <div className="wizard-pod-row-errors">
-                <ValidationMessage message={errors.manifest.env} type={'error'} />
+                <ValidationMessage message={environmentError} type={'error'} />
               </div>
-            )}
+            ))}
           {errors.manifest &&
-            errors.manifest.services && (
+            errors.manifest.services &&
+            errors.manifest.services.map((servicesError: string) => (
               <div className="wizard-pod-row-errors">
-                <ValidationMessage message={errors.manifest.services} type={'error'} />
+                <ValidationMessage message={servicesError} type={'error'} />
               </div>
-            )}
+            ))}
         </div>
       );
     } else {
@@ -448,11 +367,7 @@ class ConfigurationSettingsImpl extends React.Component<ICloudFoundryServerGroup
         <div className="form-group">
           <div className="col-md-3 sm-label-right">Manifest Pattern</div>
           <div className="col-md-7">
-            <input
-              className="form-control input-sm no-spel"
-              value={isManifestTriggerSource(manifest) && manifest.pattern}
-              onChange={this.manifestPatternUpdater}
-            />
+            <Field className="form-control input-sm no-spel" name="manifest.pattern" type="text" />
           </div>
         </div>
         <div className="form-group row">
@@ -518,13 +433,7 @@ class ConfigurationSettingsImpl extends React.Component<ICloudFoundryServerGroup
           <div className="form-group">
             <div className="col-md-3 sm-label-right">Reference</div>
             <div className="col-md-7">
-              <input
-                type="text"
-                required={true}
-                className="form-control input-sm"
-                onChange={this.artifactReferenceUpdated}
-                value={manifest.reference}
-              />
+              <Field type="text" required={true} className="form-control input-sm" name="manifest.reference" />
             </div>
           </div>
           {errors.manifest &&
@@ -624,12 +533,16 @@ class ConfigurationSettingsImpl extends React.Component<ICloudFoundryServerGroup
         values.manifest.routes.forEach(function(route) {
           if (!route) {
             errors.manifest = errors.manifest || {};
-            errors.manifest.routes = `A route was not specified`;
+            errors.manifest.routes = errors.manifest.routes || [];
+            errors.manifest.routes.push(`A route was not specified`);
           }
-          const regex = /^([a-zA-Z0-9_-]+)\.([a-zA-Z0-9_.-]+)(\:[0-9]+)?([\/a-zA-Z0-9_-]+)?$/gm;
+          const regex = /^([a-zA-Z0-9_-]+)\.([a-zA-Z0-9_.-]+)(:[0-9]+)?([\/a-zA-Z0-9_-]+)?$/gm;
           if (route && regex.exec(route) === null) {
             errors.manifest = errors.manifest || {};
-            errors.manifest.routes = `A route did not match the expected format "host.some.domain[:9999][/some/path]"`;
+            errors.manifest.routes = errors.manifest.routes || [];
+            errors.manifest.routes.push(
+              `A route did not match the expected format "host.some.domain[:9999][/some/path]"`,
+            );
           }
         });
       }
@@ -638,11 +551,13 @@ class ConfigurationSettingsImpl extends React.Component<ICloudFoundryServerGroup
         values.manifest.services.forEach(function(service) {
           if (!service) {
             errors.manifest = errors.manifest || {};
-            errors.manifest.services = `A service was not specified`;
+            errors.manifest.services = errors.manifest.services || [];
+            errors.manifest.services.push(`A service was not specified`);
           }
           if (!!existingServices[service]) {
             errors.manifest = errors.manifest || {};
-            errors.manifest.services = `Service "` + service + `" was duplicated`;
+            errors.manifest.services = errors.manifest.services || [];
+            errors.manifest.services.push(`Service "` + service + `" was duplicated`);
           }
           existingServices[service] = service;
         });
@@ -652,15 +567,28 @@ class ConfigurationSettingsImpl extends React.Component<ICloudFoundryServerGroup
         values.manifest.environment.forEach(function(e) {
           if (!e.key || !e.value) {
             errors.manifest = errors.manifest || {};
-            errors.manifest.env = `An environment variable was not set`;
+            errors.manifest.environment = errors.manifest.environment || [];
+            errors.manifest.environment.push(`An environment variable was not set`);
           } else {
+            if (e.key) {
+              const validKeyRegex = /^\w+$/g;
+              if (!validKeyRegex.exec(e.key)) {
+                errors.manifest = errors.manifest || {};
+                errors.manifest.environment = errors.manifest.environment || [];
+                errors.manifest.environment.push(
+                  `'` + e.key + `' is an invalid environment variable name and must be alphanumeric`,
+                );
+              }
+            }
             const value = existingKeys[e.key];
             if (!value) {
               existingKeys[e.key] = e.value;
             } else {
               errors.manifest = errors.manifest || {};
-              errors.manifest.env =
-                `Duplicate environment variable: "` + e.key + `" set to "` + value + `" and "` + e.value + `"`;
+              errors.manifest.environment = errors.manifest.environment || [];
+              errors.manifest.environment.push(
+                `Duplicate environment variable: "` + e.key + `" set to "` + value + `" and "` + e.value + `"`,
+              );
             }
           }
         });

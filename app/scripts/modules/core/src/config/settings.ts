@@ -26,6 +26,9 @@ export interface INotificationSettings {
     enabled: boolean;
     botName: string;
   };
+  githubstatus: {
+    enabled: boolean;
+  };
 }
 
 export interface IFeatures {
@@ -48,6 +51,7 @@ export interface IFeatures {
   versionedProviders?: boolean;
   travis?: boolean;
   managedServiceAccounts?: boolean;
+  quietPeriod?: boolean;
   wercker?: boolean;
   triggerViaEcho?: boolean;
   [key: string]: any;
@@ -61,7 +65,12 @@ export interface IDockerInsightSettings {
 export interface ISpinnakerSettings {
   [key: string]: any;
 
-  analytics: { ga?: string };
+  analytics: {
+    ga?: string;
+    customConfig?: {
+      siteSpeedSampleRate?: number;
+    };
+  };
   authEnabled: boolean;
   authEndpoint: string;
   authTtl: number;
@@ -113,6 +122,7 @@ export interface ISpinnakerSettings {
   searchVersion: 1 | 2;
   triggerTypes: string[];
   useClassicFirewallLabels: boolean;
+  quietPeriod: [string | number, string | number];
 }
 
 export const SETTINGS: ISpinnakerSettings = (window as any).spinnakerSettings;

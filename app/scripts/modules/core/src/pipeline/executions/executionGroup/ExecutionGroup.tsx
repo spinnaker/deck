@@ -6,6 +6,7 @@ import { find, flatten, uniq, without } from 'lodash';
 
 import { Application } from 'core/application/application.model';
 import { CollapsibleSectionStateCache } from 'core/cache';
+import { EntityNotifications } from 'core/entityTag/notifications/EntityNotifications';
 import { Execution } from '../execution/Execution';
 import { IExecution, IExecutionGroup, IExecutionTrigger, IPipeline, IPipelineCommand } from 'core/domain';
 import { NextRunTag } from 'core/pipeline/triggers/NextRunTag';
@@ -40,14 +41,14 @@ export interface IExecutionGroupState {
 }
 
 export class ExecutionGroup extends React.Component<IExecutionGroupProps, IExecutionGroupState> {
-  private strategyConfig: IPipeline;
+  public state: IExecutionGroupState;
   private expandUpdatedSubscription: Subscription;
   private stateChangeSuccessSubscription: Subscription;
 
   constructor(props: IExecutionGroupProps) {
     super(props);
 
-    this.strategyConfig = find(this.props.application.strategyConfigs.data, {
+    const strategyConfig = find(this.props.application.strategyConfigs.data, {
       name: this.props.group.heading,
     }) as IPipeline;
 
@@ -65,7 +66,7 @@ export class ExecutionGroup extends React.Component<IExecutionGroupProps, IExecu
         CollapsibleSectionStateCache.isExpanded(sectionCacheKey),
       poll: null,
       canTriggerPipelineManually: !!pipelineConfig,
-      canConfigure: !!(pipelineConfig || this.strategyConfig),
+      canConfigure: !!(pipelineConfig || strategyConfig),
       showAccounts: ExecutionState.filterModel.asFilterModel.sortFilter.groupBy === 'name',
       pipelineConfig,
       showOverflowAccountTags: false,
@@ -198,8 +199,8 @@ export class ExecutionGroup extends React.Component<IExecutionGroupProps, IExecu
   };
 
   public render(): React.ReactElement<ExecutionGroup> {
-    const group = this.props.group;
-    const pipelineConfig = this.state.pipelineConfig;
+    const { group } = this.props;
+    const { pipelineConfig } = this.state;
     const pipelineDisabled = pipelineConfig && pipelineConfig.disabled;
     const pipelineDescription = pipelineConfig && pipelineConfig.description;
     const hasRunningExecutions = group.runningExecutions && group.runningExecutions.length > 0;
@@ -275,6 +276,16 @@ export class ExecutionGroup extends React.Component<IExecutionGroupProps, IExecu
                     </span>
                   )}
                 </h4>
+                {pipelineConfig && (
+                  <EntityNotifications
+                    entity={pipelineConfig}
+                    application={this.props.application}
+                    entity-type="pipeline"
+                    hOffsetPercent="20%"
+                    placement="top"
+                    onUpdate={() => this.props.application.refresh()}
+                  />
+                )}
                 {this.state.canConfigure && (
                   <div className="text-right execution-group-actions">
                     {pipelineConfig && <TriggersTag pipeline={pipelineConfig} />}

@@ -1,7 +1,8 @@
 import * as React from 'react';
 import AceEditor, { Annotation } from 'react-ace';
 import { $log } from 'ngimport';
-import { load, YAMLException } from 'js-yaml';
+import { loadAll, YAMLException } from 'js-yaml';
+import { head } from 'lodash';
 
 import 'brace/theme/textmate';
 import 'brace/mode/yaml';
@@ -10,11 +11,6 @@ import '../editor.less';
 export interface IYamlEditorProps {
   value: string;
   onChange(raw: string, obj: any): void;
-}
-
-export interface IYamlEditorState {
-  errors: Annotation[];
-  value: string;
 }
 
 // js-yaml's typing for YAMLException doesn't include a type
@@ -27,54 +23,44 @@ interface IMark {
   position: string;
 }
 
-export class YamlEditor extends React.Component<IYamlEditorProps, IYamlEditorState> {
-  public static getDerivedStateFromProps = (props: IYamlEditorProps, state: IYamlEditorState): IYamlEditorState => {
-    return {
-      value: props.value,
-      errors: Array.isArray(state.errors) ? state.errors : [],
-    };
+export class YamlEditor extends React.Component<IYamlEditorProps> {
+  private handleChange = (raw: string) => {
+    let yamlDocuments: any;
+    try {
+      yamlDocuments = loadAll(raw, null);
+      if (Array.isArray(head(yamlDocuments))) {
+        // Multi-doc entered as list of maps
+        yamlDocuments = head(yamlDocuments);
+      }
+    } catch (e) {}
+    this.props.onChange
+      ? this.props.onChange(raw, yamlDocuments)
+      : $log.warn('No `onChange` handler provided for YAML editor.');
   };
 
-  constructor(props: IYamlEditorProps) {
-    super(props);
-    this.state = {
-      value: props.value,
-      errors: [],
-    };
-  }
-
-  private handleChange = (raw: string) => {
-    this.setState({ value: raw });
+  public calculateErrors = (value: string): Annotation[] => {
     try {
-      const obj = load(raw);
-      this.props.onChange
-        ? this.props.onChange(raw, obj)
-        : $log.warn('No `onChange` handler provided for YAML editor.');
-      this.setState({ errors: [] });
+      loadAll(value, null);
     } catch (e) {
-      this.props.onChange
-        ? this.props.onChange(raw, null)
-        : $log.warn('No `onChange` handler provided for YAML editor.');
       if (e instanceof YAMLException) {
         const mark = (e as any).mark as IMark;
         // Ace Editor doesn't render errors for YAML, so
         // we have to do it ourselves.
-        this.setState({
-          errors: [
-            {
-              column: mark.column,
-              row: mark.line,
-              type: 'error',
-              text: e.message,
-            },
-          ],
-        });
+        return [
+          {
+            column: mark.column,
+            row: mark.line,
+            type: 'error',
+            text: e.message,
+          },
+        ];
       }
-      $log.warn(`Error loading YAML from string ${raw}: `, e);
     }
+    return [];
   };
 
   public render = () => {
+    const { value } = this.props;
     return (
       <AceEditor
         mode="yaml"
@@ -89,14 +75,15 @@ export class YamlEditor extends React.Component<IYamlEditorProps, IYamlEditorSta
         minLines={50}
         maxLines={100}
         highlightActiveLine={true}
-        value={this.state.value || undefined}
-        annotations={this.state.errors}
+        value={value || undefined}
+        annotations={this.calculateErrors(value)}
         setOptions={{
           firstLineNumber: 1,
           tabSize: 2,
           showLineNumbers: false,
           showFoldWidgets: false,
         }}
+        editorProps={{ $blockScrolling: Infinity }}
         className="ace-editor"
       />
     );

@@ -1,10 +1,12 @@
 import { IStage } from './IStage';
 import { ITrigger } from './ITrigger';
 import { IExpectedArtifact } from 'core/domain/IExpectedArtifact';
+import { IEntityTags } from './IEntityTags';
 
 export interface IPipeline {
   application: string;
   description?: string;
+  entityTags?: IEntityTags;
   id: string;
   index: number;
   isNew?: boolean;
@@ -13,6 +15,7 @@ export interface IPipeline {
   locked?: boolean;
   limitConcurrent: boolean;
   name: string;
+  respectQuietPeriod?: boolean;
   stages: IStage[];
   strategy: boolean;
   triggers: ITrigger[];
