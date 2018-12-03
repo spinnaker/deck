@@ -455,7 +455,7 @@ export class AwsLoadBalancerTransformer {
       defaultSubnetType = AWSProviderSettings.defaults.subnetType;
     return {
       availabilityZones: undefined,
-      name: undefined,
+      name: '',
       stack: '',
       detail: '',
       loadBalancerType: 'classic',
@@ -494,7 +494,7 @@ export class AwsLoadBalancerTransformer {
       defaultSubnetType = AWSProviderSettings.defaults.subnetType,
       defaultTargetGroupName = `targetgroup`;
     return {
-      name: undefined,
+      name: '',
       availabilityZones: undefined,
       stack: '',
       detail: '',
@@ -551,7 +551,7 @@ export class AwsLoadBalancerTransformer {
       defaultSubnetType = AWSProviderSettings.defaults.subnetType,
       defaultTargetGroupName = `targetgroup`;
     return {
-      name: undefined,
+      name: '',
       availabilityZones: undefined,
       stack: '',
       detail: '',

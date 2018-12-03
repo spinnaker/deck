@@ -167,6 +167,7 @@ class LoadBalancerLocationImpl extends React.Component<
       return chain(subnets)
         .filter({ account, region })
         .reject({ target: 'ec2' })
+        .reject({ purpose: null })
         .value();
     });
   }
