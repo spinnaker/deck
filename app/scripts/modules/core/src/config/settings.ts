@@ -26,6 +26,9 @@ export interface INotificationSettings {
     enabled: boolean;
     botName: string;
   };
+  githubstatus: {
+    enabled: boolean;
+  };
 }
 
 export interface IFeatures {
@@ -62,7 +65,12 @@ export interface IDockerInsightSettings {
 export interface ISpinnakerSettings {
   [key: string]: any;
 
-  analytics: { ga?: string };
+  analytics: {
+    ga?: string;
+    customConfig?: {
+      siteSpeedSampleRate?: number;
+    };
+  };
   authEnabled: boolean;
   authEndpoint: string;
   authTtl: number;
