@@ -13,7 +13,7 @@ import {
   IAccountDetails,
   SETTINGS,
   StageConfigField,
-  AccountSelectField,
+  AccountSelectInput,
   AccountService,
   noop,
   ScopeClusterSelector,
@@ -273,11 +273,10 @@ export class ManifestSelector extends React.Component<IManifestSelectorProps, IM
     return (
       <>
         <StageConfigField label="Account">
-          <AccountSelectField
-            component={selector}
-            field="account"
+          <AccountSelectInput
+            value={selector.account}
+            onChange={evt => this.handleAccountChange(evt.target.value)}
             accounts={accounts}
-            onChange={this.handleAccountChange}
             provider="'kubernetes'"
           />
         </StageConfigField>

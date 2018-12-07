@@ -12,7 +12,7 @@ import {
   AccountService,
   FirewallLabels,
   MapEditor,
-  AccountSelectField,
+  AccountSelectInput,
 } from '@spinnaker/core';
 
 import { DockerImageAndTagSelector, DockerImageUtils, IDockerImageAndTagChanges } from '@spinnaker/docker';
@@ -156,11 +156,10 @@ export class TitusRunJobStageConfig extends React.Component<IStageConfigProps, I
             <span className="label-text">Account</span>
           </label>
           <div className="col-md-5">
-            <AccountSelectField
-              component={stage}
-              field="credentials"
+            <AccountSelectInput
+              value={stage.credentials}
+              onChange={evt => this.accountChanged(evt.target.value)}
               accounts={credentials}
-              onChange={this.accountChanged}
               provider="titus"
             />
             {stage.credentials !== undefined && (

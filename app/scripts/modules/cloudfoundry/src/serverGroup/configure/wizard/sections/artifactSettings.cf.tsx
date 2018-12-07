@@ -3,7 +3,7 @@ import * as React from 'react';
 import Select, { Option } from 'react-select';
 
 import {
-  AccountSelectField,
+  AccountSelectInput,
   AccountService,
   HelpField,
   IAccountDetails,
@@ -238,12 +238,11 @@ class ArtifactSettingsImpl extends React.Component<
         <div className="form-group">
           <div className="col-md-3 sm-label-right">Account</div>
           <div className="col-md-7">
-            <AccountSelectField
-              component={artifact}
-              field="credentials"
+            <AccountSelectInput
+              value={(artifact as any).credentials}
+              onChange={evt => this.packageAccountUpdated(evt.target.value)}
               accounts={allCloudFoundryCredentials}
               provider="cloudfoundry"
-              onChange={this.packageAccountUpdated}
             />
           </div>
         </div>

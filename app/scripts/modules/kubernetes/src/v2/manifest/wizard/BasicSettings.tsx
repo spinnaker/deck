@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { FormikErrors } from 'formik';
 
-import { AccountSelectField, HelpField, IWizardPageProps, wizardPage, Application } from '@spinnaker/core';
+import { AccountSelectInput, HelpField, IWizardPageProps, wizardPage, Application } from '@spinnaker/core';
 
 import { IKubernetesManifestCommandData } from 'kubernetes/v2/manifest/manifestCommandBuilder.service';
 
@@ -34,13 +34,12 @@ class ManifestBasicSettingsImpl extends React.Component<IManifestBasicSettingsPr
             Account <HelpField id="kubernetes.manifest.account" />
           </div>
           <div className="col-md-7">
-            <AccountSelectField
+            <AccountSelectInput
+              value={formik.values.command.account}
+              onChange={evt => this.accountUpdated(evt.target.value)}
               readOnly={false}
-              component={formik.values.command}
-              field="account"
               accounts={accounts}
               provider="kubernetes"
-              onChange={this.accountUpdated}
             />
           </div>
         </div>
