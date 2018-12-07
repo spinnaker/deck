@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {
-  AccountSelectField,
+  AccountSelectInput,
   AccountService,
   IAccount,
   IRegion,
@@ -87,12 +87,11 @@ export class CloudfoundryDestroyServiceStageConfig extends React.Component<
     return (
       <div className="form-horizontal">
         <StageConfigField label="Account">
-          <AccountSelectField
+          <AccountSelectInput
+            value={stage.credentials}
+            onChange={evt => this.accountUpdated(evt.target.value)}
             accounts={accounts}
-            component={stage}
-            field="credentials"
             provider="cloudfoundry"
-            onChange={this.accountUpdated}
           />
         </StageConfigField>
         <RegionSelectField
