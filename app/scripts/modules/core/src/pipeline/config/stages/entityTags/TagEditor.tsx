@@ -1,12 +1,13 @@
 import * as React from 'react';
 import { set } from 'lodash';
-import Select, { Option } from 'react-select';
+import { Option } from 'react-select';
 
 import { IEntityTag } from 'core/domain';
 import { HelpField } from 'core/help/HelpField';
 import { UUIDGenerator } from 'core/utils';
 
 import './TagEditor.less';
+import { FormField, TextInput, ReactSelectInput } from 'core/presentation';
 
 export type EntityTagType = 'notice' | 'alert' | 'custom';
 
@@ -17,7 +18,6 @@ export interface ITagEditorProps {
 
 export interface ITagEditorState {
   type: EntityTagType;
-  valueIsObject: boolean;
 }
 
 const typeOptions: Array<Option<EntityTagType>> = [
@@ -36,17 +36,9 @@ export class TagEditor extends React.Component<ITagEditorProps, ITagEditorState>
         ? 'alert'
         : 'custom';
 
-    const valueIsObject = typeof props.tag.value === 'object';
-
     this.state = {
       type,
-      valueIsObject,
     };
-  }
-
-  public componentWillReceiveProps(nextProps: ITagEditorProps) {
-    const valueIsObject = typeof nextProps.tag.value === 'object';
-    this.setState({ valueIsObject });
   }
 
   private handleTypeChanged = (type: EntityTagType) => {
@@ -80,8 +72,9 @@ export class TagEditor extends React.Component<ITagEditorProps, ITagEditorState>
 
   public render() {
     const { tag } = this.props;
-    const { type, valueIsObject } = this.state;
+    const { type } = this.state;
 
+    const valueIsObject = typeof tag.value === 'object';
     const value = valueIsObject ? JSON.stringify(this.props.tag.value) : this.props.tag.value;
 
     const namespaceInput =
@@ -91,11 +84,10 @@ export class TagEditor extends React.Component<ITagEditorProps, ITagEditorState>
             Namespace <HelpField id="pipeline.config.entitytags.namespace" />
           </label>
           <div className="col-md-8">
-            <input
-              className="form-control input-sm"
+            <FormField
+              input={TextInput}
               value={tag.namespace || ''}
               onChange={event => this.tagValueChanged('namespace', event.target.value)}
-              type="text"
             />
           </div>
         </div>
@@ -106,11 +98,10 @@ export class TagEditor extends React.Component<ITagEditorProps, ITagEditorState>
         <div className="row">
           <label className="col-md-3 sm-label-right">Name</label>
           <div className="col-md-8">
-            <input
-              className="form-control input-sm"
+            <FormField
+              input={TextInput}
               value={tag.name || ''}
               onChange={event => this.tagValueChanged('name', event.target.value)}
-              type="text"
             />
           </div>
         </div>
@@ -123,11 +114,10 @@ export class TagEditor extends React.Component<ITagEditorProps, ITagEditorState>
             Value <HelpField id="pipeline.config.entitytags.value" />
           </label>
           <div className="col-md-8">
-            <input
-              className="form-control input-sm"
+            <FormField
+              input={TextInput}
               value={value || ''}
               onChange={event => this.tagValueChanged('value', event.target.value)}
-              type="text"
             />
           </div>
         </div>
@@ -135,11 +125,10 @@ export class TagEditor extends React.Component<ITagEditorProps, ITagEditorState>
         <div className="row">
           <label className="col-md-3 sm-label-right">Message</label>
           <div className="col-md-8">
-            <input
-              className="form-control input-sm"
+            <FormField
+              input={TextInput}
               value={tag.value.message || ''}
               onChange={event => this.tagValueChanged('value.message', event.target.value)}
-              type="text"
             />
           </div>
         </div>
@@ -150,11 +139,12 @@ export class TagEditor extends React.Component<ITagEditorProps, ITagEditorState>
         <div className="row">
           <label className="col-md-3 sm-label-right">Type</label>
           <div className="col-md-8">
-            <Select
-              clearable={false}
+            <FormField
+              input={inputProps => (
+                <ReactSelectInput {...inputProps} options={typeOptions} clearable={false} className="full-width" />
+              )}
               required={true}
-              options={typeOptions}
-              onChange={(t: Option<EntityTagType>) => this.handleTypeChanged(t.value)}
+              onChange={e => this.handleTypeChanged(e.target.value)}
               value={type}
             />
           </div>
@@ -162,7 +152,6 @@ export class TagEditor extends React.Component<ITagEditorProps, ITagEditorState>
         {namespaceInput}
         {nameInput}
         {valueInput}
-        {/* if notice or alert, show message instead of value */}
       </div>
     );
   }

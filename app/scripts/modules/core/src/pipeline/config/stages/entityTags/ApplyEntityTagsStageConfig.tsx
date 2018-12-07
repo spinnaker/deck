@@ -1,12 +1,11 @@
 import * as React from 'react';
-import Select, { Option } from 'react-select';
 
+import { SETTINGS } from 'core/config';
 import { IEntityRef, IEntityTag, IStage } from 'core/domain';
 import { IStageConfigProps, StageConfigField } from 'core/pipeline';
-import { SETTINGS } from 'core/config/settings';
+import { FormField, ReactSelectInput, TextInput } from 'core/presentation';
 
 import { TagEditor } from './TagEditor';
-import { FormField, ReactSelectInput, StringsAsOptions } from 'core/presentation';
 
 export interface IApplyEntityTagsStage extends IStage {
   entityRef: IEntityRef;
@@ -32,7 +31,7 @@ export class ApplyEntityTagsStageConfig extends React.Component<IApplyEntityTags
   };
 
   private entityRefFieldChanged = (key: string, value: string) => {
-    const entityRef = { ...this.props.stage.entityRef, ...{ [key]: value } };
+    const entityRef = { ...this.props.stage.entityRef, [key]: value };
     this.props.updateStageField({ entityRef });
   };
 
@@ -43,8 +42,7 @@ export class ApplyEntityTagsStageConfig extends React.Component<IApplyEntityTags
   };
 
   private addTag = () => {
-    this.props.stage.tags.push({ name: '', value: '' });
-    this.props.updateStageField({ tags: this.props.stage.tags });
+    this.props.updateStageField({ tags: this.props.stage.tags.concat({ name: '', value: '' }) });
   };
 
   public render() {
@@ -58,18 +56,19 @@ export class ApplyEntityTagsStageConfig extends React.Component<IApplyEntityTags
     return (
       <div className="form-horizontal">
         <StageConfigField label="Entity Type">
-          <Select
-            clearable={false}
-            options={this.entityOptions}
-            onChange={(o: Option<string>) => this.entityRefTypeChanged(o.value)}
+          <FormField
+            input={inputProps => (
+              <ReactSelectInput {...inputProps} options={this.entityOptions} clearable={false} className="full-width" />
+            )}
+            onChange={e => this.entityRefTypeChanged(e.target.value)}
             value={entityRef.entityType || ''}
           />
         </StageConfigField>
         {entityRef.entityType && (
           <>
             <StageConfigField label="Name">
-              <input
-                className="form-control input-sm"
+              <FormField
+                input={TextInput}
                 value={entityRef.entityId || ''}
                 onChange={e => this.entityRefFieldChanged('entityId', e.target.value)}
               />
@@ -78,40 +77,36 @@ export class ApplyEntityTagsStageConfig extends React.Component<IApplyEntityTags
               <>
                 <StageConfigField label="Cloud Provider">
                   <FormField
-                    input={fieldProps => (
-                      <StringsAsOptions strings={cloudProviders}>
-                        {options => (
-                          <ReactSelectInput
-                            {...fieldProps}
-                            options={options}
-                            clearable={false}
-                            className="full-width"
-                          />
-                        )}
-                      </StringsAsOptions>
+                    input={inputProps => (
+                      <ReactSelectInput
+                        {...inputProps}
+                        stringOptions={cloudProviders}
+                        clearable={false}
+                        className="full-width"
+                      />
                     )}
                     value={entityRef.cloudProvider || ''}
                     onChange={e => this.entityRefFieldChanged('cloudProvider', e.target.value)}
                   />
                 </StageConfigField>
                 <StageConfigField label="Account">
-                  <input
-                    className="form-control input-sm"
+                  <FormField
+                    input={TextInput}
                     value={entityRef.account || ''}
                     onChange={e => this.entityRefFieldChanged('account', e.target.value)}
                   />
                 </StageConfigField>
                 <StageConfigField label="Region" helpKey="pipeline.config.entitytags.region">
-                  <input
-                    className="form-control input-sm"
+                  <FormField
+                    input={TextInput}
                     value={entityRef.region || ''}
                     onChange={e => this.entityRefFieldChanged('region', e.target.value)}
                   />
                 </StageConfigField>
                 {entityRef.entityType === 'securitygroup' && (
                   <StageConfigField label="VPC Id">
-                    <input
-                      className="form-control input-sm"
+                    <FormField
+                      input={TextInput}
                       value={entityRef.vpcId || ''}
                       onChange={e => this.entityRefFieldChanged('vpcId', e.target.value)}
                     />

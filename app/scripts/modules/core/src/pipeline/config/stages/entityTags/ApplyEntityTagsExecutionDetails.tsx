@@ -7,7 +7,7 @@ import {
   StageFailureMessage,
 } from 'core/pipeline';
 export function ApplyEntityTagsExecutionDetails(props: IExecutionDetailsSectionProps) {
-  const { stage, current } = props;
+  const { current, name, stage } = props;
 
   const entityRef = stage.context.entityRef || {};
   const tags = stage.context.tags || {};
@@ -39,15 +39,16 @@ export function ApplyEntityTagsExecutionDetails(props: IExecutionDetailsSectionP
       <div className="col-md-12">
         Tags
         <dl className="dl-narrow dl-horizontal">
-          {tags.map(({ name, value }: any) => {
+          {tags.map(({ name: tagName, value }: any) => {
             if (typeof value === 'object') {
               try {
                 value = JSON.stringify(value);
               } catch (e) {}
             }
+
             return (
-              <React.Fragment key={name}>
-                <dt title={name}>{name}</dt>
+              <React.Fragment key={tagName}>
+                <dt title={tagName}>{tagName}</dt>
                 <dd title={value}>{value}</dd>
               </React.Fragment>
             );
@@ -58,7 +59,7 @@ export function ApplyEntityTagsExecutionDetails(props: IExecutionDetailsSectionP
   );
 
   return (
-    <ExecutionDetailsSection name={props.name} current={current}>
+    <ExecutionDetailsSection name={name} current={current}>
       {entityRefSection}
       {tagsSection}
       <StageFailureMessage stage={stage} message={stage.failureMessage} />
