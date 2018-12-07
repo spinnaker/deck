@@ -31,7 +31,7 @@ module(PRECONFIGUREDJOB_STAGE, []).run(() => {
     .all('preconfigured')
     .getList()
     .then((preconfiguredJobs: IPreconfiguredJob[]) => {
-      preconfiguredJobs.forEach((preconfiguredJob: IPreconfiguredJob) => {
+      preconfiguredJobs.forEach(preconfiguredJob => {
         const { label, description, type, waitForCompletion, parameters } = preconfiguredJob;
         Registry.pipeline.registerStage({
           label,
