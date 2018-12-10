@@ -9291,7 +9291,7 @@ loader-runner@^2.3.0:
   resolved "https://registry.yarnpkg.com/loader-runner/-/loader-runner-2.3.0.tgz#f482aea82d543e07921700d5a46ef26fdac6b8a2"
   integrity sha1-9IKuqC1UPgeSFwDVpG7yb9rGuKI=
 
-loader-utils@^0.2.16, loader-utils@~0.2.6:
+loader-utils@^0.2.16:
   version "0.2.16"
   resolved "https://registry.yarnpkg.com/loader-utils/-/loader-utils-0.2.16.tgz#f08632066ed8282835dff88dfb52704765adee6d"
   integrity sha1-8IYyBm7YKCg13/iN+1JwR2Wt7m0=
@@ -10547,13 +10547,13 @@ ngimport@^1.0.0:
   dependencies:
     "@types/angular" "^1.6.34"
 
-ngtemplate-loader@^1.3.1:
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/ngtemplate-loader/-/ngtemplate-loader-1.3.1.tgz#bfd05a1d9a120041698c06f61653f606b39c1060"
-  integrity sha1-v9BaHZoSAEFpjAb2FlP2BrOcEGA=
+ngtemplate-loader@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/ngtemplate-loader/-/ngtemplate-loader-2.0.1.tgz#9d7ed2e8a2363523ad7b64d74aac402d8daff3f3"
+  integrity sha1-nX7S6KI2NSOte2TXSqxALY2v8/M=
   dependencies:
     jsesc "^0.5.0"
-    loader-utils "~0.2.6"
+    loader-utils "^1.0.2"
 
 nice-try@^1.0.4:
   version "1.0.4"
