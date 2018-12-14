@@ -1038,20 +1038,10 @@ angular2react@^3.0.2:
     lodash.kebabcase "^4.1.1"
     ngimport "^1.0.0"
 
-angular@1.6.10:
+angular@1.6.10, angular@>=1.5, angular@>=1.5.0, angular@^1.4.0, angular@~1.6.3:
   version "1.6.10"
   resolved "https://registry.yarnpkg.com/angular/-/angular-1.6.10.tgz#eed3080a34d29d0f681ff119b18ce294e3f74826"
   integrity sha512-PCZ5/hVdvPQiYyH0VwsPjrErPHRcITnaXxhksceOXgtJeesKHLA7KDu4X/yvcAi+1zdGgGF+9pDxkJvghXI9Wg==
-
-angular@>=1.5:
-  version "1.6.9"
-  resolved "https://registry.yarnpkg.com/angular/-/angular-1.6.9.tgz#bc812932e18909038412d594a5990f4bb66c0619"
-  integrity sha512-6igWH2GIsxV+J38wNWCh8oyjaZsrIPIDO35twloIUyjlF2Yit6UyLAWujHP05ma/LFxTsx4NtYibRoMNBXPR1A==
-
-angular@>=1.5.0, angular@^1.4.0, angular@~1.6.3:
-  version "1.6.4"
-  resolved "https://registry.yarnpkg.com/angular/-/angular-1.6.4.tgz#03b7b15c01a0802d7e2cf593240e604054dc77fb"
-  integrity sha1-A7exXAGggC1+LPWTJA5gQFTcd/s=
 
 angulartics-google-analytics@^0.2.0:
   version "0.2.1"
@@ -1776,10 +1766,10 @@ babel-messages@^6.23.0:
   dependencies:
     babel-runtime "^6.22.0"
 
-babel-plugin-angularjs-annotate@^0.8.2:
-  version "0.8.2"
-  resolved "https://registry.yarnpkg.com/babel-plugin-angularjs-annotate/-/babel-plugin-angularjs-annotate-0.8.2.tgz#7f9a37fbb7511668e836cb91a2e43e98e12f9ed9"
-  integrity sha512-gkPuZr4aYxhJPjqrwYlnXQIzlRagp+vxJhqaoYc3w9gBZ2/H2fKIt7a3iXoC5JQGm7ee9Lj7CWPfnfcYX/34Iw==
+babel-plugin-angularjs-annotate@^0.9.0:
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/babel-plugin-angularjs-annotate/-/babel-plugin-angularjs-annotate-0.9.0.tgz#5c499bb04d9ae5802b31e1068aedb8b2286a83af"
+  integrity sha512-erYvZAJgnrgeyEZqIJOAiK6vUK44HsVb0+Tid4zTBcsvdQuas0Z5Teh0w/hcINKW3G0xweqA5LGfg2ZWlp3nMA==
   dependencies:
     babel-code-frame "^6.26.0"
     babel-types "^6.26.0"
