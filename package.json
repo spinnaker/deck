@@ -118,7 +118,7 @@
     "@types/react-dom": "^16.0.5",
     "@types/react-select": "^1.2.3",
     "@types/react-sortable-hoc": "^0.6.2",
-    "@types/react-virtualized": "9.7.12",
+    "@types/react-virtualized": "9.18.11",
     "@types/react-virtualized-select": "^3.0.3",
     "@types/request-promise-native": "^1.0.15",
     "@types/webdriverio": "^4.13.0",
