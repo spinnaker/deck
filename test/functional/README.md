@@ -1,80 +1,123 @@
-# Deck Functional Tests
+# Deck Functional Test Suite
 
-## Recording Network Fixtures
+Run functional tests against Deck without the need for any of Spinnaker's other services
+to be running.
 
-Usage of fixtures goes as follows:
-
-1. Create a mountebank control server. For now this is managed manually but will soon be coordinated by a script:
+The test runner script is called as follows from the deck repository root:
 
 ```
-$ node
-> require('ts-node/register');
-{}
-> const { MountebankService } = require('./test/functional/tools/MountebankService.ts');
-undefined
-> MountebankService.builder().
-...   mountebankPath(process.cwd() + '/node_modules/.bin/mb').
-...   onStdOut(data => { console.log('mb stdout: ' + String(data)); }).
-...   onStdErr(data => { console.log('mb stderr: ' + String(data)); }).
-...   build().launchServer();
-Promise {
-  <pending>,
-  domain:
-   Domain {
-     domain: null,
-     _events: { error: [Function: debugDomainError] },
-     _eventsCount: 1,
-     _maxListeners: undefined,
-     members: [] } }
-> mb stdout: info: [mb:2525] mountebank v1.15.0 now taking orders - point your browser to http://localhost:2525 for help
+test/functional/run.js [options] -- [webdriver.io options]
 ```
 
-2. Launch Gate on a different port. We want 8084 to be free for the mitm proxy that will record the network traffic. Open `~/.hal/default/service-settings/gate.yml` and add these contents:
+The runner script performs the following work:
+
+1. Parses command line arguments
+2. Fires up a Mountebank mock server if network fixtures are to be recorded or replayed
+3. Compiles and serves the production build of Deck
+4. Delegates to webdriver.io to execute tests
+5. Cleans up all the processes described above
+
+The options available for the runner script are as follows:
+
+```
+--serve-deck           Boolean. Build and test the production version of Deck.
+--replay-fixtures      Boolean. Use pre-recorded network fixtures in place of a
+                       running Gate server.
+--record-fixtures      Boolean. Record network fixtures for later replay.
+                       Requires a running Spinnaker deployment.
+--gate-port            (only used when recording fixtures) Port on which a
+                       real Gate server is currently running. The imposter
+                       recording a test's network fixture will proxy requests
+                       from Deck to this port and record the results.
+--imposter-port        (only used when recording or replaying fixtures)
+                       Port on which the imposter Gate server should be created.
+                       This should typically be the port that Gate normally
+                       runs on (8084).
+--browser              Either "chrome" or "firefox".
+--headless             Boolean. Run the browser in headless mode.
+--savelogs             Chrome-only. Save browser's console log to file named
+                       [selenium-session-id].browser.log.
+--help                 Print the script's help information.
+```
+
+Any arguments appearing after `--` will be passed to webdriver.io. To see webdriver.io's
+cli args, simply run `test/functional/run.js -- --help`
+
+## Writing New Tests Requires Gate To Run On A Different Port
+
+Writing a new functional test requires recording an accompanying network
+fixture so that the test is reproducible.
+
+In order to record a fixture the test runner script creates a Gate imposter server
+that proxies requests from Deck to Gate, recording the traffic.
+
+Since the imposter server needs to sit between Deck and Gate to record traffic,
+it needs to use Gate's port. Therefore, Gate must be moved to a different port
+for the imposter to work.
+
+See "Recording a Network Fixture For a New Test" in the Example Usage section below.
+
+## Warning: Record Network Fixtures In Safe Environments!
+
+If you decide to create a new test and network fixture, please bear in mind
+that _all_ of the network traffic between Deck and Gate will be recorded. This
+will include any authentication headers exchanged during communication as well
+as all data pertaining to the infrastructure configured in your Spinnaker.
+
+It's strongly advised that network fixtures are recorded with any authentication
+system disabled and with any sensitive data removed from your working Spinnaker.
+A simple way to do this is to create a fresh Spinnaker deployment with only the
+data required to successfully complete the functional test, and then perform the
+recording step using that deployment.
+
+## Example Usage:
+
+### Running Tests In Headless Chrome Using Network Fixtures
+
+```
+test/functional/run.js --serve-deck \
+  --replay-fixtures \
+  --browser chrome
+  --headless
+```
+
+This will build and test the production version of Deck.
+
+### Recording a Network Fixture For a New Test
+
+First, move Gate off of its normal port. Assuming that you're using Halyard this
+can be achieved by opening `~/.hal/default/service-settings/gate.yml` and adding
+the following line:
 
 ```
 port: 18084
 ```
 
-3. Restart Gate:
+Second, restart Gate:
 
-```
+```bash
 hal deploy apply --service-names gate
 ```
 
-4. Record a fixture for a specific test:
+Third, run the test runner script. Supply the necessary port information for Gate
+and for the Gate imposter. Further, add webdriver.io's --spec flag to only
+execute the single test you want to record a fixture for.
 
-```
-$ ./node_modules/.bin/wdio wdio.conf.js --record-fixtures --spec test/functional/tests/core/home.spec.ts
-
-DEPRECATION: Setting specFilter directly on Env is deprecated, please use the specFilter option in `configure`
-DEPRECATION: Setting stopOnSpecFailure directly is deprecated, please use the failFast option in `configure`
-․wrote fixture to ~/dev/spinnaker/deck/test/functional/tests/core/home.spec.ts.mountebank_fixture.json
-
-
-1 passing (5.60s)
-```
-
-5. Kill the Gate process. On Mac this would go something like:
-
-```
-kill -15 $(lsof -t -i tcp:18084)
+```bash
+test/functional/run.js \
+  --serve-deck \
+  --record-fixtures \
+  --gate-port 18084 \
+  --imposter-port 8084 \
+  -- --spec path/to/test.spec.ts
 ```
 
-6. Run the test again without Gate running, instructing the test runner to create a network imposter:
+After this test has run successfully a fixture will have been written to the
+following location:
 
 ```
-$ ./node_modules/.bin/wdio wdio.conf.js --replay-fixtures --spec test/functional/tests/core/home.spec.ts
-
-DEPRECATION: Setting specFilter directly on Env is deprecated, please use the specFilter option in `configure`
-DEPRECATION: Setting stopOnSpecFailure directly is deprecated, please use the failFast option in `configure`
-Creating imposter from fixture file ~/dev/spinnaker/deck/test/functional/tests/core/home.spec.ts.mountebank_fixture.json
-․
-
-1 passing (6.00s)
+path/to/test.spec.ts.mountebank_fixture.json
 ```
 
-The mountebank server will still be running on port 2525 but can easily be exited by calling:
-
-```
-kill -15 $(lsof -t -i tcp:2525)
-```
+Review the fixture to ensure that no sensitive information has been captured
+during the recording.

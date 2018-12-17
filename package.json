@@ -26,7 +26,7 @@
     "int": "protractor protractor.conf.js",
     "precommit": "pretty-quick --staged",
     "modules": "./gradle/buildModules.sh",
-    "functional": "wdio wdio.conf.js"
+    "functional": "test/functional/run.js --serve-deck --replay-fixtures --browser chrome --headless"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.4.1",
@@ -188,6 +188,7 @@
     "typescript": "^3.0.1",
     "uglifyjs-webpack-plugin": "^1.2.4",
     "url-loader": "^1.0.1",
+    "wait-on": "^3.2.0",
     "wdio-dot-reporter": "^0.0.10",
     "wdio-jasmine-framework": "^0.3.8",
     "wdio-selenium-standalone-service": "^0.0.12",
