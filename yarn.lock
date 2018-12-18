@@ -3039,10 +3039,10 @@ cache-base@^1.0.1:
     union-value "^1.0.0"
     unset-value "^1.0.0"
 
-cache-loader@^1.2.2:
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/cache-loader/-/cache-loader-1.2.2.tgz#6d5c38ded959a09cc5d58190ab5af6f73bd353f5"
-  integrity sha512-rsGh4SIYyB9glU+d0OcHwiXHXBoUgDhHZaQ1KAbiXqfz1CDPxtTboh1gPbJ0q2qdO8a9lfcjgC5CJ2Ms32y5bw==
+cache-loader@^1.2.5:
+  version "1.2.5"
+  resolved "https://registry.yarnpkg.com/cache-loader/-/cache-loader-1.2.5.tgz#9ab15b0ae5f546f376083a695fc1a75f546cb266"
+  integrity sha512-enWKEQ4kO3YreDFd7AtVRjtJBmNiqh/X9hVDReu0C4qm8gsGmySkwuWtdc+N5O+vq5FzxL1mIZc30NyXCB7o/Q==
   dependencies:
     loader-utils "^1.1.0"
     mkdirp "^0.5.1"
