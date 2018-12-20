@@ -520,10 +520,10 @@
   dependencies:
     moment ">=2.14.0"
 
-"@types/node@*", "@types/node@7.0.5":
-  version "7.0.5"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-7.0.5.tgz#96a0f0a618b7b606f1ec547403c00650210bfbb7"
-  integrity sha1-lqDwphi3tgbx7FR0A8AGUCEL+7c=
+"@types/node@*", "@types/node@10.12.18":
+  version "10.12.18"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.12.18.tgz#1d3ca764718915584fcd9f6344621b7672665c67"
+  integrity sha512-fh+pAqt4xRzPfqA6eh3Z2y6fyZavRIumvjhaCL753+TVkGKGhpPeyrJG2JftD0T9q4GF00KjefsQ+PQNDdWQaQ==
 
 "@types/plotly.js@^1.28.12":
   version "1.35.0"
