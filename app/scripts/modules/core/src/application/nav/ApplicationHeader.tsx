@@ -10,6 +10,7 @@ import { ThirdLevelNavigation } from './ThirdLevelNavigation';
 import { ApplicationDataSource } from '../service/applicationDataSource';
 import { ReactInjector } from 'core/reactShims';
 import { ApplicationIcon } from '../ApplicationIcon';
+import { ApplicationNameWrapper } from '../ApplicationNameWrapper';
 
 import './applicationNav.component.less';
 
@@ -133,7 +134,7 @@ export class ApplicationHeader extends React.Component<IApplicationHeaderProps, 
           <ApplicationIcon app={app} />
         </span>
         <span className="horizontal middle wrap">
-          <span className="application-name">{app.name}</span>
+          <ApplicationNameWrapper app={app} />
           <ApplicationRefresher app={app} />
         </span>
       </h2>
