@@ -129,7 +129,7 @@
     "angulartics-google-analytics": "^0.2.0",
     "autoprefixer": "^7.1.2",
     "babel-core": "^6.21.1",
-    "babel-loader": "^7.1.4",
+    "babel-loader": "^7.1.5",
     "babel-plugin-angularjs-annotate": "^0.8.2",
     "cache-loader": "^1.2.2",
     "copy-webpack-plugin": "4.5.1",
