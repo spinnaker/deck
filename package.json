@@ -131,7 +131,7 @@
     "babel-core": "^6.21.1",
     "babel-loader": "^7.1.4",
     "babel-plugin-angularjs-annotate": "^0.8.2",
-    "cache-loader": "^1.2.2",
+    "cache-loader": "^1.2.4",
     "copy-webpack-plugin": "4.5.1",
     "css-loader": "^0.28.11",
     "cssnano": "^3.10.0",
