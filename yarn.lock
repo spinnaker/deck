@@ -4775,11 +4775,6 @@ deep-extend@^0.6.0:
   resolved "https://registry.yarnpkg.com/deep-extend/-/deep-extend-0.6.0.tgz#c4fa7c95404a17a9c3e8ca7e1537312b736330ac"
   integrity sha512-LOHxIOaPYdHlJRtCQfDIVZtfw/ufM8+rVj649RIHzcm/vGwQRXFt6OPqIFWsm2XEMrNIEtWR64sY1LEKD2vAOA==
 
-deep-extend@~0.4.0:
-  version "0.4.1"
-  resolved "https://registry.yarnpkg.com/deep-extend/-/deep-extend-0.4.1.tgz#efe4113d08085f4e6f9687759810f807469e2253"
-  integrity sha1-7+QRPQgIX05vlod1mBD4B0aeIlM=
-
 deep-is@~0.1.3:
   version "0.1.3"
   resolved "https://registry.yarnpkg.com/deep-is/-/deep-is-0.1.3.tgz#b369d6fb5dbc13eecf524f91b070feedc357cf34"
@@ -9342,10 +9337,10 @@ js-tokens@^3.0.0, js-tokens@^3.0.2:
   resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-4.0.0.tgz#19203fb59991df98e3a287050d4647cdeaf32499"
   integrity sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==
 
-js-worker-search@^1.2.1:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/js-worker-search/-/js-worker-search-1.2.1.tgz#c3a8b826ef90d1ed40ed4d202c992e182e370a6f"
-  integrity sha512-lhnQaU4BDJYXhzeVMiuM15PLz+ukg4+3BwijBX3GEwbTiC6fq5peCYa+GGYgzmGJaluuNBpeQgXOVT9qOXe7oA==
+js-worker-search@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/js-worker-search/-/js-worker-search-1.4.0.tgz#504f06cca63591be743a5e9a52e3544cb09ac7d4"
+  integrity sha512-xhRydfK5+/wBifybewZQQSG/2YWp/jghKiUJxyrMcoRsy3bhoeRY6cJH6FajqQAlaDLqnTYXkTK8TH15qNTsuw==
   dependencies:
     flow-bin "^0.50.0"
     uuid "^2.0.1"
@@ -13368,17 +13363,7 @@ raw-body@~2.2.0:
     iconv-lite "0.4.15"
     unpipe "1.0.0"
 
-rc@^1.1.7:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/rc/-/rc-1.2.1.tgz#2e03e8e42ee450b8cb3dce65be1bf8974e1dfd95"
-  integrity sha1-LgPo5C7kULjLPc5lvhv4l04d/ZU=
-  dependencies:
-    deep-extend "~0.4.0"
-    ini "~1.3.0"
-    minimist "^1.2.0"
-    strip-json-comments "~2.0.1"
-
-rc@^1.2.7:
+rc@^1.1.7, rc@^1.2.7:
   version "1.2.8"
   resolved "https://registry.yarnpkg.com/rc/-/rc-1.2.8.tgz#cd924bf5200a075b83c188cd6b9e211b7fc0d3ed"
   integrity sha512-y3bGgqKj3QBdxLbLkomlohkvsA8gdAiUQlSBJnBhfn+BPxg4bc62d8TcBW15wavDfgexCgccckhcZvywyQYPOw==
