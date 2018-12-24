@@ -1035,6 +1035,15 @@ angular-ui-sortable@^0.17.0:
   resolved "https://registry.yarnpkg.com/angular-ui-sortable/-/angular-ui-sortable-0.17.1.tgz#5d41aa911c5045e2080e11a7ca93659c29cb66b8"
   integrity sha1-XUGqkRxQReIIDhGnypNlnCnLZrg=
 
+angular-ui-sortable@^0.19.0:
+  version "0.19.0"
+  resolved "https://registry.yarnpkg.com/angular-ui-sortable/-/angular-ui-sortable-0.19.0.tgz#4ac4391fc4d4de57110db4b5d31a7c198d314fd0"
+  integrity sha512-u/uc981Nzg4XN1bMU9qKleMTSt7F1XjMWnyGw6gxPLIeQeLZm8jWNy7tj8y2r2HmvzXFbQVq2z6rObznFKAekQ==
+  dependencies:
+    angular ">=1.2.x"
+    jquery ">=3.1.x"
+    jquery-ui-dist ">=1.12.x"
+
 angular2react@^3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/angular2react/-/angular2react-3.0.2.tgz#1249e21446975dc82c0e4da8ed09c0cd45810a25"
@@ -1043,20 +1052,15 @@ angular2react@^3.0.2:
     lodash.kebabcase "^4.1.1"
     ngimport "^1.0.0"
 
-angular@1.6.10:
+angular@1.6.10, angular@~1.6.3:
   version "1.6.10"
   resolved "https://registry.yarnpkg.com/angular/-/angular-1.6.10.tgz#eed3080a34d29d0f681ff119b18ce294e3f74826"
   integrity sha512-PCZ5/hVdvPQiYyH0VwsPjrErPHRcITnaXxhksceOXgtJeesKHLA7KDu4X/yvcAi+1zdGgGF+9pDxkJvghXI9Wg==
 
-angular@>=1.5:
-  version "1.6.9"
-  resolved "https://registry.yarnpkg.com/angular/-/angular-1.6.9.tgz#bc812932e18909038412d594a5990f4bb66c0619"
-  integrity sha512-6igWH2GIsxV+J38wNWCh8oyjaZsrIPIDO35twloIUyjlF2Yit6UyLAWujHP05ma/LFxTsx4NtYibRoMNBXPR1A==
-
-angular@>=1.5.0, angular@^1.4.0, angular@~1.6.3:
-  version "1.6.4"
-  resolved "https://registry.yarnpkg.com/angular/-/angular-1.6.4.tgz#03b7b15c01a0802d7e2cf593240e604054dc77fb"
-  integrity sha1-A7exXAGggC1+LPWTJA5gQFTcd/s=
+angular@>=1.2.x, angular@>=1.5, angular@>=1.5.0, angular@^1.4.0:
+  version "1.7.5"
+  resolved "https://registry.yarnpkg.com/angular/-/angular-1.7.5.tgz#d1c1c01c6f5dc835638f3f9aa51012857bdac49e"
+  integrity sha512-760183yxtGzni740IBTieNuWLtPNAoMqvmC0Z62UoU0I3nqk+VJuO3JbQAXOyvo3Oy/ZsdNQwrSTh/B0OQZjNw==
 
 angulartics-google-analytics@^0.2.0:
   version "0.2.1"
@@ -9317,12 +9321,17 @@ jquery-textcomplete@1.6.1:
   resolved "https://registry.yarnpkg.com/jquery-textcomplete/-/jquery-textcomplete-1.6.1.tgz#ca5ddecf5ea5370bb400380dc79785b35afbad17"
   integrity sha1-yl3ez16lNwu0ADgNx5eFs1r7rRc=
 
+jquery-ui-dist@>=1.12.x:
+  version "1.12.1"
+  resolved "https://registry.yarnpkg.com/jquery-ui-dist/-/jquery-ui-dist-1.12.1.tgz#5c0815d3cc6f90ff5faaf5b268a6e23b4ca904fa"
+  integrity sha1-XAgV08xvkP9fqvWyaKbiO0ypBPo=
+
 jquery-ui@1.12.0:
   version "1.12.0"
   resolved "https://registry.yarnpkg.com/jquery-ui/-/jquery-ui-1.12.0.tgz#59c6037a2d9c57e9a2521a9b7a497116d41b4246"
   integrity sha1-WcYDei2cV+miUhqbeklxFtQbQkY=
 
-jquery@3.3.1:
+jquery@3.3.1, jquery@>=3.1.x:
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.3.1.tgz#958ce29e81c9790f31be7792df5d4d95fc57fbca"
   integrity sha512-Ubldcmxp5np52/ENotGxlLe6aGMvmF4R8S6tZjsP6Knsaxd/xp3Zrh50cG93lR6nPXyUFwzN3ZSOQI0wRJNdGg==
