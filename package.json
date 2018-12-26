@@ -95,7 +95,7 @@
   },
   "devDependencies": {
     "@types/angular": "1.6.26",
-    "@types/angular-mocks": "1.5.10",
+    "@types/angular-mocks": "1.7.0",
     "@types/angular-ui-bootstrap": "^0.13.41",
     "@types/classnames": "^2.2.0",
     "@types/clipboard": "^1.5.33",
