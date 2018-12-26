@@ -1043,25 +1043,15 @@ angular2react@^3.0.2:
     lodash.kebabcase "^4.1.1"
     ngimport "^1.0.0"
 
-angular@1.6.10:
+angular@1.6.10, angular@>=1.5, angular@>=1.5.0, angular@^1.4.0, angular@~1.6.3:
   version "1.6.10"
   resolved "https://registry.yarnpkg.com/angular/-/angular-1.6.10.tgz#eed3080a34d29d0f681ff119b18ce294e3f74826"
   integrity sha512-PCZ5/hVdvPQiYyH0VwsPjrErPHRcITnaXxhksceOXgtJeesKHLA7KDu4X/yvcAi+1zdGgGF+9pDxkJvghXI9Wg==
 
-angular@>=1.5:
-  version "1.6.9"
-  resolved "https://registry.yarnpkg.com/angular/-/angular-1.6.9.tgz#bc812932e18909038412d594a5990f4bb66c0619"
-  integrity sha512-6igWH2GIsxV+J38wNWCh8oyjaZsrIPIDO35twloIUyjlF2Yit6UyLAWujHP05ma/LFxTsx4NtYibRoMNBXPR1A==
-
-angular@>=1.5.0, angular@^1.4.0, angular@~1.6.3:
-  version "1.6.4"
-  resolved "https://registry.yarnpkg.com/angular/-/angular-1.6.4.tgz#03b7b15c01a0802d7e2cf593240e604054dc77fb"
-  integrity sha1-A7exXAGggC1+LPWTJA5gQFTcd/s=
-
-angulartics-google-analytics@^0.2.0:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/angulartics-google-analytics/-/angulartics-google-analytics-0.2.1.tgz#85c841e35bbb6a2d5a3d10a17cdb71b2f2ca14bc"
-  integrity sha1-hchB41u7ai1aPRChfNtxsvLKFLw=
+angulartics-google-analytics@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/angulartics-google-analytics/-/angulartics-google-analytics-0.5.0.tgz#29439b60b3bf1bc129d2662049c0c2d0d4c98fab"
+  integrity sha512-5kj0WjwbY/tPX5igzBIQm0DhVS+2Dud52UGbC9T/+X1ZvmhwtV7zuc8m7+KwixFra3iq5csVjK23gr3k83/lpg==
 
 angulartics@^1.1.2:
   version "1.4.0"
