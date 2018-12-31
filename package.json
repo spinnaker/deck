@@ -102,7 +102,7 @@
     "@types/commonmark": "^0.27.0",
     "@types/d3": "^5.0.0",
     "@types/dompurify": "^0.0.29",
-    "@types/enzyme": "^3.1.10",
+    "@types/enzyme": "^3.1.15",
     "@types/jasmine": "2.5.47",
     "@types/jquery": "^2.0.34",
     "@types/jqueryui": "^1.11.32",
