@@ -39,7 +39,7 @@
     "@uirouter/visualizer": "6.0.2",
     "Select2": "git://github.com/select2/select2.git#3.4.8",
     "angular": "1.6.10",
-    "angular-cron-gen": "0.0.21",
+    "angular-cron-gen": "0.0.26",
     "angular-messages": "1.6.10",
     "angular-sanitize": "1.6.10",
     "angular-spinner": "^1.0.1",
