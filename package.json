@@ -159,7 +159,7 @@
     "karma-sourcemap-loader": "=0.3.7",
     "karma-super-dots-reporter": "^0.2.0",
     "karma-webpack": "=2.0.13",
-    "less": "^2.7.2",
+    "less": "^3.9.0",
     "less-loader": "4.1.0",
     "loader-utils": "^1.1.0",
     "md5": "^2.2.1",
