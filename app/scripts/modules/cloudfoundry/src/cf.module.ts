@@ -60,8 +60,8 @@ module(CLOUD_FOUNDRY_MODULE, [
     },
     loadBalancer: {
       transformer: 'cfLoadBalancerTransformer',
-      detailsTemplateUrl: require('./loadBalancer/details/loadBalancer.details.html'),
-      detailsController: 'cfLoadBalancerDetailsCtrl',
+      detailsTemplateUrl: require('./loadBalancer/details/cloudFoundryLoadBalancerDetails.html'),
+      detailsController: 'cloudfoundryLoadBalancerDetailsCtrl',
       CreateLoadBalancerModal: CloudFoundryNoLoadBalancerModal,
     },
     serverGroup: {
