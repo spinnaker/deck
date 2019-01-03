@@ -131,6 +131,7 @@ module.exports = angular
 
     this.triggerUpdated = trigger => {
       let command = this.command;
+      command.triggerInvalid = false;
 
       if (trigger !== undefined) {
         command.trigger = trigger;
