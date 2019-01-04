@@ -123,7 +123,7 @@
     "@types/request-promise-native": "^1.0.15",
     "@types/webdriverio": "^4.13.0",
     "@types/webpack": "4.1.0",
-    "@types/webpack-env": "^1.13.5",
+    "@types/webpack-env": "^1.13.6",
     "angular-mocks": "1.6.10",
     "angulartics": "^1.1.2",
     "angulartics-google-analytics": "^0.2.0",
