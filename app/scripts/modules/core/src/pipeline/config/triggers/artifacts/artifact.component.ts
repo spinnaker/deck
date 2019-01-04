@@ -62,8 +62,9 @@ class ArtifactCtrl implements IController {
   public $onInit(): void {
     // Explicitly watch the artifact's kind so that external changes to it are correctly
     // reflected in the ui-select and artifact's editable form.
-    this.$scope.$watch(() => this.artifact.kind, () => this.loadArtifactKind());
-    this.loadArtifactKind();
+    this.setArtifactKind();
+    this.refreshArtifactKindConfig();
+    this.$scope.$watch(() => this.artifact.kind, () => this.refreshArtifactKindConfig());
     AccountService.getArtifactAccounts().then(accounts => {
       this.artifactAccounts = accounts;
     });
@@ -82,8 +83,12 @@ class ArtifactCtrl implements IController {
     return options.sort((a, b) => a.label.localeCompare(b.label));
   }
 
-  public loadArtifactKind(): void {
-    const kind = ExpectedArtifactService.getKind(this.artifact) || 'custom';
+  public setArtifactKind(): void {
+    this.artifact.kind = ExpectedArtifactService.getKind(this.artifact) || 'custom';
+  }
+
+  public refreshArtifactKindConfig(): void {
+    const kind = this.artifact.kind;
     if (!kind) {
       return;
     }
