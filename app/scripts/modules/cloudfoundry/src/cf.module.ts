@@ -10,7 +10,16 @@ import { SERVER_GROUP_DETAILS_MODULE } from './serverGroup/details/serverGroupDe
 import { CLOUD_FOUNDRY_SEARCH_FORMATTER } from './search/searchResultFormatter';
 import './help/cloudfoundry.help';
 
-import { CloudFoundryInfoDetailsSection } from 'cloudfoundry/serverGroup';
+import {
+  ServerGroupInformationSection,
+  ApplicationManagerSection,
+  MetricsSection,
+  ServerGroupSizingSection,
+  HealthCheckSection,
+  PackageSection,
+  BoundServicesSection,
+  EvironmentVariablesSection,
+} from 'cloudfoundry/serverGroup';
 import { CloudFoundryServerGroupActions } from './serverGroup/details/cloudFoundryServerGroupActions';
 import { cfServerGroupDetailsGetter } from './serverGroup/details/cfServerGroupDetailsGetter';
 
@@ -19,7 +28,7 @@ import { CloudFoundryNoLoadBalancerModal } from './loadBalancer/configure/cloudF
 import 'cloudfoundry/pipeline/config/validation/instanceSize.validator';
 import 'cloudfoundry/pipeline/config/validation/cfTargetImpedance.validator';
 import 'cloudfoundry/pipeline/config/validation/validServiceParameterJson.validator';
-import 'cloudfoundry/pipeline/config/validation/validateManifestRequiredField.validator.ts';
+import 'cloudfoundry/pipeline/config/validation/validateServiceRequiredField.validator.ts';
 import { CLOUD_FOUNDRY_DEPLOY_SERVICE_STAGE } from './pipeline/stages/deployService/cloudfoundryDeployServiceStage.module';
 import { CLOUD_FOUNDRY_DESTROY_ASG_STAGE } from './pipeline/stages/destroyAsg/cloudfoundryDestroyAsgStage.module';
 import { CLOUD_FOUNDRY_DESTROY_SERVICE_STAGE } from './pipeline/stages/destroyService/cloudfoundryDestroyServiceStage.module';
@@ -60,8 +69,8 @@ module(CLOUD_FOUNDRY_MODULE, [
     },
     loadBalancer: {
       transformer: 'cfLoadBalancerTransformer',
-      detailsTemplateUrl: require('./loadBalancer/details/loadBalancer.details.html'),
-      detailsController: 'cfLoadBalancerDetailsCtrl',
+      detailsTemplateUrl: require('./loadBalancer/details/cloudFoundryLoadBalancerDetails.html'),
+      detailsController: 'cloudfoundryLoadBalancerDetailsCtrl',
       CreateLoadBalancerModal: CloudFoundryNoLoadBalancerModal,
     },
     serverGroup: {
@@ -69,7 +78,16 @@ module(CLOUD_FOUNDRY_MODULE, [
       transformer: 'cfServerGroupTransformer',
       detailsActions: CloudFoundryServerGroupActions,
       detailsGetter: cfServerGroupDetailsGetter,
-      detailsSections: [CloudFoundryInfoDetailsSection],
+      detailsSections: [
+        ServerGroupInformationSection,
+        ApplicationManagerSection,
+        MetricsSection,
+        ServerGroupSizingSection,
+        HealthCheckSection,
+        PackageSection,
+        BoundServicesSection,
+        EvironmentVariablesSection,
+      ],
       CloneServerGroupModal: CloudFoundryCreateServerGroupModal,
       commandBuilder: 'cfServerGroupCommandBuilder',
       scalingActivitiesEnabled: false, // FIXME enable?
