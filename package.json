@@ -125,7 +125,7 @@
     "@types/webpack": "4.1.0",
     "@types/webpack-env": "^1.13.5",
     "angular-mocks": "1.6.10",
-    "angulartics": "^1.1.2",
+    "angulartics": "^1.6.0",
     "angulartics-google-analytics": "^0.2.0",
     "autoprefixer": "^7.1.2",
     "babel-core": "^6.21.1",
