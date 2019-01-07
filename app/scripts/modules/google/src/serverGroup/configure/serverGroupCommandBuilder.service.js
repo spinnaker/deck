@@ -3,7 +3,7 @@
 const angular = require('angular');
 import _ from 'lodash';
 
-import { AccountService, ExpectedArtifactService, INSTANCE_TYPE_SERVICE, NameUtils } from '@spinnaker/core';
+import { AccountService, ExpectedArtifactService, INSTANCE_TYPE_SERVICE } from '@spinnaker/core';
 import { GCEProviderSettings } from 'google/gce.settings';
 
 module.exports = angular
@@ -379,14 +379,14 @@ module.exports = angular
 
       function buildServerGroupCommandFromExisting(application, serverGroup, mode) {
         mode = mode || 'clone';
-        const serverGroupName = NameUtils.parseServerGroupName(serverGroup.name);
+        const moniker = serverGroup.moniker;
 
         const command = {
           application: application.name,
           autoscalingPolicy: _.cloneDeep(serverGroup.autoscalingPolicy),
           strategy: '',
-          stack: serverGroupName.stack,
-          freeFormDetails: serverGroupName.freeFormDetails,
+          stack: moniker.stack,
+          freeFormDetails: moniker.detail,
           credentials: serverGroup.account,
           loadBalancers: extractLoadBalancers(serverGroup.asg),
           loadBalancingPolicy: _.cloneDeep(serverGroup.loadBalancingPolicy),
