@@ -2,7 +2,6 @@ import { module } from 'angular';
 
 import { CloudProviderRegistry } from '@spinnaker/core';
 
-import { CLOUD_FOUNDRY_INSTANCE_DETAILS_CTRL } from './instance/details/details.controller';
 import { CLOUD_FOUNDRY_LOAD_BALANCER_MODULE } from './loadBalancer/loadBalancer.module';
 import { CLOUD_FOUNDRY_REACT_MODULE } from './reactShims/cf.react.module';
 import { CLOUD_FOUNDRY_SERVER_GROUP_TRANSFORMER } from './serverGroup/serverGroup.transformer';
@@ -11,7 +10,16 @@ import { SERVER_GROUP_DETAILS_MODULE } from './serverGroup/details/serverGroupDe
 import { CLOUD_FOUNDRY_SEARCH_FORMATTER } from './search/searchResultFormatter';
 import './help/cloudfoundry.help';
 
-import { CloudFoundryInfoDetailsSection } from 'cloudfoundry/serverGroup';
+import {
+  ServerGroupInformationSection,
+  ApplicationManagerSection,
+  MetricsSection,
+  ServerGroupSizingSection,
+  HealthCheckSection,
+  PackageSection,
+  BoundServicesSection,
+  EvironmentVariablesSection,
+} from 'cloudfoundry/serverGroup';
 import { CloudFoundryServerGroupActions } from './serverGroup/details/cloudFoundryServerGroupActions';
 import { cfServerGroupDetailsGetter } from './serverGroup/details/cfServerGroupDetailsGetter';
 
@@ -20,7 +28,7 @@ import { CloudFoundryNoLoadBalancerModal } from './loadBalancer/configure/cloudF
 import 'cloudfoundry/pipeline/config/validation/instanceSize.validator';
 import 'cloudfoundry/pipeline/config/validation/cfTargetImpedance.validator';
 import 'cloudfoundry/pipeline/config/validation/validServiceParameterJson.validator';
-import 'cloudfoundry/pipeline/config/validation/validateManifestRequiredField.validator.ts';
+import 'cloudfoundry/pipeline/config/validation/validateServiceRequiredField.validator.ts';
 import { CLOUD_FOUNDRY_DEPLOY_SERVICE_STAGE } from './pipeline/stages/deployService/cloudfoundryDeployServiceStage.module';
 import { CLOUD_FOUNDRY_DESTROY_ASG_STAGE } from './pipeline/stages/destroyAsg/cloudfoundryDestroyAsgStage.module';
 import { CLOUD_FOUNDRY_DESTROY_SERVICE_STAGE } from './pipeline/stages/destroyService/cloudfoundryDestroyServiceStage.module';
@@ -29,6 +37,7 @@ import { CLOUD_FOUNDRY_ENABLE_ASG_STAGE } from './pipeline/stages/enableAsg/clou
 import { CLOUD_FOUNDRY_RESIZE_ASG_STAGE } from './pipeline/stages/resizeAsg/cloudfoundryResizeAsgStage.module';
 import { CLOUD_FOUNDRY_ROLLBACK_CLUSTER_STAGE } from './pipeline/stages/rollbackCluster/cloudfoundryRollbackClusterStage.module';
 import { CloudFoundryCreateServerGroupModal } from 'cloudfoundry/serverGroup/configure/wizard/CreateServerGroupModal';
+import { CLOUD_FOUNDRY_INSTANCE_DETAILS } from 'cloudfoundry/instance/details/cloudfoundryInstanceDetails.module';
 
 // load all templates into the $templateCache
 const templates = require.context('./', true, /\.html$/);
@@ -43,7 +52,7 @@ module(CLOUD_FOUNDRY_MODULE, [
   CLOUD_FOUNDRY_DESTROY_ASG_STAGE,
   CLOUD_FOUNDRY_DISABLE_ASG_STAGE,
   CLOUD_FOUNDRY_ENABLE_ASG_STAGE,
-  CLOUD_FOUNDRY_INSTANCE_DETAILS_CTRL,
+  CLOUD_FOUNDRY_INSTANCE_DETAILS,
   CLOUD_FOUNDRY_LOAD_BALANCER_MODULE,
   CLOUD_FOUNDRY_REACT_MODULE,
   CLOUD_FOUNDRY_RESIZE_ASG_STAGE,
@@ -60,8 +69,8 @@ module(CLOUD_FOUNDRY_MODULE, [
     },
     loadBalancer: {
       transformer: 'cfLoadBalancerTransformer',
-      detailsTemplateUrl: require('./loadBalancer/details/loadBalancer.details.html'),
-      detailsController: 'cfLoadBalancerDetailsCtrl',
+      detailsTemplateUrl: require('./loadBalancer/details/cloudFoundryLoadBalancerDetails.html'),
+      detailsController: 'cloudfoundryLoadBalancerDetailsCtrl',
       CreateLoadBalancerModal: CloudFoundryNoLoadBalancerModal,
     },
     serverGroup: {
@@ -69,7 +78,16 @@ module(CLOUD_FOUNDRY_MODULE, [
       transformer: 'cfServerGroupTransformer',
       detailsActions: CloudFoundryServerGroupActions,
       detailsGetter: cfServerGroupDetailsGetter,
-      detailsSections: [CloudFoundryInfoDetailsSection],
+      detailsSections: [
+        ServerGroupInformationSection,
+        ApplicationManagerSection,
+        MetricsSection,
+        ServerGroupSizingSection,
+        HealthCheckSection,
+        PackageSection,
+        BoundServicesSection,
+        EvironmentVariablesSection,
+      ],
       CloneServerGroupModal: CloudFoundryCreateServerGroupModal,
       commandBuilder: 'cfServerGroupCommandBuilder',
       scalingActivitiesEnabled: false, // FIXME enable?
@@ -78,8 +96,8 @@ module(CLOUD_FOUNDRY_MODULE, [
       resultFormatter: 'cfSearchResultFormatter',
     },
     instance: {
-      detailsTemplateUrl: require('./instance/details/details.html'),
-      detailsController: 'cloudfoundryInstanceDetailsCtrl',
+      detailsTemplateUrl: require('./instance/details/cloudFoundryInstanceDetails.html'),
+      detailsController: 'cfInstanceDetailsCtrl',
     },
   });
 });
