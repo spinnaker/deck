@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { IPromise } from 'angular';
-import { filter, get, isEqual, map, uniq } from 'lodash';
-import { FormikErrors } from 'formik';
+import { get, isEqual, uniq, partition } from 'lodash';
 import VirtualizedSelect from 'react-virtualized-select';
 import { Observable, Subject } from 'rxjs';
 
@@ -55,92 +54,46 @@ class SecurityGroupsImpl extends React.Component<ISecurityGroupsProps, ISecurity
   }
 
   public validate() {
-    return {} as FormikErrors<IAmazonLoadBalancerUpsertCommand>;
+    const { removed } = this.state;
+    if (removed && removed.length) {
+      const label = FirewallLabels.get('Firewalls');
+      return { securityGroupsRemoved: `${label} removed: ${removed.join(', ')}` };
+    }
+    return {};
   }
 
   private clearRemoved = (): void => {
-    this.props.dirtyCallback(SecurityGroups.label, false);
-    this.setState({ removed: [] });
+    this.setState({ removed: [] }, () => this.props.formik.validateForm());
   };
 
   private preloadSecurityGroups(): IPromise<ISecurityGroupsByAccountSourceData> {
     return ReactInjector.securityGroupReader.getAllSecurityGroups().then(securityGroups => {
-      this.setState({
-        loaded: true,
-      });
+      this.setState({ loaded: true });
       return securityGroups;
     });
   }
 
-  private availableGroupsSorter(a: ISecurityGroup, b: ISecurityGroup): number {
-    const { securityGroups } = this.props.formik.values;
-    const { defaultSecurityGroups } = this.state;
-
-    if (defaultSecurityGroups) {
-      if (defaultSecurityGroups.includes(a.name)) {
-        return -1;
-      }
-      if (defaultSecurityGroups.includes(b.name)) {
-        return 1;
-      }
-    }
-    return securityGroups.includes(a.id) ? -1 : securityGroups.includes(b.id) ? 1 : 0;
-  }
-
-  private updateAvailableSecurityGroups(
-    availableVpcIds: string[],
-    allSecurityGroups: ISecurityGroupsByAccountSourceData,
-  ): void {
+  private updateRemovedSecurityGroups(selectedGroups: string[], availableGroups: ISecurityGroup[]): void {
     const { isNew } = this.props;
-    const { credentials: account, region, securityGroups } = this.props.formik.values;
     const { defaultSecurityGroups, removed } = this.state;
 
-    const newRemoved = removed.slice();
+    const getDesiredGroupNames = (): string[] => {
+      const desired = selectedGroups.concat(removed).sort();
+      const defaults = isNew ? defaultSecurityGroups : [];
+      return uniq(defaults.concat(desired));
+    };
 
-    let availableSecurityGroups: Array<{ label: string; value: string }> = [];
+    const getAvailableSecurityGroup = (name: string) => availableGroups.find(sg => sg.name === name || sg.id === name);
 
-    if (
-      account &&
-      region &&
-      allSecurityGroups &&
-      allSecurityGroups[account] &&
-      allSecurityGroups[account].aws[region]
-    ) {
-      const regionalSecurityGroups = filter(allSecurityGroups[account].aws[region], securityGroup => {
-        return availableVpcIds.includes(securityGroup.vpcId);
-      }).sort((a, b) => this.availableGroupsSorter(a, b)); // push existing groups to top
-      const existingSecurityGroupNames = map(regionalSecurityGroups, 'name');
-      const existingNames = isNew
-        ? defaultSecurityGroups.filter(name => existingSecurityGroupNames.includes(name))
-        : [];
-      securityGroups.forEach(securityGroup => {
-        if (!existingSecurityGroupNames.includes(securityGroup)) {
-          const matches = filter(regionalSecurityGroups, { id: securityGroup });
-          if (matches.length) {
-            existingNames.push(matches[0].name);
-          } else {
-            if (!defaultSecurityGroups.includes(securityGroup)) {
-              newRemoved.push(securityGroup);
-            }
-          }
-        } else {
-          existingNames.push(securityGroup);
-        }
-      });
-      const updatedSecurityGroups = uniq(existingNames);
-      if (newRemoved.length) {
-        this.props.dirtyCallback(SecurityGroups.label, true);
-      }
+    // Organize selected security groups into available/not available
+    const [available, notAvailable] = partition(getDesiredGroupNames(), name => !!getAvailableSecurityGroup(name));
 
-      availableSecurityGroups = regionalSecurityGroups.map(sg => {
-        return { label: `${sg.name} (${sg.id})`, value: sg.name };
-      });
-
-      if (!isEqual(updatedSecurityGroups, securityGroups)) {
-        this.props.formik.setFieldValue('securityGroups', updatedSecurityGroups);
-      }
+    // Normalize available security groups from [name or id] to name
+    const securityGroups = available.map(name => getAvailableSecurityGroup(name).name);
+    if (!isEqual(selectedGroups, securityGroups)) {
+      this.props.formik.setFieldValue('securityGroups', securityGroups);
     }
-    this.setState({ availableSecurityGroups, removed: newRemoved });
+    this.setState({ removed: notAvailable }, () => this.props.formik.validateForm());
   }
 
   private refreshSecurityGroups = (): void => {
@@ -158,8 +111,15 @@ class SecurityGroupsImpl extends React.Component<ISecurityGroupsProps, ISecurity
 
         Observable.fromPromise(this.preloadSecurityGroups())
           .takeUntil(this.destroy$)
-          .subscribe(securityGroups => {
-            this.updateAvailableSecurityGroups([this.props.formik.values.vpcId], securityGroups);
+          .subscribe(allSecurityGroups => {
+            const { credentials: account, region, vpcId, securityGroups } = this.props.formik.values;
+            const forAccount = allSecurityGroups[account] || {};
+            const forRegion = (forAccount.aws && forAccount.aws[region]) || [];
+            const availableSecurityGroups = forRegion.filter(securityGroup => securityGroup.vpcId === vpcId).sort();
+            const makeOption = (sg: ISecurityGroup) => ({ label: `${sg.name} (${sg.id})`, value: sg.name });
+
+            this.setState({ availableSecurityGroups: availableSecurityGroups.map(makeOption) });
+            this.updateRemovedSecurityGroups(securityGroups, availableSecurityGroups);
           });
       });
   };
