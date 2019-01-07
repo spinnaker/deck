@@ -192,7 +192,7 @@
     "wdio-dot-reporter": "^0.0.10",
     "wdio-jasmine-framework": "^0.3.8",
     "wdio-selenium-standalone-service": "^0.0.12",
-    "webdriverio": "^4.14.1",
+    "webdriverio": "^5.2.3",
     "webpack": "4.1.1",
     "webpack-cli": "^2.0.12",
     "webpack-dev-server": "3.1.13",
