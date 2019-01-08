@@ -176,7 +176,7 @@
     "react-test-renderer": "16.3.2",
     "request-promise-native": "^1.0.5",
     "rimraf": "^2.5.4",
-    "style-loader": "^0.20.3",
+    "style-loader": "^0.23.1",
     "thread-loader": "^1.1.5",
     "ts-loader": "4.3.0",
     "ts-node": "^7.0.1",
