@@ -70,7 +70,7 @@
     "moment-timezone": "^0.4.0",
     "n3-charts": "^2.0.18",
     "ngimport": "^0.6.0",
-    "prop-types": "15.6.1",
+    "prop-types": "15.6.2",
     "react": "16.6.0",
     "react-ace": "^6.1.4",
     "react-bootstrap": "^0.32.1",
