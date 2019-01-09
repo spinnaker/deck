@@ -129,6 +129,9 @@ export class ExpectedArtifactEditor extends React.Component<
     const EditCmp = kind && kind.editCmp;
     return (
       <>
+        <StageConfigField label="Display Name" fieldColumns={fieldColumns} groupClassName={fieldGroupClassName}>
+          <input className="form-control input-sm" value={expectedArtifact.displayName} />
+        </StageConfigField>
         <StageConfigField label="Artifact Source" fieldColumns={fieldColumns} groupClassName={fieldGroupClassName}>
           <ExpectedArtifactSourceSelector sources={sources} selected={source} onChange={this.onSourceChange} />
         </StageConfigField>

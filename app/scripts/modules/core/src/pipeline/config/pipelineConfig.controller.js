@@ -1,6 +1,7 @@
 'use strict';
 
 import _ from 'lodash';
+import { hri as HumanReadableIds } from 'human-readable-ids';
 
 import { PipelineTemplateReader } from './templates/PipelineTemplateReader';
 
@@ -18,6 +19,15 @@ module.exports = angular
 
     this.initialize = () => {
       this.pipelineConfig = _.find(app.pipelineConfigs.data, { id: $stateParams.pipelineId });
+
+      if (this.pipelineConfig && this.pipelineConfig.expectedArtifacts) {
+        for (const artifact of this.pipelineConfig.expectedArtifacts) {
+          if (!artifact.displayName || artifact.displayName.length === 0) {
+            artifact.displayName = HumanReadableIds.random();
+          }
+        }
+      }
+
       if (this.pipelineConfig && this.pipelineConfig.type === 'templatedPipeline') {
         this.isTemplatedPipeline = true;
         this.hasDynamicSource = this.containsJinja(this.pipelineConfig.config.pipeline.template.source);
