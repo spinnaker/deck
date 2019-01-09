@@ -16,6 +16,7 @@ import { ENABLE_ASG_STAGE } from './config/stages/enableAsg/enableAsgStage';
 import { EXECUTION_WINDOWS_STAGE_MODULE } from './config/stages/executionWindows/executionWindowsStage.module';
 import { FIND_AMI_STAGE } from './config/stages/findAmi/findAmiStage';
 import { FIND_ARTIFACT_FROM_EXECUTION_STAGE } from './config/stages/findArtifactFromExecution/findArtifactFromExecutionStage';
+import { GREMLIN_STAGE } from './config/stages/gremlin/gremlinStage';
 import { GROUP_STAGE_MODULE } from './config/stages/group/groupStage.module';
 import { MANUAL_JUDGMENT_STAGE_MODULE } from './config/stages/manualJudgment/manualJudgmentStage.module';
 import { RESIZE_ASG_STAGE } from './config/stages/resizeAsg/resizeAsgStage';
@@ -81,6 +82,7 @@ module(PIPELINE_MODULE, [
   FIND_ARTIFACT_FROM_EXECUTION_STAGE,
   require('./config/stages/findImageFromTags/findImageFromTagsStage.module').name,
   require('./config/stages/jenkins/jenkinsStage.module').name,
+  GREMLIN_STAGE,
   MANUAL_JUDGMENT_STAGE_MODULE,
   require('./config/stages/tagImage/tagImageStage.module').name,
   require('./config/stages/pipeline/pipelineStage.module').name,
