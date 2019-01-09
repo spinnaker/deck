@@ -29,11 +29,27 @@ module.exports = angular
         { type: 'requiredField', fieldName: 'regions' },
         {
           type: 'stageOrTriggerBeforeType',
-          stageTypes: ['jenkins', 'travis'],
+          getStageTypes: () =>
+            _.uniq(
+              [].concat(
+                _.map(Registry.pipeline.getStageTypes().filter(x => x.providesVersionForBake), 'key'),
+                _.map(Registry.pipeline.getTriggerTypes().filter(x => x.providesVersionForBake), 'key'),
+              ),
+            ),
           checkParentTriggers: true,
-          message:
-            'Bake stages should always have a Jenkins/Travis stage or trigger preceding them.<br> Otherwise, ' +
-            'Spinnaker will bake and deploy the most-recently built package.',
+          getMessage: () =>
+            'Bake stages should always have a stage or trigger preceding them that provides version information: ' +
+            '<ul>' +
+            _.uniq(
+              [].concat(
+                _.map(Registry.pipeline.getStageTypes().filter(x => x.providesVersionForBake), 'label'),
+                _.map(Registry.pipeline.getTriggerTypes().filter(x => x.providesVersionForBake), 'label'),
+              ),
+            )
+              .map(x => `<li>${x}</li>`)
+              .join('') +
+            '</ul>' +
+            'Otherwise, Spinnaker will bake and deploy the most-recently built package.',
         },
       ],
       restartable: true,
