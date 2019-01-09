@@ -28,26 +28,12 @@ module.exports = angular
         { type: 'requiredField', fieldName: 'package' },
         { type: 'requiredField', fieldName: 'regions' },
         {
-          type: 'stageOrTriggerBeforeType',
-          getStageTypes: () =>
-            _.uniq(
-              [].concat(
-                _.map(Registry.pipeline.getStageTypes().filter(x => x.providesVersionForBake), 'key'),
-                _.map(Registry.pipeline.getTriggerTypes().filter(x => x.providesVersionForBake), 'key'),
-              ),
-            ),
+          type: 'upstreamVersionProvided',
           checkParentTriggers: true,
-          getMessage: () =>
+          getMessage: labels =>
             'Bake stages should always have a stage or trigger preceding them that provides version information: ' +
             '<ul>' +
-            _.uniq(
-              [].concat(
-                _.map(Registry.pipeline.getStageTypes().filter(x => x.providesVersionForBake), 'label'),
-                _.map(Registry.pipeline.getTriggerTypes().filter(x => x.providesVersionForBake), 'label'),
-              ),
-            )
-              .map(x => `<li>${x}</li>`)
-              .join('') +
+            labels.map(label => `<li>${label}</li>`).join('') +
             '</ul>' +
             'Otherwise, Spinnaker will bake and deploy the most-recently built package.',
         },
