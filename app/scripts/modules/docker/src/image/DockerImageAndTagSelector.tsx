@@ -239,28 +239,27 @@ export class DockerImageAndTagSelector extends React.Component<
 
   private updateThings(props: IDockerImageAndTagSelectorProps) {
     let { imageId, organization, registry, repository } = props;
-    const { account, showRegistry } = props;
 
-    organization =
-      !this.organizations.includes(organization) && organization && !organization.includes('${') ? '' : organization;
+    if (props.showRegistry) {
+      registry = this.registryMap[props.account];
+    }
 
-    if (showRegistry) {
-      registry = this.registryMap[account];
+    const organizationFound = !organization || this.organizations.includes(organization) || organization.includes('${');
+    if (!organizationFound) {
+      organization = '';
     }
 
     const repositories = this.getRepositoryList(this.organizationMap, organization, registry);
+    const repositoryFound = !repository || repository.includes('${') || repositories.includes(repository);
 
-    if (!repositories.includes(repository) && repository && !repository.includes('${')) {
+    if (!repositoryFound) {
       repository = '';
     }
 
     const { tag, tags } = this.getTags(props.tag, this.repositoryMap, repository);
+    const tagFound = tag !== props.tag;
 
-    if (!imageId || !imageId.includes('${')) {
-      this.synchronizeChanges({ organization, repository, tag, digest: this.props.digest }, registry);
-    }
-
-    this.setState({
+    const newState = {
       accountOptions: this.newAccounts.sort().map(a => ({ label: a, value: a })),
       organizationOptions: this.organizations
         .filter(o => o)
@@ -269,7 +268,15 @@ export class DockerImageAndTagSelector extends React.Component<
       imagesLoaded: true,
       repositoryOptions: repositories.sort().map(r => ({ label: r, value: r })),
       tagOptions: tags.sort().map(t => ({ label: t, value: t })),
-    });
+    } as IDockerImageAndTagSelectorState;
+
+    if (imageId && !this.state.imagesLoaded && (!organizationFound || !repositoryFound || !tagFound)) {
+      newState.defineManually = true;
+    } else if (!imageId || !imageId.includes('${')) {
+      this.synchronizeChanges({ organization, repository, tag, digest: this.props.digest }, registry);
+    }
+
+    this.setState(newState);
   }
 
   private initializeImages(props: IDockerImageAndTagSelectorProps) {
