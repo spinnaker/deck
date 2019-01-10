@@ -121,58 +121,61 @@ class LoadBalancerLocationImpl extends React.Component<ILoadBalancerLocationProp
     }
 
     const formValues$ = this.props$.map(props => props.formik.values);
-    const selectedAccount$ = formValues$.map(x => x.credentials).distinctUntilChanged();
-    const selectedRegion$ = formValues$.map(x => x.region).distinctUntilChanged();
-    const subnetPurpose$ = formValues$.map(x => x.subnetType).distinctUntilChanged();
-
     const appName$ = this.props$.map(props => props.app.name).distinctUntilChanged();
-    const stack$ = formValues$.map(x => x.stack).distinctUntilChanged();
-    const detail$ = formValues$.map(x => x.detail).distinctUntilChanged();
 
-    const accounts$ = Observable.fromPromise(AccountService.listAccounts('aws')).shareReplay(1);
+    const form = {
+      account$: formValues$.map(x => x.credentials).distinctUntilChanged(),
+      region$: formValues$.map(x => x.region).distinctUntilChanged(),
+      subnetPurpose$: formValues$.map(x => x.subnetType).distinctUntilChanged(),
+      stack$: formValues$.map(x => x.stack).distinctUntilChanged(),
+      detail$: formValues$.map(x => x.detail).distinctUntilChanged(),
+    };
 
-    const regions$ = Observable.combineLatest(selectedAccount$, accounts$) // wait for accounts to load and be cached
-      .switchMap(([selectedAccount, _accounts]) => AccountService.getRegionsForAccount(selectedAccount))
+    const allAccounts$ = Observable.fromPromise(AccountService.listAccounts('aws')).shareReplay(1);
+
+    // combineLatest with allAccounts to wait for accounts to load and be cached
+    const accountRegions$ = Observable.combineLatest(form.account$, allAccounts$)
+      .switchMap(([currentAccount, _allAccounts]) => AccountService.getRegionsForAccount(currentAccount))
       .shareReplay(1);
 
     const allLoadBalancers$ = this.props.app.getDataSource('loadBalancers').data$ as Observable<IAmazonLoadBalancer[]>;
-    const existingLoadBalancerNames$ = Observable.combineLatest(allLoadBalancers$, selectedAccount$, selectedRegion$)
-      .map(([allLoadBalancers, selectedAccount, selectedRegion]) => {
+    const regionLoadBalancers$ = Observable.combineLatest(allLoadBalancers$, form.account$, form.region$)
+      .map(([allLoadBalancers, currentAccount, currentRegion]) => {
         return allLoadBalancers
-          .filter(lb => lb.account === selectedAccount && lb.region === selectedRegion)
+          .filter(lb => lb.account === currentAccount && lb.region === currentRegion)
           .map(lb => lb.name);
       })
       .shareReplay(1);
 
-    const subnets$ = Observable.combineLatest(selectedAccount$, selectedRegion$)
-      .switchMap(([credentials, region]) => this.getAvailableSubnets(credentials, region))
+    const regionSubnets$ = Observable.combineLatest(form.account$, form.region$)
+      .switchMap(([currentAccount, currentRegion]) => this.getAvailableSubnets(currentAccount, currentRegion))
       .map(availableSubnets => this.makeSubnetOptions(availableSubnets))
       .shareReplay(1);
 
-    const subnet$ = Observable.combineLatest(subnets$, subnetPurpose$).map(
-      ([subnets, subnetPurpose]) => subnets && subnets.find(subnet => subnet.purpose === subnetPurpose),
+    const subnet$ = Observable.combineLatest(regionSubnets$, form.subnetPurpose$).map(
+      ([allSubnets, subnetPurpose]) => allSubnets && allSubnets.find(subnet => subnet.purpose === subnetPurpose),
     );
 
     // I don't understand why we use subnet.availabilityZones here, but region.availabilityZones below.
     const availabilityZones$ = subnet$.map(subnet => (subnet ? uniq(subnet.availabilityZones).sort() : []));
 
     // Update selected zones when the selected region changes
-    const regionZones$ = selectedRegion$
-      .withLatestFrom(regions$)
-      .map(([selectedRegion, regions]) => regions.find(region => region.name === selectedRegion))
+    const regionZones$ = form.region$
+      .withLatestFrom(accountRegions$)
+      .map(([currentRegion, accountRegions]) => accountRegions.find(region => region.name === currentRegion))
       .map(region => (region ? region.availabilityZones : []));
 
-    const moniker$ = Observable.combineLatest(appName$, stack$, detail$).map(([app, stack, detail]) => {
+    const moniker$ = Observable.combineLatest(appName$, form.stack$, form.detail$).map(([app, stack, detail]) => {
       return { app, stack, detail, cluster: NameUtils.getClusterName(app, stack, detail) } as IMoniker;
     });
 
-    regions$
-      .withLatestFrom(selectedRegion$)
+    accountRegions$
+      .withLatestFrom(form.region$)
       .takeUntil(this.destroy$)
-      .subscribe(([regions, selectedRegion]) => {
+      .subscribe(([accountRegions, selectedRegion]) => {
         // If the selected region doesn't exist in the new list of regions (for a new acct), select the first region.
-        if (!regions.some(region => region.name === selectedRegion)) {
-          this.props.formik.setFieldValue('region', regions[0] && regions[0].name);
+        if (!accountRegions.some(x => x.name === selectedRegion)) {
+          this.props.formik.setFieldValue('region', accountRegions[0] && accountRegions[0].name);
         }
       });
 
@@ -190,7 +193,7 @@ class LoadBalancerLocationImpl extends React.Component<ILoadBalancerLocationProp
       this.props.formik.setFieldValue('name', moniker.cluster);
     });
 
-    Observable.combineLatest(accounts$, regions$, availabilityZones$, existingLoadBalancerNames$, subnets$)
+    Observable.combineLatest(allAccounts$, accountRegions$, availabilityZones$, regionLoadBalancers$, regionSubnets$)
       .takeUntil(this.destroy$)
       .subscribe(([accounts, regions, availabilityZones, existingLoadBalancerNames, subnets]) => {
         return this.setState({ accounts, regions, availabilityZones, existingLoadBalancerNames, subnets });
