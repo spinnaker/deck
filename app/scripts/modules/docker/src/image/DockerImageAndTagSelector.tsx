@@ -38,6 +38,7 @@ export interface IDockerImageAndTagSelectorProps {
 
 export interface IDockerImageAndTagSelectorState {
   accountOptions: Array<Option<string>>;
+  switchedManualWarning: string;
   imagesLoaded: boolean;
   imagesLoading: boolean;
   organizationOptions: Array<Option<string>>;
@@ -88,6 +89,7 @@ export class DockerImageAndTagSelector extends React.Component<
 
     this.state = {
       accountOptions,
+      switchedManualWarning: undefined,
       imagesLoaded: false,
       imagesLoading: false,
       organizationOptions,
@@ -272,6 +274,18 @@ export class DockerImageAndTagSelector extends React.Component<
 
     if (imageId && !this.state.imagesLoaded && (!organizationFound || !repositoryFound || !tagFound)) {
       newState.defineManually = true;
+
+      const missingFields: string[] = [];
+      if (!organizationFound) {
+        missingFields.push('organization');
+      }
+      if (!repositoryFound) {
+        missingFields.push('image');
+      }
+      if (!tagFound) {
+        missingFields.push('tag');
+      }
+      newState.switchedManualWarning = `Could not find ${missingFields.join(' or ')}, switched to manual entry`;
     } else if (!imageId || !imageId.includes('${')) {
       this.synchronizeChanges({ organization, repository, tag, digest: this.props.digest }, registry);
     }
@@ -374,6 +388,9 @@ export class DockerImageAndTagSelector extends React.Component<
     if (!defineManually) {
       const newFields = DockerImageUtils.splitImageId(this.props.imageId || '');
       this.props.onChange(newFields);
+      if (this.state.switchedManualWarning) {
+        this.setState({ switchedManualWarning: undefined });
+      }
     }
     this.setState({ defineManually });
   };
@@ -394,6 +411,7 @@ export class DockerImageAndTagSelector extends React.Component<
     } = this.props;
     const {
       accountOptions,
+      switchedManualWarning,
       imagesLoading,
       lookupType,
       organizationOptions,
@@ -428,6 +446,18 @@ export class DockerImageAndTagSelector extends React.Component<
       </div>
     );
 
+    const warning = switchedManualWarning ? (
+      <div className="sp-formItem">
+        <div className="sp-formItem__left" />
+        <div className="sp-formItem__right">
+          <div className="messageContainer warningMessage">
+            <i className="fa icon-alert-triangle" />
+            <div className="message">{switchedManualWarning}</div>
+          </div>
+        </div>
+      </div>
+    ) : null;
+
     if (defineManually) {
       return (
         <div className="sp-formGroup">
@@ -451,6 +481,7 @@ export class DockerImageAndTagSelector extends React.Component<
               </div>
             </div>
           </div>
+          {warning}
         </div>
       );
     }
