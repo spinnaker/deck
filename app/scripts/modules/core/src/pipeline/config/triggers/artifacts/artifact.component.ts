@@ -88,6 +88,7 @@ class ArtifactCtrl implements IController {
 
   public onKindChange(artifactKind: IArtifactKindConfig): void {
     this.artifact.kind = artifactKind.key;
+    this.artifact.customKind = artifactKind.customKind;
     this.renderArtifactConfigTemplate(artifactKind);
   }
 

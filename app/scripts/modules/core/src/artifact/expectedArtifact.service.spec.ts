@@ -38,6 +38,7 @@ describe('ExpectedArtifactService', () => {
     const customKindConfig = {
       ...baseKindConfig,
       key: 'custom',
+      isCustom: true,
       isMatch: true,
       isDefault: true,
     };
@@ -46,22 +47,22 @@ describe('ExpectedArtifactService', () => {
       Registry.pipeline.registerCustomArtifactKind(customKindConfig);
     });
 
-    it('returns the kind stored on an artifact', () => {
+    it('returns the kind stored on an artifact for a custom kind', () => {
       const artifact: IArtifact = {
-        kind: 'foo',
+        kind: 'custom',
         id: 'artifact-id',
       };
       const kindConfig = ExpectedArtifactService.getKindConfig(artifact, false);
-      expect(kindConfig).toEqual(kindConfigs[0]);
+      expect(kindConfig).toEqual(customKindConfig);
     });
 
-    it('returns the kind stored on an artifact regardless of default setting', () => {
+    it('returns the kind stored on an artifact for a custom kind regardless of default setting', () => {
       const artifact: IArtifact = {
-        kind: 'foo-default',
+        kind: 'custom',
         id: 'artifact-id',
       };
       const kindConfig = ExpectedArtifactService.getKindConfig(artifact, true);
-      expect(kindConfig).toEqual(kindConfigs[1]);
+      expect(kindConfig).toEqual(customKindConfig);
     });
 
     it('infers kind from type if no explicit kind is stored on the artifact', () => {

@@ -17,6 +17,7 @@ module(CUSTOM_ARTIFACT, [])
       label: 'Custom',
       description: 'A custom-defined artifact.',
       key: 'custom',
+      customKind: true,
       isDefault: true,
       isMatch: true,
       controller: function(artifact: IArtifact) {
