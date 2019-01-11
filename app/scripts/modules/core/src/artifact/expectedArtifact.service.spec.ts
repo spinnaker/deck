@@ -38,7 +38,7 @@ describe('ExpectedArtifactService', () => {
     const customKindConfig = {
       ...baseKindConfig,
       key: 'custom',
-      isCustom: true,
+      customKind: true,
       isMatch: true,
       isDefault: true,
     };
@@ -47,7 +47,7 @@ describe('ExpectedArtifactService', () => {
       Registry.pipeline.registerCustomArtifactKind(customKindConfig);
     });
 
-    it('returns the kind stored on an artifact for a custom kind', () => {
+    it('returns the custom kind when set as the artifact kind', () => {
       const artifact: IArtifact = {
         kind: 'custom',
         id: 'artifact-id',
@@ -56,7 +56,7 @@ describe('ExpectedArtifactService', () => {
       expect(kindConfig).toEqual(customKindConfig);
     });
 
-    it('returns the kind stored on an artifact for a custom kind regardless of default setting', () => {
+    it('returns the custom kind when set as the artifact kind and isDefault is true', () => {
       const artifact: IArtifact = {
         kind: 'custom',
         id: 'artifact-id',
@@ -65,7 +65,7 @@ describe('ExpectedArtifactService', () => {
       expect(kindConfig).toEqual(customKindConfig);
     });
 
-    it('infers kind from type if no explicit kind is stored on the artifact', () => {
+    it('infers kind from type', () => {
       const artifact: IArtifact = {
         id: 'artifact-id',
         type: 'bar-type',
@@ -74,13 +74,33 @@ describe('ExpectedArtifactService', () => {
       expect(kindConfig).toEqual(kindConfigs[2]);
     });
 
-    it('infers kind from type if no explicit kind is stored on the artifact when isDefault is true', () => {
+    it('infers kind from type when isDefault is true', () => {
       const artifact: IArtifact = {
         id: 'artifact-id',
         type: 'bar-type',
       };
       const kindConfig = ExpectedArtifactService.getKindConfig(artifact, true);
       expect(kindConfig).toEqual(kindConfigs[3]);
+    });
+
+    it('returns the custom kind when customKind is true, regardless of type', () => {
+      const artifact: IArtifact = {
+        id: 'artifact-id',
+        customKind: true,
+        type: 'bar-type',
+      };
+      const kindConfig = ExpectedArtifactService.getKindConfig(artifact, false);
+      expect(kindConfig).toEqual(customKindConfig);
+    });
+
+    it('returns the custom kind when customKind is true, regardless of type, when isDefault is true', () => {
+      const artifact: IArtifact = {
+        id: 'artifact-id',
+        customKind: true,
+        type: 'bar-type',
+      };
+      const kindConfig = ExpectedArtifactService.getKindConfig(artifact, true);
+      expect(kindConfig).toEqual(customKindConfig);
     });
 
     it('returns the default kind if neither kind nor type are stored on artifact', () => {
