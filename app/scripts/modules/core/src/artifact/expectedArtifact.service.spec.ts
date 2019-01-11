@@ -35,7 +35,7 @@ describe('ExpectedArtifactService', () => {
         isDefault: true,
       },
     ].map(k => ({ ...baseKindConfig, ...k }));
-    const defaultKindConfig = {
+    const customKindConfig = {
       ...baseKindConfig,
       key: 'custom',
       isMatch: true,
@@ -43,7 +43,7 @@ describe('ExpectedArtifactService', () => {
     };
     beforeAll(() => {
       kindConfigs.forEach(kindConfig => Registry.pipeline.registerArtifactKind(kindConfig));
-      Registry.pipeline.registerDefaultArtifactKind(defaultKindConfig);
+      Registry.pipeline.registerCustomArtifactKind(customKindConfig);
     });
 
     it('returns the kind stored on an artifact', () => {
@@ -57,11 +57,11 @@ describe('ExpectedArtifactService', () => {
 
     it('returns the kind stored on an artifact regardless of default setting', () => {
       const artifact: IArtifact = {
-        kind: 'foo',
+        kind: 'foo-default',
         id: 'artifact-id',
       };
       const kindConfig = ExpectedArtifactService.getKindConfig(artifact, true);
-      expect(kindConfig).toEqual(kindConfigs[0]);
+      expect(kindConfig).toEqual(kindConfigs[1]);
     });
 
     it('infers kind from type if no explicit kind is stored on the artifact', () => {
@@ -87,7 +87,7 @@ describe('ExpectedArtifactService', () => {
         id: 'artifact-id',
       };
       const kindConfig = ExpectedArtifactService.getKindConfig(artifact, false);
-      expect(kindConfig).toEqual(defaultKindConfig);
+      expect(kindConfig).toEqual(customKindConfig);
     });
 
     it('returns the default kind if neither kind nor type are stored on artifact when isDefault is true', () => {
@@ -95,7 +95,7 @@ describe('ExpectedArtifactService', () => {
         id: 'artifact-id',
       };
       const kindConfig = ExpectedArtifactService.getKindConfig(artifact, true);
-      expect(kindConfig).toEqual(defaultKindConfig);
+      expect(kindConfig).toEqual(customKindConfig);
     });
   });
 });

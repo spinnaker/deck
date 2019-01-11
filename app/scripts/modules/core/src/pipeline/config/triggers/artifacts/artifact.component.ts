@@ -20,7 +20,6 @@ class ArtifactCtrl implements IController {
   public options: IArtifactKindConfig[];
   public description: string;
   private isDefault: boolean;
-  private isMatch: boolean;
   public selectedLabel: string;
   public selectedIcon: string;
   private artifactAccounts?: IArtifactAccount[];
@@ -34,14 +33,12 @@ class ArtifactCtrl implements IController {
     private $scope: IScope,
   ) {
     'ngInject';
-    if (this.$attrs.$attr.hasOwnProperty('isDefault')) {
-      this.isDefault = true;
+    this.isDefault = this.$attrs.$attr.hasOwnProperty('isDefault');
+    if (this.isDefault) {
+      this.options = Registry.pipeline.getDefaultArtifactKinds();
+    } else {
+      this.options = Registry.pipeline.getMatchArtifactKinds();
     }
-
-    if (this.$attrs.$attr.hasOwnProperty('isMatch')) {
-      this.isMatch = true;
-    }
-    this.options = Registry.pipeline.getArtifactKinds();
   }
 
   private renderArtifactConfigTemplate(config: any) {
@@ -70,7 +67,7 @@ class ArtifactCtrl implements IController {
   }
 
   public getOptions(): IArtifactKindConfig[] {
-    let options = this.options.filter(o => o.isDefault === this.isDefault || o.isMatch === this.isMatch);
+    let options = this.options;
     if (this.artifactAccounts) {
       options = options.filter(o => {
         const isCustomArtifact = o.type == null;
