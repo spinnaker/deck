@@ -1,4 +1,5 @@
 import { IFilterService, mock } from 'angular';
+import * as moment from 'moment';
 
 import { SETTINGS } from 'core/config/settings';
 import { duration } from './timeFormatters';
@@ -6,6 +7,9 @@ import { duration } from './timeFormatters';
 describe('Filter: timeFormatters', function() {
   beforeEach(function() {
     SETTINGS.defaultTimeZone = 'Etc/GMT+0';
+    spyOn(moment.tz, 'guess').and.callFake(function() {
+      return 'GMT';
+    });
   });
 
   beforeEach(mock.module('spinnaker.core.utils.timeFormatters'));

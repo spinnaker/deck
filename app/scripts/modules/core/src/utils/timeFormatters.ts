@@ -30,7 +30,10 @@ export function timestamp(input: any) {
     return '-';
   }
   const tz = SETTINGS.defaultTimeZone;
-  const thisMoment = moment.tz(parseInt(input, 10), tz);
+  const thisMoment = moment
+    .tz(parseInt(input, 10), tz)
+    .clone()
+    .tz(moment.tz.guess());
   return thisMoment.isValid() ? thisMoment.format('YYYY-MM-DD HH:mm:ss z') : '-';
 }
 
