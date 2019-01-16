@@ -504,7 +504,7 @@ export class AwsServerGroupConfigurationService {
     const vpcLoadBalancers = this.getVpcLoadBalancerNames(command);
     const allTargetGroups = this.getTargetGroupNames(command);
 
-    if (currentLoadBalancers && command.loadBalancers) {
+    if (currentLoadBalancers && command.loadBalancers && !currentLoadBalancers.includes('${')) {
       const allValidLoadBalancers = command.vpcId ? newLoadBalancers : newLoadBalancers.concat(vpcLoadBalancers);
       const { valid, invalid, spel } = this.getValidMatches(allValidLoadBalancers, currentLoadBalancers);
       command.loadBalancers = intersection(newLoadBalancers, valid);
@@ -519,7 +519,7 @@ export class AwsServerGroupConfigurationService {
       command.spelLoadBalancers = spel || [];
     }
 
-    if (currentTargetGroups && command.targetGroups) {
+    if (currentTargetGroups && command.targetGroups && !currentTargetGroups.includes('${')) {
       const { valid, invalid, spel } = this.getValidMatches(allTargetGroups, currentTargetGroups);
       command.targetGroups = valid;
       if (invalid.length) {

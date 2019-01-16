@@ -12,6 +12,10 @@ export interface IRollingRedBlackCommand extends IServerGroupCommand {
   pipelineBeforeCleanup: {
     application: string;
   };
+  rollback: {
+    onFailure: boolean;
+  };
+  scaleDown: boolean;
   targetPercentages: number[] | string;
 }
 
@@ -30,17 +34,35 @@ export class AdditionalFields extends React.Component<IRollingRedBlackStrategyAd
     this.forceUpdate();
   };
 
+  private scaleDownChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    this.props.command.scaleDown = e.target.checked;
+    this.forceUpdate();
+  };
+
+  private rollbackOnFailureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    this.props.command.rollback.onFailure = e.target.checked;
+    this.forceUpdate();
+  };
+
   public render() {
     const { NumberList } = NgReact;
     const { command } = this.props;
+    const rollbackOnFailure = command.rollback && command.rollback.onFailure;
     return (
       <div className="form-group">
         <div className="col-md-12 checkbox" style={{ marginTop: 0 }}>
           <label>
-            <input type="checkbox" ng-model="$ctrl.command.rollback.onFailure" />
+            <input type="checkbox" checked={rollbackOnFailure} onChange={this.rollbackOnFailureChange} />
             Rollback to previous server group if deployment fails <HelpField id="strategy.rollingRedBlack.rollback" />
           </label>
         </div>
+        <div className="col-md-12 checkbox">
+          <label>
+            <input type="checkbox" checked={command.scaleDown} onChange={this.scaleDownChange} />
+            Scale down replaced server groups to zero instances <HelpField id="strategy.redblack.scaleDown" />
+          </label>
+        </div>
+
         <div className="col-md-6" style={{ marginTop: '5px' }}>
           <h4>
             Percentages

@@ -1,6 +1,14 @@
 import { PipelineConfigService } from 'core/pipeline';
 import { Registry } from 'core/registry';
-import { IPipeline, IStage, IExpectedArtifact, IExecutionContext, IArtifact, IArtifactSource } from 'core/domain';
+import {
+  IPipeline,
+  IStage,
+  IExpectedArtifact,
+  IExecutionContext,
+  IArtifact,
+  IArtifactSource,
+  IArtifactKindConfig,
+} from 'core/domain';
 import { UUIDGenerator } from 'core/utils';
 
 export class ExpectedArtifactService {
@@ -34,18 +42,18 @@ export class ExpectedArtifactService {
         .reduce((array, value) => array.concat(value), []);
   }
 
-  public static createEmptyArtifact(kind: string): IExpectedArtifact {
+  public static createEmptyArtifact(): IExpectedArtifact {
     return {
       id: UUIDGenerator.generateUuid(),
       usePriorArtifact: false,
       useDefaultArtifact: false,
       matchArtifact: {
         id: UUIDGenerator.generateUuid(),
-        kind,
+        customKind: true,
       },
       defaultArtifact: {
         id: UUIDGenerator.generateUuid(),
-        kind,
+        customKind: true,
       },
     };
   }
@@ -59,7 +67,7 @@ export class ExpectedArtifactService {
   }
 
   public static addNewArtifactTo(obj: any): IExpectedArtifact {
-    return ExpectedArtifactService.addArtifactTo(ExpectedArtifactService.createEmptyArtifact('custom'), obj);
+    return ExpectedArtifactService.addArtifactTo(ExpectedArtifactService.createEmptyArtifact(), obj);
   }
 
   public static artifactFromExpected(expected: IExpectedArtifact): IArtifact | null {
@@ -90,20 +98,15 @@ export class ExpectedArtifactService {
     return sources;
   }
 
-  public static getKind(artifact: IArtifact): string {
-    if (artifact != null) {
-      if (artifact.kind) {
-        return artifact.kind;
-      } else {
-        const artifactType = artifact.type;
-        const inferredKindConfig = Registry.pipeline.getArtifactKinds().find(k => {
-          return k.type === artifactType;
-        });
-        if (inferredKindConfig != null) {
-          return inferredKindConfig.key;
-        }
-      }
+  public static getKindConfig(artifact: IArtifact, isDefault: boolean): IArtifactKindConfig {
+    if (artifact == null || artifact.customKind || artifact.kind === 'custom') {
+      return Registry.pipeline.getCustomArtifactKind();
     }
-    return null;
+    const kinds = isDefault ? Registry.pipeline.getDefaultArtifactKinds() : Registry.pipeline.getMatchArtifactKinds();
+    const inferredKindConfig = kinds.find(k => k.type === artifact.type);
+    if (inferredKindConfig !== undefined) {
+      return inferredKindConfig;
+    }
+    return Registry.pipeline.getCustomArtifactKind();
   }
 }
