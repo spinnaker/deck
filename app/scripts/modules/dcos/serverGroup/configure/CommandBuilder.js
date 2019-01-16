@@ -123,7 +123,7 @@ module.exports = angular
         });
     }
 
-    function buildNewServerGroupCommand(application, defaults = {}) {
+    function buildNewServerGroupCommand(application, defaults) {
       defaults = defaults || {};
 
       var defaultAccount = defaults.account || DcosProviderSettings.defaults.account;
