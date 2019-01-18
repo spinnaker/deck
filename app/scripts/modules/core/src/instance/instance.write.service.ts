@@ -154,6 +154,34 @@ export class InstanceWriter {
     });
   }
 
+  public mapLoadBalancers(serverGroup: IServerGroup, application: Application, params: any = {}): IPromise<ITask> {
+    params.type = 'mapLoadBalancers';
+    params.name = [serverGroup.name];
+    params.loadBalancerNames = serverGroup.loadBalancers;
+    params.region = serverGroup.region;
+    params.credentials = serverGroup.account;
+    params.cloudProvider = serverGroup.cloudProvider;
+    return TaskExecutor.executeTask({
+      job: [params],
+      application,
+      description: `Map load balancers for server group: ${serverGroup.name}`,
+    });
+  }
+
+  public unmapLoadBalancers(serverGroup: IServerGroup, application: Application, params: any = {}): IPromise<ITask> {
+    params.type = 'unmapLoadBalancers';
+    params.name = [serverGroup.name];
+    params.loadBalancerNames = serverGroup.loadBalancers;
+    params.region = serverGroup.region;
+    params.credentials = serverGroup.account;
+    params.cloudProvider = serverGroup.cloudProvider;
+    return TaskExecutor.executeTask({
+      job: [params],
+      application,
+      description: `Unmap load balancers for server group: ${serverGroup.name}`,
+    });
+  }
+
   public enableInstancesInDiscovery(instanceGroups: IMultiInstanceGroup[], application: Application): IPromise<ITask> {
     return this.executeMultiInstanceTask(
       instanceGroups,

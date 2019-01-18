@@ -18,6 +18,8 @@ import { FIND_AMI_STAGE } from './config/stages/findAmi/findAmiStage';
 import { FIND_ARTIFACT_FROM_EXECUTION_STAGE } from './config/stages/findArtifactFromExecution/findArtifactFromExecutionStage';
 import { GROUP_STAGE_MODULE } from './config/stages/group/groupStage.module';
 import { MANUAL_JUDGMENT_STAGE_MODULE } from './config/stages/manualJudgment/manualJudgmentStage.module';
+import { MAP_LOAD_BALANCERS_STAGE } from './config/stages/mapLoadBalancers/mapLoadBalancersStage';
+import { UNMAP_LOAD_BALANCERS_STAGE } from './config/stages/unmapLoadBalancers/unmapLoadBalancersStage';
 import { RESIZE_ASG_STAGE } from './config/stages/resizeAsg/resizeAsgStage';
 import { SCALE_DOWN_CLUSTER_STAGE } from './config/stages/scaleDownCluster/scaleDownClusterStage';
 import { SCRIPT_STAGE } from './config/stages/script/scriptStage';
@@ -85,6 +87,8 @@ module(PIPELINE_MODULE, [
   require('./config/stages/findImageFromTags/findImageFromTagsStage.module').name,
   require('./config/stages/jenkins/jenkinsStage.module').name,
   MANUAL_JUDGMENT_STAGE_MODULE,
+  MAP_LOAD_BALANCERS_STAGE,
+  UNMAP_LOAD_BALANCERS_STAGE,
   require('./config/stages/tagImage/tagImageStage.module').name,
   require('./config/stages/pipeline/pipelineStage.module').name,
   PRODUCES_ARTIFACTS,
