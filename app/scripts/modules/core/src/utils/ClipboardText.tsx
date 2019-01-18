@@ -5,7 +5,7 @@ export interface IClipboardTextProps {
 }
 
 /**
- * Places text in an "invisible input field so we can auto-focus and select the text
+ * Places text in an invisible input field so we can auto-focus and select the text
  * then copy it to the clipboard onClick. Used in labels found in components like
  * ManifestStatus to make it easier to grab data from the UI.
  */
