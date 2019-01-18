@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { IManifest } from '@spinnaker/core';
 import { ClipboardText } from 'core/utils/ClipboardText';
 import { DeployManifestStatusPills } from './DeployStatusPills';
-import { ManifestYaml } from './ManifestYaml';
+import { IManifest } from '@spinnaker/core';
 import { ManifestDetailsLink } from './ManifestDetailsLink';
 import { ManifestEvents } from './ManifestEvents';
+import { ManifestYaml } from './ManifestYaml';
 
 import './ManifestStatus.less';
 
