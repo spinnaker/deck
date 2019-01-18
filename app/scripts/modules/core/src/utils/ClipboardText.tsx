@@ -32,6 +32,15 @@ export class ClipboardText extends React.Component<IClipboardTextProps> {
 
   public render() {
     const { text } = this.props;
-    return <input onClick={this.handleClick} ref={this.textRef} value={text} type="text" style={this.inputStyle} />;
+    return (
+      <input
+        onClick={this.handleClick}
+        onChange={e => e} // no-op to prevent warnings
+        ref={this.textRef}
+        value={text}
+        type="text"
+        style={this.inputStyle}
+      />
+    );
   }
 }
