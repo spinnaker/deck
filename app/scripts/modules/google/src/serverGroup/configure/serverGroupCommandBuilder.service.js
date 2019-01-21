@@ -244,6 +244,10 @@ module.exports = angular
             angular.extend(command.instanceMetadata, _.omit(metadataItems, gceServerGroupHiddenMetadataKeys));
           }
         }
+
+        if (command.labels['spinnaker-moniker-sequence']) {
+          delete command.labels['spinnaker-moniker-sequence'];
+        }
       }
 
       function getCustomUserDataKeys(customUserData) {

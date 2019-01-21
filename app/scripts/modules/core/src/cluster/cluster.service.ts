@@ -273,6 +273,13 @@ export class ClusterService {
     const nameParts = NameUtils.parseServerGroupName(serverGroup.name);
     if (serverGroup.moniker) {
       Object.assign(serverGroup, serverGroup.moniker);
+      if (serverGroup.moniker.cluster == null && (serverGroup.moniker.stack || serverGroup.moniker.detail)) {
+        serverGroup.cluster = NameUtils.getClusterName(
+          serverGroup.moniker.app || nameParts.application,
+          serverGroup.stack,
+          serverGroup.detail,
+        );
+      }
     } else {
       serverGroup.app = nameParts.application;
       serverGroup.stack = nameParts.stack;
