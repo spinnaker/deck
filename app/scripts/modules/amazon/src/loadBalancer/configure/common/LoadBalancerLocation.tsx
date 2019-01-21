@@ -107,6 +107,7 @@ class LoadBalancerLocationImpl extends React.Component<ILoadBalancerLocationProp
   private shouldHideInternalFlag(): boolean {
     if (AWSProviderSettings) {
       if (AWSProviderSettings.loadBalancers && AWSProviderSettings.loadBalancers.inferInternalFlagFromSubnet) {
+        // clouddriver will check the subnet if isInternal is competely omitted
         delete this.props.formik.values.isInternal;
         return true;
       }
@@ -187,6 +188,7 @@ class LoadBalancerLocationImpl extends React.Component<ILoadBalancerLocationProp
       this.props.formik.setFieldValue('vpcId', subnet && subnet.vpcIds[0]);
       this.props.formik.setFieldValue('subnetType', subnet && subnet.purpose);
       if (!this.state.hideInternalFlag && !this.state.internalFlagToggled && subnet && subnet.purpose) {
+        // Even if inferInternalFlagFromSubnet is false, deck will still try to guess which the user wants unless explicitly toggled
         this.props.formik.setFieldValue('isInternal', subnet.purpose.includes('internal'));
       }
     });
