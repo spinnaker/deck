@@ -46,16 +46,18 @@ module.exports = angular
     function initializeViewState() {
       var viewState = tasksViewStateCache.get(application.name) || {
         taskStateFilter: '',
-        nameFilter: '',
         expandedTasks: [],
       };
+      viewState.nameFilter = $stateParams.q || '';
       viewState.loading = true;
       viewState.itemsPerPage = tasksViewStateCache.get('#common')
         ? tasksViewStateCache.get('#common').itemsPerPage
         : 20;
 
       $scope.viewState = viewState;
-      setTaskFilter();
+      if ($stateParams.taskId) {
+        setTaskFilter();
+      }
     }
 
     const setTaskFilter = () => {
@@ -204,11 +206,12 @@ module.exports = angular
     };
 
     controller.getRegion = function(task) {
-      var deployedServerGroups = _.find(task.variables, function(variable) {
-        return variable.key === 'deploy.server.groups';
-      }).value;
-
-      return _.keys(deployedServerGroups)[0];
+      const regionVariable = (task.variables || []).find(variable => {
+        return (
+          ['deploy.server.groups', 'availabilityZones'].includes(variable.key) && Object.keys(variable.value).length
+        );
+      });
+      return regionVariable && Object.keys(regionVariable.value)[0];
     };
 
     controller.getProviderForServerGroupByTask = function(task) {

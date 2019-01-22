@@ -59,7 +59,7 @@ export class ExpectedArtifactEditor extends React.Component<
   constructor(props: IExpectedArtifactEditorProps) {
     super(props);
     this.state = {
-      expectedArtifact: props.default ? cloneDeep(props.default) : ExpectedArtifactService.createEmptyArtifact(null),
+      expectedArtifact: props.default ? cloneDeep(props.default) : ExpectedArtifactService.createEmptyArtifact(),
       source: props.sources[0],
       account: null,
     };
@@ -88,7 +88,9 @@ export class ExpectedArtifactEditor extends React.Component<
   private onKindChange = (kind: IArtifactKindConfig) => {
     const expectedArtifact = cloneDeep(this.state.expectedArtifact);
     expectedArtifact.matchArtifact.type = kind.type;
-    expectedArtifact.matchArtifact.kind = kind.key;
+    // kind is deprecated; remove it from artifacts as they are updated
+    delete expectedArtifact.matchArtifact.kind;
+    expectedArtifact.matchArtifact.customKind = kind.customKind;
     const accounts = this.accountsForExpectedArtifact(expectedArtifact);
     this.setState({ expectedArtifact, account: accounts[0] });
   };
@@ -111,7 +113,7 @@ export class ExpectedArtifactEditor extends React.Component<
     const kinds = this.props.kinds || [];
     const accounts = this.props.accounts || [];
     if (this.props.showAccounts) {
-      return kinds.filter(k => k.key === 'custom' || accounts.find(a => a.types.includes(k.type)));
+      return kinds.filter(k => k.customKind || accounts.find(a => a.types.includes(k.type)));
     } else {
       return kinds.slice(0);
     }
@@ -123,7 +125,7 @@ export class ExpectedArtifactEditor extends React.Component<
     const accounts = this.accountsForExpectedArtifact(expectedArtifact);
     const artifact = ExpectedArtifactService.artifactFromExpected(expectedArtifact);
     const kinds = this.availableKinds().sort((a, b) => a.label.localeCompare(b.label));
-    const kind = artifact ? kinds.find(k => k.key === artifact.kind) : null;
+    const kind = ExpectedArtifactService.getKindConfig(artifact, false);
     const EditCmp = kind && kind.editCmp;
     return (
       <>

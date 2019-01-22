@@ -24,6 +24,7 @@ process.on('uncaughtException', err => {
 
 const flagDefaults = {
   'serve-deck': false,
+  'serve-fixture': false,
   'replay-fixtures': false,
   'record-fixtures': false,
   'gate-port': 18084,
@@ -59,11 +60,12 @@ function main() {
       return;
     }
     if (!flagDefaults.hasOwnProperty(f)) {
-      throw new Error(`unrecognized flag --${f}`);
+      console.log(`unrecognized flag --${f}`);
+      printUsage(1);
     }
   });
 
-  if (flags['replay-fixtures'] || flags['record-fixtures']) {
+  if (flags['serve-fixture'] || flags['replay-fixtures'] || flags['record-fixtures']) {
     testRunner.launchMockServer();
   }
 
@@ -71,10 +73,28 @@ function main() {
     testRunner.launchStaticServer();
   }
 
-  testRunner.run(flags);
+  if (flags['serve-fixture']) {
+    let foundSpecFlag = false;
+    const spec = flags['--'].find((flag, idx) => {
+      if (foundSpecFlag) {
+        return true;
+      }
+      if (flag === '--spec') {
+        foundSpecFlag = true;
+      }
+    });
+    console.log('FOUND SPEC', spec);
+    if (!spec) {
+      console.log('--serve-fixture requires a single spec file to have been specified');
+      process.exit(5);
+    }
+    testRunner.serveFixture(path.join(repoRoot, spec));
+  } else {
+    testRunner.run(flags);
+  }
 }
 
-function printUsage() {
+function printUsage(errorCode = 0) {
   console.log(
     `
 Usage: test/functional/run.js [options] -- [webdriver.io options]
@@ -95,6 +115,9 @@ Options:
                        running Gate server.
 --record-fixtures      Boolean. Record network fixtures for later replay.
                        Requires a running Spinnaker deployment.
+--serve-fixture        Boolean. Serve a pre-recorded network fixtures in place
+                       of a running Gate server. Used during development to
+                       allow debugging of fixture responses.
 --gate-port            (only used when recording fixtures) Port on which a
                        real Gate server is currently running. The imposter
                        recording a test's network fixture will proxy requests
@@ -116,7 +139,7 @@ Example usage:
 test/functional/run.js --serve-deck --replay-fixtures --headless --savelogs
 `.trim(),
   );
-  process.exit(0);
+  process.exit(errorCode);
 }
 
 main();

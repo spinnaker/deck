@@ -15,6 +15,7 @@ var defaultCanaryJudge = '{%canary.defaultJudge%}';
 var defaultMetricsStore = '{%canary.defaultMetricsStore%}';
 var defaultMetricsAccountName = '{%canary.defaultMetricsAccount%}';
 var defaultStorageAccountName = '{%canary.defaultStorageAccount%}';
+var displayTimestampsInUserLocalTime = '{%features.displayTimestampsInUserLocalTime%}' === 'true';
 var entityTagsEnabled = false;
 var fiatEnabled = '{%features.fiat%}' === 'true';
 var iapRefresherEnabled = '{%features.iapRefresherEnabled}' === 'true';
@@ -30,6 +31,9 @@ var showAllConfigsEnabled = '{%canary.showAllCanaryConfigs%}' === 'true';
 var slack = {
   botName: '{%notifications.slack.botName%}',
   enabled: '{%notifications.slack.enabled%}' === 'true',
+};
+var sms = {
+  enabled: '{%notifications.twilio.enabled%}' === 'true',
 };
 var templatesEnabled = '{%canary.templatesEnabled%}' === 'true';
 var travisEnabled = '{%features.travis%}' === 'true';
@@ -150,6 +154,7 @@ window.spinnakerSettings = {
     artifacts: artifactsEnabled,
     canary: mineCanaryEnabled,
     chaosMonkey: chaosEnabled,
+    displayTimestampsInUserLocalTime: displayTimestampsInUserLocalTime,
     entityTags: entityTagsEnabled,
     fiatEnabled: fiatEnabled,
     iapRefresherEnabled: iapRefresherEnabled,
@@ -190,9 +195,7 @@ window.spinnakerSettings = {
       enabled: true,
     },
     slack: slack,
-    sms: {
-      enabled: true,
-    },
+    sms: sms,
   },
   onDemandClusterThreshold: onDemandClusterThreshold,
   pagerDuty: {
