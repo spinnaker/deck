@@ -19,15 +19,34 @@ export interface IClipboardTextProps {
 export class ClipboardText extends React.Component<IClipboardTextProps> {
   public state = {
     tooltipCopy: false,
+    inputWidth: 'auto',
   };
 
   private textRef: React.RefObject<HTMLInputElement> = React.createRef();
+  private hiddenRef: React.RefObject<HTMLSpanElement> = React.createRef();
 
   private inputStyle = {
     borderWidth: '0px',
     display: 'inline-block',
     backgroundColor: 'transparent',
   };
+
+  private hiddenStyle = {
+    position: 'absolute' as 'absolute',
+    height: 0,
+    overflow: 'hidden',
+    whiteSpace: 'pre' as 'pre',
+  };
+
+  /**
+   * We need to play some games to get the correct width of the container
+   * input element but grabbing the offsetWidth of a hidden span containing
+   * the same value text as the input.
+   */
+  public componentDidMount() {
+    const hiddenNode = this.hiddenRef.current;
+    this.setState({ inputWidth: hiddenNode.offsetWidth + 3 });
+  }
 
   /**
    * Focuses on the input element and attempts to copy to the clipboard.
@@ -58,19 +77,27 @@ export class ClipboardText extends React.Component<IClipboardTextProps> {
 
   public render() {
     const { text } = this.props;
-    const { tooltipCopy } = this.state;
+    const { inputWidth, tooltipCopy } = this.state;
 
     const copy = tooltipCopy || `Copy ${text}`;
     const tooltip = <Tooltip id={`clipboardText-${text.replace(' ', '-')}`}>{copy}</Tooltip>;
 
+    const updatedStyle = {
+      ...this.inputStyle,
+      width: inputWidth,
+    };
+
     return (
       <React.Fragment>
+        <span ref={this.hiddenRef} style={this.hiddenStyle}>
+          {text}
+        </span>
         <input
           onChange={e => e} // no-op to prevent warnings
           ref={this.textRef}
           value={text}
           type="text"
-          style={this.inputStyle}
+          style={updatedStyle}
         />
         <OverlayTrigger placement="top" overlay={tooltip}>
           <button
