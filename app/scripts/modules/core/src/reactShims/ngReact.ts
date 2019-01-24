@@ -5,7 +5,6 @@ import IInjectorService = angular.auto.IInjectorService;
 import { AddEntityTagLinksWrapperComponent } from 'core/entityTag/addEntityTagLinks.component';
 import { AccountRegionClusterSelectorWrapperComponent } from 'core/widgets/accountRegionClusterSelectorWrapper.component';
 import { ButtonBusyIndicatorComponent } from '../forms/buttonBusyIndicator/buttonBusyIndicator.component';
-import { CopyToClipboardComponent } from '../utils/clipboard/copyToClipboard.component';
 import { IDiffViewProps } from '../pipeline/config/actions/history/DiffView';
 import { EntitySourceComponent } from 'core/entityTag/entitySource.component';
 import { HelpFieldWrapperComponent } from '../help/helpField.component';
@@ -47,7 +46,6 @@ export class NgReactInjector extends ReactInject {
   public AccountRegionClusterSelector: React.ComponentClass<IAccountRegionClusterSelectorProps> = angular2react('accountRegionClusterSelectorWrapper', new AccountRegionClusterSelectorWrapperComponent(), this.$injectorProxy) as any;
   public AddEntityTagLinks: React.ComponentClass<IAddEntityTagLinksProps>                       = angular2react('addEntityTagLinksWrapper', new AddEntityTagLinksWrapperComponent(), this.$injectorProxy) as any;
   public ButtonBusyIndicator: React.ComponentClass<IButtonBusyIndicatorProps>                   = angular2react('buttonBusyIndicator', new ButtonBusyIndicatorComponent(), this.$injectorProxy) as any;
-  public CopyToClipboard: React.ComponentClass<ICopyToClipboardProps>                           = angular2react('copyToClipboard', new CopyToClipboardComponent(), this.$injectorProxy) as any;
   public DiffView: React.ComponentClass<IDiffViewProps>                                         = angular2react('diffView', diffViewComponent, this.$injectorProxy) as any;
   public EntitySource: React.ComponentClass<IEntitySourceProps>                                 = angular2react('entitySource', new EntitySourceComponent(), this.$injectorProxy) as any;
   public HelpField: React.ComponentClass<IHelpFieldProps>                                       = angular2react('helpFieldWrapper', new HelpFieldWrapperComponent(), this.$injectorProxy) as any;

@@ -13,10 +13,12 @@ import { IExecutionViewState, IPipelineGraphNode } from 'core/pipeline/config/gr
 import { OrchestratedItemRunningTime } from './OrchestratedItemRunningTime';
 import { SETTINGS } from 'core/config/settings';
 import { AccountTag } from 'core/account';
-import { NgReact, ReactInjector } from 'core/reactShims';
+import { ReactInjector } from 'core/reactShims';
 import { duration, timestamp } from 'core/utils/timeFormatters';
 import { ISortFilter } from 'core/filterModel';
 import { ExecutionState } from 'core/state';
+
+import { CopyToClipboard } from '@spinnaker/core';
 
 // react components
 import { ExecutionMarker } from './ExecutionMarker';
@@ -250,7 +252,6 @@ export class Execution extends React.Component<IExecutionProps, IExecutionState>
     const { application, execution, showAccountLabels, showDurations, standalone, title } = this.props;
     const { pipelinesUrl, restartDetails, showingDetails, sortFilter, viewState } = this.state;
 
-    const { CopyToClipboard } = NgReact;
     const accountLabels = this.props.execution.deploymentTargets.map(account => (
       <AccountTag key={account} account={account} />
     ));
@@ -394,7 +395,7 @@ export class Execution extends React.Component<IExecutionProps, IExecutionState>
                 <a onClick={this.handlePermalinkClick} href={this.getUrl()}>
                   Permalink
                 </a>
-                <CopyToClipboard text={this.getUrl()} toolTip="Copy permalink to clipboard" />
+                <CopyToClipboard value={this.getUrl()} toolTip="Copy permalink to clipboard" />
               </div>
             </div>
           </div>
