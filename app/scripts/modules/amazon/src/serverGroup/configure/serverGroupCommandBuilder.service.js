@@ -65,7 +65,7 @@ module.exports = angular
             ebsOptimized: false,
             selectedProvider: 'aws',
             iamRole: defaultIamRole,
-            terminationPolicies: ['Default'],
+            terminationPolicies: ['OldestInstance'],
             vpcId: null,
             subnetType: defaultSubnet,
             availabilityZones: availabilityZones,
