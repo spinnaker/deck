@@ -11,7 +11,6 @@ import { HelpFieldWrapperComponent } from '../help/helpField.component';
 import { IAccountRegionClusterSelectorProps } from 'core/widgets/AccountRegionClusterSelector';
 import { IAddEntityTagLinksProps } from 'core/entityTag/AddEntityTagLinks';
 import { IButtonBusyIndicatorProps } from '../forms/buttonBusyIndicator/ButtonBusyIndicator';
-import { ICopyToClipboardProps } from '../utils/clipboard/CopyToClipboard';
 import { IEntitySourceProps } from 'core/entityTag/EntitySource';
 import { IHelpFieldProps } from '../help/HelpField';
 import { IInsightLayoutProps } from 'core/insight/InsightLayout';
