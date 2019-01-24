@@ -386,6 +386,82 @@ describe('Asynchronous validation of synchronous validators', () => {
   });
 });
 
+describe('Guarantees identical interfaces and results between sync and async', () => {
+  it('crazy complicated arrays of objects with arrays of objects', done => {
+    const isArray: Validator = (array, label) => !Array.isArray(array) && `${label} must be an array.`;
+    const allOfTheThingsValidator: ArrayItemValidator = itemBuilder => {
+      itemBuilder.field(`all`, 'All').validate([isRequired()]);
+      itemBuilder.field(`of`, 'Of').validate([isRequired()]);
+      itemBuilder.field(`the`, 'The').validate([isRequired()]);
+      itemBuilder.field(`things`, 'Things').validate([isRequired()]);
+    };
+
+    const values = {
+      letsgetcrazy: [
+        {},
+        {
+          key: 'array',
+          data: [
+            { all: 1, of: 2, the: 3, things: 4 },
+            { all: '', of: 2, the: 3, things: 4 },
+            { all: 1, of: '', the: 3, things: 4 },
+            { all: 1, of: 2, the: '', things: 4 },
+            { all: 1, of: 2, the: 3, things: '' },
+            {},
+          ],
+        },
+        {
+          key: 'nothotdog',
+          data: { foo: 'bar' },
+        },
+      ],
+    };
+
+    const builderSync = buildValidators(values);
+    const builderAsync = buildValidatorsAsync(values);
+
+    [builderSync, builderAsync].forEach(builder => {
+      const { arrayForEach } = builder;
+      const outerArrayItemValidator: ArrayItemValidator = itemBuilder => {
+        itemBuilder.field('key', 'Item key').validate([isRequired()]);
+        itemBuilder.field('data', 'Item data').validate([isRequired(), isArray, arrayForEach(allOfTheThingsValidator)]);
+      };
+      builder.field('letsgetcrazy', 'Outer array').validate([arrayForEach(outerArrayItemValidator)]);
+    });
+
+    const expectedResult = {
+      letsgetcrazy: [
+        { key: 'Item key is required.', data: 'Item data is required.' },
+        {
+          data: [
+            undefined,
+            { all: 'All is required.' },
+            { of: 'Of is required.' },
+            { the: 'The is required.' },
+            { things: 'Things is required.' },
+            {
+              all: 'All is required.',
+              of: 'Of is required.',
+              the: 'The is required.',
+              things: 'Things is required.',
+            },
+          ],
+        },
+        { data: 'Item data must be an array.' },
+      ],
+    };
+
+    const resultSync = builderSync.result();
+    const resultAsync = builderAsync.result();
+
+    expect(resultSync).toEqual(expectedResult);
+    resultAsync.catch((errors: any) => {
+      expect(errors).toEqual(expectedResult);
+      done();
+    });
+  });
+});
+
 describe('Asynchronous simple validation', () => {
   it('Validate nothing', done => {
     const values = { foo: 'bar' };
