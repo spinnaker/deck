@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { DeployManifestStatusPills } from './DeployStatusPills';
 import { CopyToClipboard, IManifest } from '@spinnaker/core';
+import { DeployManifestStatusPills } from './DeployStatusPills';
 import { ManifestDetailsLink } from './ManifestDetailsLink';
 import { ManifestEvents } from './ManifestEvents';
 import { ManifestYaml } from './ManifestYaml';
