@@ -81,7 +81,7 @@ export class CopyToClipboard extends React.Component<ICopyToClipboardProps> {
   public handleClick = (e: React.SyntheticEvent): void => {
     e.preventDefault();
 
-    const { analyticsLabel, value } = this.props;
+    const { analyticsLabel, toolTip, value } = this.props;
     ReactGA.event({
       category: 'Copy to Clipboard',
       action: 'copy',
@@ -92,10 +92,31 @@ export class CopyToClipboard extends React.Component<ICopyToClipboardProps> {
     node.focus();
     node.select();
 
+    // A best attempt at trying to keep the Copied! text centered in the
+    // Tooltip, otherwise it jumps around.
+    let copiedText = 'Copied!';
+
+    // String.padStart is ES2017, but has pretty good support in browsers already
+    // Unfortunately TypeScript doesn't like it so we need to disable the checks
+
+    // @ts-ignore
+    if (String.prototype.padStart) {
+      const toolTipPadding = Math.round(Math.max(0, toolTip.length - copiedText.length) / 2);
+      // @ts-ignore
+      copiedText = copiedText.padStart(copiedText.length + toolTipPadding, ' ');
+
+      // @ts-ignore
+      copiedText = copiedText.padEnd(copiedText.length + toolTipPadding, ' ');
+
+      // Replace spaces with Figure Space which won't break
+      // https://www.fileformat.info/info/unicode/category/Zs/list.htm
+      copiedText = copiedText.replace(/ /g, '\u2007');
+    }
+
     try {
       document.execCommand('copy');
       node.blur();
-      this.setState({ tooltipCopy: 'Copied!' });
+      this.setState({ tooltipCopy: copiedText });
       window.setTimeout(this.resetToolTip, 3000);
     } catch (e) {
       this.setState({ tooltipCopy: "Couldn't copy!" });
@@ -110,6 +131,7 @@ export class CopyToClipboard extends React.Component<ICopyToClipboardProps> {
     const { displayValue, toolTip, value } = this.props;
     const { inputWidth, tooltipCopy } = this.state;
 
+    const persistOverlay = Boolean(tooltipCopy);
     const copy = tooltipCopy || toolTip;
     const id = `clipboardValue-${value.replace(' ', '-')}`;
     const tooltipComponent = <Tooltip id={id}>{copy}</Tooltip>;
@@ -143,7 +165,7 @@ export class CopyToClipboard extends React.Component<ICopyToClipboardProps> {
           type="text"
           style={updatedStyle}
         />
-        <OverlayTrigger placement="top" overlay={tooltipComponent}>
+        <OverlayTrigger defaultOverlayShown={persistOverlay} placement="top" overlay={tooltipComponent} delayHide={250}>
           <button
             onClick={this.handleClick}
             className="btn btn-xs btn-default clipboard-btn"
