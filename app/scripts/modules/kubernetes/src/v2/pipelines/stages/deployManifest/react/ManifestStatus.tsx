@@ -4,7 +4,7 @@ import { IManifest } from '@spinnaker/core';
 import { ManifestDetailsLink } from './ManifestDetailsLink';
 import { ManifestEvents } from './ManifestEvents';
 import { ManifestYaml } from './ManifestYaml';
-import { NgReact } from 'core/reactShims';
+import { NgReact } from '@spinnaker/core';
 
 import './ManifestStatus.less';
 
