@@ -102,21 +102,23 @@ export class GremlinStageConfig extends React.Component<IStageConfigProps> {
             value={stage.gremlinApiKey || ''}
             onChange={e => this.onChange(e.target.name, e.target.value)}
           />
-          <button
-            disabled={isFetchingData ? 'disabled' : ''}
-            onClick={this.fetchAPIData}
-            type="button"
-            className="btn btn-sm btn-default"
-          >
-            {isFetchingData ? 'Loading' : 'Fetch'}
-          </button>
+          <div className="form-control-static">
+            <button
+              disabled={isFetchingData || !stage.gremlinApiKey ? 'disabled' : ''}
+              onClick={this.fetchAPIData}
+              type="button"
+              className="btn btn-sm btn-default"
+            >
+              {isFetchingData ? 'Loading' : 'Fetch'}
+            </button>
+          </div>
         </StageConfigField>
         <StageConfigField label="Command Template">
           {!commands.length ? (
             isFetchingData ? (
-              <p className="text-muted">Loading...</p>
+              <p className="form-control-static">Loading...</p>
             ) : (
-              <p className="text-muted">No commands found.</p>
+              <p className="form-control-static">No commands found.</p>
             )
           ) : (
             <Select
@@ -134,9 +136,9 @@ export class GremlinStageConfig extends React.Component<IStageConfigProps> {
         <StageConfigField label="Target Template">
           {!targets.length ? (
             isFetchingData ? (
-              <p className="text-muted">Loading...</p>
+              <p className="form-control-static">Loading...</p>
             ) : (
-              <p className="text-muted">No targets found.</p>
+              <p className="form-control-static">No targets found.</p>
             )
           ) : (
             <Select
