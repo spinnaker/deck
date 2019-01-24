@@ -9,7 +9,7 @@ export class GremlinStageConfig extends React.Component<IStageConfigProps> {
   public ENDPOINT_COMMANDS = `${API.baseUrl}/gremlin/templates/command`;
   public ENDPOINT_TARGETS = `${API.baseUrl}/gremlin/templates/target`;
 
-  public state = { commands: [], targets: [] };
+  public state = { isFetchingData: false, commands: [], targets: [] };
 
   public componentDidMount() {
     this.checkInitialLoad();
@@ -62,11 +62,16 @@ export class GremlinStageConfig extends React.Component<IStageConfigProps> {
       stage: { gremlinApiKey },
     } = this.props;
 
+    this.setState({
+      isFetchingData: true,
+    });
+
     // Get the data from all the necessary sources before rendering
     Observable.forkJoin(this.fetchCommands(gremlinApiKey), this.fetchTargets(gremlinApiKey)).subscribe(results => {
       this.setState({
         commands: results[0],
         targets: results[1],
+        isFetchingData: false,
       });
     });
   };
@@ -75,9 +80,17 @@ export class GremlinStageConfig extends React.Component<IStageConfigProps> {
     this.props.updateStageField({ [name]: value });
   };
 
+  private handleGremlinCommandTemplateIdChange = (option: object) => {
+    this.props.updateStageField({ gremlinCommandTemplateId: option.value });
+  };
+
+  private handleGremlinTargetTemplateIdChange = (option: object) => {
+    this.props.updateStageField({ gremlinTargetTemplateId: option.value });
+  };
+
   public render() {
     const { stage } = this.props;
-    console.log(this.state);
+    const { isFetchingData, commands, targets } = this.state;
 
     return (
       <div className="form-horizontal">
@@ -89,27 +102,54 @@ export class GremlinStageConfig extends React.Component<IStageConfigProps> {
             value={stage.gremlinApiKey || ''}
             onChange={e => this.onChange(e.target.name, e.target.value)}
           />
-          <button onClick={this.fetchAPIData} type="button" className="btn btn-sm btn-default">
-            Fetch
+          <button
+            disabled={isFetchingData ? 'disabled' : ''}
+            onClick={this.fetchAPIData}
+            type="button"
+            className="btn btn-sm btn-default"
+          >
+            {isFetchingData ? 'Loading' : 'Fetch'}
           </button>
         </StageConfigField>
         <StageConfigField label="Command Template">
-          <input
-            name="gremlinCommandTemplateId"
-            className="form-control input"
-            type="text"
-            value={stage.gremlinCommandTemplateId || ''}
-            onChange={e => this.onChange(e.target.name, e.target.value)}
-          />
+          {!commands.length ? (
+            isFetchingData ? (
+              <p className="text-muted">Loading...</p>
+            ) : (
+              <p className="text-muted">No commands found.</p>
+            )
+          ) : (
+            <Select
+              name="gremlinCommandTemplateId"
+              options={commands.map(command => ({
+                label: command.name,
+                value: command.guid,
+              }))}
+              clearable={false}
+              value={stage.gremlinCommandTemplateId || null}
+              onChange={this.handleGremlinCommandTemplateIdChange}
+            />
+          )}
         </StageConfigField>
         <StageConfigField label="Target Template">
-          <input
-            name="gremlinTargetTemplateId"
-            className="form-control input"
-            type="text"
-            value={stage.gremlinTargetTemplateId || ''}
-            onChange={e => this.onChange(e.target.name, e.target.value)}
-          />
+          {!targets.length ? (
+            isFetchingData ? (
+              <p className="text-muted">Loading...</p>
+            ) : (
+              <p className="text-muted">No targets found.</p>
+            )
+          ) : (
+            <Select
+              name="gremlinTargetTemplateId"
+              options={targets.map(target => ({
+                label: target.name,
+                value: target.guid,
+              }))}
+              clearable={false}
+              value={stage.gremlinTargetTemplateId || null}
+              onChange={this.handleGremlinTargetTemplateIdChange}
+            />
+          )}
         </StageConfigField>
       </div>
     );
