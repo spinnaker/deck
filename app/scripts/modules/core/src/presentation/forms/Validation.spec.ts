@@ -1,11 +1,4 @@
-import {
-  Validation,
-  buildValidators,
-  Validator,
-  ArrayItemValidator,
-  buildValidatorsAsync,
-  IValidationBuilder,
-} from './Validation';
+import { Validation, buildValidators, Validator, ArrayItemValidator, buildValidatorsAsync } from './Validation';
 
 const { isRequired, minValue, maxValue } = Validation;
 
@@ -20,97 +13,106 @@ const makeAsync = (syncValidator: Validator): Validator => {
   };
 };
 
-interface ISynchronousTestCase {
-  expectation: string; // feels more like a title but jasmine calls it expectation
-  values: any;
-  expectedResult: any;
-  builders: (builder: IValidationBuilder) => void;
-}
+describe('Synchronous validation', () => {
+  it('returns empty errors when validating no validators', () => {
+    const values = { foo: 'bar' };
 
-const synchronousTestCases: ISynchronousTestCase[] = [
-  {
-    expectation: 'returns empty errors when validating no validators',
-    values: { foo: 'bar' },
-    builders: builder => {
-      builder.field('foo', 'Foo').validate([]);
-    },
-    expectedResult: {},
-  },
-  {
-    expectation: 'returns correct error when validating top level field',
-    values: {},
-    builders: builder => {
-      builder.field('foo', 'Foo').validate([isRequired()]);
-    },
-    expectedResult: {
+    const builder = buildValidators(values);
+    builder.field('foo', 'Foo').validate([]);
+
+    const result = builder.result();
+    const expectedResult = {};
+    expect(result).toEqual(expectedResult);
+  });
+
+  it('returns correct error when validating top level field', () => {
+    const values = {};
+
+    const builder = buildValidators(values);
+    builder.field('foo', 'Foo').validate([isRequired()]);
+
+    const result = builder.result();
+    const expectedResult = {
       foo: 'Foo is required.',
-    },
-  },
-  {
-    expectation: 'returns correct error when validating a deep field',
-    values: {},
-    builders: builder => {
-      builder.field('foo.bar.baz', 'Foo').validate([isRequired()]);
-    },
-    expectedResult: {
+    };
+    expect(result).toEqual(expectedResult);
+  });
+
+  it('returns correct error when validating a deep field', () => {
+    const values = {};
+
+    const builder = buildValidators(values);
+    builder.field('foo.bar.baz', 'Foo').validate([isRequired()]);
+
+    const result = builder.result();
+    const expectedResult = {
       foo: {
         bar: {
           baz: 'Foo is required.',
         },
       },
-    },
-  },
-  {
-    expectation: 'aggregates multiple levels of errors correctly',
-    values: {},
-    builders: builder => {
-      builder.field('foo', 'Foo').validate([isRequired()]);
-      builder.field('bar.baz', 'Baz').validate([isRequired()]);
-    },
-    expectedResult: {
+    };
+    expect(result).toEqual(expectedResult);
+  });
+
+  it('aggregates multiple levels of errors correctly', () => {
+    const values = {};
+
+    const builder = buildValidators(values);
+    builder.field('foo', 'Foo').validate([isRequired()]);
+    builder.field('bar.baz', 'Baz').validate([isRequired()]);
+
+    const result = builder.result();
+    const expectedResult = {
       foo: 'Foo is required.',
       bar: {
         baz: 'Baz is required.',
       },
-    },
-  },
-  {
-    expectation: 'validates arrays and aggregates them correctly',
-    values: {
-      lotsastuff: [1, 2, 3, 4, 5],
-    },
-    builders: builder => {
-      const arrayNotEmpty: Validator = (array, label) => array.length < 1 && `${label} must have at least 1 item.`;
-      const { arrayForEach } = builder;
+    };
+    expect(result).toEqual(expectedResult);
+  });
 
-      builder.field('lotsastuff', 'Array').validate([
-        isRequired(),
-        arrayNotEmpty,
-        arrayForEach(itemBuilder => {
-          itemBuilder.item('Item').validate([isRequired(), maxValue(3)]);
-        }),
-      ]);
-    },
-    expectedResult: {
+  it('validates arrays and aggregates them correctly', () => {
+    const values = {
+      lotsastuff: [1, 2, 3, 4, 5],
+    };
+
+    const builder = buildValidators(values);
+    const arrayNotEmpty: Validator = (array, label) => array.length < 1 && `${label} must have at least 1 item.`;
+    const { arrayForEach } = builder;
+
+    builder.field('lotsastuff', 'Array').validate([
+      isRequired(),
+      arrayNotEmpty,
+      arrayForEach(itemBuilder => {
+        itemBuilder.item('Item').validate([isRequired(), maxValue(3)]);
+      }),
+    ]);
+
+    const result = builder.result();
+    const expectedResult = {
       lotsastuff: [undefined, undefined, undefined, 'Item cannot be greater than 3', 'Item cannot be greater than 3'],
-    },
-  },
-  {
-    expectation: 'validates keys on array items and aggregates errors into resulting arrays correctly',
-    values: {
+    };
+    expect(result).toEqual(expectedResult);
+  });
+
+  it('validates keys on array items and aggregates errors into resulting arrays correctly', () => {
+    const values = {
       lotsastuff: [{ key: 1 }, { value: 2 }, 3, 4, 5],
-    },
-    builders: builder => {
-      const { arrayForEach } = builder;
-      builder.field('lotsastuff', 'Array').validate([
-        (array, label) => array.length < 1 && `${label} must have at least 1 item.`,
-        arrayForEach(itemBuilder => {
-          itemBuilder.field(`key`, `Item Key`).validate([isRequired()]);
-          itemBuilder.field(`value`, `Item Value`).validate([isRequired()]);
-        }),
-      ]);
-    },
-    expectedResult: {
+    };
+
+    const builder = buildValidators(values);
+    const { arrayForEach } = builder;
+    builder.field('lotsastuff', 'Array').validate([
+      (array, label) => array.length < 1 && `${label} must have at least 1 item.`,
+      arrayForEach(itemBuilder => {
+        itemBuilder.field(`key`, `Item Key`).validate([isRequired()]);
+        itemBuilder.field(`value`, `Item Value`).validate([isRequired()]);
+      }),
+    ]);
+
+    const result = builder.result();
+    const expectedResult = {
       lotsastuff: [
         { value: 'Item Value is required.' },
         { key: 'Item Key is required.' },
@@ -118,11 +120,12 @@ const synchronousTestCases: ISynchronousTestCase[] = [
         { key: 'Item Key is required.', value: 'Item Value is required.' },
         { key: 'Item Key is required.', value: 'Item Value is required.' },
       ],
-    },
-  },
-  {
-    expectation: 'validates crazy complicated arrays of objects with arrays of objects',
-    values: {
+    };
+    expect(result).toEqual(expectedResult);
+  });
+
+  it('validates crazy complicated arrays of objects with arrays of objects', () => {
+    const values = {
       letsgetcrazy: [
         {},
         {
@@ -141,25 +144,27 @@ const synchronousTestCases: ISynchronousTestCase[] = [
           data: { foo: 'bar' },
         },
       ],
-    },
-    builders: builder => {
-      const isArray: Validator = (array, label) => !Array.isArray(array) && `${label} must be an array.`;
-      const allOfTheThingsValidator: ArrayItemValidator = itemBuilder => {
-        itemBuilder.field(`all`, 'All').validate([isRequired()]);
-        itemBuilder.field(`of`, 'Of').validate([isRequired()]);
-        itemBuilder.field(`the`, 'The').validate([isRequired()]);
-        itemBuilder.field(`things`, 'Things').validate([isRequired()]);
-      };
+    };
 
-      const outerArrayItemValidator: ArrayItemValidator = itemBuilder => {
-        itemBuilder.field('key', 'Item key').validate([isRequired()]);
-        itemBuilder.field('data', 'Item data').validate([isRequired(), isArray, arrayForEach(allOfTheThingsValidator)]);
-      };
+    const builder = buildValidators(values);
+    const isArray: Validator = (array, label) => !Array.isArray(array) && `${label} must be an array.`;
+    const allOfTheThingsValidator: ArrayItemValidator = itemBuilder => {
+      itemBuilder.field(`all`, 'All').validate([isRequired()]);
+      itemBuilder.field(`of`, 'Of').validate([isRequired()]);
+      itemBuilder.field(`the`, 'The').validate([isRequired()]);
+      itemBuilder.field(`things`, 'Things').validate([isRequired()]);
+    };
 
-      const { arrayForEach } = builder;
-      builder.field('letsgetcrazy', 'Outer array').validate([arrayForEach(outerArrayItemValidator)]);
-    },
-    expectedResult: {
+    const outerArrayItemValidator: ArrayItemValidator = itemBuilder => {
+      itemBuilder.field('key', 'Item key').validate([isRequired()]);
+      itemBuilder.field('data', 'Item data').validate([isRequired(), isArray, arrayForEach(allOfTheThingsValidator)]);
+    };
+
+    const { arrayForEach } = builder;
+    builder.field('letsgetcrazy', 'Outer array').validate([arrayForEach(outerArrayItemValidator)]);
+
+    const result = builder.result();
+    const expectedResult = {
       letsgetcrazy: [
         { key: 'Item key is required.', data: 'Item data is required.' },
         {
@@ -179,43 +184,209 @@ const synchronousTestCases: ISynchronousTestCase[] = [
         },
         { data: 'Item data must be an array.' },
       ],
-    },
-  },
-];
+    };
+    expect(result).toEqual(expectedResult);
+  });
+});
 
-fdescribe('Synchronous validation', () => {
-  synchronousTestCases.forEach(testCase => {
-    it(testCase.expectation, () => {
-      const builder = buildValidators(testCase.values);
-      testCase.builders(builder);
-      const result = builder.result();
-      expect(result).toEqual(testCase.expectedResult);
+describe('Asynchronous validation of synchronous validators', () => {
+  it('returns empty errors when validating no validators - should also work with async', done => {
+    const values = { foo: 'bar' };
+
+    const builder = buildValidatorsAsync(values);
+    builder.field('foo', 'Foo').validate([]);
+
+    const result = builder.result();
+    const expectedResult = {};
+    result.then((errors: any) => {
+      expect(errors).toEqual(expectedResult);
+      done();
+    });
+  });
+
+  it('returns correct error when validating top level field - should also work with async', done => {
+    const values = {};
+
+    const builder = buildValidatorsAsync(values);
+    builder.field('foo', 'Foo').validate([isRequired()]);
+
+    const result = builder.result();
+    const expectedResult = {
+      foo: 'Foo is required.',
+    };
+    result.catch((errors: any) => {
+      expect(errors).toEqual(expectedResult);
+      done();
+    });
+  });
+
+  it('returns correct error when validating a deep field - should also work with async', done => {
+    const values = {};
+
+    const builder = buildValidatorsAsync(values);
+    builder.field('foo.bar.baz', 'Foo').validate([isRequired()]);
+
+    const result = builder.result();
+    const expectedResult = {
+      foo: {
+        bar: {
+          baz: 'Foo is required.',
+        },
+      },
+    };
+    result.catch((errors: any) => {
+      expect(errors).toEqual(expectedResult);
+      done();
+    });
+  });
+
+  it('aggregates multiple levels of errors correctly - should also work with async', done => {
+    const values = {};
+
+    const builder = buildValidatorsAsync(values);
+    builder.field('foo', 'Foo').validate([isRequired()]);
+    builder.field('bar.baz', 'Baz').validate([isRequired()]);
+
+    const result = builder.result();
+    const expectedResult = {
+      foo: 'Foo is required.',
+      bar: {
+        baz: 'Baz is required.',
+      },
+    };
+    result.catch((errors: any) => {
+      expect(errors).toEqual(expectedResult);
+      done();
+    });
+  });
+
+  it('validates arrays and aggregates them correctly - should also work with async', done => {
+    const values = {
+      lotsastuff: [1, 2, 3, 4, 5],
+    };
+
+    const builder = buildValidatorsAsync(values);
+    const arrayNotEmpty: Validator = (array, label) => array.length < 1 && `${label} must have at least 1 item.`;
+    const { arrayForEach } = builder;
+
+    builder.field('lotsastuff', 'Array').validate([
+      isRequired(),
+      arrayNotEmpty,
+      arrayForEach(itemBuilder => {
+        itemBuilder.item('Item').validate([isRequired(), maxValue(3)]);
+      }),
+    ]);
+
+    const result = builder.result();
+    const expectedResult = {
+      lotsastuff: [undefined, undefined, undefined, 'Item cannot be greater than 3', 'Item cannot be greater than 3'],
+    };
+    result.catch((errors: any) => {
+      expect(errors).toEqual(expectedResult);
+      done();
+    });
+  });
+
+  it('validates keys on array items and aggregates errors into resulting arrays correctly - should also work with async', done => {
+    const values = {
+      lotsastuff: [{ key: 1 }, { value: 2 }, 3, 4, 5],
+    };
+
+    const builder = buildValidatorsAsync(values);
+    const { arrayForEach } = builder;
+    builder.field('lotsastuff', 'Array').validate([
+      (array, label) => array.length < 1 && `${label} must have at least 1 item.`,
+      arrayForEach(itemBuilder => {
+        itemBuilder.field(`key`, `Item Key`).validate([isRequired()]);
+        itemBuilder.field(`value`, `Item Value`).validate([isRequired()]);
+      }),
+    ]);
+
+    const result = builder.result();
+    const expectedResult = {
+      lotsastuff: [
+        { value: 'Item Value is required.' },
+        { key: 'Item Key is required.' },
+        { key: 'Item Key is required.', value: 'Item Value is required.' },
+        { key: 'Item Key is required.', value: 'Item Value is required.' },
+        { key: 'Item Key is required.', value: 'Item Value is required.' },
+      ],
+    };
+    result.catch((errors: any) => {
+      expect(errors).toEqual(expectedResult);
+      done();
+    });
+  });
+
+  it('validates crazy complicated arrays of objects with arrays of objects - should also work with async', done => {
+    const values = {
+      letsgetcrazy: [
+        {},
+        {
+          key: 'array',
+          data: [
+            { all: 1, of: 2, the: 3, things: 4 },
+            { all: '', of: 2, the: 3, things: 4 },
+            { all: 1, of: '', the: 3, things: 4 },
+            { all: 1, of: 2, the: '', things: 4 },
+            { all: 1, of: 2, the: 3, things: '' },
+            {},
+          ],
+        },
+        {
+          key: 'nothotdog',
+          data: { foo: 'bar' },
+        },
+      ],
+    };
+
+    const builder = buildValidatorsAsync(values);
+    const isArray: Validator = (array, label) => !Array.isArray(array) && `${label} must be an array.`;
+    const allOfTheThingsValidator: ArrayItemValidator = itemBuilder => {
+      itemBuilder.field(`all`, 'All').validate([isRequired()]);
+      itemBuilder.field(`of`, 'Of').validate([isRequired()]);
+      itemBuilder.field(`the`, 'The').validate([isRequired()]);
+      itemBuilder.field(`things`, 'Things').validate([isRequired()]);
+    };
+
+    const outerArrayItemValidator: ArrayItemValidator = itemBuilder => {
+      itemBuilder.field('key', 'Item key').validate([isRequired()]);
+      itemBuilder.field('data', 'Item data').validate([isRequired(), isArray, arrayForEach(allOfTheThingsValidator)]);
+    };
+
+    const { arrayForEach } = builder;
+    builder.field('letsgetcrazy', 'Outer array').validate([arrayForEach(outerArrayItemValidator)]);
+
+    const result = builder.result();
+    const expectedResult = {
+      letsgetcrazy: [
+        { key: 'Item key is required.', data: 'Item data is required.' },
+        {
+          data: [
+            undefined,
+            { all: 'All is required.' },
+            { of: 'Of is required.' },
+            { the: 'The is required.' },
+            { things: 'Things is required.' },
+            {
+              all: 'All is required.',
+              of: 'Of is required.',
+              the: 'The is required.',
+              things: 'Things is required.',
+            },
+          ],
+        },
+        { data: 'Item data must be an array.' },
+      ],
+    };
+    result.catch((errors: any) => {
+      expect(errors).toEqual(expectedResult);
+      done();
     });
   });
 });
 
-fdescribe('Asynchronous validation of synchronous validators', () => {
-  synchronousTestCases.forEach(testCase => {
-    const hasErrors = Object.keys(testCase.expectedResult).length;
-    it(`${testCase.expectation} - should also work with async`, done => {
-      const builder = buildValidatorsAsync(testCase.values);
-      testCase.builders(builder);
-      if (hasErrors) {
-        builder.result().catch((errors: any) => {
-          expect(errors).toEqual(testCase.expectedResult);
-          done();
-        });
-      } else {
-        builder.result().then((errors: any) => {
-          expect(errors).toEqual(testCase.expectedResult);
-          done();
-        });
-      }
-    });
-  });
-});
-
-fdescribe('Asynchronous simple validation', () => {
+describe('Asynchronous simple validation', () => {
   it('Validate nothing', done => {
     const values = { foo: 'bar' };
 
@@ -247,7 +418,7 @@ fdescribe('Asynchronous simple validation', () => {
   });
 });
 
-fdescribe('Asynchronous array validation', () => {
+describe('Asynchronous array validation', () => {
   it('Simple array validation', done => {
     const values = {
       lotsastuff: [1, 2, 3, 4, 5],
@@ -271,7 +442,7 @@ fdescribe('Asynchronous array validation', () => {
   });
 });
 
-fdescribe('Errors', () => {
+describe('Errors', () => {
   it('Sneaking a promise into synchronous validation', () => {
     const values = { foo: 'bar' };
 
