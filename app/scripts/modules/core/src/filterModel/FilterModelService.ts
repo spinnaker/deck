@@ -252,6 +252,7 @@ export class FilterModelService {
         if (checkedStacks.includes('(none)')) {
           checkedStacks.push(''); // TODO: remove when moniker is source of truth for naming
           checkedStacks.push(null);
+          checkedStacks.push(undefined);
         }
         return includes(checkedStacks, target.stack);
       } else {
@@ -267,6 +268,7 @@ export class FilterModelService {
         if (checkedDetails.includes('(none)')) {
           checkedDetails.push(''); // TODO: remove when moniker is source of truth for naming
           checkedDetails.push(null);
+          checkedDetails.push(undefined);
         }
         return includes(checkedDetails, target.detail);
       } else {
