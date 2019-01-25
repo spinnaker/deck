@@ -10,7 +10,7 @@ const angular = require('angular');
 module.exports = angular.module('spinnaker.utils', [
   TIME_FORMATTERS,
   SELECT_ON_DOUBLE_CLICK_DIRECTIVE,
-  require('./infiniteScroll.directive.js').name,
+  require('./infiniteScroll.directive').name,
   RENDER_IF_FEATURE,
   UIB_MODAL_REJECTIONS,
   require('./waypoints/waypoint.directive').name,
