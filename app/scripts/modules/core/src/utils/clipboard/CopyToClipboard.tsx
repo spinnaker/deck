@@ -8,9 +8,9 @@ import './CopyToClipboard.less';
 
 export interface ICopyToClipboardProps {
   analyticsLabel?: string;
-  displayValue: boolean;
+  displayText: boolean;
+  text: string;
   toolTip: string;
-  value: string;
 }
 
 interface IInputStyle {
@@ -39,7 +39,7 @@ interface ICopyToClipboardState {
  */
 export class CopyToClipboard extends React.Component<ICopyToClipboardProps, ICopyToClipboardState> {
   public static defaultProps = {
-    displayValue: false,
+    displayText: false,
   };
 
   // Handles onto our DOM elements. We need to select data from the input
@@ -74,8 +74,8 @@ export class CopyToClipboard extends React.Component<ICopyToClipboardProps, ICop
    * the same value text as the input.
    */
   public componentDidMount() {
-    const { displayValue } = this.props;
-    if (displayValue) {
+    const { displayText } = this.props;
+    if (displayText) {
       const hiddenNode = this.hiddenRef.current;
       this.setState({ inputWidth: hiddenNode.offsetWidth + 3 });
     }
@@ -90,11 +90,11 @@ export class CopyToClipboard extends React.Component<ICopyToClipboardProps, ICop
   public handleClick = (e: React.SyntheticEvent): void => {
     e.preventDefault();
 
-    const { analyticsLabel, toolTip, value } = this.props;
+    const { analyticsLabel, toolTip, text } = this.props;
     ReactGA.event({
       category: 'Copy to Clipboard',
       action: 'copy',
-      label: analyticsLabel || value,
+      label: analyticsLabel || text,
     });
 
     const node: HTMLInputElement = this.inputRef.current;
@@ -124,12 +124,12 @@ export class CopyToClipboard extends React.Component<ICopyToClipboardProps, ICop
   };
 
   public render() {
-    const { displayValue, toolTip, value } = this.props;
+    const { displayText, toolTip, text = '' } = this.props;
     const { inputWidth, tooltipCopy } = this.state;
 
     const persistOverlay = Boolean(tooltipCopy);
     const copy = tooltipCopy || toolTip;
-    const id = `clipboardValue-${value.replace(' ', '-')}`;
+    const id = `clipboardValue-${text.replace(' ', '-')}`;
     const tooltipComponent = <Tooltip id={id}>{copy}</Tooltip>;
 
     let updatedStyle = {
@@ -137,7 +137,7 @@ export class CopyToClipboard extends React.Component<ICopyToClipboardProps, ICop
       width: inputWidth,
     };
 
-    if (!displayValue) {
+    if (!displayText) {
       updatedStyle = {
         ...updatedStyle,
         position: 'absolute' as 'absolute',
@@ -149,15 +149,15 @@ export class CopyToClipboard extends React.Component<ICopyToClipboardProps, ICop
 
     return (
       <React.Fragment>
-        {displayValue && (
+        {displayText && (
           <span ref={this.hiddenRef} style={this.hiddenStyle}>
-            {value}
+            {text}
           </span>
         )}
         <input
           onChange={e => e} // no-op to prevent warnings
           ref={this.inputRef}
-          value={value}
+          value={text}
           type="text"
           style={updatedStyle}
         />

@@ -21,8 +21,8 @@ export class ManifestStatus extends React.Component<IManifestStatusProps> {
         <dt>{manifest.manifest.kind}</dt>
         <dd>
           <CopyToClipboard
-            displayValue={true}
-            value={manifest.manifest.metadata.name}
+            displayText={true}
+            text={manifest.manifest.metadata.name}
             toolTip={`Copy ${manifest.manifest.metadata.name}`}
           />
           &nbsp;

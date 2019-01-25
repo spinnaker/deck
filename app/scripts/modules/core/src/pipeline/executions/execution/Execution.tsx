@@ -394,7 +394,7 @@ export class Execution extends React.Component<IExecutionProps, IExecutionState>
                 <a onClick={this.handlePermalinkClick} href={this.getUrl()}>
                   Permalink
                 </a>
-                <CopyToClipboard value={this.getUrl()} toolTip="Copy permalink to clipboard" />
+                <CopyToClipboard text={this.getUrl()} toolTip="Copy permalink to clipboard" />
               </div>
             </div>
           </div>

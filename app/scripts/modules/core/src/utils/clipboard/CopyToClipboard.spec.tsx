@@ -5,13 +5,13 @@ import { CopyToClipboard } from './CopyToClipboard';
 
 describe('<CopyToClipboard />', () => {
   it('renders an input with the text value', () => {
-    const wrapper = mount(<CopyToClipboard toolTip="Copy Rebel Girl" value="Rebel Girl" />);
+    const wrapper = mount(<CopyToClipboard toolTip="Copy Rebel Girl" text="Rebel Girl" />);
     const input = wrapper.find('input');
     expect(input.get(0).props.value).toEqual('Rebel Girl');
   });
 
   it('Mouseover/click triggers overlay with toolTip', () => {
-    const wrapper = mount(<CopyToClipboard toolTip="Copy Rebel Girl" value="Rebel Girl" />);
+    const wrapper = mount(<CopyToClipboard toolTip="Copy Rebel Girl" text="Rebel Girl" />);
     const button = wrapper.find('button');
     button.simulate('mouseOver');
 
