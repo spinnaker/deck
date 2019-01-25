@@ -5,8 +5,18 @@ import { IStageConfigProps, StageConfigField } from 'core/pipeline';
 import { Observable } from 'rxjs';
 import Select from 'react-select';
 
+interface IArgOptions {
+  value?: string;
+}
+
+interface IState {
+  isFetchingData: boolean;
+  commands: any[];
+  targets: any[];
+}
+
 export class GremlinStageConfig extends React.Component<IStageConfigProps> {
-  public state = { isFetchingData: false, commands: [], targets: [] };
+  public state: IState = { isFetchingData: false, commands: [], targets: [] };
 
   public componentDidMount() {
     this.checkInitialLoad();
@@ -20,37 +30,35 @@ export class GremlinStageConfig extends React.Component<IStageConfigProps> {
     }
   };
 
-  private fetchCommands = apiKey => {
+  private fetchCommands = (apiKey: string) => {
     return Observable.fromPromise(
       API.one('gremlin/templates/command')
         .post({
           apiKey,
         })
-        .then(
-          results => {
-            return results;
-          },
-          () => {
-            return [];
-          },
-        ),
+        .then((results: any[]) => {
+          return results;
+        })
+        .catch(() => {
+          const results: any[] = [];
+          return results;
+        }),
     );
   };
 
-  private fetchTargets = apiKey => {
+  private fetchTargets = (apiKey: string) => {
     return Observable.fromPromise(
       API.one('gremlin/templates/target')
         .post({
           apiKey,
         })
-        .then(
-          results => {
-            return results;
-          },
-          () => {
-            return [];
-          },
-        ),
+        .then((results: any[]) => {
+          return results;
+        })
+        .catch(() => {
+          const results: any[] = [];
+          return results;
+        }),
     );
   };
 
@@ -77,11 +85,11 @@ export class GremlinStageConfig extends React.Component<IStageConfigProps> {
     this.props.updateStageField({ [name]: value });
   };
 
-  private handleGremlinCommandTemplateIdChange = (option: object) => {
+  private handleGremlinCommandTemplateIdChange = (option: IArgOptions) => {
     this.props.updateStageField({ gremlinCommandTemplateId: option.value });
   };
 
-  private handleGremlinTargetTemplateIdChange = (option: object) => {
+  private handleGremlinTargetTemplateIdChange = (option: IArgOptions) => {
     this.props.updateStageField({ gremlinTargetTemplateId: option.value });
   };
 
@@ -101,7 +109,7 @@ export class GremlinStageConfig extends React.Component<IStageConfigProps> {
           />
           <div className="form-control-static">
             <button
-              disabled={isFetchingData || !stage.gremlinApiKey ? 'disabled' : ''}
+              disabled={isFetchingData || !stage.gremlinApiKey ? true : false}
               onClick={this.fetchAPIData}
               type="button"
               className="btn btn-sm btn-default"
