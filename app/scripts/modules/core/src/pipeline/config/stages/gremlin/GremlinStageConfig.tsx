@@ -6,9 +6,6 @@ import { Observable } from 'rxjs';
 import Select from 'react-select';
 
 export class GremlinStageConfig extends React.Component<IStageConfigProps> {
-  public ENDPOINT_COMMANDS = `${API.baseUrl}/gremlin/templates/command`;
-  public ENDPOINT_TARGETS = `${API.baseUrl}/gremlin/templates/target`;
-
   public state = { isFetchingData: false, commands: [], targets: [] };
 
   public componentDidMount() {
