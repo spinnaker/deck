@@ -95,9 +95,17 @@ export class CopyToClipboard extends React.Component<ICopyToClipboardProps> {
     // A best attempt at trying to keep the Copied! text centered in the
     // Tooltip, otherwise it jumps around.
     let copiedText = 'Copied!';
+
+    // String.padStart is ES2017, but has pretty good support in browsers already
+    // Unfortunately TypeScript doesn't like it so we need to disable the checks
+
+    // @ts-ignore
     if (String.prototype.padStart) {
       const toolTipPadding = Math.round(Math.max(0, toolTip.length - copiedText.length) / 2);
+      // @ts-ignore
       copiedText = copiedText.padStart(copiedText.length + toolTipPadding, ' ');
+
+      // @ts-ignore
       copiedText = copiedText.padEnd(copiedText.length + toolTipPadding, ' ');
 
       // Replace spaces with Figure Space which won't break
