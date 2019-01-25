@@ -2,6 +2,7 @@ import * as React from 'react';
 import * as ReactGA from 'react-ga';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { PositionProperty } from 'csstype';
+import { padStart, padEnd } from 'lodash';
 
 import './CopyToClipboard.less';
 
@@ -22,6 +23,11 @@ interface IInputStyle {
   position?: PositionProperty;
 }
 
+interface ICopyToClipboardState {
+  tooltipCopy: boolean | string;
+  inputWidth: number | 'auto';
+}
+
 /**
  * Places text in an invisible input field so we can auto-focus and select the text
  * then copy it to the clipboard onClick. Used in labels found in components like
@@ -31,14 +37,9 @@ interface IInputStyle {
  * since the text is placed in an invisible input its very easy to select
  * if the copy fails.
  */
-export class CopyToClipboard extends React.Component<ICopyToClipboardProps> {
+export class CopyToClipboard extends React.Component<ICopyToClipboardProps, ICopyToClipboardState> {
   public static defaultProps = {
     displayValue: false,
-  };
-
-  public state = {
-    tooltipCopy: false,
-    inputWidth: 'auto',
   };
 
   // Handles onto our DOM elements. We need to select data from the input
@@ -58,6 +59,14 @@ export class CopyToClipboard extends React.Component<ICopyToClipboardProps> {
     position: 'absolute' as 'absolute',
     whiteSpace: 'pre' as 'pre',
   };
+
+  constructor(props: ICopyToClipboardProps) {
+    super(props);
+    this.state = {
+      tooltipCopy: false,
+      inputWidth: 'auto',
+    };
+  }
 
   /**
    * We need to play some games to get the correct width of the container
@@ -96,22 +105,9 @@ export class CopyToClipboard extends React.Component<ICopyToClipboardProps> {
     // Tooltip, otherwise it jumps around.
     let copiedText = 'Copied!';
 
-    // String.padStart is ES2017, but has pretty good support in browsers already
-    // Unfortunately TypeScript doesn't like it so we need to disable the checks
-
-    // @ts-ignore
-    if (String.prototype.padStart) {
-      const toolTipPadding = Math.round(Math.max(0, toolTip.length - copiedText.length) / 2);
-      // @ts-ignore
-      copiedText = copiedText.padStart(copiedText.length + toolTipPadding, ' ');
-
-      // @ts-ignore
-      copiedText = copiedText.padEnd(copiedText.length + toolTipPadding, ' ');
-
-      // Replace spaces with Figure Space which won't break
-      // https://www.fileformat.info/info/unicode/category/Zs/list.htm
-      copiedText = copiedText.replace(/ /g, '\u2007');
-    }
+    const toolTipPadding = Math.round(Math.max(0, toolTip.length - copiedText.length) / 2);
+    copiedText = padStart(copiedText, copiedText.length + toolTipPadding, '\u2007');
+    copiedText = padEnd(copiedText, copiedText.length + toolTipPadding, '\u2007');
 
     try {
       document.execCommand('copy');
