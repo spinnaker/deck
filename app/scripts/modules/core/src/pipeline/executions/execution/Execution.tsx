@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 import * as classNames from 'classnames';
 
 import { Application } from 'core/application/application.model';
+import { CopyToClipboard } from 'core/utils';
 import { StageExecutionDetails } from 'core/pipeline/details/StageExecutionDetails';
 import { ExecutionStatus } from 'core/pipeline/status/ExecutionStatus';
 import { IExecution, IRestartDetails, IPipeline } from 'core/domain';
@@ -17,8 +18,6 @@ import { ReactInjector } from 'core/reactShims';
 import { duration, timestamp } from 'core/utils/timeFormatters';
 import { ISortFilter } from 'core/filterModel';
 import { ExecutionState } from 'core/state';
-
-import { CopyToClipboard } from '@spinnaker/core';
 
 // react components
 import { ExecutionMarker } from './ExecutionMarker';
@@ -395,7 +394,7 @@ export class Execution extends React.Component<IExecutionProps, IExecutionState>
                 <a onClick={this.handlePermalinkClick} href={this.getUrl()}>
                   Permalink
                 </a>
-                <CopyToClipboard value={this.getUrl()} toolTip="Copy permalink to clipboard" />
+                <CopyToClipboard text={this.getUrl()} toolTip="Copy permalink to clipboard" />
               </div>
             </div>
           </div>
