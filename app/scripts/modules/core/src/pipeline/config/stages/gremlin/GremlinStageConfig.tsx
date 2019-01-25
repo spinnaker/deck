@@ -106,7 +106,7 @@ export class GremlinStageConfig extends React.Component<IStageConfigProps> {
               type="button"
               className="btn btn-sm btn-default"
             >
-              {isFetchingData ? 'Loading' : 'Fetch'}
+              {isFetchingData ? 'Loading...' : 'Fetch'}
             </button>
           </div>
         </StageConfigField>
