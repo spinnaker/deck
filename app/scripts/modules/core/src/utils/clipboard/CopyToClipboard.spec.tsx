@@ -1,9 +1,12 @@
 import * as React from 'react';
+import * as ReactGA from 'react-ga';
 import { mount } from 'enzyme';
 
 import { CopyToClipboard } from './CopyToClipboard';
 
 describe('<CopyToClipboard />', () => {
+  beforeEach(() => spyOn(ReactGA, 'event'));
+
   it('renders an input with the text value', () => {
     const wrapper = mount(<CopyToClipboard toolTip="Copy Rebel Girl" text="Rebel Girl" />);
     const input = wrapper.find('input');
@@ -22,5 +25,12 @@ describe('<CopyToClipboard />', () => {
     // Click replaces overlay text with padding + Copied!
     button.simulate('click');
     expect(overlay.innerText).toEqual('    Copied!    ');
+  });
+
+  it('fires a GA event on click', () => {
+    const wrapper = mount(<CopyToClipboard toolTip="Copy Rebel Girl" text="Rebel Girl" />);
+    const button = wrapper.find('button');
+    button.simulate('click');
+    expect(ReactGA.event).toHaveBeenCalled();
   });
 });
