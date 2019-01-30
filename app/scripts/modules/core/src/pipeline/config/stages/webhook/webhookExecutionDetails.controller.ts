@@ -65,12 +65,12 @@ export class WebhookExecutionDetailsCtrl implements IController {
       webhook = context.webhook || {},
       monitor = webhook.monitor || {};
 
-    let body = monitor.body || webhook.body || null;
+    const body = monitor.body || webhook.body || null;
 
     // Empty body is only allowed when we haven't started or are running the task.
     // Otherwise, assume the request completed and didn't yield a body in the response
     if (!body && this.stage.originalStatus !== 'NOT_STARTED' && this.stage.originalStatus !== 'RUNNING') {
-      body = '<NO BODY RETURNED BY SERVER>';
+      return '<NO BODY RETURNED BY SERVER>';
     }
 
     if (typeof body === 'object') {
