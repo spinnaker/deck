@@ -90,7 +90,8 @@ export class ConfigureProjectModal extends React.Component<IConfigureProjectModa
   private submit = (project: IProject) => {
     const taskMonitor = new TaskMonitor({
       title: 'Updating Project',
-      onTaskComplete: () => ReactInjector.$state.go('home.project', { project: project.name }),
+      onTaskComplete: () =>
+        ReactInjector.$state.go('home.project', { project: project.name }, { location: 'replace', reload: true }),
       modalInstance: TaskMonitor.modalInstanceEmulation(() => this.props.dismissModal()),
     });
 
