@@ -88,10 +88,10 @@ export class ConfigureProjectModal extends React.Component<IConfigureProjectModa
   }
 
   private submit = (project: IProject) => {
+    const { name } = project;
     const taskMonitor = new TaskMonitor({
       title: 'Updating Project',
-      onTaskComplete: () => ReactInjector.$state.go('home.project', { project: project.name }),
-      modalInstance: TaskMonitor.modalInstanceEmulation(() => this.props.dismissModal()),
+      modalInstance: TaskMonitor.modalInstanceEmulation(() => this.props.closeModal({ name, action: 'upsert' })),
     });
 
     this.setState({ taskMonitor });
@@ -133,11 +133,11 @@ export class ConfigureProjectModal extends React.Component<IConfigureProjectModa
 
   private onDelete = () => {
     const { projectConfiguration } = this.props;
+    const { name } = projectConfiguration;
     if (projectConfiguration) {
       const taskMonitor = new TaskMonitor({
         title: 'Deleting Project',
-        onTaskComplete: () => ReactInjector.$state.go('home.search'),
-        modalInstance: TaskMonitor.modalInstanceEmulation(() => this.props.dismissModal()),
+        modalInstance: TaskMonitor.modalInstanceEmulation(() => this.props.closeModal({ name, action: 'delete' })),
       });
 
       this.setState({ taskMonitor });
