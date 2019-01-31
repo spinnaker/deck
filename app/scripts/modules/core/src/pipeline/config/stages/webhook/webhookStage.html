@@ -13,6 +13,9 @@
       </ui-select-choices>
     </ui-select>
   </stage-config-field>
+  <stage-config-field label="Fail Fast HTTP Statuses" help-key="pipeline.config.webhook.failFastCodes">
+    <input type="text" class="form-control input-sm" ng-model="$ctrl.viewState.failFastStatusCodes" ng-change="$ctrl.failFastCodesChanged()"/>
+  </stage-config-field>
   <stage-config-field label="Parameters"
                       ng-if="$ctrl.parameters.length">
     <div class="form-group" ng-repeat="parameter in $ctrl.parameters | orderBy:['order','name']">
@@ -31,7 +34,7 @@
     <textarea class="code form-control flex-fill"
               rows="5"
               ng-model="$ctrl.command.payloadJSON"
-              ng-change="$ctrl.updatePayload()"/>
+              ng-change="$ctrl.updatePayload()"></textarea>
 
       <div class="form-group row slide-in" ng-if="$ctrl.command.invalid">
         <div class="col-sm-9 col-sm-offset-3 error-message">

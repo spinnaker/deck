@@ -14,7 +14,9 @@ export class WebhookExecutionDetailsCtrl implements IController {
   public detailsSection: string;
   public failureMessage: string;
   public progressMessage: string;
+  public body: string;
   public stage: any;
+  public payload: string;
 
   constructor(
     private $stateParams: StateParams,
@@ -31,6 +33,8 @@ export class WebhookExecutionDetailsCtrl implements IController {
     this.detailsSection = get<string>(this.$stateParams, 'details', '');
     this.failureMessage = this.getFailureMessage();
     this.progressMessage = this.getProgressMessage();
+    this.body = this.getBodyContent();
+    this.payload = JSON.stringify(this.stage.context.payload, null, 2);
   }
 
   private getProgressMessage(): string {
@@ -44,16 +48,36 @@ export class WebhookExecutionDetailsCtrl implements IController {
     const context = this.stage.context || {},
       webhook = context.webhook || {},
       monitor = webhook.monitor || {},
-      error = monitor.error || null;
+      error = monitor.error || webhook.error || null;
 
-    if (this.stage.originalStatus === 'TERMINAL') {
-      if (error) {
-        failureMessage = `Webhook failed: ${error}`;
-      } else if (monitor.progressMessage) {
-        failureMessage = `Webhook failed. Last known progress message: ${monitor.progressMessage}`;
-      }
+    if (error) {
+      failureMessage = `Webhook failed: ${error}`;
+    } else if (monitor.progressMessage) {
+      failureMessage = `Webhook failed. Last known progress message: ${monitor.progressMessage}`;
     }
+
     return failureMessage;
+  }
+
+  private getBodyContent(): string {
+    // If there was a webhook monitor task get the body from it, otherwise get it from webhook
+    const context = this.stage.context || {},
+      webhook = context.webhook || {},
+      monitor = webhook.monitor || {};
+
+    const body = monitor.body || webhook.body || null;
+
+    // Empty body is only allowed when we haven't started or are running the task.
+    // Otherwise, assume the request completed and didn't yield a body in the response
+    if (!body && this.stage.originalStatus !== 'NOT_STARTED' && this.stage.originalStatus !== 'RUNNING') {
+      return '<NO BODY RETURNED BY SERVER>';
+    }
+
+    if (typeof body === 'object') {
+      return JSON.stringify(body, null, 2);
+    }
+
+    return body;
   }
 
   private initialize(): void {
