@@ -2,13 +2,13 @@
 
 const angular = require('angular');
 
-import { ApplicationNameValidator, FirewallLabels } from '@spinnaker/core';
+import { ApplicationNameValidator } from '@spinnaker/core';
 
 module.exports = angular
   .module('spinnaker.azure.validation.applicationName', [])
   .factory('azureApplicationNameValidator', function() {
     function validateSpecialCharacters(name, errors) {
-      const pattern = /^[^_]$/;
+      const pattern = /^([a-zA-Z][a-zA-Z0-9]*)?$/;
       if (!pattern.test(name)) {
         errors.push(
           'The application name must begin with a letter and must contain only letters or digits. No ' +
