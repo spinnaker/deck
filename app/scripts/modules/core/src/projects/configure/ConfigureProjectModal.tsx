@@ -9,7 +9,6 @@ import { PipelineConfigService } from 'core/pipeline';
 import { IModalComponentProps, ReactModal } from 'core/presentation';
 import { TaskMonitor } from 'core/task';
 import { noop } from 'core/utils';
-import { ReactInjector } from 'core/reactShims';
 
 import { ProjectReader } from '../service/ProjectReader';
 import { ProjectWriter } from '../service/ProjectWriter';
