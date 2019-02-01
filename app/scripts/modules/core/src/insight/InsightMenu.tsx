@@ -41,10 +41,10 @@ export class InsightMenu extends React.Component<IInsightMenuProps, IInsightMenu
 
   private createProject = () =>
     ConfigureProjectModal.show()
-      .catch(() => {})
       .then(result => {
         this.$state.go('home.project.dashboard', { project: result.name });
-      });
+      })
+      .catch(() => {});
 
   private createApplication = () => {
     this.$uibModal
