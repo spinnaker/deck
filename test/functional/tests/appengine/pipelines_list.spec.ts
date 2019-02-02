@@ -6,7 +6,7 @@ import { HeaderNavLocators } from '../core/locators/HeaderNavLocators';
 
 describe('AppEngine Pipelines', () => {
   describe('List', () => {
-    it('shows stored appengine pipelines with their provider tag', () => {
+    it('shows stored appengine pipelines with their account tag', () => {
       const home = new HomePage();
       const apps = new ApplicationsListPage();
       const infra = new InfrastructurePage();

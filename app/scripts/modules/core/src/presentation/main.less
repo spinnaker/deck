@@ -4,24 +4,29 @@
 @fixed-header-z-index: 1030;
 
 /* Resets for React select */
-.Select--multi .Select-multi-value-wrapper,
-.Select-control,
-.Select-input {
-  height: 30px;
-}
+html {
+  .Select--multi .Select-multi-value-wrapper,
+  .Select-control,
+  .Select-input {
+    height: 30px;
+  }
 
-.Select-input {
-  font-size: 12px;
-}
+  .Select-input {
+    font-size: 12px;
+    input:invalid {
+      box-shadow: none;
+    }
+  }
 
-.Select-placeholder {
-  line-height: 30px;
-  height: inherit;
-}
+  .Select-placeholder {
+    line-height: 30px;
+    height: inherit;
+  }
 
-.Select-placeholder,
-.Select--single > .Select-control .Select-value {
-  line-height: 30px;
+  .Select-placeholder,
+  .Select--single > .Select-control .Select-value {
+    line-height: 30px;
+  }
 }
 
 .form-field-loading {
@@ -1243,6 +1248,7 @@ select.input-sm {
 .Select.input-sm {
   display: flex;
   align-items: center;
+  padding-right: 0;
   .Select-control {
     display: flex;
     justify-content: space-between;
@@ -1256,6 +1262,11 @@ select.input-sm {
     left: 0;
     right: 0;
     width: unset;
+  }
+  .Select-clear-zone {
+    position: absolute;
+    right: 25px;
+    line-height: 30px;
   }
 }
 
@@ -1451,7 +1462,7 @@ ul.checkmap {
 }
 
 .break-word {
-  word-break: break-all;
+  overflow-wrap: break-word;
 }
 
 .horizontal-rule {
