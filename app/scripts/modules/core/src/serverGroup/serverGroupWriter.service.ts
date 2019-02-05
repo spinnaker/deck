@@ -1,4 +1,4 @@
-import { module } from 'angular';
+import { IPromise, module } from 'angular';
 
 import { Application } from 'core/application/application.model';
 import { ISecurityGroup, IServerGroup, ITask } from 'core/domain';
@@ -121,6 +121,20 @@ export class ServerGroupWriter {
       .join(', ');
   }
 
+  public mapLoadBalancers(serverGroup: IServerGroup, application: Application, params: any = {}): IPromise<ITask> {
+    params.type = 'mapLoadBalancers';
+    params.name = [serverGroup.name];
+    params.loadBalancerNames = serverGroup.loadBalancers;
+    params.region = serverGroup.region;
+    params.credentials = serverGroup.account;
+    params.cloudProvider = serverGroup.cloudProvider;
+    return TaskExecutor.executeTask({
+      job: [params],
+      application,
+      description: `Map load balancers for server group: ${serverGroup.name}`,
+    });
+  }
+
   public resizeServerGroup(
     serverGroup: IServerGroup,
     application: Application,
@@ -162,6 +176,20 @@ export class ServerGroupWriter {
     });
   }
 
+  public unmapLoadBalancers(serverGroup: IServerGroup, application: Application, params: any = {}): IPromise<ITask> {
+    params.type = 'unmapLoadBalancers';
+    params.name = [serverGroup.name];
+    params.loadBalancerNames = serverGroup.loadBalancers;
+    params.region = serverGroup.region;
+    params.credentials = serverGroup.account;
+    params.cloudProvider = serverGroup.cloudProvider;
+    return TaskExecutor.executeTask({
+      job: [params],
+      application,
+      description: `Unmap load balancers for server group: ${serverGroup.name}`,
+    });
+  }
+
   public updateSecurityGroups(
     serverGroup: IServerGroup,
     securityGroups: ISecurityGroup[],
@@ -187,7 +215,7 @@ export class ServerGroupWriter {
 }
 
 export const SERVER_GROUP_WRITER = 'spinnaker.core.serverGroup.write.service';
-module(SERVER_GROUP_WRITER, [require('./serverGroup.transformer.js').name]).service(
+module(SERVER_GROUP_WRITER, [require('./serverGroup.transformer').name]).service(
   'serverGroupWriter',
   ServerGroupWriter,
 );
