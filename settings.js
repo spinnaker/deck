@@ -62,6 +62,7 @@ window.spinnakerSettings = {
     // whether stages affecting infrastructure (like "Create Load Balancer") should be enabled or not
     infrastructureStages: infrastructureEnabled,
     jobs: false,
+    managedPipelineTemplatesV2: false,
     managedServiceAccounts: managedServiceAccountsEnabled,
     notifications: false,
     pagerDuty: false,
