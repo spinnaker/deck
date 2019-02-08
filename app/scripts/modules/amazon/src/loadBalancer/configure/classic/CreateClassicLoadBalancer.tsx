@@ -33,7 +33,6 @@ export interface ICreateClassicLoadBalancerProps extends ILoadBalancerModalProps
 }
 
 export interface ICreateClassicLoadBalancerState {
-  includeSecurityGroups: boolean;
   isNew: boolean;
   loadBalancerCommand: IAmazonClassicLoadBalancerUpsertCommand;
   taskMonitor: TaskMonitor;
@@ -65,7 +64,6 @@ export class CreateClassicLoadBalancer extends React.Component<
       : AwsReactInjector.awsLoadBalancerTransformer.constructNewClassicLoadBalancerTemplate(props.app);
 
     this.state = {
-      includeSecurityGroups: !!loadBalancerCommand.vpcId,
       isNew: !props.loadBalancer,
       loadBalancerCommand,
       taskMonitor: null,
@@ -200,15 +198,14 @@ export class CreateClassicLoadBalancer extends React.Component<
     }
   };
 
-  private validate = (values: FormikValues): FormikErrors<IAmazonClassicLoadBalancerUpsertCommand> => {
-    this.setState({ includeSecurityGroups: !!values.vpcId });
+  private validate = (_values: FormikValues): FormikErrors<IAmazonClassicLoadBalancerUpsertCommand> => {
     const errors = {} as FormikErrors<IAmazonClassicLoadBalancerUpsertCommand>;
     return errors;
   };
 
   public render(): React.ReactElement<CreateClassicLoadBalancer> {
     const { app, dismissModal, forPipelineConfig, loadBalancer } = this.props;
-    const { includeSecurityGroups, isNew, loadBalancerCommand, taskMonitor } = this.state;
+    const { isNew, loadBalancerCommand, taskMonitor } = this.state;
 
     const showLocationSection = isNew || forPipelineConfig;
 
@@ -246,7 +243,7 @@ export class CreateClassicLoadBalancer extends React.Component<
               />
             )}
 
-            {includeSecurityGroups && (
+            {!!formik.values.vpcId && (
               <WizardPage
                 label={FirewallLabels.get('Firewall')}
                 wizard={wizard}
@@ -261,7 +258,7 @@ export class CreateClassicLoadBalancer extends React.Component<
               label="Listeners"
               wizard={wizard}
               order={nextIdx()}
-              render={({ innerRef }) => <Listeners ref={innerRef} formik={formik} app={app}/>}
+              render={({ innerRef }) => <Listeners ref={innerRef} formik={formik} app={app} />}
             />
 
             <WizardPage
