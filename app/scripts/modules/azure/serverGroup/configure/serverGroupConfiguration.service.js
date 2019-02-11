@@ -199,16 +199,12 @@ module.exports = angular
           angular.extend(result.dirty, configureSecurityGroupOptions(command).dirty);
         }
         // reset previous set values
-        command.loadBalancerName = null;
-        command.vnet = null;
         command.vnetResourceGroup = null;
-        command.subnet = null;
         command.selectedSubnet = null;
         command.selectedVnet = null;
         command.selectedVnetSubnets = [];
         command.viewState.networkSettingsConfigured = false;
         command.selectedSecurityGroup = null;
-        command.securityGroupName = null;
 
         return result;
       };

@@ -9,11 +9,16 @@ module.exports = angular
   .controller('azureServerGroupLoadBalancersCtrl', function($scope, loadBalancerReader) {
     ModalWizard.markClean('load-balancers');
 
+    if ($scope.command.credentials && $scope.command.region && $scope.command.loadBalancerName) {
+      $scope.command.viewState.networkSettingsConfigured = true;
+    }
+
     this.loadBalancerChanged = function(item) {
       $scope.command.viewState.networkSettingsConfigured = true;
       ModalWizard.markComplete('load-balancers');
       $scope.command.selectedVnetSubnets = [];
       InfrastructureCaches.clearCache('networks');
+      $scope.command.selectedSubnet = null;
 
       loadBalancerReader
         .getLoadBalancerDetails('azure', $scope.command.credentials, $scope.command.region, item)
