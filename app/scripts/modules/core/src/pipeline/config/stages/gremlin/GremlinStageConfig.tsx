@@ -97,68 +97,108 @@ export class GremlinStageConfig extends React.Component<IStageConfigProps> {
     const { stage } = this.props;
     const { isFetchingData, commands, targets } = this.state;
 
+    // Provides access to meta information for summary box
+    const selectedCommandTemplateMeta = stage.gremlinCommandTemplateId
+      ? commands.find(command => command.guid === stage.gremlinCommandTemplateId)
+      : {};
+    const selectedTargetTemplateMeta = stage.gremlinTargetTemplateId
+      ? targets.find(target => target.guid === stage.gremlinTargetTemplateId)
+      : {};
+
     return (
-      <div className="form-horizontal">
-        <StageConfigField label="API Key">
-          <input
-            name="gremlinApiKey"
-            className="form-control input"
-            type="text"
-            value={stage.gremlinApiKey || ''}
-            onChange={e => this.onChange(e.target.name, e.target.value)}
-          />
-          <div className="form-control-static">
-            <button
-              disabled={isFetchingData || !stage.gremlinApiKey ? true : false}
-              onClick={this.fetchAPIData}
-              type="button"
-              className="btn btn-sm btn-default"
+      <React.Fragment>
+        <div className="form-horizontal">
+          <StageConfigField label="API Key">
+            <input
+              name="gremlinApiKey"
+              className="form-control input"
+              type="text"
+              value={stage.gremlinApiKey || ''}
+              onChange={e => this.onChange(e.target.name, e.target.value)}
+            />
+            <div className="form-control-static">
+              <button
+                disabled={isFetchingData || !stage.gremlinApiKey ? true : false}
+                onClick={this.fetchAPIData}
+                type="button"
+                className="btn btn-sm btn-default"
+              >
+                {isFetchingData ? 'Loading...' : 'Fetch'}
+              </button>
+            </div>
+          </StageConfigField>
+          <StageConfigField label="Attack Template">
+            {!commands.length ? (
+              isFetchingData ? (
+                <p className="form-control-static">Loading...</p>
+              ) : (
+                <p className="form-control-static">No commands found.</p>
+              )
+            ) : (
+              <Select
+                name="gremlinCommandTemplateId"
+                options={commands.map(command => ({
+                  label: command.name,
+                  value: command.guid,
+                }))}
+                clearable={false}
+                value={stage.gremlinCommandTemplateId || null}
+                onChange={this.handleGremlinCommandTemplateIdChange}
+              />
+            )}
+          </StageConfigField>
+          <StageConfigField label="Target Template">
+            {!targets.length ? (
+              isFetchingData ? (
+                <p className="form-control-static">Loading...</p>
+              ) : (
+                <p className="form-control-static">No targets found.</p>
+              )
+            ) : (
+              <Select
+                name="gremlinTargetTemplateId"
+                options={targets.map(target => ({
+                  label: target.name,
+                  value: target.guid,
+                }))}
+                clearable={false}
+                value={stage.gremlinTargetTemplateId || null}
+                onChange={this.handleGremlinTargetTemplateIdChange}
+              />
+            )}
+          </StageConfigField>
+          <StageConfigField>
+            <a
+              className="text-small"
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://docs.gremlin.com/attacks/#how-to-create-attack-templates-with-gremlin"
             >
-              {isFetchingData ? 'Loading...' : 'Fetch'}
-            </button>
-          </div>
-        </StageConfigField>
-        <StageConfigField label="Command Template">
-          {!commands.length ? (
-            isFetchingData ? (
-              <p className="form-control-static">Loading...</p>
-            ) : (
-              <p className="form-control-static">No commands found.</p>
-            )
-          ) : (
-            <Select
-              name="gremlinCommandTemplateId"
-              options={commands.map(command => ({
-                label: command.name,
-                value: command.guid,
-              }))}
-              clearable={false}
-              value={stage.gremlinCommandTemplateId || null}
-              onChange={this.handleGremlinCommandTemplateIdChange}
-            />
-          )}
-        </StageConfigField>
-        <StageConfigField label="Target Template">
-          {!targets.length ? (
-            isFetchingData ? (
-              <p className="form-control-static">Loading...</p>
-            ) : (
-              <p className="form-control-static">No targets found.</p>
-            )
-          ) : (
-            <Select
-              name="gremlinTargetTemplateId"
-              options={targets.map(target => ({
-                label: target.name,
-                value: target.guid,
-              }))}
-              clearable={false}
-              value={stage.gremlinTargetTemplateId || null}
-              onChange={this.handleGremlinTargetTemplateIdChange}
-            />
-          )}
-        </StageConfigField>
-      </div>
+              How to create attack templates with Gremlin
+            </a>
+          </StageConfigField>
+        </div>
+        {(stage.gremlinCommandTemplateId || stage.gremlinTargetTemplateId) && (
+          <React.Fragment>
+            <hr />
+            <h3>Summary</h3>
+            <div className="list-group">
+              {stage.gremlinCommandTemplateId && (
+                <div className="list-group-item">
+                  <h4 className="list-group-item-heading">Attack Template ({selectedCommandTemplateMeta.name})</h4>
+                  <p className="list-group-item-text">{selectedCommandTemplateMeta.synthetic_description}</p>
+                </div>
+              )}
+              {stage.gremlinTargetTemplateId && (
+                <div className="list-group-item">
+                  <h4 className="list-group-item-heading">Target Template ({selectedTargetTemplateMeta.name})</h4>
+                  <p className="list-group-item-text">{selectedTargetTemplateMeta.synthetic_description}</p>
+                </div>
+              )}
+            </div>
+          </React.Fragment>
+        )}
+      </React.Fragment>
     );
   }
 }
