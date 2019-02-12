@@ -3,7 +3,7 @@ import { react2angular } from 'react2angular';
 
 import { CloudfoundryDeployServiceStageConfig } from './CloudfoundryDeployServiceStageConfig';
 import { ExecutionDetailsTasks, IStage, Registry } from '@spinnaker/core';
-import { CloudfoundryDeployServiceExecutionDetails } from 'cloudfoundry/pipeline/stages/deployService/CloudfoundryDeployServiceExecutionDetails';
+import { CloudfoundryDeployServiceExecutionDetails } from './CloudfoundryDeployServiceExecutionDetails';
 import { IServiceFieldValidatorConfig } from 'cloudfoundry/pipeline/config/validation/ServiceFieldValidatorConfig';
 
 class CloudFoundryDeployServiceStageCtrl implements IController {
@@ -12,10 +12,10 @@ class CloudFoundryDeployServiceStageCtrl implements IController {
   }
 }
 
-const serviceNameValidatorConfig: IServiceFieldValidatorConfig = {
+const serviceInstanceNameValidatorConfig: IServiceFieldValidatorConfig = {
   type: 'requiredServiceField',
   serviceInputType: 'direct',
-  fieldName: 'serviceName',
+  fieldName: 'serviceInstanceName',
   preventSave: true,
 };
 
@@ -54,10 +54,10 @@ const referenceValidatorConfig: IServiceFieldValidatorConfig = {
   preventSave: true,
 };
 
-const userProvidedServiceNameValidatorConfig: IServiceFieldValidatorConfig = {
+const userProvidedServiceInstanceNameValidatorConfig: IServiceFieldValidatorConfig = {
   type: 'requiredServiceField',
   serviceInputType: 'userProvided',
-  fieldName: 'serviceName',
+  fieldName: 'serviceInstanceName',
   preventSave: true,
 };
 
@@ -83,13 +83,13 @@ module(CLOUD_FOUNDRY_DEPLOY_SERVICE_STAGE, [])
       validators: [
         { type: 'requiredField', fieldName: 'credentials', fieldLabel: 'account' },
         { type: 'requiredField', fieldName: 'region' },
-        serviceNameValidatorConfig,
+        serviceInstanceNameValidatorConfig,
         serviceValidatorConfig,
         servicePlanValidatorConfig,
         jsonValidatorConfig,
         accountValidatorConfig,
         referenceValidatorConfig,
-        userProvidedServiceNameValidatorConfig,
+        userProvidedServiceInstanceNameValidatorConfig,
         credentialsJsonValidatorConfig,
       ],
     });

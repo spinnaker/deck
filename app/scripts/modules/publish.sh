@@ -48,6 +48,8 @@ echo "Deck package publisher ---> Package build order:"
 echo "${BUILDORDER}"
 echo
 
+BR=$'\n';
+PULLREQUESTMESSAGE="";
 PUBLISHBRANCH="";
 # Loop over packages to build and either a) Build and Publish to NPM or b) Build only
 for DIR in ${BUILDORDER} ; do
@@ -67,7 +69,9 @@ for DIR in ${BUILDORDER} ; do
     VERSION=`node -e 'console.log(JSON.parse(require("fs").readFileSync("package.json")).version)'`
 
     echo "Deck package publisher ---> Commiting version bump of '${PACKAGE}' to ${VERSION}..."
-    git commit -m "chore(${DIR}): Bump version to ${VERSION}${COMMITS}" package.json
+    COMMITMSG="chore(${DIR}): Bump version to ${VERSION}${COMMITS}";
+    PULLREQUESTMESSAGE="${PULLREQUESTMESSAGE}### ${COMMITMSG}${BR}${BR}"
+    git commit -m "${COMMITMSG}" package.json
 
     if [ "x${PUBLISHBRANCH}" == "x" ] ; then
       PUBLISHBRANCH="bump-package-${DIR}-to-${VERSION}"
@@ -99,7 +103,7 @@ done
 # Create a branch with the package bump versions in it
 # Github will use this as the PR title
 echo "Deck package publisher ---> Creating publish branch '${PUBLISHBRANCH}'..."
-git co -b ${PUBLISHBRANCH} || exit 4
+git checkout -b ${PUBLISHBRANCH} || exit 4
 echo "Deck package publisher ---> Deleting temporary branch '${TEMPORARYBRANCH}'..."
 git branch -D ${TEMPORARYBRANCH} || exit 5
 
@@ -120,11 +124,22 @@ if [ "$REPLY" == "y" ] ; then
   if [ "x${LINK}" != "x" ] && which python > /dev/null ; then
     echo "Deck package publisher ---> Creating pull request at: ${LINK}..."
     python -mwebbrowser "${LINK}"
+    if which pbcopy > /dev/null ; then
+      echo "${PULLREQUESTMESSAGE}" | pbcopy
+      echo "";
+      echo "";
+      echo "*****************************************************";
+      echo "* Pull request message copied to your clipboard!    *";
+      echo "* Paste it in and use the 'Squash and merge' button *";
+      echo "*****************************************************";
+      echo "";
+      echo "";
+    fi
   fi
 fi
 
 echo "Deck package publisher ---> Switching back to 'master'..."
-git co master
+git checkout master
 
 echo "Deck package publisher ---> Deleting pull request branch ${PUBLISHBRANCH}..."
 git branch -D ${PUBLISHBRANCH}
