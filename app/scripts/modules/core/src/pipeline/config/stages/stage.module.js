@@ -45,7 +45,7 @@ module.exports = angular
       },
     };
   })
-  .controller('StageConfigCtrl', function($scope, $element, $compile, $controller, $templateCache, $uibModal) {
+  .controller('StageConfigCtrl', function($scope, $element, $compile, $controller, $templateCache) {
     var lastStageScope, reactComponentMounted;
 
     $scope.options = {
@@ -73,8 +73,8 @@ module.exports = angular
       return stage.available
         ? 'Available'
         : requisiteStageRefIds.includes(stage.refId)
-          ? null
-          : 'Downstream dependencies (unavailable)';
+        ? null
+        : 'Downstream dependencies (unavailable)';
     };
 
     $scope.stageProducesArtifacts = function() {
