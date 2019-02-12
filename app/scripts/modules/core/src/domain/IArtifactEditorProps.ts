@@ -1,4 +1,4 @@
-import { IArtifact } from 'core/domain';
+import { IArtifact, IPipeline } from 'core/domain';
 import { IArtifactAccount } from 'core/account';
 
 export interface IArtifactEditorProps {
@@ -9,4 +9,5 @@ export interface IArtifactEditorProps {
   fieldColumns: number;
   singleColumn?: boolean;
   groupClassName?: string;
+  pipeline?: IPipeline;
 }

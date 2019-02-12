@@ -32,7 +32,7 @@ module(CUSTOM_ARTIFACT, [])
     </label>
     <div class="col-md-3">
       <input type="text"
-             class="form-control input-sm"
+             class="form-control input-sm no-doc-link"
              ng-model="ctrl.artifact.type"/>
     </div>
     <label class="col-md-2 sm-label-right">
@@ -40,7 +40,7 @@ module(CUSTOM_ARTIFACT, [])
     </label>
     <div class="col-md-3">
       <input type="text"
-             class="form-control input-sm"
+             class="form-control input-sm no-doc-link"
              ng-model="ctrl.artifact.name"/>
     </div>
   </div>
@@ -50,7 +50,7 @@ module(CUSTOM_ARTIFACT, [])
     </label>
     <div class="col-md-3">
       <input type="text"
-             class="form-control input-sm"
+             class="form-control input-sm no-doc-link"
              ng-model="ctrl.artifact.version"/>
     </div>
     <label class="col-md-2 sm-label-right">
@@ -58,7 +58,7 @@ module(CUSTOM_ARTIFACT, [])
     </label>
     <div class="col-md-3">
       <input type="text"
-             class="form-control input-sm"
+             class="form-control input-sm no-doc-link"
              ng-model="ctrl.artifact.location"/>
     </div>
   </div>
@@ -68,7 +68,7 @@ module(CUSTOM_ARTIFACT, [])
     </label>
     <div class="col-md-8">
       <input type="text"
-             class="form-control input-sm"
+             class="form-control input-sm no-doc-link"
              ng-model="ctrl.artifact.reference"/>
     </div>
   </div>

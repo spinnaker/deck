@@ -2,6 +2,7 @@ import * as React from 'react';
 import { isFinite } from 'lodash';
 import { StageConfigField } from 'core/pipeline/config/stages/common/stageConfigField/StageConfigField';
 import { IArtifactEditorProps, IArtifact } from 'core/domain';
+import { SpelText } from 'core/widgets/spelText/SpelText';
 
 export const singleFieldArtifactEditor = (
   fieldKey: keyof IArtifact,
@@ -20,16 +21,16 @@ export const singleFieldArtifactEditor = (
         fieldColumns={fieldColumns}
         groupClassName={props.groupClassName}
       >
-        <input
-          type="text"
+        <SpelText
           placeholder={placeholder}
-          className="form-control input-sm"
           value={props.artifact[fieldKey] || ''}
-          onChange={e => {
+          onChange={(value: string) => {
             const clone = { ...props.artifact };
-            clone[fieldKey] = e.target.value;
+            clone[fieldKey] = value;
             props.onChange(clone);
           }}
+          pipeline={props.pipeline}
+          docLink={true}
         />
       </StageConfigField>
     );

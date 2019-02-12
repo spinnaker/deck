@@ -14,3 +14,8 @@ export * from './NgAppEngineDeployArtifactDelegate';
 export * from './NgBakeManifestArtifactDelegate';
 export * from './IArtifactAccountPair';
 export * from './NgAppengineConfigArtifactDelegate';
+export * from './react/ArtifactAccountSelector';
+export * from './react/ArtifactIcon';
+export * from './react/ExpectedArtifactSelector';
+export * from './react/ExpectedArtifactEditor';
+export * from './react/ExpectedArtifactSourceSelector';

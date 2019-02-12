@@ -1,5 +1,3 @@
-///<reference path="./human-readable-ids.d.ts" />
-
 import { PipelineConfigService } from 'core/pipeline';
 import { Registry } from 'core/registry';
 import {

@@ -50,7 +50,7 @@ const expectedArtifactComponent: IComponentOptions = {
           </button>
         </div>
       </div>
-      <artifact is-match artifact="ctrl.expectedArtifact.matchArtifact"/>
+      <artifact is-match artifact="ctrl.expectedArtifact.matchArtifact" context="ctrl.context"/>
       <hr/>
       Assign to a matched artifact
       <div class="form-group row"/> <!-- spacing -->
@@ -83,7 +83,8 @@ const expectedArtifactComponent: IComponentOptions = {
           <help-field key="pipeline.config.expectedArtifact.defaultArtifact"/>
         </div>
       </div>
-      <artifact ng-show="ctrl.expectedArtifact.useDefaultArtifact" is-default artifact="ctrl.expectedArtifact.defaultArtifact"></artifact>
+      <artifact ng-show="ctrl.expectedArtifact.useDefaultArtifact" is-default artifact="ctrl.expectedArtifact.defaultArtifact"
+        context="ctrl.context"/>
     </div>
   </div>
 </div>

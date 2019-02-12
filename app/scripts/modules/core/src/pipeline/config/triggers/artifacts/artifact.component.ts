@@ -10,7 +10,7 @@ import {
   module,
 } from 'angular';
 
-import { IArtifact, IArtifactKindConfig } from 'core/domain';
+import { IArtifact, IArtifactKindConfig, IPipeline } from 'core/domain';
 import { Registry } from 'core/registry';
 import { AccountService, IArtifactAccount } from 'core/account';
 import { ArtifactIconService, ExpectedArtifactService } from 'core/artifact';
@@ -18,9 +18,10 @@ import { isEqual } from 'lodash';
 
 class ArtifactCtrl implements IController {
   public artifact: IArtifact;
+  public context: IPipeline;
   public options: IArtifactKindConfig[];
   public kindConfig: IArtifactKindConfig;
-  private isDefault: boolean;
+  private readonly isDefault: boolean;
   private artifactAccounts?: IArtifactAccount[];
 
   public static $inject = ['$attrs', '$controller', '$compile', '$element', '$rootScope', '$scope'];
@@ -44,6 +45,7 @@ class ArtifactCtrl implements IController {
     const { controller: ctrl, template } = config;
     const controller = this.$controller(ctrl, { artifact: this.artifact });
     const scope = this.$rootScope.$new();
+    scope.pipeline = this.context;
     const controllerAs = config.controllerAs;
     if (controllerAs) {
       scope[config.controllerAs] = controller;
@@ -99,7 +101,7 @@ class ArtifactCtrl implements IController {
 }
 
 const artifactComponent: IComponentOptions = {
-  bindings: { artifact: '=' },
+  bindings: { artifact: '=', context: '=' },
   controller: ArtifactCtrl,
   controllerAs: 'ctrl',
   template: `
