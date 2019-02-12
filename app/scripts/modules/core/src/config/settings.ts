@@ -35,6 +35,7 @@ export interface IFeatures {
   [key: string]: any;
   canary?: boolean;
   chaosMonkey?: boolean;
+  displayTimestampsInUserLocalTime?: boolean;
   dockerBake?: boolean;
   entityTags?: boolean;
   fiatEnabled?: boolean;
@@ -42,6 +43,7 @@ export interface IFeatures {
   // whether stages affecting infrastructure (like "Create Load Balancer") should be enabled or not
   infrastructureStages?: boolean;
   jobs?: boolean;
+  managedPipelineTemplatesV2UI?: boolean;
   managedServiceAccounts?: boolean;
   notifications?: boolean;
   pagerDuty?: boolean;
@@ -86,7 +88,6 @@ export interface ISpinnakerSettings {
   defaultProviders: string[];
   defaultTimeZone: string; // see http://momentjs.com/timezone/docs/#/data-utilities/
   dockerInsights: IDockerInsightSettings;
-  displayTimestampsInUserLocalTime: boolean;
   entityTags?: {
     maxUrlLength?: number;
   };
