@@ -17,8 +17,8 @@ module.exports = angular
       $scope.command.viewState.networkSettingsConfigured = true;
       ModalWizard.markComplete('load-balancers');
       $scope.command.selectedVnetSubnets = [];
-      InfrastructureCaches.clearCache('networks');
       $scope.command.selectedSubnet = null;
+      InfrastructureCaches.clearCache('networks');
 
       loadBalancerReader
         .getLoadBalancerDetails('azure', $scope.command.credentials, $scope.command.region, item)
