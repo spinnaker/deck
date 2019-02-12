@@ -144,7 +144,7 @@ export class HoverablePopover extends React.Component<IHoverablePopoverProps, IH
     );
 
     return (
-      <g
+      <div
         style={{ display: 'inline' }}
         onMouseEnter={this.handleMouseEvent}
         onMouseLeave={this.handleMouseEvent}
@@ -170,7 +170,7 @@ export class HoverablePopover extends React.Component<IHoverablePopoverProps, IH
             {popoverContent}
           </PopoverOffset>
         </Overlay>
-      </g>
+      </div>
     );
   }
 }
