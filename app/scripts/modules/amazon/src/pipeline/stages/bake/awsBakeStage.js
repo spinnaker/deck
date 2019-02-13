@@ -10,7 +10,7 @@ import { AWSProviderSettings } from 'amazon/aws.settings';
 import { PipelineTemplates, BakeExecutionLabel, BakeryReader, Registry, SETTINGS } from '@spinnaker/core';
 
 module.exports = angular
-  .module('spinnaker.amazon.pipeline.stage.bakeStage', [require('./bakeExecutionDetails.controller.js').name])
+  .module('spinnaker.amazon.pipeline.stage.bakeStage', [require('./bakeExecutionDetails.controller').name])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'bake',
@@ -28,12 +28,14 @@ module.exports = angular
         { type: 'requiredField', fieldName: 'package' },
         { type: 'requiredField', fieldName: 'regions' },
         {
-          type: 'stageOrTriggerBeforeType',
-          stageTypes: ['jenkins', 'travis'],
+          type: 'upstreamVersionProvided',
           checkParentTriggers: true,
-          message:
-            'Bake stages should always have a Jenkins/Travis stage or trigger preceding them.<br> Otherwise, ' +
-            'Spinnaker will bake and deploy the most-recently built package.',
+          getMessage: labels =>
+            'Bake stages should always have a stage or trigger preceding them that provides version information: ' +
+            '<ul>' +
+            labels.map(label => `<li>${label}</li>`).join('') +
+            '</ul>' +
+            'Otherwise, Spinnaker will bake and deploy the most-recently built package.',
         },
       ],
       restartable: true,
@@ -41,7 +43,7 @@ module.exports = angular
   })
   .controller('awsBakeStageCtrl', function($scope, $q, $uibModal) {
     $scope.stage.extendedAttributes = $scope.stage.extendedAttributes || {};
-    $scope.stage.regions = $scope.stage.regions || [];
+    $scope.stage.regions = ($scope.stage.regions && $scope.stage.regions.sort()) || [];
 
     if (!$scope.stage.user) {
       $scope.stage.user = AuthenticationService.getAuthenticatedUser().name;

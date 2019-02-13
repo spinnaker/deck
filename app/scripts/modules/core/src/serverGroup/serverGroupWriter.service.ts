@@ -1,4 +1,4 @@
-import { module } from 'angular';
+import { IPromise, module } from 'angular';
 
 import { Application } from 'core/application/application.model';
 import { ISecurityGroup, IServerGroup, ITask } from 'core/domain';
@@ -8,9 +8,9 @@ import { IMoniker, NameUtils } from 'core/naming';
 import { IJob, TaskExecutor } from 'core/task/taskExecutor';
 
 export interface ICapacity {
-  desired: number;
-  max: number;
-  min: number;
+  desired: number | string;
+  max: number | string;
+  min: number | string;
 }
 
 export interface IServerGroupJob extends IJob {
@@ -112,6 +112,29 @@ export class ServerGroupWriter {
     });
   }
 
+  private getCapacityString(capacity: Partial<ICapacity>): string {
+    if (!capacity) {
+      return null;
+    }
+    return Object.keys(capacity)
+      .map((k: keyof ICapacity) => `${k}: ${capacity[k]}`)
+      .join(', ');
+  }
+
+  public mapLoadBalancers(serverGroup: IServerGroup, application: Application, params: any = {}): IPromise<ITask> {
+    params.type = 'mapLoadBalancers';
+    params.name = [serverGroup.name];
+    params.loadBalancerNames = serverGroup.loadBalancers;
+    params.region = serverGroup.region;
+    params.credentials = serverGroup.account;
+    params.cloudProvider = serverGroup.cloudProvider;
+    return TaskExecutor.executeTask({
+      job: [params],
+      application,
+      description: `Map load balancers for server group: ${serverGroup.name}`,
+    });
+  }
+
   public resizeServerGroup(
     serverGroup: IServerGroup,
     application: Application,
@@ -124,14 +147,14 @@ export class ServerGroupWriter {
     params.region = serverGroup.region;
     params.credentials = serverGroup.account;
     params.cloudProvider = serverGroup.type || serverGroup.provider;
-    const newSize: string = Object.keys(params.capacity)
-      .map((k: keyof ICapacity) => `${k}: ${params.capacity[k]}`)
-      .join(', ');
+    const currentSize: string = this.getCapacityString(serverGroup.capacity);
+    const newSize: string = this.getCapacityString(params.capacity);
+    const currentSizeText = currentSize ? ` from (${currentSize}) ` : ' ';
 
     return TaskExecutor.executeTask({
       job: [params],
       application,
-      description: `Resize Server Group: ${serverGroup.name} to ${newSize}`,
+      description: `Resize Server Group: ${serverGroup.name}${currentSizeText}to (${newSize})`,
     });
   }
 
@@ -150,6 +173,20 @@ export class ServerGroupWriter {
       job: [params],
       application,
       description: `Rollback Server Group: ${serverGroup.name}`,
+    });
+  }
+
+  public unmapLoadBalancers(serverGroup: IServerGroup, application: Application, params: any = {}): IPromise<ITask> {
+    params.type = 'unmapLoadBalancers';
+    params.name = [serverGroup.name];
+    params.loadBalancerNames = serverGroup.loadBalancers;
+    params.region = serverGroup.region;
+    params.credentials = serverGroup.account;
+    params.cloudProvider = serverGroup.cloudProvider;
+    return TaskExecutor.executeTask({
+      job: [params],
+      application,
+      description: `Unmap load balancers for server group: ${serverGroup.name}`,
     });
   }
 
@@ -178,7 +215,7 @@ export class ServerGroupWriter {
 }
 
 export const SERVER_GROUP_WRITER = 'spinnaker.core.serverGroup.write.service';
-module(SERVER_GROUP_WRITER, [require('./serverGroup.transformer.js').name]).service(
+module(SERVER_GROUP_WRITER, [require('./serverGroup.transformer').name]).service(
   'serverGroupWriter',
   ServerGroupWriter,
 );

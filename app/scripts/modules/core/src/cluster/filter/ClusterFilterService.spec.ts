@@ -18,7 +18,7 @@ describe('Service: clusterFilterService', function() {
   let application: Application;
 
   beforeEach(function() {
-    mock.module(APPLICATION_MODEL_BUILDER, CLUSTER_SERVICE, require('./mockApplicationData.js').name, 'ui.router');
+    mock.module(APPLICATION_MODEL_BUILDER, CLUSTER_SERVICE, require('./mockApplicationData').name, 'ui.router');
     mock.inject(function(
       _applicationJSON_: any,
       _groupedJSON_: any,
@@ -492,6 +492,152 @@ describe('Service: clusterFilterService', function() {
       setTimeout(() => {
         expect(ClusterState.filterModel.asFilterModel.groups).toEqual([groupedJSON[0]]);
         this.verifyTags([{ key: 'maxInstances', label: 'instance count (max)', value: 0 }]);
+        done();
+      }, debounceTimeout);
+    });
+  });
+
+  describe('filter by label (with search string)', function() {
+    it('should filter by label key and value as exact, case-sensitive matches', function(done) {
+      ClusterState.filterModel.asFilterModel.sortFilter.filter = 'labels:source=prod';
+      const expected: any = _.filter(groupedJSON, {
+        subgroups: [
+          {
+            subgroups: [
+              {
+                serverGroups: [
+                  {
+                    labels: {
+                      source: 'prod',
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+      ClusterState.filterService.updateClusterGroups(application);
+      setTimeout(() => {
+        expect(ClusterState.filterModel.asFilterModel.groups).toEqual(expected);
+        done();
+      }, debounceTimeout);
+    });
+
+    it('should not match on partial value', function(done) {
+      ClusterState.filterModel.asFilterModel.sortFilter.filter = 'labels:source=pro';
+      ClusterState.filterService.updateClusterGroups(application);
+      setTimeout(() => {
+        expect(ClusterState.filterModel.asFilterModel.groups).toEqual([]);
+        done();
+      }, debounceTimeout);
+    });
+
+    it('should not match on case-insensitive value', function(done) {
+      ClusterState.filterModel.asFilterModel.sortFilter.filter = 'labels:source=Prod';
+      ClusterState.filterService.updateClusterGroups(application);
+      setTimeout(() => {
+        expect(ClusterState.filterModel.asFilterModel.groups).toEqual([]);
+        done();
+      }, debounceTimeout);
+    });
+
+    it('should perform an AND match on comma separated list, ignoring spaces', function(done) {
+      ClusterState.filterModel.asFilterModel.sortFilter.filter = 'labels: source=prod, app=spinnaker';
+      const expected: any = _.filter(groupedJSON, {
+        subgroups: [
+          {
+            subgroups: [
+              {
+                serverGroups: [
+                  {
+                    labels: {
+                      app: 'spinnaker',
+                      source: 'prod',
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+      ClusterState.filterService.updateClusterGroups(application);
+      setTimeout(() => {
+        expect(ClusterState.filterModel.asFilterModel.groups).toEqual(expected);
+        done();
+      }, debounceTimeout);
+    });
+  });
+
+  describe('filter by label (with filters)', function() {
+    it('should filter by label key and value as exact, case sensitive matches', function(done) {
+      ClusterState.filterModel.asFilterModel.sortFilter.labels = { 'source:prod': true };
+      const expected: any = _.filter(groupedJSON, {
+        subgroups: [
+          {
+            subgroups: [
+              {
+                serverGroups: [
+                  {
+                    labels: {
+                      source: 'prod',
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+      ClusterState.filterService.updateClusterGroups(application);
+      setTimeout(() => {
+        expect(ClusterState.filterModel.asFilterModel.groups).toEqual(expected);
+        done();
+      }, debounceTimeout);
+    });
+
+    it('should not match on partial value', function(done) {
+      ClusterState.filterModel.asFilterModel.sortFilter.labels = { 'source:pr': true };
+      ClusterState.filterService.updateClusterGroups(application);
+      setTimeout(() => {
+        expect(ClusterState.filterModel.asFilterModel.groups).toEqual([]);
+        done();
+      }, debounceTimeout);
+    });
+
+    it('should not match on case-insensitive value', function(done) {
+      ClusterState.filterModel.asFilterModel.sortFilter.labels = { 'source:Prod': true };
+      ClusterState.filterService.updateClusterGroups(application);
+      setTimeout(() => {
+        expect(ClusterState.filterModel.asFilterModel.groups).toEqual([]);
+        done();
+      }, debounceTimeout);
+    });
+
+    it('should perform an AND match on multiple key-value pairs', function(done) {
+      ClusterState.filterModel.asFilterModel.sortFilter.labels = { 'source:prod': true, 'app:spinnaker': true };
+      const expected: any = _.filter(groupedJSON, {
+        subgroups: [
+          {
+            subgroups: [
+              {
+                serverGroups: [
+                  {
+                    labels: {
+                      app: 'spinnaker',
+                      source: 'prod',
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+      ClusterState.filterService.updateClusterGroups(application);
+      setTimeout(() => {
+        expect(ClusterState.filterModel.asFilterModel.groups).toEqual(expected);
         done();
       }, debounceTimeout);
     });

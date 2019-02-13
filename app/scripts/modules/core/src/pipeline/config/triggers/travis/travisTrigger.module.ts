@@ -79,7 +79,7 @@ export class TravisTrigger implements IController {
 }
 
 export const TRAVIS_TRIGGER = 'spinnaker.core.pipeline.config.trigger.travis';
-module(TRAVIS_TRIGGER, [require('../trigger.directive.js').name])
+module(TRAVIS_TRIGGER, [require('../trigger.directive').name])
   .config(() => {
     Registry.pipeline.registerTrigger({
       label: 'Travis',
@@ -89,6 +89,7 @@ module(TRAVIS_TRIGGER, [require('../trigger.directive.js').name])
       controllerAs: '$ctrl',
       templateUrl: require('./travisTrigger.html'),
       manualExecutionComponent: TravisTriggerTemplate,
+      providesVersionForBake: true,
       validators: [
         {
           type: 'requiredField',

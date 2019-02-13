@@ -9,18 +9,18 @@ import {
   IScope,
   module,
 } from 'angular';
+
 import { IArtifact, IArtifactKindConfig } from 'core/domain';
 import { Registry } from 'core/registry';
-import { AccountService, ArtifactIconService, ExpectedArtifactService, IArtifactAccount } from 'core';
+import { AccountService, IArtifactAccount } from 'core/account';
+import { ArtifactIconService, ExpectedArtifactService } from 'core/artifact';
+import { isEqual } from 'lodash';
 
 class ArtifactCtrl implements IController {
   public artifact: IArtifact;
   public options: IArtifactKindConfig[];
-  public description: string;
+  public kindConfig: IArtifactKindConfig;
   private isDefault: boolean;
-  private isMatch: boolean;
-  public selectedLabel: string;
-  public selectedIcon: string;
   private artifactAccounts?: IArtifactAccount[];
 
   constructor(
@@ -32,14 +32,12 @@ class ArtifactCtrl implements IController {
     private $scope: IScope,
   ) {
     'ngInject';
-    if (this.$attrs.$attr.hasOwnProperty('isDefault')) {
-      this.isDefault = true;
+    this.isDefault = this.$attrs.$attr.hasOwnProperty('isDefault');
+    if (this.isDefault) {
+      this.options = Registry.pipeline.getDefaultArtifactKinds();
+    } else {
+      this.options = Registry.pipeline.getMatchArtifactKinds();
     }
-
-    if (this.$attrs.$attr.hasOwnProperty('isMatch')) {
-      this.isMatch = true;
-    }
-    this.options = Registry.pipeline.getArtifactKinds();
   }
 
   private renderArtifactConfigTemplate(config: any) {
@@ -60,18 +58,18 @@ class ArtifactCtrl implements IController {
   public $onInit(): void {
     // Explicitly watch the artifact's kind so that external changes to it are correctly
     // reflected in the ui-select and artifact's editable form.
-    this.$scope.$watch(() => this.artifact.kind, () => this.loadArtifactKind());
     this.loadArtifactKind();
+    this.$scope.$watch(() => this.artifact.type, () => this.loadArtifactKind());
     AccountService.getArtifactAccounts().then(accounts => {
       this.artifactAccounts = accounts;
     });
   }
 
   public getOptions(): IArtifactKindConfig[] {
-    let options = this.options.filter(o => o.isDefault === this.isDefault || o.isMatch === this.isMatch);
+    let options = this.options;
     if (this.artifactAccounts) {
       options = options.filter(o => {
-        const isCustomArtifact = o.type == null;
+        const isCustomArtifact = o.customKind;
         const isPublic = !!o.isPubliclyAccessible;
         const hasCredential = this.artifactAccounts.find(a => a.types.includes(o.type));
         return isCustomArtifact || isPublic || hasCredential;
@@ -80,26 +78,23 @@ class ArtifactCtrl implements IController {
     return options.sort((a, b) => a.label.localeCompare(b.label));
   }
 
-  public loadArtifactKind(): void {
-    const kind = ExpectedArtifactService.getKind(this.artifact) || 'custom';
-    if (!kind) {
-      return;
-    }
-    const artifactKindConfig = this.options.filter(function(config) {
-      return config.key === kind;
-    });
-
-    if (artifactKindConfig.length) {
-      const config = artifactKindConfig[0];
-      this.description = config.description;
-      this.renderArtifactConfigTemplate(config);
-      this.selectedLabel = config.label;
-      this.selectedIcon = ArtifactIconService.getPath(config.type);
+  private loadArtifactKind(): void {
+    const newKindConfig = ExpectedArtifactService.getKindConfig(this.artifact, this.isDefault);
+    if (!isEqual(this.kindConfig, newKindConfig)) {
+      this.kindConfig = newKindConfig;
+      this.renderArtifactConfigTemplate(this.kindConfig);
     }
   }
 
-  public artifactIconPath(artifact: IArtifact) {
-    return ArtifactIconService.getPath(artifact.type);
+  public onKindChange(artifactKind: IArtifactKindConfig): void {
+    // kind is deprecated; remove it from artifacts as they are updated
+    delete this.artifact.kind;
+    this.artifact.customKind = artifactKind.customKind;
+    this.renderArtifactConfigTemplate(artifactKind);
+  }
+
+  public artifactIconPath(kindConfig: IArtifactKindConfig) {
+    return ArtifactIconService.getPath(kindConfig.type);
   }
 }
 
@@ -109,29 +104,30 @@ class ArtifactComponent implements IComponentOptions {
   public controllerAs = 'ctrl';
   public template = `
 <div class="form-group">
-  <div class="col-md-4 col-md-offset-1">
+  <label class="col-md-2 sm-label-right">
+      Kind
+  </label>
+  <div class="col-md-3">
     <ui-select class="form-control input-sm"
                required
-               ng-model="ctrl.artifact.kind">
+               on-select="ctrl.onKindChange($item)"
+               ng-model="ctrl.kindConfig">
       <ui-select-match>
-        <img width="20" height="20" ng-if="ctrl.selectedIcon" ng-src="{{ ctrl.selectedIcon }}" />
-        {{ ctrl.selectedLabel }}
+        <img width="20" height="20" ng-if="ctrl.artifactIconPath(ctrl.kindConfig)" ng-src="{{ ctrl.artifactIconPath(ctrl.kindConfig) }}" />
+        {{ ctrl.kindConfig.label }}
       </ui-select-match>
-      <ui-select-choices repeat="option.key as option in ctrl.getOptions() | filter: { label: $select.search }">
+      <ui-select-choices repeat="option in ctrl.getOptions() | filter: { label: $select.search }">
         <img width="20" height="20" ng-if="ctrl.artifactIconPath(option)" ng-src="{{ ctrl.artifactIconPath(option) }}" />
         <span>{{ option.label }}</span>
       </ui-select-choices>
     </ui-select>
   </div>
   <div class="col-md-6">
-    {{ctrl.description}}
+    {{ctrl.kindConfig.description}}
   </div>
 </div>
-<hr>
 <div class="form-group">
-  <div class="col-md-12">
-    <div class="artifact-body"></div>
-  </div>
+  <div class="artifact-body"></div>
 </div>
 `;
 }

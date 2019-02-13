@@ -1,27 +1,18 @@
 import * as React from 'react';
-import { difference, flatten, get, uniq } from 'lodash';
+import { difference, flatten, uniq } from 'lodash';
 
-import { IWizardPageProps, ValidationMessage, wizardPage } from '@spinnaker/core';
+import { ValidationMessage, IWizardPageComponent } from '@spinnaker/core';
 
-import { AWSProviderSettings } from 'amazon/aws.settings';
 import { NLBListenerProtocol, IListenerDescription, IAmazonNetworkLoadBalancerUpsertCommand } from 'amazon/domain';
-import { AmazonCertificateReader, IAmazonCertificate } from 'amazon/certificates/AmazonCertificateReader';
+import { FormikProps } from 'formik';
 
-export type INLBListenersProps = IWizardPageProps<IAmazonNetworkLoadBalancerUpsertCommand>;
-
-export interface INLBListenersState {
-  certificates: { [accountId: number]: IAmazonCertificate[] };
-  certificateTypes: string[];
+export interface INLBListenersProps {
+  formik: FormikProps<IAmazonNetworkLoadBalancerUpsertCommand>;
 }
 
-class NLBListenersImpl extends React.Component<INLBListenersProps, INLBListenersState> {
-  public static LABEL = 'Listeners';
+export class NLBListeners extends React.Component<INLBListenersProps>
+  implements IWizardPageComponent<IAmazonNetworkLoadBalancerUpsertCommand> {
   public protocols = ['TCP'];
-
-  public state: INLBListenersState = {
-    certificates: [],
-    certificateTypes: get(AWSProviderSettings, 'loadBalancers.certificateTypes', ['iam', 'acm']),
-  };
 
   private getAllTargetGroupsFromListeners(listeners: IListenerDescription[]): string[] {
     const actions = flatten(listeners.map(l => l.defaultActions));
@@ -44,16 +35,6 @@ class NLBListenersImpl extends React.Component<INLBListenersProps, INLBListeners
     }
 
     return errors;
-  }
-
-  public componentDidMount(): void {
-    this.loadCertificates();
-  }
-
-  private loadCertificates(): void {
-    AmazonCertificateReader.listCertificates().then(certificates => {
-      this.setState({ certificates });
-    });
   }
 
   private updateListeners(): void {
@@ -213,5 +194,3 @@ class NLBListenersImpl extends React.Component<INLBListenersProps, INLBListeners
     );
   }
 }
-
-export const NLBListeners = wizardPage(NLBListenersImpl);

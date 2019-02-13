@@ -1,19 +1,19 @@
 import { IPromise, IQService, module } from 'angular';
 import { flatten, forOwn, get, groupBy, has, head, keys, values } from 'lodash';
 
-import { API } from 'core/api/ApiService';
-import { Application } from 'core/application/application.model';
+import { ArtifactReferenceService } from 'core/artifact';
+import { API } from 'core/api';
+import { Application } from 'core/application';
 import { NameUtils } from 'core/naming';
 import { FilterModelService } from 'core/filterModel';
 import { IArtifactExtractor, ICluster, IClusterSummary, IExecution, IExecutionStage, IServerGroup } from 'core/domain';
 import { ClusterState } from 'core/state';
-import { ProviderServiceDelegate } from 'core/cloudProvider/providerService.delegate';
+import { ProviderServiceDelegate } from 'core/cloudProvider';
+import { SETTINGS } from 'core/config/settings';
+
 import { taskMatcher } from './task.matcher';
-import { ArtifactReferenceService } from 'core';
 
 export class ClusterService {
-  public static ON_DEMAND_THRESHOLD = 350;
-
   constructor(
     private $q: IQService,
     private serverGroupTransformer: any,
@@ -30,7 +30,7 @@ export class ClusterService {
       const serverGroupLoader = API.one('applications')
         .one(application.name)
         .all('serverGroups');
-      dataSource.fetchOnDemand = clusters.length > ClusterService.ON_DEMAND_THRESHOLD;
+      dataSource.fetchOnDemand = clusters.length > SETTINGS.onDemandClusterThreshold;
       if (dataSource.fetchOnDemand) {
         dataSource.clusters = clusters;
         serverGroupLoader.withParams({
@@ -318,7 +318,7 @@ export class ClusterService {
 }
 
 export const CLUSTER_SERVICE = 'spinnaker.core.cluster.service';
-module(CLUSTER_SERVICE, [require('../serverGroup/serverGroup.transformer.js').name]).service(
+module(CLUSTER_SERVICE, [require('../serverGroup/serverGroup.transformer').name]).service(
   'clusterService',
   ClusterService,
 );

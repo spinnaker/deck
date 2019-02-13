@@ -1,15 +1,16 @@
 import * as React from 'react';
-import { FormikErrors } from 'formik';
+import { FormikErrors, FormikProps } from 'formik';
 
-import { IWizardPageProps, wizardPage, NgReact } from '@spinnaker/core';
+import { IWizardPageComponent, NgReact } from '@spinnaker/core';
 
 import { IAmazonServerGroupCommand } from '../../serverGroupConfiguration.service';
 
-export type IServerGroupInstanceTypeProps = IWizardPageProps<IAmazonServerGroupCommand>;
+export interface IServerGroupInstanceTypeProps {
+  formik: FormikProps<IAmazonServerGroupCommand>;
+}
 
-class ServerGroupInstanceTypeImpl extends React.Component<IServerGroupInstanceTypeProps> {
-  public static LABEL = 'Instance Type';
-
+export class ServerGroupInstanceType extends React.Component<IServerGroupInstanceTypeProps>
+  implements IWizardPageComponent<IAmazonServerGroupCommand> {
   public validate(values: IAmazonServerGroupCommand) {
     const errors: FormikErrors<IAmazonServerGroupCommand> = {};
 
@@ -41,17 +42,16 @@ class ServerGroupInstanceTypeImpl extends React.Component<IServerGroupInstanceTy
 
     if (showTypeSelector && values) {
       return (
-        <div>
+        <div className="container-fluid form-horizontal">
           <InstanceArchetypeSelector
             command={values}
             onTypeChanged={this.instanceTypeChanged}
             onProfileChanged={this.instanceProfileChanged}
           />
           <div style={{ padding: '0 15px' }}>
-            {values.viewState.instanceProfile &&
-              values.viewState.instanceProfile !== 'custom' && (
-                <InstanceTypeSelector command={values} onTypeChanged={this.instanceTypeChanged} />
-              )}
+            {values.viewState.instanceProfile && values.viewState.instanceProfile !== 'custom' && (
+              <InstanceTypeSelector command={values} onTypeChanged={this.instanceTypeChanged} />
+            )}
           </div>
         </div>
       );
@@ -60,5 +60,3 @@ class ServerGroupInstanceTypeImpl extends React.Component<IServerGroupInstanceTy
     return <h5 className="text-center">Please select an image.</h5>;
   }
 }
-
-export const ServerGroupInstanceType = wizardPage(ServerGroupInstanceTypeImpl);

@@ -1,25 +1,20 @@
 import * as React from 'react';
-import { FormikErrors } from 'formik';
+import { FormikProps } from 'formik';
 
-import { AccountSelectField, HelpField, IWizardPageProps, wizardPage, Application } from '@spinnaker/core';
+import { AccountSelectInput, HelpField, Application } from '@spinnaker/core';
 
 import { IKubernetesManifestCommandData } from 'kubernetes/v2/manifest/manifestCommandBuilder.service';
 
-export interface IManifestBasicSettingsProps extends IWizardPageProps<IKubernetesManifestCommandData> {
+export interface IManifestBasicSettingsProps {
   app: Application;
+  formik: FormikProps<IKubernetesManifestCommandData>;
 }
 
-class ManifestBasicSettingsImpl extends React.Component<IManifestBasicSettingsProps> {
-  public static LABEL = 'Basic Settings';
-
+export class ManifestBasicSettings extends React.Component<IManifestBasicSettingsProps> {
   private accountUpdated = (account: string): void => {
     const { formik } = this.props;
     formik.values.command.account = account;
     formik.setFieldValue('account', account);
-  };
-
-  public validate = (_formik: IKubernetesManifestCommandData) => {
-    return {} as FormikErrors<IKubernetesManifestCommandData>;
   };
 
   public render() {
@@ -34,13 +29,12 @@ class ManifestBasicSettingsImpl extends React.Component<IManifestBasicSettingsPr
             Account <HelpField id="kubernetes.manifest.account" />
           </div>
           <div className="col-md-7">
-            <AccountSelectField
+            <AccountSelectInput
+              value={formik.values.command.account}
+              onChange={evt => this.accountUpdated(evt.target.value)}
               readOnly={false}
-              component={formik.values.command}
-              field="account"
               accounts={accounts}
               provider="kubernetes"
-              onChange={this.accountUpdated}
             />
           </div>
         </div>
@@ -56,5 +50,3 @@ class ManifestBasicSettingsImpl extends React.Component<IManifestBasicSettingsPr
     );
   }
 }
-
-export const ManifestBasicSettings = wizardPage(ManifestBasicSettingsImpl);

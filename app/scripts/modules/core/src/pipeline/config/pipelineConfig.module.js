@@ -10,21 +10,22 @@ import './validation/anyFieldRequired.validator';
 import './validation/serviceAccountAccess.validator';
 import './validation/stageBeforeType.validator';
 import './validation/stageOrTriggerBeforeType.validator';
+import './validation/upstreamVersionProvided.validator';
 import './validation/targetImpedance.validator';
 
 import './pipelineConfig.less';
 
 module.exports = angular.module('spinnaker.core.pipeline.config', [
   CREATE_PIPELINE_COMPONENT,
-  require('./actions/actions.module.js').name,
+  require('./actions/actions.module').name,
   PIPELINE_GRAPH_COMPONENT,
-  require('./stages/stage.module.js').name,
-  require('./stages/baseProviderStage/baseProviderStage.js').name,
-  require('./triggers/trigger.module.js').name,
-  require('./parameters/pipeline.module.js').name,
-  require('./pipelineConfig.controller.js').name,
-  require('./pipelineConfigView.js').name,
-  require('./pipelineConfigurer.js').name,
+  require('./stages/stage.module').name,
+  require('./stages/baseProviderStage/baseProviderStage').name,
+  require('./triggers/trigger.module').name,
+  require('./parameters/pipeline.module').name,
+  require('./pipelineConfig.controller').name,
+  require('./pipelineConfigView').name,
+  require('./pipelineConfigurer').name,
   TARGET_SELECT_COMPONENT,
-  require('./health/stagePlatformHealthOverride.directive.js').name,
+  require('./health/stagePlatformHealthOverride.directive').name,
 ]);

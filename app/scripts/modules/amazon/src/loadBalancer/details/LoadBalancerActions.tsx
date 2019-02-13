@@ -2,9 +2,17 @@ import * as React from 'react';
 import { Dropdown } from 'react-bootstrap';
 import { get } from 'lodash';
 
-import { Application, ApplicationReader, LoadBalancerWriter, SETTINGS, NgReact, ReactInjector } from '@spinnaker/core';
+import {
+  Application,
+  ApplicationReader,
+  LoadBalancerWriter,
+  SETTINGS,
+  NgReact,
+  ReactInjector,
+  HelpField,
+} from '@spinnaker/core';
 
-import { IAmazonLoadBalancer, IAmazonLoadBalancerDeleteCommand } from 'amazon';
+import { IAmazonLoadBalancer, IAmazonLoadBalancerDeleteCommand } from 'amazon/domain';
 
 import { ILoadBalancerFromStateParams } from './loadBalancerDetails.controller';
 import { LoadBalancerTypes } from '../configure/LoadBalancerTypes';
@@ -121,24 +129,21 @@ export class LoadBalancerActions extends React.Component<ILoadBalancerActionsPro
               </li>
             )}
             {loadBalancer.instances.length > 0 && (
-              <li
-                className="disabled"
-                uib-tooltip="You must detach all instances before you can delete this load balancer."
-              >
+              <li className="disabled">
                 <a className="clickable" onClick={this.deleteLoadBalancer}>
-                  Delete Load Balancer
+                  Delete Load Balancer{' '}
+                  <HelpField content="You must detach all instances before you can delete this load balancer." />
                 </a>
               </li>
             )}
-            {SETTINGS &&
-              SETTINGS.feature.entityTags && (
-                <AddEntityTagLinks
-                  component={loadBalancer}
-                  application={app}
-                  entityType="loadBalancer"
-                  onUpdate={this.entityTagUpdate}
-                />
-              )}
+            {SETTINGS && SETTINGS.feature.entityTags && (
+              <AddEntityTagLinks
+                component={loadBalancer}
+                application={app}
+                entityType="loadBalancer"
+                onUpdate={this.entityTagUpdate}
+              />
+            )}
           </Dropdown.Menu>
         </Dropdown>
       </div>

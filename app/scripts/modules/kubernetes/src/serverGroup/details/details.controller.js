@@ -14,10 +14,10 @@ import {
 module.exports = angular
   .module('spinnaker.serverGroup.details.kubernetes.controller', [
     require('@uirouter/angularjs').default,
-    require('../configure/configure.kubernetes.module.js').name,
+    require('../configure/configure.kubernetes.module').name,
     CONFIRMATION_MODAL_SERVICE,
     SERVER_GROUP_WRITER,
-    require('../paramsMixin.js').name,
+    require('../paramsMixin').name,
   ])
   .controller('kubernetesServerGroupDetailsController', function(
     $scope,
@@ -109,8 +109,7 @@ module.exports = angular
       if ($scope.$$destroyed) {
         return;
       }
-      $state.params.allowModalToStayOpen = true;
-      $state.go('^', null, { location: 'replace' });
+      $state.go('^', { allowModalToStayOpen: true }, { location: 'replace' });
     }
 
     function cancelLoader() {

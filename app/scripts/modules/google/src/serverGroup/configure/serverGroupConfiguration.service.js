@@ -14,6 +14,7 @@ import {
 
 import { GCEProviderSettings } from 'google/gce.settings';
 import { GCE_HEALTH_CHECK_READER } from 'google/healthCheck/healthCheck.read.service';
+import { getHealthCheckOptions } from 'google/healthCheck/healthCheckUtils';
 import { GCE_HTTP_LOAD_BALANCER_UTILS } from 'google/loadBalancer/httpLoadBalancerUtils.service';
 import { LOAD_BALANCER_SET_TRANSFORMER } from 'google/loadBalancer/loadBalancer.setTransformer';
 
@@ -23,12 +24,12 @@ module.exports = angular
     SECURITY_GROUP_READER,
     CACHE_INITIALIZER_SERVICE,
     LOAD_BALANCER_READ_SERVICE,
-    require('../../image/image.reader.js').name,
-    require('../../instance/gceInstanceType.service.js').name,
-    require('./../../instance/custom/customInstanceBuilder.gce.service.js').name,
+    require('../../image/image.reader').name,
+    require('../../instance/gceInstanceType.service').name,
+    require('./../../instance/custom/customInstanceBuilder.gce.service').name,
     GCE_HTTP_LOAD_BALANCER_UTILS,
     GCE_HEALTH_CHECK_READER,
-    require('./wizard/securityGroups/tagManager.service.js').name,
+    require('./wizard/securityGroups/tagManager.service').name,
   ])
   .factory('gceServerGroupConfigurationService', function(
     gceImageReader,
@@ -133,6 +134,7 @@ module.exports = angular
             const healthChecks = getHealthChecks(command);
             if (
               !_.chain(healthChecks)
+                .map('selfLink')
                 .includes(command.autoHealingPolicy.healthCheck)
                 .value()
             ) {
@@ -287,6 +289,33 @@ module.exports = angular
       return result;
     }
 
+    function configureAccelerators(command) {
+      const result = { dirty: {} };
+      const { credentials, zone, backingData } = command;
+      const accountBackingData = _.get(backingData, ['credentialsKeyedByAccount', credentials], {});
+      const acceleratorMap = accountBackingData.zoneToAcceleratorTypesMap || {};
+      const acceleratorTypes = _.get(acceleratorMap, [zone, 'acceleratorTypes', 'acceleratorTypes'], []).map(a => {
+        const maxCards = _.isFinite(a.maximumCardsPerInstance) ? a.maximumCardsPerInstance : 4;
+        const availableCardCounts = [];
+        for (let i = 1; i <= maxCards; i *= 2) {
+          availableCardCounts.push(i);
+        }
+        return _.assign({}, a, { availableCardCounts });
+      });
+      _.set(command, ['viewState', 'acceleratorTypes'], acceleratorTypes);
+      result.dirty.acceleratorTypes = true;
+      const chosenAccelerators = _.get(command, 'acceleratorConfigs', []);
+      if (chosenAccelerators.length > 0) {
+        command.acceleratorConfigs = chosenAccelerators.filter(
+          chosen => !!acceleratorTypes.find(a => a.name === chosen.acceleratorType),
+        );
+        if (command.acceleratorConfigs.length === 0) {
+          delete command.acceleratorConfigs;
+        }
+      }
+      return result;
+    }
+
     // n1-standard-8 should come before n1-standard-16, so we must sort by the individual segments of the names.
     function sortInstanceTypes(instanceTypes) {
       const tokenizedInstanceTypes = _.map(instanceTypes, instanceType => {
@@ -357,10 +386,8 @@ module.exports = angular
     }
 
     function getHealthChecks(command) {
-      return _.chain(command.backingData.healthChecks)
-        .filter({ account: command.credentials })
-        .map('name')
-        .value();
+      const matchingHealthChecks = _.filter(command.backingData.healthChecks, { account: command.credentials });
+      return getHealthCheckOptions(matchingHealthChecks);
     }
 
     function configureHealthChecks(command) {
@@ -376,6 +403,7 @@ module.exports = angular
       if (
         _.has(command, 'autoHealingPolicy.healthCheck') &&
         !_.chain(filteredData.healthChecks)
+          .map('selfLink')
           .includes(command.autoHealingPolicy.healthCheck)
           .value()
       ) {
@@ -571,9 +599,8 @@ module.exports = angular
 
       // Only include explicitly-selected firewalls in the body of the command.
       const xpnHostProject = getXpnHostProjectIfAny(command.network);
-      const decoratedSecurityGroups = _.map(
-        command.securityGroups,
-        sg => (!sg.startsWith(xpnHostProject) ? xpnHostProject + sg : sg),
+      const decoratedSecurityGroups = _.map(command.securityGroups, sg =>
+        !sg.startsWith(xpnHostProject) ? xpnHostProject + sg : sg,
       );
       command.securityGroups = _.difference(decoratedSecurityGroups, _.map(command.implicitSecurityGroups, 'id'));
 
@@ -725,6 +752,7 @@ module.exports = angular
         angular.extend(command.viewState.dirty, result.dirty);
         angular.extend(command.viewState.dirty, configureInstanceTypes(command).dirty);
         angular.extend(command.viewState.dirty, configureCpuPlatforms(command).dirty);
+        angular.extend(command.viewState.dirty, configureAccelerators(command).dirty);
         return result;
       };
 

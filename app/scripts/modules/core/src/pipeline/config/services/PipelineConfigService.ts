@@ -1,5 +1,5 @@
 import { IPromise } from 'angular';
-import { sortBy, uniq } from 'lodash';
+import { sortBy, uniq, cloneDeep } from 'lodash';
 import { $q } from 'ngimport';
 
 import { API } from 'core/api/ApiService';
@@ -53,11 +53,12 @@ export class PipelineConfigService {
 
   public static deletePipeline(applicationName: string, pipeline: IPipeline, pipelineName: string): IPromise<void> {
     return API.one(pipeline.strategy ? 'strategies' : 'pipelines')
-      .one(applicationName, pipelineName.trim())
+      .one(applicationName, encodeURIComponent(pipelineName.trim()))
       .remove();
   }
 
-  public static savePipeline(pipeline: IPipeline): IPromise<void> {
+  public static savePipeline(toSave: IPipeline): IPromise<void> {
+    const pipeline = cloneDeep(toSave);
     delete pipeline.isNew;
     pipeline.name = pipeline.name.trim();
     if (Array.isArray(pipeline.stages)) {
@@ -91,7 +92,7 @@ export class PipelineConfigService {
     body.user = AuthenticationService.getAuthenticatedUser().name;
     return API.one('pipelines')
       .one(applicationName)
-      .one(pipelineName)
+      .one(encodeURIComponent(pipelineName))
       .data(body)
       .post()
       .then((result: ITriggerPipelineResponse) => {
@@ -108,7 +109,7 @@ export class PipelineConfigService {
     return API.one('pipelines')
       .one('v2')
       .one(applicationName)
-      .one(pipelineName)
+      .one(encodeURIComponent(pipelineName))
       .data(body)
       .post()
       .then((result: IEchoTriggerPipelineResponse) => {

@@ -11,10 +11,10 @@ import { DcosProviderSettings } from '../../../dcos.settings';
 
 module.exports = angular
   .module('spinnaker.dcos.pipeline.stage.runJobStage', [
-    require('dcos/job/general.component.js').name,
+    require('dcos/job/general.component').name,
     //TODO Add back when scheduled jobs are supported better by Spinnaker
-    //require('dcos/job/schedule.component.js').name,
-    require('dcos/job/labels.component.js').name,
+    //require('dcos/job/schedule.component').name,
+    require('dcos/job/labels.component').name,
     DOCKER_IMAGE_AND_TAG_SELECTOR_COMPONENT,
   ])
   .config(function() {
@@ -89,8 +89,8 @@ module.exports = angular
         stage.dcosCluster = defaultDcosClusterIsValid
           ? defaultDcosCluster
           : clusterNames.length == 1
-            ? clusterNames[0]
-            : null;
+          ? clusterNames[0]
+          : null;
         stage.region = stage.dcosCluster;
       }
     }

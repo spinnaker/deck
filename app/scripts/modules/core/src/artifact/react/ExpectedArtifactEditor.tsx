@@ -2,8 +2,11 @@ import { module } from 'angular';
 import * as React from 'react';
 import { react2angular } from 'react2angular';
 import { cloneDeep } from 'lodash';
-import { IExpectedArtifact, IArtifactAccount, IArtifactKindConfig, IArtifact } from 'core';
-import { StageConfigField } from 'core/pipeline/config/stages/core/stageConfigField/StageConfigField';
+
+import { IExpectedArtifact, IArtifactKindConfig, IArtifact } from 'core/domain';
+import { IArtifactAccount } from 'core/account';
+import { StageConfigField } from 'core/pipeline';
+
 import { ExpectedArtifactService } from '../expectedArtifact.service';
 import {
   ExpectedArtifactKindSelector,
@@ -56,7 +59,7 @@ export class ExpectedArtifactEditor extends React.Component<
   constructor(props: IExpectedArtifactEditorProps) {
     super(props);
     this.state = {
-      expectedArtifact: props.default ? cloneDeep(props.default) : ExpectedArtifactService.createEmptyArtifact(null),
+      expectedArtifact: props.default ? cloneDeep(props.default) : ExpectedArtifactService.createEmptyArtifact(),
       source: props.sources[0],
       account: null,
     };
@@ -82,10 +85,19 @@ export class ExpectedArtifactEditor extends React.Component<
     this.setState({ source: e });
   };
 
+  public onDisplayNameEdit = (e: React.FormEvent<HTMLInputElement>) => {
+    const newName = e.currentTarget.value;
+    const expectedArtifact = { ...this.state.expectedArtifact };
+    expectedArtifact.displayName = newName;
+    this.setState({ expectedArtifact });
+  };
+
   private onKindChange = (kind: IArtifactKindConfig) => {
     const expectedArtifact = cloneDeep(this.state.expectedArtifact);
     expectedArtifact.matchArtifact.type = kind.type;
-    expectedArtifact.matchArtifact.kind = kind.key;
+    // kind is deprecated; remove it from artifacts as they are updated
+    delete expectedArtifact.matchArtifact.kind;
+    expectedArtifact.matchArtifact.customKind = kind.customKind;
     const accounts = this.accountsForExpectedArtifact(expectedArtifact);
     this.setState({ expectedArtifact, account: accounts[0] });
   };
@@ -108,7 +120,7 @@ export class ExpectedArtifactEditor extends React.Component<
     const kinds = this.props.kinds || [];
     const accounts = this.props.accounts || [];
     if (this.props.showAccounts) {
-      return kinds.filter(k => k.key === 'custom' || accounts.find(a => a.types.includes(k.type)));
+      return kinds.filter(k => k.customKind || accounts.find(a => a.types.includes(k.type)));
     } else {
       return kinds.slice(0);
     }
@@ -120,10 +132,17 @@ export class ExpectedArtifactEditor extends React.Component<
     const accounts = this.accountsForExpectedArtifact(expectedArtifact);
     const artifact = ExpectedArtifactService.artifactFromExpected(expectedArtifact);
     const kinds = this.availableKinds().sort((a, b) => a.label.localeCompare(b.label));
-    const kind = artifact ? kinds.find(k => k.key === artifact.kind) : null;
+    const kind = ExpectedArtifactService.getKindConfig(artifact, false);
     const EditCmp = kind && kind.editCmp;
     return (
       <>
+        <StageConfigField label="Display Name" fieldColumns={fieldColumns} groupClassName={fieldGroupClassName}>
+          <input
+            className="form-control input-sm"
+            value={expectedArtifact.displayName}
+            onChange={this.onDisplayNameEdit}
+          />
+        </StageConfigField>
         <StageConfigField label="Artifact Source" fieldColumns={fieldColumns} groupClassName={fieldGroupClassName}>
           <ExpectedArtifactSourceSelector sources={sources} selected={source} onChange={this.onSourceChange} />
         </StageConfigField>

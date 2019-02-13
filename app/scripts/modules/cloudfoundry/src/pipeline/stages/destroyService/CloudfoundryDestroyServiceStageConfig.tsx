@@ -1,13 +1,8 @@
 import * as React from 'react';
-import {
-  AccountSelectField,
-  AccountService,
-  IAccount,
-  IRegion,
-  IStageConfigProps,
-  RegionSelectField,
-  StageConfigField,
-} from '@spinnaker/core';
+
+import Select, { Option } from 'react-select';
+
+import { AccountService, IAccount, IRegion, IStageConfigProps, StageConfigField } from '@spinnaker/core';
 
 export interface ICloudfoundryDestroyServiceStageConfigState {
   accounts: IAccount[];
@@ -15,7 +10,7 @@ export interface ICloudfoundryDestroyServiceStageConfigState {
   credentials: string;
   region: string;
   regions: IRegion[];
-  serviceName: string;
+  serviceInstanceName: string;
 }
 
 export class CloudfoundryDestroyServiceStageConfig extends React.Component<
@@ -31,7 +26,7 @@ export class CloudfoundryDestroyServiceStageConfig extends React.Component<
       credentials: props.stage.credentials,
       region: props.stage.region,
       regions: [],
-      serviceName: props.stage.serviceName,
+      serviceInstanceName: props.stage.serviceInstanceName,
     };
   }
 
@@ -48,12 +43,11 @@ export class CloudfoundryDestroyServiceStageConfig extends React.Component<
 
   private clearAndReloadRegions = (): void => {
     this.setState({ regions: [] });
-    AccountService.getRegionsForAccount(this.props.stage.credentials).then(regions =>
-      this.setState({ regions: regions }),
-    );
+    AccountService.getRegionsForAccount(this.props.stage.credentials).then(regions => this.setState({ regions }));
   };
 
-  private accountUpdated = (credentials: string): void => {
+  private accountUpdated = (option: Option<string>): void => {
+    const credentials = option.value;
     this.props.stage.credentials = credentials;
     this.props.stage.region = '';
     this.props.stageFieldUpdated();
@@ -62,16 +56,17 @@ export class CloudfoundryDestroyServiceStageConfig extends React.Component<
     }
   };
 
-  private regionUpdated = (region: string): void => {
-    this.setState({ region: region });
+  private regionUpdated = (option: Option<string>): void => {
+    const region = option.value;
+    this.setState({ region });
     this.props.stage.region = region;
     this.props.stageFieldUpdated();
   };
 
-  private serviceNameUpdated = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    const serviceName = event.target.value;
-    this.setState({ serviceName });
-    this.props.stage.serviceName = serviceName;
+  private serviceInstanceNameUpdated = (event: React.ChangeEvent<HTMLInputElement>): void => {
+    const serviceInstanceName = event.target.value;
+    this.setState({ serviceInstanceName });
+    this.props.stage.serviceInstanceName = serviceInstanceName;
     this.props.stageFieldUpdated();
   };
 
@@ -82,35 +77,45 @@ export class CloudfoundryDestroyServiceStageConfig extends React.Component<
 
   public render() {
     const { stage } = this.props;
-    const { credentials, serviceName, timeout } = stage;
+    const { credentials, region, serviceInstanceName, timeout } = stage;
     const { accounts, regions } = this.state;
     return (
       <div className="form-horizontal">
         <StageConfigField label="Account">
-          <AccountSelectField
-            accounts={accounts}
-            component={stage}
-            field="credentials"
-            provider="cloudfoundry"
+          <Select
+            options={
+              accounts &&
+              accounts.map((acc: IAccount) => ({
+                label: acc.name,
+                value: acc.name,
+              }))
+            }
+            clearable={false}
+            value={credentials}
             onChange={this.accountUpdated}
           />
         </StageConfigField>
-        <RegionSelectField
-          labelColumns={3}
-          fieldColumns={8}
-          component={stage}
-          field="region"
-          account={credentials}
-          onChange={this.regionUpdated}
-          regions={regions}
-        />
-        <StageConfigField label="Service Name">
+        <StageConfigField label="Region">
+          <Select
+            options={
+              regions &&
+              regions.map((r: IRegion) => ({
+                label: r.name,
+                value: r.name,
+              }))
+            }
+            clearable={false}
+            value={region}
+            onChange={this.regionUpdated}
+          />
+        </StageConfigField>
+        <StageConfigField label="Service Instance Name">
           <input
             type="text"
             className="form-control"
             required={true}
-            onChange={this.serviceNameUpdated}
-            value={serviceName}
+            onChange={this.serviceInstanceNameUpdated}
+            value={serviceInstanceName}
           />
         </StageConfigField>
         <StageConfigField label="Override Destroy Timeout (Seconds)" helpKey="cf.service.destroy.timeout">

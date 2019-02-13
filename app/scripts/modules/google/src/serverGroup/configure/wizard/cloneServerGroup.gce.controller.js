@@ -5,13 +5,15 @@ import _ from 'lodash';
 
 import { FirewallLabels, INSTANCE_TYPE_SERVICE, ModalWizard, TaskMonitor } from '@spinnaker/core';
 
+import { parseHealthCheckUrl } from 'google/healthCheck/healthCheckUtils';
+
 module.exports = angular
   .module('spinnaker.serverGroup.configure.gce.cloneServerGroup', [
     require('@uirouter/angularjs').default,
-    require('google/instance/custom/customInstanceBuilder.gce.service.js').name,
+    require('google/instance/custom/customInstanceBuilder.gce.service').name,
     INSTANCE_TYPE_SERVICE,
-    require('./hiddenMetadataKeys.value.js').name,
-    require('./securityGroups/tagManager.service.js').name,
+    require('./hiddenMetadataKeys.value').name,
+    require('./securityGroups/tagManager.service').name,
   ])
   .controller('gceCloneServerGroupCtrl', function(
     $scope,
@@ -370,6 +372,14 @@ module.exports = angular
       if ($scope.command.viewState.mode === 'editPipeline' || $scope.command.viewState.mode === 'createPipeline') {
         return $uibModalInstance.close($scope.command);
       }
+
+      const healthCheckUrl = _.get($scope.command, 'autoHealingPolicy.healthCheck');
+      if (healthCheckUrl) {
+        const { healthCheckName, healthCheckKind } = parseHealthCheckUrl(healthCheckUrl);
+        $scope.command.autoHealingPolicy.healthCheck = healthCheckName;
+        $scope.command.autoHealingPolicy.healthCheckKind = healthCheckKind;
+      }
+
       $scope.taskMonitor.submit(function() {
         const promise = serverGroupWriter.cloneServerGroup(angular.copy($scope.command), application);
 
@@ -380,12 +390,24 @@ module.exports = angular
         $scope.command.loadBalancers = origLoadBalancers;
         $scope.command.securityGroups = gceTagManager.inferSecurityGroupIdsFromTags($scope.command.tags);
 
+        if (healthCheckUrl) {
+          $scope.command.autoHealingPolicy.healthCheck = healthCheckUrl;
+        }
+
         return promise;
       });
     };
 
     this.onHealthCheckRefresh = function() {
       gceServerGroupConfigurationService.refreshHealthChecks($scope.command);
+    };
+
+    this.onEnableAutoHealingChange = function() {
+      // Prevent empty auto-healing policies from being overwritten by those of their ancestors
+      $scope.command.overwriteAncestorAutoHealingPolicy =
+        $scope.command.viewState.mode === 'clone' &&
+        $scope.command.autoHealingPolicy != null &&
+        $scope.command.enableAutoHealing === false;
     };
 
     this.setAutoHealingPolicy = function(autoHealingPolicy) {

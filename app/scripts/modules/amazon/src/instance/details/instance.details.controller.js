@@ -19,7 +19,7 @@ module.exports = angular
     require('@uirouter/angularjs').default,
     require('angular-ui-bootstrap'),
     AMAZON_INSTANCE_WRITE_SERVICE,
-    require('../../vpc/vpcTag.directive.js').name,
+    require('../../vpc/vpcTag.directive').name,
     CONFIRMATION_MODAL_SERVICE,
   ])
   .controller('awsInstanceDetailsCtrl', function(
@@ -219,8 +219,7 @@ module.exports = angular
         $scope.state.notFoundStandalone = true;
         RecentHistoryService.removeLastItem('instances');
       } else {
-        $state.params.allowModalToStayOpen = true;
-        $state.go('^', null, { location: 'replace' });
+        $state.go('^', { allowModalToStayOpen: true }, { location: 'replace' });
       }
     }
 

@@ -37,3 +37,9 @@ yarn-error.log
 # Test Results
 test-results.xml
 /bin/
+
+# Functional Test Artifacts
+mb.pid
+mb*.log
+selenium-logs
+*.browser.log

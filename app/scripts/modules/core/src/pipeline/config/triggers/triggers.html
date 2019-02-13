@@ -18,49 +18,6 @@
       </div>
     </div>
   </page-section>
-  <page-section key="triggers" label="Automated Triggers" badge="pipeline.triggers.length" no-wrapper="true">
-    <div class="form-horizontal panel-pipeline-phase" ng-if="pipeline.triggers.length && triggersCtrl.showProperties">
-      <div class="form-group row">
-        <div class="col-md-12">
-          <div class="trigger-config">
-            <render-if-feature feature="managedServiceAccounts">
-              <pipeline-roles pipeline="pipeline"></pipeline-roles>
-            </render-if-feature>
-            <render-if-feature feature="quietPeriod">
-              <div class="row">
-                <div class="col-md-10">
-                  <div class="col-md-9 col-md-offset-3">
-                    <div class="checkbox">
-                      <label>
-                        <input type="checkbox" ng-model="pipeline.respectQuietPeriod">
-                        Disable automatic triggers during quiet period. <help-field key="pipeline.config.triggers.respectQuietPeriod"></help-field>
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </render-if-feature>
-          </div>
-        </div>
-      </div>
-    </div>
-    <trigger ng-repeat="trigger in pipeline.triggers" trigger="trigger" pipeline="pipeline" application="application" field-updated="fieldUpdated"></trigger>
-    <div class="row" ng-if="!pipeline.triggers.length">
-      <p class="col-md-12">
-        You don't have any triggers configured for {{pipeline.name}}.
-      </p>
-    </div>
-    <div class="row">
-      <div class="col-md-12">
-        <button class="btn btn-block btn-add-trigger add-new" ng-click="triggersCtrl.addTrigger()">
-          <span class="glyphicon glyphicon-plus-sign"></span> Add Trigger
-        </button>
-      </div>
-    </div>
-  </page-section>
-  <page-section key="parameters" label="Parameters" no-wrapper="true" badge="pipeline.parameterConfig.length">
-    <parameters pipeline="pipeline"></parameters>
-  </page-section>
   <render-if-feature feature="artifacts">
     <page-section key="artifacts" label="Expected Artifacts" badge="pipeline.expectedArtifacts.length" no-wrapper="true">
       <div class="row">
@@ -91,6 +48,49 @@
       </div>
     </page-section>
   </render-if-feature>
+  <page-section key="triggers" label="Automated Triggers" badge="pipeline.triggers.length" no-wrapper="true">
+    <div class="form-horizontal panel-pipeline-phase" ng-if="pipeline.triggers.length && triggersCtrl.showProperties">
+      <div class="form-group row">
+        <div class="col-md-12">
+          <div class="trigger-config">
+            <render-if-feature feature="managedServiceAccounts">
+              <pipeline-roles pipeline="pipeline"></pipeline-roles>
+            </render-if-feature>
+            <render-if-feature feature="quietPeriod">
+              <div class="row">
+                <div class="col-md-10">
+                  <div class="col-md-9 col-md-offset-3">
+                    <div class="checkbox">
+                      <label>
+                        <input type="checkbox" ng-model="pipeline.respectQuietPeriod">
+                        Disable automated triggers during quiet period (<strong>does not affect Pipeline triggers</strong>). <help-field key="pipeline.config.triggers.respectQuietPeriod"></help-field>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </render-if-feature>
+          </div>
+        </div>
+      </div>
+    </div>
+    <trigger ng-repeat="trigger in pipeline.triggers" trigger="trigger" pipeline="pipeline" application="application" field-updated="fieldUpdated"></trigger>
+    <div class="row" ng-if="!pipeline.triggers.length">
+      <p class="col-md-12">
+        You don't have any triggers configured for {{pipeline.name}}.
+      </p>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <button class="btn btn-block btn-add-trigger add-new" ng-click="triggersCtrl.addTrigger()">
+          <span class="glyphicon glyphicon-plus-sign"></span> Add Trigger
+        </button>
+      </div>
+    </div>
+  </page-section>
+  <page-section key="parameters" label="Parameters" no-wrapper="true" badge="pipeline.parameterConfig.length">
+    <parameters pipeline="pipeline"></parameters>
+  </page-section>
   <page-section key="notifications" label="Notifications" visible="!pipeline.strategy" badge="pipeline.notifications.length">
     <notification-list ng-if="!pipeline.strategy" level="pipeline" notifications="pipeline.notifications" parent="pipeline">
     </notification-list>

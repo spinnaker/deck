@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { IManifest } from '@spinnaker/core';
+import { CopyToClipboard, IManifest } from '@spinnaker/core';
 import { DeployManifestStatusPills } from './DeployStatusPills';
-import { ManifestYaml } from './ManifestYaml';
 import { ManifestDetailsLink } from './ManifestDetailsLink';
 import { ManifestEvents } from './ManifestEvents';
+import { ManifestYaml } from './ManifestYaml';
 
 import './ManifestStatus.less';
 
@@ -20,7 +20,11 @@ export class ManifestStatus extends React.Component<IManifestStatusProps> {
       <dl className="manifest-status" key="manifest-status">
         <dt>{manifest.manifest.kind}</dt>
         <dd>
-          {manifest.manifest.metadata.name}
+          <CopyToClipboard
+            displayText={true}
+            text={manifest.manifest.metadata.name}
+            toolTip={`Copy ${manifest.manifest.metadata.name}`}
+          />
           &nbsp;
           <DeployManifestStatusPills manifest={manifest} />
         </dd>

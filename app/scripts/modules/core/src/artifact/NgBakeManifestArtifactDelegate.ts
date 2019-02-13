@@ -1,14 +1,10 @@
 import { IScope } from 'angular';
-import {
-  ExpectedArtifactService,
-  Registry,
-  IExpectedArtifact,
-  IArtifactAccount,
-  IArtifactSource,
-  IExpectedArtifactSelectorViewControllerDelegate,
-  IStage,
-  IPipeline,
-} from 'core';
+
+import { IExpectedArtifact, IArtifactSource, IStage, IPipeline } from 'core/domain';
+import { ExpectedArtifactService, IExpectedArtifactSelectorViewControllerDelegate } from 'core/artifact';
+import { Registry } from 'core/registry';
+import { IArtifactAccount } from 'core/account';
+
 import { ExpectedArtifactSelectorViewControllerAngularDelegate } from './ExpectedArtifactSelectorViewControllerAngularDelegate';
 
 export class NgBakeManifestArtifactDelegate
@@ -24,7 +20,7 @@ export class NgBakeManifestArtifactDelegate
       () => this.$scope.$parent.pipeline,
       this.$scope.stage,
     );
-    this.kinds = Registry.pipeline.getArtifactKinds().filter(a => a.isMatch);
+    this.kinds = Registry.pipeline.getMatchArtifactKinds();
   }
 
   public setAccounts = (accounts: any) => {

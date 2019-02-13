@@ -1,14 +1,13 @@
 import * as React from 'react';
 
 import { Dropdown, Tooltip } from 'react-bootstrap';
-import { get, find, filter, orderBy } from 'lodash';
+import { filter, find, get, orderBy } from 'lodash';
 
 import {
   ClusterTargetBuilder,
   IOwnerOption,
   IServerGroupActionsProps,
   IServerGroupJob,
-  ModalInjector,
   NgReact,
   ReactInjector,
   ServerGroupWarningMessageService,
@@ -16,6 +15,13 @@ import {
 } from '@spinnaker/core';
 
 import { ICloudFoundryServerGroup } from 'cloudfoundry/domain';
+import { ICloudFoundryCreateServerGroupCommand } from 'cloudfoundry/serverGroup/configure/serverGroupConfigurationModel.cf';
+import { CloudFoundryCreateServerGroupModal } from 'cloudfoundry/serverGroup/configure/wizard/CreateServerGroupModal';
+import { CloudFoundryReactInjector } from 'cloudfoundry/reactShims';
+import { CloudFoundryResizeServerGroupModal } from './resize/CloudFoundryResizeServerGroupModal';
+import { CloudFoundryRollbackServerGroupModal } from './rollback/CloudFoundryRollbackServerGroupModal';
+import { CloudFoundryMapLoadBalancersModal } from './mapLoadBalancers/CloudFoundryMapLoadBalancersModal';
+import { CloudFoundryUnmapLoadBalancersModal } from './mapLoadBalancers/CloudFoundryUnmapLoadBalancersModal';
 
 export interface ICloudFoundryServerGroupActionsProps extends IServerGroupActionsProps {
   serverGroup: ICloudFoundryServerGroup;
@@ -235,48 +241,60 @@ export class CloudFoundryServerGroupActions extends React.Component<ICloudFoundr
       // if there is only one other server group, default to it being the rollback target
       previousServerGroup = allServerGroups[0];
     }
+    const cluster = find(app.clusters, {
+      name: serverGroup.cluster,
+      account: serverGroup.account,
+      serverGroups: [],
+    });
+    const disabledServerGroups: ICloudFoundryServerGroup[] = filter(cluster.serverGroups, {
+      isDisabled: true,
+      region: serverGroup.region,
+    }) as ICloudFoundryServerGroup[];
 
-    ModalInjector.modalService.open({
-      templateUrl: ReactInjector.overrideRegistry.getTemplate(
-        'cf.rollback.modal',
-        require('./rollback/rollbackServerGroup.html'),
-      ),
-      controller: 'cloudfoundryRollbackServerGroupCtrl as ctrl',
-      resolve: {
-        serverGroup: () => serverGroup,
-        previousServerGroup: () => previousServerGroup,
-        disabledServerGroups: () => {
-          const cluster = find(app.clusters, {
-            name: serverGroup.cluster,
-            account: serverGroup.account,
-            serverGroups: [],
-          });
-          return filter(cluster.serverGroups, { isDisabled: true, region: serverGroup.region });
-        },
-        allServerGroups: () => allServerGroups,
-        application: () => app,
-      },
+    CloudFoundryRollbackServerGroupModal.show({
+      serverGroup,
+      previousServerGroup,
+      disabledServerGroups: disabledServerGroups.sort((a, b) => b.name.localeCompare(a.name)),
+      allServerGroups: allServerGroups.sort((a, b) => b.name.localeCompare(a.name)),
+      application: app,
     });
   };
 
   private resizeServerGroup = (): void => {
-    ModalInjector.modalService.open({
-      templateUrl: ReactInjector.overrideRegistry.getTemplate(
-        'cf.resize.modal',
-        require('./resize/resizeServerGroup.html'),
-      ),
-      size: 'lg',
-      controller: 'cloudfoundryResizeServerGroupCtrl as ctrl',
-      resolve: {
-        serverGroup: () => this.props.serverGroup,
-        application: () => this.props.app,
-      },
-    });
+    const { app, serverGroup } = this.props;
+    CloudFoundryResizeServerGroupModal.show({ application: app, serverGroup });
+  };
+
+  private mapServerGroupToLoadBalancers = (): void => {
+    const { app, serverGroup } = this.props;
+    CloudFoundryMapLoadBalancersModal.show({ application: app, serverGroup });
+  };
+
+  private unmapServerGroupFromLoadBalancers = (): void => {
+    const { app, serverGroup } = this.props;
+    CloudFoundryUnmapLoadBalancersModal.show({ application: app, serverGroup });
+  };
+
+  private cloneServerGroup = (): void => {
+    const { app, serverGroup } = this.props;
+    CloudFoundryReactInjector.cfServerGroupCommandBuilder
+      .buildServerGroupCommandFromExisting(app, serverGroup)
+      .then((command: ICloudFoundryCreateServerGroupCommand) => {
+        const title = `Clone ${serverGroup.name}`;
+        command.artifact.type = 'package';
+        CloudFoundryCreateServerGroupModal.show({
+          application: app,
+          command,
+          isSourceConstant: true,
+          serverGroup,
+          title,
+        });
+      });
   };
 
   public render(): JSX.Element {
     const { app, serverGroup } = this.props;
-
+    const { loadBalancers } = serverGroup;
     const { AddEntityTagLinks } = NgReact;
     const showEntityTags = SETTINGS.feature && SETTINGS.feature.entityTags;
     const entityTagTargets: IOwnerOption[] = ClusterTargetBuilder.buildClusterTargets(serverGroup);
@@ -305,14 +323,13 @@ export class CloudFoundryServerGroupActions extends React.Component<ICloudFoundr
               </a>
             </li>
           )}
-          {this.hasDisabledInstances() &&
-            !this.isEnableLocked() && (
-              <li>
-                <a className="clickable" onClick={this.enableServerGroup}>
-                  Enable
-                </a>
-              </li>
-            )}
+          {this.hasDisabledInstances() && !this.isEnableLocked() && (
+            <li>
+              <a className="clickable" onClick={this.enableServerGroup}>
+                Enable
+              </a>
+            </li>
+          )}
           {this.isEnableLocked() && (
             <li className="disabled">
               <Tooltip value="Cannot enable this server group until resize operation completes" placement="left">
@@ -327,6 +344,25 @@ export class CloudFoundryServerGroupActions extends React.Component<ICloudFoundr
               Destroy
             </a>
           </li>
+          <li>
+            <a className="clickable" onClick={this.cloneServerGroup}>
+              Clone
+            </a>
+          </li>
+          {!serverGroup.isDisabled && (
+            <li>
+              <a className="clickable" onClick={this.mapServerGroupToLoadBalancers}>
+                Map Load Balancers
+              </a>
+            </li>
+          )}
+          {!serverGroup.isDisabled && loadBalancers && !!loadBalancers.length && (
+            <li>
+              <a className="clickable" onClick={this.unmapServerGroupFromLoadBalancers}>
+                Unmap Load Balancers
+              </a>
+            </li>
+          )}
           {showEntityTags && (
             <AddEntityTagLinks
               component={serverGroup}

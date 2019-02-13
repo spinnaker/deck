@@ -6,6 +6,7 @@ import { ApplicationReader } from 'core/application/service/ApplicationReader';
 import { HelpField } from 'core/help/HelpField';
 import { IPipeline, IParameter } from 'core/domain';
 import { PipelineConfigService } from 'core/pipeline/config/services/PipelineConfigService';
+import { Spinner } from 'core/widgets';
 
 interface IPipelineSelectorCommand {
   application?: string;
@@ -22,6 +23,7 @@ export interface IPipelineSelectorProps {
 }
 
 export interface IPipelineSelectorState {
+  applicationsLoaded: boolean;
   pipelinesLoaded: boolean;
   applicationOptions: Array<Option<string>>;
   pipelines: IPipeline[];
@@ -33,6 +35,7 @@ export interface IPipelineSelectorState {
 
 export class PipelineSelector extends React.Component<IPipelineSelectorProps, IPipelineSelectorState> {
   public state: IPipelineSelectorState = {
+    applicationsLoaded: false,
     pipelinesLoaded: false,
     applicationOptions: [],
     pipelineOptions: [],
@@ -105,6 +108,7 @@ export class PipelineSelector extends React.Component<IPipelineSelectorProps, IP
   }
 
   public initializePipelines(): void {
+    this.setState({ pipelinesLoaded: false });
     const { command, type } = this.props;
     if (type === 'pipelines' && command.application) {
       PipelineConfigService.getPipelinesForApplication(command.application).then(pipelines => {
@@ -122,7 +126,7 @@ export class PipelineSelector extends React.Component<IPipelineSelectorProps, IP
   }
 
   public componentDidMount() {
-    if (this.props.type === 'strategies') {
+    if (this.props.type === 'strategies' && !this.props.command.strategyApplication) {
       this.props.command.strategyApplication = this.props.command.application;
     }
 
@@ -131,7 +135,7 @@ export class PipelineSelector extends React.Component<IPipelineSelectorProps, IP
         .map(a => a.name)
         .sort()
         .map(a => ({ label: a, value: a }));
-      this.setState({ applicationOptions });
+      this.setState({ applicationOptions, applicationsLoaded: true });
       this.initializePipelines();
     });
   }
@@ -171,6 +175,7 @@ export class PipelineSelector extends React.Component<IPipelineSelectorProps, IP
   public render() {
     const { command, type } = this.props;
     const {
+      applicationsLoaded,
       applicationOptions,
       pipelineParameters,
       pipelineOptions,
@@ -178,7 +183,6 @@ export class PipelineSelector extends React.Component<IPipelineSelectorProps, IP
       useDefaultParameters,
       userSuppliedParameters,
     } = this.state;
-
     const application = type === 'pipelines' ? command.application : command.strategyApplication;
     const pipelineId = type === 'pipelines' ? command.pipelineId : command.strategyPipeline;
 
@@ -188,31 +192,37 @@ export class PipelineSelector extends React.Component<IPipelineSelectorProps, IP
           <div className="form-group">
             <label className="col-md-2 col-md-offset-1 sm-label-right">Application</label>
             <div className="col-md-6">
-              <VirtualizedSelect
-                placeholder="None"
-                value={application}
-                options={applicationOptions}
-                onChange={this.applicationChange}
-              />
+              {!applicationsLoaded && (
+                <div className="sp-margin-xs-top">
+                  <Spinner size="small" />
+                </div>
+              )}
+              {applicationsLoaded && (
+                <VirtualizedSelect
+                  placeholder="None"
+                  value={application}
+                  options={applicationOptions}
+                  onChange={this.applicationChange}
+                />
+              )}
             </div>
           </div>
 
-          {application &&
-            pipelinesLoaded && (
-              <div className="form-group">
-                <label className="col-md-2 col-md-offset-1 sm-label-right">Pipeline</label>
-                <div className="col-md-6">
-                  <div>
-                    <VirtualizedSelect
-                      placeholder="Select a pipeline..."
-                      value={pipelineId}
-                      options={pipelineOptions}
-                      onChange={this.pipelineChange as any}
-                    />
-                  </div>
+          {application && pipelinesLoaded && (
+            <div className="form-group">
+              <label className="col-md-2 col-md-offset-1 sm-label-right">Pipeline</label>
+              <div className="col-md-6">
+                <div>
+                  <VirtualizedSelect
+                    placeholder="Select a pipeline..."
+                    value={pipelineId}
+                    options={pipelineOptions}
+                    onChange={this.pipelineChange as any}
+                  />
                 </div>
               </div>
-            )}
+            </div>
+          )}
 
           {pipelineParameters.length > 0 && (
             <div className="well well-sm clearfix ng-scope col-md-12">
@@ -227,38 +237,35 @@ export class PipelineSelector extends React.Component<IPipelineSelectorProps, IP
                     {useDefaultParameters[parameter.name] && (
                       <input disabled={true} type="text" className="form-control input-sm" value={parameter.default} />
                     )}
-                    {useDefaultParameters[parameter.name] &&
-                      !parameter.hasOptions && (
-                        <input
-                          type="text"
-                          className="form-control input-sm"
-                          value={userSuppliedParameters[parameter.name]}
-                          onChange={e => this.updateParam(parameter.name, e.target.value)}
-                        />
-                      )}
-                    {!useDefaultParameters[parameter.name] &&
-                      parameter.hasOptions && (
-                        <VirtualizedSelect
-                          style={{ width: '100%' }}
-                          value={userSuppliedParameters[parameter.name]}
-                          onChange={(o: Option<string>) => this.updateParam(parameter.name, o ? o.value : '')}
-                          options={parameter.options.map(o => ({ label: o.value, value: o.value }))}
-                        />
-                      )}
-                  </div>
-                  {parameter.default !== null &&
-                    parameter.default !== undefined && (
-                      <div className="checkbox col-md-3">
-                        <label>
-                          <input
-                            type="checkbox"
-                            checked={useDefaultParameters[parameter.name]}
-                            onChange={e => this.updateParam(parameter.name, e.target.checked)}
-                          />
-                          Use default
-                        </label>
-                      </div>
+                    {useDefaultParameters[parameter.name] && !parameter.hasOptions && (
+                      <input
+                        type="text"
+                        className="form-control input-sm"
+                        value={userSuppliedParameters[parameter.name]}
+                        onChange={e => this.updateParam(parameter.name, e.target.value)}
+                      />
                     )}
+                    {!useDefaultParameters[parameter.name] && parameter.hasOptions && (
+                      <VirtualizedSelect
+                        style={{ width: '100%' }}
+                        value={userSuppliedParameters[parameter.name]}
+                        onChange={(o: Option<string>) => this.updateParam(parameter.name, o ? o.value : '')}
+                        options={parameter.options.map(o => ({ label: o.value, value: o.value }))}
+                      />
+                    )}
+                  </div>
+                  {parameter.default !== null && parameter.default !== undefined && (
+                    <div className="checkbox col-md-3">
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={useDefaultParameters[parameter.name]}
+                          onChange={e => this.updateParam(parameter.name, e.target.checked)}
+                        />
+                        Use default
+                      </label>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

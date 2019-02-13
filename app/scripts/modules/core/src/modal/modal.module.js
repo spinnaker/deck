@@ -10,16 +10,16 @@ import './modals.less';
 
 module.exports = angular
   .module('spinnaker.core.modal', [
-    require('./modalOverlay.directive.js').name,
-    require('./modalPage.directive.js').name,
+    require('./modalOverlay.directive').name,
+    require('./modalPage.directive').name,
     require('./wizard/wizardSubFormValidation.service').name,
     MODAL_CLOSE_COMPONENT,
     SUBMIT_BUTTON_COMPONENT,
     V2_MODAL_WIZARD_COMPONENT,
   ])
   .run(function($rootScope, $uibModalStack) {
-    $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
-      if (!fromParams.allowModalToStayOpen) {
+    $rootScope.$on('$stateChangeStart', function(event, toState, toParams) {
+      if (!toParams.allowModalToStayOpen) {
         $uibModalStack.dismissAll();
       }
     });

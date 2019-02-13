@@ -12,9 +12,9 @@ import { Instances } from 'core/instance/Instances';
 import { ScrollToService } from 'core/utils';
 import { ISortFilter } from 'core/filterModel';
 import { ClusterState } from 'core/state';
+import { SETTINGS } from 'core/config';
 
 import { ServerGroupHeader } from './ServerGroupHeader';
-import { SETTINGS } from 'core';
 
 export interface IJenkinsViewModel {
   number: number;
@@ -22,6 +22,7 @@ export interface IJenkinsViewModel {
 }
 
 export interface IDockerViewModel {
+  digest: string;
   image: string;
   tag: string;
   href?: string;
@@ -80,9 +81,15 @@ export class ServerGroup extends React.Component<IServerGroupProps, IServerGroup
       };
     } else if (SETTINGS.dockerInsights.enabled && dockerConfig) {
       docker = {
+        digest: dockerConfig.digest,
         tag: dockerConfig.tag,
         image: dockerConfig.image,
-        href: SETTINGS.dockerInsights.url + 'images/' + encodeURIComponent(dockerConfig.image) + '/' + dockerConfig.tag,
+        href:
+          SETTINGS.dockerInsights.url +
+          'images/' +
+          encodeURIComponent(dockerConfig.image) +
+          '/' +
+          (dockerConfig.tag || dockerConfig.digest),
       };
     } else if (has(serverGroup, 'buildInfo.images')) {
       images = serverGroup.buildInfo.images;
@@ -197,7 +204,6 @@ export class ServerGroup extends React.Component<IServerGroupProps, IServerGroup
                     hasLoadBalancers={hasLoadBalancers}
                     instances={instances}
                     serverGroup={serverGroup}
-                    sortFilter={sortFilter}
                   />
                 </div>
               ) : (

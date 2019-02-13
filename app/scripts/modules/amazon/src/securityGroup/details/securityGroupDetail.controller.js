@@ -19,7 +19,7 @@ module.exports = angular
     require('@uirouter/angularjs').default,
     SECURITY_GROUP_READER,
     CONFIRMATION_MODAL_SERVICE,
-    require('../clone/cloneSecurityGroup.controller.js').name,
+    require('../clone/cloneSecurityGroup.controller').name,
   ])
   .controller('awsSecurityGroupDetailsCtrl', function(
     $scope,
@@ -108,7 +108,7 @@ module.exports = angular
       let rules = [];
       groupedRangeRules[addr].forEach(rule => {
         (rule.portRanges || []).forEach(range => {
-          if (range.startPort !== undefined && range.endPort !== undefined) {
+          if (rule.protocol === '-1' || (range.startPort !== undefined && range.endPort !== undefined)) {
             rules.push({ startPort: range.startPort, endPort: range.endPort, protocol: rule.protocol });
           }
         });
@@ -126,8 +126,7 @@ module.exports = angular
         $scope.state.loading = false;
         RecentHistoryService.removeLastItem('securityGroups');
       } else {
-        $state.params.allowModalToStayOpen = true;
-        $state.go('^', null, { location: 'replace' });
+        $state.go('^', { allowModalToStayOpen: true }, { location: 'replace' });
       }
     }
 

@@ -1,6 +1,5 @@
 'use strict';
 
-import { copy } from 'angular';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
@@ -37,14 +36,6 @@ module.exports = angular
     this.removeTrigger = function(trigger) {
       var triggerIndex = $scope.pipeline.triggers.indexOf(trigger);
       $scope.pipeline.triggers.splice(triggerIndex, 1);
-    };
-
-    this.summarizeExpectedArtifact = function(expected) {
-      const artifact = copy(expected.matchArtifact);
-      return Object.keys(artifact)
-        .filter(k => artifact[k])
-        .map(k => `${k}: ${artifact[k]}`)
-        .join(', ');
     };
 
     this.loadTrigger = () => {

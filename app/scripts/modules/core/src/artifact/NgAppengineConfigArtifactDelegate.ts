@@ -1,15 +1,11 @@
 import { IScope } from 'angular';
 import { get } from 'lodash';
-import {
-  ExpectedArtifactService,
-  Registry,
-  IExpectedArtifact,
-  IArtifactAccount,
-  IArtifactSource,
-  IExpectedArtifactSelectorViewControllerDelegate,
-  IStage,
-  IPipeline,
-} from 'core';
+
+import { Registry } from 'core/registry';
+import { IExpectedArtifact, IArtifactSource, IStage, IPipeline } from 'core/domain';
+import { ExpectedArtifactService, IExpectedArtifactSelectorViewControllerDelegate } from 'core/artifact';
+import { IArtifactAccount } from 'core/account';
+
 import { ExpectedArtifactSelectorViewControllerAngularDelegate } from './ExpectedArtifactSelectorViewControllerAngularDelegate';
 
 export class NgAppengineConfigArtifactDelegate
@@ -30,7 +26,7 @@ export class NgAppengineConfigArtifactDelegate
     super(artifact.$scope);
     this.refreshExpectedArtifacts();
     this.sources = ExpectedArtifactService.sourcesForPipelineStage(() => this.getPipeline(), this.getStage());
-    this.kinds = Registry.pipeline.getArtifactKinds().filter(a => a.isMatch);
+    this.kinds = Registry.pipeline.getMatchArtifactKinds();
   }
 
   public setAccounts = (accounts: any) => {

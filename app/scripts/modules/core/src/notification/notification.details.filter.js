@@ -38,7 +38,9 @@ module.exports = angular
   })
   .filter('notificationDetails', function() {
     return function(input) {
-      if (input.type !== 'email') {
+      if (input.type === 'pubsub') {
+        return 'Publisher Name: ' + input.publisherName;
+      } else if (input.type !== 'email') {
         return input.address;
       } else {
         let addresses = [];

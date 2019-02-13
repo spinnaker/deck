@@ -155,8 +155,15 @@ export class FilterModelService {
 
     filterModel.hasSavedState = toParams => {
       const application = toParams.application;
+      const serverGroup = toParams.serverGroup;
+
+      const savedStateForApplication = filterModel.savedState[application];
+
       return (
-        filterModel.savedState[application] !== undefined && filterModel.savedState[application].params !== undefined
+        savedStateForApplication !== undefined &&
+        savedStateForApplication.params !== undefined &&
+        (!serverGroup ||
+          (savedStateForApplication.params.serverGroup && savedStateForApplication.params.serverGroup === serverGroup))
       );
     };
 
@@ -245,6 +252,7 @@ export class FilterModelService {
         if (checkedStacks.includes('(none)')) {
           checkedStacks.push(''); // TODO: remove when moniker is source of truth for naming
           checkedStacks.push(null);
+          checkedStacks.push(undefined);
         }
         return includes(checkedStacks, target.stack);
       } else {
@@ -260,6 +268,7 @@ export class FilterModelService {
         if (checkedDetails.includes('(none)')) {
           checkedDetails.push(''); // TODO: remove when moniker is source of truth for naming
           checkedDetails.push(null);
+          checkedDetails.push(undefined);
         }
         return includes(checkedDetails, target.detail);
       } else {

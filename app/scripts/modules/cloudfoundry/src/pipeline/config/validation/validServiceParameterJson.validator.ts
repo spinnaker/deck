@@ -1,65 +1,49 @@
-import { get, has, upperFirst } from 'lodash';
+import { get, upperFirst } from 'lodash';
 
-import {
-  IPipeline,
-  IStage,
-  IStageOrTriggerValidator,
-  ITrigger,
-  IValidatorConfig,
-  PipelineConfigValidator,
-} from '@spinnaker/core';
-
-export interface IServiceParameterJsonValidationConfig extends IValidatorConfig {
-  fieldName: string;
-  fieldLabel?: string;
-  message?: string;
-}
+import { IPipeline, IStage, IStageOrTriggerValidator, ITrigger, PipelineConfigValidator } from '@spinnaker/core';
+import { IServiceFieldValidatorConfig } from 'cloudfoundry/pipeline/config/validation/ServiceFieldValidatorConfig';
 
 export class ServiceParameterJsonFieldValidator implements IStageOrTriggerValidator {
-  public validate(
-    pipeline: IPipeline,
-    stage: IStage | ITrigger,
-    validationConfig: IServiceParameterJsonValidationConfig,
-  ): string {
-    if (!this.passesValidation(stage, validationConfig)) {
-      return this.validationMessage(validationConfig, pipeline);
-    }
-    return null;
+  private static validationMessage(validationConfig: IServiceFieldValidatorConfig): string {
+    const fieldLabel: string = ServiceParameterJsonFieldValidator.printableFieldLabel(validationConfig);
+    return validationConfig.message || `<strong>${fieldLabel}</strong> should be a valid JSON string.`;
   }
 
-  protected passesValidation(
-    stage: IStage | ITrigger,
-    validationConfig: IServiceParameterJsonValidationConfig,
-  ): boolean {
-    return this.fieldIsValid(stage, validationConfig);
-  }
-
-  protected validationMessage(validationConfig: IServiceParameterJsonValidationConfig, pipeline: IPipeline): string {
-    const fieldLabel: string = this.printableFieldLabel(validationConfig);
-    return (
-      validationConfig.message || `<strong>${fieldLabel}</strong> should be a valid JSON string in ${pipeline.name}`
-    );
-  }
-
-  protected printableFieldLabel(config: IServiceParameterJsonValidationConfig): string {
+  private static printableFieldLabel(config: IServiceFieldValidatorConfig): string {
     const fieldLabel: string = config.fieldLabel || config.fieldName;
     return upperFirst(fieldLabel);
   }
 
-  protected fieldIsValid(stage: IStage | ITrigger, config: IServiceParameterJsonValidationConfig): boolean {
-    const fieldExists = has(stage, config.fieldName);
-    const field: any = get(stage, config.fieldName);
+  private static fieldIsValid(stage: IStage | ITrigger, config: IServiceFieldValidatorConfig): boolean {
+    const serviceInput = get(stage, 'manifest');
+    const content: any = get(serviceInput, config.fieldName);
 
-    if (!fieldExists || !field.trim()) {
+    if (!content) {
       return true;
     }
 
     try {
-      JSON.parse(field);
+      JSON.parse(content);
       return true;
     } catch (e) {
       return false;
     }
+  }
+
+  public validate(
+    _pipeline: IPipeline,
+    stage: IStage | ITrigger,
+    validationConfig: IServiceFieldValidatorConfig,
+  ): string {
+    const serviceInput: any = get(stage, 'manifest');
+    if (serviceInput.type !== validationConfig.serviceInputType) {
+      return null;
+    }
+
+    if (!ServiceParameterJsonFieldValidator.fieldIsValid(stage, validationConfig)) {
+      return ServiceParameterJsonFieldValidator.validationMessage(validationConfig);
+    }
+    return null;
   }
 }
 

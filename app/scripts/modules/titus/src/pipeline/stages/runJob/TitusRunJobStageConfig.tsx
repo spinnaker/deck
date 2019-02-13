@@ -12,12 +12,13 @@ import {
   AccountService,
   FirewallLabels,
   MapEditor,
-  AccountSelectField,
+  AccountSelectInput,
 } from '@spinnaker/core';
 
 import { DockerImageAndTagSelector, DockerImageUtils, IDockerImageAndTagChanges } from '@spinnaker/docker';
 
 import { TitusSecurityGroupPicker } from './TitusSecurityGroupPicker';
+import { TitusProviderSettings } from '../../../titus.settings';
 
 export interface ITitusRunJobStageConfigState {
   credentials: string[];
@@ -56,9 +57,15 @@ export class TitusRunJobStageConfig extends React.Component<IStageConfigProps, I
       };
     }
 
+    let defaultIamProfile = TitusProviderSettings.defaults.iamProfile || '{{application}}InstanceProfile';
+    defaultIamProfile = defaultIamProfile.replace('{{application}}', application.name);
+
     const clusterDefaults = {
       application: application.name,
+      containerAttributes: {},
       env: {},
+      iamProfile: defaultIamProfile,
+      labels: {},
       resources: {
         cpu: 1,
         disk: 10000,
@@ -156,11 +163,10 @@ export class TitusRunJobStageConfig extends React.Component<IStageConfigProps, I
             <span className="label-text">Account</span>
           </label>
           <div className="col-md-5">
-            <AccountSelectField
-              component={stage}
-              field="credentials"
+            <AccountSelectInput
+              value={stage.credentials}
+              onChange={evt => this.accountChanged(evt.target.value)}
               accounts={credentials}
-              onChange={this.accountChanged}
               provider="titus"
             />
             {stage.credentials !== undefined && (
@@ -305,14 +311,14 @@ export class TitusRunJobStageConfig extends React.Component<IStageConfigProps, I
         <div className={`${stage.showAdvancedOptions === true ? 'collapse.in' : 'collapse'}`}>
           <div className="form-group">
             <label className="col-md-3 sm-label-right">
-              <span className="label-text">IAM Instance Profile (optional)</span>
-              <HelpField id="titus.deploy.iamProfile" />
+              <span className="label-text">IAM Instance Profile</span> <HelpField id="titus.deploy.iamProfile" />
             </label>
             <div className="col-md-4">
               <input
                 type="text"
                 className="form-control input-sm"
                 value={stage.cluster.iamProfile}
+                required={true}
                 onChange={e => this.stageFieldChanged('cluster.iamProfile', e.target.value)}
               />
             </div>
@@ -334,21 +340,33 @@ export class TitusRunJobStageConfig extends React.Component<IStageConfigProps, I
             {(!stage.credentials || !stage.cluster.region) && (
               <div>Account and region must be selected before {FirewallLabels.get('firewalls')} can be added</div>
             )}
-            {loaded &&
-              stage.credentials &&
-              stage.cluster.region && (
-                <TitusSecurityGroupPicker
-                  account={stage.credentials}
-                  region={stage.cluster.region}
-                  command={stage}
-                  amazonAccount={awsAccount}
-                  hideLabel={true}
-                  groupsToEdit={stage.cluster.securityGroups}
-                  onChange={this.groupsChanged}
-                />
-              )}
+            {loaded && stage.credentials && stage.cluster.region && (
+              <TitusSecurityGroupPicker
+                account={stage.credentials}
+                region={stage.cluster.region}
+                command={stage}
+                amazonAccount={awsAccount}
+                hideLabel={true}
+                groupsToEdit={stage.cluster.securityGroups}
+                onChange={this.groupsChanged}
+              />
+            )}
           </StageConfigField>
 
+          <StageConfigField label="Job Attributes (optional)">
+            <MapEditor
+              model={stage.cluster.labels}
+              allowEmpty={true}
+              onChange={(v: any) => this.mapChanged('cluster.labels', v)}
+            />
+          </StageConfigField>
+          <StageConfigField label="Container Attributes (optional)">
+            <MapEditor
+              model={stage.cluster.containerAttributes}
+              allowEmpty={true}
+              onChange={(v: any) => this.mapChanged('cluster.containerAttributes', v)}
+            />
+          </StageConfigField>
           <StageConfigField label="Environment Variables (optional)">
             <MapEditor
               model={stage.cluster.env}

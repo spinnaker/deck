@@ -1,15 +1,10 @@
 import { IScope } from 'angular';
-import {
-  ExpectedArtifactService,
-  Registry,
-  IExpectedArtifact,
-  IArtifactAccount,
-  IArtifactKindConfig,
-  IArtifactSource,
-  IExpectedArtifactSelectorViewControllerDelegate,
-  IStage,
-  IPipeline,
-} from 'core';
+
+import { IExpectedArtifact, IArtifactKindConfig, IArtifactSource, IStage, IPipeline } from 'core/domain';
+import { Registry } from 'core/registry';
+import { ExpectedArtifactService, IExpectedArtifactSelectorViewControllerDelegate } from 'core/artifact';
+import { IArtifactAccount } from 'core/account';
+
 import { ExpectedArtifactSelectorViewControllerAngularDelegate } from './ExpectedArtifactSelectorViewControllerAngularDelegate';
 
 export class NgAppEngineDeployArtifactDelegate
@@ -19,8 +14,8 @@ export class NgAppEngineDeployArtifactDelegate
     super($scope);
     const { viewState } = $scope.command;
     this.sources = ExpectedArtifactService.sourcesForPipelineStage(() => viewState.pipeline, viewState.stage);
-    this.kinds = Registry.pipeline.getArtifactKinds().filter((a: IArtifactKindConfig) => {
-      return a.isMatch && (a.key === 'custom' || offeredArtifactTypes.find(oat => oat.test(a.type)));
+    this.kinds = Registry.pipeline.getMatchArtifactKinds().filter((a: IArtifactKindConfig) => {
+      return a.customKind || offeredArtifactTypes.find(oat => oat.test(a.type));
     });
     this.refreshExpectedArtifacts();
   }

@@ -6,9 +6,11 @@ import { IPromise } from 'angular';
 import {
   AccountService,
   LoadBalancerWriter,
+  FirewallLabels,
   ReactInjector,
   TaskMonitor,
   WizardModal,
+  WizardPage,
   ILoadBalancerModalProps,
   noop,
   ReactModal,
@@ -31,7 +33,6 @@ export interface ICreateClassicLoadBalancerProps extends ILoadBalancerModalProps
 }
 
 export interface ICreateClassicLoadBalancerState {
-  includeSecurityGroups: boolean;
   isNew: boolean;
   loadBalancerCommand: IAmazonClassicLoadBalancerUpsertCommand;
   taskMonitor: TaskMonitor;
@@ -63,7 +64,6 @@ export class CreateClassicLoadBalancer extends React.Component<
       : AwsReactInjector.awsLoadBalancerTransformer.constructNewClassicLoadBalancerTemplate(props.app);
 
     this.state = {
-      includeSecurityGroups: !!loadBalancerCommand.vpcId,
       isNew: !props.loadBalancer,
       loadBalancerCommand,
       taskMonitor: null,
@@ -198,25 +198,16 @@ export class CreateClassicLoadBalancer extends React.Component<
     }
   };
 
-  private validate = (values: FormikValues): FormikErrors<IAmazonClassicLoadBalancerUpsertCommand> => {
-    this.setState({ includeSecurityGroups: !!values.vpcId });
+  private validate = (_values: FormikValues): FormikErrors<IAmazonClassicLoadBalancerUpsertCommand> => {
     const errors = {} as FormikErrors<IAmazonClassicLoadBalancerUpsertCommand>;
     return errors;
   };
 
   public render(): React.ReactElement<CreateClassicLoadBalancer> {
     const { app, dismissModal, forPipelineConfig, loadBalancer } = this.props;
-    const { includeSecurityGroups, isNew, loadBalancerCommand, taskMonitor } = this.state;
+    const { isNew, loadBalancerCommand, taskMonitor } = this.state;
 
-    const hideSections = new Set<string>();
-
-    if (!isNew && !forPipelineConfig) {
-      hideSections.add(LoadBalancerLocation.label);
-    }
-
-    if (!includeSecurityGroups) {
-      hideSections.add(SecurityGroups.label);
-    }
+    const showLocationSection = isNew || forPipelineConfig;
 
     let heading = forPipelineConfig ? 'Configure Classic Load Balancer' : 'Create New Classic Load Balancer';
     if (!isNew) {
@@ -232,19 +223,60 @@ export class CreateClassicLoadBalancer extends React.Component<
         closeModal={this.submit}
         submitButtonLabel={forPipelineConfig ? (isNew ? 'Add' : 'Done') : isNew ? 'Create' : 'Update'}
         validate={this.validate}
-        hideSections={hideSections}
-      >
-        <LoadBalancerLocation
-          app={app}
-          isNew={isNew}
-          forPipelineConfig={forPipelineConfig}
-          loadBalancer={loadBalancer}
-        />
-        <SecurityGroups done={true} isNew={isNew} />
-        <Listeners done={true} />
-        <HealthCheck done={true} />
-        <AdvancedSettings done={true} />
-      </WizardModal>
+        render={({ formik, nextIdx, wizard }) => (
+          <>
+            {showLocationSection && (
+              <WizardPage
+                label="Location"
+                wizard={wizard}
+                order={nextIdx()}
+                render={({ innerRef }) => (
+                  <LoadBalancerLocation
+                    app={app}
+                    formik={formik}
+                    isNew={isNew}
+                    forPipelineConfig={forPipelineConfig}
+                    loadBalancer={loadBalancer}
+                    ref={innerRef}
+                  />
+                )}
+              />
+            )}
+
+            {!!formik.values.vpcId && (
+              <WizardPage
+                label={FirewallLabels.get('Firewall')}
+                wizard={wizard}
+                order={nextIdx()}
+                render={({ innerRef, onLoadingChanged }) => (
+                  <SecurityGroups formik={formik} isNew={isNew} onLoadingChanged={onLoadingChanged} ref={innerRef} />
+                )}
+              />
+            )}
+
+            <WizardPage
+              label="Listeners"
+              wizard={wizard}
+              order={nextIdx()}
+              render={({ innerRef }) => <Listeners ref={innerRef} formik={formik} app={app} />}
+            />
+
+            <WizardPage
+              label="Health Check"
+              wizard={wizard}
+              order={nextIdx()}
+              render={({ innerRef }) => <HealthCheck ref={innerRef} formik={formik} />}
+            />
+
+            <WizardPage
+              label="Advanced Settings"
+              wizard={wizard}
+              order={nextIdx()}
+              render={({ innerRef }) => <AdvancedSettings ref={innerRef} formik={formik} />}
+            />
+          </>
+        )}
+      />
     );
   }
 }

@@ -29,6 +29,8 @@ import { WERCKER_STAGE_MODULE } from './config/stages/wercker/werckerStage.modul
 import { UNMATCHED_STAGE_TYPE_STAGE } from './config/stages/unmatchedStageTypeStage/unmatchedStageTypeStage';
 import './config/stages/wait/waitStage';
 import './config/stages/evaluateVariables/evaluateVariablesStage';
+import { PRECONFIGUREDJOB_STAGE_MODULE } from './config/stages/preconfiguredJob/preconfiguredJobStage.module';
+import './config/stages/entityTags/applyEntityTagsStage';
 import { WEBHOOK_STAGE_MODULE } from './config/stages/webhook/webhookStage.module';
 import { PIPELINE_STATES } from './pipeline.states';
 import { BUILD_DISPLAY_NAME_FILTER } from './executionBuild/buildDisplayName.filter';
@@ -49,7 +51,7 @@ module(PIPELINE_MODULE, [
 
   BUILD_DISPLAY_NAME_FILTER,
 
-  require('./manualExecution/manualPipelineExecution.controller.js').name,
+  require('./manualExecution/manualPipelineExecution.controller').name,
 
   STAGE_FAILURE_MESSAGE_COMPONENT,
   STEP_EXECUTION_DETAILS_COMPONENT,
@@ -62,6 +64,7 @@ module(PIPELINE_MODULE, [
   GROUP_STAGE_MODULE,
   TRAVIS_STAGE_MODULE,
   WERCKER_STAGE_MODULE,
+  PRECONFIGUREDJOB_STAGE_MODULE,
   WEBHOOK_STAGE_MODULE,
   UNMATCHED_STAGE_TYPE_STAGE,
   require('./config/stages/bake/bakeStage.module').name,

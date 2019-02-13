@@ -1,6 +1,6 @@
 import { IServerGroupCommand } from '@spinnaker/core';
 
-import { ICloudFoundryCluster, ICloudFoundryEnvVar } from 'cloudfoundry/domain';
+import { ICloudFoundryEnvVar } from 'cloudfoundry/domain';
 
 export interface ICloudFoundryCreateServerGroupCommand extends IServerGroupCommand {
   artifact: ICloudFoundryBinarySource;
@@ -12,32 +12,36 @@ export interface ICloudFoundryCreateServerGroupCommand extends IServerGroupComma
 }
 
 export interface ICloudFoundryArtifactSource {
+  type: 'artifact';
   reference: string;
   account: string;
 }
 
 export interface ICloudFoundryPackageSource {
-  cluster: ICloudFoundryCluster;
+  type: 'package';
+  clusterName: string;
   serverGroupName: string;
   account: string;
   region: string;
 }
 
 export interface ICloudFoundryTriggerSource {
+  type: 'trigger';
   pattern: string;
   account: string; // optional: used in the event that retrieving an artifact from a trigger source requires auth
 }
 
-export type ICloudFoundryBinarySource = { type: string } & (
+export type ICloudFoundryBinarySource =
   | ICloudFoundryArtifactSource
   | ICloudFoundryPackageSource
-  | ICloudFoundryTriggerSource);
+  | ICloudFoundryTriggerSource;
 
 export interface ICloudFoundryManifestDirectSource {
+  type: 'direct';
   memory: string;
   diskQuota: string;
   instances: number;
-  buildpack: string;
+  buildpacks: string[];
   healthCheckType: string;
   healthCheckHttpEndpoint: string;
   routes: string[];
@@ -46,19 +50,21 @@ export interface ICloudFoundryManifestDirectSource {
 }
 
 export interface ICloudFoundryManifestArtifactSource {
+  type: 'artifact';
   reference: string;
   account: string;
 }
 
 export interface ICloudFoundryManifestTriggerSource {
+  type: 'trigger';
   pattern: string;
   account: string; // optional: used in the event that retrieving a manifest from a trigger source requires auth
 }
 
-export type ICloudFoundryManifestSource = { type: string } & (
+export type ICloudFoundryManifestSource =
   | ICloudFoundryManifestDirectSource
   | ICloudFoundryManifestTriggerSource
-  | ICloudFoundryManifestArtifactSource);
+  | ICloudFoundryManifestArtifactSource;
 
 export interface ICloudFoundryDeployConfiguration {
   account: string;

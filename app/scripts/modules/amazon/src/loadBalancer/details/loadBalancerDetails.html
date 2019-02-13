@@ -20,7 +20,7 @@
       </a>
     </div>
     <div class="header-text horizontal middle">
-      <i class="fa icon-sitemap"/>
+      <i class="fa icon-sitemap"></i>
       <h3 class="horizontal middle space-between flex-1" select-on-dbl-click>
         {{ctrl.loadBalancer.name}}
         <render-if-feature feature="entityTags">
@@ -45,6 +45,14 @@
           load-balancer="ctrl.loadBalancer"
           load-balancer-from-params="ctrl.loadBalancerFromParams"
           ></load-balancer-actions>
+        <div class="dropdown" ng-if="ctrl.loadBalancer.elb.insightActions.length > 0" uib-dropdown dropdown-append-to-body>
+          <button type="button" class="btn btn-sm btn-default dropdown-toggle" uib-dropdown-toggle>
+            Insight <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu" uib-dropdown-menu role="menu">
+            <li ng-repeat="action in ctrl.loadBalancer.elb.insightActions"><a target=_blank href="{{action.url}}">{{action.label}}</a></li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
@@ -141,7 +149,7 @@
             <div ng-repeat="action in listener.actions">
               <!-- authenticate-oidc -->
               <span ng-if="action.type === 'authenticate-oidc'">
-                <i class="fas fa-fw fa-user-lock"/>
+                <i class="fas fa-fw fa-user-lock"></i>
                 <a ng-if="ctrl.oidcConfigPath"
                   href="{{ctrl.oidcConfigPath}}{{action.authenticateOidcConfig.clientId}}" target="_blank">
                   {{action.authenticateOidcConfig.clientId}}
@@ -152,7 +160,7 @@
               </span>
               <!-- forward -->
               <span ng-if="action.targetGroupName && action.targetGroup">
-                <i class="fa fa-fw fa-crosshairs icon" aria-hidden="true"/>
+                <i class="fa fa-fw fa-crosshairs icon" aria-hidden="true"></i>
                 <a ui-sref="^.targetGroupDetails({region: action.targetGroup.region,
                               loadBalancerName: ctrl.loadBalancer.name,
                               accountId: action.targetGroup.account,
@@ -163,7 +171,7 @@
                 </a>
               </span>
               <span ng-if="action.targetGroupName && !action.targetGroup">
-                <i class="fa fa-fw fa-crosshairs icon" aria-hidden="true"/>
+                <i class="fa fa-fw fa-crosshairs icon" aria-hidden="true"></i>
                 {{action.targetGroupName}}
               </span>
             </div>

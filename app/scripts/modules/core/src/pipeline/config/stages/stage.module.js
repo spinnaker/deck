@@ -1,5 +1,7 @@
 'use strict';
 
+import { ReactModal } from 'root/app/scripts/modules/core/src/presentation';
+
 const angular = require('angular');
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
@@ -9,23 +11,22 @@ import { AccountService } from 'core/account/AccountService';
 import { API } from 'core/api';
 import { BASE_EXECUTION_DETAILS_CTRL } from './core/baseExecutionDetails.controller';
 import { CONFIRMATION_MODAL_SERVICE } from 'core/confirmationModal/confirmationModal.service';
-import { EDIT_STAGE_JSON_CONTROLLER } from './core/editStageJson.controller';
 import { STAGE_NAME } from './StageName';
 import { PipelineConfigService } from 'core/pipeline/config/services/PipelineConfigService';
 import { Registry } from 'core/registry';
 import { StageConfigWrapper } from './StageConfigWrapper';
+import { EditStageJsonModal } from 'root/app/scripts/modules/core/src/pipeline/config/stages/core/EditStageJsonModal';
 
 module.exports = angular
   .module('spinnaker.core.pipeline.config.stage', [
     BASE_EXECUTION_DETAILS_CTRL,
-    EDIT_STAGE_JSON_CONTROLLER,
     STAGE_NAME,
-    require('./overrideTimeout/overrideTimeout.directive.js').name,
-    require('./overrideFailure/overrideFailure.component.js').name,
-    require('./optionalStage/optionalStage.directive.js').name,
-    require('./failOnFailedExpressions/failOnFailedExpressions.directive.js').name,
+    require('./overrideTimeout/overrideTimeout.directive').name,
+    require('./overrideFailure/overrideFailure.component').name,
+    require('./optionalStage/optionalStage.directive').name,
+    require('./failOnFailedExpressions/failOnFailedExpressions.directive').name,
     CONFIRMATION_MODAL_SERVICE,
-    require('./core/stageConfigField/stageConfigField.directive.js').name,
+    require('./core/stageConfigField/stageConfigField.directive').name,
   ])
   .directive('pipelineConfigStage', function() {
     return {
@@ -44,7 +45,7 @@ module.exports = angular
       },
     };
   })
-  .controller('StageConfigCtrl', function($scope, $element, $compile, $controller, $templateCache, $uibModal) {
+  .controller('StageConfigCtrl', function($scope, $element, $compile, $controller, $templateCache) {
     var lastStageScope, reactComponentMounted;
 
     $scope.options = {
@@ -72,8 +73,8 @@ module.exports = angular
       return stage.available
         ? 'Available'
         : requisiteStageRefIds.includes(stage.refId)
-          ? null
-          : 'Downstream dependencies (unavailable)';
+        ? null
+        : 'Downstream dependencies (unavailable)';
     };
 
     $scope.stageProducesArtifacts = function() {
@@ -111,27 +112,23 @@ module.exports = angular
     };
 
     this.editStageJson = () => {
-      $uibModal
-        .open({
-          size: 'lg modal-fullscreen',
-          templateUrl: require('./core/editStageJson.modal.html'),
-          controller: 'editStageJsonCtrl as $ctrl',
-          resolve: {
-            stage: () => $scope.stage,
-          },
+      const modalProps = { dialogClassName: 'modal-lg modal-fullscreen' };
+      ReactModal.show(EditStageJsonModal, { stage: $scope.stage }, modalProps)
+        .then(() => {
+          $scope.$applyAsync(() => $scope.$broadcast('pipeline-json-edited'));
         })
-        .result.then(() => {
-          $scope.$broadcast('pipeline-json-edited');
-        })
-        .catch(() => {});
+        .catch(() => {}); // user closed modal
     };
 
     this.selectStageType = stage => {
       $scope.stage.type = stage.key;
-      if (stage.addAliasToConfig) {
-        $scope.stage.alias = stage.alias;
-      }
       this.selectStage();
+      // clear stage-specific fields
+      Object.keys($scope.stage).forEach(k => {
+        if (!['requisiteStageRefIds', 'refId', 'isNew', 'name', 'type'].includes(k)) {
+          delete $scope.stage[k];
+        }
+      });
     };
 
     this.selectStage = function(newVal, oldVal) {
@@ -180,6 +177,9 @@ module.exports = angular
           $scope.description = config.description;
           $scope.extendedDescription = config.extendedDescription;
           $scope.label = config.label;
+          if (config.addAliasToConfig) {
+            $scope.stage.alias = config.alias;
+          }
           if (config.defaults) {
             defaultsDeep($scope.stage, config.defaults);
           }
@@ -200,6 +200,7 @@ module.exports = angular
               },
               stage: $scope.stage,
               component: config.component,
+              configuration: config.configuration,
             };
             ReactDOM.render(React.createElement(StageConfigWrapper, props), stageDetailsNode);
           } else {

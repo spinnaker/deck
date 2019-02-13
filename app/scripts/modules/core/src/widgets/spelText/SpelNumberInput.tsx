@@ -5,6 +5,8 @@ import { Tooltip } from 'core/presentation';
 export interface INumberInputProps {
   value: number | string;
   onChange: (value: number | string) => void;
+  min?: number;
+  max?: number;
 }
 
 export interface INumberInputState {
@@ -46,12 +48,13 @@ export class SpelNumberInput extends React.Component<INumberInputProps, INumberI
 
   public render() {
     const { expressionActive, glowing } = this.state;
-    const { value } = this.props;
+    const { value, min, max } = this.props;
     return (
-      <div className="navbar-form" style={{ padding: 0 }}>
+      <div className="navbar-form" style={{ padding: 0, margin: 0 }}>
         <div className={`button-input ${expressionActive ? 'text' : 'number'}${glowing ? ' focus' : ''}`}>
           <span className="btn-group btn-group-xs" role="group">
             <button
+              type="button"
               className={`btn btn-default ${expressionActive ? '' : 'active'}`}
               onClick={() => this.setExpressionActive(false)}
               onFocus={() => this.setGlow(true)}
@@ -62,6 +65,7 @@ export class SpelNumberInput extends React.Component<INumberInputProps, INumberI
               </Tooltip>
             </button>
             <button
+              type="button"
               className={`btn btn-default ${expressionActive ? 'active' : ''}`}
               onClick={() => this.setExpressionActive(true)}
               onFocus={() => this.setGlow(true)}
@@ -79,6 +83,8 @@ export class SpelNumberInput extends React.Component<INumberInputProps, INumberI
             type={expressionActive ? 'text' : 'number'}
             className="form-control borderless"
             value={value}
+            min={min}
+            max={max}
             onChange={this.valueChanged}
             onFocus={() => this.setGlow(true)}
             onBlur={() => this.setGlow(false)}

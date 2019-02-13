@@ -4,24 +4,29 @@
 @fixed-header-z-index: 1030;
 
 /* Resets for React select */
-.Select--multi .Select-multi-value-wrapper,
-.Select-control,
-.Select-input {
-  height: 30px;
-}
+html {
+  .Select--multi .Select-multi-value-wrapper,
+  .Select-control,
+  .Select-input {
+    height: 30px;
+  }
 
-.Select-input {
-  font-size: 12px;
-}
+  .Select-input {
+    font-size: 12px;
+    input:invalid {
+      box-shadow: none;
+    }
+  }
 
-.Select-placeholder {
-  line-height: 30px;
-  height: inherit;
-}
+  .Select-placeholder {
+    line-height: 30px;
+    height: inherit;
+  }
 
-.Select-placeholder,
-.Select--single > .Select-control .Select-value {
-  line-height: 30px;
+  .Select-placeholder,
+  .Select--single > .Select-control .Select-value {
+    line-height: 30px;
+  }
 }
 
 .form-field-loading {
@@ -303,6 +308,7 @@ html {
     }
     react-ui-view-adapter {
       width: 100%;
+      overflow-x: visible !important;
     }
   }
   .nav-content {
@@ -1239,6 +1245,31 @@ select.input-sm {
   padding-right: 0;
 }
 
+.Select.input-sm {
+  display: flex;
+  align-items: center;
+  padding-right: 0;
+  .Select-control {
+    display: flex;
+    justify-content: space-between;
+    .Select-value,
+    .Select-arrow-zone {
+      line-height: 30px;
+    }
+  }
+  .Select-menu-outer {
+    margin: -1px 10px 0;
+    left: 0;
+    right: 0;
+    width: unset;
+  }
+  .Select-clear-zone {
+    position: absolute;
+    right: 25px;
+    line-height: 30px;
+  }
+}
+
 .select-placeholder {
   display: inline-block;
   padding-left: 14px;
@@ -1285,6 +1316,7 @@ html {
         margin: 0;
         width: 100%;
       }
+      position: relative;
     }
     .scrollable-columns {
       background-color: var(--color-alabaster);
@@ -1430,7 +1462,7 @@ ul.checkmap {
 }
 
 .break-word {
-  word-break: break-all;
+  overflow-wrap: break-word;
 }
 
 .horizontal-rule {

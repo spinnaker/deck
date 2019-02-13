@@ -3,13 +3,70 @@ import { react2angular } from 'react2angular';
 
 import { CloudfoundryDeployServiceStageConfig } from './CloudfoundryDeployServiceStageConfig';
 import { ExecutionDetailsTasks, IStage, Registry } from '@spinnaker/core';
-import { CloudfoundryDeployServiceExecutionDetails } from 'cloudfoundry/pipeline/stages/deployService/CloudfoundryDeployServiceExecutionDetails';
+import { CloudfoundryDeployServiceExecutionDetails } from './CloudfoundryDeployServiceExecutionDetails';
+import { IServiceFieldValidatorConfig } from 'cloudfoundry/pipeline/config/validation/ServiceFieldValidatorConfig';
 
 class CloudFoundryDeployServiceStageCtrl implements IController {
   constructor(public $scope: IScope) {
     'ngInject';
   }
 }
+
+const serviceInstanceNameValidatorConfig: IServiceFieldValidatorConfig = {
+  type: 'requiredServiceField',
+  serviceInputType: 'direct',
+  fieldName: 'serviceInstanceName',
+  preventSave: true,
+};
+
+const serviceValidatorConfig: IServiceFieldValidatorConfig = {
+  type: 'requiredServiceField',
+  serviceInputType: 'direct',
+  fieldName: 'service',
+  preventSave: true,
+};
+
+const servicePlanValidatorConfig: IServiceFieldValidatorConfig = {
+  type: 'requiredServiceField',
+  serviceInputType: 'direct',
+  fieldName: 'servicePlan',
+  preventSave: true,
+};
+
+const jsonValidatorConfig: IServiceFieldValidatorConfig = {
+  type: 'validServiceParameterJson',
+  serviceInputType: 'direct',
+  fieldName: 'parameters',
+  preventSave: true,
+};
+
+const accountValidatorConfig: IServiceFieldValidatorConfig = {
+  type: 'requiredServiceField',
+  serviceInputType: 'artifact',
+  fieldName: 'account',
+  preventSave: true,
+};
+
+const referenceValidatorConfig: IServiceFieldValidatorConfig = {
+  type: 'requiredServiceField',
+  serviceInputType: 'artifact',
+  fieldName: 'reference',
+  preventSave: true,
+};
+
+const userProvidedServiceInstanceNameValidatorConfig: IServiceFieldValidatorConfig = {
+  type: 'requiredServiceField',
+  serviceInputType: 'userProvided',
+  fieldName: 'serviceInstanceName',
+  preventSave: true,
+};
+
+const credentialsJsonValidatorConfig: IServiceFieldValidatorConfig = {
+  type: 'validServiceParameterJson',
+  serviceInputType: 'userProvided',
+  fieldName: 'credentials',
+  preventSave: true,
+};
 
 export const CLOUD_FOUNDRY_DEPLOY_SERVICE_STAGE = 'spinnaker.cloudfoundry.pipeline.stage.deployServiceStage';
 module(CLOUD_FOUNDRY_DEPLOY_SERVICE_STAGE, [])
@@ -26,10 +83,14 @@ module(CLOUD_FOUNDRY_DEPLOY_SERVICE_STAGE, [])
       validators: [
         { type: 'requiredField', fieldName: 'credentials', fieldLabel: 'account' },
         { type: 'requiredField', fieldName: 'region' },
-        { type: 'requiredField', fieldName: 'serviceName', preventSave: true },
-        { type: 'requiredField', fieldName: 'service', preventSave: true },
-        { type: 'requiredField', fieldName: 'servicePlan', preventSave: true },
-        { type: 'validServiceParameterJson', fieldName: 'parameters', preventSave: true },
+        serviceInstanceNameValidatorConfig,
+        serviceValidatorConfig,
+        servicePlanValidatorConfig,
+        jsonValidatorConfig,
+        accountValidatorConfig,
+        referenceValidatorConfig,
+        userProvidedServiceInstanceNameValidatorConfig,
+        credentialsJsonValidatorConfig,
       ],
     });
   })

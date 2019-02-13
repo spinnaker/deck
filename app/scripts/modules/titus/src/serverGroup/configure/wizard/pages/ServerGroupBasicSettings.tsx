@@ -1,17 +1,16 @@
 import * as React from 'react';
-import { Field, FormikErrors } from 'formik';
+import { Field, FormikErrors, FormikProps } from 'formik';
 
 import {
   DeploymentStrategySelector,
   HelpField,
-  IWizardPageProps,
-  wizardPage,
   NameUtils,
   RegionSelectField,
   Application,
   ReactInjector,
   IServerGroup,
-  AccountSelectField,
+  IWizardPageComponent,
+  AccountSelectInput,
   AccountTag,
 } from '@spinnaker/core';
 
@@ -25,8 +24,9 @@ const isStackPattern = (stack: string) =>
 const isDetailPattern = (detail: string) =>
   isNotExpressionLanguage(detail) ? /^([a-zA-Z_0-9._$-{}\\\^~]*(\${.+})*)*$/.test(detail) : true;
 
-export interface IServerGroupBasicSettingsProps extends IWizardPageProps<ITitusServerGroupCommand> {
+export interface IServerGroupBasicSettingsProps {
   app: Application;
+  formik: FormikProps<ITitusServerGroupCommand>;
 }
 
 export interface IServerGroupBasicSettingsState {
@@ -36,12 +36,9 @@ export interface IServerGroupBasicSettingsState {
   showPreviewAsWarning: boolean;
 }
 
-class ServerGroupBasicSettingsImpl extends React.Component<
-  IServerGroupBasicSettingsProps,
-  IServerGroupBasicSettingsState
-> {
-  public static LABEL = 'Basic Settings';
-
+export class ServerGroupBasicSettings
+  extends React.Component<IServerGroupBasicSettingsProps, IServerGroupBasicSettingsState>
+  implements IWizardPageComponent<ITitusServerGroupCommand> {
   constructor(props: IServerGroupBasicSettingsProps) {
     super(props);
 
@@ -109,11 +106,8 @@ class ServerGroupBasicSettingsImpl extends React.Component<
     }
 
     if (!values.viewState.disableImageSelection) {
-      if (!values.repository) {
-        errors.repository = 'Image is required.';
-      }
-      if (!values.tag) {
-        errors.tag = 'Tag is required.';
+      if (!values.imageId) {
+        errors.imageId = 'Image is required.';
       }
     }
 
@@ -178,13 +172,12 @@ class ServerGroupBasicSettingsImpl extends React.Component<
         <div className="form-group">
           <div className="col-md-3 sm-label-right">Account</div>
           <div className="col-md-7">
-            <AccountSelectField
+            <AccountSelectInput
+              value={values.credentials}
+              onChange={evt => this.accountUpdated(evt.target.value)}
               readOnly={readOnlyFields.credentials}
-              component={values}
-              field="credentials"
               accounts={accounts}
               provider="titus"
-              onChange={this.accountUpdated}
             />
             {values.credentials !== undefined && (
               <div className="small">
@@ -288,14 +281,13 @@ class ServerGroupBasicSettingsImpl extends React.Component<
             </div>
           </div>
         </div>
-        {!values.viewState.disableStrategySelection &&
-          values.selectedProvider && (
-            <DeploymentStrategySelector
-              command={values}
-              onFieldChange={this.onStrategyFieldChange}
-              onStrategyChange={this.strategyChanged}
-            />
-          )}
+        {!values.viewState.disableStrategySelection && values.selectedProvider && (
+          <DeploymentStrategySelector
+            command={values}
+            onFieldChange={this.onStrategyFieldChange}
+            onStrategyChange={this.strategyChanged}
+          />
+        )}
         {!values.viewState.hideClusterNamePreview && (
           <div className="form-group">
             <div className="col-md-12">
@@ -308,26 +300,24 @@ class ServerGroupBasicSettingsImpl extends React.Component<
                       {createsNewCluster && <span> (new cluster)</span>}
                     </strong>
                   </p>
-                  {!createsNewCluster &&
-                    values.viewState.mode === 'create' &&
-                    latestServerGroup && (
-                      <div className="text-left">
-                        <p>There is already a server group in this cluster. Do you want to clone it?</p>
-                        <p>
-                          Cloning copies the entire configuration from the selected server group, allowing you to modify
-                          whichever fields (e.g. image) you need to change in the new server group.
-                        </p>
-                        <p>
-                          To clone a server group, select "Clone" from the "Server Group Actions" menu in the details
-                          view of the server group.
-                        </p>
-                        <p>
-                          <a className="clickable" onClick={this.navigateToLatestServerGroup}>
-                            Go to details for {latestServerGroup.name}
-                          </a>
-                        </p>
-                      </div>
-                    )}
+                  {!createsNewCluster && values.viewState.mode === 'create' && latestServerGroup && (
+                    <div className="text-left">
+                      <p>There is already a server group in this cluster. Do you want to clone it?</p>
+                      <p>
+                        Cloning copies the entire configuration from the selected server group, allowing you to modify
+                        whichever fields (e.g. image) you need to change in the new server group.
+                      </p>
+                      <p>
+                        To clone a server group, select "Clone" from the "Server Group Actions" menu in the details view
+                        of the server group.
+                      </p>
+                      <p>
+                        <a className="clickable" onClick={this.navigateToLatestServerGroup}>
+                          Go to details for {latestServerGroup.name}
+                        </a>
+                      </p>
+                    </div>
+                  )}
                 </h5>
               </div>
             </div>
@@ -337,5 +327,3 @@ class ServerGroupBasicSettingsImpl extends React.Component<
     );
   }
 }
-
-export const ServerGroupBasicSettings = wizardPage(ServerGroupBasicSettingsImpl);

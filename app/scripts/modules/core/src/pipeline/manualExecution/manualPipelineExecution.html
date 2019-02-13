@@ -69,7 +69,7 @@
             </select>
           </div>
         </div>
-        <trigger-template component="vm.triggerComponent" command="vm.command"/>
+        <trigger-template component="vm.triggerComponent" command="vm.command"></trigger-template>
       </div>
 
       <div ng-if="vm.command.pipeline.parameterConfig !== undefined && vm.command.pipeline.parameterConfig.length">
@@ -126,7 +126,7 @@
         </div>
       </div>
 
-      <stage-manual-components ng-if="vm.stageComponents" command="vm.command" components="vm.stageComponents" />
+      <stage-manual-components ng-if="vm.stageComponents" command="vm.command" components="vm.stageComponents"></stage-manual-components>
 
       <div class="form-group">
         <label class="col-md-4 sm-label-right">Notifications</label>
@@ -166,7 +166,7 @@
       <button type="button" class="btn btn-default" ng-click="vm.cancel()">Cancel</button>
       <button type="submit"
               class="btn btn-primary"
-              ng-disabled="!vm.command.pipeline || !manualExecutionForm.$valid"
+              ng-disabled="!vm.command.pipeline || !manualExecutionForm.$valid || vm.command.triggerInvalid"
               ng-click="vm.execute()">
         <span class="glyphicon glyphicon-play"></span> Run
       </button>

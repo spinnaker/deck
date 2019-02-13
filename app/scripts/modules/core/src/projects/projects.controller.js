@@ -2,6 +2,7 @@
 const angular = require('angular');
 
 import { ANY_FIELD_FILTER } from '../presentation/anyFieldFilter/anyField.filter';
+import { INSIGHT_MENU_DIRECTIVE } from '../insight/insightmenu.directive';
 import { ViewStateCache } from 'core/cache';
 
 import { ConfigureProjectModal } from './configure';
@@ -11,10 +12,10 @@ module.exports = angular
   .module('spinnaker.projects.controller', [
     require('@uirouter/angularjs').default,
     ANY_FIELD_FILTER,
-    require('../presentation/sortToggle/sorttoggle.directive.js').name,
-    require('../insight/insightmenu.directive.js').name,
+    require('../presentation/sortToggle/sorttoggle.directive').name,
+    INSIGHT_MENU_DIRECTIVE,
   ])
-  .controller('ProjectsCtrl', function($scope, $uibModal, $log, $filter, $state) {
+  .controller('ProjectsCtrl', function($scope, $uibModal, $log, $filter) {
     var projectsViewStateCache =
       ViewStateCache.get('projects') || ViewStateCache.createCache('projects', { version: 1 });
 
@@ -41,12 +42,6 @@ module.exports = angular
         },
       },
     ];
-
-    function routeToProject(project) {
-      $state.go('home.project.dashboard', {
-        project: project.name,
-      });
-    }
 
     this.filterProjects = function filterProjects() {
       var filtered = $filter('anyFieldFilter')($scope.projects, {

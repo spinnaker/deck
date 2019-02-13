@@ -1,4 +1,4 @@
-import { each, forOwn, groupBy, sortBy } from 'lodash';
+import { each, every, forOwn, groupBy, isEmpty, some, sortBy } from 'lodash';
 import { Debounce } from 'lodash-decorators';
 import { $log } from 'ngimport';
 import { Subject } from 'rxjs';
@@ -8,6 +8,7 @@ import { ICluster, IEntityTags, IInstance, IServerGroup } from 'core/domain';
 import { ClusterState } from 'core/state';
 import { FilterModelService, ISortFilter } from 'core/filterModel';
 import { ReactInjector } from 'core/reactShims';
+import { ILabelFilter, trueKeyObjectToLabelFilters } from 'core/cluster/filter/labelFilterUtils';
 
 export interface IParentGrouping {
   subgroups: IClusterSubgroup[] | IServerGroupSubgroup[];
@@ -96,7 +97,9 @@ export class ClusterFilterService {
               key: `${cluster}:${category}`,
               cluster: appCluster,
               subgroups: sortBy(regionGroups, 'heading'),
-              entityTags: (clusterGroup[0].clusterEntityTags || []).find(t => t.entityRef['region'] === '*'),
+              entityTags: (clusterGroup[0].clusterEntityTags || []).find(
+                t => t.entityRef['region'] === '*' || t.entityRef['region'] === undefined,
+              ),
             });
           }
         });
@@ -191,7 +194,8 @@ export class ClusterFilterService {
       .filter(g => FilterModelService.checkStatusFilters(ClusterState.filterModel.asFilterModel)(g))
       .filter(g => FilterModelService.checkProviderFilters(ClusterState.filterModel.asFilterModel)(g))
       .filter(g => this.instanceTypeFilters(g))
-      .filter(g => this.instanceFilters(g));
+      .filter(g => this.instanceFilters(g))
+      .filter(g => this.labelFilters(g));
 
     this.updateMultiselectInstanceGroups(filtered);
     this.updateMultiselectServerGroups(filtered);
@@ -286,6 +290,24 @@ export class ClusterFilterService {
     return shouldInclude;
   }
 
+  private labelFilters(serverGroup: IServerGroup): boolean {
+    const labelFiltersAsTrueKeyObj = ClusterState.filterModel.asFilterModel.sortFilter.labels;
+    const labelFilters: ILabelFilter[] = trueKeyObjectToLabelFilters(labelFiltersAsTrueKeyObj);
+    if (isEmpty(labelFilters)) {
+      return true;
+    }
+    return every(labelFilters, ({ key: filterKey, value: filterValue }) => {
+      if (filterKey === null || filterValue === null) {
+        return true;
+      }
+      return some(serverGroup.labels || {}, (value, key) => {
+        const keyMatch = filterKey && filterKey === key;
+        const valueMatch = filterValue && filterValue === value;
+        return keyMatch && valueMatch;
+      });
+    });
+  }
+
   private textFilter(serverGroup: IServerGroup): boolean {
     const filter: string = ClusterState.filterModel.asFilterModel.sortFilter.filter.toLowerCase();
     if (!filter) {
@@ -332,6 +354,26 @@ export class ClusterFilterService {
     if (filter.includes('cluster:')) {
       const clusterName: string = filter.split('cluster:')[1];
       return serverGroup.cluster === clusterName;
+    }
+
+    if (filter.includes('labels:')) {
+      const caseSensitiveFilter: string = ClusterState.filterModel.asFilterModel.sortFilter.filter;
+      const labelsStr = caseSensitiveFilter.split('labels:')[1];
+      const labels = labelsStr.split(',').map(l => l.trim());
+
+      return every(labels, label => {
+        let labelKey: string;
+        let labelValue: string;
+        if (label.includes('=')) {
+          [labelKey, labelValue] = label.split('=');
+        }
+        if (!labelKey || !labelValue) {
+          return false;
+        }
+        return some(serverGroup.labels || {}, (val: string, key: string) => {
+          return labelKey === key && val === labelValue;
+        });
+      });
     } else {
       this.addSearchField(serverGroup);
       return filter.split(' ').every((testWord: string) => {

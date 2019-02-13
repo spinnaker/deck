@@ -4,14 +4,16 @@ import * as _ from 'lodash';
 
 import { ViewStateCache } from 'core/cache';
 
+import { ReactModal } from 'core/presentation';
+
 const angular = require('angular');
 
 import { OVERRIDE_REGISTRY } from 'core/overrideRegistry/override.registry';
-import { EditPipelineJsonModalCtrl } from './actions/json/editPipelineJsonModal.controller';
 import { PipelineConfigValidator } from './validation/PipelineConfigValidator';
 import { EXECUTION_BUILD_TITLE } from '../executionBuild/ExecutionBuildTitle';
 import { PipelineConfigService } from 'core/pipeline/config/services/PipelineConfigService';
 import { ExecutionsTransformer } from 'core/pipeline/service/ExecutionsTransformer';
+import { EditPipelineJsonModal } from 'core/pipeline/config/actions/json/EditPipelineJsonModal';
 
 module.exports = angular
   .module('spinnaker.core.pipeline.config.pipelineConfigurer', [OVERRIDE_REGISTRY, EXECUTION_BUILD_TITLE])
@@ -186,18 +188,9 @@ module.exports = angular
     };
 
     this.editPipelineJson = () => {
-      $uibModal
-        .open({
-          templateUrl: require('./actions/json/editPipelineJsonModal.html'),
-          controller: EditPipelineJsonModalCtrl,
-          controllerAs: '$ctrl',
-          size: 'lg modal-fullscreen',
-          resolve: {
-            pipeline: () => $scope.pipeline,
-            plan: () => $scope.plan,
-          },
-        })
-        .result.then(() => {
+      const modalProps = { dialogClassName: 'modal-lg modal-fullscreen' };
+      ReactModal.show(EditPipelineJsonModal, { pipeline: $scope.pipeline, plan: $scope.plan }, modalProps)
+        .then(() => {
           $scope.$broadcast('pipeline-json-edited');
           this.updatePipeline();
         })
@@ -346,7 +339,12 @@ module.exports = angular
       $scope.renderablePipeline.stages.splice(stageIndex, 1);
       $scope.renderablePipeline.stages.forEach(test => {
         if (stage.refId && test.requisiteStageRefIds) {
-          test.requisiteStageRefIds = _.without(test.requisiteStageRefIds, stage.refId);
+          if (test.requisiteStageRefIds.includes(stage.refId)) {
+            test.requisiteStageRefIds = test.requisiteStageRefIds.filter(id => id !== stage.refId);
+            if (!test.requisiteStageRefIds.length) {
+              test.requisiteStageRefIds = [...stage.requisiteStageRefIds];
+            }
+          }
         }
       });
       if (stageIndex > 0) {
@@ -390,11 +388,13 @@ module.exports = angular
 
     this.savePipeline = () => {
       this.setViewState({ saving: true });
-      PipelineConfigService.savePipeline($scope.pipeline)
+      const toSave = _.cloneDeep($scope.pipeline);
+      PipelineConfigService.savePipeline(toSave)
         .then(() => $scope.application.pipelineConfigs.refresh(true))
         .then(
           () => {
-            setOriginal($scope.pipeline);
+            $scope.viewState.hasHistory = true;
+            setOriginal(toSave);
             markDirty();
             this.setViewState({ saving: false });
           },

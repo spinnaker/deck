@@ -1,19 +1,18 @@
 import * as React from 'react';
-import { FormikErrors, getIn } from 'formik';
+import { FormikErrors, getIn, FormikProps } from 'formik';
 import { isEqual } from 'lodash';
 
-import { IProject } from 'core/domain';
-import { IWizardPageProps, wizardPage } from 'core/modal';
+import { IProject, IProjectPipeline } from 'core/domain';
+import { IWizardPageComponent } from 'core/modal';
 import { FormikApplicationsPicker } from 'core/projects/configure/FormikApplicationsPicker';
 
-export interface IApplicationsProps extends IWizardPageProps<IProject> {
+export interface IApplicationsProps {
+  formik: FormikProps<IProject>;
   allApplications: string[];
   onApplicationsChanged: (applications: string[]) => void;
 }
 
-class ApplicationsImpl extends React.Component<IApplicationsProps> {
-  public static LABEL = 'Applications';
-
+export class Applications extends React.Component<IApplicationsProps> implements IWizardPageComponent<IProject> {
   public validate(project: IProject): FormikErrors<IProject> {
     const configuredApps = (project.config && project.config.applications) || [];
     const getApplicationError = (app: string) =>
@@ -42,6 +41,10 @@ class ApplicationsImpl extends React.Component<IApplicationsProps> {
 
     if (!isEqual(prevApps, nextApps)) {
       this.props.onApplicationsChanged && this.props.onApplicationsChanged(nextApps);
+      // Remove any pipelines associated with the applications removed.
+      const existingPipelineConfigs: IProjectPipeline[] = getIn(this.props.formik.values, 'config.pipelineConfigs', []);
+      const newPipelineConfigs = existingPipelineConfigs.filter(({ application }) => nextApps.includes(application));
+      this.props.formik.setFieldValue('config.pipelineConfigs', newPipelineConfigs);
     }
   }
 
@@ -57,5 +60,3 @@ class ApplicationsImpl extends React.Component<IApplicationsProps> {
     );
   }
 }
-
-export const Applications = wizardPage(ApplicationsImpl);

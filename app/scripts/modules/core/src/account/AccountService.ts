@@ -114,7 +114,7 @@ export class AccountService {
     provider: string,
     providerVersion: string = null,
   ): IPromise<IAccountDetails[]> {
-    return this.listAllAccounts(provider, providerVersion).catch((error: any) => {
+    return this.listAccounts(provider, providerVersion).catch((error: any) => {
       $log.warn(`Failed to load accounts for provider "${provider}"; exception:`, error);
       return [];
     });
@@ -126,7 +126,7 @@ export class AccountService {
     region: string,
   ): IPromise<string[]> {
     return this.getPreferredZonesByAccount(provider).then(
-      (result: IAccountZone) => (result[account] ? result[account][region] : []),
+      (result: IAccountZone) => (result[account] && result[account][region]) || [],
     );
   }
 

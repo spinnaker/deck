@@ -155,5 +155,16 @@
       </div>
     </filter-section>
 
+    <filter-section
+      expanded="true"
+      heading="Labels"
+      ng-if="$ctrl.showLabelFilter"
+    >
+      <label-filter
+        labels-map="$ctrl.labelsMap"
+        label-filters="$ctrl.labelFilters"
+        update-label-filters="$ctrl.onLabelFiltersChange"></label-filter>
+    </filter-section>
+
   </div>
 </insight-filter>
