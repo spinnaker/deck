@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { API } from '@spinnaker/core';
+import { API } from 'core/api/ApiService';
 import { IStageConfigProps, StageConfigField } from 'core/pipeline';
 import { Observable } from 'rxjs';
 import Select from 'react-select';
@@ -36,13 +36,7 @@ export class GremlinStageConfig extends React.Component<IStageConfigProps> {
         .post({
           apiKey,
         })
-        .then((results: any[]) => {
-          return results;
-        })
-        .catch(() => {
-          const results: any[] = [];
-          return results;
-        }),
+        .catch(() => [] as any[]),
     );
   };
 
@@ -52,13 +46,7 @@ export class GremlinStageConfig extends React.Component<IStageConfigProps> {
         .post({
           apiKey,
         })
-        .then((results: any[]) => {
-          return results;
-        })
-        .catch(() => {
-          const results: any[] = [];
-          return results;
-        }),
+        .catch(() => [] as any[]),
     );
   };
 
@@ -106,7 +94,7 @@ export class GremlinStageConfig extends React.Component<IStageConfigProps> {
       : {};
 
     return (
-      <React.Fragment>
+      <>
         <div className="form-horizontal">
           <StageConfigField label="API Key">
             <input
@@ -118,7 +106,7 @@ export class GremlinStageConfig extends React.Component<IStageConfigProps> {
             />
             <div className="form-control-static">
               <button
-                disabled={isFetchingData || !stage.gremlinApiKey ? true : false}
+                disabled={isFetchingData || !stage.gremlinApiKey}
                 onClick={this.fetchAPIData}
                 type="button"
                 className="btn btn-sm btn-default"
@@ -167,7 +155,7 @@ export class GremlinStageConfig extends React.Component<IStageConfigProps> {
               />
             )}
           </StageConfigField>
-          <StageConfigField>
+          <StageConfigField label="&nbsp;">
             <a
               className="text-small"
               target="_blank"
@@ -179,7 +167,7 @@ export class GremlinStageConfig extends React.Component<IStageConfigProps> {
           </StageConfigField>
         </div>
         {(stage.gremlinCommandTemplateId || stage.gremlinTargetTemplateId) && (
-          <React.Fragment>
+          <>
             <hr />
             <h3>Summary</h3>
             <div className="list-group">
@@ -196,9 +184,9 @@ export class GremlinStageConfig extends React.Component<IStageConfigProps> {
                 </div>
               )}
             </div>
-          </React.Fragment>
+          </>
         )}
-      </React.Fragment>
+      </>
     );
   }
 }

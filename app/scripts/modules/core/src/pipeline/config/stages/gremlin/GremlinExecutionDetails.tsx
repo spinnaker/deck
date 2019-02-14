@@ -4,6 +4,9 @@ import { ExecutionDetailsSection, IExecutionDetailsSectionProps, StageFailureMes
 
 export function GremlinExecutionDetails(props: IExecutionDetailsSectionProps) {
   const { stage } = props;
+  const {
+    context: { gremlinCommandTemplateId, gremlinTargetTemplateId, gremlinApiKey },
+  } = stage;
 
   return (
     <ExecutionDetailsSection name={props.name} current={props.current}>
@@ -11,20 +14,20 @@ export function GremlinExecutionDetails(props: IExecutionDetailsSectionProps) {
         <div className="col-md-12">
           <h5>Gremlin Stage Configuration</h5>
           <dl className="dl-narrow dl-horizontal">
-            {stage.context.gremlinCommandTemplateId && <dt>Command Template ID</dt>}
-            {stage.context.gremlinCommandTemplateId && <dd>{stage.context.gremlinCommandTemplateId}</dd>}
+            {gremlinCommandTemplateId && <dt>Command Template ID</dt>}
+            {gremlinCommandTemplateId && <dd>{gremlinCommandTemplateId}</dd>}
           </dl>
           <dl className="dl-narrow dl-horizontal">
-            {stage.context.gremlinTargetTemplateId && <dt>Target Template ID</dt>}
-            {stage.context.gremlinTargetTemplateId && <dd>{stage.context.gremlinTargetTemplateId}</dd>}
+            {gremlinTargetTemplateId && <dt>Target Template ID</dt>}
+            {gremlinTargetTemplateId && <dd>{gremlinTargetTemplateId}</dd>}
           </dl>
           <dl className="dl-narrow dl-horizontal">
-            {stage.context.gremlinApiKey && <dt>API Key</dt>}
-            {stage.context.gremlinApiKey && <dd>{stage.context.gremlinApiKey}</dd>}
+            {gremlinApiKey && <dt>API Key</dt>}
+            {gremlinApiKey && <dd>{gremlinApiKey}</dd>}
           </dl>
         </div>
       </div>
-      <StageFailureMessage stage={props.stage} message={props.stage.failureMessage} />
+      <StageFailureMessage stage={stage} message={stage.failureMessage} />
     </ExecutionDetailsSection>
   );
 }
