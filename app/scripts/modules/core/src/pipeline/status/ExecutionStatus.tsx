@@ -105,9 +105,19 @@ export class ExecutionStatus extends React.Component<IExecutionStatusProps, IExe
     this.props.toggleDetails();
   };
 
+  // A more friendly render for escaped JSON string parameters, e.g.
+  // { \"key\" : \"value\" } will be rendered as {"key": "value"}
+  // All other values will be rendered normally.
   private unescapeIfJSON = (value: any): any => {
     try {
-      return JSON.parse(value);
+      if (value && value.toString().match(/\\"/)) {
+        const parsed = JSON.parse(value);
+        const parsedParsed = JSON.parse(parsed);
+        if (typeof parsedParsed === 'object') {
+          return parsed;
+        }
+      }
+      return value;
     } catch {
       return value;
     }
