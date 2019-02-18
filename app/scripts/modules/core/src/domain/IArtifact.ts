@@ -1,8 +1,8 @@
 export interface IArtifact {
-  kind?: string; // json model only
+  kind?: string; // TODO delete
   id: string;
   type?: string;
-  customKind?: boolean;
+  customKind?: boolean; // TODO delete
   name?: string;
   version?: string;
   location?: string;

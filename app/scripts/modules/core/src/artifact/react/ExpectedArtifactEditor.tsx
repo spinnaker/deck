@@ -30,9 +30,6 @@ export interface IExpectedArtifactEditorProps {
   showAccounts?: boolean;
   hidePipelineFields?: boolean;
   className?: string;
-  fieldGroupClassName?: string;
-  fieldColumns: number;
-  singleColumn: boolean;
   pipeline?: IPipeline;
 }
 
@@ -94,7 +91,6 @@ export class ExpectedArtifactEditor extends React.Component<
     expectedArtifact.matchArtifact.type = kind.type;
     // kind is deprecated; remove it from artifacts as they are updated
     delete expectedArtifact.matchArtifact.kind;
-    expectedArtifact.matchArtifact.customKind = kind.customKind;
     const accounts = this.accountsForExpectedArtifact(expectedArtifact);
     this.setState({ expectedArtifact, account: accounts[0] });
   };
@@ -132,7 +128,7 @@ export class ExpectedArtifactEditor extends React.Component<
     const kinds = this.props.kinds || [];
     const accounts = this.props.accounts || [];
     if (this.props.showAccounts) {
-      return kinds.filter(k => k.customKind || accounts.find(a => a.types.includes(k.type)));
+      return kinds.filter(k => accounts.find(a => a.types.includes(k.type)));
     } else {
       return kinds.slice(0);
     }
@@ -149,15 +145,7 @@ export class ExpectedArtifactEditor extends React.Component<
   };
 
   public render() {
-    const {
-      sources,
-      showIcons,
-      showAccounts,
-      fieldColumns,
-      hidePipelineFields,
-      singleColumn,
-      fieldGroupClassName,
-    } = this.props;
+    const { sources, showIcons, showAccounts, hidePipelineFields } = this.props;
     const { expectedArtifact, source, account } = this.state;
     const accounts = this.accountsForExpectedArtifact(expectedArtifact);
     const artifact = ExpectedArtifactService.artifactFromExpected(expectedArtifact);
@@ -167,7 +155,7 @@ export class ExpectedArtifactEditor extends React.Component<
     return (
       <>
         {!hidePipelineFields && (
-          <StageConfigField label="Display Name" fieldColumns={fieldColumns} groupClassName={fieldGroupClassName}>
+          <StageConfigField label="Display Name">
             <input
               className="form-control"
               value={expectedArtifact.displayName}
@@ -176,11 +164,11 @@ export class ExpectedArtifactEditor extends React.Component<
           </StageConfigField>
         )}
         {sources.length > 1 && (
-          <StageConfigField label="Artifact Source" fieldColumns={fieldColumns} groupClassName={fieldGroupClassName}>
+          <StageConfigField label="Artifact Source">
             <ExpectedArtifactSourceSelector sources={sources} selected={source} onChange={this.onSourceChange} />
           </StageConfigField>
         )}
-        <StageConfigField label="Artifact Kind" fieldColumns={fieldColumns} groupClassName={fieldGroupClassName}>
+        <StageConfigField label="Artifact Kind">
           <ExpectedArtifactKindSelector
             kinds={kinds}
             selected={kind}
@@ -189,7 +177,7 @@ export class ExpectedArtifactEditor extends React.Component<
           />
         </StageConfigField>
         {showAccounts && (
-          <StageConfigField label="Artifact Account" fieldColumns={fieldColumns} groupClassName={fieldGroupClassName}>
+          <StageConfigField label="Artifact Account">
             <ArtifactAccountSelector accounts={accounts} selected={account} onChange={this.onAccountChange} />
           </StageConfigField>
         )}
@@ -198,15 +186,11 @@ export class ExpectedArtifactEditor extends React.Component<
             account={account}
             artifact={artifact}
             onChange={this.onArtifactEdit}
-            labelColumns={3}
-            fieldColumns={fieldColumns}
-            singleColumn={singleColumn}
-            groupClassName={fieldGroupClassName}
             pipeline={this.props.pipeline}
           />
         )}
         {!hidePipelineFields && (
-          <StageConfigField label="" fieldColumns={fieldColumns} groupClassName={fieldGroupClassName}>
+          <StageConfigField label="">
             <button onClick={this.onSave} type="button" className="btn btn-block btn-primary btn-sm">
               Confirm
             </button>
@@ -232,8 +216,6 @@ module(EXPECTED_ARTIFACT_EDITOR_COMPONENT_REACT, [
     'showIcons',
     'showAccounts',
     'className',
-    'fieldColumns',
-    'singleColumn',
-    'fieldGroupClassName',
+    'pipeline',
   ]),
 );

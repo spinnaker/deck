@@ -5,12 +5,13 @@ import * as ReactDOM from 'react-dom';
 
 import { Registry } from 'core/registry';
 import { SETTINGS } from 'core/config/settings';
+import { TRIGGER_ARTIFACT_CONSTRAINT_SELECTOR_REACT } from './artifacts';
 
 const angular = require('angular');
 
 module.exports = angular
-  .module('spinnaker.core.pipeline.config.trigger.triggerDirective', [])
-  .directive('trigger', function() {
+  .module('spinnaker.core.pipeline.config.trigger.triggerDirective', [TRIGGER_ARTIFACT_CONSTRAINT_SELECTOR_REACT])
+  .directive('trigger', function () {
     return {
       restrict: 'E',
       require: '^pipelineConfigurer',
@@ -22,7 +23,7 @@ module.exports = angular
       },
       controller: 'TriggerCtrl as triggerCtrl',
       templateUrl: require('./trigger.html'),
-      link: function(scope, elem, attrs, pipelineConfigurerCtrl) {
+      link: function (scope, elem, attrs, pipelineConfigurerCtrl) {
         scope.pipelineConfigurerCtrl = pipelineConfigurerCtrl;
       },
     };
@@ -33,15 +34,50 @@ module.exports = angular
     '$compile',
     '$controller',
     '$templateCache',
-    function($scope, $element, $compile, $controller, $templateCache) {
+    function ($scope, $element, $compile, $controller, $templateCache) {
       let reactComponentMounted;
       var triggerTypes = Registry.pipeline.getTriggerTypes();
       $scope.options = triggerTypes;
       this.disableAutoTriggering = SETTINGS.disableAutoTriggering || [];
 
-      this.removeTrigger = function(trigger) {
+      this.removeTrigger = function (trigger) {
         var triggerIndex = $scope.pipeline.triggers.indexOf(trigger);
         $scope.pipeline.triggers.splice(triggerIndex, 1);
+      };
+
+      this.changeExpectedArtifacts = function (expectedArtifacts, trigger) {
+        $scope.$applyAsync(() => {
+          trigger.expectedArtifactIds = expectedArtifacts;
+
+          // remove unused expected artifacts from the pipeline
+          const artifacts = $scope.pipeline.expectedArtifacts;
+          artifacts.forEach(artifact => {
+            if (!$scope.pipeline.triggers.find(t => t.expectedArtifactIds.includes(artifact.id))) {
+              $scope.pipeline.expectedArtifacts.splice($scope.pipeline.expectedArtifacts.indexOf(artifact), 1);
+            }
+          });
+        });
+      };
+
+      this.defineExpectedArtifact = function (expectedArtifact) {
+        $scope.$applyAsync(() => {
+          const expectedArtifacts = $scope.pipeline.expectedArtifacts;
+          let editingArtifact = expectedArtifacts.findIndex(artifact => artifact.id === expectedArtifact.id);
+          if (editingArtifact >= 0) {
+            $scope.pipeline.expectedArtifacts[editingArtifact] = expectedArtifact;
+          } else if (expectedArtifacts) {
+            expectedArtifacts.push(expectedArtifact);
+          } else {
+            $scope.pipeline.expectedArtifacts = [expectedArtifact];
+          }
+
+          const expectedArtifactIds = $scope.trigger.expectedArtifactIds;
+          if (expectedArtifactIds && !expectedArtifactIds.includes(expectedArtifact.id)) {
+            expectedArtifactIds.push(expectedArtifact.id);
+          } else {
+            $scope.trigger.expectedArtifactIds = [expectedArtifact.id];
+          }
+        });
       };
 
       this.loadTrigger = () => {
@@ -59,7 +95,7 @@ module.exports = angular
           if (this.disableAutoTriggering.includes(type)) {
             $scope.trigger.enabled = false;
           }
-          var triggerConfig = triggerTypes.filter(function(config) {
+          var triggerConfig = triggerTypes.filter(function (config) {
             return config.key === type;
           });
           if (triggerConfig.length) {

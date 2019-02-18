@@ -19,3 +19,5 @@ export * from './react/ArtifactIcon';
 export * from './react/ExpectedArtifactSelector';
 export * from './react/ExpectedArtifactEditor';
 export * from './react/ExpectedArtifactSourceSelector';
+export * from './react/ExpectedArtifactModal';
+export * from './react/StageArtifactSelector';

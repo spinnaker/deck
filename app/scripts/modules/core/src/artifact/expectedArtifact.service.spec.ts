@@ -1,4 +1,3 @@
-import { noop } from 'lodash';
 import { ExpectedArtifactService } from './expectedArtifact.service';
 import { IArtifact, IArtifactKindConfig } from 'core/domain';
 import { Registry } from 'core/registry';
@@ -10,8 +9,6 @@ describe('ExpectedArtifactService', () => {
       description: '',
       isDefault: false,
       isMatch: false,
-      template: '',
-      controller: noop,
     };
     const kindConfigs: IArtifactKindConfig[] = [
       {

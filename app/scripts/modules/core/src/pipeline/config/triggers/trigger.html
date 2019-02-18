@@ -31,24 +31,19 @@
         </div>
       </div>
       <render-if-feature feature="artifacts">
-        <div class="form-group" ng-if="pipeline.expectedArtifacts.length">
+        <div class="form-group">
           <div class="col-md-10">
             <div class="form-group">
-              <label class=" col-md-3 sm-label-right"
-                >Artifact Constraints<help-field key="pipeline.config.expectedArtifact"></help-field
-              ></label>
-              <div class="col-md-9">
-                <ui-select
-                  ng-if="pipeline.expectedArtifacts.length"
-                  multiple
-                  ng-model="trigger.expectedArtifactIds"
-                  class="form-control input-sm"
-                >
-                  <ui-select-match>{{ $item.displayName }}</ui-select-match>
-                  <ui-select-choices repeat="expected.id as expected in pipeline.expectedArtifacts">
-                    <span>{{ expected.displayName }}</span>
-                  </ui-select-choices>
-                </ui-select>
+              <label class="col-md-3 sm-label-right"
+              >Artifact Constraints<help-field key="pipeline.config.expectedArtifact"></help-field></label>
+              <div class="col-md-9 row">
+                <trigger-artifact-constraint-selector-react
+                  pipeline="pipeline"
+                  artifact-referer="trigger"
+                  selected="trigger.expectedArtifactIds || []"
+                  on-define-expected-artifact="triggerCtrl.defineExpectedArtifact"
+                  on-change-selected="triggerCtrl.changeExpectedArtifacts"
+                ></trigger-artifact-constraint-selector-react>
               </div>
             </div>
           </div>

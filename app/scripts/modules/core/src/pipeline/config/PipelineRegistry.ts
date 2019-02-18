@@ -8,12 +8,15 @@ import {
   IStageTypeConfig,
   IArtifactKindConfig,
   IStageOrTriggerTypeConfig,
+  IArtifactEditorProps,
 } from 'core/domain';
 import { CloudProviderRegistry, ICloudProviderConfig } from 'core/cloudProvider';
 import { SETTINGS } from 'core/config/settings';
 import { IAccountDetails } from 'core/account/AccountService';
 
 import { ITriggerTemplateComponentProps } from '../manualExecution/TriggerTemplate';
+import { ComponentType, SFC } from 'react';
+import { ArtifactKindConfigs } from './triggers/artifacts';
 
 export interface ITransformer {
   transform: (application: Application, execution: IExecution) => void;
@@ -23,7 +26,7 @@ export class PipelineRegistry {
   private triggerTypes: ITriggerTypeConfig[] = [];
   private stageTypes: IStageTypeConfig[] = [];
   private transformers: ITransformer[] = [];
-  private artifactKinds: IArtifactKindConfig[] = [];
+  private artifactKinds: IArtifactKindConfig[] = ArtifactKindConfigs;
   private customArtifactKind: IArtifactKindConfig;
 
   constructor() {
@@ -80,8 +83,11 @@ export class PipelineRegistry {
     this.normalizeStageTypes();
   }
 
-  public registerArtifactKind(artifactKindConfig: IArtifactKindConfig): void {
+  public registerArtifactKind(
+    artifactKindConfig: IArtifactKindConfig,
+  ): ComponentType<IArtifactEditorProps> | SFC<IArtifactEditorProps> {
     this.artifactKinds.push(artifactKindConfig);
+    return artifactKindConfig.editCmp;
   }
 
   public registerCustomArtifactKind(artifactKindConfig: IArtifactKindConfig): void {
