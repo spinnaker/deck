@@ -16,13 +16,14 @@ import { ENABLE_ASG_STAGE } from './config/stages/enableAsg/enableAsgStage';
 import { EXECUTION_WINDOWS_STAGE_MODULE } from './config/stages/executionWindows/executionWindowsStage.module';
 import { FIND_AMI_STAGE } from './config/stages/findAmi/findAmiStage';
 import { FIND_ARTIFACT_FROM_EXECUTION_STAGE } from './config/stages/findArtifactFromExecution/findArtifactFromExecutionStage';
+import './config/stages/gremlin/gremlinStage';
 import { GROUP_STAGE_MODULE } from './config/stages/group/groupStage.module';
 import { MANUAL_JUDGMENT_STAGE_MODULE } from './config/stages/manualJudgment/manualJudgmentStage.module';
 import { RESIZE_ASG_STAGE } from './config/stages/resizeAsg/resizeAsgStage';
 import { SCALE_DOWN_CLUSTER_STAGE } from './config/stages/scaleDownCluster/scaleDownClusterStage';
 import { SCRIPT_STAGE } from './config/stages/script/scriptStage';
 import { SHRINK_CLUSTER_STAGE } from './config/stages/shrinkCluster/shrinkClusterStage';
-import { STAGE_CORE_MODULE } from './config/stages/core/stage.core.module';
+import { STAGE_COMMON_MODULE } from './config/stages/common/stage.common.module';
 import { TRAVIS_STAGE_MODULE } from './config/stages/travis/travisStage.module';
 import { WERCKER_STAGE_MODULE } from './config/stages/wercker/werckerStage.module';
 import { UNMATCHED_STAGE_TYPE_STAGE } from './config/stages/unmatchedStageTypeStage/unmatchedStageTypeStage';
@@ -50,7 +51,7 @@ module(PIPELINE_MODULE, [
 
   BUILD_DISPLAY_NAME_FILTER,
 
-  require('./manualExecution/manualPipelineExecution.controller.js').name,
+  require('./manualExecution/manualPipelineExecution.controller').name,
 
   STAGE_FAILURE_MESSAGE_COMPONENT,
   STEP_EXECUTION_DETAILS_COMPONENT,
@@ -70,7 +71,7 @@ module(PIPELINE_MODULE, [
   BAKE_MANIFEST_STAGE,
   CHECK_PRECONDITIONS_STAGE_MODULE,
   CLONE_SERVER_GROUP_STAGE,
-  STAGE_CORE_MODULE,
+  STAGE_COMMON_MODULE,
   require('./config/stages/deploy/deployStage.module').name,
   DEPLOY_SERVICE_STAGE,
   DESTROY_SERVICE_STAGE,

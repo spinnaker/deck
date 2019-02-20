@@ -31,6 +31,16 @@ export class ApplicationReader {
       .getList();
   }
 
+  public static getApplicationAttributes(name: string): IPromise<any> {
+    return API.one('applications', name)
+      .withParams({ expand: false })
+      .get()
+      .then((fromServer: Application) => {
+        this.splitAttributes(fromServer.attributes, ['accounts', 'cloudProviders']);
+        return fromServer.attributes;
+      });
+  }
+
   public static getApplication(name: string, expand = true): IPromise<Application> {
     return API.one('applications', name)
       .withParams({ expand: expand })
@@ -80,12 +90,14 @@ export class ApplicationReader {
         }
       });
     }
-    allDataSources.filter(ds => ds.requiresDataSource).forEach(ds => {
-      const parent = allDataSources.find(p => p.key === ds.requiresDataSource);
-      if (parent) {
-        this.setDataSourceDisabled(ds, application, parent.disabled);
-      }
-    });
+    allDataSources
+      .filter(ds => ds.requiresDataSource)
+      .forEach(ds => {
+        const parent = allDataSources.find(p => p.key === ds.requiresDataSource);
+        if (parent) {
+          this.setDataSourceDisabled(ds, application, parent.disabled);
+        }
+      });
   }
 
   private static setDataSourceDisabled(dataSource: ApplicationDataSource, application: Application, disabled: boolean) {

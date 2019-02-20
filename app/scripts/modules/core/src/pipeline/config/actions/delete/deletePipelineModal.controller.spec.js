@@ -4,7 +4,7 @@ import { PipelineConfigService } from 'core/pipeline/config/services/PipelineCon
 describe('Controller: deletePipelineModal', function() {
   const angular = require('angular');
 
-  beforeEach(window.module(require('./delete.module.js').name, APPLICATION_MODEL_BUILDER));
+  beforeEach(window.module(require('./delete.module').name, APPLICATION_MODEL_BUILDER));
   beforeEach(
     window.inject(function($controller, $rootScope, $log, $q, $state, applicationModelBuilder) {
       this.$rootScope = $rootScope;
@@ -54,12 +54,12 @@ describe('Controller: deletePipelineModal', function() {
         newStateTarget = null,
         newStateOptions = null;
 
-      spyOn(PipelineConfigService, 'deletePipeline').and.callFake(function(applicationName, {}, pipelineName) {
+      spyOn(PipelineConfigService, 'deletePipeline').and.callFake(function(applicationName, _, pipelineName) {
         submittedPipeline = pipelineName;
         submittedApplication = applicationName;
         return $q.when(null);
       });
-      spyOn(PipelineConfigService, 'savePipeline');
+      spyOn(PipelineConfigService, 'reorderPipelines');
       spyOn(this.$uibModalInstance, 'close');
       spyOn(this.$state, 'go').and.callFake(function(target, params, options) {
         newStateTarget = target;
@@ -72,8 +72,8 @@ describe('Controller: deletePipelineModal', function() {
       expect(submittedPipeline).toBe('b');
       expect(submittedApplication).toBe('app');
       expect(this.application.pipelineConfigs.data).toEqual([this.pipelines[0], this.pipelines[2]]);
-      expect(PipelineConfigService.savePipeline).toHaveBeenCalledWith(this.pipelines[2]);
-      expect(PipelineConfigService.savePipeline.calls.count()).toEqual(1);
+      expect(PipelineConfigService.reorderPipelines).toHaveBeenCalledWith('app', { C: 1 }, false);
+      expect(PipelineConfigService.reorderPipelines.calls.count()).toEqual(1);
       expect(this.pipelines[2].index).toBe(1);
       expect(newStateTarget).toBe('^.executions');
       expect(newStateOptions).toEqual({ location: 'replace' });

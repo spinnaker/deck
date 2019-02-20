@@ -89,8 +89,9 @@ module.exports = angular
     $scope.securityGroup = securityGroup;
 
     ctrl.initializeAccounts = () => {
-      return AccountService.listAccounts('aws').then(function(accounts) {
-        $scope.accounts = accounts;
+      return AccountService.listAllAccounts('aws').then(function(accounts) {
+        $scope.accounts = accounts.filter(a => a.authorized !== false);
+        $scope.allAccounts = accounts;
         ctrl.accountUpdated();
       });
     };
@@ -333,6 +334,6 @@ module.exports = angular
       ModalWizard.markComplete('Ingress');
     };
 
-    var classicPattern = /^[\x00-\x7F]+$/;
-    var vpcPattern = /^[a-zA-Z0-9\s._\-:\/()#,@[\]+=&;{}!$*]+$/;
+    var classicPattern = /^[\x20-\x7F]+$/;
+    var vpcPattern = /^[a-zA-Z0-9\s._\-:/()#,@[\]+=&;{}!$*]+$/;
   });

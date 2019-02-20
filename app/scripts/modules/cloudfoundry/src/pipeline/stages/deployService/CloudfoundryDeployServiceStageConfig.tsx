@@ -49,7 +49,7 @@ export class CloudfoundryDeployServiceStageConfig extends React.Component<
     props.stage.cloudProvider = 'cloudfoundry';
     props.stage.manifest = props.stage.manifest || {
       service: '',
-      serviceName: '',
+      serviceInstanceName: '',
       servicePlan: '',
       parameters: '',
       type: 'direct',
@@ -71,7 +71,7 @@ export class CloudfoundryDeployServiceStageConfig extends React.Component<
       case 'direct':
         this.props.stage.manifest = {
           service: '',
-          serviceName: '',
+          serviceInstanceName: '',
           servicePlan: '',
           type: 'direct',
         };
@@ -89,12 +89,23 @@ export class CloudfoundryDeployServiceStageConfig extends React.Component<
         this.props.stage.manifest = {
           credentials: '',
           routeServiceUrl: '',
-          serviceName: '',
+          serviceInstanceName: '',
           syslogDrainUrl: '',
           tags: [],
           type: 'userProvided',
         };
         this.setState({ type: 'userProvided' });
+        break;
+      case 'userProvidedArtifact':
+        this.props.stage.manifest = {
+          service: '',
+          syslogDrainUrl: '',
+          routeServiceUrl: '',
+          tags: [],
+          credentialsMap: {},
+          type: 'userProvidedArtifact',
+        };
+        this.setState({ type: 'userProvidedArtifact' });
         break;
     }
   };
@@ -136,7 +147,7 @@ export class CloudfoundryDeployServiceStageConfig extends React.Component<
     this.props.stage.credentials = credentials;
     this.props.stage.region = '';
     this.props.stage.manifest.service = '';
-    this.props.stage.manifest.serviceName = '';
+    this.props.stage.manifest.serviceInstanceName = '';
     this.props.stage.manifest.servicePlan = '';
     this.props.stageFieldUpdated();
     if (credentials) {
@@ -149,7 +160,7 @@ export class CloudfoundryDeployServiceStageConfig extends React.Component<
     this.setState({ region: region });
     this.props.stage.region = region;
     this.props.stage.manifest.service = '';
-    this.props.stage.manifest.serviceName = '';
+    this.props.stage.manifest.serviceInstanceName = '';
     this.props.stage.manifest.servicePlan = '';
     this.props.stageFieldUpdated();
     this.clearAndReloadServices();
@@ -175,7 +186,7 @@ export class CloudfoundryDeployServiceStageConfig extends React.Component<
     let manifestInput;
 
     switch (manifest.type) {
-      case 'direct':
+      case 'direct': {
         const direct = manifest as { type: string } & ICloudfoundryServiceManifestDirectSource;
         manifestInput = (
           <CreateServiceInstanceDirectInput
@@ -185,16 +196,20 @@ export class CloudfoundryDeployServiceStageConfig extends React.Component<
           />
         );
         break;
-      case 'artifact':
+      }
+      case 'userProvidedArtifact':
+      case 'artifact': {
         const artifact = manifest as { type: string } & ICloudfoundryServiceManifestArtifactSource;
         manifestInput = (
           <CreateServiceInstanceArtifactInput onChange={serviceManifestSourceUpdated} serviceInput={artifact} />
         );
         break;
-      case 'userProvided':
+      }
+      case 'userProvided': {
         const userProvided = manifest as { type: string } & ICloudFoundryServiceUserProvidedSource;
         manifestInput = <CreateUserProvidedInput onChange={serviceManifestSourceUpdated} serviceInput={userProvided} />;
         break;
+      }
     }
 
     return (
@@ -244,6 +259,16 @@ export class CloudfoundryDeployServiceStageConfig extends React.Component<
                 onChange={() => this.manifestTypeUpdated('userProvided')}
               />{' '}
               User-Provided
+            </label>
+          </div>
+          <div className="radio radio-inline">
+            <label>
+              <input
+                type="radio"
+                checked={manifest.type === 'userProvidedArtifact'}
+                onChange={() => this.manifestTypeUpdated('userProvidedArtifact')}
+              />{' '}
+              User-Provided-Artifact
             </label>
           </div>
         </StageConfigField>

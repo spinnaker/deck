@@ -1,22 +1,22 @@
 import * as React from 'react';
 import { filter, flatten, get, groupBy, set, uniq } from 'lodash';
-import { FormikErrors } from 'formik';
+import { FormikErrors, FormikProps } from 'formik';
 import { Observable, Subject } from 'rxjs';
 
 import {
   Application,
   HelpField,
-  IWizardPageProps,
+  IWizardPageComponent,
   spelNumberCheck,
   SpInput,
   ValidationMessage,
-  wizardPage,
 } from '@spinnaker/core';
 
 import { IAmazonApplicationLoadBalancer, IAmazonNetworkLoadBalancerUpsertCommand } from 'amazon/domain';
 
-export interface ITargetGroupsProps extends IWizardPageProps<IAmazonNetworkLoadBalancerUpsertCommand> {
+export interface ITargetGroupsProps {
   app: Application;
+  formik: FormikProps<IAmazonNetworkLoadBalancerUpsertCommand>;
   isNew: boolean;
   loadBalancer: IAmazonApplicationLoadBalancer;
 }
@@ -26,9 +26,8 @@ export interface ITargetGroupsState {
   oldTargetGroupCount: number;
 }
 
-class TargetGroupsImpl extends React.Component<ITargetGroupsProps, ITargetGroupsState> {
-  public static LABEL = 'Target Groups';
-
+export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGroupsState>
+  implements IWizardPageComponent<IAmazonNetworkLoadBalancerUpsertCommand> {
   public protocols = ['TCP'];
   public healthProtocols = ['TCP', 'HTTP', 'HTTPS'];
   public targetTypes = ['instance', 'ip'];
@@ -74,12 +73,19 @@ class TargetGroupsImpl extends React.Component<ITargetGroupsProps, ITargetGroups
         tgErrors.name = 'Duplicate target group name in this load balancer.';
       }
 
-      ['port', 'healthCheckInterval', 'healthCheckPort', 'healthyThreshold', 'unhealthyThreshold'].forEach(key => {
+      ['port', 'healthCheckInterval', 'healthyThreshold', 'unhealthyThreshold'].forEach(key => {
         const err = spelNumberCheck(targetGroup[key]);
         if (err) {
           tgErrors[key] = err;
         }
       });
+
+      if (targetGroup.healthCheckPort !== 'traffic-port') {
+        const err = spelNumberCheck(targetGroup.healthCheckPort);
+        if (err) {
+          tgErrors.healthCheckPort = err;
+        }
+      }
 
       [
         'name',
@@ -132,7 +138,9 @@ class TargetGroupsImpl extends React.Component<ITargetGroupsProps, ITargetGroups
           }
         });
 
-        this.setState({ existingTargetGroupNames: targetGroupsByAccountAndRegion }, this.props.revalidate);
+        this.setState({ existingTargetGroupNames: targetGroupsByAccountAndRegion }, () =>
+          this.props.formik.validateForm(),
+        );
       });
   }
 
@@ -155,7 +163,7 @@ class TargetGroupsImpl extends React.Component<ITargetGroupsProps, ITargetGroups
       port: 7001,
       targetType: 'instance',
       healthCheckProtocol: 'TCP',
-      healthCheckPort: '7001',
+      healthCheckPort: 'traffic-port',
       healthCheckPath: '/healthcheck',
       healthCheckTimeout: 5,
       healthCheckInterval: 10,
@@ -417,5 +425,3 @@ class TargetGroupsImpl extends React.Component<ITargetGroupsProps, ITargetGroups
     );
   }
 }
-
-export const TargetGroups = wizardPage(TargetGroupsImpl);

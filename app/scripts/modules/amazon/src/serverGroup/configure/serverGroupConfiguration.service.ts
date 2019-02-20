@@ -147,9 +147,9 @@ export class AwsServerGroupConfigurationService {
       command.suspendedProcesses = command.suspendedProcesses || [];
       const processIndex = command.suspendedProcesses.indexOf(process);
       if (processIndex === -1) {
-        command.suspendedProcesses.push(process);
+        command.suspendedProcesses = command.suspendedProcesses.concat(process);
       } else {
-        command.suspendedProcesses.splice(processIndex, 1);
+        command.suspendedProcesses = command.suspendedProcesses.filter(p => p !== process);
       }
     };
 
@@ -651,7 +651,7 @@ export class AwsServerGroupConfigurationService {
 export const AWS_SERVER_GROUP_CONFIGURATION_SERVICE = 'spinnaker.amazon.serverGroup.configure.service';
 module(AWS_SERVER_GROUP_CONFIGURATION_SERVICE, [
   SECURITY_GROUP_READER,
-  require('amazon/instance/awsInstanceType.service.js').name,
+  require('amazon/instance/awsInstanceType.service').name,
   LOAD_BALANCER_READ_SERVICE,
   CACHE_INITIALIZER_SERVICE,
   SERVER_GROUP_COMMAND_REGISTRY_PROVIDER,

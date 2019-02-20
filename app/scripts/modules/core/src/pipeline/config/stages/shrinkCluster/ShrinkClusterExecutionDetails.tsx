@@ -7,7 +7,7 @@ import {
   StageFailureMessage,
 } from 'core/pipeline';
 import { AccountTag } from 'core/account';
-import { ServerGroupStageContext } from '../core/ServerGroupStageContext';
+import { ServerGroupStageContext } from '../common/ServerGroupStageContext';
 
 export function ShrinkClusterExecutionDetails(props: IExecutionDetailsSectionProps) {
   const { stage } = props;
@@ -39,6 +39,8 @@ export function ShrinkClusterExecutionDetails(props: IExecutionDetailsSectionPro
   );
 }
 
+// TODO: refactor this to not use namespace
+// eslint-disable-next-line
 export namespace ShrinkClusterExecutionDetails {
   export const title = 'shrinkClusterConfig';
 }

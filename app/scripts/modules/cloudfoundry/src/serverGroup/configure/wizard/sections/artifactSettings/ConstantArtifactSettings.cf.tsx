@@ -1,32 +1,25 @@
 import * as React from 'react';
 
-import { IWizardPageProps, wizardPage } from '@spinnaker/core';
-
 import { ICloudFoundryCreateServerGroupCommand } from 'cloudfoundry/serverGroup/configure/serverGroupConfigurationModel.cf';
 import { ICloudFoundryServerGroup } from 'cloudfoundry/domain';
+import { FormikProps } from 'formik';
 
-export interface ICloudFoundryCloneServerGroupProps extends IWizardPageProps<ICloudFoundryCreateServerGroupCommand> {
+export interface ICloudFoundryCloneServerGroupProps {
+  formik: FormikProps<ICloudFoundryCreateServerGroupCommand>;
   serverGroup: ICloudFoundryServerGroup;
 }
 
-class ArtifactSettingsImpl extends React.Component<ICloudFoundryCloneServerGroupProps> {
-  public static get LABEL() {
-    return 'Artifact';
-  }
-
-  public static validate(_values: any): any {
-    return {};
-  }
+export class CloudFoundryServerGroupConstantArtifactSettings extends React.Component<
+  ICloudFoundryCloneServerGroupProps
+> {
   constructor(props: ICloudFoundryCloneServerGroupProps) {
     super(props);
     const { serverGroup } = props;
 
-    this.props.formik.values.artifact = {
+    this.props.formik.values.source = {
       account: serverGroup.account,
-      clusterName: serverGroup.cluster,
+      asgName: serverGroup.name,
       region: serverGroup.region,
-      serverGroupName: serverGroup.name,
-      type: 'package',
     };
   }
 
@@ -62,10 +55,4 @@ class ArtifactSettingsImpl extends React.Component<ICloudFoundryCloneServerGroup
       </div>
     );
   }
-
-  public validate(_values: any): any {
-    return {};
-  }
 }
-
-export const CloudFoundryServerGroupConstantArtifactSettings = wizardPage(ArtifactSettingsImpl);

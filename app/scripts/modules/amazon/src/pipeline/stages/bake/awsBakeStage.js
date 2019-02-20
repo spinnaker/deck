@@ -10,7 +10,7 @@ import { AWSProviderSettings } from 'amazon/aws.settings';
 import { PipelineTemplates, BakeExecutionLabel, BakeryReader, Registry, SETTINGS } from '@spinnaker/core';
 
 module.exports = angular
-  .module('spinnaker.amazon.pipeline.stage.bakeStage', [require('./bakeExecutionDetails.controller.js').name])
+  .module('spinnaker.amazon.pipeline.stage.bakeStage', [require('./bakeExecutionDetails.controller').name])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'bake',
@@ -43,7 +43,7 @@ module.exports = angular
   })
   .controller('awsBakeStageCtrl', function($scope, $q, $uibModal) {
     $scope.stage.extendedAttributes = $scope.stage.extendedAttributes || {};
-    $scope.stage.regions = $scope.stage.regions || [];
+    $scope.stage.regions = ($scope.stage.regions && $scope.stage.regions.sort()) || [];
 
     if (!$scope.stage.user) {
       $scope.stage.user = AuthenticationService.getAuthenticatedUser().name;

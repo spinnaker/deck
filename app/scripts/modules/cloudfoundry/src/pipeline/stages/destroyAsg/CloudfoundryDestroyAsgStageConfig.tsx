@@ -25,7 +25,7 @@ export interface ICloudfoundryDestroyAsgStageConfigState {
   pipeline: IPipeline;
   region: string;
   regions: IRegion[];
-  serviceName: string;
+  serviceInstanceName: string;
   target: string;
 }
 
@@ -44,14 +44,14 @@ export class CloudfoundryDestroyAsgStageConfig extends React.Component<
       pipeline: props.pipeline,
       region: props.stage.region,
       regions: [],
-      serviceName: props.stage.serviceName,
+      serviceInstanceName: props.stage.serviceInstanceName,
       target: props.stage.target,
     };
   }
 
   public componentDidMount = (): void => {
     AccountService.listAccounts('cloudfoundry').then(accounts => {
-      this.setState({ accounts: accounts });
+      this.setState({ accounts });
       this.accountUpdated();
     });
     this.props.stageFieldUpdated();
@@ -61,18 +61,18 @@ export class CloudfoundryDestroyAsgStageConfig extends React.Component<
     const { credentials } = this.props.stage;
     if (credentials) {
       AccountService.getRegionsForAccount(credentials).then(regions => {
-        this.setState({ regions: regions });
+        this.setState({ regions });
       });
     }
   };
 
   private targetUpdated = (target: string) => {
-    this.setState({ target: target });
+    this.setState({ target });
     this.props.stage.target = target;
     this.props.stageFieldUpdated();
   };
 
-  private componentUpdate = (stage: any): void => {
+  private componentUpdated = (stage: any): void => {
     this.props.stage.credentials = stage.credentials;
     this.props.stage.regions = stage.regions;
     this.props.stage.cluster = stage.cluster;
@@ -90,13 +90,13 @@ export class CloudfoundryDestroyAsgStageConfig extends React.Component<
             accounts={accounts}
             application={application}
             cloudProvider={'cloudfoundry'}
-            onComponentUpdate={this.componentUpdate}
+            onComponentUpdate={this.componentUpdated}
             component={stage}
           />
         )}
 
         <StageConfigField label="Target">
-          <TargetSelect model={{ target: target }} options={StageConstants.TARGET_LIST} onChange={this.targetUpdated} />
+          <TargetSelect model={{ target }} options={StageConstants.TARGET_LIST} onChange={this.targetUpdated} />
         </StageConfigField>
       </div>
     );

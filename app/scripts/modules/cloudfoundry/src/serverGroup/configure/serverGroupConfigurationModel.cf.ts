@@ -4,19 +4,36 @@ import { ICloudFoundryEnvVar } from 'cloudfoundry/domain';
 
 export interface ICloudFoundryCreateServerGroupCommand extends IServerGroupCommand {
   artifact: ICloudFoundryBinarySource;
+  destination?: ICloudFoundryDestination;
   delayBeforeDisableSec?: number;
   manifest: ICloudFoundryManifestSource;
   maxRemainingAsgs?: number;
   rollback?: boolean;
+  source?: ICloudFoundrySource;
   startApplication: boolean;
+  target?: string;
+  targetCluster?: string;
+}
+
+export interface ICloudFoundrySource {
+  asgName: string;
+  region: string;
+  account: string;
+}
+
+export interface ICloudFoundryDestination {
+  region: string;
+  account: string;
 }
 
 export interface ICloudFoundryArtifactSource {
+  type: 'artifact';
   reference: string;
   account: string;
 }
 
 export interface ICloudFoundryPackageSource {
+  type: 'package';
   clusterName: string;
   serverGroupName: string;
   account: string;
@@ -24,16 +41,18 @@ export interface ICloudFoundryPackageSource {
 }
 
 export interface ICloudFoundryTriggerSource {
+  type: 'trigger';
   pattern: string;
   account: string; // optional: used in the event that retrieving an artifact from a trigger source requires auth
 }
 
-export type ICloudFoundryBinarySource = { type: string } & (
+export type ICloudFoundryBinarySource =
   | ICloudFoundryArtifactSource
   | ICloudFoundryPackageSource
-  | ICloudFoundryTriggerSource);
+  | ICloudFoundryTriggerSource;
 
 export interface ICloudFoundryManifestDirectSource {
+  type: 'direct';
   memory: string;
   diskQuota: string;
   instances: number;
@@ -46,19 +65,21 @@ export interface ICloudFoundryManifestDirectSource {
 }
 
 export interface ICloudFoundryManifestArtifactSource {
+  type: 'artifact';
   reference: string;
   account: string;
 }
 
 export interface ICloudFoundryManifestTriggerSource {
+  type: 'trigger';
   pattern: string;
   account: string; // optional: used in the event that retrieving a manifest from a trigger source requires auth
 }
 
-export type ICloudFoundryManifestSource = { type: string } & (
+export type ICloudFoundryManifestSource =
   | ICloudFoundryManifestDirectSource
   | ICloudFoundryManifestTriggerSource
-  | ICloudFoundryManifestArtifactSource);
+  | ICloudFoundryManifestArtifactSource;
 
 export interface ICloudFoundryDeployConfiguration {
   account: string;

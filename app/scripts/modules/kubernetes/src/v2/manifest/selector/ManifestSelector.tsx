@@ -170,11 +170,10 @@ export class ManifestSelector extends React.Component<IManifestSelectorProps, IM
     }
     const namespaces = (details.namespaces || []).sort();
     const kinds = Object.entries(details.spinnakerKindMap || {})
-      .filter(
-        ([, spinnakerKind]) =>
-          this.props.includeSpinnakerKinds && this.props.includeSpinnakerKinds.length
-            ? this.props.includeSpinnakerKinds.includes(spinnakerKind)
-            : true,
+      .filter(([, spinnakerKind]) =>
+        this.props.includeSpinnakerKinds && this.props.includeSpinnakerKinds.length
+          ? this.props.includeSpinnakerKinds.includes(spinnakerKind)
+          : true,
       )
       .map(([kind]) => kind)
       .sort();
@@ -221,7 +220,7 @@ export class ManifestSelector extends React.Component<IManifestSelectorProps, IM
     this.setStateAndUpdateStage({ selector: this.state.selector });
   };
 
-  private isExpression = (value = ''): boolean => value.includes('${');
+  private isExpression = (value: string): boolean => (typeof value === 'string' ? value.includes('${') : false);
 
   private search = (kind: string, namespace: string, account: string): IPromise<string[]> => {
     if (this.isExpression(account)) {
@@ -324,38 +323,32 @@ export class ManifestSelector extends React.Component<IManifestSelectorProps, IM
             </div>
           </StageConfigField>
         )}
-        {modes.includes(SelectorMode.Static) &&
-          mode === SelectorMode.Static && (
-            <StageConfigField label="Name">
-              <Creatable
-                isLoading={loading}
-                clearable={false}
-                value={{ value: name, label: name }}
-                options={resourceNames.map(r => ({ value: r, label: r }))}
-                onChange={(option: Option) => this.handleNameChange(option ? (option.value as string) : '')}
-                promptTextCreator={this.promptTextCreator}
+        {modes.includes(SelectorMode.Static) && mode === SelectorMode.Static && (
+          <StageConfigField label="Name">
+            <Creatable
+              isLoading={loading}
+              clearable={false}
+              value={{ value: name, label: name }}
+              options={resourceNames.map(r => ({ value: r, label: r }))}
+              onChange={(option: Option) => this.handleNameChange(option ? (option.value as string) : '')}
+              promptTextCreator={this.promptTextCreator}
+            />
+          </StageConfigField>
+        )}
+        {modes.includes(SelectorMode.Dynamic) && mode === SelectorMode.Dynamic && (
+          <>
+            <StageConfigField label="Cluster">
+              <ScopeClusterSelector clusters={clusters} model={selector.cluster} onChange={this.handleClusterChange} />
+            </StageConfigField>
+            <StageConfigField label="Target">
+              <TargetSelect
+                onChange={this.handleCriteriaChange}
+                model={{ target: selector.criteria }}
+                options={StageConstants.MANIFEST_CRITERIA_OPTIONS}
               />
             </StageConfigField>
-          )}
-        {modes.includes(SelectorMode.Dynamic) &&
-          mode === SelectorMode.Dynamic && (
-            <>
-              <StageConfigField label="Cluster">
-                <ScopeClusterSelector
-                  clusters={clusters}
-                  model={selector.cluster}
-                  onChange={this.handleClusterChange}
-                />
-              </StageConfigField>
-              <StageConfigField label="Target">
-                <TargetSelect
-                  onChange={this.handleCriteriaChange}
-                  model={{ target: selector.criteria }}
-                  options={StageConstants.MANIFEST_CRITERIA_OPTIONS}
-                />
-              </StageConfigField>
-            </>
-          )}
+          </>
+        )}
       </>
     );
   }

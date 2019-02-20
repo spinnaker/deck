@@ -9,7 +9,7 @@ module.exports = angular
   .module('spinnaker.serverGroup.configure.kubernetes.configuration.service', [
     CACHE_INITIALIZER_SERVICE,
     LOAD_BALANCER_READ_SERVICE,
-    require('../../image/image.reader.js').name,
+    require('../../image/image.reader').name,
   ])
   .factory('kubernetesServerGroupConfigurationService', function(
     $q,
@@ -97,7 +97,7 @@ module.exports = angular
         return {
           name: (image.repository || image.name.replace(/[.]/g, '-'))
             .replace(/_/g, '')
-            .replace(/[\/ ]/g, '-')
+            .replace(/[/ ]/g, '-')
             .toLowerCase(),
           imageDescription: {
             repository: image.repository,

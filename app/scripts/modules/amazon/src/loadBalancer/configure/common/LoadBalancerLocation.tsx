@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as classNames from 'classnames';
 import { IPromise } from 'angular';
 import { chain, isNil, uniq, groupBy } from 'lodash';
-import { Field, FormikErrors, FieldProps } from 'formik';
+import { Field, FormikErrors, FieldProps, FormikProps } from 'formik';
 import { Observable, Subject } from 'rxjs';
 
 import {
@@ -14,13 +14,12 @@ import {
   IMoniker,
   IRegion,
   ISubnet,
-  IWizardPageProps,
+  IWizardPageComponent,
   NameUtils,
   RegionSelectField,
   Spinner,
   SubnetReader,
   ValidationMessage,
-  wizardPage,
 } from '@spinnaker/core';
 
 import { AWSProviderSettings } from 'amazon/aws.settings';
@@ -36,8 +35,9 @@ export interface ISubnetOption {
   vpcIds: string[];
 }
 
-export interface ILoadBalancerLocationProps extends IWizardPageProps<IAmazonLoadBalancerUpsertCommand> {
+export interface ILoadBalancerLocationProps {
   app: Application;
+  formik: FormikProps<IAmazonLoadBalancerUpsertCommand>;
   forPipelineConfig?: boolean;
   isNew?: boolean;
   loadBalancer?: IAmazonLoadBalancer;
@@ -53,9 +53,8 @@ export interface ILoadBalancerLocationState {
   subnets: ISubnetOption[];
 }
 
-class LoadBalancerLocationImpl extends React.Component<ILoadBalancerLocationProps, ILoadBalancerLocationState> {
-  public static LABEL = 'Location';
-
+export class LoadBalancerLocation extends React.Component<ILoadBalancerLocationProps, ILoadBalancerLocationState>
+  implements IWizardPageComponent<IAmazonLoadBalancerUpsertCommand> {
   public state: ILoadBalancerLocationState = {
     accounts: undefined,
     availabilityZones: [],
@@ -371,29 +370,26 @@ class LoadBalancerLocationImpl extends React.Component<ILoadBalancerLocationProp
               application={app}
               onChange={() => this.handleSubnetUpdated(values.subnetType)}
             />
-            {values.vpcId &&
-              !hideInternalFlag && (
-                <div className="form-group">
-                  <div className="col-md-3 sm-label-right">
-                    <b>Internal</b> <HelpField id="aws.loadBalancer.internal" />
-                  </div>
-                  <div className="col-md-7 checkbox">
-                    <label>
-                      <Field
-                        name="isInternal"
-                        onChange={this.internalFlagChanged}
-                        render={({ field }: FieldProps) => <input type="checkbox" checked={!!field.value} />}
-                      />
-                      Create an internal load balancer
-                    </label>
-                  </div>
+            {values.vpcId && !hideInternalFlag && (
+              <div className="form-group">
+                <div className="col-md-3 sm-label-right">
+                  <b>Internal</b> <HelpField id="aws.loadBalancer.internal" />
                 </div>
-              )}
+                <div className="col-md-7 checkbox">
+                  <label>
+                    <Field
+                      name="isInternal"
+                      onChange={this.internalFlagChanged}
+                      render={({ field }: FieldProps) => <input type="checkbox" checked={!!field.value} />}
+                    />
+                    Create an internal load balancer
+                  </label>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
     );
   }
 }
-
-export const LoadBalancerLocation = wizardPage(LoadBalancerLocationImpl);

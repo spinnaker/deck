@@ -7,8 +7,8 @@ import { SERVER_GROUP_WRITER, TaskMonitor, ModalWizard, FirewallLabels } from '@
 module.exports = angular
   .module('spinnaker.azure.cloneServerGroup.controller', [
     require('@uirouter/angularjs').default,
-    require('../serverGroupConfiguration.service.js').name,
-    require('../../serverGroup.transformer.js').name,
+    require('../serverGroupConfiguration.service').name,
+    require('../../serverGroup.transformer').name,
     SERVER_GROUP_WRITER,
   ])
   .controller('azureCloneServerGroupCtrl', function(
@@ -143,13 +143,15 @@ module.exports = angular
     }
 
     function initializeSelectOptions() {
-      processCommandUpdateResult($scope.command.credentialsChanged($scope.command));
-      processCommandUpdateResult($scope.command.regionChanged($scope.command));
+      processCommandUpdateResult($scope.command.credentialsChanged($scope.command, true));
+      processCommandUpdateResult($scope.command.regionChanged($scope.command, true));
     }
 
     function createResultProcessor(method) {
-      return function() {
-        processCommandUpdateResult(method($scope.command));
+      return function(newValue, oldValue) {
+        if (newValue !== oldValue) {
+          processCommandUpdateResult(method($scope.command));
+        }
       };
     }
 

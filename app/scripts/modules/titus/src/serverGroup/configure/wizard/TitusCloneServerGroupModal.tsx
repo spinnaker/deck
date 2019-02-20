@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { get } from 'lodash';
-import { FormikErrors, FormikValues } from 'formik';
 
 import {
   Application,
@@ -12,6 +11,7 @@ import {
   ReactModal,
   TaskMonitor,
   WizardModal,
+  WizardPage,
   noop,
   AccountTag,
 } from '@spinnaker/core';
@@ -31,10 +31,8 @@ export interface ITitusCloneServerGroupModalProps extends IModalComponentProps {
 
 export interface ITitusCloneServerGroupModalState {
   firewallsLabel: string;
-  loadBalancerNote: React.ReactElement<any>;
   loaded: boolean;
   requiresTemplateSelection: boolean;
-  securityGroupNote: React.ReactElement<any>;
   taskMonitor: TaskMonitor;
 }
 
@@ -65,8 +63,6 @@ export class TitusCloneServerGroupModal extends React.Component<
 
     this.state = {
       firewallsLabel: FirewallLabels.get('Firewalls'),
-      loadBalancerNote: this.getLoadBalancerNote(props.command),
-      securityGroupNote: this.getSecurityGroupNote(props.command),
       loaded: false,
       requiresTemplateSelection,
       taskMonitor: new TaskMonitor({
@@ -149,11 +145,6 @@ export class TitusCloneServerGroupModal extends React.Component<
     }
   };
 
-  private validate = (_values: FormikValues): FormikErrors<ITitusServerGroupCommand> => {
-    const errors = {} as FormikErrors<ITitusServerGroupCommand>;
-    return errors;
-  };
-
   private getLoadBalancerNote = (command: ITitusServerGroupCommand) => {
     return (
       <div className="form-group small" style={{ marginTop: '20px' }}>
@@ -195,7 +186,7 @@ export class TitusCloneServerGroupModal extends React.Component<
 
   public render() {
     const { application, command, dismissModal, title } = this.props;
-    const { loadBalancerNote, loaded, securityGroupNote, taskMonitor, requiresTemplateSelection } = this.state;
+    const { loaded, taskMonitor, requiresTemplateSelection } = this.state;
 
     if (requiresTemplateSelection) {
       return (
@@ -210,7 +201,7 @@ export class TitusCloneServerGroupModal extends React.Component<
     }
 
     return (
-      <WizardModal
+      <WizardModal<ITitusServerGroupCommand>
         heading={title}
         initialValues={command}
         loading={!loaded}
@@ -218,21 +209,58 @@ export class TitusCloneServerGroupModal extends React.Component<
         dismissModal={dismissModal}
         closeModal={this.submit}
         submitButtonLabel={command.viewState.submitButtonLabel}
-        validate={(values: ITitusServerGroupCommand) => {
-          this.setState({
-            loadBalancerNote: this.getLoadBalancerNote(values),
-            securityGroupNote: this.getSecurityGroupNote(values),
-          });
-          return this.validate(values);
-        }}
-      >
-        <ServerGroupBasicSettings app={application} done={true} />
-        <ServerGroupResources done={true} />
-        <ServerGroupCapacity done={true} hideTargetHealthyDeployPercentage={true} />
-        <ServerGroupLoadBalancers done={true} hideLoadBalancers={true} note={loadBalancerNote} mandatory={false} />
-        <ServerGroupSecurityGroups done={true} note={securityGroupNote} mandatory={false} />
-        <ServerGroupParameters app={application} done={true} mandatory={false} />
-      </WizardModal>
+        render={({ formik, nextIdx, wizard }) => (
+          <>
+            <WizardPage
+              label="Basic Settings"
+              wizard={wizard}
+              order={nextIdx()}
+              render={({ innerRef }) => <ServerGroupBasicSettings ref={innerRef} formik={formik} app={application} />}
+            />
+
+            <WizardPage
+              label="Resources"
+              wizard={wizard}
+              order={nextIdx()}
+              render={({ innerRef }) => <ServerGroupResources ref={innerRef} formik={formik} />}
+            />
+
+            <WizardPage
+              label="Capacity"
+              wizard={wizard}
+              order={nextIdx()}
+              render={({ innerRef }) => (
+                <ServerGroupCapacity ref={innerRef} formik={formik} hideTargetHealthyDeployPercentage={true} />
+              )}
+            />
+
+            <WizardPage
+              label="Load Balancers"
+              wizard={wizard}
+              order={nextIdx()}
+              note={this.getLoadBalancerNote(formik.values)}
+              render={({ innerRef }) => (
+                <ServerGroupLoadBalancers ref={innerRef} formik={formik as any} hideLoadBalancers={true} />
+              )}
+            />
+
+            <WizardPage
+              label={FirewallLabels.get('Firewalls')}
+              wizard={wizard}
+              order={nextIdx()}
+              note={this.getSecurityGroupNote(formik.values)}
+              render={({ innerRef }) => <ServerGroupSecurityGroups ref={innerRef} formik={formik as any} />}
+            />
+
+            <WizardPage
+              label="Advanced Settings"
+              wizard={wizard}
+              order={nextIdx()}
+              render={({ innerRef }) => <ServerGroupParameters ref={innerRef} formik={formik} app={application} />}
+            />
+          </>
+        )}
+      />
     );
   }
 }

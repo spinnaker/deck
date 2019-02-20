@@ -8,7 +8,7 @@ module.exports = angular
   .module('spinnaker.azure.serverGroup.configure.basicSettings', [
     require('@uirouter/angularjs').default,
     require('angular-ui-bootstrap'),
-    require('./image.regional.filter.js').name,
+    require('./image.regional.filter').name,
     IMAGE_READER,
   ])
   .controller('azureServerGroupBasicSettingsCtrl', function($scope, $controller, $uibModalStack, $state, imageReader) {
@@ -36,4 +36,20 @@ module.exports = angular
         $state: $state,
       }),
     );
+
+    this.stackPattern = {
+      test: function(stack) {
+        var pattern = $scope.command.viewState.templatingEnabled ? /^([a-zA-Z0-9]*(\${.+})*)*$/ : /^[a-zA-Z0-9]*$/;
+
+        return pattern.test(stack);
+      },
+    };
+
+    this.detailPattern = {
+      test: function(detail) {
+        var pattern = $scope.command.viewState.templatingEnabled ? /^([a-zA-Z0-9-]*(\${.+})*)*$/ : /^[a-zA-Z0-9-]*$/;
+
+        return pattern.test(detail);
+      },
+    };
   });

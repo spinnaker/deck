@@ -310,6 +310,7 @@ export class AwsLoadBalancerTransformer {
             if (action.targetGroupName) {
               action.targetGroupName = action.targetGroupName.replace(`${applicationName}-`, '');
             }
+            action.redirectActionConfig = action.redirectConfig;
           });
 
           // Remove the default rule because it already exists in defaultActions
@@ -319,6 +320,7 @@ export class AwsLoadBalancerTransformer {
               if (action.targetGroupName) {
                 action.targetGroupName = action.targetGroupName.replace(`${applicationName}-`, '');
               }
+              action.redirectActionConfig = action.redirectConfig;
             });
             rule.conditions = rule.conditions || [];
           });
@@ -531,7 +533,7 @@ export class AwsLoadBalancerTransformer {
           port: 7001,
           targetType: 'instance',
           healthCheckProtocol: 'HTTP',
-          healthCheckPort: '7001',
+          healthCheckPort: 'traffic-port',
           healthCheckPath: '/healthcheck',
           healthCheckTimeout: 5,
           healthCheckInterval: 10,
@@ -591,7 +593,7 @@ export class AwsLoadBalancerTransformer {
           targetType: 'instance',
           healthCheckProtocol: 'TCP',
           healthCheckPath: '/healthcheck',
-          healthCheckPort: '7001',
+          healthCheckPort: 'traffic-port',
           healthCheckTimeout: 5,
           healthCheckInterval: 10,
           healthyThreshold: 10,

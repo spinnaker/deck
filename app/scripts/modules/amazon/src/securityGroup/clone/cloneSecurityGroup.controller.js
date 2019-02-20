@@ -7,7 +7,7 @@ import { AccountService, FirewallLabels } from '@spinnaker/core';
 
 module.exports = angular
   .module('spinnaker.amazon.securityGroup.clone.controller', [
-    require('../configure/configSecurityGroup.mixin.controller.js').name,
+    require('../configure/configSecurityGroup.mixin.controller').name,
   ])
   .controller('awsCloneSecurityGroupController', function(
     $scope,
@@ -37,6 +37,10 @@ module.exports = angular
         securityGroup: securityGroup,
       }),
     );
+
+    // We want to let people clone as a means to copy security groups across
+    // regions so don't block them because the names already exist.
+    $scope.allowDuplicateNames = true;
 
     AccountService.listAccounts('aws').then(function(accounts) {
       $scope.accounts = accounts;

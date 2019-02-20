@@ -1,22 +1,22 @@
 import * as React from 'react';
 import { filter, flatten, get, groupBy, set, uniq } from 'lodash';
-import { FormikErrors } from 'formik';
+import { FormikErrors, FormikProps } from 'formik';
 import { Observable, Subject } from 'rxjs';
 
 import {
   Application,
   HelpField,
-  IWizardPageProps,
+  IWizardPageComponent,
   SpInput,
   ValidationMessage,
   spelNumberCheck,
-  wizardPage,
 } from '@spinnaker/core';
 
 import { IAmazonApplicationLoadBalancer, IAmazonApplicationLoadBalancerUpsertCommand } from 'amazon/domain';
 
-export interface ITargetGroupsProps extends IWizardPageProps<IAmazonApplicationLoadBalancerUpsertCommand> {
+export interface ITargetGroupsProps {
   app: Application;
+  formik: FormikProps<IAmazonApplicationLoadBalancerUpsertCommand>;
   isNew: boolean;
   loadBalancer: IAmazonApplicationLoadBalancer;
 }
@@ -26,9 +26,8 @@ export interface ITargetGroupsState {
   oldTargetGroupCount: number;
 }
 
-class TargetGroupsImpl extends React.Component<ITargetGroupsProps, ITargetGroupsState> {
-  public static LABEL = 'Target Groups';
-
+export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGroupsState>
+  implements IWizardPageComponent<IAmazonApplicationLoadBalancerUpsertCommand> {
   public protocols = ['HTTP', 'HTTPS'];
   public targetTypes = ['instance', 'ip'];
   private destroy$ = new Subject();
@@ -73,12 +72,19 @@ class TargetGroupsImpl extends React.Component<ITargetGroupsProps, ITargetGroups
         tgErrors.name = 'Duplicate target group name in this load balancer.';
       }
 
-      ['port', 'healthCheckInterval', 'healthCheckPort', 'healthyThreshold', 'unhealthyThreshold'].forEach(key => {
+      ['port', 'healthCheckInterval', 'healthyThreshold', 'unhealthyThreshold'].forEach(key => {
         const err = spelNumberCheck(targetGroup[key]);
         if (err) {
           tgErrors[key] = err;
         }
       });
+
+      if (targetGroup.healthCheckPort !== 'traffic-port') {
+        const err = spelNumberCheck(targetGroup.healthCheckPort);
+        if (err) {
+          tgErrors.healthCheckPort = err;
+        }
+      }
 
       [
         'name',
@@ -132,7 +138,9 @@ class TargetGroupsImpl extends React.Component<ITargetGroupsProps, ITargetGroups
           }
         });
 
-        this.setState({ existingTargetGroupNames: targetGroupsByAccountAndRegion }, this.props.revalidate);
+        this.setState({ existingTargetGroupNames: targetGroupsByAccountAndRegion }, () =>
+          this.props.formik.validateForm(),
+        );
       });
   }
 
@@ -297,9 +305,28 @@ class TargetGroupsImpl extends React.Component<ITargetGroupsProps, ITargetGroups
                           </span>
                           <span className="wizard-pod-content">
                             <label>Port </label>
+                            <HelpField id="aws.targetGroup.attributes.healthCheckPort.trafficPort" />{' '}
+                            <select
+                              className="form-control input-sm inline-number"
+                              style={{ width: '90px' }}
+                              value={targetGroup.healthCheckPort === 'traffic-port' ? 'traffic-port' : 'manual'}
+                              onChange={event =>
+                                this.targetGroupFieldChanged(
+                                  index,
+                                  'healthCheckPort',
+                                  event.target.value === 'traffic-port' ? 'traffic-port' : '',
+                                )
+                              }
+                            >
+                              <option value="traffic-port">Traffic Port</option>
+                              <option value="manual">Manual</option>
+                            </select>{' '}
                             <SpInput
                               className="form-control input-sm inline-number"
                               error={tgErrors.healthCheckPort}
+                              style={{
+                                visibility: targetGroup.healthCheckPort === 'traffic-port' ? 'hidden' : 'inherit',
+                              }}
                               name="healthCheckPort"
                               required={true}
                               value={targetGroup.healthCheckPort}
@@ -462,5 +489,3 @@ class TargetGroupsImpl extends React.Component<ITargetGroupsProps, ITargetGroups
     );
   }
 }
-
-export const TargetGroups = wizardPage(TargetGroupsImpl);

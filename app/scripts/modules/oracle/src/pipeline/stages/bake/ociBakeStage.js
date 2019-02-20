@@ -5,7 +5,7 @@ const angular = require('angular');
 import { AccountService, AuthenticationService, BakeryReader, Registry } from '@spinnaker/core';
 
 module.exports = angular
-  .module('spinnaker.oracle.pipeline.stage.bakeStage', [require('./bakeExecutionDetails.controller.js').name])
+  .module('spinnaker.oracle.pipeline.stage.bakeStage', [require('./bakeExecutionDetails.controller').name])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'bake',
@@ -39,6 +39,7 @@ module.exports = angular
     }
 
     if (!$scope.stage.extended_attributes) {
+      // eslint-disable-next-line @typescript-eslint/camelcase
       $scope.stage.extended_attributes = {};
     }
 

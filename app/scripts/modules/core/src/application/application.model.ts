@@ -108,12 +108,12 @@ export class Application {
     const rolledUpStatus: IFetchStatus['status'] =
       ERROR_STATUS || FETCHING_STATUS || FETCHED_STATUS || 'NOT_INITIALIZED';
 
-    const allFetched = statuses.every(({ status }) => status === 'FETCHED');
+    const noneLeftToFetch = statuses.every(({ status }) => ['FETCHED', 'NOT_INITIALIZED'].includes(status));
     const lastFetch = statuses.reduce((latest, status) => Math.max(latest, status.lastRefresh || 0), 0);
 
     return {
       status: rolledUpStatus,
-      lastRefresh: allFetched ? lastFetch : this.lastRefresh,
+      lastRefresh: noneLeftToFetch ? lastFetch : this.lastRefresh,
       data: undefined,
     };
   }
@@ -238,9 +238,9 @@ export class Application {
       const vals = sources
         .map(ds => map(ds.data.filter(d => d[ds.providerField] === provider), ds[field]))
         .filter(v => v.length > 0);
-      const allRegions = union(...vals);
-      if (allRegions.length === 1) {
-        (results as any)[provider] = allRegions[0];
+      const allValues = union(...vals);
+      if (allValues.length === 1) {
+        (results as any)[provider] = allValues[0];
       }
     });
     return results;

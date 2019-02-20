@@ -2,20 +2,18 @@
 
 const angular = require('angular');
 
-import { ClusterState, URL_BUILDER_SERVICE } from '@spinnaker/core';
+import { ClusterState, UrlBuilder } from '@spinnaker/core';
 
 module.exports = angular
   .module('spinnaker.canary.canaryDeployment.details.controller', [
     require('@uirouter/angularjs').default,
-    URL_BUILDER_SERVICE,
-    require('./canaryDeploymentHistory.service.js').name,
+    require('./canaryDeploymentHistory.service').name,
   ])
   .controller('CanaryDeploymentExecutionDetailsCtrl', function(
     $scope,
     $stateParams,
     executionDetailsSectionService,
     canaryDeploymentHistoryService,
-    urlBuilderService,
   ) {
     $scope.configSections = ['canaryDeployment', 'canaryAnalysisHistory'];
 
@@ -44,7 +42,7 @@ module.exports = angular
           account: $scope.deployment.baselineCluster.accountName,
           project: $stateParams.project,
         };
-        baselineMetadata.href = urlBuilderService.buildFromMetadata(baselineMetadata);
+        baselineMetadata.href = UrlBuilder.buildFromMetadata(baselineMetadata);
         $scope.baselineClusterUrl = baselineMetadata;
 
         var canaryMetadata = {
@@ -54,7 +52,7 @@ module.exports = angular
           account: $scope.deployment.canaryCluster.accountName,
           project: $stateParams.project,
         };
-        canaryMetadata.href = urlBuilderService.buildFromMetadata(canaryMetadata);
+        canaryMetadata.href = UrlBuilder.buildFromMetadata(canaryMetadata);
         $scope.canaryClusterUrl = canaryMetadata;
 
         $scope.loadHistory();

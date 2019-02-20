@@ -6,10 +6,9 @@ import {
   FormikFormField,
   HelpField,
   IArtifactAccount,
-  IWizardPageProps,
+  IWizardPageComponent,
   ReactSelectInput,
   TextInput,
-  wizardPage,
 } from '@spinnaker/core';
 
 import {
@@ -27,19 +26,20 @@ import {
   Routes,
   Services,
 } from 'cloudfoundry/presentation';
+import { FormikProps } from 'formik';
 
-export interface ICloudFoundryServerGroupConfigurationSettingsProps
-  extends IWizardPageProps<ICloudFoundryCreateServerGroupCommand> {
+export interface ICloudFoundryServerGroupConfigurationSettingsProps {
   artifactAccounts: IArtifactAccount[];
+  formik: FormikProps<ICloudFoundryCreateServerGroupCommand>;
   manifest?: any;
 }
 
-class ConfigurationSettingsImpl extends React.Component<ICloudFoundryServerGroupConfigurationSettingsProps> {
-  public static LABEL = 'Configuration';
-
+export class CloudFoundryServerGroupConfigurationSettings
+  extends React.Component<ICloudFoundryServerGroupConfigurationSettingsProps>
+  implements IWizardPageComponent<ICloudFoundryCreateServerGroupCommand> {
   private manifestTypeUpdated = (type: string): void => {
     switch (type) {
-      case 'artifact':
+      case 'artifact': {
         const emptyManifestArtifact = {
           account: '',
           reference: '',
@@ -48,7 +48,8 @@ class ConfigurationSettingsImpl extends React.Component<ICloudFoundryServerGroup
         this.props.formik.setFieldValue('manifest', emptyManifestArtifact);
         this.capacityUpdated('1');
         break;
-      case 'trigger':
+      }
+      case 'trigger': {
         const emptyManifestTrigger = {
           account: '',
           pattern: '',
@@ -57,7 +58,8 @@ class ConfigurationSettingsImpl extends React.Component<ICloudFoundryServerGroup
         this.props.formik.setFieldValue('manifest', emptyManifestTrigger);
         this.capacityUpdated('1');
         break;
-      case 'direct':
+      }
+      case 'direct': {
         const emptyManifestDirect = {
           memory: '1024M',
           diskQuota: '1024M',
@@ -72,6 +74,7 @@ class ConfigurationSettingsImpl extends React.Component<ICloudFoundryServerGroup
         };
         this.props.formik.setFieldValue('manifest', emptyManifestDirect);
         break;
+      }
     }
   };
 
@@ -213,7 +216,7 @@ class ConfigurationSettingsImpl extends React.Component<ICloudFoundryServerGroup
     );
   }
 
-  public validate(values: ICloudFoundryServerGroupConfigurationSettingsProps) {
+  public validate(values: ICloudFoundryCreateServerGroupCommand) {
     const errors = {} as any;
     const isStorageSize = (value: string) => /\d+[MG]/.test(value);
     if (values.manifest.type === 'direct') {
@@ -227,7 +230,7 @@ class ConfigurationSettingsImpl extends React.Component<ICloudFoundryServerGroup
       }
       if (values.manifest.routes) {
         const routeErrors = values.manifest.routes.map((route: string) => {
-          const regex = /^([a-zA-Z0-9_-]+)\.([a-zA-Z0-9_.-]+)(:[0-9]+)?([\/a-zA-Z0-9_-]+)?$/gm;
+          const regex = /^([-\w]+)\.([-.\w]+)(:\d+)?([-/\w]+)?$/gm;
           if (route && regex.exec(route) === null) {
             return `A route did not match the expected format "host.some.domain[:9999][/some/path]"`;
           }
@@ -270,5 +273,3 @@ class ConfigurationSettingsImpl extends React.Component<ICloudFoundryServerGroup
     return errors;
   }
 }
-
-export const CloudFoundryServerGroupConfigurationSettings = wizardPage(ConfigurationSettingsImpl);

@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 
+const process = require('process');
+process.env.TS_NODE_COMPILER_OPTIONS = '{"module":"commonjs"}';
+
 require('ts-node/register');
 
 const path = require('path');
-const process = require('process');
 const minimist = require('minimist');
 const { TestRunner } = require('./tools/TestRunner');
 
@@ -115,7 +117,7 @@ Options:
                        running Gate server.
 --record-fixtures      Boolean. Record network fixtures for later replay.
                        Requires a running Spinnaker deployment.
---serve-fixture        Boolean. Serve a pre-recorded network fixtures in place
+--serve-fixture        Boolean. Serve a pre-recorded network fixture in place
                        of a running Gate server. Used during development to
                        allow debugging of fixture responses.
 --gate-port            (only used when recording fixtures) Port on which a

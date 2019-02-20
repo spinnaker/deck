@@ -1,16 +1,15 @@
 import * as React from 'react';
-import { Field, FormikErrors } from 'formik';
+import { Field, FormikErrors, FormikProps } from 'formik';
 
 import {
   DeploymentStrategySelector,
   HelpField,
-  IWizardPageProps,
-  wizardPage,
   NameUtils,
   RegionSelectField,
   Application,
   ReactInjector,
   IServerGroup,
+  IWizardPageComponent,
   AccountSelectInput,
   AccountTag,
 } from '@spinnaker/core';
@@ -20,13 +19,17 @@ import { DockerImageAndTagSelector, DockerImageUtils } from '@spinnaker/docker';
 import { ITitusServerGroupCommand } from '../../../configure/serverGroupConfiguration.service';
 
 const isNotExpressionLanguage = (field: string) => field && !field.includes('${');
-const isStackPattern = (stack: string) =>
-  isNotExpressionLanguage(stack) ? /^([a-zA-Z_0-9._${}]*(\${.+})*)*$/.test(stack) : true;
-const isDetailPattern = (detail: string) =>
-  isNotExpressionLanguage(detail) ? /^([a-zA-Z_0-9._$-{}\\\^~]*(\${.+})*)*$/.test(detail) : true;
 
-export interface IServerGroupBasicSettingsProps extends IWizardPageProps<ITitusServerGroupCommand> {
+// Allow dot, underscore, and spel
+const isStackPattern = (stack: string) => (isNotExpressionLanguage(stack) ? /^([\w.]+|\${[^}]+})*$/.test(stack) : true);
+
+// Allow dot, underscore, caret, tilde, dash and spel
+const isDetailPattern = (detail: string) =>
+  isNotExpressionLanguage(detail) ? /^([\w.^~-]+|\${[^}]+})*$/.test(detail) : true;
+
+export interface IServerGroupBasicSettingsProps {
   app: Application;
+  formik: FormikProps<ITitusServerGroupCommand>;
 }
 
 export interface IServerGroupBasicSettingsState {
@@ -36,12 +39,9 @@ export interface IServerGroupBasicSettingsState {
   showPreviewAsWarning: boolean;
 }
 
-class ServerGroupBasicSettingsImpl extends React.Component<
-  IServerGroupBasicSettingsProps,
-  IServerGroupBasicSettingsState
-> {
-  public static LABEL = 'Basic Settings';
-
+export class ServerGroupBasicSettings
+  extends React.Component<IServerGroupBasicSettingsProps, IServerGroupBasicSettingsState>
+  implements IWizardPageComponent<ITitusServerGroupCommand> {
   constructor(props: IServerGroupBasicSettingsProps) {
     super(props);
 
@@ -284,14 +284,13 @@ class ServerGroupBasicSettingsImpl extends React.Component<
             </div>
           </div>
         </div>
-        {!values.viewState.disableStrategySelection &&
-          values.selectedProvider && (
-            <DeploymentStrategySelector
-              command={values}
-              onFieldChange={this.onStrategyFieldChange}
-              onStrategyChange={this.strategyChanged}
-            />
-          )}
+        {!values.viewState.disableStrategySelection && values.selectedProvider && (
+          <DeploymentStrategySelector
+            command={values}
+            onFieldChange={this.onStrategyFieldChange}
+            onStrategyChange={this.strategyChanged}
+          />
+        )}
         {!values.viewState.hideClusterNamePreview && (
           <div className="form-group">
             <div className="col-md-12">
@@ -304,26 +303,24 @@ class ServerGroupBasicSettingsImpl extends React.Component<
                       {createsNewCluster && <span> (new cluster)</span>}
                     </strong>
                   </p>
-                  {!createsNewCluster &&
-                    values.viewState.mode === 'create' &&
-                    latestServerGroup && (
-                      <div className="text-left">
-                        <p>There is already a server group in this cluster. Do you want to clone it?</p>
-                        <p>
-                          Cloning copies the entire configuration from the selected server group, allowing you to modify
-                          whichever fields (e.g. image) you need to change in the new server group.
-                        </p>
-                        <p>
-                          To clone a server group, select "Clone" from the "Server Group Actions" menu in the details
-                          view of the server group.
-                        </p>
-                        <p>
-                          <a className="clickable" onClick={this.navigateToLatestServerGroup}>
-                            Go to details for {latestServerGroup.name}
-                          </a>
-                        </p>
-                      </div>
-                    )}
+                  {!createsNewCluster && values.viewState.mode === 'create' && latestServerGroup && (
+                    <div className="text-left">
+                      <p>There is already a server group in this cluster. Do you want to clone it?</p>
+                      <p>
+                        Cloning copies the entire configuration from the selected server group, allowing you to modify
+                        whichever fields (e.g. image) you need to change in the new server group.
+                      </p>
+                      <p>
+                        To clone a server group, select "Clone" from the "Server Group Actions" menu in the details view
+                        of the server group.
+                      </p>
+                      <p>
+                        <a className="clickable" onClick={this.navigateToLatestServerGroup}>
+                          Go to details for {latestServerGroup.name}
+                        </a>
+                      </p>
+                    </div>
+                  )}
                 </h5>
               </div>
             </div>
@@ -333,5 +330,3 @@ class ServerGroupBasicSettingsImpl extends React.Component<
     );
   }
 }
-
-export const ServerGroupBasicSettings = wizardPage(ServerGroupBasicSettingsImpl);
