@@ -55,6 +55,9 @@ module(PIPELINE_STATES, [APPLICATION_STATE_PROVIDER]).config(
       views: {
         pipelines: { component: SingleExecutionDetails, $type: 'react' },
       },
+      params: {
+        executionParams: null,
+      },
       abstract: true,
       children: [executionDetails],
     };
