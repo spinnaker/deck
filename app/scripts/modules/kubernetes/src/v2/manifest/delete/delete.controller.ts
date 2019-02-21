@@ -25,14 +25,13 @@ class KubernetesManifestDeleteController implements IController {
     verified: false,
   };
 
+  public static $inject = ['coordinates', '$uibModalInstance', 'application', 'manifestController'];
   constructor(
     coordinates: IManifestCoordinates,
     private $uibModalInstance: IModalServiceInstance,
     private application: Application,
     public manifestController: string,
   ) {
-    'ngInject';
-
     this.taskMonitor = new TaskMonitor({
       title: `Deleting ${coordinates.name} in ${coordinates.namespace}`,
       application,

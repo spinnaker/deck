@@ -18,6 +18,7 @@ class ViewChangesModalController {
   public previousBuildLink: string;
   public currentBuildLink: string;
 
+  public static $inject = ['$uibModalInstance', 'buildInfo', 'commits', 'hasJarChanges', 'jarDiffs', 'nameItem'];
   constructor(
     private $uibModalInstance: IModalInstanceService,
     public buildInfo: IBuildDiffInfo,
@@ -26,8 +27,6 @@ class ViewChangesModalController {
     public jarDiffs: IJarDiff,
     public nameItem: { name: string },
   ) {
-    'ngInject';
-
     if (buildInfo.jenkins) {
       this.previousBuildLink = this.buildJenkinsLink(buildInfo.jenkins, buildInfo.ancestor);
       this.currentBuildLink = this.buildJenkinsLink(buildInfo.jenkins, buildInfo.target);
@@ -63,9 +62,8 @@ class ViewChangesLinkController implements IController {
   private loadingExecution = false;
   private executionLoaded = false;
 
-  constructor(private $uibModal: IModalService, private executionService: ExecutionService) {
-    'ngInject';
-  }
+  public static $inject = ['$uibModal', 'executionService'];
+  constructor(private $uibModal: IModalService, private executionService: ExecutionService) {}
 
   private setJarDiffs(): void {
     this.hasJarChanges = Object.keys(this.jarDiffs).some(

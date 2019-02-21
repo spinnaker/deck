@@ -12,9 +12,8 @@ class LoadBalancerSelectorController implements IController {
   public refreshTime: number;
   public refreshing = false;
 
-  public constructor(private titusServerGroupConfigurationService: TitusServerGroupConfigurationService) {
-    'ngInject';
-  }
+  public static $inject = ['titusServerGroupConfigurationService'];
+  public constructor(private titusServerGroupConfigurationService: TitusServerGroupConfigurationService) {}
 
   public $onInit(): void {
     this.refreshing = true;

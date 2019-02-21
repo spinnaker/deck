@@ -5,9 +5,8 @@ import { SCALING_ACTIVITIES_CTRL, ScalingActivitiesCtrl } from './scalingActivit
 class ViewScalingActivitiesLinkCtrl implements IController {
   public serverGroup: any;
 
-  public constructor(private $uibModal: IModalService) {
-    'ngInject';
-  }
+  public static $inject = ['$uibModal'];
+  public constructor(private $uibModal: IModalService) {}
 
   public showScalingActivities(): void {
     this.$uibModal.open({

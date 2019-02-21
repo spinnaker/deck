@@ -38,9 +38,8 @@ export class CloudFoundryServerGroupCommandBuilder {
     }
   }
 
-  constructor(private $q: IQService) {
-    'ngInject';
-  }
+  public static $inject = ['$q'];
+  constructor(private $q: IQService) {}
 
   public buildNewServerGroupCommand(app: Application, defaults: any): IPromise<ICloudFoundryCreateServerGroupCommand> {
     defaults = defaults || {};

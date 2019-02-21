@@ -16,13 +16,12 @@ class V2InstanceArchetypeSelectorController implements IComponentController {
   public onProfileChanged: any;
   public onTypeChanged: any;
 
+  public static $inject = ['$scope', 'instanceTypeService', 'serverGroupConfigurationService'];
   public constructor(
     public $scope: IScope,
     private instanceTypeService: InstanceTypeService,
     private serverGroupConfigurationService: ServerGroupConfigurationService,
-  ) {
-    'ngInject';
-  }
+  ) {}
 
   public $onInit(): void {
     const { $scope } = this;

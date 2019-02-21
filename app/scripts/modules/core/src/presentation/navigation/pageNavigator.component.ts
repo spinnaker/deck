@@ -20,9 +20,8 @@ class PageNavigatorController implements IController {
     return `scroll.pageNavigation.${this.id}`;
   }
 
-  public constructor(private $element: JQuery, private $state: StateService, private $stateParams: StateParams) {
-    'ngInject';
-  }
+  public static $inject = ['$element', '$state', '$stateParams'];
+  public constructor(private $element: JQuery, private $state: StateService, private $stateParams: StateParams) {}
 
   public $onInit(): void {
     this.id = UUIDGenerator.generateUuid();

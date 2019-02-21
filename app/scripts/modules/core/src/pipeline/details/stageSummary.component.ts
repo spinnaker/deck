@@ -18,15 +18,14 @@ export class StageSummaryController implements IController {
   private parser: Parser = new Parser();
   private renderer: HtmlRenderer = new HtmlRenderer();
 
+  public static $inject = ['$scope', '$stateParams', '$state', 'confirmationModalService', 'executionService'];
   constructor(
     private $scope: IScope,
     private $stateParams: StateParams,
     private $state: StateService,
     private confirmationModalService: ConfirmationModalService,
     private executionService: ExecutionService,
-  ) {
-    'ngInject';
-  }
+  ) {}
 
   public $onInit(): void {
     this.updateScope();

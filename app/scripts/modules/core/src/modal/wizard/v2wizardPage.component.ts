@@ -69,9 +69,8 @@ export class WizardPageController implements IController {
    */
   public state: IWizardPageState;
 
-  public constructor(private $scope: ng.IScope) {
-    'ngInject';
-  }
+  public static $inject = ['$scope'];
+  public constructor(private $scope: ng.IScope) {}
 
   public $onInit() {
     this.render = this.render !== false;

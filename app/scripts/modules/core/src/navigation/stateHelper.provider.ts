@@ -5,9 +5,8 @@ import { INestedState } from './state.provider';
 export class StateHelper implements ng.IServiceProvider {
   private registeredStates: string[] = [];
 
-  constructor(private $stateRegistryProvider: StateRegistry) {
-    'ngInject';
-  }
+  public static $inject = ['$stateRegistryProvider'];
+  constructor(private $stateRegistryProvider: StateRegistry) {}
 
   public setNestedState(state: INestedState, keepOriginalNames = false) {
     const newState: INestedState = copy(state);

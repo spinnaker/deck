@@ -9,9 +9,8 @@ class GceLoadBalancingPolicySelectorController implements IController {
   [key: string]: any;
   public globalBackendServices: IGceBackendService[];
 
-  constructor(private gceBackendServiceReader: any) {
-    'ngInject';
-  }
+  public static $inject = ['gceBackendServiceReader'];
+  constructor(private gceBackendServiceReader: any) {}
 
   public setModel(propertyName: string, viewValue: number): void {
     set(this, propertyName, viewValue / 100);

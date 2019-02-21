@@ -42,9 +42,7 @@ export class ExecutionService {
     private $q: IQService,
     private $state: StateService,
     private $timeout: ITimeoutService,
-  ) {
-    'ngInject';
-  }
+  ) {}
 
   public getRunningExecutions(applicationName: string): IPromise<IExecution[]> {
     return this.getFilteredExecutions(applicationName, this.activeStatuses, this.runningLimit, null, true);
@@ -607,10 +605,13 @@ export class ExecutionService {
 }
 
 export const EXECUTION_SERVICE = 'spinnaker.core.pipeline.executions.service';
-module(EXECUTION_SERVICE, [require('@uirouter/angularjs').default]).factory(
-  'executionService',
+module(EXECUTION_SERVICE, [require('@uirouter/angularjs').default]).factory('executionService', [
+  '$http',
+  '$q',
+  '$state',
+  '$timeout',
   ($http: IHttpService, $q: IQService, $state: StateService, $timeout: ITimeoutService) =>
     new ExecutionService($http, $q, $state, $timeout),
-);
+]);
 
 DebugWindow.addInjectable('executionService');

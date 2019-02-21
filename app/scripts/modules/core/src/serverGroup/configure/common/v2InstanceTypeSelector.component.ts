@@ -13,9 +13,8 @@ class V2InstanceTypeSelectorController implements IComponentController {
   private instanceProfile: string;
   private instanceTypes: any;
 
-  constructor(private $scope: IScope, private instanceTypeService: InstanceTypeService) {
-    'ngInject';
-  }
+  public static $inject = ['$scope', 'instanceTypeService'];
+  constructor(private $scope: IScope, private instanceTypeService: InstanceTypeService) {}
 
   public $onInit(): void {
     this.instanceProfile = this.command.viewState.instanceProfile;

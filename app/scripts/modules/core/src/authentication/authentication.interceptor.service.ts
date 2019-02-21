@@ -3,9 +3,8 @@ import { AuthenticationService } from './AuthenticationService';
 import { SETTINGS } from 'core/config/settings';
 
 export class AuthenticationInterceptor implements ng.IHttpInterceptor {
-  constructor(private $q: ng.IQService) {
-    'ngInject';
-  }
+  public static $inject = ['$q'];
+  constructor(private $q: ng.IQService) {}
 
   // see http://www.couchcoder.com/angular-1-interceptors-using-typescript for more details on why we need to do this
   // in essense, we need to do this because "the ng1 implementaiton of interceptors only keeps references to the handler
@@ -33,8 +32,11 @@ export class AuthenticationInterceptor implements ng.IHttpInterceptor {
 export const AUTHENTICATION_INTERCEPTOR_SERVICE = 'spinnaker.authentication.interceptor.service';
 module(AUTHENTICATION_INTERCEPTOR_SERVICE, [])
   .service('authenticationInterceptor', AuthenticationInterceptor)
-  .config(($httpProvider: ng.IHttpProvider) => {
-    if (SETTINGS.authEnabled) {
-      $httpProvider.interceptors.push('authenticationInterceptor');
-    }
-  });
+  .config([
+    '$httpProvider',
+    ($httpProvider: ng.IHttpProvider) => {
+      if (SETTINGS.authEnabled) {
+        $httpProvider.interceptors.push('authenticationInterceptor');
+      }
+    },
+  ]);

@@ -16,6 +16,7 @@ class CloudFoundryLoadBalancerDetailsCtrl implements IController {
   private loadBalancerFromParams: ILoadBalancerFromStateParams;
   public loadBalancer: ICloudFoundryLoadBalancer;
 
+  public static $inject = ['$scope', 'app', 'confirmationModalService', 'loadBalancer', '$q'];
   constructor(
     public $scope: IScope,
     private app: Application,
@@ -23,7 +24,6 @@ class CloudFoundryLoadBalancerDetailsCtrl implements IController {
     loadBalancer: ILoadBalancerFromStateParams,
     private $q: IQService,
   ) {
-    'ngInject';
     this.$scope.application = this.app;
     this.$scope.confirmationModalService = this.confirmationModalService;
     this.$scope.loading = true;

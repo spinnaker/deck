@@ -13,9 +13,8 @@ class PubsubTriggerController implements IController {
   public subscriptionsLoaded = false;
   public serviceAccounts: string[];
 
+  public static $inject = ['trigger'];
   constructor(public trigger: IPubsubTrigger) {
-    'ngInject';
-
     this.subscriptionsLoaded = false;
     this.refreshPubsubSubscriptions();
     ServiceAccountReader.getServiceAccounts().then(accounts => {

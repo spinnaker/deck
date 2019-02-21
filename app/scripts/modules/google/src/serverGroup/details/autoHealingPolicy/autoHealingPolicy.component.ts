@@ -9,13 +9,12 @@ class GceAutoHealingPolicyDetailsCtrl implements IController {
   public serverGroup: IGceServerGroup;
   public application: Application;
 
+  public static $inject = ['$uibModal', 'confirmationModalService', 'gceAutoscalingPolicyWriter'];
   constructor(
     private $uibModal: IModalService,
     private confirmationModalService: ConfirmationModalService,
     private gceAutoscalingPolicyWriter: any,
-  ) {
-    'ngInject';
-  }
+  ) {}
 
   public editPolicy(): void {
     this.$uibModal.open({

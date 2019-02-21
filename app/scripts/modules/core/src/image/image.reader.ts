@@ -25,9 +25,8 @@ export interface IImageReader {
 }
 
 export class ImageReader {
-  public constructor(private providerServiceDelegate: ProviderServiceDelegate) {
-    'ngInject';
-  }
+  public static $inject = ['providerServiceDelegate'];
+  public constructor(private providerServiceDelegate: ProviderServiceDelegate) {}
 
   private getDelegate(cloudProvider: string): IImageReader {
     return this.providerServiceDelegate.getDelegate<IImageReader>(cloudProvider, 'image.reader');
