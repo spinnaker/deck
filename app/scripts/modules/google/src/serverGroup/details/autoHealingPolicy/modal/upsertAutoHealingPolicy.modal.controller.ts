@@ -18,6 +18,13 @@ class GceUpsertAutoHealingPolicyModalCtrl implements IController {
   public isNew: boolean;
   public submitButtonLabel: string;
 
+  public static $inject = [
+    '$uibModalInstance',
+    'application',
+    'serverGroup',
+    'gceHealthCheckReader',
+    'gceAutoscalingPolicyWriter',
+  ];
   constructor(
     private $uibModalInstance: IModalServiceInstance,
     private application: Application,
@@ -25,7 +32,6 @@ class GceUpsertAutoHealingPolicyModalCtrl implements IController {
     private gceHealthCheckReader: GceHealthCheckReader,
     private gceAutoscalingPolicyWriter: any,
   ) {
-    'ngInject';
     this.initialize();
   }
 

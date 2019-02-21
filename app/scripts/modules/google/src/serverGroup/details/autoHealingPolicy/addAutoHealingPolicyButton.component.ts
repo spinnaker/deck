@@ -7,9 +7,8 @@ class GceAddAutoHealingPolicyButtonCtrl implements IController {
   public application: Application;
   public serverGroup: IServerGroup;
 
-  constructor(private $uibModal: IModalService) {
-    'ngInject';
-  }
+  public static $inject = ['$uibModal'];
+  constructor(private $uibModal: IModalService) {}
 
   public addAutoHealingPolicy(): void {
     this.$uibModal.open({

@@ -23,14 +23,13 @@ class KubernetesServerGroupManagerDetailsController implements IController {
   public manifest: IManifest;
   public entityTagTargets: IOwnerOption[];
 
+  public static $inject = ['serverGroupManager', '$scope', '$uibModal', 'app'];
   constructor(
     serverGroupManager: IServerGroupManagerStateParams,
     private $scope: IScope,
     private $uibModal: IModalService,
     public app: Application,
   ) {
-    'ngInject';
-
     const unsubscribe = KubernetesManifestService.makeManifestRefresher(
       this.app,
       {

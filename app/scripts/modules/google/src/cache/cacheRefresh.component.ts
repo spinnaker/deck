@@ -12,9 +12,8 @@ class GceCacheRefreshCtrl implements IController {
   private cacheKey: string;
   private cacheKeyAlias: string;
 
-  constructor(private cacheInitializer: CacheInitializerService) {
-    'ngInject';
-  }
+  public static $inject = ['cacheInitializer'];
+  constructor(private cacheInitializer: CacheInitializerService) {}
 
   public $onInit(): void {
     const cacheKeyAlias = this.cacheKeyAlias || this.cacheKey;

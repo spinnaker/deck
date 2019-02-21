@@ -122,15 +122,20 @@ export class AwsServerGroupConfigurationService {
     'Default',
   ];
 
+  public static $inject = [
+    'securityGroupReader',
+    'awsInstanceTypeService',
+    'cacheInitializer',
+    'loadBalancerReader',
+    'serverGroupCommandRegistry',
+  ];
   constructor(
     private securityGroupReader: SecurityGroupReader,
     private awsInstanceTypeService: any,
     private cacheInitializer: CacheInitializerService,
     private loadBalancerReader: LoadBalancerReader,
     private serverGroupCommandRegistry: ServerGroupCommandRegistry,
-  ) {
-    'ngInject';
-  }
+  ) {}
 
   public configureUpdateCommand(command: IAmazonServerGroupCommand): void {
     command.backingData = {

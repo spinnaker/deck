@@ -15,9 +15,8 @@ class AppengineCacheConfigurer {
     initializers: [(): ng.IPromise<ILoadBalancer[]> => this.loadBalancerReader.listLoadBalancers('appengine')],
   };
 
-  constructor(private loadBalancerReader: any) {
-    'ngInject';
-  }
+  public static $inject = ['loadBalancerReader'];
+  constructor(private loadBalancerReader: any) {}
 }
 
 export const APPENGINE_CACHE_CONFIGURER = 'spinnaker.appengine.cacheConfigurer.service';

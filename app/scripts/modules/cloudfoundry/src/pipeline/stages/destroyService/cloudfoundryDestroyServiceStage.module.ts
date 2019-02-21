@@ -6,9 +6,8 @@ import { ExecutionDetailsTasks, IStage, Registry } from '@spinnaker/core';
 import { CloudfoundryDestroyServiceExecutionDetails } from './CloudfoundryDestroyServiceExecutionDetails';
 
 class CloudFoundryDestroyServiceStageCtrl implements IController {
-  constructor(public $scope: IScope) {
-    'ngInject';
-  }
+  public static $inject = ['$scope'];
+  constructor(public $scope: IScope) {}
 }
 
 export const CLOUD_FOUNDRY_DESTROY_SERVICE_STAGE = 'spinnaker.cloudfoundry.pipeline.stage.deleteServiceStage';

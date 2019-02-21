@@ -4,9 +4,8 @@ import { CloudfoundryCloneServerGroupStageConfig } from './CloudfoundryCloneServ
 import { IStage, Registry } from '@spinnaker/core';
 
 class CloudfoundryCloneServerGroupStageCtrl implements IController {
-  constructor(public $scope: IScope) {
-    'ngInject';
-  }
+  public static $inject = ['$scope'];
+  constructor(public $scope: IScope) {}
 }
 
 export const CLOUD_FOUNDRY_CLONE_SERVER_GROUP_STAGE = 'spinnaker.cloudfoundry.pipeline.stage.cloneServerGroupStage';

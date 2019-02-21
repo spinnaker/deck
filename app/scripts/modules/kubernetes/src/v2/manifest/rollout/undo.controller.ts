@@ -24,14 +24,13 @@ class KubernetesManifestUndoRolloutController implements IController {
     verified: false,
   };
 
+  public static $inject = ['coordinates', 'revisions', '$uibModalInstance', 'application'];
   constructor(
     coordinates: IManifestCoordinates,
     public revisions: IRolloutRevision[],
     private $uibModalInstance: IModalServiceInstance,
     private application: Application,
   ) {
-    'ngInject';
-
     this.taskMonitor = new TaskMonitor({
       title: `Undo rollout of ${coordinates.name} in ${coordinates.namespace}`,
       application,

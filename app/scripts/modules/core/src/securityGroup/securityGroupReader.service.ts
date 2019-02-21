@@ -270,14 +270,13 @@ export class SecurityGroupReader {
     }
   }
 
+  public static $inject = ['$log', '$q', 'securityGroupTransformer', 'providerServiceDelegate'];
   constructor(
     private $log: ILogService,
     private $q: IQService,
     private securityGroupTransformer: SecurityGroupTransformerService,
     private providerServiceDelegate: ProviderServiceDelegate,
-  ) {
-    'ngInject';
-  }
+  ) {}
 
   public getAllSecurityGroups(): IPromise<ISecurityGroupsByAccountSourceData> {
     // Because these are cached in local storage, we unfortunately need to remove the moniker, as it triples the size

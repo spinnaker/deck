@@ -85,6 +85,17 @@ class InternalLoadBalancerCtrl extends CommonGceLoadBalancerCtrl implements ICon
 
   private sessionAffinityModelToViewMap: any = _.invert(this.sessionAffinityViewToModelMap);
 
+  public static $inject = [
+    '$scope',
+    'application',
+    '$uibModalInstance',
+    'loadBalancer',
+    'gceCommonLoadBalancerCommandBuilder',
+    'isNew',
+    'wizardSubFormValidation',
+    'gceXpnNamingService',
+    '$state',
+  ];
   constructor(
     public $scope: IPrivateScope,
     public application: Application,
@@ -96,7 +107,6 @@ class InternalLoadBalancerCtrl extends CommonGceLoadBalancerCtrl implements ICon
     private gceXpnNamingService: any,
     $state: StateService,
   ) {
-    'ngInject';
     super($scope, application, $uibModalInstance, $state);
   }
 

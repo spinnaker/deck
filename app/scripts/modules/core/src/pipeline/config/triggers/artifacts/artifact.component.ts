@@ -23,6 +23,7 @@ class ArtifactCtrl implements IController {
   private isDefault: boolean;
   private artifactAccounts?: IArtifactAccount[];
 
+  public static $inject = ['$attrs', '$controller', '$compile', '$element', '$rootScope', '$scope'];
   constructor(
     private $attrs: IAttributes,
     private $controller: IControllerService,
@@ -31,7 +32,6 @@ class ArtifactCtrl implements IController {
     private $rootScope: IRootScopeService,
     private $scope: IScope,
   ) {
-    'ngInject';
     this.isDefault = this.$attrs.$attr.hasOwnProperty('isDefault');
     if (this.isDefault) {
       this.options = Registry.pipeline.getDefaultArtifactKinds();

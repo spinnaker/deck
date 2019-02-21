@@ -20,6 +20,17 @@ class AppengineLoadBalancerWizardController implements IController {
   public submitButtonLabel: string;
   public taskMonitor: TaskMonitor;
 
+  public static $inject = [
+    '$scope',
+    '$state',
+    '$uibModalInstance',
+    'application',
+    'loadBalancer',
+    'isNew',
+    'forPipelineConfig',
+    'appengineLoadBalancerTransformer',
+    'wizardSubFormValidation',
+  ];
   constructor(
     public $scope: ng.IScope,
     private $state: StateService,
@@ -31,7 +42,6 @@ class AppengineLoadBalancerWizardController implements IController {
     private appengineLoadBalancerTransformer: AppengineLoadBalancerTransformer,
     private wizardSubFormValidation: any,
   ) {
-    'ngInject';
     this.submitButtonLabel = this.forPipelineConfig ? 'Done' : 'Update';
 
     if (this.isNew) {

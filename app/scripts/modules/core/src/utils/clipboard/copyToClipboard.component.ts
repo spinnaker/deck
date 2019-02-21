@@ -11,9 +11,8 @@ export class CopyToClipboardController implements IController {
 
   public isOpen = false;
 
-  constructor(private $scope: IScope, private $element: JQuery, private $timeout: ITimeoutService) {
-    'ngInject';
-  }
+  public static $inject = ['$scope', '$element', '$timeout'];
+  constructor(private $scope: IScope, private $element: JQuery, private $timeout: ITimeoutService) {}
 
   public $onInit(): void {
     // tslint:disable:no-unused-expression

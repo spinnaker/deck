@@ -11,9 +11,8 @@ export class StepExecutionDetailsController implements IController {
   public sourceUrl: string;
   public stage: IExecutionStage;
 
-  constructor(private $scope: IScope) {
-    'ngInject';
-  }
+  public static $inject = ['$scope'];
+  constructor(private $scope: IScope) {}
 
   public $onInit(): void {
     // This is pretty dirty but executionDetails has its dirty tentacles

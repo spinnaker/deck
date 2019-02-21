@@ -21,6 +21,14 @@ class AppengineCloneServerGroupCtrl implements IController {
   };
   public taskMonitor: TaskMonitor;
 
+  public static $inject = [
+    '$scope',
+    '$uibModalInstance',
+    'serverGroupCommand',
+    'application',
+    'serverGroupWriter',
+    'appengineServerGroupCommandBuilder',
+  ];
   constructor(
     public $scope: IScope,
     private $uibModalInstance: IModalInstanceService,
@@ -29,7 +37,6 @@ class AppengineCloneServerGroupCtrl implements IController {
     private serverGroupWriter: ServerGroupWriter,
     appengineServerGroupCommandBuilder: AppengineServerGroupCommandBuilder,
   ) {
-    'ngInject';
     if (['create', 'clone', 'editPipeline'].includes(get<string>(serverGroupCommand, 'viewState.mode'))) {
       this.$scope.command = serverGroupCommand;
       this.state.loading = false;

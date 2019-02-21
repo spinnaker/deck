@@ -9,7 +9,9 @@ import { filterModelConfig } from 'core/cluster/filter/ClusterFilterModel';
 import { ServerGroupDetailsWrapper } from './details/ServerGroupDetailsWrapper';
 
 export const SERVER_GROUP_STATES = 'spinnaker.core.serverGroup.states';
-module(SERVER_GROUP_STATES, [APPLICATION_STATE_PROVIDER, STATE_CONFIG_PROVIDER]).config(
+module(SERVER_GROUP_STATES, [APPLICATION_STATE_PROVIDER, STATE_CONFIG_PROVIDER]).config([
+  'applicationStateProvider',
+  'stateConfigProvider',
   (applicationStateProvider: ApplicationStateProvider, stateConfigProvider: StateConfigProvider) => {
     const clusters: INestedState = {
       name: 'clusters',
@@ -103,4 +105,4 @@ module(SERVER_GROUP_STATES, [APPLICATION_STATE_PROVIDER, STATE_CONFIG_PROVIDER])
 
     stateConfigProvider.addRewriteRule('/applications/{application}', '/applications/{application}/clusters');
   },
-);
+]);
