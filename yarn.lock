@@ -109,10 +109,10 @@
     d3-collection "1"
     d3-interpolate "1"
 
-"@spinnaker/kayenta@0.0.70":
-  version "0.0.70"
-  resolved "https://registry.yarnpkg.com/@spinnaker/kayenta/-/kayenta-0.0.70.tgz#7646dcb3485566755d50a684564c5141908dbda8"
-  integrity sha512-UDjFFovVwswkbbJW5IfYqUMlI2gIClx+XrAVBlCWm0YggAaVBOipby1/g+zbDwnKDX5ecyaTXs6aY9PVXARuMw==
+"@spinnaker/kayenta@0.0.72":
+  version "0.0.72"
+  resolved "https://registry.yarnpkg.com/@spinnaker/kayenta/-/kayenta-0.0.72.tgz#dbd7bc3f2b509d5f5b15ee68e9c4a7567d5a1bd8"
+  integrity sha512-ftvxhWY09kaiZmMvJvfsfl+ff6HiIwk7SiZ0pQCTxfiqy/qbGi8cjtM3Oqw5m6wZc7AnHvBrV7C+9sdWH39TWw==
   dependencies:
     "@fortawesome/fontawesome-free" "5.5.0"
     "@types/plotly.js" "^1.28.12"
@@ -125,7 +125,7 @@
     angular-ui-sortable "^0.17.0"
     babel-plugin-transform-async-to-generator "^6.24.1"
     babel-polyfill "^6.26.0"
-    bootstrap "3.3.7"
+    bootstrap "3.4.1"
     cachefactory "^3.0.0"
     chart.js "^2.7.0"
     class-autobind-decorator "^2.2.1"
@@ -739,15 +739,6 @@
   version "5.0.21"
   resolved "https://registry.yarnpkg.com/@uirouter/core/-/core-5.0.21.tgz#b6c4c311e9416a1e8ce76b072e042a60224d1b3a"
   integrity sha512-QWHc0wT00qtYNkT0BXZaFNLLHZyux0qJjF8c2WklW5/Q0Z866NoJjJErEMWjQb/AR+olkR2NlfEEi8KTQU2OpA==
-
-"@uirouter/react-hybrid@0.3.8":
-  version "0.3.8"
-  resolved "https://registry.yarnpkg.com/@uirouter/react-hybrid/-/react-hybrid-0.3.8.tgz#895fe1f42be0c27056549a4459eecd651b167b27"
-  integrity sha512-3ESdlWWF4BzoikUBbhlA0POCmaNTWhmv5MaKR/Qh3q3q+zleIHMbPl2VLzoR5OfUN5fBVANwf/tVGnXt0/uZYA==
-  dependencies:
-    "@uirouter/angularjs" "1.0.20"
-    "@uirouter/core" "5.0.21"
-    "@uirouter/react" "0.8.7"
 
 "@uirouter/react-hybrid@0.3.9":
   version "0.3.9"
@@ -2457,11 +2448,6 @@ boom@2.x.x:
   integrity sha1-OciRjO/1eZ+D+UkqhI9iWt0Mdm8=
   dependencies:
     hoek "2.x.x"
-
-bootstrap@3.3.7:
-  version "3.3.7"
-  resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-3.3.7.tgz#5a389394549f23330875a3b150656574f8a9eb71"
-  integrity sha1-WjiTlFSfIzMIdaOxUGVldPip63E=
 
 bootstrap@3.4.1:
   version "3.4.1"
