@@ -14,14 +14,23 @@ export interface IStageArtifactSelectorProps {
   expectedArtifactId?: string;
   artifact?: IArtifact;
 
-  onArtifactSelected: (expectedArtifact?: IExpectedArtifact, artifact?: IArtifact) => void;
+  onExpectedArtifactSelected: (expectedArtifact: IExpectedArtifact) => void;
+  onArtifactEdited: (artifact: IArtifact) => void;
 }
 
 export interface IStageArtifactSelectorState {
   artifactAccounts: IArtifactAccount[];
 }
 
+const DEFINE_NEW_ARTIFACT = '__inline.artifact__';
+
 export class StageArtifactSelector extends React.Component<IStageArtifactSelectorProps, IStageArtifactSelectorState> {
+  private defineNewArtifactOption: IExpectedArtifact = {
+    ...ExpectedArtifactService.createEmptyArtifact(),
+    displayName: 'Define a new artifact...',
+    id: DEFINE_NEW_ARTIFACT,
+  };
+
   constructor(props: IStageArtifactSelectorProps) {
     super(props);
 
@@ -41,7 +50,7 @@ export class StageArtifactSelector extends React.Component<IStageArtifactSelecto
   private renderArtifact = (value: IExpectedArtifact) => {
     return (
       <span>
-        {value.id !== '__inline.artifact__' && (
+        {value.id !== DEFINE_NEW_ARTIFACT && (
           <ArtifactIcon type={value.defaultArtifact && value.defaultArtifact.type} width="16" height="16" />
         )}
         {value && value.displayName}
@@ -49,12 +58,16 @@ export class StageArtifactSelector extends React.Component<IStageArtifactSelecto
     );
   };
 
-  private handleChange = (value: IExpectedArtifact) => {
-    if (value.id === '__inline.artifact__') {
-      this.props.onArtifactSelected(undefined, value.defaultArtifact);
+  private onExpectedArtifactSelected = (value: IExpectedArtifact) => {
+    if (value.id !== DEFINE_NEW_ARTIFACT) {
+      this.props.onExpectedArtifactSelected(value);
     } else {
-      this.props.onArtifactSelected(value, undefined);
+      this.props.onArtifactEdited(value.defaultArtifact);
     }
+  };
+
+  private onInlineArtifactChanged = (value: IArtifact) => {
+    this.props.onArtifactEdited(value);
   };
 
   public render() {
@@ -64,18 +77,13 @@ export class StageArtifactSelector extends React.Component<IStageArtifactSelecto
       ? expectedArtifacts.find(a => a.id === expectedArtifactId)
       : artifact
       ? {
-          id: '__inline.artifact__',
+          id: DEFINE_NEW_ARTIFACT,
           displayName: 'Artifact from execution context',
           defaultArtifact: artifact,
         }
       : undefined;
-    const inlineArtifact = ExpectedArtifactService.createEmptyArtifact();
-    inlineArtifact.displayName = 'Define a new artifact...';
-    inlineArtifact.id = '__inline.artifact__';
-    if (artifact) {
-      inlineArtifact.defaultArtifact = artifact;
-    }
-    const options = [inlineArtifact, ...expectedArtifacts];
+
+    const options = [this.defineNewArtifactOption, ...expectedArtifacts];
 
     return (
       <>
@@ -83,10 +91,10 @@ export class StageArtifactSelector extends React.Component<IStageArtifactSelecto
           <Select
             clearable={false}
             options={options}
-            value={expectedArtifact || artifact}
+            value={expectedArtifact}
             optionRenderer={this.renderArtifact}
             valueRenderer={this.renderArtifact}
-            onChange={this.handleChange}
+            onChange={this.onExpectedArtifactSelected}
             placeholder="Select an artifact..."
           />
         </div>
@@ -95,7 +103,7 @@ export class StageArtifactSelector extends React.Component<IStageArtifactSelecto
             pipeline={pipeline}
             artifact={artifact}
             artifactAccounts={this.state.artifactAccounts}
-            onArtifactEdit={() => this.handleChange(inlineArtifact)}
+            onArtifactEdit={(edited: IArtifact) => this.onInlineArtifactChanged(edited)}
             isDefault={true}
           />
         )}
