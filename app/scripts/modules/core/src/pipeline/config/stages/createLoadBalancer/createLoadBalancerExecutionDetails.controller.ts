@@ -7,15 +7,15 @@ import {
   ExecutionDetailsSectionService,
 } from 'core/pipeline/details/executionDetailsSection.service';
 
-import { BaseExecutionDetailsCtrl, IExecutionDetailsScope } from '../core/baseExecutionDetails.controller';
+import { BaseExecutionDetailsCtrl, IExecutionDetailsScope } from '../common/baseExecutionDetails.controller';
 
 export class CreateLoadBalancerDetailsCtrl extends BaseExecutionDetailsCtrl {
+  public static $inject = ['$scope', '$stateParams', 'executionDetailsSectionService'];
   constructor(
     public $scope: IExecutionDetailsScope,
     protected $stateParams: StateParams,
     protected executionDetailsSectionService: ExecutionDetailsSectionService,
   ) {
-    'ngInject';
     super($scope, $stateParams, executionDetailsSectionService);
 
     $scope.configSections = ['loadBalancerConfig', 'taskStatus'];

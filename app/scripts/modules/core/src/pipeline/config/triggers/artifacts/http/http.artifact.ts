@@ -5,9 +5,8 @@ import { Registry } from 'core/registry';
 import { HttpArtifactEditor } from './HttpArtifactEditor';
 
 class HttpArtifactController implements IController {
-  constructor(public artifact: IArtifact) {
-    'ngInject';
-  }
+  public static $inject = ['artifact'];
+  constructor(public artifact: IArtifact) {}
 }
 
 export const HTTP_ARTIFACT = 'spinnaker.core.pipeline.trigger.http.artifact';
@@ -21,7 +20,6 @@ module(HTTP_ARTIFACT, [])
       isDefault: false,
       isMatch: true,
       controller: function(artifact: IArtifact) {
-        'ngInject';
         this.artifact = artifact;
         this.artifact.type = 'http/file';
       },

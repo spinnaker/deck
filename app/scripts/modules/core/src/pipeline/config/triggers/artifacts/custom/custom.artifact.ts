@@ -5,9 +5,8 @@ import { Registry } from 'core/registry';
 import { CustomArtifactEditor } from './CustomArtifactEditor';
 
 class CustomArtifactController implements IController {
-  constructor(public artifact: IArtifact) {
-    'ngInject';
-  }
+  public static $inject = ['artifact'];
+  constructor(public artifact: IArtifact) {}
 }
 
 export const CUSTOM_ARTIFACT = 'spinnaker.core.pipeline.trigger.custom.artifact';
@@ -21,7 +20,6 @@ module(CUSTOM_ARTIFACT, [])
       isDefault: true,
       isMatch: true,
       controller: function(artifact: IArtifact) {
-        'ngInject';
         this.artifact = artifact;
       },
       controllerAs: 'ctrl',

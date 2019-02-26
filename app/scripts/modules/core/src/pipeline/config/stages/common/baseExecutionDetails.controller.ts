@@ -12,12 +12,12 @@ export interface IExecutionDetailsScope extends IScope {
 }
 
 export class BaseExecutionDetailsCtrl {
+  public static $inject = ['$scope', '$stateParams', 'executionDetailsSectionService'];
   constructor(
     public $scope: IExecutionDetailsScope,
     protected $stateParams: StateParams,
     protected executionDetailsSectionService: ExecutionDetailsSectionService,
   ) {
-    'ngInject';
     this.$scope.$on('$stateChangeSuccess', () => this.initialize());
     this.$scope.$watch('configSections', () => this.initialize());
   }
@@ -35,7 +35,8 @@ export class BaseExecutionDetailsCtrl {
   }
 }
 
-export const BASE_EXECUTION_DETAILS_CTRL = 'spinnaker.core.pipeline.config.stages.core.baseExecutionDetails.controller';
+export const BASE_EXECUTION_DETAILS_CTRL =
+  'spinnaker.core.pipeline.config.stages.common.baseExecutionDetails.controller';
 
 module(BASE_EXECUTION_DETAILS_CTRL, [
   require('@uirouter/angularjs').default,

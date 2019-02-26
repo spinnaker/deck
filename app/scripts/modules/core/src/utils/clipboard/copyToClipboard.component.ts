@@ -11,9 +11,8 @@ export class CopyToClipboardController implements IController {
 
   public isOpen = false;
 
-  constructor(private $scope: IScope, private $element: JQuery, private $timeout: ITimeoutService) {
-    'ngInject';
-  }
+  public static $inject = ['$scope', '$element', '$timeout'];
+  constructor(private $scope: IScope, private $element: JQuery, private $timeout: ITimeoutService) {}
 
   public $onInit(): void {
     // tslint:disable:no-unused-expression
@@ -40,14 +39,14 @@ export class CopyToClipboardController implements IController {
   }
 }
 
-export class CopyToClipboardComponent implements IComponentOptions {
-  public bindings: any = {
+export const copyToClipboardComponent: IComponentOptions = {
+  bindings: {
     text: '<',
     toolTip: '<',
     analyticsLabel: '<',
-  };
-  public controller: any = CopyToClipboardController;
-  public template = `
+  },
+  controller: CopyToClipboardController,
+  template: `
       <button
         class="btn btn-xs btn-default clipboard-btn"
         uib-tooltip="{{$ctrl.toolTip}}"
@@ -63,8 +62,8 @@ export class CopyToClipboardComponent implements IComponentOptions {
         data-clipboard-text="{{$ctrl.text}}"
         aria-label="Copy to clipboard">
         <span class="glyphicon glyphicon-copy"></span>
-      </button>`;
-}
+      </button>`,
+};
 
 export const COPY_TO_CLIPBOARD_COMPONENT = 'spinnaker.core.utils.copyToClipboard.directive';
-module(COPY_TO_CLIPBOARD_COMPONENT, []).component('copyToClipboard', new CopyToClipboardComponent());
+module(COPY_TO_CLIPBOARD_COMPONENT, []).component('copyToClipboard', copyToClipboardComponent);

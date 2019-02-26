@@ -13,12 +13,12 @@ export class WerckerExecutionDetailsCtrl implements IController {
   public failureMessage: string;
   public stage: any;
 
+  public static $inject = ['$stateParams', 'executionDetailsSectionService', '$scope'];
   constructor(
     private $stateParams: StateParams,
     private executionDetailsSectionService: ExecutionDetailsSectionService,
     private $scope: IScope,
   ) {
-    'ngInject';
     this.stage = this.$scope.stage;
     this.initialize();
     this.$scope.$on('$stateChangeSuccess', () => this.initialize());

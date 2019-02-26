@@ -24,14 +24,13 @@ class CopyStageModalCtrl implements IController {
 
   private uncopiableStageTypes: Set<string> = new Set(['deploy']);
 
+  public static $inject = ['$q', 'application', '$uibModalInstance', 'forStrategyConfig'];
   constructor(
     private $q: IQService,
     public application: Application,
     private $uibModalInstance: IModalInstanceService,
     private forStrategyConfig: boolean,
-  ) {
-    'ngInject';
-  }
+  ) {}
 
   public $onInit(): void {
     this.$q

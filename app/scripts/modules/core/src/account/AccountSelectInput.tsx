@@ -99,9 +99,15 @@ export class AccountSelectInput extends React.Component<IAccountSelectInputProps
     delete otherProps.renderFilterableSelectThreshold; // not for DOM consumption
     const { primaryAccounts, secondaryAccounts } = this.state;
     const showSeparator = primaryAccounts.length > 0 && secondaryAccounts.length > 0;
+    // When this select is used in Angular, the event is accessed in a $timeout, and React will have
+    // re-rendered the input, setting its value (the event.target.value) back to the previous value
+    // This can go away once we're out of Angular land.
+    const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+      onChange(createFakeReactSyntheticEvent({ value: e.target.value }));
+    };
     return (
       <div>
-        <select className="form-control input-sm" value={value} onChange={onChange} required={true} {...otherProps}>
+        <select className="form-control input-sm" value={value} onChange={handleChange} required={true} {...otherProps}>
           <option value="" disabled={true}>
             Select...
           </option>
@@ -112,7 +118,11 @@ export class AccountSelectInput extends React.Component<IAccountSelectInputProps
             </option>
           ))}
 
-          {showSeparator && <option disabled={true}>---------------</option>}
+          {showSeparator && (
+            <option value="-" disabled={true}>
+              ---------------
+            </option>
+          )}
 
           {secondaryAccounts.map(account => (
             <option key={account} value={account}>
@@ -131,7 +141,7 @@ export class AccountSelectInput extends React.Component<IAccountSelectInputProps
     const showSeparator = primaryAccounts.length > 0 && secondaryAccounts.length > 0;
     const options: Option[] = primaryAccounts.map(a => ({ label: a, value: a }));
     if (showSeparator) {
-      options.push({ label: '---------------', value: '', disabled: true });
+      options.push({ label: '---------------', value: '-', disabled: true });
     }
     options.push(...secondaryAccounts.map(a => ({ label: a, value: a })));
     return (

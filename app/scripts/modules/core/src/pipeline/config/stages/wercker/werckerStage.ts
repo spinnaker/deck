@@ -1,12 +1,12 @@
 import { IController, IScope, module } from 'angular';
 import { IModalService } from 'angular-ui-bootstrap';
-import * as moment from 'moment';
 
 import { Registry } from 'core/registry';
 import { IgorService, BuildServiceType } from 'core/ci/igor.service';
 import { IJobConfig, IParameterDefinitionList, IStage } from 'core/domain';
 import { SETTINGS } from 'core/config/settings';
 import { WerckerExecutionLabel } from './WerckerExecutionLabel';
+import { Duration } from 'luxon';
 
 export interface IWerckerStageViewState {
   mastersLoaded: boolean;
@@ -40,6 +40,7 @@ export class WerckerStage implements IController {
   public pipeline: string;
   public job: string;
 
+  public static $inject = ['stage', '$scope', '$uibModal'];
   constructor(public stage: any, $scope: IScope, private $uibModal: IModalService) {
     this.stage.failPipeline = this.stage.failPipeline === undefined ? true : this.stage.failPipeline;
     this.stage.continuePipeline = this.stage.continuePipeline === undefined ? false : this.stage.continuePipeline;
@@ -225,7 +226,7 @@ module(WERCKER_STAGE, [])
           const lines = stage.masterStage.context.buildInfo.number ? 1 : 0;
           return lines + (stage.masterStage.context.buildInfo.testResults || []).length;
         },
-        defaultTimeoutMs: moment.duration(2, 'hours').asMilliseconds(),
+        defaultTimeoutMs: Duration.fromObject({ hours: 2 }).as('milliseconds'),
         validators: [{ type: 'requiredField', fieldName: 'job' }],
         strategy: true,
       });

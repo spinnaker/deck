@@ -32,6 +32,7 @@ class KubernetesServerGroupDetailsController implements IController {
   public manifest: IManifest;
   public entityTagTargets: IOwnerOption[];
 
+  public static $inject = ['serverGroup', 'app', '$uibModal', '$scope', 'confirmationModalService'];
   constructor(
     serverGroup: IServerGroupFromStateParams,
     public app: Application,
@@ -39,8 +40,6 @@ class KubernetesServerGroupDetailsController implements IController {
     private $scope: IScope,
     private confirmationModalService: ConfirmationModalService,
   ) {
-    'ngInject';
-
     const unsubscribe = KubernetesManifestService.makeManifestRefresher(
       this.app,
       {

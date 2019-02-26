@@ -21,6 +21,7 @@ export class AwsTargetGroupDetailsController implements IController {
   public targetGroup: ITargetGroup;
   public loadBalancer: IAmazonApplicationLoadBalancer;
 
+  public static $inject = ['$scope', '$q', '$state', 'targetGroup', 'app'];
   constructor(
     private $scope: IScope,
     private $q: IQService,
@@ -28,7 +29,6 @@ export class AwsTargetGroupDetailsController implements IController {
     targetGroup: ITargetGroupFromStateParams,
     private app: Application,
   ) {
-    'ngInject';
     this.application = app;
     this.targetGroupFromParams = targetGroup;
 

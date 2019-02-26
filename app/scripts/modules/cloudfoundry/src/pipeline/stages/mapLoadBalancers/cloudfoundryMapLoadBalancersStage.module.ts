@@ -6,8 +6,8 @@ import { AccountService, ExecutionDetailsTasks, IStage, Registry } from '@spinna
 import { CloudfoundryMapLoadBalancersExecutionDetails } from './CloudfoundryMapLoadBalancersExecutionDetails';
 
 class CloudFoundryMapLoadBalancersStageCtrl implements IController {
+  public static $inject = ['$scope'];
   constructor(public $scope: IScope) {
-    'ngInject';
     $scope.accounts = [];
     AccountService.listAccounts('cloudfoundry').then(accounts => {
       $scope.accounts = accounts;
