@@ -1,13 +1,15 @@
 import * as React from 'react';
-import { IPipeline } from 'core/domain';
 import { mount } from 'enzyme';
 
+import { IPipeline } from 'core/domain';
 import { ShowPipelineTemplateJsonModal } from './ShowPipelineTemplateJsonModal';
 
 describe('<ShowPipelineTemplateJsonModal />', () => {
   const mockPipeline: Partial<IPipeline> = {
-    application: 'test-application',
-    name: 'test-pipeline',
+    keepWaitingPipelines: false,
+    lastModifiedBy: 'anonymous',
+    limitConcurrent: true,
+    stages: [{ name: 'Find Image from Cluster', refId: '1', requisiteStageRefIds: [], type: 'findImage' }],
   };
 
   it('renders a pipeline object in a template json string', () => {
@@ -17,12 +19,12 @@ describe('<ShowPipelineTemplateJsonModal />', () => {
     expect(template.pipeline).toEqual(mockPipeline);
   });
 
-  it('dismisses modal with cancel button', () => {
+  it('dismisses modal with close button', () => {
     const dismissModal = jasmine.createSpy('dismissModal');
     const wrapper = mount(
       <ShowPipelineTemplateJsonModal pipeline={mockPipeline as IPipeline} dismissModal={dismissModal} />,
     );
-    const button = wrapper.find('button').filterWhere(n => n.text() === 'Cancel');
+    const button = wrapper.find('button').filterWhere(n => n.text() === 'Close');
     button.simulate('click');
     expect(dismissModal).toHaveBeenCalled();
   });

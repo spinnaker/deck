@@ -1,7 +1,8 @@
-import { PipelineTemplateV2Service } from './pipelineTemplateV2.service';
-import { IPipeline, IPipelineTemplateV2 } from 'core/domain';
-import { UUIDGenerator } from 'core/utils';
 import { hri as HumanReadableIds } from 'human-readable-ids';
+
+import { IPipeline, IPipelineTemplateV2 } from 'core/domain';
+import { PipelineTemplateV2Service } from './pipelineTemplateV2.service';
+import { UUIDGenerator } from 'core/utils';
 
 describe('PipelineTemplateV2Service', () => {
   describe('createPipelineTemplate()', () => {
@@ -9,8 +10,10 @@ describe('PipelineTemplateV2Service', () => {
     const mockName = 'my-template-1';
     const mockOwner = 'example@example.com';
     const mockPipeline: Partial<IPipeline> = {
-      application: 'test-application',
-      name: 'test-pipeline',
+      keepWaitingPipelines: false,
+      lastModifiedBy: 'anonymous',
+      limitConcurrent: true,
+      stages: [{ name: 'Find Image from Cluster', refId: '1', requisiteStageRefIds: [], type: 'findImage' }],
     };
 
     const mockTemplate: IPipelineTemplateV2 = {

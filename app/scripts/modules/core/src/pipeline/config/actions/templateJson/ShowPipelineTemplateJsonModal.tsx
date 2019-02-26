@@ -1,12 +1,9 @@
 import * as React from 'react';
+
 import { IModalComponentProps, JsonEditor } from 'core/presentation';
 import { IPipeline, IPipelineTemplateV2 } from 'core/domain';
 import { CopyToClipboard, noop, JsonUtils } from 'core/utils';
 import { PipelineTemplateV2Service } from 'core/pipeline/config/templates/v2/pipelineTemplateV2.service';
-import { PipelineJSONService } from 'core/pipeline/config/services/pipelineJSON.service';
-import './showPipelineTemplateJsonModal.less';
-
-const commandCopy = 'Copy "spin pipeline-templates save" command to clipboard';
 
 export interface IShowPipelineTemplateJsonModalProps extends IModalComponentProps {
   ownerEmail: string;
@@ -28,10 +25,7 @@ export class ShowPipelineTemplateJsonModal extends React.Component<
   constructor(props: IShowPipelineTemplateJsonModalProps) {
     super(props);
 
-    const template = PipelineTemplateV2Service.createPipelineTemplate(
-      PipelineJSONService.clone(props.pipeline),
-      props.ownerEmail,
-    );
+    const template = PipelineTemplateV2Service.createPipelineTemplate(props.pipeline, props.ownerEmail);
     this.state = { template };
   }
 
@@ -54,55 +48,68 @@ export class ShowPipelineTemplateJsonModal extends React.Component<
     return (
       <div className="flex-fill">
         <div className="modal-header">
-          <h3>Pipeline Template JSON</h3>
+          <h3>Export as Pipeline Template</h3>
         </div>
         <div className="modal-body flex-fill">
-          <p>The JSON below represents the derived template from the pipeline configuration in its persisted state.</p>
-          <form className="pipeline-template-form">
-            <h4>Edit Template</h4>
+          <p>The JSON below is the templated version of your pipeline. Save it by copy/pasting to the Spin CLI tool.</p>
+          <form className="form-horizontal">
             <div className="form-group">
-              <label htmlFor="template-name">Name</label>
-              <input
-                id="template-name"
-                className="form-control input-sm"
-                type="text"
-                value={template.metadata.name}
-                onChange={e => this.onChange(e, 'name')}
-              />
+              <label htmlFor="template-name" className="col-md-3 sm-label-right">
+                Name
+              </label>
+              <div className="col-md-7">
+                <input
+                  id="template-name"
+                  className="form-control input-sm"
+                  type="text"
+                  value={template.metadata.name}
+                  onChange={e => this.onChange(e, 'name')}
+                />
+              </div>
             </div>
             <div className="form-group">
-              <label htmlFor="template-description">Description</label>
-              <input
-                id="template-description"
-                className="form-control input-sm"
-                type="text"
-                value={template.metadata.description}
-                onChange={e => this.onChange(e, 'description')}
-                placeholder="Template Description"
-              />
+              <label htmlFor="template-description" className="col-md-3 sm-label-right">
+                Description
+              </label>
+              <div className="col-md-7">
+                <input
+                  id="template-description"
+                  className="form-control input-sm"
+                  type="text"
+                  value={template.metadata.description}
+                  onChange={e => this.onChange(e, 'description')}
+                  placeholder="Template Description"
+                />
+              </div>
             </div>
             <div className="form-group">
-              <label htmlFor="template-owner">Owner</label>
-              <input
-                id="template-owner"
-                className="form-control input-sm"
-                type="text"
-                value={template.metadata.owner}
-                onChange={e => this.onChange(e, 'owner')}
-              />
+              <label htmlFor="template-owner" className="col-md-3 sm-label-right">
+                Owner
+              </label>
+              <div className="col-md-7">
+                <input
+                  id="template-owner"
+                  className="form-control input-sm"
+                  type="text"
+                  value={template.metadata.owner}
+                  onChange={e => this.onChange(e, 'owner')}
+                />
+              </div>
             </div>
-            <div className="form-group">
-              <label className="pipeline-template-form__copy">
-                {commandCopy}
-                <CopyToClipboard text={`echo '${templateStr}' | spin pipeline-templates save`} toolTip={commandCopy} />
+            <div className="form-group text-center">
+              <label>
+                <CopyToClipboard
+                  text={`echo '${templateStr}' | spin pipeline-templates save`}
+                  toolTip={`Copy "spin pipeline-templates save" command to clipboard`}
+                />
               </label>
             </div>
           </form>
-          <JsonEditor value={templateStr} readOnly />
+          <JsonEditor value={templateStr} readOnly={true} />
         </div>
         <div className="modal-footer">
-          <button className="btn btn-default" onClick={dismissModal}>
-            Cancel
+          <button className="btn btn-primary" onClick={dismissModal}>
+            Close
           </button>
         </div>
       </div>
