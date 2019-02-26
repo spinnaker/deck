@@ -2,9 +2,8 @@ import { IPromise, IQService, module } from 'angular';
 import { IKubernetesServerGroup } from 'kubernetes/v2/serverGroup/details/IKubernetesServerGroup';
 
 export class KubernetesV2ServerGroupTransformer {
-  constructor(private $q: IQService) {
-    'ngInject';
-  }
+  public static $inject = ['$q'];
+  constructor(private $q: IQService) {}
 
   public normalizeServerGroup(serverGroup: IKubernetesServerGroup): IPromise<IKubernetesServerGroup> {
     // TODO(dpeach): this isn't great, but we need to assume it's a deployment so that we can click

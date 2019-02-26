@@ -22,9 +22,8 @@ class KubernetesAnnotationCustomSections implements IController {
   public manifest: any;
   public customSections: ICustomSectionMap;
 
-  constructor(private $sce: ISCEService, private $interpolate: IInterpolateService) {
-    'ngInject';
-  }
+  public static $inject = ['$sce', '$interpolate'];
+  constructor(private $sce: ISCEService, private $interpolate: IInterpolateService) {}
 
   public $onInit() {
     const annotations: IAnnotationsMap = get(this, ['manifest', 'metadata', 'annotations']);
@@ -90,11 +89,11 @@ class KubernetesAnnotationCustomSections implements IController {
   }
 }
 
-class KubernetesAnnotationCustomSectionsComponent implements IComponentOptions {
-  public bindings: any = { manifest: '<', resource: '<' };
-  public controller: any = ['$sce', '$interpolate', KubernetesAnnotationCustomSections];
-  public controllerAs = 'ctrl';
-  public template = `
+const kubernetesAnnotationCustomSectionsComponent: IComponentOptions = {
+  bindings: { manifest: '<', resource: '<' },
+  controller: ['$sce', '$interpolate', KubernetesAnnotationCustomSections],
+  controllerAs: 'ctrl',
+  template: `
     <collapsible-section expanded="true" ng-if="ctrl.manifest" ng-repeat="(section, entries) in ctrl.customSections" heading="{{ section }}">
       <div ng-repeat="entry in entries">
         <div ng-if="entry.isHtml" ng-bind-html="entry.content"></div>
@@ -104,11 +103,11 @@ class KubernetesAnnotationCustomSectionsComponent implements IComponentOptions {
         </div>
       </div>
     </collapsible-section>
-  `;
-}
+  `,
+};
 
 export const KUBERNETES_ANNOTATION_CUSTOM_SECTIONS = 'spinnaker.kubernetes.v2.manifest.annotation.custom.sections';
 module(KUBERNETES_ANNOTATION_CUSTOM_SECTIONS, []).component(
   'kubernetesAnnotationCustomSections',
-  new KubernetesAnnotationCustomSectionsComponent(),
+  kubernetesAnnotationCustomSectionsComponent,
 );

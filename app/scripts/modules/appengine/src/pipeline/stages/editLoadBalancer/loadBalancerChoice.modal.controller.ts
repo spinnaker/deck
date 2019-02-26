@@ -9,12 +9,12 @@ class AppengineLoadBalancerChoiceModalCtrl implements IController {
   public loadBalancers: ILoadBalancer[];
   public selectedLoadBalancer: ILoadBalancer;
 
+  public static $inject = ['$uibModal', '$uibModalInstance', 'application'];
   constructor(
     private $uibModal: IModalService,
     private $uibModalInstance: IModalServiceInstance,
     private application: Application,
   ) {
-    'ngInject';
     this.initialize();
   }
 

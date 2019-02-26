@@ -18,15 +18,14 @@ export class StageSummaryController implements IController {
   private parser: Parser = new Parser();
   private renderer: HtmlRenderer = new HtmlRenderer();
 
+  public static $inject = ['$scope', '$stateParams', '$state', 'confirmationModalService', 'executionService'];
   constructor(
     private $scope: IScope,
     private $stateParams: StateParams,
     private $state: StateService,
     private confirmationModalService: ConfirmationModalService,
     private executionService: ExecutionService,
-  ) {
-    'ngInject';
-  }
+  ) {}
 
   public $onInit(): void {
     this.updateScope();
@@ -149,17 +148,17 @@ export class StageSummaryController implements IController {
   }
 }
 
-export class StageSummaryComponent implements IComponentOptions {
-  public bindings: any = {
+export const stageSummaryComponent: IComponentOptions = {
+  bindings: {
     application: '<',
     execution: '<',
     sourceUrl: '<',
     stage: '<',
     stageSummary: '<',
-  };
-  public controller: any = StageSummaryController;
-  public template = '<div className="stage-summary-wrapper" ng-include="$ctrl.sourceUrl"></div>';
-}
+  },
+  controller: StageSummaryController,
+  template: '<div className="stage-summary-wrapper" ng-include="$ctrl.sourceUrl"></div>',
+};
 
 export const STAGE_SUMMARY_COMPONENT = 'spinnaker.core.pipeline.stageSummary.component';
-module(STAGE_SUMMARY_COMPONENT, []).component('stageSummary', new StageSummaryComponent());
+module(STAGE_SUMMARY_COMPONENT, []).component('stageSummary', stageSummaryComponent);

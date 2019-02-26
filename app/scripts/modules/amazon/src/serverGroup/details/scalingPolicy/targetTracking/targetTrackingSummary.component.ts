@@ -14,9 +14,8 @@ class TargetTrackingSummaryController implements IComponentController {
   public config: ITargetTrackingConfiguration;
   public popoverTemplate = require('./targetTrackingPopover.html');
 
-  constructor(private $uibModal: IModalService, private confirmationModalService: ConfirmationModalService) {
-    'ngInject';
-  }
+  public static $inject = ['$uibModal', 'confirmationModalService'];
+  constructor(private $uibModal: IModalService, private confirmationModalService: ConfirmationModalService) {}
 
   public $onInit() {
     this.config = this.policy.targetTrackingConfiguration;

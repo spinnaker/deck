@@ -6,9 +6,8 @@ import { IServerGroup, IInstanceCounts } from '@spinnaker/core';
 import { IKubernetesLoadBalancer } from './details/IKubernetesLoadBalancer';
 
 class KubernetesV2LoadBalancerTransformer {
-  constructor(private $q: IQService) {
-    'ngInject';
-  }
+  public static $inject = ['$q'];
+  constructor(private $q: IQService) {}
 
   public normalizeLoadBalancer(loadBalancer: IKubernetesLoadBalancer): IPromise<IKubernetesLoadBalancer> {
     loadBalancer.provider = loadBalancer.type;

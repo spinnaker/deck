@@ -18,12 +18,12 @@ export class WebhookExecutionDetailsCtrl implements IController {
   public stage: any;
   public payload: string;
 
+  public static $inject = ['$stateParams', 'executionDetailsSectionService', '$scope'];
   constructor(
     private $stateParams: StateParams,
     private executionDetailsSectionService: ExecutionDetailsSectionService,
     private $scope: IScope,
   ) {
-    'ngInject';
     this.initialize();
     this.$scope.$on('$stateChangeSuccess', () => this.initialize());
   }

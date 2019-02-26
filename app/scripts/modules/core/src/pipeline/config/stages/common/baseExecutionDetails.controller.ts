@@ -12,12 +12,12 @@ export interface IExecutionDetailsScope extends IScope {
 }
 
 export class BaseExecutionDetailsCtrl {
+  public static $inject = ['$scope', '$stateParams', 'executionDetailsSectionService'];
   constructor(
     public $scope: IExecutionDetailsScope,
     protected $stateParams: StateParams,
     protected executionDetailsSectionService: ExecutionDetailsSectionService,
   ) {
-    'ngInject';
     this.$scope.$on('$stateChangeSuccess', () => this.initialize());
     this.$scope.$watch('configSections', () => this.initialize());
   }

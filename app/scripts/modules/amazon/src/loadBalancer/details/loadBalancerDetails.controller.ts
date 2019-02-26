@@ -52,6 +52,15 @@ export class AwsLoadBalancerDetailsController implements IController {
   public firewallsLabel = FirewallLabels.get('Firewalls');
   public oidcConfigPath = SETTINGS.oidcConfigPath;
 
+  public static $inject = [
+    '$scope',
+    '$state',
+    '$q',
+    'loadBalancer',
+    'app',
+    'securityGroupReader',
+    'loadBalancerReader',
+  ];
   constructor(
     private $scope: IScope,
     private $state: StateService,
@@ -61,7 +70,6 @@ export class AwsLoadBalancerDetailsController implements IController {
     private securityGroupReader: SecurityGroupReader,
     private loadBalancerReader: LoadBalancerReader,
   ) {
-    'ngInject';
     this.application = app;
     this.loadBalancerFromParams = loadBalancer;
 

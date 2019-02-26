@@ -10,7 +10,9 @@ import { LoadBalancerDetails } from './LoadBalancerDetails';
 import { LoadBalancerFilters } from './filter/LoadBalancerFilters';
 
 export const LOAD_BALANCER_STATES = 'spinnaker.core.loadBalancer.states';
-module(LOAD_BALANCER_STATES, [APPLICATION_STATE_PROVIDER]).config(
+module(LOAD_BALANCER_STATES, [APPLICATION_STATE_PROVIDER]).config([
+  'applicationStateProvider',
+  'stateConfigProvider',
   (applicationStateProvider: ApplicationStateProvider, stateConfigProvider: StateConfigProvider) => {
     const loadBalancerDetails: INestedState = {
       name: 'loadBalancerDetails',
@@ -73,4 +75,4 @@ module(LOAD_BALANCER_STATES, [APPLICATION_STATE_PROVIDER]).config(
     applicationStateProvider.addInsightState(loadBalancers);
     applicationStateProvider.addInsightDetailState(loadBalancerDetails);
   },
-);
+]);
