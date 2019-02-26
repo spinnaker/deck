@@ -16,10 +16,30 @@ export interface IAppengineConfigFileConfigurerCtrlCommand {
   sourceType: string;
 }
 
+class ConfigArtifact implements IArtifactAccountPair {
+  public $scope: IScope;
+  public controller: ExpectedArtifactSelectorViewController;
+  public delegate: NgAppengineConfigArtifactDelegate;
+  public id: string;
+  public account: string;
+
+  constructor($scope: IScope, artifact = { id: '', account: '' }) {
+    const unserializable = { configurable: false, enumerable: false, writable: false };
+    this.id = artifact.id;
+    this.account = artifact.account;
+    Object.defineProperty(this, '$scope', { ...unserializable, value: $scope });
+    const delegate = new NgAppengineConfigArtifactDelegate(this);
+    const controller = new ExpectedArtifactSelectorViewController(delegate);
+    Object.defineProperty(this, 'delegate', { ...unserializable, value: delegate });
+    Object.defineProperty(this, 'controller', { ...unserializable, value: controller });
+  }
+}
+
 class AppengineConfigFileConfigurerCtrl implements IController {
   private artifactAccounts: IArtifactAccount[] = [];
   public command: IAppengineConfigFileConfigurerCtrlCommand;
 
+  public static $inject = ['$scope'];
   constructor(public $scope: IScope) {}
 
   public $onInit(): void {
@@ -78,33 +98,14 @@ class AppengineConfigFileConfigurerCtrl implements IController {
   }
 }
 
-class ConfigArtifact implements IArtifactAccountPair {
-  public $scope: IScope;
-  public controller: ExpectedArtifactSelectorViewController;
-  public delegate: NgAppengineConfigArtifactDelegate;
-  public id: string;
-  public account: string;
-
-  constructor($scope: IScope, artifact = { id: '', account: '' }) {
-    const unserializable = { configurable: false, enumerable: false, writable: false };
-    this.id = artifact.id;
-    this.account = artifact.account;
-    Object.defineProperty(this, '$scope', { ...unserializable, value: $scope });
-    const delegate = new NgAppengineConfigArtifactDelegate(this);
-    const controller = new ExpectedArtifactSelectorViewController(delegate);
-    Object.defineProperty(this, 'delegate', { ...unserializable, value: delegate });
-    Object.defineProperty(this, 'controller', { ...unserializable, value: controller });
-  }
-}
-
-class AppengineConfigFileConfigurerComponent implements ng.IComponentOptions {
-  public bindings: any = { command: '=' };
-  public controller: any = AppengineConfigFileConfigurerCtrl;
-  public templateUrl = require('./configFiles.component.html');
-}
+const appengineConfigFileConfigurerComponent: ng.IComponentOptions = {
+  bindings: { command: '=' },
+  controller: AppengineConfigFileConfigurerCtrl,
+  templateUrl: require('./configFiles.component.html'),
+};
 
 export const APPENGINE_CONFIG_FILE_CONFIGURER = 'spinnaker.appengine.configFileConfigurer.component';
 module(APPENGINE_CONFIG_FILE_CONFIGURER, []).component(
   'appengineConfigFileConfigurer',
-  new AppengineConfigFileConfigurerComponent(),
+  appengineConfigFileConfigurerComponent,
 );

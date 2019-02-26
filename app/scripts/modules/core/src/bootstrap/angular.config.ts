@@ -3,29 +3,37 @@ import { ICompileProvider, IHttpProvider, ILocationProvider, ILogProvider } from
 import { bootstrapModule } from './bootstrap.module';
 import { SETTINGS } from 'core/config';
 
-bootstrapModule.config(($logProvider: ILogProvider) => {
-  'ngInject';
-  $logProvider.debugEnabled(SETTINGS.debugEnabled);
-});
+bootstrapModule.config([
+  '$logProvider',
+  ($logProvider: ILogProvider) => {
+    $logProvider.debugEnabled(SETTINGS.debugEnabled);
+  },
+]);
 
-bootstrapModule.config(($httpProvider: IHttpProvider) => {
-  'ngInject';
-  $httpProvider.defaults.headers.patch = {
-    'Content-Type': 'application/json;charset=utf-8',
-  };
-});
+bootstrapModule.config([
+  '$httpProvider',
+  ($httpProvider: IHttpProvider) => {
+    $httpProvider.defaults.headers.patch = {
+      'Content-Type': 'application/json;charset=utf-8',
+    };
+  },
+]);
 
 // Angular 1.6 defaults preAssignBindingsEnabled to false, reset to true to mimic 1.5 behavior.
 // See https://docs.angularjs.org/guide/migration#migrate1.5to1.6-ng-services-$compile
-bootstrapModule.config(($compileProvider: ICompileProvider) => {
-  'ngInject';
-  $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|mailto|hipchat|slack|ssh):/);
-  $compileProvider.preAssignBindingsEnabled(true);
-});
+bootstrapModule.config([
+  '$compileProvider',
+  ($compileProvider: ICompileProvider) => {
+    $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|mailto|hipchat|slack|ssh):/);
+    $compileProvider.preAssignBindingsEnabled(true);
+  },
+]);
 
 // Angular 1.6 sets default hashPrefix to '!', change it back to ''
 // See https://docs.angularjs.org/guide/migration#migrate1.5to1.6-ng-services-$location
-bootstrapModule.config(($locationProvider: ILocationProvider) => {
-  'ngInject';
-  $locationProvider.hashPrefix('');
-});
+bootstrapModule.config([
+  '$locationProvider',
+  ($locationProvider: ILocationProvider) => {
+    $locationProvider.hashPrefix('');
+  },
+]);

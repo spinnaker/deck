@@ -18,6 +18,7 @@ import {
 import { ICloudFoundryCreateServerGroupCommand } from '../serverGroupConfigurationModel.cf';
 import { CloudFoundryServerGroupBasicSettings } from './sections/basicSettings/BasicSettings.cf';
 import { CloudFoundryServerGroupArtifactSettings } from './sections/artifactSettings/ArtifactSettings.cf';
+import { CloudFoundryServerGroupCloneSettings } from './sections/cloneSettings/CloneSettings.cf';
 import { CloudFoundryServerGroupConstantArtifactSettings } from './sections/artifactSettings/ConstantArtifactSettings.cf';
 import { CloudFoundryServerGroupConfigurationSettings } from './sections/configurationSettings/ConfigurationSettings.cf';
 import { CfDisclaimerPage } from 'cloudfoundry/common/wizard/sections/cfDisclaimer.cf';
@@ -36,6 +37,8 @@ export interface ICloudFoundryCreateServerGroupProps extends IModalComponentProp
 
 export interface ICloudFoundryCreateServerGroupState {
   artifactAccounts: IArtifactAccount[];
+  isClone: boolean;
+  loading: boolean;
   requiresTemplateSelection: boolean;
   taskMonitor: TaskMonitor;
 }
@@ -56,8 +59,11 @@ export class CloudFoundryCreateServerGroupModal extends React.Component<
 
   constructor(props: ICloudFoundryCreateServerGroupProps) {
     super(props);
+    const mode = get(props, 'command.viewState.mode', undefined);
     this.state = {
       artifactAccounts: [],
+      isClone: props.isSourceConstant || mode === 'editClonePipeline',
+      loading: false,
       requiresTemplateSelection: get(props, 'command.viewState.requiresTemplateSelection', false),
       taskMonitor: new TaskMonitor({
         application: props.application,
@@ -76,6 +82,11 @@ export class CloudFoundryCreateServerGroupModal extends React.Component<
 
   private templateSelected = () => {
     this.setState({ requiresTemplateSelection: false });
+    this.initialize();
+  };
+
+  private initialize = () => {
+    this.setState({ loading: false });
   };
 
   private onTaskComplete = () => {
@@ -84,8 +95,19 @@ export class CloudFoundryCreateServerGroupModal extends React.Component<
 
   private submit = (command: ICloudFoundryCreateServerGroupCommand): void => {
     command.selectedProvider = 'cloudfoundry';
-    if (command.viewState.mode === 'createPipeline' || command.viewState.mode === 'editPipeline') {
+    if (
+      command.viewState.mode === 'createPipeline' ||
+      command.viewState.mode === 'editPipeline' ||
+      command.viewState.mode === 'editClonePipeline'
+    ) {
       this.props.closeModal && this.props.closeModal(command);
+    } else if (command.viewState.mode === 'clone') {
+      this.state.taskMonitor.submit(() =>
+        ReactInjector.serverGroupWriter.cloneServerGroup(
+          { destination: { region: command.region, account: command.credentials }, ...command },
+          this.props.application,
+        ),
+      );
     } else {
       this.state.taskMonitor.submit(() =>
         ReactInjector.serverGroupWriter.cloneServerGroup(command, this.props.application),
@@ -94,7 +116,7 @@ export class CloudFoundryCreateServerGroupModal extends React.Component<
   };
 
   public render(): React.ReactElement<CloudFoundryCreateServerGroupModal> {
-    const { artifactAccounts, requiresTemplateSelection, taskMonitor } = this.state;
+    const { artifactAccounts, isClone, loading, requiresTemplateSelection, taskMonitor } = this.state;
     const { application, command, dismissModal, isSourceConstant, serverGroup, title } = this.props;
 
     if (requiresTemplateSelection) {
@@ -112,6 +134,7 @@ export class CloudFoundryCreateServerGroupModal extends React.Component<
       <WizardModal<ICloudFoundryCreateServerGroupCommand>
         heading={title}
         initialValues={command}
+        loading={loading}
         taskMonitor={taskMonitor}
         dismissModal={dismissModal}
         closeModal={this.submit}
@@ -122,10 +145,16 @@ export class CloudFoundryCreateServerGroupModal extends React.Component<
               label="Basic Settings"
               wizard={wizard}
               order={nextIdx()}
-              render={({ innerRef }) => <CloudFoundryServerGroupBasicSettings ref={innerRef} formik={formik} />}
+              render={({ innerRef }) => (
+                <CloudFoundryServerGroupBasicSettings
+                  ref={innerRef}
+                  formik={formik}
+                  isPipelineClone={isClone && !isSourceConstant}
+                />
+              )}
             />
 
-            {isSourceConstant && (
+            {isClone && isSourceConstant && (
               <WizardPage
                 label="Artifact"
                 wizard={wizard}
@@ -140,7 +169,18 @@ export class CloudFoundryCreateServerGroupModal extends React.Component<
               />
             )}
 
-            {!isSourceConstant && (
+            {isClone && !isSourceConstant && (
+              <WizardPage
+                label="Source"
+                wizard={wizard}
+                order={nextIdx()}
+                render={({ innerRef }) => (
+                  <CloudFoundryServerGroupCloneSettings application={application} ref={innerRef} formik={formik} />
+                )}
+              />
+            )}
+
+            {!isClone && (
               <WizardPage
                 label="Artifact"
                 wizard={wizard}

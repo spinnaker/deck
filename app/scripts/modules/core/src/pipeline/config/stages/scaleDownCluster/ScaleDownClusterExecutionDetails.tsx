@@ -7,7 +7,7 @@ import {
   StageFailureMessage,
 } from 'core/pipeline';
 import { AccountTag } from 'core/account';
-import { ServerGroupStageContext } from '../core/ServerGroupStageContext';
+import { ServerGroupStageContext } from '../common/ServerGroupStageContext';
 
 export function ScaleDownClusterExecutionDetails(props: IExecutionDetailsSectionProps) {
   const { stage } = props;
@@ -39,6 +39,8 @@ export function ScaleDownClusterExecutionDetails(props: IExecutionDetailsSection
   );
 }
 
+// TODO: refactor this to not use namespace
+// eslint-disable-next-line
 export namespace ScaleDownClusterExecutionDetails {
   export const title = 'scaleDownClusterConfig';
 }

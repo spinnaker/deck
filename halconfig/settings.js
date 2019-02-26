@@ -18,8 +18,10 @@ var defaultStorageAccountName = '{%canary.defaultStorageAccount%}';
 var displayTimestampsInUserLocalTime = '{%features.displayTimestampsInUserLocalTime%}' === 'true';
 var entityTagsEnabled = false;
 var fiatEnabled = '{%features.fiat%}' === 'true';
+var gremlinEnabled = '{%features.gremlinEnabled%}' === 'true';
 var iapRefresherEnabled = '{%features.iapRefresherEnabled}' === 'true';
 var infrastructureStagesEnabled = '{%features.infrastructureStages%}' === 'true';
+var managedPipelineTemplatesV2UIEnabled = '{%features.managedPipelineTemplatesV2UI%}' === 'true';
 var jobsEnabled = '{%features.jobs%}' === 'true';
 var maxPipelineAgeDays = '{%maxPipelineAgeDays%}';
 var mineCanaryEnabled = '{%features.mineCanary%}' === 'true';
@@ -138,6 +140,7 @@ window.spinnakerSettings = {
   defaultCategory: 'serverGroup',
   defaultInstancePort: 80,
   defaultProviders: [
+    'appengine',
     'aws',
     'azure',
     'cloudfoundry',
@@ -157,9 +160,11 @@ window.spinnakerSettings = {
     displayTimestampsInUserLocalTime: displayTimestampsInUserLocalTime,
     entityTags: entityTagsEnabled,
     fiatEnabled: fiatEnabled,
+    gremlinEnabled: gremlinEnabled,
     iapRefresherEnabled: iapRefresherEnabled,
     infrastructureStages: infrastructureStagesEnabled,
     jobs: jobsEnabled,
+    managedPipelineTemplatesV2UI: managedPipelineTemplatesV2UIEnabled,
     notifications: notificationsEnabled,
     pagerDuty: false,
     pipelines: true,

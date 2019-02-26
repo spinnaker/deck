@@ -1,5 +1,6 @@
 import { module, isDefined, ILogService } from 'angular';
 
+replace.$inject = ['$log'];
 function replace($log: ILogService): Function {
   return (str: string, regExStr: string, replaceValue: string) => {
     if (!isDefined(regExStr)) {

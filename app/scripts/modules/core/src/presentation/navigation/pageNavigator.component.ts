@@ -14,20 +14,20 @@ class PageNavigatorController implements IController {
   private navigator: JQuery;
   private id: string;
   private deepLinkParam: string;
+  public hideNavigation = false;
 
   private getEventKey(): string {
     return `scroll.pageNavigation.${this.id}`;
   }
 
-  public constructor(private $element: JQuery, private $state: StateService, private $stateParams: StateParams) {
-    'ngInject';
-  }
+  public static $inject = ['$element', '$state', '$stateParams'];
+  public constructor(private $element: JQuery, private $state: StateService, private $stateParams: StateParams) {}
 
   public $onInit(): void {
     this.id = UUIDGenerator.generateUuid();
     PageNavigationState.reset();
     this.container = this.$element.closest(this.scrollableContainer);
-    if (isFunction(this.container.bind)) {
+    if (isFunction(this.container.bind) && !this.hideNavigation) {
       this.container.bind(this.getEventKey(), throttle(() => this.handleScroll(), 20));
     }
     this.navigator = this.$element.find('.page-navigation');
@@ -37,7 +37,7 @@ class PageNavigatorController implements IController {
   }
 
   public $onDestroy(): void {
-    if (isFunction(this.container.unbind)) {
+    if (isFunction(this.container.unbind) && !this.hideNavigation) {
       this.container.unbind(this.getEventKey());
     }
   }
@@ -90,16 +90,17 @@ class PageNavigatorController implements IController {
   }
 }
 
-class PageNavigatorComponent implements ng.IComponentOptions {
-  public bindings: any = {
+const pageNavigatorComponent: ng.IComponentOptions = {
+  bindings: {
     scrollableContainer: '@',
     deepLinkParam: '@?',
-  };
-  public controller: any = PageNavigatorController;
-  public transclude = true;
-  public template = `
+    hideNavigation: '<?',
+  },
+  controller: PageNavigatorController,
+  transclude: true,
+  template: `
     <div class="row">
-      <div class="col-md-3 hidden-sm hidden-xs">
+      <div class="col-md-3 hidden-sm hidden-xs" ng-show="!$ctrl.hideNavigation">
         <ul class="page-navigation">
           <li ng-repeat="page in $ctrl.pageNavigationState.pages"
               data-page-navigation-link="{{page.key}}"
@@ -112,13 +113,13 @@ class PageNavigatorComponent implements ng.IComponentOptions {
           </li>
         </ul>
       </div>
-      <div class="col-md-9 col-sm-12">
+      <div class="col-md-{{$ctrl.hideNavigation ? 12 : 9}} col-sm-12">
         <div class="sections" ng-transclude></div>
       </div>
     </div>
-  `;
-}
+  `,
+};
 
 export const PAGE_NAVIGATOR_COMPONENT = 'spinnaker.core.presentation.navigation.pageNavigator';
 
-module(PAGE_NAVIGATOR_COMPONENT, [PAGE_SECTION_COMPONENT]).component('pageNavigator', new PageNavigatorComponent());
+module(PAGE_NAVIGATOR_COMPONENT, [PAGE_SECTION_COMPONENT]).component('pageNavigator', pageNavigatorComponent);

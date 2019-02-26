@@ -12,9 +12,8 @@ class KubernetesManifestCtrl implements IController {
   public manifests: IManifest[];
   public rawManifest: string;
 
-  constructor(private $scope: IScope) {
-    'ngInject';
-  }
+  public static $inject = ['$scope'];
+  constructor(private $scope: IScope) {}
 
   // If we have more than one manifest, render as a
   // list of manifests. Otherwise, hide the fact
@@ -30,16 +29,16 @@ class KubernetesManifestCtrl implements IController {
   };
 }
 
-class KubernetesManifestEntryComponent implements IComponentOptions {
-  public bindings = { command: '<', manifests: '<' };
-  public controller = KubernetesManifestCtrl;
-  public controllerAs = 'ctrl';
-  public template = `
+const kubernetesManifestEntryComponent: IComponentOptions = {
+  bindings: { command: '<', manifests: '<' },
+  controller: KubernetesManifestCtrl,
+  controllerAs: 'ctrl',
+  template: `
     <yaml-editor
       value="ctrl.rawManifest"
       on-change="ctrl.handleChange"
-    ></yaml-editor>`;
-}
+    ></yaml-editor>`,
+};
 
 export const KUBERNETES_MANIFEST_ENTRY = 'spinnaker.kubernetes.v2.manifest.entry.component';
-module(KUBERNETES_MANIFEST_ENTRY, []).component('kubernetesManifestEntry', new KubernetesManifestEntryComponent());
+module(KUBERNETES_MANIFEST_ENTRY, []).component('kubernetesManifestEntry', kubernetesManifestEntryComponent);

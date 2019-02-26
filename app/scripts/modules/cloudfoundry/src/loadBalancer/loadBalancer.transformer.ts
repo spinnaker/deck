@@ -44,9 +44,8 @@ export class CloudFoundryLoadBalancerUpsertDescription
 }
 
 export class CloudFoundryLoadBalancerTransformer {
-  constructor(private $q: ng.IQService) {
-    'ngInject';
-  }
+  public static $inject = ['$q'];
+  constructor(private $q: ng.IQService) {}
 
   public normalizeLoadBalancer(loadBalancer: ILoadBalancer): ng.IPromise<ILoadBalancer> {
     loadBalancer.provider = loadBalancer.type;

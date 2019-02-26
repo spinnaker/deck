@@ -4,13 +4,12 @@ import { StateParams, StateService } from '@uirouter/angularjs';
 export class ExecutionDetailsSectionService {
   private pendingOnComplete: IPromise<any>;
 
+  public static $inject = ['$stateParams', '$state', '$timeout'];
   public constructor(
     private $stateParams: StateParams,
     private $state: StateService,
     private $timeout: ITimeoutService,
-  ) {
-    'ngInject';
-  }
+  ) {}
 
   private sectionIsValid(availableSections: string[]): boolean {
     return availableSections.includes(this.$stateParams.details);

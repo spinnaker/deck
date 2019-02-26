@@ -43,7 +43,9 @@ export function ApplyEntityTagsExecutionDetails(props: IExecutionDetailsSectionP
             if (typeof value === 'object') {
               try {
                 value = JSON.stringify(value);
-              } catch (e) {}
+              } catch (ignored) {
+                /* noop */
+              }
             }
 
             return (
@@ -68,6 +70,8 @@ export function ApplyEntityTagsExecutionDetails(props: IExecutionDetailsSectionP
   );
 }
 
+// TODO: refactor this to not use namespace
+// eslint-disable-next-line
 export namespace ApplyEntityTagsExecutionDetails {
   export const title = 'applyEntityTagsConfig';
 }

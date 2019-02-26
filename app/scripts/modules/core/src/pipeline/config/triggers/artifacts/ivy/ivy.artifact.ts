@@ -5,9 +5,8 @@ import { Registry } from 'core/registry';
 import { IvyArtifactEditor } from './IvyArtifactEditor';
 
 class IvyArtifactController implements IController {
-  constructor(public artifact: IArtifact) {
-    'ngInject';
-  }
+  public static $inject = ['artifact'];
+  constructor(public artifact: IArtifact) {}
 }
 
 export const IVY_ARTIFACT = 'spinnaker.core.pipeline.trigger.ivy.artifact';
@@ -21,7 +20,6 @@ module(IVY_ARTIFACT, [])
       isDefault: false,
       isMatch: true,
       controller: function(artifact: IArtifact) {
-        'ngInject';
         this.artifact = artifact;
         this.artifact.type = 'ivy/file';
       },

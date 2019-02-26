@@ -23,6 +23,7 @@ class ArtifactCtrl implements IController {
   private isDefault: boolean;
   private artifactAccounts?: IArtifactAccount[];
 
+  public static $inject = ['$attrs', '$controller', '$compile', '$element', '$rootScope', '$scope'];
   constructor(
     private $attrs: IAttributes,
     private $controller: IControllerService,
@@ -31,7 +32,6 @@ class ArtifactCtrl implements IController {
     private $rootScope: IRootScopeService,
     private $scope: IScope,
   ) {
-    'ngInject';
     this.isDefault = this.$attrs.$attr.hasOwnProperty('isDefault');
     if (this.isDefault) {
       this.options = Registry.pipeline.getDefaultArtifactKinds();
@@ -98,11 +98,11 @@ class ArtifactCtrl implements IController {
   }
 }
 
-class ArtifactComponent implements IComponentOptions {
-  public bindings: any = { artifact: '=' };
-  public controller: any = ArtifactCtrl;
-  public controllerAs = 'ctrl';
-  public template = `
+const artifactComponent: IComponentOptions = {
+  bindings: { artifact: '=' },
+  controller: ArtifactCtrl,
+  controllerAs: 'ctrl',
+  template: `
 <div class="form-group">
   <label class="col-md-2 sm-label-right">
       Kind
@@ -129,8 +129,8 @@ class ArtifactComponent implements IComponentOptions {
 <div class="form-group">
   <div class="artifact-body"></div>
 </div>
-`;
-}
+`,
+};
 
 export const ARTIFACT = 'spinnaker.core.pipeline.config.trigger.artifacts.artifact';
-module(ARTIFACT, []).component('artifact', new ArtifactComponent());
+module(ARTIFACT, []).component('artifact', artifactComponent);

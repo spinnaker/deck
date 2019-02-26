@@ -40,15 +40,14 @@ export class UpsertTargetTrackingController implements IComponentController {
   public state: ITargetTrackingState;
   public command: ITargetTrackingPolicyCommand;
 
+  public static $inject = ['$uibModalInstance', 'policy', 'serverGroup', 'alarmServerGroup', 'application'];
   constructor(
     private $uibModalInstance: IModalServiceInstance,
     public policy: ITitusTargetTrackingPolicy,
     public serverGroup: ITitusServerGroup,
     public alarmServerGroup: IAlarmRenderingServerGroup,
     public application: Application,
-  ) {
-    'ngInject';
-  }
+  ) {}
 
   public $onInit() {
     this.command = this.buildCommand();

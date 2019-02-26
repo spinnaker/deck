@@ -3,19 +3,18 @@ import { react2angular } from 'react2angular';
 
 import { CloudfoundryDeployServiceStageConfig } from './CloudfoundryDeployServiceStageConfig';
 import { ExecutionDetailsTasks, IStage, Registry } from '@spinnaker/core';
-import { CloudfoundryDeployServiceExecutionDetails } from './CloudfoundryDeployServiceExecutionDetails';
+import { CloudfoundryServiceExecutionDetails } from 'cloudfoundry/presentation';
 import { IServiceFieldValidatorConfig } from 'cloudfoundry/pipeline/config/validation/ServiceFieldValidatorConfig';
 
 class CloudFoundryDeployServiceStageCtrl implements IController {
-  constructor(public $scope: IScope) {
-    'ngInject';
-  }
+  public static $inject = ['$scope'];
+  constructor(public $scope: IScope) {}
 }
 
-const serviceNameValidatorConfig: IServiceFieldValidatorConfig = {
+const serviceInstanceNameValidatorConfig: IServiceFieldValidatorConfig = {
   type: 'requiredServiceField',
   serviceInputType: 'direct',
-  fieldName: 'serviceName',
+  fieldName: 'serviceInstanceName',
   preventSave: true,
 };
 
@@ -54,10 +53,10 @@ const referenceValidatorConfig: IServiceFieldValidatorConfig = {
   preventSave: true,
 };
 
-const userProvidedServiceNameValidatorConfig: IServiceFieldValidatorConfig = {
+const userProvidedServiceInstanceNameValidatorConfig: IServiceFieldValidatorConfig = {
   type: 'requiredServiceField',
   serviceInputType: 'userProvided',
-  fieldName: 'serviceName',
+  fieldName: 'serviceInstanceName',
   preventSave: true,
 };
 
@@ -79,17 +78,18 @@ module(CLOUD_FOUNDRY_DEPLOY_SERVICE_STAGE, [])
       cloudProvider: 'cloudfoundry',
       templateUrl: require('./cloudfoundryDeployServiceStage.html'),
       controller: 'cfDeployServiceStageCtrl',
-      executionDetailsSections: [CloudfoundryDeployServiceExecutionDetails, ExecutionDetailsTasks],
+      executionDetailsSections: [CloudfoundryServiceExecutionDetails, ExecutionDetailsTasks],
+      defaultTimeoutMs: 30 * 60 * 1000,
       validators: [
         { type: 'requiredField', fieldName: 'credentials', fieldLabel: 'account' },
         { type: 'requiredField', fieldName: 'region' },
-        serviceNameValidatorConfig,
+        serviceInstanceNameValidatorConfig,
         serviceValidatorConfig,
         servicePlanValidatorConfig,
         jsonValidatorConfig,
         accountValidatorConfig,
         referenceValidatorConfig,
-        userProvidedServiceNameValidatorConfig,
+        userProvidedServiceInstanceNameValidatorConfig,
         credentialsJsonValidatorConfig,
       ],
     });

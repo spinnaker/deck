@@ -60,6 +60,15 @@ export class OracleLoadBalancerController implements IController {
   public backendSets: IOracleBackEndSet[] = [];
   public certificates: IOracleListenerCertificate[] = [];
 
+  public static $inject = [
+    '$scope',
+    '$uibModalInstance',
+    '$state',
+    'oracleLoadBalancerTransformer',
+    'application',
+    'loadBalancer',
+    'isNew',
+  ];
   constructor(
     private $scope: ng.IScope,
     private $uibModalInstance: IModalServiceInstance,
@@ -69,7 +78,6 @@ export class OracleLoadBalancerController implements IController {
     private loadBalancer: IOracleLoadBalancer,
     private isNew: boolean,
   ) {
-    'ngInject';
     this.initializeController();
   }
 
@@ -363,9 +371,11 @@ export class OracleLoadBalancerController implements IController {
   public backendSetNameChanged(idx: number) {
     const prevName = this.$scope.prevBackendSetNames && this.$scope.prevBackendSetNames[idx];
     if (prevName && prevName !== this.backendSets[idx].name) {
-      this.listeners.filter(lis => lis.defaultBackendSetName === prevName).forEach(lis => {
-        lis.defaultBackendSetName = this.backendSets[idx].name;
-      });
+      this.listeners
+        .filter(lis => lis.defaultBackendSetName === prevName)
+        .forEach(lis => {
+          lis.defaultBackendSetName = this.backendSets[idx].name;
+        });
     }
   }
 

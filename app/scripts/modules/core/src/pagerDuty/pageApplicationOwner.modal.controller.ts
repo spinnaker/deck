@@ -9,9 +9,8 @@ export class PageModalCtrl implements IController {
   public reason: string;
   public taskMonitor: TaskMonitor;
 
-  constructor(public $uibModalInstance: IModalInstanceService, public application: Application) {
-    'ngInject';
-  }
+  public static $inject = ['$uibModalInstance', 'application'];
+  constructor(public $uibModalInstance: IModalInstanceService, public application: Application) {}
 
   public submit(): void {
     const taskMonitorConfig = {

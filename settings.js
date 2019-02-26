@@ -18,8 +18,10 @@ var displayTimestampsInUserLocalTime = process.env.DISPLAY_TIMESTAMPS_IN_USER_LO
 var dryRunEnabled = process.env.DRYRUN_ENABLED === 'true' ? true : false;
 var entityTagsEnabled = process.env.ENTITY_TAGS_ENABLED === 'true' ? true : false;
 var fiatEnabled = process.env.FIAT_ENABLED === 'true' ? true : false;
+var gremlinEnabled = process.env.GREMLIN_ENABLED === 'false' ? false : true;
 var iapRefresherEnabled = process.env.IAP_REFRESHER_ENABLED === 'true' ? true : false;
 var infrastructureEnabled = process.env.INFRA_ENABLED === 'true' ? true : false;
+var managedPipelineTemplatesV2UIEnabled = process.env.MANAGED_PIPELINE_TEMPLATES_V2_UI_ENABLED === 'true';
 var managedServiceAccountsEnabled = process.env.MANAGED_SERVICE_ACCOUNTS_ENABLED === 'true';
 var onDemandClusterThreshold = process.env.ON_DEMAND_CLUSTER_THRESHOLD || '350';
 var reduxLoggerEnabled = process.env.REDUX_LOGGER === 'true';
@@ -48,7 +50,18 @@ window.spinnakerSettings = {
   debugEnabled: debugEnabled,
   defaultCategory: 'serverGroup',
   defaultInstancePort: 80,
-  defaultProviders: ['aws', 'gce', 'azure', 'cloudfoundry', 'kubernetes', 'dcos', 'openstack', 'oracle', 'ecs'],
+  defaultProviders: [
+    'appengine',
+    'aws',
+    'azure',
+    'cloudfoundry',
+    'dcos',
+    'ecs',
+    'gce',
+    'kubernetes',
+    'openstack',
+    'oracle',
+  ],
   defaultTimeZone: process.env.TIMEZONE || 'America/Los_Angeles', // see http://momentjs.com/timezone/docs/#/data-utilities/
   feature: {
     artifacts: artifactsEnabled,
@@ -58,10 +71,12 @@ window.spinnakerSettings = {
     dryRunEnabled: dryRunEnabled,
     entityTags: entityTagsEnabled,
     fiatEnabled: fiatEnabled,
+    gremlinEnabled: gremlinEnabled,
     iapRefresherEnabled: iapRefresherEnabled,
     // whether stages affecting infrastructure (like "Create Load Balancer") should be enabled or not
     infrastructureStages: infrastructureEnabled,
     jobs: false,
+    managedPipelineTemplatesV2UI: managedPipelineTemplatesV2UIEnabled,
     managedServiceAccounts: managedServiceAccountsEnabled,
     notifications: false,
     pagerDuty: false,

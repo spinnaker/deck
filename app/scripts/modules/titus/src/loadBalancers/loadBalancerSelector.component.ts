@@ -12,9 +12,8 @@ class LoadBalancerSelectorController implements IController {
   public refreshTime: number;
   public refreshing = false;
 
-  public constructor(private titusServerGroupConfigurationService: TitusServerGroupConfigurationService) {
-    'ngInject';
-  }
+  public static $inject = ['titusServerGroupConfigurationService'];
+  public constructor(private titusServerGroupConfigurationService: TitusServerGroupConfigurationService) {}
 
   public $onInit(): void {
     this.refreshing = true;
@@ -27,17 +26,17 @@ class LoadBalancerSelectorController implements IController {
   }
 }
 
-export class LoadBalancerSelectorComponent implements IComponentOptions {
-  public bindings: any = {
+export const loadBalancerSelectorComponent: IComponentOptions = {
+  bindings: {
     command: '=',
-  };
-  public controller: any = LoadBalancerSelectorController;
-  public templateUrl = require('./loadBalancerSelector.component.html');
-}
+  },
+  controller: LoadBalancerSelectorController,
+  templateUrl: require('./loadBalancerSelector.component.html'),
+};
 
 export const TITUS_LOAD_BALANCER_SELECTOR =
   'spinnaker.titus.serverGroup.configure.wizard.loadBalancers.selector.component';
 module(TITUS_LOAD_BALANCER_SELECTOR, [TITUS_SERVER_GROUP_CONFIGURATION_SERVICE]).component(
   'titusLoadBalancerSelector',
-  new LoadBalancerSelectorComponent(),
+  loadBalancerSelectorComponent,
 );

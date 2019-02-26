@@ -122,15 +122,20 @@ export class AwsServerGroupConfigurationService {
     'Default',
   ];
 
+  public static $inject = [
+    'securityGroupReader',
+    'awsInstanceTypeService',
+    'cacheInitializer',
+    'loadBalancerReader',
+    'serverGroupCommandRegistry',
+  ];
   constructor(
     private securityGroupReader: SecurityGroupReader,
     private awsInstanceTypeService: any,
     private cacheInitializer: CacheInitializerService,
     private loadBalancerReader: LoadBalancerReader,
     private serverGroupCommandRegistry: ServerGroupCommandRegistry,
-  ) {
-    'ngInject';
-  }
+  ) {}
 
   public configureUpdateCommand(command: IAmazonServerGroupCommand): void {
     command.backingData = {
@@ -147,9 +152,9 @@ export class AwsServerGroupConfigurationService {
       command.suspendedProcesses = command.suspendedProcesses || [];
       const processIndex = command.suspendedProcesses.indexOf(process);
       if (processIndex === -1) {
-        command.suspendedProcesses.push(process);
+        command.suspendedProcesses = command.suspendedProcesses.concat(process);
       } else {
-        command.suspendedProcesses.splice(processIndex, 1);
+        command.suspendedProcesses = command.suspendedProcesses.filter(p => p !== process);
       }
     };
 

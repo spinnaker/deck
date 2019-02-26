@@ -1,8 +1,9 @@
+import { IPromise } from 'angular';
 import * as React from 'react';
 import * as ReactGA from 'react-ga';
-import { get, orderBy, uniq } from 'lodash';
+import { get, isEmpty, orderBy, uniq } from 'lodash';
 import { Debounce } from 'lodash-decorators';
-import { $q } from 'ngimport';
+import * as classnames from 'classnames';
 import { SortableContainer, SortableElement, SortableHandle, arrayMove, SortEnd } from 'react-sortable-hoc';
 import { Subscription } from 'rxjs';
 
@@ -150,24 +151,26 @@ export class ExecutionFilters extends React.Component<IExecutionFiltersProps, IE
     this.updateFilterSearch(event.currentTarget.value);
   };
 
-  private updatePipelines(pipelines: IPipeline[]): void {
-    $q.all(pipelines.map(pipeline => PipelineConfigService.savePipeline(pipeline)));
+  private updatePipelines(idsToUpdatedIndices: { [key: string]: number }): IPromise<void> {
+    return PipelineConfigService.reorderPipelines(this.props.application.name, idsToUpdatedIndices, false);
   }
 
   private handleSortEnd = (sortEnd: SortEnd): void => {
     const pipelineNames = arrayMove(this.state.pipelineNames, sortEnd.oldIndex, sortEnd.newIndex);
     const { application } = this.props;
     ReactGA.event({ category: 'Pipelines', action: 'Reordered pipeline' });
-    const dirty: IPipeline[] = [];
+    const idsToUpdatedIndices: { [key: string]: number } = {};
     application.pipelineConfigs.data.forEach((pipeline: IPipeline) => {
       const newIndex = pipelineNames.indexOf(pipeline.name);
       if (pipeline.index !== newIndex) {
         pipeline.index = newIndex;
-        dirty.push(pipeline);
+        idsToUpdatedIndices[pipeline.id] = newIndex;
       }
     });
-    this.updatePipelines(dirty);
-    this.refreshPipelines();
+    if (!isEmpty(idsToUpdatedIndices)) {
+      this.updatePipelines(idsToUpdatedIndices);
+      this.refreshPipelines();
+    }
   };
 
   public render() {
@@ -288,7 +291,7 @@ const FilterCheckbox = (props: {
 
 const Pipeline = SortableElement(
   (props: { tag: IFilterTag; pipeline: string; dragEnabled: boolean; update: () => void }) => (
-    <div className="checkbox sortable">
+    <div className={classnames('checkbox sortable', { 'disable-user-select': props.dragEnabled })}>
       <div>
         <label>
           {props.dragEnabled && <DragHandle />}

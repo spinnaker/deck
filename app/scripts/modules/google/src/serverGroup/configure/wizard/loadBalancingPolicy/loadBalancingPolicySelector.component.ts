@@ -9,9 +9,8 @@ class GceLoadBalancingPolicySelectorController implements IController {
   [key: string]: any;
   public globalBackendServices: IGceBackendService[];
 
-  constructor(private gceBackendServiceReader: any) {
-    'ngInject';
-  }
+  public static $inject = ['gceBackendServiceReader'];
+  constructor(private gceBackendServiceReader: any) {}
 
   public setModel(propertyName: string, viewValue: number): void {
     set(this, propertyName, viewValue / 100);
@@ -103,7 +102,7 @@ class GceLoadBalancingPolicySelectorController implements IController {
       switch (get(index[loadBalancer], 'loadBalancerType')) {
         case 'SSL':
         case 'TCP':
-        case 'HTTP':
+        case 'HTTP': {
           const lbBackendServices: string[] = get(index[loadBalancer], 'backendServices');
           const filteredBackendServices = globalBackendServices.filter((service: IGceBackendService) =>
             lbBackendServices.includes(service.name),
@@ -111,6 +110,7 @@ class GceLoadBalancingPolicySelectorController implements IController {
           const portNames = filteredBackendServices.map((service: IGceBackendService) => service.portName);
           const portNameIntersection = intersection(portNames, inUsePortNames);
           return portNames.filter(portName => !portNameIntersection.includes(portName));
+        }
         default:
           return [];
       }
@@ -130,17 +130,17 @@ class GceLoadBalancingPolicySelectorController implements IController {
   }
 }
 
-class GceLoadBalancingPolicySelectorComponent implements IComponentOptions {
-  public bindings: any = {
+const gceLoadBalancingPolicySelectorComponent: IComponentOptions = {
+  bindings: {
     command: '=',
-  };
-  public controller: any = GceLoadBalancingPolicySelectorController;
-  public templateUrl: string = require('./loadBalancingPolicySelector.component.html');
-}
+  },
+  controller: GceLoadBalancingPolicySelectorController,
+  templateUrl: require('./loadBalancingPolicySelector.component.html'),
+};
 
 export const GCE_LOAD_BALANCING_POLICY_SELECTOR = 'spinnaker.gce.loadBalancingPolicy.selector.component';
 
 module(GCE_LOAD_BALANCING_POLICY_SELECTOR, []).component(
   'gceLoadBalancingPolicySelector',
-  new GceLoadBalancingPolicySelectorComponent(),
+  gceLoadBalancingPolicySelectorComponent,
 );

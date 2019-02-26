@@ -8,7 +8,9 @@ import { Executions } from 'core/pipeline/executions/Executions';
 import { SingleExecutionDetails } from 'core/pipeline/details/SingleExecutionDetails';
 
 export const PIPELINE_STATES = 'spinnaker.core.pipeline.states';
-module(PIPELINE_STATES, [APPLICATION_STATE_PROVIDER]).config(
+module(PIPELINE_STATES, [APPLICATION_STATE_PROVIDER]).config([
+  'applicationStateProvider',
+  'stateConfigProvider',
   (applicationStateProvider: ApplicationStateProvider, stateConfigProvider: StateConfigProvider) => {
     const pipelineConfig: INestedState = {
       name: 'pipelineConfig',
@@ -55,6 +57,9 @@ module(PIPELINE_STATES, [APPLICATION_STATE_PROVIDER]).config(
       views: {
         pipelines: { component: SingleExecutionDetails, $type: 'react' },
       },
+      params: {
+        executionParams: null,
+      },
       abstract: true,
       children: [executionDetails],
     };
@@ -88,4 +93,4 @@ module(PIPELINE_STATES, [APPLICATION_STATE_PROVIDER]).config(
 
     applicationStateProvider.addChildState(pipelines);
   },
-);
+]);

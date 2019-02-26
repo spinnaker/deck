@@ -145,9 +145,8 @@ export class ServerGroupCommandBuilderService {
     return this.providerServiceDelegate.getDelegate(provider, 'serverGroup.commandBuilder', skin);
   }
 
-  constructor(private providerServiceDelegate: ProviderServiceDelegate) {
-    'ngInject';
-  }
+  public static $inject = ['providerServiceDelegate'];
+  constructor(private providerServiceDelegate: ProviderServiceDelegate) {}
 
   public buildNewServerGroupCommand(
     application: Application,

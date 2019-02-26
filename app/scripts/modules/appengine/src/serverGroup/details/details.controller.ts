@@ -57,6 +57,17 @@ class AppengineServerGroupDetailsController implements IController {
       </table>`;
   }
 
+  public static $inject = [
+    '$state',
+    '$scope',
+    '$uibModal',
+    'serverGroup',
+    'app',
+    'serverGroupWriter',
+    'confirmationModalService',
+    'appengineServerGroupWriter',
+    'appengineServerGroupCommandBuilder',
+  ];
   constructor(
     private $state: any,
     private $scope: IPrivateScope,
@@ -68,8 +79,6 @@ class AppengineServerGroupDetailsController implements IController {
     private appengineServerGroupWriter: AppengineServerGroupWriter,
     private appengineServerGroupCommandBuilder: AppengineServerGroupCommandBuilder,
   ) {
-    'ngInject';
-
     this.app
       .ready()
       .then(() => this.extractServerGroup(serverGroup))

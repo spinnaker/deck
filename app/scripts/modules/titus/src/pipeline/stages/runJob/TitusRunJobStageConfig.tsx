@@ -18,6 +18,7 @@ import {
 import { DockerImageAndTagSelector, DockerImageUtils, IDockerImageAndTagChanges } from '@spinnaker/docker';
 
 import { TitusSecurityGroupPicker } from './TitusSecurityGroupPicker';
+import { TitusProviderSettings } from '../../../titus.settings';
 
 export interface ITitusRunJobStageConfigState {
   credentials: string[];
@@ -25,8 +26,27 @@ export interface ITitusRunJobStageConfigState {
   loaded: boolean;
 }
 
+interface IClusterDefaults {
+  application: string;
+  containerAttributes: object;
+  env: object;
+  labels: object;
+  resources: {
+    cpu: number;
+    disk: number;
+    gpu: number;
+    memory: number;
+    networkMbps: number;
+  };
+  retries: number;
+  runtimeLimitSecs: number;
+  securityGroups: string[];
+  iamProfile?: string;
+}
+
 export class TitusRunJobStageConfig extends React.Component<IStageConfigProps, ITitusRunJobStageConfigState> {
   private credentialsKeyedByAccount: IAggregatedAccounts = {};
+  private defaultIamProfile = '';
 
   public state: ITitusRunJobStageConfigState = {
     credentials: [],
@@ -56,7 +76,10 @@ export class TitusRunJobStageConfig extends React.Component<IStageConfigProps, I
       };
     }
 
-    const clusterDefaults = {
+    const defaultIamProfile = TitusProviderSettings.defaults.iamProfile || '{{application}}InstanceProfile';
+    this.defaultIamProfile = defaultIamProfile.replace('{{application}}', application.name);
+
+    const clusterDefaults: IClusterDefaults = {
       application: application.name,
       containerAttributes: {},
       env: {},
@@ -72,6 +95,11 @@ export class TitusRunJobStageConfig extends React.Component<IStageConfigProps, I
       runtimeLimitSecs: 3600,
       securityGroups: [] as string[],
     };
+
+    if (stage.isNew) {
+      clusterDefaults.iamProfile = this.defaultIamProfile;
+    }
+
     defaultsDeep(stage.cluster, clusterDefaults);
 
     stage.cloudProvider = stage.cloudProvider || 'titus';
@@ -306,20 +334,32 @@ export class TitusRunJobStageConfig extends React.Component<IStageConfigProps, I
         <div className={`${stage.showAdvancedOptions === true ? 'collapse.in' : 'collapse'}`}>
           <div className="form-group">
             <label className="col-md-3 sm-label-right">
-              <span className="label-text">IAM Instance Profile (optional)</span>
-              <HelpField id="titus.deploy.iamProfile" />
+              <span className="label-text">IAM Instance Profile</span> <HelpField id="titus.deploy.iamProfile" />
             </label>
             <div className="col-md-4">
               <input
                 type="text"
                 className="form-control input-sm"
                 value={stage.cluster.iamProfile}
+                placeholder={this.defaultIamProfile}
+                required={true}
                 onChange={e => this.stageFieldChanged('cluster.iamProfile', e.target.value)}
               />
             </div>
             <div className="col-md-1 small" style={{ whiteSpace: 'nowrap', paddingLeft: '0px', paddingTop: '7px' }}>
               in <AccountTag account={awsAccount} />
             </div>
+            {!stage.isNew && !stage.cluster.iamProfile && (
+              <div className="checkbox">
+                <label>
+                  <input
+                    type="checkbox"
+                    onChange={() => this.stageFieldChanged('cluster.iamProfile', this.defaultIamProfile)}
+                  />
+                  Use default
+                </label>
+              </div>
+            )}
           </div>
 
           <StageConfigField label="Capacity Group" fieldColumns={4} helpKey="titus.job.capacityGroup">
@@ -335,19 +375,17 @@ export class TitusRunJobStageConfig extends React.Component<IStageConfigProps, I
             {(!stage.credentials || !stage.cluster.region) && (
               <div>Account and region must be selected before {FirewallLabels.get('firewalls')} can be added</div>
             )}
-            {loaded &&
-              stage.credentials &&
-              stage.cluster.region && (
-                <TitusSecurityGroupPicker
-                  account={stage.credentials}
-                  region={stage.cluster.region}
-                  command={stage}
-                  amazonAccount={awsAccount}
-                  hideLabel={true}
-                  groupsToEdit={stage.cluster.securityGroups}
-                  onChange={this.groupsChanged}
-                />
-              )}
+            {loaded && stage.credentials && stage.cluster.region && (
+              <TitusSecurityGroupPicker
+                account={stage.credentials}
+                region={stage.cluster.region}
+                command={stage}
+                amazonAccount={awsAccount}
+                hideLabel={true}
+                groupsToEdit={stage.cluster.securityGroups}
+                onChange={this.groupsChanged}
+              />
+            )}
           </StageConfigField>
 
           <StageConfigField label="Job Attributes (optional)">

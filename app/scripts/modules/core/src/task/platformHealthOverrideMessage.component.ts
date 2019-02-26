@@ -1,9 +1,9 @@
 import { IController, IComponentOptions, module } from 'angular';
 import { get } from 'lodash';
-import * as moment from 'moment';
 
 import { Application } from 'core/application/application.model';
 import { IInstanceCounts, IStage, ITask, ITaskStep, ITimedItem } from 'core/domain';
+import { Duration } from 'luxon';
 
 class PlatformHealthOverrideMessageController implements IController {
   public showMessage: boolean;
@@ -35,7 +35,7 @@ class PlatformHealthOverrideMessageController implements IController {
       this.showMessage =
         isRelevantTask &&
         this.step.name === 'waitForUpInstances' &&
-        this.step.runningTimeInMs > moment.duration(5, 'minutes').asMilliseconds() &&
+        this.step.runningTimeInMs > Duration.fromObject({ minutes: 5 }).as('milliseconds') &&
         lastCapacity.unknown > 0 &&
         lastCapacity.unknown === lastCapacityTotal &&
         !get(this.application, 'attributes.platformHealthOnly');
@@ -43,20 +43,17 @@ class PlatformHealthOverrideMessageController implements IController {
   }
 }
 
-class PlatformHealthOverrideMessage implements IComponentOptions {
-  public bindings: any = {
+const platformHealthOverrideMessage: IComponentOptions = {
+  bindings: {
     application: '<',
     step: '<',
     task: '<',
-  };
-  public controller = PlatformHealthOverrideMessageController;
-  public template = `<i ng-if="$ctrl.showMessage"
+  },
+  controller: PlatformHealthOverrideMessageController,
+  template: `<i ng-if="$ctrl.showMessage"
                         uib-tooltip-template="::$ctrl.messageTemplate"
-                        class="fa fa-exclamation-circle" style="font-size: smaller;"></i>`;
-}
+                        class="fa fa-exclamation-circle" style="font-size: smaller;"></i>`,
+};
 
 export const PLATFORM_HEALTH_OVERRIDE_MESSAGE = 'spinnaker.core.platformHealthOverrideMessage.component';
-module(PLATFORM_HEALTH_OVERRIDE_MESSAGE, []).component(
-  'platformHealthOverrideMessage',
-  new PlatformHealthOverrideMessage(),
-);
+module(PLATFORM_HEALTH_OVERRIDE_MESSAGE, []).component('platformHealthOverrideMessage', platformHealthOverrideMessage);

@@ -1,9 +1,9 @@
 import { IController, module } from 'angular';
-import * as momentTimezone from 'moment-timezone';
 import { has } from 'lodash';
 import { Subject } from 'rxjs';
 
 import { SETTINGS } from 'core/config/settings';
+import { DateTime, Duration } from 'luxon';
 
 interface IExecutionWindow {
   displayStart: Date;
@@ -88,9 +88,8 @@ class ExecutionWindowAtlasGraphController implements IController {
   // Used to determine how tall to make the execution window bars - it's just the max of the SPS data
   private maxCount = 0;
 
-  public constructor(private $http: ng.IHttpService, private $filter: any) {
-    'ngInject';
-  }
+  public static $inject = ['$http', '$filter'];
+  public constructor(private $http: ng.IHttpService, private $filter: any) {}
 
   public buildGraph(): void {
     if (!this.stage.restrictedExecutionWindow.atlasEnabled) {
@@ -112,13 +111,15 @@ class ExecutionWindowAtlasGraphController implements IController {
           (e: any) => e.type === 'timeseries' && e.data.values.some((v: any) => v !== 'NaN'),
         );
         timeseries.forEach((series: any) => {
-          const datapoints = series.data.values.filter((v: any) => !isNaN(v)).map((val: any, idx2: number) => {
-            this.maxCount = Math.max(this.maxCount, val);
-            return {
-              val: Math.round(val),
-              timestamp: new Date(metadata.startTime + metadata.step * idx2),
-            };
-          });
+          const datapoints = series.data.values
+            .filter((v: any) => !isNaN(v))
+            .map((val: any, idx2: number) => {
+              this.maxCount = Math.max(this.maxCount, val);
+              return {
+                val: Math.round(val),
+                timestamp: new Date(metadata.startTime + metadata.step * idx2),
+              };
+            });
           datapoints.unshift({
             val: 0,
             timestamp: new Date(metadata.startTime - metadata.step),
@@ -164,23 +165,25 @@ class ExecutionWindowAtlasGraphController implements IController {
         }
         return {
           abscissas: this.$filter('timestamp')(rows[0].row.x.getTime()),
-          rows: rows.filter(r => r.row.y1).map(row => {
-            if (row.series.dataset === 'windows') {
-              return {
-                label: '(in selected window)',
-                value: '',
-                color: row.series.color,
-                id: row.series.id,
-              };
-            } else {
-              return {
-                label: 'SPS',
-                value: row.row.y1,
-                color: row.series.color,
-                id: row.series.id,
-              };
-            }
-          }),
+          rows: rows
+            .filter(r => r.row.y1)
+            .map(row => {
+              if (row.series.dataset === 'windows') {
+                return {
+                  label: '(in selected window)',
+                  value: '',
+                  color: row.series.color,
+                  id: row.series.id,
+                };
+              } else {
+                return {
+                  label: 'SPS',
+                  value: row.row.y1,
+                  color: row.series.color,
+                  id: row.series.id,
+                };
+              }
+            }),
         };
       },
       series: [
@@ -255,27 +258,29 @@ class ExecutionWindowAtlasGraphController implements IController {
   }
 
   private createWindow(window: IExecutionWindow, dayOffset: number): IWindowData {
-    const today = new Date();
     const zone: string = SETTINGS.defaultTimeZone;
+    const { displayEnd, displayStart } = window;
 
-    const start = momentTimezone
-        .tz(today, zone)
-        .hour(window.displayStart.getHours())
-        .minute(window.displayStart.getMinutes())
-        .seconds(window.displayStart.getSeconds())
-        .milliseconds(window.displayStart.getMilliseconds())
-        .subtract(dayOffset, 'days')
-        .toDate()
-        .getTime(),
-      end = momentTimezone
-        .tz(today, zone)
-        .hour(window.displayEnd.getHours())
-        .minute(window.displayEnd.getMinutes())
-        .seconds(window.displayEnd.getSeconds())
-        .milliseconds(window.displayEnd.getMilliseconds())
-        .subtract(dayOffset, 'days')
-        .toDate()
-        .getTime();
+    const start = DateTime.local()
+        .setZone(zone)
+        .set({
+          hour: displayStart.getHours(),
+          minute: displayStart.getMinutes(),
+          second: displayStart.getSeconds(),
+          millisecond: displayStart.getMilliseconds(),
+        })
+        .minus(Duration.fromObject({ days: dayOffset }))
+        .toMillis(),
+      end = DateTime.local()
+        .setZone(zone)
+        .set({
+          hour: displayEnd.getHours(),
+          minute: displayEnd.getMinutes(),
+          second: displayEnd.getSeconds(),
+          millisecond: displayEnd.getMilliseconds(),
+        })
+        .minus(Duration.fromObject({ days: dayOffset }))
+        .toMillis();
 
     return { start, end };
   }
@@ -288,14 +293,14 @@ class ExecutionWindowAtlasGraphController implements IController {
   }
 }
 
-class AtlasGraphComponent implements ng.IComponentOptions {
-  public bindings: any = {
+const atlasGraphComponent: ng.IComponentOptions = {
+  bindings: {
     windows: '=',
     windowsUpdated: '<',
     stage: '<',
-  };
-  public controller: any = ExecutionWindowAtlasGraphController;
-  public template = `
+  },
+  controller: ExecutionWindowAtlasGraphController,
+  template: `
     <div class="form-group" ng-if="$ctrl.atlasEnabled">
       <div class="col-md-9 col-md-offset-1">
         <div class="checkbox">
@@ -335,9 +340,9 @@ class AtlasGraphComponent implements ng.IComponentOptions {
         </div>
       </div>
     </div>
-  `;
-}
+  `,
+};
 
 export const EXECUTION_WINDOW_ATLAS_GRAPH = 'spinnaker.core.pipeline.config.executionWindow.atlas.graph';
 
-module(EXECUTION_WINDOW_ATLAS_GRAPH, []).component('executionWindowAtlasGraph', new AtlasGraphComponent());
+module(EXECUTION_WINDOW_ATLAS_GRAPH, []).component('executionWindowAtlasGraph', atlasGraphComponent);

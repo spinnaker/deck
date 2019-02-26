@@ -1,5 +1,5 @@
 import { module } from 'angular';
-import * as moment from 'moment';
+import { Duration } from 'luxon';
 import { omit, omitBy, isUndefined, sortBy, find } from 'lodash';
 
 import { UUIDGenerator } from 'core/utils/uuid.service';
@@ -27,7 +27,7 @@ const MAX_ITEMS = 5;
 export class RecentHistoryService {
   private static cache: ICache = DeckCacheFactory.createCache('history', 'user', {
     version: 3,
-    maxAge: moment.duration(90, 'days').asMilliseconds(),
+    maxAge: Duration.fromObject({ days: 90 }).as('milliseconds'),
   });
 
   public static getItems(type: any): IRecentHistoryEntry[] {
@@ -132,11 +132,14 @@ export class RecentHistoryService {
 }
 
 export const RECENT_HISTORY_SERVICE = 'spinnaker.core.history.recentHistory.service';
-module(RECENT_HISTORY_SERVICE, []).run(($rootScope: ng.IRootScopeService) => {
-  $rootScope.$on('$stateChangeSuccess', (_event: IAngularEvent, toState: Ng1StateDeclaration, toParams: any) => {
-    if (toState.data && toState.data.history) {
-      const params = omit(toParams || {}, ['debug', 'vis', 'trace']);
-      RecentHistoryService.addItem(toState.data.history.type, toState.name, params, toState.data.history.keyParams);
-    }
-  });
-});
+module(RECENT_HISTORY_SERVICE, []).run([
+  '$rootScope',
+  ($rootScope: ng.IRootScopeService) => {
+    $rootScope.$on('$stateChangeSuccess', (_event: IAngularEvent, toState: Ng1StateDeclaration, toParams: any) => {
+      if (toState.data && toState.data.history) {
+        const params = omit(toParams || {}, ['debug', 'vis', 'trace']);
+        RecentHistoryService.addItem(toState.data.history.type, toState.name, params, toState.data.history.keyParams);
+      }
+    });
+  },
+]);

@@ -17,13 +17,13 @@ class KubernetesServerGroupResizeController implements IController {
     verified: false,
   };
 
+  public static $inject = ['serverGroup', '$uibModalInstance', 'serverGroupWriter', 'application'];
   constructor(
     public serverGroup: IKubernetesServerGroup,
     private $uibModalInstance: IModalServiceInstance,
     private serverGroupWriter: ServerGroupWriter,
     private application: Application,
   ) {
-    'ngInject';
     this.taskMonitor = new TaskMonitor({
       title: `Resizing ${this.serverGroup.name}`,
       application,

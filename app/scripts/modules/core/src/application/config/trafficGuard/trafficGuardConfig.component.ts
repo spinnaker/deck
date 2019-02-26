@@ -7,11 +7,15 @@ import { CLUSTER_MATCHES_COMPONENT, IClusterMatch } from 'core/widgets/cluster/c
 import './trafficGuardConfig.help';
 import { ClusterMatcher, IClusterMatchRule } from 'core/cluster/ClusterRuleMatcher';
 
+export interface ITrafficGuardRule extends IClusterMatchRule {
+  enabled: boolean;
+}
+
 export class TrafficGuardConfigController {
   public application: Application;
   public locationsByAccount: { [account: string]: string[] };
   public accounts: IAccountDetails[] = [];
-  public config: IClusterMatchRule[];
+  public config: ITrafficGuardRule[];
   public initializing = true;
   public clusterMatches: IClusterMatch[][] = [];
 
@@ -23,9 +27,8 @@ export class TrafficGuardConfigController {
     isDirty: false,
   };
 
-  public constructor(private $log: ILogService) {
-    'ngInject';
-  }
+  public static $inject = ['$log'];
+  public constructor(private $log: ILogService) {}
 
   public $onInit(): void {
     if (this.application.notFound) {
@@ -74,7 +77,7 @@ export class TrafficGuardConfigController {
   }
 
   public addGuard(): void {
-    this.config.push({ account: null, location: null, stack: null, detail: null });
+    this.config.push({ enabled: true, account: null, location: null, stack: null, detail: null });
     this.configChanged();
   }
 
@@ -109,16 +112,16 @@ export class TrafficGuardConfigController {
   }
 }
 
-class TrafficGuardConfigComponent implements ng.IComponentOptions {
-  public bindings: any = {
+const trafficGuardConfigComponent: ng.IComponentOptions = {
+  bindings: {
     application: '=',
-  };
-  public controller: any = TrafficGuardConfigController;
-  public templateUrl: string = require('./trafficGuardConfig.component.html');
-}
+  },
+  controller: TrafficGuardConfigController,
+  templateUrl: require('./trafficGuardConfig.component.html'),
+};
 
 export const TRAFFIC_GUARD_CONFIG_COMPONENT = 'spinnaker.core.application.config.trafficGuard.component';
 module(TRAFFIC_GUARD_CONFIG_COMPONENT, [CLUSTER_MATCHES_COMPONENT]).component(
   'trafficGuardConfig',
-  new TrafficGuardConfigComponent(),
+  trafficGuardConfigComponent,
 );

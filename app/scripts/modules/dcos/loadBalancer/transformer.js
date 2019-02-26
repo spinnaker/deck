@@ -7,9 +7,9 @@ const angular = require('angular');
 import { AccountService } from '@spinnaker/core';
 import { DcosProviderSettings } from '../dcos.settings';
 
-module.exports = angular
-  .module('spinnaker.dcos.loadBalancer.transformer', [])
-  .factory('dcosLoadBalancerTransformer', function($q) {
+module.exports = angular.module('spinnaker.dcos.loadBalancer.transformer', []).factory('dcosLoadBalancerTransformer', [
+  '$q',
+  function($q) {
     function normalizeLoadBalancer(loadBalancer) {
       loadBalancer.provider = loadBalancer.type;
       loadBalancer.instances = [];
@@ -31,8 +31,8 @@ module.exports = angular
         loadBalancer.account = defaultAccountIsValid
           ? defaultAccount
           : firstDcosAccount
-            ? firstDcosAccount
-            : 'my-dcos-account';
+          ? firstDcosAccount
+          : 'my-dcos-account';
 
         attemptToSetValidDcosCluster(dcosAccountsByName, defaultDcosCluster, loadBalancer);
       });
@@ -46,8 +46,8 @@ module.exports = angular
         loadBalancer.dcosCluster = defaultDcosClusterIsValid
           ? defaultDcosCluster
           : clusterNames.length == 1
-            ? clusterNames[0]
-            : null;
+          ? clusterNames[0]
+          : null;
         loadBalancer.region = loadBalancer.dcosCluster;
       }
     }
@@ -112,4 +112,5 @@ module.exports = angular
       constructNewLoadBalancerTemplate: constructNewLoadBalancerTemplate,
       convertLoadBalancerForEditing: convertLoadBalancerForEditing,
     };
-  });
+  },
+]);

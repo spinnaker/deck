@@ -79,13 +79,12 @@ export interface ITitusServerGroupCommand extends IServerGroupCommand {
 }
 
 export class TitusServerGroupConfigurationService {
+  public static $inject = ['cacheInitializer', 'loadBalancerReader', 'securityGroupReader'];
   constructor(
     private cacheInitializer: CacheInitializerService,
     private loadBalancerReader: LoadBalancerReader,
     private securityGroupReader: SecurityGroupReader,
-  ) {
-    'ngInject';
-  }
+  ) {}
 
   public configureZones(command: ITitusServerGroupCommand) {
     command.backingData.filtered.regions = command.backingData.credentialsKeyedByAccount[command.credentials].regions;

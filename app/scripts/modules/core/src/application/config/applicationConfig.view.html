@@ -4,7 +4,10 @@
       <application-attributes application="config.application"></application-attributes>
     </page-section>
     <page-section key="notifications" label="Notifications">
-      <application-notifications application="config.application" notifications="config.notifications"></application-notifications>
+      <application-notifications
+        application="config.application"
+        notifications="config.notifications"
+      ></application-notifications>
     </page-section>
     <page-section key="features" label="Features">
       <application-data-source-editor application="config.application"></application-data-source-editor>
@@ -23,6 +26,15 @@
     </page-section>
     <page-section key="snapshot" label="Serialize Application" visible="config.feature.snapshots">
       <application-snapshot-section application="config.application"></application-snapshot-section>
+    </page-section>
+    <page-section key="banner" label="Custom Banners">
+      <custom-banner-config
+        banner-configs="config.application.attributes.customBanners"
+        is-saving="config.bannerConfigProps.isSaving"
+        save-error="config.bannerConfigProps.saveError"
+        update-banner-configs="config.updateBannerConfigs"
+      >
+      </custom-banner-config>
     </page-section>
     <page-section key="delete" label="Delete Application">
       <delete-application-section application="config.application"></delete-application-section>

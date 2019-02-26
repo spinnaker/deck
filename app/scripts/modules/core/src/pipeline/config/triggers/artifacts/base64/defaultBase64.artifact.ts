@@ -22,13 +22,12 @@ module(DEFAULT_BASE64_ARTIFACT, []).config(() => {
     isDefault: true,
     isMatch: false,
     controller: function(artifact: IArtifact) {
-      'ngInject';
       this.artifact = artifact;
       this.artifact.type = 'embedded/base64';
       this.decoded = '';
       this.encodeDecodeError = '';
 
-      this.convert = (fn: ((s: string) => string), str: string): string => {
+      this.convert = (fn: (s: string) => string, str: string): string => {
         this.encodeDecodeError = '';
         try {
           return fn(str);

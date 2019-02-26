@@ -13,6 +13,7 @@ const template = `
       <loading-spinner size="'medium'"></loading-spinner>
     </div>
     <div class="navbar-inverse grid-header">
+      <custom-banner></custom-banner>
       <div ng-include="$ctrl.spinnakerHeaderTemplate"></div>
     </div>
 
@@ -26,8 +27,8 @@ const template = `
 class SpinnakerController implements IController {
   public spinnakerHeaderTemplate: string;
   public feature: IFeatures;
+  public static $inject = ['overrideRegistry'];
   constructor(overrideRegistry: OverrideRegistry) {
-    'ngInject';
     react2angular(SpinnakerHeader);
     this.spinnakerHeaderTemplate = overrideRegistry.getTemplate('spinnakerHeader', require('./spinnakerHeader.html'));
     this.feature = SETTINGS.feature;

@@ -39,7 +39,7 @@ export class CloudFoundryServerGroupConfigurationSettings
   implements IWizardPageComponent<ICloudFoundryCreateServerGroupCommand> {
   private manifestTypeUpdated = (type: string): void => {
     switch (type) {
-      case 'artifact':
+      case 'artifact': {
         const emptyManifestArtifact = {
           account: '',
           reference: '',
@@ -48,7 +48,8 @@ export class CloudFoundryServerGroupConfigurationSettings
         this.props.formik.setFieldValue('manifest', emptyManifestArtifact);
         this.capacityUpdated('1');
         break;
-      case 'trigger':
+      }
+      case 'trigger': {
         const emptyManifestTrigger = {
           account: '',
           pattern: '',
@@ -57,7 +58,8 @@ export class CloudFoundryServerGroupConfigurationSettings
         this.props.formik.setFieldValue('manifest', emptyManifestTrigger);
         this.capacityUpdated('1');
         break;
-      case 'direct':
+      }
+      case 'direct': {
         const emptyManifestDirect = {
           memory: '1024M',
           diskQuota: '1024M',
@@ -72,6 +74,7 @@ export class CloudFoundryServerGroupConfigurationSettings
         };
         this.props.formik.setFieldValue('manifest', emptyManifestDirect);
         break;
+      }
     }
   };
 
@@ -227,7 +230,7 @@ export class CloudFoundryServerGroupConfigurationSettings
       }
       if (values.manifest.routes) {
         const routeErrors = values.manifest.routes.map((route: string) => {
-          const regex = /^([a-zA-Z0-9_-]+)\.([a-zA-Z0-9_.-]+)(:[0-9]+)?([\/a-zA-Z0-9_-]+)?$/gm;
+          const regex = /^([-\w]+)\.([-.\w]+)(:\d+)?([-/\w]+)?$/gm;
           if (route && regex.exec(route) === null) {
             return `A route did not match the expected format "host.some.domain[:9999][/some/path]"`;
           }

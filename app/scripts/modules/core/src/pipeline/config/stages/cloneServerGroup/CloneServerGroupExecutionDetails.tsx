@@ -3,9 +3,10 @@ import { find, get } from 'lodash';
 
 import { AccountTag } from 'core/account';
 import { ReactInjector } from 'core/reactShims';
-import { ExecutionDetailsSection, IExecutionDetailsSectionProps } from 'core/pipeline/config/stages/core';
+import { ExecutionDetailsSection, IExecutionDetailsSectionProps } from 'core/pipeline/config/stages/common';
 import { StageFailureMessage } from 'core/pipeline';
 import { ClusterState } from 'core/state';
+import { UrlBuilder } from 'core/navigation';
 
 export interface IDeployResult {
   type: string;
@@ -60,7 +61,7 @@ export class CloneServerGroupExecutionDetails extends React.Component<
           provider: 'aws',
           project: ReactInjector.$stateParams.project,
         };
-        result.href = ReactInjector.urlBuilderService.buildFromMetadata(result);
+        result.href = UrlBuilder.buildFromMetadata(result);
         return result;
       });
     }

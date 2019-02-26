@@ -131,8 +131,9 @@ export class ServerGroupBasicSettings
   }
 
   private clientRequestsChanged = () => {
-    const { values } = this.props.formik;
+    const { values, setFieldValue } = this.props.formik;
     values.toggleSuspendedProcess(values, 'AddToLoadBalancer');
+    setFieldValue('suspendedProcesses', values.suspendedProcesses);
     this.setState({});
   };
 
@@ -319,14 +320,13 @@ export class ServerGroupBasicSettings
             </label>
           </div>
         </div>
-        {!values.viewState.disableStrategySelection &&
-          values.selectedProvider && (
-            <DeploymentStrategySelector
-              command={values}
-              onFieldChange={this.onStrategyFieldChange}
-              onStrategyChange={this.strategyChanged}
-            />
-          )}
+        {!values.viewState.disableStrategySelection && values.selectedProvider && (
+          <DeploymentStrategySelector
+            command={values}
+            onFieldChange={this.onStrategyFieldChange}
+            onStrategyChange={this.strategyChanged}
+          />
+        )}
         {!values.viewState.hideClusterNamePreview && (
           <div className="form-group">
             <div className="col-md-12">
@@ -339,26 +339,24 @@ export class ServerGroupBasicSettings
                       {createsNewCluster && <span> (new cluster)</span>}
                     </strong>
                   </p>
-                  {!createsNewCluster &&
-                    values.viewState.mode === 'create' &&
-                    latestServerGroup && (
-                      <div className="text-left">
-                        <p>There is already a server group in this cluster. Do you want to clone it?</p>
-                        <p>
-                          Cloning copies the entire configuration from the selected server group, allowing you to modify
-                          whichever fields (e.g. image) you need to change in the new server group.
-                        </p>
-                        <p>
-                          To clone a server group, select "Clone" from the "Server Group Actions" menu in the details
-                          view of the server group.
-                        </p>
-                        <p>
-                          <a className="clickable" onClick={this.navigateToLatestServerGroup}>
-                            Go to details for {latestServerGroup.name}
-                          </a>
-                        </p>
-                      </div>
-                    )}
+                  {!createsNewCluster && values.viewState.mode === 'create' && latestServerGroup && (
+                    <div className="text-left">
+                      <p>There is already a server group in this cluster. Do you want to clone it?</p>
+                      <p>
+                        Cloning copies the entire configuration from the selected server group, allowing you to modify
+                        whichever fields (e.g. image) you need to change in the new server group.
+                      </p>
+                      <p>
+                        To clone a server group, select "Clone" from the "Server Group Actions" menu in the details view
+                        of the server group.
+                      </p>
+                      <p>
+                        <a className="clickable" onClick={this.navigateToLatestServerGroup}>
+                          Go to details for {latestServerGroup.name}
+                        </a>
+                      </p>
+                    </div>
+                  )}
                 </h5>
               </div>
             </div>

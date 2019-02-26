@@ -3,12 +3,11 @@ import { react2angular } from 'react2angular';
 
 import { CloudfoundryDestroyServiceStageConfig } from './CloudfoundryDestroyServiceStageConfig';
 import { ExecutionDetailsTasks, IStage, Registry } from '@spinnaker/core';
-import { CloudfoundryDestroyServiceExecutionDetails } from './CloudfoundryDestroyServiceExecutionDetails';
+import { CloudfoundryServiceExecutionDetails } from 'cloudfoundry/presentation';
 
 class CloudFoundryDestroyServiceStageCtrl implements IController {
-  constructor(public $scope: IScope) {
-    'ngInject';
-  }
+  public static $inject = ['$scope'];
+  constructor(public $scope: IScope) {}
 }
 
 export const CLOUD_FOUNDRY_DESTROY_SERVICE_STAGE = 'spinnaker.cloudfoundry.pipeline.stage.deleteServiceStage';
@@ -22,10 +21,11 @@ module(CLOUD_FOUNDRY_DESTROY_SERVICE_STAGE, [])
       cloudProvider: 'cloudfoundry',
       templateUrl: require('./cloudfoundryDestroyServiceStage.html'),
       controller: 'cfDestroyServiceStageCtrl',
-      executionDetailsSections: [CloudfoundryDestroyServiceExecutionDetails, ExecutionDetailsTasks],
+      executionDetailsSections: [CloudfoundryServiceExecutionDetails, ExecutionDetailsTasks],
+      defaultTimeoutMs: 30 * 60 * 1000,
       validators: [
         { type: 'requiredField', fieldName: 'region' },
-        { type: 'requiredField', fieldName: 'serviceName', preventSave: true },
+        { type: 'requiredField', fieldName: 'serviceInstanceName', preventSave: true },
         { type: 'requiredField', fieldName: 'credentials', fieldLabel: 'account' },
       ],
     });

@@ -25,6 +25,7 @@ interface InstanceManager {
 }
 
 class CloudFoundryInstanceDetailsCtrl implements IController {
+  public static $inject = ['$scope', 'app', 'instance', 'instanceWriter', 'confirmationModalService', '$q'];
   constructor(
     public $scope: IScope,
     private app: Application,
@@ -33,7 +34,6 @@ class CloudFoundryInstanceDetailsCtrl implements IController {
     private confirmationModalService: ConfirmationModalService,
     private $q: IQService,
   ) {
-    'ngInject';
     this.$scope.application = this.app;
     this.$scope.instanceWriter = this.instanceWriter;
     this.$scope.confirmationModalService = this.confirmationModalService;

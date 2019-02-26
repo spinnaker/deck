@@ -3,7 +3,7 @@ import { module } from 'angular';
 import { Registry } from 'core/registry';
 
 import { ExecutionWindowExecutionDetails } from './ExecutionWindowExecutionDetails';
-import { ExecutionDetailsTasks } from '../core';
+import { ExecutionDetailsTasks } from '../common';
 
 export const EXECUTION_WINDOWS_STAGE = 'spinnaker.core.pipeline.stage.executionWindowsStage';
 
@@ -17,6 +17,9 @@ module(EXECUTION_WINDOWS_STAGE, [])
       executionDetailsSections: [ExecutionWindowExecutionDetails, ExecutionDetailsTasks],
     });
   })
-  .run((executionWindowsTransformer: any) => {
-    Registry.pipeline.registerTransformer(executionWindowsTransformer);
-  });
+  .run([
+    'executionWindowsTransformer',
+    (executionWindowsTransformer: any) => {
+      Registry.pipeline.registerTransformer(executionWindowsTransformer);
+    },
+  ]);

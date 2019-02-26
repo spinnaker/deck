@@ -270,20 +270,19 @@ export class SecurityGroupReader {
     }
   }
 
+  public static $inject = ['$log', '$q', 'securityGroupTransformer', 'providerServiceDelegate'];
   constructor(
     private $log: ILogService,
     private $q: IQService,
     private securityGroupTransformer: SecurityGroupTransformerService,
     private providerServiceDelegate: ProviderServiceDelegate,
-  ) {
-    'ngInject';
-  }
+  ) {}
 
   public getAllSecurityGroups(): IPromise<ISecurityGroupsByAccountSourceData> {
     // Because these are cached in local storage, we unfortunately need to remove the moniker, as it triples the size
     // of the object being stored, which blows out our LS quota for a sufficiently large footprint
     const cache = InfrastructureCaches.get('securityGroups');
-    const cached = !!cache ? cache.get('allGroups') : null;
+    const cached = cache ? cache.get('allGroups') : null;
     if (cached) {
       return this.$q.resolve(cached);
     }

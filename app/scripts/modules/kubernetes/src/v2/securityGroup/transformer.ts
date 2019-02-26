@@ -3,9 +3,8 @@ import { module, IQService, IPromise } from 'angular';
 import { ISecurityGroup } from '@spinnaker/core';
 
 class KubernetesV2SecurityGroupTransformer {
-  constructor(private $q: IQService) {
-    'ngInject';
-  }
+  public static $inject = ['$q'];
+  constructor(private $q: IQService) {}
 
   public normalizeSecurityGroup(securityGroup: ISecurityGroup): IPromise<ISecurityGroup> {
     return this.$q.resolve(securityGroup);

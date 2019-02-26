@@ -42,9 +42,8 @@ export class DeployInitializerController implements IController {
 
   private noTemplate: IDeployTemplate = { label: 'None', serverGroup: null, cluster: null };
 
-  constructor(private providerServiceDelegate: ProviderServiceDelegate) {
-    'ngInject';
-  }
+  public static $inject = ['providerServiceDelegate'];
+  constructor(private providerServiceDelegate: ProviderServiceDelegate) {}
 
   public $onInit(): void {
     const { viewState } = this.command;
