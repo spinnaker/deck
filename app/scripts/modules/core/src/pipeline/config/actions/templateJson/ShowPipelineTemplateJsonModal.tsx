@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { cloneDeep } from 'lodash';
 import { IModalComponentProps, JsonEditor } from 'core/presentation';
 import { IPipeline, IPipelineTemplateV2 } from 'core/domain';
 import { CopyToClipboard, noop, JsonUtils } from 'core/utils';
 import { PipelineTemplateV2Service } from 'core/pipeline/config/templates/v2/pipelineTemplateV2.service';
+import { PipelineJSONService } from 'core/pipeline/config/services/pipelineJSON.service';
 import './showPipelineTemplateJsonModal.less';
 
 const commandCopy = 'Copy "spin pipeline-templates save" command to clipboard';
@@ -28,7 +28,10 @@ export class ShowPipelineTemplateJsonModal extends React.Component<
   constructor(props: IShowPipelineTemplateJsonModalProps) {
     super(props);
 
-    const template = PipelineTemplateV2Service.createPipelineTemplate(cloneDeep(props.pipeline), props.ownerEmail);
+    const template = PipelineTemplateV2Service.createPipelineTemplate(
+      PipelineJSONService.clone(props.pipeline),
+      props.ownerEmail,
+    );
     this.state = { template };
   }
 
