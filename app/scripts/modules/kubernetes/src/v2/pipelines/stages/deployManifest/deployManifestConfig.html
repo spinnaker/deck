@@ -30,41 +30,15 @@
       field-columns="8"
       ng-if="ctrl.$scope.stage.source === ctrl.artifactSource"
     >
-      <expected-artifact-selector-react
-        expected-artifacts="ctrl.$scope.expectedArtifacts"
-        selected="ctrl.manifestArtifactDelegate.getSelectedExpectedArtifact()"
-        on-change="ctrl.manifestArtifactController.onArtifactChange"
-        on-request-create="ctrl.manifestArtifactController.onRequestCreate"
-        excluded-artifact-types="ctrl.manifestArtifactDelegate.getExcludedArtifactTypes()"
-        requesting-new="ctrl.$scope.showCreateArtifactForm"
+      <stage-artifact-selector
+        pipeline="ctrl.$scope.$parent.pipeline"
+        stage="ctrl.$scope.stage"
+        expected-artifact-id="ctrl.$scope.artifact.source == 'expectedArtifact' && ctrl.$scope.stage.manifestArtifactId"
+        artifact="ctrl.$scope.artifact.source == 'inlineArtifact' && ctrl.$scope.artifact"
+        on-expected-artifact-selected="ctrl.onExpectedArtifactSelected"
+        on-artifact-edited="ctrl.onArtifactEdited"
       >
-      </expected-artifact-selector-react>
+      </stage-artifact-selector>
     </stage-config-field>
-    <stage-config-field label="Artifact Account" field-columns="8" ng-if="ctrl.canShowAccountSelect()">
-      <artifact-account-selector-react
-        accounts="ctrl.manifestArtifactController.accountsForArtifact"
-        selected="ctrl.manifestArtifactDelegate.getSelectedAccount()"
-        on-change="ctrl.manifestArtifactController.onAccountChange"
-      >
-      </artifact-account-selector-react>
-    </stage-config-field>
-    <expected-artifact-editor-react
-      ng-if="stage.source === ctrl.artifactSource && ctrl.$scope.showCreateArtifactForm"
-      kinds="ctrl.manifestArtifactDelegate.getSupportedArtifactKinds()"
-      sources="ctrl.manifestArtifactDelegate.getExpectedArtifactSources()"
-      accounts="ctrl.manifestArtifactDelegate.getExpectedArtifactAccounts()"
-      on-save="ctrl.manifestArtifactController.onArtifactCreated"
-    >
-    </expected-artifact-editor-react>
-    <hr />
-    <expected-artifact-multi-selector
-      command="ctrl.$scope.stage"
-      ids-field="requiredArtifactIds"
-      artifact-label="Req. Artifacts To Bind"
-      expected-artifacts="ctrl.$scope.expectedArtifacts"
-      help-field-key="kubernetes.manifest.requiredArtifactsToBind"
-      show-icons="true"
-    >
-    </expected-artifact-multi-selector>
   </div>
 </div>

@@ -1,6 +1,7 @@
 import { IController, IScope } from 'angular';
-import { get, defaults } from 'lodash';
-import { ExpectedArtifactSelectorViewController, NgGenericArtifactDelegate, IManifest } from '@spinnaker/core';
+import { defaults } from 'lodash';
+import { ExpectedArtifactService } from 'core/artifact';
+import { IExpectedArtifact } from '@spinnaker/core';
 
 import {
   IKubernetesManifestCommandMetadata,
@@ -17,9 +18,7 @@ export class KubernetesV2DeployManifestConfigCtrl implements IController {
   public textSource = 'text';
   public artifactSource = 'artifact';
   public sources = [this.textSource, this.artifactSource];
-
-  public manifestArtifactDelegate: NgGenericArtifactDelegate;
-  public manifestArtifactController: ExpectedArtifactSelectorViewController;
+  public workingExpectedArtifact: IExpectedArtifact = null;
 
   public static $inject = ['$scope'];
   constructor(private $scope: IScope) {
@@ -36,26 +35,42 @@ export class KubernetesV2DeployManifestConfigCtrl implements IController {
       }
       this.metadata = builtCommand.metadata;
       this.state.loaded = true;
-      this.manifestArtifactDelegate.setAccounts(get(this, ['metadata', 'backingData', 'artifactAccounts'], []));
-      this.manifestArtifactController.updateAccounts(this.manifestArtifactDelegate.getSelectedExpectedArtifact());
     });
-
-    this.manifestArtifactDelegate = new NgGenericArtifactDelegate($scope, 'manifest');
-    this.manifestArtifactController = new ExpectedArtifactSelectorViewController(this.manifestArtifactDelegate);
+    $scope.artifact = {
+      id: '',
+      source: 'expectedArtifact',
+    };
   }
 
-  public canShowAccountSelect() {
-    return (
-      this.$scope.stage.source === this.artifactSource &&
-      !this.$scope.showCreateArtifactForm &&
-      (this.manifestArtifactController.accountsForArtifact.length > 1 &&
-        this.manifestArtifactDelegate.getSelectedExpectedArtifact() != null)
+  public onExpectedArtifactSelected = (artifact: any) => {
+    this.$scope.$applyAsync(() => {
+      this.$scope.stage.manifestArtifactId = artifact.id;
+      this.$scope.artifact = { id: artifact.id, source: 'expectedArtifact' };
+    });
+  };
+
+  public onArtifactEdited = (artifact: any) => {
+    const { pipeline } = this.$scope.$parent;
+    if (!pipeline.expectedArtifacts) {
+      pipeline.expectedArtifacts = [];
+    }
+    if (!this.workingExpectedArtifact) {
+      this.workingExpectedArtifact = ExpectedArtifactService.createEmptyArtifact();
+      this.workingExpectedArtifact.matchArtifact.type = 'unmatchable/artifact';
+    }
+    this.workingExpectedArtifact = { ...this.workingExpectedArtifact, defaultArtifact: artifact };
+    const indexOfExistingArtifactWithId = pipeline.expectedArtifacts.findIndex(
+      (ea: IExpectedArtifact) => ea.id === this.workingExpectedArtifact.id,
     );
-  }
-
-  public handleCopy = (manifest: IManifest) => {
-    this.$scope.stage.manifests = [manifest];
-    // This method is called from a React component.
-    this.$scope.$applyAsync();
+    if (indexOfExistingArtifactWithId > -1) {
+      pipeline.expectedArtifacts[indexOfExistingArtifactWithId] = this.workingExpectedArtifact;
+    } else {
+      pipeline.expectedArtifacts.push(this.workingExpectedArtifact);
+    }
+    this.$scope.$applyAsync(() => {
+      this.$scope.stage.manifestArtifactId = this.workingExpectedArtifact.id;
+      this.$scope.stage.manifestArtifactAccount = artifact.artifactAccount;
+      this.$scope.artifact = { ...artifact, source: 'inlineArtifact' };
+    });
   };
 }

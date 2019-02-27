@@ -1,5 +1,7 @@
 import * as React from 'react';
+import { module } from 'angular';
 import Select from 'react-select';
+import { react2angular } from 'react2angular';
 
 import { IArtifact, IExpectedArtifact, IPipeline, IStage } from 'core/domain';
 import { ArtifactIcon, ExpectedArtifactService } from 'core/artifact';
@@ -111,3 +113,16 @@ export class StageArtifactSelector extends React.Component<IStageArtifactSelecto
     );
   }
 }
+
+export const STAGE_ARTIFACT_SELECTOR_COMPONENT_REACT = 'spinnaker.core.artifacts.stage.artifact.selector.react';
+module(STAGE_ARTIFACT_SELECTOR_COMPONENT_REACT, []).component(
+  'stageArtifactSelector',
+  react2angular(StageArtifactSelector, [
+    'pipeline',
+    'stage',
+    'expectedArtifactId',
+    'artifact',
+    'onExpectedArtifactSelected',
+    'onArtifactEdited',
+  ]),
+);

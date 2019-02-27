@@ -45,6 +45,7 @@ import { ManifestWizard } from 'kubernetes/v2/manifest/wizard/ManifestWizard';
 import { KUBERNETES_ENABLE_MANIFEST_STAGE } from 'kubernetes/v2/pipelines/stages/traffic/enableManifest.stage';
 import { KUBERNETES_DISABLE_MANIFEST_STAGE } from 'kubernetes/v2/pipelines/stages/traffic/disableManifest.stage';
 import './pipelines/validation/manifestSelector.validator';
+import { STAGE_ARTIFACT_SELECTOR_COMPONENT_REACT } from 'core/artifact/react/StageArtifactSelector';
 
 // load all templates into the $templateCache
 const templates = require.context('kubernetes', true, /\.html$/);
@@ -97,6 +98,7 @@ module(KUBERNETES_V2_MODULE, [
   JSON_EDITOR_COMPONENT,
   KUBERNETES_ENABLE_MANIFEST_STAGE,
   KUBERNETES_DISABLE_MANIFEST_STAGE,
+  STAGE_ARTIFACT_SELECTOR_COMPONENT_REACT,
 ]).config(() => {
   CloudProviderRegistry.registerProvider('kubernetes', {
     name: 'Kubernetes',
