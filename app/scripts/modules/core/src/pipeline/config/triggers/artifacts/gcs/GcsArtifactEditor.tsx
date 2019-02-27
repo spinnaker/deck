@@ -38,6 +38,7 @@ export const GcsDefault: IArtifactKindConfig = {
 
       const clonedArtifact = cloneDeep(props.artifact);
       clonedArtifact.type = 'gcs/object';
+      clonedArtifact.reference = reference;
 
       if (reference.indexOf('#') >= 0) {
         const split = reference.split('#');

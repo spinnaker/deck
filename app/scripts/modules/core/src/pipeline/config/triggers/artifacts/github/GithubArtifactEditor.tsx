@@ -35,13 +35,16 @@ export const GithubDefault: IArtifactKindConfig = {
 
     const onReferenceChange = (reference: string) => {
       const results = pathRegex.exec(reference);
+      const clonedArtifact = cloneDeep(props.artifact);
+      clonedArtifact.type = 'github/file';
       if (results !== null) {
-        const clonedArtifact = cloneDeep(props.artifact);
         clonedArtifact.name = results[1];
         clonedArtifact.reference = reference;
-        clonedArtifact.type = 'github/file';
-        props.onChange(clonedArtifact);
+      } else {
+        clonedArtifact.name = reference;
+        clonedArtifact.reference = reference;
       }
+      props.onChange(clonedArtifact);
     };
 
     const onVersionChange = (version: string) => {
