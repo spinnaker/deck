@@ -11,7 +11,7 @@ import { ExpectedArtifactModal, ExpectedArtifactService } from 'core/artifact';
 export interface ITriggerArtifactConstraintSelectorProps {
   pipeline: IPipeline;
   artifactReferer: any; // the object referring to a set of expected artifacts
-  selected: string[]; // expected artifact ids
+  selected?: string[]; // expected artifact ids
   onDefineExpectedArtifact: (artifact: IExpectedArtifact) => void;
   onChangeSelected: (selected: string[], referer: any) => void;
 }
@@ -49,9 +49,11 @@ export class TriggerArtifactConstraintSelector extends React.Component<ITriggerA
   };
 
   public render() {
-    const { pipeline, selected } = this.props;
-    const selectedAsArtifacts = pipeline.expectedArtifacts.filter(artifact => selected.includes(artifact.id));
-    const availableArtifacts = pipeline.expectedArtifacts.filter(artifact => !selected.includes(artifact.id));
+    const { pipeline } = this.props;
+    const selected = this.props.selected || [];
+    const expectedArtifacts = pipeline.expectedArtifacts || [];
+    const selectedAsArtifacts = expectedArtifacts.filter(artifact => selected.includes(artifact.id));
+    const availableArtifacts = [...expectedArtifacts.filter(artifact => !selected.includes(artifact.id))];
 
     const createNewArtifact = ExpectedArtifactService.createEmptyArtifact();
     createNewArtifact.id = '__create.new.artifact';

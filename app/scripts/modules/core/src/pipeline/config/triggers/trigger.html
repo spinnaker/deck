@@ -35,12 +35,13 @@
           <div class="col-md-10">
             <div class="form-group">
               <label class="col-md-3 sm-label-right"
-              >Artifact Constraints<help-field key="pipeline.config.expectedArtifact"></help-field></label>
+                >Artifact Constraints<help-field key="pipeline.config.expectedArtifact"></help-field
+              ></label>
               <div class="col-md-9 row">
                 <trigger-artifact-constraint-selector-react
                   pipeline="pipeline"
                   artifact-referer="trigger"
-                  selected="trigger.expectedArtifactIds || []"
+                  selected="trigger.expectedArtifactIds"
                   on-define-expected-artifact="triggerCtrl.defineExpectedArtifact"
                   on-change-selected="triggerCtrl.changeExpectedArtifacts"
                 ></trigger-artifact-constraint-selector-react>
