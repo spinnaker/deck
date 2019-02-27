@@ -5,6 +5,8 @@ import { IPipeline, IPipelineTemplateV2 } from 'core/domain';
 import { CopyToClipboard, noop, JsonUtils } from 'core/utils';
 import { PipelineTemplateV2Service } from 'core/pipeline/config/templates/v2/pipelineTemplateV2.service';
 
+import './ShowPipelineTemplateJsonModal.less';
+
 export interface IShowPipelineTemplateJsonModalProps extends IModalComponentProps {
   ownerEmail: string;
   pipeline: IPipeline;
@@ -96,13 +98,11 @@ export class ShowPipelineTemplateJsonModal extends React.Component<
                 />
               </div>
             </div>
-            <div className="form-group text-center">
-              <label>
-                <CopyToClipboard
-                  text={`echo '${templateStr}' | spin pipeline-templates save`}
-                  toolTip={`Copy "spin pipeline-templates save" command to clipboard`}
-                />
-              </label>
+            <div className="show-pipeline-template-json-modal__copy text-right">
+              <CopyToClipboard
+                text={`echo '${templateStr}' | spin pipeline-templates save`}
+                toolTip={`Copy "spin pipeline-templates save" command to clipboard`}
+              />
             </div>
           </form>
           <JsonEditor value={templateStr} readOnly={true} />
