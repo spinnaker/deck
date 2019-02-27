@@ -45,7 +45,9 @@ export class ShowPipelineTemplateJsonModal extends React.Component<
   public render() {
     const { dismissModal } = this.props;
     const { template } = this.state;
-    const templateStr = JsonUtils.makeSortedStringFromObject(template);
+    const sortedTemplate = JsonUtils.sortObject(template);
+    const templateStr = JsonUtils.makeStringFromObject(sortedTemplate, 0);
+    const templateStrWithSpacing = JsonUtils.makeStringFromObject(sortedTemplate);
 
     return (
       <div className="flex-fill">
@@ -105,7 +107,7 @@ export class ShowPipelineTemplateJsonModal extends React.Component<
               />
             </div>
           </form>
-          <JsonEditor value={templateStr} readOnly={true} />
+          <JsonEditor value={templateStrWithSpacing} readOnly={true} />
         </div>
         <div className="modal-footer">
           <button className="btn btn-primary" onClick={dismissModal}>
