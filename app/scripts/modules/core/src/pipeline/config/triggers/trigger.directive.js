@@ -11,7 +11,7 @@ const angular = require('angular');
 
 module.exports = angular
   .module('spinnaker.core.pipeline.config.trigger.triggerDirective', [TRIGGER_ARTIFACT_CONSTRAINT_SELECTOR_REACT])
-  .directive('trigger', function () {
+  .directive('trigger', function() {
     return {
       restrict: 'E',
       require: '^pipelineConfigurer',
@@ -23,7 +23,7 @@ module.exports = angular
       },
       controller: 'TriggerCtrl as triggerCtrl',
       templateUrl: require('./trigger.html'),
-      link: function (scope, elem, attrs, pipelineConfigurerCtrl) {
+      link: function(scope, elem, attrs, pipelineConfigurerCtrl) {
         scope.pipelineConfigurerCtrl = pipelineConfigurerCtrl;
       },
     };
@@ -34,18 +34,18 @@ module.exports = angular
     '$compile',
     '$controller',
     '$templateCache',
-    function ($scope, $element, $compile, $controller, $templateCache) {
+    function($scope, $element, $compile, $controller, $templateCache) {
       let reactComponentMounted;
       var triggerTypes = Registry.pipeline.getTriggerTypes();
       $scope.options = triggerTypes;
       this.disableAutoTriggering = SETTINGS.disableAutoTriggering || [];
 
-      this.removeTrigger = function (trigger) {
+      this.removeTrigger = function(trigger) {
         var triggerIndex = $scope.pipeline.triggers.indexOf(trigger);
         $scope.pipeline.triggers.splice(triggerIndex, 1);
       };
 
-      this.changeExpectedArtifacts = function (expectedArtifacts, trigger) {
+      this.changeExpectedArtifacts = function(expectedArtifacts, trigger) {
         $scope.$applyAsync(() => {
           trigger.expectedArtifactIds = expectedArtifacts;
 
@@ -59,14 +59,16 @@ module.exports = angular
         });
       };
 
-      this.defineExpectedArtifact = function (expectedArtifact) {
+      this.defineExpectedArtifact = function(expectedArtifact) {
         $scope.$applyAsync(() => {
           const expectedArtifacts = $scope.pipeline.expectedArtifacts;
-          let editingArtifact = expectedArtifacts.findIndex(artifact => artifact.id === expectedArtifact.id);
-          if (editingArtifact >= 0) {
-            $scope.pipeline.expectedArtifacts[editingArtifact] = expectedArtifact;
-          } else if (expectedArtifacts) {
-            expectedArtifacts.push(expectedArtifact);
+          if (expectedArtifacts) {
+            let editingArtifact = expectedArtifacts.findIndex(artifact => artifact.id === expectedArtifact.id);
+            if (editingArtifact >= 0) {
+              $scope.pipeline.expectedArtifacts[editingArtifact] = expectedArtifact;
+            } else {
+              expectedArtifacts.push(expectedArtifact);
+            }
           } else {
             $scope.pipeline.expectedArtifacts = [expectedArtifact];
           }
@@ -95,7 +97,7 @@ module.exports = angular
           if (this.disableAutoTriggering.includes(type)) {
             $scope.trigger.enabled = false;
           }
-          var triggerConfig = triggerTypes.filter(function (config) {
+          var triggerConfig = triggerTypes.filter(function(config) {
             return config.key === type;
           });
           if (triggerConfig.length) {

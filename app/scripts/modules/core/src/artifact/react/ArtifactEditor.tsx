@@ -15,6 +15,10 @@ export interface IArtifactEditorProps {
   isDefault: boolean;
 }
 
+/**
+ * Editor for either the match or default side of an expected artifact. Also
+ * used in stages where an inline default artifact may be defined.
+ */
 export class ArtifactEditor extends React.Component<IArtifactEditorProps> {
   private onArtifactAccountChanged = (artifactAccount: IArtifactAccount) => {
     // reset artifact fields if the account type has changed, so we don't leave dangling properties

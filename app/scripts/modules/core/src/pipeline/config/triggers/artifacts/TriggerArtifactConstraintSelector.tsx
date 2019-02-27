@@ -23,13 +23,13 @@ export class TriggerArtifactConstraintSelector extends React.Component<ITriggerA
       return;
     }
 
-    const selected = this.props.selected.slice(0);
+    const selected = (this.props.selected || []).slice(0);
     selected[index] = selectedArtifact.id;
     this.props.onChangeSelected(selected, this.props.artifactReferer);
   };
 
   private removeExpectedArtifact = (artifact: IExpectedArtifact) => {
-    const selected = this.props.selected.slice(0);
+    const selected = (this.props.selected || []).slice(0);
     selected.splice(selected.findIndex(artifactId => artifact.id === artifactId), 1);
     this.props.onChangeSelected(selected, this.props.artifactReferer);
   };
