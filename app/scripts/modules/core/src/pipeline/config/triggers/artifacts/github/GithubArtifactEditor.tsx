@@ -31,10 +31,6 @@ export const GithubDefault: IArtifactKindConfig = {
   isDefault: true,
   isMatch: false,
   editCmp: (props: IArtifactEditorProps) => {
-    // const artifact = cloneDeep(props.artifact);
-    // artifact.type = 'github/file';
-    // props.onChange(artifact);
-
     const pathRegex = new RegExp('/repos/[^/]*/[^/]*/contents/(.*)$');
 
     const onReferenceChange = (reference: string) => {

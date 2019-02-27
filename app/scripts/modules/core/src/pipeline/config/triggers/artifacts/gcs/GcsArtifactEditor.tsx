@@ -31,10 +31,6 @@ export const GcsDefault: IArtifactKindConfig = {
   isDefault: true,
   isMatch: false,
   editCmp: (props: IArtifactEditorProps) => {
-    const artifact = cloneDeep(props.artifact);
-    artifact.type = 'gcs/object';
-    props.onChange(artifact);
-
     const onReferenceChange = (reference: string) => {
       if (isNil(reference)) {
         return;
