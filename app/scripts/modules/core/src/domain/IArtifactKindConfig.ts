@@ -1,5 +1,5 @@
 import { ComponentType, SFC } from 'react';
-import { IArtifactEditorProps } from 'core/domain';
+import { IArtifactEditorProps, IArtifact } from 'core/domain';
 
 export interface IArtifactKindConfig {
   label: string;
@@ -9,4 +9,8 @@ export interface IArtifactKindConfig {
   isDefault: boolean;
   isMatch: boolean;
   editCmp?: ComponentType<IArtifactEditorProps> | SFC<IArtifactEditorProps>;
+  // Legacy angular properties
+  controller?: (artifact: IArtifact) => void;
+  controllerAs?: string;
+  template?: string;
 }
