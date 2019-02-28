@@ -50,9 +50,11 @@ export class ExpectedArtifactService {
       useDefaultArtifact: false,
       matchArtifact: {
         id: UUIDGenerator.generateUuid(),
+        customKind: true,
       },
       defaultArtifact: {
         id: UUIDGenerator.generateUuid(),
+        customKind: true,
       },
       displayName: HumanReadableIds.random(),
     };
