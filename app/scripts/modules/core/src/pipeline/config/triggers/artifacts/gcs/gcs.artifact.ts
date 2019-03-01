@@ -2,7 +2,6 @@ import { module } from 'angular';
 
 import { IArtifact } from 'core/domain/IArtifact';
 import { Registry } from 'core/registry';
-import { GcsArtifactEditor } from './GcsArtifactEditor';
 
 export const GCS_ARTIFACT = 'spinnaker.core.pipeline.trigger.gcs.artifact';
 module(GCS_ARTIFACT, []).config(() => {
@@ -18,7 +17,6 @@ module(GCS_ARTIFACT, []).config(() => {
       this.artifact.type = 'gcs/object';
     },
     controllerAs: 'ctrl',
-    editCmp: GcsArtifactEditor,
     template: `
 <div class="col-md-12">
   <div class="form-group row">

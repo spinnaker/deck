@@ -2,7 +2,6 @@ import { IController, module } from 'angular';
 
 import { IArtifact } from 'core/domain/IArtifact';
 import { Registry } from 'core/registry';
-import { MavenArtifactEditor } from './MavenArtifactEditor';
 
 class MavenArtifactController implements IController {
   public static $inject = ['artifact'];
@@ -24,7 +23,6 @@ module(MAVEN_ARTIFACT, [])
         this.artifact.type = 'maven/file';
       },
       controllerAs: 'ctrl',
-      editCmp: MavenArtifactEditor,
       template: `
 <div class="col-md-12">
   <div class="form-group row">

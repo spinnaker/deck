@@ -15,7 +15,7 @@ export class NgAppEngineDeployArtifactDelegate
     const { viewState } = $scope.command;
     this.sources = ExpectedArtifactService.sourcesForPipelineStage(() => viewState.pipeline, viewState.stage);
     this.kinds = Registry.pipeline.getMatchArtifactKinds().filter((a: IArtifactKindConfig) => {
-      return offeredArtifactTypes.find(oat => oat.test(a.type));
+      return a.customKind || offeredArtifactTypes.find(oat => oat.test(a.type));
     });
     this.refreshExpectedArtifacts();
   }

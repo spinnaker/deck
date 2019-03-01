@@ -2,7 +2,6 @@ import { IController, module } from 'angular';
 
 import { IArtifact } from 'core/domain/IArtifact';
 import { Registry } from 'core/registry';
-import { HttpArtifactEditor } from './HttpArtifactEditor';
 
 class HttpArtifactController implements IController {
   public static $inject = ['artifact'];
@@ -24,7 +23,6 @@ module(HTTP_ARTIFACT, [])
         this.artifact.type = 'http/file';
       },
       controllerAs: 'ctrl',
-      editCmp: HttpArtifactEditor,
       template: `
 <div class="col-md-12">
   <div class="form-group row">

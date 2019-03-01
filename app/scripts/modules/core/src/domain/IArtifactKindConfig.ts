@@ -9,8 +9,10 @@ export interface IArtifactKindConfig {
   isDefault: boolean;
   isMatch: boolean;
   editCmp?: ComponentType<IArtifactEditorProps> | SFC<IArtifactEditorProps>;
-  // Legacy angular properties
+  // Legacy artifacts properties
   controller?: (artifact: IArtifact) => void;
   controllerAs?: string;
   template?: string;
+  customKind?: boolean;
+  isPubliclyAccessible?: boolean;
 }

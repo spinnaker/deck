@@ -4,7 +4,6 @@ import { ArtifactService } from '../ArtifactService';
 import { AccountService } from 'core/account/AccountService';
 import { IArtifact } from 'core/domain/IArtifact';
 import { Registry } from 'core/registry';
-import { HelmArtifactEditor } from 'core/pipeline/config/triggers/artifacts/helm/HelmArtifactEditor';
 
 export const HELM_ARTIFACT = 'spinnaker.core.pipeline.trigger.artifact.helm';
 
@@ -16,7 +15,6 @@ module(HELM_ARTIFACT, []).config(() => {
     isMatch: true,
     description: 'A helm chart to be deployed',
     key: 'helm',
-    editCmp: HelmArtifactEditor,
     controller: function(artifact: IArtifact) {
       this.artifact = artifact;
       this.artifact.type = 'helm/chart';

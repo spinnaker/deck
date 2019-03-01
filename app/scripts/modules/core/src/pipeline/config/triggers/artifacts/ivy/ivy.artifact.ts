@@ -2,7 +2,6 @@ import { IController, module } from 'angular';
 
 import { IArtifact } from 'core/domain/IArtifact';
 import { Registry } from 'core/registry';
-import { IvyArtifactEditor } from './IvyArtifactEditor';
 
 class IvyArtifactController implements IController {
   public static $inject = ['artifact'];
@@ -24,7 +23,6 @@ module(IVY_ARTIFACT, [])
         this.artifact.type = 'ivy/file';
       },
       controllerAs: 'ctrl',
-      editCmp: IvyArtifactEditor,
       template: `
 <div class="col-md-12">
   <div class="form-group row">

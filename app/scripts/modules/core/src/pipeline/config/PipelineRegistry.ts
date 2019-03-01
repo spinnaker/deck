@@ -96,7 +96,6 @@ export class PipelineRegistry {
       throw new Error(`could not find existing artifact kind config for key ${artifactKindConfig.key}`);
     }
     const originalArtifactKind = this.artifactKinds[index];
-    console.log(`merging artifact kind for key ${artifactKindConfig.key}`);
     defaults(originalArtifactKind, artifactKindConfig);
   }
 
