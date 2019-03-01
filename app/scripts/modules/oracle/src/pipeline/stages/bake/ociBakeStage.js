@@ -2,7 +2,7 @@
 
 const angular = require('angular');
 
-import { AccountService, AuthenticationService, BakeryReader, Registry } from '@spinnaker/core';
+import { AccountService, AuthenticationService, BakeryReader, Registry, PipelineTemplates } from '@spinnaker/core';
 
 module.exports = angular
   .module('spinnaker.oracle.pipeline.stage.bakeStage', [require('./bakeExecutionDetails.controller.js').name])
@@ -27,7 +27,7 @@ module.exports = angular
       restartable: true,
     });
   })
-  .controller('oracleBakeStageCtrl', function($scope, $q) {
+  .controller('oracleBakeStageCtrl', function($scope, $q, $uibModal) {
     const provider = 'oracle';
 
     if (!$scope.stage.cloudProvider) {
@@ -38,9 +38,7 @@ module.exports = angular
       $scope.stage = {};
     }
 
-    if (!$scope.stage.extended_attributes) {
-      $scope.stage.extended_attributes = {};
-    }
+    $scope.stage.extendedAttributes = $scope.stage.extendedAttributes || {};
 
     if (!$scope.stage.user) {
       $scope.stage.user = AuthenticationService.getAuthenticatedUser().name;
@@ -92,6 +90,40 @@ module.exports = angular
           $scope.stage.region = regions[0].name;
         }
       });
+    };
+
+    this.addExtendedAttribute = function() {
+      if (!$scope.stage.extendedAttributes) {
+        $scope.stage.extendedAttributes = {};
+      }
+      $uibModal
+          .open({
+            templateUrl: PipelineTemplates.addExtendedAttributes,
+            controller: 'bakeStageAddExtendedAttributeController',
+            controllerAs: 'addExtendedAttribute',
+            resolve: {
+              extendedAttribute: function() {
+                return {
+                  key: '',
+                  value: '',
+                };
+              },
+            },
+          })
+          .result.then(function(extendedAttribute) {
+        $scope.stage.extendedAttributes[extendedAttribute.key] = extendedAttribute.value;
+      })
+          .catch(() => {});
+    };
+
+    this.removeExtendedAttribute = function(key) {
+      delete $scope.stage.extendedAttributes[key];
+    };
+
+    this.showExtendedAttributes = function() {
+      return (
+          $scope.viewState.roscoMode || ($scope.stage.extendedAttributes && _.size($scope.stage.extendedAttributes) > 0)
+      );
     };
 
     $scope.$watch('stage.accountName', $scope.accountUpdated);
