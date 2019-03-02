@@ -94,7 +94,7 @@ class ArtifactCtrl implements IController {
   }
 
   public artifactIconPath(kindConfig: IArtifactKindConfig) {
-    return ArtifactIconService.getPath(kindConfig.type);
+    return kindConfig && ArtifactIconService.getPath(kindConfig.type);
   }
 }
 

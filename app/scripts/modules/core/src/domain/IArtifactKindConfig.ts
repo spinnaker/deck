@@ -5,11 +5,11 @@ export interface IArtifactKindConfig {
   label: string;
   type?: string;
   description: string;
-  key: string;
   isDefault: boolean;
-  isMatch: boolean;
   editCmp?: ComponentType<IArtifactEditorProps> | SFC<IArtifactEditorProps>;
   // Legacy artifacts properties
+  key: string;
+  isMatch: boolean;
   controller?: (artifact: IArtifact) => void;
   controllerAs?: string;
   template?: string;
