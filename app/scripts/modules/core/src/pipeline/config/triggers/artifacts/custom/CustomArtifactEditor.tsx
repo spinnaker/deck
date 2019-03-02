@@ -7,8 +7,16 @@ const input = (artifact: IArtifact, field: keyof IArtifact, pipeline: IPipeline,
   <SpelText
     placeholder={''}
     value={artifact[field] || ''}
-    onChange={(value: string) => onChange({ ...artifact, type: 'custom', [field]: value })}
+    onChange={(value: string) =>
+      onChange({
+        ...artifact,
+        type: 'custom',
+        customKind: true,
+        [field]: value,
+      })
+    }
     pipeline={pipeline}
+    F
     docLink={false}
   />
 );

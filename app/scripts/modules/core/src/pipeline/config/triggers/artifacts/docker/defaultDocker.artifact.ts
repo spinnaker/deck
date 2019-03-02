@@ -32,7 +32,6 @@ module(DEFAULT_DOCKER_ARTIFACT, []).config(() => {
     type: 'docker/image',
     isDefault: true,
     isMatch: false,
-    isPubliclyAccessible: true,
     description: 'A Docker image to be deployed.',
     key: 'default.docker',
     controller: function(artifact: IArtifact) {

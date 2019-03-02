@@ -60,9 +60,9 @@ export class TriggerArtifactConstraintSelector extends React.Component<ITriggerA
     createNewArtifact.displayName = 'Define a new artifact...';
     availableArtifacts.push(createNewArtifact);
 
-    const renderSelect = (artifact: IExpectedArtifact, i: number, editable: boolean) => (
-      <div>
-        <div className="col-md-10" key={(artifact && artifact.id) || 'new'}>
+    const renderSelect = (i: number, artifact?: IExpectedArtifact) => (
+      <div key={(artifact && artifact.id) || 'new'}>
+        <div className="col-md-10">
           <div className="artifact-select input-sm">
             <Select
               clearable={false}
@@ -75,7 +75,7 @@ export class TriggerArtifactConstraintSelector extends React.Component<ITriggerA
             />
           </div>
         </div>
-        {editable && (
+        {artifact && (
           <div className="col-md-2">
             <a className="glyphicon glyphicon-edit" onClick={() => this.editExpectedArtifact(artifact)} />
             <a className="glyphicon glyphicon-trash" onClick={() => this.removeExpectedArtifact(artifact)} />
@@ -83,12 +83,12 @@ export class TriggerArtifactConstraintSelector extends React.Component<ITriggerA
         )}
       </div>
     );
-    const renderSelectEditable = (artifact: IExpectedArtifact, i: number) => renderSelect(artifact, i, true);
+    const renderSelectEditable = (artifact: IExpectedArtifact, i: number) => renderSelect(i, artifact);
 
     return (
       <>
         {selectedAsArtifacts.map(renderSelectEditable)}
-        {renderSelect(undefined, selected.length, false)}
+        {renderSelect(selected.length)}
       </>
     );
   }

@@ -9,6 +9,8 @@ import { SpelText } from 'core/widgets';
 import { singleFieldArtifactEditor } from '../singleFieldArtifactEditor';
 import './base64.artifact.less';
 
+const TYPE = 'embedded/base64';
+
 interface IDefaultBase64ArtifactEditorState {
   decoded: string;
   encodeDecodeError: string;
@@ -21,7 +23,11 @@ class DefaultBase64ArtifactEditor extends React.Component<IArtifactEditorProps, 
 
   constructor(props: IArtifactEditorProps) {
     super(props);
-
+    if (props.artifact.type !== TYPE) {
+      const clonedArtifact = cloneDeep(props.artifact);
+      clonedArtifact.type = TYPE;
+      props.onChange(clonedArtifact);
+    }
     const [decoded, encodeDecodeError] = this.convert(atob, props.artifact.reference);
     this.state = { decoded: decoded, encodeDecodeError: encodeDecodeError };
   }
@@ -42,7 +48,7 @@ class DefaultBase64ArtifactEditor extends React.Component<IArtifactEditorProps, 
   private onNameChanged = (name: string) => {
     const artifact = cloneDeep(this.props.artifact);
     artifact.name = name;
-    artifact.type = 'embedded/base64';
+    artifact.type = TYPE;
     this.props.onChange(artifact);
   };
 
@@ -51,7 +57,7 @@ class DefaultBase64ArtifactEditor extends React.Component<IArtifactEditorProps, 
     if (!encodeDecodeError) {
       const artifact = cloneDeep(this.props.artifact);
       artifact.reference = encoded;
-      artifact.type = 'embedded/base64';
+      artifact.type = TYPE;
       this.props.onChange(artifact);
     }
     this.setState({ encodeDecodeError: encodeDecodeError });
@@ -99,17 +105,17 @@ class DefaultBase64ArtifactEditor extends React.Component<IArtifactEditorProps, 
 
 export const Base64Match: IArtifactKindConfig = {
   label: 'Base64',
-  type: 'embedded/base64',
+  type: TYPE,
   description: 'An artifact that includes its referenced resource as part of its payload.',
   key: 'base64',
   isDefault: false,
   isMatch: true,
-  editCmp: singleFieldArtifactEditor('name', 'embedded/base64', 'Name', 'base64-artifact', ''),
+  editCmp: singleFieldArtifactEditor('name', TYPE, 'Name', 'base64-artifact', ''),
 };
 
 export const Base64Default: IArtifactKindConfig = {
   label: 'Base64',
-  type: 'embedded/base64',
+  type: TYPE,
   description: 'An artifact that includes its referenced resource as part of its payload.',
   key: 'default.base64',
   isDefault: true,

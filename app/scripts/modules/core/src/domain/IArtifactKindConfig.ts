@@ -14,5 +14,4 @@ export interface IArtifactKindConfig {
   controllerAs?: string;
   template?: string;
   customKind?: boolean;
-  isPubliclyAccessible?: boolean;
 }

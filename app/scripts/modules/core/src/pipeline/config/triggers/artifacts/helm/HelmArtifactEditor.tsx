@@ -8,22 +8,29 @@ import { TetheredSelect } from 'core/presentation';
 import { ArtifactService } from '../ArtifactService';
 import { cloneDeep } from 'lodash';
 
+const TYPE = 'helm/chart';
+
 interface IHelmArtifactEditorState {
   names: string[];
   versions: string[];
 }
 
-class HelmArtifactEditor extends React.Component<IArtifactEditorProps, IHelmArtifactEditorState> {
+class HelmEditor extends React.Component<IArtifactEditorProps, IHelmArtifactEditorState> {
   constructor(props: IArtifactEditorProps) {
     super(props);
-    ArtifactService.getArtifactNames('helm/chart', this.props.account.name).then(names => {
+    if (props.artifact.type !== TYPE) {
+      const clonedArtifact = cloneDeep(props.artifact);
+      clonedArtifact.type = TYPE;
+      props.onChange(clonedArtifact);
+    }
+    ArtifactService.getArtifactNames(TYPE, this.props.account.name).then(names => {
       this.setState({ names });
     });
   }
 
   public componentWillReceiveProps(nextProps: IArtifactEditorProps) {
     if (this.props.account.name !== nextProps.account.name) {
-      ArtifactService.getArtifactNames('helm/chart', nextProps.account.name).then(names => {
+      ArtifactService.getArtifactNames(TYPE, nextProps.account.name).then(names => {
         this.setState({ names, versions: [] });
       });
     }
@@ -65,37 +72,34 @@ class HelmArtifactEditor extends React.Component<IArtifactEditorProps, IHelmArti
   private onChange = (e: Option, field: keyof IArtifact) => {
     const clone = cloneDeep(this.props.artifact);
     clone[field] = e.value.toString();
-    clone.type = 'helm/chart';
     this.props.onChange(clone);
   };
 
   private onNameChange = () => {
-    ArtifactService.getArtifactVersions(
-      'helm/chart',
-      this.props.artifact.artifactAccount,
-      this.props.artifact.name,
-    ).then(versions => {
-      this.setState({ versions });
-    });
+    ArtifactService.getArtifactVersions(TYPE, this.props.artifact.artifactAccount, this.props.artifact.name).then(
+      versions => {
+        this.setState({ versions });
+      },
+    );
   };
 }
 
 export const HelmMatch: IArtifactKindConfig = {
   label: 'Helm',
-  type: 'helm/chart',
+  type: TYPE,
   isDefault: false,
   isMatch: true,
   description: 'A helm chart to be deployed',
   key: 'helm',
-  editCmp: HelmArtifactEditor,
+  editCmp: HelmEditor,
 };
 
 export const HelmDefault: IArtifactKindConfig = {
   label: 'Helm',
-  type: 'helm/chart',
+  type: TYPE,
   isDefault: true,
   isMatch: false,
   description: 'A helm chart to be deployed',
   key: 'helm',
-  editCmp: HelmArtifactEditor,
+  editCmp: HelmEditor,
 };

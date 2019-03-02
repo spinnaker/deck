@@ -6,17 +6,20 @@ import { StageConfigField } from 'core/pipeline';
 import { SpelText } from 'core/widgets';
 
 import { singleFieldArtifactEditor } from '../singleFieldArtifactEditor';
+import { ArtifactEditor } from '../ArtifactEditor';
+
+const TYPE = 'gcs/object';
 
 export const GcsMatch: IArtifactKindConfig = {
   label: 'GCS',
-  type: 'gcs/object',
+  type: TYPE,
   description: 'A GCS object.',
   key: 'gcs',
   isDefault: false,
   isMatch: true,
   editCmp: singleFieldArtifactEditor(
     'name',
-    'gcs/object',
+    TYPE,
     'Object path',
     'gs://bucket/path/to/file',
     'pipeline.config.expectedArtifact.gcs.name',
@@ -25,19 +28,22 @@ export const GcsMatch: IArtifactKindConfig = {
 
 export const GcsDefault: IArtifactKindConfig = {
   label: 'GCS',
-  type: 'gcs/object',
+  type: TYPE,
   description: 'A GCS object.',
   key: 'default.gcs',
   isDefault: true,
   isMatch: false,
-  editCmp: (props: IArtifactEditorProps) => {
-    const onReferenceChange = (reference: string) => {
+  editCmp: class extends ArtifactEditor {
+    constructor(props: IArtifactEditorProps) {
+      super(props, TYPE);
+    }
+
+    private onReferenceChange = (reference: string) => {
       if (isNil(reference)) {
         return;
       }
 
-      const clonedArtifact = cloneDeep(props.artifact);
-      clonedArtifact.type = 'gcs/object';
+      const clonedArtifact = cloneDeep(this.props.artifact);
       clonedArtifact.reference = reference;
 
       if (reference.indexOf('#') >= 0) {
@@ -47,19 +53,21 @@ export const GcsDefault: IArtifactKindConfig = {
       } else {
         clonedArtifact.name = reference;
       }
-      props.onChange(clonedArtifact);
+      this.props.onChange(clonedArtifact);
     };
 
-    return (
-      <StageConfigField label="Object path" helpKey="pipeline.config.expectedArtifact.defaultGcs.reference">
-        <SpelText
-          placeholder="gs://bucket/path/to/file"
-          value={props.artifact.reference}
-          onChange={onReferenceChange}
-          pipeline={props.pipeline}
-          docLink={true}
-        />
-      </StageConfigField>
-    );
+    public render() {
+      return (
+        <StageConfigField label="Object path" helpKey="pipeline.config.expectedArtifact.defaultGcs.reference">
+          <SpelText
+            placeholder="gs://bucket/path/to/file"
+            value={this.props.artifact.reference}
+            onChange={this.onReferenceChange}
+            pipeline={this.props.pipeline}
+            docLink={true}
+          />
+        </StageConfigField>
+      );
+    }
   },
 };

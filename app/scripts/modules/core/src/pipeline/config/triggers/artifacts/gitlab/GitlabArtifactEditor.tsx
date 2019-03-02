@@ -6,17 +6,20 @@ import { StageConfigField } from 'core/pipeline';
 import { SpelText } from 'core/widgets';
 
 import { singleFieldArtifactEditor } from '../singleFieldArtifactEditor';
+import { ArtifactEditor } from '../ArtifactEditor';
+
+const TYPE = 'gitlab/file';
 
 export const GitlabMatch: IArtifactKindConfig = {
   label: 'Gitlab',
-  type: 'gitlab/file',
+  type: TYPE,
   description: 'A file stored in git, hosted by Gitlab.',
   key: 'gitlab',
   isDefault: false,
   isMatch: true,
   editCmp: singleFieldArtifactEditor(
     'name',
-    'gitlab/file',
+    TYPE,
     'File path',
     'manifests/frontend.yaml',
     'pipeline.config.expectedArtifact.git.name',
@@ -25,53 +28,54 @@ export const GitlabMatch: IArtifactKindConfig = {
 
 export const GitlabDefault: IArtifactKindConfig = {
   label: 'Gitlab',
-  type: 'gitlab/file',
+  type: TYPE,
   description: 'A file stored in git, hosted by Gitlab.',
   key: 'default.gitlab',
   isDefault: true,
   isMatch: false,
-  editCmp: (props: IArtifactEditorProps) => {
-    const pathRegex = new RegExp('/api/v4/projects/[^/]*/[^/]*/repository/files/(.*)$');
+  editCmp: class extends ArtifactEditor {
+    constructor(props: IArtifactEditorProps) {
+      super(props, TYPE);
+    }
 
-    const onReferenceChange = (reference: string) => {
-      const results = pathRegex.exec(reference);
+    private pathRegex = new RegExp('/repos/[^/]*/[^/]*/contents/(.*)$');
+
+    private onReferenceChange = (reference: string) => {
+      const results = this.pathRegex.exec(reference);
+      const clonedArtifact = cloneDeep(this.props.artifact);
       if (results !== null) {
-        const clonedArtifact = cloneDeep(props.artifact);
-        clonedArtifact.name = decodeURIComponent(results[1]);
+        clonedArtifact.name = results[1];
         clonedArtifact.reference = reference;
-        clonedArtifact.type = 'gitlab/file';
-        props.onChange(clonedArtifact);
+      } else {
+        clonedArtifact.name = reference;
+        clonedArtifact.reference = reference;
       }
+      this.props.onChange(clonedArtifact);
     };
 
-    const onVersionChange = (version: string) => {
-      const clonedArtifact = cloneDeep(props.artifact);
-      clonedArtifact.version = version;
-      clonedArtifact.type = 'gitlab/file';
-      props.onChange(clonedArtifact);
-    };
-
-    return (
-      <>
-        <StageConfigField label="Content URL" helpKey="pipeline.config.expectedArtifact.defaultGitlab.reference">
-          <SpelText
-            placeholder="https://gitlab.com/api/v4/projects/$ORG%2F$REPO/repository/files/path%2Fto%2Ffile.yml/raw"
-            value={props.artifact.reference}
-            onChange={onReferenceChange}
-            pipeline={props.pipeline}
-            docLink={false}
-          />
-        </StageConfigField>
-        <StageConfigField label="Commit/Branch" helpKey="pipeline.config.expectedArtifact.defaultGitlab.version">
-          <SpelText
-            placeholder="master"
-            value={props.artifact.version}
-            onChange={onVersionChange}
-            pipeline={props.pipeline}
-            docLink={false}
-          />
-        </StageConfigField>
-      </>
-    );
+    public render() {
+      return (
+        <>
+          <StageConfigField label="Content URL" helpKey="pipeline.config.expectedArtifact.defaultGithub.reference">
+            <SpelText
+              placeholder="https://api.github.com/repos/$ORG/$REPO/contents/$FILEPATH"
+              value={this.props.artifact.reference}
+              onChange={this.onReferenceChange}
+              pipeline={this.props.pipeline}
+              docLink={false}
+            />
+          </StageConfigField>
+          <StageConfigField label="Commit/Branch" helpKey="pipeline.config.expectedArtifact.defaultGithub.version">
+            <SpelText
+              placeholder="master"
+              value={this.props.artifact.version}
+              onChange={this.onVersionChange}
+              pipeline={this.props.pipeline}
+              docLink={false}
+            />
+          </StageConfigField>
+        </>
+      );
+    }
   },
 };

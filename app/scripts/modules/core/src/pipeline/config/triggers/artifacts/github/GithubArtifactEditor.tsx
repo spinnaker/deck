@@ -6,17 +6,20 @@ import { StageConfigField } from 'core/pipeline';
 import { SpelText } from 'core/widgets';
 
 import { singleFieldArtifactEditor } from '../singleFieldArtifactEditor';
+import { ArtifactEditor } from '../ArtifactEditor';
+
+const TYPE = 'github/file';
 
 export const GithubMatch: IArtifactKindConfig = {
   label: 'GitHub',
   description: 'A file stored in git, hosted by GitHub.',
   key: 'github',
-  type: 'github/file',
+  type: TYPE,
   isDefault: false,
   isMatch: true,
   editCmp: singleFieldArtifactEditor(
     'name',
-    'github/file',
+    TYPE,
     'File path',
     'manifests/frontend.yaml',
     'pipeline.config.expectedArtifact.git.name',
@@ -25,18 +28,21 @@ export const GithubMatch: IArtifactKindConfig = {
 
 export const GithubDefault: IArtifactKindConfig = {
   label: 'GitHub',
-  type: 'github/file',
+  type: TYPE,
   description: 'A file stored in git, hosted by GitHub.',
   key: 'default.github',
   isDefault: true,
   isMatch: false,
-  editCmp: (props: IArtifactEditorProps) => {
-    const pathRegex = new RegExp('/repos/[^/]*/[^/]*/contents/(.*)$');
+  editCmp: class extends ArtifactEditor {
+    constructor(props: IArtifactEditorProps) {
+      super(props, TYPE);
+    }
 
-    const onReferenceChange = (reference: string) => {
-      const results = pathRegex.exec(reference);
-      const clonedArtifact = cloneDeep(props.artifact);
-      clonedArtifact.type = 'github/file';
+    private pathRegex = new RegExp('/repos/[^/]*/[^/]*/contents/(.*)$');
+
+    private onReferenceChange = (reference: string) => {
+      const results = this.pathRegex.exec(reference);
+      const clonedArtifact = cloneDeep(this.props.artifact);
       if (results !== null) {
         clonedArtifact.name = results[1];
         clonedArtifact.reference = reference;
@@ -44,37 +50,32 @@ export const GithubDefault: IArtifactKindConfig = {
         clonedArtifact.name = reference;
         clonedArtifact.reference = reference;
       }
-      props.onChange(clonedArtifact);
+      this.props.onChange(clonedArtifact);
     };
 
-    const onVersionChange = (version: string) => {
-      const clonedArtifact = cloneDeep(props.artifact);
-      clonedArtifact.version = version;
-      clonedArtifact.type = 'github/file';
-      props.onChange(clonedArtifact);
-    };
-
-    return (
-      <>
-        <StageConfigField label="Content URL" helpKey="pipeline.config.expectedArtifact.defaultGithub.reference">
-          <SpelText
-            placeholder="https://api.github.com/repos/$ORG/$REPO/contents/$FILEPATH"
-            value={props.artifact.reference}
-            onChange={onReferenceChange}
-            pipeline={props.pipeline}
-            docLink={false}
-          />
-        </StageConfigField>
-        <StageConfigField label="Commit/Branch" helpKey="pipeline.config.expectedArtifact.defaultGithub.version">
-          <SpelText
-            placeholder="master"
-            value={props.artifact.version}
-            onChange={onVersionChange}
-            pipeline={props.pipeline}
-            docLink={false}
-          />
-        </StageConfigField>
-      </>
-    );
+    public render() {
+      return (
+        <>
+          <StageConfigField label="Content URL" helpKey="pipeline.config.expectedArtifact.defaultGithub.reference">
+            <SpelText
+              placeholder="https://api.github.com/repos/$ORG/$REPO/contents/$FILEPATH"
+              value={this.props.artifact.reference}
+              onChange={this.onReferenceChange}
+              pipeline={this.props.pipeline}
+              docLink={false}
+            />
+          </StageConfigField>
+          <StageConfigField label="Commit/Branch" helpKey="pipeline.config.expectedArtifact.defaultGithub.version">
+            <SpelText
+              placeholder="master"
+              value={this.props.artifact.version}
+              onChange={this.onVersionChange}
+              pipeline={this.props.pipeline}
+              docLink={false}
+            />
+          </StageConfigField>
+        </>
+      );
+    }
   },
 };

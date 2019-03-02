@@ -6,6 +6,9 @@ import { StageConfigField } from 'core/pipeline';
 import { SpelText } from 'core/widgets';
 
 import { singleFieldArtifactEditor } from '../singleFieldArtifactEditor';
+import { ArtifactEditor } from '../ArtifactEditor';
+
+const TYPE = 'docker/image';
 
 export const setNameAndVersionFromReference = (artifact: IArtifact) => {
   const ref = artifact.reference;
@@ -31,14 +34,14 @@ export const setNameAndVersionFromReference = (artifact: IArtifact) => {
 
 export const DockerMatch: IArtifactKindConfig = {
   label: 'Docker',
-  type: 'docker/image',
+  type: TYPE,
   isDefault: false,
   isMatch: true,
   description: 'A Docker image to be deployed.',
   key: 'docker',
   editCmp: singleFieldArtifactEditor(
     'name',
-    'docker/image',
+    TYPE,
     'Docker image',
     'gcr.io/project/image',
     'pipeline.config.expectedArtifact.docker.name',
@@ -47,29 +50,34 @@ export const DockerMatch: IArtifactKindConfig = {
 
 export const DockerDefault: IArtifactKindConfig = {
   label: 'Docker',
-  type: 'docker/image',
+  type: TYPE,
   isDefault: true,
   isMatch: false,
   description: 'A Docker image to be deployed.',
   key: 'default.docker',
-  editCmp: (props: IArtifactEditorProps) => {
-    const onReferenceChanged = (reference: string) => {
-      const clonedArtifact = cloneDeep(props.artifact);
+  editCmp: class extends ArtifactEditor {
+    constructor(props: IArtifactEditorProps) {
+      super(props, TYPE);
+    }
+
+    private onReferenceChanged = (reference: string) => {
+      const clonedArtifact = cloneDeep(this.props.artifact);
       clonedArtifact.reference = reference;
-      clonedArtifact.type = 'docker/image';
-      props.onChange(setNameAndVersionFromReference(clonedArtifact));
+      this.props.onChange(setNameAndVersionFromReference(clonedArtifact));
     };
 
-    return (
-      <StageConfigField label="Object path" helpKey="pipeline.config.expectedArtifact.defaultDocker.reference">
-        <SpelText
-          placeholder="gcr.io/project/image@sha256:9efcc2818c9..."
-          value={props.artifact.reference}
-          onChange={onReferenceChanged}
-          pipeline={props.pipeline}
-          docLink={true}
-        />
-      </StageConfigField>
-    );
+    public render() {
+      return (
+        <StageConfigField label="Object path" helpKey="pipeline.config.expectedArtifact.defaultDocker.reference">
+          <SpelText
+            placeholder="gcr.io/project/image@sha256:9efcc2818c9..."
+            value={this.props.artifact.reference}
+            onChange={this.onReferenceChanged}
+            pipeline={this.props.pipeline}
+            docLink={true}
+          />
+        </StageConfigField>
+      );
+    }
   },
 };
