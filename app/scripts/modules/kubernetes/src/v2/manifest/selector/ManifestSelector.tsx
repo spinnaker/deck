@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Creatable, Option } from 'react-select';
+import Select, { Creatable, Option } from 'react-select';
 import { IPromise } from 'angular';
 import { Observable, Subject } from 'rxjs';
 import { $q } from 'ngimport';
@@ -19,8 +19,14 @@ import {
   ScopeClusterSelector,
 } from '@spinnaker/core';
 
-import { IManifestSelector, SelectorMode } from 'kubernetes/v2/manifest/selector/IManifestSelector';
+import {
+  IManifestSelector,
+  SelectorMode,
+  SelectorModeDataMap,
+} from 'kubernetes/v2/manifest/selector/IManifestSelector';
 import { ManifestKindSearchService } from 'kubernetes/v2/manifest/ManifestKindSearch';
+import LabelEditor from 'kubernetes/v2/manifest/selector/labelEditor/LabelEditor';
+import { IManifestLabelSelector } from 'kubernetes/v2/manifest/selector/IManifestLabelSelector';
 
 export interface IManifestSelectorProps {
   selector: IManifestSelector;
@@ -59,9 +65,7 @@ class StaticManifestSelectorHandler implements ISelectorHandler {
   public handleModeChange = (): void => {
     const { selector } = this.component.state;
     this.handleKindChange(selector.kind);
-    selector.kind = null;
-    selector.criteria = null;
-    selector.cluster = null;
+    Object.assign(selector, SelectorModeDataMap.static.selectorDefaults);
     this.component.setStateAndUpdateStage({ selector });
   };
 
@@ -82,8 +86,8 @@ class DynamicManifestSelectorHandler implements ISelectorHandler {
   public handleModeChange = (): void => {
     const { selector } = this.component.state;
     const { kind } = parseSpinnakerName(selector.manifestName);
-    selector.kind = kind;
-    selector.manifestName = null;
+    selector.kind = kind || null;
+    Object.assign(selector, SelectorModeDataMap.dynamic.selectorDefaults);
     this.component.setStateAndUpdateStage({ selector });
   };
 
@@ -92,6 +96,22 @@ class DynamicManifestSelectorHandler implements ISelectorHandler {
   };
 
   public getKind = (): string => this.component.state.selector.kind;
+}
+
+class LabelManifestSelectorHandler implements ISelectorHandler {
+  constructor(private component: ManifestSelector) {}
+
+  public handles = (mode: SelectorMode): boolean => mode === SelectorMode.Label;
+
+  public handleModeChange = (): void => {
+    const { selector } = this.component.state;
+    Object.assign(selector, SelectorModeDataMap.label.selectorDefaults);
+    this.component.setStateAndUpdateStage({ selector });
+  };
+
+  public handleKindChange = (): void => {};
+
+  public getKind = (): string => null;
 }
 
 export class ManifestSelector extends React.Component<IManifestSelectorProps, IManifestSelectorState> {
@@ -115,7 +135,11 @@ export class ManifestSelector extends React.Component<IManifestSelectorProps, IM
       resources: [],
       loading: false,
     };
-    this.handlers = [new StaticManifestSelectorHandler(this), new DynamicManifestSelectorHandler(this)];
+    this.handlers = [
+      new StaticManifestSelectorHandler(this),
+      new DynamicManifestSelectorHandler(this),
+      new LabelManifestSelectorHandler(this),
+    ];
   }
 
   public setStateAndUpdateStage = (state: Partial<IManifestSelectorState>, cb?: () => void): void => {
@@ -133,10 +157,10 @@ export class ManifestSelector extends React.Component<IManifestSelectorProps, IM
       .switchMap(({ kind, namespace, account }) => Observable.fromPromise(this.search(kind, namespace, account)))
       .takeUntil(this.destroy$)
       .subscribe(resources => {
-        if (this.state.selector.manifestName == null) {
+        if (this.state.selector.manifestName == null && this.getSelectedMode() === SelectorMode.Static) {
           this.handleNameChange('');
         }
-        this.setStateAndUpdateStage({ loading: false, resources: resources });
+        this.setStateAndUpdateStage({ loading: false, resources: resources, selector: this.state.selector });
       });
   };
 
@@ -248,15 +272,26 @@ export class ManifestSelector extends React.Component<IManifestSelectorProps, IM
     this.setStateAndUpdateStage({ selector: this.state.selector });
   };
 
-  private modeDelegate = (): ISelectorHandler =>
-    this.handlers.find(handler => handler.handles(this.state.selector.mode || SelectorMode.Static));
+  public handleKindsChange = (kinds: string[]): void => {
+    this.state.selector.kinds = kinds;
+    this.setStateAndUpdateStage({ selector: this.state.selector });
+  };
+
+  public handleLabelSelectorsChange = (labelSelectors: IManifestLabelSelector[]): void => {
+    this.state.selector.labelSelectors.selectors = labelSelectors;
+    this.setStateAndUpdateStage({ selector: this.state.selector });
+  };
+
+  private modeDelegate = (): ISelectorHandler => this.handlers.find(handler => handler.handles(this.getSelectedMode()));
 
   private promptTextCreator = (text: string) => `Use custom expression: ${text}`;
 
+  private getSelectedMode = (): SelectorMode => this.state.selector.mode || SelectorMode.Static;
+
   public render() {
     const { TargetSelect } = NgReact;
-    const mode = this.state.selector.mode || SelectorMode.Static;
-    const modes = this.props.modes || [mode];
+    const selectedMode = this.getSelectedMode();
+    const modes = this.props.modes || [selectedMode];
     const { selector, accounts, kinds, namespaces, resources, loading } = this.state;
     const kind = this.modeDelegate().getKind();
     const name = parseSpinnakerName(selector.manifestName).name;
@@ -267,6 +302,18 @@ export class ManifestSelector extends React.Component<IManifestSelectorProps, IM
         AppListExtractor.clusterFilterForCredentialsAndRegion(selector.account, selector.location)(serverGroup) &&
         get(serverGroup, 'serverGroupManagers.length', 0) === 0 &&
         parseSpinnakerName(serverGroup.name).kind === this.modeDelegate().getKind(),
+    );
+    const selectedKinds = selector.kinds || [];
+    const KindField = (
+      <StageConfigField label="Kind">
+        <Creatable
+          clearable={false}
+          value={{ value: kind, label: kind }}
+          options={kinds.map(k => ({ value: k, label: k }))}
+          onChange={(option: Option<string>) => this.handleKindChange(option && option.value)}
+          promptTextCreator={this.promptTextCreator}
+        />
+      </StageConfigField>
     );
 
     return (
@@ -288,42 +335,26 @@ export class ManifestSelector extends React.Component<IManifestSelectorProps, IM
             promptTextCreator={this.promptTextCreator}
           />
         </StageConfigField>
-        <StageConfigField label="Kind">
-          <Creatable
-            clearable={false}
-            value={{ value: kind, label: kind }}
-            options={kinds.map(k => ({ value: k, label: k }))}
-            onChange={(option: Option<string>) => this.handleKindChange(option && option.value)}
-            promptTextCreator={this.promptTextCreator}
-          />
-        </StageConfigField>
+        {!modes.includes(SelectorMode.Label) && KindField}
         {modes.length > 1 && (
           <StageConfigField label="Selector">
-            <div className="radio">
-              <label htmlFor="static">
-                <input
-                  type="radio"
-                  onChange={() => this.handleModeSelect(SelectorMode.Static)}
-                  checked={mode === SelectorMode.Static}
-                  id="static"
-                />{' '}
-                Choose a static target
-              </label>
-            </div>
-            <div className="radio">
-              <label htmlFor="dynamic">
-                <input
-                  type="radio"
-                  onChange={() => this.handleModeSelect(SelectorMode.Dynamic)}
-                  checked={mode === SelectorMode.Dynamic}
-                  id="dynamic"
-                />{' '}
-                Choose a target dynamically
-              </label>
-            </div>
+            {modes.map(mode => (
+              <div className="radio" key={mode}>
+                <label htmlFor={mode}>
+                  <input
+                    type="radio"
+                    onChange={() => this.handleModeSelect(mode)}
+                    checked={selectedMode === mode}
+                    id={mode}
+                  />{' '}
+                  {get(SelectorModeDataMap, [mode, 'label'], '')}
+                </label>
+              </div>
+            ))}
           </StageConfigField>
         )}
-        {modes.includes(SelectorMode.Static) && mode === SelectorMode.Static && (
+        {modes.includes(SelectorMode.Label) && selectedMode !== SelectorMode.Label && KindField}
+        {modes.includes(SelectorMode.Static) && selectedMode === SelectorMode.Static && (
           <StageConfigField label="Name">
             <Creatable
               isLoading={loading}
@@ -335,7 +366,7 @@ export class ManifestSelector extends React.Component<IManifestSelectorProps, IM
             />
           </StageConfigField>
         )}
-        {modes.includes(SelectorMode.Dynamic) && mode === SelectorMode.Dynamic && (
+        {modes.includes(SelectorMode.Dynamic) && selectedMode === SelectorMode.Dynamic && (
           <>
             <StageConfigField label="Cluster">
               <ScopeClusterSelector clusters={clusters} model={selector.cluster} onChange={this.handleClusterChange} />
@@ -345,6 +376,25 @@ export class ManifestSelector extends React.Component<IManifestSelectorProps, IM
                 onChange={this.handleCriteriaChange}
                 model={{ target: selector.criteria }}
                 options={StageConstants.MANIFEST_CRITERIA_OPTIONS}
+              />
+            </StageConfigField>
+          </>
+        )}
+        {modes.includes(SelectorMode.Label) && selectedMode === SelectorMode.Label && (
+          <>
+            <StageConfigField label="Kinds">
+              <Select
+                clearable={false}
+                multi={true}
+                value={selectedKinds}
+                options={kinds.map(k => ({ value: k, label: k }))}
+                onChange={(options: Array<Option<string>>) => this.handleKindsChange(options.map(o => o.value))}
+              />
+            </StageConfigField>
+            <StageConfigField label="Labels">
+              <LabelEditor
+                labelSelectors={get(selector, 'labelSelectors.selectors', [])}
+                onLabelSelectorsChange={this.handleLabelSelectorsChange}
               />
             </StageConfigField>
           </>
