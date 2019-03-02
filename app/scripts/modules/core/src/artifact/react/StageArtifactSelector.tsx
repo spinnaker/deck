@@ -18,6 +18,9 @@ export interface IStageArtifactSelectorProps {
 
   onExpectedArtifactSelected: (expectedArtifact: IExpectedArtifact) => void;
   onArtifactEdited: (artifact: IArtifact) => void;
+
+  excludedArtifactIds?: string[];
+  excludedArtifactTyps?: string[];
 }
 
 export interface IStageArtifactSelectorState {
@@ -53,7 +56,13 @@ export class StageArtifactSelector extends React.Component<IStageArtifactSelecto
     return (
       <span>
         {value.id !== DEFINE_NEW_ARTIFACT && (
-          <ArtifactIcon type={value.defaultArtifact && value.defaultArtifact.type} width="16" height="16" />
+          <ArtifactIcon
+            type={
+              (value.matchArtifact && value.matchArtifact.type) || (value.defaultArtifact && value.defaultArtifact.type)
+            }
+            width="16"
+            height="16"
+          />
         )}
         {value && value.displayName}
       </span>
@@ -73,7 +82,7 @@ export class StageArtifactSelector extends React.Component<IStageArtifactSelecto
   };
 
   public render() {
-    const { pipeline, stage, expectedArtifactId, artifact } = this.props;
+    const { pipeline, stage, expectedArtifactId, artifact, excludedArtifactIds } = this.props;
     const expectedArtifacts = ExpectedArtifactService.getExpectedArtifactsAvailableToStage(stage, pipeline);
     const expectedArtifact = expectedArtifactId
       ? expectedArtifacts.find(a => a.id === expectedArtifactId)
@@ -85,7 +94,12 @@ export class StageArtifactSelector extends React.Component<IStageArtifactSelecto
         }
       : undefined;
 
-    const options = [this.defineNewArtifactOption, ...expectedArtifacts];
+    const options = [
+      this.defineNewArtifactOption,
+      ...expectedArtifacts.filter(
+        (a: IExpectedArtifact) => !excludedArtifactIds || !excludedArtifactIds.includes(a.id),
+      ),
+    ];
 
     return (
       <>
@@ -116,7 +130,7 @@ export class StageArtifactSelector extends React.Component<IStageArtifactSelecto
 
 export const STAGE_ARTIFACT_SELECTOR_COMPONENT_REACT = 'spinnaker.core.artifacts.stage.artifact.selector.react';
 module(STAGE_ARTIFACT_SELECTOR_COMPONENT_REACT, []).component(
-  'stageArtifactSelector',
+  'stageArtifactSelectorReact',
   react2angular(StageArtifactSelector, [
     'pipeline',
     'stage',
