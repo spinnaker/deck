@@ -16,7 +16,6 @@ const input = (artifact: IArtifact, field: keyof IArtifact, pipeline: IPipeline,
       })
     }
     pipeline={pipeline}
-    F
     docLink={false}
   />
 );
