@@ -49,7 +49,6 @@ describe('ExpectedArtifactService', () => {
     };
     beforeAll(() => {
       kindConfigs.forEach(kindConfig => Registry.pipeline.registerArtifactKind(kindConfig));
-      Registry.pipeline.registerCustomArtifactKind(customKindConfig);
     });
 
     it('returns the custom kind when set as the artifact kind', () => {
@@ -105,14 +104,6 @@ describe('ExpectedArtifactService', () => {
         type: 'bar-type',
       };
       const kindConfig = ExpectedArtifactService.getKindConfig(artifact, true);
-      expect(kindConfig).toEqual(customKindConfig);
-    });
-
-    it('returns the default kind if neither kind nor type are stored on artifact', () => {
-      const artifact: IArtifact = {
-        id: 'artifact-id',
-      };
-      const kindConfig = ExpectedArtifactService.getKindConfig(artifact, false);
       expect(kindConfig).toEqual(customKindConfig);
     });
 

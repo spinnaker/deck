@@ -22,7 +22,7 @@ class ExpectedArtifactController implements IComponentController {
     } = this;
     if (useDefaultArtifact && defaultArtifact.type == null) {
       const defaultKindConfig = ExpectedArtifactService.getKindConfig(matchArtifact, true);
-      defaultArtifact.type = defaultKindConfig.type || matchArtifact.type;
+      defaultArtifact.type = (defaultKindConfig && defaultKindConfig.type) || matchArtifact.type;
       // kind is deprecated; remove it from artifacts as they are updated
       delete defaultArtifact.kind;
       defaultArtifact.customKind = defaultKindConfig.customKind;

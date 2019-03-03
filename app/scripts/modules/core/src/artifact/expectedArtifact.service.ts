@@ -102,13 +102,13 @@ export class ExpectedArtifactService {
 
   public static getKindConfig(artifact: IArtifact, isDefault: boolean): IArtifactKindConfig {
     if (artifact == null || artifact.customKind || artifact.kind === 'custom') {
-      return Registry.pipeline.getCustomArtifactKind();
+      return undefined;
     }
     const kinds = isDefault ? Registry.pipeline.getDefaultArtifactKinds() : Registry.pipeline.getMatchArtifactKinds();
     const inferredKindConfig = kinds.find(k => k.type === artifact.type);
     if (inferredKindConfig !== undefined) {
       return inferredKindConfig;
     }
-    return Registry.pipeline.getCustomArtifactKind();
+    return undefined;
   }
 }

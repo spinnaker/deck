@@ -7,6 +7,7 @@ import {
   IArtifact,
   IExpectedArtifact,
   ArtifactTypePatterns,
+  SETTINGS,
 } from '@spinnaker/core';
 
 import {
@@ -14,7 +15,6 @@ import {
   IKubernetesManifestCommandData,
   KubernetesManifestCommandBuilder,
 } from 'kubernetes/v2/manifest/manifestCommandBuilder.service';
-import { SETTINGS } from 'core/config/settings';
 
 import { IManifestBindArtifact } from './ManifestBindArtifactsSelector';
 
