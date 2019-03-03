@@ -1,6 +1,7 @@
 import { cloneDeep } from 'lodash';
 import * as React from 'react';
 
+import { ArtifactTypePatterns } from 'core/artifact';
 import { IArtifactEditorProps, IArtifactKindConfig } from 'core/domain';
 import { StageConfigField } from 'core/pipeline';
 import { SpelText } from 'core/widgets';
@@ -12,6 +13,7 @@ const TYPE = 'bitbucket/file';
 
 export const BitbucketMatch: IArtifactKindConfig = {
   label: 'Bitbucket',
+  typePattern: ArtifactTypePatterns.BITBUCKET_FILE,
   type: TYPE,
   description: 'A file stored in git, hosted by Bitbucket.',
   key: 'bitbucket',
@@ -28,6 +30,7 @@ export const BitbucketMatch: IArtifactKindConfig = {
 
 export const BitbucketDefault: IArtifactKindConfig = {
   label: 'Bitbucket',
+  typePattern: ArtifactTypePatterns.BITBUCKET_FILE,
   type: TYPE,
   description: 'A file stored in git, hosted by Bitbucket.',
   key: 'default.bitbucket',

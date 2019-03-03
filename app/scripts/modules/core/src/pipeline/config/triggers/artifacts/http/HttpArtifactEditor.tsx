@@ -1,8 +1,11 @@
-import { singleFieldArtifactEditor } from '../singleFieldArtifactEditor';
+import { ArtifactTypePatterns } from 'core/artifact';
 import { IArtifactKindConfig } from 'core/domain';
+
+import { singleFieldArtifactEditor } from '../singleFieldArtifactEditor';
 
 export const HttpMatch: IArtifactKindConfig = {
   label: 'HTTP',
+  typePattern: ArtifactTypePatterns.HTTP_FILE,
   type: 'http/file',
   description: 'An HTTP artifact.',
   key: 'http',
@@ -13,6 +16,7 @@ export const HttpMatch: IArtifactKindConfig = {
 
 export const HttpDefault: IArtifactKindConfig = {
   label: 'HTTP',
+  typePattern: ArtifactTypePatterns.HTTP_FILE,
   type: 'http/file',
   description: 'An HTTP artifact.',
   key: 'http',

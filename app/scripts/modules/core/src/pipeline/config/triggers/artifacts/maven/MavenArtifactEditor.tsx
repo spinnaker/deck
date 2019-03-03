@@ -1,8 +1,11 @@
+import { ArtifactTypePatterns } from 'core/artifact';
 import { IArtifactKindConfig } from 'core/domain';
+
 import { singleFieldArtifactEditor } from '../singleFieldArtifactEditor';
 
 export const MavenMatch: IArtifactKindConfig = {
   label: 'Maven',
+  typePattern: ArtifactTypePatterns.MAVEN_FILE,
   type: 'maven/file',
   description: 'A Maven repository artifact.',
   key: 'maven',
@@ -13,6 +16,7 @@ export const MavenMatch: IArtifactKindConfig = {
 
 export const MavenDefault: IArtifactKindConfig = {
   label: 'Maven',
+  typePattern: ArtifactTypePatterns.MAVEN_FILE,
   type: 'maven/file',
   description: 'A Maven repository artifact.',
   key: 'maven',

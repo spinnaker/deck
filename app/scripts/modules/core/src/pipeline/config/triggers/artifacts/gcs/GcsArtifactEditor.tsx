@@ -1,6 +1,7 @@
 import { cloneDeep, isNil } from 'lodash';
 import * as React from 'react';
 
+import { ArtifactTypePatterns } from 'core/artifact';
 import { IArtifactEditorProps, IArtifactKindConfig } from 'core/domain';
 import { StageConfigField } from 'core/pipeline';
 import { SpelText } from 'core/widgets';
@@ -12,6 +13,7 @@ const TYPE = 'gcs/object';
 
 export const GcsMatch: IArtifactKindConfig = {
   label: 'GCS',
+  typePattern: ArtifactTypePatterns.GCS_OBJECT,
   type: TYPE,
   description: 'A GCS object.',
   key: 'gcs',
@@ -28,6 +30,7 @@ export const GcsMatch: IArtifactKindConfig = {
 
 export const GcsDefault: IArtifactKindConfig = {
   label: 'GCS',
+  typePattern: ArtifactTypePatterns.GCS_OBJECT,
   type: TYPE,
   description: 'A GCS object.',
   key: 'default.gcs',

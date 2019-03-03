@@ -5,8 +5,8 @@ import * as React from 'react';
 import Select from 'react-select';
 import { react2angular } from 'react2angular';
 
+import { ArtifactTypePatterns, ExpectedArtifactModal, ExpectedArtifactService } from 'core/artifact';
 import { IExpectedArtifact, IPipeline } from 'core/domain';
-import { ExpectedArtifactModal, ExpectedArtifactService } from 'core/artifact';
 
 export interface ITriggerArtifactConstraintSelectorProps {
   pipeline: IPipeline;
@@ -19,7 +19,10 @@ export interface ITriggerArtifactConstraintSelectorProps {
 export class TriggerArtifactConstraintSelector extends React.Component<ITriggerArtifactConstraintSelectorProps> {
   private handleChange = (index: number, selectedArtifact: IExpectedArtifact) => {
     if (selectedArtifact.id === '__create.new.artifact') {
-      ExpectedArtifactModal.show({ pipeline: this.props.pipeline }).then(this.props.onDefineExpectedArtifact);
+      ExpectedArtifactModal.show({
+        pipeline: this.props.pipeline,
+        excludedArtifactTypePatterns: [ArtifactTypePatterns.KUBERNETES],
+      }).then(this.props.onDefineExpectedArtifact);
       return;
     }
 

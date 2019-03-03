@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { cloneDeep, isNil } from 'lodash';
 
+import { ArtifactTypePatterns } from 'core/artifact';
 import { IArtifact, IArtifactEditorProps, IArtifactKindConfig } from 'core/domain';
 import { StageConfigField } from 'core/pipeline';
 import { SpelText } from 'core/widgets';
@@ -34,6 +35,7 @@ export const setNameAndVersionFromReference = (artifact: IArtifact) => {
 
 export const DockerMatch: IArtifactKindConfig = {
   label: 'Docker',
+  typePattern: ArtifactTypePatterns.DOCKER_IMAGE,
   type: TYPE,
   isDefault: false,
   isMatch: true,
@@ -50,6 +52,7 @@ export const DockerMatch: IArtifactKindConfig = {
 
 export const DockerDefault: IArtifactKindConfig = {
   label: 'Docker',
+  typePattern: ArtifactTypePatterns.DOCKER_IMAGE,
   type: TYPE,
   isDefault: true,
   isMatch: false,

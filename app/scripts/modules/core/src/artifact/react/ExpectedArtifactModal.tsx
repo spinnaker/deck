@@ -16,6 +16,7 @@ import { FormikProps } from 'formik';
 export interface IExpectedArtifactModalProps extends IModalComponentProps {
   expectedArtifact?: IExpectedArtifact;
   pipeline: IPipeline;
+  excludedArtifactTypePatterns?: RegExp[];
 }
 
 export interface IExpectedArtifactModalState {
@@ -39,9 +40,14 @@ export class ExpectedArtifactModal extends React.Component<IExpectedArtifactModa
   };
 
   public componentDidMount(): void {
+    const excludedPatterns = this.props.excludedArtifactTypePatterns;
     AccountService.getArtifactAccounts().then(artifactAccounts => {
       this.setState({
-        artifactAccounts: artifactAccounts,
+        artifactAccounts: excludedPatterns
+          ? artifactAccounts.filter(
+              account => !account.types.some(typ => excludedPatterns.some(typPattern => typPattern.test(typ))),
+            )
+          : artifactAccounts,
       });
     });
   }

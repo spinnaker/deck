@@ -6,6 +6,7 @@ import { Registry } from 'core/registry';
 describe('ExpectedArtifactService', () => {
   describe('getKindConfig()', () => {
     const baseKindConfig = {
+      typePattern: /base-type/,
       label: '',
       description: '',
       isDefault: false,
@@ -15,21 +16,25 @@ describe('ExpectedArtifactService', () => {
     };
     const kindConfigs: IArtifactKindConfig[] = [
       {
+        typePattern: /foo-type/,
         type: 'foo-type',
         key: 'foo',
         isMatch: true,
       },
       {
+        typePattern: /foo-type/,
         type: 'foo-type',
         key: 'foo-default',
         isDefault: true,
       },
       {
+        typePattern: /bar-type/,
         type: 'bar-type',
         key: 'bar',
         isMatch: true,
       },
       {
+        typePattern: /bar-type/,
         type: 'bar-type',
         key: 'bar-default',
         isDefault: true,

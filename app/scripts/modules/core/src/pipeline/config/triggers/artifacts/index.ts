@@ -10,10 +10,11 @@ import { GitlabMatch, GitlabDefault } from './gitlab/GitlabArtifactEditor';
 import { HelmMatch, HelmDefault } from './helm/HelmArtifactEditor';
 import { HttpMatch, HttpDefault } from './http/HttpArtifactEditor';
 import { IvyMatch, IvyDefault } from './ivy/IvyArtifactEditor';
+import { KubernetesMatch, KubernetesDefault } from './kubernetes/KubernetesArtifactEditor';
 import { MavenMatch, MavenDefault } from './maven/MavenArtifactEditor';
 import { S3Match, S3Default } from './s3/S3ArtifactEditor';
 
-export const ArtifactKindConfigs: IArtifactKindConfig[] = [
+export const artifactKindConfigs: IArtifactKindConfig[] = [
   Base64Match,
   Base64Default,
   BitbucketMatch,
@@ -37,6 +38,8 @@ export const ArtifactKindConfigs: IArtifactKindConfig[] = [
   MavenDefault,
   S3Match,
   S3Default,
+  KubernetesMatch,
+  KubernetesDefault,
 ];
 
 export * from './TriggerArtifactConstraintSelector';

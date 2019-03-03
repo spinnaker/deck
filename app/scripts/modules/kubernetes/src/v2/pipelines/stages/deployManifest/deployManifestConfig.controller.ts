@@ -6,6 +6,7 @@ import {
   IManifest,
   IArtifact,
   IExpectedArtifact,
+  ArtifactTypePatterns,
 } from '@spinnaker/core';
 
 import {
@@ -39,6 +40,8 @@ export class KubernetesV2DeployManifestConfigCtrl implements IController {
     this.$scope.bindings = (stage.requiredArtifactIds || [])
       .map((id: string) => ({ expectedArtifactId: id }))
       .concat((stage.requiredArtifacts || []).map((artifact: IArtifact) => ({ artifact: artifact })));
+
+    this.$scope.excludedManifestArtifactTypes = [ArtifactTypePatterns.DOCKER_IMAGE];
 
     KubernetesManifestCommandBuilder.buildNewManifestCommand(
       this.$scope.application,

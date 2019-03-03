@@ -34,9 +34,9 @@ export class ArtifactEditor extends React.Component<IArtifactEditorProps> {
   public render(): React.ReactNode {
     const { pipeline, artifact, artifactAccounts, onArtifactEdit, isDefault } = this.props;
     const artifactAccount = artifactAccounts.find(acc => acc.name === artifact.artifactAccount) || artifactAccounts[0];
-    const accountTypes = artifactAccount ? new Set(artifactAccount.types) : undefined;
+    const accountTypes = artifactAccount ? artifactAccount.types : undefined;
     const kinds = isDefault ? Registry.pipeline.getDefaultArtifactKinds() : Registry.pipeline.getMatchArtifactKinds();
-    const kind = accountTypes ? kinds.find(a => accountTypes.has(a.type)) : undefined;
+    const kind = accountTypes ? kinds.find(a => accountTypes.some(typ => a.typePattern.test(typ))) : undefined;
     const EditCmp = kind && kind.editCmp;
 
     return (

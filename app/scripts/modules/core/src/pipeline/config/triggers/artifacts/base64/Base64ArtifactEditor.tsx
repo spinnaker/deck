@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { has, cloneDeep } from 'lodash';
 
+import { ArtifactTypePatterns } from 'core/artifact';
 import { IArtifactEditorProps, IArtifactKindConfig } from 'core/domain';
 import { StageConfigField } from 'core/pipeline';
 import { CopyToClipboard } from 'core/utils';
@@ -105,6 +106,7 @@ class DefaultBase64ArtifactEditor extends React.Component<IArtifactEditorProps, 
 
 export const Base64Match: IArtifactKindConfig = {
   label: 'Base64',
+  typePattern: ArtifactTypePatterns.EMBEDDED_BASE64,
   type: TYPE,
   description: 'An artifact that includes its referenced resource as part of its payload.',
   key: 'base64',
@@ -115,6 +117,7 @@ export const Base64Match: IArtifactKindConfig = {
 
 export const Base64Default: IArtifactKindConfig = {
   label: 'Base64',
+  typePattern: ArtifactTypePatterns.EMBEDDED_BASE64,
   type: TYPE,
   description: 'An artifact that includes its referenced resource as part of its payload.',
   key: 'default.base64',

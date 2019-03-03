@@ -16,7 +16,7 @@ import { IAccountDetails } from 'core/account/AccountService';
 
 import { ITriggerTemplateComponentProps } from '../manualExecution/TriggerTemplate';
 import { ComponentType, SFC } from 'react';
-import { ArtifactKindConfigs } from './triggers/artifacts';
+import { artifactKindConfigs } from './triggers/artifacts';
 
 export interface ITransformer {
   transform: (application: Application, execution: IExecution) => void;
@@ -26,7 +26,7 @@ export class PipelineRegistry {
   private triggerTypes: ITriggerTypeConfig[] = [];
   private stageTypes: IStageTypeConfig[] = [];
   private transformers: ITransformer[] = [];
-  private artifactKinds: IArtifactKindConfig[] = ArtifactKindConfigs;
+  private artifactKinds: IArtifactKindConfig[] = artifactKindConfigs;
   private customArtifactKind: IArtifactKindConfig;
 
   constructor() {

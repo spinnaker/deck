@@ -1,6 +1,7 @@
 import { cloneDeep } from 'lodash';
 import * as React from 'react';
 
+import { ArtifactTypePatterns } from 'core/artifact';
 import { IArtifactEditorProps, IArtifactKindConfig } from 'core/domain';
 import { StageConfigField } from 'core/pipeline';
 import { SpelText } from 'core/widgets';
@@ -12,6 +13,7 @@ const TYPE = 'gitlab/file';
 
 export const GitlabMatch: IArtifactKindConfig = {
   label: 'Gitlab',
+  typePattern: ArtifactTypePatterns.GITLAB_FILE,
   type: TYPE,
   description: 'A file stored in git, hosted by Gitlab.',
   key: 'gitlab',
@@ -28,6 +30,7 @@ export const GitlabMatch: IArtifactKindConfig = {
 
 export const GitlabDefault: IArtifactKindConfig = {
   label: 'Gitlab',
+  typePattern: ArtifactTypePatterns.GITLAB_FILE,
   type: TYPE,
   description: 'A file stored in git, hosted by Gitlab.',
   key: 'default.gitlab',

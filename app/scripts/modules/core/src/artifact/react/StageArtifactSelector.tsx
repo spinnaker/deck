@@ -20,7 +20,7 @@ export interface IStageArtifactSelectorProps {
   onArtifactEdited: (artifact: IArtifact) => void;
 
   excludedArtifactIds?: string[];
-  excludedArtifactTyps?: string[];
+  excludedArtifactTypePatterns?: RegExp[];
 }
 
 export interface IStageArtifactSelectorState {
@@ -45,9 +45,14 @@ export class StageArtifactSelector extends React.Component<IStageArtifactSelecto
   }
 
   public componentDidMount(): void {
+    const excludedPatterns = this.props.excludedArtifactTypePatterns;
     AccountService.getArtifactAccounts().then(artifactAccounts => {
       this.setState({
-        artifactAccounts: artifactAccounts,
+        artifactAccounts: excludedPatterns
+          ? artifactAccounts.filter(
+              account => !account.types.some(typ => excludedPatterns.some(typPattern => typPattern.test(typ))),
+            )
+          : artifactAccounts,
       });
     });
   }
@@ -138,5 +143,7 @@ module(STAGE_ARTIFACT_SELECTOR_COMPONENT_REACT, []).component(
     'artifact',
     'onExpectedArtifactSelected',
     'onArtifactEdited',
+    'excludedArtifactIds',
+    'excludedArtifactTypePatterns',
   ]),
 );

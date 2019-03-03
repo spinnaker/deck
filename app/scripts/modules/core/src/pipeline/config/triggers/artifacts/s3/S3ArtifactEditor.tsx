@@ -1,8 +1,11 @@
-import { singleFieldArtifactEditor } from '../singleFieldArtifactEditor';
+import { ArtifactTypePatterns } from 'core/artifact';
 import { IArtifactKindConfig } from 'core/domain';
+
+import { singleFieldArtifactEditor } from '../singleFieldArtifactEditor';
 
 export const S3Match: IArtifactKindConfig = {
   label: 'S3',
+  typePattern: ArtifactTypePatterns.S3_OBJECT,
   type: 's3/object',
   description: 'An S3 object.',
   key: 's3',
@@ -19,6 +22,7 @@ export const S3Match: IArtifactKindConfig = {
 
 export const S3Default: IArtifactKindConfig = {
   label: 'S3',
+  typePattern: ArtifactTypePatterns.S3_OBJECT,
   type: 's3/object',
   description: 'An S3 object.',
   key: 's3',

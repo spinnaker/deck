@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Option } from 'react-select';
 
+import { ArtifactTypePatterns } from 'core/artifact';
 import { IArtifact, IArtifactEditorProps, IArtifactKindConfig } from 'core/domain';
 import { StageConfigField } from 'core/pipeline';
 import { TetheredSelect } from 'core/presentation';
@@ -86,6 +87,7 @@ class HelmEditor extends React.Component<IArtifactEditorProps, IHelmArtifactEdit
 
 export const HelmMatch: IArtifactKindConfig = {
   label: 'Helm',
+  typePattern: ArtifactTypePatterns.HELM_CHART,
   type: TYPE,
   isDefault: false,
   isMatch: true,
@@ -96,6 +98,7 @@ export const HelmMatch: IArtifactKindConfig = {
 
 export const HelmDefault: IArtifactKindConfig = {
   label: 'Helm',
+  typePattern: ArtifactTypePatterns.HELM_CHART,
   type: TYPE,
   isDefault: true,
   isMatch: false,

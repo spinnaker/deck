@@ -1,6 +1,7 @@
 import { cloneDeep } from 'lodash';
 import * as React from 'react';
 
+import { ArtifactTypePatterns } from 'core/artifact';
 import { IArtifactEditorProps, IArtifactKindConfig } from 'core/domain';
 import { StageConfigField } from 'core/pipeline';
 import { SpelText } from 'core/widgets';
@@ -14,6 +15,7 @@ export const GithubMatch: IArtifactKindConfig = {
   label: 'GitHub',
   description: 'A file stored in git, hosted by GitHub.',
   key: 'github',
+  typePattern: ArtifactTypePatterns.GITHUB_FILE,
   type: TYPE,
   isDefault: false,
   isMatch: true,
@@ -28,6 +30,7 @@ export const GithubMatch: IArtifactKindConfig = {
 
 export const GithubDefault: IArtifactKindConfig = {
   label: 'GitHub',
+  typePattern: ArtifactTypePatterns.GITHUB_FILE,
   type: TYPE,
   description: 'A file stored in git, hosted by GitHub.',
   key: 'default.github',

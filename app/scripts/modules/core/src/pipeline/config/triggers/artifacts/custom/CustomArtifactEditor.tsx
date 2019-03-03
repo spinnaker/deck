@@ -22,6 +22,7 @@ const input = (artifact: IArtifact, field: keyof IArtifact, pipeline: IPipeline,
 
 export const CustomMatch: IArtifactKindConfig = {
   label: 'Custom',
+  typePattern: /UNMATCHABLE/,
   description: 'A custom-defined artifact.',
   key: 'custom',
   isDefault: true,

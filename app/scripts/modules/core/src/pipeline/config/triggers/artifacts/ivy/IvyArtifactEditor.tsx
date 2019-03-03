@@ -1,8 +1,11 @@
-import { singleFieldArtifactEditor } from '../singleFieldArtifactEditor';
+import { ArtifactTypePatterns } from 'core/artifact';
 import { IArtifactKindConfig } from 'core/domain';
+
+import { singleFieldArtifactEditor } from '../singleFieldArtifactEditor';
 
 export const IvyMatch: IArtifactKindConfig = {
   label: 'Ivy',
+  typePattern: ArtifactTypePatterns.IVY_FILE,
   type: 'ivy/file',
   description: 'An Ivy repository artifact.',
   key: 'ivy',
@@ -13,6 +16,7 @@ export const IvyMatch: IArtifactKindConfig = {
 
 export const IvyDefault: IArtifactKindConfig = {
   label: 'Ivy',
+  typePattern: ArtifactTypePatterns.IVY_FILE,
   type: 'ivy/file',
   description: 'An Ivy repository artifact.',
   key: 'ivy',
