@@ -1,6 +1,6 @@
 import { module } from 'angular';
 
-import { CloudProviderRegistry } from '@spinnaker/core';
+import { CloudProviderRegistry, STAGE_ARTIFACT_SELECTOR_COMPONENT_REACT } from '@spinnaker/core';
 
 import '../logo/kubernetes.logo.less';
 import { KUBERNETES_MANIFEST_BASIC_SETTINGS } from './manifest/wizard/basicSettings.component';
@@ -44,7 +44,6 @@ import { ManifestWizard } from 'kubernetes/v2/manifest/wizard/ManifestWizard';
 import { KUBERNETES_ENABLE_MANIFEST_STAGE } from 'kubernetes/v2/pipelines/stages/traffic/enableManifest.stage';
 import { KUBERNETES_DISABLE_MANIFEST_STAGE } from 'kubernetes/v2/pipelines/stages/traffic/disableManifest.stage';
 import './pipelines/validation/manifestSelector.validator';
-import { STAGE_ARTIFACT_SELECTOR_COMPONENT_REACT } from 'core/artifact/react/StageArtifactSelector';
 
 // load all templates into the $templateCache
 const templates = require.context('kubernetes', true, /\.html$/);
