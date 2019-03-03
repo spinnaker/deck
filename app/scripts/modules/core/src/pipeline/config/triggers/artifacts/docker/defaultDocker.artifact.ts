@@ -1,6 +1,7 @@
 import { module } from 'angular';
 import { isNil } from 'lodash';
 
+import { ArtifactTypePatterns } from 'core/artifact';
 import { IArtifact } from 'core/domain/IArtifact';
 import { Registry } from 'core/registry';
 
@@ -29,6 +30,7 @@ export const DEFAULT_DOCKER_ARTIFACT = 'spinnaker.core.pipeline.trigger.artifact
 module(DEFAULT_DOCKER_ARTIFACT, []).config(() => {
   Registry.pipeline.mergeArtifactKind({
     label: 'Docker',
+    typePattern: ArtifactTypePatterns.DOCKER_IMAGE,
     type: 'docker/image',
     isDefault: true,
     isMatch: false,

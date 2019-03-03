@@ -1,5 +1,6 @@
 import { module } from 'angular';
 
+import { ArtifactTypePatterns } from 'core/artifact';
 import { IArtifact } from 'core/domain/IArtifact';
 import { Registry } from 'core/registry';
 
@@ -7,6 +8,7 @@ export const BITBUCKET_ARTIFACT = 'spinnaker.core.pipeline.trigger.bitbucket.art
 module(BITBUCKET_ARTIFACT, []).config(() => {
   Registry.pipeline.mergeArtifactKind({
     label: 'Bitbucket',
+    typePattern: ArtifactTypePatterns.BITBUCKET_FILE,
     type: 'bitbucket/file',
     description: 'A file stored in git, hosted by Bitbucket.',
     key: 'bitbucket',

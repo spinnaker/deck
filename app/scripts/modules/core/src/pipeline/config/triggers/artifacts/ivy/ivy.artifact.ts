@@ -1,5 +1,6 @@
 import { IController, module } from 'angular';
 
+import { ArtifactTypePatterns } from 'core/artifact';
 import { IArtifact } from 'core/domain/IArtifact';
 import { Registry } from 'core/registry';
 
@@ -13,6 +14,7 @@ module(IVY_ARTIFACT, [])
   .config(() => {
     Registry.pipeline.mergeArtifactKind({
       label: 'Ivy',
+      typePattern: ArtifactTypePatterns.IVY_FILE,
       type: 'ivy/file',
       description: 'An Ivy repository artifact.',
       key: 'ivy',

@@ -1,5 +1,6 @@
 import { module } from 'angular';
 
+import { ArtifactTypePatterns } from 'core/artifact';
 import { IArtifact } from 'core/domain/IArtifact';
 import { Registry } from 'core/registry';
 
@@ -9,6 +10,7 @@ module(GITHUB_ARTIFACT, []).config(() => {
     label: 'GitHub',
     description: 'A file stored in git, hosted by GitHub.',
     key: 'github',
+    typePattern: ArtifactTypePatterns.GITHUB_FILE,
     type: 'github/file',
     isDefault: false,
     isMatch: true,

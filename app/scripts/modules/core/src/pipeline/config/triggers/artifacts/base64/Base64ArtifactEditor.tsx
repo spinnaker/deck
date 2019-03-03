@@ -49,7 +49,6 @@ class DefaultBase64ArtifactEditor extends React.Component<IArtifactEditorProps, 
   private onNameChanged = (name: string) => {
     const artifact = cloneDeep(this.props.artifact);
     artifact.name = name;
-    artifact.type = TYPE;
     this.props.onChange(artifact);
   };
 
@@ -58,7 +57,6 @@ class DefaultBase64ArtifactEditor extends React.Component<IArtifactEditorProps, 
     if (!encodeDecodeError) {
       const artifact = cloneDeep(this.props.artifact);
       artifact.reference = encoded;
-      artifact.type = TYPE;
       this.props.onChange(artifact);
     }
     this.setState({ encodeDecodeError: encodeDecodeError });

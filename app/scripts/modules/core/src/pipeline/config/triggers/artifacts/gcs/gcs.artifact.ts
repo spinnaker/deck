@@ -1,5 +1,6 @@
 import { module } from 'angular';
 
+import { ArtifactTypePatterns } from 'core/artifact';
 import { IArtifact } from 'core/domain/IArtifact';
 import { Registry } from 'core/registry';
 
@@ -7,6 +8,7 @@ export const GCS_ARTIFACT = 'spinnaker.core.pipeline.trigger.gcs.artifact';
 module(GCS_ARTIFACT, []).config(() => {
   Registry.pipeline.mergeArtifactKind({
     label: 'GCS',
+    typePattern: ArtifactTypePatterns.GCS_OBJECT,
     type: 'gcs/object',
     description: 'A GCS object.',
     key: 'gcs',

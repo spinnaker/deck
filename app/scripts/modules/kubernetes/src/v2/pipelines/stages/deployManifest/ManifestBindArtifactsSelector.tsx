@@ -2,8 +2,14 @@ import { module } from 'angular';
 import * as React from 'react';
 import { react2angular } from 'react2angular';
 
-import { IArtifact, IExpectedArtifact, IPipeline, IStage } from '@spinnaker/core';
-import { StageArtifactSelector } from '@spinnaker/core';
+import {
+  IArtifact,
+  IExpectedArtifact,
+  IPipeline,
+  IStage,
+  ArtifactTypePatterns,
+  StageArtifactSelector,
+} from '@spinnaker/core';
 
 export interface IManifestBindArtifact {
   expectedArtifactId?: string;

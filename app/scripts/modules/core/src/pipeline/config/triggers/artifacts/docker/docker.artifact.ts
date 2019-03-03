@@ -1,5 +1,6 @@
 import { module } from 'angular';
 
+import { ArtifactTypePatterns } from 'core/artifact';
 import { IArtifact } from 'core/domain/IArtifact';
 import { Registry } from 'core/registry';
 
@@ -7,6 +8,7 @@ export const DOCKER_ARTIFACT = 'spinnaker.core.pipeline.trigger.artifact.docker'
 module(DOCKER_ARTIFACT, []).config(() => {
   Registry.pipeline.mergeArtifactKind({
     label: 'Docker',
+    typePattern: ArtifactTypePatterns.DOCKER_IMAGE,
     type: 'docker/image',
     isDefault: false,
     isMatch: true,

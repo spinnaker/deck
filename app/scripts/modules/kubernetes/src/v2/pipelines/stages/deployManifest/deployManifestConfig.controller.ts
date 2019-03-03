@@ -43,6 +43,7 @@ export class KubernetesV2DeployManifestConfigCtrl implements IController {
 
     this.$scope.excludedManifestArtifactTypes = [
       ArtifactTypePatterns.DOCKER_IMAGE,
+      ArtifactTypePatterns.KUBERNETES,
       ArtifactTypePatterns.FRONT50_PIPELINE_TEMPLATE,
     ];
 

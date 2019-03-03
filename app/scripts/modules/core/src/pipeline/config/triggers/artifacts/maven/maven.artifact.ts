@@ -1,5 +1,6 @@
 import { IController, module } from 'angular';
 
+import { ArtifactTypePatterns } from 'core/artifact';
 import { IArtifact } from 'core/domain/IArtifact';
 import { Registry } from 'core/registry';
 
@@ -13,6 +14,7 @@ module(MAVEN_ARTIFACT, [])
   .config(() => {
     Registry.pipeline.mergeArtifactKind({
       label: 'Maven',
+      typePattern: ArtifactTypePatterns.MAVEN_FILE,
       type: 'maven/file',
       description: 'A Maven repository artifact.',
       key: 'maven',

@@ -1,5 +1,6 @@
 import { IController, module } from 'angular';
 
+import { ArtifactTypePatterns } from 'core/artifact';
 import { IArtifact } from 'core/domain/IArtifact';
 import { Registry } from 'core/registry';
 
@@ -13,6 +14,7 @@ module(HTTP_ARTIFACT, [])
   .config(() => {
     Registry.pipeline.mergeArtifactKind({
       label: 'HTTP',
+      typePattern: ArtifactTypePatterns.HTTP_FILE,
       type: 'http/file',
       description: 'An HTTP artifact.',
       key: 'http',

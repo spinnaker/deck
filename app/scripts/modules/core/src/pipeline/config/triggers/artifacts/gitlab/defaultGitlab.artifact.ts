@@ -1,5 +1,6 @@
 import { module } from 'angular';
 
+import { ArtifactTypePatterns } from 'core/artifact';
 import { IArtifact } from 'core/domain/IArtifact';
 import { Registry } from 'core/registry';
 
@@ -7,6 +8,7 @@ export const DEFAULT_GITLAB_ARTIFACT = 'spinnaker.core.pipeline.trigger.artifact
 module(DEFAULT_GITLAB_ARTIFACT, []).config(() => {
   Registry.pipeline.mergeArtifactKind({
     label: 'Gitlab',
+    typePattern: ArtifactTypePatterns.GITLAB_FILE,
     type: 'gitlab/file',
     description: 'A file stored in git, hosted by Gitlab.',
     key: 'default.gitlab',

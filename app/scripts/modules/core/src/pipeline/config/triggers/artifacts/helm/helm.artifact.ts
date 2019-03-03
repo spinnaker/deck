@@ -1,15 +1,18 @@
 import { module } from 'angular';
 
-import { ArtifactService } from '../ArtifactService';
 import { AccountService } from 'core/account/AccountService';
+import { ArtifactTypePatterns } from 'core/artifact';
 import { IArtifact } from 'core/domain/IArtifact';
 import { Registry } from 'core/registry';
+
+import { ArtifactService } from '../ArtifactService';
 
 export const HELM_ARTIFACT = 'spinnaker.core.pipeline.trigger.artifact.helm';
 
 module(HELM_ARTIFACT, []).config(() => {
   Registry.pipeline.mergeArtifactKind({
     label: 'Helm',
+    typePattern: ArtifactTypePatterns.HELM_CHART,
     type: 'helm/chart',
     isDefault: true,
     isMatch: true,
