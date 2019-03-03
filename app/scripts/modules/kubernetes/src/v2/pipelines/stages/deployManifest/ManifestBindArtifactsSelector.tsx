@@ -48,6 +48,7 @@ export class ManifestBindArtifactsSelector extends React.Component<IManifestBind
                 this.onChangeBinding(i, { expectedArtifactId: expectedArtifact.id })
               }
               excludedArtifactIds={bindings.map(b => b.expectedArtifactId)}
+              excludedArtifactTypePatterns={[ArtifactTypePatterns.FRONT50_PIPELINE_TEMPLATE]}
             />
           </div>
           {binding && (

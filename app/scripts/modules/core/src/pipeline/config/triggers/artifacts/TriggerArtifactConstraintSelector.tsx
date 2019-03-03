@@ -21,7 +21,7 @@ export class TriggerArtifactConstraintSelector extends React.Component<ITriggerA
     if (selectedArtifact.id === '__create.new.artifact') {
       ExpectedArtifactModal.show({
         pipeline: this.props.pipeline,
-        excludedArtifactTypePatterns: [ArtifactTypePatterns.KUBERNETES],
+        excludedArtifactTypePatterns: [ArtifactTypePatterns.KUBERNETES, ArtifactTypePatterns.FRONT50_PIPELINE_TEMPLATE],
       }).then(this.props.onDefineExpectedArtifact);
       return;
     }
