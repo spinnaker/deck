@@ -12,7 +12,6 @@ module(DOCKER_ARTIFACT, []).config(() => {
     type: 'docker/image',
     isDefault: false,
     isMatch: true,
-    // docker hub image artifacts can be bound to manifests without an associated artifact-account
     description: 'A Docker image to be deployed.',
     key: 'docker',
     controller: function(artifact: IArtifact) {
