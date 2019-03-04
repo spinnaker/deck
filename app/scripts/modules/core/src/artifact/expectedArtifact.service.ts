@@ -1,13 +1,13 @@
 import { PipelineConfigService } from 'core/pipeline';
 import { Registry } from 'core/registry';
 import {
+  IArtifact,
+  IArtifactKindConfig,
+  IArtifactSource,
+  IExecutionContext,
+  IExpectedArtifact,
   IPipeline,
   IStage,
-  IExpectedArtifact,
-  IExecutionContext,
-  IArtifact,
-  IArtifactSource,
-  IArtifactKindConfig,
 } from 'core/domain';
 import { UUIDGenerator } from 'core/utils';
 import { hri as HumanReadableIds } from 'human-readable-ids';
@@ -102,13 +102,13 @@ export class ExpectedArtifactService {
 
   public static getKindConfig(artifact: IArtifact, isDefault: boolean): IArtifactKindConfig {
     if (artifact == null || artifact.customKind || artifact.kind === 'custom') {
-      return undefined;
+      return Registry.pipeline.getCustomArtifactKind();
     }
     const kinds = isDefault ? Registry.pipeline.getDefaultArtifactKinds() : Registry.pipeline.getMatchArtifactKinds();
     const inferredKindConfig = kinds.find(k => k.type === artifact.type);
     if (inferredKindConfig !== undefined) {
       return inferredKindConfig;
     }
-    return undefined;
+    return Registry.pipeline.getCustomArtifactKind();
   }
 }

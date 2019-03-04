@@ -20,11 +20,13 @@ import { DEFAULT_S3_ARTIFACT } from 'core/pipeline/config/triggers/artifacts/s3/
 import { IVY_ARTIFACT } from 'core/pipeline/config/triggers/artifacts/ivy/ivy.artifact';
 import { MAVEN_ARTIFACT } from 'core/pipeline/config/triggers/artifacts/maven/maven.artifact';
 import { HTTP_ARTIFACT } from 'core/pipeline/config/triggers/artifacts/http/http.artifact';
+import { CUSTOM_ARTIFACT } from './custom/custom.artifact';
 
 export const ARTIFACT_MODULE = 'spinnaker.core.pipeline.config.trigger.artifacts';
 
 module(ARTIFACT_MODULE, [
   EXPECTED_ARTIFACT,
+  CUSTOM_ARTIFACT,
   GCS_ARTIFACT,
   GITHUB_ARTIFACT,
   GITLAB_ARTIFACT,
