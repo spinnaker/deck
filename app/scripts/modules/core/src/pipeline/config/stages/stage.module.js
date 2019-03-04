@@ -29,7 +29,7 @@ module.exports = angular
     CONFIRMATION_MODAL_SERVICE,
     require('./common/stageConfigField/stageConfigField.directive').name,
   ])
-  .directive('pipelineConfigStage', function () {
+  .directive('pipelineConfigStage', function() {
     return {
       restrict: 'E',
       require: '^pipelineConfigurer',
@@ -41,7 +41,7 @@ module.exports = angular
       },
       controller: 'StageConfigCtrl as stageConfigCtrl',
       templateUrl: require('./stage.html'),
-      link: function (scope, elem, attrs, pipelineConfigurerCtrl) {
+      link: function(scope, elem, attrs, pipelineConfigurerCtrl) {
         scope.pipelineConfigurerCtrl = pipelineConfigurerCtrl;
       },
     };
@@ -52,7 +52,7 @@ module.exports = angular
     '$compile',
     '$controller',
     '$templateCache',
-    function ($scope, $element, $compile, $controller, $templateCache) {
+    function($scope, $element, $compile, $controller, $templateCache) {
       var lastStageScope, reactComponentMounted;
 
       $scope.options = {
@@ -75,16 +75,16 @@ module.exports = angular
         return Registry.pipeline.getStageConfig(stage);
       }
 
-      $scope.groupDependencyOptions = function (stage) {
+      $scope.groupDependencyOptions = function(stage) {
         var requisiteStageRefIds = $scope.stage.requisiteStageRefIds || [];
         return stage.available
           ? 'Available'
           : requisiteStageRefIds.includes(stage.refId)
-            ? null
-            : 'Downstream dependencies (unavailable)';
+          ? null
+          : 'Downstream dependencies (unavailable)';
       };
 
-      $scope.stageProducesArtifacts = function () {
+      $scope.stageProducesArtifacts = function() {
         if (!$scope.stage) {
           return false;
         }
@@ -98,15 +98,18 @@ module.exports = angular
         }
       };
 
-      $scope.producesArtifactsChanged = function (artifacts) {
+      $scope.producesArtifactsChanged = function(artifacts) {
         $scope.$applyAsync(() => {
           $scope.stage.expectedArtifacts = artifacts;
         });
       };
 
-      $scope.updateAvailableDependencyStages = function () {
-        var availableDependencyStages = PipelineConfigService.getDependencyCandidateStages($scope.pipeline, $scope.stage);
-        $scope.options.dependencies = availableDependencyStages.map(function (stage) {
+      $scope.updateAvailableDependencyStages = function() {
+        var availableDependencyStages = PipelineConfigService.getDependencyCandidateStages(
+          $scope.pipeline,
+          $scope.stage,
+        );
+        $scope.options.dependencies = availableDependencyStages.map(function(stage) {
           return {
             name: stage.name,
             refId: stage.refId,
@@ -114,7 +117,7 @@ module.exports = angular
           };
         });
 
-        $scope.pipeline.stages.forEach(function (stage) {
+        $scope.pipeline.stages.forEach(function(stage) {
           if (stage !== $scope.stage && !availableDependencyStages.includes(stage)) {
             $scope.options.dependencies.push({
               name: stage.name,
@@ -130,8 +133,7 @@ module.exports = angular
           .then(() => {
             $scope.$applyAsync(() => $scope.$broadcast('pipeline-json-edited'));
           })
-          .catch(() => {
-          }); // user closed modal
+          .catch(() => {}); // user closed modal
       };
 
       this.selectStageType = stage => {
@@ -145,7 +147,7 @@ module.exports = angular
         });
       };
 
-      this.selectStage = function (newVal, oldVal) {
+      this.selectStage = function(newVal, oldVal) {
         const stageDetailsNode = $element.find('.stage-details').get(0);
         if ($scope.viewState.stageIndex >= $scope.pipeline.stages.length) {
           $scope.viewState.stageIndex = $scope.pipeline.stages.length - 1;
@@ -180,7 +182,7 @@ module.exports = angular
         }
         $scope.extendedDescription = '';
         lastStageScope = stageScope;
-        $scope.$on('$destroy', function () {
+        $scope.$on('$destroy', function() {
           stageScope.$destroy();
         });
 
@@ -272,20 +274,20 @@ module.exports = angular
     '$scope',
     '$stateParams',
     'confirmationModalService',
-    function ($scope, $stateParams, confirmationModalService) {
-      var restartStage = function () {
+    function($scope, $stateParams, confirmationModalService) {
+      var restartStage = function() {
         return API.one('pipelines')
           .one($stateParams.executionId)
           .one('stages', $scope.stage.id)
           .one('restart')
           .data({ skip: false })
           .put()
-          .then(function () {
+          .then(function() {
             $scope.stage.isRestarting = true;
           });
       };
 
-      this.restart = function () {
+      this.restart = function() {
         let body = null;
         if ($scope.execution.isRunning) {
           body =

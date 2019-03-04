@@ -38,6 +38,7 @@ import { EXECUTION_DETAILS_SECTION_NAV } from './details/executionDetailsSection
 import { STAGE_FAILURE_MESSAGE_COMPONENT } from './details/stageFailureMessage.component';
 import { STEP_EXECUTION_DETAILS_COMPONENT } from './details/stepExecutionDetails.component';
 import { STAGE_SUMMARY_COMPONENT } from './details/stageSummary.component';
+import { PRODUCES_ARTIFACTS } from './config/stages/producesArtifacts/producesArtifacts.component';
 
 import './pipeline.less';
 import 'angular-ui-sortable';
@@ -87,6 +88,7 @@ module(PIPELINE_MODULE, [
   MANUAL_JUDGMENT_STAGE_MODULE,
   require('./config/stages/tagImage/tagImageStage.module').name,
   require('./config/stages/pipeline/pipelineStage.module').name,
+  PRODUCES_ARTIFACTS,
   RESIZE_ASG_STAGE,
   require('./config/stages/runJob/runJobStage.module').name,
   SCALE_DOWN_CLUSTER_STAGE,
