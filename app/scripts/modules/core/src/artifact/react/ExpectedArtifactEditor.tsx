@@ -91,6 +91,7 @@ export class ExpectedArtifactEditor extends React.Component<
     expectedArtifact.matchArtifact.type = kind.type;
     // kind is deprecated; remove it from artifacts as they are updated
     delete expectedArtifact.matchArtifact.kind;
+    expectedArtifact.matchArtifact.customKind = kind.customKind;
     const accounts = this.accountsForExpectedArtifact(expectedArtifact);
     this.setState({ expectedArtifact, account: accounts[0] });
   };
@@ -128,7 +129,7 @@ export class ExpectedArtifactEditor extends React.Component<
     const kinds = this.props.kinds || [];
     const accounts = this.props.accounts || [];
     if (this.props.showAccounts) {
-      return kinds.filter(k => accounts.find(a => a.types.includes(k.type)));
+      return kinds.filter(k => k.customKind || accounts.find(a => a.types.includes(k.type)));
     } else {
       return kinds.slice(0);
     }
