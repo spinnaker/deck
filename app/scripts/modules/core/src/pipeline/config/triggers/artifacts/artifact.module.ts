@@ -8,6 +8,7 @@ import { DEFAULT_GCS_ARTIFACT } from './gcs/defaultGcs.artifact';
 import { DEFAULT_GITHUB_ARTIFACT } from './github/defaultGithub.artifact';
 import { DEFAULT_GITLAB_ARTIFACT } from './gitlab/defaultGitlab.artifact';
 import { DEFAULT_BITBUCKET_ARTIFACT } from './bitbucket/defaultBitbucket.artifact';
+import { DEFAULT_HTTP_ARTIFACT } from './http/defaultHttp.artifact';
 import { ARTIFACT } from './artifact.component';
 import { GITHUB_ARTIFACT } from 'core/pipeline/config/triggers/artifacts/github/github.artifact';
 import { GITLAB_ARTIFACT } from 'core/pipeline/config/triggers/artifacts/gitlab/gitlab.artifact';
@@ -45,5 +46,6 @@ module(ARTIFACT_MODULE, [
   DEFAULT_GITLAB_ARTIFACT,
   DEFAULT_BITBUCKET_ARTIFACT,
   DEFAULT_BASE64_ARTIFACT,
+  DEFAULT_HTTP_ARTIFACT,
   ARTIFACT,
 ]);

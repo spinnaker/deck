@@ -19,7 +19,7 @@ export const HttpDefault: IArtifactKindConfig = {
   typePattern: ArtifactTypePatterns.HTTP_FILE,
   type: 'http/file',
   description: 'An HTTP artifact.',
-  key: 'http',
+  key: 'default.http',
   isDefault: true,
   isMatch: false,
   editCmp: singleFieldArtifactEditor('name', 'http/file', 'URL', 'http://host/path/file.ext', ''),
