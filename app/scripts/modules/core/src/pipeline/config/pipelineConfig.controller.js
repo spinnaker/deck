@@ -11,9 +11,10 @@ module.exports = angular
   .module('spinnaker.core.pipeline.config.controller', [require('@uirouter/angularjs').default])
   .controller('PipelineConfigCtrl', [
     '$scope',
+    '$state',
     '$stateParams',
     'app',
-    function($scope, $stateParams, app) {
+    function($scope, $state, $stateParams, app) {
       this.application = app;
       this.state = {
         pipelinesLoaded: false,
@@ -23,6 +24,10 @@ module.exports = angular
 
       this.initialize = () => {
         this.pipelineConfig = _.find(app.pipelineConfigs.data, { id: $stateParams.pipelineId });
+
+        if (this.pipelineConfig && this.pipelineConfig.schema === 'v2') {
+          return $state.go('home.applications.application.pipelines.executions', null, { location: 'replace' });
+        }
 
         if (this.pipelineConfig && this.pipelineConfig.expectedArtifacts) {
           for (const artifact of this.pipelineConfig.expectedArtifacts) {

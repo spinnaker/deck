@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { get } from 'lodash';
 import * as ReactGA from 'react-ga';
 import { Subscription } from 'rxjs';
 import { UISref } from '@uirouter/react';
@@ -132,6 +133,8 @@ export class SingleExecutionDetails extends React.Component<
     const defaultExecutionParams = { application: app.name, executionId: execution ? execution.id : '' };
     const executionParams = ReactInjector.$state.params.executionParams || defaultExecutionParams;
 
+    const isFromMPTV2Pipeline = (get(execution, 'pipelineConfig.schema', '') as string) === 'v2';
+
     return (
       <div style={{ width: '100%', paddingTop: 0 }}>
         {execution && (
@@ -160,21 +163,22 @@ export class SingleExecutionDetails extends React.Component<
                       <span> stage durations</span>
                     </label>
                   </div>
-                  <Tooltip value="Navigate to Pipeline Configuration">
-                    <UISref
-                      to="^.pipelineConfig"
-                      params={{ application: this.props.app.name, pipelineId: this.state.execution.pipelineConfigId }}
-                    >
-                      <button
-                        className="btn btn-sm btn-default"
-                        onClick={this.handleConfigureClicked}
-                        style={{ marginRight: '5px' }}
+                  {!isFromMPTV2Pipeline && (
+                    <Tooltip value="Navigate to Pipeline Configuration">
+                      <UISref
+                        to="^.pipelineConfig"
+                        params={{ application: this.props.app.name, pipelineId: this.state.execution.pipelineConfigId }}
                       >
-                        <span className="glyphicon glyphicon-cog" />
-                        <span className="visible-md-inline visible-lg-inline"> Configure</span>
-                      </button>
-                    </UISref>
-                  </Tooltip>
+                        <button
+                          className="btn btn-sm btn-default single-execution-details__configure"
+                          onClick={this.handleConfigureClicked}
+                        >
+                          <span className="glyphicon glyphicon-cog" />
+                          <span className="visible-md-inline visible-lg-inline"> Configure</span>
+                        </button>
+                      </UISref>
+                    </Tooltip>
+                  )}
                 </div>
               </div>
             </div>

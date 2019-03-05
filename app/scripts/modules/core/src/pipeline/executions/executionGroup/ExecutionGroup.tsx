@@ -55,6 +55,8 @@ export class ExecutionGroup extends React.Component<IExecutionGroupProps, IExecu
     const pipelineConfig = find(this.props.application.pipelineConfigs.data, {
       name: this.props.group.heading,
     }) as IPipeline;
+
+    const hasNonMPTV2PipelineConfig = pipelineConfig && pipelineConfig.schema !== 'v2';
     const sectionCacheKey = this.getSectionCacheKey();
 
     this.state = {
@@ -66,7 +68,7 @@ export class ExecutionGroup extends React.Component<IExecutionGroupProps, IExecu
         CollapsibleSectionStateCache.isExpanded(sectionCacheKey),
       poll: null,
       canTriggerPipelineManually: !!pipelineConfig,
-      canConfigure: !!(pipelineConfig || strategyConfig),
+      canConfigure: !!(hasNonMPTV2PipelineConfig || strategyConfig),
       showAccounts: ExecutionState.filterModel.asFilterModel.sortFilter.groupBy === 'name',
       pipelineConfig,
       showOverflowAccountTags: false,
