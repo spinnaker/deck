@@ -3,7 +3,7 @@
 const angular = require('angular');
 import _ from 'lodash';
 
-import { API, InfrastructureCaches } from '@spinnaker/core';
+import { InfrastructureCaches } from '@spinnaker/core';
 
 module.exports = angular
   .module('spinnaker.azure.instanceType.service', [])
