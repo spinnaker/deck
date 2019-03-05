@@ -17,6 +17,7 @@ import { IRetryablePromise } from 'core/utils/retryablePromise';
 import { TriggersTag } from 'core/pipeline/triggers/TriggersTag';
 import { AccountTag } from 'core/account';
 import { ModalInjector, ReactInjector } from 'core/reactShims';
+import { PipelineTemplateV2Service } from 'core/pipeline';
 import { Spinner } from 'core/widgets/spinners/Spinner';
 
 import './executionGroup.less';
@@ -56,7 +57,7 @@ export class ExecutionGroup extends React.Component<IExecutionGroupProps, IExecu
       name: this.props.group.heading,
     }) as IPipeline;
 
-    const hasNonMPTV2PipelineConfig = pipelineConfig && pipelineConfig.schema !== 'v2';
+    const hasNonMPTV2PipelineConfig = pipelineConfig && !PipelineTemplateV2Service.isV2PipelineConfig(pipelineConfig);
     const sectionCacheKey = this.getSectionCacheKey();
 
     this.state = {

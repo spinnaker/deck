@@ -4,6 +4,7 @@ import _ from 'lodash';
 import { hri as HumanReadableIds } from 'human-readable-ids';
 
 import { PipelineTemplateReader } from './templates/PipelineTemplateReader';
+import { PipelineTemplateV2Service } from 'core/pipeline';
 
 const angular = require('angular');
 
@@ -25,7 +26,7 @@ module.exports = angular
       this.initialize = () => {
         this.pipelineConfig = _.find(app.pipelineConfigs.data, { id: $stateParams.pipelineId });
 
-        if (this.pipelineConfig && this.pipelineConfig.schema === 'v2') {
+        if (this.pipelineConfig && PipelineTemplateV2Service.isV2PipelineConfig(this.pipelineConfig)) {
           return $state.go('home.applications.application.pipelines.executions', null, { location: 'replace' });
         }
 

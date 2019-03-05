@@ -5,9 +5,10 @@ import { Subscription } from 'rxjs';
 import { UISref } from '@uirouter/react';
 
 import { Application } from 'core/application/application.model';
-import { IExecution } from 'core/domain';
+import { IExecution, IPipeline } from 'core/domain';
 import { Execution } from 'core/pipeline/executions/execution/Execution';
 import { IScheduler, SchedulerFactory } from 'core/scheduler';
+import { PipelineTemplateV2Service } from 'core/pipeline';
 import { ReactInjector, IStateChange } from 'core/reactShims';
 import { Tooltip } from 'core/presentation';
 import { ISortFilter } from 'core/filterModel';
@@ -132,8 +133,11 @@ export class SingleExecutionDetails extends React.Component<
 
     const defaultExecutionParams = { application: app.name, executionId: execution ? execution.id : '' };
     const executionParams = ReactInjector.$state.params.executionParams || defaultExecutionParams;
-
-    const isFromMPTV2Pipeline = (get(execution, 'pipelineConfig.schema', '') as string) === 'v2';
+    const isFromMPTV2Pipeline = PipelineTemplateV2Service.isV2PipelineConfig(get(
+      execution,
+      'pipelineConfig',
+      {},
+    ) as IPipeline);
 
     return (
       <div style={{ width: '100%', paddingTop: 0 }}>

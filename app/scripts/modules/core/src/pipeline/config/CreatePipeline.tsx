@@ -5,6 +5,7 @@ import { Dropdown } from 'react-bootstrap';
 
 import { Application } from 'core/application';
 import { IPipeline } from 'core/domain';
+import { PipelineTemplateV2Service } from 'core/pipeline';
 import { ReactInjector } from 'core/reactShims';
 import { Tooltip } from 'core/presentation/Tooltip';
 
@@ -23,7 +24,7 @@ export class CreatePipeline extends React.Component<ICreatePipelineProps> {
     const { application } = this.props;
 
     const pipelineConfigs = get(application, 'pipelineConfigs.data', []).filter(
-      (pipelineConfig: IPipeline) => pipelineConfig.schema !== 'v2',
+      (pipelineConfig: IPipeline) => !PipelineTemplateV2Service.isV2PipelineConfig(pipelineConfig),
     );
     const hasPipelineConfigs = pipelineConfigs.length > 0;
 
