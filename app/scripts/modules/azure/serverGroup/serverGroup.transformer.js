@@ -33,6 +33,7 @@ module.exports = angular
         cloudProvider: command.selectedProvider,
         application: command.application,
         stack: command.stack,
+        strategy: command.strategy,
         detail: command.freeFormDetails,
         freeFormDetails: command.freeFormDetails,
         account: command.credentials,
@@ -82,6 +83,7 @@ module.exports = angular
           command.customScriptsSettings.fileUris != ''
         ) {
           var fileUrisTemp = command.customScriptsSettings.fileUris;
+          if (typeof fileUrisTemp !== 'string') fileUrisTemp = fileUrisTemp[0];
           if (fileUrisTemp.includes(',')) {
             configuration.customScriptsSettings.fileUris = fileUrisTemp.split(',');
           } else if (fileUrisTemp.includes(';')) {
@@ -94,6 +96,13 @@ module.exports = angular
             configuration.customScriptsSettings.fileUris[index] = v.trim();
           });
         }
+      }
+
+      if (command.instanceType) {
+        let vmsku = command.instanceType;
+        configuration.instanceType = command.instanceType;
+        configuration.sku.name = vmsku;
+        configuration.sku.tier = vmsku.substring(0, vmsku.indexOf('_'));
       }
 
       // Default to an empty list of health provider names for now.
