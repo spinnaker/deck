@@ -1,0 +1,20 @@
+<div ng-if="ctrl.state.loaded" class="clearfix">
+  <div class="container-fluid form-horizontal">
+    <stage-config-field
+      label="Expected Artifact"
+      help-key="kubernetes.manifest.expectedArtifact"
+      field-columns="8"
+      ng-if="ctrl.$scope.stage.source === ctrl.artifactSource"
+    >
+      <stage-artifact-selector-react
+        pipeline="ctrl.$scope.$parent.pipeline"
+        stage="ctrl.$scope.stage"
+        expected-artifact-id="ctrl.$scope.stage.pipelinesArtifactId"
+        artifact="ctrl.$scope.stage.pipelinesArtifact"
+        on-expected-artifact-selected="ctrl.onExpectedArtifactSelected"
+        on-artifact-edited="ctrl.onArtifactEdited"
+      >
+      </stage-artifact-selector-react>
+    </stage-config-field>
+  </div>
+</div>
