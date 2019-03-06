@@ -3,12 +3,13 @@
 import _ from 'lodash';
 
 import { PipelineTemplateReader } from './templates/PipelineTemplateReader';
+import { PipelineTemplateV2Service } from 'core/pipeline';
 
 const angular = require('angular');
 
 module.exports = angular
   .module('spinnaker.core.pipeline.config.controller', [require('@uirouter/angularjs').default])
-  .controller('PipelineConfigCtrl', function($scope, $stateParams, app) {
+  .controller('PipelineConfigCtrl', function($scope, $state, $stateParams, app) {
     this.application = app;
     this.state = {
       pipelinesLoaded: false,
@@ -18,6 +19,11 @@ module.exports = angular
 
     this.initialize = () => {
       this.pipelineConfig = _.find(app.pipelineConfigs.data, { id: $stateParams.pipelineId });
+
+      if (this.pipelineConfig && PipelineTemplateV2Service.isV2PipelineConfig(this.pipelineConfig)) {
+        return $state.go('home.applications.application.pipelines.executions', null, { location: 'replace' });
+      }
+
       if (this.pipelineConfig && this.pipelineConfig.type === 'templatedPipeline') {
         this.isTemplatedPipeline = true;
         this.hasDynamicSource = this.containsJinja(this.pipelineConfig.config.pipeline.template.source);
