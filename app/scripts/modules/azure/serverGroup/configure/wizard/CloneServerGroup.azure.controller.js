@@ -28,6 +28,7 @@ module.exports = angular
       loadBalancers: require('./loadBalancers/loadBalancers.html'),
       networkSettings: require('./networkSettings/networkSettings.html'),
       securityGroups: require('./securityGroup/securityGroups.html'),
+      instanceType: require('./instanceType/instanceType.html'),
       advancedSettings: require('./advancedSettings/advancedSettings.html'),
     };
 
@@ -134,6 +135,7 @@ module.exports = angular
         ModalWizard.markComplete('load-balancers');
         ModalWizard.markComplete('network-settings');
         ModalWizard.markComplete('security-groups');
+        ModalWizard.markComplete('instance-type');
       }
     }
 
@@ -143,13 +145,15 @@ module.exports = angular
     }
 
     function initializeSelectOptions() {
-      processCommandUpdateResult($scope.command.credentialsChanged($scope.command));
-      processCommandUpdateResult($scope.command.regionChanged($scope.command));
+      processCommandUpdateResult($scope.command.credentialsChanged($scope.command, true));
+      processCommandUpdateResult($scope.command.regionChanged($scope.command, true));
     }
 
     function createResultProcessor(method) {
-      return function() {
-        processCommandUpdateResult(method($scope.command));
+      return function(newValue, oldValue) {
+        if (newValue !== oldValue) {
+          processCommandUpdateResult(method($scope.command));
+        }
       };
     }
 
@@ -160,6 +164,9 @@ module.exports = angular
       }
       if (result.dirty.securityGroups) {
         ModalWizard.markDirty('security-groups');
+      }
+      if (result.dirty.instanceType) {
+        ModalWizard.markDirty('instance-type');
       }
     }
 
@@ -199,5 +206,15 @@ module.exports = angular
     this.templateSelected = () => {
       $scope.state.requiresTemplateSelection = false;
       configureCommand();
+    };
+
+    this.isValid = function() {
+      return (
+        $scope.command &&
+        $scope.command.application &&
+        $scope.command.credentials &&
+        $scope.command.instanceType &&
+        $scope.command.region
+      );
     };
   });

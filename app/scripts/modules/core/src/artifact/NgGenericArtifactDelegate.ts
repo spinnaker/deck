@@ -15,7 +15,7 @@ export class NgGenericArtifactDelegate
   implements IExpectedArtifactSelectorViewControllerDelegate {
   constructor(
     protected $scope: IScope,
-    private tag: String,
+    private tag: string,
     private excludedArtifactTypes = defaultExcludedArtifactTypes,
   ) {
     super($scope);
@@ -41,7 +41,7 @@ export class NgGenericArtifactDelegate
   };
 
   public getSelectedExpectedArtifact = (): IExpectedArtifact => {
-    const id = this.$scope.stage[`${this.tag}ArtifacId`];
+    const id = this.$scope.stage[`${this.tag}ArtifactId`];
     if (id == null) {
       return null;
     }

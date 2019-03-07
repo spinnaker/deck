@@ -6,8 +6,8 @@ import { Application, IStage, Registry } from '@spinnaker/core';
 import { IInstanceFieldSizeValidationConfig } from 'cloudfoundry/pipeline/config/validation/instanceSize.validator';
 
 class CloudFoundryResizeAsgStageCtrl implements IController {
+  public static $inject = ['$scope', 'application'];
   constructor(public $scope: IScope, private application: Application) {
-    'ngInject';
     this.$scope.application = this.application;
   }
 }

@@ -23,13 +23,13 @@ export class NetworkInterceptor implements IHttpInterceptor {
   private retryQueue: Dictionary<number> = {};
   private MAX_RETRIES = 4;
 
+  public static $inject = ['$q', '$window', '$timeout', '$injector'];
   constructor(
     private $q: IQService,
     private $window: IWindowService,
     private $timeout: ITimeoutService,
     private $injector: any,
   ) {
-    'ngInject';
     this.$window.addEventListener('offline', this.handleOffline);
     this.$window.addEventListener('online', this.handleOnline);
     this.resetNetworkAvailable();
@@ -79,6 +79,9 @@ export class NetworkInterceptor implements IHttpInterceptor {
 export const NETWORK_INTERCEPTOR = 'spinnaker.core.network.interceptor';
 module(NETWORK_INTERCEPTOR, [])
   .service('networkInterceptor', NetworkInterceptor)
-  .config(($httpProvider: IHttpProvider) => {
-    $httpProvider.interceptors.push('networkInterceptor');
-  });
+  .config([
+    '$httpProvider',
+    ($httpProvider: IHttpProvider) => {
+      $httpProvider.interceptors.push('networkInterceptor');
+    },
+  ]);

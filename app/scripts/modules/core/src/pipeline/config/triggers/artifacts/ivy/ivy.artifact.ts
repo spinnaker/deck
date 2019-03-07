@@ -1,32 +1,30 @@
 import { IController, module } from 'angular';
 
+import { ArtifactTypePatterns } from 'core/artifact';
 import { IArtifact } from 'core/domain/IArtifact';
 import { Registry } from 'core/registry';
-import { IvyArtifactEditor } from './IvyArtifactEditor';
 
 class IvyArtifactController implements IController {
-  constructor(public artifact: IArtifact) {
-    'ngInject';
-  }
+  public static $inject = ['artifact'];
+  constructor(public artifact: IArtifact) {}
 }
 
 export const IVY_ARTIFACT = 'spinnaker.core.pipeline.trigger.ivy.artifact';
 module(IVY_ARTIFACT, [])
   .config(() => {
-    Registry.pipeline.registerArtifactKind({
+    Registry.pipeline.mergeArtifactKind({
       label: 'Ivy',
+      typePattern: ArtifactTypePatterns.IVY_FILE,
       type: 'ivy/file',
       description: 'An Ivy repository artifact.',
       key: 'ivy',
       isDefault: false,
       isMatch: true,
       controller: function(artifact: IArtifact) {
-        'ngInject';
         this.artifact = artifact;
         this.artifact.type = 'ivy/file';
       },
       controllerAs: 'ctrl',
-      editCmp: IvyArtifactEditor,
       template: `
 <div class="col-md-12">
   <div class="form-group row">

@@ -8,9 +8,9 @@ import { IMoniker, NameUtils } from 'core/naming';
 import { IJob, TaskExecutor } from 'core/task/taskExecutor';
 
 export interface ICapacity {
-  desired: number;
-  max: number;
-  min: number;
+  desired: number | string;
+  max: number | string;
+  min: number | string;
 }
 
 export interface IServerGroupJob extends IJob {
@@ -27,9 +27,8 @@ export interface IServerGroupJob extends IJob {
 }
 
 export class ServerGroupWriter {
-  constructor(private serverGroupTransformer: any) {
-    'ngInject';
-  }
+  public static $inject = ['serverGroupTransformer'];
+  constructor(private serverGroupTransformer: any) {}
 
   public cloneServerGroup(command: IServerGroupCommand, application: Application): ng.IPromise<ITask> {
     let description: string;

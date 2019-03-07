@@ -2,7 +2,7 @@ import { module } from 'angular';
 
 import { Application } from 'core/application/application.model';
 import { IMoniker } from 'core/naming/IMoniker';
-import { ILoadBalancer, ISecurityGroup, ISubnet, IEntityTags, IPipeline, IStage } from 'core/domain';
+import { ILoadBalancer, ISecurityGroup, ISubnet, IPipeline, IStage } from 'core/domain';
 import { ICapacity } from 'core/serverGroup/serverGroupWriter.service';
 import { IDeploymentStrategy } from 'core/deploymentStrategy';
 import { ISecurityGroupsByAccountSourceData } from 'core/securityGroup/securityGroupReader.service';
@@ -122,7 +122,7 @@ export interface IServerGroupCommand extends IServerGroupCommandResult {
   strategy: string;
   subnetType: string;
   suspendedProcesses: string[];
-  tags: IEntityTags;
+  tags: { [key: string]: string };
   terminationPolicies: string[];
   type?: string;
   useSourceCapacity?: boolean;
@@ -145,9 +145,8 @@ export class ServerGroupCommandBuilderService {
     return this.providerServiceDelegate.getDelegate(provider, 'serverGroup.commandBuilder', skin);
   }
 
-  constructor(private providerServiceDelegate: ProviderServiceDelegate) {
-    'ngInject';
-  }
+  public static $inject = ['providerServiceDelegate'];
+  constructor(private providerServiceDelegate: ProviderServiceDelegate) {}
 
   public buildNewServerGroupCommand(
     application: Application,

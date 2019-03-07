@@ -1,32 +1,30 @@
 import { IController, module } from 'angular';
 
+import { ArtifactTypePatterns } from 'core/artifact';
 import { IArtifact } from 'core/domain/IArtifact';
 import { Registry } from 'core/registry';
-import { MavenArtifactEditor } from './MavenArtifactEditor';
 
 class MavenArtifactController implements IController {
-  constructor(public artifact: IArtifact) {
-    'ngInject';
-  }
+  public static $inject = ['artifact'];
+  constructor(public artifact: IArtifact) {}
 }
 
 export const MAVEN_ARTIFACT = 'spinnaker.core.pipeline.trigger.maven.artifact';
 module(MAVEN_ARTIFACT, [])
   .config(() => {
-    Registry.pipeline.registerArtifactKind({
+    Registry.pipeline.mergeArtifactKind({
       label: 'Maven',
+      typePattern: ArtifactTypePatterns.MAVEN_FILE,
       type: 'maven/file',
       description: 'A Maven repository artifact.',
       key: 'maven',
       isDefault: false,
       isMatch: true,
       controller: function(artifact: IArtifact) {
-        'ngInject';
         this.artifact = artifact;
         this.artifact.type = 'maven/file';
       },
       controllerAs: 'ctrl',
-      editCmp: MavenArtifactEditor,
       template: `
 <div class="col-md-12">
   <div class="form-group row">

@@ -33,6 +33,8 @@ export interface INotificationSettings {
 
 export interface IFeatures {
   [key: string]: any;
+  artifacts?: boolean;
+  artifactsRewrite?: boolean;
   canary?: boolean;
   chaosMonkey?: boolean;
   displayTimestampsInUserLocalTime?: boolean;
@@ -43,6 +45,7 @@ export interface IFeatures {
   // whether stages affecting infrastructure (like "Create Load Balancer") should be enabled or not
   infrastructureStages?: boolean;
   jobs?: boolean;
+  managedPipelineTemplatesV2UI?: boolean;
   managedServiceAccounts?: boolean;
   notifications?: boolean;
   pagerDuty?: boolean;

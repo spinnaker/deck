@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Select, { Option } from 'react-select';
 
-import { HelpField, IServerGroupCommand } from '@spinnaker/core';
+import { HelpField, IServerGroupCommand, SpelNumberInput } from '@spinnaker/core';
 import { IMinMaxDesiredProps } from './MinMaxDesired';
 
 export interface ICapacitySelectorProps {
@@ -36,12 +36,11 @@ export class CapacitySelector extends React.Component<ICapacitySelectorProps> {
     this.setState({});
   }
 
-  private simpleInstancesChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = Number.parseInt(event.target.value, 10);
+  private simpleInstancesChanged = (value: number | string) => {
     this.setMinMax(value);
   };
 
-  private setMinMax(value: number) {
+  private setMinMax(value: number | string) {
     const { command } = this.props;
     if (command.viewState.useSimpleCapacity) {
       command.capacity = { min: value, max: value, desired: value };
@@ -86,58 +85,57 @@ export class CapacitySelector extends React.Component<ICapacitySelectorProps> {
           </div>
 
           {/* // TODO: Test this in a clone server group dialog or an edit pipeline dialog */}
-          {!readOnlyFields.useSourceCapacity &&
-            command.viewState.mode === 'editPipeline' && (
-              <div className="form-group">
-                <div className="col-md-3 sm-label-right">Capacity</div>
-                <div className="col-md-9 radio">
-                  <label>
-                    <input
-                      type="radio"
-                      checked={command.useSourceCapacity}
-                      value="true"
-                      id="useSourceCapacityTrue"
-                      onChange={this.useSourceCapacityUpdated}
-                    />
-                    Copy the capacity from the current server group
-                    <HelpField id="serverGroupCapacity.useSourceCapacityTrue" />
-                  </label>
-                </div>
-                {command.useSourceCapacity && (
-                  <div className="col-md-9 col-md-offset-3 radio" style={{ paddingLeft: '35px' }}>
-                    <div>
-                      If no current server group is found,
-                      <Select
-                        clearable={false}
-                        value={!!command.preferSourceCapacity}
-                        options={this.preferSourceCapacityOptions}
-                        onChange={this.preferSourceCapacityChanged}
-                      />
-                    </div>
-                    {command.preferSourceCapacity && (
-                      <div>
-                        <b>Fallback values</b>
-                        <MinMaxDesired command={command} fieldChanged={this.capacityFieldChanged} />
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                <div className="col-md-9 col-md-offset-3 radio">
-                  <label>
-                    <input
-                      type="radio"
-                      checked={!command.useSourceCapacity}
-                      value="false"
-                      id="useSourceCapacityFalse"
-                      onChange={this.useSourceCapacityUpdated}
-                    />
-                    Let me specify the capacity
-                    <HelpField id="serverGroupCapacity.useSourceCapacityFalse" />
-                  </label>
-                </div>
+          {!readOnlyFields.useSourceCapacity && command.viewState.mode === 'editPipeline' && (
+            <div className="form-group">
+              <div className="col-md-3 sm-label-right">Capacity</div>
+              <div className="col-md-9 radio">
+                <label>
+                  <input
+                    type="radio"
+                    checked={command.useSourceCapacity}
+                    value="true"
+                    id="useSourceCapacityTrue"
+                    onChange={this.useSourceCapacityUpdated}
+                  />
+                  Copy the capacity from the current server group
+                  <HelpField id="serverGroupCapacity.useSourceCapacityTrue" />
+                </label>
               </div>
-            )}
+              {command.useSourceCapacity && (
+                <div className="col-md-9 col-md-offset-3 radio" style={{ paddingLeft: '35px' }}>
+                  <div>
+                    If no current server group is found,
+                    <Select
+                      clearable={false}
+                      value={!!command.preferSourceCapacity}
+                      options={this.preferSourceCapacityOptions}
+                      onChange={this.preferSourceCapacityChanged}
+                    />
+                  </div>
+                  {command.preferSourceCapacity && (
+                    <div>
+                      <b>Fallback values</b>
+                      <MinMaxDesired command={command} fieldChanged={this.capacityFieldChanged} />
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="col-md-9 col-md-offset-3 radio">
+                <label>
+                  <input
+                    type="radio"
+                    checked={!command.useSourceCapacity}
+                    value="false"
+                    id="useSourceCapacityFalse"
+                    onChange={this.useSourceCapacityUpdated}
+                  />
+                  Let me specify the capacity
+                  <HelpField id="serverGroupCapacity.useSourceCapacityFalse" />
+                </label>
+              </div>
+            </div>
+          )}
 
           {(!command.useSourceCapacity || command.viewState.mode !== 'editPipeline') && (
             <div>
@@ -168,15 +166,8 @@ export class CapacitySelector extends React.Component<ICapacitySelectorProps> {
         </div>
         <div className="form-group">
           <div className="col-md-3 sm-label-right">Number of Instances</div>
-          <div className="col-md-2">
-            <input
-              type="number"
-              onChange={this.simpleInstancesChanged}
-              className="form-control input-sm"
-              value={command.capacity.desired}
-              min={0}
-              required={true}
-            />
+          <div className="col-md-8">
+            <SpelNumberInput value={command.capacity.desired} min={0} onChange={this.simpleInstancesChanged} />
           </div>
         </div>
       </div>

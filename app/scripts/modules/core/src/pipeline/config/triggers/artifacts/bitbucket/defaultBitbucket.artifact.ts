@@ -1,19 +1,20 @@
 import { module } from 'angular';
 
+import { ArtifactTypePatterns } from 'core/artifact';
 import { IArtifact } from 'core/domain/IArtifact';
 import { Registry } from 'core/registry';
 
 export const DEFAULT_BITBUCKET_ARTIFACT = 'spinnaker.core.pipeline.trigger.artifact.defaultBitbucket';
 module(DEFAULT_BITBUCKET_ARTIFACT, []).config(() => {
-  Registry.pipeline.registerArtifactKind({
+  Registry.pipeline.mergeArtifactKind({
     label: 'Bitbucket',
+    typePattern: ArtifactTypePatterns.BITBUCKET_FILE,
     type: 'bitbucket/file',
     description: 'A file stored in git, hosted by Bitbucket.',
     key: 'default.bitbucket',
     isDefault: true,
     isMatch: false,
     controller: function(artifact: IArtifact) {
-      'ngInject';
       this.artifact = artifact;
       this.artifact.type = 'bitbucket/file';
       const pathRegex = new RegExp('/1.0/repositories/[^/]*/[^/]*/raw/[^/]*/(.*)$');

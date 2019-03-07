@@ -33,6 +33,7 @@ module.exports = angular
         cloudProvider: command.selectedProvider,
         application: command.application,
         stack: command.stack,
+        strategy: command.strategy,
         detail: command.freeFormDetails,
         freeFormDetails: command.freeFormDetails,
         account: command.credentials,
@@ -60,8 +61,6 @@ module.exports = angular
         },
         viewState: command.viewState,
         osConfig: {
-          adminUserName: 'spinnakeruser',
-          adminPassword: '!Qnti**234',
           customData: command.osConfig ? command.osConfig.customData : null,
         },
         customScriptsSettings: {
@@ -79,11 +78,31 @@ module.exports = angular
 
       if (typeof command.customScriptsSettings !== 'undefined') {
         configuration.customScriptsSettings.commandToExecute = command.customScriptsSettings.commandToExecute;
-        if (Array.isArray(command.customScriptsSettings.fileUris)) {
-          configuration.customScriptsSettings.fileUris = command.customScriptsSettings.fileUris;
-        } else {
-          configuration.customScriptsSettings.fileUris = [command.customScriptsSettings.fileUris];
+        if (
+          typeof command.customScriptsSettings.fileUris !== 'undefined' &&
+          command.customScriptsSettings.fileUris != ''
+        ) {
+          var fileUrisTemp = command.customScriptsSettings.fileUris;
+          if (typeof fileUrisTemp !== 'string') fileUrisTemp = fileUrisTemp[0];
+          if (fileUrisTemp.includes(',')) {
+            configuration.customScriptsSettings.fileUris = fileUrisTemp.split(',');
+          } else if (fileUrisTemp.includes(';')) {
+            configuration.customScriptsSettings.fileUris = fileUrisTemp.split(';');
+          } else {
+            configuration.customScriptsSettings.fileUris = [fileUrisTemp];
+          }
+
+          configuration.customScriptsSettings.fileUris.forEach(function(v, index) {
+            configuration.customScriptsSettings.fileUris[index] = v.trim();
+          });
         }
+      }
+
+      if (command.instanceType) {
+        let vmsku = command.instanceType;
+        configuration.instanceType = command.instanceType;
+        configuration.sku.name = vmsku;
+        configuration.sku.tier = vmsku.substring(0, vmsku.indexOf('_'));
       }
 
       // Default to an empty list of health provider names for now.

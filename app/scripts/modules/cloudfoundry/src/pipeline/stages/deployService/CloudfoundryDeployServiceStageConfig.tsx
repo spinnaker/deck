@@ -35,7 +35,6 @@ interface ICloudfoundryDeployServiceStageConfigState {
   region: string;
   regions: IRegion[];
   serviceNamesAndPlans: IService[];
-  timeout: string;
   type: string;
   manifest?: ICloudFoundryServiceManifestSource;
 }
@@ -49,7 +48,7 @@ export class CloudfoundryDeployServiceStageConfig extends React.Component<
     props.stage.cloudProvider = 'cloudfoundry';
     props.stage.manifest = props.stage.manifest || {
       service: '',
-      serviceName: '',
+      serviceInstanceName: '',
       servicePlan: '',
       parameters: '',
       type: 'direct',
@@ -61,7 +60,6 @@ export class CloudfoundryDeployServiceStageConfig extends React.Component<
       region: props.stage.region,
       regions: [],
       serviceNamesAndPlans: [],
-      timeout: props.stage.timeout,
       type: props.stage.manifest.type,
     };
   }
@@ -71,7 +69,7 @@ export class CloudfoundryDeployServiceStageConfig extends React.Component<
       case 'direct':
         this.props.stage.manifest = {
           service: '',
-          serviceName: '',
+          serviceInstanceName: '',
           servicePlan: '',
           type: 'direct',
         };
@@ -89,7 +87,7 @@ export class CloudfoundryDeployServiceStageConfig extends React.Component<
         this.props.stage.manifest = {
           credentials: '',
           routeServiceUrl: '',
-          serviceName: '',
+          serviceInstanceName: '',
           syslogDrainUrl: '',
           tags: [],
           type: 'userProvided',
@@ -147,7 +145,7 @@ export class CloudfoundryDeployServiceStageConfig extends React.Component<
     this.props.stage.credentials = credentials;
     this.props.stage.region = '';
     this.props.stage.manifest.service = '';
-    this.props.stage.manifest.serviceName = '';
+    this.props.stage.manifest.serviceInstanceName = '';
     this.props.stage.manifest.servicePlan = '';
     this.props.stageFieldUpdated();
     if (credentials) {
@@ -160,17 +158,10 @@ export class CloudfoundryDeployServiceStageConfig extends React.Component<
     this.setState({ region: region });
     this.props.stage.region = region;
     this.props.stage.manifest.service = '';
-    this.props.stage.manifest.serviceName = '';
+    this.props.stage.manifest.serviceInstanceName = '';
     this.props.stage.manifest.servicePlan = '';
     this.props.stageFieldUpdated();
     this.clearAndReloadServices();
-  };
-
-  private timeoutUpdated = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    const timeout = event.target.value;
-    this.setState({ timeout });
-    this.props.stage.timeout = timeout;
-    this.props.stageFieldUpdated();
   };
 
   private serviceManifestSourceUpdated = (manifest: ICloudFoundryServiceManifestSource) => {
@@ -180,13 +171,13 @@ export class CloudfoundryDeployServiceStageConfig extends React.Component<
   };
 
   public render() {
-    const { credentials, manifest, region, timeout } = this.props.stage;
+    const { credentials, manifest, region } = this.props.stage;
     const { accounts, regions, serviceNamesAndPlans } = this.state;
     const { serviceManifestSourceUpdated } = this;
     let manifestInput;
 
     switch (manifest.type) {
-      case 'direct':
+      case 'direct': {
         const direct = manifest as { type: string } & ICloudfoundryServiceManifestDirectSource;
         manifestInput = (
           <CreateServiceInstanceDirectInput
@@ -196,17 +187,20 @@ export class CloudfoundryDeployServiceStageConfig extends React.Component<
           />
         );
         break;
+      }
       case 'userProvidedArtifact':
-      case 'artifact':
+      case 'artifact': {
         const artifact = manifest as { type: string } & ICloudfoundryServiceManifestArtifactSource;
         manifestInput = (
           <CreateServiceInstanceArtifactInput onChange={serviceManifestSourceUpdated} serviceInput={artifact} />
         );
         break;
-      case 'userProvided':
+      }
+      case 'userProvided': {
         const userProvided = manifest as { type: string } & ICloudFoundryServiceUserProvidedSource;
         manifestInput = <CreateUserProvidedInput onChange={serviceManifestSourceUpdated} serviceInput={userProvided} />;
         break;
+      }
     }
 
     return (
@@ -270,11 +264,6 @@ export class CloudfoundryDeployServiceStageConfig extends React.Component<
           </div>
         </StageConfigField>
         {manifestInput}
-        {manifest.type !== 'userProvided' && (
-          <StageConfigField label="Override Deploy Timeout (Seconds)" helpKey="cf.service.deploy.timeout">
-            <input type="number" className="form-control" onChange={this.timeoutUpdated} value={timeout} />
-          </StageConfigField>
-        )}
       </div>
     );
   }

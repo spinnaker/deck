@@ -10,9 +10,8 @@ import { SETTINGS } from 'core/config/settings';
 export type IProviderSelectionFilter = (app: Application, acc: IAccountDetails, prov: ICloudProviderConfig) => boolean;
 
 export class ProviderSelectionService {
-  constructor(private $uibModal: IModalService, private $q: IQService) {
-    'ngInject';
-  }
+  public static $inject = ['$uibModal', '$q'];
+  constructor(private $uibModal: IModalService, private $q: IQService) {}
 
   public selectProvider(
     application: Application,

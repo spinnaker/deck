@@ -29,9 +29,8 @@ export class GceLoadBalancerSetTransformer {
     return portRange.split('-')[0];
   }
 
-  constructor(private gceHttpLoadBalancerUtils: GceHttpLoadBalancerUtils) {
-    'ngInject';
-  }
+  public static $inject = ['gceHttpLoadBalancerUtils'];
+  constructor(private gceHttpLoadBalancerUtils: GceHttpLoadBalancerUtils) {}
 
   public normalizeLoadBalancerSet = (loadBalancers: IGceLoadBalancer[]): IGceLoadBalancer[] => {
     const [httpLoadBalancers, otherLoadBalancers] = partition(loadBalancers, lb =>

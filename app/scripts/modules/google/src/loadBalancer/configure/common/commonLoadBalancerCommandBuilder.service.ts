@@ -44,14 +44,13 @@ export class GceCommonLoadBalancerCommandBuilder {
     certificates: (): IPromise<IGceCertificate[]> => this.gceCertificateReader.listCertificates(),
   };
 
+  public static $inject = ['$q', 'loadBalancerReader', 'gceHealthCheckReader', 'gceCertificateReader'];
   constructor(
     private $q: ng.IQService,
     private loadBalancerReader: LoadBalancerReader,
     private gceHealthCheckReader: GceHealthCheckReader,
     private gceCertificateReader: GceCertificateReader,
-  ) {
-    'ngInject';
-  }
+  ) {}
 
   public getBackingData(dataTypes: string[]): IPromise<any> {
     const promises = dataTypes.reduce((promisesByDataType: { [dataType: string]: IPromise<any> }, dataType: string) => {

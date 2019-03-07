@@ -323,14 +323,13 @@ export class CloudFoundryServerGroupActions extends React.Component<ICloudFoundr
               </a>
             </li>
           )}
-          {this.hasDisabledInstances() &&
-            !this.isEnableLocked() && (
-              <li>
-                <a className="clickable" onClick={this.enableServerGroup}>
-                  Enable
-                </a>
-              </li>
-            )}
+          {this.hasDisabledInstances() && !this.isEnableLocked() && (
+            <li>
+              <a className="clickable" onClick={this.enableServerGroup}>
+                Enable
+              </a>
+            </li>
+          )}
           {this.isEnableLocked() && (
             <li className="disabled">
               <Tooltip value="Cannot enable this server group until resize operation completes" placement="left">
@@ -353,19 +352,17 @@ export class CloudFoundryServerGroupActions extends React.Component<ICloudFoundr
           {!serverGroup.isDisabled && (
             <li>
               <a className="clickable" onClick={this.mapServerGroupToLoadBalancers}>
-                Map Load Balancers
+                Map Load Balancer
               </a>
             </li>
           )}
-          {!serverGroup.isDisabled &&
-            loadBalancers &&
-            !!loadBalancers.length && (
-              <li>
-                <a className="clickable" onClick={this.unmapServerGroupFromLoadBalancers}>
-                  Unmap Load Balancers
-                </a>
-              </li>
-            )}
+          {!serverGroup.isDisabled && loadBalancers && !!loadBalancers.length && (
+            <li>
+              <a className="clickable" onClick={this.unmapServerGroupFromLoadBalancers}>
+                Unmap Load Balancer
+              </a>
+            </li>
+          )}
           {showEntityTags && (
             <AddEntityTagLinks
               component={serverGroup}

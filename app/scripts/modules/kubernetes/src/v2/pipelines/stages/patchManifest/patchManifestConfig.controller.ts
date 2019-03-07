@@ -34,9 +34,8 @@ export class KubernetesV2PatchManifestConfigCtrl implements IController {
   private manifestArtifactDelegate: NgGenericArtifactDelegate;
   private manifestArtifactController: ExpectedArtifactSelectorViewController;
 
+  public static $inject = ['$scope'];
   constructor(private $scope: IScope) {
-    'ngInject';
-
     const defaultOptions: IPatchOptions = {
       mergeStrategy: MergeStrategy.strategic,
       record: true,
@@ -44,6 +43,10 @@ export class KubernetesV2PatchManifestConfigCtrl implements IController {
 
     if (this.$scope.stage.isNew) {
       this.$scope.stage.options = defaultOptions;
+    }
+
+    if (!this.$scope.stage.app) {
+      this.$scope.stage.app = this.$scope.application.name;
     }
 
     this.setRawPatchBody(this.getMergeStrategy());

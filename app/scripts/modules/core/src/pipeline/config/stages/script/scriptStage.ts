@@ -4,7 +4,7 @@ import { AuthenticationService } from 'core/authentication/AuthenticationService
 import { IStage } from 'core/domain';
 import { Registry } from 'core/registry';
 
-import { ExecutionDetailsTasks } from '../core';
+import { ExecutionDetailsTasks } from '../common';
 import { ScriptExecutionDetails } from '../script/ScriptExecutionDetails';
 
 export const SCRIPT_STAGE = 'spinnaker.core.pipeline.stage.scriptStage';
@@ -24,17 +24,21 @@ module(SCRIPT_STAGE, [])
       validators: [{ type: 'requiredField', fieldName: 'command' }],
     });
   })
-  .controller('ScriptStageCtrl', function($scope: IScope, stage: IStage) {
-    $scope.stage = stage;
-    $scope.stage.failPipeline = $scope.stage.failPipeline === undefined ? true : $scope.stage.failPipeline;
-    $scope.stage.waitForCompletion =
-      $scope.stage.waitForCompletion === undefined ? true : $scope.stage.waitForCompletion;
+  .controller('ScriptStageCtrl', [
+    '$scope',
+    'stage',
+    function($scope: IScope, stage: IStage) {
+      $scope.stage = stage;
+      $scope.stage.failPipeline = $scope.stage.failPipeline === undefined ? true : $scope.stage.failPipeline;
+      $scope.stage.waitForCompletion =
+        $scope.stage.waitForCompletion === undefined ? true : $scope.stage.waitForCompletion;
 
-    if (!$scope.stage.user) {
-      $scope.stage.user = AuthenticationService.getAuthenticatedUser().name;
-    }
+      if (!$scope.stage.user) {
+        $scope.stage.user = AuthenticationService.getAuthenticatedUser().name;
+      }
 
-    $scope.viewState = {
-      loading: false,
-    };
-  });
+      $scope.viewState = {
+        loading: false,
+      };
+    },
+  ]);

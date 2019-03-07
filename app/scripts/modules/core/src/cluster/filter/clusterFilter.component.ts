@@ -38,14 +38,13 @@ class ClusterFilterCtrl {
   private groupsUpdatedSubscription: Subscription;
   private locationChangeUnsubscribe: () => void;
 
+  public static $inject = ['$scope', '$rootScope', '$timeout', 'clusterDependentFilterHelper'];
   constructor(
     public $scope: IScope,
     public $rootScope: IScope,
     public $timeout: ITimeoutService,
     public clusterDependentFilterHelper: any,
-  ) {
-    'ngInject';
-  }
+  ) {}
 
   public $onInit(): void {
     const { $scope, $rootScope, $timeout, app } = this;

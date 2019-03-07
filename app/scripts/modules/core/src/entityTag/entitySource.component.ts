@@ -15,9 +15,8 @@ class EntitySourceCtrl implements IController {
   public comments: string;
   private loadingExecution = false;
 
-  constructor(private executionService: ExecutionService) {
-    'ngInject';
-  }
+  public static $inject = ['executionService'];
+  constructor(private executionService: ExecutionService) {}
 
   public $onInit(): void {
     this.executionType = 'Task';
@@ -45,12 +44,12 @@ class EntitySourceCtrl implements IController {
   }
 }
 
-export class EntitySourceComponent implements ng.IComponentOptions {
-  public bindings: any = {
+export const entitySourceComponent: ng.IComponentOptions = {
+  bindings: {
     metadata: '<',
-  };
-  public controller: any = EntitySourceCtrl;
-  public template = `
+  },
+  controller: EntitySourceCtrl,
+  template: `
     <div ng-if="$ctrl.metadata">
       <dt>Source</dt>
       <dd>
@@ -69,8 +68,8 @@ export class EntitySourceComponent implements ng.IComponentOptions {
         </span>
       </dd>
     </div>
-  `;
-}
+  `,
+};
 
 export const ENTITY_SOURCE_COMPONENT = 'spinnaker.core.entityTag.entitySource.component';
-module(ENTITY_SOURCE_COMPONENT, [EXECUTION_SERVICE]).component('entitySource', new EntitySourceComponent());
+module(ENTITY_SOURCE_COMPONENT, [EXECUTION_SERVICE]).component('entitySource', entitySourceComponent);

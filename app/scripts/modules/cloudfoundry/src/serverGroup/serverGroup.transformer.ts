@@ -5,9 +5,8 @@ import { defaults } from 'lodash';
 import { ICloudFoundryServerGroup, ICloudFoundryEnvVar } from 'cloudfoundry/domain';
 
 export class CloudFoundryServerGroupTransformer {
-  public constructor(private $q: ng.IQService) {
-    'ngInject';
-  }
+  public static $inject = ['$q'];
+  public constructor(private $q: ng.IQService) {}
 
   public normalizeServerGroupDetails(serverGroup: ICloudFoundryServerGroup): ICloudFoundryServerGroup {
     return serverGroup;
