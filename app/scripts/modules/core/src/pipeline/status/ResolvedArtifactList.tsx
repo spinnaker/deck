@@ -5,15 +5,15 @@ import { ArtifactIconService } from 'core/artifact';
 
 import './artifactList.less';
 
-export interface IArtifactListProps {
+export interface IResolvedArtifactListProps {
   artifacts: IArtifact[];
   resolvedExpectedArtifacts?: IExpectedArtifact[];
 }
 
-export interface IArtifactListState {}
+export interface IResolvedArtifactListState {}
 
-export class ArtifactList extends React.Component<IArtifactListProps, IArtifactListState> {
-  constructor(props: IArtifactListProps) {
+export class ResolvedArtifactList extends React.Component<IResolvedArtifactListProps, IResolvedArtifactListState> {
+  constructor(props: IResolvedArtifactListProps) {
     super(props);
   }
 

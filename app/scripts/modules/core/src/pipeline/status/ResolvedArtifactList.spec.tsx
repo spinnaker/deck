@@ -3,27 +3,29 @@ import { ShallowWrapper, shallow } from 'enzyme';
 import { mock } from 'angular';
 import { REACT_MODULE } from 'core/reactShims';
 import { IArtifact, IExpectedArtifact } from 'core/domain';
-import { ArtifactList, IArtifactListProps, IArtifactListState } from './ArtifactList';
+import { ResolvedArtifactList, IResolvedArtifactListProps, IResolvedArtifactListState } from './ResolvedArtifactList';
 
 const ARTIFACT_TYPE = 'docker/image';
 const ARTIFACT_NAME = 'example.com/container';
 
-describe('<ArtifactList/>', () => {
-  let component: ShallowWrapper<IArtifactListProps, IArtifactListState>;
+describe('<ResolvedArtifactList/>', () => {
+  let component: ShallowWrapper<IResolvedArtifactListProps, IResolvedArtifactListState>;
 
   beforeEach(mock.module(REACT_MODULE));
   beforeEach(mock.inject(() => {})); // Angular is lazy.
 
   it('renders null when null artifacts are passed in', function() {
     const artifacts: IArtifact[] = null;
-    component = shallow(<ArtifactList artifacts={artifacts} />);
+    component = shallow(<ResolvedArtifactList artifacts={artifacts} />);
     expect(component.get(0)).toEqual(null);
   });
 
   it('renders null when 0 artifacts are passed in', function() {
     const artifacts: IArtifact[] = [];
     const resolvedExpectedArtifacts = artifacts.map(a => ({ boundArtifact: a } as IExpectedArtifact));
-    component = shallow(<ArtifactList artifacts={artifacts} resolvedExpectedArtifacts={resolvedExpectedArtifacts} />);
+    component = shallow(
+      <ResolvedArtifactList artifacts={artifacts} resolvedExpectedArtifacts={resolvedExpectedArtifacts} />,
+    );
     expect(component.get(0)).toEqual(null);
   });
 
@@ -36,7 +38,9 @@ describe('<ArtifactList/>', () => {
       },
     ];
     const resolvedExpectedArtifacts = artifacts.map(a => ({ boundArtifact: a } as IExpectedArtifact));
-    component = shallow(<ArtifactList artifacts={artifacts} resolvedExpectedArtifacts={resolvedExpectedArtifacts} />);
+    component = shallow(
+      <ResolvedArtifactList artifacts={artifacts} resolvedExpectedArtifacts={resolvedExpectedArtifacts} />,
+    );
     expect(component.find('ul.trigger-details.artifacts').length).toEqual(1);
   });
 
@@ -49,7 +53,9 @@ describe('<ArtifactList/>', () => {
       },
     ];
     const resolvedExpectedArtifacts = artifacts.map(a => ({ boundArtifact: a } as IExpectedArtifact));
-    component = shallow(<ArtifactList artifacts={artifacts} resolvedExpectedArtifacts={resolvedExpectedArtifacts} />);
+    component = shallow(
+      <ResolvedArtifactList artifacts={artifacts} resolvedExpectedArtifacts={resolvedExpectedArtifacts} />,
+    );
     const li = component.find('li');
     const dt = li.find('dt');
     const dd = li.find('dd');
@@ -67,7 +73,7 @@ describe('<ArtifactList/>', () => {
     ];
     const resolvedExpectedArtifacts = singleArtifact.map(a => ({ boundArtifact: a } as IExpectedArtifact));
     component = shallow(
-      <ArtifactList artifacts={singleArtifact} resolvedExpectedArtifacts={resolvedExpectedArtifacts} />,
+      <ResolvedArtifactList artifacts={singleArtifact} resolvedExpectedArtifacts={resolvedExpectedArtifacts} />,
     );
     expect(component.get(0)).toEqual(null);
 
@@ -81,7 +87,7 @@ describe('<ArtifactList/>', () => {
         name: ARTIFACT_NAME,
       },
     ];
-    component = shallow(<ArtifactList artifacts={artifacts} />);
+    component = shallow(<ResolvedArtifactList artifacts={artifacts} />);
     expect(component.find('ul.trigger-details.artifacts').length).toEqual(1);
   });
 
@@ -96,7 +102,9 @@ describe('<ArtifactList/>', () => {
       },
     ];
     const resolvedExpectedArtifacts = artifacts.map(a => ({ boundArtifact: a } as IExpectedArtifact));
-    component = shallow(<ArtifactList artifacts={artifacts} resolvedExpectedArtifacts={resolvedExpectedArtifacts} />);
+    component = shallow(
+      <ResolvedArtifactList artifacts={artifacts} resolvedExpectedArtifacts={resolvedExpectedArtifacts} />,
+    );
     const li = component.find('li');
     expect(li.find('dd').length).toEqual(2);
     expect(
@@ -115,7 +123,7 @@ describe('<ArtifactList/>', () => {
         name: ARTIFACT_NAME,
       },
     ];
-    component = shallow(<ArtifactList artifacts={artifacts} />);
+    component = shallow(<ResolvedArtifactList artifacts={artifacts} />);
     const li = component.find('li');
     expect(li.text()).toMatch(/1.*artifact.*not.*consumed/);
   });
