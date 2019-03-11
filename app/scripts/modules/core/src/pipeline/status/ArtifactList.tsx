@@ -1,21 +1,15 @@
 import * as React from 'react';
 
 import { IArtifact } from 'core/domain';
+import { Artifact } from 'core/pipeline/status/Artifact';
 
 import './artifactList.less';
-import { Artifact } from 'core/pipeline/status/Artifact';
 
 export interface IArtifactListProps {
   artifacts: IArtifact[];
 }
 
-export interface IArtifactListState {}
-
-export class ArtifactList extends React.Component<IArtifactListProps, IArtifactListState> {
-  constructor(props: IArtifactListProps) {
-    super(props);
-  }
-
+export class ArtifactList extends React.Component<IArtifactListProps> {
   public render() {
     let { artifacts } = this.props;
 

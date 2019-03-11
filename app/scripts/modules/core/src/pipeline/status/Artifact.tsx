@@ -11,13 +11,7 @@ export interface IArtifactProps {
   sequence?: number;
 }
 
-export interface IArtifactState {}
-
-export class Artifact extends React.Component<IArtifactProps, IArtifactState> {
-  constructor(props: IArtifactProps) {
-    super(props);
-  }
-
+export class Artifact extends React.Component<IArtifactProps> {
   private tooltip(artifact: IArtifact, isDefault: boolean): string {
     const tooltipEntries = [];
     if (isDefault) {

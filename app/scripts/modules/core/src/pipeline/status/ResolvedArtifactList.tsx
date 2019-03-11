@@ -1,22 +1,16 @@
 import * as React from 'react';
 
 import { IArtifact, IExpectedArtifact } from 'core/domain';
+import { Artifact } from 'core/pipeline/status/Artifact';
 
 import './artifactList.less';
-import { Artifact } from 'core/pipeline/status/Artifact';
 
 export interface IResolvedArtifactListProps {
   artifacts: IArtifact[];
   resolvedExpectedArtifacts?: IExpectedArtifact[];
 }
 
-export interface IResolvedArtifactListState {}
-
-export class ResolvedArtifactList extends React.Component<IResolvedArtifactListProps, IResolvedArtifactListState> {
-  constructor(props: IResolvedArtifactListProps) {
-    super(props);
-  }
-
+export class ResolvedArtifactList extends React.Component<IResolvedArtifactListProps> {
   public render() {
     let { artifacts, resolvedExpectedArtifacts } = this.props;
 

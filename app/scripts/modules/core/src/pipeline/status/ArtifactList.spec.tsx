@@ -2,15 +2,17 @@ import * as React from 'react';
 import { ShallowWrapper, shallow } from 'enzyme';
 import { mock } from 'angular';
 import { REACT_MODULE } from 'core/reactShims';
+
 import { IArtifact } from 'core/domain';
+
 import { Artifact } from './Artifact';
-import { ArtifactList, IArtifactListProps, IArtifactListState } from './ArtifactList';
+import { ArtifactList, IArtifactListProps } from './ArtifactList';
 
 const ARTIFACT_TYPE = 'docker/image';
 const ARTIFACT_NAME = 'example.com/container';
 
 describe('<ArtifactList/>', () => {
-  let component: ShallowWrapper<IArtifactListProps, IArtifactListState>;
+  let component: ShallowWrapper<IArtifactListProps>;
 
   beforeEach(mock.module(REACT_MODULE));
   beforeEach(mock.inject(() => {})); // Angular is lazy.
