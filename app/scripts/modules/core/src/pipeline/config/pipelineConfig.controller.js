@@ -35,7 +35,8 @@ module.exports = angular
             if (!artifact.displayName || artifact.displayName.length === 0) {
               // default display names are created for the sake of readability for pipelines that existed
               // before display names were introduced to expected artifacts
-              const { kind, name } = artifact.matchArtifact;
+              const { type, name } = artifact.matchArtifact;
+              const [kind] = type.split(/\/+/);
 
               const dockerDisplayName = () => {
                 const [, project = 'no-project', image = 'no-image'] = name.split('/');
