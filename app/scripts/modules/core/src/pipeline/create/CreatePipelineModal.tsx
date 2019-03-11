@@ -283,7 +283,7 @@ export class CreatePipelineModal extends React.Component<ICreatePipelineModalPro
       this.setState({ loading: true });
       PipelineTemplateReader.getPipelineTemplatesByScopes([this.props.application.name, 'global'])
         .then(templates => {
-          templates = uniqBy(templates, 'id');
+          templates = uniqBy(templates, 'id').filter(({ schema }) => schema !== 'v2');
           this.setState({ templates, loading: false });
         })
         .catch((response: IHttpPromiseCallbackArg<{ message: string }>) => {
@@ -464,7 +464,7 @@ export class CreatePipelineModal extends React.Component<ICreatePipelineModalPro
                       <hr />
                       {this.state.templates.length > 0 && (
                         <div className="form-group clearfix">
-                          <div className="col-md-3 sm-label-right">Template Source</div>
+                          <div className="col-md-3 sm-label-right">Template Source *</div>
                           <div className="col-md-7">
                             <label className="radio-inline">
                               <input
@@ -512,6 +512,20 @@ export class CreatePipelineModal extends React.Component<ICreatePipelineModalPro
                         loadingError={this.state.loadingTemplateFromSourceError}
                         template={this.state.command.template}
                       />
+                      <div className="form-group clearfix">
+                        <div className="col-md-12">
+                          <em>
+                            * v1 templates only. For creating pipelines from v2 templates, use{' '}
+                            <a
+                              href="https://www.spinnaker.io/guides/spin/pipeline/"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              Spin CLI.
+                            </a>
+                          </em>
+                        </div>
+                      </div>
                     </div>
                   )}
               </form>
