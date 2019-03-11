@@ -1,9 +1,9 @@
 import * as React from 'react';
 
 import { IArtifact, IExpectedArtifact } from 'core/domain';
-import { ArtifactIconService } from 'core/artifact';
 
 import './artifactList.less';
+import { Artifact } from 'core/pipeline/status/Artifact';
 
 export interface IResolvedArtifactListProps {
   artifacts: IArtifact[];
@@ -15,26 +15,6 @@ export interface IResolvedArtifactListState {}
 export class ResolvedArtifactList extends React.Component<IResolvedArtifactListProps, IResolvedArtifactListState> {
   constructor(props: IResolvedArtifactListProps) {
     super(props);
-  }
-
-  private tooltip(artifact: IArtifact, isDefault: boolean): string {
-    const tooltipEntries = [];
-    if (isDefault) {
-      tooltipEntries.push('Default Artifact');
-    }
-    if (artifact.name) {
-      tooltipEntries.push(`Name: ${artifact.name}`);
-    }
-    if (artifact.type) {
-      tooltipEntries.push(`Type: ${artifact.type}`);
-    }
-    if (artifact.version) {
-      tooltipEntries.push(`Version: ${artifact.version}`);
-    }
-    if (artifact.reference) {
-      tooltipEntries.push(`Reference: ${artifact.reference}`);
-    }
-    return tooltipEntries.join('\n');
   }
 
   public render() {
@@ -60,39 +40,24 @@ export class ResolvedArtifactList extends React.Component<IResolvedArtifactListP
     }
 
     return (
-      <ul className="trigger-details artifacts">
-        {decoratedExpectedArtifacts.map((artifact: IArtifact, i: number) => {
-          const { name, version, type, reference } = artifact;
-          const isDefault = defaultArtifactRefs.has(reference);
-          return (
-            <li key={`${i}-${name}`} className="break-word" title={this.tooltip(artifact, isDefault)}>
-              <dl>
-                <div>
-                  <dt>
-                    {ArtifactIconService.getPath(type) ? (
-                      <img className="artifact-icon" src={ArtifactIconService.getPath(type)} width="18" height="18" />
-                    ) : (
-                      <span>{type}</span>
-                    )}
-                  </dt>
-                  <dd>{name}</dd>
-                </div>
-                {version && (
-                  <div>
-                    <dt>Version</dt>
-                    <dd>{version}</dd>
-                  </div>
-                )}
-              </dl>
+      <div className="artifact-list">
+        <ul>
+          {decoratedExpectedArtifacts.map((artifact: IArtifact, i: number) => {
+            const { reference } = artifact;
+            const isDefault = defaultArtifactRefs.has(reference);
+            return (
+              <li key={`${i}-${name}`} className="break-word">
+                <Artifact artifact={artifact} isDefault={isDefault} />
+              </li>
+            );
+          })}
+          {decoratedArtifacts.length > decoratedExpectedArtifacts.length && (
+            <li key="extraneous-artifacts">
+              {decoratedArtifacts.length - decoratedExpectedArtifacts.length} received artifacts were not consumed
             </li>
-          );
-        })}
-        {decoratedArtifacts.length > decoratedExpectedArtifacts.length && (
-          <li key="extraneous-artifacts">
-            {decoratedArtifacts.length - decoratedExpectedArtifacts.length} received artifacts were not consumed
-          </li>
-        )}
-      </ul>
+          )}
+        </ul>
+      </div>
     );
   }
 }

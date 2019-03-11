@@ -4,6 +4,7 @@ import { mock } from 'angular';
 import { REACT_MODULE } from 'core/reactShims';
 import { IArtifact, IExpectedArtifact } from 'core/domain';
 import { ResolvedArtifactList, IResolvedArtifactListProps, IResolvedArtifactListState } from './ResolvedArtifactList';
+import { Artifact } from 'core/pipeline/status/Artifact';
 
 const ARTIFACT_TYPE = 'docker/image';
 const ARTIFACT_NAME = 'example.com/container';
@@ -41,31 +42,10 @@ describe('<ResolvedArtifactList/>', () => {
     component = shallow(
       <ResolvedArtifactList artifacts={artifacts} resolvedExpectedArtifacts={resolvedExpectedArtifacts} />,
     );
-    expect(component.find('ul.trigger-details.artifacts').length).toEqual(1);
+    expect(component.find(Artifact).length).toEqual(1);
   });
 
-  it("renders an artifact's name", function() {
-    const artifacts: IArtifact[] = [
-      {
-        id: 'abcd',
-        type: ARTIFACT_TYPE,
-        name: ARTIFACT_NAME,
-      },
-    ];
-    const resolvedExpectedArtifacts = artifacts.map(a => ({ boundArtifact: a } as IExpectedArtifact));
-    component = shallow(
-      <ResolvedArtifactList artifacts={artifacts} resolvedExpectedArtifacts={resolvedExpectedArtifacts} />,
-    );
-    const li = component.find('li');
-    const dt = li.find('dt');
-    const dd = li.find('dd');
-    expect(li.length).toEqual(1);
-    expect(dt.length).toEqual(1);
-    expect(dd.length).toEqual(1);
-    expect(dd.at(0).text()).toEqual(ARTIFACT_NAME);
-  });
-
-  it('does not render artifacts without a type and name', function() {
+  it('does not render an artifact without a type and name', function() {
     const singleArtifact: IArtifact[] = [
       {
         id: 'abcd',
@@ -76,7 +56,9 @@ describe('<ResolvedArtifactList/>', () => {
       <ResolvedArtifactList artifacts={singleArtifact} resolvedExpectedArtifacts={resolvedExpectedArtifacts} />,
     );
     expect(component.get(0)).toEqual(null);
+  });
 
+  it('renders an artifacts that does have a type and name', function() {
     const artifacts: IArtifact[] = [
       {
         id: 'abcd',
@@ -87,32 +69,11 @@ describe('<ResolvedArtifactList/>', () => {
         name: ARTIFACT_NAME,
       },
     ];
-    component = shallow(<ResolvedArtifactList artifacts={artifacts} />);
-    expect(component.find('ul.trigger-details.artifacts').length).toEqual(1);
-  });
-
-  it('renders an artifact version if present', function() {
-    const version = 'v001';
-    const artifacts: IArtifact[] = [
-      {
-        id: 'abcd',
-        type: ARTIFACT_TYPE,
-        name: ARTIFACT_NAME,
-        version,
-      },
-    ];
     const resolvedExpectedArtifacts = artifacts.map(a => ({ boundArtifact: a } as IExpectedArtifact));
     component = shallow(
       <ResolvedArtifactList artifacts={artifacts} resolvedExpectedArtifacts={resolvedExpectedArtifacts} />,
     );
-    const li = component.find('li');
-    expect(li.find('dd').length).toEqual(2);
-    expect(
-      li
-        .find('dd')
-        .at(1)
-        .text(),
-    ).toEqual(version);
+    expect(component.find(Artifact).length).toEqual(1);
   });
 
   it('does not render artifacts for which there is no expected artifact in the pipeline', function() {
