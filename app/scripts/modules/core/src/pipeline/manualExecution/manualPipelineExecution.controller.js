@@ -9,15 +9,18 @@ import { SETTINGS } from 'core/config/settings';
 import { UrlParser } from 'core/navigation';
 import { AppNotificationsService } from 'core/notification/AppNotificationsService';
 import { PipelineTemplateReader } from 'core/pipeline/config/templates/PipelineTemplateReader';
+import { PipelineTemplateV2Service } from 'core/pipeline';
 
 import { STAGE_MANUAL_COMPONENTS } from './stageManualComponents.component';
 import { TRIGGER_TEMPLATE } from './triggerTemplate.component';
+import { ARTIFACT_LIST } from '../status/artifactList.component';
 
 import './manualPipelineExecution.less';
 
 module.exports = angular
   .module('spinnaker.core.pipeline.manualPipelineExecution.controller', [
     require('angular-ui-bootstrap'),
+    ARTIFACT_LIST,
     TRIGGER_TEMPLATE,
     STAGE_MANUAL_COMPONENTS,
   ])
@@ -106,15 +109,20 @@ module.exports = angular
           trigger.type = this.triggers[0].type;
         }
 
-        const suppliedTriggerCanBeInvoked =
+        const suppliedTriggerHasManualComponent =
           trigger && Registry.pipeline.hasManualExecutionComponentForTriggerType(trigger.type);
-        if (suppliedTriggerCanBeInvoked) {
+        if (suppliedTriggerHasManualComponent) {
           Registry.pipeline
             .getManualExecutionComponentForTriggerType(trigger.type)
             .formatLabel(trigger)
             .then(label => (trigger.description = label));
+          // If the trigger has a manual component, we don't want to also explicitly
+          // send along the artifacts from the last run, as the manual component will
+          // populate enough information (ex: build number, docker tag) to re-inflate
+          // these on a subsequent run.
+          trigger.artifacts = [];
         }
-        this.command.trigger = suppliedTriggerCanBeInvoked ? trigger : _.head(this.triggers);
+        this.command.trigger = trigger || _.head(this.triggers);
       };
 
       const updatePipelinePlan = pipeline => {
@@ -294,7 +302,9 @@ module.exports = angular
       }
 
       if (!pipeline) {
-        this.pipelineOptions = application.pipelineConfigs.data.filter(c => !c.disabled);
+        this.pipelineOptions = application.pipelineConfigs.data.filter(
+          c => !c.disabled && !PipelineTemplateV2Service.isV2PipelineConfig(c),
+        );
       }
     },
   ]);
