@@ -239,12 +239,12 @@ export class ExecutionService {
 
   public startAndMonitorPipeline(app: Application, pipeline: string, trigger: any): IPromise<IRetryablePromise<void>> {
     const { executionService } = ReactInjector;
-    return PipelineConfigService.triggerPipelineViaEcho(app.name, pipeline, trigger).then(triggerResult =>
-      executionService.waitUntilPipelineAppearsForEventId(app, triggerResult),
+    return PipelineConfigService.triggerPipeline(app.name, pipeline, trigger).then(triggerResult =>
+      executionService.waitUntilTriggeredPipelineAppears(app, triggerResult),
     );
   }
 
-  public waitUntilPipelineAppearsForEventId(application: Application, eventId: string): IRetryablePromise<any> {
+  public waitUntilTriggeredPipelineAppears(application: Application, eventId: string): IRetryablePromise<any> {
     const closure = () =>
       this.getExecutionByEventId(application.name, eventId).then(() => application.executions.refresh());
     return retryablePromise(closure);

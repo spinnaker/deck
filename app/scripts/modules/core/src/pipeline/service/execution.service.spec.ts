@@ -449,7 +449,7 @@ describe('Service: executionService', () => {
     });
   });
 
-  describe('waitUntilPipelineAppearsForEventId', () => {
+  describe('waitUntilTriggeredPipelineAppears', () => {
     const applicationName = 'deck';
     const application: Application = { name: applicationName, executions: { refresh: () => $q.when(null) } } as any;
     const eventId = 'abc';
@@ -461,7 +461,7 @@ describe('Service: executionService', () => {
 
       $httpBackend.expectGET(url).respond(200, [execution]);
 
-      executionService.waitUntilPipelineAppearsForEventId(application, eventId).promise.then(() => (succeeded = true));
+      executionService.waitUntilTriggeredPipelineAppears(application, eventId).promise.then(() => (succeeded = true));
 
       expect(succeeded).toBe(false);
 
@@ -474,7 +474,7 @@ describe('Service: executionService', () => {
 
       $httpBackend.expectGET(url).respond(200, []);
 
-      executionService.waitUntilPipelineAppearsForEventId(application, eventId).promise.then(() => (succeeded = true));
+      executionService.waitUntilTriggeredPipelineAppears(application, eventId).promise.then(() => (succeeded = true));
 
       expect(succeeded).toBe(false);
 
@@ -487,7 +487,7 @@ describe('Service: executionService', () => {
 
       $httpBackend.expectGET(url).respond(200, []);
 
-      executionService.waitUntilPipelineAppearsForEventId(application, eventId).promise.then(() => (succeeded = true));
+      executionService.waitUntilTriggeredPipelineAppears(application, eventId).promise.then(() => (succeeded = true));
 
       expect(succeeded).toBe(false);
 

@@ -8,7 +8,7 @@ import { ViewStateCache } from 'core/cache';
 import { IStage } from 'core/domain/IStage';
 import { IPipeline } from 'core/domain/IPipeline';
 
-export interface IEchoTriggerPipelineResponse {
+export interface ITriggerPipelineResponse {
   eventId: string;
 }
 export class PipelineConfigService {
@@ -98,11 +98,7 @@ export class PipelineConfigService {
       .put();
   }
 
-  public static triggerPipelineViaEcho(
-    applicationName: string,
-    pipelineName: string,
-    body: any = {},
-  ): IPromise<string> {
+  public static triggerPipeline(applicationName: string, pipelineName: string, body: any = {}): IPromise<string> {
     body.user = AuthenticationService.getAuthenticatedUser().name;
     return API.one('pipelines')
       .one('v2')
@@ -110,7 +106,7 @@ export class PipelineConfigService {
       .one(encodeURIComponent(pipelineName))
       .data(body)
       .post()
-      .then((result: IEchoTriggerPipelineResponse) => {
+      .then((result: ITriggerPipelineResponse) => {
         return result.eventId;
       });
   }
