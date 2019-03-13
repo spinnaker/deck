@@ -250,14 +250,6 @@ export class ExecutionService {
     return retryablePromise(closure);
   }
 
-  public waitUntilNewTriggeredPipelineAppears(
-    application: Application,
-    triggeredPipelineId: string,
-  ): IRetryablePromise<any> {
-    const closure = () => this.getExecution(triggeredPipelineId).then(() => application.executions.refresh());
-    return retryablePromise(closure);
-  }
-
   private waitUntilPipelineIsCancelled(application: Application, executionId: string): IPromise<any> {
     return this.waitUntilExecutionMatches(executionId, (execution: IExecution) => execution.status === 'CANCELED').then(
       () => application.executions.refresh(),
