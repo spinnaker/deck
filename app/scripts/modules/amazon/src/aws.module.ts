@@ -76,7 +76,6 @@ module(AMAZON_MODULE, [
   AWS_SECURITY_GROUP_MODULE,
   SUBNET_RENDERER,
   VPC_MODULE,
-  require('./cache/cacheConfigurer.service').name,
   require('./search/searchResultFormatter').name,
   DEPLOY_CLOUDFORMATION_STACK_STAGE,
   CLOUDFORMATION_TEMPLATE_ENTRY,
@@ -85,9 +84,6 @@ module(AMAZON_MODULE, [
     name: 'Amazon',
     logo: {
       path: require('./logo/amazon.logo.svg'),
-    },
-    cache: {
-      configurer: 'awsCacheConfigurer',
     },
     image: {
       reader: AwsImageReader,
