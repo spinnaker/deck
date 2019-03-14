@@ -278,6 +278,11 @@ module.exports = angular
           if (command.labels['spinnaker-server-group']) {
             delete command.labels['spinnaker-server-group'];
           }
+
+          // Need to delete the sequence, otherwise it won't increment
+          if (command.labels['spinnaker-moniker-sequence']) {
+            delete command.labels['spinnaker-moniker-sequence'];
+          }
         }
       }
 
