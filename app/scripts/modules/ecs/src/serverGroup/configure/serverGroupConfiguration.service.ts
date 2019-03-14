@@ -12,6 +12,7 @@ import {
   IServerGroupCommandBackingDataFiltered,
   IServerGroupCommandDirty,
   IServerGroupCommandResult,
+  IServerGroupCommandViewState,
   ISubnet,
   LOAD_BALANCER_READ_SERVICE,
   LoadBalancerReader,
@@ -45,6 +46,19 @@ export interface IEcsServerGroupCommandResult extends IServerGroupCommandResult 
   dirty: IEcsServerGroupCommandDirty;
 }
 
+export interface IEcsDockerImage extends IDockerImage {
+  imageId: string;
+  message: string;
+  fromTrigger: boolean;
+  fromContext: boolean;
+  stageId: string;
+  imageLabelOrSha: string;
+}
+
+export interface IEcsServerGroupCommandViewState extends IServerGroupCommandViewState {
+  contextImages: IEcsDockerImage[];
+}
+
 export interface IEcsServerGroupCommandBackingDataFiltered extends IServerGroupCommandBackingDataFiltered {
   targetGroups: string[];
   iamRoles: string[];
@@ -53,7 +67,7 @@ export interface IEcsServerGroupCommandBackingDataFiltered extends IServerGroupC
   subnetTypes: string[];
   securityGroupNames: string[];
   secrets: string[];
-  images: IDockerImage[];
+  images: IEcsDockerImage[];
 }
 
 export interface IEcsServerGroupCommandBackingData extends IServerGroupCommandBackingData {
@@ -66,7 +80,7 @@ export interface IEcsServerGroupCommandBackingData extends IServerGroupCommandBa
   // subnetTypes: string;
   // securityGroups: string[]
   secrets: ISecretDescriptor[];
-  images: IDockerImage[];
+  images: IEcsDockerImage[];
 }
 
 export interface IEcsServerGroupCommand extends IServerGroupCommand {
@@ -75,6 +89,8 @@ export interface IEcsServerGroupCommand extends IServerGroupCommand {
   targetGroup: string;
   placementStrategyName: string;
   placementStrategySequence: IPlacementStrategy[];
+  imageDescription: IEcsDockerImage;
+  viewState: IEcsServerGroupCommandViewState;
 
   subnetTypeChanged: (command: IEcsServerGroupCommand) => IServerGroupCommandResult;
   placementStrategyNameChanged: (command: IEcsServerGroupCommand) => IServerGroupCommandResult;
@@ -121,7 +137,7 @@ export class EcsServerGroupConfigurationService {
   }
 
   // TODO (Bruno Carrier): Why do we need to inject an Application into this constructor so that the app works?  This is strange, and needs investigating
-  public configureCommand(cmd: IEcsServerGroupCommand, imageQuery: string = ''): IPromise<void> {
+  public configureCommand(cmd: IEcsServerGroupCommand, imageQuery = ''): IPromise<void> {
     this.applyOverrides('beforeConfiguration', cmd);
     cmd.toggleSuspendedProcess = (command: IEcsServerGroupCommand, process: string): void => {
       command.suspendedProcesses = command.suspendedProcesses || [];
@@ -218,7 +234,7 @@ export class EcsServerGroupConfigurationService {
     return imageId.split('/').pop();
   }
 
-  public buildImageId(image: IDockerImage): string {
+  public buildImageId(image: IEcsDockerImage): string {
     if (image.fromContext) {
       return `${image.imageLabelOrSha}`;
     } else if (image.fromTrigger && !image.tag) {
@@ -228,7 +244,7 @@ export class EcsServerGroupConfigurationService {
     }
   }
 
-  public mapImage(image: IDockerImage): IDockerImage {
+  public mapImage(image: IEcsDockerImage): IEcsDockerImage {
     if (image.message !== undefined) {
       return image;
     }
@@ -240,10 +256,10 @@ export class EcsServerGroupConfigurationService {
       registry: image.registry,
       fromContext: image.fromContext,
       fromTrigger: image.fromTrigger,
-      cluster: image.cluster,
       account: image.account,
-      pattern: image.pattern,
+      imageLabelOrSha: image.imageLabelOrSha,
       stageId: image.stageId,
+      message: image.message,
     };
   }
 
