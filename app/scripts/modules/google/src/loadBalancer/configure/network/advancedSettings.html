@@ -35,5 +35,23 @@
         <input class="form-control input-sm" type="number" min="0" ng-model="loadBalancer.unhealthyThreshold" />
       </div>
     </div>
+
+    <div class="form-group">
+      <div class="col-md-6 sm-label-right">
+        <b>Session Affinity</b><help-field key="gce.loadBalancer.advancedSettings.unhealthyThreshold"></help-field>
+      </div>
+      <div class="col-md-4">
+        <ui-select ng-model="loadBalancer.sessionAffinity" required class="form-control input-sm">
+          <ui-select-match placeholder="Select...">
+            {{ $select.selected }}
+          </ui-select-match>
+          <ui-select-choices
+            repeat="sessionAffinity in ['None', 'Client IP', 'Client IP and protocol'] | filter: $select.search"
+          >
+            <div ng-bind-html="sessionAffinity | highlight: $select.search"></div>
+          </ui-select-choices>
+        </ui-select>
+      </div>
+    </div>
   </div>
 </div>

@@ -198,6 +198,8 @@ module.exports = angular
             } else {
               params.healthCheck = null;
             }
+
+            params.sessionAffinity = $scope.loadBalancer.sessionAffinity;
           }
 
           return LoadBalancerWriter.upsertLoadBalancer($scope.loadBalancer, application, descriptor, params);
