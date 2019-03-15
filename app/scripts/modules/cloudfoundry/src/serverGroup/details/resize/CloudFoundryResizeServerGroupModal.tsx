@@ -207,8 +207,8 @@ export class CloudFoundryResizeServerGroupModal extends React.Component<
                 <Modal.Body>
                   <Form className="form-horizontal">
                     {this.renderDesired(formik)}
-                    {this.renderQuota(formik, 'diskQuota', 'Disk MB', diskQuota)}
-                    {this.renderQuota(formik, 'memory', 'Mem MB', memory)}
+                    {this.renderQuota(formik, 'diskQuota', 'Disk (MB)', diskQuota)}
+                    {this.renderQuota(formik, 'memory', 'Mem (MB)', memory)}
                     <TaskReason reason={formik.values.reason} onChange={val => formik.setFieldValue('reason', val)} />
                   </Form>
                 </Modal.Body>

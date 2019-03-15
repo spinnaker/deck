@@ -16,9 +16,9 @@ export class ServerGroupSizingSection extends React.Component<ICloudFoundryServe
         <dl className="dl-horizontal dl-flex">
           <dt>Instances</dt>
           <dd>{serverGroup.instances.length}</dd>
-          <dt>Disk MB</dt>
+          <dt>Disk (MB)</dt>
           <dd>{serverGroup.diskQuota}</dd>
-          <dt>Memory MB</dt>
+          <dt>Memory (MB)</dt>
           <dd>{serverGroup.memory}</dd>
         </dl>
       </CollapsibleSection>
