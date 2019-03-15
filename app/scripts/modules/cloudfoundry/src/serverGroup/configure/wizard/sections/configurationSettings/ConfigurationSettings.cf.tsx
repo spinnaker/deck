@@ -148,7 +148,7 @@ export class CloudFoundryServerGroupConfigurationSettings
                 <CloudFoundryRadioButtonInput
                   value={direct ? 'direct' : 'artifact'}
                   options={[{ label: 'Artifact', value: 'artifact' }, { label: 'Form', value: 'direct' }]}
-                  onChange={e => this.manifestSourceUpdated(e.target.value)}
+                  onChange={(e: any) => this.manifestSourceUpdated(e.target.value)}
                 />
               </div>
             </div>
