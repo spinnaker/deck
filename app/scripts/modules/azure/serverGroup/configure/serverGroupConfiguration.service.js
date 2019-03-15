@@ -146,7 +146,7 @@ module.exports = angular
       function configureZones(command) {
         const result = { dirty: {} };
         const filteredData = command.backingData.filtered;
-        if (command.region === null) {
+        if (!command.region) {
           return result;
         }
         let { regionsSupportZones, availabilityZones } = command.backingData.credentialsKeyedByAccount[
