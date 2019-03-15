@@ -2,6 +2,7 @@
 
 var apiHost = process.env.API_HOST || 'http://localhost:8084';
 var artifactsEnabled = process.env.ARTIFACTS_ENABLED === 'true';
+var artifactsRewriteEnabled = process.env.ARTIFACTS_REWRITE_ENABLED === 'true';
 var atlasWebComponentsUrl = process.env.ATLAS_WEB_COMPONENTS_URL;
 var authEndpoint = process.env.AUTH_ENDPOINT || apiHost + '/auth/user';
 var authEnabled = process.env.AUTH_ENABLED === 'false' ? false : true;
@@ -26,7 +27,6 @@ var managedServiceAccountsEnabled = process.env.MANAGED_SERVICE_ACCOUNTS_ENABLED
 var onDemandClusterThreshold = process.env.ON_DEMAND_CLUSTER_THRESHOLD || '350';
 var reduxLoggerEnabled = process.env.REDUX_LOGGER === 'true';
 var templatesEnabled = process.env.TEMPLATES_ENABLED === 'true';
-var triggerViaEcho = process.env.TRIGGER_VIA_ECHO !== 'false';
 var useClassicFirewallLabels = process.env.USE_CLASSIC_FIREWALL_LABELS === 'true';
 
 window.spinnakerSettings = {
@@ -65,6 +65,7 @@ window.spinnakerSettings = {
   defaultTimeZone: process.env.TIMEZONE || 'America/Los_Angeles', // see http://momentjs.com/timezone/docs/#/data-utilities/
   feature: {
     artifacts: artifactsEnabled,
+    artifactsRewrite: artifactsRewriteEnabled,
     canary: canaryEnabled,
     chaosMonkey: chaosEnabled,
     displayTimestampsInUserLocalTime: displayTimestampsInUserLocalTime,
@@ -86,7 +87,6 @@ window.spinnakerSettings = {
     roscoMode: false,
     snapshots: false,
     travis: false,
-    triggerViaEcho: triggerViaEcho,
     versionedProviders: true,
     wercker: false,
   },
@@ -225,7 +225,18 @@ window.spinnakerSettings = {
   },
   pubsubProviders: ['google'], // TODO(joonlim): Add amazon once it is confirmed that amazon pub/sub works.
   searchVersion: 1,
-  triggerTypes: ['cron', 'docker', 'git', 'jenkins', 'pipeline', 'pubsub', 'travis', 'wercker'],
+  triggerTypes: [
+    'artifactory',
+    'concourse',
+    'cron',
+    'docker',
+    'git',
+    'jenkins',
+    'pipeline',
+    'pubsub',
+    'travis',
+    'wercker',
+  ],
   useClassicFirewallLabels: useClassicFirewallLabels,
   whatsNew: {
     fileName: 'news.md',

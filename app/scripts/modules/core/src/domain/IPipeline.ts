@@ -16,6 +16,7 @@ export interface IPipeline {
   limitConcurrent: boolean;
   name: string;
   respectQuietPeriod?: boolean;
+  schema?: string;
   stages: IStage[];
   strategy: boolean;
   triggers: ITrigger[];
@@ -60,4 +61,10 @@ export interface IPipelineCommand {
     when: string[];
   };
   pipelineName: string;
+}
+
+export interface IPipelineRef {
+  application: String;
+  name: String;
+  id?: String;
 }

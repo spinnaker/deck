@@ -15,7 +15,7 @@ import { SETTINGS } from 'core/config/settings';
 import { buildDisplayName } from '../executionBuild/buildDisplayName.filter';
 import { ExecutionBuildLink } from '../executionBuild/ExecutionBuildLink';
 import { ExecutionUserStatus } from './ExecutionUserStatus';
-import { ArtifactList } from './ArtifactList';
+import { ResolvedArtifactList } from './ResolvedArtifactList';
 
 import './executionStatus.less';
 
@@ -107,7 +107,7 @@ export class ExecutionStatus extends React.Component<IExecutionStatusProps, IExe
 
   public render() {
     const { execution, showingDetails, standalone } = this.props;
-    const { trigger } = execution;
+    const { trigger, authentication } = execution;
     const { artifacts, resolvedExpectedArtifacts } = trigger;
     const TriggerExecutionStatus = this.getTriggerExecutionStatus();
     return (
@@ -123,7 +123,7 @@ export class ExecutionStatus extends React.Component<IExecutionStatusProps, IExe
         </span>
         <ul className="trigger-details">
           {has(trigger, 'buildInfo.url') && <li>{buildDisplayName(trigger.buildInfo)}</li>}
-          {TriggerExecutionStatus && <TriggerExecutionStatus trigger={trigger} />}
+          {TriggerExecutionStatus && <TriggerExecutionStatus trigger={trigger} authentication={authentication} />}
           <li>
             <HoverablePopover delayShow={100} delayHide={0} template={<span>{timestamp(execution.startTime)}</span>}>
               {this.state.timestamp}
@@ -136,7 +136,7 @@ export class ExecutionStatus extends React.Component<IExecutionStatusProps, IExe
           ))}
         </ul>
         {SETTINGS.feature.artifacts && (
-          <ArtifactList artifacts={artifacts} resolvedExpectedArtifacts={resolvedExpectedArtifacts} />
+          <ResolvedArtifactList artifacts={artifacts} resolvedExpectedArtifacts={resolvedExpectedArtifacts} />
         )}
         {!standalone && (
           <a className="clickable" onClick={this.toggleDetails}>

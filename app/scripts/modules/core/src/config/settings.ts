@@ -33,6 +33,8 @@ export interface INotificationSettings {
 
 export interface IFeatures {
   [key: string]: any;
+  artifacts?: boolean;
+  artifactsRewrite?: boolean;
   canary?: boolean;
   chaosMonkey?: boolean;
   displayTimestampsInUserLocalTime?: boolean;
@@ -53,9 +55,9 @@ export interface IFeatures {
   roscoMode?: boolean;
   snapshots?: boolean;
   travis?: boolean;
-  triggerViaEcho?: boolean;
   versionedProviders?: boolean;
   wercker?: boolean;
+  savePipelinesStageEnabled?: boolean;
 }
 
 export interface IDockerInsightSettings {

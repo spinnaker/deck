@@ -17,6 +17,7 @@ import { IRetryablePromise } from 'core/utils/retryablePromise';
 import { TriggersTag } from 'core/pipeline/triggers/TriggersTag';
 import { AccountTag } from 'core/account';
 import { ModalInjector, ReactInjector } from 'core/reactShims';
+import { PipelineTemplateV2Service } from 'core/pipeline';
 import { Spinner } from 'core/widgets/spinners/Spinner';
 
 import './executionGroup.less';
@@ -55,6 +56,8 @@ export class ExecutionGroup extends React.Component<IExecutionGroupProps, IExecu
     const pipelineConfig = find(this.props.application.pipelineConfigs.data, {
       name: this.props.group.heading,
     }) as IPipeline;
+
+    const hasNonMPTV2PipelineConfig = pipelineConfig && !PipelineTemplateV2Service.isV2PipelineConfig(pipelineConfig);
     const sectionCacheKey = this.getSectionCacheKey();
 
     this.state = {
@@ -65,8 +68,8 @@ export class ExecutionGroup extends React.Component<IExecutionGroupProps, IExecu
         !CollapsibleSectionStateCache.isSet(sectionCacheKey) ||
         CollapsibleSectionStateCache.isExpanded(sectionCacheKey),
       poll: null,
-      canTriggerPipelineManually: !!pipelineConfig,
-      canConfigure: !!(pipelineConfig || strategyConfig),
+      canTriggerPipelineManually: hasNonMPTV2PipelineConfig,
+      canConfigure: !!(hasNonMPTV2PipelineConfig || strategyConfig),
       showAccounts: ExecutionState.filterModel.asFilterModel.sortFilter.groupBy === 'name',
       pipelineConfig,
       showOverflowAccountTags: false,
@@ -200,7 +203,7 @@ export class ExecutionGroup extends React.Component<IExecutionGroupProps, IExecu
 
   public render(): React.ReactElement<ExecutionGroup> {
     const { group } = this.props;
-    const { pipelineConfig } = this.state;
+    const { canTriggerPipelineManually, pipelineConfig } = this.state;
     const pipelineDisabled = pipelineConfig && pipelineConfig.disabled;
     const pipelineDescription = pipelineConfig && pipelineConfig.description;
     const hasRunningExecutions = group.runningExecutions && group.runningExecutions.length > 0;
@@ -239,7 +242,7 @@ export class ExecutionGroup extends React.Component<IExecutionGroupProps, IExecu
         key={execution.id}
         execution={execution}
         application={this.props.application}
-        onRerun={this.rerunExecutionClicked}
+        onRerun={canTriggerPipelineManually ? this.rerunExecutionClicked : undefined}
       />
     ));
 

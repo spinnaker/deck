@@ -38,6 +38,8 @@ module.exports = angular
         loadBalancers: require('./loadBalancers/loadBalancers.html'),
         networkSettings: require('./networkSettings/networkSettings.html'),
         securityGroups: require('./securityGroup/securityGroups.html'),
+        instanceType: require('./instanceType/instanceType.html'),
+        zones: require('./capacity/zones.html'),
         advancedSettings: require('./advancedSettings/advancedSettings.html'),
       };
 
@@ -144,6 +146,8 @@ module.exports = angular
           ModalWizard.markComplete('load-balancers');
           ModalWizard.markComplete('network-settings');
           ModalWizard.markComplete('security-groups');
+          ModalWizard.markComplete('instance-type');
+          ModalWizard.markComplete('zones');
         }
       }
 
@@ -172,6 +176,12 @@ module.exports = angular
         }
         if (result.dirty.securityGroups) {
           ModalWizard.markDirty('security-groups');
+        }
+        if (result.dirty.instanceType) {
+          ModalWizard.markDirty('instance-type');
+        }
+        if (result.dirty.zoneEnabled || result.dirty.zones) {
+          ModalWizard.markDirty('zones');
         }
       }
 
@@ -211,6 +221,17 @@ module.exports = angular
       this.templateSelected = () => {
         $scope.state.requiresTemplateSelection = false;
         configureCommand();
+      };
+
+      this.isValid = function() {
+        return (
+          $scope.command &&
+          $scope.command.application &&
+          $scope.command.credentials &&
+          $scope.command.instanceType &&
+          $scope.command.region &&
+          (!$scope.command.zonesEnabled || $scope.command.zones.length !== 0)
+        );
       };
     },
   ]);

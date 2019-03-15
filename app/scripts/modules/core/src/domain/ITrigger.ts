@@ -9,6 +9,12 @@ export interface ITrigger {
   runAsUser?: string;
 }
 
+export interface IArtifactoryTrigger extends ITrigger {
+  artifactorySearchName: string;
+  artifactoryRepository: string;
+  type: 'artifactory';
+}
+
 export interface IGitTrigger extends ITrigger {
   source: string;
   project: string;
@@ -24,7 +30,13 @@ export interface IBuildTrigger extends ITrigger {
   job: string;
   project: string;
   master: string;
-  type: 'jenkins' | 'travis' | 'wercker';
+  type: 'jenkins' | 'travis' | 'wercker' | 'concourse';
+}
+
+export interface IConcourseTrigger extends IBuildTrigger {
+  // Concourse pipeline is represented by project
+  team: string;
+  jobName: string; // job will be the concatenation of team/pipeline/jobName
 }
 
 export interface IPipelineTrigger extends ITrigger {

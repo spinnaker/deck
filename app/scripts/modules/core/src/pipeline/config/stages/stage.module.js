@@ -8,6 +8,7 @@ import { defaultsDeep, extend } from 'lodash';
 import { AccountService } from 'core/account/AccountService';
 import { API } from 'core/api';
 import { BASE_EXECUTION_DETAILS_CTRL } from './common/baseExecutionDetails.controller';
+import { SETTINGS } from 'core/config';
 import { CONFIRMATION_MODAL_SERVICE } from 'core/confirmationModal/confirmationModal.service';
 import { STAGE_NAME } from './StageName';
 import { PipelineConfigService } from 'core/pipeline/config/services/PipelineConfigService';
@@ -15,9 +16,11 @@ import { Registry } from 'core/registry';
 import { StageConfigWrapper } from './StageConfigWrapper';
 import { EditStageJsonModal } from './common/EditStageJsonModal';
 import { ReactModal } from 'core/presentation';
+import { PRODUCES_ARTIFACTS_REACT } from './producesArtifacts/ProducesArtifacts';
 
 module.exports = angular
   .module('spinnaker.core.pipeline.config.stage', [
+    PRODUCES_ARTIFACTS_REACT,
     BASE_EXECUTION_DETAILS_CTRL,
     STAGE_NAME,
     require('./overrideTimeout/overrideTimeout.directive').name,
@@ -96,6 +99,12 @@ module.exports = angular
         }
       };
 
+      $scope.producesArtifactsChanged = function(artifacts) {
+        $scope.$applyAsync(() => {
+          $scope.stage.expectedArtifacts = artifacts;
+        });
+      };
+
       $scope.updateAvailableDependencyStages = function() {
         var availableDependencyStages = PipelineConfigService.getDependencyCandidateStages(
           $scope.pipeline,
@@ -118,6 +127,8 @@ module.exports = angular
           }
         });
       };
+
+      this.checkFeatureFlag = flag => !!SETTINGS.feature[flag];
 
       this.editStageJson = () => {
         const modalProps = { dialogClassName: 'modal-lg modal-fullscreen' };
@@ -192,24 +203,29 @@ module.exports = angular
               defaultsDeep($scope.stage, config.defaults);
             }
             if (config.useBaseProvider || config.provides) {
+              config.component = null;
               config.templateUrl = require('./baseProviderStage/baseProviderStage.html');
               config.controller = 'BaseProviderStageCtrl as baseProviderStageCtrl';
             }
             updateStageName(config, oldVal);
             applyConfigController(config, stageScope);
 
+            const props = {
+              application: $scope.application,
+              stageFieldUpdated: $scope.stageFieldUpdated,
+              updateStageField: changes => {
+                extend($scope.stage, changes);
+                $scope.stageFieldUpdated();
+              },
+              pipeline: $scope.pipeline,
+              stage: $scope.stage,
+              component: config.component,
+              configuration: config.configuration,
+            };
+            if (config.useBaseProvider || config.provides) {
+              stageScope.reactPropsForBaseProviderStage = props;
+            }
             if (config.component) {
-              const props = {
-                application: $scope.application,
-                stageFieldUpdated: $scope.stageFieldUpdated,
-                updateStageField: changes => {
-                  extend($scope.stage, changes);
-                  $scope.stageFieldUpdated();
-                },
-                stage: $scope.stage,
-                component: config.component,
-                configuration: config.configuration,
-              };
               ReactDOM.render(React.createElement(StageConfigWrapper, props), stageDetailsNode);
             } else {
               const template = $templateCache.get(config.templateUrl);

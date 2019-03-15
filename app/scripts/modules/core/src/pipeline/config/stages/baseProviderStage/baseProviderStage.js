@@ -2,16 +2,21 @@
 
 const angular = require('angular');
 
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
+
 import { AccountService } from 'core/account/AccountService';
 import { Registry } from 'core/registry';
 import { SETTINGS } from 'core/config/settings';
+import { StageConfigWrapper } from 'core/pipeline/config/stages/StageConfigWrapper';
 
 module.exports = angular
   .module('spinnaker.core.pipeline.stage.baseProviderStage', [])
   .controller('BaseProviderStageCtrl', [
     '$scope',
     'stage',
-    function($scope, stage) {
+    '$timeout',
+    function($scope, stage, $timeout) {
       // Docker Bake is wedged in here because it doesn't really fit our existing cloud provider paradigm
       let dockerBakeEnabled = SETTINGS.feature.dockerBake && stage.type === 'bake';
 
@@ -52,13 +57,30 @@ module.exports = angular
           }
         });
 
+      let reactMounted = false;
       function loadProvider() {
         const stageProvider = (stageProviders || []).find(
           s => s.cloudProvider === stage.cloudProviderType || (s.providesFor || []).includes(stage.cloudProviderType),
         );
         if (stageProvider) {
           $scope.stage.type = stageProvider.key || $scope.stage.type;
-          $scope.providerStageDetailsUrl = stageProvider.templateUrl;
+          const el = document.querySelector('.react-stage-details');
+          if (reactMounted) {
+            ReactDOM.unmountComponentAtNode(el);
+          }
+          if (stageProvider.component) {
+            const props = $scope.reactPropsForBaseProviderStage;
+            props.component = stageProvider.component;
+            $timeout(() => {
+              ReactDOM.render(
+                React.createElement(StageConfigWrapper, props),
+                el || document.querySelector('.react-stage-details'),
+              );
+            }, 0);
+          } else {
+            $scope.providerStageDetailsUrl = stageProvider.templateUrl;
+          }
+          reactMounted = !!stageProvider.component;
         }
       }
 

@@ -41,6 +41,9 @@ import {
   TagsDetailsSection,
 } from './serverGroup/details/sections';
 
+import { DEPLOY_CLOUDFORMATION_STACK_STAGE } from './pipeline/stages/deployCloudFormation/deployCloudFormationStackStage';
+import { CLOUDFORMATION_TEMPLATE_ENTRY } from './pipeline/stages/deployCloudFormation/cloudFormationTemplateEntry.component';
+
 // load all templates into the $templateCache
 const templates = require.context('./', true, /\.html$/);
 templates.keys().forEach(function(key) {
@@ -73,16 +76,14 @@ module(AMAZON_MODULE, [
   AWS_SECURITY_GROUP_MODULE,
   SUBNET_RENDERER,
   VPC_MODULE,
-  require('./cache/cacheConfigurer.service').name,
   require('./search/searchResultFormatter').name,
+  DEPLOY_CLOUDFORMATION_STACK_STAGE,
+  CLOUDFORMATION_TEMPLATE_ENTRY,
 ]).config(() => {
   CloudProviderRegistry.registerProvider('aws', {
     name: 'Amazon',
     logo: {
       path: require('./logo/amazon.logo.svg'),
-    },
-    cache: {
-      configurer: 'awsCacheConfigurer',
     },
     image: {
       reader: AwsImageReader,
