@@ -1,3 +1,7 @@
+interface IArtifactTypePatterns {
+  [typeName: string]: RegExp;
+}
+
 export const ArtifactTypePatterns = {
   BITBUCKET_FILE: /bitbucket\/file/,
   DOCKER_IMAGE: /docker\/image/,
@@ -15,3 +19,8 @@ export const ArtifactTypePatterns = {
   HTTP_FILE: /http\/file/,
   FRONT50_PIPELINE_TEMPLATE: /front50\/pipelineTemplate/,
 };
+
+export const excludeAllTypesExcept = (...types: RegExp[]) =>
+  Object.keys(ArtifactTypePatterns)
+    .map(k => (ArtifactTypePatterns as IArtifactTypePatterns)[k])
+    .filter(type => !types.includes(type));
