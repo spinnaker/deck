@@ -17,11 +17,16 @@ export interface ITriggerArtifactConstraintSelectorProps {
 }
 
 export class TriggerArtifactConstraintSelector extends React.Component<ITriggerArtifactConstraintSelectorProps> {
+  private excludedArtifactTypePatterns = [
+    ArtifactTypePatterns.KUBERNETES,
+    ArtifactTypePatterns.FRONT50_PIPELINE_TEMPLATE,
+  ];
+
   private handleChange = (index: number, selectedArtifact: IExpectedArtifact) => {
     if (selectedArtifact.id === '__create.new.artifact') {
       ExpectedArtifactModal.show({
         pipeline: this.props.pipeline,
-        excludedArtifactTypePatterns: [ArtifactTypePatterns.KUBERNETES, ArtifactTypePatterns.FRONT50_PIPELINE_TEMPLATE],
+        excludedArtifactTypePatterns: this.excludedArtifactTypePatterns,
       }).then(this.props.onDefineExpectedArtifact);
       return;
     }
@@ -41,6 +46,7 @@ export class TriggerArtifactConstraintSelector extends React.Component<ITriggerA
     ExpectedArtifactModal.show({
       expectedArtifact: artifact,
       pipeline: this.props.pipeline,
+      excludedArtifactTypePatterns: this.excludedArtifactTypePatterns,
     }).then((editedArtifact: IExpectedArtifact) => {
       this.props.onDefineExpectedArtifact(editedArtifact);
       this.props.onChangeSelected(this.props.selected, this.props.artifactReferer);
