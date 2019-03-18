@@ -10,6 +10,8 @@ const helpContents: { [key: string]: string } = {
         <p>The <em>average</em> strategy takes the average of all the canary scores</p>`,
   'pipeline.config.canary.delayBeforeAnalysis':
     '<p>The number of minutes until the first ACA measurement interval begins.</p>',
+  'pipeline.config.canary.baselineAnalysisOffset':
+    '<p>The offset in minutes of baseline data collection from the beginning of canary analysis. Useful for comparing metrics pre-canary for relative comparison. This field accepts SpEL</p>',
   'pipeline.config.canary.notificationHours': '<p>Hours at which to send a notification (comma separated)</p>',
   'pipeline.config.canary.canaryInterval':
     '<p>The frequency at which a canary score is generated.  The recommended interval is at least 30 minutes.</p>',

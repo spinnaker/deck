@@ -203,6 +203,10 @@
           <div class="col-md-4 sm-label-right compact">Interval</div>
           <div class="col-md-6">{{canaryConfig.canaryAnalysisConfig.canaryAnalysisIntervalMins}} minutes</div>
         </div>
+        <div class="row" ng-if="!canaryConfig.canaryAnalysisConfig.baselineAnalysisOffsetInMins">
+          <div class="col-md-4 sm-label-right compact">Baseline Offset</div>
+          <div class="col-md-6">{{canaryConfig.canaryAnalysisConfig.baselineAnalysisOffsetInMins}}  minutes</div>
+        </div>
         <div class="row">
           <div class="col-md-4 sm-label-right compact">Notification Hours</div>
           <div class="col-md-6">{{canaryConfig.canaryAnalysisConfig.notificationHours.join(', ')}}</div>
