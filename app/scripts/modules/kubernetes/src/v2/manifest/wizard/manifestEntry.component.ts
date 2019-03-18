@@ -22,6 +22,8 @@ class KubernetesManifestCtrl implements IController {
     this.rawManifest = yamlDocumentsToString(this.manifests);
   };
 
+  public $onChanges = () => this.$onInit();
+
   public handleChange = (rawManifest: string, manifests: any): void => {
     this.rawManifest = rawManifest;
     this.command.manifests = manifests;
