@@ -4,6 +4,7 @@ import * as DOMPurify from 'dompurify';
 
 import { HelpContentsRegistry } from 'core/help';
 import { HoverablePopover, Placement } from 'core/presentation';
+import { HelpContextConsumer } from './HelpContext';
 
 export interface IHelpFieldProps {
   id?: string;
@@ -41,6 +42,13 @@ export class HelpField extends React.PureComponent<IHelpFieldProps> {
     }
   };
 
+  private considerContext(fromContext: any, fromProps: any) {
+    if (fromProps !== undefined) {
+      return fromProps;
+    }
+    return fromContext;
+  }
+
   public render() {
     const { placement, label, expand, id, fallback, content } = this.props;
     const contents = this.renderContents(id, fallback, content);
@@ -54,15 +62,23 @@ export class HelpField extends React.PureComponent<IHelpFieldProps> {
     );
 
     if (label) {
-      return <div className="text-only">{!expand && contents && popover}</div>;
+      return (
+        <HelpContextConsumer>
+          {context => <div className="text-only">{!this.considerContext(context, expand) && contents && popover}</div>}
+        </HelpContextConsumer>
+      );
     } else {
       const expanded = <div className="help-contents small"> {contents} </div>;
 
       return (
-        <div style={{ display: 'inline-block' }}>
-          {!expand && contents && popover}
-          {expand && contents && expanded}
-        </div>
+        <HelpContextConsumer>
+          {context => (
+            <div style={{ display: 'inline-block' }}>
+              {!this.considerContext(context, expand) && contents && popover}
+              {this.considerContext(context, expand) && contents && expanded}
+            </div>
+          )}
+        </HelpContextConsumer>
       );
     }
   }
