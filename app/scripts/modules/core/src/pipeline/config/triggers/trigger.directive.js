@@ -45,6 +45,10 @@ module.exports = angular
         $scope.pipeline.triggers.splice(triggerIndex, 1);
       };
 
+      this.checkFeatureFlag = function(flag) {
+        return !!SETTINGS.feature[flag];
+      };
+
       this.changeExpectedArtifacts = function(expectedArtifacts, trigger) {
         $scope.$applyAsync(() => {
           trigger.expectedArtifactIds = expectedArtifacts;
@@ -52,8 +56,13 @@ module.exports = angular
           // remove unused expected artifacts from the pipeline
           const artifacts = $scope.pipeline.expectedArtifacts;
           artifacts.forEach(artifact => {
-            if (!$scope.pipeline.triggers.find(t => t.expectedArtifactIds.includes(artifact.id))) {
+            if (
+              !$scope.pipeline.triggers.find(t => t.expectedArtifactIds && t.expectedArtifactIds.includes(artifact.id))
+            ) {
               $scope.pipeline.expectedArtifacts.splice($scope.pipeline.expectedArtifacts.indexOf(artifact), 1);
+              if ($scope.pipeline.expectedArtifacts.length === 0) {
+                delete $scope.pipeline.expectedArtifacts;
+              }
             }
           });
         });
@@ -105,9 +114,18 @@ module.exports = angular
             if (config.component) {
               // react
               const TriggerConfig = config.component;
-              const props = { fieldUpdated: $scope.fieldUpdated, trigger: $scope.trigger };
+              const renderTrigger = props =>
+                ReactDOM.render(React.createElement(TriggerConfig, props), triggerBodyNode);
 
-              ReactDOM.render(React.createElement(TriggerConfig, props), triggerBodyNode);
+              const props = {
+                fieldUpdated: () => {
+                  $scope.fieldUpdated();
+                  renderTrigger(props);
+                },
+                trigger: $scope.trigger,
+              };
+
+              renderTrigger(props);
             } else if (config.templateUrl) {
               // angular
               const template = $templateCache.get(config.templateUrl);
