@@ -165,5 +165,83 @@ describe('azureServerGroupTransformer', function() {
       expect(transformed.customScriptsSettings.fileUris).toBeNull();
       expect(transformed.customScriptsSettings.commandToExecute).toBe('');
     });
+
+    it('it sets the zones information', function() {
+      var command = {
+        zonesEnabled: true,
+        zones: ['1', '3'],
+        stack: 's1',
+        freeFormDetails: 'd1',
+        application: 'theApp',
+        sku: {
+          capacity: 1,
+        },
+        selectedImage: {
+          publisher: 'Microsoft',
+          offer: 'Windows',
+          sku: 'Server2016',
+          version: '12.0.0.1',
+        },
+        viewState: {
+          mode: 'create',
+        },
+      };
+
+      var transformed = transformer.convertServerGroupCommandToDeployConfiguration(command);
+
+      expect(transformed.zonesEnabled).toEqual(true);
+      expect(transformed.zones).toEqual(command.zones);
+    });
+
+    it('it should not set the zones information if zonesEnabled is false', function() {
+      var command = {
+        zonesEnabled: false,
+        zones: ['1', '3'],
+        stack: 's1',
+        freeFormDetails: 'd1',
+        application: 'theApp',
+        sku: {
+          capacity: 1,
+        },
+        selectedImage: {
+          publisher: 'Microsoft',
+          offer: 'Windows',
+          sku: 'Server2016',
+          version: '12.0.0.1',
+        },
+        viewState: {
+          mode: 'create',
+        },
+      };
+
+      var transformed = transformer.convertServerGroupCommandToDeployConfiguration(command);
+
+      expect(transformed.zonesEnabled).toEqual(false);
+      expect(transformed.zones).toEqual([]);
+    });
+
+    it('sets instance tags correctly when provided', function() {
+      let imap = new Map();
+      var base = {
+        application: 'myApp',
+        sku: {
+          capacity: 1,
+        },
+        selectedImage: {
+          publisher: 'Microsoft',
+          offer: 'Windows',
+          sku: 'Server2016',
+          version: '12.0.0.1',
+        },
+        viewState: {
+          mode: 'create',
+        },
+        instanceTags: imap,
+      };
+
+      var transformed = transformer.convertServerGroupCommandToDeployConfiguration(base);
+
+      expect(transformed.instanceTags).toBe(imap);
+    });
   });
 });

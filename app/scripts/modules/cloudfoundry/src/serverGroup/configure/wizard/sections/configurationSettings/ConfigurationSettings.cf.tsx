@@ -22,6 +22,7 @@ import { ICloudFoundryEnvVar } from 'cloudfoundry/domain';
 import {
   Buildpacks,
   EnvironmentVariables,
+  FormikConfigField,
   HealthCheck,
   InstanceParameters,
   Routes,
@@ -83,7 +84,6 @@ export class CloudFoundryServerGroupConfigurationSettings
       <div className="form-group">
         <div className="col-md-11">
           <div className="StandardFieldLayout flex-container-h margin-between-lg">
-            <div className="sm-label-right">Artifact</div>
             <div className="flex-grow">
               <StageArtifactSelector
                 pipeline={pipeline}
@@ -93,6 +93,9 @@ export class CloudFoundryServerGroupConfigurationSettings
                 onExpectedArtifactSelected={this.onExpectedArtifactSelected}
                 onArtifactEdited={this.onArtifactChanged}
                 excludedArtifactTypePatterns={this.excludedArtifactTypePatterns}
+                renderLabel={(field: React.ReactNode) => {
+                  return <FormikConfigField label={'Artifact'}>{field}</FormikConfigField>;
+                }}
               />
             </div>
           </div>
@@ -148,7 +151,7 @@ export class CloudFoundryServerGroupConfigurationSettings
                 <CloudFoundryRadioButtonInput
                   value={direct ? 'direct' : 'artifact'}
                   options={[{ label: 'Artifact', value: 'artifact' }, { label: 'Form', value: 'direct' }]}
-                  onChange={e => this.manifestSourceUpdated(e.target.value)}
+                  onChange={(e: any) => this.manifestSourceUpdated(e.target.value)}
                 />
               </div>
             </div>

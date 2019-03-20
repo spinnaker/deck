@@ -36,7 +36,7 @@ export class RegionSelectField extends React.Component<IRegionSelectFieldProps> 
             regions={regions}
             readOnly={readOnly}
             value={component[field]}
-            onChange={evt => this.handleChange(evt)}
+            onChange={(evt: any) => this.handleChange(evt)}
           />
         </div>
       </div>

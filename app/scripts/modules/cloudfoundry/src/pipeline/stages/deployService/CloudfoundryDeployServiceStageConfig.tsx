@@ -11,6 +11,7 @@ import {
   StageConfigField,
   StageArtifactSelector,
   IArtifact,
+  ArtifactTypePatterns,
 } from '@spinnaker/core';
 
 import { CreateServiceInstanceDirectInput } from './CreateServiceInstanceDirectInput';
@@ -30,10 +31,11 @@ export class CloudfoundryDeployServiceStageConfig extends React.Component<
 > {
   private defaultDirectManifest = {
     direct: {
+      parameters: '',
       service: '',
       serviceInstanceName: '',
       servicePlan: '',
-      parameters: '',
+      updatable: true,
     },
   };
 
@@ -43,7 +45,7 @@ export class CloudfoundryDeployServiceStageConfig extends React.Component<
 
   constructor(props: IStageConfigProps) {
     super(props);
-    this.props.stage.cloudProvider = 'cloudfoundry';
+    this.props.updateStageField({ cloudProvider: 'cloudfoundry' });
     this.state = {
       accounts: [],
       regions: [],
@@ -97,7 +99,7 @@ export class CloudfoundryDeployServiceStageConfig extends React.Component<
   };
 
   private onArtifactChanged = (artifact: IArtifact): void => {
-    this.props.updateStageField({ manifest: { artifact: artifact } });
+    this.props.updateStageField({ manifest: { artifact } });
   };
 
   private regionUpdated = (option: Option<string>): void => {
@@ -110,7 +112,7 @@ export class CloudfoundryDeployServiceStageConfig extends React.Component<
   };
 
   private serviceManifestSourceUpdated = (manifest: ICloudFoundryServiceManifestSource) => {
-    this.props.updateStageField({ manifest: manifest });
+    this.props.updateStageField({ manifest });
   };
 
   private userProvidedUpdated = (event: React.ChangeEvent<HTMLInputElement>): void => {
@@ -127,13 +129,17 @@ export class CloudfoundryDeployServiceStageConfig extends React.Component<
     if (directInput) {
       const directManifest = (manifest && manifest.direct) || this.defaultDirectManifest;
       manifestInput = userProvided ? (
-        <CreateUserProvidedInput onChange={this.serviceManifestSourceUpdated} serviceInput={directManifest} />
+        <CreateUserProvidedInput
+          onChange={this.serviceManifestSourceUpdated}
+          service={directManifest}
+          onServiceChanged={direct => this.serviceManifestSourceUpdated({ direct })}
+        />
       ) : (
         <CreateServiceInstanceDirectInput
           credentials={credentials}
           region={region}
           service={directManifest}
-          onServiceChanged={direct => this.serviceManifestSourceUpdated({ direct: direct })}
+          onServiceChanged={direct => this.serviceManifestSourceUpdated({ direct })}
         />
       );
     } else {
@@ -143,6 +149,11 @@ export class CloudfoundryDeployServiceStageConfig extends React.Component<
             pipeline={pipeline}
             stage={stage}
             expectedArtifactId={manifest.artifactId}
+            excludedArtifactTypePatterns={[
+              ArtifactTypePatterns.KUBERNETES,
+              ArtifactTypePatterns.FRONT50_PIPELINE_TEMPLATE,
+              ArtifactTypePatterns.DOCKER_IMAGE,
+            ]}
             artifact={manifest.artifact}
             onExpectedArtifactSelected={this.onExpectedArtifactSelected}
             onArtifactEdited={this.onArtifactChanged}

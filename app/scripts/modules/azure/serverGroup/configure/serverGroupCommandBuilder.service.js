@@ -34,6 +34,9 @@ module.exports = angular
               sku: {
                 capacity: 1,
               },
+              zonesEnabled: false,
+              zones: [],
+              instanceTags: {},
               selectedProvider: 'azure',
               viewState: {
                 instanceProfile: 'custom',
@@ -87,6 +90,7 @@ module.exports = angular
             desired: serverGroup.capacity.desired,
           },
           tags: [],
+          instanceTags: serverGroup.instanceTags,
           selectedProvider: 'azure',
           source: {
             account: serverGroup.account,

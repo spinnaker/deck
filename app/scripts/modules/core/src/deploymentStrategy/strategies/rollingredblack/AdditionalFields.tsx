@@ -6,9 +6,11 @@ import { NgReact } from 'core/reactShims';
 import { IServerGroupCommand } from 'core/serverGroup';
 
 import { PipelineSelector } from '../PipelineSelector';
+import { set } from 'lodash';
 
 export interface IRollingRedBlackCommand extends IServerGroupCommand {
   delayBeforeDisableSec: string;
+  delayBeforeScaleDownSec: string;
   pipelineBeforeCleanup: {
     application: string;
   };
@@ -44,6 +46,11 @@ export class AdditionalFields extends React.Component<IRollingRedBlackStrategyAd
     this.forceUpdate();
   };
 
+  private handleChange = (key: string, value: string) => {
+    set(this.props.command, key, value);
+    this.forceUpdate();
+  };
+
   public render() {
     const { NumberList } = NgReact;
     const { command } = this.props;
@@ -63,6 +70,25 @@ export class AdditionalFields extends React.Component<IRollingRedBlackStrategyAd
           </label>
         </div>
 
+        {command.scaleDown && (
+          <div className="col-md-12 form-inline" style={{ marginTop: '5px' }}>
+            <label>
+              <span style={{ marginRight: '2px' }}>Wait Before Scale Down</span>
+              <HelpField content="Time to wait before scaling down all old server groups" />
+            </label>
+            <input
+              className="form-control input-sm"
+              style={{ width: '60px', marginLeft: '2px', marginRight: '2px' }}
+              min="0"
+              type="number"
+              value={command.delayBeforeScaleDownSec}
+              onChange={e => this.handleChange('delayBeforeScaleDownSec', e.target.value)}
+              placeholder="0"
+            />
+            seconds
+          </div>
+        )}
+
         <div className="col-md-6" style={{ marginTop: '5px' }}>
           <h4>
             Percentages
@@ -77,7 +103,7 @@ export class AdditionalFields extends React.Component<IRollingRedBlackStrategyAd
         <div className="col-md-12 form-inline">
           <label>
             Wait
-            <HelpField content="Time to wait before disabling instances in old server group" />
+            <HelpField content="Time to wait before disabling all old server groups in this cluster" />
           </label>
           <input
             className="form-control input-sm"
@@ -93,7 +119,7 @@ export class AdditionalFields extends React.Component<IRollingRedBlackStrategyAd
         <div className="col-md-12" style={{ marginTop: '5px' }}>
           <label>
             Run a Pipeline
-            <HelpField content="Pipeline to run before disabling instances in old server group" />
+            <HelpField content="Pipeline to run before disabling all old server groups in this cluster" />
           </label>
           <PipelineSelector command={command.pipelineBeforeCleanup} type="pipelines" />
         </div>
