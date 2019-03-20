@@ -38,11 +38,10 @@ module.exports = angular
           stageConfig = Registry.pipeline.getStageConfig(stage),
           stageDefaults = stageConfig ? stageConfig.defaultTimeoutMs : null;
 
-        // vm.overrideTimeout being false is only a transition state to indicate the override got unchecked
-        const shouldRemoveOverride = $scope.vm && $scope.vm.overrideTimeout === false;
-
         // Capturing this so that we can restore it after $scope.vm is clobbered
         const originalOverrideTimeout = $scope.vm && $scope.vm.overrideTimeout;
+        // vm.overrideTimeout being false is only a transition state to indicate the override got unchecked
+        const shouldRemoveOverride = originalOverrideTimeout === false;
 
         $scope.vm = {
           configurable: !!stageDefaults,
