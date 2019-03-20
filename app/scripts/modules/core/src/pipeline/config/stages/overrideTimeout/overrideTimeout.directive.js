@@ -38,6 +38,12 @@ module.exports = angular
           stageConfig = Registry.pipeline.getStageConfig(stage),
           stageDefaults = stageConfig ? stageConfig.defaultTimeoutMs : null;
 
+        // vm.overrideTimeout being false is only a transition state to indicate the override got unchecked
+        const shouldRemoveOverride = $scope.vm && $scope.vm.overrideTimeout === false;
+
+        // Capturing this so that we can restore it after $scope.vm is clobbered
+        const originalOverrideTimeout = $scope.vm && $scope.vm.overrideTimeout;
+
         $scope.vm = {
           configurable: !!stageDefaults,
         };
@@ -45,12 +51,15 @@ module.exports = angular
         $scope.vm.helpContent = HelpContentsRegistry.getHelpField('pipeline.config.timeout');
         $scope.vm.defaults = toHoursAndMinutes(stageDefaults);
 
-        if (stage.overrideTimeout) {
-          const overrideValue = stage.stageTimeoutMs || stageDefaults;
-          $scope.vm.hours = toHoursAndMinutes(overrideValue).hours;
-          $scope.vm.minutes = toHoursAndMinutes(overrideValue).minutes;
-        } else {
+        if (shouldRemoveOverride) {
           delete stage.stageTimeoutMs;
+        } else if (originalOverrideTimeout || stage.stageTimeoutMs !== undefined) {
+          // Either vm.overrideTimeout was originally true, or forcing to true because stageTimeoutMs is defined
+          $scope.vm.overrideTimeout = true;
+
+          stage.stageTimeoutMs = stage.stageTimeoutMs || stageDefaults;
+          $scope.vm.hours = toHoursAndMinutes(stage.stageTimeoutMs).hours;
+          $scope.vm.minutes = toHoursAndMinutes(stage.stageTimeoutMs).minutes;
         }
       };
 
