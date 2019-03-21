@@ -42,11 +42,11 @@ export class HelpField extends React.PureComponent<IHelpFieldProps> {
     }
   };
 
-  private considerContext(fromContext: any, fromProps: any) {
-    if (fromProps !== undefined) {
-      return fromProps;
+  private shouldExpandHelpText(expandFromContext: any, expandFromProps: any) {
+    if (expandFromProps !== undefined) {
+      return expandFromProps;
     }
-    return fromContext;
+    return expandFromContext;
   }
 
   public render() {
@@ -64,7 +64,9 @@ export class HelpField extends React.PureComponent<IHelpFieldProps> {
     if (label) {
       return (
         <HelpContextConsumer>
-          {context => <div className="text-only">{!this.considerContext(context, expand) && contents && popover}</div>}
+          {context => (
+            <div className="text-only">{!this.shouldExpandHelpText(context, expand) && contents && popover}</div>
+          )}
         </HelpContextConsumer>
       );
     } else {
@@ -74,8 +76,8 @@ export class HelpField extends React.PureComponent<IHelpFieldProps> {
         <HelpContextConsumer>
           {context => (
             <div style={{ display: 'inline-block' }}>
-              {!this.considerContext(context, expand) && contents && popover}
-              {this.considerContext(context, expand) && contents && expanded}
+              {!this.shouldExpandHelpText(context, expand) && contents && popover}
+              {this.shouldExpandHelpText(context, expand) && contents && expanded}
             </div>
           )}
         </HelpContextConsumer>
