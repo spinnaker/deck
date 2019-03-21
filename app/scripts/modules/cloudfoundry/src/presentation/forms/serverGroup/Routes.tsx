@@ -22,7 +22,7 @@ export class Routes extends React.Component<IRoutesProps> {
             <b>{singleRouteOnly ? 'Route' : 'Routes'}</b>
             &nbsp;
             {!isRequired && <HelpField id="cf.serverGroup.routes" />}
-            {isRequired && <HelpField id="cf.serverGroup.requiredRoutes" />}
+            {!!isRequired && <HelpField id="cf.serverGroup.requiredRoutes" />}
             <FieldArray
               name={fieldName}
               render={arrayHelpers => {
