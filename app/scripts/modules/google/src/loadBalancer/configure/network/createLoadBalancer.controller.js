@@ -35,6 +35,12 @@ module.exports = angular
         submitting: false,
       };
 
+      $scope.sessionAffinityViewToModelMap = new Map([
+        ['None', 'NONE'],
+        ['Client IP', 'CLIENT_IP'],
+        ['Client IP and protocol', 'CLIENT_IP_PROTO'],
+      ]);
+
       function onApplicationRefresh() {
         // If the user has already closed the modal, do not navigate to the new details view
         if ($scope.$$destroyed) {
@@ -199,7 +205,7 @@ module.exports = angular
               params.healthCheck = null;
             }
 
-            params.sessionAffinity = $scope.loadBalancer.sessionAffinity;
+            params.sessionAffinity = $scope.sessionAffinityViewToModelMap.get($scope.loadBalancer.sessionAffinity);
           }
 
           return LoadBalancerWriter.upsertLoadBalancer($scope.loadBalancer, application, descriptor, params);
