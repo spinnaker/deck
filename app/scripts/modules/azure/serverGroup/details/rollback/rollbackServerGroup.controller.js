@@ -5,7 +5,10 @@ const angular = require('angular');
 import { SERVER_GROUP_WRITER, TaskMonitor } from '@spinnaker/core';
 
 module.exports = angular
-  .module('spinnaker.azure.serverGroup.details.rollback.controller', [SERVER_GROUP_WRITER])
+  .module('spinnaker.azure.serverGroup.details.rollback.controller', [
+    SERVER_GROUP_WRITER,
+    require('../../../common/footer.directive').name,
+  ])
   .controller('azureRollbackServerGroupCtrl', [
     '$scope',
     '$uibModalInstance',

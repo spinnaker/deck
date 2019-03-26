@@ -34,7 +34,6 @@ module.exports = angular
     require('./securityGroup/securityGroup.reader').name,
     require('./image/image.reader').name,
     require('./validation/applicationName.validator').name,
-    require('./common/footer.directive').name,
   ])
   .config(function() {
     CloudProviderRegistry.registerProvider('azure', {

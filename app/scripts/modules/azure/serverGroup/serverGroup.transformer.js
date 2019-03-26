@@ -35,7 +35,7 @@ module.exports = angular
         stack: command.stack,
         strategy: command.strategy,
         rollback: {
-          onFailure: command.rollback.onFailure,
+          onFailure: command.rollback ? command.rollback.onFailure : null,
         },
         scaleDown: command.scaleDown,
         maxRemainingAsgs: command.maxRemainingAsgs,
