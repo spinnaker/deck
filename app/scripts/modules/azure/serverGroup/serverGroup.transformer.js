@@ -34,6 +34,13 @@ module.exports = angular
         application: command.application,
         stack: command.stack,
         strategy: command.strategy,
+        rollback: {
+          onFailure: command.rollback.onFailure,
+        },
+        scaleDown: command.scaleDown,
+        maxRemainingAsgs: command.maxRemainingAsgs,
+        delayBeforeDisableSec: command.delayBeforeDisableSec,
+        delayBeforeScaleDownSec: command.delayBeforeScaleDownSec,
         detail: command.freeFormDetails,
         freeFormDetails: command.freeFormDetails,
         account: command.credentials,
