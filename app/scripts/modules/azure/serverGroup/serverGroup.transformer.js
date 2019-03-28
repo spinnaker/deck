@@ -41,6 +41,8 @@ module.exports = angular
         maxRemainingAsgs: command.maxRemainingAsgs,
         delayBeforeDisableSec: command.delayBeforeDisableSec,
         delayBeforeScaleDownSec: command.delayBeforeScaleDownSec,
+        allowDeleteActive: command.strategy === 'redblack' ? true : null,
+        allowScaleDownActive: command.strategy === 'redblack' ? true : null,
         detail: command.freeFormDetails,
         freeFormDetails: command.freeFormDetails,
         account: command.credentials,
