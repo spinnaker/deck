@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import { get } from 'lodash';
 
-import { Application } from 'core/application';
+import { Application, ApplicationModelBuilder } from 'core/application';
 import { IPagerDutyService, PagerDutyWriter } from 'core/pagerDuty';
 import { NgReact } from 'core/reactShims';
 import { SETTINGS } from 'core/config';
@@ -70,17 +70,23 @@ export class PageModal extends React.Component<IPageModalProps, IPageModalState>
   };
 
   public sendPage = (): void => {
+    const { applications, services } = this.props;
+    const defaultApp = new ApplicationModelBuilder().createStandaloneApplication('spinnaker');
+    const ownerApp = applications && applications.length === 1 ? applications[0] : defaultApp;
+
     const taskMonitor = new TaskMonitor({
+      application: ownerApp,
       title: `Sending page to ${this.state.pageCount} policies`,
       modalInstance: TaskMonitor.modalInstanceEmulation(() => this.close()),
       onTaskComplete: () => this.props.closeCallback(true),
     });
 
     const submitMethod = () => {
-      const { applications, services } = this.props;
       const { subject, details } = this.state;
 
-      return PagerDutyWriter.sendPage(applications, services.map(s => s.integration_key), subject, { details });
+      return PagerDutyWriter.sendPage(applications, services.map(s => s.integration_key), subject, ownerApp, {
+        details,
+      });
     };
 
     taskMonitor.submit(submitMethod);
