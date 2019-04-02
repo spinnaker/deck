@@ -18,7 +18,9 @@ module.exports = angular
     'disabledServerGroups',
     function($scope, $uibModalInstance, serverGroupWriter, application, serverGroup, disabledServerGroups) {
       $scope.serverGroup = serverGroup;
-      $scope.disabledServerGroups = disabledServerGroups.sort((a, b) => b.name.localeCompare(a.name));
+      $scope.disabledServerGroups = disabledServerGroups
+        .filter(disabledServerGroup => disabledServerGroup.instanceCounts.total !== 0)
+        .sort((a, b) => b.name.localeCompare(a.name));
       $scope.verification = {};
 
       $scope.command = {
@@ -51,6 +53,10 @@ module.exports = angular
 
         const submitMethod = function() {
           $scope.command.interestingHealthProviderNames = [];
+          var restoreServerGroup = $scope.disabledServerGroups.find(function(disabledServerGroup) {
+            return disabledServerGroup.name === $scope.command.rollbackContext.restoreServerGroupName;
+          });
+          $scope.command.targetSize = restoreServerGroup.capacity.max;
           return serverGroupWriter.rollbackServerGroup(serverGroup, application, $scope.command);
         };
 
