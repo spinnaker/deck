@@ -21,7 +21,7 @@ export interface IStageTypeConfig extends IStageOrTriggerTypeConfig {
   executionConfigSections?: string[]; // angular only
   executionDetailsSections?: IExecutionDetailsSection[]; // react only
   executionDetailsUrl?: string; // angular only
-  executionLabelComponent?: React.ComponentClass<IExecutionStageLabelComponentProps>;
+  executionLabelComponent?: React.ComponentType<IExecutionStageLabelComponentProps>;
   executionStepLabelUrl?: string;
   executionSummaryUrl?: string;
   extraLabelLines?: (stage: IStage) => number;

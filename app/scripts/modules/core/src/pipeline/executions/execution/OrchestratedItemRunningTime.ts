@@ -17,8 +17,8 @@ export class OrchestratedItemRunningTime {
       this.updateCallback(this.item.runningTimeInMs);
     }
     if (this.item.status === 'RUNNING' && !this.updateInterval) {
-      this.reset();
       this.updateInterval = setInterval(() => this.updateCallback(Date.now() - this.item.startTime), 1000);
+      this.updateCallback(Date.now() - this.item.startTime);
     }
     return undefined;
   }

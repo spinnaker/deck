@@ -1,11 +1,12 @@
+import * as React from 'react';
 import { Registry } from 'core/registry';
 
+import { IExecutionStageLabelComponentProps } from 'core/domain';
 import { ExecutionDetailsTasks } from '../common';
 import { WaitExecutionDetails } from './WaitExecutionDetails';
 import { WaitExecutionLabel } from './WaitExecutionLabel';
 import { WaitStageConfig } from './WaitStageConfig';
-
-export const DEFAULT_SKIP_WAIT_TEXT = 'The pipeline will proceed immediately, marking this stage completed.';
+import { SkipWait } from './SkipWait';
 
 Registry.pipeline.registerStage({
   label: 'Wait',
@@ -13,7 +14,9 @@ Registry.pipeline.registerStage({
   key: 'wait',
   component: WaitStageConfig,
   executionDetailsSections: [WaitExecutionDetails, ExecutionDetailsTasks],
-  executionLabelComponent: WaitExecutionLabel,
+  executionLabelComponent: (props: IExecutionStageLabelComponentProps) => (
+    <WaitExecutionLabel {...props} skipWaitComponent={SkipWait} />
+  ),
   useCustomTooltip: true,
   strategy: true,
   validators: [{ type: 'requiredField', fieldName: 'waitTime' }],

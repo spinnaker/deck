@@ -31,6 +31,7 @@ import './config/stages/unshareService/unshareServiceStage';
 import { WERCKER_STAGE_MODULE } from './config/stages/wercker/werckerStage.module';
 import { UNMATCHED_STAGE_TYPE_STAGE } from './config/stages/unmatchedStageTypeStage/unmatchedStageTypeStage';
 import './config/stages/wait/waitStage';
+import './config/stages/waitForCondition/waitForConditionStage';
 import './config/stages/evaluateVariables/evaluateVariablesStage';
 import { PRECONFIGUREDJOB_STAGE_MODULE } from './config/stages/preconfiguredJob/preconfiguredJobStage.module';
 import './config/stages/entityTags/applyEntityTagsStage';
