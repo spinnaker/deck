@@ -340,7 +340,7 @@ module.exports = angular
       const regions = command.backingData.credentialsKeyedByAccount[command.credentials].regions;
       if (_.isArray(regions)) {
         filteredData.zones = _.find(regions, { name: command.region }).zones;
-        filteredData.automaticZones = filteredData.zones.slice().sort();
+        filteredData.truncatedZones = _.takeRight(filteredData.zones.sort(), 3);
       } else {
         // TODO(duftler): Remove this once we finish deprecating the old style regions/zones in clouddriver GCE credentials.
         filteredData.zones = regions[command.region];
@@ -572,8 +572,9 @@ module.exports = angular
 
       // Only include explicitly-selected firewalls in the body of the command.
       const xpnHostProject = getXpnHostProjectIfAny(command.network);
-      const decoratedSecurityGroups = _.map(command.securityGroups, sg =>
-        !sg.startsWith(xpnHostProject) ? xpnHostProject + sg : sg,
+      const decoratedSecurityGroups = _.map(
+        command.securityGroups,
+        sg => (!sg.startsWith(xpnHostProject) ? xpnHostProject + sg : sg),
       );
       command.securityGroups = _.difference(decoratedSecurityGroups, _.map(command.implicitSecurityGroups, 'id'));
 
