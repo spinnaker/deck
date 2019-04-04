@@ -139,7 +139,7 @@ module.exports = angular
               if (
                 !_.chain(healthChecks)
                   .map('selfLink')
-                  .includes(command.autoHealingPolicy.healthCheck)
+                  .includes(command.autoHealingPolicy.healthCheckUrl)
                   .value()
               ) {
                 healthCheckReloader = refreshHealthChecks(command, true);
@@ -369,7 +369,7 @@ module.exports = angular
         const regions = command.backingData.credentialsKeyedByAccount[command.credentials].regions;
         if (_.isArray(regions)) {
           filteredData.zones = _.find(regions, { name: command.region }).zones;
-          filteredData.automaticZones = filteredData.zones.slice().sort();
+          filteredData.truncatedZones = _.takeRight(filteredData.zones.sort(), 3);
         } else {
           // TODO(duftler): Remove this once we finish deprecating the old style regions/zones in clouddriver GCE credentials.
           filteredData.zones = regions[command.region];
@@ -406,7 +406,7 @@ module.exports = angular
           _.has(command, 'autoHealingPolicy.healthCheck') &&
           !_.chain(filteredData.healthChecks)
             .map('selfLink')
-            .includes(command.autoHealingPolicy.healthCheck)
+            .includes(command.autoHealingPolicy.healthCheckUrl)
             .value()
         ) {
           delete command.autoHealingPolicy.healthCheck;
