@@ -64,9 +64,10 @@ export class ExecutionBarLabel extends React.Component<IExecutionBarLabelProps, 
       const waitForConditionStage = stage.stages.find(s => s.type === 'waitForCondition');
       const template = (
         <div>
-          <div>
-            <b>{stage.name}</b> (waiting until condition is met)
-          </div>
+          <p>
+            <b>{stage.name}</b> (waiting until conditions are met)
+          </p>
+          Conditions:
           <SkipConditionWait application={application} execution={execution} stage={waitForConditionStage} />
         </div>
       );

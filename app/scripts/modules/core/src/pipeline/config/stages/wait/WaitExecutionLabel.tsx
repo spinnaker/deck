@@ -1,38 +1,24 @@
 import * as React from 'react';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 
-import { IExecution, IExecutionStage, IExecutionStageLabelComponentProps } from 'core/domain';
-import { Application } from 'core/application/application.model';
+import { IExecutionStageLabelComponentProps } from 'core/domain';
 import { HoverablePopover } from 'core/presentation/HoverablePopover';
 import { ExecutionBarLabel } from 'core/pipeline/config/stages/common/ExecutionBarLabel';
 
-export interface IWaitExecutionLabelProps extends IExecutionStageLabelComponentProps {
-  skipWaitComponent: React.ComponentType<{
-    execution: IExecution;
-    stage: IExecutionStage;
-    application: Application;
-  }>;
-}
+import { SkipWait } from './SkipWait';
 
 export interface IWaitExecutionLabelState {
   target?: any;
 }
 
-export class WaitExecutionLabel extends React.Component<IWaitExecutionLabelProps, IWaitExecutionLabelState> {
-  constructor(props: IWaitExecutionLabelProps) {
+export class WaitExecutionLabel extends React.Component<IExecutionStageLabelComponentProps, IWaitExecutionLabelState> {
+  constructor(props: IExecutionStageLabelComponentProps) {
     super(props);
     this.state = {};
   }
 
   public render() {
-    const {
-      stage,
-      executionMarker,
-      application,
-      execution,
-      children,
-      skipWaitComponent: SkipWaitComponent,
-    } = this.props;
+    const { stage, executionMarker, application, execution, children } = this.props;
 
     if (!executionMarker) {
       return <ExecutionBarLabel {...this.props} />;
@@ -43,7 +29,7 @@ export class WaitExecutionLabel extends React.Component<IWaitExecutionLabelProps
           <div>
             <b>{stage.name}</b>
           </div>
-          <SkipWaitComponent stage={stage.masterStage} application={application} execution={execution} />
+          <SkipWait stage={stage.masterStage} application={application} execution={execution} />
         </div>
       );
       return <HoverablePopover template={template}>{children}</HoverablePopover>;
