@@ -17,7 +17,7 @@ Note that we are unlikely to accept pull requests that add features without prio
 ----------
 # Helpful Tips
 
-## Add screenshots and annoations
+## Add screenshots and annotations
 <kbd>![](https://cl.ly/744faf8f96d7/download/Image%202019-04-08%20at%2012.35.32.png)</kbd>
 - In OSX Mojave, you can capture screenshots and add annotations. https://support.apple.com/en-us/HT201361
 - Another app you can use is https://www.getcloudapp.com/.
