@@ -79,6 +79,7 @@ module.exports = angular
         },
         zonesEnabled: command.zonesEnabled,
         zones: command.zonesEnabled ? command.zones : [],
+        enableInboundNAT: command.enableInboundNAT,
       };
 
       if (typeof command.stack !== 'undefined') {

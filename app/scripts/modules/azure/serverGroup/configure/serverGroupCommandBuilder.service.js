@@ -50,6 +50,7 @@ module.exports = angular
                 networkSettingsConfigured: false,
                 securityGroupsConfigured: false,
               },
+              enableInboundNAT: false,
             };
           });
       }
@@ -91,6 +92,7 @@ module.exports = angular
           },
           tags: [],
           instanceTags: serverGroup.instanceTags,
+          instanceType: serverGroup.sku.name,
           selectedProvider: 'azure',
           source: {
             account: serverGroup.account,
@@ -107,7 +109,34 @@ module.exports = angular
             mode: mode,
             disableStrategySelection: true,
           },
+          enableInboundNAT: serverGroup.enableInboundNAT,
         };
+
+        if (typeof serverGroup.customScriptsSettings !== 'undefined') {
+          command.customScriptsSettings = {};
+          command.customScriptsSettings.commandToExecute = serverGroup.customScriptsSettings.commandToExecute;
+          if (
+            typeof serverGroup.customScriptsSettings.fileUris !== 'undefined' &&
+            serverGroup.customScriptsSettings.fileUris != ''
+          ) {
+            if (Array.isArray(serverGroup.customScriptsSettings.fileUris)) {
+              command.customScriptsSettings.fileUris = serverGroup.customScriptsSettings.fileUris;
+            } else {
+              var fileUrisTemp = serverGroup.customScriptsSettings.fileUris;
+              if (fileUrisTemp.includes(',')) {
+                command.customScriptsSettings.fileUris = fileUrisTemp.split(',');
+              } else if (fileUrisTemp.includes(';')) {
+                command.customScriptsSettings.fileUris = fileUrisTemp.split(';');
+              } else {
+                command.customScriptsSettings.fileUris = [fileUrisTemp];
+              }
+
+              command.customScriptsSettings.fileUris.forEach(function(v, index) {
+                command.customScriptsSettings.fileUris[index] = v.trim();
+              });
+            }
+          }
+        }
 
         return $q.when(command);
       }
