@@ -55,7 +55,7 @@ export const SkipConditionWait = ({ stage, application }: ISkipConditionWaitProp
         )}
         {stage.context.status === 'SKIPPED' && <span>(skipped after {duration(stage.runningTimeInMs)})</span>}
       </div>
-      {stage.isRunning && (
+      {stage.isSuspended && (
         <div className="action-buttons">
           <button className="btn btn-xs btn-primary" onClick={event => skipRemainingWait(event, stage, application)}>
             <span style={{ marginRight: '5px' }} className="small glyphicon glyphicon-fast-forward" />

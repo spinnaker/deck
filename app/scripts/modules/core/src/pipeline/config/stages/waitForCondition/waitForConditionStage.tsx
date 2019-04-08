@@ -3,6 +3,7 @@ import { Registry } from 'core/registry';
 
 import { IExecutionStageLabelComponentProps } from 'core/domain';
 import { ExecutionDetailsTasks } from '../common';
+import { WaitForConditionTransformer } from './waitForCondition.transformer';
 import { WaitForConditionExecutionDetails } from './WaitForConditionExecutionDetails';
 import { WaitExecutionLabel } from '../wait/WaitExecutionLabel';
 import { SkipConditionWait } from './SkipConditionWait';
@@ -15,6 +16,7 @@ Registry.pipeline.registerStage({
   executionLabelComponent: (props: IExecutionStageLabelComponentProps) => (
     <WaitExecutionLabel {...props} skipWaitComponent={SkipConditionWait} />
   ),
-  useCustomTooltip: true,
   synthetic: true,
 });
+
+Registry.pipeline.registerTransformer(new WaitForConditionTransformer());

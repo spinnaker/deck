@@ -62,10 +62,10 @@ export interface IExecutionStageSummary extends IOrchestratedItem {
   group?: string;
   groupStages?: IExecutionStageSummary[];
   id: string;
-  inSuspendedExecutionWindow?: boolean;
+  suspendedStageTypes: Set<string>;
   index: number;
   labelComponent?: React.ComponentType<IExecutionStageLabelComponentProps>;
-  markerIcon?: React.ComponentClass<{ stage: IExecutionStageSummary }>;
+  markerIcon?: React.ComponentType<{ stage: IExecutionStageSummary }>;
   masterStage: IExecutionStage;
   masterStageIndex: number;
   name: string;
