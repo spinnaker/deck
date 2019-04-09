@@ -5,11 +5,15 @@ const angular = require('angular');
 import { NameUtils } from '@spinnaker/core';
 
 module.exports = angular
-  .module('spinnaker.azure.serverGroupCommandBuilder.service', [require('../../image/image.reader').name])
+  .module('spinnaker.azure.serverGroupCommandBuilder.service', [
+    require('../../image/image.reader').name,
+    require('../serverGroup.transformer').name,
+  ])
   .factory('azureServerGroupCommandBuilder', [
     '$q',
     'azureImageReader',
-    function($q, azureImageReader) {
+    'azureServerGroupTransformer',
+    function($q, azureImageReader, azureServerGroupTransformer) {
       function buildNewServerGroupCommand(application, defaults) {
         defaults = defaults || {};
 
@@ -119,22 +123,7 @@ module.exports = angular
             typeof serverGroup.customScriptsSettings.fileUris !== 'undefined' &&
             serverGroup.customScriptsSettings.fileUris != ''
           ) {
-            if (Array.isArray(serverGroup.customScriptsSettings.fileUris)) {
-              command.customScriptsSettings.fileUris = serverGroup.customScriptsSettings.fileUris;
-            } else {
-              var fileUrisTemp = serverGroup.customScriptsSettings.fileUris;
-              if (fileUrisTemp.includes(',')) {
-                command.customScriptsSettings.fileUris = fileUrisTemp.split(',');
-              } else if (fileUrisTemp.includes(';')) {
-                command.customScriptsSettings.fileUris = fileUrisTemp.split(';');
-              } else {
-                command.customScriptsSettings.fileUris = [fileUrisTemp];
-              }
-
-              command.customScriptsSettings.fileUris.forEach(function(v, index) {
-                command.customScriptsSettings.fileUris[index] = v.trim();
-              });
-            }
+            azureServerGroupTransformer.parseCustomScriptsSettings(serverGroup, command);
           }
         }
 
