@@ -12,14 +12,9 @@ module.exports = angular
     function($scope, loadBalancerReader) {
       ModalWizard.markClean('load-balancers');
 
-      function loadVnetSubnets() {
+      function loadVnetSubnets(item) {
         loadBalancerReader
-          .getLoadBalancerDetails(
-            'azure',
-            $scope.command.credentials,
-            $scope.command.region,
-            $scope.command.loadBalancerName,
-          )
+          .getLoadBalancerDetails('azure', $scope.command.credentials, $scope.command.region, item)
           .then(function(LBs) {
             if (LBs && LBs.length === 1) {
               var selectedLoadBalancer = LBs[0];
@@ -57,7 +52,7 @@ module.exports = angular
       if ($scope.command.credentials && $scope.command.region && $scope.command.loadBalancerName) {
         $scope.command.viewState.networkSettingsConfigured = true;
         $scope.command.selectedVnetSubnets = [];
-        loadVnetSubnets();
+        loadVnetSubnets($scope.command.loadBalancerName);
       }
 
       this.loadBalancerChanged = function(item) {
@@ -66,7 +61,7 @@ module.exports = angular
         $scope.command.selectedVnetSubnets = [];
         $scope.command.selectedSubnet = null;
         InfrastructureCaches.clearCache('networks');
-        loadVnetSubnets();
+        loadVnetSubnets(item);
       };
     },
   ]);
