@@ -16,6 +16,7 @@ export interface ISkipConditionWaitProps {
 const skipRemainingWait = (
   event: React.MouseEvent<HTMLElement>,
   stage: IExecutionStage,
+  execution: IExecution,
   application: Application,
 ): void => {
   const { confirmationModalService, executionService } = ReactInjector;
@@ -32,14 +33,14 @@ const skipRemainingWait = (
     body: stage.context.skipWaitText || DEFAULT_SKIP_WAIT_TEXT,
     submitMethod: () => {
       return executionService
-        .patchExecution(this.props.execution.id, stage.id, data)
-        .then(() => executionService.waitUntilExecutionMatches(this.props.execution.id, matcher))
+        .patchExecution(execution.id, stage.id, data)
+        .then(() => executionService.waitUntilExecutionMatches(execution.id, matcher))
         .then(updated => executionService.updateExecution(application, updated));
     },
   });
 };
 
-export const SkipConditionWait = ({ stage, application }: ISkipConditionWaitProps) => {
+export const SkipConditionWait = ({ stage, execution, application }: ISkipConditionWaitProps) => {
   const { conditions } = stage.outputs;
   return (
     <div>
@@ -57,7 +58,10 @@ export const SkipConditionWait = ({ stage, application }: ISkipConditionWaitProp
       </div>
       {stage.isSuspended && (
         <div className="action-buttons">
-          <button className="btn btn-xs btn-primary" onClick={event => skipRemainingWait(event, stage, application)}>
+          <button
+            className="btn btn-xs btn-primary"
+            onClick={event => skipRemainingWait(event, stage, execution, application)}
+          >
             <span style={{ marginRight: '5px' }} className="small glyphicon glyphicon-fast-forward" />
             Skip remaining wait
           </button>
