@@ -148,6 +148,7 @@ export class CloudFoundryServerGroupCommandBuilder {
     }).then(command => {
       command.credentials = stage.credentials;
       command.capacity = stage.capacity;
+      command.account = stage.account;
       command.destination = stage.destination;
       command.delayBeforeDisableSec = stage.delayBeforeDisableSec;
       command.freeFormDetails = stage.freeFormDetails || command.freeFormDetails;
@@ -159,6 +160,13 @@ export class CloudFoundryServerGroupCommandBuilder {
       command.target = stage.target;
       command.targetCluster = stage.targetCluster;
       command.manifest = stage.manifest || command.manifest;
+
+      command.viewState = {
+        ...command.viewState,
+        pipeline,
+        stage,
+      };
+
       return command;
     });
   }

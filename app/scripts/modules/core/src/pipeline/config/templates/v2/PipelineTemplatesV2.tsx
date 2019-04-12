@@ -4,19 +4,26 @@ import { DateTime } from 'luxon';
 import { get, memoize } from 'lodash';
 import { Subscription } from 'rxjs';
 import { UISref } from '@uirouter/react';
+
 import { PipelineTemplateV2Service } from './pipelineTemplateV2.service';
+import CreatePipelineFromTemplate from './CreatePipelineFromTemplate';
 import { IPipelineTemplateV2 } from 'core/domain/IPipelineTemplateV2';
 import { ShowPipelineTemplateJsonModal } from 'core/pipeline/config/actions/templateJson/ShowPipelineTemplateJsonModal';
 import { ReactInjector, IStateChange } from 'core/reactShims';
 import { PipelineTemplateReader } from '../PipelineTemplateReader';
+import { DeletePipelineTemplateV2Modal } from './DeletePipelineTemplateV2Modal';
 
 import './PipelineTemplatesV2.less';
 
+const { idForTemplate } = PipelineTemplateV2Service;
+
 export interface IPipelineTemplatesV2State {
-  templates: IPipelineTemplateV2[];
   fetchError: string;
   searchValue: string;
-  templateId: string;
+  viewTemplateId?: string;
+  deleteTemplateId?: string;
+  selectedTemplate: IPipelineTemplateV2;
+  templates: IPipelineTemplateV2[];
 }
 
 export const PipelineTemplatesV2Error = (props: { message: string }) => {
@@ -31,24 +38,16 @@ export const PipelineTemplatesV2Error = (props: { message: string }) => {
 export class PipelineTemplatesV2 extends React.Component<{}, IPipelineTemplatesV2State> {
   private routeChangedSubscription: Subscription = null;
 
-  constructor(props: {}) {
-    super(props);
-    const { $stateParams } = ReactInjector;
-    const templateId: string = $stateParams.templateId;
-    this.state = { templates: [], fetchError: null, searchValue: '', templateId };
-  }
+  public state: IPipelineTemplatesV2State = {
+    fetchError: null,
+    searchValue: '',
+    selectedTemplate: null,
+    templates: [],
+    viewTemplateId: ReactInjector.$stateParams.templateId,
+  };
 
   public componentDidMount() {
-    PipelineTemplateReader.getV2PipelineTemplateList().then(
-      templates => this.setState({ templates }),
-      err => {
-        if (err) {
-          this.setState({ fetchError: get(err, 'data.message') || get(err, 'message') || String(err) });
-        } else {
-          this.setState({ fetchError: 'An unknown error occurred while fetching templates' });
-        }
-      },
-    );
+    this.fetchTemplates();
     this.routeChangedSubscription = ReactInjector.stateEvents.stateChangeSuccess.subscribe(this.onRouteChanged);
   }
 
@@ -56,13 +55,27 @@ export class PipelineTemplatesV2 extends React.Component<{}, IPipelineTemplatesV
     this.routeChangedSubscription.unsubscribe();
   }
 
+  private fetchTemplates() {
+    PipelineTemplateReader.getV2PipelineTemplateList().then(
+      templates => this.setState({ templates }),
+      err => {
+        const errorString = get(err, 'data.message', get(err, 'message', ''));
+        if (errorString) {
+          this.setState({ fetchError: errorString });
+        } else {
+          this.setState({ fetchError: 'An unknown error occurred while fetching templates' });
+        }
+      },
+    );
+  }
+
   private onRouteChanged = (stateChange: IStateChange) => {
     const { to, toParams } = stateChange;
     if (to.name === 'home.pipeline-templates') {
-      this.setState({ templateId: null });
+      this.setState({ viewTemplateId: null });
     } else if (to.name === 'home.pipeline-templates.pipeline-templates-detail') {
       const { templateId } = toParams as { templateId?: string };
-      this.setState({ templateId: templateId || null });
+      this.setState({ viewTemplateId: templateId || null });
     }
   };
 
@@ -101,7 +114,7 @@ export class PipelineTemplatesV2 extends React.Component<{}, IPipelineTemplatesV
 
   // Creates a cache key suitable for _.memoize
   private filterMemoizeResolver = (templates: IPipelineTemplateV2[], query: string): string => {
-    return templates.reduce((s, t) => s + PipelineTemplateV2Service.idForTemplate(t), '') + query;
+    return templates.reduce((s, t) => s + idForTemplate(t), '') + query;
   };
 
   private filterSearchResults = memoize((templates: IPipelineTemplateV2[], query: string): IPipelineTemplateV2[] => {
@@ -118,16 +131,26 @@ export class PipelineTemplatesV2 extends React.Component<{}, IPipelineTemplatesV
     }
   }, this.filterMemoizeResolver);
 
-  private getViewedTemplate() {
-    return this.state.templates.find(t => PipelineTemplateV2Service.idForTemplate(t) === this.state.templateId);
+  private getViewedTemplate = () => this.state.templates.find(t => idForTemplate(t) === this.state.viewTemplateId);
+
+  private getTemplateToDelete = () => this.state.templates.find(t => idForTemplate(t) === this.state.deleteTemplateId);
+
+  private handleCreatePipelineClick(template: IPipelineTemplateV2): void {
+    this.setState({ selectedTemplate: template });
   }
 
+  public handleCreatePipelineModalClose = () => {
+    this.setState({ selectedTemplate: null });
+  };
+
   public render() {
-    const { templates, searchValue, fetchError, templateId } = this.state;
-    const detailsTemplate = templateId ? this.getViewedTemplate() : null;
+    const { templates, selectedTemplate, searchValue, fetchError, viewTemplateId, deleteTemplateId } = this.state;
+    const detailsTemplate = viewTemplateId ? this.getViewedTemplate() : null;
     const searchPerformed = searchValue.trim() !== '';
     const filteredResults = this.sortTemplates(this.filterSearchResults(templates, searchValue));
     const resultsAvailable = filteredResults.length > 0;
+    const deleteTemplate = deleteTemplateId ? this.getTemplateToDelete() : null;
+
     return (
       <>
         <div className="infrastructure">
@@ -171,7 +194,7 @@ export class PipelineTemplatesV2 extends React.Component<{}, IPipelineTemplatesV
                   <tbody>
                     {filteredResults.map(template => {
                       const { metadata } = template;
-                      const id = PipelineTemplateV2Service.idForTemplate(template);
+                      const id = idForTemplate(template);
                       return (
                         <tr key={id}>
                           <td>{metadata.name || '-'}</td>
@@ -179,10 +202,17 @@ export class PipelineTemplatesV2 extends React.Component<{}, IPipelineTemplatesV
                           <td>{this.getUpdateTimeForTemplate(template) || '-'}</td>
                           <td className="pipeline-template-actions">
                             <UISref to={`.pipeline-templates-detail`} params={{ templateId: id }}>
-                              <button className="link" onClick={() => this.setState({ templateId: id })}>
-                                View
-                              </button>
+                              <button className="link">View</button>
                             </UISref>
+                            <button className="link" onClick={() => this.setState({ deleteTemplateId: id })}>
+                              Delete
+                            </button>
+                            <button
+                              className="link link--create"
+                              onClick={() => this.handleCreatePipelineClick(template)}
+                            >
+                              Create Pipeline
+                            </button>
                           </td>
                         </tr>
                       );
@@ -203,6 +233,21 @@ export class PipelineTemplatesV2 extends React.Component<{}, IPipelineTemplatesV
               dismissModal={this.dismissDetailsModal}
             />
           </Modal>
+        )}
+        {deleteTemplate && (
+          <DeletePipelineTemplateV2Modal
+            template={deleteTemplate}
+            onClose={() => {
+              this.fetchTemplates();
+              this.setState({ deleteTemplateId: null });
+            }}
+          />
+        )}
+        {selectedTemplate && (
+          <CreatePipelineFromTemplate
+            closeModalCallback={this.handleCreatePipelineModalClose}
+            template={selectedTemplate}
+          />
         )}
       </>
     );
