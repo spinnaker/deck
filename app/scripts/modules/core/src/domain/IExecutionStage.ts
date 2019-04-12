@@ -28,14 +28,14 @@ export interface IExecutionStage extends IOrchestratedItem, IStage {
   tasks: ITaskStep[];
 }
 
-export interface IExecutionStageLabelComponentProps {
+export interface IExecutionStageLabelProps {
   application?: Application;
   execution?: IExecution;
   executionMarker?: boolean;
   stage: IExecutionStageSummary;
 }
 
-export interface IExecutionDetailsComponentProps {
+export interface IExecutionDetailsProps {
   application: Application;
   detailsSections: IExecutionDetailsSection[];
   execution: IExecution;
@@ -44,7 +44,7 @@ export interface IExecutionDetailsComponentProps {
   config: IStageTypeConfig;
 }
 
-export interface IExecutionDetailsComponentState {
+export interface IExecutionDetailsState {
   configSections: string[];
   currentSection: string;
 }
@@ -64,7 +64,7 @@ export interface IExecutionStageSummary extends IOrchestratedItem {
   id: string;
   suspendedStageTypes: Set<string>;
   index: number;
-  labelComponent?: React.ComponentType<IExecutionStageLabelComponentProps>;
+  labelComponent?: React.ComponentType<IExecutionStageLabelProps>;
   markerIcon?: React.ComponentType<{ stage: IExecutionStageSummary }>;
   masterStage: IExecutionStage;
   masterStageIndex: number;

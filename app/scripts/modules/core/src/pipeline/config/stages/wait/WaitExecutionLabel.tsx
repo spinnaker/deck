@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 
-import { IExecutionStageLabelComponentProps } from 'core/domain';
+import { IExecutionStageLabelProps } from 'core/domain';
 import { HoverablePopover } from 'core/presentation/HoverablePopover';
 import { ExecutionBarLabel } from 'core/pipeline/config/stages/common/ExecutionBarLabel';
 
@@ -11,8 +11,8 @@ export interface IWaitExecutionLabelState {
   target?: any;
 }
 
-export class WaitExecutionLabel extends React.Component<IExecutionStageLabelComponentProps, IWaitExecutionLabelState> {
-  constructor(props: IExecutionStageLabelComponentProps) {
+export class WaitExecutionLabel extends React.Component<IExecutionStageLabelProps, IWaitExecutionLabelState> {
+  constructor(props: IExecutionStageLabelProps) {
     super(props);
     this.state = {};
   }

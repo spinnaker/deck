@@ -1,6 +1,6 @@
 import { IExecution } from 'core/domain';
 
-export const mapRunningStatusToSuspended = (execution: IExecution, stageType: string) => {
+export const applySuspendedStatuses = (execution: IExecution, stageType: string) => {
   const runningStagesOfType = execution.stages.filter(stage => stage.type === stageType && stage.status === 'RUNNING');
 
   runningStagesOfType.forEach(stage => {

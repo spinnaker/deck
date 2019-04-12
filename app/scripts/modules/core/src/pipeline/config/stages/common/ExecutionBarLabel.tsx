@@ -1,14 +1,14 @@
 import * as React from 'react';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 
-import { IExecutionStageLabelComponentProps } from 'core/domain';
+import { IExecutionStageLabelProps } from 'core/domain';
 import { ExecutionWindowActions } from 'core/pipeline/config/stages/executionWindows/ExecutionWindowActions';
 import { SkipConditionWait } from 'core/pipeline/config/stages/waitForCondition/SkipConditionWait';
 import { HoverablePopover } from 'core/presentation/HoverablePopover';
 import { ReactInjector } from 'core/reactShims';
 import { Spinner } from 'core/widgets';
 
-export interface IExecutionBarLabelProps extends IExecutionStageLabelComponentProps {
+export interface IExecutionBarLabelProps extends IExecutionStageLabelProps {
   tooltip?: JSX.Element;
 }
 
