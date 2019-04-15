@@ -102,7 +102,7 @@
   </div>
   <div class="col-md-9 checkbox">
     <label>
-      <input type="checkbox" ng-model="vm.command.enableIntegrityMonitoring" />
+      <input type="checkbox" ng-model="vm.command.enableIntegrityMonitoring" ng-disabled="!vm.command.enableVtpm" />
       Turn on Integrity Monitoring
       <help-field key="gce.serverGroup.shieldedVmIntegrityMonitoring"></help-field>
     </label>

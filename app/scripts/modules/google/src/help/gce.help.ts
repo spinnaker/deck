@@ -116,7 +116,7 @@ const helpContents: { [key: string]: string } = {
   'gce.serverGroup.labels.spinnaker-server-group':
     'This label can be used to group instances when querying for metrics.',
   'gce.serverGroup.shieldedVmConfig':
-    'Shielded VM features include trusted UEFI firmware and come with options for Secure Boot, vTPM, and Integrity Monitoring.',
+    'Shielded VM features include trusted UEFI firmware and come with options for Secure Boot, Virtual Trusted Platform Module (vTPM), and Integrity Monitoring.',
   'gce.serverGroup.shieldedVmSecureBoot':
     'Secure boot helps protect your VM instances against boot-level and kernel-level malware and rootkits.',
   'gce.serverGroup.shieldedVmVtpm':
