@@ -1,5 +1,7 @@
 import * as React from 'react';
 
+import { Observable, Subject } from 'rxjs';
+
 import { get } from 'lodash';
 
 import { FormikErrors, FormikProps } from 'formik';
@@ -23,7 +25,7 @@ import 'cloudfoundry/common/cloudFoundry.less';
 
 export interface ICloudFoundryServerGroupBasicSettingsProps {
   formik: FormikProps<ICloudFoundryCreateServerGroupCommand>;
-  isPipelineClone: boolean;
+  isClone: boolean;
 }
 
 export interface ICloudFoundryServerGroupLocationSettingsState {
@@ -34,31 +36,38 @@ export interface ICloudFoundryServerGroupLocationSettingsState {
 export class CloudFoundryServerGroupBasicSettings
   extends React.Component<ICloudFoundryServerGroupBasicSettingsProps, ICloudFoundryServerGroupLocationSettingsState>
   implements IWizardPageComponent<ICloudFoundryCreateServerGroupCommand> {
+  private destroy$ = new Subject();
   public state: ICloudFoundryServerGroupLocationSettingsState = {
     accounts: [],
     regions: [],
   };
 
   public componentDidMount(): void {
-    AccountService.listAccounts('cloudfoundry').then(accounts => {
-      this.setState({ accounts });
-      this.updateRegionList();
-    });
+    Observable.fromPromise(AccountService.listAccounts('cloudfoundry'))
+      .takeUntil(this.destroy$)
+      .subscribe(accounts => {
+        this.setState({ accounts });
+        this.updateRegionList();
+      });
+  }
+
+  public componentWillUnmount(): void {
+    this.destroy$.next();
   }
 
   private accountChanged = (): void => {
     this.updateRegionList();
-    const regionField = this.props.isPipelineClone ? 'destination.region' : 'region';
+    const regionField = this.props.isClone ? 'destination.region' : 'region';
     this.props.formik.setFieldValue(regionField, '');
   };
 
   private updateRegionList = (): void => {
-    const accountField = this.props.isPipelineClone ? 'account' : 'credentials';
+    const accountField = this.props.isClone ? 'account' : 'credentials';
     const credentials = get(this.props.formik.values, accountField, undefined);
     if (credentials) {
-      AccountService.getRegionsForAccount(credentials).then(regions => {
-        this.setState({ regions: regions });
-      });
+      Observable.fromPromise(AccountService.getRegionsForAccount(credentials))
+        .takeUntil(this.destroy$)
+        .subscribe(regions => this.setState({ regions }));
     }
   };
 
@@ -71,11 +80,11 @@ export class CloudFoundryServerGroupBasicSettings
   };
 
   public render(): JSX.Element {
-    const { formik, isPipelineClone } = this.props;
+    const { formik, isClone } = this.props;
     const { accounts, regions } = this.state;
     const { values } = formik;
-    const accountField = isPipelineClone ? 'account' : 'credentials';
-    const regionField = isPipelineClone ? 'destination.region' : 'region';
+    const accountField = isClone ? 'account' : 'credentials';
+    const regionField = isClone ? 'destination.region' : 'region';
     return (
       <div className="form-group">
         <div className="col-md-11">
@@ -137,7 +146,9 @@ export class CloudFoundryServerGroupBasicSettings
               help={<HelpField id="cf.serverGroup.startApplication" />}
             />
           </div>
-          {(values.viewState.mode === 'editPipeline' || values.viewState.mode === 'createPipeline') && (
+          {(values.viewState.mode === 'editPipeline' ||
+            values.viewState.mode === 'createPipeline' ||
+            values.viewState.mode === 'editClonePipeline') && (
             <CloudFoundryDeploymentStrategySelector
               onFieldChange={this.onStrategyFieldChange}
               onStrategyChange={this.strategyChanged}

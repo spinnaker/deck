@@ -42,12 +42,13 @@ export class KubernetesV2DeployManifestConfigCtrl implements IController {
     const stage = this.$scope.stage;
     this.$scope.bindings = (stage.requiredArtifactIds || [])
       .map((id: string) => ({ expectedArtifactId: id }))
-      .concat((stage.requiredArtifacts || []).map((artifact: IArtifact) => ({ artifact: artifact })));
+      .concat(stage.requiredArtifacts || []);
 
     this.$scope.excludedManifestArtifactTypes = [
       ArtifactTypePatterns.DOCKER_IMAGE,
       ArtifactTypePatterns.KUBERNETES,
       ArtifactTypePatterns.FRONT50_PIPELINE_TEMPLATE,
+      ArtifactTypePatterns.EMBEDDED_BASE64,
     ];
 
     KubernetesManifestCommandBuilder.buildNewManifestCommand(
