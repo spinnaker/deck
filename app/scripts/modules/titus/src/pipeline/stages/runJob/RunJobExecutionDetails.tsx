@@ -56,7 +56,7 @@ export class RunJobExecutionDetails extends React.Component<
     const taskId = get(context, 'jobStatus.completionDetails.taskId');
 
     const renderProperty = (entry: string) => {
-      const linkPattern = /^http(s)*\:\/\/([^\s])*$/;
+      const linkPattern = /^https?\:\/\/([^\s])*$/;
       return linkPattern.test(entry) ? (
         <a href={entry} target="_blank">
           {entry}
