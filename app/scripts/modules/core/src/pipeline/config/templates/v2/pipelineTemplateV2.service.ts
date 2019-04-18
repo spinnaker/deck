@@ -1,6 +1,6 @@
 import { hri as HumanReadableIds } from 'human-readable-ids';
 
-import { IPipeline, IPipelineTemplateV2 } from 'core/domain';
+import { IPipeline, IPipelineTemplateConfigV2, IPipelineTemplateV2 } from 'core/domain';
 import { PipelineJSONService } from 'core/pipeline/config/services/pipelineJSON.service';
 import { UUIDGenerator } from 'core/utils';
 
@@ -18,12 +18,35 @@ export class PipelineTemplateV2Service {
       },
       pipeline: PipelineJSONService.clone(pipeline),
       protect: false,
-      schema: 'v2',
+      schema: PipelineTemplateV2Service.schema,
       variables: [],
     };
   }
 
   public static isV2PipelineConfig(pipelineConfig: IPipeline): boolean {
-    return pipelineConfig.schema === 'v2';
+    return pipelineConfig.schema === PipelineTemplateV2Service.schema;
   }
+
+  public static getUnsupportedCopy(task: string): string {
+    return `${task} of templated v2 pipelines through the UI is unsupported. Use Spin CLI instead.`;
+  }
+
+  public static idForTemplate(template: { id: string; digest?: string }): string {
+    const { id, digest = '' } = template;
+    return `${id}:${digest}`;
+  }
+
+  public static getPipelineTemplateConfigV2(id: string): Partial<IPipelineTemplateConfigV2> {
+    // Scoped to Front50 in the short-term.
+    return {
+      schema: PipelineTemplateV2Service.schema,
+      template: {
+        artifactAccount: 'front50ArtifactCredentials',
+        reference: `spinnaker://${id}`,
+        type: 'front50/pipelineTemplate',
+      },
+    };
+  }
+
+  private static schema = 'v2';
 }

@@ -1,5 +1,11 @@
 import { cloneDeep, merge } from 'lodash';
 
+export interface IAdditionalHelpLinks {
+  text: string;
+  url: string;
+  icon?: string;
+}
+
 export interface IProviderSettings {
   defaults: any;
   resetToOriginal?: () => void;
@@ -45,6 +51,7 @@ export interface IFeatures {
   // whether stages affecting infrastructure (like "Create Load Balancer") should be enabled or not
   infrastructureStages?: boolean;
   jobs?: boolean;
+  kubernetesRolloutStrategies?: boolean;
   managedPipelineTemplatesV2UI?: boolean;
   managedServiceAccounts?: boolean;
   notifications?: boolean;
@@ -63,6 +70,10 @@ export interface IFeatures {
 export interface IDockerInsightSettings {
   enabled: boolean;
   url: string;
+}
+
+export interface INewApplicationDefaults {
+  chaosMonkey?: boolean;
 }
 
 export interface ISpinnakerSettings {
@@ -105,9 +116,11 @@ export interface ISpinnakerSettings {
     text?: string;
     url: string;
   };
+  additionalHelpLinks?: IAdditionalHelpLinks[];
   gateUrl: string;
   gitSources: string[];
   maxPipelineAgeDays: number;
+  newApplicationDefaults: INewApplicationDefaults;
   notifications: INotificationSettings;
   onDemandClusterThreshold: number;
   pagerDuty?: {

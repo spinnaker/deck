@@ -28,6 +28,8 @@ module.exports = angular
     function($scope, $uibModalInstance, $state, azureLoadBalancerTransformer, application, loadBalancer, isNew) {
       var ctrl = this;
 
+      $scope.regions = [];
+
       $scope.pages = {
         location: require('./createLoadBalancerProperties.html'),
         listeners: require('./listeners.html'),
@@ -159,7 +161,6 @@ module.exports = angular
         $scope.loadBalancer.vnet = null;
         $scope.loadBalancer.vnetResourceGroup = null;
         ctrl.selectedVnets = [];
-        InfrastructureCaches.clearCache('networks');
 
         NetworkReader.listNetworks().then(function(vnets) {
           if (vnets.azure) {

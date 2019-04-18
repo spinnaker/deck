@@ -1,6 +1,9 @@
 import * as React from 'react';
 
+import { Observable, Subject } from 'rxjs';
+
 import {
+  AccountService,
   Application,
   IAccount,
   IPipeline,
@@ -14,7 +17,6 @@ import { AccountRegionClusterSelector, Routes } from 'cloudfoundry/presentation'
 import { Formik } from 'formik';
 
 interface ICloudfoundryLoadBalancerStageConfigProps extends IStageConfigProps {
-  accounts: IAccount[];
   pipeline: IPipeline;
 }
 
@@ -23,13 +25,10 @@ interface ICloudFoundryMapLoadBalancersValues {
 }
 
 interface ICloudfoundryMapLoadBalancersStageConfigState {
+  accounts: IAccount[];
   application: Application;
-  cloudProvider: string;
-  credentials: string;
   initialValues: ICloudFoundryMapLoadBalancersValues;
   pipeline: IPipeline;
-  region: string;
-  target: string;
 }
 
 export class CloudfoundryMapLoadBalancersStageConfig extends React.Component<
@@ -37,40 +36,53 @@ export class CloudfoundryMapLoadBalancersStageConfig extends React.Component<
   ICloudfoundryMapLoadBalancersStageConfigState
 > {
   private formikRef = React.createRef<Formik<ICloudFoundryMapLoadBalancersValues>>();
+  private destroy$ = new Subject();
 
   constructor(props: ICloudfoundryLoadBalancerStageConfigProps) {
     super(props);
-    props.stage.cloudProvider = 'cloudfoundry';
-    this.state = {
-      application: props.application,
+    const { loadBalancerNames } = props.stage;
+    const routes = loadBalancerNames && loadBalancerNames.length ? loadBalancerNames : [''];
+    this.props.updateStageField({
       cloudProvider: 'cloudfoundry',
-      credentials: props.stage.credentials,
+      loadBalancerNames: routes,
+    });
+    this.state = {
+      accounts: [],
+      application: props.application,
       initialValues: {
-        routes: props.stage.loadBalancerNames,
+        routes,
       },
       pipeline: props.pipeline,
-      region: props.stage.region,
-      target: props.stage.target,
     };
   }
 
+  public componentDidMount(): void {
+    Observable.fromPromise(AccountService.listAccounts('cloudfoundry'))
+      .takeUntil(this.destroy$)
+      .subscribe(accounts => this.setState({ accounts }));
+  }
+
+  public componentWillUnmount(): void {
+    this.destroy$.next();
+  }
+
   private targetUpdated = (target: string) => {
-    this.setState({ target });
-    this.props.stage.target = target;
-    this.props.stageFieldUpdated();
+    this.props.updateStageField({ target });
   };
 
   private componentUpdated = (stage: any): void => {
-    this.props.stage.credentials = stage.credentials;
-    this.props.stage.region = stage.region;
-    this.props.stage.cluster = stage.cluster;
-    this.props.stage.loadBalancerNames = stage.loadBalancerNames;
-    this.props.stageFieldUpdated();
+    this.props.updateStageField({
+      credentials: stage.credentials,
+      region: stage.region,
+      cluster: stage.cluster,
+      loadBalancerNames: stage.loadBalancerNames,
+    });
   };
 
   public render() {
-    const { accounts, stage } = this.props;
-    const { application, initialValues, pipeline, target } = this.state;
+    const { stage } = this.props;
+    const { accounts, application, initialValues, pipeline } = this.state;
+    const { target } = stage;
     const { TargetSelect } = NgReact;
     return (
       <div className="form-horizontal">
@@ -95,6 +107,8 @@ export class CloudfoundryMapLoadBalancersStageConfig extends React.Component<
             return (
               <Routes
                 fieldName={'routes'}
+                isRequired={true}
+                singleRouteOnly={true}
                 onChange={(routes: string[]) => {
                   stage.loadBalancerNames = routes;
                   this.componentUpdated(stage);

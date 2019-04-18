@@ -14,6 +14,7 @@ import { DISABLE_CLUSTER_STAGE } from './config/stages/disableCluster/disableClu
 import { ROLLBACK_CLUSTER_STAGE } from './config/stages/rollbackCluster/rollbackClusterStage';
 import { ENABLE_ASG_STAGE } from './config/stages/enableAsg/enableAsgStage';
 import { EXECUTION_WINDOWS_STAGE_MODULE } from './config/stages/executionWindows/executionWindowsStage.module';
+import './config/stages/executionWindows/executionWindowsStage';
 import { FIND_AMI_STAGE } from './config/stages/findAmi/findAmiStage';
 import { FIND_ARTIFACT_FROM_EXECUTION_STAGE } from './config/stages/findArtifactFromExecution/findArtifactFromExecutionStage';
 import './config/stages/gremlin/gremlinStage';
@@ -31,6 +32,7 @@ import './config/stages/unshareService/unshareServiceStage';
 import { WERCKER_STAGE_MODULE } from './config/stages/wercker/werckerStage.module';
 import { UNMATCHED_STAGE_TYPE_STAGE } from './config/stages/unmatchedStageTypeStage/unmatchedStageTypeStage';
 import './config/stages/wait/waitStage';
+import './config/stages/waitForCondition/waitForConditionStage';
 import './config/stages/evaluateVariables/evaluateVariablesStage';
 import { PRECONFIGUREDJOB_STAGE_MODULE } from './config/stages/preconfiguredJob/preconfiguredJobStage.module';
 import './config/stages/entityTags/applyEntityTagsStage';
@@ -43,6 +45,8 @@ import { STEP_EXECUTION_DETAILS_COMPONENT } from './details/stepExecutionDetails
 import { STAGE_SUMMARY_COMPONENT } from './details/stageSummary.component';
 import { PRODUCES_ARTIFACTS } from './config/stages/producesArtifacts/producesArtifacts.component';
 import { ARTIFACT_LIST } from './status/artifactList.component';
+import { PIPELINE_TEMPLATES_V2_STATES_CONFIG } from './config/templates/v2/pipelineTemplateV2.states';
+import './config/stages/googleCloudBuild/googleCloudBuildStage';
 
 import './pipeline.less';
 import 'angular-ui-sortable';
@@ -103,4 +107,5 @@ module(PIPELINE_MODULE, [
   require('./config/preconditions/preconditions.module').name,
   require('./config/preconditions/types/clusterSize/clusterSize.precondition.type.module').name,
   require('./config/preconditions/types/expression/expression.precondition.type.module').name,
+  PIPELINE_TEMPLATES_V2_STATES_CONFIG,
 ]);

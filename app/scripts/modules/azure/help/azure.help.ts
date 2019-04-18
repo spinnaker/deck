@@ -33,6 +33,8 @@ const helpContents: { [key: string]: string } = {
   'azure.serverGroup.customTags': `Custom tags on Virtual Machine Scale Set. Allow ${
     Utility.TAG_LIMITATION
   } tags at most.`,
+  'azure.serverGroup.enableInboundNAT':
+    'An Azure load balancer of the basic sku will be created with adding inbound NAT port-forwarding rules to facilitate loggin on VM instances. There is no charge for creating an Azure load balancer of the basic sku. This option is disabled if Availability Zones are set which require Standard Azure Load Balancer and an extra Network Security Group with correct inbound and outbound rules configured.',
 };
 
 Object.keys(helpContents).forEach(key => HelpContentsRegistry.register(key, helpContents[key]));

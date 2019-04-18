@@ -25,6 +25,8 @@ module.exports = angular
         ingress: require('./createSecurityGroupIngress.html'),
       };
 
+      $scope.regions = [];
+
       $scope.firewallLabel = FirewallLabels.get('Firewall');
 
       var ctrl = this;
@@ -100,8 +102,6 @@ module.exports = angular
         $scope.securityGroup.vnetResourceGroup = null;
 
         ctrl.selectedVnets = [];
-
-        InfrastructureCaches.clearCache('networks');
 
         NetworkReader.listNetworks().then(function(vnets) {
           if (vnets.azure) {

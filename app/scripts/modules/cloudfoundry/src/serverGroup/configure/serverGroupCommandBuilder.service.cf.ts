@@ -148,17 +148,25 @@ export class CloudFoundryServerGroupCommandBuilder {
     }).then(command => {
       command.credentials = stage.credentials;
       command.capacity = stage.capacity;
+      command.account = stage.account;
       command.destination = stage.destination;
       command.delayBeforeDisableSec = stage.delayBeforeDisableSec;
       command.freeFormDetails = stage.freeFormDetails || command.freeFormDetails;
       command.maxRemainingAsgs = stage.maxRemainingAsgs;
       command.region = stage.region;
-      command.startApplication = stage.startApplication;
+      command.startApplication = stage.startApplication === undefined || stage.startApplication;
       command.stack = stage.stack || command.stack;
       command.strategy = stage.strategy;
       command.target = stage.target;
       command.targetCluster = stage.targetCluster;
       command.manifest = stage.manifest || command.manifest;
+
+      command.viewState = {
+        ...command.viewState,
+        pipeline,
+        stage,
+      };
+
       return command;
     });
   }
