@@ -193,6 +193,7 @@
     "style-loader": "0.23.1",
     "thread-loader": "2.1.2",
     "ts-loader": "5.3.3",
+    "exports-loader": "^0.7.0",
     "ts-node": "^7.0.1",
     "typed-css-modules": "^0.6.3",
     "typed-css-modules-webpack-plugin": "^0.1.2",

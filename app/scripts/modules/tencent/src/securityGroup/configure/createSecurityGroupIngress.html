@@ -1,0 +1,103 @@
+<div class="container-fluid form-horizontal">
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-md-12" ng-if="state.removedRules.length">
+        <div class="alert alert-danger">
+          <p>
+            <i class="fa fa-exclamation-triangle"></i> The following
+            <firewall-label label="firewalls"></firewall-label> could not be found in the selected account/region/VPC
+            and were removed:
+          </p>
+          <ul>
+            <li ng-repeat="securityGroup in state.removedRules">{{securityGroup}}</li>
+          </ul>
+          <p class="text-right">
+            <a class="btn btn-sm btn-primary dirty-flag-dismiss" href ng-click="ctrl.dismissRemovedRules()">Okay</a>
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <p class="info">
+          <span class="glyphicon glyphicon-info-sign"></span> IP range rules can only be edited through the tencent
+          cloud Console.
+        </p>
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="col-md-12">
+        <table class="table table-condensed packed">
+          <thead>
+            <tr>
+              <th style="width: 40%">Cidr Block</th>
+              <th style="width: 15%">Protocol</th>
+              <th style="width: 15%">Port</th>
+              <th style="width: 15%">Policy</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="rule in securityGroup.securityGroupIngress">
+              <td>
+                <input
+                  required
+                  type="text"
+                  class="form-control input-sm no-spel"
+                  ng-model="rule.cidrBlock"
+                  ng-readonly="rule.existing"
+                />
+              </td>
+              <td>
+                <span class="form-control-static" ng-if="rule.existing">{{ rule.protocol}}</span>
+                <select
+                  ng-if="!rule.existing"
+                  class="form-control input-sm"
+                  ng-model="rule.protocol"
+                  ng-options="protocol for protocol in ['TCP', 'UDP', 'ICMP']"
+                  ng-change="ctrl.protocolChange(rule)"
+                  required
+                ></select>
+              </td>
+              <td>
+                <span class="form-control-static" ng-if="rule.existing">{{ rule.port}}</span>
+                <input
+                  ng-if="!rule.existing"
+                  class="form-control input-sm"
+                  ng-model="rule.port"
+                  ng-required="rule.protocol !='ICMP'"
+                  ng-disabled="rule.protocol == 'ICMP'"
+                />
+              </td>
+              <td>
+                <span class="form-control-static" ng-if="rule.existing">{{ rule.action}}</span>
+                <select
+                  ng-if="!rule.existing"
+                  class="form-control input-sm"
+                  ng-model="rule.action"
+                  ng-options="action for action in ['ACCEPT', 'DROP']"
+                  required
+                ></select>
+              </td>
+              <td>
+                <a class="sm-label" ng-click="ctrl.removeRule(securityGroup.securityGroupIngress, $index)">
+                  <span class="glyphicon glyphicon-trash"></span
+                ></a>
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="5">
+                <button class="add-new col-md-12" ng-click="ctrl.addRule(securityGroup.securityGroupIngress)">
+                  <span class="glyphicon glyphicon-plus-sign"></span> Add new
+                  <firewall-label label="Firewall"></firewall-label> Rule
+                </button>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

@@ -61,7 +61,7 @@ function configure(env, webpackOpts) {
                 ecma: 6,
                 mangle: false,
                 output: {
-                  comments: /webpackIgnore/,
+                  comments: false,
                 },
               },
             }),
@@ -109,6 +109,8 @@ function configure(env, webpackOpts) {
         '@spinnaker/titus': path.join(__dirname, 'app', 'scripts', 'modules', 'titus', 'src'),
         azure: path.join(__dirname, 'app', 'scripts', 'modules', 'azure', 'src'),
         '@spinnaker/azure': path.join(__dirname, 'app', 'scripts', 'modules', 'azure', 'src'),
+        tencent: path.join(__dirname, 'app', 'scripts', 'modules', 'tencent', 'src'),
+        '@spinnaker/tencent': path.join(__dirname, 'app', 'scripts', 'modules', 'tencent', 'src'),
       },
     },
     module: {

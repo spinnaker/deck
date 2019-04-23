@@ -1,0 +1,38 @@
+<div modal-page>
+  <task-monitor monitor="$ctrl.taskMonitor"></task-monitor>
+  <form role="form" name="form">
+    <modal-close dismiss="$dismiss()"></modal-close>
+    <div class="modal-header">
+      <h3>Edit <firewall-label label="Firewalls"></firewall-label> for {{$ctrl.serverGroup.name}}</h3>
+    </div>
+    <div class="modal-body container-fluid form-horizontal">
+      <div class="form-group">
+        <div class="col-md-10 col-md-offset-1">
+          <ui-select
+            multiple
+            ng-model="$ctrl.command.securityGroups"
+            uis-open-close="$ctrl.resetCurrentItems()"
+            class="form-control input-sm"
+          >
+            <ui-select-match>{{$item.name}} ({{$item.id}})</ui-select-match>
+            <ui-select-choices
+              repeat="securityGroup as securityGroup in $ctrl.availableSecurityGroups | filter: $select.search | limitTo: $ctrl.infiniteScroll.currentItems"
+              infinite-scroll="$ctrl.addMoreItems()"
+              infinite-scroll-distance="4"
+            >
+              <span ng-bind-html="securityGroup.name | highlight: $select.search"></span>
+              (<span ng-bind-html="securityGroup.id  | highlight: $select.search"></span>)
+            </ui-select-choices>
+          </ui-select>
+        </div>
+      </div>
+    </div>
+    <tencent-footer
+      action="$ctrl.submit()"
+      cancel="$ctrl.cancel()"
+      is-valid="$ctrl.isValid()"
+      account="$ctrl.serverGroup.account"
+      verification="$ctrl.state.verification"
+    ></tencent-footer>
+  </form>
+</div>

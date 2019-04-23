@@ -66,6 +66,7 @@ window.spinnakerSettings = {
     'huaweicloud',
     'kubernetes',
     'oracle',
+    'tencent',
   ],
   defaultTimeZone: process.env.TIMEZONE || 'America/Los_Angeles', // see http://momentjs.com/timezone/docs/#/data-utilities/
   entityTags: {
@@ -232,6 +233,12 @@ window.spinnakerSettings = {
         account: 'titustestvpc',
         iamProfile: '{{application}}InstanceProfile',
         region: 'us-east-1',
+      },
+    },
+    tencent: {
+      defaults: {
+        account: 'test',
+        region: 'ap-guangzhou',
       },
     },
   },

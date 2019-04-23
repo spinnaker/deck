@@ -1,0 +1,34 @@
+<span class="label label-default">Step Scaling</span>
+
+<div
+  uib-popover-template="$ctrl.popoverTemplate"
+  popover-placement="left"
+  popover-title="{{ $ctrl.policy.scalingPolicyName }}"
+  popover-trigger="'mouseenter'"
+>
+  <div>
+    <strong>Whenever</strong>
+    {{ $ctrl.policy.metricAlarm.statistic }} of
+    <span class="alarm-name">{{ $ctrl.policy.metricAlarm.metricName }}</span> is
+    <span ng-bind-html="$ctrl.policy.metricAlarm.comparator"></span> {{ $ctrl.policy.metricAlarm.threshold }}
+  </div>
+  <div>
+    <strong>for at least</strong>
+    {{ $ctrl.policy.metricAlarm.continuousTime }} consecutive periods of {{ $ctrl.policy.metricAlarm.period }} seconds
+  </div>
+</div>
+
+<div ng-if="!$ctrl.policy.metricAlarm">
+  <em>No alarms configured for this policy.</em>
+</div>
+
+<div class="actions text-right">
+  <button class="btn btn-xs btn-link" ng-click="$ctrl.editPolicy()" ng-if="$ctrl.policy.metricAlarm">
+    <span class="glyphicon glyphicon-cog" uib-tooltip="Edit policy"></span>
+    <span class="sr-only">Edit policy</span>
+  </button>
+  <button class="btn btn-xs btn-link" ng-click="$ctrl.deletePolicy()" ng-if="$ctrl.policy.metricAlarm">
+    <span class="glyphicon glyphicon-trash" uib-tooltip="Delete policy"></span>
+    <span class="sr-only">Delete policy</span>
+  </button>
+</div>

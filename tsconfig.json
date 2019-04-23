@@ -48,7 +48,11 @@
       "titus/": ["titus/src"],
       "@spinnaker/huaweicloud": ["huaweicloud/src"],
       "huaweicloud/*": ["huaweicloud/src/*"],
-      "huaweicloud": ["huaweicloud/src"]
+      "huaweicloud": ["huaweicloud/src"],
+      "titus/": ["titus/src"],
+      "@spinnaker/tencent": ["tencent/src"],
+      "tencent/*": ["tencent/src/*"],
+      "tencent": ["tencent/src"]
     },
     "pretty": true,
     "removeComments": true,

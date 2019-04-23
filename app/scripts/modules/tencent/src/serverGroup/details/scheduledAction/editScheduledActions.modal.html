@@ -1,0 +1,133 @@
+<div modal-page>
+  <task-monitor monitor="taskMonitor"></task-monitor>
+  <form role="form" name="form">
+    <modal-close dismiss="$dismiss()"></modal-close>
+    <div class="modal-header">
+      <h3>Edit Scheduled Actions for {{serverGroup.name}}</h3>
+    </div>
+    <div class="modal-body container-fluid form-horizontal">
+      <div class="form-group">
+        <div class="col-md-12">
+          <p>You must specify : Min Size, Max Size, Desired Capacity and StartTime</p>
+          <p>Recurrence (CRON) and EndTime are required when Repeat is 'Yes'</p>
+          <p><strong>Note:</strong> CRON expressions are evaluated in UTC.</p>
+          <table class="table table-condensed packed">
+            <thead>
+              <tr>
+                <th>Start Time</th>
+                <th>Repeat</th>
+                <th>Recurrence (CRON)</th>
+                <th>End Time</th>
+                <th>Min Size</th>
+                <th>Max Size</th>
+                <th>Desired Capacity</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="action in command.scheduledActions">
+                <td>
+                  <input
+                    class="form-control input-sm no-spel"
+                    type="datetime-local"
+                    ng-model="action.startTime"
+                    name="startTime-{{$index}}"
+                    required
+                  />
+                </td>
+                <td>
+                  <select
+                    class="form-control input-sm"
+                    ng-model="action.repeat"
+                    ng-options="isRepeat for isRepeat in ['Yes', 'No']"
+                    ng-change="ctrl.isRepeatChange(action)"
+                    required
+                  ></select>
+                </td>
+                <td>
+                  <input
+                    class="form-control input-sm no-spel"
+                    type="text"
+                    ng-model="action.recurrence"
+                    name="recurrence-{{$index}}"
+                    ng-required="action.repeat=='Yes'"
+                    ng-disabled="action.repeat=='No'"
+                  />
+                  <!-- TODO: Add cron-validator when endpoint is fixed -->
+                  <div class="form-group row slide-in" ng-if="form['recurrence-' + $index].$error.cronExpression">
+                    <div class="error-message">
+                      {{cronErrors['action.recurrence.cronExpression']}}
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <input
+                    class="form-control input-sm no-spel"
+                    type="datetime-local"
+                    ng-model="action.endTime"
+                    name="end-{{$index}}"
+                    ng-required="action.repeat=='Yes'"
+                    ng-disabled="action.repeat=='No'"
+                  />
+                </td>
+                <td>
+                  <input
+                    class="form-control input-sm"
+                    type="number"
+                    min="0"
+                    max="{{action.maxSize || Infinity}}"
+                    ng-model="action.minSize"
+                    required
+                  />
+                </td>
+                <td>
+                  <input
+                    class="form-control input-sm"
+                    type="number"
+                    min="{{action.minSize || 0}}"
+                    ng-model="action.maxSize"
+                    required
+                  />
+                </td>
+                <td>
+                  <input
+                    class="form-control input-sm"
+                    type="number"
+                    ng-model="action.desiredCapacity"
+                    min="{{command.minSize || 0}}"
+                    max="{{command.maxSize || Infinity}}"
+                    required
+                  />
+                </td>
+                <td>
+                  <a
+                    ng-if="!action.scheduledActionId"
+                    href
+                    class="sm-label"
+                    ng-click="ctrl.removeScheduledAction($index)"
+                    ><span class="glyphicon glyphicon-trash"></span
+                  ></a>
+                </td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="7">
+                  <button class="add-new col-md-12" ng-click="ctrl.addScheduledAction()">
+                    <span class="glyphicon glyphicon-plus-sign"></span> Add new Scheduled Action
+                  </button>
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-default" ng-click="ctrl.cancel()">Cancel</button>
+      <button type="submit" class="btn btn-primary" ng-disabled="form.$invalid" ng-click="ctrl.submit()">
+        Submit
+      </button>
+    </div>
+  </form>
+</div>
