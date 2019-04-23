@@ -3,21 +3,7 @@ import { Formik, FormikProps, FormikErrors } from 'formik';
 
 import { IStage, IPipeline } from 'core/domain';
 import { Application } from 'core/application';
-import { LayoutProvider, ResponsiveFieldLayout } from 'core/presentation';
-
-export interface IEffectProps {
-  formik: FormikProps<IStage>;
-  onChange(values: any): void;
-}
-
-class Effect extends React.Component<IEffectProps> {
-  public componentDidUpdate() {
-    this.props.onChange && this.props.onChange(this.props.formik.values);
-  }
-  public render(): null {
-    return null;
-  }
-}
+import { LayoutProvider, ResponsiveFieldLayout, WatchValue } from 'core/presentation';
 
 export interface IFormikStageConfigInjectedProps {
   application: Application;
@@ -36,9 +22,9 @@ export interface IFormikStageConfigProps {
   onChange?: (values: IStage) => void;
 }
 
-export type IFormikValidator = (values: IStage) => void | object | Promise<FormikErrors<IStage>>;
+export type IStageValidator = (values: IStage) => void | object | Promise<FormikErrors<IStage>>;
 
-const decorate = (validate: IContextualValidator, props: IFormikStageConfigProps): IFormikValidator => {
+const decorate = (validate: IContextualValidator, props: IFormikStageConfigProps): IStageValidator => {
   const { application, pipeline } = props;
   return (values: IStage) => validate(values, { application, pipeline });
 };
@@ -53,7 +39,7 @@ export class FormikStageConfig extends React.Component<IFormikStageConfigProps> 
         onSubmit={() => {}}
         render={formik => (
           <LayoutProvider value={ResponsiveFieldLayout}>
-            <Effect formik={formik} onChange={onChange} />
+            <WatchValue onChange={onChange} value={formik.values} />
             {render({ application, pipeline, formik })}
           </LayoutProvider>
         )}
