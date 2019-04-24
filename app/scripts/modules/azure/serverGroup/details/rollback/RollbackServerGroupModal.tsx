@@ -15,7 +15,6 @@ import {
 import { AzureModalFooter } from '../../../common/AzureModalFooter';
 
 export interface IAzureRollbackServerGroupModalProps extends IModalComponentProps {
-  scope: object;
   application: object;
   serverGroup: object;
   disabledServerGroups: object;
@@ -24,8 +23,7 @@ export interface IAzureRollbackServerGroupModalProps extends IModalComponentProp
 export interface IAzureRollbackServerGroupModalState {
   taskMonitor: TaskMonitor;
   submitting: boolean;
-  restoreServerGroupName: string;
-  taskReason: string;
+  command: object;
 }
 
 export class AzureRollbackServerGroupModal extends React.Component<
@@ -45,16 +43,7 @@ export class AzureRollbackServerGroupModal extends React.Component<
   constructor(props: IAzureRollbackServerGroupModalProps) {
     super(props);
 
-    const { scope, application, serverGroup, disabledServerGroups } = props;
-
-    scope.command = {
-      interestingHealthProviderNames: [],
-      rollbackType: 'EXPLICIT',
-      rollbackContext: {
-        rollbackServerGroupName: serverGroup.name,
-        enableAndDisableOnly: true,
-      },
-    };
+    const { application, serverGroup } = props;
 
     this.state = {
       taskMonitor: new TaskMonitor({
@@ -63,6 +52,14 @@ export class AzureRollbackServerGroupModal extends React.Component<
         modalInstance: TaskMonitor.modalInstanceEmulation(() => this.props.dismissModal()),
       }),
       submitting: true,
+      command: {
+        interestingHealthProviderNames: [],
+        rollbackType: 'EXPLICIT',
+        rollbackContext: {
+          rollbackServerGroupName: serverGroup.name,
+          enableAndDisableOnly: true,
+        },
+      },
     };
   }
 
@@ -71,17 +68,11 @@ export class AzureRollbackServerGroupModal extends React.Component<
   };
 
   private submit = () => {
-    scope.command.rollbackContext.restoreServerGroupName = this.state.restoreServerGroupName.value;
-    scope.command.reason = this.state.taskReason;
+    const { command, taskMonitor } = this.state;
+    const { serverGroup, application } = this.props;
 
-    this.state.taskMonitor.submit(() => {
-      const restoreServerGroup = this.filterServerGroups(this.props.disabledServerGroups).find(function(
-        disabledServerGroup,
-      ) {
-        return disabledServerGroup.name === scope.command.rollbackContext.restoreServerGroupName;
-      });
-      scope.command.targetSize = restoreServerGroup.capacity.max;
-      return ReactInjector.serverGroupWriter.rollbackServerGroup(serverGroup, application, scope.command);
+    taskMonitor.submit(() => {
+      return ReactInjector.serverGroupWriter.rollbackServerGroup(serverGroup, application, command);
     });
   };
 
@@ -94,32 +85,45 @@ export class AzureRollbackServerGroupModal extends React.Component<
   };
 
   private isValid = () => {
-    const restoreServerGroupName = this.state.restoreServerGroupName;
+    const restoreServerGroupName = this.state.command.rollbackContext.restoreServerGroupName;
     return restoreServerGroupName !== undefined;
   };
 
-  private handleServerGroupChange = restoreServerGroupName => {
-    this.setState({ restoreServerGroupName });
+  private handleServerGroupChange = restoreServerGroupOption => {
+    const { disabledServerGroups } = this.props;
+    const newCommand = this.state.command;
+    newCommand.rollbackContext.restoreServerGroupName = restoreServerGroupOption.value;
+    const restoreServerGroup = this.filterServerGroups(disabledServerGroups).find(function(disabledServerGroup) {
+      return disabledServerGroup.name === restoreServerGroupOption.value;
+    });
+    newCommand.targetSize = restoreServerGroup.capacity.max;
+    this.setState({
+      command: newCommand,
+    });
   };
 
   private handleTaskReasonChange = taskReason => {
-    this.setState({ taskReason });
+    const newCommand = this.state.command;
+    newCommand.reason = taskReason;
+    this.setState({
+      command: newCommand,
+    });
   };
 
   public render() {
-    const { restoreServerGroupName, taskReason } = this.state;
+    const { command, taskMonitor, submitting } = this.state;
+    const { serverGroup, disabledServerGroups } = this.props;
     const { TaskMonitorWrapper } = NgReact;
     const isValidSG = this.isValid();
-    const disabledServerGroupOptions = this.filterServerGroups(this.props.disabledServerGroups).map(
-      disabledServerGroup => ({
-        label: disabledServerGroup.name,
-        value: disabledServerGroup.name,
-      }),
-    );
+    const disabledServerGroupOptions = this.filterServerGroups(disabledServerGroups).map(disabledServerGroup => ({
+      label: disabledServerGroup.name,
+      value: disabledServerGroup.name,
+    }));
+
     return (
       <div className="modal-page confirmation-modal">
-        <TaskMonitorWrapper monitor={this.state.taskMonitor} />
-        {this.state.submitting && (
+        <TaskMonitorWrapper monitor={taskMonitor} />
+        {submitting && (
           <form role="form">
             <div className="modal-close close-button pull-right">
               <button className="link" type="button" onClick={this.close}>
@@ -127,26 +131,26 @@ export class AzureRollbackServerGroupModal extends React.Component<
               </button>
             </div>
             <div className="modal-header">
-              <h3>Rollback {this.props.serverGroup.name}</h3>
+              <h3>Rollback {serverGroup.name}</h3>
             </div>
             <div className="modal-body confirmation-modal">
               <div className="row">
                 <div className="col-sm-3 sm-label-right">Restore to</div>
                 <div className="col-sm-6">
                   <Select
-                    value={restoreServerGroupName}
+                    value={command.rollbackContext.restoreServerGroupName}
                     onChange={this.handleServerGroupChange}
                     options={disabledServerGroupOptions}
                   />
                 </div>
               </div>
-              <TaskReason reason={taskReason} onChange={this.handleTaskReasonChange} />
+              <TaskReason reason={command.taskReason} onChange={this.handleTaskReasonChange} />
             </div>
             <AzureModalFooter
               onSubmit={this.submit}
               onCancel={this.close}
               isValid={isValidSG}
-              account={this.props.serverGroup.account}
+              account={serverGroup.account}
             />
           </form>
         )}

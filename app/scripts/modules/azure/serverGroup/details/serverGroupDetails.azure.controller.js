@@ -232,7 +232,7 @@ module.exports = angular
         var serverGroup = $scope.serverGroup;
         const cluster = _.find(app.clusters, { name: serverGroup.cluster, account: serverGroup.account });
         const disabledServerGroups = _.filter(cluster.serverGroups, { isDisabled: true, region: serverGroup.region });
-        AzureRollbackServerGroupModal.show({ scope: $scope, application: app, serverGroup, disabledServerGroups });
+        AzureRollbackServerGroupModal.show({ application: app, serverGroup, disabledServerGroups });
       };
 
       this.cloneServerGroup = serverGroup => {
