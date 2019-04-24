@@ -47,6 +47,12 @@ const helpContents: { [key: string]: string } = {
     '<p>A map of log options.  This directly maps with the <a href="https://docs.docker.com/config/containers/logging/log_tags/"><b>--log-opt</b> Docker flag  </a></p>',
   'ecs.environmentVariables':
     '<p>The environment variable(s) your container are deployed with. SERVER_GROUP, CLOUD_STACK and CLOUD_DETAIL environment variables are used during deployment to identify the task and cannot be set here.</p>',
+  'ecs.serviceDiscovery':
+    '<p>The AWS Cloud Map service discovery registries to assign to this service</p>',
+  'ecs.serviceDiscoveryRegistry':
+    '<p>The AWS Cloud Map service to use for service discovery registration</p>',
+  'ecs.serviceDiscoveryContainerPort':
+    '<p>The port to be used for your service discovery service. Required only for services using bridge or host network mode, and for services using awsvpc network mode and a type SRV DNS record'
 };
 
 Object.keys(helpContents).forEach(key => HelpContentsRegistry.register(key, helpContents[key]));

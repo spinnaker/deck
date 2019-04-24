@@ -141,6 +141,7 @@ module.exports = angular
               healthCheckGracePeriodSeconds: '',
               placementStrategyName: '',
               placementStrategySequence: [],
+              serviceDiscoveryAssociations: [],
               ecsClusterName: '',
               targetGroup: '',
               copySourceScalingPoliciesAndActions: true,
