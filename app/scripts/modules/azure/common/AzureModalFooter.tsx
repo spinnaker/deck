@@ -14,7 +14,7 @@ export interface IAzureModalFooterState {
 }
 
 export class AzureModalFooter extends React.Component<IAzureModalFooterProps, IAzureModalFooterState> {
-  constructor(props) {
+  constructor(props: any) {
     super(props);
   }
 

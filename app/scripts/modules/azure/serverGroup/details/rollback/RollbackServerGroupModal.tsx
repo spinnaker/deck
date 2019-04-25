@@ -15,15 +15,15 @@ import {
 import { AzureModalFooter } from '../../../common/AzureModalFooter';
 
 export interface IAzureRollbackServerGroupModalProps extends IModalComponentProps {
-  application: object;
-  serverGroup: object;
-  disabledServerGroups: object;
+  application: any;
+  serverGroup: any;
+  disabledServerGroups: any;
 }
 
 export interface IAzureRollbackServerGroupModalState {
   taskMonitor: TaskMonitor;
   submitting: boolean;
-  command: object;
+  command: any;
 }
 
 export class AzureRollbackServerGroupModal extends React.Component<
@@ -76,10 +76,10 @@ export class AzureRollbackServerGroupModal extends React.Component<
     });
   };
 
-  private filterServerGroups = disabledServerGroups => {
+  private filterServerGroups = (disabledServerGroups: any) => {
     const filteredDisabledServerGroups = disabledServerGroups
-      .filter(disabledServerGroup => disabledServerGroup.instanceCounts.total !== 0)
-      .sort((a, b) => b.name.localeCompare(a.name));
+      .filter((disabledServerGroup: any) => disabledServerGroup.instanceCounts.total !== 0)
+      .sort((a: any, b: any) => b.name.localeCompare(a.name));
 
     return filteredDisabledServerGroups;
   };
@@ -89,11 +89,11 @@ export class AzureRollbackServerGroupModal extends React.Component<
     return restoreServerGroupName !== undefined;
   };
 
-  private handleServerGroupChange = restoreServerGroupOption => {
+  private handleServerGroupChange = (restoreServerGroupOption: any) => {
     const { disabledServerGroups } = this.props;
     const newCommand = this.state.command;
     newCommand.rollbackContext.restoreServerGroupName = restoreServerGroupOption.value;
-    const restoreServerGroup = this.filterServerGroups(disabledServerGroups).find(function(disabledServerGroup) {
+    const restoreServerGroup = this.filterServerGroups(disabledServerGroups).find(function(disabledServerGroup: any) {
       return disabledServerGroup.name === restoreServerGroupOption.value;
     });
     newCommand.targetSize = restoreServerGroup.capacity.max;
@@ -102,7 +102,7 @@ export class AzureRollbackServerGroupModal extends React.Component<
     });
   };
 
-  private handleTaskReasonChange = taskReason => {
+  private handleTaskReasonChange = (taskReason?: any) => {
     const newCommand = this.state.command;
     newCommand.reason = taskReason;
     this.setState({
@@ -115,10 +115,12 @@ export class AzureRollbackServerGroupModal extends React.Component<
     const { serverGroup, disabledServerGroups } = this.props;
     const { TaskMonitorWrapper } = NgReact;
     const isValidSG = this.isValid();
-    const disabledServerGroupOptions = this.filterServerGroups(disabledServerGroups).map(disabledServerGroup => ({
-      label: disabledServerGroup.name,
-      value: disabledServerGroup.name,
-    }));
+    const disabledServerGroupOptions = this.filterServerGroups(disabledServerGroups).map(
+      (disabledServerGroup: any) => ({
+        label: disabledServerGroup.name,
+        value: disabledServerGroup.name,
+      }),
+    );
 
     return (
       <div className="modal-page confirmation-modal">
