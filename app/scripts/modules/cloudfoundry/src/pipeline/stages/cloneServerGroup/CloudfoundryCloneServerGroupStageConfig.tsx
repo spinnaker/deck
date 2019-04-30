@@ -82,7 +82,7 @@ export class CloudfoundryCloneServerGroupStageConfig extends React.Component<
               <tr>
                 <td>{stage.source ? stage.source.account : ''}</td>
                 <td>{stage.source ? stage.source.region : ''}</td>
-                <td>{stage.source ? stage.source.targetCluster : ''}</td>
+                <td>{stage.source ? stage.source.clusterName : ''}</td>
                 <td>{stage.source ? cloneTargets.filter(t => t.val === stage.source.target).map(t => t.label) : ''}</td>
               </tr>
             </tbody>
