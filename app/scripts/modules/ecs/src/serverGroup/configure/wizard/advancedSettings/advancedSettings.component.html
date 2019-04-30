@@ -110,12 +110,11 @@
         <tbody>
           <tr ng-repeat="constraint in $ctrl.command.placementConstraints">
             <td>
-              <ui-select ng-model="constraint.type" class="form-control input-sm">
-                <ui-select-match>{{ $select.selected }}</ui-select-match>
-                <ui-select-choices repeat="item in ['distinctInstance', 'memberOf'] | filter: $select.search">
-                  <span ng-bind-html="item"></span>
-                </ui-select-choices>
-              </ui-select>
+              <select
+                class="form-control input-sm"
+                ng-model="constraint.type"
+                ng-options="type for type in ['distinctInstance', 'memberOf']"
+              />
             </td>
             <td>
               <input type="text" class="form-control input-sm no-spel" ng-model="constraint.expression"/>
