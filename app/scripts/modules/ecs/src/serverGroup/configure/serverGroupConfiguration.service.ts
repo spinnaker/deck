@@ -120,7 +120,6 @@ export class EcsServerGroupConfigurationService {
     'placementStrategyService',
     'securityGroupReader',
     'secretReader',
-    'serviceDiscoveryReader',
   ];
   constructor(
     private $q: IQService,
@@ -132,7 +131,6 @@ export class EcsServerGroupConfigurationService {
     private placementStrategyService: PlacementStrategyService,
     private securityGroupReader: SecurityGroupReader,
     private secretReader: SecretReader,
-    private serviceDiscoveryReader: ServiceDiscoveryReader,
   ) {}
 
   public configureUpdateCommand(command: IEcsServerGroupCommand): void {
@@ -206,7 +204,7 @@ export class EcsServerGroupConfigurationService {
         securityGroups: this.securityGroupReader.getAllSecurityGroups(),
         launchTypes: this.$q.when(clone(this.launchTypes)),
         secrets: this.secretReader.listSecrets(),
-        serviceDiscoveryRegistries: this.serviceDiscoveryReader.listServiceDiscoveryRegistries(),
+        serviceDiscoveryRegistries: ServiceDiscoveryReader.listServiceDiscoveryRegistries(),
         images: imagesPromise,
       })
       .then((backingData: Partial<IEcsServerGroupCommandBackingData>) => {

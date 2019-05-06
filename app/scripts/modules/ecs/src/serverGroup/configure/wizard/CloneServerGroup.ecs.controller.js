@@ -14,7 +14,6 @@ import { ECS_SERVER_GROUP_CONFIGURATION_SERVICE } from '../serverGroupConfigurat
 import { ECS_CLUSTER_READ_SERVICE } from '../../../ecsCluster/ecsCluster.read.service';
 import { IAM_ROLE_READ_SERVICE } from '../../../iamRoles/iamRole.read.service';
 import { ECS_SECRET_READ_SERVICE } from '../../../secrets/secret.read.service';
-import { ECS_SERVICE_DISCOVERY_READ_SERVICE } from '../../../serviceDiscovery/serviceDiscovery.read.service';
 
 module.exports = angular
   .module('spinnaker.ecs.cloneServerGroup.controller', [
@@ -26,7 +25,6 @@ module.exports = angular
     IAM_ROLE_READ_SERVICE,
     ECS_CLUSTER_READ_SERVICE,
     ECS_SECRET_READ_SERVICE,
-    ECS_SERVICE_DISCOVERY_READ_SERVICE,
   ])
   .controller('ecsCloneServerGroupCtrl', [
     '$scope',
@@ -41,7 +39,6 @@ module.exports = angular
     'iamRoleReader',
     'ecsClusterReader',
     'secretReader',
-    'serviceDiscoveryReader',
     'application',
     'title',
     function(
@@ -57,7 +54,6 @@ module.exports = angular
       iamRoleReader,
       ecsClusterReader,
       secretReader,
-      serviceDiscoveryReader,
       application,
       title,
     ) {
