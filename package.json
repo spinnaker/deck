@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.4.1",
-    "@spinnaker/kayenta": "0.0.74",
+    "@spinnaker/kayenta": "0.0.75",
     "@spinnaker/styleguide": "^1.0.12",
     "@types/date-fns": "^2.6.0",
     "@types/memoize-one": "^3.1.1",
@@ -70,6 +70,7 @@
     "memoize-one": "^4.0.2",
     "n3-charts": "^2.0.18",
     "ngimport": "^0.6.0",
+    "pretty-ms": "^5.0.0",
     "prop-types": "15.6.1",
     "react": "~16.8.0",
     "react-ace": "^6.1.4",
