@@ -1,10 +1,11 @@
 import { IPromise, module } from 'angular';
-import { chain, flatten, intersection, xor } from 'lodash';
+import { chain, flatten, intersection, xor, cloneDeep } from 'lodash';
 import { $q } from 'ngimport';
 import { Subject } from 'rxjs';
 
 import {
   AccountService,
+  Application,
   IServerGroupCommand,
   IServerGroupCommandViewState,
   IDeploymentStrategy,
@@ -27,6 +28,8 @@ import {
   VpcReader,
 } from '@spinnaker/amazon';
 
+import { IJobDisruptionBudget } from 'titus/domain';
+
 export interface ITitusServerGroupCommandBackingData extends IServerGroupCommandBackingData {
   accounts: string[];
   vpcs: IVpc[];
@@ -37,26 +40,6 @@ export interface ITitusServerGroupCommandViewState extends IServerGroupCommandVi
   regionChangedStream: Subject<{}>;
   groupsRemovedStream: Subject<{}>;
   dirty: IAmazonServerGroupCommandDirty;
-}
-
-export interface IJobTimeWindow {
-  days: string[];
-  hourlyTimeWindows: Array<{ startHour: number; endHour: number }>;
-  timeZone: string;
-}
-
-export interface IJobDisruptionBudget {
-  // policy options
-  availabilityPercentageLimit?: { percentageOfHealthyContainers: number }; // default
-  unhealthyTasksLimit?: { limitOfUnhealthyContainers: number };
-  selfManaged?: { relocationTimeMs: number };
-  relocationLimit?: { limit: number };
-
-  rateUnlimited?: boolean;
-  timeWindows: IJobTimeWindow[];
-  containerHealthProviders: Array<{ name: string }>;
-  ratePerInterval?: { intervalMs: number; limitPerInterval: number };
-  ratePercentagePerInterval?: { intervalMs: number; percentageLimitPerInterval: number };
 }
 
 export const defaultJobDisruptionBudget: IJobDisruptionBudget = {
@@ -75,6 +58,14 @@ export const defaultJobDisruptionBudget: IJobDisruptionBudget = {
       timeZone: 'PST',
     },
   ],
+};
+
+export const getDefaultJobDisruptionBudgetForApp = (application: Application): IJobDisruptionBudget => {
+  const budget = cloneDeep(defaultJobDisruptionBudget);
+  if (application.attributes && application.attributes.platformHealthOnly) {
+    budget.containerHealthProviders = [];
+  }
+  return budget;
 };
 
 export type Constraint = 'ExclusiveHost' | 'UniqueHost' | 'ZoneBalance';

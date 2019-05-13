@@ -1,9 +1,10 @@
 import * as React from 'react';
 import { FormikProps } from 'formik';
 import { Option } from 'react-select';
-import { cloneDeep, isEqual, get } from 'lodash';
+import { isEqual, get } from 'lodash';
 
 import {
+  Application,
   FormikFormField,
   CheckboxInput,
   HelpField,
@@ -17,8 +18,10 @@ import { WindowPicker } from './WindowPicker';
 import {
   ITitusServerGroupCommand,
   defaultJobDisruptionBudget,
-  IJobDisruptionBudget,
+  getDefaultJobDisruptionBudgetForApp,
 } from '../../../serverGroupConfiguration.service';
+
+import { IJobDisruptionBudget } from 'titus/domain';
 
 import { rateOptions } from './RateOptions';
 
@@ -26,6 +29,7 @@ import { policyOptions } from './PolicyOptions';
 
 export interface IJobDisruptionBudgetProps {
   formik: FormikProps<ITitusServerGroupCommand>;
+  app: Application;
 }
 
 export interface IJobDisruptionBudgetState {
@@ -42,6 +46,16 @@ export interface IFieldOption extends Option {
 export interface IFieldOptionComponentProps {
   isDisabled: boolean;
 }
+
+export const DisruptionBudgetDescription = () => (
+  <p>
+    The Job Disruption Budget is part of the job descriptor, and defines the behavior of how containers of the job can
+    be relocated.{' '}
+    <a href="http://manuals.test.netflix.net/view/titus-docs/mkdocs/master/disruption_budget/" target="_blank">
+      Read the full documentation
+    </a>
+  </p>
+);
 
 export class JobDisruptionBudget extends React.Component<IJobDisruptionBudgetProps, IJobDisruptionBudgetState> {
   private timeWindowOptions: IFieldOption[] = [
@@ -63,7 +77,7 @@ export class JobDisruptionBudget extends React.Component<IJobDisruptionBudgetPro
     super(props);
     const { disruptionBudget } = props.formik.values;
     this.state = {
-      usingDefault: !disruptionBudget || isEqual(disruptionBudget, defaultJobDisruptionBudget),
+      usingDefault: !disruptionBudget || isEqual(disruptionBudget, getDefaultJobDisruptionBudgetForApp(props.app)),
     };
     if (this.state.usingDefault) {
       this.setToDefaultBudget();
@@ -71,7 +85,7 @@ export class JobDisruptionBudget extends React.Component<IJobDisruptionBudgetPro
   }
 
   private setToDefaultBudget(): void {
-    this.props.formik.setFieldValue('disruptionBudget', cloneDeep(defaultJobDisruptionBudget));
+    this.props.formik.setFieldValue('disruptionBudget', getDefaultJobDisruptionBudgetForApp(this.props.app));
   }
 
   private toggleUseDefault = (): void => {
@@ -124,7 +138,7 @@ export class JobDisruptionBudget extends React.Component<IJobDisruptionBudgetPro
 
   public render() {
     const { usingDefault } = this.state;
-    const budget = this.props.formik.values.disruptionBudget || defaultJobDisruptionBudget;
+    const budget = this.props.formik.values.disruptionBudget || getDefaultJobDisruptionBudgetForApp(this.props.app);
 
     const policyType = this.getSelectionFromFields(policyOptions);
     const PolicyFields = policyType.fieldComponent;
@@ -141,13 +155,7 @@ export class JobDisruptionBudget extends React.Component<IJobDisruptionBudgetPro
     return (
       <LayoutProvider value={ResponsiveFieldLayout}>
         <div className="form-horizontal sp-margin-l-xaxis">
-          <p>
-            The Job Disruption Budget is part of the job descriptor, and defines the behavior of how containers of the
-            job can be relocated.{' '}
-            <a href="http://manuals.test.netflix.net/view/titus-docs/mkdocs/master/disruption_budget/" target="_blank">
-              Read the full documentation
-            </a>
-          </p>
+          <DisruptionBudgetDescription />
 
           <FormikFormField
             name="usingDefault"
