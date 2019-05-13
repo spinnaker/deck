@@ -1,7 +1,8 @@
 import * as React from 'react';
 
+import { CollapsibleSection } from '@spinnaker/core';
+
 import { ICloudFoundryServerGroupDetailsSectionProps } from './ICloudFoundryServerGroupDetailsSectionProps';
-import { CollapsibleSection } from '../../../../../core/src/presentation';
 
 export class BuildSection extends React.Component<ICloudFoundryServerGroupDetailsSectionProps> {
   constructor(props: ICloudFoundryServerGroupDetailsSectionProps) {

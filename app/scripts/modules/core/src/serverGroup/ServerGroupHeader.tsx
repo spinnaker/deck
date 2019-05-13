@@ -133,7 +133,8 @@ export class SequenceAndBuildAndImages extends React.Component<IServerGroupHeade
         {!!images && <ImageList {...this.props} />}
         {!!ciBuild && ciBuild.jobUrl && (
           <span>
-            &nbsp;({ciBuild.version})
+            {' '}
+            ({ciBuild.version})
             <a className="build-link" href={ciBuild.jobUrl} target="_blank">
               Build: #{ciBuild.jobNumber}
             </a>
