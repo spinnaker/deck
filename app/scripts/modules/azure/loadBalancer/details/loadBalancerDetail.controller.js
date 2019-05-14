@@ -93,7 +93,7 @@ module.exports = angular
               }
 
               if ($scope.loadBalancer.loadBalancerType) {
-                let type = $scope.loadBalancer.loadBalancerType;
+                const type = $scope.loadBalancer.loadBalancerType;
                 $scope.loadBalancer.loadBalancerType = type
                   .split('_')
                   .map(s => {

@@ -1,10 +1,16 @@
 import * as React from 'react';
 import { Button, Modal } from 'react-bootstrap';
 
-import { ILoadBalancerModalProps, ModalClose, ReactModal, noop, CloudProviderRegistry } from '@spinnaker/core';
+import {
+  ILoadBalancerModalProps,
+  ModalClose,
+  ReactModal,
+  noop,
+  CloudProviderRegistry,
+  ModalInjector,
+} from '@spinnaker/core';
 
 import { AzureLoadBalancerTypes, IAzureLoadBalancer } from '../../utility';
-import { ModalInjector } from 'core/reactShims';
 
 export interface IAzureLoadBalancerChoiceModalState {
   choices: IAzureLoadBalancer[];
@@ -15,14 +21,12 @@ export class AzureLoadBalancerChoiceModal extends React.Component<
   ILoadBalancerModalProps,
   IAzureLoadBalancerChoiceModalState
 > {
-  private static parentProps: ILoadBalancerModalProps;
   public static defaultProps: Partial<ILoadBalancerModalProps> = {
     closeModal: noop,
     dismissModal: noop,
   };
 
   public static show(props: ILoadBalancerModalProps): Promise<void> {
-    this.parentProps = props;
     return ReactModal.show(AzureLoadBalancerChoiceModal, {
       ...props,
       className: 'create-pipeline-modal-overflow-visible',
@@ -50,7 +54,7 @@ export class AzureLoadBalancerChoiceModal extends React.Component<
         controller: `${provider.createLoadBalancerController} as ctrl`,
         size: 'lg',
         resolve: {
-          application: () => AzureLoadBalancerChoiceModal.parentProps.app,
+          application: () => this.props.app,
           loadBalancer: (): any => null,
           isNew: () => true,
           forPipelineConfig: () => false,
