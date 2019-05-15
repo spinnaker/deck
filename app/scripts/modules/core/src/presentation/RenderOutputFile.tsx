@@ -3,9 +3,6 @@ import { dump as dumpYaml } from 'js-yaml';
 
 interface IRenderOutputFileProps {
   outputFileObject: object;
-  options?: {
-    transformLinks?: boolean;
-  };
 }
 
 /**
@@ -13,23 +10,19 @@ interface IRenderOutputFileProps {
  * Transforms strings that look like URLs into links
  * The intention is to render the output file from a Script or Run Job stage
  */
-export const RenderOutputFile = React.memo(({ outputFileObject, options = {} }: IRenderOutputFileProps) => {
+export const RenderOutputFile = React.memo(({ outputFileObject }: IRenderOutputFileProps) => {
   const linkRegex = /(https?:\/\/[^$\s'"]+)/;
   const isLink = (str: string) => `'${str}'`.match(linkRegex);
 
   const yaml = dumpYaml(outputFileObject);
 
-  if (options.transformLinks) {
-    let linkCount = 0;
-    const segments = yaml.split(linkRegex);
-    const renderLink = (url: string) => (
-      <a key={`${linkCount++}`} href={url} target="_blank">
-        {url}
-      </a>
-    );
-    const renderSegment = (segment: string) => (isLink(segment) ? renderLink(segment) : segment);
-    return <pre style={{ overflow: 'scroll', maxHeight: '400px' }}>{segments.map(renderSegment)}</pre>;
-  }
-
-  return <pre style={{ overflow: 'scroll', maxHeight: '400px' }}>{yaml}</pre>;
+  let linkCount = 0;
+  const segments = yaml.split(linkRegex);
+  const renderLink = (url: string) => (
+    <a key={`${linkCount++}`} href={url} target="_blank">
+      {url}
+    </a>
+  );
+  const renderSegment = (segment: string) => (isLink(segment) ? renderLink(segment) : segment);
+  return <pre style={{ overflow: 'scroll', maxHeight: '400px' }}>{segments.map(renderSegment)}</pre>;
 });
