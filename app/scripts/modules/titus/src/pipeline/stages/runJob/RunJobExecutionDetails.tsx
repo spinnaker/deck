@@ -133,7 +133,7 @@ export class RunJobExecutionDetails extends React.Component<
           <div className="row">
             <div className="col-md-12">
               <h5 style={{ marginBottom: '0px', paddingBottom: '5px' }}>Property File</h5>
-              <RenderOutputFile outputFileObject={context.propertyFileContents} options={{ transformLinks: true }} />
+              <RenderOutputFile outputFileObject={context.propertyFileContents} />
             </div>
           </div>
         )}

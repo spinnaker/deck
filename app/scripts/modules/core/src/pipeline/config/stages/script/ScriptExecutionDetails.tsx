@@ -33,10 +33,7 @@ export function ScriptExecutionDetails(props: IExecutionDetailsSectionProps) {
         <div className="row">
           <div className="col-md-12">
             <h5 style={{ marginBottom: '0px', paddingBottom: '5px' }}>Property File</h5>
-            <RenderOutputFile
-              outputFileObject={stage.context.propertyFileContents}
-              options={{ transformLinks: true }}
-            />
+            <RenderOutputFile outputFileObject={stage.context.propertyFileContents} />
           </div>
         </div>
       )}
