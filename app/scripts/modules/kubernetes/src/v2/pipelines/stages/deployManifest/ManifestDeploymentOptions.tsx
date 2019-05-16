@@ -2,13 +2,14 @@ import { module } from 'angular';
 import * as DOMPurify from 'dompurify';
 import * as React from 'react';
 import { react2angular } from 'react2angular';
-import { cloneDeep, find, get, map, set, split } from 'lodash';
+import { cloneDeep, map, set, split } from 'lodash';
 import Select, { Option } from 'react-select';
 
 import { IAccountDetails, IDeploymentStrategy, StageConfigField } from '@spinnaker/core';
 
 import { ManifestKindSearchService } from 'kubernetes/v2/manifest/ManifestKindSearch';
 import { rolloutStrategies } from 'kubernetes/v2/rolloutStrategy';
+import { NamespaceSelector } from './NamespaceSelector';
 
 export interface ITrafficManagementConfig {
   enabled: boolean;
@@ -68,13 +69,6 @@ export class ManifestDeploymentOptions extends React.Component<
     });
   };
 
-  private getNamespaceOptions = (): Array<Option<string>> => {
-    const { accounts, selectedAccount } = this.props;
-    const selectedAccountDetails = find(accounts, a => a.name === selectedAccount);
-    const namespaces = get(selectedAccountDetails, 'namespaces', []);
-    return map(namespaces, n => ({ label: n, value: n }));
-  };
-
   private strategyOptionRenderer = (option: IDeploymentStrategy) => {
     return (
       <div className="body-regular">
@@ -128,11 +122,11 @@ export class ManifestDeploymentOptions extends React.Component<
         {config.enabled && (
           <>
             <StageConfigField fieldColumns={8} label="Service(s) Namespace">
-              <Select
-                clearable={false}
-                onChange={(option: Option<string>) => this.onConfigChange('options.namespace', option.value)}
-                options={this.getNamespaceOptions()}
-                value={config.options.namespace}
+              <NamespaceSelector
+                onChange={(namespace: string): void => this.onConfigChange('options.namespace', namespace)}
+                accounts={this.props.accounts}
+                selectedAccount={this.props.selectedAccount}
+                selectedNamespace={config.options.namespace}
               />
             </StageConfigField>
             <StageConfigField fieldColumns={8} label="Service(s)">
