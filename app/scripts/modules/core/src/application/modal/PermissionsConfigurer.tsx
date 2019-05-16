@@ -61,26 +61,35 @@ export class PermissionsConfigurer extends React.Component<IPermissionsConfigure
       return permissionRows;
     }
 
-    permissions.READ.forEach(group => {
-      permissionRows.push({ group, access: 'READ' });
-    });
+    permissions.READ &&
+      permissions.READ.forEach(group => {
+        permissionRows.push({ group, access: 'READ' });
+      });
 
-    permissions.EXECUTE.forEach(group => {
-      const matchingRow = permissionRows.find(row => row.group === group);
-      if (matchingRow) {
-        matchingRow.access += ',EXECUTE';
-      } else {
-        permissionRows.push({ group, access: 'EXECUTE' });
-      }
-    });
+    permissions.EXECUTE &&
+      permissions.EXECUTE.forEach(group => {
+        const matchingRow = permissionRows.find(row => row.group === group);
+        if (matchingRow) {
+          matchingRow.access += ',EXECUTE';
+        } else {
+          permissionRows.push({ group, access: 'EXECUTE' });
+        }
+      });
 
-    permissions.WRITE.forEach(group => {
-      const matchingRow = permissionRows.find(row => row.group === group);
-      if (matchingRow) {
-        matchingRow.access += ',WRITE';
-      } else {
-        // WRITE only permissions aren't supported in the UI, but they could be.
-        permissionRows.push({ group, access: 'WRITE' });
+    permissions.WRITE &&
+      permissions.WRITE.forEach(group => {
+        const matchingRow = permissionRows.find(row => row.group === group);
+        if (matchingRow) {
+          matchingRow.access += ',WRITE';
+        } else {
+          // WRITE only permissions aren't supported in the UI, but they could be.
+          permissionRows.push({ group, access: 'WRITE' });
+        }
+      });
+
+    permissionRows.forEach(row => {
+      if (row.access === 'READ,WRITE') {
+        row.access = 'READ,EXECUTE,WRITE';
       }
     });
 

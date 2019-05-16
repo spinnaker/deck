@@ -42,6 +42,24 @@ describe('PermissionsConfigurer', () => {
     });
   });
 
+  it('supports old READ/WRITE permissions by adding EXECUTE implicitly', () => {
+    const component = createComponent({
+      permissions: {
+        READ: ['my-team'],
+        WRITE: ['my-team'],
+      } as IPermissions,
+      requiredGroupMembership: null,
+      onPermissionsChange: () => null,
+    });
+
+    expect(component.state.permissionRows).toEqual([
+      {
+        group: 'my-team',
+        access: 'READ,EXECUTE,WRITE',
+      },
+    ]);
+  });
+
   it(`populates the 'roleOptions' list with a user's roles minus the roles already used in the permissions object`, () => {
     const component = createComponent({
       permissions: { READ: ['groupA', 'groupB'], EXECUTE: ['groupB'], WRITE: ['groupB'] },
