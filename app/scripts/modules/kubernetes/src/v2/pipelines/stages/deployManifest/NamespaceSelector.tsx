@@ -33,6 +33,6 @@ export class NamespaceSelector extends React.Component<INamespaceSelectorProps> 
       value: this.props.selectedNamespace,
       onChange: (option: Option) => this.props.onChange(option.value.toString()),
     };
-    return <>{this.props.createable ? <Creatable {...componentProps} /> : <Select {...componentProps} />}</>;
+    return this.props.createable ? <Creatable {...componentProps} /> : <Select {...componentProps} />;
   }
 }
