@@ -115,6 +115,8 @@ export class SequenceAndBuildAndImages extends React.Component<IServerGroupHeade
   public render() {
     const { serverGroup, jenkins, images, docker } = this.props;
     const serverGroupSequence = NameUtils.getSequence(serverGroup.moniker.sequence);
+    const ciBuild = serverGroup.buildInfo && serverGroup.buildInfo.ciBuild;
+    const appArtifact = serverGroup.buildInfo && serverGroup.buildInfo.appArtifact;
     return (
       <div>
         {!!serverGroupSequence && <span className="server-group-sequence"> {serverGroupSequence}</span>}
@@ -130,6 +132,16 @@ export class SequenceAndBuildAndImages extends React.Component<IServerGroupHeade
           </a>
         )}
         {!!images && <ImageList {...this.props} />}
+        {(!!ciBuild || !!appArtifact) && (
+          <span>
+            {!!appArtifact.version && <span> ({appArtifact.version})</span>}
+            {!!ciBuild.jobUrl && (
+              <a className="build-link" href={ciBuild.jobUrl} target="_blank">
+                Build: #{ciBuild.jobNumber}
+              </a>
+            )}
+          </span>
+        )}
       </div>
     );
   }
