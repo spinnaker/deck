@@ -157,6 +157,7 @@ module.exports = angular
         const command = {
           cloudProvider: 'azure',
           loadBalancerName: $scope.loadBalancer.name,
+          loadBalancerType: $scope.loadBalancer.loadBalancerType,
           credentials: $scope.loadBalancer.account,
           region: loadBalancer.region,
           appName: app.name,
