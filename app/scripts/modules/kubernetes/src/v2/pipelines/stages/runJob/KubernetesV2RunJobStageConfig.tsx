@@ -27,6 +27,14 @@ export class KubernetesV2RunJobStageConfig extends React.Component<IStageConfigP
     credentials: [],
   };
 
+  constructor(props: IStageConfigProps) {
+    super(props);
+    const { stage, application } = this.props;
+    if (!stage.application) {
+      stage.application = application.name;
+    }
+  }
+
   public outputOptions = [
     { label: 'None', value: 'none' },
     { label: 'Logs', value: 'propertyFile' },
@@ -129,7 +137,7 @@ export class KubernetesV2RunJobStageConfig extends React.Component<IStageConfigP
     const { stage, pipeline } = this.props;
     return (
       <PreRewriteStageArtifactSelector
-        excludedArtifactTypes={[]}
+        excludedArtifactTypePatterns={[]}
         stage={stage}
         pipeline={pipeline}
         selectedArtifactId={stage.consumeArtifactId}
