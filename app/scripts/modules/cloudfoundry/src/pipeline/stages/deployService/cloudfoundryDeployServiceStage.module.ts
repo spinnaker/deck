@@ -66,7 +66,7 @@ PipelineConfigValidator.registerValidator(
 
     private isYaml(value: string): boolean {
       try {
-        safeLoad(value, null);
+        safeLoad(value);
         return true;
       } catch (e) {
         return false;
