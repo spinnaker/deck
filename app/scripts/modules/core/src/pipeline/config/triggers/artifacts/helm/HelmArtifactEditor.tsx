@@ -1,21 +1,19 @@
 import * as React from 'react';
 import { Option } from 'react-select';
+import { cloneDeep } from 'lodash';
 
 import { ArtifactTypePatterns } from 'core/artifact';
 import { IArtifact, IArtifactEditorProps, IArtifactKindConfig } from 'core/domain';
 import { StageConfigField } from 'core/pipeline';
 import { TetheredSelect, TetheredCreatable } from 'core/presentation';
 import { ArtifactService } from '../ArtifactService';
-import { cloneDeep } from 'lodash';
 import { Spinner } from 'core/widgets';
 
 const TYPE = 'helm/chart';
-// taken from https://github.com/semver/semver/issues/232
-const SEMVER = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(-(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\+[0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*)?$/;
 
 interface IHelmArtifactEditorState {
   names: string[];
-  versions: Option<string>[];
+  versions: Array<Option<string>>;
   versionsLoading: boolean;
   namesLoading: boolean;
 }
@@ -28,11 +26,16 @@ class HelmEditor extends React.Component<IArtifactEditorProps, IHelmArtifactEdit
     namesLoading: true,
   };
 
+  // taken from https://github.com/semver/semver/issues/232
+  private SEMVER: RegExp = new RegExp(
+    /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(-(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\+[0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*)?$/,
+  );
+
   constructor(props: IArtifactEditorProps) {
     super(props);
     const { artifact } = this.props;
     if (artifact.type !== TYPE) {
-      const clonedArtifact = cloneDeep(props.artifact);
+      const clonedArtifact = cloneDeep(artifact);
       clonedArtifact.type = TYPE;
       props.onChange(clonedArtifact);
     }
@@ -52,7 +55,7 @@ class HelmEditor extends React.Component<IArtifactEditorProps, IHelmArtifactEdit
     }
   }
 
-  public componentWillReceiveProps(nextProps: IArtifactEditorProps) {
+  public componentDidUpdate(nextProps: IArtifactEditorProps) {
     if (this.props.account.name !== nextProps.account.name) {
       ArtifactService.getArtifactNames(TYPE, nextProps.account.name).then(names => {
         this.setState({
@@ -113,7 +116,7 @@ class HelmEditor extends React.Component<IArtifactEditorProps, IHelmArtifactEdit
     ArtifactService.getArtifactVersions(TYPE, account.name, chartName).then((versions: string[]) => {
       // if the version doesn't match SEMVER we assume that it's a regular expression or SpEL expression
       // and add it to the list of valid versions
-      if (artifact.version && !new RegExp(SEMVER).test(artifact.version)) {
+      if (artifact.version && !this.SEMVER.test(artifact.version)) {
         versions = versions.concat(artifact.version);
       }
       this.setState({
