@@ -3,6 +3,7 @@ import { $q, $http } from 'ngimport';
 import { AuthenticationInitializer } from '../authentication/AuthenticationInitializer';
 import { SETTINGS } from 'core/config/settings';
 import { ICache } from 'core/cache';
+import { isNil } from 'lodash';
 
 export interface IRequestBuilder {
   config?: IRequestConfig;
@@ -40,7 +41,7 @@ export class API {
     return $q((resolve, reject) => {
       const contentType = result.headers('content-type');
       if (contentType) {
-        const isJson = contentType.includes('application/json');
+        const isJson = contentType.match(/application\/(.+\+)?json/); // e.g application/json, application/hal+json
         const isZeroLengthHtml = contentType.includes('text/html') && result.data === '';
         const isZeroLengthText = contentType.includes('text/plain') && result.data === '';
         if (!(isJson || isZeroLengthHtml || isZeroLengthText)) {
@@ -166,7 +167,9 @@ export class API {
       method: '',
       url: this.baseUrl,
     };
-    urls.forEach((url: string) => (config.url = `${config.url}/${url.toString().replace(/^\/+/, '')}`));
+    urls
+      .filter(i => !isNil(i))
+      .forEach((url: string) => (config.url = `${config.url}/${url.toString().replace(/^\/+/, '')}`));
 
     return this.baseReturn(config);
   }

@@ -54,7 +54,7 @@ class HelmEditor extends React.Component<IArtifactEditorProps, IHelmArtifactEdit
             value={artifact.name || ''}
             onChange={(e: Option) => {
               this.onChange(e, 'name');
-              this.onNameChange();
+              this.onNameChange(e.value.toString());
             }}
             clearable={false}
           />
@@ -80,12 +80,10 @@ class HelmEditor extends React.Component<IArtifactEditorProps, IHelmArtifactEdit
     this.props.onChange(clone);
   };
 
-  private onNameChange = () => {
-    ArtifactService.getArtifactVersions(TYPE, this.props.artifact.artifactAccount, this.props.artifact.name).then(
-      versions => {
-        this.setState({ versions });
-      },
-    );
+  private onNameChange = (chartName: string) => {
+    ArtifactService.getArtifactVersions(TYPE, this.props.account.name, chartName).then(versions => {
+      this.setState({ versions });
+    });
   };
 }
 

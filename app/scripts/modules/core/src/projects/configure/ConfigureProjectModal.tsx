@@ -2,9 +2,8 @@ import * as React from 'react';
 
 import { AccountService, IAccount } from 'core/account';
 import { ApplicationReader, IApplicationSummary } from 'core/application';
-import { IPipeline, IProject } from 'core/domain';
+import { IProject } from 'core/domain';
 import { WizardModal, WizardPage } from 'core/modal';
-import { PipelineConfigService } from 'core/pipeline';
 import { IModalComponentProps, ReactModal } from 'core/presentation';
 import { TaskMonitor } from 'core/task';
 import { noop } from 'core/utils';
@@ -28,10 +27,6 @@ export interface IConfigureProjectModalState {
   allAccounts: IAccount[];
   allProjects: IProject[];
   allApplications: IApplicationSummary[];
-  appPipelines: {
-    [appName: string]: IPipeline[];
-  };
-  configuredApps: string[];
   loading: boolean;
   taskMonitor?: TaskMonitor;
 }
@@ -47,8 +42,6 @@ export class ConfigureProjectModal extends React.Component<IConfigureProjectModa
     allAccounts: [],
     allProjects: [],
     allApplications: [],
-    appPipelines: {},
-    configuredApps: [],
   };
 
   public static show(props?: IConfigureProjectModalProps): Promise<any> {
@@ -72,17 +65,8 @@ export class ConfigureProjectModal extends React.Component<IConfigureProjectModa
     return ReactModal.show(ConfigureProjectModal, projectProps, modalProps);
   }
 
-  private handleApplicationsChanged = (configuredApps: string[]) => {
-    this.setState({ configuredApps });
-    this.fetchPipelinesForApps(configuredApps);
-  };
-
   public componentDidMount() {
-    const { projectConfiguration } = this.props;
-    const configuredApps = (projectConfiguration && projectConfiguration.config.applications) || [];
-    Promise.all([this.fetchPipelinesForApps(configuredApps), this.initialFetch()]).then(() =>
-      this.setState({ loading: false, configuredApps }),
-    );
+    this.initialFetch().then(() => this.setState({ loading: false }));
   }
 
   private submit = (project: IProject) => {
@@ -110,21 +94,6 @@ export class ConfigureProjectModal extends React.Component<IConfigureProjectModa
     );
   }
 
-  private fetchPipelinesForApps = (applications: string[]) => {
-    // Only fetch for apps we don't already have results for
-    const appsToFetch = applications.filter(appName => !this.state.appPipelines[appName]);
-
-    const fetches = appsToFetch.map(appName => {
-      return PipelineConfigService.getPipelinesForApplication(appName).then(pipelines =>
-        this.setState({
-          appPipelines: { ...this.state.appPipelines, [appName]: pipelines },
-        }),
-      );
-    });
-
-    return Promise.all(fetches);
-  };
-
   private onDelete = () => {
     const { projectConfiguration } = this.props;
     const { name } = projectConfiguration;
@@ -142,7 +111,7 @@ export class ConfigureProjectModal extends React.Component<IConfigureProjectModa
 
   public render() {
     const { dismissModal, projectConfiguration } = this.props;
-    const { allAccounts, allApplications, allProjects, appPipelines, loading, taskMonitor } = this.state;
+    const { allAccounts, allApplications, allProjects, loading, taskMonitor } = this.state;
     const appNames = allApplications.map(app => app.name);
 
     return (
@@ -169,14 +138,7 @@ export class ConfigureProjectModal extends React.Component<IConfigureProjectModa
               label="Applications"
               wizard={wizard}
               order={nextIdx()}
-              render={({ innerRef }) => (
-                <Applications
-                  ref={innerRef}
-                  formik={formik}
-                  allApplications={appNames}
-                  onApplicationsChanged={this.handleApplicationsChanged}
-                />
-              )}
+              render={({ innerRef }) => <Applications ref={innerRef} formik={formik} allApplications={appNames} />}
             />
 
             <WizardPage
@@ -190,7 +152,7 @@ export class ConfigureProjectModal extends React.Component<IConfigureProjectModa
               label="Pipelines"
               wizard={wizard}
               order={nextIdx()}
-              render={({ innerRef }) => <Pipelines ref={innerRef} appsPipelines={appPipelines} />}
+              render={({ innerRef }) => <Pipelines ref={innerRef} formik={formik} />}
             />
           </>
         )}

@@ -1,25 +1,40 @@
 import * as React from 'react';
-import { FieldArray, FormikErrors, getIn } from 'formik';
+import { FieldArray, FormikErrors, FormikProps, getIn } from 'formik';
+import { chain, get, isEqual } from 'lodash';
 
+import { PipelineConfigService } from 'core/pipeline';
 import { FormikFormField, ReactSelectInput, StringsAsOptions } from 'core/presentation';
 import { Spinner } from 'core/widgets';
 import { IPipeline, IProject, IProjectPipeline } from 'core/domain';
 import { IWizardPageComponent } from 'core/modal';
 
 export interface IPipelinesProps {
+  formik: FormikProps<IProject>;
+}
+
+export interface IPipelinesState {
   appsPipelines: {
     [appName: string]: IPipeline[];
   };
+  initialized: boolean;
 }
 
-export class Pipelines extends React.Component<IPipelinesProps> implements IWizardPageComponent<IProject> {
+export class Pipelines extends React.Component<IPipelinesProps, IPipelinesState>
+  implements IWizardPageComponent<IProject> {
+  private static readonly pipelineConfigsPath = 'config.pipelineConfigs';
+
+  public state: IPipelinesState = {
+    appsPipelines: {},
+    initialized: false,
+  };
+
   public validate = (value: IProject): FormikErrors<IProject> => {
     const projectApplications = (value.config && value.config.applications) || [];
-    const { appsPipelines } = this.props;
+    const { appsPipelines, initialized } = this.state;
 
-    if (value.config && value.config.pipelineConfigs && value.config.pipelineConfigs.length) {
+    if (initialized && value.config && value.config.pipelineConfigs && value.config.pipelineConfigs.length) {
       const pipelineConfigErrors = value.config.pipelineConfigs.map(config => {
-        const pipelineIdsForApp = (appsPipelines[config.application] || []).map(p => p.id);
+        const pipelineIdsForApp = appsPipelines[config.application].map(p => p.id);
 
         if (!config.application) {
           return { application: 'Application must be specified' };
@@ -46,8 +61,55 @@ export class Pipelines extends React.Component<IPipelinesProps> implements IWiza
     return {};
   };
 
+  private getProjectPipelines = (props: IPipelinesProps): IProjectPipeline[] => {
+    return get(props.formik.values, Pipelines.pipelineConfigsPath, []);
+  };
+
+  private fetchPipelinesForApps = (projectPipelines: IProjectPipeline[]) => {
+    const appsToFetch = chain(projectPipelines)
+      .map('application')
+      .uniq()
+      // Only fetch for apps we don't already have results for
+      .filter(appName => appName && !this.state.appsPipelines[appName])
+      .value();
+
+    const appsPipelines: { [appName: string]: IPipeline[] } = { ...this.state.appsPipelines };
+
+    Promise.all(
+      appsToFetch.map(appName => {
+        return PipelineConfigService.getPipelinesForApplication(appName)
+          .then(pipelines => {
+            appsPipelines[appName] = pipelines;
+          })
+          .catch(() => {
+            appsPipelines[appName] = [];
+          });
+      }),
+    ).then(() => {
+      this.setState({ appsPipelines, initialized: true });
+    });
+  };
+
+  public componentDidMount() {
+    this.fetchPipelinesForApps(this.getProjectPipelines(this.props));
+  }
+
+  public componentDidUpdate(prevProps: IPipelinesProps) {
+    if (!isEqual(this.getProjectPipelines(prevProps), this.getProjectPipelines(this.props))) {
+      this.fetchPipelinesForApps(this.getProjectPipelines(this.props));
+    }
+  }
+
   public render() {
-    const { appsPipelines } = this.props;
+    const { appsPipelines, initialized } = this.state;
+
+    if (!initialized) {
+      return (
+        <div style={{ height: '200px' }}>
+          <Spinner size="medium" />
+        </div>
+      );
+    }
 
     const tableHeader = (
       <tr>
@@ -57,14 +119,12 @@ export class Pipelines extends React.Component<IPipelinesProps> implements IWiza
       </tr>
     );
 
-    const pipelineConfigsPath = 'config.pipelineConfigs';
-
     return (
       <FieldArray
-        name={pipelineConfigsPath}
+        name={Pipelines.pipelineConfigsPath}
         render={pipelinesArrayHelper => {
           const project: IProject = pipelinesArrayHelper.form.values;
-          const configs: IProjectPipeline[] = getIn(project, pipelineConfigsPath);
+          const configs: IProjectPipeline[] = getIn(project, Pipelines.pipelineConfigsPath);
           const apps: string[] = getIn(project, 'config.applications');
 
           return (
@@ -74,7 +134,7 @@ export class Pipelines extends React.Component<IPipelinesProps> implements IWiza
                   <thead>{tableHeader}</thead>
                   <tbody>
                     {configs.map((config, idx) => {
-                      const pipelinePath = `${pipelineConfigsPath}[${idx}]`;
+                      const pipelinePath = `${Pipelines.pipelineConfigsPath}[${idx}]`;
                       const application = config && config.application;
                       const appPipelines = application && appsPipelines[application];
                       const pipelineOptions = appPipelines && appPipelines.map(p => ({ label: p.name, value: p.id }));
