@@ -195,7 +195,7 @@ const helpContents: { [key: string]: string } = {
     '<p>(Optional) The name of a Google account configured within Rosco. If left blank, the first configured account will be used.</p>',
   'pipeline.config.gce.bake.baseImage':
     '<p>(Optional) A GCE image name. For example: ubuntu-1204-precise-v20150910.</p>',
-  'gce.loadBalancertype.Network': `
+  'gce.loadBalancerType.Network': `
     <p>Use Network Load Balancing to balance the load on your systems based on incoming IP protocol data, such as address, port, and protocol type.</p>
     <p>Network Load Balancing is a regional, non-proxied load balancer. You can use it to load balance UDP traffic, and TCP and SSL traffic on ports that are not supported by the SSL proxy and TCP proxy load balancers.</p>`,
   'gce.loadBalancertype.HTTP(S)':
