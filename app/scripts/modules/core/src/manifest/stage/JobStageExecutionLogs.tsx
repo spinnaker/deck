@@ -15,6 +15,7 @@ interface IJobStageExecutionLogsProps {
   application: Application;
   externalLink: string;
   podNameProvider: IPodNameProvider;
+  location: string;
 }
 
 interface IJobStageExecutionLogsState {
@@ -71,14 +72,12 @@ export class JobStageExecutionLogs extends React.Component<IJobStageExecutionLog
   }
 
   private stageManifestToIManifest(manifest: IStageManifest, deployedName: string, account: string): IManifest {
-    const namespace = get(manifest, ['metadata', 'namespace'], '');
-
     return {
       name: deployedName,
       moniker: null,
       account,
       cloudProvider: 'kubernetes',
-      location: namespace,
+      location: this.props.location,
       manifest,
       status: {},
       artifacts: [],
@@ -97,10 +96,7 @@ export class JobStageExecutionLogs extends React.Component<IJobStageExecutionLog
 
   public render() {
     const { manifest } = this.state.subscription;
-    const { externalLink, podNameProvider } = this.props;
-    const namespace = trim(
-      get(manifest, ['manifest', 'metadata', 'annotations', 'artifact.spinnaker.io/location'], ''),
-    );
+    const { externalLink, podNameProvider, location } = this.props;
 
     // prefer links to external logging platforms
     if (!isEmpty(manifest) && externalLink) {
@@ -112,12 +108,16 @@ export class JobStageExecutionLogs extends React.Component<IJobStageExecutionLog
     }
 
     return (
-      <JobManifestPodLogs
-        account={manifest.account}
-        location={namespace}
-        podNameProvider={podNameProvider}
-        linkName="Console Output"
-      />
+      <>
+        {location && (
+          <JobManifestPodLogs
+            account={manifest.account}
+            location={location}
+            podNameProvider={podNameProvider}
+            linkName="Console Output"
+          />
+        )}
+      </>
     );
   }
 }
