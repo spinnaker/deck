@@ -36,7 +36,7 @@ const helpContents: { [key: string]: string } = {
   'azure.serverGroup.enableInboundNAT':
     'An Azure load balancer of the basic sku will be created with adding inbound NAT port-forwarding rules to facilitate loggin on VM instances. There is no charge for creating an Azure load balancer of the basic sku. This option is disabled if Availability Zones are set which require Standard Azure Load Balancer and an extra Network Security Group with correct inbound and outbound rules configured.',
   'azure.loadBalancer.dnsName':
-    'If there is no custom DNS label specified, a default DNS name will be created. The default value will be "GeneratedText.cloudapp.azure.net" for Azure Application Gateway or "GeneratedText.[region].cloudapp.azure.net" for Azure Load Balancer.',
+    'If there is no custom DNS label specified, a default DNS name will be created. The default value will be "GeneratedText.cloudapp.net" for Azure Application Gateway or "GeneratedText.[region].cloudapp.azure.com" for Azure Load Balancer.',
   'azure.loadBalancer.probes.probeInterval':
     'Probe interval in seconds. This value is the time interval between two consecutive probes.',
   'azure.loadBalancer.probes.timeout':
