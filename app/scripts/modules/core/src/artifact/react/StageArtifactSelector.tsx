@@ -2,6 +2,7 @@ import * as React from 'react';
 import { module } from 'angular';
 import Select from 'react-select';
 import { react2angular } from 'react2angular';
+import { Observable, Subject } from 'rxjs';
 
 import { IArtifact, IExpectedArtifact, IPipeline, IStage } from 'core/domain';
 import { ArtifactIcon, ExpectedArtifactService } from 'core/artifact';
@@ -21,6 +22,8 @@ export interface IStageArtifactSelectorProps {
 
   excludedArtifactIds?: string[];
   excludedArtifactTypePatterns?: RegExp[];
+
+  renderLabel?: (reactNode: React.ReactNode) => React.ReactNode;
 }
 
 export interface IStageArtifactSelectorState {
@@ -36,6 +39,8 @@ export class StageArtifactSelector extends React.Component<IStageArtifactSelecto
     id: DEFINE_NEW_ARTIFACT,
   };
 
+  private destroy$ = new Subject();
+
   constructor(props: IStageArtifactSelectorProps) {
     super(props);
 
@@ -44,17 +49,23 @@ export class StageArtifactSelector extends React.Component<IStageArtifactSelecto
     };
   }
 
+  public componentWillUnmount(): void {
+    this.destroy$.next();
+  }
+
   public componentDidMount(): void {
     const excludedPatterns = this.props.excludedArtifactTypePatterns;
-    AccountService.getArtifactAccounts().then(artifactAccounts => {
-      this.setState({
-        artifactAccounts: excludedPatterns
-          ? artifactAccounts.filter(
-              account => !account.types.some(typ => excludedPatterns.some(typPattern => typPattern.test(typ))),
-            )
-          : artifactAccounts,
+    Observable.fromPromise(AccountService.getArtifactAccounts())
+      .takeUntil(this.destroy$)
+      .subscribe(artifactAccounts => {
+        this.setState({
+          artifactAccounts: excludedPatterns
+            ? artifactAccounts.filter(
+                account => !account.types.some(typ => excludedPatterns.some(typPattern => typPattern.test(typ))),
+              )
+            : artifactAccounts,
+        });
       });
-    });
   }
 
   private renderArtifact = (value: IExpectedArtifact) => {
@@ -87,7 +98,7 @@ export class StageArtifactSelector extends React.Component<IStageArtifactSelecto
   };
 
   public render() {
-    const { pipeline, stage, expectedArtifactId, artifact, excludedArtifactIds } = this.props;
+    const { pipeline, stage, expectedArtifactId, artifact, excludedArtifactIds, renderLabel } = this.props;
     const expectedArtifacts = ExpectedArtifactService.getExpectedArtifactsAvailableToStage(stage, pipeline);
     const expectedArtifact = expectedArtifactId
       ? expectedArtifacts.find(a => a.id === expectedArtifactId)
@@ -106,20 +117,22 @@ export class StageArtifactSelector extends React.Component<IStageArtifactSelecto
       ),
     ];
 
+    const select = (
+      <Select
+        clearable={false}
+        options={options}
+        value={expectedArtifact}
+        optionRenderer={this.renderArtifact}
+        valueRenderer={this.renderArtifact}
+        onChange={this.onExpectedArtifactSelected}
+        placeholder="Select an artifact..."
+      />
+    );
+
     return (
       <>
-        <div className="sp-margin-m-bottom">
-          <Select
-            clearable={false}
-            options={options}
-            value={expectedArtifact}
-            optionRenderer={this.renderArtifact}
-            valueRenderer={this.renderArtifact}
-            onChange={this.onExpectedArtifactSelected}
-            placeholder="Select an artifact..."
-          />
-        </div>
-        {artifact && (
+        <div className="sp-margin-m-bottom">{renderLabel ? renderLabel(select) : select}</div>
+        {!!artifact && (
           <ArtifactEditor
             pipeline={pipeline}
             artifact={artifact}

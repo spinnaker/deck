@@ -9,6 +9,7 @@ import { Application } from 'core/application/application.model';
 import { CopyToClipboard } from 'core/utils';
 import { StageExecutionDetails } from 'core/pipeline/details/StageExecutionDetails';
 import { ExecutionStatus } from 'core/pipeline/status/ExecutionStatus';
+import { ParametersAndArtifacts } from 'core/pipeline/status/ParametersAndArtifacts';
 import { IExecution, IRestartDetails, IPipeline } from 'core/domain';
 import { IExecutionViewState, IPipelineGraphNode } from 'core/pipeline/config/graph/pipelineGraph.service';
 import { OrchestratedItemRunningTime } from './OrchestratedItemRunningTime';
@@ -30,6 +31,7 @@ import './execution.less';
 export interface IExecutionProps {
   application: Application;
   execution: IExecution;
+  pipelineConfig: IPipeline;
   showDurations?: boolean;
   standalone?: boolean;
   title?: string | JSX.Element;
@@ -42,6 +44,7 @@ export interface IExecutionProps {
 
 export interface IExecutionState {
   showingDetails: boolean;
+  showingParams: boolean;
   pipelinesUrl: string;
   viewState: IExecutionViewState;
   sortFilter: ISortFilter;
@@ -60,7 +63,7 @@ export class Execution extends React.Component<IExecutionProps, IExecutionState>
 
   constructor(props: IExecutionProps) {
     super(props);
-    const { execution } = this.props;
+    const { execution, standalone } = this.props;
     const { $stateParams } = ReactInjector;
 
     const initialViewState = {
@@ -75,6 +78,7 @@ export class Execution extends React.Component<IExecutionProps, IExecutionState>
 
     this.state = {
       showingDetails: this.invalidateShowingDetails(props),
+      showingParams: standalone,
       pipelinesUrl: [SETTINGS.gateUrl, 'pipelines/'].join('/'),
       viewState: initialViewState,
       sortFilter: ExecutionState.filterModel.asFilterModel.sortFilter,
@@ -250,8 +254,22 @@ export class Execution extends React.Component<IExecutionProps, IExecutionState>
     ReactGA.event({ category: 'Pipeline', action: 'Permalink clicked' });
   };
 
+  private handleToggleDetails = (): void => {
+    ReactGA.event({ category: 'Pipeline', action: 'Execution details toggled (Details link)' });
+    this.toggleDetails();
+  };
+
   public render() {
-    const { application, execution, showAccountLabels, showDurations, standalone, title, cancelHelpText } = this.props;
+    const {
+      application,
+      execution,
+      showAccountLabels,
+      showDurations,
+      standalone,
+      title,
+      cancelHelpText,
+      pipelineConfig,
+    } = this.props;
     const { pipelinesUrl, restartDetails, showingDetails, sortFilter, viewState } = this.state;
 
     const accountLabels = this.props.execution.deploymentTargets.map(account => (
@@ -259,7 +277,7 @@ export class Execution extends React.Component<IExecutionProps, IExecutionState>
     ));
 
     const executionMarkerWidth = `${100 / execution.stageSummaries.length}%`;
-    const showExecutionName = !title && sortFilter.groupBy !== 'name';
+    const showExecutionName = standalone || (!title && sortFilter.groupBy !== 'name');
     const executionMarkers = execution.stageSummaries.map(stage => (
       <ExecutionMarker
         key={stage.refId}
@@ -283,26 +301,14 @@ export class Execution extends React.Component<IExecutionProps, IExecutionState>
     return (
       <div className={className} id={`execution-${execution.id}`}>
         <div className={`execution-overview group-by-${sortFilter.groupBy}`}>
-          {title && (
+          {(title || showExecutionName) && (
             <h4 className="execution-name">
-              {showAccountLabels && accountLabels}
+              {(showAccountLabels || showExecutionName) && accountLabels}
               {execution.fromTemplate && <i className="from-template fa fa-table" title="Pipeline from template" />}
-              {title}
+              {title || execution.name}
             </h4>
           )}
-          {showExecutionName && (
-            <h4 className="execution-name">
-              {accountLabels}
-              {execution.fromTemplate && <i className="from-template fa fa-table" title="Pipeline from template" />}
-              {execution.name}
-            </h4>
-          )}
-          <ExecutionStatus
-            execution={execution}
-            toggleDetails={this.toggleDetails}
-            showingDetails={showingDetails}
-            standalone={standalone}
-          />
+          <ExecutionStatus execution={execution} showingDetails={showingDetails} standalone={standalone} />
           <div className="execution-bar">
             <div className="stages">
               {executionMarkers}
@@ -379,7 +385,25 @@ export class Execution extends React.Component<IExecutionProps, IExecutionState>
               </Tooltip>
             )}
           </div>
+
+          <ParametersAndArtifacts
+            execution={execution}
+            expandParamsOnInit={standalone}
+            pipelineConfig={pipelineConfig}
+          />
+
+          {!standalone && (
+            <div className="execution-details-button">
+              <a className="clickable" onClick={this.handleToggleDetails}>
+                <span
+                  className={`small glyphicon ${showingDetails ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right'}`}
+                />
+                Execution Details
+              </a>
+            </div>
+          )}
         </div>
+
         {showingDetails && (
           <div className="execution-graph">
             <PipelineGraph execution={execution} onNodeClick={this.handleNodeClick} viewState={viewState} />

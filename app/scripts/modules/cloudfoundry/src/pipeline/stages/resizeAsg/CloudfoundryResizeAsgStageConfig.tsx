@@ -1,11 +1,10 @@
 import * as React from 'react';
+
+import { Observable, Subject } from 'rxjs';
+
 import {
   AccountService,
-  Application,
   IAccount,
-  ICapacity,
-  IPipeline,
-  IRegion,
   IStageConfigProps,
   NgReact,
   StageConstants,
@@ -14,134 +13,87 @@ import {
 
 import { AccountRegionClusterSelector } from 'cloudfoundry/presentation';
 
-export interface ICloudfoundryResizeAsgStageProps extends IStageConfigProps {
-  pipeline: IPipeline;
-}
-
 export interface ICloudfoundryResizeAsgStageConfigState {
   accounts: IAccount[];
-  action?: string;
-  application: Application;
-  capacity?: Partial<ICapacity>;
-  cloudProvider?: string;
-  cloudProviderType?: string;
-  credentials: string;
-  diskQuota?: number;
-  instanceCount?: number;
-  interestingHealthProviderNames?: string[];
-  memory?: number;
-  pipeline: IPipeline;
-  region?: string;
-  regions: IRegion[];
-  resizeLabel: string;
-  resizeMessage: string;
-  resizeType: any;
-  target?: string;
 }
 
 export class CloudfoundryResizeAsgStageConfig extends React.Component<
-  ICloudfoundryResizeAsgStageProps,
+  IStageConfigProps,
   ICloudfoundryResizeAsgStageConfigState
 > {
-  constructor(props: ICloudfoundryResizeAsgStageProps) {
+  private destroy$ = new Subject();
+
+  constructor(props: IStageConfigProps) {
     super(props);
+    const { stage } = props;
     let interestingHealthProviderNames;
     if (
-      props.stage.isNew &&
+      stage.isNew &&
       props.application.attributes.platformHealthOnlyShowOverride &&
       props.application.attributes.platformHealthOnly
     ) {
       interestingHealthProviderNames = ['Cloud Foundry'];
     }
-    props.stage.capacity = props.stage.capacity || {};
-    props.stage.capacity.desired = props.stage.capacity.desired || 1;
-    const initStage = {
+    const { capacity } = stage;
+    this.props.updateStageField({
       action: 'scale_exact',
-      capacity: props.stage.capacity,
+      capacity: capacity && capacity.desired ? capacity : { desired: 1, min: 1, max: 1 },
       cloudProvider: 'cloudfoundry',
-      cloudProviderType: props.stage.cloudProvider,
-      diskQuota: props.stage.diskQuota || 1024,
-      instanceCount: props.stage.instanceCount || 1,
+      diskQuota: stage.diskQuota || 1024,
       interestingHealthProviderNames: interestingHealthProviderNames,
-      memory: props.stage.memory || 1024,
-      target: props.stage.target,
-    };
-    Object.assign(props.stage, initStage);
+      memory: stage.memory || 1024,
+    });
 
-    this.state = {
-      accounts: [],
-      application: props.application,
-      credentials: props.stage.credentials,
-      pipeline: props.pipeline,
-      region: props.stage.region || '',
-      regions: [],
-      resizeLabel: 'Match capacity',
-      resizeMessage: 'Scaled capacity will match the numbers entered',
-      resizeType: 'exact',
-    };
-    Object.assign(this.state, initStage);
+    this.state = { accounts: [] };
   }
 
-  public componentDidMount = (): void => {
-    AccountService.listAccounts('cloudfoundry').then(accounts => {
-      this.setState({ accounts: accounts });
-      this.accountUpdated();
-    });
+  public componentDidMount(): void {
+    Observable.fromPromise(AccountService.listAccounts('cloudfoundry'))
+      .takeUntil(this.destroy$)
+      .subscribe(accounts => this.setState({ accounts }));
     this.props.stageFieldUpdated();
-  };
+  }
 
-  private accountUpdated = (): void => {
-    const { credentials } = this.props.stage;
-    if (credentials) {
-      AccountService.getRegionsForAccount(credentials).then(regions => {
-        this.setState({ regions: regions });
-      });
-    }
-  };
+  public componentWillUnmount(): void {
+    this.destroy$.next();
+  }
 
   private instanceCountUpdated = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const instanceCount = parseInt(event.target.value, 10);
-    this.setState({ instanceCount: instanceCount });
-    this.props.stage.capacity.desired = instanceCount;
-    this.props.stage.capacity.min = instanceCount;
-    this.props.stage.capacity.max = instanceCount;
-    this.props.stageFieldUpdated();
+    this.props.updateStageField({
+      capacity: {
+        desired: instanceCount,
+        min: instanceCount,
+        max: instanceCount,
+      },
+    });
   };
 
   private memoryUpdated = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    const memory = parseInt(event.target.value, 10);
-    this.setState({ memory: memory });
-    this.props.stage.memory = memory;
-    this.props.stageFieldUpdated();
+    this.props.updateStageField({ memory: parseInt(event.target.value, 10) });
   };
 
   private diskQuotaUpdated = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    const diskQuota = parseInt(event.target.value, 10);
-    this.setState({ diskQuota: diskQuota });
-    this.props.stage.diskQuota = diskQuota;
-    this.props.stageFieldUpdated();
+    this.props.updateStageField({ diskQuota: parseInt(event.target.value, 10) });
   };
 
   private targetUpdated = (target: string) => {
-    this.setState({ target: target });
-    this.props.stage.target = target;
-    this.props.stageFieldUpdated();
+    this.props.updateStageField({ target });
   };
 
-  private componentUpdate = (stage: any): void => {
-    this.props.stage.credentials = stage.credentials;
-    this.props.stage.regions = stage.regions;
-    this.props.stage.cluster = stage.cluster;
-    this.props.stageFieldUpdated();
+  private componentUpdated = (stage: any): void => {
+    this.props.updateStageField({
+      credentials: stage.credentials,
+      regions: stage.regions,
+      cluster: stage.cluster,
+    });
   };
 
   public render() {
-    const { accounts, application, pipeline, resizeLabel, resizeMessage } = this.state;
-    const { stage } = this.props;
-    const { capacity, target } = this.props.stage;
-    const diskQuota = this.props.stage.diskQuota;
+    const { accounts } = this.state;
+    const { application, pipeline, stage } = this.props;
+    const { capacity, diskQuota, memory, target } = stage;
     const instanceCount = capacity.desired;
-    const memory = this.props.stage.memory;
     const { TargetSelect } = NgReact;
     return (
       <div className="cloudfoundry-resize-asg-stage form-horizontal">
@@ -150,21 +102,21 @@ export class CloudfoundryResizeAsgStageConfig extends React.Component<
             accounts={accounts}
             application={application}
             cloudProvider={'cloudfoundry'}
-            onComponentUpdate={this.componentUpdate}
+            onComponentUpdate={this.componentUpdated}
             component={stage}
           />
         )}
         <StageConfigField label="Target">
-          <TargetSelect model={{ target: target }} options={StageConstants.TARGET_LIST} onChange={this.targetUpdated} />
+          <TargetSelect model={{ target }} options={StageConstants.TARGET_LIST} onChange={this.targetUpdated} />
         </StageConfigField>
         <div className="form-group">
           <span className="col-md-3 sm-label-right" />
           <div className="col-md-9">
             <div className="col-md-3 sm-label-left">Instances</div>
-            <div className="col-md-3 sm-label-left">Mem Mb</div>
-            <div className="col-md-3 sm-label-left">Disk Mb</div>
+            <div className="col-md-3 sm-label-left">Mem (MB)</div>
+            <div className="col-md-3 sm-label-left">Disk (MB)</div>
           </div>
-          <StageConfigField label={resizeLabel}>
+          <StageConfigField label="Match capacity">
             <div className="col-md-3">
               <input
                 type="number"
@@ -193,7 +145,7 @@ export class CloudfoundryResizeAsgStageConfig extends React.Component<
               />
             </div>
             <div className="col-md-9 col-md-offset-3">
-              <em className="subinput-note">{resizeMessage}</em>
+              <em className="subinput-note">Scaled capacity will match the numbers entered</em>
             </div>
           </StageConfigField>
         </div>

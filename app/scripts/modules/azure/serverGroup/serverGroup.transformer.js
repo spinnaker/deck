@@ -9,6 +9,30 @@ module.exports = angular
       return serverGroup;
     }
 
+    function parseCustomScriptsSettings(command, configuration) {
+      /*
+        At the first time this wizard pops up, the type of command.customScriptsSettings.fileUris is String. As for the following
+        occurrences of its pop up with this field unchanged, its type becomes an array. So here differentiate the two scenarios
+        to assign the correct value to model.
+      */
+      if (Array.isArray(command.customScriptsSettings.fileUris)) {
+        configuration.customScriptsSettings.fileUris = command.customScriptsSettings.fileUris;
+      } else {
+        var fileUrisTemp = command.customScriptsSettings.fileUris;
+        if (fileUrisTemp.includes(',')) {
+          configuration.customScriptsSettings.fileUris = fileUrisTemp.split(',');
+        } else if (fileUrisTemp.includes(';')) {
+          configuration.customScriptsSettings.fileUris = fileUrisTemp.split(';');
+        } else {
+          configuration.customScriptsSettings.fileUris = [fileUrisTemp];
+        }
+
+        configuration.customScriptsSettings.fileUris.forEach(function(v, index) {
+          configuration.customScriptsSettings.fileUris[index] = v.trim();
+        });
+      }
+    }
+
     function convertServerGroupCommandToDeployConfiguration(command) {
       var tempImage;
 
@@ -34,12 +58,21 @@ module.exports = angular
         application: command.application,
         stack: command.stack,
         strategy: command.strategy,
+        rollback: {
+          onFailure: command.rollback ? command.rollback.onFailure : null,
+        },
+        scaleDown: command.scaleDown,
+        maxRemainingAsgs: command.maxRemainingAsgs,
+        delayBeforeDisableSec: command.delayBeforeDisableSec,
+        delayBeforeScaleDownSec: command.delayBeforeScaleDownSec,
+        allowDeleteActive: command.strategy === 'redblack' ? true : null,
+        allowScaleDownActive: command.strategy === 'redblack' ? true : null,
         detail: command.freeFormDetails,
         freeFormDetails: command.freeFormDetails,
         account: command.credentials,
         selectedProvider: 'azure',
         vnet: command.vnet,
-        vnetResourceGroup: command.vnetResourceGroup,
+        vnetResourceGroup: command.selectedVnet.resourceGroup,
         subnet: command.subnet,
         capacity: {
           useSourceCapacity: false,
@@ -50,6 +83,7 @@ module.exports = angular
         region: command.region,
         securityGroupName: command.securityGroupName,
         loadBalancerName: command.loadBalancerName,
+        loadBalancerType: command.loadBalancerType,
         user: '[anonymous]',
         upgradePolicy: 'Manual',
         type: 'createServerGroup',
@@ -59,6 +93,7 @@ module.exports = angular
           tier: 'Standard',
           capacity: command.sku.capacity,
         },
+        instanceTags: command.instanceTags,
         viewState: command.viewState,
         osConfig: {
           customData: command.osConfig ? command.osConfig.customData : null,
@@ -67,6 +102,9 @@ module.exports = angular
           fileUris: null,
           commandToExecute: '',
         },
+        zonesEnabled: command.zonesEnabled,
+        zones: command.zonesEnabled ? command.zones : [],
+        enableInboundNAT: command.enableInboundNAT,
       };
 
       if (typeof command.stack !== 'undefined') {
@@ -82,27 +120,7 @@ module.exports = angular
           typeof command.customScriptsSettings.fileUris !== 'undefined' &&
           command.customScriptsSettings.fileUris != ''
         ) {
-          /*
-              At the first time this wizard pops up, the type of command.customScriptsSettings.fileUris is String. As for the following 
-              occurrences of its pop up with this field unchanged, its type becomes an array. So here differentiate the two scenarios
-              to assign the correct value to model.
-            */
-          if (Array.isArray(command.customScriptsSettings.fileUris)) {
-            configuration.customScriptsSettings.fileUris = command.customScriptsSettings.fileUris;
-          } else {
-            var fileUrisTemp = command.customScriptsSettings.fileUris;
-            if (fileUrisTemp.includes(',')) {
-              configuration.customScriptsSettings.fileUris = fileUrisTemp.split(',');
-            } else if (fileUrisTemp.includes(';')) {
-              configuration.customScriptsSettings.fileUris = fileUrisTemp.split(';');
-            } else {
-              configuration.customScriptsSettings.fileUris = [fileUrisTemp];
-            }
-
-            configuration.customScriptsSettings.fileUris.forEach(function(v, index) {
-              configuration.customScriptsSettings.fileUris[index] = v.trim();
-            });
-          }
+          parseCustomScriptsSettings(command, configuration);
         }
       }
 
@@ -122,5 +140,6 @@ module.exports = angular
     return {
       convertServerGroupCommandToDeployConfiguration: convertServerGroupCommandToDeployConfiguration,
       normalizeServerGroup: normalizeServerGroup,
+      parseCustomScriptsSettings: parseCustomScriptsSettings,
     };
   });

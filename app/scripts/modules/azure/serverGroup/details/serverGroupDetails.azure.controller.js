@@ -11,6 +11,8 @@ import {
   FirewallLabels,
 } from '@spinnaker/core';
 
+import { AzureRollbackServerGroupModal } from './rollback/RollbackServerGroupModal';
+
 require('../configure/serverGroup.configure.azure.module');
 
 module.exports = angular
@@ -224,6 +226,13 @@ module.exports = angular
           taskMonitorConfig: taskMonitor,
           submitMethod: submitMethod,
         });
+      };
+
+      this.rollbackServerGroup = () => {
+        var serverGroup = $scope.serverGroup;
+        const cluster = _.find(app.clusters, { name: serverGroup.cluster, account: serverGroup.account });
+        const disabledServerGroups = _.filter(cluster.serverGroups, { isDisabled: true, region: serverGroup.region });
+        AzureRollbackServerGroupModal.show({ application: app, serverGroup, disabledServerGroups });
       };
 
       this.cloneServerGroup = serverGroup => {

@@ -3,6 +3,12 @@ import { ITrigger } from './ITrigger';
 import { IExpectedArtifact } from 'core/domain/IExpectedArtifact';
 import { IEntityTags } from './IEntityTags';
 
+interface INotification {
+  type: string;
+  address: string;
+  when: string[];
+}
+
 export interface IPipeline {
   application: string;
   description?: string;
@@ -15,6 +21,7 @@ export interface IPipeline {
   locked?: boolean;
   limitConcurrent: boolean;
   name: string;
+  notifications?: INotification[];
   respectQuietPeriod?: boolean;
   schema?: string;
   stages: IStage[];
@@ -35,6 +42,7 @@ export interface IParameter {
   description: string;
   default: string;
   hasOptions: boolean;
+  pinned: boolean;
   options: IParameterOption[];
   condition?: IParameterCondition;
 }
@@ -55,10 +63,12 @@ export interface IPipelineCommand {
   pipeline: IPipeline;
   trigger: ITrigger;
   notificationEnabled: boolean;
-  notification: {
-    type: string;
-    address: string;
-    when: string[];
-  };
+  notification: INotification;
   pipelineName: string;
+}
+
+export interface IPipelineRef {
+  application: String;
+  name: String;
+  id?: String;
 }

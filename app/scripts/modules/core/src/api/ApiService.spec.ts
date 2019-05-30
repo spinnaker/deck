@@ -11,13 +11,46 @@ describe('API Service', function() {
   beforeEach(
     mock.inject(function(_$httpBackend_: ng.IHttpBackendService) {
       $httpBackend = _$httpBackend_;
-      baseUrl = SETTINGS.gateUrl;
+      baseUrl = API.baseUrl;
     }),
   );
 
   afterEach(function() {
+    SETTINGS.resetToOriginal();
     $httpBackend.verifyNoOutstandingExpectation();
     $httpBackend.verifyNoOutstandingRequest();
+  });
+
+  describe('ensure api requests generate normalized urls', function() {
+    let expected: ng.IRequestConfig;
+    beforeEach(() => {
+      expected = {
+        method: '',
+        url: '',
+      };
+    });
+
+    it('trims leading slashes from urls', function() {
+      const result = API.one('/foo');
+      expected.url = `${baseUrl}/foo`;
+      expect(result.config).toEqual(expected);
+    });
+
+    it('trims repeated leading slashes from urls', function() {
+      const result = API.one('/////foo');
+      expected.url = `${baseUrl}/foo`;
+      expect(result.config).toEqual(expected);
+    });
+
+    it('trims trailing slashes from baseUrl', function() {
+      SETTINGS.gateUrl = 'http://localhost/';
+      expect(API.baseUrl).toEqual('http://localhost');
+    });
+
+    it('trims repeated trailing slashes from baseUrl', function() {
+      SETTINGS.gateUrl = 'http://localhost/////';
+      expect(API.baseUrl).toEqual('http://localhost');
+    });
   });
 
   describe('validate response content-type header', function() {
@@ -35,6 +68,22 @@ describe('API Service', function() {
       $httpBackend.flush();
       expect((AuthenticationInitializer.reauthenticateUser as Spy).calls.count()).toBe(1);
       expect(rejected).toBe(true);
+    });
+
+    it('application/foo+json is fine', () => {
+      spyOn(AuthenticationInitializer, 'reauthenticateUser').and.callFake(noop);
+      $httpBackend
+        .expectGET(`${baseUrl}/bad`)
+        .respond(200, '{"good":"job"}', { 'content-type': 'application/foo+json' });
+
+      let rejected = false;
+      API.one('bad')
+        .get()
+        .then(noop, () => (rejected = true));
+
+      $httpBackend.flush();
+      expect((AuthenticationInitializer.reauthenticateUser as Spy).calls.count()).toBe(0);
+      expect(rejected).toBe(false);
     });
 
     it('string responses starting with <html should trigger a reauthentication request and reject', function() {

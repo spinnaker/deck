@@ -1,5 +1,5 @@
 <page-navigator scrollable-container="[ui-view]">
-  <page-section key="concurrent" label="Concurrent Executions" visible="!pipeline.strategy">
+  <page-section key="concurrent" label="Execution Options" visible="!pipeline.strategy">
     <div class="row">
       <div class="col-md-11 col-md-offset-1">
         <div class="checkbox">
@@ -102,7 +102,15 @@
     </div>
   </page-section>
   <page-section key="parameters" label="Parameters" no-wrapper="true" badge="pipeline.parameterConfig.length">
-    <parameters pipeline="pipeline"></parameters>
+    <parameters
+      add-parameter="addParameter"
+      parameters="pipeline.parameterConfig"
+      pipeline-name="pipeline.name"
+      remove-parameter="removeParameter"
+      update-parameter="updateParameter"
+      update-all-parameters="updateAllParameters"
+    >
+    </parameters>
   </page-section>
   <page-section
     key="notifications"

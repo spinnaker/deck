@@ -18,8 +18,8 @@ var defaultStorageAccountName = '{%canary.defaultStorageAccount%}';
 var displayTimestampsInUserLocalTime = '{%features.displayTimestampsInUserLocalTime%}' === 'true';
 var entityTagsEnabled = false;
 var fiatEnabled = '{%features.fiat%}' === 'true';
-var gremlinEnabled = '{%features.gremlinEnabled%}' === 'true';
-var iapRefresherEnabled = '{%features.iapRefresherEnabled}' === 'true';
+var gremlinEnabled = '{%features.gremlin%}' === 'true';
+var iapRefresherEnabled = '{%features.iapRefresherEnabled%}' === 'true';
 var infrastructureStagesEnabled = '{%features.infrastructureStages%}' === 'true';
 var managedPipelineTemplatesV2UIEnabled = '{%features.managedPipelineTemplatesV2UI%}' === 'true';
 var jobsEnabled = '{%features.jobs%}' === 'true';
@@ -102,12 +102,6 @@ var kubernetes = {
     proxy: '{%kubernetes.default.proxy%}',
   },
 };
-var openstack = {
-  defaults: {
-    account: '{%openstack.default.account%}',
-    region: '{%openstack.default.region%}',
-  },
-};
 var oracle = {
   defaults: {
     account: '{%oracle.default.account%}',
@@ -148,7 +142,6 @@ window.spinnakerSettings = {
     'ecs',
     'gce',
     'kubernetes',
-    'openstack',
     'oracle',
     'titus',
   ],
@@ -178,6 +171,9 @@ window.spinnakerSettings = {
   gateUrl: gateHost,
   gitSources: ['bitbucket', 'gitlab', 'github', 'stash'],
   maxPipelineAgeDays: maxPipelineAgeDays,
+  newApplicationDefaults: {
+    chaosMonkey: false,
+  },
   notifications: {
     bearychat: {
       enabled: true,
@@ -189,10 +185,6 @@ window.spinnakerSettings = {
       enabled: true,
     },
     googlechat: {
-      enabled: true,
-    },
-    hipchat: {
-      botName: 'Skynet T-800',
       enabled: true,
     },
     pubsub: {
@@ -215,7 +207,6 @@ window.spinnakerSettings = {
     ecs: ecs,
     gce: gce,
     kubernetes: kubernetes,
-    openstack: openstack,
     oracle: oracle,
     titus: {
       defaults: {
@@ -226,6 +217,18 @@ window.spinnakerSettings = {
     },
   },
   pubsubProviders: ['google'], // TODO(joonlim): Add amazon once it is confirmed that amazon pub/sub works.
-  triggerTypes: ['cron', 'docker', 'git', 'jenkins', 'pipeline', 'pubsub', 'travis', 'webhook', 'wercker'],
+  triggerTypes: [
+    'artifactory',
+    'concourse',
+    'cron',
+    'docker',
+    'git',
+    'jenkins',
+    'pipeline',
+    'pubsub',
+    'travis',
+    'webhook',
+    'wercker',
+  ],
   version: version,
 };

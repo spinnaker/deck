@@ -32,7 +32,6 @@
 .sp-formGroup {
   border: 1px solid var(--color-titanium);
   border-radius: 8px;
-  overflow: hidden;
   box-shadow: 0 2px 0 0 var(--color-titanium);
   max-width: @form-max-width;
   margin-bottom: 16px;
@@ -41,32 +40,37 @@
 
 .sp-formItem {
   font-size: 14px;
-  padding: 0 8px 8px 8px;
+  padding: 0 0 8px 16px;
   max-width: @form-max-width;
 
   @media only screen and (min-width: @desktop) {
     display: flex;
   }
 
-  &.groupHeader {
-    background-color: rgba(0, 0, 0, 0.025);
-    border-bottom: 1px dotted var(--color-concrete);
-    padding-bottom: 0;
-    margin-bottom: 7px;
-    padding-top: 8px;
+  .help-contents {
+    font-style: italic;
   }
 }
+
+.groupHeader {
+  background-color: rgba(0, 0, 0, 0.025);
+  border-bottom: 1px dotted var(--color-concrete);
+  padding-bottom: 0;
+  margin-bottom: 7px;
+  padding-top: 8px;
+}
+
 .sp-formItem__left {
   display: flex;
 
   @media only screen and (min-width: @desktop) {
-    flex: 0 0 23%;
+    flex: 0 0 32%;
   }
 }
 .sp-formItem__right {
   @media only screen and (min-width: @desktop) {
-    flex: 0 0 58%;
-    margin-left: 14px;
+    flex: 0 0 68%;
+    padding: 0 14px;
   }
 }
 
@@ -75,14 +79,13 @@
   margin-left: 8px;
   margin-bottom: 4px;
   flex: 1 1 100%;
-  font-weight: 600;
   font-size: 13px;
   font-weight: 700;
 
   @media only screen and (min-width: @desktop) {
     align-self: flex-start;
     text-align: right;
-    margin: 6px 16px 8px 0;
+    margin: 6px 0 8px 0;
   }
 
   .optional {

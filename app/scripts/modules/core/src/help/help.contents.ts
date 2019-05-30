@@ -253,6 +253,8 @@ const helpContents: { [key: string]: string } = {
       <p>For example, if the user selects "rollback" from this list of options, that branch can be activated by using the expression:
         <samp class="small">execution.stages[n].context.judgmentInput=="rollback"</samp></p>`,
   'pipeline.config.bake.manifest.expectedArtifact': '<p>This is the template you want to render.</p>',
+  'pipeline.config.bake.manifest.overrideExpressionEvaluation':
+    '<p>Explicitly evaluate SpEL expressions in overrides just prior to manifest baking. Can be paired with the "Skip SpEL evaluation" option in the Deploy Manifest stage when baking a third-party manifest artifact with expressions not meant for Spinnaker to evaluate as SpEL.</p>',
   'pipeline.config.haltPipelineOnFailure':
     'Immediately halts execution of all running stages and fails the entire execution.',
   'pipeline.config.haltBranchOnFailure':
@@ -427,6 +429,8 @@ const helpContents: { [key: string]: string } = {
   'pipeline.config.parameter.label': '(Optional): a label to display when users are triggering the pipeline manually',
   'pipeline.config.parameter.description': `(Optional): if supplied, will be displayed to users as a tooltip
       when triggering the pipeline manually. You can include HTML in this field.`,
+  'pipeline.config.parameter.pinned': `(Optional): if checked, this parameter will be always shown in a pipeline execution view, otherwise it'll be collapsed by default.`,
+  'pipeline.config.parameter.pinAll': `(Optional): if checked, all parameters will be shown in a pipeline execution view.`,
   'pipeline.config.failOnFailedExpressions': `When this option is enabled, the stage will be marked as failed if it contains any failed expressions`,
   'pipeline.config.roles.help': `
     <p> When the pipeline is triggered using an automated trigger, these roles will be used to decide if the pipeline has permissions to access a protected application or account.</p>

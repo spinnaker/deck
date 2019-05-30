@@ -5,11 +5,15 @@ const angular = require('angular');
 import { NameUtils } from '@spinnaker/core';
 
 module.exports = angular
-  .module('spinnaker.azure.serverGroupCommandBuilder.service', [require('../../image/image.reader').name])
+  .module('spinnaker.azure.serverGroupCommandBuilder.service', [
+    require('../../image/image.reader').name,
+    require('../serverGroup.transformer').name,
+  ])
   .factory('azureServerGroupCommandBuilder', [
     '$q',
     'azureImageReader',
-    function($q, azureImageReader) {
+    'azureServerGroupTransformer',
+    function($q, azureImageReader, azureServerGroupTransformer) {
       function buildNewServerGroupCommand(application, defaults) {
         defaults = defaults || {};
 
@@ -34,6 +38,9 @@ module.exports = angular
               sku: {
                 capacity: 1,
               },
+              zonesEnabled: false,
+              zones: [],
+              instanceTags: {},
               selectedProvider: 'azure',
               viewState: {
                 instanceProfile: 'custom',
@@ -47,6 +54,7 @@ module.exports = angular
                 networkSettingsConfigured: false,
                 securityGroupsConfigured: false,
               },
+              enableInboundNAT: false,
             };
           });
       }
@@ -73,13 +81,18 @@ module.exports = angular
           credentials: serverGroup.account,
           loadBalancers: serverGroup.loadBalancers,
           selectedSubnets: serverGroup.selectedVnetSubnets,
+          selectedVnet: serverGroup.selectedVnet,
           securityGroups: serverGroup.securityGroups,
-          loadBalancerName: serverGroup.appGatewayName,
+          loadBalancerName: serverGroup.loadBalancerName,
+          loadBalancerType: serverGroup.loadBalancerType,
           securityGroupName: serverGroup.securityGroupName,
           region: serverGroup.region,
           vnet: serverGroup.vnet,
           vnetResourceGroup: serverGroup.vnetResourceGroup,
           subnet: serverGroup.subnet,
+          zones: serverGroup.zones,
+          zonesEnabled: serverGroup.zones && serverGroup.zones.length > 0,
+          instanceTags: {},
           sku: serverGroup.sku,
           capacity: {
             min: serverGroup.capacity.min,
@@ -87,6 +100,7 @@ module.exports = angular
             desired: serverGroup.capacity.desired,
           },
           tags: [],
+          instanceType: serverGroup.sku.name,
           selectedProvider: 'azure',
           source: {
             account: serverGroup.account,
@@ -103,7 +117,19 @@ module.exports = angular
             mode: mode,
             disableStrategySelection: true,
           },
+          enableInboundNAT: serverGroup.enableInboundNAT,
         };
+
+        if (typeof serverGroup.customScriptsSettings !== 'undefined') {
+          command.customScriptsSettings = {};
+          command.customScriptsSettings.commandToExecute = serverGroup.customScriptsSettings.commandToExecute;
+          if (
+            typeof serverGroup.customScriptsSettings.fileUris !== 'undefined' &&
+            serverGroup.customScriptsSettings.fileUris != ''
+          ) {
+            azureServerGroupTransformer.parseCustomScriptsSettings(serverGroup, command);
+          }
+        }
 
         return $q.when(command);
       }

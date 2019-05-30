@@ -3,7 +3,7 @@
 const angular = require('angular');
 const _ = require('lodash');
 
-import { AccountService, FirewallLabels, InfrastructureCaches, NetworkReader, TaskMonitor } from '@spinnaker/core';
+import { AccountService, FirewallLabels, NetworkReader, TaskMonitor } from '@spinnaker/core';
 
 module.exports = angular
   .module('spinnaker.azure.securityGroup.create.controller', [
@@ -24,6 +24,8 @@ module.exports = angular
         location: require('./createSecurityGroupProperties.html'),
         ingress: require('./createSecurityGroupIngress.html'),
       };
+
+      $scope.regions = [];
 
       $scope.firewallLabel = FirewallLabels.get('Firewall');
 
@@ -100,8 +102,6 @@ module.exports = angular
         $scope.securityGroup.vnetResourceGroup = null;
 
         ctrl.selectedVnets = [];
-
-        InfrastructureCaches.clearCache('networks');
 
         NetworkReader.listNetworks().then(function(vnets) {
           if (vnets.azure) {

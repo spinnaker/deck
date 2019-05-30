@@ -84,7 +84,7 @@ export class DockerImageAndTagSelector extends React.Component<
     const repositoryOptions =
       props.repository && props.repository.length ? [{ label: props.repository, value: props.repository }] : [];
     const tagOptions = props.tag && props.tag.length ? [{ label: props.tag, value: props.tag }] : [];
-
+    const parsedImageId = DockerImageUtils.splitImageId(props.imageId);
     const defineManually = Boolean(props.imageId && props.imageId.includes('${'));
 
     this.state = {
@@ -96,7 +96,7 @@ export class DockerImageAndTagSelector extends React.Component<
       repositoryOptions,
       defineManually,
       tagOptions,
-      lookupType: props.digest ? 'digest' : 'tag',
+      lookupType: props.digest || parsedImageId.digest ? 'digest' : 'tag',
     };
   }
 
@@ -291,7 +291,12 @@ export class DockerImageAndTagSelector extends React.Component<
       }
       newState.switchedManualWarning = `Could not find ${missingFields.join(' or ')}, switched to manual entry`;
     } else if (!imageId || !imageId.includes('${')) {
-      this.synchronizeChanges({ organization, repository, tag, digest: this.props.digest }, registry);
+      this.synchronizeChanges(
+        this.state.defineManually
+          ? DockerImageUtils.splitImageId(imageId)
+          : { organization, repository, tag, digest: this.props.digest },
+        registry,
+      );
     }
 
     this.setState(newState);
@@ -423,6 +428,8 @@ export class DockerImageAndTagSelector extends React.Component<
       defineManually,
       tagOptions,
     } = this.state;
+
+    const parsedImageId = DockerImageUtils.splitImageId(imageId);
 
     const manualInputToggle = (
       <div className="sp-formItem groupHeader">
@@ -654,7 +661,7 @@ export class DockerImageAndTagSelector extends React.Component<
             <input
               className="form-control input-sm"
               placeholder="sha256:abc123"
-              value={digest || ''}
+              value={digest || parsedImageId.digest || ''}
               onChange={e => this.valueChanged('digest', e.target.value)}
               required={true}
             />

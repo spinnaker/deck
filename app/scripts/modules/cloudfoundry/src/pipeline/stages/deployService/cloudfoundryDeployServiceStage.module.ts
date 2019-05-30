@@ -1,4 +1,5 @@
 import { get, upperFirst } from 'lodash';
+import { safeLoad } from 'js-yaml';
 
 import {
   ExecutionDetailsTasks,
@@ -20,11 +21,15 @@ interface IServiceFieldValidatorConfig extends IValidatorConfig {
 }
 
 const sourceType = (manifest: ICloudFoundryServiceManifestSource, userProvided: boolean) => {
-  if (manifest.direct) {
+  if (manifest && manifest.direct) {
     return userProvided ? 'userProvided' : 'direct';
   } else {
     return 'artifact';
   }
+};
+
+const sourceStruct = (manifest: ICloudFoundryServiceManifestSource) => {
+  return manifest && manifest.direct ? 'direct' : 'artifact';
 };
 
 PipelineConfigValidator.registerValidator(
@@ -39,7 +44,7 @@ PipelineConfigValidator.registerValidator(
       if (sourceType(serviceInput, get(stage, 'userProvided')) !== validationConfig.manifestSource) {
         return null;
       }
-      const manifestSource: any = get(serviceInput, validationConfig.manifestSource);
+      const manifestSource: any = get(serviceInput, sourceStruct(serviceInput));
       const content: any = get(manifestSource, validationConfig.fieldName);
       const fieldLabel = validationConfig.fieldLabel || upperFirst(validationConfig.fieldName);
       return content ? null : `<strong>${fieldLabel}</strong> is a required field for the Deploy Service stage.`;
@@ -48,29 +53,20 @@ PipelineConfigValidator.registerValidator(
 );
 
 PipelineConfigValidator.registerValidator(
-  'validDeployServiceParameterJson',
+  'validDeployServiceParameterJsonOrYaml',
   new class implements IStageOrTriggerValidator {
-    private validationMessage(validationConfig: IServiceFieldValidatorConfig): string {
-      return (
-        validationConfig.message ||
-        `<strong>${this.printableFieldLabel(validationConfig)}</strong> should be a valid JSON string.`
-      );
-    }
-
-    private printableFieldLabel(config: IServiceFieldValidatorConfig): string {
-      return upperFirst(config.fieldLabel || config.fieldName);
-    }
-
-    private fieldIsValid(stage: IStage | ITrigger, config: IServiceFieldValidatorConfig): boolean {
-      const serviceInput = get(stage, 'manifest');
-      const content: any = get(serviceInput, config.fieldName);
-
-      if (!content) {
-        return true;
-      }
-
+    private isJson(value: string): boolean {
       try {
-        JSON.parse(content);
+        JSON.parse(value);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    private isYaml(value: string): boolean {
+      try {
+        safeLoad(value);
         return true;
       } catch (e) {
         return false;
@@ -86,9 +82,14 @@ PipelineConfigValidator.registerValidator(
       if (sourceType(manifest, get(stage, 'userProvided')) !== validationConfig.manifestSource) {
         return null;
       }
+      const manifestSource: any = get(manifest, sourceStruct(manifest));
+      const fieldContent: any = get(manifestSource, validationConfig.fieldName);
 
-      if (!this.fieldIsValid(stage, validationConfig)) {
-        return this.validationMessage(validationConfig);
+      if (fieldContent) {
+        if (!this.isJson(fieldContent) && !this.isYaml(fieldContent)) {
+          const fieldLabel = upperFirst(validationConfig.fieldLabel || validationConfig.fieldName);
+          return validationConfig.message || `<strong>${fieldLabel}</strong> should be a valid JSON or YAML string.`;
+        }
       }
       return null;
     }
@@ -97,14 +98,14 @@ PipelineConfigValidator.registerValidator(
 
 Registry.pipeline.registerStage({
   accountExtractor: (stage: IStage) => stage.context.credentials,
-  configAccountExtractor: (stage: IStage) => [stage.credentials],
-  label: 'Deploy Service',
-  description: 'Deploys services using Open Service Broker and deploys user-provided services',
-  key: 'deployService',
   cloudProvider: 'cloudfoundry',
   component: CloudfoundryDeployServiceStageConfig,
-  executionDetailsSections: [CloudfoundryServiceExecutionDetails, ExecutionDetailsTasks],
+  configAccountExtractor: (stage: IStage) => [stage.credentials],
   defaultTimeoutMs: 30 * 60 * 1000,
+  description: 'Deploys services using Open Service Broker and deploys user-provided services',
+  executionDetailsSections: [CloudfoundryServiceExecutionDetails, ExecutionDetailsTasks],
+  key: 'deployService',
+  label: 'Deploy Service',
   validators: [
     { type: 'requiredField', fieldName: 'credentials', fieldLabel: 'account' },
     { type: 'requiredField', fieldName: 'region' },
@@ -129,7 +130,7 @@ Registry.pipeline.registerStage({
     {
       type: 'requiredDeployServiceField',
       manifestSource: 'artifact',
-      fieldName: 'account',
+      fieldName: 'artifactAccount',
       preventSave: true,
     } as IServiceFieldValidatorConfig,
     {
@@ -145,13 +146,13 @@ Registry.pipeline.registerStage({
       preventSave: true,
     } as IServiceFieldValidatorConfig,
     {
-      type: 'validDeployServiceParameterJson',
+      type: 'validDeployServiceParameterJsonOrYaml',
       manifestSource: 'direct',
       fieldName: 'parameters',
       preventSave: true,
     } as IServiceFieldValidatorConfig,
     {
-      type: 'validDeployServiceParameterJson',
+      type: 'validDeployServiceParameterJsonOrYaml',
       manifestSource: 'userProvided',
       fieldName: 'credentials',
       preventSave: true,

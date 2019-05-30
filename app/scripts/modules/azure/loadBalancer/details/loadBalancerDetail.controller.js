@@ -91,6 +91,17 @@ module.exports = angular
                 });
                 $scope.securityGroups = _.sortBy(securityGroups, 'name');
               }
+
+              if ($scope.loadBalancer.loadBalancerType && $scope.loadBalancer.loadBalancerType.includes('_')) {
+                const type = $scope.loadBalancer.loadBalancerType;
+                $scope.loadBalancer.loadBalancerType = type
+                  .split('_')
+                  .map(s => {
+                    let ss = s.toLowerCase();
+                    return ss.substring(0, 1).toUpperCase() + ss.substring(1);
+                  })
+                  .join(' ');
+              }
             }
           });
         }
@@ -126,6 +137,9 @@ module.exports = angular
             isNew: function() {
               return false;
             },
+            loadBalancerType: function() {
+              return { type: $scope.loadBalancer.loadBalancerType };
+            },
           },
         });
       };
@@ -143,6 +157,7 @@ module.exports = angular
         const command = {
           cloudProvider: 'azure',
           loadBalancerName: $scope.loadBalancer.name,
+          loadBalancerType: $scope.loadBalancer.loadBalancerType,
           credentials: $scope.loadBalancer.account,
           region: loadBalancer.region,
           appName: app.name,

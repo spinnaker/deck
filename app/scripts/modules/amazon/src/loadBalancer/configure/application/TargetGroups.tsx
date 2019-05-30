@@ -10,6 +10,8 @@ import {
   SpInput,
   ValidationMessage,
   spelNumberCheck,
+  Validators,
+  robotToHuman,
 } from '@spinnaker/core';
 
 import { IAmazonApplicationLoadBalancer, IAmazonApplicationLoadBalancerUpsertCommand } from 'amazon/domain';
@@ -40,6 +42,18 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
       existingTargetGroupNames: {},
       oldTargetGroupCount,
     };
+  }
+
+  private checkBetween(errors: any, object: any, fieldName: string, min: number, max: number) {
+    const field = object[fieldName];
+    if (!Number.isNaN(field)) {
+      const error =
+        Validators.minValue(min)(field, robotToHuman(fieldName)) ||
+        Validators.maxValue(max)(field, robotToHuman(fieldName));
+      if (error) {
+        errors[fieldName] = error;
+      }
+    }
   }
 
   public validate(
@@ -78,6 +92,11 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
           tgErrors[key] = err;
         }
       });
+
+      this.checkBetween(tgErrors, targetGroup, 'healthCheckTimeout', 2, 60);
+      this.checkBetween(tgErrors, targetGroup, 'healthCheckInterval', 5, 300);
+      this.checkBetween(tgErrors, targetGroup, 'healthyThreshold', 2, 10);
+      this.checkBetween(tgErrors, targetGroup, 'unhealthyThreshold', 2, 10);
 
       if (targetGroup.healthCheckPort !== 'traffic-port') {
         const err = spelNumberCheck(targetGroup.healthCheckPort);
@@ -126,7 +145,7 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
       .takeUntil(this.destroy$)
       .subscribe(() => {
         app.getDataSource('loadBalancers').data.forEach((lb: IAmazonApplicationLoadBalancer) => {
-          if (lb.loadBalancerType === 'application') {
+          if (lb.loadBalancerType !== 'classic') {
             if (!loadBalancer || lb.name !== loadBalancer.name) {
               lb.targetGroups.forEach(targetGroup => {
                 targetGroupsByAccountAndRegion[lb.account] = targetGroupsByAccountAndRegion[lb.account] || {};

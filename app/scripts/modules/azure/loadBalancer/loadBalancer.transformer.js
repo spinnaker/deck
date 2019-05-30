@@ -68,7 +68,7 @@ module.exports = angular
 
       function constructNewLoadBalancerTemplate(application) {
         var defaultCredentials = application.defaultCredentials.azure || AzureProviderSettings.defaults.account,
-          defaultRegion = application.defaultRegion || AzureProviderSettings.defaults.region;
+          defaultRegion = application.defaultRegions.azure || AzureProviderSettings.defaults.region;
         return {
           stack: '',
           detail: 'frontend',
@@ -81,7 +81,7 @@ module.exports = angular
             {
               probeName: '',
               probeProtocol: 'HTTP',
-              probePort: 'www.bing.com',
+              probePort: '80',
               probePath: '/',
               probeInterval: 30,
               unhealthyThreshold: 8,

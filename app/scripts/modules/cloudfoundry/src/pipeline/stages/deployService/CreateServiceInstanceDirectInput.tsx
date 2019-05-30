@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { Option } from 'react-select';
+import { Observable, Subject } from 'rxjs';
 
 import {
   IService,
@@ -30,6 +31,7 @@ export class CreateServiceInstanceDirectInput extends React.Component<
   ICreateServiceInstanceDirectInputProps,
   ICreateServiceInstanceDirectInputState
 > {
+  private destroy$ = new Subject();
   constructor(props: ICreateServiceInstanceDirectInputProps) {
     super(props);
     this.state = { serviceNamesAndPlans: [] };
@@ -42,15 +44,19 @@ export class CreateServiceInstanceDirectInput extends React.Component<
     }
   }
 
-  public componentDidMount = () => {
+  public componentDidMount(): void {
     this.loadServices(this.props.credentials, this.props.region);
-  };
+  }
+
+  public componentWillUnmount(): void {
+    this.destroy$.next();
+  }
 
   private loadServices(credentials: string, region: string) {
     if (credentials && region) {
-      ServicesReader.getServices(credentials, region).then(serviceNamesAndPlans => {
-        this.setState({ serviceNamesAndPlans });
-      });
+      Observable.fromPromise(ServicesReader.getServices(credentials, region))
+        .takeUntil(this.destroy$)
+        .subscribe(serviceNamesAndPlans => this.setState({ serviceNamesAndPlans }));
     }
   }
 
@@ -90,6 +96,13 @@ export class CreateServiceInstanceDirectInput extends React.Component<
     });
   };
 
+  private updatableUpdated = (event: React.ChangeEvent<HTMLInputElement>) => {
+    this.props.onServiceChanged({
+      ...this.props.service,
+      updatable: event.target.checked,
+    });
+  };
+
   public render() {
     const { service } = this.props;
     const services = this.state.serviceNamesAndPlans.map(item => item.name);
@@ -126,6 +139,15 @@ export class CreateServiceInstanceDirectInput extends React.Component<
         </StageConfigField>
         <StageConfigField label="Parameters">
           <TextAreaInput className="form-control" onChange={this.parametersUpdated} value={service.parameters || ''} />
+        </StageConfigField>
+        <StageConfigField label="Updatable">
+          <input type="checkbox" checked={!!service.updatable} onChange={this.updatableUpdated} />
+          {!service.updatable && (
+            <div>
+              If a service instance with the name '{service.serviceInstanceName}' is already present then it will not be
+              updated, and the operation will succeed.
+            </div>
+          )}
         </StageConfigField>
       </div>
     );

@@ -1,5 +1,7 @@
 import * as React from 'react';
 
+import { Observable, Subject } from 'rxjs';
+
 import { get } from 'lodash';
 
 import {
@@ -20,6 +22,7 @@ export interface IFormikAccountRegionClusterSelectorProps {
   cloudProvider: string;
   clusterField?: string;
   componentName?: string;
+  credentialsField?: string;
   formik: FormikProps<ICloudFoundryCreateServerGroupCommand>;
 }
 
@@ -29,50 +32,68 @@ export interface IFormikAccountRegionClusterSelectorState {
   clusterField: string;
   clusters: string[];
   componentName: string;
+  credentialsField: string;
 }
 
 export class FormikAccountRegionClusterSelector extends React.Component<
   IFormikAccountRegionClusterSelectorProps,
   IFormikAccountRegionClusterSelectorState
 > {
+  private destroy$ = new Subject();
+
   constructor(props: IFormikAccountRegionClusterSelectorProps) {
     super(props);
+    const credentialsField = props.credentialsField || 'credentials';
     const clusterField = props.clusterField || 'cluster';
     this.state = {
       availableRegions: [],
       cloudProvider: props.cloudProvider,
-      clusterField: clusterField,
+      clusterField,
       clusters: [],
       componentName: props.componentName || '',
+      credentialsField,
     };
   }
 
   public componentDidMount(): void {
     const { componentName, formik } = this.props;
-    const credentials = get(formik.values, componentName ? `${componentName}.credentials` : 'credentials', undefined);
+    const { credentialsField } = this.state;
+    const credentials = get(
+      formik.values,
+      componentName ? `${componentName}.${credentialsField}` : `${credentialsField}`,
+      undefined,
+    );
     const region = get(formik.values, componentName ? `${componentName}.region` : 'region', undefined);
     this.setRegionList(credentials);
     this.setClusterList(credentials, [region]);
+  }
+
+  public componentWillUnmount(): void {
+    this.destroy$.next();
   }
 
   private setRegionList = (credentials: string): void => {
     const { application } = this.props;
     const accountFilter: IServerGroupFilter = (serverGroup: IServerGroup) =>
       serverGroup ? serverGroup.account === credentials : true;
-    application.ready().then(() => {
-      const availableRegions = AppListExtractor.getRegions([application], accountFilter);
-      availableRegions.sort();
-      this.setState({ availableRegions });
-    });
+    Observable.fromPromise(application.ready())
+      .takeUntil(this.destroy$)
+      .subscribe(() => {
+        const availableRegions = AppListExtractor.getRegions([application], accountFilter);
+        availableRegions.sort();
+        this.setState({ availableRegions });
+      });
   };
 
   private setClusterList = (credentials: string, regions: string[]): void => {
     const { application } = this.props;
-    application.ready().then(() => {
-      const clusterFilter = AppListExtractor.clusterFilterForCredentialsAndRegion(credentials, regions);
-      const clusters = AppListExtractor.getClusters([application], clusterFilter);
-      this.setState({ clusters });
-    });
+    Observable.fromPromise(application.ready())
+      .takeUntil(this.destroy$)
+      .subscribe(() => {
+        const clusterFilter = AppListExtractor.clusterFilterForCredentialsAndRegion(credentials, regions);
+        const clusters = AppListExtractor.getClusters([application], clusterFilter);
+        this.setState({ clusters });
+      });
   };
 
   public accountChanged = (credentials: string): void => {
@@ -82,18 +103,23 @@ export class FormikAccountRegionClusterSelector extends React.Component<
 
   public regionChanged = (region: string): void => {
     const { componentName, formik } = this.props;
-    const credentials = get(formik.values, componentName ? `${componentName}.credentials` : 'credentials', undefined);
+    const { credentialsField } = this.state;
+    const credentials = get(
+      formik.values,
+      componentName ? `${componentName}.${credentialsField}` : `${credentialsField}`,
+      undefined,
+    );
     this.setClusterList(credentials, [region]);
   };
 
   public render() {
     const { accounts } = this.props;
-    const { availableRegions, clusters, clusterField, componentName } = this.state;
+    const { credentialsField, availableRegions, clusters, clusterField, componentName } = this.state;
     return (
       <div className="col-md-9">
         <div className="sp-margin-m-bottom">
           <FormikFormField
-            name={componentName ? `${componentName}.credentials` : 'credentials'}
+            name={componentName ? `${componentName}.${credentialsField}` : `${credentialsField}`}
             label="Account"
             fastField={false}
             input={props => (

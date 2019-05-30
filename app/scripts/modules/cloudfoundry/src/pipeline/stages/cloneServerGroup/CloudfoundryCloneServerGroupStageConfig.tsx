@@ -1,62 +1,59 @@
 import * as React from 'react';
 
-import { IPipeline, IStageConfigProps, StageConstants } from '@spinnaker/core';
+import { IStageConfigProps, StageConstants } from '@spinnaker/core';
 
 import { CloudFoundryCreateServerGroupModal } from 'cloudfoundry/serverGroup/configure/wizard/CreateServerGroupModal';
-import { CloudFoundryReactInjector } from 'cloudfoundry/reactShims';
-
-export interface ICloudfoundryCloneServerGroupStageProps extends IStageConfigProps {
-  pipeline: IPipeline;
-}
+import { CloudFoundryServerGroupCommandBuilder } from 'cloudfoundry/serverGroup/configure';
 
 export interface ICloudfoundryCloneServerGroupStageConfigState {
   buttonText: string;
 }
 
 export class CloudfoundryCloneServerGroupStageConfig extends React.Component<
-  ICloudfoundryCloneServerGroupStageProps,
+  IStageConfigProps,
   ICloudfoundryCloneServerGroupStageConfigState
 > {
-  constructor(props: ICloudfoundryCloneServerGroupStageProps) {
+  constructor(props: IStageConfigProps) {
     super(props);
-    props.stage.cloudProvider = 'cloudfoundry';
-    props.stage.application = props.application.name;
+    this.props.updateStageField({
+      cloudProvider: 'cloudfoundry',
+      application: props.application.name,
+    });
     this.state = {
       buttonText: props.stage.destination ? 'Edit clone configuration' : 'Add clone configuration',
     };
   }
 
   private handleResult = (command: any) => {
-    this.props.stage.credentials = command.credentials;
-    this.props.stage.capacity = command.capacity;
-    this.props.stage.destination = command.destination;
-    this.props.stage.delayBeforeDisableSec = command.delayBeforeDisableSec;
-    this.props.stage.freeFormDetails = command.freeFormDetails;
-    this.props.stage.maxRemainingAsgs = command.maxRemainingAsgs;
-    this.props.stage.region = command.region;
-    this.props.stage.startApplication = command.startApplication;
-    this.props.stage.stack = command.stack;
-    this.props.stage.strategy = command.strategy;
-    this.props.stage.target = command.target;
-    this.props.stage.targetCluster = command.targetCluster;
-    this.props.stage.manifest = command.manifest;
+    this.props.updateStageField({
+      credentials: command.credentials,
+      capacity: command.capacity,
+      account: command.account,
+      delayBeforeDisableSec: command.delayBeforeDisableSec,
+      freeFormDetails: command.freeFormDetails,
+      maxRemainingAsgs: command.maxRemainingAsgs,
+      region: command.region,
+      startApplication: command.startApplication,
+      stack: command.stack,
+      strategy: command.strategy,
+      target: command.target,
+      targetCluster: command.targetCluster,
+      manifest: command.manifest,
+      source: command.source,
+    });
     this.setState({ buttonText: 'Edit clone configuration' });
-    this.props.stageFieldUpdated();
   };
 
   private addCluster = () => {
     const { application, stage, pipeline } = this.props;
     const title = 'Clone Cluster';
-    CloudFoundryReactInjector.cfServerGroupCommandBuilder
-      .buildCloneServerGroupCommandFromPipeline(stage, pipeline)
-      .then((command: any) => {
-        return CloudFoundryCreateServerGroupModal.show({
-          application,
-          command,
-          isSourceConstant: false,
-          title,
-        });
-      })
+    const command = CloudFoundryServerGroupCommandBuilder.buildCloneServerGroupCommandFromPipeline(stage, pipeline);
+    CloudFoundryCreateServerGroupModal.show({
+      application,
+      command,
+      isSourceConstant: false,
+      title,
+    })
       .then(this.handleResult)
       .catch(() => {});
   };
@@ -80,10 +77,10 @@ export class CloudfoundryCloneServerGroupStageConfig extends React.Component<
             </thead>
             <tbody>
               <tr>
-                <td>{stage.credentials}</td>
-                <td>{stage.region}</td>
-                <td>{stage.targetCluster}</td>
-                <td>{cloneTargets.filter(t => t.val === stage.target).map(t => t.label)}</td>
+                <td>{stage.source ? stage.source.account : ''}</td>
+                <td>{stage.source ? stage.source.region : ''}</td>
+                <td>{stage.source ? stage.source.clusterName : ''}</td>
+                <td>{stage.source ? cloneTargets.filter(t => t.val === stage.source.target).map(t => t.label) : ''}</td>
               </tr>
             </tbody>
           </table>
@@ -99,8 +96,8 @@ export class CloudfoundryCloneServerGroupStageConfig extends React.Component<
             </thead>
             <tbody>
               <tr>
-                <td>{stage.destination ? stage.destination.account : ''}</td>
-                <td>{stage.destination ? stage.destination.region : ''}</td>
+                <td>{stage.credentials}</td>
+                <td>{stage.region}</td>
               </tr>
             </tbody>
           </table>

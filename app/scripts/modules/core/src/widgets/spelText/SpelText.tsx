@@ -10,6 +10,7 @@ import { SpelAutocompleteService } from './SpelAutocompleteService';
 import { ExecutionService } from '../../pipeline/service/execution.service';
 import { StateService } from '@uirouter/core';
 import { IPipeline } from '../../domain';
+import { Observable, Subject } from 'rxjs';
 
 export interface ISpelTextProps {
   placeholder: string;
@@ -24,8 +25,13 @@ export interface ISpelTextState {
 }
 
 export class SpelText extends React.Component<ISpelTextProps, ISpelTextState> {
+  public static defaultProps: Partial<ISpelTextProps> = {
+    placeholder: '',
+  };
+
   private autocompleteService: SpelAutocompleteService;
-  private spelInputRef: any;
+  private readonly spelInputRef: any;
+  private destroy$ = new Subject();
 
   constructor(props: ISpelTextProps) {
     super(props);
@@ -34,30 +40,36 @@ export class SpelText extends React.Component<ISpelTextProps, ISpelTextState> {
       $q,
       new ExecutionService($http, $q, {} as StateService, $timeout),
     );
-    this.autocompleteService.addPipelineInfo(this.props.pipeline).then(textcompleteConfig => {
-      this.setState({ textcompleteConfig: textcompleteConfig });
-    });
+    Observable.fromPromise(this.autocompleteService.addPipelineInfo(this.props.pipeline))
+      .takeUntil(this.destroy$)
+      .subscribe(textcompleteConfig => {
+        this.setState({ textcompleteConfig: textcompleteConfig });
+      });
     this.spelInputRef = React.createRef();
+  }
+
+  public componentWillUnmount(): void {
+    this.destroy$.next();
   }
 
   public componentDidMount(): void {
     this.renderSuggestions();
   }
 
-  public componentDidUpdate() {
-    this.renderSuggestions();
+  public componentDidUpdate(_: Readonly<ISpelTextProps>, prevState: Readonly<ISpelTextState>): void {
+    if (prevState.textcompleteConfig !== this.state.textcompleteConfig) {
+      this.renderSuggestions();
+    }
   }
 
   private renderSuggestions() {
     const input = $(this.spelInputRef.current);
-    if (!input.attr('contenteditable')) {
-      input.attr('contenteditable', 'true');
-      input.textcomplete(this.state.textcompleteConfig, {
-        maxCount: 1000,
-        zIndex: 9000,
-        dropdownClassName: 'dropdown-menu textcomplete-dropdown spel-dropdown',
-      });
-    }
+    input.attr('contenteditable', 'true');
+    input.textcomplete(this.state.textcompleteConfig, {
+      maxCount: 1000,
+      zIndex: 9000,
+      dropdownClassName: 'dropdown-menu textcomplete-dropdown spel-dropdown',
+    });
   }
 
   public render() {

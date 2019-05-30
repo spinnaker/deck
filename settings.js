@@ -50,18 +50,7 @@ window.spinnakerSettings = {
   debugEnabled: debugEnabled,
   defaultCategory: 'serverGroup',
   defaultInstancePort: 80,
-  defaultProviders: [
-    'appengine',
-    'aws',
-    'azure',
-    'cloudfoundry',
-    'dcos',
-    'ecs',
-    'gce',
-    'kubernetes',
-    'openstack',
-    'oracle',
-  ],
+  defaultProviders: ['appengine', 'aws', 'azure', 'cloudfoundry', 'dcos', 'ecs', 'gce', 'kubernetes', 'oracle'],
   defaultTimeZone: process.env.TIMEZONE || 'America/Los_Angeles', // see http://momentjs.com/timezone/docs/#/data-utilities/
   feature: {
     artifacts: artifactsEnabled,
@@ -93,6 +82,9 @@ window.spinnakerSettings = {
   gateUrl: apiHost,
   gitSources: ['stash', 'github', 'bitbucket', 'gitlab'],
   maxPipelineAgeDays: 14,
+  newApplicationDefaults: {
+    chaosMonkey: false,
+  },
   notifications: {
     bearychat: {
       enabled: true,
@@ -104,10 +96,6 @@ window.spinnakerSettings = {
       enabled: true,
     },
     googlechat: {
-      enabled: true,
-    },
-    hipchat: {
-      botName: 'Skynet T-800',
       enabled: true,
     },
     pubsub: {
@@ -206,12 +194,6 @@ window.spinnakerSettings = {
         region: 'us-phoenix-1',
       },
     },
-    openstack: {
-      defaults: {
-        account: 'test',
-        region: 'us-west-1',
-      },
-    },
     titus: {
       defaults: {
         account: 'titustestvpc',
@@ -225,7 +207,19 @@ window.spinnakerSettings = {
   },
   pubsubProviders: ['google'], // TODO(joonlim): Add amazon once it is confirmed that amazon pub/sub works.
   searchVersion: 1,
-  triggerTypes: ['artifactory', 'cron', 'docker', 'git', 'jenkins', 'pipeline', 'pubsub', 'travis', 'wercker'],
+  triggerTypes: [
+    'artifactory',
+    'concourse',
+    'cron',
+    'docker',
+    'git',
+    'jenkins',
+    'pipeline',
+    'pubsub',
+    'travis',
+    'webhook',
+    'wercker',
+  ],
   useClassicFirewallLabels: useClassicFirewallLabels,
   whatsNew: {
     fileName: 'news.md',

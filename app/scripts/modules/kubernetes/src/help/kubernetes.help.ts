@@ -202,10 +202,18 @@ const helpContents: { [key: string]: string } = {
         <b>artifact:</b> The manifest is read from an artifact supplied/created upstream. The expected artifact must be referenced here, and will be bound at runtime.
       </p>
   `,
+  'kubernetes.manifest.rolloutStrategyOptions': `
+    <p>Allow Spinnaker to associate your workload with one or more Services and manage traffic based on your selected rollout strategy options. Valid for ReplicaSets only.</p>
+  `,
+  'kubernetes.manifest.rolloutStrategy': `
+    <p>The rollout strategy tells Spinnaker what to do with the previous version(s) of the ReplicaSet in the cluster.</p>
+  `,
   'kubernetes.manifest.expectedArtifact':
     'The artifact that is to be applied to the Kubernetes account for this stage.  The artifact should represent a valid Kubernetes manifest.',
   'kubernetes.manifest.requiredArtifactsToBind':
     'These artifacts must be present in the context for this stage to successfully complete. Artifacts specified will be <a href="https://www.spinnaker.io/reference/artifacts/in-kubernetes-v2/#binding-artifacts-in-manifests" target="_blank">bound to the deployed manifest.</a>',
+  'kubernetes.manifest.skipExpressionEvaluation':
+    '<p>Skip SpEL expression evaluation of the manifest artifact in this stage. Can be paired with the "Evaluate SpEL expressions in overrides at bake time" option in the Bake Manifest stage when baking a third-party manifest artifact with expressions not meant for Spinnaker to evaluate as SpEL.</p>',
   'kubernetes.manifest.undoRollout.revisionsBack': `
       <p>How many revisions to rollback from the current active revision. This is not a hard-coded revision to rollout.</p>
       <p>For example: If you specify "1", and this stage executes, the prior revision will be active upon success.</p>
@@ -217,6 +225,9 @@ const helpContents: { [key: string]: string } = {
     <p><b>json</b>: <a href="https://tools.ietf.org/html/rfc6902" target="_blank">JSON Patch, RFC 6902</a></p>
     <p><b>merge</b>: <a href="https://tools.ietf.org/html/rfc7386" target="_blank">JSON Merge Patch, RFC 7386</a></p>
   `,
+  'kubernetes.runJob.captureSource':
+    'Source from which to capture Job output. Captured output will be available in the pipeline context for use in downstream stages.',
+  'kubernetes.runJob.captureSource.containerName': `Use logs from this container to capture output data.`,
 };
 
 Object.keys(helpContents).forEach(key => HelpContentsRegistry.register(key, helpContents[key]));

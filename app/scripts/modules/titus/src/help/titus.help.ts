@@ -45,17 +45,6 @@ const helpContents: { [key: string]: string } = {
     'AWS Security Groups to assign to this service. Security groups are set only if <samp>Allocate IP?</samp> has been selected and are assigned to the Titus AWS Elastic Network Interface.',
   'titus.job.capacityGroup': 'Capacity Group will default to application name if not specified.',
   'titus.job.securityGroups': 'AWS Security Groups to assign to this job',
-  'titus.configBin.metrics': `
-      <p>Metrics must be forwarded from Atlas to Cloudwatch in order to use them in scaling policies. Metrics can be
-        forwarded via
-        the <a href="http://insight-docs.prod.netflix.net/atlas/autoscaling/#sending-custom-metrics" target="_blank">
-          Atlas Java Client
-        </a>, or via ConfigBin, which can be configured <a href="https://configbin.prod.netflix.net/app/cloudwatch-forwarding/type/clusters/LATEST" target="_blank">here</a>.
-      </p>
-      <p>Additional information on metrics below can be found
-        in <a href="http://insight-docs.prod.netflix.net/glossary/cgroup-system/" target="_blank">the documentation</a>.
-      </p>
-  `,
   'titus.autoscaling.cooldown': `
       <p>The amount of time, in seconds, after a scaling activity completes where previous trigger-related scaling
         activities can influence future scaling events.</p>
@@ -82,6 +71,15 @@ const helpContents: { [key: string]: string } = {
     <p>While the cooldown period is in effect, the capacity that has been added by the previous scale out event that
       initiated the cooldown is calculated as part of the desired capacity for the next scale out. The intention is to
       continuously (but not excessively) scale out.</p>
+  `,
+  'titus.disruptionbudget.description': `
+    <p>
+      The Job Disruption Budget is part of the job descriptor, and defines the behavior of how containers of the
+      job can be relocated.{' '}
+      <a href="http://manuals.test.netflix.net/view/titus-docs/mkdocs/master/disruption_budget/" target="_blank">
+        Read the full documentation
+      </a>
+    </p>
   `,
 };
 

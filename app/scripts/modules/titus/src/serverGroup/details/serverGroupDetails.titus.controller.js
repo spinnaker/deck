@@ -7,7 +7,6 @@ import {
   AccountService,
   ClusterTargetBuilder,
   CONFIRMATION_MODAL_SERVICE,
-  NameUtils,
   ServerGroupReader,
   ServerGroupWarningMessageService,
   SERVER_GROUP_WRITER,
@@ -16,10 +15,9 @@ import {
 
 import { TitusReactInjector } from 'titus/reactShims';
 
-import { SCALING_POLICY_MODULE } from './scalingPolicy/scalingPolicy.module';
+import { DISRUPTION_BUDGET_DETAILS_SECTION } from './disruptionBudget/DisruptionBudgetSection';
 
-import { configBinService } from './scalingPolicy/configBin/configBin.reader';
-import { CONFIG_BIN_LINK_COMPONENT } from './scalingPolicy/configBin/configBinLink.component';
+import { SCALING_POLICY_MODULE } from './scalingPolicy/scalingPolicy.module';
 
 import { TitusCloneServerGroupModal } from '../configure/wizard/TitusCloneServerGroupModal';
 import { TITUS_SECURITY_GROUPS_DETAILS } from './titusSecurityGroups.component';
@@ -28,8 +26,8 @@ module.exports = angular
   .module('spinnaker.serverGroup.details.titus.controller', [
     require('@uirouter/angularjs').default,
     require('../configure/ServerGroupCommandBuilder').name,
-    CONFIG_BIN_LINK_COMPONENT,
     CONFIRMATION_MODAL_SERVICE,
+    DISRUPTION_BUDGET_DETAILS_SECTION,
     SERVER_GROUP_WRITER,
     require('./resize/resizeServerGroup.controller').name,
     require('./rollback/rollbackServerGroup.controller').name,
@@ -124,18 +122,6 @@ module.exports = angular
         }, autoClose);
       }
 
-      $scope.addConfigBinData = () => {
-        const cluster = NameUtils.parseServerGroupName($scope.serverGroup.name).cluster;
-        configBinService
-          .getConfig(cluster)
-          .then(config => {
-            $scope.configBinData = config;
-          })
-          .catch(() => {
-            /* not found */
-          });
-      };
-
       function transformScalingPolicies(serverGroup) {
         serverGroup.scalingPolicies = (serverGroup.scalingPolicies || [])
           .map(p => {
@@ -199,7 +185,6 @@ module.exports = angular
 
       retrieveServerGroup()
         .then(() => {
-          $scope.addConfigBinData();
           // If the user navigates away from the view before the initial retrieveServerGroup call completes,
           // do not bother subscribing to the refresh
           if (!$scope.$$destroyed) {

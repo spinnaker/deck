@@ -1,4 +1,13 @@
-import { AccountService, Application, IHealth, IInstance, IServerGroup, IVpc, NameUtils } from '@spinnaker/core';
+import {
+  AccountService,
+  Application,
+  IHealth,
+  IInstance,
+  IServerGroup,
+  IVpc,
+  NameUtils,
+  SETTINGS,
+} from '@spinnaker/core';
 import { AWSProviderSettings } from 'amazon/aws.settings';
 import {
   IALBListenerCertificate,
@@ -16,7 +25,7 @@ import {
   ITargetGroup,
 } from 'amazon/domain';
 import { VpcReader } from 'amazon/vpc/VpcReader';
-import { IPromise, module } from 'angular';
+import { IPromise } from 'angular';
 import { chain, filter, flatten, map } from 'lodash';
 
 import { $q } from 'ngimport';
@@ -138,7 +147,7 @@ export class AwsLoadBalancerTransformer {
     });
   }
 
-  public normalizeActions(loadBalancer: IAmazonApplicationLoadBalancer) {
+  private normalizeActions(loadBalancer: IAmazonApplicationLoadBalancer) {
     if (loadBalancer.loadBalancerType === 'application') {
       const alb = loadBalancer as IAmazonApplicationLoadBalancer;
 
@@ -180,7 +189,7 @@ export class AwsLoadBalancerTransformer {
     );
   }
 
-  public convertClassicLoadBalancerForEditing(
+  public static convertClassicLoadBalancerForEditing(
     loadBalancer: IAmazonClassicLoadBalancer,
   ): IAmazonClassicLoadBalancerUpsertCommand {
     const toEdit: IAmazonClassicLoadBalancerUpsertCommand = {
@@ -261,7 +270,7 @@ export class AwsLoadBalancerTransformer {
     return toEdit;
   }
 
-  public convertApplicationLoadBalancerForEditing(
+  public static convertApplicationLoadBalancerForEditing(
     loadBalancer: IAmazonApplicationLoadBalancer,
   ): IAmazonApplicationLoadBalancerUpsertCommand {
     const applicationName = NameUtils.parseLoadBalancerName(loadBalancer.name).application;
@@ -367,7 +376,7 @@ export class AwsLoadBalancerTransformer {
     return toEdit;
   }
 
-  public convertNetworkLoadBalancerForEditing(
+  public static convertNetworkLoadBalancerForEditing(
     loadBalancer: IAmazonApplicationLoadBalancer,
   ): IAmazonNetworkLoadBalancerUpsertCommand {
     const applicationName = NameUtils.parseLoadBalancerName(loadBalancer.name).application;
@@ -467,7 +476,9 @@ export class AwsLoadBalancerTransformer {
     return toEdit;
   }
 
-  public constructNewClassicLoadBalancerTemplate(application: Application): IAmazonClassicLoadBalancerUpsertCommand {
+  public static constructNewClassicLoadBalancerTemplate(
+    application: Application,
+  ): IAmazonClassicLoadBalancerUpsertCommand {
     const defaultCredentials = application.defaultCredentials.aws || AWSProviderSettings.defaults.account,
       defaultRegion = application.defaultRegions.aws || AWSProviderSettings.defaults.region,
       defaultSubnetType = AWSProviderSettings.defaults.subnetType;
@@ -505,12 +516,13 @@ export class AwsLoadBalancerTransformer {
     };
   }
 
-  public constructNewApplicationLoadBalancerTemplate(
+  public static constructNewApplicationLoadBalancerTemplate(
     application: Application,
   ): IAmazonApplicationLoadBalancerUpsertCommand {
     const defaultCredentials = application.defaultCredentials.aws || AWSProviderSettings.defaults.account,
       defaultRegion = application.defaultRegions.aws || AWSProviderSettings.defaults.region,
       defaultSubnetType = AWSProviderSettings.defaults.subnetType,
+      defaultPort = application.attributes.instancePort || SETTINGS.defaultInstancePort,
       defaultTargetGroupName = `targetgroup`;
     return {
       name: '',
@@ -530,7 +542,7 @@ export class AwsLoadBalancerTransformer {
         {
           name: defaultTargetGroupName,
           protocol: 'HTTP',
-          port: 7001,
+          port: defaultPort,
           targetType: 'instance',
           healthCheckProtocol: 'HTTP',
           healthCheckPort: 'traffic-port',
@@ -566,7 +578,9 @@ export class AwsLoadBalancerTransformer {
     };
   }
 
-  public constructNewNetworkLoadBalancerTemplate(application: Application): IAmazonNetworkLoadBalancerUpsertCommand {
+  public static constructNewNetworkLoadBalancerTemplate(
+    application: Application,
+  ): IAmazonNetworkLoadBalancerUpsertCommand {
     const defaultCredentials = application.defaultCredentials.aws || AWSProviderSettings.defaults.account,
       defaultRegion = application.defaultRegions.aws || AWSProviderSettings.defaults.region,
       defaultSubnetType = AWSProviderSettings.defaults.subnetType,
@@ -621,6 +635,3 @@ export class AwsLoadBalancerTransformer {
     };
   }
 }
-
-export const AWS_LOAD_BALANCER_TRANSFORMER = 'spinnaker.amazon.loadBalancer.transformer';
-module(AWS_LOAD_BALANCER_TRANSFORMER, []).service('awsLoadBalancerTransformer', AwsLoadBalancerTransformer);

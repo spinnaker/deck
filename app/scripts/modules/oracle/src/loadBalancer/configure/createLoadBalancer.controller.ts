@@ -7,7 +7,6 @@ import { trimEnd } from 'lodash';
 import {
   AccountService,
   Application,
-  InfrastructureCaches,
   LoadBalancerWriter,
   NameUtils,
   NetworkReader,
@@ -274,7 +273,6 @@ export class OracleLoadBalancerController implements IController {
   }
 
   public loadVnets() {
-    InfrastructureCaches.clearCache('networks'); // TODO desagar previous code had this line. What does it do exactly? is it safe to clear?
     NetworkReader.listNetworksByProvider(this.oracle).then((vnets: INetwork[]) => {
       this.allVnets = vnets || [];
       if (this.$scope.loadBalancerCmd.region) {
@@ -498,5 +496,6 @@ export class OracleLoadBalancerController implements IController {
 export const ORACLE_LOAD_BALANCER_CREATE_CONTROLLER = 'spinnaker.oracle.loadBalancer.create.controller';
 module(ORACLE_LOAD_BALANCER_CREATE_CONTROLLER, [
   require('angular-ui-bootstrap'),
+  require('@uirouter/angularjs').default,
   ORACLE_LOAD_BALANCER_TRANSFORMER,
 ]).controller('oracleCreateLoadBalancerCtrl', OracleLoadBalancerController);

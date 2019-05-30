@@ -84,6 +84,7 @@ module.exports = angular
 
         var command = {
           application: application.name,
+          disruptionBudget: serverGroup.disruptionBudget,
           strategy: '',
           stack: serverGroupName.stack,
           freeFormDetails: serverGroupName.freeFormDetails,
@@ -145,7 +146,12 @@ module.exports = angular
         }
 
         if (mode !== 'editPipeline') {
-          command.imageId = serverGroup.image.dockerImageName + ':' + serverGroup.image.dockerImageVersion;
+          command.imageId =
+            serverGroup.image.dockerImageName +
+            ':' +
+            (serverGroup.image.dockerImageVersion
+              ? serverGroup.image.dockerImageVersion
+              : serverGroup.image.dockerImageDigest);
         }
 
         return $q.when(command);

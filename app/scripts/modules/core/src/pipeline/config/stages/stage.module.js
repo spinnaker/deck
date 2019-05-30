@@ -8,6 +8,7 @@ import { defaultsDeep, extend } from 'lodash';
 import { AccountService } from 'core/account/AccountService';
 import { API } from 'core/api';
 import { BASE_EXECUTION_DETAILS_CTRL } from './common/baseExecutionDetails.controller';
+import { SETTINGS } from 'core/config';
 import { CONFIRMATION_MODAL_SERVICE } from 'core/confirmationModal/confirmationModal.service';
 import { STAGE_NAME } from './StageName';
 import { PipelineConfigService } from 'core/pipeline/config/services/PipelineConfigService';
@@ -127,6 +128,8 @@ module.exports = angular
         });
       };
 
+      this.checkFeatureFlag = flag => !!SETTINGS.feature[flag];
+
       this.editStageJson = () => {
         const modalProps = { dialogClassName: 'modal-lg modal-fullscreen' };
         ReactModal.show(EditStageJsonModal, { stage: $scope.stage }, modalProps)
@@ -213,6 +216,11 @@ module.exports = angular
               updateStageField: changes => {
                 extend($scope.stage, changes);
                 $scope.stageFieldUpdated();
+              },
+              // Added to enable inline artifact editing from React stages
+              // todo(mneterval): remove after pre-rewrite artifacts are deprecated
+              updatePipeline: changes => {
+                extend($scope.$parent.pipeline, changes);
               },
               pipeline: $scope.pipeline,
               stage: $scope.stage,

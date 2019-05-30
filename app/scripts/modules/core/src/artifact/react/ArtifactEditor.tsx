@@ -24,12 +24,28 @@ export class ArtifactEditor extends React.Component<IArtifactEditorProps> {
     // reset artifact fields if the account type has changed, so we don't leave dangling properties
     // that are not modifiable using the new artifact account type's form.
     const artifact: IArtifact =
-      this.props.artifact && artifactAccount.types.includes(this.props.artifact.type)
+      this.props.artifact && (!this.props.artifact.type || artifactAccount.types.includes(this.props.artifact.type))
         ? cloneDeep(this.props.artifact)
         : { id: UUIDGenerator.generateUuid() };
     artifact.artifactAccount = artifactAccount.name;
+    artifact.type = artifactAccount.types && artifactAccount.types.length > 0 ? artifactAccount.types[0] : '';
     this.props.onArtifactEdit(artifact);
   };
+
+  private defaultArtifactAccountIfNecessary(): void {
+    const { artifact, artifactAccounts } = this.props;
+    if (!artifact.artifactAccount && artifactAccounts.length > 0) {
+      this.onArtifactAccountChanged(artifactAccounts[0]);
+    }
+  }
+
+  public componentDidMount(): void {
+    this.defaultArtifactAccountIfNecessary();
+  }
+
+  public componentDidUpdate(): void {
+    this.defaultArtifactAccountIfNecessary();
+  }
 
   public render(): React.ReactNode {
     const { pipeline, artifact, artifactAccounts, onArtifactEdit, isDefault } = this.props;

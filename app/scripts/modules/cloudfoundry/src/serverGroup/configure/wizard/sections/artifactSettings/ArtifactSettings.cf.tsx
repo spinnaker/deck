@@ -13,6 +13,7 @@ import {
 } from '@spinnaker/core';
 
 import { ICloudFoundryCreateServerGroupCommand } from 'cloudfoundry/serverGroup/configure/serverGroupConfigurationModel.cf';
+import { FormikConfigField } from 'cloudfoundry/presentation';
 
 export interface ICloudFoundryCreateServerGroupArtifactSettingsProps {
   formik: FormikProps<ICloudFoundryCreateServerGroupCommand>;
@@ -42,7 +43,19 @@ export class CloudFoundryServerGroupArtifactSettings
   };
 
   public validate(_values: ICloudFoundryCreateServerGroupCommand) {
-    return {};
+    const { applicationArtifact } = this.props.formik.values;
+    const errors = {} as any;
+    if (
+      !applicationArtifact ||
+      !(
+        (applicationArtifact.artifact && applicationArtifact.artifact.type && applicationArtifact.artifact.reference) ||
+        applicationArtifact.artifactId
+      )
+    ) {
+      errors.applicationArtifact = 'Application artifact information is required';
+    }
+
+    return errors;
   }
 
   public render() {
@@ -52,7 +65,6 @@ export class CloudFoundryServerGroupArtifactSettings
       <div className="form-group">
         <div className="col-md-11">
           <div className="StandardFieldLayout flex-container-h margin-between-lg">
-            <div className="sm-label-right">Artifact</div>
             <div className="flex-grow">
               <StageArtifactSelector
                 pipeline={pipeline}
@@ -62,6 +74,9 @@ export class CloudFoundryServerGroupArtifactSettings
                 onExpectedArtifactSelected={this.onExpectedArtifactSelected}
                 onArtifactEdited={this.onArtifactChanged}
                 excludedArtifactTypePatterns={this.excludedArtifactTypePatterns}
+                renderLabel={(field: React.ReactNode) => {
+                  return <FormikConfigField label={'Artifact'}>{field}</FormikConfigField>;
+                }}
               />
             </div>
           </div>

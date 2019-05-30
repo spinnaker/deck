@@ -1,20 +1,30 @@
-import { IServerGroupCommand, IArtifact } from '@spinnaker/core';
+import { IServerGroupCommand, IArtifact, IPipeline, IStage } from '@spinnaker/core';
 import { ICloudFoundryEnvVar } from 'cloudfoundry/domain';
 
 export interface ICloudFoundryCreateServerGroupCommand extends IServerGroupCommand {
   // clone server group model
-  destination?: ICloudFoundryDestination;
-  source?: ICloudFoundrySource;
+  account?: string;
+  delayBeforeScaleDownSec?: number;
   rollback?: boolean;
+  source?: ICloudFoundrySource;
   target?: string;
   targetCluster?: string;
+  targetPercentages?: number[];
 
   // deploy server group model
-  delayBeforeDisableSec?: number;
   applicationArtifact?: ICloudFoundryArtifact;
+  delayBeforeDisableSec?: number;
   manifest?: ICloudFoundryManifest;
   maxRemainingAsgs?: number;
   startApplication: boolean;
+}
+
+export interface IViewState {
+  mode?: string;
+  pipeline?: IPipeline;
+  requiresTemplateSelection?: boolean;
+  stage?: IStage;
+  submitButtonLabel?: string;
 }
 
 export interface ICloudFoundryArtifact {
@@ -34,11 +44,7 @@ export interface ICloudFoundrySource {
   asgName: string;
   region: string;
   account: string;
-}
-
-export interface ICloudFoundryDestination {
-  region: string;
-  account: string;
+  clusterName?: string;
 }
 
 export interface ICloudFoundryManifestDirectSource {
@@ -56,14 +62,16 @@ export interface ICloudFoundryManifestDirectSource {
 export interface ICloudFoundryDeployConfiguration {
   account: string;
   application: string;
-  delayBeforeDisableSec?: number;
   applicationArtifact: ICloudFoundryArtifact;
+  delayBeforeDisableSec?: number;
+  delayBeforeScaleDownSec?: number;
+  freeFormDetails?: string;
   manifest: ICloudFoundryManifest;
   maxRemainingAsgs?: number;
   region: string;
   rollback?: boolean;
   stack?: string;
-  freeFormDetails?: string;
-  strategy?: string;
   startApplication: boolean;
+  strategy?: string;
+  targetPercentages?: number[];
 }

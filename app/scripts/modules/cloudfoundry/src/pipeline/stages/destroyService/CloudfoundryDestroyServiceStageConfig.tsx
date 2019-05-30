@@ -1,73 +1,71 @@
 import * as React from 'react';
 
 import Select, { Option } from 'react-select';
+import { Observable, Subject } from 'rxjs';
 
 import { AccountService, IAccount, IRegion, IStageConfigProps, StageConfigField } from '@spinnaker/core';
 
 export interface ICloudfoundryDestroyServiceStageConfigState {
   accounts: IAccount[];
-  cloudProvider: string;
-  credentials: string;
-  region: string;
   regions: IRegion[];
-  serviceInstanceName: string;
 }
 
 export class CloudfoundryDestroyServiceStageConfig extends React.Component<
   IStageConfigProps,
   ICloudfoundryDestroyServiceStageConfigState
 > {
+  private destroy$ = new Subject();
   constructor(props: IStageConfigProps) {
     super(props);
-    props.stage.cloudProvider = 'cloudfoundry';
+    this.props.updateStageField({ cloudProvider: 'cloudfoundry' });
     this.state = {
       accounts: [],
-      cloudProvider: 'cloudfoundry',
-      credentials: props.stage.credentials,
-      region: props.stage.region,
       regions: [],
-      serviceInstanceName: props.stage.serviceInstanceName,
     };
   }
 
-  public componentDidMount = (): void => {
-    AccountService.listAccounts('cloudfoundry').then(accounts => {
-      this.setState({ accounts: accounts });
-      const { credentials } = this.props.stage;
-      if (credentials) {
-        this.clearAndReloadRegions();
-      }
-    });
-    this.props.stageFieldUpdated();
-  };
+  public componentDidMount(): void {
+    Observable.fromPromise(AccountService.listAccounts('cloudfoundry'))
+      .takeUntil(this.destroy$)
+      .subscribe(accounts => {
+        this.setState({ accounts });
+        if (this.props.stage.credentials) {
+          this.clearAndReloadRegions();
+        }
+      });
+  }
 
-  private clearAndReloadRegions = (): void => {
+  public componentWillUnmount(): void {
+    this.destroy$.next();
+  }
+
+  private clearAndReloadRegions = () => {
     this.setState({ regions: [] });
-    AccountService.getRegionsForAccount(this.props.stage.credentials).then(regions => this.setState({ regions }));
+    const { credentials } = this.props.stage;
+    if (credentials) {
+      Observable.fromPromise(AccountService.getRegionsForAccount(credentials))
+        .takeUntil(this.destroy$)
+        .subscribe(regions => this.setState({ regions }));
+    }
   };
 
-  private accountUpdated = (option: Option<string>): void => {
+  private accountUpdated = (option: Option<string>) => {
     const credentials = option.value;
-    this.props.stage.credentials = credentials;
-    this.props.stage.region = '';
-    this.props.stageFieldUpdated();
+    this.props.updateStageField({
+      credentials,
+      region: '',
+    });
     if (credentials) {
       this.clearAndReloadRegions();
     }
   };
 
-  private regionUpdated = (option: Option<string>): void => {
-    const region = option.value;
-    this.setState({ region });
-    this.props.stage.region = region;
-    this.props.stageFieldUpdated();
+  private regionUpdated = (option: Option<string>) => {
+    this.props.updateStageField({ region: option.value });
   };
 
-  private serviceInstanceNameUpdated = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    const serviceInstanceName = event.target.value;
-    this.setState({ serviceInstanceName });
-    this.props.stage.serviceInstanceName = serviceInstanceName;
-    this.props.stageFieldUpdated();
+  private serviceInstanceNameUpdated = (event: React.ChangeEvent<HTMLInputElement>) => {
+    this.props.updateStageField({ serviceInstanceName: event.target.value });
   };
 
   public render() {
