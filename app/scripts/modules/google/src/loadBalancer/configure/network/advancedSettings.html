@@ -41,16 +41,12 @@
         <b>Session Affinity</b><help-field key="gce.loadBalancer.advancedSettings.unhealthyThreshold"></help-field>
       </div>
       <div class="col-md-4">
-        <ui-select ng-model="loadBalancer.sessionAffinity" required class="form-control input-sm">
-          <ui-select-match placeholder="Select...">
-            {{ $select.selected }}
-          </ui-select-match>
-          <ui-select-choices
-            repeat="sessionAffinity in ['None', 'Client IP', 'Client IP and protocol'] | filter: $select.search"
-          >
-            <div ng-bind-html="sessionAffinity | highlight: $select.search"></div>
-          </ui-select-choices>
-        </ui-select>
+        <select
+          class="form-control input-sm"
+          ng-model="loadBalancer.sessionAffinity"
+          ng-options="option.name for option in sessionAffinityOptions"
+          name="sessionAffinitySelect"
+        ></select>
       </div>
     </div>
   </div>

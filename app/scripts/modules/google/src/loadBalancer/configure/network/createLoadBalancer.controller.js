@@ -41,6 +41,12 @@ module.exports = angular
         ['Client IP and protocol', 'CLIENT_IP_PROTO'],
       ]);
 
+      $scope.sessionAffinityOptions = [
+        { value: 'NONE', name: 'None' },
+        { value: 'CLIENT_IP', name: 'Client IP' },
+        { value: 'CLIENT_IP_PROTO', name: 'Client IP and protocol' },
+      ];
+
       function onApplicationRefresh() {
         // If the user has already closed the modal, do not navigate to the new details view
         if ($scope.$$destroyed) {
@@ -205,7 +211,7 @@ module.exports = angular
               params.healthCheck = null;
             }
 
-            params.sessionAffinity = $scope.sessionAffinityViewToModelMap.get($scope.loadBalancer.sessionAffinity);
+            params.sessionAffinity = $scope.loadBalancer.sessionAffinity.value;
           }
 
           return LoadBalancerWriter.upsertLoadBalancer($scope.loadBalancer, application, descriptor, params);

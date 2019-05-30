@@ -133,7 +133,7 @@ module.exports = angular.module('spinnaker.gce.loadBalancer.transformer', []).fa
           toEdit.unhealthyThreshold = 2;
         }
 
-        toEdit.sessionAffinity = 'None'; // TODO: load existing session affinity here
+        toEdit.sessionAffinity = loadBalancer.sessionAffinity || 'None';
       }
       return toEdit;
     }
