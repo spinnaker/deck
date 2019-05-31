@@ -181,7 +181,7 @@ module.exports = angular
                 originalCluster.hardConstraints.reduce((a, c) => set(a, c, 'true'), {})) ||
               {},
             soft:
-              (originalCluster.constarints && originalCluster.constarints.soft) ||
+              (originalCluster.constraints && originalCluster.constraints.soft) ||
               (originalCluster.softConstraints &&
                 originalCluster.softConstraints.reduce((a, c) => set(a, c, 'true'), {})) ||
               {},
