@@ -35,12 +35,6 @@ module.exports = angular
         submitting: false,
       };
 
-      $scope.sessionAffinityViewToModelMap = new Map([
-        ['None', 'NONE'],
-        ['Client IP', 'CLIENT_IP'],
-        ['Client IP and protocol', 'CLIENT_IP_PROTO'],
-      ]);
-
       $scope.sessionAffinityOptions = [
         { value: 'NONE', name: 'None' },
         { value: 'CLIENT_IP', name: 'Client IP' },
@@ -211,7 +205,7 @@ module.exports = angular
               params.healthCheck = null;
             }
 
-            params.sessionAffinity = $scope.loadBalancer.sessionAffinity.value;
+            params.sessionAffinity = $scope.loadBalancer.sessionAffinity;
           }
 
           return LoadBalancerWriter.upsertLoadBalancer($scope.loadBalancer, application, descriptor, params);

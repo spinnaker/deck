@@ -44,7 +44,7 @@
         <select
           class="form-control input-sm"
           ng-model="loadBalancer.sessionAffinity"
-          ng-options="option.name for option in sessionAffinityOptions"
+          ng-options="option.value as option.name for option in sessionAffinityOptions"
           name="sessionAffinitySelect"
         ></select>
       </div>
