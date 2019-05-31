@@ -152,7 +152,7 @@ module.exports = angular.module('spinnaker.gce.loadBalancer.transformer', []).fa
         healthInterval: 10,
         healthyThreshold: 10,
         unhealthyThreshold: 2,
-        sessionAffinity: 'None',
+        sessionAffinity: 'NONE',
         regionZones: [],
         listeners: [
           {
