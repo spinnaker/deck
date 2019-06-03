@@ -4,7 +4,7 @@ import { ReactInjector } from 'core/reactShims';
 export class ExecutionsLookup extends React.Component {
   public render() {
     const { params } = ReactInjector.$state;
-    return <LookupExecution executionId={params.executionid} />;
+    return <LookupExecution executionId={params.executionId} />;
   }
 }
 

@@ -96,9 +96,9 @@ module(PIPELINE_STATES, [APPLICATION_STATE_PROVIDER]).config([
 
     const executionsLookup: INestedState = {
       name: 'executionLookup',
-      url: '/executions/:executionid',
+      url: '/executions/:executionId',
       params: {
-        executionid: { dynamic: true },
+        executionId: { dynamic: true },
       },
       views: {
         'main@': { component: ExecutionsLookup, $type: 'react' },
