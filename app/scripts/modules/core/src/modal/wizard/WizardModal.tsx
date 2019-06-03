@@ -24,11 +24,12 @@ export interface IWizardPageInjectedProps<T> {
 export interface IWizardModalProps<T> extends IModalComponentProps {
   formClassName?: string;
   heading: string;
+  hideWizardNavigation?: boolean;
   initialValues: T;
   loading?: boolean;
   render: (props: IWizardPageInjectedProps<T>) => React.ReactNode;
   submitButtonLabel: string;
-  taskMonitor: TaskMonitor;
+  taskMonitor?: TaskMonitor;
   validate?(values: T): any;
 }
 
@@ -123,6 +124,7 @@ export class WizardModal<T = {}> extends React.Component<IWizardModalProps<T>, I
     const {
       formClassName,
       heading,
+      hideWizardNavigation,
       initialValues,
       loading,
       submitButtonLabel,
@@ -180,11 +182,12 @@ export class WizardModal<T = {}> extends React.Component<IWizardModalProps<T>, I
                   spinner
                 ) : (
                   <div className="row">
-                    <div className="col-md-3 hidden-sm hidden-xs">
-                      <ul className="steps-indicator wizard-navigation">{pageLabels}</ul>
-                    </div>
-
-                    <div className="col-md-9 col-sm-12">
+                    {!hideWizardNavigation && (
+                      <div className="col-md-3 hidden-sm hidden-xs">
+                        <ul className="steps-indicator wizard-navigation">{pageLabels}</ul>
+                      </div>
+                    )}
+                    <div className={hideWizardNavigation ? 'col-md-12 col-sm-12' : 'col-md-9 col-sm-12'}>
                       <div className="steps" ref={this.stepsElement} onScroll={this.handleStepsScroll}>
                         {renderPageContents()}
                       </div>

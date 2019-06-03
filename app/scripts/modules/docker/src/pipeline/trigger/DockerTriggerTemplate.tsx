@@ -56,12 +56,12 @@ export class DockerTriggerTemplate extends React.Component<
 
   private lookupTypeChanged = (o: Option<IDockerLookupType>) => {
     const newType = o.value;
-    this.props.command.extraFields.tag = newType === 'tag' ? this.state.selectedTag : this.state.digest;
+    this.props.updateCommand('extraFields.tag', newType === 'tag' ? this.state.selectedTag : this.state.digest);
     this.setState({ lookupType: newType });
   };
 
   private updateArtifact(command: IPipelineCommand, tag: string) {
-    command.extraFields.tag = tag;
+    this.props.updateCommand('extraFields.tag', tag);
     const trigger = command.trigger as IDockerTrigger;
     if (trigger && trigger.repository) {
       let imageName = '';
@@ -69,14 +69,14 @@ export class DockerTriggerTemplate extends React.Component<
         imageName += trigger.registry + '/';
       }
       imageName += trigger.repository;
-      command.extraFields.artifacts = [
+      this.props.updateCommand('extraFields.artifacts', [
         {
           type: 'docker/image',
           name: imageName,
           version: tag,
           reference: imageName + ':' + tag,
         },
-      ];
+      ]);
     }
   }
 
@@ -115,10 +115,10 @@ export class DockerTriggerTemplate extends React.Component<
 
   private initialize = () => {
     const { command } = this.props;
-    command.triggerInvalid = true;
+    this.props.updateCommand('triggerInvalid', true);
 
     // These fields will be added to the trigger when the form is submitted
-    command.extraFields = {};
+    this.props.updateCommand('extraFields', {});
 
     if (this.subscription) {
       this.subscription.unsubscribe();

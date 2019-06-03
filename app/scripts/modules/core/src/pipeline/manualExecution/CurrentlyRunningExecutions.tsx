@@ -1,0 +1,45 @@
+import * as React from 'react';
+import { head } from 'lodash';
+
+import { IExecution } from 'core/domain';
+
+export interface ICurrentlyRunningExecutionsProps {
+  currentlyRunningExecutions: IExecution[];
+}
+
+export class CurrentlyRunningExecutions extends React.Component<ICurrentlyRunningExecutionsProps> {
+  constructor(props: ICurrentlyRunningExecutionsProps) {
+    super(props);
+  }
+
+  public render() {
+    const { currentlyRunningExecutions } = this.props;
+    const currentlyRunningExecution = head(currentlyRunningExecutions);
+    return (
+      <div className="alert alert-warning">
+        <p>
+          <strong>
+            <i className="fa fa-exclamation-triangle" />
+            This pipeline is currently executing!
+          </strong>
+        </p>
+        <div className="pad-left">
+          <strong>Execution started: </strong>
+          {currentlyRunningExecution.startTime}
+          <div>
+            <strong>Current stage:</strong>
+            {currentlyRunningExecution.currentStages &&
+              currentlyRunningExecution.currentStages.map((s: any, i: number) => {
+                return <span key={i}>{s.name}</span>;
+              })}
+          </div>
+        </div>
+        {currentlyRunningExecutions.length > 1 && (
+          <div>
+            <em>{currentlyRunningExecutions.length - 1 + ' other execution(s)'}</em>
+          </div>
+        )}
+      </div>
+    );
+  }
+}
