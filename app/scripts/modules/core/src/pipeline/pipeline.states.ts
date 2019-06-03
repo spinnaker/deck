@@ -5,6 +5,7 @@ import { INestedState, StateConfigProvider } from 'core/navigation/state.provide
 import { filterModelConfig } from './filter/ExecutionFilterModel';
 
 import { Executions } from 'core/pipeline/executions/Executions';
+import { ExecutionsLookup } from 'core/pipeline/executions/ExecutionsLookup';
 import { SingleExecutionDetails } from 'core/pipeline/details/SingleExecutionDetails';
 
 export const PIPELINE_STATES = 'spinnaker.core.pipeline.states';
@@ -92,5 +93,18 @@ module(PIPELINE_STATES, [APPLICATION_STATE_PROVIDER]).config([
     };
 
     applicationStateProvider.addChildState(pipelines);
+
+    const executionsLookup: INestedState = {
+      name: 'executionLookup',
+      url: '/executions/:executionid',
+      params: {
+        executionid: { dynamic: true },
+      },
+      views: {
+        'main@': { component: ExecutionsLookup, $type: 'react' },
+      },
+    };
+
+    stateConfigProvider.addToRootState(executionsLookup);
   },
 ]);
