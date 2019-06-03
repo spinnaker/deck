@@ -37,10 +37,10 @@
   dependencies:
     tinyqueue "^1.1.0"
 
-"@spinnaker/kayenta@0.0.79":
-  version "0.0.79"
-  resolved "https://registry.yarnpkg.com/@spinnaker/kayenta/-/kayenta-0.0.79.tgz#e7bda8b2fdeaaae6d707dcdbf78300d0b1c6bf19"
-  integrity sha512-A34ZfBhLBR1yOsyEI3sXVpUnGGxz1NEtD1ZoXVPAA0AcAmhy2nW7VxVR+dJwJFUXIFQ+mIBcqRhDqAmjuIu1lg==
+"@spinnaker/kayenta@0.0.80":
+  version "0.0.80"
+  resolved "https://registry.yarnpkg.com/@spinnaker/kayenta/-/kayenta-0.0.80.tgz#0075e94875fde540372d187e7916d27d92c049bf"
+  integrity sha512-Pl85vJFuaIhKx908uxUlO7r9dBbQn8FgbDQZwc8W7MfDO3qAFOj7MycDSJdcGSDuLsykiF0R2FFbjF7ml5cWHQ==
   dependencies:
     "@fortawesome/fontawesome-free" "5.5.0"
     "@uirouter/angularjs" "^1.0.15"
@@ -65,7 +65,7 @@
     react-bootstrap "^0.32.1"
     react-bootstrap-typeahead "^3.2.4"
     react-container-dimensions "^1.4.1"
-    react-dom "16.3.2"
+    react-dom "16.3.3"
     react-ga "^2.4.1"
     react-redux "^5.0.7"
     react-select "^1.2.1"
@@ -10004,10 +10004,10 @@ react-container-dimensions@^1.4.1:
     invariant "^2.2.2"
     prop-types "^15.5.8"
 
-react-dom@16.3.2:
-  version "16.3.2"
-  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.3.2.tgz#cb90f107e09536d683d84ed5d4888e9640e0e4df"
-  integrity sha512-MMPko3zYncNrz/7gG17wJWUREZDvskZHXOwbttzl0F0L3wDmToyuETuo/r8Y5yvDejwYcRyWI1lvVBjLJWFwKA==
+react-dom@16.3.3:
+  version "16.3.3"
+  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.3.3.tgz#af4c2aef9f6a66251a46da50253c860a67ae66d9"
+  integrity sha512-ALCp7ZbSGkqRDtQoZozKVNgwXMxbxf/IGOUMC2A0yF6JHeZrS8e2cOotPT87Vf4b7PKCuUVKU4/RDEXxToA/yA==
   dependencies:
     fbjs "^0.8.16"
     loose-envify "^1.1.0"
