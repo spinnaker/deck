@@ -888,6 +888,13 @@ select:invalid {
   color: var(--color-danger);
 }
 
+.success-message {
+  text-align: left;
+  display: block;
+  font-weight: 600;
+  color: var(--color-success);
+}
+
 .warning-message {
   text-align: left;
   display: block;
@@ -1431,16 +1438,19 @@ body > .select2-container.open {
   }
 }
 
+.checkbox-inline + .checkbox-inline,
+.radio-inline + .radio-inline {
+  margin-left: 0 !important;
+}
+
 .checkbox-inline,
 .radio-inline {
-  input[type='checkbox'],
-  input[type='radio'] {
-    margin-left: -15px;
-  }
-  padding-left: 25px;
-  &:first-child {
-    padding-left: 15px;
-  }
+  margin-right: 15px;
+}
+
+.checkbox-inline:last-of-type,
+.radio-inline:last-of-type {
+  margin-right: 0;
 }
 
 ul.checkmap {
