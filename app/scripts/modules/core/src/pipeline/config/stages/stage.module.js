@@ -204,6 +204,9 @@ module.exports = angular
             if (config.addAliasToConfig) {
               $scope.stage.alias = config.alias;
             }
+            if (config.altKey) {
+              $scope.stage.altKey = config.altKey;
+            }
             if (config.defaults) {
               defaultsDeep($scope.stage, config.defaults);
             }
