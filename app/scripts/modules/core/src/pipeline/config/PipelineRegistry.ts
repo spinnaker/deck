@@ -31,7 +31,11 @@ export class PipelineRegistry {
 
   constructor() {
     this.getStageConfig = memoize(this.getStageConfig.bind(this), (stage: IStage) =>
-      [stage ? stage.type : '', stage ? stage.cloudProvider || stage.cloudProviderType || 'aws' : ''].join(':'),
+      [
+        stage ? stage.type : '',
+        stage ? stage.altKey : '',
+        stage ? stage.cloudProvider || stage.cloudProviderType || 'aws' : '',
+      ].join(':'),
     );
   }
 
@@ -223,8 +227,17 @@ export class PipelineRegistry {
     if (!stage || !stage.type) {
       return null;
     }
+
+    const altKeyMatch = stage.altKey && this.getStageTypes().find(stageType => stageType.altKey === stage.altKey);
+    if (altKeyMatch) {
+      return altKeyMatch;
+    }
+
     const matches = this.getStageTypes().filter(stageType => {
-      return stageType.key === stage.type || stageType.provides === stage.type || stageType.alias === stage.type;
+      return (
+        !stageType.altKey &&
+        (stageType.key === stage.type || stageType.provides === stage.type || stageType.alias === stage.type)
+      );
     });
 
     switch (matches.length) {

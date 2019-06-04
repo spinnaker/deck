@@ -312,6 +312,11 @@ export class ExecutionsTransformer {
       }
       const context = stage.context || {};
       stage.cloudProvider = context.cloudProvider || context.cloudProviderType;
+
+      // Promote altKey to a stage attribute because that's where the registry will look for it
+      if (context.altKey) {
+        stage.altKey = context.altKey;
+      }
     });
 
     OrchestratedItemTransformer.defineProperties(execution);
