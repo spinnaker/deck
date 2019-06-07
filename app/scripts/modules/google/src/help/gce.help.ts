@@ -203,7 +203,7 @@ const helpContents: { [key: string]: string } = {
   'gce.loadBalancerType.Internal':
     '<p>Internal TCP/UDP Load Balancing is a regional load balancer that enables you to run and scale your services behind a private load balancing IP address that is accessible only to your internal virtual machine instances.</p>',
   'gce.loadBalancerType.SSL':
-    '<p>Google Cloud SSL Proxy Load Balancing terminates user SSL (TLS) connections at the load balancing layer, then balances the connections across your instances using the SSL or TCP protocols. SSL Proxy Load Balancing supports both IPv4 and IPv6 addresses for client traffic.</p>',
+    '<p>Google Cloud SSL Proxy Load Balancing terminates user SSL (TLS) connections at the load balancing layer, then balances the connections across your instances using the SSL or TCP protocols. This supports both IPv4 and IPv6 addresses for client traffic.</p>',
   'gce.loadBalancerType.TCP':
     '<p>Google Cloud Platform (GCP) TCP Proxy Load Balancing allows you to use a single IP address for all users around the world. GCP TCP proxy load balancing automatically routes traffic to the instances that are closest to the user.</p>',
 };
