@@ -5,7 +5,6 @@ import { HelpField } from 'core/help';
 import { RadioButtonInput } from 'core/presentation';
 import { StageConfigField } from 'core/pipeline';
 
-const { useEffect, useState } = React;
 import './overrideFailure.less';
 
 export interface IOverrideFailureConfigProps {
@@ -16,7 +15,6 @@ export interface IOverrideFailureConfigProps {
 }
 
 export const OverrideFailure = (props: IOverrideFailureConfigProps) => {
-  const [failureOption, setFailureOption] = useState('');
   const overrideFailureOptions = [
     {
       label: 'halt the entire pipeline',
@@ -40,7 +38,7 @@ export const OverrideFailure = (props: IOverrideFailureConfigProps) => {
     },
   ];
 
-  useEffect(() => {
+  const getFailureOption = () => {
     let initValue = 'fail';
     if (props.completeOtherBranchesThenFail === true) {
       initValue = 'faileventual';
@@ -51,8 +49,8 @@ export const OverrideFailure = (props: IOverrideFailureConfigProps) => {
     } else if (props.failPipeline === false && props.continuePipeline === true) {
       initValue = 'ignore';
     }
-    setFailureOption(initValue);
-  }, [props.completeOtherBranchesThenFail, props.failPipeline, props.continuePipeline]);
+    return initValue;
+  };
 
   const failureOptionChanged = (value: string) => {
     if (value === 'fail') {
@@ -80,7 +78,6 @@ export const OverrideFailure = (props: IOverrideFailureConfigProps) => {
         completeOtherBranchesThenFail: true,
       });
     }
-    setFailureOption(value);
   };
 
   return (
@@ -88,7 +85,7 @@ export const OverrideFailure = (props: IOverrideFailureConfigProps) => {
       <RadioButtonInput
         inputClassName={'override-failure-radio-input'}
         options={overrideFailureOptions}
-        value={failureOption}
+        value={getFailureOption()}
         onChange={(e: any) => failureOptionChanged(e.target.value)}
       />
     </StageConfigField>
