@@ -4,7 +4,7 @@ const angular = require('angular');
 import { Subject } from 'rxjs';
 
 import { EXECUTION_WINDOW_ATLAS_GRAPH } from './atlasGraph.component';
-import { EXECUTION_WINDOWS_DAY_PICKER } from './executionWindowDayPicker.component';
+import { EXECUTION_WINDOWS_DAY_PICKER } from './executionWindowDayPicker.module';
 import { DEFAULT_SKIP_WINDOW_TEXT } from './ExecutionWindowActions';
 import { TimePickerOptions } from 'core/utils/TimePickerOptions';
 
@@ -83,6 +83,13 @@ module.exports = angular
 
       this.windowsUpdated = () => {
         this.windowsUpdatedStream.next($scope.timelineWindows);
+      };
+
+      this.windowDaysUpdated = days => {
+        $scope.$applyAsync(() => {
+          $scope.stage.restrictedExecutionWindow.days = days;
+          this.windowsUpdatedStream.next($scope.timelineWindows);
+        });
       };
 
       function buildTimelineWindow(window, originalWindow) {
