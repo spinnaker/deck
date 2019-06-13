@@ -41,6 +41,7 @@ module.exports = angular
               zonesEnabled: false,
               zones: [],
               instanceTags: {},
+              dataDisks: [],
               selectedProvider: 'azure',
               viewState: {
                 instanceProfile: 'custom',
@@ -93,6 +94,7 @@ module.exports = angular
           zones: serverGroup.zones,
           zonesEnabled: serverGroup.zones && serverGroup.zones.length > 0,
           instanceTags: {},
+          dataDisks: serverGroup.dataDisks,
           sku: serverGroup.sku,
           capacity: {
             min: serverGroup.capacity.min,
@@ -125,7 +127,8 @@ module.exports = angular
           command.customScriptsSettings.commandToExecute = serverGroup.customScriptsSettings.commandToExecute;
           if (
             typeof serverGroup.customScriptsSettings.fileUris !== 'undefined' &&
-            serverGroup.customScriptsSettings.fileUris != ''
+            serverGroup.customScriptsSettings.fileUris != '' &&
+            serverGroup.customScriptsSettings.fileUris !== null
           ) {
             azureServerGroupTransformer.parseCustomScriptsSettings(serverGroup, command);
           }

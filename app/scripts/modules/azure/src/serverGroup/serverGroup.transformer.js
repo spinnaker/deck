@@ -94,6 +94,7 @@ module.exports = angular
           capacity: command.sku.capacity,
         },
         instanceTags: command.instanceTags,
+        dataDisks: command.dataDisks,
         viewState: command.viewState,
         osConfig: {
           customData: command.osConfig ? command.osConfig.customData : null,
@@ -118,7 +119,8 @@ module.exports = angular
         configuration.customScriptsSettings.commandToExecute = command.customScriptsSettings.commandToExecute;
         if (
           typeof command.customScriptsSettings.fileUris !== 'undefined' &&
-          command.customScriptsSettings.fileUris != ''
+          command.customScriptsSettings.fileUris != '' &&
+          command.customScriptsSettings.fileUris !== null
         ) {
           parseCustomScriptsSettings(command, configuration);
         }
