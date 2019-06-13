@@ -34,6 +34,7 @@ module.exports = angular
 
     this.removePersistentDisk = index => {
       var newDataDisks = angular.copy(this.command.dataDisks);
-      this.command.dataDisks = newDataDisks.splice(index, 1);
+      newDataDisks.splice(index, 1);
+      this.command.dataDisks = newDataDisks;
     };
   });
