@@ -1,6 +1,6 @@
 {
-  "name": "@spinnaker/core",
-  "version": "0.0.375",
+  "name": "@spinnaker/azure",
+  "version": "0.0.248",
   "main": "lib/lib.js",
   "typings": "lib/index.d.ts",
   "scripts": {
