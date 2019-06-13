@@ -141,15 +141,10 @@ module.exports = angular
 
       this.selectStageType = stage => {
         $scope.stage.type = stage.key;
-        if (stage.altKey) {
-          $scope.stage.altKey = stage.altKey;
-        } else {
-          delete $scope.stage.altKey;
-        }
         this.selectStage();
         // clear stage-specific fields
         Object.keys($scope.stage).forEach(k => {
-          if (!['requisiteStageRefIds', 'refId', 'isNew', 'name', 'type', 'altKey'].includes(k)) {
+          if (!['requisiteStageRefIds', 'refId', 'isNew', 'name', 'type'].includes(k)) {
             delete $scope.stage[k];
           }
         });
@@ -203,9 +198,6 @@ module.exports = angular
             $scope.label = config.label;
             if (config.addAliasToConfig) {
               $scope.stage.alias = config.alias;
-            }
-            if (config.altKey) {
-              $scope.stage.altKey = config.altKey;
             }
             if (config.defaults) {
               defaultsDeep($scope.stage, config.defaults);
@@ -287,7 +279,6 @@ module.exports = angular
       $scope.$on('pipeline-reverted', this.selectStage);
       $scope.$on('pipeline-json-edited', this.selectStage);
       $scope.$watch('stage.type', this.selectStage);
-      $scope.$watch('stage.altKey', this.selectStage);
       $scope.$watch('viewState.stageIndex', this.selectStage);
       $scope.$watch('stage.refId', this.selectStage);
     },
