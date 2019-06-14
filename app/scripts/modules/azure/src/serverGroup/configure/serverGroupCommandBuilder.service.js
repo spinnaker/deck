@@ -1,6 +1,7 @@
 'use strict';
 
 const angular = require('angular');
+const _ = require('lodash');
 
 import { NameUtils } from '@spinnaker/core';
 
@@ -125,11 +126,7 @@ module.exports = angular
         if (typeof serverGroup.customScriptsSettings !== 'undefined') {
           command.customScriptsSettings = {};
           command.customScriptsSettings.commandToExecute = serverGroup.customScriptsSettings.commandToExecute;
-          if (
-            typeof serverGroup.customScriptsSettings.fileUris !== 'undefined' &&
-            serverGroup.customScriptsSettings.fileUris != '' &&
-            serverGroup.customScriptsSettings.fileUris !== null
-          ) {
+          if (!_.isEmpty(serverGroup.customScriptsSettings.fileUris)) {
             azureServerGroupTransformer.parseCustomScriptsSettings(serverGroup, command);
           }
         }

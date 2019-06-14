@@ -1,6 +1,7 @@
 'use strict';
 
 const angular = require('angular');
+const _ = require('lodash');
 
 module.exports = angular
   .module('spinnaker.azure.serverGroup.transformer', [])
@@ -117,11 +118,7 @@ module.exports = angular
 
       if (typeof command.customScriptsSettings !== 'undefined') {
         configuration.customScriptsSettings.commandToExecute = command.customScriptsSettings.commandToExecute;
-        if (
-          typeof command.customScriptsSettings.fileUris !== 'undefined' &&
-          command.customScriptsSettings.fileUris != '' &&
-          command.customScriptsSettings.fileUris !== null
-        ) {
+        if (!_.isEmpty(command.customScriptsSettings.fileUris)) {
           parseCustomScriptsSettings(command, configuration);
         }
       }

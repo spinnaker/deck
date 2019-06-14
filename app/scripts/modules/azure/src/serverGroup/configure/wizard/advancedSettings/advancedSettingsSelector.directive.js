@@ -17,7 +17,7 @@ module.exports = angular
     };
   })
   .controller('azureServerGroupAdvancedSettingsSelectorCtrl', function() {
-    this.addPersistentDisk = () => {
+    this.addDataDisk = () => {
       var newDataDisks = angular.copy(this.command.dataDisks);
       this.command.dataDisks = newDataDisks.concat([
         {
@@ -32,7 +32,7 @@ module.exports = angular
       ]);
     };
 
-    this.removePersistentDisk = index => {
+    this.removeDataDisk = index => {
       var newDataDisks = angular.copy(this.command.dataDisks);
       newDataDisks.splice(index, 1);
       this.command.dataDisks = newDataDisks;

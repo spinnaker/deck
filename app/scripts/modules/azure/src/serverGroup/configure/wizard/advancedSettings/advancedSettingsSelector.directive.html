@@ -56,7 +56,7 @@
     </div>
     <div class="form-group">
       <div class="col-md-4 sm-label-left">
-        Persistent Disks
+        Data Disks
       </div>
       <div class="col-md-11">
         <table class="table table-condensed packed tags">
@@ -92,9 +92,9 @@
                 <ui-select ng-model="disk.managedDisk.storageAccountType" class="form-control input-sm" required>
                   <ui-select-match placeholder="Select...">{{$select.selected}}</ui-select-match>
                   <ui-select-choices
-                    repeat="persistentDiskType in adv.command.backingData.persistentDiskTypes | filter: $select.search"
+                    repeat="dataDiskType in adv.command.backingData.dataDiskTypes | filter: $select.search"
                   >
-                    <span ng-bind-html="persistentDiskType | highlight: $select.search"></span>
+                    <span ng-bind-html="dataDiskType | highlight: $select.search"></span>
                   </ui-select-choices>
                 </ui-select>
               </td>
@@ -102,14 +102,14 @@
                 <ui-select ng-model="disk.caching" class="form-control input-sm" required>
                   <ui-select-match placeholder="Select...">{{$select.selected}}</ui-select-match>
                   <ui-select-choices
-                    repeat="persistentDiskCachingType in adv.command.backingData.persistentDiskCachingTypes | filter: $select.search"
+                    repeat="dataDiskCachingType in adv.command.backingData.dataDiskCachingTypes | filter: $select.search"
                   >
-                    <span ng-bind-html="persistentDiskCachingType | highlight: $select.search"></span>
+                    <span ng-bind-html="dataDiskCachingType | highlight: $select.search"></span>
                   </ui-select-choices>
                 </ui-select>
               </td>
               <td>
-                <a class="btn btn-link sm-label" style="margin-top: 0;" ng-click="adv.removePersistentDisk($index)">
+                <a class="btn btn-link sm-label" style="margin-top: 0;" ng-click="adv.removeDataDisk($index)">
                   <span class="glyphicon glyphicon-trash"></span>
                 </a>
               </td>
@@ -118,8 +118,8 @@
           <tfoot>
             <tr>
               <td colspan="4">
-                <button class="btn btn-block btn-sm add-new" ng-click="adv.addPersistentDisk()">
-                  <span class="glyphicon glyphicon-plus-sign"></span> Add New Persistent Disk
+                <button class="btn btn-block btn-sm add-new" ng-click="adv.addDataDisk()">
+                  <span class="glyphicon glyphicon-plus-sign"></span> Add New Data Disk
                 </button>
               </td>
             </tr>

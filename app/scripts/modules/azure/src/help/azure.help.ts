@@ -38,7 +38,7 @@ const helpContents: { [key: string]: string } = {
   'azure.serverGroup.lun':
     'Specifies the logical unit number of the data disk. This value is used to identify data disks within the VM and therefore must be unique for each data disk attached to a VM.',
   'azure.serverGroup.diskSizeGB':
-    'Specifies the size of an empty data disk in gigabytes. This element can be used to overwrite the size of the disk in a virtual machine image. This value cannot be larger than 1023 GB',
+    'Specifies the size of an empty data disk in gigabytes. This value cannot be larger than 1023 GB',
   'azure.serverGroup.managedDisk.storageAccountType':
     'You can choose between Azure managed disks types to support your workload or scenario.',
   'azure.serverGroup.caching':
