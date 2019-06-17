@@ -28,7 +28,7 @@ export const ExecutionWindowDayPicker = (props: IExecutionWindowDayPickerConfigP
   };
 
   const weekend = (): void => {
-    props.onChange([2, 3, 4, 5, 6]);
+    props.onChange([1, 7]);
   };
 
   const updateModel = (day: any): void => {

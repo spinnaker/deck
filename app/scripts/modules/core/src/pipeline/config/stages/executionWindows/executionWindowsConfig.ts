@@ -14,7 +14,7 @@ export interface IWindow {
   wrapEnd?: boolean;
 }
 
-export interface ITimeLineWindow {
+export interface ITimelineWindow {
   style: any;
   start: Date;
   end: Date;

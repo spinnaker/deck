@@ -1,7 +1,7 @@
 import * as React from 'react';
-import * as moment from 'moment';
 import { extend, get } from 'lodash';
 import { Option } from 'react-select';
+import { format } from 'date-fns';
 
 import { IStage } from 'core/domain';
 import { CheckboxInput, NumberInput, ReactSelectInput, TextAreaInput, TextInput, Tooltip } from 'core/presentation';
@@ -10,7 +10,7 @@ import { TimePickerOptions } from 'core/utils/TimePickerOptions';
 
 import { DEFAULT_SKIP_WINDOW_TEXT } from './ExecutionWindowActions';
 import { ExecutionWindowDayPicker } from './ExecutionWindowDayPicker';
-import { IJitter, IRestrictedExecutionWindow, ITimeLineWindow, IWindow } from './executionWindowsConfig';
+import { IJitter, IRestrictedExecutionWindow, ITimelineWindow, IWindow } from './executionWindowsConfig';
 
 import './executionWindows.less';
 
@@ -24,6 +24,8 @@ export interface IExecutionWindowsConfigProps {
 }
 
 export const ExecutionWindows = (props: IExecutionWindowsConfigProps) => {
+  const SELECT_EXECUTION_WINDOW_CLASSES =
+    'visible-xs-inline-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block vertical-align-select';
   const defaultJitter: IJitter = {
     minDelay: 0,
     maxDelay: 600,
@@ -108,7 +110,7 @@ export const ExecutionWindows = (props: IExecutionWindowsConfigProps) => {
     props.updateStageField({ restrictedExecutionWindow });
   };
 
-  const updateWhiteList = (changes: Partial<IWindow>, index: number) => {
+  const updateWhitelist = (changes: Partial<IWindow>, index: number) => {
     const newWhitelist = [...whitelist];
     extend(newWhitelist[index], changes);
     const restrictedExecutionWindow = {
@@ -119,8 +121,8 @@ export const ExecutionWindows = (props: IExecutionWindowsConfigProps) => {
     setTimelineWindows(getTimelineWindows(newWhitelist));
   };
 
-  function getTimelineWindows(w: IWindow[]): ITimeLineWindow[] {
-    const windows: ITimeLineWindow[] = [];
+  function getTimelineWindows(w: IWindow[]): ITimelineWindow[] {
+    const windows: ITimelineWindow[] = [];
     w.forEach((window: IWindow) => {
       const start = window.startHour * 60 + window.startMin,
         end = window.endHour * 60 + window.endMin;
@@ -149,7 +151,7 @@ export const ExecutionWindows = (props: IExecutionWindowsConfigProps) => {
     return windows;
   }
 
-  function buildTimelineWindow(window: IWindow, originalWindow?: IWindow): ITimeLineWindow {
+  function buildTimelineWindow(window: IWindow, originalWindow?: IWindow): ITimelineWindow {
     const labelRef = originalWindow || window;
     const timelineWindow = {
       style: getWindowStyle(window),
@@ -234,7 +236,7 @@ export const ExecutionWindows = (props: IExecutionWindowsConfigProps) => {
                 <div className="execution-day">
                   {timelineWindows.map((w, i) => {
                     return (
-                      <Tooltip key={i} value={moment(w.start).format('HH:mm') + ' - ' + moment(w.end).format('HH:mm')}>
+                      <Tooltip key={i} value={format(w.start, 'HH:mm') + ' - ' + format(w.end, 'HH:mm')}>
                         <div className="execution-window" style={w.style} />
                       </Tooltip>
                     );
@@ -268,49 +270,41 @@ export const ExecutionWindows = (props: IExecutionWindowsConfigProps) => {
                     <span className="start-end-divider">From</span>
                     <ReactSelectInput
                       clearable={false}
-                      inputClassName={
-                        'visible-xs-inline-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block vertical-align-select'
-                      }
+                      inputClassName={SELECT_EXECUTION_WINDOW_CLASSES}
                       value={w.startHour}
                       options={hours.map(h => ({ label: h.label, value: h.value }))}
                       onChange={(option: Option<number>) => {
-                        updateWhiteList({ startHour: option.target.value }, i);
+                        updateWhitelist({ startHour: option.target.value }, i);
                       }}
                     />
                     <span> : </span>
                     <ReactSelectInput
                       clearable={false}
-                      inputClassName={
-                        'visible-xs-inline-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block vertical-align-select'
-                      }
+                      inputClassName={SELECT_EXECUTION_WINDOW_CLASSES}
                       value={w.startMin}
                       options={minutes.map(m => ({ label: m.label, value: m.value }))}
                       onChange={(option: Option<number>) => {
-                        updateWhiteList({ startMin: option.target.value }, i);
+                        updateWhitelist({ startMin: option.target.value }, i);
                       }}
                     />
                     <span className="start-end-divider"> to </span>
                     <ReactSelectInput
                       clearable={false}
-                      inputClassName={
-                        'visible-xs-inline-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block vertical-align-select'
-                      }
+                      inputClassName={SELECT_EXECUTION_WINDOW_CLASSES}
                       value={w.endHour}
                       options={hours.map(h => ({ label: h.label, value: h.value }))}
                       onChange={(option: Option<number>) => {
-                        updateWhiteList({ endHour: option.target.value }, i);
+                        updateWhitelist({ endHour: option.target.value }, i);
                       }}
                     />
                     <span> : </span>
                     <ReactSelectInput
                       clearable={false}
-                      inputClassName={
-                        'visible-xs-inline-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block vertical-align-select'
-                      }
+                      inputClassName={SELECT_EXECUTION_WINDOW_CLASSES}
                       value={w.endMin}
                       options={minutes.map(m => ({ label: m.label, value: m.value }))}
                       onChange={(option: Option<number>) => {
-                        updateWhiteList({ endMin: option.target.value }, i);
+                        updateWhitelist({ endMin: option.target.value }, i);
                       }}
                     />
                     <Tooltip value={'Remove window'}>
