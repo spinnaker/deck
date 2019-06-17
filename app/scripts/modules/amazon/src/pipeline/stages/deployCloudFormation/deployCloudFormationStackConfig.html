@@ -33,8 +33,9 @@
         <label class="sm-label-right">
           <input type="radio" ng-model="ctrl.$scope.stage.source" value="{{ctrl.textSource}}" />
           {{ ctrl.textSource | robotToHuman }}
-          <span ng-if="stage.source === ctrl.textSource"> </span> </label
-        ><br />
+          <span ng-if="stage.source === ctrl.textSource"> </span>
+        </label>
+        <br />
         <label class="sm-label-right">
           <input type="radio" ng-model="ctrl.$scope.stage.source" value="{{ctrl.artifactSource}}" />
           {{ ctrl.artifactSource | robotToHuman }}
