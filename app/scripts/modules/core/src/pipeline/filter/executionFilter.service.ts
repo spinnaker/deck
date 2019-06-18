@@ -136,7 +136,6 @@ export class ExecutionFilterService {
     }
     const searchText = [execution.name];
     searchText.push(execution.id);
-    searchText.push(this.getValuesAsString(execution.appConfig));
     searchText.push(this.getValuesAsString(execution.trigger, ['parentExecution']));
 
     execution.searchField = searchText.join(' ').toLowerCase();
