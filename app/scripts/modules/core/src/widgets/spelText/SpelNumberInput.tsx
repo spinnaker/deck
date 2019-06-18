@@ -39,12 +39,9 @@ export class SpelNumberInput extends React.Component<INumberInputProps, INumberI
     this.setState({ glowing });
   }
 
-  private valueChanged = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    if (event.target.type === 'number') {
-      this.props.onChange(parseInt(event.target.value, 10));
-    } else {
-      this.props.onChange(event.target.value);
-    }
+  private valueChanged = ({ target: { value } }: React.ChangeEvent<HTMLInputElement>): void => {
+    const num = parseInt(value, 10);
+    this.props.onChange(isNaN(num) ? value : num);
   };
 
   public render() {
