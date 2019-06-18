@@ -94,10 +94,14 @@ module.exports = angular
             }
             $scope.pipelineParameters = config.parameterConfig;
             $scope.pipelineParameters.forEach(parameterConfig => {
-              if (parameterConfig.default && parameterConfig.options && !parameterConfig.options.some(option => option.value === parameterConfig.default)) {
+              if (
+                parameterConfig.default &&
+                parameterConfig.options &&
+                !parameterConfig.options.some(option => option.value === parameterConfig.default)
+              ) {
                 parameterConfig.options.unshift({ value: parameterConfig.default });
               }
-            })
+            });
             $scope.userSuppliedParameters = $scope.stage.pipelineParameters;
 
             if ($scope.pipelineParameters) {
