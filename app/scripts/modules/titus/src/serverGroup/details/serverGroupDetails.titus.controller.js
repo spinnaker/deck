@@ -16,7 +16,7 @@ import {
 import { TitusReactInjector } from 'titus/reactShims';
 
 import { DISRUPTION_BUDGET_DETAILS_SECTION } from './disruptionBudget/DisruptionBudgetSection';
-
+import { SERVICE_JOB_PROCESSES_DETAILS_SECTION } from './serviceJobProcesses/ServiceJobProcessesSection';
 import { SCALING_POLICY_MODULE } from './scalingPolicy/scalingPolicy.module';
 
 import { TitusCloneServerGroupModal } from '../configure/wizard/TitusCloneServerGroupModal';
@@ -31,6 +31,7 @@ module.exports = angular
     SERVER_GROUP_WRITER,
     require('./resize/resizeServerGroup.controller').name,
     require('./rollback/rollbackServerGroup.controller').name,
+    SERVICE_JOB_PROCESSES_DETAILS_SECTION,
     SCALING_POLICY_MODULE,
     TITUS_SECURITY_GROUPS_DETAILS,
   ])
