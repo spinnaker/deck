@@ -33,7 +33,7 @@ export function ChecklistInput(props: IChecklistInputProps) {
   // Naively call the the field's onBlur handler
   // This is what Formik uses to mark the field as touched
   function touchField() {
-    props.onBlur(createFakeReactSyntheticEvent({ name: props.name, value }));
+    props.onBlur && props.onBlur(createFakeReactSyntheticEvent({ name: props.name, value }));
   }
   useEffect(touchField, []);
 
