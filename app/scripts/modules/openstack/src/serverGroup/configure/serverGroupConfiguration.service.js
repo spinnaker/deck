@@ -49,9 +49,9 @@ module.exports = angular
             securityGroups: securityGroupReader.getAllSecurityGroups(),
             loadBalancers: loadBalancerReader.loadLoadBalancers(application.name),
             userDataTypes: $q.when(angular.copy(userDataTypes)),
+            accounts: AccountService.listAccounts('openstack'),
           })
           .then(function(backingData) {
-            backingData.accounts = _.keys(backingData.credentialsKeyedByAccount);
             backingData.filtered = {};
             command.backingData = backingData;
             backingData.filtered.securityGroups = getRegionalSecurityGroups(command);

@@ -52,6 +52,8 @@ module.exports = angular
           userData: base.userData,
           serverGroupParameters: params,
           strategy: base.strategy,
+          strategyPipeline: base.strategyPipeline,
+          strategyApplication: base.strategyApplication,
         };
 
         if (base.viewState.mode === 'clone' && base.source) {
