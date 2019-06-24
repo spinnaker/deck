@@ -413,7 +413,7 @@ const helpContents: { [key: string]: string } = {
   'pipeline.config.webhook.statusUrlJsonPath':
     "JSON path to the status url in the webhook's response JSON. (i.e. <samp>$.buildInfo.url</samp>)",
   'pipeline.config.webhook.retryStatusCodes':
-    'Normally, webhook stage only retries on 429 and 5xx status codes. <br>You can specify additional status codes here that will cause the monitor to retry (e.g. <samp>404, 418</samp>)',
+    'Normally, webhook stages only retry on 429 and 5xx status codes. <br>You can specify additional status codes here that will cause the monitor to retry (e.g. <samp>404, 418</samp>)',
   'pipeline.config.webhook.waitBeforeMonitor':
     'Optional delay (in seconds) to wait before starting to poll the endpoint for monitoring status',
   'pipeline.config.webhook.statusJsonPath':
