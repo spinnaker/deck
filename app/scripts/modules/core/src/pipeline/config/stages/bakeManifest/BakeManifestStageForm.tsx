@@ -4,7 +4,7 @@ import { Option } from 'react-select';
 import { StageArtifactSelectorDelegate } from 'core/artifact';
 import { IArtifact, IExpectedArtifact, IPipeline } from 'core/domain';
 import { MapEditor } from 'core/forms';
-import { IFormikStageConfigInjectedProps, IStageConfigProps, StageConfigField } from 'core/pipeline';
+import { IFormikStageConfigInjectedProps, StageConfigField } from 'core/pipeline';
 import { CheckboxInput, ReactSelectInput, TextInput } from 'core/presentation';
 
 interface IBakeManifestStageFormProps {
@@ -15,10 +15,6 @@ export class BakeManifestStageForm extends React.Component<
   IBakeManifestStageFormProps & IFormikStageConfigInjectedProps
 > {
   public readonly templateRenderers = ['HELM2'];
-
-  public constructor(props: IStageConfigProps & IFormikStageConfigInjectedProps) {
-    super(props);
-  }
 
   public componentDidMount() {
     const stage = this.props.formik.values;
@@ -33,17 +29,17 @@ export class BakeManifestStageForm extends React.Component<
   }
 
   private onTemplateArtifactEdited = (artifact: IArtifact, index: number) => {
-    this.props.formik.setFieldValue('inputArtifacts[' + index + '].id', null);
-    this.props.formik.setFieldValue('inputArtifacts[' + index + '].artifact', artifact);
+    this.props.formik.setFieldValue(`inputArtifacts[${index}].id`, null);
+    this.props.formik.setFieldValue(`inputArtifacts[${index}].artifact`, artifact);
   };
 
   private onTemplateArtifactSelected = (id: string, index: number) => {
-    this.props.formik.setFieldValue('inputArtifacts[' + index + '].id', id);
-    this.props.formik.setFieldValue('inputArtifacts[' + index + '].artifact', null);
+    this.props.formik.setFieldValue(`inputArtifacts[${index}].id`, id);
+    this.props.formik.setFieldValue(`inputArtifacts[${index}].artifact`, null);
   };
 
   private onTemplateArtifactAccountSelected = (account: string, index: number) => {
-    this.props.formik.setFieldValue('inputArtifacts[' + index + '].account', account);
+    this.props.formik.setFieldValue(`inputArtifacts[${index}].account`, account);
   };
 
   private addInputArtifact = () => {
