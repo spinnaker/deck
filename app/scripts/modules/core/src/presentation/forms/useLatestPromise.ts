@@ -47,9 +47,9 @@ export function useLatestPromise<T>(
       }
     };
 
-    const reject = (error: any) => {
+    const reject = (rejection: any) => {
       if (mounted && promise === requestInFlight.current) {
-        setError(error);
+        setError(rejection);
         setStatus('REJECTED');
       }
     };
