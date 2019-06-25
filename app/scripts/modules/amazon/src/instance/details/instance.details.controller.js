@@ -10,7 +10,6 @@ import {
   RecentHistoryService,
   SETTINGS,
   FirewallLabels,
-  MANAGED_RESOURCE_DETAILS_INDICATOR,
 } from '@spinnaker/core';
 
 import { AMAZON_INSTANCE_WRITE_SERVICE } from 'amazon/instance/amazon.instance.write.service';
@@ -22,7 +21,6 @@ module.exports = angular
     AMAZON_INSTANCE_WRITE_SERVICE,
     require('../../vpc/vpcTag.directive').name,
     CONFIRMATION_MODAL_SERVICE,
-    MANAGED_RESOURCE_DETAILS_INDICATOR,
   ])
   .controller('awsInstanceDetailsCtrl', [
     '$scope',

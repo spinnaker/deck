@@ -92,11 +92,6 @@
       </div>
     </div>
   </div>
-  <managed-resource-details-indicator
-    ng-if="!state.loading && instance.serverGroup && instance.serverGroup.clusterEntityTags"
-    entity-tags="instance.serverGroup.clusterEntityTags"
-  >
-  </managed-resource-details-indicator>
   <div class="content" ng-if="!state.loading && instance">
     <collapsible-section heading="Instance Information" expanded="true">
       <dl class="dl-horizontal dl-flex">
