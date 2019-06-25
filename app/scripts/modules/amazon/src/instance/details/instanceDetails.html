@@ -92,6 +92,11 @@
       </div>
     </div>
   </div>
+  <managed-resource-details-indicator
+    ng-if="!state.loading && instance.serverGroup && instance.serverGroup.clusterEntityTags"
+    entity-tags="instance.serverGroup.clusterEntityTags"
+  >
+  </managed-resource-details-indicator>
   <div class="content" ng-if="!state.loading && instance">
     <collapsible-section heading="Instance Information" expanded="true">
       <dl class="dl-horizontal dl-flex">
@@ -116,9 +121,13 @@
           >
         </dd>
         <dt ng-if="instance.serverGroup">VPC</dt>
-        <dd ng-if="instance.serverGroup"><vpc-tag vpc-id="instance.vpcId"></vpc-tag></dd>
+        <dd ng-if="instance.serverGroup">
+          <vpc-tag vpc-id="instance.vpcId"></vpc-tag>
+        </dd>
         <dt ng-if="instance.subnetId">Subnet</dt>
-        <dd ng-if="instance.subnetId"><subnet-tag subnet-id="instance.subnetId"></subnet-tag></dd>
+        <dd ng-if="instance.subnetId">
+          <subnet-tag subnet-id="instance.subnetId"></subnet-tag>
+        </dd>
         <dt ng-if="instance.imageId">Image ID</dt>
         <dd ng-if="instance.imageId">{{instance.imageId}}</dd>
       </dl>
