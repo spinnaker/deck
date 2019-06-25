@@ -27,14 +27,9 @@ export const RenderWhenVisible = ({
   const [height, setHeight] = React.useState(placeholderHeight);
   let observer: IntersectionObserver;
 
-  React.useEffect(() => {
-    return () => observer && observer.disconnect();
-  }, []);
+  const nodeRef = React.useRef<HTMLDivElement>();
 
-  const configureObserver = React.useCallback((node: HTMLDivElement) => {
-    if (!node) {
-      return;
-    }
+  React.useEffect(() => {
     let visible = isVisible;
     observer = new IntersectionObserver(
       entries => {
@@ -55,11 +50,14 @@ export const RenderWhenVisible = ({
         rootMargin: bufferHeight && container ? `${bufferHeight}px 0px` : '0px',
       },
     );
-    observer.observe(node);
+    observer.observe(nodeRef.current);
+    return () => {
+      observer.disconnect();
+    };
   }, []);
 
   return (
-    <div ref={configureObserver} className="render-when-visible">
+    <div ref={nodeRef} className="render-when-visible">
       {isVisible && render()}
       {!isVisible && <div style={{ height: height + 'px' }} />}
     </div>

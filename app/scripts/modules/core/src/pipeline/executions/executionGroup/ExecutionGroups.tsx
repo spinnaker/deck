@@ -54,7 +54,12 @@ export class ExecutionGroups extends React.Component<IExecutionGroupsProps, IExe
 
   private showingDetails(): boolean {
     const { executionId } = ReactInjector.$stateParams;
-    if (this.state.groups.every(g => g.executions.every(e => e.id !== executionId))) {
+    // showingDetails() is just used to set a class ('.showing-details') on the wrapper around the execution groups.
+    // the effect of this class is that, when an execution is deep linked, all the other execution groups have a partial
+    // opacity (except when hovering over them).
+    // Here, we are checking if there is an executionId deep linked - and also confirming it's actually present
+    // on screen. If not, we will not apply the '.showing-details' class to the wrapper.
+    if (!executionId || this.state.groups.every(g => g.executions.every(e => e.id !== executionId))) {
       return false;
     }
     return ReactInjector.$state.includes('**.execution');
