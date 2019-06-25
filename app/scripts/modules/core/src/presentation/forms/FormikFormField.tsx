@@ -109,6 +109,6 @@ export function createFieldValidator<T>(
   return (value: any) => validator(value, labelString);
 }
 
-export function FormikFormField<T>(props: IFormikFormFieldProps<T>) {
+export function FormikFormField<T = any>(props: IFormikFormFieldProps<T>) {
   return <FormikConsumer>{formik => <FormikFormFieldImpl {...props} formik={formik} />}</FormikConsumer>;
 }
