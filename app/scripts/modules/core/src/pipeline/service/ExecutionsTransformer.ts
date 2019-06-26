@@ -1,5 +1,5 @@
 import { duration } from 'core/utils/timeFormatters';
-import { find, findLast, flattenDeep, get, has, maxBy, uniq, sortBy } from 'lodash';
+import { find, findLast, get, has, maxBy, uniq, sortBy } from 'lodash';
 
 import { Application } from 'core/application';
 import { ExecutionBarLabel } from 'core/pipeline/config/stages/common/ExecutionBarLabel';
@@ -21,10 +21,12 @@ export class ExecutionsTransformer {
     execution.stages.forEach(stage => {
       const stageConfig = Registry.pipeline.getStageConfig(stage);
       if (stageConfig && stageConfig.accountExtractor) {
-        targets.push(stageConfig.accountExtractor(stage));
+        targets.push(...stageConfig.accountExtractor(stage));
       }
     });
-    execution.deploymentTargets = uniq(flattenDeep(targets)).sort();
+    execution.deploymentTargets = uniq(targets)
+      .filter(a => !!a)
+      .sort();
   }
 
   private static siblingStageSorter(a: IOrchestratedItem, b: IOrchestratedItem): number {
@@ -312,6 +314,10 @@ export class ExecutionsTransformer {
       }
       const context = stage.context || {};
       stage.cloudProvider = context.cloudProvider || context.cloudProviderType;
+
+      if (context.alias) {
+        stage.alias = context.alias;
+      }
     });
 
     OrchestratedItemTransformer.defineProperties(execution);
@@ -356,6 +362,7 @@ export class ExecutionsTransformer {
           group: context.group,
           id: stage.id,
           index: undefined,
+          graphRowOverride: context.graphRowOverride || 0,
           masterStage: stage,
           name: stage.name,
           refId: stage.refId,

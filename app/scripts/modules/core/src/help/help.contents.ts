@@ -52,7 +52,6 @@ const helpContents: { [key: string]: string } = {
       <ul>
         <li>Name</li>
         <li>Trigger</li>
-        <li>Context - server groups, bakery results, etc.</li>
       </ul>`,
   'pipeline.config.triggers.respectQuietPeriod': `
       <p>The quiet period is a system operator designated period of time when automated pipelines and deploys should not run.</p>`,
@@ -413,6 +412,10 @@ const helpContents: { [key: string]: string } = {
     "Pick the status url from the JSON returned by the webhook's response call.",
   'pipeline.config.webhook.statusUrlJsonPath':
     "JSON path to the status url in the webhook's response JSON. (i.e. <samp>$.buildInfo.url</samp>)",
+  'pipeline.config.webhook.retryStatusCodes':
+    'Normally, webhook stages only retry on 429 and 5xx status codes. <br>You can specify additional status codes here that will cause the monitor to retry (e.g. <samp>404, 418</samp>)',
+  'pipeline.config.webhook.waitBeforeMonitor':
+    'Optional delay (in seconds) to wait before starting to poll the endpoint for monitoring status',
   'pipeline.config.webhook.statusJsonPath':
     "JSON path to the status information in the webhook's response JSON. (e.g. <samp>$.buildInfo.status</samp>)",
   'pipeline.config.webhook.progressJsonPath':

@@ -84,9 +84,24 @@
       <div class="stage-details"></div>
     </page-section>
     <page-section key="execution" label="Execution Options">
-      <override-failure stage="stage"></override-failure>
-      <execution-windows stage="stage" ng-if="!pipeline.strategy && stage"></execution-windows>
-      <override-timeout stage="stage"></override-timeout>
+      <override-failure
+        fail-pipeline="stage.failPipeline"
+        continue-pipeline="stage.continuePipeline"
+        complete-other-branches-then-fail="stage.completeOtherBranchesThenFail"
+        update-stage-field="stageConfigCtrl.updateStageField"
+      ></override-failure>
+      <execution-windows
+        ng-if="!pipeline.strategy && stage"
+        restrict-execution-during-time-window="stage.restrictExecutionDuringTimeWindow"
+        restricted-execution-window="stage.restrictedExecutionWindow"
+        skip-window-text="stage.skipWindowText"
+        update-stage-field="stageConfigCtrl.updateStageField"
+      ></execution-windows>
+      <override-timeout
+        stage-config="stageConfig"
+        stage-timeout-ms="stage.stageTimeoutMs"
+        update-stage-field="stageConfigCtrl.updateStageField"
+      ></override-timeout>
       <fail-on-failed-expressions stage="stage"></fail-on-failed-expressions>
       <optional-stage stage="stage"></optional-stage>
     </page-section>
