@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactGA from 'react-ga';
-import { clone, isEqual } from 'lodash';
+import { isEqual } from 'lodash';
 import { $location } from 'ngimport';
 import { Subscription } from 'rxjs';
 import * as classNames from 'classnames';
@@ -53,7 +53,7 @@ export interface IExecutionState {
   runningTimeInMs: number;
 }
 
-export class Execution extends React.Component<IExecutionProps, IExecutionState> {
+export class Execution extends React.PureComponent<IExecutionProps, IExecutionState> {
   public static defaultProps: Partial<IExecutionProps> = {
     dataSourceKey: 'executions',
     cancelHelpText: 'Cancel execution',
@@ -89,20 +89,23 @@ export class Execution extends React.Component<IExecutionProps, IExecutionState>
     };
   }
 
-  private updateViewStateDetails(): void {
-    const { $stateParams } = ReactInjector;
+  private updateViewStateDetails(toParams: any, fromParams: any): void {
+    const executionId = this.props.execution.id;
     const { viewState } = this.state;
-    const newViewState = clone(viewState);
-    newViewState.activeStageId = Number($stateParams.stage);
-    newViewState.activeSubStageId = Number($stateParams.subStage);
-    newViewState.executionId = $stateParams.executionId;
-    const shouldScroll =
-      newViewState.executionId === this.props.execution.id && newViewState.executionId !== viewState.executionId;
-    if (!isEqual(viewState, newViewState)) {
+    const shouldShowDetails = toParams.executionId === executionId;
+    const shouldScroll = toParams.executionId === executionId && fromParams.executionId !== executionId;
+    const newViewState = { ...viewState };
+    newViewState.activeStageId = Number(toParams.stage);
+    newViewState.activeSubStageId = Number(toParams.subStage);
+    if (this.state.showingDetails !== shouldShowDetails) {
       this.setState({
-        viewState: newViewState,
         showingDetails: this.invalidateShowingDetails(this.props, shouldScroll),
+        viewState: newViewState,
       });
+    } else {
+      if (this.state.showingDetails && !isEqual(viewState, newViewState)) {
+        this.setState({ viewState: newViewState });
+      }
     }
   }
 
@@ -199,8 +202,10 @@ export class Execution extends React.Component<IExecutionProps, IExecutionState>
     this.runningTime = new OrchestratedItemRunningTime(execution, (time: number) =>
       this.setState({ runningTimeInMs: time }),
     );
-    this.stateChangeSuccessSubscription = ReactInjector.stateEvents.stateChangeSuccess.subscribe(() =>
-      this.updateViewStateDetails(),
+    this.stateChangeSuccessSubscription = ReactInjector.stateEvents.stateChangeSuccess.subscribe(
+      ({ toParams, fromParams }) => {
+        this.updateViewStateDetails(toParams, fromParams);
+      },
     );
   }
 
