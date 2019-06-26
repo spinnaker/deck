@@ -6,7 +6,6 @@ import { Subscription } from 'rxjs';
 import * as classNames from 'classnames';
 
 import { Application } from 'core/application/application.model';
-import { CopyToClipboard } from 'core/utils';
 import { StageExecutionDetails } from 'core/pipeline/details/StageExecutionDetails';
 import { ExecutionStatus } from 'core/pipeline/status/ExecutionStatus';
 import { ParametersAndArtifacts } from 'core/pipeline/status/ParametersAndArtifacts';
@@ -25,6 +24,7 @@ import { ExecutionMarker } from './ExecutionMarker';
 import { PipelineGraph } from 'core/pipeline/config/graph/PipelineGraph';
 import { Tooltip } from 'core/presentation/Tooltip';
 import { CancelModal } from 'core/cancelModal/CancelModal';
+import { ExecutionPermalink } from './ExecutionPermalink';
 
 import './execution.less';
 
@@ -257,10 +257,6 @@ export class Execution extends React.Component<IExecutionProps, IExecutionState>
     ReactGA.event({ category: 'Pipeline', action: 'Execution source clicked' });
   };
 
-  private handlePermalinkClick = (): void => {
-    ReactGA.event({ category: 'Pipeline', action: 'Permalink clicked' });
-  };
-
   private handleToggleDetails = (): void => {
     ReactGA.event({ category: 'Pipeline', action: 'Execution details toggled (Details link)' });
     this.toggleDetails();
@@ -440,10 +436,7 @@ export class Execution extends React.Component<IExecutionProps, IExecutionState>
                   Source
                 </a>
                 {' | '}
-                <a onClick={this.handlePermalinkClick} href={this.getUrl()}>
-                  Permalink
-                </a>
-                <CopyToClipboard text={this.getUrl()} toolTip="Copy permalink to clipboard" />
+                <ExecutionPermalink standalone={standalone} />
               </div>
             </div>
           </div>
