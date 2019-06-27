@@ -88,7 +88,7 @@ module.exports = angular
 
       function retrieveInstance() {
         var extraData = {};
-        var instanceSummary, loadBalancers, targetGroups, account, region, vpcId;
+        var instanceSummary, loadBalancers, targetGroups, account, region, vpcId, serverGroupDisabled;
         if (!app.serverGroups) {
           // standalone instance
           instanceSummary = {};
@@ -106,6 +106,7 @@ module.exports = angular
                 account = serverGroup.account;
                 region = serverGroup.region;
                 vpcId = serverGroup.vpcId;
+                serverGroupDisabled = serverGroup.isDisabled;
                 extraData.serverGroup = serverGroup.name;
                 extraData.vpcId = serverGroup.vpcId;
                 return true;
@@ -196,6 +197,7 @@ module.exports = angular
             $scope.instance.account = account;
             $scope.instance.region = region;
             $scope.instance.vpcId = vpcId;
+            $scope.instance.serverGroupDisabled = serverGroupDisabled;
             $scope.instance.loadBalancers = loadBalancers;
             $scope.instance.targetGroups = targetGroups;
             if ($scope.instance.networkInterfaces) {
