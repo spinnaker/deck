@@ -1,7 +1,7 @@
 import { module } from 'angular';
 
 import { APPLY_SOURCE_SERVER_GROUP_CAPACITY_STAGE } from './config/stages/applySourceServerGroupCapacity/applySourceServerGroupCapacityStage.module';
-import { BAKE_MANIFEST_STAGE } from './config/stages/bakeManifest/bakeManifestStage';
+import './config/stages/bakeManifest/bakeManifestStage';
 import { CHECK_PRECONDITIONS_STAGE_MODULE } from './config/stages/checkPreconditions/checkPreconditionsStage.module';
 import { CLONE_SERVER_GROUP_STAGE } from './config/stages/cloneServerGroup/cloneServerGroupStage.module';
 import { COPY_STAGE_MODAL_CONTROLLER } from './config/copyStage/copyStage.modal.controller';
@@ -13,7 +13,7 @@ import { DISABLE_ASG_STAGE_MODULE } from './config/stages/disableAsg/disableAsgS
 import { DISABLE_CLUSTER_STAGE } from './config/stages/disableCluster/disableClusterStage';
 import { ROLLBACK_CLUSTER_STAGE } from './config/stages/rollbackCluster/rollbackClusterStage';
 import { ENABLE_ASG_STAGE } from './config/stages/enableAsg/enableAsgStage';
-import { EXECUTION_WINDOWS_STAGE_MODULE } from './config/stages/executionWindows/executionWindowsStage.module';
+import { EXECUTION_WINDOWS } from './config/stages/executionWindows/executionWindows.module';
 import './config/stages/executionWindows/executionWindowsStage';
 import { FIND_AMI_STAGE } from './config/stages/findAmi/findAmiStage';
 import { FIND_ARTIFACT_FROM_EXECUTION_STAGE } from './config/stages/findArtifactFromExecution/findArtifactFromExecutionStage';
@@ -78,7 +78,6 @@ module(PIPELINE_MODULE, [
   WEBHOOK_STAGE_MODULE,
   UNMATCHED_STAGE_TYPE_STAGE,
   require('./config/stages/bake/bakeStage.module').name,
-  BAKE_MANIFEST_STAGE,
   CHECK_PRECONDITIONS_STAGE_MODULE,
   CLONE_SERVER_GROUP_STAGE,
   STAGE_COMMON_MODULE,
@@ -88,7 +87,7 @@ module(PIPELINE_MODULE, [
   DISABLE_CLUSTER_STAGE,
   ROLLBACK_CLUSTER_STAGE,
   ENABLE_ASG_STAGE,
-  EXECUTION_WINDOWS_STAGE_MODULE,
+  EXECUTION_WINDOWS,
   FIND_AMI_STAGE,
   FIND_ARTIFACT_FROM_EXECUTION_STAGE,
   require('./config/stages/findImageFromTags/findImageFromTagsStage.module').name,

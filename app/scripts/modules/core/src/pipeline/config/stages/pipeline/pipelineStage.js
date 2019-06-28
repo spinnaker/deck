@@ -1,5 +1,7 @@
 'use strict';
 
+import { pickBy } from 'lodash';
+
 const angular = require('angular');
 
 import { ApplicationReader } from 'core/application/service/ApplicationReader';
@@ -93,15 +95,26 @@ module.exports = angular
               $scope.stage.pipelineParameters = {};
             }
             $scope.pipelineParameters = config.parameterConfig;
+            $scope.pipelineParameters.forEach(parameterConfig => {
+              if (
+                parameterConfig.default &&
+                parameterConfig.options &&
+                !parameterConfig.options.some(option => option.value === parameterConfig.default)
+              ) {
+                parameterConfig.options.unshift({ value: parameterConfig.default });
+              }
+            });
             $scope.userSuppliedParameters = $scope.stage.pipelineParameters;
 
             if ($scope.pipelineParameters) {
               const acceptedPipelineParams = $scope.pipelineParameters.map(param => param.name);
-              $scope.invalidParameters = Object.keys($scope.userSuppliedParameters).filter(
-                paramName => !acceptedPipelineParams.includes(paramName),
+              $scope.invalidParameters = pickBy(
+                $scope.userSuppliedParameters,
+                (value, name) => !acceptedPipelineParams.includes(name),
               );
             }
 
+            $scope.hasInvalidParameters = () => Object.keys($scope.invalidParameters || {}).length;
             $scope.useDefaultParameters = {};
             _.each($scope.pipelineParameters, function(property) {
               if (!(property.name in $scope.stage.pipelineParameters) && property.default !== null) {
@@ -135,7 +148,7 @@ module.exports = angular
       };
 
       this.removeInvalidParameters = function() {
-        $scope.invalidParameters.forEach(param => {
+        Object.keys($scope.invalidParameters).forEach(param => {
           if ($scope.stage.pipelineParameters[param] !== 'undefined') {
             delete $scope.stage.pipelineParameters[param];
           }

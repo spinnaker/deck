@@ -7,15 +7,16 @@ import { StageArtifactSelector, IStageArtifactSelectorProps } from './StageArtif
 import { PreRewriteStageArtifactSelector, IPreRewriteArtifactSelectorProps } from './PreRewriteStageArtifactSelector';
 
 interface IStageArtifactSelectorDelegateProps {
-  helpKey: string;
+  helpKey?: string;
   label: string;
+  fieldColumns?: number;
 }
 
 export const StageArtifactSelectorDelegate = (
   props: IStageArtifactSelectorProps & IPreRewriteArtifactSelectorProps & IStageArtifactSelectorDelegateProps,
 ) => {
   return SETTINGS.feature['artifactsRewrite'] ? (
-    <StageConfigField label={props.label} helpKey={props.helpKey}>
+    <StageConfigField label={props.label} helpKey={props.helpKey} fieldColumns={props.fieldColumns}>
       <StageArtifactSelector {...props} />
     </StageConfigField>
   ) : (

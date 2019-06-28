@@ -17,14 +17,16 @@ import { StageConfigWrapper } from './StageConfigWrapper';
 import { EditStageJsonModal } from './common/EditStageJsonModal';
 import { ReactModal } from 'core/presentation';
 import { PRODUCES_ARTIFACTS_REACT } from './producesArtifacts/ProducesArtifacts';
+import { OVERRRIDE_FAILURE } from './overrideFailure/overrideFailure.module';
+import { OVERRIDE_TIMEOUT_COMPONENT } from './overrideTimeout/overrideTimeout.module';
 
 module.exports = angular
   .module('spinnaker.core.pipeline.config.stage', [
     PRODUCES_ARTIFACTS_REACT,
     BASE_EXECUTION_DETAILS_CTRL,
     STAGE_NAME,
-    require('./overrideTimeout/overrideTimeout.directive').name,
-    require('./overrideFailure/overrideFailure.component').name,
+    OVERRIDE_TIMEOUT_COMPONENT,
+    OVERRRIDE_FAILURE,
     require('./optionalStage/optionalStage.directive').name,
     require('./failOnFailedExpressions/failOnFailedExpressions.directive').name,
     CONFIRMATION_MODAL_SERVICE,
@@ -150,6 +152,11 @@ module.exports = angular
         });
       };
 
+      this.updateStageField = changes => {
+        extend($scope.stage, changes);
+        $scope.stageFieldUpdated();
+      };
+
       this.selectStage = function(newVal, oldVal) {
         const stageDetailsNode = $element.find('.stage-details').get(0);
         if ($scope.viewState.stageIndex >= $scope.pipeline.stages.length) {
@@ -244,6 +251,8 @@ module.exports = angular
           $scope.description = null;
           $scope.extendedDescription = null;
         }
+
+        updateStageConfig($scope.stage);
       };
 
       function applyConfigController(config, stageScope) {
@@ -274,6 +283,12 @@ module.exports = angular
         if (!$scope.stage.name && config.label) {
           $scope.stage.name = config.label;
         }
+      }
+
+      function updateStageConfig(stage) {
+        $scope.$applyAsync(() => {
+          $scope.stageConfig = getConfig(stage);
+        });
       }
 
       $scope.$on('pipeline-reverted', this.selectStage);

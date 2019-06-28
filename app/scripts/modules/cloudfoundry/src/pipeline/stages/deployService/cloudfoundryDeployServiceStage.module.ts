@@ -34,7 +34,7 @@ const sourceStruct = (manifest: ICloudFoundryServiceManifestSource) => {
 
 PipelineConfigValidator.registerValidator(
   'requiredDeployServiceField',
-  new class implements IStageOrTriggerValidator {
+  new (class implements IStageOrTriggerValidator {
     public validate(
       _pipeline: IPipeline,
       stage: IStage | ITrigger,
@@ -49,12 +49,12 @@ PipelineConfigValidator.registerValidator(
       const fieldLabel = validationConfig.fieldLabel || upperFirst(validationConfig.fieldName);
       return content ? null : `<strong>${fieldLabel}</strong> is a required field for the Deploy Service stage.`;
     }
-  }(),
+  })(),
 );
 
 PipelineConfigValidator.registerValidator(
   'validDeployServiceParameterJsonOrYaml',
-  new class implements IStageOrTriggerValidator {
+  new (class implements IStageOrTriggerValidator {
     private isJson(value: string): boolean {
       try {
         JSON.parse(value);
@@ -93,11 +93,11 @@ PipelineConfigValidator.registerValidator(
       }
       return null;
     }
-  }(),
+  })(),
 );
 
 Registry.pipeline.registerStage({
-  accountExtractor: (stage: IStage) => stage.context.credentials,
+  accountExtractor: (stage: IStage) => [stage.context.credentials],
   cloudProvider: 'cloudfoundry',
   component: CloudfoundryDeployServiceStageConfig,
   configAccountExtractor: (stage: IStage) => [stage.credentials],

@@ -194,6 +194,7 @@ export class PipelineGraph extends React.Component<IPipelineGraphProps, IPipelin
             }
             return 0;
           },
+          (node: IPipelineGraphNode) => (node.graphRowOverride ? node.graphRowOverride : 1000),
           // same highest parent, prefer farthest last node
           (node: IPipelineGraphNode) => 1 - node.lastPhase,
           // same highest parent, prefer fewer terminal children if any
@@ -377,16 +378,16 @@ export class PipelineGraph extends React.Component<IPipelineGraphProps, IPipelin
   }
 
   private resetLinks(props: IPipelineGraphProps, node: IPipelineGraphNode): void {
-    const { execution, viewState } = props;
+    const { activeStageId, section, stageIndex } = props.viewState;
     if (props.execution) {
       // executions view
-      node.isActive = viewState.activeStageId === node.index && viewState.executionId === execution.id;
+      node.isActive = activeStageId === node.index;
     } else {
       // pipeline config view
       if (node.section === 'triggers') {
-        node.isActive = viewState.section === node.section;
+        node.isActive = section === node.section;
       } else {
-        node.isActive = viewState.stageIndex === node.index && viewState.section === 'stage';
+        node.isActive = stageIndex === node.index && section === 'stage';
       }
     }
     node.isHighlighted = false;
