@@ -56,7 +56,7 @@
   </div>
   <managed-resource-details-indicator
     ng-if="!state.loading && securityGroup.entityTags"
-    entity-tags="securityGroup.entityTags"
+    entity-tags="[securityGroup.entityTags]"
   >
   </managed-resource-details-indicator>
   <div class="content" ng-if="!state.loading">
