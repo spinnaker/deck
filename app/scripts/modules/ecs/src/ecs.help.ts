@@ -56,7 +56,7 @@ const helpContents: { [key: string]: string } = {
     '<p>The source of the ECS Task Definition. Task Definition contents can either be entering manually via input fields or from a selected JSON file artifact. Artifact file contents should be structured as an ECS "RegisterTaskDefinition" request.</p>',
   'ecs.taskDefinitionArtifact': '<p>The artifact containing the ECS Task Definition.</p>',
   'ecs.containerMappings':
-    '<p>The list of expected containers within the Task Definition and which container image they should use. Containers in the Task Definition which are not specified here will be registered as appears in the artifact.</p>',
+    '<p>The list of expected containers within the Task Definition and which container image they should use. Containers in the Task Definition which are not specified here will be registered as they appear in the artifact.</p>',
   'ecs.containerMappingName':
     '<p>The name of the container. Name should match the <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_ContainerDefinition.html#ECS-Type-ContainerDefinition-name"><b>containerDefinition.name</b></a> field as it appears in the Task Definition.</p>',
   'ecs.containerMappingImage': '<p>The container image the named container should run.</p>',

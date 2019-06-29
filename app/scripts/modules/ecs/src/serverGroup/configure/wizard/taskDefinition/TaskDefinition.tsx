@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { module, IPromise } from 'angular';
+import { concat, uniq } from 'lodash';
 import { react2angular } from 'react2angular';
 import {
   IEcsContainerMapping,
@@ -142,8 +143,14 @@ export class TaskDefinition extends React.Component<ITaskDefinitionProps, ITaskD
     this.setState({ containerMappings: currentMappings });
   };
 
-  // NoOp here, but required by StageArtifactSelectorDelegate.
-  private updatePipeline = (pipeline: IPipeline): void => {};
+  private updatePipeline = (pipeline: IPipeline): void => {
+    if (pipeline.expectedArtifacts && pipeline.expectedArtifacts.length > 0) {
+      const oldArtifacts = this.props.command.viewState.pipeline.expectedArtifacts;
+      const updatedArtifacts = concat(pipeline.expectedArtifacts, oldArtifacts);
+      pipeline.expectedArtifacts = uniq(updatedArtifacts);
+      this.props.notifyAngular('pipeline', pipeline);
+    }
+  };
 
   public render(): React.ReactElement<TaskDefinition> {
     const { command } = this.props;

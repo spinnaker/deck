@@ -234,7 +234,11 @@ module.exports = angular
 
       // used by react components to update command fields in parent (angular) scope
       $scope.notifyAngular = function(commandKey, value) {
-        $scope.command[commandKey] = value;
+        if (commandKey == 'pipeline') {
+          $scope.command.viewState.pipeline = value;
+        } else {
+          $scope.command[commandKey] = value;
+        }
       };
 
       // used by react components to configure command for image queries
