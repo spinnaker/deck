@@ -159,8 +159,13 @@ export class TaskDefinition extends React.Component<ITaskDefinitionProps, ITaskD
     const updateContainerMappingImage = this.updateContainerMappingImage;
 
     const dockerImages = this.state.dockerImages.map(function(image, index) {
+      let msg = '';
+      if (image.fromTrigger || image.fromContext) {
+        msg = image.fromTrigger ? '(TRIGGER) ' : '(FIND IMAGE RESULT) ';
+      }
       return (
         <option key={index} value={image.imageId}>
+          {msg}
           {image.imageId}
         </option>
       );
