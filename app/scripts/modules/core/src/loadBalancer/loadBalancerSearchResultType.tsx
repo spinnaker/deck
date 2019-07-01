@@ -64,7 +64,6 @@ class LoadBalancersSearchResultType extends SearchResultType<ILoadBalancerSearch
     };
 
     const results = resultSet.results.slice().sort(itemSortFn);
-
     return (
       <TableBody>
         {results

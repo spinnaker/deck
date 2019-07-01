@@ -1,0 +1,18 @@
+[
+  {
+    "type": "File",
+    "name": "/Users/nabebe/Documents/code/client/Spinnaker/deck-github-private/deck-private/app/scripts/modules/core/src/api/ApiService.ts",
+    "parent_id": null,
+    "workspaceRoot": "/Users/nabebe/Documents/code/client/Spinnaker/deck-github-private/deck-private",
+    "workspacePath": "app/scripts/modules/core/src/api/ApiService.ts",
+    "id": "XUIZacKiMFexDEkv"
+  },
+  {
+    "type": "File",
+    "name": "/Users/nabebe/Documents/code/client/Spinnaker/deck-github-private/deck-private/app/scripts/modules/ecs/src/iamRoles/iamRole.read.service.ts",
+    "parent_id": null,
+    "workspaceRoot": "/Users/nabebe/Documents/code/client/Spinnaker/deck-github-private/deck-private",
+    "workspacePath": "app/scripts/modules/ecs/src/iamRoles/iamRole.read.service.ts",
+    "id": "m0BYGSqUk8zy56bZ"
+  }
+]

@@ -170,7 +170,6 @@ export class API {
     urls
       .filter(i => !isNil(i))
       .forEach((url: string) => (config.url = `${config.url}/${url.toString().replace(/^\/+/, '')}`));
-
     return this.baseReturn(config);
   }
 

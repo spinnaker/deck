@@ -9,6 +9,7 @@ export class SubnetReader {
     if (this.cache) {
       return this.cache;
     }
+
     this.cache = API.one('subnets')
       .getList()
       .then((subnets: ISubnet[]) => {
@@ -23,7 +24,6 @@ export class SubnetReader {
       });
     return this.cache;
   }
-
   public static listSubnetsByProvider(cloudProvider: string): ng.IPromise<ISubnet[]> {
     return API.one('subnets', cloudProvider).getList();
   }
