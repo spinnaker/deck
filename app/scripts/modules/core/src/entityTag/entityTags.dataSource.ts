@@ -37,6 +37,10 @@ module(ENTITY_TAGS_DATA_SOURCE, [LOAD_BALANCER_READ_SERVICE]).run([
         .ready()
         .then(() => EntityTagsReader.addTagsToLoadBalancers(application), noop);
       application
+        .getDataSource('functions')
+        .ready()
+        .then(() => EntityTagsReader.addTagsToFunctions(application), noop);
+      application
         .getDataSource('securityGroups')
         .ready()
         .then(() => EntityTagsReader.addTagsToSecurityGroups(application), noop);

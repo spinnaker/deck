@@ -202,9 +202,11 @@
     "wdio-selenium-standalone-service": "^0.0.12",
     "wdio-spec-reporter": "^0.1.5",
     "webdriverio": "^4.14.1",
-    "webpack": "4.29.1",
-    "webpack-cli": "3.2.3",
-    "webpack-dev-server": "3.1.14",
+    "webpack": "^4.29.1",
+    "webpack-cli": "^3.3.7",
+    "webpack-dev-middleware": "^3.7.0",
+    "webpack-dev-server": "^3.1.14",
+    "webpack-hot-middleware": "^2.25.0",
     "webpack-node-externals": "1.7.2"
   },
   "optionalDependencies": {

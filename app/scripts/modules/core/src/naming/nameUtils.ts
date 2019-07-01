@@ -104,4 +104,15 @@ export class NameUtils {
   public static getMoniker(app: string, stack: string, detail: string): IMoniker {
     return { app, stack, detail };
   }
+
+  public static parseFunctionName(functionName: string): IComponentName {
+    const split = functionName.split('-'),
+    result: IComponentName = {
+      application: split[0],
+      stack: '',
+      freeFormDetails: split[1],
+      cluster: '',
+    };
+    return result;
+  }
 }

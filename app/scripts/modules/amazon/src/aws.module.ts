@@ -3,6 +3,7 @@ import { module } from 'angular';
 import { CloudProviderRegistry, DeploymentStrategyRegistry } from '@spinnaker/core';
 
 import { AWS_LOAD_BALANCER_MODULE } from './loadBalancer/loadBalancer.module';
+import { AWS_FUNCTION_MODULE } from './function/function.module';
 import { AWS_REACT_MODULE } from './reactShims/aws.react.module';
 import { AWS_SECURITY_GROUP_MODULE } from './securityGroup/securityGroup.module';
 import { AWS_SERVER_GROUP_TRANSFORMER } from './serverGroup/serverGroup.transformer';
@@ -17,7 +18,7 @@ import { AwsImageReader } from './image';
 import { AmazonLoadBalancerClusterContainer } from './loadBalancer/AmazonLoadBalancerClusterContainer';
 import { AmazonLoadBalancersTag } from './loadBalancer/AmazonLoadBalancersTag';
 import { AwsLoadBalancerTransformer } from './loadBalancer/loadBalancer.transformer';
-
+import { AwsFunctionTransformer } from './function/function.transformer';
 import './deploymentStrategy/rollingPush.strategy';
 
 import './logo/aws.logo.less';
@@ -44,6 +45,7 @@ import {
 
 import { DEPLOY_CLOUDFORMATION_STACK_STAGE } from './pipeline/stages/deployCloudFormation/deployCloudFormationStackStage';
 import { CLOUDFORMATION_TEMPLATE_ENTRY } from './pipeline/stages/deployCloudFormation/cloudFormationTemplateEntry.component';
+import { CreateLambdaFunction } from './function/CreateLambdaFunction';
 
 // load all templates into the $templateCache
 const templates = require.context('./', true, /\.html$/);
@@ -73,6 +75,7 @@ module(AMAZON_MODULE, [
   AWS_SERVER_GROUP_TRANSFORMER,
   require('./instance/awsInstanceType.service').name,
   AWS_LOAD_BALANCER_MODULE,
+  AWS_FUNCTION_MODULE,
   require('./instance/details/instance.details.controller').name,
   AWS_SECURITY_GROUP_MODULE,
   SUBNET_RENDERER,
@@ -127,6 +130,13 @@ module(AMAZON_MODULE, [
       ClusterContainer: AmazonLoadBalancerClusterContainer,
       LoadBalancersTag: AmazonLoadBalancersTag,
     },
+
+    function: {
+      details: require('./function/details/AmazonFunctionDetails'),
+      CreateFunctionModal: CreateLambdaFunction,
+      transformer: AwsFunctionTransformer,
+    },
+
     securityGroup: {
       transformer: 'awsSecurityGroupTransformer',
       reader: 'awsSecurityGroupReader',
