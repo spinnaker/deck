@@ -5,7 +5,6 @@ export interface IExecutionViewState {
   activeSubStageId: number;
   canConfigure: boolean;
   canTriggerPipelineManually: boolean;
-  executionId: string;
   section?: string;
   stageIndex?: number;
 }
@@ -32,6 +31,7 @@ export interface IPipelineGraphNode {
   parents: IPipelineGraphNode[];
   placeholder?: boolean;
   root?: boolean;
+  graphRowOverride?: number;
   row?: number; // Added after the fact in PipelineGraphDirective
   x?: number; // Added after the fact in PipelineGraphDirective
   y?: number; // Added after the fact in PipelineGraphDirective
@@ -48,7 +48,6 @@ export interface IPipelineGraphNode {
   warnings?: { messages: string[] };
 
   // Execution node parameters
-  executionId?: string;
   executionStage?: boolean;
   hasNotStarted?: boolean;
   labelComponent?: React.ComponentType<{ stage: IExecutionStageSummary }>;
@@ -67,13 +66,13 @@ export class PipelineGraphService {
       const node: IPipelineGraphNode = {
         childLinks: [],
         children: [],
-        executionId: execution.id,
         executionStage: true,
         extraLabelLines: stage.extraLabelLines ? stage.extraLabelLines(stage) : 0,
+        graphRowOverride: stage.graphRowOverride || 0,
         hasNotStarted: stage.hasNotStarted,
         id: stage.refId,
         index: idx,
-        isActive: viewState.activeStageId === stage.index && viewState.executionId === execution.id,
+        isActive: viewState.activeStageId === stage.index,
         isHighlighted: false,
         labelComponent: stage.labelComponent,
         masterStage: stage.masterStage,
@@ -120,6 +119,7 @@ export class PipelineGraphService {
       const node: IPipelineGraphNode = {
         childLinks: [],
         children: [],
+        graphRowOverride: stage.graphRowOverride || 0,
         hasWarnings: !!warnings,
         id: stage.refId,
         index: idx,

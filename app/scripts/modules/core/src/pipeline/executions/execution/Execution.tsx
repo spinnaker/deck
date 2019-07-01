@@ -1,12 +1,11 @@
 import * as React from 'react';
 import * as ReactGA from 'react-ga';
-import { clone, isEqual } from 'lodash';
+import { isEqual } from 'lodash';
 import { $location } from 'ngimport';
 import { Subscription } from 'rxjs';
 import * as classNames from 'classnames';
 
 import { Application } from 'core/application/application.model';
-import { CopyToClipboard } from 'core/utils';
 import { StageExecutionDetails } from 'core/pipeline/details/StageExecutionDetails';
 import { ExecutionStatus } from 'core/pipeline/status/ExecutionStatus';
 import { ParametersAndArtifacts } from 'core/pipeline/status/ParametersAndArtifacts';
@@ -25,6 +24,7 @@ import { ExecutionMarker } from './ExecutionMarker';
 import { PipelineGraph } from 'core/pipeline/config/graph/PipelineGraph';
 import { Tooltip } from 'core/presentation/Tooltip';
 import { CancelModal } from 'core/cancelModal/CancelModal';
+import { ExecutionPermalink } from './ExecutionPermalink';
 
 import './execution.less';
 
@@ -40,6 +40,7 @@ export interface IExecutionProps {
   onRerun?: (execution: IExecution, config: IPipeline) => void;
   cancelHelpText?: string;
   cancelConfirmationText?: string;
+  scrollIntoView?: boolean; // should really only be set to ensure scrolling on initial page load deep link
 }
 
 export interface IExecutionState {
@@ -52,7 +53,7 @@ export interface IExecutionState {
   runningTimeInMs: number;
 }
 
-export class Execution extends React.Component<IExecutionProps, IExecutionState> {
+export class Execution extends React.PureComponent<IExecutionProps, IExecutionState> {
   public static defaultProps: Partial<IExecutionProps> = {
     dataSourceKey: 'executions',
     cancelHelpText: 'Cancel execution',
@@ -60,6 +61,7 @@ export class Execution extends React.Component<IExecutionProps, IExecutionState>
 
   private stateChangeSuccessSubscription: Subscription;
   private runningTime: OrchestratedItemRunningTime;
+  private wrapperRef = React.createRef<HTMLDivElement>();
 
   constructor(props: IExecutionProps) {
     super(props);
@@ -77,7 +79,7 @@ export class Execution extends React.Component<IExecutionProps, IExecutionState>
     const restartedStage = execution.stages.find(stage => stage.context.restartDetails !== undefined);
 
     this.state = {
-      showingDetails: this.invalidateShowingDetails(props),
+      showingDetails: this.invalidateShowingDetails(props, true),
       showingParams: standalone,
       pipelinesUrl: [SETTINGS.gateUrl, 'pipelines/'].join('/'),
       viewState: initialViewState,
@@ -87,31 +89,39 @@ export class Execution extends React.Component<IExecutionProps, IExecutionState>
     };
   }
 
-  private updateViewStateDetails(): void {
-    const { $stateParams } = ReactInjector;
+  private updateViewStateDetails(toParams: any, fromParams: any): void {
+    const executionId = this.props.execution.id;
     const { viewState } = this.state;
-    const newViewState = clone(viewState);
-    newViewState.activeStageId = Number($stateParams.stage);
-    newViewState.activeSubStageId = Number($stateParams.subStage);
-    newViewState.executionId = $stateParams.executionId;
-    if (!isEqual(viewState, newViewState)) {
+    const shouldShowDetails = toParams.executionId === executionId;
+    const shouldScroll = toParams.executionId === executionId && fromParams.executionId !== executionId;
+    const newViewState = { ...viewState };
+    newViewState.activeStageId = Number(toParams.stage);
+    newViewState.activeSubStageId = Number(toParams.subStage);
+    if (this.state.showingDetails !== shouldShowDetails) {
       this.setState({
+        showingDetails: this.invalidateShowingDetails(this.props, shouldScroll),
         viewState: newViewState,
-        showingDetails: this.invalidateShowingDetails(),
       });
+    } else {
+      if (this.state.showingDetails && !isEqual(viewState, newViewState)) {
+        this.setState({ viewState: newViewState });
+      }
     }
   }
 
-  private invalidateShowingDetails(props = this.props): boolean {
+  private invalidateShowingDetails(props = this.props, forceScroll = false): boolean {
     const { $state, $stateParams, executionService } = ReactInjector;
     const { execution, application, standalone } = props;
     const showing =
       standalone === true || (execution.id === $stateParams.executionId && $state.includes('**.execution.**'));
     if (showing && !execution.hydrated) {
       executionService.hydrate(application, execution).then(() => {
-        this.setState({ showingDetails: true });
+        this.setState({ showingDetails: true }, () => this.scrollIntoView(forceScroll));
       });
       return false;
+    }
+    if (forceScroll) {
+      this.scrollIntoView(true);
     }
     return showing;
   }
@@ -192,8 +202,10 @@ export class Execution extends React.Component<IExecutionProps, IExecutionState>
     this.runningTime = new OrchestratedItemRunningTime(execution, (time: number) =>
       this.setState({ runningTimeInMs: time }),
     );
-    this.stateChangeSuccessSubscription = ReactInjector.stateEvents.stateChangeSuccess.subscribe(() =>
-      this.updateViewStateDetails(),
+    this.stateChangeSuccessSubscription = ReactInjector.stateEvents.stateChangeSuccess.subscribe(
+      ({ toParams, fromParams }) => {
+        this.updateViewStateDetails(toParams, fromParams);
+      },
     );
   }
 
@@ -250,13 +262,24 @@ export class Execution extends React.Component<IExecutionProps, IExecutionState>
     ReactGA.event({ category: 'Pipeline', action: 'Execution source clicked' });
   };
 
-  private handlePermalinkClick = (): void => {
-    ReactGA.event({ category: 'Pipeline', action: 'Permalink clicked' });
-  };
-
   private handleToggleDetails = (): void => {
     ReactGA.event({ category: 'Pipeline', action: 'Execution details toggled (Details link)' });
     this.toggleDetails();
+  };
+
+  private scrollIntoView = (forceScroll = false) => {
+    const element = this.wrapperRef.current;
+    const { scrollIntoView, execution } = this.props;
+    // use a timeout to let Angular render the execution details before scrolling it into view
+    (scrollIntoView || forceScroll) &&
+      element &&
+      execution.hydrated &&
+      setTimeout(() => {
+        element.scrollIntoView();
+        // nudge it back down to accommodate the group header
+        const parent = element.closest('.all-execution-groups');
+        parent && (parent.scrollTop -= 45);
+      });
   };
 
   public render() {
@@ -299,7 +322,7 @@ export class Execution extends React.Component<IExecutionProps, IExecutionState>
     });
 
     return (
-      <div className={className} id={`execution-${execution.id}`}>
+      <div className={className} id={`execution-${execution.id}`} ref={this.wrapperRef}>
         <div className={`execution-overview group-by-${sortFilter.groupBy}`}>
           {(title || showExecutionName) && (
             <h4 className="execution-name">
@@ -418,10 +441,7 @@ export class Execution extends React.Component<IExecutionProps, IExecutionState>
                   Source
                 </a>
                 {' | '}
-                <a onClick={this.handlePermalinkClick} href={this.getUrl()}>
-                  Permalink
-                </a>
-                <CopyToClipboard text={this.getUrl()} toolTip="Copy permalink to clipboard" />
+                <ExecutionPermalink standalone={standalone} />
               </div>
             </div>
           </div>
