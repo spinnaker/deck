@@ -35,8 +35,8 @@ interface ITitusResizeServerGroupCommand {
 
 function surfacedErrorMessage(formik: FormikContext<ITitusResizeServerGroupCommand>) {
   const capacityErrors = formik.errors.capacity || ({} as any);
-  const { min: minError, max: maxError, desired: desiredError } = capacityErrors;
-  return [minError, maxError, desiredError].find(x => !!x);
+  const { min, max, desired } = capacityErrors;
+  return [min, max, desired].find(x => !!x);
 }
 
 function SimpleMode({ formik, serverGroup, toggleMode }: IAdvancedModeProps) {
