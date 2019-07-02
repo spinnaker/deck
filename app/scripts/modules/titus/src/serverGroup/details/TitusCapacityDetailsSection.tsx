@@ -9,7 +9,7 @@ interface ICapacityDetailsSectionProps {
   serverGroup: ITitusServerGroup;
 }
 
-const SimpleMinMaxDesired = ({ serverGroup }: ICapacityDetailsSectionProps) => (
+export const TitusSimpleMinMaxDesired = ({ serverGroup }: ICapacityDetailsSectionProps) => (
   <>
     <dt>Min/Max</dt>
     <dd>{serverGroup.capacity.desired}</dd>
@@ -18,7 +18,7 @@ const SimpleMinMaxDesired = ({ serverGroup }: ICapacityDetailsSectionProps) => (
   </>
 );
 
-const AdvancedMinMaxDesired = ({ serverGroup }: ICapacityDetailsSectionProps) => (
+export const TitusAdvancedMinMaxDesired = ({ serverGroup }: ICapacityDetailsSectionProps) => (
   <>
     <dt>Min</dt>
     <dd>{serverGroup.capacity.min}</dd>
@@ -31,7 +31,7 @@ const AdvancedMinMaxDesired = ({ serverGroup }: ICapacityDetailsSectionProps) =>
   </>
 );
 
-const CapacityGroup = ({ serverGroup }: ICapacityDetailsSectionProps) => (
+export const TitusCapacityGroup = ({ serverGroup }: ICapacityDetailsSectionProps) => (
   <>
     <dt>Cap. Group</dt>
     <dd>{serverGroup.capacityGroup}</dd>
@@ -39,19 +39,18 @@ const CapacityGroup = ({ serverGroup }: ICapacityDetailsSectionProps) => (
 );
 
 @Overridable('titus.serverGroup.CapacityDetailsSection')
-export class CapacityDetailsSection extends React.Component<ICapacityDetailsSectionProps> {
+export class TitusCapacityDetailsSection extends React.Component<ICapacityDetailsSectionProps> {
   public render(): JSX.Element {
     const { serverGroup, app: application } = this.props;
     const isSimpleMode = serverGroup.capacity.min === serverGroup.capacity.max;
-    // const hasNimbleCapacity = !!nimbleCapacity;
     const resizeServerGroup = () =>
       ReactModal.show<ITitusResizeServerGroupModalProps>(TitusResizeServerGroupModal, { serverGroup, application });
 
     return (
       <>
         <dl className="dl-horizontal dl-flex">
-          {isSimpleMode ? <SimpleMinMaxDesired {...this.props} /> : <AdvancedMinMaxDesired {...this.props} />}
-          {serverGroup.capacityGroup && <CapacityGroup {...this.props} />}
+          {isSimpleMode ? <TitusSimpleMinMaxDesired {...this.props} /> : <TitusAdvancedMinMaxDesired {...this.props} />}
+          {serverGroup.capacityGroup && <TitusCapacityGroup {...this.props} />}
         </dl>
 
         <div>
