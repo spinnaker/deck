@@ -1,7 +1,6 @@
 import * as React from 'react';
 
-import { CollapsibleSection, NgReact, Overridable } from '@spinnaker/core';
-import { ICapacity, CapacityDetailsSection } from 'core/serverGroup';
+import { CollapsibleSection, NgReact, Overridable, ICapacity, CapacityDetailsSection } from '@spinnaker/core';
 
 import { IAmazonServerGroupDetailsSectionProps } from './IAmazonServerGroupDetailsSectionProps';
 import { AmazonResizeServerGroupModal } from '../resize/AmazonResizeServerGroupModal';
