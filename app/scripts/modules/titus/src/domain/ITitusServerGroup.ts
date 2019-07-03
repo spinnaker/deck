@@ -12,6 +12,7 @@ export interface ITitusServerGroup extends IServerGroup {
   serviceJobProcesses?: ITitusServiceJobProcesses;
   scalingPolicies?: ITitusPolicy[];
   targetGroups?: string[];
+  capacityGroup?: string;
 }
 
 export interface ITitusImage {

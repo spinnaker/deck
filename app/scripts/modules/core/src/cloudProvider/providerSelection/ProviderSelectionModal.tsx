@@ -50,16 +50,19 @@ export class ProviderSelectionModal extends React.Component<
           <div className="card-choices">
             {providerOptions.map(provider => (
               <div
-                className={`card ${selectedProvider === provider && 'active'}`}
+                className={`card vertical center middle ${selectedProvider === provider && 'active'}`}
                 key={provider}
                 onClick={() => this.setProvider(provider)}
               >
-                <img
-                  src={CloudProviderRegistry.getValue(provider, 'logo.path')}
-                  alt={provider}
-                  width="170px"
-                  height="65px"
-                />
+                {CloudProviderRegistry.hasValue(provider, 'logo.path') && (
+                  <img
+                    src={CloudProviderRegistry.getValue(provider, 'logo.path')}
+                    alt={provider}
+                    width="100%"
+                    height="auto"
+                  />
+                )}
+                {!CloudProviderRegistry.hasValue(provider, 'logo.path') && <h3 className="card-label">{provider}</h3>}
               </div>
             ))}
           </div>

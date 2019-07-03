@@ -25,7 +25,6 @@ module.exports = angular
   .controller('awsInstanceDetailsCtrl', [
     '$scope',
     '$state',
-    '$uibModal',
     'amazonInstanceWriter',
     'confirmationModalService',
     'instance',
@@ -37,7 +36,6 @@ module.exports = angular
     function(
       $scope,
       $state,
-      $uibModal,
       amazonInstanceWriter,
       confirmationModalService,
       instance,
@@ -91,7 +89,7 @@ module.exports = angular
         var instanceSummary, loadBalancers, targetGroups, account, region, vpcId;
         if (!app.serverGroups) {
           // standalone instance
-          instanceSummary = {};
+          instanceSummary = { id: instance.instanceId }; // terminate call expects `id` to be populated
           loadBalancers = [];
           targetGroups = [];
           account = instance.account;
