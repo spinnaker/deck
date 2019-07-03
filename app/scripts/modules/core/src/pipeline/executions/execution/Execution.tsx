@@ -352,7 +352,7 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
                 {execution.status}
                 {execution.status === 'NOT_STARTED' && execution.limitConcurrent && (
                   <>
-                    {' '}
+                    {' ('}
                     waiting on{' '}
                     <UISref
                       to={`${$state.current.name.endsWith('.execution') ? '^' : ''}.^.executions`}
