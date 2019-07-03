@@ -360,7 +360,7 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
                     >
                       <a>RUNNING</a>
                     </UISref>{' '}
-                    executions
+                    executions)
                   </>
                 )}
               </span>
