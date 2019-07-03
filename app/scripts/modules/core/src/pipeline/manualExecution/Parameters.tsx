@@ -14,10 +14,6 @@ export interface IParametersProps {
 }
 
 export class Parameters extends React.Component<IParametersProps> {
-  constructor(props: IParametersProps) {
-    super(props);
-  }
-
   private dateSelected = (date: Date, name: string): void => {
     this.props.formik.setFieldValue('parameter.' + name, date.toISOString().slice(0, 10));
   };

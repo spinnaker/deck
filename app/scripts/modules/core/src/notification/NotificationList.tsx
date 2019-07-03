@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Observable, Subject } from 'rxjs';
+import * as classNames from 'classnames';
 
 import { capitalize, extend, isEmpty, filter, flatten, get } from 'lodash';
 
@@ -170,7 +171,7 @@ export class NotificationList extends React.Component<INotificationListProps, IN
                   {notifications &&
                     notifications.map((n, i) => {
                       return (
-                        <tr key={i}>
+                        <tr key={i} className={classNames({ 'templated-pipeline-item': n.inherited })}>
                           <td>{capitalize(n.type)}</td>
                           <td>{NotificationTransformer.getNotificationDetails(n)}</td>
                           <td>
@@ -182,12 +183,20 @@ export class NotificationList extends React.Component<INotificationListProps, IN
                               ))}
                           </td>
                           <td>
-                            <button className="btn btn-xs btn-link" onClick={() => this.editNotification(n, i)}>
-                              Edit
-                            </button>
-                            <button className="btn btn-xs btn-link pad-left" onClick={() => this.removeNotification(i)}>
-                              Remove
-                            </button>
+                            {!n.inherited && (
+                              <>
+                                <button className="btn btn-xs btn-link" onClick={() => this.editNotification(n, i)}>
+                                  Edit
+                                </button>
+                                <button
+                                  className="btn btn-xs btn-link pad-left"
+                                  onClick={() => this.removeNotification(i)}
+                                >
+                                  Remove
+                                </button>
+                              </>
+                            )}
+                            {n.inherited && <span className="btn btn-xs pad-left">Inherited from template</span>}
                           </td>
                         </tr>
                       );

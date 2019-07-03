@@ -1,4 +1,6 @@
-export interface INotification {
+import { ITemplateInheritable } from './IPipeline';
+
+export interface INotification extends ITemplateInheritable {
   level?: string;
   type: string;
   when: string[];

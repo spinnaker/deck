@@ -8,10 +8,6 @@ export interface ICurrentlyRunningExecutionsProps {
 }
 
 export class CurrentlyRunningExecutions extends React.Component<ICurrentlyRunningExecutionsProps> {
-  constructor(props: ICurrentlyRunningExecutionsProps) {
-    super(props);
-  }
-
   public render() {
     const { currentlyRunningExecutions } = this.props;
     const currentlyRunningExecution = head(currentlyRunningExecutions);
@@ -27,7 +23,7 @@ export class CurrentlyRunningExecutions extends React.Component<ICurrentlyRunnin
           <strong>Execution started: </strong>
           {currentlyRunningExecution.startTime}
           <div>
-            <strong>Current stage:</strong>
+            <strong>Current stage: </strong>
             {currentlyRunningExecution.currentStages &&
               currentlyRunningExecution.currentStages.map((s: any, i: number) => {
                 return <span key={i}>{s.name}</span>;
