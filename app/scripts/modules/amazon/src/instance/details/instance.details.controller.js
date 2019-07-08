@@ -25,7 +25,6 @@ module.exports = angular
   .controller('awsInstanceDetailsCtrl', [
     '$scope',
     '$state',
-    '$uibModal',
     'amazonInstanceWriter',
     'confirmationModalService',
     'instance',
@@ -37,7 +36,6 @@ module.exports = angular
     function(
       $scope,
       $state,
-      $uibModal,
       amazonInstanceWriter,
       confirmationModalService,
       instance,
@@ -88,10 +86,10 @@ module.exports = angular
 
       function retrieveInstance() {
         var extraData = {};
-        var instanceSummary, loadBalancers, targetGroups, account, region, vpcId;
+        var instanceSummary, loadBalancers, targetGroups, account, region, vpcId, serverGroupDisabled;
         if (!app.serverGroups) {
           // standalone instance
-          instanceSummary = {};
+          instanceSummary = { id: instance.instanceId }; // terminate call expects `id` to be populated
           loadBalancers = [];
           targetGroups = [];
           account = instance.account;
@@ -106,6 +104,7 @@ module.exports = angular
                 account = serverGroup.account;
                 region = serverGroup.region;
                 vpcId = serverGroup.vpcId;
+                serverGroupDisabled = serverGroup.isDisabled;
                 extraData.serverGroup = serverGroup.name;
                 extraData.vpcId = serverGroup.vpcId;
                 return true;
@@ -196,6 +195,7 @@ module.exports = angular
             $scope.instance.account = account;
             $scope.instance.region = region;
             $scope.instance.vpcId = vpcId;
+            $scope.instance.serverGroupDisabled = serverGroupDisabled;
             $scope.instance.loadBalancers = loadBalancers;
             $scope.instance.targetGroups = targetGroups;
             if ($scope.instance.networkInterfaces) {
