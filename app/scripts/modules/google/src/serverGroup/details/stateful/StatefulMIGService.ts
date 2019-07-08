@@ -33,7 +33,7 @@ export class StatefulMIGService {
           credentials: serverGroup.account,
           region: serverGroup.region,
           serverGroupName: serverGroup.name,
-          type: 'statefullyUpdateBootDisk',
+          type: 'statefullyUpdateBootImage',
         },
       ],
     });

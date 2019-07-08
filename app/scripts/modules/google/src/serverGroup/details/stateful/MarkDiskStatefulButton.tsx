@@ -29,7 +29,7 @@ export function MarkDiskStatefulButton({ application, deviceName, serverGroup }:
   }
 
   if (StatefulMIGService.isDiskStateful(deviceName, serverGroup)) {
-    return <span>(Marked as Stateful)</span>;
+    return <span> (Marked as Stateful)</span>;
   }
 
   return (
