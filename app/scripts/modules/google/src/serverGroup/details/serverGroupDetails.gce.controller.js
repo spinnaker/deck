@@ -141,7 +141,6 @@ module.exports = angular
             determineAssociatePublicIPAddress();
 
             findStartupScript();
-            prepareDiskDescriptions();
             prepareAvailabilityPolicies();
             prepareShieldedVmConfig();
             prepareAutoHealingPolicy();
@@ -168,24 +167,6 @@ module.exports = angular
           }
         }
       };
-
-      const prepareDiskDescriptions = () => {
-        if (_.has(this.serverGroup, 'launchConfig.instanceTemplate.properties.disks')) {
-          this.serverGroup.diskDescriptions = this.serverGroup.launchConfig.instanceTemplate.properties.disks.map(
-            disk => {
-              return {
-                diskLabel: disk.boot ? 'Boot Disk' : 'Disk',
-                typeLabel: `${translateDiskType(disk.initializeParams.diskType)}: ${
-                  disk.initializeParams.diskSizeGb
-                }GB`,
-                imageLabel: `Image: ${getSourceImage(disk)}`,
-              };
-            },
-          );
-        }
-      };
-
-      const getSourceImage = disk => _.last(_.get(disk, 'initializeParams.sourceImage', '').split('/'));
 
       const prepareAvailabilityPolicies = () => {
         if (_.has(this.serverGroup, 'launchConfig.instanceTemplate.properties.scheduling')) {
@@ -256,16 +237,6 @@ module.exports = angular
           if (!this.serverGroup.currentActionsSummary.length) {
             delete this.serverGroup.currentActionsSummary;
           }
-        }
-      };
-
-      const translateDiskType = diskType => {
-        if (diskType === 'pd-ssd') {
-          return 'Persistent SSD';
-        } else if (diskType === 'local-ssd') {
-          return 'Local SSD';
-        } else {
-          return 'Persistent Std';
         }
       };
 
