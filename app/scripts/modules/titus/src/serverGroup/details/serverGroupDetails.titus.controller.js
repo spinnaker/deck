@@ -1,5 +1,7 @@
 'use strict';
 
+import { TitusResizeServerGroupModal } from './resize/TitusResizeServerGroupModal';
+
 const angular = require('angular');
 import _ from 'lodash';
 
@@ -11,6 +13,7 @@ import {
   ServerGroupWarningMessageService,
   SERVER_GROUP_WRITER,
   SETTINGS,
+  ReactModal,
 } from '@spinnaker/core';
 
 import { TitusReactInjector } from 'titus/reactShims';
@@ -29,7 +32,6 @@ module.exports = angular
     CONFIRMATION_MODAL_SERVICE,
     DISRUPTION_BUDGET_DETAILS_SECTION,
     SERVER_GROUP_WRITER,
-    require('./resize/resizeServerGroup.controller').name,
     require('./rollback/rollbackServerGroup.controller').name,
     SCALING_POLICY_MODULE,
     TITUS_SECURITY_GROUPS_DETAILS,
@@ -311,6 +313,10 @@ module.exports = angular
           });
       };
 
+      this.resizeServerGroup = () => {
+        ReactModal.show(TitusResizeServerGroupModal, { serverGroup: $scope.serverGroup, application });
+      };
+
       this.showEnableServerGroupModal = () => {
         var serverGroup = $scope.serverGroup;
 
@@ -339,21 +345,6 @@ module.exports = angular
         };
 
         confirmationModalService.confirm(confirmationModalParams);
-      };
-
-      this.resizeServerGroup = function resizeServerGroup() {
-        $uibModal.open({
-          templateUrl: require('./resize/resizeServerGroup.html'),
-          controller: 'titusResizeServerGroupCtrl as ctrl',
-          resolve: {
-            serverGroup: function() {
-              return $scope.serverGroup;
-            },
-            application: function() {
-              return application;
-            },
-          },
-        });
       };
 
       this.cloneServerGroup = function cloneServerGroup() {
