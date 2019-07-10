@@ -2,8 +2,15 @@
 
 const angular = require('angular');
 import { Observable, Subject } from 'rxjs';
+import { extend } from 'lodash';
 
-import { IMAGE_READER, ExpectedArtifactSelectorViewController, NgGCEImageArtifactDelegate } from '@spinnaker/core';
+import {
+  ArtifactTypePatterns,
+  ExpectedArtifactSelectorViewController,
+  excludeAllTypesExcept,
+  IMAGE_READER,
+  NgGCEImageArtifactDelegate,
+} from '@spinnaker/core';
 
 module.exports = angular
   .module('spinnaker.google.serverGroup.configure.wizard.basicSettings.controller', [
@@ -34,15 +41,17 @@ module.exports = angular
       const imageSearchResultsStream = new Subject();
       imageSearchResultsStream.switchMap(fetchImagesForAccount).subscribe(images => {
         $scope.command.backingData.allImages = images;
-        $scope.command.backingData.packageImages = images;
       });
 
       this.accountUpdated = () => {
         imageSearchResultsStream.next();
       };
 
-      this.enableAllImageSearch = () => {
-        $scope.command.viewState.useAllImageSelection = true;
+      this.selectImage = image => {
+        // called from a React component
+        $scope.$apply(() => {
+          $scope.command.image = image;
+        });
       };
 
       angular.extend(
@@ -84,6 +93,38 @@ module.exports = angular
       };
 
       this.imageSources = ['artifact', 'priorStage'];
+
+      this.excludedImageArtifactTypes = excludeAllTypesExcept(ArtifactTypePatterns.CUSTOM_OBJECT);
+
+      this.onImageArtifactEdited = artifact => {
+        $scope.$applyAsync(() => {
+          $scope.command.imageArtifactId = null;
+          $scope.command.imageArtifact = artifact;
+        });
+      };
+
+      this.onImageArtifactSelected = expectedArtifact => {
+        this.onChangeImageArtifactId(expectedArtifact.id);
+      };
+
+      this.onChangeImageArtifactId = artifactId => {
+        $scope.$applyAsync(() => {
+          $scope.command.imageArtifactId = artifactId;
+          $scope.command.imageArtifact = null;
+        });
+      };
+
+      this.onImageArtifactAccountSelected = accountName => {
+        $scope.$applyAsync(() => {
+          $scope.command.imageAccountName = accountName;
+        });
+      };
+
+      this.updatePipeline = changes => {
+        $scope.$applyAsync(() => {
+          extend($scope.$parent.pipeline, changes);
+        });
+      };
 
       const gceImageDelegate = new NgGCEImageArtifactDelegate($scope);
       $scope.gceImageArtifact = {
