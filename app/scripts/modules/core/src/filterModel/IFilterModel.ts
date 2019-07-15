@@ -1,11 +1,8 @@
-import { Ng1StateDeclaration, StateParams } from '@uirouter/angularjs';
-import { FilterModelServiceConverters } from 'core/filterModel';
-
 export interface IFilterConfig {
   model: keyof ISortFilter;
   param?: string;
   clearValue?: any;
-  type?: keyof FilterModelServiceConverters;
+  type?: string;
   filterLabel?: string;
   filterTranslator?: { [key: string]: string };
   displayOption?: boolean;
@@ -47,15 +44,12 @@ export interface ISortFilter {
 }
 
 export interface IFilterModel {
+  config: IFilterConfig[];
   groups: any[];
   tags: any[];
   displayOptions: any;
-  savedState: any;
   sortFilter: ISortFilter;
   addTags: () => void;
-  saveState: (state: Ng1StateDeclaration, params: StateParams, filters: any) => void;
-  restoreState: (toParams: StateParams) => void;
-  hasSavedState: (toParams: StateParams) => boolean;
   clearFilters: () => void;
   activate: () => void;
   applyParamsToUrl: () => void;
