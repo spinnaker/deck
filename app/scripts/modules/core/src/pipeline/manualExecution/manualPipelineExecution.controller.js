@@ -30,7 +30,8 @@ module.exports = angular
     'pipeline',
     'application',
     'trigger',
-    function($scope, $uibModalInstance, pipeline, application, trigger) {
+    '$q',
+    function($scope, $uibModalInstance, pipeline, application, trigger, $q) {
       let applicationNotifications = [];
       let pipelineNotifications = [];
 
@@ -122,23 +123,52 @@ module.exports = angular
           // these on a subsequent run.
           trigger.artifacts = [];
         }
-        this.command.trigger = trigger || _.head(this.triggers);
-      };
-
-      const updatePipelinePlan = pipeline => {
-        if (pipeline.type === 'templatedPipeline' && (pipeline.stages === undefined || pipeline.stages.length === 0)) {
-          PipelineTemplateReader.getPipelinePlan(pipeline)
-            .then(plan => (this.stageComponents = getManualExecutionComponents(plan.stages)))
-            .catch(() => getManualExecutionComponents(pipeline.stages));
+        if (trigger) {
+          // Find the pipeline.trigger that matches trigger (the trigger from the execution being re-run)
+          this.command.trigger = this.triggers.find(t =>
+            Object.keys(t)
+              .filter(k => k !== 'description')
+              .every(k => t[k] === trigger[k]),
+          );
+          // If we found a match, rehydrate it with everything from trigger, otherwise just default back to setting it to trigger
+          this.command.trigger = this.command.trigger ? Object.assign(this.command.trigger, trigger) : trigger;
         } else {
-          this.stageComponents = getManualExecutionComponents(pipeline.stages);
+          this.command.trigger = _.head(this.triggers);
         }
       };
+
+      const getPlannedPipeline = pipeline =>
+        $q(resolve => {
+          const isV1PipelineMissingStages =
+            pipeline.type === 'templatedPipeline' && (pipeline.stages === undefined || pipeline.stages.length === 0);
+          const isV2Pipeline = PipelineTemplateV2Service.isV2PipelineConfig(pipeline);
+
+          if (isV1PipelineMissingStages || isV2Pipeline) {
+            PipelineTemplateReader.getPipelinePlan(pipeline)
+              .then(plan => {
+                updateStageComponents(plan.stages);
+                resolve(isV2Pipeline ? plan : pipeline);
+              })
+              .catch(() => {
+                if (isV2Pipeline) {
+                  this.planError = true;
+                }
+                updateStageComponents(pipeline.stages);
+                resolve(pipeline);
+              });
+          } else {
+            updateStageComponents(pipeline.stages);
+            resolve(pipeline);
+          }
+        });
 
       const getManualExecutionComponents = stages => {
         const additionalComponents = stages.map(stage => Registry.pipeline.getManualExecutionComponentForStage(stage));
         return _.uniq(_.compact(additionalComponents));
       };
+
+      const updateStageComponents = pipelineStages =>
+        (this.stageComponents = getManualExecutionComponents(pipelineStages));
 
       /**
        * Controller API
@@ -161,26 +191,26 @@ module.exports = angular
       };
 
       this.pipelineSelected = () => {
-        const pipeline = this.command.pipeline,
-          executions = application.executions.data || [];
+        getPlannedPipeline(this.command.pipeline).then(pipeline => {
+          this.command.pipeline = pipeline;
+          const executions = application.executions.data || [];
 
-        pipelineNotifications = pipeline.notifications || [];
-        synchronizeNotifications();
+          pipelineNotifications = pipeline.notifications || [];
+          synchronizeNotifications();
 
-        this.currentlyRunningExecutions = executions.filter(
-          execution => execution.pipelineConfigId === pipeline.id && execution.isActive,
-        );
-        addTriggers();
-        this.triggerUpdated();
+          this.currentlyRunningExecutions = executions.filter(
+            execution => execution.pipelineConfigId === pipeline.id && execution.isActive,
+          );
+          addTriggers();
+          this.triggerUpdated();
 
-        updatePipelinePlan(pipeline);
-
-        if (pipeline.parameterConfig && pipeline.parameterConfig.length) {
-          this.parameters = {};
-          this.hasRequiredParameters = pipeline.parameterConfig.some(p => p.required);
-          pipeline.parameterConfig.forEach(p => this.addParameter(p));
-          this.updateParameters();
-        }
+          if (pipeline.parameterConfig && pipeline.parameterConfig.length) {
+            this.parameters = {};
+            this.hasRequiredParameters = pipeline.parameterConfig.some(p => p.required);
+            pipeline.parameterConfig.forEach(p => this.addParameter(p));
+            this.updateParameters();
+          }
+        });
       };
 
       this.addParameter = parameterConfig => {
