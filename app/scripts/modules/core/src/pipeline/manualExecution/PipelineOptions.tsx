@@ -28,6 +28,7 @@ export class PipelineOptions extends React.Component<IPipelineOptionsProps, IPip
 
   constructor(props: IPipelineOptionsProps) {
     super(props);
+    this.state = {};
   }
 
   public componentWillUnmount() {
@@ -38,9 +39,7 @@ export class PipelineOptions extends React.Component<IPipelineOptionsProps, IPip
     const isV1PipelineMissingStages =
       pipeline.type === 'templatedPipeline' && (pipeline.stages === undefined || pipeline.stages.length === 0);
     const isV2Pipeline = PipelineTemplateV2Service.isV2PipelineConfig(pipeline);
-    const {
-      formatPipeline,
-    } = this.props;
+    const { formatPipeline } = this.props;
     if (isV1PipelineMissingStages || isV2Pipeline) {
       const pipelineTemplateConfig: IPipelineTemplateConfig = {
         type: 'templatedPipeline',
@@ -65,10 +64,7 @@ export class PipelineOptions extends React.Component<IPipelineOptionsProps, IPip
   };
 
   private pipelineSelected = (option: Option<String>) => {
-    const {
-      formatPipeline,
-      pipelineOptions,
-    } = this.props;
+    const { formatPipeline, pipelineOptions } = this.props;
     const pipelineId = option.value;
     const pipeline = formatPipeline(pipelineOptions.find(p => p.id === pipelineId));
     this.setPipelinePlan(pipeline);
@@ -83,7 +79,7 @@ export class PipelineOptions extends React.Component<IPipelineOptionsProps, IPip
       triggerChanged,
       updateTriggerOptions,
     } = this.props;
-    const parameters = formatParameterConfig(pipeline.parameterConfig);
+    const parameters = formatParameterConfig(pipeline.parameterConfig || []);
     const triggers: ITrigger[] = pipeline.triggers || [];
     const manualExecutionTriggers: ITrigger[] = formatTriggers(triggers);
     const manualTrigger = head(manualExecutionTriggers);
