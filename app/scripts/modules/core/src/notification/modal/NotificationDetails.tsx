@@ -52,8 +52,12 @@ export class NotificationDetails extends React.Component<INotificationDetailsPro
     }
   }
 
-  private renderCustomMessage = (type: string, whenOption: string): React.ReactNode => {
-    if (whenOption !== 'manualJudgment' && ['email', 'slack', 'googlechat'].includes(type)) {
+  private renderCustomMessage = (type: string, whenOption: string, selectedOptions: string[]): React.ReactNode => {
+    if (
+      whenOption !== 'manualJudgment' &&
+      ['email', 'slack', 'googlechat'].includes(type) &&
+      selectedOptions.includes(whenOption)
+    ) {
       return (
         <FormikFormField
           name={'message.' + whenOption + '.text'}
@@ -70,6 +74,7 @@ export class NotificationDetails extends React.Component<INotificationDetailsPro
     if (!!notificationTypeUpdate) {
       this.props.formik.setFieldValue('address', '');
     }
+    this.props.formik.setFieldValue('when', [...this.props.formik.values.when]);
   };
 
   public validate(_values: INotification) {
@@ -95,14 +100,13 @@ export class NotificationDetails extends React.Component<INotificationDetailsPro
             <FormikFormField
               name="when"
               label="Notify when"
-              fastField={false}
               input={props => (
                 <ChecklistInput
                   {...props}
                   options={whenOptions.map(o => ({
                     value: o,
                     label: NotificationTransformer.getNotificationWhenDisplayName(o, level, stageType),
-                    additionalFields: renderCustomMessage(values.type, o),
+                    additionalFields: renderCustomMessage(values.type, o, formik.values.when),
                   }))}
                 />
               )}

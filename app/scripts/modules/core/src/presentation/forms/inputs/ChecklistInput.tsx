@@ -72,7 +72,7 @@ export function ChecklistInput(props: IChecklistInputProps) {
           />
           {option.label}
         </label>
-        {isChecked(option.value) && option.additionalFields}
+        {option.additionalFields}
       </>
     );
   }
