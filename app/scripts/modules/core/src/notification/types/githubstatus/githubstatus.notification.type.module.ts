@@ -3,6 +3,7 @@ import { module } from 'angular';
 interface INotificationTypeConfig {
   label: string;
   key: string;
+  addressTemplateUrl: string;
 }
 
 interface IRegisterNotificationTypeConfigProvider {
@@ -16,6 +17,7 @@ module(SPINNAKER_CORE_NOTIFICATION_TYPES_GITHUB_STATUS, []).config([
     notificationTypeConfigProvider.registerNotificationType({
       label: 'Github Status',
       key: 'githubStatus',
+      addressTemplateUrl: require('./additionalFields.html'),
     });
   },
 ]);

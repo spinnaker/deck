@@ -38,6 +38,9 @@ var slack = {
 var sms = {
   enabled: '{%notifications.twilio.enabled%}' === 'true',
 };
+var githubStatus = {
+  enabled: '{%notifications.github-status.enabled%}' === 'true',
+};
 var templatesEnabled = '{%canary.templatesEnabled%}' === 'true';
 var travisEnabled = '{%features.travis%}' === 'true';
 var timezone = '{%timezone%}';
@@ -183,9 +186,7 @@ window.spinnakerSettings = {
     email: {
       enabled: true,
     },
-    githubStatus: {
-      enabled: true,
-    },
+    githubStatus: githubStatus,
     googlechat: {
       enabled: true,
     },
