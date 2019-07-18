@@ -41,8 +41,10 @@ export class PageModal extends React.Component<IPageModalProps, IPageModalState>
 
   private getDefaultState(props: IPageModalProps): IPageModalState {
     const {
-      $state: {
-        params: { subject, details },
+      $uiRouter: {
+        globals: {
+          params: { subject, details },
+        },
       },
     } = ReactInjector;
     const defaultSubject = subject || get(SETTINGS, 'pagerDuty.defaultSubject', 'Urgent Issue');
@@ -66,13 +68,13 @@ export class PageModal extends React.Component<IPageModalProps, IPageModalState>
 
   private handleSubjectChanged = (event: any): void => {
     const value = event.target.value;
-    ReactInjector.$state.go('.', { subject: value });
+    ReactInjector.$state.go('.', { subject: value }, { location: 'replace' });
     this.setState({ subject: value });
   };
 
   private handleDetailsChanged = (event: any): void => {
     const value = event.target.value;
-    ReactInjector.$state.go('.', { details: value });
+    ReactInjector.$state.go('.', { details: value }, { location: 'replace' });
     this.setState({ details: value });
   };
 
