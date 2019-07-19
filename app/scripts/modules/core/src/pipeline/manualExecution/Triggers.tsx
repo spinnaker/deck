@@ -1,10 +1,12 @@
 import * as React from 'react';
+import { Observable, Subject } from 'rxjs';
 import Select, { Option } from 'react-select';
-import { head } from 'lodash';
+import { clone, head } from 'lodash';
 import { FormikProps } from 'formik';
 
 import { IPipelineCommand, ITrigger } from 'core/domain';
 import { StandardFieldLayout } from 'core/presentation';
+import { Registry } from 'core/registry';
 
 import { ITriggerTemplateComponentProps, TriggerTemplate } from './TriggerTemplate';
 
@@ -20,6 +22,8 @@ export interface ITriggersState {
 }
 
 export class Triggers extends React.Component<ITriggersProps, ITriggersState> {
+  private destroy$ = new Subject();
+
   constructor(props: ITriggersProps) {
     super(props);
     this.state = {
@@ -27,9 +31,35 @@ export class Triggers extends React.Component<ITriggersProps, ITriggersState> {
     };
   }
 
+  public componentDidMount() {
+    this.updateTriggerDescription(this.props.formik.values.trigger);
+  }
+
+  public componentWillUnmount() {
+    this.destroy$.next();
+  }
+
   private updateCommand = (path: string, value: any) => {
     const { formik } = this.props;
     formik.setFieldValue(path, value);
+  };
+
+  private updateTriggerDescription = (trigger: ITrigger) => {
+    if (trigger && !trigger.description) {
+      Observable.fromPromise(
+        (Registry.pipeline.getManualExecutionComponentForTriggerType(trigger.type) as any).formatLabel(trigger),
+      )
+        .takeUntil(this.destroy$)
+        .subscribe((label: string) => {
+          const newTrigger = clone(trigger);
+          newTrigger.description = label;
+          this.props.formik.setFieldValue('trigger', newTrigger);
+          this.props.triggerChanged(trigger);
+          this.setState({ command: { ...this.state.command, trigger } });
+        });
+    } else {
+      this.props.triggerChanged(trigger);
+    }
   };
 
   private triggerSelected = (option: Option<string>) => {

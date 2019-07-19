@@ -87,6 +87,7 @@ export class ManualExecutionModal extends React.Component<IManualExecutionModalP
       pipelineNotifications = pipeline.notifications || [];
       if (pipeline.triggers) {
         triggers = this.formatTriggers(pipeline.triggers);
+        this.updateTriggerOptions(triggers);
       }
     } else {
       pipelineOptions = application.pipelineConfigs.data.filter(
@@ -116,7 +117,6 @@ export class ManualExecutionModal extends React.Component<IManualExecutionModalP
       dryRunEnabled: SETTINGS.feature.dryRunEnabled,
       pipelineOptions,
       pipelineNotifications,
-      triggers,
     });
   }
 
@@ -189,16 +189,7 @@ export class ManualExecutionModal extends React.Component<IManualExecutionModalP
   };
 
   private formatTriggers = (triggers: ITrigger[]): ITrigger[] => {
-    return triggers
-      .filter(t => Registry.pipeline.hasManualExecutionComponentForTriggerType(t.type))
-      .map(t => {
-        const copy = clone(t);
-        copy.description = '...'; // placeholder
-        (Registry.pipeline.getManualExecutionComponentForTriggerType(t.type) as any)
-          .formatLabel(t)
-          .then((label: string) => (copy.description = label));
-        return copy;
-      });
+    return triggers.filter(t => Registry.pipeline.hasManualExecutionComponentForTriggerType(t.type));
   };
 
   private formatPipeline = (pipeline: IPipeline) => {
@@ -236,13 +227,28 @@ export class ManualExecutionModal extends React.Component<IManualExecutionModalP
   };
 
   private updateTriggerOptions = (triggers: ITrigger[]) => {
-    this.setState({ triggers });
+    triggers.map((t, i) => {
+      Observable.fromPromise(
+        (Registry.pipeline.getManualExecutionComponentForTriggerType(t.type) as any).formatLabel(t),
+      )
+        .takeUntil(this.destroy$)
+        .subscribe(
+          (label: string) => {
+            const newTriggers = triggers.slice(0);
+            newTriggers[i].description = label;
+            this.setState({ triggers: newTriggers });
+          },
+          () => {
+            this.setState({ triggers });
+          },
+        );
+    });
   };
 
   private generateInitialValues = (pipeline: IPipeline): IPipelineCommand => {
     const user = AuthenticationService.getAuthenticatedUser();
     const userEmail = user.authenticated && user.name.includes('@') ? user.name : '';
-    const triggers = this.state.triggers;
+    const triggers = this.formatTriggers(pipeline && pipeline.triggers ? pipeline.triggers : []);
     let trigger: ITrigger;
     if (this.props.trigger) {
       trigger = clone(this.props.trigger);
@@ -259,9 +265,6 @@ export class ManualExecutionModal extends React.Component<IManualExecutionModalP
       trigger = matchingTrigger ? assign(trigger, matchingTrigger) : trigger;
 
       if (Registry.pipeline.hasManualExecutionComponentForTriggerType(trigger.type)) {
-        (Registry.pipeline.getManualExecutionComponentForTriggerType(trigger.type) as any)
-          .formatLabel(trigger)
-          .then((label: string) => (trigger.description = label));
         // If the trigger has a manual component, we don't want to also explicitly
         // send along the artifacts from the last run, as the manual component will
         // populate enough information (ex: build number, docker tag) to re-inflate
@@ -269,7 +272,7 @@ export class ManualExecutionModal extends React.Component<IManualExecutionModalP
         trigger.artifacts = [];
       }
     } else {
-      trigger = head(pipeline && pipeline.triggers ? pipeline.triggers : []);
+      trigger = head(triggers);
     }
     let parameters: { [key: string]: any } = {};
     if (pipeline && pipeline.parameterConfig) {
