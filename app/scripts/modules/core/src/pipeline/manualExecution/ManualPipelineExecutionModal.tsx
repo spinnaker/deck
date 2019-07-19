@@ -113,6 +113,7 @@ export class ManualExecutionModal extends React.Component<IManualExecutionModalP
           });
         this.setState({ applicationNotifications });
       });
+    this.pipelineChanged(pipeline);
     this.setState({
       dryRunEnabled: SETTINGS.feature.dryRunEnabled,
       pipelineOptions,
@@ -158,7 +159,6 @@ export class ManualExecutionModal extends React.Component<IManualExecutionModalP
   };
 
   private pipelineChanged = (pipeline: IPipeline): void => {
-    this.setState({ stageComponents: this.getManualExecutionComponents(pipeline.stages) });
     if (pipeline) {
       const executions: IExecution[] = this.props.application.executions.data || [];
       const currentPipelineExecutions = executions.filter(
@@ -168,6 +168,7 @@ export class ManualExecutionModal extends React.Component<IManualExecutionModalP
         currentPipelineExecutions,
         pipelineNotifications: pipeline.notifications || [],
       });
+      this.setState({ stageComponents: this.getManualExecutionComponents(pipeline.stages) });
     }
   };
 
