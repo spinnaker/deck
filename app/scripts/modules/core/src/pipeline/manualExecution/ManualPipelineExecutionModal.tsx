@@ -282,6 +282,9 @@ export class ManualExecutionModal extends React.Component<IManualExecutionModalP
       pipeline: this.formatPipeline(pipeline),
       pipelineName: pipeline ? pipeline.name : '',
       dryRun: false,
+      extraFields: {
+        buildNumber: '',
+      },
       notificationEnabled: false,
       notification: {
         type: 'email',
