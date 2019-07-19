@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Observable, Subject } from 'rxjs';
 import Select, { Option } from 'react-select';
-import { clone, head } from 'lodash';
+import { clone, head, set } from 'lodash';
 import { FormikProps } from 'formik';
 
 import { IPipelineCommand, ITrigger } from 'core/domain';
@@ -42,6 +42,9 @@ export class Triggers extends React.Component<ITriggersProps, ITriggersState> {
   private updateCommand = (path: string, value: any) => {
     const { formik } = this.props;
     formik.setFieldValue(path, value);
+    const newCommand = { ...this.state.command };
+    set(newCommand, path, value);
+    this.setState({ command: newCommand });
   };
 
   private updateTriggerDescription = (trigger: ITrigger) => {
