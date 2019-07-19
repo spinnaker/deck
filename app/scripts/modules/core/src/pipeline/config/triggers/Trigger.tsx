@@ -48,6 +48,7 @@ export class Trigger extends React.Component<ITriggerProps, ITriggerState> {
     if (this.disableAutoTriggering.includes(type)) {
       this.triggerUpdated({ enabled: false });
     }
+    this.triggerUpdated({ type });
   };
 
   private triggerUpdated = (changes: { [key: string]: any }) => {
