@@ -11,7 +11,7 @@ module(TRIGGER, []).component(
     'index',
     'pipeline',
     'removeTrigger',
-    'initialTrigger',
+    'trigger',
     'updateExpectedArtifacts',
     'updateTrigger',
   ]),
