@@ -1,31 +1,37 @@
 import * as React from 'react';
 import Select, { Option } from 'react-select';
 import * as classNames from 'classnames';
+import { pick } from 'lodash';
 
 import { Application } from 'core/application';
-import { IExpectedArtifact, IPipeline, ITrigger, ITriggerTypeConfig } from 'core/domain';
-import { Registry } from 'core/registry';
 import { SETTINGS } from 'core/config/settings';
+import { IExpectedArtifact, IPipeline, ITrigger, ITriggerTypeConfig } from 'core/domain';
 import { HelpField } from 'core/help/HelpField';
 import { TriggerArtifactConstraintSelector } from 'core/pipeline/config/triggers/artifacts';
 import { CheckboxInput, Tooltip } from 'core/presentation';
+import { Registry } from 'core/registry';
 
 export interface ITriggerProps {
   application: Application;
   index: number;
   pipeline: IPipeline;
   removeTrigger: (index: number) => void;
-  trigger: ITrigger;
+  initialTrigger: ITrigger;
   updateExpectedArtifacts: (expectedArtifacts: IExpectedArtifact[]) => void;
   updateTrigger: (index: number, changes: { [key: string]: any }) => void;
 }
 
-export class Trigger extends React.Component<ITriggerProps> {
+interface ITriggerState {
+  trigger: ITrigger;
+}
+
+export class Trigger extends React.Component<ITriggerProps, ITriggerState> {
+  public state = { trigger: this.props.initialTrigger || {} } as ITriggerState;
   private disableAutoTriggering = SETTINGS.disableAutoTriggering || [];
   private triggerTypes = Registry.pipeline.getTriggerTypes();
 
   private getSelectedTriggerType = (): string => {
-    return this.props.trigger.type || '';
+    return this.state.trigger.type || '';
   };
 
   private getTriggerConfig = (): ITriggerTypeConfig => {
@@ -34,20 +40,32 @@ export class Trigger extends React.Component<ITriggerProps> {
   };
 
   private handleTriggerEnabled = () => {
-    const enabled = !this.props.trigger.enabled;
-    this.triggerUpdated({ enabled });
+    const enabled = !this.state.trigger.enabled;
+    this.updateTriggerFields({ enabled });
   };
 
   private handleTypeChange = (option: Option<string>) => {
-    const type = option.value;
-    this.triggerUpdated({ type });
-    if (this.disableAutoTriggering.includes(type)) {
-      this.triggerUpdated({ enabled: false });
-    }
+    const commonFields: Array<keyof ITrigger> = [
+      'enabled',
+      'rebake',
+      'user',
+      'type',
+      'expectedArtifactIds',
+      'runAsUser',
+      'excludedArtifactTypePatterns',
+    ];
+
+    // Clear out all non-common fields when the type is changed
+    const trigger = pick(this.state.trigger, commonFields) as ITrigger;
+    trigger.enabled = this.disableAutoTriggering.includes(option.valuetype) ? false : trigger.enabled;
+    trigger.type = option.value;
+    this.setState({ trigger }, () => this.updateTriggerFields({}));
   };
 
-  private triggerUpdated = (changes: { [key: string]: any }) => {
-    this.props.updateTrigger(this.props.index, changes);
+  private updateTriggerFields = (changes: { [key: string]: any }) => {
+    const trigger = { ...this.state.trigger, ...changes };
+    this.setState({ trigger });
+    this.props.updateTrigger(this.props.index, trigger);
   };
 
   private TriggerContents = () => {
@@ -56,8 +74,9 @@ export class Trigger extends React.Component<ITriggerProps> {
       const TriggerComponent = triggerConfig.component;
       const componentProps = {
         ...this.props,
+        trigger: this.state.trigger,
         pipelineId: this.props.pipeline.id,
-        triggerUpdated: this.triggerUpdated,
+        triggerUpdated: this.updateTriggerFields,
       };
       return <TriggerComponent {...componentProps} />;
     }
@@ -83,13 +102,13 @@ export class Trigger extends React.Component<ITriggerProps> {
       this.props.updateExpectedArtifacts([expectedArtifact]);
     }
 
-    const expectedArtifactIds = this.props.trigger.expectedArtifactIds;
+    const expectedArtifactIds = this.state.trigger.expectedArtifactIds;
     if (expectedArtifactIds && !expectedArtifactIds.includes(expectedArtifact.id)) {
-      this.triggerUpdated({
+      this.updateTriggerFields({
         expectedArtifactIds: [...expectedArtifactIds, expectedArtifact.id],
       });
     } else {
-      this.triggerUpdated({
+      this.updateTriggerFields({
         expectedArtifactIds: [expectedArtifact.id],
       });
     }
@@ -100,7 +119,7 @@ export class Trigger extends React.Component<ITriggerProps> {
   };
 
   private changeExpectedArtifacts = (expectedArtifacts: string[]) => {
-    this.triggerUpdated({
+    this.updateTriggerFields({
       expectedArtifactIds: expectedArtifacts,
     });
   };
@@ -108,7 +127,8 @@ export class Trigger extends React.Component<ITriggerProps> {
   public render() {
     const type = this.getSelectedTriggerType();
     const triggerConfig = this.getTriggerConfig();
-    const { pipeline, trigger } = this.props;
+    const { trigger } = this.state;
+    const { pipeline } = this.props;
     const { TriggerContents } = this;
     const fieldSetClassName = classNames({ 'templated-pipeline-item': trigger.inherited });
 
