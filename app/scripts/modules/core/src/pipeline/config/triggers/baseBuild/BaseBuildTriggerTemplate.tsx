@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { capitalize, isEqual } from 'lodash';
+import { capitalize, get, isEqual } from 'lodash';
 import { Option } from 'react-select';
 import { $q } from 'ngimport';
 import { IPromise } from 'angular';
@@ -87,7 +87,7 @@ export class BaseBuildTriggerTemplate extends React.Component<
     const trigger = command.trigger as IBuildTrigger;
 
     // These fields will be added to the trigger when the form is submitted
-    this.props.updateCommand('extraFields', {});
+    this.props.updateCommand('extraFields', { buildNumber: get(command, 'extraFields.buildNumber', '') });
 
     this.setState({
       buildsLoading: true,

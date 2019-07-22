@@ -1,24 +1,8 @@
 import * as React from 'react';
-import { FormikFormField, TextInput } from 'core/presentation';
+import { FormikFormField, TextInput, Validators } from 'core/presentation';
 import { INotificationTypeCustomConfig } from 'core/domain';
 
 export class EmailNotificationType extends React.Component<INotificationTypeCustomConfig> {
-  private validateEmail = (value: string): string => {
-    let errorMessage: string;
-    if (value && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value)) {
-      errorMessage = 'Please enter a valid email address';
-    }
-    return errorMessage;
-  };
-
-  private validateCC = (value: string): string => {
-    let errorMessage: string;
-    if (value) {
-      errorMessage = this.validateEmail(value);
-    }
-    return errorMessage;
-  };
-
   public render() {
     const { fieldName } = this.props;
     return (
@@ -27,7 +11,7 @@ export class EmailNotificationType extends React.Component<INotificationTypeCust
           <FormikFormField
             name={fieldName ? `${fieldName}.address` : 'address'}
             label="Email Address"
-            validate={this.validateEmail}
+            validate={Validators.emailValue('Please enter a valid email address')}
             input={props => <TextInput inputClassName={'form-control input-sm'} {...props} />}
             required={true}
           />
@@ -36,7 +20,7 @@ export class EmailNotificationType extends React.Component<INotificationTypeCust
           <FormikFormField
             name={fieldName ? `${fieldName}.cc` : 'cc'}
             label="CC Address"
-            validate={this.validateCC}
+            validate={Validators.emailValue('Please enter a valid email address')}
             input={props => <TextInput inputClassName={'form-control input-sm'} {...props} />}
           />
         </div>

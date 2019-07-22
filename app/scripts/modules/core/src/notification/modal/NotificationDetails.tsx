@@ -4,7 +4,7 @@ import { Option } from 'react-select';
 
 import { INotification, INotificationTypeConfig } from 'core/domain';
 import { Registry } from 'core/registry';
-import { ChecklistInput, FormikFormField, TextAreaInput } from 'core/presentation';
+import { buildValidators, ChecklistInput, FormikFormField, TextAreaInput } from 'core/presentation';
 import { NotificationSelector } from 'core/notification';
 import { NotificationTransformer } from '../notification.transformer';
 import { MANUAL_JUDGEMENT_WHEN_OPTIONS, PIPELINE_WHEN_OPTIONS, STAGE_WHEN_OPTIONS } from './whenOptions';
@@ -48,7 +48,7 @@ export class NotificationDetails extends React.Component<INotificationDetailsPro
     const { formik } = this.props;
     if (!formik.values.type) {
       const { notificationTypes } = this.state;
-      formik.setFieldValue('type', notificationTypes ? notificationTypes[0].value : '');
+      formik.setFieldValue('type', notificationTypes && notificationTypes[0] ? notificationTypes[0].value : '');
     }
   }
 
@@ -65,7 +65,7 @@ export class NotificationDetails extends React.Component<INotificationDetailsPro
         />
       );
     } else {
-      return <></>;
+      return null;
     }
   };
 
@@ -77,14 +77,12 @@ export class NotificationDetails extends React.Component<INotificationDetailsPro
     this.props.formik.setFieldValue('when', [...this.props.formik.values.when]);
   };
 
-  public validate(_values: INotification) {
-    const { when } = this.props.formik.values;
-    const errors = {} as any;
-    if (!when || when.length === 0) {
-      errors.whenOption = 'Please select when the notification should execute';
-    }
-
-    return errors;
+  public validate(values: INotification) {
+    const validation = buildValidators(values);
+    validation
+      .field('when', 'Notify when')
+      .required([(value: any[]) => !value.length && 'Please select when the notification should execute']);
+    return validation.result();
   }
 
   public render() {

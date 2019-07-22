@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Observable, Subject } from 'rxjs';
-import { assign, clone, compact, extend, get, head, isArray, uniq } from 'lodash';
+import { assign, clone, compact, extend, flatten, get, head, uniq, valuesIn } from 'lodash';
 
 import { Application } from 'core/application';
 import { AuthenticationService } from 'core/authentication';
@@ -100,17 +100,9 @@ export class ManualExecutionModal extends React.Component<IManualExecutionModalP
     Observable.fromPromise(AppNotificationsService.getNotificationsForApplication(application.name))
       .takeUntil(this.destroy$)
       .subscribe(notifications => {
-        const applicationNotifications: INotification[] = [];
-        Object.keys(notifications)
-          .sort()
-          .filter(k => Array.isArray(notifications[k]))
-          .forEach(type => {
-            if (isArray(notifications[type])) {
-              (notifications[type] as INotification[]).forEach((notification: INotification) => {
-                applicationNotifications.push(notification);
-              });
-            }
-          });
+        const applicationNotifications: INotification[] = flatten(valuesIn(notifications) as INotification[][]).filter(
+          (x: any) => !!x,
+        );
         this.setState({ applicationNotifications });
       });
     this.pipelineChanged(pipeline);
@@ -391,7 +383,6 @@ export class ManualExecutionModal extends React.Component<IManualExecutionModalP
                 components={stageComponents}
                 updateCommand={(path: string, value: any) => {
                   formik.setFieldValue(path, value);
-                  this.setState({});
                 }}
               />
             )}

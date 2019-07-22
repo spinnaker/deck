@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Option } from 'react-select';
+import { get } from 'lodash';
 import { IPromise } from 'angular';
 import { $q } from 'ngimport';
 import { Observable, Subject, Subscription } from 'rxjs';
@@ -118,7 +119,10 @@ export class DockerTriggerTemplate extends React.Component<
     this.props.updateCommand('triggerInvalid', true);
 
     // These fields will be added to the trigger when the form is submitted
-    this.props.updateCommand('extraFields', {});
+    this.props.updateCommand('extraFields', {
+      tag: get(command, 'extraFields.tag', ''),
+      artifacts: get(command, 'extraFields.artifacts', ''),
+    });
 
     if (this.subscription) {
       this.subscription.unsubscribe();

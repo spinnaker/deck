@@ -2,6 +2,7 @@ import * as React from 'react';
 import { head } from 'lodash';
 
 import { IExecution } from 'core/domain';
+import { timestamp } from 'core/utils/timeFormatters';
 
 export interface ICurrentlyRunningExecutionsProps {
   currentlyRunningExecutions: IExecution[];
@@ -21,7 +22,7 @@ export class CurrentlyRunningExecutions extends React.Component<ICurrentlyRunnin
         </p>
         <div className="pad-left">
           <strong>Execution started: </strong>
-          {currentlyRunningExecution.startTime}
+          {timestamp(currentlyRunningExecution.startTime)}
           <div>
             <strong>Current stage: </strong>
             {currentlyRunningExecution.currentStages &&

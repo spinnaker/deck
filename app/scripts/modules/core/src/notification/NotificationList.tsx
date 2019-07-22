@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Observable, Subject } from 'rxjs';
 import * as classNames from 'classnames';
 
-import { capitalize, extend, isEmpty, filter, flatten, get } from 'lodash';
+import { capitalize, isEmpty, filter, flatten, get } from 'lodash';
 
 import { Application } from 'core/application';
 import { INotification, INotificationTypeConfig } from 'core/domain';
@@ -66,7 +66,7 @@ export class NotificationList extends React.Component<INotificationListProps, IN
           updateNotifications(notificationsCopy.concat(newNotification));
         } else {
           const update = [...notificationsCopy];
-          extend(update[index], newNotification);
+          update[index] = newNotification;
           updateNotifications(update);
         }
         this.setState({ isNotificationsDirty: true });
@@ -158,7 +158,7 @@ export class NotificationList extends React.Component<INotificationListProps, IN
             <div className={'col-md-12'}>
               <table className="table table-condensed">
                 {notifications && notifications.length > 0 && (
-                  <thead ng-if="notifications.length">
+                  <thead>
                     <tr>
                       <th>Type</th>
                       <th>Details</th>

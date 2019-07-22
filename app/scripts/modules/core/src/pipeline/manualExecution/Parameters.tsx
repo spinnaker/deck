@@ -44,77 +44,65 @@ export class Parameters extends React.Component<IParametersProps> {
   public render() {
     const { parameters } = this.props;
     const hasRequiredParameters = parameters.some(p => p.required);
-    const hiddenParameters = new Set<string>();
-    parameters.forEach(p => {
-      if (p.conditional) {
-        const include = this.shouldInclude(p);
-        if (!include) {
-          hiddenParameters.add(p.name);
-        }
-      }
-    });
+    const visibleParameters = parameters.filter(p => p.conditional && this.shouldInclude(p));
     return (
       <>
         <p className="manual-execution-parameters-description">
           This pipeline is parameterized. Please enter values for the parameters below.
         </p>
-        {parameters &&
-          parameters.map((parameter, i) => {
-            if (hiddenParameters.has(parameter.name)) {
-              return <> </>;
-            } else {
-              return (
-                <div className="form-group" key={i}>
-                  <div className="col-md-4 sm-label-right break-word">
-                    {parameter.name}
-                    {parameter.required && <span>*</span>}
-                    {parameter.description && <HelpField content={parameter.description} />}
-                  </div>
-                  {!parameter.hasOptions && parameter.constraint === 'date' && (
-                    <div className="col-md-6">
-                      <DayPickerInput
-                        format={'yyyy-MM-dd'}
-                        onDayChange={(date: Date) => this.dateSelected(date, parameter.name)}
-                      />
-                    </div>
-                  )}
-                  {!parameter.hasOptions && !parameter.constraint && (
-                    <div className="col-md-6">
-                      <FormikFormField
-                        name={'parameters.' + parameter.name}
-                        fastField={false}
-                        input={(props: any) => <TextInput {...props} inputClassName={'form-control input-sm'} />}
-                        required={parameter.required}
-                      />
-                    </div>
-                  )}
-                  {parameter.hasOptions && (
-                    <div className="col-md-6">
-                      <FormikFormField
-                        name={'parameters.' + parameter.name}
-                        fastField={false}
-                        input={(props: any) => (
-                          <ReactSelectInput
-                            {...props}
-                            clearable={false}
-                            inputClassName={'parameter-option-select'}
-                            options={parameter.options.map(o => ({ label: o.value, value: o.value }))}
-                          />
-                        )}
-                        required={parameter.required}
-                      />
-                    </div>
-                  )}
-                  {hasRequiredParameters && (
-                    <div className="form-group">
-                      <div className="col-md-4 col-md-offset-4">
-                        <em>* Required</em>
-                      </div>
-                    </div>
-                  )}
+        {visibleParameters &&
+          visibleParameters.map((parameter, i) => {
+            return (
+              <div className="form-group" key={i}>
+                <div className="col-md-4 sm-label-right break-word">
+                  {parameter.name}
+                  {parameter.required && <span>*</span>}
+                  {parameter.description && <HelpField content={parameter.description} />}
                 </div>
-              );
-            }
+                {!parameter.hasOptions && parameter.constraint === 'date' && (
+                  <div className="col-md-6">
+                    <DayPickerInput
+                      format={'yyyy-MM-dd'}
+                      onDayChange={(date: Date) => this.dateSelected(date, parameter.name)}
+                    />
+                  </div>
+                )}
+                {!parameter.hasOptions && !parameter.constraint && (
+                  <div className="col-md-6">
+                    <FormikFormField
+                      name={'parameters.' + parameter.name}
+                      fastField={false}
+                      input={(props: any) => <TextInput {...props} inputClassName={'form-control input-sm'} />}
+                      required={parameter.required}
+                    />
+                  </div>
+                )}
+                {parameter.hasOptions && (
+                  <div className="col-md-6">
+                    <FormikFormField
+                      name={'parameters.' + parameter.name}
+                      fastField={false}
+                      input={(props: any) => (
+                        <ReactSelectInput
+                          {...props}
+                          clearable={false}
+                          inputClassName={'parameter-option-select'}
+                          options={parameter.options.map(o => ({ label: o.value, value: o.value }))}
+                        />
+                      )}
+                      required={parameter.required}
+                    />
+                  </div>
+                )}
+                {hasRequiredParameters && (
+                  <div className="form-group">
+                    <div className="col-md-4 col-md-offset-4">
+                      <em>* Required</em>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
           })}
       </>
     );

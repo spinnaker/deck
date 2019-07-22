@@ -6,7 +6,7 @@ import { head } from 'lodash';
 
 import { IParameter, IPipeline, IPipelineCommand, ITrigger } from 'core/domain';
 import { IPipelineTemplateConfig, PipelineTemplateReader, PipelineTemplateV2Service } from 'core/pipeline';
-import { StandardFieldLayout } from 'core/presentation';
+import { FormField } from 'core/presentation';
 
 export interface IPipelineOptionsProps {
   formatParameterConfig: (p: IParameter[]) => { [key: string]: any };
@@ -20,7 +20,7 @@ export interface IPipelineOptionsProps {
 }
 
 export interface IPipelineOptionsState {
-  planError?: boolean;
+  planError: boolean;
 }
 
 export class PipelineOptions extends React.Component<IPipelineOptionsProps, IPipelineOptionsState> {
@@ -28,7 +28,7 @@ export class PipelineOptions extends React.Component<IPipelineOptionsProps, IPip
 
   constructor(props: IPipelineOptionsProps) {
     super(props);
-    this.state = {};
+    this.state = { planError: false };
   }
 
   public componentWillUnmount() {
@@ -105,20 +105,21 @@ export class PipelineOptions extends React.Component<IPipelineOptionsProps, IPip
     } else {
       return (
         <div className="form-group row">
-          <StandardFieldLayout
+          <FormField
             label={'Pipeline'}
-            input={
+            onChange={this.pipelineSelected}
+            value={formik.values.pipeline ? formik.values.pipeline.id : ''}
+            input={props => (
               <Select
+                {...props}
                 clearable={false}
                 className={'pipeline-select'}
                 options={pipelineOptions.map(p => ({
                   label: p.name,
                   value: p.id,
                 }))}
-                value={formik.values.pipeline ? formik.values.pipeline.id : ''}
-                onChange={this.pipelineSelected}
               />
-            }
+            )}
           />
         </div>
       );

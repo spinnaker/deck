@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { Observable, Subject } from 'rxjs';
 import Select, { Option } from 'react-select';
-import { clone, head, set } from 'lodash';
+import { clone, head } from 'lodash';
 import { FormikProps } from 'formik';
 
 import { IPipelineCommand, ITrigger } from 'core/domain';
-import { StandardFieldLayout } from 'core/presentation';
+import { FormField } from 'core/presentation';
 import { Registry } from 'core/registry';
 
 import { ITriggerTemplateComponentProps, TriggerTemplate } from './TriggerTemplate';
@@ -17,19 +17,8 @@ export interface ITriggersProps {
   formik: FormikProps<IPipelineCommand>;
 }
 
-export interface ITriggersState {
-  command: IPipelineCommand;
-}
-
-export class Triggers extends React.Component<ITriggersProps, ITriggersState> {
+export class Triggers extends React.Component<ITriggersProps> {
   private destroy$ = new Subject();
-
-  constructor(props: ITriggersProps) {
-    super(props);
-    this.state = {
-      command: props.formik.values,
-    };
-  }
 
   public componentDidMount() {
     this.updateTriggerDescription(this.props.formik.values.trigger);
@@ -42,9 +31,6 @@ export class Triggers extends React.Component<ITriggersProps, ITriggersState> {
   private updateCommand = (path: string, value: any) => {
     const { formik } = this.props;
     formik.setFieldValue(path, value);
-    const newCommand = { ...this.state.command };
-    set(newCommand, path, value);
-    this.setState({ command: newCommand });
   };
 
   private updateTriggerDescription = (trigger: ITrigger) => {
@@ -58,7 +44,6 @@ export class Triggers extends React.Component<ITriggersProps, ITriggersState> {
           newTrigger.description = label;
           this.props.formik.setFieldValue('trigger', newTrigger);
           this.props.triggerChanged(trigger);
-          this.setState({ command: { ...this.state.command, trigger } });
         });
     } else {
       this.props.triggerChanged(trigger);
@@ -72,36 +57,42 @@ export class Triggers extends React.Component<ITriggersProps, ITriggersState> {
     formik.setFieldValue('trigger', trigger);
     formik.setFieldValue('triggerInvalid', false);
     triggerChanged(trigger);
-    this.setState({ command: { ...this.state.command, trigger } });
   };
 
   public render() {
     const { formik, triggerComponent, triggers } = this.props;
-    const { command } = this.state;
     return (
       <div className="form-group row">
-        {triggers.length === 1 && <p className="form-control-static">{head(triggers).description}</p>}
+        {triggers.length === 1 && (
+          <div className="form-group">
+            <label className="col-md-4 sm-label-right">Trigger</label>
+            <div className="col-md-8">
+              <p className="form-control-static">{head(triggers).description}</p>
+            </div>
+          </div>
+        )}
         {triggers.length > 1 && (
-          <StandardFieldLayout
+          <FormField
             label={'Trigger'}
-            input={
+            onChange={this.triggerSelected}
+            value={formik.values.trigger ? formik.values.trigger.description : ''}
+            input={props => (
               <Select
+                {...props}
                 className={'trigger-select'}
                 clearable={false}
                 options={triggers.map(t => ({
                   label: t.description,
                   value: t.description,
                 }))}
-                value={formik.values.trigger ? formik.values.trigger.description : ''}
-                onChange={this.triggerSelected}
               />
-            }
+            )}
           />
         )}
 
         {triggerComponent && (
           <div className={'trigger-template'}>
-            <TriggerTemplate updateCommand={this.updateCommand} component={triggerComponent} command={command} />
+            <TriggerTemplate updateCommand={this.updateCommand} component={triggerComponent} command={formik.values} />
           </div>
         )}
       </div>
