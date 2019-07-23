@@ -8,6 +8,7 @@ import './HelpMenu.less';
 
 const DOCS_URL = 'https://spinnaker.io/docs';
 const COMMUNITY_URL = 'https://spinnaker.io/community';
+const VERSIONS_URL = 'https://www.spinnaker.io/community/releases/versions/';
 
 const Feedback = () =>
   SETTINGS.feedback && SETTINGS.feedback.url ? (
@@ -49,6 +50,10 @@ export const HelpMenu = () => {
           <MenuItem divider={true} />
           <MenuItem href={COMMUNITY_URL} target="_blank">
             Community Resources
+          </MenuItem>
+          <MenuItem divider={true} />
+          <MenuItem href={VERSIONS_URL} target="_blank">
+            Spinnaker { SETTINGS.version }
           </MenuItem>
           {SETTINGS.feature.pagerDuty && (
             <li role="presentation">
