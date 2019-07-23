@@ -85,21 +85,25 @@ export class NotificationDetails extends React.Component<INotificationDetailsPro
           <NotificationSelector onNotificationTypeChange={onNotificationTypeChange} type={values.type} />
           {(stageType || level) && (
             <div className="sp-margin-m-bottom">
-              <FormikFormField
-                name="when"
-                label="Notify when"
-                input={props => (
-                  <WhenChecklistInput
-                    {...props}
-                    options={whenOptions.map(o => ({
-                      value: o,
-                      label: NotificationTransformer.getNotificationWhenDisplayName(o, level, stageType),
-                      additionalFields: renderCustomMessage(values.type, o),
-                    }))}
+              <div className={'form-group'}>
+                <label className={'col-md-4 sm-label-right'}>Notify when</label>
+                <div className="col-md-6">
+                  <FormikFormField
+                    name="when"
+                    input={props => (
+                      <WhenChecklistInput
+                        {...props}
+                        options={whenOptions.map(o => ({
+                          value: o,
+                          label: NotificationTransformer.getNotificationWhenDisplayName(o, level, stageType),
+                          additionalFields: renderCustomMessage(values.type, o),
+                        }))}
+                      />
+                    )}
+                    required={true}
                   />
-                )}
-                required={true}
-              />
+                </div>
+              </div>
             </div>
           )}
         </div>

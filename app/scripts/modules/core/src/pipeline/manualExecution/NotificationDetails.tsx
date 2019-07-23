@@ -63,15 +63,19 @@ export class NotificationDetails extends React.Component<INotificationDetailsPro
     const { values } = formik;
     return (
       <>
-        <FormikFormField
-          name="notificationEnabled"
-          label="Notifications"
-          fastField={false}
-          input={props => <CheckboxInput {...props} text={'Notify me when the pipeline completes'} />}
-        />
+        <div className={'form-group'}>
+          <label className={'col-md-4 sm-label-right'}>Notifications</label>
+          <div className="col-md-6">
+            <FormikFormField
+              name="notificationEnabled"
+              fastField={false}
+              input={props => <CheckboxInput {...props} text={'Notify me when the pipeline completes'} />}
+            />
+          </div>
+        </div>
         <div className="form-group">
           {notifications.length === 1 && (
-            <div className="col-md-12">
+            <div className="col-md-offset-4 col-md-6">
               There is{' '}
               <HoverablePopover placement="bottom" template={notificationToolTip(notifications)}>
                 <a>one notification</a>
@@ -80,7 +84,7 @@ export class NotificationDetails extends React.Component<INotificationDetailsPro
             </div>
           )}
           {notifications.length > 1 && (
-            <div className="col-md-12">
+            <div className="col-md-offset-4 col-md-6">
               There are{' '}
               <HoverablePopover placement="bottom" template={notificationToolTip(notifications)}>
                 <a>{notifications.length} notifications</a>

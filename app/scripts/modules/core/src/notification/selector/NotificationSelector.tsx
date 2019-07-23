@@ -47,20 +47,24 @@ export class NotificationSelector extends React.Component<INotificationSelectorP
     return (
       <>
         <div className="sp-margin-m-bottom">
-          <FormikFormField
-            name={fieldName ? `${fieldName}.type` : 'type'}
-            label="Notify via"
-            input={props => (
-              <ReactSelectInput
-                clearable={false}
-                {...props}
-                inputClassName={'notification-type-select'}
-                options={notificationTypes}
+          <div className={'form-group'}>
+            <label className={'col-md-4 sm-label-right'}>Notify via</label>
+            <div className="col-md-6">
+              <FormikFormField
+                name={fieldName ? `${fieldName}.type` : 'type'}
+                input={props => (
+                  <ReactSelectInput
+                    clearable={false}
+                    {...props}
+                    inputClassName={'notification-type-select'}
+                    options={notificationTypes}
+                  />
+                )}
+                onChange={onNotificationTypeChange}
+                required={true}
               />
-            )}
-            onChange={onNotificationTypeChange}
-            required={true}
-          />
+            </div>
+          </div>
         </div>
         <NotificationDetailFields type={type} fieldName={fieldName} />
       </>

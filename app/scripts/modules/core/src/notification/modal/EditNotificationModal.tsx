@@ -51,7 +51,7 @@ export class EditNotificationModal extends React.Component<IEditNotificationModa
             </Modal.Header>
             <Modal.Body>
               <div className={'row'}>
-                <div className={'col-md-12'}>
+                <div className="container-fluid modal-body-content">
                   <NotificationDetails formik={formik} level={level} stageType={stageType} />
                 </div>
               </div>

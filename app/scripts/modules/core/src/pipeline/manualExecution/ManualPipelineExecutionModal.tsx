@@ -1,11 +1,14 @@
 import * as React from 'react';
+
+import { Formik, Form } from 'formik';
+import { Modal } from 'react-bootstrap';
 import { Observable, Subject } from 'rxjs';
 import { assign, clone, compact, extend, flatten, get, head, uniq, valuesIn } from 'lodash';
 
+import { SubmitButton, ModalClose } from 'core/modal';
 import { Application } from 'core/application';
 import { AuthenticationService } from 'core/authentication';
-import { WizardModal, WizardPage } from 'core/modal/';
-import { IModalComponentProps, ReactModal } from 'core/presentation';
+import { buildValidators, IModalComponentProps, ReactModal } from 'core/presentation';
 import {
   IExecution,
   IExecutionTrigger,
@@ -52,6 +55,7 @@ export interface IManualExecutionModalState {
 }
 
 export class ManualExecutionModal extends React.Component<IManualExecutionModalProps, IManualExecutionModalState> {
+  private formikRef = React.createRef<Formik<any>>();
   private destroy$ = new Subject();
 
   constructor(props: IManualExecutionModalProps) {
@@ -290,6 +294,11 @@ export class ManualExecutionModal extends React.Component<IManualExecutionModalP
     };
   };
 
+  private validate = (values: IPipelineCommand): any => {
+    const validation = buildValidators(values);
+    return validation.result();
+  };
+
   public render(): React.ReactElement<ManualExecutionModal> {
     const { dismissModal, pipeline } = this.props;
     const {
@@ -304,24 +313,25 @@ export class ManualExecutionModal extends React.Component<IManualExecutionModalP
       triggers,
     } = this.state;
     const notifications = applicationNotifications.concat(pipelineNotifications);
+    const pipelineCommand = this.generateInitialValues(pipeline);
     return (
-      <WizardModal<IPipelineCommand>
-        closeModal={this.submit}
-        dismissModal={dismissModal}
-        heading={modalHeader}
-        hideWizardNavigation={true}
-        initialValues={this.generateInitialValues(pipeline)}
-        submitButtonLabel={'Run'}
-        render={({ formik, nextIdx, wizard }) => (
-          <div className="container-fluid">
-            {pipelineOptions.length > 0 && (
-              <WizardPage
-                wizard={wizard}
-                order={nextIdx()}
-                render={({ innerRef }) => (
+      <Formik<IPipelineCommand>
+        ref={this.formikRef}
+        initialValues={pipelineCommand}
+        isInitialValid={() => !(Object.keys(pipelineCommand).length > 0)}
+        onSubmit={this.submit}
+        validate={this.validate}
+        render={formik => (
+          <Form className={`form-horizontal`}>
+            <ModalClose dismiss={dismissModal} />
+            <Modal.Header>
+              <Modal.Title>{modalHeader}</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <div className="container-fluid modal-body-content">
+                {pipelineOptions.length > 0 && (
                   <PipelineOptions
                     formik={formik}
-                    ref={innerRef}
                     formatPipeline={this.formatPipeline}
                     formatTriggers={this.formatTriggers}
                     formatParameterConfig={this.formatParameterConfig}
@@ -331,80 +341,59 @@ export class ManualExecutionModal extends React.Component<IManualExecutionModalP
                     updateTriggerOptions={this.updateTriggerOptions}
                   />
                 )}
-              />
-            )}
-            {formik.values.pipeline && (
-              <div className="form-group">
-                <div className="col-md-10">
-                  <p>
-                    This will start a new run of <strong>{formik.values.pipeline.name}</strong>.
-                  </p>
-                </div>
-              </div>
-            )}
-            {currentPipelineExecutions.length > 0 && (
-              <WizardPage
-                wizard={wizard}
-                order={nextIdx()}
-                render={({ innerRef }) => (
-                  <CurrentlyRunningExecutions ref={innerRef} currentlyRunningExecutions={currentPipelineExecutions} />
+                {formik.values.pipeline && (
+                  <div className="form-group">
+                    <div className="col-md-10">
+                      <p>
+                        This will start a new run of <strong>{formik.values.pipeline.name}</strong>.
+                      </p>
+                    </div>
+                  </div>
                 )}
-              />
-            )}
-            {triggers && triggers.length > 0 && (
-              <WizardPage
-                wizard={wizard}
-                order={nextIdx()}
-                render={({ innerRef }) => (
+                {currentPipelineExecutions.length > 0 && (
+                  <CurrentlyRunningExecutions currentlyRunningExecutions={currentPipelineExecutions} />
+                )}
+                {triggers && triggers.length > 0 && (
                   <Triggers
                     formik={formik}
-                    ref={innerRef}
                     triggers={triggers}
                     triggerChanged={this.triggerChanged}
                     triggerComponent={triggerComponent}
                   />
                 )}
-              />
-            )}
-            {formik.values.pipeline &&
-              formik.values.pipeline.parameterConfig &&
-              formik.values.pipeline.parameterConfig.length > 0 && (
-                <WizardPage
-                  wizard={wizard}
-                  order={nextIdx()}
-                  render={({ innerRef }) => (
-                    <Parameters formik={formik} ref={innerRef} parameters={formik.values.pipeline.parameterConfig} />
+                {formik.values.pipeline &&
+                  formik.values.pipeline.parameterConfig &&
+                  formik.values.pipeline.parameterConfig.length > 0 && (
+                    <Parameters formik={formik} parameters={formik.values.pipeline.parameterConfig} />
                   )}
-                />
-              )}
-            {stageComponents.length > 0 && (
-              <StageManualComponents
-                command={formik.values}
-                components={stageComponents}
-                updateCommand={(path: string, value: any) => {
-                  formik.setFieldValue(path, value);
-                }}
-              />
-            )}
-            {formik.values.trigger && formik.values.trigger.artifacts && (
-              <div className="form-group">
-                <label className="col-md-4 sm-label-right">Artifacts</label>
-                <div className="col-md-8">
-                  <ArtifactList artifacts={formik.values.trigger.artifacts} />
-                </div>
+                {stageComponents.length > 0 && (
+                  <StageManualComponents
+                    command={formik.values}
+                    components={stageComponents}
+                    updateCommand={(path: string, value: any) => {
+                      formik.setFieldValue(path, value);
+                    }}
+                  />
+                )}
+                {formik.values.trigger && formik.values.trigger.artifacts && (
+                  <div className="form-group">
+                    <label className="col-md-4 sm-label-right">Artifacts</label>
+                    <div className="col-md-8">
+                      <ArtifactList artifacts={formik.values.trigger.artifacts} />
+                    </div>
+                  </div>
+                )}
+                {dryRunEnabled && <DryRun />}
+                <NotificationDetails formik={formik} notifications={notifications} />
               </div>
-            )}
-            {dryRunEnabled && (
-              <WizardPage wizard={wizard} order={nextIdx()} render={({ innerRef }) => <DryRun ref={innerRef} />} />
-            )}
-            <WizardPage
-              wizard={wizard}
-              order={nextIdx()}
-              render={({ innerRef }) => (
-                <NotificationDetails formik={formik} ref={innerRef} notifications={notifications} />
-              )}
-            />
-          </div>
+            </Modal.Body>
+            <Modal.Footer>
+              <button className="btn btn-default" onClick={dismissModal} type="button">
+                Cancel
+              </button>
+              <SubmitButton isDisabled={!formik.isValid} isFormSubmit={true} submitting={false} label={'Run'} />
+            </Modal.Footer>
+          </Form>
         )}
       />
     );

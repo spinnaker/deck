@@ -44,7 +44,7 @@ export class Parameters extends React.Component<IParametersProps> {
   public render() {
     const { parameters } = this.props;
     const hasRequiredParameters = parameters.some(p => p.required);
-    const visibleParameters = parameters.filter(p => p.conditional && this.shouldInclude(p));
+    const visibleParameters = parameters.filter(p => !p.conditional || this.shouldInclude(p));
     return (
       <>
         <p className="manual-execution-parameters-description">
