@@ -6,7 +6,7 @@ export class PubsubNotificationType extends React.Component<INotificationTypeCus
   public render() {
     const { fieldName } = this.props;
     return (
-      <div className="form-group row">
+      <div className="sp-margin-m-bottom">
         <FormikFormField
           name={fieldName ? `${fieldName}.publisherName` : 'publisherName'}
           label="Publisher Name"

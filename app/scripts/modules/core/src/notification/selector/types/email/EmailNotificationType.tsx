@@ -7,7 +7,7 @@ export class EmailNotificationType extends React.Component<INotificationTypeCust
     const { fieldName } = this.props;
     return (
       <>
-        <div className="form-group row">
+        <div className="sp-margin-m-bottom">
           <FormikFormField
             name={fieldName ? `${fieldName}.address` : 'address'}
             label="Email Address"
@@ -16,7 +16,7 @@ export class EmailNotificationType extends React.Component<INotificationTypeCust
             required={true}
           />
         </div>
-        <div className="form-group row">
+        <div className="sp-margin-m-bottom">
           <FormikFormField
             name={fieldName ? `${fieldName}.cc` : 'cc'}
             label="CC Address"

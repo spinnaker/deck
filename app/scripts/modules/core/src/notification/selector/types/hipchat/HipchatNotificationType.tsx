@@ -7,14 +7,16 @@ export class HipchatNotificationType extends React.Component<INotificationTypeCu
     const { botName, fieldName } = this.props;
     return (
       <>
-        <div className="form-group row">
-          {!!botName && (
+        {!!botName && (
+          <div className={'row'}>
             <div className="col-sm-9 col-sm-offset-3">
               <strong>Please note:</strong> You need to invite the
               <strong> {botName} </strong> bot to <strong>private</strong> rooms to receive HipChat notifications
               <br />
             </div>
-          )}
+          </div>
+        )}
+        <div className="sp-margin-m-bottom">
           <FormikFormField
             name={fieldName ? `${fieldName}.address` : 'address'}
             label="HipChat Room"

@@ -4,9 +4,10 @@ import { Option } from 'react-select';
 
 import { INotification, INotificationTypeConfig } from 'core/domain';
 import { Registry } from 'core/registry';
-import { buildValidators, ChecklistInput, FormikFormField, TextAreaInput } from 'core/presentation';
+import { FormikFormField, TextAreaInput } from 'core/presentation';
 import { NotificationSelector } from 'core/notification';
 import { NotificationTransformer } from '../notification.transformer';
+import { WhenChecklistInput } from './WhenChecklistInput';
 import { MANUAL_JUDGEMENT_WHEN_OPTIONS, PIPELINE_WHEN_OPTIONS, STAGE_WHEN_OPTIONS } from './whenOptions';
 
 import './editNotification.less';
@@ -52,12 +53,8 @@ export class NotificationDetails extends React.Component<INotificationDetailsPro
     }
   }
 
-  private renderCustomMessage = (type: string, whenOption: string, selectedOptions: string[]): React.ReactNode => {
-    if (
-      whenOption !== 'manualJudgment' &&
-      ['email', 'slack', 'googlechat'].includes(type) &&
-      selectedOptions.includes(whenOption)
-    ) {
+  private renderCustomMessage = (type: string, whenOption: string): React.ReactNode => {
+    if (whenOption !== 'manualJudgment' && ['email', 'slack', 'googlechat'].includes(type)) {
       return (
         <FormikFormField
           name={'message.' + whenOption + '.text'}
@@ -77,14 +74,6 @@ export class NotificationDetails extends React.Component<INotificationDetailsPro
     this.props.formik.setFieldValue('when', [...this.props.formik.values.when]);
   };
 
-  public validate(values: INotification) {
-    const validation = buildValidators(values);
-    validation
-      .field('when', 'Notify when')
-      .required([(value: any[]) => !value.length && 'Please select when the notification should execute']);
-    return validation.result();
-  }
-
   public render() {
     const { onNotificationTypeChange, renderCustomMessage } = this;
     const { formik, level, stageType } = this.props;
@@ -92,26 +81,28 @@ export class NotificationDetails extends React.Component<INotificationDetailsPro
     const { whenOptions } = this.state;
     return (
       <>
-        <NotificationSelector onNotificationTypeChange={onNotificationTypeChange} type={values.type} />
-        {(stageType || level) && (
-          <div className="form-group row">
-            <FormikFormField
-              name="when"
-              label="Notify when"
-              input={props => (
-                <ChecklistInput
-                  {...props}
-                  options={whenOptions.map(o => ({
-                    value: o,
-                    label: NotificationTransformer.getNotificationWhenDisplayName(o, level, stageType),
-                    additionalFields: renderCustomMessage(values.type, o, formik.values.when),
-                  }))}
-                />
-              )}
-              required={true}
-            />
-          </div>
-        )}
+        <div className={'notification-details'}>
+          <NotificationSelector onNotificationTypeChange={onNotificationTypeChange} type={values.type} />
+          {(stageType || level) && (
+            <div className="sp-margin-m-bottom">
+              <FormikFormField
+                name="when"
+                label="Notify when"
+                input={props => (
+                  <WhenChecklistInput
+                    {...props}
+                    options={whenOptions.map(o => ({
+                      value: o,
+                      label: NotificationTransformer.getNotificationWhenDisplayName(o, level, stageType),
+                      additionalFields: renderCustomMessage(values.type, o),
+                    }))}
+                  />
+                )}
+                required={true}
+              />
+            </div>
+          )}
+        </div>
       </>
     );
   }

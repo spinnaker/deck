@@ -6,7 +6,7 @@ export class BearychatNoficationType extends React.Component<INotificationTypeCu
   public render() {
     const { fieldName } = this.props;
     return (
-      <div className="form-group row">
+      <div className="sp-margin-m-bottom">
         <FormikFormField
           name={fieldName ? `${fieldName}.address` : 'address'}
           label="Email Address"

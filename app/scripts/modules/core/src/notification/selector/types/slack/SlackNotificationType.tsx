@@ -7,7 +7,7 @@ export class SlackNotificationType extends React.Component<INotificationTypeCust
     const { botName, fieldName } = this.props;
     return (
       <>
-        <div className="form-group row">
+        <div className="sp-margin-m-bottom">
           <FormikFormField
             name={fieldName ? `${fieldName}.address` : 'address'}
             label="Slack Channel"
@@ -17,11 +17,13 @@ export class SlackNotificationType extends React.Component<INotificationTypeCust
             required={true}
           />
           {!!botName && (
-            <div className="col-sm-9 col-sm-offset-3">
-              <strong>Note:</strong> You will need to invite the
-              <strong> {botName} </strong>
-              bot to this channel to receive Slack notifications
-              <br />
+            <div className="row">
+              <div className="col-sm-9 col-sm-offset-3">
+                <strong>Note:</strong> You will need to invite the
+                <strong> {botName} </strong>
+                bot to this channel to receive Slack notifications
+                <br />
+              </div>
             </div>
           )}
         </div>

@@ -1,8 +1,10 @@
 import * as React from 'react';
 
-import { WizardModal, WizardPage } from 'core/modal/';
-import { IModalComponentProps, ReactModal } from 'core/presentation';
+import { Formik, Form } from 'formik';
+import { Modal } from 'react-bootstrap';
+import { buildValidators, IModalComponentProps, ReactModal } from 'core/presentation';
 import { INotification } from 'core/domain';
+import { SubmitButton, ModalClose } from 'core/modal';
 
 import { NotificationDetails } from './NotificationDetails';
 
@@ -13,6 +15,8 @@ export interface IEditNotificationModalProps extends IModalComponentProps {
 }
 
 export class EditNotificationModal extends React.Component<IEditNotificationModalProps> {
+  private formikRef = React.createRef<Formik<any>>();
+
   private submit = (values: INotification): void => {
     this.props.closeModal(values);
   };
@@ -22,26 +26,43 @@ export class EditNotificationModal extends React.Component<IEditNotificationModa
     return ReactModal.show(EditNotificationModal, props, modalProps);
   }
 
+  private validate = (values: INotification): any => {
+    const validation = buildValidators(values);
+    validation
+      .field('when', 'Notify when')
+      .required([(value: any[]) => !value.length && 'Please select when the notification should execute']);
+    return validation.result();
+  };
+
   public render(): React.ReactElement<EditNotificationModal> {
     const { dismissModal, level, notification, stageType } = this.props;
     return (
-      <WizardModal<INotification>
-        closeModal={this.submit}
-        dismissModal={dismissModal}
-        heading={'Edit Notification'}
-        hideWizardNavigation={true}
+      <Formik<INotification>
+        ref={this.formikRef}
         initialValues={notification}
-        submitButtonLabel={'Update'}
-        render={({ formik, nextIdx, wizard }) => (
-          <div className="container-fluid notification-details">
-            <WizardPage
-              wizard={wizard}
-              order={nextIdx()}
-              render={({ innerRef }) => (
-                <NotificationDetails formik={formik} level={level} ref={innerRef} stageType={stageType} />
-              )}
-            />
-          </div>
+        isInitialValid={() => !(Object.keys(this.validate(notification)).length > 0)}
+        onSubmit={this.submit}
+        validate={this.validate}
+        render={formik => (
+          <Form className={`form-horizontal`}>
+            <ModalClose dismiss={dismissModal} />
+            <Modal.Header>
+              <Modal.Title>Edit Notification</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <div className={'row'}>
+                <div className={'col-md-12'}>
+                  <NotificationDetails formik={formik} level={level} stageType={stageType} />
+                </div>
+              </div>
+            </Modal.Body>
+            <Modal.Footer>
+              <button className="btn btn-default" onClick={dismissModal} type="button">
+                Cancel
+              </button>
+              <SubmitButton isDisabled={!formik.isValid} isFormSubmit={true} submitting={false} label={'Update'} />
+            </Modal.Footer>
+          </Form>
         )}
       />
     );

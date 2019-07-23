@@ -15,7 +15,6 @@ interface IChecklistInputProps extends IFormInputProps, OmitControlledInputProps
 export interface IChecklistInputOption {
   label: string;
   value: string;
-  additionalFields?: React.ReactNode;
 }
 
 export function ChecklistInput(props: IChecklistInputProps) {
@@ -60,20 +59,17 @@ export function ChecklistInput(props: IChecklistInputProps) {
     }
 
     return (
-      <>
-        <label className={labelClassName} key={option.value}>
-          <input
-            className={className}
-            type="checkbox"
-            value={option.value}
-            onChange={handleChange}
-            checked={isChecked(option.value)}
-            {...otherProps}
-          />
-          {option.label}
-        </label>
-        {option.additionalFields}
-      </>
+      <label className={labelClassName} key={option.value}>
+        <input
+          className={className}
+          type="checkbox"
+          value={option.value}
+          onChange={handleChange}
+          checked={isChecked(option.value)}
+          {...otherProps}
+        />
+        {option.label}
+      </label>
     );
   }
 

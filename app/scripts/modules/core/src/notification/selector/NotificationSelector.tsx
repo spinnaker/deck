@@ -46,7 +46,7 @@ export class NotificationSelector extends React.Component<INotificationSelectorP
     const { notificationTypes } = this.state;
     return (
       <>
-        <div className="form-group row">
+        <div className="sp-margin-m-bottom">
           <FormikFormField
             name={fieldName ? `${fieldName}.type` : 'type'}
             label="Notify via"

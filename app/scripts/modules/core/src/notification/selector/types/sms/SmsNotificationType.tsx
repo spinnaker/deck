@@ -14,19 +14,17 @@ export class SmsNotificationType extends React.Component<INotificationTypeCustom
   public render() {
     const { fieldName } = this.props;
     return (
-      <>
-        <div className="form-group row">
-          <FormikFormField
-            name={fieldName ? `${fieldName}.address` : 'address'}
-            label="Phone Number"
-            validate={this.validate}
-            input={props => (
-              <TextInput inputClassName={'form-control input-sm'} {...props} placeholder="enter a phone number" />
-            )}
-            required={true}
-          />
-        </div>
-      </>
+      <div className="sp-margin-m-bottom">
+        <FormikFormField
+          name={fieldName ? `${fieldName}.address` : 'address'}
+          label="Phone Number"
+          validate={this.validate}
+          input={props => (
+            <TextInput inputClassName={'form-control input-sm'} {...props} placeholder="enter a phone number" />
+          )}
+          required={true}
+        />
+      </div>
     );
   }
 }
