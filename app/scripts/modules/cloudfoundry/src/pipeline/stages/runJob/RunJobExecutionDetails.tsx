@@ -17,6 +17,7 @@ export class RunJobExecutionDetails extends React.Component<IExecutionDetailsSec
     const region = get(stage, ['context', 'jobStatus', 'location'], '');
     const taskId = get(stage, ['context', 'jobStatus', 'id'], '');
     const taskName = get(stage, ['context', 'jobStatus', 'name'], '');
+    const logsUrl: string = get(stage, ['context', 'logsUrl']);
 
     return (
       <ExecutionDetailsSection name={name} current={current}>
@@ -41,6 +42,13 @@ export class RunJobExecutionDetails extends React.Component<IExecutionDetailsSec
                       logsType={CloudFoundryRecentLogsType.TASK}
                     />
                   </dd>
+                  {logsUrl && (
+                    <dd>
+                      <a target="_blank" href={logsUrl}>
+                        External
+                      </a>
+                    </dd>
+                  )}
                 </>
               )}
               {!region && <div className="well">Collecting additional details...</div>}

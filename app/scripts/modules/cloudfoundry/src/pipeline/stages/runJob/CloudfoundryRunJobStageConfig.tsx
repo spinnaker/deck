@@ -12,6 +12,7 @@ import {
 } from '@spinnaker/core';
 
 import { AccountRegionClusterSelector } from 'cloudfoundry/presentation';
+import { set } from 'lodash';
 
 export interface ICloudfoundryRunTaskStageConfigState {
   accounts: IAccount[];
@@ -52,21 +53,15 @@ export class CloudfoundryRunJobStageConfig extends React.Component<
     });
   };
 
-  private commandUpdated = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.props.updateStageField({ command: event.target.value });
-  };
-
-  private JobNameUpdated = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.props.updateStageField({ jobName: event.target.value });
-  };
-
-  private targetUpdated = (target: string) => {
-    this.props.updateStageField({ target });
+  private stageFieldChanged = (fieldName: string, value: any) => {
+    set(this.props.stage, fieldName, value);
+    this.props.stageFieldUpdated();
+    this.forceUpdate();
   };
 
   public render() {
     const { application, stage } = this.props;
-    const { command, jobName, target } = stage;
+    const { target, jobName, command, logsUrl } = stage;
     const { accounts } = this.state;
     const { TargetSelect } = NgReact;
 
@@ -81,13 +76,34 @@ export class CloudfoundryRunJobStageConfig extends React.Component<
           isSingleRegion={true}
         />
         <StageConfigField label="Target">
-          <TargetSelect model={{ target }} options={StageConstants.TARGET_LIST} onChange={this.targetUpdated} />
-        </StageConfigField>
-        <StageConfigField label="Command">
-          <TextInput type="text" className="form-control" onChange={this.commandUpdated} value={command} />
+          <TargetSelect
+            model={{ target }}
+            options={StageConstants.TARGET_LIST}
+            onChange={t => this.stageFieldChanged('target', t)}
+          />
         </StageConfigField>
         <StageConfigField label="Job Name">
-          <TextInput type="text" className="form-control" onChange={this.JobNameUpdated} value={jobName} />
+          <TextInput
+              type="text"
+              className="form-control"
+              onChange={e => this.stageFieldChanged('command', e.target.value)}
+              value={jobName} />
+        </StageConfigField>
+        <StageConfigField label="Command">
+          <TextInput
+            type="text"
+            className="form-control"
+            onChange={e => this.stageFieldChanged('command', e.target.value)}
+            value={command}
+          />
+        </StageConfigField>
+        <StageConfigField label="Logs URL" helpKey={'cf.runJob.logsUrl'}>
+          <TextInput
+            type="text"
+            className="form-control"
+            onChange={e => this.stageFieldChanged('logsUrl', e.target.value)}
+            value={logsUrl}
+          />
         </StageConfigField>
       </div>
     );
