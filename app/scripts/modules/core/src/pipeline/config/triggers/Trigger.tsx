@@ -200,17 +200,11 @@ export class Trigger extends React.Component<ITriggerProps> {
                 input={props => <CheckboxInput {...props} text="Trigger Enabled" />}
               />
             )}
-
-            <Debug trigger={trigger} />
           </div>
         </fieldset>
       </LayoutProvider>
     );
   }
-}
-
-function Debug({ trigger }: { trigger: ITrigger }) {
-  return <pre>{JSON.stringify(trigger, null, 2)}</pre>;
 }
 
 function TriggerTypeSelectInput(props: IFormInputProps & { triggerConfig: ITriggerTypeConfig }) {
