@@ -6,6 +6,7 @@ import {
   IAccount,
   IStageConfigProps,
   NgReact,
+  SpelText,
   StageConfigField,
   StageConstants,
   TextInput,
@@ -82,12 +83,14 @@ export class CloudfoundryRunJobStageConfig extends React.Component<
             onChange={t => this.stageFieldChanged('target', t)}
           />
         </StageConfigField>
-        <StageConfigField label="Job Name">
+        <StageConfigField label="Job Name" helpKey={'cf.runJob.jobName'}>
           <TextInput
-              type="text"
-              className="form-control"
-              onChange={e => this.stageFieldChanged('command', e.target.value)}
-              value={jobName} />
+            type="text"
+            className="form-control"
+            onChange={e => this.stageFieldChanged('jobName', e.target.value)}
+            value={jobName}
+            maxLength={238}
+          />
         </StageConfigField>
         <StageConfigField label="Command">
           <TextInput
@@ -98,11 +101,12 @@ export class CloudfoundryRunJobStageConfig extends React.Component<
           />
         </StageConfigField>
         <StageConfigField label="Logs URL" helpKey={'cf.runJob.logsUrl'}>
-          <TextInput
-            type="text"
-            className="form-control"
-            onChange={e => this.stageFieldChanged('logsUrl', e.target.value)}
+          <SpelText
+            placeholder=""
             value={logsUrl}
+            onChange={value => this.stageFieldChanged('logsUrl', value)}
+            pipeline={this.props.pipeline}
+            docLink={false}
           />
         </StageConfigField>
       </div>

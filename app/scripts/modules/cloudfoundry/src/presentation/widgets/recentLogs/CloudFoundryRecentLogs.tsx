@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import { bindAll } from 'lodash';
 
-import { InstanceReader, IInstanceConsoleOutput } from 'core/instance/InstanceReader';
+import { InstanceReader, IInstanceConsoleOutput } from '@spinnaker/core';
 
 export enum CloudFoundryRecentLogsType {
   APP = 'app',

@@ -25,6 +25,7 @@ const helpContents: { [key: string]: string } = {
     '<li><code>${name}</code> the task name.</li>' +
     '</ul>' +
     '</p>',
+  'cf.runJob.jobName': '(Optional) If left empty, a random string will be generated.',
 };
 
 Object.keys(helpContents).forEach(key => HelpContentsRegistry.register(key, helpContents[key]));
