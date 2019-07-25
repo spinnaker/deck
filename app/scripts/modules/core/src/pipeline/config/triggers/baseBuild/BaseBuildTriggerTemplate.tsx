@@ -126,12 +126,6 @@ export class BaseBuildTriggerTemplate extends React.Component<
     this.destroy$.next();
   }
 
-  public componentWillReceiveProps(nextProps: ITriggerTemplateComponentProps) {
-    if (!isEqual(nextProps.command, this.props.command)) {
-      this.initialize(nextProps.command);
-    }
-  }
-
   private handleBuildChanged = (option: Option): void => {
     this.updateSelectedBuild({ number: option.number });
   };
