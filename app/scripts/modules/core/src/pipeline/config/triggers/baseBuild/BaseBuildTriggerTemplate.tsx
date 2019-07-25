@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { capitalize, get, isEqual } from 'lodash';
+import { capitalize, get } from 'lodash';
 import { Option } from 'react-select';
 import { $q } from 'ngimport';
 import { IPromise } from 'angular';
