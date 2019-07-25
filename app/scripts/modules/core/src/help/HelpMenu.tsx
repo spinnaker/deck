@@ -51,10 +51,11 @@ export const HelpMenu = () => {
           <MenuItem href={COMMUNITY_URL} target="_blank">
             Community Resources
           </MenuItem>
-          <MenuItem divider={true} />
-          <MenuItem href={VERSIONS_URL} target="_blank">
-            Spinnaker { SETTINGS.version }
-          </MenuItem>
+          {SETTINGS.version && (
+            <MenuItem href={VERSIONS_URL} target="_blank">
+              Spinnaker {SETTINGS.version}
+            </MenuItem>
+          )}
           {SETTINGS.feature.pagerDuty && (
             <li role="presentation">
               <UISref to="home.page">
