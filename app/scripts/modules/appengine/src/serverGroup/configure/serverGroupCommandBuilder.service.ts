@@ -188,6 +188,7 @@ export class AppengineServerGroupCommandBuilder {
             triggerOptions: AppengineServerGroupCommandBuilder.getTriggerOptions(pipeline),
             expectedArtifacts: AppengineServerGroupCommandBuilder.getExpectedArtifacts(pipeline),
           },
+          credentials: cluster.account || command.credentials,
           viewState: {
             ...command.viewState,
             stage: _stage,
