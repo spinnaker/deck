@@ -104,9 +104,17 @@ export class ManualExecutionModal extends React.Component<IManualExecutionModalP
     Observable.fromPromise(AppNotificationsService.getNotificationsForApplication(application.name))
       .takeUntil(this.destroy$)
       .subscribe(notifications => {
-        const applicationNotifications: INotification[] = flatten(valuesIn(notifications) as INotification[][]).filter(
-          (x: any) => !!x,
-        );
+        const applicationNotifications: INotification[] = [];
+        Object.keys(notifications)
+          .sort()
+          .filter(k => Array.isArray(notifications[k]))
+          .forEach(type => {
+            if (isArray(notifications[type])) {
+              (notifications[type] as INotification[]).forEach((notification: INotification) => {
+                applicationNotifications.push(notification);
+              });
+            }
+          });
         this.setState({ applicationNotifications });
       });
     this.pipelineChanged(pipeline);
