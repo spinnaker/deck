@@ -3,7 +3,7 @@ import * as React from 'react';
 import { Formik, Form } from 'formik';
 import { Modal } from 'react-bootstrap';
 import { Observable, Subject } from 'rxjs';
-import { assign, clone, compact, extend, flatten, get, head, uniq, valuesIn } from 'lodash';
+import { assign, clone, compact, extend, get, head, uniq, isArray } from 'lodash';
 
 import { SubmitButton, ModalClose } from 'core/modal';
 import { Application } from 'core/application';
