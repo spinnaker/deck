@@ -13,7 +13,6 @@ import {
 } from '@spinnaker/core';
 
 import { AccountRegionClusterSelector } from 'cloudfoundry/presentation';
-import { set } from 'lodash';
 
 export interface ICloudfoundryRunTaskStageConfigState {
   accounts: IAccount[];
@@ -54,12 +53,6 @@ export class CloudfoundryRunJobStageConfig extends React.Component<
     });
   };
 
-  private stageFieldChanged = (fieldName: string, value: any) => {
-    set(this.props.stage, fieldName, value);
-    this.props.stageFieldUpdated();
-    this.forceUpdate();
-  };
-
   public render() {
     const { application, stage } = this.props;
     const { target, jobName, command, logsUrl } = stage;
@@ -80,14 +73,14 @@ export class CloudfoundryRunJobStageConfig extends React.Component<
           <TargetSelect
             model={{ target }}
             options={StageConstants.TARGET_LIST}
-            onChange={t => this.stageFieldChanged('target', t)}
+            onChange={t => this.props.updateStageField({ target: t })}
           />
         </StageConfigField>
         <StageConfigField label="Job Name" helpKey={'cf.runJob.jobName'}>
           <TextInput
             type="text"
             className="form-control"
-            onChange={e => this.stageFieldChanged('jobName', e.target.value)}
+            onChange={e => this.props.updateStageField({ jobName: e.target.value })}
             value={jobName}
             maxLength={238}
           />
@@ -96,15 +89,15 @@ export class CloudfoundryRunJobStageConfig extends React.Component<
           <TextInput
             type="text"
             className="form-control"
-            onChange={e => this.stageFieldChanged('command', e.target.value)}
+            onChange={e => this.props.updateStageField({ command: e.target.value })}
             value={command}
           />
         </StageConfigField>
         <StageConfigField label="Logs URL" helpKey={'cf.runJob.logsUrl'}>
           <SpelText
             placeholder=""
+            onChange={value => this.props.updateStageField({ logsUrl: value })}
             value={logsUrl}
-            onChange={value => this.stageFieldChanged('logsUrl', value)}
             pipeline={this.props.pipeline}
             docLink={false}
           />
