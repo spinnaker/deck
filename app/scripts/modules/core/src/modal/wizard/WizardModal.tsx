@@ -167,7 +167,6 @@ export class WizardModal<T = {}> extends React.Component<IWizardModalProps<T>, I
         <SpinFormik<T>
           ref={this.formikRef}
           initialValues={initialValues}
-          isInitialValid={() => !(Object.keys(this.validate(initialValues)).length > 0)}
           onSubmit={closeModal}
           validate={this.validate}
           render={formik => (

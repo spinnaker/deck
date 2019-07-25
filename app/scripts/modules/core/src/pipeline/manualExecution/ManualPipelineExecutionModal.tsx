@@ -326,7 +326,6 @@ export class ManualExecutionModal extends React.Component<IManualExecutionModalP
       <SpinFormik<IPipelineCommand>
         ref={this.formikRef}
         initialValues={pipelineCommand}
-        isInitialValid={() => !(Object.keys(pipelineCommand).length > 0)}
         onSubmit={this.submit}
         validate={this.validate}
         render={formik => (

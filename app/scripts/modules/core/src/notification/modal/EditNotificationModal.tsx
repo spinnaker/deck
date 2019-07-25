@@ -40,7 +40,6 @@ export class EditNotificationModal extends React.Component<IEditNotificationModa
       <SpinFormik<INotification>
         ref={this.formikRef}
         initialValues={notification}
-        isInitialValid={() => !(Object.keys(this.validate(notification)).length > 0)}
         onSubmit={this.submit}
         validate={this.validate}
         render={formik => (

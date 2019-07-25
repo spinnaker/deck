@@ -64,7 +64,6 @@ export class EditDisruptionBudgetModal extends React.Component<IEditDisruptionBu
         <TaskMonitorWrapper monitor={taskMonitor} />
         <SpinFormik<ITitusServerGroupCommand>
           initialValues={command}
-          isInitialValid={true}
           onSubmit={(values: ITitusServerGroupCommand) => this.submit(values, taskMonitor)}
           render={formik => (
             <>
