@@ -27,8 +27,9 @@ export const reactSelectValidationErrorStyle = {
  * somewhat compatible with the controlled input pattern
  */
 export const reactSelectOnChangeAdapter = (name: string, onChange: IReactSelectInputProps['onChange']) => {
-  return (selectedOption: Option) => {
-    const target = { name, value: selectedOption ? selectedOption.value : null };
+  return (selection: Option | Option[]) => {
+    const value = !selection ? null : Array.isArray(selection) ? selection.map(x => x.value) : selection.value;
+    const target = { name, value };
     const event = createFakeReactSyntheticEvent(target);
     return (onChange || noop)(event);
   };
@@ -81,20 +82,15 @@ export class ReactSelectInput extends React.Component<IReactSelectInputProps> {
       onChange: reactSelectOnChangeAdapter(name, onChange),
     };
 
+    const commonProps = { className, style, ...fieldProps, ...otherProps };
+
     const SelectElement = ({ options }: { options: IReactSelectInputProps['options'] }) =>
       mode === 'TETHERED' ? (
-        <TetheredSelect className={className} style={style} options={options} {...fieldProps} {...otherProps} />
+        <TetheredSelect {...commonProps} options={options} />
       ) : mode === 'VIRTUALIZED' ? (
-        <VirtualizedSelect
-          className={className}
-          style={style}
-          options={options}
-          {...fieldProps}
-          {...otherProps}
-          optionRenderer={null}
-        />
+        <VirtualizedSelect {...commonProps} options={options} optionRenderer={null} />
       ) : (
-        <Select className={className} style={style} options={options} {...fieldProps} {...otherProps} />
+        <Select {...commonProps} options={options} />
       );
 
     if (isStringArray(stringOptions)) {
