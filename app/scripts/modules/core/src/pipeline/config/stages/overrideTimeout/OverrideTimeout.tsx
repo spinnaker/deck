@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { get } from 'lodash';
+import { Duration } from 'luxon';
 
 import { IStage } from 'core/domain';
 import { CheckboxInput, NumberInput } from 'core/presentation';
@@ -21,10 +22,13 @@ const toHoursAndMinutes = (ms: number) => {
   if (!ms) {
     return { hours: 0, minutes: 0 };
   } else {
-    const seconds = ms / 1000;
+    const { hours, minutes } = Duration.fromMillis(ms)
+      .shiftTo('hours', 'minutes')
+      .toObject();
+
     return {
-      hours: Math.floor(seconds / 3600),
-      minutes: Math.floor(seconds / 60) % 60,
+      hours: Math.floor(hours),
+      minutes: Math.floor(minutes),
     };
   }
 };
