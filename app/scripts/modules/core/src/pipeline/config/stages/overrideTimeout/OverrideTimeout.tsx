@@ -40,7 +40,7 @@ export const OverrideTimeout = (props: IOverrideTimeoutConfigProps) => {
 
   useEffect(() => {
     stageChanged();
-  }, [!!get(props.stageConfig, 'supportsCustomTimeout'), props.stageTimeoutMs]);
+  }, [props.stageTimeoutMs]);
 
   const stageChanged = () => {
     if (props.stageTimeoutMs !== undefined) {
