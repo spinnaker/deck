@@ -56,8 +56,7 @@ module(TASK_STATES, [APPLICATION_STATE_PROVIDER]).config([
           return undefined;
         }
 
-        return Promise.resolve()
-          .then(() => TaskReader.getTask(taskId))
+        return Promise.resolve(TaskReader.getTask(taskId))
           .then(task =>
             transition.router.stateService.target('home.applications.application.tasks.taskDetails', {
               application: task.application,
