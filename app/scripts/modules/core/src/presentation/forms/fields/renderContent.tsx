@@ -6,19 +6,13 @@ import * as React from 'react';
  * Supports:
  *
  * - React Class
- * - Arrow Function
- * - Render Function
+ * - Functional component
  * - JSX.Element or string
  */
 export function renderContent<T>(Content: string | JSX.Element | React.ComponentType<T>, props: T): React.ReactNode {
-  const prototype = typeof Content === 'function' && Content.prototype;
-
-  if (prototype && (prototype.isReactComponent || typeof prototype.render === 'function')) {
-    const ClassComponent = Content as React.ComponentType<T>;
-    return <ClassComponent {...props} />;
-  } else if (typeof Content === 'function') {
-    const arrowOrSFC = Content as (props: T) => JSX.Element;
-    return arrowOrSFC(props);
+  if (typeof Content === 'function') {
+    const Component = Content as React.ComponentType<T>;
+    return <Component {...props} />;
   } else {
     return Content;
   }
