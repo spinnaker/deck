@@ -90,7 +90,7 @@ export class AmazonLoadBalancerChoiceModal extends React.Component<
               <div className="alert alert-warning">
                 <p>
                   <i className="fa fa-exclamation-triangle" /> Note: Classic Load Balancers cannot be used with Titus as
-                  they do not have <em>ip</em> based target groups.
+                  they do not have <em>IP</em> based target groups.
                 </p>
               </div>
             )}
