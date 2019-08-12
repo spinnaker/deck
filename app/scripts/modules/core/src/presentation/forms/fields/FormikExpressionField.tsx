@@ -4,7 +4,7 @@ import { ValidationMessage } from 'core/validation';
 
 import { FormikFormField, IFormikFieldProps } from '../FormikFormField';
 import { ExpressionError, ExpressionInput, ExpressionPreview, ISpelError } from '../inputs';
-import { ICommonFormFieldProps, IFieldLayoutPropsWithoutInput, IFormInputProps } from '../interface';
+import { ICommonFormFieldProps, IFieldLayoutPropsWithoutInput } from '../interface';
 
 export interface IExpressionFieldProps {
   placeholder?: string;

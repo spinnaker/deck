@@ -9,8 +9,7 @@ export interface IServicesProps {
   fieldName: string;
 }
 
-export const Services: React.SFC<IServicesProps> = (props: IServicesProps) => {
-  const { fieldName } = props;
+export const Services: React.SFC<IServicesProps> = ({ fieldName }: IServicesProps) => {
   return (
     <div>
       <div className="form-group">

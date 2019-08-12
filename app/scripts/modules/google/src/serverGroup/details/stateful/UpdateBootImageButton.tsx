@@ -3,7 +3,6 @@ import * as React from 'react';
 import {
   Application,
   FormikFormField,
-  IFormInputProps,
   IModalComponentProps,
   ReactModal,
   TaskMonitor,
