@@ -58,6 +58,11 @@ export class AmazonLoadBalancerChoiceModal extends React.Component<
   };
 
   public render() {
+    const {
+      app: {
+        attributes: { cloudProviders = [] },
+      },
+    } = this.props;
     const { choices, selectedChoice } = this.state;
 
     return (
@@ -81,6 +86,14 @@ export class AmazonLoadBalancerChoiceModal extends React.Component<
                 </div>
               ))}
             </div>
+            {selectedChoice.type === 'classic' && cloudProviders.includes('titus') && (
+              <div className="alert alert-warning">
+                <p>
+                  <i className="fa fa-exclamation-triangle" /> Note: Classic Load Balancers cannot be used with Titus as
+                  they do not have <em>ip</em> based target groups.
+                </p>
+              </div>
+            )}
             <div className="load-balancer-description" />
           </div>
         </Modal.Body>
