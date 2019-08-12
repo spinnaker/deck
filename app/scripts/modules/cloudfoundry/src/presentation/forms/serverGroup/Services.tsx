@@ -31,7 +31,7 @@ export const Services: React.SFC<IServicesProps> = (props: IServicesProps) => {
                           <div className="sp-margin-m-bottom">
                             <FormikFormField
                               name={`${fieldName}[${index}]`}
-                              input={p => <TextInput {...p} />}
+                              input={props => <TextInput {...props} />}
                               required={true}
                             />
                           </div>

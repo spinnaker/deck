@@ -39,7 +39,7 @@ export class FormikExpressionField extends React.Component<IFormikExpressionFiel
     return (
       <FormikFormField
         name={name}
-        input={(props: IFormInputProps) => (
+        input={props => (
           <ExpressionInput onExpressionChange={changes => this.setState(changes)} context={context} {...props} />
         )}
         label={label}
