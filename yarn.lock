@@ -37,10 +37,10 @@
   dependencies:
     tinyqueue "^1.1.0"
 
-"@spinnaker/kayenta@0.0.82":
-  version "0.0.82"
-  resolved "https://registry.yarnpkg.com/@spinnaker/kayenta/-/kayenta-0.0.82.tgz#82e17e39d9d0f1ff1903b4390c2b6fcdae84c129"
-  integrity sha512-CqFZbhptDPwS/A1dYI4e8PWKHoH/jNTbChIPzdz98RO7zX6PcMrlHBgTNdi73Ee2YHMehQJoF+Y8arLK7zlnbQ==
+"@spinnaker/kayenta@0.0.85":
+  version "0.0.85"
+  resolved "https://registry.yarnpkg.com/@spinnaker/kayenta/-/kayenta-0.0.85.tgz#59b752f7c322270938cf0ea283c59c2b9ded0c39"
+  integrity sha512-5R7RTYitQzbcw2Y/LWOVwxykijnJVoVTtk4nfmyp9MMCBpP/fmCxuLZGh9iXrFa1qDZvqB8oeJFchqAEQngF3A==
   dependencies:
     "@fortawesome/fontawesome-free" "5.5.0"
     "@uirouter/angularjs" "^1.0.15"
@@ -10004,6 +10004,13 @@ react-container-dimensions@^1.4.1:
     element-resize-detector "^1.1.10"
     invariant "^2.2.2"
     prop-types "^15.5.8"
+
+react-day-picker@^7.3.0:
+  version "7.3.0"
+  resolved "https://registry.yarnpkg.com/react-day-picker/-/react-day-picker-7.3.0.tgz#59b6d4e19d274650c79dcf49fbcce2637313467d"
+  integrity sha512-t2kz0Zy4P5U4qwU5YhsBq2QGmypP8L/u+89TSnuD0h4dYKSEDQArFPWfin9gv8erV1ciR1Wzr485TMaYnI7FTw==
+  dependencies:
+    prop-types "^15.6.2"
 
 react-dom@16.3.3:
   version "16.3.3"
