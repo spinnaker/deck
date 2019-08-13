@@ -150,7 +150,7 @@ function TriggerForm(triggerFormProps: ITriggerProps & { formik: FormikProps<ITr
             name="runAsUser"
             label="Run As User"
             help={<HelpField id="pipeline.config.trigger.runAsUser" />}
-            input={RunAsUserInput}
+            input={props => <RunAsUserInput {...props} />}
           />
         )}
 
