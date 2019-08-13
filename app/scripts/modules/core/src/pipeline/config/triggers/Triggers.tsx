@@ -27,7 +27,7 @@ export function Triggers(props: ITriggersProps) {
 
   return (
     <PageNavigator scrollableContainer="[ui-view]">
-      <PageSection pageKey={'concurrent'} label={'Execution Options'} visible={!pipeline.strategy}>
+      <PageSection pageKey="concurrent" label="Execution Options" visible={!pipeline.strategy}>
         <ExecutionOptionsPageContent {...props} />
       </PageSection>
       <PageSection
@@ -48,22 +48,22 @@ export function Triggers(props: ITriggersProps) {
         <TriggersPageContent {...props} />
       </PageSection>
       <PageSection
-        pageKey={'parameters'}
-        label={'Parameters'}
+        pageKey="parameters"
+        label="Parameters"
         badge={pipeline.parameterConfig ? pipeline.parameterConfig.length.toString() : '0'}
         noWrapper={true}
       >
         <ParametersPageContent {...props} />
       </PageSection>
       <PageSection
-        pageKey={'notifications'}
-        label={'Notifications'}
+        pageKey="notifications"
+        label="Notifications"
         badge={pipeline.notifications ? pipeline.notifications.length.toString() : '0'}
         visible={!pipeline.strategy}
       >
         <NotificationsPageContent {...props} />
       </PageSection>
-      <PageSection pageKey={'description'} label={'Description'} noWrapper={true}>
+      <PageSection pageKey="description" label="Description" noWrapper={true}>
         <DescriptionPageContent {...props} />
       </PageSection>
     </PageNavigator>

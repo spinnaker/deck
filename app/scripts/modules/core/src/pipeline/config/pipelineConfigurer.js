@@ -470,7 +470,7 @@ module.exports = angular
 
       this.revertPipelineChanges = () => {
         $scope.$applyAsync(() => {
-          let original = getOriginal();
+          const original = getOriginal();
           $scope.pipeline = _.clone(original);
           $scope.renderablePipeline = $scope.pipeline;
 

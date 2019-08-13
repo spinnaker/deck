@@ -59,9 +59,8 @@ export function TriggersPageContent(props: ITriggersPageContentProps) {
 
   function removeUnusedExpectedArtifacts(pipelineParam: IPipeline) {
     // remove unused expected artifacts from the pipeline
-    const expectedArtifacts: IExpectedArtifact[] = [...pipelineParam.expectedArtifacts];
-    const newExpectedArtifacts: IExpectedArtifact[] = expectedArtifacts.slice(0);
-    expectedArtifacts.forEach(expectedArtifact => {
+    const newExpectedArtifacts: IExpectedArtifact[] = pipelineParam.expectedArtifacts.slice(0);
+    pipelineParam.expectedArtifacts.forEach(expectedArtifact => {
       if (
         !pipelineParam.triggers.find(t => t.expectedArtifactIds && t.expectedArtifactIds.includes(expectedArtifact.id))
       ) {
@@ -73,7 +72,7 @@ export function TriggersPageContent(props: ITriggersPageContentProps) {
   }
 
   return (
-    <div className={'triggers'}>
+    <div className="triggers">
       {pipeline.triggers.length > 0 && showProperties && (
         <div className="form-horizontal panel-pipeline-phase">
           <div className="form-group row">
@@ -87,7 +86,7 @@ export function TriggersPageContent(props: ITriggersPageContentProps) {
                     <div className="col-md-10">
                       <div className="col-md-9 col-md-offset-3">
                         <FormField
-                          name={'respectQuietPeriod'}
+                          name="respectQuietPeriod"
                           onChange={() => {
                             updatePipelineConfig({ respectQuietPeriod: !pipeline.respectQuietPeriod });
                           }}
@@ -99,7 +98,7 @@ export function TriggersPageContent(props: ITriggersPageContentProps) {
                                 <>
                                   Disable automated triggers during quiet period (
                                   <strong>does not affect Pipeline triggers</strong>).
-                                  <HelpField id={'pipeline.config.triggers.respectQuietPeriod'} />
+                                  <HelpField id="pipeline.config.triggers.respectQuietPeriod" />
                                 </>
                               }
                             />
@@ -115,7 +114,7 @@ export function TriggersPageContent(props: ITriggersPageContentProps) {
         </div>
       )}
       {pipeline.triggers.map((trigger, index) => (
-        <div className={'trigger-config'} key={index}>
+        <div className="trigger-config" key={index}>
           <Trigger
             application={application}
             index={index}

@@ -14,7 +14,7 @@ export function ParametersPageContent(props: IParametersPageContentProps) {
 
   function addParameter() {
     const parameterConfig = pipeline.parameterConfig || [];
-    parameterConfig.push({
+    const updatedParameterConfig = parameterConfig.concat({
       name: '',
       label: '',
       required: false,
@@ -24,7 +24,7 @@ export function ParametersPageContent(props: IParametersPageContentProps) {
       hasOptions: false,
       options: [{ value: '' }],
     });
-    updatePipelineConfig({ parameterConfig });
+    updatePipelineConfig({ parameterConfig: updatedParameterConfig });
   }
 
   function removeParameter(index: number): void {

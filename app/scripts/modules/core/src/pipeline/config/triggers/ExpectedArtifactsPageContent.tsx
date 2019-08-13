@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { clone, findIndex } from 'lodash';
 
 import { ArtifactReferenceService } from 'core/artifact/ArtifactReferenceService';
 import { ExpectedArtifactService } from 'core/artifact/expectedArtifact.service';
@@ -32,11 +31,11 @@ export function ExpectedArtifactsPageContent(props: IExpectedArtifactsPageConten
     if (!pipelineContext.triggers) {
       return;
     }
-    const triggers = clone(pipelineContext.triggers);
-    triggers.forEach(t => {
+    const triggers = pipelineContext.triggers.map(t => {
       if (t.expectedArtifactIds) {
         t.expectedArtifactIds = t.expectedArtifactIds.filter(eid => expectedArtifact.id !== eid);
       }
+      return t;
     });
     updatePipelineConfig({ triggers });
 
@@ -44,9 +43,9 @@ export function ExpectedArtifactsPageContent(props: IExpectedArtifactsPageConten
   }
 
   function updateExpectedArtifact(expectedArtifact: IExpectedArtifact) {
-    const newExpectedArtifacts = pipeline.expectedArtifacts.slice(0);
-    const index = findIndex(pipeline.expectedArtifacts, e => e.id === expectedArtifact.id);
-    newExpectedArtifacts[index] = expectedArtifact;
+    const newExpectedArtifacts = pipeline.expectedArtifacts.map(artifact => {
+      return artifact.id === expectedArtifact.id ? expectedArtifact : artifact;
+    });
     updatePipelineConfig({
       expectedArtifacts: newExpectedArtifacts,
     });
