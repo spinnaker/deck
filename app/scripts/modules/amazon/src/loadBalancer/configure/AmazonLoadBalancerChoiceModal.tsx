@@ -5,13 +5,21 @@ import { ILoadBalancerModalProps, ModalClose, ReactModal, noop } from '@spinnake
 
 import { IAmazonLoadBalancerConfig, LoadBalancerTypes } from './LoadBalancerTypes';
 
+export interface IAmazonLoadBalancerChoiceModalDetailsInectedProps {
+  selectedChoice: IAmazonLoadBalancerConfig;
+}
+
+export interface IAmazonLoadBalancerChoiceModalProps extends ILoadBalancerModalProps {
+  renderDetails?: (details: IAmazonLoadBalancerChoiceModalDetailsInectedProps) => React.ReactNode;
+}
+
 export interface IAmazonLoadBalancerChoiceModalState {
   choices: IAmazonLoadBalancerConfig[];
   selectedChoice: IAmazonLoadBalancerConfig;
 }
 
 export class AmazonLoadBalancerChoiceModal extends React.Component<
-  ILoadBalancerModalProps,
+  IAmazonLoadBalancerChoiceModalProps,
   IAmazonLoadBalancerChoiceModalState
 > {
   public static defaultProps: Partial<ILoadBalancerModalProps> = {
@@ -19,7 +27,7 @@ export class AmazonLoadBalancerChoiceModal extends React.Component<
     dismissModal: noop,
   };
 
-  public static show(props: ILoadBalancerModalProps): Promise<void> {
+  public static show(props: IAmazonLoadBalancerChoiceModalProps): Promise<void> {
     return ReactModal.show(
       AmazonLoadBalancerChoiceModal,
       {
@@ -58,11 +66,6 @@ export class AmazonLoadBalancerChoiceModal extends React.Component<
   };
 
   public render() {
-    const {
-      app: {
-        attributes: { cloudProviders = [] },
-      },
-    } = this.props;
     const { choices, selectedChoice } = this.state;
 
     return (
@@ -86,14 +89,7 @@ export class AmazonLoadBalancerChoiceModal extends React.Component<
                 </div>
               ))}
             </div>
-            {selectedChoice.type === 'classic' && cloudProviders.includes('titus') && (
-              <div className="alert alert-warning">
-                <p>
-                  <i className="fa fa-exclamation-triangle" /> Note: Classic Load Balancers cannot be used with Titus as
-                  they do not have <em>ip</em> based target groups.
-                </p>
-              </div>
-            )}
+            {this.props.renderDetails && this.props.renderDetails({ selectedChoice })}
             <div className="load-balancer-description" />
           </div>
         </Modal.Body>
