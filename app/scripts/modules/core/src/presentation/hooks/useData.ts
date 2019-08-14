@@ -16,7 +16,7 @@ import { useLatestPromise, IUseLatestPromiseResult } from './useLatestPromise';
  * @returns an object with the result and current status of the promise
  */
 export function useData<T>(callback: () => IPromise<T>, defaultValue: T, deps: any[]): IUseLatestPromiseResult<T> {
-  const anyDepsMissing = deps.some(dep => !dep);
+  const anyDepsMissing = deps.some(dep => isNil(dep));
   const defaultValueCallback = () => $q.resolve(defaultValue);
   return useLatestPromise(anyDepsMissing ? defaultValueCallback : callback, deps);
 }
