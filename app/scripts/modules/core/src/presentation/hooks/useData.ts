@@ -15,7 +15,7 @@ import { useLatestPromise, IUseLatestPromiseResult } from './useLatestPromise';
  * @param deps array of dependencies, which (when changed) cause the callback to be invoked again
  * @returns an object with the result and current status of the promise
  */
-function useData<T>(callback: () => IPromise<T>, defaultValue: T, deps: any[]): IUseLatestPromiseResult<T> {
+export function useData<T>(callback: () => IPromise<T>, defaultValue: T, deps: any[]): IUseLatestPromiseResult<T> {
   const anyDepsMissing = deps.some(dep => !dep);
   const defaultValueCallback = () => $q.resolve(defaultValue);
   return useLatestPromise(anyDepsMissing ? defaultValueCallback : callback, deps);
