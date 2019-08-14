@@ -34,14 +34,15 @@ export function ConcourseTrigger({ formik, trigger }: IConcourseTriggerConfigPro
     formik.setFieldValue('jobName', jobName);
   };
 
-  const fetchMasters = useData(() => IgorService.listMasters(BuildServiceType.Concourse), []);
-  const fetchTeams = useData(() => ConcourseService.listTeamsForMaster(master), [master]);
-  const fetchPipelines = useData(() => ConcourseService.listPipelinesForTeam(master, team), [master, team]);
+  const fetchMasters = useData(() => IgorService.listMasters(BuildServiceType.Concourse), [], []);
+  const fetchTeams = useData(() => ConcourseService.listTeamsForMaster(master), [], [master]);
+  const fetchPipelines = useData(() => ConcourseService.listPipelinesForTeam(master, team), [], [master, team]);
   const fetchJobs = useData(
     () =>
       ConcourseService.listJobsForPipeline(master, team, pipeline).then(jobs =>
         jobs.map(job => `${team}/${pipeline}/${job}`),
       ),
+    [],
     [master, team, pipeline],
   );
 
