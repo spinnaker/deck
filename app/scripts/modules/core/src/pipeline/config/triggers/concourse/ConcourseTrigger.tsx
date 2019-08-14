@@ -1,220 +1,134 @@
 import * as React from 'react';
-import Select, { Option } from 'react-select';
+import { IPromise } from 'angular';
+import { FormikProps } from 'formik';
+import { $q } from 'ngimport';
+import { Option } from 'react-select';
 
-import { BaseTrigger } from 'core/pipeline';
-import { IConcourseTrigger } from 'core/domain';
-import { Observable } from 'rxjs';
 import { BuildServiceType, IgorService } from 'core/ci';
+import { IConcourseTrigger } from 'core/domain';
+import { FormikFormField, ReactSelectInput, useLatestPromise } from 'core/presentation';
+
 import { ConcourseService } from './concourse.service';
-import { Subject } from 'rxjs/Subject';
 
 export interface IConcourseTriggerConfigProps {
   trigger: IConcourseTrigger;
-  triggerUpdated: (trigger: IConcourseTrigger) => void;
+  formik: FormikProps<IConcourseTrigger>;
 }
 
-export interface IConcourseTriggerConfigState {
-  masters: string[];
-  teams: string[];
-  pipelines: string[];
-  jobs: string[];
-}
+export function ConcourseTrigger({ formik, trigger }: IConcourseTriggerConfigProps) {
+  const { team, project, master } = trigger;
 
-export class ConcourseTrigger extends React.Component<IConcourseTriggerConfigProps, IConcourseTriggerConfigState> {
-  private destroy$ = new Subject();
+  const pipeline = project && project.split('/').pop();
 
-  constructor(props: IConcourseTriggerConfigProps) {
-    super(props);
-    const { master, team, project, job } = this.props.trigger;
-    this.state = {
-      masters: master ? [master] : [],
-      teams: team ? [team] : [],
-      pipelines: project ? [project.split('/').pop()] : [],
-      jobs: job ? [job] : [],
-    };
+  const onTeamChanged = () => {
+    formik.setFieldValue('job', '');
+    formik.setFieldValue('jobName', '');
+    formik.setFieldValue('project', '');
+  };
+
+  const onProjectChanged = () => {
+    formik.setFieldValue('job', '');
+    formik.setFieldValue('jobName', '');
+  };
+
+  const onJobChanged = (job: string) => {
+    const jobName = job && job.split('/').pop();
+    formik.setFieldValue('jobName', jobName);
+  };
+
+  // Fetches data when anything in the dependencies list changes
+  // Returns an empty array if any dependencies are falsey
+  function useData<T>(callback: () => IPromise<T>, deps: any[]) {
+    const anyDepsMissing = deps.some(dep => !dep);
+    const defaultValueCallback = () => $q.resolve(([] as any) as T);
+    return useLatestPromise(anyDepsMissing ? defaultValueCallback : callback, deps);
   }
 
-  public componentDidMount() {
-    Observable.fromPromise(IgorService.listMasters(BuildServiceType.Concourse))
-      .takeUntil(this.destroy$)
-      .subscribe((masters: string[]) => {
-        this.setState({ masters });
-      });
+  const fetchMasters = useData(() => IgorService.listMasters(BuildServiceType.Concourse), []);
+  const fetchTeams = useData(() => ConcourseService.listTeamsForMaster(master), [master]);
+  const fetchPipelines = useData(() => ConcourseService.listPipelinesForTeam(master, team), [master, team]);
+  const fetchJobs = useData(
+    () =>
+      ConcourseService.listJobsForPipeline(master, team, pipeline).then(jobs =>
+        jobs.map(job => `${team}/${pipeline}/${job}`),
+      ),
+    [master, team, pipeline],
+  );
 
-    const { trigger } = this.props;
-    this.fetchAvailableTeams(trigger);
-    this.fetchAvailablePipelines(trigger);
-    this.fetchAvailableJobs(trigger);
-  }
+  const lastSegmentOptionRenderer = (option: Option<string>) => <>{option.value.split('/').pop()}</>;
 
-  private onUpdateTrigger = (update: any) => {
-    this.props.triggerUpdated &&
-      this.props.triggerUpdated({
-        ...this.props.trigger,
-        ...update,
-      });
-  };
+  return (
+    <>
+      <FormikFormField
+        name="master"
+        label="Master"
+        fastField={false}
+        input={props => (
+          <ReactSelectInput
+            {...props}
+            clearable={false}
+            disabled={fetchMasters.status === 'PENDING'}
+            isLoading={fetchMasters.status === 'PENDING'}
+            stringOptions={fetchMasters.result}
+            placeholder="Select a master..."
+          />
+        )}
+      />
 
-  private onTeamChanged = (option: Option<string>) => {
-    const team = option.value;
-    if (this.props.trigger.team !== team) {
-      const trigger = {
-        ...this.props.trigger,
-        job: '',
-        jobName: '',
-        project: '',
-        team,
-      };
-      this.fetchAvailablePipelines(trigger);
-      this.onUpdateTrigger(trigger);
-    }
-  };
+      <FormikFormField
+        name="team"
+        label="Team"
+        fastField={false}
+        onChange={onTeamChanged}
+        input={props => (
+          <ReactSelectInput
+            {...props}
+            clearable={false}
+            disabled={!master || fetchTeams.status === 'PENDING'}
+            isLoading={fetchTeams.status === 'PENDING'}
+            stringOptions={fetchTeams.result}
+            placeholder="Select a team..."
+          />
+        )}
+      />
 
-  private onPipelineChanged = (option: Option<string>) => {
-    const p = option.value;
-    const { project, team } = this.props.trigger;
+      <FormikFormField
+        name="project"
+        label="Pipeline"
+        fastField={false}
+        onChange={onProjectChanged}
+        input={props => (
+          <ReactSelectInput
+            {...props}
+            clearable={false}
+            disabled={!team || fetchPipelines.status === 'PENDING'}
+            isLoading={fetchPipelines.status === 'PENDING'}
+            stringOptions={fetchPipelines.result}
+            optionRenderer={lastSegmentOptionRenderer}
+            valueRenderer={lastSegmentOptionRenderer}
+            placeholder="Select a pipeline..."
+          />
+        )}
+      />
 
-    if (!project || project.split('/').pop() !== p) {
-      const trigger = {
-        ...this.props.trigger,
-        job: '',
-        jobName: '',
-        project: `${team}/${p}`,
-      };
-      this.fetchAvailableJobs(trigger);
-      this.onUpdateTrigger(trigger);
-    }
-  };
-
-  private onJobChanged = (option: Option<string>) => {
-    const jobName = option.value;
-
-    if (this.props.trigger.jobName !== jobName) {
-      const { project } = this.props.trigger;
-      const trigger = {
-        ...this.props.trigger,
-        jobName,
-        job: `${project}/${jobName}`,
-      };
-      this.fetchAvailableJobs(trigger);
-      this.onUpdateTrigger(trigger);
-    }
-  };
-
-  private onMasterChanged = (option: Option<string>) => {
-    const master = option.value;
-
-    if (this.props.trigger.master !== master) {
-      const trigger = {
-        ...this.props.trigger,
-        master,
-      };
-      this.fetchAvailableTeams(trigger);
-      this.onUpdateTrigger(trigger);
-    }
-  };
-
-  private fetchAvailableTeams = (trigger: IConcourseTrigger) => {
-    const { master } = trigger;
-    if (master) {
-      Observable.fromPromise(ConcourseService.listTeamsForMaster(master))
-        .takeUntil(this.destroy$)
-        .subscribe(teams => this.setState({ teams }));
-    }
-  };
-
-  private fetchAvailablePipelines = (trigger: IConcourseTrigger) => {
-    const { master, team } = trigger;
-    if (master && team) {
-      Observable.fromPromise(ConcourseService.listPipelinesForTeam(master, team))
-        .takeUntil(this.destroy$)
-        .subscribe(pipelines => this.setState({ pipelines }));
-    }
-  };
-
-  private fetchAvailableJobs = (trigger: IConcourseTrigger) => {
-    const { master, project, team } = trigger;
-    if (master && team && project) {
-      const pipeline = project.split('/').pop();
-      Observable.fromPromise(ConcourseService.listJobsForPipeline(master, team, pipeline))
-        .takeUntil(this.destroy$)
-        .subscribe(jobs => this.setState({ jobs }));
-    }
-  };
-
-  private ConcourseTriggerContents = () => {
-    const { jobName, team, project, master } = this.props.trigger;
-    const { jobs, pipelines, teams, masters } = this.state;
-    const pipeline = project && project.split('/').pop();
-
-    return (
-      <>
-        <div className="form-group">
-          <label className="col-md-3 sm-label-right">Master</label>
-          <div className="col-md-8">
-            <Select
-              value={master}
-              placeholder="Select a master..."
-              onChange={this.onMasterChanged}
-              options={masters.map((name: string) => ({ label: name, value: name }))}
-              clearable={false}
-            />
-          </div>
-        </div>
-        <div className="form-group">
-          <label className="col-md-3 sm-label-right">Team</label>
-          <div className="col-md-8">
-            {!master && <p className="form-control-static">(Select a master)</p>}
-            {master && (
-              <Select
-                value={team}
-                placeholder="Select a team..."
-                onChange={this.onTeamChanged}
-                options={teams.map((name: string) => ({ label: name, value: name }))}
-                clearable={false}
-              />
-            )}
-          </div>
-        </div>
-        <div className="form-group">
-          <label className="col-md-3 sm-label-right">Pipeline</label>
-          <div className="col-md-8">
-            {!team && <p className="form-control-static">(Select a master and team)</p>}
-            {team && (
-              <Select
-                value={pipeline}
-                placeholder="Select a pipeline..."
-                onChange={this.onPipelineChanged}
-                options={pipelines.map((name: string) => ({ label: name, value: name }))}
-                clearable={false}
-              />
-            )}
-          </div>
-        </div>
-        <div className="form-group">
-          <label className="col-md-3 sm-label-right">Job</label>
-          <div className="col-md-8">
-            {!pipeline && <p className="form-control-static">(Select a master, team, and pipeline)</p>}
-            {pipeline && (
-              <Select
-                value={jobName}
-                placeholder="Select a job..."
-                onChange={this.onJobChanged}
-                options={jobs.map((name: string) => {
-                  const jobNameOption = name.split('/').pop();
-                  return { label: jobNameOption, value: jobNameOption };
-                })}
-                clearable={false}
-              />
-            )}
-          </div>
-        </div>
-      </>
-    );
-  };
-
-  public render() {
-    const { ConcourseTriggerContents } = this;
-    return <BaseTrigger {...this.props} triggerContents={<ConcourseTriggerContents />} />;
-  }
+      <FormikFormField
+        name="job"
+        label="Job"
+        fastField={false}
+        onChange={onJobChanged}
+        input={props => (
+          <ReactSelectInput
+            {...props}
+            clearable={false}
+            disabled={!pipeline || fetchJobs.status === 'PENDING'}
+            isLoading={fetchJobs.status === 'PENDING'}
+            stringOptions={fetchJobs.result}
+            optionRenderer={lastSegmentOptionRenderer}
+            valueRenderer={lastSegmentOptionRenderer}
+            placeholder="Select a job..."
+          />
+        )}
+      />
+    </>
+  );
 }

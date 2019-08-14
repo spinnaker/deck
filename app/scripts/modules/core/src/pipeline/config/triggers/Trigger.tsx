@@ -1,14 +1,29 @@
 import * as React from 'react';
-import Select, { Option } from 'react-select';
 import * as classNames from 'classnames';
+import { FormikProps } from 'formik';
+import { isEqual, pick } from 'lodash';
+import { Option } from 'react-select';
 
 import { Application } from 'core/application';
-import { IExpectedArtifact, IPipeline, ITrigger, ITriggerTypeConfig } from 'core/domain';
-import { Registry } from 'core/registry';
 import { SETTINGS } from 'core/config/settings';
+import { IExpectedArtifact, IPipeline, ITrigger, ITriggerTypeConfig } from 'core/domain';
 import { HelpField } from 'core/help/HelpField';
-import { TriggerArtifactConstraintSelector } from 'core/pipeline/config/triggers/artifacts';
-import { CheckboxInput, Tooltip } from 'core/presentation';
+import { TriggerArtifactConstraintSelectorInput } from 'core/pipeline/config/triggers/artifacts';
+import {
+  CheckboxInput,
+  FormField,
+  FormikFormField,
+  IFormInputProps,
+  ReactSelectInput,
+  SpinFormik,
+  Tooltip,
+  WatchValue,
+} from 'core/presentation';
+import { Registry } from 'core/registry';
+import { ValidationMessage } from 'core/validation';
+
+import { RunAsUserInput } from './RunAsUser';
+import './Trigger.less';
 
 export interface ITriggerProps {
   application: Application;
@@ -20,236 +35,205 @@ export interface ITriggerProps {
   updateTrigger: (index: number, changes: { [key: string]: any }) => void;
 }
 
-export interface ITriggerState {
-  type: string;
-  triggerConfig?: ITriggerTypeConfig;
+export const Trigger = (props: ITriggerProps) => (
+  <SpinFormik
+    onSubmit={() => null}
+    initialValues={props.trigger}
+    render={formik => <TriggerForm {...props} formik={formik} />}
+  />
+);
+
+const commonTriggerFields: Array<keyof ITrigger> = [
+  'enabled',
+  'rebake',
+  'user',
+  'type',
+  'expectedArtifactIds',
+  'runAsUser',
+  'excludedArtifactTypePatterns',
+];
+
+function TriggerForm(triggerFormProps: ITriggerProps & { formik: FormikProps<ITrigger> }) {
+  const { formik, pipeline, index, updateTrigger, updateExpectedArtifacts } = triggerFormProps;
+  const trigger = formik.values as Readonly<ITrigger>;
+
+  const { type } = trigger;
+  const triggerTypes = React.useMemo(() => Registry.pipeline.getTriggerTypes(), []);
+  const triggerConfig = React.useMemo(() => triggerTypes.find(x => x.key === trigger.type), [
+    triggerTypes,
+    trigger.type,
+  ]);
+  const disableAutoTriggering = SETTINGS.disableAutoTriggering || [];
+
+  // Clear out all non-common fields when the type is changed
+  const handleTypeChange = (newType: string) => {
+    const newValues = pick(trigger, commonTriggerFields) as ITrigger;
+    newValues.enabled = disableAutoTriggering.includes(newType) ? false : trigger.enabled;
+    newValues.type = newType;
+    formik.setValues(newValues);
+  };
+
+  const updateTriggerFields = (changes: { [key: string]: any }) => {
+    const updatedTrigger = { ...trigger, ...changes };
+    formik.setValues(updatedTrigger);
+  };
+
+  const triggerComponentProps = {
+    ...triggerFormProps,
+    trigger: formik.values,
+    formik,
+    pipelineId: pipeline.id,
+    triggerUpdated: updateTriggerFields,
+  };
+
+  const EmptyComponent = () => <></>;
+  // The actual trigger component for the specific trigger type
+  const TriggerComponent = (triggerConfig && triggerConfig.component) || EmptyComponent;
+
+  const defineExpectedArtifact = (expectedArtifact: IExpectedArtifact) => {
+    const pipelineExpectedArtifacts = (pipeline.expectedArtifacts || []).slice();
+    const triggerExpectedArtifactIds = (trigger.expectedArtifactIds || []).slice();
+
+    const editArtifactIdx = pipelineExpectedArtifacts.findIndex(artifact => artifact.id === expectedArtifact.id);
+
+    if (editArtifactIdx !== -1) {
+      pipelineExpectedArtifacts.splice(editArtifactIdx, 1, expectedArtifact);
+    } else {
+      pipelineExpectedArtifacts.push(expectedArtifact);
+      triggerExpectedArtifactIds.push(expectedArtifact.id);
+    }
+
+    updateExpectedArtifacts(pipelineExpectedArtifacts);
+    updateTriggerFields({ expectedArtifactIds: triggerExpectedArtifactIds });
+  };
+
+  const showRunAsUser = SETTINGS.feature.fiatEnabled && !SETTINGS.feature.managedServiceAccounts;
+  const fieldSetClassName = classNames({ 'templated-pipeline-item': trigger.inherited, Trigger: true });
+
+  const expectedArtifactOptions =
+    pipeline.expectedArtifacts && pipeline.expectedArtifacts.map(e => ({ label: e.displayName, value: e.id }));
+
+  const showArtifactConstraints = SETTINGS.feature['artifactsRewrite'];
+  const showOldArtifactConstraints =
+    !showArtifactConstraints &&
+    SETTINGS.feature['artifacts'] &&
+    pipeline.expectedArtifacts &&
+    pipeline.expectedArtifacts.length > 0;
+
+  return (
+    <fieldset disabled={trigger.inherited} className={fieldSetClassName}>
+      <WatchValue
+        value={trigger}
+        isEqual={isEqual} // deep compare
+        onChange={updatedTrigger => updateTrigger(index, updatedTrigger)}
+      />
+
+      <div className="form-horizontal panel-pipeline-phase">
+        <FormField // use FormField to avoid race condition setting type and then clearing out non-common fields
+          label="Type"
+          actions={
+            trigger.inherited ? (
+              <FromTemplateMessage />
+            ) : (
+              <RemoveTriggerButton onClick={() => triggerFormProps.removeTrigger(index)} />
+            )
+          }
+          value={trigger.type}
+          onChange={e => handleTypeChange(e.target.value)}
+          input={props => <TriggerTypeSelectInput {...props} triggerConfig={triggerConfig} />}
+        />
+
+        <TriggerComponent {...triggerComponentProps} />
+
+        {showRunAsUser && (
+          <FormikFormField
+            name="runAsUser"
+            label="Run As User"
+            help={<HelpField id="pipeline.config.trigger.runAsUser" />}
+            input={props => <RunAsUserInput {...props} />}
+          />
+        )}
+
+        {showOldArtifactConstraints && (
+          <FormikFormField
+            name="expectedArtifactIds"
+            label="Artifact Constraints"
+            help={<HelpField id="pipeline.config.expectedArtifacts" />}
+            input={props => <ReactSelectInput {...props} multi={true} options={expectedArtifactOptions} />}
+          />
+        )}
+
+        {showArtifactConstraints && (
+          <FormikFormField
+            fastField={false}
+            name="expectedArtifactIds"
+            label="Artifact Constraints"
+            help={<HelpField id="pipeline.config.expectedArtifact" />}
+            input={props => (
+              <TriggerArtifactConstraintSelectorInput
+                {...props}
+                pipeline={pipeline}
+                triggerType={trigger.type}
+                onDefineExpectedArtifact={defineExpectedArtifact}
+              />
+            )}
+          />
+        )}
+
+        {type && disableAutoTriggering.includes(type) && <AutoTriggeringDisabledMessage />}
+
+        {type && !disableAutoTriggering.includes(type) && (
+          <FormField
+            label=""
+            value={trigger.enabled}
+            onChange={() => formik.setFieldValue('enabled', !trigger.enabled)}
+            input={props => <CheckboxInput {...props} text="Trigger Enabled" />}
+          />
+        )}
+      </div>
+    </fieldset>
+  );
 }
 
-export class Trigger extends React.Component<ITriggerProps, ITriggerState> {
-  private disableAutoTriggering = SETTINGS.disableAutoTriggering || [];
-  private triggerTypes = Registry.pipeline.getTriggerTypes();
+function TriggerTypeSelectInput(props: IFormInputProps & { triggerConfig: ITriggerTypeConfig }) {
+  const triggerTypes = Registry.pipeline
+    .getTriggerTypes()
+    .map(t => ({ label: t.label, value: t.key, description: t.description }));
 
-  constructor(props: ITriggerProps) {
-    super(props);
-    const type = props.trigger.type || '';
-    const triggerConfig = this.triggerTypes.find(triggerType => triggerType.key === type);
-    this.state = { type, triggerConfig };
-  }
+  const optionRenderer = (option: Option<any>) => (
+    <p className="flex-container-h baseline margin-between-md">
+      <span style={{ fontWeight: 'bold', minWidth: '100px' }}>{option.label}</span>
+      <span>{option.description}</span>
+    </p>
+  );
 
-  private handleTriggerEnabled = () => {
-    const enabled = !this.props.trigger.enabled;
-    this.triggerUpdated({ enabled });
-  };
+  return <ReactSelectInput {...props} options={triggerTypes} optionRenderer={optionRenderer} />;
+}
 
-  private handleTypeChange = (option: Option<string>) => {
-    const type = option.value;
-    const triggerConfig = this.triggerTypes.find(config => config.key === type);
-    this.setState({ type, triggerConfig });
-    if (this.disableAutoTriggering.includes(type)) {
-      this.triggerUpdated({ enabled: false });
-    }
-  };
+function RemoveTriggerButton(props: { onClick: () => void }) {
+  return (
+    <button className="btn btn-sm btn-default" onClick={props.onClick}>
+      <span className="glyphicon glyphicon-trash" />
+      <span className="visible-xl-inline">Remove trigger</span>
+    </button>
+  );
+}
 
-  private triggerUpdated = (changes: { [key: string]: any }) => {
-    this.props.updateTrigger(this.props.index, changes);
-  };
+function AutoTriggeringDisabledMessage() {
+  const message =
+    'Automatic triggering is disabled for this trigger type. ' +
+    'You can still use this as a trigger to supply data ' +
+    'to downstream stages, but will need to manually execute this pipeline.';
+  return <FormField label="" input={() => <ValidationMessage message={message} type="warning" />} />;
+}
 
-  private TriggerContents = () => {
-    const { triggerConfig } = this.state;
-    if (triggerConfig) {
-      const TriggerComponent = triggerConfig.component;
-      const componentProps = {
-        ...this.props,
-        pipelineId: this.props.pipeline.id,
-        triggerUpdated: this.triggerUpdated,
-      };
-      return <TriggerComponent {...componentProps} />;
-    }
-    return <div />;
-  };
-
-  private removeTrigger = () => {
-    this.props.removeTrigger(this.props.index);
-  };
-
-  private defineExpectedArtifact = (expectedArtifact: IExpectedArtifact) => {
-    const expectedArtifacts = this.props.pipeline.expectedArtifacts;
-    if (expectedArtifacts) {
-      const editingArtifact = expectedArtifacts.findIndex(artifact => artifact.id === expectedArtifact.id);
-      if (editingArtifact >= 0) {
-        const newExpectedArtifactsList = expectedArtifacts.splice(0);
-        newExpectedArtifactsList.splice(editingArtifact, 1, expectedArtifact);
-        this.props.updateExpectedArtifacts(newExpectedArtifactsList);
-      } else {
-        this.props.updateExpectedArtifacts([...expectedArtifacts, expectedArtifact]);
-      }
-    } else {
-      this.props.updateExpectedArtifacts([expectedArtifact]);
-    }
-
-    const expectedArtifactIds = this.props.trigger.expectedArtifactIds;
-    if (expectedArtifactIds && !expectedArtifactIds.includes(expectedArtifact.id)) {
-      this.triggerUpdated({
-        expectedArtifactIds: [...expectedArtifactIds, expectedArtifact.id],
-      });
-    } else {
-      this.triggerUpdated({
-        expectedArtifactIds: [expectedArtifact.id],
-      });
-    }
-  };
-
-  private changeOldExpectedArtifacts = (expectedArtifacts: any[]) => {
-    this.changeExpectedArtifacts(expectedArtifacts.map(e => e.value));
-  };
-
-  private changeExpectedArtifacts = (expectedArtifacts: string[]) => {
-    this.triggerUpdated({
-      expectedArtifactIds: expectedArtifacts,
-    });
-  };
-
-  public render() {
-    const { triggerConfig, type } = this.state;
-    const { pipeline, trigger } = this.props;
-    const { TriggerContents } = this;
-    const fieldSetClassName = classNames({ 'templated-pipeline-item': trigger.inherited });
-
-    return (
-      <div className="row">
-        <div className="col-md-12">
-          <fieldset disabled={trigger.inherited} className={fieldSetClassName}>
-            <div className="form-horizontal panel-pipeline-phase">
-              <div className="form-group row">
-                <div className="col-md-10">
-                  <div className="row">
-                    <label className="col-md-3 sm-label-right">Type</label>
-                    <div className="col-md-4">
-                      <Select
-                        className="input-sm"
-                        clearable={false}
-                        onChange={this.handleTypeChange}
-                        options={[
-                          { label: 'Select...', value: '' },
-                          ...Registry.pipeline.getTriggerTypes().map(t => ({
-                            label: t.label,
-                            value: t.key,
-                          })),
-                        ]}
-                        value={type}
-                      />
-                    </div>
-                    <div className="col-md-5">{triggerConfig && triggerConfig.description}</div>
-                  </div>
-                </div>
-                {trigger.inherited ? (
-                  <span className="templated-pipeline-item__status btn btn-sm btn-default">
-                    <Tooltip value="From Template">
-                      <i className="from-template fa fa-table" />
-                    </Tooltip>
-                    <span className="visible-xl-inline">From Template</span>
-                  </span>
-                ) : (
-                  <div className="col-md-2 text-right">
-                    <button className="btn btn-sm btn-default" onClick={this.removeTrigger}>
-                      <span className="glyphicon glyphicon-trash" />
-                      <span className="visible-xl-inline">Remove trigger</span>
-                    </button>
-                  </div>
-                )}
-              </div>
-              <div className="form-group">
-                <div className="col-md-10">
-                  <TriggerContents />
-                </div>
-              </div>
-              {!SETTINGS.feature['artifactsRewrite'] &&
-                SETTINGS.feature['artifacts'] &&
-                pipeline.expectedArtifacts &&
-                pipeline.expectedArtifacts.length > 0 && (
-                  <div className="form-group">
-                    <div className="col-md-10">
-                      <div className="form-group">
-                        <label className="col-md-3 sm-label-right">
-                          <span>Artifact Constraints </span>
-                          <HelpField id="pipeline.config.expectedArtifact" />
-                        </label>
-                        <div className="col-md-9">
-                          <Select
-                            multi={true}
-                            onChange={this.changeOldExpectedArtifacts}
-                            options={pipeline.expectedArtifacts.map(e => ({
-                              label: e.displayName,
-                              value: e.id,
-                            }))}
-                            value={trigger.expectedArtifactIds}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              {SETTINGS.feature['artifactsRewrite'] && (
-                <div className="form-group">
-                  <div className="col-md-10">
-                    <div className="form-group">
-                      <label className="col-md-3 sm-label-right">
-                        <span>Artifact Constraints </span>
-                        <HelpField id="pipeline.config.expectedArtifact" />
-                      </label>
-                      <div className="col-md-9 row">
-                        <TriggerArtifactConstraintSelector
-                          pipeline={pipeline}
-                          trigger={trigger}
-                          selected={trigger.expectedArtifactIds}
-                          onDefineExpectedArtifact={this.defineExpectedArtifact}
-                          onChangeSelected={this.changeExpectedArtifacts}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-              {type && !this.disableAutoTriggering.includes(type) && (
-                <div className="form-group">
-                  <div className="col-md-10">
-                    <div className="row">
-                      <div className="col-md-9 col-md-offset-3 checkbox">
-                        <label>
-                          <CheckboxInput
-                            checked={trigger.enabled}
-                            onChange={this.handleTriggerEnabled}
-                            text={'Trigger Enabled'}
-                          />
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-              {type && this.disableAutoTriggering.includes(type) && (
-                <div className="form-group">
-                  <div className="col-md-10 col-md-offset-1">
-                    <div className="row">
-                      <div className="col-md-8 col-md-offset-3">
-                        <div className="alert alert-warning">
-                          Automatic triggering is disabled for this trigger type. You can still use this as a trigger to
-                          supply data to downstream stages, but will need to manually execute this pipeline.
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-            <div className="stage-details">
-              <div className="row">
-                <div className="stage-body" />
-              </div>
-            </div>
-          </fieldset>
-        </div>
-      </div>
-    );
-  }
+function FromTemplateMessage() {
+  return (
+    <span className="templated-pipeline-item__status btn btn-sm btn-default">
+      <Tooltip value="From Template">
+        <i className="from-template fa fa-table" />
+      </Tooltip>
+      <span className="visible-xl-inline">From Template</span>
+    </span>
+  );
 }

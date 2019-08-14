@@ -46,4 +46,5 @@ export const artifactKindConfigs: IArtifactKindConfig[] = [
   KubernetesDefault,
 ];
 
-export * from './TriggerArtifactConstraintSelector';
+export * from './TriggerArtifactConstraintSelectorInput';
+export * from './ExpectedArtifact';

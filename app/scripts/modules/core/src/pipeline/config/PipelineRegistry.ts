@@ -1,8 +1,9 @@
-import { uniq, isNil, cloneDeep, intersection, memoize, defaults } from 'lodash';
+import { get, uniq, isNil, cloneDeep, intersection, memoize, defaults } from 'lodash';
 
 import { Application } from 'core/application/application.model';
 import {
   IExecution,
+  INotificationTypeConfig,
   IStage,
   ITriggerTypeConfig,
   IStageTypeConfig,
@@ -26,12 +27,13 @@ export class PipelineRegistry {
   private triggerTypes: ITriggerTypeConfig[] = [];
   private stageTypes: IStageTypeConfig[] = [];
   private transformers: ITransformer[] = [];
+  private notificationTypes: INotificationTypeConfig[] = [];
   private artifactKinds: IArtifactKindConfig[] = artifactKindConfigs;
   private customArtifactKind: IArtifactKindConfig;
 
   constructor() {
     this.getStageConfig = memoize(this.getStageConfig.bind(this), (stage: IStage) =>
-      [stage ? stage.type : '', stage ? stage.cloudProvider || stage.cloudProviderType || 'aws' : ''].join(':'),
+      [stage ? stage.type : '', stage ? PipelineRegistry.resolveCloudProvider(stage) : ''].join(':'),
     );
   }
 
@@ -62,6 +64,22 @@ export class PipelineRegistry {
           }
         }
       });
+  }
+
+  public registerNotification(notificationConfig: INotificationTypeConfig): void {
+    if (SETTINGS.notifications) {
+      const notificationSetting: { enabled: boolean; botName?: string } = get(
+        SETTINGS.notifications,
+        notificationConfig.key,
+      );
+      if (notificationSetting && notificationSetting.enabled) {
+        const config = cloneDeep(notificationConfig);
+        config.config = { ...notificationSetting };
+        this.notificationTypes.push(config);
+      }
+    } else {
+      this.notificationTypes.push(notificationConfig);
+    }
   }
 
   public registerTrigger(triggerConfig: ITriggerTypeConfig): void {
@@ -106,6 +124,10 @@ export class PipelineRegistry {
 
   public getExecutionTransformers(): ITransformer[] {
     return this.transformers;
+  }
+
+  public getNotificationTypes(): INotificationTypeConfig[] {
+    return cloneDeep(this.notificationTypes);
   }
 
   public getTriggerTypes(): ITriggerTypeConfig[] {
@@ -205,6 +227,10 @@ export class PipelineRegistry {
     });
   }
 
+  public getNotificationConfig(type: string): INotificationTypeConfig {
+    return this.getNotificationTypes().find(notificationType => notificationType.key === type);
+  }
+
   public getTriggerConfig(type: string): ITriggerTypeConfig {
     return this.getTriggerTypes().find(triggerType => triggerType.key === type);
   }
@@ -270,7 +296,7 @@ export class PipelineRegistry {
       case 1:
         return matches[0];
       default: {
-        const provider = stage.cloudProvider || stage.cloudProviderType || 'aws';
+        const provider = PipelineRegistry.resolveCloudProvider(stage);
         const matchesForStageCloudProvider = matches.filter(stageType => {
           return stageType.cloudProvider === provider;
         });
@@ -286,6 +312,18 @@ export class PipelineRegistry {
         }
       }
     }
+  }
+
+  // IStage doesn't have a cloudProvider field yet many stage configs are setting it.
+  // Some stages (RunJob, ?) are only setting the cloudProvider field in stage.context.
+  private static resolveCloudProvider(stage: IStage): string {
+    return (
+      stage.cloudProvider ||
+      stage.cloudProviderType ||
+      get(stage, ['context', 'cloudProvider']) ||
+      get(stage, ['context', 'cloudProviderType']) ||
+      'aws'
+    );
   }
 
   private getManualExecutionComponent(

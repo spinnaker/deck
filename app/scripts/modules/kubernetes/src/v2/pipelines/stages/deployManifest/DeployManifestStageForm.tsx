@@ -45,7 +45,6 @@ export class DeployManifestStageForm extends React.Component<
     ArtifactTypePatterns.DOCKER_IMAGE,
     ArtifactTypePatterns.KUBERNETES,
     ArtifactTypePatterns.FRONT50_PIPELINE_TEMPLATE,
-    ArtifactTypePatterns.EMBEDDED_BASE64,
     ArtifactTypePatterns.MAVEN_FILE,
   ];
 
@@ -149,6 +148,7 @@ export class DeployManifestStageForm extends React.Component<
         <h4>Manifest Configuration</h4>
         <StageConfigField label="Manifest Source" helpKey="kubernetes.manifest.source">
           <RadioButtonInput
+            inline={true}
             options={this.getSourceOptions()}
             onChange={(e: any) => this.props.formik.setFieldValue('source', e.target.value)}
             value={stage.source}
