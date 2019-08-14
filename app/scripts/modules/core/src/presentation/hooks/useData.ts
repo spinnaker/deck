@@ -1,5 +1,6 @@
 import { IPromise } from 'angular';
 import { $q } from 'ngimport';
+import { isNil } from 'lodash';
 
 import { useLatestPromise, IUseLatestPromiseResult } from './useLatestPromise';
 
