@@ -6,7 +6,7 @@ import { useLatestPromise, IUseLatestPromiseResult } from './useLatestPromise';
 
 /**
  * A react hook which invokes a promise returning callback whenever any of its dependencies changes.
- * Returns the provided default value whenever any dependency is falsey
+ * Returns the provided default value whenever any dependency is null or undefined
  *
  * This can be useful when fetching data based on a users keyboard input, for example.
  * This behavior is similar to RxJS switchMap.
