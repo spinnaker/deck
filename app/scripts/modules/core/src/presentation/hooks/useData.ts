@@ -11,7 +11,7 @@ import { useLatestPromise, IUseLatestPromiseResult } from './useLatestPromise';
  * This behavior is similar to RxJS switchMap.
  *
  * @param callback the callback to be invoked whenever dependencies change
- * @param defaultValue the default value to return when any dependencies are falsey
+ * @param defaultValue the default value to return when any dependencies are null or undefined
  * @param deps array of dependencies, which (when changed) cause the callback to be invoked again
  * @returns an object with the result and current status of the promise
  */
