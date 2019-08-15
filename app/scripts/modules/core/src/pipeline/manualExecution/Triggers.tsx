@@ -43,7 +43,7 @@ export class Triggers extends React.Component<ITriggersProps> {
           const newTrigger = clone(trigger);
           newTrigger.description = label;
           this.props.formik.setFieldValue('trigger', newTrigger);
-          this.props.triggerChanged(trigger);
+          this.props.triggerChanged(newTrigger);
         });
     } else {
       this.props.triggerChanged(trigger);
@@ -89,7 +89,12 @@ export class Triggers extends React.Component<ITriggersProps> {
 
         {triggerComponent && (
           <div className={'trigger-template'}>
-            <TriggerTemplate updateCommand={this.updateCommand} component={triggerComponent} command={formik.values} />
+            <TriggerTemplate
+              key={formik.values.trigger.description}
+              updateCommand={this.updateCommand}
+              component={triggerComponent}
+              command={formik.values}
+            />
           </div>
         )}
       </div>
