@@ -1,14 +1,14 @@
 import * as React from 'react';
+import { isEmpty } from 'lodash';
 
 import { IValidationMessageProps, ValidationMessage } from 'core/validation';
 import { IFieldLayoutProps } from 'core/presentation';
-import { isUndefined } from 'util';
 
 export class ManualExecutionFieldLayout extends React.Component<IFieldLayoutProps> {
   public render() {
     const { label, help, input, actions, touched, validationMessage, validationStatus } = this.props;
 
-    const showLabel = !isUndefined(label) || !isUndefined(help);
+    const showLabel = !isEmpty(label) || !isEmpty(help);
 
     const renderMessage = (message: React.ReactNode, type: IValidationMessageProps['type']) =>
       typeof message === 'string' ? <ValidationMessage type={type} message={message} /> : message;
