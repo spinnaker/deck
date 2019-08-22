@@ -15,7 +15,8 @@ export interface IParametersProps {
 
 export class Parameters extends React.Component<IParametersProps> {
   private dateSelected = (date: Date, name: string): void => {
-    this.props.formik.setFieldValue('parameter.' + name, date.toISOString().slice(0, 10));
+    /* We need to use bracket notation because parameter names are strings that can have all sorts of characters */
+    this.props.formik.setFieldValue('parameter["' + name + '"]', date.toISOString().slice(0, 10));
   };
 
   private shouldInclude = (p: IParameter) => {
@@ -70,7 +71,11 @@ export class Parameters extends React.Component<IParametersProps> {
                 {!parameter.hasOptions && !parameter.constraint && (
                   <div className="col-md-6">
                     <FormikFormField
-                      name={'parameters.' + parameter.name}
+                      name={
+                        'parameters["' +
+                        parameter.name +
+                        '"]' /* We need to use bracket notation because parameter names are strings that can have all sorts of characters */
+                      }
                       fastField={false}
                       input={props => <TextInput {...props} inputClassName={'form-control input-sm'} />}
                       required={parameter.required}
@@ -80,30 +85,34 @@ export class Parameters extends React.Component<IParametersProps> {
                 {parameter.hasOptions && (
                   <div className="col-md-6">
                     <FormikFormField
-                      name={'parameters.' + parameter.name}
+                      name={
+                        'parameters["' +
+                        parameter.name +
+                        '"]' /* We need to use bracket notation because parameter names are strings that can have all sorts of characters */
+                      }
                       fastField={false}
                       input={props => (
                         <ReactSelectInput
                           {...props}
                           clearable={false}
                           inputClassName={'parameter-option-select'}
-                          options={parameter.options.map(o => ({ label: o.value, value: o.value }))}
+                          options={parameter.options.map(o => ({ label: `${o.value}`, value: o.value }))}
                         />
                       )}
                       required={parameter.required}
                     />
                   </div>
                 )}
-                {hasRequiredParameters && (
-                  <div className="form-group">
-                    <div className="col-md-4 col-md-offset-4">
-                      <em>* Required</em>
-                    </div>
-                  </div>
-                )}
               </div>
             );
           })}
+        {hasRequiredParameters && (
+          <div className="form-group sp-margin-l-top">
+            <div className="col-md-4 col-md-offset-4">
+              <em>* Required</em>
+            </div>
+          </div>
+        )}
       </>
     );
   }
