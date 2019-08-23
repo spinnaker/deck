@@ -41,7 +41,13 @@ export function DisablePipelineModal(props: IDisablePipelineModalProps) {
                 {errorMessage}
               </p>
               <p>
-                <a href="javascript:void(0)" onClick={() => setSaveError(false)}>
+                <a
+                  className="btn btn-link"
+                  onClick={e => {
+                    e.preventDefault();
+                    setSaveError(false);
+                  }}
+                >
                   [dismiss]
                 </a>
               </p>

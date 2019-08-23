@@ -67,7 +67,13 @@ export function DeletePipelineModal(props: IDeletePipelineModalProps) {
                 {errorMessage}
               </p>
               <p>
-                <a href="javascript:void(0)" onClick={() => setDeleteError(false)}>
+                <a
+                  className="btn btn-link"
+                  onClick={e => {
+                    e.preventDefault();
+                    setDeleteError(false);
+                  }}
+                >
                   [dismiss]
                 </a>
               </p>
