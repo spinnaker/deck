@@ -1,6 +1,8 @@
 import * as React from 'react';
 
 import { extend, findIndex } from 'lodash';
+import { IPromise } from 'angular';
+import { $q } from 'ngimport';
 
 import { Application } from 'core/application';
 import { ArtifactReferenceService } from 'core/artifact/ArtifactReferenceService';
@@ -53,14 +55,16 @@ export function TriggersPageContent(props: ITriggersPageContentProps) {
   }
 
   // Expected Artifacts
-  function updateExpectedArtifacts(expectedArtifacts: IExpectedArtifact[]) {
-    updatePipelineConfig({ expectedArtifacts });
+  function updateExpectedArtifacts(expectedArtifacts: IExpectedArtifact[]): IPromise<IExpectedArtifact[]> {
+    return $q.resolve(updatePipelineConfig({ expectedArtifacts })).then(() => pipeline.expectedArtifacts);
   }
 
   function removeUnusedExpectedArtifacts(pipelineParam: IPipeline) {
     // remove unused expected artifacts from the pipeline
-    const newExpectedArtifacts: IExpectedArtifact[] = pipelineParam.expectedArtifacts.slice(0);
-    pipelineParam.expectedArtifacts.forEach(expectedArtifact => {
+    const newExpectedArtifacts: IExpectedArtifact[] = pipelineParam.expectedArtifacts
+      ? pipelineParam.expectedArtifacts.slice(0)
+      : [];
+    newExpectedArtifacts.forEach(expectedArtifact => {
       if (
         !pipelineParam.triggers.find(t => t.expectedArtifactIds && t.expectedArtifactIds.includes(expectedArtifact.id))
       ) {

@@ -3,6 +3,7 @@ import * as classNames from 'classnames';
 import { FormikProps } from 'formik';
 import { isEqual, pick } from 'lodash';
 import { Option } from 'react-select';
+import { IPromise } from 'angular';
 
 import { Application } from 'core/application';
 import { SETTINGS } from 'core/config/settings';
@@ -31,7 +32,7 @@ export interface ITriggerProps {
   pipeline: IPipeline;
   removeTrigger: (index: number) => void;
   trigger: ITrigger;
-  updateExpectedArtifacts: (expectedArtifacts: IExpectedArtifact[]) => void;
+  updateExpectedArtifacts: (expectedArtifacts: IExpectedArtifact[]) => IPromise<IExpectedArtifact[]>;
   updateTrigger: (index: number, changes: { [key: string]: any }) => void;
 }
 
@@ -103,8 +104,9 @@ function TriggerForm(triggerFormProps: ITriggerProps & { formik: FormikProps<ITr
       triggerExpectedArtifactIds.push(expectedArtifact.id);
     }
 
-    updateTriggerFields({ expectedArtifactIds: triggerExpectedArtifactIds });
-    updateExpectedArtifacts(pipelineExpectedArtifacts);
+    Promise.resolve(updateExpectedArtifacts(pipelineExpectedArtifacts)).then(() => {
+      updateTriggerFields({ expectedArtifactIds: triggerExpectedArtifactIds });
+    });
   };
 
   const showRunAsUser = SETTINGS.feature.fiatEnabled && !SETTINGS.feature.managedServiceAccounts;
