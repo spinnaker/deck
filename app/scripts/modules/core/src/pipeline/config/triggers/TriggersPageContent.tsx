@@ -1,8 +1,6 @@
 import * as React from 'react';
 
 import { extend, findIndex } from 'lodash';
-import { IPromise } from 'angular';
-import { $q } from 'ngimport';
 
 import { Application } from 'core/application';
 import { ArtifactReferenceService } from 'core/artifact/ArtifactReferenceService';
@@ -24,6 +22,10 @@ export interface ITriggersPageContentProps {
 export function TriggersPageContent(props: ITriggersPageContentProps) {
   const showProperties = SETTINGS.feature.quietPeriod || SETTINGS.feature.managedServiceAccounts;
   const { pipeline, application, updatePipelineConfig } = props;
+  // must keep track of state to avoid race condition -- Remove once PipelineConfigurer is converted over to React
+  const [expectedArtifacts, setExpectedArtifacts] = React.useState<IExpectedArtifact[]>(
+    props.pipeline.expectedArtifacts ? props.pipeline.expectedArtifacts : [],
+  );
 
   function updateRoles(roles: any[]): void {
     updatePipelineConfig({ roles });
@@ -55,15 +57,14 @@ export function TriggersPageContent(props: ITriggersPageContentProps) {
   }
 
   // Expected Artifacts
-  function updateExpectedArtifacts(expectedArtifacts: IExpectedArtifact[]): IPromise<IExpectedArtifact[]> {
-    return $q.resolve(updatePipelineConfig({ expectedArtifacts })).then(() => pipeline.expectedArtifacts);
+  function updateExpectedArtifacts(e: IExpectedArtifact[]) {
+    setExpectedArtifacts(e);
+    updatePipelineConfig({ expectedArtifacts });
   }
 
   function removeUnusedExpectedArtifacts(pipelineParam: IPipeline) {
     // remove unused expected artifacts from the pipeline
-    const newExpectedArtifacts: IExpectedArtifact[] = pipelineParam.expectedArtifacts
-      ? pipelineParam.expectedArtifacts.slice(0)
-      : [];
+    const newExpectedArtifacts: IExpectedArtifact[] = expectedArtifacts;
     newExpectedArtifacts.forEach(expectedArtifact => {
       if (
         !pipelineParam.triggers.find(t => t.expectedArtifactIds && t.expectedArtifactIds.includes(expectedArtifact.id))
@@ -72,7 +73,8 @@ export function TriggersPageContent(props: ITriggersPageContentProps) {
       }
       ArtifactReferenceService.removeReferenceFromStages(expectedArtifact.id, pipelineParam.stages);
     });
-    updatePipelineConfig({ expectedArtifacts: newExpectedArtifacts });
+    setExpectedArtifacts(newExpectedArtifacts);
+    updatePipelineConfig({ expectedArtifacts });
   }
 
   return (
