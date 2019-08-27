@@ -4,7 +4,7 @@ import { ILoadBalancerModalProps, noop } from '@spinnaker/core';
 import {
   AmazonLoadBalancerChoiceModal,
   IAmazonLoadBalancerChoiceModalProps,
-  IAmazonLoadBalancerChoiceModalDetailsInectedProps,
+  LoadBalancerTypes,
 } from '@spinnaker/amazon';
 
 export class TitusLoadBalancerChoiceModal extends React.Component<ILoadBalancerModalProps> {
@@ -14,23 +14,10 @@ export class TitusLoadBalancerChoiceModal extends React.Component<ILoadBalancerM
   };
 
   public static show(props: IAmazonLoadBalancerChoiceModalProps): Promise<void> {
-    const {
-      app: {
-        attributes: { cloudProviders = [] },
-      },
-    } = props;
+    // Titus is not compatible with NLBs as it requires ip target groups which NLBs do not have
     return AmazonLoadBalancerChoiceModal.show({
       ...props,
-      renderDetails: ({ selectedChoice }: IAmazonLoadBalancerChoiceModalDetailsInectedProps) =>
-        selectedChoice.type === 'classic' &&
-        cloudProviders.includes('titus') && (
-          <div className="alert alert-warning">
-            <p>
-              <i className="fa fa-exclamation-triangle" /> Note: Classic Load Balancers cannot be used with Titus as
-              they do not have <em>IP</em> based target groups.
-            </p>
-          </div>
-        ),
+      choices: LoadBalancerTypes.filter(lb => lb.type !== 'network'),
     });
   }
 }

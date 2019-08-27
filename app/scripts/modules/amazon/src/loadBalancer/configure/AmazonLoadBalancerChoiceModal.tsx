@@ -5,16 +5,11 @@ import { ILoadBalancerModalProps, ModalClose, ReactModal, noop } from '@spinnake
 
 import { IAmazonLoadBalancerConfig, LoadBalancerTypes } from './LoadBalancerTypes';
 
-export interface IAmazonLoadBalancerChoiceModalDetailsInectedProps {
-  selectedChoice: IAmazonLoadBalancerConfig;
-}
-
 export interface IAmazonLoadBalancerChoiceModalProps extends ILoadBalancerModalProps {
-  renderDetails?: (details: IAmazonLoadBalancerChoiceModalDetailsInectedProps) => React.ReactNode;
+  choices: IAmazonLoadBalancerConfig[];
 }
 
 export interface IAmazonLoadBalancerChoiceModalState {
-  choices: IAmazonLoadBalancerConfig[];
   selectedChoice: IAmazonLoadBalancerConfig;
 }
 
@@ -22,9 +17,10 @@ export class AmazonLoadBalancerChoiceModal extends React.Component<
   IAmazonLoadBalancerChoiceModalProps,
   IAmazonLoadBalancerChoiceModalState
 > {
-  public static defaultProps: Partial<ILoadBalancerModalProps> = {
+  public static defaultProps: Partial<IAmazonLoadBalancerChoiceModalProps> = {
     closeModal: noop,
     dismissModal: noop,
+    choices: LoadBalancerTypes,
   };
 
   public static show(props: IAmazonLoadBalancerChoiceModalProps): Promise<void> {
@@ -38,11 +34,10 @@ export class AmazonLoadBalancerChoiceModal extends React.Component<
     );
   }
 
-  constructor(props: ILoadBalancerModalProps) {
+  constructor(props: IAmazonLoadBalancerChoiceModalProps) {
     super(props);
     this.state = {
-      choices: LoadBalancerTypes,
-      selectedChoice: LoadBalancerTypes[0],
+      selectedChoice: props.choices[0],
     };
   }
 
@@ -66,7 +61,8 @@ export class AmazonLoadBalancerChoiceModal extends React.Component<
   };
 
   public render() {
-    const { choices, selectedChoice } = this.state;
+    const { choices } = this.props;
+    const { selectedChoice } = this.state;
 
     return (
       <>
@@ -89,7 +85,6 @@ export class AmazonLoadBalancerChoiceModal extends React.Component<
                 </div>
               ))}
             </div>
-            {this.props.renderDetails && this.props.renderDetails({ selectedChoice })}
             <div className="load-balancer-description" />
           </div>
         </Modal.Body>
