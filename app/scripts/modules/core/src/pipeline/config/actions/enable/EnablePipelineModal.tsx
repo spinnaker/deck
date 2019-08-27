@@ -62,10 +62,10 @@ export function EnablePipelineModal(props: IEnablePipelineModalProps) {
           </form>
         </Modal.Body>
         <Modal.Footer>
-          <button className="btn btn-default" onClick={() => dismissModal()} type="button">
+          <button className="btn btn-default" onClick={dismissModal} type="button">
             Cancel
           </button>
-          <button className="btn btn-primary" onClick={() => enablePipeline()} type="button">
+          <button className="btn btn-primary" onClick={enablePipeline} type="button">
             Enable pipeline
           </button>
         </Modal.Footer>

@@ -66,10 +66,10 @@ export function DisablePipelineModal(props: IDisablePipelineModalProps) {
           </form>
         </Modal.Body>
         <Modal.Footer>
-          <button className="btn btn-default" onClick={() => dismissModal()} type="button">
+          <button className="btn btn-default" onClick={dismissModal} type="button">
             Cancel
           </button>
-          <button className="btn btn-primary" onClick={() => disablePipeline()} type="button">
+          <button className="btn btn-primary" onClick={disablePipeline} type="button">
             Disable pipeline
           </button>
         </Modal.Footer>
