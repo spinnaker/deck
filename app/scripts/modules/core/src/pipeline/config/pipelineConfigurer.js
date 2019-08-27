@@ -14,6 +14,9 @@ import { EXECUTION_BUILD_TITLE } from '../executionBuild/ExecutionBuildTitle';
 import { PipelineConfigService } from 'core/pipeline/config/services/PipelineConfigService';
 import { ExecutionsTransformer } from 'core/pipeline/service/ExecutionsTransformer';
 import { EditPipelineJsonModal } from 'core/pipeline/config/actions/pipelineJson/EditPipelineJsonModal';
+import { DeletePipelineModal } from 'core/pipeline/config/actions/delete/DeletePipelineModal';
+import { DisablePipelineModal } from 'core/pipeline/config/actions/disable/DisablePipelineModal';
+import { EnablePipelineModal } from 'core/pipeline/config/actions/enable/EnablePipelineModal';
 import { ShowPipelineTemplateJsonModal } from 'core/pipeline/config/actions/templateJson/ShowPipelineTemplateJsonModal';
 import { PipelineTemplateV2Service } from 'core/pipeline';
 import { PipelineTemplateWriter } from 'core/pipeline/config/templates/PipelineTemplateWriter';
@@ -104,15 +107,7 @@ module.exports = angular
       };
 
       this.deletePipeline = () => {
-        $uibModal.open({
-          templateUrl: require('./actions/delete/deletePipelineModal.html'),
-          controller: 'DeletePipelineModalCtrl',
-          controllerAs: 'deletePipelineModalCtrl',
-          resolve: {
-            pipeline: () => $scope.pipeline,
-            application: () => $scope.application,
-          },
-        });
+        ReactModal.show(DeletePipelineModal, { pipeline: $scope.pipeline, application: $scope.application });
       };
 
       this.addStage = (newStage = { isNew: true }) => {
@@ -203,15 +198,8 @@ module.exports = angular
 
       // Enabling a pipeline simply toggles the disabled flag - it does not save any pending changes
       this.enablePipeline = () => {
-        $uibModal
-          .open({
-            templateUrl: require('./actions/enable/enablePipelineModal.html'),
-            controller: 'EnablePipelineModalCtrl as ctrl',
-            resolve: {
-              pipeline: () => getOriginal(),
-            },
-          })
-          .result.then(() => disableToggled(false))
+        ReactModal.show(EnablePipelineModal, { pipeline: getOriginal() })
+          .then(() => disableToggled(false))
           .catch(() => {});
       };
 
@@ -229,15 +217,8 @@ module.exports = angular
 
       // Disabling a pipeline also just toggles the disabled flag - it does not save any pending changes
       this.disablePipeline = () => {
-        $uibModal
-          .open({
-            templateUrl: require('./actions/disable/disablePipelineModal.html'),
-            controller: 'DisablePipelineModalCtrl as ctrl',
-            resolve: {
-              pipeline: () => getOriginal(),
-            },
-          })
-          .result.then(() => disableToggled(true))
+        ReactModal.show(DisablePipelineModal, { pipeline: getOriginal() })
+          .then(() => disableToggled(true))
           .catch(() => {});
       };
 
