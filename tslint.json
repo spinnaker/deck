@@ -24,6 +24,7 @@
       "titus "
     ],
     "indent": [true, "spaces"],
+    "interface-name": [false],
     "jsx-no-lambda": false,
     "jsx-no-multiline-js": false,
     "label-position": true,
