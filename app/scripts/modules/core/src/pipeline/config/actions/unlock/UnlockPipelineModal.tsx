@@ -5,7 +5,7 @@ import { unset } from 'lodash';
 import { IPipeline } from 'core/domain';
 import { ModalClose } from 'core/modal';
 import { IModalComponentProps } from 'core/presentation';
-import { PipelineConfigService } from 'core/pipeline/config/services/PipelineConfigService';
+import { PipelineConfigService } from 'core/pipeline';
 
 export interface IUnlockPipelineModalProps extends IModalComponentProps {
   pipeline: IPipeline;
@@ -16,7 +16,7 @@ export function UnlockPipelineModal(props: IUnlockPipelineModalProps) {
   const [saveError, setSaveError] = React.useState<boolean>(false);
   const { closeModal, dismissModal, pipeline } = props;
 
-  function UnlockPipeline() {
+  function unlockPipeline() {
     const newPipeline = { ...pipeline };
     unset(newPipeline, 'lock');
     PipelineConfigService.savePipeline(newPipeline).then(
@@ -68,7 +68,7 @@ export function UnlockPipelineModal(props: IUnlockPipelineModalProps) {
           <button className="btn btn-default" onClick={dismissModal} type="button">
             Cancel
           </button>
-          <button className="btn btn-primary" onClick={UnlockPipeline} type="button">
+          <button className="btn btn-primary" onClick={unlockPipeline} type="button">
             Unlock pipeline
           </button>
         </Modal.Footer>

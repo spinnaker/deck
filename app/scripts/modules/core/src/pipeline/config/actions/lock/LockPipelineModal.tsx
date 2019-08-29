@@ -5,7 +5,7 @@ import { IPipeline, IPipelineLock } from 'core/domain';
 import { ModalClose } from 'core/modal';
 import { CheckboxInput, FormField, IModalComponentProps, TextInput } from 'core/presentation';
 import { HelpField } from 'core/help';
-import { PipelineConfigService } from 'core/pipeline/config/services/PipelineConfigService';
+import { PipelineConfigService } from 'core/pipeline';
 
 export interface ILockPipelineModalProps extends IModalComponentProps {
   pipeline: IPipeline;
@@ -21,8 +21,8 @@ export function LockPipelineModal(props: ILockPipelineModalProps) {
   function lockPipeline() {
     const locked: IPipelineLock = {
       ui: true,
-      allowUnlockUi: allowUnlockUi,
-      description: description,
+      allowUnlockUi,
+      description,
     };
     const newPipeline = { ...pipeline, locked };
     PipelineConfigService.savePipeline(newPipeline).then(
