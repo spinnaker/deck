@@ -12,7 +12,8 @@
       margin: 0;
     }
 
-    .loading-placeholder { position: absolute;
+    .loading-placeholder {
+      position: absolute;
       width: 100%;
       height: 100%;
       top: 0;
