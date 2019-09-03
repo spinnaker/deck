@@ -110,8 +110,7 @@ export function RenamePipelineModal(props: IRenamePipelineModalProps) {
                   type="submit"
                   onClick={() => renamePipeline(formik.values)}
                 >
-                  {!saving && <span className="far fa-check-circle" />}
-                  {saving && <span className="fa fa-cog fa-spin" />}
+                  <span className={saving ? 'fa fa-cog fa-spin' : 'far fa-check-circle'} />
                   Rename {pipelineType}
                 </button>
               </Modal.Footer>
