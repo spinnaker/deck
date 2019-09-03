@@ -1,13 +1,13 @@
 import * as React from 'react';
 
-import { capitalize } from 'lodash';
+import { capitalize, get } from 'lodash';
 import { Option } from 'react-select';
 import { $q } from 'ngimport';
 import { IPromise } from 'angular';
 
 import { Observable, Subject } from 'rxjs';
 
-import { IBuild, IBuildInfo, IBuildTrigger } from 'core/domain';
+import { IBuild, IBuildInfo, IBuildTrigger, IPipelineCommand } from 'core/domain';
 import { ITriggerTemplateComponentProps } from 'core/pipeline/manualExecution/TriggerTemplate';
 import { IgorService, BuildServiceType } from 'core/ci';
 import { Spinner } from 'core/widgets/spinners/Spinner';
@@ -56,7 +56,7 @@ export class BaseBuildTriggerTemplate extends React.Component<
     };
 
     const trigger = this.props.command.trigger as IBuildTrigger;
-    newState.builds = allBuilds
+    newState.builds = (allBuilds || [])
       .filter(build => !build.building && build.result === 'SUCCESS')
       .sort((a, b) => b.number - a.number);
     if (newState.builds.length) {
@@ -77,18 +77,17 @@ export class BaseBuildTriggerTemplate extends React.Component<
   };
 
   private updateSelectedBuild = (item: any) => {
-    this.props.command.extraFields.buildNumber = item.number;
-    this.props.command.triggerInvalid = false;
+    const { updateCommand } = this.props;
+    updateCommand('extraFields.buildNumber', item.number);
     this.setState({ selectedBuild: item.number });
   };
 
-  private initialize = () => {
-    const { command } = this.props;
-    command.triggerInvalid = true;
+  private initialize = (command: IPipelineCommand) => {
+    this.props.updateCommand('triggerInvalid', true);
     const trigger = command.trigger as IBuildTrigger;
 
     // These fields will be added to the trigger when the form is submitted
-    command.extraFields = {};
+    this.props.updateCommand('extraFields', { buildNumber: get(command, 'extraFields.buildNumber', '') });
 
     this.setState({
       buildsLoading: true,
@@ -120,17 +119,11 @@ export class BaseBuildTriggerTemplate extends React.Component<
   };
 
   public componentDidMount() {
-    this.initialize();
+    this.initialize(this.props.command);
   }
 
   public componentWillUnmount(): void {
     this.destroy$.next();
-  }
-
-  public componentWillReceiveProps(nextProps: ITriggerTemplateComponentProps) {
-    if (nextProps.command !== this.props.command) {
-      this.initialize();
-    }
   }
 
   private handleBuildChanged = (option: Option): void => {

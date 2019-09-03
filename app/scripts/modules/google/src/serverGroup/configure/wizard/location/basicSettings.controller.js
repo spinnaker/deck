@@ -12,6 +12,8 @@ import {
   NgGCEImageArtifactDelegate,
 } from '@spinnaker/core';
 
+import { GceImageReader } from 'google/image';
+
 module.exports = angular
   .module('spinnaker.google.serverGroup.configure.wizard.basicSettings.controller', [
     require('@uirouter/angularjs').default,
@@ -26,11 +28,10 @@ module.exports = angular
     '$controller',
     '$uibModalStack',
     '$state',
-    'imageReader',
-    function($scope, $controller, $uibModalStack, $state, imageReader) {
+    function($scope, $controller, $uibModalStack, $state) {
       function fetchImagesForAccount() {
         return Observable.fromPromise(
-          imageReader.findImages({
+          GceImageReader.findImages({
             account: $scope.command.credentials,
             provider: $scope.command.selectedProvider,
             q: '*',
@@ -41,22 +42,24 @@ module.exports = angular
       const imageSearchResultsStream = new Subject();
       imageSearchResultsStream.switchMap(fetchImagesForAccount).subscribe(images => {
         $scope.command.backingData.allImages = images;
-        $scope.command.backingData.packageImages = images;
       });
 
       this.accountUpdated = () => {
         imageSearchResultsStream.next();
       };
 
-      this.enableAllImageSearch = () => {
-        $scope.command.viewState.useAllImageSelection = true;
+      this.selectImage = image => {
+        // called from a React component
+        $scope.$apply(() => {
+          $scope.command.image = image;
+        });
       };
 
       angular.extend(
         this,
         $controller('BasicSettingsMixin', {
           $scope: $scope,
-          imageReader: imageReader,
+          imageReader: GceImageReader,
           $uibModalStack: $uibModalStack,
           $state: $state,
         }),

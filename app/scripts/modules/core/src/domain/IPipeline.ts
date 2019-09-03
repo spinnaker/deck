@@ -2,12 +2,7 @@ import { IStage } from './IStage';
 import { ITrigger } from './ITrigger';
 import { IExpectedArtifact } from 'core/domain/IExpectedArtifact';
 import { IEntityTags } from './IEntityTags';
-
-interface INotification extends ITemplateInheritable {
-  type: string;
-  address: string;
-  when: string[];
-}
+import { INotification } from './INotification';
 
 export interface IPipeline {
   application: string;
@@ -18,7 +13,7 @@ export interface IPipeline {
   isNew?: boolean;
   keepWaitingPipelines: boolean;
   lastModifiedBy?: string;
-  locked?: boolean;
+  locked?: IPipelineLock;
   limitConcurrent: boolean;
   name: string;
   notifications?: INotification[];
@@ -30,6 +25,7 @@ export interface IPipeline {
   parameterConfig: IParameter[];
   disabled?: boolean;
   expectedArtifacts?: IExpectedArtifact[];
+  roles?: any[];
   source?: {
     id: string;
     type: string;
@@ -37,14 +33,24 @@ export interface IPipeline {
   type?: string;
 }
 
+export interface IPipelineLock {
+  ui: boolean;
+  allowUnlockUi?: boolean;
+  description?: string;
+}
+
 export interface IParameter extends ITemplateInheritable {
   name: string;
+  conditional?: any;
+  constraint?: string;
   description: string;
   default: string;
   hasOptions: boolean;
+  label?: string;
   pinned: boolean;
   options: IParameterOption[];
   condition?: IParameterCondition;
+  required?: boolean;
 }
 
 export interface IParameterCondition {
@@ -58,12 +64,14 @@ export interface IParameterOption {
 }
 
 export interface IPipelineCommand {
+  dryRun?: boolean;
   extraFields?: { [key: string]: any };
   triggerInvalid?: boolean;
   pipeline: IPipeline;
   trigger: ITrigger;
   notificationEnabled: boolean;
   notification: INotification;
+  parameters?: { [key: string]: any };
   pipelineName: string;
 }
 

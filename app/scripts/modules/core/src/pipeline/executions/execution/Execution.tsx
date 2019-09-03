@@ -10,6 +10,7 @@ import { Application } from 'core/application/application.model';
 import { StageExecutionDetails } from 'core/pipeline/details/StageExecutionDetails';
 import { ExecutionStatus } from 'core/pipeline/status/ExecutionStatus';
 import { ParametersAndArtifacts } from 'core/pipeline/status/ParametersAndArtifacts';
+import { ExecutionCancellationReason } from 'core/pipeline/status/ExecutionCancellationReason';
 import { IExecution, IRestartDetails, IPipeline } from 'core/domain';
 import { IExecutionViewState, IPipelineGraphNode } from 'core/pipeline/config/graph/pipelineGraph.service';
 import { OrchestratedItemRunningTime } from './OrchestratedItemRunningTime';
@@ -365,7 +366,7 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
                 )}
               </span>
               {execution.cancellationReason && (
-                <Tooltip value={execution.cancellationReason}>
+                <Tooltip value="See Cancellation Reason below for additional details.">
                   <span className="glyphicon glyphicon-info-sign" />
                 </Tooltip>
               )}
@@ -399,21 +400,19 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
                 </button>
               </Tooltip>
             )}
+            {(!execution.isActive || application.attributes.enableRerunActiveExecutions) && this.props.onRerun && (
+              <Tooltip value="Re-run execution with same parameters">
+                <button className="link" onClick={this.handleRerunClick}>
+                  <i className="fa fa-redo" />
+                </button>
+              </Tooltip>
+            )}
             {!execution.isActive && (
-              <span>
-                {this.props.onRerun && (
-                  <Tooltip value="Re-run execution with same parameters">
-                    <button className="link" onClick={this.handleRerunClick}>
-                      <i className="fa fa-redo" />
-                    </button>
-                  </Tooltip>
-                )}
-                <Tooltip value="Delete execution">
-                  <button className="link" onClick={this.handleDeleteClick}>
-                    <span className="glyphicon glyphicon-trash" />
-                  </button>
-                </Tooltip>
-              </span>
+              <Tooltip value="Delete execution">
+                <button className="link" onClick={this.handleDeleteClick}>
+                  <span className="glyphicon glyphicon-trash" />
+                </button>
+              </Tooltip>
             )}
             {execution.isActive && (
               <Tooltip value={cancelHelpText}>
@@ -423,6 +422,10 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
               </Tooltip>
             )}
           </div>
+
+          {execution.cancellationReason && (
+            <ExecutionCancellationReason cancellationReason={execution.cancellationReason} />
+          )}
 
           <ParametersAndArtifacts
             execution={execution}

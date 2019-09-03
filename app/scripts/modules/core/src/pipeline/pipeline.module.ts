@@ -48,6 +48,7 @@ import { PRODUCES_ARTIFACTS } from './config/stages/producesArtifacts/producesAr
 import { ARTIFACT_LIST } from './status/artifactList.component';
 import { PIPELINE_TEMPLATES_V2_STATES_CONFIG } from './config/templates/v2/pipelineTemplateV2.states';
 import './config/stages/googleCloudBuild/googleCloudBuildStage';
+import { STAGE_STATUS_PRECONDITION } from './config/preconditions/types/stageStatus/stageStatus.precondition.type.module';
 
 import './pipeline.less';
 import 'angular-ui-sortable';
@@ -59,8 +60,6 @@ module(PIPELINE_MODULE, [
   EXECUTION_DETAILS_SECTION_NAV,
 
   BUILD_DISPLAY_NAME_FILTER,
-
-  require('./manualExecution/manualPipelineExecution.controller').name,
 
   STAGE_FAILURE_MESSAGE_COMPONENT,
   STEP_EXECUTION_DETAILS_COMPONENT,
@@ -108,4 +107,5 @@ module(PIPELINE_MODULE, [
   require('./config/preconditions/types/clusterSize/clusterSize.precondition.type.module').name,
   require('./config/preconditions/types/expression/expression.precondition.type.module').name,
   PIPELINE_TEMPLATES_V2_STATES_CONFIG,
+  STAGE_STATUS_PRECONDITION,
 ]);

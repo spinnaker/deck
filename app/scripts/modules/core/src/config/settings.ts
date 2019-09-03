@@ -61,6 +61,7 @@ export interface IFeatures {
   versionedProviders?: boolean;
   wercker?: boolean;
   savePipelinesStageEnabled?: boolean;
+  kustomizeEnabled?: boolean;
 }
 
 export interface IDockerInsightSettings {
@@ -99,6 +100,7 @@ export interface ISpinnakerSettings {
   dockerInsights: IDockerInsightSettings;
   entityTags?: {
     maxUrlLength?: number;
+    maxResults?: number;
   };
   executionWindow?: {
     atlas?: {

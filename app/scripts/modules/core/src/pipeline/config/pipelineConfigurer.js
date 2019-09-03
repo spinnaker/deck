@@ -14,6 +14,11 @@ import { EXECUTION_BUILD_TITLE } from '../executionBuild/ExecutionBuildTitle';
 import { PipelineConfigService } from 'core/pipeline/config/services/PipelineConfigService';
 import { ExecutionsTransformer } from 'core/pipeline/service/ExecutionsTransformer';
 import { EditPipelineJsonModal } from 'core/pipeline/config/actions/pipelineJson/EditPipelineJsonModal';
+import { DeletePipelineModal } from 'core/pipeline/config/actions/delete/DeletePipelineModal';
+import { DisablePipelineModal } from 'core/pipeline/config/actions/disable/DisablePipelineModal';
+import { EnablePipelineModal } from 'core/pipeline/config/actions/enable/EnablePipelineModal';
+import { LockPipelineModal } from 'core/pipeline/config/actions/lock/LockPipelineModal';
+import { UnlockPipelineModal } from 'core/pipeline/config/actions/unlock/UnlockPipelineModal';
 import { ShowPipelineTemplateJsonModal } from 'core/pipeline/config/actions/templateJson/ShowPipelineTemplateJsonModal';
 import { PipelineTemplateV2Service } from 'core/pipeline';
 import { PipelineTemplateWriter } from 'core/pipeline/config/templates/PipelineTemplateWriter';
@@ -104,15 +109,7 @@ module.exports = angular
       };
 
       this.deletePipeline = () => {
-        $uibModal.open({
-          templateUrl: require('./actions/delete/deletePipelineModal.html'),
-          controller: 'DeletePipelineModalCtrl',
-          controllerAs: 'deletePipelineModalCtrl',
-          resolve: {
-            pipeline: () => $scope.pipeline,
-            application: () => $scope.application,
-          },
-        });
+        ReactModal.show(DeletePipelineModal, { pipeline: $scope.pipeline, application: $scope.application });
       };
 
       this.addStage = (newStage = { isNew: true }) => {
@@ -203,15 +200,8 @@ module.exports = angular
 
       // Enabling a pipeline simply toggles the disabled flag - it does not save any pending changes
       this.enablePipeline = () => {
-        $uibModal
-          .open({
-            templateUrl: require('./actions/enable/enablePipelineModal.html'),
-            controller: 'EnablePipelineModalCtrl as ctrl',
-            resolve: {
-              pipeline: () => getOriginal(),
-            },
-          })
-          .result.then(() => disableToggled(false))
+        ReactModal.show(EnablePipelineModal, { pipeline: getOriginal() })
+          .then(() => disableToggled(false))
           .catch(() => {});
       };
 
@@ -229,15 +219,8 @@ module.exports = angular
 
       // Disabling a pipeline also just toggles the disabled flag - it does not save any pending changes
       this.disablePipeline = () => {
-        $uibModal
-          .open({
-            templateUrl: require('./actions/disable/disablePipelineModal.html'),
-            controller: 'DisablePipelineModalCtrl as ctrl',
-            resolve: {
-              pipeline: () => getOriginal(),
-            },
-          })
-          .result.then(() => disableToggled(true))
+        ReactModal.show(DisablePipelineModal, { pipeline: getOriginal() })
+          .then(() => disableToggled(true))
           .catch(() => {});
       };
 
@@ -250,28 +233,17 @@ module.exports = angular
 
       // Locking a pipeline persists any pending changes
       this.lockPipeline = () => {
-        $uibModal
-          .open({
-            templateUrl: require('./actions/lock/lockPipelineModal.html'),
-            controller: 'LockPipelineModalCtrl as ctrl',
-            resolve: {
-              pipeline: () => $scope.pipeline,
-            },
+        ReactModal.show(LockPipelineModal, { pipeline: $scope.pipeline })
+          .then(pipeline => {
+            $scope.pipeline.locked = pipeline.locked;
+            setOriginal($scope.pipeline);
           })
-          .result.then(() => setOriginal($scope.pipeline))
           .catch(() => {});
       };
 
       this.unlockPipeline = () => {
-        $uibModal
-          .open({
-            templateUrl: require('./actions/unlock/unlockPipelineModal.html'),
-            controller: 'unlockPipelineModalCtrl as ctrl',
-            resolve: {
-              pipeline: () => $scope.pipeline,
-            },
-          })
-          .result.then(function() {
+        ReactModal.show(UnlockPipelineModal, { pipeline: $scope.pipeline })
+          .then(() => {
             delete $scope.pipeline.locked;
             setOriginal($scope.pipeline);
           })
@@ -375,7 +347,11 @@ module.exports = angular
       };
 
       this.isValid = () => {
-        return _.every($scope.pipeline.stages, 'name') && !ctrl.preventSave;
+        return (
+          _.every($scope.pipeline.stages, function(item) {
+            return item['name'] && item['type'];
+          }) && !ctrl.preventSave
+        );
       };
 
       this.configureTemplate = () => {
@@ -465,33 +441,33 @@ module.exports = angular
       };
 
       this.revertPipelineChanges = () => {
-        let original = getOriginal();
-        Object.keys($scope.pipeline).forEach(key => {
-          delete $scope.pipeline[key];
-        });
-        Object.assign($scope.pipeline, original);
+        $scope.$applyAsync(() => {
+          const original = getOriginal();
+          $scope.pipeline = _.clone(original);
+          $scope.renderablePipeline = $scope.pipeline;
 
-        if ($scope.isTemplatedPipeline) {
-          const originalRenderablePipeline = getOriginalRenderablePipeline();
-          Object.assign($scope.renderablePipeline, originalRenderablePipeline);
-          Object.keys($scope.renderablePipeline).forEach(key => {
-            if (!originalRenderablePipeline.hasOwnProperty(key)) {
-              delete $scope.renderablePipeline[key];
+          if ($scope.isTemplatedPipeline) {
+            const originalRenderablePipeline = getOriginalRenderablePipeline();
+            Object.assign($scope.renderablePipeline, originalRenderablePipeline);
+            Object.keys($scope.renderablePipeline).forEach(key => {
+              if (!originalRenderablePipeline.hasOwnProperty(key)) {
+                delete $scope.renderablePipeline[key];
+              }
+            });
+          }
+
+          // if we were looking at a stage that no longer exists, move to the last stage
+          if ($scope.viewState.section === 'stage') {
+            var lastStage = $scope.renderablePipeline.stages.length - 1;
+            if ($scope.viewState.stageIndex > lastStage) {
+              this.setViewState({ stageIndex: lastStage });
             }
-          });
-        }
-
-        // if we were looking at a stage that no longer exists, move to the last stage
-        if ($scope.viewState.section === 'stage') {
-          var lastStage = $scope.renderablePipeline.stages.length - 1;
-          if ($scope.viewState.stageIndex > lastStage) {
-            this.setViewState({ stageIndex: lastStage });
+            if (!$scope.renderablePipeline.stages.length) {
+              this.navigateTo({ section: 'triggers' });
+            }
           }
-          if (!$scope.renderablePipeline.stages.length) {
-            this.navigateTo({ section: 'triggers' });
-          }
-        }
-        $scope.$broadcast('pipeline-reverted');
+          $scope.$broadcast('pipeline-reverted');
+        });
       };
 
       var markDirty = () => {
@@ -567,6 +543,16 @@ module.exports = angular
             throw err;
           },
         );
+      };
+
+      //update pipeline through a callback for React
+      this.updatePipelineConfig = changes => {
+        $scope.$applyAsync(() => {
+          $scope.pipeline = _.cloneDeep($scope.pipeline);
+          _.extend($scope.pipeline, changes);
+          $scope.renderablePipeline = $scope.pipeline;
+          markDirty();
+        });
       };
     },
   ]);
