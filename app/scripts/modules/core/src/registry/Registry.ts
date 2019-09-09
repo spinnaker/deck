@@ -11,4 +11,4 @@ export class Registry {
   };
 }
 
-window.Registry = Registry;
+// window.Registry = Registry;
