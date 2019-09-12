@@ -12,8 +12,7 @@ function loadPluginScript(href) {
 }
 
 export function initPlugins() {
-  const plugins = ['/plugins/mystage.js'];
-
+  const plugins = window.spinnakerSettings.plugins;
   window.spinnakerSettings.onPluginLoaded = plugin => plugin.initialize(Registry);
   return Promise.all(plugins.map(p => loadPluginScript(p)));
 }

@@ -16,21 +16,24 @@ import { ECS_MODULE } from '@spinnaker/ecs';
 import '@spinnaker/cloudfoundry';
 import { AZURE_MODULE } from '@spinnaker/azure';
 
-initPlugins().then(() => {
-  module('netflix.spinnaker', [
-    CORE_MODULE,
-    AMAZON_MODULE,
-    GOOGLE_MODULE,
-    ECS_MODULE,
-    AZURE_MODULE,
-    KUBERNETES_V1_MODULE,
-    DOCKER_MODULE,
-    ORACLE_MODULE,
-    require('./modules/dcos/dcos.module').name,
-    APPENGINE_MODULE,
-    CANARY_MODULE,
-    KUBERNETES_V2_MODULE,
-    KAYENTA_MODULE,
-    TITUS_MODULE,
-  ]);
+initPlugins().catch(() => {
+  //TODO use CustomBanner to tell the user that plugin(s) have not been loaded
+  console.log('Plugins not loaded');
 });
+
+module('netflix.spinnaker', [
+  CORE_MODULE,
+  AMAZON_MODULE,
+  GOOGLE_MODULE,
+  ECS_MODULE,
+  AZURE_MODULE,
+  KUBERNETES_V1_MODULE,
+  DOCKER_MODULE,
+  ORACLE_MODULE,
+  require('./modules/dcos/dcos.module').name,
+  APPENGINE_MODULE,
+  CANARY_MODULE,
+  KUBERNETES_V2_MODULE,
+  KAYENTA_MODULE,
+  TITUS_MODULE,
+]);

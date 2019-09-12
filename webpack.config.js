@@ -27,7 +27,6 @@ function configure(env, webpackOpts) {
       settings: SETTINGS_PATH,
       'settings-local': './settings-local.js',
       app: './app/scripts/app.ts',
-      'plugin-loader': './plugin-loader.js',
     },
     output: {
       path: path.join(__dirname, 'build', 'webpack', process.env.SPINNAKER_ENV || ''),
