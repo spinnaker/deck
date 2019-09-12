@@ -1,7 +1,6 @@
 import { module } from 'angular';
 
 import { CloudProviderRegistry, DeploymentStrategyRegistry } from '@spinnaker/core';
-
 import { AmazonLoadBalancersTag } from '@spinnaker/amazon';
 
 import { TITUS_MIGRATION_CONFIG_COMPONENT } from './migration/titusMigrationConfig.component';
@@ -63,6 +62,12 @@ module(TITUS_MODULE, [
     },
     loadBalancer: {
       LoadBalancersTag: AmazonLoadBalancersTag,
+      incompatibleLoadBalancerTypes: [
+        {
+          type: 'classic',
+          reason: 'Classic Load Balancers cannot be used with Titus as they do not have IP based target groups.',
+        },
+      ],
       useProvider: 'aws',
     },
     instance: {
