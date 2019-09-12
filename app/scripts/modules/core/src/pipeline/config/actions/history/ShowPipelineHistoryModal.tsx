@@ -40,6 +40,10 @@ export function ShowPipelineHistoryModal(props: IShowHistoryModalProps) {
     PipelineConfigService.getHistory(pipelineConfigId, isStrategy, 100).then(historyLoaded, loadError);
   }, []);
 
+  React.useEffect(() => {
+    updateDiff(history, version, compareTo);
+  }, [compareTo, version]);
+
   function historyLoaded(loadedPipelines: IPipeline[]): void {
     const historyToBeProcessed = currentConfig ? [currentConfig].concat(loadedPipelines) : loadedPipelines;
     const pipelineHistory: IHistoryContents[] = historyToBeProcessed.map((h, index) => {
@@ -72,27 +76,19 @@ export function ShowPipelineHistoryModal(props: IShowHistoryModalProps) {
   }
 
   function updateDiff(h: IHistoryContents[], v: number, c: string): void {
-    const right = h[v].contents;
-    let left;
-    if (c === compareOptions[1]) {
-      left = h[0].contents;
-    } else {
-      left = right;
-      if (v < h.length - 1) {
-        left = h[v + 1].contents;
+    if (h.length > 0) {
+      const right = h[v].contents;
+      let left;
+      if (c === compareOptions[1]) {
+        left = h[0].contents;
+      } else {
+        left = right;
+        if (v < h.length - 1) {
+          left = h[v + 1].contents;
+        }
       }
+      setDiff(JsonUtils.diff(left, right, true));
     }
-    setDiff(JsonUtils.diff(left, right, true));
-  }
-
-  function compareToChanged(compareToOption: string) {
-    setCompareTo(compareToOption);
-    updateDiff(history, version, compareToOption);
-  }
-
-  function versionChanged(versionValue: number) {
-    setVersion(versionValue);
-    updateDiff(history, versionValue, compareTo);
   }
 
   return (
@@ -133,7 +129,7 @@ export function ShowPipelineHistoryModal(props: IShowHistoryModalProps) {
                         {...inputProps}
                       />
                     )}
-                    onChange={e => versionChanged(e.target.value)}
+                    onChange={e => setVersion(e.target.value)}
                     value={version}
                   />
                 </div>
@@ -151,7 +147,7 @@ export function ShowPipelineHistoryModal(props: IShowHistoryModalProps) {
                     input={inputProps => (
                       <ReactSelectInput clearable={false} stringOptions={compareOptions} {...inputProps} />
                     )}
-                    onChange={e => compareToChanged(e.target.value)}
+                    onChange={e => setCompareTo(e.target.value)}
                     value={compareTo}
                   />
                 </div>
