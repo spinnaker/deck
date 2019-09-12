@@ -18,7 +18,6 @@ import { AZURE_MODULE } from '@spinnaker/azure';
 
 initPlugins().catch(() => {
   //TODO use CustomBanner to tell the user that plugin(s) have not been loaded
-  console.log('Plugins not loaded');
 });
 
 module('netflix.spinnaker', [

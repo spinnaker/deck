@@ -10,5 +10,3 @@ export class Registry {
     Registry.urlBuilder = new UrlBuilderRegistry();
   };
 }
-
-// window.Registry = Registry;

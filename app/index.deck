@@ -188,5 +188,6 @@
 
   <!-- Actually injects our application -->
   <spinnaker ng-if="!authenticating"></spinnaker>
+
 </body>
 </html>
