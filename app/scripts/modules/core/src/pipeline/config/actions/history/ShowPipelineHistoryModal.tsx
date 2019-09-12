@@ -41,8 +41,8 @@ export function ShowPipelineHistoryModal(props: IShowHistoryModalProps) {
   }, []);
 
   function historyLoaded(loadedPipelines: IPipeline[]): void {
-    const historyTobeProcessed = currentConfig ? [currentConfig].concat(loadedPipelines) : loadedPipelines;
-    const pipelineHistory: IHistoryContents[] = historyTobeProcessed.map((h, index) => {
+    const historyToBeProcessed = currentConfig ? [currentConfig].concat(loadedPipelines) : loadedPipelines;
+    const pipelineHistory: IHistoryContents[] = historyToBeProcessed.map((h, index) => {
       const ts = h.updateTs;
       delete h.updateTs;
       return {
