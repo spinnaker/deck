@@ -1,10 +1,8 @@
 import { PipelineRegistry } from '@spinnaker/core';
 
-export interface Init {
-  (registry: StageRegistry): void;
-}
+export type IPluginInitialize = (registry: IStageRegistry) => void;
 
-export interface StageRegistry {
+export interface IStageRegistry {
   pipeline: PipelineRegistry;
 }
 
