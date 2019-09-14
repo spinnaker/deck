@@ -66,11 +66,13 @@ module.exports = angular
         });
       };
 
-      this.hasManagedResources = false;
-      ManagedReader.getApplicationSummary(this.application.name).then(({ hasManagedResources }) => {
-        $scope.$applyAsync(() => {
-          this.hasManagedResources = hasManagedResources;
+      if (this.feature.managedResources) {
+        this.hasManagedResources = false;
+        ManagedReader.getApplicationSummary(this.application.name).then(({ hasManagedResources }) => {
+          $scope.$applyAsync(() => {
+            this.hasManagedResources = hasManagedResources;
+          });
         });
-      });
+      }
     },
   ]);
