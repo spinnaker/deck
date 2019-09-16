@@ -30,12 +30,12 @@ const getManagementStatus = (paused: boolean) => {
   if (paused) {
     return (
       <>
-        <p>
+        <div className="sp-padding-m sp-margin-m-bottom paused-warning">
           <i className="fa fa-pause sp-margin-xs-right" /> <b>Continuous management of resources is paused.</b>
-        </p>
+        </div>
         <p className="sp-margin-l-bottom">
-          Spinnaker is configured to continuously manage some resources, but management has been paused. When resumed,
-          Spinnaker will take action to make each resource match its declarative configuration.
+          Spinnaker is configured to continuously manage some of this application's resources, but management has been
+          paused. When resumed, Spinnaker will take action to make each resource match its declarative configuration.
         </p>
       </>
     );
