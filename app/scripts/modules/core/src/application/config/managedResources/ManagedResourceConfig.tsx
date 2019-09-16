@@ -7,6 +7,7 @@ import * as classNames from 'classnames';
 import { NgReact } from 'core/reactShims';
 import { Application } from 'core/application';
 import { useData } from 'core/presentation';
+import { ValidationMessage } from 'core/validation';
 import { Spinner } from 'core/widgets';
 import { ManagedReader, ManagedWriter } from 'core/managed';
 
@@ -115,7 +116,11 @@ const ManagedResourceConfig = ({ application }: IManagedResourceConfigProps) => 
         {(!pausePending && <i className={classNames('fa sp-margin-xs-right', iconClass)} />) || <ButtonBusyIndicator />}{' '}
         {paused ? 'Resume Management' : 'Pause Management'}
       </button>
-      {pauseFailed && <div className="alert alert-danger sp-margin-l-top">Saving failed.</div>}
+      {pauseFailed && (
+        <div className="sp-margin-l-top">
+          <ValidationMessage type="error" message="Saving failed." />
+        </div>
+      )}
       <div className="color-text-caption sp-margin-l-top">
         Not sure what this means?{' '}
         <a
