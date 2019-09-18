@@ -28,7 +28,7 @@ module.exports = angular
       // for service names: - https://github.com/kubernetes/kubernetes/pull/29523 (until K8s 1.4.0 it was 24 characters https://github.com/kubernetes/kubernetes/issues/12463)
       // or annotations:    - https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/#syntax-and-character-set
 
-      let maxResourceNameLength = 63;
+      const maxResourceNameLength = 63;
 
       if (name.length > maxResourceNameLength) {
         errors.push('The maximum length for an application in Kubernetes is ${maxResourceNameLength} characters.');
