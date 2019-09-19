@@ -1,9 +1,9 @@
 import { Registry } from '@spinnaker/core';
 
-function loadPluginScript(href) {
+function loadPluginScript(plugin) {
   return new Promise((resolve, reject) => {
     var scriptTag = document.createElement('script');
-    scriptTag.src = href;
+    scriptTag.src = plugin.location;
     scriptTag.onload = () => resolve();
     scriptTag.onreadystatechange = () => resolve();
     scriptTag.onerror = () => reject();
