@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { get } from 'lodash';
 
+import { FormField, CheckboxInput } from 'core/presentation';
 import { HelpField } from 'core/help/HelpField';
 import { ITriggerTemplateComponentProps } from 'core/pipeline/manualExecution/TriggerTemplate';
 
@@ -16,17 +17,13 @@ export class ManualExecutionBake extends React.Component<ITriggerTemplateCompone
     const force = get(this.props.command, 'trigger.rebake', false);
 
     return (
-      <div className="form-group">
-        <label className="col-md-4 sm-label-right">
-          Rebake <HelpField id="execution.forceRebake" />
-        </label>
-        <div className="checkbox col-md-6">
-          <label>
-            <input type="checkbox" checked={force} onChange={this.handleChange} />
-            Force Rebake
-          </label>
-        </div>
-      </div>
+      <FormField
+        label="Rebake"
+        onChange={this.handleChange}
+        value={force}
+        help={<HelpField id="execution.forceRebake" />}
+        input={props => <CheckboxInput {...props} text="Force Rebake" />}
+      />
     );
   }
 }
