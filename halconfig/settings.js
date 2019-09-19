@@ -49,6 +49,12 @@ var version = '{%version%}';
 var werckerEnabled = '{%features.wercker%}' === 'true';
 
 // Cloud Providers
+var alicloud = {
+  defaults: {
+    account: '{%alicloud.default.account%}',
+    region: '{%alicloud.default.region%}',
+  },
+};
 var appengine = {
   defaults: {
     account: '{%appengine.default.account%}',
@@ -139,6 +145,7 @@ window.spinnakerSettings = {
   defaultCategory: 'serverGroup',
   defaultInstancePort: 80,
   defaultProviders: [
+    'alicloud',
     'appengine',
     'aws',
     'azure',
@@ -204,6 +211,7 @@ window.spinnakerSettings = {
   },
   pollSchedule: 30000,
   providers: {
+    alicloud: alicloud,
     appengine: appengine,
     aws: aws,
     azure: azure,

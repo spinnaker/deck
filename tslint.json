@@ -9,6 +9,7 @@
     "forin": true,
     "import-blacklist": [
       true,
+      "alicloud",
       "amazon",
       "appengine",
       "azure",

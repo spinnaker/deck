@@ -103,6 +103,8 @@ function configure(env, webpackOpts) {
         '@spinnaker/titus': path.join(__dirname, 'app', 'scripts', 'modules', 'titus', 'src'),
         azure: path.join(__dirname, 'app', 'scripts', 'modules', 'azure', 'src'),
         '@spinnaker/azure': path.join(__dirname, 'app', 'scripts', 'modules', 'azure', 'src'),
+        alicloud: path.join(__dirname, 'app', 'scripts', 'modules', 'alicloud', 'src'),
+        '@spinnaker/alicloud': path.join(__dirname, 'app', 'scripts', 'modules', 'alicloud', 'src'),
       },
     },
     module: {

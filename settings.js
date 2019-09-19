@@ -52,7 +52,18 @@ window.spinnakerSettings = {
   debugEnabled: debugEnabled,
   defaultCategory: 'serverGroup',
   defaultInstancePort: 80,
-  defaultProviders: ['appengine', 'aws', 'azure', 'cloudfoundry', 'dcos', 'ecs', 'gce', 'kubernetes', 'oracle'],
+  defaultProviders: [
+    'alicloud',
+    'appengine',
+    'aws',
+    'azure',
+    'cloudfoundry',
+    'dcos',
+    'ecs',
+    'gce',
+    'kubernetes',
+    'oracle',
+  ],
   defaultTimeZone: process.env.TIMEZONE || 'America/Los_Angeles', // see http://momentjs.com/timezone/docs/#/data-utilities/
   entityTags: {
     maxResults: 5000,
@@ -143,6 +154,12 @@ window.spinnakerSettings = {
       defaults: {
         account: 'azure-test',
         region: 'westus',
+      },
+    },
+    alicloud: {
+      defaults: {
+        account: 'ali-account',
+        region: 'ch-hangzhou',
       },
     },
     cloudfoundry: {
