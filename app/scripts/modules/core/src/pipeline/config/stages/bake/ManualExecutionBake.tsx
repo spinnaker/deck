@@ -17,13 +17,14 @@ export class ManualExecutionBake extends React.Component<ITriggerTemplateCompone
 
     return (
       <div className="form-group">
-        <label className="col-md-4 sm-label-right">Rebake</label>
+        <label className="col-md-4 sm-label-right">
+          Rebake <HelpField id="execution.forceRebake" />
+        </label>
         <div className="checkbox col-md-6">
           <label>
             <input type="checkbox" checked={force} onChange={this.handleChange} />
             Force Rebake
-          </label>{' '}
-          <HelpField id="execution.forceRebake" />
+          </label>
         </div>
       </div>
     );

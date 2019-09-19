@@ -2,16 +2,17 @@ import * as React from 'react';
 import { CheckboxInput, FormikFormField } from 'core/presentation';
 import { HelpField } from 'core/help';
 
-export class DryRun extends React.Component {
-  public render() {
-    return (
+export const DryRun = () => (
+  <div className="form-group">
+    <label className="col-md-4 sm-label-right">
+      Dry run <HelpField id="execution.dryRun" />
+    </label>
+    <div className="col-md-6">
       <FormikFormField
         name="dryRun"
-        label={'Dry run'}
         fastField={false}
-        help={<HelpField id={'execution.dryRun'} />}
-        input={props => <CheckboxInput {...props} text={'Run a test execution'} />}
+        input={props => <CheckboxInput {...props} text="Run a test execution" />}
       />
-    );
-  }
-}
+    </div>
+  </div>
+);
