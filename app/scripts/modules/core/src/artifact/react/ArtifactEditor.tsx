@@ -29,8 +29,7 @@ export class ArtifactEditor extends React.Component<IArtifactEditorProps> {
       this.props.artifact &&
       (!this.props.artifact.type ||
         artifactAccount.types.includes(this.props.artifact.type) ||
-        (artifactAccount.name === CUSTOM_ARTIFACT_ACCOUNT &&
-          this.props.artifact.artifactAccount === artifactAccount.name))
+        artifactAccount.name === CUSTOM_ARTIFACT_ACCOUNT)
         ? cloneDeep(this.props.artifact)
         : { id: UUIDGenerator.generateUuid() };
     artifact.artifactAccount = artifactAccount.name;
