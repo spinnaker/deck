@@ -1,5 +1,5 @@
 import 'jquery'; // ensures jQuery is loaded before Angular so Angular does not use jqlite
-import { bootstrap } from 'angular';
+import { module } from 'angular';
 import { initPlugins } from './plugin-loader';
 
 import { CORE_MODULE } from '@spinnaker/core';
@@ -21,7 +21,7 @@ initPlugins()
     //TODO use CustomBanner to tell the user that plugin(s) have not been loaded
   })
   .finally(() => {
-    bootstrap(document.body, [
+    module('netflix.spinnaker', [
       CORE_MODULE,
       AMAZON_MODULE,
       GOOGLE_MODULE,
