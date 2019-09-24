@@ -19,7 +19,7 @@ import { SETTINGS } from 'core/config/settings';
 export class EntityTagsReader {
   public static getAllEntityTagsForApplication(application: string): IPromise<IEntityTags[]> {
     return API.one('tags')
-      .withParams({ application })
+      .withParams({ maxResults: SETTINGS.entityTags.maxResults || 5000, application })
       .getList()
       .then((allTags: IEntityTags[]) => this.flattenTagsAndAddMetadata(allTags));
   }

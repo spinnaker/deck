@@ -25,8 +25,8 @@ module(KUBERNETES_V2_RUN_JOB_STAGE, [])
       addAliasToConfig: true,
       cloudProvider: 'kubernetes',
       component: KubernetesV2RunJobStageConfig,
-      executionDetailsSections: [ExecutionDetailsTasks, RunJobExecutionDetails],
-      defaultTimeoutMs: 30 * 60 * 1000,
+      executionDetailsSections: [RunJobExecutionDetails, ExecutionDetailsTasks],
+      supportsCustomTimeout: true,
       producesArtifacts: true,
       validators: [
         {

@@ -89,59 +89,37 @@
         help-field-key="gce.image.source"
       >
       </image-source-selector>
-      <stage-config-field
-        label="Expected Artifact"
-        help-key="gce.image.artifact"
-        field-columns="8"
+      <stage-artifact-selector-delegate
         ng-if="command.imageSource === 'artifact'"
+        artifact="command.imageArtifact"
+        excluded-artifact-type-patterns="basicSettingsCtrl.excludedImageArtifactTypes"
+        expected-artifact-id="command.imageArtifactId"
+        field-columns="7"
+        help-key="'gce.image.artifact'"
+        label="'Expected Artifact'"
+        on-artifact-edited="basicSettingsCtrl.onImageArtifactEdited"
+        on-expected-artifact-selected="basicSettingsCtrl.onImageArtifactSelected"
+        pipeline="command.viewState.pipeline"
+        selected-artifact-account="command.imageAccountName"
+        selected-artifact-id="command.imageArtifactId"
+        set-artifact-account="basicSettingsCtrl.onImageArtifactAccountSelected"
+        set-artifact-id="basicSettingsCtrl.onChangeImageArtifactId"
+        stage="command.viewState.stage"
+        update-pipeline="basicSettingsCtrl.updatePipeline"
       >
-        <expected-artifact-selector-react
-          expected-artifacts="command.viewState.expectedArtifacts"
-          selected="gceImageArtifact.delegate.getSelectedExpectedArtifact()"
-          on-change="gceImageArtifact.controller.onArtifactChange"
-          on-request-create="gceImageArtifact.controller.onRequestCreate"
-          offered-artifact-types="gceImageArtifact.delegate.getOfferedArtifactTypes()"
-          requesting-new="gceImageArtifact.showCreateArtifactForm"
-        >
-        </expected-artifact-selector-react>
-      </stage-config-field>
-      <expected-artifact-editor-react
-        ng-if="gceImageArtifact.showCreateArtifactForm"
-        kinds="gceImageArtifact.delegate.getSupportedArtifactKinds()"
-        sources="gceImageArtifact.delegate.getExpectedArtifactSources()"
-        on-save="gceImageArtifact.controller.onArtifactCreated"
-        show-accounts="false"
-      >
-      </expected-artifact-editor-react>
+      </stage-artifact-selector-delegate>
     </div>
     <div class="form-group" ng-if="!command.viewState.disableImageSelection">
       <div class="col-md-3 sm-label-right">
         Image
         <help-field key="gce.serverGroup.imageName"></help-field>
       </div>
-      <div class="col-md-9" ng-if="command.viewState.useAllImageSelection">
-        <ui-select ng-model="command.image" class="form-control input-sm" required>
-          <ui-select-match placeholder="Search for an image..."
-            >{{$select.selected.imageName || 'Search for an image...'}}</ui-select-match
-          >
-          <ui-select-choices
-            repeat="result.imageName as result in command.backingData.allImages | filter: { imageName: $select.search }"
-          >
-            <span ng-bind-html="result.imageName | highlight: $select.search"></span>
-          </ui-select-choices>
-        </ui-select>
-      </div>
-      <div class="col-md-9" ng-if="!command.viewState.useAllImageSelection">
-        <ui-select class="form-control input-sm" required ng-model="command.image">
-          <ui-select-match placeholder="Pick an image">{{$select.selected.imageName}}</ui-select-match>
-          <ui-select-choices
-            repeat="image.imageName as image in command.backingData.allImages | filter: { imageName: $select.search }"
-          >
-            <span ng-bind-html="image.imageName | highlight: $select.search"></span>
-          </ui-select-choices>
-        </ui-select>
-        <a href ng-click="basicSettingsCtrl.enableAllImageSearch()">Search All Images</a
-        ><help-field key="aws.serverGroup.allImages"></help-field>
+      <div class="col-md-7">
+        <gce-image-select
+          available-images="command.backingData.allImages"
+          selected-image="command.image"
+          select-image="basicSettingsCtrl.selectImage"
+        />
       </div>
     </div>
     <div class="form-group">

@@ -3,15 +3,17 @@ import { isNil } from 'lodash';
 import { IPromise } from 'angular';
 import { $q } from 'ngimport';
 
-import { noop } from '../../utils';
+import { noop } from 'core/utils';
+
 import { LayoutContext } from './layouts';
-import { useLatestPromise } from './useLatestPromise';
+import { useLatestPromise } from '../hooks';
 import { createFieldValidator } from './FormikFormField';
 import { renderContent } from './fields/renderContent';
 import { IValidator, IValidatorResultRaw } from './validation';
 import {
   ICommonFormFieldProps,
   IControlledInputProps,
+  IFieldLayoutProps,
   IFieldLayoutPropsWithoutInput,
   IValidationProps,
 } from './interface';
@@ -47,15 +49,13 @@ export function FormField(props: IFormFieldProps) {
   const addValidator = useCallback((v: IValidator) => setInternalValidators(list => list.concat(v)), []);
   const removeValidator = useCallback((v: IValidator) => setInternalValidators(list => list.filter(x => x !== v)), []);
 
-  const fieldLayoutFromContext = useContext(LayoutContext);
-
   const validate = useMemo(() => props.validate, []);
   const fieldValidator = useMemo(
     () => createFieldValidator(label, required, [].concat(validate || noop).concat(internalValidators)),
     [label, required, validate],
   );
 
-  const [errorMessage] = useLatestPromise(
+  const { result: errorMessage } = useLatestPromise(
     // TODO: remove the following cast when we remove async validation from our API
     () => $q.resolve((fieldValidator(value) as any) as IPromise<IValidatorResultRaw>),
     [fieldValidator, value],
@@ -68,6 +68,11 @@ export function FormField(props: IFormFieldProps) {
 
   const touched = firstDefined(touchedProp, hasBlurred);
 
+  const FieldLayoutFromContext = useContext(LayoutContext);
+  const inputRenderPropOrNode = firstDefined(input, noop);
+  const layoutFromContext = (layoutProps: IFieldLayoutProps) => <FieldLayoutFromContext {...layoutProps} />;
+  const layoutRenderPropOrNode = firstDefined(layout, layoutFromContext);
+
   const validationProps: IValidationProps = {
     touched,
     validationMessage,
@@ -78,7 +83,7 @@ export function FormField(props: IFormFieldProps) {
 
   const controlledInputProps: IControlledInputProps = {
     value: props.value,
-    name: props.name || noop,
+    name: props.name || '',
     onChange: props.onChange || noop,
     onBlur: (e: React.FocusEvent) => {
       setHasBlurred(true);
@@ -87,12 +92,12 @@ export function FormField(props: IFormFieldProps) {
   };
 
   // Render the input
-  const inputElement = renderContent(input, { ...controlledInputProps, validation: validationProps });
+  const inputElement = renderContent(inputRenderPropOrNode, { ...controlledInputProps, validation: validationProps });
 
   // Render the layout passing the rendered input in
   return (
     <>
-      {renderContent(layout || fieldLayoutFromContext, {
+      {renderContent(layoutRenderPropOrNode, {
         ...fieldLayoutPropsWithoutInput,
         ...validationProps,
         input: inputElement,

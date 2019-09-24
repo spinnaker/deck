@@ -9,11 +9,12 @@ import { SETTINGS } from 'core/config';
 import { IExecution, IPipeline } from 'core/domain';
 import { Execution } from 'core/pipeline/executions/execution/Execution';
 import { IScheduler, SchedulerFactory } from 'core/scheduler';
-import { PipelineTemplateV2Service } from 'core/pipeline';
+import { PipelineTemplateV2Service, ManualExecutionModal } from 'core/pipeline';
 import { ReactInjector, IStateChange } from 'core/reactShims';
 import { Tooltip } from 'core/presentation';
 import { ISortFilter } from 'core/filterModel';
 import { ExecutionState } from 'core/state';
+import { ExecutionsTransformer } from '../service/ExecutionsTransformer';
 
 import './singleExecutionDetails.less';
 
@@ -65,7 +66,7 @@ export class SingleExecutionDetails extends React.Component<
 
     executionService.getExecution($state.params.executionId).then(
       execution => {
-        executionService.transformExecution(app, execution);
+        ExecutionsTransformer.transformExecution(app, execution);
         if (execution.isActive && !this.executionScheduler) {
           this.executionScheduler = SchedulerFactory.createScheduler(5000);
           this.executionLoader = this.executionScheduler.subscribe(() => this.getExecution());
@@ -87,6 +88,7 @@ export class SingleExecutionDetails extends React.Component<
       (stateChange: ISingleExecutionRouterStateChange) => {
         if (
           !stateChange.to.name.includes('pipelineConfig') &&
+          !stateChange.to.name.includes('executions') &&
           (stateChange.toParams.application !== stateChange.fromParams.application ||
             stateChange.toParams.executionId !== stateChange.fromParams.executionId)
         ) {
@@ -124,6 +126,23 @@ export class SingleExecutionDetails extends React.Component<
       pipelineId: this.state.execution.pipelineConfigId,
     });
     e.stopPropagation();
+  };
+
+  private rerunExecution = (execution: IExecution) => {
+    const { app } = this.props;
+    app.pipelineConfigs.activate();
+    app.pipelineConfigs.ready().then(() => {
+      const pipeline = app.pipelineConfigs.data.find((p: IPipeline) => p.id === execution.pipelineConfigId);
+      ManualExecutionModal.show({
+        pipeline: pipeline,
+        application: app,
+        trigger: execution.trigger,
+      }).then(command => {
+        const { executionService } = ReactInjector;
+        executionService.startAndMonitorPipeline(app, command.pipelineName, command.trigger);
+        ReactInjector.$state.go('^.^.executions');
+      });
+    });
   };
 
   public render() {
@@ -197,6 +216,9 @@ export class SingleExecutionDetails extends React.Component<
                 pipelineConfig={null}
                 standalone={true}
                 showDurations={sortFilter.showDurations}
+                onRerun={() => {
+                  this.rerunExecution(execution);
+                }}
               />
             </div>
           </div>

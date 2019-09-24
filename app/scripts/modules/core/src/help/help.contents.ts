@@ -153,11 +153,11 @@ const helpContents: { [key: string]: string } = {
       <p>Determines the target URL required to trigger this pipeline, as well as how the payload can be transformed into artifacts.</p>
   `,
   'pipeline.config.trigger.webhook.payloadConstraints': `
-      <p>When provided, only a webhook with a payload containing at least the specified key/value pairs will be allowed to trigger this pipeline. For example, if you wanted to lockdown the systems/users that can trigger this pipeline via this webhook, you could require the key "secret" and value "something-secret" as a constraint.</p>
+      <p>When provided, only a webhook with a payload containing at least the specified key/value pairs will be allowed to trigger this pipeline. For example, if you wanted to lock down the systems/users that can trigger this pipeline via this webhook, you could require the key "secret" and value "something-secret" as a constraint.</p>
       <p>The constraint values may be supplied as regex.</p>
   `,
   'pipeline.config.trigger.pubsub.attributeConstraints': `
-      <p>Pubsub mesages can have system-specific metadata accompanying the payload called <b>attributes</b>.</p>
+      <p>Pubsub messages can have system-specific metadata accompanying the payload called <b>attributes</b>.</p>
       <p>When provided, only a pubsub message with attributes containing at least the specified key/value pairs will be allowed to trigger this pipeline.</p>
       <p>The constraint value is a java regex string.</p>
   `,
@@ -299,8 +299,8 @@ const helpContents: { [key: string]: string } = {
   'pipeline.config.parallel.cancel.queue':
     '<p>If concurrent pipeline execution is disabled, then the pipelines that are in the waiting queue will get canceled when the next execution starts. <br><br>Check this box if you want to keep them in the queue.</p>',
   'pipeline.config.timeout': `
-      <p>Allows you to override the amount of time the stage can run before failing.</p>
-      <p><b>Note:</b> this represents the overall time the stage has to complete (the sum of all the task times).</p>`,
+      <p>Allows you to force the stage to fail if its running time exceeds a specific length.</p>
+      <p><b>Note:</b> by default there is not a time limit on the stage, only the individual tasks it runs. The maximum possible running time for a stage is the sum of each task's timeout.</p>`,
   'pipeline.config.trigger.runAsUser':
     "The current user must have access to the specified service account, and the service account must have access to the current application. Otherwise, you'll receive an 'Access is denied' error.",
   'pipeline.config.script.repoUrl':
@@ -393,7 +393,7 @@ const helpContents: { [key: string]: string } = {
   'pipeline.waitForCompletion':
     'if unchecked, marks the stage as successful right away without waiting for the pipeline to complete',
   'jenkins.waitForCompletion':
-    'if unchecked, marks the stage as successful right away without waiting for the jenkins job to complete',
+    'if unchecked, marks the stage as successful right away without waiting for the Jenkins job to complete',
   'travis.waitForCompletion':
     'if unchecked, marks the stage as successful right away without waiting for the Travis job to complete',
   'wercker.waitForCompletion':
@@ -403,6 +403,8 @@ const helpContents: { [key: string]: string } = {
   'markdown.examples':
     'Some examples of markdown syntax: <br/> *<em>emphasis</em>* <br/> **<b>strong</b>** <br/> [link text](http://url-goes-here)',
   'pipeline.config.webhook.payload': 'JSON payload to be added to the webhook call.',
+  'pipeline.config.webhook.cancelPayload':
+    'JSON payload to be added to the webhook call when it is called in response to a cancellation.',
   'pipeline.config.webhook.waitForCompletion':
     'If not checked, we consider the stage succeeded if the webhook returns an HTTP status code 2xx, otherwise it will be failed. If checked, it will poll a status url (defined below) to determine the progress of the stage.',
   'pipeline.config.webhook.statusUrlResolutionIsGetMethod': "Use the webhook's URL with GET method as status endpoint.",
@@ -429,6 +431,8 @@ const helpContents: { [key: string]: string } = {
   'pipeline.config.webhook.customHeaders': 'Key-value pairs to be sent as additional headers to the service.',
   'pipeline.config.webhook.failFastCodes':
     'Comma-separated HTTP status codes (4xx or 5xx) that will cause this webhook stage to fail without retrying.',
+  'pipeline.config.webhook.signalCancellation':
+    'Trigger a specific webhook if this stage is cancelled by user or due to pipeline failure',
   'pipeline.config.parameter.label': '(Optional): a label to display when users are triggering the pipeline manually',
   'pipeline.config.parameter.description': `(Optional): if supplied, will be displayed to users as a tooltip
       when triggering the pipeline manually. You can include HTML in this field.`,

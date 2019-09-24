@@ -31,7 +31,7 @@ import { amazonServerGroupDetailsGetter } from './serverGroup/details/amazonServ
 import {
   AdvancedSettingsDetailsSection,
   AmazonInfoDetailsSection,
-  CapacityDetailsSection,
+  AmazonCapacityDetailsSection,
   HealthDetailsSection,
   LaunchConfigDetailsSection,
   LogsDetailsSection,
@@ -98,7 +98,7 @@ module(AMAZON_MODULE, [
       detailsGetter: amazonServerGroupDetailsGetter,
       detailsSections: [
         AmazonInfoDetailsSection,
-        CapacityDetailsSection,
+        AmazonCapacityDetailsSection,
         HealthDetailsSection,
         LaunchConfigDetailsSection,
         SecurityGroupsDetailsSection,

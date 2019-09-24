@@ -43,12 +43,14 @@ export interface IFeatures {
   dockerBake?: boolean;
   entityTags?: boolean;
   fiatEnabled?: boolean;
+  gceStatefulMigsEnabled?: boolean;
   iapRefresherEnabled?: boolean;
   // whether stages affecting infrastructure (like "Create Load Balancer") should be enabled or not
   infrastructureStages?: boolean;
   jobs?: boolean;
   managedPipelineTemplatesV2UI?: boolean;
   managedServiceAccounts?: boolean;
+  managedResources?: boolean;
   notifications?: boolean;
   pagerDuty?: boolean;
   pipelines?: boolean;
@@ -60,6 +62,7 @@ export interface IFeatures {
   versionedProviders?: boolean;
   wercker?: boolean;
   savePipelinesStageEnabled?: boolean;
+  kustomizeEnabled?: boolean;
 }
 
 export interface IDockerInsightSettings {
@@ -98,6 +101,7 @@ export interface ISpinnakerSettings {
   dockerInsights: IDockerInsightSettings;
   entityTags?: {
     maxUrlLength?: number;
+    maxResults?: number;
   };
   executionWindow?: {
     atlas?: {

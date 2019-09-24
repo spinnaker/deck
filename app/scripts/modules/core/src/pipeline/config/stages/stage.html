@@ -10,7 +10,7 @@
       <p class="small" ng-if="!stage.type">No stage type selected</p>
     </div>
     <div class="col-md-7 form-horizontal">
-      <stage-config-field label="Type" field-columns="9" ng-if="stage.isNew">
+      <stage-config-field label="Type" field-columns="9" ng-if="stage.isNew || !stage.type">
         <ui-select
           ng-model="options.selectedStageType"
           style="width: 250px"
@@ -111,7 +111,15 @@
       visible="canConfigureNotifications"
       badge="stage.notifications.length"
     >
-      <notification-list level="stage" notifications="stage.notifications" parent="stage"></notification-list>
+      <notification-list
+        level="'stage'"
+        handle-send-notifications-changed="stageConfigCtrl.handleSendNotificationsChanged"
+        notifications="stage.notifications"
+        send-notifications="!!stage.sendNotifications"
+        type="stage.type"
+        update-notifications="stageConfigCtrl.updateNotifications"
+      >
+      </notification-list>
     </page-section>
     <page-section
       key="producesArtifacts"

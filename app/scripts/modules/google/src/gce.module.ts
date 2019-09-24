@@ -8,6 +8,8 @@ import { GCE_SSL_LOAD_BALANCER_CTRL } from './loadBalancer/configure/ssl/gceCrea
 import { GCE_TCP_LOAD_BALANCER_CTRL } from './loadBalancer/configure/tcp/gceCreateTcpLoadBalancer.controller';
 import { IAP_INTERCEPTOR } from 'google/interceptors/iap.interceptor';
 import { LOAD_BALANCER_SET_TRANSFORMER } from './loadBalancer/loadBalancer.setTransformer';
+import { GCE_SERVER_GROUP_DISK_DESCRIPTIONS } from './serverGroup/details/ServerGroupDiskDescriptions';
+import { GceImageReader } from './image';
 import './help/gce.help';
 
 import './logo/gce.logo.less';
@@ -26,6 +28,7 @@ module(GOOGLE_MODULE, [
   GCE_SSL_LOAD_BALANCER_CTRL,
   GCE_TCP_LOAD_BALANCER_CTRL,
   IAP_INTERCEPTOR,
+  GCE_SERVER_GROUP_DISK_DESCRIPTIONS,
   require('./serverGroup/details/serverGroup.details.gce.module').name,
   require('./serverGroup/configure/serverGroupCommandBuilder.service').name,
   require('./serverGroup/configure/wizard/cloneServerGroup.gce.controller').name,
@@ -58,7 +61,6 @@ module(GOOGLE_MODULE, [
   require('./securityGroup/securityGroup.reader').name,
   require('./subnet/subnet.renderer').name,
   require('./validation/applicationName.validator').name,
-  require('./image/image.reader').name,
   require('./cache/cacheConfigurer.service').name,
   require('./common/xpnNaming.gce.service').name,
 ]).config(() => {
@@ -71,7 +73,7 @@ module(GOOGLE_MODULE, [
       configurer: 'gceCacheConfigurer',
     },
     image: {
-      reader: 'gceImageReader',
+      reader: GceImageReader,
     },
     serverGroup: {
       transformer: 'gceServerGroupTransformer',
