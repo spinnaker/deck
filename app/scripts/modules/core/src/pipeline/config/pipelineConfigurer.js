@@ -431,7 +431,6 @@ module.exports = angular
         $scope.$applyAsync(() => {
           const original = getOriginal();
           $scope.pipeline = _.clone(original);
-          $scope.renderablePipeline = $scope.pipeline;
 
           if ($scope.isTemplatedPipeline) {
             const originalRenderablePipeline = getOriginalRenderablePipeline();
@@ -537,7 +536,6 @@ module.exports = angular
         $scope.$applyAsync(() => {
           $scope.pipeline = _.cloneDeep($scope.pipeline);
           _.extend($scope.pipeline, changes);
-          $scope.renderablePipeline = $scope.pipeline;
           markDirty();
         });
       };
