@@ -22,6 +22,7 @@ import { SelectorMode } from 'kubernetes/v2/manifest/selector/IManifestSelector'
 import { PatchManifestOptionsForm } from './PatchManifestOptionsForm';
 
 interface IPatchManifestStageConfigFormProps {
+  stageFieldUpdated: () => void;
   updatePipeline: (pipeline: IPipeline) => void;
 }
 
@@ -88,7 +89,9 @@ export class PatchManifestStageForm extends React.Component<
     this.props.formik.setFieldValue('patchBody', manifests[0]);
   };
 
-  private onManifestSelectorChange = (): void => {};
+  private onManifestSelectorChange = (): void => {
+    this.props.stageFieldUpdated();
+  };
 
   private getSourceOptions = (): Array<Option<string>> => {
     return map([this.textSource, this.artifactSource], option => ({
