@@ -117,7 +117,7 @@ export class PatchManifestStageForm extends React.Component<
           <RadioButtonInput
             options={this.getSourceOptions()}
             onChange={(e: any) => this.props.formik.setFieldValue('source', e.target.value)}
-            value={stage.source || 'text'}
+            value={stage.source}
           />
         </StageConfigField>
         {stage.source === this.textSource && (
