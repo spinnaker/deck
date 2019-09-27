@@ -157,7 +157,7 @@ export class PatchManifestStageForm extends React.Component<
         <hr />
         <h4>Patch Options</h4>
         <PatchManifestOptionsForm
-          strategy={!!stage.options && stage.options.strategy}
+          strategy={!!stage.options && stage.options.mergeStrategy}
           onStrategyChange={(strategy: string) => this.props.formik.setFieldValue('options.mergeStrategy', strategy)}
           record={!!stage.options && stage.options.record}
           onRecordChange={(record: boolean) => this.props.formik.setFieldValue('options.record', record)}
