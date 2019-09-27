@@ -13,7 +13,7 @@ import { RunJobExecutionDetails } from './RunJobExecutionDetails';
 
 Registry.pipeline.registerStage({
   label: 'Run Job (Manifest)',
-  description: 'Run a Kubernetes Job mainfest yaml/json file.',
+  description: 'Run a Kubernetes Job manifest yaml/json file.',
   key: 'runJobManifest',
   alias: 'runJob',
   addAliasToConfig: true,
