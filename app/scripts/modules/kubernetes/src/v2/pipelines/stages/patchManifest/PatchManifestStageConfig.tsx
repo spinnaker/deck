@@ -26,8 +26,9 @@ export class PatchManifestStageConfig extends React.Component<IStageConfigProps>
     // delete any value in 'strategy'. If 'mergeStrategy' is empty, set it to
     // the value we deleted from 'strategy'.
     defaults(props.stage.options, {
-      mergeStrategy: delete props.stage.options.strategy,
+      mergeStrategy: props.stage.options.strategy,
     });
+    delete props.stage.options.strategy;
 
     // Intentionally initializing the stage config only once in the constructor
     // The stage config is then completely owned within FormikStageConfig's Formik state
