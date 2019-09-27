@@ -8,17 +8,16 @@ import { robotToHuman } from 'core/presentation/robotToHumanFilter/robotToHuman.
 
 export function CheckPreconditionsExecutionDetails(props: IExecutionDetailsSectionProps) {
   const context = get(props.stage, 'context.context', {} as any);
-  const userDefinedMessage = context['description'];
+  const userFailureMessage = context.failureMessage;
   const failureMessage = props.stage.failureMessage;
-  const stageFailureMessage =
-    failureMessage == null || failureMessage === ErrorMsgs.NO_REASON_PROVIDED ? userDefinedMessage : failureMessage;
+  const stageFailureMessage = failureMessage == null ? userFailureMessage : failureMessage;
   return (
     <ExecutionDetailsSection name={props.name} current={props.current}>
       <div className="row">
         <div className="col-md-12">
           <dl className="dl-horizontal">
             {Object.keys(context)
-              .filter(key => key !== 'expression' && context[key] !== null)
+              .filter(key => !['expression', 'failureMessage'].includes(key) && context[key] !== null)
               .map(key => (
                 <div key={key}>
                   <dt>{robotToHuman(key)}</dt>
