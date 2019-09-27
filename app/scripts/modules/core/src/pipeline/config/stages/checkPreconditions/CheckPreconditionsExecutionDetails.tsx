@@ -1,12 +1,17 @@
 import * as React from 'react';
 import { get } from 'lodash';
 
-import { StageFailureMessage } from 'core/pipeline';
+import { ErrorMsgs, StageFailureMessage } from 'core/pipeline';
+
 import { ExecutionDetailsSection, IExecutionDetailsSectionProps } from '../common';
 import { robotToHuman } from 'core/presentation/robotToHumanFilter/robotToHuman.filter';
 
 export function CheckPreconditionsExecutionDetails(props: IExecutionDetailsSectionProps) {
   const context = get(props.stage, 'context.context', {} as any);
+  const userDefinedMessage = context['description'];
+  const failureMessage = props.stage.failureMessage;
+  const stageFailureMessage =
+    failureMessage == null || failureMessage === ErrorMsgs.NO_REASON_PROVIDED ? userDefinedMessage : failureMessage;
   return (
     <ExecutionDetailsSection name={props.name} current={props.current}>
       <div className="row">
@@ -27,7 +32,7 @@ export function CheckPreconditionsExecutionDetails(props: IExecutionDetailsSecti
           </dl>
         </div>
       </div>
-      <StageFailureMessage stage={props.stage} message={props.stage.failureMessage} />
+      <StageFailureMessage stage={props.stage} message={stageFailureMessage} />
     </ExecutionDetailsSection>
   );
 }

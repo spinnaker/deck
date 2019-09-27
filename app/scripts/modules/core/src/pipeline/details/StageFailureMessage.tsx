@@ -23,6 +23,10 @@ export interface IStageFailureMessageState {
   isFailed?: boolean;
 }
 
+export namespace ErrorMsgs {
+  export const NO_REASON_PROVIDED = 'No reason provided.';
+}
+
 @UIRouterContext
 export class StageFailureMessage extends React.Component<IStageFailureMessageProps, IStageFailureMessageState> {
   public static defaultProps: Partial<IStageFailureMessageProps> = {
@@ -73,9 +77,11 @@ export class StageFailureMessage extends React.Component<IStageFailureMessagePro
       const exceptionTitle = isFailed ? (messages.length ? 'Exceptions' : 'Exception') : 'Warning';
       const displayMessages =
         message || !messages.length ? (
-          <Markdown message={message || 'No reason provided.'} className="break-word" />
+          <Markdown message={message || ErrorMsgs.NO_REASON_PROVIDED} className="break-word" />
         ) : (
-          messages.map((m, i) => <Markdown key={i} message={m || 'No reason provided.'} className="break-word" />)
+          messages.map((m, i) => (
+            <Markdown key={i} message={m || ErrorMsgs.NO_REASON_PROVIDED} className="break-word" />
+          ))
         );
 
       if (displayMessages) {
