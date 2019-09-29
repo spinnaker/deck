@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { get } from 'lodash';
 
-import { ErrorMsgs, StageFailureMessage } from 'core/pipeline';
+import { StageFailureMessage } from 'core/pipeline';
 
 import { ExecutionDetailsSection, IExecutionDetailsSectionProps } from '../common';
 import { robotToHuman } from 'core/presentation/robotToHumanFilter/robotToHuman.filter';
