@@ -8,7 +8,7 @@ import { IPipeline } from 'core/domain';
 import { ModalClose } from 'core/modal';
 import { IModalComponentProps } from 'core/presentation';
 import { ReactInjector } from 'core/reactShims';
-import { PipelineConfigService } from 'core/pipeline/config/services/PipelineConfigService';
+import { PipelineConfigService } from 'core/pipeline';
 
 export interface IDeletePipelineModalProps extends IModalComponentProps {
   application: Application;
@@ -91,10 +91,10 @@ export function DeletePipelineModal(props: IDeletePipelineModalProps) {
           </form>
         </Modal.Body>
         <Modal.Footer>
-          <button className="btn btn-default" onClick={() => dismissModal()} type="button">
+          <button className="btn btn-default" onClick={dismissModal} type="button">
             Cancel
           </button>
-          <button className="btn btn-primary" onClick={() => deletePipeline()}>
+          <button className="btn btn-primary" onClick={deletePipeline}>
             {!deleting && (
               <span>
                 <span className="far fa-check-circle" /> Delete

@@ -3,12 +3,19 @@ import * as React from 'react';
 import { Formik, Form } from 'formik';
 import { Modal } from 'react-bootstrap';
 import { Observable, Subject } from 'rxjs';
-import { assign, clone, compact, extend, get, head, uniq, isArray } from 'lodash';
+import { assign, clone, compact, extend, get, head, uniq, isArray, isEmpty, pickBy } from 'lodash';
 
 import { SubmitButton, ModalClose } from 'core/modal';
 import { Application } from 'core/application';
 import { AuthenticationService } from 'core/authentication';
-import { buildValidators, IModalComponentProps, ReactModal, SpinFormik } from 'core/presentation';
+import {
+  FormValidator,
+  IModalComponentProps,
+  ReactModal,
+  SpinFormik,
+  Markdown,
+  LayoutProvider,
+} from 'core/presentation';
 import {
   IExecution,
   IExecutionTrigger,
@@ -16,6 +23,7 @@ import {
   IParameter,
   IPipeline,
   IPipelineCommand,
+  IPipelineTrigger,
   IStage,
   ITrigger,
 } from 'core/domain';
@@ -25,6 +33,7 @@ import { Registry } from 'core/registry';
 import { SETTINGS } from 'core/config/settings';
 import { UrlParser } from 'core/navigation/urlParser';
 
+import { ManualExecutionFieldLayout } from './layout/ManualExecutionFieldLayout';
 import { PipelineOptions } from './PipelineOptions';
 import { CurrentlyRunningExecutions } from './CurrentlyRunningExecutions';
 import { StageManualComponents } from './StageManualComponents';
@@ -54,6 +63,8 @@ export interface IManualExecutionModalState {
   triggers: ITrigger[];
 }
 
+const TRIGGER_FIELDS_TO_EXCLUDE = ['correlationId', 'eventId', 'executionId'];
+
 export class ManualExecutionModal extends React.Component<IManualExecutionModalProps, IManualExecutionModalState> {
   private formikRef = React.createRef<Formik<any>>();
   private destroy$ = new Subject();
@@ -82,17 +93,39 @@ export class ManualExecutionModal extends React.Component<IManualExecutionModalP
     };
   }
 
+  private static getPipelineTriggers(pipeline: IPipeline, trigger: IExecutionTrigger): ITrigger[] {
+    if (!isEmpty(pipeline.triggers)) {
+      return pipeline.triggers;
+    }
+
+    /**
+     * If Pipeline B runs as a stage of Pipeline A, we want manual
+     * re-runs to behave as though Pipeline B were triggered by Pipeline A,
+     * so that artifacts from the prior execution are passed to the re-run
+     * as expected, so we shim the trigger.
+     */
+    if (trigger && trigger.type === 'pipeline' && trigger.parentPipelineStageId) {
+      return [
+        {
+          enabled: true,
+          parentExecution: trigger.parentExecution,
+          type: trigger.type,
+        } as IPipelineTrigger,
+      ];
+    }
+
+    return [];
+  }
+
   public componentDidMount() {
     const { application, pipeline, trigger } = this.props;
     let pipelineOptions = [];
     let pipelineNotifications: INotification[] = [];
-    let triggers: ITrigger[] = [];
     if (pipeline) {
       pipelineNotifications = pipeline.notifications || [];
-      if (pipeline.triggers) {
-        triggers = this.formatTriggers(pipeline.triggers);
-        this.updateTriggerOptions(triggers);
-      }
+      const pipelineTriggers = ManualExecutionModal.getPipelineTriggers(pipeline, trigger);
+      const triggers = this.formatTriggers(pipelineTriggers);
+      this.updateTriggerOptions(triggers);
     } else {
       pipelineOptions = application.pipelineConfigs.data.filter(
         (c: any) => !c.disabled && PipelineTemplateV2Service.isConfigurable(c),
@@ -256,12 +289,15 @@ export class ManualExecutionModal extends React.Component<IManualExecutionModalP
     const triggers = this.formatTriggers(pipeline && pipeline.triggers ? pipeline.triggers : []);
     let trigger: ITrigger;
     if (this.props.trigger) {
-      trigger = clone(this.props.trigger);
+      // Certain fields like correlationId will cause unexepcted behavior if used to trigger
+      // a different execution, others are just left unused. Let's exclude them.
+      trigger = pickBy(this.props.trigger, (_, key) => !TRIGGER_FIELDS_TO_EXCLUDE.includes(key));
+
       if (trigger.type === 'manual' && triggers.length) {
         trigger.type = head(triggers).type;
       }
       // Find the pipeline.trigger that matches trigger (the trigger from the execution being re-run)
-      const matchingTrigger = pipeline.triggers.find(t =>
+      const matchingTrigger = (pipeline.triggers || []).find(t =>
         Object.keys(t)
           .filter(k => k !== 'description')
           .every(k => get(t, k) === get(this.props.trigger, k)),
@@ -303,8 +339,8 @@ export class ManualExecutionModal extends React.Component<IManualExecutionModalP
   };
 
   private validate = (values: IPipelineCommand): any => {
-    const validation = buildValidators(values);
-    return validation.result();
+    const formValidator = new FormValidator(values);
+    return formValidator.validateForm();
   };
 
   public render(): React.ReactElement<ManualExecutionModal> {
@@ -335,64 +371,76 @@ export class ManualExecutionModal extends React.Component<IManualExecutionModalP
               <Modal.Title>{modalHeader}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              <div className="container-fluid modal-body-content">
-                {pipelineOptions.length > 0 && (
-                  <PipelineOptions
-                    formik={formik}
-                    formatPipeline={this.formatPipeline}
-                    formatTriggers={this.formatTriggers}
-                    formatParameterConfig={this.formatParameterConfig}
-                    pipelineOptions={pipelineOptions}
-                    pipelineChanged={this.pipelineChanged}
-                    triggerChanged={this.triggerChanged}
-                    updateTriggerOptions={this.updateTriggerOptions}
-                  />
-                )}
-                {formik.values.pipeline && (
-                  <div className="form-group">
-                    <div className="col-md-10">
-                      <p>
-                        This will start a new run of <strong>{formik.values.pipeline.name}</strong>.
-                      </p>
-                    </div>
-                  </div>
-                )}
-                {currentPipelineExecutions.length > 0 && (
-                  <CurrentlyRunningExecutions currentlyRunningExecutions={currentPipelineExecutions} />
-                )}
-                {triggers && triggers.length > 0 && (
-                  <Triggers
-                    formik={formik}
-                    triggers={triggers}
-                    triggerChanged={this.triggerChanged}
-                    triggerComponent={triggerComponent}
-                  />
-                )}
-                {formik.values.pipeline &&
-                  formik.values.pipeline.parameterConfig &&
-                  formik.values.pipeline.parameterConfig.length > 0 && (
-                    <Parameters formik={formik} parameters={formik.values.pipeline.parameterConfig} />
+              <LayoutProvider value={ManualExecutionFieldLayout}>
+                <div className="container-fluid modal-body-content">
+                  {pipelineOptions.length > 0 && (
+                    <PipelineOptions
+                      formik={formik}
+                      formatPipeline={this.formatPipeline}
+                      formatTriggers={this.formatTriggers}
+                      formatParameterConfig={this.formatParameterConfig}
+                      pipelineOptions={pipelineOptions}
+                      pipelineChanged={this.pipelineChanged}
+                      triggerChanged={this.triggerChanged}
+                      updateTriggerOptions={this.updateTriggerOptions}
+                    />
                   )}
-                {stageComponents.length > 0 && (
-                  <StageManualComponents
-                    command={formik.values}
-                    components={stageComponents}
-                    updateCommand={(path: string, value: any) => {
-                      formik.setFieldValue(path, value);
-                    }}
-                  />
-                )}
-                {formik.values.trigger && formik.values.trigger.artifacts && (
-                  <div className="form-group">
-                    <label className="col-md-4 sm-label-right">Artifacts</label>
-                    <div className="col-md-8">
-                      <ArtifactList artifacts={formik.values.trigger.artifacts} />
+                  {formik.values.pipeline && (
+                    <div className="form-group">
+                      <div className={pipelineOptions.length > 0 ? 'col-md-6 col-md-offset-4' : 'col-md-10'}>
+                        <p>
+                          This will start a new run of <strong>{formik.values.pipeline.name}</strong>.
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                )}
-                {dryRunEnabled && <DryRun />}
-                <NotificationDetails formik={formik} notifications={notifications} />
-              </div>
+                  )}
+                  {currentPipelineExecutions.length > 0 && (
+                    <CurrentlyRunningExecutions currentlyRunningExecutions={currentPipelineExecutions} />
+                  )}
+                  {pipeline && pipeline.manualStartAlert && (
+                    <Markdown
+                      className={`alert alert-${
+                        ['danger', 'warning', 'info'].includes(pipeline.manualStartAlert.type)
+                          ? pipeline.manualStartAlert.type
+                          : 'warning'
+                      }`}
+                      message={pipeline.manualStartAlert.message}
+                    />
+                  )}
+                  {triggers && triggers.length > 0 && (
+                    <Triggers
+                      formik={formik}
+                      triggers={triggers}
+                      triggerChanged={this.triggerChanged}
+                      triggerComponent={triggerComponent}
+                    />
+                  )}
+                  {formik.values.pipeline &&
+                    formik.values.pipeline.parameterConfig &&
+                    formik.values.pipeline.parameterConfig.length > 0 && (
+                      <Parameters formik={formik} parameters={formik.values.pipeline.parameterConfig} />
+                    )}
+                  {stageComponents.length > 0 && (
+                    <StageManualComponents
+                      command={formik.values}
+                      components={stageComponents}
+                      updateCommand={(path: string, value: any) => {
+                        formik.setFieldValue(path, value);
+                      }}
+                    />
+                  )}
+                  {!isEmpty(get(formik.values, 'trigger.artifacts')) && (
+                    <div className="form-group">
+                      <label className="col-md-4 sm-label-right">Artifacts</label>
+                      <div className="col-md-8">
+                        <ArtifactList artifacts={formik.values.trigger.artifacts} />
+                      </div>
+                    </div>
+                  )}
+                  {dryRunEnabled && <DryRun />}
+                  <NotificationDetails formik={formik} notifications={notifications} />
+                </div>
+              </LayoutProvider>
             </Modal.Body>
             <Modal.Footer>
               <button className="btn btn-default" onClick={dismissModal} type="button">

@@ -13,8 +13,9 @@ export interface IPipeline {
   isNew?: boolean;
   keepWaitingPipelines: boolean;
   lastModifiedBy?: string;
-  locked?: boolean;
+  locked?: IPipelineLock;
   limitConcurrent: boolean;
+  manualStartAlert?: IPipelineManualStartAlert;
   name: string;
   notifications?: INotification[];
   respectQuietPeriod?: boolean;
@@ -31,6 +32,18 @@ export interface IPipeline {
     type: string;
   };
   type?: string;
+  updateTs?: number;
+}
+
+export interface IPipelineManualStartAlert {
+  type: 'danger' | 'warning' | 'info';
+  message: string;
+}
+
+export interface IPipelineLock {
+  ui: boolean;
+  allowUnlockUi?: boolean;
+  description?: string;
 }
 
 export interface IParameter extends ITemplateInheritable {
