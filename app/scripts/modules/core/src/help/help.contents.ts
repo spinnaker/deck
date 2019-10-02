@@ -359,6 +359,10 @@ const helpContents: { [key: string]: string } = {
     '<p>Rolling red black will slowly scale up the new server group. It will resize the new server group by each percentage defined.</p>',
   'strategy.rollingRedBlack.rollback':
     '<p>Disable the new server group and ensure that the previous server group is restored to its original capacity.</p>',
+  'strategy.monitored.deploySteps':
+    '<p>Monitored Deploy will scale up the new server group as specified by these per cent steps. After each step, the health of the new server group will be evaluated by the specified deployment monitor.</p>',
+  'strategy.monitored.rollback':
+    '<p>If deploy fails, disable the new server group and ensure that the previous server group is active and restored to its original capacity.</p>',
   'loadBalancers.filter.serverGroups': `
       <p>Displays all server groups configured to use the load balancer.</p>
       <p>If the server group is configured to <em>not</em> add new instances to the load balancer, it will be grayed out.</p>`,
@@ -423,11 +427,11 @@ const helpContents: { [key: string]: string } = {
   'pipeline.config.webhook.progressJsonPath':
     "JSON path to a descriptive message about the progress in the webhook's response JSON. (e.g. <samp>$.buildInfo.progress</samp>)",
   'pipeline.config.webhook.successStatuses':
-    'Comma-separated list of strings that will be considered as SUCCESS status.',
+    'Comma-separated list of strings (that will be returned in the response body in the previously defined `statusJsonPath` field) that will be considered as SUCCESS status.',
   'pipeline.config.webhook.canceledStatuses':
-    'Comma-separated list of strings that will be considered as CANCELED status.',
+    'Comma-separated list of strings (that will be returned in the response body in the previously defined `statusJsonPath` field) that will be considered as CANCELED status.',
   'pipeline.config.webhook.terminalStatuses':
-    'Comma-separated list of strings that will be considered as TERMINAL status.',
+    'Comma-separated list of strings (that will be returned in the response body in the previously defined `statusJsonPath` field) that will be considered as TERMINAL status.',
   'pipeline.config.webhook.customHeaders': 'Key-value pairs to be sent as additional headers to the service.',
   'pipeline.config.webhook.failFastCodes':
     'Comma-separated HTTP status codes (4xx or 5xx) that will cause this webhook stage to fail without retrying.',
