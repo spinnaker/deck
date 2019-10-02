@@ -31,6 +31,7 @@ describe('categorizedErrors', () => {
   const emptyErrors = Object.freeze({
     async: {},
     error: {},
+    info: {},
     message: {},
     success: {},
     warning: {},
