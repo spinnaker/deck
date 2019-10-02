@@ -15,9 +15,10 @@ import {
   IModalComponentProps,
   ReactSelectInput,
   SpinFormik,
+  useData,
   useLatestPromise,
 } from 'core/presentation';
-import { ICopyStageCardProps, CopyStageCardProps } from './CopyStageCard';
+import { ICopyStageCardProps, CopyStageCard } from './CopyStageCard';
 
 import './copyStageModal.less';
 
@@ -32,21 +33,15 @@ interface ICopyStageCommand {
 }
 
 export function CopyStageModal(props: ICopyStageModalProps) {
-  const [error, setError] = React.useState<boolean>(false);
   const [application, setApplication] = React.useState<string>(props.application.name);
   const uncopiableStageTypes: Set<string> = new Set(['deploy']);
   const initialValues: ICopyStageCommand = { application: application, selectedStage: null };
   const { closeModal, dismissModal, forStrategyConfig } = props;
 
   const fetchApplications = useLatestPromise(() => ApplicationReader.listApplications(), []);
+  const fetchStages = useData(() => getStagesForApplication(application), null, [application]);
 
-  const fetchStages = useLatestPromise(() => {
-    return application ? getStagesForApplication(application) : null;
-  }, [application]);
-
-  React.useEffect(() => {
-    setError(fetchApplications.status === 'REJECTED' || fetchStages.status === 'REJECTED');
-  }, [fetchApplications.status, fetchStages.status]);
+  const error = fetchApplications.status === 'REJECTED' || fetchStages.status === 'REJECTED';
 
   function getStagesForApplication(applicationName: string): IPromise<ICopyStageCardProps[]> {
     const configType = forStrategyConfig ? 'strategyConfigs' : 'pipelineConfigs';
@@ -74,7 +69,7 @@ export function CopyStageModal(props: ICopyStageModalProps) {
 
   function renderCopyStageCard(option: Option<string>) {
     const parsed = JSON.parse(option.value);
-    return <CopyStageCardProps {...parsed} />;
+    return <CopyStageCard {...parsed} />;
   }
 
   function renderCopyStageValue(option: Option<string>) {
@@ -119,6 +114,7 @@ export function CopyStageModal(props: ICopyStageModalProps) {
                         {...inputProps}
                         isLoading={fetchApplications.status === 'PENDING'}
                         clearable={false}
+                        mode="VIRTUALIZED"
                         stringOptions={(fetchApplications.result || []).map(a => a.name)}
                         onChange={e => setApplication(e.target.value)}
                         value={application}
@@ -152,7 +148,7 @@ export function CopyStageModal(props: ICopyStageModalProps) {
                   )}
                 </Form>
 
-                <div className="dcontainer-fluid">
+                <div className="container-fluid">
                   <div className="row">
                     <div className="col-md-offset-3 col-md-7">
                       <div className="well">

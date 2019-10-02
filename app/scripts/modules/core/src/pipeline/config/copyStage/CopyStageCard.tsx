@@ -12,7 +12,7 @@ export interface ICopyStageCardProps {
   stage: IStage;
 }
 
-export function CopyStageCardProps(props: ICopyStageCardProps) {
+export function CopyStageCard(props: ICopyStageCardProps) {
   const {
     pipeline,
     strategy,
