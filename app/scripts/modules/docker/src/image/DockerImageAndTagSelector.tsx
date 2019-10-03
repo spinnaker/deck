@@ -2,8 +2,7 @@ import * as React from 'react';
 import Select, { Option } from 'react-select';
 import { groupBy, reduce, trim, uniq } from 'lodash';
 
-import { AccountService, HelpField, IAccount, IFindImageParams, Tooltip } from '@spinnaker/core';
-import { ValidationMessage } from '../../../core/src/validation';
+import { AccountService, HelpField, IAccount, IFindImageParams, Tooltip, ValidationMessage } from '@spinnaker/core';
 
 import { DockerImageReader, IDockerImage } from './DockerImageReader';
 import { DockerImageUtils, IDockerImageParts } from './DockerImageUtils';
