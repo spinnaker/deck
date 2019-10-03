@@ -33,9 +33,14 @@ export class SpelText extends React.Component<ISpelTextProps, ISpelTextState> {
   private readonly spelInputRef: any;
   private destroy$ = new Subject();
   private $input: JQLite;
+  selection: { start: any; end: any };
 
   constructor(props: ISpelTextProps) {
     super(props);
+    this.selection = {
+      start: false,
+      end: false,
+    };
     this.state = { textcompleteConfig: [] };
     this.autocompleteService = new SpelAutocompleteService(
       $q,
@@ -61,10 +66,23 @@ export class SpelText extends React.Component<ISpelTextProps, ISpelTextState> {
   }
 
   private onChange = (e: any) => {
+    const input = this.spelInputRef.current;
+    this.selection = {
+      start: input.selectionStart,
+      end: input.selectionEnd,
+    };
     this.props.onChange(e.target.value);
   };
 
   public componentDidUpdate(_: Readonly<ISpelTextProps>, prevState: Readonly<ISpelTextState>): void {
+    const { selectionStart, selectionEnd } = this.spelInputRef.current;
+    const update =
+      (this.selection.start !== false && this.selection.start !== selectionStart) ||
+      (this.selection.end !== false && this.selection.end !== selectionEnd);
+    if (update) {
+      this.spelInputRef.current.selectionStart = this.selection.start;
+      this.spelInputRef.current.selectionEnd = this.selection.end;
+    }
     if (prevState.textcompleteConfig !== this.state.textcompleteConfig) {
       this.renderSuggestions();
     }
