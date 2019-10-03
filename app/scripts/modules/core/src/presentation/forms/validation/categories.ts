@@ -1,7 +1,20 @@
 import { set, values } from 'lodash';
 import { traverseObject } from '../../../utils';
 
-import { categoryLabels, ICategorizedErrors, IValidationCategory } from './validation';
+export const categoryLabels = {
+  async: 'Async',
+  error: 'Error',
+  info: 'Info',
+  message: 'Message',
+  success: 'Success',
+  warning: 'Warning',
+};
+
+type ICategoryLabels = typeof categoryLabels;
+export type IValidationCategory = keyof typeof categoryLabels;
+export type ICategorizedErrors = {
+  [P in keyof ICategoryLabels]: any;
+};
 
 // Category label strings, e.g., ['Error', 'Warning', ...]
 const labels = values(categoryLabels);
@@ -10,6 +23,14 @@ const inverseLabels: { [label: string]: IValidationCategory } = Object.keys(cate
   (acc, key: IValidationCategory) => ({ ...acc, [categoryLabels[key]]: key }),
   {},
 );
+
+export const asyncMessage = (message: string) => `Async: ${message}`;
+
+export const errorMessage = (message: string) => `Error: ${message}`;
+export const infoMessage = (message: string) => `Info: ${message}`;
+export const messageMessage = (message: string) => `Message: ${message}`;
+export const successMessage = (message: string) => `Success: ${message}`;
+export const warningMessage = (message: string) => `Warning: ${message}`;
 
 // A regular expression which captures the category label and validation message from a validation message
 // I.e., for the string: "Error: There was a fatal error"

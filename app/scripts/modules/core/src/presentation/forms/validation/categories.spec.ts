@@ -1,4 +1,4 @@
-import { categorizeErrorMessage, categorizeErrors } from './categorizedErrors';
+import { categorizeErrorMessage, categorizeErrors } from './categories';
 
 describe('categorizeErrorMessage', () => {
   it('returns an array of length 2', () => {
