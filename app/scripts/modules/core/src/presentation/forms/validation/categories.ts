@@ -25,7 +25,6 @@ const inverseLabels: { [label: string]: IValidationCategory } = Object.keys(cate
 );
 
 export const asyncMessage = (message: string) => `Async: ${message}`;
-
 export const errorMessage = (message: string) => `Error: ${message}`;
 export const infoMessage = (message: string) => `Info: ${message}`;
 export const messageMessage = (message: string) => `Message: ${message}`;
