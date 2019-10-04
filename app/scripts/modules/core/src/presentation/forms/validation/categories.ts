@@ -24,12 +24,14 @@ const inverseLabels: { [label: string]: IValidationCategory } = Object.keys(cate
   {},
 );
 
-export const asyncMessage = (message: string) => `Async: ${message}`;
-export const errorMessage = (message: string) => `Error: ${message}`;
-export const infoMessage = (message: string) => `Info: ${message}`;
-export const messageMessage = (message: string) => `Message: ${message}`;
-export const successMessage = (message: string) => `Success: ${message}`;
-export const warningMessage = (message: string) => `Warning: ${message}`;
+const buildCategoryMessage = (type: IValidationCategory) => (message: string) => `${categoryLabels[type]}: ${message}`;
+
+export const asyncMessage = buildCategoryMessage('async');
+export const errorMessage = buildCategoryMessage('error');
+export const infoMessage = buildCategoryMessage('info');
+export const messageMessage = buildCategoryMessage('message');
+export const successMessage = buildCategoryMessage('success');
+export const warningMessage = buildCategoryMessage('warning');
 
 // A regular expression which captures the category label and validation message from a validation message
 // I.e., for the string: "Error: There was a fatal error"
