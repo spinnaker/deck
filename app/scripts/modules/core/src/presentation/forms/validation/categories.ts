@@ -59,8 +59,8 @@ export const categorizeValidationMessages = (errors: any): ICategorizedErrors =>
   const categories: ICategorizedErrors = statusKeys.reduce((acc, status) => ({ ...acc, [status]: {} }), {}) as any;
 
   // Given a path and a validation message, store the validation message into the same path of the correct category
-  const storeMessageInCategory = (path: string, errorMessage: any) => {
-    const [status, message] = categorizeValidationMessage(errorMessage);
+  const storeMessageInCategory = (path: string, validationMessage: any) => {
+    const [status, message] = categorizeValidationMessage(validationMessage);
 
     if (message) {
       set(categories[status], path, message);
