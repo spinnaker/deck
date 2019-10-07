@@ -68,7 +68,7 @@ module.exports = angular
       };
 
       function createSecurityGroupProviderFilterFn(application, account, provider) {
-        let sgConfig = provider.securityGroup;
+        const sgConfig = provider.securityGroup;
         return sgConfig && (sgConfig.CreateSecurityGroupModal || (sgConfig.createSecurityGroupTemplateUrl && sgConfig.createSecurityGroupController));
       }
 
