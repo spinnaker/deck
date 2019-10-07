@@ -88,7 +88,7 @@ export class ExecutionsTransformer {
   // TODO: remove if we ever figure out why quickPatchAsgStage never has a startTime
   private static setMasterStageStartTime(stages: IExecutionStage[], stage: IExecutionStageSummary): void {
     const allStartTimes = stages.filter(child => child.startTime).map(child => child.startTime);
-    if (allStartTimes.length) {
+    if (!stage.startTime && allStartTimes.length) {
       stage.startTime = Math.min(...allStartTimes);
     }
   }
