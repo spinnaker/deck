@@ -104,8 +104,11 @@ export class LoadBalancerActions extends React.Component<ILoadBalancerActionsPro
   public render() {
     const { app, loadBalancer } = this.props;
     const { application } = this.state;
-
     const { AddEntityTagLinks } = NgReact;
+
+    const { loadBalancerType, instances, instanceCounts } = loadBalancer;
+    const clbInstances = loadBalancerType === 'classic' && Object.values(instanceCounts).filter(v => v).length;
+    const allowDeletion = !clbInstances && !instances.length;
 
     return (
       <div style={{ display: 'inline-block' }}>
@@ -119,14 +122,14 @@ export class LoadBalancerActions extends React.Component<ILoadBalancerActionsPro
                 Edit Load Balancer
               </a>
             </li>
-            {!loadBalancer.instances.length && (
+            {allowDeletion && (
               <li>
                 <a className="clickable" onClick={this.deleteLoadBalancer}>
                   Delete Load Balancer
                 </a>
               </li>
             )}
-            {loadBalancer.instances.length > 0 && (
+            {!allowDeletion && (
               <li className="disabled">
                 <a className="clickable" onClick={this.deleteLoadBalancer}>
                   Delete Load Balancer{' '}
