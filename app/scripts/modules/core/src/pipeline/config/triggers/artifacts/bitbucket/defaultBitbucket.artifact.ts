@@ -17,12 +17,14 @@ module(DEFAULT_BITBUCKET_ARTIFACT, []).config(() => {
     controller: function(artifact: IArtifact) {
       this.artifact = artifact;
       this.artifact.type = 'bitbucket/file';
-      const pathRegex = new RegExp('/1.0/repositories/[^/]*/[^/]*/raw/[^/]*/(.*)$');
+      const pathRegex = new RegExp('.*/rest/api/1.0/[^/]*/[^/]*/repos/[^/]*/raw/(.*)$');
 
       this.onReferenceChange = () => {
         const results = pathRegex.exec(this.artifact.reference);
         if (results !== null) {
-          this.artifact.name = decodeURIComponent(results[1]);
+          this.artifact.name = results[1];
+        } else {
+          this.artifact.name = this.artifact.reference;
         }
       };
     },
@@ -36,7 +38,7 @@ module(DEFAULT_BITBUCKET_ARTIFACT, []).config(() => {
     </label>
     <div class="col-md-8">
       <input type="text"
-             placeholder="https://api.bitbucket.org/1.0/repositories/$ORG/$REPO/raw/$VERSION/$FILEPATH"
+             placeholder="https://api.bitbucket.com/rest/api/1.0/$PROJECTS/$PROJECTKEY/repos/$REPONAME/raw/$FILEPATH"
              class="form-control input-sm"
              ng-change="ctrl.onReferenceChange()"
              ng-model="ctrl.artifact.reference"/>
