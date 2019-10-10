@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Dropdown } from 'react-bootstrap';
-import { get } from 'lodash';
+import { get, values } from 'lodash';
 
 import {
   Application,
@@ -107,7 +107,8 @@ export class LoadBalancerActions extends React.Component<ILoadBalancerActionsPro
     const { AddEntityTagLinks } = NgReact;
 
     const { loadBalancerType, instances, instanceCounts } = loadBalancer;
-    const clbInstances = loadBalancerType === 'classic' && Object.values(instanceCounts).filter(v => v).length;
+    const clbInstances =
+      loadBalancerType === 'classic' && values(instanceCounts).filter((v: number | undefined) => v).length;
     const allowDeletion = !clbInstances && !instances.length;
 
     return (
