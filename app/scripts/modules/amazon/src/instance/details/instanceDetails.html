@@ -171,16 +171,10 @@
             ng-if="metric.type === 'TargetGroup' && metric.targetGroups.length"
             ng-repeat="targetGroup in metric.targetGroups"
           >
-            <instance-load-balancer-health load-balancer="targetGroup"></instance-load-balancer-health>
-            <span class="pad-left small">
-              <a
-                ng-if="targetGroup.healthCheckPath"
-                target="_blank"
-                href="{{targetGroup.healthCheckProtocol}}://{{instance.privateIpAddress}}{{targetGroup.healthCheckPath}}"
-              >
-                Health Check
-              </a>
-            </span>
+            <instance-load-balancer-health
+              load-balancer="targetGroup"
+              ip-address="instance.privateIpAddress"
+            ></instance-load-balancer-health>
           </div>
         </dd>
       </dl>

@@ -2,7 +2,7 @@
 
 const angular = require('angular');
 import _ from 'lodash';
-import { getAllTargetGroups, getTargetGroupHealthCheckInfo } from 'core/instance';
+import { getAllTargetGroups, applyHealthCheckInfoToTargetGroups } from 'core/instance';
 
 import {
   CloudProviderRegistry,
@@ -72,7 +72,7 @@ module.exports = angular
 
         // augment with target group healthcheck data
         const targetGroups = getAllTargetGroups(app.loadBalancers.data);
-        getTargetGroupHealthCheckInfo(displayableMetrics, targetGroups);
+        applyHealthCheckInfoToTargetGroups(displayableMetrics, targetGroups);
 
         // backfill details where applicable
         if (latest.health) {

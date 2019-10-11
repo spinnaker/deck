@@ -1,16 +1,12 @@
-import { flatten } from 'lodash';
+import { flatten, keyBy } from 'lodash';
 
 export const getAllTargetGroups = loadBalancers => {
   const allTargetGroups = loadBalancers.map(d => d.targetGroups);
-  const targetGroups = flatten(allTargetGroups).reduce((groups, tg) => {
-    groups[tg.name] = tg;
-    return groups;
-  }, {});
-
+  const targetGroups = keyBy(flatten(allTargetGroups), 'name');
   return targetGroups;
 };
 
-export const getTargetGroupHealthCheckInfo = (healthMetrics, targetGroups) => {
+export const applyHealthCheckInfoToTargetGroups = (healthMetrics, targetGroups) => {
   healthMetrics.forEach(metric => {
     if (metric.type === 'TargetGroup') {
       metric.targetGroups.forEach(tg => {
