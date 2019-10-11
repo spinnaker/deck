@@ -1,17 +1,15 @@
 import * as React from 'react';
 
-import { FormikFormField, ReactSelectInput, useLatestPromise } from 'core/presentation';
+import { errorMessage, FormikFormField, ReactSelectInput, useLatestPromise } from 'core/presentation';
 
 import { NexusReaderService } from './nexusReader.service';
 
 export function NexusTrigger() {
   const fetchNames = useLatestPromise(() => NexusReaderService.getNexusNames(), []);
 
-  const validationStatus = fetchNames.status === 'REJECTED' ? 'error' : null;
-  const validationMessage =
-    fetchNames.status === 'REJECTED'
-      ? `Error fetching nexus names: ${fetchNames.error.data.status} ${fetchNames.error.data.error}`
-      : null;
+  const fetchError = () =>
+    errorMessage(`Error fetching nexus names: ${fetchNames.error.data.status} ${fetchNames.error.data.error}`);
+  const validationMessage = fetchNames.status === 'REJECTED' ? fetchError() : null;
 
   return (
     <FormikFormField
@@ -20,7 +18,6 @@ export function NexusTrigger() {
       touched={true}
       fastField={false}
       validationMessage={validationMessage}
-      validationStatus={validationStatus}
       input={props => (
         <ReactSelectInput
           {...props}
