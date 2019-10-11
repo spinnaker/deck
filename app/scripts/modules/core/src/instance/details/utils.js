@@ -16,7 +16,7 @@ export const getTargetGroupHealthCheckInfo = (healthMetrics, targetGroups) => {
       metric.targetGroups.forEach(tg => {
         const group = targetGroups[tg.name];
         tg.healthCheckProtocol = group.healthCheckProtocol.toLowerCase();
-        tg.healthCheckPath = `:${group.healthCheckPort}/${group.healthCheckPath}`;
+        tg.healthCheckPath = `:${group.healthCheckPort}${group.healthCheckPath}`;
       });
     }
   });

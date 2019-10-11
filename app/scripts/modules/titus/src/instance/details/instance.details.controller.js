@@ -73,6 +73,7 @@ module.exports = angular
           return metric.state !== 'Unknown';
         });
 
+        // augment with target group healthcheck data
         const targetGroups = getAllTargetGroups(app.loadBalancers.data);
         getTargetGroupHealthCheckInfo(displayableMetrics, targetGroups);
 
