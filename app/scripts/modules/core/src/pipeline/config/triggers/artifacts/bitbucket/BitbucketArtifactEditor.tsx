@@ -41,14 +41,8 @@ export const BitbucketDefault: IArtifactKindConfig = {
       super(props, TYPE);
     }
 
-    private pathRegex = new RegExp('/1.0/repositories/[^/]*/[^/]*/raw/[^/]*/(.*)$');
-
     private onReferenceChanged = (reference: string) => {
-      const result = this.pathRegex.exec(reference);
       const clonedArtifact = cloneDeep(this.props.artifact);
-      if (result !== null) {
-        clonedArtifact.name = result[1];
-      }
       clonedArtifact.reference = reference;
       this.props.onChange(clonedArtifact);
     };
