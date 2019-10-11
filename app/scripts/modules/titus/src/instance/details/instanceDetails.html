@@ -145,6 +145,15 @@
             ng-repeat="targetGroup in metric.targetGroups"
           >
             <instance-load-balancer-health load-balancer="targetGroup"></instance-load-balancer-health>
+            <span class="pad-left small">
+              <a
+                ng-if="targetGroup.healthCheckPath"
+                target="_blank"
+                href="{{targetGroup.healthCheckProtocol}}://{{metric.instanceId}}{{targetGroup.healthCheckPath}}"
+              >
+                Health Check
+              </a>
+            </span>
           </div>
         </dd>
       </dl>
