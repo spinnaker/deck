@@ -4,7 +4,7 @@ import {
   IAmazonNetworkLoadBalancer,
   ITargetGroup,
   IAmazonHealth,
-} from '@spinnaker/amazon';
+} from '../../../../amazon/src/domain';
 
 export const getAllTargetGroups = (
   loadBalancers: IAmazonApplicationLoadBalancer[] | IAmazonNetworkLoadBalancer[],
