@@ -1,10 +1,5 @@
 import { flatten, keyBy } from 'lodash';
-import {
-  IAmazonApplicationLoadBalancer,
-  IAmazonNetworkLoadBalancer,
-  ITargetGroup,
-  IAmazonHealth,
-} from '@spinnaker/amazon';
+import { IAmazonApplicationLoadBalancer, IAmazonNetworkLoadBalancer, ITargetGroup, IAmazonHealth } from 'amazon/domain';
 
 export const getAllTargetGroups = (
   loadBalancers: IAmazonApplicationLoadBalancer[] | IAmazonNetworkLoadBalancer[],
