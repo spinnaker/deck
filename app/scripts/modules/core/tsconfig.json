@@ -30,6 +30,7 @@
     "typeRoots": ["../../../../node_modules/@types"],
     "paths": {
       "@spinnaker/core": ["."],
+      "@spinnaker/amazon": ["../../amazon/lib"],
       "core/*": ["*"],
       "core": ["."]
     }
