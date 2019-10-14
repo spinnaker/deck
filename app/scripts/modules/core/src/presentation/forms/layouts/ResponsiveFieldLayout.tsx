@@ -1,21 +1,22 @@
 import * as React from 'react';
-import * as classNames from 'classnames';
 
-import { HelpContextProvider } from 'core/help';
+import { HelpTextExpandedContext } from 'core/help';
+import { ValidationMessage } from '../validation';
 
-import { IFieldLayoutProps } from '../interface';
+import { ILayoutProps } from './interface';
 
 import '../forms.less';
 
-export class ResponsiveFieldLayout extends React.Component<IFieldLayoutProps> {
+export class ResponsiveFieldLayout extends React.Component<ILayoutProps> {
   public render() {
-    const { label, help, input, actions, validationMessage, validationStatus } = this.props;
+    const { label, help, input, actions, validation } = this.props;
+    const { hidden, messageNode, category } = validation;
     const showLabel = !!label || !!help;
 
     const helpUnder = false;
 
     return (
-      <HelpContextProvider value={helpUnder}>
+      <HelpTextExpandedContext.Provider value={helpUnder}>
         <div className="sp-formItem">
           <div className="sp-formItem__left">
             {showLabel && (
@@ -31,21 +32,10 @@ export class ResponsiveFieldLayout extends React.Component<IFieldLayoutProps> {
               </span>
             </div>
             {helpUnder && help && <div className="description">{help}</div>}
-            {validationMessage && (
-              <div
-                className={classNames('messageContainer', {
-                  errorMessage: validationStatus === 'error',
-                  warningMessage: validationStatus === 'warning',
-                  previewMessage: validationStatus === 'message',
-                })}
-              >
-                <i />
-                <div className="message">{validationMessage}</div>
-              </div>
-            )}
+            {!hidden && <ValidationMessage message={messageNode} type={category} />}
           </div>
         </div>
-      </HelpContextProvider>
+      </HelpTextExpandedContext.Provider>
     );
   }
 }

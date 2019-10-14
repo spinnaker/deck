@@ -79,6 +79,8 @@ const helpContents: { [key: string]: string } = {
   'pipeline.config.checkPreconditions.failPipeline': `
       <p><strong>Checked</strong> - the overall pipeline will fail whenever this precondition is false.</p>
       <p><strong>Unchecked</strong> - the overall pipeline will continue executing but this particular branch will stop.</p>`,
+  'pipeline.config.checkPreconditions.failureMessage': `
+      <p> This failure message will be shown to the user if the precondition evaluates to false. </p>`,
   'pipeline.config.checkPreconditions.expectedSize': 'Number of server groups in the selected cluster',
   'pipeline.config.checkPreconditions.expression': `
       <p>Value must evaluate to "true".</p>
@@ -155,11 +157,11 @@ const helpContents: { [key: string]: string } = {
       <p>Determines the target URL required to trigger this pipeline, as well as how the payload can be transformed into artifacts.</p>
   `,
   'pipeline.config.trigger.webhook.payloadConstraints': `
-      <p>When provided, only a webhook with a payload containing at least the specified key/value pairs will be allowed to trigger this pipeline. For example, if you wanted to lockdown the systems/users that can trigger this pipeline via this webhook, you could require the key "secret" and value "something-secret" as a constraint.</p>
+      <p>When provided, only a webhook with a payload containing at least the specified key/value pairs will be allowed to trigger this pipeline. For example, if you wanted to lock down the systems/users that can trigger this pipeline via this webhook, you could require the key "secret" and value "something-secret" as a constraint.</p>
       <p>The constraint values may be supplied as regex.</p>
   `,
   'pipeline.config.trigger.pubsub.attributeConstraints': `
-      <p>Pubsub mesages can have system-specific metadata accompanying the payload called <b>attributes</b>.</p>
+      <p>Pubsub messages can have system-specific metadata accompanying the payload called <b>attributes</b>.</p>
       <p>When provided, only a pubsub message with attributes containing at least the specified key/value pairs will be allowed to trigger this pipeline.</p>
       <p>The constraint value is a java regex string.</p>
   `,
@@ -256,6 +258,8 @@ const helpContents: { [key: string]: string } = {
   'pipeline.config.bake.manifest.expectedArtifact': '<p>This is the template you want to render.</p>',
   'pipeline.config.bake.manifest.overrideExpressionEvaluation':
     '<p>Explicitly evaluate SpEL expressions in overrides just prior to manifest baking. Can be paired with the "Skip SpEL evaluation" option in the Deploy Manifest stage when baking a third-party manifest artifact with expressions not meant for Spinnaker to evaluate as SpEL.</p>',
+  'pipeline.config.bake.manifest.helm.rawOverrides':
+    'Use <i>--set</i> instead of <i>--set-string</i> when injecting override values. Values injected using <i>--set</i> will be converted to primitive types by Helm.',
   'pipeline.config.haltPipelineOnFailure':
     'Immediately halts execution of all running stages and fails the entire execution.',
   'pipeline.config.haltBranchOnFailure':
@@ -302,7 +306,7 @@ const helpContents: { [key: string]: string } = {
     '<p>If concurrent pipeline execution is disabled, then the pipelines that are in the waiting queue will get canceled when the next execution starts. <br><br>Check this box if you want to keep them in the queue.</p>',
   'pipeline.config.timeout': `
       <p>Allows you to force the stage to fail if its running time exceeds a specific length.</p>
-      <p><b>Note:</b> by default there is not a time limit on the stage, only the individual tasks it runs. The maximium possible running time for a stage is the sum of each task's timeout.</p>`,
+      <p><b>Note:</b> by default there is not a time limit on the stage, only the individual tasks it runs. The maximum possible running time for a stage is the sum of each task's timeout.</p>`,
   'pipeline.config.trigger.runAsUser':
     "The current user must have access to the specified service account, and the service account must have access to the current application. Otherwise, you'll receive an 'Access is denied' error.",
   'pipeline.config.script.repoUrl':
@@ -361,6 +365,10 @@ const helpContents: { [key: string]: string } = {
     '<p>Rolling red black will slowly scale up the new server group. It will resize the new server group by each percentage defined.</p>',
   'strategy.rollingRedBlack.rollback':
     '<p>Disable the new server group and ensure that the previous server group is restored to its original capacity.</p>',
+  'strategy.monitored.deploySteps':
+    '<p>Monitored Deploy will scale up the new server group as specified by these per cent steps. After each step, the health of the new server group will be evaluated by the specified deployment monitor.</p>',
+  'strategy.monitored.rollback':
+    '<p>If deploy fails, disable the new server group and ensure that the previous server group is active and restored to its original capacity.</p>',
   'loadBalancers.filter.serverGroups': `
       <p>Displays all server groups configured to use the load balancer.</p>
       <p>If the server group is configured to <em>not</em> add new instances to the load balancer, it will be grayed out.</p>`,
@@ -395,7 +403,7 @@ const helpContents: { [key: string]: string } = {
   'pipeline.waitForCompletion':
     'if unchecked, marks the stage as successful right away without waiting for the pipeline to complete',
   'jenkins.waitForCompletion':
-    'if unchecked, marks the stage as successful right away without waiting for the jenkins job to complete',
+    'if unchecked, marks the stage as successful right away without waiting for the Jenkins job to complete',
   'travis.waitForCompletion':
     'if unchecked, marks the stage as successful right away without waiting for the Travis job to complete',
   'wercker.waitForCompletion':
@@ -425,11 +433,11 @@ const helpContents: { [key: string]: string } = {
   'pipeline.config.webhook.progressJsonPath':
     "JSON path to a descriptive message about the progress in the webhook's response JSON. (e.g. <samp>$.buildInfo.progress</samp>)",
   'pipeline.config.webhook.successStatuses':
-    'Comma-separated list of strings that will be considered as SUCCESS status.',
+    'Comma-separated list of strings (that will be returned in the response body in the previously defined `statusJsonPath` field) that will be considered as SUCCESS status.',
   'pipeline.config.webhook.canceledStatuses':
-    'Comma-separated list of strings that will be considered as CANCELED status.',
+    'Comma-separated list of strings (that will be returned in the response body in the previously defined `statusJsonPath` field) that will be considered as CANCELED status.',
   'pipeline.config.webhook.terminalStatuses':
-    'Comma-separated list of strings that will be considered as TERMINAL status.',
+    'Comma-separated list of strings (that will be returned in the response body in the previously defined `statusJsonPath` field) that will be considered as TERMINAL status.',
   'pipeline.config.webhook.customHeaders': 'Key-value pairs to be sent as additional headers to the service.',
   'pipeline.config.webhook.failFastCodes':
     'Comma-separated HTTP status codes (4xx or 5xx) that will cause this webhook stage to fail without retrying.',

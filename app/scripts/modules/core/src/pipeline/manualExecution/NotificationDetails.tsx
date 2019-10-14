@@ -63,16 +63,12 @@ export class NotificationDetails extends React.Component<INotificationDetailsPro
     const { values } = formik;
     return (
       <>
-        <div className={'form-group'}>
-          <label className={'col-md-4 sm-label-right'}>Notifications</label>
-          <div className="col-md-6">
-            <FormikFormField
-              name="notificationEnabled"
-              fastField={false}
-              input={props => <CheckboxInput {...props} text={'Notify me when the pipeline completes'} />}
-            />
-          </div>
-        </div>
+        <FormikFormField
+          name="notificationEnabled"
+          label="Notifications"
+          fastField={false}
+          input={props => <CheckboxInput {...props} text={'Notify me when the pipeline completes'} />}
+        />
         <div className="form-group">
           {notifications.length === 1 && (
             <div className="col-md-offset-4 col-md-6">

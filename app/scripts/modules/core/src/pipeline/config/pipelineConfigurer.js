@@ -9,20 +9,30 @@ import { ReactModal } from 'core/presentation';
 const angular = require('angular');
 
 import { OVERRIDE_REGISTRY } from 'core/overrideRegistry/override.registry';
+import { PIPELINE_CONFIG_ACTIONS } from 'core/pipeline/config/actions/pipelineConfigActions.module';
 import { PipelineConfigValidator } from './validation/PipelineConfigValidator';
 import { EXECUTION_BUILD_TITLE } from '../executionBuild/ExecutionBuildTitle';
 import { PipelineConfigService } from 'core/pipeline/config/services/PipelineConfigService';
+import { CopyStageModal } from 'core/pipeline/config/copyStage/CopyStageModal';
 import { ExecutionsTransformer } from 'core/pipeline/service/ExecutionsTransformer';
 import { EditPipelineJsonModal } from 'core/pipeline/config/actions/pipelineJson/EditPipelineJsonModal';
 import { DeletePipelineModal } from 'core/pipeline/config/actions/delete/DeletePipelineModal';
 import { DisablePipelineModal } from 'core/pipeline/config/actions/disable/DisablePipelineModal';
 import { EnablePipelineModal } from 'core/pipeline/config/actions/enable/EnablePipelineModal';
+import { LockPipelineModal } from 'core/pipeline/config/actions/lock/LockPipelineModal';
+import { UnlockPipelineModal } from 'core/pipeline/config/actions/unlock/UnlockPipelineModal';
+import { RenamePipelineModal } from 'core/pipeline/config/actions/rename/RenamePipelineModal';
+import { ShowPipelineHistoryModal } from 'core/pipeline/config/actions/history/ShowPipelineHistoryModal';
 import { ShowPipelineTemplateJsonModal } from 'core/pipeline/config/actions/templateJson/ShowPipelineTemplateJsonModal';
 import { PipelineTemplateV2Service } from 'core/pipeline';
 import { PipelineTemplateWriter } from 'core/pipeline/config/templates/PipelineTemplateWriter';
 
 module.exports = angular
-  .module('spinnaker.core.pipeline.config.pipelineConfigurer', [OVERRIDE_REGISTRY, EXECUTION_BUILD_TITLE])
+  .module('spinnaker.core.pipeline.config.pipelineConfigurer', [
+    OVERRIDE_REGISTRY,
+    PIPELINE_CONFIG_ACTIONS,
+    EXECUTION_BUILD_TITLE,
+  ])
   .directive('pipelineConfigurer', function() {
     return {
       restrict: 'E',
@@ -31,6 +41,7 @@ module.exports = angular
         application: '=',
         plan: '<',
         isTemplatedPipeline: '<',
+        isV2TemplatedPipeline: '<',
         hasDynamicSource: '<',
         templateError: '<',
       },
@@ -50,14 +61,10 @@ module.exports = angular
     '$location',
     function($scope, $uibModal, $timeout, $window, $q, $state, executionService, overrideRegistry, $location) {
       // For standard pipelines, a 'renderablePipeline' is just the pipeline config.
-      // For templated pipelines, a 'renderablePipeline' is the pipeline template plan, and '$scope.pipeline' is the template config.
+      // For both v1 and v2 templated pipelines, a 'renderablePipeline' is the pipeline template plan, and '$scope.pipeline' is the template config.
       $scope.renderablePipeline = $scope.plan || $scope.pipeline;
       // Watch for non-reference changes to renderablePipline and make them reference changes to make React happy
       $scope.$watch('renderablePipeline', (newValue, oldValue) => newValue !== oldValue && this.updatePipeline(), true);
-      this.actionsTemplateUrl = overrideRegistry.getTemplate(
-        'pipelineConfigActions',
-        require('./actions/pipelineConfigActions.html'),
-      );
 
       this.warningsPopover = require('./warnings.popover.html');
 
@@ -80,6 +87,7 @@ module.exports = angular
         section: 'triggers',
         stageIndex: 0,
         loading: false,
+        revertCount: 0,
       };
 
       $scope.viewState.loadingHistory = true;
@@ -122,17 +130,11 @@ module.exports = angular
       };
 
       this.copyExistingStage = () => {
-        $uibModal
-          .open({
-            templateUrl: require('./copyStage/copyStage.modal.html'),
-            controller: 'CopyStageModalCtrl',
-            controllerAs: 'copyStageModalCtrl',
-            resolve: {
-              application: () => $scope.application,
-              forStrategyConfig: () => $scope.pipeline.strategy,
-            },
-          })
-          .result.then(stageTemplate => ctrl.addStage(stageTemplate))
+        ReactModal.show(CopyStageModal, {
+          application: $scope.application,
+          forStrategyConfig: $scope.pipeline.strategy,
+        })
+          .then(stageTemplate => ctrl.addStage(stageTemplate))
           .catch(() => {});
       };
 
@@ -169,17 +171,9 @@ module.exports = angular
       };
 
       this.renamePipeline = () => {
-        $uibModal
-          .open({
-            templateUrl: require('./actions/rename/renamePipelineModal.html'),
-            controller: 'RenamePipelineModalCtrl',
-            controllerAs: 'renamePipelineModalCtrl',
-            resolve: {
-              pipeline: () => $scope.pipeline,
-              application: () => $scope.application,
-            },
-          })
-          .result.then(() => {
+        ReactModal.show(RenamePipelineModal, { pipeline: $scope.pipeline, application: $scope.application })
+          .then(pipelineName => {
+            $scope.pipeline.name = pipelineName;
             setOriginal($scope.pipeline);
             markDirty();
           })
@@ -231,28 +225,17 @@ module.exports = angular
 
       // Locking a pipeline persists any pending changes
       this.lockPipeline = () => {
-        $uibModal
-          .open({
-            templateUrl: require('./actions/lock/lockPipelineModal.html'),
-            controller: 'LockPipelineModalCtrl as ctrl',
-            resolve: {
-              pipeline: () => $scope.pipeline,
-            },
+        ReactModal.show(LockPipelineModal, { pipeline: $scope.pipeline })
+          .then(pipeline => {
+            $scope.pipeline.locked = pipeline.locked;
+            setOriginal($scope.pipeline);
           })
-          .result.then(() => setOriginal($scope.pipeline))
           .catch(() => {});
       };
 
       this.unlockPipeline = () => {
-        $uibModal
-          .open({
-            templateUrl: require('./actions/unlock/unlockPipelineModal.html'),
-            controller: 'unlockPipelineModalCtrl as ctrl',
-            resolve: {
-              pipeline: () => $scope.pipeline,
-            },
-          })
-          .result.then(function() {
+        ReactModal.show(UnlockPipelineModal, { pipeline: $scope.pipeline })
+          .then(() => {
             delete $scope.pipeline.locked;
             setOriginal($scope.pipeline);
           })
@@ -260,19 +243,12 @@ module.exports = angular
       };
 
       this.showHistory = () => {
-        $uibModal
-          .open({
-            templateUrl: require('./actions/history/showHistory.modal.html'),
-            controller: 'ShowHistoryCtrl',
-            controllerAs: 'ctrl',
-            size: 'lg modal-fullscreen',
-            resolve: {
-              pipelineConfigId: () => $scope.pipeline.id,
-              isStrategy: $scope.pipeline.strategy,
-              currentConfig: () => ($scope.viewState.isDirty ? JSON.parse(angular.toJson($scope.pipeline)) : null),
-            },
-          })
-          .result.then(newConfig => {
+        ReactModal.show(ShowPipelineHistoryModal, {
+          pipelineConfigId: $scope.pipeline.id,
+          isStrategy: $scope.pipeline.strategy,
+          currentConfig: $scope.viewState.isDirty ? JSON.parse(angular.toJson($scope.pipeline)) : null,
+        })
+          .then(newConfig => {
             $scope.renderablePipeline = newConfig;
             $scope.pipeline = newConfig;
             $scope.$broadcast('pipeline-json-edited');
@@ -452,8 +428,10 @@ module.exports = angular
       this.revertPipelineChanges = () => {
         $scope.$applyAsync(() => {
           const original = getOriginal();
-          $scope.pipeline = _.clone(original);
-          $scope.renderablePipeline = $scope.pipeline;
+          Object.keys($scope.pipeline).forEach(key => {
+            delete $scope.pipeline[key];
+          });
+          Object.assign($scope.pipeline, original);
 
           if ($scope.isTemplatedPipeline) {
             const originalRenderablePipeline = getOriginalRenderablePipeline();
@@ -463,6 +441,8 @@ module.exports = angular
                 delete $scope.renderablePipeline[key];
               }
             });
+          } else {
+            $scope.renderablePipeline = $scope.pipeline;
           }
 
           // if we were looking at a stage that no longer exists, move to the last stage
@@ -475,6 +455,7 @@ module.exports = angular
               this.navigateTo({ section: 'triggers' });
             }
           }
+          $scope.viewState.revertCount++;
           $scope.$broadcast('pipeline-reverted');
         });
       };
@@ -556,12 +537,20 @@ module.exports = angular
 
       //update pipeline through a callback for React
       this.updatePipelineConfig = changes => {
-        $scope.$applyAsync(() => {
-          $scope.pipeline = _.cloneDeep($scope.pipeline);
-          _.extend($scope.pipeline, changes);
+        $scope.pipeline = Object.assign(
+          $scope.pipeline,
+          $scope.isV2TemplatedPipeline
+            ? PipelineTemplateV2Service.filterInheritedConfig(Object.assign({}, changes))
+            : changes,
+        );
+
+        if ($scope.isV2TemplatedPipeline) {
+          $scope.renderablePipeline = Object.assign($scope.renderablePipeline, changes);
+        } else if (!$scope.isTemplatedPipeline) {
           $scope.renderablePipeline = $scope.pipeline;
-          markDirty();
-        });
+        }
+
+        markDirty();
       };
     },
   ]);

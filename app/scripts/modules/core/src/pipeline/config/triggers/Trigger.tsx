@@ -17,10 +17,10 @@ import {
   ReactSelectInput,
   SpinFormik,
   Tooltip,
+  ValidationMessage,
   WatchValue,
 } from 'core/presentation';
 import { Registry } from 'core/registry';
-import { ValidationMessage } from 'core/validation';
 
 import { RunAsUserInput } from './RunAsUser';
 import './Trigger.less';
@@ -35,13 +35,22 @@ export interface ITriggerProps {
   updateTrigger: (index: number, changes: { [key: string]: any }) => void;
 }
 
-export const Trigger = (props: ITriggerProps) => (
-  <SpinFormik
-    onSubmit={() => null}
-    initialValues={props.trigger}
-    render={formik => <TriggerForm {...props} formik={formik} />}
-  />
-);
+export const Trigger = (props: ITriggerProps) => {
+  function getValidateFn() {
+    const triggerType = Registry.pipeline.getTriggerTypes().find(type => type.key === props.trigger.type);
+    const validateWithContext = (values: ITrigger) => triggerType.validateFn(values, { pipeline: props.pipeline });
+    return triggerType && triggerType.validateFn ? validateWithContext : undefined;
+  }
+
+  return (
+    <SpinFormik<ITrigger>
+      onSubmit={() => null}
+      initialValues={props.trigger}
+      validate={getValidateFn()}
+      render={formik => <TriggerForm {...props} formik={formik} />}
+    />
+  );
+};
 
 const commonTriggerFields: Array<keyof ITrigger> = [
   'enabled',
@@ -103,8 +112,8 @@ function TriggerForm(triggerFormProps: ITriggerProps & { formik: FormikProps<ITr
       triggerExpectedArtifactIds.push(expectedArtifact.id);
     }
 
-    updateTriggerFields({ expectedArtifactIds: triggerExpectedArtifactIds });
     updateExpectedArtifacts(pipelineExpectedArtifacts);
+    updateTriggerFields({ expectedArtifactIds: triggerExpectedArtifactIds });
   };
 
   const showRunAsUser = SETTINGS.feature.fiatEnabled && !SETTINGS.feature.managedServiceAccounts;
@@ -158,7 +167,7 @@ function TriggerForm(triggerFormProps: ITriggerProps & { formik: FormikProps<ITr
           <FormikFormField
             name="expectedArtifactIds"
             label="Artifact Constraints"
-            help={<HelpField id="pipeline.config.expectedArtifacts" />}
+            help={<HelpField id="pipeline.config.expectedArtifact" />}
             input={props => <ReactSelectInput {...props} multi={true} options={expectedArtifactOptions} />}
           />
         )}
