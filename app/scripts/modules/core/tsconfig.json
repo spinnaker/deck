@@ -31,8 +31,7 @@
     "paths": {
       "@spinnaker/core": ["."],
       "core/*": ["*"],
-      "core": ["."],
-      "@spinnaker/amazon": ["../../amazon/lib"]
+      "core": ["."]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],

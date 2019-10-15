@@ -72,10 +72,10 @@ export class InstanceLoadBalancerHealth extends React.Component<IInstanceLoadBal
     }
 
     return (
-      <React.Fragment>
+      <>
         {healthDiv}
         {ipAddress && healthCheckPath && healthCheckLinkSpan}
-      </React.Fragment>
+      </>
     );
   }
 }
