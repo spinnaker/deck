@@ -7,11 +7,7 @@ import { react2angular } from 'react2angular';
 
 import { HelpField } from '@spinnaker/core';
 
-interface IGceAcceleratorType {
-  name: string;
-  description: string;
-  availableCardCounts: number[];
-}
+import { IGceAcceleratorType } from './gceAccelerator.service';
 
 interface IGceAcceleratorConfig {
   acceleratorType: string;
@@ -177,11 +173,6 @@ export function GceAcceleratorConfigurer({
               </td>
             </tr>
           )}
-          {regional && (
-            <tr>
-              <td colSpan={3}>Adding accelerators is not currently supported in multi-zone deployments.</td>
-            </tr>
-          )}
           {isEmpty(availableAccelerators) && !regional && !zone && (
             <tr>
               <td colSpan={3}>
@@ -189,7 +180,7 @@ export function GceAcceleratorConfigurer({
                 are limited by zone. See{' '}
                 <a href="https://cloud.google.com/compute/docs/gpus/#gpus-list" target="_blank">
                   the complete list of types in each zone
-                </a>
+                </a>{' '}
                 for more information.
               </td>
             </tr>
@@ -197,6 +188,18 @@ export function GceAcceleratorConfigurer({
           {isEmpty(availableAccelerators) && !regional && zone && (
             <tr>
               <td colSpan={3}>There are no accelerators available in the currently selected zone.</td>
+            </tr>
+          )}
+          {isEmpty(availableAccelerators) && regional && (
+            <tr>
+              <td colSpan={3}>
+                There are no accelerators available in all of the currently selected zone(s). Please explicitly select
+                only zones that each support the accelerators you would like to configure. See{' '}
+                <a href="https://cloud.google.com/compute/docs/gpus/#gpus-list" target="_blank">
+                  the complete list of types in each zone
+                </a>{' '}
+                for more information.
+              </td>
             </tr>
           )}
         </tbody>
