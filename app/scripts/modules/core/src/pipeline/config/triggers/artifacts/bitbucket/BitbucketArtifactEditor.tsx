@@ -42,21 +42,29 @@ export const BitbucketDefault: IArtifactKindConfig = {
     }
 
     private onReferenceChanged = (reference: string) => {
-      const pathRegex = new RegExp('/1.0/repositories/[^/]*/[^/]*/raw/[^/]*/(.*)$');
-      const results = pathRegex.exec(reference);
-      if (results !== null) {
-        const clonedArtifact = cloneDeep(this.props.artifact);
-        clonedArtifact.name = decodeURIComponent(results[1]);
-        clonedArtifact.reference = reference;
-        this.props.onChange(clonedArtifact);
+      const bitbucketCloudRegex = new RegExp('/1.0/repositories/[^/]*/[^/]*/raw/[^/]*/(.*)$');
+      const bitbucketServerRegex = new RegExp('/projects/[^/]*/repos/[^/]*/raw/([^?]*)');
+
+      const clonedArtifact = cloneDeep(this.props.artifact);
+      clonedArtifact.reference = reference;
+
+      let results;
+      results = bitbucketCloudRegex.exec(reference);
+      if (results === null) {
+        results = bitbucketServerRegex.exec(reference);
       }
+
+      if (results !== null) {
+        clonedArtifact.name = decodeURIComponent(results[1]);
+      }
+      this.props.onChange(clonedArtifact);
     };
 
     public render() {
       return (
-        <StageConfigField label="Object path" helpKey="pipeline.config.expectedArtifact.defaultDocker.reference">
+        <StageConfigField label="Object path" helpKey="pipeline.config.expectedArtifact.defaultBitbucket.reference">
           <SpelText
-            placeholder="gcr.io/project/image@sha256:9efcc2818c9..."
+            placeholder="https://api.bitbucket.com/repos/$ORG/$REPO/contents/$FILEPATH"
             value={this.props.artifact.reference}
             onChange={this.onReferenceChanged}
             pipeline={this.props.pipeline}

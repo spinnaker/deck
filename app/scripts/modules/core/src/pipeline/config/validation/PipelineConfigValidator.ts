@@ -1,7 +1,7 @@
 import { IPromise } from 'angular';
 import { Subject, Subscription } from 'rxjs';
 import { $log, $q } from 'ngimport';
-import { values, flatten } from 'lodash';
+import { values, flatten, isNumber } from 'lodash';
 import { FormikErrors } from 'formik';
 
 import {
@@ -93,6 +93,16 @@ export class PipelineConfigValidator {
             );
           }
         });
+      } else if (config && config.validateFn) {
+        validations.push(
+          $q<FormikErrors<IStage>>((resolve, reject) =>
+            Promise.resolve(config.validateFn(trigger, { pipeline })).then(resolve, reject),
+          ).then((errors: FormikErrors<ITrigger>) => {
+            PipelineConfigValidator.flattenValues(errors).forEach(message => {
+              pipelineValidations.push(message);
+            });
+          }),
+        );
       }
     });
     stages.forEach(stage => {
@@ -138,6 +148,13 @@ export class PipelineConfigValidator {
             }
           }),
         );
+      }
+
+      if (stage.stageTimeoutMs !== undefined && !(isNumber(stage.stageTimeoutMs) && stage.stageTimeoutMs > 0)) {
+        stageValidations.set(stage, [
+          ...(stageValidations.get(stage) || []),
+          'Stage is configured to fail after a specific amount of time, but no time is set.',
+        ]);
       }
     });
 

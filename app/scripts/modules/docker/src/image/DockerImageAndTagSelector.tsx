@@ -2,7 +2,7 @@ import * as React from 'react';
 import Select, { Option } from 'react-select';
 import { groupBy, reduce, trim, uniq } from 'lodash';
 
-import { AccountService, HelpField, IAccount, IFindImageParams, Tooltip } from '@spinnaker/core';
+import { AccountService, HelpField, IAccount, IFindImageParams, Tooltip, ValidationMessage } from '@spinnaker/core';
 
 import { DockerImageReader, IDockerImage } from './DockerImageReader';
 import { DockerImageUtils, IDockerImageParts } from './DockerImageUtils';
@@ -39,6 +39,7 @@ export interface IDockerImageAndTagSelectorProps {
 export interface IDockerImageAndTagSelectorState {
   accountOptions: Array<Option<string>>;
   switchedManualWarning: string;
+  missingFields?: string[];
   imagesLoaded: boolean;
   imagesLoading: boolean;
   organizationOptions: Array<Option<string>>;
@@ -293,6 +294,7 @@ export class DockerImageAndTagSelector extends React.Component<
       if (!tagFound) {
         missingFields.push('tag');
       }
+      newState.missingFields = missingFields;
       newState.switchedManualWarning = `Could not find ${missingFields.join(' or ')}, switched to manual entry`;
     } else if (!imageId || !imageId.includes('${')) {
       this.synchronizeChanges(
@@ -402,7 +404,7 @@ export class DockerImageAndTagSelector extends React.Component<
       const newFields = DockerImageUtils.splitImageId(this.props.imageId || '');
       this.props.onChange(newFields);
       if (this.state.switchedManualWarning) {
-        this.setState({ switchedManualWarning: undefined });
+        this.setState({ switchedManualWarning: undefined, missingFields: undefined });
       }
     }
     this.setState({ defineManually });
@@ -425,6 +427,7 @@ export class DockerImageAndTagSelector extends React.Component<
     const {
       accountOptions,
       switchedManualWarning,
+      missingFields,
       imagesLoading,
       lookupType,
       organizationOptions,
@@ -465,10 +468,19 @@ export class DockerImageAndTagSelector extends React.Component<
       <div className="sp-formItem">
         <div className="sp-formItem__left" />
         <div className="sp-formItem__right">
-          <div className="messageContainer warningMessage">
-            <i className="fa icon-alert-triangle" />
-            <div className="message">{switchedManualWarning}</div>
-          </div>
+          <ValidationMessage
+            type="warning"
+            message={
+              <>
+                {switchedManualWarning}
+                {(missingFields || []).map(f => (
+                  <div key={f}>
+                    <HelpField expand={true} id={`pipeline.config.docker.trigger.missing.${f}`} />
+                  </div>
+                ))}
+              </>
+            }
+          />
         </div>
       </div>
     ) : null;
@@ -638,15 +650,18 @@ export class DockerImageAndTagSelector extends React.Component<
                       required={true}
                     />
                   ) : (
-                    <Select
-                      value={tag || ''}
-                      disabled={imagesLoading || !repository}
-                      isLoading={imagesLoading}
-                      onChange={(o: Option<string>) => this.valueChanged('tag', o ? o.value : undefined)}
-                      options={tagOptions}
-                      placeholder="No tag"
-                      required={true}
-                    />
+                    <>
+                      <Select
+                        value={tag || ''}
+                        disabled={imagesLoading || !repository}
+                        isLoading={imagesLoading}
+                        onChange={(o: Option<string>) => this.valueChanged('tag', o ? o.value : undefined)}
+                        options={tagOptions}
+                        placeholder="No tag"
+                        required={true}
+                      />
+                      <HelpField id="pipeline.config.docker.trigger.tag.additionalInfo" expand={true} />
+                    </>
                   )}
                 </span>
               </div>

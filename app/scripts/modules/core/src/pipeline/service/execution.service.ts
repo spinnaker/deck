@@ -6,7 +6,6 @@ import { API } from 'core/api/ApiService';
 import { Application } from 'core/application/application.model';
 import { ExecutionsTransformer } from 'core/pipeline/service/ExecutionsTransformer';
 import { IExecution, IExecutionStage, IExecutionStageSummary } from 'core/domain';
-import { Registry } from 'core/registry';
 import { JsonUtils } from 'core/utils';
 import { SETTINGS } from 'core/config/settings';
 import { ApplicationDataSource } from 'core/application/service/applicationDataSource';
@@ -117,10 +116,6 @@ export class ExecutionService {
         }
         return execution;
       });
-  }
-
-  public transformExecution(application: Application, execution: IExecution): void {
-    ExecutionsTransformer.transformExecution(application, execution);
   }
 
   public transformExecutions(application: Application, executions: IExecution[], currentData: IExecution[] = []): void {
@@ -438,18 +433,6 @@ export class ExecutionService {
     application.runningExecutions.dataUpdated();
   }
 
-  private calculateGraphStatusHash(execution: IExecution): string {
-    return (execution.stageSummaries || [])
-      .map(stage => {
-        const stageConfig = Registry.pipeline.getStageConfig(stage);
-        if (stageConfig && stageConfig.extraLabelLines) {
-          return [stageConfig.extraLabelLines(stage), stage.status].join('-');
-        }
-        return stage.status;
-      })
-      .join(':');
-  }
-
   public updateExecution(
     application: Application,
     updatedExecution: IExecution,
@@ -463,8 +446,7 @@ export class ExecutionService {
             updatedExecution.status !== currentExecution.status ||
             currentExecution.stringVal !== updatedExecution.stringVal
           ) {
-            this.transformExecution(application, updatedExecution);
-            updatedExecution.graphStatusHash = this.calculateGraphStatusHash(updatedExecution);
+            ExecutionsTransformer.transformExecution(application, updatedExecution);
             dataSource.data[idx] = updatedExecution;
             dataSource.dataUpdated();
           }
@@ -480,7 +462,7 @@ export class ExecutionService {
    * If this method is called multiple times, only the first call performs the fetch;
    * subsequent calls will return the promise produced by the first call.
    *
-   * This is a mutating operation.
+   * This is a mutating operation - it fills the context, outputs, and tasks on the stages of the unhydrated execution.
    * @param application the application owning the execution; needed because the stupid
    *   transformExecution requires it.
    * @param unhydrated the execution to hydrate (which may already be hydrated)
@@ -494,9 +476,22 @@ export class ExecutionService {
       return Promise.resolve(unhydrated);
     }
     const executionHydrator = this.getExecution(unhydrated.id).then(hydrated => {
-      this.transformExecution(application, hydrated);
-      Object.assign(unhydrated, hydrated);
-      unhydrated.graphStatusHash = this.calculateGraphStatusHash(unhydrated);
+      ExecutionsTransformer.transformExecution(application, hydrated);
+      unhydrated.stages.forEach((s, i) => {
+        // stages *should* be in the same order, so getting the hydrated one by index should be fine.
+        // worth verifying, though, and, if not, find the stage by id (which makes this an O(n^2) operation instead of O(n))
+        const hydratedStage =
+          hydrated.stages.length === unhydrated.stages.length && hydrated.stages[i].id === s.id
+            ? hydrated.stages[i]
+            : hydrated.stages.find(s2 => s.id === s2.id);
+        if (hydratedStage) {
+          s.context = hydratedStage.context;
+          s.outputs = hydratedStage.outputs;
+          s.tasks = hydratedStage.tasks;
+        }
+      });
+      unhydrated.hydrated = true;
+      unhydrated.graphStatusHash = hydrated.graphStatusHash;
       return unhydrated;
     });
     unhydrated.hydrator = Promise.resolve(executionHydrator);
@@ -535,7 +530,7 @@ export class ExecutionService {
       .then((data: IExecution[]) => {
         if (data) {
           if (transform && application) {
-            data.forEach((execution: IExecution) => this.transformExecution(application, execution));
+            data.forEach((execution: IExecution) => ExecutionsTransformer.transformExecution(application, execution));
           }
           return data.sort((a, b) => (b.buildTime || 0) - (a.buildTime || 0));
         }

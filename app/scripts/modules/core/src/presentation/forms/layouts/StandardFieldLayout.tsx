@@ -1,38 +1,30 @@
 import * as React from 'react';
-
-import { IValidationMessageProps, ValidationMessage } from 'core/validation';
-
-import { IFieldLayoutProps } from '../interface';
-
+import { isUndefined } from 'lodash';
+import { ValidationMessage } from '../validation';
+import { ILayoutProps } from './interface';
 import './StandardFieldLayout.css';
 
-export class StandardFieldLayout extends React.Component<IFieldLayoutProps> {
+export class StandardFieldLayout extends React.Component<ILayoutProps> {
   public render() {
-    const { label, help, input, actions, touched, validationMessage, validationStatus } = this.props;
-
-    const showLabel = !!label || !!help;
-
-    const renderMessage = (message: React.ReactNode, type: IValidationMessageProps['type']) =>
-      typeof message === 'string' ? <ValidationMessage type={type} message={message} /> : message;
-
-    const isErrorOrWarning = validationStatus === 'error' || validationStatus === 'warning';
-    const validation = isErrorOrWarning && !touched ? null : renderMessage(validationMessage, validationStatus);
+    const { label, help, input, actions, validation } = this.props;
+    const { hidden, messageNode, category } = validation;
+    const showLabel = !isUndefined(label) || !isUndefined(help);
 
     return (
       <div className="StandardFieldLayout flex-container-h baseline margin-between-lg">
         {showLabel && (
-          <div className="sm-label-right">
+          <div className="StandardFieldLayout_Label sm-label-right">
             {label} {help}
           </div>
         )}
 
         <div className="flex-grow">
-          <div className="flex-container-v">
-            <div className="flex-container-h baseline margin-between-lg">
+          <div className="flex-container-v margin-between-md">
+            <div className="flex-container-h baseline margin-between-lg StandardFieldLayout_Contents">
               {input} {actions}
             </div>
 
-            {validation}
+            {!hidden && <ValidationMessage message={messageNode} type={category} />}
           </div>
         </div>
       </div>

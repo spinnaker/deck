@@ -368,7 +368,6 @@ module.exports = angular
           viewState: {
             instanceProfile: 'custom',
             allImageSelection: null,
-            useAllImageSelection: false,
             useSimpleCapacity: true,
             usePreferredZones: true,
             listImplicitSecurityGroups: false,
@@ -394,8 +393,10 @@ module.exports = angular
         const expectedArtifacts = ExpectedArtifactService.getExpectedArtifactsAvailableToStage(currentStage, pipeline);
         return $q.when({
           viewState: {
+            pipeline,
             expectedArtifacts: expectedArtifacts,
             requiresTemplateSelection: true,
+            stage: currentStage,
           },
         });
       }
@@ -447,7 +448,6 @@ module.exports = angular
           },
           viewState: {
             allImageSelection: null,
-            useAllImageSelection: false,
             useSimpleCapacity: !serverGroup.autoscalingPolicy,
             usePreferredZones: false,
             listImplicitSecurityGroups: false,

@@ -16,6 +16,8 @@ import './ecs.help';
 import { COMMON_MODULE } from './common/common.module';
 import { ECS_SERVERGROUP_MODULE } from './serverGroup/serverGroup.module';
 import { ECS_SERVER_GROUP_LOGGING } from './serverGroup/configure/wizard/logging/logging.component';
+import { TASK_DEFINITION_REACT } from './serverGroup/configure/wizard/taskDefinition/TaskDefinition';
+import { ECS_SECURITY_GROUP_MODULE } from './securityGroup/securityGroup.module';
 
 import './logo/ecs.logo.less';
 
@@ -38,6 +40,7 @@ angular
     require('./serverGroup/configure/wizard/advancedSettings/advancedSettings.component').name,
     require('./serverGroup/configure/wizard/container/container.component').name,
     require('./serverGroup/configure/wizard/horizontalScaling/horizontalScaling.component').name,
+    TASK_DEFINITION_REACT,
     ECS_SERVER_GROUP_LOGGING,
     ECS_NETWORKING_SECTION,
     ECS_CLUSTER_READ_SERVICE,
@@ -57,7 +60,7 @@ angular
     require('./pipeline/stages/resizeAsg/ecsResizeAsgStage').name,
     require('./pipeline/stages/scaleDownCluster/ecsScaleDownClusterStage').name,
     require('./pipeline/stages/shrinkCluster/ecsShrinkClusterStage').name,
-    require('./securityGroup/securityGroup.transformer').name,
+    ECS_SECURITY_GROUP_MODULE,
     ECS_SERVERGROUP_MODULE,
   ])
   .config(function() {
@@ -80,6 +83,9 @@ angular
       },
       securityGroup: {
         transformer: 'ecsSecurityGroupTransformer',
+        reader: 'ecsSecurityGroupReader',
+        detailsTemplateUrl: require('./securityGroup/details/securityGroupDetail.html'),
+        detailsController: 'ecsSecurityGroupDetailsCtrl',
       },
     });
   });

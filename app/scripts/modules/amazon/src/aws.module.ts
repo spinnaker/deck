@@ -30,7 +30,7 @@ import { amazonServerGroupDetailsGetter } from './serverGroup/details/amazonServ
 import {
   AdvancedSettingsDetailsSection,
   AmazonInfoDetailsSection,
-  CapacityDetailsSection,
+  AmazonCapacityDetailsSection,
   HealthDetailsSection,
   LaunchConfigDetailsSection,
   LogsDetailsSection,
@@ -95,7 +95,7 @@ module(AMAZON_MODULE, [
       detailsGetter: amazonServerGroupDetailsGetter,
       detailsSections: [
         AmazonInfoDetailsSection,
-        CapacityDetailsSection,
+        AmazonCapacityDetailsSection,
         HealthDetailsSection,
         LaunchConfigDetailsSection,
         SecurityGroupsDetailsSection,
@@ -147,4 +147,10 @@ module(AMAZON_MODULE, [
   });
 });
 
-DeploymentStrategyRegistry.registerProvider('aws', ['custom', 'redblack', 'rollingpush', 'rollingredblack']);
+DeploymentStrategyRegistry.registerProvider('aws', [
+  'custom',
+  'redblack',
+  'rollingpush',
+  'rollingredblack',
+  'monitored',
+]);

@@ -1,15 +1,18 @@
 import { IController, IComponentOptions, module } from 'angular';
+import { isEmpty } from 'lodash';
 
 export interface IBaseOsOption {
   id: string;
   shortDescription?: string;
   detailedDescription: string;
   isImageFamily?: boolean;
+  displayName?: string;
 }
 
 export class BakeStageChooseOSController implements IController {
   public model: any;
   public baseOsOptions: IBaseOsOption[];
+  public onChange: () => any;
 
   public showRadioButtons = false;
 
@@ -18,9 +21,9 @@ export class BakeStageChooseOSController implements IController {
   }
 
   public getBaseOsDescription(baseOsOption: IBaseOsOption): string {
-    return baseOsOption.id + (baseOsOption.shortDescription ? ' (' + baseOsOption.shortDescription + ')' : '');
+    const baseOsName = isEmpty(baseOsOption.displayName) ? baseOsOption.id : baseOsOption.displayName;
+    return baseOsName + (baseOsOption.shortDescription ? ' (' + baseOsOption.shortDescription + ')' : '');
   }
-
   public getBaseOsDetailedDescription(baseOsOption: IBaseOsOption): string {
     return baseOsOption.detailedDescription + (baseOsOption.isImageFamily ? ' (family)' : '');
   }
@@ -30,6 +33,7 @@ const bakeStageChooseOsComponent: IComponentOptions = {
   bindings: {
     baseOsOptions: '<',
     model: '=',
+    onChange: '=',
   },
   controller: BakeStageChooseOSController,
   templateUrl: require('./bakeStageChooseOs.component.html'),

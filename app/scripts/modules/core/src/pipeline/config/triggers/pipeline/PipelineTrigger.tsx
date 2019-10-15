@@ -1,140 +1,89 @@
 import * as React from 'react';
-import Select, { Option } from 'react-select';
+import { FormikProps } from 'formik';
 
-import { Observable, Subject } from 'rxjs';
-
-import { Application, ApplicationReader } from 'core/application';
-import { BaseTrigger, PipelineConfigService } from 'core/pipeline';
-import { IPipeline, IPipelineTrigger } from 'core/domain';
-import { ChecklistInput, Omit } from 'core/presentation';
-
-type IPipelineTriggerConfig = Omit<IPipelineTrigger, 'parentExecution' | 'parentPipelineId' | 'user' | 'rebake'>;
+import { ApplicationReader } from 'core/application';
+import { IPipelineTrigger } from 'core/domain';
+import { PipelineConfigService } from 'core/pipeline';
+import { ChecklistInput, FormikFormField, ReactSelectInput, useLatestPromise } from 'core/presentation';
 
 export interface IPipelineTriggerConfigProps {
-  status: string[];
-  trigger: IPipelineTrigger;
-  application: Application;
+  formik: FormikProps<IPipelineTrigger>;
   pipelineId: string;
-  triggerUpdated: (trigger: IPipelineTriggerConfig) => void;
 }
 
-export interface IPipelineTriggerState {
-  applications: string[];
-  pipelines: IPipeline[];
-  pipelinesLoaded: boolean;
-}
+const statusOptions = ['successful', 'failed', 'canceled'];
 
-export class PipelineTrigger extends React.Component<IPipelineTriggerConfigProps, IPipelineTriggerState> {
-  private destroy$ = new Subject();
-  private statusOptions = ['successful', 'failed', 'canceled'];
+export function PipelineTrigger(pipelineTriggerProps: IPipelineTriggerConfigProps) {
+  const { formik, pipelineId } = pipelineTriggerProps;
+  const trigger = formik.values;
+  const { application } = trigger;
 
-  public state: IPipelineTriggerState = {
-    applications: [],
-    pipelines: [],
-    pipelinesLoaded: false,
-  };
+  const fetchApps = useLatestPromise(() => ApplicationReader.listApplications(), []);
 
-  public componentDidMount() {
-    Observable.fromPromise(ApplicationReader.listApplications())
-      .takeUntil(this.destroy$)
-      .subscribe(
-        applications => this.setState({ applications: applications.map(a => a.name).sort() }),
-        () => this.setState({ applications: [] }),
-      );
+  const appsLoaded = fetchApps.status === 'RESOLVED';
+  const appsLoading = fetchApps.status === 'PENDING';
+  const applications = React.useMemo(() => {
+    return appsLoaded ? fetchApps.result.map(app => app.name).sort() : [];
+  }, [appsLoaded, fetchApps.result]);
 
-    const { application, status } = this.props.trigger;
-    this.onUpdateTrigger({
-      application: application || this.props.application.name,
-      status: status || [],
-    });
+  const fetchPipelines = useLatestPromise(() => {
+    return application ? PipelineConfigService.getPipelinesForApplication(application) : null;
+  }, [application]);
 
-    this.init(application);
-  }
+  const pipelinesLoaded = fetchPipelines.status === 'RESOLVED';
+  const pipelinesLoading = fetchPipelines.status === 'PENDING';
+  const pipelines = React.useMemo(() => {
+    return pipelinesLoaded ? fetchPipelines.result.filter(p => p.id !== pipelineId) : [];
+  }, [pipelinesLoaded, pipelineId, fetchPipelines.result]);
 
-  public componentWillUnmount() {
-    this.destroy$.next();
-  }
-
-  private init = (application: string) => {
-    const { pipelineId, trigger } = this.props;
-    if (application) {
-      Observable.fromPromise(PipelineConfigService.getPipelinesForApplication(application))
-        .takeUntil(this.destroy$)
-        .subscribe(pipelines => {
-          pipelines = pipelines.filter(p => p.id !== pipelineId);
-          if (!pipelines.find(p => p.id === trigger.pipeline)) {
-            this.onUpdateTrigger({ pipeline: null });
-          }
-          this.setState({
-            pipelines,
-            pipelinesLoaded: true,
-          });
-        });
+  React.useEffect(() => {
+    if (pipelinesLoaded && !pipelines.find(p => p.id === trigger.pipeline)) {
+      formik.setFieldValue('pipeline', null);
     }
-  };
+  }, [pipelinesLoaded, trigger.pipeline, pipelines]);
 
-  private onUpdateTrigger = (update: Partial<IPipelineTriggerConfig>) => {
-    this.props.triggerUpdated &&
-      this.props.triggerUpdated({
-        ...this.props.trigger,
-        ...update,
-      });
-  };
+  return (
+    <>
+      <FormikFormField
+        name="application"
+        label="Application"
+        fastField={false}
+        required={true}
+        input={props => (
+          <ReactSelectInput
+            {...props}
+            disabled={!appsLoaded}
+            isLoading={appsLoading}
+            mode="VIRTUALIZED"
+            stringOptions={applications}
+            placeholder="None"
+          />
+        )}
+      />
 
-  private PipelineTriggerContents = () => {
-    const { application, pipeline, status } = this.props.trigger;
-    const { applications, pipelines, pipelinesLoaded } = this.state;
-    return (
-      <>
-        <div className="form-horizontal">
-          <div className="form-group">
-            <label className="col-md-3 sm-label-right">Application</label>
-            <div className="col-md-6">
-              <Select
-                className="form-control input-sm"
-                options={applications.map(j => ({ label: j, value: j }))}
-                placeholder={'None'}
-                value={application}
-                onChange={(option: Option<string>) => {
-                  const a = option.value;
-                  this.onUpdateTrigger({ application: a });
-                  this.init(a);
-                }}
-              />
-            </div>
-          </div>
-          <div className="form-group">
-            <label className="col-md-3 sm-label-right">Pipeline</label>
-            <div className="col-md-6">
-              {application && pipelinesLoaded && (
-                <Select
-                  className="form-control input-sm"
-                  onChange={(option: Option<string>) => this.onUpdateTrigger({ pipeline: option.value })}
-                  options={pipelines.map(p => ({ label: p.name, value: p.id }))}
-                  placeholder={'Select a pipeline...'}
-                  value={pipeline}
-                />
-              )}
-            </div>
-          </div>
-          <div className="form-group">
-            <label className="col-md-3 sm-label-right">Pipeline Status</label>
-            <div className="col-md-6">
-              <ChecklistInput
-                inline={true}
-                value={status}
-                stringOptions={this.statusOptions}
-                onChange={(e: React.ChangeEvent<any>) => this.onUpdateTrigger({ status: e.target.value })}
-              />
-            </div>
-          </div>
-        </div>
-      </>
-    );
-  };
+      <FormikFormField
+        name="pipeline"
+        label="Pipeline"
+        fastField={false}
+        required={true}
+        input={props => (
+          <ReactSelectInput
+            {...props}
+            disabled={!application || !pipelinesLoaded}
+            isLoading={pipelinesLoading}
+            mode="VIRTUALIZED"
+            options={pipelines.map(p => ({ label: p.name, value: p.id }))}
+            placeholder="Select a pipeline..."
+          />
+        )}
+      />
 
-  public render() {
-    const { PipelineTriggerContents } = this;
-    return <BaseTrigger {...this.props} triggerContents={<PipelineTriggerContents />} />;
-  }
+      <FormikFormField
+        name="status"
+        label="Pipeline Status"
+        required={true}
+        input={props => <ChecklistInput {...props} stringOptions={statusOptions} inline={true} />}
+      />
+    </>
+  );
 }

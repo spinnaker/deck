@@ -1,6 +1,8 @@
-import { IExecution, ITemplateInheritable } from 'core/domain';
+import { IArtifact, IExecution, ITemplateInheritable } from 'core/domain';
 
 export interface ITrigger extends ITemplateInheritable {
+  artifacts?: IArtifact[];
+  description?: string;
   enabled: boolean;
   rebake?: boolean;
   user?: string;
@@ -16,8 +18,22 @@ export interface IArtifactoryTrigger extends ITrigger {
   type: 'artifactory';
 }
 
+export interface INexusTrigger extends ITrigger {
+  nexusSearchName: string;
+  nexusRepository: string;
+  type: 'nexus';
+}
+
+export interface IDockerTrigger extends ITrigger {
+  account?: string;
+  tag?: string;
+  registry?: string;
+  repository: string;
+  organization?: string;
+}
+
 export interface IGitTrigger extends ITrigger {
-  source: string;
+  source: 'stash' | 'github' | 'bitbucket' | 'gitlab';
   secret?: string;
   project: string;
   slug: string;

@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as ReactGA from 'react-ga';
+import { UISref } from '@uirouter/react';
 import { isEqual } from 'lodash';
 import { $location } from 'ngimport';
 import { Subscription } from 'rxjs';
@@ -9,6 +10,7 @@ import { Application } from 'core/application/application.model';
 import { StageExecutionDetails } from 'core/pipeline/details/StageExecutionDetails';
 import { ExecutionStatus } from 'core/pipeline/status/ExecutionStatus';
 import { ParametersAndArtifacts } from 'core/pipeline/status/ParametersAndArtifacts';
+import { ExecutionCancellationReason } from 'core/pipeline/status/ExecutionCancellationReason';
 import { IExecution, IRestartDetails, IPipeline } from 'core/domain';
 import { IExecutionViewState, IPipelineGraphNode } from 'core/pipeline/config/graph/pipelineGraph.service';
 import { OrchestratedItemRunningTime } from './OrchestratedItemRunningTime';
@@ -262,9 +264,9 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
     ReactGA.event({ category: 'Pipeline', action: 'Execution source clicked' });
   };
 
-  private handleToggleDetails = (): void => {
+  private handleToggleDetails = (showingDetails: boolean): void => {
     ReactGA.event({ category: 'Pipeline', action: 'Execution details toggled (Details link)' });
-    this.toggleDetails();
+    showingDetails ? this.toggleDetails() : this.toggleDetails(0, 0);
   };
 
   private scrollIntoView = (forceScroll = false) => {
@@ -294,6 +296,7 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
       pipelineConfig,
     } = this.props;
     const { pipelinesUrl, restartDetails, showingDetails, sortFilter, viewState } = this.state;
+    const { $state } = ReactInjector;
 
     const accountLabels = this.props.execution.deploymentTargets.map(account => (
       <AccountTag key={account} account={account} />
@@ -337,7 +340,7 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
               {executionMarkers}
               {!execution.stageSummaries.length && (
                 <div className="text-center">
-                  No stages found.
+                  No stages found.{' '}
                   <a onClick={this.handleSourceNoStagesClick} target="_blank" href={pipelinesUrl + execution.id}>
                     Source
                   </a>
@@ -348,9 +351,22 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
               Status:{' '}
               <span className={`status execution-status execution-status-${execution.status.toLowerCase()}`}>
                 {execution.status}
+                {execution.status === 'NOT_STARTED' && execution.limitConcurrent && (
+                  <>
+                    {' ('}
+                    waiting on{' '}
+                    <UISref
+                      to={`${$state.current.name.endsWith('.execution') ? '^' : ''}.^.executions`}
+                      params={{ pipeline: execution.name, status: 'RUNNING' }}
+                    >
+                      <a>RUNNING</a>
+                    </UISref>{' '}
+                    executions)
+                  </>
+                )}
               </span>
               {execution.cancellationReason && (
-                <Tooltip value={execution.cancellationReason}>
+                <Tooltip value="See Cancellation Reason below for additional details.">
                   <span className="glyphicon glyphicon-info-sign" />
                 </Tooltip>
               )}
@@ -384,21 +400,19 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
                 </button>
               </Tooltip>
             )}
+            {(!execution.isActive || application.attributes.enableRerunActiveExecutions) && this.props.onRerun && (
+              <Tooltip value="Re-run execution with same parameters">
+                <button className="link" onClick={this.handleRerunClick}>
+                  <i className="fa fa-redo" />
+                </button>
+              </Tooltip>
+            )}
             {!execution.isActive && (
-              <span>
-                {this.props.onRerun && (
-                  <Tooltip value="Re-run execution with same parameters">
-                    <button className="link" onClick={this.handleRerunClick}>
-                      <i className="fa fa-redo" />
-                    </button>
-                  </Tooltip>
-                )}
-                <Tooltip value="Delete execution">
-                  <button className="link" onClick={this.handleDeleteClick}>
-                    <span className="glyphicon glyphicon-trash" />
-                  </button>
-                </Tooltip>
-              </span>
+              <Tooltip value="Delete execution">
+                <button className="link" onClick={this.handleDeleteClick}>
+                  <span className="glyphicon glyphicon-trash" />
+                </button>
+              </Tooltip>
             )}
             {execution.isActive && (
               <Tooltip value={cancelHelpText}>
@@ -409,6 +423,10 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
             )}
           </div>
 
+          {execution.cancellationReason && (
+            <ExecutionCancellationReason cancellationReason={execution.cancellationReason} />
+          )}
+
           <ParametersAndArtifacts
             execution={execution}
             expandParamsOnInit={standalone}
@@ -417,7 +435,7 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
 
           {!standalone && (
             <div className="execution-details-button">
-              <a className="clickable" onClick={this.handleToggleDetails}>
+              <a className="clickable" onClick={() => this.handleToggleDetails(showingDetails)}>
                 <span
                   className={`small glyphicon ${showingDetails ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right'}`}
                 />

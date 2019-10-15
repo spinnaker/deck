@@ -1,8 +1,10 @@
 import * as React from 'react';
+import { get } from 'lodash';
+import { Duration } from 'luxon';
 
 import { IStage } from 'core/domain';
 import { CheckboxInput, NumberInput } from 'core/presentation';
-import { HelpContentsRegistry, HelpField } from 'core/help';
+import { HelpField } from 'core/help';
 
 const { useEffect, useState } = React;
 
@@ -13,39 +15,38 @@ export interface IOverrideTimeoutConfigProps {
 }
 
 interface IStageConfig {
-  defaultTimeoutMs: number;
+  supportsCustomTimeout: boolean;
 }
+
+const toHoursAndMinutes = (ms: number) => {
+  if (!ms) {
+    return { hours: 0, minutes: 0 };
+  } else {
+    const { hours, minutes } = Duration.fromMillis(ms)
+      .shiftTo('hours', 'minutes')
+      .toObject();
+
+    return {
+      hours: Math.floor(hours),
+      minutes: Math.floor(minutes),
+    };
+  }
+};
 
 export const OverrideTimeout = (props: IOverrideTimeoutConfigProps) => {
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
   const [overrideTimeout, setOverrideTimeout] = useState(false);
-  const [configurable, setConfigurable] = useState(false);
-  const [defaults, setDefaults] = useState({ hours: 0, minutes: 0 });
-  const helpContent = HelpContentsRegistry.getHelpField('pipeline.config.timeout');
 
   useEffect(() => {
-    setOverrideValues(overrideTimeout);
-  }, [props.stageConfig]);
+    stageChanged();
+  }, [props.stageTimeoutMs]);
 
-  const setOverrideValues = (newOverrideTimeout: boolean) => {
-    const stageDefaults = props.stageConfig ? props.stageConfig.defaultTimeoutMs : null;
-    const originalOverrideTimeout = newOverrideTimeout === true;
-    const shouldRemoveOverride = originalOverrideTimeout === false;
-
-    setConfigurable(!!stageDefaults);
-    setDefaults(toHoursAndMinutes(stageDefaults));
-
-    if (shouldRemoveOverride) {
-      props.updateStageField({ stageTimeoutMs: undefined });
-    } else if (originalOverrideTimeout || props.stageTimeoutMs !== undefined) {
-      // Either vm.overrideTimeout was originally true, or forcing to true because stageTimeoutMs is defined
-      setOverrideTimeout(true);
-      props.updateStageField({
-        stageTimeoutMs: props.stageTimeoutMs || stageDefaults,
-      });
-      setHours(toHoursAndMinutes(props.stageTimeoutMs).hours);
-      setMinutes(toHoursAndMinutes(props.stageTimeoutMs).minutes);
+  const stageChanged = () => {
+    if (props.stageTimeoutMs !== undefined) {
+      enableTimeout();
+    } else {
+      clearTimeout();
     }
   };
 
@@ -56,19 +57,27 @@ export const OverrideTimeout = (props: IOverrideTimeoutConfigProps) => {
     props.updateStageField({ stageTimeoutMs: timeout });
   };
 
-  function toHoursAndMinutes(ms: number) {
-    if (!ms) {
-      return { hours: 0, minutes: 0 };
-    } else {
-      const seconds = ms / 1000;
-      return {
-        hours: Math.floor(seconds / 3600),
-        minutes: Math.floor(seconds / 60) % 60,
-      };
-    }
-  }
+  const toggleTimeout = () => {
+    overrideTimeout ? clearTimeout() : enableTimeout();
+  };
 
-  if (configurable) {
+  const clearTimeout = () => {
+    props.updateStageField({ stageTimeoutMs: undefined });
+    setOverrideTimeout(false);
+  };
+
+  const enableTimeout = () => {
+    setOverrideTimeout(true);
+    props.updateStageField({
+      stageTimeoutMs: props.stageTimeoutMs || null,
+    });
+    setHours(toHoursAndMinutes(props.stageTimeoutMs).hours);
+    setMinutes(toHoursAndMinutes(props.stageTimeoutMs).minutes);
+  };
+
+  const isConfigurable = !!get(props.stageConfig, 'supportsCustomTimeout');
+
+  if (isConfigurable) {
     return (
       <>
         <div className="form-group">
@@ -77,26 +86,12 @@ export const OverrideTimeout = (props: IOverrideTimeoutConfigProps) => {
               <CheckboxInput
                 text={
                   <>
-                    <strong> Override default timeout</strong> (
-                    {defaults.hours > 0 && (
-                      <span>
-                        {defaults.hours} {defaults.hours > 1 ? 'hours' : 'hour'}{' '}
-                      </span>
-                    )}
-                    {defaults.minutes > 0 && (
-                      <span>
-                        {defaults.minutes} {defaults.minutes > 1 ? 'minutes' : 'minute'}
-                      </span>
-                    )}
-                    )<HelpField content={helpContent} />
+                    <strong>Fail stage after a specific amount of time</strong>{' '}
+                    <HelpField id="pipeline.config.timeout" />
                   </>
                 }
                 value={overrideTimeout}
-                onChange={() => {
-                  const newOverrideTimeout = !overrideTimeout;
-                  setOverrideTimeout(newOverrideTimeout);
-                  setOverrideValues(newOverrideTimeout);
-                }}
+                onChange={toggleTimeout}
               />
             </div>
           </div>
@@ -107,24 +102,24 @@ export const OverrideTimeout = (props: IOverrideTimeoutConfigProps) => {
               <div className="col-md-9 col-md-offset-1 checkbox-padding">
                 Fail this stage if it takes longer than
                 <NumberInput
-                  inputClassName={'form-control input-sm inline-number with-space-before'}
+                  inputClassName="form-control input-sm inline-number with-space-before"
                   min={0}
                   onChange={(e: React.ChangeEvent<any>) => {
                     setHours(e.target.value);
                     synchronizeTimeout(e.target.value, minutes);
                   }}
                   value={hours}
-                />
+                />{' '}
                 hours
                 <NumberInput
-                  inputClassName={'form-control input-sm inline-number with-space-before'}
+                  inputClassName="form-control input-sm inline-number with-space-before"
                   min={0}
                   onChange={(e: React.ChangeEvent<any>) => {
                     setMinutes(e.target.value);
                     synchronizeTimeout(hours, e.target.value);
                   }}
                   value={minutes}
-                />
+                />{' '}
                 minutes to complete
               </div>
             </div>
