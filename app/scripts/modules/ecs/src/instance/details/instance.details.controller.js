@@ -2,7 +2,7 @@
 
 const angular = require('angular');
 import _ from 'lodash';
-import { getAllTargetGroups, applyHealthCheckInfoToTargetGroups } from 'amazon/instance/details/utils';
+import { getAllTargetGroups, applyHealthCheckInfoToTargetGroups } from '@spinnaker/amazon';
 
 import {
   CloudProviderRegistry,
