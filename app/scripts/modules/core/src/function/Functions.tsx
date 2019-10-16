@@ -5,8 +5,8 @@ import { Application } from 'core/application/application.model';
 import { FilterTags, IFilterTag } from 'core/filterModel/FilterTags';
 import { IFunctionGroup } from 'core/domain';
 import { FunctionState } from 'core/state';
-import { FunctionPod } from './FunctionPod';
 import { Spinner } from 'core/widgets/spinners/Spinner';
+import { FunctionGroupings } from './FunctionGroupings';
 
 export interface IFunctionsProps {
   app: Application;
@@ -78,19 +78,7 @@ export class Functions extends React.Component<IFunctionsProps, IFunctionsState>
   public render(): React.ReactElement<Functions> {
     const groupings = this.state.initialized ? (
       <div>
-        {this.state.groups.map(group => (
-          <div key={group.heading} className="rollup">
-            {group.subgroups &&
-              group.subgroups.map(subgroup => (
-                <FunctionPod
-                  key={subgroup.heading}
-                  grouping={subgroup}
-                  application={this.props.app}
-                  parentHeading={group.heading}
-                />
-              ))}
-          </div>
-        ))}
+        <FunctionGroupings app={this.props.app} groups={this.state.groups} />
         {this.state.groups.length === 0 && (
           <div>
             <h4 className="text-center">No functions match the filters you've selected.</h4>
