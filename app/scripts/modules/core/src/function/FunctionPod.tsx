@@ -3,7 +3,7 @@ import * as React from 'react';
 import { AccountTag } from 'core/account';
 import { Application } from 'core/application/application.model';
 import { IFunctionGroup } from 'core/domain';
-import { Function } from './Function';
+import Function from './Function';
 
 import './functionPod.less';
 
