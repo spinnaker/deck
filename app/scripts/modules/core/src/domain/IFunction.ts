@@ -11,10 +11,9 @@ export interface IFunctionSourceData {
 export interface IFunction extends ITaggedEntity {
   account?: string;
   cloudProvider?: string;
-  detail?: string;
+  description?: string;
   name?: string;
   functionName?: string;
-  moniker?: IMoniker;
   provider?: string;
   region?: string;
   searchField?: string;

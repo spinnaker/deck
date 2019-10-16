@@ -16,8 +16,7 @@ module.exports = angular
         return AccountService.getAccountDetails(functionDef.account).then(accountDetails => {
           return providerServiceDelegate
             .getDelegate(
-              // functionDef.provider,
-              'aws',
+              functionDef.provider ? functionDef.provider : 'aws',
               'function.transformer',
               accountDetails && accountDetails.skin,
             )
@@ -27,7 +26,9 @@ module.exports = angular
 
       function normalizeFunctionSet(functions) {
         let setNormalizers = chain(functions)
-          .filter(fn => providerServiceDelegate.hasDelegate(fn.provider, 'function.setTransformer'))
+          .filter(fn =>
+            providerServiceDelegate.hasDelegate(fn.provider ? fn.provider : 'aws', 'function.setTransformer'),
+          )
           .compact()
           .map(fn => providerServiceDelegate.getDelegate(fn.provider, 'function.setTransformer').normalizeFunctionSet)
           .uniq()

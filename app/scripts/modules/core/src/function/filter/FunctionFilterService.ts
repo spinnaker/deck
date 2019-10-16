@@ -43,7 +43,6 @@ export class FunctionFilterService {
       .filter(fn => this.checkSearchTextFilter(fn))
       .filter(fn => FilterModelService.checkAccountFilters(FunctionState.filterModel.asFilterModel)(fn))
       .filter(fn => FilterModelService.checkRegionFilters(FunctionState.filterModel.asFilterModel)(fn))
-      .filter(fn => FilterModelService.checkDetailFilters(FunctionState.filterModel.asFilterModel)(fn))
       .filter(fn => FilterModelService.checkProviderFilters(FunctionState.filterModel.asFilterModel)(fn))
       .value();
   }
