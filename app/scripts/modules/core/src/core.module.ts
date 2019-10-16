@@ -46,7 +46,7 @@ import { INSIGHT_MODULE } from './insight/insight.module';
 import { INTERCEPTOR_MODULE } from './interceptor/interceptor.module';
 import { LOAD_BALANCER_MODULE } from './loadBalancer/loadBalancer.module';
 import { FUNCTION_MODULE } from './function/function.module';
-
+import { MANAGED_RESOURCE_CONFIG } from './application/config/managedResources/ManagedResourceConfig';
 import { NETWORK_INTERCEPTOR } from './api/network.interceptor';
 
 import { PAGE_TITLE_MODULE } from './pageTitle/pageTitle.module';
@@ -116,6 +116,7 @@ module(CORE_MODULE, [
   LOAD_BALANCER_MODULE,
   FUNCTION_MODULE,
 
+  MANAGED_RESOURCE_CONFIG,
   require('./modal/modal.module').name,
 
   NETWORK_INTERCEPTOR,

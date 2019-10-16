@@ -138,15 +138,6 @@ module.exports = angular
         gceServerGroupConfigurationService
           .configureCommand(application, serverGroupCommand)
           .then(function() {
-            const mode = serverGroupCommand.viewState.mode;
-            if (mode === 'clone' || mode === 'create') {
-              if (
-                !serverGroupCommand.backingData.packageImages ||
-                !serverGroupCommand.backingData.packageImages.length
-              ) {
-                serverGroupCommand.viewState.useAllImageSelection = true;
-              }
-            }
             $scope.state.loaded = true;
             initializeSelectOptions();
             initializeWatches();
@@ -170,6 +161,8 @@ module.exports = angular
         $scope.$watch('command.network', createResultProcessor($scope.command.networkChanged));
         $scope.$watch('command.zone', createResultProcessor($scope.command.zoneChanged));
         $scope.$watch('command.viewState.instanceTypeDetails', updateStorageSettingsFromInstanceType());
+        $scope.$watch('command.selectZones', createResultProcessor($scope.command.selectZonesChanged));
+        $scope.$watch('command.distributionPolicy.zones', createResultProcessor($scope.command.selectZonesChanged));
         $scope.$watch(
           'command.viewState.customInstance',
           () => {

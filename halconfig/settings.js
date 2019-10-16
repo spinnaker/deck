@@ -2,6 +2,7 @@
 
 var gateHost = '{%gate.baseUrl%}';
 var artifactsEnabled = '{%features.artifacts%}' === 'true';
+var artifactsRewriteEnabled = '{%features.artifactsRewrite%}' === 'true';
 var atlasWebComponentsUrl = '{%canary.atlasWebComponentsUrl%}';
 var authEnabled = '{%features.auth%}' === 'true';
 var authEndpoint = gateHost + '/auth/user';
@@ -18,6 +19,7 @@ var defaultStorageAccountName = '{%canary.defaultStorageAccount%}';
 var displayTimestampsInUserLocalTime = '{%features.displayTimestampsInUserLocalTime%}' === 'true';
 var entityTagsEnabled = false;
 var fiatEnabled = '{%features.fiat%}' === 'true';
+var gceStatefulMigsEnabled = '{%features.gceStatefulMigsEnabled%}' === 'true';
 var gremlinEnabled = '{%features.gremlin%}' === 'true';
 var iapRefresherEnabled = '{%features.iapRefresherEnabled%}' === 'true';
 var infrastructureStagesEnabled = '{%features.infrastructureStages%}' === 'true';
@@ -36,6 +38,9 @@ var slack = {
 };
 var sms = {
   enabled: '{%notifications.twilio.enabled%}' === 'true',
+};
+var githubStatus = {
+  enabled: '{%notifications.github-status.enabled%}' === 'true',
 };
 var templatesEnabled = '{%canary.templatesEnabled%}' === 'true';
 var travisEnabled = '{%features.travis%}' === 'true';
@@ -148,11 +153,13 @@ window.spinnakerSettings = {
   defaultTimeZone: timezone, // see http://momentjs.com/timezone/docs/#/data-utilities/
   feature: {
     artifacts: artifactsEnabled,
+    artifactsRewrite: artifactsRewriteEnabled,
     canary: mineCanaryEnabled,
     chaosMonkey: chaosEnabled,
     displayTimestampsInUserLocalTime: displayTimestampsInUserLocalTime,
     entityTags: entityTagsEnabled,
     fiatEnabled: fiatEnabled,
+    gceStatefulMigsEnabled: gceStatefulMigsEnabled,
     gremlinEnabled: gremlinEnabled,
     iapRefresherEnabled: iapRefresherEnabled,
     infrastructureStages: infrastructureStagesEnabled,
@@ -181,9 +188,7 @@ window.spinnakerSettings = {
     email: {
       enabled: true,
     },
-    githubStatus: {
-      enabled: true,
-    },
+    githubStatus: githubStatus,
     googlechat: {
       enabled: true,
     },
@@ -219,6 +224,7 @@ window.spinnakerSettings = {
   pubsubProviders: ['google'], // TODO(joonlim): Add amazon once it is confirmed that amazon pub/sub works.
   triggerTypes: [
     'artifactory',
+    'nexus',
     'concourse',
     'cron',
     'docker',

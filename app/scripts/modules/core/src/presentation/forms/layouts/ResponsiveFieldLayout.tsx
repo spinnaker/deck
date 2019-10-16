@@ -1,51 +1,39 @@
 import * as React from 'react';
-import * as classNames from 'classnames';
 
-import { HelpContextProvider } from 'core/help';
+import { HelpTextExpandedContext } from 'core/help';
+import { ValidationMessage } from '../validation';
 
-import { IFieldLayoutProps } from '../interface';
+import { ILayoutProps } from './interface';
 
 import '../forms.less';
 
-export class ResponsiveFieldLayout extends React.Component<IFieldLayoutProps> {
-  public render() {
-    const { label, help, input, actions, validationMessage, validationStatus } = this.props;
-    const showLabel = !!label || !!help;
+export function ResponsiveFieldLayout(props: ILayoutProps) {
+  const { label, help, input, actions, validation = {} } = props;
+  const { hidden, messageNode, category } = validation;
+  const showLabel = !!label || !!help;
 
-    const helpUnder = false;
+  const helpUnder = false;
 
-    return (
-      <HelpContextProvider value={helpUnder}>
-        <div className="sp-formItem">
-          <div className="sp-formItem__left">
-            {showLabel && (
-              <div className="sp-formLabel">
-                {label} {!helpUnder && help}
-              </div>
-            )}
-          </div>
-          <div className="sp-formItem__right">
-            <div className="sp-form">
-              <span className="field">
-                {input} {actions}
-              </span>
+  return (
+    <HelpTextExpandedContext.Provider value={helpUnder}>
+      <div className="sp-formItem">
+        <div className="sp-formItem__left">
+          {showLabel && (
+            <div className="sp-formLabel">
+              {label} {!helpUnder && help}
             </div>
-            {helpUnder && help && <div className="description">{help}</div>}
-            {validationMessage && (
-              <div
-                className={classNames('messageContainer', {
-                  errorMessage: validationStatus === 'error',
-                  warningMessage: validationStatus === 'warning',
-                  previewMessage: validationStatus === 'message',
-                })}
-              >
-                <i />
-                <div className="message">{validationMessage}</div>
-              </div>
-            )}
-          </div>
+          )}
         </div>
-      </HelpContextProvider>
-    );
-  }
+        <div className="sp-formItem__right">
+          <div className="sp-form">
+            <span className="field">
+              {input} {actions}
+            </span>
+          </div>
+          {helpUnder && help && <div className="description">{help}</div>}
+          {!hidden && <ValidationMessage message={messageNode} type={category} />}
+        </div>
+      </div>
+    </HelpTextExpandedContext.Provider>
+  );
 }

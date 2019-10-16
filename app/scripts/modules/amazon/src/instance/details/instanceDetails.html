@@ -25,6 +25,12 @@
       <h3 class="horizontal middle space-between flex-1" select-on-dbl-click>
         {{instance ? instance.instanceId : instanceIdNotFound }}
       </h3>
+      <copy-to-clipboard
+        class="copy-to-clipboard copy-to-clipboard-sm"
+        text="instance.instanceId"
+        tool-tip="'Copy to clipboard'"
+      >
+      </copy-to-clipboard>
     </div>
     <div>
       <div class="actions" ng-class="{ insights: instance.insightActions.length > 0 }" ng-if="instance.placement">
@@ -39,7 +45,10 @@
           </button>
           <ul class="dropdown-menu" uib-dropdown-menu role="menu">
             <li>
-              <a href ng-click="ctrl.enableInstanceInDiscovery()" ng-if="ctrl.canRegisterWithDiscovery()"
+              <a
+                href
+                ng-click="ctrl.enableInstanceInDiscovery()"
+                ng-if="ctrl.canRegisterWithDiscovery() && !instance.serverGroupDisabled"
                 >Enable in Discovery</a
               >
             </li>
@@ -162,7 +171,10 @@
             ng-if="metric.type === 'TargetGroup' && metric.targetGroups.length"
             ng-repeat="targetGroup in metric.targetGroups"
           >
-            <instance-load-balancer-health load-balancer="targetGroup"></instance-load-balancer-health>
+            <instance-load-balancer-health
+              load-balancer="targetGroup"
+              ip-address="instance.privateIpAddress"
+            ></instance-load-balancer-health>
           </div>
         </dd>
       </dl>

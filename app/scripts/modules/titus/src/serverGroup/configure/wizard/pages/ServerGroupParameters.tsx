@@ -9,10 +9,14 @@ import {
   MapEditor,
   PlatformHealthOverride,
   Application,
+  ChecklistInput,
+  robotToHuman,
 } from '@spinnaker/core';
 
 import { ITitusServerGroupCommand } from '../../../configure/serverGroupConfiguration.service';
-import { intersection } from 'lodash';
+import { intersection, set, union } from 'lodash';
+import { enabledProcesses, processesList } from 'titus/serverGroup/details/serviceJobProcesses/ServiceJobProcesses';
+import { ITitusServiceJobProcesses } from 'titus/domain/ITitusServiceJobProcesses';
 
 export interface IServerGroupParametersProps {
   app: Application;
@@ -81,7 +85,13 @@ export class ServerGroupParameters extends React.Component<IServerGroupParameter
             <Field type="text" className="form-control input-sm no-spel" name="iamProfile" />
           </div>
           <div className="col-md-1 small" style={{ whiteSpace: 'nowrap', paddingLeft: '0px', paddingTop: '7px' }}>
-            in <AccountTag account={values.backingData.credentialsKeyedByAccount[values.credentials].awsAccount} />
+            in{' '}
+            <AccountTag
+              account={
+                values.backingData.credentialsKeyedByAccount[values.credentials] &&
+                values.backingData.credentialsKeyedByAccount[values.credentials].awsAccount
+              }
+            />
           </div>
         </div>
         <div className="form-group">
@@ -106,6 +116,30 @@ export class ServerGroupParameters extends React.Component<IServerGroupParameter
                 setFieldValue('migrationPolicy', { ...values.migrationPolicy, ...{ type: option.value } })
               }
               clearable={false}
+            />
+          </div>
+        </div>
+        <div className="form-group">
+          <div className="col-md-4 sm-label-right">
+            <b>Service Job Processes </b>
+          </div>
+          <div className="col-md-4">
+            <ChecklistInput
+              value={enabledProcesses(values.serviceJobProcesses)}
+              options={union(processesList, Object.keys(values.serviceJobProcesses)).map((value: string) => ({
+                value,
+                label: robotToHuman(value),
+              }))}
+              onChange={(e: React.ChangeEvent<any>) =>
+                setFieldValue(
+                  'serviceJobProcesses',
+                  union(processesList, Object.keys(values.serviceJobProcesses)).reduce(
+                    (processes: ITitusServiceJobProcesses, process: string) =>
+                      set(processes, process, e.target.value.includes(process)),
+                    {},
+                  ),
+                )
+              }
             />
           </div>
         </div>

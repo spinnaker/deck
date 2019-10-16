@@ -47,7 +47,7 @@ export class PipelineConfigService {
     const endpoint = isStrategy ? 'strategyConfigs' : 'pipelineConfigs';
     return API.one(endpoint, id)
       .all('history')
-      .withParams({ count })
+      .withParams({ limit: count })
       .getList();
   }
 
@@ -139,6 +139,7 @@ export class PipelineConfigService {
         stage !== stageToTest &&
         stageToTest.requisiteStageRefIds &&
         !downstreamIds.includes(stageToTest.refId) &&
+        stage.requisiteStageRefIds &&
         !stage.requisiteStageRefIds.includes(stageToTest.refId)
       );
     });

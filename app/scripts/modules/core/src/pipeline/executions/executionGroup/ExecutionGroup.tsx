@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as ReactGA from 'react-ga';
 import { IPromise } from 'angular';
-import { Subscription } from 'rxjs';
+import { Observable, Subject, Subscription } from 'rxjs';
 import { flatten, uniq, without } from 'lodash';
 
 import { Application } from 'core/application/application.model';
@@ -9,7 +9,14 @@ import { CollapsibleSectionStateCache } from 'core/cache';
 import { EntityNotifications } from 'core/entityTag/notifications/EntityNotifications';
 import { Execution } from '../execution/Execution';
 import { ExecutionAction } from '../executionAction/ExecutionAction';
-import { IExecution, IExecutionGroup, IExecutionTrigger, IPipeline, IPipelineCommand } from 'core/domain';
+import {
+  IExecution,
+  IExecutionGroup,
+  IExecutionTrigger,
+  IPipeline,
+  IPipelineCommand,
+  IPipelineTemplateConfigV2,
+} from 'core/domain';
 import { NextRunTag } from 'core/pipeline/triggers/NextRunTag';
 import { Popover } from 'core/presentation/Popover';
 import { ExecutionState } from 'core/state';
@@ -18,8 +25,8 @@ import { RenderWhenVisible } from 'core/utils/RenderWhenVisible';
 
 import { TriggersTag } from 'core/pipeline/triggers/TriggersTag';
 import { AccountTag } from 'core/account';
-import { ModalInjector, ReactInjector } from 'core/reactShims';
-import { PipelineTemplateV2Service } from 'core/pipeline';
+import { ReactInjector } from 'core/reactShims';
+import { ManualExecutionModal, PipelineTemplateReader, PipelineTemplateV2Service } from 'core/pipeline';
 import { Spinner } from 'core/widgets/spinners/Spinner';
 
 import './executionGroup.less';
@@ -48,6 +55,7 @@ export class ExecutionGroup extends React.PureComponent<IExecutionGroupProps, IE
   public state: IExecutionGroupState;
   private expandUpdatedSubscription: Subscription;
   private stateChangeSuccessSubscription: Subscription;
+  private destroy$ = new Subject();
 
   constructor(props: IExecutionGroupProps) {
     super(props);
@@ -128,19 +136,28 @@ export class ExecutionGroup extends React.PureComponent<IExecutionGroupProps, IE
   }
 
   public triggerPipeline(trigger: IExecutionTrigger = null, config = this.state.pipelineConfig): void {
-    ModalInjector.modalService
-      .open({
-        templateUrl: require('../../manualExecution/manualPipelineExecution.html'),
-        controller: 'ManualPipelineExecutionCtrl as vm',
-        resolve: {
-          pipeline: () => config,
-          application: () => this.props.application,
-          currentlyRunningExecutions: () => this.props.group.runningExecutions,
-          trigger: () => trigger,
-        },
-      })
-      .result.then(command => this.startPipeline(command))
-      .catch(() => {});
+    Observable.fromPromise(
+      new Promise(resolve => {
+        if (PipelineTemplateV2Service.isV2PipelineConfig(config)) {
+          PipelineTemplateReader.getPipelinePlan(config as IPipelineTemplateConfigV2)
+            .then(plan => resolve(plan))
+            .catch(() => resolve(config));
+        } else {
+          resolve(config);
+        }
+      }),
+    )
+      .takeUntil(this.destroy$)
+      .subscribe(pipeline =>
+        ManualExecutionModal.show({
+          pipeline,
+          application: this.props.application,
+          trigger: trigger,
+          currentlyRunningExecutions: this.props.group.runningExecutions,
+        })
+          .then(command => this.startPipeline(command))
+          .catch(() => {}),
+      );
   }
 
   public componentDidMount(): void {
@@ -172,6 +189,8 @@ export class ExecutionGroup extends React.PureComponent<IExecutionGroupProps, IE
     if (this.stateChangeSuccessSubscription) {
       this.stateChangeSuccessSubscription.unsubscribe();
     }
+
+    this.destroy$.next();
   }
 
   private handleHeadingClicked = (): void => {
@@ -203,6 +222,31 @@ export class ExecutionGroup extends React.PureComponent<IExecutionGroupProps, IE
     ReactGA.event({ category: 'Pipeline', action: 'Rerun pipeline button clicked', label: config.name });
     this.triggerPipeline(execution.trigger, config);
   };
+
+  private getDeploymentAccounts(): string[] {
+    return uniq(flatten<string>(this.props.group.executions.map((e: IExecution) => e.deploymentTargets)))
+      .sort()
+      .filter(a => !!a);
+  }
+
+  private renderExecutions() {
+    const { pipelineConfig } = this.state;
+    const { executions } = this.props.group;
+    const isConfigurable = !pipelineConfig || PipelineTemplateV2Service.isConfigurable(pipelineConfig);
+    return (
+      <>
+        {executions.map(execution => (
+          <Execution
+            key={execution.id}
+            execution={execution}
+            pipelineConfig={pipelineConfig}
+            application={this.props.application}
+            onRerun={pipelineConfig && isConfigurable ? this.rerunExecutionClicked : undefined}
+          />
+        ))}
+      </>
+    );
+  }
 
   public render(): React.ReactElement<ExecutionGroup> {
     const { group } = this.props;
@@ -345,30 +389,5 @@ export class ExecutionGroup extends React.PureComponent<IExecutionGroupProps, IE
         )}
       </div>
     );
-  }
-
-  private renderExecutions() {
-    const { pipelineConfig } = this.state;
-    const { executions } = this.props.group;
-    const isConfigurable = !pipelineConfig || PipelineTemplateV2Service.isConfigurable(pipelineConfig);
-    return (
-      <>
-        {executions.map(execution => (
-          <Execution
-            key={execution.id}
-            execution={execution}
-            pipelineConfig={pipelineConfig}
-            application={this.props.application}
-            onRerun={pipelineConfig && isConfigurable ? this.rerunExecutionClicked : undefined}
-          />
-        ))}
-      </>
-    );
-  }
-
-  private getDeploymentAccounts(): string[] {
-    return uniq(flatten<string>(this.props.group.executions.map((e: IExecution) => e.deploymentTargets)))
-      .sort()
-      .filter(a => !!a);
   }
 }

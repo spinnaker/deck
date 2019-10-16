@@ -1,149 +1,78 @@
 import * as React from 'react';
-import Select, { Option } from 'react-select';
+import { FormikProps } from 'formik';
 
-import { Observable, Subject } from 'rxjs';
-
-import { BaseTrigger } from 'core/pipeline';
+import { SETTINGS } from 'core/config/settings';
+import { IPubsubTrigger } from 'core/domain';
+import { MapEditorInput } from 'core/forms';
 import { HelpField } from 'core/help';
-import { IPubsubSubscription, IPubsubTrigger } from 'core/domain';
-import { MapEditor } from 'core/forms';
+
+import { FormikFormField, ReactSelectInput, useLatestPromise } from 'core/presentation';
 import { PubsubSubscriptionReader } from 'core/pubsub';
 import { Spinner } from 'core/widgets';
-import { SETTINGS } from 'core/config/settings';
 
 export interface IPubsubTriggerProps {
-  trigger: IPubsubTrigger;
+  formik: FormikProps<IPubsubTrigger>;
   triggerUpdated: (trigger: IPubsubTrigger) => void;
 }
 
-export interface IPubsubTriggerState {
-  pubsubSubscriptions: IPubsubSubscription[];
-  subscriptionsLoaded: boolean;
-}
+export function PubsubTrigger(pubsubTriggerProps: IPubsubTriggerProps) {
+  const { formik } = pubsubTriggerProps;
+  const trigger = formik.values;
+  const pubsubSystems = SETTINGS.pubsubProviders || ['google']; // TODO(joonlim): Add amazon once it is confirmed that amazon pub/sub works.
 
-export class PubsubTrigger extends React.Component<IPubsubTriggerProps, IPubsubTriggerState> {
-  private destroy$ = new Subject();
-  private pubsubSystems = SETTINGS.pubsubProviders || ['google']; // TODO(joonlim): Add amazon once it is confirmed that amazon pub/sub works.
+  const fetchSubscriptions = useLatestPromise(() => PubsubSubscriptionReader.getPubsubSubscriptions(), []);
+  const pubsubSubscriptions = fetchSubscriptions.result || [];
+  const subscriptionsLoaded = fetchSubscriptions.status === 'RESOLVED';
 
-  constructor(props: IPubsubTriggerProps) {
-    super(props);
-    this.state = {
-      pubsubSubscriptions: [],
-      subscriptionsLoaded: false,
-    };
-  }
+  const filteredPubsubSubscriptions = pubsubSubscriptions
+    .filter(subscription => subscription.pubsubSystem === trigger.pubsubSystem)
+    .map(subscription => subscription.subscriptionName);
 
-  public componentDidMount() {
-    Observable.fromPromise(PubsubSubscriptionReader.getPubsubSubscriptions())
-      .takeUntil(this.destroy$)
-      .subscribe(
-        pubsubSubscriptions => {
-          this.setState({
-            pubsubSubscriptions,
-            subscriptionsLoaded: true,
-          });
-        },
-        () => {
-          this.setState({
-            pubsubSubscriptions: [],
-            subscriptionsLoaded: true,
-          });
-        },
-      );
-  }
+  if (subscriptionsLoaded) {
+    return (
+      <>
+        <FormikFormField
+          name="pubsubSystem"
+          label="Pub/Sub System Type"
+          input={props => (
+            <ReactSelectInput {...props} placeholder="Select Pub/Sub System" stringOptions={pubsubSystems} />
+          )}
+        />
 
-  public componentWillUnmount() {
-    this.destroy$.next();
-  }
+        <FormikFormField
+          name="subscriptionName"
+          label="Subscription Name"
+          input={props => (
+            <ReactSelectInput
+              {...props}
+              placeholder="Select Pub/Sub Subscription"
+              stringOptions={filteredPubsubSubscriptions}
+            />
+          )}
+        />
 
-  private onUpdateTrigger = (update: any) => {
-    this.props.triggerUpdated &&
-      this.props.triggerUpdated({
-        ...this.props.trigger,
-        ...update,
-      });
-  };
+        <hr />
 
-  public PubSubTriggerContents = () => {
-    const { pubsubSubscriptions, subscriptionsLoaded } = this.state;
-    const { trigger } = this.props;
-    const a = trigger.attributeConstraints || {};
-    const p = trigger.payloadConstraints || {};
-    const filteredPubsubSubscriptions = pubsubSubscriptions
-      .filter(subscription => subscription.pubsubSystem === trigger.pubsubSystem)
-      .map(subscription => subscription.subscriptionName);
+        <FormikFormField
+          name="payloadConstraints"
+          label="Payload Constraints"
+          help={<HelpField id="pipeline.config.trigger.pubsub.payloadConstraints" />}
+          input={props => <MapEditorInput {...props} addButtonLabel="Add payload constraint" />}
+        />
 
-    if (subscriptionsLoaded) {
-      return (
-        <>
-          <div className="form-group">
-            <label className="col-md-3 sm-label-right">Pub/Sub System Type</label>
-            <div className="col-md-6">
-              <Select
-                className="form-control input-sm"
-                options={this.pubsubSystems.map(sys => ({ label: sys, value: sys }))}
-                onChange={(option: Option<string>) => this.onUpdateTrigger({ pubsubSystem: option.value })}
-                placeholder="Select Pub/Sub System"
-                value={trigger.pubsubSystem}
-              />
-            </div>
-          </div>
-
-          <div className="form-group">
-            <div className="col-md-3 sm-label-right">Subscription Name</div>
-            <div className="col-md-6">
-              <Select
-                className="form-control input-sm"
-                onChange={(option: Option<string>) => this.onUpdateTrigger({ subscriptionName: option.value })}
-                options={filteredPubsubSubscriptions.map(sub => ({ label: sub, value: sub }))}
-                placeholder="Select Pub/Sub Subscription"
-                value={trigger.subscriptionName}
-              />
-            </div>
-          </div>
-
-          <hr />
-
-          <div className="form-group">
-            <div className="col-md-3 sm-label-right">
-              <span>Payload Constraints </span>
-              <HelpField id="pipeline.config.trigger.pubsub.payloadConstraints" />
-            </div>
-            <div className="col-md-9">
-              <MapEditor
-                addButtonLabel="Add payload constraint"
-                model={p}
-                onChange={(payloadConstraints: any) => this.onUpdateTrigger({ payloadConstraints })}
-              />
-            </div>
-          </div>
-
-          <div className="form-group">
-            <div className="col-md-3 sm-label-right">
-              <span>Attribute Constraints </span>
-              <HelpField id="pipeline.config.trigger.pubsub.attributeConstraints" />
-            </div>
-            <div className="col-md-9">
-              <MapEditor
-                addButtonLabel="Add attribute constraint"
-                model={a}
-                onChange={(attributeConstraints: any) => this.onUpdateTrigger({ attributeConstraints })}
-              />
-            </div>
-          </div>
-        </>
-      );
-    } else {
-      return (
-        <div className="horizontal middle center" style={{ marginBottom: '250px', height: '150px' }}>
-          <Spinner size={'medium'} />
-        </div>
-      );
-    }
-  };
-
-  public render() {
-    const { PubSubTriggerContents } = this;
-    return <BaseTrigger {...this.props} triggerContents={<PubSubTriggerContents />} />;
+        <FormikFormField
+          name="attributeConstraints"
+          label="Attribute Constraints "
+          help={<HelpField id="pipeline.config.trigger.pubsub.attributeConstraints" />}
+          input={props => <MapEditorInput {...props} addButtonLabel="Add attribute constraint" />}
+        />
+      </>
+    );
+  } else {
+    return (
+      <div className="horizontal middle center" style={{ marginBottom: '250px', height: '150px' }}>
+        <Spinner size={'medium'} />
+      </div>
+    );
   }
 }

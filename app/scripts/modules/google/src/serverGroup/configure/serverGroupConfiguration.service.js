@@ -17,6 +17,8 @@ import { GCE_HEALTH_CHECK_READER } from 'google/healthCheck/healthCheck.read.ser
 import { getHealthCheckOptions } from 'google/healthCheck/healthCheckUtils';
 import { GCE_HTTP_LOAD_BALANCER_UTILS } from 'google/loadBalancer/httpLoadBalancerUtils.service';
 import { LOAD_BALANCER_SET_TRANSFORMER } from 'google/loadBalancer/loadBalancer.setTransformer';
+import { GceImageReader } from 'google/image';
+import { GceAcceleratorService } from 'google/serverGroup/configure/wizard/advancedSettings/gceAccelerator.service';
 
 module.exports = angular
   .module('spinnaker.serverGroup.configure.gce.configuration.service', [
@@ -24,7 +26,6 @@ module.exports = angular
     SECURITY_GROUP_READER,
     CACHE_INITIALIZER_SERVICE,
     LOAD_BALANCER_READ_SERVICE,
-    require('../../image/image.reader').name,
     require('../../instance/gceInstanceType.service').name,
     require('./../../instance/custom/customInstanceBuilder.gce.service').name,
     GCE_HTTP_LOAD_BALANCER_UTILS,
@@ -32,7 +33,6 @@ module.exports = angular
     require('./wizard/securityGroups/tagManager.service').name,
   ])
   .factory('gceServerGroupConfigurationService', [
-    'gceImageReader',
     'securityGroupReader',
     'gceInstanceTypeService',
     'cacheInitializer',
@@ -44,7 +44,6 @@ module.exports = angular
     'gceTagManager',
     'gceLoadBalancerSetTransformer',
     function(
-      gceImageReader,
       securityGroupReader,
       gceInstanceTypeService,
       cacheInitializer,
@@ -84,15 +83,6 @@ module.exports = angular
       ];
 
       function configureCommand(application, command) {
-        let imageLoader;
-        if (command.viewState.disableImageSelection) {
-          imageLoader = $q.when(null);
-        } else {
-          imageLoader = command.viewState.imageId
-            ? loadImagesFromImageName(command)
-            : loadImagesFromApplicationName(application, command.selectedProvider, command.credentials);
-        }
-
         return $q
           .all({
             credentialsKeyedByAccount: AccountService.getCredentialsKeyedByAccount('gce'),
@@ -100,7 +90,6 @@ module.exports = angular
             networks: NetworkReader.listNetworksByProvider('gce'),
             subnets: SubnetReader.listSubnetsByProvider('gce'),
             loadBalancers: loadBalancerReader.listLoadBalancers('gce'),
-            packageImages: imageLoader,
             allImages: loadAllImages(command.credentials),
             instanceTypes: gceInstanceTypeService.getAllTypesByRegion(),
             persistentDiskTypes: $q.when(angular.copy(persistentDiskTypes)),
@@ -153,39 +142,11 @@ module.exports = angular
           });
       }
 
-      function loadImagesFromApplicationName(application, provider, account) {
-        return gceImageReader.findImages({
-          account: account,
-          provider: provider,
-          q: application.name.replace(/_/g, '[_\\-]') + '*',
-        });
-      }
-
-      // Used to populate the image selection dropdowns in the persistent disk configurer.
       function loadAllImages(account) {
-        return gceImageReader.findImages({
+        return GceImageReader.findImages({
           account: account,
           provider: 'gce',
           q: '*',
-        });
-      }
-
-      function loadImagesFromImageName(command) {
-        command.image = command.viewState.imageId;
-
-        let packageBase = command.image.split('_')[0];
-        const parts = packageBase.split('-');
-        if (parts.length > 3) {
-          packageBase = parts.slice(0, -3).join('-');
-        }
-        if (!packageBase || packageBase.length < 3) {
-          return [{ account: command.credentials, imageName: command.image }];
-        }
-
-        return gceImageReader.findImages({
-          account: command.credentials,
-          provider: command.selectedProvider,
-          q: packageBase + '*',
         });
       }
 
@@ -296,17 +257,7 @@ module.exports = angular
 
       function configureAccelerators(command) {
         const result = { dirty: {} };
-        const { credentials, zone, backingData } = command;
-        const accountBackingData = _.get(backingData, ['credentialsKeyedByAccount', credentials], {});
-        const acceleratorMap = accountBackingData.zoneToAcceleratorTypesMap || {};
-        const acceleratorTypes = _.get(acceleratorMap, [zone, 'acceleratorTypes', 'acceleratorTypes'], []).map(a => {
-          const maxCards = _.isFinite(a.maximumCardsPerInstance) ? a.maximumCardsPerInstance : 4;
-          const availableCardCounts = [];
-          for (let i = 1; i <= maxCards; i *= 2) {
-            availableCardCounts.push(i);
-          }
-          return _.assign({}, a, { availableCardCounts });
-        });
+        const acceleratorTypes = GceAcceleratorService.getAvailableAccelerators(command);
         _.set(command, ['viewState', 'acceleratorTypes'], acceleratorTypes);
         result.dirty.acceleratorTypes = true;
         const chosenAccelerators = _.get(command, 'acceleratorConfigs', []);
@@ -346,13 +297,12 @@ module.exports = angular
       }
 
       function configureImages(command) {
+        command.image = command.viewState.imageId;
         const result = { dirty: {} };
         if (command.credentials !== command.viewState.lastImageAccount) {
           command.viewState.lastImageAccount = command.credentials;
-          const filteredImages = extractFilteredImages(command);
-          command.backingData.filtered.images = filteredImages;
           if (
-            !_.chain(filteredImages)
+            !_.chain(command.backingData.allImages)
               .find({ imageName: command.image })
               .value()
           ) {
@@ -486,13 +436,6 @@ module.exports = angular
         if (Object.keys(backendServices).length > 0) {
           command.backendServices = backendServices;
         }
-      }
-
-      function extractFilteredImages(command) {
-        return _.chain(command.backingData.packageImages)
-          .filter({ account: command.credentials })
-          .uniq()
-          .value();
       }
 
       function refreshLoadBalancers(command, skipCommandReconfiguration) {
@@ -757,6 +700,14 @@ module.exports = angular
           angular.extend(command.viewState.dirty, result.dirty);
           angular.extend(command.viewState.dirty, configureInstanceTypes(command).dirty);
           angular.extend(command.viewState.dirty, configureCpuPlatforms(command).dirty);
+          angular.extend(command.viewState.dirty, configureAccelerators(command).dirty);
+          return result;
+        };
+
+        cmd.selectZonesChanged = function selectZonesChanged(command) {
+          const result = { dirty: {} };
+          command.viewState.dirty = command.viewState.dirty || {};
+          angular.extend(command.viewState.dirty, result.dirty);
           angular.extend(command.viewState.dirty, configureAccelerators(command).dirty);
           return result;
         };

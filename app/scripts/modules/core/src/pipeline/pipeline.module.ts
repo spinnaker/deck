@@ -1,10 +1,11 @@
 import { module } from 'angular';
 
 import { APPLY_SOURCE_SERVER_GROUP_CAPACITY_STAGE } from './config/stages/applySourceServerGroupCapacity/applySourceServerGroupCapacityStage.module';
+import { EVALUATE_HEALTH_STAGE } from './config/stages/monitoreddeploy/evaluateHealthStage';
+import { NOTIFY_DEPLOY_STARTING_STAGE } from './config/stages/monitoreddeploy/notifyDeployStartingStage';
 import './config/stages/bakeManifest/bakeManifestStage';
 import { CHECK_PRECONDITIONS_STAGE_MODULE } from './config/stages/checkPreconditions/checkPreconditionsStage.module';
 import { CLONE_SERVER_GROUP_STAGE } from './config/stages/cloneServerGroup/cloneServerGroupStage.module';
-import { COPY_STAGE_MODAL_CONTROLLER } from './config/copyStage/copyStage.modal.controller';
 import './config/stages/deployService/deployServiceStage';
 import './config/stages/destroyService/destroyServiceStage';
 import { CREATE_LOAD_BALANCER_STAGE } from './config/stages/createLoadBalancer/createLoadBalancerStage.module';
@@ -48,6 +49,7 @@ import { PRODUCES_ARTIFACTS } from './config/stages/producesArtifacts/producesAr
 import { ARTIFACT_LIST } from './status/artifactList.component';
 import { PIPELINE_TEMPLATES_V2_STATES_CONFIG } from './config/templates/v2/pipelineTemplateV2.states';
 import './config/stages/googleCloudBuild/googleCloudBuildStage';
+import { STAGE_STATUS_PRECONDITION } from './config/preconditions/types/stageStatus/stageStatus.precondition.type.module';
 
 import './pipeline.less';
 import 'angular-ui-sortable';
@@ -60,8 +62,6 @@ module(PIPELINE_MODULE, [
 
   BUILD_DISPLAY_NAME_FILTER,
 
-  require('./manualExecution/manualPipelineExecution.controller').name,
-
   STAGE_FAILURE_MESSAGE_COMPONENT,
   STEP_EXECUTION_DETAILS_COMPONENT,
   STAGE_SUMMARY_COMPONENT,
@@ -70,7 +70,6 @@ module(PIPELINE_MODULE, [
   ARTIFACT_LIST,
   PIPELINE_STATES,
   require('./config/pipelineConfig.module').name,
-  COPY_STAGE_MODAL_CONTROLLER,
   GROUP_STAGE_MODULE,
   TRAVIS_STAGE_MODULE,
   WERCKER_STAGE_MODULE,
@@ -104,8 +103,11 @@ module(PIPELINE_MODULE, [
   require('./config/stages/waitForParentTasks/waitForParentTasks').name,
   CREATE_LOAD_BALANCER_STAGE,
   APPLY_SOURCE_SERVER_GROUP_CAPACITY_STAGE,
+  EVALUATE_HEALTH_STAGE,
+  NOTIFY_DEPLOY_STARTING_STAGE,
   require('./config/preconditions/preconditions.module').name,
   require('./config/preconditions/types/clusterSize/clusterSize.precondition.type.module').name,
   require('./config/preconditions/types/expression/expression.precondition.type.module').name,
   PIPELINE_TEMPLATES_V2_STATES_CONFIG,
+  STAGE_STATUS_PRECONDITION,
 ]);

@@ -3,14 +3,14 @@ import { getIn } from 'formik';
 
 import {
   CollapsibleSection,
+  errorMessage,
   ExpressionError,
   FormikForm,
   FormikFormField,
-  IFieldLayoutProps,
-  IFieldValidationStatus,
+  ILayoutProps,
+  messageMessage,
   TextInput,
 } from 'core/presentation';
-import { ValidationMessage } from 'core/validation';
 
 import { ExpressionInput, ExpressionPreview, ISpelError } from '../inputs';
 import { IFormikExpressionFieldProps } from './FormikExpressionField';
@@ -38,8 +38,8 @@ export class FormikExpressionRegexField extends React.Component<
     spelError: null,
   };
 
-  private renderRegexFields(props: IFormikExpressionRegexFieldProps, defaultExpanded: boolean) {
-    const { RegexHelp, regexName, replaceName } = props;
+  private renderRegexFields(fieldProps: IFormikExpressionRegexFieldProps, defaultExpanded: boolean) {
+    const { RegexHelp, regexName, replaceName } = fieldProps;
 
     const sectionHeading = ({ chevron }: { chevron: JSX.Element }) => (
       <span>
@@ -57,7 +57,7 @@ export class FormikExpressionRegexField extends React.Component<
       }
     };
 
-    const RegexLayout = ({ input }: IFieldLayoutProps) => <div style={{ flex: '1 1 40%' }}> {input} </div>;
+    const RegexLayout = ({ input }: ILayoutProps) => <div style={{ flex: '1 1 40%' }}> {input} </div>;
 
     return (
       <CollapsibleSection
@@ -71,12 +71,16 @@ export class FormikExpressionRegexField extends React.Component<
           <FormikFormField
             name={regexName}
             validate={validateRegexString}
-            layout={RegexLayout}
-            input={TextInput}
+            layout={props => <RegexLayout {...props} />}
+            input={props => <TextInput {...props} />}
             touched={true}
           />
           <code>/</code>
-          <FormikFormField name={replaceName} layout={RegexLayout} input={TextInput} />
+          <FormikFormField
+            name={replaceName}
+            layout={props => <RegexLayout {...props} />}
+            input={props => <TextInput {...props} />}
+          />
           <code>/g</code>
         </div>
       </CollapsibleSection>
@@ -104,7 +108,7 @@ export class FormikExpressionRegexField extends React.Component<
     }
   }
 
-  private renderFormField(validationMessage: React.ReactNode, validationStatus: IFieldValidationStatus, regex: string) {
+  private renderFormField(validationMessage: React.ReactNode, regex: string) {
     const { context, placeholder, help, label, actions } = this.props;
 
     return (
@@ -126,7 +130,6 @@ export class FormikExpressionRegexField extends React.Component<
         label={label}
         actions={actions}
         validationMessage={validationMessage}
-        validationStatus={validationStatus}
         touched={true}
       />
     );
@@ -145,17 +148,15 @@ export class FormikExpressionRegexField extends React.Component<
           const regexError = getIn(formik.errors, regexName) || getIn(formik.errors, replaceName);
 
           if (regexError) {
-            const message = <ValidationMessage type="error" message={regexError} />;
-            return this.renderFormField(message, 'error', regex);
+            return this.renderFormField(errorMessage(regexError), regex);
           } else if (spelError) {
-            const message = <ExpressionError spelError={spelError} />;
-            return this.renderFormField(message, 'error', regex);
+            return this.renderFormField(<ExpressionError spelError={spelError} />, regex);
           } else if (spelPreview) {
             const message = this.renderPreview(this.props, spelPreview, regex, replace);
-            return this.renderFormField(message, 'message', regex);
+            return this.renderFormField(message, regex);
           }
 
-          return this.renderFormField(null, 'message', regex);
+          return this.renderFormField(messageMessage(null), regex);
         }}
       />
     );

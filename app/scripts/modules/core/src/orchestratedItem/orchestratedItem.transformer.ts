@@ -39,6 +39,15 @@ export class OrchestratedItemTransformer {
       return match ? match.value : null;
     };
 
+    item.getDisplayUser = (): string => {
+      const authenticatedUser = get(item, 'execution.authentication.user', 'unknown user');
+      const user = item.getValueFor('user');
+      if (user === null || user === authenticatedUser) {
+        return authenticatedUser;
+      }
+      return `${user} (${authenticatedUser})`;
+    };
+
     item.originalStatus = item.status;
 
     Object.defineProperties(item, {
@@ -164,7 +173,7 @@ export class OrchestratedItemTransformer {
     if (generalException) {
       const errors = get(generalException, 'details.errors', []).filter(m => !!m);
       if (errors.length) {
-        return errors.join(', ');
+        return errors.join('\n\n');
       }
       if (generalException.details && generalException.details.error) {
         return generalException.details.error;

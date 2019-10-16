@@ -6,6 +6,7 @@ import { without, merge } from 'lodash';
 import { TaskMonitor } from 'core/task';
 import { NgReact } from 'core/reactShims';
 import { Spinner } from 'core/widgets';
+import { SpinFormik } from 'core/presentation';
 
 import { IModalComponentProps } from '../../presentation/ReactModal';
 import { ModalClose } from '../buttons/ModalClose';
@@ -163,10 +164,9 @@ export class WizardModal<T = {}> extends React.Component<IWizardModalProps<T>, I
       <>
         {taskMonitor && <TaskMonitorWrapper monitor={taskMonitor} />}
 
-        <Formik<T>
+        <SpinFormik<T>
           ref={this.formikRef}
           initialValues={initialValues}
-          isInitialValid={() => !(Object.keys(this.validate(initialValues)).length > 0)}
           onSubmit={closeModal}
           validate={this.validate}
           render={formik => (
@@ -183,7 +183,6 @@ export class WizardModal<T = {}> extends React.Component<IWizardModalProps<T>, I
                     <div className="col-md-3 hidden-sm hidden-xs">
                       <ul className="steps-indicator wizard-navigation">{pageLabels}</ul>
                     </div>
-
                     <div className="col-md-9 col-sm-12">
                       <div className="steps" ref={this.stepsElement} onScroll={this.handleStepsScroll}>
                         {renderPageContents()}

@@ -1,41 +1,31 @@
 import * as React from 'react';
-
-import { IValidationMessageProps, ValidationMessage } from 'core/validation';
-
-import { IFieldLayoutProps } from '../interface';
-
+import { isUndefined } from 'lodash';
+import { ValidationMessage } from '../validation';
+import { ILayoutProps } from './interface';
 import './StandardFieldLayout.css';
 
-export class StandardFieldLayout extends React.Component<IFieldLayoutProps> {
-  public render() {
-    const { label, help, input, actions, touched, validationMessage, validationStatus } = this.props;
+export function StandardFieldLayout(props: ILayoutProps) {
+  const { label, help, input, actions, validation = {} } = props;
+  const { hidden, messageNode, category } = validation;
+  const showLabel = !isUndefined(label) || !isUndefined(help);
 
-    const showLabel = !!label || !!help;
+  return (
+    <div className="StandardFieldLayout flex-container-h baseline margin-between-lg">
+      {showLabel && (
+        <div className="StandardFieldLayout_Label sm-label-right">
+          {label} {help}
+        </div>
+      )}
 
-    const renderMessage = (message: React.ReactNode, type: IValidationMessageProps['type']) =>
-      typeof message === 'string' ? <ValidationMessage type={type} message={message} /> : message;
-
-    const isErrorOrWarning = validationStatus === 'error' || validationStatus === 'warning';
-    const validation = isErrorOrWarning && !touched ? null : renderMessage(validationMessage, validationStatus);
-
-    return (
-      <div className="StandardFieldLayout flex-container-h baseline margin-between-lg">
-        {showLabel && (
-          <div className="sm-label-right">
-            {label} {help}
+      <div className="flex-grow">
+        <div className="flex-container-v margin-between-md">
+          <div className="flex-container-h baseline margin-between-lg StandardFieldLayout_Contents">
+            {input} {actions}
           </div>
-        )}
 
-        <div className="flex-grow">
-          <div className="flex-container-v">
-            <div className="flex-container-h baseline margin-between-lg">
-              {input} {actions}
-            </div>
-
-            {validation}
-          </div>
+          {!hidden && <ValidationMessage message={messageNode} type={category} />}
         </div>
       </div>
-    );
-  }
+    </div>
+  );
 }
