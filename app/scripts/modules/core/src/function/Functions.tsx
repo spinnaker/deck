@@ -99,7 +99,6 @@ export class Functions extends React.Component<IFunctionsProps, IFunctionsState>
           </div>
           <FilterTags tags={this.state.tags} tagCleared={this.tagCleared} clearFilters={this.clearFilters} />
         </div>
-
         <div className="content">{groupings}</div>
       </div>
     );
