@@ -7,22 +7,14 @@ export interface IFunctionGroupingsProps {
   app: Application;
   groups: IFunctionGroup[];
 }
-export interface IFunctionGroupingsState {
-  groups: IFunctionGroup[];
-}
-export class FunctionGroupings extends React.Component<IFunctionGroupingsProps, IFunctionGroupingsState> {
+export class FunctionGroupings extends React.Component<IFunctionGroupingsProps> {
   constructor(props: IFunctionGroupingsProps) {
     super(props);
-
-    const { groups } = props;
-    this.state = {
-      groups,
-    };
   }
   public render() {
     return (
       <div>
-        {this.state.groups.map(group => (
+        {this.props.groups.map(group => (
           <div key={group.heading} className="rollup">
             {group.subgroups &&
               group.subgroups.map(subgroup => (
