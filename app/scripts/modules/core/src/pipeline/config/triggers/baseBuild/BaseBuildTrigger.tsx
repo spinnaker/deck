@@ -34,7 +34,7 @@ export function BaseBuildTrigger(buildTriggerProps: IBaseBuildTriggerConfigProps
     }
   }, [fetchJobs.result]);
 
-  const label = buildTriggerType === 'jenkins' ? 'Controller' : 'Master';
+  const label = buildTriggerType === 'jenkins' ? 'Controller' : 'Build Service';
 
   return (
     <>
