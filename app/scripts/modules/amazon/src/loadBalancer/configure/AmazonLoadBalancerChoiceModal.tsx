@@ -9,6 +9,7 @@ import {
   noop,
   CloudProviderRegistry,
 } from '@spinnaker/core';
+import { AWSProviderSettings } from 'amazon/aws.settings';
 
 import { IAmazonLoadBalancerConfig, LoadBalancerTypes } from './LoadBalancerTypes';
 
@@ -102,6 +103,11 @@ export class AmazonLoadBalancerChoiceModal extends React.Component<
       .map(cloudProvider => this.getIncompatibility(selectedChoice, cloudProvider))
       .filter((x: ILoadBalancerIncompatibility) => x);
 
+    const hasNLBWarning =
+      selectedChoice.type === 'network' &&
+      AWSProviderSettings.createLoadBalancerWarnings &&
+      AWSProviderSettings.createLoadBalancerWarnings[selectedChoice.type];
+
     return (
       <>
         <ModalClose dismiss={this.close} />
@@ -133,6 +139,18 @@ export class AmazonLoadBalancerChoiceModal extends React.Component<
                   </div>
                 ))}
             </>
+            {hasNLBWarning && (
+              <div className="alert alert-warning">
+                <p>
+                  <i className="fa fa-exclamation-triangle" />
+                  {` Warning: There are a limited number of NLBs available and some manual steps are required to setup. Contact `}
+                  <a target="_blank" href="https://slack.com/app_redirect?channel=C0DT7CG2U">
+                    #cloudnetwork
+                  </a>
+                  {` before proceeding to discuss further.`}
+                </p>
+              </div>
+            )}
             <div className="load-balancer-description" />
           </div>
         </Modal.Body>
