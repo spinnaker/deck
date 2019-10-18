@@ -88,6 +88,23 @@ export class AmazonLoadBalancerChoiceModal extends React.Component<
     return false;
   }
 
+  // This assumes that () and [] only exist in the link markup, and satisfies the use cases of this component.
+  private parseMessageForLinks(message: string) {
+    const words = message
+      .split('[')
+      .join(')')
+      .split(')');
+    const messageWithLinks = words.map(word => {
+      if (word.indexOf('](http') !== -1) {
+        const [alias, href] = word.split('](');
+        return <a href={href}>{alias}</a>;
+      }
+      return word;
+    });
+
+    return messageWithLinks;
+  }
+
   public render() {
     const {
       app: { attributes },
@@ -103,7 +120,7 @@ export class AmazonLoadBalancerChoiceModal extends React.Component<
       .map(cloudProvider => this.getIncompatibility(selectedChoice, cloudProvider))
       .filter((x: ILoadBalancerIncompatibility) => x);
 
-    const hasNLBWarning =
+    const nlbWarning =
       selectedChoice.type === 'network' &&
       AWSProviderSettings.createLoadBalancerWarnings &&
       AWSProviderSettings.createLoadBalancerWarnings[selectedChoice.type];
@@ -139,15 +156,11 @@ export class AmazonLoadBalancerChoiceModal extends React.Component<
                   </div>
                 ))}
             </>
-            {hasNLBWarning && (
+            {Boolean(nlbWarning) && (
               <div className="alert alert-warning">
                 <p>
                   <i className="fa fa-exclamation-triangle" />
-                  {` Warning: There are a limited number of NLBs available and some manual steps are required to setup. Contact `}
-                  <a target="_blank" href="https://slack.com/app_redirect?channel=C0DT7CG2U">
-                    #cloudnetwork
-                  </a>
-                  {` before proceeding to discuss further.`}
+                  {this.parseMessageForLinks(nlbWarning)}
                 </p>
               </div>
             )}
