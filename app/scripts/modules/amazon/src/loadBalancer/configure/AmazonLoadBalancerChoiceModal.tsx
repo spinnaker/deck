@@ -120,8 +120,7 @@ export class AmazonLoadBalancerChoiceModal extends React.Component<
       .map(cloudProvider => this.getIncompatibility(selectedChoice, cloudProvider))
       .filter((x: ILoadBalancerIncompatibility) => x);
 
-    const nlbWarning =
-      selectedChoice.type === 'network' &&
+    const loadBalancerWarning =
       AWSProviderSettings.createLoadBalancerWarnings &&
       AWSProviderSettings.createLoadBalancerWarnings[selectedChoice.type];
 
@@ -156,11 +155,11 @@ export class AmazonLoadBalancerChoiceModal extends React.Component<
                   </div>
                 ))}
             </>
-            {Boolean(nlbWarning) && (
+            {Boolean(loadBalancerWarning) && (
               <div className="alert alert-warning">
                 <p>
                   <i className="fa fa-exclamation-triangle" />
-                  {this.parseMessageForLinks(nlbWarning)}
+                  {this.parseMessageForLinks(loadBalancerWarning)}
                 </p>
               </div>
             )}
