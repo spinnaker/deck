@@ -8,6 +8,7 @@ import {
   ReactModal,
   noop,
   CloudProviderRegistry,
+  Markdown,
 } from '@spinnaker/core';
 import { AWSProviderSettings } from 'amazon/aws.settings';
 
@@ -88,23 +89,6 @@ export class AmazonLoadBalancerChoiceModal extends React.Component<
     return false;
   }
 
-  // This assumes that () and [] only exist in the link markup, and satisfies the use cases of this component.
-  private parseMessageForLinks(message: string) {
-    const words = message
-      .split('[')
-      .join(')')
-      .split(')');
-    const messageWithLinks = words.map(word => {
-      if (word.indexOf('](http') !== -1) {
-        const [alias, href] = word.split('](');
-        return <a href={href}>{alias}</a>;
-      }
-      return word;
-    });
-
-    return messageWithLinks;
-  }
-
   public render() {
     const {
       app: { attributes },
@@ -155,11 +139,11 @@ export class AmazonLoadBalancerChoiceModal extends React.Component<
                   </div>
                 ))}
             </>
-            {Boolean(loadBalancerWarning) && (
+            {!!loadBalancerWarning && (
               <div className="alert alert-warning">
                 <p>
                   <i className="fa fa-exclamation-triangle" />
-                  {this.parseMessageForLinks(loadBalancerWarning)}
+                  <Markdown message={loadBalancerWarning} style={{ display: 'inline-block', marginLeft: '2px' }} />
                 </p>
               </div>
             )}
