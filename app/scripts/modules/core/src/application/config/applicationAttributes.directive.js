@@ -5,12 +5,11 @@ import { get } from 'lodash';
 const angular = require('angular');
 
 import { OVERRIDE_REGISTRY } from 'core/overrideRegistry/override.registry';
+import { ReactModal } from 'core/presentation';
+import { EditApplicationModal } from '../modal/EditApplicationModal';
 
 module.exports = angular
-  .module('spinnaker.core.application.config.attributes.directive', [
-    require('../modal/editApplication.controller.modal').name,
-    OVERRIDE_REGISTRY,
-  ])
+  .module('spinnaker.core.application.config.attributes.directive', [OVERRIDE_REGISTRY])
   .directive('applicationAttributes', [
     'overrideRegistry',
     function(overrideRegistry) {
@@ -30,9 +29,10 @@ module.exports = angular
     },
   ])
   .controller('ApplicationAttributesCtrl', [
+    '$scope',
     '$uibModal',
     'overrideRegistry',
-    function($uibModal, overrideRegistry) {
+    function($scope) {
       const cpHealthMsg = 'considers only cloud provider health when executing tasks';
       const healthOverrideMsg = 'shows a health override option for each operation';
       const setHealthMessage = () => {
@@ -88,21 +88,13 @@ module.exports = angular
       setPermissions();
 
       this.editApplication = () => {
-        $uibModal
-          .open({
-            templateUrl: overrideRegistry.getTemplate('editApplicationModal', require('../modal/editApplication.html')),
-            controller: overrideRegistry.getController('EditApplicationController'),
-            controllerAs: 'editApp',
-            resolve: {
-              application: () => {
-                return this.application;
-              },
-            },
-          })
-          .result.then(newAttributes => {
-            this.application.attributes = newAttributes;
-            setHealthMessage();
-            setPermissions();
+        ReactModal.show(EditApplicationModal, { application: this.application })
+          .then(newAttributes => {
+            $scope.$applyAsync(() => {
+              this.application.attributes = newAttributes;
+              setHealthMessage();
+              setPermissions();
+            });
           })
           .catch(() => {});
       };

@@ -27,6 +27,8 @@ import { AmazonLoadBalancerChoiceModal } from './loadBalancer/configure/AmazonLo
 import { AmazonServerGroupActions } from './serverGroup/details/AmazonServerGroupActions';
 import { amazonServerGroupDetailsGetter } from './serverGroup/details/amazonServerGroupDetailsGetter';
 
+import { AwsFields } from './applicationProviderFields/AwsFields';
+
 import {
   AdvancedSettingsDetailsSection,
   AmazonInfoDetailsSection,
@@ -143,6 +145,7 @@ module(AMAZON_MODULE, [
     },
     applicationProviderFields: {
       templateUrl: require('./applicationProviderFields/awsFields.html'),
+      component: AwsFields,
     },
   });
 });

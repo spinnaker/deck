@@ -13,6 +13,7 @@ import { GceImageReader } from './image';
 import './help/gce.help';
 
 import './logo/gce.logo.less';
+import { GceFields } from './applicationProviderFields/GceFields';
 
 // load all templates into the $templateCache
 const templates = require.context('./', true, /\.html$/);
@@ -113,6 +114,7 @@ module(GOOGLE_MODULE, [
     snapshotsEnabled: true,
     applicationProviderFields: {
       templateUrl: require('./applicationProviderFields/gceFields.html'),
+      component: GceFields,
     },
   });
 });
