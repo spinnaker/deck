@@ -88,7 +88,7 @@ export class EntityTagsReader {
     application.getDataSource('functions').data.forEach((fn: IFunction) => {
       fn.entityTags = functionTags.find(
         t =>
-          t.entityRef.entityId === (fn.name || fn.functionName) &&
+          t.entityRef.entityId === fn.functionName &&
           t.entityRef.account === fn.account &&
           t.entityRef.region === fn.region,
       );

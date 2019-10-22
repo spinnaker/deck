@@ -11,7 +11,6 @@ export interface IFunction extends ITaggedEntity {
   account?: string;
   cloudProvider?: string;
   description?: string;
-  name?: string;
   functionName?: string;
   region?: string;
   searchField?: string;
