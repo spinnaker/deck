@@ -13,7 +13,6 @@ export interface IFunction extends ITaggedEntity {
   description?: string;
   name?: string;
   functionName?: string;
-  provider?: string;
   region?: string;
   searchField?: string;
   type?: string;

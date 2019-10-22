@@ -16,13 +16,7 @@ module(FUNCTION_STATES, [APPLICATION_STATE_PROVIDER]).config([
   (applicationStateProvider: ApplicationStateProvider, stateConfigProvider: StateConfigProvider) => {
     const functionDetails: INestedState = {
       name: 'functionDetails',
-      url: '/functionDetails/:provider/:account/:region/:vpcId/:name',
-      params: {
-        vpcId: {
-          value: null,
-          squash: true,
-        },
-      },
+      url: '/functionDetails/:provider/:account/:region/:name',
       views: {
         'detail@../insight': {
           component: FunctionDetails,

@@ -21,7 +21,6 @@ export class FunctionReader {
   public loadFunctions(applicationName: string): IPromise<IFunctionSourceData[]> {
     return API.one('applications', applicationName)
       .all('functions')
-      .withParams({ region: 'us-west-2' })
       .getList()
       .then((functions: IFunctionSourceData[]) => {
         functions = this.functionTransformer.normalizeFunctionSet(functions);
@@ -48,7 +47,7 @@ export class FunctionReader {
 
   private normalizeFunction(functionDef: IFunctionSourceData): IPromise<IFunction> {
     return this.functionTransformer.normalizeFunction(functionDef).then((fn: IFunction) => {
-      fn.cloudProvider = fn.provider || fn.cloudProvider || 'aws';
+      fn.cloudProvider = fn.cloudProvider || 'aws';
       return fn;
     });
   }

@@ -1,4 +1,4 @@
-import { chain, find, forOwn, groupBy, intersection, sortBy, values } from 'lodash';
+import { chain, forOwn, groupBy, intersection, sortBy, values, Dictionary } from 'lodash';
 import { Debounce } from 'lodash-decorators';
 import { Subject } from 'rxjs';
 
@@ -47,46 +47,10 @@ export class FunctionFilterService {
       .value();
   }
 
-  private diffSubgroups(oldGroups: IFunctionGroup[], newGroups: IFunctionGroup[]): void {
-    const groupsToRemove: number[] = [];
-
-    oldGroups.forEach((oldGroup, idx) => {
-      const newGroup = find(newGroups, { heading: oldGroup.heading });
-      if (!newGroup) {
-        groupsToRemove.push(idx);
-      } else {
-        if (newGroup.functionDef) {
-          oldGroup.functionDef = newGroup.functionDef;
-        }
-
-        if (newGroup.subgroups) {
-          this.diffSubgroups(oldGroup.subgroups, newGroup.subgroups);
-        }
-      }
-    });
-    groupsToRemove.reverse().forEach(idx => {
-      oldGroups.splice(idx, 1);
-    });
-    newGroups.forEach(newGroup => {
-      const match = find(oldGroups, { heading: newGroup.heading });
-      if (!match) {
-        oldGroups.push(newGroup);
-      }
-    });
-  }
-
-  public sortGroupsByHeading(groups: IFunctionGroup[]): void {
-    this.diffSubgroups(FunctionState.filterModel.asFilterModel.groups, groups);
-
+  public sortGroupsByHeading(): void {
     // sort groups in place so Angular doesn't try to update the world
     FunctionState.filterModel.asFilterModel.groups.sort((a, b) => {
-      if (a.heading < b.heading) {
-        return -1;
-      }
-      if (a.heading > b.heading) {
-        return 1;
-      }
-      return 0;
+      return a.heading.localeCompare(b.heading);
     });
   }
 
@@ -95,22 +59,12 @@ export class FunctionFilterService {
     FunctionState.filterModel.asFilterModel.applyParamsToUrl();
   }
 
-  @Debounce(25)
-  public updateFunctionGroups(application: Application): void {
-    if (!application) {
-      application = this.lastApplication;
-      if (!this.lastApplication) {
-        return null;
-      }
-    }
-
+  public getFunctionGroups(groupedByAccount: Dictionary<IFunction[]>): IFunctionGroup[] {
     const groups: IFunctionGroup[] = [];
-    const functions = this.filterFunctionsForDisplay(application.functions.data);
-    const grouped = groupBy(functions, 'account');
-
-    forOwn(grouped, (group, account) => {
+    forOwn(groupedByAccount, (group, account) => {
       const groupedByRegion = values(groupBy(group, 'region'));
       const namesByRegion = groupedByRegion.map(g => g.map(fn => fn.functionName));
+      /** gather functions with same name but different region */
       const functionNames =
         namesByRegion.length > 1
           ? intersection(...namesByRegion).reduce<{ [key: string]: boolean }>((acc, name) => {
@@ -118,7 +72,7 @@ export class FunctionFilterService {
               return acc;
             }, {})
           : {};
-
+      /* Group by functionName:region */
       const subGroupings = groupBy(group, fn => `${fn.functionName}:${fn.region}`),
         subGroups: IFunctionGroup[] = [];
 
@@ -133,6 +87,7 @@ export class FunctionFilterService {
           });
         });
 
+        /* In case function with same name exists in a different region, heading = name(region)*/
         const heading = `${name}${functionNames[name] && region ? ` (${region})` : ''}`;
         subGroups.push({
           heading,
@@ -141,8 +96,24 @@ export class FunctionFilterService {
       });
       groups.push({ heading: account, subgroups: sortBy(subGroups, 'heading') });
     });
+    return groups;
+  }
 
-    this.sortGroupsByHeading(groups);
+  @Debounce(25)
+  public updateFunctionGroups(application: Application): void {
+    if (!application) {
+      application = this.lastApplication;
+      if (!this.lastApplication) {
+        return null;
+      }
+    }
+
+    const functions = this.filterFunctionsForDisplay(application.functions.data);
+    const grouped = groupBy(functions, 'account');
+    const groups = this.getFunctionGroups(grouped);
+
+    FunctionState.filterModel.asFilterModel.groups = groups;
+    this.sortGroupsByHeading();
     FunctionState.filterModel.asFilterModel.addTags();
     this.lastApplication = application;
     this.groupsUpdatedStream.next(groups);

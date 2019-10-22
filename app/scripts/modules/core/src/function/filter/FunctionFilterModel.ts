@@ -19,7 +19,7 @@ export class FunctionFilterModel {
 
   constructor() {
     this.asFilterModel = FilterModelService.configureFilterModel(this as any, filterModelConfig);
-    FilterModelService.registerRouterHooks(this.asFilterModel, '**.application.insight.loadBalancers.**');
+    FilterModelService.registerRouterHooks(this.asFilterModel, '**.application.insight.functions.**');
     this.asFilterModel.activate();
   }
 }
