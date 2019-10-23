@@ -47,7 +47,6 @@ export interface IFeatures {
   iapRefresherEnabled?: boolean;
   // whether stages affecting infrastructure (like "Create Load Balancer") should be enabled or not
   infrastructureStages?: boolean;
-  jobs?: boolean;
   managedPipelineTemplatesV2UI?: boolean;
   managedServiceAccounts?: boolean;
   managedResources?: boolean;
@@ -94,7 +93,6 @@ export interface ISpinnakerSettings {
   };
   checkForUpdates: boolean;
   debugEnabled: boolean;
-  defaultCategory: string;
   defaultInstancePort: number;
   defaultProviders: string[];
   defaultTimeZone: string; // see http://momentjs.com/timezone/docs/#/data-utilities/
