@@ -151,6 +151,8 @@ const helpContents: { [key: string]: string } = {
   'pipeline.config.expectedArtifact.defaultBitbucket.reference': `
       <p>The Bitbucket API file url the artifact lives under. The domain name may change if you're running your own Bitbucket server. The repository and path to files must be URL encoded.</p>
       <p>An example is <code>https://api.bitbucket.org/1.0/repositories/$ORG/$REPO/raw/$VERSION/$FILEPATH</code>. See <a href="https://www.spinnaker.io/reference/artifacts/types/bitbucket-file/#fields">our docs</a> for more info.</p>`,
+  'pipeline.config.expectedArtifact.defaultBitbucket.filepath': `
+      <p>The file path within your repo. path/to/file.yml is an example.</p>`,
   'pipeline.config.trigger.webhook.source': `
       <p>Determines the target URL required to trigger this pipeline, as well as how the payload can be transformed into artifacts.</p>
   `,
@@ -367,6 +369,8 @@ const helpContents: { [key: string]: string } = {
     '<p>Monitored Deploy will scale up the new server group as specified by these per cent steps. After each step, the health of the new server group will be evaluated by the specified deployment monitor.</p>',
   'strategy.monitored.rollback':
     '<p>If deploy fails, disable the new server group and ensure that the previous server group is active and restored to its original capacity.</p>',
+  'strategy.monitored.destroyFailedAsg':
+    '<p>If deploy fails and rollback succeeds destroys the server group that failed the deploy instead of just disabling it.</p>',
   'loadBalancers.filter.serverGroups': `
       <p>Displays all server groups configured to use the load balancer.</p>
       <p>If the server group is configured to <em>not</em> add new instances to the load balancer, it will be grayed out.</p>`,

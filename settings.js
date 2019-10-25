@@ -1,5 +1,7 @@
 'use strict';
 
+// Use environment variables when developing locqlly via 'yarn start', i.e.:
+// API_HOST=https://gate.spinnaker.mycompany.com yarn start
 var apiHost = process.env.API_HOST || 'http://localhost:8084';
 var artifactsEnabled = process.env.ARTIFACTS_ENABLED === 'true';
 var artifactsRewriteEnabled = process.env.ARTIFACTS_REWRITE_ENABLED === 'true';
@@ -51,7 +53,6 @@ window.spinnakerSettings = {
   },
   checkForUpdates: true,
   debugEnabled: debugEnabled,
-  defaultCategory: 'serverGroup',
   defaultInstancePort: 80,
   defaultProviders: ['appengine', 'aws', 'azure', 'cloudfoundry', 'dcos', 'ecs', 'gce', 'kubernetes', 'oracle'],
   defaultTimeZone: process.env.TIMEZONE || 'America/Los_Angeles', // see http://momentjs.com/timezone/docs/#/data-utilities/
@@ -72,7 +73,6 @@ window.spinnakerSettings = {
     iapRefresherEnabled: iapRefresherEnabled,
     // whether stages affecting infrastructure (like "Create Load Balancer") should be enabled or not
     infrastructureStages: infrastructureEnabled,
-    jobs: false,
     managedPipelineTemplatesV2UI: managedPipelineTemplatesV2UIEnabled,
     managedServiceAccounts: managedServiceAccountsEnabled,
     managedResources: managedResourcesEnabled,

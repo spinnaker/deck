@@ -7,30 +7,19 @@ export interface IAdditionalHelpLinks {
 }
 
 export interface IProviderSettings {
+  bakeryRegions?: string[];
   defaults: any;
   resetToOriginal?: () => void;
 }
 
 export interface INotificationSettings {
-  email: {
-    enabled: boolean;
-  };
-  bearychat: {
-    enabled: boolean;
-  };
-  googlechat: {
-    enabled: boolean;
-  };
-  sms: {
-    enabled: boolean;
-  };
-  slack: {
-    botName: string;
-    enabled: boolean;
-  };
-  githubstatus: {
-    enabled: boolean;
-  };
+  bearychat: { enabled: boolean };
+  email: { enabled: boolean };
+  githubStatus: { enabled: boolean };
+  googlechat: { enabled: boolean };
+  pubsub: { enabled: boolean };
+  slack: { botName: string; enabled: boolean };
+  sms: { enabled: boolean };
 }
 
 export interface IFeatures {
@@ -47,7 +36,6 @@ export interface IFeatures {
   iapRefresherEnabled?: boolean;
   // whether stages affecting infrastructure (like "Create Load Balancer") should be enabled or not
   infrastructureStages?: boolean;
-  jobs?: boolean;
   managedPipelineTemplatesV2UI?: boolean;
   managedServiceAccounts?: boolean;
   managedResources?: boolean;
@@ -95,7 +83,6 @@ export interface ISpinnakerSettings {
   };
   checkForUpdates: boolean;
   debugEnabled: boolean;
-  defaultCategory: string;
   defaultInstancePort: number;
   defaultProviders: string[];
   defaultTimeZone: string; // see http://momentjs.com/timezone/docs/#/data-utilities/
