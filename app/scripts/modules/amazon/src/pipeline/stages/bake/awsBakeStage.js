@@ -85,6 +85,15 @@ module.exports = angular
 
           if (!$scope.stage.baseOs && $scope.baseOsOptions && $scope.baseOsOptions.length) {
             $scope.stage.baseOs = $scope.baseOsOptions[0].id;
+          } else if (
+            $scope.stage.baseOs &&
+            !($scope.baseOsOptions || []).find(baseOs => baseOs.id === $scope.stage.baseOs)
+          ) {
+            $scope.baseOsOptions.push({
+              id: $scope.stage.baseOs,
+              detailedDescription: 'Custom',
+              vmTypes: ['hvm', 'pv'],
+            });
           }
           if (!$scope.stage.baseLabel && $scope.baseLabelOptions && $scope.baseLabelOptions.length) {
             $scope.stage.baseLabel = $scope.baseLabelOptions[0];
