@@ -55,7 +55,9 @@ module.exports = angular
 
       $scope.viewState = {
         loading: true,
-        roscoMode: SETTINGS.feature.roscoMode,
+        roscoMode:
+          SETTINGS.feature.roscoMode ||
+          (typeof SETTINGS.feature.roscoSelector === 'function' && SETTINGS.feature.roscoSelector($scope.stage)),
         minRootVolumeSize: AWSProviderSettings.minRootVolumeSize,
         showVmTypeSelector: true,
       };
