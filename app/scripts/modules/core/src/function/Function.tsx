@@ -24,7 +24,7 @@ const Function = (props: IFunctionProps) => {
         <UISrefActive class="active">
           <UISref to=".functionDetails" params={params}>
             <h6 className="clickable clickable-row horizontal middle">
-              <i className="fa icon-sitemap" />
+              <i className="fas fa-angle-up" />
               &nbsp; {(functionDef.region || '').toUpperCase()}
               <div className="flex-1">
                 <EntityNotifications

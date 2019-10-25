@@ -6,12 +6,16 @@ import { Application } from 'core/application/application.model';
 import { EntityTagsReader } from 'core/entityTag/EntityTagsReader';
 import { IFunction } from 'core/domain';
 import { FUNCTION_READ_SERVICE, FunctionReader } from 'core/function/function.read.service';
+import { SETTINGS } from 'core/config/settings';
 
 export const FUNCTION_DATA_SOURCE = 'spinnaker.core.functions.dataSource';
 module(FUNCTION_DATA_SOURCE, [FUNCTION_READ_SERVICE]).run([
   '$q',
   'functionReader',
   ($q: IQService, functionReader: FunctionReader) => {
+    if (!SETTINGS.feature.functions) {
+      return;
+    }
     const functions = (application: Application) => {
       return functionReader.loadFunctions(application.name);
     };
@@ -30,7 +34,7 @@ module(FUNCTION_DATA_SOURCE, [FUNCTION_READ_SERVICE]).run([
       sref: '.insight.functions',
       category: INFRASTRUCTURE_KEY,
       optional: true,
-      icon: 'fa fa-xs fa-fw icon-sitemap',
+      icon: 'fas fa-angle-up',
       loader: functions,
       onLoad: addFunctions,
       afterLoad: addTags,

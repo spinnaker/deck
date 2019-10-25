@@ -80,7 +80,7 @@ export class EntityTagsReader {
   }
 
   public static addTagsToFunctions(application: Application): void {
-    if (!SETTINGS.feature.entityTags) {
+    if (!SETTINGS.feature.entityTags || !SETTINGS.feature.functions) {
       return;
     }
     const allTags = application.getDataSource('entityTags').data;

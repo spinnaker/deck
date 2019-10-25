@@ -8,12 +8,15 @@ import { Functions } from 'core/function/Functions';
 
 import { FunctionDetails } from './FunctionDetails';
 import { FunctionFilters } from './filter/FunctionFilters';
-
+import { SETTINGS } from 'core/config/settings';
 export const FUNCTION_STATES = 'spinnaker.core.functions.states';
 module(FUNCTION_STATES, [APPLICATION_STATE_PROVIDER]).config([
   'applicationStateProvider',
   'stateConfigProvider',
   (applicationStateProvider: ApplicationStateProvider, stateConfigProvider: StateConfigProvider) => {
+    if (!SETTINGS.feature.functions) {
+      return;
+    }
     const functionDetails: INestedState = {
       name: 'functionDetails',
       url: '/functionDetails/:provider/:account/:region/:name',
@@ -32,7 +35,6 @@ module(FUNCTION_STATES, [APPLICATION_STATE_PROVIDER]).config([
               name: $stateParams.name,
               accountId: $stateParams.account,
               region: $stateParams.region,
-              vpcId: $stateParams.vpcId,
             };
           },
         ],

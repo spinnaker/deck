@@ -63,6 +63,7 @@ export interface IFeatures {
   wercker?: boolean;
   savePipelinesStageEnabled?: boolean;
   kustomizeEnabled?: boolean;
+  functions?: boolean;
 }
 
 export interface IDockerInsightSettings {
