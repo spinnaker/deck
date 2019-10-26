@@ -122,6 +122,12 @@ export function ShowPipelineHistoryModal(props: IShowHistoryModalProps) {
                 <div className="revision-section col-md-4">
                   <FormField
                     label="Revision"
+                    layout={({ label, input }) => (
+                      <div className="flex-container-h baseline margin-between-lg">
+                        <div className="bold">{label}</div>
+                        <div className="flex-grow">{input}</div>
+                      </div>
+                    )}
                     input={inputProps => (
                       <ReactSelectInput
                         clearable={false}
