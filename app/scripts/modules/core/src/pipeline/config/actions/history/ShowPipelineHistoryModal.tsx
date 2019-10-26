@@ -119,7 +119,7 @@ export function ShowPipelineHistoryModal(props: IShowHistoryModalProps) {
           {!loading && history.length > 1 && (
             <>
               <div className="history-header row horizontal">
-                <div className="revision-section col-md-4">
+                <div className="col-md-4">
                   <FormField
                     label="Revision"
                     layout={({ label, input }) => (
