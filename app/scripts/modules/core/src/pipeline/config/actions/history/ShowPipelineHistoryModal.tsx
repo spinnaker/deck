@@ -118,8 +118,8 @@ export function ShowPipelineHistoryModal(props: IShowHistoryModalProps) {
           )}
           {!loading && history.length > 1 && (
             <>
-              <div className="history-header row">
-                <div className="col-md-4">
+              <div className="history-header row horizontal">
+                <div className="revision-section col-md-4">
                   <FormField
                     label="Revision"
                     input={inputProps => (
@@ -133,7 +133,7 @@ export function ShowPipelineHistoryModal(props: IShowHistoryModalProps) {
                     value={version}
                   />
                 </div>
-                <div className="col-md-4">
+                <div className="diff-section col-md-4 horizontal middle">
                   <DiffSummary summary={diff.summary} />
                   {version > 0 && (
                     <button className="btn btn-sm btn-primary" onClick={restoreVersion}>
