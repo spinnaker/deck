@@ -3,7 +3,7 @@ import * as React from 'react';
 import { IFormikStageConfigInjectedProps, StageConfigField } from 'core/pipeline';
 import { StageArtifactSelectorDelegate, ArtifactTypePatterns, excludeAllTypesExcept } from 'core/artifact';
 import { IArtifact, IPipeline } from 'core/domain';
-import { TextInput } from '../../../../../presentation/forms/inputs';
+import { TextInput } from 'core/presentation';
 
 interface IBakeKustomizeConfigFormProps {
   updatePipeline: (pipeline: IPipeline) => void;
