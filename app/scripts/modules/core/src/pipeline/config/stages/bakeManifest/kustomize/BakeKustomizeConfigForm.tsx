@@ -57,7 +57,7 @@ export class BakeKustomizeConfigForm extends React.Component<
               this.props.formik.setFieldValue('inputArtifact.artifact', null);
             }}
           />
-          <StageConfigField label={'Kustomize File'} helpKey="pipeline.config.bake.manifest.kustomize.filePath">
+          <StageConfigField label="Kustomize File" helpKey="pipeline.config.bake.manifest.kustomize.filePath">
             <TextInput
               onChange={(e: React.ChangeEvent<any>) => {
                 this.props.formik.setFieldValue('kustomizeFilePath', e.target.value);
