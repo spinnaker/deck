@@ -5,7 +5,7 @@ import { ArtifactTypePatterns } from 'core/artifact';
 import { IArtifactEditorProps, IArtifactKindConfig } from 'core/domain';
 import { StageConfigField } from 'core/pipeline';
 import { SpelText } from 'core/widgets';
-import { CheckboxInput } from '../../../../../presentation/forms/inputs';
+import { CheckboxInput } from 'core/presentation';
 
 const TYPE = 'git/repo';
 
