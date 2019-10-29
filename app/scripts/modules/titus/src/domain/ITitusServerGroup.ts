@@ -5,14 +5,14 @@ import { ITitusPolicy } from './ITitusScalingPolicy';
 import { ITitusServiceJobProcesses } from './ITitusServiceJobProcesses';
 
 export interface ITitusServerGroup extends IServerGroup {
-  id?: string;
-  disruptionBudget?: IJobDisruptionBudget;
-  migrationPolicy?: { type: string };
-  image?: ITitusImage;
-  serviceJobProcesses?: ITitusServiceJobProcesses;
-  scalingPolicies?: ITitusPolicy[];
-  targetGroups?: string[];
   capacityGroup?: string;
+  disruptionBudget?: IJobDisruptionBudget;
+  id?: string;
+  image?: ITitusImage;
+  migrationPolicy?: { type: string };
+  scalingPolicies?: ITitusPolicy[];
+  serviceJobProcesses?: ITitusServiceJobProcesses;
+  targetGroups?: string[];
 }
 
 export interface ITitusImage {
