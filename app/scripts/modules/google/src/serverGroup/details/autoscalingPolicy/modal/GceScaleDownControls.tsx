@@ -14,11 +14,11 @@ enum maxReplicasUnit {
 }
 
 interface IGceScaleDownControl {
-  maxScaledDownReplicas: {
+  maxScaledDownReplicas?: {
     fixed?: number;
     percent?: number;
   };
-  timeWindowSec: number;
+  timeWindowSec?: number;
 }
 
 interface IGceAutoscalingPolicy {
@@ -35,7 +35,7 @@ const defaultScaleDownControl: IGceScaleDownControl = {
     fixed: null,
     percent: 0,
   },
-  timeWindowSec: 0,
+  timeWindowSec: 60,
 };
 
 function GceScaleDownControls({ policy, updatePolicy }: IGceScaleDownControlsProps) {
@@ -64,7 +64,7 @@ function GceScaleDownControls({ policy, updatePolicy }: IGceScaleDownControlsPro
           input={inputProps => <CheckboxInput {...inputProps} />}
           label="Enable scale-down controls"
           onChange={(e: React.ChangeEvent<any>) => {
-            updateScaleDownControl(e.target.checked ? defaultScaleDownControl : null);
+            updateScaleDownControl(e.target.checked ? defaultScaleDownControl : {});
           }}
           value={!isEmpty(policy.scaleDownControl)}
         />
@@ -113,7 +113,7 @@ function GceScaleDownControls({ policy, updatePolicy }: IGceScaleDownControlsPro
           </div>
           <div className="row">
             <FormField
-              input={inputProps => <NumberInput {...inputProps} min={0} />}
+              input={inputProps => <NumberInput {...inputProps} min={60} max={3600} />}
               label="Time window (seconds)"
               onChange={(e: React.ChangeEvent<any>) => {
                 updateScaleDownControl({
