@@ -46,10 +46,12 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
 
   private checkBetween(errors: any, object: any, fieldName: string, min: number, max: number) {
     const field = object[fieldName];
-    if (!Number.isNaN(field)) {
+    const sanitizedField = Number.parseInt(field, 10);
+
+    if (!Number.isNaN(sanitizedField)) {
       const error =
-        Validators.minValue(min)(field, robotToHuman(fieldName)) ||
-        Validators.maxValue(max)(field, robotToHuman(fieldName));
+        Validators.minValue(min)(sanitizedField, robotToHuman(fieldName)) ||
+        Validators.maxValue(max)(sanitizedField, robotToHuman(fieldName));
       if (error) {
         errors[fieldName] = error;
       }
@@ -94,6 +96,20 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
           }
         });
       }
+      ['port', 'healthCheckInterval', 'healthyThreshold', 'unhealthyThreshold'].forEach(key => {
+        const err = spelNumberCheck(targetGroup[key]);
+        if (err) {
+          tgErrors[key] = err;
+        }
+      });
+
+      if (targetGroup.healthCheckProtocol === 'TCP') {
+        const field = Number.parseInt(targetGroup.healthCheckInterval, 10);
+        if (field !== 10 && field !== 30) {
+          tgErrors.healthCheckInterval = 'TCP health checks only support 10s and 30s intervals.';
+        }
+      }
+
       this.checkBetween(tgErrors, targetGroup, 'healthCheckTimeout', 2, 60);
       this.checkBetween(tgErrors, targetGroup, 'healthCheckInterval', 5, 300);
       this.checkBetween(tgErrors, targetGroup, 'healthyThreshold', 2, 10);
