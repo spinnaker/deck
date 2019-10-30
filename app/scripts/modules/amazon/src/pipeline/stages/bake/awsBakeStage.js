@@ -55,7 +55,9 @@ module.exports = angular
 
       $scope.viewState = {
         loading: true,
-        roscoMode: SETTINGS.feature.roscoMode,
+        roscoMode:
+          SETTINGS.feature.roscoMode ||
+          (typeof SETTINGS.feature.roscoSelector === 'function' && SETTINGS.feature.roscoSelector($scope.stage)),
         minRootVolumeSize: AWSProviderSettings.minRootVolumeSize,
         showVmTypeSelector: true,
       };
@@ -85,6 +87,15 @@ module.exports = angular
 
           if (!$scope.stage.baseOs && $scope.baseOsOptions && $scope.baseOsOptions.length) {
             $scope.stage.baseOs = $scope.baseOsOptions[0].id;
+          } else if (
+            $scope.stage.baseOs &&
+            !($scope.baseOsOptions || []).find(baseOs => baseOs.id === $scope.stage.baseOs)
+          ) {
+            $scope.baseOsOptions.push({
+              id: $scope.stage.baseOs,
+              detailedDescription: 'Custom',
+              vmTypes: ['hvm', 'pv'],
+            });
           }
           if (!$scope.stage.baseLabel && $scope.baseLabelOptions && $scope.baseLabelOptions.length) {
             $scope.stage.baseLabel = $scope.baseLabelOptions[0];
@@ -96,6 +107,14 @@ module.exports = angular
           $scope.showAdvancedOptions = showAdvanced();
           $scope.viewState.loading = false;
         });
+      }
+
+      function stageUpdated() {
+        deleteEmptyProperties();
+        // Since the selector computes using stage as an input, it needs to be able to recompute roscoMode on updates
+        if (typeof SETTINGS.feature.roscoSelector === 'function') {
+          $scope.viewState.roscoMode = SETTINGS.feature.roscoSelector($scope.stage);
+        }
       }
 
       function deleteEmptyProperties() {
@@ -184,7 +203,7 @@ module.exports = angular
         }
       };
 
-      $scope.$watch('stage', deleteEmptyProperties, true);
+      $scope.$watch('stage', stageUpdated, true);
 
       initialize();
     },

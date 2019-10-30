@@ -84,7 +84,9 @@ module.exports = angular
           if (!$scope.stage.baseLabel && $scope.baseLabelOptions && $scope.baseLabelOptions.length) {
             $scope.stage.baseLabel = $scope.baseLabelOptions[0];
           }
-          $scope.viewState.roscoMode = SETTINGS.feature.roscoMode;
+          $scope.viewState.roscoMode =
+            SETTINGS.feature.roscoModeSETTINGS.feature.roscoMode ||
+            (typeof SETTINGS.feature.roscoSelector === 'function' && SETTINGS.feature.roscoSelector($scope.stage));
           $scope.showAdvancedOptions = showAdvanced();
           $scope.viewState.loading = false;
         });
@@ -99,6 +101,14 @@ module.exports = angular
           stage.baseAmi ||
           stage.accountName
         );
+      }
+
+      function stageUpdated() {
+        deleteEmptyProperties();
+        // Since the selector computes using stage as an input, it needs to be able to recompute roscoMode on updates
+        if (typeof SETTINGS.feature.roscoSelector === 'function') {
+          $scope.viewState.roscoMode = SETTINGS.feature.roscoSelector($scope.stage);
+        }
       }
 
       function deleteEmptyProperties() {
@@ -155,7 +165,7 @@ module.exports = angular
         return $scope.viewState.roscoMode || $scope.stage.varFileName;
       };
 
-      $scope.$watch('stage', deleteEmptyProperties, true);
+      $scope.$watch('stage', stageUpdated, true);
 
       initialize();
     },
