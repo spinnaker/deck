@@ -110,7 +110,20 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
         }
       }
 
-      this.checkBetween(tgErrors, targetGroup, 'healthCheckTimeout', 2, 60);
+      if (targetGroup.protocol === 'TCP' || targetGroup.protocol === 'TLS') {
+        if (targetGroup.healthCheckProtocol === 'HTTP' && Number.parseInt(targetGroup.healthCheckInterval, 10) !== 6) {
+          tgErrors.healthCheckTimeout = 'HTTP health check timeouts for TCP/TLS target groups must be 6s';
+        }
+
+        if (
+          (targetGroup.healthCheckProtocol === 'HTTPS' || targetGroup.healthCheckProtocol === 'TLS') &&
+          Number.parseInt(targetGroup.healthCheckInterval, 10) !== 10
+        ) {
+          tgErrors.healthCheckTimeout = 'HTTPS/TLS health check timeouts for TCP/TLS target groups must be 10s';
+        }
+      }
+
+      this.checkBetween(tgErrors, targetGroup, 'healthCheckTimeout', 2, 120);
       this.checkBetween(tgErrors, targetGroup, 'healthCheckInterval', 5, 300);
       this.checkBetween(tgErrors, targetGroup, 'healthyThreshold', 2, 10);
       this.checkBetween(tgErrors, targetGroup, 'unhealthyThreshold', 2, 10);
