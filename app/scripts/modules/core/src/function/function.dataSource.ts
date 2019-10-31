@@ -34,7 +34,7 @@ module(FUNCTION_DATA_SOURCE, [FUNCTION_READ_SERVICE]).run([
       sref: '.insight.functions',
       category: INFRASTRUCTURE_KEY,
       optional: true,
-      icon: 'fas fa-angle-up',
+      icon: 'fa fa-xs fa-fw fa-asterisk',
       loader: functions,
       onLoad: addFunctions,
       afterLoad: addTags,
