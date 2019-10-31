@@ -5,7 +5,6 @@ import {
   IFunction,
   Application,
   AccountTag,
-  ManagedResourceDetailsIndicator,
   IOverridableProps,
   Overrides,
 } from '@spinnaker/core';
@@ -74,7 +73,6 @@ export class AmazonFunctionDetails extends React.Component<IAmazonFunctionDetail
   public render() {
     const { app } = this.props;
     const { loading, functionDef } = this.state;
-    const func = functionDef as IAmazonFunction;
     if (loading) {
       // Don't bother computing any children if we're loading
       return <Details loading={loading} />;
@@ -122,7 +120,6 @@ export class AmazonFunctionDetails extends React.Component<IAmazonFunctionDetail
             }
           </div>
         </Details.Header>
-        {functionDef.entityTags && <ManagedResourceDetailsIndicator entityTags={[func.entityTags]} />}
         {functionDetailsSection}
       </Details>
     );
