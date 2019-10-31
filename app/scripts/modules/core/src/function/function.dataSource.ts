@@ -1,5 +1,4 @@
 import { module, IQService } from 'angular';
-
 import { ApplicationDataSourceRegistry } from 'core/application/service/ApplicationDataSourceRegistry';
 import { INFRASTRUCTURE_KEY } from 'core/application/nav/defaultCategories';
 import { Application } from 'core/application/application.model';
@@ -42,6 +41,7 @@ module(FUNCTION_DATA_SOURCE, [FUNCTION_READ_SERVICE]).run([
       credentialsField: 'account',
       regionField: 'region',
       description: 'Serverless Compute Service.',
+      defaultData: [],
     });
   },
 ]);

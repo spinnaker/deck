@@ -17,8 +17,13 @@ module.exports = angular
       const initialized = () => {
         $scope.detailsSection = $stateParams.details;
         $scope.provider = $scope.stage.context.cloudProviderType || 'gce';
-        $scope.roscoMode = SETTINGS.feature.roscoMode;
-        $scope.bakeryDetailUrl = $interpolate(SETTINGS.bakeryDetailUrl);
+        $scope.roscoMode =
+          SETTINGS.feature.roscoMode ||
+          (typeof SETTINGS.feature.roscoSelector === 'function' &&
+            SETTINGS.feature.roscoSelector($scope.stage.context));
+        $scope.bakeryDetailUrl = $interpolate(
+          $scope.roscoMode && SETTINGS.roscoDetailUrl ? SETTINGS.roscoDetailUrl : SETTINGS.bakeryDetailUrl,
+        );
       };
 
       const initialize = () => executionDetailsSectionService.synchronizeSection($scope.configSections, initialized);
