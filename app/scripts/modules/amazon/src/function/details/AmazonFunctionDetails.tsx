@@ -9,7 +9,7 @@ import {
   IOverridableProps,
   Overrides,
 } from '@spinnaker/core';
-import { IAmazonFunctionSourceData } from 'amazon/domain';
+import { IAmazonFunctionSourceData, IAmazonFunction } from 'amazon/domain';
 import { FunctionActions } from './FunctionActions';
 import { AwsReactInjector } from 'amazon/reactShims';
 
@@ -35,7 +35,7 @@ export class AmazonFunctionDetails extends React.Component<IAmazonFunctionDetail
 
   public extractFunction(): void {
     const { app, functionObj: functionFromProps } = this.props;
-    const functionDef = app.functions.data.find((test: IFunction) => {
+    const functionDef: IFunction = app.functions.data.find((test: IFunction) => {
       return (
         test.functionName === functionFromProps.functionName &&
         test.region === functionFromProps.region &&
@@ -49,7 +49,7 @@ export class AmazonFunctionDetails extends React.Component<IAmazonFunctionDetail
         .then((details: IAmazonFunctionSourceData[]) => {
           if (details.length) {
             this.setState({
-              functionDef: details[0],
+              functionDef: details[0] as IAmazonFunction,
               loading: false,
             });
           }
@@ -74,7 +74,7 @@ export class AmazonFunctionDetails extends React.Component<IAmazonFunctionDetail
   public render() {
     const { app } = this.props;
     const { loading, functionDef } = this.state;
-
+    const func = functionDef as IAmazonFunction;
     if (loading) {
       // Don't bother computing any children if we're loading
       return <Details loading={loading} />;
@@ -122,7 +122,7 @@ export class AmazonFunctionDetails extends React.Component<IAmazonFunctionDetail
             }
           </div>
         </Details.Header>
-        {functionDef.entityTags && <ManagedResourceDetailsIndicator entityTags={functionDef.entityTags} />}
+        {functionDef.entityTags && <ManagedResourceDetailsIndicator entityTags={[func.entityTags]} />}
         {functionDetailsSection}
       </Details>
     );
