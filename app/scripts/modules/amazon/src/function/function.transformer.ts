@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { AWSProviderSettings } from 'amazon/aws.settings';
 import { Application } from '@spinnaker/core';
 
@@ -78,12 +77,5 @@ export class AwsFunctionTransformer {
       },
       operation: '',
     };
-=======
-import { IAmazonFunction } from 'amazon/domain';
-
-export class AwsFunctionTransformer {
-  public normalizeFunction(functionDef: IAmazonFunction): IAmazonFunction {
-    return functionDef;
->>>>>>> upstream/master
   }
 }
