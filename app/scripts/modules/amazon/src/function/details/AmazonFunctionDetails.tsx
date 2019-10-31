@@ -1,6 +1,4 @@
 import * as React from 'react';
-import { IOverridableProps, Overrides } from 'core/overrideRegistry';
-
 import {
   Details,
   CollapsibleSection,
@@ -8,6 +6,8 @@ import {
   Application,
   AccountTag,
   ManagedResourceDetailsIndicator,
+  IOverridableProps,
+  Overrides,
 } from '@spinnaker/core';
 import { IAmazonFunctionSourceData } from 'amazon/domain';
 import { FunctionActions } from './FunctionActions';
