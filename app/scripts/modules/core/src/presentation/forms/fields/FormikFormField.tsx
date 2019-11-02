@@ -53,7 +53,7 @@ function FormikFormFieldImpl<T = any>(props: IFormikFormFieldImplProps<T>) {
   const [internalValidators, setInternalValidators] = useState([]);
   const addValidator = useCallback((v: IValidator) => setInternalValidators(list => list.concat(v)), []);
   const removeValidator = useCallback((v: IValidator) => setInternalValidators(list => list.filter(x => x !== v)), []);
-  const revalidate = () => formik.validate(formik.values);
+  const revalidate = () => formik.validateForm();
 
   const validation: IFormInputValidation = {
     touched,
