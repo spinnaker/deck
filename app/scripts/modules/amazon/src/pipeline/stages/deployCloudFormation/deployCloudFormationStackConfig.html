@@ -34,6 +34,12 @@
           <input type="text" class="form-control input-sm" ng-model="stage.roleARN" />
         </label>
       </stage-config-field>
+      <stage-config-field label="">
+        <label>
+          <input type="checkbox" ng-checked="ctrl.capabilities()" ng-click="ctrl.toggleCapabilities()" />
+          <strong>Enable CAPABILITY_NAMED_IAM</strong>
+        </label>
+      </stage-config-field>
       <stage-config-field label="Source" help-key="aws.cloudformation.source">
         <label class="sm-label-right">
           <input type="radio" ng-model="ctrl.$scope.stage.source" value="{{ctrl.textSource}}" />

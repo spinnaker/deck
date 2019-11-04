@@ -56,8 +56,20 @@ export class DeployCloudFormationStackConfigController implements IController {
     return this.$scope.stage.isChangeSet;
   }
 
+  public capabilities() {
+    return this.$scope.stage.capabilities;
+  }
+
   public toggleChangeSet() {
     this.$scope.stage.isChangeSet = !this.$scope.stage.isChangeSet;
+  }
+
+  public toggleCapabilities() {
+    if (this.$scope.stage.capabilities) {
+      delete this.$scope.stage.capabilities;
+    } else {
+      this.$scope.stage.capabilities = ['CAPABILITY_NAMED_IAM'];
+    }
   }
 
   public onStackArtifactEdited = (artifact: IArtifact) => {
