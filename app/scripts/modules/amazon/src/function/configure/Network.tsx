@@ -47,7 +47,6 @@ export class Network extends React.Component<INetworkProps, INetworkState>
   constructor(props: INetworkProps) {
     super(props);
     this.getAllVpcs();
-    // this.getAllSubnets();
   }
 
   public state: INetworkState = {

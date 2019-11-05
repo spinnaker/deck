@@ -43,7 +43,7 @@ export class FunctionWriter {
     return TaskExecutor.executeTask({
       job: [command],
       application,
-      description: `${descriptor} Function: ${command['functionName']}`,
+      description: `${descriptor} Function: ${command.functionName || ''}`,
     });
   }
 }

@@ -18,7 +18,10 @@ export interface IFunctionTagsState {
 export class FunctionTags extends React.Component<IFunctionTagsProps, IFunctionTagsState>
   implements IWizardPageComponent<IAmazonFunctionUpsertCommand> {
   private duplicateKeys = false;
-
+  constructor(props: IFunctionTagsProps) {
+    super(props);
+    this.state = { some: '' };
+  }
   public validate = () => {
     const errors = {} as any;
 
@@ -27,10 +30,6 @@ export class FunctionTags extends React.Component<IFunctionTagsProps, IFunctionT
     }
     return errors;
   };
-
-  public componentDidMount() {
-    this.setState({ some: '' });
-  }
 
   private varsChanged = (tag: string | { [key: string]: string }, duplicateKeys: boolean) => {
     this.duplicateKeys = duplicateKeys;

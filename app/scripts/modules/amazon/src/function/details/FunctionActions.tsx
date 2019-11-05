@@ -21,7 +21,9 @@ export interface IFunctionActionsState {
 export class FunctionActions extends React.Component<IFunctionActionsProps, IFunctionActionsState> {
   constructor(props: IFunctionActionsProps) {
     super(props);
+  }
 
+  public componentWillMount(): void {
     const { app, functionDef } = this.props;
     let application: Application;
 
@@ -41,9 +43,9 @@ export class FunctionActions extends React.Component<IFunctionActionsProps, IFun
         });
     }
 
-    this.state = {
+    this.setState({
       application,
-    };
+    });
   }
 
   public editFunction = (): void => {

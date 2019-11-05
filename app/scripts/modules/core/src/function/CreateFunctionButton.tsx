@@ -14,8 +14,8 @@ export interface IFunctionModalProps extends IModalComponentProps {
   forPipelineConfig?: boolean;
   functionDef: IFunction;
   command?: IFunctionUpsertCommand; // optional, when ejecting from a wizard
-  closeModal?(functionCommand: IFunctionUpsertCommand): void; // provided by ReactModal
-  dismissModal?(rejectReason?: any): void; // provided by ReactModal
+  closeModal?: (functionCommand: IFunctionUpsertCommand) => void; // provided by ReactModal
+  dismissModal?: (rejectReason?: any) => void; // provided by ReactModal
 }
 
 export interface ICreateFunctionButtonProps {
@@ -43,8 +43,6 @@ export class CreateFunctionButton extends React.Component<ICreateFunctionButtonP
             isNew: true,
           });
         } else {
-          // TODO
-          // angular
           ModalInjector.modalService
             .open({
               templateUrl: provider.createFunctionTemplateUrl,

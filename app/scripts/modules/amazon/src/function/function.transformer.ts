@@ -10,37 +10,24 @@ export class AwsFunctionTransformer {
     return normalizedFunctionDef;
   }
 
-  public convertFunctionForEditing(functionDef: IAmazonFunction): IAmazonFunctionUpsertCommand {
-    const toEdit: IAmazonFunctionUpsertCommand = {
-      role: functionDef.role,
-      runtime: functionDef.runtime,
-      s3bucket: functionDef.s3bucket,
-      s3key: functionDef.s3key,
-      handler: functionDef.handler,
-      tags: functionDef.tags,
-      memorySize: functionDef.memorySize,
-      timeout: functionDef.timeout,
-      envVariables: functionDef.environment ? functionDef.environment.variables : {},
-      functionName: functionDef.functionName,
-      region: functionDef.region,
-      credentials: functionDef.account,
-      description: functionDef.description,
-      tracingConfig: {
-        mode: functionDef.tracingConfig ? functionDef.tracingConfig.mode : '',
-      },
-      deadLetterConfig: {
-        targetArn: functionDef.deadLetterConfig ? functionDef.deadLetterConfig.targetArn : '',
-      },
-      KMSKeyArn: functionDef.KMSKeyArn ? functionDef.KMSKeyArn : '',
-      subnetIds: functionDef.vpcConfig ? functionDef.vpcConfig.subnetIds : [],
-      securityGroupIds: functionDef.vpcConfig ? functionDef.vpcConfig.securityGroupIds : [],
-      vpcId: functionDef.vpcConfig ? functionDef.vpcConfig.vpcId : '',
-      publish: functionDef.publish,
-      cloudProvider: functionDef.cloudProvider,
-      operation: '',
-    };
-    return toEdit;
-  }
+  public convertFunctionForEditing = (functionDef: IAmazonFunction): IAmazonFunctionUpsertCommand => ({
+    ...functionDef,
+    envVariables: functionDef.environment ? functionDef.environment.variables : {},
+    credentials: functionDef.account,
+    tracingConfig: {
+      mode: functionDef.tracingConfig ? functionDef.tracingConfig.mode : '',
+    },
+    deadLetterConfig: {
+      targetArn: functionDef.deadLetterConfig ? functionDef.deadLetterConfig.targetArn : '',
+    },
+    KMSKeyArn: functionDef.KMSKeyArn ? functionDef.KMSKeyArn : '',
+    subnetIds: functionDef.vpcConfig ? functionDef.vpcConfig.subnetIds : [],
+    securityGroupIds: functionDef.vpcConfig ? functionDef.vpcConfig.securityGroupIds : [],
+    vpcId: functionDef.vpcConfig ? functionDef.vpcConfig.vpcId : '',
+    operation: '',
+    cloudProvider: functionDef.cloudProvider,
+    region: functionDef.region,
+  });
 
   public constructNewAwsFunctionTemplate(application: Application): IAmazonFunctionUpsertCommand {
     const defaultCredentials = application.defaultCredentials.aws || AWSProviderSettings.defaults.account,

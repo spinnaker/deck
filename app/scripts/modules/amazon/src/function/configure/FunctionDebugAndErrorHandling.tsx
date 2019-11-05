@@ -27,6 +27,7 @@ export class FunctionDebugAndErrorHandling
   implements IWizardPageComponent<IAmazonFunctionUpsertCommand> {
   constructor(props: IFunctionDebugAndErrorHandlingProps) {
     super(props);
+    this.state = { some: '' };
   }
   public validate = (values: IAmazonFunctionUpsertCommand): FormikErrors<IAmazonFunctionUpsertCommand> => {
     const errors = {} as any;
@@ -38,10 +39,6 @@ export class FunctionDebugAndErrorHandling
     }
     return errors;
   };
-
-  public componentDidMount() {
-    this.setState({ some: '' });
-  }
 
   public render() {
     const { errors, values } = this.props.formik;
