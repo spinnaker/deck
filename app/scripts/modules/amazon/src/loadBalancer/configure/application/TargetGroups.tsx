@@ -13,8 +13,6 @@ import {
   spelNumberCheck,
   FormValidator,
 } from '@spinnaker/core';
-
-import { IAmazonApplicationLoadBalancer, IAmazonApplicationLoadBalancerUpsertCommand } from 'amazon/domain';
 import {
   isNameLong,
   isNameInUse,
@@ -24,6 +22,8 @@ import {
   isValidHealthCheckProtocol,
   spelNumber,
 } from '../common/targetGroupValidators';
+
+import { IAmazonApplicationLoadBalancer, IAmazonApplicationLoadBalancerUpsertCommand } from 'amazon/domain';
 
 export interface ITargetGroupsProps {
   app: Application;
@@ -93,13 +93,13 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
           .spelAware()
           .withValidators(spelNumber, checkBetween('unhealthyThreshold', 2, 10));
         builder.field('protocol', 'Protocol').required();
-        builder.field('healthCheckPath', 'HealthCheck Path').required();
+        builder.field('healthCheckPath', 'Health Check Path').required();
         builder
-          .field('healthCheckPort', 'HealthCheck Port')
+          .field('healthCheckPort', 'Health Check Port')
           .required()
           .spelAware()
           .withValidators(value => (value === 'traffic-port' ? null : spelNumberCheck(value)));
-        builder.field('healthCheckProtocol', 'HealthCheck Protocol').required();
+        builder.field('healthCheckProtocol', 'Health Check Protocol').required();
         builder
           .field('healthCheckTimeout', 'Timeout')
           .withValidators(isValidTimeout(item), checkBetween('healthCheckTimeout', 2, 120));
