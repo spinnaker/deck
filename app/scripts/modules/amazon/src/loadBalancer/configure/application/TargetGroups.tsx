@@ -242,6 +242,13 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
           <div className="col-md-12">
             {values.targetGroups.map((targetGroup, index) => {
               const tgErrors = (errors.targetGroups && errors.targetGroups[index]) || {};
+              const has6sTimeout =
+                (targetGroup.protocol === 'TCP' || targetGroup.protocol === 'TLS') &&
+                targetGroup.healthCheckProtocol === 'HTTP';
+              const has10sTimeout =
+                (targetGroup.protocol === 'TCP' || targetGroup.protocol === 'TLS') &&
+                targetGroup.healthCheckProtocol === 'HTTPS';
+
               return (
                 <div key={index} className="wizard-pod">
                   <div>
@@ -374,6 +381,53 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
                             </span>
                           )}
                           <span className="wizard-pod-content">
+                            <label>Protocol </label>
+                            {targetGroup.healthCheckProtocol === 'TCP' && (
+                              <HelpField id="aws.targetGroup.healthCheckProtocol" />
+                            )}{' '}
+                            <select
+                              className="form-control input-sm inline-number"
+                              value={targetGroup.healthCheckProtocol}
+                              onChange={event =>
+                                this.targetGroupFieldChanged(index, 'healthCheckProtocol', event.target.value)
+                              }
+                            >
+                              {ProtocolOptions}
+                            </select>
+                          </span>
+                          <span className="wizard-pod-content">
+                            <label>Port </label>
+                            <HelpField id="aws.targetGroup.attributes.healthCheckPort.trafficPort" />{' '}
+                            <select
+                              className="form-control input-sm inline-number"
+                              style={{ width: '90px' }}
+                              value={targetGroup.healthCheckPort === 'traffic-port' ? 'traffic-port' : 'manual'}
+                              onChange={event =>
+                                this.targetGroupFieldChanged(
+                                  index,
+                                  'healthCheckPort',
+                                  event.target.value === 'traffic-port' ? 'traffic-port' : '',
+                                )
+                              }
+                            >
+                              <option value="traffic-port">Traffic Port</option>
+                              <option value="manual">Manual</option>
+                            </select>{' '}
+                            <SpInput
+                              className="form-control input-sm inline-number"
+                              error={tgErrors.healthCheckPort}
+                              style={{
+                                visibility: targetGroup.healthCheckPort === 'traffic-port' ? 'hidden' : 'inherit',
+                              }}
+                              name="healthCheckPort"
+                              required={true}
+                              value={targetGroup.healthCheckPort}
+                              onChange={event =>
+                                this.targetGroupFieldChanged(index, 'healthCheckPort', event.target.value)
+                              }
+                            />
+                          </span>
+                          <span className="wizard-pod-content">
                             <label>Path </label>
                             <SpInput
                               // error={tgErrors.healthCheckPath}
@@ -387,16 +441,31 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
                           </span>
                           <span className="wizard-pod-content">
                             <label>Timeout </label>
-                            <SpelNumberInput
-                              error={tgErrors.healthCheckTimeout}
-                              required={true}
-                              value={targetGroup.healthCheckTimeout}
-                              min={2}
-                              max={120}
-                              onChange={(value: string) =>
-                                this.targetGroupFieldChanged(index, 'healthCheckTimeout', value)
-                              }
-                            />
+                            {(has6sTimeout || has10sTimeout) && <HelpField id="aws.targetGroup.healthCheckTimeout" />}
+                            {has6sTimeout || has10sTimeout ? (
+                              <SpInput
+                                disabled={true}
+                                className="form-control input-sm inline-number"
+                                error={tgErrors.healthCheckTimeout}
+                                name="healthCheckTimeout"
+                                required={true}
+                                value={has6sTimeout ? 6 : 10}
+                                onChange={event =>
+                                  this.targetGroupFieldChanged(index, 'healthCheckTimeout', event.target.value)
+                                }
+                              />
+                            ) : (
+                              <SpelNumberInput
+                                error={tgErrors.healthCheckTimeout}
+                                required={true}
+                                value={targetGroup.healthCheckTimeout}
+                                min={2}
+                                max={120}
+                                onChange={(value: string) =>
+                                  this.targetGroupFieldChanged(index, 'healthCheckTimeout', value)
+                                }
+                              />
+                            )}
                           </span>
                           <span className="wizard-pod-content">
                             <label>Interval </label>
