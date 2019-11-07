@@ -9,7 +9,6 @@ import {
   WizardModal,
   WizardPage,
   noop,
-  Application,
 } from '@spinnaker/core';
 
 import { IAmazonFunction, IAmazonFunctionUpsertCommand } from 'amazon/domain';
@@ -23,7 +22,6 @@ import { FunctionTags } from './configure/FunctionTags';
 import { FunctionDebugAndErrorHandling } from './configure/FunctionDebugAndErrorHandling';
 
 export interface IAmazonCreateFunctionProps extends IFunctionModalProps {
-  app: Application;
   functionDef: IAmazonFunction;
 }
 export interface IAmazonCreateFunctionState {
@@ -41,12 +39,9 @@ export class CreateLambdaFunction extends React.Component<IAmazonCreateFunctionP
   constructor(props: IAmazonCreateFunctionProps) {
     super(props);
     const functionTransformer = new AwsFunctionTransformer();
-    const funcCommand = props.command
-      ? (props.command as IAmazonFunctionUpsertCommand) // ejecting from a wizard
-      : props.functionDef
+    const funcCommand = props.functionDef
       ? functionTransformer.convertFunctionForEditing(props.functionDef)
       : functionTransformer.constructNewAwsFunctionTemplate(props.app);
-
     this.state = {
       isNew: !props.functionDef,
       functionCommand: funcCommand,
@@ -98,17 +93,11 @@ export class CreateLambdaFunction extends React.Component<IAmazonCreateFunctionP
   }
 
   private checkForS3Update(functionCommandFormatted: IAmazonFunctionUpsertCommand, descriptor: string): void {
-    if (descriptor.includes('Update') && (functionCommandFormatted.s3bucket || functionCommandFormatted.s3key)) {
+    const { isNew } = this.state;
+    if (!isNew && (functionCommandFormatted.s3bucket || functionCommandFormatted.s3key)) {
       functionCommandFormatted.operation = 'updateLambdaFunctionCode';
       const { app } = this.props;
-      const taskMonitor = new TaskMonitor({
-        application: app,
-        title: 'Updating your function code',
-        modalInstance: TaskMonitor.modalInstanceEmulation(() => this.props.dismissModal()),
-      });
-      taskMonitor.submit(() => {
-        return FunctionWriter.upsertFunction(functionCommandFormatted, app, descriptor);
-      });
+      FunctionWriter.upsertFunction(functionCommandFormatted, app, descriptor);
     }
     this.onTaskComplete(functionCommandFormatted);
   }
@@ -124,12 +113,14 @@ export class CreateLambdaFunction extends React.Component<IAmazonCreateFunctionP
       application: app,
       title: `${isNew ? 'Creating' : 'Updating'} your function`,
       modalInstance: TaskMonitor.modalInstanceEmulation(() => this.props.dismissModal()),
-      onTaskComplete: () => this.checkForS3Update(functionCommandFormatted, descriptor),
+      onTaskComplete: () => {
+        this.checkForS3Update(functionCommandFormatted, descriptor);
+      },
     });
 
     taskMonitor.submit(() => {
       functionCommandFormatted.type = 'lambdaFunction';
-      if (descriptor.includes('Update')) {
+      if (!isNew) {
         functionCommandFormatted.operation = 'updateLambdaFunctionConfiguration';
       } else {
         functionCommandFormatted.operation = 'createLambdaFunction';

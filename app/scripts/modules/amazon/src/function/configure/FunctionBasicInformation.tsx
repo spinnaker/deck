@@ -10,15 +10,15 @@ import {
   HelpField,
   TextInput,
   ReactSelectInput,
-  RegionSelectField,
   Application,
-  ValidationMessage,
+  FormValidator,
 } from '@spinnaker/core';
 
-import { FormikProps, FormikErrors, Field } from 'formik';
+import { FormikProps, FormikErrors } from 'formik';
 import { IAmazonFunctionUpsertCommand } from 'amazon/index';
 import { IAmazonFunction } from 'amazon/domain';
 import { Subject, Observable } from 'rxjs';
+import { s3BucketNameValidator } from 'amazon/aws.validators';
 
 const availableRuntimes = [
   'nodejs',
@@ -60,34 +60,23 @@ export class FunctionBasicInformation extends React.Component<IFunctionProps, IF
     regions: [],
   };
 
-  constructor(props: IFunctionProps) {
-    super(props);
-
-    AccountService.listAccounts('aws').then(accounts => {
-      this.state = {
-        accounts,
-        regions: [],
-        existingFunctionNames: [],
-      };
-    });
-  }
-
   private props$ = new Subject<IFunctionProps>();
   private destroy$ = new Subject<void>();
 
   public validate(values: IAmazonFunctionUpsertCommand): FormikErrors<IAmazonFunctionUpsertCommand> {
-    const errors = {} as any;
+    const validator = new FormValidator(values);
+    validator
+      .field('s3bucket', 'S3 Bucket Name')
+      .optional()
+      .withValidators(s3BucketNameValidator);
+    const errors = validator.validateForm();
+
     if (
       this.props.isNew &&
       this.state.existingFunctionNames.includes(this.props.app.name.concat('-').concat(values.functionName))
     ) {
       errors.functionName = `There is already a function in ${values.credentials}:${values.region} with that name.`;
     }
-
-    if (values.s3bucket && !values.s3bucket.match(/^[0-9A-Za-z\.\-_]*(?<!\.)$/)) {
-      errors.s3bucket = 'Invalid S3 Bucket name.';
-    }
-
     return errors;
   }
 
@@ -113,7 +102,6 @@ export class FunctionBasicInformation extends React.Component<IFunctionProps, IF
     };
 
     const allAccounts$ = Observable.fromPromise(AccountService.listAccounts('aws')).shareReplay(1);
-
     // combineLatest with allAccounts to wait for accounts to load and be cached
     const accountRegions$ = Observable.combineLatest(form.account$, allAccounts$)
       .switchMap(([currentAccount, _allAccounts]) => AccountService.getRegionsForAccount(currentAccount))
@@ -145,10 +133,6 @@ export class FunctionBasicInformation extends React.Component<IFunctionProps, IF
       });
   }
 
-  private handleRegionChange = (value: string): void => {
-    this.props.formik.setFieldValue('region', value);
-  };
-
   public render() {
     const { isNew } = this.props;
     const { errors, values } = this.props.formik;
@@ -160,111 +144,63 @@ export class FunctionBasicInformation extends React.Component<IFunctionProps, IF
     });
     return (
       <div className="container-fluid form-horizontal ">
-        <div className="sp-margin-m-bottom">
-          {isNew && (
-            <div className={className}>
-              <strong>Your load balancer will be named: </strong>
-              <HelpField id="aws.function.name" />
-              <span>{this.props.app.name.concat('-').concat(values.functionName)}</span>
-              <Field
-                type="text"
-                style={{ display: 'none' }}
-                className="form-control input-sm no-spel"
-                name="functionName"
-              />
-              {errors.functionName && <ValidationMessage type="error" message={errors.functionName} />}
-            </div>
+        {isNew && (
+          <div className={className}>
+            <strong>Your function will be named: </strong>
+            <HelpField id="aws.function.name" />
+            <span>
+              {this.props.app.name}-{values.functionName}
+            </span>
+            <FormikFormField name="functionName" input={() => null} />
+          </div>
+        )}
+        <FormikFormField
+          fastField={false}
+          name="credentials"
+          label="Account"
+          input={props => (
+            <ReactSelectInput {...props} stringOptions={accounts.map((acc: IAccount) => acc.name)} clearable={true} />
           )}
-        </div>
-        <div className="sp-margin-m-bottom">
-          <FormikFormField
-            fastField={false}
-            name="credentials"
-            label="Account"
-            input={props => (
-              <ReactSelectInput
-                {...props}
-                inputClassName="cloudfoundry-react-select"
-                value={values.credentials}
-                stringOptions={accounts.map((acc: IAccount) => acc.name)}
-                clearable={true}
-              />
-            )}
-          />
-        </div>
-        <div className="sp-margin-m-bottom">
-          <RegionSelectField
-            labelColumns={3}
-            component={values}
-            field="region"
-            account={values.credentials}
-            onChange={this.handleRegionChange}
-            regions={regions}
-          />
-        </div>
-        <div className="sp-margin-m-bottom">
-          <FormikFormField
-            name="functionName"
-            label="Function Name"
-            help={<HelpField id="aws.function.name" />}
-            input={props => <TextInput {...props} />}
-          />
-        </div>
-        <div className="sp-margin-m-bottom">
-          <FormikFormField
-            name="runtime"
-            label="Runtime"
-            help={<HelpField id="aws.function.runtime" />}
-            input={props => (
-              <ReactSelectInput
-                {...props}
-                inputClassName="cloudfoundry-react-select"
-                stringOptions={availableRuntimes}
-                clearable={true}
-              />
-            )}
-          />
-        </div>
-        <div className="sp-margin-m-bottom">
-          <FormikFormField
-            name="s3bucket"
-            label="S3 Bucket"
-            help={<HelpField id="aws.function.s3bucket" />}
-            input={props => <TextInput {...props} placeholder="S3 bucket name" />}
-          />
-        </div>
-        {errors.s3bucket && <ValidationMessage type="error" message={errors.s3bucket} />}
-        <div className="sp-margin-m-bottom">
-          <FormikFormField
-            name="s3key"
-            label="S3 Key"
-            help={<HelpField id="aws.function.s3key" />}
-            input={props => <TextInput {...props} placeholder="object.zip" />}
-          />
-        </div>
-
-        <div className="sp-margin-m-bottom">
-          <FormikFormField
-            name="handler"
-            label="Handler"
-            help={<HelpField id="aws.function.handler" />}
-            input={props => <TextInput {...props} placeholder="filename.method" />}
-          />
-        </div>
-
-        <div className="sp-margin-m-bottom">
-          <FormikFormField
-            name="publish"
-            label="Publish"
-            input={props => (
-              <CheckboxInput
-                {...props}
-                value={values.publish}
-                onChange={() => this.props.formik.setFieldValue('publish', !values.publish)}
-              />
-            )}
-          />
-        </div>
+        />
+        <FormikFormField
+          fastField={false}
+          name="region"
+          label="Region"
+          input={props => (
+            <ReactSelectInput {...props} stringOptions={regions.map((reg: IRegion) => reg.name)} clearable={true} />
+          )}
+        />
+        <FormikFormField
+          name="functionName"
+          label="Function Name"
+          help={<HelpField id="aws.function.name" />}
+          input={props => <TextInput {...props} />}
+        />
+        <FormikFormField
+          name="runtime"
+          label="Runtime"
+          help={<HelpField id="aws.function.runtime" />}
+          input={props => <ReactSelectInput {...props} stringOptions={availableRuntimes} clearable={true} />}
+        />
+        <FormikFormField
+          name="s3bucket"
+          label="S3 Bucket"
+          help={<HelpField id="aws.function.s3bucket" />}
+          input={props => <TextInput {...props} placeholder="S3 bucket name" />}
+        />
+        <FormikFormField
+          name="s3key"
+          label="S3 Key"
+          help={<HelpField id="aws.function.s3key" />}
+          input={props => <TextInput {...props} placeholder="object.zip" />}
+        />
+        <FormikFormField
+          name="handler"
+          label="Handler"
+          help={<HelpField id="aws.function.handler" />}
+          input={props => <TextInput {...props} placeholder="filename.method" />}
+        />
+        <FormikFormField name="publish" label="Publish" input={props => <CheckboxInput {...props} />} />
       </div>
     );
   }

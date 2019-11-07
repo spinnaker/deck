@@ -1,9 +1,11 @@
 import * as React from 'react';
 
-import { IWizardPageComponent, MapEditor } from '@spinnaker/core';
+import { IWizardPageComponent, MapEditor, FormikFormField, FormValidator } from '@spinnaker/core';
 import { FormikProps } from 'formik';
 import { IAmazonFunctionUpsertCommand } from 'amazon/index';
 import { IAmazonFunction } from 'amazon/domain';
+import * as _ from 'lodash';
+import { awsTagsValidator } from 'amazon/aws.validators';
 
 export interface IFunctionTagsProps {
   formik: FormikProps<IAmazonFunctionUpsertCommand>;
@@ -11,40 +13,33 @@ export interface IFunctionTagsProps {
   functionDef: IAmazonFunction;
 }
 
-export interface IFunctionTagsState {
-  some: string;
-}
-
-export class FunctionTags extends React.Component<IFunctionTagsProps, IFunctionTagsState>
+export class FunctionTags extends React.Component<IFunctionTagsProps>
   implements IWizardPageComponent<IAmazonFunctionUpsertCommand> {
-  private duplicateKeys = false;
   constructor(props: IFunctionTagsProps) {
     super(props);
-    this.state = { some: '' };
   }
-  public validate = () => {
-    const errors = {} as any;
-
-    if (this.duplicateKeys) {
-      errors.vars = 'Tags have duplicate keys.';
-    }
-    return errors;
+  public validate = (values: IAmazonFunctionUpsertCommand) => {
+    const validator = new FormValidator(values);
+    validator
+      .field('tags', 'Tag')
+      .required()
+      .withValidators(awsTagsValidator);
+    return validator.validateForm();
   };
 
-  private varsChanged = (tag: string | { [key: string]: string }, duplicateKeys: boolean) => {
-    this.duplicateKeys = duplicateKeys;
+  private varsChanged = (tag: string | { [key: string]: string }) => {
     this.props.formik.setFieldValue('tags', Array(tag));
   };
 
   public render() {
     const { values } = this.props.formik;
     return (
-      <div className="form-group">
-        <div className="col-md-11">
-          <div className="sp-margin-m-bottom">
-            <MapEditor model={values.tags} allowEmpty={true} onChange={this.varsChanged} />
-          </div>
-        </div>
+      <div className="container-fluid form-horizontal ">
+        <FormikFormField
+          fastField={false}
+          name="tags"
+          input={props => <MapEditor {...props} model={values.tags} allowEmpty={false} onChange={this.varsChanged} />}
+        />
       </div>
     );
   }

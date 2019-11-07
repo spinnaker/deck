@@ -6,7 +6,6 @@ export interface IAmazonFunctionSourceData extends IFunctionSourceData {
   createdTime: number;
   functionName: string;
   runtime: string;
-  name: string;
   region: string;
   publish: boolean;
   description: string;
@@ -25,10 +24,6 @@ export interface IAmazonFunctionSourceData extends IFunctionSourceData {
     mode: string;
   };
   version: string;
-  // Some of the backend in clouddriver returns a vpcid (lowecase) only,
-  // and was cached with some of that. Until caches roll off and we are
-  // sure clouddriver is cleaned up, leave this dirtiness in here
-  vpcid?: string;
   envVariables: {};
   environment: {
     variables: {};

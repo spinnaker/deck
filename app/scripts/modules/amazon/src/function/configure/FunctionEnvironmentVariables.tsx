@@ -1,9 +1,10 @@
 import * as React from 'react';
 
-import { IWizardPageComponent, HelpField, MapEditor, TextInput } from '@spinnaker/core';
+import { IWizardPageComponent, HelpField, MapEditor, TextInput, FormikFormField, FormValidator } from '@spinnaker/core';
 import { FormikProps } from 'formik';
 import { IAmazonFunctionUpsertCommand } from 'amazon/index';
 import { IAmazonFunction } from 'amazon/domain';
+import { awsArnValidator } from 'amazon/aws.validators';
 
 export interface IFunctionEnvironmentVariablesProps {
   formik: FormikProps<IAmazonFunctionUpsertCommand>;
@@ -11,60 +12,45 @@ export interface IFunctionEnvironmentVariablesProps {
   functionDef: IAmazonFunction;
 }
 
-export interface IFunctionEnvironmentVariablesState {
-  some: string;
-}
-
-export class FunctionEnvironmentVariables
-  extends React.Component<IFunctionEnvironmentVariablesProps, IFunctionEnvironmentVariablesState>
+export class FunctionEnvironmentVariables extends React.Component<IFunctionEnvironmentVariablesProps>
   implements IWizardPageComponent<IAmazonFunctionUpsertCommand> {
-  private duplicateKeys = false;
-
-  public validate = () => {
-    const errors = {} as any;
-
-    if (this.duplicateKeys) {
-      errors.vars = 'Variables have duplicate keys.';
-    }
-
-    return errors;
+  public validate = (values: IAmazonFunctionUpsertCommand) => {
+    const validator = new FormValidator(values);
+    validator
+      .field('KMSKeyArn', 'KMS Key ARN')
+      .optional()
+      .withValidators(awsArnValidator);
+    return validator.validateForm();
   };
 
-  public componentDidMount() {
-    this.setState({ some: '' });
-  }
-
-  private varsChanged = (envVar: { [key: string]: string }, duplicateKeys: boolean) => {
-    this.duplicateKeys = duplicateKeys;
+  private varsChanged = (envVar: { [key: string]: string }) => {
     this.props.formik.setFieldValue('envVariables', envVar);
-  };
-
-  private kmsKeyChanged = (keyArn: string) => {
-    this.props.formik.setFieldValue('KMSKeyArn', keyArn);
   };
 
   public render() {
     const { values } = this.props.formik;
     return (
-      <div className="form-group">
-        <div className="col-md-11">
-          <div className="sp-margin-m-bottom">
-            <b>Environment Variables (optional)</b>
-            <HelpField id="aws.function.env.vars" />
-          </div>
-          <MapEditor model={values.envVariables} allowEmpty={true} onChange={this.varsChanged} />
-        </div>
-        <div className="col-md-11">
-          <div className="sp-margin-m-bottom">
-            <b>KMS Key</b>
-            <HelpField id="aws.function.kmsKeyArn" />
-            <TextInput
-              placeholder="Key ARN"
-              onChange={(event: any) => this.kmsKeyChanged(event.target.value)}
-              value={values.KMSKeyArn}
-            />
-          </div>
-        </div>
+      <div className="container-fluid form-horizontal ">
+        Environment Variables
+        <FormikFormField
+          fastField={false}
+          name="envVariables"
+          input={props => (
+            <MapEditor {...props} model={values.envVariables} allowEmpty={true} onChange={this.varsChanged} />
+          )}
+        />
+        {/* <FormikFormField
+            fastField={false}
+            name="envVariables"
+            label="Environment Variables"
+            input={props => <MapEditorInput {...props} allowEmptyValues={true} addButtonLabel="Add" />}
+          /> */}
+        <FormikFormField
+          name="KMSKeyArn"
+          label="Key ARN"
+          help={<HelpField id="aws.function.kmsKeyArn" />}
+          input={props => <TextInput {...props} />}
+        />
       </div>
     );
   }

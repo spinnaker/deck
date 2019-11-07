@@ -4,7 +4,7 @@ import { Application } from 'core/application';
 import { CloudProviderRegistry, ProviderSelectionService } from 'core/cloudProvider';
 import { IFunction } from 'core/domain';
 import { IFunctionUpsertCommand } from 'core/function';
-import { ModalInjector, ReactInjector } from 'core/reactShims';
+import { ReactInjector } from 'core/reactShims';
 import { IModalComponentProps, Tooltip } from 'core/presentation';
 
 export interface IFunctionModalProps extends IModalComponentProps {
@@ -34,29 +34,13 @@ export class CreateFunctionButton extends React.Component<ICreateFunctionButtonP
     ProviderSelectionService.selectProvider(app, 'function').then(selectedProvider => {
       skinSelectionService.selectSkin(selectedProvider).then(selectedSkin => {
         const provider = CloudProviderRegistry.getValue(selectedProvider, 'function', selectedSkin);
-        if (provider.CreateFunctionModal) {
-          provider.CreateFunctionModal.show({
-            app: app,
-            application: app,
-            forPipelineConfig: false,
-            function: null,
-            isNew: true,
-          });
-        } else {
-          ModalInjector.modalService
-            .open({
-              templateUrl: provider.createFunctionTemplateUrl,
-              controller: `${provider.createFunctionController} as ctrl`,
-              size: 'lg',
-              resolve: {
-                application: () => this.props.app,
-                function: (): IFunction => null,
-                isNew: () => true,
-                forPipelineConfig: () => false,
-              },
-            })
-            .result.catch(() => {});
-        }
+        provider.CreateFunctionModal.show({
+          app: app,
+          application: app,
+          forPipelineConfig: false,
+          function: null,
+          isNew: true,
+        });
       });
     });
   };

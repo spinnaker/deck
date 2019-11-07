@@ -46,6 +46,7 @@ import {
 import { DEPLOY_CLOUDFORMATION_STACK_STAGE } from './pipeline/stages/deployCloudFormation/deployCloudFormationStackStage';
 import { CLOUDFORMATION_TEMPLATE_ENTRY } from './pipeline/stages/deployCloudFormation/cloudFormationTemplateEntry.component';
 import { CreateLambdaFunction } from './function/CreateLambdaFunction';
+import { AmazonFunctionDetails } from './function';
 
 // load all templates into the $templateCache
 const templates = require.context('./', true, /\.html$/);
@@ -131,7 +132,7 @@ module(AMAZON_MODULE, [
       LoadBalancersTag: AmazonLoadBalancersTag,
     },
     function: {
-      details: require('./function/details/AmazonFunctionDetails'),
+      details: AmazonFunctionDetails,
       CreateFunctionModal: CreateLambdaFunction,
       transformer: AwsFunctionTransformer,
     },

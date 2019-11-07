@@ -53,6 +53,10 @@ export class AmazonFunctionDetails extends React.Component<IAmazonFunctionDetail
             });
           }
         });
+    } else {
+      this.setState({
+        loading: false,
+      });
     }
   }
 
@@ -79,24 +83,28 @@ export class AmazonFunctionDetails extends React.Component<IAmazonFunctionDetail
     }
 
     const functionDetails = (
-      <>
-        <dl className="horizontal-when-filters-collapsed dl-horizontal dl-flex">
-          <dt>Last Modified </dt>
-          <dd>{functionDef.lastModified}</dd>
-          <dt>In</dt>
-          <dd>
-            <AccountTag account={functionDef.account} /> {functionDef.region}
-          </dd>
-          <dt>VPC</dt>
-          <dd>{functionDef.vpcConfig ? functionDef.vpcConfig.vpcId : 'Default'}</dd>
-          <dt>Function ARN</dt>
-          <dd>{functionDef.functionArn}</dd>
-          <dt>Revision ID</dt>
-          <dd>{functionDef.revisionId}</dd>
-          <dt>Version</dt>
-          <dd>{functionDef.version}</dd>
-        </dl>
-      </>
+      <dl className="horizontal-when-filters-collapsed dl-horizontal dl-flex">
+        <dt>Last Modified </dt>
+        <dd>{functionDef.lastModified}</dd>
+        <dt>In</dt>
+        <dd>
+          <AccountTag account={functionDef.account} /> {functionDef.region}
+        </dd>
+        <dt>VPC</dt>
+        <dd>{functionDef.vpcConfig ? functionDef.vpcConfig.vpcId : 'Default'}</dd>
+        <dt>Function ARN</dt>
+        <dd>{functionDef.functionArn}</dd>
+        <dt>Revision ID</dt>
+        <dd>{functionDef.revisionId}</dd>
+        <dt>Version</dt>
+        <dd>{functionDef.version}</dd>
+        <dt>Event Source</dt>
+        <dd>
+          {functionDef.eventSourceMappings && functionDef.eventSourceMappings.length !== 0
+            ? functionDef.eventSourceMappings
+            : 'None'}
+        </dd>
+      </dl>
     );
 
     const functionDetailsSection = (
@@ -107,17 +115,15 @@ export class AmazonFunctionDetails extends React.Component<IAmazonFunctionDetail
       <Details loading={this.state.loading}>
         <Details.Header icon={<i className="fa icon-sitemap" />} name={this.state.functionDef.functionName}>
           <div className="actions">
-            {
-              <FunctionActions
-                app={app}
-                functionDef={functionDef}
-                functionFromParams={{
-                  account: this.state.functionDef.account,
-                  region: this.state.functionDef.region,
-                  functionName: this.state.functionDef.functionName,
-                }}
-              />
-            }
+            <FunctionActions
+              app={app}
+              functionDef={functionDef}
+              functionFromParams={{
+                account: this.state.functionDef.account,
+                region: this.state.functionDef.region,
+                functionName: this.state.functionDef.functionName,
+              }}
+            />
           </div>
         </Details.Header>
         {functionDetailsSection}

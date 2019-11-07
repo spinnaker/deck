@@ -1,9 +1,10 @@
 import * as React from 'react';
 
-import { FormikFormField, IWizardPageComponent, TextInput } from '@spinnaker/core';
+import { FormikFormField, IWizardPageComponent, TextInput, FormValidator } from '@spinnaker/core';
 import { FormikProps, FormikErrors } from 'formik';
 import { IAmazonFunctionUpsertCommand } from 'amazon/index';
 import { IAmazonFunction } from 'amazon/domain';
+import { iamRoleValidator } from 'amazon/aws.validators';
 
 export interface IExecutionRoleProps {
   formik: FormikProps<IAmazonFunctionUpsertCommand>;
@@ -11,31 +12,22 @@ export interface IExecutionRoleProps {
   functionDef: IAmazonFunction;
 }
 
-export interface IExecutionRoleState {
-  some: '';
-}
-
-export class ExecutionRole extends React.Component<IExecutionRoleProps, IExecutionRoleState>
+export class ExecutionRole extends React.Component<IExecutionRoleProps>
   implements IWizardPageComponent<IAmazonFunctionUpsertCommand> {
   constructor(props: IExecutionRoleProps) {
     super(props);
-    this.state = {
-      some: '',
-    };
   }
 
   public validate(values: IAmazonFunctionUpsertCommand): FormikErrors<IAmazonFunctionUpsertCommand> {
-    const errors = {} as any;
-
-    if (values.role && !values.role.match(/^arn:aws:iam::\d{12}:role\/?\/[a-zA-Z_0-9+=,.@\-_/]+/)) {
-      errors.role = 'Invalid role. Must match regular expression:  arn:aws:iam::d{12}:role/?[a-zA-Z_0-9+=,.@-_/]+ ';
-    }
-    return errors;
+    const validator = new FormValidator(values);
+    validator
+      .field('role', 'Role ARN')
+      .required()
+      .withValidators(iamRoleValidator);
+    return validator.validateForm();
   }
 
   public render() {
-    const { values } = this.props.formik;
-
     return (
       <div className="form-group">
         <div className="col-md-11">
@@ -44,16 +36,7 @@ export class ExecutionRole extends React.Component<IExecutionRoleProps, IExecuti
               name="role"
               label="Role ARN"
               fastField={false}
-              input={props => (
-                <TextInput
-                  {...props}
-                  type="text"
-                  placeholder="Enter role ARN"
-                  className="form-control input-sm no-spel"
-                  name="role"
-                  value={values.role}
-                />
-              )}
+              input={props => <TextInput {...props} placeholder="Enter role ARN" name="role" />}
               required={true}
             />
           </div>

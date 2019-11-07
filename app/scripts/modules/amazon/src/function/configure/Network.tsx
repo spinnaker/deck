@@ -61,7 +61,7 @@ export class Network extends React.Component<INetworkProps, INetworkState>
 
   private getAllVpcs(): void {
     VpcReader.listVpcs().then(Vpcs => {
-      this.state.vpcOptions = Vpcs;
+      this.setState({ vpcOptions: Vpcs });
     });
   }
 
@@ -101,7 +101,7 @@ export class Network extends React.Component<INetworkProps, INetworkState>
   }
 
   public componentDidMount(): void {
-    const subnets$ = Promise.resolve(this.getAvailableSubnets())
+    const allSubnets = Promise.resolve(this.getAvailableSubnets())
       .then((subnets: ISubnet[]) => {
         subnets.forEach((subnet: ISubnet) => {
           subnet.label = subnet.id;
@@ -117,7 +117,7 @@ export class Network extends React.Component<INetworkProps, INetworkState>
       });
 
     const secGroups$ = Promise.resolve(this.getAvailableSecurityGroups());
-    Observable.combineLatest(subnets$, secGroups$)
+    Observable.combineLatest(allSubnets, secGroups$)
       .takeUntil(this.destroy$)
       .subscribe(([subnets, securityGroups]) => {
         return this.setState({ subnets, securityGroups });
@@ -150,12 +150,16 @@ export class Network extends React.Component<INetworkProps, INetworkState>
   private getSecurityGroupsByVpc = (sgs: ISecurityGroupsByAccountSourceData): Array<Option<string>> => {
     const { values } = this.props.formik;
     const sgOptions: Array<Option<string>> = [];
+    /** Get security groups that belong to current selected account */
     forOwn(sgs, function(sgByAccount, acc) {
       if (acc === values.credentials) {
+        /** Get security groups that fall under the provider 'aws' */
         forOwn(sgByAccount, function(sgByRegion, provider) {
           if (provider === 'aws') {
+            /** Get security groups that are under the current selected region */
             forOwn(sgByRegion, function(groups, region) {
               if (region === values.region) {
+                /** Get security groups that fall under the current selected VPC */
                 groups.forEach(function(group) {
                   if (group.vpcId === values.vpcId) {
                     sgOptions.push({ value: group.id, label: group.name });
@@ -187,13 +191,11 @@ export class Network extends React.Component<INetworkProps, INetworkState>
                 fastField={false}
                 input={props => (
                   <ReactSelectInput
-                    inputClassName="cloudfoundry-react-select"
                     {...props}
                     stringOptions={vpcOptions
                       .filter((v: IVpc) => v.account === values.credentials)
                       .map((v: IVpc) => v.id)}
                     clearable={true}
-                    value={values.vpcId}
                   />
                 )}
                 onChange={this.handleVpcChange}
@@ -229,7 +231,7 @@ export class Network extends React.Component<INetworkProps, INetworkState>
               {sgOptions.length === 0 && (
                 <div className="form-control-static">No security groups found in the selected account/region/VPC</div>
               )}
-              {values.credentials && values.credentials !== 'test' && values.vpcId ? (
+              {values.credentials && values.vpcId ? (
                 <TetheredSelect
                   multi={true}
                   options={sgOptions}
