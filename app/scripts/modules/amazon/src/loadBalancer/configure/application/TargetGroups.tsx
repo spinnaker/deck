@@ -19,7 +19,7 @@ import {
   isDuplicateName,
   isValidTimeout,
   checkBetween,
-  isValidHealthCheckProtocol,
+  isValidHealthCheckInterval,
   spelNumber,
 } from '../common/targetGroupValidators';
 
@@ -81,7 +81,7 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
         builder
           .field('healthCheckInterval', 'Health Check Interval')
           .required()
-          .withValidators(isValidHealthCheckProtocol(item), checkBetween('healthCheckProtocol', 5, 300), spelNumber);
+          .withValidators(isValidHealthCheckInterval(item), checkBetween('healthCheckProtocol', 5, 300), spelNumber);
         builder
           .field('healthyThreshold', 'Healthy Threshold')
           .required()
@@ -235,7 +235,6 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
 
     const ProtocolOptions = this.protocols.map(p => <option key={p}>{p}</option>);
     const TargetTypeOptions = this.targetTypes.map(p => <option key={p}>{p}</option>);
-
     return (
       <div className="container-fluid form-horizontal">
         <div className="form-group">

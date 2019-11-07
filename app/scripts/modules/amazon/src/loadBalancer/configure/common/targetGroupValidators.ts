@@ -35,10 +35,12 @@ export const isValidTimeout = (targetGroup: ITargetGroup) => (value: string) => 
   return null;
 };
 
-export const isValidHealthCheckProtocol = (targetGroup: ITargetGroup) => (value: string) =>
-  targetGroup.healthCheckProtocol === 'TCP' && (Number.parseInt(value, 10) !== 10 || Number.parseInt(value, 10) !== 30)
-    ? 'TCP health checks only support 10s and 30s intervals'
-    : null;
+export const isValidHealthCheckInterval = (targetGroup: ITargetGroup) => (value: string) =>
+  targetGroup.healthCheckProtocol !== 'TCP' ||
+  (targetGroup.healthCheckProtocol === 'TCP' &&
+    (Number.parseInt(value, 10) === 10 || Number.parseInt(value, 10) === 30))
+    ? null
+    : 'TCP health checks only support 10s and 30s intervals';
 
 export const checkBetween = (fieldName: string, min: number, max: number) => (value: string) => {
   const sanitizedField = Number.parseInt(value, 10);
