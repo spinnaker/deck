@@ -6,7 +6,7 @@ import { useLatestPromise, IUseLatestPromiseResult } from './useLatestPromise.ho
 /**
  * A react hook which invokes a promise factory callback whenever any of its dependencies changes.
  *
- * Returns the default result until one promise resolves.
+ * Returns the default result until the first promise resolves.
  *
  * The promise factory is not called if any of the deps are null or undefined.
  *
