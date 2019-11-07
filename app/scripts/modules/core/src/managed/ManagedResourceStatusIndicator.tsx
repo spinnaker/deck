@@ -116,7 +116,7 @@ const viewConfigurationByStatus = {
         </p>
         <p>
           Management was resumed after being temporarily paused. If Spinnaker detects that a drift from the declarative
-          configuration occured while paused, it will take automatic action to resolve the drift.
+          configuration occurred while paused, it will take automatic action to resolve the drift.
         </p>
         <p>
           You can pause and resume management on the{' '}
