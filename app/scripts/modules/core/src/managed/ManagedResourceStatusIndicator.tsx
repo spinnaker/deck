@@ -107,7 +107,7 @@ const viewConfigurationByStatus = {
     ),
   },
   RESUMED: {
-    iconClass: 'icon-md',
+    iconClass: 'icon-md-resumed',
     colorClass: 'info',
     popoverContents: (id: string) => (
       <>
