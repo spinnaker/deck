@@ -6,7 +6,6 @@ import { CloudProviderRegistry } from 'core/cloudProvider';
 
 export interface IApplicationProviderFieldsProps {
   application: Application;
-  updateApplication: (applicationFieldPath: string, value: any) => void;
   cloudProviders: string[];
 }
 

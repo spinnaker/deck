@@ -1,6 +1,5 @@
 import * as React from 'react';
 
-import { IScheduler, SchedulerFactory } from 'core/scheduler/SchedulerFactory';
 import { FormikFormField, ReactSelectInput } from 'core/presentation';
 import { IPagerDutyService, PagerDutyReader } from './pagerDuty.read.service';
 
@@ -9,7 +8,6 @@ export interface IFormikPagerDutySelectField {
 }
 
 export function FormikPagerDutySelectField(props: IFormikPagerDutySelectField) {
-  const scheduler: IScheduler = SchedulerFactory.createScheduler(10000);
   const [pageDutyServices, setPageDutyServices] = React.useState<IPagerDutyService[]>([]);
   const [servicesLoaded, setServicesLoaded] = React.useState<boolean>(false);
   const label = `PagerDuty${props.required ? ' *' : ''}`;
@@ -32,15 +30,10 @@ export function FormikPagerDutySelectField(props: IFormikPagerDutySelectField) {
   );
 
   React.useEffect(() => {
-    scheduler.subscribe(() => {
-      PagerDutyReader.listServices().subscribe((pagerDutyServices: IPagerDutyService[]) => {
-        setPageDutyServices(pagerDutyServices.filter(service => service.integration_key));
-        setServicesLoaded(true);
-      });
+    PagerDutyReader.listServices().subscribe((pagerDutyServices: IPagerDutyService[]) => {
+      setPageDutyServices(pagerDutyServices.filter(service => service.integration_key));
+      setServicesLoaded(true);
     });
-    return () => {
-      scheduler.unsubscribe();
-    };
   }, []);
 
   return (
