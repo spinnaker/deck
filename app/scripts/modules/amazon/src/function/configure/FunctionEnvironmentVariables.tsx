@@ -1,6 +1,13 @@
 import * as React from 'react';
 
-import { IWizardPageComponent, HelpField, MapEditor, TextInput, FormikFormField, FormValidator } from '@spinnaker/core';
+import {
+  IWizardPageComponent,
+  HelpField,
+  TextInput,
+  FormikFormField,
+  FormValidator,
+  MapEditorInput,
+} from '@spinnaker/core';
 import { FormikProps } from 'formik';
 import { IAmazonFunctionUpsertCommand } from 'amazon/index';
 import { IAmazonFunction } from 'amazon/domain';
@@ -23,28 +30,15 @@ export class FunctionEnvironmentVariables extends React.Component<IFunctionEnvir
     return validator.validateForm();
   };
 
-  private varsChanged = (envVar: { [key: string]: string }) => {
-    this.props.formik.setFieldValue('envVariables', envVar);
-  };
-
   public render() {
-    const { values } = this.props.formik;
     return (
       <div className="container-fluid form-horizontal ">
-        Environment Variables
         <FormikFormField
           fastField={false}
           name="envVariables"
-          input={props => (
-            <MapEditor {...props} model={values.envVariables} allowEmpty={true} onChange={this.varsChanged} />
-          )}
+          label="Env Variables"
+          input={props => <MapEditorInput {...props} allowEmptyValues={true} addButtonLabel="Add" />}
         />
-        {/* <FormikFormField
-            fastField={false}
-            name="envVariables"
-            label="Environment Variables"
-            input={props => <MapEditorInput {...props} allowEmptyValues={true} addButtonLabel="Add" />}
-          /> */}
         <FormikFormField
           name="KMSKeyArn"
           label="Key ARN"
