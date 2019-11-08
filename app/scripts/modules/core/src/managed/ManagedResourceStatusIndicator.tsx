@@ -4,7 +4,7 @@ import * as classNames from 'classnames';
 import { UISref } from '@uirouter/react';
 
 import { HoverablePopover } from 'core/presentation';
-import { IManagedResourceSummary } from 'core/managed';
+import { IManagedResourceSummary, ManagedResourceStatus } from 'core/managed';
 
 import './ManagedResourceStatusIndicator.less';
 
@@ -22,8 +22,9 @@ const viewConfigurationByStatus = {
           <UISref to="home.applications.application.tasks">
             <a>tasks view</a>
           </UISref>{' '}
-          to see work that's in progress. <LearnMoreLink id={id} />
+          to see work that's in progress.
         </p>
+        <LearnMoreLink id={id} status={ManagedResourceStatus.ACTUATING} />
       </>
     ),
   },
@@ -37,9 +38,9 @@ const viewConfigurationByStatus = {
         </p>
         <p>
           If its actual configuration drifts from the declarative configuration, Spinnaker will automatically correct
-          it. Changes made in the UI will be stomped in favor of the declarative configuration.{' '}
-          <LearnMoreLink id={id} />
+          it. Changes made in the UI will be stomped in favor of the declarative configuration.
         </p>
+        <LearnMoreLink id={id} status={ManagedResourceStatus.CREATED} />
       </>
     ),
   },
@@ -51,10 +52,8 @@ const viewConfigurationByStatus = {
         <p>
           <b>A drift from the declarative configuration was detected.</b>
         </p>
-        <p>
-          Spinnaker will automatically take action to bring this resource back to its desired state.{' '}
-          <LearnMoreLink id={id} />
-        </p>
+        <p>Spinnaker will automatically take action to bring this resource back to its desired state.</p>
+        <LearnMoreLink id={id} status={ManagedResourceStatus.DIFF} />
       </>
     ),
   },
@@ -68,9 +67,9 @@ const viewConfigurationByStatus = {
         </p>
         <p>
           Spinnaker is configured to continuously manage this resource, but something went wrong trying to check its
-          current state. Automatic action can't be taken right now, and manual intervention might be required.{' '}
-          <LearnMoreLink id={id} />
+          current state. Automatic action can't be taken right now, and manual intervention might be required.
         </p>
+        <LearnMoreLink id={id} status={ManagedResourceStatus.ERROR} />
       </>
     ),
   },
@@ -82,9 +81,8 @@ const viewConfigurationByStatus = {
         <p>
           <b>Spinnaker is continuously managing this resource.</b>
         </p>
-        <p>
-          Changes made in the UI will be stomped in favor of the declarative configuration. <LearnMoreLink id={id} />
-        </p>
+        <p>Changes made in the UI will be stomped in favor of the declarative configuration.</p>
+        <LearnMoreLink id={id} status={ManagedResourceStatus.HAPPY} />
       </>
     ),
   },
@@ -102,8 +100,32 @@ const viewConfigurationByStatus = {
           <UISref to="home.applications.application.config" params={{ section: 'managed-resources' }}>
             <a>config view</a>
           </UISref>
-          . <LearnMoreLink id={id} />
+          .
         </p>
+        <LearnMoreLink id={id} status={ManagedResourceStatus.PAUSED} />
+      </>
+    ),
+  },
+  RESUMED: {
+    iconClass: 'icon-md-resumed',
+    colorClass: 'info',
+    popoverContents: (id: string) => (
+      <>
+        <p>
+          <b>Continuous management was just resumed.</b>
+        </p>
+        <p>
+          Management was resumed after being temporarily paused. If Spinnaker detects that a drift from the declarative
+          configuration occurred while paused, it will take automatic action to resolve the drift.
+        </p>
+        <p>
+          You can pause and resume management on the{' '}
+          <UISref to="home.applications.application.config" params={{ section: 'managed-resources' }}>
+            <a>config view</a>
+          </UISref>
+          .
+        </p>
+        <LearnMoreLink id={id} status={ManagedResourceStatus.RESUMED} />
       </>
     ),
   },
@@ -124,8 +146,9 @@ const viewConfigurationByStatus = {
           <UISref to="home.applications.application.config" params={{ section: 'managed-resources' }}>
             <a>config view</a>
           </UISref>{' '}
-          to troubleshoot or make manual changes. <LearnMoreLink id={id} />
+          to troubleshoot or make manual changes.
         </p>
+        <LearnMoreLink id={id} status={ManagedResourceStatus.UNHAPPY} />
       </>
     ),
   },
@@ -139,28 +162,31 @@ const viewConfigurationByStatus = {
         </p>
         <p>
           Spinnaker is configured to continuously manage this resource, but its current status can't be calculated right
-          now. <LearnMoreLink id={id} />
+          now.
         </p>
+        <LearnMoreLink id={id} status={ManagedResourceStatus.UNKNOWN} />
       </>
     ),
   },
 };
 
-const logClick = (label: string, resourceId: string) =>
+const logClick = (label: string, resourceId: string, status: ManagedResourceStatus) =>
   ReactGA.event({
     category: 'Managed Resource Status Indicator',
     action: `${label} clicked`,
-    label: resourceId,
+    label: `${resourceId},${status}`,
   });
 
-const LearnMoreLink = ({ id }: { id: string }) => (
-  <a
-    target="_blank"
-    onClick={() => logClick('Learn More', id)}
-    href="https://www.spinnaker.io/reference/managed-delivery"
-  >
-    Learn More
-  </a>
+const LearnMoreLink = ({ id, status }: { id: string; status: ManagedResourceStatus }) => (
+  <p className="sp-margin-m-top sp-margin-xs-bottom">
+    <a
+      target="_blank"
+      onClick={() => logClick('Status docs link', id, status)}
+      href={`https://www.spinnaker.io/reference/managed-delivery/resource-status/#${status.toLowerCase()}`}
+    >
+      Learn more about this
+    </a>
+  </p>
 );
 
 export interface IManagedResourceStatusIndicatorProps {
