@@ -11,6 +11,7 @@ import {
 import { IAmazonFunctionSourceData, IAmazonFunction } from 'amazon/domain';
 import { FunctionActions } from './FunctionActions';
 import { AwsReactInjector } from 'amazon/reactShims';
+import * as _ from 'lodash';
 
 export interface IFunctionFromStateParams {
   account: string;
@@ -55,6 +56,7 @@ export class AmazonFunctionDetails extends React.Component<IAmazonFunctionDetail
         });
     } else {
       this.setState({
+        functionDef: {},
         loading: false,
       });
     }
@@ -113,20 +115,27 @@ export class AmazonFunctionDetails extends React.Component<IAmazonFunctionDetail
 
     return (
       <Details loading={this.state.loading}>
-        <Details.Header icon={<i className="fa icon-sitemap" />} name={this.state.functionDef.functionName}>
-          <div className="actions">
-            <FunctionActions
-              app={app}
-              functionDef={functionDef}
-              functionFromParams={{
-                account: this.state.functionDef.account,
-                region: this.state.functionDef.region,
-                functionName: this.state.functionDef.functionName,
-              }}
-            />
-          </div>
-        </Details.Header>
-        {functionDetailsSection}
+        {_.isEmpty(this.state.functionDef) ? (
+          'Function not found.'
+        ) : (
+          <Details.Header
+            icon={<i className="fa fa-xs fa-fw fa-asterisk" />}
+            name={this.state.functionDef.functionName}
+          >
+            <div className="actions">
+              <FunctionActions
+                app={app}
+                functionDef={functionDef}
+                functionFromParams={{
+                  account: this.state.functionDef.account,
+                  region: this.state.functionDef.region,
+                  functionName: this.state.functionDef.functionName,
+                }}
+              />
+            </div>
+          </Details.Header>
+        )}
+        {!_.isEmpty(this.state.functionDef) ? functionDetailsSection : ''}
       </Details>
     );
   }
