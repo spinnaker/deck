@@ -11,7 +11,7 @@ import {
 import { IAmazonFunctionSourceData, IAmazonFunction } from 'amazon/domain';
 import { FunctionActions } from './FunctionActions';
 import { AwsReactInjector } from 'amazon/reactShims';
-import * as _ from 'lodash';
+import { isEmpty } from 'lodash';
 
 export interface IFunctionFromStateParams {
   account: string;
@@ -115,7 +115,7 @@ export class AmazonFunctionDetails extends React.Component<IAmazonFunctionDetail
 
     return (
       <Details loading={this.state.loading}>
-        {_.isEmpty(this.state.functionDef) ? (
+        {isEmpty(this.state.functionDef) ? (
           'Function not found.'
         ) : (
           <Details.Header
@@ -135,7 +135,7 @@ export class AmazonFunctionDetails extends React.Component<IAmazonFunctionDetail
             </div>
           </Details.Header>
         )}
-        {!_.isEmpty(this.state.functionDef) ? functionDetailsSection : ''}
+        {!isEmpty(this.state.functionDef) ? functionDetailsSection : ''}
       </Details>
     );
   }

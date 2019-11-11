@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import { isEmpty } from 'lodash';
 
 export const iamRoleValidator = (value: string, label: string) => {
   const isIAMRole = value.match(/^arn:aws:iam::\d{12}:role\/?\/[a-zA-Z_0-9+=,.@\-_/]+/);
@@ -23,5 +23,5 @@ export const awsArnValidator = (value: string, label: string) => {
 };
 
 export const awsTagsValidator = (value: string | { [key: string]: string }, label: string) => {
-  return _.isEmpty(value) ? `Atleast one ${label} is required` : undefined;
+  return isEmpty(value) ? `At least one ${label} is required` : undefined;
 };

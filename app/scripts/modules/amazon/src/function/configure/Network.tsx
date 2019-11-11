@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Option } from 'react-select';
 import { IPromise } from 'angular';
 import { Observable, Subject } from 'rxjs';
-import { forOwn } from 'lodash';
+import { forOwn, uniqBy } from 'lodash';
 
 import {
   Application,
@@ -39,6 +39,7 @@ export interface INetworkState {
   accounts: IAccount[];
   regions: IRegion[];
   subnets: ISubnetOption[];
+  availableSubnets: ISubnetOption[];
   securityGroups: ISecurityGroupsByAccountSourceData;
 }
 
@@ -54,15 +55,18 @@ export class Network extends React.Component<INetworkProps, INetworkState>
     accounts: null,
     regions: [],
     subnets: [],
+    availableSubnets: [],
     securityGroups: null,
   };
   private props$ = new Subject<INetworkProps>();
   private destroy$ = new Subject<void>();
 
   private getAllVpcs(): void {
-    VpcReader.listVpcs().then(Vpcs => {
-      this.setState({ vpcOptions: Vpcs });
-    });
+    Observable.fromPromise(VpcReader.listVpcs())
+      .takeUntil(this.destroy$)
+      .subscribe(Vpcs => {
+        this.setState({ vpcOptions: Vpcs });
+      });
   }
 
   public validate(): FormikErrors<IAmazonFunctionUpsertCommand> {
@@ -77,18 +81,9 @@ export class Network extends React.Component<INetworkProps, INetworkState>
     return ReactInjector.securityGroupReader.getAllSecurityGroups();
   }
   private makeSubnetOptions(availableSubnets: ISubnet[]): ISubnetOption[] {
-    const subOptions: ISubnetOption[] = [];
-    availableSubnets.forEach(s => {
-      const opt: ISubnetOption = {
-        subnetId: s.id,
-        vpcId: s.vpcId,
-      };
-      subOptions.push(opt);
-    });
+    const subOptions: ISubnetOption[] = availableSubnets.map(s => ({ subnetId: s.id, vpcId: s.vpcId }));
     // we have to filter out any duplicate options
-    const uniqueSubOptions = Array.from(new Set(subOptions.map(a => a.subnetId))).map(subnetId => {
-      return subOptions.find(a => a.subnetId === subnetId);
-    });
+    const uniqueSubOptions = uniqBy(subOptions, 'subnetId');
     return uniqueSubOptions;
   }
 
@@ -119,8 +114,8 @@ export class Network extends React.Component<INetworkProps, INetworkState>
     const secGroups$ = Promise.resolve(this.getAvailableSecurityGroups());
     Observable.combineLatest(allSubnets, secGroups$)
       .takeUntil(this.destroy$)
-      .subscribe(([subnets, securityGroups]) => {
-        return this.setState({ subnets, securityGroups });
+      .subscribe(([availableSubnets, securityGroups]) => {
+        return this.setState({ availableSubnets, securityGroups });
       });
   }
 
@@ -136,8 +131,8 @@ export class Network extends React.Component<INetworkProps, INetworkState>
 
   private handleVpcChange = (vpcId: string): void => {
     this.props.formik.setFieldValue('vpcId', vpcId);
-    const { subnets } = this.state;
-    const subs = subnets.filter(function(s: ISubnetOption) {
+    const { availableSubnets } = this.state;
+    const subs = availableSubnets.filter(function(s: ISubnetOption) {
       return s.vpcId.includes(vpcId);
     });
     this.setState({ subnets: subs });

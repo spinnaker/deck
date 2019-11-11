@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { IWizardPageComponent, MapEditor, FormikFormField, FormValidator } from '@spinnaker/core';
+import { IWizardPageComponent, FormikFormField, FormValidator, MapEditorInput } from '@spinnaker/core';
 import { FormikProps } from 'formik';
 import { IAmazonFunctionUpsertCommand } from 'amazon/index';
 import { IAmazonFunction } from 'amazon/domain';
@@ -15,9 +15,6 @@ export interface IFunctionTagsProps {
 
 export class FunctionTags extends React.Component<IFunctionTagsProps>
   implements IWizardPageComponent<IAmazonFunctionUpsertCommand> {
-  constructor(props: IFunctionTagsProps) {
-    super(props);
-  }
   public validate = (values: IAmazonFunctionUpsertCommand) => {
     const validator = new FormValidator(values);
     validator
@@ -27,18 +24,13 @@ export class FunctionTags extends React.Component<IFunctionTagsProps>
     return validator.validateForm();
   };
 
-  private varsChanged = (tag: string | { [key: string]: string }) => {
-    this.props.formik.setFieldValue('tags', Array(tag));
-  };
-
   public render() {
-    const { values } = this.props.formik;
     return (
       <div className="container-fluid form-horizontal ">
         <FormikFormField
           fastField={false}
           name="tags"
-          input={props => <MapEditor {...props} model={values.tags} allowEmpty={false} onChange={this.varsChanged} />}
+          input={props => <MapEditorInput {...props} allowEmptyValues={false} addButtonLabel="Add" />}
         />
       </div>
     );

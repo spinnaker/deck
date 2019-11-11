@@ -23,10 +23,6 @@ export interface ICreateFunctionButtonProps {
 }
 
 export class CreateFunctionButton extends React.Component<ICreateFunctionButtonProps> {
-  constructor(props: ICreateFunctionButtonProps) {
-    super(props);
-  }
-
   private createFunction = (): void => {
     const { skinSelectionService } = ReactInjector;
     const { app } = this.props;
