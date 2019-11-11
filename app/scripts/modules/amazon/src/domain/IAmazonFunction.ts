@@ -49,8 +49,8 @@ export interface IAmazonFunctionUpsertCommand extends IFunctionUpsertCommand {
     targetArn: string;
   };
   KMSKeyArn: string;
-  securityGroupIds: [];
-  subnetIds: [];
+  securityGroupIds: string[];
+  subnetIds: string[];
   vpcId: string;
 }
 

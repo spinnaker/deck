@@ -12,6 +12,8 @@ import { IAmazonFunctionSourceData, IAmazonFunction } from 'amazon/domain';
 import { FunctionActions } from './FunctionActions';
 import { AwsReactInjector } from 'amazon/reactShims';
 import { isEmpty } from 'lodash';
+import { Observable } from 'rxjs/Observable';
+import { Subject } from 'rxjs/Subject';
 
 export interface IFunctionFromStateParams {
   account: string;
@@ -26,6 +28,7 @@ export interface IAmazonFunctionDetailsProps extends IOverridableProps {
 
 @Overrides('function.details', 'aws')
 export class AmazonFunctionDetails extends React.Component<IAmazonFunctionDetailsProps, any> {
+  private destroy$ = new Subject();
   constructor(props: IAmazonFunctionDetailsProps) {
     super(props);
     this.state = {
@@ -44,9 +47,16 @@ export class AmazonFunctionDetails extends React.Component<IAmazonFunctionDetail
     });
 
     if (functionDef) {
-      AwsReactInjector.functionReader
-        .getFunctionDetails('aws', functionFromProps.account, functionFromProps.region, functionFromProps.functionName)
-        .then((details: IAmazonFunctionSourceData[]) => {
+      Observable.fromPromise(
+        AwsReactInjector.functionReader.getFunctionDetails(
+          'aws',
+          functionFromProps.account,
+          functionFromProps.region,
+          functionFromProps.functionName,
+        ),
+      )
+        .takeUntil(this.destroy$)
+        .subscribe((details: IAmazonFunctionSourceData[]) => {
           if (details.length) {
             this.setState({
               functionDef: details[0] as IAmazonFunction,
@@ -65,15 +75,18 @@ export class AmazonFunctionDetails extends React.Component<IAmazonFunctionDetail
   public componentDidMount(): void {
     const { app } = this.props;
     const dataSource = app.functions;
-    dataSource.ready().then(() => {
-      const dataSourceUnsubscribe = dataSource.onRefresh(null, () => this.extractFunction());
-      this.setState({ dataSourceUnsubscribe });
-      this.extractFunction();
-    });
+    Observable.fromPromise(dataSource.ready())
+      .takeUntil(this.destroy$)
+      .subscribe(() => {
+        const dataSourceUnsubscribe = dataSource.onRefresh(null, () => this.extractFunction());
+        this.setState({ dataSourceUnsubscribe });
+        this.extractFunction();
+      });
   }
 
   public componentWillUnmount() {
     this.state.dataSourceUnsubscribe && this.state.dataSourceUnsubscribe();
+    this.destroy$.next();
   }
 
   public render() {

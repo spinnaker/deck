@@ -129,8 +129,9 @@ export class Network extends React.Component<INetworkProps, INetworkState>
     this.props.formik.setFieldValue('securityGroupIds', sgSelected);
   };
 
-  private handleVpcChange = (vpcId: string): void => {
+  private setVpc = (vpcId: string): void => {
     this.props.formik.setFieldValue('vpcId', vpcId);
+    this.props.formik.setFieldValue('subnetIds', []);
     const { availableSubnets } = this.state;
     const subs = availableSubnets.filter(function(s: ISubnetOption) {
       return s.vpcId.includes(vpcId);
@@ -169,10 +170,24 @@ export class Network extends React.Component<INetworkProps, INetworkState>
     return sgOptions;
   };
 
-  public render() {
-    const { vpcOptions, subnets, securityGroups } = this.state;
+  private getSubnetOptions = (): Array<Option<string>> => {
+    const { subnets, availableSubnets } = this.state;
     const { values } = this.props.formik;
-    const subnetOptions = (subnets || []).map(this.toSubnetOption);
+    if (!this.props.isNew && values.vpcId) {
+      return availableSubnets
+        .filter(function(s: ISubnetOption) {
+          return s.vpcId.includes(values.vpcId);
+        })
+        .map(this.toSubnetOption);
+    } else {
+      return subnets.map(this.toSubnetOption);
+    }
+  };
+
+  public render() {
+    const { vpcOptions, securityGroups } = this.state;
+    const { values } = this.props.formik;
+    const subnetOptions = this.getSubnetOptions();
     const sgOptions = securityGroups ? this.getSecurityGroupsByVpc(securityGroups) : [];
     return (
       <div className="form-group">
@@ -193,7 +208,7 @@ export class Network extends React.Component<INetworkProps, INetworkState>
                     clearable={true}
                   />
                 )}
-                onChange={this.handleVpcChange}
+                onChange={this.setVpc}
                 required={false}
               />
             )}
