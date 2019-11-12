@@ -10,7 +10,7 @@ export interface IAmazonFunction extends IFunction {
   functionName: string;
   publish: boolean;
   description: string;
-  tags: string | { [key: string]: string };
+  tags: [];
   memorySize: number;
   timeout: number;
   envVariables: {};
@@ -29,6 +29,7 @@ export interface IAmazonFunction extends IFunction {
     subnetIds: [];
     vpcId: string;
   };
+  targetGroups: string[];
 }
 
 export interface IAmazonFunctionUpsertCommand extends IFunctionUpsertCommand {
@@ -37,7 +38,7 @@ export interface IAmazonFunctionUpsertCommand extends IFunctionUpsertCommand {
   s3bucket: string;
   s3key: string;
   handler: string;
-  tags: string | { [key: string]: string };
+  tags: [];
   memorySize: number;
   timeout: number;
   envVariables: {};
@@ -52,6 +53,7 @@ export interface IAmazonFunctionUpsertCommand extends IFunctionUpsertCommand {
   securityGroupIds: string[];
   subnetIds: string[];
   vpcId: string;
+  targetGroup: string;
 }
 
 export interface IAmazonFunctionDeleteCommand extends IFunctionDeleteCommand {
