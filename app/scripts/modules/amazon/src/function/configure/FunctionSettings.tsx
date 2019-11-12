@@ -20,9 +20,7 @@ export class FunctionSettings extends React.Component<IFunctionSettingsProps>
   public render() {
     return (
       <div className="container-fluid form-horizontal ">
-        <div className="sp-margin-m-bottom">
-          <FormikFormField name="description" label="Description" input={props => <TextInput {...props} />} />
-        </div>
+        <FormikFormField name="description" label="Description" input={props => <TextInput {...props} />} />
         <FormikFormField
           name="memorySize"
           label="Memory (MB)"
