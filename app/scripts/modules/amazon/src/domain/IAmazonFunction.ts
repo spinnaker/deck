@@ -10,7 +10,7 @@ export interface IAmazonFunction extends IFunction {
   functionName: string;
   publish: boolean;
   description: string;
-  tags: [];
+  tags: string | { [key: string]: string };
   memorySize: number;
   timeout: number;
   envVariables: {};
@@ -38,7 +38,7 @@ export interface IAmazonFunctionUpsertCommand extends IFunctionUpsertCommand {
   s3bucket: string;
   s3key: string;
   handler: string;
-  tags: [];
+  tags: string | { [key: string]: string };
   memorySize: number;
   timeout: number;
   envVariables: {};
@@ -53,7 +53,7 @@ export interface IAmazonFunctionUpsertCommand extends IFunctionUpsertCommand {
   securityGroupIds: string[];
   subnetIds: string[];
   vpcId: string;
-  targetGroup: string;
+  targetGroups: string[];
 }
 
 export interface IAmazonFunctionDeleteCommand extends IFunctionDeleteCommand {

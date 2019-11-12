@@ -35,11 +35,10 @@ export interface IAmazonFunctionSourceData extends IFunctionSourceData {
   };
   s3bucket: string;
   s3key: string;
-  tags: [];
+  tags: string | { [key: string]: string };
   deadLetterConfig: {
     targetArn: string;
   };
   KMSKeyArn: string;
-  targetGroup: string;
   targetGroups: string[];
 }

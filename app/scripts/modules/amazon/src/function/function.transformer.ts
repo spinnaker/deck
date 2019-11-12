@@ -2,7 +2,6 @@ import { AWSProviderSettings } from 'amazon/aws.settings';
 import { Application } from '@spinnaker/core';
 
 import { IAmazonFunctionUpsertCommand, IAmazonFunction } from 'amazon/domain';
-import { isEmpty } from 'lodash';
 
 export class AwsFunctionTransformer {
   public normalizeFunction(functionDef: IAmazonFunction): IAmazonFunction {
@@ -28,7 +27,7 @@ export class AwsFunctionTransformer {
     operation: '',
     cloudProvider: functionDef.cloudProvider,
     region: functionDef.region,
-    targetGroup: isEmpty(functionDef.targetGroups) ? '' : functionDef.targetGroups[0],
+    targetGroups: functionDef.targetGroups,
   });
 
   public constructNewAwsFunctionTemplate(application: Application): IAmazonFunctionUpsertCommand {
@@ -43,7 +42,7 @@ export class AwsFunctionTransformer {
       handler: '',
       functionName: '',
       publish: false,
-      tags: [],
+      tags: {},
       memorySize: 128,
       description: '',
 
@@ -65,7 +64,7 @@ export class AwsFunctionTransformer {
         targetArn: '',
       },
       operation: '',
-      targetGroup: '',
+      targetGroups: [],
     };
   }
 }
