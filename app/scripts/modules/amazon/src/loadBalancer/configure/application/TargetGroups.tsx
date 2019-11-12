@@ -87,7 +87,7 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
       }
 
       if (targetGroup.targetType !== 'lambda') {
-        ['healthCheckInterval', 'healthyThreshold', 'unhealthyThreshold'].forEach(key => {
+        ['port', 'healthCheckInterval', 'healthyThreshold', 'unhealthyThreshold'].forEach(key => {
           const err = spelNumberCheck(targetGroup[key]);
           if (err) {
             tgErrors[key] = err;

@@ -33,12 +33,7 @@ export class FunctionSettings extends React.Component<IFunctionSettingsProps>
           help={<HelpField id="aws.functionBasicSettings.timeout" />}
           input={props => <NumberInput {...props} min={1} max={900} />}
         />
-        <FormikFormField
-          name="targetGroups"
-          label="Target Group Name"
-          help={<HelpField id="" />}
-          input={props => <TextInput {...props} />}
-        />
+        <FormikFormField name="targetGroups" label="Target Group Name" input={props => <TextInput {...props} />} />
       </div>
     );
   }
