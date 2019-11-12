@@ -17,10 +17,6 @@ export class FunctionSettings extends React.Component<IFunctionSettingsProps>
     return errors;
   };
 
-  private handleTargetGroups = (targetGrpName: string): void => {
-    this.props.formik.setFieldValue('targetGroups', [targetGrpName]);
-  };
-
   public render() {
     return (
       <div className="container-fluid form-horizontal ">
@@ -42,7 +38,6 @@ export class FunctionSettings extends React.Component<IFunctionSettingsProps>
           label="Target Group Name"
           help={<HelpField id="" />}
           input={props => <TextInput {...props} />}
-          onChange={this.handleTargetGroups}
         />
       </div>
     );
