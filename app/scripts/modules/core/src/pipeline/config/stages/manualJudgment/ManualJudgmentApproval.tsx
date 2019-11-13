@@ -5,6 +5,9 @@ import { IExecution, IExecutionStage } from 'core/domain';
 import { Application } from 'core/application/application.model';
 import { Markdown } from 'core/presentation/Markdown';
 import { NgReact, ReactInjector } from 'core/reactShims';
+import { useLatestPromise } from 'core/presentation';
+import { ApplicationReader } from 'core/application/service/ApplicationReader';
+import { AuthenticationService } from 'core/authentication';
 
 export interface IManualJudgmentApprovalProps {
   execution: IExecution;
@@ -16,6 +19,10 @@ export interface IManualJudgmentApprovalState {
   submitting: boolean;
   judgmentDecision: string;
   judgmentInput: { value?: string };
+  applicationRoles: {};
+  appRoles: string[];
+  runOnce: boolean;
+  userRoles: [];
   error: boolean;
 }
 
@@ -29,8 +36,33 @@ export class ManualJudgmentApproval extends React.Component<
       submitting: false,
       judgmentDecision: null,
       judgmentInput: {},
+      applicationRoles: {},
+      appRoles: string[],
+      runOnce: true,
+      userRoles: [],
       error: false,
     };
+  }
+
+  componentDidMount() {
+      if (this.state.runOnce) {
+          const applicationName = this.props.execution.application;
+          ApplicationReader.getApplicationPermissions(applicationName)
+              .then(result => {
+                  this.setState({
+                      applicationRoles: result,
+                      runOnce: false,
+                  })
+                  this.populateApplicationRoles();
+                  this.isStageAuthorized();
+              })
+              .catch(error => this.setState({
+                  error,
+              }));
+          this.setState({
+              userRoles: AuthenticationService.getAuthenticatedUser().roles
+          });
+      }
   }
 
   private provideJudgment(judgmentDecision: string): void {
@@ -45,6 +77,36 @@ export class ManualJudgmentApproval extends React.Component<
       this.props.stage.context.judgmentStatus === decision ||
       (this.state.submitting && this.state.judgmentDecision === decision)
     );
+  }
+
+  private populateApplicationRoles(): void {
+      const readArray = this.state.applicationRoles.READ || [];
+      const writeArray = this.state.applicationRoles.WRITE || [];
+      const executeArray = this.state.applicationRoles.EXECUTE || [];
+      const roles = readArray.concat(writeArray, executeArray);
+      this.setState({
+          appRoles: Array.from(new Set(roles))
+      });
+  }
+
+  private isStageAuthorized(): boolean {
+
+      let disableBtn = true;
+      let usrRole;
+      const stageRoles = this.props.stage.context.selectedStageRoles || [];
+      const appRoles = this.state.appRoles;
+      const usrRoles = this.state.userRoles;
+      if (appRoles.length === 0 || stageRoles.length === 0) {
+          disableBtn = false;
+          return disableBtn;
+      }
+      for (usrRole of usrRoles) {
+          if ((stageRoles.indexOf(usrRole) > -1) && (appRoles.indexOf(usrRole) > -1)) {
+              disableBtn = false;
+              break;
+          }
+      }
+      return disableBtn;
   }
 
   private handleJudgementChanged = (option: Option): void => {
@@ -103,7 +165,7 @@ export class ManualJudgmentApproval extends React.Component<
                 className="btn btn-danger"
                 onClick={this.handleStopClick}
                 disabled={
-                  this.state.submitting ||
+                  this.isStageAuthorized() || this.state.submitting ||
                   stage.context.judgmentStatus ||
                   (options.length && !this.state.judgmentInput.value)
                 }
@@ -114,7 +176,7 @@ export class ManualJudgmentApproval extends React.Component<
               <button
                 className="btn btn-primary"
                 disabled={
-                  this.state.submitting ||
+                  this.isStageAuthorized() || this.state.submitting ||
                   stage.context.judgmentStatus ||
                   (options.length && !this.state.judgmentInput.value)
                 }
