@@ -19,6 +19,7 @@ import { ReactModal } from 'core/presentation';
 import { PRODUCES_ARTIFACTS_REACT } from './producesArtifacts/ProducesArtifacts';
 import { OVERRRIDE_FAILURE } from './overrideFailure/overrideFailure.module';
 import { OVERRIDE_TIMEOUT_COMPONENT } from './overrideTimeout/overrideTimeout.module';
+import { ApplicationReader } from 'core/application/service/ApplicationReader';
 
 module.exports = angular
   .module('spinnaker.core.pipeline.config.stage', [
@@ -57,10 +58,13 @@ module.exports = angular
     '$templateCache',
     function($scope, $element, $compile, $controller, $templateCache) {
       var lastStageScope, reactComponentMounted;
+      var appPermissions = {};
+      var appRoles = [];
 
       $scope.options = {
         stageTypes: [],
         selectedStageType: null,
+        stageRoles: [],
       };
 
       AccountService.applicationAccounts($scope.application).then(accounts => {
@@ -130,6 +134,33 @@ module.exports = angular
         });
       };
 
+      $scope.getApplicationPermissions = function() {
+
+          ApplicationReader.getApplicationPermissions($scope.application.name)
+              .then(result => {
+                  appPermissions = result;
+                  if (appPermissions) {
+                      const readArray = appPermissions.READ || [];
+                      const writeArray = appPermissions.WRITE || [];
+                      const executeArray = appPermissions.EXECUTE || [];
+                      appRoles = readArray.concat(writeArray, executeArray);
+                      appRoles = Array.from(new Set(appRoles));
+                      $scope.updateAvailableStageRoles();
+                  }
+              });
+      }
+
+      $scope.updateAvailableStageRoles = function() {
+          $scope.options.stageRoles = appRoles.map(function(value, index) {
+              return {
+                  name: value,
+                  roleId: value,
+                  id: index,
+                  available: true,
+              };
+          });
+      };
+
       this.checkFeatureFlag = flag => !!SETTINGS.feature[flag];
 
       this.editStageJson = () => {
@@ -170,11 +201,13 @@ module.exports = angular
 
         if (!$scope.stage.type) {
           $scope.options.selectedStageType = null;
+	        $scope.options.selectedStageRoles = null;
         } else {
           $scope.options.selectedStageType = $scope.stage.type;
         }
 
         $scope.updateAvailableDependencyStages();
+        $scope.updateAvailableStageRoles();
         var type = $scope.stage.type,
           stageScope = $scope.$new();
 
@@ -303,6 +336,7 @@ module.exports = angular
         });
       };
 
+      $scope.getApplicationPermissions();
       $scope.$on('pipeline-reverted', this.selectStage);
       $scope.$on('pipeline-json-edited', this.selectStage);
       $scope.$watch('stage.type', this.selectStage);
