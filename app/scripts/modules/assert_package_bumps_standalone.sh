@@ -10,8 +10,7 @@ echo "TRAVIS_BRANCH=$TRAVIS_BRANCH"
 TARGET_BRANCH=${TRAVIS_BRANCH:-master}
 echo "TARGET_BRANCH=$TARGET_BRANCH"
 
-echo "Merging from target branch to get minimal diff."
-git merge $TARGET_BRANCH
+# Tests are run against an ephemeral merge commit so we don't have to merge in $TARGET_BRANCH
 
 for PKGJSON in `ls app/scripts/modules/*/package.json` ; do
   MODULE=`basename $(dirname $PKGJSON)`
