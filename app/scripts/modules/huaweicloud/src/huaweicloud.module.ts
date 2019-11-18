@@ -11,7 +11,7 @@ templates.keys().forEach(function(key) {
 });
 
 export const HUAWEICLOUD_MODULE = 'spinnaker.huaweicloud';
-module(HUAWEICLOUD_MODULE, []).config(() => {
+module(HUAWEICLOUD_MODULE, [require('./pipeline/stages/bake/bakeStage.controller').name]).config(() => {
   CloudProviderRegistry.registerProvider('huaweicloud', {
     name: 'huaweicloud',
   });
