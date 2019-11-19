@@ -34,7 +34,6 @@ export class CapacitySelector extends React.Component<ICapacitySelectorProps> {
       ...command.viewState,
       useSimpleCapacity: simpleCapacity,
     };
-    // command.viewState.useSimpleCapacity = simpleCapacity;
     this.props.setFieldValue('useSourceCapacity', false);
     this.props.setFieldValue('viewState', newViewState);
     this.setMinMax(command.capacity.desired);
