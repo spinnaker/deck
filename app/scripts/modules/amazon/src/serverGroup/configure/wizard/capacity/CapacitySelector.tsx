@@ -30,8 +30,13 @@ export class CapacitySelector extends React.Component<ICapacitySelectorProps> {
 
   private setSimpleCapacity(simpleCapacity: boolean) {
     const { command } = this.props;
-    command.viewState.useSimpleCapacity = simpleCapacity;
+    const newViewState = {
+      ...command.viewState,
+      useSimpleCapacity: simpleCapacity,
+    };
+    // command.viewState.useSimpleCapacity = simpleCapacity;
     this.props.setFieldValue('useSourceCapacity', false);
+    this.props.setFieldValue('viewState', newViewState);
     this.setMinMax(command.capacity.desired);
     this.setState({});
   }
@@ -67,7 +72,7 @@ export class CapacitySelector extends React.Component<ICapacitySelectorProps> {
 
     const readOnlyFields = command.viewState.readOnlyFields || {};
 
-    if (!command.viewState.useSimpleCapacity) {
+    if (!command.viewState.useSimpleCapacity || command.useSourceCapacity) {
       return (
         <div>
           <div className="form-group">
