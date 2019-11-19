@@ -12,6 +12,7 @@ import {
   ValidationMessage,
   FormValidator,
   Validators,
+  spelNumberCheck,
 } from '@spinnaker/core';
 import { isNameLong, isNameInUse, isValidTimeout, isValidHealthCheckInterval } from '../common/targetGroupValidators';
 
@@ -69,11 +70,7 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
           );
         builder
           .field('healthCheckInterval', 'Health Check Interval')
-          .withValidators(
-            isValidHealthCheckInterval(item),
-            Validators.checkBetween('healthCheckProtocol', 5, 300),
-            Validators.isNum(),
-          );
+          .withValidators(isValidHealthCheckInterval(item), Validators.checkBetween('healthCheckInterval', 5, 300));
         builder
           .field('healthyThreshold', 'Healthy Threshold')
           .withValidators(Validators.checkBetween('healthyThreshold', 2, 10));
@@ -94,37 +91,37 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
             .field('healthyThreshold', 'Healthy Threshold')
             .required()
             .spelAware()
-            .withValidators(Validators.isNum());
+            .withValidators(value => spelNumberCheck(value));
           builder
             .field('unhealthyThreshold', 'Unhealthy Threshold')
             .required()
             .spelAware()
-            .withValidators(Validators.isNum());
+            .withValidators(value => spelNumberCheck(value));
           builder
             .field('healthCheckInterval', 'Health Check Interval')
             .required()
             .spelAware()
-            .withValidators(Validators.isNum());
+            .withValidators(value => spelNumberCheck(value));
           builder
             .field('healthCheckPort', 'Health Check Port')
             .required()
             .spelAware()
-            .withValidators(value => (value === 'traffic-port' ? null : Validators.isNum()(value)));
+            .withValidators(value => (value === 'traffic-port' ? null : spelNumberCheck(value)));
           builder
             .field('port', 'Port')
             .required()
             .spelAware()
-            .withValidators(Validators.isNum());
+            .withValidators(value => spelNumberCheck(value));
           builder
             .field('healthyThreshold', 'Healthy Threshold')
             .required()
             .spelAware()
-            .withValidators(Validators.isNum(), Validators.checkBetween('healthyThreshold', 2, 10));
+            .withValidators(value => spelNumberCheck(value), Validators.checkBetween('healthyThreshold', 2, 10));
           builder
             .field('unhealthyThreshold', 'Unhealthy Threshold')
             .required()
             .spelAware()
-            .withValidators(Validators.isNum(), Validators.checkBetween('unhealthyThreshold', 2, 10));
+            .withValidators(value => spelNumberCheck(value), Validators.checkBetween('unhealthyThreshold', 2, 10));
         }
       }),
     );

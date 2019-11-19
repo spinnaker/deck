@@ -73,22 +73,22 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
           .field('port', 'Port')
           .required()
           .spelAware()
-          .withValidators(Validators.isNum());
+          .withValidators(value => spelNumberCheck(value));
         builder
           .field('healthCheckInterval', 'Health Check Interval')
           .required()
           .spelAware()
-          .withValidators(Validators.isNum());
+          .withValidators(value => spelNumberCheck(value));
         builder
           .field('healthyThreshold', 'Healthy Threshold')
           .required()
           .spelAware()
-          .withValidators(Validators.isNum());
+          .withValidators(value => spelNumberCheck(value));
         builder
           .field('unhealthyThreshold', 'Unhealthy Threshold')
           .required()
           .spelAware()
-          .withValidators(Validators.isNum());
+          .withValidators(value => spelNumberCheck(value));
         builder
           .field('healthCheckPort', 'Health Check Port')
           .required()
