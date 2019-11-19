@@ -145,6 +145,7 @@ window.spinnakerSettings = {
         region: 'us-east-1',
         iamRole: 'BaseIAMRole',
       },
+      crossAccountSecurityGroups: true,
       defaultSecurityGroups: [],
       loadBalancers: {
         disableManualOidcDialog: false,

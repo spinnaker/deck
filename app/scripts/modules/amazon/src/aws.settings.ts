@@ -13,6 +13,9 @@ export interface IAWSProviderSettings extends IProviderSettings {
     subnetType?: string;
     vpc?: string;
   };
+  // Allows creation of new cross account security group ingresses.
+  // Defaults to true
+  crossAccountSecurityGroups?: boolean;
   defaultSecurityGroups?: string[];
   loadBalancers?: {
     certificateTypes?: string[];

@@ -59,12 +59,7 @@
   </div>
 </div>
 
-<a
-  href
-  class="small"
-  ng-if="!$ctrl.rule.existing && $ctrl.securityGroup.regions.length === 1 && !$ctrl.rule.crossAccountEnabled"
-  ng-click="$ctrl.enableCrossAccount($index)"
->
+<a href class="small" ng-if="$ctrl.showCrossAccountToggle()" ng-click="$ctrl.enableCrossAccount($index)">
   Select from a different account <span ng-if="$ctrl.securityGroup.vpcId">or VPC</span>
 </a>
 

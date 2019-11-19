@@ -3,6 +3,7 @@ import { Subject, Subscription } from 'rxjs';
 import { get, intersection, uniq } from 'lodash';
 
 import { ISecurityGroupRule, ISecurityGroup, IVpc } from '@spinnaker/core';
+import { AWSProviderSettings } from 'amazon/aws.settings';
 
 interface IInfiniteScroll {
   currentItems: number;
@@ -72,6 +73,15 @@ class IngressRuleSelectorController implements IController {
     this.rule.crossAccountEnabled = false;
     this.rule.accountName = undefined;
     this.rule.vpcId = undefined;
+  }
+
+  public showCrossAccountToggle(): boolean {
+    return (
+      AWSProviderSettings.crossAccountSecurityGroups !== false && // Setting to allow creating new x-account ingress
+      !this.rule.existing && // not editing an existing rule
+      this.securityGroup.regions.length === 1 && // only show when in single-region mode
+      !this.rule.crossAccountEnabled // we're not already in the mode
+    );
   }
 
   public $onInit(): void {
