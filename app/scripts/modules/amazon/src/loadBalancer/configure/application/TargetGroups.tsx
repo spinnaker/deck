@@ -10,18 +10,10 @@ import {
   SpInput,
   SpelNumberInput,
   ValidationMessage,
-  spelNumberCheck,
   FormValidator,
+  Validators,
 } from '@spinnaker/core';
-import {
-  isNameLong,
-  isNameInUse,
-  isDuplicateName,
-  isValidTimeout,
-  checkBetween,
-  isValidHealthCheckInterval,
-  spelNumber,
-} from '../common/targetGroupValidators';
+import { isNameLong, isNameInUse, isValidTimeout, isValidHealthCheckInterval } from '../common/targetGroupValidators';
 
 import { IAmazonApplicationLoadBalancer, IAmazonApplicationLoadBalancerUpsertCommand } from 'amazon/domain';
 
@@ -67,78 +59,75 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
       arrayForEach((builder, item) => {
         builder
           .field('name', 'Name')
-          .required()
           .withValidators(
             isNameInUse(this.state.existingTargetGroupNames, values.credentials, values.region),
             isNameLong(this.props.app.name.length),
-            isDuplicateName(duplicateTargetGroups),
+            Validators.valueUnique(
+              duplicateTargetGroups,
+              'There is already a target group in this load balancer with the same name.',
+            ),
           );
         builder
-          .field('port', 'Port')
-          .required()
-          .spelAware()
-          .withValidators(spelNumber);
-        builder
           .field('healthCheckInterval', 'Health Check Interval')
-          .required()
-          .withValidators(isValidHealthCheckInterval(item), checkBetween('healthCheckProtocol', 5, 300), spelNumber);
+          .withValidators(
+            isValidHealthCheckInterval(item),
+            Validators.checkBetween('healthCheckProtocol', 5, 300),
+            Validators.isNum(),
+          );
         builder
           .field('healthyThreshold', 'Healthy Threshold')
-          .required()
-          .spelAware()
-          .withValidators(spelNumber, checkBetween('healthyThreshold', 2, 10));
+          .withValidators(Validators.checkBetween('healthyThreshold', 2, 10));
         builder
           .field('unhealthyThreshold', 'Unhealthy Threshold')
-          .required()
           .spelAware()
-          .withValidators(spelNumber, checkBetween('unhealthyThreshold', 2, 10));
-        builder.field('protocol', 'Protocol').required();
-        builder.field('healthCheckPath', 'Health Check Path').required();
-        builder
-          .field('healthCheckPort', 'Health Check Port')
-          .required()
-          .spelAware()
-          .withValidators(value => (value === 'traffic-port' ? null : spelNumberCheck(value)));
-        builder.field('healthCheckProtocol', 'Health Check Protocol').required();
+          .withValidators(Validators.checkBetween('unhealthyThreshold', 2, 10));
         builder
           .field('healthCheckTimeout', 'Timeout')
-          .withValidators(isValidTimeout(item), checkBetween('healthCheckTimeout', 2, 120));
+          .withValidators(isValidTimeout(item), Validators.checkBetween('healthCheckTimeout', 2, 120));
+
+        if (item.targetType !== 'lambda') {
+          builder.field('protocol', 'Protocol').required();
+          builder.field('healthCheckPath', 'Health Check Path').required();
+          builder.field('healthCheckProtocol', 'Health Check Protocol').required();
+          builder.field('name', 'Name').required();
+          builder
+            .field('healthyThreshold', 'Healthy Threshold')
+            .required()
+            .spelAware()
+            .withValidators(Validators.isNum());
+          builder
+            .field('unhealthyThreshold', 'Unhealthy Threshold')
+            .required()
+            .spelAware()
+            .withValidators(Validators.isNum());
+          builder
+            .field('healthCheckInterval', 'Health Check Interval')
+            .required()
+            .spelAware()
+            .withValidators(Validators.isNum());
+          builder
+            .field('healthCheckPort', 'Health Check Port')
+            .required()
+            .spelAware()
+            .withValidators(value => (value === 'traffic-port' ? null : Validators.isNum()(value)));
+          builder
+            .field('port', 'Port')
+            .required()
+            .spelAware()
+            .withValidators(Validators.isNum());
+          builder
+            .field('healthyThreshold', 'Healthy Threshold')
+            .required()
+            .spelAware()
+            .withValidators(Validators.isNum(), Validators.checkBetween('healthyThreshold', 2, 10));
+          builder
+            .field('unhealthyThreshold', 'Unhealthy Threshold')
+            .required()
+            .spelAware()
+            .withValidators(Validators.isNum(), Validators.checkBetween('unhealthyThreshold', 2, 10));
+        }
       }),
     );
-
-      // if (targetGroup.targetType !== 'lambda') {
-      //   ['port', 'healthCheckInterval', 'healthyThreshold', 'unhealthyThreshold'].forEach(key => {
-      //     const err = spelNumberCheck(targetGroup[key]);
-      //     if (err) {
-      //       tgErrors[key] = err;
-      //     }
-      //   });
-      // }
-
-      // if (targetGroup.targetType !== 'lambda' && targetGroup.healthCheckPort !== 'traffic-port') {
-      //   const err = spelNumberCheck(targetGroup.healthCheckPort);
-      //   if (err) {
-      //     tgErrors.healthCheckPort = err;
-      //   }
-      // }
-      // if (targetGroup.targetType !== 'lambda') {
-      //   [
-      //     'name',
-      //     'port',
-      //     'protocol',
-      //     'healthCheckInterval',
-      //     'healthCheckPath',
-      //     'healthCheckPort',
-      //     'healthCheckProtocol',
-      //     'healthyThreshold',
-      //     'unhealthyThreshold',
-      //   ].forEach(key => {
-      //     if (!targetGroup[key]) {
-      //       tgErrors[key] = 'Required';
-      //     }
-      //   });
-      // }
-
 
     return formValidator.validateForm();
   }
@@ -173,7 +162,7 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
       });
   }
 
-  private targetGroupFieldChanged(index: number, field: string, value: string | boolean): void {
+  private targetGroupFieldChanged(index: number, field: string, value: string | boolean | number): void {
     const { setFieldValue, values } = this.props.formik;
     const targetGroup = values.targetGroups[index];
     if (field === 'targetType' && value === 'lambda') {
@@ -429,7 +418,7 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
                           <span className="wizard-pod-content">
                             <label>Path </label>
                             <SpInput
-                              // error={tgErrors.healthCheckPath}
+                              error={tgErrors.healthCheckPath}
                               name="healthCheckPath"
                               required={true}
                               value={targetGroup.healthCheckPath}
@@ -441,30 +430,17 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
                           <span className="wizard-pod-content">
                             <label>Timeout </label>
                             {(has6sTimeout || has10sTimeout) && <HelpField id="aws.targetGroup.healthCheckTimeout" />}
-                            {has6sTimeout || has10sTimeout ? (
-                              <SpInput
-                                disabled={true}
-                                className="form-control input-sm inline-number"
-                                error={tgErrors.healthCheckTimeout}
-                                name="healthCheckTimeout"
-                                required={true}
-                                value={has6sTimeout ? 6 : 10}
-                                onChange={event =>
-                                  this.targetGroupFieldChanged(index, 'healthCheckTimeout', event.target.value)
-                                }
-                              />
-                            ) : (
-                              <SpelNumberInput
-                                error={tgErrors.healthCheckTimeout}
-                                required={true}
-                                value={targetGroup.healthCheckTimeout}
-                                min={2}
-                                max={120}
-                                onChange={(value: string) =>
-                                  this.targetGroupFieldChanged(index, 'healthCheckTimeout', value)
-                                }
-                              />
-                            )}
+                            <SpelNumberInput
+                              error={tgErrors.healthCheckTimeout}
+                              disabled={has6sTimeout || has10sTimeout}
+                              required={true}
+                              value={has6sTimeout ? 6 : has10sTimeout ? 10 : targetGroup.healthCheckTimeout}
+                              min={2}
+                              max={120}
+                              onChange={(value: string | number) =>
+                                this.targetGroupFieldChanged(index, 'healthCheckTimeout', value)
+                              }
+                            />
                           </span>
                           <span className="wizard-pod-content">
                             <label>Interval </label>
@@ -474,7 +450,7 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
                               value={targetGroup.healthCheckInterval}
                               min={5}
                               max={300}
-                              onChange={(value: string) =>
+                              onChange={(value: string | number) =>
                                 this.targetGroupFieldChanged(index, 'healthCheckInterval', value)
                               }
                             />
@@ -493,7 +469,7 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
                               value={targetGroup.healthyThreshold}
                               min={2}
                               max={10}
-                              onChange={(value: string) =>
+                              onChange={(value: string | number) =>
                                 this.targetGroupFieldChanged(index, 'healthyThreshold', value)
                               }
                             />
@@ -506,7 +482,7 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
                               value={targetGroup.unhealthyThreshold}
                               min={2}
                               max={10}
-                              onChange={(value: string) =>
+                              onChange={(value: string | number) =>
                                 this.targetGroupFieldChanged(index, 'unhealthyThreshold', value)
                               }
                             />

@@ -12,8 +12,9 @@ import {
   SpelNumberInput,
   ValidationMessage,
   FormValidator,
+  Validators,
 } from '@spinnaker/core';
-import { isNameLong, isNameInUse, isDuplicateName, spelNumber } from '../common/targetGroupValidators';
+import { isNameLong, isNameInUse } from '../common/targetGroupValidators';
 
 import { IAmazonApplicationLoadBalancer, IAmazonNetworkLoadBalancerUpsertCommand } from 'amazon/domain';
 
@@ -63,28 +64,31 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
           .withValidators(
             isNameInUse(this.state.existingTargetGroupNames, values.credentials, values.region),
             isNameLong(this.props.app.name.length),
-            isDuplicateName(duplicateTargetGroups),
+            Validators.valueUnique(
+              duplicateTargetGroups,
+              'There is already a target group in this load balancer with the same name.',
+            ),
           );
         builder
           .field('port', 'Port')
           .required()
           .spelAware()
-          .withValidators(spelNumber);
+          .withValidators(Validators.isNum());
         builder
           .field('healthCheckInterval', 'Health Check Interval')
           .required()
           .spelAware()
-          .withValidators(spelNumber);
+          .withValidators(Validators.isNum());
         builder
           .field('healthyThreshold', 'Healthy Threshold')
           .required()
           .spelAware()
-          .withValidators(spelNumber);
+          .withValidators(Validators.isNum());
         builder
           .field('unhealthyThreshold', 'Unhealthy Threshold')
           .required()
           .spelAware()
-          .withValidators(spelNumber);
+          .withValidators(Validators.isNum());
         builder
           .field('healthCheckPort', 'Health Check Port')
           .required()

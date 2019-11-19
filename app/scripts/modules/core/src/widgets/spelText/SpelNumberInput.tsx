@@ -9,6 +9,7 @@ export interface INumberInputProps {
   max?: number;
   required?: boolean;
   error?: string;
+  disabled?: boolean;
 }
 
 export interface INumberInputState {
@@ -47,7 +48,7 @@ export class SpelNumberInput extends React.Component<INumberInputProps, INumberI
 
   public render() {
     const { expressionActive, glowing } = this.state;
-    const { value, min, max, required = false, error } = this.props;
+    const { value, min, max, required = false, error, disabled } = this.props;
     return (
       <div className="navbar-form" style={{ padding: 0, margin: 0, display: 'inline-block' }}>
         <Tooltip value={error} placement="right">
@@ -55,6 +56,7 @@ export class SpelNumberInput extends React.Component<INumberInputProps, INumberI
             <span className="btn-group btn-group-xs" role="group">
               <button
                 type="button"
+                disabled={disabled}
                 className={`btn btn-default ${expressionActive ? '' : 'active'}`}
                 onClick={() => this.setExpressionActive(false)}
                 onFocus={() => this.setGlow(true)}
@@ -66,6 +68,7 @@ export class SpelNumberInput extends React.Component<INumberInputProps, INumberI
               </button>
               <button
                 type="button"
+                disabled={disabled}
                 className={`btn btn-default ${expressionActive ? 'active' : ''}`}
                 onClick={() => this.setExpressionActive(true)}
                 onFocus={() => this.setGlow(true)}
@@ -81,6 +84,7 @@ export class SpelNumberInput extends React.Component<INumberInputProps, INumberI
             </span>
             <input
               type={expressionActive ? 'text' : 'number'}
+              disabled={disabled}
               className={`form-control borderless inline-${expressionActive ? 'text' : 'number'}`}
               value={value}
               min={min}
