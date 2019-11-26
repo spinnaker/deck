@@ -1,3 +1,4 @@
+import { API } from '@spinnaker/core';
 import { ISlackChannel, SlackReader } from './SlackReader';
 
 const mockSlackChannels: ISlackChannel[] = [
@@ -24,10 +25,12 @@ const mockSlackChannels: ISlackChannel[] = [
 describe('SlackReader', () => {
   it('should fetch a list of public Slack channels', () => {
     spyOn(SlackReader, 'getChannels').and.returnValue(Promise.resolve(mockSlackChannels));
+    spyOn(API, 'one');
 
     SlackReader.getChannels().then((channels: ISlackChannel[]) => {
       expect(SlackReader.getChannels).toHaveBeenCalled();
       expect(channels.length).toEqual(2);
+      expect(API.one).toHaveBeenCalledWith('slack/channels');
     });
   });
 });

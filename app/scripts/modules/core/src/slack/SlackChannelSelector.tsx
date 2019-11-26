@@ -15,52 +15,37 @@ export interface ISlackChannelSelectorState {
   loading: boolean;
 }
 
-export default class SlackChannelSelector extends React.Component<
-  ISlackChannelSelectorProps,
-  ISlackChannelSelectorState
-> {
-  public constructor(props: ISlackChannelSelectorProps) {
-    super(props);
-    this.state = {
-      channels: [],
-      selected: this.props.channel || null,
-      loading: true,
-    };
-  }
+export default function SlackChannelSelector({ channel, callback }: ISlackChannelSelectorProps) {
+  const [channels, setChannels] = React.useState([]);
+  const [selectedChannel, setSelectedChannel] = React.useState(channel);
+  const [isLoading, setIsLoading] = React.useState(true);
 
-  public componentDidMount() {
-    SlackReader.getChannels().then((channels: ISlackChannel[]) =>
-      this.setState({
-        channels,
-        loading: false,
-      }),
-    );
-  }
+  React.useEffect(() => {
+    SlackReader.getChannels().then((ch: ISlackChannel[]) => {
+      setChannels(ch);
+      setIsLoading(false);
+    });
+  }, []);
 
-  private onChange = (evt: Select.Option<ISlackChannel>) => {
-    const channel = evt ? evt.value : null;
-    const { callback } = this.props;
-    callback('slackChannel', channel || {});
-    this.setState({ selected: channel });
+  const onInputChange = (evt: Select.Option<ISlackChannel>) => {
+    const newChannel = evt ? evt.target.value : null;
+    callback('slackChannel', newChannel || {});
+    setSelectedChannel(newChannel);
   };
 
-  public render() {
-    const { channels, loading, selected } = this.state;
-
-    return (
-      <div className="form-group row">
-        <div className="col-sm-3 sm-label-right">Slack Channel</div>
-        <div className="col-sm-9">
-          <ReactSelectInput
-            inputClassName="form-control input-sm"
-            mode="VIRTUALIZED"
-            options={channels.map((ch: ISlackChannel) => ({ value: ch, label: ch.name }))}
-            value={selected && ({ value: selected, label: selected.name } as Select.Option<ISlackChannel>)}
-            onChange={this.onChange}
-            isLoading={loading}
-          />
-        </div>
+  return (
+    <div className="form-group row">
+      <div className="col-sm-3 sm-label-right">Slack Channel</div>
+      <div className="col-sm-9">
+        <ReactSelectInput
+          inputClassName="form-control input-sm"
+          mode="VIRTUALIZED"
+          options={channels.map((ch: ISlackChannel) => ({ value: ch, label: ch.name }))}
+          value={selectedChannel && { value: selectedChannel, label: selectedChannel.name }}
+          onChange={onInputChange}
+          isLoading={isLoading}
+        />
       </div>
-    );
-  }
+    </div>
+  );
 }
