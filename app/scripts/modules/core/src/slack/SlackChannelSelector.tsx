@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as Select from 'react-select';
-import VirtualizedSelect from 'react-virtualized-select';
+import { ReactSelectInput } from '@spinnaker/core';
 
 import { ISlackChannel, SlackReader } from './SlackReader';
 
@@ -51,9 +51,9 @@ export default class SlackChannelSelector extends React.Component<
       <div className="form-group row">
         <div className="col-sm-3 sm-label-right">Slack Channel</div>
         <div className="col-sm-9">
-          <VirtualizedSelect
-            className="form-control input-sm"
-            selectComponent={Select.default}
+          <ReactSelectInput
+            inputClassName="form-control input-sm"
+            mode="VIRTUALIZED"
             options={channels.map((ch: ISlackChannel) => ({ value: ch, label: ch.name }))}
             value={selected && ({ value: selected, label: selected.name } as Select.Option<ISlackChannel>)}
             onChange={this.onChange}

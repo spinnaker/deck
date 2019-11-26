@@ -95,7 +95,7 @@ window.spinnakerSettings = {
     pipelines: true,
     quietPeriod: false,
     roscoMode: false,
-    slack: false,
+    slack: true,
     snapshots: false,
     travis: false,
     versionedProviders: true,
