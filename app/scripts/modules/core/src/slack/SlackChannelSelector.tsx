@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as Select from 'react-select';
-import { ReactSelectInput } from '@spinnaker/core';
+import { ReactSelectInput, useLatestPromise } from '@spinnaker/core';
 
 import { ISlackChannel, SlackReader } from './SlackReader';
 
@@ -16,16 +16,10 @@ export interface ISlackChannelSelectorState {
 }
 
 export default function SlackChannelSelector({ channel, callback }: ISlackChannelSelectorProps) {
-  const [channels, setChannels] = React.useState([]);
   const [selectedChannel, setSelectedChannel] = React.useState(channel);
-  const [isLoading, setIsLoading] = React.useState(true);
-
-  React.useEffect(() => {
-    SlackReader.getChannels().then((ch: ISlackChannel[]) => {
-      setChannels(ch);
-      setIsLoading(false);
-    });
-  }, []);
+  const fetchChannels = useLatestPromise(() => SlackReader.getChannels(), []);
+  const channels = fetchChannels.result;
+  const isLoading = fetchChannels.status === 'PENDING';
 
   const onInputChange = (evt: Select.Option<ISlackChannel>) => {
     const newChannel = evt ? evt.target.value : null;
@@ -40,7 +34,7 @@ export default function SlackChannelSelector({ channel, callback }: ISlackChanne
         <ReactSelectInput
           inputClassName="form-control input-sm"
           mode="VIRTUALIZED"
-          options={channels.map((ch: ISlackChannel) => ({ value: ch, label: ch.name }))}
+          options={(channels || []).map((ch: ISlackChannel) => ({ value: ch, label: ch.name }))}
           value={selectedChannel && { value: selectedChannel, label: selectedChannel.name }}
           onChange={onInputChange}
           isLoading={isLoading}

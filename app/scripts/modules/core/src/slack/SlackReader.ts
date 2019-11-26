@@ -1,3 +1,4 @@
+import { IPromise } from 'angular';
 import { API } from '@spinnaker/core';
 
 export interface ISlackChannel {
@@ -11,7 +12,7 @@ export interface ISlackChannel {
 }
 
 export class SlackReader {
-  public static getChannels(): Promise<ISlackChannel[]> {
+  public static getChannels(): IPromise<ISlackChannel[]> {
     return API.one('slack/channels')
       .getList()
       .catch(() => [] as ISlackChannel[]);
