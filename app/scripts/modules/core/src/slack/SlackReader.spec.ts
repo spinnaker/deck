@@ -24,8 +24,8 @@ const mockSlackChannels: ISlackChannel[] = [
 
 describe('SlackReader', () => {
   it('should fetch a list of public Slack channels', () => {
-    spyOn(SlackReader, 'getChannels').and.returnValue(Promise.resolve(mockSlackChannels));
-    spyOn(API, 'one');
+    spyOn(SlackReader, 'getChannels').and.callThrough();
+    spyOn(API, 'one').and.returnValue(Promise.resolve(mockSlackChannels));
 
     SlackReader.getChannels().then((channels: ISlackChannel[]) => {
       expect(SlackReader.getChannels).toHaveBeenCalled();
