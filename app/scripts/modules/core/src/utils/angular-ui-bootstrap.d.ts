@@ -1,4 +1,5 @@
 declare module 'angular-ui-bootstrap' {
+  export default "ui.bootstrap";
   export type IAccordionConfig = angular.ui.bootstrap.IAccordionConfig;
   export type IButtonConfig = angular.ui.bootstrap.IButtonConfig;
   export type IDatepickerConfig = angular.ui.bootstrap.IDatepickerConfig;
