@@ -1,4 +1,5 @@
 ///<reference path="./classnames.d.ts" />
+///<reference path="./angular-ui-bootstrap.d.ts" />
 
 export * from './RenderWhenVisible';
 export * from './clipboard/CopyToClipboard';

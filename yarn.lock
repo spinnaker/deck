@@ -105,10 +105,10 @@
   dependencies:
     "@types/angular" "*"
 
-"@types/angular-ui-bootstrap@^0.13.41":
-  version "0.13.41"
-  resolved "https://registry.yarnpkg.com/@types/angular-ui-bootstrap/-/angular-ui-bootstrap-0.13.41.tgz#dfbe5e6171a8255d7a220bc63baec0f854822d84"
-  integrity sha1-375eYXGoJV16IgvGO67A+FSCLYQ=
+"@types/angular-ui-bootstrap@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@types/angular-ui-bootstrap/-/angular-ui-bootstrap-1.0.0.tgz#57b2aebacf528f82826c7af7ff328c6da49d1b63"
+  integrity sha512-uqFykayfJIIFmXRrHoa6fPghUZvN+09JoOlHZzgPtm2bp/bVkQtVfef7/H3m//TUWTGCTZlijWtIhavaQNKRsg==
   dependencies:
     "@types/angular" "*"
 
