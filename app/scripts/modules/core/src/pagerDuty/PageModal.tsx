@@ -7,7 +7,7 @@ import { IPagerDutyService, PagerDutyWriter } from 'core/pagerDuty';
 import { NgReact, ReactInjector } from 'core/reactShims';
 import { SETTINGS } from 'core/config';
 import { SubmitButton } from 'core/modal';
-import { TaskMonitor, TaskExecutor } from 'core/task';
+import { TaskMonitor } from 'core/task';
 
 import { IPageButtonProps } from './PageButton';
 
