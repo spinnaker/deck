@@ -7,7 +7,7 @@ import { IPagerDutyService, PagerDutyWriter } from 'core/pagerDuty';
 import { NgReact, ReactInjector } from 'core/reactShims';
 import { SETTINGS } from 'core/config';
 import { SubmitButton } from 'core/modal';
-import { TaskMonitor } from 'core/task';
+import { TaskMonitor, TaskExecutor } from 'core/task';
 
 import { IPageButtonProps } from './PageButton';
 
@@ -87,7 +87,6 @@ export class PageModal extends React.Component<IPageModalProps, IPageModalState>
       application: ownerApp,
       title: `Sending page to ${this.state.pageCount} policies`,
       modalInstance: TaskMonitor.modalInstanceEmulation(() => this.close()),
-      onTaskComplete: () => this.props.closeCallback(true),
     });
 
     const submitMethod = () => {
