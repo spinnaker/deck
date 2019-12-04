@@ -8,6 +8,8 @@ export * from './IBuild';
 export * from './IBuildDiffInfo';
 export * from './IBuildInfo';
 
+export * from './IGcbTrigger';
+
 export * from './ICloudMetric';
 export * from './ICluster';
 export * from './ICredentials';

@@ -15,16 +15,21 @@ import {
   StageConfigField,
   yamlDocumentsToString,
   YamlEditor,
+  TextInput,
 } from '@spinnaker/core';
+import { IGcbTrigger } from 'core/domain';
 
 export enum buildDefinitionSources {
   ARTIFACT = 'artifact',
   TEXT = 'text',
+  TRIGGER = 'trigger',
 }
 
 interface IGoogleCloudBuildStageFormProps {
   googleCloudBuildAccounts: string[];
+  gcbTriggers: IGcbTrigger[];
   updatePipeline: (pipeline: IPipeline) => void;
+  fetchGcbTriggers: (account: String) => void;
 }
 
 interface IGoogleCloudBuildStageFormState {
@@ -50,7 +55,10 @@ export class GoogleCloudBuildStageForm extends React.Component<
   };
 
   private onAccountChange = (accountOption: Option) => {
-    this.props.formik.setFieldValue('account', accountOption.value);
+    const account = accountOption.value;
+    this.props.formik.setFieldValue('account', account);
+    // OptionValues can also be number or boolean, but in this case, account is always a string.
+    this.props.fetchGcbTriggers(account as string);
   };
 
   private getAccountOptions = (): Array<Option<string>> => {
@@ -60,15 +68,58 @@ export class GoogleCloudBuildStageForm extends React.Component<
     }));
   };
 
+  private getCloudBuildTriggers = (): Array<Option<string>> => {
+    return this.props.gcbTriggers.map(trigger => ({
+      label: trigger.name,
+      value: trigger.id,
+    }));
+  };
+
+  private getTriggerTypes = (): Array<Option<string>> => {
+    return [
+      { value: 'branchName', label: 'Branch name' },
+      { value: 'tagName', label: 'Tag Name' },
+      { value: 'commitSha', label: 'Commit SHA' },
+    ];
+  };
+
   private getSourceOptions = (): Array<Option<string>> => {
     return [
       { value: buildDefinitionSources.TEXT, label: 'Text' },
       { value: buildDefinitionSources.ARTIFACT, label: 'Artifact' },
+      { value: buildDefinitionSources.TRIGGER, label: 'Trigger' },
     ];
   };
 
   private onSourceChange = (e: any): void => {
     this.props.formik.setFieldValue('buildDefinitionSource', e.target.value);
+  };
+
+  private onTriggerTypeValueChange = (e: any): void => {
+    const stage = this.props.formik.values;
+    if (stage.triggerType) {
+      const path = `repoSource.${stage.triggerType}`;
+      this.props.formik.setFieldValue(path, e.target.value);
+    }
+  };
+
+  private onTriggerChange = (selectedTrigger: Option) => {
+    this.props.formik.setFieldValue('triggerId', selectedTrigger.value);
+  };
+
+  private onTriggerTypeChange = (selectedType: Option) => {
+    this.props.formik.setFieldValue('triggerType', selectedType.value);
+    this.props.formik.setFieldValue('repoSource', undefined);
+  };
+
+  private getTriggerTypeValue = () => {
+    const stage = this.props.formik.values;
+    if (stage.triggerType) {
+      const path = `repoSource.${stage.triggerType}`;
+      return get(stage, path);
+    }
+
+    return undefined;
   };
 
   private setArtifactId = (expectedArtifactId: string): void => {
@@ -143,6 +194,34 @@ export class GoogleCloudBuildStageForm extends React.Component<
             stage={stage}
             updatePipeline={this.props.updatePipeline}
           />
+        )}
+        {stage.buildDefinitionSource === buildDefinitionSources.TRIGGER && (
+          <React.Fragment>
+            <StageConfigField label="Trigger Name">
+              <Select
+                clearable={false}
+                onChange={this.onTriggerChange}
+                options={this.getCloudBuildTriggers()}
+                value={stage.triggerId}
+              />
+            </StageConfigField>
+            <StageConfigField label="Trigger Type">
+              <Select
+                clearable={false}
+                onChange={this.onTriggerTypeChange}
+                options={this.getTriggerTypes()}
+                value={stage.triggerType}
+              />
+            </StageConfigField>
+            <StageConfigField label="Value">
+              <TextInput
+                type="text"
+                className="form-control"
+                onChange={this.onTriggerTypeValueChange}
+                value={this.getTriggerTypeValue()}
+              />
+            </StageConfigField>
+          </React.Fragment>
         )}
       </>
     );
