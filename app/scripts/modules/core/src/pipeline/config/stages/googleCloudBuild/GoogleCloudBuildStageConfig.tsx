@@ -2,11 +2,10 @@ import * as React from 'react';
 import { Observable, Subject } from 'rxjs';
 import { cloneDeep } from 'lodash';
 
-import { FormikStageConfig, IgorService, IStage, IStageConfigProps } from '@spinnaker/core';
+import { FormikStageConfig, IgorService, IStage, IStageConfigProps, IGcbTrigger } from '@spinnaker/core';
 
-import { GoogleCloudBuildStageForm, buildDefinitionSources } from './GoogleCloudBuildStageForm';
+import { GoogleCloudBuildStageForm, buildDefinitionSources, triggerType } from './GoogleCloudBuildStageForm';
 import { validate } from './googleCloudBuildValidators';
-import { IGcbTrigger } from 'core/domain';
 
 interface IGoogleCloudBuildStageConfigState {
   googleCloudBuildAccounts: string[];
@@ -30,6 +29,9 @@ export class GoogleCloudBuildStageConfig extends React.Component<IStageConfigPro
     }
     if (!stage.buildDefinitionSource) {
       stage.buildDefinitionSource = buildDefinitionSources.TEXT;
+    }
+    if (!stage.triggerType) {
+      stage.triggerType = triggerType.BRANCH;
     }
     // Intentionally initializing the stage config only once in the constructor
     // The stage config is then completely owned within FormikStageConfig's Formik state
