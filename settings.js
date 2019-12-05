@@ -222,6 +222,12 @@ window.spinnakerSettings = {
         region: 'us-phoenix-1',
       },
     },
+    tencent: {
+      defaults: {
+        account: 'test',
+        region: 'ap-guangzhou',
+      },
+    },
     titus: {
       defaults: {
         account: 'titustestvpc',

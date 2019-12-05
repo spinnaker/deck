@@ -15,6 +15,7 @@ import { ECS_MODULE } from '@spinnaker/ecs';
 import '@spinnaker/cloudfoundry';
 import { AZURE_MODULE } from '@spinnaker/azure';
 import { HUAWEICLOUD_MODULE } from '@spinnaker/huaweicloud';
+import { TENCENT_MODULE } from '@spinnaker/tencent';
 
 module('netflix.spinnaker', [
   CORE_MODULE,
@@ -32,4 +33,5 @@ module('netflix.spinnaker', [
   KAYENTA_MODULE,
   TITUS_MODULE,
   HUAWEICLOUD_MODULE,
+  TENCENT_MODULE,
 ]);
