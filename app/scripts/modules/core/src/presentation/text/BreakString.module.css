@@ -1,0 +1,5 @@
+.breakString {
+  word-break: break-all;
+  overflow-wrap: break-word;
+  hyphens: none;
+}
