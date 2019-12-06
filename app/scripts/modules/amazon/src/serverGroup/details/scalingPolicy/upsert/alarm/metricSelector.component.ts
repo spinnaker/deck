@@ -95,6 +95,11 @@ export class MetricSelectorController implements IController {
         }
         if (selected) {
           this.state.selectedMetric = selected;
+        } else {
+          // If metricName is blank (new policy), auto-select the first metric instead of sitting on the blank invalid option
+          if (alarm.metricName === '' && this.state.metrics.length > 0) {
+            this.state.selectedMetric = this.state.metrics[0];
+          }
         }
         this.metricChanged();
       })
