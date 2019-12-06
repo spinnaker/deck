@@ -6,7 +6,6 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
-const { TypedCssModulesPlugin } = require('typed-css-modules-webpack-plugin');
 
 const CACHE_INVALIDATE = getCacheInvalidateString();
 const NODE_MODULE_PATH = path.join(__dirname, 'node_modules');
@@ -159,6 +158,7 @@ function configure(env, webpackOpts) {
                 localIdentName: '[name]__[local]--[hash:base64:8]',
               },
             },
+            { loader: 'typed-css-modules-loader' },
             { loader: 'postcss-loader' },
           ],
         },
@@ -181,9 +181,6 @@ function configure(env, webpackOpts) {
       ],
     },
     plugins: [
-      new TypedCssModulesPlugin({
-        globPattern: '**/*.module.css',
-      }),
       new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true, tslint: true }),
       new CopyWebpackPlugin([
         {
