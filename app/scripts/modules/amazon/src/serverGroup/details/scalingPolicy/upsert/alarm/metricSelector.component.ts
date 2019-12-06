@@ -98,7 +98,8 @@ export class MetricSelectorController implements IController {
         } else {
           // If metricName is blank (new policy), auto-select the first metric instead of sitting on the blank invalid option
           if (alarm.metricName === '' && this.state.metrics.length > 0) {
-            this.state.selectedMetric = this.state.metrics[0];
+            this.state.selectedMetric =
+              this.state.metrics.find(metric => metric.name.match('CPUUtilization')) || this.state.metrics[0];
           }
         }
         this.metricChanged();
