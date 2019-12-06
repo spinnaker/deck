@@ -96,7 +96,7 @@ export class MetricSelectorController implements IController {
         if (selected) {
           this.state.selectedMetric = selected;
         } else {
-          // If metricName is blank (new policy), auto-select the first metric instead of sitting on the blank invalid option
+          // If metricName is blank (new policy), try to find a CPU metric or select the first option instead of sitting on the invalid blank option
           if (alarm.metricName === '' && this.state.metrics.length > 0) {
             this.state.selectedMetric =
               this.state.metrics.find(metric => metric.name.match('CPUUtilization')) || this.state.metrics[0];
