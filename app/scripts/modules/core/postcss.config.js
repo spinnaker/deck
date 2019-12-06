@@ -6,6 +6,5 @@ module.exports = {
     'postcss-colorfix': {
       colors: colorMap,
     },
-    'postcss-nested': {},
   },
 };
