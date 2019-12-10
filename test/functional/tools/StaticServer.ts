@@ -1,29 +1,34 @@
 /// <reference path="wait-on.d.ts" />
 
-import { spawn, ChildProcess } from 'child_process';
-import * as process from 'process';
 import * as waitOn from 'wait-on';
+const configure = require('../../../webpack.config.js');
+
+const webpack = require('webpack');
+const middleware = require('webpack-dev-middleware');
+const express = require('express');
+const app = express();
 
 const WAIT_INTERVAL_MS = 500;
 const WAIT_TIMEOUT_MS = 300000;
 
 export class StaticServer {
-  private proc: ChildProcess;
+  private server: any;
 
-  constructor(private repoRoot: string) {}
+  constructor() {}
 
   public launch(): Promise<void | Error> {
     return new Promise((resolve, reject) => {
-      this.proc = spawn('./node_modules/.bin/webpack-dev-server', ['--mode=production'], {
-        cwd: this.repoRoot,
-        env: {
-          PATH: process.env.PATH,
-          NODE_OPTIONS: '--max_old_space_size=8192',
-        },
-      });
-      this.proc.on('error', (err: Error) => {
-        reject(err);
-      });
+      console.log('Creating a promise');
+
+      const webpackConfig = configure({}, {});
+      const compiler = webpack(webpackConfig);
+      app.use(
+        middleware(compiler, {
+          publicPath: '/',
+        }),
+      );
+
+      this.server = app.listen(9000, () => console.log('webpack-dev-middleware listening on port 9000'));
       waitOn(
         {
           interval: WAIT_INTERVAL_MS,
@@ -42,10 +47,8 @@ export class StaticServer {
     });
   }
 
-  public kill(): Promise<void | Error> {
-    return new Promise(resolve => {
-      this.proc.kill();
-      resolve();
-    });
+  public kill(): void {
+    this.server && this.server.close();
+    this.server = null;
   }
 }
