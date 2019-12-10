@@ -1,8 +1,7 @@
 /// <reference path="wait-on.d.ts" />
 
-import * as waitOn from 'wait-on';
+const waitOn = require('wait-on');
 const configure = require('../../../webpack.config.js');
-
 const webpack = require('webpack');
 const middleware = require('webpack-dev-middleware');
 const express = require('express');
