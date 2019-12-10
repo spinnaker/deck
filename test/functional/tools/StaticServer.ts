@@ -14,36 +14,30 @@ const WAIT_TIMEOUT_MS = 300000;
 export class StaticServer {
   private server: any;
 
-  constructor() {}
+  constructor(private repoRoot: string) {}
 
   public launch(): Promise<void | Error> {
-    return new Promise((resolve, reject) => {
-      console.log('Creating a promise');
+    const webpackConfig = configure(
+      {},
+      {
+        context: this.repoRoot,
+      },
+    );
+    const compiler = webpack(webpackConfig);
+    app.use(
+      middleware(compiler, {
+        publicPath: '/',
+      }),
+    );
 
-      const webpackConfig = configure({}, {});
-      const compiler = webpack(webpackConfig);
-      app.use(
-        middleware(compiler, {
-          publicPath: '/',
-        }),
-      );
-
-      this.server = app.listen(9000, () => console.log('webpack-dev-middleware listening on port 9000'));
-      waitOn(
-        {
-          interval: WAIT_INTERVAL_MS,
-          timeout: WAIT_TIMEOUT_MS,
-          resources: ['http-get://localhost:9000'],
-        },
-        (err: Error) => {
-          if (err) {
-            reject(new Error(`failed to launch webpack-dev-server: ${err}`));
-            this.kill();
-          } else {
-            resolve();
-          }
-        },
-      );
+    this.server = app.listen(9000, () => console.log('webpack-dev-middleware listening on port 9000'));
+    return waitOn({
+      interval: WAIT_INTERVAL_MS,
+      timeout: WAIT_TIMEOUT_MS,
+      resources: ['http-get://localhost:9000'],
+    }).catch((err: any) => {
+      this.kill();
+      throw new Error(`failed to launch webpack-dev-server: ${err}`);
     });
   }
 
