@@ -95,7 +95,7 @@ window.spinnakerSettings = {
     pipelines: true,
     quietPeriod: false,
     roscoMode: false,
-    slack: false,
+    slack: true,
     snapshots: false,
     travis: false,
     versionedProviders: true,
@@ -233,6 +233,9 @@ window.spinnakerSettings = {
   },
   pagerDuty: {
     required: false,
+  },
+  slack: {
+    baseUrl: 'https://slack.com',
   },
   pubsubProviders: ['google'], // TODO(joonlim): Add amazon once it is confirmed that amazon pub/sub works.
   searchVersion: 1,
