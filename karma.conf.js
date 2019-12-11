@@ -58,6 +58,7 @@ module.exports = function(config) {
       require('karma-sourcemap-loader'),
       require('karma-super-dots-reporter'),
       require('karma-mocha-reporter'),
+      require('karma-spec-reporter'),
     ],
 
     // list of files / patterns to exclude
