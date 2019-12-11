@@ -74,7 +74,7 @@ module.exports = function(config) {
     // possible values: LOG_DISABLE || LOG_ERROR || LOG_WARN || LOG_INFO || LOG_DEBUG
     logLevel: config.DEBUG,
 
-    reporters: ['super-dots', 'mocha'],
+    reporters: ['super-dots', 'mocha', 'spec'],
     mochaReporter: {
       output: 'minimal',
     },
