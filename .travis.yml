@@ -10,6 +10,7 @@ before_install:
   #- rm -rf node_modules
   - sh -e /etc/init.d/xvfb start
   - git log | head -n 100
+  - yarn --version
 install: gradle/installViaTravis.sh
 
 jobs:
