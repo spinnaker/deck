@@ -1,14 +1,17 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 import _ from 'lodash';
 
 import { NameUtils } from '@spinnaker/core';
 
 import { OracleProviderSettings } from '../../oracle.settings';
 
-module.exports = angular
-  .module('spinnaker.oracle.serverGroupCommandBuilder.service', [])
+export const ORACLE_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER_SERVICE =
+  'spinnaker.oracle.serverGroupCommandBuilder.service';
+export const name = ORACLE_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER_SERVICE; // for backwards compatibility
+angular
+  .module(ORACLE_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER_SERVICE, [])
   .factory('oracleServerGroupCommandBuilder', [
     '$q',
     function($q) {

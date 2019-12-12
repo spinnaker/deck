@@ -2,7 +2,7 @@
 
 import { TitusResizeServerGroupModal } from './resize/TitusResizeServerGroupModal';
 
-const angular = require('angular');
+import * as angular from 'angular';
 import _ from 'lodash';
 
 import {
@@ -24,15 +24,21 @@ import { SCALING_POLICY_MODULE } from './scalingPolicy/scalingPolicy.module';
 
 import { TitusCloneServerGroupModal } from '../configure/wizard/TitusCloneServerGroupModal';
 import { TITUS_SECURITY_GROUPS_DETAILS } from './titusSecurityGroups.component';
+import { TITUS_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER } from '../configure/ServerGroupCommandBuilder';
+import { TITUS_SERVERGROUP_DETAILS_ROLLBACK_ROLLBACKSERVERGROUP_CONTROLLER } from './rollback/rollbackServerGroup.controller';
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
-module.exports = angular
-  .module('spinnaker.serverGroup.details.titus.controller', [
-    require('@uirouter/angularjs').default,
-    require('../configure/ServerGroupCommandBuilder').name,
+export const TITUS_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_TITUS_CONTROLLER =
+  'spinnaker.serverGroup.details.titus.controller';
+export const name = TITUS_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_TITUS_CONTROLLER; // for backwards compatibility
+angular
+  .module(TITUS_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_TITUS_CONTROLLER, [
+    UIROUTER_ANGULARJS,
+    TITUS_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER,
     CONFIRMATION_MODAL_SERVICE,
     DISRUPTION_BUDGET_DETAILS_SECTION,
     SERVER_GROUP_WRITER,
-    require('./rollback/rollbackServerGroup.controller').name,
+    TITUS_SERVERGROUP_DETAILS_ROLLBACK_ROLLBACKSERVERGROUP_CONTROLLER,
     SERVICE_JOB_PROCESSES_DETAILS_SECTION,
     SCALING_POLICY_MODULE,
     TITUS_SECURITY_GROUPS_DETAILS,

@@ -2,11 +2,14 @@
 
 import _ from 'lodash';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { FirewallLabels } from '@spinnaker/core';
 
-module.exports = angular.module('spinnaker.deck.gce.tagManager.service', []).factory('gceTagManager', function() {
+export const GOOGLE_SERVERGROUP_CONFIGURE_WIZARD_SECURITYGROUPS_TAGMANAGER_SERVICE =
+  'spinnaker.deck.gce.tagManager.service';
+export const name = GOOGLE_SERVERGROUP_CONFIGURE_WIZARD_SECURITYGROUPS_TAGMANAGER_SERVICE; // for backwards compatibility
+module(GOOGLE_SERVERGROUP_CONFIGURE_WIZARD_SECURITYGROUPS_TAGMANAGER_SERVICE, []).factory('gceTagManager', function() {
   const resetKeys = ['command', 'securityGroups', 'securityGroupObjectsKeyedByTag', 'securityGroupObjectsKeyedById'];
 
   this.reset = () => {

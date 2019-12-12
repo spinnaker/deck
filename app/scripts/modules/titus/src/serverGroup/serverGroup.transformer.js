@@ -2,9 +2,11 @@
 
 import _ from 'lodash';
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular.module('spinnaker.titus.serverGroup.transformer', []).factory('titusServerGroupTransformer', [
+export const TITUS_SERVERGROUP_SERVERGROUP_TRANSFORMER = 'spinnaker.titus.serverGroup.transformer';
+export const name = TITUS_SERVERGROUP_SERVERGROUP_TRANSFORMER; // for backwards compatibility
+module(TITUS_SERVERGROUP_SERVERGROUP_TRANSFORMER, []).factory('titusServerGroupTransformer', [
   '$q',
   function($q) {
     function normalizeServerGroup(serverGroup) {

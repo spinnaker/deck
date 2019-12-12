@@ -1,12 +1,16 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular
-  .module('spinnaker.deck.core.serverGroup.dirtyInstanceTypeNotification.component', [])
-  .component('dirtyInstanceTypeNotification', {
+export const CORE_SERVERGROUP_CONFIGURE_COMMON_DIRTYINSTANCETYPENOTIFICATION_COMPONENT =
+  'spinnaker.deck.core.serverGroup.dirtyInstanceTypeNotification.component';
+export const name = CORE_SERVERGROUP_CONFIGURE_COMMON_DIRTYINSTANCETYPENOTIFICATION_COMPONENT; // for backwards compatibility
+module(CORE_SERVERGROUP_CONFIGURE_COMMON_DIRTYINSTANCETYPENOTIFICATION_COMPONENT, []).component(
+  'dirtyInstanceTypeNotification',
+  {
     bindings: {
       command: '=',
     },
     templateUrl: require('./dirtyInstanceTypeNotification.component.html'),
-  });
+  },
+);

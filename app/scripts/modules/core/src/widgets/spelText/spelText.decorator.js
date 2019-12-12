@@ -1,9 +1,10 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 require('jquery-textcomplete');
 
 import './spel.less';
+import { CORE_WIDGETS_SPELTEXT_SPELAUTOCOMPLETE_SERVICE } from './spelAutocomplete.service';
 
 decorateFn.$inject = ['$delegate', 'spelAutocomplete'];
 function decorateFn($delegate, spelAutocomplete) {
@@ -64,7 +65,9 @@ function decorateFn($delegate, spelAutocomplete) {
   return $delegate;
 }
 
-module.exports = angular.module('spinnaker.core.widget.spelText', [require('./spelAutocomplete.service').name]).config([
+export const CORE_WIDGETS_SPELTEXT_SPELTEXT_DECORATOR = 'spinnaker.core.widget.spelText';
+export const name = CORE_WIDGETS_SPELTEXT_SPELTEXT_DECORATOR; // for backwards compatibility
+module(CORE_WIDGETS_SPELTEXT_SPELTEXT_DECORATOR, [CORE_WIDGETS_SPELTEXT_SPELAUTOCOMPLETE_SERVICE]).config([
   '$provide',
   function($provide) {
     $provide.decorator('inputDirective', decorateFn);

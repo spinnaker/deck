@@ -1,6 +1,6 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 import _ from 'lodash';
 
 import {
@@ -13,9 +13,11 @@ import {
   Registry,
   SETTINGS,
 } from '@spinnaker/core';
+import { GOOGLE_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER } from './bakeExecutionDetails.controller';
 
-module.exports = angular
-  .module('spinnaker.gce.pipeline.stage..bakeStage', [require('./bakeExecutionDetails.controller').name])
+export const GOOGLE_PIPELINE_STAGES_BAKE_GCEBAKESTAGE = 'spinnaker.gce.pipeline.stage..bakeStage';
+export const name = GOOGLE_PIPELINE_STAGES_BAKE_GCEBAKESTAGE; // for backwards compatibility
+module(GOOGLE_PIPELINE_STAGES_BAKE_GCEBAKESTAGE, [GOOGLE_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'bake',

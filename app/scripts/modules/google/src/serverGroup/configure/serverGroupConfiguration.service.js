@@ -1,6 +1,6 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 import _ from 'lodash';
 
 import {
@@ -19,18 +19,24 @@ import { GCE_HTTP_LOAD_BALANCER_UTILS } from 'google/loadBalancer/httpLoadBalanc
 import { LOAD_BALANCER_SET_TRANSFORMER } from 'google/loadBalancer/loadBalancer.setTransformer';
 import { GceImageReader } from 'google/image';
 import { GceAcceleratorService } from 'google/serverGroup/configure/wizard/advancedSettings/gceAccelerator.service';
+import { GOOGLE_INSTANCE_GCEINSTANCETYPE_SERVICE } from '../../instance/gceInstanceType.service';
+import { GOOGLE_INSTANCE_CUSTOM_CUSTOMINSTANCEBUILDER_GCE_SERVICE } from './../../instance/custom/customInstanceBuilder.gce.service';
+import { GOOGLE_SERVERGROUP_CONFIGURE_WIZARD_SECURITYGROUPS_TAGMANAGER_SERVICE } from './wizard/securityGroups/tagManager.service';
 
-module.exports = angular
-  .module('spinnaker.serverGroup.configure.gce.configuration.service', [
+export const GOOGLE_SERVERGROUP_CONFIGURE_SERVERGROUPCONFIGURATION_SERVICE =
+  'spinnaker.serverGroup.configure.gce.configuration.service';
+export const name = GOOGLE_SERVERGROUP_CONFIGURE_SERVERGROUPCONFIGURATION_SERVICE; // for backwards compatibility
+angular
+  .module(GOOGLE_SERVERGROUP_CONFIGURE_SERVERGROUPCONFIGURATION_SERVICE, [
     LOAD_BALANCER_SET_TRANSFORMER,
     SECURITY_GROUP_READER,
     CACHE_INITIALIZER_SERVICE,
     LOAD_BALANCER_READ_SERVICE,
-    require('../../instance/gceInstanceType.service').name,
-    require('./../../instance/custom/customInstanceBuilder.gce.service').name,
+    GOOGLE_INSTANCE_GCEINSTANCETYPE_SERVICE,
+    GOOGLE_INSTANCE_CUSTOM_CUSTOMINSTANCEBUILDER_GCE_SERVICE,
     GCE_HTTP_LOAD_BALANCER_UTILS,
     GCE_HEALTH_CHECK_READER,
-    require('./wizard/securityGroups/tagManager.service').name,
+    GOOGLE_SERVERGROUP_CONFIGURE_WIZARD_SECURITYGROUPS_TAGMANAGER_SERVICE,
   ])
   .factory('gceServerGroupConfigurationService', [
     'securityGroupReader',

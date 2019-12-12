@@ -1,10 +1,13 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular
-  .module('spinnaker.deck.gce.autoscalingPolicy.basicSettings.component', [])
-  .component('gceAutoscalingPolicyBasicSettings', {
+export const GOOGLE_AUTOSCALINGPOLICY_COMPONENTS_BASICSETTINGS_BASICSETTINGS_COMPONENT =
+  'spinnaker.deck.gce.autoscalingPolicy.basicSettings.component';
+export const name = GOOGLE_AUTOSCALINGPOLICY_COMPONENTS_BASICSETTINGS_BASICSETTINGS_COMPONENT; // for backwards compatibility
+module(GOOGLE_AUTOSCALINGPOLICY_COMPONENTS_BASICSETTINGS_BASICSETTINGS_COMPONENT, []).component(
+  'gceAutoscalingPolicyBasicSettings',
+  {
     bindings: {
       policy: '=',
       updatePolicy: '<',
@@ -13,4 +16,5 @@ module.exports = angular
     controller: function controller() {
       this.modes = ['ON', 'OFF', 'ONLY_UP'];
     },
-  });
+  },
+);

@@ -1,13 +1,15 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { AccountService } from 'core/account/AccountService';
 
 import './userVerification.directive.less';
 
-module.exports = angular
-  .module('spinnaker.core.task.verification.userVerification.directive', [])
+export const CORE_TASK_VERIFICATION_USERVERIFICATION_DIRECTIVE =
+  'spinnaker.core.task.verification.userVerification.directive';
+export const name = CORE_TASK_VERIFICATION_USERVERIFICATION_DIRECTIVE; // for backwards compatibility
+module(CORE_TASK_VERIFICATION_USERVERIFICATION_DIRECTIVE, [])
   .directive('userVerification', function() {
     /**
      * The user verification directive takes at least two arguments

@@ -1,6 +1,6 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { defaultsDeep, extend } from 'lodash';
@@ -19,19 +19,23 @@ import { ReactModal } from 'core/presentation';
 import { PRODUCES_ARTIFACTS_REACT } from './producesArtifacts/ProducesArtifacts';
 import { OVERRRIDE_FAILURE } from './overrideFailure/overrideFailure.module';
 import { OVERRIDE_TIMEOUT_COMPONENT } from './overrideTimeout/overrideTimeout.module';
+import { CORE_PIPELINE_CONFIG_STAGES_OPTIONALSTAGE_OPTIONALSTAGE_DIRECTIVE } from './optionalStage/optionalStage.directive';
+import { CORE_PIPELINE_CONFIG_STAGES_FAILONFAILEDEXPRESSIONS_FAILONFAILEDEXPRESSIONS_DIRECTIVE } from './failOnFailedExpressions/failOnFailedExpressions.directive';
+import { CORE_PIPELINE_CONFIG_STAGES_COMMON_STAGECONFIGFIELD_STAGECONFIGFIELD_DIRECTIVE } from './common/stageConfigField/stageConfigField.directive';
 
-module.exports = angular
-  .module('spinnaker.core.pipeline.config.stage', [
-    PRODUCES_ARTIFACTS_REACT,
-    BASE_EXECUTION_DETAILS_CTRL,
-    STAGE_NAME,
-    OVERRIDE_TIMEOUT_COMPONENT,
-    OVERRRIDE_FAILURE,
-    require('./optionalStage/optionalStage.directive').name,
-    require('./failOnFailedExpressions/failOnFailedExpressions.directive').name,
-    CONFIRMATION_MODAL_SERVICE,
-    require('./common/stageConfigField/stageConfigField.directive').name,
-  ])
+export const CORE_PIPELINE_CONFIG_STAGES_STAGE_MODULE = 'spinnaker.core.pipeline.config.stage';
+export const name = CORE_PIPELINE_CONFIG_STAGES_STAGE_MODULE; // for backwards compatibility
+module(CORE_PIPELINE_CONFIG_STAGES_STAGE_MODULE, [
+  PRODUCES_ARTIFACTS_REACT,
+  BASE_EXECUTION_DETAILS_CTRL,
+  STAGE_NAME,
+  OVERRIDE_TIMEOUT_COMPONENT,
+  OVERRRIDE_FAILURE,
+  CORE_PIPELINE_CONFIG_STAGES_OPTIONALSTAGE_OPTIONALSTAGE_DIRECTIVE,
+  CORE_PIPELINE_CONFIG_STAGES_FAILONFAILEDEXPRESSIONS_FAILONFAILEDEXPRESSIONS_DIRECTIVE,
+  CONFIRMATION_MODAL_SERVICE,
+  CORE_PIPELINE_CONFIG_STAGES_COMMON_STAGECONFIGFIELD_STAGECONFIGFIELD_DIRECTIVE,
+])
   .directive('pipelineConfigStage', function() {
     return {
       restrict: 'E',

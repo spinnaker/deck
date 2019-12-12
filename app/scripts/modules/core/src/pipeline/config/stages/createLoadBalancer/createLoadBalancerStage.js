@@ -4,10 +4,13 @@ import { CloudProviderRegistry, ProviderSelectionService } from 'core/cloudProvi
 import { Registry } from 'core/registry';
 import { SETTINGS } from 'core/config/settings';
 
-const angular = require('angular');
+import * as angular from 'angular';
 
-module.exports = angular
-  .module('spinnaker.core.pipeline.stage.createLoadBalancerStage', [])
+export const CORE_PIPELINE_CONFIG_STAGES_CREATELOADBALANCER_CREATELOADBALANCERSTAGE =
+  'spinnaker.core.pipeline.stage.createLoadBalancerStage';
+export const name = CORE_PIPELINE_CONFIG_STAGES_CREATELOADBALANCER_CREATELOADBALANCERSTAGE; // for backwards compatibility
+angular
+  .module(CORE_PIPELINE_CONFIG_STAGES_CREATELOADBALANCER_CREATELOADBALANCERSTAGE, [])
   .config(function() {
     // Register this stage only if infrastructure stages are enabled in settings.js
     if (SETTINGS.feature.infrastructureStages) {

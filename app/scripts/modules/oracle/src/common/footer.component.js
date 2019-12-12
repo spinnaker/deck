@@ -1,8 +1,10 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 
-module.exports = angular.module('spinnaker.oracle.footer.component', []).component('oracleFooter', {
+export const ORACLE_COMMON_FOOTER_COMPONENT = 'spinnaker.oracle.footer.component';
+export const name = ORACLE_COMMON_FOOTER_COMPONENT; // for backwards compatibility
+angular.module(ORACLE_COMMON_FOOTER_COMPONENT, []).component('oracleFooter', {
   templateUrl: require('./footer.component.html'),
   bindings: {
     action: '&',

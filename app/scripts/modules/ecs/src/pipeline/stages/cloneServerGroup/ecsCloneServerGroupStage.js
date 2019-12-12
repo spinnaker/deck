@@ -1,12 +1,14 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 import _ from 'lodash';
 
 import { AccountService, NameUtils, Registry, StageConstants } from '@spinnaker/core';
 
-module.exports = angular
-  .module('spinnaker.ecs.pipeline.stage.cloneServerGroupStage', [])
+export const ECS_PIPELINE_STAGES_CLONESERVERGROUP_ECSCLONESERVERGROUPSTAGE =
+  'spinnaker.ecs.pipeline.stage.cloneServerGroupStage';
+export const name = ECS_PIPELINE_STAGES_CLONESERVERGROUP_ECSCLONESERVERGROUPSTAGE; // for backwards compatibility
+module(ECS_PIPELINE_STAGES_CLONESERVERGROUP_ECSCLONESERVERGROUPSTAGE, [])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'cloneServerGroup',

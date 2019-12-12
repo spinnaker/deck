@@ -1,6 +1,6 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 import _ from 'lodash';
 import { Subject } from 'rxjs';
 // we need to explicitly import d3 because n3-charts depends on it being in the global namespace
@@ -12,9 +12,12 @@ import 'n3-charts/build/LineChart';
 import './LineChartHack.css';
 import './metricAlarmChart.component.less';
 
-module.exports = angular
-  .module('spinnaker.amazon.serverGroup.details.scalingPolicy.metricAlarmChart.component', ['n3-line-chart'])
-  .component('metricAlarmChart', {
+export const AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_CHART_METRICALARMCHART_COMPONENT =
+  'spinnaker.amazon.serverGroup.details.scalingPolicy.metricAlarmChart.component';
+export const name = AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_CHART_METRICALARMCHART_COMPONENT; // for backwards compatibility
+module(AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_CHART_METRICALARMCHART_COMPONENT, ['n3-line-chart']).component(
+  'metricAlarmChart',
+  {
     bindings: {
       alarm: '=',
       serverGroup: '=',
@@ -190,4 +193,5 @@ module.exports = angular
         };
       },
     ],
-  });
+  },
+);

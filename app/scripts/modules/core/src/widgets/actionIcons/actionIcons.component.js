@@ -1,8 +1,10 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 
-module.exports = angular.module('spinnaker.core.actionIcons.component', []).component('actionIcons', {
+export const CORE_WIDGETS_ACTIONICONS_ACTIONICONS_COMPONENT = 'spinnaker.core.actionIcons.component';
+export const name = CORE_WIDGETS_ACTIONICONS_ACTIONICONS_COMPONENT; // for backwards compatibility
+angular.module(CORE_WIDGETS_ACTIONICONS_ACTIONICONS_COMPONENT, []).component('actionIcons', {
   bindings: {
     edit: '&',
     editInfo: '@',

@@ -2,14 +2,17 @@
 
 import _ from 'lodash';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { AccountService } from 'core/account/AccountService';
 import { AppListExtractor } from 'core/application/listExtractor/AppListExtractor';
 
-module.exports = angular
-  .module('spinnaker.core.accountNamespaceClusterSelector.directive', [])
-  .directive('accountNamespaceClusterSelector', function() {
+export const CORE_WIDGETS_ACCOUNTNAMESPACECLUSTERSELECTOR_COMPONENT =
+  'spinnaker.core.accountNamespaceClusterSelector.directive';
+export const name = CORE_WIDGETS_ACCOUNTNAMESPACECLUSTERSELECTOR_COMPONENT; // for backwards compatibility
+module(CORE_WIDGETS_ACCOUNTNAMESPACECLUSTERSELECTOR_COMPONENT, []).directive(
+  'accountNamespaceClusterSelector',
+  function() {
     return {
       restrict: 'E',
       scope: {},
@@ -93,4 +96,5 @@ module.exports = angular
         init();
       },
     };
-  });
+  },
+);

@@ -1,14 +1,16 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 require('./preconditionList.directive.html');
 require('./modal/editPrecondition.html');
 
 import './preconditionList.directive.less';
 
-module.exports = angular
-  .module('spinnaker.core.pipeline.config.preconditions.preconditionList', [])
+export const CORE_PIPELINE_CONFIG_PRECONDITIONS_PRECONDITIONLIST_DIRECTIVE =
+  'spinnaker.core.pipeline.config.preconditions.preconditionList';
+export const name = CORE_PIPELINE_CONFIG_PRECONDITIONS_PRECONDITIONLIST_DIRECTIVE; // for backwards compatibility
+module(CORE_PIPELINE_CONFIG_PRECONDITIONS_PRECONDITIONLIST_DIRECTIVE, [])
   .directive('preconditionList', function() {
     return {
       restrict: 'E',

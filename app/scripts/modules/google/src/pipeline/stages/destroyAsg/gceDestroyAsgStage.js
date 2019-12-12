@@ -1,11 +1,12 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { AccountService, Registry, StageConstants } from '@spinnaker/core';
 
-module.exports = angular
-  .module('spinnaker.gce.pipeline.stage..destroyAsgStage', [])
+export const GOOGLE_PIPELINE_STAGES_DESTROYASG_GCEDESTROYASGSTAGE = 'spinnaker.gce.pipeline.stage..destroyAsgStage';
+export const name = GOOGLE_PIPELINE_STAGES_DESTROYASG_GCEDESTROYASGSTAGE; // for backwards compatibility
+module(GOOGLE_PIPELINE_STAGES_DESTROYASG_GCEDESTROYASGSTAGE, [])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'destroyServerGroup',

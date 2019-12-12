@@ -2,17 +2,18 @@
 
 import { FirewallLabels } from '@spinnaker/core';
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular
-  .module('spinnaker.oracle.securityGroup.create.controller', [])
-  .controller('oracleCreateSecurityGroupCtrl', [
-    '$scope',
-    '$uibModalInstance',
-    function($scope, $uibModalInstance) {
-      this.cancel = () => {
-        $uibModalInstance.dismiss();
-      };
-      $scope.firewallLabel = FirewallLabels.get('Firewall');
-    },
-  ]);
+export const ORACLE_SECURITYGROUP_CONFIGURE_CREATESECURITYGROUP_CONTROLLER =
+  'spinnaker.oracle.securityGroup.create.controller';
+export const name = ORACLE_SECURITYGROUP_CONFIGURE_CREATESECURITYGROUP_CONTROLLER; // for backwards compatibility
+module(ORACLE_SECURITYGROUP_CONFIGURE_CREATESECURITYGROUP_CONTROLLER, []).controller('oracleCreateSecurityGroupCtrl', [
+  '$scope',
+  '$uibModalInstance',
+  function($scope, $uibModalInstance) {
+    this.cancel = () => {
+      $uibModalInstance.dismiss();
+    };
+    $scope.firewallLabel = FirewallLabels.get('Firewall');
+  },
+]);

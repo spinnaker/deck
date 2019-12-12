@@ -1,6 +1,6 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 import _ from 'lodash';
 
 import {
@@ -12,13 +12,18 @@ import {
 } from '@spinnaker/core';
 
 import { AzureRollbackServerGroupModal } from './rollback/RollbackServerGroupModal';
+import { AZURE_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER_SERVICE } from '../configure/serverGroupCommandBuilder.service';
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
 require('../configure/serverGroup.configure.azure.module');
 
-module.exports = angular
-  .module('spinnaker.azure.serverGroup.details.controller', [
-    require('@uirouter/angularjs').default,
-    require('../configure/serverGroupCommandBuilder.service').name,
+export const AZURE_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_AZURE_CONTROLLER =
+  'spinnaker.azure.serverGroup.details.controller';
+export const name = AZURE_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_AZURE_CONTROLLER; // for backwards compatibility
+angular
+  .module(AZURE_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_AZURE_CONTROLLER, [
+    UIROUTER_ANGULARJS,
+    AZURE_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER_SERVICE,
     CONFIRMATION_MODAL_SERVICE,
     SERVER_GROUP_WRITER,
   ])

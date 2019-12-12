@@ -1,11 +1,12 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { ApplicationNameValidator, FirewallLabels } from '@spinnaker/core';
 
-module.exports = angular
-  .module('spinnaker.gce.validation.applicationName', [])
+export const GOOGLE_VALIDATION_APPLICATIONNAME_VALIDATOR = 'spinnaker.gce.validation.applicationName';
+export const name = GOOGLE_VALIDATION_APPLICATIONNAME_VALIDATOR; // for backwards compatibility
+module(GOOGLE_VALIDATION_APPLICATIONNAME_VALIDATOR, [])
   .factory('gceApplicationNameValidator', function() {
     function validateSpecialCharacters(name, errors) {
       const pattern = /^([a-zA-Z][a-zA-Z0-9]*)?$/;

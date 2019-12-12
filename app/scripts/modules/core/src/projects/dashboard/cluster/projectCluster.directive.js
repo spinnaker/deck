@@ -1,6 +1,6 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 import _ from 'lodash';
 
 import { CollapsibleSectionStateCache } from 'core/cache';
@@ -10,13 +10,16 @@ import { ClusterState } from 'core/state';
 import { TIME_FORMATTERS } from 'core/utils/timeFormatters';
 
 import './projectCluster.less';
+import { CORE_PROJECTS_DASHBOARD_REGIONFILTER_REGIONFILTER_SERVICE } from '../regionFilter/regionFilter.service';
 
-module.exports = angular
-  .module('spinnaker.core.projects.dashboard.clusters.projectCluster.directive', [
-    TIME_FORMATTERS,
-    HEALTH_COUNTS_COMPONENT,
-    require('../regionFilter/regionFilter.service').name,
-  ])
+export const CORE_PROJECTS_DASHBOARD_CLUSTER_PROJECTCLUSTER_DIRECTIVE =
+  'spinnaker.core.projects.dashboard.clusters.projectCluster.directive';
+export const name = CORE_PROJECTS_DASHBOARD_CLUSTER_PROJECTCLUSTER_DIRECTIVE; // for backwards compatibility
+module(CORE_PROJECTS_DASHBOARD_CLUSTER_PROJECTCLUSTER_DIRECTIVE, [
+  TIME_FORMATTERS,
+  HEALTH_COUNTS_COMPONENT,
+  CORE_PROJECTS_DASHBOARD_REGIONFILTER_REGIONFILTER_SERVICE,
+])
   .directive('projectCluster', function() {
     return {
       restrict: 'E',

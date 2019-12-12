@@ -1,11 +1,13 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { AccountService, Registry } from '@spinnaker/core';
 
-module.exports = angular
-  .module('spinnaker.dcos.pipeline.stage.disableClusterStage', [])
+export const DCOS_PIPELINE_STAGES_DISABLECLUSTER_DCOSDISABLECLUSTERSTAGE =
+  'spinnaker.dcos.pipeline.stage.disableClusterStage';
+export const name = DCOS_PIPELINE_STAGES_DISABLECLUSTER_DCOSDISABLECLUSTERSTAGE; // for backwards compatibility
+module(DCOS_PIPELINE_STAGES_DISABLECLUSTER_DCOSDISABLECLUSTERSTAGE, [])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'disableCluster',

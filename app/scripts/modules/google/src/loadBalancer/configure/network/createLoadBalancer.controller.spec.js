@@ -1,10 +1,9 @@
 'use strict';
 
+import * as angular from 'angular';
 import { ApplicationModelBuilder, ModalWizard } from '@spinnaker/core';
 
 describe('Controller: gceCreateLoadBalancerCtrl', function() {
-  const angular = require('angular');
-
   // load the controller's module
   beforeEach(function() {
     window.module(require('./createLoadBalancer.controller').name);

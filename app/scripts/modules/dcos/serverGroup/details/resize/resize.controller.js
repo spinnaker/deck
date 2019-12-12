@@ -1,11 +1,13 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 
 import { SERVER_GROUP_WRITER, TaskMonitor } from '@spinnaker/core';
 
-module.exports = angular
-  .module('spinnaker.dcos.serverGroup.details.resize.controller', [SERVER_GROUP_WRITER])
+export const DCOS_SERVERGROUP_DETAILS_RESIZE_RESIZE_CONTROLLER = 'spinnaker.dcos.serverGroup.details.resize.controller';
+export const name = DCOS_SERVERGROUP_DETAILS_RESIZE_RESIZE_CONTROLLER; // for backwards compatibility
+angular
+  .module(DCOS_SERVERGROUP_DETAILS_RESIZE_RESIZE_CONTROLLER, [SERVER_GROUP_WRITER])
   .controller('dcosResizeServerGroupController', [
     '$scope',
     '$uibModalInstance',

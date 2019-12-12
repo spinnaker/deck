@@ -8,9 +8,11 @@
   This is what using ui-select has done to us.
  */
 
-const angular = require('angular');
+import * as angular from 'angular';
 
-module.exports = angular.module('spinnaker.core.utils.infiniteScroll.directive', []).directive('infiniteScroll', [
+export const CORE_UTILS_INFINITESCROLL_DIRECTIVE = 'spinnaker.core.utils.infiniteScroll.directive';
+export const name = CORE_UTILS_INFINITESCROLL_DIRECTIVE; // for backwards compatibility
+angular.module(CORE_UTILS_INFINITESCROLL_DIRECTIVE, []).directive('infiniteScroll', [
   '$rootScope',
   '$window',
   '$timeout',

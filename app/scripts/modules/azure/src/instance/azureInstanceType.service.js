@@ -1,9 +1,11 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 import _ from 'lodash';
 
-module.exports = angular.module('spinnaker.azure.instanceType.service', []).factory('azureInstanceTypeService', [
+export const AZURE_INSTANCE_AZUREINSTANCETYPE_SERVICE = 'spinnaker.azure.instanceType.service';
+export const name = AZURE_INSTANCE_AZUREINSTANCETYPE_SERVICE; // for backwards compatibility
+module(AZURE_INSTANCE_AZUREINSTANCETYPE_SERVICE, []).factory('azureInstanceTypeService', [
   '$http',
   '$q',
   function($http, $q) {

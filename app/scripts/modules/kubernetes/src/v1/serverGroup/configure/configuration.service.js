@@ -1,15 +1,19 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 import _ from 'lodash';
 
 import { AccountService, CACHE_INITIALIZER_SERVICE, LOAD_BALANCER_READ_SERVICE } from '@spinnaker/core';
+import { KUBERNETES_V1_IMAGE_IMAGE_READER } from '../../image/image.reader';
 
-module.exports = angular
-  .module('spinnaker.serverGroup.configure.kubernetes.configuration.service', [
+export const KUBERNETES_V1_SERVERGROUP_CONFIGURE_CONFIGURATION_SERVICE =
+  'spinnaker.serverGroup.configure.kubernetes.configuration.service';
+export const name = KUBERNETES_V1_SERVERGROUP_CONFIGURE_CONFIGURATION_SERVICE; // for backwards compatibility
+angular
+  .module(KUBERNETES_V1_SERVERGROUP_CONFIGURE_CONFIGURATION_SERVICE, [
     CACHE_INITIALIZER_SERVICE,
     LOAD_BALANCER_READ_SERVICE,
-    require('../../image/image.reader').name,
+    KUBERNETES_V1_IMAGE_IMAGE_READER,
   ])
   .factory('kubernetesServerGroupConfigurationService', [
     '$q',

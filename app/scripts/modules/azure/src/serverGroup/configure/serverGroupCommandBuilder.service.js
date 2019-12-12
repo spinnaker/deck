@@ -1,14 +1,19 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 const _ = require('lodash');
 
 import { NameUtils } from '@spinnaker/core';
+import { AZURE_IMAGE_IMAGE_READER } from '../../image/image.reader';
+import { AZURE_SERVERGROUP_SERVERGROUP_TRANSFORMER } from '../serverGroup.transformer';
 
-module.exports = angular
-  .module('spinnaker.azure.serverGroupCommandBuilder.service', [
-    require('../../image/image.reader').name,
-    require('../serverGroup.transformer').name,
+export const AZURE_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER_SERVICE =
+  'spinnaker.azure.serverGroupCommandBuilder.service';
+export const name = AZURE_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER_SERVICE; // for backwards compatibility
+angular
+  .module(AZURE_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER_SERVICE, [
+    AZURE_IMAGE_IMAGE_READER,
+    AZURE_SERVERGROUP_SERVERGROUP_TRANSFORMER,
   ])
   .factory('azureServerGroupCommandBuilder', [
     '$q',

@@ -1,11 +1,12 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { AccountService, Registry, StageConstants } from '@spinnaker/core';
 
-module.exports = angular
-  .module('spinnaker.titus.pipeline.stage.enableAsgStage', [])
+export const TITUS_PIPELINE_STAGES_ENABLEASG_TITUSENABLEASGSTAGE = 'spinnaker.titus.pipeline.stage.enableAsgStage';
+export const name = TITUS_PIPELINE_STAGES_ENABLEASG_TITUSENABLEASGSTAGE; // for backwards compatibility
+module(TITUS_PIPELINE_STAGES_ENABLEASG_TITUSENABLEASGSTAGE, [])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'enableServerGroup',

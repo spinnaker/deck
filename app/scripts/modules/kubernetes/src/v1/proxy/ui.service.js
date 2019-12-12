@@ -1,10 +1,12 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { KubernetesProviderSettings } from '../../kubernetes.settings';
 
-module.exports = angular.module('spinnaker.proxy.kubernetes.ui.service', []).factory('kubernetesProxyUiService', [
+export const KUBERNETES_V1_PROXY_UI_SERVICE = 'spinnaker.proxy.kubernetes.ui.service';
+export const name = KUBERNETES_V1_PROXY_UI_SERVICE; // for backwards compatibility
+module(KUBERNETES_V1_PROXY_UI_SERVICE, []).factory('kubernetesProxyUiService', [
   '$interpolate',
   function($interpolate) {
     function getHost(accountName) {

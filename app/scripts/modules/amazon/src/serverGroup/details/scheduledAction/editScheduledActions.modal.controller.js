@@ -1,12 +1,15 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { TaskExecutor, TaskMonitor } from '@spinnaker/core';
 
-module.exports = angular
-  .module('spinnaker.amazon.serverGroup.details.scheduledActions.editScheduledActions.modal.controller', [])
-  .controller('EditScheduledActionsCtrl', [
+export const AMAZON_SERVERGROUP_DETAILS_SCHEDULEDACTION_EDITSCHEDULEDACTIONS_MODAL_CONTROLLER =
+  'spinnaker.amazon.serverGroup.details.scheduledActions.editScheduledActions.modal.controller';
+export const name = AMAZON_SERVERGROUP_DETAILS_SCHEDULEDACTION_EDITSCHEDULEDACTIONS_MODAL_CONTROLLER; // for backwards compatibility
+module(AMAZON_SERVERGROUP_DETAILS_SCHEDULEDACTION_EDITSCHEDULEDACTIONS_MODAL_CONTROLLER, []).controller(
+  'EditScheduledActionsCtrl',
+  [
     '$scope',
     '$uibModalInstance',
     'application',
@@ -63,4 +66,5 @@ module.exports = angular
 
       this.cancel = $uibModalInstance.dismiss;
     },
-  ]);
+  ],
+);

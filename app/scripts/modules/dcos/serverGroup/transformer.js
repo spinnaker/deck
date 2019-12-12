@@ -2,9 +2,11 @@
 
 import _ from 'lodash';
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular.module('spinnaker.dcos.serverGroup.transformer', []).factory('dcosServerGroupTransformer', [
+export const DCOS_SERVERGROUP_TRANSFORMER = 'spinnaker.dcos.serverGroup.transformer';
+export const name = DCOS_SERVERGROUP_TRANSFORMER; // for backwards compatibility
+module(DCOS_SERVERGROUP_TRANSFORMER, []).factory('dcosServerGroupTransformer', [
   '$q',
   function($q) {
     function normalizeServerGroup(serverGroup) {

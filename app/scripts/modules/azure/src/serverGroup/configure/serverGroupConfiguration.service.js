@@ -1,6 +1,6 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 import _ from 'lodash';
 
 import {
@@ -9,14 +9,19 @@ import {
   LOAD_BALANCER_READ_SERVICE,
   SECURITY_GROUP_READER,
 } from '@spinnaker/core';
+import { AZURE_IMAGE_IMAGE_READER } from '../../image/image.reader';
+import { AZURE_INSTANCE_AZUREINSTANCETYPE_SERVICE } from '../../instance/azureInstanceType.service';
 
-module.exports = angular
-  .module('spinnaker.azure.serverGroup.configure.service', [
-    require('../../image/image.reader').name,
+export const AZURE_SERVERGROUP_CONFIGURE_SERVERGROUPCONFIGURATION_SERVICE =
+  'spinnaker.azure.serverGroup.configure.service';
+export const name = AZURE_SERVERGROUP_CONFIGURE_SERVERGROUPCONFIGURATION_SERVICE; // for backwards compatibility
+angular
+  .module(AZURE_SERVERGROUP_CONFIGURE_SERVERGROUPCONFIGURATION_SERVICE, [
+    AZURE_IMAGE_IMAGE_READER,
     LOAD_BALANCER_READ_SERVICE,
     SECURITY_GROUP_READER,
     CACHE_INITIALIZER_SERVICE,
-    require('../../instance/azureInstanceType.service').name,
+    AZURE_INSTANCE_AZUREINSTANCETYPE_SERVICE,
   ])
   .factory('azureServerGroupConfigurationService', [
     '$q',

@@ -1,11 +1,15 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 
 import { AccountService, InfrastructureCaches } from '@spinnaker/core';
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
-module.exports = angular
-  .module('spinnaker.gce.securityGroup.create.controller', [require('@uirouter/angularjs').default])
+export const GOOGLE_SECURITYGROUP_CONFIGURE_CREATESECURITYGROUP_CONTROLLER =
+  'spinnaker.gce.securityGroup.create.controller';
+export const name = GOOGLE_SECURITYGROUP_CONFIGURE_CREATESECURITYGROUP_CONTROLLER; // for backwards compatibility
+angular
+  .module(GOOGLE_SECURITYGROUP_CONFIGURE_CREATESECURITYGROUP_CONTROLLER, [UIROUTER_ANGULARJS])
   .controller('gceCreateSecurityGroupCtrl', [
     '$scope',
     '$uibModalInstance',

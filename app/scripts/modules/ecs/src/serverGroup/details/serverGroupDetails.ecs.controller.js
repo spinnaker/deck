@@ -1,6 +1,6 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 import { chain, filter, find, has, isEmpty } from 'lodash';
 import { FirewallLabels } from '@spinnaker/core';
 
@@ -15,17 +15,23 @@ import {
   ServerGroupWarningMessageService,
   SubnetReader,
 } from '@spinnaker/core';
+import { ECS_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER_SERVICE } from '../configure/serverGroupCommandBuilder.service';
+import { ECS_SERVERGROUP_DETAILS_RESIZE_RESIZESERVERGROUP_CONTROLLER } from './resize/resizeServerGroup.controller';
+import { ECS_SERVERGROUP_DETAILS_ROLLBACK_ROLLBACKSERVERGROUP_CONTROLLER } from './rollback/rollbackServerGroup.controller';
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
-module.exports = angular
-  .module('spinnaker.ecs.serverGroup.details.controller', [
-    require('@uirouter/angularjs').default,
+export const ECS_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_ECS_CONTROLLER = 'spinnaker.ecs.serverGroup.details.controller';
+export const name = ECS_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_ECS_CONTROLLER; // for backwards compatibility
+angular
+  .module(ECS_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_ECS_CONTROLLER, [
+    UIROUTER_ANGULARJS,
     ECS_SERVER_GROUP_TRANSFORMER,
     CONFIRMATION_MODAL_SERVICE,
     OVERRIDE_REGISTRY,
     SERVER_GROUP_WRITER,
-    require('../configure/serverGroupCommandBuilder.service').name,
-    require('./resize/resizeServerGroup.controller').name,
-    require('./rollback/rollbackServerGroup.controller').name,
+    ECS_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER_SERVICE,
+    ECS_SERVERGROUP_DETAILS_RESIZE_RESIZESERVERGROUP_CONTROLLER,
+    ECS_SERVERGROUP_DETAILS_ROLLBACK_ROLLBACKSERVERGROUP_CONTROLLER,
   ])
   .controller('ecsServerGroupDetailsCtrl', [
     '$scope',

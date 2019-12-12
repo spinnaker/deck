@@ -1,12 +1,15 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 import _ from 'lodash';
 
 import { SecurityGroupWriter, TaskMonitor, FirewallLabels } from '@spinnaker/core';
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
-module.exports = angular
-  .module('spinnaker.amazon.securityGroup.edit.controller', [require('@uirouter/angularjs').default])
+export const AMAZON_SECURITYGROUP_CONFIGURE_EDITSECURITYGROUPCTRL = 'spinnaker.amazon.securityGroup.edit.controller';
+export const name = AMAZON_SECURITYGROUP_CONFIGURE_EDITSECURITYGROUPCTRL; // for backwards compatibility
+angular
+  .module(AMAZON_SECURITYGROUP_CONFIGURE_EDITSECURITYGROUPCTRL, [UIROUTER_ANGULARJS])
   .controller('awsEditSecurityGroupCtrl', [
     '$scope',
     '$uibModalInstance',

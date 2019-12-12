@@ -8,10 +8,12 @@ import { ManualJudgmentExecutionLabel } from './ManualJudgmentExecutionLabel';
 import { ManualJudgmentMarkerIcon } from './ManualJudgmentMarkerIcon';
 import { ExecutionDetailsTasks } from '../common/ExecutionDetailsTasks';
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular
-  .module('spinnaker.core.pipeline.stage.manualJudgmentStage', [])
+export const CORE_PIPELINE_CONFIG_STAGES_MANUALJUDGMENT_MANUALJUDGMENTSTAGE =
+  'spinnaker.core.pipeline.stage.manualJudgmentStage';
+export const name = CORE_PIPELINE_CONFIG_STAGES_MANUALJUDGMENT_MANUALJUDGMENTSTAGE; // for backwards compatibility
+module(CORE_PIPELINE_CONFIG_STAGES_MANUALJUDGMENT_MANUALJUDGMENTSTAGE, [])
   .config(function() {
     Registry.pipeline.registerStage({
       label: 'Manual Judgment',

@@ -1,5 +1,8 @@
-'use strict';
+import { KUBERNETES_V1_CLUSTER_CONFIGURE_COMMANDBUILDER } from './configure/CommandBuilder';
+('use strict');
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular.module('spinnaker.cluster.kubernetes', [require('./configure/CommandBuilder').name]);
+export const KUBERNETES_V1_CLUSTER_CLUSTER_KUBERNETES_MODULE = 'spinnaker.cluster.kubernetes';
+export const name = KUBERNETES_V1_CLUSTER_CLUSTER_KUBERNETES_MODULE; // for backwards compatibility
+module(KUBERNETES_V1_CLUSTER_CLUSTER_KUBERNETES_MODULE, [KUBERNETES_V1_CLUSTER_CONFIGURE_COMMANDBUILDER]);

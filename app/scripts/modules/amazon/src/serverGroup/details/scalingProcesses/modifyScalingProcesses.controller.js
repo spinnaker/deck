@@ -1,12 +1,15 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 import _ from 'lodash';
 
 import { TaskExecutor, TaskMonitor } from '@spinnaker/core';
 
-module.exports = angular
-  .module('spinnaker.amazon.serverGroup.details.autoscaling.process.controller', [])
+export const AMAZON_SERVERGROUP_DETAILS_SCALINGPROCESSES_MODIFYSCALINGPROCESSES_CONTROLLER =
+  'spinnaker.amazon.serverGroup.details.autoscaling.process.controller';
+export const name = AMAZON_SERVERGROUP_DETAILS_SCALINGPROCESSES_MODIFYSCALINGPROCESSES_CONTROLLER; // for backwards compatibility
+angular
+  .module(AMAZON_SERVERGROUP_DETAILS_SCALINGPROCESSES_MODIFYSCALINGPROCESSES_CONTROLLER, [])
   .controller('ModifyScalingProcessesCtrl', [
     '$scope',
     '$uibModalInstance',

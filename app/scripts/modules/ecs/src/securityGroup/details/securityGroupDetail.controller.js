@@ -1,6 +1,6 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 import _ from 'lodash';
 
 import {
@@ -12,10 +12,14 @@ import {
 } from '@spinnaker/core';
 
 import { VpcReader } from '@spinnaker/amazon';
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
-module.exports = angular
-  .module('spinnaker.ecs.securityGroup.details.controller', [
-    require('@uirouter/angularjs').default,
+export const ECS_SECURITYGROUP_DETAILS_SECURITYGROUPDETAIL_CONTROLLER =
+  'spinnaker.ecs.securityGroup.details.controller';
+export const name = ECS_SECURITYGROUP_DETAILS_SECURITYGROUPDETAIL_CONTROLLER; // for backwards compatibility
+angular
+  .module(ECS_SECURITYGROUP_DETAILS_SECURITYGROUPDETAIL_CONTROLLER, [
+    UIROUTER_ANGULARJS,
     SECURITY_GROUP_READER,
     MANAGED_RESOURCE_DETAILS_INDICATOR,
   ])

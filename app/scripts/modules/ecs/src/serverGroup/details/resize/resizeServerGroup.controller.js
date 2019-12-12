@@ -1,13 +1,19 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 
 import { SERVER_GROUP_WRITER, TaskMonitor } from '@spinnaker/core';
 
 import { ECS_RESIZE_CAPACITY_COMPONENT } from './resizeCapacity.component';
 
-module.exports = angular
-  .module('spinnaker.ecs.serverGroup.details.resize.controller', [SERVER_GROUP_WRITER, ECS_RESIZE_CAPACITY_COMPONENT])
+export const ECS_SERVERGROUP_DETAILS_RESIZE_RESIZESERVERGROUP_CONTROLLER =
+  'spinnaker.ecs.serverGroup.details.resize.controller';
+export const name = ECS_SERVERGROUP_DETAILS_RESIZE_RESIZESERVERGROUP_CONTROLLER; // for backwards compatibility
+angular
+  .module(ECS_SERVERGROUP_DETAILS_RESIZE_RESIZESERVERGROUP_CONTROLLER, [
+    SERVER_GROUP_WRITER,
+    ECS_RESIZE_CAPACITY_COMPONENT,
+  ])
   .controller('ecsResizeServerGroupCtrl', [
     '$scope',
     '$uibModalInstance',

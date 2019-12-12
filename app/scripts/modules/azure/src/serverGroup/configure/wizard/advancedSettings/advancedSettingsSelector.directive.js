@@ -1,9 +1,12 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 
-module.exports = angular
-  .module('spinnaker.azure.serverGroup.configure.wizard.advancedSettings.selector.directive', [])
+export const AZURE_SERVERGROUP_CONFIGURE_WIZARD_ADVANCEDSETTINGS_ADVANCEDSETTINGSSELECTOR_DIRECTIVE =
+  'spinnaker.azure.serverGroup.configure.wizard.advancedSettings.selector.directive';
+export const name = AZURE_SERVERGROUP_CONFIGURE_WIZARD_ADVANCEDSETTINGS_ADVANCEDSETTINGSSELECTOR_DIRECTIVE; // for backwards compatibility
+angular
+  .module(AZURE_SERVERGROUP_CONFIGURE_WIZARD_ADVANCEDSETTINGS_ADVANCEDSETTINGSSELECTOR_DIRECTIVE, [])
   .directive('azureServerGroupAdvancedSettingsSelector', function() {
     return {
       restrict: 'E',

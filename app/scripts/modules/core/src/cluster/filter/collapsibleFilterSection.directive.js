@@ -1,8 +1,10 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular.module('cluster.filter.collapse', []).directive('filterSection', function() {
+export const CORE_CLUSTER_FILTER_COLLAPSIBLEFILTERSECTION_DIRECTIVE = 'cluster.filter.collapse';
+export const name = CORE_CLUSTER_FILTER_COLLAPSIBLEFILTERSECTION_DIRECTIVE; // for backwards compatibility
+module(CORE_CLUSTER_FILTER_COLLAPSIBLEFILTERSECTION_DIRECTIVE, []).directive('filterSection', function() {
   return {
     restrict: 'E',
     transclude: true,

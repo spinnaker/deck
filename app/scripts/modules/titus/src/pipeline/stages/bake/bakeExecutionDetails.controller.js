@@ -1,12 +1,16 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { SETTINGS } from '@spinnaker/core';
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
-module.exports = angular
-  .module('spinnaker.titus.pipeline.stage.bake.executionDetails.controller', [require('@uirouter/angularjs').default])
-  .controller('titusBakeExecutionDetailsCtrl', [
+export const TITUS_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER =
+  'spinnaker.titus.pipeline.stage.bake.executionDetails.controller';
+export const name = TITUS_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER; // for backwards compatibility
+module(TITUS_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER, [UIROUTER_ANGULARJS]).controller(
+  'titusBakeExecutionDetailsCtrl',
+  [
     '$scope',
     '$stateParams',
     'executionDetailsSectionService',
@@ -28,4 +32,5 @@ module.exports = angular
 
       $scope.$on('$stateChangeSuccess', initialize);
     },
-  ]);
+  ],
+);

@@ -1,6 +1,6 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 import _ from 'lodash';
 
 import {
@@ -11,10 +11,14 @@ import {
   SecurityGroupWriter,
   ServerGroupTemplates,
 } from '@spinnaker/core';
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
-module.exports = angular
-  .module('spinnaker.securityGroup.kubernetes.details.controller', [
-    require('@uirouter/angularjs').default,
+export const KUBERNETES_V1_SECURITYGROUP_DETAILS_DETAILS_CONTROLLER =
+  'spinnaker.securityGroup.kubernetes.details.controller';
+export const name = KUBERNETES_V1_SECURITYGROUP_DETAILS_DETAILS_CONTROLLER; // for backwards compatibility
+angular
+  .module(KUBERNETES_V1_SECURITYGROUP_DETAILS_DETAILS_CONTROLLER, [
+    UIROUTER_ANGULARJS,
     SECURITY_GROUP_READER,
     CONFIRMATION_MODAL_SERVICE,
   ])

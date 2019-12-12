@@ -1,13 +1,23 @@
-'use strict';
+import { KUBERNETES_V1_SERVERGROUP_CONFIGURE_CONFIGURATION_SERVICE } from './configuration.service';
+import { KUBERNETES_V1_SERVERGROUP_CONFIGURE_COMMANDBUILDER } from './CommandBuilder';
+import { KUBERNETES_V1_SERVERGROUP_CONFIGURE_WIZARD_BASICSETTINGS_CONTROLLER } from './wizard/BasicSettings.controller';
+import { KUBERNETES_V1_SERVERGROUP_CONFIGURE_WIZARD_ADVANCEDSETTINGS_CONTROLLER } from './wizard/advancedSettings.controller';
+import { KUBERNETES_V1_SERVERGROUP_CONFIGURE_WIZARD_CLONE_CONTROLLER } from './wizard/Clone.controller';
+import { KUBERNETES_V1_SERVERGROUP_CONFIGURE_WIZARD_VOLUMES_CONTROLLER } from './wizard/volumes.controller';
+import { KUBERNETES_V1_SERVERGROUP_CONFIGURE_WIZARD_DEPLOYMENT_CONTROLLER } from './wizard/deployment.controller';
+('use strict');
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular.module('spinnaker.serverGroup.configure.kubernetes', [
-  require('./configuration.service').name,
-  require('./CommandBuilder').name,
-  require('./wizard/BasicSettings.controller').name,
-  require('./wizard/advancedSettings.controller').name,
-  require('./wizard/Clone.controller').name,
-  require('./wizard/volumes.controller').name,
-  require('./wizard/deployment.controller').name,
+export const KUBERNETES_V1_SERVERGROUP_CONFIGURE_CONFIGURE_KUBERNETES_MODULE =
+  'spinnaker.serverGroup.configure.kubernetes';
+export const name = KUBERNETES_V1_SERVERGROUP_CONFIGURE_CONFIGURE_KUBERNETES_MODULE; // for backwards compatibility
+module(KUBERNETES_V1_SERVERGROUP_CONFIGURE_CONFIGURE_KUBERNETES_MODULE, [
+  KUBERNETES_V1_SERVERGROUP_CONFIGURE_CONFIGURATION_SERVICE,
+  KUBERNETES_V1_SERVERGROUP_CONFIGURE_COMMANDBUILDER,
+  KUBERNETES_V1_SERVERGROUP_CONFIGURE_WIZARD_BASICSETTINGS_CONTROLLER,
+  KUBERNETES_V1_SERVERGROUP_CONFIGURE_WIZARD_ADVANCEDSETTINGS_CONTROLLER,
+  KUBERNETES_V1_SERVERGROUP_CONFIGURE_WIZARD_CLONE_CONTROLLER,
+  KUBERNETES_V1_SERVERGROUP_CONFIGURE_WIZARD_VOLUMES_CONTROLLER,
+  KUBERNETES_V1_SERVERGROUP_CONFIGURE_WIZARD_DEPLOYMENT_CONTROLLER,
 ]);

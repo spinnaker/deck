@@ -1,12 +1,13 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 import { react2angular } from 'react2angular';
 
 import { RegionSelectField } from './RegionSelectField';
 
-module.exports = angular
-  .module('spinnaker.core.region.regionSelectField.directive', [])
+export const CORE_REGION_REGIONSELECTFIELD_DIRECTIVE = 'spinnaker.core.region.regionSelectField.directive';
+export const name = CORE_REGION_REGIONSELECTFIELD_DIRECTIVE; // for backwards compatibility
+module(CORE_REGION_REGIONSELECTFIELD_DIRECTIVE, [])
   .component(
     'regionSelectFieldWrapper',
     react2angular(RegionSelectField, [

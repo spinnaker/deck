@@ -1,13 +1,16 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 
 import { AccountService, AuthenticationService, Registry, SETTINGS } from '@spinnaker/core';
 
 import { CanaryExecutionLabel } from '../canary/CanaryExecutionLabel';
+import { CANARY_CANARY_CANARYEXECUTIONSUMMARY_CONTROLLER } from '../canary/canaryExecutionSummary.controller';
 
-module.exports = angular
-  .module('spinnaker.canary.acaTaskStage', [require('../canary/canaryExecutionSummary.controller').name])
+export const CANARY_ACATASK_ACATASKSTAGE = 'spinnaker.canary.acaTaskStage';
+export const name = CANARY_ACATASK_ACATASKSTAGE; // for backwards compatibility
+angular
+  .module(CANARY_ACATASK_ACATASKSTAGE, [CANARY_CANARY_CANARYEXECUTIONSUMMARY_CONTROLLER])
   .config(function() {
     if (SETTINGS.feature.canary) {
       Registry.pipeline.registerStage({

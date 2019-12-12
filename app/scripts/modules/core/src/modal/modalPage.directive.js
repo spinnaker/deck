@@ -1,9 +1,11 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 const $ = require('jquery');
 
-module.exports = angular.module('spinnaker.core.modal.modalPage.directive', []).directive('modalPage', function() {
+export const CORE_MODAL_MODALPAGE_DIRECTIVE = 'spinnaker.core.modal.modalPage.directive';
+export const name = CORE_MODAL_MODALPAGE_DIRECTIVE; // for backwards compatibility
+module(CORE_MODAL_MODALPAGE_DIRECTIVE, []).directive('modalPage', function() {
   return {
     restrict: 'EA',
     link: function(scope, elem, attrs) {

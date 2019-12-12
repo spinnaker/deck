@@ -1,6 +1,6 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 import _ from 'lodash';
 
 import {
@@ -10,10 +10,14 @@ import {
   SECURITY_GROUP_READER,
   FirewallLabels,
 } from '@spinnaker/core';
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
-module.exports = angular
-  .module('spinnaker.azure.loadBalancer.details.controller', [
-    require('@uirouter/angularjs').default,
+export const AZURE_LOADBALANCER_DETAILS_LOADBALANCERDETAIL_CONTROLLER =
+  'spinnaker.azure.loadBalancer.details.controller';
+export const name = AZURE_LOADBALANCER_DETAILS_LOADBALANCERDETAIL_CONTROLLER; // for backwards compatibility
+angular
+  .module(AZURE_LOADBALANCER_DETAILS_LOADBALANCERDETAIL_CONTROLLER, [
+    UIROUTER_ANGULARJS,
     SECURITY_GROUP_READER,
     LOAD_BALANCER_READ_SERVICE,
     CONFIRMATION_MODAL_SERVICE,
