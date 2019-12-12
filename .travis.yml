@@ -8,8 +8,8 @@ before_install:
   - export DISPLAY=:99.0
   - export PATH=$HOME/.yarn/bin:$PATH
   #- rm -rf node_modules
-  - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.10.1
   - sh -e /etc/init.d/xvfb start
+  - git log | head -n 100
 install: gradle/installViaTravis.sh
 
 jobs:
@@ -23,10 +23,6 @@ jobs:
       script: gradle/buildModules.sh
 
 before_cache: gradle/prepCaches.sh
-cache:
-  directories:
-    - $HOME/.gradle
-    - node_modules
 notifications:
   slack:
     rooms:
