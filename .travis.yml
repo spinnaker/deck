@@ -13,8 +13,6 @@ before_install:
   - yarn --version
   - git --version
 install: gradle/installViaTravis.sh
-after_install:
-  - ./node_modules/.bin/eslint
 
 jobs:
   include:
