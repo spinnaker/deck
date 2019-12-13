@@ -105,46 +105,48 @@ export class PipelineTemplatesV2 extends React.Component<{}, IPipelineTemplatesV
   };
 
   // Creates a cache key suitable for _.memoize
-  private filterMemoizeResolver = (templateCollections: [string, IPipelineTemplateV2[]][], query: string): string => {
+  private filterMemoizeResolver = (
+    templateCollections: Array<[string, IPipelineTemplateV2[]]>,
+    query: string,
+  ): string => {
     const templateIds = templateCollections.flatMap(([, templateCollection]) =>
       templateCollection.map(template => getTemplateVersion(template)),
     );
     return `${templateIds.join('')}${query}`;
   };
 
-  private filterSearchResults = memoize((templateCollections: [string, IPipelineTemplateV2[]][], query: string): [
-    string,
-    IPipelineTemplateV2[],
-  ][] => {
-    const searchValue = query.trim().toLowerCase();
+  private filterSearchResults = memoize(
+    (
+      templateCollections: Array<[string, IPipelineTemplateV2[]]>,
+      query: string,
+    ): Array<[string, IPipelineTemplateV2[]]> => {
+      const searchValue = query.trim().toLowerCase();
 
-    if (!searchValue) {
-      return templateCollections;
-    } else {
-      return templateCollections.filter(([, templateCollection]) =>
-        templateCollection.some(
-          ({ metadata: { name = '', description = '', owner = '' } = {} }) =>
-            name.toLowerCase().includes(searchValue) ||
-            description.toLowerCase().includes(searchValue) ||
-            owner.toLowerCase().includes(searchValue),
-        ),
-      );
-    }
-  }, this.filterMemoizeResolver);
+      if (!searchValue) {
+        return templateCollections;
+      } else {
+        return templateCollections.filter(([, templateCollection]) =>
+          templateCollection.some(
+            ({ metadata: { name = '', description = '', owner = '' } = {} }) =>
+              name.toLowerCase().includes(searchValue) ||
+              description.toLowerCase().includes(searchValue) ||
+              owner.toLowerCase().includes(searchValue),
+          ),
+        );
+      }
+    },
+    this.filterMemoizeResolver,
+  );
 
-  private getViewedTemplate = () => {
-    const { viewTemplateVersion, templates } = this.state;
-    const templateId = convertTemplateVersionToId(viewTemplateVersion);
-    const { [templateId]: viewTemplateCollection = [] } = templates;
-    return viewTemplateCollection.find(template => getTemplateVersion(template) === viewTemplateVersion);
-  };
+  private getViewTemplate = () => this.findTemplate('viewTemplateVersion');
+  private getDeleteTemplate = () => this.findTemplate('deleteTemplateVersion');
 
-  private getTemplateToDelete = () => {
-    const { deleteTemplateVersion, templates } = this.state;
-    const templateId = convertTemplateVersionToId(deleteTemplateVersion);
-    const { [templateId]: deleteTemplateCollection = [] } = templates;
-    return deleteTemplateCollection.find(template => getTemplateVersion(template) === deleteTemplateVersion);
-  };
+  private findTemplate(actionKey: 'viewTemplateVersion' | 'deleteTemplateVersion') {
+    const { [actionKey]: templateVersion, templates } = this.state;
+    const templateId = convertTemplateVersionToId(templateVersion);
+    const { [templateId]: templateCollection = [] } = templates;
+    return templateCollection.find(template => getTemplateVersion(template) === templateVersion);
+  }
 
   private handleCreatePipelineClick(template: IPipelineTemplateV2): void {
     this.setState({ selectedTemplate: template });
@@ -169,11 +171,11 @@ export class PipelineTemplatesV2 extends React.Component<{}, IPipelineTemplatesV
       deleteTemplateVersion,
       templateVersionSelections,
     } = this.state;
-    const detailsTemplate = viewTemplateVersion ? this.getViewedTemplate() : null;
+    const detailsTemplate = viewTemplateVersion ? this.getViewTemplate() : null;
     const searchPerformed = searchValue.trim() !== '';
     const filteredResults = this.filterSearchResults(Object.entries(templates), searchValue);
     const resultsAvailable = filteredResults.length > 0;
-    const deleteTemplate = deleteTemplateVersion ? this.getTemplateToDelete() : null;
+    const deleteTemplate = deleteTemplateVersion ? this.getDeleteTemplate() : null;
 
     return (
       <>
@@ -207,7 +209,12 @@ export class PipelineTemplatesV2 extends React.Component<{}, IPipelineTemplatesV
                     <th>Name</th>
                     <th>Owner</th>
                     <th>Updated</th>
-                    <th>Version</th>
+                    <th>
+                      <span className="sort-toggle clickable">
+                        Version
+                        <span className="glyphicon glyphicon-Down-triangle" />
+                      </span>
+                    </th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -215,25 +222,25 @@ export class PipelineTemplatesV2 extends React.Component<{}, IPipelineTemplatesV
                   {filteredResults.map(([templateId, templateCollection]) => {
                     const templateVersion =
                       templateVersionSelections[templateId] || getTemplateVersion(templateCollection[0]);
-                    const template = templateCollection.find(
+                    const currentTemplate = templateCollection.find(
                       template => getTemplateVersion(template) === templateVersion,
                     );
-                    const { metadata } = template;
+                    const { metadata } = currentTemplate;
 
                     return (
                       <tr key={templateVersion}>
                         <td className="templates-table__template-name">{metadata.name || '-'}</td>
                         <td>{metadata.owner || '-'}</td>
-                        <td>{this.getUpdateTimeForTemplate(template) || '-'}</td>
+                        <td>{this.getUpdateTimeForTemplate(currentTemplate) || '-'}</td>
                         <td className="templates-table__template-versions">
                           <ReactSelectInput
                             clearable={false}
                             onChange={e => this.handleSelectedTemplateVersionChange(e, templateId)}
                             value={templateVersion}
-                            stringOptions={templateCollection.map(template => getTemplateVersion(template))}
+                            stringOptions={templateCollection.map(templateOption => getTemplateVersion(templateOption))}
                           />
                         </td>
-                        <td className="pipeline-template-actions">
+                        <td className="templates-table__template-actions">
                           <UISref to={`.pipeline-templates-detail`} params={{ templateId: templateVersion }}>
                             <button className="link">View</button>
                           </UISref>
@@ -245,7 +252,7 @@ export class PipelineTemplatesV2 extends React.Component<{}, IPipelineTemplatesV
                           </button>
                           <button
                             className="link link--create"
-                            onClick={() => this.handleCreatePipelineClick(template)}
+                            onClick={() => this.handleCreatePipelineClick(currentTemplate)}
                           >
                             Create Pipeline
                           </button>
