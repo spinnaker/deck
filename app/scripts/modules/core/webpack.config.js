@@ -8,6 +8,7 @@ const nodeExternals = require('webpack-node-externals');
 const TerserPlugin = require('terser-webpack-plugin');
 const exclusionPattern = /(node_modules|\.\.\/deck)/;
 const WEBPACK_THREADS = Math.max(require('physical-cpu-count') - 1, 1);
+console.log('WEBPACK_THREADS', WEBPACK_THREADS);
 
 const WATCH = process.env.WATCH === 'true';
 const WEBPACK_MODE = WATCH ? 'development' : 'production';
