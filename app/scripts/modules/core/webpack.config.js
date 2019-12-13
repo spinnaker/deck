@@ -7,7 +7,7 @@ const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const nodeExternals = require('webpack-node-externals');
 const TerserPlugin = require('terser-webpack-plugin');
 const exclusionPattern = /(node_modules|\.\.\/deck)/;
-const WEBPACK_THREADS = Math.max(require('physical-cpu-count') - 1, 1);
+const WEBPACK_THREADS = 1;
 console.log('WEBPACK_THREADS', WEBPACK_THREADS);
 
 const WATCH = process.env.WATCH === 'true';
@@ -62,23 +62,12 @@ module.exports = {
     rules: [
       {
         test: /\.js$/,
-        use: [
-          { loader: 'cache-loader' },
-          { loader: 'thread-loader', options: { workers: WEBPACK_THREADS } },
-          { loader: 'babel-loader' },
-          { loader: 'envify-loader' },
-          { loader: 'eslint-loader' },
-        ],
+        use: [{ loader: 'babel-loader' }, { loader: 'envify-loader' }, { loader: 'eslint-loader' }],
         exclude: exclusionPattern,
       },
       {
         test: /\.tsx?$/,
-        use: [
-          { loader: 'cache-loader' },
-          { loader: 'thread-loader', options: { workers: WEBPACK_THREADS } },
-          { loader: 'ts-loader', options: { happyPackMode: true } },
-          { loader: 'eslint-loader' },
-        ],
+        use: [{ loader: 'ts-loader', options: { happyPackMode: true } }, { loader: 'eslint-loader' }],
         exclude: exclusionPattern,
       },
       {
