@@ -62,7 +62,7 @@ export class EvaluateCloudFormationChangeSetExecutionApproval extends React.Comp
 
   public render(): React.ReactElement<EvaluateCloudFormationChangeSetExecutionApproval> {
     const stage: IExecutionStage = this.props.stage;
-    const changeSetIsReplacement = !stage.context.changeSetIsReplacement;
+    const changeSetContainsReplacement = !stage.context.changeSetContainsReplacement;
     const { ButtonBusyIndicator } = NgReact;
 
     return (
@@ -76,14 +76,14 @@ export class EvaluateCloudFormationChangeSetExecutionApproval extends React.Comp
             <button
               className="btn btn-danger"
               onClick={this.handleStopClick}
-              disabled={changeSetIsReplacement || this.state.submitting}
+              disabled={changeSetContainsReplacement || this.state.submitting}
             >
               {this.isSubmitting('Execute') && <ButtonBusyIndicator />}
               {stage.context.stopButtonLabel || 'Execute'}
             </button>
             <button
               className="btn btn-primary"
-              disabled={changeSetIsReplacement || this.state.submitting}
+              disabled={changeSetContainsReplacement || this.state.submitting}
               onClick={this.handleContinueClick}
             >
               {this.isSubmitting('Skip') && <ButtonBusyIndicator />}
@@ -91,7 +91,7 @@ export class EvaluateCloudFormationChangeSetExecutionApproval extends React.Comp
             </button>
             <button
               className="btn btn-primary"
-              disabled={changeSetIsReplacement || this.state.submitting}
+              disabled={changeSetContainsReplacement || this.state.submitting}
               onClick={this.handleFailClick}
             >
               {this.isSubmitting('Fail') && <ButtonBusyIndicator />}

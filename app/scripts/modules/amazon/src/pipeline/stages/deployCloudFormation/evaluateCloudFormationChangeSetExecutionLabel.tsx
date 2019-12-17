@@ -23,7 +23,7 @@ export class EvaluateCloudFormationChangeSetExecutionLabel extends React.Compone
     const stage = this.props.stage;
     if (
       stage.isRunning &&
-      stage.stages[0].context.changeSetIsReplacement &&
+      stage.stages[0].context.changeSetContainsReplacement &&
       stage.stages[0].context.actionOnReplacement === 'ask'
     ) {
       const template = (

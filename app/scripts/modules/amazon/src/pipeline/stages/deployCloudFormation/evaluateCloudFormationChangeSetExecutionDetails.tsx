@@ -24,7 +24,7 @@ export class EvaluateCloudFormationChangeSetExecutionDetails extends React.Compo
 
   public render() {
     const { application, execution, stage, current, name } = this.props;
-    const hasReplacement = stage.context.changeSetIsReplacement;
+    const hasReplacement = stage.context.changeSetContainsReplacement;
     if (hasReplacement && stage.isRunning && stage.context.actionOnReplacement === 'ask') {
       return (
         <ExecutionDetailsSection name={name} current={current}>

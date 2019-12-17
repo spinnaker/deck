@@ -9,7 +9,7 @@ export class EvaluateCloudFormationChangeSetExecutionMarkerIcon extends React.Co
   public render() {
     if (
       this.props.stage.isRunning &&
-      this.props.stage.stages[0].context.changeSetIsReplacement &&
+      this.props.stage.stages[0].context.changeSetContainsReplacement &&
       this.props.stage.stages[0].context.actionOnReplacement === 'ask'
     ) {
       require('./evaluateCloudFormationChangeSetExecutionDetailsAsk.less');
