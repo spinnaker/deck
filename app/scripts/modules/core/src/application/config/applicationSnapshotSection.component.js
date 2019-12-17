@@ -35,7 +35,6 @@ module(CORE_APPLICATION_CONFIG_APPLICATIONSNAPSHOTSECTION_COMPONENT, [
         const taskMonitor = {
           application: this.application,
           title: 'Taking snapshot of ' + this.application.name,
-          hasKatoTask: true,
         };
 
         confirmationModalService.confirm({

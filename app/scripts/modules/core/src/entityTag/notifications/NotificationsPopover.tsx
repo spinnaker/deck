@@ -150,7 +150,6 @@ export class NotificationsPopover extends React.Component<INotificationsPopoverP
     confirmationModalService.confirm({
       header: `Really delete ${type}?`,
       buttonText: `Delete ${type}`,
-      provider: entity.cloudProvider,
       account: entity.account,
       applicationName: application.name,
       taskMonitorConfig,

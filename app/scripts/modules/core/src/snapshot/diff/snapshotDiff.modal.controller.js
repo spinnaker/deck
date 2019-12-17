@@ -103,7 +103,6 @@ module(CORE_SNAPSHOT_DIFF_SNAPSHOTDIFF_MODAL_CONTROLLER, [
       const taskMonitor = {
         application: application,
         title: 'Restoring snapshot of ' + application.name,
-        hasKatoTask: true,
       };
 
       confirmationModalService.confirm({
