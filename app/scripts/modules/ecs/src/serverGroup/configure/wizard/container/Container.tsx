@@ -8,6 +8,7 @@ import {
   IEcsTargetGroupMapping,
 } from '../../serverGroupConfiguration.service';
 import { HelpField } from '@spinnaker/core';
+import { Alert } from 'react-bootstrap';
 
 export interface IContainerProps {
   command: IEcsServerGroupCommand;
@@ -51,8 +52,8 @@ export class Container extends React.Component<IContainerProps, IContainerState>
 
     this.state = {
       imageDescription: cmd.imageDescription ? cmd.imageDescription : this.getEmptyImageDescription(),
-      computeUnits: cmd.computeUnits ? cmd.computeUnits : 256,
-      reservedMemory: cmd.reservedMemory ? cmd.reservedMemory : 256,
+      computeUnits: cmd.computeUnits,
+      reservedMemory: cmd.reservedMemory,
       dockerImages: cmd.backingData && cmd.backingData.filtered ? cmd.backingData.filtered.images : [],
       targetGroupMappings: cmd.targetGroupMappings,
       targetGroupsAvailable: cmd.backingData && cmd.backingData.filtered ? cmd.backingData.filtered.targetGroups : [],
@@ -67,6 +68,8 @@ export class Container extends React.Component<IContainerProps, IContainerState>
       });
     });
   }
+
+  // TODO: Separate docker image component used by both TaskDefinition and Container
 
   private getIdToImageMap = (): Map<string, IEcsDockerImage> => {
     const imageIdToDescription = new Map<string, IEcsDockerImage>();
@@ -150,6 +153,17 @@ export class Container extends React.Component<IContainerProps, IContainerState>
         </option>
       );
     });
+
+    const newTargetGroupMapping = this.state.targetGroupsAvailable.length ? (
+      <button className="btn btn-block btn-sm add-new" onClick={this.pushTargetGroupMapping}>
+        <span className="glyphicon glyphicon-plus-sign" />
+        Add New Target Group Mapping
+      </button>
+    ) : (
+      <div className="sm-label-left">
+        <Alert color="warning">No target groups found in the selected account/region/VPC</Alert>
+      </div>
+    );
 
     const targetGroupsAvailable = this.state.targetGroupsAvailable.map(function(targetGroup, index) {
       return (
@@ -237,12 +251,7 @@ export class Container extends React.Component<IContainerProps, IContainerState>
               <tbody>{targetGroupInputs}</tbody>
               <tfoot>
                 <tr>
-                  <td colSpan={4}>
-                    <button className="btn btn-block btn-sm add-new" onClick={this.pushTargetGroupMapping}>
-                      <span className="glyphicon glyphicon-plus-sign" />
-                      Add New Target Group Mapping
-                    </button>
-                  </td>
+                  <td colSpan={4}>{newTargetGroupMapping}</td>
                 </tr>
               </tfoot>
             </table>

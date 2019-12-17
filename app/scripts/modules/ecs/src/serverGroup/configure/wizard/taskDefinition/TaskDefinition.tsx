@@ -17,6 +17,7 @@ import {
   IPipeline,
   StageArtifactSelectorDelegate,
 } from '@spinnaker/core';
+import { Alert } from 'react-bootstrap';
 
 export interface ITaskDefinitionProps {
   command: IEcsServerGroupCommand;
@@ -70,6 +71,7 @@ export class TaskDefinition extends React.Component<ITaskDefinitionProps, ITaskD
     };
   }
 
+  // TODO: Separate docker image component used by both TaskDefinition and Container
   public componentDidMount() {
     this.props.configureCommand('1').then(() => {
       this.setState({
@@ -318,6 +320,17 @@ export class TaskDefinition extends React.Component<ITaskDefinitionProps, ITaskD
       );
     });
 
+    const newTargetGroupMapping = this.state.targetGroupsAvailable.length ? (
+      <button className="btn btn-block btn-sm add-new" onClick={this.pushTargetGroupMapping}>
+        <span className="glyphicon glyphicon-plus-sign" />
+        Add New Target Group Mapping
+      </button>
+    ) : (
+      <div className="sm-label-left">
+        <Alert color="warning">No target groups found in the selected account/region/VPC</Alert>
+      </div>
+    );
+
     return (
       <div className="container-fluid form-horizontal">
         <div className="form-group">
@@ -379,6 +392,10 @@ export class TaskDefinition extends React.Component<ITaskDefinitionProps, ITaskD
             <b>Target Group Mappings</b>
             <HelpField id="ecs.targetGroupMappings" />
           </div>
+          <div className="sm-label-left">
+            <b>Target Group Mappings</b>
+            <HelpField id="ecs.targetGroupMappings" />
+          </div>
           <form name="ecsTaskDefinitionTargetGroupMappings">
             <table className="table table-condensed packed tags">
               <thead>
@@ -401,12 +418,7 @@ export class TaskDefinition extends React.Component<ITaskDefinitionProps, ITaskD
               <tbody>{targetGroupInputs}</tbody>
               <tfoot>
                 <tr>
-                  <td colSpan={4}>
-                    <button className="btn btn-block btn-sm add-new" onClick={this.pushTargetGroupMapping}>
-                      <span className="glyphicon glyphicon-plus-sign" />
-                      Add New Target Group Mapping
-                    </button>
-                  </td>
+                  <td colSpan={4}>{newTargetGroupMapping}</td>
                 </tr>
               </tfoot>
             </table>
