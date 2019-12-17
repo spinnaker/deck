@@ -392,10 +392,6 @@ export class TaskDefinition extends React.Component<ITaskDefinitionProps, ITaskD
             <b>Target Group Mappings</b>
             <HelpField id="ecs.targetGroupMappings" />
           </div>
-          <div className="sm-label-left">
-            <b>Target Group Mappings</b>
-            <HelpField id="ecs.targetGroupMappings" />
-          </div>
           <form name="ecsTaskDefinitionTargetGroupMappings">
             <table className="table table-condensed packed tags">
               <thead>
