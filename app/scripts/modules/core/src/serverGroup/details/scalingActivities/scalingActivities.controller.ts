@@ -1,5 +1,5 @@
 import { IController, module } from 'angular';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { IModalServiceInstance } from 'angular-ui-bootstrap';
 
 import { ServerGroupReader } from 'core/serverGroup/serverGroupReader.service';
@@ -41,8 +41,8 @@ export class ScalingActivitiesCtrl implements IController {
   }
 
   private groupActivities(activities: IRawScalingActivity[]): void {
-    const grouped: any = _.groupBy(activities, 'cause'),
-      results: IScalingEventSummary[] = [];
+    const grouped: any = _.groupBy(activities, 'cause');
+    const results: IScalingEventSummary[] = [];
 
     _.forOwn(grouped, (group: IRawScalingActivity[]) => {
       if (group.length) {

@@ -2,12 +2,14 @@
 
 import _ from 'lodash';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { AccountService } from '@spinnaker/core';
 import { DcosProviderSettings } from '../dcos.settings';
 
-module.exports = angular.module('spinnaker.dcos.loadBalancer.transformer', []).factory('dcosLoadBalancerTransformer', [
+export const DCOS_LOADBALANCER_TRANSFORMER = 'spinnaker.dcos.loadBalancer.transformer';
+export const name = DCOS_LOADBALANCER_TRANSFORMER; // for backwards compatibility
+module(DCOS_LOADBALANCER_TRANSFORMER, []).factory('dcosLoadBalancerTransformer', [
   '$q',
   function($q) {
     function normalizeLoadBalancer(loadBalancer) {
@@ -19,14 +21,14 @@ module.exports = angular.module('spinnaker.dcos.loadBalancer.transformer', []).f
 
     function attemptToSetValidAccount(defaultAccount, defaultDcosCluster, loadBalancer) {
       return AccountService.getCredentialsKeyedByAccount('dcos').then(function(dcosAccountsByName) {
-        var dcosAccountNames = _.keys(dcosAccountsByName);
-        var firstDcosAccount = null;
+        const dcosAccountNames = _.keys(dcosAccountsByName);
+        let firstDcosAccount = null;
 
         if (dcosAccountNames.length) {
           firstDcosAccount = dcosAccountNames[0];
         }
 
-        var defaultAccountIsValid = defaultAccount && dcosAccountNames.includes(defaultAccount);
+        const defaultAccountIsValid = defaultAccount && dcosAccountNames.includes(defaultAccount);
 
         loadBalancer.account = defaultAccountIsValid
           ? defaultAccount
@@ -39,10 +41,10 @@ module.exports = angular.module('spinnaker.dcos.loadBalancer.transformer', []).f
     }
 
     function attemptToSetValidDcosCluster(dcosAccountsByName, defaultDcosCluster, loadBalancer) {
-      var selectedAccount = dcosAccountsByName[loadBalancer.account];
+      const selectedAccount = dcosAccountsByName[loadBalancer.account];
       if (selectedAccount) {
-        var clusterNames = _.map(selectedAccount.dcosClusters, 'name');
-        var defaultDcosClusterIsValid = defaultDcosCluster && clusterNames.includes(defaultDcosCluster);
+        const clusterNames = _.map(selectedAccount.dcosClusters, 'name');
+        const defaultDcosClusterIsValid = defaultDcosCluster && clusterNames.includes(defaultDcosCluster);
         loadBalancer.dcosCluster = defaultDcosClusterIsValid
           ? defaultDcosCluster
           : clusterNames.length == 1
@@ -53,7 +55,7 @@ module.exports = angular.module('spinnaker.dcos.loadBalancer.transformer', []).f
     }
 
     function buildInstanceCounts(serverGroups) {
-      let instanceCounts = _.chain(serverGroups)
+      const instanceCounts = _.chain(serverGroups)
         .map('instances')
         .flatten()
         .reduce(
@@ -81,10 +83,10 @@ module.exports = angular.module('spinnaker.dcos.loadBalancer.transformer', []).f
     }
 
     function constructNewLoadBalancerTemplate() {
-      var defaultAccount = DcosProviderSettings.defaults.account;
-      var defaultDcosCluster = DcosProviderSettings.defaults.dcosCluster;
+      const defaultAccount = DcosProviderSettings.defaults.account;
+      const defaultDcosCluster = DcosProviderSettings.defaults.dcosCluster;
 
-      var loadBalancer = {
+      const loadBalancer = {
         provider: 'dcos',
         bindHttpHttps: true,
         cpus: 2,

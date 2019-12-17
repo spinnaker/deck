@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { FormikProps } from 'formik';
 import { dump } from 'js-yaml';
 
@@ -32,7 +32,10 @@ export class ManifestEntry extends React.Component<IManifestBasicSettingsProps, 
   }
 
   private handleChange = (rawManifest: string, manifest: any) => {
-    this.props.formik.setFieldValue('command.manifests', [].concat(manifest).filter(x => !!x));
+    this.props.formik.setFieldValue(
+      'command.manifests',
+      [].concat(manifest).filter(x => !!x),
+    );
     this.setState({ rawManifest });
   };
 

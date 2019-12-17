@@ -1,5 +1,5 @@
-import * as React from 'react';
-const angular = require('angular');
+import React from 'react';
+import { module } from 'angular';
 import { react2angular } from 'react2angular';
 
 import {
@@ -75,13 +75,10 @@ const EditTitusServiceJobProcessesModal: React.SFC<IEditTitusServiceJobProcesses
         job: [
           {
             type: 'updateJobProcesses',
-            serviceJobProcesses: Object.keys(serverGroup.serviceJobProcesses).reduce(
-              (result, process) => {
-                result[process] = checkedServiceJobProcesses.includes(process) ? true : false;
-                return result;
-              },
-              {} as ITitusServiceJobProcesses,
-            ),
+            serviceJobProcesses: Object.keys(serverGroup.serviceJobProcesses).reduce((result, process) => {
+              result[process] = checkedServiceJobProcesses.includes(process) ? true : false;
+              return result;
+            }, {} as ITitusServiceJobProcesses),
             reason,
             region,
             jobId,
@@ -130,6 +127,7 @@ export class ServiceJobProcessesSection extends React.Component<ITitusServerGrou
 
 export const SERVICE_JOB_PROCESSES_DETAILS_SECTION = 'spinnaker.titus.servicejobprocesses.section';
 
-angular
-  .module(SERVICE_JOB_PROCESSES_DETAILS_SECTION, [])
-  .component('titusServiceJobProcessesSection', react2angular(ServiceJobProcessesSection, ['serverGroup', 'app']));
+module(SERVICE_JOB_PROCESSES_DETAILS_SECTION, []).component(
+  'titusServiceJobProcessesSection',
+  react2angular(ServiceJobProcessesSection, ['serverGroup', 'app']),
+);

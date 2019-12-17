@@ -1,10 +1,13 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular
-  .module('spinnaker.azure.serverGroup.configure.networkSettings.directive', [])
-  .directive('azureServerGroupNetworkSettingsSelector', function() {
+export const AZURE_SERVERGROUP_CONFIGURE_WIZARD_NETWORKSETTINGS_SERVERGROUPNETWORKSETTINGSSELECTOR_DIRECTIVE =
+  'spinnaker.azure.serverGroup.configure.networkSettings.directive';
+export const name = AZURE_SERVERGROUP_CONFIGURE_WIZARD_NETWORKSETTINGS_SERVERGROUPNETWORKSETTINGSSELECTOR_DIRECTIVE; // for backwards compatibility
+module(AZURE_SERVERGROUP_CONFIGURE_WIZARD_NETWORKSETTINGS_SERVERGROUPNETWORKSETTINGSSELECTOR_DIRECTIVE, []).directive(
+  'azureServerGroupNetworkSettingsSelector',
+  function() {
     return {
       restrict: 'E',
       scope: {
@@ -12,4 +15,5 @@ module.exports = angular
       },
       templateUrl: require('./ServerGroupNetworkSettingsSelector.directive.html'),
     };
-  });
+  },
+);

@@ -1,13 +1,17 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 import _ from 'lodash';
 
 import { AccountService, FirewallLabels } from '@spinnaker/core';
+import { AMAZON_SECURITYGROUP_CONFIGURE_CONFIGSECURITYGROUP_MIXIN_CONTROLLER } from '../configure/configSecurityGroup.mixin.controller';
 
-module.exports = angular
-  .module('spinnaker.amazon.securityGroup.clone.controller', [
-    require('../configure/configSecurityGroup.mixin.controller').name,
+export const AMAZON_SECURITYGROUP_CLONE_CLONESECURITYGROUP_CONTROLLER =
+  'spinnaker.amazon.securityGroup.clone.controller';
+export const name = AMAZON_SECURITYGROUP_CLONE_CLONESECURITYGROUP_CONTROLLER; // for backwards compatibility
+angular
+  .module(AMAZON_SECURITYGROUP_CLONE_CLONESECURITYGROUP_CONTROLLER, [
+    AMAZON_SECURITYGROUP_CONFIGURE_CONFIGSECURITYGROUP_MIXIN_CONTROLLER,
   ])
   .controller('awsCloneSecurityGroupController', [
     '$scope',
@@ -16,7 +20,7 @@ module.exports = angular
     'securityGroup',
     'application',
     function($scope, $uibModalInstance, $controller, securityGroup, application) {
-      var vm = this;
+      const vm = this;
 
       vm.firewallLabel = FirewallLabels.get('Firewall');
 

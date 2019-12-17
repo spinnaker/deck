@@ -1,11 +1,12 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { AccountService, PipelineTemplates, Registry, StageConstants } from '@spinnaker/core';
 
-module.exports = angular
-  .module('spinnaker.ecs.pipeline.stage.disableAsgStage', [])
+export const ECS_PIPELINE_STAGES_DISABLEASG_ECSDISABLEASGSTAGE = 'spinnaker.ecs.pipeline.stage.disableAsgStage';
+export const name = ECS_PIPELINE_STAGES_DISABLEASG_ECSDISABLEASGSTAGE; // for backwards compatibility
+module(ECS_PIPELINE_STAGES_DISABLEASG_ECSDISABLEASGSTAGE, [])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'disableServerGroup',
@@ -30,7 +31,7 @@ module.exports = angular
   .controller('ecsDisableAsgStageCtrl', [
     '$scope',
     function($scope) {
-      let stage = $scope.stage;
+      const stage = $scope.stage;
 
       $scope.state = {
         accounts: false,

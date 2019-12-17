@@ -1,6 +1,6 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 import _ from 'lodash';
 
 import {
@@ -19,18 +19,24 @@ import { GCE_HTTP_LOAD_BALANCER_UTILS } from 'google/loadBalancer/httpLoadBalanc
 import { LOAD_BALANCER_SET_TRANSFORMER } from 'google/loadBalancer/loadBalancer.setTransformer';
 import { GceImageReader } from 'google/image';
 import { GceAcceleratorService } from 'google/serverGroup/configure/wizard/advancedSettings/gceAccelerator.service';
+import { GOOGLE_INSTANCE_GCEINSTANCETYPE_SERVICE } from '../../instance/gceInstanceType.service';
+import { GOOGLE_INSTANCE_CUSTOM_CUSTOMINSTANCEBUILDER_GCE_SERVICE } from './../../instance/custom/customInstanceBuilder.gce.service';
+import { GOOGLE_SERVERGROUP_CONFIGURE_WIZARD_SECURITYGROUPS_TAGMANAGER_SERVICE } from './wizard/securityGroups/tagManager.service';
 
-module.exports = angular
-  .module('spinnaker.serverGroup.configure.gce.configuration.service', [
+export const GOOGLE_SERVERGROUP_CONFIGURE_SERVERGROUPCONFIGURATION_SERVICE =
+  'spinnaker.serverGroup.configure.gce.configuration.service';
+export const name = GOOGLE_SERVERGROUP_CONFIGURE_SERVERGROUPCONFIGURATION_SERVICE; // for backwards compatibility
+angular
+  .module(GOOGLE_SERVERGROUP_CONFIGURE_SERVERGROUPCONFIGURATION_SERVICE, [
     LOAD_BALANCER_SET_TRANSFORMER,
     SECURITY_GROUP_READER,
     CACHE_INITIALIZER_SERVICE,
     LOAD_BALANCER_READ_SERVICE,
-    require('../../instance/gceInstanceType.service').name,
-    require('./../../instance/custom/customInstanceBuilder.gce.service').name,
+    GOOGLE_INSTANCE_GCEINSTANCETYPE_SERVICE,
+    GOOGLE_INSTANCE_CUSTOM_CUSTOMINSTANCEBUILDER_GCE_SERVICE,
     GCE_HTTP_LOAD_BALANCER_UTILS,
     GCE_HEALTH_CHECK_READER,
-    require('./wizard/securityGroups/tagManager.service').name,
+    GOOGLE_SERVERGROUP_CONFIGURE_WIZARD_SECURITYGROUPS_TAGMANAGER_SERVICE,
   ])
   .factory('gceServerGroupConfigurationService', [
     'securityGroupReader',
@@ -190,9 +196,9 @@ module.exports = angular
         const c = command;
         const result = { dirty: {} };
 
-        const locations = c.regional ? [c.region] : [c.zone],
-          { credentialsKeyedByAccount } = c.backingData,
-          { locationToInstanceTypesMap } = credentialsKeyedByAccount[c.credentials];
+        const locations = c.regional ? [c.region] : [c.zone];
+        const { credentialsKeyedByAccount } = c.backingData;
+        const { locationToInstanceTypesMap } = credentialsKeyedByAccount[c.credentials];
 
         if (locations.every(l => !l)) {
           return result;
@@ -212,12 +218,12 @@ module.exports = angular
 
       function configureCustomInstanceTypes(command) {
         const c = command;
-        let result = { dirty: {} },
-          vCpuCount = _.get(c, 'viewState.customInstance.vCpuCount'),
-          memory = _.get(c, 'viewState.customInstance.memory'),
-          { zone, regional, region } = c,
-          { locationToInstanceTypesMap } = c.backingData.credentialsKeyedByAccount[c.credentials],
-          location = regional ? region : zone;
+        const result = { dirty: {} };
+        let vCpuCount = _.get(c, 'viewState.customInstance.vCpuCount');
+        const memory = _.get(c, 'viewState.customInstance.memory');
+        const { zone, regional, region } = c;
+        const { locationToInstanceTypesMap } = c.backingData.credentialsKeyedByAccount[c.credentials];
+        const location = regional ? region : zone;
 
         if (!location) {
           return result;

@@ -1,15 +1,15 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular
-  .module('spinnaker.core.validation.error.directive', [])
-  .directive('validationError', function() {
-    return {
-      restrict: 'E',
-      templateUrl: require('./validationError.html'),
-      scope: {
-        message: '@',
-      },
-    };
-  });
+export const CORE_VALIDATION_VALIDATIONERROR_DIRECTIVE = 'spinnaker.core.validation.error.directive';
+export const name = CORE_VALIDATION_VALIDATIONERROR_DIRECTIVE; // for backwards compatibility
+module(CORE_VALIDATION_VALIDATIONERROR_DIRECTIVE, []).directive('validationError', function() {
+  return {
+    restrict: 'E',
+    templateUrl: require('./validationError.html'),
+    scope: {
+      message: '@',
+    },
+  };
+});

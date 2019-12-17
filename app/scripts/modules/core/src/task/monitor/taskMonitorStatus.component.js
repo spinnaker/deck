@@ -1,8 +1,10 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular.module('spinnaker.core.task.monitor.status', []).component('taskMonitorStatus', {
+export const CORE_TASK_MONITOR_TASKMONITORSTATUS_COMPONENT = 'spinnaker.core.task.monitor.status';
+export const name = CORE_TASK_MONITOR_TASKMONITORSTATUS_COMPONENT; // for backwards compatibility
+module(CORE_TASK_MONITOR_TASKMONITORSTATUS_COMPONENT, []).component('taskMonitorStatus', {
   bindings: {
     monitor: '=',
   },

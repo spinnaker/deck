@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { FieldArray, FormikErrors, FormikProps, getIn } from 'formik';
 
 import { IAccount } from 'core/account';
@@ -30,6 +30,19 @@ export class Clusters extends React.Component<IClustersProps> implements IWizard
           errors.applications = applicationErrors;
         }
 
+        const areStackAndDetailDisabled = this.areStackAndDetailDisabled(cluster);
+
+        const stackErrors =
+          areStackAndDetailDisabled && cluster.stack !== '*' && 'Only * is valid for the selected account';
+        if (stackErrors) {
+          errors.stack = stackErrors;
+        }
+        const detailErrors =
+          areStackAndDetailDisabled && cluster.detail !== '*' && 'Only * is valid for the selected account';
+        if (detailErrors) {
+          errors.detail = detailErrors;
+        }
+
         return Object.keys(errors).length ? errors : null;
       });
 
@@ -51,6 +64,9 @@ export class Clusters extends React.Component<IClustersProps> implements IWizard
   }
 
   private areStackAndDetailDisabled(cluster: IProjectCluster): boolean {
+    if (!cluster || !cluster.account) {
+      return false;
+    }
     const account = this.props.accounts.find(({ name }) => name === cluster.account);
     return account.type === 'kubernetes' && account.providerVersion === 'v2';
   }
@@ -92,7 +108,6 @@ export class Clusters extends React.Component<IClustersProps> implements IWizard
                   {clusters.map((cluster, idx) => {
                     const clusterPath = `config.clusters[${idx}]`;
                     const applicationsPath = `${clusterPath}.applications`;
-                    const areStackAndDetailDisabled = this.areStackAndDetailDisabled(cluster);
 
                     return (
                       <tr key={idx}>
@@ -124,26 +139,14 @@ export class Clusters extends React.Component<IClustersProps> implements IWizard
                         <td>
                           <FormikFormField
                             name={`${clusterPath}.stack`}
-                            input={props => (
-                              <TextInput
-                                {...props}
-                                disabled={areStackAndDetailDisabled}
-                                inputClassName="sp-padding-xs-xaxis"
-                              />
-                            )}
+                            input={props => <TextInput {...props} inputClassName="sp-padding-xs-xaxis" />}
                           />
                         </td>
 
                         <td>
                           <FormikFormField
                             name={`${clusterPath}.detail`}
-                            input={props => (
-                              <TextInput
-                                {...props}
-                                disabled={areStackAndDetailDisabled}
-                                inputClassName="sp-padding-xs-xaxis"
-                              />
-                            )}
+                            input={props => <TextInput {...props} inputClassName="sp-padding-xs-xaxis" />}
                           />
                         </td>
 

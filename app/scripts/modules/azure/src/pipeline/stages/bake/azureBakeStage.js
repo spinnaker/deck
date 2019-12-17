@@ -1,6 +1,6 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 import _ from 'lodash';
 
 import {
@@ -11,9 +11,11 @@ import {
   PipelineTemplates,
   SETTINGS,
 } from '@spinnaker/core';
+import { AZURE_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER } from './bakeExecutionDetails.controller';
 
-module.exports = angular
-  .module('spinnaker.azure.pipeline.stage.bakeStage', [require('./bakeExecutionDetails.controller').name])
+export const AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE = 'spinnaker.azure.pipeline.stage.bakeStage';
+export const name = AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE; // for backwards compatibility
+module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [AZURE_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'bake',
@@ -100,7 +102,7 @@ module.exports = angular
       }
 
       this.baseOsChanged = () => {
-        var selectedOption = _.find($scope.baseOsOptions, { id: $scope.stage.baseOs });
+        const selectedOption = _.find($scope.baseOsOptions, { id: $scope.stage.baseOs });
         $scope.stage.osType = selectedOption.osType;
       };
 

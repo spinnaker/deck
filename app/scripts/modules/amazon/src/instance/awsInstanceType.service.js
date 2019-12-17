@@ -1,17 +1,19 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 import _ from 'lodash';
 
 import { API } from '@spinnaker/core';
 
 import { AWSProviderSettings } from 'amazon/aws.settings';
 
-module.exports = angular.module('spinnaker.amazon.instanceType.service', []).factory('awsInstanceTypeService', [
+export const AMAZON_INSTANCE_AWSINSTANCETYPE_SERVICE = 'spinnaker.amazon.instanceType.service';
+export const name = AMAZON_INSTANCE_AWSINSTANCETYPE_SERVICE; // for backwards compatibility
+module(AMAZON_INSTANCE_AWSINSTANCETYPE_SERVICE, []).factory('awsInstanceTypeService', [
   '$http',
   '$q',
   function($http, $q) {
-    var m5 = {
+    const m5 = {
       type: 'm5',
       description:
         'm5 instances provide a balance of compute, memory, and network resources. They are a good choice for most applications.',
@@ -43,7 +45,7 @@ module.exports = angular.module('spinnaker.amazon.instanceType.service', []).fac
       ],
     };
 
-    var t2gp = {
+    const t2gp = {
       type: 't2',
       description:
         't2 instances are a good choice for workloads that don’t use the full CPU often or consistently, but occasionally need to burst (e.g. web servers, developer environments and small databases).',
@@ -67,7 +69,7 @@ module.exports = angular.module('spinnaker.amazon.instanceType.service', []).fac
       ],
     };
 
-    var t2 = {
+    const t2 = {
       type: 't2',
       description:
         't2 instances are a good choice for workloads that don’t use the full CPU often or consistently, but occasionally need to burst (e.g. web servers, developer environments and small databases).',
@@ -99,7 +101,7 @@ module.exports = angular.module('spinnaker.amazon.instanceType.service', []).fac
       ],
     };
 
-    var r5 = {
+    const r5 = {
       type: 'r5',
       description:
         'r5 instances are optimized for memory-intensive applications and have the lowest cost per GiB of RAM among Amazon EC2 instance types.',
@@ -139,7 +141,7 @@ module.exports = angular.module('spinnaker.amazon.instanceType.service', []).fac
       ],
     };
 
-    var defaultCategories = [
+    const defaultCategories = [
       {
         type: 'general',
         label: 'General Purpose',
@@ -180,7 +182,7 @@ module.exports = angular.module('spinnaker.amazon.instanceType.service', []).fac
       return $q.when(categories);
     }
 
-    var getAllTypesByRegion = function getAllTypesByRegion() {
+    const getAllTypesByRegion = function getAllTypesByRegion() {
       return API.one('instanceTypes')
         .get()
         .then(function(types) {
@@ -199,14 +201,14 @@ module.exports = angular.module('spinnaker.amazon.instanceType.service', []).fac
         });
     };
 
-    let instanceClassOrder = ['xlarge', 'large', 'medium', 'small', 'micro', 'nano'];
+    const instanceClassOrder = ['xlarge', 'large', 'medium', 'small', 'micro', 'nano'];
 
     function sortTypesByFamilyAndSize(o1, o2) {
-      var type1 = o1.split('.'),
-        type2 = o2.split('.');
+      const type1 = o1.split('.');
+      const type2 = o2.split('.');
 
-      let [family1, class1 = ''] = type1;
-      let [family2, class2 = ''] = type2;
+      const [family1, class1 = ''] = type1;
+      const [family2, class2 = ''] = type2;
 
       if (family1 !== family2) {
         if (family1 > family2) {
@@ -217,16 +219,16 @@ module.exports = angular.module('spinnaker.amazon.instanceType.service', []).fac
         return 0;
       }
 
-      let t1Idx = instanceClassOrder.findIndex(el => class1.endsWith(el));
-      let t2Idx = instanceClassOrder.findIndex(el => class2.endsWith(el));
+      const t1Idx = instanceClassOrder.findIndex(el => class1.endsWith(el));
+      const t2Idx = instanceClassOrder.findIndex(el => class2.endsWith(el));
 
       if (t1Idx === -1 || t2Idx === -1) {
         return 0;
       }
 
       if (t1Idx === 0 && t2Idx === 0) {
-        let size1 = parseInt(class1.replace('xlarge', '')) || 0;
-        let size2 = parseInt(class2.replace('xlarge', '')) || 0;
+        const size1 = parseInt(class1.replace('xlarge', '')) || 0;
+        const size2 = parseInt(class2.replace('xlarge', '')) || 0;
 
         if (size2 < size1) {
           return 1;
@@ -246,7 +248,7 @@ module.exports = angular.module('spinnaker.amazon.instanceType.service', []).fac
 
     function getAvailableTypesForRegions(availableRegions, selectedRegions) {
       selectedRegions = selectedRegions || [];
-      var availableTypes = [];
+      let availableTypes = [];
 
       // prime the list of available types
       if (selectedRegions && selectedRegions.length) {
@@ -263,7 +265,7 @@ module.exports = angular.module('spinnaker.amazon.instanceType.service', []).fac
       return availableTypes.sort(sortTypesByFamilyAndSize);
     }
 
-    let families = {
+    const families = {
       paravirtual: ['c1', 'c3', 'hi1', 'hs1', 'm1', 'm2', 'm3', 't1'],
       hvm: ['c3', 'c4', 'd2', 'i2', 'g2', 'm3', 'm4', 'm5', 'p2', 'r3', 'r4', 'r5', 't2', 'x1'],
       vpcOnly: ['c4', 'm4', 'm5', 'r4', 'r5', 't2', 'x1'],
@@ -276,7 +278,7 @@ module.exports = angular.module('spinnaker.amazon.instanceType.service', []).fac
           // show all instance types
           return true;
         }
-        let [family] = instanceType.split('.');
+        const [family] = instanceType.split('.');
         if (!vpcOnly && families.vpcOnly.includes(family)) {
           return false;
         }
@@ -291,7 +293,7 @@ module.exports = angular.module('spinnaker.amazon.instanceType.service', []).fac
       if (!instanceType) {
         return false;
       }
-      let [family] = instanceType.split('.');
+      const [family] = instanceType.split('.');
       return families.ebsOptimized.includes(family);
     }
 

@@ -1,6 +1,6 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 import _ from 'lodash';
 
 import {
@@ -11,10 +11,14 @@ import {
   SecurityGroupWriter,
   ServerGroupTemplates,
 } from '@spinnaker/core';
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
-module.exports = angular
-  .module('spinnaker.securityGroup.kubernetes.details.controller', [
-    require('@uirouter/angularjs').default,
+export const KUBERNETES_V1_SECURITYGROUP_DETAILS_DETAILS_CONTROLLER =
+  'spinnaker.securityGroup.kubernetes.details.controller';
+export const name = KUBERNETES_V1_SECURITYGROUP_DETAILS_DETAILS_CONTROLLER; // for backwards compatibility
+angular
+  .module(KUBERNETES_V1_SECURITYGROUP_DETAILS_DETAILS_CONTROLLER, [
+    UIROUTER_ANGULARJS,
     SECURITY_GROUP_READER,
     CONFIRMATION_MODAL_SERVICE,
   ])
@@ -59,7 +63,7 @@ module.exports = angular
               $scope.securityGroup = details;
 
               // Change TLS hosts from array to string for the UI
-              for (let idx in $scope.securityGroup.tls) {
+              for (const idx in $scope.securityGroup.tls) {
                 const tls = $scope.securityGroup.tls[idx];
                 tls.hosts = tls.hosts[0];
               }
@@ -98,7 +102,7 @@ module.exports = angular
           size: 'lg',
           resolve: {
             securityGroup: function() {
-              var securityGroup = angular.copy($scope.securityGroup.description);
+              const securityGroup = angular.copy($scope.securityGroup.description);
               securityGroup.account = $scope.securityGroup.accountName;
               securityGroup.edit = true;
               return securityGroup;
@@ -111,12 +115,12 @@ module.exports = angular
       };
 
       this.deleteSecurityGroup = function deleteSecurityGroup() {
-        var taskMonitor = {
+        const taskMonitor = {
           application: application,
           title: 'Deleting ' + securityGroup.name,
         };
 
-        var submitMethod = function() {
+        const submitMethod = function() {
           return SecurityGroupWriter.deleteSecurityGroup(securityGroup, application, {
             cloudProvider: $scope.securityGroup.type,
             securityGroupName: securityGroup.name,

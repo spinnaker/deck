@@ -1,13 +1,18 @@
-'use strict';
+import { CORE_SERVERGROUP_CONFIGURE_COMMON_COSTFACTOR } from './costFactor';
+import { CORE_PRESENTATION_ISVISIBLE_ISVISIBLE_DIRECTIVE } from '../../../presentation/isVisible/isVisible.directive';
+import { CORE_SERVERGROUP_CONFIGURE_COMMON_DIRTYINSTANCETYPENOTIFICATION_COMPONENT } from './dirtyInstanceTypeNotification.component';
+('use strict');
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular
-  .module('spinnaker.core.serverGroup.configure.common.instanceArchetypeSelector', [
-    require('./costFactor').name,
-    require('../../../presentation/isVisible/isVisible.directive').name,
-    require('./dirtyInstanceTypeNotification.component').name,
-  ])
+export const CORE_SERVERGROUP_CONFIGURE_COMMON_INSTANCEARCHETYPESELECTOR =
+  'spinnaker.core.serverGroup.configure.common.instanceArchetypeSelector';
+export const name = CORE_SERVERGROUP_CONFIGURE_COMMON_INSTANCEARCHETYPESELECTOR; // for backwards compatibility
+module(CORE_SERVERGROUP_CONFIGURE_COMMON_INSTANCEARCHETYPESELECTOR, [
+  CORE_SERVERGROUP_CONFIGURE_COMMON_COSTFACTOR,
+  CORE_PRESENTATION_ISVISIBLE_ISVISIBLE_DIRECTIVE,
+  CORE_SERVERGROUP_CONFIGURE_COMMON_DIRTYINSTANCETYPENOTIFICATION_COMPONENT,
+])
   .directive('instanceArchetypeSelector', function() {
     return {
       restrict: 'E',
@@ -23,7 +28,7 @@ module.exports = angular
     '$scope',
     'instanceTypeService',
     function($scope, instanceTypeService) {
-      var controller = this;
+      const controller = this;
       instanceTypeService.getCategories($scope.command.selectedProvider).then(function(categories) {
         $scope.instanceProfiles = categories;
         if ($scope.instanceProfiles.length % 3 === 0) {

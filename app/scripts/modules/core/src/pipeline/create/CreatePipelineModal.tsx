@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import Select, { Option } from 'react-select';
 import { Debounce } from 'lodash-decorators';
@@ -332,8 +332,8 @@ export class CreatePipelineModal extends React.Component<ICreatePipelineModalPro
   public render() {
     const { preselectedTemplate } = this.props;
     const hasSelectedATemplate = this.state.useTemplate || preselectedTemplate;
-    const nameHasError: boolean = !this.validateNameCharacters();
-    const nameIsNotUnique: boolean = !this.validateNameIsUnique();
+    const nameHasError = !this.validateNameCharacters();
+    const nameIsNotUnique = !this.validateNameIsUnique();
     const formValid =
       !nameHasError &&
       !nameIsNotUnique &&
@@ -388,7 +388,10 @@ export class CreatePipelineModal extends React.Component<ICreatePipelineModalPro
                     </div>
                     <div className="col-md-7">
                       <Select
-                        options={[{ label: 'Pipeline', value: false }, { label: 'Strategy', value: true }]}
+                        options={[
+                          { label: 'Pipeline', value: false },
+                          { label: 'Strategy', value: true },
+                        ]}
                         clearable={false}
                         value={this.state.command.strategy ? { label: 'Strategy' } : { label: 'Pipeline' }}
                         onChange={this.handleTypeChange}

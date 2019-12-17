@@ -1,10 +1,10 @@
-import * as React from 'react';
-import * as ReactGA from 'react-ga';
-import * as classNames from 'classnames';
+import React from 'react';
+import ReactGA from 'react-ga';
+import classNames from 'classnames';
 import { UISref } from '@uirouter/react';
 
 import { HoverablePopover } from 'core/presentation';
-import { IManagedResourceSummary, ManagedResourceStatus } from 'core/managed';
+import { IManagedResourceSummary, ManagedResourceStatus } from 'core/domain';
 
 import './ManagedResourceStatusIndicator.less';
 

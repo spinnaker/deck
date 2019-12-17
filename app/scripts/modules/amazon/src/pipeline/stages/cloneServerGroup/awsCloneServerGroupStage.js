@@ -1,12 +1,14 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 import _ from 'lodash';
 
 import { AccountService, AppListExtractor, NameUtils, Registry, StageConstants } from '@spinnaker/core';
 
-module.exports = angular
-  .module('spinnaker.amazon.pipeline.stage.cloneServerGroupStage', [])
+export const AMAZON_PIPELINE_STAGES_CLONESERVERGROUP_AWSCLONESERVERGROUPSTAGE =
+  'spinnaker.amazon.pipeline.stage.cloneServerGroupStage';
+export const name = AMAZON_PIPELINE_STAGES_CLONESERVERGROUP_AWSCLONESERVERGROUPSTAGE; // for backwards compatibility
+module(AMAZON_PIPELINE_STAGES_CLONESERVERGROUP_AWSCLONESERVERGROUPSTAGE, [])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'cloneServerGroup',
@@ -25,7 +27,7 @@ module.exports = angular
   .controller('awsCloneServerGroupStageCtrl', [
     '$scope',
     function($scope) {
-      let stage = $scope.stage;
+      const stage = $scope.stage;
 
       $scope.viewState = {
         accountsLoaded: false,
@@ -66,7 +68,7 @@ module.exports = angular
       this.targetClusterUpdated = () => {
         if (stage.targetCluster) {
           const filterByCluster = AppListExtractor.monikerClusterNameFilter(stage.targetCluster);
-          let moniker = _.first(AppListExtractor.getMonikers([$scope.application], filterByCluster));
+          const moniker = _.first(AppListExtractor.getMonikers([$scope.application], filterByCluster));
           if (moniker) {
             stage.stack = moniker.stack;
             stage.freeFormDetails = moniker.detail;
@@ -94,7 +96,7 @@ module.exports = angular
 
       this.toggleSuspendedProcess = process => {
         stage.suspendedProcesses = stage.suspendedProcesses || [];
-        var processIndex = stage.suspendedProcesses.indexOf(process);
+        const processIndex = stage.suspendedProcesses.indexOf(process);
         if (processIndex === -1) {
           stage.suspendedProcesses.push(process);
         } else {

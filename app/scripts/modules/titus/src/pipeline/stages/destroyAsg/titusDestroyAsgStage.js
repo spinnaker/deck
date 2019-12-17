@@ -1,11 +1,12 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { AccountService, Registry, StageConstants } from '@spinnaker/core';
 
-module.exports = angular
-  .module('spinnaker.titus.pipeline.stage.destroyAsgStage', [])
+export const TITUS_PIPELINE_STAGES_DESTROYASG_TITUSDESTROYASGSTAGE = 'spinnaker.titus.pipeline.stage.destroyAsgStage';
+export const name = TITUS_PIPELINE_STAGES_DESTROYASG_TITUSDESTROYASGSTAGE; // for backwards compatibility
+module(TITUS_PIPELINE_STAGES_DESTROYASG_TITUSDESTROYASGSTAGE, [])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'destroyServerGroup',
@@ -31,7 +32,7 @@ module.exports = angular
   .controller('titusDestroyAsgStageCtrl', [
     '$scope',
     function($scope) {
-      let stage = $scope.stage;
+      const stage = $scope.stage;
 
       $scope.state = {
         accounts: false,

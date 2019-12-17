@@ -1,10 +1,13 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular
-  .module('spinnaker.amazon.serverGroup.details.scalingPolicy.upsert.actions.simplePolicy', [])
-  .component('awsSimplePolicyAction', {
+export const AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_SIMPLE_SIMPLEPOLICYACTION_COMPONENT =
+  'spinnaker.amazon.serverGroup.details.scalingPolicy.upsert.actions.simplePolicy';
+export const name = AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_SIMPLE_SIMPLEPOLICYACTION_COMPONENT; // for backwards compatibility
+module(AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_SIMPLE_SIMPLEPOLICYACTION_COMPONENT, []).component(
+  'awsSimplePolicyAction',
+  {
     bindings: {
       command: '<',
       viewState: '=',
@@ -31,4 +34,5 @@ module.exports = angular
         this.adjustmentTypeChanged();
       };
     },
-  });
+  },
+);

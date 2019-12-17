@@ -1,8 +1,12 @@
-'use strict';
+import { CANARY_CANARY_CANARYDEPLOYMENT_CANARYDEPLOYMENTSTAGE } from './canaryDeploymentStage';
+import { CANARY_CANARY_CANARYDEPLOYMENT_CANARYDEPLOYMENTEXECUTIONDETAILS_CONTROLLER } from './canaryDeploymentExecutionDetails.controller';
+('use strict');
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular.module('spinnaker.canary.canaryDeployment', [
-  require('./canaryDeploymentStage').name,
-  require('./canaryDeploymentExecutionDetails.controller').name,
+export const CANARY_CANARY_CANARYDEPLOYMENT_CANARYDEPLOYMENT_MODULE = 'spinnaker.canary.canaryDeployment';
+export const name = CANARY_CANARY_CANARYDEPLOYMENT_CANARYDEPLOYMENT_MODULE; // for backwards compatibility
+module(CANARY_CANARY_CANARYDEPLOYMENT_CANARYDEPLOYMENT_MODULE, [
+  CANARY_CANARY_CANARYDEPLOYMENT_CANARYDEPLOYMENTSTAGE,
+  CANARY_CANARY_CANARYDEPLOYMENT_CANARYDEPLOYMENTEXECUTIONDETAILS_CONTROLLER,
 ]);

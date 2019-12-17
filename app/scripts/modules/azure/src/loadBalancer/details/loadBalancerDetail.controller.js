@@ -1,6 +1,6 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 import _ from 'lodash';
 
 import {
@@ -10,10 +10,14 @@ import {
   SECURITY_GROUP_READER,
   FirewallLabels,
 } from '@spinnaker/core';
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
-module.exports = angular
-  .module('spinnaker.azure.loadBalancer.details.controller', [
-    require('@uirouter/angularjs').default,
+export const AZURE_LOADBALANCER_DETAILS_LOADBALANCERDETAIL_CONTROLLER =
+  'spinnaker.azure.loadBalancer.details.controller';
+export const name = AZURE_LOADBALANCER_DETAILS_LOADBALANCERDETAIL_CONTROLLER; // for backwards compatibility
+angular
+  .module(AZURE_LOADBALANCER_DETAILS_LOADBALANCERDETAIL_CONTROLLER, [
+    UIROUTER_ANGULARJS,
     SECURITY_GROUP_READER,
     LOAD_BALANCER_READ_SERVICE,
     CONFIRMATION_MODAL_SERVICE,
@@ -57,7 +61,7 @@ module.exports = angular
         })[0];
 
         if ($scope.loadBalancer) {
-          var detailsLoader = loadBalancerReader.getLoadBalancerDetails(
+          const detailsLoader = loadBalancerReader.getLoadBalancerDetails(
             $scope.loadBalancer.provider,
             loadBalancer.accountId,
             loadBalancer.region,
@@ -66,9 +70,9 @@ module.exports = angular
 
           return detailsLoader.then(function(details) {
             $scope.state.loading = false;
-            var securityGroups = [];
+            const securityGroups = [];
 
-            var filtered = details.filter(function(test) {
+            const filtered = details.filter(function(test) {
               return test.name === loadBalancer.name;
             });
 
@@ -79,7 +83,7 @@ module.exports = angular
 
               if ($scope.loadBalancer.elb.securityGroups) {
                 $scope.loadBalancer.elb.securityGroups.forEach(function(securityGroupId) {
-                  var match = securityGroupReader.getApplicationSecurityGroup(
+                  const match = securityGroupReader.getApplicationSecurityGroup(
                     app,
                     loadBalancer.accountId,
                     loadBalancer.region,
@@ -97,7 +101,7 @@ module.exports = angular
                 $scope.loadBalancer.loadBalancerType = type
                   .split('_')
                   .map(s => {
-                    let ss = s.toLowerCase();
+                    const ss = s.toLowerCase();
                     return ss.substring(0, 1).toUpperCase() + ss.substring(1);
                   })
                   .join(' ');
@@ -150,7 +154,7 @@ module.exports = angular
           return;
         }
 
-        var taskMonitor = {
+        const taskMonitor = {
           application: app,
           title: 'Deleting ' + loadBalancer.name,
         };

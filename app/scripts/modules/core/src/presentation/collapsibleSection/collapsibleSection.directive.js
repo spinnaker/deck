@@ -1,12 +1,15 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { CollapsibleSectionStateCache } from 'core/cache';
 
-module.exports = angular
-  .module('spinnaker.core.presentation.collapsibleSection.directive', [])
-  .directive('collapsibleSection', function() {
+export const CORE_PRESENTATION_COLLAPSIBLESECTION_COLLAPSIBLESECTION_DIRECTIVE =
+  'spinnaker.core.presentation.collapsibleSection.directive';
+export const name = CORE_PRESENTATION_COLLAPSIBLESECTION_COLLAPSIBLESECTION_DIRECTIVE; // for backwards compatibility
+module(CORE_PRESENTATION_COLLAPSIBLESECTION_COLLAPSIBLESECTION_DIRECTIVE, []).directive(
+  'collapsibleSection',
+  function() {
     return {
       restrict: 'E',
       replace: true,
@@ -24,7 +27,7 @@ module.exports = angular
       },
       templateUrl: require('./collapsibleSection.directive.html'),
       link: function(scope) {
-        let cacheKey = scope.cacheKey || scope.heading;
+        const cacheKey = scope.cacheKey || scope.heading;
         let expanded = true;
         if (cacheKey) {
           expanded = CollapsibleSectionStateCache.isSet(cacheKey)
@@ -50,4 +53,5 @@ module.exports = angular
         };
       },
     };
-  });
+  },
+);

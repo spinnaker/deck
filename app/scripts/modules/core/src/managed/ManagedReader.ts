@@ -1,35 +1,7 @@
 import { IPromise } from 'angular';
 
 import { API } from 'core/api';
-import { IMoniker } from 'core/naming';
-
-export enum ManagedResourceStatus {
-  ACTUATING = 'ACTUATING',
-  CREATED = 'CREATED',
-  DIFF = 'DIFF',
-  ERROR = 'ERROR',
-  HAPPY = 'HAPPY',
-  PAUSED = 'PAUSED',
-  RESUMED = 'RESUMED',
-  UNHAPPY = 'UNHAPPY',
-  UNKNOWN = 'UNKNOWN',
-}
-
-export interface IManagedResourceSummary {
-  id: string;
-  kind: string;
-  status: ManagedResourceStatus;
-  moniker: IMoniker;
-  locations: {
-    account: string;
-    regions: Array<{ name: string }>;
-  };
-}
-
-export interface IManagedApplicationSummary {
-  hasManagedResources: boolean;
-  resources: IManagedResourceSummary[];
-}
+import { IManagedApplicationSummary, ManagedResourceStatus } from 'core/domain';
 
 export const getResourceKindForLoadBalancerType = (type: string) => {
   switch (type) {
@@ -47,14 +19,17 @@ export class ManagedReader {
     return API.one('managed')
       .one('application', app)
       .withParams({ includeDetails: true })
-      .get();
-  }
+      .get()
+      .then((response: IManagedApplicationSummary) => {
+        // Individual resources don't update their status when an application is paused/resumed,
+        // so for now let's swap to a PAUSED status and keep things simpler in downstream components.
+        if (response.applicationPaused) {
+          response.resources.forEach(resource => (resource.status = ManagedResourceStatus.PAUSED));
+        }
 
-  public static getApplicationVetos(): IPromise<string[]> {
-    return API.one('managed')
-      .all('vetos')
-      .one('ApplicationVeto')
-      .all('rejections')
-      .get();
+        response.resources.forEach(resource => (resource.isPaused = resource.status === ManagedResourceStatus.PAUSED));
+
+        return response;
+      });
   }
 }

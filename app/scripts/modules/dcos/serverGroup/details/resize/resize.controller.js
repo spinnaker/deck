@@ -1,11 +1,13 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 
 import { SERVER_GROUP_WRITER, TaskMonitor } from '@spinnaker/core';
 
-module.exports = angular
-  .module('spinnaker.dcos.serverGroup.details.resize.controller', [SERVER_GROUP_WRITER])
+export const DCOS_SERVERGROUP_DETAILS_RESIZE_RESIZE_CONTROLLER = 'spinnaker.dcos.serverGroup.details.resize.controller';
+export const name = DCOS_SERVERGROUP_DETAILS_RESIZE_RESIZE_CONTROLLER; // for backwards compatibility
+angular
+  .module(DCOS_SERVERGROUP_DETAILS_RESIZE_RESIZE_CONTROLLER, [SERVER_GROUP_WRITER])
   .controller('dcosResizeServerGroupController', [
     '$scope',
     '$uibModalInstance',
@@ -28,7 +30,7 @@ module.exports = angular
       }
 
       this.isValid = function() {
-        var command = $scope.command;
+        const command = $scope.command;
         if (!$scope.verification.verified) {
           return false;
         }
@@ -46,9 +48,9 @@ module.exports = angular
           return;
         }
 
-        var capacity = { min: $scope.command.newSize, max: $scope.command.newSize, desired: $scope.command.newSize };
+        const capacity = { min: $scope.command.newSize, max: $scope.command.newSize, desired: $scope.command.newSize };
 
-        var submitMethod = function() {
+        const submitMethod = function() {
           return serverGroupWriter.resizeServerGroup(serverGroup, application, {
             serverGroupName: serverGroup.name,
             credentials: serverGroup.account,

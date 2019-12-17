@@ -1,13 +1,17 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 import { get } from 'lodash';
 
 import { SETTINGS } from '@spinnaker/core';
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
-module.exports = angular
-  .module('spinnaker.amazon.pipeline.stage.bake.executionDetails.controller', [require('@uirouter/angularjs').default])
-  .controller('awsBakeExecutionDetailsCtrl', [
+export const AMAZON_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER =
+  'spinnaker.amazon.pipeline.stage.bake.executionDetails.controller';
+export const name = AMAZON_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER; // for backwards compatibility
+module(AMAZON_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER, [UIROUTER_ANGULARJS]).controller(
+  'awsBakeExecutionDetailsCtrl',
+  [
     '$scope',
     '$stateParams',
     'executionDetailsSectionService',
@@ -15,7 +19,7 @@ module.exports = angular
     function($scope, $stateParams, executionDetailsSectionService, $interpolate) {
       $scope.configSections = ['bakeConfig', 'taskStatus'];
 
-      let initialized = () => {
+      const initialized = () => {
         $scope.detailsSection = $stateParams.details;
         $scope.provider = $scope.stage.context.cloudProviderType || 'aws';
         $scope.roscoMode =
@@ -29,10 +33,11 @@ module.exports = angular
           get($scope.stage, 'context.status.result') === 'FAILURE' && !$scope.stage.failureMessage;
       };
 
-      let initialize = () => executionDetailsSectionService.synchronizeSection($scope.configSections, initialized);
+      const initialize = () => executionDetailsSectionService.synchronizeSection($scope.configSections, initialized);
 
       initialize();
 
       $scope.$on('$stateChangeSuccess', initialize);
     },
-  ]);
+  ],
+);

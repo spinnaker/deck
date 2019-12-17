@@ -1,8 +1,8 @@
 // This is all mercilessly copied from LoadBalancersTag.tsx. This should be cleaned up at some point
 // Probably when we convert clusters view to React.
 
-import * as React from 'react';
-import * as ReactGA from 'react-ga';
+import React from 'react';
+import ReactGA from 'react-ga';
 import { sortBy } from 'lodash';
 
 import {
@@ -130,8 +130,10 @@ export class AmazonLoadBalancersTag extends React.Component<ILoadBalancersTagPro
         this.setState({ loadBalancers, isLoading: false });
       }
     });
-    AmazonLoadBalancerDataUtils.populateTargetGroups(this.props.application, this.props
-      .serverGroup as IAmazonServerGroup).then((targetGroups: ITargetGroup[]) => {
+    AmazonLoadBalancerDataUtils.populateTargetGroups(
+      this.props.application,
+      this.props.serverGroup as IAmazonServerGroup,
+    ).then((targetGroups: ITargetGroup[]) => {
       if (this.mounted) {
         this.setState({ targetGroups });
       }
@@ -146,9 +148,9 @@ export class AmazonLoadBalancersTag extends React.Component<ILoadBalancersTagPro
   public render(): React.ReactElement<AmazonLoadBalancersTag> {
     const { loadBalancers, targetGroups, isLoading } = this.state;
 
-    const targetGroupCount = (targetGroups && targetGroups.length) || 0,
-      loadBalancerCount = (loadBalancers && loadBalancers.length) || 0,
-      totalCount = targetGroupCount + loadBalancerCount;
+    const targetGroupCount = (targetGroups && targetGroups.length) || 0;
+    const loadBalancerCount = (loadBalancers && loadBalancers.length) || 0;
+    const totalCount = targetGroupCount + loadBalancerCount;
 
     if (!totalCount) {
       return isLoading ? <Spinner size="nano" /> : null;

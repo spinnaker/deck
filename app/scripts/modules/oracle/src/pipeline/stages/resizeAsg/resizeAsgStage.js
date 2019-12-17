@@ -1,13 +1,13 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { AccountService, Registry, StageConstants } from '@spinnaker/core';
+import { CORE_APPLICATION_MODAL_PLATFORMHEALTHOVERRIDE_DIRECTIVE } from 'core/application/modal/platformHealthOverride.directive';
 
-module.exports = angular
-  .module('spinnaker.oracle.pipeline.stage.resizeAsgStage', [
-    require('core/application/modal/platformHealthOverride.directive').name,
-  ])
+export const ORACLE_PIPELINE_STAGES_RESIZEASG_RESIZEASGSTAGE = 'spinnaker.oracle.pipeline.stage.resizeAsgStage';
+export const name = ORACLE_PIPELINE_STAGES_RESIZEASG_RESIZEASGSTAGE; // for backwards compatibility
+module(ORACLE_PIPELINE_STAGES_RESIZEASG_RESIZEASGSTAGE, [CORE_APPLICATION_MODAL_PLATFORMHEALTHOVERRIDE_DIRECTIVE])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'resizeServerGroup',
@@ -31,11 +31,11 @@ module.exports = angular
   .controller('oracleResizeAsgStageCtrl', [
     '$scope',
     function($scope) {
-      let ctrl = this;
+      const ctrl = this;
 
-      let provider = 'oracle';
+      const provider = 'oracle';
 
-      let stage = $scope.stage;
+      const stage = $scope.stage;
 
       $scope.viewState = {
         accountsLoaded: false,
@@ -56,7 +56,10 @@ module.exports = angular
         { label: 'Scale to Exact Size', val: 'scale_exact' },
       ];
 
-      $scope.resizeTypes = [{ label: 'Percentage', val: 'pct' }, { label: 'Incremental', val: 'incr' }];
+      $scope.resizeTypes = [
+        { label: 'Percentage', val: 'pct' },
+        { label: 'Incremental', val: 'incr' },
+      ];
 
       stage.capacity = stage.capacity || {};
       stage.regions = stage.regions || [];

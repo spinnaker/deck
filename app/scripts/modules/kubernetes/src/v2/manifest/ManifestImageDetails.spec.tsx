@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { mount } from 'enzyme';
 import { load } from 'js-yaml';
 import { ManifestImageDetails } from 'kubernetes/v2/manifest/ManifestImageDetails';
@@ -72,4 +72,4 @@ describe('<ManifestImageDetails />', () => {
     expect(li.text().trim()).toEqual('busybox:latest');
   });
 });
-const component = (manifest: string) => mount(<ManifestImageDetails manifest={load(manifest)} /> as any);
+const component = (manifest: string) => mount((<ManifestImageDetails manifest={load(manifest)} />) as any);

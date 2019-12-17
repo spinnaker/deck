@@ -1,14 +1,19 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 
 import { FirewallLabels, SERVER_GROUP_WRITER, TaskMonitor, ModalWizard } from '@spinnaker/core';
+import { KUBERNETES_V1_SERVERGROUP_CONFIGURE_CONFIGURATION_SERVICE } from '../configuration.service';
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
-module.exports = angular
-  .module('spinnaker.serverGroup.configure.kubernetes.clone', [
-    require('@uirouter/angularjs').default,
+export const KUBERNETES_V1_SERVERGROUP_CONFIGURE_WIZARD_CLONE_CONTROLLER =
+  'spinnaker.serverGroup.configure.kubernetes.clone';
+export const name = KUBERNETES_V1_SERVERGROUP_CONFIGURE_WIZARD_CLONE_CONTROLLER; // for backwards compatibility
+angular
+  .module(KUBERNETES_V1_SERVERGROUP_CONFIGURE_WIZARD_CLONE_CONTROLLER, [
+    UIROUTER_ANGULARJS,
     SERVER_GROUP_WRITER,
-    require('../configuration.service').name,
+    KUBERNETES_V1_SERVERGROUP_CONFIGURE_CONFIGURATION_SERVICE,
   ])
   .controller('kubernetesCloneServerGroupController', [
     '$scope',
@@ -96,7 +101,7 @@ module.exports = angular
       }
 
       function initializeWizardState() {
-        var mode = serverGroupCommand.viewState.mode;
+        const mode = serverGroupCommand.viewState.mode;
         if (mode === 'clone' || mode === 'editPipeline') {
           ModalWizard.markComplete('location');
           ModalWizard.markComplete('deployment');

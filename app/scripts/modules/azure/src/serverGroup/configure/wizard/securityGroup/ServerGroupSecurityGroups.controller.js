@@ -1,12 +1,15 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { ModalWizard } from '@spinnaker/core';
 
-module.exports = angular
-  .module('spinnaker.azure.serverGroup.configure.securityGroups.controller', [])
-  .controller('azureServerGroupSecurityGroupsCtrl', [
+export const AZURE_SERVERGROUP_CONFIGURE_WIZARD_SECURITYGROUP_SERVERGROUPSECURITYGROUPS_CONTROLLER =
+  'spinnaker.azure.serverGroup.configure.securityGroups.controller';
+export const name = AZURE_SERVERGROUP_CONFIGURE_WIZARD_SECURITYGROUP_SERVERGROUPSECURITYGROUPS_CONTROLLER; // for backwards compatibility
+module(AZURE_SERVERGROUP_CONFIGURE_WIZARD_SECURITYGROUP_SERVERGROUPSECURITYGROUPS_CONTROLLER, []).controller(
+  'azureServerGroupSecurityGroupsCtrl',
+  [
     '$scope',
     function($scope) {
       ModalWizard.markClean('security-groups');
@@ -21,4 +24,5 @@ module.exports = angular
         ModalWizard.markComplete('security-groups');
       };
     },
-  ]);
+  ],
+);

@@ -46,6 +46,7 @@ export interface IFeatures {
   pipelineTemplates?: boolean;
   quietPeriod?: boolean;
   roscoMode?: boolean;
+  slack?: boolean;
   snapshots?: boolean;
   travis?: boolean;
   versionedProviders?: boolean;
@@ -116,6 +117,9 @@ export interface ISpinnakerSettings {
     defaultDetails?: string;
     defaultSubject?: string;
     required?: boolean;
+  };
+  slack?: {
+    baseUrl: string;
   };
   pollSchedule: number;
   providers?: {

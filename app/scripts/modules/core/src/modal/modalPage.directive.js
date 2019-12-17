@@ -1,9 +1,11 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 const $ = require('jquery');
 
-module.exports = angular.module('spinnaker.core.modal.modalPage.directive', []).directive('modalPage', function() {
+export const CORE_MODAL_MODALPAGE_DIRECTIVE = 'spinnaker.core.modal.modalPage.directive';
+export const name = CORE_MODAL_MODALPAGE_DIRECTIVE; // for backwards compatibility
+module(CORE_MODAL_MODALPAGE_DIRECTIVE, []).directive('modalPage', function() {
   return {
     restrict: 'EA',
     link: function(scope, elem, attrs) {
@@ -11,19 +13,19 @@ module.exports = angular.module('spinnaker.core.modal.modalPage.directive', []).
         return;
       }
       function getTabbableElements() {
-        var tagSelector = 'a[href],input,select,button,textarea';
+        const tagSelector = 'a[href],input,select,button,textarea';
         return elem
           .find(tagSelector)
           .filter(':visible')
           .not(':disabled');
       }
 
-      var ts = Math.floor(Math.random() * 4294967295);
+      const ts = Math.floor(Math.random() * 4294967295);
       $(document).on('keydown.modalPage-' + ts, function(event) {
         if (event.keyCode === 9) {
-          var $tabbableElements = getTabbableElements(),
-            $firstElem = $tabbableElements[0],
-            $lastElem = $tabbableElements[$tabbableElements.length - 1];
+          const $tabbableElements = getTabbableElements();
+          const $firstElem = $tabbableElements[0];
+          const $lastElem = $tabbableElements[$tabbableElements.length - 1];
           if ($firstElem === event.target && event.shiftKey) {
             $lastElem.focus();
             return false;

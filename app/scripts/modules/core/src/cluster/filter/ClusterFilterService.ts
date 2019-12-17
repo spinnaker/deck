@@ -4,12 +4,11 @@ import { $log } from 'ngimport';
 import { Subject } from 'rxjs';
 
 import { Application } from 'core/application/application.model';
-import { ICluster, IEntityTags, IInstance, IServerGroup } from 'core/domain';
+import { ICluster, IEntityTags, IInstance, IManagedResourceSummary, IServerGroup } from 'core/domain';
 import { ClusterState } from 'core/state';
 import { FilterModelService, ISortFilter } from 'core/filterModel';
 import { ReactInjector } from 'core/reactShims';
 import { ILabelFilter, trueKeyObjectToLabelFilters } from 'core/cluster/filter/labelFilterUtils';
-import { IManagedResourceSummary } from 'core/managed';
 
 export interface IParentGrouping {
   subgroups: IClusterSubgroup[] | IServerGroupSubgroup[];
@@ -71,15 +70,15 @@ export class ClusterFilterService {
     const accountGroupings = groupBy(serverGroups, 'account');
 
     forOwn(accountGroupings, (accountGroup: IServerGroup[], account: string) => {
-      const categoryGroupings = groupBy(accountGroup, 'category'),
-        clusterGroups: IClusterSubgroup[] = [];
+      const categoryGroupings = groupBy(accountGroup, 'category');
+      const clusterGroups: IClusterSubgroup[] = [];
 
       forOwn(categoryGroupings, (categoryGroup: IServerGroup[], category: string) => {
         const clusterGroupings = groupBy(categoryGroup, 'cluster');
 
         forOwn(clusterGroupings, (clusterGroup: IServerGroup[], cluster: string) => {
-          const regionGroupings = groupBy(clusterGroup, 'region'),
-            regionGroups: IServerGroupSubgroup[] = [];
+          const regionGroupings = groupBy(clusterGroup, 'region');
+          const regionGroups: IServerGroupSubgroup[] = [];
 
           forOwn(regionGroupings, (regionGroup: IServerGroup[], region: string) => {
             regionGroups.push({

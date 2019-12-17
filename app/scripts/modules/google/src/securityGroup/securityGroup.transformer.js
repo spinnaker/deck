@@ -1,8 +1,10 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular.module('spinnaker.gce.securityGroup.transformer', []).factory('gceSecurityGroupTransformer', [
+export const GOOGLE_SECURITYGROUP_SECURITYGROUP_TRANSFORMER = 'spinnaker.gce.securityGroup.transformer';
+export const name = GOOGLE_SECURITYGROUP_SECURITYGROUP_TRANSFORMER; // for backwards compatibility
+module(GOOGLE_SECURITYGROUP_SECURITYGROUP_TRANSFORMER, []).factory('gceSecurityGroupTransformer', [
   '$q',
   function($q) {
     function normalizeSecurityGroup(securityGroup) {

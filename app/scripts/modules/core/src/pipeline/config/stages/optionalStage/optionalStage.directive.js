@@ -1,9 +1,11 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular
-  .module('spinnaker.core.pipeline.stage.optionalStage.directive', [])
+export const CORE_PIPELINE_CONFIG_STAGES_OPTIONALSTAGE_OPTIONALSTAGE_DIRECTIVE =
+  'spinnaker.core.pipeline.stage.optionalStage.directive';
+export const name = CORE_PIPELINE_CONFIG_STAGES_OPTIONALSTAGE_OPTIONALSTAGE_DIRECTIVE; // for backwards compatibility
+module(CORE_PIPELINE_CONFIG_STAGES_OPTIONALSTAGE_OPTIONALSTAGE_DIRECTIVE, [])
   .directive('optionalStage', function() {
     return {
       restrict: 'E',

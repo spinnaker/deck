@@ -2,15 +2,19 @@
 
 import { get } from 'lodash';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { OVERRIDE_REGISTRY } from 'core/overrideRegistry/override.registry';
+import { CORE_APPLICATION_MODAL_EDITAPPLICATION_CONTROLLER_MODAL } from '../modal/editApplication.controller.modal';
+import { SETTINGS } from 'core/config/settings';
 
-module.exports = angular
-  .module('spinnaker.core.application.config.attributes.directive', [
-    require('../modal/editApplication.controller.modal').name,
-    OVERRIDE_REGISTRY,
-  ])
+export const CORE_APPLICATION_CONFIG_APPLICATIONATTRIBUTES_DIRECTIVE =
+  'spinnaker.core.application.config.attributes.directive';
+export const name = CORE_APPLICATION_CONFIG_APPLICATIONATTRIBUTES_DIRECTIVE; // for backwards compatibility
+module(CORE_APPLICATION_CONFIG_APPLICATIONATTRIBUTES_DIRECTIVE, [
+  CORE_APPLICATION_MODAL_EDITAPPLICATION_CONTROLLER_MODAL,
+  OVERRIDE_REGISTRY,
+])
   .directive('applicationAttributes', [
     'overrideRegistry',
     function(overrideRegistry) {
@@ -106,5 +110,7 @@ module.exports = angular
           })
           .catch(() => {});
       };
+
+      this.slackBaseUrl = SETTINGS.slack.baseUrl;
     },
   ]);

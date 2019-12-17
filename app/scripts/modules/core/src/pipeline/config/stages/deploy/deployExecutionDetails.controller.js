@@ -10,12 +10,16 @@ import { ServerGroupReader } from 'core/serverGroup/serverGroupReader.service';
 import { UrlBuilder } from 'core/navigation';
 import { ClusterState } from 'core/state';
 import { HelpContentsRegistry } from 'core/help';
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
-let angular = require('angular');
+const angular = require('angular');
 
-module.exports = angular
-  .module('spinnaker.core.pipeline.stage.deploy.details.controller', [
-    require('@uirouter/angularjs').default,
+export const CORE_PIPELINE_CONFIG_STAGES_DEPLOY_DEPLOYEXECUTIONDETAILS_CONTROLLER =
+  'spinnaker.core.pipeline.stage.deploy.details.controller';
+export const name = CORE_PIPELINE_CONFIG_STAGES_DEPLOY_DEPLOYEXECUTIONDETAILS_CONTROLLER; // for backwards compatibility
+angular
+  .module(CORE_PIPELINE_CONFIG_STAGES_DEPLOY_DEPLOYEXECUTIONDETAILS_CONTROLLER, [
+    UIROUTER_ANGULARJS,
     EXECUTION_DETAILS_SECTION_SERVICE,
   ])
   .controller('DeployExecutionDetailsCtrl', [
@@ -51,18 +55,19 @@ module.exports = angular
 
       evaluateSections();
 
-      let initialized = () => {
+      const initialized = () => {
+        const context = $scope.stage.context || {};
+        let resultObjects;
         evaluateSections();
         $scope.detailsSection = $stateParams.details;
 
-        var context = $scope.stage.context || {},
-          results = [];
+        let results = [];
 
         function addDeployedArtifacts(key) {
-          var deployedArtifacts = _.find(resultObjects, key);
+          const deployedArtifacts = _.find(resultObjects, key);
           if (deployedArtifacts) {
             _.forEach(deployedArtifacts[key], function(serverGroupName, region) {
-              var result = {
+              const result = {
                 type: 'serverGroups',
                 application: context.application,
                 serverGroup: serverGroupName,
@@ -79,7 +84,7 @@ module.exports = angular
         }
 
         if (context && context['kato.tasks'] && context['kato.tasks'].length) {
-          var resultObjects = context['kato.tasks'][0].resultObjects;
+          resultObjects = context['kato.tasks'][0].resultObjects;
           if (resultObjects && resultObjects.length) {
             results = [];
             addDeployedArtifacts('serverGroupNameByRegion');
@@ -169,7 +174,7 @@ module.exports = angular
 
       this.overrideFiltersForUrl = r => ClusterState.filterService.overrideFiltersForUrl(r);
 
-      let initialize = () => executionDetailsSectionService.synchronizeSection($scope.configSections, initialized);
+      const initialize = () => executionDetailsSectionService.synchronizeSection($scope.configSections, initialized);
 
       initialize();
 

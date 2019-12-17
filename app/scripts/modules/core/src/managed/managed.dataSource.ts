@@ -1,10 +1,11 @@
-import { module, IQService } from 'angular';
+import { IQService, module } from 'angular';
 
 import { noop } from 'core/utils';
 import { SETTINGS } from 'core/config/settings';
 import { ApplicationDataSourceRegistry } from 'core/application/service/ApplicationDataSourceRegistry';
 import { Application } from 'core/application';
-import { ManagedReader, IManagedApplicationSummary } from './ManagedReader';
+import { IManagedApplicationSummary } from 'core/domain';
+import { ManagedReader } from './ManagedReader';
 import {
   addManagedResourceMetadataToServerGroups,
   addManagedResourceMetadataToLoadBalancers,
@@ -22,7 +23,8 @@ module(MANAGED_RESOURCES_DATA_SOURCE, []).run([
       return ManagedReader.getApplicationSummary(application.name);
     };
 
-    const addManagedResources = (_application: Application, data: IManagedApplicationSummary) => {
+    const addManagedResources = (application: Application, data: IManagedApplicationSummary) => {
+      application.isManagementPaused = data.applicationPaused;
       return $q.when(data);
     };
 
@@ -38,7 +40,7 @@ module(MANAGED_RESOURCES_DATA_SOURCE, []).run([
       loader: loadManagedResources,
       onLoad: addManagedResources,
       afterLoad: addManagedMetadataToResources,
-      defaultData: { hasManagedResources: false, resources: [] },
+      defaultData: { applicationPaused: false, hasManagedResources: false, resources: [] },
     });
   },
 ]);

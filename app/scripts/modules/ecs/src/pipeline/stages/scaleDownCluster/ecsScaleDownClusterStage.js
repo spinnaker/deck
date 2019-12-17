@@ -1,11 +1,13 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { AccountService, Registry } from '@spinnaker/core';
 
-module.exports = angular
-  .module('spinnaker.ecs.pipeline.stage.scaleDownClusterStage', [])
+export const ECS_PIPELINE_STAGES_SCALEDOWNCLUSTER_ECSSCALEDOWNCLUSTERSTAGE =
+  'spinnaker.ecs.pipeline.stage.scaleDownClusterStage';
+export const name = ECS_PIPELINE_STAGES_SCALEDOWNCLUSTER_ECSSCALEDOWNCLUSTERSTAGE; // for backwards compatibility
+module(ECS_PIPELINE_STAGES_SCALEDOWNCLUSTER_ECSSCALEDOWNCLUSTERSTAGE, [])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'scaleDownCluster',
@@ -29,9 +31,9 @@ module.exports = angular
   .controller('ecsScaleDownClusterStageCtrl', [
     '$scope',
     function($scope) {
-      var ctrl = this;
+      const ctrl = this;
 
-      let stage = $scope.stage;
+      const stage = $scope.stage;
 
       $scope.state = {
         accounts: false,

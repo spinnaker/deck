@@ -1,12 +1,16 @@
-'use strict';
+import { GOOGLE_SERVERGROUP_CONFIGURE_WIZARD_SECURITYGROUPS_TAGMANAGER_SERVICE } from '../securityGroups/tagManager.service';
+import UI_SELECT from 'ui-select';
+('use strict');
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular
-  .module('spinnaker.google.serverGroup.configure.wizard.advancedSettings.selector.directive', [
-    require('ui-select'),
-    require('../securityGroups/tagManager.service').name,
-  ])
+export const GOOGLE_SERVERGROUP_CONFIGURE_WIZARD_ADVANCEDSETTINGS_ADVANCEDSETTINGSSELECTOR_DIRECTIVE =
+  'spinnaker.google.serverGroup.configure.wizard.advancedSettings.selector.directive';
+export const name = GOOGLE_SERVERGROUP_CONFIGURE_WIZARD_ADVANCEDSETTINGS_ADVANCEDSETTINGSSELECTOR_DIRECTIVE; // for backwards compatibility
+module(GOOGLE_SERVERGROUP_CONFIGURE_WIZARD_ADVANCEDSETTINGS_ADVANCEDSETTINGSSELECTOR_DIRECTIVE, [
+  UI_SELECT,
+  GOOGLE_SERVERGROUP_CONFIGURE_WIZARD_SECURITYGROUPS_TAGMANAGER_SERVICE,
+])
   .directive('gceServerGroupAdvancedSettingsSelector', function() {
     return {
       restrict: 'E',

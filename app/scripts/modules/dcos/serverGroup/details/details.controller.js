@@ -1,6 +1,6 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 import _ from 'lodash';
 
 import {
@@ -10,13 +10,17 @@ import {
   SERVER_GROUP_WRITER,
   ServerGroupTemplates,
 } from '@spinnaker/core';
+import { DCOS_SERVERGROUP_CONFIGURE_CONFIGURE_DCOS_MODULE } from '../configure/configure.dcos.module';
+import { DCOS_SERVERGROUP_PARAMSMIXIN } from '../paramsMixin';
 
-module.exports = angular
-  .module('spinnaker.dcos.serverGroup.details.controller', [
-    require('../configure/configure.dcos.module').name,
+export const DCOS_SERVERGROUP_DETAILS_DETAILS_CONTROLLER = 'spinnaker.dcos.serverGroup.details.controller';
+export const name = DCOS_SERVERGROUP_DETAILS_DETAILS_CONTROLLER; // for backwards compatibility
+angular
+  .module(DCOS_SERVERGROUP_DETAILS_DETAILS_CONTROLLER, [
+    DCOS_SERVERGROUP_CONFIGURE_CONFIGURE_DCOS_MODULE,
     CONFIRMATION_MODAL_SERVICE,
     SERVER_GROUP_WRITER,
-    require('../paramsMixin').name,
+    DCOS_SERVERGROUP_PARAMSMIXIN,
   ])
   .controller('dcosServerGroupDetailsController', [
     '$scope',
@@ -41,14 +45,14 @@ module.exports = angular
       confirmationModalService,
       dcosProxyUiService,
     ) {
-      let application = app;
+      const application = app;
 
       $scope.state = {
         loading: true,
       };
 
       function extractServerGroupSummary() {
-        var summary = _.find(application.serverGroups.data, function(toCheck) {
+        let summary = _.find(application.serverGroups.data, function(toCheck) {
           return (
             toCheck.name === serverGroup.name &&
             toCheck.account === serverGroup.accountId &&
@@ -89,7 +93,7 @@ module.exports = angular
       };
 
       function normalizeDeploymentStatus(serverGroup) {
-        let deploymentStatus = serverGroup.deploymentStatus;
+        const deploymentStatus = serverGroup.deploymentStatus;
 
         if (deploymentStatus !== undefined && deploymentStatus !== null) {
           deploymentStatus.unavailableReplicas |= 0;
@@ -99,7 +103,7 @@ module.exports = angular
       }
 
       function retrieveServerGroup() {
-        var summary = extractServerGroupSummary();
+        const summary = extractServerGroupSummary();
         return ServerGroupReader.getServerGroup(
           application.name,
           serverGroup.accountId,
@@ -136,7 +140,7 @@ module.exports = angular
 
       this.isLastServerGroupInRegion = function(serverGroup, application) {
         try {
-          var cluster = _.find(application.clusters, { name: serverGroup.cluster, account: serverGroup.account });
+          const cluster = _.find(application.clusters, { name: serverGroup.cluster, account: serverGroup.account });
           return _.filter(cluster.serverGroups, { region: serverGroup.region }).length === 1;
         } catch (error) {
           return false;
@@ -144,27 +148,27 @@ module.exports = angular
       };
 
       this.destroyServerGroup = () => {
-        var serverGroup = $scope.serverGroup;
+        const serverGroup = $scope.serverGroup;
 
-        var taskMonitor = {
+        const taskMonitor = {
           application: application,
           title: 'Destroying ' + serverGroup.name,
         };
 
-        var submitMethod = params =>
+        const submitMethod = params =>
           serverGroupWriter.destroyServerGroup(
             serverGroup,
             application,
             angular.extend(params, dcosServerGroupParamsMixin.destroyServerGroup(serverGroup, application)),
           );
 
-        var stateParams = {
+        const stateParams = {
           name: serverGroup.name,
           accountId: serverGroup.account,
           region: serverGroup.region,
         };
 
-        var confirmationModalParams = {
+        const confirmationModalParams = {
           header: 'Really destroy ' + serverGroup.name + '?',
           buttonText: 'Destroy ' + serverGroup.name,
           provider: 'dcos',
@@ -185,21 +189,21 @@ module.exports = angular
       };
 
       this.disableServerGroup = function disableServerGroup() {
-        var serverGroup = $scope.serverGroup;
+        const serverGroup = $scope.serverGroup;
 
-        var taskMonitor = {
+        const taskMonitor = {
           application: application,
           title: 'Disabling ' + serverGroup.name,
         };
 
-        var submitMethod = params =>
+        const submitMethod = params =>
           serverGroupWriter.disableServerGroup(
             serverGroup,
             application,
             angular.extend(params, dcosServerGroupParamsMixin.disableServerGroup(serverGroup, application)),
           );
 
-        var confirmationModalParams = {
+        const confirmationModalParams = {
           header: 'Really disable ' + serverGroup.name + '?',
           buttonText: 'Disable ' + serverGroup.name,
           provider: 'dcos',

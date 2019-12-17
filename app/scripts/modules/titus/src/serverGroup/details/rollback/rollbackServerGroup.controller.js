@@ -1,13 +1,16 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { get } from 'lodash';
 import { SERVER_GROUP_WRITER, TaskMonitor } from '@spinnaker/core';
 
-module.exports = angular
-  .module('spinnaker.titus.serverGroup.details.rollback.controller', [SERVER_GROUP_WRITER])
-  .controller('titusRollbackServerGroupCtrl', [
+export const TITUS_SERVERGROUP_DETAILS_ROLLBACK_ROLLBACKSERVERGROUP_CONTROLLER =
+  'spinnaker.titus.serverGroup.details.rollback.controller';
+export const name = TITUS_SERVERGROUP_DETAILS_ROLLBACK_ROLLBACKSERVERGROUP_CONTROLLER; // for backwards compatibility
+module(TITUS_SERVERGROUP_DETAILS_ROLLBACK_ROLLBACKSERVERGROUP_CONTROLLER, [SERVER_GROUP_WRITER]).controller(
+  'titusRollbackServerGroupCtrl',
+  [
     '$scope',
     '$uibModalInstance',
     'serverGroupWriter',
@@ -31,9 +34,9 @@ module.exports = angular
       $scope.allServerGroups = allServerGroups.sort((a, b) => b.name.localeCompare(a.name));
       $scope.verification = {};
 
-      var desired = serverGroup.capacity.desired;
+      const desired = serverGroup.capacity.desired;
 
-      var rollbackType = 'EXPLICIT';
+      let rollbackType = 'EXPLICIT';
 
       if (allServerGroups.length === 0 && serverGroup.entityTags) {
         const previousServerGroup = get(serverGroup, 'entityTags.creationMetadata.value.previousServerGroup');
@@ -50,8 +53,9 @@ module.exports = angular
         }
       }
 
+      let healthyPercent;
       if (desired < 10) {
-        var healthyPercent = 100;
+        healthyPercent = 100;
       } else if (desired < 20) {
         // accept 1 instance in an unknown state during rollback
         healthyPercent = 90;
@@ -82,14 +86,16 @@ module.exports = angular
       }
 
       this.isValid = function() {
-        var command = $scope.command;
+        const command = $scope.command;
         if (!$scope.verification.verified) {
           return false;
         }
 
         if (rollbackType === 'PREVIOUS_IMAGE') {
           // no need to validate when using an explicit image
-          return true;
+          // return true;
+          // KLUDGE: temporarily disabling previous image rollbacks for titus because they do not work properly
+          return false;
         }
 
         return command.rollbackContext.restoreServerGroupName !== undefined;
@@ -106,7 +112,7 @@ module.exports = angular
           return;
         }
 
-        var submitMethod = function() {
+        const submitMethod = function() {
           return serverGroupWriter.rollbackServerGroup(serverGroup, application, $scope.command);
         };
 
@@ -126,7 +132,7 @@ module.exports = angular
           return serverGroup.name;
         }
 
-        var imageName = serverGroup.buildInfo.images[0];
+        let imageName = serverGroup.buildInfo.images[0];
         if (imageName.indexOf('/') > 0) {
           imageName = imageName.substring(imageName.indexOf('/') + 1);
         }
@@ -138,4 +144,5 @@ module.exports = angular
         return serverGroup.isDisabled ? 'Disabled Server Groups' : 'Enabled Server Groups';
       };
     },
-  ]);
+  ],
+);
