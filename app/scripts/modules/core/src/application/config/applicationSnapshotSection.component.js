@@ -40,7 +40,6 @@ module(CORE_APPLICATION_CONFIG_APPLICATIONSNAPSHOTSECTION_COMPONENT, [
         confirmationModalService.confirm({
           header: 'Are you sure you want to take a snapshot of: ' + this.application.name + '?',
           buttonText: 'Take snapshot',
-          provider: 'gce',
           taskMonitorConfig: taskMonitor,
           submitMethod: submitMethod,
         });

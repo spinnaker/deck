@@ -151,7 +151,6 @@ export class NotificationsPopover extends React.Component<INotificationsPopoverP
       header: `Really delete ${type}?`,
       buttonText: `Delete ${type}`,
       account: entity.account,
-      applicationName: application.name,
       taskMonitorConfig,
       submitMethod: () => EntityTagWriter.deleteEntityTag(application, entity, entityTags, entityTag.name),
     });
