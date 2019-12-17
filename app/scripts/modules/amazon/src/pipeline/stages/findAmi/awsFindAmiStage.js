@@ -1,11 +1,13 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 
 import { AccountService, Registry } from '@spinnaker/core';
 
-module.exports = angular
-  .module('spinnaker.amazon.pipeline.stage.findAmiStage', [])
+export const AMAZON_PIPELINE_STAGES_FINDAMI_AWSFINDAMISTAGE = 'spinnaker.amazon.pipeline.stage.findAmiStage';
+export const name = AMAZON_PIPELINE_STAGES_FINDAMI_AWSFINDAMISTAGE; // for backwards compatibility
+angular
+  .module(AMAZON_PIPELINE_STAGES_FINDAMI_AWSFINDAMISTAGE, [])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'findImage',
@@ -23,7 +25,7 @@ module.exports = angular
   .controller('awsFindAmiStageCtrl', [
     '$scope',
     function($scope) {
-      let stage = $scope.stage;
+      const stage = $scope.stage;
 
       $scope.state = {
         accounts: false,

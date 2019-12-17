@@ -2,9 +2,11 @@
 
 import _ from 'lodash';
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular.module('spinnaker.titus.serverGroup.transformer', []).factory('titusServerGroupTransformer', [
+export const TITUS_SERVERGROUP_SERVERGROUP_TRANSFORMER = 'spinnaker.titus.serverGroup.transformer';
+export const name = TITUS_SERVERGROUP_SERVERGROUP_TRANSFORMER; // for backwards compatibility
+module(TITUS_SERVERGROUP_SERVERGROUP_TRANSFORMER, []).factory('titusServerGroupTransformer', [
   '$q',
   function($q) {
     function normalizeServerGroup(serverGroup) {
@@ -13,7 +15,7 @@ module.exports = angular.module('spinnaker.titus.serverGroup.transformer', []).f
 
     function convertServerGroupCommandToDeployConfiguration(base) {
       // use _.defaults to avoid copying the backingData, which is huge and expensive to copy over
-      var command = _.defaults({ backingData: [], viewState: [] }, base);
+      const command = _.defaults({ backingData: [], viewState: [] }, base);
       if (base.viewState.mode !== 'clone') {
         delete command.source;
       }
@@ -34,7 +36,7 @@ module.exports = angular.module('spinnaker.titus.serverGroup.transformer', []).f
         alarms: [
           {
             namespace: 'NFLX/EPIC',
-            metricName: 'CPUUtilization',
+            metricName: '',
             threshold: 50,
             statistic: 'Average',
             comparisonOperator: 'GreaterThanThreshold',
@@ -62,7 +64,7 @@ module.exports = angular.module('spinnaker.titus.serverGroup.transformer', []).f
           disableScaleIn: false,
           customizedMetricSpecification: {
             namespace: 'NFLX/EPIC',
-            metricName: 'CPUUtilization',
+            metricName: '',
             dimensions: [{ name: 'AutoScalingGroupName', value: serverGroup.name }],
           },
           scaleInCooldown: 300,

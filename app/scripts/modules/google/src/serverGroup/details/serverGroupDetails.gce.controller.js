@@ -1,6 +1,6 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 import _ from 'lodash';
 
 import {
@@ -17,18 +17,28 @@ import {
 require('../configure/serverGroup.configure.gce.module');
 
 import './serverGroupDetails.less';
+import { GOOGLE_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER_SERVICE } from '../configure/serverGroupCommandBuilder.service';
+import { GOOGLE_COMMON_XPNNAMING_GCE_SERVICE } from 'google/common/xpnNaming.gce.service';
+import { GOOGLE_SERVERGROUP_DETAILS_RESIZE_RESIZESERVERGROUP_CONTROLLER } from './resize/resizeServerGroup.controller';
+import { GOOGLE_SERVERGROUP_DETAILS_ROLLBACK_ROLLBACKSERVERGROUP_CONTROLLER } from './rollback/rollbackServerGroup.controller';
+import { GOOGLE_SERVERGROUP_DETAILS_AUTOSCALINGPOLICY_AUTOSCALINGPOLICY_DIRECTIVE } from './autoscalingPolicy/autoscalingPolicy.directive';
+import { GOOGLE_SERVERGROUP_DETAILS_AUTOSCALINGPOLICY_ADDAUTOSCALINGPOLICYBUTTON_COMPONENT } from './autoscalingPolicy/addAutoscalingPolicyButton.component';
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
-module.exports = angular
-  .module('spinnaker.serverGroup.details.gce.controller', [
-    require('@uirouter/angularjs').default,
-    require('../configure/serverGroupCommandBuilder.service').name,
+export const GOOGLE_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_GCE_CONTROLLER =
+  'spinnaker.serverGroup.details.gce.controller';
+export const name = GOOGLE_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_GCE_CONTROLLER; // for backwards compatibility
+angular
+  .module(GOOGLE_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_GCE_CONTROLLER, [
+    UIROUTER_ANGULARJS,
+    GOOGLE_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER_SERVICE,
     CONFIRMATION_MODAL_SERVICE,
     SERVER_GROUP_WRITER,
-    require('google/common/xpnNaming.gce.service').name,
-    require('./resize/resizeServerGroup.controller').name,
-    require('./rollback/rollbackServerGroup.controller').name,
-    require('./autoscalingPolicy/autoscalingPolicy.directive').name,
-    require('./autoscalingPolicy/addAutoscalingPolicyButton.component').name,
+    GOOGLE_COMMON_XPNNAMING_GCE_SERVICE,
+    GOOGLE_SERVERGROUP_DETAILS_RESIZE_RESIZESERVERGROUP_CONTROLLER,
+    GOOGLE_SERVERGROUP_DETAILS_ROLLBACK_ROLLBACKSERVERGROUP_CONTROLLER,
+    GOOGLE_SERVERGROUP_DETAILS_AUTOSCALINGPOLICY_AUTOSCALINGPOLICY_DIRECTIVE,
+    GOOGLE_SERVERGROUP_DETAILS_AUTOSCALINGPOLICY_ADDAUTOSCALINGPOLICYBUTTON_COMPONENT,
   ])
   .controller('gceServerGroupDetailsCtrl', [
     '$scope',
@@ -194,7 +204,7 @@ module.exports = angular
 
       const prepareAutoHealingPolicy = () => {
         if (this.serverGroup.autoHealingPolicy) {
-          let autoHealingPolicy = this.serverGroup.autoHealingPolicy;
+          const autoHealingPolicy = this.serverGroup.autoHealingPolicy;
           const healthCheckUrl = autoHealingPolicy.healthCheck;
 
           this.serverGroup.autoHealingPolicyHealthCheck = healthCheckUrl ? _.last(healthCheckUrl.split('/')) : null;
@@ -483,7 +493,7 @@ module.exports = angular
         if (this.serverGroup && this.serverGroup.buildInfo && this.serverGroup.buildInfo.buildInfoUrl) {
           return this.serverGroup.buildInfo.buildInfoUrl;
         } else if (this.serverGroup && this.serverGroup.buildInfo && this.serverGroup.buildInfo.jenkins) {
-          var jenkins = this.serverGroup.buildInfo.jenkins;
+          const jenkins = this.serverGroup.buildInfo.jenkins;
           return jenkins.host + 'job/' + jenkins.name + '/' + jenkins.number;
         }
         return null;

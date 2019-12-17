@@ -1,6 +1,6 @@
 import { IController, module } from 'angular';
-import { IModalServiceInstance } from 'angular-ui-bootstrap';
-import { StateService } from '@uirouter/angularjs';
+import ANGULAR_UI_BOOTSTRAP, { IModalServiceInstance } from 'angular-ui-bootstrap';
+import UIROUTER_ANGULARJS, { StateService } from '@uirouter/angularjs';
 
 import { trimEnd } from 'lodash';
 
@@ -36,7 +36,7 @@ import {
 export class OracleLoadBalancerController implements IController {
   public oracle = 'oracle';
   public shapes: string[] = ['100Mbps', '400Mbps', '8000Mbps']; // TODO desagar use listShapes to get this from clouddriver later
-  public loadBalancingPolicies: string[] = Object.keys(LoadBalancingPolicy).map(k => LoadBalancingPolicy[k as any]);
+  public loadBalancingPolicies: string[] = Object.keys(LoadBalancingPolicy).map(k => (LoadBalancingPolicy as any)[k]);
   public pages: { [key: string]: any } = {
     properties: require('./createLoadBalancerProperties.html'),
     listeners: require('./listeners.html'),
@@ -167,8 +167,8 @@ export class OracleLoadBalancerController implements IController {
   }
 
   public updateLoadBalancerNames() {
-    const account = this.$scope.loadBalancerCmd.credentials,
-      region = this.$scope.loadBalancerCmd.region;
+    const account = this.$scope.loadBalancerCmd.credentials;
+    const region = this.$scope.loadBalancerCmd.region;
 
     const accountLoadBalancerNamesByRegion: { [key: string]: string[] } = {};
     this.application
@@ -497,7 +497,7 @@ export class OracleLoadBalancerController implements IController {
 
 export const ORACLE_LOAD_BALANCER_CREATE_CONTROLLER = 'spinnaker.oracle.loadBalancer.create.controller';
 module(ORACLE_LOAD_BALANCER_CREATE_CONTROLLER, [
-  require('angular-ui-bootstrap'),
-  require('@uirouter/angularjs').default,
+  ANGULAR_UI_BOOTSTRAP as any,
+  UIROUTER_ANGULARJS,
   ORACLE_LOAD_BALANCER_TRANSFORMER,
 ]).controller('oracleCreateLoadBalancerCtrl', OracleLoadBalancerController);

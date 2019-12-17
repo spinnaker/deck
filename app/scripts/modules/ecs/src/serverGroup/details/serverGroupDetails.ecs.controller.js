@@ -1,6 +1,6 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 import { chain, filter, find, has, isEmpty } from 'lodash';
 import { FirewallLabels } from '@spinnaker/core';
 
@@ -15,17 +15,23 @@ import {
   ServerGroupWarningMessageService,
   SubnetReader,
 } from '@spinnaker/core';
+import { ECS_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER_SERVICE } from '../configure/serverGroupCommandBuilder.service';
+import { ECS_SERVERGROUP_DETAILS_RESIZE_RESIZESERVERGROUP_CONTROLLER } from './resize/resizeServerGroup.controller';
+import { ECS_SERVERGROUP_DETAILS_ROLLBACK_ROLLBACKSERVERGROUP_CONTROLLER } from './rollback/rollbackServerGroup.controller';
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
-module.exports = angular
-  .module('spinnaker.ecs.serverGroup.details.controller', [
-    require('@uirouter/angularjs').default,
+export const ECS_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_ECS_CONTROLLER = 'spinnaker.ecs.serverGroup.details.controller';
+export const name = ECS_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_ECS_CONTROLLER; // for backwards compatibility
+angular
+  .module(ECS_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_ECS_CONTROLLER, [
+    UIROUTER_ANGULARJS,
     ECS_SERVER_GROUP_TRANSFORMER,
     CONFIRMATION_MODAL_SERVICE,
     OVERRIDE_REGISTRY,
     SERVER_GROUP_WRITER,
-    require('../configure/serverGroupCommandBuilder.service').name,
-    require('./resize/resizeServerGroup.controller').name,
-    require('./rollback/rollbackServerGroup.controller').name,
+    ECS_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER_SERVICE,
+    ECS_SERVERGROUP_DETAILS_RESIZE_RESIZESERVERGROUP_CONTROLLER,
+    ECS_SERVERGROUP_DETAILS_ROLLBACK_ROLLBACKSERVERGROUP_CONTROLLER,
   ])
   .controller('ecsServerGroupDetailsCtrl', [
     '$scope',
@@ -58,9 +64,9 @@ module.exports = angular
 
       this.application = app;
 
-      let extractServerGroupSummary = () => {
+      const extractServerGroupSummary = () => {
         return app.ready().then(() => {
-          var summary = find(app.serverGroups.data, toCheck => {
+          let summary = find(app.serverGroups.data, toCheck => {
             return (
               toCheck.name === serverGroup.name &&
               toCheck.account === serverGroup.accountId &&
@@ -83,18 +89,18 @@ module.exports = angular
         });
       };
 
-      let autoClose = () => {
+      const autoClose = () => {
         if ($scope.$$destroyed) {
           return;
         }
         $state.go('^', { allowModalToStayOpen: true }, { location: 'replace' });
       };
 
-      let cancelLoader = () => {
+      const cancelLoader = () => {
         this.state.loading = false;
       };
 
-      let retrieveServerGroup = () => {
+      const retrieveServerGroup = () => {
         return extractServerGroupSummary()
           .then(summary => {
             return ServerGroupReader.getServerGroup(
@@ -114,12 +120,12 @@ module.exports = angular
               if (!isEmpty(this.serverGroup)) {
                 this.image = details.image ? details.image : undefined;
 
-                var vpc = this.serverGroup.asg ? this.serverGroup.asg.vpczoneIdentifier : '';
+                const vpc = this.serverGroup.asg ? this.serverGroup.asg.vpczoneIdentifier : '';
 
                 if (vpc !== '') {
-                  var subnetId = vpc.split(',')[0];
+                  const subnetId = vpc.split(',')[0];
                   SubnetReader.listSubnets().then(subnets => {
-                    var subnet = chain(subnets)
+                    const subnet = chain(subnets)
                       .find({ id: subnetId })
                       .value();
                     this.serverGroup.subnetType = subnet.purpose;
@@ -127,9 +133,9 @@ module.exports = angular
                 }
 
                 if (details.image && details.image.description) {
-                  var tags = details.image.description.split(', ');
+                  const tags = details.image.description.split(', ');
                   tags.forEach(tag => {
-                    var keyVal = tag.split('=');
+                    const keyVal = tag.split('=');
                     if (keyVal.length === 2 && keyVal[0] === 'ancestor_name') {
                       details.image.baseImage = keyVal[1];
                     }
@@ -137,7 +143,7 @@ module.exports = angular
                 }
 
                 if (details.image && details.image.tags) {
-                  var baseAmiVersionTag = details.image.tags.find(tag => tag.key === 'base_ami_version');
+                  const baseAmiVersionTag = details.image.tags.find(tag => tag.key === 'base_ami_version');
                   if (baseAmiVersionTag) {
                     details.baseAmiVersion = baseAmiVersionTag.value;
                   }
@@ -181,22 +187,22 @@ module.exports = angular
       });
 
       this.destroyServerGroup = () => {
-        var serverGroup = this.serverGroup;
+        const serverGroup = this.serverGroup;
 
-        var taskMonitor = {
+        const taskMonitor = {
           application: app,
           title: 'Destroying ' + serverGroup.name,
         };
 
-        var submitMethod = params => serverGroupWriter.destroyServerGroup(serverGroup, app, params);
+        const submitMethod = params => serverGroupWriter.destroyServerGroup(serverGroup, app, params);
 
-        var stateParams = {
+        const stateParams = {
           name: serverGroup.name,
           accountId: serverGroup.account,
           region: serverGroup.region,
         };
 
-        var confirmationModalParams = {
+        const confirmationModalParams = {
           header: 'Really destroy ' + serverGroup.name + '?',
           buttonText: 'Destroy ' + serverGroup.name,
           account: serverGroup.account,
@@ -223,18 +229,18 @@ module.exports = angular
       };
 
       this.disableServerGroup = () => {
-        var serverGroup = this.serverGroup;
+        const serverGroup = this.serverGroup;
 
-        var taskMonitor = {
+        const taskMonitor = {
           application: app,
           title: 'Disabling ' + serverGroup.name,
         };
 
-        var submitMethod = params => {
+        const submitMethod = params => {
           return serverGroupWriter.disableServerGroup(serverGroup, app, params);
         };
 
-        var confirmationModalParams = {
+        const confirmationModalParams = {
           header: 'Really disable ' + serverGroup.name + '?',
           buttonText: 'Disable ' + serverGroup.name,
           account: serverGroup.account,
@@ -256,18 +262,18 @@ module.exports = angular
       };
 
       this.enableServerGroup = () => {
-        var serverGroup = this.serverGroup;
+        const serverGroup = this.serverGroup;
 
-        var taskMonitor = {
+        const taskMonitor = {
           application: app,
           title: 'Enabling ' + serverGroup.name,
         };
 
-        var submitMethod = params => {
+        const submitMethod = params => {
           return serverGroupWriter.enableServerGroup(serverGroup, app, params);
         };
 
-        var confirmationModalParams = {
+        const confirmationModalParams = {
           header: 'Really enable ' + serverGroup.name + '?',
           buttonText: 'Enable ' + serverGroup.name,
           account: serverGroup.account,
@@ -295,7 +301,7 @@ module.exports = angular
           resolve: {
             serverGroup: () => this.serverGroup,
             disabledServerGroups: () => {
-              var cluster = find(app.clusters, { name: this.serverGroup.cluster, account: this.serverGroup.account });
+              const cluster = find(app.clusters, { name: this.serverGroup.cluster, account: this.serverGroup.account });
               return filter(cluster.serverGroups, { isDisabled: true, region: this.serverGroup.region });
             },
             allServerGroups: () =>
@@ -342,7 +348,7 @@ module.exports = angular
         if (has(this, 'serverGroup.buildInfo.buildInfoUrl')) {
           return this.serverGroup.buildInfo.buildInfoUrl;
         } else if (has(this, 'serverGroup.buildInfo.jenkins')) {
-          var jenkins = this.serverGroup.buildInfo.jenkins;
+          const jenkins = this.serverGroup.buildInfo.jenkins;
           return jenkins.host + 'job/' + jenkins.name + '/' + jenkins.number;
         }
         return null;

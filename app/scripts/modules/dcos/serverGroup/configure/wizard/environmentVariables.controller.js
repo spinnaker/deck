@@ -1,10 +1,13 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular
-  .module('spinnaker.dcos.serverGroup.configure.environmentVariables', [])
-  .controller('dcosServerGroupEnvironmentVariablesController', [
+export const DCOS_SERVERGROUP_CONFIGURE_WIZARD_ENVIRONMENTVARIABLES_CONTROLLER =
+  'spinnaker.dcos.serverGroup.configure.environmentVariables';
+export const name = DCOS_SERVERGROUP_CONFIGURE_WIZARD_ENVIRONMENTVARIABLES_CONTROLLER; // for backwards compatibility
+module(DCOS_SERVERGROUP_CONFIGURE_WIZARD_ENVIRONMENTVARIABLES_CONTROLLER, []).controller(
+  'dcosServerGroupEnvironmentVariablesController',
+  [
     '$scope',
     function($scope) {
       $scope.command.viewModel.env = [];
@@ -16,7 +19,7 @@ module.exports = angular
       // init from the model
       if ($scope.command.env && this.isEnvironmentValid($scope.command.env)) {
         Object.keys($scope.command.env).forEach(key => {
-          let val = $scope.command.env[key];
+          const val = $scope.command.env[key];
           let secretSource = null;
           if (val.secret) {
             secretSource = $scope.command.secrets[val.secret].source;
@@ -83,7 +86,7 @@ module.exports = angular
       };
 
       this.synchronize = () => {
-        let allNames = $scope.command.viewModel.env.map(item => item.name);
+        const allNames = $scope.command.viewModel.env.map(item => item.name);
 
         $scope.command.env = {};
 
@@ -97,4 +100,5 @@ module.exports = angular
       };
       $scope.$watch(() => JSON.stringify($scope.command.viewModel.env), this.synchronize);
     },
-  ]);
+  ],
+);

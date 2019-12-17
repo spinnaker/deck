@@ -1,13 +1,15 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 import _ from 'lodash';
 
 import { SETTINGS } from 'core/config/settings';
 
 import './instanceLinks.component.less';
 
-module.exports = angular.module('spinnaker.core.instance.details.instanceLinks', []).component('instanceLinks', {
+export const CORE_INSTANCE_DETAILS_INSTANCELINKS_COMPONENT = 'spinnaker.core.instance.details.instanceLinks';
+export const name = CORE_INSTANCE_DETAILS_INSTANCELINKS_COMPONENT; // for backwards compatibility
+module(CORE_INSTANCE_DETAILS_INSTANCELINKS_COMPONENT, []).component('instanceLinks', {
   bindings: {
     address: '=',
     application: '=',
@@ -30,7 +32,7 @@ module.exports = angular.module('spinnaker.core.instance.details.instanceLinks',
       );
       this.sections.forEach(section => {
         section.links = section.links.map(link => {
-          let port = link.path.indexOf(':') === 0 || !this.port ? '' : ':' + this.port;
+          const port = link.path.indexOf(':') === 0 || !this.port ? '' : ':' + this.port;
           let url = link.path;
           // handle interpolated variables
           if (url.includes('{{')) {

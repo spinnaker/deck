@@ -2,29 +2,31 @@ import { ApplicationDataSourceRegistry } from '../application/service/Applicatio
 import { TaskReader } from 'core/task/task.read.service';
 import { CLUSTER_SERVICE } from 'core/cluster/cluster.service';
 
-const angular = require('angular');
+import * as angular from 'angular';
 
-module.exports = angular.module('spinnaker.core.task.dataSource', [CLUSTER_SERVICE]).run([
+export const CORE_TASK_TASK_DATASOURCE = 'spinnaker.core.task.dataSource';
+export const name = CORE_TASK_TASK_DATASOURCE; // for backwards compatibility
+angular.module(CORE_TASK_TASK_DATASOURCE, [CLUSTER_SERVICE]).run([
   '$q',
   'clusterService',
   function($q, clusterService) {
-    let addTasks = (application, tasks) => {
+    const addTasks = (application, tasks) => {
       return $q.when(angular.isArray(tasks) ? tasks : []);
     };
 
-    let loadTasks = application => {
+    const loadTasks = application => {
       return TaskReader.getTasks(application.name);
     };
 
-    let loadRunningTasks = application => {
+    const loadRunningTasks = application => {
       return TaskReader.getRunningTasks(application.name);
     };
 
-    let addRunningTasks = (application, data) => {
+    const addRunningTasks = (application, data) => {
       return $q.when(data);
     };
 
-    let runningTasksLoaded = application => {
+    const runningTasksLoaded = application => {
       clusterService.addTasksToServerGroups(application);
       application.getDataSource('serverGroups').dataUpdated();
     };

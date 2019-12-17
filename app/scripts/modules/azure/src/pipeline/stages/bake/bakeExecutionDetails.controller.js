@@ -1,12 +1,16 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { SETTINGS } from '@spinnaker/core';
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
-module.exports = angular
-  .module('spinnaker.azure.pipeline.stage.bake.executionDetails.controller', [require('@uirouter/angularjs').default])
-  .controller('azureBakeExecutionDetailsCtrl', [
+export const AZURE_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER =
+  'spinnaker.azure.pipeline.stage.bake.executionDetails.controller';
+export const name = AZURE_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER; // for backwards compatibility
+module(AZURE_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER, [UIROUTER_ANGULARJS]).controller(
+  'azureBakeExecutionDetailsCtrl',
+  [
     '$scope',
     '$stateParams',
     'executionDetailsSectionService',
@@ -14,7 +18,7 @@ module.exports = angular
     function($scope, $stateParams, executionDetailsSectionService, $interpolate) {
       $scope.configSections = ['bakeConfig', 'taskStatus'];
 
-      let initialized = () => {
+      const initialized = () => {
         $scope.detailsSection = $stateParams.details;
         $scope.provider = $scope.stage.context.cloudProviderType || 'azure';
         $scope.roscoMode =
@@ -26,10 +30,11 @@ module.exports = angular
         );
       };
 
-      let initialize = () => executionDetailsSectionService.synchronizeSection($scope.configSections, initialized);
+      const initialize = () => executionDetailsSectionService.synchronizeSection($scope.configSections, initialized);
 
       initialize();
 
       $scope.$on('$stateChangeSuccess', initialize);
     },
-  ]);
+  ],
+);

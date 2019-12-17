@@ -4,10 +4,13 @@ import { CloudProviderRegistry, ProviderSelectionService } from 'core/cloudProvi
 import { Registry } from 'core/registry';
 import { SETTINGS } from 'core/config/settings';
 
-const angular = require('angular');
+import * as angular from 'angular';
 
-module.exports = angular
-  .module('spinnaker.core.pipeline.stage.createLoadBalancerStage', [])
+export const CORE_PIPELINE_CONFIG_STAGES_CREATELOADBALANCER_CREATELOADBALANCERSTAGE =
+  'spinnaker.core.pipeline.stage.createLoadBalancerStage';
+export const name = CORE_PIPELINE_CONFIG_STAGES_CREATELOADBALANCER_CREATELOADBALANCERSTAGE; // for backwards compatibility
+angular
+  .module(CORE_PIPELINE_CONFIG_STAGES_CREATELOADBALANCER_CREATELOADBALANCERSTAGE, [])
   .config(function() {
     // Register this stage only if infrastructure stages are enabled in settings.js
     if (SETTINGS.feature.infrastructureStages) {
@@ -34,7 +37,7 @@ module.exports = angular
 
       this.addLoadBalancer = function() {
         ProviderSelectionService.selectProvider($scope.application, 'loadBalancer').then(function(selectedProvider) {
-          let config = CloudProviderRegistry.getValue(selectedProvider, 'loadBalancer');
+          const config = CloudProviderRegistry.getValue(selectedProvider, 'loadBalancer');
           $uibModal
             .open({
               templateUrl: config.createLoadBalancerTemplateUrl,
@@ -56,7 +59,7 @@ module.exports = angular
 
       this.editLoadBalancer = function(loadBalancer, index) {
         ProviderSelectionService.selectProvider($scope.application, 'loadBalancer').then(function(selectedProvider) {
-          let config = CloudProviderRegistry.getValue(selectedProvider, 'loadBalancer');
+          const config = CloudProviderRegistry.getValue(selectedProvider, 'loadBalancer');
           $uibModal
             .open({
               templateUrl: config.createLoadBalancerTemplateUrl,

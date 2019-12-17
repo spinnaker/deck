@@ -1,10 +1,13 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular
-  .module('spinnaker.loadBalancer.configure.kubernetes.advancedSettings', [])
-  .controller('kubernetesLoadBalancerAdvancedSettingsController', [
+export const KUBERNETES_V1_LOADBALANCER_CONFIGURE_WIZARD_ADVANCEDSETTINGS_CONTROLLER =
+  'spinnaker.loadBalancer.configure.kubernetes.advancedSettings';
+export const name = KUBERNETES_V1_LOADBALANCER_CONFIGURE_WIZARD_ADVANCEDSETTINGS_CONTROLLER; // for backwards compatibility
+module(KUBERNETES_V1_LOADBALANCER_CONFIGURE_WIZARD_ADVANCEDSETTINGS_CONTROLLER, []).controller(
+  'kubernetesLoadBalancerAdvancedSettingsController',
+  [
     '$scope',
     function($scope) {
       this.addExternalIp = function() {
@@ -18,4 +21,5 @@ module.exports = angular
       this.sessionAffinities = ['None', 'ClientIP'];
       this.types = ['ClusterIP', 'LoadBalancer', 'NodePort'];
     },
-  ]);
+  ],
+);

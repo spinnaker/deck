@@ -2,9 +2,11 @@
 
 import { Registry } from 'core/registry';
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular.module('spinnaker.core.pipeline.stage.tagImageStage', []).config(function() {
+export const CORE_PIPELINE_CONFIG_STAGES_TAGIMAGE_TAGIMAGESTAGE = 'spinnaker.core.pipeline.stage.tagImageStage';
+export const name = CORE_PIPELINE_CONFIG_STAGES_TAGIMAGE_TAGIMAGESTAGE; // for backwards compatibility
+module(CORE_PIPELINE_CONFIG_STAGES_TAGIMAGE_TAGIMAGESTAGE, []).config(function() {
   Registry.pipeline.registerStage({
     useBaseProvider: true,
     key: 'upsertImageTags',

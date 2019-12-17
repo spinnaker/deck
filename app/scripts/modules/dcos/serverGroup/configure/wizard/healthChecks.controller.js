@@ -1,19 +1,22 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular
-  .module('spinnaker.dcos.serverGroup.configure.healthChecks', [])
-  .controller('dcosServerGroupHealthChecksController', [
+export const DCOS_SERVERGROUP_CONFIGURE_WIZARD_HEALTHCHECKS_CONTROLLER =
+  'spinnaker.dcos.serverGroup.configure.healthChecks';
+export const name = DCOS_SERVERGROUP_CONFIGURE_WIZARD_HEALTHCHECKS_CONTROLLER; // for backwards compatibility
+module(DCOS_SERVERGROUP_CONFIGURE_WIZARD_HEALTHCHECKS_CONTROLLER, []).controller(
+  'dcosServerGroupHealthChecksController',
+  [
     '$scope',
     function($scope) {
-      var HTTP_PROTOCOL = 'HTTP';
-      var HTTPS_PROTOCOL = 'HTTPS';
-      var TCP_PROTOCOL = 'TCP';
-      var COMMAND_PROTOCOL = 'COMMAND';
-      var MESOS_HTTP_PROTOCOL = 'MESOS_HTTP';
-      var MESOS_HTTPS_PROTOCOL = 'MESOS_HTTPS';
-      var MESOS_TCP_PROTOCOL = 'MESOS_TCP';
+      const HTTP_PROTOCOL = 'HTTP';
+      const HTTPS_PROTOCOL = 'HTTPS';
+      const TCP_PROTOCOL = 'TCP';
+      const COMMAND_PROTOCOL = 'COMMAND';
+      const MESOS_HTTP_PROTOCOL = 'MESOS_HTTP';
+      const MESOS_HTTPS_PROTOCOL = 'MESOS_HTTPS';
+      const MESOS_TCP_PROTOCOL = 'MESOS_TCP';
 
       this.healthCheckProtocols = [
         HTTP_PROTOCOL,
@@ -78,4 +81,5 @@ module.exports = angular
         $scope.command.healthChecks.splice(index, 1);
       };
     },
-  ]);
+  ],
+);

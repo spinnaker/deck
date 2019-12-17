@@ -1,6 +1,4 @@
-import { IController, module } from 'angular';
-
-const angular = require('angular');
+import angular, { IController, module } from 'angular';
 
 import {
   Application,
@@ -12,8 +10,8 @@ import {
   FirewallLabels,
 } from '@spinnaker/core';
 
-import { StateService } from '@uirouter/angularjs';
-import { IModalService } from 'angular-ui-bootstrap';
+import UIROUTER_ANGULARJS, { StateService } from '@uirouter/angularjs';
+import ANGULAR_UI_BOOTSTRAP, { IModalService } from 'angular-ui-bootstrap';
 import { IOracleLoadBalancer, ILoadBalancerDetails } from 'oracle/domain/IOracleLoadBalancer';
 import { sortBy } from 'lodash';
 import { OracleLoadBalancerController } from 'oracle/loadBalancer/configure/createLoadBalancer.controller';
@@ -167,7 +165,7 @@ export class OracleLoadBalancerDetailController implements IController {
 }
 
 export const ORACLE_LOAD_BALANCER_DETAIL_CONTROLLER = 'spinnaker.oracle.loadBalancerDetail.controller';
-module(ORACLE_LOAD_BALANCER_DETAIL_CONTROLLER, [
-  require('@uirouter/angularjs').default,
-  require('angular-ui-bootstrap'),
-]).controller('oracleLoadBalancerDetailCtrl', OracleLoadBalancerDetailController);
+module(ORACLE_LOAD_BALANCER_DETAIL_CONTROLLER, [UIROUTER_ANGULARJS, ANGULAR_UI_BOOTSTRAP as any]).controller(
+  'oracleLoadBalancerDetailCtrl',
+  OracleLoadBalancerDetailController,
+);

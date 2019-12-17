@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { cloneDeep } from 'lodash';
 import { StageConfigField } from 'core/pipeline/config/stages/common';
 import { IArtifact, IArtifactEditorProps } from 'core/domain';
@@ -25,7 +25,7 @@ export const singleFieldArtifactEditor = (
             value={this.props.artifact[fieldKey] || ''}
             onChange={(value: string) => {
               const clone = cloneDeep(this.props.artifact);
-              clone[fieldKey] = value;
+              (clone[fieldKey] as any) = value;
               clone.type = type;
               this.props.onChange(clone);
             }}

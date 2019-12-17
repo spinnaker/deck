@@ -1,10 +1,13 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular
-  .module('spinnaker.serverGroup.configure.kubernetes.volumes', [])
-  .controller('kubernetesServerGroupVolumesController', [
+export const KUBERNETES_V1_SERVERGROUP_CONFIGURE_WIZARD_VOLUMES_CONTROLLER =
+  'spinnaker.serverGroup.configure.kubernetes.volumes';
+export const name = KUBERNETES_V1_SERVERGROUP_CONFIGURE_WIZARD_VOLUMES_CONTROLLER; // for backwards compatibility
+module(KUBERNETES_V1_SERVERGROUP_CONFIGURE_WIZARD_VOLUMES_CONTROLLER, []).controller(
+  'kubernetesServerGroupVolumesController',
+  [
     '$scope',
     function($scope) {
       this.volumeTypes = [
@@ -142,4 +145,5 @@ module.exports = angular
 
       this.prepVolumes();
     },
-  ]);
+  ],
+);

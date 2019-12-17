@@ -2,9 +2,11 @@
 
 import _ from 'lodash';
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular.module('spinnaker.dcos.serverGroup.transformer', []).factory('dcosServerGroupTransformer', [
+export const DCOS_SERVERGROUP_TRANSFORMER = 'spinnaker.dcos.serverGroup.transformer';
+export const name = DCOS_SERVERGROUP_TRANSFORMER; // for backwards compatibility
+module(DCOS_SERVERGROUP_TRANSFORMER, []).factory('dcosServerGroupTransformer', [
   '$q',
   function($q) {
     function normalizeServerGroup(serverGroup) {
@@ -13,7 +15,7 @@ module.exports = angular.module('spinnaker.dcos.serverGroup.transformer', []).fa
 
     function convertServerGroupCommandToDeployConfiguration(base) {
       // use _.defaults to avoid copying the backingData, which is huge and expensive to copy over
-      var command = _.defaults({ backingData: [], viewState: [] }, base);
+      const command = _.defaults({ backingData: [], viewState: [] }, base);
       if (base.viewState.mode !== 'clone') {
         delete command.source;
       }

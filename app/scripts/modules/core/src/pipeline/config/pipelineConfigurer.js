@@ -1,12 +1,12 @@
 'use strict';
 
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 import { ViewStateCache } from 'core/cache';
 
 import { ReactModal } from 'core/presentation';
 
-const angular = require('angular');
+import * as angular from 'angular';
 
 import { OVERRIDE_REGISTRY } from 'core/overrideRegistry/override.registry';
 import { PIPELINE_CONFIG_ACTIONS } from 'core/pipeline/config/actions/pipelineConfigActions.module';
@@ -27,12 +27,10 @@ import { ShowPipelineTemplateJsonModal } from 'core/pipeline/config/actions/temp
 import { PipelineTemplateV2Service } from 'core/pipeline';
 import { PipelineTemplateWriter } from 'core/pipeline/config/templates/PipelineTemplateWriter';
 
-module.exports = angular
-  .module('spinnaker.core.pipeline.config.pipelineConfigurer', [
-    OVERRIDE_REGISTRY,
-    PIPELINE_CONFIG_ACTIONS,
-    EXECUTION_BUILD_TITLE,
-  ])
+export const CORE_PIPELINE_CONFIG_PIPELINECONFIGURER = 'spinnaker.core.pipeline.config.pipelineConfigurer';
+export const name = CORE_PIPELINE_CONFIG_PIPELINECONFIGURER; // for backwards compatibility
+angular
+  .module(CORE_PIPELINE_CONFIG_PIPELINECONFIGURER, [OVERRIDE_REGISTRY, PIPELINE_CONFIG_ACTIONS, EXECUTION_BUILD_TITLE])
   .directive('pipelineConfigurer', function() {
     return {
       restrict: 'E',
@@ -60,6 +58,13 @@ module.exports = angular
     'overrideRegistry',
     '$location',
     function($scope, $uibModal, $timeout, $window, $q, $state, executionService, overrideRegistry, $location) {
+      const ctrl = this;
+      const markDirty = () => {
+        if (!$scope.viewState.original) {
+          setOriginal($scope.pipeline);
+        }
+        this.setViewState({ isDirty: $scope.viewState.original !== angular.toJson($scope.pipeline) });
+      };
       // For standard pipelines, a 'renderablePipeline' is just the pipeline config.
       // For both v1 and v2 templated pipelines, a 'renderablePipeline' is the pipeline template plan, and '$scope.pipeline' is the template config.
       $scope.renderablePipeline = $scope.plan || $scope.pipeline;
@@ -77,7 +82,7 @@ module.exports = angular
         })
         .finally(() => this.setViewState({ loadingHistory: false }));
 
-      var configViewStateCache = ViewStateCache.get('pipelineConfig');
+      const configViewStateCache = ViewStateCache.get('pipelineConfig');
 
       function buildCacheKey() {
         return PipelineConfigService.buildViewStateCacheKey($scope.application.name, $scope.pipeline.id);
@@ -92,13 +97,13 @@ module.exports = angular
 
       $scope.viewState.loadingHistory = true;
 
-      let setOriginal = pipeline => {
+      const setOriginal = pipeline => {
         $scope.viewState.original = angular.toJson(pipeline);
         $scope.viewState.originalRenderablePipeline = angular.toJson($scope.renderablePipeline);
         this.updatePipeline();
       };
 
-      let getOriginal = () => angular.fromJson($scope.viewState.original);
+      const getOriginal = () => angular.fromJson($scope.viewState.original);
 
       const getOriginalRenderablePipeline = () => angular.fromJson($scope.viewState.originalRenderablePipeline);
 
@@ -138,7 +143,6 @@ module.exports = angular
           .catch(() => {});
       };
 
-      var ctrl = this;
       $scope.stageSortOptions = {
         axis: 'x',
         delay: 150,
@@ -148,21 +152,21 @@ module.exports = angular
           ui.placeholder.width(ui.helper.width()).height(ui.helper.height());
         },
         update: (e, ui) => {
-          var itemScope = ui.item.scope(),
-            currentPage = $scope.viewState.stageIndex,
-            startingPagePosition = itemScope.$index,
-            isCurrentPage = currentPage === startingPagePosition;
+          let itemScope = ui.item.scope();
+          const currentPage = $scope.viewState.stageIndex;
+          const startingPagePosition = itemScope.$index;
+          const isCurrentPage = currentPage === startingPagePosition;
 
           $timeout(() => {
             itemScope = ui.item.scope(); // this is terrible but provides a hook for mocking in tests
-            var newPagePosition = itemScope.$index;
+            const newPagePosition = itemScope.$index;
             if (isCurrentPage) {
               ctrl.navigateToStage(newPagePosition);
             } else {
-              var wasBefore = startingPagePosition < currentPage,
-                isBefore = newPagePosition <= currentPage;
+              const wasBefore = startingPagePosition < currentPage;
+              const isBefore = newPagePosition <= currentPage;
               if (wasBefore !== isBefore) {
-                var newCurrentPage = isBefore ? currentPage + 1 : currentPage - 1;
+                const newCurrentPage = isBefore ? currentPage + 1 : currentPage - 1;
                 ctrl.navigateToStage(newCurrentPage);
               }
             }
@@ -218,7 +222,7 @@ module.exports = angular
 
       function disableToggled(isDisabled) {
         $scope.pipeline.disabled = isDisabled;
-        let original = getOriginal();
+        const original = getOriginal();
         original.disabled = isDisabled;
         setOriginal(original);
       }
@@ -308,7 +312,7 @@ module.exports = angular
       };
 
       this.removeStage = stage => {
-        var stageIndex = $scope.renderablePipeline.stages.indexOf(stage);
+        const stageIndex = $scope.renderablePipeline.stages.indexOf(stage);
         $scope.renderablePipeline.stages.splice(stageIndex, 1);
         $scope.renderablePipeline.stages.forEach(test => {
           if (stage.refId && test.requisiteStageRefIds) {
@@ -395,7 +399,7 @@ module.exports = angular
       };
 
       this.getErrorMessage = errorMsg => {
-        var msg = 'There was an error saving your pipeline';
+        let msg = 'There was an error saving your pipeline';
         if (_.isString(errorMsg)) {
           msg += ': ' + errorMsg;
         }
@@ -447,7 +451,7 @@ module.exports = angular
 
           // if we were looking at a stage that no longer exists, move to the last stage
           if ($scope.viewState.section === 'stage') {
-            var lastStage = $scope.renderablePipeline.stages.length - 1;
+            const lastStage = $scope.renderablePipeline.stages.length - 1;
             if ($scope.viewState.stageIndex > lastStage) {
               this.setViewState({ stageIndex: lastStage });
             }
@@ -458,13 +462,6 @@ module.exports = angular
           $scope.viewState.revertCount++;
           $scope.$broadcast('pipeline-reverted');
         });
-      };
-
-      var markDirty = () => {
-        if (!$scope.viewState.original) {
-          setOriginal($scope.pipeline);
-        }
-        this.setViewState({ isDirty: $scope.viewState.original !== angular.toJson($scope.pipeline) });
       };
 
       // Poor bridge to update dirty flag when React stage field is updated
@@ -487,7 +484,7 @@ module.exports = angular
 
       const warningMessage = 'You have unsaved changes.\nAre you sure you want to navigate away from this page?';
 
-      var confirmPageLeave = $scope.$on('$stateChangeStart', event => {
+      const confirmPageLeave = $scope.$on('$stateChangeStart', event => {
         if ($scope.viewState.isDirty) {
           if (!$window.confirm(warningMessage)) {
             event.preventDefault();

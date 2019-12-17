@@ -1,11 +1,13 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { AuthenticationService, Registry } from '@spinnaker/core';
+import { TITUS_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER } from './bakeExecutionDetails.controller';
 
-module.exports = angular
-  .module('spinnaker.titus.pipeline.stage.titusBakeStage', [require('./bakeExecutionDetails.controller').name])
+export const TITUS_PIPELINE_STAGES_BAKE_TITUSBAKESTAGE = 'spinnaker.titus.pipeline.stage.titusBakeStage';
+export const name = TITUS_PIPELINE_STAGES_BAKE_TITUSBAKESTAGE; // for backwards compatibility
+module(TITUS_PIPELINE_STAGES_BAKE_TITUSBAKESTAGE, [TITUS_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'bake',
@@ -19,7 +21,7 @@ module.exports = angular
   .controller('titusBakeCtrl', [
     '$scope',
     function($scope) {
-      let stage = $scope.stage;
+      const stage = $scope.stage;
 
       if (!stage.user) {
         stage.user = AuthenticationService.getAuthenticatedUser().name;
@@ -74,7 +76,7 @@ module.exports = angular
           }
         }
 
-        let buildParams = $.param(stage.repository.buildParameters);
+        const buildParams = $.param(stage.repository.buildParameters);
         if (buildParams.length > 0) {
           url += '&' + decodeURIComponent(buildParams);
         }

@@ -1,14 +1,16 @@
 import { get } from 'lodash';
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
 ('use strict');
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular
-  .module('spinnaker.kubernetes.pipeline.stage.disableCluster.runJobExecutionDetails.controller', [
-    require('@uirouter/angularjs').default,
-  ])
-  .controller('kubernetesRunJobExecutionDetailsCtrl', [
+export const KUBERNETES_V1_PIPELINE_STAGES_RUNJOB_RUNJOBEXECUTIONDETAILS_CONTROLLER =
+  'spinnaker.kubernetes.pipeline.stage.disableCluster.runJobExecutionDetails.controller';
+export const name = KUBERNETES_V1_PIPELINE_STAGES_RUNJOB_RUNJOBEXECUTIONDETAILS_CONTROLLER; // for backwards compatibility
+module(KUBERNETES_V1_PIPELINE_STAGES_RUNJOB_RUNJOBEXECUTIONDETAILS_CONTROLLER, [UIROUTER_ANGULARJS]).controller(
+  'kubernetesRunJobExecutionDetailsCtrl',
+  [
     '$scope',
     '$stateParams',
     'executionService',
@@ -23,11 +25,11 @@ module.exports = angular
         $scope.stage.context.containers = [$scope.stage.context.container];
       }
 
-      let initialized = () => {
+      const initialized = () => {
         $scope.detailsSection = $stateParams.details;
       };
 
-      let initialize = () => executionDetailsSectionService.synchronizeSection($scope.configSections, initialized);
+      const initialize = () => executionDetailsSectionService.synchronizeSection($scope.configSections, initialized);
 
       initialize();
 
@@ -56,4 +58,5 @@ module.exports = angular
         }
       };
     },
-  ]);
+  ],
+);

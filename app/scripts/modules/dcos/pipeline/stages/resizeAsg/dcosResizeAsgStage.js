@@ -1,11 +1,12 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { AccountService, Registry, StageConstants } from '@spinnaker/core';
 
-module.exports = angular
-  .module('spinnaker.dcos.pipeline.stage.resizeAsgStage', [])
+export const DCOS_PIPELINE_STAGES_RESIZEASG_DCOSRESIZEASGSTAGE = 'spinnaker.dcos.pipeline.stage.resizeAsgStage';
+export const name = DCOS_PIPELINE_STAGES_RESIZEASG_DCOSRESIZEASGSTAGE; // for backwards compatibility
+module(DCOS_PIPELINE_STAGES_RESIZEASG_DCOSRESIZEASGSTAGE, [])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'resizeServerGroup',
@@ -31,9 +32,9 @@ module.exports = angular
   .controller('dcosResizeAsgStageCtrl', [
     '$scope',
     function($scope) {
-      var ctrl = this;
+      const ctrl = this;
 
-      let stage = $scope.stage;
+      const stage = $scope.stage;
 
       $scope.viewState = {
         accountsLoaded: false,

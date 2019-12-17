@@ -1,12 +1,15 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { SERVER_GROUP_WRITER, TaskMonitor } from '@spinnaker/core';
 
-module.exports = angular
-  .module('spinnaker.ecs.serverGroup.details.rollback.controller', [SERVER_GROUP_WRITER])
-  .controller('ecsRollbackServerGroupCtrl', [
+export const ECS_SERVERGROUP_DETAILS_ROLLBACK_ROLLBACKSERVERGROUP_CONTROLLER =
+  'spinnaker.ecs.serverGroup.details.rollback.controller';
+export const name = ECS_SERVERGROUP_DETAILS_ROLLBACK_ROLLBACKSERVERGROUP_CONTROLLER; // for backwards compatibility
+module(ECS_SERVERGROUP_DETAILS_ROLLBACK_ROLLBACKSERVERGROUP_CONTROLLER, [SERVER_GROUP_WRITER]).controller(
+  'ecsRollbackServerGroupCtrl',
+  [
     '$scope',
     '$uibModalInstance',
     'serverGroupWriter',
@@ -44,7 +47,7 @@ module.exports = angular
       }
 
       this.isValid = function() {
-        var command = $scope.command;
+        const command = $scope.command;
         if (!$scope.verification.verified) {
           return false;
         }
@@ -63,7 +66,7 @@ module.exports = angular
           return;
         }
 
-        var submitMethod = function() {
+        const submitMethod = function() {
           return serverGroupWriter.rollbackServerGroup(serverGroup, application, $scope.command);
         };
 
@@ -90,4 +93,5 @@ module.exports = angular
         return serverGroup.isDisabled ? 'Disabled Server Groups' : 'Enabled Server Groups';
       };
     },
-  ]);
+  ],
+);

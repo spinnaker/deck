@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { isEqual, orderBy } from 'lodash';
 
 import { ILoadBalancer, IServerGroup } from 'core/domain';
@@ -16,7 +16,10 @@ export interface ILoadBalancerClusterContainerProps {
 export class LoadBalancerClusterContainer extends React.Component<ILoadBalancerClusterContainerProps> {
   public shouldComponentUpdate(nextProps: ILoadBalancerClusterContainerProps) {
     const serverGroupsEqual = () =>
-      isEqual((nextProps.serverGroups || []).map(g => g.name), (this.props.serverGroups || []).map(g => g.name));
+      isEqual(
+        (nextProps.serverGroups || []).map(g => g.name),
+        (this.props.serverGroups || []).map(g => g.name),
+      );
     return (
       nextProps.showInstances !== this.props.showInstances ||
       nextProps.showServerGroups !== this.props.showServerGroups ||

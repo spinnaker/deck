@@ -1,5 +1,6 @@
 import 'jquery'; // ensures jQuery is loaded before Angular so Angular does not use jqlite
 import { module } from 'angular';
+import './strictDi';
 
 import { CORE_MODULE } from '@spinnaker/core';
 import { DOCKER_MODULE } from '@spinnaker/docker';
@@ -15,6 +16,7 @@ import { ECS_MODULE } from '@spinnaker/ecs';
 import '@spinnaker/cloudfoundry';
 import { AZURE_MODULE } from '@spinnaker/azure';
 import { HUAWEICLOUD_MODULE } from '@spinnaker/huaweicloud';
+import { DCOS_DCOS_MODULE } from './modules/dcos/dcos.module';
 
 module('netflix.spinnaker', [
   CORE_MODULE,
@@ -25,7 +27,7 @@ module('netflix.spinnaker', [
   KUBERNETES_V1_MODULE,
   DOCKER_MODULE,
   ORACLE_MODULE,
-  require('./modules/dcos/dcos.module').name,
+  DCOS_DCOS_MODULE,
   APPENGINE_MODULE,
   CANARY_MODULE,
   KUBERNETES_V2_MODULE,

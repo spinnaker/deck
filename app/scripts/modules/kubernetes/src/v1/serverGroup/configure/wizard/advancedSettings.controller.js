@@ -1,10 +1,13 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular
-  .module('spinnaker.serverGroup.configure.kubernetes.advancedSettings', [])
-  .controller('kubernetesServerGroupAdvancedSettingsController', [
+export const KUBERNETES_V1_SERVERGROUP_CONFIGURE_WIZARD_ADVANCEDSETTINGS_CONTROLLER =
+  'spinnaker.serverGroup.configure.kubernetes.advancedSettings';
+export const name = KUBERNETES_V1_SERVERGROUP_CONFIGURE_WIZARD_ADVANCEDSETTINGS_CONTROLLER; // for backwards compatibility
+module(KUBERNETES_V1_SERVERGROUP_CONFIGURE_WIZARD_ADVANCEDSETTINGS_CONTROLLER, []).controller(
+  'kubernetesServerGroupAdvancedSettingsController',
+  [
     '$scope',
     function($scope) {
       if (!$scope.command.dnsPolicy) {
@@ -18,4 +21,5 @@ module.exports = angular
         $scope.$applyAsync();
       };
     },
-  ]);
+  ],
+);

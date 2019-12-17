@@ -1,12 +1,14 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular.module('spinnaker.proxy.dcos.ui.service', []).factory('dcosProxyUiService', function() {
-  let apiPrefix = '#';
+export const DCOS_PROXY_UI_SERVICE = 'spinnaker.proxy.dcos.ui.service';
+export const name = DCOS_PROXY_UI_SERVICE; // for backwards compatibility
+module(DCOS_PROXY_UI_SERVICE, []).factory('dcosProxyUiService', function() {
+  const apiPrefix = '#';
 
   function buildLink(host, accountName, region, name, taskName = null) {
-    let regionParts = region != null ? region.replace('_', '/').split('/') : [];
+    const regionParts = region != null ? region.replace('_', '/').split('/') : [];
     let link = host + '/' + apiPrefix + '/services/overview/';
 
     if (regionParts.length > 1) {

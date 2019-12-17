@@ -1,17 +1,23 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 import _ from 'lodash';
 
 import { CONFIRMATION_MODAL_SERVICE, SECURITY_GROUP_READER, FirewallLabels } from '@spinnaker/core';
+import { AZURE_SECURITYGROUP_SECURITYGROUP_WRITE_SERVICE } from '../securityGroup.write.service';
+import { AZURE_SECURITYGROUP_CLONE_CLONESECURITYGROUP_CONTROLLER } from '../clone/cloneSecurityGroup.controller';
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
-module.exports = angular
-  .module('spinnaker.azure.securityGroup.azure.details.controller', [
-    require('@uirouter/angularjs').default,
+export const AZURE_SECURITYGROUP_DETAILS_SECURITYGROUPDETAIL_CONTROLLER =
+  'spinnaker.azure.securityGroup.azure.details.controller';
+export const name = AZURE_SECURITYGROUP_DETAILS_SECURITYGROUPDETAIL_CONTROLLER; // for backwards compatibility
+angular
+  .module(AZURE_SECURITYGROUP_DETAILS_SECURITYGROUPDETAIL_CONTROLLER, [
+    UIROUTER_ANGULARJS,
     SECURITY_GROUP_READER,
-    require('../securityGroup.write.service').name,
+    AZURE_SECURITYGROUP_SECURITYGROUP_WRITE_SERVICE,
     CONFIRMATION_MODAL_SERVICE,
-    require('../clone/cloneSecurityGroup.controller').name,
+    AZURE_SECURITYGROUP_CLONE_CLONESECURITYGROUP_CONTROLLER,
   ])
   .controller('azureSecurityGroupDetailsCtrl', [
     '$scope',
@@ -100,7 +106,7 @@ module.exports = angular
           controller: 'azureCloneSecurityGroupController as ctrl',
           resolve: {
             securityGroup: function() {
-              var securityGroup = angular.copy($scope.securityGroup);
+              const securityGroup = angular.copy($scope.securityGroup);
               if (securityGroup.region) {
                 securityGroup.regions = [securityGroup.region];
               }
@@ -114,12 +120,12 @@ module.exports = angular
       };
 
       this.deleteSecurityGroup = function deleteSecurityGroup() {
-        var taskMonitor = {
+        const taskMonitor = {
           application: application,
           title: 'Deleting ' + securityGroup.name,
         };
 
-        var submitMethod = function() {
+        const submitMethod = function() {
           $scope.securityGroup.type = 'deleteSecurityGroup';
           return azureSecurityGroupWriter.deleteSecurityGroup(securityGroup, application, {
             cloudProvider: 'azure',

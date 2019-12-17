@@ -1,12 +1,15 @@
 'use strict';
 
-import * as _ from 'lodash';
+import _ from 'lodash';
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular
-  .module('spinnaker.deck.gce.httpLoadBalancer.basicSettings.component', [])
-  .component('gceHttpLoadBalancerBasicSettings', {
+export const GOOGLE_LOADBALANCER_CONFIGURE_HTTP_BASICSETTINGS_BASICSETTINGS_COMPONENT =
+  'spinnaker.deck.gce.httpLoadBalancer.basicSettings.component';
+export const name = GOOGLE_LOADBALANCER_CONFIGURE_HTTP_BASICSETTINGS_BASICSETTINGS_COMPONENT; // for backwards compatibility
+module(GOOGLE_LOADBALANCER_CONFIGURE_HTTP_BASICSETTINGS_BASICSETTINGS_COMPONENT, []).component(
+  'gceHttpLoadBalancerBasicSettings',
+  {
     bindings: {
       command: '=',
       application: '=',
@@ -38,4 +41,5 @@ module.exports = angular
 
       this.existingLoadBalancerNames = _.get(loadBalancerMap, [this.loadBalancer.credentials, 'urlMapNames']) || [];
     },
-  });
+  },
+);

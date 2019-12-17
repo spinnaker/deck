@@ -22,7 +22,7 @@ export class FilterModelService {
     filterModel.clearFilters = () => {
       filterModelConfig.forEach(function(property) {
         if (!property.displayOption) {
-          filterModel.sortFilter[property.model] = property.clearValue;
+          (filterModel.sortFilter[property.model] as any) = property.clearValue;
         }
       });
     };
@@ -56,16 +56,13 @@ export class FilterModelService {
 
     const iFilterConfigs = filterModel.config;
 
-    return iFilterConfigs.reduce(
-      (acc, filter) => {
-        const valueIfNil = filterTypeDefaults[filter.type];
-        const rawValue = params[filter.param];
-        const paramValue = isNil(rawValue) ? valueIfNil : rawValue;
-        // Clone deep so angularjs mutations happen on a different object reference
-        return { ...acc, [filter.model]: cloneDeep(paramValue) };
-      },
-      {} as any,
-    );
+    return iFilterConfigs.reduce((acc, filter) => {
+      const valueIfNil = filterTypeDefaults[filter.type];
+      const rawValue = params[filter.param];
+      const paramValue = isNil(rawValue) ? valueIfNil : rawValue;
+      // Clone deep so angularjs mutations happen on a different object reference
+      return { ...acc, [filter.model]: cloneDeep(paramValue) };
+    }, {} as any);
   }
 
   public static registerRouterHooks(filterModel: IFilterModel, stateGlob: string) {
@@ -235,7 +232,7 @@ export class FilterModelService {
           label,
           value: translator[modelVal as string] || modelVal,
           clear() {
-            model.sortFilter[key] = clearValue;
+            (model.sortFilter[key] as any) = clearValue;
             model.applyParamsToUrl();
           },
         });

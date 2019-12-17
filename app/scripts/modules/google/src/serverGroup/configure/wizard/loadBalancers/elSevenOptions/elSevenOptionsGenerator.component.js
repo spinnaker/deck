@@ -1,9 +1,15 @@
-'use strict';
+import { GOOGLE_SERVERGROUP_CONFIGURE_WIZARD_LOADBALANCERS_ELSEVENOPTIONS_BACKENDSERVICESELECTOR_COMPONENT } from './backendServiceSelector.component';
+('use strict');
 
-const angular = require('angular');
+import * as angular from 'angular';
 
-module.exports = angular
-  .module('spinnaker.deck.gce.elSevenOptionsGenerator.component', [require('./backendServiceSelector.component').name])
+export const GOOGLE_SERVERGROUP_CONFIGURE_WIZARD_LOADBALANCERS_ELSEVENOPTIONS_ELSEVENOPTIONSGENERATOR_COMPONENT =
+  'spinnaker.deck.gce.elSevenOptionsGenerator.component';
+export const name = GOOGLE_SERVERGROUP_CONFIGURE_WIZARD_LOADBALANCERS_ELSEVENOPTIONS_ELSEVENOPTIONSGENERATOR_COMPONENT; // for backwards compatibility
+angular
+  .module(GOOGLE_SERVERGROUP_CONFIGURE_WIZARD_LOADBALANCERS_ELSEVENOPTIONS_ELSEVENOPTIONSGENERATOR_COMPONENT, [
+    GOOGLE_SERVERGROUP_CONFIGURE_WIZARD_LOADBALANCERS_ELSEVENOPTIONS_BACKENDSERVICESELECTOR_COMPONENT,
+  ])
   .directive('gceElSevenOptionsGenerator', [
     '$compile',
     function($compile) {

@@ -1,6 +1,6 @@
-import * as React from 'react';
+import React from 'react';
 import { get } from 'lodash';
-import * as ReactGA from 'react-ga';
+import ReactGA from 'react-ga';
 import { Subscription } from 'rxjs';
 import { UISref } from '@uirouter/react';
 
@@ -156,11 +156,9 @@ export class SingleExecutionDetails extends React.Component<
 
     const defaultExecutionParams = { application: app.name, executionId: execution ? execution.id : '' };
     const executionParams = ReactInjector.$state.params.executionParams || defaultExecutionParams;
-    const isFromMPTV2Pipeline = PipelineTemplateV2Service.isV2PipelineConfig(get(
-      execution,
-      'pipelineConfig',
-      {},
-    ) as IPipeline);
+    const isFromMPTV2Pipeline = PipelineTemplateV2Service.isV2PipelineConfig(
+      get(execution, 'pipelineConfig', {}) as IPipeline,
+    );
     const showConfigButton = SETTINGS.feature.managedPipelineTemplatesV2UI || !isFromMPTV2Pipeline;
 
     return (

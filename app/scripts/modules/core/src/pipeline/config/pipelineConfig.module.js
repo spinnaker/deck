@@ -1,6 +1,6 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { CREATE_PIPELINE_COMPONENT } from './createPipeline.component';
 import { PIPELINE_GRAPH_COMPONENT } from './graph/pipeline.graph.component';
@@ -16,17 +16,26 @@ import './validation/upstreamVersionProvided.validator';
 import './validation/targetImpedance.validator';
 
 import './pipelineConfig.less';
+import { CORE_PIPELINE_CONFIG_STAGES_STAGE_MODULE } from './stages/stage.module';
+import { CORE_PIPELINE_CONFIG_STAGES_BASEPROVIDERSTAGE_BASEPROVIDERSTAGE } from './stages/baseProviderStage/baseProviderStage';
+import { CORE_PIPELINE_CONFIG_PARAMETERS_PIPELINE_MODULE } from './parameters/pipeline.module';
+import { CORE_PIPELINE_CONFIG_PIPELINECONFIG_CONTROLLER } from './pipelineConfig.controller';
+import { CORE_PIPELINE_CONFIG_PIPELINECONFIGVIEW } from './pipelineConfigView';
+import { CORE_PIPELINE_CONFIG_PIPELINECONFIGURER } from './pipelineConfigurer';
+import { CORE_PIPELINE_CONFIG_HEALTH_STAGEPLATFORMHEALTHOVERRIDE_DIRECTIVE } from './health/stagePlatformHealthOverride.directive';
 
-module.exports = angular.module('spinnaker.core.pipeline.config', [
+export const CORE_PIPELINE_CONFIG_PIPELINECONFIG_MODULE = 'spinnaker.core.pipeline.config';
+export const name = CORE_PIPELINE_CONFIG_PIPELINECONFIG_MODULE; // for backwards compatibility
+module(CORE_PIPELINE_CONFIG_PIPELINECONFIG_MODULE, [
   CREATE_PIPELINE_COMPONENT,
   PIPELINE_GRAPH_COMPONENT,
-  require('./stages/stage.module').name,
-  require('./stages/baseProviderStage/baseProviderStage').name,
+  CORE_PIPELINE_CONFIG_STAGES_STAGE_MODULE,
+  CORE_PIPELINE_CONFIG_STAGES_BASEPROVIDERSTAGE_BASEPROVIDERSTAGE,
   TRIGGERS,
-  require('./parameters/pipeline.module').name,
-  require('./pipelineConfig.controller').name,
-  require('./pipelineConfigView').name,
-  require('./pipelineConfigurer').name,
+  CORE_PIPELINE_CONFIG_PARAMETERS_PIPELINE_MODULE,
+  CORE_PIPELINE_CONFIG_PIPELINECONFIG_CONTROLLER,
+  CORE_PIPELINE_CONFIG_PIPELINECONFIGVIEW,
+  CORE_PIPELINE_CONFIG_PIPELINECONFIGURER,
   TARGET_SELECT_COMPONENT,
-  require('./health/stagePlatformHealthOverride.directive').name,
+  CORE_PIPELINE_CONFIG_HEALTH_STAGEPLATFORMHEALTHOVERRIDE_DIRECTIVE,
 ]);

@@ -1,12 +1,16 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { SETTINGS } from '@spinnaker/core';
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
-module.exports = angular
-  .module('spinnaker.gce.pipeline.stage.bake.executionDetails.controller', [require('@uirouter/angularjs').default])
-  .controller('gceBakeExecutionDetailsCtrl', [
+export const GOOGLE_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER =
+  'spinnaker.gce.pipeline.stage.bake.executionDetails.controller';
+export const name = GOOGLE_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER; // for backwards compatibility
+module(GOOGLE_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER, [UIROUTER_ANGULARJS]).controller(
+  'gceBakeExecutionDetailsCtrl',
+  [
     '$scope',
     '$stateParams',
     'executionDetailsSectionService',
@@ -32,4 +36,5 @@ module.exports = angular
 
       $scope.$on('$stateChangeSuccess', initialize);
     },
-  ]);
+  ],
+);

@@ -1,13 +1,15 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 import _ from 'lodash';
 
-module.exports = angular.module('spinnaker.azure.instanceType.service', []).factory('azureInstanceTypeService', [
+export const AZURE_INSTANCE_AZUREINSTANCETYPE_SERVICE = 'spinnaker.azure.instanceType.service';
+export const name = AZURE_INSTANCE_AZUREINSTANCETYPE_SERVICE; // for backwards compatibility
+module(AZURE_INSTANCE_AZUREINSTANCETYPE_SERVICE, []).factory('azureInstanceTypeService', [
   '$http',
   '$q',
   function($http, $q) {
-    var B = {
+    const B = {
       type: 'B-series',
       description:
         'The B-series burstable VMs are ideal for workloads that do not need the full performance of the CPU continuously, like web servers, small databases and development and test environments.',
@@ -92,7 +94,7 @@ module.exports = angular.module('spinnaker.azure.instanceType.service', []).fact
       ],
     };
 
-    var DSV3 = {
+    const DSV3 = {
       type: 'Dsv3-series',
       description:
         'The Dsv3-series sizes offer a combination of vCPU, memory, and temporary storage for most production workloads.',
@@ -166,7 +168,7 @@ module.exports = angular.module('spinnaker.azure.instanceType.service', []).fact
       ],
     };
 
-    var DV3 = {
+    const DV3 = {
       type: 'Dv3-series',
       description:
         'The Dv3-series sizes offer a combination of vCPU, memory, and temporary storage for most production workloads.',
@@ -240,7 +242,7 @@ module.exports = angular.module('spinnaker.azure.instanceType.service', []).fact
       ],
     };
 
-    var DSV2 = {
+    const DSV2 = {
       type: 'DSv2-series',
       description: '',
       instanceTypes: [
@@ -357,7 +359,7 @@ module.exports = angular.module('spinnaker.azure.instanceType.service', []).fact
       ],
     };
 
-    var DV2 = {
+    const DV2 = {
       type: 'Dv2-series',
       description: '',
       instanceTypes: [
@@ -474,7 +476,7 @@ module.exports = angular.module('spinnaker.azure.instanceType.service', []).fact
       ],
     };
 
-    var AV2 = {
+    const AV2 = {
       type: 'Av2-series',
       description: '',
       instanceTypes: [
@@ -558,7 +560,7 @@ module.exports = angular.module('spinnaker.azure.instanceType.service', []).fact
       ],
     };
 
-    var DC = {
+    const DC = {
       type: 'DC-series',
       description: '',
       instanceTypes: [
@@ -587,7 +589,7 @@ module.exports = angular.module('spinnaker.azure.instanceType.service', []).fact
       ],
     };
 
-    var FSV2 = {
+    const FSV2 = {
       type: 'Fsv2-series',
       description: '',
       instanceTypes: [
@@ -643,7 +645,7 @@ module.exports = angular.module('spinnaker.azure.instanceType.service', []).fact
       ],
     };
 
-    var FS = {
+    const FS = {
       type: 'Fs-series',
       description: '',
       instanceTypes: [
@@ -685,7 +687,7 @@ module.exports = angular.module('spinnaker.azure.instanceType.service', []).fact
       ],
     };
 
-    var F = {
+    const F = {
       type: 'F-series',
       description: '',
       instanceTypes: [
@@ -727,7 +729,7 @@ module.exports = angular.module('spinnaker.azure.instanceType.service', []).fact
       ],
     };
 
-    var categories = [
+    const categories = [
       {
         type: 'general',
         label: 'General Purpose',
@@ -761,7 +763,7 @@ module.exports = angular.module('spinnaker.azure.instanceType.service', []).fact
     }
 
     function buildStats(category) {
-      var stats = {
+      const stats = {
         cpu: {
           min: Number.MAX_VALUE,
           max: -Number.MAX_VALUE,
@@ -780,12 +782,12 @@ module.exports = angular.module('spinnaker.azure.instanceType.service', []).fact
       if (category.families && category.families.length) {
         category.families.forEach(function(family) {
           stats.families.push(family.type);
-          var cpuMin = _.minBy(family.instanceTypes, 'cpu').cpu || Number.MAX_VALUE,
-            cpuMax = _.maxBy(family.instanceTypes, 'cpu').cpu || -Number.MAX_VALUE,
-            memoryMin = _.minBy(family.instanceTypes, 'memory').memory || Number.MAX_VALUE,
-            memoryMax = _.maxBy(family.instanceTypes, 'memory').memory || -Number.MAX_VALUE,
-            storageMin = calculateStorage(_.minBy(family.instanceTypes, calculateStorage)) || Number.MAX_VALUE,
-            storageMax = calculateStorage(_.maxBy(family.instanceTypes, calculateStorage)) || -Number.MAX_VALUE;
+          const cpuMin = _.minBy(family.instanceTypes, 'cpu').cpu || Number.MAX_VALUE;
+          const cpuMax = _.maxBy(family.instanceTypes, 'cpu').cpu || -Number.MAX_VALUE;
+          const memoryMin = _.minBy(family.instanceTypes, 'memory').memory || Number.MAX_VALUE;
+          const memoryMax = _.maxBy(family.instanceTypes, 'memory').memory || -Number.MAX_VALUE;
+          const storageMin = calculateStorage(_.minBy(family.instanceTypes, calculateStorage)) || Number.MAX_VALUE;
+          const storageMax = calculateStorage(_.maxBy(family.instanceTypes, calculateStorage)) || -Number.MAX_VALUE;
 
           stats.cpu.min = Math.min(stats.cpu.min, cpuMin);
           stats.cpu.max = Math.max(stats.cpu.max, cpuMax);
@@ -801,8 +803,8 @@ module.exports = angular.module('spinnaker.azure.instanceType.service', []).fact
 
     function getCategories() {
       categories.map(function(category) {
-        for (let family of category.families) {
-          for (let inst of family.instanceTypes) {
+        for (const family of category.families) {
+          for (const inst of family.instanceTypes) {
             if (inst.costFactor == undefined) inst.costFactor = 0;
           }
         }
@@ -811,7 +813,7 @@ module.exports = angular.module('spinnaker.azure.instanceType.service', []).fact
       return $q.when(categories);
     }
 
-    var getAllTypesByRegion = function getAllTypesByRegion() {
+    const getAllTypesByRegion = function getAllTypesByRegion() {
       return getCategories();
     };
 

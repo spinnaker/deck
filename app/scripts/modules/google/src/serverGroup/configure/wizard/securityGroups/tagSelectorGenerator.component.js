@@ -1,11 +1,16 @@
-'use strict';
+import { GOOGLE_SERVERGROUP_CONFIGURE_WIZARD_SECURITYGROUPS_TAGSELECTOR_COMPONENT } from './tagSelector.component';
+import { GOOGLE_SERVERGROUP_CONFIGURE_WIZARD_SECURITYGROUPS_TAGMANAGER_SERVICE } from './tagManager.service';
+('use strict');
 
-const angular = require('angular');
+import * as angular from 'angular';
 
-module.exports = angular
-  .module('spinnaker.deck.gce.tagSelectorGenerator.component', [
-    require('./tagSelector.component').name,
-    require('./tagManager.service').name,
+export const GOOGLE_SERVERGROUP_CONFIGURE_WIZARD_SECURITYGROUPS_TAGSELECTORGENERATOR_COMPONENT =
+  'spinnaker.deck.gce.tagSelectorGenerator.component';
+export const name = GOOGLE_SERVERGROUP_CONFIGURE_WIZARD_SECURITYGROUPS_TAGSELECTORGENERATOR_COMPONENT; // for backwards compatibility
+angular
+  .module(GOOGLE_SERVERGROUP_CONFIGURE_WIZARD_SECURITYGROUPS_TAGSELECTORGENERATOR_COMPONENT, [
+    GOOGLE_SERVERGROUP_CONFIGURE_WIZARD_SECURITYGROUPS_TAGSELECTOR_COMPONENT,
+    GOOGLE_SERVERGROUP_CONFIGURE_WIZARD_SECURITYGROUPS_TAGMANAGER_SERVICE,
   ])
   .directive('gceTagSelectorGenerator', [
     '$compile',

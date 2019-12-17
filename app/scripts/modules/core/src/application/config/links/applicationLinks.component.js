@@ -1,17 +1,22 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 import _ from 'lodash';
 
 import { SETTINGS } from 'core/config/settings';
 import { CONFIG_SECTION_FOOTER } from '../footer/configSectionFooter.component';
 
 import './applicationLinks.component.less';
+import { CORE_APPLICATION_CONFIG_LINKS_EDITLINKS_MODAL_CONTROLLER } from './editLinks.modal.controller';
+import ANGULAR_UI_BOOTSTRAP from 'angular-ui-bootstrap';
 
-module.exports = angular
-  .module('spinnaker.core.application.config.applicationLinks.component', [
-    require('./editLinks.modal.controller').name,
-    require('angular-ui-bootstrap'),
+export const CORE_APPLICATION_CONFIG_LINKS_APPLICATIONLINKS_COMPONENT =
+  'spinnaker.core.application.config.applicationLinks.component';
+export const name = CORE_APPLICATION_CONFIG_LINKS_APPLICATIONLINKS_COMPONENT; // for backwards compatibility
+angular
+  .module(CORE_APPLICATION_CONFIG_LINKS_APPLICATIONLINKS_COMPONENT, [
+    CORE_APPLICATION_CONFIG_LINKS_EDITLINKS_MODAL_CONTROLLER,
+    ANGULAR_UI_BOOTSTRAP,
     CONFIG_SECTION_FOOTER,
   ])
   .component('applicationLinks', {
@@ -22,7 +27,7 @@ module.exports = angular
     controller: [
       '$uibModal',
       function($uibModal) {
-        let initialize = () => {
+        const initialize = () => {
           if (this.application.notFound || this.application.hasError) {
             return;
           }
@@ -74,7 +79,7 @@ module.exports = angular
         };
 
         this.addSection = () => {
-          let section = { title: '', links: [] };
+          const section = { title: '', links: [] };
           this.sections.push(section);
           this.addLink(section);
         };

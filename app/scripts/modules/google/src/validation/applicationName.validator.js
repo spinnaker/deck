@@ -1,11 +1,12 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { ApplicationNameValidator, FirewallLabels } from '@spinnaker/core';
 
-module.exports = angular
-  .module('spinnaker.gce.validation.applicationName', [])
+export const GOOGLE_VALIDATION_APPLICATIONNAME_VALIDATOR = 'spinnaker.gce.validation.applicationName';
+export const name = GOOGLE_VALIDATION_APPLICATIONNAME_VALIDATOR; // for backwards compatibility
+module(GOOGLE_VALIDATION_APPLICATIONNAME_VALIDATOR, [])
   .factory('gceApplicationNameValidator', function() {
     function validateSpecialCharacters(name, errors) {
       const pattern = /^([a-zA-Z][a-zA-Z0-9]*)?$/;
@@ -46,7 +47,7 @@ module.exports = angular
               'Google load balancers.',
           );
         } else {
-          let remaining = maxLengthForLoadBalancers - 2 - name.length;
+          const remaining = maxLengthForLoadBalancers - 2 - name.length;
           warnings.push(`If you plan to include a stack or detail field for Google load balancers, you will only
             have ~${remaining} characters to do so.`);
         }
@@ -63,7 +64,7 @@ module.exports = angular
               'Google server groups.',
           );
         } else {
-          let remaining = maxLengthForServerGroups - 2 - name.length;
+          const remaining = maxLengthForServerGroups - 2 - name.length;
           warnings.push(`If you plan to include a stack or detail field for Google server groups, you will only
             have ~${remaining} characters to do so.`);
         }
@@ -77,7 +78,7 @@ module.exports = angular
             )}.`,
           );
         } else {
-          let remaining = maxResourceNameLength - 2 - name.length;
+          const remaining = maxResourceNameLength - 2 - name.length;
           warnings.push(`If you plan to include a stack or detail field for Google ${FirewallLabels.get(
             'firewalls',
           )}, you will only
@@ -87,8 +88,8 @@ module.exports = angular
     }
 
     function validate(name) {
-      const warnings = [],
-        errors = [];
+      const warnings = [];
+      const errors = [];
 
       if (name && name.length) {
         validateSpecialCharacters(name, errors);

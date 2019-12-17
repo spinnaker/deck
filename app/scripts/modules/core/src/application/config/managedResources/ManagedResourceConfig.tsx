@@ -1,14 +1,13 @@
-import * as React from 'react';
+import React from 'react';
 import { module } from 'angular';
 import { react2angular } from 'react2angular';
-import * as ReactGA from 'react-ga';
-import * as classNames from 'classnames';
+import ReactGA from 'react-ga';
+import classNames from 'classnames';
 
 import { NgReact } from 'core/reactShims';
 import { Application } from 'core/application';
-import { useData, ValidationMessage } from 'core/presentation';
-import { Spinner } from 'core/widgets';
-import { ManagedReader, ManagedWriter } from 'core/managed';
+import { ValidationMessage, useLatestCallback } from 'core/presentation';
+import { ManagedWriter } from 'core/managed';
 
 import './ManagedResourceConfig.less';
 
@@ -58,13 +57,12 @@ const getManagementStatus = (paused: boolean) => {
 const ManagedResourceConfig = ({ application }: IManagedResourceConfigProps) => {
   const [pausePending, setPausePending] = useState(false);
   const [pauseFailed, setPauseFailed] = useState(false);
-  const [paused, setPaused] = useState(false);
-  const { status: vetoStatus, result: vetos, refresh } = useData(() => ManagedReader.getApplicationVetos(), [], []);
+  const [paused, setPaused] = useState(application.isManagementPaused);
 
-  const isRejected = vetos && vetos.includes(application.name);
-  useEffect(() => {
-    setPaused(isRejected);
-  }, [isRejected]);
+  const onRefresh = useLatestCallback(() => {
+    setPaused(application.isManagementPaused);
+  });
+  useEffect(() => application.managedResources.onRefresh(null, onRefresh), [application]);
 
   const pauseManagement = () => {
     setPausePending(true);
@@ -72,7 +70,10 @@ const ManagedResourceConfig = ({ application }: IManagedResourceConfigProps) => 
     logClick('Pause Management', application.name);
 
     ManagedWriter.pauseResourceManagement(application.name)
-      .then(() => setPaused(true))
+      .then(() => {
+        setPaused(true);
+        application.managedResources.refresh();
+      })
       .catch(() => setPauseFailed(true))
       .finally(() => setPausePending(false));
   };
@@ -83,23 +84,13 @@ const ManagedResourceConfig = ({ application }: IManagedResourceConfigProps) => 
     logClick('Resume Management', application.name);
 
     ManagedWriter.resumeResourceManagement(application.name)
-      .then(() => setPaused(false))
+      .then(() => {
+        setPaused(false);
+        application.managedResources.refresh();
+      })
       .catch(() => setPauseFailed(true))
       .finally(() => setPausePending(false));
   };
-
-  if (['NONE', 'PENDING'].includes(vetoStatus)) {
-    return <Spinner size="medium" />;
-  } else if (vetoStatus === 'REJECTED') {
-    return (
-      <div className="alert alert-danger">
-        Something went wrong.{' '}
-        <button className="btn btn-link" onClick={refresh}>
-          Try again
-        </button>
-      </div>
-    );
-  }
 
   const iconClass = paused ? 'fa-play' : 'fa-pause';
 

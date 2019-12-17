@@ -7,10 +7,12 @@ import { Registry } from 'core/registry';
 import { SERVER_GROUP_COMMAND_BUILDER_SERVICE } from 'core/serverGroup/configure/common/serverGroupCommandBuilder.service';
 import { StageConstants } from 'core/pipeline/config/stages/stageConstants';
 
-const angular = require('angular');
+import * as angular from 'angular';
 
-module.exports = angular
-  .module('spinnaker.core.pipeline.stage.deployStage', [SERVER_GROUP_COMMAND_BUILDER_SERVICE, CLUSTER_SERVICE])
+export const CORE_PIPELINE_CONFIG_STAGES_DEPLOY_DEPLOYSTAGE = 'spinnaker.core.pipeline.stage.deployStage';
+export const name = CORE_PIPELINE_CONFIG_STAGES_DEPLOY_DEPLOYSTAGE; // for backwards compatibility
+angular
+  .module(CORE_PIPELINE_CONFIG_STAGES_DEPLOY_DEPLOYSTAGE, [SERVER_GROUP_COMMAND_BUILDER_SERVICE, CLUSTER_SERVICE])
   .config([
     'clusterServiceProvider',
     function(clusterServiceProvider) {
@@ -78,9 +80,9 @@ module.exports = angular
         if (cluster.region) {
           return cluster.region;
         }
-        var availabilityZones = cluster.availabilityZones;
+        const availabilityZones = cluster.availabilityZones;
         if (availabilityZones) {
-          var regions = Object.keys(availabilityZones);
+          const regions = Object.keys(availabilityZones);
           if (regions && regions.length) {
             return regions[0];
           }
@@ -90,7 +92,7 @@ module.exports = angular
 
       this.hasSubnetDeployments = () => {
         return stage.clusters.some(cluster => {
-          let cloudProvider = cluster.cloudProvider || cluster.provider || cluster.providerType || 'aws';
+          const cloudProvider = cluster.cloudProvider || cluster.provider || cluster.providerType || 'aws';
           return CloudProviderRegistry.hasValue(cloudProvider, 'subnet');
         });
       };
@@ -102,9 +104,9 @@ module.exports = angular
       };
 
       this.getSubnet = cluster => {
-        let cloudProvider = cluster.cloudProvider || cluster.provider || cluster.providerType || 'aws';
+        const cloudProvider = cluster.cloudProvider || cluster.provider || cluster.providerType || 'aws';
         if (CloudProviderRegistry.hasValue(cloudProvider, 'subnet')) {
-          let subnetRenderer = CloudProviderRegistry.getValue(cloudProvider, 'subnet').renderer;
+          const subnetRenderer = CloudProviderRegistry.getValue(cloudProvider, 'subnet').renderer;
           if ($injector.has(subnetRenderer)) {
             return $injector.get(subnetRenderer).render(cluster);
           } else {
@@ -162,7 +164,7 @@ module.exports = angular
 
       this.editCluster = function(cluster, index) {
         cluster.provider = cluster.cloudProvider || cluster.providerType || 'aws';
-        let providerConfig = CloudProviderRegistry.getProvider(cluster.provider);
+        const providerConfig = CloudProviderRegistry.getProvider(cluster.provider);
 
         const handleResult = function(command) {
           const stageCluster = serverGroupTransformer.convertServerGroupCommandToDeployConfiguration(command);

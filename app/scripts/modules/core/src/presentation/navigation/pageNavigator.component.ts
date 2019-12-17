@@ -28,7 +28,10 @@ class PageNavigatorController implements IController {
     PageNavigationState.reset();
     this.container = this.$element.closest(this.scrollableContainer);
     if (isFunction(this.container.bind) && !this.hideNavigation) {
-      this.container.bind(this.getEventKey(), throttle(() => this.handleScroll(), 20));
+      this.container.bind(
+        this.getEventKey(),
+        throttle(() => this.handleScroll(), 20),
+      );
     }
     this.navigator = this.$element.find('.page-navigation');
     if (this.deepLinkParam && this.$stateParams[this.deepLinkParam]) {
@@ -51,8 +54,8 @@ class PageNavigatorController implements IController {
   }
 
   private handleScroll(): void {
-    const navigatorRect = this.$element.get(0).getBoundingClientRect(),
-      scrollableContainerTop = this.container.get(0).getBoundingClientRect().top;
+    const navigatorRect = this.$element.get(0).getBoundingClientRect();
+    const scrollableContainerTop = this.container.get(0).getBoundingClientRect().top;
 
     const currentPage = PageNavigationState.pages.find(p => {
       const content = this.container.find(`[data-page-content=${p.key}]`);

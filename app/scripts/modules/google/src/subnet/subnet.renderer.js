@@ -1,11 +1,13 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 import _ from 'lodash';
 
 import { NetworkReader } from '@spinnaker/core';
 
-module.exports = angular.module('spinnaker.gce.subnet.renderer', []).factory('gceSubnetRenderer', function() {
+export const GOOGLE_SUBNET_SUBNET_RENDERER = 'spinnaker.gce.subnet.renderer';
+export const name = GOOGLE_SUBNET_SUBNET_RENDERER; // for backwards compatibility
+module(GOOGLE_SUBNET_SUBNET_RENDERER, []).factory('gceSubnetRenderer', function() {
   let gceNetworks;
 
   NetworkReader.listNetworksByProvider('gce').then(function(networks) {

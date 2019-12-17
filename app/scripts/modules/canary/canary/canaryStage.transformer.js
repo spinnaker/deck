@@ -1,16 +1,18 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 import _ from 'lodash';
 import { $log } from 'ngimport';
 
 import { OrchestratedItemTransformer } from '@spinnaker/core';
 
-module.exports = angular.module('spinnaker.canary.transformer', []).service('canaryStageTransformer', function() {
+export const CANARY_CANARY_CANARYSTAGE_TRANSFORMER = 'spinnaker.canary.transformer';
+export const name = CANARY_CANARY_CANARYSTAGE_TRANSFORMER; // for backwards compatibility
+module(CANARY_CANARY_CANARYSTAGE_TRANSFORMER, []).service('canaryStageTransformer', function() {
   // adds "canary" or "baseline" to the deploy stage name when converting it to a task
   function getDeployTaskName(stage) {
     if (stage.context.freeFormDetails) {
-      var nameParts = stage.name.split(' ');
+      const nameParts = stage.name.split(' ');
       if (_.endsWith(stage.context.freeFormDetails, 'canary')) {
         nameParts.splice(1, 0, 'canary');
       } else {
@@ -24,13 +26,13 @@ module.exports = angular.module('spinnaker.canary.transformer', []).service('can
   function getException(stage) {
     OrchestratedItemTransformer.defineProperties(stage);
     if (stage.isFailed && _.has(stage, 'context.canary.canaryResult')) {
-      let result = stage.context.canary.canaryResult;
+      const result = stage.context.canary.canaryResult;
       if (result.overallResult === 'FAILURE' && result.message) {
         return `Canary terminated by user. Reason: ${result.message}`;
       }
     }
 
-    let exception = stage.context.exception;
+    const exception = stage.context.exception;
     if (exception && exception.details && exception.details.errors && exception.details.errors.length) {
       return exception.details.errors.join(', ');
     }
@@ -40,8 +42,8 @@ module.exports = angular.module('spinnaker.canary.transformer', []).service('can
 
   function buildCanaryDeploymentsFromClusterPairs(stage) {
     return _.map(stage.context.clusterPairs, function(pair) {
-      var name = function(cluster) {
-        var parts = [cluster.application];
+      const name = function(cluster) {
+        const parts = [cluster.application];
         if (cluster.stack) {
           parts.push(cluster.stack);
         } else if (cluster.freeFormDetails) {
@@ -52,7 +54,7 @@ module.exports = angular.module('spinnaker.canary.transformer', []).service('can
         }
         return parts.join('-');
       };
-      var region = function(cluster) {
+      const region = function(cluster) {
         return _.head(_.keys(cluster.availabilityZones));
       };
       return {
@@ -79,7 +81,7 @@ module.exports = angular.module('spinnaker.canary.transformer', []).service('can
   function extractBuild(cluster) {
     cluster.build = cluster.build || {};
     if (cluster.buildId) {
-      var parts = cluster.buildId.split('/');
+      const parts = cluster.buildId.split('/');
       parts.pop();
       cluster.build.url = cluster.buildId;
       cluster.build.number = parts.pop();
@@ -123,7 +125,7 @@ module.exports = angular.module('spinnaker.canary.transformer', []).service('can
   }
 
   this.transform = function(application, execution) {
-    var syntheticStagesToAdd = [];
+    const syntheticStagesToAdd = [];
     if (!execution.hydrated) {
       // don't bother trying to transform if it isn't hydrated
       return;
@@ -133,7 +135,7 @@ module.exports = angular.module('spinnaker.canary.transformer', []).service('can
         OrchestratedItemTransformer.defineProperties(stage);
         stage.exceptions = [];
 
-        var deployParent = _.find(execution.stages, {
+        const deployParent = _.find(execution.stages, {
           type: 'deployCanary',
           context: {
             canaryStageId: stage.id,
@@ -144,7 +146,7 @@ module.exports = angular.module('spinnaker.canary.transformer', []).service('can
           return;
         }
 
-        var monitorStage = _.find(execution.stages, {
+        const monitorStage = _.find(execution.stages, {
           type: 'monitorCanary',
           context: {
             canaryStageId: stage.id,
@@ -179,7 +181,7 @@ module.exports = angular.module('spinnaker.canary.transformer', []).service('can
         if (!stage.context.canary.canaryDeployments) {
           stage.context.canary.canaryDeployments = buildCanaryDeploymentsFromClusterPairs(stage);
         }
-        var status =
+        let status =
           monitorStage.status === 'CANCELED' || _.some(deployStages, { status: 'CANCELED' }) ? 'CANCELED' : 'UNKNOWN';
 
         if (monitorStage.status === 'STOPPED') {
@@ -195,7 +197,7 @@ module.exports = angular.module('spinnaker.canary.transformer', []).service('can
         if (_.some(deployStages, { status: 'SKIPPED' })) {
           status = 'SKIPPED';
         }
-        var canaryStatus = stage.context.canary.status;
+        const canaryStatus = stage.context.canary.status;
         if (canaryStatus && !['CANCELED', 'STOPPED'].includes(status)) {
           if (canaryStatus.status === 'LAUNCHED' || monitorStage.status === 'RUNNING') {
             status = 'RUNNING';
@@ -218,8 +220,8 @@ module.exports = angular.module('spinnaker.canary.transformer', []).service('can
         }
         stage.status = status;
 
-        var tasks = _.map(deployStages, function(deployStage) {
-          var region = _.head(_.keys(deployStage.context.availabilityZones));
+        const tasks = _.map(deployStages, function(deployStage) {
+          const region = _.head(_.keys(deployStage.context.availabilityZones));
           return {
             id: deployStage.id,
             region: region,
@@ -241,11 +243,11 @@ module.exports = angular.module('spinnaker.canary.transformer', []).service('can
 
         stage.tasks = tasks;
 
-        let deployments = stage.context.canary.canaryDeployments.filter(d => d.baselineCluster && d.canaryCluster);
+        const deployments = stage.context.canary.canaryDeployments.filter(d => d.baselineCluster && d.canaryCluster);
         deployments.forEach(function(deployment, deploymentIdx) {
           deployment.id = deployment.id || deploymentIdx;
 
-          var deployedClusterPair = _.find(monitorStage.context.deployedClusterPairs, {
+          const deployedClusterPair = _.find(monitorStage.context.deployedClusterPairs, {
             baselineCluster: {
               accountName: deployment.baselineCluster.accountName,
               name: deployment.baselineCluster.name,
@@ -258,8 +260,8 @@ module.exports = angular.module('spinnaker.canary.transformer', []).service('can
             },
           });
 
-          var deploymentEndTime = null;
-          var monitorTask = _.find(monitorStage.tasks, { name: 'monitorCanary' });
+          let deploymentEndTime = null;
+          const monitorTask = _.find(monitorStage.tasks, { name: 'monitorCanary' });
           if (monitorTask) {
             deploymentEndTime = monitorTask.endTime;
           }
@@ -270,7 +272,7 @@ module.exports = angular.module('spinnaker.canary.transformer', []).service('can
           deployment.canaryResult = deployment.canaryAnalysisResult || {};
           deployment.canaryCluster = deployment.canaryCluster || {};
 
-          var foundTask = _.find(stage.tasks, function(task) {
+          const foundTask = _.find(stage.tasks, function(task) {
             return (
               task.region === deployment.baselineCluster.region && task.commits !== undefined && task.commits.length > 0
             );
@@ -287,7 +289,7 @@ module.exports = angular.module('spinnaker.canary.transformer', []).service('can
             deployedClusterPair.canaryCluster &&
             application.serverGroups
           ) {
-            var canaryServerGroup = _.find(application.serverGroups.data, {
+            const canaryServerGroup = _.find(application.serverGroups.data, {
               name: deployedClusterPair.canaryCluster.serverGroup,
               account: deployedClusterPair.canaryCluster.accountName,
               region: deployedClusterPair.canaryCluster.region,
@@ -298,7 +300,7 @@ module.exports = angular.module('spinnaker.canary.transformer', []).service('can
               deployment.canaryCluster.capacity = 'n/a';
             }
 
-            var baselineServerGroup = _.find(application.serverGroups.data, {
+            const baselineServerGroup = _.find(application.serverGroups.data, {
               name: deployedClusterPair.baselineCluster.serverGroup,
               account: deployedClusterPair.baselineCluster.accountName,
               region: deployedClusterPair.baselineCluster.region,
@@ -313,7 +315,7 @@ module.exports = angular.module('spinnaker.canary.transformer', []).service('can
             deployment.canaryCluster.capacity = 'n/a';
           }
 
-          var canaryDeploymentId = deployment.canaryAnalysisResult
+          const canaryDeploymentId = deployment.canaryAnalysisResult
             ? deployment.canaryAnalysisResult.canaryDeploymentId
             : null;
           syntheticStagesToAdd.push(

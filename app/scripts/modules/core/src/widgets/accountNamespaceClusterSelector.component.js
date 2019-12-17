@@ -2,14 +2,17 @@
 
 import _ from 'lodash';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { AccountService } from 'core/account/AccountService';
 import { AppListExtractor } from 'core/application/listExtractor/AppListExtractor';
 
-module.exports = angular
-  .module('spinnaker.core.accountNamespaceClusterSelector.directive', [])
-  .directive('accountNamespaceClusterSelector', function() {
+export const CORE_WIDGETS_ACCOUNTNAMESPACECLUSTERSELECTOR_COMPONENT =
+  'spinnaker.core.accountNamespaceClusterSelector.directive';
+export const name = CORE_WIDGETS_ACCOUNTNAMESPACECLUSTERSELECTOR_COMPONENT; // for backwards compatibility
+module(CORE_WIDGETS_ACCOUNTNAMESPACECLUSTERSELECTOR_COMPONENT, []).directive(
+  'accountNamespaceClusterSelector',
+  function() {
     return {
       restrict: 'E',
       scope: {},
@@ -25,22 +28,22 @@ module.exports = angular
       controller: function controller() {
         this.clusterField = this.clusterField || 'cluster';
 
-        let vm = this;
+        const vm = this;
         let isTextInputForClusterFiled;
 
         let namespaces;
 
-        let setNamespaceList = () => {
-          let accountFilter = cluster => (cluster ? cluster.account === vm.component.credentials : true);
+        const setNamespaceList = () => {
+          const accountFilter = cluster => (cluster ? cluster.account === vm.component.credentials : true);
           // TODO(lwander): Move away from regions to namespaces here.
-          let namespaceList = AppListExtractor.getRegions([vm.application], accountFilter);
+          const namespaceList = AppListExtractor.getRegions([vm.application], accountFilter);
           vm.namespaces = namespaceList.length ? namespaceList : namespaces;
         };
 
-        let setClusterList = () => {
-          let namespaceField = vm.component.namespaces;
+        const setClusterList = () => {
+          const namespaceField = vm.component.namespaces;
           // TODO(lwander): Move away from regions to namespaces here.
-          let clusterFilter = AppListExtractor.clusterFilterForCredentialsAndRegion(
+          const clusterFilter = AppListExtractor.clusterFilterForCredentialsAndRegion(
             vm.component.credentials,
             namespaceField,
           );
@@ -54,12 +57,12 @@ module.exports = angular
           }
         };
 
-        let setToggledState = () => {
+        const setToggledState = () => {
           vm.namespaces = namespaces;
           isTextInputForClusterFiled = true;
         };
 
-        let setUnToggledState = () => {
+        const setUnToggledState = () => {
           vm.component[this.clusterField] = undefined;
           isTextInputForClusterFiled = false;
           setNamespaceList();
@@ -75,7 +78,7 @@ module.exports = angular
           setClusterList();
         };
 
-        let init = () => {
+        const init = () => {
           AccountService.getUniqueAttributeForAllAccounts(vm.component.cloudProviderType, 'namespaces')
             .then(allNamespaces => {
               namespaces = allNamespaces;
@@ -93,4 +96,5 @@ module.exports = angular
         init();
       },
     };
-  });
+  },
+);

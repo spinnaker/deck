@@ -1,8 +1,10 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular.module('spinnaker.canary.status.directive', []).directive('canaryStatus', function() {
+export const CANARY_CANARY_CANARYSTATUS_DIRECTIVE = 'spinnaker.canary.status.directive';
+export const name = CANARY_CANARY_CANARYSTATUS_DIRECTIVE; // for backwards compatibility
+module(CANARY_CANARY_CANARYSTATUS_DIRECTIVE, []).directive('canaryStatus', function() {
   return {
     restrict: 'E',
     scope: {

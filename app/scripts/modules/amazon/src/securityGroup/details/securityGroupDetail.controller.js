@@ -1,6 +1,6 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 import _ from 'lodash';
 
 import {
@@ -14,13 +14,18 @@ import {
 } from '@spinnaker/core';
 
 import { VpcReader } from '../../vpc/VpcReader';
+import { AMAZON_SECURITYGROUP_CLONE_CLONESECURITYGROUP_CONTROLLER } from '../clone/cloneSecurityGroup.controller';
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
-module.exports = angular
-  .module('spinnaker.amazon.securityGroup.details.controller', [
-    require('@uirouter/angularjs').default,
+export const AMAZON_SECURITYGROUP_DETAILS_SECURITYGROUPDETAIL_CONTROLLER =
+  'spinnaker.amazon.securityGroup.details.controller';
+export const name = AMAZON_SECURITYGROUP_DETAILS_SECURITYGROUPDETAIL_CONTROLLER; // for backwards compatibility
+angular
+  .module(AMAZON_SECURITYGROUP_DETAILS_SECURITYGROUPDETAIL_CONTROLLER, [
+    UIROUTER_ANGULARJS,
     SECURITY_GROUP_READER,
     CONFIRMATION_MODAL_SERVICE,
-    require('../clone/cloneSecurityGroup.controller').name,
+    AMAZON_SECURITYGROUP_CLONE_CLONESECURITYGROUP_CONTROLLER,
     MANAGED_RESOURCE_DETAILS_INDICATOR,
   ])
   .controller('awsSecurityGroupDetailsCtrl', [
@@ -83,7 +88,7 @@ module.exports = angular
       }
 
       function buildIpRulesModel(details) {
-        let groupedRangeRules = _.groupBy(details.ipRangeRules, rule => rule.range.ip + rule.range.cidr);
+        const groupedRangeRules = _.groupBy(details.ipRangeRules, rule => rule.range.ip + rule.range.cidr);
         return Object.keys(groupedRangeRules)
           .map(addr => {
             return {
@@ -95,7 +100,7 @@ module.exports = angular
       }
 
       function buildSecurityGroupRulesModel(details) {
-        let groupedRangeRules = _.groupBy(details.securityGroupRules, rule => rule.securityGroup.id);
+        const groupedRangeRules = _.groupBy(details.securityGroupRules, rule => rule.securityGroup.id);
         return Object.keys(groupedRangeRules)
           .map(addr => {
             return {
@@ -107,7 +112,7 @@ module.exports = angular
       }
 
       function buildRuleModel(groupedRangeRules, addr) {
-        let rules = [];
+        const rules = [];
         groupedRangeRules[addr].forEach(rule => {
           (rule.portRanges || []).forEach(range => {
             if (rule.protocol === '-1' || (range.startPort !== undefined && range.endPort !== undefined)) {
@@ -163,7 +168,7 @@ module.exports = angular
           size: 'lg',
           resolve: {
             securityGroup: function() {
-              var securityGroup = angular.copy($scope.securityGroup);
+              const securityGroup = angular.copy($scope.securityGroup);
               if (securityGroup.region) {
                 securityGroup.regions = [securityGroup.region];
               }

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { $q } from 'ngimport';
 import { SortableContainer, SortableElement, SortableHandle, arrayMove, SortEnd } from 'react-sortable-hoc';
 import { difference, flatten, get, some, uniq } from 'lodash';
@@ -45,15 +45,6 @@ export interface IALBListenersState {
 const DragHandle = SortableHandle(() => (
   <span className="pipeline-drag-handle clickable glyphicon glyphicon-resize-vertical" />
 ));
-export interface IAuthenticateOidcActionConfig {
-  authorizationEndpoint: string;
-  clientId: string;
-  issuer: string;
-  scope: string;
-  sessionCookieName: string;
-  tokenEndpoint: string;
-  userInfoEndpoint: string;
-}
 
 const defaultAuthAction = {
   authenticateOidcConfig: {

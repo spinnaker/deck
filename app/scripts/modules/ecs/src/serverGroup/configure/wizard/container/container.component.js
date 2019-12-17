@@ -1,10 +1,12 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 import { Observable, Subject } from 'rxjs';
 
-module.exports = angular
-  .module('spinnaker.ecs.serverGroup.configure.wizard.container.component', [])
+export const ECS_SERVERGROUP_CONFIGURE_WIZARD_CONTAINER_CONTAINER_COMPONENT =
+  'spinnaker.ecs.serverGroup.configure.wizard.container.component';
+export const name = ECS_SERVERGROUP_CONFIGURE_WIZARD_CONTAINER_CONTAINER_COMPONENT; // for backwards compatibility
+module(ECS_SERVERGROUP_CONFIGURE_WIZARD_CONTAINER_CONTAINER_COMPONENT, [])
   .component('ecsServerGroupContainer', {
     bindings: {
       command: '=',
@@ -12,31 +14,35 @@ module.exports = angular
     },
     templateUrl: require('./container.component.html'),
   })
-  .controller('ecsContainerImageController', function($scope, ecsServerGroupConfigurationService) {
-    this.groupByRegistry = function(image) {
-      if (image) {
-        if (image.fromContext) {
-          return 'Find Image Result(s)';
-        } else if (image.fromTrigger) {
-          return 'Images from Trigger(s)';
-        } else {
-          return image.registry;
+  .controller('ecsContainerImageController', [
+    '$scope',
+    'ecsServerGroupConfigurationService',
+    function($scope, ecsServerGroupConfigurationService) {
+      this.groupByRegistry = function(image) {
+        if (image) {
+          if (image.fromContext) {
+            return 'Find Image Result(s)';
+          } else if (image.fromTrigger) {
+            return 'Images from Trigger(s)';
+          } else {
+            return image.registry;
+          }
         }
+      };
+
+      function searchImages(cmd, q) {
+        return Observable.fromPromise(ecsServerGroupConfigurationService.configureCommand(cmd, q));
       }
-    };
 
-    function searchImages(cmd, q) {
-      return Observable.fromPromise(ecsServerGroupConfigurationService.configureCommand(cmd, q));
-    }
+      const imageSearchResultsStream = new Subject();
 
-    var imageSearchResultsStream = new Subject();
+      imageSearchResultsStream
+        .debounceTime(250)
+        .switchMap(searchImages)
+        .subscribe();
 
-    imageSearchResultsStream
-      .debounceTime(250)
-      .switchMap(searchImages)
-      .subscribe();
-
-    this.searchImages = function(q) {
-      imageSearchResultsStream.next(q);
-    };
-  });
+      this.searchImages = function(q) {
+        imageSearchResultsStream.next(q);
+      };
+    },
+  ]);

@@ -6,11 +6,16 @@ import { AccountService } from 'core/account/AccountService';
 import { ApplicationWriter } from 'core/application/service/ApplicationWriter';
 import { TaskReader } from 'core/task/task.read.service';
 import { SETTINGS } from 'core/config/settings';
+import { CORE_APPLICATION_MODAL_APPLICATIONPROVIDERFIELDS_COMPONENT } from './applicationProviderFields.component';
 
-const angular = require('angular');
+import * as angular from 'angular';
 
-module.exports = angular
-  .module('spinnaker.editApplication.modal.controller', [require('./applicationProviderFields.component').name])
+export const CORE_APPLICATION_MODAL_EDITAPPLICATION_CONTROLLER_MODAL = 'spinnaker.editApplication.modal.controller';
+export const name = CORE_APPLICATION_MODAL_EDITAPPLICATION_CONTROLLER_MODAL; // for backwards compatibility
+angular
+  .module(CORE_APPLICATION_MODAL_EDITAPPLICATION_CONTROLLER_MODAL, [
+    CORE_APPLICATION_MODAL_APPLICATIONPROVIDERFIELDS_COMPONENT,
+  ])
   .controller('EditApplicationController', [
     '$scope',
     '$window',
@@ -18,7 +23,7 @@ module.exports = angular
     '$uibModalInstance',
     'application',
     function($scope, $window, $state, $uibModalInstance, application) {
-      var vm = this;
+      const vm = this;
       this.data = {
         gitSources: SETTINGS.gitSources || ['stash', 'github', 'bitbucket', 'gitlab'],
       };
@@ -37,7 +42,7 @@ module.exports = angular
       }
 
       function extractErrorMsg(error) {
-        var exceptions = _.chain(error.variables)
+        const exceptions = _.chain(error.variables)
           .filter({ key: 'exception' })
           .head()
           .value().value.details.errors;

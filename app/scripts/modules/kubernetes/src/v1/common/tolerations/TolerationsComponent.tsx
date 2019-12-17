@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { cloneDeep } from 'lodash';
 import Select, { Option } from 'react-select';
 import { Button } from 'react-bootstrap';
@@ -21,7 +21,10 @@ export interface IKubernetesTolerationsProps {
 }
 
 export class KubernetesTolerations extends React.Component<IKubernetesTolerationsProps> {
-  private static operators: Option[] = [{ value: 'Exists', label: 'Exists' }, { value: 'Equal', label: 'Equal' }];
+  private static operators: Option[] = [
+    { value: 'Exists', label: 'Exists' },
+    { value: 'Equal', label: 'Equal' },
+  ];
 
   private static effects: Option[] = [
     { value: 'NoSchedule', label: 'NoSchedule' },
@@ -52,7 +55,7 @@ export class KubernetesTolerations extends React.Component<IKubernetesToleration
   private handleChange(index: number, tolerationProperty: keyof IToleration): (event: any) => void {
     return (event: any) => {
       const tolerations = cloneDeep(this.props.tolerations);
-      tolerations[index][tolerationProperty] = event.target.value;
+      (tolerations[index][tolerationProperty] as any) = event.target.value;
       this.props.onTolerationChange(tolerations);
     };
   }

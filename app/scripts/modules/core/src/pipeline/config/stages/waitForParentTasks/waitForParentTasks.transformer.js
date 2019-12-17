@@ -1,19 +1,22 @@
 'use strict';
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular
-  .module('spinnaker.core.pipeline.stage.waitForParentTasks.transformer', [])
-  .service('waitForParentTasksTransformer', function() {
+export const CORE_PIPELINE_CONFIG_STAGES_WAITFORPARENTTASKS_WAITFORPARENTTASKS_TRANSFORMER =
+  'spinnaker.core.pipeline.stage.waitForParentTasks.transformer';
+export const name = CORE_PIPELINE_CONFIG_STAGES_WAITFORPARENTTASKS_WAITFORPARENTTASKS_TRANSFORMER; // for backwards compatibility
+module(CORE_PIPELINE_CONFIG_STAGES_WAITFORPARENTTASKS_WAITFORPARENTTASKS_TRANSFORMER, []).service(
+  'waitForParentTasksTransformer',
+  function() {
     // injects wait for parent tasks stage
     function injectWaitForParentStages(execution) {
       /*
        * Every time you see one, look at its requisite ids, then set it as the child of any that match it
        * */
-      let stagesToInject = [];
+      const stagesToInject = [];
       execution.stages
         .filter(stage => stage.requisiteStageRefIds && stage.requisiteStageRefIds.length > 1)
         .forEach(function(stage) {
-          let waitStages = execution.stages.filter(
+          const waitStages = execution.stages.filter(
             candidate =>
               candidate.type === 'waitForRequisiteCompletion' &&
               candidate.context.requisiteIds &&
@@ -21,8 +24,10 @@ module.exports = angular
               candidate.context.requisiteIds.every(reqId => stage.requisiteStageRefIds.includes(reqId)),
           );
           if (waitStages.length) {
-            let waitStage = waitStages[0],
-              parentStages = execution.stages.filter(parent => waitStage.context.requisiteIds.includes(parent.refId));
+            const waitStage = waitStages[0];
+            const parentStages = execution.stages.filter(parent =>
+              waitStage.context.requisiteIds.includes(parent.refId),
+            );
             stagesToInject.push({
               parentTasks: parentStages,
               syntheticStageOwner: 'STAGE_BEFORE',
@@ -42,4 +47,5 @@ module.exports = angular
     this.transform = function(application, execution) {
       injectWaitForParentStages(execution);
     };
-  });
+  },
+);

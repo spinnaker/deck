@@ -1,12 +1,14 @@
-'use strict';
+import { KUBERNETES_V1_CLUSTER_CLUSTER_KUBERNETES_MODULE } from '../../cluster/cluster.kubernetes.module';
+('use strict');
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular
-  .module('spinnaker.kubernetes.serverGroupCommandBuilder.service', [
-    require('../../cluster/cluster.kubernetes.module').name,
-  ])
-  .factory('kubernetesServerGroupCommandBuilder', [
+export const KUBERNETES_V1_SERVERGROUP_CONFIGURE_COMMANDBUILDER =
+  'spinnaker.kubernetes.serverGroupCommandBuilder.service';
+export const name = KUBERNETES_V1_SERVERGROUP_CONFIGURE_COMMANDBUILDER; // for backwards compatibility
+module(KUBERNETES_V1_SERVERGROUP_CONFIGURE_COMMANDBUILDER, [KUBERNETES_V1_CLUSTER_CLUSTER_KUBERNETES_MODULE]).factory(
+  'kubernetesServerGroupCommandBuilder',
+  [
     '$q',
     'kubernetesClusterCommandBuilder',
     function($q, kubernetesClusterCommandBuilder) {
@@ -14,7 +16,7 @@ module.exports = angular
         if (defaults == null) {
           defaults = {};
         }
-        var command = kubernetesClusterCommandBuilder.buildNewClusterCommand(application, defaults);
+        const command = kubernetesClusterCommandBuilder.buildNewClusterCommand(application, defaults);
         command.targetSize = 1;
 
         return $q.when(command);
@@ -31,7 +33,7 @@ module.exports = angular
       }
 
       function buildServerGroupCommandFromExisting(application, serverGroup, mode) {
-        var command = kubernetesClusterCommandBuilder.buildClusterCommandFromExisting(application, serverGroup, mode);
+        const command = kubernetesClusterCommandBuilder.buildClusterCommandFromExisting(application, serverGroup, mode);
 
         command.source = {
           serverGroupName: serverGroup.name,
@@ -51,4 +53,5 @@ module.exports = angular
         buildServerGroupCommandFromPipeline: buildServerGroupCommandFromPipeline,
       };
     },
-  ]);
+  ],
+);

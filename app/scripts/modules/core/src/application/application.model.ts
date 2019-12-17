@@ -83,6 +83,11 @@ export class Application {
   public isStandalone = false;
 
   /**
+   * If managed delivery is enabled, indicates whether an entire application is in an explicit paused state
+   */
+  public isManagementPaused = false;
+
+  /**
    * Which data source is the active state
    * @type {ApplicationDataSource}
    */
@@ -154,9 +159,10 @@ export class Application {
   public refresh(forceRefresh?: boolean): IPromise<any> {
     // refresh hidden data sources but do not consider their results when determining when the refresh completes
     this.dataSources.filter(ds => !ds.visible).forEach(ds => ds.refresh(forceRefresh));
-    return $q
-      .all(this.dataSources.filter(ds => ds.visible).map(source => source.refresh(forceRefresh)))
-      .then(() => this.applicationLoadSuccess(), error => this.applicationLoadError(error));
+    return $q.all(this.dataSources.filter(ds => ds.visible).map(source => source.refresh(forceRefresh))).then(
+      () => this.applicationLoadSuccess(),
+      error => this.applicationLoadError(error),
+    );
   }
 
   /**
@@ -246,13 +252,15 @@ export class Application {
     const sources: Array<ApplicationDataSource<any[]>> = this.dataSources.filter(
       ds => ds[field] !== undefined && Array.isArray(ds.data) && ds.providerField !== undefined,
     );
-    const providers = sources.map(ds => ds.data.map(d => d[ds.providerField])).filter(p => p.length > 0);
-    let allProviders: any; // typescript made me do it this way
-    allProviders = union<string[]>(...providers);
+    const providers: string[][] = sources.map(ds => ds.data.map(d => d[ds.providerField])).filter(p => p.length > 0);
+    const allProviders = union(...providers);
     allProviders.forEach((provider: string) => {
       const vals = sources
         .map(ds =>
-          map(ds.data.filter((d: any) => typeof d === 'object' && d[ds.providerField] === provider), ds[field]),
+          map(
+            ds.data.filter((d: any) => typeof d === 'object' && d[ds.providerField] === provider),
+            ds[field],
+          ),
         )
         .filter(v => v.length > 0);
       const allValues = union(...vals);

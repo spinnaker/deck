@@ -1,14 +1,17 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 import _ from 'lodash';
 
 import { AccountService, INSTANCE_TYPE_SERVICE } from '@spinnaker/core';
 
 import { ECS_SERVER_GROUP_CONFIGURATION_SERVICE } from './serverGroupConfiguration.service';
 
-module.exports = angular
-  .module('spinnaker.ecs.serverGroupCommandBuilder.service', [
+export const ECS_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER_SERVICE =
+  'spinnaker.ecs.serverGroupCommandBuilder.service';
+export const name = ECS_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER_SERVICE; // for backwards compatibility
+angular
+  .module(ECS_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER_SERVICE, [
     INSTANCE_TYPE_SERVICE,
     ECS_SERVER_GROUP_CONFIGURATION_SERVICE,
   ])
@@ -19,7 +22,7 @@ module.exports = angular
     function($q, instanceTypeService, ecsServerGroupConfigurationService) {
       function reconcileUpstreamImages(image, upstreamImages) {
         if (image.fromContext) {
-          let matchingImage = upstreamImages.find(otherImage => image.stageId === otherImage.stageId);
+          const matchingImage = upstreamImages.find(otherImage => image.stageId === otherImage.stageId);
 
           if (matchingImage) {
             image.cluster = matchingImage.cluster;
@@ -30,7 +33,7 @@ module.exports = angular
             return null;
           }
         } else if (image.fromTrigger) {
-          let matchingImage = upstreamImages.find(otherImage => {
+          const matchingImage = upstreamImages.find(otherImage => {
             return (
               image.registry === otherImage.registry &&
               image.repository === otherImage.repository &&
@@ -64,7 +67,7 @@ module.exports = angular
           });
         }
         current.requisiteStageRefIds.forEach(function(id) {
-          let next = all.find(stage => stage.refId === id);
+          const next = all.find(stage => stage.refId === id);
           if (next) {
             result = result.concat(findUpstreamImages(next, all, visited));
           }
@@ -74,7 +77,7 @@ module.exports = angular
       }
 
       function findTriggerImages(triggers) {
-        let result = triggers
+        const result = triggers
           .filter(trigger => {
             return trigger.type === 'docker';
           })
@@ -94,12 +97,12 @@ module.exports = angular
 
       function buildNewServerGroupCommand(application, defaults) {
         defaults = defaults || {};
-        var credentialsLoader = AccountService.getCredentialsKeyedByAccount('ecs');
+        const credentialsLoader = AccountService.getCredentialsKeyedByAccount('ecs');
 
-        var defaultCredentials = defaults.account || application.defaultCredentials.ecs;
-        var defaultRegion = defaults.region || application.defaultRegions.ecs;
+        const defaultCredentials = defaults.account || application.defaultCredentials.ecs;
+        const defaultRegion = defaults.region || application.defaultRegions.ecs;
 
-        var preferredZonesLoader = AccountService.getAvailabilityZonesForAccountAndRegion(
+        const preferredZonesLoader = AccountService.getAvailabilityZonesForAccountAndRegion(
           'ecs',
           defaultCredentials,
           defaultRegion,
@@ -111,14 +114,14 @@ module.exports = angular
             credentialsKeyedByAccount: credentialsLoader,
           })
           .then(function(asyncData) {
-            var availabilityZones = asyncData.preferredZones;
+            const availabilityZones = asyncData.preferredZones;
 
-            var defaultIamRole = 'None (No IAM role)';
+            let defaultIamRole = 'None (No IAM role)';
             defaultIamRole = defaultIamRole.replace('{{application}}', application.name);
 
-            var defaultImageCredentials = 'None (No registry credentials)';
+            const defaultImageCredentials = 'None (No registry credentials)';
 
-            var command = {
+            const command = {
               application: application.name,
               credentials: defaultCredentials,
               region: defaultRegion,
@@ -170,16 +173,16 @@ module.exports = angular
       }
 
       function buildServerGroupCommandFromPipeline(application, originalCluster, current, pipeline) {
-        var pipelineCluster = _.cloneDeep(originalCluster);
-        var region = Object.keys(pipelineCluster.availabilityZones)[0];
+        const pipelineCluster = _.cloneDeep(originalCluster);
+        const region = Object.keys(pipelineCluster.availabilityZones)[0];
         // var instanceTypeCategoryLoader = instanceTypeService.getCategoryForInstanceType('ecs', pipelineCluster.instanceType);
-        var commandOptions = { account: pipelineCluster.account, region: region };
-        var asyncLoader = $q.all({ command: buildNewServerGroupCommand(application, commandOptions) });
+        const commandOptions = { account: pipelineCluster.account, region: region };
+        const asyncLoader = $q.all({ command: buildNewServerGroupCommand(application, commandOptions) });
 
         return asyncLoader.then(function(asyncData) {
-          var command = asyncData.command;
-          var zones = pipelineCluster.availabilityZones[region];
-          var usePreferredZones = zones.join(',') === command.availabilityZones.join(',');
+          const command = asyncData.command;
+          const zones = pipelineCluster.availabilityZones[region];
+          const usePreferredZones = zones.join(',') === command.availabilityZones.join(',');
 
           let contextImages = findUpstreamImages(current, pipeline.stages) || [];
           contextImages = contextImages.concat(findTriggerImages(pipeline.triggers));
@@ -188,7 +191,7 @@ module.exports = angular
             command.docker.image = reconcileUpstreamImages(command.docker.image, contextImages);
           }
 
-          var viewState = {
+          const viewState = {
             instanceProfile: asyncData.instanceProfile,
             disableImageSelection: true,
             useSimpleCapacity:
@@ -205,7 +208,7 @@ module.exports = angular
             currentStage: current,
           };
 
-          var viewOverrides = {
+          const viewOverrides = {
             region: region,
             credentials: pipelineCluster.account,
             availabilityZones: pipelineCluster.availabilityZones[region],
@@ -240,7 +243,7 @@ module.exports = angular
       }
 
       function buildUpdateServerGroupCommand(serverGroup) {
-        var command = {
+        const command = {
           type: 'modifyAsg',
           asgs: [{ asgName: serverGroup.name, region: serverGroup.region }],
           healthCheckType: serverGroup.asg.healthCheckType,
@@ -251,13 +254,13 @@ module.exports = angular
       }
 
       function buildServerGroupCommandFromExisting(application, serverGroup, mode = 'clone') {
-        var commandOptions = { account: serverGroup.account, region: serverGroup.region };
-        var asyncLoader = $q.all({ command: buildNewServerGroupCommand(application, commandOptions) });
+        const commandOptions = { account: serverGroup.account, region: serverGroup.region };
+        const asyncLoader = $q.all({ command: buildNewServerGroupCommand(application, commandOptions) });
 
         // do NOT copy: deployment strategy. DO copy: account, region, cluster name, stack
         // TODO: query for & pull in ECS-specific data that would be useful, e.g, network mode, launch type
         return asyncLoader.then(function(asyncData) {
-          var command = asyncData.command;
+          const command = asyncData.command;
 
           command.credentials = serverGroup.account;
           command.app = serverGroup.moniker.app;

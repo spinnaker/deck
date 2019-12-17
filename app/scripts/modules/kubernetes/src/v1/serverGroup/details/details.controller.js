@@ -1,6 +1,6 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 import _ from 'lodash';
 
 import {
@@ -10,14 +10,20 @@ import {
   SERVER_GROUP_WRITER,
   ServerGroupTemplates,
 } from '@spinnaker/core';
+import { KUBERNETES_V1_SERVERGROUP_CONFIGURE_CONFIGURE_KUBERNETES_MODULE } from '../configure/configure.kubernetes.module';
+import { KUBERNETES_V1_SERVERGROUP_PARAMSMIXIN } from '../paramsMixin';
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
-module.exports = angular
-  .module('spinnaker.serverGroup.details.kubernetes.controller', [
-    require('@uirouter/angularjs').default,
-    require('../configure/configure.kubernetes.module').name,
+export const KUBERNETES_V1_SERVERGROUP_DETAILS_DETAILS_CONTROLLER =
+  'spinnaker.serverGroup.details.kubernetes.controller';
+export const name = KUBERNETES_V1_SERVERGROUP_DETAILS_DETAILS_CONTROLLER; // for backwards compatibility
+angular
+  .module(KUBERNETES_V1_SERVERGROUP_DETAILS_DETAILS_CONTROLLER, [
+    UIROUTER_ANGULARJS,
+    KUBERNETES_V1_SERVERGROUP_CONFIGURE_CONFIGURE_KUBERNETES_MODULE,
     CONFIRMATION_MODAL_SERVICE,
     SERVER_GROUP_WRITER,
-    require('../paramsMixin').name,
+    KUBERNETES_V1_SERVERGROUP_PARAMSMIXIN,
   ])
   .controller('kubernetesServerGroupDetailsController', [
     '$scope',
@@ -42,14 +48,14 @@ module.exports = angular
       confirmationModalService,
       kubernetesProxyUiService,
     ) {
-      let application = (this.application = app);
+      const application = (this.application = app);
 
       $scope.state = {
         loading: true,
       };
 
       function extractServerGroupSummary() {
-        var summary = _.find(application.serverGroups.data, function(toCheck) {
+        let summary = _.find(application.serverGroups.data, function(toCheck) {
           return (
             toCheck.name === serverGroup.name &&
             toCheck.account === serverGroup.accountId &&
@@ -90,7 +96,7 @@ module.exports = angular
       };
 
       function normalizeDeploymentStatus(serverGroup) {
-        let deploymentStatus = serverGroup.deploymentStatus;
+        const deploymentStatus = serverGroup.deploymentStatus;
 
         if (deploymentStatus !== undefined && deploymentStatus !== null) {
           deploymentStatus.unavailableReplicas |= 0;
@@ -100,7 +106,7 @@ module.exports = angular
       }
 
       function retrieveServerGroup() {
-        var summary = extractServerGroupSummary();
+        const summary = extractServerGroupSummary();
         return ServerGroupReader.getServerGroup(
           application.name,
           serverGroup.accountId,
@@ -136,21 +142,21 @@ module.exports = angular
       });
 
       this.destroyServerGroup = () => {
-        var serverGroup = $scope.serverGroup;
+        const serverGroup = $scope.serverGroup;
 
-        var taskMonitor = {
+        const taskMonitor = {
           application: application,
           title: 'Destroying ' + serverGroup.name,
         };
 
-        var submitMethod = params =>
+        const submitMethod = params =>
           serverGroupWriter.destroyServerGroup(
             serverGroup,
             application,
             angular.extend(params, kubernetesServerGroupParamsMixin.destroyServerGroup(serverGroup, application)),
           );
 
-        var stateParams = {
+        const stateParams = {
           name: serverGroup.name,
           accountId: serverGroup.account,
           namespace: serverGroup.namespace,
@@ -176,21 +182,21 @@ module.exports = angular
       };
 
       this.disableServerGroup = function disableServerGroup() {
-        var serverGroup = $scope.serverGroup;
+        const serverGroup = $scope.serverGroup;
 
-        var taskMonitor = {
+        const taskMonitor = {
           application: application,
           title: 'Disabling ' + serverGroup.name,
         };
 
-        var submitMethod = params =>
+        const submitMethod = params =>
           serverGroupWriter.disableServerGroup(
             serverGroup,
             application,
             angular.extend(params, kubernetesServerGroupParamsMixin.disableServerGroup(serverGroup, application)),
           );
 
-        var confirmationModalParams = {
+        const confirmationModalParams = {
           header: 'Really disable ' + serverGroup.name + '?',
           buttonText: 'Disable ' + serverGroup.name,
           provider: 'kubernetes',
@@ -206,21 +212,21 @@ module.exports = angular
       };
 
       this.enableServerGroup = function enableServerGroup() {
-        var serverGroup = $scope.serverGroup;
+        const serverGroup = $scope.serverGroup;
 
-        var taskMonitor = {
+        const taskMonitor = {
           application: application,
           title: 'Enabling ' + serverGroup.name,
         };
 
-        var submitMethod = params =>
+        const submitMethod = params =>
           serverGroupWriter.enableServerGroup(
             serverGroup,
             application,
             angular.extend(params, kubernetesServerGroupParamsMixin.enableServerGroup(serverGroup, application)),
           );
 
-        var confirmationModalParams = {
+        const confirmationModalParams = {
           header: 'Really enable ' + serverGroup.name + '?',
           buttonText: 'Enable ' + serverGroup.name,
           provider: 'kubernetes',
@@ -242,7 +248,7 @@ module.exports = angular
               return $scope.serverGroup;
             },
             disabledServerGroups: function() {
-              var cluster = _.find(app.clusters, {
+              const cluster = _.find(app.clusters, {
                 name: $scope.serverGroup.cluster,
                 account: $scope.serverGroup.account,
               });

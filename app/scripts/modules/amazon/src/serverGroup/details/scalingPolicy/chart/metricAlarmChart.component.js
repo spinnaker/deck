@@ -1,6 +1,6 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 import _ from 'lodash';
 import { Subject } from 'rxjs';
 // we need to explicitly import d3 because n3-charts depends on it being in the global namespace
@@ -8,17 +8,16 @@ import 'd3';
 
 import { CloudMetricsReader } from '@spinnaker/core';
 
-// TODO: Remove LineChartHack, replace require with commented out one once
-// https://github.com/n3-charts/line-chart/issues/512 is resolved
-// require('style!n3-charts/build/LineChart.css');
+import 'n3-charts/build/LineChart';
 import './LineChartHack.css';
 import './metricAlarmChart.component.less';
 
-module.exports = angular
-  .module('spinnaker.amazon.serverGroup.details.scalingPolicy.metricAlarmChart.component', [
-    require('exports-loader?"n3-line-chart"!n3-charts/build/LineChart'),
-  ])
-  .component('metricAlarmChart', {
+export const AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_CHART_METRICALARMCHART_COMPONENT =
+  'spinnaker.amazon.serverGroup.details.scalingPolicy.metricAlarmChart.component';
+export const name = AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_CHART_METRICALARMCHART_COMPONENT; // for backwards compatibility
+module(AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_CHART_METRICALARMCHART_COMPONENT, ['n3-line-chart']).component(
+  'metricAlarmChart',
+  {
     bindings: {
       alarm: '=',
       serverGroup: '=',
@@ -33,9 +32,9 @@ module.exports = angular
       '$filter',
       function($filter) {
         // converts alarm into parameters used to retrieve statistic data
-        let getFilterParameters = () => {
-          let alarm = this.alarm;
-          let base = {
+        const getFilterParameters = () => {
+          const alarm = this.alarm;
+          const base = {
             namespace: alarm.namespace,
             statistics: alarm.statistic,
             period: alarm.period,
@@ -46,11 +45,11 @@ module.exports = angular
           }, base);
         };
 
-        let initializeStatistics = () => {
-          let start = new Date(new Date().getTime() - 24 * 60 * 60 * 1000),
-            end = new Date(),
-            threshold = this.alarm.threshold || 0,
-            topline = this.alarm.comparisonOperator.indexOf('Less') === 0 ? threshold * 3 : threshold * 1.02;
+        const initializeStatistics = () => {
+          const start = new Date(new Date().getTime() - 24 * 60 * 60 * 1000);
+          const end = new Date();
+          const threshold = this.alarm.threshold || 0;
+          const topline = this.alarm.comparisonOperator.indexOf('Less') === 0 ? threshold * 3 : threshold * 1.02;
 
           /**
            * Draw four lines:
@@ -63,15 +62,24 @@ module.exports = angular
           this.chartData = {
             loading: true,
             noData: false, // flag set when server error occurs or no data available from server
-            threshold: [{ val: threshold, timestamp: start }, { val: threshold, timestamp: end }],
+            threshold: [
+              { val: threshold, timestamp: start },
+              { val: threshold, timestamp: end },
+            ],
             datapoints: [],
-            baseline: [{ val: 0, timestamp: start }, { val: 0, timestamp: end }],
-            topline: [{ val: topline, timestamp: start }, { val: topline, timestamp: end }],
+            baseline: [
+              { val: 0, timestamp: start },
+              { val: 0, timestamp: end },
+            ],
+            topline: [
+              { val: topline, timestamp: start },
+              { val: topline, timestamp: end },
+            ],
           };
         };
 
         // forces tooltips to render with the same time format we use throughout the application
-        let tooltipHook = rows => {
+        const tooltipHook = rows => {
           if (!rows) {
             return null;
           }
@@ -88,7 +96,7 @@ module.exports = angular
           };
         };
 
-        let updateChartData = () => {
+        const updateChartData = () => {
           CloudMetricsReader.getMetricStatistics(
             this.serverGroup.type,
             this.serverGroup.account,
@@ -117,11 +125,11 @@ module.exports = angular
             });
         };
 
-        let configureChart = () => {
-          let statKey = _.camelCase(this.alarm.statistic);
+        const configureChart = () => {
+          const statKey = _.camelCase(this.alarm.statistic);
           initializeStatistics(statKey);
 
-          let ticks = this.ticks || { x: 6, y: 3 };
+          const ticks = this.ticks || { x: 6, y: 3 };
 
           this.chartOptions = {
             margin: this.margins || { top: 5, left: 5 },
@@ -194,4 +202,5 @@ module.exports = angular
         };
       },
     ],
-  });
+  },
+);

@@ -1,10 +1,13 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular
-  .module('spinnaker.deck.gce.loadBalancer.hostAndPathRules.service', [])
-  .factory('hostAndPathRulesService', function() {
+export const GOOGLE_LOADBALANCER_DETAILS_HOSTANDPATHRULES_HOSTANDPATHRULES_SERVICE =
+  'spinnaker.deck.gce.loadBalancer.hostAndPathRules.service';
+export const name = GOOGLE_LOADBALANCER_DETAILS_HOSTANDPATHRULES_HOSTANDPATHRULES_SERVICE; // for backwards compatibility
+module(GOOGLE_LOADBALANCER_DETAILS_HOSTANDPATHRULES_HOSTANDPATHRULES_SERVICE, []).factory(
+  'hostAndPathRulesService',
+  function() {
     function buildTable(hostRules, defaultService) {
       const defaultRow = buildRow('Any unmatched (default)', 'Any unmatched (default)', defaultService.name);
       if (hostRules.length === 0) {
@@ -34,4 +37,5 @@ module.exports = angular
     }
 
     return { buildTable };
-  });
+  },
+);

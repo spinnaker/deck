@@ -1,19 +1,24 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 
 import { PROVIDER_SERVICE_DELEGATE } from 'core/cloudProvider/providerService.delegate';
 import { CONFIRMATION_MODAL_SERVICE } from 'core/confirmationModal/confirmationModal.service';
 import { SERVER_GROUP_WRITER } from 'core/serverGroup/serverGroupWriter.service';
 import { ClusterState } from 'core/state';
+import { CORE_SERVERGROUP_DETAILS_MULTIPLESERVERGROUP_COMPONENT } from './multipleServerGroup.component';
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
-module.exports = angular
-  .module('spinnaker.core.serverGroup.details.multipleServerGroups.controller', [
-    require('@uirouter/angularjs').default,
+export const CORE_SERVERGROUP_DETAILS_MULTIPLESERVERGROUPS_CONTROLLER =
+  'spinnaker.core.serverGroup.details.multipleServerGroups.controller';
+export const name = CORE_SERVERGROUP_DETAILS_MULTIPLESERVERGROUPS_CONTROLLER; // for backwards compatibility
+angular
+  .module(CORE_SERVERGROUP_DETAILS_MULTIPLESERVERGROUPS_CONTROLLER, [
+    UIROUTER_ANGULARJS,
     SERVER_GROUP_WRITER,
     CONFIRMATION_MODAL_SERVICE,
     PROVIDER_SERVICE_DELEGATE,
-    require('./multipleServerGroup.component').name,
+    CORE_SERVERGROUP_DETAILS_MULTIPLESERVERGROUP_COMPONENT,
   ])
   .controller('MultipleServerGroupsCtrl', [
     '$scope',
@@ -29,7 +34,7 @@ module.exports = angular
        * Actions
        */
 
-      let getDescriptor = () => {
+      const getDescriptor = () => {
         let descriptor = this.serverGroups.length + ' server group';
         if (this.serverGroups.length > 1) {
           descriptor += 's';
@@ -37,17 +42,17 @@ module.exports = angular
         return descriptor;
       };
 
-      let confirm = (submitMethodName, verbs) => {
-        let descriptor = getDescriptor(),
-          monitorInterval = this.serverGroups.length * 1000;
-        let taskMonitors = this.serverGroups.map(serverGroup => {
-          let provider = serverGroup.provider || serverGroup.type;
-          let providerParamsMixin = providerServiceDelegate.hasDelegate(provider, 'serverGroup.paramsMixin')
+      const confirm = (submitMethodName, verbs) => {
+        const descriptor = getDescriptor();
+        const monitorInterval = this.serverGroups.length * 1000;
+        const taskMonitors = this.serverGroups.map(serverGroup => {
+          const provider = serverGroup.provider || serverGroup.type;
+          const providerParamsMixin = providerServiceDelegate.hasDelegate(provider, 'serverGroup.paramsMixin')
             ? providerServiceDelegate.getDelegate(provider, 'serverGroup.paramsMixin')
             : {};
 
           let mixinParams = {};
-          let mixinParamsFactory = providerParamsMixin[submitMethodName];
+          const mixinParamsFactory = providerParamsMixin[submitMethodName];
           if (mixinParamsFactory !== undefined) {
             mixinParams = mixinParamsFactory(serverGroup);
           }
@@ -108,10 +113,10 @@ module.exports = angular
        * View instantiation/synchronization
        */
 
-      let retrieveServerGroups = () => {
+      const retrieveServerGroups = () => {
         this.serverGroups = ClusterState.multiselectModel.serverGroups.map(multiselectGroup => {
-          let group = _.cloneDeep(multiselectGroup);
-          let match = app.serverGroups.data.find(
+          const group = _.cloneDeep(multiselectGroup);
+          const match = app.serverGroups.data.find(
             check => check.name === group.name && check.account === group.account && check.region === group.region,
           );
           if (match) {
@@ -122,7 +127,7 @@ module.exports = angular
         });
       };
 
-      let multiselectWatcher = ClusterState.multiselectModel.serverGroupsStream.subscribe(retrieveServerGroups);
+      const multiselectWatcher = ClusterState.multiselectModel.serverGroupsStream.subscribe(retrieveServerGroups);
       app.serverGroups.onRefresh($scope, retrieveServerGroups);
 
       retrieveServerGroups();

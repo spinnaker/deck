@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { get, flatten } from 'lodash';
 
 import { StageConstants } from '@spinnaker/core';
@@ -36,7 +36,10 @@ export enum SelectorKind {
 }
 
 const mapCriteriaToLabel = (criteria: string): string =>
-  get(StageConstants.MANIFEST_CRITERIA_OPTIONS.find(option => option.val === criteria), 'label');
+  get(
+    StageConstants.MANIFEST_CRITERIA_OPTIONS.find(option => option.val === criteria),
+    'label',
+  );
 
 export const formatLabelSelectors = (labelSelectors: ILabelSelectors): string => {
   return (labelSelectors.selectors || [])
