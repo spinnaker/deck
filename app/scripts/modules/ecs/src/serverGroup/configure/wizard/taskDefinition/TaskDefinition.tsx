@@ -137,7 +137,7 @@ export class TaskDefinition extends React.Component<ITaskDefinitionProps, ITaskD
 
   private pushTargetGroupMapping = () => {
     const targetMaps = this.state.targetGroupMappings;
-    targetMaps.push({ containerName: '', targetGroup: '', containerPort: 0 });
+    targetMaps.push({ containerName: '', targetGroup: '', containerPort: 80 });
     this.setState({ targetGroupMappings: targetMaps });
   };
 
