@@ -66,6 +66,7 @@
   ng-click="$ctrl.enableCrossAccount($index)"
 >
   Select from a different account <span ng-if="$ctrl.securityGroup.vpcId">or VPC</span>
+  <help-field key="aws.securityGroup.cross.account.ingress.help"></help-field>
 </a>
 
 <span ng-if="$ctrl.securityGroup.regions.length > 1" class="small">
