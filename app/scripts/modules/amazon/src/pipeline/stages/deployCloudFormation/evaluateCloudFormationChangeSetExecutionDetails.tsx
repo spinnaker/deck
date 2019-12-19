@@ -1,21 +1,10 @@
 import * as React from 'react';
 
 import { IExecutionDetailsSectionProps } from 'core/pipeline';
-import { IStage } from 'core/domain';
 import { ExecutionDetailsSection } from '@spinnaker/core';
-import {
-  EvaluateCloudFormationChangeSetExecutionApproval,
-  IEvaluateCloudFormationChangeSetExecutionApprovalState,
-} from './evaluateCloudFormationChangeSetExecutionApproval';
+import { EvaluateCloudFormationChangeSetExecutionApproval } from './evaluateCloudFormationChangeSetExecutionApproval';
 
-export interface IEvaluateCloudFormationChangeSetExecutionDetailsState {
-  parentDeployStage: IStage;
-}
-
-export class EvaluateCloudFormationChangeSetExecutionDetails extends React.Component<
-  IExecutionDetailsSectionProps,
-  IEvaluateCloudFormationChangeSetExecutionApprovalState
-> {
+export class EvaluateCloudFormationChangeSetExecutionDetails extends React.Component<IExecutionDetailsSectionProps> {
   public static title = 'Change Set Execution';
 
   constructor(props: IExecutionDetailsSectionProps) {
