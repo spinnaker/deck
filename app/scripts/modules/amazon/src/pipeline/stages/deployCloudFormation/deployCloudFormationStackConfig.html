@@ -18,7 +18,7 @@
         </label>
         <br />
         <label>
-          <input type="checkbox" ng-checked="ctrl.isChangeSet()" ng-click="ctrl.toggleChangeSet()" />
+          <input type="checkbox" ng-checked="stage.isChangeSet" ng-click="ctrl.toggleChangeSet()" />
           <strong>Create CloudFormation ChangeSet</strong>
         </label>
       </stage-config-field>
@@ -65,7 +65,7 @@
       update-pipeline="ctrl.updatePipeline"
     >
     </stage-artifact-selector-delegate>
-    <div ng-if="ctrl.isChangeSet()">
+    <div ng-if="stage.isChangeSet">
       <hr />
       <h4>ChangeSet Configuration</h4>
       <stage-config-field label="ChangeSet name">
@@ -75,12 +75,12 @@
       </stage-config-field>
       <stage-config-field label="" field-colums="6">
         <label>
-          <input type="checkbox" ng-checked="ctrl.executeChangeSet()" ng-click="ctrl.toggleExecuteChangeSet()" />
+          <input type="checkbox" ng-checked="stage.executeChangeSet" ng-click="ctrl.toggleExecuteChangeSet()" />
         </label>
         <strong>Execute CloudFormation ChangeSet</strong>
       </stage-config-field>
-      <div ng-if="ctrl.isChangeSet()">
-        <div ng-if="ctrl.executeChangeSet()">
+      <div ng-if="stage.isChangeSet">
+        <div ng-if="stage.executeChangeSet">
           <stage-config-field
             label="If ChangeSet contains a replacement"
             help-key="aws.cloudformation.changeSet.options"
