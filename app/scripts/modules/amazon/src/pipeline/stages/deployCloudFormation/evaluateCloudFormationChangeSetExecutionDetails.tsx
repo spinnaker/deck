@@ -37,7 +37,7 @@ export class EvaluateCloudFormationChangeSetExecutionDetails extends React.Compo
         </ExecutionDetailsSection>
       );
     } else {
-      return <br />;
+      return null;
     }
   }
 }
