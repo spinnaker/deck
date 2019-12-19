@@ -1,5 +1,5 @@
 import React from 'react';
-import { Overridable } from 'core/overrideRegistry';
+import { Overridable } from '@spinnaker/core';
 import { ISecurityGroupDetail } from 'core/securityGroup';
 
 export interface IAdditionalIpRulesProps {
