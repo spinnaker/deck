@@ -20,7 +20,7 @@ export class EvaluateCloudFormationChangeSetExecutionLabel extends React.Compone
       return <ExecutionBarLabel {...this.props} />;
     }
 
-    const stage = this.props.stage;
+    const { stage } = this.props;
     if (
       stage.isRunning &&
       stage.stages[0].context.changeSetContainsReplacement &&
