@@ -1,19 +1,22 @@
 import React from 'react';
 
-import { CollapsibleSection, ModalInjector } from '@spinnaker/core';
+import { CollapsibleSection, ModalInjector, confirmNotManaged } from '@spinnaker/core';
 
 import { IAmazonServerGroupDetailsSectionProps } from './IAmazonServerGroupDetailsSectionProps';
 
 export class AdvancedSettingsDetailsSection extends React.Component<IAmazonServerGroupDetailsSectionProps> {
   private editAdvancedSettings = (): void => {
-    ModalInjector.modalService.open({
-      templateUrl: require('../advancedSettings/editAsgAdvancedSettings.modal.html'),
-      controller: 'EditAsgAdvancedSettingsCtrl as ctrl',
-      resolve: {
-        application: () => this.props.app,
-        serverGroup: () => this.props.serverGroup,
-      },
-    });
+    const { app, serverGroup } = this.props;
+    confirmNotManaged(serverGroup, app).then(() =>
+      ModalInjector.modalService.open({
+        templateUrl: require('../advancedSettings/editAsgAdvancedSettings.modal.html'),
+        controller: 'EditAsgAdvancedSettingsCtrl as ctrl',
+        resolve: {
+          application: () => app,
+          serverGroup: () => serverGroup,
+        },
+      }),
+    );
   };
 
   public render(): JSX.Element {
