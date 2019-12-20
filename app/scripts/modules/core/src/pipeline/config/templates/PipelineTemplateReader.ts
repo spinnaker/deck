@@ -143,6 +143,6 @@ export class PipelineTemplateReader {
   }
 
   public static getV2PipelineTemplateList(): IPromise<IPipelineTemplateV2Collections> {
-    return API.one('v2', 'pipelineTemplates').get();
+    return API.one('v2', 'pipelineTemplates', 'versions').get();
   }
 }

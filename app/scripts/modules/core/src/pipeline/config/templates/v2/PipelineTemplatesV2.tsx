@@ -86,6 +86,21 @@ export class PipelineTemplatesV2 extends React.Component<{}, IPipelineTemplatesV
     }
   };
 
+  private sortTemplates = (
+    templates: Array<[string, IPipelineTemplateV2[]]>,
+  ): Array<[string, IPipelineTemplateV2[]]> => {
+    return templates.sort(([a]: [string, IPipelineTemplateV2[]], [b]: [string, IPipelineTemplateV2[]]) => {
+      const caseInsensitiveA = a.toLowerCase();
+      const caseInsensitiveB = b.toLowerCase();
+      if (caseInsensitiveA > caseInsensitiveB) {
+        return 1;
+      } else if (caseInsensitiveA < caseInsensitiveB) {
+        return -1;
+      }
+      return 0;
+    });
+  };
+
   private getUpdateTimeForTemplate = (template: IPipelineTemplateV2) => {
     const millis = Number.parseInt(template.updateTs, 10);
     if (isNaN(millis)) {
@@ -173,7 +188,7 @@ export class PipelineTemplatesV2 extends React.Component<{}, IPipelineTemplatesV
     } = this.state;
     const detailsTemplate = viewTemplateVersion ? this.getViewTemplate() : null;
     const searchPerformed = searchValue.trim() !== '';
-    const filteredResults = this.filterSearchResults(Object.entries(templates), searchValue);
+    const filteredResults = this.sortTemplates(this.filterSearchResults(Object.entries(templates), searchValue));
     const resultsAvailable = filteredResults.length > 0;
     const deleteTemplate = deleteTemplateVersion ? this.getDeleteTemplate() : null;
 
