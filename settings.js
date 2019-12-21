@@ -259,4 +259,8 @@ window.spinnakerSettings = {
     fileName: 'news.md',
     gistId: '32526cd608db3d811b38',
   },
+  managedDelivery: {
+    manifestBasePath: '.spinnaker',
+    defaultManifest: 'spinnaker.yml',
+  },
 };

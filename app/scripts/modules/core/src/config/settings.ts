@@ -134,6 +134,10 @@ export interface ISpinnakerSettings {
   searchVersion: 1 | 2;
   triggerTypes: string[];
   useClassicFirewallLabels: boolean;
+  managedDelivery?: {
+    manifestBasePath: string;
+    defaultManifest: string;
+  };
 }
 
 export const SETTINGS: ISpinnakerSettings = (window as any).spinnakerSettings;
