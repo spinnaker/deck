@@ -80,6 +80,7 @@ class HelmEditor extends React.Component<IArtifactEditorProps, IHelmArtifactEdit
               value={artifact.name || ''}
               onChange={(e: Option) => {
                 this.onChange(e, 'name');
+                this.onChange(e, 'reference');
                 this.getChartVersionOptions(e.value.toString());
               }}
               clearable={false}
