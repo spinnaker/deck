@@ -1,3 +1,4 @@
+import { IPluginManifest } from 'core/plugins/plugin.registry';
 import { cloneDeep, merge } from 'lodash';
 
 export interface IAdditionalHelpLinks {
@@ -125,6 +126,7 @@ export interface ISpinnakerSettings {
   providers?: {
     [key: string]: IProviderSettings; // allows custom providers not typed in here (good for testing too)
   };
+  plugins: IPluginManifest[];
   pubsubProviders: string[];
   quietPeriod: [string | number, string | number];
   resetProvider: (provider: string) => () => void;
