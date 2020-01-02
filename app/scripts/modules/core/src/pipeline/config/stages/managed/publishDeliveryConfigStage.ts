@@ -6,8 +6,8 @@ import { PublishDeliveryConfigExecutionDetails } from './PublishDeliveryConfigEx
 import { IStageOrTriggerBeforeTypeValidationConfig } from 'core/pipeline/config/validation/stageOrTriggerBeforeType.validator';
 
 Registry.pipeline.registerStage({
-  label: 'Publish Managed Delivery Manifest',
-  description: 'Publish Managed Delivery Manifest',
+  label: 'Publish Delivery Config',
+  description: 'Publish Delivery Config Manifest',
   key: 'publishDeliveryConfig',
   restartable: false,
   component: PublishDeliveryConfigStageConfig,

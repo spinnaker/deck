@@ -2,9 +2,11 @@ import React from 'react';
 import { get } from 'lodash';
 
 import { ExecutionDetailsSection, IExecutionDetailsSectionProps, StageFailureMessage } from 'core/pipeline';
+import { IGitTrigger } from 'core/domain';
 
 export function PublishDeliveryConfigExecutionDetails(props: IExecutionDetailsSectionProps) {
   const { stage } = props;
+  const trigger = props.execution.trigger as IGitTrigger;
   const errorDetailsAvailable = stage.isFailed && !stage.failureMessage && get(stage.context, 'error') != null;
 
   return (
@@ -14,11 +16,11 @@ export function PublishDeliveryConfigExecutionDetails(props: IExecutionDetailsSe
           <h5>Publish Managed Delivery Manifest Stage Configuration</h5>
           <dl className="dl-narrow dl-horizontal">
             <dt>SCM</dt>
-            <dd>{stage.context.repoType}</dd>
+            <dd>{trigger.source}</dd>
             <dt>Project</dt>
-            <dd>{stage.context.projectKey}</dd>
+            <dd>{trigger.project}</dd>
             <dt>Repository</dt>
-            <dd>{stage.context.repositorySlug}</dd>
+            <dd>{trigger.slug}</dd>
             {stage.context.directory && <dt>Directory</dt>}
             {stage.context.directory && <dd>{stage.context.directory}</dd>}
             {stage.context.manifest && <dt>Manifest</dt>}

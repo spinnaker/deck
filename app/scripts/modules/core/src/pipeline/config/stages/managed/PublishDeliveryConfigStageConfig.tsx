@@ -13,7 +13,7 @@ export const PublishDeliveryConfigStageConfig: React.SFC<IStageConfigProps> = st
       // TODO: make this text look pretty. Also I'm not sure the config section is the right place for it...
       <div className="form-horizontal">
         <div>
-          This stage will retrieve a Managed Delivery manifest from the source control repository associated with your
+          This stage will retrieve a Delivery Config manifest from the source control repository associated with your
           pipeline's trigger, then save (or update) it in Spinnaker so it will automatically monitor and manage your
           application's infrastructure resources within logical environments, as well as the deployment of artifacts
           into those environments.
