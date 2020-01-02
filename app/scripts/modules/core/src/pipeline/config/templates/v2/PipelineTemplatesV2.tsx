@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal } from 'react-bootstrap';
 import { DateTime } from 'luxon';
-import { get, memoize } from 'lodash';
+import { flatMap, get, memoize } from 'lodash';
 import { Subscription } from 'rxjs';
 import { UISref } from '@uirouter/react';
 
@@ -124,7 +124,7 @@ export class PipelineTemplatesV2 extends React.Component<{}, IPipelineTemplatesV
     templateCollections: Array<[string, IPipelineTemplateV2[]]>,
     query: string,
   ): string => {
-    const templateIds = templateCollections.flatMap(([, templateCollection]) =>
+    const templateIds = flatMap(templateCollections, ([, templateCollection]) =>
       templateCollection.map(template => getTemplateVersion(template)),
     );
     return `${templateIds.join('')}${query}`;
