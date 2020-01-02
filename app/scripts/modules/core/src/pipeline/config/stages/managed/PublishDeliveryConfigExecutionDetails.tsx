@@ -3,11 +3,16 @@ import { get } from 'lodash';
 
 import { ExecutionDetailsSection, IExecutionDetailsSectionProps, StageFailureMessage } from 'core/pipeline';
 import { IGitTrigger } from 'core/domain';
+import { SETTINGS } from '../../../../config';
 
 export function PublishDeliveryConfigExecutionDetails(props: IExecutionDetailsSectionProps) {
   const { stage } = props;
   const trigger = props.execution.trigger as IGitTrigger;
   const errorDetailsAvailable = stage.isFailed && !stage.failureMessage && get(stage.context, 'error') != null;
+  const manifestDirectory =
+    SETTINGS.managedDelivery.manifestBasePath + (stage.context.directory ? stage.context.directory : '');
+  const manifestFilename = stage.context.manifest ? stage.context.manifest : SETTINGS.managedDelivery.defaultManifest;
+  const gitRef = stage.context.ref ? stage.context.ref : 'refs/heads/master';
 
   return (
     <ExecutionDetailsSection name={props.name} current={props.current}>
@@ -21,12 +26,12 @@ export function PublishDeliveryConfigExecutionDetails(props: IExecutionDetailsSe
             <dd>{trigger.project}</dd>
             <dt>Repository</dt>
             <dd>{trigger.slug}</dd>
-            {stage.context.directory && <dt>Directory</dt>}
-            {stage.context.directory && <dd>{stage.context.directory}</dd>}
-            {stage.context.manifest && <dt>Manifest</dt>}
-            {stage.context.manifest && <dd>{stage.context.manifest}</dd>}
-            {stage.context.ref && <dt>Git ref</dt>}
-            {stage.context.ref && <dd>{stage.context.ref}</dd>}
+            <dt>Directory</dt>
+            <dd>{manifestDirectory}</dd>
+            <dt>Manifest</dt>
+            <dd>{manifestFilename}</dd>
+            <dt>Git ref</dt>
+            <dd>{gitRef}</dd>
           </dl>
         </div>
       </div>
