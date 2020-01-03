@@ -6,15 +6,6 @@ env:
   NODE_VERSION: 10.15.1
 
 jobs:
-  check:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - uses: actions/setup-node@v1
-        with:
-          node-version: ${{ env.NODE_VERSION  }}
-      - run: yarn cache dir
-
   purebump:
     name: Ensure package bumps are pure
     runs-on: ubuntu-latest
@@ -23,14 +14,14 @@ jobs:
       - name: Ensure package bumps are pure
         run: app/scripts/modules/assert_package_bumps_standalone.sh
 
-  unit:
+  unittests:
     name: Unit tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
       - uses: actions/cache@v1
         with:
-          path: .cache/yarn
+          path: /home/runner/.cache/yarn
           key: yarn
       - uses: actions/setup-node@v1
         with:
@@ -40,8 +31,8 @@ jobs:
       - name: Unit Tests
         run: gradle/buildViaTravis.sh
 
-  modules:
-    name: Build NPM Packages
+  packages:
+    name: Build Packages
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -51,7 +42,7 @@ jobs:
       - uses: actions/checkout@v1
       - uses: actions/cache@v1
         with:
-          path: .cache/yarn
+          path: /home/runner/.cache/yarn
           key: yarn
       - uses: actions/setup-node@v1
         with:
