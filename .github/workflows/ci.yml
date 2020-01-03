@@ -20,15 +20,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - uses: actions/cache@v1
-        with:
-          path: .cache/yarn
-          key: yarn
-      - uses: actions/setup-node@v1
-        with:
-          node-version: ${{ env.NODE_VERSION  }}
-      - name: Install Dependencies
-        run: yarn --frozen-lockfile
       - name: Ensure package bumps are pure
         run: app/scripts/modules/assert_package_bumps_standalone.sh
 
