@@ -9,7 +9,12 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: ${{ env.NODE_VERSION  }}
       - run: yarn cache dir
+
   purebump:
     name: Ensure package bumps are pure
     runs-on: ubuntu-latest
