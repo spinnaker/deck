@@ -42,8 +42,8 @@ jobs:
       - uses: actions/checkout@v1
       - uses: actions/cache@v1
         with:
-          path: app/scripts/modules/core/.cache-loader
-          key: core-cache-loader
+          path: app/scripts/modules/*/.cache-loader
+          key: cache-loader
       - uses: actions/cache@v1
         with:
           path: /home/runner/.cache/yarn
