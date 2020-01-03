@@ -1,0 +1,62 @@
+name: Run CI
+
+on: push
+
+env:
+  NODE_VERSION: 10.15.1
+
+jobs:
+  purebump:
+    name: Ensure package bumps are pure
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/cache@v1
+        with:
+          path: node_modules
+          key: node_modules
+      - uses: actions/setup-node@v1
+        with:
+          node-version: ${{ env.NODE_VERSION  }}
+      - name: Install Dependencies
+        run: yarn --frozen-lockfile
+      - name: Ensure package bumps are pure
+        run: app/scripts/modules/assert_package_bumps_standalone.sh
+
+  unit:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/cache@v1
+        with:
+          path: node_modules
+          key: node_modules
+      - uses: actions/setup-node@v1
+        with:
+          node-version: ${{ env.NODE_VERSION  }}
+      - name: Install Dependencies
+        run: yarn --frozen-lockfile
+      - name: Unit Tests
+        run: gradle/buildViaTravis.sh
+
+  modules:
+    name: Build NPM Packages
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        packages: ['amazon azure', 'kubernetes cloudfoundry', 'titus']
+
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/cache@v1
+        with:
+          path: node_modules
+          key: node_modules
+      - uses: actions/setup-node@v1
+        with:
+          node-version: ${{ env.NODE_VERSION  }}
+      - name: Install Dependencies
+        run: yarn --frozen-lockfile
+      - name: Build NPM Packages
+        run: app/scripts/modules/build_modules.sh ${{ matrix.packages }}
