@@ -36,7 +36,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        packages: ['amazon azure', 'kubernetes cloudfoundry', 'titus']
+        packages:
+          ['core amazon docker titus', 'appengine azure cloudfoundry', 'ecs google huaweicloud kubernetes oracle']
 
     steps:
       - uses: actions/checkout@v1
