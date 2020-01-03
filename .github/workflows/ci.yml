@@ -6,6 +6,10 @@ env:
   NODE_VERSION: 10.15.1
 
 jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - run: yarn cache dir
   purebump:
     name: Ensure package bumps are pure
     runs-on: ubuntu-latest
