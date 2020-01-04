@@ -66,36 +66,7 @@
     >
     </stage-artifact-selector-delegate>
     <div ng-if="stage.isChangeSet">
-      <hr />
-      <h4>ChangeSet Configuration</h4>
-      <stage-config-field label="ChangeSet name">
-        <label class="sm-label-right">
-          <input type="text" class="form-control input-sm" ng-model="stage.changeSetName" />
-        </label>
-      </stage-config-field>
-      <stage-config-field label="" field-colums="6">
-        <label>
-          <input type="checkbox" ng-checked="stage.executeChangeSet" ng-click="ctrl.toggleExecuteChangeSet()" />
-        </label>
-        <strong>Execute CloudFormation ChangeSet</strong>
-      </stage-config-field>
-      <div ng-if="stage.isChangeSet">
-        <div ng-if="stage.executeChangeSet">
-          <stage-config-field
-            label="If ChangeSet contains a replacement"
-            help-key="aws.cloudformation.changeSet.options"
-          >
-            <label>
-              <select class="form-control input-sm" ng-model="stage.actionOnReplacement" required>
-                <option value="ask">ask</option>
-                <option value="skip">skip it</option>
-                <option value="execute">execute it</option>
-                <option value="fail">fail stage</option>
-              </select>
-            </label>
-          </stage-config-field>
-        </div>
-      </div>
+      <cloud-formation-change-set-info stage="stage" stageconfig="stageConfigCtrl"> </cloud-formation-change-set-info>
     </div>
     <hr />
     <stage-config-field label="Parameters" field-columns="6">

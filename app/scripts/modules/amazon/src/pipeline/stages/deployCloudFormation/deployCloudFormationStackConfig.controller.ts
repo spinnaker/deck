@@ -57,10 +57,6 @@ export class DeployCloudFormationStackConfigController implements IController {
     this.$scope.stage.isChangeSet = !this.$scope.stage.isChangeSet;
   }
 
-  public toggleExecuteChangeSet() {
-    this.$scope.stage.executeChangeSet = !this.$scope.stage.executeChangeSet;
-  }
-
   public onStackArtifactEdited = (artifact: IArtifact) => {
     this.$scope.$applyAsync(() => {
       this.$scope.stage.stackArtifactId = null;

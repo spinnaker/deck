@@ -45,6 +45,7 @@ import {
 
 import { DEPLOY_CLOUDFORMATION_STACK_STAGE } from './pipeline/stages/deployCloudFormation/deployCloudFormationStackStage';
 import { CLOUDFORMATION_TEMPLATE_ENTRY } from './pipeline/stages/deployCloudFormation/cloudFormationTemplateEntry.component';
+import { CLOUD_FORMATION_CHANGE_SET_INFO } from './pipeline/stages/deployCloudFormation/CloudFormationChangeSetInfo';
 import { CreateLambdaFunction } from './function/CreateLambdaFunction';
 import { AmazonFunctionDetails } from './function';
 import { AMAZON_PIPELINE_STAGES_BAKE_AWSBAKESTAGE } from './pipeline/stages/bake/awsBakeStage';
@@ -102,6 +103,7 @@ module(AMAZON_MODULE, [
   AMAZON_SEARCH_SEARCHRESULTFORMATTER,
   DEPLOY_CLOUDFORMATION_STACK_STAGE,
   CLOUDFORMATION_TEMPLATE_ENTRY,
+  CLOUD_FORMATION_CHANGE_SET_INFO,
   AWS_EVALUATE_CLOUD_FORMATION_CHANGE_SET_EXECUTION_SERVICE,
 ]).config(() => {
   CloudProviderRegistry.registerProvider('aws', {
