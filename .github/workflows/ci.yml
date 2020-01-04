@@ -37,30 +37,30 @@ jobs:
     strategy:
       matrix:
         packages:
-          ['core amazon docker titus', 'appengine azure cloudfoundry', 'ecs google huaweicloud kubernetes oracle']
+          ['core amazon docker titus', 'appengine azure cloudfoundry', 'ecs oracle', 'google huaweicloud kubernetes']
 
     steps:
       - uses: actions/checkout@v1
-      - uses: actions/cache@v1
-        with:
-          path: app/scripts/modules/core/.cache-loader
-          key: cache-loader-core
-      - uses: actions/cache@v1
-        with:
-          path: app/scripts/modules/docker/.cache-loader
-          key: cache-loader-docker
-      - uses: actions/cache@v1
-        with:
-          path: app/scripts/modules/amazon/.cache-loader
-          key: cache-loader-amazon
-      - uses: actions/cache@v1
-        with:
-          path: app/scripts/modules/titus/.cache-loader
-          key: cache-loader-titus
-      - uses: actions/cache@v1
-        with:
-          path: /home/runner/.cache/yarn
-          key: yarn
+      #      - uses: actions/cache@v1
+      #        with:
+      #          path: app/scripts/modules/core/.cache-loader
+      #          key: cache-loader-core
+      #      - uses: actions/cache@v1
+      #        with:
+      #          path: app/scripts/modules/docker/.cache-loader
+      #          key: cache-loader-docker
+      #      - uses: actions/cache@v1
+      #        with:
+      #          path: app/scripts/modules/amazon/.cache-loader
+      #          key: cache-loader-amazon
+      #      - uses: actions/cache@v1
+      #        with:
+      #          path: app/scripts/modules/titus/.cache-loader
+      #          key: cache-loader-titus
+      #      - uses: actions/cache@v1
+      #        with:
+      #          path: /home/runner/.cache/yarn
+      #          key: yarn
       - uses: actions/setup-node@v1
         with:
           node-version: ${{ env.NODE_VERSION  }}
