@@ -1,5 +1,4 @@
 import React from 'react';
-import { get } from 'lodash';
 
 import { ExecutionDetailsSection, IExecutionDetailsSectionProps, StageFailureMessage } from 'core/pipeline';
 import { IGitTrigger } from 'core/domain';
