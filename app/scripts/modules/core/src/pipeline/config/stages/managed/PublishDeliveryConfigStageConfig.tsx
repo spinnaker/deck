@@ -33,7 +33,7 @@ export const PublishDeliveryConfigStageConfig: React.SFC<IStageConfigProps> = st
           name="manifest"
           label="File name"
           help={<HelpField id="pipeline.config.deliveryConfig.manifest" />}
-          input={props => <TextInput {...props} placeholder={SETTINGS.managedDelivery.defaultManifest} />}
+          input={props => <TextInput {...props} placeholder={SETTINGS.managedDelivery?.defaultManifest} />}
         />
       </div>
     )}
