@@ -3,7 +3,7 @@ import { get } from 'lodash';
 
 import { ExecutionDetailsSection, IExecutionDetailsSectionProps, StageFailureMessage } from 'core/pipeline';
 import { IGitTrigger } from 'core/domain';
-import { SETTINGS } from '../../../../config';
+import { SETTINGS } from 'core/config';
 
 export function PublishDeliveryConfigExecutionDetails(props: IExecutionDetailsSectionProps) {
   const { stage } = props;
