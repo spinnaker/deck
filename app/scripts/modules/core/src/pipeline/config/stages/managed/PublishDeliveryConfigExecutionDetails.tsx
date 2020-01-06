@@ -10,7 +10,7 @@ export function PublishDeliveryConfigExecutionDetails(props: IExecutionDetailsSe
   const trigger = props.execution.trigger as IGitTrigger;
   const errorDetailsAvailable = stage.isFailed && !stage.failureMessage && get(stage.context, 'error') != null;
   const manifestDirectory =
-    SETTINGS.managedDelivery.manifestBasePath + (stage.context.directory ? stage.context.directory : '');
+    SETTINGS.managedDelivery?.manifestBasePath + (stage.context.directory ?? '');
   const manifestFilename = stage.context.manifest ? stage.context.manifest : SETTINGS.managedDelivery.defaultManifest;
   const gitRef = stage.context.ref ? stage.context.ref : 'refs/heads/master';
 
