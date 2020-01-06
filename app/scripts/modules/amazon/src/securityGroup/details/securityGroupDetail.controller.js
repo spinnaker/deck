@@ -12,6 +12,7 @@ import {
   SecurityGroupWriter,
   FirewallLabels,
   MANAGED_RESOURCE_DETAILS_INDICATOR,
+  noop,
 } from '@spinnaker/core';
 
 import { VpcReader } from '../../vpc/VpcReader';
@@ -151,21 +152,23 @@ angular
       }
 
       this.editInboundRules = function editInboundRules() {
-        checkManagement().then(() =>
-          $uibModal.open({
-            templateUrl: require('../configure/editSecurityGroup.html'),
-            controller: 'awsEditSecurityGroupCtrl as ctrl',
-            size: 'lg',
-            resolve: {
-              securityGroup: function() {
-                return angular.copy($scope.securityGroup);
+        checkManagement()
+          .then(() =>
+            $uibModal.open({
+              templateUrl: require('../configure/editSecurityGroup.html'),
+              controller: 'awsEditSecurityGroupCtrl as ctrl',
+              size: 'lg',
+              resolve: {
+                securityGroup: function() {
+                  return angular.copy($scope.securityGroup);
+                },
+                application: function() {
+                  return application;
+                },
               },
-              application: function() {
-                return application;
-              },
-            },
-          }),
-        );
+            }),
+          )
+          .catch(noop);
       };
 
       this.cloneSecurityGroup = function cloneSecurityGroup() {
