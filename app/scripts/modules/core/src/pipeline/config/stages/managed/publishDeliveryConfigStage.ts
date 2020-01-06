@@ -9,7 +9,10 @@ import { SETTINGS } from 'core/config';
 if (SETTINGS.feature.managedDelivery) {
   Registry.pipeline.registerStage({
     label: 'Publish Delivery Config',
-    description: 'Publish Delivery Config Manifest',
+    description:
+      "Retrieve a Delivery Config manifest from the git repository configured in the pipeline's trigger, then update it in Spinnaker.",
+    extendedDescription: `<a target="_blank" href="https://www.spinnaker.io/reference/managed-delivery/">
+      <i class="small far fa-file"></i> Documentation</a>`,
     key: 'publishDeliveryConfig',
     restartable: false,
     component: PublishDeliveryConfigStageConfig,
