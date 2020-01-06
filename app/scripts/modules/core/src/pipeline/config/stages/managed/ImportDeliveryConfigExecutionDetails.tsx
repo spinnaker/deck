@@ -17,7 +17,7 @@ export function ImportDeliveryConfigExecutionDetails(props: IExecutionDetailsSec
     <ExecutionDetailsSection name={props.name} current={props.current}>
       <div className="row">
         <div className="col-md-12">
-          <h5>Publish Managed Delivery Manifest Stage Configuration</h5>
+          <h5>Import Delivery Config Stage Configuration</h5>
           <dl className="dl-narrow dl-horizontal">
             <dt>SCM</dt>
             <dd>{trigger.source}</dd>
@@ -51,6 +51,6 @@ export function ImportDeliveryConfigExecutionDetails(props: IExecutionDetailsSec
 
 // TODO: refactor this to not use namespace
 // eslint-disable-next-line
-export namespace PublishDeliveryConfigExecutionDetails {
-  export const title = 'publishDeliveryConfig';
+export namespace ImportDeliveryConfigExecutionDetails {
+  export const title = 'Import Delivery Config';
 }
