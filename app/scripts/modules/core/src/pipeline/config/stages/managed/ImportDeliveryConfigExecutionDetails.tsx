@@ -5,12 +5,11 @@ import { ExecutionDetailsSection, IExecutionDetailsSectionProps, StageFailureMes
 import { IGitTrigger } from 'core/domain';
 import { SETTINGS } from 'core/config';
 
-export function PublishDeliveryConfigExecutionDetails(props: IExecutionDetailsSectionProps) {
+export function ImportDeliveryConfigExecutionDetails(props: IExecutionDetailsSectionProps) {
   const { stage } = props;
   const trigger = props.execution.trigger as IGitTrigger;
   const errorDetailsAvailable = stage.isFailed && !stage.failureMessage && get(stage.context, 'error') != null;
-  const manifestDirectory =
-    SETTINGS.managedDelivery?.manifestBasePath + (stage.context.directory ?? '');
+  const manifestDirectory = SETTINGS.managedDelivery?.manifestBasePath + (stage.context.directory ?? '');
   const manifestFilename = stage.context.manifest ?? SETTINGS.managedDelivery?.defaultManifest;
   const gitRef = stage.context.ref ?? 'refs/heads/master';
 
