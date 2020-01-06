@@ -12,7 +12,7 @@ export function PublishDeliveryConfigExecutionDetails(props: IExecutionDetailsSe
   const manifestDirectory =
     SETTINGS.managedDelivery?.manifestBasePath + (stage.context.directory ?? '');
   const manifestFilename = stage.context.manifest ?? SETTINGS.managedDelivery?.defaultManifest;
-  const gitRef = stage.context.ref ? stage.context.ref : 'refs/heads/master';
+  const gitRef = stage.context.ref ?? 'refs/heads/master';
 
   return (
     <ExecutionDetailsSection name={props.name} current={props.current}>
