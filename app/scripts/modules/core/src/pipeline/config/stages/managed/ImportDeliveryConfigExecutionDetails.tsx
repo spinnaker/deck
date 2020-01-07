@@ -26,7 +26,7 @@ export function ImportDeliveryConfigExecutionDetails(props: IExecutionDetailsSec
             <dd>{trigger.slug}</dd>
             <dt>Directory</dt>
             <dd>{manifestDirectory}</dd>
-            <dt>Manifest</dt>
+            <dt>Manifest File</dt>
             <dd>{manifestFilename}</dd>
             <dt>Git ref</dt>
             <dd>{gitRef}</dd>
@@ -37,7 +37,7 @@ export function ImportDeliveryConfigExecutionDetails(props: IExecutionDetailsSec
       {errorDetailsAvailable && (
         <div>
           <div className="alert alert-danger">
-            Stage failed with the following error:
+            Something went wrong during import:
             <pre>${stage.context.error}</pre>
           </div>
         </div>
@@ -51,5 +51,5 @@ export function ImportDeliveryConfigExecutionDetails(props: IExecutionDetailsSec
 // TODO: refactor this to not use namespace
 // eslint-disable-next-line
 export namespace ImportDeliveryConfigExecutionDetails {
-  export const title = 'Import Delivery Config';
+  export const title = 'Configuration';
 }

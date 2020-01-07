@@ -5,7 +5,7 @@ import { IStageConfigProps, FormikStageConfig } from 'core/pipeline';
 import { FormikFormField, TextInput } from 'core/presentation';
 import { HelpField } from 'core/help';
 
-export const ImportDeliveryConfigStageConfig: React.SFC<IStageConfigProps> = stageConfigProps => (
+export const ImportDeliveryConfigStageConfig: React.ComponentType<IStageConfigProps> = stageConfigProps => (
   <FormikStageConfig
     {...stageConfigProps}
     onChange={stageConfigProps.updateStage}
