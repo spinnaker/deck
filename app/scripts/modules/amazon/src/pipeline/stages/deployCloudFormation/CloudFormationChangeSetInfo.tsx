@@ -55,7 +55,7 @@ export const CloudFormationChangeSetInfo = (props: ICloudFormationChangeSetInfoP
     <div>
       <hr />
       <h4>ChangeSet Configuration</h4>
-      <StageConfigField label="ChangeSet Name" helpkey="someone">
+      <StageConfigField label="ChangeSet Name">
         <TextInput
           className="form-control"
           type="text"

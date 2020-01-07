@@ -19,7 +19,6 @@ export interface IEvaluateCloudFormationChangeSetExecutionApprovalState {
 
 export const EvaluateCloudFormationChangeSetExecutionApproval = (
   props: IEvaluateCloudFormationChangeSetExecutionApprovalProps,
-  IEvaluateCloudFormationChangeSetExecutionApprovalState,
 ) => {
   const { execution, stage, application } = props;
   const [submitting, setSubmitting] = useState(false);
@@ -29,6 +28,7 @@ export const EvaluateCloudFormationChangeSetExecutionApproval = (
 
   const provideJudgment = (judgmentDecision: string) => {
     setSubmitting(true);
+    setJudgmentDecision(judgmentDecision);
     setError(false);
     AwsReactInjector.evaluateCloudFormationChangeSetExecutionService.evaluateExecution(
       application,
