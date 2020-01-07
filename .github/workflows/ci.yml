@@ -14,7 +14,7 @@ jobs:
       - name: Ensure package bumps are pure
         run: app/scripts/modules/assert_package_bumps_standalone.sh
 
-  unittests:
+  test:
     name: Unit tests
     runs-on: ubuntu-latest
     steps:
@@ -29,7 +29,24 @@ jobs:
       - name: Install Dependencies
         run: yarn --frozen-lockfile
       - name: Unit Tests
-        run: gradle/buildViaTravis.sh
+        run: yarn test
+
+  build:
+    name: Production Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/cache@v1
+        with:
+          path: /home/runner/.cache/yarn
+          key: yarn
+      - uses: actions/setup-node@v1
+        with:
+          node-version: ${{ env.NODE_VERSION  }}
+      - name: Install Dependencies
+        run: yarn --frozen-lockfile
+      - name: Unit Tests
+        run: yarn build
 
   packages:
     name: Build Packages
@@ -41,26 +58,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
-      #      - uses: actions/cache@v1
-      #        with:
-      #          path: app/scripts/modules/core/.cache-loader
-      #          key: cache-loader-core
-      #      - uses: actions/cache@v1
-      #        with:
-      #          path: app/scripts/modules/docker/.cache-loader
-      #          key: cache-loader-docker
-      #      - uses: actions/cache@v1
-      #        with:
-      #          path: app/scripts/modules/amazon/.cache-loader
-      #          key: cache-loader-amazon
-      #      - uses: actions/cache@v1
-      #        with:
-      #          path: app/scripts/modules/titus/.cache-loader
-      #          key: cache-loader-titus
-      #      - uses: actions/cache@v1
-      #        with:
-      #          path: /home/runner/.cache/yarn
-      #          key: yarn
       - uses: actions/setup-node@v1
         with:
           node-version: ${{ env.NODE_VERSION  }}
