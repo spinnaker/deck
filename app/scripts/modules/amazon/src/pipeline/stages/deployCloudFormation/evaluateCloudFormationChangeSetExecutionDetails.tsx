@@ -25,6 +25,21 @@ export class EvaluateCloudFormationChangeSetExecutionDetails extends React.Compo
           />
         </ExecutionDetailsSection>
       );
+    } else if (hasReplacement && !stage.isRunning && stage.context.changeSetExecutionChoice) {
+      return (
+        <ExecutionDetailsSection name={name} current={current}>
+          <div>
+            <div>
+              <dl className="no-margin">
+                <dt>Judgment</dt>
+                <dd>{stage.context.changeSetExecutionChoice}</dd>
+                <dt>Judged By</dt>
+                <dd>{stage.context.lastModifiedBy}</dd>
+              </dl>
+            </div>
+          </div>
+        </ExecutionDetailsSection>
+      );
     } else {
       return null;
     }
