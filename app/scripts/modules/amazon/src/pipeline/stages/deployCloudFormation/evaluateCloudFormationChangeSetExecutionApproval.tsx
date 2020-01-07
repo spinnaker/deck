@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 
 import { IExecution, IExecutionStage } from 'core/domain';
 import { Application } from 'core/application/application.model';
@@ -17,92 +17,66 @@ export interface IEvaluateCloudFormationChangeSetExecutionApprovalState {
   error: boolean;
 }
 
-export class EvaluateCloudFormationChangeSetExecutionApproval extends React.Component<
-  IEvaluateCloudFormationChangeSetExecutionApprovalProps,
-  IEvaluateCloudFormationChangeSetExecutionApprovalState
-> {
-  constructor(props: IEvaluateCloudFormationChangeSetExecutionApprovalProps) {
-    super(props);
-    this.state = {
-      submitting: false,
-      judgmentDecision: '',
-      error: false,
-    };
-  }
+export const EvaluateCloudFormationChangeSetExecutionApproval = (
+  props: IEvaluateCloudFormationChangeSetExecutionApprovalProps,
+  IEvaluateCloudFormationChangeSetExecutionApprovalState,
+) => {
+  const { execution, stage, application } = props;
+  const [submitting, setSubmitting] = useState(false);
+  const [judgmentDecision, setJudgmentDecision] = useState('');
+  const [error, setError] = useState(false);
+  const { ButtonBusyIndicator } = NgReact;
 
-  public provideJudgment(judgmentDecision: string): void {
-    const { application, execution, stage } = this.props;
-    this.setState({ submitting: true, error: false, judgmentDecision });
+  const provideJudgment = (judgmentDecision: string) => {
+    setSubmitting(true);
+    setError(false);
     AwsReactInjector.evaluateCloudFormationChangeSetExecutionService.evaluateExecution(
       application,
       execution,
       stage,
       judgmentDecision,
     );
-  }
-
-  private isSubmitting(decision: string): boolean {
-    return (
-      this.props.stage.context.judgmentStatus === decision ||
-      (this.state.submitting && this.state.judgmentDecision === decision)
-    );
-  }
-
-  private handleContinueClick = (): void => {
-    this.provideJudgment('skip');
   };
 
-  private handleFailClick = (): void => {
-    this.provideJudgment('fail');
+  const isSubmitting = (decision: string): boolean => {
+    return stage.judgmentStatus === decision || (submitting && judgmentDecision === decision);
   };
 
-  private handleStopClick = (): void => {
-    this.provideJudgment('execute');
+  const handleContinueClick = (): void => {
+    provideJudgment('skip');
   };
 
-  public render(): React.ReactElement<EvaluateCloudFormationChangeSetExecutionApproval> {
-    const stage: IExecutionStage = this.props.stage;
-    const changeSetContainsReplacement = !stage.context.changeSetContainsReplacement;
-    const { ButtonBusyIndicator } = NgReact;
+  const handleFailClick = (): void => {
+    provideJudgment('fail');
+  };
 
-    return (
+  const handleExecuteClick = (): void => {
+    provideJudgment('execute');
+  };
+
+  return (
+    <div>
       <div>
-        <div>
-          <p>
-            This ChangeSet contains a replacement, which means there will be <b>potential data loss</b> when executed.
-          </p>
-          <p>How do you want to proceed?</p>
-          <div className="action-buttons">
-            <button
-              className="btn btn-danger"
-              onClick={this.handleStopClick}
-              disabled={changeSetContainsReplacement || this.state.submitting}
-            >
-              {this.isSubmitting('Execute') && <ButtonBusyIndicator />}
-              {stage.context.stopButtonLabel || 'Execute'}
-            </button>
-            <button
-              className="btn btn-primary"
-              disabled={changeSetContainsReplacement || this.state.submitting}
-              onClick={this.handleContinueClick}
-            >
-              {this.isSubmitting('Skip') && <ButtonBusyIndicator />}
-              {stage.context.continueButtonLabel || 'Skip'}
-            </button>
-            <button
-              className="btn btn-primary"
-              disabled={changeSetContainsReplacement || this.state.submitting}
-              onClick={this.handleFailClick}
-            >
-              {this.isSubmitting('Fail') && <ButtonBusyIndicator />}
-              {stage.context.continueButtonLabel || 'Fail'}
-            </button>
-          </div>
+        <p>
+          This ChangeSet contains a replacement, which means there will be <b>potential data loss</b> when executed.
+        </p>
+        <p>How do you want to proceed?</p>
+        <div className="action-buttons">
+          <button className="btn btn-danger" onClick={handleExecuteClick} disabled={submitting}>
+            {isSubmitting('Execute') && <ButtonBusyIndicator />}
+            {stage.context.stopButtonLabel || 'Execute'}
+          </button>
+          <button className="btn btn-primary" disabled={submitting} onClick={handleContinueClick}>
+            {isSubmitting('Skip') && <ButtonBusyIndicator />}
+            {stage.context.skipButtonLabel || 'Skip'}
+          </button>
+          <button className="btn btn-primary" disabled={submitting} onClick={handleFailClick}>
+            {isSubmitting('Fail') && <ButtonBusyIndicator />}
+            {stage.context.FailButtonLabel || 'Fail'}
+          </button>
         </div>
-        {this.state.error && (
-          <div className="error-message">There was an error recording your decision. Please try again.</div>
-        )}
       </div>
-    );
-  }
-}
+      {error && <div className="error-message">There was an error recording your decision. Please try again.</div>}
+    </div>
+  );
+};
