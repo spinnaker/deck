@@ -10,13 +10,11 @@ export function ImportDeliveryConfigExecutionDetails(props: IExecutionDetailsSec
   const errorDetailsAvailable = stage.isFailed && !stage.failureMessage && stage.context.error;
   const manifestDirectory = SETTINGS.managedDelivery?.manifestBasePath + (stage.context.directory ?? '');
   const manifestFilename = stage.context.manifest ?? SETTINGS.managedDelivery?.defaultManifest;
-  const gitRef = stage.context.ref ?? 'refs/heads/master';
 
   return (
     <ExecutionDetailsSection name={props.name} current={props.current}>
       <div className="row">
         <div className="col-md-12">
-          <h5>Import Delivery Config Stage Configuration</h5>
           <dl className="dl-narrow dl-horizontal">
             <dt>SCM</dt>
             <dd>{trigger.source}</dd>
@@ -28,8 +26,10 @@ export function ImportDeliveryConfigExecutionDetails(props: IExecutionDetailsSec
             <dd>{manifestDirectory}</dd>
             <dt>Manifest File</dt>
             <dd>{manifestFilename}</dd>
-            <dt>Git ref</dt>
-            <dd>{gitRef}</dd>
+            <dt>Branch</dt>
+            <dd>{trigger.branch}</dd>
+            <dt>Commit</dt>
+            <dd>{trigger.hash}</dd>
           </dl>
         </div>
       </div>
