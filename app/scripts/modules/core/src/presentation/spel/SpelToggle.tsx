@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as classNames from 'classnames';
 
 import { Tooltip } from 'core/presentation';
 
@@ -13,14 +14,16 @@ export enum SpelAwareInputMode {
 }
 
 export function SpelToggle(props: ISpelToggleProps) {
-  const inputModeLabels: { [k in SpelAwareInputMode]: string } = {
-    [SpelAwareInputMode.DEFAULT]: 'Enter SpEL in freeform input',
-    [SpelAwareInputMode.FREEFORM]: 'Return to default input',
-  };
-
   return (
-    <Tooltip value={inputModeLabels[props.inputMode]}>
-      <button className="btn btn-sm btn-default" onClick={props.onClick}>
+    <Tooltip
+      value={
+        props.inputMode === SpelAwareInputMode.FREEFORM ? 'Return to default input' : 'Enter SpEL in freeform input'
+      }
+    >
+      <button
+        className={classNames('btn btn-sm btn-default', { active: props.inputMode === SpelAwareInputMode.FREEFORM })}
+        onClick={props.onClick}
+      >
         <span className="fa icon-spel" />
       </button>
     </Tooltip>

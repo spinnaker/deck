@@ -2,21 +2,14 @@ import React from 'react';
 import { get, isString } from 'lodash';
 import { FastField, Field, FieldProps, FormikConsumer, FormikContext, getIn } from 'formik';
 
-import { firstDefined, noop } from 'core/utils';
+import { firstDefined } from 'core/utils';
 
 import { WatchValue } from '../../WatchValue';
 import { composeValidators, IValidator, useValidationData, Validators } from '../validation';
 import { ICommonFormFieldProps, renderContent } from './index';
-import { IFormInputProps, IFormInputValidation } from '../inputs';
+import { IFormInputValidation } from '../inputs';
 import { ILayoutProps, LayoutContext } from '../layouts';
-import {
-  FormikSpelContext,
-  IFormikSpelConfig,
-  SimpleSpelInput,
-  SpelAwareInputMode,
-  SpelService,
-  SpelToggle,
-} from '../../spel';
+import { FormikSpelContext, SimpleSpelInput, SpelAwareInputMode, SpelService, SpelToggle } from '../../spel';
 
 export interface IFormikFieldProps<T> {
   /**
@@ -39,7 +32,7 @@ export interface IFormikFieldProps<T> {
   /** Configures SpEL-awareness of the input.
    * Overrides configuration set on FormikSpelContext.
    */
-  spelConfig?: IFormikSpelConfig;
+  spelAware?: boolean;
 }
 
 export type IFormikFormFieldProps<T> = ICommonFormFieldProps & IFormikFieldProps<T>;
@@ -53,6 +46,7 @@ function FormikFormFieldImpl<T = any>(props: IFormikFormFieldImplProps<T>) {
   const { input, layout, label, help, required, actions, validate, validationMessage, touched: touchedProp } = props;
 
   const FieldLayoutFromContext = useContext(LayoutContext);
+  const SpelAwareFromContext = useContext(FormikSpelContext);
 
   const formikTouched = getIn(formik.touched, name);
   const formikError = getIn(formik.errors, props.name);
@@ -84,16 +78,7 @@ function FormikFormFieldImpl<T = any>(props: IFormikFormFieldImplProps<T>) {
 
   const [inputMode, setInputMode] = React.useState(SpelAwareInputMode.DEFAULT);
 
-  const modeToInput: { [k in SpelAwareInputMode]: React.ComponentType<IFormInputProps> } = {
-    [SpelAwareInputMode.DEFAULT]: input,
-    [SpelAwareInputMode.FREEFORM]: SimpleSpelInput,
-  };
-
-  const freeformInputEnabled = firstDefined(
-    get(props, 'spelConfig.freeformInputEnabled', null),
-    get(useContext(FormikSpelContext), 'freeformInputEnabled', null),
-    false,
-  );
+  const freeformInputEnabled = firstDefined(props.spelAware, SpelAwareFromContext, false);
 
   React.useEffect(() => {
     if (!freeformInputEnabled) {
@@ -112,10 +97,10 @@ function FormikFormFieldImpl<T = any>(props: IFormikFormFieldImplProps<T>) {
   };
 
   const renderField = ({ field }: FieldProps<any>) => {
-    const inputRenderPropOrNode = firstDefined(modeToInput[inputMode], noop);
+    const inputOrSpel = inputMode === SpelAwareInputMode.DEFAULT ? input : SimpleSpelInput;
     const layoutFromContext = (fieldLayoutProps: ILayoutProps) => <FieldLayoutFromContext {...fieldLayoutProps} />;
     const layoutRenderPropOrNode = firstDefined(layout, layoutFromContext);
-    const inputElement = renderContent(inputRenderPropOrNode, { ...field, validation });
+    const inputElement = renderContent(inputOrSpel, { ...field, validation });
 
     const composedActions = (
       <>

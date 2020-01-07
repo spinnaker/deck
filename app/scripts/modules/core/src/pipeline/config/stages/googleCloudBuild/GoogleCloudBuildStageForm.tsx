@@ -134,22 +134,8 @@ export function GoogleCloudBuildStageForm(props: IGoogleCloudBuildStageFormProps
     }
   }, [stage.triggerType]);
 
-  const freeformSpelEnabled = React.useMemo(
-    () => ({
-      freeformInputEnabled: true,
-    }),
-    [],
-  );
-
-  const freeformSpelDisabled = React.useMemo(
-    () => ({
-      freeformInputEnabled: false,
-    }),
-    [],
-  );
-
   return (
-    <FormikSpelContextProvider value={freeformSpelEnabled}>
+    <FormikSpelContextProvider value={true}>
       <div className="form-horizontal">
         <FormikFormField
           fastField={false}
@@ -169,7 +155,7 @@ export function GoogleCloudBuildStageForm(props: IGoogleCloudBuildStageFormProps
           label="Build Definition Source"
           name="buildDefinitionSource"
           input={(inputProps: IFormInputProps) => <RadioButtonInput {...inputProps} options={SOURCE_OPTIONS} />}
-          spelConfig={freeformSpelDisabled}
+          spelAware={false}
         />
         {stage.buildDefinitionSource === BuildDefinitionSource.TEXT && (
           <FormikFormField
@@ -179,7 +165,7 @@ export function GoogleCloudBuildStageForm(props: IGoogleCloudBuildStageFormProps
             input={(inputProps: IFormInputProps) => (
               <YamlEditor {...inputProps} value={rawBuildDefinitionYaml} onChange={onYamlChange} />
             )}
-            spelConfig={freeformSpelDisabled}
+            spelAware={false}
           />
         )}
         {stage.buildDefinitionSource === BuildDefinitionSource.ARTIFACT && (
@@ -230,14 +216,14 @@ export function GoogleCloudBuildStageForm(props: IGoogleCloudBuildStageFormProps
                   options={TRIGGER_TYPE_OPTIONS}
                 />
               )}
-              spelConfig={freeformSpelDisabled}
+              spelAware={false}
             />
             <FormikFormField
               fastField={false}
               label="Value"
               name={`repoSource.${stage.triggerType}`}
               input={(inputProps: IFormInputProps) => <TextInput {...inputProps} disabled={!stage.triggerType} />}
-              spelConfig={freeformSpelDisabled}
+              spelAware={false}
             />
           </>
         )}
