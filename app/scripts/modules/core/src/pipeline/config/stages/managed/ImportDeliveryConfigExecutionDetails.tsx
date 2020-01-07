@@ -29,7 +29,7 @@ export function ImportDeliveryConfigExecutionDetails(props: IExecutionDetailsSec
             <dt>Branch</dt>
             <dd>{trigger.branch}</dd>
             <dt>Commit</dt>
-            <dd>{trigger.hash}</dd>
+            <dd>{trigger.hash.substring(0, 7)}</dd>
           </dl>
         </div>
       </div>
