@@ -1,6 +1,6 @@
 import { IController, IScope, module } from 'angular';
 import { IModalService } from 'angular-ui-bootstrap';
-import { cloneDeep, get, map, mapValues, reduce } from 'lodash';
+import { cloneDeep, map, mapValues, reduce } from 'lodash';
 
 import {
   Application,
@@ -126,18 +126,23 @@ class AppengineServerGroupDetailsController implements IController {
   }
 
   public destroyServerGroup(): void {
-    const taskMonitor = {
-      application: this.app,
-      title: 'Destroying ' + this.serverGroup.name,
-    };
-
-    const submitMethod = (params: any) => this.serverGroupWriter.destroyServerGroup(this.serverGroup, this.app, params);
-
     const stateParams = {
       name: this.serverGroup.name,
       accountId: this.serverGroup.account,
       region: this.serverGroup.region,
     };
+
+    const taskMonitor = {
+      application: this.app,
+      title: 'Destroying ' + this.serverGroup.name,
+      onTaskComplete: () => {
+        if (this.$state.includes('**.serverGroup', stateParams)) {
+          this.$state.go('^');
+        }
+      },
+    };
+
+    const submitMethod = (params: any) => this.serverGroupWriter.destroyServerGroup(this.serverGroup, this.app, params);
 
     const confirmationModalParams = {
       header: 'Really destroy ' + this.serverGroup.name + '?',
@@ -149,11 +154,6 @@ class AppengineServerGroupDetailsController implements IController {
       platformHealthOnlyShowOverride: this.app.attributes.platformHealthOnlyShowOverride,
       platformHealthType: AppengineHealth.PLATFORM,
       body: this.getBodyTemplate(this.serverGroup, this.app),
-      onTaskComplete: () => {
-        if (this.$state.includes('**.serverGroup', stateParams)) {
-          this.$state.go('^');
-        }
-      },
       interestingHealthProviderNames: [] as string[],
     };
 
@@ -345,9 +345,7 @@ class AppengineServerGroupDetailsController implements IController {
 
   private canStartOrStopServerGroup(): boolean {
     const isFlex = this.serverGroup.env === 'FLEXIBLE';
-    const usesManualScaling = get(this.serverGroup, 'scalingPolicy.type') === 'MANUAL';
-    const usesBasicScaling = get(this.serverGroup, 'scalingPolicy.type') === 'BASIC';
-    return isFlex || usesManualScaling || usesBasicScaling;
+    return isFlex || ['MANUAL', 'BASIC'].includes(this.serverGroup.scalingPolicy?.type);
   }
 
   private getBodyTemplate(serverGroup: IAppengineServerGroup, app: Application): string {
@@ -392,7 +390,7 @@ class AppengineServerGroupDetailsController implements IController {
     app: Application,
   ): { [key: string]: number } {
     const loadBalancer = app.getDataSource('loadBalancers').data.find((toCheck: IAppengineLoadBalancer): boolean => {
-      const allocations = get(toCheck, 'split.allocations', {});
+      const allocations = toCheck.split?.allocations ?? {};
       const enabledServerGroups = Object.keys(allocations);
       return enabledServerGroups.includes(serverGroup.name);
     });
