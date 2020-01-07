@@ -24,10 +24,10 @@ export const CloudFormationChangeSetInfo = (props: ICloudFormationChangeSetInfoP
 
   const { stage, stageconfig } = props;
   const [changeSetName, setChangeSetName] = useState(
-    stage.changeSetName ? stage.changeSetName : 'ChangeSet-' + randomString,
+    (stage as any).changeSetName ? (stage as any).changeSetName : 'ChangeSet-' + randomString,
   );
-  const [executeChangeSet, setExecuteChangeSet] = useState(stage.executeChangeSet);
-  const [actionOnReplacement, setActionOnReplacement] = useState(stage.actionOnReplacement);
+  const [executeChangeSet, setExecuteChangeSet] = useState((stage as any).executeChangeSet);
+  const [actionOnReplacement, setActionOnReplacement] = useState((stage as any).actionOnReplacement);
 
   const modifyChangeSetName = (value: string) => {
     setChangeSetName(value);
