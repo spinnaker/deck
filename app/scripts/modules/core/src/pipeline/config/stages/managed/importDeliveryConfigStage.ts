@@ -1,9 +1,8 @@
 import { Registry } from 'core/registry';
 import { ExecutionDetailsTasks } from 'core/pipeline';
 
-import { ImportDeliveryConfigStageConfig } from './ImportDeliveryConfigStageConfig';
+import { ImportDeliveryConfigStageConfig, validate } from './ImportDeliveryConfigStageConfig';
 import { ImportDeliveryConfigExecutionDetails } from './ImportDeliveryConfigExecutionDetails';
-import { IStageOrTriggerBeforeTypeValidationConfig } from 'core/pipeline/config/validation/stageOrTriggerBeforeType.validator';
 import { SETTINGS } from 'core/config';
 
 if (SETTINGS.feature.managedDelivery) {
@@ -17,14 +16,6 @@ if (SETTINGS.feature.managedDelivery) {
     restartable: false,
     component: ImportDeliveryConfigStageConfig,
     executionDetailsSections: [ImportDeliveryConfigExecutionDetails, ExecutionDetailsTasks],
-    //validateFn: validate,
-    validators: [
-      {
-        type: 'stageOrTriggerBeforeType',
-        // FIXME: this needs to be generalized so that it accepts a rocket trigger in the netflix deployment
-        stageType: 'git',
-        message: 'This stage requires a git trigger to locate your Delivery Config manifest.',
-      } as IStageOrTriggerBeforeTypeValidationConfig,
-    ],
+    validateFn: validate,
   });
 }
