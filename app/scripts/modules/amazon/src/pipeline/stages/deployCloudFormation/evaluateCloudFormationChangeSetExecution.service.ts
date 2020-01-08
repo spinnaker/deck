@@ -7,27 +7,12 @@ export class EvaluateCloudFormationChangeSetExecutionService {
   public static $inject = ['executionService'];
   constructor(private executionService: ExecutionService) {}
 
-  private clearPipelineColor(): void {
-    if (
-      typeof document.getElementsByClassName(
-        'execution-marker-running stage-type-deploycloudformation stage-type-deploycloudformation-ask',
-      )[0] !== 'undefined'
-    ) {
-      document
-        .getElementsByClassName(
-          'execution-marker-running stage-type-deploycloudformation stage-type-deploycloudformation-ask',
-        )[0]
-        .classList.remove('stage-type-deploycloudformation-ask');
-    }
-  }
-
   public evaluateExecution(
     application: Application,
     execution: IExecution,
     stage: IExecutionStage,
     changeSetExecutionChoice: string,
   ): IPromise<void> {
-    this.clearPipelineColor();
     const matcher = (result: IExecution) => {
       const match = result.stages.find((test: { id: any }) => test.id === stage.id);
       return match && match.status !== 'RUNNING';

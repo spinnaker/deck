@@ -31,6 +31,10 @@ export class EvaluateCloudFormationChangeSetExecutionDetails extends React.Compo
           <div>
             <div>
               <dl className="no-margin">
+                <dt>ChangeSet Name</dt>
+                <dd>{stage.context.changeSetName}</dd>
+                <dt>Replacement</dt>
+                <dd>true</dd>
                 <dt>Judgment</dt>
                 <dd>{stage.context.changeSetExecutionChoice}</dd>
                 <dt>Judged By</dt>
@@ -40,8 +44,34 @@ export class EvaluateCloudFormationChangeSetExecutionDetails extends React.Compo
           </div>
         </ExecutionDetailsSection>
       );
+    } else if (!hasReplacement && !stage.isRunning) {
+      return (
+        <ExecutionDetailsSection name={name} current={current}>
+          <div>
+            <div>
+              <dl className="no-margin">
+                <dt>ChangeSet Name</dt>
+                <dd>{stage.context.changeSetName}</dd>
+                <dt>Replacement</dt>
+                <dd>false</dd>
+              </dl>
+            </div>
+          </div>
+        </ExecutionDetailsSection>
+      );
     } else {
-      return null;
+      return (
+        <ExecutionDetailsSection name={name} current={current}>
+          <div>
+            <div>
+              <dl className="no-margin">
+                <dt>ChangeSet Name</dt>
+                <dd>{stage.context.changeSetName}</dd>
+              </dl>
+            </div>
+          </div>
+        </ExecutionDetailsSection>
+      );
     }
   }
 }
