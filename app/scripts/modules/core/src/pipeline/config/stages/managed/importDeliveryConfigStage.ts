@@ -21,6 +21,7 @@ if (SETTINGS.feature.managedDelivery) {
     validators: [
       {
         type: 'stageOrTriggerBeforeType',
+        // FIXME: this needs to be generalized so that it accepts a rocket trigger in the netflix deployment
         stageType: 'git',
         message: 'This stage requires a git trigger to locate your Delivery Config manifest.',
       } as IStageOrTriggerBeforeTypeValidationConfig,
