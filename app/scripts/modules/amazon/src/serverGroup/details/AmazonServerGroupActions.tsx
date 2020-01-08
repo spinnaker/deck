@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dropdown, Tooltip } from 'react-bootstrap';
+import { Dropdown, MenuItem, Tooltip } from 'react-bootstrap';
 import { filter, find, get, orderBy } from 'lodash';
 
 import {
@@ -36,15 +36,7 @@ export class AmazonServerGroupActionsResize extends React.Component<IAmazonResiz
   };
 
   public render(): JSX.Element {
-    return (
-      <ManagedMenuItem
-        resource={this.props.serverGroup}
-        application={this.props.application}
-        onClick={this.resizeServerGroup}
-      >
-        Resize
-      </ManagedMenuItem>
-    );
+    return <MenuItem onClick={this.resizeServerGroup}>Resize</MenuItem>;
   }
 }
 

@@ -25,11 +25,10 @@ export class TitusCapacityDetailsSection extends React.Component<ICapacityDetail
     const simpleMode = capacity.min === capacity.max;
 
     const resizeServerGroup = () =>
-      confirmNotManaged(serverGroup, application)
-        .then(() => {
+      confirmNotManaged(serverGroup, application).then(notManaged => {
+        notManaged &&
           ReactModal.show<ITitusResizeServerGroupModalProps>(TitusResizeServerGroupModal, { serverGroup, application });
-        })
-        .catch(() => {});
+      });
 
     return (
       <>

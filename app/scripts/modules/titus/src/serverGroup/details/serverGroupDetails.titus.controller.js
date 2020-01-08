@@ -261,9 +261,9 @@ angular
 
         ServerGroupWarningMessageService.addDestroyWarningMessage(app, serverGroup, confirmationModalParams);
 
-        confirmNotManaged(serverGroup, app)
-          .then(() => confirmationModalService.confirm(confirmationModalParams))
-          .catch(() => {});
+        confirmNotManaged(serverGroup, app).then(
+          notManaged => notManaged && confirmationModalService.confirm(confirmationModalParams),
+        );
       };
 
       this.disableServerGroup = function disableServerGroup() {
@@ -295,46 +295,45 @@ angular
 
         ServerGroupWarningMessageService.addDisableWarningMessage(app, serverGroup, confirmationModalParams);
 
-        confirmNotManaged(serverGroup, app)
-          .then(() => confirmationModalService.confirm(confirmationModalParams))
-          .catch(() => {});
+        confirmNotManaged(serverGroup, app).then(
+          notManaged => notManaged && confirmationModalService.confirm(confirmationModalParams),
+        );
       };
 
       this.enableServerGroup = () => {
-        confirmNotManaged(serverGroup, app)
-          .then(() => {
-            if (!this.isRollbackEnabled()) {
-              this.showEnableServerGroupModal();
-              return;
-            }
+        confirmNotManaged(serverGroup, app).then(notManaged => {
+          if (!notManaged) {
+            return;
+          }
+          if (!this.isRollbackEnabled()) {
+            this.showEnableServerGroupModal();
+            return;
+          }
 
-            const confirmationModalParams = {
-              header: 'Rolling back?',
-              body: `Spinnaker provides an orchestrated rollback feature to carefully restore a different version of this
+          const confirmationModalParams = {
+            header: 'Rolling back?',
+            body: `Spinnaker provides an orchestrated rollback feature to carefully restore a different version of this
                  server group. Do you want to use the orchestrated rollback?`,
-              buttonText: `Yes, take me to the rollback settings modal`,
-              cancelButtonText: 'No, I just want to enable the server group',
-            };
+            buttonText: `Yes, take me to the rollback settings modal`,
+            cancelButtonText: 'No, I just want to enable the server group',
+          };
 
-            confirmationModalService
-              .confirm(confirmationModalParams)
-              .then(() => this.rollbackServerGroup())
-              .catch(({ source }) => {
-                // don't show the enable modal if the user cancels with the header button
-                if (source === 'footer') {
-                  this.showEnableServerGroupModal();
-                }
-              });
-          })
-          .catch(() => {});
+          confirmationModalService
+            .confirm(confirmationModalParams)
+            .then(() => this.rollbackServerGroup())
+            .catch(({ source }) => {
+              // don't show the enable modal if the user cancels with the header button
+              if (source === 'footer') {
+                this.showEnableServerGroupModal();
+              }
+            });
+        });
       };
 
       this.resizeServerGroup = () => {
-        confirmNotManaged(serverGroup, app)
-          .then(() => {
-            ReactModal.show(TitusResizeServerGroupModal, { serverGroup: $scope.serverGroup, application });
-          })
-          .catch(() => {});
+        confirmNotManaged(serverGroup, app).then(notManaged => {
+          notManaged && ReactModal.show(TitusResizeServerGroupModal, { serverGroup: $scope.serverGroup, application });
+        });
       };
 
       this.showEnableServerGroupModal = () => {
@@ -430,8 +429,8 @@ angular
           previousServerGroup = allServerGroups[0];
         }
 
-        confirmNotManaged(serverGroup, app)
-          .then(() => {
+        confirmNotManaged(serverGroup, app).then(notManaged => {
+          notManaged &&
             $uibModal.open({
               templateUrl: require('./rollback/rollbackServerGroup.html'),
               controller: 'titusRollbackServerGroupCtrl as ctrl',
@@ -449,8 +448,7 @@ angular
                 application: () => application,
               },
             });
-          })
-          .catch(() => {});
+        });
       };
     },
   ]);
