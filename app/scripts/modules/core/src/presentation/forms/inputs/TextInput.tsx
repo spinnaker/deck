@@ -16,7 +16,7 @@ export class TextInput extends React.Component<ITextInputProps> {
       <input className={className} type="text" autoComplete="off" value={orEmptyString(value)} {...otherProps} />
     );
 
-    if (prefix != null) {
+    if (prefix) {
       return (
         <div className="flex-container-h middle">
           <div className="sp-padding-xs-right body-regular">{prefix}</div>
