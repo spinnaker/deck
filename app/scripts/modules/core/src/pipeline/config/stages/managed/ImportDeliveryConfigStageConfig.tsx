@@ -13,16 +13,16 @@ export const ImportDeliveryConfigStageConfig: React.ComponentType<IStageConfigPr
     render={() => (
       <div className="form-horizontal">
         <FormikFormField
-          name="directory"
-          label="Directory"
-          help={<HelpField id="pipeline.config.deliveryConfig.directory" />}
-          input={props => <TextInput {...props} placeholder={'/'} />}
-        />
-        <FormikFormField
           name="manifest"
-          label="File name"
+          label="Manifest Path"
           help={<HelpField id="pipeline.config.deliveryConfig.manifest" />}
-          input={props => <TextInput {...props} placeholder={SETTINGS.managedDelivery?.defaultManifest} />}
+          input={props => (
+            <TextInput
+              {...props}
+              prefix={SETTINGS.managedDelivery?.manifestBasePath + '/'}
+              placeholder={SETTINGS.managedDelivery?.defaultManifest}
+            />
+          )}
         />
       </div>
     )}

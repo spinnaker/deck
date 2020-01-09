@@ -8,8 +8,10 @@ export function ImportDeliveryConfigExecutionDetails(props: IExecutionDetailsSec
   const { stage } = props;
   const trigger = props.execution.trigger as IGitTrigger;
   const errorDetailsAvailable = stage.isFailed && !stage.failureMessage && stage.context.error;
-  const manifestDirectory = SETTINGS.managedDelivery?.manifestBasePath + (stage.context.directory ?? '');
-  const manifestFilename = stage.context.manifest ?? SETTINGS.managedDelivery?.defaultManifest;
+  const manifestPath =
+    SETTINGS.managedDelivery?.manifestBasePath +
+    '/' +
+    (stage.context.manifest ?? SETTINGS.managedDelivery?.defaultManifest);
 
   return (
     <ExecutionDetailsSection name={props.name} current={props.current}>
@@ -22,10 +24,8 @@ export function ImportDeliveryConfigExecutionDetails(props: IExecutionDetailsSec
             <dd>{trigger.project}</dd>
             <dt>Repository</dt>
             <dd>{trigger.slug}</dd>
-            <dt>Directory</dt>
-            <dd>{manifestDirectory}</dd>
-            <dt>Manifest File</dt>
-            <dd>{manifestFilename}</dd>
+            <dt>Manifest Path</dt>
+            <dd>{manifestPath}</dd>
             <dt>Branch</dt>
             <dd>{trigger.branch}</dd>
             <dt>Commit</dt>
