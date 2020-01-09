@@ -1,8 +1,9 @@
 import { Registry } from 'core/registry';
 import { ExecutionDetailsTasks } from 'core/pipeline';
 
-import { ImportDeliveryConfigStageConfig, validate } from './ImportDeliveryConfigStageConfig';
+import { ImportDeliveryConfigStageConfig } from './ImportDeliveryConfigStageConfig';
 import { ImportDeliveryConfigExecutionDetails } from './ImportDeliveryConfigExecutionDetails';
+import { IUpstreamFlagProvidedValidationConfig } from 'core/pipeline/config/validation/upstreamHasFlagValidator.builder';
 import { SETTINGS } from 'core/config';
 
 if (SETTINGS.feature.managedDelivery) {
@@ -16,6 +17,14 @@ if (SETTINGS.feature.managedDelivery) {
     restartable: false,
     component: ImportDeliveryConfigStageConfig,
     executionDetailsSections: [ImportDeliveryConfigExecutionDetails, ExecutionDetailsTasks],
-    validateFn: validate,
+    validators: [
+      {
+        type: 'repositoryInformationProvided',
+        getMessage: (labels: any[]) => `
+          This stage requires one of the following triggers to locate your Delivery Config manifest:
+          <ul>${labels.map(label => `<li>${label}</li>`)}</ul>
+          `,
+      } as IUpstreamFlagProvidedValidationConfig,
+    ],
   });
 }
