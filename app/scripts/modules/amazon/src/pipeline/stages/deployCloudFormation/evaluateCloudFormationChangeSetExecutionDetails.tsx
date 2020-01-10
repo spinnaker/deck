@@ -14,64 +14,43 @@ export class EvaluateCloudFormationChangeSetExecutionDetails extends React.Compo
   public render() {
     const { application, execution, stage, current, name } = this.props;
     const hasReplacement = stage.context.changeSetContainsReplacement;
-    if (hasReplacement && stage.isRunning && stage.context.actionOnReplacement === 'ask') {
-      return (
-        <ExecutionDetailsSection name={name} current={current}>
+    const askAction = hasReplacement && stage.isRunning && stage.context.actionOnReplacement === 'ask';
+    const isChangeSet = stage.context.isChangeSet;
+
+    return (
+      <ExecutionDetailsSection name={name} current={current}>
+        {askAction ? (
           <EvaluateCloudFormationChangeSetExecutionApproval
             key={stage.refId}
             application={application}
             execution={execution}
             stage={stage}
           />
-        </ExecutionDetailsSection>
-      );
-    } else if (hasReplacement && !stage.isRunning && stage.context.changeSetExecutionChoice) {
-      return (
-        <ExecutionDetailsSection name={name} current={current}>
+        ) : (
           <div>
-            <div>
-              <dl className="no-margin">
-                <dt>ChangeSet Name</dt>
-                <dd>{stage.context.changeSetName}</dd>
-                <dt>Replacement</dt>
-                <dd>true</dd>
-                <dt>Judgment</dt>
-                <dd>{stage.context.changeSetExecutionChoice}</dd>
-                <dt>Judged By</dt>
-                <dd>{stage.context.lastModifiedBy}</dd>
-              </dl>
-            </div>
+            {isChangeSet ? (
+              <div>
+                <dl className="no-margin">
+                  <dt>ChangeSet Name</dt>
+                  <dd>{stage.context.changeSetName}</dd>
+                  <dt>Replacement</dt>
+                  <dd>{String(hasReplacement)}</dd>
+                  {stage.context.changeSetExecutionChoice && (
+                    <div>
+                      <dt>Judgment</dt>
+                      <dd>{stage.context.changeSetExecutionChoice}</dd>
+                      <dt>Judged By</dt>
+                      <dd>{stage.context.lastModifiedBy}</dd>
+                    </div>
+                  )}
+                </dl>
+              </div>
+            ) : (
+              <div>No changeSets found</div>
+            )}
           </div>
-        </ExecutionDetailsSection>
-      );
-    } else if (!hasReplacement && !stage.isRunning) {
-      return (
-        <ExecutionDetailsSection name={name} current={current}>
-          <div>
-            <div>
-              <dl className="no-margin">
-                <dt>ChangeSet Name</dt>
-                <dd>{stage.context.changeSetName}</dd>
-                <dt>Replacement</dt>
-                <dd>false</dd>
-              </dl>
-            </div>
-          </div>
-        </ExecutionDetailsSection>
-      );
-    } else {
-      return (
-        <ExecutionDetailsSection name={name} current={current}>
-          <div>
-            <div>
-              <dl className="no-margin">
-                <dt>ChangeSet Name</dt>
-                <dd>{stage.context.changeSetName}</dd>
-              </dl>
-            </div>
-          </div>
-        </ExecutionDetailsSection>
-      );
-    }
+        )}
+      </ExecutionDetailsSection>
+    );
   }
 }
