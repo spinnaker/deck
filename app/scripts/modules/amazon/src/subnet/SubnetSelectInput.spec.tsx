@@ -2,18 +2,11 @@ import React from 'react';
 import { shallow } from 'enzyme';
 import { mock } from 'angular';
 import { SubnetSelectInput } from './SubnetSelectInput';
-import {
-  Application,
-  ApplicationModelBuilder,
-  mockServerGroupDataSourceConfig,
-  mockSubnet,
-  REACT_MODULE,
-} from '@spinnaker/core';
+import { Application, ApplicationModelBuilder, mockServerGroupDataSourceConfig, mockSubnet } from '@spinnaker/core';
 
 describe('SubnetSelectInput', () => {
   let application: Application;
 
-  //beforeEach(mock.module(REACT_MODULE));
   beforeEach(
     mock.inject(() => {
       application = ApplicationModelBuilder.createApplicationForTests('testapp', mockServerGroupDataSourceConfig);
@@ -49,7 +42,6 @@ describe('SubnetSelectInput', () => {
 describe('SubnetSelectInput read only', () => {
   let application: Application;
 
-  beforeEach(mock.module(REACT_MODULE));
   beforeEach(
     mock.inject(() => {
       application = ApplicationModelBuilder.createApplicationForTests('testapp', mockServerGroupDataSourceConfig);
