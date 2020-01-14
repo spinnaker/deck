@@ -406,24 +406,12 @@ export class Pager extends React.Component<IPagerProps, IPagerState> {
 
   private pageRenderer = (data: TableCellProps): React.ReactNode => {
     const service: IPagerDutyService = data.cellData;
-    const disabled = service.status === 'disabled';
 
-    const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (!disabled) {
-        const target = event.target;
-        this.selectedChanged(service, target.checked);
-      }
-    };
-
-    const id = `checkbox-${service.integration_key}`;
     const checked = this.state.selectedKeys.has(service.integration_key);
     return (
       <div style={paddingStyle}>
         <div className={`page-checkbox ${checked ? 'checked' : ''}`}>
-          <input type="checkbox" id={id} name={service.integration_key} checked={checked} onChange={onChange} />
-          <label htmlFor={id}>
-            <i className="fa fa-check" />
-          </label>
+          <i className="fa fa-check" />
         </div>
       </div>
     );
