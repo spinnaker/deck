@@ -3,7 +3,7 @@ import { mockHealth } from 'core/mocks';
 
 export const mockInstance: IInstance = {
   account: 'test',
-  availabilityZone: 'us-west-2',
+  availabilityZone: 'us-west-2a',
   cloudProvider: 'aws',
   hasHealthStatus: true,
   health: [mockHealth],

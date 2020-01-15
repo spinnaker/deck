@@ -8,7 +8,7 @@ export const mockLoadBalancer: ILoadBalancer = {
   healthState: 'Up',
   instanceCounts: mockInstanceCounts,
   instances: [mockInstance],
-  loadBalancerType: 'applciation',
+  loadBalancerType: 'application',
   moniker: mockMoniker,
   name: 'deck-test',
   provider: 'aws',
