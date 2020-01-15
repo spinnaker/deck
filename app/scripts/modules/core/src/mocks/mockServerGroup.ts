@@ -19,7 +19,6 @@ export const mockServerGroup: IServerGroup = {
   account: 'test',
   app: 'deck',
   buildInfo: {
-    package_name: 'deck',
     version: '2.1140.0',
     commit: '1234567',
     jenkins: {
