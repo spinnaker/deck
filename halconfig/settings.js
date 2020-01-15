@@ -121,6 +121,13 @@ var oracle = {
   },
 };
 
+var plugins = [];
+try {
+  plugins = JSON.parse('{%plugins%}');
+} catch (errpr) {
+  console.error('Cannot load plugins: ' + error);
+}
+
 window.spinnakerSettings = {
   authEnabled: authEnabled,
   authEndpoint: authEndpoint,
@@ -231,6 +238,7 @@ window.spinnakerSettings = {
       },
     },
   },
+  plugins: plugins,
   pubsubProviders: ['google'], // TODO(joonlim): Add amazon once it is confirmed that amazon pub/sub works.
   triggerTypes: [
     'artifactory',
