@@ -8,6 +8,7 @@ import { useEventListener, useContainerClassNames, useLatestCallback } from 'cor
 
 import { ModalContext } from './ModalContext';
 import styles from './Modal.module.css';
+import { TabBoundary } from './TabBoundary';
 
 export interface IModalProps {
   isOpen: boolean;
@@ -31,7 +32,7 @@ export const Modal = ({ onRequestClose, isOpen, children }: IModalProps) => {
   return (
     <ModalContext.Provider value={modalContext}>
       {ReactDOM.createPortal(
-        <>
+        <TabBoundary>
           <CSSTransition in={isOpen} timeout={300} mountOnEnter={true} unmountOnExit={true} classNames={styles}>
             <div className={styles.backdrop} />
           </CSSTransition>
@@ -40,7 +41,7 @@ export const Modal = ({ onRequestClose, isOpen, children }: IModalProps) => {
               <div className={styles.dialog}>{children}</div>
             </div>
           </CSSTransition>
-        </>,
+        </TabBoundary>,
         document.body,
       )}
     </ModalContext.Provider>
