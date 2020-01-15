@@ -339,7 +339,6 @@ module(AMAZON_SECURITYGROUP_CONFIGURE_CONFIGSECURITYGROUP_MIXIN_CONTROLLER, [
 
     ctrl.updateRuleType = function(type, ruleset, index) {
       const rule = ruleset[index];
-      rule.type = type;
       if (type === 'icmp') {
         rule.startPort = 0;
         rule.endPort = 0;
