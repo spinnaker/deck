@@ -2,7 +2,7 @@ import { ISubnet } from '../domain/ISubnet';
 
 export const mockSubnet: ISubnet = {
   availabilityZone: 'us-west-1b',
-  id: 'subnet-f7af8783',
+  id: 'subnet-1234',
   name: 'test-subnet',
   account: 'test',
   region: 'us-west-1',
@@ -10,5 +10,5 @@ export const mockSubnet: ISubnet = {
   label: 'label',
   purpose: 'testing subnets',
   deprecated: false,
-  vpcId: 'vpc-9af769ff',
+  vpcId: 'vpc-1234',
 };
