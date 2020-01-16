@@ -2,7 +2,7 @@ import React from 'react';
 import { useEventListener } from 'core';
 
 export const TabBoundary = ({ children }: { children: React.ReactNode }) => {
-  const dialogRef = React.createRef<HTMLDivElement>();
+  const boundaryRef = React.createRef<HTMLDivElement>();
 
   const keydownCallback = (event: KeyboardEvent) => {
     const { keyCode, shiftKey, target } = event;
@@ -10,14 +10,14 @@ export const TabBoundary = ({ children }: { children: React.ReactNode }) => {
       let targetOverride = null;
       // tabbable selector via https://kennethbi.com/posts/5
       const tabbableElements: HTMLElement[] = Array.from(
-        dialogRef.current.querySelectorAll(`
+        (boundaryRef.current?.querySelectorAll(`
           input:not([tabindex^="-"]):not([disabled]),
           select:not([tabindex^="-"]):not([disabled]),
           textarea:not([tabindex^="-"]):not([disabled]),
           button:not([tabindex^="-"]):not([disabled]),
           a[href]:not([tabindex^="-"]):not([disabled]),
           [tabindex]:not([tabindex^="-"]):not([disabled])
-      `) as NodeListOf<HTMLElement>,
+      `) as NodeListOf<HTMLElement>) ?? [],
       ).filter((ele: HTMLElement) => ele.offsetParent !== null);
       if (!tabbableElements.length) {
         return;
@@ -41,5 +41,5 @@ export const TabBoundary = ({ children }: { children: React.ReactNode }) => {
   };
   useEventListener(document, 'keydown', keydownCallback);
 
-  return <div ref={dialogRef}>{children}</div>;
+  return <div ref={boundaryRef}>{children}</div>;
 };

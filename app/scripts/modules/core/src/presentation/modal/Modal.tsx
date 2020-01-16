@@ -4,11 +4,10 @@ import { CSSTransition } from 'react-transition-group';
 
 const { useMemo } = React;
 
-import { useEventListener, useContainerClassNames, useLatestCallback } from 'core/presentation';
+import { useEventListener, useContainerClassNames, useLatestCallback, TabBoundary } from 'core/presentation';
 
 import { ModalContext } from './ModalContext';
 import styles from './Modal.module.css';
-import { TabBoundary } from './TabBoundary';
 
 export interface IModalProps {
   isOpen: boolean;
