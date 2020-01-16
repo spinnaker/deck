@@ -16,11 +16,12 @@ module(PLUGINS_MODULE, ['ui.router']).config([
     //    const PLUGINS = [{'name':'myPlugin', 'version':'1.2.3', 'devUrl':'/plugins/index.js'}]
     //    export { PLUGINS }
     try {
-      const pluginModule = await import(/* webpackIgnore: true */ '/plugin-manifest.json');
+      const pluginModule = await import(/* webpackIgnore: true */ '/plugin-manifest.js');
 
       if (!pluginModule || !pluginModule.PLUGINS) {
         throw new Error(`Error loading plugins.`);
       } else {
+        // @ts-ignore
         pluginModule.PLUGINS.forEach(plugin => pluginRegistry.register(plugin));
       }
     } catch (error) {
