@@ -1,0 +1,2 @@
+const PLUGINS = [];
+export { PLUGINS };
