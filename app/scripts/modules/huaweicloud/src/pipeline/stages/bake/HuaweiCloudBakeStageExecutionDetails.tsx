@@ -11,16 +11,14 @@ import {
 
 function interpolate(text: string, stage: IExecutionStage) {
   let newText = text;
+  const re = /{{([^{}]*)}}/;
 
-  while (true) {
-    let oldText = newText;
-    newText = newText.replace(/{{([^{}]*)}}/, (substr: string) => {
+  while (-1 != newText.search(re)) {
+    newText = newText.replace(re, (substr: string) => {
       return get(stage, substr.substring(2, substr.length - 2), undefined);
     });
-    if (newText == oldText) {
-      break;
-    }
   }
+
   return newText;
 }
 

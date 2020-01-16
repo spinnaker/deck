@@ -1,20 +1,18 @@
 import * as React from 'react';
 
-import { Observable, Subject } from 'rxjs';
-import { Option } from 'react-select';
-import { HelpField } from 'core/help';
-
 import {
   BakeryReader,
   IBaseImage,
   IStageConfigProps,
   TextInput,
-  SelectInput,
   RadioButtonInput,
   CheckboxInput,
   FormikFormField,
   FormikStageConfig,
   SETTINGS,
+  FormValidator,
+  IStage,
+  HelpField,
 } from '@spinnaker/core';
 
 interface IHuaweiCloudBakeStageConfigState {
@@ -79,7 +77,7 @@ export class HuaweiCloudBakeStageConfig extends React.Component<IStageConfigProp
           <FormikStageConfig
             {...stageConfigProps}
             onChange={stageConfigProps.updateStage}
-            render={({ pipeline }) => (
+            render={() => (
               <div className="form-horizontal">
                 <FormikFormField
                   name="baseOs"
@@ -110,7 +108,7 @@ export class HuaweiCloudBakeStageConfig extends React.Component<IStageConfigProp
                   <FormikFormField
                     name="rebake"
                     label="Rebake"
-                    input={(inputProps: ICheckBoxInputProps) => (
+                    input={inputProps => (
                       <CheckboxInput
                         {...inputProps}
                         text="Rebake image without regard to the status of any existing bake"
@@ -142,3 +140,14 @@ export class HuaweiCloudBakeStageConfig extends React.Component<IStageConfigProp
     );
   }
 }
+
+export const validate = (stage: IStage) => {
+  const formValidator = new FormValidator(stage);
+
+  formValidator.field('baseOs', 'Base Image').required();
+  formValidator.field('region', 'Region').required();
+  formValidator.field('package', 'Package').required();
+  formValidator.field('baseLabel', 'Base Label').required();
+
+  return formValidator.validateForm();
+};
