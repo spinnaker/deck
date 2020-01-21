@@ -13,8 +13,8 @@ module(PLUGINS_MODULE, ['ui.router']).config([
 
     // Grab all plugins that are defined in plugin-manifest
     // The format for plugin-manifest would be:
-    //    const PLUGINS = [{'name':'myPlugin', 'version':'1.2.3', 'devUrl':'/plugins/index.js'}]
-    //    export { PLUGINS }
+    //    const plugins = [{'name':'myPlugin', 'version':'1.2.3', 'devUrl':'/plugins/index.js'}]
+    //    export { plugins }
     try {
       const pluginManifestLocation = '/plugin-manifest.js';
       const pluginModule = await import(/* webpackIgnore: true */ pluginManifestLocation);
