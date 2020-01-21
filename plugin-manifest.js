@@ -1,2 +1,2 @@
-const PLUGINS = [];
-export { PLUGINS };
+const plugins = [];
+export { plugins };
