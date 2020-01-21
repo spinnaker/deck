@@ -16,7 +16,8 @@ module(PLUGINS_MODULE, ['ui.router']).config([
     //    const PLUGINS = [{'name':'myPlugin', 'version':'1.2.3', 'devUrl':'/plugins/index.js'}]
     //    export { PLUGINS }
     try {
-      const pluginModule = await import(/* webpackIgnore: true */ '/plugin-manifest.js');
+      const pluginManifestLocation = '/plugin-manifest.js';
+      const pluginModule = await import(/* webpackIgnore: true */ pluginManifestLocation);
 
       if (!pluginModule || !pluginModule.PLUGINS) {
         throw new Error(`Error loading plugins.`);
