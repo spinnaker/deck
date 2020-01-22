@@ -5,6 +5,7 @@ import { filter, find, get, orderBy } from 'lodash';
 import {
   ClusterTargetBuilder,
   ConfirmationModalService,
+  ExportResourceMenuItem,
   IOwnerOption,
   IServerGroupActionsProps,
   IServerGroupJob,
@@ -324,6 +325,14 @@ export class AmazonServerGroupActions extends React.Component<IAmazonServerGroup
               Clone
             </a>
           </li>
+          <ExportResourceMenuItem
+            cloudProvider={serverGroup.cloudProvider}
+            account={serverGroup.account}
+            type="cluster"
+            name={serverGroup.cluster}
+            application={app}
+            isManaged={!!serverGroup.managedResourceSummary}
+          />
           {showEntityTags && (
             <AddEntityTagLinks
               component={serverGroup}

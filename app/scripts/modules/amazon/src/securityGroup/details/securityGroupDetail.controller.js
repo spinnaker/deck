@@ -12,7 +12,7 @@ import {
   SecurityGroupWriter,
   FirewallLabels,
   MANAGED_RESOURCE_DETAILS_INDICATOR,
-  noop,
+  EXPORT_RESOURCE_MENU_ITEM,
 } from '@spinnaker/core';
 
 import { VpcReader } from '../../vpc/VpcReader';
@@ -28,6 +28,7 @@ angular
     SECURITY_GROUP_READER,
     AMAZON_SECURITYGROUP_CLONE_CLONESECURITYGROUP_CONTROLLER,
     MANAGED_RESOURCE_DETAILS_INDICATOR,
+    EXPORT_RESOURCE_MENU_ITEM,
   ])
   .controller('awsSecurityGroupDetailsCtrl', [
     '$scope',

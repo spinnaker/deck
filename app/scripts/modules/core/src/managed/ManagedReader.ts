@@ -14,7 +14,27 @@ export const getResourceKindForLoadBalancerType = (type: string) => {
   }
 };
 
+export interface IResourceExportArguments {
+  cloudProvider: string;
+  account: string;
+  type: string;
+  name: string;
+  serviceAccount: string;
+}
+
 export class ManagedReader {
+  public static getResourceExportUrl({
+    cloudProvider,
+    account,
+    type,
+    name,
+    serviceAccount,
+  }: IResourceExportArguments): string {
+    return `managed/resources/export/${cloudProvider}/${account}/${type}/${name}?serviceAccount=${serviceAccount}`;
+  }
+  public static getResourceExport(params: IResourceExportArguments): IPromise<string> {
+    return API.one(ManagedReader.getResourceExportUrl(params)).get();
+  }
   public static getApplicationSummary(app: string): IPromise<IManagedApplicationSummary> {
     return API.one('managed')
       .one('application', app)

@@ -6,6 +6,7 @@ import {
   Application,
   ApplicationReader,
   ConfirmationModalService,
+  ExportResourceMenuItem,
   LoadBalancerWriter,
   ManagedMenuItem,
   SETTINGS,
@@ -149,6 +150,14 @@ export class LoadBalancerActions extends React.Component<ILoadBalancerActionsPro
                 </a>
               </li>
             )}
+            <ExportResourceMenuItem
+              cloudProvider={loadBalancer.cloudProvider}
+              account={loadBalancer.account}
+              type={`${loadBalancer.loadBalancerType}-load-balancer`}
+              name={loadBalancer.name}
+              application={app}
+              isManaged={!!loadBalancer.managedResourceSummary}
+            />
             {SETTINGS && SETTINGS.feature.entityTags && (
               <AddEntityTagLinks
                 component={loadBalancer}

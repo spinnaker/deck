@@ -42,6 +42,14 @@
           <li>
             <a href ng-click="ctrl.cloneSecurityGroup()">Clone <firewall-label label="Firewall"></firewall-label></a>
           </li>
+          <export-resource-menu-item
+            cloud-provider="'aws'"
+            account="securityGroup.account"
+            type="'security-group'"
+            name="securityGroup.name"
+            is-managed="!!securityGroup.managedResourceSummary"
+            application="ctrl.application"
+          ></export-resource-menu-item>
           <render-if-feature feature="entityTags">
             <add-entity-tag-links
               component="securityGroup"

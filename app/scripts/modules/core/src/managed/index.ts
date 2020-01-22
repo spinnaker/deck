@@ -1,4 +1,5 @@
 export * from './DeployingIntoManagedClusterWarning';
+export * from './export/ExportResourceMenuItem';
 export * from './ManagedReader';
 export * from './ManagedWriter';
 export * from './ManagedResourceDetailsIndicator';
