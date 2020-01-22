@@ -77,31 +77,31 @@ module(ECS_MODULE, [
   ECS_PIPELINE_STAGES_SHRINKCLUSTER_ECSSHRINKCLUSTERSTAGE,
   ECS_SECURITY_GROUP_MODULE,
   ECS_SERVERGROUP_MODULE,
-]).config(function() {
-  CloudProviderRegistry.registerProvider('ecs', {
-    name: 'EC2 Container Service',
-    logo: { path: require('./logo/ecs.logo.svg') },
-    serverGroup: {
-      transformer: 'ecsServerGroupTransformer',
-      detailsTemplateUrl: require('./serverGroup/details/serverGroupDetails.html'),
-      detailsController: 'ecsServerGroupDetailsCtrl',
-      cloneServerGroupTemplateUrl: require('./serverGroup/configure/wizard/serverGroupWizard.html'),
-      cloneServerGroupController: 'ecsCloneServerGroupCtrl',
-      commandBuilder: 'ecsServerGroupCommandBuilder',
-      // configurationService: 'ecsServerGroupConfigurationService',
-      scalingActivitiesEnabled: false,
-    },
-    instance: {
-      detailsTemplateUrl: require('./instance/details/instanceDetails.html'),
-      detailsController: 'ecsInstanceDetailsCtrl',
-    },
-    securityGroup: {
-      transformer: 'ecsSecurityGroupTransformer',
-      reader: 'ecsSecurityGroupReader',
-      detailsTemplateUrl: require('./securityGroup/details/securityGroupDetail.html'),
-      detailsController: 'ecsSecurityGroupDetailsCtrl',
-    },
-  });
+]);
+
+CloudProviderRegistry.registerProvider('ecs', {
+  name: 'EC2 Container Service',
+  logo: { path: require('./logo/ecs.logo.svg') },
+  serverGroup: {
+    transformer: 'ecsServerGroupTransformer',
+    detailsTemplateUrl: require('./serverGroup/details/serverGroupDetails.html'),
+    detailsController: 'ecsServerGroupDetailsCtrl',
+    cloneServerGroupTemplateUrl: require('./serverGroup/configure/wizard/serverGroupWizard.html'),
+    cloneServerGroupController: 'ecsCloneServerGroupCtrl',
+    commandBuilder: 'ecsServerGroupCommandBuilder',
+    // configurationService: 'ecsServerGroupConfigurationService',
+    scalingActivitiesEnabled: false,
+  },
+  instance: {
+    detailsTemplateUrl: require('./instance/details/instanceDetails.html'),
+    detailsController: 'ecsInstanceDetailsCtrl',
+  },
+  securityGroup: {
+    transformer: 'ecsSecurityGroupTransformer',
+    reader: 'ecsSecurityGroupReader',
+    detailsTemplateUrl: require('./securityGroup/details/securityGroupDetail.html'),
+    detailsController: 'ecsSecurityGroupDetailsCtrl',
+  },
 });
 
 DeploymentStrategyRegistry.registerProvider('ecs', ['redblack']);

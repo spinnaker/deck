@@ -61,39 +61,39 @@ module(ORACLE_MODULE, [
   ORACLE_SECURITYGROUP_SECURITYGROUP_READER,
   ORACLE_SECURITYGROUP_SECURITYGROUP_TRANSFORMER,
   ORACLE_SECURITYGROUP_CONFIGURE_CREATESECURITYGROUP_CONTROLLER,
-]).config(function() {
-  CloudProviderRegistry.registerProvider('oracle', {
-    name: 'Oracle',
-    image: {
-      reader: 'oracleImageReader',
-    },
-    loadBalancer: {
-      transformer: 'oracleLoadBalancerTransformer',
-      detailsTemplateUrl: require('./loadBalancer/details/loadBalancerDetail.html'),
-      detailsController: 'oracleLoadBalancerDetailCtrl',
-      createLoadBalancerTemplateUrl: require('./loadBalancer/configure/createLoadBalancer.html'),
-      createLoadBalancerController: 'oracleCreateLoadBalancerCtrl',
-    },
-    serverGroup: {
-      transformer: 'oracleServerGroupTransformer',
-      detailsTemplateUrl: require('./serverGroup/details/serverGroupDetails.html'),
-      detailsController: 'oracleServerGroupDetailsCtrl',
-      commandBuilder: 'oracleServerGroupCommandBuilder',
-      cloneServerGroupController: 'oracleCloneServerGroupCtrl',
-      cloneServerGroupTemplateUrl: require('./serverGroup/configure/wizard/serverGroupWizard.html'),
-      configurationService: 'oracleServerGroupConfigurationService',
-    },
-    instance: {
-      detailsController: 'oracleInstanceDetailsCtrl',
-      detailsTemplateUrl: require('./instance/details/instanceDetails.html'),
-    },
-    securityGroup: {
-      reader: 'oracleSecurityGroupReader',
-      transformer: 'oracleSecurityGroupTransformer',
-      createSecurityGroupTemplateUrl: require('./securityGroup/configure/createSecurityGroup.html'),
-      createSecurityGroupController: 'oracleCreateSecurityGroupCtrl',
-    },
-  });
+]);
+
+CloudProviderRegistry.registerProvider('oracle', {
+  name: 'Oracle',
+  image: {
+    reader: 'oracleImageReader',
+  },
+  loadBalancer: {
+    transformer: 'oracleLoadBalancerTransformer',
+    detailsTemplateUrl: require('./loadBalancer/details/loadBalancerDetail.html'),
+    detailsController: 'oracleLoadBalancerDetailCtrl',
+    createLoadBalancerTemplateUrl: require('./loadBalancer/configure/createLoadBalancer.html'),
+    createLoadBalancerController: 'oracleCreateLoadBalancerCtrl',
+  },
+  serverGroup: {
+    transformer: 'oracleServerGroupTransformer',
+    detailsTemplateUrl: require('./serverGroup/details/serverGroupDetails.html'),
+    detailsController: 'oracleServerGroupDetailsCtrl',
+    commandBuilder: 'oracleServerGroupCommandBuilder',
+    cloneServerGroupController: 'oracleCloneServerGroupCtrl',
+    cloneServerGroupTemplateUrl: require('./serverGroup/configure/wizard/serverGroupWizard.html'),
+    configurationService: 'oracleServerGroupConfigurationService',
+  },
+  instance: {
+    detailsController: 'oracleInstanceDetailsCtrl',
+    detailsTemplateUrl: require('./instance/details/instanceDetails.html'),
+  },
+  securityGroup: {
+    reader: 'oracleSecurityGroupReader',
+    transformer: 'oracleSecurityGroupTransformer',
+    createSecurityGroupTemplateUrl: require('./securityGroup/configure/createSecurityGroup.html'),
+    createSecurityGroupController: 'oracleCreateSecurityGroupCtrl',
+  },
 });
 
 DeploymentStrategyRegistry.registerProvider('oracle', []);

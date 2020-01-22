@@ -53,47 +53,47 @@ module(AZURE_MODULE, [
   AZURE_SECURITYGROUP_SECURITYGROUP_READER,
   AZURE_IMAGE_IMAGE_READER,
   AZURE_VALIDATION_APPLICATIONNAME_VALIDATOR,
-]).config(function() {
-  CloudProviderRegistry.registerProvider('azure', {
-    name: 'Azure',
-    logo: {
-      path: require('./logo/logo_azure.png'),
-    },
-    image: {
-      reader: 'azureImageReader',
-    },
-    serverGroup: {
-      transformer: 'azureServerGroupTransformer',
-      detailsTemplateUrl: require('./serverGroup/details/serverGroupDetails.html'),
-      detailsController: 'azureServerGroupDetailsCtrl',
-      cloneServerGroupTemplateUrl: require('./serverGroup/configure/wizard/serverGroupWizard.html'),
-      cloneServerGroupController: 'azureCloneServerGroupCtrl',
-      commandBuilder: 'azureServerGroupCommandBuilder',
-      configurationService: 'azureServerGroupConfigurationService',
-    },
-    instance: {
-      instanceTypeService: 'azureInstanceTypeService',
-      detailsTemplateUrl: require('./instance/details/instanceDetails.html'),
-      detailsController: 'azureInstanceDetailsCtrl',
-    },
-    loadBalancer: {
-      transformer: 'azureLoadBalancerTransformer',
-      detailsTemplateUrl: require('./loadBalancer/details/loadBalancerDetail.html'),
-      detailsController: 'azureLoadBalancerDetailsCtrl',
-      createLoadBalancerTemplateUrl: require('./loadBalancer/configure/createLoadBalancer.html'),
-      createLoadBalancerController: 'azureCreateLoadBalancerCtrl',
-      CreateLoadBalancerModal: require('./loadBalancer/configure/AzureLoadBalancerChoiceModal')
-        .AzureLoadBalancerChoiceModal,
-    },
-    securityGroup: {
-      transformer: 'azureSecurityGroupTransformer',
-      reader: 'azureSecurityGroupReader',
-      detailsTemplateUrl: require('./securityGroup/details/securityGroupDetail.html'),
-      detailsController: 'azureSecurityGroupDetailsCtrl',
-      createSecurityGroupTemplateUrl: require('./securityGroup/configure/createSecurityGroup.html'),
-      createSecurityGroupController: 'azureCreateSecurityGroupCtrl',
-    },
-  });
+]);
+
+CloudProviderRegistry.registerProvider('azure', {
+  name: 'Azure',
+  logo: {
+    path: require('./logo/logo_azure.png'),
+  },
+  image: {
+    reader: 'azureImageReader',
+  },
+  serverGroup: {
+    transformer: 'azureServerGroupTransformer',
+    detailsTemplateUrl: require('./serverGroup/details/serverGroupDetails.html'),
+    detailsController: 'azureServerGroupDetailsCtrl',
+    cloneServerGroupTemplateUrl: require('./serverGroup/configure/wizard/serverGroupWizard.html'),
+    cloneServerGroupController: 'azureCloneServerGroupCtrl',
+    commandBuilder: 'azureServerGroupCommandBuilder',
+    configurationService: 'azureServerGroupConfigurationService',
+  },
+  instance: {
+    instanceTypeService: 'azureInstanceTypeService',
+    detailsTemplateUrl: require('./instance/details/instanceDetails.html'),
+    detailsController: 'azureInstanceDetailsCtrl',
+  },
+  loadBalancer: {
+    transformer: 'azureLoadBalancerTransformer',
+    detailsTemplateUrl: require('./loadBalancer/details/loadBalancerDetail.html'),
+    detailsController: 'azureLoadBalancerDetailsCtrl',
+    createLoadBalancerTemplateUrl: require('./loadBalancer/configure/createLoadBalancer.html'),
+    createLoadBalancerController: 'azureCreateLoadBalancerCtrl',
+    CreateLoadBalancerModal: require('./loadBalancer/configure/AzureLoadBalancerChoiceModal')
+      .AzureLoadBalancerChoiceModal,
+  },
+  securityGroup: {
+    transformer: 'azureSecurityGroupTransformer',
+    reader: 'azureSecurityGroupReader',
+    detailsTemplateUrl: require('./securityGroup/details/securityGroupDetail.html'),
+    detailsController: 'azureSecurityGroupDetailsCtrl',
+    createSecurityGroupTemplateUrl: require('./securityGroup/configure/createSecurityGroup.html'),
+    createSecurityGroupController: 'azureCreateSecurityGroupCtrl',
+  },
 });
 
 DeploymentStrategyRegistry.registerProvider('azure', ['redblack']);

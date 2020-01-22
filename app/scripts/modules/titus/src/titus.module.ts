@@ -59,40 +59,40 @@ module(TITUS_MODULE, [
   TITUS_SERVERGROUP_DETAILS_CAPACITYDETAILSSECTION,
   TITUS_SERVERGROUP_DETAILS_LAUNCHCONFIGSECTION,
   TITUS_MIGRATION_CONFIG_COMPONENT,
-]).config(() => {
-  CloudProviderRegistry.registerProvider('titus', {
-    name: 'Titus',
-    logo: {
-      path: require('./logo/titus.logo.png'),
-    },
-    serverGroup: {
-      transformer: 'titusServerGroupTransformer',
-      detailsTemplateUrl: require('./serverGroup/details/serverGroupDetails.html'),
-      detailsController: 'titusServerGroupDetailsCtrl',
-      CloneServerGroupModal: TitusCloneServerGroupModal,
-      commandBuilder: 'titusServerGroupCommandBuilder',
-      configurationService: 'titusServerGroupConfigurationService',
-      skipUpstreamStageCheck: true,
-    },
-    securityGroup: {
-      reader: 'titusSecurityGroupReader',
-      useProvider: 'aws',
-    },
-    loadBalancer: {
-      LoadBalancersTag: AmazonLoadBalancersTag,
-      incompatibleLoadBalancerTypes: [
-        {
-          type: 'classic',
-          reason: 'Classic Load Balancers cannot be used with Titus as they do not have IP based target groups.',
-        },
-      ],
-      useProvider: 'aws',
-    },
-    instance: {
-      detailsTemplateUrl: require('./instance/details/instanceDetails.html'),
-      detailsController: 'titusInstanceDetailsCtrl',
-    },
-  });
+]);
+
+CloudProviderRegistry.registerProvider('titus', {
+  name: 'Titus',
+  logo: {
+    path: require('./logo/titus.logo.png'),
+  },
+  serverGroup: {
+    transformer: 'titusServerGroupTransformer',
+    detailsTemplateUrl: require('./serverGroup/details/serverGroupDetails.html'),
+    detailsController: 'titusServerGroupDetailsCtrl',
+    CloneServerGroupModal: TitusCloneServerGroupModal,
+    commandBuilder: 'titusServerGroupCommandBuilder',
+    configurationService: 'titusServerGroupConfigurationService',
+    skipUpstreamStageCheck: true,
+  },
+  securityGroup: {
+    reader: 'titusSecurityGroupReader',
+    useProvider: 'aws',
+  },
+  loadBalancer: {
+    LoadBalancersTag: AmazonLoadBalancersTag,
+    incompatibleLoadBalancerTypes: [
+      {
+        type: 'classic',
+        reason: 'Classic Load Balancers cannot be used with Titus as they do not have IP based target groups.',
+      },
+    ],
+    useProvider: 'aws',
+  },
+  instance: {
+    detailsTemplateUrl: require('./instance/details/instanceDetails.html'),
+    detailsController: 'titusInstanceDetailsCtrl',
+  },
 });
 
 DeploymentStrategyRegistry.registerProvider('titus', ['custom', 'redblack']);

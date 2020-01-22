@@ -1,1 +1,1 @@
-export { HUAWEICLOUD_MODULE } from './huaweicloud.module';
+export * from './huaweicloud.module';

@@ -15,7 +15,7 @@ import { TITUS_MODULE } from '@spinnaker/titus';
 import { ECS_MODULE } from '@spinnaker/ecs';
 import '@spinnaker/cloudfoundry';
 import { AZURE_MODULE } from '@spinnaker/azure';
-import { HUAWEICLOUD_MODULE } from '@spinnaker/huaweicloud';
+import '@spinnaker/huaweicloud';
 import { DCOS_DCOS_MODULE } from './modules/dcos/dcos.module';
 
 module('netflix.spinnaker', [
@@ -33,5 +33,4 @@ module('netflix.spinnaker', [
   KUBERNETES_V2_MODULE,
   KAYENTA_MODULE,
   TITUS_MODULE,
-  HUAWEICLOUD_MODULE,
 ]);

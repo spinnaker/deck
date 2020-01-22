@@ -15,6 +15,8 @@ import { isEmpty } from 'lodash';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
+import 'amazon/aws.module';
+
 export interface IFunctionFromStateParams {
   account: string;
   region: string;

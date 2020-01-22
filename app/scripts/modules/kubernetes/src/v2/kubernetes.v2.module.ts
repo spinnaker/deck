@@ -89,54 +89,54 @@ module(KUBERNETES_V2_MODULE, [
   KUBERNETES_DISABLE_MANIFEST_STAGE,
   STAGE_ARTIFACT_SELECTOR_COMPONENT_REACT,
   KUBERNETES_ROLLING_RESTART,
-]).config(() => {
-  CloudProviderRegistry.registerProvider('kubernetes', {
-    name: 'Kubernetes',
-    skin: 'v2',
-    logo: {
-      path: require('../shared/logo/kubernetes.icon.svg'),
-    },
-    serverGroup: {
-      CloneServerGroupModal: ManifestWizard,
-      commandBuilder: 'kubernetesV2ServerGroupCommandBuilder',
-      detailsController: 'kubernetesV2ServerGroupDetailsCtrl',
-      detailsTemplateUrl: require('./serverGroup/details/details.html'),
-      transformer: 'kubernetesV2ServerGroupTransformer',
-    },
-    serverGroupManager: {
-      detailsTemplateUrl: require('./serverGroupManager/details/details.html'),
-      detailsController: 'kubernetesV2ServerGroupManagerDetailsCtrl',
-    },
-    loadBalancer: {
-      CreateLoadBalancerModal: ManifestWizard,
-      detailsController: 'kubernetesV2LoadBalancerDetailsCtrl',
-      detailsTemplateUrl: require('./loadBalancer/details/details.html'),
-      transformer: 'kubernetesV2LoadBalancerTransformer',
-    },
-    securityGroup: {
-      reader: KubernetesSecurityGroupReader,
-      CreateSecurityGroupModal: ManifestWizard,
-      detailsController: 'kubernetesV2SecurityGroupDetailsCtrl',
-      detailsTemplateUrl: require('./securityGroup/details/details.html'),
-      transformer: 'kubernetesV2SecurityGroupTransformer',
-    },
-    instance: {
-      detailsController: 'kubernetesV2InstanceDetailsCtrl',
-      detailsTemplateUrl: require('./instance/details/details.html'),
-    },
-    unsupportedStageTypes: [
-      'deploy',
-      'destroyServerGroup',
-      'disableCluster',
-      'disableServerGroup',
-      'enableServerGroup',
-      'findImage',
-      'resizeServerGroup',
-      'rollbackCluster',
-      'runJob',
-      'scaleDown',
-      'scaleDownCluster',
-      'shrinkCluster',
-    ],
-  });
+]);
+
+CloudProviderRegistry.registerProvider('kubernetes', {
+  name: 'Kubernetes',
+  skin: 'v2',
+  logo: {
+    path: require('../shared/logo/kubernetes.icon.svg'),
+  },
+  serverGroup: {
+    CloneServerGroupModal: ManifestWizard,
+    commandBuilder: 'kubernetesV2ServerGroupCommandBuilder',
+    detailsController: 'kubernetesV2ServerGroupDetailsCtrl',
+    detailsTemplateUrl: require('./serverGroup/details/details.html'),
+    transformer: 'kubernetesV2ServerGroupTransformer',
+  },
+  serverGroupManager: {
+    detailsTemplateUrl: require('./serverGroupManager/details/details.html'),
+    detailsController: 'kubernetesV2ServerGroupManagerDetailsCtrl',
+  },
+  loadBalancer: {
+    CreateLoadBalancerModal: ManifestWizard,
+    detailsController: 'kubernetesV2LoadBalancerDetailsCtrl',
+    detailsTemplateUrl: require('./loadBalancer/details/details.html'),
+    transformer: 'kubernetesV2LoadBalancerTransformer',
+  },
+  securityGroup: {
+    reader: KubernetesSecurityGroupReader,
+    CreateSecurityGroupModal: ManifestWizard,
+    detailsController: 'kubernetesV2SecurityGroupDetailsCtrl',
+    detailsTemplateUrl: require('./securityGroup/details/details.html'),
+    transformer: 'kubernetesV2SecurityGroupTransformer',
+  },
+  instance: {
+    detailsController: 'kubernetesV2InstanceDetailsCtrl',
+    detailsTemplateUrl: require('./instance/details/details.html'),
+  },
+  unsupportedStageTypes: [
+    'deploy',
+    'destroyServerGroup',
+    'disableCluster',
+    'disableServerGroup',
+    'enableServerGroup',
+    'findImage',
+    'resizeServerGroup',
+    'rollbackCluster',
+    'runJob',
+    'scaleDown',
+    'scaleDownCluster',
+    'shrinkCluster',
+  ],
 });

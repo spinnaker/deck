@@ -41,33 +41,33 @@ module(APPENGINE_MODULE, [
   APPENGINE_SERVER_GROUP_TRANSFORMER,
   APPENGINE_SERVER_GROUP_WRITER,
   CONFIG_FILE_ARTIFACT_LIST,
-]).config(() => {
-  CloudProviderRegistry.registerProvider('appengine', {
-    name: 'App Engine',
-    instance: {
-      detailsTemplateUrl: require('./instance/details/details.html'),
-      detailsController: 'appengineInstanceDetailsCtrl',
-    },
-    serverGroup: {
-      transformer: 'appengineServerGroupTransformer',
-      detailsController: 'appengineServerGroupDetailsCtrl',
-      detailsTemplateUrl: require('./serverGroup/details/details.html'),
-      commandBuilder: 'appengineServerGroupCommandBuilder',
-      cloneServerGroupController: 'appengineCloneServerGroupCtrl',
-      cloneServerGroupTemplateUrl: require('./serverGroup/configure/wizard/serverGroupWizard.html'),
-      skipUpstreamStageCheck: true,
-    },
-    loadBalancer: {
-      transformer: 'appengineLoadBalancerTransformer',
-      createLoadBalancerTemplateUrl: require('./loadBalancer/configure/wizard/wizard.html'),
-      createLoadBalancerController: 'appengineLoadBalancerWizardCtrl',
-      detailsTemplateUrl: require('./loadBalancer/details/details.html'),
-      detailsController: 'appengineLoadBalancerDetailsCtrl',
-    },
-    logo: {
-      path: require('./logo/appengine.logo.svg'),
-    },
-  });
+]);
+
+CloudProviderRegistry.registerProvider('appengine', {
+  name: 'App Engine',
+  instance: {
+    detailsTemplateUrl: require('./instance/details/details.html'),
+    detailsController: 'appengineInstanceDetailsCtrl',
+  },
+  serverGroup: {
+    transformer: 'appengineServerGroupTransformer',
+    detailsController: 'appengineServerGroupDetailsCtrl',
+    detailsTemplateUrl: require('./serverGroup/details/details.html'),
+    commandBuilder: 'appengineServerGroupCommandBuilder',
+    cloneServerGroupController: 'appengineCloneServerGroupCtrl',
+    cloneServerGroupTemplateUrl: require('./serverGroup/configure/wizard/serverGroupWizard.html'),
+    skipUpstreamStageCheck: true,
+  },
+  loadBalancer: {
+    transformer: 'appengineLoadBalancerTransformer',
+    createLoadBalancerTemplateUrl: require('./loadBalancer/configure/wizard/wizard.html'),
+    createLoadBalancerController: 'appengineLoadBalancerWizardCtrl',
+    detailsTemplateUrl: require('./loadBalancer/details/details.html'),
+    detailsController: 'appengineLoadBalancerDetailsCtrl',
+  },
+  logo: {
+    path: require('./logo/appengine.logo.svg'),
+  },
 });
 
 DeploymentStrategyRegistry.registerProvider('appengine', ['custom']);

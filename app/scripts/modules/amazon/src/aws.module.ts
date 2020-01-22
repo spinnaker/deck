@@ -105,76 +105,76 @@ module(AMAZON_MODULE, [
   CLOUDFORMATION_TEMPLATE_ENTRY,
   CLOUD_FORMATION_CHANGE_SET_INFO,
   AWS_EVALUATE_CLOUD_FORMATION_CHANGE_SET_EXECUTION_SERVICE,
-]).config(() => {
-  CloudProviderRegistry.registerProvider('aws', {
-    name: 'Amazon',
-    logo: {
-      path: require('./logo/amazon.logo.svg'),
-    },
-    image: {
-      reader: AwsImageReader,
-    },
-    serverGroup: {
-      transformer: 'awsServerGroupTransformer',
-      detailsActions: AmazonServerGroupActions,
-      detailsGetter: amazonServerGroupDetailsGetter,
-      detailsSections: [
-        AmazonInfoDetailsSection,
-        AmazonCapacityDetailsSection,
-        HealthDetailsSection,
-        LaunchConfigDetailsSection,
-        SecurityGroupsDetailsSection,
-        ScalingProcessesDetailsSection,
-        ScalingPoliciesDetailsSection,
-        ScheduledActionsDetailsSection,
-        TagsDetailsSection,
-        PackageDetailsSection,
-        AdvancedSettingsDetailsSection,
-        LogsDetailsSection,
-      ],
-      CloneServerGroupModal: AmazonCloneServerGroupModal,
-      commandBuilder: 'awsServerGroupCommandBuilder',
-      configurationService: 'awsServerGroupConfigurationService',
-      scalingActivitiesEnabled: true,
-    },
-    instance: {
-      instanceTypeService: 'awsInstanceTypeService',
-      detailsTemplateUrl: require('./instance/details/instanceDetails.html'),
-      detailsController: 'awsInstanceDetailsCtrl',
-    },
-    loadBalancer: {
-      transformer: AwsLoadBalancerTransformer,
-      detailsTemplateUrl: require('./loadBalancer/details/loadBalancerDetails.html'),
-      detailsController: 'awsLoadBalancerDetailsCtrl',
-      CreateLoadBalancerModal: AmazonLoadBalancerChoiceModal,
-      targetGroupDetailsTemplateUrl: require('./loadBalancer/details/targetGroupDetails.html'),
-      targetGroupDetailsController: 'awsTargetGroupDetailsCtrl',
-      ClusterContainer: AmazonLoadBalancerClusterContainer,
-      LoadBalancersTag: AmazonLoadBalancersTag,
-    },
-    function: {
-      details: AmazonFunctionDetails,
-      CreateFunctionModal: CreateLambdaFunction,
-      transformer: AwsFunctionTransformer,
-    },
-    securityGroup: {
-      transformer: 'awsSecurityGroupTransformer',
-      reader: 'awsSecurityGroupReader',
-      detailsTemplateUrl: require('./securityGroup/details/securityGroupDetail.html'),
-      detailsController: 'awsSecurityGroupDetailsCtrl',
-      createSecurityGroupTemplateUrl: require('./securityGroup/configure/createSecurityGroup.html'),
-      createSecurityGroupController: 'awsCreateSecurityGroupCtrl',
-    },
-    subnet: {
-      renderer: 'awsSubnetRenderer',
-    },
-    search: {
-      resultFormatter: 'awsSearchResultFormatter',
-    },
-    applicationProviderFields: {
-      templateUrl: require('./applicationProviderFields/awsFields.html'),
-    },
-  });
+]);
+
+CloudProviderRegistry.registerProvider('aws', {
+  name: 'Amazon',
+  logo: {
+    path: require('./logo/amazon.logo.svg'),
+  },
+  image: {
+    reader: AwsImageReader,
+  },
+  serverGroup: {
+    transformer: 'awsServerGroupTransformer',
+    detailsActions: AmazonServerGroupActions,
+    detailsGetter: amazonServerGroupDetailsGetter,
+    detailsSections: [
+      AmazonInfoDetailsSection,
+      AmazonCapacityDetailsSection,
+      HealthDetailsSection,
+      LaunchConfigDetailsSection,
+      SecurityGroupsDetailsSection,
+      ScalingProcessesDetailsSection,
+      ScalingPoliciesDetailsSection,
+      ScheduledActionsDetailsSection,
+      TagsDetailsSection,
+      PackageDetailsSection,
+      AdvancedSettingsDetailsSection,
+      LogsDetailsSection,
+    ],
+    CloneServerGroupModal: AmazonCloneServerGroupModal,
+    commandBuilder: 'awsServerGroupCommandBuilder',
+    configurationService: 'awsServerGroupConfigurationService',
+    scalingActivitiesEnabled: true,
+  },
+  instance: {
+    instanceTypeService: 'awsInstanceTypeService',
+    detailsTemplateUrl: require('./instance/details/instanceDetails.html'),
+    detailsController: 'awsInstanceDetailsCtrl',
+  },
+  loadBalancer: {
+    transformer: AwsLoadBalancerTransformer,
+    detailsTemplateUrl: require('./loadBalancer/details/loadBalancerDetails.html'),
+    detailsController: 'awsLoadBalancerDetailsCtrl',
+    CreateLoadBalancerModal: AmazonLoadBalancerChoiceModal,
+    targetGroupDetailsTemplateUrl: require('./loadBalancer/details/targetGroupDetails.html'),
+    targetGroupDetailsController: 'awsTargetGroupDetailsCtrl',
+    ClusterContainer: AmazonLoadBalancerClusterContainer,
+    LoadBalancersTag: AmazonLoadBalancersTag,
+  },
+  function: {
+    details: AmazonFunctionDetails,
+    CreateFunctionModal: CreateLambdaFunction,
+    transformer: AwsFunctionTransformer,
+  },
+  securityGroup: {
+    transformer: 'awsSecurityGroupTransformer',
+    reader: 'awsSecurityGroupReader',
+    detailsTemplateUrl: require('./securityGroup/details/securityGroupDetail.html'),
+    detailsController: 'awsSecurityGroupDetailsCtrl',
+    createSecurityGroupTemplateUrl: require('./securityGroup/configure/createSecurityGroup.html'),
+    createSecurityGroupController: 'awsCreateSecurityGroupCtrl',
+  },
+  subnet: {
+    renderer: 'awsSubnetRenderer',
+  },
+  search: {
+    resultFormatter: 'awsSearchResultFormatter',
+  },
+  applicationProviderFields: {
+    templateUrl: require('./applicationProviderFields/awsFields.html'),
+  },
 });
 
 DeploymentStrategyRegistry.registerProvider('aws', [

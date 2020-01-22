@@ -56,35 +56,35 @@ module(DCOS_DCOS_MODULE, [
   DCOS_SERVERGROUP_TRANSFORMER,
   DCOS_VALIDATION_APPLICATIONNAME_VALIDATOR,
   DCOS_COMMON_SELECTFIELD_DIRECTIVE,
-]).config(function() {
-  CloudProviderRegistry.registerProvider('dcos', {
-    name: 'DC/OS',
-    logo: {
-      path: require('./logo/dcos.logo.png'),
-    },
-    instance: {
-      detailsTemplateUrl: require('./instance/details/details.html'),
-      detailsController: 'dcosInstanceDetailsController',
-    },
-    loadBalancer: {
-      transformer: 'dcosLoadBalancerTransformer',
-      detailsTemplateUrl: require('./loadBalancer/details/details.html'),
-      detailsController: 'dcosLoadBalancerDetailsController',
-      createLoadBalancerTemplateUrl: require('./loadBalancer/configure/wizard/createWizard.html'),
-      createLoadBalancerController: 'dcosUpsertLoadBalancerController',
-    },
-    image: {
-      reader: 'dcosImageReader',
-    },
-    serverGroup: {
-      skipUpstreamStageCheck: true,
-      transformer: 'dcosServerGroupTransformer',
-      detailsTemplateUrl: require('./serverGroup/details/details.html'),
-      detailsController: 'dcosServerGroupDetailsController',
-      cloneServerGroupController: 'dcosCloneServerGroupController',
-      cloneServerGroupTemplateUrl: require('./serverGroup/configure/wizard/wizard.html'),
-      commandBuilder: 'dcosServerGroupCommandBuilder',
-      configurationService: 'dcosServerGroupConfigurationService',
-    },
-  });
+]);
+
+CloudProviderRegistry.registerProvider('dcos', {
+  name: 'DC/OS',
+  logo: {
+    path: require('./logo/dcos.logo.png'),
+  },
+  instance: {
+    detailsTemplateUrl: require('./instance/details/details.html'),
+    detailsController: 'dcosInstanceDetailsController',
+  },
+  loadBalancer: {
+    transformer: 'dcosLoadBalancerTransformer',
+    detailsTemplateUrl: require('./loadBalancer/details/details.html'),
+    detailsController: 'dcosLoadBalancerDetailsController',
+    createLoadBalancerTemplateUrl: require('./loadBalancer/configure/wizard/createWizard.html'),
+    createLoadBalancerController: 'dcosUpsertLoadBalancerController',
+  },
+  image: {
+    reader: 'dcosImageReader',
+  },
+  serverGroup: {
+    skipUpstreamStageCheck: true,
+    transformer: 'dcosServerGroupTransformer',
+    detailsTemplateUrl: require('./serverGroup/details/details.html'),
+    detailsController: 'dcosServerGroupDetailsController',
+    cloneServerGroupController: 'dcosCloneServerGroupController',
+    cloneServerGroupTemplateUrl: require('./serverGroup/configure/wizard/wizard.html'),
+    commandBuilder: 'dcosServerGroupCommandBuilder',
+    configurationService: 'dcosServerGroupConfigurationService',
+  },
 });

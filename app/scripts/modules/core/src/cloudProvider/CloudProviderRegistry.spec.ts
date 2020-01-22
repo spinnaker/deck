@@ -1,16 +1,21 @@
 import { mock } from 'angular';
 
 import { CloudProviderRegistry } from './CloudProviderRegistry';
+import { SETTINGS } from 'core/config';
 
 describe('CloudProviderRegistry: API', function() {
+  beforeEach(() => {
+    SETTINGS.providers.aws2 = { defaults: {} };
+  });
+  afterEach(SETTINGS.resetToOriginal);
   describe('registration', function() {
     it(
       'registers providers',
       mock.inject(function() {
-        expect(CloudProviderRegistry.getProvider('aws')).toBeNull();
+        expect(CloudProviderRegistry.getProvider('aws2')).toBeNull();
         const config = { name: 'a', key: 'a' };
-        CloudProviderRegistry.registerProvider('aws', config);
-        expect(CloudProviderRegistry.getProvider('aws')).toEqual(config);
+        CloudProviderRegistry.registerProvider('aws2', config);
+        expect(CloudProviderRegistry.getProvider('aws2')).toEqual(config);
       }),
     );
   });
@@ -29,42 +34,42 @@ describe('CloudProviderRegistry: API', function() {
     });
 
     it('returns simple or nested properties', function() {
-      CloudProviderRegistry.registerProvider('aws', this.config);
-      expect(CloudProviderRegistry.getValue('aws', 'key')).toEqual('a');
-      expect(CloudProviderRegistry.getValue('aws', 'nested')).toEqual(this.config.nested);
-      expect(CloudProviderRegistry.getValue('aws', 'nested.good')).toEqual('nice');
+      CloudProviderRegistry.registerProvider('aws2', this.config);
+      expect(CloudProviderRegistry.getValue('aws2', 'key')).toEqual('a');
+      expect(CloudProviderRegistry.getValue('aws2', 'nested')).toEqual(this.config.nested);
+      expect(CloudProviderRegistry.getValue('aws2', 'nested.good')).toEqual('nice');
     });
 
     it('returns a copy of properties, not actual registered values', function() {
-      CloudProviderRegistry.registerProvider('aws', this.config);
+      CloudProviderRegistry.registerProvider('aws2', this.config);
 
-      expect(CloudProviderRegistry.getValue('aws', 'nested')).not.toBe(this.config.nested);
-      expect(CloudProviderRegistry.getValue('aws', 'nested')).toEqual(this.config.nested);
+      expect(CloudProviderRegistry.getValue('aws2', 'nested')).not.toBe(this.config.nested);
+      expect(CloudProviderRegistry.getValue('aws2', 'nested')).toEqual(this.config.nested);
 
       // the above tests should be sufficient, but just to really drive home the point
-      const nested = CloudProviderRegistry.getValue('aws', 'nested');
+      const nested = CloudProviderRegistry.getValue('aws2', 'nested');
       expect(nested.good).toBe('nice');
       nested.good = 'mean';
-      expect(CloudProviderRegistry.getValue('aws', 'nested').good).toBe('nice');
+      expect(CloudProviderRegistry.getValue('aws2', 'nested').good).toBe('nice');
     });
 
     it(
       'returns falsy values',
       mock.inject(function() {
-        CloudProviderRegistry.registerProvider('aws', this.config);
-        expect(CloudProviderRegistry.getValue('aws', 'nested.falsy')).toBe(false);
-        expect(CloudProviderRegistry.getValue('aws', 'nested.nully')).toBe(null);
-        expect(CloudProviderRegistry.getValue('aws', 'nested.zero')).toBe(0);
+        CloudProviderRegistry.registerProvider('aws2', this.config);
+        expect(CloudProviderRegistry.getValue('aws2', 'nested.falsy')).toBe(false);
+        expect(CloudProviderRegistry.getValue('aws2', 'nested.nully')).toBe(null);
+        expect(CloudProviderRegistry.getValue('aws2', 'nested.zero')).toBe(0);
       }),
     );
 
     it(
       'returns null when provider or property is not found',
       mock.inject(function() {
-        CloudProviderRegistry.registerProvider('aws', this.config);
+        CloudProviderRegistry.registerProvider('aws2', this.config);
         expect(CloudProviderRegistry.getValue('gce', 'a')).toBe(null);
-        expect(CloudProviderRegistry.getValue('aws', 'b')).toBe(null);
-        expect(CloudProviderRegistry.getValue('aws', 'a.b')).toBe(null);
+        expect(CloudProviderRegistry.getValue('aws2', 'b')).toBe(null);
+        expect(CloudProviderRegistry.getValue('aws2', 'a.b')).toBe(null);
       }),
     );
   });
@@ -83,19 +88,19 @@ describe('CloudProviderRegistry: API', function() {
     });
 
     it('returns true on simple or nested properties', function() {
-      CloudProviderRegistry.registerProvider('aws', this.config);
-      expect(CloudProviderRegistry.hasValue('aws', 'key')).toBe(true);
-      expect(CloudProviderRegistry.hasValue('aws', 'nested')).toBe(true);
-      expect(CloudProviderRegistry.hasValue('aws', 'nested.good')).toBe(true);
-      expect(CloudProviderRegistry.hasValue('aws', 'nested.falsy')).toBe(true);
-      expect(CloudProviderRegistry.hasValue('aws', 'nested.zero')).toBe(true);
+      CloudProviderRegistry.registerProvider('aws2', this.config);
+      expect(CloudProviderRegistry.hasValue('aws2', 'key')).toBe(true);
+      expect(CloudProviderRegistry.hasValue('aws2', 'nested')).toBe(true);
+      expect(CloudProviderRegistry.hasValue('aws2', 'nested.good')).toBe(true);
+      expect(CloudProviderRegistry.hasValue('aws2', 'nested.falsy')).toBe(true);
+      expect(CloudProviderRegistry.hasValue('aws2', 'nested.zero')).toBe(true);
     });
 
     it('returns false on null properties, non-existent properties or non-existent providers', function() {
-      CloudProviderRegistry.registerProvider('aws', this.config);
-      expect(CloudProviderRegistry.hasValue('aws', 'nested.nully')).toBe(false);
-      expect(CloudProviderRegistry.hasValue('aws', 'nonexistent')).toBe(false);
-      expect(CloudProviderRegistry.hasValue('aws', 'definitely.nonexistent')).toBe(false);
+      CloudProviderRegistry.registerProvider('aws2', this.config);
+      expect(CloudProviderRegistry.hasValue('aws2', 'nested.nully')).toBe(false);
+      expect(CloudProviderRegistry.hasValue('aws2', 'nonexistent')).toBe(false);
+      expect(CloudProviderRegistry.hasValue('aws2', 'definitely.nonexistent')).toBe(false);
       expect(CloudProviderRegistry.hasValue('boo', 'bar')).toBe(false);
       expect(CloudProviderRegistry.hasValue('boo', 'bar.baz')).toBe(false);
     });
