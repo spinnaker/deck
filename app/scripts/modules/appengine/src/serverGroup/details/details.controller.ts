@@ -1,10 +1,9 @@
 import { IController, IScope, module } from 'angular';
 import { IModalService } from 'angular-ui-bootstrap';
-import { cloneDeep, get, map, mapValues, reduce } from 'lodash';
+import { cloneDeep, map, mapValues, reduce } from 'lodash';
 
 import {
   Application,
-  CONFIRMATION_MODAL_SERVICE,
   ConfirmationModalService,
   IConfirmationModalParams,
   IServerGroup,
@@ -65,7 +64,6 @@ class AppengineServerGroupDetailsController implements IController {
     'serverGroup',
     'app',
     'serverGroupWriter',
-    'confirmationModalService',
     'appengineServerGroupWriter',
     'appengineServerGroupCommandBuilder',
   ];
@@ -76,7 +74,6 @@ class AppengineServerGroupDetailsController implements IController {
     serverGroup: IServerGroupFromStateParams,
     public app: Application,
     private serverGroupWriter: ServerGroupWriter,
-    private confirmationModalService: ConfirmationModalService,
     private appengineServerGroupWriter: AppengineServerGroupWriter,
     private appengineServerGroupCommandBuilder: AppengineServerGroupCommandBuilder,
   ) {
@@ -161,7 +158,7 @@ class AppengineServerGroupDetailsController implements IController {
       confirmationModalParams.interestingHealthProviderNames = [AppengineHealth.PLATFORM];
     }
 
-    this.confirmationModalService.confirm(confirmationModalParams);
+    ConfirmationModalService.confirm(confirmationModalParams);
   }
 
   public enableServerGroup(): void {
@@ -173,8 +170,7 @@ class AppengineServerGroupDetailsController implements IController {
     const submitMethod = (params: any) =>
       this.serverGroupWriter.enableServerGroup(this.serverGroup, this.app, { ...params });
 
-    const modalBody = `
-      <div class="well well-sm">
+    const modalBody = `<div class="well well-sm">
         <p>
           Enabling <b>${this.serverGroup.name}</b> will set its traffic allocation for
           <b>${this.serverGroup.loadBalancers[0]}</b> to 100%.
@@ -203,7 +199,7 @@ class AppengineServerGroupDetailsController implements IController {
       confirmationModalParams.interestingHealthProviderNames = [AppengineHealth.PLATFORM];
     }
 
-    this.confirmationModalService.confirm(confirmationModalParams);
+    ConfirmationModalService.confirm(confirmationModalParams);
   }
 
   public disableServerGroup(): void {
@@ -216,8 +212,7 @@ class AppengineServerGroupDetailsController implements IController {
       this.serverGroupWriter.disableServerGroup(this.serverGroup, this.app.name, params);
 
     const expectedAllocations = this.expectedAllocationsAfterDisableOperation(this.serverGroup, this.app);
-    const modalBody = `
-      <div class="well well-sm">
+    const modalBody = `<div class="well well-sm">
         <p>
           For App Engine, a disable operation sets this server group's allocation
           to 0% and sets the other enabled server groups' allocations to their relative proportions
@@ -252,7 +247,7 @@ class AppengineServerGroupDetailsController implements IController {
       confirmationModalParams.interestingHealthProviderNames = [AppengineHealth.PLATFORM];
     }
 
-    this.confirmationModalService.confirm(confirmationModalParams);
+    ConfirmationModalService.confirm(confirmationModalParams);
   }
 
   public stopServerGroup(): void {
@@ -265,8 +260,7 @@ class AppengineServerGroupDetailsController implements IController {
 
     let modalBody: string;
     if (!this.serverGroup.disabled) {
-      modalBody = `
-        <div class="alert alert-danger">
+      modalBody = `<div class="alert alert-danger">
           <p>Stopping this server group will scale it down to zero instances.</p>
           <p>
             This server group is currently serving traffic from <b>${this.serverGroup.loadBalancers[0]}</b>.
@@ -287,7 +281,7 @@ class AppengineServerGroupDetailsController implements IController {
       askForReason: true,
     };
 
-    this.confirmationModalService.confirm(confirmationModalParams);
+    ConfirmationModalService.confirm(confirmationModalParams);
   }
 
   public startServerGroup(): void {
@@ -309,7 +303,7 @@ class AppengineServerGroupDetailsController implements IController {
       askForReason: true,
     };
 
-    this.confirmationModalService.confirm(confirmationModalParams);
+    ConfirmationModalService.confirm(confirmationModalParams);
   }
 
   public cloneServerGroup(): void {
@@ -345,9 +339,7 @@ class AppengineServerGroupDetailsController implements IController {
 
   private canStartOrStopServerGroup(): boolean {
     const isFlex = this.serverGroup.env === 'FLEXIBLE';
-    const usesManualScaling = get(this.serverGroup, 'scalingPolicy.type') === 'MANUAL';
-    const usesBasicScaling = get(this.serverGroup, 'scalingPolicy.type') === 'BASIC';
-    return isFlex || usesManualScaling || usesBasicScaling;
+    return isFlex || ['MANUAL', 'BASIC'].includes(this.serverGroup.scalingPolicy?.type);
   }
 
   private getBodyTemplate(serverGroup: IAppengineServerGroup, app: Application): string {
@@ -392,7 +384,7 @@ class AppengineServerGroupDetailsController implements IController {
     app: Application,
   ): { [key: string]: number } {
     const loadBalancer = app.getDataSource('loadBalancers').data.find((toCheck: IAppengineLoadBalancer): boolean => {
-      const allocations = get(toCheck, 'split.allocations', {});
+      const allocations = toCheck.split?.allocations ?? {};
       const enabledServerGroups = Object.keys(allocations);
       return enabledServerGroups.includes(serverGroup.name);
     });
@@ -461,8 +453,7 @@ class AppengineServerGroupDetailsController implements IController {
 
 export const APPENGINE_SERVER_GROUP_DETAILS_CTRL = 'spinnaker.appengine.serverGroup.details.controller';
 
-module(APPENGINE_SERVER_GROUP_DETAILS_CTRL, [
-  APPENGINE_SERVER_GROUP_WRITER,
-  CONFIRMATION_MODAL_SERVICE,
-  SERVER_GROUP_WRITER,
-]).controller('appengineServerGroupDetailsCtrl', AppengineServerGroupDetailsController);
+module(APPENGINE_SERVER_GROUP_DETAILS_CTRL, [APPENGINE_SERVER_GROUP_WRITER, SERVER_GROUP_WRITER]).controller(
+  'appengineServerGroupDetailsCtrl',
+  AppengineServerGroupDetailsController,
+);

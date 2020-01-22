@@ -1,4 +1,4 @@
-import { module, IPromise } from 'angular';
+import { IPromise } from 'angular';
 import { $q } from 'ngimport';
 
 import { ConfirmModal, IConfirmModalProps } from 'core/confirmationModal/ConfirmModal';
@@ -30,12 +30,12 @@ export interface IConfirmationModalParams extends IConfirmationModalPassthroughP
 }
 
 export class ConfirmationModalService {
-  private defaults: IConfirmationModalParams = {
+  private static defaults: IConfirmationModalParams = {
     buttonText: 'Confirm',
     cancelButtonText: 'Cancel',
   };
 
-  public confirm(params: IConfirmationModalParams): IPromise<any> {
+  public static confirm(params: IConfirmationModalParams): IPromise<any> {
     const extendedParams: IConfirmModalProps = { ...this.defaults, ...params };
 
     if (params.body) {
@@ -52,16 +52,11 @@ export class ConfirmationModalService {
       extendedParams.taskMonitors = taskMonitorConfigs.map(m => new TaskMonitor(m));
     }
 
-    const modalProps = { closeModal: deferred.resolve, dismissModal: deferred.reject };
-    const props = { ...extendedParams, ...modalProps };
-    ReactModal.show(ConfirmModal, props);
+    ReactModal.show(ConfirmModal, extendedParams).then(deferred.resolve, deferred.reject);
 
-    // modal was closed
+    // modal was dismissed
     deferred.promise.catch(() => {});
 
     return deferred.promise;
   }
 }
-
-export const CONFIRMATION_MODAL_SERVICE = 'spinnaker.core.confirmationModal.service';
-module(CONFIRMATION_MODAL_SERVICE, []).service('confirmationModalService', ConfirmationModalService);

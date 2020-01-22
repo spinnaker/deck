@@ -7,8 +7,9 @@ import _ from 'lodash';
 
 import {
   AccountService,
+  confirmNotManaged,
   ClusterTargetBuilder,
-  CONFIRMATION_MODAL_SERVICE,
+  ConfirmationModalService,
   ServerGroupReader,
   ServerGroupWarningMessageService,
   SERVER_GROUP_WRITER,
@@ -35,7 +36,6 @@ angular
   .module(TITUS_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_TITUS_CONTROLLER, [
     UIROUTER_ANGULARJS,
     TITUS_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER,
-    CONFIRMATION_MODAL_SERVICE,
     DISRUPTION_BUDGET_DETAILS_SECTION,
     SERVER_GROUP_WRITER,
     TITUS_SERVERGROUP_DETAILS_ROLLBACK_ROLLBACKSERVERGROUP_CONTROLLER,
@@ -52,7 +52,6 @@ angular
     'serverGroup',
     'titusServerGroupCommandBuilder',
     '$uibModal',
-    'confirmationModalService',
     'serverGroupWriter',
     'awsServerGroupTransformer',
     function(
@@ -64,7 +63,6 @@ angular
       serverGroup,
       titusServerGroupCommandBuilder,
       $uibModal,
-      confirmationModalService,
       serverGroupWriter,
       awsServerGroupTransformer,
     ) {
@@ -260,7 +258,9 @@ angular
 
         ServerGroupWarningMessageService.addDestroyWarningMessage(app, serverGroup, confirmationModalParams);
 
-        confirmationModalService.confirm(confirmationModalParams);
+        confirmNotManaged(serverGroup, app).then(
+          notManaged => notManaged && ConfirmationModalService.confirm(confirmationModalParams),
+        );
       };
 
       this.disableServerGroup = function disableServerGroup() {
@@ -292,36 +292,44 @@ angular
 
         ServerGroupWarningMessageService.addDisableWarningMessage(app, serverGroup, confirmationModalParams);
 
-        confirmationModalService.confirm(confirmationModalParams);
+        confirmNotManaged(serverGroup, app).then(
+          notManaged => notManaged && ConfirmationModalService.confirm(confirmationModalParams),
+        );
       };
 
       this.enableServerGroup = () => {
-        if (!this.isRollbackEnabled()) {
-          this.showEnableServerGroupModal();
-          return;
-        }
+        confirmNotManaged(serverGroup, app).then(notManaged => {
+          if (!notManaged) {
+            return;
+          }
+          if (!this.isRollbackEnabled()) {
+            this.showEnableServerGroupModal();
+            return;
+          }
 
-        const confirmationModalParams = {
-          header: 'Rolling back?',
-          body: `Spinnaker provides an orchestrated rollback feature to carefully restore a different version of this
-             server group. Do you want to use the orchestrated rollback?`,
-          buttonText: `Yes, take me to the rollback settings modal`,
-          cancelButtonText: 'No, I just want to enable the server group',
-        };
+          const confirmationModalParams = {
+            header: 'Rolling back?',
+            body: `Spinnaker provides an orchestrated rollback feature to carefully restore a different version of this
+                 server group. Do you want to use the orchestrated rollback?`,
+            buttonText: `Yes, take me to the rollback settings modal`,
+            cancelButtonText: 'No, I just want to enable the server group',
+          };
 
-        confirmationModalService
-          .confirm(confirmationModalParams)
-          .then(() => this.rollbackServerGroup())
-          .catch(({ source }) => {
-            // don't show the enable modal if the user cancels with the header button
-            if (source === 'footer') {
-              this.showEnableServerGroupModal();
-            }
-          });
+          ConfirmationModalService.confirm(confirmationModalParams)
+            .then(() => this.rollbackServerGroup())
+            .catch(({ source }) => {
+              // don't show the enable modal if the user cancels with the header button
+              if (source === 'footer') {
+                this.showEnableServerGroupModal();
+              }
+            });
+        });
       };
 
       this.resizeServerGroup = () => {
-        ReactModal.show(TitusResizeServerGroupModal, { serverGroup: $scope.serverGroup, application });
+        confirmNotManaged(serverGroup, app).then(notManaged => {
+          notManaged && ReactModal.show(TitusResizeServerGroupModal, { serverGroup: $scope.serverGroup, application });
+        });
       };
 
       this.showEnableServerGroupModal = () => {
@@ -351,7 +359,7 @@ angular
           submitMethod: submitMethod,
         };
 
-        confirmationModalService.confirm(confirmationModalParams);
+        ConfirmationModalService.confirm(confirmationModalParams);
       };
 
       this.cloneServerGroup = function cloneServerGroup() {
@@ -417,19 +425,25 @@ angular
           previousServerGroup = allServerGroups[0];
         }
 
-        $uibModal.open({
-          templateUrl: require('./rollback/rollbackServerGroup.html'),
-          controller: 'titusRollbackServerGroupCtrl as ctrl',
-          resolve: {
-            serverGroup: () => serverGroup,
-            previousServerGroup: () => previousServerGroup,
-            disabledServerGroups: () => {
-              const cluster = _.find(application.clusters, { name: serverGroup.cluster, account: serverGroup.account });
-              return _.filter(cluster.serverGroups, { isDisabled: true, region: serverGroup.region });
-            },
-            allServerGroups: () => allServerGroups,
-            application: () => application,
-          },
+        confirmNotManaged(serverGroup, app).then(notManaged => {
+          notManaged &&
+            $uibModal.open({
+              templateUrl: require('./rollback/rollbackServerGroup.html'),
+              controller: 'titusRollbackServerGroupCtrl as ctrl',
+              resolve: {
+                serverGroup: () => serverGroup,
+                previousServerGroup: () => previousServerGroup,
+                disabledServerGroups: () => {
+                  const cluster = _.find(application.clusters, {
+                    name: serverGroup.cluster,
+                    account: serverGroup.account,
+                  });
+                  return _.filter(cluster.serverGroups, { isDisabled: true, region: serverGroup.region });
+                },
+                allServerGroups: () => allServerGroups,
+                application: () => application,
+              },
+            });
         });
       };
     },

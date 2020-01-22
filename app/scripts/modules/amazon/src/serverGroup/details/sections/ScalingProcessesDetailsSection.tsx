@@ -1,6 +1,6 @@
 import React from 'react';
 import { IScalingProcess } from 'amazon/domain';
-import { CollapsibleSection, HelpField, ModalInjector, timestamp, Tooltip } from '@spinnaker/core';
+import { CollapsibleSection, confirmNotManaged, HelpField, ModalInjector, timestamp, Tooltip } from '@spinnaker/core';
 import { AutoScalingProcessService } from '../scalingProcesses/AutoScalingProcessService';
 import { IAmazonServerGroupDetailsSectionProps } from './IAmazonServerGroupDetailsSectionProps';
 
@@ -21,15 +21,20 @@ export class ScalingProcessesDetailsSection extends React.Component<
   }
 
   private toggleScalingProcesses = (): void => {
-    ModalInjector.modalService.open({
-      templateUrl: require('../scalingProcesses/modifyScalingProcesses.html'),
-      controller: 'ModifyScalingProcessesCtrl as ctrl',
-      resolve: {
-        serverGroup: () => this.props.serverGroup,
-        application: () => this.props.app,
-        processes: () => this.state.autoScalingProcesses,
-      },
-    });
+    const { app, serverGroup } = this.props;
+    confirmNotManaged(serverGroup, app).then(
+      isNotManaged =>
+        isNotManaged &&
+        ModalInjector.modalService.open({
+          templateUrl: require('../scalingProcesses/modifyScalingProcesses.html'),
+          controller: 'ModifyScalingProcessesCtrl as ctrl',
+          resolve: {
+            serverGroup: () => serverGroup,
+            application: () => app,
+            processes: () => this.state.autoScalingProcesses,
+          },
+        }),
+    );
   };
 
   private getState(props: IAmazonServerGroupDetailsSectionProps): IScalingProcessesDetailsSectionState {
