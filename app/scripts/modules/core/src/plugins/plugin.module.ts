@@ -1,6 +1,6 @@
 import { module } from 'angular';
 import { UIRouter } from '@uirouter/core';
-import { PluginRegistry } from 'core/plugins/plugin.registry';
+import { IPluginManifest, PluginRegistry } from 'core/plugins/plugin.registry';
 
 export const PLUGINS_MODULE = 'netflix.spinnaker.plugins';
 module(PLUGINS_MODULE, ['ui.router']).config([
@@ -22,8 +22,7 @@ module(PLUGINS_MODULE, ['ui.router']).config([
       if (!pluginModule || !pluginModule.plugins) {
         throw new Error(`Expected plugin-manifest.js to contain an export named 'plugins' but it did not.`);
       } else {
-        // @ts-ignore
-        pluginModule.plugins.forEach(plugin => pluginRegistry.register(plugin));
+        pluginModule.plugins.forEach((plugin: IPluginManifest) => pluginRegistry.register(plugin));
       }
     } catch (error) {
       console.error('Error registering plugin manifests');
