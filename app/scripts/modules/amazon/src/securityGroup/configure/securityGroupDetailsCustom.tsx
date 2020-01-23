@@ -1,7 +1,6 @@
 import React from 'react';
 import { Overridable } from '@spinnaker/core';
 import { ISecurityGroupDetail } from '@spinnaker/core';
-import './nflx/additionalIpRules.nflx';
 
 export interface IAdditionalIpRulesProps {
   securityGroupDetails: ISecurityGroupDetail;
