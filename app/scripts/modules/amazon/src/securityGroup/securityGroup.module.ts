@@ -9,7 +9,7 @@ import { AMAZON_SECURITYGROUP_CONFIGURE_EDITSECURITYGROUPCTRL } from './configur
 import { AMAZON_SECURITYGROUP_DETAILS_SECURITYGROUPDETAIL_CONTROLLER } from './details/securityGroupDetail.controller';
 import { AMAZON_SECURITYGROUP_SECURITYGROUP_TRANSFORMER } from './securityGroup.transformer';
 import { AWS_SECURITY_GROUP_IP_RANGE_RULES } from './details/securityGroupIpRangeRules.component';
-import { AWS_SECURITY_GROUP_DETAILS_CUSTOM } from 'securityGroupDetailsCustom.component.ts';
+import { AWS_SECURITY_GROUP_DETAILS_CUSTOM } from './configure/securityGroupDetailsCustom.component';
 
 export const AWS_SECURITY_GROUP_MODULE = 'spinnaker.amazon.securityGroup';
 module(AWS_SECURITY_GROUP_MODULE, [
