@@ -7,7 +7,7 @@ import { UISref } from '@uirouter/react';
 import { Application } from 'core/application/application.model';
 import { SETTINGS } from 'core/config';
 import { IExecution, IPipeline } from 'core/domain';
-import { Execution } from 'core/pipeline/executions/execution/Execution';
+import { Execution } from '../executions/execution/Execution';
 import { IScheduler, SchedulerFactory } from 'core/scheduler';
 import { PipelineTemplateV2Service, ManualExecutionModal } from 'core/pipeline';
 import { ReactInjector, IStateChange } from 'core/reactShims';

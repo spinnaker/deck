@@ -10,7 +10,7 @@ import { PipelineTemplateV2Service } from 'core/pipeline';
 import { ReactInjector } from 'core/reactShims';
 import { Tooltip } from 'core/presentation/Tooltip';
 
-import { CreatePipelineButton } from 'core/pipeline/create/CreatePipelineButton';
+import { CreatePipelineButton } from '../create/CreatePipelineButton';
 
 export interface ICreatePipelineProps {
   application: Application;
