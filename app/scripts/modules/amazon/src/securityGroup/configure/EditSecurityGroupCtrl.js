@@ -19,7 +19,6 @@ angular
     '$controller',
     function($scope, $uibModalInstance, $state, application, securityGroup, $controller) {
       $scope.self = $scope;
-      $scope.application = application;
       $scope.pages = {
         ingress: require('./createSecurityGroupIngress.html'),
       };
