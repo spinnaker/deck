@@ -183,22 +183,20 @@ export class SingleExecutionDetails extends React.Component<
                       <span> stage durations</span>
                     </label>
                   </div>
-                  {
-                    <Tooltip value="Navigate to Pipeline Configuration">
-                      <UISref
-                        to="^.pipelineConfig"
-                        params={{ application: this.props.app.name, pipelineId: this.state.execution.pipelineConfigId }}
+                  <Tooltip value="Navigate to Pipeline Configuration">
+                    <UISref
+                      to="^.pipelineConfig"
+                      params={{ application: this.props.app.name, pipelineId: this.state.execution.pipelineConfigId }}
+                    >
+                      <button
+                        className="btn btn-sm btn-default single-execution-details__configure"
+                        onClick={this.handleConfigureClicked}
                       >
-                        <button
-                          className="btn btn-sm btn-default single-execution-details__configure"
-                          onClick={this.handleConfigureClicked}
-                        >
-                          <span className="glyphicon glyphicon-cog" />
-                          <span className="visible-md-inline visible-lg-inline"> Configure</span>
-                        </button>
-                      </UISref>
-                    </Tooltip>
-                  }
+                        <span className="glyphicon glyphicon-cog" />
+                        <span className="visible-md-inline visible-lg-inline"> Configure</span>
+                      </button>
+                    </UISref>
+                  </Tooltip>
                 </div>
               </div>
             </div>
