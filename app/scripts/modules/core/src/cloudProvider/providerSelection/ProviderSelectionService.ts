@@ -47,4 +47,13 @@ export class ProviderSelectionService {
       return provider;
     });
   }
+
+  public static disableButton(application: Application): boolean {
+    if (application.attributes.cloudProviders.length == 1) {
+      if (application.attributes.cloudProviders.includes('kubernetes')) {
+        return !SETTINGS.createKubernetesInfrastructure;
+      }
+    }
+    return false;
+  }
 }

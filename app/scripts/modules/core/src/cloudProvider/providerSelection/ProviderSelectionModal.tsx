@@ -2,6 +2,7 @@ import { CloudProviderRegistry } from 'core/cloudProvider';
 import * as React from 'react';
 import { Modal } from 'react-bootstrap';
 import { IModalComponentProps, ReactModal } from 'core/presentation';
+import { SETTINGS } from 'core/config/settings';
 
 export interface IProviderSelectionModalProps extends IModalComponentProps {
   providerOptions: string[];
@@ -40,6 +41,13 @@ export class ProviderSelectionModal extends React.Component<
   public render() {
     const { selectedProvider } = this.state;
     const { providerOptions } = this.props;
+
+    if (!SETTINGS.createKubernetesInfrastructure) {
+      if (providerOptions.includes('kubernetes')) {
+        var pos = providerOptions.indexOf('kubernetes');
+        providerOptions.splice(pos, 1);
+      }
+    }
 
     return (
       <>

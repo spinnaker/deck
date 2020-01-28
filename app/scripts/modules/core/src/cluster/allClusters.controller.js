@@ -57,6 +57,8 @@ module.exports = angular
 
         this.createLabel = 'Create Server Group';
 
+        $scope.isDisabled = ProviderSelectionService.disableButton(app);
+
         app
           .getDataSource('serverGroups')
           .ready()

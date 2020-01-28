@@ -32,6 +32,8 @@ module.exports = angular
 
         $scope.application = app;
 
+        $scope.isDisabled = ProviderSelectionService.disableButton(app);
+
         $scope.sortFilter = SecurityGroupState.filterModel.sortFilter;
 
         app.setActiveState(app.securityGroups);
@@ -69,7 +71,11 @@ module.exports = angular
 
       function createSecurityGroupProviderFilterFn(application, account, provider) {
         const sgConfig = provider.securityGroup;
-        return sgConfig && (sgConfig.CreateSecurityGroupModal || (sgConfig.createSecurityGroupTemplateUrl && sgConfig.createSecurityGroupController));
+        return (
+          sgConfig &&
+          (sgConfig.CreateSecurityGroupModal ||
+            (sgConfig.createSecurityGroupTemplateUrl && sgConfig.createSecurityGroupController))
+        );
       }
 
       this.createSecurityGroup = function createSecurityGroup() {
