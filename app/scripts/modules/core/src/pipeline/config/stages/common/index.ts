@@ -6,3 +6,4 @@ export * from './ExecutionMarkerIcon';
 export * from './IStageConfigProps';
 export * from './stageConfigField/StageConfigField';
 export * from './applySuspendedStatuses';
+export * from './ExecutionStepDetails';
