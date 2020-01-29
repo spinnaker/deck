@@ -1,13 +1,14 @@
-'use strict';
+import { ORACLE_COMMON_OCID_TRUNCATEOCID_FILTER } from './truncateOcid.filter';
+('use strict');
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular
-  .module('spinnaker.oracle.ocid.component', [require('./truncateOcid.filter').name])
-  .component('ocid', {
-    templateUrl: require('./ocid.template.html'),
-    bindings: {
-      ocid: '=',
-      showOcid: '@',
-    },
-  });
+export const ORACLE_COMMON_OCID_OCID_COMPONENT = 'spinnaker.oracle.ocid.component';
+export const name = ORACLE_COMMON_OCID_OCID_COMPONENT; // for backwards compatibility
+module(ORACLE_COMMON_OCID_OCID_COMPONENT, [ORACLE_COMMON_OCID_TRUNCATEOCID_FILTER]).component('ocid', {
+  templateUrl: require('./ocid.template.html'),
+  bindings: {
+    ocid: '=',
+    showOcid: '@',
+  },
+});

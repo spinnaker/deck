@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { get } from 'lodash';
 import { FormikProps } from 'formik';
 
@@ -173,8 +173,10 @@ export class Listeners extends React.Component<IListenersProps, IListenersState>
                           className="form-control input-sm"
                           value={listener.externalProtocol}
                           onChange={event =>
-                            this.listenerExternalProtocolChanged(listener, event.target
-                              .value as ClassicListenerProtocol)
+                            this.listenerExternalProtocolChanged(
+                              listener,
+                              event.target.value as ClassicListenerProtocol,
+                            )
                           }
                         >
                           {this.protocols.map(p => (
@@ -200,8 +202,10 @@ export class Listeners extends React.Component<IListenersProps, IListenersState>
                           className="form-control input-sm"
                           value={listener.internalProtocol}
                           onChange={event =>
-                            this.listenerInternalProtocolChanged(listener, event.target
-                              .value as ClassicListenerProtocol)
+                            this.listenerInternalProtocolChanged(
+                              listener,
+                              event.target.value as ClassicListenerProtocol,
+                            )
                           }
                         >
                           {this.protocols.map(p => (

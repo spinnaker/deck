@@ -1,6 +1,6 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 import _ from 'lodash';
 
 import { AuthenticationService } from '@spinnaker/core';
@@ -8,9 +8,11 @@ import { AuthenticationService } from '@spinnaker/core';
 import { AWSProviderSettings } from 'amazon/aws.settings';
 
 import { PipelineTemplates, BakeExecutionLabel, BakeryReader, Registry, SETTINGS } from '@spinnaker/core';
+import { AMAZON_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER } from './bakeExecutionDetails.controller';
 
-module.exports = angular
-  .module('spinnaker.amazon.pipeline.stage.bakeStage', [require('./bakeExecutionDetails.controller').name])
+export const AMAZON_PIPELINE_STAGES_BAKE_AWSBAKESTAGE = 'spinnaker.amazon.pipeline.stage.bakeStage';
+export const name = AMAZON_PIPELINE_STAGES_BAKE_AWSBAKESTAGE; // for backwards compatibility
+module(AMAZON_PIPELINE_STAGES_BAKE_AWSBAKESTAGE, [AMAZON_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'bake',
@@ -55,7 +57,9 @@ module.exports = angular
 
       $scope.viewState = {
         loading: true,
-        roscoMode: SETTINGS.feature.roscoMode,
+        roscoMode:
+          SETTINGS.feature.roscoMode ||
+          (typeof SETTINGS.feature.roscoSelector === 'function' && SETTINGS.feature.roscoSelector($scope.stage)),
         minRootVolumeSize: AWSProviderSettings.minRootVolumeSize,
         showVmTypeSelector: true,
       };
@@ -85,6 +89,15 @@ module.exports = angular
 
           if (!$scope.stage.baseOs && $scope.baseOsOptions && $scope.baseOsOptions.length) {
             $scope.stage.baseOs = $scope.baseOsOptions[0].id;
+          } else if (
+            $scope.stage.baseOs &&
+            !($scope.baseOsOptions || []).find(baseOs => baseOs.id === $scope.stage.baseOs)
+          ) {
+            $scope.baseOsOptions.push({
+              id: $scope.stage.baseOs,
+              detailedDescription: 'Custom',
+              vmTypes: ['hvm', 'pv'],
+            });
           }
           if (!$scope.stage.baseLabel && $scope.baseLabelOptions && $scope.baseLabelOptions.length) {
             $scope.stage.baseLabel = $scope.baseLabelOptions[0];
@@ -96,6 +109,14 @@ module.exports = angular
           $scope.showAdvancedOptions = showAdvanced();
           $scope.viewState.loading = false;
         });
+      }
+
+      function stageUpdated() {
+        deleteEmptyProperties();
+        // Since the selector computes using stage as an input, it needs to be able to recompute roscoMode on updates
+        if (typeof SETTINGS.feature.roscoSelector === 'function') {
+          $scope.viewState.roscoMode = SETTINGS.feature.roscoSelector($scope.stage);
+        }
       }
 
       function deleteEmptyProperties() {
@@ -184,7 +205,7 @@ module.exports = angular
         }
       };
 
-      $scope.$watch('stage', deleteEmptyProperties, true);
+      $scope.$watch('stage', stageUpdated, true);
 
       initialize();
     },

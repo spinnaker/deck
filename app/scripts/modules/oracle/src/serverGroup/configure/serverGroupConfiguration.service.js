@@ -1,21 +1,24 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 import _ from 'lodash';
 
 import { AccountService, NetworkReader, SECURITY_GROUP_READER, SubnetReader } from '@spinnaker/core';
 import { OracleProviderSettings } from '../../oracle.settings';
 
-module.exports = angular
-  .module('spinnaker.oracle.serverGroup.configure.configuration.service', [SECURITY_GROUP_READER])
-  .factory('oracleServerGroupConfigurationService', [
+export const ORACLE_SERVERGROUP_CONFIGURE_SERVERGROUPCONFIGURATION_SERVICE =
+  'spinnaker.oracle.serverGroup.configure.configuration.service';
+export const name = ORACLE_SERVERGROUP_CONFIGURE_SERVERGROUPCONFIGURATION_SERVICE; // for backwards compatibility
+module(ORACLE_SERVERGROUP_CONFIGURE_SERVERGROUPCONFIGURATION_SERVICE, [SECURITY_GROUP_READER]).factory(
+  'oracleServerGroupConfigurationService',
+  [
     '$q',
     'oracleImageReader',
     'securityGroupReader',
     function($q, oracleImageReader, securityGroupReader) {
-      let oracle = 'oracle';
+      const oracle = 'oracle';
 
-      let getShapes = image => {
+      const getShapes = image => {
         if (!image || !image.compatibleShapes) {
           return [];
         }
@@ -24,9 +27,9 @@ module.exports = angular
         });
       };
 
-      let loadAndSelectRegions = (command, backingData) => {
+      const loadAndSelectRegions = (command, backingData) => {
         if (command.account) {
-          let selectedAccountDetails = backingData.credentialsKeyedByAccount[command.account];
+          const selectedAccountDetails = backingData.credentialsKeyedByAccount[command.account];
           if (!selectedAccountDetails) {
             return;
           }
@@ -39,7 +42,7 @@ module.exports = angular
         }
       };
 
-      let loadAvailabilityDomains = command => {
+      const loadAvailabilityDomains = command => {
         if (command.account && command.region) {
           AccountService.getAvailabilityZonesForAccountAndRegion(oracle, command.account, command.region).then(
             availDoms => {
@@ -56,7 +59,7 @@ module.exports = angular
         }
       };
 
-      let loadLoadBalancers = command => {
+      const loadLoadBalancers = command => {
         if (command.account && command.region) {
           command.backingData.filtered.loadBalancers = command.backingData.loadBalancers.filter(function(lb) {
             return lb.region === command.region && lb.account === command.account;
@@ -65,10 +68,10 @@ module.exports = angular
       };
 
       function configureCommand(application, command) {
-        let defaults = command || {};
-        let defaultCredentials =
+        const defaults = command || {};
+        const defaultCredentials =
           defaults.account || application.defaultCredentials.oracle || OracleProviderSettings.defaults.account;
-        let defaultRegion =
+        const defaultRegion =
           defaults.region || application.defaultRegions.oracle || OracleProviderSettings.defaults.region;
 
         return $q
@@ -126,11 +129,11 @@ module.exports = angular
             };
 
             backingData.subnetOnChange = function() {
-              let subnet = _.find(backingData.subnets, { id: command.subnetId });
-              let mySecGroups = backingData.securityGroups[command.account][oracle][command.region];
-              let secLists = [];
+              const subnet = _.find(backingData.subnets, { id: command.subnetId });
+              const mySecGroups = backingData.securityGroups[command.account][oracle][command.region];
+              const secLists = [];
               _.forEach(subnet.securityListIds, function(sid) {
-                let sgRef = _.find(mySecGroups, { id: sid });
+                const sgRef = _.find(mySecGroups, { id: sid });
                 securityGroupReader
                   .getSecurityGroupDetails(
                     command.application,
@@ -194,7 +197,7 @@ module.exports = angular
             };
 
             backingData.filtered.images = backingData.images;
-            let shapesMap = {};
+            const shapesMap = {};
             _.forEach(backingData.filtered.images, image => {
               shapesMap[image.id] = getShapes(image);
             });
@@ -217,4 +220,5 @@ module.exports = angular
         configureCommand: configureCommand,
       };
     },
-  ]);
+  ],
+);

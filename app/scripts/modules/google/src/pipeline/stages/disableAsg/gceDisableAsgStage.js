@@ -1,11 +1,12 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { AccountService, Registry, StageConstants } from '@spinnaker/core';
 
-module.exports = angular
-  .module('spinnaker.gce.pipeline.stage..disableAsgStage', [])
+export const GOOGLE_PIPELINE_STAGES_DISABLEASG_GCEDISABLEASGSTAGE = 'spinnaker.gce.pipeline.stage..disableAsgStage';
+export const name = GOOGLE_PIPELINE_STAGES_DISABLEASG_GCEDISABLEASGSTAGE; // for backwards compatibility
+module(GOOGLE_PIPELINE_STAGES_DISABLEASG_GCEDISABLEASGSTAGE, [])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'disableServerGroup',

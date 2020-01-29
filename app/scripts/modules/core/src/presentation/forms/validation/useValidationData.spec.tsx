@@ -6,7 +6,7 @@ import {
   successMessage,
   warningMessage,
 } from 'core/presentation/forms/validation/categories';
-import * as React from 'react';
+import React from 'react';
 
 import { mount } from 'enzyme';
 import { IValidationData, useValidationData } from './useValidationData';
@@ -50,11 +50,20 @@ describe('useValidationData hook', () => {
     expect(data.category).toBe('error');
   });
 
-  it('should pass non-string ReactNodes through (such as JSX.Element) with no validation category', () => {
+  it('should pass JSX.Element nodes through, with category: null and hidden: false', () => {
     const element = <div />;
     const data = runUseValidationDataHook(element);
     expect(data.messageNode).toBe(element);
     expect(data.category).toBeNull();
+    expect(data.hidden).toBe(false);
+  });
+
+  it('should pass non-JSX.Element/non-string nodes through, with category: null and hidden: true', () => {
+    const element = { foo: 'bar', baz: [1] };
+    const data = runUseValidationDataHook(element);
+    expect(data.messageNode).toBe(element);
+    expect(data.category).toBeNull();
+    expect(data.hidden).toBe(true);
   });
 
   it('should return async category when asyncMessage is provided', () => {

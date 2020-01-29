@@ -6,26 +6,41 @@ export interface IClassicLaunchWhitelist {
 }
 
 export interface IAWSProviderSettings extends IProviderSettings {
+  classicLaunchLockout?: number;
+  classicLaunchWhitelist?: IClassicLaunchWhitelist[];
+  createLoadBalancerWarnings?: {
+    application?: string;
+    classic?: string;
+    network?: string;
+  };
+  crossAccountIngressExclusions?: {
+    [credentials: string]: string | string[];
+  };
   defaults: {
     account?: string;
-    region?: string;
     iamRole?: string;
+    region?: string;
     subnetType?: string;
     vpc?: string;
   };
   defaultSecurityGroups?: string[];
-  loadBalancers?: {
-    inferInternalFlagFromSubnet: boolean;
-    certificateTypes?: string[];
+  disableSpotPricing?: boolean;
+  instanceTypes?: {
+    exclude?: {
+      categories?: string[];
+      families?: string[];
+    };
   };
-  useAmiBlockDeviceMappings?: boolean;
-  classicLaunchLockout?: number;
-  classicLaunchWhitelist?: IClassicLaunchWhitelist[];
+  loadBalancers?: {
+    certificateTypes?: string[];
+    disableManualOidcDialog?: boolean;
+    inferInternalFlagFromSubnet: boolean;
+  };
   metrics?: {
     customNamespaces?: string[];
   };
   minRootVolumeSize?: number;
-  disableSpotPricing?: boolean;
+  useAmiBlockDeviceMappings?: boolean;
 }
 
 export const AWSProviderSettings: IAWSProviderSettings = (SETTINGS.providers.aws as IAWSProviderSettings) || {

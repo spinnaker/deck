@@ -1,4 +1,4 @@
-import { padStart, isNil } from 'lodash';
+import { padStart, isNil, pickBy } from 'lodash';
 import { IMoniker } from './IMoniker';
 
 export interface IComponentName {
@@ -9,7 +9,7 @@ export interface IComponentName {
 }
 
 export class NameUtils {
-  public static VERSION_PATTERN: RegExp = /(v\d{3})/;
+  public static VERSION_PATTERN = /(v\d{3})/;
 
   public static parseServerGroupName(serverGroupName: string): IComponentName {
     const result: IComponentName = {
@@ -22,8 +22,8 @@ export class NameUtils {
     if (!serverGroupName) {
       return result;
     }
-    const split: string[] = serverGroupName.split('-'),
-      isVersioned = NameUtils.VERSION_PATTERN.test(split[split.length - 1]);
+    const split: string[] = serverGroupName.split('-');
+    const isVersioned = NameUtils.VERSION_PATTERN.test(split[split.length - 1]);
 
     result.application = split[0];
 
@@ -61,8 +61,8 @@ export class NameUtils {
   }
 
   public static getClusterNameFromServerGroupName(serverGroupName: string): string {
-    const split = serverGroupName.split('-'),
-      isVersioned = NameUtils.VERSION_PATTERN.test(split[split.length - 1]);
+    const split = serverGroupName.split('-');
+    const isVersioned = NameUtils.VERSION_PATTERN.test(split[split.length - 1]);
 
     if (isVersioned) {
       split.pop();
@@ -79,13 +79,13 @@ export class NameUtils {
   }
 
   public static parseLoadBalancerName(loadBalancerName: string): IComponentName {
-    const split = loadBalancerName.split('-'),
-      result: IComponentName = {
-        application: split[0],
-        stack: '',
-        freeFormDetails: '',
-        cluster: '',
-      };
+    const split = loadBalancerName.split('-');
+    const result: IComponentName = {
+      application: split[0],
+      stack: '',
+      freeFormDetails: '',
+      cluster: '',
+    };
 
     if (split.length > 1) {
       result.stack = split[1];
@@ -102,6 +102,6 @@ export class NameUtils {
   }
 
   public static getMoniker(app: string, stack: string, detail: string): IMoniker {
-    return { app, stack, detail };
+    return pickBy({ app, stack, detail });
   }
 }

@@ -1,11 +1,11 @@
-import * as React from 'react';
+import React from 'react';
 import { Field } from 'formik';
 import Select, { Option } from 'react-select';
 
 import { HelpField, MapEditor, PlatformHealthOverride } from '@spinnaker/core';
 
 import { AWSProviderSettings } from 'amazon/aws.settings';
-import { IAmazonServerGroupCommand } from 'amazon/serverGroup/configure/serverGroupConfiguration.service';
+import { IAmazonServerGroupCommand } from '../../../serverGroupConfiguration.service';
 
 import { IServerGroupAdvancedSettingsProps } from './ServerGroupAdvancedSettings';
 
@@ -75,7 +75,12 @@ export class ServerGroupAdvancedSettingsCommon extends React.Component<IServerGr
               multi={true}
               value={values.enabledMetrics}
               options={values.backingData.enabledMetrics.map(m => ({ label: m, value: m }))}
-              onChange={(option: Option[]) => setFieldValue('enabledMetrics', option.map(o => o.value))}
+              onChange={(option: Option[]) =>
+                setFieldValue(
+                  'enabledMetrics',
+                  option.map(o => o.value),
+                )
+              }
             />
           </div>
         </div>
@@ -117,7 +122,12 @@ export class ServerGroupAdvancedSettingsCommon extends React.Component<IServerGr
               multi={true}
               value={values.terminationPolicies}
               options={values.backingData.terminationPolicies.map(m => ({ label: m, value: m }))}
-              onChange={(option: Option[]) => setFieldValue('terminationPolicies', option.map(o => o.value))}
+              onChange={(option: Option[]) =>
+                setFieldValue(
+                  'terminationPolicies',
+                  option.map(o => o.value),
+                )
+              }
             />
           </div>
         </div>

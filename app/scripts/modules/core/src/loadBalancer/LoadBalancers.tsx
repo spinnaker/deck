@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { Debounce } from 'lodash-decorators';
 import { Subscription } from 'rxjs';
 
@@ -11,7 +11,7 @@ import { LoadBalancerPod } from './LoadBalancerPod';
 import { Spinner } from 'core/widgets/spinners/Spinner';
 
 import { NgReact, ReactInjector } from 'core/reactShims';
-import { CreateLoadBalancerButton } from 'core/loadBalancer/CreateLoadBalancerButton';
+import { CreateLoadBalancerButton } from './CreateLoadBalancerButton';
 
 export interface ILoadBalancersProps {
   app: Application;
@@ -102,7 +102,7 @@ export class LoadBalancers extends React.Component<ILoadBalancersProps, ILoadBal
     const value = target.type === 'checkbox' ? target.checked : target.value;
     const name: keyof ISortFilter = target.name;
 
-    LoadBalancerState.filterModel.asFilterModel.sortFilter[name] = value;
+    (LoadBalancerState.filterModel.asFilterModel.sortFilter[name] as any) = value;
 
     const state: any = {}; // Use any type since we can't infer the property name
     state[name] = value;

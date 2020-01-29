@@ -1,11 +1,13 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 
 import { AccountService, Registry } from '@spinnaker/core';
 
-module.exports = angular
-  .module('spinnaker.oracle.pipeline.stage.findAmiStage', [])
+export const ORACLE_PIPELINE_STAGES_FINDAMI_FINDAMISTAGE = 'spinnaker.oracle.pipeline.stage.findAmiStage';
+export const name = ORACLE_PIPELINE_STAGES_FINDAMI_FINDAMISTAGE; // for backwards compatibility
+angular
+  .module(ORACLE_PIPELINE_STAGES_FINDAMI_FINDAMISTAGE, [])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'findImage',
@@ -24,7 +26,7 @@ module.exports = angular
     $scope => {
       const provider = 'oracle';
 
-      let stage = $scope.stage;
+      const stage = $scope.stage;
 
       $scope.state = {
         accounts: false,

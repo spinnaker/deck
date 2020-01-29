@@ -1,5 +1,5 @@
 import { IController, module, toJson } from 'angular';
-import * as _ from 'lodash';
+import { cloneDeep } from 'lodash';
 
 import { SETTINGS } from 'core/config/settings';
 
@@ -48,11 +48,11 @@ export class ChaosMonkeyConfigController implements IController {
   };
 
   public $onInit(): void {
-    if (this.application.notFound) {
+    if (this.application.notFound || this.application.hasError) {
       return;
     }
     this.config = new ChaosMonkeyConfig(this.application.attributes.chaosMonkey || {});
-    this.viewState.originalConfig = _.cloneDeep(this.config);
+    this.viewState.originalConfig = cloneDeep(this.config);
     this.viewState.originalStringVal = toJson(this.viewState.originalConfig);
     this.chaosEnabled = SETTINGS.feature.chaosMonkey;
     this.groupingOptions = [

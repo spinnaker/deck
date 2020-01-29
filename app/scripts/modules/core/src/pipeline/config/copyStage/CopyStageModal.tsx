@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { Modal } from 'react-bootstrap';
 import { Form } from 'formik';
 import { IPromise } from 'angular';
@@ -95,7 +95,7 @@ export function CopyStageModal(props: ICopyStageModalProps) {
           <Modal key="modal" show={true} onHide={() => {}}>
             <ModalClose dismiss={dismissModal} />
             <Modal.Header>
-              <h3>Copy Stage</h3>
+              <Modal.Title>Copy Stage</Modal.Title>
             </Modal.Header>
             <Modal.Body>
               <div className="copy-stage-modal-body">

@@ -1,28 +1,27 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 import _ from 'lodash';
 import { getAllTargetGroups, applyHealthCheckInfoToTargetGroups } from '@spinnaker/amazon';
 
 import {
   CloudProviderRegistry,
-  CONFIRMATION_MODAL_SERVICE,
+  ConfirmationModalService,
   InstanceReader,
   RecentHistoryService,
   SETTINGS,
 } from '@spinnaker/core';
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
+import ANGULAR_UI_BOOTSTRAP from 'angular-ui-bootstrap';
 
-module.exports = angular
-  .module('spinnaker.ecs.instance.details.controller', [
-    require('@uirouter/angularjs').default,
-    require('angular-ui-bootstrap'),
-    CONFIRMATION_MODAL_SERVICE,
-  ])
-  .controller('ecsInstanceDetailsCtrl', [
+export const ECS_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER = 'spinnaker.ecs.instance.details.controller';
+export const name = ECS_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER; // for backwards compatibility
+module(ECS_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [UIROUTER_ANGULARJS, ANGULAR_UI_BOOTSTRAP]).controller(
+  'ecsInstanceDetailsCtrl',
+  [
     '$scope',
     '$state',
     '$uibModal',
-    'confirmationModalService',
     'instanceWriter',
     'instance',
     'app',
@@ -30,19 +29,7 @@ module.exports = angular
     'environment',
     '$q',
     'overrides',
-    function(
-      $scope,
-      $state,
-      $uibModal,
-      confirmationModalService,
-      instanceWriter,
-      instance,
-      app,
-      moniker,
-      environment,
-      $q,
-      overrides,
-    ) {
+    function($scope, $state, $uibModal, instanceWriter, instance, app, moniker, environment, $q, overrides) {
       // needed for standalone instances
       $scope.detailsTemplateUrl = CloudProviderRegistry.getValue('ecs', 'instance.detailsTemplateUrl');
 
@@ -66,7 +53,7 @@ module.exports = angular
         }
 
         instance.health = instance.health || [];
-        var displayableMetrics = instance.health.filter(function(metric) {
+        const displayableMetrics = instance.health.filter(function(metric) {
           return metric.type !== 'Ecs' || metric.state !== 'Unknown';
         });
 
@@ -77,7 +64,7 @@ module.exports = angular
         // backfill details where applicable
         if (latest.health) {
           displayableMetrics.forEach(function(metric) {
-            var detailsMatch = latest.health.filter(function(latestHealth) {
+            const detailsMatch = latest.health.filter(function(latestHealth) {
               return latestHealth.type === metric.type;
             });
             if (detailsMatch.length) {
@@ -89,8 +76,8 @@ module.exports = angular
       }
 
       function retrieveInstance() {
-        var extraData = {};
-        var instanceSummary, loadBalancers, targetGroup, account, region, vpcId;
+        const extraData = {};
+        let instanceSummary, loadBalancers, targetGroup, account, region, vpcId;
         if (!app.serverGroups) {
           // standalone instance
           instanceSummary = {};
@@ -201,7 +188,7 @@ module.exports = angular
             $scope.instance.loadBalancers = loadBalancers;
             $scope.instance.targetGroup = targetGroup;
             if ($scope.instance.networkInterfaces) {
-              var permanentNetworkInterfaces = $scope.instance.networkInterfaces.filter(
+              const permanentNetworkInterfaces = $scope.instance.networkInterfaces.filter(
                 f => f.attachment.deleteOnTermination === false,
               );
               if (permanentNetworkInterfaces.length) {
@@ -238,18 +225,18 @@ module.exports = angular
       }
 
       this.canRegisterWithDiscovery = function() {
-        var instance = $scope.instance;
-        let healthMetrics = instance.health || [];
-        var discoveryHealth = healthMetrics.filter(function(health) {
+        const instance = $scope.instance;
+        const healthMetrics = instance.health || [];
+        const discoveryHealth = healthMetrics.filter(function(health) {
           return health.type === 'Discovery';
         });
         return discoveryHealth.length ? discoveryHealth[0].state === 'OutOfService' : false;
       };
 
       this.terminateInstance = function terminateInstance() {
-        var instance = $scope.instance;
+        const instance = $scope.instance;
 
-        var taskMonitor = {
+        const taskMonitor = {
           application: app,
           title: 'Terminating ' + instance.instanceId,
           onTaskComplete: function() {
@@ -259,24 +246,23 @@ module.exports = angular
           },
         };
 
-        var submitMethod = function() {
+        const submitMethod = function() {
           return instanceWriter.terminateInstance(instance, app, defaultRequestParams);
         };
 
-        confirmationModalService.confirm({
+        ConfirmationModalService.confirm({
           header: 'Really terminate ' + instance.instanceId + '?',
           buttonText: 'Terminate ' + instance.instanceId,
           account: instance.account,
-          provider: 'ecs',
           taskMonitorConfig: taskMonitor,
           submitMethod: submitMethod,
         });
       };
 
       this.terminateInstanceAndShrinkServerGroup = function terminateInstanceAndShrinkServerGroup() {
-        var instance = $scope.instance;
+        const instance = $scope.instance;
 
-        var taskMonitor = {
+        const taskMonitor = {
           application: app,
           title: 'Terminating ' + instance.instanceId + ' and shrinking server group',
           onTaskComplete: function() {
@@ -286,33 +272,32 @@ module.exports = angular
           },
         };
 
-        var submitMethod = function() {
+        const submitMethod = function() {
           return instanceWriter.terminateInstanceAndShrinkServerGroup(instance, app, defaultRequestParams);
         };
 
-        confirmationModalService.confirm({
+        ConfirmationModalService.confirm({
           header: 'Really terminate ' + instance.instanceId + ' and shrink ' + instance.serverGroup + '?',
           buttonText: 'Terminate ' + instance.instanceId + ' and shrink ' + instance.serverGroup,
           account: instance.account,
-          provider: 'ecs',
           taskMonitorConfig: taskMonitor,
           submitMethod: submitMethod,
         });
       };
 
       this.enableInstanceInDiscovery = function enableInstanceInDiscovery() {
-        var instance = $scope.instance;
+        const instance = $scope.instance;
 
-        var taskMonitor = {
+        const taskMonitor = {
           application: app,
           title: 'Enabling ' + instance.instanceId + ' in discovery',
         };
 
-        var submitMethod = function() {
+        const submitMethod = function() {
           return instanceWriter.enableInstanceInDiscovery(instance, app, defaultRequestParams);
         };
 
-        confirmationModalService.confirm({
+        ConfirmationModalService.confirm({
           header: 'Really enable ' + instance.instanceId + ' in discovery?',
           buttonText: 'Enable ' + instance.instanceId,
           account: instance.account,
@@ -322,21 +307,20 @@ module.exports = angular
       };
 
       this.disableInstanceInDiscovery = function disableInstanceInDiscovery() {
-        var instance = $scope.instance;
+        const instance = $scope.instance;
 
-        var taskMonitor = {
+        const taskMonitor = {
           application: app,
           title: 'Disabling ' + instance.instanceId + ' in discovery',
         };
 
-        var submitMethod = function() {
+        const submitMethod = function() {
           return instanceWriter.disableInstanceInDiscovery(instance, app, defaultRequestParams);
         };
 
-        confirmationModalService.confirm({
+        ConfirmationModalService.confirm({
           header: 'Really disable ' + instance.instanceId + ' in discovery?',
           buttonText: 'Disable ' + instance.instanceId,
-          provider: 'ecs',
           account: instance.account,
           taskMonitorConfig: taskMonitor,
           submitMethod: submitMethod,
@@ -344,14 +328,14 @@ module.exports = angular
       };
 
       this.hasHealthState = function hasHealthState(healthProviderType, state) {
-        var instance = $scope.instance,
-          healthMetrics = instance.health || [];
+        const instance = $scope.instance;
+        const healthMetrics = instance.health || [];
         return healthMetrics.some(function(health) {
           return health.type === healthProviderType && health.state === state;
         });
       };
 
-      let initialize = app.isStandalone
+      const initialize = app.isStandalone
         ? retrieveInstance()
         : $q.all([app.serverGroups.ready(), app.loadBalancers.ready()]).then(retrieveInstance);
 
@@ -367,4 +351,5 @@ module.exports = angular
 
       $scope.account = instance.account;
     },
-  ]);
+  ],
+);

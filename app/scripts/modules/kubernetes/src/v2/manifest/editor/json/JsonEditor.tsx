@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import AceEditor from 'react-ace';
 import { $log } from 'ngimport';
 
@@ -49,6 +49,7 @@ export class JsonEditor extends React.Component<IJsonEditorProps> {
           showLineNumbers: false,
           showFoldWidgets: false,
         }}
+        editorProps={{ $blockScrolling: Infinity }}
         className="ace-editor"
       />
     );

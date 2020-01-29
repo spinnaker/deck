@@ -1,14 +1,19 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 const _ = require('lodash');
 
 import { NameUtils } from '@spinnaker/core';
+import { AZURE_IMAGE_IMAGE_READER } from '../../image/image.reader';
+import { AZURE_SERVERGROUP_SERVERGROUP_TRANSFORMER } from '../serverGroup.transformer';
 
-module.exports = angular
-  .module('spinnaker.azure.serverGroupCommandBuilder.service', [
-    require('../../image/image.reader').name,
-    require('../serverGroup.transformer').name,
+export const AZURE_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER_SERVICE =
+  'spinnaker.azure.serverGroupCommandBuilder.service';
+export const name = AZURE_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER_SERVICE; // for backwards compatibility
+angular
+  .module(AZURE_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER_SERVICE, [
+    AZURE_IMAGE_IMAGE_READER,
+    AZURE_SERVERGROUP_SERVERGROUP_TRANSFORMER,
   ])
   .factory('azureServerGroupCommandBuilder', [
     '$q',
@@ -18,10 +23,10 @@ module.exports = angular
       function buildNewServerGroupCommand(application, defaults) {
         defaults = defaults || {};
 
-        var imageLoader = azureImageReader.findImages({ provider: 'azure' });
+        const imageLoader = azureImageReader.findImages({ provider: 'azure' });
 
-        var defaultCredentials = defaults.account || application.defaultCredentials.azure;
-        var defaultRegion = defaults.region || application.defaultRegions.azure;
+        const defaultCredentials = defaults.account || application.defaultCredentials.azure;
+        const defaultRegion = defaults.region || application.defaultRegions.azure;
 
         return $q
           .all({
@@ -73,9 +78,9 @@ module.exports = angular
       function buildServerGroupCommandFromExisting(application, serverGroup, mode) {
         mode = mode || 'clone';
 
-        var serverGroupName = NameUtils.parseServerGroupName(serverGroup.name);
+        const serverGroupName = NameUtils.parseServerGroupName(serverGroup.name);
 
-        var command = {
+        const command = {
           application: application.name,
           strategy: '',
           stack: serverGroupName.stack,
@@ -135,17 +140,17 @@ module.exports = angular
       }
 
       function buildServerGroupCommandFromPipeline(application, originalCluster) {
-        var pipelineCluster = _.cloneDeep(originalCluster);
-        var region = pipelineCluster.region;
-        var commandOptions = { account: pipelineCluster.account, region: region };
-        var asyncLoader = $q.all({
+        const pipelineCluster = _.cloneDeep(originalCluster);
+        const region = pipelineCluster.region;
+        const commandOptions = { account: pipelineCluster.account, region: region };
+        const asyncLoader = $q.all({
           command: buildNewServerGroupCommand(application, commandOptions),
         });
 
         return asyncLoader.then(function(asyncData) {
-          var command = asyncData.command;
+          const command = asyncData.command;
 
-          var viewState = {
+          const viewState = {
             disableImageSelection: true,
             useSimpleCapacity: true,
             mode: 'editPipeline',
@@ -154,7 +159,7 @@ module.exports = angular
             instanceTypeDetails: originalCluster.viewState.instanceTypeDetails,
           };
 
-          var viewOverrides = {
+          const viewOverrides = {
             region: region,
             credentials: pipelineCluster.account,
             viewState: viewState,
@@ -165,7 +170,7 @@ module.exports = angular
 
           pipelineCluster.strategy = pipelineCluster.strategy || '';
 
-          var extendedCommand = angular.extend({}, command, pipelineCluster, viewOverrides);
+          const extendedCommand = angular.extend({}, command, pipelineCluster, viewOverrides);
 
           return extendedCommand;
         });

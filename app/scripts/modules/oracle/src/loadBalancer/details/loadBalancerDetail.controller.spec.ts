@@ -8,8 +8,6 @@ import {
   ApplicationModelBuilder,
   SECURITY_GROUP_READER,
   SecurityGroupReader,
-  CONFIRMATION_MODAL_SERVICE,
-  ConfirmationModalService,
   LOAD_BALANCER_READ_SERVICE,
   LoadBalancerReader,
 } from '@spinnaker/core';
@@ -19,7 +17,6 @@ describe('Controller: oracleLoadBalancerDetailCtrl', function() {
   let $scope: IScope;
   let $state: StateService;
   let securityGroupReader: SecurityGroupReader;
-  let confirmationModalService: ConfirmationModalService;
   let loadBalancerReader: LoadBalancerReader;
 
   const loadBalancer = {
@@ -30,14 +27,7 @@ describe('Controller: oracleLoadBalancerDetailCtrl', function() {
     vpcId: '1',
   };
 
-  beforeEach(
-    mock.module(
-      ORACLE_LOAD_BALANCER_DETAIL_CONTROLLER,
-      SECURITY_GROUP_READER,
-      LOAD_BALANCER_READ_SERVICE,
-      CONFIRMATION_MODAL_SERVICE,
-    ),
-  );
+  beforeEach(mock.module(ORACLE_LOAD_BALANCER_DETAIL_CONTROLLER, SECURITY_GROUP_READER, LOAD_BALANCER_READ_SERVICE));
 
   beforeEach(
     mock.inject(
@@ -46,15 +36,17 @@ describe('Controller: oracleLoadBalancerDetailCtrl', function() {
         $rootScope: IRootScopeService,
         _$state_: StateService,
         _securityGroupReader_: SecurityGroupReader,
-        _confirmationModalService_: ConfirmationModalService,
         _loadBalancerReader_: LoadBalancerReader,
       ) => {
         $scope = $rootScope.$new();
         $state = _$state_;
-        const app = ApplicationModelBuilder.createApplicationForTests('app', { key: 'loadBalancers', lazy: true });
+        const app = ApplicationModelBuilder.createApplicationForTests('app', {
+          key: 'loadBalancers',
+          lazy: true,
+          defaultData: [],
+        });
         app.loadBalancers.data.push(loadBalancer);
         securityGroupReader = _securityGroupReader_;
-        confirmationModalService = _confirmationModalService_;
         loadBalancerReader = _loadBalancerReader_;
         controller = $controller('oracleLoadBalancerDetailCtrl', {
           $scope: $scope,
@@ -63,7 +55,6 @@ describe('Controller: oracleLoadBalancerDetailCtrl', function() {
           $state: $state,
           securityGroupReader: securityGroupReader,
           loadBalancerReader: loadBalancerReader,
-          confirmationModalService: confirmationModalService,
         });
       },
     ),

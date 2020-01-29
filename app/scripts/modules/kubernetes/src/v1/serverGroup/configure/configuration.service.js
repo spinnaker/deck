@@ -1,26 +1,29 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 import _ from 'lodash';
 
 import { AccountService, CACHE_INITIALIZER_SERVICE, LOAD_BALANCER_READ_SERVICE } from '@spinnaker/core';
+import { KUBERNETES_V1_IMAGE_IMAGE_READER } from '../../image/image.reader';
 
-module.exports = angular
-  .module('spinnaker.serverGroup.configure.kubernetes.configuration.service', [
+export const KUBERNETES_V1_SERVERGROUP_CONFIGURE_CONFIGURATION_SERVICE =
+  'spinnaker.serverGroup.configure.kubernetes.configuration.service';
+export const name = KUBERNETES_V1_SERVERGROUP_CONFIGURE_CONFIGURATION_SERVICE; // for backwards compatibility
+angular
+  .module(KUBERNETES_V1_SERVERGROUP_CONFIGURE_CONFIGURATION_SERVICE, [
     CACHE_INITIALIZER_SERVICE,
     LOAD_BALANCER_READ_SERVICE,
-    require('../../image/image.reader').name,
+    KUBERNETES_V1_IMAGE_IMAGE_READER,
   ])
   .factory('kubernetesServerGroupConfigurationService', [
     '$q',
     'kubernetesImageReader',
     'loadBalancerReader',
-    'cacheInitializer',
     function($q, kubernetesImageReader, loadBalancerReader) {
       function configureCommand(application, command, query = '') {
         // this ensures we get the images we need when cloning or copying a server group template.
         const containers = command.containers.concat(command.initContainers || []);
-        let queries = containers
+        const queries = containers
           .filter(c => {
             return !c.imageDescription.fromContext && !c.imageDescription.fromArtifact;
           })
@@ -69,7 +72,7 @@ module.exports = angular
             // If we search for *nginx* and *nginx:1.11.1*, we might get two copies of nginx:1.11.1.
             backingData.allImages = _.uniqWith(backingData.allImages, _.isEqual);
 
-            var accountMap = _.fromPairs(
+            const accountMap = _.fromPairs(
               _.map(backingData.accounts, function(account) {
                 return [account.name, AccountService.getAccountDetails(account.name)];
               }),
@@ -154,13 +157,13 @@ module.exports = angular
       }
 
       function configureLoadBalancers(command) {
-        var results = { dirty: {} };
-        var current = command.loadBalancers;
-        var newLoadBalancers = getLoadBalancerNames(command);
+        const results = { dirty: {} };
+        const current = command.loadBalancers;
+        const newLoadBalancers = getLoadBalancerNames(command);
 
         if (current && command.loadBalancers) {
-          var matched = _.intersection(newLoadBalancers, command.loadBalancers);
-          var removed = _.xor(matched, current);
+          const matched = _.intersection(newLoadBalancers, command.loadBalancers);
+          const removed = _.xor(matched, current);
           command.loadBalancers = matched;
           if (removed.length) {
             results.dirty.loadBalancers = removed;
@@ -178,7 +181,7 @@ module.exports = angular
           if (fromContext || fromTrigger || fromArtifact) {
             validContainers.push(container);
           } else {
-            let matchingContainers = command.backingData.filtered.containers.filter(test => {
+            const matchingContainers = command.backingData.filtered.containers.filter(test => {
               if (container.imageDescription.registry) {
                 return test.imageDescription.imageId === container.imageDescription.imageId;
               } else {
@@ -197,7 +200,7 @@ module.exports = angular
       }
 
       function configureContainers(command) {
-        var result = { dirty: {} };
+        const result = { dirty: {} };
         angular.extend(result.dirty, configureImages(command).dirty);
         command.backingData.filtered.containers = _.map(
           command.backingData.filtered.images,
@@ -219,13 +222,13 @@ module.exports = angular
       }
 
       function configureSecurityGroups(command) {
-        var result = { dirty: {} };
+        const result = { dirty: {} };
         command.backingData.filtered.securityGroups = command.backingData.securityGroups;
         return result;
       }
 
       function configureNamespaces(command) {
-        var result = { dirty: {} };
+        const result = { dirty: {} };
         command.backingData.filtered.namespaces = command.backingData.account.namespaces;
         if (!_.includes(command.backingData.filtered.namespaces, command.namespace)) {
           command.namespace = null;
@@ -237,13 +240,13 @@ module.exports = angular
       }
 
       function configureDockerRegistries(command) {
-        var result = { dirty: {} };
+        const result = { dirty: {} };
         command.backingData.filtered.dockerRegistries = command.backingData.account.dockerRegistries;
         return result;
       }
 
       function configureAccount(command) {
-        var result = { dirty: {} };
+        const result = { dirty: {} };
         command.backingData.account = command.backingData.accountMap[command.account];
         if (command.backingData.account) {
           angular.extend(result.dirty, configureDockerRegistries(command).dirty);
@@ -254,11 +257,11 @@ module.exports = angular
       }
 
       function configureImages(command) {
-        var result = { dirty: {} };
+        const result = { dirty: {} };
         if (!command.namespace) {
           command.backingData.filtered.images = [];
         } else {
-          var accounts = _.map(
+          const accounts = _.map(
             _.filter(command.backingData.account.dockerRegistries, function(registry) {
               return _.includes(registry.namespaces, command.namespace);
             }),
@@ -276,7 +279,7 @@ module.exports = angular
 
       function attachEventHandlers(command) {
         command.namespaceChanged = function namespaceChanged() {
-          var result = { dirty: {} };
+          const result = { dirty: {} };
           angular.extend(result.dirty, configureNamespaces(command).dirty);
           command.viewState.dirty = command.viewState.dirty || {};
           angular.extend(command.viewState.dirty, result.dirty);
@@ -284,7 +287,7 @@ module.exports = angular
         };
 
         command.accountChanged = function accountChanged() {
-          var result = { dirty: {} };
+          const result = { dirty: {} };
           angular.extend(result.dirty, configureAccount(command).dirty);
           command.viewState.dirty = command.viewState.dirty || {};
           angular.extend(command.viewState.dirty, result.dirty);

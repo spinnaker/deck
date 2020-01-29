@@ -1,10 +1,10 @@
-import * as React from 'react';
+import React from 'react';
 import { get } from 'lodash';
 
 import { NgReact } from 'core/reactShims';
 import { Application } from 'core/application';
 import { IServerGroup } from 'core/domain';
-import { IJenkinsViewModel, IDockerViewModel } from 'core/serverGroup/ServerGroup';
+import { IJenkinsViewModel, IDockerViewModel } from './ServerGroup';
 import { EntityNotifications } from 'core/entityTag/notifications/EntityNotifications';
 import { HealthCounts } from 'core/healthCounts';
 import { NameUtils } from 'core/naming';
@@ -188,7 +188,7 @@ export class Alerts extends React.Component<IServerGroupHeaderProps> {
 export class Health extends React.Component<IServerGroupHeaderProps> {
   public render() {
     const { serverGroup } = this.props;
-    return <HealthCounts className="no-float" container={serverGroup.instanceCounts} />;
+    return <HealthCounts container={serverGroup.instanceCounts} />;
   }
 }
 
@@ -216,15 +216,15 @@ export class ServerGroupHeader extends React.Component<IServerGroupHeaderProps> 
     const props = this.props;
 
     return (
-      <div className={`flex-container-h baseline server-group-title sticky-header-3`}>
-        <div className="flex-container-h baseline section-title">
+      <div className="horizontal top server-group-title sticky-header-3">
+        <div className="horizontal section-title flex-1">
           <MultiSelectCheckbox {...props} />
           <CloudProviderIcon {...props} />
           <SequenceAndBuildAndImages {...props} />
           <Alerts {...props} />
         </div>
 
-        <div className="flex-container-h baseline flex-pull-right">
+        <div className="horizontal center flex-none">
           <RunningTasks {...props} />
           <LoadBalancers {...props} />
           <Health {...props} />

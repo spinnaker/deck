@@ -1,5 +1,4 @@
-import * as React from 'react';
-import * as DOMPurify from 'dompurify';
+import React from 'react';
 import { UISref } from '@uirouter/react';
 import SearchApi from 'js-worker-search';
 import { groupBy } from 'lodash';
@@ -13,17 +12,20 @@ import {
   Column,
   RowMouseEventHandlerParams,
   SortDirection,
-  SortDirectionType,
   Table,
   TableCellProps,
   TableHeaderProps,
 } from 'react-virtualized';
+
+// defined in react-virtualized but TS complains about not finding it so we duplicate it here
+type SortDirectionType = 'ASC' | 'DESC';
 
 import { ApplicationReader, IApplicationSummary } from 'core/application';
 import { relativeTime } from 'core/utils/timeFormatters';
 import { IOnCall, IPagerDutyService, PagerDutyReader } from './pagerDuty.read.service';
 import { ReactInjector } from 'core/reactShims';
 import { SETTINGS } from 'core/config';
+import { Markdown } from 'core/presentation';
 
 import './pager.less';
 
@@ -249,7 +251,9 @@ export class Pager extends React.Component<IPagerProps, IPagerState> {
     onCalls: { [id: string]: IOnCall[] },
     services: IPagerDutyService[],
   ): IOnCallsByService[] {
+    const appsByApiKey = groupBy(applications, 'pdApiKey');
     return services
+      .filter(a => a.integration_key) // filter out services without an integration_key
       .map(service => {
         // connect the users attached to the service by way of escalation policy
         let users: IUserList;
@@ -271,7 +275,7 @@ export class Pager extends React.Component<IPagerProps, IPagerState> {
 
         // Get applications associated with the service key
         const apiKey = service.integration_key;
-        const associatedApplications = apiKey ? applications.filter(app => app.pdApiKey === apiKey) : [];
+        const associatedApplications = appsByApiKey[apiKey] ?? [];
         searchTokens.push(...associatedApplications.map(app => `${app.name},${app.aliases || ''}`));
 
         const onCallsByService = {
@@ -281,13 +285,9 @@ export class Pager extends React.Component<IPagerProps, IPagerState> {
           last: DateTime.fromISO((service as any).lastIncidentTimestamp),
           searchString: searchTokens.join(' '),
         };
-        if (onCallsByService.service.integration_key) {
-          this.searchApi.indexDocument(onCallsByService.service.id, onCallsByService.searchString);
-        }
+        this.searchApi.indexDocument(onCallsByService.service.id, onCallsByService.searchString);
         return onCallsByService;
-      })
-      .filter(a => a.service.integration_key);
-    // filter out services without an integration_key
+      });
   }
 
   private selectedChanged = (service: IPagerDutyService, value: boolean): void => {
@@ -315,8 +315,9 @@ export class Pager extends React.Component<IPagerProps, IPagerState> {
           title={service.name}
           href={`https://${this.state.accountName}.pagerduty.com/services/${service.id}`}
           target="_blank"
-          dangerouslySetInnerHTML={{ __html: this.highlight(service.name) }}
-        />
+        >
+          <Markdown tag="span" message={this.highlight(service.name)} />
+        </a>
       </div>
     );
   };
@@ -337,7 +338,9 @@ export class Pager extends React.Component<IPagerProps, IPagerState> {
       return (
         <li key={app.name}>
           <UISref to="home.applications.application.insight.clusters" params={{ application: app.name }}>
-            <a className="clickable" dangerouslySetInnerHTML={{ __html: this.highlight(displayName) }} />
+            <a>
+              <Markdown message={this.highlight(displayName)} tag="span" />
+            </a>
           </UISref>
         </li>
       );
@@ -362,9 +365,9 @@ export class Pager extends React.Component<IPagerProps, IPagerState> {
     const match = this.state.filterString || this.state.app;
     if (match) {
       const re = new RegExp(match, 'gi');
-      return DOMPurify.sanitize(text.replace(re, '<span class="highlighted">$&</span>'));
+      return text.replace(re, '<span class="highlighted">$&</span>');
     }
-    return DOMPurify.sanitize(text);
+    return text;
   }
 
   private onCallRenderer = (data: TableCellProps): React.ReactNode => {
@@ -387,12 +390,9 @@ export class Pager extends React.Component<IPagerProps, IPagerState> {
                       {onCalls[Number(level)]
                         .filter(user => !user.name.includes('ExcludeFromAudit'))
                         .map((user, index) => (
-                          <a
-                            key={index}
-                            target="_blank"
-                            href={user.url}
-                            dangerouslySetInnerHTML={{ __html: this.highlight(user.name) }}
-                          />
+                          <a key={index} target="_blank" href={user.url}>
+                            <Markdown tag="span" message={this.highlight(user.name)} />
+                          </a>
                         ))}
                     </div>
                   </div>
@@ -406,24 +406,12 @@ export class Pager extends React.Component<IPagerProps, IPagerState> {
 
   private pageRenderer = (data: TableCellProps): React.ReactNode => {
     const service: IPagerDutyService = data.cellData;
-    const disabled = service.status === 'disabled';
 
-    const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (!disabled) {
-        const target = event.target;
-        this.selectedChanged(service, target.checked);
-      }
-    };
-
-    const id = `checkbox-${service.integration_key}`;
     const checked = this.state.selectedKeys.has(service.integration_key);
     return (
       <div style={paddingStyle}>
         <div className={`page-checkbox ${checked ? 'checked' : ''}`}>
-          <input type="checkbox" id={id} name={service.integration_key} checked={checked} onChange={onChange} />
-          <label htmlFor={id}>
-            <i className="fa fa-check" />
-          </label>
+          <i className="fa fa-check" />
         </div>
       </div>
     );
@@ -476,12 +464,13 @@ export class Pager extends React.Component<IPagerProps, IPagerState> {
 
   private rowClicked = (info: RowMouseEventHandlerParams): void => {
     // Don't change selection if clicking a link...
-    if (!['A', 'I'].includes((info.event.target as any).tagName)) {
-      const service: IPagerDutyService = (info.rowData as any).service;
-      if (service.status !== 'disabled') {
-        const flippedValue = !this.state.selectedKeys.get(service.integration_key);
-        this.selectedChanged(service, flippedValue);
-      }
+    if ((info.event.target as HTMLElement).closest('A') !== null) {
+      return;
+    }
+    const service: IPagerDutyService = (info.rowData as any).service;
+    if (service.status !== 'disabled') {
+      const flippedValue = !this.state.selectedKeys.get(service.integration_key);
+      this.selectedChanged(service, flippedValue);
     }
   };
 

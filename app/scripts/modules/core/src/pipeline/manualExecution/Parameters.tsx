@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { FormikProps } from 'formik';
 
 import { HelpField } from 'core/help';
@@ -49,7 +49,7 @@ export class Parameters extends React.Component<IParametersProps> {
           visibleParameters.map((parameter, i) => {
             const fieldProps = {
               name: formikFieldNameForParam(parameter),
-              label: parameter.name,
+              label: parameter.label || parameter.name,
               help: parameter.description && <HelpField content={parameter.description} />,
               fastField: false,
               required: parameter.required,

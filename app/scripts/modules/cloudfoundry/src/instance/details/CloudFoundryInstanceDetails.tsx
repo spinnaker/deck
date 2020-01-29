@@ -1,19 +1,19 @@
-import * as React from 'react';
+import React from 'react';
 import { UISref } from '@uirouter/react';
 import { UIRouterContext } from '@uirouter/react-hybrid';
 
 import {
   Application,
-  ConfirmationModalService,
   InstanceReader,
   InstanceWriter,
   RecentHistoryService,
   Spinner,
+  ILoadBalancer,
 } from '@spinnaker/core';
 
 import { ICloudFoundryInstance } from 'cloudfoundry/domain';
-import { CloudFoundryInstanceDetailsSection } from 'cloudfoundry/instance/details/sections';
-import { CloudFoundryInstanceActions } from 'cloudfoundry/instance/details/CloudFoundryInstanceActions';
+import { CloudFoundryInstanceDetailsSection } from './sections';
+import { CloudFoundryInstanceActions } from './CloudFoundryInstanceActions';
 import { flattenDeep } from 'lodash';
 
 interface InstanceFromStateParams {
@@ -36,7 +36,6 @@ interface ICloudFoundryInstanceDetailsState {
 
 interface ICloudFoundryInstanceDetailsProps {
   app: Application;
-  confirmationModalService: ConfirmationModalService;
   instance: InstanceFromStateParams;
   instanceWriter: InstanceWriter;
   loading: boolean;
@@ -68,7 +67,9 @@ export class CloudFoundryInstanceDetails extends React.Component<
     const dataSources: InstanceManager[] = flattenDeep([
       this.props.app.getDataSource('serverGroups').data,
       this.props.app.getDataSource('loadBalancers').data,
-      this.props.app.getDataSource('loadBalancers').data.map(loadBalancer => loadBalancer.serverGroups),
+      this.props.app
+        .getDataSource('loadBalancers')
+        .data.map((loadBalancer: ILoadBalancer) => loadBalancer.serverGroups),
     ]);
 
     const instanceManager = dataSources.find(instanceLocatorPredicate);
@@ -98,7 +99,7 @@ export class CloudFoundryInstanceDetails extends React.Component<
   }
 
   public render(): JSX.Element {
-    const { app, confirmationModalService, instanceWriter } = this.props;
+    const { app, instanceWriter } = this.props;
     const { instance, instanceIdNotFound, loading } = this.state;
     const CloseButton = (
       <div className="close-button">
@@ -130,12 +131,7 @@ export class CloudFoundryInstanceDetails extends React.Component<
           <span className={'glyphicon glyphicon-hdd ' + instance.healthState} />
           <h3 className="horizontal middle space-between flex-1">{instance.name}</h3>
         </div>
-        <CloudFoundryInstanceActions
-          application={app}
-          confirmationModalService={confirmationModalService}
-          instance={instance}
-          instanceWriter={instanceWriter}
-        />
+        <CloudFoundryInstanceActions application={app} instance={instance} instanceWriter={instanceWriter} />
       </div>
     );
     const notFoundContent = () => (

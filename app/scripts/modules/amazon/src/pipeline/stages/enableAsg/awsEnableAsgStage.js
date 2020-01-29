@@ -1,11 +1,12 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { AccountService, Registry, StageConstants } from '@spinnaker/core';
 
-module.exports = angular
-  .module('spinnaker.amazon.pipeline.stage.enableAsgStage', [])
+export const AMAZON_PIPELINE_STAGES_ENABLEASG_AWSENABLEASGSTAGE = 'spinnaker.amazon.pipeline.stage.enableAsgStage';
+export const name = AMAZON_PIPELINE_STAGES_ENABLEASG_AWSENABLEASGSTAGE; // for backwards compatibility
+module(AMAZON_PIPELINE_STAGES_ENABLEASG_AWSENABLEASGSTAGE, [])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'enableServerGroup',
@@ -24,9 +25,9 @@ module.exports = angular
   .controller('awsEnableAsgStageCtrl', [
     '$scope',
     function($scope) {
-      var ctrl = this;
+      const ctrl = this;
 
-      let stage = $scope.stage;
+      const stage = $scope.stage;
 
       $scope.state = {
         accounts: false,

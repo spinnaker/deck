@@ -1,0 +1,23 @@
+pull_request_rules:
+  - name: Automatically merge on CI success and review
+    conditions:
+      - status-success=continuous-integration/travis-ci/pr
+      - 'label=ready to merge'
+      - 'approved-reviews-by=@oss-approvers'
+    actions:
+      merge:
+        method: squash
+        strict: smart
+      label:
+        add: ['auto merged']
+  - name: Automatically rebase and merge on CI success and review
+    conditions:
+      - status-success=continuous-integration/travis-ci/pr
+      - 'label=ready to rebase'
+      - 'approved-reviews-by=@oss-approvers'
+    actions:
+      merge:
+        method: rebase
+        strict: smart
+      label:
+        add: ['auto merged']

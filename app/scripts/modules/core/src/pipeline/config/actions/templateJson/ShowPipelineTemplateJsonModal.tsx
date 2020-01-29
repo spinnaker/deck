@@ -1,11 +1,14 @@
-import * as React from 'react';
+import React from 'react';
 import { IPromise } from 'angular';
-import * as classnames from 'classnames';
+import classNames from 'classnames';
+
+import { Modal } from 'react-bootstrap';
 
 import { Spinner } from 'core/widgets/spinners/Spinner';
 import { IModalComponentProps, JsonEditor } from 'core/presentation';
 import { IPipelineTemplateV2 } from 'core/domain';
 import { CopyToClipboard, noop, JsonUtils } from 'core/utils';
+import { ModalClose } from 'core/modal';
 
 import './ShowPipelineTemplateJsonModal.less';
 
@@ -83,22 +86,27 @@ export class ShowPipelineTemplateJsonModal extends React.Component<
 
     if (saving) {
       return (
-        <div className="flex-fill">
-          <div className="modal-header">
-            <h3>{modalHeading}</h3>
-          </div>
-          <div className="modal-body flex-fill show-pipeline-template-json-modal__saving-spinner">
-            <Spinner size="medium" message="Saving ..." />
-          </div>
-        </div>
+        <>
+          <ModalClose dismiss={dismissModal} />
+          <Modal.Header>
+            <Modal.Title>{modalHeading}</Modal.Title>
+          </Modal.Header>
+
+          <Modal.Body className="flex-fill">
+            <div className="text-center">
+              <Spinner size="medium" message="Saving ..." />
+            </div>
+          </Modal.Body>
+        </>
       );
     }
     return (
-      <div className="flex-fill">
-        <div className="modal-header">
-          <h3>{modalHeading}</h3>
-        </div>
-        <div className="modal-body flex-fill">
+      <>
+        <ModalClose dismiss={dismissModal} />
+        <Modal.Header>
+          <Modal.Title>{modalHeading}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="flex-fill">
           <p>{descriptionText}</p>
           <form className="form-horizontal">
             <div className="form-group">
@@ -157,12 +165,12 @@ export class ShowPipelineTemplateJsonModal extends React.Component<
             )}
           </form>
           <JsonEditor value={templateStrWithSpacing} readOnly={true} />
-        </div>
-        <div className="modal-footer">
+        </Modal.Body>
+        <Modal.Footer>
           {saveError && <span className="show-pipeline-template-json-modal__save-error">{String(saveError)}</span>}
           <ShowPipelineTemplateJsonModalButtons onSave={saveTemplate && this.saveTemplate} onClose={dismissModal} />
-        </div>
-      </div>
+        </Modal.Footer>
+      </>
     );
   }
 }
@@ -174,8 +182,8 @@ interface IShowPipelineTemplateJsonModalButtons {
 
 const ShowPipelineTemplateJsonModalButtons = (props: IShowPipelineTemplateJsonModalButtons) => {
   const { onClose, onSave } = props;
-  const closeClasses = classnames({ btn: true, 'btn-primary': !onSave });
-  const saveClasses = classnames({ btn: true, 'btn-primary': true });
+  const closeClasses = classNames({ btn: true, 'btn-primary': !onSave });
+  const saveClasses = classNames({ btn: true, 'btn-primary': true });
   return (
     <>
       <button className={closeClasses} onClick={onClose}>

@@ -1,11 +1,14 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 import { Observable, Subject } from 'rxjs';
 
-module.exports = angular
-  .module('spinnaker.dcos.serverGroup.configure.containerSettings', [])
-  .controller('dcosServerGroupContainerSettingsController', [
+export const DCOS_SERVERGROUP_CONFIGURE_WIZARD_CONTAINERSETTINGS_CONTROLLER =
+  'spinnaker.dcos.serverGroup.configure.containerSettings';
+export const name = DCOS_SERVERGROUP_CONFIGURE_WIZARD_CONTAINERSETTINGS_CONTROLLER; // for backwards compatibility
+module(DCOS_SERVERGROUP_CONFIGURE_WIZARD_CONTAINERSETTINGS_CONTROLLER, []).controller(
+  'dcosServerGroupContainerSettingsController',
+  [
     '$scope',
     'dcosServerGroupConfigurationService',
     function($scope, dcosServerGroupConfigurationService) {
@@ -27,7 +30,7 @@ module.exports = angular
         );
       }
 
-      var imageSearchResultsStream = new Subject();
+      const imageSearchResultsStream = new Subject();
 
       imageSearchResultsStream
         .debounceTime(250)
@@ -57,4 +60,5 @@ module.exports = angular
         $scope.command.docker.parameters.splice(index, 1);
       };
     },
-  ]);
+  ],
+);

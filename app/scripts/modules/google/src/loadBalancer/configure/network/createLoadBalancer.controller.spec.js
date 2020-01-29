@@ -1,10 +1,9 @@
 'use strict';
 
+import * as angular from 'angular';
 import { ApplicationModelBuilder, ModalWizard } from '@spinnaker/core';
 
 describe('Controller: gceCreateLoadBalancerCtrl', function() {
-  const angular = require('angular');
-
   // load the controller's module
   beforeEach(function() {
     window.module(require('./createLoadBalancer.controller').name);
@@ -14,7 +13,11 @@ describe('Controller: gceCreateLoadBalancerCtrl', function() {
   beforeEach(
     window.inject(function($controller, $rootScope) {
       this.$scope = $rootScope.$new();
-      const app = ApplicationModelBuilder.createApplicationForTests('app', { key: 'loadBalancers', lazy: true });
+      const app = ApplicationModelBuilder.createApplicationForTests('app', {
+        key: 'loadBalancers',
+        lazy: true,
+        defaultData: [],
+      });
       this.ctrl = $controller('gceCreateLoadBalancerCtrl', {
         $scope: this.$scope,
         $uibModalInstance: { dismiss: angular.noop, result: { then: angular.noop } },

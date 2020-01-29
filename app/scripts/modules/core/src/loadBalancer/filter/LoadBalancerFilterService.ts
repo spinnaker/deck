@@ -106,6 +106,10 @@ export class LoadBalancerFilterService {
         if (newGroup.subgroups) {
           this.diffSubgroups(oldGroup.subgroups, newGroup.subgroups);
         }
+        if (oldGroup.hasOwnProperty('isManaged') || newGroup.hasOwnProperty('isManaged')) {
+          oldGroup.isManaged = newGroup.isManaged;
+          oldGroup.managedResourceSummary = newGroup.managedResourceSummary;
+        }
       }
     });
     groupsToRemove.reverse().forEach(idx => {
@@ -224,8 +228,8 @@ export class LoadBalancerFilterService {
               return acc;
             }, {})
           : {};
-      const subGroupings = groupBy(group, lb => `${lb.name}:${lb.loadBalancerType}`),
-        subGroups: ILoadBalancerGroup[] = [];
+      const subGroupings = groupBy(group, lb => `${lb.name}:${lb.loadBalancerType}`);
+      const subGroups: ILoadBalancerGroup[] = [];
 
       forOwn(subGroupings, (subGroup, nameAndType) => {
         const [name, type] = nameAndType.split(':');
@@ -235,13 +239,18 @@ export class LoadBalancerFilterService {
             heading: loadBalancer.region,
             loadBalancer,
             serverGroups: this.filterServerGroups(loadBalancer),
+            isManaged: !!loadBalancer.isManaged,
+            managedResourceSummary: loadBalancer.managedResourceSummary,
           });
         });
 
         const heading = `${name}${crossTypeLoadBalancerNames[name] && type ? ` (${type})` : ''}`;
+        const allRegionsManaged = subSubGroups.every(({ isManaged }) => isManaged);
         subGroups.push({
           heading,
           subgroups: sortBy(subSubGroups, 'heading'),
+          isManaged: allRegionsManaged,
+          managedResourceSummary: allRegionsManaged ? subSubGroups[0].managedResourceSummary : undefined,
         });
       });
 

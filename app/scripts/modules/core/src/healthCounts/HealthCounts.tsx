@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { isEqual } from 'lodash';
 
 import { IInstanceCounts } from 'core/domain';
@@ -33,15 +33,15 @@ export class HealthCounts extends React.Component<IHealthCountsProps, IHealthCou
   private calculatePercent(container: IInstanceCounts): IHealthCountsState {
     container = container || ({} as IInstanceCounts);
 
-    const up = container.up || 0,
-      down = container.down || 0,
-      succeeded = container.succeeded || 0,
-      failed = container.failed || 0,
-      unknown = container.unknown || 0,
-      starting = container.starting || 0,
-      total = container.total || up + down + unknown + starting + succeeded + failed,
-      percent = total ? Math.floor(((up + succeeded) * 100) / total) : undefined,
-      percentLabel = percent === undefined ? 'n/a' : percent + '%';
+    const up = container.up || 0;
+    const down = container.down || 0;
+    const succeeded = container.succeeded || 0;
+    const failed = container.failed || 0;
+    const unknown = container.unknown || 0;
+    const starting = container.starting || 0;
+    const total = container.total || up + down + unknown + starting + succeeded + failed;
+    const percent = total ? Math.floor(((up + succeeded) * 100) / total) : undefined;
+    const percentLabel = percent === undefined ? 'n/a' : percent + '%';
 
     const statusClass =
       percent === undefined
@@ -188,7 +188,7 @@ export class HealthCounts extends React.Component<IHealthCountsProps, IHealthCou
 
     if (percentLabel !== 'n/a') {
       return (
-        <div className={`health-counts ${className}`}>
+        <span className={`health-counts ${className}`}>
           <Tooltip template={legend} placement={this.props.legendPlacement}>
             <span className="counter instance-health-counts">
               {counts}
@@ -200,11 +200,11 @@ export class HealthCounts extends React.Component<IHealthCountsProps, IHealthCou
               )}
             </span>
           </Tooltip>
-        </div>
+        </span>
       );
     } else if (container.outOfService) {
       return (
-        <div className={`health-counts ${className}`}>
+        <span className={`health-counts ${className}`}>
           <Tooltip template={legend}>
             <span className="counter instance-health-counts">
               <span>
@@ -212,7 +212,7 @@ export class HealthCounts extends React.Component<IHealthCountsProps, IHealthCou
               </span>
             </span>
           </Tooltip>
-        </div>
+        </span>
       );
     } else {
       return null;

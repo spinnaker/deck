@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import AceEditor, { AceEditorProps, Annotation } from 'react-ace';
 
 import 'brace/mode/json';
@@ -51,6 +51,13 @@ export class JsonEditor extends React.Component<IJsonEditorProps> {
   }
 
   public render() {
-    return <AceEditor {...this.props} ref={this.editorRef} onValidate={this.validate} />;
+    return (
+      <AceEditor
+        {...this.props}
+        ref={this.editorRef}
+        onValidate={this.validate}
+        editorProps={{ $blockScrolling: Infinity }}
+      />
+    );
   }
 }

@@ -1,14 +1,13 @@
-import * as classNames from 'classnames';
-import { isUndefined, isString } from 'lodash';
+import classNames from 'classnames';
+import { isString } from 'lodash';
 
 import { noop } from 'core/utils';
 
 import { IFormInputValidation } from './interface';
 
-export const orEmptyString = (val: any) => (isUndefined(val) ? '' : val);
+export const orEmptyString = (val: any) => val || '';
 
-export const validationClassName = (validation: IFormInputValidation) => {
-  validation = validation || {};
+export const validationClassName = (validation = {} as IFormInputValidation) => {
   return classNames({
     'ng-dirty': !!validation.touched,
     'ng-invalid': validation.category === 'error',

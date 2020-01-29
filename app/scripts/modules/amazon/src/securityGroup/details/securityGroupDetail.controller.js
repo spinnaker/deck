@@ -1,26 +1,32 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 import _ from 'lodash';
 
 import {
   CloudProviderRegistry,
-  CONFIRMATION_MODAL_SERVICE,
+  ConfirmationModalService,
+  confirmNotManaged,
   RecentHistoryService,
   SECURITY_GROUP_READER,
   SecurityGroupWriter,
   FirewallLabels,
   MANAGED_RESOURCE_DETAILS_INDICATOR,
+  noop,
 } from '@spinnaker/core';
 
 import { VpcReader } from '../../vpc/VpcReader';
+import { AMAZON_SECURITYGROUP_CLONE_CLONESECURITYGROUP_CONTROLLER } from '../clone/cloneSecurityGroup.controller';
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
-module.exports = angular
-  .module('spinnaker.amazon.securityGroup.details.controller', [
-    require('@uirouter/angularjs').default,
+export const AMAZON_SECURITYGROUP_DETAILS_SECURITYGROUPDETAIL_CONTROLLER =
+  'spinnaker.amazon.securityGroup.details.controller';
+export const name = AMAZON_SECURITYGROUP_DETAILS_SECURITYGROUPDETAIL_CONTROLLER; // for backwards compatibility
+angular
+  .module(AMAZON_SECURITYGROUP_DETAILS_SECURITYGROUPDETAIL_CONTROLLER, [
+    UIROUTER_ANGULARJS,
     SECURITY_GROUP_READER,
-    CONFIRMATION_MODAL_SERVICE,
-    require('../clone/cloneSecurityGroup.controller').name,
+    AMAZON_SECURITYGROUP_CLONE_CLONESECURITYGROUP_CONTROLLER,
     MANAGED_RESOURCE_DETAILS_INDICATOR,
   ])
   .controller('awsSecurityGroupDetailsCtrl', [
@@ -28,10 +34,9 @@ module.exports = angular
     '$state',
     'resolvedSecurityGroup',
     'app',
-    'confirmationModalService',
     'securityGroupReader',
     '$uibModal',
-    function($scope, $state, resolvedSecurityGroup, app, confirmationModalService, securityGroupReader, $uibModal) {
+    function($scope, $state, resolvedSecurityGroup, app, securityGroupReader, $uibModal) {
       this.application = app;
       const application = app;
       const securityGroup = resolvedSecurityGroup;
@@ -83,7 +88,7 @@ module.exports = angular
       }
 
       function buildIpRulesModel(details) {
-        let groupedRangeRules = _.groupBy(details.ipRangeRules, rule => rule.range.ip + rule.range.cidr);
+        const groupedRangeRules = _.groupBy(details.ipRangeRules, rule => rule.range.ip + rule.range.cidr);
         return Object.keys(groupedRangeRules)
           .map(addr => {
             return {
@@ -95,7 +100,7 @@ module.exports = angular
       }
 
       function buildSecurityGroupRulesModel(details) {
-        let groupedRangeRules = _.groupBy(details.securityGroupRules, rule => rule.securityGroup.id);
+        const groupedRangeRules = _.groupBy(details.securityGroupRules, rule => rule.securityGroup.id);
         return Object.keys(groupedRangeRules)
           .map(addr => {
             return {
@@ -107,7 +112,7 @@ module.exports = angular
       }
 
       function buildRuleModel(groupedRangeRules, addr) {
-        let rules = [];
+        const rules = [];
         groupedRangeRules[addr].forEach(rule => {
           (rule.portRanges || []).forEach(range => {
             if (rule.protocol === '-1' || (range.startPort !== undefined && range.endPort !== undefined)) {
@@ -140,19 +145,26 @@ module.exports = angular
         }
       });
 
+      function checkManagement() {
+        return confirmNotManaged($scope.securityGroup, application);
+      }
+
       this.editInboundRules = function editInboundRules() {
-        $uibModal.open({
-          templateUrl: require('../configure/editSecurityGroup.html'),
-          controller: 'awsEditSecurityGroupCtrl as ctrl',
-          size: 'lg',
-          resolve: {
-            securityGroup: function() {
-              return angular.copy($scope.securityGroup);
-            },
-            application: function() {
-              return application;
-            },
-          },
+        confirmNotManaged($scope.securityGroup, application).then(notManaged => {
+          notManaged &&
+            $uibModal.open({
+              templateUrl: require('../configure/editSecurityGroup.html'),
+              controller: 'awsEditSecurityGroupCtrl as ctrl',
+              size: 'lg',
+              resolve: {
+                securityGroup: function() {
+                  return angular.copy($scope.securityGroup);
+                },
+                application: function() {
+                  return application;
+                },
+              },
+            });
         });
       };
 
@@ -163,7 +175,7 @@ module.exports = angular
           size: 'lg',
           resolve: {
             securityGroup: function() {
-              var securityGroup = angular.copy($scope.securityGroup);
+              const securityGroup = angular.copy($scope.securityGroup);
               if (securityGroup.region) {
                 securityGroup.regions = [securityGroup.region];
               }
@@ -199,17 +211,18 @@ module.exports = angular
           return SecurityGroupWriter.deleteSecurityGroup(securityGroup, application, params);
         };
 
-        confirmationModalService.confirm({
-          header: 'Really delete ' + securityGroup.name + '?',
-          buttonText: 'Delete ' + securityGroup.name,
-          provider: 'aws',
-          account: securityGroup.accountId,
-          applicationName: application.name,
-          taskMonitorConfig: taskMonitor,
-          submitMethod: submitMethod,
-          retryBody: `<div><p>Retry deleting the ${FirewallLabels.get(
-            'firewall',
-          )} and revoke any dependent ingress rules?</p><p>Any instance or load balancer associations will have to removed manually.</p></div>`,
+        confirmNotManaged($scope.securityGroup, application).then(notManaged => {
+          notManaged &&
+            ConfirmationModalService.confirm({
+              header: 'Really delete ' + securityGroup.name + '?',
+              buttonText: 'Delete ' + securityGroup.name,
+              account: securityGroup.accountId,
+              taskMonitorConfig: taskMonitor,
+              submitMethod: submitMethod,
+              retryBody: `<div><p>Retry deleting the ${FirewallLabels.get(
+                'firewall',
+              )} and revoke any dependent ingress rules?</p><p>Any instance or load balancer associations will have to removed manually.</p></div>`,
+            });
         });
       };
 

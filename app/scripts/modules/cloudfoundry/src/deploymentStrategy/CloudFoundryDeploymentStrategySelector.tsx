@@ -1,5 +1,4 @@
-import * as React from 'react';
-import * as DOMPurify from 'dompurify';
+import React from 'react';
 import Select, { Option } from 'react-select';
 import { defaultsDeep, unset } from 'lodash';
 
@@ -8,14 +7,15 @@ import {
   IDeploymentStrategy,
   IDeploymentStrategyAdditionalFieldsProps,
   IServerGroupCommand,
+  Markdown,
 } from '@spinnaker/core';
 
-import { IRedBlackCommand } from 'cloudfoundry/deploymentStrategy/strategies/redblack/redblack.strategy';
-import { AdditionalFields as AdditionalRedBlackFields } from 'cloudfoundry/deploymentStrategy/strategies/redblack/AdditionalFields';
+import { IRedBlackCommand } from './strategies/redblack/redblack.strategy';
+import { AdditionalFields as AdditionalRedBlackFields } from './strategies/redblack/AdditionalFields';
 import {
   AdditionalFields as AdditionalRollingRedBlackFields,
   IRollingRedBlackCommand,
-} from 'cloudfoundry/deploymentStrategy/strategies/rollingredblack/AdditionalFields';
+} from './strategies/rollingredblack/AdditionalFields';
 
 export interface ICloudFoundryDeploymentStrategySelectorProps {
   command: IServerGroupCommand;
@@ -167,10 +167,10 @@ export class CloudFoundryDeploymentStrategySelector extends React.Component<
     return (
       <div className="body-regular">
         <strong>
-          <span dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(option.label) }} />
+          <Markdown tag="span" message={option.label} />
         </strong>
         <div>
-          <span dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(option.description) }} />
+          <Markdown tag="span" message={option.description} />
         </div>
       </div>
     );

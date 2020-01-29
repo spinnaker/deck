@@ -1,13 +1,15 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 import _ from 'lodash';
 
 import { AccountService, SETTINGS } from '@spinnaker/core';
 
 import { GCE_INSTANCE_TYPE_DISK_DEFAULTS } from './gceInstanceTypeDisks';
 
-module.exports = angular.module('spinnaker.gce.instanceType.service', []).factory('gceInstanceTypeService', [
+export const GOOGLE_INSTANCE_GCEINSTANCETYPE_SERVICE = 'spinnaker.gce.instanceType.service';
+export const name = GOOGLE_INSTANCE_GCEINSTANCETYPE_SERVICE; // for backwards compatibility
+module(GOOGLE_INSTANCE_GCEINSTANCETYPE_SERVICE, []).factory('gceInstanceTypeService', [
   '$http',
   '$q',
   '$log',
@@ -276,8 +278,8 @@ module.exports = angular.module('spinnaker.gce.instanceType.service', []).factor
                   })
                   .filter(disk => !!disk);
 
-                let size = 0,
-                  count = 0;
+                let size = 0;
+                let count = 0;
                 if (diskDefaults.supportsLocalSSD) {
                   count = disks.filter(disk => disk.type === 'local-ssd').length;
                   size = 375;

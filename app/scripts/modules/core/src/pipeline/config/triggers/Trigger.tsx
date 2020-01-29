@@ -1,5 +1,5 @@
-import * as React from 'react';
-import * as classNames from 'classnames';
+import React from 'react';
+import classNames from 'classnames';
 import { FormikProps } from 'formik';
 import { isEqual, pick } from 'lodash';
 import { Option } from 'react-select';
@@ -8,7 +8,7 @@ import { Application } from 'core/application';
 import { SETTINGS } from 'core/config/settings';
 import { IExpectedArtifact, IPipeline, ITrigger, ITriggerTypeConfig } from 'core/domain';
 import { HelpField } from 'core/help/HelpField';
-import { TriggerArtifactConstraintSelectorInput } from 'core/pipeline/config/triggers/artifacts';
+import { TriggerArtifactConstraintSelectorInput } from './artifacts';
 import {
   CheckboxInput,
   FormField,

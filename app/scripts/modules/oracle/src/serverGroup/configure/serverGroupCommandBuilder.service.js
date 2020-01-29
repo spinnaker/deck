@@ -1,26 +1,29 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 import _ from 'lodash';
 
 import { NameUtils } from '@spinnaker/core';
 
 import { OracleProviderSettings } from '../../oracle.settings';
 
-module.exports = angular
-  .module('spinnaker.oracle.serverGroupCommandBuilder.service', [])
+export const ORACLE_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER_SERVICE =
+  'spinnaker.oracle.serverGroupCommandBuilder.service';
+export const name = ORACLE_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER_SERVICE; // for backwards compatibility
+angular
+  .module(ORACLE_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER_SERVICE, [])
   .factory('oracleServerGroupCommandBuilder', [
     '$q',
     function($q) {
-      let oracle = 'oracle';
+      const oracle = 'oracle';
 
       function buildNewServerGroupCommand(application, defaults) {
         defaults = defaults || {};
 
-        let defaultAccount = defaults.account || OracleProviderSettings.defaults.account;
-        let defaultRegion = defaults.region || OracleProviderSettings.defaults.region;
+        const defaultAccount = defaults.account || OracleProviderSettings.defaults.account;
+        const defaultRegion = defaults.region || OracleProviderSettings.defaults.region;
 
-        let command = {
+        const command = {
           account: defaultAccount,
           application: application.name,
           capacity: {
@@ -39,9 +42,9 @@ module.exports = angular
 
       function buildServerGroupCommandFromExisting(application, serverGroup, mode) {
         mode = mode || 'clone';
-        let serverGroupName = NameUtils.parseServerGroupName(serverGroup.name);
+        const serverGroupName = NameUtils.parseServerGroupName(serverGroup.name);
 
-        let command = {
+        const command = {
           account: serverGroup.account,
           application: application.name,
           shape: serverGroup.launchConfig.shape,
@@ -65,17 +68,17 @@ module.exports = angular
       }
 
       function buildServerGroupCommandFromPipeline(application, originalCluster) {
-        let pipelineCluster = _.cloneDeep(originalCluster);
-        let commandDefaults = { account: pipelineCluster.account, region: pipelineCluster.region };
+        const pipelineCluster = _.cloneDeep(originalCluster);
+        const commandDefaults = { account: pipelineCluster.account, region: pipelineCluster.region };
         return buildNewServerGroupCommand(application, commandDefaults).then(command => {
-          let viewState = {
+          const viewState = {
             disableImageSelection: true,
             mode: 'editPipeline',
             submitButtonLabel: 'Done',
             templatingEnabled: true,
           };
 
-          let viewOverrides = {
+          const viewOverrides = {
             viewState: viewState,
           };
 

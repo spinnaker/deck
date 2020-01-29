@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { Modal, ModalFooter } from 'react-bootstrap';
 import { Form, Formik } from 'formik';
 
@@ -109,10 +109,10 @@ export class CloudFoundryUnmapLoadBalancersModal extends React.Component<
           render={formik => {
             return (
               <>
-                <Modal.Header>
-                  <h3>Unmap route from {serverGroup.name}</h3>
-                </Modal.Header>
                 <ModalClose dismiss={this.close} />
+                <Modal.Header>
+                  <Modal.Title>Unmap route from {serverGroup.name}</Modal.Title>
+                </Modal.Header>
                 <Modal.Body>
                   <Form className="form-horizontal">
                     <Routes fieldName="routes" isRequired={true} singleRouteOnly={true} />

@@ -2,9 +2,11 @@
 
 import { API } from '@spinnaker/core';
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular.module('spinnaker.dcos.image.reader', []).factory('dcosImageReader', function() {
+export const DCOS_IMAGE_IMAGE_READER = 'spinnaker.dcos.image.reader';
+export const name = DCOS_IMAGE_IMAGE_READER; // for backwards compatibility
+module(DCOS_IMAGE_IMAGE_READER, []).factory('dcosImageReader', function() {
   function findImages(params) {
     return API.all('images/find')
       .getList(params)

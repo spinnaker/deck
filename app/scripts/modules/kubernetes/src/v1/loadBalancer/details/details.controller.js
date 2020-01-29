@@ -1,17 +1,18 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 import _ from 'lodash';
 
-import { CONFIRMATION_MODAL_SERVICE, LoadBalancerWriter, ServerGroupTemplates } from '@spinnaker/core';
+import { ConfirmationModalService, LoadBalancerWriter, ServerGroupTemplates } from '@spinnaker/core';
 
 import { KubernetesProviderSettings } from 'kubernetes/kubernetes.settings';
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
-module.exports = angular
-  .module('spinnaker.loadBalancer.kubernetes.details.controller', [
-    require('@uirouter/angularjs').default,
-    CONFIRMATION_MODAL_SERVICE,
-  ])
+export const KUBERNETES_V1_LOADBALANCER_DETAILS_DETAILS_CONTROLLER =
+  'spinnaker.loadBalancer.kubernetes.details.controller';
+export const name = KUBERNETES_V1_LOADBALANCER_DETAILS_DETAILS_CONTROLLER; // for backwards compatibility
+angular
+  .module(KUBERNETES_V1_LOADBALANCER_DETAILS_DETAILS_CONTROLLER, [UIROUTER_ANGULARJS])
   .controller('kubernetesLoadBalancerDetailsController', [
     '$interpolate',
     '$scope',
@@ -19,25 +20,15 @@ module.exports = angular
     '$uibModal',
     'loadBalancer',
     'app',
-    'confirmationModalService',
     'kubernetesProxyUiService',
-    function(
-      $interpolate,
-      $scope,
-      $state,
-      $uibModal,
-      loadBalancer,
-      app,
-      confirmationModalService,
-      kubernetesProxyUiService,
-    ) {
-      let application = app;
+    function($interpolate, $scope, $state, $uibModal, loadBalancer, app, kubernetesProxyUiService) {
+      const application = app;
 
       $scope.state = {
         loading: true,
       };
 
-      let extractLoadBalancer = () => {
+      const extractLoadBalancer = () => {
         return application.loadBalancers.ready().then(() => {
           $scope.loadBalancer = application.loadBalancers.data.find(test => {
             return (
@@ -133,12 +124,10 @@ module.exports = angular
 
         const submitMethod = () => LoadBalancerWriter.deleteLoadBalancer(command, application);
 
-        confirmationModalService.confirm({
+        ConfirmationModalService.confirm({
           header: 'Really delete ' + loadBalancer.name + '?',
           buttonText: 'Delete ' + loadBalancer.name,
-          provider: 'kubernetes',
           account: loadBalancer.account,
-          applicationName: application.name,
           taskMonitorConfig: taskMonitor,
           submitMethod: submitMethod,
         });

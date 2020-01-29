@@ -1,7 +1,7 @@
-import * as React from 'react';
+import React from 'react';
 
 import { Application } from 'core/application';
-import { CategoryDropdown } from 'core/application/nav/CategoryDropdown';
+import { CategoryDropdown } from './CategoryDropdown';
 import { IDataSourceCategory } from './ApplicationHeader';
 
 export interface IApplicationNavProps {
@@ -12,7 +12,7 @@ export interface IApplicationNavProps {
 }
 
 export const ApplicationNavSection = ({ application, categories, activeCategory }: IApplicationNavProps) => {
-  if (application.notFound) {
+  if (application.notFound || application.hasError) {
     return null;
   }
   return (

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { FormikProps } from 'formik';
 
 import { DockerImageAndTagSelector, IDockerImageAndTagChanges } from '../../image';
@@ -22,6 +22,7 @@ export function DockerTriggerConfig(props: IDockerTriggerConfigProps) {
   return (
     <div className="form-horizontal">
       <DockerImageAndTagSelector
+        allowManualDefinition={false}
         specifyTagByRegex={true}
         account={trigger.account}
         organization={trigger.organization}

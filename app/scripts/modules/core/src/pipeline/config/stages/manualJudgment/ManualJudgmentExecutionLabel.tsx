@@ -1,11 +1,11 @@
-import * as React from 'react';
+import React from 'react';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 import { ManualJudgmentApproval } from './ManualJudgmentApproval';
 import { IExecutionStageSummary, IExecution } from 'core/domain';
 import { Application } from 'core/application/application.model';
 import { HoverablePopover } from 'core/presentation/HoverablePopover';
-import { ExecutionBarLabel } from 'core/pipeline/config/stages/common/ExecutionBarLabel';
+import { ExecutionBarLabel } from '../common/ExecutionBarLabel';
 
 export interface IManualJudgmentExecutionLabelProps {
   stage: IExecutionStageSummary;

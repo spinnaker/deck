@@ -5,7 +5,6 @@ import { cloneDeep } from 'lodash';
 
 import {
   Application,
-  CONFIRMATION_MODAL_SERVICE,
   ConfirmationModalService,
   ILoadBalancer,
   ILoadBalancerDeleteCommand,
@@ -26,14 +25,13 @@ class AppengineLoadBalancerDetailsController implements IController {
   public loadBalancer: IAppengineLoadBalancer;
   public dispatchRules: string[] = [];
 
-  public static $inject = ['$uibModal', '$state', '$scope', 'loadBalancer', 'app', 'confirmationModalService'];
+  public static $inject = ['$uibModal', '$state', '$scope', 'loadBalancer', 'app'];
   constructor(
     private $uibModal: IModalService,
     private $state: StateService,
     private $scope: IScope,
     loadBalancer: ILoadBalancerFromStateParams,
     private app: Application,
-    private confirmationModalService: ConfirmationModalService,
   ) {
     this.loadBalancerFromParams = loadBalancer;
     this.app
@@ -71,7 +69,7 @@ class AppengineLoadBalancerDetailsController implements IController {
       return LoadBalancerWriter.deleteLoadBalancer(loadBalancer, this.app);
     };
 
-    this.confirmationModalService.confirm({
+    ConfirmationModalService.confirm({
       header: 'Really delete ' + this.loadBalancer.name + '?',
       buttonText: 'Delete ' + this.loadBalancer.name,
       body: this.getConfirmationModalBodyHtml(),
@@ -119,8 +117,7 @@ class AppengineLoadBalancerDetailsController implements IController {
     if (hasAny) {
       if (hasMoreThanOne) {
         const listOfServerGroupNames = serverGroupNames.map(name => `<li>${name}</li>`).join('');
-        return `
-          <div class="alert alert-warning">
+        return `<div class="alert alert-warning">
             <p>
               Deleting <b>${this.loadBalancer.name}</b> will destroy the following server groups:
               <ul>
@@ -130,8 +127,7 @@ class AppengineLoadBalancerDetailsController implements IController {
           </div>
         `;
       } else {
-        return `
-          <div class="alert alert-warning">
+        return `<div class="alert alert-warning">
             <p>
               Deleting <b>${this.loadBalancer.name}</b> will destroy <b>${serverGroupNames[0]}</b>.
             </p>
@@ -154,7 +150,7 @@ class AppengineLoadBalancerDetailsController implements IController {
 }
 
 export const APPENGINE_LOAD_BALANCER_DETAILS_CTRL = 'spinnaker.appengine.loadBalancerDetails.controller';
-module(APPENGINE_LOAD_BALANCER_DETAILS_CTRL, [CONFIRMATION_MODAL_SERVICE]).controller(
+module(APPENGINE_LOAD_BALANCER_DETAILS_CTRL, []).controller(
   'appengineLoadBalancerDetailsCtrl',
   AppengineLoadBalancerDetailsController,
 );

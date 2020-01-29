@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { Option } from 'react-select';
 import { capitalize, get, isEmpty, map } from 'lodash';
 
@@ -15,8 +15,8 @@ import {
   YamlEditor,
 } from '@spinnaker/core';
 
-import { ManifestBindArtifactsSelectorDelegate } from 'kubernetes/v2/pipelines/stages/deployManifest/ManifestBindArtifactsSelectorDelegate';
-import { IManifestBindArtifact } from 'kubernetes/v2/pipelines/stages/deployManifest/ManifestBindArtifactsSelector';
+import { ManifestBindArtifactsSelectorDelegate } from '../deployManifest/ManifestBindArtifactsSelectorDelegate';
+import { IManifestBindArtifact } from '../deployManifest/ManifestBindArtifactsSelector';
 import { ManifestSelector } from 'kubernetes/v2/manifest/selector/ManifestSelector';
 import { SelectorMode } from 'kubernetes/v2/manifest/selector/IManifestSelector';
 import { PatchManifestOptionsForm } from './PatchManifestOptionsForm';
@@ -46,10 +46,10 @@ export class PatchManifestStageForm extends React.Component<
 
   public constructor(props: IPatchManifestStageConfigFormProps & IFormikStageConfigInjectedProps) {
     super(props);
-    const patchBody: string = get(props.formik.values, 'patchBody');
+    const patchBody: any[] = get(props.formik.values, 'patchBody');
     const isTextManifest: boolean = get(props.formik.values, 'source') === this.textSource;
     this.state = {
-      rawManifest: !isEmpty(patchBody) && isTextManifest ? yamlDocumentsToString([patchBody]) : '',
+      rawManifest: !isEmpty(patchBody) && isTextManifest ? yamlDocumentsToString(patchBody) : '',
     };
   }
 
@@ -79,14 +79,17 @@ export class PatchManifestStageForm extends React.Component<
       'requiredArtifactIds',
       bindings.filter(b => b.expectedArtifactId).map(b => b.expectedArtifactId),
     );
-    this.props.formik.setFieldValue('requiredArtifacts', bindings.filter(b => b.artifact));
+    this.props.formik.setFieldValue(
+      'requiredArtifacts',
+      bindings.filter(b => b.artifact),
+    );
   };
 
   private handleRawManifestChange = (rawManifest: string, manifests: any): void => {
     this.setState({
       rawManifest,
     });
-    this.props.formik.setFieldValue('patchBody', manifests[0]);
+    this.props.formik.setFieldValue('patchBody', manifests);
   };
 
   private onManifestSelectorChange = (): void => {

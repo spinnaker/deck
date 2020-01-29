@@ -1,11 +1,13 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 import _ from 'lodash';
 
 import { OrchestratedItemTransformer } from '@spinnaker/core';
 
-module.exports = angular.module('spinnaker.canary.acaTask.transformer', []).service('acaTaskTransformer', function() {
+export const CANARY_ACATASK_ACATASKSTAGE_TRANSFORMER = 'spinnaker.canary.acaTask.transformer';
+export const name = CANARY_ACATASK_ACATASKSTAGE_TRANSFORMER; // for backwards compatibility
+module(CANARY_ACATASK_ACATASKSTAGE_TRANSFORMER, []).service('acaTaskTransformer', function() {
   function getException(stage) {
     return stage && stage.isFailed ? stage.failureMessage : null;
   }
@@ -22,11 +24,11 @@ module.exports = angular.module('spinnaker.canary.acaTask.transformer', []).serv
 
         stage.exceptions = _.uniq(stage.exceptions);
 
-        var status = stage.status;
+        let status = stage.status;
 
-        var canaryStatus = stage.context.canary.status;
+        const canaryStatus = stage.context.canary.status;
 
-        var canaryResult = stage.context.canary.canaryResult && stage.context.canary.canaryResult.overallResult;
+        const canaryResult = stage.context.canary.canaryResult && stage.context.canary.canaryResult.overallResult;
 
         if (canaryStatus && status !== 'CANCELED') {
           if (canaryStatus.status === 'LAUNCHED' || canaryStatus.status === 'RUNNING') {

@@ -4,7 +4,6 @@ import { head, sortBy } from 'lodash';
 
 import {
   Application,
-  CONFIRMATION_MODAL_SERVICE,
   IApplicationSecurityGroup,
   ILoadBalancer,
   ISecurityGroup,
@@ -30,6 +29,7 @@ import {
 } from 'amazon/domain';
 
 import { LOAD_BALANCER_ACTIONS } from './loadBalancerActions.component';
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
 export interface ILoadBalancerFromStateParams {
   accountId: string;
@@ -230,10 +230,9 @@ export class AwsLoadBalancerDetailsController implements IController {
 
 export const AWS_LOAD_BALANCER_DETAILS_CTRL = 'spinnaker.amazon.loadBalancer.details.controller';
 module(AWS_LOAD_BALANCER_DETAILS_CTRL, [
-  require('@uirouter/angularjs').default,
+  UIROUTER_ANGULARJS,
   SECURITY_GROUP_READER,
   LOAD_BALANCER_ACTIONS,
   LOAD_BALANCER_READ_SERVICE,
-  CONFIRMATION_MODAL_SERVICE,
   MANAGED_RESOURCE_DETAILS_INDICATOR,
 ]).controller('awsLoadBalancerDetailsCtrl', AwsLoadBalancerDetailsController);

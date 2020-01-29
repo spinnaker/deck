@@ -1,7 +1,7 @@
 <div class="modal-page">
   <modal-close dismiss="$dismiss()"></modal-close>
   <div class="modal-header">
-    <h3 data-purpose="modal-header">Edit Application</h3>
+    <h4 class="modal-title">Edit Application</h4>
   </div>
 
   <form role="form" class="container-fluid" novalidate name="editApplicationForm">
@@ -108,6 +108,13 @@
 
       <render-if-feature feature="pagerDuty">
         <pager-duty-select-field component="editApp.applicationAttributes"></pager-duty-select-field>
+      </render-if-feature>
+
+      <render-if-feature feature="slack">
+        <slack-channel-selector
+          channel="editApp.applicationAttributes.slackChannel"
+          callback="editApp.setAttribute"
+        ></slack-channel-selector>
       </render-if-feature>
 
       <div class="form-group row">

@@ -86,6 +86,22 @@ describe('API Service', function() {
       expect(rejected).toBe(false);
     });
 
+    it('application/x-yaml;charset=utf-8 is fine, too', () => {
+      spyOn(AuthenticationInitializer, 'reauthenticateUser').and.callFake(noop);
+      $httpBackend
+        .expectGET(`${baseUrl}/yaml`)
+        .respond(200, '---\nfoo: bar', { 'content-type': 'application/x-yaml;charset=utf-8' });
+
+      let rejected = false;
+      API.one('yaml')
+        .get()
+        .then(noop, () => (rejected = true));
+
+      $httpBackend.flush();
+      expect((AuthenticationInitializer.reauthenticateUser as Spy).calls.count()).toBe(0);
+      expect(rejected).toBe(false);
+    });
+
     it('string responses starting with <html should trigger a reauthentication request and reject', function() {
       spyOn(AuthenticationInitializer, 'reauthenticateUser').and.callFake(noop);
       $httpBackend.expectGET(`${baseUrl}/fine`).respond(200, 'this is fine');
@@ -94,7 +110,10 @@ describe('API Service', function() {
       let succeeded = false;
       API.one('fine')
         .get()
-        .then(() => (succeeded = true), () => (rejected = true));
+        .then(
+          () => (succeeded = true),
+          () => (rejected = true),
+        );
 
       $httpBackend.flush();
       expect((AuthenticationInitializer.reauthenticateUser as Spy).calls.count()).toBe(0);
@@ -110,7 +129,10 @@ describe('API Service', function() {
       $httpBackend.expectGET(`${baseUrl}/some-array`).respond(200, []);
       API.one('some-array')
         .get()
-        .then(() => (succeeded = true), () => (rejected = true));
+        .then(
+          () => (succeeded = true),
+          () => (rejected = true),
+        );
       $httpBackend.flush();
 
       expect((AuthenticationInitializer.reauthenticateUser as Spy).calls.count()).toBe(0);
@@ -123,7 +145,10 @@ describe('API Service', function() {
       $httpBackend.expectGET(`${baseUrl}/some-object`).respond(200, {});
       API.one('some-object')
         .get()
-        .then(() => (succeeded = true), () => (rejected = true));
+        .then(
+          () => (succeeded = true),
+          () => (rejected = true),
+        );
       $httpBackend.flush();
 
       expect((AuthenticationInitializer.reauthenticateUser as Spy).calls.count()).toBe(0);

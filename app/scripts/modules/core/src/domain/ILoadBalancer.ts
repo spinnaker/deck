@@ -1,8 +1,10 @@
+import { IMoniker } from 'core/naming';
+
 import { IInstance } from './IInstance';
 import { IInstanceCounts } from './IInstanceCounts';
+import { IManagedResource } from './IManagedEntity';
 import { IServerGroup } from './IServerGroup';
 import { ITaggedEntity } from './ITaggedEntity';
-import { IMoniker } from 'core/naming/IMoniker';
 
 export interface ILoadBalancerSourceData {
   cloudProvider?: string;
@@ -11,7 +13,7 @@ export interface ILoadBalancerSourceData {
   type?: string;
 }
 
-export interface ILoadBalancer extends ITaggedEntity {
+export interface ILoadBalancer extends ITaggedEntity, IManagedResource {
   account?: string;
   cloudProvider?: string;
   detail?: string;
@@ -20,8 +22,8 @@ export interface ILoadBalancer extends ITaggedEntity {
   instances?: IInstance[];
   listenerDescriptions?: any[];
   loadBalancerType?: string;
-  name?: string;
   moniker?: IMoniker;
+  name?: string;
   provider?: string;
   region?: string;
   searchField?: string;
@@ -33,7 +35,7 @@ export interface ILoadBalancer extends ITaggedEntity {
   vpcName?: string;
 }
 
-export interface ILoadBalancerGroup {
+export interface ILoadBalancerGroup extends IManagedResource {
   heading: string;
   loadBalancer?: ILoadBalancer;
   serverGroups?: IServerGroup[];

@@ -3,11 +3,13 @@
 import { defaults } from 'lodash';
 import { GCE_HTTP_LOAD_BALANCER_UTILS } from 'google/loadBalancer/httpLoadBalancerUtils.service';
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular
-  .module('spinnaker.gce.serverGroup.transformer', [GCE_HTTP_LOAD_BALANCER_UTILS])
-  .factory('gceServerGroupTransformer', [
+export const GOOGLE_SERVERGROUP_SERVERGROUP_TRANSFORMER = 'spinnaker.gce.serverGroup.transformer';
+export const name = GOOGLE_SERVERGROUP_SERVERGROUP_TRANSFORMER; // for backwards compatibility
+module(GOOGLE_SERVERGROUP_SERVERGROUP_TRANSFORMER, [GCE_HTTP_LOAD_BALANCER_UTILS]).factory(
+  'gceServerGroupTransformer',
+  [
     'gceHttpLoadBalancerUtils',
     function(gceHttpLoadBalancerUtils) {
       function normalizeServerGroup(serverGroup, application) {
@@ -58,4 +60,5 @@ module.exports = angular
         normalizeServerGroup: normalizeServerGroup,
       };
     },
-  ]);
+  ],
+);

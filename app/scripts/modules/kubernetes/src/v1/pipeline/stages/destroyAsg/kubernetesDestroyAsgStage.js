@@ -1,11 +1,13 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { AccountService, Registry, StageConstants } from '@spinnaker/core';
 
-module.exports = angular
-  .module('spinnaker.kubernetes.pipeline.stage.destroyAsgStage', [])
+export const KUBERNETES_V1_PIPELINE_STAGES_DESTROYASG_KUBERNETESDESTROYASGSTAGE =
+  'spinnaker.kubernetes.pipeline.stage.destroyAsgStage';
+export const name = KUBERNETES_V1_PIPELINE_STAGES_DESTROYASG_KUBERNETESDESTROYASGSTAGE; // for backwards compatibility
+module(KUBERNETES_V1_PIPELINE_STAGES_DESTROYASG_KUBERNETESDESTROYASGSTAGE, [])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'destroyServerGroup',
@@ -31,7 +33,7 @@ module.exports = angular
   .controller('kubernetesDestroyAsgStageCtrl', [
     '$scope',
     function($scope) {
-      let stage = $scope.stage;
+      const stage = $scope.stage;
 
       $scope.state = {
         accounts: false,

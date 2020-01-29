@@ -1,25 +1,29 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 import _ from 'lodash';
 
 import {
   AccountService,
   CloudProviderRegistry,
-  CONFIRMATION_MODAL_SERVICE,
+  ConfirmationModalService,
   FirewallLabels,
   SECURITY_GROUP_READER,
   SecurityGroupWriter,
 } from '@spinnaker/core';
 
 import { GCE_SECURITY_GROUP_HELP_TEXT_SERVICE } from '../securityGroupHelpText.service';
+import { GOOGLE_SECURITYGROUP_CLONE_CLONESECURITYGROUP_CONTROLLER } from '../clone/cloneSecurityGroup.controller';
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
-module.exports = angular
-  .module('spinnaker.securityGroup.gce.details.controller', [
-    require('@uirouter/angularjs').default,
+export const GOOGLE_SECURITYGROUP_DETAILS_SECURITYGROUPDETAIL_CONTROLLER =
+  'spinnaker.securityGroup.gce.details.controller';
+export const name = GOOGLE_SECURITYGROUP_DETAILS_SECURITYGROUPDETAIL_CONTROLLER; // for backwards compatibility
+angular
+  .module(GOOGLE_SECURITYGROUP_DETAILS_SECURITYGROUPDETAIL_CONTROLLER, [
+    UIROUTER_ANGULARJS,
     SECURITY_GROUP_READER,
-    CONFIRMATION_MODAL_SERVICE,
-    require('../clone/cloneSecurityGroup.controller').name,
+    GOOGLE_SECURITYGROUP_CLONE_CLONESECURITYGROUP_CONTROLLER,
     GCE_SECURITY_GROUP_HELP_TEXT_SERVICE,
   ])
   .controller('gceSecurityGroupDetailsCtrl', [
@@ -27,7 +31,6 @@ module.exports = angular
     '$state',
     'resolvedSecurityGroup',
     'app',
-    'confirmationModalService',
     'securityGroupReader',
     '$uibModal',
     'gceSecurityGroupHelpTextService',
@@ -36,7 +39,6 @@ module.exports = angular
       $state,
       resolvedSecurityGroup,
       app,
-      confirmationModalService,
       securityGroupReader,
       $uibModal,
       gceSecurityGroupHelpTextService,
@@ -81,23 +83,23 @@ module.exports = angular
 
               // These come back from the global firewall endpoint as '[tag-a, tag-b]'
               if (typeof $scope.securityGroup.targetTags === 'string') {
-                let targetTags = $scope.securityGroup.targetTags;
+                const targetTags = $scope.securityGroup.targetTags;
                 $scope.securityGroup.targetTags = targetTags.substring(1, targetTags.length - 1).split(', ');
               }
               if (typeof $scope.securityGroup.sourceTags === 'string') {
-                let sourceTags = $scope.securityGroup.sourceTags;
+                const sourceTags = $scope.securityGroup.sourceTags;
                 $scope.securityGroup.sourceTags = sourceTags.substring(1, sourceTags.length - 1).split(', ');
               }
 
               // These come back from the global firewall endpoint as '[account-a@project.iam.gserviceaccount.com, account-b@project.iam.gserviceaccount.com]'
               if (typeof $scope.securityGroup.targetServiceAccounts === 'string') {
-                let targetServiceAccounts = $scope.securityGroup.targetServiceAccounts;
+                const targetServiceAccounts = $scope.securityGroup.targetServiceAccounts;
                 $scope.securityGroup.targetServiceAccounts = targetServiceAccounts
                   .substring(1, targetServiceAccounts.length - 1)
                   .split(', ');
               }
               if (typeof $scope.securityGroup.sourceServiceAccounts === 'string') {
-                let sourceServiceAccounts = $scope.securityGroup.sourceServiceAccounts;
+                const sourceServiceAccounts = $scope.securityGroup.sourceServiceAccounts;
                 $scope.securityGroup.sourceServiceAccounts = sourceServiceAccounts
                   .substring(1, sourceServiceAccounts.length - 1)
                   .split(', ');
@@ -237,12 +239,10 @@ module.exports = angular
           });
         };
 
-        confirmationModalService.confirm({
+        ConfirmationModalService.confirm({
           header: 'Really delete ' + securityGroup.name + '?',
           buttonText: 'Delete ' + securityGroup.name,
-          provider: 'gce',
           account: securityGroup.accountId,
-          applicationName: application.name,
           taskMonitorConfig: taskMonitor,
           submitMethod: submitMethod,
         });

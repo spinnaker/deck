@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { map, without } from 'lodash';
 import { Modal } from 'react-bootstrap';
 import { Form } from 'formik';
@@ -36,8 +36,8 @@ export function RenamePipelineModal(props: IRenamePipelineModalProps) {
 
   const validPipelineName = (): IValidator => {
     return (val: string) => {
-      const message = `${pipelineType} cannot contain: \\ ? % #`;
-      return val && !/^[^\\\^/^?^%^#]*$/i.test(val) && message;
+      const message = `${pipelineType} cannot contain: \\ ^ / ? % #`;
+      return val && !/^[^\\^/?%#]*$/i.test(val) && message;
     };
   };
 
@@ -66,7 +66,7 @@ export function RenamePipelineModal(props: IRenamePipelineModalProps) {
             <Modal key="modal" show={true} onHide={() => {}}>
               <ModalClose dismiss={dismissModal} />
               <Modal.Header>
-                <h3>Rename Pipeline</h3>
+                <Modal.Title>Rename Pipeline</Modal.Title>
               </Modal.Header>
               <Modal.Body>
                 {saveError && (

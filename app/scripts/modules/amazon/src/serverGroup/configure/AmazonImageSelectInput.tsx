@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { IPromise } from 'angular';
 import { $q } from 'ngimport';
 import { ReactSelectProps, HandlerRendererResult, MenuRendererProps, Option, OptionValues } from 'react-select';
@@ -343,7 +343,10 @@ export class AmazonImageSelectInput extends React.Component<IAmazonImageSelector
             filterOptions={false as any}
             noResultsText={searchNoResultsText}
             options={searchResults}
-            onInputChange={searchInput => this.searchInput$.next(searchInput)}
+            onInputChange={searchInput => {
+              this.searchInput$.next(searchInput);
+              return searchInput;
+            }}
             onChange={onChange}
           />
           {error}

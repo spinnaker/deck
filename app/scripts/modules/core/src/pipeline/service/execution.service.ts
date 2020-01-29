@@ -4,7 +4,7 @@ import { StateService } from '@uirouter/core';
 
 import { API } from 'core/api/ApiService';
 import { Application } from 'core/application/application.model';
-import { ExecutionsTransformer } from 'core/pipeline/service/ExecutionsTransformer';
+import { ExecutionsTransformer } from './ExecutionsTransformer';
 import { IExecution, IExecutionStage, IExecutionStageSummary } from 'core/domain';
 import { JsonUtils } from 'core/utils';
 import { SETTINGS } from 'core/config/settings';
@@ -15,7 +15,8 @@ import { ISortFilter } from 'core/filterModel';
 import { ExecutionState } from 'core/state';
 import { IRetryablePromise, retryablePromise } from 'core/utils/retryablePromise';
 import { ReactInjector } from 'core/reactShims';
-import { PipelineConfigService } from 'core/pipeline/config/services/PipelineConfigService';
+import { PipelineConfigService } from '../config/services/PipelineConfigService';
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
 export class ExecutionService {
   public get activeStatuses(): string[] {
@@ -232,9 +233,10 @@ export class ExecutionService {
   }
 
   private waitUntilPipelineIsCancelled(application: Application, executionId: string): IPromise<any> {
-    return this.waitUntilExecutionMatches(executionId, (execution: IExecution) => execution.status === 'CANCELED').then(
-      () => application.executions.refresh(),
-    );
+    return this.waitUntilExecutionMatches(
+      executionId,
+      (execution: IExecution) => execution.status === 'CANCELED',
+    ).then(() => application.executions.refresh());
   }
 
   private waitUntilPipelineIsDeleted(application: Application, executionId: string): IPromise<any> {
@@ -436,10 +438,10 @@ export class ExecutionService {
   public updateExecution(
     application: Application,
     updatedExecution: IExecution,
-    dataSource: ApplicationDataSource = application.executions,
+    dataSource: ApplicationDataSource<IExecution[]> = application.executions,
   ): void {
     if (dataSource.data && dataSource.data.length) {
-      dataSource.data.forEach((currentExecution: IExecution, idx: number) => {
+      dataSource.data.forEach((currentExecution, idx) => {
         if (updatedExecution.id === currentExecution.id) {
           updatedExecution.stringVal = this.stringifyExecution(updatedExecution);
           if (
@@ -562,7 +564,7 @@ export class ExecutionService {
 }
 
 export const EXECUTION_SERVICE = 'spinnaker.core.pipeline.executions.service';
-module(EXECUTION_SERVICE, [require('@uirouter/angularjs').default]).factory('executionService', [
+module(EXECUTION_SERVICE, [UIROUTER_ANGULARJS]).factory('executionService', [
   '$http',
   '$q',
   '$state',

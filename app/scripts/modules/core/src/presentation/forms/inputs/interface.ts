@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 
 import { FieldProps } from 'formik';
 import { IValidationCategory, IValidator } from '../validation';
@@ -21,12 +21,13 @@ export type OmitControlledInputPropsFrom<T> = Omit<T, keyof IControlledInputProp
 
 /** These props are used by Input components, such as TextInput */
 export interface IFormInputValidation {
-  touched?: boolean;
-  category?: IValidationCategory;
-  messageNode?: React.ReactNode;
-  hidden?: boolean;
-  addValidator?: (validator: IValidator) => void;
-  removeValidator?: (validator: IValidator) => void;
+  touched: boolean;
+  hidden: boolean;
+  category: IValidationCategory | undefined;
+  messageNode: React.ReactNode | undefined;
+  revalidate: () => void;
+  addValidator: (validator: IValidator) => void;
+  removeValidator: (validator: IValidator) => void;
 }
 
 /** These props are used by Form Input components, such as TextInput */

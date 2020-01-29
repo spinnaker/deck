@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { Modal } from 'react-bootstrap';
 
 import { IPipeline, IPipelineLock } from 'core/domain';
@@ -39,7 +39,7 @@ export function LockPipelineModal(props: ILockPipelineModalProps) {
       <Modal key="modal" show={true} onHide={() => {}}>
         <ModalClose dismiss={dismissModal} />
         <Modal.Header>
-          <h3>Really Lock Pipeline?</h3>
+          <Modal.Title>Really Lock Pipeline?</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {saveError && (

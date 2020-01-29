@@ -41,7 +41,7 @@ export * from './image';
 export * from './instance';
 
 export * from './loadBalancer';
-
+export * from './function';
 export * from './modal';
 
 export * from './managed';
@@ -77,6 +77,7 @@ export * from './serverGroup';
 export * from './serverGroupManager';
 export * from './serviceAccount';
 export * from './services';
+export * from './slack';
 export * from './state';
 export * from './storage';
 export * from './subnet';

@@ -18,12 +18,11 @@ export class StageSummaryController implements IController {
   private parser: Parser = new Parser();
   private renderer: HtmlRenderer = new HtmlRenderer();
 
-  public static $inject = ['$scope', '$stateParams', '$state', 'confirmationModalService', 'executionService'];
+  public static $inject = ['$scope', '$stateParams', '$state', 'executionService'];
   constructor(
     private $scope: IScope,
     private $stateParams: StateParams,
     private $state: StateService,
-    private confirmationModalService: ConfirmationModalService,
     private executionService: ExecutionService,
   ) {}
 
@@ -93,8 +92,8 @@ export class StageSummaryController implements IController {
   }
 
   public getTopLevelStage(): IExecutionStage {
-    let parentStageId = this.stage.parentStageId,
-      topLevelStage: IExecutionStage = this.stage;
+    let parentStageId = this.stage.parentStageId;
+    let topLevelStage: IExecutionStage = this.stage;
     while (parentStageId) {
       topLevelStage = this.execution.stages.find(stage => stage.id === parentStageId);
       parentStageId = topLevelStage.parentStageId;
@@ -104,13 +103,12 @@ export class StageSummaryController implements IController {
 
   public openManualSkipStageModal(): void {
     const topLevelStage = this.getTopLevelStage();
-    this.confirmationModalService.confirm({
+    ConfirmationModalService.confirm({
       header: 'Really skip this stage?',
       buttonText: 'Skip',
       askForReason: true,
       submitJustWithReason: true,
-      body: `
-        <div class="alert alert-warning">
+      body: `<div class="alert alert-warning">
           <b>Warning:</b> Skipping this stage may have unpredictable results.
           <ul>
             <li>Mutating changes initiated by this stage will continue and will need to be cleaned up manually.</li>

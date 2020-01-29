@@ -1,10 +1,9 @@
 'use strict';
 
+import * as angular from 'angular';
 import { CACHE_INITIALIZER_SERVICE } from 'core/cache/cacheInitializer.service';
 
 describe('Directives: regionSelectField', function() {
-  const angular = require('angular');
-
   beforeEach(function() {
     window.module(require('./regionSelectField.directive').name, CACHE_INITIALIZER_SERVICE, function($provide) {
       $provide.decorator('cacheInitializer', function() {

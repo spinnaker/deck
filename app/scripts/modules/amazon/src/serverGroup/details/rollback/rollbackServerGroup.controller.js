@@ -1,13 +1,16 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { get } from 'lodash';
 import { SERVER_GROUP_WRITER, TaskMonitor } from '@spinnaker/core';
 
-module.exports = angular
-  .module('spinnaker.amazon.serverGroup.details.rollback.controller', [SERVER_GROUP_WRITER])
-  .controller('awsRollbackServerGroupCtrl', [
+export const AMAZON_SERVERGROUP_DETAILS_ROLLBACK_ROLLBACKSERVERGROUP_CONTROLLER =
+  'spinnaker.amazon.serverGroup.details.rollback.controller';
+export const name = AMAZON_SERVERGROUP_DETAILS_ROLLBACK_ROLLBACKSERVERGROUP_CONTROLLER; // for backwards compatibility
+module(AMAZON_SERVERGROUP_DETAILS_ROLLBACK_ROLLBACKSERVERGROUP_CONTROLLER, [SERVER_GROUP_WRITER]).controller(
+  'awsRollbackServerGroupCtrl',
+  [
     '$scope',
     '$uibModalInstance',
     'serverGroupWriter',
@@ -31,9 +34,9 @@ module.exports = angular
       $scope.allServerGroups = allServerGroups.sort((a, b) => b.name.localeCompare(a.name));
       $scope.verification = {};
 
-      var desired = serverGroup.capacity.desired;
+      const desired = serverGroup.capacity.desired;
 
-      var rollbackType = 'EXPLICIT';
+      let rollbackType = 'EXPLICIT';
 
       if (allServerGroups.length === 0 && serverGroup.entityTags) {
         const previousServerGroup = get(serverGroup, 'entityTags.creationMetadata.value.previousServerGroup');
@@ -55,8 +58,9 @@ module.exports = angular
         }
       }
 
+      let healthyPercent;
       if (desired < 10) {
-        var healthyPercent = 100;
+        healthyPercent = 100;
       } else if (desired < 20) {
         // accept 1 instance in an unknown state during rollback
         healthyPercent = 90;
@@ -87,7 +91,7 @@ module.exports = angular
       }
 
       this.isValid = function() {
-        var command = $scope.command;
+        const command = $scope.command;
         if (!$scope.verification.verified) {
           return false;
         }
@@ -111,7 +115,7 @@ module.exports = angular
           return;
         }
 
-        var submitMethod = function() {
+        const submitMethod = function() {
           return serverGroupWriter.rollbackServerGroup(serverGroup, application, $scope.command);
         };
 
@@ -138,4 +142,5 @@ module.exports = angular
         return serverGroup.isDisabled ? 'Disabled Server Groups' : 'Enabled Server Groups';
       };
     },
-  ]);
+  ],
+);

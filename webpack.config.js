@@ -6,16 +6,20 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
+const { TypedCssModulesPlugin } = require('typed-css-modules-webpack-plugin');
 
 const CACHE_INVALIDATE = getCacheInvalidateString();
 const NODE_MODULE_PATH = path.join(__dirname, 'node_modules');
 const SETTINGS_PATH = process.env.SETTINGS_PATH || './settings.js';
 const THREADS = getThreadLoaderThreads();
+// Used to fail CI for PRs which contain linter errors
+const ESLINT_FAIL_ON_ERROR = process.env.ESLINT_FAIL_ON_ERROR === 'true';
 
 function configure(env, webpackOpts) {
   const WEBPACK_MODE = (webpackOpts && webpackOpts.mode) || 'development';
   const IS_PRODUCTION = WEBPACK_MODE === 'production';
 
+  // eslint-disable-next-line no-console
   console.log('Webpack mode: ' + WEBPACK_MODE);
 
   const config = {
@@ -81,6 +85,8 @@ function configure(env, webpackOpts) {
         '@spinnaker/kubernetes': path.join(__dirname, 'app', 'scripts', 'modules', 'kubernetes', 'src'),
         ecs: path.join(__dirname, 'app', 'scripts', 'modules', 'ecs', 'src'),
         '@spinnaker/ecs': path.join(__dirname, 'app', 'scripts', 'modules', 'ecs', 'src'),
+        huaweicloud: path.join(__dirname, 'app', 'scripts', 'modules', 'huaweicloud', 'src'),
+        '@spinnaker/huaweicloud': path.join(__dirname, 'app', 'scripts', 'modules', 'huaweicloud', 'src'),
         coreImports: path.resolve(
           __dirname,
           'app',
@@ -117,7 +123,7 @@ function configure(env, webpackOpts) {
             { loader: 'cache-loader', options: { cacheIdentifier: CACHE_INVALIDATE } },
             { loader: 'thread-loader', options: { workers: THREADS } },
             { loader: 'babel-loader' },
-            { loader: 'eslint-loader' },
+            { loader: 'eslint-loader', options: { failOnError: ESLINT_FAIL_ON_ERROR } },
           ],
           exclude: /(node_modules(?!\/clipboard)|settings\.js)/,
         },
@@ -127,7 +133,7 @@ function configure(env, webpackOpts) {
             { loader: 'cache-loader', options: { cacheIdentifier: CACHE_INVALIDATE } },
             { loader: 'thread-loader', options: { workers: THREADS } },
             { loader: 'ts-loader', options: { happyPackMode: true } },
-            { loader: 'tslint-loader' },
+            { loader: 'eslint-loader', options: { failOnError: ESLINT_FAIL_ON_ERROR } },
           ],
           exclude: /node_modules/,
         },
@@ -142,7 +148,22 @@ function configure(env, webpackOpts) {
         },
         {
           test: /\.css$/,
+          exclude: /\.module\.css$/,
           use: [{ loader: 'style-loader' }, { loader: 'css-loader' }, { loader: 'postcss-loader' }],
+        },
+        {
+          test: /\.module\.css$/i,
+          use: [
+            { loader: 'style-loader' },
+            {
+              loader: 'css-loader',
+              options: {
+                modules: true,
+                localIdentName: '[name]__[local]--[hash:base64:8]',
+              },
+            },
+            { loader: 'postcss-loader' },
+          ],
         },
         {
           test: /\.html$/,
@@ -163,11 +184,18 @@ function configure(env, webpackOpts) {
       ],
     },
     plugins: [
-      new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true, tslint: true }),
+      new TypedCssModulesPlugin({
+        globPattern: '**/*.module.css',
+      }),
+      new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true }),
       new CopyWebpackPlugin([
         {
           from: `${NODE_MODULE_PATH}/@spinnaker/styleguide/public/styleguide.html`,
           to: `./styleguide.html`,
+        },
+        {
+          from: `./plugin-manifest.js`,
+          to: `./plugin-manifest.js`,
         },
       ]),
       new HtmlWebpackPlugin({

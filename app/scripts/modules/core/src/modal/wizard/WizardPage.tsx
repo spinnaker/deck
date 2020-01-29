@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { isFunction, isEqual } from 'lodash';
 
 import { IWizardModalApi } from './WizardModal';
@@ -22,7 +22,7 @@ export interface IWizardPageProps {
   wizard: IWizardModalApi;
 }
 
-export interface IWizardPageState {
+interface IWizardPageState {
   errors: object;
   order: number;
   isLoading: boolean;

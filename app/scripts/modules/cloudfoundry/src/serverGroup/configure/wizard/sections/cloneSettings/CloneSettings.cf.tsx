@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 
 import { Observable, Subject } from 'rxjs';
 
@@ -11,15 +11,15 @@ import {
   IAccount,
   IDeploymentStrategy,
   IWizardPageComponent,
+  Markdown,
   ReactSelectInput,
   StageConstants,
 } from '@spinnaker/core';
 
-import { ICloudFoundryCreateServerGroupCommand } from 'cloudfoundry/serverGroup/configure/serverGroupConfigurationModel.cf';
+import { ICloudFoundryCreateServerGroupCommand } from '../../../serverGroupConfigurationModel.cf';
 import { FormikAccountRegionClusterSelector } from 'cloudfoundry/presentation';
 
 import 'cloudfoundry/common/cloudFoundry.less';
-import * as DOMPurify from 'dompurify';
 
 export interface ICloudFoundryCloneSettingsProps {
   formik: FormikProps<ICloudFoundryCreateServerGroupCommand>;
@@ -52,10 +52,10 @@ export class CloudFoundryServerGroupCloneSettings
     return (
       <div className="body-regular">
         <strong>
-          <span dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(option.label) }} />
+          <Markdown tag="span" message={option.label} />
         </strong>
         <div>
-          <span dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(option.description) }} />
+          <Markdown tag="span" message={option.description} />
         </div>
       </div>
     );

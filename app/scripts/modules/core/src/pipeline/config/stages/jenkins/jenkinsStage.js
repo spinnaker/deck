@@ -6,10 +6,11 @@ import { IgorService, BuildServiceType } from 'core/ci/igor.service';
 import { JenkinsExecutionLabel } from './JenkinsExecutionLabel';
 import { pickBy } from 'lodash';
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular
-  .module('spinnaker.core.pipeline.stage.jenkinsStage', [])
+export const CORE_PIPELINE_CONFIG_STAGES_JENKINS_JENKINSSTAGE = 'spinnaker.core.pipeline.stage.jenkinsStage';
+export const name = CORE_PIPELINE_CONFIG_STAGES_JENKINS_JENKINSSTAGE; // for backwards compatibility
+module(CORE_PIPELINE_CONFIG_STAGES_JENKINS_JENKINSSTAGE, [])
   .config(function() {
     Registry.pipeline.registerStage({
       label: 'Jenkins',
@@ -27,7 +28,7 @@ module.exports = angular
         if (!stage.masterStage.context || !stage.masterStage.context.buildInfo) {
           return 0;
         }
-        let lines = stage.masterStage.context.buildInfo.number ? 1 : 0;
+        const lines = stage.masterStage.context.buildInfo.number ? 1 : 0;
         return lines + (stage.masterStage.context.buildInfo.testResults || []).length;
       },
       supportsCustomTimeout: true,
@@ -79,8 +80,8 @@ module.exports = angular
 
       function updateJobsList() {
         if ($scope.stage && $scope.stage.master) {
-          let master = $scope.stage.master,
-            job = $scope.stage.job || '';
+          const master = $scope.stage.master;
+          const job = $scope.stage.job || '';
           $scope.viewState.masterIsParameterized = master.includes('${');
           $scope.viewState.jobIsParameterized = job.includes('${');
           if ($scope.viewState.masterIsParameterized || $scope.viewState.jobIsParameterized) {
@@ -104,8 +105,8 @@ module.exports = angular
       }
 
       function updateJobConfig() {
-        let stage = $scope.stage,
-          view = $scope.viewState;
+        const stage = $scope.stage;
+        const view = $scope.viewState;
 
         if (stage && stage.master && stage.job && !view.masterIsParameterized && !view.jobIsParameterized) {
           IgorService.getJobConfig($scope.stage.master, $scope.stage.job).then(config => {
@@ -125,7 +126,7 @@ module.exports = angular
               );
             }
 
-            let params = $scope.jobParams || [];
+            const params = $scope.jobParams || [];
             params.forEach(property => {
               if (!(property.name in $scope.stage.parameters) && property.defaultValue !== null) {
                 $scope.useDefaultParameters[property.name] = true;

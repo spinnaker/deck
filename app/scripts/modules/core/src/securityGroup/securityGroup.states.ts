@@ -9,11 +9,12 @@ import {
   ApplicationModelBuilder,
 } from 'core/application';
 import { SkinService } from 'core/cloudProvider';
-import { FirewallLabels } from 'core/securityGroup/label';
+import { FirewallLabels } from './label';
 
 import { SecurityGroupReader } from './securityGroupReader.service';
 import { filterModelConfig } from './filter/SecurityGroupFilterModel';
 import { SecurityGroupDetails } from './SecurityGroupDetails';
+import { SecurityGroups } from './SecurityGroups';
 
 export const SECURITY_GROUP_STATES = 'spinnaker.core.securityGroup.states';
 module(SECURITY_GROUP_STATES, [APPLICATION_STATE_PROVIDER, STATE_CONFIG_PROVIDER]).config([
@@ -71,9 +72,8 @@ module(SECURITY_GROUP_STATES, [APPLICATION_STATE_PROVIDER, STATE_CONFIG_PROVIDER
           template: '<security-group-filter app="$resolve.app"></security-group-filter>',
         },
         master: {
-          templateUrl: require('../securityGroup/all.html'),
-          controller: 'AllSecurityGroupsCtrl',
-          controllerAs: 'ctrl',
+          component: SecurityGroups,
+          $type: 'react',
         },
       },
       params: stateConfigProvider.buildDynamicParams(filterModelConfig),

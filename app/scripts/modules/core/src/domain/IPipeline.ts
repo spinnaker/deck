@@ -1,6 +1,6 @@
 import { IStage } from './IStage';
 import { ITrigger } from './ITrigger';
-import { IExpectedArtifact } from 'core/domain/IExpectedArtifact';
+import { IExpectedArtifact } from './IExpectedArtifact';
 import { IEntityTags } from './IEntityTags';
 import { INotification } from './INotification';
 
@@ -83,9 +83,9 @@ export interface IPipelineCommand {
 }
 
 export interface IPipelineRef {
-  application: String;
-  name: String;
-  id?: String;
+  application: string;
+  name: string;
+  id?: string;
 }
 
 export interface ITemplateInheritable {

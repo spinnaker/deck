@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 
 import { IPipeline } from 'core/domain';
 import { IFormikStageConfigInjectedProps, StageConfigField } from 'core/pipeline';
@@ -47,7 +47,6 @@ export class BakeManifestStageForm extends React.Component<
                 this.props.formik.setFieldValue('templateRenderer', o.target.value);
               }}
               value={stage.templateRenderer}
-              validation={{}}
               stringOptions={this.templateRenderers()}
             />
           </StageConfigField>

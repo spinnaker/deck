@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { Button, Modal } from 'react-bootstrap';
 
 import {
@@ -8,7 +8,9 @@ import {
   ReactModal,
   noop,
   CloudProviderRegistry,
+  Markdown,
 } from '@spinnaker/core';
+import { AWSProviderSettings } from 'amazon/aws.settings';
 
 import { IAmazonLoadBalancerConfig, LoadBalancerTypes } from './LoadBalancerTypes';
 
@@ -65,7 +67,7 @@ export class AmazonLoadBalancerChoiceModal extends React.Component<
   };
 
   private getIncompatibility(choice: IAmazonLoadBalancerConfig, cloudProvider: string): ILoadBalancerIncompatibility {
-    const { loadBalancer } = CloudProviderRegistry.getProvider(cloudProvider);
+    const { loadBalancer = {} } = CloudProviderRegistry.getProvider(cloudProvider);
     const {
       incompatibleLoadBalancerTypes = [],
     }: { incompatibleLoadBalancerTypes: ILoadBalancerIncompatibility[] } = loadBalancer;
@@ -102,6 +104,10 @@ export class AmazonLoadBalancerChoiceModal extends React.Component<
       .map(cloudProvider => this.getIncompatibility(selectedChoice, cloudProvider))
       .filter((x: ILoadBalancerIncompatibility) => x);
 
+    const loadBalancerWarning =
+      AWSProviderSettings.createLoadBalancerWarnings &&
+      AWSProviderSettings.createLoadBalancerWarnings[selectedChoice.type];
+
     return (
       <>
         <ModalClose dismiss={this.close} />
@@ -133,6 +139,14 @@ export class AmazonLoadBalancerChoiceModal extends React.Component<
                   </div>
                 ))}
             </>
+            {!!loadBalancerWarning && (
+              <div className="alert alert-warning">
+                <p>
+                  <i className="fa fa-exclamation-triangle" />
+                  <Markdown message={loadBalancerWarning} style={{ display: 'inline-block', marginLeft: '2px' }} />
+                </p>
+              </div>
+            )}
             <div className="load-balancer-description" />
           </div>
         </Modal.Body>

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 
 import { capitalize, get } from 'lodash';
 import { Option } from 'react-select';
@@ -8,10 +8,10 @@ import { IPromise } from 'angular';
 import { Observable, Subject } from 'rxjs';
 
 import { IBuild, IBuildInfo, IBuildTrigger, IPipelineCommand } from 'core/domain';
-import { ITriggerTemplateComponentProps } from 'core/pipeline/manualExecution/TriggerTemplate';
+import { ITriggerTemplateComponentProps } from '../../../manualExecution/TriggerTemplate';
 import { IgorService, BuildServiceType } from 'core/ci';
 import { Spinner } from 'core/widgets/spinners/Spinner';
-import { buildDisplayName } from 'core/pipeline/executionBuild/buildDisplayName.filter';
+import { buildDisplayName } from '../../../executionBuild/buildDisplayName.filter';
 import { timestamp } from 'core/utils/timeFormatters';
 import { TetheredSelect } from 'core/presentation/TetheredSelect';
 import { TextInput } from 'core/presentation';

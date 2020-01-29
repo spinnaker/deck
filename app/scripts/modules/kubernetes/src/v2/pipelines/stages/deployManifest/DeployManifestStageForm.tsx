@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { capitalize, get, isEmpty, map } from 'lodash';
 import { Option } from 'react-select';
 
@@ -106,7 +106,10 @@ export class DeployManifestStageForm extends React.Component<
       'requiredArtifactIds',
       bindings.filter(b => b.expectedArtifactId).map(b => b.expectedArtifactId),
     );
-    this.props.formik.setFieldValue('requiredArtifacts', bindings.filter(b => b.artifact));
+    this.props.formik.setFieldValue(
+      'requiredArtifacts',
+      bindings.filter(b => b.artifact),
+    );
   };
 
   private overrideNamespaceChange(checked: boolean) {

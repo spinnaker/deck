@@ -27,6 +27,7 @@ import { RECENT_HISTORY_SERVICE } from 'core/history';
 require('root/app/fonts/spinnaker/icons.css');
 
 import './analytics/GoogleAnalyticsInitializer';
+import { sharedLibraries } from './plugins/sharedLibraries';
 import { ANALYTICS_MODULE } from './analytics/angulartics.module';
 import { APPLICATION_BOOTSTRAP_MODULE } from './bootstrap';
 import { APPLICATION_MODULE } from './application/application.module';
@@ -46,6 +47,8 @@ import { INSIGHT_MODULE } from './insight/insight.module';
 import { INTERCEPTOR_MODULE } from './interceptor/interceptor.module';
 import { LOAD_BALANCER_MODULE } from './loadBalancer/loadBalancer.module';
 import { MANAGED_RESOURCE_CONFIG } from './application/config/managedResources/ManagedResourceConfig';
+import { MANAGED_RESOURCES_DATA_SOURCE } from './managed';
+import { FUNCTION_MODULE } from './function/function.module';
 
 import { NETWORK_INTERCEPTOR } from './api/network.interceptor';
 
@@ -53,10 +56,12 @@ import { PAGE_TITLE_MODULE } from './pageTitle/pageTitle.module';
 import { PAGER_DUTY_MODULE } from 'core/pagerDuty/pagerDuty.module';
 import { PIPELINE_MODULE } from './pipeline/pipeline.module';
 import { PIPELINE_TEMPLATE_MODULE } from './pipeline/config/templates/pipelineTemplate.module';
+import { PLUGINS_MODULE } from './plugins';
 import { REACT_MODULE } from './reactShims';
 import { REGION_MODULE } from './region/region.module';
 import { SERVERGROUP_MODULE } from './serverGroup/serverGroup.module';
 import { SERVER_GROUP_MANAGER_MODULE } from './serverGroupManager/serverGroupManager.module';
+import { SLACK_COMPONENT } from './slack';
 import { STYLEGUIDE_MODULE } from './styleguide/styleguide.module';
 import { SUBNET_MODULE } from './subnet/subnet.module';
 
@@ -67,6 +72,22 @@ import { WHATS_NEW_MODULE } from './whatsNew/whatsNew.module';
 import { WIDGETS_MODULE } from './widgets/widgets.module';
 
 import * as State from './state';
+import { CORE_FORMS_FORMS_MODULE } from './forms/forms.module';
+import { CORE_INSTANCE_INSTANCE_MODULE } from './instance/instance.module';
+import { CORE_MODAL_MODAL_MODULE } from './modal/modal.module';
+import { CORE_NOTIFICATION_NOTIFICATIONS_MODULE } from './notification/notifications.module';
+import { CORE_PRESENTATION_PRESENTATION_MODULE } from './presentation/presentation.module';
+import { CORE_PROJECTS_PROJECTS_MODULE } from './projects/projects.module';
+import { CORE_SEARCH_SEARCH_MODULE } from './search/search.module';
+import { CORE_SECURITYGROUP_SECURITYGROUP_MODULE } from './securityGroup/securityGroup.module';
+import { CORE_TASK_TASK_MODULE } from './task/task.module';
+import { CORE_UTILS_UTILS_MODULE } from './utils/utils.module';
+import { CORE_VALIDATION_VALIDATION_MODULE } from './validation/validation.module';
+import ANGULAR_MESSAGES from 'angular-messages';
+import ANGULAR_SANITIZE from 'angular-sanitize';
+import { angularSpinner } from 'angular-spinner';
+import ANGULAR_UI_BOOTSTRAP from 'angular-ui-bootstrap';
+import UI_SELECT from 'ui-select';
 
 // load all templates into the $templateCache
 const templates = require.context('./', true, /\.html$/);
@@ -74,17 +95,19 @@ templates.keys().forEach(function(key) {
   templates(key);
 });
 
+sharedLibraries.exposeSharedLibraries();
+
 export const CORE_MODULE = 'spinnaker.core';
 module(CORE_MODULE, [
-  require('angular-messages'),
-  require('angular-sanitize'),
+  ANGULAR_MESSAGES,
+  ANGULAR_SANITIZE,
   UI_ROUTER,
   UI_ROUTER_STATE_EVENTS_SHIM,
   UI_ROUTER_REACT_HYBRID,
   REACT_MODULE, // must precede modules which register states
-  require('angular-ui-bootstrap'),
-  require('ui-select'),
-  require('angular-spinner').angularSpinner.name,
+  ANGULAR_UI_BOOTSTRAP as any,
+  UI_SELECT,
+  angularSpinner.name,
 
   ANALYTICS_MODULE,
   APPLICATION_MODULE,
@@ -103,50 +126,53 @@ module(CORE_MODULE, [
   ENTITY_TAGS_MODULE,
 
   FIREWALL_LABEL_COMPONENT,
-  require('./forms/forms.module').name,
+  CORE_FORMS_FORMS_MODULE,
 
   HEALTH_COUNTS_MODULE,
   HELP_MODULE,
 
   INSIGHT_MODULE,
-  require('./instance/instance.module').name,
+  CORE_INSTANCE_INSTANCE_MODULE,
   INTERCEPTOR_MODULE,
 
   LABEL_FILTER_COMPONENT,
   LOAD_BALANCER_MODULE,
-
+  FUNCTION_MODULE,
   MANAGED_RESOURCE_CONFIG,
-  require('./modal/modal.module').name,
+  MANAGED_RESOURCES_DATA_SOURCE,
+  CORE_MODAL_MODAL_MODULE,
 
   NETWORK_INTERCEPTOR,
 
-  require('./notification/notifications.module').name,
+  CORE_NOTIFICATION_NOTIFICATIONS_MODULE,
 
   PAGE_TITLE_MODULE,
   PAGER_DUTY_MODULE,
   PIPELINE_TEMPLATE_MODULE,
   PIPELINE_MODULE,
-  require('./presentation/presentation.module').name,
-  require('./projects/projects.module').name,
+  PLUGINS_MODULE,
+  CORE_PRESENTATION_PRESENTATION_MODULE,
+  CORE_PROJECTS_PROJECTS_MODULE,
 
   RECENT_HISTORY_SERVICE,
   REGION_MODULE,
 
-  require('./search/search.module').name,
-  require('./securityGroup/securityGroup.module').name,
+  CORE_SEARCH_SEARCH_MODULE,
+  CORE_SECURITYGROUP_SECURITYGROUP_MODULE,
   SERVERGROUP_MODULE,
   SERVER_GROUP_MANAGER_MODULE,
+  SLACK_COMPONENT,
   STYLEGUIDE_MODULE,
   SUBNET_MODULE,
 
-  require('./task/task.module').name,
+  CORE_TASK_TASK_MODULE,
 
-  require('./utils/utils.module').name,
+  CORE_UTILS_UTILS_MODULE,
 
   WHATS_NEW_MODULE,
   WIDGETS_MODULE,
 
-  require('./validation/validation.module').name,
+  CORE_VALIDATION_VALIDATION_MODULE,
 ]).run(() => {
   // initialize all the stateful services
   State.initialize();

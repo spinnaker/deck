@@ -2,35 +2,41 @@
 
 import _ from 'lodash';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { AccountService, Registry } from '@spinnaker/core';
 
 import { DOCKER_IMAGE_AND_TAG_SELECTOR_COMPONENT } from './dockerImageAndTagSelector.component';
 import { DcosProviderSettings } from '../../../dcos.settings';
+import { DCOS_JOB_GENERAL_COMPONENT } from 'dcos/job/general.component';
+import { DCOS_JOB_LABELS_COMPONENT } from 'dcos/job/labels.component';
 
-module.exports = angular
-  .module('spinnaker.dcos.pipeline.stage.runJobStage', [
-    require('dcos/job/general.component').name,
-    //TODO Add back when scheduled jobs are supported better by Spinnaker
-    //require('dcos/job/schedule.component').name,
-    require('dcos/job/labels.component').name,
-    DOCKER_IMAGE_AND_TAG_SELECTOR_COMPONENT,
-  ])
+export const DCOS_PIPELINE_STAGES_RUNJOB_RUNJOBSTAGE = 'spinnaker.dcos.pipeline.stage.runJobStage';
+export const name = DCOS_PIPELINE_STAGES_RUNJOB_RUNJOBSTAGE; // for backwards compatibility
+module(DCOS_PIPELINE_STAGES_RUNJOB_RUNJOBSTAGE, [
+  DCOS_JOB_GENERAL_COMPONENT,
+  //TODO Add back when scheduled jobs are supported better by Spinnaker
+  //require('dcos/job/schedule.component').name,
+  DCOS_JOB_LABELS_COMPONENT,
+  DOCKER_IMAGE_AND_TAG_SELECTOR_COMPONENT,
+])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'runJob',
       cloudProvider: 'dcos',
       templateUrl: require('./runJobStage.html'),
       executionDetailsUrl: require('./runJobExecutionDetails.html'),
-      validators: [{ type: 'requiredField', fieldName: 'account' }, { type: 'requiredField', fieldName: 'general.id' }],
+      validators: [
+        { type: 'requiredField', fieldName: 'account' },
+        { type: 'requiredField', fieldName: 'general.id' },
+      ],
     });
   })
   .controller('dcosRunJobStageCtrl', [
     '$scope',
     '$q',
     function($scope, $q) {
-      let stage = $scope.stage;
+      const stage = $scope.stage;
       this.stage = $scope.stage;
 
       if (!_.has(stage, 'name')) {
@@ -68,14 +74,14 @@ module.exports = angular
       };
 
       function attemptToSetValidAccount(accountsByName, stage) {
-        var defaultAccount = DcosProviderSettings.defaults.account;
-        var dcosAccountNames = _.keys(accountsByName);
-        var firstDcosAccount = null;
+        const defaultAccount = DcosProviderSettings.defaults.account;
+        const dcosAccountNames = _.keys(accountsByName);
+        let firstDcosAccount = null;
         if (dcosAccountNames.length) {
           firstDcosAccount = dcosAccountNames[0];
         }
 
-        var defaultAccountIsValid = defaultAccount && dcosAccountNames.includes(defaultAccount);
+        const defaultAccountIsValid = defaultAccount && dcosAccountNames.includes(defaultAccount);
 
         stage.account = defaultAccountIsValid
           ? defaultAccount
@@ -87,12 +93,12 @@ module.exports = angular
       }
 
       function attemptToSetValidDcosCluster(dcosAccountsByName, stage) {
-        var defaultDcosCluster = DcosProviderSettings.defaults.dcosCluster;
-        var selectedAccount = dcosAccountsByName[stage.account];
+        const defaultDcosCluster = DcosProviderSettings.defaults.dcosCluster;
+        const selectedAccount = dcosAccountsByName[stage.account];
 
         if (selectedAccount) {
-          var clusterNames = _.map(selectedAccount.dcosClusters, 'name');
-          var defaultDcosClusterIsValid = defaultDcosCluster && clusterNames.includes(defaultDcosCluster);
+          const clusterNames = _.map(selectedAccount.dcosClusters, 'name');
+          const defaultDcosClusterIsValid = defaultDcosCluster && clusterNames.includes(defaultDcosCluster);
           stage.dcosCluster = defaultDcosClusterIsValid
             ? defaultDcosCluster
             : clusterNames.length == 1

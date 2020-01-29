@@ -1,11 +1,11 @@
-import * as React from 'react';
+import React from 'react';
 import Select, { Option, OptionValues, ReactSelectProps } from 'react-select';
 import VirtualizedSelect from 'react-virtualized-select';
 import { isNil } from 'lodash';
 
 import { noop } from 'core/utils';
 
-import { IFormInputProps, OmitControlledInputPropsFrom } from './interface';
+import { IFormInputProps, IFormInputValidation, OmitControlledInputPropsFrom } from './interface';
 import { createFakeReactSyntheticEvent, isStringArray, orEmptyString } from './utils';
 import { StringsAsOptions } from './StringsAsOptions';
 import { useValidationData } from '../validation';
@@ -58,13 +58,13 @@ export const reactSelectOnBlurAdapter = (name: string, value: any, onBlur: IReac
  *
  * This component does not attempt to support async loading
  */
-export function ReactSelectInput(props: IReactSelectInputProps) {
+export function ReactSelectInput<T = string>(props: IReactSelectInputProps<T>) {
   const {
     name,
     onChange,
     onBlur,
     value,
-    validation = {},
+    validation = {} as IFormInputValidation,
     stringOptions,
     options: optionOptions,
     ignoreAccents: accents,
@@ -85,9 +85,9 @@ export function ReactSelectInput(props: IReactSelectInputProps) {
     onChange: reactSelectOnChangeAdapter(name, onChange),
   };
 
-  const commonProps = { className, style, ignoreAccents, ...fieldProps, ...otherProps };
+  const commonProps = { className, style, ignoreAccents, ...fieldProps, ...otherProps } as any;
 
-  const SelectElement = ({ options }: { options: IReactSelectInputProps['options'] }) =>
+  const SelectElement = ({ options }: { options: any[] }) =>
     mode === 'TETHERED' ? (
       <TetheredSelect {...commonProps} options={options} />
     ) : mode === 'VIRTUALIZED' ? (

@@ -1,9 +1,9 @@
-import * as React from 'react';
+import React from 'react';
 import { find, get } from 'lodash';
 
 import { AccountTag } from 'core/account';
 import { ReactInjector } from 'core/reactShims';
-import { ExecutionDetailsSection, IExecutionDetailsSectionProps } from 'core/pipeline/config/stages/common';
+import { ExecutionDetailsSection, IExecutionDetailsSectionProps } from '../common';
 import { StageFailureMessage } from 'core/pipeline';
 import { ClusterState } from 'core/state';
 import { UrlBuilder } from 'core/navigation';

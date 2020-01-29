@@ -1,8 +1,10 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular.module('spinnaker.widgets.spelSelect.component', []).component('spelSelect', {
+export const CORE_WIDGETS_SPELTEXT_SPELSELECT_COMPONENT = 'spinnaker.widgets.spelSelect.component';
+export const name = CORE_WIDGETS_SPELTEXT_SPELSELECT_COMPONENT; // for backwards compatibility
+module(CORE_WIDGETS_SPELTEXT_SPELSELECT_COMPONENT, []).component('spelSelect', {
   template: `
       <div class="navbar-form" style="padding: 0 ;">
         <div class="button-input" ng-class="{select: $ctrl.selectActive, text: $ctrl.textActive, focus: $ctrl.isGlowing}">
@@ -49,11 +51,11 @@ module.exports = angular.module('spinnaker.widgets.spelSelect.component', []).co
   },
   transclude: true,
   controller: function() {
-    let ctrl = this;
-    let select = 'select';
-    let textType = 'text';
+    const ctrl = this;
+    const select = 'select';
+    const textType = 'text';
 
-    let setState = inputType => {
+    const setState = inputType => {
       if (inputType == textType) {
         ctrl.expressionActive = true;
         ctrl.selectActive = false;

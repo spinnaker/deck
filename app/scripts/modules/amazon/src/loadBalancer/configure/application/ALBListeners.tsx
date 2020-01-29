@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { $q } from 'ngimport';
 import { SortableContainer, SortableElement, SortableHandle, arrayMove, SortEnd } from 'react-sortable-hoc';
 import { difference, flatten, get, some, uniq } from 'lodash';
@@ -6,10 +6,10 @@ import { FormikErrors, FormikProps } from 'formik';
 
 import {
   Application,
+  ConfirmationModalService,
   CustomLabels,
   HelpField,
   IWizardPageComponent,
-  ReactInjector,
   Tooltip,
   ValidationMessage,
 } from '@spinnaker/core';
@@ -30,7 +30,7 @@ import {
   IListenerActionType,
 } from 'amazon/domain';
 import { AmazonCertificateReader } from 'amazon/certificates/AmazonCertificateReader';
-import { IAuthenticateOidcActionConfig, OidcConfigReader } from 'amazon/loadBalancer/OidcConfigReader';
+import { IAuthenticateOidcActionConfig, OidcConfigReader } from '../../OidcConfigReader';
 
 import { ConfigureOidcConfigModal } from './ConfigureOidcConfigModal';
 import { AmazonCertificateSelectField } from '../common/AmazonCertificateSelectField';
@@ -45,15 +45,6 @@ export interface IALBListenersState {
 const DragHandle = SortableHandle(() => (
   <span className="pipeline-drag-handle clickable glyphicon glyphicon-resize-vertical" />
 ));
-export interface IAuthenticateOidcActionConfig {
-  authorizationEndpoint: string;
-  clientId: string;
-  issuer: string;
-  scope: string;
-  sessionCookieName: string;
-  tokenEndpoint: string;
-  userInfoEndpoint: string;
-}
 
 const defaultAuthAction = {
   authenticateOidcConfig: {
@@ -412,7 +403,7 @@ export class ALBListeners extends React.Component<IALBListenersProps, IALBListen
 
     if (confirmDefaultRemove || confirmRemove) {
       // TODO: Confirmation Dialog first.
-      ReactInjector.confirmationModalService.confirm({
+      ConfirmationModalService.confirm({
         header: 'Really remove authentication?',
         buttonText: `Remove Auth`,
         submitMethod: () => {
@@ -425,7 +416,6 @@ export class ALBListeners extends React.Component<IALBListenersProps, IALBListen
           }
           return $q.resolve();
         },
-        windowClass: 'zindex-top',
       });
     } else {
       this.removeAuthActionInternal(listener, actions, authIndex, ruleIndex);

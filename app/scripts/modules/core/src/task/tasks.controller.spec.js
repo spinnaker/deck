@@ -1,4 +1,5 @@
 import { ApplicationModelBuilder } from 'core/application/applicationModel.builder';
+import { ConfirmationModalService } from 'core/confirmationModal';
 import { TaskWriter } from './task.write.service';
 
 describe('Controller: tasks', function() {
@@ -13,22 +14,20 @@ describe('Controller: tasks', function() {
       $q = _$q_;
 
       this.initializeController = tasks => {
-        let application = ApplicationModelBuilder.createApplicationForTests('app', { key: 'tasks', lazy: true });
+        let application = ApplicationModelBuilder.createApplicationForTests('app', {
+          key: 'tasks',
+          lazy: true,
+          defaultData: [],
+        });
         application.tasks.activate = angular.noop;
         application.tasks.data = tasks || [];
         application.tasks.loaded = true;
         application.tasks.dataUpdated();
 
-        let confirmationModalService = {
-          confirm: function(params) {
-            $q.when(null).then(params.submitMethod);
-          },
-        };
         scope = $rootScope.$new();
         controller = $controller('TasksCtrl', {
           app: application,
           $scope: scope,
-          confirmationModalService: confirmationModalService,
         });
       };
     }),
@@ -71,6 +70,7 @@ describe('Controller: tasks', function() {
 
       this.initializeController(tasks);
       spyOn(controller.application.tasks, 'refresh').and.callFake(() => taskReloadCalls++);
+      spyOn(ConfirmationModalService, 'confirm').and.callFake(params => $q.when().then(params.submitMethod));
       scope.$digest();
 
       expect(taskReloadCalls).toBe(0);
@@ -85,7 +85,10 @@ describe('Controller: tasks', function() {
   });
 
   describe('Filtering Task list with one running task', function() {
-    var tasks = [{ isActive: false, name: 'a' }, { isActive: true, name: 'a' }];
+    var tasks = [
+      { isActive: false, name: 'a' },
+      { isActive: true, name: 'a' },
+    ];
 
     it('should sort the tasks with the RUNNING status at the top', function() {
       this.initializeController(tasks);
@@ -96,7 +99,10 @@ describe('Controller: tasks', function() {
   });
 
   describe('Filtering Task list by startTime in descending order with only running task', function() {
-    var tasks = [{ isActive: true, startTime: 20, name: 'a' }, { isActive: true, startTime: 99, name: 'a' }];
+    var tasks = [
+      { isActive: true, startTime: 20, name: 'a' },
+      { isActive: true, startTime: 99, name: 'a' },
+    ];
 
     it('should sort the tasks with the RUNNING status at the top', function() {
       this.initializeController(tasks);
@@ -111,7 +117,10 @@ describe('Controller: tasks', function() {
   });
 
   describe('Filtering Task list with zero running task', function() {
-    var tasks = [{ isActive: false, startTime: 22, name: 'a' }, { isActive: false, startTime: 100, name: 'a' }];
+    var tasks = [
+      { isActive: false, startTime: 22, name: 'a' },
+      { isActive: false, startTime: 100, name: 'a' },
+    ];
 
     it('should sort the tasks in descending order by startTime', function() {
       this.initializeController(tasks);

@@ -1,7 +1,7 @@
 <div class="modal-page">
   <modal-close dismiss="$dismiss()"></modal-close>
   <div class="modal-header">
-    <h3 data-purpose="modal-header">New Application</h3>
+    <h4 class="modal-title">New Application</h4>
   </div>
   <div ng-if="newAppModal.state.initializing" style="height: 200px">
     <loading-spinner size="'medium'"></loading-spinner>
@@ -127,6 +127,13 @@
 
       <render-if-feature feature="pagerDuty">
         <pager-duty-select-field component="newAppModal.application"></pager-duty-select-field>
+      </render-if-feature>
+
+      <render-if-feature feature="slack">
+        <slack-channel-selector
+          channel="newAppModal.application.slackChannel"
+          callback="newAppModal.setAttribute"
+        ></slack-channel-selector>
       </render-if-feature>
 
       <div class="form-group row">

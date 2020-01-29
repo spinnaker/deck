@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 
 import { IExpectedArtifact, IStage, IPipeline } from 'core/domain';
 import { ExpectedArtifactModal, ArtifactTypePatterns } from 'core/artifact';
@@ -18,7 +18,10 @@ export const ProducesArtifacts: React.SFC<IProducesArtifactsProps> = props => {
 
   const removeExpectedArtifact = (artifact: IExpectedArtifact) => {
     const producesAfterRemove = produces.slice(0);
-    producesAfterRemove.splice(produces.findIndex(a => artifact.id === a.id), 1);
+    producesAfterRemove.splice(
+      produces.findIndex(a => artifact.id === a.id),
+      1,
+    );
     onProducesChanged(producesAfterRemove, stage);
   };
 

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { Observable, Subject } from 'rxjs';
 import { find, get } from 'lodash';
 
@@ -18,7 +18,7 @@ import {
   IStage,
   Registry,
   StageConfigField,
-} from '@spinnaker/core';
+} from 'core';
 
 export interface IPreRewriteArtifactSelectorProps {
   excludedArtifactTypePatterns?: RegExp[];

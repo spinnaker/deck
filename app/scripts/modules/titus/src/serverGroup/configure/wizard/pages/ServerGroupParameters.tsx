@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { Field, FormikProps } from 'formik';
 import Select, { Option } from 'react-select';
 
@@ -15,7 +15,7 @@ import {
 
 import { ITitusServerGroupCommand } from '../../../configure/serverGroupConfiguration.service';
 import { intersection, set, union } from 'lodash';
-import { enabledProcesses, processesList } from 'titus/serverGroup/details/serviceJobProcesses/ServiceJobProcesses';
+import { enabledProcesses, processesList } from '../../../details/serviceJobProcesses/ServiceJobProcesses';
 import { ITitusServiceJobProcesses } from 'titus/domain/ITitusServiceJobProcesses';
 
 export interface IServerGroupParametersProps {
@@ -134,9 +134,8 @@ export class ServerGroupParameters extends React.Component<IServerGroupParameter
                 setFieldValue(
                   'serviceJobProcesses',
                   union(processesList, Object.keys(values.serviceJobProcesses)).reduce(
-                    (processes: ITitusServiceJobProcesses, process: string) =>
-                      set(processes, process, e.target.value.includes(process)),
-                    {},
+                    (processes, process: string) => set(processes, process, !!e.target.value.includes(process)),
+                    {} as ITitusServiceJobProcesses,
                   ),
                 )
               }

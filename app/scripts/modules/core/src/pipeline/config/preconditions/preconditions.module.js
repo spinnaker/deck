@@ -1,12 +1,20 @@
-'use strict';
+import { CORE_PIPELINE_CONFIG_PRECONDITIONS_PRECONDITIONTYPECONFIG_PROVIDER } from './preconditionTypeConfig.provider';
+import { CORE_PIPELINE_CONFIG_PRECONDITIONS_SELECTOR_PRECONDITIONSELECTOR_DIRECTIVE } from './selector/preconditionSelector.directive';
+import { CORE_PIPELINE_CONFIG_PRECONDITIONS_PRECONDITIONLIST_DIRECTIVE } from './preconditionList.directive';
+import { CORE_PIPELINE_CONFIG_PRECONDITIONS_PRECONDITIONTYPE_SERVICE } from './preconditionType.service';
+import { CORE_PIPELINE_CONFIG_PRECONDITIONS_MODAL_EDITPRECONDITION_CONTROLLER_MODAL } from './modal/editPrecondition.controller.modal';
+import { CORE_PIPELINE_CONFIG_PRECONDITIONS_PRECONDITION_DETAILS_FILTER } from './precondition.details.filter';
+('use strict');
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular.module('spinnaker.core.pipeline.config.preconditions', [
-  require('./preconditionTypeConfig.provider').name,
-  require('./selector/preconditionSelector.directive').name,
-  require('./preconditionList.directive').name,
-  require('./preconditionType.service').name,
-  require('./modal/editPrecondition.controller.modal').name,
-  require('./precondition.details.filter').name,
+export const CORE_PIPELINE_CONFIG_PRECONDITIONS_PRECONDITIONS_MODULE = 'spinnaker.core.pipeline.config.preconditions';
+export const name = CORE_PIPELINE_CONFIG_PRECONDITIONS_PRECONDITIONS_MODULE; // for backwards compatibility
+module(CORE_PIPELINE_CONFIG_PRECONDITIONS_PRECONDITIONS_MODULE, [
+  CORE_PIPELINE_CONFIG_PRECONDITIONS_PRECONDITIONTYPECONFIG_PROVIDER,
+  CORE_PIPELINE_CONFIG_PRECONDITIONS_SELECTOR_PRECONDITIONSELECTOR_DIRECTIVE,
+  CORE_PIPELINE_CONFIG_PRECONDITIONS_PRECONDITIONLIST_DIRECTIVE,
+  CORE_PIPELINE_CONFIG_PRECONDITIONS_PRECONDITIONTYPE_SERVICE,
+  CORE_PIPELINE_CONFIG_PRECONDITIONS_MODAL_EDITPRECONDITION_CONTROLLER_MODAL,
+  CORE_PIPELINE_CONFIG_PRECONDITIONS_PRECONDITION_DETAILS_FILTER,
 ]);

@@ -1,3 +1,4 @@
+import { IPluginManifest } from 'core/plugins/plugin.registry';
 import { cloneDeep, merge } from 'lodash';
 
 export interface IAdditionalHelpLinks {
@@ -7,30 +8,19 @@ export interface IAdditionalHelpLinks {
 }
 
 export interface IProviderSettings {
+  bakeryRegions?: string[];
   defaults: any;
   resetToOriginal?: () => void;
 }
 
 export interface INotificationSettings {
-  email: {
-    enabled: boolean;
-  };
-  bearychat: {
-    enabled: boolean;
-  };
-  googlechat: {
-    enabled: boolean;
-  };
-  sms: {
-    enabled: boolean;
-  };
-  slack: {
-    botName: string;
-    enabled: boolean;
-  };
-  githubstatus: {
-    enabled: boolean;
-  };
+  bearychat: { enabled: boolean };
+  email: { enabled: boolean };
+  githubStatus: { enabled: boolean };
+  googlechat: { enabled: boolean };
+  pubsub: { enabled: boolean };
+  slack: { botName: string; enabled: boolean };
+  sms: { enabled: boolean };
 }
 
 export interface IFeatures {
@@ -43,12 +33,12 @@ export interface IFeatures {
   dockerBake?: boolean;
   entityTags?: boolean;
   fiatEnabled?: boolean;
+  gceScaleDownControlsEnabled?: boolean;
   gceStatefulMigsEnabled?: boolean;
   iapRefresherEnabled?: boolean;
   // whether stages affecting infrastructure (like "Create Load Balancer") should be enabled or not
   infrastructureStages?: boolean;
-  jobs?: boolean;
-  managedPipelineTemplatesV2UI?: boolean;
+  managedDelivery?: boolean;
   managedServiceAccounts?: boolean;
   managedResources?: boolean;
   notifications?: boolean;
@@ -57,12 +47,14 @@ export interface IFeatures {
   pipelineTemplates?: boolean;
   quietPeriod?: boolean;
   roscoMode?: boolean;
+  slack?: boolean;
   snapshots?: boolean;
   travis?: boolean;
   versionedProviders?: boolean;
   wercker?: boolean;
   savePipelinesStageEnabled?: boolean;
   kustomizeEnabled?: boolean;
+  functions?: boolean;
 }
 
 export interface IDockerInsightSettings {
@@ -94,7 +86,6 @@ export interface ISpinnakerSettings {
   };
   checkForUpdates: boolean;
   debugEnabled: boolean;
-  defaultCategory: string;
   defaultInstancePort: number;
   defaultProviders: string[];
   defaultTimeZone: string; // see http://momentjs.com/timezone/docs/#/data-utilities/
@@ -118,6 +109,10 @@ export interface ISpinnakerSettings {
   additionalHelpLinks?: IAdditionalHelpLinks[];
   gateUrl: string;
   gitSources: string[];
+  managedDelivery?: {
+    defaultManifest: string;
+    manifestBasePath: string;
+  };
   maxPipelineAgeDays: number;
   newApplicationDefaults: INewApplicationDefaults;
   notifications: INotificationSettings;
@@ -128,10 +123,14 @@ export interface ISpinnakerSettings {
     defaultSubject?: string;
     required?: boolean;
   };
+  slack?: {
+    baseUrl: string;
+  };
   pollSchedule: number;
   providers?: {
     [key: string]: IProviderSettings; // allows custom providers not typed in here (good for testing too)
   };
+  plugins: IPluginManifest[];
   pubsubProviders: string[];
   quietPeriod: [string | number, string | number];
   resetProvider: (provider: string) => () => void;
@@ -150,6 +149,7 @@ SETTINGS.analytics = SETTINGS.analytics || {};
 SETTINGS.providers = SETTINGS.providers || {};
 SETTINGS.defaultTimeZone = SETTINGS.defaultTimeZone || 'America/Los_Angeles';
 SETTINGS.dockerInsights = SETTINGS.dockerInsights || { enabled: false, url: '' };
+SETTINGS.plugins = SETTINGS.plugins || [];
 
 // A helper to make resetting settings to steady state after running tests easier
 const originalSettings: ISpinnakerSettings = cloneDeep(SETTINGS);

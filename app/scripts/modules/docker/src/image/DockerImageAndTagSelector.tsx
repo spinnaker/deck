@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import Select, { Option } from 'react-select';
 import { groupBy, reduce, trim, uniq } from 'lodash';
 
@@ -32,6 +32,7 @@ export interface IDockerImageAndTagSelectorProps {
   onChange: (changes: IDockerImageAndTagChanges) => void;
   deferInitialization?: boolean;
   showDigest?: boolean;
+  allowManualDefinition?: boolean;
 }
 
 export interface IDockerImageAndTagSelectorState {
@@ -48,7 +49,10 @@ export interface IDockerImageAndTagSelectorState {
 }
 
 const imageFields = ['organization', 'repository', 'tag', 'digest'];
-const defineOptions = [{ label: 'Manually', value: true }, { label: 'Select from list', value: false }];
+const defineOptions = [
+  { label: 'Manually', value: true },
+  { label: 'Select from list', value: false },
+];
 
 export class DockerImageAndTagSelector extends React.Component<
   IDockerImageAndTagSelectorProps,
@@ -59,6 +63,7 @@ export class DockerImageAndTagSelector extends React.Component<
     registry: '',
     repository: '',
     showDigest: true,
+    allowManualDefinition: true,
   };
 
   private images: IDockerImage[];
@@ -82,7 +87,7 @@ export class DockerImageAndTagSelector extends React.Component<
       props.repository && props.repository.length ? [{ label: props.repository, value: props.repository }] : [];
     const tagOptions = props.tag && props.tag.length ? [{ label: props.tag, value: props.tag }] : [];
     const parsedImageId = DockerImageUtils.splitImageId(props.imageId);
-    const defineManually = Boolean(props.imageId && props.imageId.includes('${'));
+    const defineManually = props.allowManualDefinition && Boolean(props.imageId && props.imageId.includes('${'));
 
     this.state = {
       accountOptions,
@@ -98,7 +103,10 @@ export class DockerImageAndTagSelector extends React.Component<
   }
 
   private getAccountMap(images: IDockerImage[]): { [key: string]: string[] } {
-    const groupedImages = groupBy(images.filter(image => image.account), 'account');
+    const groupedImages = groupBy(
+      images.filter(image => image.account),
+      'account',
+    );
     return reduce<IDockerImage[], { [key: string]: string[] }>(
       groupedImages,
       (acc, image, key) => {
@@ -118,13 +126,10 @@ export class DockerImageAndTagSelector extends React.Component<
   }
 
   private getRegistryMap(images: IDockerImage[]) {
-    return images.reduce(
-      (m: { [key: string]: string }, image: IDockerImage) => {
-        m[image.account] = image.registry;
-        return m;
-      },
-      {} as { [key: string]: string },
-    );
+    return images.reduce((m: { [key: string]: string }, image: IDockerImage) => {
+      m[image.account] = image.registry;
+      return m;
+    }, {} as { [key: string]: string });
   }
 
   private getOrganizationMap(images: IDockerImage[]): { [key: string]: string[] } {
@@ -133,7 +138,10 @@ export class DockerImageAndTagSelector extends React.Component<
         .split('/')
         .slice(0, -1)
         .join('/')}`;
-    const groupedImages = groupBy(images.filter(image => image.repository), extractGroupByKey);
+    const groupedImages = groupBy(
+      images.filter(image => image.repository),
+      extractGroupByKey,
+    );
     return reduce<IDockerImage[], { [key: string]: string[] }>(
       groupedImages,
       (acc, image, key) => {
@@ -145,7 +153,10 @@ export class DockerImageAndTagSelector extends React.Component<
   }
 
   private getRepositoryMap(images: IDockerImage[]) {
-    const groupedImages = groupBy(images.filter(image => image.account), 'repository');
+    const groupedImages = groupBy(
+      images.filter(image => image.account),
+      'repository',
+    );
     return reduce<IDockerImage[], { [key: string]: string[] }>(
       groupedImages,
       (acc, image, key) => {
@@ -241,7 +252,8 @@ export class DockerImageAndTagSelector extends React.Component<
       return;
     }
 
-    let { imageId, organization, registry, repository, specifyTagByRegex } = props;
+    const { imageId, specifyTagByRegex } = props;
+    let { organization, registry, repository } = props;
 
     if (props.showRegistry) {
       registry = this.registryMap[props.account];
@@ -409,6 +421,7 @@ export class DockerImageAndTagSelector extends React.Component<
   public render() {
     const {
       account,
+      allowManualDefinition,
       digest,
       imageId,
       organization,
@@ -447,7 +460,7 @@ export class DockerImageAndTagSelector extends React.Component<
             <span className="field">
               <Select
                 value={defineManually}
-                disabled={imagesLoading}
+                disabled={imagesLoading || !allowManualDefinition}
                 onChange={(o: Option<boolean>) => this.showManualInput(o.value)}
                 options={defineOptions}
                 clearable={false}
@@ -700,7 +713,10 @@ export class DockerImageAndTagSelector extends React.Component<
               <Select
                 clearable={false}
                 value={lookupType}
-                options={[{ value: 'digest', label: 'Digest' }, { value: 'tag', label: 'Tag' }]}
+                options={[
+                  { value: 'digest', label: 'Digest' },
+                  { value: 'tag', label: 'Tag' },
+                ]}
                 onChange={this.lookupTypeChanged}
               />
             </span>

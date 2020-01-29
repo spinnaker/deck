@@ -1,17 +1,19 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 import _ from 'lodash';
 
 import { AuthenticationService, BakeExecutionLabel, BakeryReader, Registry } from '@spinnaker/core';
+import { DOCKER_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER } from './bakeExecutionDetails.controller';
 
 /*
   This stage is just here so that we can experiment with baking Docker containers within pipelines.
   Without this stage, programmatically-created pipelines with Docker bake stages would not render
   execution details.
  */
-module.exports = angular
-  .module('spinnaker.docker.pipeline.stage.bakeStage', [require('./bakeExecutionDetails.controller').name])
+export const DOCKER_PIPELINE_STAGES_BAKE_DOCKERBAKESTAGE = 'spinnaker.docker.pipeline.stage.bakeStage';
+export const name = DOCKER_PIPELINE_STAGES_BAKE_DOCKERBAKESTAGE; // for backwards compatibility
+module(DOCKER_PIPELINE_STAGES_BAKE_DOCKERBAKESTAGE, [DOCKER_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'bake',
@@ -33,7 +35,7 @@ module.exports = angular
     '$scope',
     '$q',
     function($scope, $q) {
-      var stage = $scope.stage;
+      const stage = $scope.stage;
 
       stage.region = 'global';
 

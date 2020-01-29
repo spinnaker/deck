@@ -1,14 +1,15 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import './multipleServerGroup.component.less';
 
-module.exports = angular
-  .module('spinnaker.core.serverGroup.details.multipleServerGroup.component', [])
-  .component('multipleServerGroup', {
-    bindings: {
-      serverGroup: '=',
-    },
-    templateUrl: require('./multipleServerGroup.component.html'),
-  });
+export const CORE_SERVERGROUP_DETAILS_MULTIPLESERVERGROUP_COMPONENT =
+  'spinnaker.core.serverGroup.details.multipleServerGroup.component';
+export const name = CORE_SERVERGROUP_DETAILS_MULTIPLESERVERGROUP_COMPONENT; // for backwards compatibility
+module(CORE_SERVERGROUP_DETAILS_MULTIPLESERVERGROUP_COMPONENT, []).component('multipleServerGroup', {
+  bindings: {
+    serverGroup: '=',
+  },
+  templateUrl: require('./multipleServerGroup.component.html'),
+});

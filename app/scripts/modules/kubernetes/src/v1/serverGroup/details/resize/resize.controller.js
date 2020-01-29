@@ -1,13 +1,16 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 import { get, set } from 'lodash';
 
 import { SERVER_GROUP_WRITER, TaskMonitor } from '@spinnaker/core';
 
-module.exports = angular
-  .module('spinnaker.kubernetes.serverGroup.details.resize.controller', [SERVER_GROUP_WRITER])
-  .controller('kubernetesResizeServerGroupController', [
+export const KUBERNETES_V1_SERVERGROUP_DETAILS_RESIZE_RESIZE_CONTROLLER =
+  'spinnaker.kubernetes.serverGroup.details.resize.controller';
+export const name = KUBERNETES_V1_SERVERGROUP_DETAILS_RESIZE_RESIZE_CONTROLLER; // for backwards compatibility
+module(KUBERNETES_V1_SERVERGROUP_DETAILS_RESIZE_RESIZE_CONTROLLER, [SERVER_GROUP_WRITER]).controller(
+  'kubernetesResizeServerGroupController',
+  [
     '$scope',
     '$uibModalInstance',
     'serverGroupWriter',
@@ -17,7 +20,7 @@ module.exports = angular
     function($scope, $uibModalInstance, serverGroupWriter, application, serverGroup, kubernetesAutoscalerWriter) {
       $scope.serverGroup = serverGroup;
       $scope.currentSize = { desired: serverGroup.replicas };
-      let hasAutoscaler = !!$scope.serverGroup.autoscalerStatus;
+      const hasAutoscaler = !!$scope.serverGroup.autoscalerStatus;
 
       $scope.command = {
         capacity: {
@@ -28,7 +31,7 @@ module.exports = angular
       if (hasAutoscaler) {
         $scope.command.capacity.min = $scope.serverGroup.deployDescription.capacity.min;
         $scope.command.capacity.max = $scope.serverGroup.deployDescription.capacity.max;
-        let cpuUtilizationTarget = get(
+        const cpuUtilizationTarget = get(
           $scope.serverGroup,
           'deployDescription.scalingPolicy.cpuUtilization.target',
           null,
@@ -47,7 +50,7 @@ module.exports = angular
       }
 
       this.isValid = function() {
-        var command = $scope.command;
+        const command = $scope.command;
         return $scope.verification.verified && command.capacity !== null && command.capacity.desired !== null;
       };
 
@@ -72,8 +75,8 @@ module.exports = angular
           };
         }
 
-        var submitMethod = function() {
-          var payload = {
+        const submitMethod = function() {
+          const payload = {
             capacity: capacity,
             scalingPolicy: hasAutoscaler ? $scope.command.scalingPolicy : null,
             serverGroupName: serverGroup.name,
@@ -98,4 +101,5 @@ module.exports = angular
         $uibModalInstance.dismiss();
       };
     },
-  ]);
+  ],
+);

@@ -1,15 +1,15 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { InstanceReader, INSTANCE_WRITE_SERVICE } from '@spinnaker/core';
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
-module.exports = angular
-  .module('spinnaker.oracle.instance.details.controller', [
-    require('@uirouter/angularjs').default,
-    INSTANCE_WRITE_SERVICE,
-  ])
-  .controller('oracleInstanceDetailsCtrl', [
+export const ORACLE_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER = 'spinnaker.oracle.instance.details.controller';
+export const name = ORACLE_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER; // for backwards compatibility
+module(ORACLE_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [UIROUTER_ANGULARJS, INSTANCE_WRITE_SERVICE]).controller(
+  'oracleInstanceDetailsCtrl',
+  [
     '$scope',
     '$q',
     'instanceWriter',
@@ -18,7 +18,7 @@ module.exports = angular
     function($scope, $q, instanceWriter, app, instance) {
       $scope.application = app;
 
-      let initialize = app.isStandalone
+      const initialize = app.isStandalone
         ? retrieveInstance()
         : $q.all([app.serverGroups.ready()]).then(retrieveInstance);
 
@@ -53,4 +53,5 @@ module.exports = angular
         });
       }
     },
-  ]);
+  ],
+);

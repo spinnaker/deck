@@ -1,5 +1,5 @@
 import { mock, IQService, IScope } from 'angular';
-import * as React from 'react';
+import React from 'react';
 import { shallow } from 'enzyme';
 
 import { CreatePipelineModal, ICreatePipelineModalProps } from './CreatePipelineModal';
@@ -31,12 +31,14 @@ xdescribe('CreatePipelineModal', () => {
             lazy: true,
             loader: () => $q.resolve(application.pipelineConfigs.data),
             onLoad: (_app, data) => $q.resolve(data),
+            defaultData: [],
           },
           {
             key: 'strategyConfigs',
             lazy: true,
             loader: () => $q.resolve(application.strategyConfigs.data),
             onLoad: (_app, data) => $q.resolve(data),
+            defaultData: [],
           },
         );
         application.pipelineConfigs.data = configs;

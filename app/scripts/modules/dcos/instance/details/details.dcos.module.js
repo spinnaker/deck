@@ -1,5 +1,8 @@
-'use strict';
+import { DCOS_INSTANCE_DETAILS_DETAILS_CONTROLLER } from './details.controller';
+('use strict');
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular.module('spinnaker.dcos.instance.details', [require('./details.controller').name]);
+export const DCOS_INSTANCE_DETAILS_DETAILS_DCOS_MODULE = 'spinnaker.dcos.instance.details';
+export const name = DCOS_INSTANCE_DETAILS_DETAILS_DCOS_MODULE; // for backwards compatibility
+module(DCOS_INSTANCE_DETAILS_DETAILS_DCOS_MODULE, [DCOS_INSTANCE_DETAILS_DETAILS_CONTROLLER]);

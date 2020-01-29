@@ -19,6 +19,9 @@ export * from './IExecution';
 export * from './IExecutionStage';
 export * from './IExecutionTrigger';
 export * from './IExpectedArtifact';
+export * from './IFunction';
+
+export * from './IGcbTrigger';
 
 export * from './IHealth';
 
@@ -33,6 +36,7 @@ export * from '../widgets/Keys';
 export * from './ILoadBalancer';
 export * from './ILoadBalancerIncompatibility';
 
+export * from './IManagedEntity';
 export * from './IManifest';
 
 export * from './INotification';

@@ -1,6 +1,7 @@
-import * as React from 'react';
+import React from 'react';
 
 import { Application, ApplicationWriter } from 'core/application';
+import { ConfirmationModalService } from 'core/confirmationModal';
 import { ReactInjector } from 'core/reactShims';
 import { FirewallLabel } from 'core/securityGroup/label';
 
@@ -14,16 +15,14 @@ export function DeleteApplicationSection(props: IDeleteApplicationSection) {
     const taskMonitor = {
       application,
       title: `Deleting ${application.name}`,
-      hasKatoTask: false,
       onTaskComplete: () => {
         ReactInjector.$state.go('home.infrastructure');
       },
     };
 
-    ReactInjector.confirmationModalService.confirm({
+    ConfirmationModalService.confirm({
       header: `Really delete ${application.name} ?`,
       buttonText: `Delete ${application.name}`,
-      provider: 'aws',
       taskMonitorConfig: taskMonitor,
       submitMethod: () => ApplicationWriter.deleteApplication(application.attributes),
     });
@@ -33,6 +32,14 @@ export function DeleteApplicationSection(props: IDeleteApplicationSection) {
     return (
       <>
         <p>Application not found.</p>
+      </>
+    );
+  } else if (application.hasError) {
+    return (
+      <>
+        <p>
+          Something went wrong loading <em>{application.name}</em>.
+        </p>
       </>
     );
   } else {

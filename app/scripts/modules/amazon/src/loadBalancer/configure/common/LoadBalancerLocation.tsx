@@ -1,5 +1,5 @@
-import * as React from 'react';
-import * as classNames from 'classnames';
+import React from 'react';
+import classNames from 'classnames';
 import { IPromise } from 'angular';
 import { chain, isNil, uniq, groupBy } from 'lodash';
 import { Field, FormikErrors, FieldProps, FormikProps } from 'formik';
@@ -273,7 +273,7 @@ export class LoadBalancerLocation extends React.Component<ILoadBalancerLocationP
     const className = classNames({
       'col-md-12': true,
       well: true,
-      'alert-danger': errors.name,
+      'alert-danger': !!errors.name,
       'alert-info': !errors.name,
     });
 

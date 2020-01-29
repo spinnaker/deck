@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 
 import { Dropdown } from 'react-bootstrap';
 
@@ -13,13 +13,12 @@ import {
 
 export interface ICloudFoundryLoadBalancerActionsProps {
   application: Application;
-  confirmationModalService: ConfirmationModalService;
   loadBalancer: ILoadBalancer;
 }
 
 export class CloudFoundryLoadBalancerActions extends React.Component<ICloudFoundryLoadBalancerActionsProps> {
   private deleteLoadBalancer = () => {
-    const { application, confirmationModalService, loadBalancer } = this.props;
+    const { application, loadBalancer } = this.props;
     const taskMonitor = {
       application: application,
       title: 'Deleting ' + loadBalancer.name,
@@ -40,7 +39,7 @@ export class CloudFoundryLoadBalancerActions extends React.Component<ICloudFound
       return LoadBalancerWriter.deleteLoadBalancer(loadBalancerDeleteCommand, application);
     };
 
-    confirmationModalService.confirm({
+    ConfirmationModalService.confirm({
       header: 'Really delete ' + loadBalancer.name + '?',
       buttonText: 'Delete ' + loadBalancer.name,
       account: loadBalancer.account,

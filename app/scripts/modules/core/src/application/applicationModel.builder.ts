@@ -1,11 +1,12 @@
 import { SchedulerFactory } from 'core/scheduler/SchedulerFactory';
-import { Application } from './application.model';
+import { IServerGroup } from 'core/domain';
 
+import { Application } from './application.model';
 import { IDataSourceConfig } from './service/applicationDataSource';
 
 export class ApplicationModelBuilder {
   /** This is mostly used in tests */
-  public static createApplicationForTests(name: string, ...dataSources: IDataSourceConfig[]): Application {
+  public static createApplicationForTests(name: string, ...dataSources: Array<IDataSourceConfig<any>>): Application {
     return new Application(name, SchedulerFactory.createScheduler(), dataSources);
   }
 
@@ -16,9 +17,16 @@ export class ApplicationModelBuilder {
   }
 
   public static createNotFoundApplication(name: string): Application {
-    const config: IDataSourceConfig = { key: 'serverGroups', lazy: true };
+    const config: IDataSourceConfig<IServerGroup[]> = { key: 'serverGroups', lazy: true, defaultData: [] };
     const application = new Application(name, SchedulerFactory.createScheduler(), [config]);
     application.notFound = true;
+    return application;
+  }
+
+  public static createApplicationWithError(name: string): Application {
+    const config: IDataSourceConfig<IServerGroup[]> = { key: 'serverGroups', lazy: true, defaultData: [] };
+    const application = new Application(name, SchedulerFactory.createScheduler(), [config]);
+    application.hasError = true;
     return application;
   }
 }

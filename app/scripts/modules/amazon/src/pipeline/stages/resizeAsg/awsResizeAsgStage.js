@@ -1,11 +1,12 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { AccountService, Registry, StageConstants } from '@spinnaker/core';
 
-module.exports = angular
-  .module('spinnaker.amazon.pipeline.stage.aws.resizeAsgStage', [])
+export const AMAZON_PIPELINE_STAGES_RESIZEASG_AWSRESIZEASGSTAGE = 'spinnaker.amazon.pipeline.stage.aws.resizeAsgStage';
+export const name = AMAZON_PIPELINE_STAGES_RESIZEASG_AWSRESIZEASGSTAGE; // for backwards compatibility
+module(AMAZON_PIPELINE_STAGES_RESIZEASG_AWSRESIZEASGSTAGE, [])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'resizeServerGroup',
@@ -32,9 +33,9 @@ module.exports = angular
   .controller('awsResizeAsgStageCtrl', [
     '$scope',
     function($scope) {
-      var ctrl = this;
+      const ctrl = this;
 
-      let stage = $scope.stage;
+      const stage = $scope.stage;
 
       $scope.viewState = {
         accountsLoaded: false,

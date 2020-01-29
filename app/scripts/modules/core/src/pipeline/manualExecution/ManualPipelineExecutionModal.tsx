@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 
 import { Formik, Form } from 'formik';
 import { Modal } from 'react-bootstrap';
@@ -28,13 +28,14 @@ import {
   ITrigger,
 } from 'core/domain';
 import { AppNotificationsService } from 'core/notification/AppNotificationsService';
-import { ArtifactList, ITriggerTemplateComponentProps, PipelineTemplateV2Service } from 'core/pipeline';
+import { ArtifactList, IPipelineTemplateConfig, ITriggerTemplateComponentProps } from 'core/pipeline';
 import { Registry } from 'core/registry';
 import { SETTINGS } from 'core/config/settings';
 import { UrlParser } from 'core/navigation/urlParser';
 
 import { ManualExecutionFieldLayout } from './layout/ManualExecutionFieldLayout';
 import { PipelineOptions } from './PipelineOptions';
+import { PipelineTemplateReader } from '../config/templates/PipelineTemplateReader';
 import { CurrentlyRunningExecutions } from './CurrentlyRunningExecutions';
 import { StageManualComponents } from './StageManualComponents';
 import { Triggers } from './Triggers';
@@ -127,9 +128,7 @@ export class ManualExecutionModal extends React.Component<IManualExecutionModalP
       const triggers = this.formatTriggers(pipelineTriggers);
       this.updateTriggerOptions(triggers);
     } else {
-      pipelineOptions = application.pipelineConfigs.data.filter(
-        (c: any) => !c.disabled && PipelineTemplateV2Service.isConfigurable(c),
-      );
+      pipelineOptions = application.pipelineConfigs.data.filter((c: any) => !c.disabled);
     }
 
     this.triggerChanged(trigger);
@@ -205,7 +204,7 @@ export class ManualExecutionModal extends React.Component<IManualExecutionModalP
         currentPipelineExecutions,
         pipelineNotifications: pipeline.notifications || [],
       });
-      this.setState({ stageComponents: this.getManualExecutionComponents(pipeline.stages) });
+      this.parseManualExecution(pipeline);
     }
   };
 
@@ -219,11 +218,19 @@ export class ManualExecutionModal extends React.Component<IManualExecutionModalP
     });
   };
 
-  private getManualExecutionComponents = (
-    stages: IStage[],
-  ): Array<React.ComponentType<ITriggerTemplateComponentProps>> => {
+  private parseManualExecution = (pipeline: IPipeline): void => {
+    if (pipeline.type === 'templatedPipeline' && (pipeline.stages === undefined || pipeline.stages.length === 0)) {
+      PipelineTemplateReader.getPipelinePlan(pipeline as IPipelineTemplateConfig)
+        .then(plan => this.setStageComponentsForManualExecution(plan.stages))
+        .catch(() => this.setStageComponentsForManualExecution(pipeline.stages));
+    } else {
+      this.setStageComponentsForManualExecution(pipeline.stages);
+    }
+  };
+
+  private setStageComponentsForManualExecution = (stages: IStage[]): void => {
     const additionalComponents = stages.map(stage => Registry.pipeline.getManualExecutionComponentForStage(stage));
-    return uniq(compact(additionalComponents));
+    this.setState({ stageComponents: uniq(compact(additionalComponents)) });
   };
 
   private formatTriggers = (triggers: ITrigger[]): ITrigger[] => {

@@ -1,9 +1,12 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 
-module.exports = angular
-  .module('spinnaker.google.serverGroup.configure.wizard.capacity.regional.directive', [])
+export const GOOGLE_SERVERGROUP_CONFIGURE_WIZARD_ZONES_REGIONALSELECTOR_DIRECTIVE =
+  'spinnaker.google.serverGroup.configure.wizard.capacity.regional.directive';
+export const name = GOOGLE_SERVERGROUP_CONFIGURE_WIZARD_ZONES_REGIONALSELECTOR_DIRECTIVE; // for backwards compatibility
+angular
+  .module(GOOGLE_SERVERGROUP_CONFIGURE_WIZARD_ZONES_REGIONALSELECTOR_DIRECTIVE, [])
   .directive('gceRegionalSelector', function() {
     return {
       restrict: 'E',

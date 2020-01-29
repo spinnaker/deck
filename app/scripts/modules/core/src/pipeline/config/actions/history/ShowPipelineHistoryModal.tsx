@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { Modal } from 'react-bootstrap';
 import { isEmpty } from 'lodash';
 
@@ -96,7 +96,7 @@ export function ShowPipelineHistoryModal(props: IShowHistoryModalProps) {
       <Modal key="modal" dialogClassName="modal-lg modal-fullscreen" show={true} onHide={() => {}}>
         <ModalClose dismiss={dismissModal} />
         <Modal.Header>
-          <h3>Pipeline Revision History</h3>
+          <Modal.Title>Pipeline Revision History</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {loading && (
@@ -118,10 +118,16 @@ export function ShowPipelineHistoryModal(props: IShowHistoryModalProps) {
           )}
           {!loading && history.length > 1 && (
             <>
-              <div className="history-header row">
+              <div className="history-header row horizontal">
                 <div className="col-md-4">
                   <FormField
                     label="Revision"
+                    layout={({ label, input }) => (
+                      <div className="flex-container-h baseline margin-between-lg">
+                        <div className="bold">{label}</div>
+                        <div className="flex-grow">{input}</div>
+                      </div>
+                    )}
                     input={inputProps => (
                       <ReactSelectInput
                         clearable={false}
@@ -133,7 +139,7 @@ export function ShowPipelineHistoryModal(props: IShowHistoryModalProps) {
                     value={version}
                   />
                 </div>
-                <div className="col-md-4">
+                <div className="diff-section col-md-4 horizontal middle">
                   <DiffSummary summary={diff.summary} />
                   {version > 0 && (
                     <button className="btn btn-sm btn-primary" onClick={restoreVersion}>

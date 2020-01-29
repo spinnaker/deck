@@ -1,4 +1,4 @@
-import { chain, compact, forOwn, get, groupBy, includes, uniq } from 'lodash';
+import { chain, compact, forOwn, groupBy, includes, uniq } from 'lodash';
 import { Debounce } from 'lodash-decorators';
 import { Subject } from 'rxjs';
 import { $log } from 'ngimport';
@@ -236,8 +236,7 @@ export class ExecutionFilterService {
       const executionGroups = groupBy(executions, 'name');
       forOwn(executionGroups, (groupExecutions, key) => {
         const matchId = (pipelineConfig: IPipeline) => pipelineConfig.id === groupExecutions[0].pipelineConfigId;
-        const config =
-          application.pipelineConfigs.data.find(matchId) || get(application, 'strategyConfigs.data', []).find(matchId);
+        const config = application.pipelineConfigs.data.concat(application.strategyConfigs?.data ?? []).find(matchId);
         groupExecutions.sort((a, b) => this.executionSorter(a, b));
         groups.push({
           heading: key,
@@ -321,9 +320,10 @@ export class ExecutionFilterService {
 
   private static applyGroupsToModel(groups: IExecutionGroup[]): void {
     const filterModel = ExecutionState.filterModel.asFilterModel;
-    filterModel.groups = this.diffExecutionGroups(filterModel.groups, groups).sort(
-      (a: IExecutionGroup, b: IExecutionGroup) => this.executionGroupSorter(a, b),
-    );
+    filterModel.groups = this.diffExecutionGroups(
+      filterModel.groups,
+      groups,
+    ).sort((a: IExecutionGroup, b: IExecutionGroup) => this.executionGroupSorter(a, b));
   }
 
   public static executionGroupSorter(a: IExecutionGroup, b: IExecutionGroup): number {

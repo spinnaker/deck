@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 
 import { FormikProps } from 'formik';
 
@@ -16,7 +16,7 @@ import {
 import {
   ICloudFoundryCreateServerGroupCommand,
   ICloudFoundryManifest,
-} from 'cloudfoundry/serverGroup/configure/serverGroupConfigurationModel.cf';
+} from '../../../serverGroupConfigurationModel.cf';
 
 import { ICloudFoundryEnvVar } from 'cloudfoundry/domain';
 import {
@@ -151,7 +151,10 @@ export class CloudFoundryServerGroupConfigurationSettings
                 <RadioButtonInput
                   inline={true}
                   value={direct ? 'direct' : 'artifact'}
-                  options={[{ label: 'Artifact', value: 'artifact' }, { label: 'Form', value: 'direct' }]}
+                  options={[
+                    { label: 'Artifact', value: 'artifact' },
+                    { label: 'Form', value: 'direct' },
+                  ]}
                   onChange={(e: any) => this.manifestSourceUpdated(e.target.value)}
                 />
               </div>

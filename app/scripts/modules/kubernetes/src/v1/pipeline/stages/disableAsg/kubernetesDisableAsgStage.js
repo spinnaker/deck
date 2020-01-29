@@ -1,11 +1,13 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { AccountService, Registry, StageConstants } from '@spinnaker/core';
 
-module.exports = angular
-  .module('spinnaker.kubernetes.pipeline.stage.disableAsgStage', [])
+export const KUBERNETES_V1_PIPELINE_STAGES_DISABLEASG_KUBERNETESDISABLEASGSTAGE =
+  'spinnaker.kubernetes.pipeline.stage.disableAsgStage';
+export const name = KUBERNETES_V1_PIPELINE_STAGES_DISABLEASG_KUBERNETESDISABLEASGSTAGE; // for backwards compatibility
+module(KUBERNETES_V1_PIPELINE_STAGES_DISABLEASG_KUBERNETESDISABLEASGSTAGE, [])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'disableServerGroup',
@@ -29,7 +31,7 @@ module.exports = angular
   .controller('kubernetesDisableAsgStageController', [
     '$scope',
     function($scope) {
-      let stage = $scope.stage;
+      const stage = $scope.stage;
 
       $scope.state = {
         accounts: false,

@@ -1,14 +1,19 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { STAGE_COMMON_MODULE } from '../common/stage.common.module';
 import { TIME_FORMATTERS } from 'core/utils/timeFormatters';
+import { CORE_PIPELINE_CONFIG_STAGES_JENKINS_JENKINSSTAGE } from './jenkinsStage';
+import { CORE_PIPELINE_CONFIG_STAGES_STAGE_MODULE } from '../stage.module';
+import { CORE_PIPELINE_CONFIG_STAGES_JENKINS_JENKINSEXECUTIONDETAILS_CONTROLLER } from './jenkinsExecutionDetails.controller';
 
-module.exports = angular.module('spinnaker.core.pipeline.stage.jenkins', [
-  require('./jenkinsStage').name,
-  require('../stage.module').name,
+export const CORE_PIPELINE_CONFIG_STAGES_JENKINS_JENKINSSTAGE_MODULE = 'spinnaker.core.pipeline.stage.jenkins';
+export const name = CORE_PIPELINE_CONFIG_STAGES_JENKINS_JENKINSSTAGE_MODULE; // for backwards compatibility
+module(CORE_PIPELINE_CONFIG_STAGES_JENKINS_JENKINSSTAGE_MODULE, [
+  CORE_PIPELINE_CONFIG_STAGES_JENKINS_JENKINSSTAGE,
+  CORE_PIPELINE_CONFIG_STAGES_STAGE_MODULE,
   STAGE_COMMON_MODULE,
   TIME_FORMATTERS,
-  require('./jenkinsExecutionDetails.controller').name,
+  CORE_PIPELINE_CONFIG_STAGES_JENKINS_JENKINSEXECUTIONDETAILS_CONTROLLER,
 ]);

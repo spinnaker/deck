@@ -1,12 +1,12 @@
 import { module } from 'angular';
 
-import {
-  ArtifactReferenceService,
-  ExecutionDetailsTasks,
-  ExpectedArtifactService,
-  IStage,
-  Registry,
-} from '@spinnaker/core';
+import { ArtifactReferenceService, ExpectedArtifactService, IStage, Registry } from '@spinnaker/core';
+
+import { DeployExecutionDetails } from './deployCloudFormationExecutionDetails';
+
+import { EvaluateCloudFormationChangeSetExecutionMarkerIcon } from './evaluateCloudFormationChangeSetExecutionMarkerIcon';
+import { EvaluateCloudFormationChangeSetExecutionLabel } from './evaluateCloudFormationChangeSetExecutionLabel';
+import { EvaluateCloudFormationChangeSetExecutionDetails } from './evaluateCloudFormationChangeSetExecutionDetails';
 
 import { DeployCloudFormationStackConfigController } from './deployCloudFormationStackConfig.controller';
 
@@ -22,10 +22,13 @@ module(DEPLOY_CLOUDFORMATION_STACK_STAGE, [])
       templateUrl: require('./deployCloudFormationStackConfig.html'),
       controller: 'DeployCloudFormationStackConfigController',
       controllerAs: 'ctrl',
-      executionDetailsSections: [ExecutionDetailsTasks],
+      useCustomTooltip: true,
+      executionDetailsSections: [DeployExecutionDetails, EvaluateCloudFormationChangeSetExecutionDetails],
+      executionLabelComponent: EvaluateCloudFormationChangeSetExecutionLabel,
       producesArtifacts: true,
       supportsCustomTimeout: true,
       validators: [],
+      markerIcon: EvaluateCloudFormationChangeSetExecutionMarkerIcon,
       accountExtractor: (stage: IStage): string[] => (stage.account ? [stage.account] : []),
       configAccountExtractor: (stage: any): string[] => (stage.account ? [stage.account] : []),
       artifactExtractor: ExpectedArtifactService.accumulateArtifacts(['stackArtifactId', 'requiredArtifactIds']),

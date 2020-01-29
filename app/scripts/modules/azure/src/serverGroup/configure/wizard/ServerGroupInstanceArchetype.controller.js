@@ -1,15 +1,18 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular
-  .module('spinnaker.azure.serverGroup.configure.instanceArchetype.controller', [])
-  .controller('azureInstanceArchetypeCtrl', [
+export const AZURE_SERVERGROUP_CONFIGURE_WIZARD_SERVERGROUPINSTANCEARCHETYPE_CONTROLLER =
+  'spinnaker.azure.serverGroup.configure.instanceArchetype.controller';
+export const name = AZURE_SERVERGROUP_CONFIGURE_WIZARD_SERVERGROUPINSTANCEARCHETYPE_CONTROLLER; // for backwards compatibility
+module(AZURE_SERVERGROUP_CONFIGURE_WIZARD_SERVERGROUPINSTANCEARCHETYPE_CONTROLLER, []).controller(
+  'azureInstanceArchetypeCtrl',
+  [
     '$scope',
     'instanceTypeService',
     'modalWizardService',
     function($scope, instanceTypeService, modalWizardService) {
-      var wizard = modalWizardService.getWizard();
+      const wizard = modalWizardService.getWizard();
 
       $scope.$watch('command.viewState.instanceProfile', function() {
         if (!$scope.command.viewState.instanceProfile || $scope.command.viewState.instanceProfile === 'custom') {
@@ -28,4 +31,5 @@ module.exports = angular
         }
       });
     },
-  ]);
+  ],
+);

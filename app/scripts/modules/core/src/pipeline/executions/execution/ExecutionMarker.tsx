@@ -1,12 +1,12 @@
-import * as React from 'react';
-import * as ReactGA from 'react-ga';
+import React from 'react';
+import ReactGA from 'react-ga';
 
 import { IExecution, IExecutionStageSummary } from 'core/domain';
 import { OrchestratedItemRunningTime } from './OrchestratedItemRunningTime';
 import { duration } from 'core/utils/timeFormatters';
 
 import { Application } from 'core/application/application.model';
-import { ExecutionBarLabel } from 'core/pipeline/config/stages/common/ExecutionBarLabel';
+import { ExecutionBarLabel } from '../../config/stages/common/ExecutionBarLabel';
 
 import './executionMarker.less';
 
@@ -70,6 +70,7 @@ export class ExecutionMarker extends React.Component<IExecutionMarkerProps, IExe
       active ? 'active' : '',
       previousStageActive ? 'after-active' : '',
       stage.isRunning ? 'glowing' : '',
+      stage.requiresAttention ? 'requires-attention' : '',
     ].join(' ');
 
     const TooltipComponent = stage.useCustomTooltip ? stage.labelComponent : ExecutionBarLabel;

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 
 import { AccountService, ChecklistInput } from '@spinnaker/core';
 
@@ -24,7 +24,7 @@ export class AvailabilityZoneSelector extends React.Component<
     super(props);
     this.state = {
       defaultZones: [],
-      usePreferredZones: props.usePreferredZones || (!props.selectedZones || props.selectedZones.length === 0),
+      usePreferredZones: props.usePreferredZones || !props.selectedZones || props.selectedZones.length === 0,
     };
 
     this.setDefaultZones(props);

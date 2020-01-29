@@ -1,11 +1,13 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { Registry } from '@spinnaker/core';
 
-module.exports = angular
-  .module('spinnaker.ecs.pipeline.stage.findImageFromTagsStage', [])
+export const ECS_PIPELINE_STAGES_FINDIMAGEFROMTAGS_ECSFINDIMAGEFROMTAGSTAGE =
+  'spinnaker.ecs.pipeline.stage.findImageFromTagsStage';
+export const name = ECS_PIPELINE_STAGES_FINDIMAGEFROMTAGS_ECSFINDIMAGEFROMTAGSTAGE; // for backwards compatibility
+module(ECS_PIPELINE_STAGES_FINDIMAGEFROMTAGS_ECSFINDIMAGEFROMTAGSTAGE, [])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'findImageFromTags',

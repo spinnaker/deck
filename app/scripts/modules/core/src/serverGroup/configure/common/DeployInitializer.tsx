@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { Modal } from 'react-bootstrap';
 import { Option } from 'react-select';
 import { IPromise } from 'angular';
@@ -152,7 +152,7 @@ export class DeployInitializer extends React.Component<IDeployInitializerProps, 
         <ModalClose dismiss={onDismiss} />
         <div>
           <Modal.Header>
-            <h3>Template Selection</h3>
+            <Modal.Title>Template Selection</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <form className="form-horizontal">

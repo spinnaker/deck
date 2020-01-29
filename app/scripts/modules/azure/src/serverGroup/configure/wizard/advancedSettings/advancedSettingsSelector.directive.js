@@ -1,9 +1,12 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 
-module.exports = angular
-  .module('spinnaker.azure.serverGroup.configure.wizard.advancedSettings.selector.directive', [])
+export const AZURE_SERVERGROUP_CONFIGURE_WIZARD_ADVANCEDSETTINGS_ADVANCEDSETTINGSSELECTOR_DIRECTIVE =
+  'spinnaker.azure.serverGroup.configure.wizard.advancedSettings.selector.directive';
+export const name = AZURE_SERVERGROUP_CONFIGURE_WIZARD_ADVANCEDSETTINGS_ADVANCEDSETTINGSSELECTOR_DIRECTIVE; // for backwards compatibility
+angular
+  .module(AZURE_SERVERGROUP_CONFIGURE_WIZARD_ADVANCEDSETTINGS_ADVANCEDSETTINGSSELECTOR_DIRECTIVE, [])
   .directive('azureServerGroupAdvancedSettingsSelector', function() {
     return {
       restrict: 'E',
@@ -18,7 +21,7 @@ module.exports = angular
   })
   .controller('azureServerGroupAdvancedSettingsSelectorCtrl', function() {
     this.addDataDisk = () => {
-      var newDataDisks = angular.copy(this.command.dataDisks);
+      const newDataDisks = angular.copy(this.command.dataDisks);
       this.command.dataDisks = newDataDisks.concat([
         {
           lun: 0,
@@ -33,7 +36,7 @@ module.exports = angular
     };
 
     this.removeDataDisk = index => {
-      var newDataDisks = angular.copy(this.command.dataDisks);
+      const newDataDisks = angular.copy(this.command.dataDisks);
       newDataDisks.splice(index, 1);
       this.command.dataDisks = newDataDisks;
     };

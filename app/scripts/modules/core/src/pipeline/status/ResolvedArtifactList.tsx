@@ -1,7 +1,7 @@
-import * as React from 'react';
+import React from 'react';
 
 import { IArtifact, IExpectedArtifact } from 'core/domain';
-import { Artifact } from 'core/pipeline/status/Artifact';
+import { Artifact } from './Artifact';
 
 import './artifactList.less';
 
@@ -17,7 +17,8 @@ export class ResolvedArtifactList extends React.Component<IResolvedArtifactListP
   }
 
   public render() {
-    let { artifacts, resolvedExpectedArtifacts, showingExpandedArtifacts } = this.props;
+    let { artifacts, resolvedExpectedArtifacts } = this.props;
+    const { showingExpandedArtifacts } = this.props;
 
     artifacts = artifacts || [];
     resolvedExpectedArtifacts = resolvedExpectedArtifacts || [];
@@ -27,7 +28,7 @@ export class ResolvedArtifactList extends React.Component<IResolvedArtifactListP
         set.add(rea.defaultArtifact.reference);
       }
       return set;
-    }, new Set());
+    }, new Set<string>());
 
     const decoratedArtifacts = artifacts.filter(({ name, reference, type }) => (name || reference) && type);
     const decoratedExpectedArtifacts = resolvedExpectedArtifacts

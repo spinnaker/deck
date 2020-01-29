@@ -1,11 +1,12 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { AccountService, Registry, StageConstants } from '@spinnaker/core';
 
-module.exports = angular
-  .module('spinnaker.azure.pipeline.stage.destroyAsgStage', [])
+export const AZURE_PIPELINE_STAGES_DESTROYASG_AZUREDESTROYASGSTAGE = 'spinnaker.azure.pipeline.stage.destroyAsgStage';
+export const name = AZURE_PIPELINE_STAGES_DESTROYASG_AZUREDESTROYASGSTAGE; // for backwards compatibility
+module(AZURE_PIPELINE_STAGES_DESTROYASG_AZUREDESTROYASGSTAGE, [])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'destroyServerGroup',
@@ -30,9 +31,9 @@ module.exports = angular
   .controller('azureDestroyAsgStageCtrl', [
     '$scope',
     function($scope) {
-      var ctrl = this;
+      const ctrl = this;
 
-      let stage = $scope.stage;
+      const stage = $scope.stage;
 
       $scope.state = {
         accounts: false,

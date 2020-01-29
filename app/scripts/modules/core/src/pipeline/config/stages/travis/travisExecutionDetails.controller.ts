@@ -1,11 +1,10 @@
 import { IController, IScope, module } from 'angular';
 import { StateParams } from '@uirouter/angularjs';
-import { get } from 'lodash';
 
 import {
   EXECUTION_DETAILS_SECTION_SERVICE,
   ExecutionDetailsSectionService,
-} from 'core/pipeline/details/executionDetailsSection.service';
+} from '../../../details/executionDetailsSection.service';
 
 export class TravisExecutionDetailsCtrl implements IController {
   public configSections = ['travisConfig', 'taskStatus'];
@@ -25,17 +24,17 @@ export class TravisExecutionDetailsCtrl implements IController {
   }
 
   public initialized(): void {
-    this.detailsSection = get<string>(this.$stateParams, 'details', '');
+    this.detailsSection = this.$stateParams.details ?? '';
     this.failureMessage = this.getFailureMessage();
   }
 
   private getFailureMessage(): string {
     let failureMessage = this.stage.failureMessage;
-    const context = this.stage.context || {},
-      buildInfo = context.buildInfo || {},
-      testResults = get(buildInfo, 'testResults', []),
-      failingTests = testResults.filter(results => results.failCount > 0),
-      failingTestCount = failingTests.reduce((acc, results) => acc + results.failCount, 0);
+    const context = this.stage.context || {};
+    const buildInfo = context.buildInfo || {};
+    const testResults: Array<{ failCount: number }> = buildInfo.testResults ?? [];
+    const failingTests = testResults.filter(results => results.failCount > 0);
+    const failingTestCount = failingTests.reduce((acc, results) => acc + results.failCount, 0);
     if (buildInfo.result === 'FAILURE') {
       failureMessage = 'Build failed.';
     }

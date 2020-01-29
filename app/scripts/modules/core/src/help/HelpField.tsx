@@ -1,10 +1,9 @@
-import * as React from 'react';
-import * as ReactGA from 'react-ga';
-import * as DOMPurify from 'dompurify';
+import React from 'react';
+import ReactGA from 'react-ga';
 import { isUndefined } from 'lodash';
 
 import { HelpContentsRegistry, HelpTextExpandedContext } from 'core/help';
-import { HoverablePopover, Placement } from 'core/presentation';
+import { HoverablePopover, Markdown, Placement } from 'core/presentation';
 
 export interface IHelpFieldProps {
   id?: string;
@@ -24,7 +23,7 @@ function HelpFieldContents(props: Pick<IHelpFieldProps, 'id' | 'fallback' | 'con
   }
 
   const config = { ADD_ATTR: ['target'] }; // allow: target="_blank"
-  return <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(contentString, config) }} />;
+  return <Markdown message={contentString} options={config} trim={true} />;
 }
 
 export function HelpField(props: IHelpFieldProps) {
@@ -45,7 +44,7 @@ export function HelpField(props: IHelpFieldProps) {
   const contents = <HelpFieldContents content={content} fallback={fallback} id={id} />;
   const popover = (
     <HoverablePopover placement={placement || 'top'} template={contents} onShow={onShow} onHide={onHide}>
-      <a className="clickable help-field"> {label || icon} </a>
+      <span className="clickable help-field"> {label || icon} </span>
     </HoverablePopover>
   );
 

@@ -135,7 +135,7 @@ export interface ITargetGroup {
   cloudProvider: string; // returned from clouddriver
   detachedInstances?: IInstance[];
   healthCheckProtocol: string;
-  healthCheckPort: number;
+  healthCheckPort: number | 'traffic-port';
   healthCheckPath: string;
   healthTimeout: number;
   healthInterval: number;
@@ -167,9 +167,9 @@ export interface IListenerDescription {
 
 export interface IALBTargetGroupDescription {
   name: string;
-  protocol: 'HTTP' | 'HTTPS';
+  protocol: 'HTTP' | 'HTTPS' | 'TCP' | 'TLS';
   port: number;
-  targetType: 'instance' | 'ip';
+  targetType: 'instance' | 'ip' | 'lambda';
   attributes: {
     // Defaults to 300
     deregistrationDelay?: number;
@@ -179,6 +179,7 @@ export interface IALBTargetGroupDescription {
     stickinessType?: 'lb_cookie';
     // Defaults to 86400
     stickinessDuration?: number;
+    multiValueHeadersEnabled?: boolean;
   };
   // Defaults to 10
   healthCheckInterval?: number;
@@ -186,7 +187,7 @@ export interface IALBTargetGroupDescription {
   healthCheckMatcher?: string;
   healthCheckPath: string;
   healthCheckPort: string;
-  healthCheckProtocol: 'HTTP' | 'HTTPS';
+  healthCheckProtocol: 'HTTP' | 'HTTPS' | 'TCP';
   // Defaults to 10
   healthyThreshold?: number;
   // Defaults to 5

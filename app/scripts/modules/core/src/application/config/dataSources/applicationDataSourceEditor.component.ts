@@ -2,8 +2,8 @@ import { IController, module } from 'angular';
 
 import { Application } from '../../application.model';
 import { ApplicationDataSource } from '../../service/applicationDataSource';
-import { ApplicationWriter } from 'core/application/service/ApplicationWriter';
-import { ApplicationReader } from 'core/application/service/ApplicationReader';
+import { ApplicationWriter } from '../../service/ApplicationWriter';
+import { ApplicationReader } from '../../service/ApplicationReader';
 
 import './applicationDataSourceEditor.component.less';
 
@@ -21,7 +21,7 @@ export class DataSourceEditorController implements IController {
   public dataSources: ApplicationDataSource[];
 
   public $onInit() {
-    if (this.application.notFound) {
+    if (this.application.notFound || this.application.hasError) {
       return;
     }
     if (!this.application.attributes) {

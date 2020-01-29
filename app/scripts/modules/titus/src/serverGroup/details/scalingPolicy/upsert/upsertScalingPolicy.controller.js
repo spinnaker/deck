@@ -1,13 +1,16 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { TaskMonitor } from '@spinnaker/core';
 import { ScalingPolicyWriter } from '@spinnaker/amazon';
 
-module.exports = angular
-  .module('spinnaker.titus.serverGroup.details.scalingPolicy.upsertScalingPolicy.controller', [])
-  .controller('titusUpsertScalingPolicyCtrl', [
+export const TITUS_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_UPSERTSCALINGPOLICY_CONTROLLER =
+  'spinnaker.titus.serverGroup.details.scalingPolicy.upsertScalingPolicy.controller';
+export const name = TITUS_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_UPSERTSCALINGPOLICY_CONTROLLER; // for backwards compatibility
+module(TITUS_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_UPSERTSCALINGPOLICY_CONTROLLER, []).controller(
+  'titusUpsertScalingPolicyCtrl',
+  [
     '$uibModalInstance',
     'alarmServerGroup',
     'serverGroup',
@@ -99,8 +102,8 @@ module.exports = angular
 
       this.boundsChanged = () => {
         const source =
-            this.viewState.comparatorBound === 'min' ? 'metricIntervalLowerBound' : 'metricIntervalUpperBound',
-          target = source === 'metricIntervalLowerBound' ? 'metricIntervalUpperBound' : 'metricIntervalLowerBound';
+          this.viewState.comparatorBound === 'min' ? 'metricIntervalLowerBound' : 'metricIntervalUpperBound';
+        const target = source === 'metricIntervalLowerBound' ? 'metricIntervalUpperBound' : 'metricIntervalLowerBound';
 
         if (this.command.step) {
           const steps = this.command.step.stepAdjustments;
@@ -162,4 +165,5 @@ module.exports = angular
 
       this.initialize();
     },
-  ]);
+  ],
+);

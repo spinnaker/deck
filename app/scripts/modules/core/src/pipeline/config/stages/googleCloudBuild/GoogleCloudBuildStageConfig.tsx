@@ -1,69 +1,37 @@
-import * as React from 'react';
-import { Observable, Subject } from 'rxjs';
+import React from 'react';
 import { cloneDeep } from 'lodash';
 
-import { FormikStageConfig, IgorService, IStage, IStageConfigProps } from '@spinnaker/core';
+import { FormikStageConfig, IFormikStageConfigInjectedProps, IStageConfigProps } from 'core';
 
-import { GoogleCloudBuildStageForm, buildDefinitionSources } from './GoogleCloudBuildStageForm';
+import { GoogleCloudBuildStageForm } from './GoogleCloudBuildStageForm';
 import { validate } from './googleCloudBuildValidators';
+import { BuildDefinitionSource, IGoogleCloudBuildStage } from './IGoogleCloudBuildStage';
 
-interface IGoogleCloudBuildStageConfigState {
-  googleCloudBuildAccounts: string[];
-}
-
-export class GoogleCloudBuildStageConfig extends React.Component<IStageConfigProps, IGoogleCloudBuildStageConfigState> {
-  private stage: IStage;
-  private destroy$ = new Subject();
-
-  public constructor(props: IStageConfigProps) {
-    super(props);
-    this.state = {
-      googleCloudBuildAccounts: [],
+export function GoogleCloudBuildStageConfig({
+  application,
+  pipeline,
+  stage,
+  updatePipeline,
+  updateStage,
+}: IStageConfigProps) {
+  const stageWithDefaults: IGoogleCloudBuildStage = React.useMemo(() => {
+    return {
+      application: application.name,
+      buildDefinitionSource: BuildDefinitionSource.TEXT,
+      ...cloneDeep(stage),
     };
-    const { stage: initialStageConfig } = props;
-    const stage = cloneDeep(initialStageConfig);
-    if (!stage.application) {
-      stage.application = props.application.name;
-    }
-    if (!stage.buildDefinitionSource) {
-      stage.buildDefinitionSource = buildDefinitionSources.TEXT;
-    }
-    // Intentionally initializing the stage config only once in the constructor
-    // The stage config is then completely owned within FormikStageConfig's Formik state
-    this.stage = stage;
-  }
+  }, []);
 
-  public componentDidMount = (): void => {
-    this.fetchGoogleCloudBuildAccounts();
-  };
-
-  private fetchGoogleCloudBuildAccounts = (): void => {
-    Observable.fromPromise(IgorService.getGcbAccounts())
-      .takeUntil(this.destroy$)
-      .subscribe((googleCloudBuildAccounts: string[]) => {
-        this.setState({ googleCloudBuildAccounts });
-      });
-  };
-
-  public componentWillUnmount(): void {
-    this.destroy$.next();
-  }
-
-  public render() {
-    return (
-      <FormikStageConfig
-        {...this.props}
-        stage={this.stage}
-        onChange={this.props.updateStage}
-        validate={validate}
-        render={props => (
-          <GoogleCloudBuildStageForm
-            {...props}
-            googleCloudBuildAccounts={this.state.googleCloudBuildAccounts}
-            updatePipeline={this.props.updatePipeline}
-          />
-        )}
-      />
-    );
-  }
+  return (
+    <FormikStageConfig
+      application={application}
+      onChange={updateStage}
+      pipeline={pipeline}
+      stage={stageWithDefaults}
+      validate={validate}
+      render={(props: IFormikStageConfigInjectedProps) => (
+        <GoogleCloudBuildStageForm {...props} updatePipeline={updatePipeline} />
+      )}
+    />
+  );
 }

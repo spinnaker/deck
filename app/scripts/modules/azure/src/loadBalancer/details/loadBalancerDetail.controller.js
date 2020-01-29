@@ -1,22 +1,27 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 import _ from 'lodash';
 
 import {
-  CONFIRMATION_MODAL_SERVICE,
+  ConfirmationModalService,
   LOAD_BALANCER_READ_SERVICE,
   LoadBalancerWriter,
   SECURITY_GROUP_READER,
   FirewallLabels,
 } from '@spinnaker/core';
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
+import ANGULAR_UI_BOOTSTRAP from 'angular-ui-bootstrap';
 
-module.exports = angular
-  .module('spinnaker.azure.loadBalancer.details.controller', [
-    require('@uirouter/angularjs').default,
+export const AZURE_LOADBALANCER_DETAILS_LOADBALANCERDETAIL_CONTROLLER =
+  'spinnaker.azure.loadBalancer.details.controller';
+export const name = AZURE_LOADBALANCER_DETAILS_LOADBALANCERDETAIL_CONTROLLER; // for backwards compatibility
+angular
+  .module(AZURE_LOADBALANCER_DETAILS_LOADBALANCERDETAIL_CONTROLLER, [
+    ANGULAR_UI_BOOTSTRAP,
+    UIROUTER_ANGULARJS,
     SECURITY_GROUP_READER,
     LOAD_BALANCER_READ_SERVICE,
-    CONFIRMATION_MODAL_SERVICE,
   ])
   .controller('azureLoadBalancerDetailsCtrl', [
     '$scope',
@@ -26,7 +31,6 @@ module.exports = angular
     'loadBalancer',
     'app',
     'securityGroupReader',
-    'confirmationModalService',
     'loadBalancerReader',
     '$q',
     function(
@@ -37,7 +41,6 @@ module.exports = angular
       loadBalancer,
       app,
       securityGroupReader,
-      confirmationModalService,
       loadBalancerReader,
       $q,
     ) {
@@ -57,7 +60,7 @@ module.exports = angular
         })[0];
 
         if ($scope.loadBalancer) {
-          var detailsLoader = loadBalancerReader.getLoadBalancerDetails(
+          const detailsLoader = loadBalancerReader.getLoadBalancerDetails(
             $scope.loadBalancer.provider,
             loadBalancer.accountId,
             loadBalancer.region,
@@ -66,9 +69,9 @@ module.exports = angular
 
           return detailsLoader.then(function(details) {
             $scope.state.loading = false;
-            var securityGroups = [];
+            const securityGroups = [];
 
-            var filtered = details.filter(function(test) {
+            const filtered = details.filter(function(test) {
               return test.name === loadBalancer.name;
             });
 
@@ -79,7 +82,7 @@ module.exports = angular
 
               if ($scope.loadBalancer.elb.securityGroups) {
                 $scope.loadBalancer.elb.securityGroups.forEach(function(securityGroupId) {
-                  var match = securityGroupReader.getApplicationSecurityGroup(
+                  const match = securityGroupReader.getApplicationSecurityGroup(
                     app,
                     loadBalancer.accountId,
                     loadBalancer.region,
@@ -97,7 +100,7 @@ module.exports = angular
                 $scope.loadBalancer.loadBalancerType = type
                   .split('_')
                   .map(s => {
-                    let ss = s.toLowerCase();
+                    const ss = s.toLowerCase();
                     return ss.substring(0, 1).toUpperCase() + ss.substring(1);
                   })
                   .join(' ');
@@ -150,7 +153,7 @@ module.exports = angular
           return;
         }
 
-        var taskMonitor = {
+        const taskMonitor = {
           application: app,
           title: 'Deleting ' + loadBalancer.name,
         };
@@ -166,12 +169,10 @@ module.exports = angular
 
         const submitMethod = () => LoadBalancerWriter.deleteLoadBalancer(command, app);
 
-        confirmationModalService.confirm({
+        ConfirmationModalService.confirm({
           header: 'Really delete ' + loadBalancer.name + '?',
           buttonText: 'Delete ' + loadBalancer.name,
-          provider: 'azure',
           account: loadBalancer.accountId,
-          applicationName: app.name,
           taskMonitorConfig: taskMonitor,
           submitMethod: submitMethod,
         });

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { uniq } from 'lodash';
 import { FormikProps } from 'formik';
 
@@ -75,13 +75,13 @@ export function WerckerTrigger(werckerTriggerProps: IWerckerTriggerConfigProps) 
     <>
       <FormikFormField
         name="master"
-        label="Master"
+        label="Build Service"
         fastField={false}
         input={props => (
           <RefreshableReactSelectInput
             {...props}
             stringOptions={fetchMasters.result}
-            placeholder={'Select a master...'}
+            placeholder={'Select a build service...'}
             disabled={!mastersLoaded}
             isLoading={mastersLoading}
             onRefreshClicked={() => fetchMasters.refresh()}

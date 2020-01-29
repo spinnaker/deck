@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { FormikProps } from 'formik';
 import { Option } from 'react-select';
 
@@ -52,7 +52,7 @@ export function ConcourseTrigger({ formik, trigger }: IConcourseTriggerConfigPro
     <>
       <FormikFormField
         name="master"
-        label="Master"
+        label="Build Service"
         fastField={false}
         input={props => (
           <ReactSelectInput
@@ -61,7 +61,7 @@ export function ConcourseTrigger({ formik, trigger }: IConcourseTriggerConfigPro
             disabled={fetchMasters.status === 'PENDING'}
             isLoading={fetchMasters.status === 'PENDING'}
             stringOptions={fetchMasters.result}
-            placeholder="Select a master..."
+            placeholder="Select a build service..."
           />
         )}
       />

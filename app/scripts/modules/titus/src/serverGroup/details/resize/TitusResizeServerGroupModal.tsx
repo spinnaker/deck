@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { Modal } from 'react-bootstrap';
 import { Form, FormikContext } from 'formik';
 import { ITitusServerGroup } from 'titus/domain';
@@ -17,7 +17,7 @@ import {
   UserVerification,
   ValidationMessage,
 } from '@spinnaker/core';
-import { useTaskMonitor } from 'titus/serverGroup/details/resize/useTaskMonitor';
+import { useTaskMonitor } from './useTaskMonitor';
 
 const { useState, useEffect, useMemo } = React;
 
@@ -254,11 +254,10 @@ export function TitusResizeServerGroupModal(props: ITitusResizeServerGroupModalP
         render={formik => {
           return (
             <>
-              <Modal.Header>
-                <h3>Resize {serverGroup.name}</h3>
-              </Modal.Header>
-
               <ModalClose dismiss={dismissModal} />
+              <Modal.Header>
+                <Modal.Title>Resize {serverGroup.name}</Modal.Title>
+              </Modal.Header>
 
               <Modal.Body>
                 <Form className="form-horizontal">

@@ -91,6 +91,10 @@ export class SecurityGroupFilterService {
         if (newGroup.subgroups) {
           this.diffSubgroups(oldGroup.subgroups, newGroup.subgroups);
         }
+        if (oldGroup.hasOwnProperty('isManaged') || newGroup.hasOwnProperty('isManaged')) {
+          oldGroup.isManaged = newGroup.isManaged;
+          oldGroup.managedResourceSummary = newGroup.managedResourceSummary;
+        }
       }
     });
     groupsToRemove.reverse().forEach(idx => {
@@ -118,8 +122,8 @@ export class SecurityGroupFilterService {
     const grouped = groupBy(securityGroups, 'account');
 
     forOwn(grouped, (group, key) => {
-      const subGroupings = groupBy(group, 'name'),
-        subGroups: ISecurityGroupGroup[] = [];
+      const subGroupings = groupBy(group, 'name');
+      const subGroups: ISecurityGroupGroup[] = [];
 
       forOwn(subGroupings, (subGroup, subKey) => {
         const subSubGroups: ISecurityGroupGroup[] = [];
@@ -131,11 +135,17 @@ export class SecurityGroupFilterService {
             heading,
             vpcName: securityGroup.vpcName,
             securityGroup,
+            isManaged: !!securityGroup.isManaged,
+            managedResourceSummary: securityGroup.managedResourceSummary,
           });
         });
+
+        const allRegionsManaged = subSubGroups.every(({ isManaged }) => isManaged);
         subGroups.push({
           heading: subKey,
           subgroups: sortBy(subSubGroups, ['heading', 'vpcName']),
+          isManaged: allRegionsManaged,
+          managedResourceSummary: allRegionsManaged ? subSubGroups[0].managedResourceSummary : undefined,
         });
       });
 

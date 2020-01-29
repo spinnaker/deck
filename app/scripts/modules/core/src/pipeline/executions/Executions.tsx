@@ -1,21 +1,21 @@
 import { IPromise } from 'angular';
-import { CreatePipelineButton } from 'core/pipeline/create/CreatePipelineButton';
+import { CreatePipelineButton } from '../create/CreatePipelineButton';
 import { IScheduler } from 'core/scheduler/SchedulerFactory';
-import * as React from 'react';
-import * as ReactGA from 'react-ga';
+import React from 'react';
+import ReactGA from 'react-ga';
 import { get } from 'lodash';
 import { $q } from 'ngimport';
 import { Subscription } from 'rxjs';
 
 import { Application } from 'core/application';
-import { IPipeline, IPipelineCommand } from 'core/domain';
+import { IPipeline, IPipelineCommand, IExecution } from 'core/domain';
 import { ReactInjector } from 'core/reactShims';
 import { ManualExecutionModal } from 'core/pipeline';
 import { Tooltip } from 'core/presentation/Tooltip';
 
-import { CreatePipeline } from 'core/pipeline/config/CreatePipeline';
-import { ExecutionFilters } from 'core/pipeline/filter/ExecutionFilters';
-import { ExecutionFilterService } from 'core/pipeline/filter/executionFilter.service';
+import { CreatePipeline } from '../config/CreatePipeline';
+import { ExecutionFilters } from '../filter/ExecutionFilters';
+import { ExecutionFilterService } from '../filter/executionFilter.service';
 import { ExecutionGroups } from './executionGroup/ExecutionGroups';
 import { FilterTags, IFilterTag, ISortFilter } from 'core/filterModel';
 import { Spinner } from 'core/widgets/spinners/Spinner';
@@ -181,7 +181,7 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
       ExecutionState.filterModel.mostRecentApplication = app.name;
     }
 
-    if (app.notFound) {
+    if (app.notFound || app.hasError) {
       return;
     }
     app.setActiveState(app.executions);
@@ -202,7 +202,8 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
         // if an execution was selected but is no longer present, navigate up
         const { $state } = ReactInjector;
         if ($state.params.executionId) {
-          if (app.getDataSource('executions').data.every(e => e.id !== $state.params.executionId)) {
+          const executions: IExecution[] = app.executions.data;
+          if (executions.every(e => e.id !== $state.params.executionId)) {
             $state.go('.^');
           }
         }
@@ -275,7 +276,7 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
 
     const hasPipelines = !!(get(app, 'executions.data', []).length || get(app, 'pipelineConfigs.data', []).length);
 
-    if (!app.notFound) {
+    if (!app.notFound && !app.hasError) {
       if (!hasPipelines && !loading) {
         return (
           <div className="text-center full-width">

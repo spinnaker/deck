@@ -1,10 +1,9 @@
 'use strict';
 
+import * as angular from 'angular';
 import { TaskExecutor } from '@spinnaker/core';
 
 describe('Controller: modifyScalingProcesses', function() {
-  const angular = require('angular');
-
   beforeEach(window.module(require('./modifyScalingProcesses.controller').name));
 
   beforeEach(
@@ -30,7 +29,10 @@ describe('Controller: modifyScalingProcesses', function() {
   describe('isDirty', function() {
     beforeEach(function() {
       this.serverGroup = { name: 'the-asg' };
-      this.processes = [{ name: 'Launch', enabled: true }, { name: 'Terminate', enabled: true }];
+      this.processes = [
+        { name: 'Launch', enabled: true },
+        { name: 'Terminate', enabled: true },
+      ];
     });
     it('starts as not dirty', function() {
       this.initializeController(this.serverGroup, this.processes);

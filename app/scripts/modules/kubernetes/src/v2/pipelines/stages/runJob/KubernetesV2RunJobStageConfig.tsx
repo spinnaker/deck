@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import Select, { Option } from 'react-select';
 import { map, capitalize } from 'lodash';
 
@@ -61,7 +61,7 @@ export class KubernetesV2RunJobStageConfig extends React.Component<IStageConfigP
 
   public accountChanged = (account: string) => {
     this.props.updateStageField({
-      credentails: account,
+      credentials: account,
       account: account,
     });
   };
@@ -183,6 +183,7 @@ export class KubernetesV2RunJobStageConfig extends React.Component<IStageConfigP
         selectedArtifactAccount={stage.consumeArtifactAccount}
         setArtifactAccount={(artifactAccount: string) => this.updateArtifactAccount(artifactAccount)}
         setArtifactId={(artifactId: string) => this.updateArtifactId(artifactId)}
+        updatePipeline={this.props.updatePipeline}
       />
     );
   }

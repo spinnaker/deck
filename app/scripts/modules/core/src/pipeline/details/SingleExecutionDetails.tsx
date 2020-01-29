@@ -1,15 +1,13 @@
-import * as React from 'react';
-import { get } from 'lodash';
-import * as ReactGA from 'react-ga';
+import React from 'react';
+import ReactGA from 'react-ga';
 import { Subscription } from 'rxjs';
 import { UISref } from '@uirouter/react';
 
 import { Application } from 'core/application/application.model';
-import { SETTINGS } from 'core/config';
 import { IExecution, IPipeline } from 'core/domain';
-import { Execution } from 'core/pipeline/executions/execution/Execution';
+import { Execution } from '../executions/execution/Execution';
 import { IScheduler, SchedulerFactory } from 'core/scheduler';
-import { PipelineTemplateV2Service, ManualExecutionModal } from 'core/pipeline';
+import { ManualExecutionModal } from 'core/pipeline';
 import { ReactInjector, IStateChange } from 'core/reactShims';
 import { Tooltip } from 'core/presentation';
 import { ISortFilter } from 'core/filterModel';
@@ -24,6 +22,7 @@ export interface ISingleExecutionDetailsProps {
 
 export interface ISingleExecutionDetailsState {
   execution: IExecution;
+  pipelineConfig?: IPipeline;
   sortFilter: ISortFilter;
   stateNotFound: boolean;
 }
@@ -60,7 +59,7 @@ export class SingleExecutionDetails extends React.Component<
     const { executionService, $state } = ReactInjector;
     const { app } = this.props;
 
-    if (!app || app.notFound) {
+    if (!app || app.notFound || app.hasError) {
       return;
     }
 
@@ -76,6 +75,12 @@ export class SingleExecutionDetails extends React.Component<
           this.executionLoader.unsubscribe();
         }
         this.setState({ execution });
+
+        app.pipelineConfigs.activate();
+        app.pipelineConfigs.ready().then(() => {
+          const pipelineConfig = app.pipelineConfigs.data.find((p: IPipeline) => p.id === execution.pipelineConfigId);
+          this.setState({ pipelineConfig });
+        });
       },
       () => {
         this.setState({ execution: null, stateNotFound: true });
@@ -130,33 +135,25 @@ export class SingleExecutionDetails extends React.Component<
 
   private rerunExecution = (execution: IExecution) => {
     const { app } = this.props;
-    app.pipelineConfigs.activate();
-    app.pipelineConfigs.ready().then(() => {
-      const pipeline = app.pipelineConfigs.data.find((p: IPipeline) => p.id === execution.pipelineConfigId);
-      ManualExecutionModal.show({
-        pipeline: pipeline,
-        application: app,
-        trigger: execution.trigger,
-      }).then(command => {
-        const { executionService } = ReactInjector;
-        executionService.startAndMonitorPipeline(app, command.pipelineName, command.trigger);
-        ReactInjector.$state.go('^.^.executions');
-      });
+    const { pipelineConfig: pipeline } = this.state;
+
+    ManualExecutionModal.show({
+      pipeline: pipeline,
+      application: app,
+      trigger: execution.trigger,
+    }).then(command => {
+      const { executionService } = ReactInjector;
+      executionService.startAndMonitorPipeline(app, command.pipelineName, command.trigger);
+      ReactInjector.$state.go('^.^.executions');
     });
   };
 
   public render() {
     const { app } = this.props;
-    const { execution, sortFilter, stateNotFound } = this.state;
+    const { execution, pipelineConfig, sortFilter, stateNotFound } = this.state;
 
     const defaultExecutionParams = { application: app.name, executionId: execution ? execution.id : '' };
     const executionParams = ReactInjector.$state.params.executionParams || defaultExecutionParams;
-    const isFromMPTV2Pipeline = PipelineTemplateV2Service.isV2PipelineConfig(get(
-      execution,
-      'pipelineConfig',
-      {},
-    ) as IPipeline);
-    const showConfigButton = SETTINGS.feature.managedPipelineTemplatesV2UI || !isFromMPTV2Pipeline;
 
     return (
       <div style={{ width: '100%', paddingTop: 0 }}>
@@ -186,22 +183,20 @@ export class SingleExecutionDetails extends React.Component<
                       <span> stage durations</span>
                     </label>
                   </div>
-                  {showConfigButton && (
-                    <Tooltip value="Navigate to Pipeline Configuration">
-                      <UISref
-                        to="^.pipelineConfig"
-                        params={{ application: this.props.app.name, pipelineId: this.state.execution.pipelineConfigId }}
+                  <Tooltip value="Navigate to Pipeline Configuration">
+                    <UISref
+                      to="^.pipelineConfig"
+                      params={{ application: this.props.app.name, pipelineId: this.state.execution.pipelineConfigId }}
+                    >
+                      <button
+                        className="btn btn-sm btn-default single-execution-details__configure"
+                        onClick={this.handleConfigureClicked}
                       >
-                        <button
-                          className="btn btn-sm btn-default single-execution-details__configure"
-                          onClick={this.handleConfigureClicked}
-                        >
-                          <span className="glyphicon glyphicon-cog" />
-                          <span className="visible-md-inline visible-lg-inline"> Configure</span>
-                        </button>
-                      </UISref>
-                    </Tooltip>
-                  )}
+                        <span className="glyphicon glyphicon-cog" />
+                        <span className="visible-md-inline visible-lg-inline"> Configure</span>
+                      </button>
+                    </UISref>
+                  </Tooltip>
                 </div>
               </div>
             </div>
@@ -216,9 +211,12 @@ export class SingleExecutionDetails extends React.Component<
                 pipelineConfig={null}
                 standalone={true}
                 showDurations={sortFilter.showDurations}
-                onRerun={() => {
-                  this.rerunExecution(execution);
-                }}
+                onRerun={
+                  pipelineConfig &&
+                  (() => {
+                    this.rerunExecution(execution);
+                  })
+                }
               />
             </div>
           </div>

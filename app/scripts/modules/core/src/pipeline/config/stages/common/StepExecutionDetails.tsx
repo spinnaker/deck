@@ -1,8 +1,8 @@
-import * as React from 'react';
+import React from 'react';
 import { isEqual } from 'lodash';
 
 import { IExecutionDetailsProps, IExecutionDetailsState } from 'core/domain';
-import { ExecutionDetailsSectionNav } from 'core/pipeline/details';
+import { ExecutionDetailsSectionNav } from '../../../details';
 import { ReactInjector } from 'core/reactShims';
 
 export class StepExecutionDetails extends React.Component<IExecutionDetailsProps, IExecutionDetailsState> {

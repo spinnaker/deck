@@ -1,11 +1,11 @@
-import * as React from 'react';
+import React from 'react';
 
 import { IExecutionStage } from 'core/domain';
 import { StatusGlyph } from 'core/task/StatusGlyph';
 import { displayableTasks } from 'core/task/displayableTasks.filter';
 import { duration } from 'core/utils/timeFormatters';
 import { robotToHuman } from 'core/presentation/robotToHumanFilter/robotToHuman.filter';
-import { OrchestratedItemRunningTime } from 'core/pipeline/executions/execution/OrchestratedItemRunningTime';
+import { OrchestratedItemRunningTime } from '../../../executions/execution/OrchestratedItemRunningTime';
 
 export interface IExecutionStepDetailsProps {
   item: IExecutionStage;

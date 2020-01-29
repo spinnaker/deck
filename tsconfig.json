@@ -2,7 +2,8 @@
   "buildOnSave": false,
   "compileOnSave": true,
   "compilerOptions": {
-    "allowJs": false,
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
     "baseUrl": "app/scripts/modules",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
@@ -44,7 +45,10 @@
       "cloudfoundry/": ["cloudfoundry/src"],
       "@spinnaker/titus": ["titus/src"],
       "titus/*": ["titus/src/*"],
-      "titus/": ["titus/src"]
+      "titus/": ["titus/src"],
+      "@spinnaker/huaweicloud": ["huaweicloud/src"],
+      "huaweicloud/*": ["huaweicloud/src/*"],
+      "huaweicloud": ["huaweicloud/src"]
     },
     "pretty": true,
     "removeComments": true,

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import Select, { Creatable, Option } from 'react-select';
 import { intersection, uniq, without, cloneDeep, compact } from 'lodash';
 import { Button } from 'react-bootstrap';
@@ -102,8 +102,8 @@ export class PermissionsConfigurer extends React.Component<IPermissionsConfigure
   }
 
   private convertRequiredGroupMembershipToPermissions(): IPermissions {
-    let READ: string[] = [],
-      WRITE: string[] = [];
+    let READ: string[] = [];
+    let WRITE: string[] = [];
     if (this.props.permissions && this.props.permissions.READ) {
       READ = this.props.permissions.READ.slice();
     }

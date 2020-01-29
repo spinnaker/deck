@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { Modal } from 'react-bootstrap';
 import { isEmpty, set } from 'lodash';
 import { $log } from 'ngimport';
@@ -29,7 +29,10 @@ export function DeletePipelineModal(props: IDeletePipelineModalProps) {
         const idsToUpdatedIndices = {};
         const isPipelineStrategy = pipeline.strategy === true;
         const data = isPipelineStrategy ? application.strategyConfigs.data : application.pipelineConfigs.data;
-        data.splice(data.findIndex((p: any) => p.id === pipeline.id), 1);
+        data.splice(
+          data.findIndex((p: any) => p.id === pipeline.id),
+          1,
+        );
         data.forEach((p: IPipeline, index: number) => {
           if (p.index !== index) {
             p.index = index;
@@ -56,7 +59,7 @@ export function DeletePipelineModal(props: IDeletePipelineModalProps) {
       <Modal key="modal" show={true} onHide={() => {}}>
         <ModalClose dismiss={dismissModal} />
         <Modal.Header>
-          <h3>Really Delete {pipeline.strategy === true ? 'Strategy' : 'Pipeline'}?</h3>
+          <Modal.Title>Really Delete {pipeline.strategy === true ? 'Strategy' : 'Pipeline'}?</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {deleteError && (
