@@ -48,8 +48,6 @@ export * from './managed';
 
 export * from './manifest';
 
-export * from './mocks';
-
 export * from './naming';
 
 export * from './navigation';
