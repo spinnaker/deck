@@ -4,7 +4,6 @@ import {
   IExecutionDetailsSectionProps,
   ExecutionDetailsSection,
   StageFailureMessage,
-  Overridable,
   IManifest,
 } from '@spinnaker/core';
 
@@ -43,7 +42,6 @@ export interface IDeployStatusState {
   manifestIds: string[];
 }
 
-@Overridable('kubernetes.v2.pipeline.stages.deployManifest.deployStatus')
 export class DeployStatus extends React.Component<IExecutionDetailsSectionProps, IDeployStatusState> {
   public static title = 'deployStatus';
 
