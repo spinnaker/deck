@@ -1,4 +1,4 @@
-import { ExecutionDetailsTasks, Registry } from '@spinnaker/core';
+import { ExecutionDetailsTasks, Registry } from 'core';
 
 import { AwsCodeBuildStageConfig } from './AwsCodeBuildStageConfig';
 import { AwsCodeBuildExecutionDetails } from './AwsCodeBuildExecutionDetails';

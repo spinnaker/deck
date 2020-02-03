@@ -4,7 +4,7 @@ import { Observable, Subject } from 'rxjs';
 
 import { Option } from 'react-select';
 
-import { IgorService, IStageConfigProps, ReactSelectInput, StageConfigField, TextInput } from '@spinnaker/core';
+import { IgorService, IStageConfigProps, ReactSelectInput, StageConfigField, TextInput } from 'core';
 
 export interface IAwsCodeBuildStageConfigState {
   accounts: string[];
