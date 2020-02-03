@@ -52,6 +52,7 @@ export class AwsCodeBuildStageConfig extends React.Component<IStageConfigProps, 
           />
         </StageConfigField>
         <StageConfigField label="Project Name">
+          {/* TODO: Select project from a drop-down list. Behind the scene, gate calls igor to fetch projects list */}
           <TextInput
             type="text"
             className="form-control"
