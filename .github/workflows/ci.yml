@@ -1,6 +1,11 @@
-name: Run CI
+name: Deck CI
 
-on: push
+on:
+  pull_request:
+  push:
+    branches:
+    - master
+    - release-*
 
 env:
   NODE_VERSION: 10.15.1
