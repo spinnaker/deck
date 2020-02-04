@@ -3,25 +3,52 @@ import Select, { Option } from 'react-select';
 
 import { noop } from '@spinnaker/core';
 
-import { IManifestLabelSelector, LABEL_KINDS } from '../IManifestLabelSelector';
+import { IManifestLabelSelector, RequirementKind, SelectorKind } from '../IManifestLabelSelector';
+import { ManifestLabelSelectors } from '../ManifestLabelSelectors';
 
 import './labelEditor.less';
 
 export interface ILabelEditorProps {
   labelSelectors: IManifestLabelSelector[];
   onLabelSelectorsChange: (labelSelectors: IManifestLabelSelector[]) => void;
+  selectorKinds?: SelectorKind[];
 }
-
-const LabelKeyOptions: Array<Option<string>> = LABEL_KINDS.map(kind => ({ label: kind, value: kind }));
 
 export default class LabelEditor extends React.Component<ILabelEditorProps> {
   public static defaultProps: Partial<ILabelEditorProps> = {
     labelSelectors: [],
     onLabelSelectorsChange: noop,
+    selectorKinds: [
+      SelectorKind.EQUALS,
+      SelectorKind.NOT_EQUALS,
+      SelectorKind.CONTAINS,
+      SelectorKind.NOT_CONTAINS,
+      SelectorKind.EXISTS,
+      SelectorKind.NOT_EXISTS,
+      SelectorKind.ANY,
+    ],
   };
 
   private static convertValueStringToArray = (value: string): string[] => {
     return value.split(',').map((v: string) => v.trim());
+  };
+
+  private getPlaceholderForKind = (selectorKind: SelectorKind): string => {
+    const requirementKind = ManifestLabelSelectors.getRequirementKind(selectorKind);
+    switch (requirementKind) {
+      case RequirementKind.EQUALITY_BASED:
+        return 'Enter exactly one value';
+      case RequirementKind.SET_BASED:
+        return 'Enter comma-separated values';
+      case RequirementKind.EXISTENCE_BASED:
+        return 'Any value entered here will be ignored';
+      default:
+        return '';
+    }
+  };
+
+  private getKindOptions = (): Array<Option<string>> => {
+    return this.props.selectorKinds.map(kind => ({ label: kind, value: kind }));
   };
 
   private handleChange = (idx: number, property: keyof IManifestLabelSelector, value: string | string[]): void => {
@@ -51,7 +78,7 @@ export default class LabelEditor extends React.Component<ILabelEditorProps> {
       this.props.labelSelectors.concat([
         {
           key: '',
-          kind: 'EQUALS',
+          kind: SelectorKind.EQUALS,
           values: [],
         },
       ]),
@@ -85,7 +112,7 @@ export default class LabelEditor extends React.Component<ILabelEditorProps> {
                   className="label-editor-kind-select"
                   clearable={false}
                   onChange={(option: Option<string>) => this.handleChange(idx, 'kind', option.value)}
-                  options={LabelKeyOptions}
+                  options={this.getKindOptions()}
                   value={selector.kind}
                 />
               </td>
@@ -95,7 +122,7 @@ export default class LabelEditor extends React.Component<ILabelEditorProps> {
                   onChange={(e: any) =>
                     this.handleChange(idx, 'values', LabelEditor.convertValueStringToArray(e.target.value))
                   }
-                  placeholder="Comma-separated values"
+                  placeholder={this.getPlaceholderForKind(selector.kind)}
                   value={selector.values.join(', ')}
                   type="text"
                 />

@@ -3,36 +3,21 @@ import { get, flatten } from 'lodash';
 
 import { StageConstants } from '@spinnaker/core';
 
+import { ManifestLabelSelectors } from '../../manifest/selector/ManifestLabelSelectors';
+import { IManifestLabelSelectors } from '../../manifest/selector/IManifestLabelSelector';
+
 export interface IManifestCoordinateProps {
   account: string;
   manifestName: string;
   location: string;
   cluster: string;
   criteria: string;
-  labelSelectors: ILabelSelectors;
+  labelSelectors: IManifestLabelSelectors;
   manifestNamesByNamespace: IManifestNamesByNamespace;
 }
 
 export interface IManifestNamesByNamespace {
   [namespace: string]: string[];
-}
-
-export interface ILabelSelectors {
-  selectors: Array<{
-    key?: string;
-    kind: SelectorKind;
-    values?: string[];
-  }>;
-}
-
-export enum SelectorKind {
-  ANY = 'ANY',
-  EQUALS = 'EQUALS',
-  NOT_EQUALS = 'NOT_EQUALS',
-  CONTAINS = 'CONTAINS',
-  NOT_CONTAINS = 'NOT_CONTAINS',
-  EXISTS = 'EXISTS',
-  NOT_EXISTS = 'NOT_EXISTS',
 }
 
 const mapCriteriaToLabel = (criteria: string): string =>
@@ -41,29 +26,9 @@ const mapCriteriaToLabel = (criteria: string): string =>
     'label',
   );
 
-export const formatLabelSelectors = (labelSelectors: ILabelSelectors): string => {
+const formatLabelSelectors = (labelSelectors: IManifestLabelSelectors): string => {
   return (labelSelectors.selectors || [])
-    .map(selector => {
-      const { key, kind, values = [] } = selector;
-      switch (kind) {
-        case SelectorKind.ANY:
-          return null;
-        case SelectorKind.EQUALS:
-          return `${key} = ${values[0]}`;
-        case SelectorKind.NOT_EQUALS:
-          return `${key} != ${values[0]}`;
-        case SelectorKind.CONTAINS:
-          return `${key} in (${values.join(', ')})`;
-        case SelectorKind.NOT_CONTAINS:
-          return `${key} notin (${values.join(', ')})`;
-        case SelectorKind.EXISTS:
-          return `${key}`;
-        case SelectorKind.NOT_EXISTS:
-          return `!${key}`;
-        default:
-          return null;
-      }
-    })
+    .map(selector => ManifestLabelSelectors.formatLabelSelector(selector))
     .filter(formatted => !!formatted)
     .join(', ');
 };

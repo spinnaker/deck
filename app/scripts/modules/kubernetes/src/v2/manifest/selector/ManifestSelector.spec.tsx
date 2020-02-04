@@ -16,7 +16,7 @@ import { ManifestKindSearchService } from 'kubernetes/v2/manifest/ManifestKindSe
 import { ManifestSelector, IManifestSelectorState } from 'kubernetes/v2/manifest/selector/ManifestSelector';
 import { SelectorMode } from 'kubernetes/v2/manifest/selector/IManifestSelector';
 import LabelEditor from 'kubernetes/v2/manifest/selector/labelEditor/LabelEditor';
-import { IManifestLabelSelector } from 'kubernetes/v2/manifest/selector/IManifestLabelSelector';
+import { IManifestLabelSelector, SelectorKind } from 'kubernetes/v2/manifest/selector/IManifestLabelSelector';
 
 describe('<ManifestSelector />', () => {
   let searchService: Spy;
@@ -88,7 +88,7 @@ describe('<ManifestSelector />', () => {
       const labelSelectors: IManifestLabelSelector[] = [
         {
           key: 'label-key',
-          kind: 'EQUALS',
+          kind: SelectorKind.EQUALS,
           values: ['label-value'],
         },
       ];

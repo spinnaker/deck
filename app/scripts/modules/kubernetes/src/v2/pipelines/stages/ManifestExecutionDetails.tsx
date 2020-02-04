@@ -1,7 +1,8 @@
 import React from 'react';
 
 import { ExecutionDetailsSection, IExecutionDetailsSectionProps, StageFailureMessage } from '@spinnaker/core';
-import { ManifestCoordinates, ILabelSelectors, IManifestNamesByNamespace } from './ManifestCoordinates';
+import { ManifestCoordinates, IManifestNamesByNamespace } from './ManifestCoordinates';
+import { IManifestLabelSelectors } from '../../manifest/selector/IManifestLabelSelector';
 
 interface IManifestExecutionDetailsProps extends IExecutionDetailsSectionProps {
   context: {
@@ -10,7 +11,7 @@ interface IManifestExecutionDetailsProps extends IExecutionDetailsSectionProps {
     location: string;
     cluster: string;
     criteria: string;
-    labelSelectors: ILabelSelectors;
+    labelSelectors: IManifestLabelSelectors;
     manifestNamesByNamespace: IManifestNamesByNamespace;
   };
 }

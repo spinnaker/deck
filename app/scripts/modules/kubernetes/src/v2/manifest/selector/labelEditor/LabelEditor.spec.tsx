@@ -2,6 +2,7 @@ import React from 'react';
 import { shallow, ShallowWrapper } from 'enzyme';
 
 import LabelEditor, { ILabelEditorProps } from './LabelEditor';
+import { SelectorKind } from '../IManifestLabelSelector';
 
 describe('<LabelEditor />', () => {
   let onChangeSpy: jasmine.Spy;
@@ -14,12 +15,12 @@ describe('<LabelEditor />', () => {
       labelSelectors: [
         {
           key: 'my-label-1',
-          kind: 'EQUALS',
+          kind: SelectorKind.EQUALS,
           values: ['my-value-1', 'my-value-2'],
         },
         {
           key: 'my-label-2',
-          kind: 'NOT_EQUALS',
+          kind: SelectorKind.NOT_EQUALS,
           values: ['my-value-3'],
         },
       ],
