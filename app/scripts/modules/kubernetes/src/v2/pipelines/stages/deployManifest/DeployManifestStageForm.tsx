@@ -24,6 +24,10 @@ import { IManifestBindArtifact } from './ManifestBindArtifactsSelector';
 import { ManifestDeploymentOptions } from './ManifestDeploymentOptions';
 import { ManifestBindArtifactsSelectorDelegate } from './ManifestBindArtifactsSelectorDelegate';
 import { NamespaceSelector } from './NamespaceSelector';
+import {
+  ILabelFiltrationStageConfig,
+  LabelFiltrationStageForm,
+} from '../../../manifest/selector/labelEditor/LabelFiltrationStageForm';
 
 interface IDeployManifestStageConfigFormProps {
   accounts: IAccountDetails[];
@@ -119,6 +123,10 @@ export class DeployManifestStageForm extends React.Component<
     this.setState({ overrideNamespace: checked });
   }
 
+  private setLabelFilterConfig = (labelFiltrationConfig: ILabelFiltrationStageConfig): void => {
+    this.props.formik.setFieldValue('sourceManifestFiltration', labelFiltrationConfig);
+  };
+
   public render() {
     const stage = this.props.formik.values;
     return (
@@ -197,6 +205,7 @@ export class DeployManifestStageForm extends React.Component<
             stage={stage}
           />
         </StageConfigField>
+        <LabelFiltrationStageForm config={stage.sourceManifestFiltration} setConfig={this.setLabelFilterConfig} />
         <hr />
         <ManifestDeploymentOptions
           accounts={this.props.accounts}

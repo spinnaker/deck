@@ -179,6 +179,12 @@ const helpContents: { [key: string]: string } = {
   'kubernetes.manifest.cluster': `
       <p>A cluster is a grouping of resources (often across multiple versions of a resource) within an application.</p>
   `,
+  'kubernetes.manifest.labelSelectors': `
+    <p>If enabled, Spinnaker will only apply the subset of manifests that match all configured
+        <a href="https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors">Kubernetes label selector</a>
+        requirements.
+    </p>
+  `,
   'kubernetes.manifest.stackdetail': `
       <p>
       <b>Stack:</b> <i>(Optional)</i> A naming component used to optionally group manifests within Spinnaker. Typically used to create vertical stacks of resources that can be aggregated/filtered later.

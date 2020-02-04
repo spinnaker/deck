@@ -22,6 +22,10 @@ import {
 import { ManifestBasicSettings } from 'kubernetes/v2/manifest/wizard/BasicSettings';
 import { ManifestBindArtifactsSelectorDelegate } from '../deployManifest/ManifestBindArtifactsSelectorDelegate';
 import { IManifestBindArtifact } from '../deployManifest/ManifestBindArtifactsSelector';
+import {
+  ILabelFiltrationStageConfig,
+  LabelFiltrationStageForm,
+} from '../../../manifest/selector/labelEditor/LabelFiltrationStageForm';
 
 export interface IKubernetesRunJobStageConfigState {
   credentials: IAccount[];
@@ -209,6 +213,10 @@ export class KubernetesV2RunJobStageConfig extends React.Component<IStageConfigP
     this.props.updateStageField({ requiredArtifacts: bindings.filter(b => b.artifact) });
   };
 
+  private setLabelFilterConfig = (labelFiltrationConfig: ILabelFiltrationStageConfig): void => {
+    this.props.updateStageField({ sourceManifestFiltration: labelFiltrationConfig });
+  };
+
   public render() {
     const { application, stage } = this.props;
 
@@ -267,6 +275,7 @@ export class KubernetesV2RunJobStageConfig extends React.Component<IStageConfigP
             stage={stage}
           />
         </StageConfigField>
+        <LabelFiltrationStageForm config={stage.sourceManifestFiltration} setConfig={this.setLabelFilterConfig} />
         <h4>Output</h4>
         <StageConfigField label="Capture Output From" helpKey="kubernetes.runJob.captureSource">
           <div>
