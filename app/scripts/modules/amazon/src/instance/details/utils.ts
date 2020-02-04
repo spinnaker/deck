@@ -17,7 +17,12 @@ export const applyHealthCheckInfoToTargetGroups = (
     if (metric.type === 'TargetGroup') {
       metric.targetGroups.forEach((tg: ITargetGroup) => {
         const group = targetGroups[tg.name] ?? ({} as ITargetGroup);
-        const port = parseInt(group.healthCheckPort as any, 10) ?? group.port;
+        let port = group.port;
+
+        if (group.healthCheckPort != null && group.healthCheckPort !== 'traffic-port') {
+          port =
+            typeof group.healthCheckPort === 'string' ? parseInt(group.healthCheckPort, 10) : group.healthCheckPort;
+        }
         tg.healthCheckProtocol = group.healthCheckProtocol.toLowerCase();
         tg.healthCheckPath = `:${port}${group.healthCheckPath}`;
       });
