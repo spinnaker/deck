@@ -197,8 +197,9 @@ module(AMAZON_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
           $scope.instance.loadBalancers = loadBalancers;
           $scope.instance.targetGroups = targetGroups;
           if ($scope.instance.networkInterfaces) {
-            const allIpv6Addresses = _.flatten($scope.instance.networkInterfaces.map(i => i.ipv6Addresses));
-            $scope.instance.ipv6Addresses = allIpv6Addresses.map(address => address.ipv6Address);
+            $scope.instance.ipv6Addresses = _.flatMap($scope.instance.networkInterfaces, i =>
+              i.ipv6Addresses.map(a => a.ipv6Address),
+            );
 
             const permanentNetworkInterfaces = $scope.instance.networkInterfaces.filter(
               f => f.attachment.deleteOnTermination === false,
