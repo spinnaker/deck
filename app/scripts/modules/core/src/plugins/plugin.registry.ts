@@ -1,8 +1,6 @@
 import { API } from 'core/api';
-import { IUrlBuilder } from 'core/navigation';
 import { Registry } from 'core/registry';
 import { IStageTypeConfig } from 'core/domain';
-import { SearchResultType } from 'core/search';
 
 export interface IDeckPlugin {
   stages?: IStageTypeConfig[];
