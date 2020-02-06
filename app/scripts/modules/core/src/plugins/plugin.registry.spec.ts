@@ -1,4 +1,5 @@
 import { IStageTypeConfig } from 'core/domain';
+import { API } from '../api';
 import { IDeckPlugin, IPluginManifest, IPluginMetaData, PluginRegistry } from './plugin.registry';
 import { Registry } from 'core/registry';
 
@@ -31,6 +32,19 @@ describe('PluginRegistry', () => {
       expect(pluginRegistry.getRegisteredPlugins()[0]).toEqual(jasmine.objectContaining(plugin1));
       expect(pluginRegistry.getRegisteredPlugins()[1]).toEqual(jasmine.objectContaining(plugin2));
     });
+  });
+
+  it('loadPluginManifestFromDeck() should import() from /plugin-manifest.js', async () => {
+    loadModuleFromUrlSpy.and.callFake(() => Promise.resolve({ plugins: [] }));
+    await pluginRegistry.loadPluginManifestFromDeck();
+    expect(loadModuleFromUrlSpy).toHaveBeenCalledWith('/plugin-manifest.js');
+  });
+
+  it('loadPluginManifestFromGate() should fetch from gate /plugins/deck/plugin-manifest.json', async () => {
+    const spy = jasmine.createSpy('get', () => Promise.resolve([])).and.callThrough();
+    spyOn(API as any, 'getFn').and.callFake(() => spy);
+    await pluginRegistry.loadPluginManifestFromGate();
+    expect(spy).toHaveBeenCalled();
   });
 
   describe('loadPlugins()', () => {
