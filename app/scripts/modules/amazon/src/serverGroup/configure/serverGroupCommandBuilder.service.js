@@ -89,7 +89,6 @@ angular
                 instanceProfile: 'custom',
                 useAllImageSelection: false,
                 useSimpleCapacity: true,
-                usePreferredZones: true,
                 mode: defaults.mode || 'create',
                 disableStrategySelection: true,
                 dirty: {},
@@ -125,7 +124,6 @@ angular
         return asyncLoader.then(function(asyncData) {
           const command = asyncData.command;
           const zones = pipelineCluster.availabilityZones[region];
-          const usePreferredZones = zones.join(',') === command.availabilityZones.join(',');
 
           const viewState = {
             instanceProfile: asyncData.instanceProfile,
@@ -133,7 +131,6 @@ angular
             useSimpleCapacity:
               pipelineCluster.capacity.min === pipelineCluster.capacity.max &&
               pipelineCluster.useSourceCapacity !== true,
-            usePreferredZones: usePreferredZones,
             mode: 'editPipeline',
             submitButtonLabel: 'Done',
             templatingEnabled: true,
@@ -192,7 +189,6 @@ angular
       }
 
       function buildServerGroupCommandFromExisting(application, serverGroup, mode = 'clone') {
-        const preferredZonesLoader = AccountService.getPreferredZonesByAccount('aws');
         const subnetsLoader = SubnetReader.listSubnets();
 
         const serverGroupName = NameUtils.parseServerGroupName(serverGroup.asg.autoScalingGroupName);
@@ -201,20 +197,12 @@ angular
         const instanceTypeCategoryLoader = instanceTypeService.getCategoryForInstanceType('aws', instanceType);
 
         const asyncLoader = $q.all({
-          preferredZones: preferredZonesLoader,
           subnets: subnetsLoader,
           instanceProfile: instanceTypeCategoryLoader,
         });
 
         return asyncLoader.then(function(asyncData) {
           const zones = serverGroup.asg.availabilityZones.sort();
-          let usePreferredZones = false;
-          const preferredZonesForAccount = asyncData.preferredZones[serverGroup.account];
-          if (preferredZonesForAccount) {
-            const preferredZones = preferredZonesForAccount[serverGroup.region].sort();
-            usePreferredZones = zones.join(',') === preferredZones.join(',');
-          }
-
           // These processes should never be copied over, as the affect launching instances and enabling traffic
           const enabledProcesses = ['Launch', 'Terminate', 'AddToLoadBalancer'];
 
@@ -271,7 +259,6 @@ angular
               instanceProfile: asyncData.instanceProfile,
               useAllImageSelection: false,
               useSimpleCapacity: serverGroup.asg.minSize === serverGroup.asg.maxSize,
-              usePreferredZones: usePreferredZones,
               mode: mode,
               submitButtonLabel: getSubmitButtonLabel(mode),
               isNew: false,

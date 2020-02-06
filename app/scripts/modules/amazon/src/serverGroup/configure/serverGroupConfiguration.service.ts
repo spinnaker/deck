@@ -1,20 +1,6 @@
 import { module, IPromise } from 'angular';
 import { $q } from 'ngimport';
-import {
-  chain,
-  clone,
-  cloneDeep,
-  extend,
-  find,
-  flatten,
-  has,
-  intersection,
-  keys,
-  map,
-  partition,
-  some,
-  xor,
-} from 'lodash';
+import { chain, clone, extend, find, flatten, has, intersection, keys, map, partition, some, xor } from 'lodash';
 
 import {
   AccountService,
@@ -99,7 +85,6 @@ export interface IAmazonServerGroupCommand extends IServerGroupCommand {
 
   getBlockDeviceMappingsSource: (command: IServerGroupCommand) => IBlockDeviceMappingSource;
   selectBlockDeviceMappingsSource: (command: IServerGroupCommand, selection: string) => void;
-  usePreferredZonesChanged: (command: IServerGroupCommand) => IAmazonServerGroupCommandResult;
   regionIsDeprecated: (command: IServerGroupCommand) => boolean;
 }
 
@@ -337,6 +322,8 @@ export class AwsServerGroupConfigurationService {
       command.backingData.credentialsKeyedByAccount[command.credentials].regions,
       { name: command.region },
     ).availabilityZones;
+
+    command.availabilityZones = command.backingData.preferredZones[command.credentials]?.[command.region] || [];
   }
 
   public configureSubnetPurposes(command: IAmazonServerGroupCommand): IServerGroupCommandResult {
@@ -534,25 +521,6 @@ export class AwsServerGroupConfigurationService {
 
   // TODO: Instead of attaching these to the command itself, they could be static methods
   public attachEventHandlers(cmd: IAmazonServerGroupCommand): void {
-    cmd.usePreferredZonesChanged = (command: IAmazonServerGroupCommand): IAmazonServerGroupCommandResult => {
-      const currentZoneCount = command.availabilityZones ? command.availabilityZones.length : 0;
-      const result: IAmazonServerGroupCommandResult = { dirty: {} };
-      const preferredZonesForAccount = command.backingData.preferredZones[command.credentials];
-      if (preferredZonesForAccount && preferredZonesForAccount[command.region] && command.viewState.usePreferredZones) {
-        command.availabilityZones = cloneDeep(preferredZonesForAccount[command.region].sort());
-      } else {
-        command.availabilityZones = intersection(
-          command.availabilityZones,
-          command.backingData.filtered.availabilityZones,
-        );
-        const newZoneCount = command.availabilityZones ? command.availabilityZones.length : 0;
-        if (currentZoneCount !== newZoneCount) {
-          result.dirty.availabilityZones = true;
-        }
-      }
-      return result;
-    };
-
     cmd.subnetChanged = (command: IAmazonServerGroupCommand): IServerGroupCommandResult => {
       const result = this.configureVpcId(command);
       extend(result.dirty, this.configureSecurityGroupOptions(command).dirty);
@@ -571,7 +539,6 @@ export class AwsServerGroupConfigurationService {
         extend(result.dirty, this.configureInstanceTypes(command).dirty);
 
         this.configureAvailabilityZones(command);
-        extend(result.dirty, command.usePreferredZonesChanged(command).dirty);
 
         extend(result.dirty, this.configureImages(command).dirty);
         extend(result.dirty, this.configureKeyPairs(command).dirty);

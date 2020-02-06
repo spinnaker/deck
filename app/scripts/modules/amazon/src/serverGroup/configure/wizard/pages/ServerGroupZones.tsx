@@ -21,9 +21,14 @@ export class ServerGroupZones extends React.Component<IServerGroupZonesProps>
   }
 
   private handleAvailabilityZonesChanged = (zones: string[]): void => {
+    this.props.formik.setFieldValue('availabilityZones', zones);
+  };
+
+  private handlePreferredZonesSelected = (): void => {
     const { values, setFieldValue } = this.props.formik;
-    values.usePreferredZonesChanged(values);
-    setFieldValue('availabilityZones', zones);
+    const preferredZones = values.backingData.preferredZones[values.credentials]?.[values.region]?.slice() || [];
+
+    setFieldValue('availabilityZones', preferredZones);
   };
 
   private rebalanceToggled = () => {
@@ -35,15 +40,18 @@ export class ServerGroupZones extends React.Component<IServerGroupZonesProps>
 
   public render() {
     const { values } = this.props.formik;
+    const currentAvailabilityZones = values.availabilityZones;
+    const preferredZones = values.backingData.preferredZones[values.credentials]?.[values.region] || [];
+    const isUsingPreferredZones = currentAvailabilityZones.sort().join() === preferredZones.sort().join();
     return (
       <div className="container-fluid form-horizontal">
         <AvailabilityZoneSelector
           credentials={values.credentials}
           region={values.region}
           onChange={this.handleAvailabilityZonesChanged}
+          onPreferredZonesSelect={isUsingPreferredZones ? undefined : this.handlePreferredZonesSelected}
           selectedZones={values.availabilityZones}
           allZones={values.backingData.filtered.availabilityZones}
-          usePreferredZones={values.viewState.usePreferredZones}
         />
         <div className="form-group">
           <div className="col-md-3 sm-label-right">

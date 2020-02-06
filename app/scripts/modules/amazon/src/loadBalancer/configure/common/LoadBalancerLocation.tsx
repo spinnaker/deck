@@ -156,14 +156,10 @@ export class LoadBalancerLocation extends React.Component<ILoadBalancerLocationP
       ([allSubnets, subnetPurpose]) => allSubnets && allSubnets.find(subnet => subnet.purpose === subnetPurpose),
     );
 
-    // I don't understand why we use subnet.availabilityZones here, but region.availabilityZones below.
     const availabilityZones$ = subnet$.map(subnet => (subnet ? uniq(subnet.availabilityZones).sort() : []));
-
-    // Update selected zones when the selected region changes
-    const regionZones$ = form.region$
-      .withLatestFrom(accountRegions$)
-      .map(([currentRegion, accountRegions]) => accountRegions.find(region => region.name === currentRegion))
-      .map(region => (region ? region.availabilityZones : []));
+    availabilityZones$.takeUntil(this.destroy$).subscribe(availabilityZones => {
+      this.props.formik.setFieldValue('regionZones', availabilityZones);
+    });
 
     const moniker$ = Observable.combineLatest(appName$, form.stack$, form.detail$).map(([app, stack, detail]) => {
       return { app, stack, detail, cluster: NameUtils.getClusterName(app, stack, detail) } as IMoniker;
@@ -178,10 +174,6 @@ export class LoadBalancerLocation extends React.Component<ILoadBalancerLocationP
           this.props.formik.setFieldValue('region', accountRegions[0] && accountRegions[0].name);
         }
       });
-
-    regionZones$.takeUntil(this.destroy$).subscribe(regionZones => {
-      this.props.formik.setFieldValue('regionZones', regionZones);
-    });
 
     subnet$.takeUntil(this.destroy$).subscribe(subnet => {
       this.props.formik.setFieldValue('vpcId', subnet && subnet.vpcIds[0]);

@@ -29,7 +29,7 @@ describe('awsServerGroupCommandBuilder', function() {
   afterEach(AWSProviderSettings.resetToOriginal);
 
   describe('buildNewServerGroupCommand', function() {
-    it('initializes to default values, setting usePreferredZone flag to true', function() {
+    it('initializes to default values', function() {
       var command = null;
       AWSProviderSettings.defaults.iamRole = '{{application}}IAMRole';
       this.awsServerGroupCommandBuilder
@@ -40,14 +40,13 @@ describe('awsServerGroupCommandBuilder', function() {
 
       this.$scope.$digest();
 
-      expect(command.viewState.usePreferredZones).toBe(true);
       expect(command.availabilityZones).toEqual(['a', 'b', 'c']);
       expect(command.iamRole).toBe('appoIAMRole');
     });
   });
 
   describe('buildServerGroupCommandFromExisting', function() {
-    it('sets usePreferredZones flag based on initial value', function() {
+    it('sets availabilityZones based on initial value', function() {
       spyOn(this.instanceTypeService, 'getCategoryForInstanceType').and.returnValue(this.$q.when('custom'));
       var baseServerGroup = {
         account: 'prod',
@@ -67,7 +66,6 @@ describe('awsServerGroupCommandBuilder', function() {
 
       this.$scope.$digest();
 
-      expect(command.viewState.usePreferredZones).toBe(true);
       expect(command.availabilityZones).toEqual(['g', 'h', 'i']);
 
       baseServerGroup.asg.availabilityZones = ['g'];
@@ -80,7 +78,6 @@ describe('awsServerGroupCommandBuilder', function() {
 
       this.$scope.$digest();
 
-      expect(command.viewState.usePreferredZones).toBe(false);
       expect(command.availabilityZones).toEqual(['g']);
     });
 

@@ -52,7 +52,6 @@ export interface IServerGroupCommandViewState {
   showImageSourceSelector: true;
   useAllImageSelection: boolean;
   useSimpleCapacity: boolean;
-  usePreferredZones: boolean;
   mode: string;
   pipeline?: IPipeline;
   stage?: IStage;
