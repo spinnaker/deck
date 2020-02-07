@@ -6,15 +6,11 @@ export interface ILinkWithClipboardProps {
   text: string;
 }
 
-export const LinkWithClipboard = ({ url, text }: ILinkWithClipboardProps) => {
-  // eslint-disable-next-line
-  console.log('here', url, text);
-  return (
-    <>
-      <a href={url} target="_blank">
-        {text}
-      </a>
-      <CopyToClipboard className="copy-to-clipboard copy-to-clipboard-sm" text={text} toolTip="'Copy to clipboard'" />
-    </>
-  );
-};
+export const LinkWithClipboard = ({ url, text }: ILinkWithClipboardProps) => (
+  <>
+    <a href={url} target="_blank">
+      {text}
+    </a>
+    <CopyToClipboard text={text} toolTip="'Copy to clipboard'" />
+  </>
+);
