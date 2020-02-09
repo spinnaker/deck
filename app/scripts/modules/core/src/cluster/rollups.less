@@ -267,7 +267,7 @@ running-tasks-tag {
   }
 }
 
-.menu-load-balancers {
+.menu-badge-popover {
   &.popover.bottom div.arrow:after {
     border-bottom-color: var(--color-dovegray);
   }
@@ -279,13 +279,13 @@ running-tasks-tag {
 
   min-width: 150px;
 
-  .menu-load-balancers-header {
+  .menu-badge-popover-header {
     font-weight: 600;
     color: var(--color-cirrus);
     background-color: var(--color-dovegray);
   }
 
-  .menu-load-balancers-header,
+  .menu-badge-popover-header,
   a {
     text-transform: none;
     font-size: 82.5%;
@@ -325,14 +325,16 @@ running-tasks-tag {
   }
 }
 
+.autoscalers-tag,
 .load-balancers-tag,
 .server-group-manager-tag {
   &.overflowing {
     position: relative;
   }
 
+  .btn-autoscaler button,
   .btn-load-balancer button,
-  .btn-multiple-load-balancers {
+  .btn-badge-popover {
     margin-top: -5px;
   }
 

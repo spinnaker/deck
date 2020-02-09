@@ -1,5 +1,6 @@
 export * from './collapsibleSection/CollapsibleSection';
 export * from './details/Details';
+export * from './badgePopover';
 export * from './CustomLabels';
 export * from './FormElements';
 export * from './forms';

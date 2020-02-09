@@ -7,7 +7,7 @@ import { ApplicationModelBuilder } from 'core/application/applicationModel.build
 import { ILoadBalancersTagProps } from './LoadBalancersTagWrapper';
 import { LoadBalancersTag } from './LoadBalancersTag';
 import { IServerGroup } from 'core/domain';
-import { HoverablePopover } from 'core/presentation';
+import { BadgePopover, HoverablePopover } from 'core/presentation';
 
 describe('<LoadBalancersTag />', () => {
   const lb1 = { name: 'lb1', account: 'prod', region: 'us-east-1', vpcId: 'vpc-1' };
@@ -68,13 +68,13 @@ describe('<LoadBalancersTag />', () => {
     $scope.$digest();
 
     component.update();
-    const popover = component.find(HoverablePopover);
+    const popover = component.find(BadgePopover).find(HoverablePopover);
     expect(popover.length).toBe(1);
 
     popover.instance().setState({ popoverIsOpen: true, animation: false });
     // Wait for the popover to show
     setTimeout(() => {
-      const menuChildren = popoverContainerEl.querySelector('.popover-content div.menu-load-balancers').children;
+      const menuChildren = popoverContainerEl.querySelector('.popover-content div.menu-badge-popover').children;
 
       expect(menuChildren.length).toBe(3);
       expect(menuChildren[0].textContent.trim()).toBe('Load Balancers');

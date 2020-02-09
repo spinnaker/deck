@@ -158,8 +158,8 @@ export class AmazonLoadBalancersTag extends React.Component<ILoadBalancersTagPro
 
     const className = `load-balancers-tag ${totalCount > 1 ? 'overflowing' : ''}`;
     const popover = (
-      <div className="menu-load-balancers">
-        {loadBalancerCount > 0 && <div className="menu-load-balancers-header">Load Balancers</div>}
+      <div className="menu-badge-popover">
+        {loadBalancerCount > 0 && <div className="menu-badge-popover-header">Load Balancers</div>}
         {sortBy(loadBalancers, 'name').map(loadBalancer => (
           <LoadBalancerListItem
             key={loadBalancer.name}
@@ -168,7 +168,7 @@ export class AmazonLoadBalancersTag extends React.Component<ILoadBalancersTagPro
           />
         ))}
 
-        {targetGroupCount > 0 && <div className="menu-load-balancers-header">Target Groups</div>}
+        {targetGroupCount > 0 && <div className="menu-badge-popover-header">Target Groups</div>}
         {sortBy(targetGroups, 'name').map(targetGroup => (
           <LoadBalancerListItem
             key={targetGroup.name}
@@ -190,9 +190,9 @@ export class AmazonLoadBalancersTag extends React.Component<ILoadBalancersTagPro
             template={popover}
             hOffsetPercent="80%"
             container={this.props.container}
-            className="no-padding menu-load-balancers"
+            className="no-padding menu-badge-popover"
           >
-            <button onClick={this.handleClick} className="btn btn-link btn-multiple-load-balancers clearfix no-padding">
+            <button onClick={this.handleClick} className="btn btn-link btn-badge-popover clearfix no-padding">
               <span className="badge badge-counter">
                 <span className="icon">
                   <i className="fa icon-sitemap" />

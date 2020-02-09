@@ -26,10 +26,14 @@ export class KubernetesManifestService {
     app: Application,
     params: IManifestParams,
     container: IManifestContainer,
+    updateCallback?: (manifest: IManifest) => void,
   ): () => void {
-    const onUpdate = (manifest: IManifest) => {
-      container.manifest = manifest || container.manifest;
-    };
+    const onUpdate =
+      updateCallback ||
+      ((manifest: IManifest) => {
+        container.manifest = manifest || container.manifest;
+      });
+
     return KubernetesManifestService.subscribe(app, params, onUpdate);
   }
 

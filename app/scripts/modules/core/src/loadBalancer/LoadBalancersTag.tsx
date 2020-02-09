@@ -6,9 +6,9 @@ import { ILoadBalancer } from 'core/domain';
 import { ILoadBalancersTagProps } from './LoadBalancersTagWrapper';
 import { HealthCounts } from 'core/healthCounts/HealthCounts';
 import { LoadBalancerDataUtils } from './loadBalancerDataUtils';
+import { BadgePopover } from 'core/presentation';
 import { Tooltip } from 'core/presentation/Tooltip';
 import { ReactInjector } from 'core/reactShims';
-import { HoverablePopover } from 'core/presentation';
 import { Spinner } from 'core/widgets';
 
 interface ILoadBalancerListItemProps {
@@ -117,41 +117,26 @@ export class LoadBalancersTag extends React.Component<ILoadBalancersTagProps, IL
 
     const className = `load-balancers-tag ${totalCount > 1 ? 'overflowing' : ''}`;
 
-    const popover = (
-      <div className="menu-load-balancers">
-        <div className="menu-load-balancers-header"> Load Balancers </div>
-        {sortBy(loadBalancers, 'name').map(loadBalancer => (
-          <LoadBalancerListItem
-            key={loadBalancer.name}
-            loadBalancer={loadBalancer}
-            onItemClick={this.showLoadBalancerDetails}
-          />
-        ))}
-      </div>
-    );
+    const loadBalancerList = sortBy(loadBalancers, 'name').map(loadBalancer => (
+      <LoadBalancerListItem
+        key={loadBalancer.name}
+        loadBalancer={loadBalancer}
+        onItemClick={this.showLoadBalancerDetails}
+      />
+    ));
 
     return (
       <span className={className}>
         {totalCount > 1 && (
-          <HoverablePopover
-            delayShow={100}
-            delayHide={150}
-            onShow={this.handleShowPopover}
-            placement="bottom"
-            template={popover}
-            hOffsetPercent="80%"
+          <BadgePopover
             container={this.props.container}
-            className="no-padding menu-load-balancers"
-          >
-            <button onClick={this.handleClick} className="btn btn-link btn-multiple-load-balancers clearfix no-padding">
-              <span className="badge badge-counter">
-                <span className="icon">
-                  <i className="fa icon-sitemap" />
-                </span>{' '}
-                {totalCount}
-              </span>
-            </button>
-          </HoverablePopover>
+            count={totalCount}
+            handleBadgeClick={this.handleClick}
+            handleShowPopover={this.handleShowPopover}
+            icon={<i className="fa icon-sitemap" />}
+            popoverBody={loadBalancerList}
+            title="Load Balancers"
+          />
         )}
 
         {totalCount === 1 && (

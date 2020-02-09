@@ -13,6 +13,7 @@ import { LoadBalancersTagWrapper } from 'core/loadBalancer';
 import { ISortFilter } from 'core/filterModel';
 import { Overridable } from 'core/overrideRegistry';
 import { ArtifactIconService } from 'core/artifact';
+import { Autoscalers } from 'core/autoscaler';
 
 export interface IServerGroupHeaderProps {
   application: Application;
@@ -226,6 +227,7 @@ export class ServerGroupHeader extends React.Component<IServerGroupHeaderProps> 
 
         <div className="horizontal center flex-none">
           <RunningTasks {...props} />
+          <Autoscalers application={props.application} serverGroup={props.serverGroup} />
           <LoadBalancers {...props} />
           <Health {...props} />
         </div>

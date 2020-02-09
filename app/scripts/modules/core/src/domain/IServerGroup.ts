@@ -19,6 +19,7 @@ export interface IServerGroup extends IManagedResource {
   account: string;
   app?: string;
   asg?: IAsg;
+  autoscalers?: string[];
   buildInfo?: any;
   capacity?: ICapacity;
   category?: string;

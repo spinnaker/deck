@@ -4,6 +4,8 @@ export * from './IArtifactExtractor';
 export * from './IArtifactKindConfig';
 export * from './IArtifactSource';
 
+export * from './IAutoscaler';
+
 export * from './IBuild';
 export * from './IBuildDiffInfo';
 export * from './IBuildInfo';

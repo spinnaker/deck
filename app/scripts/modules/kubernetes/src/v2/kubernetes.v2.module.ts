@@ -2,6 +2,7 @@ import { module } from 'angular';
 
 import { CloudProviderRegistry, STAGE_ARTIFACT_SELECTOR_COMPONENT_REACT, YAML_EDITOR_COMPONENT } from '@spinnaker/core';
 
+import { KubernetesAutoscalerDetails } from './autoscaler/KubernetesAutoscalerDetails';
 import { KUBERNETES_MANIFEST_DELETE_CTRL } from './manifest/delete/delete.controller';
 import { KUBERNETES_MANIFEST_SCALE_CTRL } from './manifest/scale/scale.controller';
 import { KUBERNETES_V2_INSTANCE_DETAILS_CTRL } from './instance/details/details.controller';
@@ -26,6 +27,7 @@ import { KUBERNETES_MANIFEST_LABELS } from './manifest/manifestLabels.component'
 import { KUBERNETES_MANIFEST_EVENTS } from './manifest/manifestEvents.component';
 import { KUBERNETES_MANIFEST_RESOURCES } from './manifest/manifestResources.component';
 import { KUBERNETES_MANIFEST_QOS } from './manifest/manifestQos.component';
+import { KUBERNETES_V2_AUTOSCALER_TRANSFORMER } from './autoscaler/transformer';
 import { KUBERNETES_V2_LOAD_BALANCER_TRANSFORMER } from './loadBalancer/transformer';
 import { KUBERNETES_V2_SECURITY_GROUP_TRANSFORMER } from './securityGroup/transformer';
 import { KUBERNETES_ANNOTATION_CUSTOM_SECTIONS } from './manifest/annotationCustomSections.component';
@@ -70,6 +72,7 @@ module(KUBERNETES_V2_MODULE, [
   KUBERNETES_MANIFEST_STATUS,
   KUBERNETES_MANIFEST_CONDITION,
   KUBERNETES_MANIFEST_ARTIFACT,
+  KUBERNETES_V2_AUTOSCALER_TRANSFORMER,
   KUBERNETES_V2_LOAD_BALANCER_TRANSFORMER,
   KUBERNETES_V2_SECURITY_GROUP_TRANSFORMER,
   KUBERNETES_SCALE_MANIFEST_STAGE,
@@ -95,6 +98,10 @@ module(KUBERNETES_V2_MODULE, [
     skin: 'v2',
     logo: {
       path: require('../shared/logo/kubernetes.icon.svg'),
+    },
+    autoscaler: {
+      details: KubernetesAutoscalerDetails,
+      transformer: 'kubernetesV2AutoscalerTransformer',
     },
     serverGroup: {
       CloneServerGroupModal: ManifestWizard,

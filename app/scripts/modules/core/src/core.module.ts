@@ -32,6 +32,7 @@ import { APPLICATION_BOOTSTRAP_MODULE } from './bootstrap';
 import { APPLICATION_MODULE } from './application/application.module';
 import { ARTIFACT_MODULE } from './artifact/artifact.module';
 import { AUTHENTICATION_MODULE } from './authentication/authentication.module';
+import { AUTOSCALER_MODULE } from './autoscaler/autoscaler.module';
 import { CLOUD_PROVIDER_MODULE } from './cloudProvider/cloudProvider.module';
 import { CLUSTER_MODULE } from './cluster/cluster.module';
 import { CUSTOM_BANNER_CONFIG } from './application/config/customBanner/customBannerConfig.component';
@@ -111,6 +112,7 @@ module(CORE_MODULE, [
   APPLICATION_BOOTSTRAP_MODULE,
   ARTIFACT_MODULE,
   AUTHENTICATION_MODULE,
+  AUTOSCALER_MODULE,
 
   CLOUD_PROVIDER_MODULE,
   CLUSTER_MODULE,
