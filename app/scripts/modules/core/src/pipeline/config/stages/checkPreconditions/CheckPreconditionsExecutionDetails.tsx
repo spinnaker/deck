@@ -1,5 +1,5 @@
 import React from 'react';
-import { get } from 'lodash';
+import { get, isBoolean, isString } from 'lodash';
 
 import { StageFailureMessage } from 'core/pipeline';
 
@@ -21,7 +21,9 @@ export function CheckPreconditionsExecutionDetails(props: IExecutionDetailsSecti
               .map(key => (
                 <div key={key}>
                   <dt>{robotToHuman(key)}</dt>
-                  <dd>{JSON.stringify(context[key])}</dd>
+                  <dd>
+                    {isString(context[key]) || isBoolean(context[key]) ? context[key] : JSON.stringify(context[key])}
+                  </dd>
                 </div>
               ))}
             <div>
