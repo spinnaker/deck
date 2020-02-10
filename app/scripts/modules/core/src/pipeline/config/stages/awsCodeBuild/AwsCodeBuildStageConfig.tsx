@@ -4,7 +4,7 @@ import { cloneDeep } from 'lodash';
 import { FormikStageConfig, IFormikStageConfigInjectedProps, IStage, IStageConfigProps } from 'core';
 
 import { AwsCodeBuildStageForm } from './AwsCodeBuildStageForm';
-import { validate } from './awsCodeBuildValidator';
+import { validate } from './AwsCodeBuildValidator';
 
 export function AwsCodeBuildStageConfig({
   application,
