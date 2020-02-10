@@ -96,6 +96,8 @@ export class ServerGroup extends React.Component<IServerGroupProps, IServerGroup
       images = serverGroup.buildInfo.images;
     }
 
+    images = images.map(val => this.getShortSha(val)).sort();
+
     return {
       jenkins,
       instances,
@@ -104,6 +106,15 @@ export class ServerGroup extends React.Component<IServerGroupProps, IServerGroup
       isSelected,
       isMultiSelected,
     };
+  }
+
+  private getShortSha(val: string): string {
+    const sha = val.lastIndexOf('sha256:');
+    if (sha > -1) {
+      // 14 = "sha256:" + 7 characters of hash
+      val = val.substring(0, sha + 14) + '...';
+    }
+    return val;
   }
 
   private isSelected(serverGroup: IServerGroup) {
