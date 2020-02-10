@@ -24,7 +24,7 @@ module.exports = {
   output: {
     path: path.join(__dirname, 'lib'),
     filename: '[name].js',
-    library: '@spinnaker/huaweicloud',
+    library: '@spinnaker/oracle',
     libraryTarget: 'umd',
     umdNamedDefine: true,
   },
@@ -40,7 +40,7 @@ module.exports = {
               ecma: 6,
               mangle: false,
               output: {
-                comments: /webpackIgnore/,
+                comments: false,
               },
             },
           }),
@@ -51,7 +51,7 @@ module.exports = {
     extensions: ['.json', '.js', '.jsx', '.ts', '.tsx', '.css', '.less', '.html'],
     modules: [NODE_MODULE_PATH, path.resolve('.')],
     alias: {
-      '@spinnaker/huaweicloud': path.join(__dirname, 'src'),
+      '@spinnaker/core': path.resolve(basePath, 'app', 'scripts', 'modules', 'core', 'src'),
       coreImports: path.resolve(
         basePath,
         'app',
@@ -64,7 +64,7 @@ module.exports = {
         'imports',
         'commonImports.less',
       ),
-      huaweicloud: path.join(__dirname, 'src'),
+      oracle: path.join(__dirname, 'src'),
     },
   },
   module: {
@@ -107,7 +107,7 @@ module.exports = {
         test: /\.html$/,
         exclude: exclusionPattern,
         use: [
-          { loader: 'ngtemplate-loader?relativeTo=' + path.resolve(__dirname) + '&prefix=huaweicloud' },
+          { loader: 'ngtemplate-loader?relativeTo=' + path.resolve(__dirname) + '&prefix=ecs' },
           { loader: 'html-loader' },
         ],
       },
