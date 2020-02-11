@@ -28,6 +28,8 @@ const EXCLUDED_ARTIFACT_TYPES: RegExp[] = excludeAllTypesExcept(
   ArtifactTypePatterns.GIT_REPO,
 );
 
+const SOURCE_TYPES: string[] = ['BITBUCKET', 'CODECOMMIT', 'GITHUB', 'GITHUB_ENTERPRISE', 'S3'];
+
 export function AwsCodeBuildStageForm(props: IAwsCodeBuildStageFormProps & IFormikStageConfigInjectedProps) {
   const stage = props.formik.values;
 
@@ -77,6 +79,16 @@ export function AwsCodeBuildStageForm(props: IAwsCodeBuildStageFormProps & IForm
           <CheckboxInput {...inputProps} text="Override source to Spinnaker artifact" />
         )}
       />
+      {stage.sourceOverride === true && (
+        <FormikFormField
+          fastField={false}
+          label="SourceType"
+          name="source.sourceType"
+          input={(inputProps: IFormInputProps) => (
+            <ReactSelectInput {...inputProps} clearable={true} stringOptions={SOURCE_TYPES} />
+          )}
+        />
+      )}
       {stage.sourceOverride === true && (
         <FormikFormField
           fastField={false}
