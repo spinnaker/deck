@@ -26,12 +26,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Ensure package bumps are pure
-        id: purebump
-        run: app/scripts/modules/assert_package_bumps_standalone.sh
-
       - name: ready to merge label
-        if: steps.purebump.outputs.ispurebump == 'true'
         uses: actions/github@v1.0.0
         with:
           args: label 'ready to merge'
@@ -39,7 +34,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.SPINNAKERBOT_TOKEN }}
 
       - name: Approve package bump
-        if: steps.purebump.outputs.ispurebump == 'true'
         # pin to v2.0.0 tag by commit hash
         uses: hmarr/auto-approve-action@7782c7e
         with:
