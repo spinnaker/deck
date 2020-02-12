@@ -16,6 +16,6 @@ jobs:
       - name: ready to merge label
         uses: actions/github@v1.0.0
         with:
-          args: label 'ready to merge'
+          args: label "ready to merge"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
