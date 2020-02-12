@@ -2,19 +2,6 @@ name: Deck CI
 
 on:
   pull_request:
-    paths:
-      - 'app/scripts/modules/amazon/package.json'
-      - 'app/scripts/modules/appengine/package.json'
-      - 'app/scripts/modules/azure/package.json'
-      - 'app/scripts/modules/cloudfoundry/package.json'
-      - 'app/scripts/modules/core/package.json'
-      - 'app/scripts/modules/docker/package.json'
-      - 'app/scripts/modules/ecs/package.json'
-      - 'app/scripts/modules/google/package.json'
-      - 'app/scripts/modules/huaweicloud/package.json'
-      - 'app/scripts/modules/kubernetes/package.json'
-      - 'app/scripts/modules/oracle/package.json'
-      - 'app/scripts/modules/titus/package.json'
 
 env:
   NODE_VERSION: 10.15.1
