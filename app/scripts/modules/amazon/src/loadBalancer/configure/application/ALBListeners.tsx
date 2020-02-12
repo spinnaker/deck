@@ -772,12 +772,11 @@ const Action = (props: {
         props.oidcConfigs.length > 0 &&
         (!clientId || props.oidcConfigs.find(c => c.clientId === clientId)));
 
-    const oidcOptions =
-      props.oidcConfigs && props.oidcConfigs.length ? (
-        (props.oidcConfigs || []).map(config => <option key={config.clientId}>{config.clientId}</option>)
-      ) : (
-        <option disabled>No {CustomLabels.get('OIDC client')} config found</option>
-      );
+    const oidcOptions = props.oidcConfigs?.length ? (
+      props.oidcConfigs.map(config => <option key={config.clientId}>{config.clientId}</option>)
+    ) : (
+      <option disabled>No {CustomLabels.get('OIDC client')} config found</option>
+    );
 
     return (
       <div className="horizontal middle" style={{ height: '30px' }}>
