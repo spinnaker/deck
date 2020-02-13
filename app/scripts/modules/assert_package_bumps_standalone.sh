@@ -13,6 +13,7 @@ if [[ -n $TRAVIS || -n $GITHUB_ACTIONS ]] ; then
   echo "git fetch -q..."
   git fetch -q
   CI_TARGET_BRANCH=origin/master
+  cd ../../.. # i think we should already be in app/scripts/modules?
   cd app/scripts/modules || exit 1;
 else
   cd "$(dirname "$0")" || exit 2;
