@@ -14,6 +14,7 @@ if [[ -n $TRAVIS || -n $GITHUB_ACTIONS ]] ; then
   git fetch -q
   CI_TARGET_BRANCH=origin/master
   pwd
+  ls -al
   cd ../../.. # i think we should already be in app/scripts/modules?
   pwd
   cd app/scripts/modules || exit 1;
