@@ -15,8 +15,12 @@ if [[ -n $TRAVIS || -n $GITHUB_ACTIONS ]] ; then
   CI_TARGET_BRANCH=origin/master
   pwd
   ls -al
-  cd ../../.. # i think we should already be in app/scripts/modules?
-  pwd
+  cd app
+  ls -al
+  cd scripts
+  ls -al
+  cd modules
+  ls -al
   cd app/scripts/modules || exit 1;
 else
   cd "$(dirname "$0")" || exit 2;
