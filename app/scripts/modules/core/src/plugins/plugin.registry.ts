@@ -4,6 +4,7 @@ import { IStageTypeConfig } from 'core/domain';
 
 export interface IDeckPlugin {
   stages?: IStageTypeConfig[];
+  undefinedExtensions?(): void;
 }
 
 export interface IPluginManifest {
@@ -134,6 +135,9 @@ export class PluginRegistry {
 
       // Register extensions with deck.
       plugin.stages?.forEach(stage => Registry.pipeline.registerStage(stage));
+
+      // Run code that currently does not have an extension point
+      plugin.undefinedExtensions && plugin.undefinedExtensions();
 
       return module;
     } catch (error) {

@@ -80,4 +80,9 @@ then
 	cp /opt/spinnaker/config/settings-local.js /opt/deck/html/settings-local.js
 fi
 
+if [ -e /opt/spinnaker/config/plugin-manifest.js ];
+then 
+	cp /opt/spinnaker/config/plugin-manifest.js /opt/deck/html/plugin-manifest.js
+fi
+
 apache2ctl -D FOREGROUND 
