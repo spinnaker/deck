@@ -66,6 +66,7 @@ window.spinnakerSettings = {
     'huaweicloud',
     'kubernetes',
     'oracle',
+    'spot',
   ],
   defaultTimeZone: process.env.TIMEZONE || 'America/Los_Angeles', // see http://momentjs.com/timezone/docs/#/data-utilities/
   entityTags: {

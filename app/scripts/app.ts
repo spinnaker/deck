@@ -17,6 +17,7 @@ import '@spinnaker/cloudfoundry';
 import { AZURE_MODULE } from '@spinnaker/azure';
 import { HUAWEICLOUD_MODULE } from '@spinnaker/huaweicloud';
 import { DCOS_DCOS_MODULE } from './modules/dcos/dcos.module';
+import { SPOT_MODULE } from './modules/spot/src';
 
 module('netflix.spinnaker', [
   CORE_MODULE,
@@ -34,4 +35,5 @@ module('netflix.spinnaker', [
   KAYENTA_MODULE,
   TITUS_MODULE,
   HUAWEICLOUD_MODULE,
+  SPOT_MODULE,
 ]);

@@ -119,6 +119,11 @@ var oracle = {
     region: '{%oracle.default.region%}',
   },
 };
+var spot = {
+  defaults: {
+    account: '{%spot.default.account%}',
+  },
+};
 
 window.spinnakerSettings = {
   authEnabled: authEnabled,
@@ -155,6 +160,7 @@ window.spinnakerSettings = {
     'kubernetes',
     'oracle',
     'titus',
+    'spot',
   ],
   defaultTimeZone: timezone, // see http://momentjs.com/timezone/docs/#/data-utilities/
   feature: {
@@ -228,6 +234,7 @@ window.spinnakerSettings = {
         region: 'us-east-1',
       },
     },
+    spot: spot,
   },
   pubsubProviders: ['google'], // TODO(joonlim): Add amazon once it is confirmed that amazon pub/sub works.
   triggerTypes: [
