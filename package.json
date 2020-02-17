@@ -30,12 +30,12 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.4.1",
     "@spinnaker/kayenta": "^0.0.89",
-    "@spinnaker/styleguide": "^1.0.15",
+    "@spinnaker/styleguide": "^1.0.16",
     "@types/date-fns": "^2.6.0",
     "@types/memoize-one": "^3.1.1",
     "@types/tether": "^1.4.4",
-    "@uirouter/react-hybrid": "0.3.9",
-    "@uirouter/rx": "0.4.5",
+    "@uirouter/react-hybrid": "1.0.0",
+    "@uirouter/rx": "0.6.5",
     "@uirouter/visualizer": "^7.0.0",
     "Select2": "git://github.com/select2/select2.git#3.4.8",
     "angular": "1.6.10",
@@ -101,7 +101,7 @@
     "webpack-dev-middleware": "^3.7.2"
   },
   "devDependencies": {
-    "@spinnaker/eslint-plugin": "./packages/eslint-plugin",
+    "@spinnaker/eslint-plugin": "latest",
     "@types/angular": "1.6.26",
     "@types/angular-mocks": "1.5.10",
     "@types/angular-ui-bootstrap": "^0.13.41",
@@ -213,10 +213,10 @@
   },
   "resolutionsPurpose": "This temporarily chooses the right versions of these libs, which are specified in both deck AND deck-kayenta",
   "resolutions": {
-    "@uirouter/react-hybrid": "0.3.9",
-    "@uirouter/react": "0.8.7",
-    "@uirouter/angularjs": "1.0.20",
-    "@uirouter/core": "5.0.21"
+    "@uirouter/react-hybrid": "1.0.0",
+    "@uirouter/react": "1.0.1",
+    "@uirouter/angularjs": "1.0.25",
+    "@uirouter/core": "6.0.4"
   },
   "husky": {
     "hooks": {
