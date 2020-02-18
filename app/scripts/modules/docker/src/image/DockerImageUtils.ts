@@ -9,7 +9,7 @@ export class DockerImageUtils {
   // Split the image id up into the selectable parts to feed the UI
   public static splitImageId(imageId = ''): IDockerImageParts {
     let imageParts: string[];
-    if (imageId.indexOf('@') > 0) {
+    if (imageId.includes('@')) {
       imageParts = imageId.split('@');
     } else {
       imageParts = imageId.split(':');
