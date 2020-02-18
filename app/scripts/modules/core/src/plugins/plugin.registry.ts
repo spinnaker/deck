@@ -90,11 +90,11 @@ export class PluginRegistry {
   /** Loads plugin manifest file served as a custom deck asset */
   public loadPluginManifestFromDeck() {
     const source = 'deck';
-    const uri = '/plugin-manifest.js';
+    const uri = '/plugin-manifest.json';
     const loadPromise = this.loadModuleFromUrl(uri)
       .then((pluginManifest: IPluginManifest) => {
         if (!pluginManifest || !pluginManifest.plugins) {
-          throw new Error(`Expected plugin-manifest.js to contain an export named 'plugins' but it did not.`);
+          throw new Error(`Expected plugin-manifest.json to contain an export named 'plugins' but it did not.`);
         }
         return pluginManifest.plugins;
       })

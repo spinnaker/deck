@@ -34,10 +34,10 @@ describe('PluginRegistry', () => {
     });
   });
 
-  it('loadPluginManifestFromDeck() should import() from /plugin-manifest.js', async () => {
+  it('loadPluginManifestFromDeck() should import() from /plugin-manifest.json', async () => {
     loadModuleFromUrlSpy.and.callFake(() => Promise.resolve({ plugins: [] }));
     await pluginRegistry.loadPluginManifestFromDeck();
-    expect(loadModuleFromUrlSpy).toHaveBeenCalledWith('/plugin-manifest.js');
+    expect(loadModuleFromUrlSpy).toHaveBeenCalledWith('/plugin-manifest.json');
   });
 
   it('loadPluginManifestFromGate() should fetch from gate /plugins/deck/plugin-manifest.json', async () => {
