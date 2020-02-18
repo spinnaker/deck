@@ -138,6 +138,7 @@
     "@types/webpack-env": "1.13.7",
     "@typescript-eslint/eslint-plugin": "^2.11.0",
     "@typescript-eslint/parser": "^2.11.0",
+    "@wdio/local-runner": "^5.18.7",
     "angular-mocks": "1.6.10",
     "angulartics": "^1.1.2",
     "angulartics-google-analytics": "^0.2.0",
