@@ -13,7 +13,7 @@ import {
   FirewallLabels,
 } from '@spinnaker/core';
 
-import { AMAZON_INSTANCE_WRITE_SERVICE } from 'amazon/instance/amazon.instance.write.service';
+import { AMAZON_INSTANCE_WRITE_SERVICE } from '../amazon.instance.write.service';
 import { AMAZON_VPC_VPCTAG_DIRECTIVE } from '../../vpc/vpcTag.directive';
 import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 import ANGULAR_UI_BOOTSTRAP from 'angular-ui-bootstrap';
@@ -197,6 +197,10 @@ module(AMAZON_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
           $scope.instance.loadBalancers = loadBalancers;
           $scope.instance.targetGroups = targetGroups;
           if ($scope.instance.networkInterfaces) {
+            $scope.instance.ipv6Addresses = _.flatMap($scope.instance.networkInterfaces, i =>
+              i.ipv6Addresses.map(a => a.ipv6Address),
+            );
+
             const permanentNetworkInterfaces = $scope.instance.networkInterfaces.filter(
               f => f.attachment.deleteOnTermination === false,
             );

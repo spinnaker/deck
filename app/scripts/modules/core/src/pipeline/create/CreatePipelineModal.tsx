@@ -5,6 +5,7 @@ import { Debounce } from 'lodash-decorators';
 import { $log } from 'ngimport';
 import { IHttpPromiseCallbackArg } from 'angular';
 import { cloneDeep, get, uniqBy } from 'lodash';
+import { UISref } from '@uirouter/react';
 
 import { Overridable } from 'core/overrideRegistry';
 import { Application } from 'core/application/application.model';
@@ -15,10 +16,10 @@ import {
   IPipelineTemplateConfig,
   IPipelineTemplate,
   PipelineTemplateReader,
-} from 'core/pipeline/config/templates/PipelineTemplateReader';
+} from '../config/templates/PipelineTemplateReader';
 import { Spinner } from 'core/widgets/spinners/Spinner';
 import { IPipelineTemplateV2 } from 'core/domain/IPipelineTemplateV2';
-import { PipelineConfigService } from 'core/pipeline/config/services/PipelineConfigService';
+import { PipelineConfigService } from '../config/services/PipelineConfigService';
 import { PipelineTemplateV2Service } from 'core/pipeline';
 
 import { TemplateDescription } from './TemplateDescription';
@@ -88,6 +89,7 @@ export class CreatePipelineModal extends React.Component<ICreatePipelineModalPro
       application: this.props.application.name,
       limitConcurrent: true,
       keepWaitingPipelines: false,
+      spelEvaluator: 'v4',
     };
   }
 
@@ -388,10 +390,7 @@ export class CreatePipelineModal extends React.Component<ICreatePipelineModalPro
                     </div>
                     <div className="col-md-7">
                       <Select
-                        options={[
-                          { label: 'Pipeline', value: false },
-                          { label: 'Strategy', value: true },
-                        ]}
+                        options={[{ label: 'Pipeline', value: false }, { label: 'Strategy', value: true }]}
                         clearable={false}
                         value={this.state.command.strategy ? { label: 'Strategy' } : { label: 'Pipeline' }}
                         onChange={this.handleTypeChange}
@@ -530,18 +529,14 @@ export class CreatePipelineModal extends React.Component<ICreatePipelineModalPro
                       loadingError={this.state.loadingTemplateFromSourceError}
                       template={this.state.command.template || preselectedTemplate}
                     />
-                    {!SETTINGS.feature.managedPipelineTemplatesV2UI && (
+                    {!preselectedTemplate && (
                       <div className="form-group clearfix">
                         <div className="col-md-12">
                           <em>
-                            * v1 templates only. For creating pipelines from v2 templates, use{' '}
-                            <a
-                              href="https://www.spinnaker.io/guides/spin/pipeline/"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              Spin CLI.
-                            </a>
+                            * v1 templates only. For creating pipelines from v2 templates, use the{' '}
+                            <UISref to="home.pipeline-templates">
+                              <a>Pipeline Templates view.</a>
+                            </UISref>
                           </em>
                         </div>
                       </div>

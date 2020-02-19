@@ -61,7 +61,7 @@ function configure(env, webpackOpts) {
                 ecma: 6,
                 mangle: false,
                 output: {
-                  comments: false,
+                  comments: /webpackIgnore/,
                 },
               },
             }),
@@ -192,6 +192,10 @@ function configure(env, webpackOpts) {
         {
           from: `${NODE_MODULE_PATH}/@spinnaker/styleguide/public/styleguide.html`,
           to: `./styleguide.html`,
+        },
+        {
+          from: `./plugin-manifest.js`,
+          to: `./plugin-manifest.js`,
         },
       ]),
       new HtmlWebpackPlugin({

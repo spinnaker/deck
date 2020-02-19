@@ -4,6 +4,10 @@ module.exports = {
   plugins: ['@typescript-eslint', '@spinnaker/eslint-plugin'],
   extends: ['eslint:recommended', 'prettier', 'prettier/@typescript-eslint', 'plugin:@typescript-eslint/recommended'],
   rules: {
+    '@spinnaker/import-from-alias-not-npm': 2,
+    '@spinnaker/import-from-npm-not-alias': 2,
+    '@spinnaker/import-from-npm-not-relative': 2,
+    '@spinnaker/import-relative-within-subpackage': 2,
     '@spinnaker/ng-no-component-class': 2,
     '@spinnaker/ng-no-module-export': 2,
     '@spinnaker/ng-no-require-angularjs': 2,
@@ -17,6 +21,8 @@ module.exports = {
     'one-var': ['error', { initialized: 'never' }],
     'prefer-rest-params': 'off',
     'prefer-spread': 'off',
+    // turn back on if https://github.com/eslint/eslint/issues/11899 fixes false positives
+    'require-atomic-updates': 'off',
     '@typescript-eslint/array-type': ['error', { default: 'array-simple' }],
     '@typescript-eslint/ban-ts-ignore': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',

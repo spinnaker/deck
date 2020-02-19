@@ -36,6 +36,8 @@ module(AMAZON_SECURITYGROUP_CONFIGURE_CONFIGSECURITYGROUP_MIXIN_CONTROLLER, [
   function($scope, $state, $uibModalInstance, application, securityGroup, securityGroupReader, cacheInitializer) {
     let allSecurityGroups;
     const ctrl = this;
+    $scope.self = $scope;
+    $scope.application = application;
 
     $scope.state = {
       submitting: false,
@@ -335,6 +337,14 @@ module(AMAZON_SECURITYGROUP_CONFIGURE_CONFIGSECURITYGROUP_MIXIN_CONTROLLER, [
 
     ctrl.removeRule = function(ruleset, index) {
       ruleset.splice(index, 1);
+    };
+
+    ctrl.updateRuleType = function(type, ruleset, index) {
+      const rule = ruleset[index];
+      if (type === 'icmp') {
+        rule.startPort = 0;
+        rule.endPort = 0;
+      }
     };
 
     ctrl.dismissRemovedRules = function() {

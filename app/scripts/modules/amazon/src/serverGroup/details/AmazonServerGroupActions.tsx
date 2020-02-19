@@ -18,7 +18,7 @@ import {
 } from '@spinnaker/core';
 
 import { IAmazonServerGroup, IAmazonServerGroupView } from 'amazon/domain';
-import { AmazonCloneServerGroupModal } from 'amazon/serverGroup/configure/wizard/AmazonCloneServerGroupModal';
+import { AmazonCloneServerGroupModal } from '../configure/wizard/AmazonCloneServerGroupModal';
 import { AwsReactInjector } from 'amazon/reactShims';
 import { IAmazonServerGroupCommand } from '../configure';
 import {
@@ -171,9 +171,9 @@ export class AmazonServerGroupActions extends React.Component<IAmazonServerGroup
 
     ConfirmationModalService.confirm(confirmationModalParams)
       .then(() => this.rollbackServerGroup())
-      .catch(({ source }) => {
+      .catch(error => {
         // don't show the enable modal if the user cancels with the header button
-        if (source === 'footer') {
+        if (error?.source === 'footer') {
           this.showEnableServerGroupModal();
         }
       });

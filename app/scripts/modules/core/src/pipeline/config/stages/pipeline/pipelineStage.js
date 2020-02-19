@@ -5,13 +5,12 @@ import { pickBy } from 'lodash';
 import { module } from 'angular';
 
 import { ApplicationReader } from 'core/application/service/ApplicationReader';
-import { PipelineConfigService } from 'core/pipeline/config/services/PipelineConfigService';
+import { PipelineConfigService } from '../../services/PipelineConfigService';
 import { Registry } from 'core/registry';
 import { ExecutionDetailsTasks } from '../common';
 import { PipelineStageExecutionDetails } from './PipelineStageExecutionDetails';
 import { PipelineParametersExecutionDetails } from './PipelineParametersExecutionDetails';
 import { PipelineTemplateReader, PipelineTemplateV2Service } from 'core/pipeline';
-import { SETTINGS } from 'core/config';
 
 export const CORE_PIPELINE_CONFIG_STAGES_PIPELINE_PIPELINESTAGE = 'spinnaker.core.pipeline.stage.pipelineStage';
 export const name = CORE_PIPELINE_CONFIG_STAGES_PIPELINE_PIPELINESTAGE; // for backwards compatibility
@@ -93,11 +92,7 @@ module(CORE_PIPELINE_CONFIG_STAGES_PIPELINE_PIPELINESTAGE, [])
 
         if ($scope.stage && $scope.stage.application && pipeline) {
           const config = _.find($scope.pipelines, pipeline => pipeline.id === $scope.stage.pipeline);
-          if (
-            SETTINGS.feature.managedPipelineTemplatesV2UI &&
-            config &&
-            PipelineTemplateV2Service.isV2PipelineConfig(config)
-          ) {
+          if (config && PipelineTemplateV2Service.isV2PipelineConfig(config)) {
             PipelineTemplateReader.getPipelinePlan(config)
               .then(plan => applyPipelineConfigParameters(plan))
               .catch(() => clearParams());

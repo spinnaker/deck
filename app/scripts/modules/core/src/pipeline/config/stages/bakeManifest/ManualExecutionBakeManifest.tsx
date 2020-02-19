@@ -1,15 +1,15 @@
 import React from 'react';
 
 import { CheckboxInput } from 'core/presentation';
-import { ITriggerTemplateComponentProps } from 'core/pipeline/manualExecution/TriggerTemplate';
+import { ITriggerTemplateComponentProps } from '../../../manualExecution/TriggerTemplate';
 import { IArtifact, IExpectedArtifact } from 'core/domain';
-import { HelmMatch } from 'core/pipeline/config/triggers/artifacts/helm/HelmArtifactEditor';
-import { BAKE_MANIFEST_STAGE_KEY } from 'core/pipeline/config/stages/bakeManifest/bakeManifestStage';
+import { HelmMatch } from '../../triggers/artifacts/helm/HelmArtifactEditor';
+import { BAKE_MANIFEST_STAGE_KEY } from './bakeManifestStage';
 
 const HelmEditor = HelmMatch.editCmp;
 
 export function ManualExecutionBakeManifest(props: ITriggerTemplateComponentProps) {
-  const [overrideArtifact, setOverrideArtifact] = React.useState(false);
+  const [overrideArtifact, setOverrideArtifact] = React.useState(true);
 
   const updateHelmArtifact = (artifact: IArtifact) => {
     const updatedArtifacts = (props.command.extraFields.artifacts || []).filter(
