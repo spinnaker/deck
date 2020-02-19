@@ -66,7 +66,7 @@ export class DockerTriggerTemplate extends React.Component<
 
   private lookupTypeChanged = (o: Option<IDockerLookupType>) => {
     const newType = o.value;
-    this.props.updateCommand('extraFields.tag', newType === 'tag' ? this.state.selectedTag : this.state.digest);
+    this.updateArtifact(this.props.command, newType === 'tag' ? this.state.selectedTag : this.state.digest);
     this.setState({ lookupType: newType });
   };
 
