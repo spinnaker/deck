@@ -170,7 +170,7 @@ export class PluginRegistry {
       plugin.stages?.forEach(stage => Registry.pipeline.registerStage(stage));
 
       // Run code that currently does not have an extension point
-      plugin.initialize && plugin.initialize();
+      plugin.initialize?.();
 
       return module;
     } catch (error) {
