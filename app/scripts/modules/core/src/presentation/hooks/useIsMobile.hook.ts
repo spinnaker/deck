@@ -1,10 +1,8 @@
 import * as React from 'react';
-import { throttle } from 'lodash';
 
 import { useEventListener } from './useEventListener.hook';
-import { useLatestCallback } from './useLatestCallback.hook';
 
-const { useState, useCallback } = React;
+const { useState } = React;
 
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
@@ -21,10 +19,12 @@ const BREAKPOINT_MOBILE = 1024;
 export const useIsMobile = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= BREAKPOINT_MOBILE);
 
-  const resizeListener = useLatestCallback(() => setIsMobile(window.innerWidth <= BREAKPOINT_MOBILE));
-  const memoizedResizeListener = useCallback(throttle(resizeListener, 200), []);
-
-  useEventListener(window, 'resize', memoizedResizeListener);
+  useEventListener(window, 'resize', () => {
+    const newValue = window.innerWidth <= BREAKPOINT_MOBILE;
+    if (newValue !== isMobile) {
+      setIsMobile(newValue);
+    }
+  });
 
   return isMobile;
 };
