@@ -33,22 +33,8 @@ export function AwsCodeBuildStageForm(props: IAwsCodeBuildStageFormProps & IForm
     [],
   );
 
-  const onYamlChange = (buildspec: string, _: any): void => {
-    props.formik.setFieldValue('source.buildspec', buildspec);
-  };
-
-  const setArtifactId = (artifactId: string): void => {
-    props.formik.setFieldValue('source.sourceArtifact.artifactId', artifactId);
-    props.formik.setFieldValue('source.sourceArtifact.artifact', null);
-  };
-
-  const setArtifact = (artifact: IArtifact): void => {
-    props.formik.setFieldValue('source.sourceArtifact.artifact', artifact);
-    props.formik.setFieldValue('source.sourceArtifact.artifactId', null);
-  };
-
-  const updateSources = (sources: IAwsCodeBuildSource[]): void => {
-    props.formik.setFieldValue('secondarySources', sources);
+  const onFieldChange = (fieldName: string, fieldValue: any): void => {
+    props.formik.setFieldValue(fieldName, fieldValue);
   };
 
   return (
@@ -104,8 +90,14 @@ export function AwsCodeBuildStageForm(props: IAwsCodeBuildStageFormProps & IForm
               artifact={get(stage, 'source.sourceArtifact.artifact')}
               excludedArtifactTypePatterns={EXCLUDED_ARTIFACT_TYPES}
               expectedArtifactId={get(stage, 'source.sourceArtifact.artifactId')}
-              onArtifactEdited={setArtifact}
-              onExpectedArtifactSelected={(artifact: IExpectedArtifact) => setArtifactId(artifact.id)}
+              onArtifactEdited={(artifact: IArtifact) => {
+                onFieldChange('source.sourceArtifact.artifact', artifact);
+                onFieldChange('source.sourceArtifact.artifactId', null);
+              }}
+              onExpectedArtifactSelected={(artifact: IExpectedArtifact) => {
+                onFieldChange('source.sourceArtifact.artifact', null);
+                onFieldChange('source.sourceArtifact.artifactId', artifact.id);
+              }}
               pipeline={props.pipeline}
               stage={stage}
             />
@@ -123,7 +115,11 @@ export function AwsCodeBuildStageForm(props: IAwsCodeBuildStageFormProps & IForm
         label="Buildspec"
         name="source.buildspec"
         input={(inputProps: IFormInputProps) => (
-          <YamlEditor {...inputProps} value={get(stage, 'source.buildspec')} onChange={onYamlChange} />
+          <YamlEditor
+            {...inputProps}
+            value={get(stage, 'source.buildspec')}
+            onChange={(buildspec: string, _: any) => onFieldChange('source.buildspec', buildspec)}
+          />
         )}
       />
       <FormikFormField
@@ -134,7 +130,7 @@ export function AwsCodeBuildStageForm(props: IAwsCodeBuildStageFormProps & IForm
           <AwsCodeBuildSourceList
             {...inputProps}
             sources={get(stage, 'secondarySources')}
-            updateSources={updateSources}
+            updateSources={(sources: IAwsCodeBuildSource[]) => onFieldChange('secondarySources', sources)}
             stage={stage}
             pipeline={props.pipeline}
           />
