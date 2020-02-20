@@ -9,13 +9,11 @@ if [[ $GITHUB_EVENT_NAME == "pull_request" && ( $GITHUB_BASE_REF != "master" || 
   exit 0
 fi
 
+cd "$(dirname "$0")" || exit 1;
 if [[ -n $TRAVIS || -n $GITHUB_ACTIONS ]] ; then
   echo "git fetch -q..."
   git fetch -q
-  CI_TARGET_BRANCH=origin/master
-  cd app/scripts/modules || exit 1;
-else
-  cd "$(dirname "$0")" || exit 2;
+  CI_TARGET_BRANCH=origin/master # dirname should maybe work in both cases?
 fi
 
 # Use the command line argument, origin/master (if running on GHA) or master (in that order)
@@ -34,8 +32,11 @@ HAS_PURE_PKG_BUMP=false
 for PKGJSON in */package.json ; do
   MODULE=$(basename "$(dirname "$PKGJSON")")
 
-  HAS_PKG_BUMP=$(git diff "$TARGET_BRANCH" -- "$PKGJSON" | grep -c '"version":')
+  HAS_PKG_BUMP=$(git diff -U0 "$TARGET_BRANCH" -- "$PKGJSON" | grep -c '"version":')
   if [ "$HAS_PKG_BUMP" -ne 0 ] ; then
+    FROM_VERSION=$(git diff "$TARGET_BRANCH" -- "$PKGJSON" | grep '^-.*"version":' | sed -e 's/^.*version": "//' -e 's/[",]//g')
+    TO_VERSION=$(git diff "$TARGET_BRANCH" -- "$PKGJSON" | grep '^\+.*"version":' | sed -e 's/^.*": "//' -e 's/[",]//g')
+
     # Ensuring that the version change is the only change in package.json
     PKG_JSON_OTHER_CHANGES=$(git diff --numstat "$TARGET_BRANCH" -- "$PKGJSON" | cut -f 1)
     if [ "$PKG_JSON_OTHER_CHANGES" -ne 1 ] ; then
@@ -46,8 +47,7 @@ for PKGJSON in */package.json ; do
       echo "Version change found in $MODULE/package.json"
       echo "However, other changes were found in package.json"
       echo ""
-      echo "Version change:"
-      git diff -u "$TARGET_BRANCH" -- "$PKGJSON" | grep '"version"' >&2
+      echo "Version changed from $FROM_VERSION -> $TO_VERSION:"
       echo ""
       echo "git diff of package.json:"
       echo "=========================================="
@@ -67,8 +67,7 @@ for PKGJSON in */package.json ; do
       echo "Version change found in $MODULE/package.json"
       echo "However, other files were also changed"
       echo ""
-      echo "Version change:"
-      git diff -u "$TARGET_BRANCH" -- "$PKGJSON" | grep '"version"' >&2
+      echo "Version changed from $FROM_VERSION -> $TO_VERSION:"
       echo ""
       echo "List of all files changed:"
       echo "=========================================="
@@ -77,8 +76,6 @@ for PKGJSON in */package.json ; do
       exit 4
     fi
 
-    FROM_VERSION=$(git diff "$TARGET_BRANCH" -- "$PKGJSON" | grep '^-.*"version":' | sed -e 's/^.*version": "//' -e 's/[",]//g')
-    TO_VERSION=$(git diff "$TARGET_BRANCH" -- "$PKGJSON" | grep '^\+.*"version":' | sed -e 's/^.*": "//' -e 's/[",]//g')
 
 
     HAS_PURE_PKG_BUMP=true
