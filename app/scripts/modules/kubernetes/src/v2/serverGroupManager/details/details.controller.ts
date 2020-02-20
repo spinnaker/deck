@@ -11,6 +11,7 @@ import {
   ClusterTargetBuilder,
   IOwnerOption,
   IEntityTags,
+  ProviderSelectionService,
 } from '@spinnaker/core';
 import { IKubernetesServerGroupManager } from '../IKubernetesServerGroupManager';
 import { KubernetesManifestService } from 'kubernetes/v2/manifest/manifest.service';
@@ -47,6 +48,7 @@ class KubernetesServerGroupManagerDetailsController implements IController {
       this.extractServerGroupManager(serverGroupManager);
       this.state.loading = false;
     });
+    $scope.isDisabled = ProviderSelectionService.hideK8InfraButton(this.app);
   }
 
   public pauseRolloutServerGroupManager(): void {

@@ -3,7 +3,12 @@
 import * as angular from 'angular';
 import _ from 'lodash';
 
-import { ConfirmationModalService, LoadBalancerWriter, ServerGroupTemplates } from '@spinnaker/core';
+import {
+  ConfirmationModalService,
+  LoadBalancerWriter,
+  ServerGroupTemplates,
+  ProviderSelectionService,
+} from '@spinnaker/core';
 
 import { KubernetesProviderSettings } from 'kubernetes/kubernetes.settings';
 import UIROUTER_ANGULARJS from '@uirouter/angularjs';
@@ -28,6 +33,7 @@ angular
         loading: true,
       };
 
+      $scope.isDisabled = ProviderSelectionService.hideK8InfraButton(application);
       const extractLoadBalancer = () => {
         return application.loadBalancers.ready().then(() => {
           $scope.loadBalancer = application.loadBalancers.data.find(test => {

@@ -2,7 +2,13 @@ import { IController, IScope, module } from 'angular';
 import { IModalService } from 'angular-ui-bootstrap';
 import { StateService } from '@uirouter/angularjs';
 
-import { Application, ISecurityGroupDetail, SECURITY_GROUP_READER, SecurityGroupReader } from '@spinnaker/core';
+import {
+  Application,
+  ISecurityGroupDetail,
+  SECURITY_GROUP_READER,
+  SecurityGroupReader,
+  ProviderSelectionService,
+} from '@spinnaker/core';
 
 import { IKubernetesSecurityGroup } from './IKubernetesSecurityGroup';
 import { KubernetesManifestCommandBuilder } from 'kubernetes/v2/manifest/manifestCommandBuilder.service';
@@ -30,6 +36,7 @@ class KubernetesSecurityGroupDetailsController implements IController {
   ) {
     this.securityGroupFromParams = resolvedSecurityGroup;
     this.extractSecurityGroup();
+    this.$scope.isDisabled = ProviderSelectionService.hideK8InfraButton(this.app);
   }
 
   public deleteSecurityGroup(): void {

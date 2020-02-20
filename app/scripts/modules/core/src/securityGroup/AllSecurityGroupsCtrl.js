@@ -38,7 +38,7 @@ module(CORE_SECURITYGROUP_ALLSECURITYGROUPSCTRL, [
 
       $scope.application = app;
 
-      $scope.isDisabled = ProviderSelectionService.disableButton(app);
+      $scope.isDisabled = ProviderSelectionService.hideK8InfraButton(app);
 
       $scope.sortFilter = SecurityGroupState.filterModel.sortFilter;
 

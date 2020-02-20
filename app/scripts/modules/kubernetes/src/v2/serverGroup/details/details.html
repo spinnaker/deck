@@ -44,7 +44,7 @@
         </button>
         <ul class="dropdown-menu" uib-dropdown-menu role="menu">
           <li ng-if="ctrl.canEditServerGroup()">
-            <a href ng-click="ctrl.editServerGroup()">
+            <a href ng-click="ctrl.editServerGroup()" ng-hide="isDisabled">
               Edit
             </a>
           </li>

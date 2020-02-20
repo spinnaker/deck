@@ -50,7 +50,9 @@
             <a href ng-click="ctrl.deleteSecurityGroup()">Delete <firewall-label label="Firewall"></firewall-label></a>
           </li>
           <li>
-            <a href ng-click="ctrl.editSecurityGroup()">Edit <firewall-label label="Firewall"></firewall-label></a>
+            <a href ng-click="ctrl.editSecurityGroup()" ng-hide="isDisabled"
+              >Edit <firewall-label label="Firewall"></firewall-label
+            ></a>
           </li>
           <render-if-feature feature="entityTags">
             <add-entity-tag-links

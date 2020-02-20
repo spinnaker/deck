@@ -10,6 +10,7 @@ import {
   SECURITY_GROUP_READER,
   SecurityGroupWriter,
   ServerGroupTemplates,
+  ProviderSelectionService,
 } from '@spinnaker/core';
 import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
@@ -33,7 +34,7 @@ angular
       $scope.detailsTemplateUrl = CloudProviderRegistry.getValue('kubernetes', 'securityGroup.detailsTemplateUrl');
 
       $scope.firewallLabel = FirewallLabels.get('Firewall');
-
+      $scope.isDisabled = ProviderSelectionService.hideK8InfraButton(application);
       $scope.state = {
         loading: true,
         standalone: app.isStandalone,

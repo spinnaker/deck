@@ -49,7 +49,7 @@ module(CORE_CLUSTER_ALLCLUSTERS_CONTROLLER, [
       this.application = app;
 
       $scope.sortFilter = ClusterState.filterModel.sortFilter;
-      $scope.isDisabled = ProviderSelectionService.disableButton(app);
+      $scope.isDisabled = ProviderSelectionService.hideK8InfraButton(app);
       this.createLabel = 'Create Server Group';
 
       app

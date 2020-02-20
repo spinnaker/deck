@@ -11,6 +11,7 @@ import {
   SERVER_GROUP_WRITER,
   ServerGroupReader,
   ConfirmationModalService,
+  ProviderSelectionService,
 } from '@spinnaker/core';
 
 import { IKubernetesServerGroup } from './IKubernetesServerGroup';
@@ -57,6 +58,7 @@ class KubernetesServerGroupDetailsController implements IController {
       .catch(() => this.autoClose());
 
     this.app.getDataSource('serverGroups').onRefresh(this.$scope, () => this.extractServerGroup(serverGroup));
+    this.$scope.isDisabled = ProviderSelectionService.hideK8InfraButton(this.app);
   }
 
   private ownerReferences(): any[] {

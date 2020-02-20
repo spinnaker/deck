@@ -48,7 +48,8 @@ export class ProviderSelectionService {
     });
   }
 
-  public static disableButton(application: Application): boolean {
+  // Only hide the button when the provider is kubernetes otherwise is going to be shown
+  public static hideK8InfraButton(application: Application): boolean {
     if (application.attributes.cloudProviders.length == 1) {
       if (application.attributes.cloudProviders.includes('kubernetes')) {
         return !SETTINGS.createKubernetesInfrastructure;
