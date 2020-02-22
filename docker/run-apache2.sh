@@ -80,4 +80,4 @@ then
 	cp /opt/spinnaker/config/settings-local.js /opt/deck/html/settings-local.js
 fi
 
-apache2ctl -D FOREGROUND 
+apache2ctl -D FOREGROUND || { echo "Error log:"; cat /var/log/apache2/error.log; exit 1 }
