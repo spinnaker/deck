@@ -5,6 +5,7 @@ import { $http } from 'ngimport';
 
 export interface IDeckPlugin {
   stages?: IStageTypeConfig[];
+  initialize?(): void;
 }
 
 export interface IPluginManifest {
@@ -163,6 +164,9 @@ export class PluginRegistry {
 
       // Register extensions with deck.
       plugin.stages?.forEach(stage => Registry.pipeline.registerStage(stage));
+
+      // Run code that currently does not have an extension point
+      plugin.initialize?.();
 
       return module;
     } catch (error) {
