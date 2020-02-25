@@ -87,7 +87,7 @@ export function AwsCodeBuildStageForm(props: IAwsCodeBuildStageFormProps & IForm
         <FormikFormField
           fastField={false}
           help={<HelpField id="pipeline.config.codebuild.sourceType" />}
-          label="SourceType"
+          label="Source Type"
           name="source.sourceType"
           input={(inputProps: IFormInputProps) => (
             <ReactSelectInput {...inputProps} clearable={true} stringOptions={SOURCE_TYPES} />
