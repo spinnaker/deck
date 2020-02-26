@@ -177,9 +177,9 @@ export const ManagedResourceHistoryModal = ({ resourceSummary }: IManagedResourc
               >
                 {historyEvents
                   .filter(({ type }) => viewConfigurationByEventType[type])
-                  .map(({ type, timestamp: eventTimestamp, delta, tasks, message, reason }) => {
+                  .map(({ type, timestamp: eventTimestamp, delta, tasks, message, reason, exceptionMessage }) => {
                     const eventTimestampMillis = DateTime.fromISO(eventTimestamp).toMillis();
-                    const hasDetails = delta || tasks || message || reason;
+                    const hasDetails = delta || tasks || message || reason || exceptionMessage;
                     return (
                       <TableRow
                         key={type + eventTimestamp}
@@ -190,12 +190,13 @@ export const ManagedResourceHistoryModal = ({ resourceSummary }: IManagedResourc
                               viewConfigurationByEventType[type].level,
                               delta,
                               tasks,
-                              message || reason,
+                              message || reason || exceptionMessage,
                             ))
                         }
                       >
                         <TableCell>
-                          <AccountTag account={account} /> <span className="where-column-arrow" /> {resourceDisplayName}
+                          <AccountTag account={account} />{' '}
+                          <span className="sp-margin-s-left">{resourceDisplayName}</span>
                         </TableCell>
                         <TableCell>
                           <i
