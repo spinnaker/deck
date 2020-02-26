@@ -6,6 +6,43 @@ import { SETTINGS } from 'core/config';
 
 const NOT_FOUND = 'Not found';
 
+export class DeliveryConfigImportErrorDetails {
+  error: string;
+  message: string;
+  pathExpression: string;
+
+  getErrorMessage() {
+    let errorMessage = 'Error parsing delivery config: <br/>';
+    switch (this.error) {
+      case 'missing_property':
+        errorMessage += 'The following property is missing: ' + this.pathExpression;
+        break;
+
+      case 'invalid_type':
+        errorMessage += 'The type of property `' + this.pathExpression + '` is invalid.';
+        break;
+
+      case 'invalid_format':
+        errorMessage += 'The format of property `' + this.pathExpression + '` is invalid.';
+        break;
+
+      case 'invalid_value':
+        errorMessage += 'The value of property `' + this.pathExpression + '` is invalid.';
+        break;
+
+      default:
+        errorMessage += this.message;
+        break;
+    }
+    return errorMessage;
+  }
+}
+
+export interface IDeliveryConfigImportError {
+  message: string;
+  details?: DeliveryConfigImportErrorDetails;
+}
+
 export function ImportDeliveryConfigExecutionDetails(props: IExecutionDetailsSectionProps) {
   const { stage } = props;
   const trigger = props.execution.trigger as IGitTrigger;
@@ -13,6 +50,14 @@ export function ImportDeliveryConfigExecutionDetails(props: IExecutionDetailsSec
     SETTINGS.managedDelivery?.manifestBasePath +
     '/' +
     (stage.context.manifest ?? SETTINGS.managedDelivery?.defaultManifest);
+
+  let errorMessage;
+  if (stage.context.error instanceof Map) {
+    const importError = stage.context.error as IDeliveryConfigImportError;
+    errorMessage = importError.details ? importError.details.getErrorMessage() : importError.message;
+  } else {
+    errorMessage = stage.context.error;
+  }
 
   return (
     <ExecutionDetailsSection name={props.name} current={props.current}>
@@ -35,7 +80,7 @@ export function ImportDeliveryConfigExecutionDetails(props: IExecutionDetailsSec
         </div>
       </div>
 
-      <StageFailureMessage stage={stage} message={stage.context.error || stage.failureMessage} />
+      <StageFailureMessage stage={stage} message={errorMessage || stage.failureMessage} />
     </ExecutionDetailsSection>
   );
 }
