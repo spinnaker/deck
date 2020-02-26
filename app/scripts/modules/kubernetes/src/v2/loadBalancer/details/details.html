@@ -40,7 +40,7 @@
     </div>
     <div class="actions">
       <div class="dropdown" uib-dropdown dropdown-append-to-body>
-        <button type="button" class="btn btn-sm btn-primary dropdown-toggle" uib-dropdown-toggle>
+        <button type="button" class="btn btn-sm btn-primary dropdown-toggle" uib-dropdown-toggle ng-hide="isDisabled">
           {{ctrl.loadBalancer.kind | robotToHuman}} Actions <span class="caret"></span>
         </button>
         <ul class="dropdown-menu" uib-dropdown-menu role="menu">
@@ -48,7 +48,7 @@
             <a href ng-click="ctrl.deleteLoadBalancer()">Delete</a>
           </li>
           <li>
-            <a href ng-click="ctrl.editLoadBalancer()" ng-hide="isDisabled">Edit</a>
+            <a href ng-click="ctrl.editLoadBalancer()">Edit</a>
           </li>
           <render-if-feature feature="entityTags">
             <add-entity-tag-links

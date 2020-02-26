@@ -41,7 +41,7 @@
     </div>
     <div class="actions">
       <div class="dropdown" uib-dropdown dropdown-append-to-body>
-        <button type="button" class="btn btn-sm btn-primary dropdown-toggle" uib-dropdown-toggle>
+        <button type="button" class="btn btn-sm btn-primary dropdown-toggle" uib-dropdown-toggle ng-hide="isDisabled">
           <firewall-label label="{{ctrl.securityGroup.kind | robotToHuman}}"></firewall-label> Actions
           <span class="caret"></span>
         </button>
@@ -50,9 +50,7 @@
             <a href ng-click="ctrl.deleteSecurityGroup()">Delete <firewall-label label="Firewall"></firewall-label></a>
           </li>
           <li>
-            <a href ng-click="ctrl.editSecurityGroup()" ng-hide="isDisabled"
-              >Edit <firewall-label label="Firewall"></firewall-label
-            ></a>
+            <a href ng-click="ctrl.editSecurityGroup()">Edit <firewall-label label="Firewall"></firewall-label></a>
           </li>
           <render-if-feature feature="entityTags">
             <add-entity-tag-links
