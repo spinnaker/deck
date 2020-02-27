@@ -6,41 +6,41 @@ import { SETTINGS } from 'core/config';
 
 const NOT_FOUND = 'Not found';
 
-export class DeliveryConfigImportErrorDetails {
+interface IDeliveryConfigImportErrorDetails {
   error: string;
   message: string;
   pathExpression: string;
-
-  getErrorMessage() {
-    let errorMessage = 'Error parsing delivery config: <br/>';
-    switch (this.error) {
-      case 'missing_property':
-        errorMessage += 'The following property is missing: ' + this.pathExpression;
-        break;
-
-      case 'invalid_type':
-        errorMessage += 'The type of property `' + this.pathExpression + '` is invalid.';
-        break;
-
-      case 'invalid_format':
-        errorMessage += 'The format of property `' + this.pathExpression + '` is invalid.';
-        break;
-
-      case 'invalid_value':
-        errorMessage += 'The value of property `' + this.pathExpression + '` is invalid.';
-        break;
-
-      default:
-        errorMessage += this.message;
-        break;
-    }
-    return errorMessage;
-  }
 }
 
-export interface IDeliveryConfigImportError {
+interface IDeliveryConfigImportError {
   message: string;
-  details?: DeliveryConfigImportErrorDetails;
+  details?: IDeliveryConfigImportErrorDetails;
+}
+
+function extractErrorMessage(props: IDeliveryConfigImportErrorDetails) {
+  let errorMessage = 'There was an error parsing your delivery config file.<br/>';
+  switch (props.error) {
+    case 'missing_property':
+      errorMessage += 'The following property is missing: `' + props.pathExpression + '`';
+      break;
+
+    case 'invalid_type':
+      errorMessage += 'The type of property `' + props.pathExpression + '` is invalid.';
+      break;
+
+    case 'invalid_format':
+      errorMessage += 'The format of property `' + props.pathExpression + '` is invalid.';
+      break;
+
+    case 'invalid_value':
+      errorMessage += 'The value of property `' + props.pathExpression + '` is invalid.';
+      break;
+
+    default:
+      break;
+  }
+  errorMessage += '<br/><br/>Debug details: ' + props.message;
+  return errorMessage;
 }
 
 export function ImportDeliveryConfigExecutionDetails(props: IExecutionDetailsSectionProps) {
@@ -52,9 +52,9 @@ export function ImportDeliveryConfigExecutionDetails(props: IExecutionDetailsSec
     (stage.context.manifest ?? SETTINGS.managedDelivery?.defaultManifest);
 
   let errorMessage;
-  if (stage.context.error instanceof Map) {
+  if (stage.context.error instanceof Object) {
     const importError = stage.context.error as IDeliveryConfigImportError;
-    errorMessage = importError.details ? importError.details.getErrorMessage() : importError.message;
+    errorMessage = importError.details ? extractErrorMessage(importError.details) : importError.message;
   } else {
     errorMessage = stage.context.error;
   }
