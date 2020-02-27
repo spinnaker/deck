@@ -7,7 +7,6 @@ import {
   ApplicationModelBuilder,
   Details,
   IManifest,
-  IManifestContainer,
   IManifestParams,
   noop,
   timestamp,
@@ -67,13 +66,8 @@ describe('<KubernetesAutoscalerDetails />', () => {
       application.autoscalers.refresh();
       $scope.$digest();
 
-      spyOn(KubernetesManifestService, 'makeManifestRefresher').and.callFake(
-        (
-          _application: Application,
-          _params: IManifestParams,
-          _container: IManifestContainer,
-          updateCallback: (manifest: IManifest) => void,
-        ) => {
+      spyOn(KubernetesManifestService, 'subscribe').and.callFake(
+        (_application: Application, _params: IManifestParams, updateCallback: (manifest: IManifest) => void) => {
           updateCallback({ manifest: {} } as IManifest);
           return noop;
         },

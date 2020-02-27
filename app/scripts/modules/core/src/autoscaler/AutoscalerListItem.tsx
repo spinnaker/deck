@@ -13,9 +13,9 @@ export class AutoscalerListItem extends React.Component<IAutoscalerListItemProps
 
   public render(): React.ReactElement<AutoscalerListItem> {
     return (
-      <a onClick={this.onClick}>
+      <button className="btn-link" onClick={this.onClick}>
         <span className="name">{this.props.autoscaler}</span>
-      </a>
+      </button>
     );
   }
 }

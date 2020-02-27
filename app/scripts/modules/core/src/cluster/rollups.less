@@ -268,6 +268,10 @@ running-tasks-tag {
 }
 
 .menu-badge-popover {
+  .btn-link {
+    width: 100%;
+  }
+
   &.popover.bottom div.arrow:after {
     border-bottom-color: var(--color-dovegray);
   }
@@ -286,14 +290,16 @@ running-tasks-tag {
   }
 
   .menu-badge-popover-header,
-  a {
+  a,
+  .btn-link {
     text-transform: none;
     font-size: 82.5%;
     padding: 5px 10px;
     display: block;
   }
 
-  a {
+  a,
+  .btn-link {
     cursor: pointer;
     display: flex;
     justify-content: space-between;

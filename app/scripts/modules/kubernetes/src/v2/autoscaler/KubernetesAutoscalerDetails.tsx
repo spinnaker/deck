@@ -59,14 +59,13 @@ export class KubernetesAutoscalerDetails extends React.Component<
     Observable.fromPromise(dataSource.ready())
       .takeUntil(this.destroy$)
       .subscribe(() => {
-        const manifestUnsubscribe = KubernetesManifestService.makeManifestRefresher(
+        const manifestUnsubscribe = KubernetesManifestService.subscribe(
           app,
           {
             account: autoscalerMetadata.accountId,
             location: autoscalerMetadata.region,
             name: autoscalerMetadata.name,
           },
-          null,
           this.updateManifest,
         );
 

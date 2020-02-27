@@ -49,9 +49,7 @@ export class Autoscalers extends React.Component<IAutoscalerProps> {
     const autoscalers = serverGroup.autoscalers.filter((sgAutoScalerName: string) =>
       applicationAutoscalers.find(
         ({ account, name, region }: IAutoscaler) =>
-          name === sgAutoScalerName &&
-          account === serverGroup.account &&
-          (region === serverGroup.region || region === 'global'),
+          name === sgAutoScalerName && account === serverGroup.account && region === serverGroup.region,
       ),
     );
 

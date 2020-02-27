@@ -2,12 +2,12 @@ import React from 'react';
 
 import { Tooltip } from 'core/presentation/Tooltip';
 
-interface IAutoscalerListItemProps {
+interface IAutoscalerButtonProps {
   name: string;
   onItemClick: (autoscaler: string) => void;
 }
 
-export class AutoscalerButton extends React.Component<IAutoscalerListItemProps> {
+export class AutoscalerButton extends React.Component<IAutoscalerButtonProps> {
   private onClick = (e: React.MouseEvent<HTMLElement>): void => {
     e.stopPropagation();
     this.props.onItemClick(this.props.name);
