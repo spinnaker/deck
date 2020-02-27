@@ -31,7 +31,7 @@ import { Spinner } from 'core/widgets/spinners/Spinner';
 
 import './executionGroup.less';
 
-const ACCOUNT_TAG_OVERFLOW_LIMIT = 2;
+const ACCOUNT_TAG_OVERFLOW_LIMIT = 1;
 
 export interface IExecutionGroupProps {
   group: IExecutionGroup;
