@@ -26,9 +26,11 @@ const CustomErrorMessage = (message: string, debugDetails?: string) => {
         <br />
         <Markdown message={message} />
         <br />
-        <CollapsibleSection heading={({ chevron }) => <span>{chevron} Debug Details</span>}>
-          <pre>{debugDetails}</pre>
-        </CollapsibleSection>
+        {debugDetails && (
+          <CollapsibleSection heading={({ chevron }) => <span>{chevron} Debug Details</span>}>
+            <pre>{debugDetails}</pre>
+          </CollapsibleSection>
+        )}
       </div>
     </div>
   );
