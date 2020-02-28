@@ -9,7 +9,7 @@ const NOT_FOUND = 'Not found';
 
 // Turn off linter for the block below because it wants CamelCase property names.
 /* eslint-disable @typescript-eslint/camelcase */
-const ERROR_MESSAGE_MAP: any = {
+const ERROR_MESSAGE_MAP = {
   missing_property: 'The following property is missing:',
   invalid_type: 'The type of the following property is invalid:',
   invalid_format: 'The format of the following property is invalid:',
@@ -18,7 +18,7 @@ const ERROR_MESSAGE_MAP: any = {
 /* eslint-enable */
 
 interface IDeliveryConfigImportErrorDetails {
-  error: string;
+  error: 'missing_property' | 'invalid_type' | 'invalid_format' | 'invalid_value';
   message: string;
   pathExpression: string;
 }
