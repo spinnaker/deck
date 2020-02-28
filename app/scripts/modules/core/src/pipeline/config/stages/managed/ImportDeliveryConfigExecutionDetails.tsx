@@ -43,14 +43,16 @@ function buildCustomErrorMessage(error: IDeliveryConfigImportError) {
     return CustomErrorMessage(error.message);
   }
 
+  const pathExpression = error.details.pathExpression.replace('.', '/');
+  /* eslint-disable */
   const errorMessage =
     {
-      missing_property: `The following property is missing: \`${error.details.pathExpression}\``,
-      invalid_type: `The type of property \`${error.details.pathExpression}\` is invalid.`,
-      invalid_format: `The format of property \`${error.details.pathExpression}\` is invalid.`,
-      invalid_value: `The value of property \`${error.details.pathExpression}\` is invalid.`,
+      missing_property: `The following property is missing: \`${pathExpression}\``,
+      invalid_type: `The type of property \`${pathExpression}\` is invalid.`,
+      invalid_format: `The format of property \`${pathExpression}\` is invalid.`,
+      invalid_value: `The value of property \`${pathExpression}\` is invalid.`,
     }[error.details.error] || 'Unknown error';
-
+  /* eslint-enable */
   return CustomErrorMessage(errorMessage, error.details.message);
 }
 
