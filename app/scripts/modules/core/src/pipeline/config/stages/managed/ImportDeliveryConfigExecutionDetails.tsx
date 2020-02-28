@@ -28,13 +28,13 @@ interface IDeliveryConfigImportError {
   details?: IDeliveryConfigImportErrorDetails;
 }
 
-const CustomErrorMessage = ({ message, debugDetails }: { message: string; debugDetails?: string }) => {
+const CustomErrorMessage = ({ summary, debugDetails }: { summary: string; debugDetails?: string }) => {
   return (
     <div>
       <div className="alert alert-danger">
         <b>There was an error parsing your delivery config file.</b>
         <br />
-        <Markdown message={message} style={{ wordBreak: 'break-all' }} />
+        <Markdown message={summary} style={{ wordBreak: 'break-all' }} />
         <br />
         {debugDetails && (
           <CollapsibleSection heading={({ chevron }) => <span>{chevron} Debug Details</span>}>
@@ -46,7 +46,7 @@ const CustomErrorMessage = ({ message, debugDetails }: { message: string; debugD
   );
 };
 
-function extractErrorMessage(error: IDeliveryConfigImportError): { summary: string; debugDetails?: string } {
+function extractCustomError(error: IDeliveryConfigImportError): { summary: string; debugDetails?: string } {
   if (!error) {
     return null;
   }
@@ -73,7 +73,7 @@ export function ImportDeliveryConfigExecutionDetails(props: IExecutionDetailsSec
     '/' +
     (stage.context.manifest ?? SETTINGS.managedDelivery?.defaultManifest);
 
-  const errorMessage = extractErrorMessage(stage.context.error as IDeliveryConfigImportError);
+  const customError = extractCustomError(stage.context.error as IDeliveryConfigImportError);
 
   return (
     <ExecutionDetailsSection name={props.name} current={props.current}>
@@ -96,8 +96,8 @@ export function ImportDeliveryConfigExecutionDetails(props: IExecutionDetailsSec
         </div>
       </div>
 
-      {errorMessage ? (
-        <CustomErrorMessage message={errorMessage.summary} debugDetails={errorMessage.debugDetails} />
+      {customError ? (
+        <CustomErrorMessage summary={customError.summary} debugDetails={customError.debugDetails} />
       ) : (
         <StageFailureMessage stage={stage} />
       )}
