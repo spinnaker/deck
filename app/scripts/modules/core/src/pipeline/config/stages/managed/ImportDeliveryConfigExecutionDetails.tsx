@@ -7,6 +7,16 @@ import { SETTINGS } from 'core/config';
 
 const NOT_FOUND = 'Not found';
 
+// Turn off linter for the block below because it wants CamelCase property names.
+/* eslint-disable @typescript-eslint/camelcase */
+const ERROR_MESSAGE_MAP = {
+  missing_property: 'The following property is missing:',
+  invalid_type: 'The type of the following property is invalid:',
+  invalid_format: 'The format of the following property is invalid:',
+  invalid_value: 'The value of the following property is invalid:',
+};
+/* eslint-enable */
+
 interface IDeliveryConfigImportErrorDetails {
   error: string;
   message: string;
@@ -47,16 +57,11 @@ function buildCustomErrorMessage(error: IDeliveryConfigImportError) {
 
   // Replace dots with slashes for paths because it feels more familiar. Also ditch the very first slash/dot as it just adds noise.
   const pathExpression = error.details.pathExpression.substring(1).replace(/\./g, '/');
-  // Turn off linter for the block below because it wants CamelCase property names.
-  /* eslint-disable @typescript-eslint/camelcase */
-  const errorMessageMap = {
-    missing_property: `The following property is missing: <br/> \`${pathExpression}\``,
-    invalid_type: `The type of the following property is invalid: <br/> \`${pathExpression}\``,
-    invalid_format: `The format of the following property is invalid: <br/> \`${pathExpression}\``,
-    invalid_value: `The value of the following property is invalid: <br/> \`${pathExpression}\``,
-  };
-  /* eslint-enable */
-  const errorMessage = errorMessageMap[error.details.error] || 'Unknown error';
+
+  const errorMessage = ERROR_MESSAGE_MAP[error.details.error]
+    ? ERROR_MESSAGE_MAP[error.details.error] + `<br/>\`${pathExpression}\``
+    : 'Unknown error';
+
   return CustomErrorMessage(errorMessage, error.details.message);
 }
 
