@@ -2,6 +2,7 @@ import React from 'react';
 
 import { ExecutionDetailsSection, IExecutionDetailsSectionProps, StageFailureMessage } from 'core/pipeline';
 import { IGitTrigger } from 'core/domain';
+import { CollapsibleSection, Markdown } from 'core/presentation';
 import { SETTINGS } from 'core/config';
 
 const NOT_FOUND = 'Not found';
@@ -17,30 +18,40 @@ interface IDeliveryConfigImportError {
   details?: IDeliveryConfigImportErrorDetails;
 }
 
-function extractErrorMessage(props: IDeliveryConfigImportErrorDetails) {
-  let errorMessage = 'There was an error parsing your delivery config file.<br/>';
-  switch (props.error) {
-    case 'missing_property':
-      errorMessage += 'The following property is missing: `' + props.pathExpression + '`';
-      break;
+const CustomErrorMessage = (message: string, debugDetails?: string) => {
+  return (
+    <div>
+      <div className="alert alert-danger">
+        <b>There was an error parsing your delivery config file.</b>
+        <br />
+        <Markdown message={message} />
+        <br />
+        <CollapsibleSection heading={({ chevron }) => <span>{chevron} Debug Details</span>}>
+          <pre>{debugDetails}</pre>
+        </CollapsibleSection>
+      </div>
+    </div>
+  );
+};
 
-    case 'invalid_type':
-      errorMessage += 'The type of property `' + props.pathExpression + '` is invalid.';
-      break;
-
-    case 'invalid_format':
-      errorMessage += 'The format of property `' + props.pathExpression + '` is invalid.';
-      break;
-
-    case 'invalid_value':
-      errorMessage += 'The value of property `' + props.pathExpression + '` is invalid.';
-      break;
-
-    default:
-      break;
+function buildCustomErrorMessage(error: IDeliveryConfigImportError) {
+  if (!error) {
+    return null;
   }
-  errorMessage += '<br/><br/>Debug details: ' + props.message;
-  return errorMessage;
+
+  if (!error.details) {
+    return CustomErrorMessage(error.message);
+  }
+
+  const errorMessage =
+    {
+      missing_property: `The following property is missing: \`${error.details.pathExpression}\``,
+      invalid_type: `The type of property \`${error.details.pathExpression}\` is invalid.`,
+      invalid_format: `The format of property \`${error.details.pathExpression}\` is invalid.`,
+      invalid_value: `The value of property \`${error.details.pathExpression}\` is invalid.`,
+    }[error.details.error] || 'Unknown error';
+
+  return CustomErrorMessage(errorMessage, error.details.message);
 }
 
 export function ImportDeliveryConfigExecutionDetails(props: IExecutionDetailsSectionProps) {
@@ -51,13 +62,7 @@ export function ImportDeliveryConfigExecutionDetails(props: IExecutionDetailsSec
     '/' +
     (stage.context.manifest ?? SETTINGS.managedDelivery?.defaultManifest);
 
-  let errorMessage;
-  if (stage.context.error instanceof Object) {
-    const importError = stage.context.error as IDeliveryConfigImportError;
-    errorMessage = importError.details ? extractErrorMessage(importError.details) : importError.message;
-  } else {
-    errorMessage = stage.context.error;
-  }
+  const customErrorMessage = buildCustomErrorMessage(stage.context.error as IDeliveryConfigImportError);
 
   return (
     <ExecutionDetailsSection name={props.name} current={props.current}>
@@ -80,7 +85,7 @@ export function ImportDeliveryConfigExecutionDetails(props: IExecutionDetailsSec
         </div>
       </div>
 
-      <StageFailureMessage stage={stage} message={errorMessage || stage.failureMessage} />
+      {customErrorMessage ? customErrorMessage : <StageFailureMessage stage={stage} />}
     </ExecutionDetailsSection>
   );
 }
