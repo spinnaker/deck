@@ -28,7 +28,7 @@ interface IDeliveryConfigImportError {
   details?: IDeliveryConfigImportErrorDetails;
 }
 
-const CustomErrorMessage = (message: string, debugDetails?: string) => {
+const CustomErrorMessage = ({ message, debugDetails }: { message: string; debugDetails?: string }) => {
   return (
     <div>
       <div className="alert alert-danger">
@@ -46,23 +46,23 @@ const CustomErrorMessage = (message: string, debugDetails?: string) => {
   );
 };
 
-function buildCustomErrorMessage(error: IDeliveryConfigImportError) {
+function extractErrorMessage(error: IDeliveryConfigImportError): { summary: string; debugDetails?: string } {
   if (!error) {
     return null;
   }
 
   if (!error.details) {
-    return CustomErrorMessage(error.message);
+    return { summary: error.message };
   }
 
   // Replace dots with slashes for paths because it feels more familiar. Also ditch the very first slash/dot as it just adds noise.
   const pathExpression = error.details.pathExpression.substring(1).replace(/\./g, '/');
 
   const errorMessage = ERROR_MESSAGE_MAP[error.details.error]
-    ? ERROR_MESSAGE_MAP[error.details.error] + `<br/>\`${pathExpression}\``
+    ? `${ERROR_MESSAGE_MAP[error.details.error]}<br/> \`${pathExpression}\``
     : 'Unknown error';
 
-  return CustomErrorMessage(errorMessage, error.details.message);
+  return { summary: errorMessage, debugDetails: error.details.message };
 }
 
 export function ImportDeliveryConfigExecutionDetails(props: IExecutionDetailsSectionProps) {
@@ -73,7 +73,7 @@ export function ImportDeliveryConfigExecutionDetails(props: IExecutionDetailsSec
     '/' +
     (stage.context.manifest ?? SETTINGS.managedDelivery?.defaultManifest);
 
-  const customErrorMessage = buildCustomErrorMessage(stage.context.error as IDeliveryConfigImportError);
+  const errorMessage = extractErrorMessage(stage.context.error as IDeliveryConfigImportError);
 
   return (
     <ExecutionDetailsSection name={props.name} current={props.current}>
@@ -96,7 +96,11 @@ export function ImportDeliveryConfigExecutionDetails(props: IExecutionDetailsSec
         </div>
       </div>
 
-      {customErrorMessage ? customErrorMessage : <StageFailureMessage stage={stage} />}
+      {errorMessage ? (
+        <CustomErrorMessage message={errorMessage.summary} debugDetails={errorMessage.debugDetails} />
+      ) : (
+        <StageFailureMessage stage={stage} />
+      )}
     </ExecutionDetailsSection>
   );
 }
