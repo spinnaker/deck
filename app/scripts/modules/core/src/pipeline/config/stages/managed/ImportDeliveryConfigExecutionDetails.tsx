@@ -24,11 +24,11 @@ const CustomErrorMessage = (message: string, debugDetails?: string) => {
       <div className="alert alert-danger">
         <b>There was an error parsing your delivery config file.</b>
         <br />
-        <Markdown message={message} />
+        <Markdown message={message} style={{ wordBreak: 'break-all' }} />
         <br />
         {debugDetails && (
           <CollapsibleSection heading={({ chevron }) => <span>{chevron} Debug Details</span>}>
-            <pre>{debugDetails}</pre>
+            <pre style={{ whiteSpace: 'pre-wrap' }}>{debugDetails}</pre>
           </CollapsibleSection>
         )}
       </div>
@@ -45,14 +45,16 @@ function buildCustomErrorMessage(error: IDeliveryConfigImportError) {
     return CustomErrorMessage(error.message);
   }
 
-  const pathExpression = error.details.pathExpression.replace('.', '/');
-  /* eslint-disable */
+  // Replace dots with slashes for paths because it feels more familiar. Also ditch the very first slash/dot as it just adds noise.
+  const pathExpression = error.details.pathExpression.substring(1).replace(/\./g, '/');
+  // Turn off linter for the block below because it wants CamelCase property names.
+  /* eslint-disable @typescript-eslint/camelcase */
   const errorMessage =
     {
-      missing_property: `The following property is missing: \`${pathExpression}\``,
-      invalid_type: `The type of property \`${pathExpression}\` is invalid.`,
-      invalid_format: `The format of property \`${pathExpression}\` is invalid.`,
-      invalid_value: `The value of property \`${pathExpression}\` is invalid.`,
+      missing_property: `The following property is missing: <br/> \`${pathExpression}\``,
+      invalid_type: `The type of the following property is invalid: <br/> \`${pathExpression}\``,
+      invalid_format: `The format of the following property is invalid: <br/> \`${pathExpression}\``,
+      invalid_value: `The value of the following property is invalid: <br/> \`${pathExpression}\``,
     }[error.details.error] || 'Unknown error';
   /* eslint-enable */
   return CustomErrorMessage(errorMessage, error.details.message);
