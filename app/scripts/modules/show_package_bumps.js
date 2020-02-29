@@ -7,7 +7,7 @@ const readline = require('readline');
 const filename = process.argv[2];
 
 if (!filename) {
-  console.error('Usage: parse_package_bump_commits.js <path-to-package-json>');
+  console.error('Usage: show_package_bumps.js <path-to-package-json>');
   process.exit(1);
 }
 
