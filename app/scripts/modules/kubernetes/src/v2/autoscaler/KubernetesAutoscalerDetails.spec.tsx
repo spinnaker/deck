@@ -40,7 +40,7 @@ describe('<KubernetesAutoscalerDetails />', () => {
     name,
     account,
     region,
-    serverGroups: [
+    serverGroupSummaries: [
       {
         account,
         name: 'statefulSet demo',

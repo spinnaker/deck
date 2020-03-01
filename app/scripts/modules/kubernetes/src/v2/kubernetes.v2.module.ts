@@ -27,7 +27,6 @@ import { KUBERNETES_MANIFEST_LABELS } from './manifest/manifestLabels.component'
 import { KUBERNETES_MANIFEST_EVENTS } from './manifest/manifestEvents.component';
 import { KUBERNETES_MANIFEST_RESOURCES } from './manifest/manifestResources.component';
 import { KUBERNETES_MANIFEST_QOS } from './manifest/manifestQos.component';
-import { KUBERNETES_V2_AUTOSCALER_TRANSFORMER } from './autoscaler/transformer';
 import { KUBERNETES_V2_LOAD_BALANCER_TRANSFORMER } from './loadBalancer/transformer';
 import { KUBERNETES_V2_SECURITY_GROUP_TRANSFORMER } from './securityGroup/transformer';
 import { KUBERNETES_ANNOTATION_CUSTOM_SECTIONS } from './manifest/annotationCustomSections.component';
@@ -72,7 +71,6 @@ module(KUBERNETES_V2_MODULE, [
   KUBERNETES_MANIFEST_STATUS,
   KUBERNETES_MANIFEST_CONDITION,
   KUBERNETES_MANIFEST_ARTIFACT,
-  KUBERNETES_V2_AUTOSCALER_TRANSFORMER,
   KUBERNETES_V2_LOAD_BALANCER_TRANSFORMER,
   KUBERNETES_V2_SECURITY_GROUP_TRANSFORMER,
   KUBERNETES_SCALE_MANIFEST_STAGE,
@@ -101,7 +99,6 @@ module(KUBERNETES_V2_MODULE, [
     },
     autoscaler: {
       details: KubernetesAutoscalerDetails,
-      transformer: 'kubernetesV2AutoscalerTransformer',
     },
     serverGroup: {
       CloneServerGroupModal: ManifestWizard,

@@ -10,7 +10,6 @@ import {
   CloudProviderLogo,
   CollapsibleSection,
   Details,
-  HealthCounts,
   IManifest,
   IServerGroup,
   noop,
@@ -105,10 +104,9 @@ export class KubernetesAutoscalerDetails extends React.Component<
         account: autoscalerDef.account,
         createdTime: autoscalerDef.createdTime,
         displayName: autoscalerDef.manifest.metadata.name,
-        instanceCounts: { ...autoscalerDef.instanceCounts },
         kind: autoscalerDef.manifest.kind,
         namespace: autoscalerDef.region,
-        serverGroups: autoscalerDef.serverGroups,
+        serverGroups: autoscalerDef.serverGroupSummaries,
       },
       isLoading: false,
     });
@@ -122,6 +120,8 @@ export class KubernetesAutoscalerDetails extends React.Component<
     const currentCPUUtilizationPercentage = latestManifest?.manifest?.status?.currentCPUUtilizationPercentage;
     const targetCPUUtilizationPercentage = latestManifest?.manifest?.spec?.targetCPUUtilizationPercentage;
     const lastScaled = latestManifest?.manifest?.status?.lastScaleTime;
+    const currentReplicas = latestManifest?.manifest?.status?.currentReplicas;
+    const desiredReplicas = latestManifest?.manifest?.status?.desiredReplicas;
 
     return (
       <Details loading={isLoading}>
@@ -167,12 +167,10 @@ export class KubernetesAutoscalerDetails extends React.Component<
                         </UISref>
                       </dd>
                     ))}
-                    {!isNil(autoscaler.instanceCounts) && (
+                    {!isNil(currentReplicas) && !isNil(desiredReplicas) && (
                       <div>
-                        <dt>Pod status</dt>
-                        <dd>
-                          <HealthCounts container={autoscaler.instanceCounts} />
-                        </dd>
+                        <dt>Pods</dt>
+                        <dd>{`${currentReplicas} current / ${desiredReplicas} desired`}</dd>
                       </div>
                     )}
                   </>
