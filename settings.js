@@ -235,6 +235,14 @@ window.spinnakerSettings = {
         region: 'us-east-1',
       },
     },
+    //todo yossi understand where this is used
+    spot: {
+      defaults: {
+        account: 'spottest',
+        iamProfile: '{{application}}InstanceProfile',
+        region: 'us-east-1',
+      },
+    },
   },
   pagerDuty: {
     required: false,

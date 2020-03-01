@@ -1,0 +1,100 @@
+<div class="details-panel" ng-class="{ disabled: ctrl.serverGroup.isDisabled }">
+  <div class="header" ng-if="ctrl.state.loading">
+    <div class="close-button">
+      <a class="btn btn-link" ui-sref="^">
+        <span class="glyphicon glyphicon-remove"></span>
+      </a>
+    </div>
+    <div class="horizontal center spinner-container">
+      <loading-spinner size="'small'"></loading-spinner>
+    </div>
+  </div>
+  <div class="header" ng-if="!ctrl.state.loading">
+    <div class="close-button">
+      <a class="btn btn-link" ui-sref="^">
+        <span class="glyphicon glyphicon-remove"></span>
+      </a>
+    </div>
+    <div class="header-text horizontal middle">
+      <h3 class="horizontal middle space-between flex-1" select-on-dbl-click>
+        {{ctrl.serverGroup.name}}
+      </h3>
+    </div>
+    <div>
+      <div class="actions" ng-class="{ insights: ctrl.serverGroup.insightActions.length > 0 }">
+        <div class="dropdown" uib-dropdown dropdown-append-to-body>
+          <button type="button" class="btn btn-sm btn-primary dropdown-toggle" uib-dropdown-toggle>
+            Server Group Actions <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu" uib-dropdown-menu role="menu">
+            <li><a href ng-if="!ctrl.serverGroup.disabled" ng-click="ctrl.disableServerGroup()">Disable</a></li>
+            <li><a href ng-if="ctrl.serverGroup.disabled" ng-click="ctrl.enableServerGroup()">Enable</a></li>
+            <li><a href ng-click="ctrl.destroyServerGroup()">Destroy</a></li>
+            <li><a href ng-click="ctrl.resizeServerGroup()">Resize</a></li>
+            <li><a href ng-click="ctrl.rollbackServerGroup()">Rollback</a></li>
+          </ul>
+        </div>
+        <div class="dropdown" ng-if="ctrl.serverGroup.insightActions.length > 0" uib-dropdown dropdown-append-to-body>
+          <button type="button" class="btn btn-sm btn-default dropdown-toggle" uib-dropdown-toggle>
+            Insight <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu" uib-dropdown-menu role="menu">
+            <li ng-repeat="action in ctrl.serverGroup.insightActions">
+              <a target="_blank" href="{{action.url}}">{{action.label}}</a>
+            </li>
+          </ul>
+        </div>
+        <div class="clearfix"></div>
+      </div>
+    </div>
+  </div>
+  <div class="content" ng-if="!ctrl.state.loading">
+    <h4 class="text-center" ng-if="ctrl.serverGroup.isDisabled">[SERVER GROUP IS DISABLED]</h4>
+    <server-group-running-tasks-details server-group="ctrl.serverGroup"></server-group-running-tasks-details>
+    <collapsible-section heading="Server Group Information" expanded="true">
+      <dl class="dl-horizontal dl-flex">
+        <dt>Created</dt>
+        <dd>{{ctrl.serverGroup.createdTime | timestamp}}</dd>
+        <dt>In</dt>
+        <dd>
+          <account-tag account="ctrl.serverGroup.account" pad="right"></account-tag>
+          {{ctrl.serverGroup.region}}
+        </dd>
+        <dt>Subnet</dt>
+        <dd>{{ctrl.serverGroup.subnet.name}}</dd>
+        <dt>Zones</dt>
+        <dd>{{ctrl.serverGroup.zone}}</dd>
+      </dl>
+    </collapsible-section>
+    <collapsible-section heading="Size" expanded="true">
+      <dl class="dl-horizontal dl-flex">
+        <dt>Min</dt>
+        <dd>{{ctrl.serverGroup.capacity.min}}</dd>
+        <dt>Max</dt>
+        <dd>{{ctrl.serverGroup.capacity.max}}</dd>
+        <dt>Desired</dt>
+        <dd>{{ctrl.serverGroup.capacity.desired}}</dd>
+      </dl>
+    </collapsible-section>
+    <collapsible-section heading="Launch Configuration">
+      <dl class="dl-horizontal dl-flex">
+        <dt>Name</dt>
+        <dd>{{ctrl.serverGroup.name}}</dd>
+        <dt ng-if="ctrl.serverGroup.launchConfig.image">Image</dt>
+        <dd ng-if="ctrl.serverGroup.launchConfig.image">{{ctrl.serverGroup.launchConfig.image}}</dd>
+
+        <dt ng-if="ctrl.serverGroup.launchConfig.iamRole.name">IAM Profile</dt>
+        <dd ng-if="ctrl.serverGroup.launchConfig.iamRole.name">{{ctrl.serverGroup.launchConfig.iamRole.name}}</dd>
+
+        <dt ng-if="ctrl.serverGroup.launchConfig.userData">User Data</dt>
+        <dd ng-if="ctrl.serverGroup.launchConfig.userData">{{ctrl.serverGroup.launchConfig.userData}}</dd>
+
+        <dt ng-if="ctrl.serverGroup.instanceType">On-Demand Type</dt>
+        <dd ng-if="ctrl.serverGroup.instanceType">{{ctrl.serverGroup.instanceType}}</dd>
+
+        <dt ng-if="ctrl.serverGroup.instanceType">Spot Type</dt>
+        <dd ng-if="ctrl.serverGroup.instanceTypes">{{ctrl.serverGroup.instanceType}}</dd>
+      </dl>
+    </collapsible-section>
+  </div>
+</div>
