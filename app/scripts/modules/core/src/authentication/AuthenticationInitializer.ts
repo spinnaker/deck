@@ -52,8 +52,6 @@ export class AuthenticationInitializer {
 
   public static loginRedirect(): void {
     const callback: string = encodeURIComponent($location.absUrl());
-    // eslint-disable-next-line
-    console.log(callback);
     window.location.href = `${SETTINGS.gateUrl}/auth/redirect?to=${callback}`;
   }
 
