@@ -10,6 +10,7 @@
     </div>
   </div>
   <div class="header" ng-if="!ctrl.state.loading">
+    <cloud-provider-logo provider="ctrl.serverGroup.type" height="'36px'" width="'36px'"></cloud-provider-logo>
     <div class="close-button">
       <a class="btn btn-link" ui-sref="^">
         <span class="glyphicon glyphicon-remove"></span>
@@ -81,19 +82,29 @@
         <dt>Name</dt>
         <dd>{{ctrl.serverGroup.name}}</dd>
         <dt ng-if="ctrl.serverGroup.launchConfig.image">Image</dt>
-        <dd ng-if="ctrl.serverGroup.launchConfig.image">{{ctrl.serverGroup.launchConfig.image}}</dd>
+        <dd ng-if="ctrl.serverGroup.launchConfig.image">
+          {{ctrl.serverGroup.launchConfig.image}}
+        </dd>
 
         <dt ng-if="ctrl.serverGroup.launchConfig.iamRole.name">IAM Profile</dt>
-        <dd ng-if="ctrl.serverGroup.launchConfig.iamRole.name">{{ctrl.serverGroup.launchConfig.iamRole.name}}</dd>
+        <dd ng-if="ctrl.serverGroup.launchConfig.iamRole.name">
+          {{ctrl.serverGroup.launchConfig.iamRole.name}}
+        </dd>
 
         <dt ng-if="ctrl.serverGroup.launchConfig.userData">User Data</dt>
-        <dd ng-if="ctrl.serverGroup.launchConfig.userData">{{ctrl.serverGroup.launchConfig.userData}}</dd>
+        <dd ng-if="ctrl.serverGroup.launchConfig.userData">
+          {{ctrl.serverGroup.launchConfig.userData}}
+        </dd>
 
         <dt ng-if="ctrl.serverGroup.instanceType">On-Demand Type</dt>
-        <dd ng-if="ctrl.serverGroup.instanceType">{{ctrl.serverGroup.instanceType}}</dd>
+        <dd ng-if="ctrl.serverGroup.instanceType">
+          {{ctrl.serverGroup.instanceType}}
+        </dd>
 
         <dt ng-if="ctrl.serverGroup.instanceType">Spot Type</dt>
-        <dd ng-if="ctrl.serverGroup.instanceTypes">{{ctrl.serverGroup.instanceType}}</dd>
+        <dd ng-if="ctrl.serverGroup.instanceTypes">
+          {{ctrl.serverGroup.instanceType}}
+        </dd>
       </dl>
     </collapsible-section>
   </div>

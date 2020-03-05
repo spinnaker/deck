@@ -2,8 +2,11 @@ import { module } from 'angular';
 
 import { CloudProviderRegistry, DeploymentStrategyRegistry } from '@spinnaker/core';
 import { SpotServerGroupTransformer } from './serverGroup/serverGroup.transformer';
+import './logo/spot.logo.less';
+import { COMMON_MODULE } from './common/common.module';
 
 import { SPOT_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_CONTROLLER } from './serverGroup/details/serverGroupDetails.controller';
+import { SPOT_SERVERGROUP_DETAILS_RESIZE_RESIZESERVERGROUP_CONTROLLER } from './serverGroup/details/resize/resizeServerGroup.controller';
 
 const templates = require.context('./', true, /\.html$/);
 templates.keys().forEach(function(key) {
@@ -12,13 +15,15 @@ templates.keys().forEach(function(key) {
 
 export const SPOT_MODULE = 'spinnaker.spot';
 module(SPOT_MODULE, [
+  COMMON_MODULE,
   // Server Groups
   SPOT_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_CONTROLLER,
+  SPOT_SERVERGROUP_DETAILS_RESIZE_RESIZESERVERGROUP_CONTROLLER,
 ]).config(function() {
   CloudProviderRegistry.registerProvider('spot', {
     name: 'Spot',
     logo: {
-      path: require('./logo/spotinst-logo.png'),
+      path: require('./logo/spotinst-logo.icon.svg'),
     },
     serverGroup: {
       transformer: SpotServerGroupTransformer,

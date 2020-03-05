@@ -85,6 +85,17 @@ module(SPOT_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_CONTROLLER, [UIROUTER_ANGULAR
         });
       };
 
+      this.resizeServerGroup = () => {
+        $uibModal.open({
+          templateUrl: require('./resize/resizeServerGroup.html'),
+          controller: 'spotResizeServerGroupCtrl as ctrl',
+          resolve: {
+            serverGroup: () => this.serverGroup,
+            application: () => app,
+          },
+        });
+      };
+
       //todo yossi not been tested
       this.disableServerGroup = () => {
         const serverGroup = this.serverGroup;
