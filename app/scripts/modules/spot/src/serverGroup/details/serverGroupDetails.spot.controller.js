@@ -10,8 +10,6 @@ import {
 } from '@spinnaker/core';
 import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
-//todo yossi - taken from oracle
-
 export const SPOT_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_CONTROLLER = 'spinnaker.spot.serverGroup.details.controller';
 export const name = SPOT_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_CONTROLLER; // for backwards compatibility
 module(SPOT_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_CONTROLLER, [UIROUTER_ANGULARJS, SERVER_GROUP_WRITER]).controller(
@@ -54,37 +52,6 @@ module(SPOT_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_CONTROLLER, [UIROUTER_ANGULAR
       // Actions. Triggered by server group details dropdown menu
       ////////////////////////////////////////////////////////////
 
-      this.destroyServerGroup = function destroyServerGroup() {
-        const serverGroup = this.serverGroup;
-        const taskMonitor = {
-          application: app,
-          title: 'Destroying ' + serverGroup.name,
-          onTaskComplete: function() {
-            if ($state.includes('**.serverGroup', stateParams)) {
-              $state.go('^');
-            }
-          },
-        };
-
-        const submitMethod = function() {
-          return serverGroupWriter.destroyServerGroup(serverGroup, app);
-        };
-
-        const stateParams = {
-          name: serverGroup.name,
-          account: serverGroup.account,
-          region: serverGroup.region,
-        };
-
-        ConfirmationModalService.confirm({
-          header: 'Really destroy ' + serverGroup.name + '?',
-          buttonText: 'Destroy ' + serverGroup.name,
-          account: serverGroup.account,
-          taskMonitorConfig: taskMonitor,
-          submitMethod: submitMethod,
-        });
-      };
-
       this.resizeServerGroup = () => {
         $uibModal.open({
           templateUrl: require('./resize/resizeServerGroup.html'),
@@ -94,6 +61,48 @@ module(SPOT_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_CONTROLLER, [UIROUTER_ANGULAR
             application: () => app,
           },
         });
+      };
+
+      this.destroyServerGroup = () => {
+        const serverGroup = this.serverGroup;
+
+        const taskMonitor = {
+          application: app,
+          title: 'Destroying ' + serverGroup.name,
+          onTaskComplete: () => {
+            if ($state.includes('**.serverGroup', stateParams)) {
+              $state.go('^');
+            }
+          },
+        };
+
+        const submitMethod = params =>
+          serverGroupWriter.destroyServerGroup(serverGroup, app, { elastigroupId: serverGroup.elastigroup.id });
+
+        const stateParams = {
+          name: serverGroup.name,
+          accountId: serverGroup.account,
+          region: serverGroup.region,
+        };
+
+        const confirmationModalParams = {
+          header: 'Really destroy ' + serverGroup.name + '?',
+          buttonText: 'Destroy ' + serverGroup.name,
+          account: serverGroup.account,
+          taskMonitorConfig: taskMonitor,
+          submitMethod: submitMethod,
+          askForReason: true,
+          platformHealthOnlyShowOverride: app.attributes.platformHealthOnlyShowOverride,
+          platformHealthType: 'Spot',
+        };
+
+        ServerGroupWarningMessageService.addDestroyWarningMessage(app, serverGroup, confirmationModalParams);
+
+        if (app.attributes.platformHealthOnlyShowOverride && app.attributes.platformHealthOnly) {
+          confirmationModalParams.interestingHealthProviderNames = ['Spot'];
+        }
+
+        ConfirmationModalService.confirm(confirmationModalParams);
       };
 
       //todo yossi not been tested

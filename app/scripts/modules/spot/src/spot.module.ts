@@ -5,7 +5,7 @@ import { SpotServerGroupTransformer } from './serverGroup/serverGroup.transforme
 import './logo/spot.logo.less';
 import { COMMON_MODULE } from './common/common.module';
 
-import { SPOT_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_CONTROLLER } from './serverGroup/details/serverGroupDetails.controller';
+import { SPOT_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_CONTROLLER } from './serverGroup/details/serverGroupDetails.spot.controller';
 import { SPOT_SERVERGROUP_DETAILS_RESIZE_RESIZESERVERGROUP_CONTROLLER } from './serverGroup/details/resize/resizeServerGroup.controller';
 
 const templates = require.context('./', true, /\.html$/);
