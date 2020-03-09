@@ -116,6 +116,9 @@ export interface IServerGroupCommand {
   resourceSummary?: IManagedResourceSummary;
   securityGroups: string[];
   selectedProvider: string;
+  shards: {
+    [shardIndex: string]: string;
+  };
   source?: {
     asgName: string;
   };

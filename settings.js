@@ -31,6 +31,7 @@ var managedServiceAccountsEnabled = process.env.MANAGED_SERVICE_ACCOUNTS_ENABLED
 var managedResourcesEnabled = process.env.MANAGED_RESOURCES_ENABLED === 'true';
 var onDemandClusterThreshold = process.env.ON_DEMAND_CLUSTER_THRESHOLD || '350';
 var reduxLoggerEnabled = process.env.REDUX_LOGGER === 'true';
+var shardsEnabled = process.env.SHARDS_ENABLED === 'true';
 var templatesEnabled = process.env.TEMPLATES_ENABLED === 'true';
 var useClassicFirewallLabels = process.env.USE_CLASSIC_FIREWALL_LABELS === 'true';
 var functionsEnabled = process.env.FUNCTIONS_ENABLED === 'true' ? true : false;
@@ -95,6 +96,7 @@ window.spinnakerSettings = {
     pipelines: true,
     quietPeriod: false,
     roscoMode: false,
+    shard: shardsEnabled,
     slack: false,
     snapshots: false,
     travis: false,

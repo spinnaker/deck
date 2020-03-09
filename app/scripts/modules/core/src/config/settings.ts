@@ -46,6 +46,7 @@ export interface IFeatures {
   pipelineTemplates?: boolean;
   quietPeriod?: boolean;
   roscoMode?: boolean;
+  shards?: boolean;
   slack?: boolean;
   snapshots?: boolean;
   travis?: boolean;

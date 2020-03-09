@@ -57,6 +57,8 @@ const helpContents: { [key: string]: string } = {
     '(Optional) <b>Stack</b> is one of the core naming components of a cluster, used to create vertical stacks of dependent services for integration testing.',
   'aws.serverGroup.detail':
     '(Optional) <b>Detail</b> is a string of free-form alphanumeric characters and hyphens to describe any other variables.',
+  'aws.serverGroup.shard':
+    '(Optional) <b>Shard</b> is a string of alphanumeric characters to create another dimension for a cluster in addition to stack and detail',
   'aws.serverGroup.imageName':
     '(Required) <b>Image</b> is the deployable Amazon Machine Image. Images are restricted to the account and region selected.',
   'aws.serverGroup.legacyUdf': `<p>(Optional) <b>User Data Format</b> allows overriding of the format used when generating user data during deployment. The default format used is configured
