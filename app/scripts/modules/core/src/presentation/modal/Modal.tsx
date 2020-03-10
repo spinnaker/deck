@@ -4,7 +4,8 @@ import { CSSTransition } from 'react-transition-group';
 
 const { useMemo } = React;
 
-import { useEventListener, useContainerClassNames, useLatestCallback, TabBoundary } from 'core/presentation';
+import { useLatestCallback, useContainerClassNames, useEventListener } from '../hooks';
+import { TabBoundary } from '../TabBoundary';
 
 import { ModalContext } from './ModalContext';
 import styles from './Modal.module.css';
@@ -12,10 +13,11 @@ import styles from './Modal.module.css';
 export interface IModalProps {
   isOpen: boolean;
   onRequestClose?: () => any;
+  onAfterClose?: () => any;
   children?: React.ReactNode;
 }
 
-export const Modal = ({ onRequestClose, isOpen, children }: IModalProps) => {
+export const Modal = ({ onRequestClose, onAfterClose, isOpen, children }: IModalProps) => {
   useContainerClassNames(isOpen ? [styles.backdropBlurEffect] : []);
 
   const keydownCallback = ({ keyCode }: KeyboardEvent) => {
@@ -35,7 +37,14 @@ export const Modal = ({ onRequestClose, isOpen, children }: IModalProps) => {
           <CSSTransition in={isOpen} timeout={300} mountOnEnter={true} unmountOnExit={true} classNames={styles}>
             <div className={styles.backdrop} />
           </CSSTransition>
-          <CSSTransition in={isOpen} timeout={300} mountOnEnter={true} unmountOnExit={true} classNames={styles}>
+          <CSSTransition
+            in={isOpen}
+            timeout={300}
+            mountOnEnter={true}
+            unmountOnExit={true}
+            classNames={styles}
+            onExited={onAfterClose}
+          >
             <div className={styles.dialogWrapper}>
               <div className={styles.dialog}>{children}</div>
             </div>
