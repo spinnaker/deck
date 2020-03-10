@@ -59,7 +59,7 @@ export interface IManagedArtifactSummary {
   versions: IManagedArtifactVersion[];
 }
 
-export interface IManagedApplicationEntities {
+interface IManagedApplicationEntities {
   resources: IManagedResourceSummary[];
   environments: IManagedEnviromentSummary[];
   artifacts: IManagedArtifactSummary[];
