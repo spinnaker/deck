@@ -38,7 +38,10 @@ module(MANAGED_RESOURCES_DATA_SOURCE, []).run([
       return ManagedReader.getEnvironmentsSummary(application.name);
     };
 
-    const addEnvironments = (_application: Application, data: IManagedApplicationSummary) => {
+    const addEnvironments = (
+      _application: Application,
+      data: IManagedApplicationSummary<'resources' | 'artifacts' | 'environments'>,
+    ) => {
       return $q.when(data);
     };
 

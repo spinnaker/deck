@@ -84,7 +84,7 @@ export class ManagedReader {
   public static getApplicationSummary(app: string): IPromise<IManagedApplicationSummary<'resources'>> {
     return API.one('managed')
       .one('application', app)
-      .withParams({ includeDetails: true, entities: 'resources' })
+      .withParams({ entities: 'resources' })
       .get()
       .then(this.decorateResources);
   }
@@ -94,7 +94,7 @@ export class ManagedReader {
   ): IPromise<IManagedApplicationSummary<'resources' | 'artifacts' | 'environments'>> {
     return API.one('managed')
       .one('application', app)
-      .withParams({ includeDetails: true, entities: ['resources', 'artifacts', 'environments'] })
+      .withParams({ entities: ['resources', 'artifacts', 'environments'] })
       .get()
       .then(this.decorateResources);
   }
