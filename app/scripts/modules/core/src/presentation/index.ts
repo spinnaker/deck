@@ -7,6 +7,7 @@ export * from './hooks';
 export * from './HoverablePopover';
 export * from './LabelComponent';
 export * from './labeledValues';
+export * from './layout';
 export * from './LinkWithClipboard';
 export * from './linkWithClipboard.component';
 export * from './Markdown';

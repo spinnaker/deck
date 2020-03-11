@@ -1,0 +1,107 @@
+@value variables: "../../_variables.module.css";
+@value webRowHeight, colorRowRule, colorKey, gradientHover, colorBg, mobile from variables;
+
+.indent {
+  margin: 0 0 0 16px;
+}
+
+.ObjectRow {
+  display: flex;
+  align-items: center;
+
+  /*border-bottom: 1px solid colorRowRule;*/
+  box-shadow: inset 0 -1px 0 0 colorRowRule;
+  height: webRowHeight;
+
+  /*padding: 0 8px;*/
+  margin-right: 36px;
+  position: relative;
+  font-size: 14px;
+
+  background-color: colorBg;
+}
+
+.active {
+  box-shadow: inset 0 -2px 0 0 colorKey;
+}
+
+.clickableArea {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  padding-left: 8px;
+  color: #666666;
+}
+
+.clickableArea:hover {
+  background-image: gradientHover;
+}
+
+/* "pointer-events: none;" is added to children so the data-key attached to ObjectRow is always captured */
+
+.leftCol {
+  flex: 5 0 1px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-right: 16px;
+
+  pointer-events: none;
+  background-color: rgba(255, 0, 0, 0.1);
+}
+
+.leftCol i {
+  margin-right: 8px;
+}
+
+.rowTitle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1 1 auto;
+}
+
+.centerCol {
+  flex: 0 0 100px;
+  display: flex;
+  align-items: center;
+
+  pointer-events: none;
+  background-color: rgba(0, 255, 0, 0.1);
+}
+
+/*.rightCol {*/
+/*flex: 0 0 120px;*/
+/*display: flex;*/
+/*align-items: center;*/
+
+/*pointer-events: none;*/
+/*background-color: rgba(0,0,255,0.1);*/
+/*}*/
+
+.ObjectRow:hover .select,
+.ObjectRow:hover .expand {
+  visibility: visible;
+}
+
+.select {
+  margin-right: -40px;
+}
+
+.select,
+.expand {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 100%;
+  visibility: hidden;
+}
+
+.select:hover,
+.expand:hover {
+  background-image: gradientHover;
+  cursor: pointer;
+}
