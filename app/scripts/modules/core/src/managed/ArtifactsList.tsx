@@ -23,27 +23,7 @@ export function ArtifactsList({ artifacts, artifactSelected }: IArtifactsListPro
               version={version}
               name={name}
               sha="abc123"
-              stages={[
-                {
-                  level: 'ok',
-                },
-                {
-                  level: 'ok',
-                },
-                {
-                  level: 'ok',
-                },
-              ]}
-              statuses={[
-                {
-                  icon: 'app-window',
-                  level: 'error',
-                },
-                {
-                  icon: 'app-window',
-                  level: 'error',
-                },
-              ]}
+              stages={[4, 3, 0]}
             />
           </>
         )),

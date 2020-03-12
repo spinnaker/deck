@@ -56,19 +56,8 @@ export function EnvironmentsList({ environments, resources, artifacts, selectedA
                   'unknown version'}`}
               />
             ))}
-          {/* <pre>
-              {resources
-                .map(resourceId => resourcesMap[resourceId])
-                .map(
-                  ({ kind, artifact, moniker: { app, stack, detail } }) =>
-                    ` [${kind}] ${[app, stack, detail].filter(Boolean).join('-')} ${artifact?.versions?.current ||
-                      'unknown version'}`,
-                )
-                .join('\n')}
-            </pre> */}
         </div>
       ))}
-      {/* {debug && <pre>{JSON.stringify(resourcesMap, null, 4)}</pre>} */}
     </div>
   );
 }
