@@ -1,7 +1,4 @@
 import React from 'react';
-// import { Link } from 'react-router-dom';
-// import StatusBubble from './StatusBubble';
-// import classNames from 'classnames';
 
 import styles from './ObjectRow.module.css';
 

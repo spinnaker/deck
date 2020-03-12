@@ -1,5 +1,4 @@
 .GenericRowRoute {
-  /*flex: 0 1 1200px;*/
   flex: 1 1 1200px;
 }
 
@@ -29,7 +28,6 @@
 
 .mainContent {
   display: flex;
-  /*margin-right: 40px;*/
   margin-top: 24px;
 }
 

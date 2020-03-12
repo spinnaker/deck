@@ -1,9 +1,24 @@
 import React from 'react';
+import { keyBy } from 'lodash';
 
 import { NoticeCard } from '../presentation/layout/NoticeCard';
 import { ObjectRow } from '../presentation/layout/ObjectRow';
 import { IManagedEnviromentSummary, IManagedResourceSummary, IManagedArtifactSummary } from '../domain/IManagedEntity';
 import { ISelectedArtifact } from './Environments';
+import { getKindName } from './ManagedReader';
+
+const kindIconMap: { [key: string]: string } = {
+  cluster: 'cluster',
+};
+
+function getIconTypeFromKind(kind: string): string {
+  return kindIconMap[getKindName(kind)] ?? 'cluster';
+}
+
+function shouldDisplayResource(resource: IManagedResourceSummary) {
+  //TODO: naively filter on presence of moniker but how should we really decide what to display?
+  return !!resource.moniker;
+}
 
 interface IEnvironmentsListProps {
   environments: IManagedEnviromentSummary[];
@@ -12,24 +27,8 @@ interface IEnvironmentsListProps {
   selectedArtifact: ISelectedArtifact;
 }
 
-function getIconTypeFromKind(kind: string) {
-  if (kind === 'titus/cluster@v1') {
-    return 'cluster';
-  }
-  // default for now
-  return 'cluster';
-}
-
-function shouldDisplayResource(resource: IManagedResourceSummary) {
-  //TODO: naively filter on presence of moniker but how should we really decide what to display?
-  return !!resource.moniker;
-}
-
 export function EnvironmentsList({ environments, resources, artifacts, selectedArtifact }: IEnvironmentsListProps) {
-  const resourcesMap: { [key: string]: IManagedResourceSummary } = resources.reduce((map, r) => {
-    map[r.id] = r;
-    return map;
-  }, {} as { [key: string]: IManagedResourceSummary });
+  const resourcesMap = keyBy(resources, 'id');
 
   return (
     <div>

@@ -2,7 +2,6 @@
   display: flex;
   flex-wrap: wrap;
   border-radius: 3px;
-  /*max-width: 600px;*/
   padding: 8px 16px;
   font-size: 13px;
   margin-bottom: 16px;
@@ -42,7 +41,6 @@
 }
 
 .text {
-  /*padding: 0;*/
   flex: 0 0 100%;
   margin-top: 8px;
   align-self: center;

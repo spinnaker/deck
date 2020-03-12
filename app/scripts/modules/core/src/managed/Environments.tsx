@@ -7,6 +7,7 @@ import { ArtifactsList } from './ArtifactsList';
 import { EnvironmentsList } from './EnvironmentsList';
 
 import styles from './Environments.module.css';
+import { isEqual } from 'lodash';
 
 const CONTENT_WIDTH = 1200;
 
@@ -19,12 +20,12 @@ interface IEnvironmentsProps {
   app: Application;
 }
 
-export default function Environments(props: IEnvironmentsProps) {
+export function Environments(props: IEnvironmentsProps) {
   const { app } = props;
   const dataSource: ApplicationDataSource<IManagedApplicationSummary<
     'resources' | 'artifacts' | 'environments'
   >> = app.getDataSource('environments');
-  const [selectedArtifact, setSelectedArtifact] = useState<ISelectedArtifact | undefined>();
+  const [selectedArtifact, setSelectedArtifact] = useState<ISelectedArtifact>();
   const [environments, setEnvironments] = useState(dataSource.data);
   const [isFiltersOpen] = useState(false);
   useEffect(() => dataSource.onRefresh(null, () => setEnvironments(dataSource.data)), [app]);
@@ -42,13 +43,9 @@ export default function Environments(props: IEnvironmentsProps) {
             <ArtifactsList
               {...environments}
               selectedArtifact={selectedArtifact}
-              artifactSelected={clickedArtifact => {
-                const unselect =
-                  selectedArtifact &&
-                  selectedArtifact.name === clickedArtifact.name &&
-                  selectedArtifact.version === clickedArtifact.version;
-                setSelectedArtifact(unselect ? null : clickedArtifact);
-              }}
+              artifactSelected={clickedArtifact =>
+                setSelectedArtifact(isEqual(clickedArtifact, selectedArtifact) ? null : clickedArtifact)
+              }
             />
           </div>
           <div className={styles.environmentsColumn}>
