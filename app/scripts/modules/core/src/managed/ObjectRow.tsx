@@ -10,17 +10,15 @@ interface IObjectRowProps {
 export const ObjectRow = ({ icon, title }: IObjectRowProps) => {
   const depth = 0;
   return (
-    <>
-      <div className={styles.ObjectRow} style={getStylesFromDepth(depth)}>
-        <div className={styles.leftCol}>
-          <i className={`ico icon-${icon}`} />
-          <span className={styles.rowTitle}>{title}</span>
-        </div>
-        <div className={styles.centerCol} style={{ flex: `0 0 ${200 + depth * 16}px` }}>
-          {'unknown version'}
-        </div>
+    <div className={styles.ObjectRow} style={getStylesFromDepth(depth)}>
+      <div className={styles.leftCol}>
+        <i className={`ico icon-${icon}`} />
+        <span className={styles.rowTitle}>{title}</span>
       </div>
-    </>
+      <div className={styles.centerCol} style={{ flex: `0 0 ${200 + depth * 16}px` }}>
+        {'unknown version'}
+      </div>
+    </div>
   );
 };
 
