@@ -177,7 +177,6 @@ export class PluginRegistry {
       return module;
     } catch (error) {
       console.error(`Failed to load plugin code from ${pluginUrl}`);
-      console.error(`Error message: ${error}`);
       throw error;
     }
   }
