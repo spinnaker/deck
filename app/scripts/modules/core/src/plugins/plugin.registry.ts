@@ -97,7 +97,6 @@ export class PluginRegistry {
       .then(response => response.data)
       .catch((error: any) => {
         console.error(`Failed to load ${uri} from ${source}`);
-        console.error(`Error message: ${error}`);
         throw error;
       });
 
