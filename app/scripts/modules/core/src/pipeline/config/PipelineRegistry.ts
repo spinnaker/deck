@@ -1,4 +1,4 @@
-import { uniq, isNil, cloneDeep, intersection, memoize, defaults } from 'lodash';
+import { uniq, isNil, cloneDeep, intersection, memoize, defaults, fromPairs } from 'lodash';
 
 import { Application } from 'core/application/application.model';
 import {
@@ -14,6 +14,7 @@ import {
 import { CloudProviderRegistry, ICloudProviderConfig } from 'core/cloudProvider';
 import { SETTINGS } from 'core/config/settings';
 import { IAccountDetails } from 'core/account/AccountService';
+import { PreconfiguredJobReader } from './stages/preconfiguredJob';
 
 import { ITriggerTemplateComponentProps } from '../manualExecution/TriggerTemplate';
 import { ComponentType, SFC } from 'react';
@@ -97,6 +98,59 @@ export class PipelineRegistry {
   public registerStage(stageConfig: IStageTypeConfig): void {
     this.stageTypes.push(stageConfig);
     this.normalizeStageTypes();
+  }
+
+  /**
+   * Registers a custom UI for a preconfigured run job stage.
+   *
+   * Fetches and applies the preconfigured job configuration from Gate.
+   * The following IStageTypeConfig fields are overwritten:
+   *
+   * - configuration.parameters
+   * - configuration.waitForCompletion
+   * - defaults
+   * - description
+   * - label
+   * - producesArtifacts
+   *
+   * @param stageConfigSkeleton a partial IStageTypeConfig (typically from makePreconfiguredJobStage())
+   * @returns a promise for the IStageTypeConfig that got registered
+   */
+  public async registerPreconfiguredJobStage(stageConfigSkeleton: IStageTypeConfig): Promise<IStageTypeConfig> {
+    const preconfiguredJobsFromGate = await PreconfiguredJobReader.list();
+    const job = preconfiguredJobsFromGate.find(j => j.type === stageConfigSkeleton.key);
+
+    if (!job) {
+      throw new Error(
+        `Preconfigured Job of type '${stageConfigSkeleton.key}' not found in /jobs/preconfigured from gate.  ` +
+          'Is the preconfigured job registered in orca?',
+      );
+    }
+
+    const parameters = job?.parameters ?? [];
+    const paramsWithDefaults = parameters.filter(p => !isNil(p.defaultValue));
+    const defaultParameterValues = fromPairs(paramsWithDefaults.map(p => [p.name, p.defaultValue]));
+
+    const { label, description, waitForCompletion, producesArtifacts } = job;
+
+    // Apply job configuration from Gate to the skeleton
+    const stageConfig: IStageTypeConfig = {
+      ...stageConfigSkeleton,
+      configuration: {
+        ...stageConfigSkeleton.configuration,
+        parameters,
+        waitForCompletion,
+      },
+      defaults: {
+        parameters: defaultParameterValues,
+      },
+      description,
+      label,
+      producesArtifacts,
+    };
+
+    this.registerStage(stageConfig);
+    return stageConfig;
   }
 
   public registerArtifactKind(
