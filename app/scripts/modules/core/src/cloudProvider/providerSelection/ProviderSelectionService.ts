@@ -19,12 +19,10 @@ export class ProviderSelectionService {
     return AccountService.applicationAccounts(application).then((accounts: IAccountDetails[]) => {
       let reducedAccounts: IAccountDetails[] = [];
       if (feature) {
-        console.log('paso por feature');
         reducedAccounts = accounts.filter(a => CloudProviderRegistry.hasValue(a.cloudProvider, feature));
       }
 
       if (filterFn) {
-        console.log('paso por filterFn');
         reducedAccounts = reducedAccounts.filter((acc: IAccountDetails) => {
           return filterFn(application, acc, CloudProviderRegistry.getProvider(acc.cloudProvider, acc.skin));
         });
@@ -34,10 +32,7 @@ export class ProviderSelectionService {
       const providerOptions = uniq(
         reducedAccounts
           .map(a => {
-            //console.log(a);
             const provider = CloudProviderRegistry.getValue(a.cloudProvider, feature, a.skin);
-            //console.log(provider);
-            //console.log(provider.infra);
             const providerFeature = CloudProviderRegistry.getProvider(a.cloudProvider)[feature] || {};
             return provider.infra ? providerFeature.useProvider || a.cloudProvider : null;
           })

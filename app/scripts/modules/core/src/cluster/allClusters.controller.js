@@ -49,13 +49,9 @@ module(CORE_CLUSTER_ALLCLUSTERS_CONTROLLER, [
       this.application = app;
 
       $scope.sortFilter = ClusterState.filterModel.sortFilter;
-      //$scope.isDisabled = ProviderSelectionService.hideK8InfraButton(app);
       $scope.isDisabled = true;
-      console.log('Application providers from Cluster ');
       app.attributes.cloudProviders.forEach(element => {
         const provider = CloudProviderRegistry.getValue(element, 'serverGroup');
-        //console.log(provider);
-        console.log(element + ' infra: ' + provider.infra);
         if (provider.infra) {
           $scope.isDisabled = false;
         }

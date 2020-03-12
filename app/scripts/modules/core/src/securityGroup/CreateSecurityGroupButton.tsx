@@ -66,17 +66,20 @@ export const CreateSecurityGroupButton = ({ app }: { app: Application }) => {
       });
     });
   };
-  let disableButton = false;
-  console.log('Application providers from Firewall ');
-  app.attributes.cloudProviders.forEach((element: any) => {
-    const provider = CloudProviderRegistry.getValue(element, 'securityGroup');
-    //console.log(provider);
-    console.log(element + ' infra: ' + provider.infra);
-    if (provider.infra) {
-      disableButton = true;
-    }
-  });
-  if (disableButton) {
+  let isDisabled = true;
+  var BreakException = {};
+  try {
+    app.attributes.cloudProviders.forEach((element: any) => {
+      const provider = CloudProviderRegistry.getValue(element, 'securityGroup');
+      if (provider.infra) {
+        isDisabled = false;
+        throw BreakException;
+      }
+    });
+  } catch (e) {
+    if (e !== BreakException) throw e;
+  }
+  if (!isDisabled) {
     return (
       <div>
         <button className="btn btn-sm btn-default" onClick={createSecurityGroup}>
