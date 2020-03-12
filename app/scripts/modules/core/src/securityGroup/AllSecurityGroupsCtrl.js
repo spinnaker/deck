@@ -38,7 +38,13 @@ module(CORE_SECURITYGROUP_ALLSECURITYGROUPSCTRL, [
 
       $scope.application = app;
 
-      $scope.isDisabled = ProviderSelectionService.hideK8InfraButton(app);
+      $scope.isDisabled = true;
+      app.attributes.cloudProviders.forEach(element => {
+        const provider = CloudProviderRegistry.getValue(element, 'securityGroup');
+        if (provider.infra) {
+          $scope.isDisabled = false;
+        }
+      });
 
       $scope.sortFilter = SecurityGroupState.filterModel.sortFilter;
 
