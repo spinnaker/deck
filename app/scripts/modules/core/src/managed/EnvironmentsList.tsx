@@ -10,13 +10,21 @@ interface IEnvironmentsListProps {
   selectedArtifact: ISelectedArtifact;
 }
 
-const icons = {
-  'titus/cluster@v1': 'cluster',
-};
+function getIconTypeFromKind(kind: string) {
+  if (kind === 'titus/cluster@v1') {
+    return 'cluster';
+  }
+  // default for now
+  return 'cluster';
+}
+
+function shouldDisplayResource(resource: IManagedResourceSummary) {
+  //TODO: naively filter on presence of moniker but how should we really decide what to display?
+  return !!resource.moniker;
+}
 
 export function EnvironmentsList({ environments, resources, artifacts, selectedArtifact }: IEnvironmentsListProps) {
-  const resourcesMap = resources.reduce((map, r) => {
-    r.moniker = r.moniker ?? {};
+  const resourcesMap: { [key: string]: IManagedResourceSummary } = resources.reduce((map, r) => {
     map[r.id] = r;
     return map;
   }, {} as { [key: string]: IManagedResourceSummary });
@@ -35,14 +43,15 @@ export function EnvironmentsList({ environments, resources, artifacts, selectedA
         noticeType={'ok'}
       />
       {environments.map(({ name, resources }) => (
-        <div key={name.toUpperCase()}>
-          <h3>{name}</h3>
+        <div key={name}>
+          <h3>{name.toUpperCase()}</h3>
           {resources
             .map(resourceId => resourcesMap[resourceId])
-            .map(({ id, kind, artifact, moniker: { app, stack, detail } }) => (
+            .filter(shouldDisplayResource)
+            .map(({ id, kind, artifact, moniker: { app, stack, detail } }: IManagedResourceSummary) => (
               <ObjectRow
                 key={id}
-                icon={icons[kind] || 'cluster'}
+                icon={getIconTypeFromKind(kind)}
                 title={`${[app, stack, detail].filter(Boolean).join('-')} ${artifact?.versions?.current ||
                   'unknown version'}`}
               />

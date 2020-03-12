@@ -11,19 +11,15 @@ interface IArtifactsListProps {
   selectedArtifact: ISelectedArtifact;
 }
 
-export function ArtifactsList({ artifacts, artifactSelected, selectedArtifact }: IArtifactsListProps) {
+export function ArtifactsList({ artifacts, artifactSelected }: IArtifactsListProps) {
   return (
     <div>
       {artifacts.map(({ versions, name }) =>
-        versions.map(({ version, environments }) => (
+        versions.map(({ version }) => (
           <>
             <ArtifactRow
               key={`${name}-${version}`}
-              clickHandler={() => {
-                artifactSelected(
-                  selectedArtifact?.name === name && selectedArtifact?.version === version ? null : { name, version },
-                );
-              }}
+              clickHandler={artifactSelected}
               version={version}
               name={name}
               sha="abc123"
@@ -49,18 +45,6 @@ export function ArtifactsList({ artifacts, artifactSelected, selectedArtifact }:
                 },
               ]}
             />
-            {/* <div key={version}>
-              <pre
-                onClick={() => {
-                  artifactSelected(
-                    selectedArtifact?.name === name && selectedArtifact?.version === version ? null : { name, version },
-                  );
-                }}
-              >
-                {`[${version}] ${name}\n`}
-                {environments.map(env => env.name).join(', ')}
-              </pre>
-            </div> */}
           </>
         )),
       )}
@@ -68,9 +52,17 @@ export function ArtifactsList({ artifacts, artifactSelected, selectedArtifact }:
   );
 }
 
-export function ArtifactRow({ clickHandler, version, name, sha, stages }) {
+interface IArtifactRowProps {
+  clickHandler: (artifact: ISelectedArtifact) => void;
+  version: string;
+  name: string;
+  sha: string;
+  stages: any[];
+}
+
+export function ArtifactRow({ clickHandler, version, name, sha, stages }: IArtifactRowProps) {
   return (
-    <div className={styles.ArtifactRow} onClick={clickHandler}>
+    <div className={styles.ArtifactRow} onClick={() => clickHandler({ name, version })}>
       <div className={styles.content}>
         <div className={styles.version}>
           <Pill text={version} />
@@ -82,7 +74,7 @@ export function ArtifactRow({ clickHandler, version, name, sha, stages }) {
         {/* Holding spot for status bubbles */}
       </div>
       <div className={styles.stages}>
-        {stages.map((stag, i) => (
+        {stages.map((_stage, i) => (
           <span key={i} className={styles.stage} />
         ))}
       </div>

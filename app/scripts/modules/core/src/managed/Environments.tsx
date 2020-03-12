@@ -1,20 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import {
-  IManagedEnviromentSummary,
-  IManagedResourceSummary,
-  IManagedArtifactSummary,
-  IManagedApplicationEnvironmentsSummary,
-  IManagedApplicationSummary,
-} from 'core/domain';
+import { IManagedApplicationSummary } from 'core/domain';
 import { Application, ApplicationDataSource } from 'core/application';
 
-import styles from './Environments.module.css';
 import { ColumnHeader } from 'core/presentation/layout';
 import { ArtifactsList } from './ArtifactsList';
 import { EnvironmentsList } from './EnvironmentsList';
 
+import styles from './Environments.module.css';
+
 const CONTENT_WIDTH = 1200;
-const debug = false;
 
 export interface ISelectedArtifact {
   name: string;
@@ -32,7 +26,7 @@ export default function Environments(props: IEnvironmentsProps) {
   >> = app.getDataSource('environments');
   const [selectedArtifact, setSelectedArtifact] = useState<ISelectedArtifact | undefined>();
   const [environments, setEnvironments] = useState(dataSource.data);
-  const [isFiltersOpen, setFiltersOpen] = useState(false);
+  const [isFiltersOpen] = useState(false);
   useEffect(() => dataSource.onRefresh(null, () => setEnvironments(dataSource.data)), [app]);
 
   const totalContentWidth = isFiltersOpen ? CONTENT_WIDTH + 248 + 'px' : CONTENT_WIDTH + 'px';
@@ -48,8 +42,12 @@ export default function Environments(props: IEnvironmentsProps) {
             <ArtifactsList
               {...environments}
               selectedArtifact={selectedArtifact}
-              artifactSelected={artifact => {
-                setSelectedArtifact(artifact);
+              artifactSelected={clickedArtifact => {
+                const unselect =
+                  selectedArtifact &&
+                  selectedArtifact.name === clickedArtifact.name &&
+                  selectedArtifact.version === clickedArtifact.version;
+                setSelectedArtifact(unselect ? null : clickedArtifact);
               }}
             />
           </div>
