@@ -60,12 +60,7 @@ export interface IManagedArtifactSummary {
   versions: IManagedArtifactVersion[];
 }
 
-export interface IManagedApplicationEnvironmentsSummary extends IManagedApplicationSummary {
-  environments: IManagedEnviromentSummary[];
-  artifacts: IManagedArtifactSummary[];
-}
-
-export interface IManagedApplicationEntities {
+interface IManagedApplicationEntities {
   resources: IManagedResourceSummary[];
   environments: IManagedEnviromentSummary[];
   artifacts: IManagedArtifactSummary[];
