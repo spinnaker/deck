@@ -1,8 +1,8 @@
 import React from 'react';
 
 import { IManagedArtifactSummary } from '../domain/IManagedEntity';
-import { Pill } from '../presentation/layout/Pill';
 import { ISelectedArtifact } from './Environments';
+import { Pill } from './Pill';
 
 import styles from './ArtifactRow.module.css';
 

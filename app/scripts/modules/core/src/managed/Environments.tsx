@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 import { Application, ApplicationDataSource } from '../application';
 import { IManagedApplicationSummary } from '../domain/IManagedEntity';
-import { ColumnHeader } from '../presentation/layout/ColumnHeader';
+import { ColumnHeader } from './ColumnHeader';
 import { ArtifactsList } from './ArtifactsList';
 import { EnvironmentsList } from './EnvironmentsList';
 

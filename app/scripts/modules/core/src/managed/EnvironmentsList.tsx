@@ -1,11 +1,11 @@
 import React from 'react';
 import { keyBy } from 'lodash';
 
-import { NoticeCard } from '../presentation/layout/NoticeCard';
-import { ObjectRow } from '../presentation/layout/ObjectRow';
 import { IManagedEnviromentSummary, IManagedResourceSummary, IManagedArtifactSummary } from '../domain/IManagedEntity';
 import { ISelectedArtifact } from './Environments';
 import { getKindName } from './ManagedReader';
+import { NoticeCard } from './NoticeCard';
+import { ObjectRow } from './ObjectRow';
 
 const kindIconMap: { [key: string]: string } = {
   cluster: 'cluster',
