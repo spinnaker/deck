@@ -66,6 +66,10 @@ interface IManagedApplicationEntities {
   artifacts: IManagedArtifactSummary[];
 }
 
+export type IManagedApplicationEnvironmentSummary = IManagedApplicationSummary<
+  'resources' | 'artifacts' | 'environments'
+>;
+
 export type IManagedApplicationSummary<T extends keyof IManagedApplicationEntities = 'resources'> = Pick<
   IManagedApplicationEntities,
   T
