@@ -60,7 +60,7 @@ module(MANAGED_RESOURCES_DATA_SOURCE, []).run([
       category: DELIVERY_KEY,
       optional: true,
       optIn: true,
-      hidden: false,
+      hidden: true,
       icon: 'fa fa-fw fa-xs fa-code-branch',
       loader: loadEnvironments,
       onLoad: addEnvironments,

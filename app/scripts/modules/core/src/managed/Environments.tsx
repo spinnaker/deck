@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { IManagedApplicationSummary } from 'core/domain';
-import { Application, ApplicationDataSource } from 'core/application';
 
-import { ColumnHeader } from 'core/presentation/layout';
+import { Application, ApplicationDataSource } from '../application';
+import { IManagedApplicationSummary } from '../domain/IManagedEntity';
+import { ColumnHeader } from '../presentation/layout/ColumnHeader';
 import { ArtifactsList } from './ArtifactsList';
 import { EnvironmentsList } from './EnvironmentsList';
 
@@ -59,20 +59,4 @@ export default function Environments(props: IEnvironmentsProps) {
       </div>
     </div>
   );
-  // return (
-  //   <div style={{ width: '100%' }}>
-  //     <span>For there shall be no greater pursuit than that towards desired state.</span>
-  //     <div style={{ display: 'flex' }}>
-  //       <ArtifactsList
-  //         {...environments}
-  //         selectedArtifact={selectedArtifact}
-  //         artifactSelected={artifact => {
-  //           setSelectedArtifact(artifact);
-  //         }}
-  //       />
-  //       <EnvironmentsList {...environments} selectedArtifact={selectedArtifact} />
-  //     </div>
-  //     {/* <pre>{JSON.stringify(environments, null, 4)}</pre> */}
-  //   </div>
-  // );
 }

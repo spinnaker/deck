@@ -1,7 +1,9 @@
 import React from 'react';
-import { IManagedEnviromentSummary, IManagedResourceSummary, IManagedArtifactSummary } from '..';
+
+import { NoticeCard } from '../presentation/layout/NoticeCard';
+import { ObjectRow } from '../presentation/layout/ObjectRow';
+import { IManagedEnviromentSummary, IManagedResourceSummary, IManagedArtifactSummary } from '../domain/IManagedEntity';
 import { ISelectedArtifact } from './Environments';
-import { ObjectRow, NoticeCard } from 'core/presentation';
 
 interface IEnvironmentsListProps {
   environments: IManagedEnviromentSummary[];

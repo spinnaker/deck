@@ -1,9 +1,10 @@
 import React from 'react';
-import { Pill } from 'core/presentation/layout';
+
+import { IManagedArtifactSummary } from '../domain/IManagedEntity';
+import { Pill } from '../presentation/layout/Pill';
+import { ISelectedArtifact } from './Environments';
 
 import styles from './ArtifactRow.module.css';
-import { IManagedArtifactSummary } from 'core/domain';
-import { ISelectedArtifact } from './Environments';
 
 interface IArtifactsListProps {
   artifacts: IManagedArtifactSummary[];
