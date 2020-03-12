@@ -136,7 +136,12 @@ export interface ISpinnakerSettings {
   searchVersion: 1 | 2;
   triggerTypes: string[];
   useClassicFirewallLabels: boolean;
-  createKubernetesInfrastructure: boolean;
+  adHocInfraWritesK8sCluster: boolean;
+  adHocInfraWritesK8sLoadBalancer: boolean;
+  adHocInfraWritesK8sFirewall: boolean;
+  adHocInfraWritesAWSCluster: boolean;
+  adHocInfraWritesAWSLoadBalancer: boolean;
+  adHocInfraWritesAWSFirewall: boolean;
 }
 
 export const SETTINGS: ISpinnakerSettings = (window as any).spinnakerSettings;

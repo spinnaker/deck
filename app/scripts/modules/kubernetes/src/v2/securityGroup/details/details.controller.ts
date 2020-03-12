@@ -7,7 +7,7 @@ import {
   ISecurityGroupDetail,
   SECURITY_GROUP_READER,
   SecurityGroupReader,
-  ProviderSelectionService,
+  SETTINGS,
 } from '@spinnaker/core';
 
 import { IKubernetesSecurityGroup } from './IKubernetesSecurityGroup';
@@ -36,7 +36,7 @@ class KubernetesSecurityGroupDetailsController implements IController {
   ) {
     this.securityGroupFromParams = resolvedSecurityGroup;
     this.extractSecurityGroup();
-    this.$scope.isDisabled = ProviderSelectionService.hideK8InfraButton(this.app);
+    this.$scope.isDisabled = !SETTINGS.adHocInfraWritesK8sFirewall;
   }
 
   public deleteSecurityGroup(): void {

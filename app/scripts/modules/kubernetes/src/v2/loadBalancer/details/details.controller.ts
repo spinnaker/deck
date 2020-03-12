@@ -2,7 +2,7 @@ import { copy, IController, IScope, module } from 'angular';
 import { IModalService } from 'angular-ui-bootstrap';
 import { StateService } from '@uirouter/angularjs';
 
-import { Application, ILoadBalancer, IManifest, ProviderSelectionService } from '@spinnaker/core';
+import { Application, ILoadBalancer, IManifest, SETTINGS } from '@spinnaker/core';
 
 import { IKubernetesLoadBalancer } from './IKubernetesLoadBalancer';
 import { KubernetesManifestService } from 'kubernetes/v2/manifest/manifest.service';
@@ -47,7 +47,7 @@ class KubernetesLoadBalancerDetailsController implements IController {
         this.$scope.$on('$destroy', () => {
           unsubscribe();
         });
-        this.$scope.isDisabled = ProviderSelectionService.hideK8InfraButton(this.app);
+        this.$scope.isDisabled = !SETTINGS.adHocInfraWritesK8sLoadBalancer;
       });
   }
 

@@ -1,6 +1,6 @@
 import { module } from 'angular';
 
-import { CloudProviderRegistry, DeploymentStrategyRegistry } from '@spinnaker/core';
+import { CloudProviderRegistry, DeploymentStrategyRegistry, SETTINGS } from '@spinnaker/core';
 
 import { KUBERNETES_KEY_VALUE_DETAILS } from './common/keyValueDetails.component';
 import { KUBERNETES_TOLERATIONS } from './common/tolerations/tolerations.component';
@@ -109,6 +109,7 @@ module(KUBERNETES_V1_MODULE, [
       detailsController: 'kubernetesLoadBalancerDetailsController',
       createLoadBalancerTemplateUrl: require('./loadBalancer/configure/wizard/createWizard.html'),
       createLoadBalancerController: 'kubernetesUpsertLoadBalancerController',
+      infra: SETTINGS.adHocInfraWritesK8sLoadBalancer,
     },
     securityGroup: {
       reader: KubernetesSecurityGroupReader,
@@ -117,6 +118,7 @@ module(KUBERNETES_V1_MODULE, [
       detailsController: 'kubernetesSecurityGroupDetailsController',
       createSecurityGroupTemplateUrl: require('./securityGroup/configure/wizard/createWizard.html'),
       createSecurityGroupController: 'kubernetesUpsertSecurityGroupController',
+      infra: SETTINGS.adHocInfraWritesK8sFirewall,
     },
     serverGroup: {
       artifactExtractor: 'kubernetesServerGroupArtifactExtractor',
@@ -129,6 +131,7 @@ module(KUBERNETES_V1_MODULE, [
       commandBuilder: 'kubernetesServerGroupCommandBuilder',
       configurationService: 'kubernetesServerGroupConfigurationService',
       paramsMixin: 'kubernetesServerGroupParamsMixin',
+      infra: SETTINGS.adHocInfraWritesK8sCluster,
     },
     unsupportedStageTypes: [
       'scaleManifest',

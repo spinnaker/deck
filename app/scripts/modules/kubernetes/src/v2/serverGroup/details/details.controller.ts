@@ -1,6 +1,5 @@
 import { IController, IScope, module } from 'angular';
 import { IModalService } from 'angular-ui-bootstrap';
-
 import {
   Application,
   ClusterTargetBuilder,
@@ -11,9 +10,8 @@ import {
   SERVER_GROUP_WRITER,
   ServerGroupReader,
   ConfirmationModalService,
-  ProviderSelectionService,
+  SETTINGS,
 } from '@spinnaker/core';
-
 import { IKubernetesServerGroup } from './IKubernetesServerGroup';
 import { KubernetesManifestService } from 'kubernetes/v2/manifest/manifest.service';
 import { KubernetesManifestCommandBuilder } from 'kubernetes/v2/manifest/manifestCommandBuilder.service';
@@ -58,7 +56,8 @@ class KubernetesServerGroupDetailsController implements IController {
       .catch(() => this.autoClose());
 
     this.app.getDataSource('serverGroups').onRefresh(this.$scope, () => this.extractServerGroup(serverGroup));
-    this.$scope.isDisabled = ProviderSelectionService.hideK8InfraButton(this.app);
+    //console.log(app);
+    this.$scope.isDisabled = !SETTINGS.adHocInfraWritesK8sCluster;
   }
 
   private ownerReferences(): any[] {

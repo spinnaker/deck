@@ -1,6 +1,11 @@
 import { module } from 'angular';
 
-import { CloudProviderRegistry, STAGE_ARTIFACT_SELECTOR_COMPONENT_REACT, YAML_EDITOR_COMPONENT } from '@spinnaker/core';
+import {
+  CloudProviderRegistry,
+  STAGE_ARTIFACT_SELECTOR_COMPONENT_REACT,
+  YAML_EDITOR_COMPONENT,
+  SETTINGS,
+} from '@spinnaker/core';
 
 import { KUBERNETES_MANIFEST_DELETE_CTRL } from './manifest/delete/delete.controller';
 import { KUBERNETES_MANIFEST_SCALE_CTRL } from './manifest/scale/scale.controller';
@@ -102,6 +107,7 @@ module(KUBERNETES_V2_MODULE, [
       detailsController: 'kubernetesV2ServerGroupDetailsCtrl',
       detailsTemplateUrl: require('./serverGroup/details/details.html'),
       transformer: 'kubernetesV2ServerGroupTransformer',
+      infra: SETTINGS.adHocInfraWritesK8sCluster,
     },
     serverGroupManager: {
       detailsTemplateUrl: require('./serverGroupManager/details/details.html'),
@@ -112,6 +118,7 @@ module(KUBERNETES_V2_MODULE, [
       detailsController: 'kubernetesV2LoadBalancerDetailsCtrl',
       detailsTemplateUrl: require('./loadBalancer/details/details.html'),
       transformer: 'kubernetesV2LoadBalancerTransformer',
+      infra: SETTINGS.adHocInfraWritesK8sLoadBalancer,
     },
     securityGroup: {
       reader: KubernetesSecurityGroupReader,
@@ -119,6 +126,7 @@ module(KUBERNETES_V2_MODULE, [
       detailsController: 'kubernetesV2SecurityGroupDetailsCtrl',
       detailsTemplateUrl: require('./securityGroup/details/details.html'),
       transformer: 'kubernetesV2SecurityGroupTransformer',
+      infra: SETTINGS.adHocInfraWritesK8sFirewall,
     },
     instance: {
       detailsController: 'kubernetesV2InstanceDetailsCtrl',

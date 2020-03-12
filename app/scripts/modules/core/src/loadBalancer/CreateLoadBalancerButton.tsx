@@ -64,7 +64,21 @@ export class CreateLoadBalancerButton extends React.Component<ICreateLoadBalance
 
   public render() {
     const { app } = this.props;
-    const isDisabled = ProviderSelectionService.hideK8InfraButton(app);
+    let isDisabled = true;
+    console.log('Application providers from LB: ');
+    var BreakException = {};
+    try {
+      app.attributes.cloudProviders.forEach((element: any) => {
+        const provider = CloudProviderRegistry.getValue(element, 'loadBalancer');
+        console.log(element + ' infra: ' + provider.infra);
+        if (provider.infra) {
+          isDisabled = false;
+          throw BreakException;
+        }
+      });
+    } catch (e) {
+      if (e !== BreakException) throw e;
+    }
     if (!isDisabled) {
       return (
         <div>

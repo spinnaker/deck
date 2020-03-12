@@ -66,8 +66,17 @@ export const CreateSecurityGroupButton = ({ app }: { app: Application }) => {
       });
     });
   };
-  const isDisabled = ProviderSelectionService.hideK8InfraButton(app);
-  if (!isDisabled) {
+  let disableButton = false;
+  console.log('Application providers from Firewall ');
+  app.attributes.cloudProviders.forEach((element: any) => {
+    const provider = CloudProviderRegistry.getValue(element, 'securityGroup');
+    //console.log(provider);
+    console.log(element + ' infra: ' + provider.infra);
+    if (provider.infra) {
+      disableButton = true;
+    }
+  });
+  if (disableButton) {
     return (
       <div>
         <button className="btn btn-sm btn-default" onClick={createSecurityGroup}>

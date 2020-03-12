@@ -67,6 +67,7 @@ import { AMAZON_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER } from './instance/
 import { AMAZON_SEARCH_SEARCHRESULTFORMATTER } from './search/searchResultFormatter';
 import { AWS_EVALUATE_CLOUD_FORMATION_CHANGE_SET_EXECUTION_SERVICE } from './pipeline/stages/deployCloudFormation/evaluateCloudFormationChangeSetExecution.service';
 
+import { SETTINGS } from '@spinnaker/core';
 // load all templates into the $templateCache
 const templates = require.context('./', true, /\.html$/);
 templates.keys().forEach(function(key) {
@@ -136,6 +137,7 @@ module(AMAZON_MODULE, [
       commandBuilder: 'awsServerGroupCommandBuilder',
       configurationService: 'awsServerGroupConfigurationService',
       scalingActivitiesEnabled: true,
+      infra: SETTINGS.adHocInfraWritesAWSCluster,
     },
     instance: {
       instanceTypeService: 'awsInstanceTypeService',
@@ -151,6 +153,7 @@ module(AMAZON_MODULE, [
       targetGroupDetailsController: 'awsTargetGroupDetailsCtrl',
       ClusterContainer: AmazonLoadBalancerClusterContainer,
       LoadBalancersTag: AmazonLoadBalancersTag,
+      infra: SETTINGS.adHocInfraWritesAWSLoadBalancer,
     },
     function: {
       details: AmazonFunctionDetails,
@@ -164,6 +167,7 @@ module(AMAZON_MODULE, [
       detailsController: 'awsSecurityGroupDetailsCtrl',
       createSecurityGroupTemplateUrl: require('./securityGroup/configure/createSecurityGroup.html'),
       createSecurityGroupController: 'awsCreateSecurityGroupCtrl',
+      infra: SETTINGS.adHocInfraWritesAWSFirewall,
     },
     subnet: {
       renderer: 'awsSubnetRenderer',

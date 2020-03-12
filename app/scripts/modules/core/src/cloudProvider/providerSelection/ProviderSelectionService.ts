@@ -19,10 +19,12 @@ export class ProviderSelectionService {
     return AccountService.applicationAccounts(application).then((accounts: IAccountDetails[]) => {
       let reducedAccounts: IAccountDetails[] = [];
       if (feature) {
+        console.log('paso por feature');
         reducedAccounts = accounts.filter(a => CloudProviderRegistry.hasValue(a.cloudProvider, feature));
       }
 
       if (filterFn) {
+        console.log('paso por filterFn');
         reducedAccounts = reducedAccounts.filter((acc: IAccountDetails) => {
           return filterFn(application, acc, CloudProviderRegistry.getProvider(acc.cloudProvider, acc.skin));
         });
@@ -30,10 +32,18 @@ export class ProviderSelectionService {
 
       // reduce the accounts to the smallest, unique collection taking into consideration the useProvider values
       const providerOptions = uniq(
-        reducedAccounts.map(a => {
-          const providerFeature = CloudProviderRegistry.getProvider(a.cloudProvider)[feature] || {};
-          return providerFeature.useProvider || a.cloudProvider;
-        }),
+        reducedAccounts
+          .map(a => {
+            //console.log(a);
+            const provider = CloudProviderRegistry.getValue(a.cloudProvider, feature, a.skin);
+            //console.log(provider);
+            //console.log(provider.infra);
+            const providerFeature = CloudProviderRegistry.getProvider(a.cloudProvider)[feature] || {};
+            return provider.infra ? providerFeature.useProvider || a.cloudProvider : null;
+          })
+          .filter(a => {
+            return a != null;
+          }),
       );
 
       let provider;
@@ -46,15 +56,5 @@ export class ProviderSelectionService {
       }
       return provider;
     });
-  }
-
-  // Only hide the button when the provider is kubernetes otherwise is going to be shown
-  public static hideK8InfraButton(application: Application): boolean {
-    if (application.attributes.cloudProviders.length == 1) {
-      if (application.attributes.cloudProviders.includes('kubernetes')) {
-        return !SETTINGS.createKubernetesInfrastructure;
-      }
-    }
-    return false;
   }
 }
