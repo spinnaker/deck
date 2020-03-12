@@ -16,17 +16,15 @@ export function ArtifactsList({ artifacts, artifactSelected }: IArtifactsListPro
   return (
     <div>
       {artifacts.map(({ versions, name }) =>
-        versions.map(({ version }) => (
-          <>
-            <ArtifactRow
-              key={`${name}-${version}`}
-              clickHandler={artifactSelected}
-              version={version}
-              name={name}
-              sha="abc123"
-              stages={[4, 3, 0]}
-            />
-          </>
+        versions.map(({ version }, i) => (
+          <ArtifactRow
+            key={`${name}-${version}-${i}`} // appending index until name-version is guaranteed to be unique
+            clickHandler={artifactSelected}
+            version={version}
+            name={name}
+            sha="abc123"
+            stages={[4, 3, 0]}
+          />
         )),
       )}
     </div>
