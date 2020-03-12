@@ -1,6 +1,3 @@
-@value variables: "../../_variables.module.css";
-@value webRowHeight, colorRowRule, colorKey, gradientHover, colorBg, mobile from variables;
-
 .indent {
   margin: 0 0 0 16px;
 }
@@ -9,20 +6,20 @@
   display: flex;
   align-items: center;
 
-  /*border-bottom: 1px solid colorRowRule;*/
-  box-shadow: inset 0 -1px 0 0 colorRowRule;
-  height: webRowHeight;
+  /*border-bottom: 1px solid #cccccc;*/
+  box-shadow: inset 0 -1px 0 0 #cccccc;
+  height: 40px;
 
   /*padding: 0 8px;*/
   margin-right: 36px;
   position: relative;
   font-size: 14px;
 
-  background-color: colorBg;
+  background-color: #f7f7f7;
 }
 
 .active {
-  box-shadow: inset 0 -2px 0 0 colorKey;
+  box-shadow: inset 0 -2px 0 0 rgb(100, 140, 175);
 }
 
 .clickableArea {
@@ -34,7 +31,7 @@
 }
 
 .clickableArea:hover {
-  background-image: gradientHover;
+  background-image: linear-gradient(to bottom, rgba(160, 180, 220, 0.15), rgba(160, 180, 220, 0.15));
 }
 
 /* "pointer-events: none;" is added to children so the data-key attached to ObjectRow is always captured */
@@ -102,6 +99,6 @@
 
 .select:hover,
 .expand:hover {
-  background-image: gradientHover;
+  background-image: linear-gradient(to bottom, rgba(160, 180, 220, 0.15), rgba(160, 180, 220, 0.15));
   cursor: pointer;
 }

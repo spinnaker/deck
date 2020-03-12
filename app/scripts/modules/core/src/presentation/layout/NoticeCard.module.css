@@ -1,6 +1,3 @@
-@value variables: "../../_variables.module.css";
-@value colorActive, colorOk, colorError, colorSubHeaderDark from variables;
-
 .NoticeCard {
   display: flex;
   flex-wrap: wrap;
@@ -9,13 +6,13 @@
   padding: 8px 16px;
   font-size: 13px;
   margin-bottom: 16px;
-  color: colorSubHeaderDark;
+  color: #444;
 }
 .NoticeCard.active {
-  background-color: colorActive;
+  background-color: #fff0a0;
 }
 .NoticeCard.warning {
-  background-color: colorError;
+  background-color: #ff8282;
   animation: noticeStrobe 4s linear;
 }
 
@@ -29,11 +26,11 @@
   border-radius: 48px;
 }
 .iconContainer.warning {
-  background-color: colorError;
+  background-color: #ff8282;
   color: #ffffff;
 }
 .iconContainer.ok {
-  background-color: colorOk;
+  background-color: #00b237;
   color: #ffffff;
 }
 

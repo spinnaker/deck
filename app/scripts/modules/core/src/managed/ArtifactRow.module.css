@@ -1,13 +1,10 @@
-@value variables: "../_variables.module.css";
-@value colorActive, colorOk, colorError, colorSubHeaderLight, gradientHover from variables;
-
 .ArtifactRow {
   height: 48px;
   display: block;
 }
 .ArtifactRow:hover {
   cursor: pointer;
-  background-image: gradientHover;
+  background-image: linear-gradient(to bottom, rgba(160, 180, 220, 0.15), rgba(160, 180, 220, 0.15));
 }
 
 .content {
@@ -31,7 +28,7 @@
 .name {
   font-size: 12px;
   font-style: italic;
-  color: colorSubHeaderLight;
+  color: #999;
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
@@ -47,7 +44,7 @@
   padding-bottom: 2px;
 }
 .stage {
-  background-color: colorOk;
+  background-color: #00b237;
   flex: 1 1 auto;
   margin-right: 2px;
 }
