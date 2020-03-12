@@ -112,7 +112,6 @@ export class PluginRegistry {
       .get()
       .catch((error: any) => {
         console.error(`Failed to load ${uri} from ${source}`);
-        console.error(`Error message: ${error}`);
         // If we cannot hit the Gate URL, ignore it
         if (error.data.status === 404) {
           console.error(error);
@@ -140,7 +139,6 @@ export class PluginRegistry {
       return plugins.map(pluginMetaData => this.registerPluginMetaData(source, pluginMetaData));
     } catch (error) {
       console.error(`Error loading plugin manifest from ${location}`);
-      console.error(`Error message: ${error}`);
       throw error;
     }
   }
