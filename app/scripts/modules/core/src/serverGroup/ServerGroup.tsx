@@ -93,10 +93,8 @@ export class ServerGroup extends React.Component<IServerGroupProps, IServerGroup
           (dockerConfig.tag || dockerConfig.digest),
       };
     } else if (has(serverGroup, 'buildInfo.images')) {
-      images = serverGroup.buildInfo.images;
+      images = serverGroup.buildInfo.images.map((val: string) => this.getShortSha(val));
     }
-
-    images = images.map(val => this.getShortSha(val)).sort();
 
     return {
       jenkins,
