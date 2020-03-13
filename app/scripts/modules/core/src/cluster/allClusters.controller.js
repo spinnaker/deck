@@ -50,12 +50,18 @@ module(CORE_CLUSTER_ALLCLUSTERS_CONTROLLER, [
 
       $scope.sortFilter = ClusterState.filterModel.sortFilter;
       $scope.isDisabled = true;
-      app.attributes.cloudProviders.forEach(element => {
-        const provider = CloudProviderRegistry.getValue(element, 'serverGroup');
-        if (provider.infra) {
-          $scope.isDisabled = false;
-        }
-      });
+      const BreakException = {};
+      try {
+        app.attributes.cloudProviders.forEach(element => {
+          const provider = CloudProviderRegistry.getValue(element, 'serverGroup');
+          if (provider.infra) {
+            $scope.isDisabled = false;
+            throw BreakException;
+          }
+        });
+      } catch (e) {
+        if (e !== BreakException) throw e;
+      }
       this.createLabel = 'Create Server Group';
 
       app
