@@ -6,7 +6,7 @@ import { Application } from 'core/application';
 import { ArtifactReferenceService } from 'core/artifact/ArtifactReferenceService';
 import { IExpectedArtifact, IPipeline, ITrigger } from 'core/domain';
 import { HelpField } from 'core/help';
-import { PipelineConfigValidator } from 'core/pipeline';
+import { PipelineConfigValidator } from '../validation/PipelineConfigValidator';
 import { CheckboxInput, FormField } from 'core/presentation';
 import { Registry } from 'core/registry';
 import { SETTINGS } from 'core/config/settings';
@@ -71,9 +71,9 @@ export function TriggersPageContent(props: ITriggersPageContentProps) {
   }
 
   // Expected Artifacts
-  function updateExpectedArtifacts(e: IExpectedArtifact[]) {
-    setExpectedArtifacts(e);
-    updatePipelineConfig({ expectedArtifacts });
+  function updateExpectedArtifacts(updatedExpectedArtifacts: IExpectedArtifact[]) {
+    setExpectedArtifacts(updatedExpectedArtifacts);
+    updatePipelineConfig({ expectedArtifacts: updatedExpectedArtifacts });
   }
 
   function removeUnusedExpectedArtifacts(pipelineParam: IPipeline) {
@@ -90,8 +90,7 @@ export function TriggersPageContent(props: ITriggersPageContentProps) {
       }
       ArtifactReferenceService.removeReferenceFromStages(expectedArtifact.id, pipelineParam.stages);
     });
-    setExpectedArtifacts(newExpectedArtifacts);
-    updatePipelineConfig({ expectedArtifacts });
+    updateExpectedArtifacts(newExpectedArtifacts);
   }
 
   return (

@@ -1,9 +1,11 @@
 import { API } from 'core/api';
 import { Registry } from 'core/registry';
 import { IStageTypeConfig } from 'core/domain';
+import { $http } from 'ngimport';
 
 export interface IDeckPlugin {
   stages?: IStageTypeConfig[];
+  preconfiguredJobStages?: IStageTypeConfig[];
   initialize?(): void;
 }
 
@@ -91,15 +93,10 @@ export class PluginRegistry {
   /** Loads plugin manifest file served as a custom deck asset */
   public loadPluginManifestFromDeck() {
     const source = 'deck';
-    const uri = '/plugin-manifest.js';
-    const loadPromise = this.loadModuleFromUrl(uri)
-      .then((pluginManifest: IPluginManifest) => {
-        if (!pluginManifest || !pluginManifest.plugins) {
-          throw new Error(`Expected plugin-manifest.js to contain an export named 'plugins' but it did not.`);
-        }
-        return pluginManifest.plugins;
-      })
-      .catch(error => {
+    const uri = '/plugin-manifest.json';
+    const loadPromise = Promise.resolve($http.get<IPluginMetaData[]>(uri))
+      .then(response => response.data)
+      .catch((error: any) => {
         console.error(`Failed to load ${uri} from ${source}`);
         throw error;
       });
@@ -115,6 +112,11 @@ export class PluginRegistry {
       .get()
       .catch((error: any) => {
         console.error(`Failed to load ${uri} from ${source}`);
+        // If we cannot hit the Gate URL, ignore it
+        if (error.data.status === 404) {
+          console.error(error);
+          return Promise.resolve([]);
+        }
         throw error;
       });
 
@@ -168,6 +170,7 @@ export class PluginRegistry {
 
       // Register extensions with deck.
       plugin.stages?.forEach(stage => Registry.pipeline.registerStage(stage));
+      plugin.preconfiguredJobStages?.forEach(stage => Registry.pipeline.registerPreconfiguredJobStage(stage));
 
       // Run code that currently does not have an extension point
       plugin.initialize?.();

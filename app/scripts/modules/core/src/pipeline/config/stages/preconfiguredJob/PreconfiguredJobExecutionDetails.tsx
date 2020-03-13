@@ -1,13 +1,9 @@
 import React from 'react';
 import { get, sortBy, last } from 'lodash';
 
-import {
-  IExecutionDetailsSectionProps,
-  ExecutionDetailsSection,
-  StageExecutionLogs,
-  StageFailureMessage,
-} from 'core/pipeline';
-import { IPreconfiguredJobParameter } from './preconfiguredJobStage';
+import { IExecutionDetailsSectionProps, ExecutionDetailsSection } from '../common';
+import { StageExecutionLogs, StageFailureMessage } from '../../../details';
+import { IPreconfiguredJobParameter } from './preconfiguredJob.reader';
 import { JobStageExecutionLogs } from 'core/manifest/stage/JobStageExecutionLogs';
 import { IStage, IJobOwnedPodStatus } from 'core/domain';
 import { AccountService } from 'core/account';

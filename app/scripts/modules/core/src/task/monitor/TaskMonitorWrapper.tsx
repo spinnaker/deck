@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { CSSTransition } from 'react-transition-group';
 import { Modal } from 'react-bootstrap';
 
-import { TaskMonitor } from 'core/task';
+import { TaskMonitor } from './TaskMonitor';
 import { useForceUpdate } from 'core/presentation/hooks';
 
 import { TaskMonitorStatus } from './TaskMonitorStatus';
@@ -13,21 +13,14 @@ export interface ITaskMonitorProps {
 }
 
 export const TaskMonitorWrapper = ({ monitor }: ITaskMonitorProps) => {
-  if (!monitor) {
-    return null;
-  }
-
   const forceUpdate = useForceUpdate();
-  if (!monitor) {
-    return null;
-  }
 
   useEffect(() => {
-    const subscription = monitor.statusUpdatedStream.subscribe(() => forceUpdate());
-    return () => subscription.unsubscribe();
+    const subscription = monitor?.statusUpdatedStream.subscribe(() => forceUpdate());
+    return () => subscription?.unsubscribe();
   }, []);
 
-  if (!monitor.submitting && !monitor.error) {
+  if (!monitor || (!monitor.submitting && !monitor.error)) {
     return null;
   }
 
