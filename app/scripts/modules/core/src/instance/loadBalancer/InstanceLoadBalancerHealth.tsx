@@ -48,7 +48,7 @@ export class InstanceLoadBalancerHealth extends React.Component<IInstanceLoadBal
 
     return (
       <div className="flex-container-h">
-        <div style={{ width: '20px' }}>{icon}</div>
+        <div style={{ flex: 'none', width: '16px' }}>{icon}</div>
         <div className="flex-container-v">
           {displayName}
           {downReason}
