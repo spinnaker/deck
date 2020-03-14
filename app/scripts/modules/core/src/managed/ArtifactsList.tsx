@@ -3,6 +3,7 @@ import React from 'react';
 import { IManagedArtifactSummary } from '../domain/IManagedEntity';
 import { ISelectedArtifact } from './Environments';
 import { Pill } from './Pill';
+import { parseName } from './Frigga';
 
 import styles from './ArtifactRow.module.css';
 
@@ -22,7 +23,7 @@ export function ArtifactsList({ artifacts, artifactSelected }: IArtifactsListPro
             clickHandler={artifactSelected}
             version={version}
             name={name}
-            sha="abc123"
+            sha=""
             stages={[4, 3, 0]}
           />
         )),
@@ -39,16 +40,17 @@ interface IArtifactRowProps {
   stages: any[];
 }
 
-export function ArtifactRow({ clickHandler, version, name, sha, stages }: IArtifactRowProps) {
+export function ArtifactRow({ clickHandler, version: versionString, name, sha, stages }: IArtifactRowProps) {
+  const { packageName, version, buildNumber, commit } = parseName(versionString);
   return (
     <div className={styles.ArtifactRow} onClick={() => clickHandler({ name, version })}>
       <div className={styles.content}>
         <div className={styles.version}>
-          <Pill text={version} />
+          <Pill text={`#${buildNumber}`} />
         </div>
         <div className={styles.text}>
-          <div className={styles.sha}>{sha}</div>
-          <div className={styles.name}>{name}</div>
+          <div className={styles.sha}>{sha || commit}</div>
+          <div className={styles.name}>{name || packageName}</div>
         </div>
         {/* Holding spot for status bubbles */}
       </div>
