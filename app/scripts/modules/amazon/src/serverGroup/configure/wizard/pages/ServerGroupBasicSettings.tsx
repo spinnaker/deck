@@ -1,12 +1,11 @@
 import React from 'react';
-import { Field, FormikErrors, FormikProps } from 'formik';
+import { FormikErrors, FormikProps } from 'formik';
 
 import {
   AccountSelectInput,
   DeploymentStrategySelector,
   HelpField,
   NameUtils,
-  RegionSelectField,
   Application,
   ReactInjector,
   IServerGroup,
@@ -14,14 +13,22 @@ import {
   Markdown,
   DeployingIntoManagedClusterWarning,
   TaskReason,
+  FormikFormField,
+  TextInput,
+  ReactSelectInput,
+  RegionSelectInput,
+  CheckboxInput,
+  FormField,
 } from '@spinnaker/core';
 
 import { IAmazonImage } from 'amazon/image';
-import { SubnetSelectField } from 'amazon/subnet';
+import { SubnetSelectInput } from 'amazon/subnet';
 
 import { AmazonImageSelectInput } from '../../AmazonImageSelectInput';
 import { IAmazonServerGroupCommand } from '../../serverGroupConfiguration.service';
-import ServerGroupDetailsField from './fields/ServerGroupDetailsField';
+import { ServerGroupDetailsField } from './fields/ServerGroupDetailsField';
+import { DeployingIntoDeprecatedRegionWarning } from './notices/DeployingIntoDeprecatedRegionWarning';
+import { ClusterNamePreview } from './notices/ClusterNamePreviewNotice';
 
 const isExpressionLanguage = (field: string) => field && field.includes('${');
 const isStackPattern = (stack: string) =>
@@ -107,8 +114,9 @@ export class ServerGroupBasicSettings
     setFieldValue('region', region);
   };
 
-  private subnetUpdated = (): void => {
+  private subnetUpdated = (subnetType: string): void => {
     const { setFieldValue, values } = this.props.formik;
+    values.subnetType = subnetType;
     values.subnetChanged(values);
     setFieldValue('subnetType', values.subnetType);
   };
@@ -190,7 +198,7 @@ export class ServerGroupBasicSettings
 
   public render() {
     const { app, formik } = this.props;
-    const { errors, values } = formik;
+    const { values } = formik;
     const { createsNewCluster, latestServerGroup, namePreview, showPreviewAsWarning } = this.state;
 
     const accounts = values.backingData.accounts;
@@ -198,154 +206,139 @@ export class ServerGroupBasicSettings
 
     return (
       <div className="container-fluid form-horizontal">
-        {values.regionIsDeprecated(values) && (
-          <div className="form-group row">
-            <div className="col-md-12 error-message">
-              <div className="alert alert-danger">
-                You are deploying into a deprecated region within the {values.credentials} account!
-              </div>
-            </div>
-          </div>
-        )}
+        {values.regionIsDeprecated(values) ? (
+          <DeployingIntoDeprecatedRegionWarning credentials={values.credentials} />
+        ) : null}
+
         <DeployingIntoManagedClusterWarning app={app} formik={formik} />
-        <div className="form-group">
-          <div className="col-md-3 sm-label-right">Account</div>
-          <div className="col-md-7">
+
+        <FormikFormField
+          label="Account"
+          name="credentials"
+          input={props => (
             <AccountSelectInput
-              value={values.credentials}
-              onChange={(evt: any) => this.accountUpdated(evt.target.value)}
-              readOnly={readOnlyFields.credentials}
+              {...props}
               accounts={accounts}
               provider="aws"
+              readOnly={readOnlyFields.credentials}
+              onChange={e => this.accountUpdated(e.target.value)}
             />
-          </div>
-        </div>
-        <RegionSelectField
-          readOnly={readOnlyFields.region}
-          labelColumns={3}
-          component={values}
-          field="region"
-          account={values.credentials}
-          regions={values.backingData.filtered.regions}
-          onChange={this.regionUpdated}
+          )}
         />
-        <SubnetSelectField
-          readOnly={readOnlyFields.subnet}
-          labelColumns={3}
-          helpKey="aws.serverGroup.subnet"
-          component={values}
-          field="subnetType"
-          region={values.region}
-          application={app}
-          subnets={values.backingData.filtered.subnetPurposes}
-          onChange={this.subnetUpdated}
-        />
-        <div className="form-group">
-          <div className="col-md-3 sm-label-right">
-            Stack <HelpField id="aws.serverGroup.stack" />
-          </div>
-          <div className="col-md-7">
-            <input
-              type="text"
-              className="form-control input-sm no-spel"
-              value={values.stack}
-              onChange={e => this.stackChanged(e.target.value)}
+
+        <FormikFormField
+          label="Region"
+          name="region"
+          input={props => (
+            <RegionSelectInput
+              {...props}
+              account={values.credentials}
+              readOnly={readOnlyFields.region}
+              regions={values.backingData.filtered.regions}
+              onChange={e => this.regionUpdated(e.target.value)}
             />
-          </div>
-        </div>
-        {errors.stack && (
-          <div className="form-group row slide-in">
-            <div className="col-sm-9 col-sm-offset-2 error-message">
-              <span>{errors.stack}</span>
-            </div>
-          </div>
-        )}
-        <ServerGroupDetailsField formik={formik} />
-        {values.viewState.imageSourceText && (
-          <div className="form-group">
-            <div className="col-md-3 sm-label-right">Image Source</div>
-            <div className="col-md-7" style={{ marginTop: '5px' }}>
-              <Markdown tag="span" message={values.viewState.imageSourceText} />
-            </div>
-          </div>
-        )}
-        {!values.viewState.disableImageSelection && (
-          <div className="form-group">
-            <div className="col-md-3 sm-label-right">
-              Image <HelpField id="aws.serverGroup.imageName" />
-            </div>
-            {isExpressionLanguage(values.amiName) ? (
-              <Field name="amiName" />
-            ) : (
-              <AmazonImageSelectInput
-                onChange={image => this.imageChanged(image)}
-                value={this.state.selectedImage}
+          )}
+        />
+
+        <FormikFormField
+          label="VPC Subnet"
+          name="subnetType"
+          help={<HelpField id="aws.serverGroup.subnet" />}
+          input={({ value, ...props }) =>
+            values.region ? (
+              <SubnetSelectInput
+                {...props}
                 application={app}
                 credentials={values.credentials}
+                readOnly={readOnlyFields.subnet}
                 region={values.region}
+                subnets={values.backingData.filtered.subnetPurposes}
+                value={value}
+                onChange={e => this.subnetUpdated(e.target.value)}
               />
-            )}
-          </div>
+            ) : (
+              <ReactSelectInput
+                disabled={true}
+                options={[{ value: 'disabled', label: '(Select an account)' }]}
+                value="disabled"
+              />
+            )
+          }
+        />
+
+        <FormikFormField
+          label="Stack"
+          name="stack"
+          help={<HelpField id="aws.serverGroup.stack" />}
+          input={props => <TextInput {...props} onChange={e => this.stackChanged(e.target.value)} />}
+        />
+
+        <ServerGroupDetailsField formik={formik} />
+
+        {values.viewState.imageSourceText && (
+          <FormField
+            label="Image Source"
+            name="viewState.imageSourceText"
+            input={() => <Markdown tag="span" message={values.viewState.imageSourceText} />}
+          />
         )}
-        <div className="form-group">
-          <div className="col-md-3 sm-label-right">
-            Traffic <HelpField id="aws.serverGroup.traffic" />
-          </div>
-          <div className="col-md-9 checkbox">
-            <label>
-              <input
-                type="checkbox"
-                onChange={this.clientRequestsChanged}
-                checked={!values.processIsSuspended(values, 'AddToLoadBalancer')}
-                disabled={values.strategy !== '' && values.strategy !== 'custom'}
-              />
-              Send client requests to new instances
-            </label>
-          </div>
-        </div>
+
+        {!values.viewState.disableImageSelection && (
+          <FormikFormField
+            label="Image"
+            name="amiName"
+            help={<HelpField id="aws.serverGroup.imageName" />}
+            input={props =>
+              isExpressionLanguage(values.amiName) ? (
+                <TextInput {...props} />
+              ) : (
+                <AmazonImageSelectInput
+                  application={app}
+                  credentials={values.credentials}
+                  region={values.region}
+                  value={this.state.selectedImage}
+                  onChange={image => this.imageChanged(image)}
+                />
+              )
+            }
+          />
+        )}
+
+        <FormikFormField
+          label="Traffic"
+          name="suspendedProcesses"
+          help={<HelpField id="aws.serverGroup.traffic" />}
+          input={({ value }) => (
+            <CheckboxInput
+              checked={value.includes('AddToLoadBalancer')}
+              disabled={values.strategy !== '' && values.strategy !== 'custom'}
+              text="Send client requests to new instances"
+              onChange={this.clientRequestsChanged}
+            />
+          )}
+        />
+
         {!values.viewState.disableStrategySelection && values.selectedProvider && (
           <DeploymentStrategySelector
             command={values}
+            useSystemLayout={true}
             onFieldChange={this.onStrategyFieldChange}
             onStrategyChange={this.strategyChanged}
           />
         )}
+
         {!values.viewState.hideClusterNamePreview && (
-          <div className="form-group">
-            <div className="col-md-12">
-              <div className={`well-compact ${showPreviewAsWarning ? 'alert alert-warning' : 'well'}`}>
-                <h5 className="text-center">
-                  <p>Your server group will be in the cluster:</p>
-                  <p>
-                    <strong>
-                      {namePreview}
-                      {createsNewCluster && <span> (new cluster)</span>}
-                    </strong>
-                  </p>
-                  {!createsNewCluster && values.viewState.mode === 'create' && latestServerGroup && (
-                    <div className="text-left">
-                      <p>There is already a server group in this cluster. Do you want to clone it?</p>
-                      <p>
-                        Cloning copies the entire configuration from the selected server group, allowing you to modify
-                        whichever fields (e.g. image) you need to change in the new server group.
-                      </p>
-                      <p>
-                        To clone a server group, select "Clone" from the "Server Group Actions" menu in the details view
-                        of the server group.
-                      </p>
-                      <p>
-                        <a className="clickable" onClick={this.navigateToLatestServerGroup}>
-                          Go to details for {latestServerGroup.name}
-                        </a>
-                      </p>
-                    </div>
-                  )}
-                </h5>
-              </div>
-            </div>
-          </div>
+          <ClusterNamePreview
+            createsNewCluster={createsNewCluster}
+            latestServerGroup={latestServerGroup}
+            mode={values.viewState.mode}
+            namePreview={namePreview}
+            navigateToLatestServerGroup={this.navigateToLatestServerGroup}
+            showPreviewAsWarning={showPreviewAsWarning}
+          />
         )}
-        <TaskReason reason={values.reason} onChange={this.handleReasonChanged} />
+
+        <TaskReason reason={values.reason} useSystemLayout={true} onChange={this.handleReasonChanged} />
       </div>
     );
   }

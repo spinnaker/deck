@@ -1,9 +1,9 @@
 import React from 'react';
-import Select, { Option } from 'react-select';
+import { Option } from 'react-select';
 import { unset } from 'lodash';
 
 import { HelpField } from 'core/help/HelpField';
-import { Markdown, FormikFormField } from 'core/presentation';
+import { Markdown, FormikFormField, ReactSelectInput } from 'core/presentation';
 import { IServerGroupCommand } from 'core/serverGroup';
 
 import {
@@ -89,7 +89,7 @@ export class DeploymentStrategySelector extends React.Component<
     const { AdditionalFieldsComponent, currentStrategy, strategies } = this.state;
     const hasAdditionalFields = Boolean(AdditionalFieldsComponent);
     const selectField = (
-      <Select
+      <ReactSelectInput
         clearable={false}
         options={strategies}
         optionRenderer={this.strategyOptionRenderer}

@@ -10,7 +10,7 @@ interface IClusterNamePreviewProps {
   navigateToLatestServerGroup: () => void;
   showPreviewAsWarning: boolean;
 }
-export default function ClusterNamePreview({
+export function ClusterNamePreview({
   createsNewCluster,
   latestServerGroup,
   mode,

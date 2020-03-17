@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormikFormField } from 'core/presentation';
+import { FormikFormField, TextAreaInput } from 'core/presentation';
 
 export interface ITaskReasonProps {
   onChange: (reason: string) => void;
@@ -11,7 +11,7 @@ export class TaskReason extends React.Component<ITaskReasonProps> {
   public render() {
     const label = 'Reason';
     const field = (
-      <textarea
+      <TextAreaInput
         className="form-control"
         value={this.props.reason}
         onChange={event => this.props.onChange(event.target.value)}

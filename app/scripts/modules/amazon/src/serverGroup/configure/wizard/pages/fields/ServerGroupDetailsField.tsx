@@ -9,7 +9,7 @@ export interface DetailsFieldProps {
 }
 
 @Overridable('aws.serverGroup.configure.detailsField')
-export default class ServerGroupDetailsField extends React.Component<DetailsFieldProps> {
+export class ServerGroupDetailsField extends React.Component<DetailsFieldProps> {
   private freeFormDetailsChanged = (freeFormDetails: string) => {
     const { setFieldValue, values } = this.props.formik;
     values.freeFormDetails = freeFormDetails; // have to do it here to make sure it's done before calling values.clusterChanged
