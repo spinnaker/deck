@@ -66,11 +66,14 @@ module(TITUS_SERVERGROUP_DETAILS_ROLLBACK_ROLLBACKSERVERGROUP_CONTROLLER, [SERVE
       $scope.command = {
         rollbackType: rollbackType,
         rollbackContext: {
+          imageId: previousServerGroup ? previousServerGroup.imageId : undefined,
           rollbackServerGroupName: serverGroup.name,
           restoreServerGroupName: previousServerGroup ? previousServerGroup.name : undefined,
           targetHealthyRollbackPercentage: healthyPercent,
           delayBeforeDisableSeconds: 0,
         },
+        targetGroups: serverGroup.targetGroups,
+        securityGroups: serverGroup.securityGroups,
       };
 
       $scope.minHealthy = function(percent) {
