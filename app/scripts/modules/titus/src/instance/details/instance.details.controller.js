@@ -1,7 +1,7 @@
 'use strict';
 
 import { module } from 'angular';
-import { defaults, filter } from 'lodash';
+import { defaults, filter, flatMap } from 'lodash';
 import { getAllTargetGroups, applyHealthCheckInfoToTargetGroups } from '@spinnaker/amazon';
 
 import {
@@ -85,6 +85,8 @@ module(TITUS_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
       let instanceSummary, loadBalancers, account, region, vpcId;
       app.serverGroups.data.some(function(serverGroup) {
         return serverGroup.instances.some(function(possibleInstance) {
+          // eslint-disable-next-line
+          // console.log(possibleInstance);
           if (possibleInstance.id === instance.instanceId) {
             $scope.serverGroup = serverGroup;
             instanceSummary = possibleInstance;
@@ -118,6 +120,7 @@ module(TITUS_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
             $scope.instance.externalIpAddress = $scope.instance.placement.host;
             getBastionAddressForAccount(accountDetails, region);
             $scope.instance.titusUiEndpoint = this.titusUiEndpoint;
+            addIpv6Addresses(accountDetails.awsAccount, region, instance.agentId);
             if (overrides.instanceDetailsLoaded) {
               overrides.instanceDetailsLoaded();
             }
@@ -297,6 +300,16 @@ module(TITUS_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
       $scope.sshLink = `ssh -t ${this.bastionHost} 'titus-ssh -region ${region} ${$scope.instance.id}'`;
 
       return titusUiEndpoint;
+    };
+
+    const addIpv6Addresses = (account, region, instanceId) => {
+      InstanceReader.getInstanceDetails(account, region, instanceId).then(instance => {
+        $scope.instance.addIpv6Addresses = flatMap($scope.instance.netWorkInterfaces, i =>
+          i.ipv6Addresses.map(a => a.ipv6Address),
+        );
+        // eslint-disable-next-line
+        console.log($scope.instance);
+      });
     };
 
     this.hasPorts = () => {
