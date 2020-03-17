@@ -3,7 +3,7 @@ import Select, { Option } from 'react-select';
 import { unset } from 'lodash';
 
 import { HelpField } from 'core/help/HelpField';
-import { Markdown } from 'core/presentation';
+import { Markdown, FormikFormField } from 'core/presentation';
 import { IServerGroupCommand } from 'core/serverGroup';
 
 import {
@@ -18,6 +18,7 @@ export interface IDeploymentStrategySelectorProps {
   onStrategyChange: (command: IServerGroupCommand, strategy: IDeploymentStrategy) => void;
   labelColumns?: string;
   fieldColumns?: string;
+  useSystemLayout?: boolean;
 }
 
 export interface IDeploymentStrategySelectorState {
@@ -84,34 +85,51 @@ export class DeploymentStrategySelector extends React.Component<
   }
 
   public render() {
-    const { command, fieldColumns, labelColumns, onFieldChange } = this.props;
+    const { command, fieldColumns, labelColumns, useSystemLayout, onFieldChange } = this.props;
     const { AdditionalFieldsComponent, currentStrategy, strategies } = this.state;
     const hasAdditionalFields = Boolean(AdditionalFieldsComponent);
+    const selectField = (
+      <Select
+        clearable={false}
+        options={strategies}
+        optionRenderer={this.strategyOptionRenderer}
+        placeholder="None"
+        required={true}
+        value={currentStrategy}
+        valueKey="key"
+        valueRenderer={o => <>{o.label}</>}
+        onChange={this.strategyChanged}
+      />
+    );
+    const label = 'Strategy';
+    const help = <HelpField id="core.serverGroup.strategy" />;
+    const additionalFields = hasAdditionalFields ? (
+      <AdditionalFieldsComponent command={command} onChange={onFieldChange} />
+    ) : null;
+
     if (strategies && strategies.length) {
-      return (
-        <div className="form-group">
-          <div className={`col-md-${labelColumns} sm-label-right`} style={{ paddingLeft: '13px' }}>
-            Strategy
-            <HelpField id="core.serverGroup.strategy" />
-          </div>
-          <div className={`col-md-${fieldColumns}`}>
-            <Select
-              clearable={false}
-              required={true}
-              options={strategies}
-              placeholder="None"
-              valueKey="key"
-              value={currentStrategy}
-              optionRenderer={this.strategyOptionRenderer}
-              valueRenderer={o => <>{o.label}</>}
-              onChange={this.strategyChanged}
-            />
-          </div>
-          {hasAdditionalFields && (
-            <div className="col-md-9 col-md-offset-3" style={{ marginTop: '5px' }}>
-              <AdditionalFieldsComponent command={command} onChange={onFieldChange} />
+      return useSystemLayout ? (
+        <FormikFormField
+          label={label}
+          name="strategy"
+          help={help}
+          input={() => (
+            <div>
+              {selectField}
+              <div style={{ marginTop: '5px' }}>{additionalFields}</div>
             </div>
           )}
+        />
+      ) : (
+        <div className="form-group">
+          <div className={`col-md-${labelColumns} sm-label-right`} style={{ paddingLeft: '13px' }}>
+            {label}
+            {help}
+          </div>
+          <div className={`col-md-${fieldColumns}`}>{selectField}</div>
+          <div className="col-md-9 col-md-offset-3" style={{ marginTop: '5px' }}>
+            {additionalFields}
+          </div>
         </div>
       );
     }

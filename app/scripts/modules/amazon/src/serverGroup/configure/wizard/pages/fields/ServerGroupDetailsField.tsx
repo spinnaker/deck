@@ -1,7 +1,7 @@
 import React from 'react';
 import { FormikProps } from 'formik';
 
-import { HelpField, Overridable } from '@spinnaker/core';
+import { FormikFormField, HelpField, Overridable, TextInput } from '@spinnaker/core';
 import { IAmazonServerGroupCommand } from '../../../serverGroupConfiguration.service';
 
 export interface DetailsFieldProps {
@@ -18,29 +18,16 @@ export default class ServerGroupDetailsField extends React.Component<DetailsFiel
   };
 
   render() {
-    const { errors, values } = this.props.formik;
     return (
       <>
-        <div className="form-group">
-          <div className="col-md-3 sm-label-right">
-            Detail <HelpField id="aws.serverGroup.detail" />
-          </div>
-          <div className="col-md-7">
-            <input
-              type="text"
-              className="form-control input-sm no-spel"
-              value={values.freeFormDetails}
-              onChange={e => this.freeFormDetailsChanged(e.target.value)}
-            />
-          </div>
-        </div>
-        {errors.freeFormDetails && (
-          <div className="form-group row slide-in">
-            <div className="col-sm-9 col-sm-offset-2 error-message">
-              <span>{errors.freeFormDetails}</span>
-            </div>
-          </div>
-        )}
+        <FormikFormField
+          label="Details"
+          name="freeFormDetails"
+          help={<HelpField id="aws.serverGroup.detail" />}
+          input={({ onChange, ...props }) => (
+            <TextInput {...props} onChange={e => this.freeFormDetailsChanged(e.target.value)} />
+          )}
+        />
       </>
     );
   }
