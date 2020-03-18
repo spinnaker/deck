@@ -85,8 +85,6 @@ module(TITUS_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
       let instanceSummary, loadBalancers, account, region, vpcId;
       app.serverGroups.data.some(function(serverGroup) {
         return serverGroup.instances.some(function(possibleInstance) {
-          // eslint-disable-next-line
-          // console.log(possibleInstance);
           if (possibleInstance.id === instance.instanceId) {
             $scope.serverGroup = serverGroup;
             instanceSummary = possibleInstance;
@@ -109,8 +107,6 @@ module(TITUS_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
             AccountService.getAccountDetails(account),
           ])
           .then(([instanceDetails, accountDetails]) => {
-            // eslint-disable-next-line
-            console.log(instanceDetails);
             $scope.state.loading = false;
             extractHealthMetrics(instanceSummary, instanceDetails);
             $scope.instance = defaults(instanceDetails, instanceSummary);
@@ -305,11 +301,7 @@ module(TITUS_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
     };
 
     const addIpv6Addresses = (account, region, instanceId) => {
-      // eslint-disable-next-line
-      console.log(account, region, instanceId);
       InstanceReader.getInstanceDetails(account, region, instanceId).then(instance => {
-        // eslint-disable-next-line
-        console.log(instance);
         if (instance.networkInterfaces) {
           $scope.instance.ipv6Addresses = flatMap(instance.networkInterfaces, i =>
             i.ipv6Addresses.map(a => a.ipv6Address),
