@@ -109,6 +109,8 @@ module(TITUS_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
             AccountService.getAccountDetails(account),
           ])
           .then(([instanceDetails, accountDetails]) => {
+            // eslint-disable-next-line
+            console.log(instanceDetails);
             $scope.state.loading = false;
             extractHealthMetrics(instanceSummary, instanceDetails);
             $scope.instance = defaults(instanceDetails, instanceSummary);
@@ -120,7 +122,7 @@ module(TITUS_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
             $scope.instance.externalIpAddress = $scope.instance.placement.host;
             getBastionAddressForAccount(accountDetails, region);
             $scope.instance.titusUiEndpoint = this.titusUiEndpoint;
-            addIpv6Addresses(accountDetails.awsAccount, region, instance.agentId);
+            addIpv6Addresses(accountDetails.awsAccount, region, instanceDetails.agentId);
             if (overrides.instanceDetailsLoaded) {
               overrides.instanceDetailsLoaded();
             }
@@ -303,12 +305,16 @@ module(TITUS_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
     };
 
     const addIpv6Addresses = (account, region, instanceId) => {
+      // eslint-disable-next-line
+      console.log(account, region, instanceId);
       InstanceReader.getInstanceDetails(account, region, instanceId).then(instance => {
-        $scope.instance.addIpv6Addresses = flatMap($scope.instance.netWorkInterfaces, i =>
-          i.ipv6Addresses.map(a => a.ipv6Address),
-        );
         // eslint-disable-next-line
-        console.log($scope.instance);
+        console.log(instance);
+        if (instance.networkInterfaces) {
+          $scope.instance.ipv6Addresses = flatMap(instance.networkInterfaces, i =>
+            i.ipv6Addresses.map(a => a.ipv6Address),
+          );
+        }
       });
     };
 
