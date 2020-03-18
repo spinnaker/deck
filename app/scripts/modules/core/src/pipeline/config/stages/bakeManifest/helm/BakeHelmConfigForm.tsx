@@ -15,6 +15,7 @@ export class BakeHelmConfigForm extends React.Component<IBakeHelmConfigFormProps
   private static readonly excludedArtifactTypes = excludeAllTypesExcept(
     ArtifactTypePatterns.BITBUCKET_FILE,
     ArtifactTypePatterns.CUSTOM_OBJECT,
+    ArtifactTypePatterns.EMBEDDED_BASE64,
     ArtifactTypePatterns.GCS_OBJECT,
     ArtifactTypePatterns.GITHUB_FILE,
     ArtifactTypePatterns.GITLAB_FILE,
