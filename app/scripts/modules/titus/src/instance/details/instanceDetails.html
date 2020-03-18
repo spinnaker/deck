@@ -166,9 +166,7 @@
         </dd>
         <dt>Host IP</dt>
         <dd>{{instance.placement.host}}</dd>
-        <dt ng-if="instance.ipv6Addresses.length">
-          IPv6 Address<span ng-if="instance.ipv6Addresses.length > 1">es</span>
-        </dt>
+        <dt ng-if="instance.ipv6Addresses.length">IPv6</dt>
         <dd ng-if="instance.ipv6Addresses.length" ng-repeat="ip in instance.ipv6Addresses">
           <link-with-clipboard url="'http://[' + ip + ']:' + state.instancePort" text="ip"> </link-with-clipboard>
         </dd>
