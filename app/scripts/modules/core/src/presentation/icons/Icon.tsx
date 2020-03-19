@@ -7,7 +7,7 @@ export type IconNames = keyof typeof iconsByName;
 export type IIconProps = {
   name: IconNames;
   appearance?: 'light' | 'neutral' | 'dark';
-  size?: string;
+  size?: 'extraSmall' | 'small' | 'medium' | 'large' | 'extraLarge' | string;
   color?: string;
   className?: string;
 };
