@@ -118,9 +118,18 @@ module(TITUS_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
             $scope.instance.externalIpAddress = $scope.instance.placement.host;
             getBastionAddressForAccount(accountDetails, region);
             $scope.instance.titusUiEndpoint = this.titusUiEndpoint;
-            addIpv6Addresses(accountDetails.awsAccount, region, instanceDetails.agentId);
             if (overrides.instanceDetailsLoaded) {
               overrides.instanceDetailsLoaded();
+            }
+
+            // Network interfaces are needed for any IPv6 addresses.
+            return InstanceReader.getInstanceDetails(accountDetails.awsAccount, region, instanceDetails.agentId);
+          })
+          .then(instance => {
+            if (instance && instance.networkInterfaces) {
+              $scope.instance.ipv6Addresses = flatMap(instance.networkInterfaces, i =>
+                i.ipv6Addresses.map(a => a.ipv6Address),
+              );
             }
           }, autoClose);
       }
@@ -298,16 +307,6 @@ module(TITUS_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
       $scope.sshLink = `ssh -t ${this.bastionHost} 'titus-ssh -region ${region} ${$scope.instance.id}'`;
 
       return titusUiEndpoint;
-    };
-
-    const addIpv6Addresses = (account, region, instanceId) => {
-      InstanceReader.getInstanceDetails(account, region, instanceId).then(instance => {
-        if (instance.networkInterfaces) {
-          $scope.instance.ipv6Addresses = flatMap(instance.networkInterfaces, i =>
-            i.ipv6Addresses.map(a => a.ipv6Address),
-          );
-        }
-      });
     };
 
     this.hasPorts = () => {
