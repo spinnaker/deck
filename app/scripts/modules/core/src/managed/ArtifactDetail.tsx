@@ -114,13 +114,14 @@ export const ArtifactDetail = ({
                   text={undefined}
                   title={
                     <span className="sp-group-margin-xs-xaxis">
-                      Marked as bad{' '}
-                      {deployedAt && (
+                      Marked as bad <span className="text-regular sp-margin-xs-left">—</span>{' '}
+                      {deployedAt ? (
                         <>
-                          <span className="text-regular sp-margin-xs-left">—</span>{' '}
                           <span className="text-regular">last deployed {relativeTime(deployedAtMillis)}</span>{' '}
                           <span className="text-italic text-regular">({timestamp(deployedAtMillis)})</span>
                         </>
+                      ) : (
+                        <span className="text-regular">never deployed here</span>
                       )}
                     </span>
                   }
