@@ -21,6 +21,17 @@ export class ArtifactReferenceService {
   }
 
   /**
+   * Removes each of a list of artifact references from each of a list of
+   * stages with a registered `artifactRemover` method.
+   *
+   * @param references The list of artifact IDs to remove.
+   * @param stages The stages from which to remove artifact references.
+   */
+  public static removeReferencesFromStages(references: string[], stages: IStage[]): void {
+    references.forEach(reference => ArtifactReferenceService.removeReferenceFromStages(reference, stages));
+  }
+
+  /**
    * Removes an artifact reference from a field of an object. The field can
    * be either a single artifact ID or a list of artifact IDs.
    *
