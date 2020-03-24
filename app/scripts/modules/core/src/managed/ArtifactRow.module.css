@@ -1,10 +1,14 @@
 .ArtifactRow {
   height: 48px;
   display: block;
-}
-.ArtifactRow:hover {
   cursor: pointer;
+}
+.ArtifactRow:not(.selected):hover {
   background-image: linear-gradient(to bottom, rgba(160, 180, 220, 0.15), rgba(160, 180, 220, 0.15));
+}
+
+.selected {
+  background-color: var(--color-white);
 }
 
 .content {
@@ -24,6 +28,9 @@
 }
 .sha {
   font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
 .name {
   font-size: 12px;
@@ -43,11 +50,36 @@
   height: 6px;
   padding-bottom: 2px;
 }
+
 .stage {
-  background-color: #00b237;
   flex: 1 1 auto;
   margin-right: 2px;
+
+  &.current {
+    background-color: #00b237;
+  }
+
+  &.approved {
+    background-color: var(--color-status-info);
+  }
+
+  &.deploying {
+    background-color: var(--color-status-info);
+  }
+
+  &.pending {
+    background-color: var(--color-porcelain);
+  }
+
+  &.previous {
+    background-color: var(--color-nobel);
+  }
+
+  &.vetoed {
+    background-color: var(--color-status-error);
+  }
 }
+
 .stage:last-child {
   margin-right: 0;
 }

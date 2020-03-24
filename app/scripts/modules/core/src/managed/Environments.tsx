@@ -1,13 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
+import { isEqual, keyBy } from 'lodash';
 
+import { useDataSource } from '../presentation/hooks';
 import { Application, ApplicationDataSource } from '../application';
-import { IManagedApplicationSummary } from '../domain/IManagedEntity';
+import { IManagedApplicationEnvironmentSummary, IManagedResourceSummary } from '../domain';
+
 import { ColumnHeader } from './ColumnHeader';
 import { ArtifactsList } from './ArtifactsList';
 import { EnvironmentsList } from './EnvironmentsList';
+import { ArtifactDetail } from './ArtifactDetail';
 
 import styles from './Environments.module.css';
-import { isEqual } from 'lodash';
 
 const CONTENT_WIDTH = 1200;
 
@@ -20,15 +23,33 @@ interface IEnvironmentsProps {
   app: Application;
 }
 
-export function Environments(props: IEnvironmentsProps) {
-  const { app } = props;
-  const dataSource: ApplicationDataSource<IManagedApplicationSummary<
-    'resources' | 'artifacts' | 'environments'
-  >> = app.getDataSource('environments');
+export function Environments({ app }: IEnvironmentsProps) {
+  const dataSource: ApplicationDataSource<IManagedApplicationEnvironmentSummary> = app.getDataSource('environments');
+  const {
+    data: { environments, artifacts, resources },
+  } = useDataSource(dataSource);
+
   const [selectedArtifact, setSelectedArtifact] = useState<ISelectedArtifact>();
-  const [environments, setEnvironments] = useState(dataSource.data);
   const [isFiltersOpen] = useState(false);
-  useEffect(() => dataSource.onRefresh(null, () => setEnvironments(dataSource.data)), [app]);
+
+  const resourcesById = useMemo(() => keyBy(resources, 'id'), [resources]);
+  const resourcesByEnvironment = useMemo(
+    () =>
+      environments.reduce((byEnvironment, { name, resources: resourceIds }) => {
+        byEnvironment[name] = resourceIds.map(id => resourcesById[id]);
+        return byEnvironment;
+      }, {} as { [environment: string]: IManagedResourceSummary[] }),
+    [environments, resourcesById],
+  );
+
+  const selectedArtifactDetails = useMemo(
+    () =>
+      selectedArtifact &&
+      artifacts
+        .find(({ name }) => name === selectedArtifact.name)
+        ?.versions.find(({ version }) => version === selectedArtifact.version),
+    [selectedArtifact, artifacts],
+  );
 
   const totalContentWidth = isFiltersOpen ? CONTENT_WIDTH + 248 + 'px' : CONTENT_WIDTH + 'px';
 
@@ -41,16 +62,32 @@ export function Environments(props: IEnvironmentsProps) {
           <div className={styles.artifactsColumn}>
             <ColumnHeader text="Artifacts" icon="search" />
             <ArtifactsList
-              {...environments}
+              artifacts={artifacts}
               selectedArtifact={selectedArtifact}
-              artifactSelected={clickedArtifact =>
-                setSelectedArtifact(isEqual(clickedArtifact, selectedArtifact) ? null : clickedArtifact)
-              }
+              artifactSelected={clickedArtifact => {
+                if (!isEqual(clickedArtifact, selectedArtifact)) {
+                  setSelectedArtifact(clickedArtifact);
+                }
+              }}
             />
           </div>
           <div className={styles.environmentsColumn}>
-            <ColumnHeader text="Environments" icon="search" />
-            <EnvironmentsList {...environments} selectedArtifact={selectedArtifact} />
+            {/* This view switcheroo will be handled via the router soon,
+                but for now let's do it in component local state.  */}
+            {!selectedArtifact && (
+              <>
+                <ColumnHeader text="Environments" icon="search" />
+                <EnvironmentsList {...{ environments, artifacts, resourcesById }} />
+              </>
+            )}
+            {selectedArtifact && (
+              <ArtifactDetail
+                name={selectedArtifact.name}
+                version={selectedArtifactDetails}
+                resourcesByEnvironment={resourcesByEnvironment}
+                onRequestClose={() => setSelectedArtifact(null)}
+              />
+            )}
           </div>
         </div>
       </div>

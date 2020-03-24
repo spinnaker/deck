@@ -1,19 +1,10 @@
 import React from 'react';
-import { keyBy } from 'lodash';
 
-import { IManagedEnviromentSummary, IManagedResourceSummary, IManagedArtifactSummary } from '../domain/IManagedEntity';
-import { ISelectedArtifact } from './Environments';
-import { getKindName } from './ManagedReader';
+import { IManagedEnviromentSummary, IManagedResourceSummary, IManagedArtifactSummary } from '../domain';
+
 import { NoticeCard } from './NoticeCard';
-import { ObjectRow } from './ObjectRow';
-
-const kindIconMap: { [key: string]: string } = {
-  cluster: 'cluster',
-};
-
-function getIconTypeFromKind(kind: string): string {
-  return kindIconMap[getKindName(kind)] ?? 'cluster';
-}
+import { ManagedResourceObject } from './ManagedResourceObject';
+import { EnvironmentRow } from './EnvironmentRow';
 
 function shouldDisplayResource(resource: IManagedResourceSummary) {
   //TODO: naively filter on presence of moniker but how should we really decide what to display?
@@ -22,42 +13,31 @@ function shouldDisplayResource(resource: IManagedResourceSummary) {
 
 interface IEnvironmentsListProps {
   environments: IManagedEnviromentSummary[];
-  resources: IManagedResourceSummary[];
+  resourcesById: { [id: string]: IManagedResourceSummary };
   artifacts: IManagedArtifactSummary[];
-  selectedArtifact: ISelectedArtifact;
 }
 
-export function EnvironmentsList({ environments, resources, artifacts, selectedArtifact }: IEnvironmentsListProps) {
-  const resourcesMap = keyBy(resources, 'id');
-
+export function EnvironmentsList({ environments, resourcesById, artifacts }: IEnvironmentsListProps) {
   return (
     <div>
       <NoticeCard
         icon="search"
         text={undefined}
-        title={
-          selectedArtifact
-            ? `Showing ${selectedArtifact.name} ${selectedArtifact.version}`
-            : `${artifacts.length} artifacts is deployed in 2 environments with no issues detected.`
-        }
+        title={`${artifacts.length} ${
+          artifacts.length === 1 ? 'artifact is' : 'artifacts are'
+        } deployed in 2 environments with no issues detected.`}
         isActive={true}
-        noticeType={'ok'}
+        noticeType="success"
       />
       {environments.map(({ name, resources }) => (
-        <div key={name}>
-          <h3>{name.toUpperCase()}</h3>
+        <EnvironmentRow key={name} name={name} isProd={true}>
           {resources
-            .map(resourceId => resourcesMap[resourceId])
+            .map(resourceId => resourcesById[resourceId])
             .filter(shouldDisplayResource)
-            .map(({ id, kind, artifact, moniker: { app, stack, detail } }: IManagedResourceSummary) => (
-              <ObjectRow
-                key={id}
-                icon={getIconTypeFromKind(kind)}
-                title={`${[app, stack, detail].filter(Boolean).join('-')} ${artifact?.versions?.current ||
-                  'unknown version'}`}
-              />
+            .map(resource => (
+              <ManagedResourceObject key={resource.id} resource={resource} />
             ))}
-        </div>
+        </EnvironmentRow>
       ))}
     </div>
   );
