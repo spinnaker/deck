@@ -11,16 +11,18 @@ import { NoticeCard } from './NoticeCard';
 import { Pill } from './Pill';
 import { ManagedResourceObject } from './ManagedResourceObject';
 import { parseName } from './Frigga';
+import { EnvironmentRow } from './EnvironmentRow';
 
 import './ArtifactDetail.less';
 
-function shouldDisplayResource(resource: IManagedResourceSummary) {
+function shouldDisplayResource(name: string, type: string, resource: IManagedResourceSummary) {
   //TODO: naively filter on presence of moniker but how should we really decide what to display?
-  return !!resource.moniker;
+  return !!resource.moniker && name === resource.artifact?.name && type === resource.artifact?.type;
 }
 
 export interface IArtifactDetailProps {
   name: string;
+  type: string;
   version: IManagedArtifactVersion;
   resourcesByEnvironment: { [environment: string]: IManagedResourceSummary[] };
   onRequestClose: () => any;
@@ -28,6 +30,7 @@ export interface IArtifactDetailProps {
 
 export const ArtifactDetail = ({
   name,
+  type,
   version: { version, environments },
   resourcesByEnvironment,
   onRequestClose,
@@ -48,15 +51,14 @@ export const ArtifactDetail = ({
           {/* a short summary with actions/buttons will live here */}
           <div className="detail-section-right">{/* artifact metadata will live here */}</div>
         </div>
-        {environments.map(({ name, state, deployedAt, replacedAt, replacedBy }) => {
+        {environments.map(({ name: environmentName, state, deployedAt, replacedAt, replacedBy }) => {
           const deployedAtMillis = DateTime.fromISO(deployedAt).toMillis();
           const replacedAtMillis = DateTime.fromISO(replacedAt).toMillis();
           const { version: replacedByPackageVersion, buildNumber: replacedByBuildNumber } =
             parseName(replacedBy || '') || {};
 
           return (
-            <div key={name}>
-              <h3>{name.toUpperCase()}</h3>
+            <EnvironmentRow key={environmentName} name={environmentName} isProd={true}>
               {state === 'deploying' && (
                 <NoticeCard
                   className="sp-margin-l-right"
@@ -129,15 +131,17 @@ export const ArtifactDetail = ({
                   noticeType="error"
                 />
               )}
-              {resourcesByEnvironment[name].filter(shouldDisplayResource).map(resource => (
-                <div className="flex-container-h middle">
-                  <div
-                    className={classNames('resource-badge flex-container-h center middle sp-margin-s-right', state)}
-                  ></div>
-                  <ManagedResourceObject key={resource.id} resource={resource} />
-                </div>
-              ))}
-            </div>
+              {resourcesByEnvironment[environmentName]
+                .filter(resource => shouldDisplayResource(name, type, resource))
+                .map(resource => (
+                  <div className="flex-container-h middle">
+                    <div
+                      className={classNames('resource-badge flex-container-h center middle sp-margin-s-right', state)}
+                    ></div>
+                    <ManagedResourceObject key={resource.id} resource={resource} />
+                  </div>
+                ))}
+            </EnvironmentRow>
           );
         })}
       </div>

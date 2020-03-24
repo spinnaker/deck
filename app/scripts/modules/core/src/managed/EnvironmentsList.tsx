@@ -4,6 +4,7 @@ import { IManagedEnviromentSummary, IManagedResourceSummary, IManagedArtifactSum
 
 import { NoticeCard } from './NoticeCard';
 import { ManagedResourceObject } from './ManagedResourceObject';
+import { EnvironmentRow } from './EnvironmentRow';
 
 function shouldDisplayResource(resource: IManagedResourceSummary) {
   //TODO: naively filter on presence of moniker but how should we really decide what to display?
@@ -16,28 +17,30 @@ interface IEnvironmentsListProps {
   artifacts: IManagedArtifactSummary[];
 }
 
-export function EnvironmentsList({ environments, resourcesById, artifacts }: IEnvironmentsListProps) {
+export function EnvironmentsList({ environments, resourcesById, artifacts: allArtifacts }: IEnvironmentsListProps) {
   return (
     <div>
       <NoticeCard
         icon="search"
         text={undefined}
-        title={`${artifacts.length} ${
-          artifacts.length === 1 ? 'artifact is' : 'artifacts are'
+        title={`${allArtifacts.length} ${
+          allArtifacts.length === 1 ? 'artifact is' : 'artifacts are'
         } deployed in 2 environments with no issues detected.`}
         isActive={true}
         noticeType="success"
       />
-      {environments.map(({ name, resources }) => (
-        <div key={name}>
-          <h3>{name.toUpperCase()}</h3>
+      {environments.map(({ name, resources, artifacts }) => (
+        <EnvironmentRow key={name} name={name} isProd={true}>
           {resources
             .map(resourceId => resourcesById[resourceId])
             .filter(shouldDisplayResource)
-            .map(resource => (
-              <ManagedResourceObject key={resource.id} resource={resource} />
-            ))}
-        </div>
+            .map(resource => {
+              const artifact =
+                resource.artifact &&
+                artifacts.find(({ name, type }) => name === resource.artifact.name && type === resource.artifact.type);
+              return <ManagedResourceObject key={resource.id} resource={resource} artifact={artifact} />;
+            })}
+        </EnvironmentRow>
       ))}
     </div>
   );
