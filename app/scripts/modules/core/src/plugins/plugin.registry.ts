@@ -1,12 +1,22 @@
 import { API } from 'core/api';
+import { overrideRegistrationQueue } from 'core/overrideRegistry';
 import { Registry } from 'core/registry';
 import { IStageTypeConfig } from 'core/domain';
 import { $http } from 'ngimport';
+import React from 'react';
 
 export interface IDeckPlugin {
   stages?: IStageTypeConfig[];
   preconfiguredJobStages?: IStageTypeConfig[];
   initialize?(): void;
+  componentOverrides?: IOverrideComponent[];
+}
+
+export interface IOverrideComponent {
+  component: React.ComponentClass;
+  key: string;
+  cloudProvider?: string;
+  cloudProviderVersion?: string;
 }
 
 export interface IPluginManifest {
@@ -171,6 +181,14 @@ export class PluginRegistry {
       // Register extensions with deck.
       plugin.stages?.forEach(stage => Registry.pipeline.registerStage(stage));
       plugin.preconfiguredJobStages?.forEach(stage => Registry.pipeline.registerPreconfiguredJobStage(stage));
+
+      plugin.componentOverrides?.forEach(o => {
+        if (!o.cloudProvider) {
+          overrideRegistrationQueue.register(o.component, o.key);
+        } else {
+          overrideRegistrationQueue.register(o.component, o.key, o.cloudProvider, o.cloudProviderVersion);
+        }
+      });
 
       // Run code that currently does not have an extension point
       plugin.initialize?.();
