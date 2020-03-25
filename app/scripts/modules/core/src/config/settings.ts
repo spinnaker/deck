@@ -142,6 +142,9 @@ export interface ISpinnakerSettings {
   adHocInfraWritesAWSCluster: boolean;
   adHocInfraWritesAWSLoadBalancer: boolean;
   adHocInfraWritesAWSFirewall: boolean;
+  adHocInfraWritesGCECluster: boolean;
+  adHocInfraWritesGCELoadBalancer: boolean;
+  adHocInfraWritesGCEFirewall: boolean;
 }
 
 export const SETTINGS: ISpinnakerSettings = (window as any).spinnakerSettings;

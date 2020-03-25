@@ -7,7 +7,8 @@ describe('google: Create Server Group Modal GPU Accelerators', () => {
     cy.route('/images/find?*', 'fixture:google/shared/images.json');
   });
 
-  it(`provides different accelerators according to the server group's chosen zone`, () => {
+  //TODO find a way to set SETTINGS.adHocInfraWritesGCECluster = true
+  it.skip(`provides different accelerators according to the server group's chosen zone`, () => {
     cy.visit('#/applications/compute/clusters');
     cy.get('button:contains("Create Server Group")').click();
 
@@ -36,5 +37,10 @@ describe('google: Create Server Group Modal GPU Accelerators', () => {
       expect(types).to.include('NVIDIA Tesla K80');
     });
     typeSelect.toggleDropdown();
+  });
+
+  it(`Create Server Group button should be hidden due the SETTINGS.adHocInfraWritesGCECluster flag is false by default`, () => {
+    cy.visit('#/applications/compute/clusters');
+    cy.get('button:contains("Create Server Group")').should('be.hidden');
   });
 });

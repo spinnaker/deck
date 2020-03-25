@@ -1,6 +1,6 @@
 import { module } from 'angular';
 
-import { CloudProviderRegistry, DeploymentStrategyRegistry } from '@spinnaker/core';
+import { CloudProviderRegistry, DeploymentStrategyRegistry, SETTINGS } from '@spinnaker/core';
 
 import { GCE_LOAD_BALANCER_CHOICE_MODAL } from './loadBalancer/configure/choice/gceLoadBalancerChoice.modal';
 import { GCE_INTERNAL_LOAD_BALANCER_CTRL } from './loadBalancer/configure/internal/gceCreateInternalLoadBalancer.controller';
@@ -119,6 +119,7 @@ module(GOOGLE_MODULE, [
       cloneServerGroupController: 'gceCloneServerGroupCtrl',
       commandBuilder: 'gceServerGroupCommandBuilder',
       configurationService: 'gceServerGroupConfigurationService',
+      infra: SETTINGS.adHocInfraWritesGCECluster,
     },
     instance: {
       instanceTypeService: 'gceInstanceTypeService',
@@ -134,6 +135,7 @@ module(GOOGLE_MODULE, [
       detailsController: 'gceLoadBalancerDetailsCtrl',
       createLoadBalancerTemplateUrl: require('./loadBalancer/configure/choice/gceLoadBalancerChoice.modal.html'),
       createLoadBalancerController: 'gceLoadBalancerChoiceCtrl',
+      infra: SETTINGS.adHocInfraWritesGCELoadBalancer,
     },
     securityGroup: {
       transformer: 'gceSecurityGroupTransformer',
@@ -142,6 +144,7 @@ module(GOOGLE_MODULE, [
       detailsController: 'gceSecurityGroupDetailsCtrl',
       createSecurityGroupTemplateUrl: require('./securityGroup/configure/createSecurityGroup.html'),
       createSecurityGroupController: 'gceCreateSecurityGroupCtrl',
+      infra: SETTINGS.adHocInfraWritesGCEFirewall,
     },
     subnet: {
       renderer: 'gceSubnetRenderer',

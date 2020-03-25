@@ -1,6 +1,6 @@
 import { module } from 'angular';
 
-import { CloudProviderRegistry, DeploymentStrategyRegistry } from '@spinnaker/core';
+import { CloudProviderRegistry, DeploymentStrategyRegistry, SETTINGS } from '@spinnaker/core';
 
 import { AWS_LOAD_BALANCER_MODULE } from './loadBalancer/loadBalancer.module';
 import { AWS_FUNCTION_MODULE } from './function/function.module';
@@ -69,7 +69,6 @@ import { AMAZON_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER } from './instance/
 import { AMAZON_SEARCH_SEARCHRESULTFORMATTER } from './search/searchResultFormatter';
 import { AWS_EVALUATE_CLOUD_FORMATION_CHANGE_SET_EXECUTION_SERVICE } from './pipeline/stages/deployCloudFormation/evaluateCloudFormationChangeSetExecution.service';
 
-import { SETTINGS } from '@spinnaker/core';
 // load all templates into the $templateCache
 const templates = require.context('./', true, /\.html$/);
 templates.keys().forEach(function(key) {
