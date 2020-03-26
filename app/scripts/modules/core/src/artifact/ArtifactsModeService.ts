@@ -27,7 +27,7 @@ export enum ArtifactsMode {
 }
 
 export class ArtifactsModeService {
-  public static artifactsMode = ArtifactsModeService.getArtifactsMode();
+  public static readonly artifactsMode = ArtifactsModeService.getArtifactsMode();
 
   private static getArtifactsMode(): ArtifactsMode {
     if (SETTINGS.feature.artifactsRewrite === true) {
