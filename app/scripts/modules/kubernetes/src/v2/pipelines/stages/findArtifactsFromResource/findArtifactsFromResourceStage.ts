@@ -18,8 +18,7 @@ export const KUBERNETES_FIND_ARTIFACTS_FROM_RESOURCE_STAGE =
 const STAGE_NAME = 'Find Artifacts From Resource (Manifest)';
 module(KUBERNETES_FIND_ARTIFACTS_FROM_RESOURCE_STAGE, [KUBERNETES_MANIFEST_SELECTOR])
   .config(() => {
-    // TODO(mneterval): should be enabled for STANDARD as well
-    if (ArtifactsModeService.artifactsMode === ArtifactsMode.LEGACY) {
+    if (ArtifactsModeService.artifactsMode !== ArtifactsMode.DISABLED) {
       Registry.pipeline.registerStage({
         label: STAGE_NAME,
         description: 'Finds artifacts from a Kubernetes resource.',
