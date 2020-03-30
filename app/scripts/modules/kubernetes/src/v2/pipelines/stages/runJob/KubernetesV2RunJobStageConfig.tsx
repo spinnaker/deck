@@ -3,6 +3,8 @@ import Select, { Option } from 'react-select';
 import { map, capitalize } from 'lodash';
 
 import {
+  ArtifactsMode,
+  ArtifactsModeService,
   ArtifactTypePatterns,
   IStageConfigProps,
   AccountService,
@@ -10,7 +12,6 @@ import {
   yamlDocumentsToString,
   IAccount,
   StageArtifactSelector,
-  SETTINGS,
   IExpectedArtifact,
   IArtifact,
   PreRewriteStageArtifactSelector,
@@ -22,6 +23,7 @@ import {
 import { ManifestBasicSettings } from 'kubernetes/v2/manifest/wizard/BasicSettings';
 import { ManifestBindArtifactsSelectorDelegate } from '../deployManifest/ManifestBindArtifactsSelectorDelegate';
 import { IManifestBindArtifact } from '../deployManifest/ManifestBindArtifactsSelector';
+import { ManifestSource } from '../../../manifest/ManifestSource';
 
 export interface IKubernetesRunJobStageConfigState {
   credentials: IAccount[];
@@ -29,8 +31,6 @@ export interface IKubernetesRunJobStageConfigState {
 }
 
 export class KubernetesV2RunJobStageConfig extends React.Component<IStageConfigProps> {
-  public readonly textSource = 'text';
-  public readonly artifactSource = 'artifact';
   public state: IKubernetesRunJobStageConfigState = {
     credentials: [],
   };
@@ -49,7 +49,7 @@ export class KubernetesV2RunJobStageConfig extends React.Component<IStageConfigP
       stage.application = application.name;
     }
     if (!stage.source) {
-      stage.source = this.textSource;
+      stage.source = ManifestSource.TEXT;
     }
   }
 
@@ -137,10 +137,6 @@ export class KubernetesV2RunJobStageConfig extends React.Component<IStageConfigP
     this.props.updateStageField({ propertyFile: event.target.value });
   };
 
-  private checkFeatureFlag(flag: string): boolean {
-    return !!SETTINGS.feature[flag];
-  }
-
   public logSourceForm() {
     const { stage } = this.props;
     return (
@@ -189,7 +185,7 @@ export class KubernetesV2RunJobStageConfig extends React.Component<IStageConfigP
   }
 
   private getSourceOptions = (): Array<Option<string>> => {
-    return map([this.textSource, this.artifactSource], option => ({
+    return map([ManifestSource.TEXT, ManifestSource.ARTIFACT], option => ({
       label: capitalize(option),
       value: option,
     }));
@@ -210,20 +206,22 @@ export class KubernetesV2RunJobStageConfig extends React.Component<IStageConfigP
   };
 
   public render() {
-    const { application, stage } = this.props;
+    const { stage } = this.props;
 
     let outputSource = <div />;
     if (stage.consumeArtifactSource === 'propertyFile') {
       outputSource = this.logSourceForm();
     } else if (stage.consumeArtifactSource === 'artifact') {
-      outputSource = this.checkFeatureFlag('artifactsRewrite') ? this.artifactRewriteForm() : this.artifactForm();
+      outputSource =
+        ArtifactsModeService.artifactsMode === ArtifactsMode.STANDARD
+          ? this.artifactRewriteForm()
+          : this.artifactForm();
     }
 
     return (
       <div className="container-fluid form-horizontal">
         <h4>Basic Settings</h4>
         <ManifestBasicSettings
-          app={application}
           selectedAccount={stage.account || ''}
           accounts={this.state.credentials}
           onAccountSelect={(selectedAccount: string) => this.accountChanged(selectedAccount)}
@@ -236,10 +234,10 @@ export class KubernetesV2RunJobStageConfig extends React.Component<IStageConfigP
             value={stage.source}
           />
         </StageConfigField>
-        {stage.source === this.textSource && (
+        {stage.source === ManifestSource.TEXT && (
           <YamlEditor value={this.state.rawManifest} onChange={this.handleRawManifestChange} />
         )}
-        {stage.source === this.artifactSource && (
+        {stage.source === ManifestSource.ARTIFACT && (
           <>
             <StageArtifactSelectorDelegate
               artifact={stage.manifestArtifact}

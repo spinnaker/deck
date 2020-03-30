@@ -1,7 +1,7 @@
 'use strict';
 
 import { module } from 'angular';
-import { defaults, filter } from 'lodash';
+import { defaults, filter, flatMap } from 'lodash';
 import { getAllTargetGroups, applyHealthCheckInfoToTargetGroups } from '@spinnaker/amazon';
 
 import {
@@ -64,7 +64,7 @@ module(TITUS_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
 
       // augment with target group healthcheck data
       const targetGroups = getAllTargetGroups(app.loadBalancers.data);
-      applyHealthCheckInfoToTargetGroups(displayableMetrics, targetGroups);
+      applyHealthCheckInfoToTargetGroups(displayableMetrics, targetGroups, instance.account);
 
       // backfill details where applicable
       if (latest.health) {
@@ -98,6 +98,7 @@ module(TITUS_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
       });
 
       if (instanceSummary && account && region) {
+        instanceSummary.account = account;
         extraData.account = account;
         extraData.region = region;
         RecentHistoryService.addExtraDataToLatest('instances', extraData);
@@ -120,6 +121,16 @@ module(TITUS_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
             $scope.instance.titusUiEndpoint = this.titusUiEndpoint;
             if (overrides.instanceDetailsLoaded) {
               overrides.instanceDetailsLoaded();
+            }
+
+            // Network interfaces are needed for any IPv6 addresses.
+            return InstanceReader.getInstanceDetails(accountDetails.environment, region, instanceDetails.agentId);
+          })
+          .then(instance => {
+            if (instance && instance.networkInterfaces) {
+              $scope.instance.ipv6Addresses = flatMap(instance.networkInterfaces, i =>
+                i.ipv6Addresses.map(a => a.ipv6Address),
+              );
             }
           }, autoClose);
       }

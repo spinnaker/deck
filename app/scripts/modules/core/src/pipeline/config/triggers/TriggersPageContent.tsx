@@ -3,10 +3,10 @@ import React from 'react';
 import { findIndex } from 'lodash';
 
 import { Application } from 'core/application';
-import { ArtifactReferenceService } from 'core/artifact/ArtifactReferenceService';
+import { ArtifactReferenceService, ArtifactsMode, ArtifactsModeService } from 'core/artifact';
 import { IExpectedArtifact, IPipeline, ITrigger } from 'core/domain';
 import { HelpField } from 'core/help';
-import { PipelineConfigValidator } from 'core/pipeline';
+import { PipelineConfigValidator } from '../validation/PipelineConfigValidator';
 import { CheckboxInput, FormField } from 'core/presentation';
 import { Registry } from 'core/registry';
 import { SETTINGS } from 'core/config/settings';
@@ -65,15 +65,15 @@ export function TriggersPageContent(props: ITriggersPageContentProps) {
     updatedTriggers[index] = updatedTrigger;
     PipelineConfigValidator.validatePipeline(pipeline);
     updatePipelineConfig({ triggers: updatedTriggers });
-    if (SETTINGS.feature['artifactsRewrite']) {
+    if (ArtifactsModeService.artifactsMode === ArtifactsMode.STANDARD) {
       removeUnusedExpectedArtifacts(pipeline);
     }
   }
 
   // Expected Artifacts
-  function updateExpectedArtifacts(e: IExpectedArtifact[]) {
-    setExpectedArtifacts(e);
-    updatePipelineConfig({ expectedArtifacts });
+  function updateExpectedArtifacts(updatedExpectedArtifacts: IExpectedArtifact[]) {
+    setExpectedArtifacts(updatedExpectedArtifacts);
+    updatePipelineConfig({ expectedArtifacts: updatedExpectedArtifacts });
   }
 
   function removeUnusedExpectedArtifacts(pipelineParam: IPipeline) {
@@ -87,11 +87,10 @@ export function TriggersPageContent(props: ITriggersPageContentProps) {
           findIndex(newExpectedArtifacts, e => e.id === expectedArtifact.id),
           1,
         );
+        ArtifactReferenceService.removeReferenceFromStages(expectedArtifact.id, pipelineParam.stages);
       }
-      ArtifactReferenceService.removeReferenceFromStages(expectedArtifact.id, pipelineParam.stages);
     });
-    setExpectedArtifacts(newExpectedArtifacts);
-    updatePipelineConfig({ expectedArtifacts });
+    updateExpectedArtifacts(newExpectedArtifacts);
   }
 
   return (

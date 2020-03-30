@@ -3,10 +3,11 @@ import ReactGA from 'react-ga';
 import classNames from 'classnames';
 import { UISref } from '@uirouter/react';
 
-import { HoverablePopover, IHoverablePopoverContentsProps } from 'core/presentation';
+import { HoverablePopover, IHoverablePopoverContentsProps, showModal } from 'core/presentation';
 import { IManagedResourceSummary, ManagedResourceStatus } from 'core/domain';
 import { Application } from 'core/application';
 
+import { ManagedResourceHistoryModal } from './ManagedResourceHistoryModal';
 import { toggleResourcePause } from './toggleResourceManagement';
 
 import './ManagedResourceStatusIndicator.less';
@@ -27,11 +28,8 @@ const viewConfigurationByStatus: { [status in ManagedResourceStatus]: IViewConfi
           <b>Action is being taken to resolve a drift from the declarative configuration.</b>
         </p>
         <p>
-          Check the{' '}
-          <UISref to="home.applications.application.tasks">
-            <a>tasks view</a>
-          </UISref>{' '}
-          to see work that's in progress. <LearnMoreLink resourceSummary={resourceSummary} />
+          Check this resource's History to see details and track the work currently in progress.{' '}
+          <LearnMoreLink resourceSummary={resourceSummary} />
         </p>
       </>
     ),
@@ -61,8 +59,8 @@ const viewConfigurationByStatus: { [status in ManagedResourceStatus]: IViewConfi
           <b>A drift from the declarative configuration was detected.</b>
         </p>
         <p>
-          Spinnaker will automatically take action to bring this resource back to its desired state.{' '}
-          <LearnMoreLink resourceSummary={resourceSummary} />
+          Spinnaker will automatically take action to bring this resource back to its desired state. Check the History
+          to see details and track progress. <LearnMoreLink resourceSummary={resourceSummary} />
         </p>
       </>
     ),
@@ -77,8 +75,8 @@ const viewConfigurationByStatus: { [status in ManagedResourceStatus]: IViewConfi
         </p>
         <p>
           Spinnaker is configured to continuously manage this resource, but something went wrong trying to check its
-          current state. Automatic action can't be taken right now, and manual intervention might be required.{' '}
-          <LearnMoreLink resourceSummary={resourceSummary} />
+          current state. Automatic action can't be taken right now, and manual intervention might be required. Check the
+          History for details. <LearnMoreLink resourceSummary={resourceSummary} />
         </p>
       </>
     ),
@@ -147,7 +145,8 @@ const viewConfigurationByStatus: { [status in ManagedResourceStatus]: IViewConfi
         </p>
         <p>
           Spinnaker has been trying to correct a detected drift, but taking automatic action hasn't helped. Manual
-          intervention might be required. <LearnMoreLink resourceSummary={resourceSummary} />
+          intervention might be required. Check the History for details.{' '}
+          <LearnMoreLink resourceSummary={resourceSummary} />
         </p>
       </>
     ),
@@ -180,13 +179,13 @@ const LearnMoreLink = ({ resourceSummary }: { resourceSummary: IManagedResourceS
   <a
     target="_blank"
     onClick={() => logClick('Status docs link', resourceSummary.id, resourceSummary.status)}
-    href={`https://www.spinnaker.io/reference/managed-delivery/resource-status/#${resourceSummary.status.toLowerCase()}`}
+    href={`https://www.spinnaker.io/guides/user/managed-delivery/resource-status/#${resourceSummary.status.toLowerCase()}`}
   >
     Learn more
   </a>
 );
 
-const PopoverLinks = ({
+const PopoverActions = ({
   resourceSummary,
   application,
   hidePopover,
@@ -194,31 +193,47 @@ const PopoverLinks = ({
   resourceSummary: IManagedResourceSummary;
   application: Application;
   hidePopover: () => void;
-}) => (
-  <div className="horizontal right">
-    {!resourceSummary.isPaused && (
-      <p className="sp-margin-m-top sp-margin-xs-bottom">
-        <button className="passive" onClick={() => toggleResourcePause(resourceSummary, application, hidePopover)}>
-          <i className="fa fa-pause" /> Pause management of this resource
-        </button>
+}) => {
+  const historyButton = (
+    <button
+      className="passive flex-none"
+      onClick={() => {
+        hidePopover();
+        showModal(ManagedResourceHistoryModal, { resourceSummary });
+      }}
+    >
+      <i className="fa fa-history" /> History
+    </button>
+  );
+  return (
+    <div className="horizontal right">
+      <p className="flex-container-h middle sp-margin-m-top sp-margin-xs-bottom sp-group-margin-s-xaxis">
+        {historyButton}
+        {!resourceSummary.isPaused && (
+          <button
+            className="passive flex-none"
+            onClick={() => toggleResourcePause(resourceSummary, application, hidePopover)}
+          >
+            <i className="fa fa-pause" /> Pause management of this resource
+          </button>
+        )}
+        {resourceSummary.isPaused && !application.isManagementPaused && (
+          <button
+            className="passive flex-none"
+            onClick={() => toggleResourcePause(resourceSummary, application, hidePopover)}
+          >
+            <i className="fa fa-play" /> Resume management of this resource
+          </button>
+        )}
+        {application.isManagementPaused && (
+          <UISref to="home.applications.application.config" params={{ section: 'managed-resources' }}>
+            <a>Resume application management</a>
+          </UISref>
+        )}
       </p>
-    )}
-    {resourceSummary.isPaused && !application.isManagementPaused && (
-      <p className="sp-margin-m-top sp-margin-xs-bottom">
-        <button className="passive" onClick={() => toggleResourcePause(resourceSummary, application, hidePopover)}>
-          <i className="fa fa-play" /> Resume management of this resource
-        </button>
-      </p>
-    )}
-    {application.isManagementPaused && (
-      <p>
-        <UISref to="home.applications.application.config" params={{ section: 'managed-resources' }}>
-          <a>Resume application management</a>
-        </UISref>
-      </p>
-    )}
-  </div>
-);
+    </div>
+  );
+};
 
 export interface IManagedResourceStatusIndicatorProps {
   shape: 'square' | 'circle';
@@ -232,10 +247,11 @@ export const ManagedResourceStatusIndicator = ({
   application,
 }: IManagedResourceStatusIndicatorProps) => {
   const { status } = resourceSummary;
+
   const PopoverContents = ({ hidePopover }: IHoverablePopoverContentsProps) => (
     <>
       {viewConfigurationByStatus[status].popoverContents(resourceSummary, application)}
-      <PopoverLinks resourceSummary={resourceSummary} application={application} hidePopover={hidePopover} />
+      <PopoverActions resourceSummary={resourceSummary} application={application} hidePopover={hidePopover} />
     </>
   );
   return (

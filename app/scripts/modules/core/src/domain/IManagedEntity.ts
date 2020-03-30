@@ -22,15 +22,121 @@ export interface IManagedResourceSummary {
     account: string;
     regions: Array<{ name: string }>;
   };
+  artifact?: {
+    name: string;
+    type: string;
+  };
 }
 
-export interface IManagedApplicationSummary {
+export interface IManagedEnviromentSummary {
+  name: string;
+  resources: string[];
+  artifacts: Array<{
+    name: string;
+    type: string;
+    statuses: string[];
+    versions: {
+      current?: string;
+      deploying?: string;
+      pending: string[];
+      approved: string[];
+      previous: string[];
+      vetoed: string[];
+    };
+  }>;
+}
+
+export interface IManagedArtifactVersion {
+  version: string;
+  environments: Array<{
+    name: string;
+    state: 'current' | 'deploying' | 'approved' | 'pending' | 'previous' | 'vetoed';
+    deployedAt?: string;
+    replacedAt?: string;
+    replacedBy?: string;
+  }>;
+}
+
+export interface IManagedArtifactSummary {
+  name: string;
+  type: string;
+  versions: IManagedArtifactVersion[];
+}
+
+interface IManagedApplicationEntities {
+  resources: IManagedResourceSummary[];
+  environments: IManagedEnviromentSummary[];
+  artifacts: IManagedArtifactSummary[];
+}
+
+export type IManagedApplicationEnvironmentSummary = IManagedApplicationSummary<
+  'resources' | 'artifacts' | 'environments'
+>;
+
+export type IManagedApplicationSummary<T extends keyof IManagedApplicationEntities = 'resources'> = Pick<
+  IManagedApplicationEntities,
+  T
+> & {
   applicationPaused: boolean;
   hasManagedResources: boolean;
-  resources: IManagedResourceSummary[];
-}
+};
 
 export interface IManagedResource {
   managedResourceSummary?: IManagedResourceSummary;
   isManaged?: boolean;
 }
+
+export enum ManagedResourceEventType {
+  ResourceCreated = 'ResourceCreated',
+  ResourceUpdated = 'ResourceUpdated',
+  ResourceDeleted = 'ResourceDeleted',
+  ResourceMissing = 'ResourceMissing',
+  ResourceValid = 'ResourceValid',
+  ResourceDeltaDetected = 'ResourceDeltaDetected',
+  ResourceDeltaResolved = 'ResourceDeltaResolved',
+  ResourceActuationLaunched = 'ResourceActuationLaunched',
+  ResourceCheckError = 'ResourceCheckError',
+  ResourceCheckUnresolvable = 'ResourceCheckUnresolvable',
+  ResourceActuationPaused = 'ResourceActuationPaused',
+  ResourceActuationResumed = 'ResourceActuationResumed',
+}
+
+export interface IManagedResourceDiff {
+  [fieldName: string]: {
+    key: string;
+    diffType: 'CHANGED' | 'ADDED' | 'REMOVED';
+    desired?: string;
+    actual?: string;
+    fields: IManagedResourceDiff;
+  };
+}
+
+export interface IManagedResourceEvent {
+  type: ManagedResourceEventType;
+  kind: string;
+  id: string;
+  application: string;
+  timestamp: string;
+  plugin?: string;
+  tasks?: Array<{ id: string; name: string }>;
+  delta?: IManagedResourceDiff;
+  // We really should not have 3 different versions of basically
+  // the same field, but right now we do.
+  message?: string;
+  reason?: string;
+  exceptionMessage?: string;
+}
+
+export type IManagedResourceEventHistory = IManagedResourceEvent[];
+
+export type IManagedResourceEventHistoryResponse = Array<
+  Omit<IManagedResourceEvent, 'delta'> & {
+    delta?: {
+      [key: string]: {
+        state: 'CHANGED' | 'ADDED' | 'REMOVED';
+        desired: string;
+        current: string;
+      };
+    };
+  }
+>;

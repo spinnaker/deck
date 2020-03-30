@@ -26,12 +26,23 @@ export function ManualExecutionBakeManifest(props: ITriggerTemplateComponentProp
     props.updateCommand('extraFields.artifacts', updatedArtifacts);
   };
 
+  React.useEffect(() => {
+    if (overrideArtifact === false) {
+      removeHelmArtifact();
+    } else {
+      updateHelmArtifact(defaultArtifact);
+    }
+  }, [overrideArtifact]);
+
   /*
   Only allow manual override of a helm chart artifact when there is exactly one Helm
   Bake (Manifest) stage and exactly one artifact of type `helm/chart`.
    */
   const bakeManifestStages = props.command.pipeline.stages.filter(stage => stage.type === BAKE_MANIFEST_STAGE_KEY);
-  if (bakeManifestStages.length !== 1 || bakeManifestStages[0].templateRenderer !== 'HELM2') {
+  if (
+    bakeManifestStages.length !== 1 ||
+    (bakeManifestStages[0].templateRenderer !== 'HELM2' && bakeManifestStages[0].templateRenderer !== 'HELM3')
+  ) {
     return null;
   }
   const expectedArtifacts = props.command.pipeline.expectedArtifacts || [];
@@ -47,14 +58,6 @@ export function ManualExecutionBakeManifest(props: ITriggerTemplateComponentProp
     ...expectedHelmArtifacts[0].matchArtifact,
     version: null,
   };
-
-  React.useEffect(() => {
-    if (overrideArtifact === false) {
-      removeHelmArtifact();
-    } else {
-      updateHelmArtifact(defaultArtifact);
-    }
-  }, [overrideArtifact]);
 
   return (
     <>

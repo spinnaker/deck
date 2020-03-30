@@ -20,7 +20,7 @@ import {
 import { Spinner } from 'core/widgets/spinners/Spinner';
 import { IPipelineTemplateV2 } from 'core/domain/IPipelineTemplateV2';
 import { PipelineConfigService } from '../config/services/PipelineConfigService';
-import { PipelineTemplateV2Service } from 'core/pipeline';
+import { PipelineTemplateV2Service } from '../config/templates/v2/pipelineTemplateV2.service';
 
 import { TemplateDescription } from './TemplateDescription';
 import { ManagedTemplateSelector } from './ManagedTemplateSelector';
@@ -89,6 +89,7 @@ export class CreatePipelineModal extends React.Component<ICreatePipelineModalPro
       application: this.props.application.name,
       limitConcurrent: true,
       keepWaitingPipelines: false,
+      spelEvaluator: 'v4',
     };
   }
 

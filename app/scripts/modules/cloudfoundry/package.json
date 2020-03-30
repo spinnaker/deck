@@ -1,6 +1,6 @@
 {
   "name": "@spinnaker/cloudfoundry",
-  "version": "0.0.93",
+  "version": "0.0.95",
   "main": "lib/lib.js",
   "typings": "lib/index.d.ts",
   "scripts": {
