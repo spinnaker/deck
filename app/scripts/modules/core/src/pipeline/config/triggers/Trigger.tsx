@@ -189,7 +189,9 @@ function TriggerForm(triggerFormProps: ITriggerProps & { formik: FormikProps<ITr
             label=""
             value={trigger.enabled}
             onChange={() => formik.setFieldValue('enabled', !trigger.enabled)}
-            input={props => <CheckboxInput {...props} text="Trigger Enabled" />}
+            input={props => (
+              <CheckboxInput {...props} inputClassName="enable-trigger-checkbox" text="Trigger Enabled" />
+            )}
           />
         )}
       </div>
