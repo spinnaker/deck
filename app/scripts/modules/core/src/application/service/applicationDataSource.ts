@@ -65,6 +65,11 @@ export interface IDataSourceConfig<T> {
   icon?: string;
 
   /**
+   * Represents the name of the svg to be used with the svg loader (Icon.tsx)
+   */
+  iconSvg?: string;
+
+  /**
    * unique value for this data source; the data source will be available on the Application directly via this key,
    * e.g. if the key is "serverGroups", you can access the data source via application.serverGroups
    */
@@ -195,6 +200,7 @@ export class ApplicationDataSource<T = any> implements IDataSourceConfig<T> {
   public credentialsField: string;
   public description: string;
   public icon: string;
+  public iconSvg: string;
   public key: string;
   public label: string;
   public category: string;

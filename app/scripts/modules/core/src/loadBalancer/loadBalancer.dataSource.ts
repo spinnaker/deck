@@ -32,6 +32,7 @@ module(LOAD_BALANCER_DATA_SOURCE, [LOAD_BALANCER_READ_SERVICE]).run([
       category: INFRASTRUCTURE_KEY,
       optional: true,
       icon: 'fa fa-xs fa-fw icon-sitemap',
+      iconSvg: 'spMenuLoadBalancers',
       loader: loadLoadBalancers,
       onLoad: addLoadBalancers,
       afterLoad: addTags,

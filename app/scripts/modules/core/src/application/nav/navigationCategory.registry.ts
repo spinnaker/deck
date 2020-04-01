@@ -4,6 +4,7 @@ export interface INavigationCategory {
   key: string;
   label: string;
   icon?: string;
+  iconSvg?: string;
   primary: boolean;
   order: number;
 }
