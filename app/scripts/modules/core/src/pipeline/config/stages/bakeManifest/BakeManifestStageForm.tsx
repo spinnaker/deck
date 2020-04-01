@@ -1,7 +1,8 @@
 import React from 'react';
 
+import { ExpectedArtifactService } from 'core/artifact';
 import { SETTINGS } from 'core/config';
-import { IPipeline } from 'core/domain';
+import { IExpectedArtifact, IPipeline } from 'core/domain';
 import { ReactSelectInput } from 'core/presentation';
 
 import { StageConfigField } from '../common';
@@ -9,6 +10,7 @@ import { IFormikStageConfigInjectedProps } from '../FormikStageConfig';
 import { BakeKustomizeConfigForm } from './kustomize/BakeKustomizeConfigForm';
 import { BakeHelmConfigForm } from './helm/BakeHelmConfigForm';
 import { ManifestRenderers, HELM_RENDERERS } from './ManifestRenderers';
+import { BASE_64_ARTIFACT_ACCOUNT, BASE_64_ARTIFACT_TYPE } from '../../triggers/artifacts/base64/base64.artifact';
 
 interface IBakeManifestStageFormProps {
   updatePipeline: (pipeline: IPipeline) => void;
@@ -21,6 +23,16 @@ export function BakeManifestStageForm({
   updatePipeline,
 }: IBakeManifestStageFormProps & IFormikStageConfigInjectedProps) {
   const stage = formik.values;
+
+  React.useEffect(() => {
+    if (!validateProducedArtifacts(stage.expectedArtifacts)) {
+      const defaultProducedArtifact = ExpectedArtifactService.createEmptyArtifact();
+      defaultProducedArtifact.matchArtifact.type = BASE_64_ARTIFACT_TYPE;
+      defaultProducedArtifact.matchArtifact.artifactAccount = BASE_64_ARTIFACT_ACCOUNT;
+      defaultProducedArtifact.matchArtifact.customKind = false;
+      formik.setFieldValue('expectedArtifacts', [defaultProducedArtifact]);
+    }
+  }, []);
 
   const templateRenderers = React.useMemo(() => {
     const renderers = [...HELM_RENDERERS];
@@ -67,4 +79,8 @@ export function BakeManifestStageForm({
       </div>
     </div>
   );
+}
+
+export function validateProducedArtifacts(artifacts: IExpectedArtifact[]): boolean {
+  return artifacts?.length === 1 && artifacts[0]?.matchArtifact?.type === BASE_64_ARTIFACT_TYPE;
 }
