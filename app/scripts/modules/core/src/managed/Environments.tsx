@@ -26,13 +26,16 @@ interface IEnvironmentsProps {
   app: Application;
 }
 
+const defaultGettingStartedUrl = 'https://www.spinnaker.io/guides/user/managed-delivery/getting-started/';
+
 export function Environments({ app }: IEnvironmentsProps) {
   const dataSource: ApplicationDataSource<IManagedApplicationEnvironmentSummary> = app.getDataSource('environments');
   const {
     data: { environments, artifacts, resources, hasManagedResources },
+    status,
     loaded,
-    loadFailure,
   } = useDataSource(dataSource);
+  const loadFailure = status === 'ERROR';
 
   const [selectedArtifact, setSelectedArtifact] = useState<ISelectedArtifact>();
   const [isFiltersOpen] = useState(false);
@@ -73,9 +76,7 @@ export function Environments({ app }: IEnvironmentsProps) {
   }
 
   const unmanaged = loaded && !hasManagedResources;
-  const gettingStartedLink =
-    (SETTINGS.managedDelivery && SETTINGS.managedDelivery.gettingStarted) ||
-    'https://www.spinnaker.io/guides/user/managed-delivery/getting-started/';
+  const gettingStartedLink = SETTINGS.managedDelivery?.gettingStartedUrl || defaultGettingStartedUrl;
   if (unmanaged) {
     return (
       <div style={{ width: '100%' }}>
