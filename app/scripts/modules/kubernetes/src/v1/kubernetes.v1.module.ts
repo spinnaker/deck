@@ -112,7 +112,7 @@ module(KUBERNETES_V1_MODULE, [
       detailsController: 'kubernetesLoadBalancerDetailsController',
       createLoadBalancerTemplateUrl: require('./loadBalancer/configure/wizard/createWizard.html'),
       createLoadBalancerController: 'kubernetesUpsertLoadBalancerController',
-      infra: SETTINGS.adHocInfraWritesK8sLoadBalancer,
+      infra: SETTINGS.adHocInfraWrites,
     },
     securityGroup: {
       reader: KubernetesSecurityGroupReader,
@@ -121,7 +121,7 @@ module(KUBERNETES_V1_MODULE, [
       detailsController: 'kubernetesSecurityGroupDetailsController',
       createSecurityGroupTemplateUrl: require('./securityGroup/configure/wizard/createWizard.html'),
       createSecurityGroupController: 'kubernetesUpsertSecurityGroupController',
-      infra: SETTINGS.adHocInfraWritesK8sFirewall,
+      infra: SETTINGS.adHocInfraWrites,
     },
     serverGroup: {
       artifactExtractor: 'kubernetesServerGroupArtifactExtractor',
@@ -134,7 +134,7 @@ module(KUBERNETES_V1_MODULE, [
       commandBuilder: 'kubernetesServerGroupCommandBuilder',
       configurationService: 'kubernetesServerGroupConfigurationService',
       paramsMixin: 'kubernetesServerGroupParamsMixin',
-      infra: SETTINGS.adHocInfraWritesK8sCluster,
+      infra: SETTINGS.adHocInfraWrites,
     },
     unsupportedStageTypes: [
       'scaleManifest',

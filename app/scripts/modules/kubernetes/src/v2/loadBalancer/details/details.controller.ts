@@ -47,7 +47,7 @@ class KubernetesLoadBalancerDetailsController implements IController {
         this.$scope.$on('$destroy', () => {
           unsubscribe();
         });
-        this.$scope.isDisabled = !SETTINGS.adHocInfraWritesK8sLoadBalancer;
+        this.$scope.isDisabled = !SETTINGS.adHocInfraWrites;
       });
   }
 

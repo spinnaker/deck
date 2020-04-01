@@ -136,15 +136,7 @@ export interface ISpinnakerSettings {
   searchVersion: 1 | 2;
   triggerTypes: string[];
   useClassicFirewallLabels: boolean;
-  adHocInfraWritesK8sCluster: boolean;
-  adHocInfraWritesK8sLoadBalancer: boolean;
-  adHocInfraWritesK8sFirewall: boolean;
-  adHocInfraWritesAWSCluster: boolean;
-  adHocInfraWritesAWSLoadBalancer: boolean;
-  adHocInfraWritesAWSFirewall: boolean;
-  adHocInfraWritesGCECluster: boolean;
-  adHocInfraWritesGCELoadBalancer: boolean;
-  adHocInfraWritesGCEFirewall: boolean;
+  adHocInfraWrites: boolean;
 }
 
 export const SETTINGS: ISpinnakerSettings = (window as any).spinnakerSettings;

@@ -1,6 +1,6 @@
 import { module } from 'angular';
 
-import { CloudProviderRegistry, DeploymentStrategyRegistry, SETTINGS } from '@spinnaker/core';
+import { CloudProviderRegistry, DeploymentStrategyRegistry } from '@spinnaker/core';
 
 import { AWS_LOAD_BALANCER_MODULE } from './loadBalancer/loadBalancer.module';
 import { AWS_FUNCTION_MODULE } from './function/function.module';
@@ -138,7 +138,6 @@ module(AMAZON_MODULE, [
       commandBuilder: 'awsServerGroupCommandBuilder',
       configurationService: 'awsServerGroupConfigurationService',
       scalingActivitiesEnabled: true,
-      infra: SETTINGS.adHocInfraWritesAWSCluster,
     },
     instance: {
       instanceTypeService: 'awsInstanceTypeService',
@@ -154,7 +153,6 @@ module(AMAZON_MODULE, [
       targetGroupDetailsController: 'awsTargetGroupDetailsCtrl',
       ClusterContainer: AmazonLoadBalancerClusterContainer,
       LoadBalancersTag: AmazonLoadBalancersTag,
-      infra: SETTINGS.adHocInfraWritesAWSLoadBalancer,
     },
     function: {
       details: AmazonFunctionDetails,
@@ -168,7 +166,6 @@ module(AMAZON_MODULE, [
       detailsController: 'awsSecurityGroupDetailsCtrl',
       createSecurityGroupTemplateUrl: require('./securityGroup/configure/createSecurityGroup.html'),
       createSecurityGroupController: 'awsCreateSecurityGroupCtrl',
-      infra: SETTINGS.adHocInfraWritesAWSFirewall,
     },
     subnet: {
       renderer: 'awsSubnetRenderer',

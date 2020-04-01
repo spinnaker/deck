@@ -11,7 +11,6 @@ import { SKIN_SELECTION_SERVICE } from 'core/cloudProvider/skinSelection/skinSel
 
 import { CLUSTER_FILTER } from './filter/clusterFilter.component';
 import { FILTER_TAGS_COMPONENT } from '../filterModel/filterTags.component';
-
 import './rollups.less';
 import { CORE_ACCOUNT_ACCOUNT_MODULE } from '../account/account.module';
 import { CORE_UTILS_WAYPOINTS_WAYPOINTCONTAINER_DIRECTIVE } from '../utils/waypoints/waypointContainer.directive';
@@ -49,19 +48,7 @@ module(CORE_CLUSTER_ALLCLUSTERS_CONTROLLER, [
       this.application = app;
 
       $scope.sortFilter = ClusterState.filterModel.sortFilter;
-      $scope.isDisabled = true;
-      const BreakException = {};
-      try {
-        app.attributes.cloudProviders.forEach(element => {
-          const provider = CloudProviderRegistry.getValue(element, 'serverGroup');
-          if (provider.infra) {
-            $scope.isDisabled = false;
-            throw BreakException;
-          }
-        });
-      } catch (e) {
-        if (e !== BreakException) throw e;
-      }
+      $scope.isDisabled = ProviderSelectionService.isDisabled(app, 'serverGroup');
       this.createLabel = 'Create Server Group';
 
       app

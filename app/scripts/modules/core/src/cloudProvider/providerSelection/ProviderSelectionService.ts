@@ -34,7 +34,13 @@ export class ProviderSelectionService {
           .map(a => {
             const provider = CloudProviderRegistry.getValue(a.cloudProvider, feature, a.skin);
             const providerFeature = CloudProviderRegistry.getProvider(a.cloudProvider)[feature] || {};
-            return provider.infra ? providerFeature.useProvider || a.cloudProvider : null;
+            if (a.cloudProvider === 'kubernetes') {
+              if (typeof provider.infra !== 'undefined' && provider.infra) {
+                return providerFeature.useProvider || a.cloudProvider;
+              }
+            } else {
+              return providerFeature.useProvider || a.cloudProvider;
+            }
           })
           .filter(a => {
             return a != null;
@@ -51,5 +57,27 @@ export class ProviderSelectionService {
       }
       return provider;
     });
+  }
+
+  public static isDisabled(app: Application, feature: string): boolean {
+    let isDisabled = true;
+    const BreakException = {};
+    try {
+      app.attributes.cloudProviders.forEach((element: any) => {
+        const provider = CloudProviderRegistry.getValue(element, feature);
+        if (element === 'kubernetes') {
+          if (typeof provider.infra !== 'undefined' && provider.infra) {
+            isDisabled = false;
+            throw BreakException;
+          }
+        } else {
+          isDisabled = false;
+          throw BreakException;
+        }
+      });
+    } catch (e) {
+      if (e !== BreakException) throw e;
+    }
+    return isDisabled;
   }
 }

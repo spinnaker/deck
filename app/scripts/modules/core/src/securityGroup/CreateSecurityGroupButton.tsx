@@ -6,7 +6,6 @@ import { ModalInjector, ReactInjector } from 'core/reactShims';
 import { Tooltip } from 'core/presentation';
 import { IAccountDetails } from 'core/account';
 import { SETTINGS } from 'core/config/settings';
-
 import { FirewallLabels } from './label/FirewallLabels';
 
 const providerFilterFn = (_application: Application, _account: IAccountDetails, provider: ICloudProviderConfig) => {
@@ -66,20 +65,7 @@ export const CreateSecurityGroupButton = ({ app }: { app: Application }) => {
       });
     });
   };
-  let isDisabled = true;
-  const BreakException = {};
-  try {
-    app.attributes.cloudProviders.forEach((element: any) => {
-      const provider = CloudProviderRegistry.getValue(element, 'securityGroup');
-      if (provider.infra) {
-        isDisabled = false;
-        throw BreakException;
-      }
-    });
-  } catch (e) {
-    if (e !== BreakException) throw e;
-  }
-  if (!isDisabled) {
+  if (!ProviderSelectionService.isDisabled(app, 'securityGroup')) {
     return (
       <div>
         <button className="btn btn-sm btn-default" onClick={createSecurityGroup}>

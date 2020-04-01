@@ -48,7 +48,7 @@ class KubernetesServerGroupManagerDetailsController implements IController {
       this.extractServerGroupManager(serverGroupManager);
       this.state.loading = false;
     });
-    this.$scope.isDisabled = !SETTINGS.adHocInfraWritesK8sCluster;
+    this.$scope.isDisabled = !SETTINGS.adHocInfraWrites;
   }
 
   public pauseRolloutServerGroupManager(): void {

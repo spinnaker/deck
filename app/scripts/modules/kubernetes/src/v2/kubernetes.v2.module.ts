@@ -109,7 +109,7 @@ module(KUBERNETES_V2_MODULE, [
       detailsController: 'kubernetesV2ServerGroupDetailsCtrl',
       detailsTemplateUrl: require('./serverGroup/details/details.html'),
       transformer: 'kubernetesV2ServerGroupTransformer',
-      infra: SETTINGS.adHocInfraWritesK8sCluster,
+      infra: SETTINGS.adHocInfraWrites,
     },
     serverGroupManager: {
       detailsTemplateUrl: require('./serverGroupManager/details/details.html'),
@@ -120,7 +120,7 @@ module(KUBERNETES_V2_MODULE, [
       detailsController: 'kubernetesV2LoadBalancerDetailsCtrl',
       detailsTemplateUrl: require('./loadBalancer/details/details.html'),
       transformer: 'kubernetesV2LoadBalancerTransformer',
-      infra: SETTINGS.adHocInfraWritesK8sLoadBalancer,
+      infra: SETTINGS.adHocInfraWrites,
     },
     securityGroup: {
       reader: KubernetesSecurityGroupReader,
@@ -128,7 +128,7 @@ module(KUBERNETES_V2_MODULE, [
       detailsController: 'kubernetesV2SecurityGroupDetailsCtrl',
       detailsTemplateUrl: require('./securityGroup/details/details.html'),
       transformer: 'kubernetesV2SecurityGroupTransformer',
-      infra: SETTINGS.adHocInfraWritesK8sFirewall,
+      infra: SETTINGS.adHocInfraWrites,
     },
     instance: {
       detailsController: 'kubernetesV2InstanceDetailsCtrl',

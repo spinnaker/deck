@@ -36,7 +36,7 @@ class KubernetesSecurityGroupDetailsController implements IController {
   ) {
     this.securityGroupFromParams = resolvedSecurityGroup;
     this.extractSecurityGroup();
-    this.$scope.isDisabled = !SETTINGS.adHocInfraWritesK8sFirewall;
+    this.$scope.isDisabled = !SETTINGS.adHocInfraWrites;
   }
 
   public deleteSecurityGroup(): void {

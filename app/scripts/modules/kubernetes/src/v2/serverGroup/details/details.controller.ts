@@ -56,7 +56,7 @@ class KubernetesServerGroupDetailsController implements IController {
       .catch(() => this.autoClose());
 
     this.app.getDataSource('serverGroups').onRefresh(this.$scope, () => this.extractServerGroup(serverGroup));
-    this.$scope.isDisabled = !SETTINGS.adHocInfraWritesK8sCluster;
+    this.$scope.isDisabled = !SETTINGS.adHocInfraWrites;
   }
 
   private ownerReferences(): any[] {
