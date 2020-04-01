@@ -5,6 +5,10 @@ import { ApplicationDataSource, IFetchStatus } from '../../application';
 
 export interface IDataSourceResult<T> extends IFetchStatus {
   data: T;
+  status: IFetchStatus;
+  loaded: boolean;
+  loading: boolean;
+  loadFailure: boolean;
   refresh: () => void;
 }
 
