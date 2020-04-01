@@ -62,7 +62,7 @@ module(MANAGED_RESOURCES_DATA_SOURCE, []).run([
       optIn: true,
       hidden: true,
       icon: 'fa fa-fw fa-xs fa-code-branch',
-      iconSvg: 'spCIBranch',
+      iconName: 'spCIBranch',
       loader: loadEnvironments,
       onLoad: addEnvironments,
       defaultData: {

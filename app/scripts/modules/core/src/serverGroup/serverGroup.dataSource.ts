@@ -46,7 +46,7 @@ module(SERVER_GROUP_DATA_SOURCE, [CLUSTER_SERVICE]).run([
       optional: true,
       primary: true,
       icon: 'fas fa-xs fa-fw fa-th-large',
-      iconSvg: 'spMenuClusters',
+      iconName: 'spMenuClusters',
       loader: loadServerGroups,
       onLoad: addServerGroups,
       afterLoad: addTags,

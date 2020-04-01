@@ -68,7 +68,7 @@ module(CORE_PIPELINE_PIPELINE_DATASOURCE, [EXECUTION_SERVICE, CLUSTER_SERVICE]).
         optional: true,
         primary: true,
         icon: 'fa fa-xs fa-fw fa-list',
-        iconSvg: 'spMenuPipelines',
+        iconName: 'spMenuPipelines',
         key: 'executions',
         label: 'Pipelines',
         category: DELIVERY_KEY,

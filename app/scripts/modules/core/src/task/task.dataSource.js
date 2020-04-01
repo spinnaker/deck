@@ -42,7 +42,7 @@ angular.module(CORE_TASK_TASK_DATASOURCE, [CLUSTER_SERVICE]).run([
       lazy: true,
       primary: true,
       icon: 'fa fa-sm fa-fw fa-check-square',
-      iconSvg: 'spMenuTasks',
+      iconName: 'spMenuTasks',
       defaultData: [],
     });
 

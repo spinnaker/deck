@@ -3,7 +3,7 @@ import { $log, $q } from 'ngimport';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 
 import { IEntityTags } from 'core/domain';
-import { robotToHuman } from 'core/presentation';
+import { robotToHuman, IconNames } from 'core/presentation';
 import { ReactInjector } from 'core/reactShims';
 import { FirewallLabels } from 'core/securityGroup';
 import { toIPromise } from 'core/utils';
@@ -67,7 +67,7 @@ export interface IDataSourceConfig<T> {
   /**
    * Represents the name of the svg to be used with the svg loader (Icon.tsx)
    */
-  iconSvg?: string;
+  iconName?: IconNames;
 
   /**
    * unique value for this data source; the data source will be available on the Application directly via this key,
@@ -200,7 +200,7 @@ export class ApplicationDataSource<T = any> implements IDataSourceConfig<T> {
   public credentialsField: string;
   public description: string;
   public icon: string;
-  public iconSvg: string;
+  public iconName: IconNames;
   public key: string;
   public label: string;
   public category: string;
