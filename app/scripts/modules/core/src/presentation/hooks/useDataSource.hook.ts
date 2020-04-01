@@ -3,12 +3,8 @@ import { useLatestCallback } from './useLatestCallback.hook';
 
 import { ApplicationDataSource, IFetchStatus } from '../../application';
 
-export interface IDataSourceResult<T> {
+export interface IDataSourceResult<T> extends IFetchStatus {
   data: T;
-  status: IFetchStatus;
-  loaded: boolean;
-  loading: boolean;
-  loadFailure: boolean;
   refresh: () => void;
 }
 
@@ -21,9 +17,7 @@ export interface IDataSourceResult<T> {
  * @returns IDataSourceResult<T>
  */
 export const useDataSource = <T>(dataSource: ApplicationDataSource<T>): IDataSourceResult<T> => {
-  const data = useObservableValue(dataSource.data$, dataSource.data$.value);
   const status = useObservableValue(dataSource.status$, dataSource.status$.value);
-  const { loaded, loading, loadFailure } = dataSource;
 
   // Memoize to give consumers a stable ref,
   // but don't return the promise that dataSource.refresh() returns
@@ -32,11 +26,7 @@ export const useDataSource = <T>(dataSource: ApplicationDataSource<T>): IDataSou
   });
 
   return {
-    data,
-    status,
-    loaded,
-    loading,
-    loadFailure,
+    ...status,
     refresh,
   };
 };
