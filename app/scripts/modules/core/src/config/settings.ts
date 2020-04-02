@@ -49,7 +49,6 @@ export interface IFeatures {
   slack?: boolean;
   snapshots?: boolean;
   travis?: boolean;
-  versionedProviders?: boolean;
   wercker?: boolean;
   savePipelinesStageEnabled?: boolean;
   kustomizeEnabled?: boolean;
@@ -109,6 +108,7 @@ export interface ISpinnakerSettings {
   gateUrl: string;
   gitSources: string[];
   managedDelivery?: {
+    gettingStartedUrl?: string;
     defaultManifest: string;
     manifestBasePath: string;
   };
