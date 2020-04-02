@@ -3,7 +3,7 @@ import { $log, $q } from 'ngimport';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 
 import { IEntityTags } from 'core/domain';
-import { robotToHuman } from 'core/presentation';
+import { robotToHuman, IconNames } from 'core/presentation';
 import { ReactInjector } from 'core/reactShims';
 import { FirewallLabels } from 'core/securityGroup';
 import { toIPromise } from 'core/utils';
@@ -12,6 +12,7 @@ import { Application } from '../application.model';
 
 export interface IFetchStatus {
   status: 'NOT_INITIALIZED' | 'FETCHING' | 'FETCHED' | 'ERROR';
+  loaded: boolean;
   error?: any;
   lastRefresh: number;
   data: any;
@@ -63,6 +64,11 @@ export interface IDataSourceConfig<T> {
    * Represents a font-awesome icon to be displayed before the name of the tab
    */
   icon?: string;
+
+  /**
+   * Represents the name of the svg to be used with the svg loader (Icon.tsx)
+   */
+  iconName?: IconNames;
 
   /**
    * unique value for this data source; the data source will be available on the Application directly via this key,
@@ -195,6 +201,7 @@ export class ApplicationDataSource<T = any> implements IDataSourceConfig<T> {
   public credentialsField: string;
   public description: string;
   public icon: string;
+  public iconName: IconNames;
   public key: string;
   public label: string;
   public category: string;
@@ -316,6 +323,8 @@ export class ApplicationDataSource<T = any> implements IDataSourceConfig<T> {
   public dataUpdated(data?: T): void {
     if (this.loaded) {
       this.updateData(data !== undefined ? data : this.data);
+      const updatedStatus = { data: this.data, ...this.status$.value };
+      this.status$.next(updatedStatus);
     }
   }
 
@@ -364,6 +373,7 @@ export class ApplicationDataSource<T = any> implements IDataSourceConfig<T> {
 
     this.status$ = new BehaviorSubject({
       status: 'NOT_INITIALIZED',
+      loaded: this.loaded,
       lastRefresh: 0,
       error: null,
       data: this.data,
@@ -397,6 +407,7 @@ export class ApplicationDataSource<T = any> implements IDataSourceConfig<T> {
     fetchStream$.withLatestFrom(nextTick$).subscribe(([fetchStatus, _void]) => {
       // Update mutable flags
       this.statusUpdated(fetchStatus);
+      fetchStatus.loaded = this.loaded;
 
       if (fetchStatus.status === 'FETCHED') {
         this.updateData(fetchStatus.data);
