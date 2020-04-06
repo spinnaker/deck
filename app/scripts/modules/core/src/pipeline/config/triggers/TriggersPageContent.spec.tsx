@@ -129,9 +129,8 @@ describe('<TriggersPageContent />', () => {
         .simulate('click');
       expect(updatePipelineSpy).toHaveBeenCalledTimes(1);
       expect(removeReferencesFromStagesSpy).toHaveBeenCalledTimes(1);
-      // TODO(mneterval): make these assertions true
-      //expect(updatePipelineSpy).toHaveBeenCalledWith({ triggers: [triggerB], expectedArtifacts: [expectedArtifactB] });
-      //expect(removeReferencesFromStagesSpy).toHaveBeenCalledWith([expectedArtifactA.id], props.pipeline.stages);
+      expect(updatePipelineSpy).toHaveBeenCalledWith({ triggers: [triggerB], expectedArtifacts: [expectedArtifactB] });
+      expect(removeReferencesFromStagesSpy).toHaveBeenCalledWith([expectedArtifactA.id], props.pipeline.stages);
     });
     it('Does not remove expected artifacts if associated with multiple triggers', () => {
       const component = mount(
@@ -153,11 +152,10 @@ describe('<TriggersPageContent />', () => {
         .at(0)
         .simulate('click');
       expect(updatePipelineSpy).toHaveBeenCalledTimes(1);
-      // TODO(mneterval): make this assertion true
-      // expect(updatePipelineSpy).toHaveBeenCalledWith({
-      //   triggers: [{ ...triggerB, expectedArtifactIds: [expectedArtifactA.id] }],
-      // });
       expect(removeReferencesFromStagesSpy).toHaveBeenCalledTimes(0);
+      expect(updatePipelineSpy).toHaveBeenCalledWith({
+        triggers: [{ ...triggerB, expectedArtifactIds: [expectedArtifactA.id] }],
+      });
     });
   });
 });
