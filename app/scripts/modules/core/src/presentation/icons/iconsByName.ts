@@ -3,6 +3,7 @@ import { ReactComponent as accordionExpand } from './vectors/accordionExpand.svg
 import { ReactComponent as accordionExpandAll } from './vectors/accordionExpandAll.svg';
 import { ReactComponent as artifact } from './vectors/artifact.svg';
 import { ReactComponent as build } from './vectors/build.svg';
+import { ReactComponent as caretRight } from './vectors/caretRight.svg';
 import { ReactComponent as checkBadge } from './vectors/checkBadge.svg';
 import { ReactComponent as checkboxIndeterminate } from './vectors/checkboxIndeterminate.svg';
 import { ReactComponent as checkboxChecked } from './vectors/checkboxChecked.svg';
@@ -22,6 +23,7 @@ import { ReactComponent as instances } from './vectors/instances.svg';
 import { ReactComponent as loadBalancer } from './vectors/loadBalancer.svg';
 import { ReactComponent as manualJudgement } from './vectors/manualJudgement.svg';
 import { ReactComponent as placeholder } from './vectors/placeholder.svg';
+import { ReactComponent as securityGroup } from './vectors/securityGroup.svg';
 import { ReactComponent as servergroupAws } from './vectors/servergroupAws.svg';
 import { ReactComponent as spel } from './vectors/spel.svg';
 import { ReactComponent as templateFull } from './vectors/templateFull.svg';
@@ -75,6 +77,7 @@ export const iconsByName = {
   canaryRunning,
   canaryPass,
   canaryMarginal,
+  caretRight,
   checkBadge,
   checkboxIndeterminate,
   checkboxChecked,
@@ -106,6 +109,7 @@ export const iconsByName = {
   mdUnknown,
   md,
   placeholder,
+  securityGroup,
   servergroupAws,
   spCIBranch,
   spCIBuild,
