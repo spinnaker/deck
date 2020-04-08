@@ -119,7 +119,7 @@ export class ClusterService {
         }
       });
       // filter out the removed server groups (nullified above)
-      application.serverGroups.data = data.filter(x => x !== null);
+      application.serverGroups.data = data.filter(Boolean);
       return application.serverGroups.data;
     } else {
       return serverGroups;
