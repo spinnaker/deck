@@ -98,6 +98,7 @@ export class ClusterService {
     if (application.serverGroups.data) {
       const data = application.serverGroups.data;
       // remove any that have dropped off, update any that have changed
+      const toRemove: number[] = [];
       data.forEach((serverGroup: IServerGroup, idx: number) => {
         const match = remoteMap[this.generateServerGroupLookupKey(serverGroup)];
         if (match) {
@@ -106,10 +107,13 @@ export class ClusterService {
             data[idx] = match;
           }
         } else {
-          // Not found means server group was removed: nullify in place for a single pass removal
-          data[idx] = null;
+          // Not found means server group was removed
+          toRemove.push(idx);
         }
       });
+
+      // splice is necessary to preserve referential equality
+      toRemove.forEach(idx => data.splice(idx, 1));
 
       // add any new ones
       serverGroups.forEach(serverGroup => {
@@ -118,9 +122,7 @@ export class ClusterService {
           data.push(serverGroup);
         }
       });
-      // filter out the removed server groups (nullified above)
-      application.serverGroups.data = data.filter(Boolean);
-      return application.serverGroups.data;
+      return data;
     } else {
       return serverGroups;
     }
