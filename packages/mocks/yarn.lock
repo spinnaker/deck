@@ -14,11 +14,6 @@
   dependencies:
     lodash "^4.17.15"
 
-"@spinnaker/mocks@^1.0.3":
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/@spinnaker/mocks/-/mocks-1.0.3.tgz#99883ebce324074fe222b673913e9e39d41f58bd"
-  integrity sha512-YVatQfuAq7l7IwtRkW8lX59RykxCqY/gK1OfVbMy/ieB4L+eiqappUpt4P1EbhTTk64QBnMMlZuiTjPJxMMFPQ==
-
 lodash@^4.17.15:
   version "4.17.15"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.15.tgz#b447f6670a0455bbfeedd11392eff330ea097548"
