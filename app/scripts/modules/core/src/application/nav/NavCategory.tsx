@@ -1,10 +1,10 @@
 import React from 'react';
 
-import { DataSourceNotifications } from 'core/entityTag/notifications/DataSourceNotifications';
+import { DataSourceNotifications } from '../../entityTag/notifications/DataSourceNotifications';
 import { Icon, useDataSource, useObservable } from '../../presentation';
 
 import { ApplicationDataSource } from '../service/applicationDataSource';
-import { Application } from '../application.model';
+import { Application } from '../../application';
 import { IEntityTags } from '../../domain';
 
 export interface INavCategoryProps {
