@@ -4,7 +4,7 @@ import { DataSourceNotifications } from '../../entityTag/notifications/DataSourc
 import { Icon, useDataSource, useObservable } from '../../presentation';
 
 import { ApplicationDataSource } from '../service/applicationDataSource';
-import { Application, IFetchStatus } from '../../application';
+import { Application } from '../../application';
 import { IEntityTags } from '../../domain';
 
 export interface INavCategoryProps {
@@ -17,12 +17,15 @@ export const NavCategory: React.FC<INavCategoryProps> = ({ app, category, isActi
   const { alerts, badge, iconName, key, label, status$ } = category;
   const { data: badgeData } = useDataSource(app.getDataSource(badge || key));
   const runningCount = badge ? badgeData.length : 0;
-
   const [tags, setTags] = React.useState<IEntityTags[]>(alerts || []);
-  useObservable(status$, (status: IFetchStatus) => {
-    const newTags = status.data.map((d: ApplicationDataSource) => d.entityTags).filter((d: ApplicationDataSource) => d);
-    setTags(newTags);
+  useObservable(status$, () => {
+    setTags(alerts || []);
   });
+
+  /**
+   * This helps with rendering latency from setting initial tags
+   */
+  const tagList = (alerts || []).length && !tags.length ? alerts : tags;
   const badgeClassNames = runningCount ? 'badge-running-count' : 'badge-none';
 
   return (
@@ -34,7 +37,7 @@ export const NavCategory: React.FC<INavCategoryProps> = ({ app, category, isActi
         )}
       </div>
       <div className="nav-item">{' ' + category.label}</div>
-      <DataSourceNotifications tags={tags} application={app} tabName={label} />
+      <DataSourceNotifications tags={tagList} application={app} tabName={label} />
     </div>
   );
 };

@@ -1,5 +1,7 @@
 import React from 'react';
 import { mount } from 'enzyme';
+import { BehaviorSubject } from 'rxjs';
+
 import { mockEntityTags, mockServerGroupDataSourceConfig, mockPipelineDataSourceConfig } from '@spinnaker/mocks';
 import { Application, ApplicationModelBuilder } from '../../application';
 import { ApplicationDataSource, IDataSourceConfig } from '../service/applicationDataSource';
@@ -35,7 +37,13 @@ describe('NavCategory', () => {
     const app = buildApp<IPipeline>(mockPipelineDataSourceConfig);
     const category = app.getDataSource('executions');
     app.dataSources.push({ ...category, key: 'runningExecutions' } as ApplicationDataSource<IPipeline>);
-    app.getDataSource(category.badge).data = [mockPipelineDataSourceConfig, mockPipelineDataSourceConfig];
+    app.getDataSource(category.badge).status$ = new BehaviorSubject({
+      status: 'FETCHED',
+      loaded: true,
+      lastRefresh: 0,
+      error: null,
+      data: [mockPipelineDataSourceConfig, mockPipelineDataSourceConfig],
+    });
 
     const wrapper = mount(<NavCategory app={app} category={category} isActive={false} />);
     const nodes = wrapper.children();
@@ -93,7 +101,6 @@ describe('NavCategory', () => {
   it('should subscribe to alert updates', () => {
     const app = buildApp<IServerGroup>(mockServerGroupDataSourceConfig);
     const category = app.getDataSource('serverGroups');
-
     const wrapper = mount(<NavCategory app={app} category={category} isActive={false} />);
     const nodes = wrapper.children();
     const tags: IEntityTags[] = nodes.find('DataSourceNotifications').prop('tags');
@@ -102,6 +109,7 @@ describe('NavCategory', () => {
     const newCategory = {
       ...category,
       alerts: [mockEntityTags],
+      entityTags: [mockEntityTags],
     };
 
     wrapper.setProps({
@@ -109,6 +117,7 @@ describe('NavCategory', () => {
       category: newCategory,
       isActive: false,
     });
+
     const newTags: IEntityTags[] = wrapper
       .children()
       .find('DataSourceNotifications')
