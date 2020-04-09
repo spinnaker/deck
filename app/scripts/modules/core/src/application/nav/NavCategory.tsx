@@ -36,7 +36,8 @@ export const NavCategory: React.FC<INavCategoryProps> = ({ app, category, isActi
   };
 
   React.useEffect(() => {
-    setRunningCount(badgeSourceData), setTags(alerts || []);
+    setRunningCount(badgeSourceData);
+    setTags(alerts || []);
     clearSubscriptions();
     configureSubscriptions();
     return clearSubscriptions;
