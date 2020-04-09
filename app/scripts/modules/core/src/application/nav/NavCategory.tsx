@@ -1,10 +1,10 @@
 import React from 'react';
 
-import { DataSourceNotifications } from '../../entityTag/notifications/DataSourceNotifications';
+import { DataSourceNotifications } from 'core/entityTag/notifications/DataSourceNotifications';
 import { Icon, useDataSource, useObservable } from '../../presentation';
 
 import { ApplicationDataSource } from '../service/applicationDataSource';
-import { Application } from '../../application';
+import { Application } from '../application.model';
 import { IEntityTags } from '../../domain';
 
 export interface INavCategoryProps {
@@ -15,16 +15,16 @@ export interface INavCategoryProps {
 
 export const NavCategory: React.FC<INavCategoryProps> = ({ app, category, isActive }: INavCategoryProps) => {
   const { alerts, badge, iconName, key, label, status$ } = category;
+
   const { data: badgeData } = useDataSource(app.getDataSource(badge || key));
   const runningCount = badge ? badgeData.length : 0;
+
   const [tags, setTags] = React.useState<IEntityTags[]>(alerts || []);
   useObservable(status$, () => {
-    setTags(alerts || []);
+    setTags(category.alerts || []);
   });
 
-  /**
-   * This helps with rendering latency from setting initial tags
-   */
+  // Helps with render latency from setting initial tags
   const tagList = (alerts || []).length && !tags.length ? alerts : tags;
   const badgeClassNames = runningCount ? 'badge-running-count' : 'badge-none';
 
