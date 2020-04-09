@@ -36,10 +36,16 @@ const cardAppearanceByState = {
     appearance: 'neutral',
     title: ({ replacedAtMillis, replacedByVersionName }: CardTitleMetadata) => (
       <span className="sp-group-margin-xs-xaxis">
-        Decommissioned {relativeTime(replacedAtMillis)}{' '}
-        <span className="text-italic text-regular sp-margin-xs-left">({timestamp(replacedAtMillis)})</span>{' '}
-        <span className="text-regular">—</span> <span className="text-regular">replaced by </span>
-        <Pill text={replacedByVersionName} />
+        <span>Decommissioned {replacedAtMillis && relativeTime(replacedAtMillis)}</span>
+        {replacedAtMillis && (
+          <span className="text-italic text-regular sp-margin-xs-left">({timestamp(replacedAtMillis)})</span>
+        )}{' '}
+        {replacedByVersionName && (
+          <>
+            <span className="text-regular">—</span> <span className="text-regular">replaced by </span>
+            <Pill text={replacedByVersionName} />
+          </>
+        )}
       </span>
     ),
   },
@@ -63,8 +69,15 @@ const cardAppearanceByState = {
     appearance: 'success',
     title: ({ deployedAtMillis }: CardTitleMetadata) => (
       <span>
-        Deployed {relativeTime(deployedAtMillis)}{' '}
-        <span className="text-italic text-regular sp-margin-xs-left">({timestamp(deployedAtMillis)})</span>
+        Deployed here{' '}
+        {deployedAtMillis ? (
+          <>
+            since {relativeTime(deployedAtMillis)}{' '}
+            <span className="text-italic text-regular sp-margin-xs-left">({timestamp(deployedAtMillis)})</span>
+          </>
+        ) : (
+          'now'
+        )}
       </span>
     ),
   },
