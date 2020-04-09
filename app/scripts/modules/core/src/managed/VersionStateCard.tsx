@@ -16,12 +16,12 @@ interface CardTitleMetadata {
 
 const cardAppearanceByState = {
   pending: {
-    icon: 'placeholder',
+    icon: 'artifactPending',
     appearance: 'neutral',
     title: (_: CardTitleMetadata) => 'Not deployed here yet',
   },
   skipped: {
-    icon: 'placeholder',
+    icon: 'artifactSkipped',
     appearance: 'neutral',
     title: ({ replacedByVersionName }: CardTitleMetadata) => (
       <span className="sp-group-margin-xs-xaxis">
@@ -44,7 +44,7 @@ const cardAppearanceByState = {
     ),
   },
   approved: {
-    icon: 'checkBadge',
+    icon: 'artifactApproved',
     appearance: 'info',
     title: (_: CardTitleMetadata) => (
       <span className="sp-group-margin-xs-xaxis">
