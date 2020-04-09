@@ -4,7 +4,7 @@ import { UISref, UISrefActive } from '@uirouter/react';
 
 import { NavCategory } from './NavCategory';
 import { ApplicationDataSource } from '../service/applicationDataSource';
-import { Application } from '../application.model';
+import { Application } from '../../application';
 
 export interface INavRouteProps {
   category: ApplicationDataSource;
