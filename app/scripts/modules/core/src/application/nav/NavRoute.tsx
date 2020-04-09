@@ -1,6 +1,6 @@
 import React from 'react';
-import { UIRouterContext } from '@uirouter/react-hybrid';
-import { UISref, UISrefActive } from '@uirouter/react';
+import { UIRouterContextComponent } from '@uirouter/react-hybrid';
+import { UISref } from '@uirouter/react';
 
 import { NavCategory } from './NavCategory';
 import { ApplicationDataSource } from '../service/applicationDataSource';
@@ -12,19 +12,12 @@ export interface INavRouteProps {
   app: Application;
 }
 
-@UIRouterContext
-export class NavRoute extends React.Component<INavRouteProps> {
-  public render() {
-    const { app, category, isActive } = this.props;
-
-    return (
-      <UISrefActive class="active" key={category.key}>
-        <UISref to={category.sref}>
-          <a>
-            <NavCategory app={app} category={category} isActive={isActive} />
-          </a>
-        </UISref>
-      </UISrefActive>
-    );
-  }
-}
+export const NavRoute = ({ app, category, isActive }: INavRouteProps) => (
+  <UIRouterContextComponent key={category.key}>
+    <UISref to={category.sref}>
+      <a>
+        <NavCategory app={app} category={category} isActive={isActive} />
+      </a>
+    </UISref>
+  </UIRouterContextComponent>
+);
