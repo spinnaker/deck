@@ -34,6 +34,16 @@ export function BakeManifestStageForm({
     }
   }, []);
 
+  // Clear renderer-specific fields when selected renderer changes
+  React.useEffect(() => {
+    if (stage.templateRenderer == ManifestRenderers.KUSTOMIZE) {
+      formik.setFieldValue('inputArtifacts', null);
+    }
+    if (HELM_RENDERERS.includes(stage.templateRenderer)) {
+      formik.setFieldValue('inputArtifact', null);
+    }
+  }, [stage.templateRenderer]);
+
   const templateRenderers = React.useMemo(() => {
     const renderers = [...HELM_RENDERERS];
     if (SETTINGS.feature.kustomizeEnabled) {
