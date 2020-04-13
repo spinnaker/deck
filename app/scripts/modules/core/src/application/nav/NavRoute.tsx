@@ -14,7 +14,7 @@ export interface INavRouteProps {
 
 export const NavRoute = ({ app, category, isActive }: INavRouteProps) => (
   <UIRouterContextComponent key={category.key}>
-    <UISref to={category.sref}>
+    <UISref className={isActive ? 'active' : ''} to={category.sref}>
       <a>
         <NavCategory app={app} category={category} isActive={isActive} />
       </a>
