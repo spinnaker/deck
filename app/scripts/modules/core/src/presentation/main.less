@@ -979,12 +979,26 @@ select:invalid {
     color: var(--color-black);
   }
   h4 {
-    padding: 10px 5px 0;
+    padding: 5px;
     margin: 0;
+    display: flex;
+    align-items: center;
+
     .glyphicon {
       font-size: 13px;
-      opacity: 0.7;
       margin-right: 4px;
+      margin-left: auto;
+    }
+
+    .arrow {
+      visibility: hidden;
+    }
+
+    &:hover {
+      background-color: var(--color-accent-g3);
+      .arrow {
+        visibility: visible;
+      }
     }
     font-weight: 600;
     text-transform: uppercase;

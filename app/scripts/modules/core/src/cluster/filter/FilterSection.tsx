@@ -36,7 +36,7 @@ export class FilterSection extends React.Component<IFilterSectionProps, IFilterS
       <div className="collapsible-filter-section">
         <div className="section-heading clickable" onClick={this.toggle}>
           <h4>
-            <div>{` ${this.props.heading}`}</div>
+            <div className="sp-margin-xs-right">{` ${this.props.heading}`}</div>
             {this.props.helpKey && (
               <div>
                 {' '}
