@@ -28,7 +28,11 @@ export class CreateLoadBalancerButton extends React.Component<ICreateLoadBalance
     super(props);
   }
 
-  private createLoadBalancerProviderFilterFn = ({}, {}, provider: ICloudProviderConfig): boolean => {
+  private createLoadBalancerProviderFilterFn = (
+    _app: Application,
+    _acc: IAccountDetails,
+    provider: ICloudProviderConfig,
+  ): boolean => {
     const lbConfig = provider.loadBalancer;
     return (
       lbConfig &&
