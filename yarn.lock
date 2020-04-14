@@ -903,10 +903,10 @@
   resolved "https://registry.yarnpkg.com/@spinnaker/mocks/-/mocks-1.0.3.tgz#99883ebce324074fe222b673913e9e39d41f58bd"
   integrity sha512-YVatQfuAq7l7IwtRkW8lX59RykxCqY/gK1OfVbMy/ieB4L+eiqappUpt4P1EbhTTk64QBnMMlZuiTjPJxMMFPQ==
 
-"@spinnaker/styleguide@^1.0.18":
-  version "1.0.18"
-  resolved "https://registry.yarnpkg.com/@spinnaker/styleguide/-/styleguide-1.0.18.tgz#0d627331088e84a6e630d2cd127473f301587962"
-  integrity sha512-8XNYA2u32Ugi8d1XCExCj0CEY+QY8+u+pxC9upKaCTxKSjB8bcQIO93GSZB4cxtpLPkFNEspAGRHF5Ysq7bdJg==
+"@spinnaker/styleguide@^1.0.19":
+  version "1.0.19"
+  resolved "https://registry.yarnpkg.com/@spinnaker/styleguide/-/styleguide-1.0.19.tgz#afed43123170736ad9c56b5f789433a95f73edad"
+  integrity sha512-GGg/1mf7p4A9w6HNxBwxZUNkxu9fxp/bkoUz6lcxu6ipqxXPa9bfvin6QxE2BiYSJBM4Gxa2TKowCbmcLb3W5w==
 
 "@svgr/babel-plugin-add-jsx-attribute@^5.0.1":
   version "5.0.1"
