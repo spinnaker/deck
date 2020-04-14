@@ -65,19 +65,16 @@ export const CreateSecurityGroupButton = ({ app }: { app: Application }) => {
       });
     });
   };
-  if (!ProviderSelectionService.isDisabled(app, 'securityGroup')) {
-    return (
-      <div>
-        <button className="btn btn-sm btn-default" onClick={createSecurityGroup}>
-          <span className="glyphicon glyphicon-plus-sign visible-lg-inline" />
-          <Tooltip value="Create Load Balancer">
-            <span className="glyphicon glyphicon-plus-sign visible-md-inline visible-sm-inline" />
-          </Tooltip>
-          <span className="visible-lg-inline"> Create {FirewallLabels.get('Firewall')}</span>
-        </button>
-      </div>
-    );
-  } else {
-    return <div></div>;
-  }
+
+  return (
+    <div>
+      <button className="btn btn-sm btn-default" onClick={createSecurityGroup}>
+        <span className="glyphicon glyphicon-plus-sign visible-lg-inline" />
+        <Tooltip value="Create Load Balancer">
+          <span className="glyphicon glyphicon-plus-sign visible-md-inline visible-sm-inline" />
+        </Tooltip>
+        <span className="visible-lg-inline"> Create {FirewallLabels.get('Firewall')}</span>
+      </button>
+    </div>
+  );
 };

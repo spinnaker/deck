@@ -64,20 +64,25 @@ export class CreateLoadBalancerButton extends React.Component<ICreateLoadBalance
 
   public render() {
     const { app } = this.props;
-    if (!ProviderSelectionService.isDisabled(app, 'loadBalancer')) {
-      return (
-        <div>
-          <button className="btn btn-sm btn-default" onClick={this.createLoadBalancer}>
-            <span className="glyphicon glyphicon-plus-sign visible-lg-inline" />
-            <Tooltip value="Create Load Balancer">
-              <span className="glyphicon glyphicon-plus-sign visible-md-inline visible-sm-inline" />
-            </Tooltip>
-            <span className="visible-lg-inline"> Create Load Balancer</span>
-          </button>
-        </div>
-      );
-    } else {
-      return <div></div>;
-    }
+    let valor = false;
+    const promesa = ProviderSelectionService.isDisabled(app).then(res => {
+      console.log('Debo desabilitar?= ' + res);
+      return res;
+    });
+    promesa.then(prom => {
+      valor = prom;
+    });
+    console.log('otro valor: ' + valor);
+    return (
+      <div>
+        <button className="btn btn-sm btn-default" onClick={this.createLoadBalancer}>
+          <span className="glyphicon glyphicon-plus-sign visible-lg-inline" />
+          <Tooltip value="Create Load Balancer">
+            <span className="glyphicon glyphicon-plus-sign visible-md-inline visible-sm-inline" />
+          </Tooltip>
+          <span className="visible-lg-inline"> Create Load Balancer</span>
+        </button>
+      </div>
+    );
   }
 }

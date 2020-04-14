@@ -4,3 +4,4 @@
   e.g.,
   window.spinnakerSettings.defaultInstancePort = 8080;
 */
+window.spinnakerSettings.kubernetesAdHocInfraWritesEnabled = false;

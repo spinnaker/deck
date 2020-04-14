@@ -32,21 +32,20 @@ export class ProviderSelectionService {
       const providerOptions = uniq(
         reducedAccounts
           .map(a => {
-            const provider = CloudProviderRegistry.getValue(a.cloudProvider, feature, a.skin);
             const providerFeature = CloudProviderRegistry.getProvider(a.cloudProvider)[feature] || {};
-            if (a.cloudProvider === 'kubernetes') {
-              if (typeof provider.infra !== 'undefined' && provider.infra) {
-                return providerFeature.useProvider || a.cloudProvider;
-              }
-            } else {
-              return providerFeature.useProvider || a.cloudProvider;
+            //If the flag kubernetesAdHocInfraWritesEnabled is disabled then remove the provider from the array
+            if (
+              CloudProviderRegistry.hasValue(a.cloudProvider, 'infraWritesEnabled', a.providerVersion) &&
+              !CloudProviderRegistry.getValue(a.cloudProvider, 'infraWritesEnabled', a.providerVersion)
+            ) {
+              a.cloudProvider = null;
             }
+            return providerFeature.useProvider || a.cloudProvider;
           })
           .filter(a => {
             return a != null;
           }),
       );
-
       let provider;
       if (providerOptions.length > 1) {
         return ProviderSelectionModal.show({ providerOptions });
@@ -59,25 +58,47 @@ export class ProviderSelectionService {
     });
   }
 
-  public static isDisabled(app: Application, feature: string): boolean {
-    let isDisabled = true;
-    const BreakException = {};
-    try {
-      app.attributes.cloudProviders.forEach((element: any) => {
-        const provider = CloudProviderRegistry.getValue(element, feature);
-        if (element === 'kubernetes') {
-          if (typeof provider.infra !== 'undefined' && provider.infra) {
-            isDisabled = false;
-            throw BreakException;
-          }
-        } else {
-          isDisabled = false;
-          throw BreakException;
-        }
-      });
-    } catch (e) {
-      if (e !== BreakException) throw e;
-    }
-    return isDisabled;
+  public static isDisabled(app: Application): IPromise<boolean> {
+    return AccountService.applicationAccounts(app).then((accounts: IAccountDetails[]) => {
+      let isDisable = false;
+      if (accounts.length === 1) {
+        accounts
+          .filter(a => {
+            return CloudProviderRegistry.hasValue(a.cloudProvider, 'infraWritesEnabled', a.providerVersion);
+          })
+          .map(a => {
+            isDisable = !CloudProviderRegistry.getValue(a.cloudProvider, 'infraWritesEnabled', a.providerVersion);
+          });
+      }
+      return isDisable;
+    });
+  }
+}
+
+export class ProviderFilter {
+  constructor(isDisabled: boolean) {
+    this.isDisabled = isDisabled;
+  }
+
+  private isDisabled: boolean;
+
+  public isCreateButtonDisabled() {
+    return this.isDisabled;
+  }
+
+  public static staticMethod(app: Application): IPromise<boolean> {
+    return AccountService.applicationAccounts(app).then((accounts: IAccountDetails[]) => {
+      let isDisable = false;
+      if (accounts.length === 1) {
+        accounts
+          .filter(a => {
+            return CloudProviderRegistry.hasValue(a.cloudProvider, 'infraWritesEnabled', a.providerVersion);
+          })
+          .map(a => {
+            isDisable = !CloudProviderRegistry.getValue(a.cloudProvider, 'infraWritesEnabled', a.providerVersion);
+          });
+      }
+      return isDisable;
+    });
   }
 }

@@ -45,10 +45,11 @@ module(CORE_CLUSTER_ALLCLUSTERS_CONTROLLER, [
       ClusterState.filterModel.activate();
       this.initialized = false;
       this.dataSource = app.getDataSource('serverGroups');
-      this.application = app;
 
       $scope.sortFilter = ClusterState.filterModel.sortFilter;
-      $scope.isDisabled = ProviderSelectionService.isDisabled(app, 'serverGroup');
+      ProviderSelectionService.isDisabled(app).then(disabled => {
+        $scope.isDisabled = disabled;
+      });
       this.createLabel = 'Create Server Group';
 
       app
