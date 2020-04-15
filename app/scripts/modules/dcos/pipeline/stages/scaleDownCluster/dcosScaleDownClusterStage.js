@@ -1,11 +1,13 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { AccountService, Registry } from '@spinnaker/core';
 
-module.exports = angular
-  .module('spinnaker.dcos.pipeline.stage.scaleDownClusterStage', [])
+export const DCOS_PIPELINE_STAGES_SCALEDOWNCLUSTER_DCOSSCALEDOWNCLUSTERSTAGE =
+  'spinnaker.dcos.pipeline.stage.scaleDownClusterStage';
+export const name = DCOS_PIPELINE_STAGES_SCALEDOWNCLUSTER_DCOSSCALEDOWNCLUSTERSTAGE; // for backwards compatibility
+module(DCOS_PIPELINE_STAGES_SCALEDOWNCLUSTER_DCOSSCALEDOWNCLUSTERSTAGE, [])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'scaleDownCluster',
@@ -27,9 +29,9 @@ module.exports = angular
   .controller('dcosScaleDownClusterStageCtrl', [
     '$scope',
     function($scope) {
-      var ctrl = this;
+      const ctrl = this;
 
-      let stage = $scope.stage;
+      const stage = $scope.stage;
 
       $scope.state = {
         accounts: false,

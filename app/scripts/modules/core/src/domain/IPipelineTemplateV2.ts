@@ -1,4 +1,4 @@
-import { IPipeline } from 'core/domain';
+import { IPipeline } from './IPipeline';
 import { VariableType } from 'core/pipeline/config/templates/PipelineTemplateReader';
 
 export interface IPipelineTemplateV2 {
@@ -26,4 +26,17 @@ interface IVariableMetadataV2 {
   description?: string;
   name: string;
   type: VariableType;
+}
+
+export interface IPipelineTemplatePlanV2 extends IPipeline {
+  appConfig: { [key: string]: any };
+  templateVariables: { [key: string]: any };
+}
+
+export interface IPipelineTemplateV2Collections {
+  [key: string]: IPipelineTemplateV2[];
+}
+
+export interface IPipelineTemplateV2VersionSelections {
+  [key: string]: string;
 }

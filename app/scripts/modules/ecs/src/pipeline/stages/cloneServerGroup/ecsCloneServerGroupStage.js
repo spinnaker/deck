@@ -1,12 +1,14 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 import _ from 'lodash';
 
 import { AccountService, NameUtils, Registry, StageConstants } from '@spinnaker/core';
 
-module.exports = angular
-  .module('spinnaker.ecs.pipeline.stage.cloneServerGroupStage', [])
+export const ECS_PIPELINE_STAGES_CLONESERVERGROUP_ECSCLONESERVERGROUPSTAGE =
+  'spinnaker.ecs.pipeline.stage.cloneServerGroupStage';
+export const name = ECS_PIPELINE_STAGES_CLONESERVERGROUP_ECSCLONESERVERGROUPSTAGE; // for backwards compatibility
+module(ECS_PIPELINE_STAGES_CLONESERVERGROUP_ECSCLONESERVERGROUPSTAGE, [])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'cloneServerGroup',
@@ -25,7 +27,7 @@ module.exports = angular
   .controller('ecsCloneServerGroupStageCtrl', [
     '$scope',
     function($scope) {
-      let stage = $scope.stage;
+      const stage = $scope.stage;
 
       $scope.viewState = {
         accountsLoaded: false,
@@ -56,7 +58,7 @@ module.exports = angular
 
       this.targetClusterUpdated = () => {
         if (stage.targetCluster) {
-          let clusterName = NameUtils.parseServerGroupName(stage.targetCluster);
+          const clusterName = NameUtils.parseServerGroupName(stage.targetCluster);
           stage.stack = clusterName.stack;
           stage.freeFormDetails = clusterName.freeFormDetails;
         } else {
@@ -77,7 +79,7 @@ module.exports = angular
 
       this.toggleSuspendedProcess = process => {
         stage.suspendedProcesses = stage.suspendedProcesses || [];
-        var processIndex = stage.suspendedProcesses.indexOf(process);
+        const processIndex = stage.suspendedProcesses.indexOf(process);
         if (processIndex === -1) {
           stage.suspendedProcesses.push(process);
         } else {

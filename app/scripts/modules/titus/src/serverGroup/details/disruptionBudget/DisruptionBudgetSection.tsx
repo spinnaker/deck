@@ -1,8 +1,8 @@
-import * as React from 'react';
+import React from 'react';
 import { isEqual } from 'lodash';
-const angular = require('angular');
+import { module } from 'angular';
 import { react2angular } from 'react2angular';
-import * as prettyMilliseconds from 'pretty-ms';
+import prettyMilliseconds from 'pretty-ms';
 
 import { IServerGroupDetailsSectionProps, HelpField } from '@spinnaker/core';
 import { TitusReactInjector } from 'titus/reactShims';
@@ -20,7 +20,11 @@ import {
 import { ITitusServerGroup, IJobDisruptionBudget } from '../../../domain';
 import { EditDisruptionBudgetModal } from './EditDisruptionBudgetModal';
 
-export class DisruptionBudgetSection extends React.Component<IServerGroupDetailsSectionProps> {
+interface IDisruptionBudgetSection extends IServerGroupDetailsSectionProps {
+  serverGroup: ITitusServerGroup;
+}
+
+export class DisruptionBudgetSection extends React.Component<IDisruptionBudgetSection> {
   private SectionHeading = ({
     budget,
     options,
@@ -219,6 +223,7 @@ export class DisruptionBudgetSection extends React.Component<IServerGroupDetails
 
 export const DISRUPTION_BUDGET_DETAILS_SECTION = 'spinnaker.titus.disruptionbudget.section';
 
-angular
-  .module(DISRUPTION_BUDGET_DETAILS_SECTION, [])
-  .component('titusDisruptionBudgetSection', react2angular(DisruptionBudgetSection, ['serverGroup', 'app']));
+module(DISRUPTION_BUDGET_DETAILS_SECTION, []).component(
+  'titusDisruptionBudgetSection',
+  react2angular(DisruptionBudgetSection, ['serverGroup', 'app']),
+);

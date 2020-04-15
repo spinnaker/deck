@@ -1,17 +1,21 @@
-import * as React from 'react';
-import Select, { Option, ReactSelectProps } from 'react-select';
+import React from 'react';
+import Select, { Option, OptionValues, ReactSelectProps } from 'react-select';
+import VirtualizedSelect from 'react-virtualized-select';
+import { isNil } from 'lodash';
 
 import { noop } from 'core/utils';
 
+import { IFormInputProps, IFormInputValidation, OmitControlledInputPropsFrom } from './interface';
+import { createFakeReactSyntheticEvent, isStringArray, orEmptyString } from './utils';
 import { StringsAsOptions } from './StringsAsOptions';
+import { useValidationData } from '../validation';
 import { TetheredSelect } from '../../TetheredSelect';
 
-import { createFakeReactSyntheticEvent, isStringArray, orEmptyString } from './utils';
-import { IFormInputProps, OmitControlledInputPropsFrom } from '../interface';
-
-interface IReactSelectInputProps extends IFormInputProps, OmitControlledInputPropsFrom<ReactSelectProps> {
+export interface IReactSelectInputProps<T = OptionValues>
+  extends IFormInputProps,
+    OmitControlledInputPropsFrom<ReactSelectProps<T>> {
   stringOptions?: string[];
-  tethered?: boolean;
+  mode?: 'TETHERED' | 'VIRTUALIZED' | 'PLAIN';
 }
 
 // TODO: use standard css classes (from style guide?)
@@ -27,8 +31,9 @@ export const reactSelectValidationErrorStyle = {
  * somewhat compatible with the controlled input pattern
  */
 export const reactSelectOnChangeAdapter = (name: string, onChange: IReactSelectInputProps['onChange']) => {
-  return (selectedOption: Option) => {
-    const target = { name, value: selectedOption.value };
+  return (selection: Option | Option[]) => {
+    const value = !selection ? null : Array.isArray(selection) ? selection.map(x => x.value) : selection.value;
+    const target = { name, value };
     const event = createFakeReactSyntheticEvent(target);
     return (onChange || noop)(event);
   };
@@ -53,47 +58,49 @@ export const reactSelectOnBlurAdapter = (name: string, value: any, onBlur: IReac
  *
  * This component does not attempt to support async loading
  */
-export class ReactSelectInput extends React.Component<IReactSelectInputProps> {
-  public static defaultProps: Partial<IReactSelectInputProps> = {
-    tethered: true,
+export function ReactSelectInput<T = string>(props: IReactSelectInputProps<T>) {
+  const {
+    name,
+    onChange,
+    onBlur,
+    value,
+    validation = {} as IFormInputValidation,
+    stringOptions,
+    options: optionOptions,
+    ignoreAccents: accents,
+    inputClassName,
+    ...otherProps
+  } = props;
+
+  // Default to false because this feature is SLOW
+  const ignoreAccents = isNil(accents) ? false : accents;
+  const mode = props.mode || 'TETHERED';
+  const className = orEmptyString(inputClassName);
+  const { category } = useValidationData(validation.messageNode, validation.touched);
+  const style = category === 'error' ? reactSelectValidationErrorStyle : {};
+  const fieldProps = {
+    name,
+    value: orEmptyString(value),
+    onBlur: reactSelectOnBlurAdapter(name, value, onBlur),
+    onChange: reactSelectOnChangeAdapter(name, onChange),
   };
 
-  public render() {
-    const {
-      name,
-      onChange,
-      onBlur,
-      value,
-      tethered,
-      validation,
-      stringOptions,
-      options: optionOptions,
-      inputClassName,
-      ...otherProps
-    } = this.props;
+  const commonProps = { className, style, ignoreAccents, ...fieldProps, ...otherProps } as any;
 
-    const className = orEmptyString(inputClassName);
-    const style = (validation || {}).validationStatus === 'error' ? reactSelectValidationErrorStyle : {};
-    const fieldProps = {
-      name,
-      value: orEmptyString(value),
-      onBlur: reactSelectOnBlurAdapter(name, value, onBlur),
-      onChange: reactSelectOnChangeAdapter(name, onChange),
-    };
+  const SelectElement = ({ options }: { options: any[] }) =>
+    mode === 'TETHERED' ? (
+      <TetheredSelect {...commonProps} options={options} />
+    ) : mode === 'VIRTUALIZED' ? (
+      <VirtualizedSelect {...commonProps} options={options} optionRenderer={null} />
+    ) : (
+      <Select {...commonProps} options={options} />
+    );
 
-    const SelectElement = ({ options }: { options: IReactSelectInputProps['options'] }) =>
-      tethered ? (
-        <TetheredSelect className={className} style={style} options={options} {...fieldProps} {...otherProps} />
-      ) : (
-        <Select className={className} style={style} options={options} {...fieldProps} {...otherProps} />
-      );
-
-    if (isStringArray(stringOptions)) {
-      return (
-        <StringsAsOptions strings={stringOptions}>{options => <SelectElement options={options} />}</StringsAsOptions>
-      );
-    } else {
-      return <SelectElement options={optionOptions} />;
-    }
+  if (isStringArray(stringOptions)) {
+    return (
+      <StringsAsOptions strings={stringOptions}>{options => <SelectElement options={options} />}</StringsAsOptions>
+    );
+  } else {
+    return <SelectElement options={optionOptions} />;
   }
 }

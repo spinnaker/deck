@@ -1,13 +1,17 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular
-  .module('spinnaker.ecs.serverGroup.configure.wizard.horizontalScaling.component', [])
-  .component('ecsServerGroupHorizontalScaling', {
+export const ECS_SERVERGROUP_CONFIGURE_WIZARD_HORIZONTALSCALING_HORIZONTALSCALING_COMPONENT =
+  'spinnaker.ecs.serverGroup.configure.wizard.horizontalScaling.component';
+export const name = ECS_SERVERGROUP_CONFIGURE_WIZARD_HORIZONTALSCALING_HORIZONTALSCALING_COMPONENT; // for backwards compatibility
+module(ECS_SERVERGROUP_CONFIGURE_WIZARD_HORIZONTALSCALING_HORIZONTALSCALING_COMPONENT, []).component(
+  'ecsServerGroupHorizontalScaling',
+  {
     bindings: {
       command: '=',
       application: '=',
     },
     templateUrl: require('./horizontalScaling.component.html'),
-  });
+  },
+);

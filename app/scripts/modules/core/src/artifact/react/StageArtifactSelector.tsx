@@ -1,11 +1,12 @@
-import * as React from 'react';
+import React from 'react';
 import { module } from 'angular';
 import Select from 'react-select';
 import { react2angular } from 'react2angular';
 import { Observable, Subject } from 'rxjs';
 
 import { IArtifact, IExpectedArtifact, IPipeline, IStage } from 'core/domain';
-import { ArtifactIcon, ExpectedArtifactService } from 'core/artifact';
+import { ExpectedArtifactService } from '../expectedArtifact.service';
+import { ArtifactIcon } from './ArtifactIcon';
 import { AccountService, IArtifactAccount } from 'core/account';
 import { ArtifactEditor } from './ArtifactEditor';
 

@@ -1,6 +1,6 @@
-import * as React from 'react';
+import React from 'react';
 
-import { CloudProviderRegistry } from 'core/cloudProvider';
+import { CloudProviderRegistry } from './CloudProviderRegistry';
 
 export interface ICloudProviderLabelProps {
   provider: string;

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { Subscription } from 'rxjs';
 
 import { Application } from 'core/application/application.model';
@@ -6,7 +6,7 @@ import { ExecutionGroup } from './ExecutionGroup';
 import { IExecutionGroup } from 'core/domain';
 import { ReactInjector } from 'core/reactShims';
 import { ExecutionState } from 'core/state';
-import { ExecutionFilterService } from 'core/pipeline/filter/executionFilter.service';
+import { ExecutionFilterService } from '../../filter/executionFilter.service';
 
 import './executionGroups.less';
 

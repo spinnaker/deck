@@ -3,7 +3,7 @@ import { module } from 'angular';
 import { EXECUTION_ARTIFACT_TAB, ExecutionDetailsTasks, IStage, Registry } from '@spinnaker/core';
 import { ManifestTrafficStageConfig } from './ManifestTrafficStageConfig';
 import { manifestSelectorValidators } from '../validators/manifestSelectorValidators';
-import { manifestExecutionDetails } from 'kubernetes/v2/pipelines/stages/ManifestExecutionDetails';
+import { manifestExecutionDetails } from '../ManifestExecutionDetails';
 
 const STAGE_NAME = 'Disable (Manifest)';
 const STAGE_KEY = 'disableManifest';
@@ -16,7 +16,7 @@ module(KUBERNETES_DISABLE_MANIFEST_STAGE, [EXECUTION_ARTIFACT_TAB]).config(() =>
     cloudProvider: 'kubernetes',
     component: ManifestTrafficStageConfig,
     executionDetailsSections: [manifestExecutionDetails(STAGE_KEY), ExecutionDetailsTasks],
-    defaultTimeoutMs: 30 * 60 * 1000, // 30 minutes
+    supportsCustomTimeout: true,
     accountExtractor: (stage: IStage): string[] => (stage.account ? [stage.account] : []),
     configAccountExtractor: (stage: IStage): string[] => (stage.account ? [stage.account] : []),
     validators: manifestSelectorValidators(STAGE_NAME),

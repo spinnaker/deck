@@ -1,11 +1,12 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { Registry, PipelineConfigService, StageConstants } from '@spinnaker/core';
 
-module.exports = angular
-  .module('spinnaker.amazon.pipeline.stage.tagImageStage', [])
+export const AMAZON_PIPELINE_STAGES_TAGIMAGE_AWSTAGIMAGESTAGE = 'spinnaker.amazon.pipeline.stage.tagImageStage';
+export const name = AMAZON_PIPELINE_STAGES_TAGIMAGE_AWSTAGIMAGESTAGE; // for backwards compatibility
+module(AMAZON_PIPELINE_STAGES_TAGIMAGE_AWSTAGIMAGESTAGE, [])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'upsertImageTags',

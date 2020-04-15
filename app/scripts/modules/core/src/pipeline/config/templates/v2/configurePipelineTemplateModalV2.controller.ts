@@ -4,7 +4,7 @@ import { without, chain, has } from 'lodash';
 
 import { Application } from 'core/application/application.model';
 import { IPipelineTemplateConfigV2 } from 'core/domain';
-import { PipelineTemplateV2Service } from 'core/pipeline';
+import { PipelineTemplateV2Service } from './pipelineTemplateV2.service';
 import { VariableValidatorService } from '../validators/variableValidator.service';
 
 import {
@@ -13,7 +13,7 @@ import {
   IPipelineTemplatePlanResponse,
   IPipelineTemplate,
   IPipelineTemplatePlanError,
-} from 'core/pipeline/config/templates/PipelineTemplateReader';
+} from '../PipelineTemplateReader';
 import { IVariable } from '../inputs/variableInput.service';
 
 export interface IVariableMetadataGroup {
@@ -171,12 +171,22 @@ export class ConfigurePipelineTemplateModalV2Controller implements IController {
     return chain(this.variables || [])
       .cloneDeep()
       .map(v => {
-        if (v.type === 'object') {
-          v.value = JSON.parse(v.value);
-        } else if (v.type === 'int') {
-          return [v.name, parseInt(v.value, 10)];
-        } else if (v.type === 'float') {
-          return [v.name, parseFloat(v.value)];
+        switch (v.type) {
+          case 'boolean':
+            v.value = !!v.value;
+            break;
+
+          case 'object':
+            v.value = JSON.parse(v.value);
+            break;
+
+          case 'int':
+            v.value = parseInt(v.value, 10);
+            break;
+
+          case 'float':
+            v.value = parseFloat(v.value);
+            break;
         }
         return [v.name, v.value];
       })

@@ -1,10 +1,9 @@
 import { IPromise, IScope } from 'angular';
-import { get } from 'lodash';
 import { $log, $q } from 'ngimport';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 
 import { IEntityTags } from 'core/domain';
-import { robotToHuman } from 'core/presentation';
+import { robotToHuman, IconNames } from 'core/presentation';
 import { ReactInjector } from 'core/reactShims';
 import { FirewallLabels } from 'core/securityGroup';
 import { toIPromise } from 'core/utils';
@@ -13,12 +12,13 @@ import { Application } from '../application.model';
 
 export interface IFetchStatus {
   status: 'NOT_INITIALIZED' | 'FETCHING' | 'FETCHED' | 'ERROR';
+  loaded: boolean;
   error?: any;
   lastRefresh: number;
   data: any;
 }
 
-export interface IDataSourceConfig {
+export interface IDataSourceConfig<T> {
   /**
    * (Optional) Used to determine when the application header tab should appear active; the field will be used via
    * $state.includes(activeState).
@@ -66,10 +66,20 @@ export interface IDataSourceConfig {
   icon?: string;
 
   /**
+   * Represents the name of the svg to be used with the svg loader (Icon.tsx)
+   */
+  iconName?: IconNames;
+
+  /**
    * unique value for this data source; the data source will be available on the Application directly via this key,
    * e.g. if the key is "serverGroups", you can access the data source via application.serverGroups
    */
   key: string;
+
+  /**
+   * The initial value of the data source
+   */
+  defaultData: T;
 
   /**
    * (Optional) The display label of the application header tab
@@ -101,7 +111,7 @@ export interface IDataSourceConfig {
    * If the onLoad method resolves with a null value, the result will be discarded and the data source's "data" field
    * will remain unchanged.
    */
-  onLoad?: (application: Application, result: any) => IPromise<any>;
+  onLoad?: (application: Application, result: any) => IPromise<T>;
 
   /**
    * (Optional) whether this data source should be included in the application by default
@@ -180,7 +190,7 @@ export interface IDataSourceConfig {
   category?: string;
 }
 
-export class ApplicationDataSource implements IDataSourceConfig {
+export class ApplicationDataSource<T = any> implements IDataSourceConfig<T> {
   /** Index Signature */
   [k: string]: any;
 
@@ -191,12 +201,13 @@ export class ApplicationDataSource implements IDataSourceConfig {
   public credentialsField: string;
   public description: string;
   public icon: string;
+  public iconName: IconNames;
   public key: string;
   public label: string;
   public category: string;
   public lazy = false;
   public loader: (application: Application) => IPromise<any>;
-  public onLoad: (application: Application, result: any) => IPromise<any>;
+  public onLoad: (application: Application, result: any) => IPromise<T>;
   public optIn = false;
   public optional = false;
   public primary = false;
@@ -242,9 +253,19 @@ export class ApplicationDataSource implements IDataSourceConfig {
   public active = false;
 
   /**
+   * The initial default value for the data source
+   */
+  public defaultData: T;
+
+  /**
    * The actual data (if any) for the data source. This field should only be populated by the "loader" method.
    */
-  public data: any[] = [];
+  public data: T;
+
+  /**
+   * The current fetch status of the data source
+   */
+  public status: IFetchStatus;
 
   /**
    * If entity tags are enabled, and any of the data has entity tags with alerts, they will be added to the data source
@@ -259,42 +280,35 @@ export class ApplicationDataSource implements IDataSourceConfig {
   public lastRefresh: number;
 
   /** This subject is used to cancel the internal subscription */
-  private destroy$ = new Subject<void>();
+  private destroy$: Subject<void>;
 
   /** This subject is used to trigger a new fetch */
-  private fetchRequest$ = new Subject<void>();
+  private fetchRequest$: Subject<void>;
 
   /**
    * Stream of IFetchStatus.
    * Updated when the status and/or data changes.
    * Starts with NOT_INITIALIZED
    */
-  public status$ = new BehaviorSubject<IFetchStatus>({
-    status: 'NOT_INITIALIZED',
-    lastRefresh: 0,
-    error: null,
-    data: this.data,
-  });
+  public status$: BehaviorSubject<IFetchStatus>;
 
   /** BehaviorSubject of data changes, starts by emitting the current value */
-  public data$ = new BehaviorSubject<any>(this.data);
+  public data$: BehaviorSubject<T>;
 
   /**
    * Stream of data changes
    * @deprecated use data$.skip(1) instead
    */
-  public refresh$: Observable<any> = this.data$.skip(1);
+  public refresh$: Observable<T>;
 
   /** Stream of failed IFetchStatus */
-  private refreshFailure$ = this.status$.skip(1).filter(({ status }) => status === 'ERROR');
+  private refreshFailure$: Observable<IFetchStatus>;
 
   /** Stream that throws fetch failures. */
-  private throwFailures$ = this.refreshFailure$.map(({ error }) => {
-    throw error;
-  });
+  private throwFailures$: Observable<never>;
 
   /** A stream that either emits the next data change, or throws */
-  private nextRefresh$ = Observable.merge(this.data$.skip(1), this.throwFailures$).take(1);
+  private nextRefresh$: Observable<T>;
 
   /**
    * A flag to toggle debug messages on. To use, open the JS console and enter:
@@ -306,9 +320,11 @@ export class ApplicationDataSource implements IDataSourceConfig {
    * Called when a method mutates some item in the data source's data, e.g. when a running execution is updated
    * independent of the execution data source's refresh cycle
    */
-  public dataUpdated(data?: any | undefined): void {
+  public dataUpdated(data?: T): void {
     if (this.loaded) {
       this.updateData(data !== undefined ? data : this.data);
+      const updatedStatus = { data: this.data, ...this.status$.value };
+      this.status$.next(updatedStatus);
     }
   }
 
@@ -325,9 +341,18 @@ export class ApplicationDataSource implements IDataSourceConfig {
     this.debug(`status: ${fetchStatus.status}`);
   }
 
-  constructor(config: IDataSourceConfig, private application: Application) {
+  constructor(config: IDataSourceConfig<T>, private application: Application) {
     Object.assign(this, config);
 
+    if (!config.hasOwnProperty('defaultData')) {
+      throw new Error(
+        'The defaultData field is required when registering a data source.\n\n' +
+          'defaultData accepts the initial default value that will be used before data has been fetched.\n' +
+          'For example, if your data source holds an array of objects, you should set defaultData to an empty array.',
+      );
+    }
+
+    this.data = this.data || this.defaultData;
     this.label = FirewallLabels.get(config.label || robotToHuman(config.key));
 
     if (!config.activeState && this.sref) {
@@ -338,6 +363,30 @@ export class ApplicationDataSource implements IDataSourceConfig {
       ReactInjector.$uiRouter.transitionService.onSuccess({ entering: this.activeState }, () => this.activate());
       ReactInjector.$uiRouter.transitionService.onSuccess({ exiting: this.activeState }, () => this.deactivate());
     }
+
+    // While we can initialize these fields directly on the class to give them private/public
+    // status, we have to configure their initial values down here or else things like this.data
+    // and this.defaultData will be undefined. This is because member initialization gets transpiled
+    // to the *top* of the constructor, so all custom constructor code runs last.
+    this.destroy$ = new Subject();
+    this.fetchRequest$ = new Subject();
+
+    this.status$ = new BehaviorSubject({
+      status: 'NOT_INITIALIZED',
+      loaded: this.loaded,
+      lastRefresh: 0,
+      error: null,
+      data: this.data,
+    });
+
+    this.data$ = new BehaviorSubject(this.data);
+
+    this.refresh$ = this.data$.skip(1);
+    this.refreshFailure$ = this.status$.skip(1).filter(({ status }) => status === 'ERROR');
+    this.throwFailures$ = this.refreshFailure$.map(({ error }) => {
+      throw error;
+    });
+    this.nextRefresh$ = Observable.merge(this.data$.skip(1), this.throwFailures$).take(1);
 
     const fetchStream$ = this.fetchRequest$
       .do(() => this.debug('fetch requested...'))
@@ -358,6 +407,7 @@ export class ApplicationDataSource implements IDataSourceConfig {
     fetchStream$.withLatestFrom(nextTick$).subscribe(([fetchStatus, _void]) => {
       // Update mutable flags
       this.statusUpdated(fetchStatus);
+      fetchStatus.loaded = this.loaded;
 
       if (fetchStatus.status === 'FETCHED') {
         this.updateData(fetchStatus.data);
@@ -383,7 +433,10 @@ export class ApplicationDataSource implements IDataSourceConfig {
    * @return a method to call to unsubscribe
    */
   public onNextRefresh($scope: IScope, callback: (data?: any) => void, onError?: (err?: any) => void): () => void {
-    const subscription = this.nextRefresh$.subscribe(data => callback(data), error => onError && onError(error));
+    const subscription = this.nextRefresh$.subscribe(
+      data => callback(data),
+      error => onError && onError(error),
+    );
 
     $scope && $scope.$on('$destroy', () => subscription.unsubscribe());
     return () => subscription.unsubscribe();
@@ -423,7 +476,7 @@ export class ApplicationDataSource implements IDataSourceConfig {
    *
    * @returns {IPromise<T>}
    */
-  public ready(): IPromise<any> {
+  public ready(): IPromise<T> {
     if (this.disabled || this.loaded || (this.lazy && !this.active)) {
       return $q.resolve(this.data);
     }
@@ -450,8 +503,8 @@ export class ApplicationDataSource implements IDataSourceConfig {
     this.active = false;
   }
 
-  private updateData(data: any) {
-    this.data = data || [];
+  private updateData(data: T) {
+    this.data = data || this.defaultData;
     this.data$.next(this.data);
     this.debug(`this.data:`, this.data);
   }
@@ -476,7 +529,7 @@ export class ApplicationDataSource implements IDataSourceConfig {
     this.debug(`refresh(${forceRefresh})`);
     if (!this.loader || this.disabled || (this.lazy && !this.active)) {
       this.loaded = false;
-      this.updateData([]);
+      this.updateData(this.defaultData);
       return $q.resolve(this.data);
     }
 
@@ -493,9 +546,9 @@ export class ApplicationDataSource implements IDataSourceConfig {
 
   private addAlerts(): void {
     this.alerts = [];
-    if (this.data && this.data.length) {
+    if (Array.isArray(this.data) && this.data.length) {
       this.alerts = this.data
-        .filter((d: any) => get(d, 'entityTags.alerts.length', 0))
+        .filter((d: any) => d.entityTags?.alerts?.length ?? 0)
         .map((d: any) => d['entityTags'] as IEntityTags);
     }
   }

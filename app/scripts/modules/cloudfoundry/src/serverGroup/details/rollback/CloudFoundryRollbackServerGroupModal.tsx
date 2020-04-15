@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { Modal, ModalFooter } from 'react-bootstrap';
 import { Form, Formik } from 'formik';
 
@@ -13,6 +13,7 @@ import {
   ReactInjector,
   ReactModal,
   ReactSelectInput,
+  SpinFormik,
   TaskMonitor,
   TaskReason,
 } from '@spinnaker/core';
@@ -110,17 +111,17 @@ export class CloudFoundryRollbackServerGroupModal extends React.Component<
     return (
       <>
         <TaskMonitorWrapper monitor={this.state.taskMonitor} />
-        <Formik<ICloudFoundryRollbackServerGroupValues>
+        <SpinFormik<ICloudFoundryRollbackServerGroupValues>
           ref={this.formikRef}
           initialValues={initialValues}
           onSubmit={this.submit}
           render={formik => {
             return (
               <>
-                <Modal.Header>
-                  <h3>Rollback {serverGroup.name}</h3>
-                </Modal.Header>
                 <ModalClose dismiss={this.close} />
+                <Modal.Header>
+                  <Modal.Title>Rollback {serverGroup.name}</Modal.Title>
+                </Modal.Header>
                 <Modal.Body>
                   <Form className="form-horizontal">
                     <div className="row" style={{ marginTop: '10px', marginBottom: '10px' }}>

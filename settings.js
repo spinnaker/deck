@@ -1,5 +1,7 @@
 'use strict';
 
+// Use environment variables when developing locally via 'yarn start', i.e.:
+// API_HOST=https://gate.spinnaker.mycompany.com yarn start
 var apiHost = process.env.API_HOST || 'http://localhost:8084';
 var artifactsEnabled = process.env.ARTIFACTS_ENABLED === 'true';
 var artifactsRewriteEnabled = process.env.ARTIFACTS_REWRITE_ENABLED === 'true';
@@ -19,16 +21,19 @@ var displayTimestampsInUserLocalTime = process.env.DISPLAY_TIMESTAMPS_IN_USER_LO
 var dryRunEnabled = process.env.DRYRUN_ENABLED === 'true' ? true : false;
 var entityTagsEnabled = process.env.ENTITY_TAGS_ENABLED === 'true' ? true : false;
 var fiatEnabled = process.env.FIAT_ENABLED === 'true' ? true : false;
+var gceScaleDownControlsEnabled = process.env.GCE_SCALE_DOWN_CONTROLS_ENABLED === 'true' ? true : false;
 var gceStatefulMigsEnabled = process.env.GCE_STATEFUL_MIGS_ENABLED === 'true' ? true : false;
 var gremlinEnabled = process.env.GREMLIN_ENABLED === 'false' ? false : true;
 var iapRefresherEnabled = process.env.IAP_REFRESHER_ENABLED === 'true' ? true : false;
 var infrastructureEnabled = process.env.INFRA_ENABLED === 'true' ? true : false;
-var managedPipelineTemplatesV2UIEnabled = process.env.MANAGED_PIPELINE_TEMPLATES_V2_UI_ENABLED === 'true';
+var managedDeliveryEnabled = process.env.MANAGED_DELIVERY_ENABLED === 'true';
 var managedServiceAccountsEnabled = process.env.MANAGED_SERVICE_ACCOUNTS_ENABLED === 'true';
+var managedResourcesEnabled = process.env.MANAGED_RESOURCES_ENABLED === 'true';
 var onDemandClusterThreshold = process.env.ON_DEMAND_CLUSTER_THRESHOLD || '350';
 var reduxLoggerEnabled = process.env.REDUX_LOGGER === 'true';
 var templatesEnabled = process.env.TEMPLATES_ENABLED === 'true';
 var useClassicFirewallLabels = process.env.USE_CLASSIC_FIREWALL_LABELS === 'true';
+var functionsEnabled = process.env.FUNCTIONS_ENABLED === 'true' ? true : false;
 
 window.spinnakerSettings = {
   authEnabled: authEnabled,
@@ -49,10 +54,23 @@ window.spinnakerSettings = {
   },
   checkForUpdates: true,
   debugEnabled: debugEnabled,
-  defaultCategory: 'serverGroup',
   defaultInstancePort: 80,
-  defaultProviders: ['appengine', 'aws', 'azure', 'cloudfoundry', 'dcos', 'ecs', 'gce', 'kubernetes', 'oracle'],
+  defaultProviders: [
+    'appengine',
+    'aws',
+    'azure',
+    'cloudfoundry',
+    'dcos',
+    'ecs',
+    'gce',
+    'huaweicloud',
+    'kubernetes',
+    'oracle',
+  ],
   defaultTimeZone: process.env.TIMEZONE || 'America/Los_Angeles', // see http://momentjs.com/timezone/docs/#/data-utilities/
+  entityTags: {
+    maxResults: 5000,
+  },
   feature: {
     artifacts: artifactsEnabled,
     artifactsRewrite: artifactsRewriteEnabled,
@@ -62,27 +80,33 @@ window.spinnakerSettings = {
     dryRunEnabled: dryRunEnabled,
     entityTags: entityTagsEnabled,
     fiatEnabled: fiatEnabled,
+    gceScaleDownControlsEnabled: gceScaleDownControlsEnabled,
     gceStatefulMigsEnabled: gceStatefulMigsEnabled,
     gremlinEnabled: gremlinEnabled,
     iapRefresherEnabled: iapRefresherEnabled,
     // whether stages affecting infrastructure (like "Create Load Balancer") should be enabled or not
     infrastructureStages: infrastructureEnabled,
-    jobs: false,
-    managedPipelineTemplatesV2UI: managedPipelineTemplatesV2UIEnabled,
+    managedDelivery: managedDeliveryEnabled,
     managedServiceAccounts: managedServiceAccountsEnabled,
+    managedResources: managedResourcesEnabled,
     notifications: false,
     pagerDuty: false,
     pipelineTemplates: false,
     pipelines: true,
     quietPeriod: false,
     roscoMode: false,
+    slack: false,
     snapshots: false,
     travis: false,
-    versionedProviders: true,
     wercker: false,
+    functions: functionsEnabled,
   },
   gateUrl: apiHost,
   gitSources: ['stash', 'github', 'bitbucket', 'gitlab'],
+  managedDelivery: {
+    defaultManifest: 'spinnaker.yml',
+    manifestBasePath: '.spinnaker',
+  },
   maxPipelineAgeDays: 14,
   newApplicationDefaults: {
     chaosMonkey: false,
@@ -179,6 +203,12 @@ window.spinnakerSettings = {
         zone: 'us-central1-f',
       },
     },
+    huaweicloud: {
+      defaults: {
+        account: 'default',
+        region: 'cn-north-1',
+      },
+    },
     kubernetes: {
       defaults: {
         account: 'my-kubernetes-account',
@@ -207,10 +237,15 @@ window.spinnakerSettings = {
   pagerDuty: {
     required: false,
   },
+  slack: {
+    baseUrl: 'https://slack.com',
+  },
   pubsubProviders: ['google'], // TODO(joonlim): Add amazon once it is confirmed that amazon pub/sub works.
+  plugins: [],
   searchVersion: 1,
   triggerTypes: [
     'artifactory',
+    'nexus',
     'concourse',
     'cron',
     'docker',
@@ -223,7 +258,7 @@ window.spinnakerSettings = {
     'wercker',
   ],
   useClassicFirewallLabels: useClassicFirewallLabels,
-  whatsNew: {
+  changelog: {
     fileName: 'news.md',
     gistId: '32526cd608db3d811b38',
   },

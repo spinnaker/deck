@@ -1,15 +1,15 @@
-import * as React from 'react';
+import React from 'react';
 import { $q } from 'ngimport';
 import { SortableContainer, SortableElement, SortableHandle, arrayMove, SortEnd } from 'react-sortable-hoc';
-import { difference, flatten, get, some, uniq } from 'lodash';
+import { difference, flatten, get, some, uniq, uniqBy } from 'lodash';
 import { FormikErrors, FormikProps } from 'formik';
 
 import {
   Application,
+  ConfirmationModalService,
   CustomLabels,
   HelpField,
   IWizardPageComponent,
-  ReactInjector,
   Tooltip,
   ValidationMessage,
 } from '@spinnaker/core';
@@ -30,7 +30,7 @@ import {
   IListenerActionType,
 } from 'amazon/domain';
 import { AmazonCertificateReader } from 'amazon/certificates/AmazonCertificateReader';
-import { IAuthenticateOidcActionConfig, OidcConfigReader } from 'amazon/loadBalancer/OidcConfigReader';
+import { IAuthenticateOidcActionConfig, OidcConfigReader } from '../../OidcConfigReader';
 
 import { ConfigureOidcConfigModal } from './ConfigureOidcConfigModal';
 import { AmazonCertificateSelectField } from '../common/AmazonCertificateSelectField';
@@ -45,15 +45,6 @@ export interface IALBListenersState {
 const DragHandle = SortableHandle(() => (
   <span className="pipeline-drag-handle clickable glyphicon glyphicon-resize-vertical" />
 ));
-export interface IAuthenticateOidcActionConfig {
-  authorizationEndpoint: string;
-  clientId: string;
-  issuer: string;
-  scope: string;
-  sessionCookieName: string;
-  tokenEndpoint: string;
-  userInfoEndpoint: string;
-}
 
 const defaultAuthAction = {
   authenticateOidcConfig: {
@@ -122,6 +113,11 @@ export class ALBListeners extends React.Component<IALBListenersProps, IALBListen
       errors.listeners = `Target group ${unusedTargetGroupNames[0]} is unused.`;
     } else if (unusedTargetGroupNames.length > 1) {
       errors.listeners = `Target groups ${unusedTargetGroupNames.join(', ')} are unused.`;
+    }
+
+    const { listeners } = values;
+    if (uniqBy(listeners, 'port').length < listeners.length) {
+      errors.listenerPorts = 'Multiple listeners cannot use the same port.';
     }
 
     const missingRuleFields = values.listeners.find(l => {
@@ -412,7 +408,7 @@ export class ALBListeners extends React.Component<IALBListenersProps, IALBListen
 
     if (confirmDefaultRemove || confirmRemove) {
       // TODO: Confirmation Dialog first.
-      ReactInjector.confirmationModalService.confirm({
+      ConfirmationModalService.confirm({
         header: 'Really remove authentication?',
         buttonText: `Remove Auth`,
         submitMethod: () => {
@@ -425,7 +421,6 @@ export class ALBListeners extends React.Component<IALBListenersProps, IALBListen
           }
           return $q.resolve();
         },
-        windowClass: 'zindex-top',
       });
     } else {
       this.removeAuthActionInternal(listener, actions, authIndex, ruleIndex);
@@ -588,6 +583,11 @@ export class ALBListeners extends React.Component<IALBListenersProps, IALBListen
                 </div>
               </div>
             ))}
+            {errors.listenerPorts && (
+              <div className="wizard-pod-row-errors">
+                <ValidationMessage type="error" message={errors.listenerPorts} />
+              </div>
+            )}
             {errors.listeners && (
               <div className="wizard-pod-row-errors">
                 <ValidationMessage type="error" message={errors.listeners} />
@@ -781,6 +781,13 @@ const Action = (props: {
       (props.oidcConfigs &&
         props.oidcConfigs.length > 0 &&
         (!clientId || props.oidcConfigs.find(c => c.clientId === clientId)));
+
+    const oidcOptions = props.oidcConfigs?.length ? (
+      props.oidcConfigs.map(config => <option key={config.clientId}>{config.clientId}</option>)
+    ) : (
+      <option disabled>No {CustomLabels.get('OIDC client')} config found</option>
+    );
+
     return (
       <div className="horizontal middle" style={{ height: '30px' }}>
         <span style={{ whiteSpace: 'pre' }}>auth with {CustomLabels.get('OIDC client')} </span>
@@ -793,9 +800,7 @@ const Action = (props: {
             required={true}
           >
             <option value="" />
-            {(props.oidcConfigs || []).map(config => (
-              <option key={config.clientId}>{config.clientId}</option>
-            ))}
+            {oidcOptions}
           </select>
         )}
         {!showOidcConfigs && (

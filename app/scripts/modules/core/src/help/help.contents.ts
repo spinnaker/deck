@@ -1,10 +1,13 @@
 import { HelpContentsRegistry } from './helpContents.registry';
+import { SETTINGS } from 'core/config/settings';
 
 export interface IHelpContents {
   [key: string]: string;
 }
 
 const helpContents: { [key: string]: string } = {
+  'core.serverGroup.detail':
+    '(Optional) <b>Detail</b> is a string of free-form alphanumeric characters and hyphens to describe any other variables in naming a cluster.',
   'core.serverGroup.strategy':
     'The deployment strategy tells Spinnaker what to do with the previous version of the server group.',
   'cluster.search': `
@@ -79,6 +82,8 @@ const helpContents: { [key: string]: string } = {
   'pipeline.config.checkPreconditions.failPipeline': `
       <p><strong>Checked</strong> - the overall pipeline will fail whenever this precondition is false.</p>
       <p><strong>Unchecked</strong> - the overall pipeline will continue executing but this particular branch will stop.</p>`,
+  'pipeline.config.checkPreconditions.failureMessage': `
+      <p> This failure message will be shown to the user if the precondition evaluates to false. </p>`,
   'pipeline.config.checkPreconditions.expectedSize': 'Number of server groups in the selected cluster',
   'pipeline.config.checkPreconditions.expression': `
       <p>Value must evaluate to "true".</p>
@@ -101,7 +106,7 @@ const helpContents: { [key: string]: string } = {
       </p>
       <p>For example, if you want to match against any GCS object, only supply <b>type</b> = gcs/object. If you also want to restrict the matches by other fields, include those as well.</p>
       <p>Regex is accepted, so you could for example match on a filepath like so <b>name</b> = .*\\.yaml to match all incoming YAML files.</p>
-      <p>See the <a href="https://www.spinnaker.io/reference/artifacts/">reference</a> for more information.</p>`,
+      <p>See the <a href="https://www.spinnaker.io/reference/artifacts/in-pipelines/#expected-artifacts">reference</a> for more information.</p>`,
   'pipeline.config.expectedArtifact.ifMissing': `
       <p>If no artifact was supplied by your trigger to match against this expected artifact, you have a few options:
         <ol>
@@ -134,12 +139,19 @@ const helpContents: { [key: string]: string } = {
       <p>Either the commit or branch to checkout.</p>`,
   'pipeline.config.expectedArtifact.defaultGithub.reference': `
       <p>The GitHub API content url the artifact lives under. The domain name may change if you're running GHE.</p>
-      <p>An example is <code>https://api.github.com/repos/$ORG/$REPO/contents/$FILEPATH</code>. See <a href="https://www.spinnaker.io/reference/artifacts/types/github-file/#fields">our docs</a> for more info.</p>`,
+      <p>An example for GitHub.com is <code>https://api.github.com/repos/$ORG/$REPO/contents/$FILEPATH</code>. An example for GitHub Enterprise is <code>https://github.domain.com/api/v3/repos/$ORG/$REPO/contents/$FILEPATH</code>. See <a href="https://www.spinnaker.io/reference/artifacts/types/github-file/#fields">our docs</a> for more info.</p>`,
   'pipeline.config.expectedArtifact.defaultGitlab.version': `
       <p>Either the commit or branch to checkout.</p>`,
   'pipeline.config.expectedArtifact.defaultGitlab.reference': `
       <p>The Gitlab API file url the artifact lives under. The domain name may change if you're running your own Gitlab server. The repository and path to files must be URL encoded.</p>
       <p>An example is <code>https://gitlab.com/api/v4/projects/$ORG%2F$REPO/repository/files/path%2Fto%2Ffile.yml/raw</code>. See <a href="https://www.spinnaker.io/reference/artifacts/types/gitlab-file/#fields">our docs</a> for more info.</p>`,
+  'pipeline.config.expectedArtifact.gitrepo.url': '<p>The location of your Git repository.</p>',
+  'pipeline.config.expectedArtifact.gitrepo.branch': '<p>The branch of the repository you want to use.</p>',
+  'pipeline.config.expectedArtifact.gitrepo.checkoutSubpath':
+    '<p>Check this if you want to specify a subpath; doing so will reduce the size of the generated artifact.</p>',
+  'pipeline.config.expectedArtifact.gitrepo.subpath': `
+    <p>The subpath within the Git repository you desire to checkout.</p>
+    <p>e.g.: <b>examples/wordpress/mysql/</b></p>`,
   'pipeline.config.expectedArtifact.helm.account': `
       <p>The account contains url the charts can be found</p>`,
   'pipeline.config.expectedArtifact.helm.name': `
@@ -149,15 +161,17 @@ const helpContents: { [key: string]: string } = {
   'pipeline.config.expectedArtifact.defaultBitbucket.reference': `
       <p>The Bitbucket API file url the artifact lives under. The domain name may change if you're running your own Bitbucket server. The repository and path to files must be URL encoded.</p>
       <p>An example is <code>https://api.bitbucket.org/1.0/repositories/$ORG/$REPO/raw/$VERSION/$FILEPATH</code>. See <a href="https://www.spinnaker.io/reference/artifacts/types/bitbucket-file/#fields">our docs</a> for more info.</p>`,
+  'pipeline.config.expectedArtifact.defaultBitbucket.filepath': `
+      <p>The file path within your repo. path/to/file.yml is an example.</p>`,
   'pipeline.config.trigger.webhook.source': `
       <p>Determines the target URL required to trigger this pipeline, as well as how the payload can be transformed into artifacts.</p>
   `,
   'pipeline.config.trigger.webhook.payloadConstraints': `
-      <p>When provided, only a webhook with a payload containing at least the specified key/value pairs will be allowed to trigger this pipeline. For example, if you wanted to lockdown the systems/users that can trigger this pipeline via this webhook, you could require the key "secret" and value "something-secret" as a constraint.</p>
+      <p>When provided, only a webhook with a payload containing at least the specified key/value pairs will be allowed to trigger this pipeline. For example, if you wanted to lock down the systems/users that can trigger this pipeline via this webhook, you could require the key "secret" and value "something-secret" as a constraint.</p>
       <p>The constraint values may be supplied as regex.</p>
   `,
   'pipeline.config.trigger.pubsub.attributeConstraints': `
-      <p>Pubsub mesages can have system-specific metadata accompanying the payload called <b>attributes</b>.</p>
+      <p>Pubsub messages can have system-specific metadata accompanying the payload called <b>attributes</b>.</p>
       <p>When provided, only a pubsub message with attributes containing at least the specified key/value pairs will be allowed to trigger this pipeline.</p>
       <p>The constraint value is a java regex string.</p>
   `,
@@ -254,6 +268,12 @@ const helpContents: { [key: string]: string } = {
   'pipeline.config.bake.manifest.expectedArtifact': '<p>This is the template you want to render.</p>',
   'pipeline.config.bake.manifest.overrideExpressionEvaluation':
     '<p>Explicitly evaluate SpEL expressions in overrides just prior to manifest baking. Can be paired with the "Skip SpEL evaluation" option in the Deploy Manifest stage when baking a third-party manifest artifact with expressions not meant for Spinnaker to evaluate as SpEL.</p>',
+  'pipeline.config.bake.manifest.templateRenderer': '<p>This is the engine used for rendering your manifest.</p>',
+  'pipeline.config.bake.manifest.helm.rawOverrides':
+    'Use <i>--set</i> instead of <i>--set-string</i> when injecting override values. Values injected using <i>--set</i> will be converted to primitive types by Helm.',
+  'pipeline.config.bake.manifest.kustomize.filePath': `
+    <p>This is the relative path to the kustomization.yaml file within your Git repo.</p>
+    <p>e.g.: <b>examples/wordpress/mysql/kustomization.yaml</b></p>`,
   'pipeline.config.haltPipelineOnFailure':
     'Immediately halts execution of all running stages and fails the entire execution.',
   'pipeline.config.haltBranchOnFailure':
@@ -299,8 +319,9 @@ const helpContents: { [key: string]: string } = {
   'pipeline.config.parallel.cancel.queue':
     '<p>If concurrent pipeline execution is disabled, then the pipelines that are in the waiting queue will get canceled when the next execution starts. <br><br>Check this box if you want to keep them in the queue.</p>',
   'pipeline.config.timeout': `
-      <p>Allows you to override the amount of time the stage can run before failing.</p>
-      <p><b>Note:</b> this represents the overall time the stage has to complete (the sum of all the task times).</p>`,
+      <p>Allows you to force the stage to fail if its running time exceeds a specific length.</p>
+      <p><b>Note:</b> By default, Spinnaker will use sensible timeouts that depend on the stage type and the operations the stage needs to perform at runtime. These defaults can vary based on chosen configuration and other external factors.
+      </p>`,
   'pipeline.config.trigger.runAsUser':
     "The current user must have access to the specified service account, and the service account must have access to the current application. Otherwise, you'll receive an 'Access is denied' error.",
   'pipeline.config.script.repoUrl':
@@ -359,6 +380,12 @@ const helpContents: { [key: string]: string } = {
     '<p>Rolling red black will slowly scale up the new server group. It will resize the new server group by each percentage defined.</p>',
   'strategy.rollingRedBlack.rollback':
     '<p>Disable the new server group and ensure that the previous server group is restored to its original capacity.</p>',
+  'strategy.monitored.deploySteps':
+    '<p>Monitored Deploy will scale up the new server group as specified by these per cent steps. After each step, the health of the new server group will be evaluated by the specified deployment monitor.</p>',
+  'strategy.monitored.rollback':
+    '<p>If deploy fails, disable the new server group and ensure that the previous server group is active and restored to its original capacity.</p>',
+  'strategy.monitored.destroyFailedAsg':
+    '<p>If deploy fails and rollback succeeds destroys the server group that failed the deploy instead of just disabling it.</p>',
   'loadBalancers.filter.serverGroups': `
       <p>Displays all server groups configured to use the load balancer.</p>
       <p>If the server group is configured to <em>not</em> add new instances to the load balancer, it will be grayed out.</p>`,
@@ -373,9 +400,9 @@ const helpContents: { [key: string]: string } = {
       <p>Filters the list of load balancers and server groups (if enabled)
       to only show load balancers with instances failing the health check for the load balancer.</p>`,
   'project.cluster.stack':
-    '<p>(Optional field)</p><p>Filters displayed clusters by stack.</p><p>Enter <samp>*</samp> to include all stacks; leave blank to omit any clusters with a stack.</p>',
+    '<p>(Optional field)</p><p>Filters displayed clusters by stack.</p><p>Enter <samp>*</samp> to include all stacks; leave blank to omit any clusters with a stack.</p><p>Only <samp>*</samp> is valid for Kubernetes V2 accounts.</p>',
   'project.cluster.detail':
-    '<p>(Optional field)</p><p>Filters displayed clusters by detail.</p><p>Enter <samp>*</samp> to include all details; leave blank to omit any clusters with a detail.</p>',
+    '<p>(Optional field)</p><p>Filters displayed clusters by detail.</p><p>Enter <samp>*</samp> to include all details; leave blank to omit any clusters with a detail.</p><p>Only <samp>*</samp> is valid for Kubernetes V2 accounts.</p>',
   'instanceType.storageOverridden':
     '<p>These storage settings have been cloned from the base server group and differ from the default settings for this instance type.</p>',
   'instanceType.unavailable': '<p>This instance type is not available for the selected configuration.</p>',
@@ -393,7 +420,7 @@ const helpContents: { [key: string]: string } = {
   'pipeline.waitForCompletion':
     'if unchecked, marks the stage as successful right away without waiting for the pipeline to complete',
   'jenkins.waitForCompletion':
-    'if unchecked, marks the stage as successful right away without waiting for the jenkins job to complete',
+    'if unchecked, marks the stage as successful right away without waiting for the Jenkins job to complete',
   'travis.waitForCompletion':
     'if unchecked, marks the stage as successful right away without waiting for the Travis job to complete',
   'wercker.waitForCompletion':
@@ -403,6 +430,8 @@ const helpContents: { [key: string]: string } = {
   'markdown.examples':
     'Some examples of markdown syntax: <br/> *<em>emphasis</em>* <br/> **<b>strong</b>** <br/> [link text](http://url-goes-here)',
   'pipeline.config.webhook.payload': 'JSON payload to be added to the webhook call.',
+  'pipeline.config.webhook.cancelPayload':
+    'JSON payload to be added to the webhook call when it is called in response to a cancellation.',
   'pipeline.config.webhook.waitForCompletion':
     'If not checked, we consider the stage succeeded if the webhook returns an HTTP status code 2xx, otherwise it will be failed. If checked, it will poll a status url (defined below) to determine the progress of the stage.',
   'pipeline.config.webhook.statusUrlResolutionIsGetMethod': "Use the webhook's URL with GET method as status endpoint.",
@@ -421,14 +450,16 @@ const helpContents: { [key: string]: string } = {
   'pipeline.config.webhook.progressJsonPath':
     "JSON path to a descriptive message about the progress in the webhook's response JSON. (e.g. <samp>$.buildInfo.progress</samp>)",
   'pipeline.config.webhook.successStatuses':
-    'Comma-separated list of strings that will be considered as SUCCESS status.',
+    'Comma-separated list of strings (that will be returned in the response body in the previously defined `statusJsonPath` field) that will be considered as SUCCESS status.',
   'pipeline.config.webhook.canceledStatuses':
-    'Comma-separated list of strings that will be considered as CANCELED status.',
+    'Comma-separated list of strings (that will be returned in the response body in the previously defined `statusJsonPath` field) that will be considered as CANCELED status.',
   'pipeline.config.webhook.terminalStatuses':
-    'Comma-separated list of strings that will be considered as TERMINAL status.',
+    'Comma-separated list of strings (that will be returned in the response body in the previously defined `statusJsonPath` field) that will be considered as TERMINAL status.',
   'pipeline.config.webhook.customHeaders': 'Key-value pairs to be sent as additional headers to the service.',
   'pipeline.config.webhook.failFastCodes':
     'Comma-separated HTTP status codes (4xx or 5xx) that will cause this webhook stage to fail without retrying.',
+  'pipeline.config.webhook.signalCancellation':
+    'Trigger a specific webhook if this stage is cancelled by user or due to pipeline failure',
   'pipeline.config.parameter.label': '(Optional): a label to display when users are triggering the pipeline manually',
   'pipeline.config.parameter.description': `(Optional): if supplied, will be displayed to users as a tooltip
       when triggering the pipeline manually. You can include HTML in this field.`,
@@ -449,6 +480,14 @@ const helpContents: { [key: string]: string } = {
   'pipeline.config.entitytags.namespace': `All tags have an associated namespace (<strong>default</strong> will be used if unspecified) that provides a means of grouping tags by a logical owner.`,
   'pipeline.config.entitytags.value': `Value can either be a string or an object. If you want to use an object, input a valid JSON string.`,
   'pipeline.config.entitytags.region': `(Optional) Target a specific region, use * if you want to apply to all regions.`,
+  'pipeline.config.deliveryConfig.manifest': `(Optional) Name of the file with your Delivery Config manifest. Leave blank to use the default name (<strong><i>${SETTINGS.managedDelivery?.defaultManifest}</i></strong>).`,
+  'pipeline.config.codebuild.source': `(Optional) Source of the build. It will be overrided to Spinnaker artifact if checked. If not checked, source configured in CodeBuild project will be used.`,
+  'pipeline.config.codebuild.sourceType': `(Optional) Type of the source. It can be specified explicitly, otherwise it will be inferred from source artifact.`,
+  'pipeline.config.codebuild.sourceVersion': `(Optional) Source version of the build. If not specified, the artifact version will be used. If artifact doesn't have a version, the latest version will be used. See the <a href="https://docs.aws.amazon.com/codebuild/latest/APIReference/API_StartBuild.html#CodeBuild-StartBuild-request-sourceVersion">CodeBuild reference</a> for more information.`,
+  'pipeline.config.codebuild.buildspec': `(Optional) Inline buildspec definition of the build. If not specified, buildspec configured in CodeBuild project will be used.`,
+  'pipeline.config.codebuild.secondarySources': `(Optional) Secondary sources of the build. It can be overrided by adding Spinnaker Artifacts. If not specified, secondary sources configured in CodeBuild project will be used.`,
+  'pipeline.config.codebuild.image': `(Optional) Image in which the build will run. It can be overrided by specifying the name of the image. If not specified, image configured in CodeBuild project will be used.`,
+  'pipeline.config.codebuild.envVar': `(Optional) Environment variables that will be propagated into the build.`,
 };
 
 Object.keys(helpContents).forEach(key => HelpContentsRegistry.register(key, helpContents[key]));

@@ -1,9 +1,9 @@
 import { cloneDeep } from 'lodash';
-import * as React from 'react';
+import React from 'react';
 
 import { ArtifactTypePatterns } from 'core/artifact';
 import { IArtifactEditorProps, IArtifactKindConfig } from 'core/domain';
-import { StageConfigField } from 'core/pipeline';
+import { StageConfigField } from '../../../stages/common';
 import { SpelText } from 'core/widgets';
 
 import { singleFieldArtifactEditor } from '../singleFieldArtifactEditor';
@@ -42,27 +42,39 @@ export const BitbucketDefault: IArtifactKindConfig = {
     }
 
     private onReferenceChanged = (reference: string) => {
-      const pathRegex = new RegExp('/1.0/repositories/[^/]*/[^/]*/raw/[^/]*/(.*)$');
-      const results = pathRegex.exec(reference);
-      if (results !== null) {
-        const clonedArtifact = cloneDeep(this.props.artifact);
-        clonedArtifact.name = decodeURIComponent(results[1]);
-        clonedArtifact.reference = reference;
-        this.props.onChange(clonedArtifact);
-      }
+      const clonedArtifact = cloneDeep(this.props.artifact);
+      clonedArtifact.reference = reference;
+      this.props.onChange(clonedArtifact);
+    };
+
+    private onFilePathChanged = (name: string) => {
+      const clonedArtifact = cloneDeep(this.props.artifact);
+      clonedArtifact.name = name;
+      this.props.onChange(clonedArtifact);
     };
 
     public render() {
       return (
-        <StageConfigField label="Object path" helpKey="pipeline.config.expectedArtifact.defaultDocker.reference">
-          <SpelText
-            placeholder="gcr.io/project/image@sha256:9efcc2818c9..."
-            value={this.props.artifact.reference}
-            onChange={this.onReferenceChanged}
-            pipeline={this.props.pipeline}
-            docLink={true}
-          />
-        </StageConfigField>
+        <>
+          <StageConfigField label="Object path" helpKey="pipeline.config.expectedArtifact.defaultBitbucket.reference">
+            <SpelText
+              placeholder="https://api.bitbucket.com/rest/api/1.0/$PROJECTS/$PROJECTKEY/repos/$REPONAME/raw/$FILEPATH"
+              value={this.props.artifact.reference}
+              onChange={this.onReferenceChanged}
+              pipeline={this.props.pipeline}
+              docLink={true}
+            />
+          </StageConfigField>
+          <StageConfigField label="File Path" helpKey="pipeline.config.expectedArtifact.defaultBitbucket.filepath">
+            <SpelText
+              placeholder="path/to/file.yml"
+              onChange={this.onFilePathChanged}
+              value={this.props.artifact.name}
+              pipeline={this.props.pipeline}
+              docLink={true}
+            />
+          </StageConfigField>
+        </>
       );
     }
   },

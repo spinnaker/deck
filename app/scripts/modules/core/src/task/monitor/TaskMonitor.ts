@@ -1,6 +1,7 @@
-import { noop, IPromise, IDeferred } from 'angular';
+import { IPromise, IDeferred } from 'angular';
 import { IModalServiceInstance } from 'angular-ui-bootstrap';
 import { $timeout, $q } from 'ngimport';
+import { Subject } from 'rxjs';
 
 import { Application } from 'core/application/application.model';
 import { ITask } from 'core/domain';
@@ -31,7 +32,8 @@ export class TaskMonitor {
   public modalInstance: IModalServiceInstance;
   private monitorInterval: number;
   private onTaskComplete: () => any;
-  private onTaskRetry: () => void;
+  public onTaskRetry: () => void;
+  public statusUpdatedStream: Subject<void> = new Subject<void>();
 
   /** Use this factory in React Modal classes to emulate an AngularJS UI-Bootstrap modalInstance */
   public static modalInstanceEmulation<T = any>(
@@ -39,11 +41,19 @@ export class TaskMonitor {
     onDismiss?: (result: T) => void,
   ): IModalServiceInstanceEmulation {
     const deferred = $q.defer();
+    // handle when modal was closed
+    deferred.promise.catch(() => {});
     return {
       deferred,
       result: deferred.promise,
-      close: onClose,
-      dismiss: onDismiss || onClose,
+      close: (result: T) => {
+        deferred.resolve(result);
+        return onClose(result);
+      },
+      dismiss: (result: T) => {
+        deferred.reject(result);
+        return (onDismiss || onClose)(result);
+      },
     } as IModalServiceInstanceEmulation;
   }
 
@@ -57,7 +67,10 @@ export class TaskMonitor {
     this.submitMethod = config.submitMethod;
 
     if (this.modalInstance) {
-      this.modalInstance.result.then(() => this.onModalClose(), () => this.onModalClose());
+      this.modalInstance.result.then(
+        () => this.onModalClose(),
+        () => this.onModalClose(),
+      );
     }
   }
 
@@ -67,13 +80,14 @@ export class TaskMonitor {
     }
   }
 
-  public closeModal(): void {
+  public closeModal = (evt?: React.MouseEvent<any>): void => {
     try {
+      evt && evt.stopPropagation();
       this.modalInstance.dismiss();
     } catch (ignored) {
       // modal was already closed
     }
-  }
+  };
 
   public startSubmit(): void {
     this.submitting = true;
@@ -81,6 +95,7 @@ export class TaskMonitor {
     this.error = false;
     this.errorMessage = null;
     document.activeElement && (document.activeElement as HTMLElement).blur();
+    this.statusUpdatedStream.next();
   }
 
   public setError(task?: ITask): void {
@@ -92,6 +107,12 @@ export class TaskMonitor {
     }
     this.submitting = false;
     this.error = true;
+    this.statusUpdatedStream.next();
+  }
+
+  private handleTaskComplete(): void {
+    this.onTaskComplete?.();
+    this.statusUpdatedStream.next();
   }
 
   public handleTaskSuccess(task: ITask): void {
@@ -99,17 +120,18 @@ export class TaskMonitor {
     if (this.application && this.application.getDataSource('runningTasks')) {
       this.application.getDataSource('runningTasks').refresh();
     }
-    TaskReader.waitUntilTaskCompletes(task, this.monitorInterval)
-      .then(() => (this.onTaskComplete ? this.onTaskComplete() : noop))
+    TaskReader.waitUntilTaskCompletes(task, this.monitorInterval, this.statusUpdatedStream)
+      .then(() => this.handleTaskComplete())
       .catch(() => this.setError(task));
+    this.statusUpdatedStream.next();
   }
 
-  public tryToFix() {
+  public tryToFix = () => {
     this.error = null;
     if (this.onTaskRetry) {
       this.onTaskRetry();
     }
-  }
+  };
 
   public submit = (submitMethod?: () => IPromise<ITask>) => {
     this.startSubmit();

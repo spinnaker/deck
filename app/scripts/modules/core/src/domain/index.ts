@@ -1,4 +1,3 @@
-export * from './IAppNotification';
 export * from './IArtifact';
 export * from './IArtifactEditorProps';
 export * from './IArtifactExtractor';
@@ -20,6 +19,9 @@ export * from './IExecution';
 export * from './IExecutionStage';
 export * from './IExecutionTrigger';
 export * from './IExpectedArtifact';
+export * from './IFunction';
+
+export * from './IGcbTrigger';
 
 export * from './IHealth';
 
@@ -32,8 +34,13 @@ export * from './IJenkinsInfo';
 export * from '../widgets/Keys';
 
 export * from './ILoadBalancer';
+export * from './ILoadBalancerIncompatibility';
 
+export * from './IManagedEntity';
 export * from './IManifest';
+
+export * from './INotification';
+export * from './INotificationTypeConfig';
 
 export * from './IOrchestratedItem';
 

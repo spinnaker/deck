@@ -1,10 +1,12 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 import { AccountService, Registry } from '@spinnaker/core';
 
-module.exports = angular
-  .module('spinnaker.dcos.pipeline.stage.findAmiStage', [])
+export const DCOS_PIPELINE_STAGES_FINDAMI_DCOSFINDAMISTAGE = 'spinnaker.dcos.pipeline.stage.findAmiStage';
+export const name = DCOS_PIPELINE_STAGES_FINDAMI_DCOSFINDAMISTAGE; // for backwards compatibility
+angular
+  .module(DCOS_PIPELINE_STAGES_FINDAMI_DCOSFINDAMISTAGE, [])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'findImage',
@@ -20,7 +22,7 @@ module.exports = angular
   .controller('dcosFindAmiStageController', [
     '$scope',
     function($scope) {
-      let stage = $scope.stage;
+      const stage = $scope.stage;
 
       $scope.state = {
         accounts: false,

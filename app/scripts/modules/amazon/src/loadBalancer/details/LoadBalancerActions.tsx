@@ -1,14 +1,15 @@
-import * as React from 'react';
+import React from 'react';
 import { Dropdown } from 'react-bootstrap';
-import { get } from 'lodash';
+import { get, values } from 'lodash';
 
 import {
   Application,
   ApplicationReader,
+  ConfirmationModalService,
   LoadBalancerWriter,
+  ManagedMenuItem,
   SETTINGS,
   NgReact,
-  ReactInjector,
   HelpField,
 } from '@spinnaker/core';
 
@@ -46,8 +47,10 @@ export class LoadBalancerActions extends React.Component<ILoadBalancerActionsPro
           this.setState({ application: loadBalancerApp });
         })
         .catch(() => {
-          // If the application can't be found, just use the old one
-          this.setState({ application: this.props.app });
+          // We should not "just use the current app" in place of the (missing) app
+          // that the load balancer actually belongs.
+          // Instead, the user should be forced to create the application of the orphaned load balancer.
+          // Otherwise, there will be unexpected behavior.
         });
     }
 
@@ -86,12 +89,10 @@ export class LoadBalancerActions extends React.Component<ILoadBalancerActionsPro
 
     const submitMethod = () => LoadBalancerWriter.deleteLoadBalancer(command, app);
 
-    ReactInjector.confirmationModalService.confirm({
+    ConfirmationModalService.confirm({
       header: `Really delete ${loadBalancerFromParams.name} in ${loadBalancerFromParams.region}: ${loadBalancerFromParams.accountId}?`,
       buttonText: `Delete ${loadBalancerFromParams.name}`,
-      provider: 'aws',
       account: loadBalancerFromParams.accountId,
-      applicationName: app.name,
       taskMonitorConfig: taskMonitor,
       submitMethod,
     });
@@ -104,8 +105,14 @@ export class LoadBalancerActions extends React.Component<ILoadBalancerActionsPro
   public render() {
     const { app, loadBalancer } = this.props;
     const { application } = this.state;
-
     const { AddEntityTagLinks } = NgReact;
+
+    const { loadBalancerType, instances, instanceCounts } = loadBalancer;
+    const loadBalancerAppName = loadBalancer.name.split('-')[0];
+
+    const clbInstances =
+      loadBalancerType === 'classic' && values(instanceCounts).filter((v: number | undefined) => v).length;
+    const allowDeletion = !clbInstances && !instances.length;
 
     return (
       <div style={{ display: 'inline-block' }}>
@@ -114,21 +121,29 @@ export class LoadBalancerActions extends React.Component<ILoadBalancerActionsPro
             <span>Load Balancer Actions</span>
           </Dropdown.Toggle>
           <Dropdown.Menu className="dropdown-menu">
-            <li className={!application ? 'disabled' : ''}>
-              <a className="clickable" onClick={this.editLoadBalancer}>
+            {application && (
+              <ManagedMenuItem resource={loadBalancer} application={app} onClick={this.editLoadBalancer}>
                 Edit Load Balancer
-              </a>
-            </li>
-            {!loadBalancer.instances.length && (
-              <li>
-                <a className="clickable" onClick={this.deleteLoadBalancer}>
-                  Delete Load Balancer
+              </ManagedMenuItem>
+            )}
+            {!application && (
+              <li className="disabled">
+                <a>
+                  Edit Load Balancer{' '}
+                  <HelpField
+                    content={`The application <b>${loadBalancerAppName}</b> must be configured before this load balancer can be edited.`}
+                  />
                 </a>
               </li>
             )}
-            {loadBalancer.instances.length > 0 && (
+            {allowDeletion && (
+              <ManagedMenuItem resource={loadBalancer} application={app} onClick={this.deleteLoadBalancer}>
+                Delete Load Balancer
+              </ManagedMenuItem>
+            )}
+            {!allowDeletion && (
               <li className="disabled">
-                <a className="clickable" onClick={this.deleteLoadBalancer}>
+                <a>
                   Delete Load Balancer{' '}
                   <HelpField content="You must detach all instances before you can delete this load balancer." />
                 </a>

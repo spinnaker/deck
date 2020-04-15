@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { mock, noop, IScope } from 'angular';
 import { mount, shallow } from 'enzyme';
 
@@ -45,7 +45,8 @@ describe('<AccountRegionClusterSelector />', () => {
           createServerGroup('account-name-one', 'app-stack-detailFour', 'app', 'region-three'),
           createServerGroup('account-name-one', 'app-stack-detailFive', 'app', 'region-two'),
         ],
-      } as ApplicationDataSource);
+        defaultData: [] as IServerGroup[],
+      } as ApplicationDataSource<IServerGroup[]>);
     }),
   );
 

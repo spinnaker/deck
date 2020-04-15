@@ -1,7 +1,7 @@
 <div class="modal-page">
   <modal-close dismiss="$dismiss()"></modal-close>
   <div class="modal-header">
-    <h3 data-purpose="modal-header">New Application</h3>
+    <h4 class="modal-title">New Application</h4>
   </div>
   <div ng-if="newAppModal.state.initializing" style="height: 200px">
     <loading-spinner size="'medium'"></loading-spinner>
@@ -129,6 +129,13 @@
         <pager-duty-select-field component="newAppModal.application"></pager-duty-select-field>
       </render-if-feature>
 
+      <render-if-feature feature="slack">
+        <slack-channel-selector
+          channel="newAppModal.application.slackChannel"
+          callback="newAppModal.setAttribute"
+        ></slack-channel-selector>
+      </render-if-feature>
+
       <div class="form-group row">
         <div class="col-sm-3 sm-label-right">Description</div>
         <div class="col-sm-9">
@@ -230,6 +237,11 @@
             Enable restarting running pipelines
           </label>
           <help-field key="application.enableRestartRunningExecutions"></help-field>
+          <label>
+            <input type="checkbox" ng-model="editApp.applicationAttributes.enableRerunActiveExecutions" />
+            Enable re-run button on active pipelines
+          </label>
+          <help-field key="application.enableRerunActiveExecutions"></help-field>
         </div>
       </div>
 

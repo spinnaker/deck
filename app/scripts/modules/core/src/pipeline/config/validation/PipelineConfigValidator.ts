@@ -1,7 +1,7 @@
 import { IPromise } from 'angular';
 import { Subject, Subscription } from 'rxjs';
 import { $log, $q } from 'ngimport';
-import { values, flatten } from 'lodash';
+import { values, flatten, isNumber } from 'lodash';
 import { FormikErrors } from 'formik';
 
 import {
@@ -62,11 +62,11 @@ export class PipelineConfigValidator {
   }
 
   public static validatePipeline(pipeline: IPipeline): IPromise<IPipelineValidationResults> {
-    const stages: IStage[] = pipeline.stages || [],
-      triggers: ITrigger[] = pipeline.triggers || [],
-      validations: Array<IPromise<void>> = [],
-      pipelineValidations: string[] = this.getPipelineLevelValidations(pipeline),
-      stageValidations: Map<IStage, string[]> = new Map();
+    const stages: IStage[] = pipeline.stages || [];
+    const triggers: ITrigger[] = pipeline.triggers || [];
+    const validations: Array<IPromise<void>> = [];
+    const pipelineValidations: string[] = this.getPipelineLevelValidations(pipeline);
+    const stageValidations: Map<IStage, string[]> = new Map();
     let preventSave = false;
 
     triggers.forEach((trigger, index) => {
@@ -148,6 +148,13 @@ export class PipelineConfigValidator {
             }
           }),
         );
+      }
+
+      if (stage.stageTimeoutMs !== undefined && !(isNumber(stage.stageTimeoutMs) && stage.stageTimeoutMs > 0)) {
+        stageValidations.set(stage, [
+          ...(stageValidations.get(stage) || []),
+          'Stage is configured to fail after a specific amount of time, but no time is set.',
+        ]);
       }
     });
 

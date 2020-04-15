@@ -1,17 +1,19 @@
-import * as React from 'react';
-import * as ReactGA from 'react-ga';
+import React from 'react';
+import ReactGA from 'react-ga';
 import { UISref } from '@uirouter/react';
 import { isEqual } from 'lodash';
 import { $location } from 'ngimport';
 import { Subscription } from 'rxjs';
-import * as classNames from 'classnames';
+import classNames from 'classnames';
 
 import { Application } from 'core/application/application.model';
-import { StageExecutionDetails } from 'core/pipeline/details/StageExecutionDetails';
-import { ExecutionStatus } from 'core/pipeline/status/ExecutionStatus';
-import { ParametersAndArtifacts } from 'core/pipeline/status/ParametersAndArtifacts';
+import { ConfirmationModalService } from 'core/confirmationModal';
+import { StageExecutionDetails } from '../../details/StageExecutionDetails';
+import { ExecutionStatus } from '../../status/ExecutionStatus';
+import { ParametersAndArtifacts } from '../../status/ParametersAndArtifacts';
+import { ExecutionCancellationReason } from '../../status/ExecutionCancellationReason';
 import { IExecution, IRestartDetails, IPipeline } from 'core/domain';
-import { IExecutionViewState, IPipelineGraphNode } from 'core/pipeline/config/graph/pipelineGraph.service';
+import { IExecutionViewState, IPipelineGraphNode } from '../../config/graph/pipelineGraph.service';
 import { OrchestratedItemRunningTime } from './OrchestratedItemRunningTime';
 import { SETTINGS } from 'core/config/settings';
 import { AccountTag } from 'core/account';
@@ -22,7 +24,7 @@ import { ExecutionState } from 'core/state';
 
 // react components
 import { ExecutionMarker } from './ExecutionMarker';
-import { PipelineGraph } from 'core/pipeline/config/graph/PipelineGraph';
+import { PipelineGraph } from '../../config/graph/PipelineGraph';
 import { Tooltip } from 'core/presentation/Tooltip';
 import { CancelModal } from 'core/cancelModal/CancelModal';
 import { ExecutionPermalink } from './ExecutionPermalink';
@@ -148,8 +150,8 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
   }
 
   public deleteExecution(): void {
-    const { confirmationModalService, executionService } = ReactInjector;
-    confirmationModalService.confirm({
+    const { executionService } = ReactInjector;
+    ConfirmationModalService.confirm({
       header: 'Really delete execution?',
       buttonText: 'Delete',
       body: '<p>This will permanently delete the execution history.</p>',
@@ -179,8 +181,8 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
   }
 
   public pauseExecution(): void {
-    const { confirmationModalService, executionService } = ReactInjector;
-    confirmationModalService.confirm({
+    const { executionService } = ReactInjector;
+    ConfirmationModalService.confirm({
       header: 'Really pause execution?',
       buttonText: 'Pause',
       body:
@@ -190,8 +192,8 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
   }
 
   public resumeExecution(): void {
-    const { confirmationModalService, executionService } = ReactInjector;
-    confirmationModalService.confirm({
+    const { executionService } = ReactInjector;
+    ConfirmationModalService.confirm({
       header: 'Really resume execution?',
       buttonText: 'Resume',
       submitMethod: () => executionService.resumeExecution(this.props.application, this.props.execution.id),
@@ -263,9 +265,9 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
     ReactGA.event({ category: 'Pipeline', action: 'Execution source clicked' });
   };
 
-  private handleToggleDetails = (): void => {
+  private handleToggleDetails = (showingDetails: boolean): void => {
     ReactGA.event({ category: 'Pipeline', action: 'Execution details toggled (Details link)' });
-    this.toggleDetails();
+    showingDetails ? this.toggleDetails() : this.toggleDetails(0, 0);
   };
 
   private scrollIntoView = (forceScroll = false) => {
@@ -339,7 +341,7 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
               {executionMarkers}
               {!execution.stageSummaries.length && (
                 <div className="text-center">
-                  No stages found.
+                  No stages found.{' '}
                   <a onClick={this.handleSourceNoStagesClick} target="_blank" href={pipelinesUrl + execution.id}>
                     Source
                   </a>
@@ -365,7 +367,7 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
                 )}
               </span>
               {execution.cancellationReason && (
-                <Tooltip value={execution.cancellationReason}>
+                <Tooltip value="See Cancellation Reason below for additional details.">
                   <span className="glyphicon glyphicon-info-sign" />
                 </Tooltip>
               )}
@@ -399,21 +401,19 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
                 </button>
               </Tooltip>
             )}
+            {(!execution.isActive || application.attributes.enableRerunActiveExecutions) && this.props.onRerun && (
+              <Tooltip value="Re-run execution with same parameters">
+                <button className="link" onClick={this.handleRerunClick}>
+                  <i className="fa fa-redo" />
+                </button>
+              </Tooltip>
+            )}
             {!execution.isActive && (
-              <span>
-                {this.props.onRerun && (
-                  <Tooltip value="Re-run execution with same parameters">
-                    <button className="link" onClick={this.handleRerunClick}>
-                      <i className="fa fa-redo" />
-                    </button>
-                  </Tooltip>
-                )}
-                <Tooltip value="Delete execution">
-                  <button className="link" onClick={this.handleDeleteClick}>
-                    <span className="glyphicon glyphicon-trash" />
-                  </button>
-                </Tooltip>
-              </span>
+              <Tooltip value="Delete execution">
+                <button className="link" onClick={this.handleDeleteClick}>
+                  <span className="glyphicon glyphicon-trash" />
+                </button>
+              </Tooltip>
             )}
             {execution.isActive && (
               <Tooltip value={cancelHelpText}>
@@ -424,6 +424,10 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
             )}
           </div>
 
+          {execution.cancellationReason && (
+            <ExecutionCancellationReason cancellationReason={execution.cancellationReason} />
+          )}
+
           <ParametersAndArtifacts
             execution={execution}
             expandParamsOnInit={standalone}
@@ -432,7 +436,7 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
 
           {!standalone && (
             <div className="execution-details-button">
-              <a className="clickable" onClick={this.handleToggleDetails}>
+              <a className="clickable" onClick={() => this.handleToggleDetails(showingDetails)}>
                 <span
                   className={`small glyphicon ${showingDetails ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right'}`}
                 />

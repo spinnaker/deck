@@ -4,13 +4,13 @@
       <h4 ng-bind="stage.name || '[new stage]'"></h4>
       <p class="small" ng-if="stage.type && label">
         <strong>Stage type:</strong> {{label}}<br />
-        {{description}}
+        <markdown message="description"></markdown>
       </p>
       <p class="small" ng-if="extendedDescription" ng-bind-html="extendedDescription"></p>
       <p class="small" ng-if="!stage.type">No stage type selected</p>
     </div>
     <div class="col-md-7 form-horizontal">
-      <stage-config-field label="Type" field-columns="9" ng-if="stage.isNew">
+      <stage-config-field label="Type" field-columns="9" ng-if="stage.isNew || !stage.type">
         <ui-select
           ng-model="options.selectedStageType"
           style="width: 250px"
@@ -111,20 +111,29 @@
       visible="canConfigureNotifications"
       badge="stage.notifications.length"
     >
-      <notification-list level="stage" notifications="stage.notifications" parent="stage"></notification-list>
+      <notification-list
+        level="'stage'"
+        handle-send-notifications-changed="stageConfigCtrl.handleSendNotificationsChanged"
+        notifications="stage.notifications"
+        send-notifications="!!stage.sendNotifications"
+        type="stage.type"
+        update-notifications="stageConfigCtrl.updateNotifications"
+      >
+      </notification-list>
     </page-section>
-    <page-section
-      key="producesArtifacts"
-      label="Produces Artifacts"
-      visible="stageProducesArtifacts() && !stageConfigCtrl.checkFeatureFlag('artifactsRewrite') && stageConfigCtrl.checkFeatureFlag('artifacts')"
-    >
-      <produces-artifacts stage="stage" pipeline="pipeline"></produces-artifacts>
+    <page-section key="producesArtifacts" label="Produces Artifacts" visible="stageProducesArtifacts()">
+      <produces-artifacts
+        ng-if="stageConfigCtrl.renderLegacyArtifactsUI"
+        stage="stage"
+        pipeline="pipeline"
+      ></produces-artifacts>
+      <produces-artifacts-react
+        ng-if="stageConfigCtrl.renderStandardArtifactsUI"
+        stage="stage"
+        pipeline="pipeline"
+        on-produces-changed="producesArtifactsChanged"
+      />
     </page-section>
-    <render-if-feature feature="artifactsRewrite">
-      <page-section key="producesArtifacts" label="Produces Artifacts" visible="stageProducesArtifacts()">
-        <produces-artifacts-react stage="stage" pipeline="pipeline" on-produces-changed="producesArtifactsChanged" />
-      </page-section>
-    </render-if-feature>
     <page-section key="comments" label="Comments" no-wrapper="true">
       <textarea
         class="form-control"

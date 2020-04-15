@@ -23,7 +23,8 @@ class AmazonApplicationNameValidator implements IApplicationNameValidator {
     if (name.includes('.') || name.includes('_')) {
       warnings.push(`If the application's name contains an underscore(_) or dot(.),
             you will not be able to create a load balancer,
-            preventing it from being used as a front end service.`);
+            preventing it from being used as a front end service.
+            Any hostname constructed with this application name may have issues.`);
     }
   }
 
@@ -63,8 +64,8 @@ class AmazonApplicationNameValidator implements IApplicationNameValidator {
   }
 
   public validate(name = '') {
-    const warnings: string[] = [],
-      errors: string[] = [];
+    const warnings: string[] = [];
+    const errors: string[] = [];
 
     if (name.length) {
       this.validateClassicLock(warnings);

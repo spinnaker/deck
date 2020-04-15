@@ -1,6 +1,6 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 import { isString, toInteger } from 'lodash';
 
 import {
@@ -18,11 +18,10 @@ import {
 import { CanaryExecutionLabel } from './CanaryExecutionLabel';
 import { CANARY_ANALYSIS_NAME_SELECTOR_COMPONENT } from './canaryAnalysisNameSelector.component';
 
-module.exports = angular
-  .module('spinnaker.canary.canaryStage', [
-    SERVER_GROUP_COMMAND_BUILDER_SERVICE,
-    CANARY_ANALYSIS_NAME_SELECTOR_COMPONENT,
-  ])
+export const CANARY_CANARY_CANARYSTAGE = 'spinnaker.canary.canaryStage';
+export const name = CANARY_CANARY_CANARYSTAGE; // for backwards compatibility
+angular
+  .module(CANARY_CANARY_CANARYSTAGE, [SERVER_GROUP_COMMAND_BUILDER_SERVICE, CANARY_ANALYSIS_NAME_SELECTOR_COMPONENT])
   .config(function() {
     function isExpression(value) {
       return isString(value) && value.includes('${');
@@ -75,9 +74,9 @@ module.exports = angular
             type: 'custom',
             fieldLabel: 'Lookback Duration',
             validate: (_pipeline, stage) => {
-              const cac = stage.canary.canaryConfig.canaryAnalysisConfig,
-                useLookback = cac.useLookback,
-                lookbackMins = cac.lookbackMins;
+              const cac = stage.canary.canaryConfig.canaryAnalysisConfig;
+              const useLookback = cac.useLookback;
+              const lookbackMins = cac.lookbackMins;
               let result = null;
               if (useLookback && !isValidValue(lookbackMins)) {
                 result =
@@ -316,7 +315,7 @@ module.exports = angular
         return terminateAction ? terminateAction.delayBeforeActionInMins : 60;
       };
 
-      let filterServerGroups = () => {
+      const filterServerGroups = () => {
         AccountService.listAccounts(this.getCloudProvider()).then(accounts => ($scope.accounts = accounts));
         setClusterList();
       };
@@ -343,9 +342,9 @@ module.exports = angular
         if (cluster.region) {
           return cluster.region;
         }
-        var availabilityZones = cluster.availabilityZones;
+        const availabilityZones = cluster.availabilityZones;
         if (availabilityZones) {
-          var regions = Object.keys(availabilityZones);
+          const regions = Object.keys(availabilityZones);
           if (regions && regions.length) {
             return regions[0];
           }
@@ -360,11 +359,11 @@ module.exports = angular
         }
       };
 
-      let clusterFilter = cluster => {
+      const clusterFilter = cluster => {
         return $scope.stage.baseline.account ? cluster.account === $scope.stage.baseline.account : true;
       };
 
-      let setClusterList = () => {
+      const setClusterList = () => {
         $scope.clusterList = AppListExtractor.getClusters([$scope.application], clusterFilter);
       };
 
@@ -373,13 +372,13 @@ module.exports = angular
         setClusterList();
       };
 
-      let getCloudProvider = () => {
+      const getCloudProvider = () => {
         return $scope.stage.baseline.cloudProvider || overriddenCloudProvider || 'aws';
       };
 
       this.getCloudProvider = getCloudProvider;
 
-      let resetCloudProvider = () => {
+      const resetCloudProvider = () => {
         delete $scope.stage.baseline.cluster;
         delete $scope.stage.baseline.account;
         delete $scope.stage.clusterPairs;

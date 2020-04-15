@@ -1,13 +1,17 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 import _ from 'lodash';
 
 import { AccountService, FirewallLabels } from '@spinnaker/core';
+import { GOOGLE_SECURITYGROUP_CONFIGURE_CONFIGSECURITYGROUPMIXIN_CONTROLLER } from '../configure/ConfigSecurityGroupMixin.controller';
 
-module.exports = angular
-  .module('spinnaker.google.securityGroup.clone.controller', [
-    require('../configure/ConfigSecurityGroupMixin.controller').name,
+export const GOOGLE_SECURITYGROUP_CLONE_CLONESECURITYGROUP_CONTROLLER =
+  'spinnaker.google.securityGroup.clone.controller';
+export const name = GOOGLE_SECURITYGROUP_CLONE_CLONESECURITYGROUP_CONTROLLER; // for backwards compatibility
+angular
+  .module(GOOGLE_SECURITYGROUP_CLONE_CLONESECURITYGROUP_CONTROLLER, [
+    GOOGLE_SECURITYGROUP_CONFIGURE_CONFIGSECURITYGROUPMIXIN_CONTROLLER,
   ])
   .controller('gceCloneSecurityGroupController', [
     '$scope',

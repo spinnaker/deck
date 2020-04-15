@@ -40,7 +40,7 @@ module.exports = {
               ecma: 6,
               mangle: false,
               output: {
-                comments: false,
+                comments: /webpackIgnore/,
               },
             },
           }),
@@ -76,7 +76,7 @@ module.exports = {
           { loader: 'cache-loader' },
           { loader: 'thread-loader', options: { workers: WEBPACK_THREADS } },
           { loader: 'ts-loader', options: { happyPackMode: true } },
-          { loader: 'tslint-loader' },
+          { loader: 'eslint-loader' },
         ],
         exclude: exclusionPattern,
       },
@@ -91,7 +91,30 @@ module.exports = {
       },
       {
         test: /\.css$/,
+        exclude: /\.module\.css$/,
         use: [{ loader: 'style-loader' }, { loader: 'css-loader' }, { loader: 'postcss-loader' }],
+      },
+      {
+        test: /\.module\.css$/i,
+        use: [
+          { loader: 'style-loader' },
+          {
+            loader: 'css-loader',
+            options: {
+              modules: true,
+              localIdentName: '[name]__[local]--[hash:base64:8]',
+            },
+          },
+          { loader: 'postcss-loader' },
+        ],
+      },
+      {
+        test: /\.svg$/,
+        issuer: {
+          test: /\.(tsx?|js)$/,
+        },
+        use: [{ loader: '@svgr/webpack' }],
+        exclude: exclusionPattern,
       },
       {
         test: /\.html$/,

@@ -1,12 +1,11 @@
-import * as React from 'react';
-import * as ReactGA from 'react-ga';
-import * as DOMPurify from 'dompurify';
-import * as classNames from 'classnames';
+import React from 'react';
+import ReactGA from 'react-ga';
+import classNames from 'classnames';
 import { get } from 'lodash';
 
 import { IExecutionStageSummary } from 'core/domain';
-import { GroupExecutionPopover } from 'core/pipeline/config/stages/group/GroupExecutionPopover';
-import { LabelComponent } from 'core/presentation';
+import { GroupExecutionPopover } from '../stages/group/GroupExecutionPopover';
+import { LabelComponent, Markdown } from 'core/presentation';
 import { Popover } from 'core/presentation/Popover';
 
 import { IPipelineGraphNode } from './pipelineGraph.service';
@@ -70,7 +69,9 @@ export class PipelineGraphNode extends React.Component<IPipelineGraphNodeProps> 
         <ul>
           {node.hasWarnings &&
             node.warnings.messages.map(message => (
-              <li key={message} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(message) }} />
+              <li key={message}>
+                <Markdown message={message} trim={true} />
+              </li>
             ))}
         </ul>
       </div>

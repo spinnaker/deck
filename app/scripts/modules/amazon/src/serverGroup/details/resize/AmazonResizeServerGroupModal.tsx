@@ -1,10 +1,11 @@
-import * as React from 'react';
+import React from 'react';
 import { Modal } from 'react-bootstrap';
 import { FormikErrors, Form, Formik, FormikProps } from 'formik';
 import { pickBy } from 'lodash';
 
 import {
   Application,
+  confirmNotManaged,
   CheckboxInput,
   FormikFormField,
   HelpField,
@@ -18,6 +19,7 @@ import {
   PlatformHealthOverride,
   ReactInjector,
   ReactModal,
+  SpinFormik,
   TaskMonitor,
   TaskReason,
   ValidationMessage,
@@ -65,9 +67,12 @@ export class AmazonResizeServerGroupModal extends React.Component<
 
   private formikRef = React.createRef<Formik<IAmazonResizeServerGroupValues>>();
 
-  public static show(props: IAmazonResizeServerGroupModalProps): Promise<IResizeJob> {
+  public static show(props: IAmazonResizeServerGroupModalProps) {
     const modalProps = {};
-    return ReactModal.show(AmazonResizeServerGroupModal, props, modalProps);
+    const { serverGroup, application } = props;
+    return confirmNotManaged(serverGroup, application).then(notManaged => {
+      notManaged && ReactModal.show(AmazonResizeServerGroupModal, props, modalProps);
+    });
   }
 
   constructor(props: IAmazonResizeServerGroupModalProps) {
@@ -396,7 +401,7 @@ export class AmazonResizeServerGroupModal extends React.Component<
     return (
       <>
         <TaskMonitorWrapper monitor={this.state.taskMonitor} />
-        <Formik<IAmazonResizeServerGroupValues>
+        <SpinFormik<IAmazonResizeServerGroupValues>
           ref={this.formikRef}
           initialValues={initialValues}
           validate={this.validate}
@@ -408,10 +413,10 @@ export class AmazonResizeServerGroupModal extends React.Component<
 
             return (
               <>
-                <Modal.Header>
-                  <h3>Resize {serverGroup.name}</h3>
-                </Modal.Header>
                 <ModalClose dismiss={this.close} />
+                <Modal.Header>
+                  <Modal.Title>Resize {serverGroup.name}</Modal.Title>
+                </Modal.Header>
                 <Modal.Body>
                   <Form className="form-horizontal">
                     {advancedMode && this.renderAdvancedMode(formik)}

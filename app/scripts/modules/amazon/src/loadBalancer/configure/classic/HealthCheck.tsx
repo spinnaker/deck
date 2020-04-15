@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { FormikProps } from 'formik';
 
 import { FormikFormField, SelectInput, TextInput, NumberInput } from '@spinnaker/core';
@@ -54,7 +54,7 @@ export class HealthCheck extends React.Component<IHealthCheckProps> {
                   {this.requiresHealthCheckPath() && (
                     <FormikFormField
                       name="healthCheckPath"
-                      input={TextInput}
+                      input={props => <TextInput {...props} />}
                       required={true}
                       onChange={this.healthCheckPathChanged}
                     />

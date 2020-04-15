@@ -1,7 +1,8 @@
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular
-  .module('cluster.test.data', [])
+export const CORE_CLUSTER_FILTER_MOCKAPPLICATIONDATA = 'cluster.test.data';
+export const name = CORE_CLUSTER_FILTER_MOCKAPPLICATIONDATA; // for backwards compatibility
+module(CORE_CLUSTER_FILTER_MOCKAPPLICATIONDATA, [])
   .value('applicationJSON', {
     clusters: [
       { name: 'in-eu-east-2-only', account: 'prod', region: 'eu-east-2', category: 'serverGroup' },
@@ -57,12 +58,16 @@ module.exports = angular
           hasDiscovery: false,
           hasLoadBalancers: false,
           entityTags: undefined,
+          isManaged: false,
+          managedResourceSummary: undefined,
           subgroups: [
             {
               heading: 'eu-east-2',
               category: 'serverGroup',
               key: 'eu-east-2:serverGroup',
               entityTags: undefined,
+              isManaged: false,
+              managedResourceSummary: undefined,
               serverGroups: [
                 {
                   cluster: 'in-eu-east-2-only',
@@ -105,12 +110,16 @@ module.exports = angular
           hasDiscovery: false,
           hasLoadBalancers: false,
           entityTags: undefined,
+          isManaged: false,
+          managedResourceSummary: undefined,
           subgroups: [
             {
               heading: 'us-west-1',
               category: 'serverGroup',
               key: 'us-west-1:serverGroup',
               entityTags: undefined,
+              isManaged: false,
+              managedResourceSummary: undefined,
               serverGroups: [
                 {
                   cluster: 'in-us-west-1-only',

@@ -42,6 +42,7 @@ export interface IRangeRule {
     endPort: number;
   }>;
   protocol: string;
+  description: string;
 }
 
 export interface ISecurityGroupRule extends IRangeRule {
@@ -117,6 +118,16 @@ export class SecurityGroupReader {
     }
   }
 
+  private static sortUsages(securityGroup: ISecurityGroup): void {
+    if (!securityGroup.usages) {
+      return;
+    }
+    // reverse sort - it's gross but keeps versions mostly sorted in the chronological order
+    securityGroup.usages.serverGroups.sort((a, b) => b.name.localeCompare(a.name));
+    // reverse sort - gross but what we are doing now and consistent with the server groups
+    securityGroup.usages.loadBalancers.sort((a, b) => b.name.localeCompare(a.name));
+  }
+
   private resolve(index: any, container: ISecurityGroup, securityGroupId: string): any {
     return this.providerServiceDelegate
       .getDelegate<any>(container.provider || container.type || container.cloudProvider, 'securityGroup.reader')
@@ -147,6 +158,7 @@ export class SecurityGroupReader {
         });
       }
     });
+    securityGroups.forEach(SecurityGroupReader.sortUsages);
 
     return { notFoundCaught, securityGroups };
   }
@@ -173,7 +185,7 @@ export class SecurityGroupReader {
 
   private addServerGroupSecurityGroups(application: Application): ISecurityGroupProcessorResult {
     let notFoundCaught = false;
-    const securityGroups: ISecurityGroup[] = [];
+    const sgSet: Set<ISecurityGroup> = new Set();
     application.getDataSource('serverGroups').data.forEach((serverGroup: IServerGroup) => {
       if (serverGroup.securityGroups) {
         serverGroup.securityGroups.forEach((securityGroupId: string) => {
@@ -188,7 +200,7 @@ export class SecurityGroupReader {
               const { account, isDisabled, name, cloudProvider, region } = serverGroup;
               securityGroup.usages.serverGroups.push({ account, isDisabled, name, cloudProvider, region });
             }
-            securityGroups.push(securityGroup);
+            sgSet.add(securityGroup);
           } catch (e) {
             this.$log.warn('could not attach firewall to server group:', serverGroup.name, securityGroupId);
             notFoundCaught = true;
@@ -196,6 +208,8 @@ export class SecurityGroupReader {
         });
       }
     });
+    const securityGroups: ISecurityGroup[] = Array.from(sgSet);
+    securityGroups.forEach(SecurityGroupReader.sortUsages);
 
     return { notFoundCaught, securityGroups };
   }
@@ -216,6 +230,7 @@ export class SecurityGroupReader {
     const nameParts: IComponentName = NameUtils.parseSecurityGroupName(securityGroup.name);
     securityGroup.stack = nameParts.stack;
     securityGroup.detail = nameParts.freeFormDetails;
+    securityGroup.moniker = NameUtils.getMoniker(nameParts.application, nameParts.stack, nameParts.freeFormDetails);
   }
 
   private attachSecurityGroups(

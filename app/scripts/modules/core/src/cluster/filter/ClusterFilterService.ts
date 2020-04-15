@@ -4,11 +4,11 @@ import { $log } from 'ngimport';
 import { Subject } from 'rxjs';
 
 import { Application } from 'core/application/application.model';
-import { ICluster, IEntityTags, IInstance, IServerGroup } from 'core/domain';
+import { ICluster, IEntityTags, IInstance, IManagedResourceSummary, IServerGroup } from 'core/domain';
 import { ClusterState } from 'core/state';
 import { FilterModelService, ISortFilter } from 'core/filterModel';
 import { ReactInjector } from 'core/reactShims';
-import { ILabelFilter, trueKeyObjectToLabelFilters } from 'core/cluster/filter/labelFilterUtils';
+import { ILabelFilter, trueKeyObjectToLabelFilters } from './labelFilterUtils';
 
 export interface IParentGrouping {
   subgroups: IClusterSubgroup[] | IServerGroupSubgroup[];
@@ -30,6 +30,8 @@ export interface IClusterSubgroup extends IParentGrouping {
   hasDiscovery?: boolean;
   hasLoadBalancers?: boolean;
   entityTags: IEntityTags;
+  isManaged: boolean;
+  managedResourceSummary?: IManagedResourceSummary;
 }
 
 export interface IServerGroupSubgroup {
@@ -38,6 +40,8 @@ export interface IServerGroupSubgroup {
   category: string;
   serverGroups: IServerGroup[];
   entityTags: IEntityTags;
+  isManaged: boolean;
+  managedResourceSummary?: IManagedResourceSummary;
 }
 
 export type Grouping = IClusterGroup | IClusterSubgroup | IServerGroupSubgroup;
@@ -66,15 +70,15 @@ export class ClusterFilterService {
     const accountGroupings = groupBy(serverGroups, 'account');
 
     forOwn(accountGroupings, (accountGroup: IServerGroup[], account: string) => {
-      const categoryGroupings = groupBy(accountGroup, 'category'),
-        clusterGroups: IClusterSubgroup[] = [];
+      const categoryGroupings = groupBy(accountGroup, 'category');
+      const clusterGroups: IClusterSubgroup[] = [];
 
       forOwn(categoryGroupings, (categoryGroup: IServerGroup[], category: string) => {
         const clusterGroupings = groupBy(categoryGroup, 'cluster');
 
         forOwn(clusterGroupings, (clusterGroup: IServerGroup[], cluster: string) => {
-          const regionGroupings = groupBy(clusterGroup, 'region'),
-            regionGroups: IServerGroupSubgroup[] = [];
+          const regionGroupings = groupBy(clusterGroup, 'region');
+          const regionGroups: IServerGroupSubgroup[] = [];
 
           forOwn(regionGroupings, (regionGroup: IServerGroup[], region: string) => {
             regionGroups.push({
@@ -83,6 +87,8 @@ export class ClusterFilterService {
               serverGroups: regionGroup,
               key: `${region}:${category}`,
               entityTags: (regionGroup[0].clusterEntityTags || []).find(t => t.entityRef['region'] === region),
+              isManaged: !!regionGroup[0].isManaged,
+              managedResourceSummary: regionGroup[0].managedResourceSummary,
             });
           });
 
@@ -91,6 +97,7 @@ export class ClusterFilterService {
           );
 
           if (appCluster) {
+            const isEntireClusterManaged = regionGroups.every(({ isManaged }) => isManaged);
             clusterGroups.push({
               heading: cluster,
               category,
@@ -100,6 +107,8 @@ export class ClusterFilterService {
               entityTags: (clusterGroup[0].clusterEntityTags || []).find(
                 t => t.entityRef['region'] === '*' || t.entityRef['region'] === undefined,
               ),
+              isManaged: isEntireClusterManaged,
+              managedResourceSummary: isEntireClusterManaged ? regionGroups[0].managedResourceSummary : undefined,
             });
           }
         });
@@ -462,6 +471,12 @@ export class ClusterFilterService {
         }
         if (oldGroup.entityTags || newGroup.entityTags) {
           oldGroup.entityTags = newGroup.entityTags;
+        }
+        if (oldGroup.hasOwnProperty('isManaged') || newGroup.hasOwnProperty('isManaged')) {
+          const oldSubGroup = oldGroup as IClusterSubgroup | IServerGroupSubgroup;
+          const newSubGroup = newGroup as IClusterSubgroup | IServerGroupSubgroup;
+          oldSubGroup.isManaged = newSubGroup.isManaged;
+          oldSubGroup.managedResourceSummary = newSubGroup.managedResourceSummary;
         }
       }
     });

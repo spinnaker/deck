@@ -1,6 +1,6 @@
-import * as React from 'react';
+import React from 'react';
 
-import { IExecutionDetailsSectionProps, ExecutionDetailsSection } from 'core/pipeline';
+import { IExecutionDetailsSectionProps, ExecutionDetailsSection } from '../common';
 
 export function PipelineParametersExecutionDetails(props: IExecutionDetailsSectionProps) {
   const {

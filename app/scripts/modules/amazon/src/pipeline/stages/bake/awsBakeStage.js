@@ -1,6 +1,6 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 import _ from 'lodash';
 
 import { AuthenticationService } from '@spinnaker/core';
@@ -8,9 +8,11 @@ import { AuthenticationService } from '@spinnaker/core';
 import { AWSProviderSettings } from 'amazon/aws.settings';
 
 import { PipelineTemplates, BakeExecutionLabel, BakeryReader, Registry, SETTINGS } from '@spinnaker/core';
+import { AMAZON_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER } from './bakeExecutionDetails.controller';
 
-module.exports = angular
-  .module('spinnaker.amazon.pipeline.stage.bakeStage', [require('./bakeExecutionDetails.controller').name])
+export const AMAZON_PIPELINE_STAGES_BAKE_AWSBAKESTAGE = 'spinnaker.amazon.pipeline.stage.bakeStage';
+export const name = AMAZON_PIPELINE_STAGES_BAKE_AWSBAKESTAGE; // for backwards compatibility
+module(AMAZON_PIPELINE_STAGES_BAKE_AWSBAKESTAGE, [AMAZON_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'bake',
@@ -23,7 +25,7 @@ module.exports = angular
       extraLabelLines: stage => {
         return stage.masterStage.context.allPreviouslyBaked || stage.masterStage.context.somePreviouslyBaked ? 1 : 0;
       },
-      defaultTimeoutMs: 60 * 60 * 1000, // 60 minutes
+      supportsCustomTimeout: true,
       validators: [
         { type: 'requiredField', fieldName: 'package' },
         { type: 'requiredField', fieldName: 'regions' },
@@ -55,7 +57,9 @@ module.exports = angular
 
       $scope.viewState = {
         loading: true,
-        roscoMode: SETTINGS.feature.roscoMode,
+        roscoMode:
+          SETTINGS.feature.roscoMode ||
+          (typeof SETTINGS.feature.roscoSelector === 'function' && SETTINGS.feature.roscoSelector($scope.stage)),
         minRootVolumeSize: AWSProviderSettings.minRootVolumeSize,
         showVmTypeSelector: true,
       };
@@ -67,7 +71,7 @@ module.exports = angular
           baseLabelOptions: BakeryReader.getBaseLabelOptions(),
           storeTypes: ['ebs', 'docker'],
         }).then(function(results) {
-          $scope.regions = results.regions;
+          $scope.regions = [...results.regions].sort();
           $scope.storeTypes = results.storeTypes;
           if (!$scope.stage.storeType && $scope.storeTypes && $scope.storeTypes.length) {
             $scope.stage.storeType = $scope.storeTypes[0];
@@ -78,16 +82,22 @@ module.exports = angular
             delete $scope.stage.region;
           }
           if (!$scope.stage.regions.length && $scope.application.defaultRegions.aws) {
-            $scope.stage.regions.push($scope.application.defaultRegions.aws);
-          }
-          if (!$scope.stage.regions.length && $scope.application.defaultRegions.aws) {
-            $scope.stage.regions.push($scope.application.defaultRegions.aws);
+            $scope.stage.regions.push(...Object.keys($scope.application.defaultRegions.aws).sort());
           }
           $scope.baseOsOptions = results.baseOsOptions.baseImages;
           $scope.baseLabelOptions = results.baseLabelOptions;
 
           if (!$scope.stage.baseOs && $scope.baseOsOptions && $scope.baseOsOptions.length) {
             $scope.stage.baseOs = $scope.baseOsOptions[0].id;
+          } else if (
+            $scope.stage.baseOs &&
+            !($scope.baseOsOptions || []).find(baseOs => baseOs.id === $scope.stage.baseOs)
+          ) {
+            $scope.baseOsOptions.push({
+              id: $scope.stage.baseOs,
+              detailedDescription: 'Custom',
+              vmTypes: ['hvm', 'pv'],
+            });
           }
           if (!$scope.stage.baseLabel && $scope.baseLabelOptions && $scope.baseLabelOptions.length) {
             $scope.stage.baseLabel = $scope.baseLabelOptions[0];
@@ -99,6 +109,14 @@ module.exports = angular
           $scope.showAdvancedOptions = showAdvanced();
           $scope.viewState.loading = false;
         });
+      }
+
+      function stageUpdated() {
+        deleteEmptyProperties();
+        // Since the selector computes using stage as an input, it needs to be able to recompute roscoMode on updates
+        if (typeof SETTINGS.feature.roscoSelector === 'function') {
+          $scope.viewState.roscoMode = SETTINGS.feature.roscoSelector($scope.stage);
+        }
       }
 
       function deleteEmptyProperties() {
@@ -187,7 +205,7 @@ module.exports = angular
         }
       };
 
-      $scope.$watch('stage', deleteEmptyProperties, true);
+      $scope.$watch('stage', stageUpdated, true);
 
       initialize();
     },

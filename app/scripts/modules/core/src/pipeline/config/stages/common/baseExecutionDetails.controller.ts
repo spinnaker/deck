@@ -4,7 +4,8 @@ import { StateParams } from '@uirouter/angularjs';
 import {
   EXECUTION_DETAILS_SECTION_SERVICE,
   ExecutionDetailsSectionService,
-} from 'core/pipeline/details/executionDetailsSection.service';
+} from '../../../details/executionDetailsSection.service';
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
 export interface IExecutionDetailsScope extends IScope {
   configSections: string[];
@@ -38,7 +39,7 @@ export class BaseExecutionDetailsCtrl {
 export const BASE_EXECUTION_DETAILS_CTRL =
   'spinnaker.core.pipeline.config.stages.common.baseExecutionDetails.controller';
 
-module(BASE_EXECUTION_DETAILS_CTRL, [
-  require('@uirouter/angularjs').default,
-  EXECUTION_DETAILS_SECTION_SERVICE,
-]).controller('BaseExecutionDetailsCtrl', BaseExecutionDetailsCtrl);
+module(BASE_EXECUTION_DETAILS_CTRL, [UIROUTER_ANGULARJS, EXECUTION_DETAILS_SECTION_SERVICE]).controller(
+  'BaseExecutionDetailsCtrl',
+  BaseExecutionDetailsCtrl,
+);

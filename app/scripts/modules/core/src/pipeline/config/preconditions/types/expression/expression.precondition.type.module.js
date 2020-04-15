@@ -1,8 +1,11 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular.module('spinnaker.core.pipeline.config.preconditions.types.expression', []).config([
+export const CORE_PIPELINE_CONFIG_PRECONDITIONS_TYPES_EXPRESSION_EXPRESSION_PRECONDITION_TYPE_MODULE =
+  'spinnaker.core.pipeline.config.preconditions.types.expression';
+export const name = CORE_PIPELINE_CONFIG_PRECONDITIONS_TYPES_EXPRESSION_EXPRESSION_PRECONDITION_TYPE_MODULE; // for backwards compatibility
+module(CORE_PIPELINE_CONFIG_PRECONDITIONS_TYPES_EXPRESSION_EXPRESSION_PRECONDITION_TYPE_MODULE, []).config([
   'preconditionTypeConfigProvider',
   function(preconditionTypeConfigProvider) {
     preconditionTypeConfigProvider.registerPreconditionType({

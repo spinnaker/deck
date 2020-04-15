@@ -6,6 +6,7 @@ import { CLUSTER_SERVICE, ClusterService } from 'core/cluster/cluster.service';
 import { JsonUtils } from 'core/utils';
 import { Application } from 'core/application/application.model';
 import { IServerGroup } from 'core/domain';
+import { addManagedResourceMetadataToServerGroups } from 'core/managed';
 
 export const SERVER_GROUP_DATA_SOURCE = 'spinnaker.core.serverGroup.dataSource';
 
@@ -34,6 +35,7 @@ module(SERVER_GROUP_DATA_SOURCE, [CLUSTER_SERVICE]).run([
 
     const addTags = (application: Application) => {
       EntityTagsReader.addTagsToServerGroups(application);
+      addManagedResourceMetadataToServerGroups(application);
     };
 
     ApplicationDataSourceRegistry.registerDataSource({
@@ -44,6 +46,7 @@ module(SERVER_GROUP_DATA_SOURCE, [CLUSTER_SERVICE]).run([
       optional: true,
       primary: true,
       icon: 'fas fa-xs fa-fw fa-th-large',
+      iconName: 'spMenuClusters',
       loader: loadServerGroups,
       onLoad: addServerGroups,
       afterLoad: addTags,
@@ -51,6 +54,7 @@ module(SERVER_GROUP_DATA_SOURCE, [CLUSTER_SERVICE]).run([
       credentialsField: 'account',
       regionField: 'region',
       description: 'Collections of server groups or jobs',
+      defaultData: [],
     });
   },
 ]);

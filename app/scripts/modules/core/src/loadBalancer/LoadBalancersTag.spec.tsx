@@ -1,5 +1,5 @@
 import { mock, IQService, IScope } from 'angular';
-import * as React from 'react';
+import React from 'react';
 import { ReactWrapper, mount } from 'enzyme';
 
 import { Application } from 'core/application/application.model';
@@ -23,6 +23,7 @@ describe('<LoadBalancersTag />', () => {
         key: 'loadBalancers',
         loader: () => $q.resolve(application.loadBalancers.data),
         onLoad: (_app, data) => $q.resolve(data),
+        defaultData: [],
       });
       application.loadBalancers.refresh();
       $scope.$digest();
@@ -44,6 +45,7 @@ describe('<LoadBalancersTag />', () => {
     component = mount(<LoadBalancersTag {...props} />);
 
     $scope.$digest();
+    component.update();
     expect(component.render().find('span.btn-load-balancer').length).toBe(1);
   });
 

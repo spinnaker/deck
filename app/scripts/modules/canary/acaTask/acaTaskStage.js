@@ -1,13 +1,16 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 
 import { AccountService, AuthenticationService, Registry, SETTINGS } from '@spinnaker/core';
 
 import { CanaryExecutionLabel } from '../canary/CanaryExecutionLabel';
+import { CANARY_CANARY_CANARYEXECUTIONSUMMARY_CONTROLLER } from '../canary/canaryExecutionSummary.controller';
 
-module.exports = angular
-  .module('spinnaker.canary.acaTaskStage', [require('../canary/canaryExecutionSummary.controller').name])
+export const CANARY_ACATASK_ACATASKSTAGE = 'spinnaker.canary.acaTaskStage';
+export const name = CANARY_ACATASK_ACATASKSTAGE; // for backwards compatibility
+angular
+  .module(CANARY_ACATASK_ACATASKSTAGE, [CANARY_CANARY_CANARYEXECUTIONSUMMARY_CONTROLLER])
   .config(function() {
     if (SETTINGS.feature.canary) {
       Registry.pipeline.registerStage({
@@ -31,7 +34,7 @@ module.exports = angular
     '$uibModal',
     'stage',
     function($scope, $uibModal, stage) {
-      var user = AuthenticationService.getAuthenticatedUser();
+      const user = AuthenticationService.getAuthenticatedUser();
       $scope.stage = stage;
       $scope.stage.baseline = $scope.stage.baseline || {};
       $scope.stage.canary = $scope.stage.canary || {};
@@ -66,7 +69,7 @@ module.exports = angular
           : $scope.stage.canary.watchers //if it is not an array it is probably a SpEL
         : '';
 
-      let applicationProviders = $scope.application.attributes.cloudProviders;
+      const applicationProviders = $scope.application.attributes.cloudProviders;
       $scope.accounts = [];
       $scope.regions = [];
 
@@ -97,7 +100,7 @@ module.exports = angular
       this.notificationHours = $scope.stage.canary.canaryConfig.canaryAnalysisConfig.notificationHours.join(',');
 
       this.splitNotificationHours = () => {
-        var hoursField = this.notificationHours || '';
+        const hoursField = this.notificationHours || '';
         $scope.stage.canary.canaryConfig.canaryAnalysisConfig.notificationHours = _.map(hoursField.split(','), function(
           str,
         ) {

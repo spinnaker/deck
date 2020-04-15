@@ -1,9 +1,9 @@
-import * as React from 'react';
+import React from 'react';
 import { FormikProps } from 'formik';
 
 import { Application, IWizardPageComponent } from '@spinnaker/core';
 
-import { IAmazonServerGroupCommand } from 'amazon/serverGroup/configure/serverGroupConfiguration.service';
+import { IAmazonServerGroupCommand } from '../../../serverGroupConfiguration.service';
 import { ServerGroupAdvancedSettingsInner } from './ServerGroupAdvancedSettingsInner';
 
 export interface IServerGroupAdvancedSettingsProps {

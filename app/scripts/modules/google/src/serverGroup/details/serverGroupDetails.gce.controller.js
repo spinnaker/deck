@@ -1,10 +1,11 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 import _ from 'lodash';
 
 import {
-  CONFIRMATION_MODAL_SERVICE,
+  AccountService,
+  ConfirmationModalService,
   ClusterTargetBuilder,
   FirewallLabels,
   NetworkReader,
@@ -17,18 +18,27 @@ import {
 require('../configure/serverGroup.configure.gce.module');
 
 import './serverGroupDetails.less';
+import { GOOGLE_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER_SERVICE } from '../configure/serverGroupCommandBuilder.service';
+import { GOOGLE_COMMON_XPNNAMING_GCE_SERVICE } from 'google/common/xpnNaming.gce.service';
+import { GOOGLE_SERVERGROUP_DETAILS_RESIZE_RESIZESERVERGROUP_CONTROLLER } from './resize/resizeServerGroup.controller';
+import { GOOGLE_SERVERGROUP_DETAILS_ROLLBACK_ROLLBACKSERVERGROUP_CONTROLLER } from './rollback/rollbackServerGroup.controller';
+import { GOOGLE_SERVERGROUP_DETAILS_AUTOSCALINGPOLICY_AUTOSCALINGPOLICY_DIRECTIVE } from './autoscalingPolicy/autoscalingPolicy.directive';
+import { GOOGLE_SERVERGROUP_DETAILS_AUTOSCALINGPOLICY_ADDAUTOSCALINGPOLICYBUTTON_COMPONENT } from './autoscalingPolicy/addAutoscalingPolicyButton.component';
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
-module.exports = angular
-  .module('spinnaker.serverGroup.details.gce.controller', [
-    require('@uirouter/angularjs').default,
-    require('../configure/serverGroupCommandBuilder.service').name,
-    CONFIRMATION_MODAL_SERVICE,
+export const GOOGLE_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_GCE_CONTROLLER =
+  'spinnaker.serverGroup.details.gce.controller';
+export const name = GOOGLE_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_GCE_CONTROLLER; // for backwards compatibility
+angular
+  .module(GOOGLE_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_GCE_CONTROLLER, [
+    UIROUTER_ANGULARJS,
+    GOOGLE_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER_SERVICE,
     SERVER_GROUP_WRITER,
-    require('google/common/xpnNaming.gce.service').name,
-    require('./resize/resizeServerGroup.controller').name,
-    require('./rollback/rollbackServerGroup.controller').name,
-    require('./autoscalingPolicy/autoscalingPolicy.directive').name,
-    require('./autoscalingPolicy/addAutoscalingPolicyButton.component').name,
+    GOOGLE_COMMON_XPNNAMING_GCE_SERVICE,
+    GOOGLE_SERVERGROUP_DETAILS_RESIZE_RESIZESERVERGROUP_CONTROLLER,
+    GOOGLE_SERVERGROUP_DETAILS_ROLLBACK_ROLLBACKSERVERGROUP_CONTROLLER,
+    GOOGLE_SERVERGROUP_DETAILS_AUTOSCALINGPOLICY_AUTOSCALINGPOLICY_DIRECTIVE,
+    GOOGLE_SERVERGROUP_DETAILS_AUTOSCALINGPOLICY_ADDAUTOSCALINGPOLICYBUTTON_COMPONENT,
   ])
   .controller('gceServerGroupDetailsCtrl', [
     '$scope',
@@ -39,7 +49,6 @@ module.exports = angular
     'serverGroup',
     'gceServerGroupCommandBuilder',
     '$uibModal',
-    'confirmationModalService',
     'serverGroupWriter',
     'gceXpnNamingService',
     function(
@@ -51,7 +60,6 @@ module.exports = angular
       serverGroup,
       gceServerGroupCommandBuilder,
       $uibModal,
-      confirmationModalService,
       serverGroupWriter,
       gceXpnNamingService,
     ) {
@@ -149,6 +157,7 @@ module.exports = angular
             augmentTagsWithHelp();
             configureEntityTagTargets();
             processLabels();
+            retrieveComputeVersion(details.account);
           } else {
             autoClose();
           }
@@ -194,7 +203,7 @@ module.exports = angular
 
       const prepareAutoHealingPolicy = () => {
         if (this.serverGroup.autoHealingPolicy) {
-          let autoHealingPolicy = this.serverGroup.autoHealingPolicy;
+          const autoHealingPolicy = this.serverGroup.autoHealingPolicy;
           const healthCheckUrl = autoHealingPolicy.healthCheck;
 
           this.serverGroup.autoHealingPolicyHealthCheck = healthCheckUrl ? _.last(healthCheckUrl.split('/')) : null;
@@ -266,6 +275,12 @@ module.exports = angular
         }
       };
 
+      const retrieveComputeVersion = accountId => {
+        AccountService.getAccountDetails(accountId).then(accountDetails => {
+          this.serverGroup.computeVersion = accountDetails.computeVersion;
+        });
+      };
+
       const processLabels = () => {
         if (!_.size(this.serverGroup.instanceTemplateLabels)) {
           delete this.serverGroup.instanceTemplateLabels;
@@ -321,6 +336,11 @@ module.exports = angular
         const taskMonitor = {
           application: app,
           title: 'Destroying ' + serverGroup.name,
+          onTaskComplete: () => {
+            if ($state.includes('**.serverGroup', stateParams)) {
+              $state.go('^');
+            }
+          },
         };
 
         const submitMethod = params => serverGroupWriter.destroyServerGroup(serverGroup, app, params);
@@ -340,11 +360,6 @@ module.exports = angular
           askForReason: true,
           platformHealthOnlyShowOverride: app.attributes.platformHealthOnlyShowOverride,
           platformHealthType: 'Google',
-          onTaskComplete: () => {
-            if ($state.includes('**.serverGroup', stateParams)) {
-              $state.go('^');
-            }
-          },
         };
 
         ServerGroupWarningMessageService.addDestroyWarningMessage(app, serverGroup, confirmationModalParams);
@@ -353,7 +368,7 @@ module.exports = angular
           confirmationModalParams.interestingHealthProviderNames = ['Google'];
         }
 
-        confirmationModalService.confirm(confirmationModalParams);
+        ConfirmationModalService.confirm(confirmationModalParams);
       };
 
       this.disableServerGroup = () => {
@@ -383,7 +398,7 @@ module.exports = angular
           confirmationModalParams.interestingHealthProviderNames = ['Google'];
         }
 
-        confirmationModalService.confirm(confirmationModalParams);
+        ConfirmationModalService.confirm(confirmationModalParams);
       };
 
       this.enableServerGroup = () => {
@@ -411,7 +426,7 @@ module.exports = angular
           confirmationModalParams.interestingHealthProviderNames = ['Google'];
         }
 
-        confirmationModalService.confirm(confirmationModalParams);
+        ConfirmationModalService.confirm(confirmationModalParams);
       };
 
       this.rollbackServerGroup = () => {
@@ -483,7 +498,7 @@ module.exports = angular
         if (this.serverGroup && this.serverGroup.buildInfo && this.serverGroup.buildInfo.buildInfoUrl) {
           return this.serverGroup.buildInfo.buildInfoUrl;
         } else if (this.serverGroup && this.serverGroup.buildInfo && this.serverGroup.buildInfo.jenkins) {
-          var jenkins = this.serverGroup.buildInfo.jenkins;
+          const jenkins = this.serverGroup.buildInfo.jenkins;
           return jenkins.host + 'job/' + jenkins.name + '/' + jenkins.number;
         }
         return null;
@@ -494,6 +509,10 @@ module.exports = angular
           return this.serverGroup.buildInfo.commit.substring(0, 8);
         }
         return null;
+      };
+
+      this.isAlphaListed = () => {
+        return this.serverGroup.computeVersion === 'ALPHA';
       };
 
       const configureEntityTagTargets = () => {

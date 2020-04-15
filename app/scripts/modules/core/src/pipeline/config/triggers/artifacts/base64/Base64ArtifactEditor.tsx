@@ -1,9 +1,9 @@
-import * as React from 'react';
+import React from 'react';
 import { has, cloneDeep } from 'lodash';
 
 import { ArtifactTypePatterns } from 'core/artifact';
 import { IArtifactEditorProps, IArtifactKindConfig } from 'core/domain';
-import { StageConfigField } from 'core/pipeline';
+import { StageConfigField } from '../../../stages/common';
 import { CopyToClipboard } from 'core/utils';
 import { SpelText } from 'core/widgets';
 
@@ -63,7 +63,10 @@ class DefaultBase64ArtifactEditor extends React.Component<IArtifactEditorProps, 
       artifact.reference = encoded;
       this.props.onChange(artifact);
     }
-    this.setState({ encodeDecodeError: encodeDecodeError });
+    this.setState({
+      decoded: event.target.value,
+      encodeDecodeError: encodeDecodeError,
+    });
   };
 
   public render() {

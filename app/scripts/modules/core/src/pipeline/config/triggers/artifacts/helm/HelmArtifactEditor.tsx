@@ -1,10 +1,10 @@
-import * as React from 'react';
+import React from 'react';
 import { Option } from 'react-select';
 import { cloneDeep } from 'lodash';
 
 import { ArtifactTypePatterns } from 'core/artifact';
 import { IArtifact, IArtifactEditorProps, IArtifactKindConfig } from 'core/domain';
-import { StageConfigField } from 'core/pipeline';
+import { StageConfigField } from '../../../stages/common';
 import { TetheredSelect, TetheredCreatable } from 'core/presentation';
 import { ArtifactService } from '../ArtifactService';
 import { Spinner } from 'core/widgets';
@@ -27,7 +27,7 @@ class HelmEditor extends React.Component<IArtifactEditorProps, IHelmArtifactEdit
   };
 
   // taken from https://github.com/semver/semver/issues/232
-  private SEMVER: RegExp = new RegExp(
+  private SEMVER = new RegExp(
     /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(-(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\+[0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*)?$/,
   );
 
@@ -106,7 +106,7 @@ class HelmEditor extends React.Component<IArtifactEditorProps, IHelmArtifactEdit
 
   private onChange = (e: Option, field: keyof IArtifact) => {
     const clone = cloneDeep(this.props.artifact);
-    clone[field] = e.value.toString();
+    (clone[field] as any) = e.value.toString();
     this.props.onChange(clone);
   };
 

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { Modal, ModalFooter } from 'react-bootstrap';
 import { Form, Formik, FormikProps } from 'formik';
 
@@ -14,6 +14,7 @@ import {
   NumberInput,
   ReactInjector,
   ReactModal,
+  SpinFormik,
   TaskMonitor,
   TaskReason,
 } from '@spinnaker/core';
@@ -193,17 +194,17 @@ export class CloudFoundryResizeServerGroupModal extends React.Component<
     return (
       <>
         <TaskMonitorWrapper monitor={this.state.taskMonitor} />
-        <Formik<ICloudFoundryResizeServerGroupValues>
+        <SpinFormik<ICloudFoundryResizeServerGroupValues>
           ref={this.formikRef}
           initialValues={initialValues}
           onSubmit={this.submit}
           render={formik => {
             return (
               <>
-                <Modal.Header>
-                  <h3>Resize {serverGroup.name}</h3>
-                </Modal.Header>
                 <ModalClose dismiss={this.close} />
+                <Modal.Header>
+                  <Modal.Title>Resize {serverGroup.name}</Modal.Title>
+                </Modal.Header>
                 <Modal.Body>
                   <Form className="form-horizontal">
                     {this.renderDesired(formik)}

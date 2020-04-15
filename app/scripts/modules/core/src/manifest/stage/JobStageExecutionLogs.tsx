@@ -1,16 +1,14 @@
-import * as React from 'react';
+import React from 'react';
 import { template, isEmpty } from 'lodash';
 import { Observable, Subject } from 'rxjs';
 
-import { IStageManifest } from '../ManifestService';
 import { JobManifestPodLogs } from './JobManifestPodLogs';
 import { IManifest } from 'core/domain/IManifest';
 import { Application } from 'core/application';
 import { IPodNameProvider } from '../PodNameProvider';
-import { ManifestReader } from 'core/manifest';
+import { ManifestReader } from '../ManifestReader';
 
 interface IJobStageExecutionLogsProps {
-  manifest: IStageManifest;
   deployedName: string;
   account: string;
   application: Application;
@@ -34,7 +32,10 @@ export class JobStageExecutionLogs extends React.Component<IJobStageExecutionLog
     const { account, location, deployedName } = this.props;
     Observable.from(ManifestReader.getManifest(account, location, deployedName))
       .takeUntil(this.destroy$)
-      .subscribe(manifest => this.setState({ manifest }), () => {});
+      .subscribe(
+        manifest => this.setState({ manifest }),
+        () => {},
+      );
   }
 
   private renderExternalLink(link: string, manifest: IManifest): string {

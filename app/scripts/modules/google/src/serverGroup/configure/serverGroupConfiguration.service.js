@@ -1,6 +1,6 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 import _ from 'lodash';
 
 import {
@@ -18,18 +18,25 @@ import { getHealthCheckOptions } from 'google/healthCheck/healthCheckUtils';
 import { GCE_HTTP_LOAD_BALANCER_UTILS } from 'google/loadBalancer/httpLoadBalancerUtils.service';
 import { LOAD_BALANCER_SET_TRANSFORMER } from 'google/loadBalancer/loadBalancer.setTransformer';
 import { GceImageReader } from 'google/image';
+import { GceAcceleratorService } from './wizard/advancedSettings/gceAccelerator.service';
+import { GOOGLE_INSTANCE_GCEINSTANCETYPE_SERVICE } from '../../instance/gceInstanceType.service';
+import { GOOGLE_INSTANCE_CUSTOM_CUSTOMINSTANCEBUILDER_GCE_SERVICE } from './../../instance/custom/customInstanceBuilder.gce.service';
+import { GOOGLE_SERVERGROUP_CONFIGURE_WIZARD_SECURITYGROUPS_TAGMANAGER_SERVICE } from './wizard/securityGroups/tagManager.service';
 
-module.exports = angular
-  .module('spinnaker.serverGroup.configure.gce.configuration.service', [
+export const GOOGLE_SERVERGROUP_CONFIGURE_SERVERGROUPCONFIGURATION_SERVICE =
+  'spinnaker.serverGroup.configure.gce.configuration.service';
+export const name = GOOGLE_SERVERGROUP_CONFIGURE_SERVERGROUPCONFIGURATION_SERVICE; // for backwards compatibility
+angular
+  .module(GOOGLE_SERVERGROUP_CONFIGURE_SERVERGROUPCONFIGURATION_SERVICE, [
     LOAD_BALANCER_SET_TRANSFORMER,
     SECURITY_GROUP_READER,
     CACHE_INITIALIZER_SERVICE,
     LOAD_BALANCER_READ_SERVICE,
-    require('../../instance/gceInstanceType.service').name,
-    require('./../../instance/custom/customInstanceBuilder.gce.service').name,
+    GOOGLE_INSTANCE_GCEINSTANCETYPE_SERVICE,
+    GOOGLE_INSTANCE_CUSTOM_CUSTOMINSTANCEBUILDER_GCE_SERVICE,
     GCE_HTTP_LOAD_BALANCER_UTILS,
     GCE_HEALTH_CHECK_READER,
-    require('./wizard/securityGroups/tagManager.service').name,
+    GOOGLE_SERVERGROUP_CONFIGURE_WIZARD_SECURITYGROUPS_TAGMANAGER_SERVICE,
   ])
   .factory('gceServerGroupConfigurationService', [
     'securityGroupReader',
@@ -101,6 +108,7 @@ module.exports = angular
             let networkReloader = $q.when(null);
             let healthCheckReloader = $q.when(null);
             backingData.filtered = {};
+            backingData.distributionPolicyTargetShapes = getDistributionPolicyTargetShapes();
             command.backingData = backingData;
             configureImages(command);
 
@@ -139,6 +147,17 @@ module.exports = angular
               attachEventHandlers(command);
             });
           });
+      }
+
+      function getDistributionPolicyTargetShapes() {
+        return ['ANY', 'EVEN'];
+      }
+
+      function configureDistributionPolicyTargetShape(command) {
+        const accountDetails = command.backingData.credentialsKeyedByAccount[command.credentials];
+        if (accountDetails.computeVersion === 'ALPHA' && !command.distributionPolicy.targetShape) {
+          command.distributionPolicy.targetShape = 'EVEN';
+        }
       }
 
       function loadAllImages(account) {
@@ -189,9 +208,9 @@ module.exports = angular
         const c = command;
         const result = { dirty: {} };
 
-        const locations = c.regional ? [c.region] : [c.zone],
-          { credentialsKeyedByAccount } = c.backingData,
-          { locationToInstanceTypesMap } = credentialsKeyedByAccount[c.credentials];
+        const locations = c.regional ? [c.region] : [c.zone];
+        const { credentialsKeyedByAccount } = c.backingData;
+        const { locationToInstanceTypesMap } = credentialsKeyedByAccount[c.credentials];
 
         if (locations.every(l => !l)) {
           return result;
@@ -211,12 +230,12 @@ module.exports = angular
 
       function configureCustomInstanceTypes(command) {
         const c = command;
-        let result = { dirty: {} },
-          vCpuCount = _.get(c, 'viewState.customInstance.vCpuCount'),
-          memory = _.get(c, 'viewState.customInstance.memory'),
-          { zone, regional, region } = c,
-          { locationToInstanceTypesMap } = c.backingData.credentialsKeyedByAccount[c.credentials],
-          location = regional ? region : zone;
+        const result = { dirty: {} };
+        let vCpuCount = _.get(c, 'viewState.customInstance.vCpuCount');
+        const memory = _.get(c, 'viewState.customInstance.memory');
+        const { zone, regional, region } = c;
+        const { locationToInstanceTypesMap } = c.backingData.credentialsKeyedByAccount[c.credentials];
+        const location = regional ? region : zone;
 
         if (!location) {
           return result;
@@ -256,17 +275,7 @@ module.exports = angular
 
       function configureAccelerators(command) {
         const result = { dirty: {} };
-        const { credentials, zone, backingData } = command;
-        const accountBackingData = _.get(backingData, ['credentialsKeyedByAccount', credentials], {});
-        const acceleratorMap = accountBackingData.zoneToAcceleratorTypesMap || {};
-        const acceleratorTypes = _.get(acceleratorMap, [zone, 'acceleratorTypes', 'acceleratorTypes'], []).map(a => {
-          const maxCards = _.isFinite(a.maximumCardsPerInstance) ? a.maximumCardsPerInstance : 4;
-          const availableCardCounts = [];
-          for (let i = 1; i <= maxCards; i *= 2) {
-            availableCardCounts.push(i);
-          }
-          return _.assign({}, a, { availableCardCounts });
-        });
+        const acceleratorTypes = GceAcceleratorService.getAvailableAccelerators(command);
         _.set(command, ['viewState', 'acceleratorTypes'], acceleratorTypes);
         result.dirty.acceleratorTypes = true;
         const chosenAccelerators = _.get(command, 'acceleratorConfigs', []);
@@ -601,6 +610,7 @@ module.exports = angular
           const defaults = GCEProviderSettings.defaults;
           if (command.regional) {
             command.zone = null;
+            configureDistributionPolicyTargetShape(command);
           } else if (!command.zone) {
             if (command.region === defaults.region) {
               command.zone = defaults.zone;
@@ -664,6 +674,8 @@ module.exports = angular
 
             angular.extend(result.dirty, configureHealthChecks(command).dirty);
             angular.extend(result.dirty, configureInstanceTypes(command).dirty);
+
+            configureDistributionPolicyTargetShape(command);
           } else {
             command.region = null;
           }
@@ -709,6 +721,14 @@ module.exports = angular
           angular.extend(command.viewState.dirty, result.dirty);
           angular.extend(command.viewState.dirty, configureInstanceTypes(command).dirty);
           angular.extend(command.viewState.dirty, configureCpuPlatforms(command).dirty);
+          angular.extend(command.viewState.dirty, configureAccelerators(command).dirty);
+          return result;
+        };
+
+        cmd.selectZonesChanged = function selectZonesChanged(command) {
+          const result = { dirty: {} };
+          command.viewState.dirty = command.viewState.dirty || {};
+          angular.extend(command.viewState.dirty, result.dirty);
           angular.extend(command.viewState.dirty, configureAccelerators(command).dirty);
           return result;
         };

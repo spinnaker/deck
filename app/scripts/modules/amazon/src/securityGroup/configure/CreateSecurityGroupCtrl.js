@@ -1,14 +1,15 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 
 import { CACHE_INITIALIZER_SERVICE, FirewallLabels } from '@spinnaker/core';
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
-module.exports = angular
-  .module('spinnaker.amazon.securityGroup.create.controller', [
-    require('@uirouter/angularjs').default,
-    CACHE_INITIALIZER_SERVICE,
-  ])
+export const AMAZON_SECURITYGROUP_CONFIGURE_CREATESECURITYGROUPCTRL =
+  'spinnaker.amazon.securityGroup.create.controller';
+export const name = AMAZON_SECURITYGROUP_CONFIGURE_CREATESECURITYGROUPCTRL; // for backwards compatibility
+angular
+  .module(AMAZON_SECURITYGROUP_CONFIGURE_CREATESECURITYGROUPCTRL, [UIROUTER_ANGULARJS, CACHE_INITIALIZER_SERVICE])
   .controller('awsCreateSecurityGroupCtrl', [
     '$scope',
     '$uibModalInstance',
@@ -23,7 +24,7 @@ module.exports = angular
         ingress: require('./createSecurityGroupIngress.html'),
       };
 
-      var ctrl = this;
+      const ctrl = this;
 
       ctrl.translate = label => FirewallLabels.get(label);
 

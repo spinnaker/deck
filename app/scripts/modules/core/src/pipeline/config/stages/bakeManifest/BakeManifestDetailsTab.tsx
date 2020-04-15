@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 
 import {
   decodeUnicodeBase64,
@@ -6,17 +6,20 @@ import {
   IArtifact,
   IExecutionDetailsSectionProps,
   ManifestYaml,
-} from '@spinnaker/core';
+  StageFailureMessage,
+} from 'core';
 
 export class BakeManifestDetailsTab extends React.Component<IExecutionDetailsSectionProps> {
   public static title = 'bakedManifest';
 
   public render() {
-    const bakedArtifacts: IArtifact[] = (this.props.stage.context.artifacts || []).filter(
+    const { current, name, stage } = this.props;
+    const bakedArtifacts: IArtifact[] = (stage.context.artifacts || []).filter(
       (a: IArtifact) => a.type === 'embedded/base64',
     );
     return (
-      <ExecutionDetailsSection name={this.props.name} current={this.props.current}>
+      <ExecutionDetailsSection name={name} current={current}>
+        <StageFailureMessage stage={stage} message={stage.failureMessage} />
         {bakedArtifacts.map((artifact, i) => (
           <ManifestYaml
             key={i}

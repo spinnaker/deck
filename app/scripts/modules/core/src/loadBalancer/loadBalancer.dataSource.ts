@@ -5,7 +5,8 @@ import { INFRASTRUCTURE_KEY } from 'core/application/nav/defaultCategories';
 import { Application } from 'core/application/application.model';
 import { EntityTagsReader } from 'core/entityTag/EntityTagsReader';
 import { ILoadBalancer } from 'core/domain';
-import { LOAD_BALANCER_READ_SERVICE, LoadBalancerReader } from 'core/loadBalancer/loadBalancer.read.service';
+import { LOAD_BALANCER_READ_SERVICE, LoadBalancerReader } from './loadBalancer.read.service';
+import { addManagedResourceMetadataToLoadBalancers } from 'core/managed';
 
 export const LOAD_BALANCER_DATA_SOURCE = 'spinnaker.core.loadBalancer.dataSource';
 module(LOAD_BALANCER_DATA_SOURCE, [LOAD_BALANCER_READ_SERVICE]).run([
@@ -22,6 +23,7 @@ module(LOAD_BALANCER_DATA_SOURCE, [LOAD_BALANCER_READ_SERVICE]).run([
 
     const addTags = (application: Application) => {
       EntityTagsReader.addTagsToLoadBalancers(application);
+      addManagedResourceMetadataToLoadBalancers(application);
     };
 
     ApplicationDataSourceRegistry.registerDataSource({
@@ -30,6 +32,7 @@ module(LOAD_BALANCER_DATA_SOURCE, [LOAD_BALANCER_READ_SERVICE]).run([
       category: INFRASTRUCTURE_KEY,
       optional: true,
       icon: 'fa fa-xs fa-fw icon-sitemap',
+      iconName: 'spMenuLoadBalancers',
       loader: loadLoadBalancers,
       onLoad: addLoadBalancers,
       afterLoad: addTags,
@@ -37,6 +40,7 @@ module(LOAD_BALANCER_DATA_SOURCE, [LOAD_BALANCER_READ_SERVICE]).run([
       credentialsField: 'account',
       regionField: 'region',
       description: 'Traffic distribution management between servers',
+      defaultData: [],
     });
   },
 ]);

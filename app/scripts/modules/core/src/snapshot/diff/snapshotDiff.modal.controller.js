@@ -1,9 +1,10 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 import _ from 'lodash';
 
-import { CONFIRMATION_MODAL_SERVICE } from 'core/confirmationModal/confirmationModal.service';
+import { ConfirmationModalService } from 'core/confirmationModal';
+import { DIFF_SUMMARY_COMPONENT } from 'core/pipeline/config/actions/history/diffSummary.component';
 import { DIFF_VIEW_COMPONENT } from 'core/pipeline/config/actions/history/diffView.component';
 import { JsonUtils } from 'core/utils/json/JsonUtils';
 import { SnapshotReader } from '../SnapshotReader';
@@ -11,19 +12,16 @@ import { SnapshotWriter } from '../SnapshotWriter';
 
 import './snapshotDiff.modal.less';
 
-module.exports = angular
-  .module('spinnaker.deck.core.snapshot.diff.modal.controller', [
-    CONFIRMATION_MODAL_SERVICE,
-    require('../../pipeline/config/actions/history/diffSummary.component').name,
-    DIFF_VIEW_COMPONENT,
-  ])
-  .controller('SnapshotDiffModalCtrl', [
+export const CORE_SNAPSHOT_DIFF_SNAPSHOTDIFF_MODAL_CONTROLLER = 'spinnaker.deck.core.snapshot.diff.modal.controller';
+export const name = CORE_SNAPSHOT_DIFF_SNAPSHOTDIFF_MODAL_CONTROLLER; // for backwards compatibility
+module(CORE_SNAPSHOT_DIFF_SNAPSHOTDIFF_MODAL_CONTROLLER, [DIFF_SUMMARY_COMPONENT, DIFF_VIEW_COMPONENT]).controller(
+  'SnapshotDiffModalCtrl',
+  [
     'availableAccounts',
     'application',
     '$filter',
     '$uibModalInstance',
-    'confirmationModalService',
-    function(availableAccounts, application, $filter, $uibModalInstance, confirmationModalService) {
+    function(availableAccounts, application, $filter, $uibModalInstance) {
       this.availableAccounts = availableAccounts;
       this.selectedAccount = _.head(availableAccounts);
       this.compareOptions = ['most recent', 'previous version'];
@@ -39,7 +37,7 @@ module.exports = angular
         },
       };
 
-      let resetView = () => {
+      const resetView = () => {
         this.state = {
           loading: true,
           error: false,
@@ -49,8 +47,8 @@ module.exports = angular
         this.version = 0;
       };
 
-      let formatSnapshots = snapshots => {
-        let formatted = snapshots
+      const formatSnapshots = snapshots => {
+        const formatted = snapshots
           .sort((a, b) => b.timestamp - a.timestamp)
           .map((s, index) => {
             return {
@@ -66,7 +64,7 @@ module.exports = angular
         return formatted;
       };
 
-      let loadSuccess = snapshots => {
+      const loadSuccess = snapshots => {
         this.state.loading = false;
         if (!snapshots.length) {
           return;
@@ -76,7 +74,7 @@ module.exports = angular
         this.updateDiff();
       };
 
-      let loadError = () => {
+      const loadError = () => {
         this.state.loading = false;
         this.state.error = true;
       };
@@ -91,7 +89,7 @@ module.exports = angular
       };
 
       this.restoreSnapshot = () => {
-        let submitMethod = () => {
+        const submitMethod = () => {
           return SnapshotWriter.restoreSnapshot(
             application,
             this.selectedAccount,
@@ -99,16 +97,14 @@ module.exports = angular
           );
         };
 
-        let taskMonitor = {
+        const taskMonitor = {
           application: application,
           title: 'Restoring snapshot of ' + application.name,
-          hasKatoTask: true,
         };
 
-        confirmationModalService.confirm({
+        ConfirmationModalService.confirm({
           header: `Are you sure you want to restore snapshot of: ${application.name}?`,
           buttonText: 'Restore snapshot',
-          provider: 'gce',
           body: '<p>This will change your infrastructure to the state specified in the snapshot selected</p>',
           taskMonitorConfig: taskMonitor,
           submitMethod: submitMethod,
@@ -129,4 +125,5 @@ module.exports = angular
       this.getSnapshotHistoryForAccount(this.selectedAccount);
       this.close = $uibModalInstance.dismiss;
     },
-  ]);
+  ],
+);

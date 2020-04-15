@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { get } from 'lodash';
 import { UISref } from '@uirouter/react';
 import { UIRouterContext } from '@uirouter/react-hybrid';
@@ -21,6 +21,10 @@ export interface IStageFailureMessageState {
   failedStageName?: string;
   failedStageId?: number;
   isFailed?: boolean;
+}
+
+export enum StageFailureMessages {
+  NO_REASON_PROVIDED = 'No reason provided.',
 }
 
 @UIRouterContext
@@ -73,9 +77,11 @@ export class StageFailureMessage extends React.Component<IStageFailureMessagePro
       const exceptionTitle = isFailed ? (messages.length ? 'Exceptions' : 'Exception') : 'Warning';
       const displayMessages =
         message || !messages.length ? (
-          <Markdown message={message || 'No reason provided.'} className="break-word" />
+          <Markdown message={message || StageFailureMessages.NO_REASON_PROVIDED} className="break-word" />
         ) : (
-          messages.map((m, i) => <Markdown key={i} message={m || 'No reason provided.'} className="break-word" />)
+          messages.map((m, i) => (
+            <Markdown key={i} message={m || StageFailureMessages.NO_REASON_PROVIDED} className="break-word" />
+          ))
         );
 
       if (displayMessages) {

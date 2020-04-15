@@ -1,7 +1,7 @@
-import * as React from 'react';
+import React from 'react';
 
 import { IPipelineCommand } from 'core/domain';
-import { ITriggerTemplateComponentProps } from 'core/pipeline/manualExecution/TriggerTemplate';
+import { ITriggerTemplateComponentProps } from './TriggerTemplate';
 
 /**
  * This is only necessary because manualPipelineExecution is still in angular
@@ -9,9 +9,11 @@ import { ITriggerTemplateComponentProps } from 'core/pipeline/manualExecution/Tr
  */
 export class StageManualComponents extends React.Component<{
   command: IPipelineCommand;
+  updateCommand: (path: string, value: any) => void;
   components: Array<React.ComponentType<ITriggerTemplateComponentProps>>;
 }> {
   public render() {
-    return this.props.components.map((Comp, index) => <Comp key={index} command={this.props.command} />);
+    const { command, components, updateCommand } = this.props;
+    return components.map((Comp, index) => <Comp key={index} command={command} updateCommand={updateCommand} />);
   }
 }

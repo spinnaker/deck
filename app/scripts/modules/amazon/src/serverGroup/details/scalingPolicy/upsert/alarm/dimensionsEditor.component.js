@@ -1,6 +1,6 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 import _ from 'lodash';
 
 import { CloudMetricsReader } from '@spinnaker/core';
@@ -8,9 +8,12 @@ import { Observable, Subject } from 'rxjs';
 
 import './dimensionsEditor.component.less';
 
-module.exports = angular
-  .module('spinnaker.amazon.serverGroup.details.scalingPolicy.dimensionEditor', [])
-  .component('dimensionsEditor', {
+export const AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_ALARM_DIMENSIONSEDITOR_COMPONENT =
+  'spinnaker.amazon.serverGroup.details.scalingPolicy.dimensionEditor';
+export const name = AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_ALARM_DIMENSIONSEDITOR_COMPONENT; // for backwards compatibility
+module(AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_ALARM_DIMENSIONSEDITOR_COMPONENT, []).component(
+  'dimensionsEditor',
+  {
     bindings: {
       alarm: '=',
       serverGroup: '=',
@@ -25,13 +28,13 @@ module.exports = angular
 
       this.fetchDimensionOptions = () => {
         this.viewState.loadingDimensions = true;
-        let filters = { namespace: this.alarm.namespace };
+        const filters = { namespace: this.alarm.namespace };
         return Observable.fromPromise(
           CloudMetricsReader.listMetrics('aws', this.serverGroup.account, this.serverGroup.region, filters),
         );
       };
 
-      let dimensionSubject = new Subject();
+      const dimensionSubject = new Subject();
 
       dimensionSubject.switchMap(this.fetchDimensionOptions).subscribe(results => {
         this.viewState.loadingDimensions = false;
@@ -56,4 +59,5 @@ module.exports = angular
         });
       };
     },
-  });
+  },
+);

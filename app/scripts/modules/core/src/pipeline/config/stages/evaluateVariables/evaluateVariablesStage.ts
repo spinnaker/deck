@@ -2,12 +2,11 @@ import { Registry } from 'core/registry';
 
 import { ExecutionDetailsTasks } from '../common';
 import { EvaluateVariablesExecutionDetails } from './EvaluateVariablesExecutionDetails';
-import { EvaluateVariablesStageConfig } from './EvaluateVariablesStageConfig';
+import { EvaluateVariablesStageConfig, validateEvaluateVariablesStage } from './EvaluateVariablesStageConfig';
 
 Registry.pipeline.registerStage({
   label: 'Evaluate Variables',
-  description:
-    'Evaluates variables for use in SpEL expressions in downstream stages. Variables can be accessed by their key.',
+  description: 'Evaluates variables for use in downstream stages.',
   key: 'evaluateVariables',
   defaults: {
     failOnFailedExpressions: true,
@@ -15,5 +14,5 @@ Registry.pipeline.registerStage({
   component: EvaluateVariablesStageConfig,
   executionDetailsSections: [EvaluateVariablesExecutionDetails, ExecutionDetailsTasks],
   strategy: true,
-  validators: [{ type: 'requiredField', fieldName: 'variables' }],
+  validateFn: validateEvaluateVariablesStage,
 });

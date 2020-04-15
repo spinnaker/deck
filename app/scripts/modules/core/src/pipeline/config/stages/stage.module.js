@@ -1,17 +1,17 @@
 'use strict';
 
-const angular = require('angular');
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import { defaultsDeep, extend } from 'lodash';
+import { module } from 'angular';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { defaultsDeep, extend, omit } from 'lodash';
 
 import { AccountService } from 'core/account/AccountService';
 import { API } from 'core/api';
+import { ArtifactsMode, ArtifactsModeService } from 'core/artifact';
 import { BASE_EXECUTION_DETAILS_CTRL } from './common/baseExecutionDetails.controller';
-import { SETTINGS } from 'core/config';
-import { CONFIRMATION_MODAL_SERVICE } from 'core/confirmationModal/confirmationModal.service';
+import { ConfirmationModalService } from 'core/confirmationModal';
 import { STAGE_NAME } from './StageName';
-import { PipelineConfigService } from 'core/pipeline/config/services/PipelineConfigService';
+import { PipelineConfigService } from '../services/PipelineConfigService';
 import { Registry } from 'core/registry';
 import { StageConfigWrapper } from './StageConfigWrapper';
 import { EditStageJsonModal } from './common/EditStageJsonModal';
@@ -19,19 +19,22 @@ import { ReactModal } from 'core/presentation';
 import { PRODUCES_ARTIFACTS_REACT } from './producesArtifacts/ProducesArtifacts';
 import { OVERRRIDE_FAILURE } from './overrideFailure/overrideFailure.module';
 import { OVERRIDE_TIMEOUT_COMPONENT } from './overrideTimeout/overrideTimeout.module';
+import { CORE_PIPELINE_CONFIG_STAGES_OPTIONALSTAGE_OPTIONALSTAGE_DIRECTIVE } from './optionalStage/optionalStage.directive';
+import { CORE_PIPELINE_CONFIG_STAGES_FAILONFAILEDEXPRESSIONS_FAILONFAILEDEXPRESSIONS_DIRECTIVE } from './failOnFailedExpressions/failOnFailedExpressions.directive';
+import { CORE_PIPELINE_CONFIG_STAGES_COMMON_STAGECONFIGFIELD_STAGECONFIGFIELD_DIRECTIVE } from './common/stageConfigField/stageConfigField.directive';
 
-module.exports = angular
-  .module('spinnaker.core.pipeline.config.stage', [
-    PRODUCES_ARTIFACTS_REACT,
-    BASE_EXECUTION_DETAILS_CTRL,
-    STAGE_NAME,
-    OVERRIDE_TIMEOUT_COMPONENT,
-    OVERRRIDE_FAILURE,
-    require('./optionalStage/optionalStage.directive').name,
-    require('./failOnFailedExpressions/failOnFailedExpressions.directive').name,
-    CONFIRMATION_MODAL_SERVICE,
-    require('./common/stageConfigField/stageConfigField.directive').name,
-  ])
+export const CORE_PIPELINE_CONFIG_STAGES_STAGE_MODULE = 'spinnaker.core.pipeline.config.stage';
+export const name = CORE_PIPELINE_CONFIG_STAGES_STAGE_MODULE; // for backwards compatibility
+module(CORE_PIPELINE_CONFIG_STAGES_STAGE_MODULE, [
+  PRODUCES_ARTIFACTS_REACT,
+  BASE_EXECUTION_DETAILS_CTRL,
+  STAGE_NAME,
+  OVERRIDE_TIMEOUT_COMPONENT,
+  OVERRRIDE_FAILURE,
+  CORE_PIPELINE_CONFIG_STAGES_OPTIONALSTAGE_OPTIONALSTAGE_DIRECTIVE,
+  CORE_PIPELINE_CONFIG_STAGES_FAILONFAILEDEXPRESSIONS_FAILONFAILEDEXPRESSIONS_DIRECTIVE,
+  CORE_PIPELINE_CONFIG_STAGES_COMMON_STAGECONFIGFIELD_STAGECONFIGFIELD_DIRECTIVE,
+])
   .directive('pipelineConfigStage', function() {
     return {
       restrict: 'E',
@@ -56,7 +59,7 @@ module.exports = angular
     '$controller',
     '$templateCache',
     function($scope, $element, $compile, $controller, $templateCache) {
-      var lastStageScope, reactComponentMounted;
+      let lastStageScope, reactComponentMounted;
 
       $scope.options = {
         stageTypes: [],
@@ -79,7 +82,7 @@ module.exports = angular
       }
 
       $scope.groupDependencyOptions = function(stage) {
-        var requisiteStageRefIds = $scope.stage.requisiteStageRefIds || [];
+        const requisiteStageRefIds = $scope.stage.requisiteStageRefIds || [];
         return stage.available
           ? 'Available'
           : requisiteStageRefIds.includes(stage.refId)
@@ -108,7 +111,7 @@ module.exports = angular
       };
 
       $scope.updateAvailableDependencyStages = function() {
-        var availableDependencyStages = PipelineConfigService.getDependencyCandidateStages(
+        const availableDependencyStages = PipelineConfigService.getDependencyCandidateStages(
           $scope.pipeline,
           $scope.stage,
         );
@@ -130,7 +133,8 @@ module.exports = angular
         });
       };
 
-      this.checkFeatureFlag = flag => !!SETTINGS.feature[flag];
+      this.renderLegacyArtifactsUI = ArtifactsModeService.artifactsMode === ArtifactsMode.LEGACY;
+      this.renderStandardArtifactsUI = ArtifactsModeService.artifactsMode === ArtifactsMode.STANDARD;
 
       this.editStageJson = () => {
         const modalProps = { dialogClassName: 'modal-lg modal-fullscreen' };
@@ -175,8 +179,8 @@ module.exports = angular
         }
 
         $scope.updateAvailableDependencyStages();
-        var type = $scope.stage.type,
-          stageScope = $scope.$new();
+        const type = $scope.stage.type;
+        const stageScope = $scope.$new();
 
         // clear existing contents
         if (reactComponentMounted) {
@@ -197,7 +201,7 @@ module.exports = angular
         });
 
         if (type && stageDetailsNode) {
-          let config = getConfig($scope.stage);
+          const config = getConfig($scope.stage);
           if (config) {
             $scope.canConfigureNotifications = !$scope.pipeline.strategy && !config.disableNotifications;
             $scope.description = config.description;
@@ -221,7 +225,10 @@ module.exports = angular
               application: $scope.application,
               stageFieldUpdated: $scope.stageFieldUpdated,
               updateStageField: changes => {
-                extend($scope.stage, changes);
+                // Reserved fields should not be mutated from with a StageConfig component
+                const allowedChanges = omit(changes, ['requisiteStageRefIds', 'refId', 'isNew', 'name', 'type']);
+
+                extend($scope.stage, allowedChanges);
                 $scope.stageFieldUpdated();
               },
               // Added to enable inline artifact editing from React stages
@@ -257,8 +264,8 @@ module.exports = angular
 
       function applyConfigController(config, stageScope) {
         if (config.controller) {
-          var ctrl = config.controller.split(' as ');
-          var controller = $controller(ctrl[0], {
+          const ctrl = config.controller.split(' as ');
+          const controller = $controller(ctrl[0], {
             $scope: stageScope,
             stage: $scope.stage,
             viewState: $scope.viewState,
@@ -275,7 +282,7 @@ module.exports = angular
       function updateStageName(config, oldVal) {
         // apply a default name if the type changes and the user has not specified a name
         if (oldVal) {
-          var oldConfig = getConfig({ type: oldVal });
+          const oldConfig = getConfig({ type: oldVal });
           if (oldConfig && $scope.stage.name === oldConfig.label) {
             $scope.stage.name = config.label;
           }
@@ -291,6 +298,18 @@ module.exports = angular
         });
       }
 
+      this.updateNotifications = function(notifications) {
+        $scope.$applyAsync(() => {
+          $scope.stage.notifications = notifications;
+        });
+      };
+
+      this.handleSendNotificationsChanged = function() {
+        $scope.$applyAsync(() => {
+          $scope.stage.sendNotifications = !$scope.stage.sendNotifications;
+        });
+      };
+
       $scope.$on('pipeline-reverted', this.selectStage);
       $scope.$on('pipeline-json-edited', this.selectStage);
       $scope.$watch('stage.type', this.selectStage);
@@ -301,9 +320,8 @@ module.exports = angular
   .controller('RestartStageCtrl', [
     '$scope',
     '$stateParams',
-    'confirmationModalService',
-    function($scope, $stateParams, confirmationModalService) {
-      var restartStage = function() {
+    function($scope, $stateParams) {
+      const restartStage = function() {
         return API.one('pipelines')
           .one($stateParams.executionId)
           .one('stages', $scope.stage.id)
@@ -321,7 +339,7 @@ module.exports = angular
           body =
             '<p><strong>This pipeline is currently running - restarting this stage will result in multiple concurrently running pipelines.</strong></p>';
         }
-        confirmationModalService.confirm({
+        ConfirmationModalService.confirm({
           header: 'Really restart ' + $scope.stage.name + '?',
           buttonText: 'Restart ' + $scope.stage.name,
           body: body,

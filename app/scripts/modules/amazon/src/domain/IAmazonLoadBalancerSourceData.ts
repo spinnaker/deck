@@ -1,6 +1,6 @@
 import { ILoadBalancerSourceData } from '@spinnaker/core';
 
-import { IListenerAction, NLBListenerProtocol } from 'amazon/domain';
+import { IListenerAction, NLBListenerProtocol } from './IAmazonLoadBalancer';
 
 import { IListenerRule } from './IAmazonLoadBalancer';
 
@@ -80,6 +80,7 @@ export interface IAmazonTargetGroupSourceData {
     'stickiness.enabled': boolean;
     'stickiness.lb_cookie.duration_seconds': number;
     'stickiness.type': 'lb_cookie';
+    'lambda.multi_value_headers.enabled': boolean;
   };
   cloudProvider: string;
   healthCheckIntervalSeconds: number;

@@ -1,8 +1,8 @@
-import { ApplicationHeader } from 'core/application/nav/ApplicationHeader';
-import * as React from 'react';
+import { ApplicationHeader } from './nav/ApplicationHeader';
+import React from 'react';
 import { UIView } from '@uirouter/react';
 
-import { Application } from 'core/application';
+import { Application } from './application.model';
 import { RecentHistoryService } from 'core/history';
 import { DebugWindow } from 'core/utils/consoleDebug';
 
@@ -28,17 +28,18 @@ export class ApplicationComponent extends React.Component<IApplicationComponentP
   }
 
   private mountApplication(app: Application) {
-    if (app.notFound) {
+    if (app.notFound || app.hasError) {
       RecentHistoryService.removeLastItem('applications');
       return;
     }
 
     DebugWindow.application = app;
-    app.enableAutoRefresh();
+    // KLUDGE: warning, do not use, this is temporarily and will be removed very soon.
+    !app.attributes?.disableAutoRefresh && app.enableAutoRefresh();
   }
 
   private unmountApplication(app: Application) {
-    if (app.notFound) {
+    if (app.notFound || app.hasError) {
       return;
     }
     DebugWindow.application = undefined;
@@ -49,12 +50,20 @@ export class ApplicationComponent extends React.Component<IApplicationComponentP
     const { app } = this.props;
     return (
       <div className="application">
-        {!app.notFound && <ApplicationHeader app={app} />}
+        {!app.notFound && !app.hasError && <ApplicationHeader app={app} />}
         {app.notFound && (
           <div>
             <h2 className="text-center">Application Not Found</h2>
             <p className="text-center" style={{ marginBottom: '20px' }}>
               Please check your URL - we can't find any data for <em>{app.name}</em>.
+            </p>
+          </div>
+        )}
+        {app.hasError && (
+          <div>
+            <h2 className="text-center">Something went wrong</h2>
+            <p className="text-center" style={{ marginBottom: '20px' }}>
+              There was a problem loading <em>{app.name}</em>. Try checking your browser console for errors.
             </p>
           </div>
         )}

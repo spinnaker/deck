@@ -1,14 +1,17 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 import _ from 'lodash';
 
 import { AccountService, NameUtils, Registry, StageConstants } from '@spinnaker/core';
+import { TITUS_PIPELINE_STAGES_CLONESERVERGROUP_CLONESERVERGROUPEXECUTIONDETAILS_CONTROLLER } from './cloneServerGroupExecutionDetails.controller';
 
-module.exports = angular
-  .module('spinnaker.titus.pipeline.stage.cloneServerGroupStage', [
-    require('./cloneServerGroupExecutionDetails.controller').name,
-  ])
+export const TITUS_PIPELINE_STAGES_CLONESERVERGROUP_TITUSCLONESERVERGROUPSTAGE =
+  'spinnaker.titus.pipeline.stage.cloneServerGroupStage';
+export const name = TITUS_PIPELINE_STAGES_CLONESERVERGROUP_TITUSCLONESERVERGROUPSTAGE; // for backwards compatibility
+module(TITUS_PIPELINE_STAGES_CLONESERVERGROUP_TITUSCLONESERVERGROUPSTAGE, [
+  TITUS_PIPELINE_STAGES_CLONESERVERGROUP_CLONESERVERGROUPEXECUTIONDETAILS_CONTROLLER,
+])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'cloneServerGroup',
@@ -27,7 +30,7 @@ module.exports = angular
   .controller('titusCloneServerGroupStageCtrl', [
     '$scope',
     function($scope) {
-      let stage = $scope.stage;
+      const stage = $scope.stage;
 
       $scope.viewState = {
         accountsLoaded: false,
@@ -58,7 +61,7 @@ module.exports = angular
 
       this.targetClusterUpdated = () => {
         if (stage.targetCluster) {
-          let clusterName = NameUtils.parseServerGroupName(stage.targetCluster);
+          const clusterName = NameUtils.parseServerGroupName(stage.targetCluster);
           stage.stack = clusterName.stack;
           stage.freeFormDetails = clusterName.freeFormDetails;
         } else {
@@ -79,7 +82,7 @@ module.exports = angular
 
       this.toggleSuspendedProcess = process => {
         stage.suspendedProcesses = stage.suspendedProcesses || [];
-        var processIndex = stage.suspendedProcesses.indexOf(process);
+        const processIndex = stage.suspendedProcesses.indexOf(process);
         if (processIndex === -1) {
           stage.suspendedProcesses.push(process);
         } else {

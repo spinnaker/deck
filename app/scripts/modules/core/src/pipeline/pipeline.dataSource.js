@@ -1,63 +1,65 @@
-const angular = require('angular');
+import { module } from 'angular';
 
 import { ApplicationDataSourceRegistry } from 'core/application/service/ApplicationDataSourceRegistry';
 import { DELIVERY_KEY } from 'core/application/nav/defaultCategories';
 import { EntityTagsReader } from 'core/entityTag/EntityTagsReader';
 import { EXECUTION_SERVICE } from './service/execution.service';
-import { PipelineConfigService } from 'core/pipeline/config/services/PipelineConfigService';
+import { PipelineConfigService } from './config/services/PipelineConfigService';
 import { SETTINGS } from 'core/config/settings';
 import { CLUSTER_SERVICE } from 'core/cluster/cluster.service';
 
-module.exports = angular.module('spinnaker.core.pipeline.dataSource', [EXECUTION_SERVICE, CLUSTER_SERVICE]).run([
+export const CORE_PIPELINE_PIPELINE_DATASOURCE = 'spinnaker.core.pipeline.dataSource';
+export const name = CORE_PIPELINE_PIPELINE_DATASOURCE; // for backwards compatibility
+module(CORE_PIPELINE_PIPELINE_DATASOURCE, [EXECUTION_SERVICE, CLUSTER_SERVICE]).run([
   '$q',
   'executionService',
   'clusterService',
   function($q, executionService, clusterService) {
-    let addExecutions = (application, executions) => {
+    const addExecutions = (application, executions) => {
       executionService.transformExecutions(application, executions, application.executions.data);
       return $q.when(executionService.addExecutionsToApplication(application, executions));
     };
 
-    let loadExecutions = application => {
+    const loadExecutions = application => {
       return executionService.getExecutions(application.name, application);
     };
 
-    let loadPipelineConfigs = application => {
-      let pipelineLoader = PipelineConfigService.getPipelinesForApplication(application.name),
-        strategyLoader = PipelineConfigService.getStrategiesForApplication(application.name);
+    const loadPipelineConfigs = application => {
+      const pipelineLoader = PipelineConfigService.getPipelinesForApplication(application.name);
+      const strategyLoader = PipelineConfigService.getStrategiesForApplication(application.name);
       return $q.all({ pipelineConfigs: pipelineLoader, strategyConfigs: strategyLoader });
     };
 
-    let addPipelineConfigs = (application, data) => {
+    const addPipelineConfigs = (application, data) => {
       application.strategyConfigs = { data: data.strategyConfigs };
       return $q.when(data.pipelineConfigs);
     };
 
-    let loadRunningExecutions = application => {
+    const loadRunningExecutions = application => {
       return executionService.getRunningExecutions(application.name);
     };
 
-    let addRunningExecutions = (application, data) => {
+    const addRunningExecutions = (application, data) => {
       executionService.transformExecutions(application, data);
       return $q.when(data);
     };
 
-    let runningExecutionsLoaded = application => {
+    const runningExecutionsLoaded = application => {
       clusterService.addExecutionsToServerGroups(application);
       executionService.mergeRunningExecutionsIntoExecutions(application);
       application.getDataSource('serverGroups').dataUpdated();
     };
 
-    let executionsLoaded = application => {
+    const executionsLoaded = application => {
       addExecutionTags(application);
       executionService.removeCompletedExecutionsFromRunningData(application);
     };
 
-    let addExecutionTags = application => {
+    const addExecutionTags = application => {
       EntityTagsReader.addTagsToExecutions(application);
     };
 
-    let addPipelineTags = application => {
+    const addPipelineTags = application => {
       EntityTagsReader.addTagsToPipelines(application);
     };
 
@@ -66,6 +68,7 @@ module.exports = angular.module('spinnaker.core.pipeline.dataSource', [EXECUTION
         optional: true,
         primary: true,
         icon: 'fa fa-xs fa-fw fa-list',
+        iconName: 'spMenuPipelines',
         key: 'executions',
         label: 'Pipelines',
         category: DELIVERY_KEY,
@@ -77,6 +80,7 @@ module.exports = angular.module('spinnaker.core.pipeline.dataSource', [EXECUTION
         lazy: true,
         badge: 'runningExecutions',
         description: 'Orchestrated deployment management',
+        defaultData: [],
       });
 
       ApplicationDataSourceRegistry.registerDataSource({
@@ -86,6 +90,7 @@ module.exports = angular.module('spinnaker.core.pipeline.dataSource', [EXECUTION
         afterLoad: addPipelineTags,
         lazy: true,
         visible: false,
+        defaultData: [],
       });
 
       ApplicationDataSourceRegistry.registerDataSource({
@@ -94,6 +99,7 @@ module.exports = angular.module('spinnaker.core.pipeline.dataSource', [EXECUTION
         loader: loadRunningExecutions,
         onLoad: addRunningExecutions,
         afterLoad: runningExecutionsLoaded,
+        defaultData: [],
       });
     }
   },

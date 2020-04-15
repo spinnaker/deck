@@ -1,6 +1,6 @@
-import * as React from 'react';
+import React from 'react';
 
-import { IStageConfigProps } from 'core/pipeline';
+import { IStageConfigProps } from './common/IStageConfigProps';
 
 export interface IStageConfigWrapperProps extends IStageConfigProps {
   component: React.ComponentType<any>;

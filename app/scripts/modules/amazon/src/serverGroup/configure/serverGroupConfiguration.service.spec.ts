@@ -104,7 +104,11 @@ describe('Service: awsServerGroupConfiguration', function() {
       } as any;
 
       service.configureCommand(
-        ApplicationModelBuilder.createApplicationForTests('name', { key: 'loadBalancers', lazy: true }),
+        ApplicationModelBuilder.createApplicationForTests('name', {
+          key: 'loadBalancers',
+          lazy: true,
+          defaultData: [],
+        }),
         command,
       );
       $scope.$digest();
@@ -398,6 +402,81 @@ describe('Service: awsServerGroupConfiguration', function() {
       const result = service.configureImages(this.command);
       expect(this.command.amiName).toBe(null);
       expect(result.dirty.amiName).toBe(true);
+    });
+  });
+
+  describe('managedResources', () => {
+    beforeEach(() => {
+      this.command = {
+        viewState: {},
+        backingData: {
+          filtered: {},
+          credentialsKeyedByAccount: {
+            prod: {
+              regions: [
+                { name: 'us-east-1', availabilityZones: [] },
+                { name: 'us-west-1', availabilityZones: [] },
+              ],
+            },
+            test: {
+              regions: [
+                { name: 'us-east-1', availabilityZones: [] },
+                { name: 'us-west-1', availabilityZones: [] },
+              ],
+            },
+          },
+          managedResources: [
+            {
+              kind: 'ec2/cluster@v1',
+              locations: {
+                account: 'prod',
+                regions: [{ name: 'us-east-1' }],
+              },
+              moniker: {
+                stack: 'foo',
+                detail: 'bar',
+              },
+            },
+          ],
+          securityGroups: {},
+          preferredZones: {},
+        },
+        credentials: 'test',
+        region: 'us-west-1',
+        stack: '',
+        freeFormDetails: '',
+      };
+      service.attachEventHandlers(this.command);
+    });
+
+    it('does not add managedResource on initial load if not matched', () => {
+      expect(this.command.viewState.resourceSummary).toBeFalsy();
+    });
+
+    it('adds managedResource when all fields match a non-paused resource', () => {
+      const { command } = this;
+      const managedResource = command.backingData.managedResources[0];
+      expect(command.resourceSummary).toBeFalsy();
+
+      command.credentials = managedResource.locations.account;
+      command.credentialsChanged(command);
+      expect(command.resourceSummary).toBeFalsy();
+
+      command.region = managedResource.locations.regions[0].name;
+      command.regionChanged(command);
+      expect(command.resourceSummary).toBeFalsy();
+
+      command.stack = managedResource.moniker.stack;
+      command.clusterChanged(command);
+      expect(command.resourceSummary).toBeFalsy();
+
+      command.freeFormDetails = managedResource.moniker.detail;
+      command.clusterChanged(command);
+      expect(command.resourceSummary).toBe(managedResource);
+
+      managedResource.isPaused = true;
+      command.clusterChanged(command);
+      expect(command.resourceSummary).toBeFalsy();
     });
   });
 });

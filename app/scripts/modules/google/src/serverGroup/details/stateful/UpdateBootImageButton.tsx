@@ -1,9 +1,8 @@
-import * as React from 'react';
+import React from 'react';
 
 import {
   Application,
   FormikFormField,
-  IFormInputProps,
   IModalComponentProps,
   ReactModal,
   TaskMonitor,
@@ -93,8 +92,7 @@ class UpdateBootImageModal extends React.Component<IUpdateBootImageModalProps, I
             order={nextIdx()}
             render={() => (
               <FormikFormField
-                fastField={false}
-                input={(props: IFormInputProps) => (
+                input={props => (
                   <div className="full-width" style={{ height: '225px' }}>
                     <ImageSelect
                       availableImages={this.state.availableImages}

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { Formik, Form, FormikProps } from 'formik';
 import { Modal } from 'react-bootstrap';
 import { without, merge } from 'lodash';
@@ -6,8 +6,9 @@ import { without, merge } from 'lodash';
 import { TaskMonitor } from 'core/task';
 import { NgReact } from 'core/reactShims';
 import { Spinner } from 'core/widgets';
+import { SpinFormik } from 'core/presentation';
 
-import { IModalComponentProps } from '../../presentation/ReactModal';
+import { IModalComponentProps } from '../../presentation';
 import { ModalClose } from '../buttons/ModalClose';
 import { SubmitButton } from '../buttons/SubmitButton';
 import { WizardPage } from './WizardPage';
@@ -163,17 +164,15 @@ export class WizardModal<T = {}> extends React.Component<IWizardModalProps<T>, I
       <>
         {taskMonitor && <TaskMonitorWrapper monitor={taskMonitor} />}
 
-        <Formik<T>
+        <SpinFormik<T>
           ref={this.formikRef}
           initialValues={initialValues}
-          isInitialValid={() => !(Object.keys(this.validate(initialValues)).length > 0)}
           onSubmit={closeModal}
           validate={this.validate}
           render={formik => (
             <Form className={`form-horizontal ${formClassName}`}>
               <ModalClose dismiss={dismissModal} />
-
-              <Modal.Header>{heading && <h3>{heading}</h3>}</Modal.Header>
+              <Modal.Header>{heading && <Modal.Title>{heading}</Modal.Title>}</Modal.Header>
 
               <Modal.Body>
                 {loading || !initialized ? (
@@ -183,7 +182,6 @@ export class WizardModal<T = {}> extends React.Component<IWizardModalProps<T>, I
                     <div className="col-md-3 hidden-sm hidden-xs">
                       <ul className="steps-indicator wizard-navigation">{pageLabels}</ul>
                     </div>
-
                     <div className="col-md-9 col-sm-12">
                       <div className="steps" ref={this.stepsElement} onScroll={this.handleStepsScroll}>
                         {renderPageContents()}

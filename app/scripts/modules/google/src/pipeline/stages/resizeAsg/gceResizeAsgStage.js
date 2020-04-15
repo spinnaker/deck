@@ -1,11 +1,12 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { AccountService, Registry, StageConstants } from '@spinnaker/core';
 
-module.exports = angular
-  .module('spinnaker.gce.pipeline.stage..resizeAsgStage', [])
+export const GOOGLE_PIPELINE_STAGES_RESIZEASG_GCERESIZEASGSTAGE = 'spinnaker.gce.pipeline.stage..resizeAsgStage';
+export const name = GOOGLE_PIPELINE_STAGES_RESIZEASG_GCERESIZEASGSTAGE; // for backwards compatibility
+module(GOOGLE_PIPELINE_STAGES_RESIZEASG_GCERESIZEASGSTAGE, [])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'resizeServerGroup',
@@ -14,7 +15,7 @@ module.exports = angular
       executionStepLabelUrl: require('./resizeAsgStepLabel.html'),
       accountExtractor: stage => [stage.context.credentials],
       configAccountExtractor: stage => [stage.credentials],
-      defaultTimeoutMs: 3 * 60 * 60 * 1000 + 21 * 60 * 1000, // 3h21m
+      supportsCustomTimeout: true,
       validators: [
         {
           type: 'targetImpedance',

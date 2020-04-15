@@ -1,12 +1,20 @@
-import * as React from 'react';
-import { Form, Formik } from 'formik';
+import React from 'react';
+import { Form } from 'formik';
 import { Modal } from 'react-bootstrap';
 
 import { Application } from 'core/application';
 import { IEntityRef, IEntityTag } from 'core/domain';
 import { HelpField } from 'core/help';
-import { SubmitButton } from 'core/modal';
-import { FormField, FormikFormField, Markdown, RadioButtonInput, ReactModal, TextAreaInput } from 'core/presentation';
+import { SubmitButton, ModalClose } from 'core/modal';
+import {
+  FormField,
+  FormikFormField,
+  Markdown,
+  RadioButtonInput,
+  ReactModal,
+  SpinFormik,
+  TextAreaInput,
+} from 'core/presentation';
 import { NgReact } from 'core/reactShims';
 import { TaskMonitor } from 'core/task';
 import { noop, UUIDGenerator } from 'core/utils';
@@ -128,14 +136,6 @@ export class EntityTagEditor extends React.Component<IEntityTagEditorProps, IEnt
     const { initialValues, isSubmitting } = this.state;
     const ownerOptions = opts || [];
 
-    const closeButton = (
-      <div className="modal-close close-button pull-right">
-        <a className="btn btn-link" onClick={this.close}>
-          <span className="glyphicon glyphicon-remove" />
-        </a>
-      </div>
-    );
-
     const submitLabel = `${isNew ? ' Create' : ' Update'} ${tag.value.type}`;
 
     const { TaskMonitorWrapper } = NgReact;
@@ -144,16 +144,16 @@ export class EntityTagEditor extends React.Component<IEntityTagEditorProps, IEnt
       <div>
         <TaskMonitorWrapper monitor={this.state.taskMonitor} />
 
-        <Formik<IEntityTagEditorValues>
+        <SpinFormik<IEntityTagEditorValues>
           initialValues={initialValues}
           onSubmit={this.upsertTag}
           render={({ isValid, values, setFieldValue }) => (
             <Form className="form-horizontal">
+              <ModalClose dismiss={this.close} />
               <Modal.Header>
-                <h3>
+                <Modal.Title>
                   {isNew ? 'Create' : 'Update'} {tag.value.type}
-                </h3>
-                {closeButton}
+                </Modal.Title>
               </Modal.Header>
 
               <Modal.Body className="entity-tag-editor-modal">

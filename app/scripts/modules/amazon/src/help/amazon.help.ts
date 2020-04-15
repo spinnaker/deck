@@ -82,6 +82,7 @@ const helpContents: { [key: string]: string } = {
     <p>If you do not wish to use VPC, select "None".</p>`,
   'aws.securityGroup.name':
     '<p>The {{firewall}} name is formed by combining the application name, the <b>Stack</b> field, and the <b>Detail</b> field.</p>',
+  'aws.securityGroup.cross.account.ingress.help': '<p>Accounts that are excluded will not show up in this list</p>',
   'aws.scalingPolicy.search.restricted': `<p>Resets dimensions to "AutoScalingGroupName: {name of the ASG}" and provides
         a simpler, combined input for the namespace and metric name fields.</p>`,
   'aws.scalingPolicy.search.all': `
@@ -102,7 +103,7 @@ const helpContents: { [key: string]: string } = {
   'aws.targetGroup.port':
     'The port on which the targets receive traffic. Cannot be edited after being saved; if you want to use a different port, create a new target group, save the load balancer, move your targets, and then delete this target group.',
   'aws.targetGroup.attributes.deregistrationDelay':
-    'The amount of time for the load balancer to wait before changing the state of a deregistering target from draining to unused. The range is 0-3600 seconds. The default value is 300 seconds.',
+    'The amount of time for the load balancer to wait before changing the state of a deregistering target from draining to unused. The range is 0-3600 seconds. The default value is 600 seconds.',
   'aws.targetGroup.attributes.stickinessEnabled': ' Indicates whether sticky sessions are enabled.',
   'aws.targetGroup.attributes.stickinessType':
     'The type of sticky sessions. The only current possible value is <code>lb_cookie</code>.',
@@ -110,6 +111,11 @@ const helpContents: { [key: string]: string } = {
     'The time period, in seconds, during which requests from a client should be routed to the same target. After this time period expires, the load balancer-generated cookie is considered stale. The range is 1 second to 1 week (604800 seconds). The default value is 1 day (86400 seconds).',
   'aws.targetGroup.attributes.healthCheckPort.trafficPort':
     'The port the load balancer uses when performing health checks on targets. The default is <b>traffic-port</b>, which is the port on which each target receives traffic from the load balancer.',
+  'aws.targetGroup.healthCheckProtocol': 'TCP health checks only support 10s and 30s intervals',
+  'aws.targetGroup.healthCheckTimeout':
+    'Target groups with TCP or TLS protocol must have a 6s timeout for HTTP health checks or a 10s timeout for HTTPS/TLS health checks.',
+  'aws.targetGroup.nlbHealthcheckThreshold':
+    'The healthy and unhealthy threshold for NLBs must be equal. This represents the number of successful and failed healthchecks required for healthy and unhealthy targets, respectively.',
   'aws.serverGroup.capacityConstraint': `
       <p>Ensures that the capacity of this server group has not changed in the background (i.e. due to autoscaling activity).</p>
       <p>If the capacity has changed, this resize operation will be rejected.</p>`,
@@ -141,6 +147,33 @@ const helpContents: { [key: string]: string } = {
       </p>
   `,
   'aws.cloudformation.expectedArtifact': `The artifact that is to be applied to this stage. The artifact should represent a valid cloudformation template.`,
+  'aws.function.name': `Enter a name that describes the purpose of your function. Function name will be prefixed with the application name.`,
+  'aws.function.runtime': `Choose the language to use to write your function`,
+  'aws.function.s3key': `The Amazon S3 key of the deployment package`,
+  'aws.function.handler': `The name of the method within your code that Lambda calls to execute your function. The format includes the file name. It can also include namespaces and other qualifiers, depending on the runtime.`,
+  'aws.function.s3bucket': `An Amazon S3 bucket in the same AWS Region as your function. The bucket can be in a different AWS account.`,
+  'aws.function.execution.role': `Lambda will create an execution role with permission to upload logs to Amazon CloudWatch Logs. You can also choose an existing role that defines the permissions of your function.`,
+  'aws.function.env.vars': `You can define environment variables as key-value pairs that are accessible from your function code. These are useful to store configuration settings without the need to change function code`,
+  'aws.function.tags': `You can use tags to group and filter your functions. A tag consists of a case-sensitive key-value pair`,
+  'aws.functionBasicSettings.memorySize': `Your function is allocated CPU proportional to the memory configured.`,
+  'aws.functionBasicSettings.timeout': `The amount of time that Lambda allows a function to run before stopping it. The default is 3 seconds. The maximum allowed value is 900 seconds.`,
+  'aws.function.publish': `Set to true to publish the first version of the function during creation.`,
+  'aws.function.deadletterqueue': `A dead letter queue configuration that specifies the queue or topic where Lambda sends asynchronous events when they fail processing. (SNS or SQS)`,
+  'aws.function.tracingConfig.mode': `The function's AWS X-Ray tracing configuration.`,
+  'aws.function.kmsKeyArn': `The ARN of the AWS Key Management Service (AWS KMS) key that's used to encrypt your function's environment variables. If it's not provided, AWS Lambda uses a default service key.`,
+  'aws.cloudformation.changeSet.options': `<p>Action to take when the created ChangeSet contains a replacement.</p>
+        <p>
+          <b>ask:</b> Execution will be put on hold asking for user feedback.
+        </p>
+        <p>
+          <b>skip it:</b> ChangeSet will not be executed and stage will continue.
+        </p>
+        <p>
+          <b>execute it</b> ChangeSet will be executed.
+        </p>
+        <p>
+          <b>fail stage</b> ChangeSet will not be executed and the stage will fail.
+        </p>`,
 };
 
 Object.keys(helpContents).forEach(key => HelpContentsRegistry.register(key, helpContents[key]));

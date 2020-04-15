@@ -1,11 +1,13 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import './instanceTypeSelector.directive.less';
 
-module.exports = angular
-  .module('spinnaker.core.serverGroup.configure.common.instanceTypeSelector', [])
+export const CORE_SERVERGROUP_CONFIGURE_COMMON_INSTANCETYPESELECTOR =
+  'spinnaker.core.serverGroup.configure.common.instanceTypeSelector';
+export const name = CORE_SERVERGROUP_CONFIGURE_COMMON_INSTANCETYPESELECTOR; // for backwards compatibility
+module(CORE_SERVERGROUP_CONFIGURE_COMMON_INSTANCETYPESELECTOR, [])
   .directive('instanceTypeSelector', function() {
     return {
       restrict: 'E',
@@ -21,7 +23,7 @@ module.exports = angular
     'instanceTypeService',
     function($scope, instanceTypeService) {
       function updateFamilies() {
-        let availableTypes = $scope.command.backingData.filtered.instanceTypes;
+        const availableTypes = $scope.command.backingData.filtered.instanceTypes;
         instanceTypeService.getCategories($scope.command.selectedProvider).then(function(categories) {
           categories.forEach(function(profile) {
             if (profile.type === $scope.command.viewState.instanceProfile) {

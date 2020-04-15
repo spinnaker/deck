@@ -1,10 +1,10 @@
 import { duration } from 'core/utils/timeFormatters';
-import { find, findLast, get, has, maxBy, uniq, sortBy } from 'lodash';
+import { find, findLast, get, has, maxBy, uniq, sortBy, Dictionary } from 'lodash';
 
 import { Application } from 'core/application';
-import { ExecutionBarLabel } from 'core/pipeline/config/stages/common/ExecutionBarLabel';
-import { ExecutionMarkerIcon } from 'core/pipeline/config/stages/common/ExecutionMarkerIcon';
-import { IExecution, IExecutionStage, IExecutionStageSummary, IOrchestratedItem } from 'core/domain';
+import { ExecutionBarLabel } from '../config/stages/common/ExecutionBarLabel';
+import { ExecutionMarkerIcon } from '../config/stages/common/ExecutionMarkerIcon';
+import { IExecution, IExecutionStage, IExecutionStageSummary, IOrchestratedItem, IStage } from 'core/domain';
 import { OrchestratedItemTransformer } from 'core/orchestratedItem/orchestratedItem.transformer';
 import { Registry } from 'core/registry';
 
@@ -151,17 +151,27 @@ export class ExecutionsTransformer {
     stage.stages = stages;
   }
 
-  private static applyPhasesAndLink(execution: IExecution): void {
-    const stages = execution.stages;
-    let allPhasesResolved = true;
+  private static cleanRequisiteStageRefIds(execution: IExecution, stageMap: Dictionary<IStage>): void {
+    const { stages } = execution;
     // remove any invalid requisiteStageRefIds, set requisiteStageRefIds to empty for synthetic stages
     stages.forEach(stage => {
-      if (has(stage, 'context.requisiteIds')) {
+      if (stage.context && stage.context.requisiteIds) {
         stage.context.requisiteIds = uniq(stage.context.requisiteIds);
       }
       stage.requisiteStageRefIds = uniq(stage.requisiteStageRefIds || []);
-      stage.requisiteStageRefIds = stage.requisiteStageRefIds.filter(parentId => find(stages, { refId: parentId }));
+      stage.requisiteStageRefIds = stage.requisiteStageRefIds.filter(parentId => !!stageMap[parentId]);
     });
+  }
+
+  private static getStagesMappedByRefId(execution: IExecution): Dictionary<IStage> {
+    const map: Dictionary<IStage> = {};
+    execution.stages.forEach(s => (map[s.refId] = s));
+    return map;
+  }
+
+  private static applyPhasesAndLink(execution: IExecution, stageMap: Dictionary<IStage>): void {
+    const stages = execution.stages;
+    let allPhasesResolved = true;
 
     stages.forEach(stage => {
       let phaseResolvable = true;
@@ -171,7 +181,7 @@ export class ExecutionsTransformer {
         stage.phase = phase;
       } else {
         stage.requisiteStageRefIds.forEach(parentId => {
-          const parent = find(stages, { refId: parentId });
+          const parent = stageMap[parentId];
           if (!parent || parent.phase === undefined) {
             phaseResolvable = false;
           } else {
@@ -187,7 +197,7 @@ export class ExecutionsTransformer {
     });
     execution.stages = sortBy(stages, 'phase', 'refId');
     if (!allPhasesResolved) {
-      this.applyPhasesAndLink(execution);
+      this.applyPhasesAndLink(execution, stageMap);
     }
   }
 
@@ -285,7 +295,9 @@ export class ExecutionsTransformer {
     if (execution.trigger) {
       execution.isStrategy = execution.trigger.isPipeline === false && execution.trigger.type === 'pipeline';
     }
-    this.applyPhasesAndLink(execution);
+    const stageRefIdsMap = this.getStagesMappedByRefId(execution);
+    this.cleanRequisiteStageRefIds(execution, stageRefIdsMap);
+    this.applyPhasesAndLink(execution, stageRefIdsMap);
     Registry.pipeline.getExecutionTransformers().forEach(transformer => {
       transformer.transform(application, execution);
     });
@@ -391,62 +403,57 @@ export class ExecutionsTransformer {
     });
 
     const idToGroupIdMap: { [key: string]: number | string } = {};
-    stageSummaries = stageSummaries.reduce(
-      (groupedStages, stage) => {
-        // Since everything should already be sorted, if the stage is not in a group, just push it on and continue
-        if (!stage.group) {
-          groupedStages.push(stage);
-          return groupedStages;
-        }
-
-        // The stage is in a group
-        let groupedStage = groupedStages.find(s => s.type === 'group' && s.name === stage.group);
-        if (!groupedStage) {
-          // Create a new grouped stage
-          groupedStage = {
-            activeStageType: undefined,
-            after: undefined,
-            before: stage.before,
-            cloudProvider: stage.cloudProvider, // what if the group has two different cloud providers?
-            comments: '',
-            endTime: stage.endTime,
-            groupStages: [],
-            id: stage.group, // TODO: Can't key off group name because a partial 'group' can be used multiple times...
-            index: undefined,
-            masterStage: undefined,
-            name: stage.group,
-            refId: stage.group, // TODO: Can't key off group name because a partial 'group' can be used multiple times...
-            requisiteStageRefIds:
-              stage.requisiteStageRefIds && stage.requisiteStageRefIds[0] === '*'
-                ? []
-                : stage.requisiteStageRefIds || [], // TODO: No idea what to do with refids...
-            stages: [],
-            startTime: stage.startTime,
-            status: undefined,
-            type: 'group',
-          } as IExecutionStageSummary;
-          groupedStages.push(groupedStage);
-        }
-        OrchestratedItemTransformer.defineProperties(stage);
-
-        // Update the runningTimeInMs function to account for the group
-        Object.defineProperties(groupedStage, {
-          runningTime: {
-            get: () => duration(this.calculateRunningTime(groupedStage)()),
-            configurable: true,
-          },
-          runningTimeInMs: {
-            get: this.calculateRunningTime(groupedStage),
-            configurable: true,
-          },
-        });
-
-        idToGroupIdMap[stage.refId] = groupedStage.refId;
-        groupedStage.groupStages.push(stage);
+    stageSummaries = stageSummaries.reduce((groupedStages, stage) => {
+      // Since everything should already be sorted, if the stage is not in a group, just push it on and continue
+      if (!stage.group) {
+        groupedStages.push(stage);
         return groupedStages;
-      },
-      [] as IExecutionStageSummary[],
-    );
+      }
+
+      // The stage is in a group
+      let groupedStage = groupedStages.find(s => s.type === 'group' && s.name === stage.group);
+      if (!groupedStage) {
+        // Create a new grouped stage
+        groupedStage = {
+          activeStageType: undefined,
+          after: undefined,
+          before: stage.before,
+          cloudProvider: stage.cloudProvider, // what if the group has two different cloud providers?
+          comments: '',
+          endTime: stage.endTime,
+          groupStages: [],
+          id: stage.group, // TODO: Can't key off group name because a partial 'group' can be used multiple times...
+          index: undefined,
+          masterStage: undefined,
+          name: stage.group,
+          refId: stage.group, // TODO: Can't key off group name because a partial 'group' can be used multiple times...
+          requisiteStageRefIds:
+            stage.requisiteStageRefIds && stage.requisiteStageRefIds[0] === '*' ? [] : stage.requisiteStageRefIds || [], // TODO: No idea what to do with refids...
+          stages: [],
+          startTime: stage.startTime,
+          status: undefined,
+          type: 'group',
+        } as IExecutionStageSummary;
+        groupedStages.push(groupedStage);
+      }
+      OrchestratedItemTransformer.defineProperties(stage);
+
+      // Update the runningTimeInMs function to account for the group
+      Object.defineProperties(groupedStage, {
+        runningTime: {
+          get: () => duration(this.calculateRunningTime(groupedStage)()),
+          configurable: true,
+        },
+        runningTimeInMs: {
+          get: this.calculateRunningTime(groupedStage),
+          configurable: true,
+        },
+      });
+
+      idToGroupIdMap[stage.refId] = groupedStage.refId;
+      groupedStage.groupStages.push(stage);
+      return groupedStages;
+    }, [] as IExecutionStageSummary[]);
 
     stageSummaries.forEach((summary, index) => {
       // this shouldn't be necessary, but we had a few group stages slip in, so this handles it gracefully-ish

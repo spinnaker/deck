@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 
 import '@uirouter/rx';
 import { Transition } from '@uirouter/core';
@@ -9,7 +9,7 @@ import { Subject } from 'rxjs';
 import { ReactInjector } from 'core/reactShims';
 import { IProject } from 'core/domain';
 import { SpanDropdownTrigger } from 'core/presentation';
-import { ConfigureProjectModal } from 'core/projects';
+import { ConfigureProjectModal } from './configure/ConfigureProjectModal';
 
 import './project.less';
 
@@ -112,7 +112,7 @@ export class ProjectHeader extends React.Component<IProjectHeaderProps, IProject
                     </UISref>
                     <MenuItem divider={true} />
                     {config.applications &&
-                      config.applications.map(app => (
+                      config.applications.sort().map(app => (
                         <UISref key={app} to=".application.insight.clusters" params={{ application: app }}>
                           <MenuItem onClick={closeDropdown}> {app} </MenuItem>
                         </UISref>

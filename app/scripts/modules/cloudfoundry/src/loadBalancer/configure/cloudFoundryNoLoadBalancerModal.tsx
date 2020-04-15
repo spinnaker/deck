@@ -1,10 +1,10 @@
 import { IDeferred } from 'angular';
 
-import * as React from 'react';
+import React from 'react';
 
 import { ILoadBalancerModalProps, WizardModal, WizardPage, ReactModal, noop } from '@spinnaker/core';
 import { ICloudFoundryLoadBalancerUpsertCommand } from 'cloudfoundry/domain/ICloudFoundryLoadBalancer';
-import { NoLoadBalancerDetails } from 'cloudfoundry/loadBalancer/configure/noLoadBalancer';
+import { NoLoadBalancerDetails } from './noLoadBalancer';
 import { IModalServiceInstance } from 'angular-ui-bootstrap';
 import { $q } from 'ngimport';
 

@@ -1,10 +1,11 @@
 import { module } from 'angular';
 
 import { APPLY_SOURCE_SERVER_GROUP_CAPACITY_STAGE } from './config/stages/applySourceServerGroupCapacity/applySourceServerGroupCapacityStage.module';
+import { EVALUATE_HEALTH_STAGE } from './config/stages/monitoreddeploy/evaluateHealthStage';
+import { NOTIFY_DEPLOY_STARTING_STAGE } from './config/stages/monitoreddeploy/notifyDeployStartingStage';
 import './config/stages/bakeManifest/bakeManifestStage';
 import { CHECK_PRECONDITIONS_STAGE_MODULE } from './config/stages/checkPreconditions/checkPreconditionsStage.module';
 import { CLONE_SERVER_GROUP_STAGE } from './config/stages/cloneServerGroup/cloneServerGroupStage.module';
-import { COPY_STAGE_MODAL_CONTROLLER } from './config/copyStage/copyStage.modal.controller';
 import './config/stages/deployService/deployServiceStage';
 import './config/stages/destroyService/destroyServiceStage';
 import { CREATE_LOAD_BALANCER_STAGE } from './config/stages/createLoadBalancer/createLoadBalancerStage.module';
@@ -48,9 +49,25 @@ import { PRODUCES_ARTIFACTS } from './config/stages/producesArtifacts/producesAr
 import { ARTIFACT_LIST } from './status/artifactList.component';
 import { PIPELINE_TEMPLATES_V2_STATES_CONFIG } from './config/templates/v2/pipelineTemplateV2.states';
 import './config/stages/googleCloudBuild/googleCloudBuildStage';
+import { STAGE_STATUS_PRECONDITION } from './config/preconditions/types/stageStatus/stageStatus.precondition.type.module';
+import './config/stages/awsCodeBuild/awsCodeBuildStage';
 
 import './pipeline.less';
 import 'angular-ui-sortable';
+import { CORE_PIPELINE_PIPELINE_DATASOURCE } from './pipeline.dataSource';
+import { CORE_PIPELINE_CONFIG_PIPELINECONFIG_MODULE } from './config/pipelineConfig.module';
+import { CORE_PIPELINE_CONFIG_STAGES_BAKE_BAKESTAGE_MODULE } from './config/stages/bake/bakeStage.module';
+import { CORE_PIPELINE_CONFIG_STAGES_DEPLOY_DEPLOYSTAGE_MODULE } from './config/stages/deploy/deployStage.module';
+import { CORE_PIPELINE_CONFIG_STAGES_FINDIMAGEFROMTAGS_FINDIMAGEFROMTAGSSTAGE_MODULE } from './config/stages/findImageFromTags/findImageFromTagsStage.module';
+import { CORE_PIPELINE_CONFIG_STAGES_JENKINS_JENKINSSTAGE_MODULE } from './config/stages/jenkins/jenkinsStage.module';
+import { CORE_PIPELINE_CONFIG_STAGES_TAGIMAGE_TAGIMAGESTAGE_MODULE } from './config/stages/tagImage/tagImageStage.module';
+import { CORE_PIPELINE_CONFIG_STAGES_PIPELINE_PIPELINESTAGE_MODULE } from './config/stages/pipeline/pipelineStage.module';
+import { CORE_PIPELINE_CONFIG_STAGES_RUNJOB_RUNJOBSTAGE_MODULE } from './config/stages/runJob/runJobStage.module';
+import { CORE_PIPELINE_CONFIG_STAGES_WAITFORPARENTTASKS_WAITFORPARENTTASKS } from './config/stages/waitForParentTasks/waitForParentTasks';
+import { CORE_PIPELINE_CONFIG_PRECONDITIONS_PRECONDITIONS_MODULE } from './config/preconditions/preconditions.module';
+import { CORE_PIPELINE_CONFIG_PRECONDITIONS_TYPES_CLUSTERSIZE_CLUSTERSIZE_PRECONDITION_TYPE_MODULE } from './config/preconditions/types/clusterSize/clusterSize.precondition.type.module';
+import { CORE_PIPELINE_CONFIG_PRECONDITIONS_TYPES_EXPRESSION_EXPRESSION_PRECONDITION_TYPE_MODULE } from './config/preconditions/types/expression/expression.precondition.type.module';
+import './config/stages/managed/importDeliveryConfigStage';
 
 export const PIPELINE_MODULE = 'spinnaker.core.pipeline';
 
@@ -60,28 +77,25 @@ module(PIPELINE_MODULE, [
 
   BUILD_DISPLAY_NAME_FILTER,
 
-  require('./manualExecution/manualPipelineExecution.controller').name,
-
   STAGE_FAILURE_MESSAGE_COMPONENT,
   STEP_EXECUTION_DETAILS_COMPONENT,
   STAGE_SUMMARY_COMPONENT,
 
-  require('./pipeline.dataSource').name,
+  CORE_PIPELINE_PIPELINE_DATASOURCE,
   ARTIFACT_LIST,
   PIPELINE_STATES,
-  require('./config/pipelineConfig.module').name,
-  COPY_STAGE_MODAL_CONTROLLER,
+  CORE_PIPELINE_CONFIG_PIPELINECONFIG_MODULE,
   GROUP_STAGE_MODULE,
   TRAVIS_STAGE_MODULE,
   WERCKER_STAGE_MODULE,
   PRECONFIGUREDJOB_STAGE_MODULE,
   WEBHOOK_STAGE_MODULE,
   UNMATCHED_STAGE_TYPE_STAGE,
-  require('./config/stages/bake/bakeStage.module').name,
+  CORE_PIPELINE_CONFIG_STAGES_BAKE_BAKESTAGE_MODULE,
   CHECK_PRECONDITIONS_STAGE_MODULE,
   CLONE_SERVER_GROUP_STAGE,
   STAGE_COMMON_MODULE,
-  require('./config/stages/deploy/deployStage.module').name,
+  CORE_PIPELINE_CONFIG_STAGES_DEPLOY_DEPLOYSTAGE_MODULE,
   DESTROY_ASG_STAGE,
   DISABLE_ASG_STAGE_MODULE,
   DISABLE_CLUSTER_STAGE,
@@ -90,22 +104,25 @@ module(PIPELINE_MODULE, [
   EXECUTION_WINDOWS,
   FIND_AMI_STAGE,
   FIND_ARTIFACT_FROM_EXECUTION_STAGE,
-  require('./config/stages/findImageFromTags/findImageFromTagsStage.module').name,
-  require('./config/stages/jenkins/jenkinsStage.module').name,
+  CORE_PIPELINE_CONFIG_STAGES_FINDIMAGEFROMTAGS_FINDIMAGEFROMTAGSSTAGE_MODULE,
+  CORE_PIPELINE_CONFIG_STAGES_JENKINS_JENKINSSTAGE_MODULE,
   MANUAL_JUDGMENT_STAGE_MODULE,
-  require('./config/stages/tagImage/tagImageStage.module').name,
-  require('./config/stages/pipeline/pipelineStage.module').name,
+  CORE_PIPELINE_CONFIG_STAGES_TAGIMAGE_TAGIMAGESTAGE_MODULE,
+  CORE_PIPELINE_CONFIG_STAGES_PIPELINE_PIPELINESTAGE_MODULE,
   PRODUCES_ARTIFACTS,
   RESIZE_ASG_STAGE,
-  require('./config/stages/runJob/runJobStage.module').name,
+  CORE_PIPELINE_CONFIG_STAGES_RUNJOB_RUNJOBSTAGE_MODULE,
   SCALE_DOWN_CLUSTER_STAGE,
   SCRIPT_STAGE,
   SHRINK_CLUSTER_STAGE,
-  require('./config/stages/waitForParentTasks/waitForParentTasks').name,
+  CORE_PIPELINE_CONFIG_STAGES_WAITFORPARENTTASKS_WAITFORPARENTTASKS,
   CREATE_LOAD_BALANCER_STAGE,
   APPLY_SOURCE_SERVER_GROUP_CAPACITY_STAGE,
-  require('./config/preconditions/preconditions.module').name,
-  require('./config/preconditions/types/clusterSize/clusterSize.precondition.type.module').name,
-  require('./config/preconditions/types/expression/expression.precondition.type.module').name,
+  EVALUATE_HEALTH_STAGE,
+  NOTIFY_DEPLOY_STARTING_STAGE,
+  CORE_PIPELINE_CONFIG_PRECONDITIONS_PRECONDITIONS_MODULE,
+  CORE_PIPELINE_CONFIG_PRECONDITIONS_TYPES_CLUSTERSIZE_CLUSTERSIZE_PRECONDITION_TYPE_MODULE,
+  CORE_PIPELINE_CONFIG_PRECONDITIONS_TYPES_EXPRESSION_EXPRESSION_PRECONDITION_TYPE_MODULE,
   PIPELINE_TEMPLATES_V2_STATES_CONFIG,
+  STAGE_STATUS_PRECONDITION,
 ]);

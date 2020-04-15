@@ -1,6 +1,6 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 import _ from 'lodash';
 
 import {
@@ -11,9 +11,11 @@ import {
   PipelineTemplates,
   SETTINGS,
 } from '@spinnaker/core';
+import { AZURE_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER } from './bakeExecutionDetails.controller';
 
-module.exports = angular
-  .module('spinnaker.azure.pipeline.stage.bakeStage', [require('./bakeExecutionDetails.controller').name])
+export const AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE = 'spinnaker.azure.pipeline.stage.bakeStage';
+export const name = AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE; // for backwards compatibility
+module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [AZURE_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'bake',
@@ -26,7 +28,7 @@ module.exports = angular
       extraLabelLines: stage => {
         return stage.masterStage.context.allPreviouslyBaked || stage.masterStage.context.somePreviouslyBaked ? 1 : 0;
       },
-      defaultTimeoutMs: 60 * 60 * 1000, // 60 minutes
+      supportsCustomTimeout: true,
       validators: [
         { type: 'requiredField', fieldName: 'package' },
         { type: 'requiredField', fieldName: 'regions' },
@@ -92,15 +94,25 @@ module.exports = angular
           if (!$scope.stage.baseLabel && $scope.baseLabelOptions && $scope.baseLabelOptions.length) {
             $scope.stage.baseLabel = $scope.baseLabelOptions[0];
           }
-          $scope.viewState.roscoMode = SETTINGS.feature.roscoMode;
+          $scope.viewState.roscoMode =
+            SETTINGS.feature.roscoMode ||
+            (typeof SETTINGS.feature.roscoSelector === 'function' && SETTINGS.feature.roscoSelector($scope.stage));
           $scope.viewState.loading = false;
         });
       }
 
       this.baseOsChanged = () => {
-        var selectedOption = _.find($scope.baseOsOptions, { id: $scope.stage.baseOs });
+        const selectedOption = _.find($scope.baseOsOptions, { id: $scope.stage.baseOs });
         $scope.stage.osType = selectedOption.osType;
       };
+
+      function stageUpdated() {
+        deleteEmptyProperties();
+        // Since the selector computes using stage as an input, it needs to be able to recompute roscoMode on updates
+        if (typeof SETTINGS.feature.roscoSelector === 'function') {
+          $scope.viewState.roscoMode = SETTINGS.feature.roscoSelector($scope.stage);
+        }
+      }
 
       function deleteEmptyProperties() {
         _.forOwn($scope.stage, function(val, key) {
@@ -152,7 +164,7 @@ module.exports = angular
         return $scope.viewState.roscoMode || $scope.stage.varFileName;
       };
 
-      $scope.$watch('stage', deleteEmptyProperties, true);
+      $scope.$watch('stage', stageUpdated, true);
 
       initialize();
     },

@@ -1,36 +1,36 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular
-  .module('spinnaker.core.validation.unique.directive', [])
-  .directive('validateUnique', function() {
-    return {
-      restrict: 'A',
-      require: 'ngModel',
-      link: function(scope, elem, attr, ctrl) {
-        scope.$watch(
-          attr.validateUnique,
-          function(newVal, oldVal) {
-            if (newVal !== oldVal && (ctrl.$viewValue || ctrl.$dirty)) {
-              ctrl.$validate();
-            }
-          },
-          true,
-        );
-        var uniqueValidator = function(value) {
-          var options = scope.$eval(attr.validateUnique) || [],
-            test = value;
-          if (attr.validateIgnoreCase === 'true') {
-            options = options.map(function(option) {
-              return option ? option.toLowerCase() : null;
-            });
-            test = value ? value.toLowerCase() : value;
+export const CORE_VALIDATION_VALIDATEUNIQUE_DIRECTIVE = 'spinnaker.core.validation.unique.directive';
+export const name = CORE_VALIDATION_VALIDATEUNIQUE_DIRECTIVE; // for backwards compatibility
+module(CORE_VALIDATION_VALIDATEUNIQUE_DIRECTIVE, []).directive('validateUnique', function() {
+  return {
+    restrict: 'A',
+    require: 'ngModel',
+    link: function(scope, elem, attr, ctrl) {
+      scope.$watch(
+        attr.validateUnique,
+        function(newVal, oldVal) {
+          if (newVal !== oldVal && (ctrl.$viewValue || ctrl.$dirty)) {
+            ctrl.$validate();
           }
-          return !options.includes(test);
-        };
+        },
+        true,
+      );
+      const uniqueValidator = function(value) {
+        let options = scope.$eval(attr.validateUnique) || [];
+        let test = value;
+        if (attr.validateIgnoreCase === 'true') {
+          options = options.map(function(option) {
+            return option ? option.toLowerCase() : null;
+          });
+          test = value ? value.toLowerCase() : value;
+        }
+        return !options.includes(test);
+      };
 
-        ctrl.$validators.validateUnique = uniqueValidator;
-      },
-    };
-  });
+      ctrl.$validators.validateUnique = uniqueValidator;
+    },
+  };
+});

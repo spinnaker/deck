@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { isFunction, isEqual } from 'lodash';
 
 import { IWizardModalApi } from './WizardModal';
@@ -15,14 +15,14 @@ export interface IWizardPageRenderProps {
 }
 
 export interface IWizardPageProps {
-  label: string;
+  label?: string;
   order: number;
   note?: React.ReactNode;
   render: (props: IWizardPageRenderProps) => JSX.Element;
   wizard: IWizardModalApi;
 }
 
-export interface IWizardPageState {
+interface IWizardPageState {
   errors: object;
   order: number;
   isLoading: boolean;
@@ -98,9 +98,11 @@ export class WizardPage<T> extends React.Component<IWizardPageProps, IWizardPage
 
     return (
       <div className="modal-page" ref={this.ref}>
-        <div className="wizard-subheading sticky-header">
-          <h4 className={className}>{label}</h4>
-        </div>
+        {label && (
+          <div className="wizard-subheading sticky-header">
+            <h4 className={className}>{label}</h4>
+          </div>
+        )}
         <div className="wizard-page-body">
           {pageContents}
           {note && <div className="row">{note}</div>}

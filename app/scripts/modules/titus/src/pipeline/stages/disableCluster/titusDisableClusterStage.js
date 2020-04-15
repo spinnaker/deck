@@ -1,11 +1,13 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { AccountService, Registry } from '@spinnaker/core';
 
-module.exports = angular
-  .module('spinnaker.titus.pipeline.stage.disableClusterStage', [])
+export const TITUS_PIPELINE_STAGES_DISABLECLUSTER_TITUSDISABLECLUSTERSTAGE =
+  'spinnaker.titus.pipeline.stage.disableClusterStage';
+export const name = TITUS_PIPELINE_STAGES_DISABLECLUSTER_TITUSDISABLECLUSTERSTAGE; // for backwards compatibility
+module(TITUS_PIPELINE_STAGES_DISABLECLUSTER_TITUSDISABLECLUSTERSTAGE, [])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'disableCluster',
@@ -27,9 +29,9 @@ module.exports = angular
   .controller('titusDisableClusterStageCtrl', [
     '$scope',
     function($scope) {
-      var ctrl = this;
+      const ctrl = this;
 
-      let stage = $scope.stage;
+      const stage = $scope.stage;
 
       $scope.state = {
         accounts: false,

@@ -1,9 +1,10 @@
-import * as React from 'react';
+import React from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import { get } from 'lodash';
 
 import { Application, ApplicationModelBuilder } from 'core/application';
-import { IPagerDutyService, PagerDutyWriter } from 'core/pagerDuty';
+import { IPagerDutyService } from './pagerDuty.read.service';
+import { PagerDutyWriter } from './pagerDuty.write.service';
 import { NgReact, ReactInjector } from 'core/reactShims';
 import { SETTINGS } from 'core/config';
 import { SubmitButton } from 'core/modal';
@@ -87,15 +88,20 @@ export class PageModal extends React.Component<IPageModalProps, IPageModalState>
       application: ownerApp,
       title: `Sending page to ${this.state.pageCount} policies`,
       modalInstance: TaskMonitor.modalInstanceEmulation(() => this.close()),
-      onTaskComplete: () => this.props.closeCallback(true),
     });
 
     const submitMethod = () => {
       const { subject, details } = this.state;
 
-      return PagerDutyWriter.sendPage(applications, services.map(s => s.integration_key), subject, ownerApp, {
-        details,
-      });
+      return PagerDutyWriter.sendPage(
+        applications,
+        services.map(s => s.integration_key),
+        subject,
+        ownerApp,
+        {
+          details,
+        },
+      );
     };
 
     taskMonitor.submit(submitMethod);

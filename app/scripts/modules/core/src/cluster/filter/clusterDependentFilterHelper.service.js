@@ -2,12 +2,15 @@
 
 import _ from 'lodash';
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular
-  .module('spinnaker.deck.core.cluster.dependentFilterHelper.service', [])
-  .factory('clusterDependentFilterHelper', function() {
-    let poolValueCoordinates = [
+export const CORE_CLUSTER_FILTER_CLUSTERDEPENDENTFILTERHELPER_SERVICE =
+  'spinnaker.deck.core.cluster.dependentFilterHelper.service';
+export const name = CORE_CLUSTER_FILTER_CLUSTERDEPENDENTFILTERHELPER_SERVICE; // for backwards compatibility
+module(CORE_CLUSTER_FILTER_CLUSTERDEPENDENTFILTERHELPER_SERVICE, []).factory(
+  'clusterDependentFilterHelper',
+  function() {
+    const poolValueCoordinates = [
       { filterField: 'providerType', on: 'serverGroup', localField: 'type' },
       { filterField: 'account', on: 'serverGroup', localField: 'account' },
       { filterField: 'region', on: 'serverGroup', localField: 'region' },
@@ -16,9 +19,9 @@ module.exports = angular
     ];
 
     function poolBuilder(serverGroups) {
-      let pool = _.chain(serverGroups)
+      const pool = _.chain(serverGroups)
         .map(sg => {
-          let poolUnitTemplate = _.chain(poolValueCoordinates)
+          const poolUnitTemplate = _.chain(poolValueCoordinates)
             .filter({ on: 'serverGroup' })
             .reduce((poolUnitTemplate, coordinate) => {
               poolUnitTemplate[coordinate.filterField] = sg[coordinate.localField];
@@ -26,8 +29,8 @@ module.exports = angular
             }, {})
             .value();
 
-          let poolUnits = sg.instances.map(instance => {
-            let poolUnit = _.cloneDeep(poolUnitTemplate);
+          const poolUnits = sg.instances.map(instance => {
+            const poolUnit = _.cloneDeep(poolUnitTemplate);
             return _.chain(poolValueCoordinates)
               .filter({ on: 'instance' })
               .reduce((poolUnit, coordinate) => {
@@ -50,4 +53,5 @@ module.exports = angular
     }
 
     return { poolBuilder };
-  });
+  },
+);

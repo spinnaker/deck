@@ -1,11 +1,11 @@
-import * as React from 'react';
+import React from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import { Option } from 'react-select';
 import { Observable, Subject } from 'rxjs';
 
 import { Application, ApplicationReader, IApplicationSummary } from 'core/application';
 import ApplicationSelector from '../ApplicationSelector';
-import { CreatePipelineModal } from 'core/pipeline';
+import { CreatePipelineModal } from '../../../../create';
 import { IPipelineTemplateV2 } from 'core/domain/IPipelineTemplateV2';
 import { ReactInjector } from 'core/reactShims';
 import { Spinner } from 'core/widgets/spinners/Spinner';

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { mount } from 'enzyme';
 import Select, { Creatable, Option } from 'react-select';
 import { $q } from 'ngimport';
@@ -468,4 +468,4 @@ describe('<ManifestSelector />', () => {
 });
 
 const component = (selector: any, props: any = {}) =>
-  mount<ManifestSelector>(<ManifestSelector onChange={noop} selector={selector} {...props} /> as any);
+  mount<ManifestSelector>((<ManifestSelector onChange={noop} selector={selector} {...props} />) as any);

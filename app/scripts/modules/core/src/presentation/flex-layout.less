@@ -70,6 +70,10 @@
     align-items: flex-end;
   }
 
+  &.left {
+    align-items: flex-start;
+  }
+
   &.bottom {
     justify-content: flex-end;
   }
@@ -80,6 +84,24 @@
 
   &.space-between {
     justify-content: space-between;
+  }
+
+  &.margin-between-sm {
+    > * + * {
+      margin-top: 4px;
+    }
+  }
+
+  &.margin-between-md {
+    > * + * {
+      margin-top: 8px;
+    }
+  }
+
+  &.margin-between-lg {
+    > * + * {
+      margin-top: 12px;
+    }
   }
 }
 
@@ -111,20 +133,28 @@
 
 // Flex item
 .flex-grow {
-  flex: auto; /* Same as flex: 1 1 auto; */
+  flex: auto;
+  /* Same as flex: 1 1 auto; */
 }
 
 .flex-nogrow {
-  flex: 0 1 auto; /* Same as flex: initial, or omitting flex: */
+  flex: 0 1 auto;
+  /* Same as flex: initial, or omitting flex: */
 }
 
 .flex-none {
-  flex: none; /* Same as flex: 0 0 auto */
+  flex: none;
+  /* Same as flex: 0 0 auto */
 }
 
 .flex-container-h .flex-pull-right,
 .flex-pull-right {
   margin-left: auto;
+}
+
+.flex-container-h .flex-pull-left,
+.flex-pull-left {
+  margin-right: auto;
 }
 
 .flex-fill {

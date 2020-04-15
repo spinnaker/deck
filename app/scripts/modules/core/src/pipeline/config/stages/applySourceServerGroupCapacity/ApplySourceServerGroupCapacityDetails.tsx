@@ -1,9 +1,9 @@
-import * as React from 'react';
+import React from 'react';
 import { find, get } from 'lodash';
 
-import { StageFailureMessage } from 'core/pipeline';
+import { StageFailureMessage } from '../../../details/StageFailureMessage';
 import { IStage } from 'core/domain';
-import { IExecutionDetailsSectionProps } from 'core/pipeline/config/stages/common';
+import { IExecutionDetailsSectionProps } from '../common';
 import { ExecutionDetailsSection } from '../common/ExecutionDetailsSection';
 
 export interface IApplySourceServerGroupCapacityDetailsState {

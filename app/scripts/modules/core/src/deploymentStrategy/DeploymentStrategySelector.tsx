@@ -1,8 +1,9 @@
-import * as React from 'react';
-import * as DOMPurify from 'dompurify';
+import React from 'react';
 import Select, { Option } from 'react-select';
 import { unset } from 'lodash';
 
+import { HelpField } from 'core/help/HelpField';
+import { Markdown } from 'core/presentation';
 import { IServerGroupCommand } from 'core/serverGroup';
 
 import {
@@ -10,7 +11,6 @@ import {
   IDeploymentStrategy,
   IDeploymentStrategyAdditionalFieldsProps,
 } from './deploymentStrategy.registry';
-import { HelpField } from 'core/help/HelpField';
 
 export interface IDeploymentStrategySelectorProps {
   command: IServerGroupCommand;
@@ -43,7 +43,7 @@ export class DeploymentStrategySelector extends React.Component<
     AdditionalFieldsComponent: undefined,
   };
 
-  public selectStrategy(strategy: string): void {
+  public selectStrategy(strategy: string, onMount = false): void {
     const { command, onStrategyChange } = this.props;
 
     const oldStrategy = DeploymentStrategyRegistry.getStrategy(this.state.currentStrategy);
@@ -60,7 +60,8 @@ export class DeploymentStrategySelector extends React.Component<
     let AdditionalFieldsComponent;
     if (newStrategy) {
       AdditionalFieldsComponent = newStrategy.AdditionalFieldsComponent;
-      if (newStrategy.initializationMethod) {
+      // do not run on mount otherwise we'll confusingly fill in things that weren't there
+      if (newStrategy.initializationMethod && !onMount) {
         newStrategy.initializationMethod(command);
       }
     }
@@ -79,7 +80,7 @@ export class DeploymentStrategySelector extends React.Component<
   };
 
   public componentDidMount() {
-    this.selectStrategy(this.props.command.strategy);
+    this.selectStrategy(this.props.command.strategy, true);
   }
 
   public render() {
@@ -122,10 +123,10 @@ export class DeploymentStrategySelector extends React.Component<
     return (
       <div className="body-regular">
         <strong>
-          <span dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(option.label) }} />
+          <Markdown tag="span" message={option.label} />
         </strong>
         <div>
-          <span dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(option.description) }} />
+          <Markdown tag="span" message={option.description} />
         </div>
       </div>
     );

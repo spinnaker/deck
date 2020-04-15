@@ -3,12 +3,12 @@ import { cloneDeep, flattenDeep } from 'lodash';
 
 import {
   Application,
-  CONFIRMATION_MODAL_SERVICE,
   ConfirmationModalService,
   INSTANCE_WRITE_SERVICE,
   InstanceReader,
   InstanceWriter,
   RecentHistoryService,
+  ILoadBalancer,
 } from '@spinnaker/core';
 
 import { IAppengineInstance } from 'appengine/domain';
@@ -33,12 +33,11 @@ class AppengineInstanceDetailsController implements IController {
   public outOfServiceToolTip = `
     An App Engine instance is 'Out Of Service' if no load balancers are directing traffic to its server group.`;
 
-  public static $inject = ['$q', 'app', 'instanceWriter', 'confirmationModalService', 'instance'];
+  public static $inject = ['$q', 'app', 'instanceWriter', 'instance'];
   constructor(
     private $q: IQService,
     private app: Application,
     private instanceWriter: InstanceWriter,
-    private confirmationModalService: ConfirmationModalService,
     instance: InstanceFromStateParams,
   ) {
     this.app
@@ -74,7 +73,7 @@ class AppengineInstanceDetailsController implements IController {
       return this.instanceWriter.terminateInstance(instance, this.app, { cloudProvider: 'appengine' });
     };
 
-    this.confirmationModalService.confirm({
+    ConfirmationModalService.confirm({
       header: 'Really terminate ' + shortName + '?',
       buttonText: 'Terminate ' + shortName,
       account: instance.account,
@@ -91,7 +90,7 @@ class AppengineInstanceDetailsController implements IController {
     const dataSources: InstanceManager[] = flattenDeep([
       this.app.getDataSource('serverGroups').data,
       this.app.getDataSource('loadBalancers').data,
-      this.app.getDataSource('loadBalancers').data.map(loadBalancer => loadBalancer.serverGroups),
+      this.app.getDataSource('loadBalancers').data.map((loadBalancer: ILoadBalancer) => loadBalancer.serverGroups),
     ]);
 
     const instanceManager = dataSources.find(instanceLocatorPredicate);
@@ -123,7 +122,7 @@ class AppengineInstanceDetailsController implements IController {
 
 export const APPENGINE_INSTANCE_DETAILS_CTRL = 'spinnaker.appengine.instanceDetails.controller';
 
-module(APPENGINE_INSTANCE_DETAILS_CTRL, [INSTANCE_WRITE_SERVICE, CONFIRMATION_MODAL_SERVICE]).controller(
+module(APPENGINE_INSTANCE_DETAILS_CTRL, [INSTANCE_WRITE_SERVICE]).controller(
   'appengineInstanceDetailsCtrl',
   AppengineInstanceDetailsController,
 );

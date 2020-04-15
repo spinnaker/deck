@@ -1,13 +1,13 @@
 'use strict';
 
-let angular = require('angular');
+const angular = require('angular');
 
 import { AccountService, Registry, StageConstants } from '@spinnaker/core';
 
-module.exports = angular
-  .module('spinnaker.oracle.pipeline.stage.disableAsgStage', [
-    require('core/application/modal/platformHealthOverride.directive').name,
-  ])
+export const ORACLE_PIPELINE_DISABLEASG_DISABLEASGSTAGE = 'spinnaker.oracle.pipeline.stage.disableAsgStage';
+export const name = ORACLE_PIPELINE_DISABLEASG_DISABLEASGSTAGE; // for backwards compatibility
+angular
+  .module(ORACLE_PIPELINE_DISABLEASG_DISABLEASGSTAGE, [])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'disableServerGroup',
@@ -30,9 +30,9 @@ module.exports = angular
   .controller('oracleDisableAsgStageCtrl', [
     '$scope',
     function($scope) {
-      let stage = $scope.stage;
+      const stage = $scope.stage;
 
-      let provider = 'oracle';
+      const provider = 'oracle';
 
       $scope.state = {
         accounts: false,

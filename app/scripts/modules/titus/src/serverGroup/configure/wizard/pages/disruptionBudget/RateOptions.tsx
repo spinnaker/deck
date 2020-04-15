@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 
 import { FormikFormField, HelpField, NumberInput } from '@spinnaker/core';
 
@@ -10,7 +10,6 @@ const RatePercentagePerInterval = (componentProps: IFieldOptionComponentProps) =
   <>
     <FormikFormField
       name="disruptionBudget.ratePercentagePerInterval.intervalMs"
-      fastField={false}
       label="Interval"
       input={props => (
         <div>
@@ -21,7 +20,6 @@ const RatePercentagePerInterval = (componentProps: IFieldOptionComponentProps) =
     />
     <FormikFormField
       name="disruptionBudget.ratePercentagePerInterval.percentageLimitPerInterval"
-      fastField={false}
       label="Percentage Per Interval"
       input={props => (
         <div>

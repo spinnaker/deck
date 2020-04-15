@@ -1,10 +1,8 @@
 import { IController, IComponentOptions, copy, module, toJson } from 'angular';
 import { cloneDeep } from 'lodash';
 
-import { ApplicationWriter } from 'core/application/service/ApplicationWriter';
-import { Application } from 'core/application/application.model';
-
-import './configSectionFooter.component.less';
+import { ApplicationWriter } from '../../service/ApplicationWriter';
+import { Application } from '../../application.model';
 
 export interface IConfigSectionFooterViewState {
   originalConfig: any;
@@ -49,7 +47,10 @@ export class ConfigSectionFooterController implements IController {
     };
     updateCommand[this.configField] = this.config;
 
-    ApplicationWriter.updateApplication(updateCommand).then(() => this.saveSuccess(), () => this.saveError());
+    ApplicationWriter.updateApplication(updateCommand).then(
+      () => this.saveSuccess(),
+      () => this.saveError(),
+    );
   }
 }
 

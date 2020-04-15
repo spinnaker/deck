@@ -1,9 +1,9 @@
-import * as React from 'react';
+import React from 'react';
 import { cloneDeep, isNil } from 'lodash';
 
 import { ArtifactTypePatterns } from 'core/artifact';
 import { IArtifact, IArtifactEditorProps, IArtifactKindConfig } from 'core/domain';
-import { StageConfigField } from 'core/pipeline';
+import { StageConfigField } from '../../../stages/common';
 import { SpelText } from 'core/widgets';
 
 import { singleFieldArtifactEditor } from '../singleFieldArtifactEditor';

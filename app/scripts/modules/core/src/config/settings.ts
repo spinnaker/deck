@@ -7,30 +7,19 @@ export interface IAdditionalHelpLinks {
 }
 
 export interface IProviderSettings {
+  bakeryRegions?: string[];
   defaults: any;
   resetToOriginal?: () => void;
 }
 
 export interface INotificationSettings {
-  email: {
-    enabled: boolean;
-  };
-  bearychat: {
-    enabled: boolean;
-  };
-  googlechat: {
-    enabled: boolean;
-  };
-  sms: {
-    enabled: boolean;
-  };
-  slack: {
-    botName: string;
-    enabled: boolean;
-  };
-  githubstatus: {
-    enabled: boolean;
-  };
+  bearychat: { enabled: boolean };
+  email: { enabled: boolean };
+  githubStatus: { enabled: boolean };
+  googlechat: { enabled: boolean };
+  pubsub: { enabled: boolean };
+  slack: { botName: string; enabled: boolean };
+  sms: { enabled: boolean };
 }
 
 export interface IFeatures {
@@ -43,24 +32,26 @@ export interface IFeatures {
   dockerBake?: boolean;
   entityTags?: boolean;
   fiatEnabled?: boolean;
+  gceScaleDownControlsEnabled?: boolean;
   gceStatefulMigsEnabled?: boolean;
   iapRefresherEnabled?: boolean;
   // whether stages affecting infrastructure (like "Create Load Balancer") should be enabled or not
   infrastructureStages?: boolean;
-  jobs?: boolean;
-  managedPipelineTemplatesV2UI?: boolean;
+  managedDelivery?: boolean;
   managedServiceAccounts?: boolean;
+  managedResources?: boolean;
   notifications?: boolean;
   pagerDuty?: boolean;
   pipelines?: boolean;
   pipelineTemplates?: boolean;
   quietPeriod?: boolean;
   roscoMode?: boolean;
+  slack?: boolean;
   snapshots?: boolean;
   travis?: boolean;
-  versionedProviders?: boolean;
   wercker?: boolean;
   savePipelinesStageEnabled?: boolean;
+  functions?: boolean;
 }
 
 export interface IDockerInsightSettings {
@@ -92,13 +83,13 @@ export interface ISpinnakerSettings {
   };
   checkForUpdates: boolean;
   debugEnabled: boolean;
-  defaultCategory: string;
   defaultInstancePort: number;
   defaultProviders: string[];
   defaultTimeZone: string; // see http://momentjs.com/timezone/docs/#/data-utilities/
   dockerInsights: IDockerInsightSettings;
   entityTags?: {
     maxUrlLength?: number;
+    maxResults?: number;
   };
   executionWindow?: {
     atlas?: {
@@ -115,6 +106,11 @@ export interface ISpinnakerSettings {
   additionalHelpLinks?: IAdditionalHelpLinks[];
   gateUrl: string;
   gitSources: string[];
+  managedDelivery?: {
+    gettingStartedUrl?: string;
+    defaultManifest: string;
+    manifestBasePath: string;
+  };
   maxPipelineAgeDays: number;
   newApplicationDefaults: INewApplicationDefaults;
   notifications: INotificationSettings;
@@ -124,6 +120,9 @@ export interface ISpinnakerSettings {
     defaultDetails?: string;
     defaultSubject?: string;
     required?: boolean;
+  };
+  slack?: {
+    baseUrl: string;
   };
   pollSchedule: number;
   providers?: {

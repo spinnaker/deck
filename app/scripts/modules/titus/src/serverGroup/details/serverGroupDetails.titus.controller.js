@@ -2,13 +2,14 @@
 
 import { TitusResizeServerGroupModal } from './resize/TitusResizeServerGroupModal';
 
-const angular = require('angular');
+import * as angular from 'angular';
 import _ from 'lodash';
 
 import {
   AccountService,
+  confirmNotManaged,
   ClusterTargetBuilder,
-  CONFIRMATION_MODAL_SERVICE,
+  ConfirmationModalService,
   ServerGroupReader,
   ServerGroupWarningMessageService,
   SERVER_GROUP_WRITER,
@@ -24,15 +25,20 @@ import { SCALING_POLICY_MODULE } from './scalingPolicy/scalingPolicy.module';
 
 import { TitusCloneServerGroupModal } from '../configure/wizard/TitusCloneServerGroupModal';
 import { TITUS_SECURITY_GROUPS_DETAILS } from './titusSecurityGroups.component';
+import { TITUS_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER } from '../configure/ServerGroupCommandBuilder';
+import { TITUS_SERVERGROUP_DETAILS_ROLLBACK_ROLLBACKSERVERGROUP_CONTROLLER } from './rollback/rollbackServerGroup.controller';
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
-module.exports = angular
-  .module('spinnaker.serverGroup.details.titus.controller', [
-    require('@uirouter/angularjs').default,
-    require('../configure/ServerGroupCommandBuilder').name,
-    CONFIRMATION_MODAL_SERVICE,
+export const TITUS_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_TITUS_CONTROLLER =
+  'spinnaker.serverGroup.details.titus.controller';
+export const name = TITUS_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_TITUS_CONTROLLER; // for backwards compatibility
+angular
+  .module(TITUS_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_TITUS_CONTROLLER, [
+    UIROUTER_ANGULARJS,
+    TITUS_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER,
     DISRUPTION_BUDGET_DETAILS_SECTION,
     SERVER_GROUP_WRITER,
-    require('./rollback/rollbackServerGroup.controller').name,
+    TITUS_SERVERGROUP_DETAILS_ROLLBACK_ROLLBACKSERVERGROUP_CONTROLLER,
     SERVICE_JOB_PROCESSES_DETAILS_SECTION,
     SCALING_POLICY_MODULE,
     TITUS_SECURITY_GROUPS_DETAILS,
@@ -46,7 +52,6 @@ module.exports = angular
     'serverGroup',
     'titusServerGroupCommandBuilder',
     '$uibModal',
-    'confirmationModalService',
     'serverGroupWriter',
     'awsServerGroupTransformer',
     function(
@@ -58,11 +63,10 @@ module.exports = angular
       serverGroup,
       titusServerGroupCommandBuilder,
       $uibModal,
-      confirmationModalService,
       serverGroupWriter,
       awsServerGroupTransformer,
     ) {
-      let application = app;
+      const application = app;
       this.application = app;
 
       $scope.gateUrl = SETTINGS.gateUrl;
@@ -72,7 +76,7 @@ module.exports = angular
       };
 
       function extractServerGroupSummary() {
-        var summary = _.find(application.serverGroups.data, function(toCheck) {
+        const summary = _.find(application.serverGroups.data, function(toCheck) {
           return (
             toCheck.name === serverGroup.name &&
             toCheck.account === serverGroup.accountId &&
@@ -83,7 +87,7 @@ module.exports = angular
       }
 
       function retrieveServerGroup() {
-        var summary = extractServerGroupSummary();
+        const summary = extractServerGroupSummary();
         return ServerGroupReader.getServerGroup(
           application.name,
           serverGroup.accountId,
@@ -102,7 +106,7 @@ module.exports = angular
           angular.extend(details, summary);
 
           $scope.serverGroup = details;
-          var labels = $scope.serverGroup.labels;
+          const labels = $scope.serverGroup.labels;
           delete labels['name'];
           delete labels['source'];
           delete labels['spinnakerAccount'];
@@ -211,40 +215,16 @@ module.exports = angular
         }
       });
 
-      let configureEntityTagTargets = () => {
+      const configureEntityTagTargets = () => {
         this.entityTagTargets = ClusterTargetBuilder.buildClusterTargets($scope.serverGroup);
       };
 
       this.destroyServerGroup = function destroyServerGroup() {
-        var serverGroup = $scope.serverGroup;
+        const serverGroup = $scope.serverGroup;
 
-        var taskMonitor = {
+        const taskMonitor = {
           application: application,
           title: 'Destroying ' + serverGroup.name,
-        };
-
-        var submitMethod = function() {
-          return serverGroupWriter.destroyServerGroup(serverGroup, application, {
-            cloudProvider: 'titus',
-            serverGroupName: serverGroup.name,
-            region: serverGroup.region,
-          });
-        };
-
-        var stateParams = {
-          name: serverGroup.name,
-          accountId: serverGroup.account,
-          region: serverGroup.region,
-        };
-
-        var confirmationModalParams = {
-          header: 'Really destroy ' + serverGroup.name + '?',
-          buttonText: 'Destroy ' + serverGroup.name,
-          account: serverGroup.account,
-          taskMonitorConfig: taskMonitor,
-          platformHealthOnlyShowOverride: app.attributes.platformHealthOnlyShowOverride,
-          platformHealthType: 'Titus',
-          submitMethod: submitMethod,
           onTaskComplete: function() {
             if ($state.includes('**.serverGroup', stateParams)) {
               $state.go('^');
@@ -252,20 +232,46 @@ module.exports = angular
           },
         };
 
+        const submitMethod = function() {
+          return serverGroupWriter.destroyServerGroup(serverGroup, application, {
+            cloudProvider: 'titus',
+            serverGroupName: serverGroup.name,
+            region: serverGroup.region,
+          });
+        };
+
+        const stateParams = {
+          name: serverGroup.name,
+          accountId: serverGroup.account,
+          region: serverGroup.region,
+        };
+
+        const confirmationModalParams = {
+          header: 'Really destroy ' + serverGroup.name + '?',
+          buttonText: 'Destroy ' + serverGroup.name,
+          account: serverGroup.account,
+          taskMonitorConfig: taskMonitor,
+          platformHealthOnlyShowOverride: app.attributes.platformHealthOnlyShowOverride,
+          platformHealthType: 'Titus',
+          submitMethod: submitMethod,
+        };
+
         ServerGroupWarningMessageService.addDestroyWarningMessage(app, serverGroup, confirmationModalParams);
 
-        confirmationModalService.confirm(confirmationModalParams);
+        confirmNotManaged(serverGroup, app).then(
+          notManaged => notManaged && ConfirmationModalService.confirm(confirmationModalParams),
+        );
       };
 
       this.disableServerGroup = function disableServerGroup() {
-        var serverGroup = $scope.serverGroup;
+        const serverGroup = $scope.serverGroup;
 
-        var taskMonitor = {
+        const taskMonitor = {
           application: application,
           title: 'Disabling ' + serverGroup.name,
         };
 
-        var submitMethod = function() {
+        const submitMethod = function() {
           return serverGroupWriter.disableServerGroup(serverGroup, application, {
             cloudProvider: 'titus',
             serverGroupName: serverGroup.name,
@@ -274,7 +280,7 @@ module.exports = angular
           });
         };
 
-        var confirmationModalParams = {
+        const confirmationModalParams = {
           header: 'Really disable ' + serverGroup.name + '?',
           buttonText: 'Disable ' + serverGroup.name,
           account: serverGroup.account,
@@ -286,47 +292,55 @@ module.exports = angular
 
         ServerGroupWarningMessageService.addDisableWarningMessage(app, serverGroup, confirmationModalParams);
 
-        confirmationModalService.confirm(confirmationModalParams);
+        confirmNotManaged(serverGroup, app).then(
+          notManaged => notManaged && ConfirmationModalService.confirm(confirmationModalParams),
+        );
       };
 
       this.enableServerGroup = () => {
-        if (!this.isRollbackEnabled()) {
-          this.showEnableServerGroupModal();
-          return;
-        }
+        confirmNotManaged(serverGroup, app).then(notManaged => {
+          if (!notManaged) {
+            return;
+          }
+          if (!this.isRollbackEnabled()) {
+            this.showEnableServerGroupModal();
+            return;
+          }
 
-        const confirmationModalParams = {
-          header: 'Rolling back?',
-          body: `Spinnaker provides an orchestrated rollback feature to carefully restore a different version of this
-             server group. Do you want to use the orchestrated rollback?`,
-          buttonText: `Yes, take me to the rollback settings modal`,
-          cancelButtonText: 'No, I just want to enable the server group',
-        };
+          const confirmationModalParams = {
+            header: 'Rolling back?',
+            body: `Spinnaker provides an orchestrated rollback feature to carefully restore a different version of this
+                 server group. Do you want to use the orchestrated rollback?`,
+            buttonText: `Yes, take me to the rollback settings modal`,
+            cancelButtonText: 'No, I just want to enable the server group',
+          };
 
-        confirmationModalService
-          .confirm(confirmationModalParams)
-          .then(() => this.rollbackServerGroup())
-          .catch(({ source }) => {
-            // don't show the enable modal if the user cancels with the header button
-            if (source === 'footer') {
-              this.showEnableServerGroupModal();
-            }
-          });
+          ConfirmationModalService.confirm(confirmationModalParams)
+            .then(() => this.rollbackServerGroup())
+            .catch(({ source }) => {
+              // don't show the enable modal if the user cancels with the header button
+              if (source === 'footer') {
+                this.showEnableServerGroupModal();
+              }
+            });
+        });
       };
 
       this.resizeServerGroup = () => {
-        ReactModal.show(TitusResizeServerGroupModal, { serverGroup: $scope.serverGroup, application });
+        confirmNotManaged(serverGroup, app).then(notManaged => {
+          notManaged && ReactModal.show(TitusResizeServerGroupModal, { serverGroup: $scope.serverGroup, application });
+        });
       };
 
       this.showEnableServerGroupModal = () => {
-        var serverGroup = $scope.serverGroup;
+        const serverGroup = $scope.serverGroup;
 
-        var taskMonitor = {
+        const taskMonitor = {
           application: application,
           title: 'Enabling ' + serverGroup.name,
         };
 
-        var submitMethod = function() {
+        const submitMethod = function() {
           return serverGroupWriter.enableServerGroup(serverGroup, application, {
             cloudProvider: 'titus',
             serverGroupName: serverGroup.name,
@@ -335,7 +349,7 @@ module.exports = angular
           });
         };
 
-        var confirmationModalParams = {
+        const confirmationModalParams = {
           header: 'Really enable ' + serverGroup.name + '?',
           buttonText: 'Enable ' + serverGroup.name,
           account: serverGroup.account,
@@ -345,7 +359,7 @@ module.exports = angular
           submitMethod: submitMethod,
         };
 
-        confirmationModalService.confirm(confirmationModalParams);
+        ConfirmationModalService.confirm(confirmationModalParams);
       };
 
       this.cloneServerGroup = function cloneServerGroup() {
@@ -358,7 +372,7 @@ module.exports = angular
       };
 
       this.isRollbackEnabled = function rollbackServerGroup() {
-        let serverGroup = $scope.serverGroup;
+        const serverGroup = $scope.serverGroup;
         if (!serverGroup.isDisabled) {
           // enabled server groups are always a candidate for rollback
           return true;
@@ -411,19 +425,25 @@ module.exports = angular
           previousServerGroup = allServerGroups[0];
         }
 
-        $uibModal.open({
-          templateUrl: require('./rollback/rollbackServerGroup.html'),
-          controller: 'titusRollbackServerGroupCtrl as ctrl',
-          resolve: {
-            serverGroup: () => serverGroup,
-            previousServerGroup: () => previousServerGroup,
-            disabledServerGroups: () => {
-              var cluster = _.find(application.clusters, { name: serverGroup.cluster, account: serverGroup.account });
-              return _.filter(cluster.serverGroups, { isDisabled: true, region: serverGroup.region });
-            },
-            allServerGroups: () => allServerGroups,
-            application: () => application,
-          },
+        confirmNotManaged(serverGroup, app).then(notManaged => {
+          notManaged &&
+            $uibModal.open({
+              templateUrl: require('./rollback/rollbackServerGroup.html'),
+              controller: 'titusRollbackServerGroupCtrl as ctrl',
+              resolve: {
+                serverGroup: () => serverGroup,
+                previousServerGroup: () => previousServerGroup,
+                disabledServerGroups: () => {
+                  const cluster = _.find(application.clusters, {
+                    name: serverGroup.cluster,
+                    account: serverGroup.account,
+                  });
+                  return _.filter(cluster.serverGroups, { isDisabled: true, region: serverGroup.region });
+                },
+                allServerGroups: () => allServerGroups,
+                application: () => application,
+              },
+            });
         });
       };
     },

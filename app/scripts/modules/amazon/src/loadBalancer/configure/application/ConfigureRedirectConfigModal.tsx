@@ -1,6 +1,6 @@
-import * as React from 'react';
+import React from 'react';
 import { Modal } from 'react-bootstrap';
-import { Formik, Form } from 'formik';
+import { Form } from 'formik';
 import { pickBy } from 'lodash';
 
 import {
@@ -11,6 +11,7 @@ import {
   SubmitButton,
   noop,
   SelectInput,
+  SpinFormik,
   HelpField,
   ReactSelectInput,
 } from '@spinnaker/core';
@@ -66,16 +67,16 @@ export class ConfigureRedirectConfigModal extends React.Component<IConfigureRedi
 
     return (
       <div className="configure-config-modal">
-        <Formik<IRedirectActionConfig>
+        <SpinFormik<IRedirectActionConfig>
           initialValues={this.initialValues}
           onSubmit={this.submit}
           render={({ isValid }) => (
             <Form className="form-horizontal">
               <ModalClose dismiss={this.close} />
               <Modal.Header>
-                <h3>
+                <Modal.Title>
                   Configure Redirect <HelpField id="aws.loadBalancer.redirect" />
-                </h3>
+                </Modal.Title>
               </Modal.Header>
 
               <Modal.Body>

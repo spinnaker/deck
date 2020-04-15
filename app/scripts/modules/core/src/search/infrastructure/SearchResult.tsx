@@ -1,7 +1,7 @@
-import * as DOMPurify from 'dompurify';
-import * as React from 'react';
+import React from 'react';
 
 import { AccountTag } from 'core/account';
+import { Markdown } from 'core/presentation';
 
 import './searchResult.less';
 
@@ -17,7 +17,7 @@ export class SearchResult extends React.Component<ISearchResultProps> {
     return (
       <span className="search-result">
         {account && <AccountTag account={account} />}
-        <span dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(displayName) }} />
+        <Markdown tag="span" message={displayName} />
       </span>
     );
   }

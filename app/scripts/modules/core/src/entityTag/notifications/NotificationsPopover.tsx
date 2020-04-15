@@ -1,18 +1,15 @@
-import * as React from 'react';
-import * as ReactGA from 'react-ga';
+import React from 'react';
+import ReactGA from 'react-ga';
 import { uniq, pick } from 'lodash';
 
 import { Application } from 'core/application';
 import { IEntityTags, IEntityTag } from 'core/domain';
-import {
-  EntityTagEditor,
-  EntityTagWriter,
-  GroupedNotificationList,
-  IEntityTagEditorProps,
-  NotificationList,
-} from 'core/entityTag';
+import { EntityTagEditor, IEntityTagEditorProps } from '../EntityTagEditor';
+import { EntityTagWriter } from '../entityTags.write.service';
+import { GroupedNotificationList } from './GroupedNotificationList';
+import { NotificationList } from './NotificationList';
 import { Placement, HoverablePopover, IHoverablePopoverContentsProps } from 'core/presentation';
-import { ReactInjector } from 'core/reactShims';
+import { ConfirmationModalService } from 'core/confirmationModal';
 import { noop } from 'core/utils';
 import { ITaskMonitorConfig } from 'core/task';
 
@@ -136,7 +133,6 @@ export class NotificationsPopover extends React.Component<INotificationsPopoverP
   }
 
   public handleDeleteNotification(notification: INotification): void {
-    const { confirmationModalService } = ReactInjector;
     const { application, entity, onUpdate } = this.props;
     const { entityTags, entityTag } = notification;
     const type = entityTag.value['type'];
@@ -147,12 +143,10 @@ export class NotificationsPopover extends React.Component<INotificationsPopoverP
       onTaskComplete: () => application.entityTags.refresh().then(() => onUpdate()),
     };
 
-    confirmationModalService.confirm({
+    ConfirmationModalService.confirm({
       header: `Really delete ${type}?`,
       buttonText: `Delete ${type}`,
-      provider: entity.cloudProvider,
       account: entity.account,
-      applicationName: application.name,
       taskMonitorConfig,
       submitMethod: () => EntityTagWriter.deleteEntityTag(application, entity, entityTags, entityTag.name),
     });

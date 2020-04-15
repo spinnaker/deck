@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 
 import { Observable, Subject } from 'rxjs';
 
@@ -9,11 +9,13 @@ import {
   IPipeline,
   IStageConfigProps,
   NgReact,
+  SpinFormik,
   StageConfigField,
   StageConstants,
 } from '@spinnaker/core';
 
-import { AccountRegionClusterSelector, Routes } from 'cloudfoundry/presentation';
+import { AccountRegionClusterSelector } from '../../widgets/accountRegionClusterSelector';
+import { Routes } from '../../forms/serverGroup';
 import { Formik } from 'formik';
 
 interface ICloudfoundryLoadBalancerStageConfigProps extends IStageConfigProps {
@@ -99,7 +101,7 @@ export class CloudfoundryLoadBalancersStageConfig extends React.Component<
         <StageConfigField label="Target">
           <TargetSelect model={{ target }} options={StageConstants.TARGET_LIST} onChange={this.targetUpdated} />
         </StageConfigField>
-        <Formik<ICloudFoundryLoadBalancersValues>
+        <SpinFormik<ICloudFoundryLoadBalancersValues>
           ref={this.formikRef}
           initialValues={initialValues}
           onSubmit={null}

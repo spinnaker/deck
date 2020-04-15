@@ -1,8 +1,8 @@
-import * as React from 'react';
+import React from 'react';
 import { UISref } from '@uirouter/react';
 
 import { timestamp } from 'core/utils';
-import { IApplicationSummary } from 'core/application';
+import { IApplicationSummary } from '../service/ApplicationReader';
 import { SortToggle } from 'core/presentation';
 
 export interface IApplicationTableProps {

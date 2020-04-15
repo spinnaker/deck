@@ -1,7 +1,7 @@
 import { IPipeline, IStage, IStageOrTriggerTypeConfig } from 'core/domain';
 import { NameUtils } from 'core/naming';
 
-import { PipelineConfigService } from 'core/pipeline/config/services/PipelineConfigService';
+import { PipelineConfigService } from '../services/PipelineConfigService';
 import { IStageOrTriggerValidator, IValidatorConfig, PipelineConfigValidator } from './PipelineConfigValidator';
 
 export interface ITargetImpedanceValidationConfig extends IValidatorConfig {
@@ -17,8 +17,8 @@ export class TargetImpedanceValidator implements IStageOrTriggerValidator {
     validator: ITargetImpedanceValidationConfig,
     _config: IStageOrTriggerTypeConfig,
   ): string {
-    const stagesToTest: IStage[] = PipelineConfigService.getAllUpstreamDependencies(pipeline, stage),
-      regions: string[] = stage['regions'] || [];
+    const stagesToTest: IStage[] = PipelineConfigService.getAllUpstreamDependencies(pipeline, stage);
+    const regions: string[] = stage['regions'] || [];
     let allRegionsFound = true;
 
     regions.forEach(region => {

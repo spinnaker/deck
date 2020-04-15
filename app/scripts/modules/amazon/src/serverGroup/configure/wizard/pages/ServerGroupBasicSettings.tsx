@@ -1,6 +1,5 @@
-import * as React from 'react';
-import * as DOMPurify from 'dompurify';
-import { Field, FormikProps } from 'formik';
+import React from 'react';
+import { Field, FormikErrors, FormikProps } from 'formik';
 
 import {
   AccountSelectInput,
@@ -12,7 +11,10 @@ import {
   ReactInjector,
   IServerGroup,
   IWizardPageComponent,
+  Markdown,
+  DeployingIntoManagedClusterWarning,
   TaskReason,
+  ServerGroupDetailsField,
 } from '@spinnaker/core';
 
 import { IAmazonImage } from 'amazon/image';
@@ -111,8 +113,8 @@ export class ServerGroupBasicSettings
     setFieldValue('subnetType', values.subnetType);
   };
 
-  public validate(values: IAmazonServerGroupCommand): { [key: string]: string } {
-    const errors: { [key: string]: string } = {};
+  public validate(values: IAmazonServerGroupCommand): FormikErrors<IAmazonServerGroupCommand> {
+    const errors: FormikErrors<IAmazonServerGroupCommand> = {};
 
     if (!isStackPattern(values.stack)) {
       errors.stack = 'Only dot(.) and underscore(_) special characters are allowed in the Stack field.';
@@ -125,6 +127,12 @@ export class ServerGroupBasicSettings
 
     if (!values.viewState.disableImageSelection && !values.amiName) {
       errors.amiName = 'Image required.';
+    }
+
+    // this error is added exclusively to disable the "create/clone" button - it is not visible aside from the warning
+    // rendered by the DeployingIntoManagedClusterWarning component
+    if (values.resourceSummary) {
+      errors.resourceSummary = { id: 'Cluster is managed' };
     }
 
     return errors;
@@ -160,13 +168,6 @@ export class ServerGroupBasicSettings
     const { setFieldValue, values } = this.props.formik;
     values.stack = stack; // have to do it here to make sure it's done before calling values.clusterChanged
     setFieldValue('stack', stack);
-    values.clusterChanged(values);
-  };
-
-  private freeFormDetailsChanged = (freeFormDetails: string) => {
-    const { setFieldValue, values } = this.props.formik;
-    values.freeFormDetails = freeFormDetails; // have to do it here to make sure it's done before calling values.clusterChanged
-    setFieldValue('freeFormDetails', freeFormDetails);
     values.clusterChanged(values);
   };
 
@@ -206,6 +207,7 @@ export class ServerGroupBasicSettings
             </div>
           </div>
         )}
+        <DeployingIntoManagedClusterWarning app={app} formik={formik} />
         <div className="form-group">
           <div className="col-md-3 sm-label-right">Account</div>
           <div className="col-md-7">
@@ -258,31 +260,12 @@ export class ServerGroupBasicSettings
             </div>
           </div>
         )}
-        <div className="form-group">
-          <div className="col-md-3 sm-label-right">
-            Detail <HelpField id="aws.serverGroup.detail" />
-          </div>
-          <div className="col-md-7">
-            <input
-              type="text"
-              className="form-control input-sm no-spel"
-              value={values.freeFormDetails}
-              onChange={e => this.freeFormDetailsChanged(e.target.value)}
-            />
-          </div>
-        </div>
-        {errors.freeFormDetails && (
-          <div className="form-group row slide-in">
-            <div className="col-sm-9 col-sm-offset-2 error-message">
-              <span>{errors.freeFormDetails}</span>
-            </div>
-          </div>
-        )}
+        <ServerGroupDetailsField app={app} formik={formik} />
         {values.viewState.imageSourceText && (
           <div className="form-group">
             <div className="col-md-3 sm-label-right">Image Source</div>
             <div className="col-md-7" style={{ marginTop: '5px' }}>
-              <span dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(values.viewState.imageSourceText) }} />
+              <Markdown tag="span" message={values.viewState.imageSourceText} />
             </div>
           </div>
         )}

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { capitalize, get, isEmpty, map } from 'lodash';
 import { Option } from 'react-select';
 
@@ -24,6 +24,7 @@ import { IManifestBindArtifact } from './ManifestBindArtifactsSelector';
 import { ManifestDeploymentOptions } from './ManifestDeploymentOptions';
 import { ManifestBindArtifactsSelectorDelegate } from './ManifestBindArtifactsSelectorDelegate';
 import { NamespaceSelector } from './NamespaceSelector';
+import { ManifestSource } from '../../../manifest/ManifestSource';
 
 interface IDeployManifestStageConfigFormProps {
   accounts: IAccountDetails[];
@@ -39,13 +40,10 @@ export class DeployManifestStageForm extends React.Component<
   IDeployManifestStageConfigFormProps & IFormikStageConfigInjectedProps,
   IDeployManifestStageConfigFormState
 > {
-  public readonly textSource = 'text';
-  public readonly artifactSource = 'artifact';
   private readonly excludedManifestArtifactTypes = [
     ArtifactTypePatterns.DOCKER_IMAGE,
     ArtifactTypePatterns.KUBERNETES,
     ArtifactTypePatterns.FRONT50_PIPELINE_TEMPLATE,
-    ArtifactTypePatterns.EMBEDDED_BASE64,
     ArtifactTypePatterns.MAVEN_FILE,
   ];
 
@@ -53,7 +51,7 @@ export class DeployManifestStageForm extends React.Component<
     super(props);
     const stage = this.props.formik.values;
     const manifests: any[] = get(props.formik.values, 'manifests');
-    const isTextManifest: boolean = get(props.formik.values, 'source') === this.textSource;
+    const isTextManifest: boolean = get(props.formik.values, 'source') === ManifestSource.TEXT;
     this.state = {
       rawManifest: !isEmpty(manifests) && isTextManifest ? yamlDocumentsToString(manifests) : '',
       overrideNamespace: get(stage, 'namespaceOverride', '') !== '',
@@ -61,7 +59,7 @@ export class DeployManifestStageForm extends React.Component<
   }
 
   private getSourceOptions = (): Array<Option<string>> => {
-    return map([this.textSource, this.artifactSource], option => ({
+    return map([ManifestSource.TEXT, ManifestSource.ARTIFACT], option => ({
       label: capitalize(option),
       value: option,
     }));
@@ -107,7 +105,10 @@ export class DeployManifestStageForm extends React.Component<
       'requiredArtifactIds',
       bindings.filter(b => b.expectedArtifactId).map(b => b.expectedArtifactId),
     );
-    this.props.formik.setFieldValue('requiredArtifacts', bindings.filter(b => b.artifact));
+    this.props.formik.setFieldValue(
+      'requiredArtifacts',
+      bindings.filter(b => b.artifact),
+    );
   };
 
   private overrideNamespaceChange(checked: boolean) {
@@ -123,7 +124,6 @@ export class DeployManifestStageForm extends React.Component<
       <div className="form-horizontal">
         <h4>Basic Settings</h4>
         <ManifestBasicSettings
-          app={this.props.application}
           accounts={this.props.accounts}
           onAccountSelect={accountName => this.props.formik.setFieldValue('account', accountName)}
           selectedAccount={stage.account}
@@ -149,19 +149,18 @@ export class DeployManifestStageForm extends React.Component<
         <h4>Manifest Configuration</h4>
         <StageConfigField label="Manifest Source" helpKey="kubernetes.manifest.source">
           <RadioButtonInput
-            inline={true}
             options={this.getSourceOptions()}
             onChange={(e: any) => this.props.formik.setFieldValue('source', e.target.value)}
             value={stage.source}
           />
         </StageConfigField>
-        {stage.source === this.textSource && (
+        {stage.source === ManifestSource.TEXT && (
           <StageConfigField label="Manifest">
             <CopyFromTemplateButton application={this.props.application} handleCopy={this.handleCopy} />
             <YamlEditor onChange={this.handleRawManifestChange} value={this.state.rawManifest} />
           </StageConfigField>
         )}
-        {stage.source === this.artifactSource && (
+        {stage.source === ManifestSource.ARTIFACT && (
           <>
             <StageArtifactSelectorDelegate
               artifact={stage.manifestArtifact}

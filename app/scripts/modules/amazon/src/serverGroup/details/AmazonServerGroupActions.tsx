@@ -1,27 +1,44 @@
-import * as React from 'react';
-import { Dropdown, Tooltip } from 'react-bootstrap';
-import { get, find, filter, orderBy } from 'lodash';
+import React from 'react';
+import { Dropdown, MenuItem, Tooltip } from 'react-bootstrap';
+import { filter, find, get, orderBy } from 'lodash';
 
 import {
   ClusterTargetBuilder,
+  ConfirmationModalService,
   IOwnerOption,
   IServerGroupActionsProps,
   IServerGroupJob,
+  ManagedMenuItem,
   ModalInjector,
   NgReact,
+  Overridable,
   ReactInjector,
   ServerGroupWarningMessageService,
   SETTINGS,
 } from '@spinnaker/core';
 
 import { IAmazonServerGroup, IAmazonServerGroupView } from 'amazon/domain';
-import { AmazonCloneServerGroupModal } from 'amazon/serverGroup/configure/wizard/AmazonCloneServerGroupModal';
+import { AmazonCloneServerGroupModal } from '../configure/wizard/AmazonCloneServerGroupModal';
 import { AwsReactInjector } from 'amazon/reactShims';
 import { IAmazonServerGroupCommand } from '../configure';
-import { AmazonResizeServerGroupModal } from './resize/AmazonResizeServerGroupModal';
+import {
+  AmazonResizeServerGroupModal,
+  IAmazonResizeServerGroupModalProps,
+} from './resize/AmazonResizeServerGroupModal';
 
 export interface IAmazonServerGroupActionsProps extends IServerGroupActionsProps {
   serverGroup: IAmazonServerGroupView;
+}
+
+@Overridable('AmazonServerGroupActions.resize')
+export class AmazonServerGroupActionsResize extends React.Component<IAmazonResizeServerGroupModalProps> {
+  private resizeServerGroup = (): void => {
+    AmazonResizeServerGroupModal.show(this.props);
+  };
+
+  public render(): JSX.Element {
+    return <MenuItem onClick={this.resizeServerGroup}>Resize</MenuItem>;
+  }
 }
 
 export class AmazonServerGroupActions extends React.Component<IAmazonServerGroupActionsProps> {
@@ -68,6 +85,11 @@ export class AmazonServerGroupActions extends React.Component<IAmazonServerGroup
     const taskMonitor = {
       application: app,
       title: 'Destroying ' + serverGroup.name,
+      onTaskComplete: () => {
+        if (ReactInjector.$state.includes('**.serverGroup', stateParams)) {
+          ReactInjector.$state.go('^');
+        }
+      },
     };
 
     const submitMethod = (params: IServerGroupJob) =>
@@ -83,18 +105,12 @@ export class AmazonServerGroupActions extends React.Component<IAmazonServerGroup
       header: 'Really destroy ' + serverGroup.name + '?',
       buttonText: 'Destroy ' + serverGroup.name,
       account: serverGroup.account,
-      provider: 'aws',
       taskMonitorConfig: taskMonitor,
       interestingHealthProviderNames: undefined as string[],
       submitMethod,
       askForReason: true,
       platformHealthOnlyShowOverride: app.attributes.platformHealthOnlyShowOverride,
       platformHealthType: 'Amazon',
-      onTaskComplete: () => {
-        if (ReactInjector.$state.includes('**.serverGroup', stateParams)) {
-          ReactInjector.$state.go('^');
-        }
-      },
     };
 
     ServerGroupWarningMessageService.addDestroyWarningMessage(app, serverGroup, confirmationModalParams);
@@ -103,7 +119,7 @@ export class AmazonServerGroupActions extends React.Component<IAmazonServerGroup
       confirmationModalParams.interestingHealthProviderNames = ['Amazon'];
     }
 
-    ReactInjector.confirmationModalService.confirm(confirmationModalParams);
+    ConfirmationModalService.confirm(confirmationModalParams);
   };
 
   private disableServerGroup = (): void => {
@@ -122,7 +138,6 @@ export class AmazonServerGroupActions extends React.Component<IAmazonServerGroup
       header: 'Really disable ' + serverGroup.name + '?',
       buttonText: 'Disable ' + serverGroup.name,
       account: serverGroup.account,
-      provider: 'aws',
       interestingHealthProviderNames: undefined as string[],
       taskMonitorConfig: taskMonitor,
       platformHealthOnlyShowOverride: app.attributes.platformHealthOnlyShowOverride,
@@ -137,7 +152,7 @@ export class AmazonServerGroupActions extends React.Component<IAmazonServerGroup
       confirmationModalParams.interestingHealthProviderNames = ['Amazon'];
     }
 
-    ReactInjector.confirmationModalService.confirm(confirmationModalParams);
+    ConfirmationModalService.confirm(confirmationModalParams);
   };
 
   private enableServerGroup = (): void => {
@@ -154,12 +169,11 @@ export class AmazonServerGroupActions extends React.Component<IAmazonServerGroup
       cancelButtonText: 'No, I just want to enable the server group',
     };
 
-    ReactInjector.confirmationModalService
-      .confirm(confirmationModalParams)
+    ConfirmationModalService.confirm(confirmationModalParams)
       .then(() => this.rollbackServerGroup())
-      .catch(({ source }) => {
+      .catch(error => {
         // don't show the enable modal if the user cancels with the header button
-        if (source === 'footer') {
+        if (error?.source === 'footer') {
           this.showEnableServerGroupModal();
         }
       });
@@ -193,7 +207,7 @@ export class AmazonServerGroupActions extends React.Component<IAmazonServerGroup
       confirmationModalParams.interestingHealthProviderNames = ['Amazon'];
     }
 
-    ReactInjector.confirmationModalService.confirm(confirmationModalParams);
+    ConfirmationModalService.confirm(confirmationModalParams);
   }
 
   private rollbackServerGroup = (): void => {
@@ -255,11 +269,6 @@ export class AmazonServerGroupActions extends React.Component<IAmazonServerGroup
     });
   };
 
-  private resizeServerGroup = (): void => {
-    const { app, serverGroup } = this.props;
-    AmazonResizeServerGroupModal.show({ application: app, serverGroup });
-  };
-
   private cloneServerGroup = (): void => {
     const { app, serverGroup } = this.props;
     AwsReactInjector.awsServerGroupCommandBuilder
@@ -282,31 +291,21 @@ export class AmazonServerGroupActions extends React.Component<IAmazonServerGroup
         <Dropdown.Toggle className="btn btn-sm btn-primary dropdown-toggle">Server Group Actions</Dropdown.Toggle>
         <Dropdown.Menu className="dropdown-menu">
           {this.isRollbackEnabled() && (
-            <li>
-              <a className="clickable" onClick={this.rollbackServerGroup}>
-                Rollback
-              </a>
-            </li>
+            <ManagedMenuItem resource={serverGroup} application={app} onClick={this.rollbackServerGroup}>
+              Rollback
+            </ManagedMenuItem>
           )}
           {this.isRollbackEnabled() && <li role="presentation" className="divider" />}
-          <li>
-            <a className="clickable" onClick={this.resizeServerGroup}>
-              Resize
-            </a>
-          </li>
+          <AmazonServerGroupActionsResize application={app} serverGroup={serverGroup} />
           {!serverGroup.isDisabled && (
-            <li>
-              <a className="clickable" onClick={this.disableServerGroup}>
-                Disable
-              </a>
-            </li>
+            <ManagedMenuItem resource={serverGroup} application={app} onClick={this.disableServerGroup}>
+              Disable
+            </ManagedMenuItem>
           )}
           {this.hasDisabledInstances() && !this.isEnableLocked() && (
-            <li>
-              <a className="clickable" onClick={this.enableServerGroup}>
-                Enable
-              </a>
-            </li>
+            <ManagedMenuItem resource={serverGroup} application={app} onClick={this.enableServerGroup}>
+              Enable
+            </ManagedMenuItem>
           )}
           {this.isEnableLocked() && (
             <li className="disabled">
@@ -317,11 +316,9 @@ export class AmazonServerGroupActions extends React.Component<IAmazonServerGroup
               </Tooltip>
             </li>
           )}
-          <li>
-            <a className="clickable" onClick={this.destroyServerGroup}>
-              Destroy
-            </a>
-          </li>
+          <ManagedMenuItem resource={serverGroup} application={app} onClick={this.destroyServerGroup}>
+            Destroy
+          </ManagedMenuItem>
           <li>
             <a className="clickable" onClick={this.cloneServerGroup}>
               Clone

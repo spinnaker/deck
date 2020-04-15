@@ -1,6 +1,15 @@
 import { IValidator } from './validation';
+import { isNumber } from 'lodash';
+import { robotToHuman } from 'core';
 
 const THIS_FIELD = 'This field';
+
+const emailValue = (message?: string): IValidator => {
+  return (val: string, label = THIS_FIELD) => {
+    message = message || `${label} is not a valid email address.`;
+    return val && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(val) && message;
+  };
+};
 
 const isRequired = (message?: string): IValidator => {
   return (val: any, label = THIS_FIELD) => {
@@ -9,19 +18,43 @@ const isRequired = (message?: string): IValidator => {
   };
 };
 
+const isNum = (message?: string) => (value: any) => (isNumber(value) ? null : message || 'Must be a number');
+
 const minValue = (min: number, message?: string): IValidator => {
   return (val: number, label = THIS_FIELD) => {
-    const text = min === 0 ? 'cannot be negative' : `cannot be less than ${min}`;
-    message = message || `${label} ${text}`;
-    return val < min && message;
+    if (!isNumber(val)) {
+      return message || `${label} must be a number`;
+    } else if (val < min) {
+      const minText = min === 0 ? 'cannot be negative' : `cannot be less than ${min}`;
+      return message || `${label} ${minText}`;
+    }
+    return null;
   };
 };
 
 const maxValue = (max: number, message?: string): IValidator => {
   return (val: number, label = THIS_FIELD) => {
-    message = message || `${label} cannot be greater than ${max}`;
-    return val > max && message;
+    if (!isNumber(val)) {
+      return message || `${label} must be a number`;
+    } else if (val > max) {
+      const maxText = `cannot be greater than ${max}`;
+      return message || `${label} ${maxText}`;
+    }
+    return null;
   };
+};
+
+const checkBetween = (fieldName: string, min: number, max: number): IValidator => (value: string) => {
+  const sanitizedField = Number.parseInt(value, 10);
+
+  if (!Number.isNaN(sanitizedField)) {
+    const error =
+      Validators.minValue(min)(sanitizedField, robotToHuman(fieldName)) ||
+      Validators.maxValue(max)(sanitizedField, robotToHuman(fieldName));
+
+    return error;
+  }
+  return null;
 };
 
 const oneOf = (list: any[], message?: string): IValidator => {
@@ -45,6 +78,14 @@ const skipIfUndefined = (actualValidator: IValidator): IValidator => {
   };
 };
 
+const valueUnique = (list: any[], message?: string): IValidator => {
+  return (val: any, label = THIS_FIELD) => {
+    list = list || [];
+    message = message || `${label} must be not be included in (${list.join(', ')})`;
+    return list.includes(val) && message;
+  };
+};
+
 /**
  * A collection of reusable Validator factories.
  *
@@ -54,11 +95,15 @@ const skipIfUndefined = (actualValidator: IValidator): IValidator => {
  */
 export const Validators = {
   arrayNotEmpty,
+  emailValue,
   isRequired,
+  isNum,
   maxValue,
   minValue,
+  checkBetween,
   oneOf,
   skipIfUndefined,
+  valueUnique,
 };
 
 // Typescript kludge:

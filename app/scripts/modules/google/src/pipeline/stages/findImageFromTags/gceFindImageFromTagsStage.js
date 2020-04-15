@@ -1,11 +1,13 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { BakeryReader, Registry } from '@spinnaker/core';
 
-module.exports = angular
-  .module('spinnaker.gce.pipeline.stage..findImageFromTagsStage', [])
+export const GOOGLE_PIPELINE_STAGES_FINDIMAGEFROMTAGS_GCEFINDIMAGEFROMTAGSSTAGE =
+  'spinnaker.gce.pipeline.stage..findImageFromTagsStage';
+export const name = GOOGLE_PIPELINE_STAGES_FINDIMAGEFROMTAGS_GCEFINDIMAGEFROMTAGSSTAGE; // for backwards compatibility
+module(GOOGLE_PIPELINE_STAGES_FINDIMAGEFROMTAGS_GCEFINDIMAGEFROMTAGSSTAGE, [])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'findImageFromTags',
@@ -13,7 +15,10 @@ module.exports = angular
       templateUrl: require('./findImageFromTagsStage.html'),
       executionDetailsUrl: require('./findImageFromTagsExecutionDetails.html'),
       executionConfigSections: ['findImageConfig', 'taskStatus'],
-      validators: [{ type: 'requiredField', fieldName: 'packageName' }, { type: 'requiredField', fieldName: 'tags' }],
+      validators: [
+        { type: 'requiredField', fieldName: 'packageName' },
+        { type: 'requiredField', fieldName: 'tags' },
+      ],
     });
   })
   .controller('gceFindImageFromTagsStageCtrl', [

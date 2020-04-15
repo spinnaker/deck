@@ -1,11 +1,14 @@
-import { module } from 'angular';
-import { IModalService, IModalSettings } from 'angular-ui-bootstrap';
+import { IPromise } from 'angular';
+import { $q } from 'ngimport';
 
-export interface IConfirmationModalParams {
+import { ConfirmModal, IConfirmModalProps } from './ConfirmModal';
+import { ReactModal, toMarkdown } from 'core/presentation';
+import { ITaskMonitorConfig, TaskMonitor } from 'core/task';
+
+export interface IConfirmationModalPassthroughProps {
   account?: string;
-  applicationName?: string;
   askForReason?: boolean;
-  body?: string;
+  bodyContent?: JSX.Element;
   buttonText?: string;
   cancelButtonText?: string;
   header?: string;
@@ -13,60 +16,46 @@ export interface IConfirmationModalParams {
   multiTaskTitle?: string;
   platformHealthOnlyShowOverride?: boolean;
   platformHealthType?: string;
-  provider?: string;
-  reason?: string;
-  size?: string;
+  retryBody?: string;
   submitJustWithReason?: boolean;
-  submitMethod?: (args: any) => ng.IPromise<any>;
-  taskMonitorConfig?: any;
-  taskMonitors?: any[];
+  submitMethod?: (args?: any) => IPromise<any>;
   textToVerify?: string;
   verificationLabel?: string;
-  windowClass?: string;
+}
+
+export interface IConfirmationModalParams extends IConfirmationModalPassthroughProps {
+  body?: string;
+  taskMonitorConfig?: ITaskMonitorConfig;
+  taskMonitorConfigs?: ITaskMonitorConfig[];
 }
 
 export class ConfirmationModalService {
-  private defaults: IConfirmationModalParams = {
+  private static defaults: IConfirmationModalParams = {
     buttonText: 'Confirm',
     cancelButtonText: 'Cancel',
   };
 
-  public static $inject = ['$uibModal', '$sce'];
-  public constructor(private $uibModal: IModalService, private $sce: ng.ISCEService) {}
+  public static confirm(params: IConfirmationModalParams): IPromise<any> {
+    const extendedParams: IConfirmModalProps = { ...this.defaults, ...params };
 
-  public confirm(params: IConfirmationModalParams): ng.IPromise<any> {
-    const extendedParams: IConfirmationModalParams = { ...this.defaults, ...params };
-
-    if (extendedParams.body) {
-      extendedParams.body = this.$sce.trustAsHtml(extendedParams.body);
+    if (params.body) {
+      extendedParams.bodyContent = toMarkdown(params.body);
     }
 
-    const modalArgs: IModalSettings = {
-      templateUrl: require('./confirm.html'),
-      controller: 'ConfirmationModalCtrl as ctrl',
-      resolve: {
-        params: () => extendedParams,
-      },
-    };
-
-    if (params.size) {
-      modalArgs.size = params.size;
+    const { taskMonitorConfig, taskMonitorConfigs } = params;
+    if (taskMonitorConfig) {
+      extendedParams.taskMonitor = new TaskMonitor(taskMonitorConfig);
+    }
+    if (taskMonitorConfigs) {
+      extendedParams.taskMonitors = taskMonitorConfigs.map(m => new TaskMonitor(m));
     }
 
-    if (params.windowClass) {
-      modalArgs.windowClass = params.windowClass;
-    }
+    const { promise, resolve, reject } = $q.defer();
+    ReactModal.show(ConfirmModal, extendedParams).then(resolve, reject);
 
-    const result = this.$uibModal.open(modalArgs).result;
+    // modal was dismissed
+    promise.catch(() => {});
 
-    result.catch(() => {});
-
-    return result;
+    return promise;
   }
 }
-
-export const CONFIRMATION_MODAL_SERVICE = 'spinnaker.core.confirmationModal.service';
-module(CONFIRMATION_MODAL_SERVICE, [
-  require('angular-ui-bootstrap'),
-  require('./confirmationModal.controller').name,
-]).service('confirmationModalService', ConfirmationModalService);

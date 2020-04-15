@@ -1,8 +1,8 @@
-import * as React from 'react';
+import React from 'react';
 
-import { Application, ReactInjector } from '@spinnaker/core';
+import { Application, ConfirmationModalService } from '@spinnaker/core';
 
-import { StatefulMIGService } from 'google/serverGroup/details/stateful/StatefulMIGService';
+import { StatefulMIGService } from './StatefulMIGService';
 import { IGceServerGroup } from 'google/domain';
 
 interface IMarkDiskStatefulButtonProps {
@@ -13,7 +13,7 @@ interface IMarkDiskStatefulButtonProps {
 
 export function MarkDiskStatefulButton({ application, deviceName, serverGroup }: IMarkDiskStatefulButtonProps) {
   function openConfirmationModal(): void {
-    ReactInjector.confirmationModalService.confirm({
+    ConfirmationModalService.confirm({
       account: serverGroup.account,
       askForReason: true,
       buttonText: 'Mark as stateful',

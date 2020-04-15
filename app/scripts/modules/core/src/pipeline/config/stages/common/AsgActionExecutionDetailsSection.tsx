@@ -1,6 +1,6 @@
-import * as React from 'react';
+import React from 'react';
 
-import { StageExecutionLogs, StageFailureMessage } from 'core/pipeline';
+import { StageFailureMessage, StageExecutionLogs } from '../../../details';
 import { ExecutionDetailsSection, IExecutionDetailsSectionProps } from './';
 import { AccountTag } from 'core/account';
 

@@ -1,6 +1,6 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 import _ from 'lodash';
 
 import {
@@ -9,14 +9,19 @@ import {
   LOAD_BALANCER_READ_SERVICE,
   SECURITY_GROUP_READER,
 } from '@spinnaker/core';
+import { AZURE_IMAGE_IMAGE_READER } from '../../image/image.reader';
+import { AZURE_INSTANCE_AZUREINSTANCETYPE_SERVICE } from '../../instance/azureInstanceType.service';
 
-module.exports = angular
-  .module('spinnaker.azure.serverGroup.configure.service', [
-    require('../../image/image.reader').name,
+export const AZURE_SERVERGROUP_CONFIGURE_SERVERGROUPCONFIGURATION_SERVICE =
+  'spinnaker.azure.serverGroup.configure.service';
+export const name = AZURE_SERVERGROUP_CONFIGURE_SERVERGROUPCONFIGURATION_SERVICE; // for backwards compatibility
+angular
+  .module(AZURE_SERVERGROUP_CONFIGURE_SERVERGROUPCONFIGURATION_SERVICE, [
+    AZURE_IMAGE_IMAGE_READER,
     LOAD_BALANCER_READ_SERVICE,
     SECURITY_GROUP_READER,
     CACHE_INITIALIZER_SERVICE,
-    require('../../instance/azureInstanceType.service').name,
+    AZURE_INSTANCE_AZUREINSTANCETYPE_SERVICE,
   ])
   .factory('azureServerGroupConfigurationService', [
     '$q',
@@ -33,17 +38,17 @@ module.exports = angular
       loadBalancerReader,
       azureInstanceTypeService,
     ) {
-      var dataDiskTypes = ['Standard_LRS', 'StandardSSD_LRS', 'Premium_LRS'];
-      var dataDiskCachingTypes = ['None', 'ReadOnly', 'ReadWrite'];
+      const dataDiskTypes = ['Standard_LRS', 'StandardSSD_LRS', 'Premium_LRS'];
+      const dataDiskCachingTypes = ['None', 'ReadOnly', 'ReadWrite'];
 
-      var healthCheckTypes = ['EC2', 'ELB'],
-        terminationPolicies = [
-          'OldestInstance',
-          'NewestInstance',
-          'OldestLaunchConfiguration',
-          'ClosestToNextInstanceHour',
-          'Default',
-        ];
+      const healthCheckTypes = ['EC2', 'ELB'];
+      const terminationPolicies = [
+        'OldestInstance',
+        'NewestInstance',
+        'OldestLaunchConfiguration',
+        'ClosestToNextInstanceHour',
+        'Default',
+      ];
 
       function configureUpdateCommand(command) {
         command.backingData = {
@@ -92,15 +97,15 @@ module.exports = angular
           dirty: {},
         };
 
-        const locations = [c.region],
-          { credentialsKeyedByAccount } = c.backingData,
-          { locationToInstanceTypesMap } = credentialsKeyedByAccount[c.credentials];
+        const locations = [c.region];
+        const { credentialsKeyedByAccount } = c.backingData;
+        const { locationToInstanceTypesMap } = credentialsKeyedByAccount[c.credentials];
 
         if (locations.every(l => !l)) {
           return result;
         }
 
-        let filtered = azureInstanceTypeService
+        const filtered = azureInstanceTypeService
           .getAvailableTypesForRegions(locationToInstanceTypesMap, locations)
           .map(type => type.name);
 
@@ -114,10 +119,10 @@ module.exports = angular
       }
 
       function configureImages(command) {
-        var result = {
+        const result = {
           dirty: {},
         };
-        var regionalImages = null;
+        let regionalImages = null;
         if (command.viewState.disableImageSelection) {
           return result;
         }
@@ -165,7 +170,7 @@ module.exports = angular
       }
 
       function getRegionalSecurityGroups(command) {
-        var newSecurityGroups = command.backingData.securityGroups[command.credentials] || {
+        const newSecurityGroups = command.backingData.securityGroups[command.credentials] || {
           azure: {},
         };
         return _.chain(newSecurityGroups[command.region])
@@ -174,14 +179,14 @@ module.exports = angular
       }
 
       function configureSecurityGroupOptions(command) {
-        var result = {
+        const result = {
           dirty: {},
         };
-        var currentOptions;
+        let currentOptions;
         if (command.backingData.filtered.securityGroups) {
           currentOptions = command.backingData.filtered.securityGroups;
         }
-        var newRegionalSecurityGroups = getRegionalSecurityGroups(command);
+        const newRegionalSecurityGroups = getRegionalSecurityGroups(command);
         if (command.selectedSecurityGroup) {
           // one has not been previously selected. We are either configuring for the
           //first time or they changed regions or account
@@ -222,15 +227,15 @@ module.exports = angular
       }
 
       function configureLoadBalancerOptions(command) {
-        var result = {
+        const result = {
           dirty: {},
         };
-        var current = command.loadBalancers;
-        var newLoadBalancers = getLoadBalancerNames(command.backingData.loadBalancers);
+        const current = command.loadBalancers;
+        const newLoadBalancers = getLoadBalancerNames(command.backingData.loadBalancers);
 
         if (current && command.loadBalancers) {
-          var matched = _.intersection(newLoadBalancers, command.loadBalancers);
-          var removed = _.xor(matched, current);
+          const matched = _.intersection(newLoadBalancers, command.loadBalancers);
+          const removed = _.xor(matched, current);
           command.loadBalancers = matched;
           if (removed.length) {
             result.dirty.loadBalancers = removed;
@@ -250,11 +255,11 @@ module.exports = angular
       }
 
       function configureLoadBalancers(command) {
-        var result = {
+        const result = {
           dirty: {},
         };
-        var temp = command.backingData.loadBalancers;
-        var filterlist = _.filter(temp, function(lb) {
+        const temp = command.backingData.loadBalancers;
+        const filterlist = _.filter(temp, function(lb) {
           return lb.account === command.credentials && lb.region === command.region;
         });
 
@@ -266,7 +271,7 @@ module.exports = angular
 
       function attachEventHandlers(cmd) {
         cmd.regionChanged = function regionChanged(command, isInit = false) {
-          var result = {
+          const result = {
             dirty: {},
           };
           if (command.region && command.credentials) {
@@ -296,12 +301,12 @@ module.exports = angular
         };
 
         cmd.credentialsChanged = function credentialsChanged(command, isInit) {
-          var result = {
+          const result = {
             dirty: {},
           };
-          var backingData = command.backingData;
+          const backingData = command.backingData;
           if (command.credentials) {
-            var regionsForAccount = backingData.credentialsKeyedByAccount[command.credentials] || {
+            const regionsForAccount = backingData.credentialsKeyedByAccount[command.credentials] || {
               regions: [],
               defaultKeyPair: null,
             };

@@ -1,12 +1,15 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 import { HealthCheckTemplate } from '../templates';
-import * as _ from 'lodash';
+import _ from 'lodash';
 
-module.exports = angular
-  .module('spinnaker.deck.httpLoadBalancer.healthCheck.component', [])
-  .component('gceHttpLoadBalancerHealthCheck', {
+export const GOOGLE_LOADBALANCER_CONFIGURE_HTTP_HEALTHCHECK_HEALTHCHECK_COMPONENT =
+  'spinnaker.deck.httpLoadBalancer.healthCheck.component';
+export const name = GOOGLE_LOADBALANCER_CONFIGURE_HTTP_HEALTHCHECK_HEALTHCHECK_COMPONENT; // for backwards compatibility
+module(GOOGLE_LOADBALANCER_CONFIGURE_HTTP_HEALTHCHECK_HEALTHCHECK_COMPONENT, []).component(
+  'gceHttpLoadBalancerHealthCheck',
+  {
     bindings: {
       command: '=',
       deleteHealthCheck: '&',
@@ -59,4 +62,5 @@ module.exports = angular
 
       this.healthCheckType = this.healthCheck.healthCheckType;
     },
-  });
+  },
+);

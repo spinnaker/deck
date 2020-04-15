@@ -1,12 +1,13 @@
-import { MenuTitle } from 'core/application/nav/MenuTitle';
-import * as React from 'react';
+import { MenuTitle } from './MenuTitle';
+import React from 'react';
 import { UIRouterContext } from '@uirouter/react-hybrid';
 import { UISref, UISrefActive } from '@uirouter/react';
 import { Subscription } from 'rxjs';
 import { Dropdown } from 'react-bootstrap';
 import { merge } from 'rxjs/observable/merge';
 
-import { Application, ApplicationDataSource } from 'core/application';
+import { Application } from '../application.model';
+import { ApplicationDataSource } from '../service/applicationDataSource';
 import { IEntityTags } from 'core/domain';
 import { noop } from 'core/utils';
 import { DataSourceNotifications } from 'core/entityTag/notifications/DataSourceNotifications';
@@ -55,7 +56,7 @@ export class CategoryDropdown extends React.Component<ICategoryDropdownProps, IC
     const withBadges = category.dataSources.filter(ds => ds.badge).map(ds => application.getDataSource(ds.badge));
     this.runningCountSubscription = merge(...withBadges.map(ds => ds.refresh$)).subscribe(() => {
       this.setState({
-        runningCount: withBadges.reduce((acc: number, ds: ApplicationDataSource) => acc + ds.data.length, 0),
+        runningCount: withBadges.reduce((acc: number, ds: ApplicationDataSource<any[]>) => acc + ds.data.length, 0),
       });
     });
     if (category.key === 'delivery') {

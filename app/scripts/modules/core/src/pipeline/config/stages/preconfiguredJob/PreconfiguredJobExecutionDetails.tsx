@@ -1,13 +1,9 @@
-import * as React from 'react';
+import React from 'react';
 import { get, sortBy, last } from 'lodash';
 
-import {
-  IExecutionDetailsSectionProps,
-  ExecutionDetailsSection,
-  StageExecutionLogs,
-  StageFailureMessage,
-} from 'core/pipeline';
-import { IPreconfiguredJobParameter } from './preconfiguredJobStage';
+import { IExecutionDetailsSectionProps, ExecutionDetailsSection } from '../common';
+import { StageExecutionLogs, StageFailureMessage } from '../../../details';
+import { IPreconfiguredJobParameter } from './preconfiguredJob.reader';
 import { JobStageExecutionLogs } from 'core/manifest/stage/JobStageExecutionLogs';
 import { IStage, IJobOwnedPodStatus } from 'core/domain';
 import { AccountService } from 'core/account';
@@ -75,7 +71,6 @@ export class PreconfiguredJobExecutionDetails extends React.Component<IExecution
     const { stage } = this.props;
 
     if (cloudProvider === 'kubernetes') {
-      const manifest = get(stage, ['context', 'manifest'], null);
       const namespace = get<string>(stage, ['context', 'jobStatus', 'location']);
       const deployedJobs = get(this.props.stage, ['context', 'deploy.jobs']);
       const deployedName = get(deployedJobs, namespace, [])[0] || '';
@@ -85,7 +80,6 @@ export class PreconfiguredJobExecutionDetails extends React.Component<IExecution
       return (
         <div className="well">
           <JobStageExecutionLogs
-            manifest={manifest}
             deployedName={deployedName}
             account={this.props.stage.context.account}
             application={this.props.application}

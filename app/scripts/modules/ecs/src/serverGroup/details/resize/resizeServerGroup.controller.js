@@ -1,13 +1,19 @@
 'use strict';
 
-const angular = require('angular');
+import * as angular from 'angular';
 
 import { SERVER_GROUP_WRITER, TaskMonitor } from '@spinnaker/core';
 
 import { ECS_RESIZE_CAPACITY_COMPONENT } from './resizeCapacity.component';
 
-module.exports = angular
-  .module('spinnaker.ecs.serverGroup.details.resize.controller', [SERVER_GROUP_WRITER, ECS_RESIZE_CAPACITY_COMPONENT])
+export const ECS_SERVERGROUP_DETAILS_RESIZE_RESIZESERVERGROUP_CONTROLLER =
+  'spinnaker.ecs.serverGroup.details.resize.controller';
+export const name = ECS_SERVERGROUP_DETAILS_RESIZE_RESIZESERVERGROUP_CONTROLLER; // for backwards compatibility
+angular
+  .module(ECS_SERVERGROUP_DETAILS_RESIZE_RESIZESERVERGROUP_CONTROLLER, [
+    SERVER_GROUP_WRITER,
+    ECS_RESIZE_CAPACITY_COMPONENT,
+  ])
   .controller('ecsResizeServerGroupCtrl', [
     '$scope',
     '$uibModalInstance',
@@ -37,7 +43,7 @@ module.exports = angular
       }
 
       this.isValid = function() {
-        var command = $scope.command;
+        const command = $scope.command;
         if (!$scope.verification.verified) {
           return false;
         }
@@ -56,12 +62,12 @@ module.exports = angular
         if (!this.isValid()) {
           return;
         }
-        var capacity = { min: $scope.command.min, max: $scope.command.max, desired: $scope.command.desired };
+        let capacity = { min: $scope.command.min, max: $scope.command.max, desired: $scope.command.desired };
         if (!$scope.command.advancedMode) {
           capacity = { min: $scope.command.newSize, max: $scope.command.newSize, desired: $scope.command.newSize };
         }
 
-        var submitMethod = function() {
+        const submitMethod = function() {
           return serverGroupWriter.resizeServerGroup(serverGroup, application, {
             capacity: capacity,
             interestingHealthProviderNames: $scope.command.interestingHealthProviderNames,

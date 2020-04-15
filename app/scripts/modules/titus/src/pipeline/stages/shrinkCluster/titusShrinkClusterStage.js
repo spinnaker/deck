@@ -1,11 +1,13 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { AccountService, Registry } from '@spinnaker/core';
 
-module.exports = angular
-  .module('spinnaker.titus.pipeline.stage.shrinkClusterStage', [])
+export const TITUS_PIPELINE_STAGES_SHRINKCLUSTER_TITUSSHRINKCLUSTERSTAGE =
+  'spinnaker.titus.pipeline.stage.shrinkClusterStage';
+export const name = TITUS_PIPELINE_STAGES_SHRINKCLUSTER_TITUSSHRINKCLUSTERSTAGE; // for backwards compatibility
+module(TITUS_PIPELINE_STAGES_SHRINKCLUSTER_TITUSSHRINKCLUSTERSTAGE, [])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'shrinkCluster',
@@ -24,9 +26,9 @@ module.exports = angular
   .controller('titusShrinkClusterStageCtrl', [
     '$scope',
     function($scope) {
-      var ctrl = this;
+      const ctrl = this;
 
-      let stage = $scope.stage;
+      const stage = $scope.stage;
 
       $scope.state = {
         accounts: false,

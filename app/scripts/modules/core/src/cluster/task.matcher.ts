@@ -1,6 +1,6 @@
-import { get, intersection, map } from 'lodash';
+import { intersection, map } from 'lodash';
 
-import { IServerGroup, ITask, IExecutionStage } from 'core/domain';
+import { IServerGroup, ITask } from 'core/domain';
 
 export type ITaskMatcher = (task: ITask, serverGroup: IServerGroup) => boolean;
 
@@ -55,8 +55,7 @@ export class TaskMatcher {
     this.instanceIdMatchers.forEach(m => (matchers[m] = instanceIdsTaskMatcher));
     this.baseTaskMatchers.forEach(m => (matchers[m] = baseTaskMatcher));
 
-    const emptyStage = { context: {} } as IExecutionStage;
-    const firstStage = get(task, 'execution.stages[0]', emptyStage);
+    const firstStage = task.execution?.stages?.[0] ?? { context: {} };
     const notificationType: string =
       firstStage.context['notification.type'] || firstStage.type || task.getValueFor('notification.type');
 
@@ -66,19 +65,19 @@ export class TaskMatcher {
 }
 
 function createcopylastasgMatcher(task: ITask, serverGroup: IServerGroup): boolean {
-  const source: any = task.getValueFor('source'),
-    targetAccount: string = task.getValueFor('deploy.account.name'),
-    targetRegion: string = task.getValueFor('availabilityZones')
-      ? Object.keys(task.getValueFor('availabilityZones'))[0]
-      : null,
-    deployedServerGroups: { [region: string]: string[] } = task.getValueFor('deploy.server.groups'),
-    targetServerGroup: string =
-      targetRegion && deployedServerGroups && deployedServerGroups[targetRegion]
-        ? deployedServerGroups[targetRegion][0]
-        : null,
-    sourceServerGroup: string = source.asgName,
-    sourceAccount: string = source.account,
-    sourceRegion: string = source.region;
+  const source: any = task.getValueFor('source');
+  const targetAccount: string = task.getValueFor('deploy.account.name');
+  const targetRegion: string = task.getValueFor('availabilityZones')
+    ? Object.keys(task.getValueFor('availabilityZones'))[0]
+    : null;
+  const deployedServerGroups: { [region: string]: string[] } = task.getValueFor('deploy.server.groups');
+  const targetServerGroup: string =
+    targetRegion && deployedServerGroups && deployedServerGroups[targetRegion]
+      ? deployedServerGroups[targetRegion][0]
+      : null;
+  const sourceServerGroup: string = source.asgName;
+  const sourceAccount: string = source.account;
+  const sourceRegion: string = source.region;
 
   const targetMatches =
     serverGroup.account === targetAccount &&
@@ -92,11 +91,11 @@ function createcopylastasgMatcher(task: ITask, serverGroup: IServerGroup): boole
 }
 
 function createdeployMatcher(task: ITask, serverGroup: IServerGroup): boolean {
-  const account: string = task.getValueFor('deploy.account.name'),
-    region: string = task.getValueFor('deploy.server.groups')
-      ? Object.keys(task.getValueFor('deploy.server.groups'))[0]
-      : null,
-    serverGroupName: string = serverGroup && region ? task.getValueFor('deploy.server.groups')[region][0] : null;
+  const account: string = task.getValueFor('deploy.account.name');
+  const region: string = task.getValueFor('deploy.server.groups')
+    ? Object.keys(task.getValueFor('deploy.server.groups'))[0]
+    : null;
+  const serverGroupName: string = serverGroup && region ? task.getValueFor('deploy.server.groups')[region][0] : null;
 
   if (account && serverGroup && region) {
     return serverGroup.account === account && serverGroup.region === region && serverGroup.name === serverGroupName;
@@ -127,8 +126,8 @@ function instanceIdsTaskMatcher(task: ITask, serverGroup: IServerGroup): boolean
 }
 
 function rollbackServerGroupTaskMatcher(task: ITask, serverGroup: IServerGroup): boolean {
-  const account: string = task.getValueFor('credentials'),
-    region: string = task.getValueFor('region');
+  const account: string = task.getValueFor('credentials');
+  const region: string = task.getValueFor('region');
 
   if (account && serverGroup.account === account && region && serverGroup.region === region) {
     return (

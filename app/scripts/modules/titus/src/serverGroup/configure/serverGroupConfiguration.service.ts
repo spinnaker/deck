@@ -20,6 +20,8 @@ import {
   SecurityGroupReader,
   IVpc,
   ISecurityGroup,
+  NameUtils,
+  setMatchingResourceSummary,
 } from '@spinnaker/core';
 import {
   IAmazonApplicationLoadBalancer,
@@ -28,7 +30,7 @@ import {
   VpcReader,
 } from '@spinnaker/amazon';
 
-import { IJobDisruptionBudget } from 'titus/domain';
+import { IJobDisruptionBudget, ITitusResources } from 'titus/domain';
 import { ITitusServiceJobProcesses } from 'titus/domain/ITitusServiceJobProcesses';
 
 export interface ITitusServerGroupCommandBackingData extends IServerGroupCommandBackingData {
@@ -81,13 +83,7 @@ export interface ITitusServerGroupCommand extends IServerGroupCommand {
   digest?: string;
   image: string;
   inService: boolean;
-  resources: {
-    cpu: number;
-    memory: number;
-    disk: number;
-    networkMbps: number;
-    gpu: number;
-  };
+  resources: ITitusResources;
   efs: {
     efsId: string;
     mountPoint: string;
@@ -141,13 +137,20 @@ export class TitusServerGroupConfigurationService {
       command.viewState.dirty = { ...(command.viewState.dirty || {}), ...result.dirty };
       this.configureLoadBalancerOptions(command);
       this.configureSecurityGroupOptions(command);
+      setMatchingResourceSummary(command);
       return result;
     };
 
     cmd.regionChanged = (command: ITitusServerGroupCommand) => {
       this.configureLoadBalancerOptions(command);
       this.configureSecurityGroupOptions(command);
+      setMatchingResourceSummary(command);
       return {};
+    };
+
+    cmd.clusterChanged = (command: ITitusServerGroupCommand): void => {
+      command.moniker = NameUtils.getMoniker(command.application, command.stack, command.freeFormDetails);
+      setMatchingResourceSummary(command);
     };
   }
 
@@ -217,7 +220,7 @@ export class TitusServerGroupConfigurationService {
 
   private configureSecurityGroupOptions(command: ITitusServerGroupCommand): void {
     const currentOptions = command.backingData.filtered.securityGroups;
-    if (command.credentials.includes('${') || command.region.includes('${')) {
+    if (command.credentials.includes('${') || (command.region && command.region.includes('${'))) {
       // If any of our dependencies are expressions, the only thing we can do is preserve current values
       command.backingData.filtered.securityGroups = command.securityGroups.map(group => ({ name: group, id: group }));
     } else {
@@ -306,7 +309,7 @@ export class TitusServerGroupConfigurationService {
 
   public configureLoadBalancerOptions(command: ITitusServerGroupCommand) {
     const currentTargetGroups = command.targetGroups || [];
-    if (command.credentials.includes('${') || command.region.includes('${')) {
+    if (command.credentials.includes('${') || (command.region && command.region.includes('${'))) {
       // If any of our dependencies are expressions, the only thing we can do is preserve current values
       command.targetGroups = currentTargetGroups;
       (command.backingData.filtered as any).targetGroups = currentTargetGroups;

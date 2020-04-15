@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 
 import { ICapacity } from '../../serverGroupWriter.service';
 import { CurrentCapacity } from './CurrentCapacity';
@@ -11,7 +11,7 @@ interface ICapacityDetailsSectionProps {
 
 export function CapacityDetailsSection(props: ICapacityDetailsSectionProps) {
   const { capacity, current } = props;
-  const simpleMode = capacity.max === capacity.max;
+  const simpleMode = capacity.min === capacity.max;
   return (
     <dl className="dl-horizontal dl-flex">
       <DesiredCapacity capacity={capacity} simpleMode={simpleMode} />

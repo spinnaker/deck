@@ -1,12 +1,13 @@
 import { mock } from 'angular';
 import { map } from 'lodash';
-import * as React from 'react';
+import React from 'react';
 
 import { IStage, ITriggerTypeConfig, IStageTypeConfig } from 'core/domain';
 import { IRegion } from 'core/account/AccountService';
 import { Registry } from 'core/registry';
 import { ITriggerTemplateComponentProps } from '../manualExecution/TriggerTemplate';
 import { PipelineRegistry } from './PipelineRegistry';
+import { IPreconfiguredJob, makePreconfiguredJobStage, PreconfiguredJobReader } from './stages/preconfiguredJob';
 
 const mockProviderAccount = {
   accountId: 'abc',
@@ -103,7 +104,7 @@ describe('PipelineRegistry: API', function() {
     it(
       'augments provider stages with parent keys, labels, manualExecutionComponents, and descriptions',
       mock.inject(function() {
-        const CompA = ({  }: ITriggerTemplateComponentProps) => React.createElement('a');
+        const CompA = ({}: ITriggerTemplateComponentProps) => React.createElement('a');
         const baseStage = {
             key: 'c',
             useBaseProvider: true,
@@ -145,8 +146,8 @@ describe('PipelineRegistry: API', function() {
     it(
       'allows provider stages to override of label, description, manualExecutionComponent',
       mock.inject(function() {
-        const CompA = ({  }: ITriggerTemplateComponentProps) => React.createElement('a');
-        const CompB = ({  }: ITriggerTemplateComponentProps) => React.createElement('b');
+        const CompA = ({}: ITriggerTemplateComponentProps) => React.createElement('a');
+        const CompB = ({}: ITriggerTemplateComponentProps) => React.createElement('b');
         Registry.pipeline.registerStage({
           key: 'a',
           useBaseProvider: true,
@@ -177,9 +178,53 @@ describe('PipelineRegistry: API', function() {
         Registry.pipeline.registerStage(config);
         expect(Registry.pipeline.getStageConfig({ type: 'a' } as IStage)).toEqual(config);
         expect(Registry.pipeline.getStageConfig({ type: 'a1' } as IStage)).toEqual(config);
-        expect(Registry.pipeline.getStageConfig({ type: 'b' } as IStage)).toBe(null);
+        expect(Registry.pipeline.getStageConfig({ type: 'b' } as IStage)).toBeFalsy();
       }),
     );
+  });
+
+  describe('preconfigured stage', function() {
+    beforeEach(mock.inject());
+
+    // Gate response
+    const makeJobMetadata = () => {
+      return {
+        type: 'job',
+        parameters: [
+          { name: 'param', description: 'description', defaultValue: 'abc', label: 'Param', type: 'string' },
+        ],
+      } as Partial<IPreconfiguredJob>;
+    };
+
+    const spyOnReader = () =>
+      spyOn(PreconfiguredJobReader, 'list').and.callFake(() => Promise.resolve([makeJobMetadata()]));
+
+    it('registration returns a promise', async () => {
+      spyOnReader();
+      const result = Registry.pipeline.registerPreconfiguredJobStage(makePreconfiguredJobStage('job'));
+      expect(typeof result.then).toBe('function');
+      await result;
+    });
+
+    it('registers a stage', async () => {
+      spyOnReader();
+      expect(Registry.pipeline.getStageTypes().length).toBe(0);
+      await Registry.pipeline.registerPreconfiguredJobStage(makePreconfiguredJobStage('job'));
+      expect(Registry.pipeline.getStageTypes().length).toBe(1);
+    });
+
+    it('fetches fresh preconfigured jobs metadata from gate', async () => {
+      const spy = spyOnReader();
+      await Registry.pipeline.registerPreconfiguredJobStage(makePreconfiguredJobStage('job'));
+      expect(spy).toHaveBeenCalledTimes(1);
+    });
+
+    it('applies default job parameters to the stage config', async () => {
+      spyOnReader();
+      await Registry.pipeline.registerPreconfiguredJobStage(makePreconfiguredJobStage('job'));
+      const stageType = Registry.pipeline.getStageTypes()[0];
+      expect(stageType.defaults.parameters).toEqual({ param: 'abc' });
+    });
   });
 
   describe('getStageConfig all permutations', function() {
@@ -234,7 +279,7 @@ describe('PipelineRegistry: API', function() {
       const pipelineRegistry = new PipelineRegistry();
       slimmaker.filter(stage => stage !== unmatchedStage).forEach(stage => pipelineRegistry.registerStage(stage));
 
-      expect(pipelineRegistry.getStageConfig({ type: 'x' } as IStage)).toEqual(null);
+      expect(pipelineRegistry.getStageConfig({ type: 'x' } as IStage)).toBeFalsy();
     });
 
     it('matches renamed stage with both stageType.key or (legacy) stageType.alias', function() {
@@ -415,7 +460,7 @@ describe('PipelineRegistry: API', function() {
     });
 
     it('hasManualExecutionComponentForTriggerType returns true if declared and available', function() {
-      const CompA = ({  }: ITriggerTemplateComponentProps) => React.createElement('a');
+      const CompA = ({}: ITriggerTemplateComponentProps) => React.createElement('a');
       Registry.pipeline.registerTrigger({ key: 'cron', manualExecutionComponent: CompA } as ITriggerTypeConfig);
       expect(Registry.pipeline.hasManualExecutionComponentForTriggerType('cron')).toBe(true);
     });
@@ -427,7 +472,7 @@ describe('PipelineRegistry: API', function() {
     });
 
     it('hasManualExecutionComponentForTriggerType returns handler if declared and available', function() {
-      const CompA = ({  }: ITriggerTemplateComponentProps) => React.createElement('a');
+      const CompA = ({}: ITriggerTemplateComponentProps) => React.createElement('a');
       Registry.pipeline.registerTrigger({ key: 'cron', manualExecutionComponent: CompA } as ITriggerTypeConfig);
       expect(Registry.pipeline.getManualExecutionComponentForTriggerType('cron')).toEqual(CompA);
     });

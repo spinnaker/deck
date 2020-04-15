@@ -1,9 +1,9 @@
-import * as React from 'react';
+import React from 'react';
 import { $window } from 'ngimport';
 
 import { IScheduler } from 'core/scheduler/SchedulerFactory';
 import { SchedulerFactory } from 'core/scheduler';
-import { Tooltip } from 'core/presentation';
+import { Tooltip } from '../Tooltip';
 import { relativeTime, timestamp } from 'core/utils/timeFormatters';
 
 import './refresher.less';

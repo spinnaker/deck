@@ -1,10 +1,12 @@
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
+import React from 'react';
+import ReactDOM from 'react-dom';
 import { Overlay, Popover, PopoverProps } from 'react-bootstrap';
 import { Observable, Subject } from 'rxjs';
 
-import { Placement } from 'core/presentation';
+import { Placement } from './Placement';
 import { UUIDGenerator } from 'core/utils';
+
+import './HoverablePopover.css';
 
 export interface IHoverablePopoverContentsProps extends IHoverablePopoverProps {
   // The popover contents can forcibly hide the popover by calling this function
@@ -28,7 +30,6 @@ export interface IHoverablePopoverProps extends React.HTMLProps<any> {
   hOffsetPercent?: string;
   /** class to put on the popover content */
   className?: string;
-
   /** Rendered on the top of the popover content */
   title?: string;
   id?: string;
@@ -157,7 +158,7 @@ export class HoverablePopover extends React.Component<IHoverablePopoverProps, IH
     );
 
     return (
-      <Wrapper style={{ display: 'inline' }} onMouseEnter={this.handleMouseEvent} onMouseLeave={this.handleMouseEvent}>
+      <Wrapper className="HoverablePopover" onMouseEnter={this.handleMouseEvent} onMouseLeave={this.handleMouseEvent}>
         {this.props.children}
         <Overlay
           show={popoverIsOpen}

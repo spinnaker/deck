@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 
 import { FormikFormField, RadioButtonInput, TextInput } from '@spinnaker/core';
 
@@ -32,7 +32,6 @@ export class HealthCheck extends React.Component<IHealthCheckProps> {
           <FormikFormField
             name={healthCheckTypeFieldName}
             label="Health Check Type"
-            fastField={false}
             input={props => <RadioButtonInput {...props} inline={true} options={this.HEALTH_CHECK_TYPE_OPTIONS} />}
             onChange={value => {
               onHealthCheckTypeChange && onHealthCheckTypeChange(value);

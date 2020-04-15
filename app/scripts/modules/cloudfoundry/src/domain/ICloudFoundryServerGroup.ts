@@ -1,7 +1,8 @@
 import { IServerGroup } from '@spinnaker/core';
 
-import { ICloudFoundrySpace, ICloudFoundryDroplet } from 'cloudfoundry/domain';
-import { ICloudFoundryInstance } from 'cloudfoundry/domain/ICloudFoundryInstance';
+import { ICloudFoundrySpace } from './ICloudFoundrySpace';
+import { ICloudFoundryDroplet } from './ICloudFoundryDroplet';
+import { ICloudFoundryInstance } from './ICloudFoundryInstance';
 
 export interface ICloudFoundryServerGroup extends IServerGroup {
   appsManagerUri?: string;
@@ -18,7 +19,7 @@ export interface ICloudFoundryServerGroup extends IServerGroup {
   env: ICloudFoundryEnvVar[];
   ciBuild: ICloudFoundryBuildInfo;
   appArtifact: ICloudFoundryArtifactInfo;
-  pipelineId: String;
+  pipelineId: string;
 }
 
 export interface ICloudFoundryServiceInstance {

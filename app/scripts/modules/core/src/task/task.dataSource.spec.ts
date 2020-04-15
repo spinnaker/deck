@@ -20,7 +20,7 @@ describe('Task Data Source', function() {
   );
 
   function configureApplication() {
-    ApplicationDataSourceRegistry.registerDataSource({ key: 'serverGroups' });
+    ApplicationDataSourceRegistry.registerDataSource({ key: 'serverGroups', defaultData: [] });
     application = ApplicationModelBuilder.createApplicationForTests(
       'app',
       ...ApplicationDataSourceRegistry.getDataSources(),
@@ -82,7 +82,11 @@ describe('Task Data Source', function() {
       let errorsHandled = 0,
         successesHandled = 0;
       configureApplication();
-      application.getDataSource('tasks').onRefresh($scope, () => successesHandled++, () => errorsHandled++);
+      application.getDataSource('tasks').onRefresh(
+        $scope,
+        () => successesHandled++,
+        () => errorsHandled++,
+      );
 
       application.getDataSource('tasks').refresh();
       $scope.$digest();

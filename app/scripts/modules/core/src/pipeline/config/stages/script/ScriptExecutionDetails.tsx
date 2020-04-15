@@ -1,8 +1,9 @@
 import { RenderOutputFile } from 'core/presentation/RenderOutputFile';
-import * as React from 'react';
+import React from 'react';
 import { get } from 'lodash';
 
-import { ExecutionDetailsSection, IExecutionDetailsSectionProps, StageFailureMessage } from 'core/pipeline';
+import { ExecutionDetailsSection, IExecutionDetailsSectionProps } from '../common';
+import { StageFailureMessage } from '../../../details';
 
 export function ScriptExecutionDetails(props: IExecutionDetailsSectionProps) {
   const { stage } = props;

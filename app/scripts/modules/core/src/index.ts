@@ -18,6 +18,7 @@ export * from './deploymentStrategy';
 export * from './domain';
 
 export * from './entityTag';
+export * from './pipeline/config/stages/common/ExecutionMarkerIcon';
 // TODO: try pushing this export back down; for some unknown reason, it causes grief with the library (the export
 // is found by the TS compiler, but not at runtime)
 export * from './entityTag/notifications/EntityNotifications';
@@ -41,7 +42,7 @@ export * from './image';
 export * from './instance';
 
 export * from './loadBalancer';
-
+export * from './function';
 export * from './modal';
 
 export * from './managed';
@@ -53,12 +54,15 @@ export * from './naming';
 export * from './navigation';
 export * from './network';
 
+export * from './notification';
+
 export * from './orchestratedItem';
 export * from './overrideRegistry';
 
 export * from './pageTitle';
 export * from './pagerDuty';
 export * from './pipeline';
+export * from './plugins';
 export * from './presentation';
 export * from './projects';
 export * from './pubsub';
@@ -75,6 +79,7 @@ export * from './serverGroup';
 export * from './serverGroupManager';
 export * from './serviceAccount';
 export * from './services';
+export * from './slack';
 export * from './state';
 export * from './storage';
 export * from './subnet';
@@ -82,8 +87,6 @@ export * from './subnet';
 export * from './task';
 
 export * from './utils';
-
-export * from './validation';
 
 export * from './widgets';
 

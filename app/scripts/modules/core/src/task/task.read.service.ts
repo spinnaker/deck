@@ -1,5 +1,6 @@
 import { IPromise } from 'angular';
 import { $log, $q, $timeout } from 'ngimport';
+import { Subject } from 'rxjs';
 
 import { API } from 'core/api/ApiService';
 import { OrchestratedItemTransformer } from 'core/orchestratedItem/orchestratedItem.transformer';
@@ -26,17 +27,13 @@ export class TaskReader {
     return API.one('tasks', taskId)
       .get()
       .then((task: ITask) => {
-        OrchestratedItemTransformer.defineProperties(task);
-        if (task.steps && task.steps.length) {
-          task.steps.forEach(step => OrchestratedItemTransformer.defineProperties(step));
-        }
+        this.setTaskProperties(task);
         if (task.execution) {
           OrchestratedItemTransformer.defineProperties(task.execution);
           if (task.execution.stages) {
             task.execution.stages.forEach((stage: any) => OrchestratedItemTransformer.defineProperties(stage));
           }
         }
-        this.setTaskProperties(task);
         return task;
       })
       .catch((error: any) => $log.warn('There was an issue retrieving taskId: ', taskId, error));
@@ -47,6 +44,7 @@ export class TaskReader {
     closure: (task: ITask) => boolean,
     failureClosure?: (task: ITask) => boolean,
     interval = 1000,
+    notifier?: Subject<void>,
   ): IPromise<ITask> {
     const deferred = $q.defer<ITask>();
     if (!task) {
@@ -59,15 +57,25 @@ export class TaskReader {
       task.poller = $timeout(() => {
         this.getTask(task.id).then(updated => {
           this.updateTask(task, updated);
-          this.waitUntilTaskMatches(task, closure, failureClosure, interval).then(deferred.resolve, deferred.reject);
+          notifier?.next();
+          this.waitUntilTaskMatches(task, closure, failureClosure, interval, notifier).then(
+            deferred.resolve,
+            deferred.reject,
+          );
         });
       }, interval);
     }
     return deferred.promise;
   }
 
-  public static waitUntilTaskCompletes(task: ITask, interval = 1000): IPromise<ITask> {
-    return this.waitUntilTaskMatches(task, t => t.isCompleted, t => t.isFailed, interval);
+  public static waitUntilTaskCompletes(task: ITask, interval = 1000, notifier?: Subject<void>): IPromise<ITask> {
+    return this.waitUntilTaskMatches(
+      task,
+      t => t.isCompleted,
+      t => t.isFailed,
+      interval,
+      notifier,
+    );
   }
 
   /**

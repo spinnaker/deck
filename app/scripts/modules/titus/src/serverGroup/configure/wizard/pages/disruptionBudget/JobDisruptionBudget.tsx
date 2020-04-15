@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { FormikProps } from 'formik';
 import { Option } from 'react-select';
 import { isEqual, get } from 'lodash';
@@ -130,7 +130,10 @@ export class JobDisruptionBudget extends React.Component<IJobDisruptionBudgetPro
     const providers = values.disruptionBudget.containerHealthProviders;
     const existing = providers.find(p => p.name === provider);
     if (existing) {
-      setFieldValue('disruptionBudget.containerHealthProviders', providers.filter(p => p !== existing));
+      setFieldValue(
+        'disruptionBudget.containerHealthProviders',
+        providers.filter(p => p !== existing),
+      );
     } else {
       setFieldValue('disruptionBudget.containerHealthProviders', providers.concat({ name: provider }));
     }
@@ -159,7 +162,6 @@ export class JobDisruptionBudget extends React.Component<IJobDisruptionBudgetPro
 
           <FormikFormField
             name="usingDefault"
-            fastField={false}
             input={() => (
               <CheckboxInput
                 checked={usingDefault}
@@ -175,7 +177,6 @@ export class JobDisruptionBudget extends React.Component<IJobDisruptionBudgetPro
                 <FormikFormField
                   name="policyType"
                   label="Policy"
-                  fastField={false}
                   input={props => (
                     <div>
                       <TetheredSelect
@@ -209,7 +210,6 @@ export class JobDisruptionBudget extends React.Component<IJobDisruptionBudgetPro
                     <FormikFormField
                       name="rates"
                       label="Rates"
-                      fastField={false}
                       input={props => (
                         <TetheredSelect
                           {...props}
@@ -234,7 +234,6 @@ export class JobDisruptionBudget extends React.Component<IJobDisruptionBudgetPro
                     <FormikFormField
                       name="timeWindows"
                       label="When Can Disruption Occur?"
-                      fastField={false}
                       input={props => (
                         <TetheredSelect
                           {...props}
@@ -253,19 +252,12 @@ export class JobDisruptionBudget extends React.Component<IJobDisruptionBudgetPro
                 <FormikFormField
                   name="healthProviders"
                   label="Container Health Provider"
-                  fastField={false}
                   input={() => (
                     <div>
                       <CheckboxInput
                         checked={selectedProviders.includes('eureka')}
                         onChange={() => this.toggleHealthProvider('eureka')}
                         text="Discovery"
-                        disabled={usingDefault}
-                      />
-                      <CheckboxInput
-                        checked={selectedProviders.includes('atlasHealthCheckPoller')}
-                        onChange={() => this.toggleHealthProvider('atlasHealthCheckPoller')}
-                        text="Atlas Health Check"
                         disabled={usingDefault}
                       />
                     </div>

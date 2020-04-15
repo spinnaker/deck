@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { Field, FormikProps } from 'formik';
 import Select, { Option } from 'react-select';
 
@@ -10,11 +10,12 @@ import {
   PlatformHealthOverride,
   Application,
   ChecklistInput,
+  robotToHuman,
 } from '@spinnaker/core';
 
 import { ITitusServerGroupCommand } from '../../../configure/serverGroupConfiguration.service';
 import { intersection, set, union } from 'lodash';
-import { enabledProcesses, processesList } from 'titus/serverGroup/details/serviceJobProcesses/ServiceJobProcesses';
+import { enabledProcesses, processesList } from '../../../details/serviceJobProcesses/ServiceJobProcesses';
 import { ITitusServiceJobProcesses } from 'titus/domain/ITitusServiceJobProcesses';
 
 export interface IServerGroupParametersProps {
@@ -125,14 +126,16 @@ export class ServerGroupParameters extends React.Component<IServerGroupParameter
           <div className="col-md-4">
             <ChecklistInput
               value={enabledProcesses(values.serviceJobProcesses)}
-              stringOptions={union(processesList, Object.keys(values.serviceJobProcesses))}
+              options={union(processesList, Object.keys(values.serviceJobProcesses)).map((value: string) => ({
+                value,
+                label: robotToHuman(value),
+              }))}
               onChange={(e: React.ChangeEvent<any>) =>
                 setFieldValue(
                   'serviceJobProcesses',
                   union(processesList, Object.keys(values.serviceJobProcesses)).reduce(
-                    (processes: ITitusServiceJobProcesses, process: string) =>
-                      set(processes, process, e.target.value.includes(process)),
-                    {},
+                    (processes, process: string) => set(processes, process, !!e.target.value.includes(process)),
+                    {} as ITitusServiceJobProcesses,
                   ),
                 )
               }

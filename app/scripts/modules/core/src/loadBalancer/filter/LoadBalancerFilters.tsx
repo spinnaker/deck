@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { chain, cloneDeep, compact, debounce, uniq, map } from 'lodash';
 import { $rootScope } from 'ngimport';
 import { Subscription } from 'rxjs';
@@ -21,13 +21,10 @@ function poolBuilder(loadBalancers: any[]) {
     .map(lb => {
       const poolUnitTemplate = chain(poolValueCoordinates)
         .filter({ on: 'loadBalancer' })
-        .reduce(
-          (acc, coordinate) => {
-            acc[coordinate.filterField] = lb[coordinate.localField];
-            return acc;
-          },
-          {} as any,
-        )
+        .reduce((acc, coordinate) => {
+          acc[coordinate.filterField] = lb[coordinate.localField];
+          return acc;
+        }, {} as any)
         .value();
 
       const poolUnits = chain(['instances', 'detachedInstances'])

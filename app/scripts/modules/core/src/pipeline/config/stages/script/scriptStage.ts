@@ -2,7 +2,7 @@ import { module } from 'angular';
 
 import { Registry } from 'core/registry';
 import { AuthenticationService } from 'core/authentication';
-import { ExecutionDetailsTasks } from 'core/pipeline';
+import { ExecutionDetailsTasks } from '../common';
 
 import { ScriptStageConfig, validate } from './ScriptStageConfig';
 import { ScriptExecutionDetails } from './ScriptExecutionDetails';
@@ -12,7 +12,7 @@ module(SCRIPT_STAGE, []).config(() => {
   Registry.pipeline.registerStage({
     label: 'Script',
     description: 'Runs a script',
-    defaultTimeoutMs: 1000 * 60 * 60 * 2, // 2 hours
+    supportsCustomTimeout: true,
     key: 'script',
     restartable: true,
     defaults: {

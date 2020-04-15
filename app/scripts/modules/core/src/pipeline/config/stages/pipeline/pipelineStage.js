@@ -2,19 +2,19 @@
 
 import { pickBy } from 'lodash';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { ApplicationReader } from 'core/application/service/ApplicationReader';
-import { PipelineConfigService } from 'core/pipeline/config/services/PipelineConfigService';
+import { PipelineConfigService } from '../../services/PipelineConfigService';
 import { Registry } from 'core/registry';
 import { ExecutionDetailsTasks } from '../common';
 import { PipelineStageExecutionDetails } from './PipelineStageExecutionDetails';
 import { PipelineParametersExecutionDetails } from './PipelineParametersExecutionDetails';
-import { PipelineTemplateReader, PipelineTemplateV2Service } from 'core/pipeline';
-import { SETTINGS } from 'core/config';
+import { PipelineTemplateReader, PipelineTemplateV2Service } from '../../templates';
 
-module.exports = angular
-  .module('spinnaker.core.pipeline.stage.pipelineStage', [])
+export const CORE_PIPELINE_CONFIG_STAGES_PIPELINE_PIPELINESTAGE = 'spinnaker.core.pipeline.stage.pipelineStage';
+export const name = CORE_PIPELINE_CONFIG_STAGES_PIPELINE_PIPELINESTAGE; // for backwards compatibility
+module(CORE_PIPELINE_CONFIG_STAGES_PIPELINE_PIPELINESTAGE, [])
   .config(function() {
     Registry.pipeline.registerStage({
       label: 'Pipeline',
@@ -30,7 +30,7 @@ module.exports = angular
         PipelineParametersExecutionDetails,
         ExecutionDetailsTasks,
       ],
-      defaultTimeoutMs: 12 * 60 * 60 * 1000, // 12 hours
+      supportsCustomTimeout: true,
       validators: [{ type: 'requiredField', fieldName: 'pipeline' }],
     });
   })
@@ -92,11 +92,7 @@ module.exports = angular
 
         if ($scope.stage && $scope.stage.application && pipeline) {
           const config = _.find($scope.pipelines, pipeline => pipeline.id === $scope.stage.pipeline);
-          if (
-            SETTINGS.feature.managedPipelineTemplatesV2UI &&
-            config &&
-            PipelineTemplateV2Service.isV2PipelineConfig(config)
-          ) {
+          if (config && PipelineTemplateV2Service.isV2PipelineConfig(config)) {
             PipelineTemplateReader.getPipelinePlan(config)
               .then(plan => applyPipelineConfigParameters(plan))
               .catch(() => clearParams());
@@ -159,7 +155,7 @@ module.exports = angular
           delete $scope.userSuppliedParameters[parameter];
           delete $scope.stage.pipelineParameters[parameter];
         } else if ($scope.userSuppliedParameters[parameter]) {
-          $scope.stage.pipelineParameters[parameter] = $scope.userSuppliedParameters[parameter];
+          $scope.stage.pipelineParameters[parameter] = $scope.userSuppliedParameters[parameter] || '';
         }
       };
 

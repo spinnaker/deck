@@ -1,11 +1,7 @@
-import * as React from 'react';
+import React from 'react';
 
-import {
-  IExecutionDetailsSectionProps,
-  ExecutionDetailsSection,
-  StageExecutionLogs,
-  StageFailureMessage,
-} from 'core/pipeline';
+import { ExecutionDetailsSection, IExecutionDetailsSectionProps } from '../common';
+import { StageFailureMessage, StageExecutionLogs } from '../../../details';
 
 export function ConcourseExecutionDetails(props: IExecutionDetailsSectionProps) {
   const {
@@ -18,7 +14,7 @@ export function ConcourseExecutionDetails(props: IExecutionDetailsSectionProps) 
   return (
     <ExecutionDetailsSection name={name} current={current}>
       <dl className="dl-narrow dl-horizontal">
-        <dt>Master</dt>
+        <dt>Build Service</dt>
         <dd>{context.master}</dd>
         <dt>Team</dt>
         <dd>{context.teamName}</dd>

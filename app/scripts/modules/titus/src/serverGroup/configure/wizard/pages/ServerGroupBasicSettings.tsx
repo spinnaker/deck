@@ -1,8 +1,9 @@
-import * as React from 'react';
+import React from 'react';
 import { Field, FormikErrors, FormikProps } from 'formik';
 
 import {
   DeploymentStrategySelector,
+  DeployingIntoManagedClusterWarning,
   HelpField,
   NameUtils,
   RegionSelectField,
@@ -12,6 +13,7 @@ import {
   IWizardPageComponent,
   AccountSelectInput,
   AccountTag,
+  ServerGroupDetailsField,
 } from '@spinnaker/core';
 
 import { DockerImageAndTagSelector, DockerImageUtils } from '@spinnaker/docker';
@@ -114,6 +116,12 @@ export class ServerGroupBasicSettings
       }
     }
 
+    // this error is added exclusively to disable the "create/clone" button - it is not visible aside from the warning
+    // rendered by the DeployingIntoManagedClusterWarning component
+    if (values.resourceSummary) {
+      errors.resourceSummary = { id: 'Cluster is managed' };
+    }
+
     return errors;
   }
 
@@ -137,11 +145,9 @@ export class ServerGroupBasicSettings
   };
 
   private stackChanged = (stack: string) => {
-    this.props.formik.setFieldValue('stack', stack);
-  };
-
-  private freeFormDetailsChanged = (freeFormDetails: string) => {
-    this.props.formik.setFieldValue('freeFormDetails', freeFormDetails);
+    const { formik } = this.props;
+    formik.setFieldValue('stack', stack);
+    formik.values.clusterChanged(formik.values);
   };
 
   public componentWillReceiveProps(nextProps: IServerGroupBasicSettingsProps) {
@@ -164,7 +170,8 @@ export class ServerGroupBasicSettings
   };
 
   public render() {
-    const { errors, setFieldValue, values } = this.props.formik;
+    const { app, formik } = this.props;
+    const { errors, setFieldValue, values } = formik;
     const { createsNewCluster, latestServerGroup, namePreview, showPreviewAsWarning } = this.state;
 
     const accounts = values.backingData.accounts;
@@ -172,6 +179,7 @@ export class ServerGroupBasicSettings
 
     return (
       <div className="container-fluid form-horizontal">
+        <DeployingIntoManagedClusterWarning app={app} formik={formik} />
         <div className="form-group">
           <div className="col-md-3 sm-label-right">Account</div>
           <div className="col-md-7">
@@ -212,7 +220,7 @@ export class ServerGroupBasicSettings
             <input
               type="text"
               className="form-control input-sm no-spel"
-              value={values.stack}
+              value={values.stack || ''}
               onChange={e => this.stackChanged(e.target.value)}
             />
           </div>
@@ -224,26 +232,8 @@ export class ServerGroupBasicSettings
             </div>
           </div>
         )}
-        <div className="form-group">
-          <div className="col-md-3 sm-label-right">
-            Detail <HelpField id="aws.serverGroup.detail" />
-          </div>
-          <div className="col-md-7">
-            <input
-              type="text"
-              className="form-control input-sm no-spel"
-              value={values.freeFormDetails}
-              onChange={e => this.freeFormDetailsChanged(e.target.value)}
-            />
-          </div>
-        </div>
-        {errors.freeFormDetails && (
-          <div className="form-group row slide-in">
-            <div className="col-sm-9 col-sm-offset-2 error-message">
-              <span>{errors.freeFormDetails}</span>
-            </div>
-          </div>
-        )}
+
+        <ServerGroupDetailsField app={app} formik={formik} />
 
         {!values.viewState.disableImageSelection && (
           <DockerImageAndTagSelector
@@ -257,8 +247,6 @@ export class ServerGroupBasicSettings
             tag={values.tag}
             showRegistry={false}
             deferInitialization={values.deferredInitialization}
-            labelClass="col-md-3"
-            fieldClass="col-md-7"
             onChange={this.dockerValuesChanged}
           />
         )}

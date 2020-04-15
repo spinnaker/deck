@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { Modal, ModalFooter } from 'react-bootstrap';
 import { Form, Formik } from 'formik';
 
@@ -12,6 +12,7 @@ import {
   noop,
   ReactInjector,
   ReactModal,
+  SpinFormik,
   TaskMonitor,
 } from '@spinnaker/core';
 
@@ -101,17 +102,17 @@ export class CloudFoundryMapLoadBalancersModal extends React.Component<
     return (
       <>
         <TaskMonitorWrapper monitor={this.state.taskMonitor} />
-        <Formik<ICloudFoundryLoadBalancerLinksModalValues>
+        <SpinFormik<ICloudFoundryLoadBalancerLinksModalValues>
           ref={this.formikRef}
           initialValues={initialValues}
           onSubmit={this.submit}
           render={formik => {
             return (
               <>
-                <Modal.Header>
-                  <h3>Map route to {serverGroup.name}</h3>
-                </Modal.Header>
                 <ModalClose dismiss={this.close} />
+                <Modal.Header>
+                  <Modal.Title>Map route to {serverGroup.name}</Modal.Title>
+                </Modal.Header>
                 <Modal.Body>
                   <Form className="form-horizontal">
                     <Routes fieldName="routes" isRequired={true} singleRouteOnly={true} />

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { Modal } from 'react-bootstrap';
 import { Field, FieldProps, Form, Formik } from 'formik';
 import { IPromise } from 'angular';
@@ -72,14 +72,14 @@ export class CancelModal extends React.Component<ICancelModalProps, ICancelModal
         initialValues={{}}
         onSubmit={this.submitConfirmation}
         render={() => {
-          const wrappedBody = body ? <Markdown message={body} /> : null;
+          const wrappedBody = body ? <Markdown message={body} trim={true} /> : null;
 
           return (
             <Form className="form-horizontal">
-              <Modal.Header>
-                <h3>{header}</h3>
-              </Modal.Header>
               <ModalClose dismiss={this.close} />
+              <Modal.Header>
+                <Modal.Title>{header}</Modal.Title>
+              </Modal.Header>
               <Modal.Body>
                 {wrappedBody}
                 {error}

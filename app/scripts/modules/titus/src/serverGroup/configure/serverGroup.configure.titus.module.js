@@ -1,7 +1,9 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { TITUS_SERVER_GROUP_CONFIGURATION_SERVICE } from './serverGroupConfiguration.service';
 
-module.exports = angular.module('spinnaker.serverGroup.configure.titus', [TITUS_SERVER_GROUP_CONFIGURATION_SERVICE]);
+export const TITUS_SERVERGROUP_CONFIGURE_SERVERGROUP_CONFIGURE_TITUS_MODULE = 'spinnaker.serverGroup.configure.titus';
+export const name = TITUS_SERVERGROUP_CONFIGURE_SERVERGROUP_CONFIGURE_TITUS_MODULE; // for backwards compatibility
+module(TITUS_SERVERGROUP_CONFIGURE_SERVERGROUP_CONFIGURE_TITUS_MODULE, [TITUS_SERVER_GROUP_CONFIGURATION_SERVICE]);

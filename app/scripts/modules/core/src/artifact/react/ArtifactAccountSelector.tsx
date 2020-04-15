@@ -1,5 +1,5 @@
 import { module } from 'angular';
-import * as React from 'react';
+import React from 'react';
 import { react2angular } from 'react2angular';
 
 import { IArtifactAccount } from 'core/account';
@@ -38,6 +38,7 @@ export class ArtifactAccountSelector extends React.Component<IArtifactAccountSel
         optionRenderer={this.renderOption}
         valueRenderer={this.renderOption}
         clearable={false}
+        valueKey="name"
       />
     );
   }

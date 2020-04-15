@@ -4,9 +4,11 @@ import _ from 'lodash';
 
 import { GCEProviderSettings } from '../gce.settings';
 
-const angular = require('angular');
+import { module } from 'angular';
 
-module.exports = angular.module('spinnaker.gce.loadBalancer.transformer', []).factory('gceLoadBalancerTransformer', [
+export const GOOGLE_LOADBALANCER_LOADBALANCER_TRANSFORMER = 'spinnaker.gce.loadBalancer.transformer';
+export const name = GOOGLE_LOADBALANCER_LOADBALANCER_TRANSFORMER; // for backwards compatibility
+module(GOOGLE_LOADBALANCER_LOADBALANCER_TRANSFORMER, []).factory('gceLoadBalancerTransformer', [
   '$q',
   function($q) {
     function updateHealthCounts(container) {
@@ -90,7 +92,7 @@ module.exports = angular.module('spinnaker.gce.loadBalancer.transformer', []).fa
       };
 
       if (loadBalancer.elb) {
-        var elb = loadBalancer.elb;
+        const elb = loadBalancer.elb;
 
         toEdit.vpcId = elb.vpcid;
 
@@ -111,9 +113,9 @@ module.exports = angular.module('spinnaker.gce.loadBalancer.transformer', []).fa
           toEdit.healthyThreshold = elb.healthCheck.healthyThreshold;
           toEdit.unhealthyThreshold = elb.healthCheck.unhealthyThreshold;
 
-          var healthCheck = loadBalancer.elb.healthCheck.target;
-          const protocolIndex = healthCheck.indexOf(':'),
-            pathIndex = healthCheck.indexOf('/');
+          const healthCheck = loadBalancer.elb.healthCheck.target;
+          const protocolIndex = healthCheck.indexOf(':');
+          const pathIndex = healthCheck.indexOf('/');
 
           if (protocolIndex !== -1 && pathIndex !== -1) {
             toEdit.healthCheckProtocol = healthCheck.substring(0, protocolIndex);
@@ -132,6 +134,8 @@ module.exports = angular.module('spinnaker.gce.loadBalancer.transformer', []).fa
           toEdit.healthyThreshold = 10;
           toEdit.unhealthyThreshold = 2;
         }
+
+        toEdit.sessionAffinity = loadBalancer.sessionAffinity || 'None';
       }
       return toEdit;
     }
@@ -150,6 +154,7 @@ module.exports = angular.module('spinnaker.gce.loadBalancer.transformer', []).fa
         healthInterval: 10,
         healthyThreshold: 10,
         unhealthyThreshold: 2,
+        sessionAffinity: 'NONE',
         regionZones: [],
         listeners: [
           {

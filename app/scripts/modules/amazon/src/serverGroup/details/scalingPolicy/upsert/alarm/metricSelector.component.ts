@@ -1,11 +1,11 @@
 import { IController, IComponentOptions, module } from 'angular';
 
-import { Dictionary, get } from 'lodash';
+import { Dictionary } from 'lodash';
 import { Subject } from 'rxjs';
 
 import { CloudMetricsReader, ICloudMetricDescriptor, IServerGroup, IMetricAlarmDimension } from '@spinnaker/core';
 
-import { IConfigurableMetric } from 'amazon/serverGroup';
+import { IConfigurableMetric } from '../../ScalingPolicyWriter';
 import { AWSProviderSettings } from 'amazon/aws.settings';
 import { NAMESPACES } from './namespaces';
 
@@ -31,7 +31,7 @@ export class MetricSelectorController implements IController {
   public namespaceUpdated = new Subject();
 
   public alarm: IConfigurableMetric;
-  public namespaces = get(AWSProviderSettings, 'metrics.customNamespaces', []).concat(NAMESPACES);
+  public namespaces = (AWSProviderSettings?.metrics?.customNamespaces ?? []).concat(NAMESPACES);
   public state: IMetricEditorState;
   public serverGroup: IServerGroup;
 
@@ -95,6 +95,12 @@ export class MetricSelectorController implements IController {
         }
         if (selected) {
           this.state.selectedMetric = selected;
+        } else {
+          // If metricName is blank (new policy), try to find a CPU metric or select the first option instead of sitting on the invalid blank option
+          if (!alarm.metricName && this.state.metrics.length) {
+            this.state.selectedMetric =
+              this.state.metrics.find(metric => metric.name.match('CPUUtilization')) || this.state.metrics[0];
+          }
         }
         this.metricChanged();
       })
@@ -118,13 +124,10 @@ export class MetricSelectorController implements IController {
   }
 
   private convertDimensionsToObject(): Dictionary<string> {
-    return this.alarm.dimensions.reduce(
-      (acc: Dictionary<string>, dimension: IMetricAlarmDimension) => {
-        acc[dimension.name] = dimension.value;
-        return acc;
-      },
-      {} as Dictionary<string>,
-    );
+    return this.alarm.dimensions.reduce((acc: Dictionary<string>, dimension: IMetricAlarmDimension) => {
+      acc[dimension.name] = dimension.value;
+      return acc;
+    }, {} as Dictionary<string>);
   }
 
   // used to determine if dimensions have changed when selecting a metric
@@ -143,11 +146,11 @@ export class MetricSelectorController implements IController {
       return;
     }
     if (this.state.selectedMetric) {
-      const selected = this.state.selectedMetric,
-        dimensionsChanged =
-          selected && this.dimensionsToString(alarm.dimensions) !== this.dimensionsToString(selected.dimensions),
-        alarmUpdated =
-          alarm.metricName !== selected.name || alarm.namespace !== selected.namespace || dimensionsChanged;
+      const selected = this.state.selectedMetric;
+      const dimensionsChanged =
+        selected && this.dimensionsToString(alarm.dimensions) !== this.dimensionsToString(selected.dimensions);
+      const alarmUpdated =
+        alarm.metricName !== selected.name || alarm.namespace !== selected.namespace || dimensionsChanged;
       alarm.metricName = selected.name;
       alarm.namespace = selected.namespace;
       if (dimensionsChanged) {

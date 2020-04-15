@@ -1,17 +1,26 @@
 import { IPromise, IQService, module } from 'angular';
-import { flatten, forOwn, get, groupBy, has, head, keys, values } from 'lodash';
+import { flatten, forOwn, groupBy, has, head, keys, values, keyBy } from 'lodash';
 
 import { ArtifactReferenceService } from 'core/artifact';
 import { API } from 'core/api';
 import { Application } from 'core/application';
 import { NameUtils } from 'core/naming';
 import { FilterModelService } from 'core/filterModel';
-import { IArtifactExtractor, ICluster, IClusterSummary, IExecution, IExecutionStage, IServerGroup } from 'core/domain';
+import {
+  IArtifactExtractor,
+  ICluster,
+  IClusterSummary,
+  IExecution,
+  IExecutionStage,
+  IServerGroup,
+  ITask,
+} from 'core/domain';
 import { ClusterState } from 'core/state';
 import { ProviderServiceDelegate } from 'core/cloudProvider';
 import { SETTINGS } from 'core/config/settings';
 
 import { taskMatcher } from './task.matcher';
+import { CORE_SERVERGROUP_SERVERGROUP_TRANSFORMER } from '../serverGroup/serverGroup.transformer';
 
 export class ClusterService {
   public static $inject = ['$q', 'serverGroupTransformer', 'providerServiceDelegate'];
@@ -75,41 +84,41 @@ export class ClusterService {
     }
   }
 
+  private generateServerGroupLookupKey(serverGroup: IServerGroup): string {
+    const { name, account, region, category } = serverGroup;
+    return [name, account, region, category].join('-');
+  }
+
   public addServerGroupsToApplication(application: Application, serverGroups: IServerGroup[] = []): IServerGroup[] {
+    // map of incoming data
+    const remoteMap = keyBy(serverGroups, this.generateServerGroupLookupKey);
+    // map local cache
+    const localMap = keyBy(application.serverGroups.data, this.generateServerGroupLookupKey);
+
     if (application.serverGroups.data) {
       const data = application.serverGroups.data;
       // remove any that have dropped off, update any that have changed
       const toRemove: number[] = [];
       data.forEach((serverGroup: IServerGroup, idx: number) => {
-        const matches = serverGroups.filter(
-          test =>
-            test.name === serverGroup.name &&
-            test.account === serverGroup.account &&
-            test.region === serverGroup.region &&
-            test.category === serverGroup.category,
-        );
-        if (!matches.length) {
-          toRemove.push(idx);
-        } else {
-          if (serverGroup.stringVal && matches[0].stringVal && serverGroup.stringVal !== matches[0].stringVal) {
-            data[idx] = matches[0];
+        const match = remoteMap[this.generateServerGroupLookupKey(serverGroup)];
+        if (match) {
+          // Match found between local and incoming data, update but only if needed
+          if (serverGroup.stringVal && match.stringVal && serverGroup.stringVal !== match.stringVal) {
+            data[idx] = match;
           }
+        } else {
+          // Not found means server group was removed
+          toRemove.push(idx);
         }
       });
 
+      // splice is necessary to preserve referential equality
       toRemove.forEach(idx => data.splice(idx, 1));
 
       // add any new ones
       serverGroups.forEach(serverGroup => {
-        if (
-          !application.serverGroups.data.filter(
-            (test: IServerGroup) =>
-              test.name === serverGroup.name &&
-              test.account === serverGroup.account &&
-              test.region === serverGroup.region &&
-              test.category === serverGroup.category,
-          ).length
-        ) {
+        const match = localMap[this.generateServerGroupLookupKey(serverGroup)];
+        if (!match) {
           data.push(serverGroup);
         }
       });
@@ -144,7 +153,7 @@ export class ClusterService {
   }
 
   public addExecutionsToServerGroups(application: Application): void {
-    const executions = get(application, 'runningExecutions.data', []);
+    const executions = application.runningExecutions?.data ?? [];
 
     if (!application.serverGroups.data) {
       return; // still run if there are no running tasks, since they may have all finished and we need to clear them.
@@ -170,7 +179,7 @@ export class ClusterService {
   }
 
   public addTasksToServerGroups(application: Application): void {
-    const runningTasks = get(application, 'runningTasks.data', []);
+    const runningTasks: ITask[] = application.runningTasks?.data ?? [];
     if (!application.serverGroups.data) {
       return; // still run if there are no running tasks, since they may have all finished and we need to clear them.
     }
@@ -180,7 +189,7 @@ export class ClusterService {
       } else {
         serverGroup.runningTasks.length = 0;
       }
-      runningTasks.forEach(function(task) {
+      runningTasks.forEach(task => {
         if (taskMatcher.taskMatches(task, serverGroup)) {
           serverGroup.runningTasks.push(task);
         }
@@ -317,7 +326,4 @@ export class ClusterService {
 }
 
 export const CLUSTER_SERVICE = 'spinnaker.core.cluster.service';
-module(CLUSTER_SERVICE, [require('../serverGroup/serverGroup.transformer').name]).service(
-  'clusterService',
-  ClusterService,
-);
+module(CLUSTER_SERVICE, [CORE_SERVERGROUP_SERVERGROUP_TRANSFORMER]).service('clusterService', ClusterService);

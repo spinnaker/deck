@@ -4,11 +4,10 @@ import { $q } from 'ngimport';
 
 import { API } from 'core/api/ApiService';
 import { AuthenticationService } from 'core/authentication/AuthenticationService';
-import { PipelineTemplateV2Service } from 'core/pipeline';
+import { PipelineTemplateV2Service } from '../templates/v2/pipelineTemplateV2.service';
 import { ViewStateCache } from 'core/cache';
 import { IStage } from 'core/domain/IStage';
 import { IPipeline } from 'core/domain/IPipeline';
-import { SETTINGS } from 'core/config';
 
 export interface ITriggerPipelineResponse {
   eventId: string;
@@ -47,7 +46,7 @@ export class PipelineConfigService {
     const endpoint = isStrategy ? 'strategyConfigs' : 'pipelineConfigs';
     return API.one(endpoint, id)
       .all('history')
-      .withParams({ count })
+      .withParams({ limit: count })
       .getList();
   }
 
@@ -69,7 +68,7 @@ export class PipelineConfigService {
         }
       });
     }
-    if (SETTINGS.feature.managedPipelineTemplatesV2UI && PipelineTemplateV2Service.isV2PipelineConfig(pipeline)) {
+    if (PipelineTemplateV2Service.isV2PipelineConfig(pipeline)) {
       pipeline = PipelineTemplateV2Service.filterInheritedConfig(pipeline) as IPipeline;
     }
 
@@ -139,6 +138,7 @@ export class PipelineConfigService {
         stage !== stageToTest &&
         stageToTest.requisiteStageRefIds &&
         !downstreamIds.includes(stageToTest.refId) &&
+        stage.requisiteStageRefIds &&
         !stage.requisiteStageRefIds.includes(stageToTest.refId)
       );
     });

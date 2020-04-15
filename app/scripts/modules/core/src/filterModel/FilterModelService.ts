@@ -1,6 +1,6 @@
 import { cloneDeep, size, some, isNil, reduce, forOwn, includes, pick } from 'lodash';
 
-import { IFilterModel, IFilterConfig } from './IFilterModel';
+import { IFilterModel, IFilterConfig, ITrueKeyModel } from './IFilterModel';
 import { ReactInjector } from 'core/reactShims';
 
 export class FilterModelService {
@@ -22,7 +22,7 @@ export class FilterModelService {
     filterModel.clearFilters = () => {
       filterModelConfig.forEach(function(property) {
         if (!property.displayOption) {
-          filterModel.sortFilter[property.model] = property.clearValue;
+          (filterModel.sortFilter[property.model] as any) = property.clearValue;
         }
       });
     };
@@ -56,16 +56,13 @@ export class FilterModelService {
 
     const iFilterConfigs = filterModel.config;
 
-    return iFilterConfigs.reduce(
-      (acc, filter) => {
-        const valueIfNil = filterTypeDefaults[filter.type];
-        const rawValue = params[filter.param];
-        const paramValue = isNil(rawValue) ? valueIfNil : rawValue;
-        // Clone deep so angularjs mutations happen on a different object reference
-        return { ...acc, [filter.model]: cloneDeep(paramValue) };
-      },
-      {} as any,
-    );
+    return iFilterConfigs.reduce((acc, filter) => {
+      const valueIfNil = filterTypeDefaults[filter.type];
+      const rawValue = params[filter.param];
+      const paramValue = isNil(rawValue) ? valueIfNil : rawValue;
+      // Clone deep so angularjs mutations happen on a different object reference
+      return { ...acc, [filter.model]: cloneDeep(paramValue) };
+    }, {} as any);
   }
 
   public static registerRouterHooks(filterModel: IFilterModel, stateGlob: string) {
@@ -204,17 +201,6 @@ export class FilterModelService {
     };
   }
 
-  public static checkCategoryFilters(model: IFilterModel) {
-    return (target: any) => {
-      if (this.isFilterable(model.sortFilter.category)) {
-        const checkedCategories = this.getCheckValues(model.sortFilter.category);
-        return includes(checkedCategories, target.type) || includes(checkedCategories, target.category);
-      } else {
-        return true;
-      }
-    };
-  }
-
   private static addTagsForSection(model: IFilterModel, property: IFilterConfig) {
     const key = property.model;
     const label = property.filterLabel || property.model;
@@ -231,7 +217,9 @@ export class FilterModelService {
             label,
             value: translator[value] || value,
             clear() {
-              delete (modelVal as any)[value];
+              // do not reuse the modelVal variable - it's possible it has been reassigned since the tag was created
+              const toClearFrom: ITrueKeyModel = model.sortFilter[key] as ITrueKeyModel;
+              delete toClearFrom[value];
               model.applyParamsToUrl();
             },
           });
@@ -244,7 +232,7 @@ export class FilterModelService {
           label,
           value: translator[modelVal as string] || modelVal,
           clear() {
-            model.sortFilter[key] = clearValue;
+            (model.sortFilter[key] as any) = clearValue;
             model.applyParamsToUrl();
           },
         });

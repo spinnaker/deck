@@ -1,7 +1,8 @@
-import * as React from 'react';
+import React from 'react';
 
-import { IStageConfigProps, FormikStageConfig, IContextualValidator } from 'core/pipeline';
-import { FormikFormField, TextInput, TextAreaInput, CheckboxInput, buildValidators } from 'core/presentation';
+import { IStageConfigProps } from '../common/IStageConfigProps';
+import { FormikStageConfig, IContextualValidator } from '../FormikStageConfig';
+import { FormikFormField, TextInput, TextAreaInput, CheckboxInput, FormValidator } from 'core/presentation';
 import { HelpField } from 'core/help';
 
 export const ScriptStageConfig: React.SFC<IStageConfigProps> = stageConfigProps => (
@@ -76,14 +77,20 @@ export const ScriptStageConfig: React.SFC<IStageConfigProps> = stageConfigProps 
           help={<HelpField id="script.waitForCompletion" />}
           input={props => <CheckboxInput {...props} />}
         />
+        <FormikFormField
+          name="propertyFile"
+          label="Property File"
+          help={<HelpField id="pipeline.config.script.propertyFile" />}
+          input={props => <TextInput {...props} />}
+        />
       </div>
     )}
   />
 );
 
 export const validate: IContextualValidator = stage => {
-  const validation = buildValidators(stage);
-  validation.field('command', 'Command').required();
-  validation.field('scriptPath', 'Script Path').required();
-  return validation.result();
+  const formValidator = new FormValidator(stage);
+  formValidator.field('command', 'Command').required();
+  formValidator.field('scriptPath', 'Script Path').required();
+  return formValidator.validateForm();
 };

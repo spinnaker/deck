@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { UISref } from '@uirouter/react';
 import { Subject } from 'rxjs';
 
@@ -122,7 +122,9 @@ export class ServerGroupDetails extends React.Component<IServerGroupDetailsProps
         {serverGroup && serverGroup.isDisabled && (
           <div className="band band-info">Disabled {timestamp(serverGroup.disabledDate)}</div>
         )}
-        {!loading && <ManagedResourceDetailsIndicator entityTags={serverGroup.clusterEntityTags} />}
+        {!loading && serverGroup.isManaged && (
+          <ManagedResourceDetailsIndicator resourceSummary={serverGroup.managedResourceSummary} application={app} />
+        )}
         {!loading && (
           <div className="content">
             <RunningTasks serverGroup={serverGroup} application={app} />

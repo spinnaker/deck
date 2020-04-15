@@ -1,9 +1,9 @@
 import { IScope } from 'angular';
-import { get } from 'lodash';
 
 import { Registry } from 'core/registry';
 import { IExpectedArtifact, IArtifactSource, IStage, IPipeline } from 'core/domain';
-import { ExpectedArtifactService, IExpectedArtifactSelectorViewControllerDelegate } from 'core/artifact';
+import { ExpectedArtifactService } from './expectedArtifact.service';
+import { IExpectedArtifactSelectorViewControllerDelegate } from './ExpectedArtifactSelectorViewController';
 import { IArtifactAccount } from 'core/account';
 
 import { ExpectedArtifactSelectorViewControllerAngularDelegate } from './ExpectedArtifactSelectorViewControllerAngularDelegate';
@@ -15,11 +15,11 @@ export class NgAppengineConfigArtifactDelegate
   public requestingNew = false;
 
   private getStage() {
-    return get(this, 'artifact.$scope.command.viewState.stage', null);
+    return this.artifact?.$scope?.command?.viewState?.stage;
   }
 
   private getPipeline() {
-    return get(this, 'artifact.$scope.command.viewState.pipeline', null);
+    return this.artifact?.$scope?.command?.viewState?.pipeline;
   }
 
   constructor(private artifact: { $scope: IScope; id: string; account: string }) {

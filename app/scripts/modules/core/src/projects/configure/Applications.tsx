@@ -1,10 +1,10 @@
-import * as React from 'react';
+import React from 'react';
 import { FormikErrors, getIn, FormikProps } from 'formik';
 import { isEqual } from 'lodash';
 
 import { IProject, IProjectPipeline } from 'core/domain';
 import { IWizardPageComponent } from 'core/modal';
-import { FormikApplicationsPicker } from 'core/projects/configure/FormikApplicationsPicker';
+import { FormikApplicationsPicker } from './FormikApplicationsPicker';
 
 export interface IApplicationsProps {
   formik: FormikProps<IProject>;

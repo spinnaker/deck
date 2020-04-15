@@ -1,8 +1,8 @@
-import * as React from 'react';
-import { Formik, FormikProps } from 'formik';
+import React from 'react';
+import { FormikProps } from 'formik';
 import { get } from 'lodash';
 
-import { FormikFormField, ChecklistInput, NumberInput, HelpField, ReactSelectInput } from '@spinnaker/core';
+import { FormikFormField, ChecklistInput, NumberInput, HelpField, ReactSelectInput, SpinFormik } from '@spinnaker/core';
 
 import { ITitusServerGroupCommand } from '../../../serverGroupConfiguration.service';
 import { IJobTimeWindow } from 'titus/domain';
@@ -38,7 +38,10 @@ export class WindowPicker extends React.Component<IWindowPickerProps, IWindowPic
     const { timeWindows } = values.disruptionBudget;
     const toRemove = timeWindows[index];
     if (toRemove.hourlyTimeWindows.length === 1) {
-      setFieldValue('disruptionBudget.timeWindows', timeWindows.filter(w => w !== toRemove));
+      setFieldValue(
+        'disruptionBudget.timeWindows',
+        timeWindows.filter(w => w !== toRemove),
+      );
     } else {
       const subWindowToRemove = toRemove.hourlyTimeWindows[subIndex];
       const newWindows = toRemove.hourlyTimeWindows.filter(w => w !== subWindowToRemove);
@@ -131,7 +134,7 @@ export class WindowPicker extends React.Component<IWindowPickerProps, IWindowPic
       );
     }
     return (
-      <Formik<IJobTimeWindowForm>
+      <SpinFormik<IJobTimeWindowForm>
         initialValues={{
           days: [],
           startHour: 10,
@@ -149,7 +152,6 @@ export class WindowPicker extends React.Component<IWindowPickerProps, IWindowPic
             <FormikFormField
               name="startHour"
               label="Start"
-              fastField={false}
               input={props => (
                 <div>
                   <NumberInput {...props} min={0} max={formik.values.endHour} />
@@ -160,7 +162,6 @@ export class WindowPicker extends React.Component<IWindowPickerProps, IWindowPic
             <FormikFormField
               name="endHour"
               label="End"
-              fastField={false}
               input={props => (
                 <div>
                   <NumberInput {...props} min={formik.values.startHour} max={23} />

@@ -1,12 +1,19 @@
 'use strict';
 
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const { TypedCssModulesPlugin } = require('typed-css-modules-webpack-plugin');
+
 const prodWebpackConfig = require('./webpack.config')();
 const webpackConfig = {
   mode: 'development',
   module: prodWebpackConfig.module,
   resolve: prodWebpackConfig.resolve,
-  plugins: [new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true, tslint: true })],
+  plugins: [
+    new TypedCssModulesPlugin({
+      globPattern: '**/*.module.css',
+    }),
+    new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true }),
+  ],
 };
 
 module.exports = function(config) {
@@ -33,14 +40,8 @@ module.exports = function(config) {
     },
 
     customLaunchers: {
-      Chrome_travis_ci: {
-        base: 'Chrome',
-        flags: ['--no-sandbox'],
-      },
-      ChromeActive: {
-        base: 'Chrome',
-        flags: ['--override-plugin-power-saver-for-testing=0'],
-      },
+      ChromeCI: { base: 'ChromeHeadless', flags: ['--no-sandbox'] },
+      ChromeActive: { base: 'Chrome', flags: ['--override-plugin-power-saver-for-testing=0'] },
     },
 
     plugins: [
@@ -59,7 +60,7 @@ module.exports = function(config) {
     // web server port
     port: 8081,
 
-    browsers: [process.env.TRAVIS ? 'Chrome_travis_ci' : 'ChromeActive'],
+    browsers: [process.env.TRAVIS || process.env.GITHUB_ACTIONS ? 'ChromeCI' : 'ChromeActive'],
 
     colors: true,
 

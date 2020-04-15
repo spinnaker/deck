@@ -6,7 +6,6 @@ import { SETTINGS } from 'core/config/settings';
 import { IgorService, BuildServiceType } from 'core/ci/igor.service';
 import { IJobConfig, IParameterDefinitionList, IStage } from 'core/domain';
 import { TravisExecutionLabel } from './TravisExecutionLabel';
-import { Duration } from 'luxon';
 
 export interface ITravisStageViewState {
   mastersLoaded: boolean;
@@ -84,9 +83,9 @@ export class TravisStage implements IController {
   }
 
   private updateJobsList(): void {
-    const master = this.stage.master,
-      job: string = this.stage.job || '',
-      viewState = this.viewState;
+    const master = this.stage.master;
+    const job: string = this.stage.job || '';
+    const viewState = this.viewState;
     viewState.masterIsParameterized = master.includes('${');
     viewState.jobIsParameterized = job.includes('${');
     if (viewState.masterIsParameterized || viewState.jobIsParameterized) {
@@ -164,6 +163,7 @@ module(TRAVIS_STAGE, [])
         restartable: true,
         controller: 'TravisStageCtrl',
         controllerAs: '$ctrl',
+        producesArtifacts: true,
         templateUrl: require('./travisStage.html'),
         executionDetailsUrl: require('./travisExecutionDetails.html'),
         executionLabelComponent: TravisExecutionLabel,
@@ -175,7 +175,7 @@ module(TRAVIS_STAGE, [])
           const lines = stage.masterStage.context.buildInfo.number ? 1 : 0;
           return lines + (stage.masterStage.context.buildInfo.testResults || []).length;
         },
-        defaultTimeoutMs: Duration.fromObject({ hours: 2 }).as('milliseconds'),
+        supportsCustomTimeout: true,
         validators: [{ type: 'requiredField', fieldName: 'job' }],
         strategy: true,
       });

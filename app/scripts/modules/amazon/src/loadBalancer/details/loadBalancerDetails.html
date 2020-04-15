@@ -59,8 +59,9 @@
     </div>
   </div>
   <managed-resource-details-indicator
-    ng-if="!ctrl.state.loading && ctrl.loadBalancer.entityTags"
-    entity-tags="[ctrl.loadBalancer.entityTags]"
+    ng-if="!ctrl.state.loading && ctrl.loadBalancer.isManaged"
+    resource-summary="ctrl.loadBalancer.managedResourceSummary"
+    application="ctrl.application"
   >
   </managed-resource-details-indicator>
   <div ng-if="!ctrl.state.loading" class="content">
@@ -78,8 +79,8 @@
         </dd>
         <dt>Subnet</dt>
         <dd>{{ctrl.getFirstSubnetPurpose(ctrl.loadBalancer.subnetDetails)}}</dd>
-        <dt ng-if="ctrl.ipAddressTypeDescription">Type</dt>
-        <dd ng-if="ctrl.ipAddressTypeDescription">{{ctrl.loadBalancer.loadBalancerType}}</dd>
+        <dt ng-if="ctrl.loadBalancer.loadBalancerType">Type</dt>
+        <dd ng-if="ctrl.loadBalancer.loadBalancerType">{{ctrl.loadBalancer.loadBalancerType}}</dd>
         <dt ng-if="ctrl.ipAddressTypeDescription">IP Type</dt>
         <dd ng-if="ctrl.ipAddressTypeDescription">{{ctrl.ipAddressTypeDescription}}</dd>
       </dl>

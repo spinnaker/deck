@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { ReactWrapper, mount } from 'enzyme';
 import { set } from 'lodash';
 import { IScope, mock, noop } from 'angular';
@@ -38,8 +38,9 @@ describe('<Executions/>', () => {
       scope = $rootScope.$new();
       application = ApplicationModelBuilder.createApplicationForTests(
         'app',
-        { key: 'executions', lazy: true },
-        { key: 'pipelineConfigs', lazy: true },
+        { key: 'executions', lazy: true, defaultData: [] },
+        { key: 'pipelineConfigs', lazy: true, defaultData: [] },
+        { key: 'runningExecutions', lazy: true, defaultData: [] },
       );
     }),
   );

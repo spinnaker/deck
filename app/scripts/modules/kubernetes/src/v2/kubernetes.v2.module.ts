@@ -2,12 +2,9 @@ import { module } from 'angular';
 
 import { CloudProviderRegistry, STAGE_ARTIFACT_SELECTOR_COMPONENT_REACT, YAML_EDITOR_COMPONENT } from '@spinnaker/core';
 
-import '../logo/kubernetes.logo.less';
-
 import { KUBERNETES_MANIFEST_DELETE_CTRL } from './manifest/delete/delete.controller';
 import { KUBERNETES_MANIFEST_SCALE_CTRL } from './manifest/scale/scale.controller';
 import { KUBERNETES_V2_INSTANCE_DETAILS_CTRL } from './instance/details/details.controller';
-import { KUBERNETES_DELETE_MANIFEST_STAGE } from './pipelines/stages/deleteManifest/deleteManifestStage';
 import { KUBERNETES_SCALE_MANIFEST_STAGE } from './pipelines/stages/scaleManifest/scaleManifestStage';
 import { KUBERNETES_UNDO_ROLLOUT_MANIFEST_STAGE } from './pipelines/stages/undoRolloutManifest/undoRolloutManifestStage';
 import { KUBERNETES_FIND_ARTIFACTS_FROM_RESOURCE_STAGE } from './pipelines/stages/findArtifactsFromResource/findArtifactsFromResourceStage';
@@ -38,13 +35,16 @@ import { JSON_EDITOR_COMPONENT } from './manifest/editor/json/jsonEditor.compone
 import { ManifestWizard } from 'kubernetes/v2/manifest/wizard/ManifestWizard';
 import { KUBERNETES_ENABLE_MANIFEST_STAGE } from 'kubernetes/v2/pipelines/stages/traffic/enableManifest.stage';
 import { KUBERNETES_DISABLE_MANIFEST_STAGE } from 'kubernetes/v2/pipelines/stages/traffic/disableManifest.stage';
-import { KUBERNETES_V2_RUN_JOB_STAGE } from 'kubernetes/v2/pipelines/stages/runJob/runJobStage';
+import { KubernetesSecurityGroupReader } from 'kubernetes/shared/securityGroup/securityGroup.reader';
+import { KUBERNETES_ROLLING_RESTART } from 'kubernetes/v2/manifest/rollout/RollingRestart';
 
-// React stages
-import './pipelines/stages/deployManifest/deployManifestStage';
-import './pipelines/stages/patchManifest/patchManifestStage';
+import kubernetesLogo from '../shared/logo/kubernetes.icon.svg';
 
-import './pipelines/validation/manifestSelector.validator';
+import 'kubernetes/shared/validation/applicationName.validator';
+import 'kubernetes/shared/help/kubernetes.help';
+import 'kubernetes/shared/logo/kubernetes.logo.less';
+import 'kubernetes/v2/pipelines/stages';
+import 'kubernetes/v2/pipelines/validation/manifestSelector.validator';
 
 // load all templates into the $templateCache
 const templates = require.context('kubernetes', true, /\.html$/);
@@ -74,8 +74,6 @@ module(KUBERNETES_V2_MODULE, [
   KUBERNETES_MANIFEST_ARTIFACT,
   KUBERNETES_V2_LOAD_BALANCER_TRANSFORMER,
   KUBERNETES_V2_SECURITY_GROUP_TRANSFORMER,
-  require('../securityGroup/reader').name,
-  KUBERNETES_DELETE_MANIFEST_STAGE,
   KUBERNETES_SCALE_MANIFEST_STAGE,
   KUBERNETES_UNDO_ROLLOUT_MANIFEST_STAGE,
   KUBERNETES_FIND_ARTIFACTS_FROM_RESOURCE_STAGE,
@@ -92,13 +90,13 @@ module(KUBERNETES_V2_MODULE, [
   KUBERNETES_ENABLE_MANIFEST_STAGE,
   KUBERNETES_DISABLE_MANIFEST_STAGE,
   STAGE_ARTIFACT_SELECTOR_COMPONENT_REACT,
-  KUBERNETES_V2_RUN_JOB_STAGE,
+  KUBERNETES_ROLLING_RESTART,
 ]).config(() => {
   CloudProviderRegistry.registerProvider('kubernetes', {
     name: 'Kubernetes',
     skin: 'v2',
     logo: {
-      path: require('../logo/kubernetes.icon.svg'),
+      path: kubernetesLogo,
     },
     serverGroup: {
       CloneServerGroupModal: ManifestWizard,
@@ -118,7 +116,7 @@ module(KUBERNETES_V2_MODULE, [
       transformer: 'kubernetesV2LoadBalancerTransformer',
     },
     securityGroup: {
-      reader: 'kubernetesSecurityGroupReader',
+      reader: KubernetesSecurityGroupReader,
       CreateSecurityGroupModal: ManifestWizard,
       detailsController: 'kubernetesV2SecurityGroupDetailsCtrl',
       detailsTemplateUrl: require('./securityGroup/details/details.html'),

@@ -2,6 +2,7 @@
 
 var gateHost = '{%gate.baseUrl%}';
 var artifactsEnabled = '{%features.artifacts%}' === 'true';
+var artifactsRewriteEnabled = '{%features.artifactsRewrite%}' === 'true';
 var atlasWebComponentsUrl = '{%canary.atlasWebComponentsUrl%}';
 var authEnabled = '{%features.auth%}' === 'true';
 var authEndpoint = gateHost + '/auth/user';
@@ -18,12 +19,11 @@ var defaultStorageAccountName = '{%canary.defaultStorageAccount%}';
 var displayTimestampsInUserLocalTime = '{%features.displayTimestampsInUserLocalTime%}' === 'true';
 var entityTagsEnabled = false;
 var fiatEnabled = '{%features.fiat%}' === 'true';
+var gceScaleDownControlsEnabled = '{%features.gceScaleDownControlsEnabled%}' === 'true';
 var gceStatefulMigsEnabled = '{%features.gceStatefulMigsEnabled%}' === 'true';
 var gremlinEnabled = '{%features.gremlin%}' === 'true';
 var iapRefresherEnabled = '{%features.iapRefresherEnabled%}' === 'true';
 var infrastructureStagesEnabled = '{%features.infrastructureStages%}' === 'true';
-var managedPipelineTemplatesV2UIEnabled = '{%features.managedPipelineTemplatesV2UI%}' === 'true';
-var jobsEnabled = '{%features.jobs%}' === 'true';
 var maxPipelineAgeDays = '{%maxPipelineAgeDays%}';
 var mineCanaryEnabled = '{%features.mineCanary%}' === 'true';
 var notificationsEnabled = '{%notifications.enabled%}' === 'true';
@@ -38,11 +38,15 @@ var slack = {
 var sms = {
   enabled: '{%notifications.twilio.enabled%}' === 'true',
 };
+var githubStatus = {
+  enabled: '{%notifications.github-status.enabled%}' === 'true',
+};
 var templatesEnabled = '{%canary.templatesEnabled%}' === 'true';
 var travisEnabled = '{%features.travis%}' === 'true';
 var timezone = '{%timezone%}';
 var version = '{%version%}';
 var werckerEnabled = '{%features.wercker%}' === 'true';
+var functionsEnabled = '{%features.functions%}' === 'true';
 
 // Cloud Providers
 var appengine = {
@@ -103,6 +107,12 @@ var kubernetes = {
     proxy: '{%kubernetes.default.proxy%}',
   },
 };
+var huaweicloud = {
+  defaults: {
+    account: '{%huaweicloud.default.account%}',
+    region: '{%huaweicloud.default.region%}',
+  },
+};
 var oracle = {
   defaults: {
     account: '{%oracle.default.account%}',
@@ -132,7 +142,6 @@ window.spinnakerSettings = {
     gistId: changelogGistId,
   },
   checkForUpdates: false,
-  defaultCategory: 'serverGroup',
   defaultInstancePort: 80,
   defaultProviders: [
     'appengine',
@@ -142,6 +151,7 @@ window.spinnakerSettings = {
     'dcos',
     'ecs',
     'gce',
+    'huaweicloud',
     'kubernetes',
     'oracle',
     'titus',
@@ -149,26 +159,27 @@ window.spinnakerSettings = {
   defaultTimeZone: timezone, // see http://momentjs.com/timezone/docs/#/data-utilities/
   feature: {
     artifacts: artifactsEnabled,
+    artifactsRewrite: artifactsRewriteEnabled,
     canary: mineCanaryEnabled,
     chaosMonkey: chaosEnabled,
     displayTimestampsInUserLocalTime: displayTimestampsInUserLocalTime,
     entityTags: entityTagsEnabled,
     fiatEnabled: fiatEnabled,
+    gceScaleDownControlsEnabled: gceScaleDownControlsEnabled,
     gceStatefulMigsEnabled: gceStatefulMigsEnabled,
     gremlinEnabled: gremlinEnabled,
     iapRefresherEnabled: iapRefresherEnabled,
     infrastructureStages: infrastructureStagesEnabled,
-    jobs: jobsEnabled,
-    managedPipelineTemplatesV2UI: managedPipelineTemplatesV2UIEnabled,
     notifications: notificationsEnabled,
     pagerDuty: false,
     pipelines: true,
     pipelineTemplates: pipelineTemplatesEnabled,
     roscoMode: true,
+    slack: false,
     snapshots: false,
     travis: travisEnabled,
-    versionedProviders: true,
     wercker: werckerEnabled,
+    functions: functionsEnabled,
   },
   gateUrl: gateHost,
   gitSources: ['bitbucket', 'gitlab', 'github', 'stash'],
@@ -183,9 +194,7 @@ window.spinnakerSettings = {
     email: {
       enabled: true,
     },
-    githubStatus: {
-      enabled: true,
-    },
+    githubStatus: githubStatus,
     googlechat: {
       enabled: true,
     },
@@ -208,6 +217,7 @@ window.spinnakerSettings = {
     dcos: dcos,
     ecs: ecs,
     gce: gce,
+    huaweicloud: huaweicloud,
     kubernetes: kubernetes,
     oracle: oracle,
     titus: {
@@ -218,9 +228,10 @@ window.spinnakerSettings = {
       },
     },
   },
-  pubsubProviders: ['google'], // TODO(joonlim): Add amazon once it is confirmed that amazon pub/sub works.
+  pubsubProviders: ['amazon', 'google'],
   triggerTypes: [
     'artifactory',
+    'nexus',
     'concourse',
     'cron',
     'docker',

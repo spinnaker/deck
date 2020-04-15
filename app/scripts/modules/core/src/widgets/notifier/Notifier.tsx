@@ -1,11 +1,11 @@
-import { INotification } from 'core/widgets/notifier/notifier.service';
-import * as DOMPurify from 'dompurify';
-import * as React from 'react';
+import React from 'react';
 import { Subscription } from 'rxjs';
-import { NotifierService } from './notifier.service';
+
+import { INotifier, NotifierService } from './notifier.service';
+import { Markdown } from 'core/presentation';
 
 export interface INotifierState {
-  messages: INotification[];
+  messages: INotifier[];
 }
 
 export class Notifier extends React.Component<{}, INotifierState> {
@@ -40,12 +40,9 @@ export class Notifier extends React.Component<{}, INotifierState> {
     this.setState({ messages: this.state.messages.filter(m => m.key !== key) });
   }
 
-  private makeNotification = (message: INotification) => (
+  private makeNotification = (message: INotifier) => (
     <div key={message.key} className="user-notification horizontal space-around">
-      <div
-        className="message"
-        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(message.body, { ADD_ATTR: ['onclick'] }) }}
-      />
+      <Markdown className="message" message={message.body} options={{ ADD_ATTR: ['onclick'] }} />
       <button className="btn btn-link close-notification" role="button" onClick={() => this.dismiss(message.key)}>
         <span className="fa fa-times" />
       </button>

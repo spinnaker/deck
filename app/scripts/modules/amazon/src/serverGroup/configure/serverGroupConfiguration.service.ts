@@ -37,6 +37,7 @@ import {
   SECURITY_GROUP_READER,
   SecurityGroupReader,
   SERVER_GROUP_COMMAND_REGISTRY_PROVIDER,
+  setMatchingResourceSummary,
   ServerGroupCommandRegistry,
   SubnetReader,
   IServerGroupCommandViewState,
@@ -50,6 +51,7 @@ import {
 } from 'amazon/domain';
 import { KeyPairsReader } from 'amazon/keyPairs';
 import { AutoScalingProcessService } from '../details/scalingProcesses/AutoScalingProcessService';
+import { AMAZON_INSTANCE_AWSINSTANCETYPE_SERVICE } from 'amazon/instance/awsInstanceType.service';
 
 export type IBlockDeviceMappingSource = 'source' | 'ami' | 'default';
 
@@ -98,7 +100,6 @@ export interface IAmazonServerGroupCommand extends IServerGroupCommand {
   getBlockDeviceMappingsSource: (command: IServerGroupCommand) => IBlockDeviceMappingSource;
   selectBlockDeviceMappingsSource: (command: IServerGroupCommand, selection: string) => void;
   usePreferredZonesChanged: (command: IServerGroupCommand) => IAmazonServerGroupCommandResult;
-  clusterChanged: (command: IServerGroupCommand) => void;
   regionIsDeprecated: (command: IServerGroupCommand) => boolean;
 }
 
@@ -218,6 +219,7 @@ export class AwsServerGroupConfigurationService {
         backingData.filtered = {} as IAmazonServerGroupCommandBackingDataFiltered;
         backingData.scalingProcesses = AutoScalingProcessService.listProcesses();
         backingData.appLoadBalancers = application.getDataSource('loadBalancers').data;
+        backingData.managedResources = application.getDataSource('managedResources')?.data?.resources;
         cmd.backingData = backingData as IAmazonServerGroupCommandBackingData;
         this.configureVpcId(cmd);
         backingData.filtered.securityGroups = this.getRegionalSecurityGroups(cmd);
@@ -576,12 +578,13 @@ export class AwsServerGroupConfigurationService {
       } else {
         filteredData.regionalAvailabilityZones = null;
       }
-
+      setMatchingResourceSummary(command);
       return result;
     };
 
     cmd.clusterChanged = (command: IAmazonServerGroupCommand): void => {
       command.moniker = NameUtils.getMoniker(command.application, command.stack, command.freeFormDetails);
+      setMatchingResourceSummary(command);
     };
 
     cmd.credentialsChanged = (command: IAmazonServerGroupCommand): IServerGroupCommandResult => {
@@ -601,6 +604,7 @@ export class AwsServerGroupConfigurationService {
       } else {
         command.region = null;
       }
+      setMatchingResourceSummary(command);
       return result;
     };
 
@@ -618,7 +622,7 @@ export class AwsServerGroupConfigurationService {
 export const AWS_SERVER_GROUP_CONFIGURATION_SERVICE = 'spinnaker.amazon.serverGroup.configure.service';
 module(AWS_SERVER_GROUP_CONFIGURATION_SERVICE, [
   SECURITY_GROUP_READER,
-  require('amazon/instance/awsInstanceType.service').name,
+  AMAZON_INSTANCE_AWSINSTANCETYPE_SERVICE,
   LOAD_BALANCER_READ_SERVICE,
   CACHE_INITIALIZER_SERVICE,
   SERVER_GROUP_COMMAND_REGISTRY_PROVIDER,

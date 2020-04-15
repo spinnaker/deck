@@ -1,21 +1,29 @@
-import * as React from 'react';
-import Select from 'react-select';
+import React from 'react';
+import Select, { Option } from 'react-select';
+import { map, capitalize } from 'lodash';
 
 import {
+  ArtifactsMode,
+  ArtifactsModeService,
+  ArtifactTypePatterns,
   IStageConfigProps,
   AccountService,
   YamlEditor,
   yamlDocumentsToString,
   IAccount,
   StageArtifactSelector,
-  SETTINGS,
   IExpectedArtifact,
   IArtifact,
   PreRewriteStageArtifactSelector,
+  StageArtifactSelectorDelegate,
   StageConfigField,
+  RadioButtonInput,
 } from '@spinnaker/core';
 
 import { ManifestBasicSettings } from 'kubernetes/v2/manifest/wizard/BasicSettings';
+import { ManifestBindArtifactsSelectorDelegate } from '../deployManifest/ManifestBindArtifactsSelectorDelegate';
+import { IManifestBindArtifact } from '../deployManifest/ManifestBindArtifactsSelector';
+import { ManifestSource } from '../../../manifest/ManifestSource';
 
 export interface IKubernetesRunJobStageConfigState {
   credentials: IAccount[];
@@ -27,11 +35,21 @@ export class KubernetesV2RunJobStageConfig extends React.Component<IStageConfigP
     credentials: [],
   };
 
+  private readonly excludedManifestArtifactTypes = [
+    ArtifactTypePatterns.DOCKER_IMAGE,
+    ArtifactTypePatterns.KUBERNETES,
+    ArtifactTypePatterns.FRONT50_PIPELINE_TEMPLATE,
+    ArtifactTypePatterns.MAVEN_FILE,
+  ];
+
   constructor(props: IStageConfigProps) {
     super(props);
     const { stage, application } = this.props;
     if (!stage.application) {
       stage.application = application.name;
+    }
+    if (!stage.source) {
+      stage.source = ManifestSource.TEXT;
     }
   }
 
@@ -43,7 +61,7 @@ export class KubernetesV2RunJobStageConfig extends React.Component<IStageConfigP
 
   public accountChanged = (account: string) => {
     this.props.updateStageField({
-      credentails: account,
+      credentials: account,
       account: account,
     });
   };
@@ -97,13 +115,27 @@ export class KubernetesV2RunJobStageConfig extends React.Component<IStageConfigP
     });
   };
 
+  private onManifestArtifactSelected = (expectedArtifactId: string): void => {
+    this.props.updateStageField({
+      manifestArtifactId: expectedArtifactId,
+      manifestArtifact: null,
+    });
+  };
+
+  private onManifestArtifactEdited = (artifact: IArtifact) => {
+    this.props.updateStageField({
+      manifestArtifactId: null,
+      manifestArtifact: artifact,
+    });
+  };
+
+  private onManifestArtifactAccountSelected = (accountName: string): void => {
+    this.props.updateStageField({ manifestArtifactAccount: accountName });
+  };
+
   private updatePropertyFile = (event: any) => {
     this.props.updateStageField({ propertyFile: event.target.value });
   };
-
-  private checkFeatureFlag(flag: string): boolean {
-    return !!SETTINGS.feature[flag];
-  }
 
   public logSourceForm() {
     const { stage } = this.props;
@@ -147,31 +179,92 @@ export class KubernetesV2RunJobStageConfig extends React.Component<IStageConfigP
         selectedArtifactAccount={stage.consumeArtifactAccount}
         setArtifactAccount={(artifactAccount: string) => this.updateArtifactAccount(artifactAccount)}
         setArtifactId={(artifactId: string) => this.updateArtifactId(artifactId)}
+        updatePipeline={this.props.updatePipeline}
       />
     );
   }
 
+  private getSourceOptions = (): Array<Option<string>> => {
+    return map([ManifestSource.TEXT, ManifestSource.ARTIFACT], option => ({
+      label: capitalize(option),
+      value: option,
+    }));
+  };
+
+  private getRequiredArtifacts = (): IManifestBindArtifact[] => {
+    const { requiredArtifactIds, requiredArtifacts } = this.props.stage;
+    return (requiredArtifactIds || [])
+      .map((id: string) => ({ expectedArtifactId: id }))
+      .concat(requiredArtifacts || []);
+  };
+
+  private onRequiredArtifactsChanged = (bindings: IManifestBindArtifact[]): void => {
+    this.props.updateStageField({
+      requiredArtifactIds: bindings.filter(b => b.expectedArtifactId).map(b => b.expectedArtifactId),
+    });
+    this.props.updateStageField({ requiredArtifacts: bindings.filter(b => b.artifact) });
+  };
+
   public render() {
-    const { application, stage } = this.props;
+    const { stage } = this.props;
 
     let outputSource = <div />;
     if (stage.consumeArtifactSource === 'propertyFile') {
       outputSource = this.logSourceForm();
     } else if (stage.consumeArtifactSource === 'artifact') {
-      outputSource = this.checkFeatureFlag('artifactsRewrite') ? this.artifactRewriteForm() : this.artifactForm();
+      outputSource =
+        ArtifactsModeService.artifactsMode === ArtifactsMode.STANDARD
+          ? this.artifactRewriteForm()
+          : this.artifactForm();
     }
 
     return (
       <div className="container-fluid form-horizontal">
         <h4>Basic Settings</h4>
         <ManifestBasicSettings
-          app={application}
           selectedAccount={stage.account || ''}
           accounts={this.state.credentials}
           onAccountSelect={(selectedAccount: string) => this.accountChanged(selectedAccount)}
         />
         <h4>Manifest Configuration</h4>
-        <YamlEditor value={this.state.rawManifest} onChange={this.handleRawManifestChange} />
+        <StageConfigField label="Manifest Source" helpKey="kubernetes.manifest.source">
+          <RadioButtonInput
+            options={this.getSourceOptions()}
+            onChange={(e: any) => this.props.updateStageField({ source: e.target.value })}
+            value={stage.source}
+          />
+        </StageConfigField>
+        {stage.source === ManifestSource.TEXT && (
+          <YamlEditor value={this.state.rawManifest} onChange={this.handleRawManifestChange} />
+        )}
+        {stage.source === ManifestSource.ARTIFACT && (
+          <>
+            <StageArtifactSelectorDelegate
+              artifact={stage.manifestArtifact}
+              excludedArtifactTypePatterns={this.excludedManifestArtifactTypes}
+              expectedArtifactId={stage.manifestArtifactId}
+              helpKey="kubernetes.manifest.expectedArtifact"
+              label="Manifest Artifact"
+              onArtifactEdited={this.onManifestArtifactEdited}
+              onExpectedArtifactSelected={(artifact: IExpectedArtifact) => this.onManifestArtifactSelected(artifact.id)}
+              pipeline={this.props.pipeline}
+              selectedArtifactAccount={stage.manifestArtifactAccount}
+              selectedArtifactId={stage.manifestArtifactId}
+              setArtifactAccount={this.onManifestArtifactAccountSelected}
+              setArtifactId={this.onManifestArtifactSelected}
+              stage={stage}
+              updatePipeline={this.props.updatePipeline}
+            />
+          </>
+        )}
+        <StageConfigField label="Required Artifacts to Bind" helpKey="kubernetes.manifest.requiredArtifactsToBind">
+          <ManifestBindArtifactsSelectorDelegate
+            bindings={this.getRequiredArtifacts()}
+            onChangeBindings={this.onRequiredArtifactsChanged}
+            pipeline={this.props.pipeline}
+            stage={stage}
+          />
+        </StageConfigField>
         <h4>Output</h4>
         <StageConfigField label="Capture Output From" helpKey="kubernetes.runJob.captureSource">
           <div>

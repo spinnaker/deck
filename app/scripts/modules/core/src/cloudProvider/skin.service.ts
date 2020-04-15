@@ -1,10 +1,9 @@
 import { IPromise } from 'angular';
 import { map } from 'lodash';
-import { $log, $q } from 'ngimport';
+import { $log } from 'ngimport';
 
-import { SETTINGS } from 'core/config/settings';
 import { AccountService, IAccountDetails } from 'core/account';
-import { CloudProviderRegistry } from 'core/cloudProvider';
+import { CloudProviderRegistry } from './CloudProviderRegistry';
 import { ILoadBalancer, IServerGroup } from 'core/domain';
 import { IMoniker } from 'core/naming';
 import { Application } from 'core/application';
@@ -109,10 +108,6 @@ export class SkinService {
   }
 
   public static getAccounts(): IPromise<IAccountDetails[]> {
-    if (!SETTINGS.feature.versionedProviders) {
-      return $q.resolve([]);
-    }
-
     return AccountService.getCredentialsKeyedByAccount()
       .then(aggregatedAccounts => map(aggregatedAccounts))
       .catch(e => {

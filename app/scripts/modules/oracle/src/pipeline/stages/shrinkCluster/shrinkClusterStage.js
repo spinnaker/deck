@@ -1,11 +1,13 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
 import { AccountService, Registry } from '@spinnaker/core';
 
-module.exports = angular
-  .module('spinnaker.core.pipeline.stage.oracle.shrinkClusterStage', [])
+export const ORACLE_PIPELINE_STAGES_SHRINKCLUSTER_SHRINKCLUSTERSTAGE =
+  'spinnaker.core.pipeline.stage.oracle.shrinkClusterStage';
+export const name = ORACLE_PIPELINE_STAGES_SHRINKCLUSTER_SHRINKCLUSTERSTAGE; // for backwards compatibility
+module(ORACLE_PIPELINE_STAGES_SHRINKCLUSTER_SHRINKCLUSTERSTAGE, [])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'shrinkCluster',
@@ -22,9 +24,9 @@ module.exports = angular
   .controller('oracleShrinkClusterStageCtrl', [
     '$scope',
     function($scope) {
-      let ctrl = this;
+      const ctrl = this;
 
-      let stage = $scope.stage;
+      const stage = $scope.stage;
 
       $scope.state = {
         accounts: false,

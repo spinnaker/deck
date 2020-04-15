@@ -40,7 +40,7 @@ module.exports = {
               ecma: 6,
               mangle: false,
               output: {
-                comments: false,
+                comments: /webpackIgnore/,
               },
             },
           }),
@@ -87,7 +87,7 @@ module.exports = {
           { loader: 'thread-loader', options: { workers: WEBPACK_THREADS } },
           { loader: 'babel-loader' },
           { loader: 'ts-loader', options: { happyPackMode: true } },
-          { loader: 'tslint-loader' },
+          { loader: 'eslint-loader' },
         ],
         exclude: exclusionPattern,
       },
@@ -103,6 +103,14 @@ module.exports = {
       {
         test: /\.css$/,
         use: [{ loader: 'style-loader' }, { loader: 'css-loader' }, { loader: 'postcss-loader' }],
+      },
+      {
+        test: /\.svg$/,
+        issuer: {
+          test: /\.(tsx?|js)$/,
+        },
+        use: [{ loader: '@svgr/webpack' }],
+        exclude: exclusionPattern,
       },
       {
         test: /\.html$/,
@@ -123,9 +131,5 @@ module.exports = {
     ],
   },
   plugins: [new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true })],
-  externals: [
-    '@spinnaker/core',
-    'exports-loader?"n3-line-chart"!n3-charts/build/LineChart.js',
-    nodeExternals({ modulesDir: '../../../../node_modules' }),
-  ],
+  externals: ['@spinnaker/core', nodeExternals({ modulesDir: '../../../../node_modules' })],
 };

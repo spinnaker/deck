@@ -1,10 +1,11 @@
-import * as React from 'react';
+import React from 'react';
 
 import { Dropdown, Tooltip } from 'react-bootstrap';
 import { filter, find, get, orderBy } from 'lodash';
 
 import {
   ClusterTargetBuilder,
+  ConfirmationModalService,
   IOwnerOption,
   IServerGroupActionsProps,
   IServerGroupJob,
@@ -15,7 +16,7 @@ import {
 } from '@spinnaker/core';
 
 import { ICloudFoundryServerGroup } from 'cloudfoundry/domain';
-import { CloudFoundryCreateServerGroupModal } from 'cloudfoundry/serverGroup/configure/wizard/CreateServerGroupModal';
+import { CloudFoundryCreateServerGroupModal } from '../configure/wizard/CreateServerGroupModal';
 import { CloudFoundryResizeServerGroupModal } from './resize/CloudFoundryResizeServerGroupModal';
 import { CloudFoundryRollbackServerGroupModal } from './rollback/CloudFoundryRollbackServerGroupModal';
 import { CloudFoundryMapLoadBalancersModal } from './mapLoadBalancers/CloudFoundryMapLoadBalancersModal';
@@ -71,9 +72,20 @@ export class CloudFoundryServerGroupActions extends React.Component<ICloudFoundr
   private destroyServerGroup = (): void => {
     const { app, serverGroup } = this.props;
 
+    const stateParams = {
+      name: serverGroup.name,
+      accountId: serverGroup.account,
+      region: serverGroup.region,
+    };
+
     const taskMonitor = {
       application: app,
       title: 'Destroying ' + serverGroup.name,
+      onTaskComplete: () => {
+        if (ReactInjector.$state.includes('**.serverGroup', stateParams)) {
+          ReactInjector.$state.go('^');
+        }
+      },
     };
 
     const submitMethod = (params: ICloudFoundryServerGroupJob) => {
@@ -81,28 +93,16 @@ export class CloudFoundryServerGroupActions extends React.Component<ICloudFoundr
       return ReactInjector.serverGroupWriter.destroyServerGroup(serverGroup, app, params);
     };
 
-    const stateParams = {
-      name: serverGroup.name,
-      accountId: serverGroup.account,
-      region: serverGroup.region,
-    };
-
     const confirmationModalParams = {
       header: 'Really destroy ' + serverGroup.name + '?',
       buttonText: 'Destroy ' + serverGroup.name,
       account: serverGroup.account,
-      provider: 'cloudfoundry',
       taskMonitorConfig: taskMonitor,
       interestingHealthProviderNames: undefined as string[],
       submitMethod,
       askForReason: true,
       platformHealthOnlyShowOverride: app.attributes.platformHealthOnlyShowOverride,
       platformHealthType: 'Cloud Foundry',
-      onTaskComplete: () => {
-        if (ReactInjector.$state.includes('**.serverGroup', stateParams)) {
-          ReactInjector.$state.go('^');
-        }
-      },
     };
 
     ServerGroupWarningMessageService.addDestroyWarningMessage(app, serverGroup, confirmationModalParams);
@@ -111,7 +111,7 @@ export class CloudFoundryServerGroupActions extends React.Component<ICloudFoundr
       confirmationModalParams.interestingHealthProviderNames = ['Cloud Foundry'];
     }
 
-    ReactInjector.confirmationModalService.confirm(confirmationModalParams);
+    ConfirmationModalService.confirm(confirmationModalParams);
   };
 
   private disableServerGroup = (): void => {
@@ -130,7 +130,6 @@ export class CloudFoundryServerGroupActions extends React.Component<ICloudFoundr
       header: 'Really disable ' + serverGroup.name + '?',
       buttonText: 'Disable ' + serverGroup.name,
       account: serverGroup.account,
-      provider: 'cloudfoundry',
       interestingHealthProviderNames: undefined as string[],
       taskMonitorConfig: taskMonitor,
       platformHealthOnlyShowOverride: app.attributes.platformHealthOnlyShowOverride,
@@ -145,7 +144,7 @@ export class CloudFoundryServerGroupActions extends React.Component<ICloudFoundr
       confirmationModalParams.interestingHealthProviderNames = ['Cloud Foundry'];
     }
 
-    ReactInjector.confirmationModalService.confirm(confirmationModalParams);
+    ConfirmationModalService.confirm(confirmationModalParams);
   };
 
   private enableServerGroup = (): void => {
@@ -162,8 +161,7 @@ export class CloudFoundryServerGroupActions extends React.Component<ICloudFoundr
       cancelButtonText: 'No, I just want to enable the server group',
     };
 
-    ReactInjector.confirmationModalService
-      .confirm(confirmationModalParams)
+    ConfirmationModalService.confirm(confirmationModalParams)
       .then(() => this.rollbackServerGroup())
       .catch(({ source }) => {
         // don't show the enable modal if the user cancels with the header button
@@ -202,7 +200,7 @@ export class CloudFoundryServerGroupActions extends React.Component<ICloudFoundr
       confirmationModalParams.interestingHealthProviderNames = ['Cloud Foundry'];
     }
 
-    ReactInjector.confirmationModalService.confirm(confirmationModalParams);
+    ConfirmationModalService.confirm(confirmationModalParams);
   }
 
   private rollbackServerGroup = (): void => {
@@ -210,12 +208,9 @@ export class CloudFoundryServerGroupActions extends React.Component<ICloudFoundr
 
     let serverGroup: ICloudFoundryServerGroup = this.props.serverGroup;
     let previousServerGroup: ICloudFoundryServerGroup;
-    let allServerGroups = app
-      .getDataSource('serverGroups')
-      .data.filter(
-        (g: ICloudFoundryServerGroup) =>
-          g.cluster === serverGroup.cluster && g.region === serverGroup.region && g.account === serverGroup.account,
-      );
+    let allServerGroups = (app.serverGroups.data as ICloudFoundryServerGroup[]).filter(
+      g => g.cluster === serverGroup.cluster && g.region === serverGroup.region && g.account === serverGroup.account,
+    );
 
     if (serverGroup.isDisabled) {
       // if the selected server group is disabled, it represents the server group that should be _rolled back to_
@@ -234,7 +229,7 @@ export class CloudFoundryServerGroupActions extends React.Component<ICloudFoundr
     }
 
     // the set of all server groups should not include the server group selected for rollback
-    allServerGroups = allServerGroups.filter((g: ICloudFoundryServerGroup) => g.name !== serverGroup.name);
+    allServerGroups = allServerGroups.filter(g => g.name !== serverGroup.name);
 
     if (allServerGroups.length === 1 && !previousServerGroup) {
       // if there is only one other server group, default to it being the rollback target

@@ -238,6 +238,7 @@ export class AwsLoadBalancerTransformer {
               sslCertificateId: listener.sslcertificateId,
               sslCertificateName: listener.sslcertificateId,
               sslCertificateType: listener.sslCertificateType,
+              policyNames: description.policyNames,
             };
           },
         );
@@ -368,6 +369,7 @@ export class AwsLoadBalancerTransformer {
               stickinessEnabled: targetGroup.attributes['stickiness.enabled'] === 'true',
               stickinessType: targetGroup.attributes['stickiness.type'],
               stickinessDuration: Number(targetGroup.attributes['stickiness.lb_cookie.duration_seconds']),
+              multiValueHeadersEnabled: targetGroup.attributes['lambda.multi_value_headers.enabled'] === 'true',
             },
           };
         });
@@ -479,9 +481,9 @@ export class AwsLoadBalancerTransformer {
   public static constructNewClassicLoadBalancerTemplate(
     application: Application,
   ): IAmazonClassicLoadBalancerUpsertCommand {
-    const defaultCredentials = application.defaultCredentials.aws || AWSProviderSettings.defaults.account,
-      defaultRegion = application.defaultRegions.aws || AWSProviderSettings.defaults.region,
-      defaultSubnetType = AWSProviderSettings.defaults.subnetType;
+    const defaultCredentials = application.defaultCredentials.aws || AWSProviderSettings.defaults.account;
+    const defaultRegion = application.defaultRegions.aws || AWSProviderSettings.defaults.region;
+    const defaultSubnetType = AWSProviderSettings.defaults.subnetType;
     return {
       availabilityZones: undefined,
       name: '',
@@ -519,11 +521,11 @@ export class AwsLoadBalancerTransformer {
   public static constructNewApplicationLoadBalancerTemplate(
     application: Application,
   ): IAmazonApplicationLoadBalancerUpsertCommand {
-    const defaultCredentials = application.defaultCredentials.aws || AWSProviderSettings.defaults.account,
-      defaultRegion = application.defaultRegions.aws || AWSProviderSettings.defaults.region,
-      defaultSubnetType = AWSProviderSettings.defaults.subnetType,
-      defaultPort = application.attributes.instancePort || SETTINGS.defaultInstancePort,
-      defaultTargetGroupName = `targetgroup`;
+    const defaultCredentials = application.defaultCredentials.aws || AWSProviderSettings.defaults.account;
+    const defaultRegion = application.defaultRegions.aws || AWSProviderSettings.defaults.region;
+    const defaultSubnetType = AWSProviderSettings.defaults.subnetType;
+    const defaultPort = application.attributes.instancePort || SETTINGS.defaultInstancePort;
+    const defaultTargetGroupName = `targetgroup`;
     return {
       name: '',
       availabilityZones: undefined,
@@ -556,6 +558,7 @@ export class AwsLoadBalancerTransformer {
             stickinessEnabled: false,
             stickinessType: 'lb_cookie',
             stickinessDuration: 8400,
+            multiValueHeadersEnabled: false,
           },
         },
       ],
@@ -581,10 +584,10 @@ export class AwsLoadBalancerTransformer {
   public static constructNewNetworkLoadBalancerTemplate(
     application: Application,
   ): IAmazonNetworkLoadBalancerUpsertCommand {
-    const defaultCredentials = application.defaultCredentials.aws || AWSProviderSettings.defaults.account,
-      defaultRegion = application.defaultRegions.aws || AWSProviderSettings.defaults.region,
-      defaultSubnetType = AWSProviderSettings.defaults.subnetType,
-      defaultTargetGroupName = `targetgroup`;
+    const defaultCredentials = application.defaultCredentials.aws || AWSProviderSettings.defaults.account;
+    const defaultRegion = application.defaultRegions.aws || AWSProviderSettings.defaults.region;
+    const defaultSubnetType = AWSProviderSettings.defaults.subnetType;
+    const defaultTargetGroupName = `targetgroup`;
     return {
       name: '',
       availabilityZones: undefined,

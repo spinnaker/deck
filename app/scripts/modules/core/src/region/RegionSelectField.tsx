@@ -1,8 +1,8 @@
-import * as React from 'react';
+import React from 'react';
 import { $rootScope } from 'ngimport';
 
 import { IRegion } from 'core/account';
-import { RegionSelectInput } from 'core/region/RegionSelectInput';
+import { RegionSelectInput } from './RegionSelectInput';
 
 export interface IRegionSelectFieldProps {
   account: string;

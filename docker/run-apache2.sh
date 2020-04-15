@@ -44,6 +44,10 @@ mv spinnaker.conf  /etc/apache2/sites-available
 
 a2ensite spinnaker
 
+# Disable default site
+
+a2dissite 000-default
+
 # Update ports.conf to reflect desired deck host
 
 cp docker/ports.conf.gen ports.conf
@@ -74,6 +78,11 @@ fi
 if [ -e /opt/spinnaker/config/settings-local.js ];
 then 
 	cp /opt/spinnaker/config/settings-local.js /opt/deck/html/settings-local.js
+fi
+
+if [ -e /opt/spinnaker/config/plugin-manifest.json ];
+then 
+	cp /opt/spinnaker/config/plugin-manifest.json /opt/deck/html/plugin-manifest.json
 fi
 
 apache2ctl -D FOREGROUND 

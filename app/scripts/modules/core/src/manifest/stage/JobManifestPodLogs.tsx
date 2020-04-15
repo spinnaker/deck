@@ -1,6 +1,6 @@
-import * as React from 'react';
+import React from 'react';
 import { Modal, Button } from 'react-bootstrap';
-import * as classNames from 'classnames';
+import classNames from 'classnames';
 import { bindAll } from 'lodash';
 
 import { InstanceReader, IInstanceConsoleOutput, IInstanceMultiOutputLog } from 'core/instance/InstanceReader';
@@ -85,11 +85,11 @@ export class JobManifestPodLogs extends React.Component<IJobManifestPodLogsProps
           <a onClick={this.onClick} className="clickable">
             {this.props.linkName}
           </a>
-          <Modal show={showModal} onHide={this.close} dialogClassName="modal-lg modal-fullscreen">
+          <Modal show={showModal} onHide={this.close} dialogClassName="modal-lg modal-fullscreen flex-fill">
             <Modal.Header closeButton={true}>
               <Modal.Title>Console Output: {this.podName()} </Modal.Title>
             </Modal.Header>
-            <Modal.Body>
+            <Modal.Body className="flex-fill">
               {containerLogs.length && (
                 <>
                   <ul className="tabs-basic console-output-tabs">
@@ -105,7 +105,7 @@ export class JobManifestPodLogs extends React.Component<IJobManifestPodLogsProps
                       </li>
                     ))}
                   </ul>
-                  <pre className="body-small">{selectedContainerLog.output}</pre>
+                  <pre className="body-small flex-fill">{selectedContainerLog.output}</pre>
                 </>
               )}
               {errorMessage && <pre className="body-small">{errorMessage}</pre>}

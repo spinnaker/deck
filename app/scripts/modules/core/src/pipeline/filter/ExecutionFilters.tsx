@@ -1,9 +1,9 @@
 import { IPromise } from 'angular';
-import * as React from 'react';
-import * as ReactGA from 'react-ga';
+import React from 'react';
+import ReactGA from 'react-ga';
 import { get, isEmpty, orderBy, uniq, isEqual } from 'lodash';
 import { Debounce } from 'lodash-decorators';
-import * as classnames from 'classnames';
+import classNames from 'classnames';
 import { SortableContainer, SortableElement, SortableHandle, arrayMove, SortEnd } from 'react-sortable-hoc';
 import { Subscription } from 'rxjs';
 
@@ -11,7 +11,7 @@ import { Application } from 'core/application';
 import { FilterSection } from 'core/cluster/filter/FilterSection';
 import { IFilterTag } from 'core/filterModel';
 import { IExecution, IPipeline } from 'core/domain';
-import { PipelineConfigService } from 'core/pipeline/config/services/PipelineConfigService';
+import { PipelineConfigService } from '../config/services/PipelineConfigService';
 import { ReactInjector } from 'core/reactShims';
 import { ExecutionState } from 'core/state';
 import { ExecutionFilterService } from './executionFilter.service';
@@ -301,7 +301,7 @@ const FilterCheckbox = (props: {
 
 const Pipeline = SortableElement(
   (props: { tag: IFilterTag; pipeline: string; dragEnabled: boolean; update: () => void }) => (
-    <div className={classnames('checkbox sortable', { 'disable-user-select': props.dragEnabled })}>
+    <div className={classNames('checkbox sortable', { 'disable-user-select': props.dragEnabled })}>
       <div>
         <label>
           {props.dragEnabled && <DragHandle />}

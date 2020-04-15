@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 
 import { FormikFormField, HelpField, NumberInput } from '@spinnaker/core';
 
@@ -35,7 +35,6 @@ const UnhealthyTasksLimitsField = () => (
 const AvailabilityPercentageLimit = (componentProps: IFieldOptionComponentProps) => (
   <FormikFormField
     name="disruptionBudget.availabilityPercentageLimit.percentageOfHealthyContainers"
-    fastField={false}
     label="Percentage of Healthy Containers"
     input={props => (
       <div>

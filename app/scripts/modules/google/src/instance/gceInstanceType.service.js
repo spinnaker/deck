@@ -1,11 +1,15 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 import _ from 'lodash';
 
 import { AccountService, SETTINGS } from '@spinnaker/core';
 
-module.exports = angular.module('spinnaker.gce.instanceType.service', []).factory('gceInstanceTypeService', [
+import { GCE_INSTANCE_TYPE_DISK_DEFAULTS } from './gceInstanceTypeDisks';
+
+export const GOOGLE_INSTANCE_GCEINSTANCETYPE_SERVICE = 'spinnaker.gce.instanceType.service';
+export const name = GOOGLE_INSTANCE_GCEINSTANCETYPE_SERVICE; // for backwards compatibility
+module(GOOGLE_INSTANCE_GCEINSTANCETYPE_SERVICE, []).factory('gceInstanceTypeService', [
   '$http',
   '$q',
   '$log',
@@ -237,7 +241,10 @@ module.exports = angular.module('spinnaker.gce.instanceType.service', []).factor
       const initializedCategories = _.cloneDeep(categories);
       return AccountService.getAllAccountDetailsForProvider('gce').then(accountDetails => {
         // All GCE accounts have the same instance type disk defaults, so we can pick the first one.
-        const instanceTypeDisks = _.get(accountDetails, '[0].instanceTypeDisks');
+        let instanceTypeDisks = _.get(accountDetails, '[0].instanceTypeDisks');
+        if (_.isEmpty(instanceTypeDisks)) {
+          instanceTypeDisks = GCE_INSTANCE_TYPE_DISK_DEFAULTS;
+        }
         if (instanceTypeDisks) {
           const families = _.flatten(initializedCategories.map(category => category.families));
           families.forEach(family => {
@@ -271,8 +278,8 @@ module.exports = angular.module('spinnaker.gce.instanceType.service', []).factor
                   })
                   .filter(disk => !!disk);
 
-                let size = 0,
-                  count = 0;
+                let size = 0;
+                let count = 0;
                 if (diskDefaults.supportsLocalSSD) {
                   count = disks.filter(disk => disk.type === 'local-ssd').length;
                   size = 375;

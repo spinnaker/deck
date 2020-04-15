@@ -1,8 +1,9 @@
-import { uniq, isNil, cloneDeep, intersection, memoize, defaults } from 'lodash';
+import { uniq, isNil, cloneDeep, intersection, memoize, defaults, fromPairs } from 'lodash';
 
 import { Application } from 'core/application/application.model';
 import {
   IExecution,
+  INotificationTypeConfig,
   IStage,
   ITriggerTypeConfig,
   IStageTypeConfig,
@@ -13,6 +14,7 @@ import {
 import { CloudProviderRegistry, ICloudProviderConfig } from 'core/cloudProvider';
 import { SETTINGS } from 'core/config/settings';
 import { IAccountDetails } from 'core/account/AccountService';
+import { PreconfiguredJobReader } from './stages/preconfiguredJob';
 
 import { ITriggerTemplateComponentProps } from '../manualExecution/TriggerTemplate';
 import { ComponentType, SFC } from 'react';
@@ -26,12 +28,13 @@ export class PipelineRegistry {
   private triggerTypes: ITriggerTypeConfig[] = [];
   private stageTypes: IStageTypeConfig[] = [];
   private transformers: ITransformer[] = [];
+  private notificationTypes: INotificationTypeConfig[] = [];
   private artifactKinds: IArtifactKindConfig[] = artifactKindConfigs;
   private customArtifactKind: IArtifactKindConfig;
 
   constructor() {
     this.getStageConfig = memoize(this.getStageConfig.bind(this), (stage: IStage) =>
-      [stage ? stage.type : '', stage ? stage.cloudProvider || stage.cloudProviderType || 'aws' : ''].join(':'),
+      [stage ? stage.type : '', stage ? PipelineRegistry.resolveCloudProvider(stage) : ''].join(':'),
     );
   }
 
@@ -64,6 +67,20 @@ export class PipelineRegistry {
       });
   }
 
+  public registerNotification(notificationConfig: INotificationTypeConfig): void {
+    if (SETTINGS.notifications) {
+      const notificationSetting: { enabled: boolean; botName?: string } =
+        SETTINGS.notifications?.[notificationConfig.key];
+      if (notificationSetting && notificationSetting.enabled) {
+        const config = cloneDeep(notificationConfig);
+        config.config = { ...notificationSetting };
+        this.notificationTypes.push(config);
+      }
+    } else {
+      this.notificationTypes.push(notificationConfig);
+    }
+  }
+
   public registerTrigger(triggerConfig: ITriggerTypeConfig): void {
     if (SETTINGS.triggerTypes) {
       if (SETTINGS.triggerTypes.indexOf(triggerConfig.key) >= 0) {
@@ -81,6 +98,59 @@ export class PipelineRegistry {
   public registerStage(stageConfig: IStageTypeConfig): void {
     this.stageTypes.push(stageConfig);
     this.normalizeStageTypes();
+  }
+
+  /**
+   * Registers a custom UI for a preconfigured run job stage.
+   *
+   * Fetches and applies the preconfigured job configuration from Gate.
+   * The following IStageTypeConfig fields are overwritten:
+   *
+   * - configuration.parameters
+   * - configuration.waitForCompletion
+   * - defaults
+   * - description
+   * - label
+   * - producesArtifacts
+   *
+   * @param stageConfigSkeleton a partial IStageTypeConfig (typically from makePreconfiguredJobStage())
+   * @returns a promise for the IStageTypeConfig that got registered
+   */
+  public async registerPreconfiguredJobStage(stageConfigSkeleton: IStageTypeConfig): Promise<IStageTypeConfig> {
+    const preconfiguredJobsFromGate = await PreconfiguredJobReader.list();
+    const job = preconfiguredJobsFromGate.find(j => j.type === stageConfigSkeleton.key);
+
+    if (!job) {
+      throw new Error(
+        `Preconfigured Job of type '${stageConfigSkeleton.key}' not found in /jobs/preconfigured from gate.  ` +
+          'Is the preconfigured job registered in orca?',
+      );
+    }
+
+    const parameters = job?.parameters ?? [];
+    const paramsWithDefaults = parameters.filter(p => !isNil(p.defaultValue));
+    const defaultParameterValues = fromPairs(paramsWithDefaults.map(p => [p.name, p.defaultValue]));
+
+    const { label, description, waitForCompletion, producesArtifacts } = job;
+
+    // Apply job configuration from Gate to the skeleton
+    const stageConfig: IStageTypeConfig = {
+      ...stageConfigSkeleton,
+      configuration: {
+        ...stageConfigSkeleton.configuration,
+        parameters,
+        waitForCompletion,
+      },
+      defaults: {
+        parameters: defaultParameterValues,
+      },
+      description,
+      label,
+      producesArtifacts,
+    };
+
+    this.registerStage(stageConfig);
+    return stageConfig;
   }
 
   public registerArtifactKind(
@@ -106,6 +176,10 @@ export class PipelineRegistry {
 
   public getExecutionTransformers(): ITransformer[] {
     return this.transformers;
+  }
+
+  public getNotificationTypes(): INotificationTypeConfig[] {
+    return cloneDeep(this.notificationTypes);
   }
 
   public getTriggerTypes(): ITriggerTypeConfig[] {
@@ -205,6 +279,10 @@ export class PipelineRegistry {
     });
   }
 
+  public getNotificationConfig(type: string): INotificationTypeConfig {
+    return this.getNotificationTypes().find(notificationType => notificationType.key === type);
+  }
+
   public getTriggerConfig(type: string): ITriggerTypeConfig {
     return this.getTriggerTypes().find(triggerType => triggerType.key === type);
   }
@@ -258,34 +336,37 @@ export class PipelineRegistry {
     });
 
     switch (matches.length) {
-      case 0:
+      case 0: {
         // There are really only 2 usages for 'alias':
         // - to allow deck to still find a match for legacy stage types
         // - to have stages that actually run as their 'alias' in orca (addAliasToConfig) because their 'key' doesn't actually exist
         const aliasMatch = this.checkAliasedStageTypes(stage) || this.checkAliasFallback(stage);
-        if (aliasMatch) {
-          return aliasMatch;
-        }
-        return this.getStageTypes().find(s => s.key === 'unmatched') || null;
+        const unmatchedStageType = this.getStageTypes().find(s => s.key === 'unmatched');
+        return aliasMatch ?? unmatchedStageType;
+      }
       case 1:
         return matches[0];
       default: {
-        const provider = stage.cloudProvider || stage.cloudProviderType || 'aws';
-        const matchesForStageCloudProvider = matches.filter(stageType => {
-          return stageType.cloudProvider === provider;
-        });
-
-        if (!matchesForStageCloudProvider.length) {
-          return (
-            matches.find(stageType => {
-              return !!stageType.cloudProvider;
-            }) || null
-          );
-        } else {
-          return matchesForStageCloudProvider[0];
-        }
+        // More than one stage definition matched the stage's 'type' field.
+        // Try to narrow it down by cloud provider.
+        const provider = PipelineRegistry.resolveCloudProvider(stage);
+        const matchesThisCloudProvider = matches.find(stageType => stageType.cloudProvider === provider);
+        const matchesAnyCloudProvider = matches.find(stageType => !!stageType.cloudProvider);
+        return matchesThisCloudProvider ?? matchesAnyCloudProvider ?? matches[0];
       }
     }
+  }
+
+  // IStage doesn't have a cloudProvider field yet many stage configs are setting it.
+  // Some stages (RunJob, ?) are only setting the cloudProvider field in stage.context.
+  private static resolveCloudProvider(stage: IStage): string {
+    return (
+      stage.cloudProvider ??
+      stage.cloudProviderType ??
+      stage.context?.cloudProvider ??
+      stage.context?.cloudProviderType ??
+      'aws'
+    );
   }
 
   private getManualExecutionComponent(

@@ -1,11 +1,20 @@
 'use strict';
 
-const angular = require('angular');
+import { module } from 'angular';
 
-import { AccountService, AuthenticationService, BakeryReader, Registry, PipelineTemplates } from '@spinnaker/core';
+import {
+  AccountService,
+  AuthenticationService,
+  BakeryReader,
+  BakeExecutionLabel,
+  Registry,
+  PipelineTemplates,
+} from '@spinnaker/core';
+import { ORACLE_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER } from './bakeExecutionDetails.controller';
 
-module.exports = angular
-  .module('spinnaker.oracle.pipeline.stage.bakeStage', [require('./bakeExecutionDetails.controller').name])
+export const ORACLE_PIPELINE_STAGES_BAKE_OCIBAKESTAGE = 'spinnaker.oracle.pipeline.stage.bakeStage';
+export const name = ORACLE_PIPELINE_STAGES_BAKE_OCIBAKESTAGE; // for backwards compatibility
+module(ORACLE_PIPELINE_STAGES_BAKE_OCIBAKESTAGE, [ORACLE_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER])
   .config(function() {
     Registry.pipeline.registerStage({
       provides: 'bake',
@@ -14,8 +23,8 @@ module.exports = angular
       description: 'Bakes an image',
       templateUrl: require('./bakeStage.html'),
       executionDetailsUrl: require('./bakeExecutionDetails.html'),
-      executionLabelTemplateUrl: require('core/pipeline/config/stages/bake/BakeExecutionLabel'),
-      defaultTimeoutMs: 60 * 60 * 1000, // 60 minutes
+      executionLabelComponent: BakeExecutionLabel,
+      supportsCustomTimeout: true,
       validators: [
         { type: 'requiredField', fieldName: 'accountName' },
         { type: 'requiredField', fieldName: 'region' },

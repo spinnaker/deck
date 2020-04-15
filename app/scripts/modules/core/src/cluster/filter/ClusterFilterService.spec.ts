@@ -1,10 +1,10 @@
 import { mock } from 'angular';
-import * as _ from 'lodash';
 import { REACT_MODULE } from 'core/reactShims';
 import { CLUSTER_SERVICE } from 'core/cluster/cluster.service';
 import { Application } from 'core/application/application.model';
 import { ApplicationModelBuilder } from 'core/application/applicationModel.builder';
 import * as State from 'core/state';
+import { cloneDeep, filter } from 'lodash';
 
 const ClusterState = State.ClusterState;
 
@@ -29,9 +29,13 @@ describe('Service: clusterFilterService', function() {
     });
 
     this.buildApplication = (json: any) => {
-      const app = ApplicationModelBuilder.createApplicationForTests('app', { key: 'serverGroups', lazy: true });
+      const app = ApplicationModelBuilder.createApplicationForTests('app', {
+        key: 'serverGroups',
+        lazy: true,
+        defaultData: [],
+      });
       if (json.serverGroups) {
-        app.getDataSource('serverGroups').data = _.cloneDeep(json.serverGroups.data);
+        app.getDataSource('serverGroups').data = cloneDeep(json.serverGroups.data);
       }
       if (json.clusters) {
         app.clusters = json.clusters;
@@ -67,7 +71,7 @@ describe('Service: clusterFilterService', function() {
     describe('filter by cluster', function() {
       it('should filter by cluster name as an exact match', function(done) {
         ClusterState.filterModel.asFilterModel.sortFilter.filter = 'cluster:in-us-west-1-only';
-        const expected: any = _.filter(groupedJSON, { subgroups: [{ heading: 'in-us-west-1-only' }] });
+        const expected: any = filter(groupedJSON, { subgroups: [{ heading: 'in-us-west-1-only' }] });
         ClusterState.filterService.updateClusterGroups(application);
         setTimeout(() => {
           expect(ClusterState.filterModel.asFilterModel.groups).toEqual(expected);
@@ -88,7 +92,7 @@ describe('Service: clusterFilterService', function() {
     describe('filter by vpc', function() {
       it('should filter by vpc name as an exact match', function(done) {
         ClusterState.filterModel.asFilterModel.sortFilter.filter = 'vpc:main';
-        const expected: any = _.filter(groupedJSON, { subgroups: [{ heading: 'in-us-west-1-only' }] });
+        const expected: any = filter(groupedJSON, { subgroups: [{ heading: 'in-us-west-1-only' }] });
         ClusterState.filterService.updateClusterGroups(application);
         setTimeout(() => {
           expect(ClusterState.filterModel.asFilterModel.groups).toEqual(expected);
@@ -109,7 +113,7 @@ describe('Service: clusterFilterService', function() {
     describe('filter by clusters', function() {
       it('should filter by cluster names as an exact match', function(done) {
         ClusterState.filterModel.asFilterModel.sortFilter.filter = 'clusters:in-us-west-1-only';
-        const expected: any = _.filter(groupedJSON, { subgroups: [{ heading: 'in-us-west-1-only' }] });
+        const expected: any = filter(groupedJSON, { subgroups: [{ heading: 'in-us-west-1-only' }] });
         ClusterState.filterService.updateClusterGroups(application);
         setTimeout(() => {
           expect(ClusterState.filterModel.asFilterModel.groups).toEqual(expected);
@@ -139,7 +143,7 @@ describe('Service: clusterFilterService', function() {
     describe('filtering by account type', function() {
       it('1 account filter: should be transformed showing only prod accounts', function(done) {
         ClusterState.filterModel.asFilterModel.sortFilter.account = { prod: true };
-        const expectedProd: any = _.filter(groupedJSON, { heading: 'prod' });
+        const expectedProd: any = filter(groupedJSON, { heading: 'prod' });
         ClusterState.filterService.updateClusterGroups(application);
         setTimeout(() => {
           expect(ClusterState.filterModel.asFilterModel.groups).toEqual(expectedProd);
@@ -166,7 +170,7 @@ describe('Service: clusterFilterService', function() {
   describe('filter by region', function() {
     it('1 region: should filter by that region ', function(done) {
       ClusterState.filterModel.asFilterModel.sortFilter.region = { 'us-west-1': true };
-      const expected: any = _.filter(groupedJSON, { subgroups: [{ heading: 'in-us-west-1-only' }] });
+      const expected: any = filter(groupedJSON, { subgroups: [{ heading: 'in-us-west-1-only' }] });
       ClusterState.filterService.updateClusterGroups(application);
       setTimeout(() => {
         expect(ClusterState.filterModel.asFilterModel.groups).toEqual(expected);
@@ -179,7 +183,7 @@ describe('Service: clusterFilterService', function() {
   describe('filter by healthy status', function() {
     it('should filter by health if checked', function(done) {
       ClusterState.filterModel.asFilterModel.sortFilter.status = { healthy: true };
-      const expected: any = _.filter(groupedJSON, {
+      const expected: any = filter(groupedJSON, {
         subgroups: [
           {
             subgroups: [
@@ -216,7 +220,7 @@ describe('Service: clusterFilterService', function() {
   describe('filter by unhealthy status', function() {
     it('should filter by unhealthy status if checked', function(done) {
       ClusterState.filterModel.asFilterModel.sortFilter.status = { unhealthy: true };
-      const expected: any = _.filter(groupedJSON, {
+      const expected: any = filter(groupedJSON, {
         subgroups: [
           {
             subgroups: [
@@ -254,7 +258,7 @@ describe('Service: clusterFilterService', function() {
   describe('filter by both healthy and unhealthy status', function() {
     it('should not filter by healthy if unchecked', function(done) {
       ClusterState.filterModel.asFilterModel.sortFilter.status = { unhealthy: true, healthy: true };
-      const expected: any = _.filter(groupedJSON, {
+      const expected: any = filter(groupedJSON, {
         subgroups: [
           {
             subgroups: [
@@ -284,7 +288,7 @@ describe('Service: clusterFilterService', function() {
   describe('filter by disabled status', function() {
     it('should filter by disabled status if checked', function(done) {
       ClusterState.filterModel.asFilterModel.sortFilter.status = { Disabled: true };
-      const expected: any = _.filter(groupedJSON, {
+      const expected: any = filter(groupedJSON, {
         subgroups: [
           {
             subgroups: [
@@ -375,7 +379,7 @@ describe('Service: clusterFilterService', function() {
   describe('filtered by provider type', function() {
     it('should filter by aws if checked', function(done) {
       ClusterState.filterModel.asFilterModel.sortFilter.providerType = { aws: true };
-      const expected: any = _.filter(groupedJSON, {
+      const expected: any = filter(groupedJSON, {
         subgroups: [
           {
             subgroups: [
@@ -425,7 +429,7 @@ describe('Service: clusterFilterService', function() {
   describe('filtered by instance type', function() {
     it('should filter by m3.large if checked', function(done) {
       ClusterState.filterModel.asFilterModel.sortFilter.instanceType = { 'm3.large': true };
-      const expected: any = _.filter(groupedJSON, {
+      const expected: any = filter(groupedJSON, {
         subgroups: [
           {
             subgroups: [
@@ -494,7 +498,7 @@ describe('Service: clusterFilterService', function() {
   describe('filter by label (with search string)', function() {
     it('should filter by label key and value as exact, case-sensitive matches', function(done) {
       ClusterState.filterModel.asFilterModel.sortFilter.filter = 'labels:source=prod';
-      const expected: any = _.filter(groupedJSON, {
+      const expected: any = filter(groupedJSON, {
         subgroups: [
           {
             subgroups: [
@@ -538,7 +542,7 @@ describe('Service: clusterFilterService', function() {
 
     it('should perform an AND match on comma separated list, ignoring spaces', function(done) {
       ClusterState.filterModel.asFilterModel.sortFilter.filter = 'labels: source=prod, app=spinnaker';
-      const expected: any = _.filter(groupedJSON, {
+      const expected: any = filter(groupedJSON, {
         subgroups: [
           {
             subgroups: [
@@ -567,7 +571,7 @@ describe('Service: clusterFilterService', function() {
   describe('filter by label (with filters)', function() {
     it('should filter by label key and value as exact, case sensitive matches', function(done) {
       ClusterState.filterModel.asFilterModel.sortFilter.labels = { 'source:prod': true };
-      const expected: any = _.filter(groupedJSON, {
+      const expected: any = filter(groupedJSON, {
         subgroups: [
           {
             subgroups: [
@@ -611,7 +615,7 @@ describe('Service: clusterFilterService', function() {
 
     it('should perform an AND match on multiple key-value pairs', function(done) {
       ClusterState.filterModel.asFilterModel.sortFilter.labels = { 'source:prod': true, 'app:spinnaker': true };
-      const expected: any = _.filter(groupedJSON, {
+      const expected: any = filter(groupedJSON, {
         subgroups: [
           {
             subgroups: [

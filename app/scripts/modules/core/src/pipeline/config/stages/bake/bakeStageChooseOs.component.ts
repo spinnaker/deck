@@ -5,6 +5,7 @@ export interface IBaseOsOption {
   shortDescription?: string;
   detailedDescription: string;
   isImageFamily?: boolean;
+  displayName?: string;
 }
 
 export class BakeStageChooseOSController implements IController {
@@ -19,9 +20,12 @@ export class BakeStageChooseOSController implements IController {
   }
 
   public getBaseOsDescription(baseOsOption: IBaseOsOption): string {
-    return baseOsOption.id + (baseOsOption.shortDescription ? ' (' + baseOsOption.shortDescription + ')' : '');
+    const baseOsName = baseOsOption?.displayName || baseOsOption?.id || '';
+    if (baseOsOption?.shortDescription) {
+      return `${baseOsName} (${baseOsOption.shortDescription})`;
+    }
+    return baseOsName;
   }
-
   public getBaseOsDetailedDescription(baseOsOption: IBaseOsOption): string {
     return baseOsOption.detailedDescription + (baseOsOption.isImageFamily ? ' (family)' : '');
   }

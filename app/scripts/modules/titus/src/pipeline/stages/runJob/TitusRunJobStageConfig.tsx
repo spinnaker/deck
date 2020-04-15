@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { defaultsDeep, set } from 'lodash';
 
 import {
@@ -16,6 +16,7 @@ import {
 } from '@spinnaker/core';
 
 import { DockerImageAndTagSelector, DockerImageUtils, IDockerImageAndTagChanges } from '@spinnaker/docker';
+import { ITitusResources } from 'titus/domain';
 
 import { TitusSecurityGroupPicker } from './TitusSecurityGroupPicker';
 import { TitusProviderSettings } from '../../../titus.settings';
@@ -31,13 +32,7 @@ interface IClusterDefaults {
   containerAttributes: object;
   env: object;
   labels: object;
-  resources: {
-    cpu: number;
-    disk: number;
-    gpu: number;
-    memory: number;
-    networkMbps: number;
-  };
+  resources: ITitusResources;
   retries: number;
   runtimeLimitSecs: number;
   securityGroups: string[];
@@ -222,8 +217,6 @@ export class TitusRunJobStageConfig extends React.Component<IStageConfigProps, I
           showRegistry={false}
           onChange={this.dockerChanged}
           deferInitialization={stage.deferredInitialization}
-          labelClass="col-md-2 col-md-offset-1 sm-label-right"
-          fieldClass="col-md-6"
         />
 
         <StageConfigField label="CPU(s)">
@@ -345,21 +338,18 @@ export class TitusRunJobStageConfig extends React.Component<IStageConfigProps, I
                 required={true}
                 onChange={e => this.stageFieldChanged('cluster.iamProfile', e.target.value)}
               />
+              {!stage.isNew && !stage.cluster.iamProfile && (
+                <a
+                  className="small clickable"
+                  onClick={() => this.stageFieldChanged('cluster.iamProfile', this.defaultIamProfile)}
+                >
+                  Use suggested default
+                </a>
+              )}
             </div>
             <div className="col-md-1 small" style={{ whiteSpace: 'nowrap', paddingLeft: '0px', paddingTop: '7px' }}>
               in <AccountTag account={awsAccount} />
             </div>
-            {!stage.isNew && !stage.cluster.iamProfile && (
-              <div className="checkbox">
-                <label>
-                  <input
-                    type="checkbox"
-                    onChange={() => this.stageFieldChanged('cluster.iamProfile', this.defaultIamProfile)}
-                  />
-                  Use default
-                </label>
-              </div>
-            )}
           </div>
 
           <StageConfigField label="Capacity Group" fieldColumns={4} helpKey="titus.job.capacityGroup">
