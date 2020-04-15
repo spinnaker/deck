@@ -159,6 +159,18 @@ html {
       overflow-y: auto;
     }
   }
+  .filters-toggle {
+    position: absolute;
+
+    .filters-placeholder {
+      margin-top: 10px;
+    }
+
+    .show-filter-text {
+      border-left: 1px solid var(--color-accessory-light);
+    }
+  }
+
   .filters-content {
     overflow-x: hidden;
     @media (min-width: 708px) and (max-width: 992px) {
@@ -208,7 +220,20 @@ html {
         width: 260px;
       }
     }
+
+    .main-content {
+      > .header {
+        margin-left: 68px;
+      }
+    }
+
+    .nav-content {
+      > .header {
+        margin-left: 72px;
+      }
+    }
   }
+
   &.filters-expanded {
     .detail-content {
       @media (min-width: 768px) and (max-width: 992px) {
@@ -237,6 +262,9 @@ html {
         width: inherit;
         display: block;
       }
+      .heading {
+        margin-top: 32px;
+      }
       @media (min-width: 768px) and (max-width: 992px) {
         width: 180px;
       }
@@ -258,15 +286,8 @@ html {
   .nav {
     overflow-x: hidden;
     position: relative;
-    width: 39px;
     padding-top: 5px;
-    .pin,
-    .unpin {
-      position: absolute;
-      right: 7px;
-      top: 5px;
-      padding: 1px 3px;
-    }
+
     .pin {
       padding-left: 5px;
     }
@@ -278,10 +299,10 @@ html {
       margin: 10px;
     }
     .filters-placeholder {
-      margin-top: 20px;
       font-size: 120%;
     }
   }
+
   .detail-content {
     overflow: visible;
     margin: 0;
@@ -310,7 +331,7 @@ html {
     }
   }
   .nav-content {
-    margin: 0 25px;
+    margin-right: 25px;
     @media (max-width: 768px) {
       width: 70%;
     }
@@ -977,9 +998,11 @@ select:invalid {
 .collapsible-filter-section {
   a.section-heading {
     color: var(--color-black);
+    text-decoration: none;
   }
+
   h4 {
-    padding: 5px;
+    padding: 10px 5px;
     margin: 0;
     display: flex;
     align-items: center;
@@ -998,6 +1021,7 @@ select:invalid {
       background-color: var(--color-accent-g3);
       .arrow {
         visibility: visible;
+        text-decoration: none;
       }
     }
     font-weight: 600;
