@@ -33,8 +33,6 @@ export interface IFeatures {
   gceScaleDownControlsEnabled?: boolean;
   gceStatefulMigsEnabled?: boolean;
   iapRefresherEnabled?: boolean;
-  // whether stages affecting infrastructure (like "Create Load Balancer") should be enabled or not
-  infrastructureStages?: boolean;
   // todo(mneterval): remove prior to release 1.21
   legacyArtifactsEnabled?: boolean;
   managedDelivery?: boolean;
@@ -48,8 +46,6 @@ export interface IFeatures {
   roscoMode?: boolean;
   slack?: boolean;
   snapshots?: boolean;
-  travis?: boolean;
-  wercker?: boolean;
   savePipelinesStageEnabled?: boolean;
   functions?: boolean;
 }
