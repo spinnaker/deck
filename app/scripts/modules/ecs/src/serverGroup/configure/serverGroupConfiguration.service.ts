@@ -97,6 +97,15 @@ export interface IEcsTaskDefinitionArtifact {
   artifactId?: string;
 }
 
+export interface IEcsServiceDiscoveryRegistry {
+  account: string;
+  region: string;
+  name: string;
+  id: string;
+  arn: string;
+  displayName: string;
+}
+
 export interface IEcsContainerMapping {
   containerName: string;
   imageDescription: IEcsDockerImage;
@@ -106,6 +115,11 @@ export interface IEcsTargetGroupMapping {
   containerName: string;
   containerPort: number;
   targetGroup: string;
+}
+
+export interface IEcsServiceDiscoveryRegistryAssociation {
+  registry: IServiceDiscoveryRegistryDescriptor;
+  containerPort: number;
 }
 
 export interface IEcsServerGroupCommand extends IServerGroupCommand {
@@ -124,6 +138,7 @@ export interface IEcsServerGroupCommand extends IServerGroupCommand {
   containerMappings: IEcsContainerMapping[];
   loadBalancedContainer: string;
   targetGroupMappings: IEcsTargetGroupMapping[];
+  serviceDiscoveryAssociations: IEcsServiceDiscoveryRegistryAssociation[];
 
   subnetTypeChanged: (command: IEcsServerGroupCommand) => IServerGroupCommandResult;
   placementStrategyNameChanged: (command: IEcsServerGroupCommand) => IServerGroupCommandResult;
