@@ -122,7 +122,7 @@ module(TITUS_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
             if (overrides.instanceDetailsLoaded) {
               overrides.instanceDetailsLoaded();
             }
-          });
+          }, autoClose);
       }
 
       if (!instanceSummary) {
