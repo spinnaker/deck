@@ -1,16 +1,21 @@
 import React, { useState } from 'react';
 import classNames from 'classnames';
 
+import { IManagedResourceSummary } from '../domain';
+import { Icon } from '../presentation';
+import { useEnvironmentTypeFromResources } from './useEnvironmentTypeFromResources.hooks';
+
 import './EnvironmentRow.less';
 
 interface IEnvironmentRowProps {
   name: string;
-  isProd?: boolean;
+  resources?: IManagedResourceSummary[];
   children?: React.ReactNode;
 }
 
-export function EnvironmentRow({ name, isProd = false, children }: IEnvironmentRowProps) {
+export function EnvironmentRow({ name, resources = [], children }: IEnvironmentRowProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const isProd = useEnvironmentTypeFromResources(resources);
 
   const envRowClasses = classNames({
     srow: true,
@@ -30,8 +35,8 @@ export function EnvironmentRow({ name, isProd = false, children }: IEnvironmentR
           <span className={envLabelClasses}>{name}</span>
         </span>
         <div className="expand" onClick={() => setIsCollapsed(!isCollapsed)}>
-          {isCollapsed && <i className="ico icon-expand" />}
-          {!isCollapsed && <i className="ico icon-collapse" />}
+          {isCollapsed && <Icon name="accordionExpand" size="medium" />}
+          {!isCollapsed && <Icon name="accordionCollapse" size="medium" />}
         </div>
         {/* <div className="select">
             <i className={`ico icon-checkbox-unchecked`}/>

@@ -1,13 +1,15 @@
 .ColumnHeader {
   background-color: rgb(100, 140, 175);
   display: flex;
+  position: sticky;
+  top: 0;
   height: 32px;
   justify-content: space-between;
   align-items: center;
   color: #fff;
   font-size: 14px;
-  font-weight: 600;
   margin-bottom: 16px;
+  border-radius: 2px;
 }
 
 .icon {

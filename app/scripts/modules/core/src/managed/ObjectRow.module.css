@@ -6,11 +6,8 @@
   display: flex;
   align-items: center;
   flex: auto;
-
   box-shadow: inset 0 -1px 0 0 #cccccc;
   height: 40px;
-
-  position: relative;
   font-size: 14px;
 }
 
@@ -30,8 +27,6 @@
   background-image: linear-gradient(to bottom, rgba(160, 180, 220, 0.15), rgba(160, 180, 220, 0.15));
 }
 
-/* "pointer-events: none;" is added to children so the data-key attached to ObjectRow is always captured */
-
 .leftCol {
   flex: 5 0 1px;
   display: flex;
@@ -40,13 +35,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   margin-right: 16px;
-
-  pointer-events: none;
   /* background-color: rgba(255, 0, 0, 0.1); */
-}
-
-.leftCol i {
-  margin-right: 8px;
 }
 
 .rowTitle {

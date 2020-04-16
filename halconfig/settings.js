@@ -1,8 +1,6 @@
 'use strict';
 
 var gateHost = '{%gate.baseUrl%}';
-var artifactsEnabled = '{%features.artifacts%}' === 'true';
-var artifactsRewriteEnabled = '{%features.artifactsRewrite%}' === 'true';
 var atlasWebComponentsUrl = '{%canary.atlasWebComponentsUrl%}';
 var authEnabled = '{%features.auth%}' === 'true';
 var authEndpoint = gateHost + '/auth/user';
@@ -158,8 +156,6 @@ window.spinnakerSettings = {
   ],
   defaultTimeZone: timezone, // see http://momentjs.com/timezone/docs/#/data-utilities/
   feature: {
-    artifacts: artifactsEnabled,
-    artifactsRewrite: artifactsRewriteEnabled,
     canary: mineCanaryEnabled,
     chaosMonkey: chaosEnabled,
     displayTimestampsInUserLocalTime: displayTimestampsInUserLocalTime,
@@ -178,7 +174,6 @@ window.spinnakerSettings = {
     slack: false,
     snapshots: false,
     travis: travisEnabled,
-    versionedProviders: true,
     wercker: werckerEnabled,
     functions: functionsEnabled,
   },
@@ -229,7 +224,7 @@ window.spinnakerSettings = {
       },
     },
   },
-  pubsubProviders: ['google'], // TODO(joonlim): Add amazon once it is confirmed that amazon pub/sub works.
+  pubsubProviders: ['amazon', 'google'],
   triggerTypes: [
     'artifactory',
     'nexus',

@@ -1,16 +1,15 @@
 import React from 'react';
 import { FormikProps } from 'formik';
 
-import { Application, HelpField, Overridable } from '@spinnaker/core';
-import { IAmazonServerGroupCommand } from '../../../serverGroupConfiguration.service';
+import { Application, HelpField, IServerGroupCommand, Overridable } from 'core';
 
-export interface DetailsFieldProps {
+export interface DetailsFieldProps<T extends IServerGroupCommand> {
   app: Application;
-  formik: FormikProps<IAmazonServerGroupCommand>;
+  formik: FormikProps<T>;
 }
 
-@Overridable('aws.serverGroup.configure.detailsField')
-export default class ServerGroupDetailsField extends React.Component<DetailsFieldProps> {
+@Overridable('serverGroup.configure.detailsField')
+export class ServerGroupDetailsField<T extends IServerGroupCommand> extends React.Component<DetailsFieldProps<T>> {
   private freeFormDetailsChanged = (freeFormDetails: string) => {
     const { setFieldValue, values } = this.props.formik;
     values.freeFormDetails = freeFormDetails; // have to do it here to make sure it's done before calling values.clusterChanged
@@ -24,7 +23,7 @@ export default class ServerGroupDetailsField extends React.Component<DetailsFiel
       <>
         <div className="form-group">
           <div className="col-md-3 sm-label-right">
-            Detail <HelpField id="aws.serverGroup.detail" />
+            Detail <HelpField id="core.serverGroup.detail" />
           </div>
           <div className="col-md-7">
             <input

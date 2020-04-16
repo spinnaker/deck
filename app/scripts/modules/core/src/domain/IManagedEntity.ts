@@ -12,6 +12,33 @@ export enum ManagedResourceStatus {
   UNKNOWN = 'UNKNOWN',
 }
 
+export enum StatefulConstraintStatus {
+  NOT_EVALUATED = 'NOT_EVALUATED',
+  PENDING = 'PENDING',
+  PASS = 'PASS',
+  FAIL = 'FAIL',
+  OVERRIDE_PASS = 'OVERRIDE_PASS',
+  OVERRIDE_FAIL = 'OVERRIDE_FAIL',
+}
+
+export interface IStatefulConstraint {
+  type: string;
+  status: StatefulConstraintStatus;
+  startedAt?: string;
+  judgedAt?: string;
+  judgedBy?: string;
+  comment?: string;
+}
+
+export interface IDependsOnConstraint {
+  type: 'depends-on';
+  currentlyPassing: boolean;
+  attributes: { environment: string };
+}
+
+// more stateless types coming soon
+export type IStatelessConstraint = IDependsOnConstraint;
+
 export interface IManagedResourceSummary {
   id: string;
   kind: string;
@@ -42,19 +69,29 @@ export interface IManagedEnviromentSummary {
       approved: string[];
       previous: string[];
       vetoed: string[];
+      skipped: string[];
     };
   }>;
 }
 
 export interface IManagedArtifactVersion {
   version: string;
+  displayName: string;
   environments: Array<{
     name: string;
-    state: 'current' | 'deploying' | 'approved' | 'pending' | 'previous' | 'vetoed';
+    state: 'current' | 'deploying' | 'approved' | 'pending' | 'previous' | 'vetoed' | 'skipped';
     deployedAt?: string;
     replacedAt?: string;
     replacedBy?: string;
+    statefulConstraints?: IStatefulConstraint[];
+    statelessConstraints?: IStatelessConstraint[];
   }>;
+  build?: {
+    id: number;
+  };
+  git?: {
+    commit: string;
+  };
 }
 
 export interface IManagedArtifactSummary {

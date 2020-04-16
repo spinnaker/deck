@@ -1,17 +1,18 @@
-import React from 'react';
+import React, { memo, useMemo } from 'react';
 import classNames from 'classnames';
-import { DateTime } from 'luxon';
+import { useTransition, animated, UseTransitionProps } from 'react-spring';
 
-import { relativeTime, timestamp } from '../utils';
-import { IManagedArtifactVersion, IManagedResourceSummary } from '../domain';
+import { IManagedArtifactSummary, IManagedArtifactVersion, IManagedResourceSummary } from '../domain';
+import { Application } from '../application';
 import { useEventListener } from '../presentation';
 
 import { ArtifactDetailHeader } from './ArtifactDetailHeader';
-import { NoticeCard } from './NoticeCard';
-import { Pill } from './Pill';
 import { ManagedResourceObject } from './ManagedResourceObject';
-import { parseName } from './Frigga';
 import { EnvironmentRow } from './EnvironmentRow';
+import { VersionStateCard } from './VersionStateCard';
+
+import { ConstraintCard } from './constraints/ConstraintCard';
+import { isConstraintSupported } from './constraints/constraintRegistry';
 
 import './ArtifactDetail.less';
 
@@ -20,21 +21,118 @@ function shouldDisplayResource(name: string, type: string, resource: IManagedRes
   return !!resource.moniker && name === resource.artifact?.name && type === resource.artifact?.type;
 }
 
+const inStyles = {
+  opacity: 1,
+  transform: 'scale(1.0, 1.0)',
+};
+
+const outStyles = {
+  opacity: 0,
+  transform: 'scale(0.95, 0.95)',
+};
+
+const cardTransitionConfig = {
+  from: outStyles,
+  // KLUDGE: all we're *actually* doing in this scary looking handler
+  // is delaying the start of any enter transitions for a fixed time
+  // so parent transitions for the overall layout have time to start.
+  // Unfortunately today useTransition doesn't support fixed delays
+  // without tapping into this promise-based orchestration feature (ew).
+  // When react-spring v9 is released, this can be changed
+  // to a function that returns { to: inStyles, delay: 180 }
+  enter: () => async (next: (_: React.CSSProperties) => any) => {
+    await new Promise(resolve => setTimeout(resolve, 180));
+    next(inStyles);
+  },
+  leave: outStyles,
+  trail: 40,
+  config: { mass: 1, tension: 600, friction: 40 },
+} as UseTransitionProps<JSX.Element, React.CSSProperties>;
+
+type IEnvironmentCardsProps = Pick<IArtifactDetailProps, 'application' | 'version' | 'allVersions'> & {
+  environment: IManagedArtifactSummary['versions'][0]['environments'][0];
+};
+
+const EnvironmentCards = memo(
+  ({
+    application,
+    environment: {
+      name: environmentName,
+      state,
+      deployedAt,
+      replacedAt,
+      replacedBy,
+      statefulConstraints,
+      statelessConstraints,
+    },
+    version: { version },
+    allVersions,
+  }: IEnvironmentCardsProps) => {
+    const versionStateCard = (
+      <VersionStateCard
+        key="versionStateCard"
+        state={state}
+        deployedAt={deployedAt}
+        replacedAt={replacedAt}
+        replacedBy={replacedBy}
+        allVersions={allVersions}
+      />
+    );
+    const constraintCards = useMemo(
+      () =>
+        [...(statelessConstraints || []), ...(statefulConstraints || [])]
+          .filter(({ type }) => isConstraintSupported(type))
+          .map(constraint => (
+            <ConstraintCard
+              key={constraint.type}
+              application={application}
+              environment={environmentName}
+              version={version}
+              constraint={constraint}
+            />
+          )),
+      [application, environmentName, version, statefulConstraints, statelessConstraints],
+    );
+
+    const transitions = useTransition([...constraintCards, versionStateCard], ({ key }) => key, cardTransitionConfig);
+
+    return (
+      <>
+        {/*
+         * Since transitions trail in ascending order, we need to reverse them
+         * to get the trail to go up the the list instead of down.
+         */
+        transitions.reverse().map(({ item: card, key, props }) => (
+          <animated.div key={key} className="sp-margin-2xs-bottom" style={props}>
+            {card}
+          </animated.div>
+        ))}
+      </>
+    );
+  },
+);
+
 export interface IArtifactDetailProps {
+  application: Application;
   name: string;
   type: string;
   version: IManagedArtifactVersion;
+  allVersions: IManagedArtifactSummary['versions'];
   resourcesByEnvironment: { [environment: string]: IManagedResourceSummary[] };
   onRequestClose: () => any;
 }
 
 export const ArtifactDetail = ({
+  application,
   name,
   type,
-  version: { version, environments },
+  version: versionDetails,
+  allVersions,
   resourcesByEnvironment,
   onRequestClose,
 }: IArtifactDetailProps) => {
+  const { environments } = versionDetails;
+
   const keydownCallback = ({ keyCode }: KeyboardEvent) => {
     if (keyCode === 27 /* esc */) {
       onRequestClose();
@@ -44,103 +142,50 @@ export const ArtifactDetail = ({
 
   return (
     <>
-      <ArtifactDetailHeader name={name} version={version} onRequestClose={onRequestClose} />
+      <ArtifactDetailHeader name={name} version={versionDetails} onRequestClose={onRequestClose} />
 
       <div className="ArtifactDetail">
         <div className="flex-container-h">
           {/* a short summary with actions/buttons will live here */}
           <div className="detail-section-right">{/* artifact metadata will live here */}</div>
         </div>
-        {environments.map(({ name: environmentName, state, deployedAt, replacedAt, replacedBy }) => {
-          const deployedAtMillis = DateTime.fromISO(deployedAt).toMillis();
-          const replacedAtMillis = DateTime.fromISO(replacedAt).toMillis();
-          const { version: replacedByPackageVersion, buildNumber: replacedByBuildNumber } =
-            parseName(replacedBy || '') || {};
-
+        {environments.map(environment => {
+          const { name: environmentName, state } = environment;
           return (
-            <EnvironmentRow key={environmentName} name={environmentName} isProd={true}>
-              {state === 'deploying' && (
-                <NoticeCard
-                  className="sp-margin-l-right"
-                  icon="md-actuation-launched"
-                  text={undefined}
-                  title="Deploying"
-                  isActive={true}
-                  noticeType="info"
+            <EnvironmentRow
+              key={environmentName}
+              name={environmentName}
+              resources={resourcesByEnvironment[environmentName]}
+            >
+              <div className="sp-margin-l-right">
+                <EnvironmentCards
+                  application={application}
+                  environment={environment}
+                  version={versionDetails}
+                  allVersions={allVersions}
                 />
-              )}
-              {state === 'current' && deployedAt && (
-                <NoticeCard
-                  className="sp-margin-l-right"
-                  icon="cloud-check"
-                  text={undefined}
-                  title={
-                    <span>
-                      Deployed {relativeTime(deployedAtMillis)}{' '}
-                      <span className="text-italic text-regular sp-margin-xs-left">
-                        ({timestamp(deployedAtMillis)})
-                      </span>
-                    </span>
-                  }
-                  isActive={true}
-                  noticeType="success"
-                />
-              )}
-              {state === 'previous' && (
-                <NoticeCard
-                  className="sp-margin-l-right"
-                  icon="checkbox-indeterminate"
-                  text={undefined}
-                  title={
-                    <span className="sp-group-margin-xs-xaxis">
-                      Decommissioned {relativeTime(replacedAtMillis)}{' '}
-                      <span className="text-italic text-regular sp-margin-xs-left">
-                        ({timestamp(replacedAtMillis)})
-                      </span>{' '}
-                      <span className="text-regular">—</span> <span className="text-regular">replaced by </span>
-                      <Pill
-                        text={
-                          replacedByBuildNumber ? `#${replacedByBuildNumber}` : replacedByPackageVersion || replacedBy
-                        }
-                      />
-                    </span>
-                  }
-                  isActive={true}
-                  noticeType="neutral"
-                />
-              )}
-              {state === 'vetoed' && (
-                <NoticeCard
-                  className="sp-margin-l-right"
-                  icon="skull"
-                  text={undefined}
-                  title={
-                    <span className="sp-group-margin-xs-xaxis">
-                      Marked as bad <span className="text-regular sp-margin-xs-left">—</span>{' '}
-                      {deployedAt ? (
-                        <>
-                          <span className="text-regular">last deployed {relativeTime(deployedAtMillis)}</span>{' '}
-                          <span className="text-italic text-regular">({timestamp(deployedAtMillis)})</span>
-                        </>
-                      ) : (
-                        <span className="text-regular">never deployed here</span>
+              </div>
+              <div className="sp-margin-l-top">
+                {resourcesByEnvironment[environmentName]
+                  .filter(resource => shouldDisplayResource(name, type, resource))
+                  .map(resource => (
+                    <div key={resource.id} className="flex-container-h middle">
+                      {state === 'deploying' && (
+                        <div
+                          className={classNames(
+                            'resource-badge flex-container-h center middle sp-margin-s-right',
+                            state,
+                          )}
+                        />
                       )}
-                    </span>
-                  }
-                  isActive={true}
-                  noticeType="error"
-                />
-              )}
-              {resourcesByEnvironment[environmentName]
-                .filter(resource => shouldDisplayResource(name, type, resource))
-                .map(resource => (
-                  <div className="flex-container-h middle">
-                    <div
-                      className={classNames('resource-badge flex-container-h center middle sp-margin-s-right', state)}
-                    ></div>
-                    <ManagedResourceObject key={resource.id} resource={resource} />
-                  </div>
-                ))}
+                      <ManagedResourceObject
+                        key={resource.id}
+                        resource={resource}
+                        depth={state === 'deploying' ? 0 : 1}
+                      />
+                    </div>
+                  ))}
+              </div>
             </EnvironmentRow>
           );
         })}

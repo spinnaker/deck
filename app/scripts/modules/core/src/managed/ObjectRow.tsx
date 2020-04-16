@@ -1,10 +1,12 @@
 import React from 'react';
 
+import { Icon, IconNames } from '../presentation';
+
 import styles from './ObjectRow.module.css';
 
 interface IObjectRowProps {
-  icon: string;
-  title: string;
+  icon: IconNames;
+  title: JSX.Element | string;
   metadata?: JSX.Element;
   depth?: number;
 }
@@ -14,7 +16,7 @@ export const ObjectRow = ({ icon, title, metadata, depth = 1 }: IObjectRowProps)
     <div className={styles.ObjectRow} style={getStylesFromDepth(depth)}>
       <span className="clickableArea">
         <div className={styles.leftCol}>
-          <i className={`ico icon-${icon}`} />
+          <Icon name={icon} size="medium" appearance="dark" className="sp-margin-s-right" />
           <span className={styles.rowTitle}>{title}</span>
         </div>
         <div className={styles.centerCol} style={{ flex: `0 0 ${200 + depth * 16}px` }}>
@@ -28,8 +30,5 @@ export const ObjectRow = ({ icon, title, metadata, depth = 1 }: IObjectRowProps)
 const getStylesFromDepth = (depth: number): React.CSSProperties => {
   return {
     marginLeft: 16 * depth,
-    position: 'sticky',
-    top: 104 + 40 * depth,
-    zIndex: 500 - depth,
   };
 };
