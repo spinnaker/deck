@@ -71,6 +71,7 @@ describe('ProviderSelectionService: API', () => {
   it('should use the specified, default provider if the requested provider cannot be found', () => {
     let provider = '';
     SETTINGS.defaultProvider = 'defaultProvider';
+
     CloudProviderRegistry.registerProvider('fakeProvider', config);
     ProviderSelectionService.selectProvider(application, 'securityGroup').then(_provider => {
       provider = _provider;
@@ -86,7 +87,6 @@ describe('ProviderSelectionService: API', () => {
       provider = _provider;
     });
     $scope.$digest();
-    console.log(provider);
     expect(provider).toBe('aws');
   });
 

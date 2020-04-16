@@ -21,11 +21,13 @@ export class ProviderSelectionService {
       if (feature) {
         reducedAccounts = accounts.filter(a => CloudProviderRegistry.hasValue(a.cloudProvider, feature));
       }
+
       if (filterFn) {
         reducedAccounts = reducedAccounts.filter((acc: IAccountDetails) => {
           return filterFn(application, acc, CloudProviderRegistry.getProvider(acc.cloudProvider, acc.skin));
         });
       }
+
       // reduce the accounts to the smallest, unique collection taking into consideration the useProvider values
       const providerOptions = uniq(
         reducedAccounts
@@ -37,6 +39,7 @@ export class ProviderSelectionService {
             return providerFeature.useProvider || a.cloudProvider;
           }),
       );
+
       let provider;
       if (providerOptions.length > 1) {
         return ProviderSelectionModal.show({ providerOptions });

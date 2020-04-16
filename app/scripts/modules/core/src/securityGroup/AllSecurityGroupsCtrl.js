@@ -38,11 +38,6 @@ module(CORE_SECURITYGROUP_ALLSECURITYGROUPSCTRL, [
 
       $scope.application = app;
 
-      ProviderSelectionService.isDisabled(app).then(disabled => {
-        console.log('Estoy haciendo algo');
-        $scope.isDisabled = disabled;
-      });
-
       $scope.sortFilter = SecurityGroupState.filterModel.sortFilter;
 
       app.setActiveState(app.securityGroups);
