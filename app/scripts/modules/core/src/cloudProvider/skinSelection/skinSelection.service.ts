@@ -11,8 +11,14 @@ export class SkinSelectionService {
 
   public selectSkin(provider: string): IPromise<string> {
     return AccountService.getAllAccountDetailsForProvider(provider).then(accounts => {
-      const skins = uniq(accounts.map(a => a.skin).filter(v => !isNil(v)));
-
+      const skins = uniq(
+        accounts
+          .filter(a => {
+            return !CloudProviderRegistry.isDisabled(a.cloudProvider, a.providerVersion);
+          })
+          .map(a => a.skin)
+          .filter(v => !isNil(v)),
+      );
       if (skins.length === 0) {
         return CloudProviderRegistry.getProvider(provider).skin;
       } else if (skins.length === 1) {

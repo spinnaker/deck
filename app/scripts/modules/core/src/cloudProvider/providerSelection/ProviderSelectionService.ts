@@ -21,29 +21,20 @@ export class ProviderSelectionService {
       if (feature) {
         reducedAccounts = accounts.filter(a => CloudProviderRegistry.hasValue(a.cloudProvider, feature));
       }
-
       if (filterFn) {
         reducedAccounts = reducedAccounts.filter((acc: IAccountDetails) => {
           return filterFn(application, acc, CloudProviderRegistry.getProvider(acc.cloudProvider, acc.skin));
         });
       }
-
       // reduce the accounts to the smallest, unique collection taking into consideration the useProvider values
       const providerOptions = uniq(
         reducedAccounts
+          .filter(a => {
+            return !CloudProviderRegistry.isDisabled(a.cloudProvider, a.providerVersion);
+          })
           .map(a => {
             const providerFeature = CloudProviderRegistry.getProvider(a.cloudProvider)[feature] || {};
-            //If the flag kubernetesAdHocInfraWritesEnabled is disabled then remove the provider from the array
-            if (
-              CloudProviderRegistry.hasValue(a.cloudProvider, 'infraWritesEnabled', a.providerVersion) &&
-              !CloudProviderRegistry.getValue(a.cloudProvider, 'infraWritesEnabled', a.providerVersion)
-            ) {
-              a.cloudProvider = null;
-            }
             return providerFeature.useProvider || a.cloudProvider;
-          })
-          .filter(a => {
-            return a != null;
           }),
       );
       let provider;
@@ -59,34 +50,6 @@ export class ProviderSelectionService {
   }
 
   public static isDisabled(app: Application): IPromise<boolean> {
-    return AccountService.applicationAccounts(app).then((accounts: IAccountDetails[]) => {
-      let isDisable = false;
-      if (accounts.length === 1) {
-        accounts
-          .filter(a => {
-            return CloudProviderRegistry.hasValue(a.cloudProvider, 'infraWritesEnabled', a.providerVersion);
-          })
-          .map(a => {
-            isDisable = !CloudProviderRegistry.getValue(a.cloudProvider, 'infraWritesEnabled', a.providerVersion);
-          });
-      }
-      return isDisable;
-    });
-  }
-}
-
-export class ProviderFilter {
-  constructor(isDisabled: boolean) {
-    this.isDisabled = isDisabled;
-  }
-
-  private isDisabled: boolean;
-
-  public isCreateButtonDisabled() {
-    return this.isDisabled;
-  }
-
-  public static staticMethod(app: Application): IPromise<boolean> {
     return AccountService.applicationAccounts(app).then((accounts: IAccountDetails[]) => {
       let isDisable = false;
       if (accounts.length === 1) {

@@ -100,6 +100,7 @@ module(KUBERNETES_V2_MODULE, [
   CloudProviderRegistry.registerProvider('kubernetes', {
     name: 'Kubernetes',
     skin: 'v2',
+    infraWritesEnabled: SETTINGS.kubernetesAdHocInfraWritesEnabled,
     logo: {
       path: kubernetesLogo,
     },
@@ -145,6 +146,5 @@ module(KUBERNETES_V2_MODULE, [
       'scaleDownCluster',
       'shrinkCluster',
     ],
-    infraWritesEnabled: SETTINGS.kubernetesAdHocInfraWritesEnabled,
   });
 });

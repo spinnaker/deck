@@ -71,7 +71,6 @@ describe('ProviderSelectionService: API', () => {
   it('should use the specified, default provider if the requested provider cannot be found', () => {
     let provider = '';
     SETTINGS.defaultProvider = 'defaultProvider';
-
     CloudProviderRegistry.registerProvider('fakeProvider', config);
     ProviderSelectionService.selectProvider(application, 'securityGroup').then(_provider => {
       provider = _provider;
@@ -87,6 +86,7 @@ describe('ProviderSelectionService: API', () => {
       provider = _provider;
     });
     $scope.$digest();
+    console.log(provider);
     expect(provider).toBe('aws');
   });
 
@@ -176,5 +176,136 @@ describe('ProviderSelectionService: API', () => {
     });
     $scope.$digest();
     expect(provider).toBe('titus');
+  });
+
+  it('should return k8s V2 provider in case the infraWritesEnabled is set to true and is the only provider configured', () => {
+    let provider = '';
+    hasValue = true;
+    const k8s = fakeAccount('kubernetes');
+    k8s.providerVersion = 'v2';
+    k8s.type = 'kubernetes';
+    accounts = [k8s];
+    let configuration = {
+      name: 'Kubernetes',
+      skin: 'v2',
+      infraWritesEnabled: true,
+    };
+    CloudProviderRegistry.registerProvider('kubernetes', configuration);
+    ProviderSelectionService.selectProvider(application, 'securityGroup').then(_provider => {
+      provider = _provider;
+    });
+    $scope.$digest();
+    expect(provider).toBe('kubernetes');
+  });
+
+  it('should use "aws" as the default provider in case the only provider is k8s and the infraWritesEnabled is set to false', () => {
+    let provider = '';
+    hasValue = true;
+    const k8s = fakeAccount('kubernetes');
+    k8s.providerVersion = 'v2';
+    k8s.type = 'kubernetes';
+    accounts = [k8s];
+    let configuration = {
+      name: 'Kubernetes',
+      skin: 'v2',
+      infraWritesEnabled: false,
+    };
+    CloudProviderRegistry.registerProvider('kubernetes', configuration);
+    ProviderSelectionService.selectProvider(application, 'securityGroup').then(_provider => {
+      provider = _provider;
+    });
+    $scope.$digest();
+    expect(provider).toBe('aws');
+  });
+
+  it('should use "aws" as the default provider in case the only provider is k8s and the infraWritesEnabled is not specified', () => {
+    let provider = '';
+    hasValue = true;
+    const k8s = fakeAccount('kubernetes');
+    k8s.providerVersion = 'v2';
+    k8s.type = 'kubernetes';
+    accounts = [k8s];
+    let configuration = {
+      name: 'Kubernetes',
+      skin: 'v2',
+    };
+    CloudProviderRegistry.registerProvider('kubernetes', configuration);
+    ProviderSelectionService.selectProvider(application, 'securityGroup').then(_provider => {
+      provider = _provider;
+    });
+    $scope.$digest();
+    expect(provider).toBe('aws');
+  });
+
+  it('should not use "k8s" as an option for the modal when the k8s infraWritesEnabled is set to false and there are others providers', () => {
+    let provider = '';
+    hasValue = true;
+    const k8s = fakeAccount('kubernetes');
+    k8s.providerVersion = 'v2';
+    k8s.type = 'kubernetes';
+    accounts = [k8s, fakeAccount('gce')];
+    let configuration = {
+      name: 'Kubernetes',
+      skin: 'v2',
+      infraWritesEnabled: false,
+    };
+    CloudProviderRegistry.registerProvider('kubernetes', configuration);
+    CloudProviderRegistry.registerProvider('gce', config);
+    ProviderSelectionService.selectProvider(application, 'securityGroup').then(_provider => {
+      provider = _provider;
+    });
+    $scope.$digest();
+    expect(provider).toBe('gce');
+  });
+
+  it('should use "modalProvider" when the k8s infraWritesEnabled is set to true and there are others providers', () => {
+    let provider = '';
+    hasValue = true;
+    const k8s = fakeAccount('kubernetes');
+    k8s.providerVersion = 'v2';
+    k8s.type = 'kubernetes';
+    accounts = [k8s, fakeAccount('gce')];
+    let configuration = {
+      name: 'Kubernetes',
+      skin: 'v2',
+      infraWritesEnabled: true,
+    };
+    CloudProviderRegistry.registerProvider('kubernetes', configuration);
+    CloudProviderRegistry.registerProvider('gce', config);
+    ProviderSelectionService.selectProvider(application, 'securityGroup').then(_provider => {
+      provider = _provider;
+    });
+    $scope.$digest();
+    expect(provider).toBe('modalProvider');
+  });
+
+  it('should return "kubernetes" even if both providers are Kubernetes v1 and v2 and the infraWritesEnabled is set to true', () => {
+    let provider = '';
+    hasValue = true;
+    let k8sV1 = fakeAccount('kubernetes');
+    k8sV1.providerVersion = 'v1';
+    k8sV1.type = 'kubernetes';
+    let k8sV2 = fakeAccount('kubernetes');
+    k8sV2.providerVersion = 'v2';
+    k8sV2.type = 'kubernetes';
+    accounts = [k8sV1, k8sV2];
+    let configV1 = {
+      name: 'Kubernetes',
+      securityGroup: {},
+      skin: 'v1',
+    };
+    let configV2 = {
+      name: 'Kubernetes',
+      skin: 'v2',
+      securityGroup: {},
+      infraWritesEnabled: true,
+    };
+    CloudProviderRegistry.registerProvider('kubernetes', configV1);
+    CloudProviderRegistry.registerProvider('kubernetes', configV2);
+    ProviderSelectionService.selectProvider(application, 'securityGroup').then(_provider => {
+      provider = _provider;
+    });
+    $scope.$digest();
+    expect(provider).toBe('kubernetes');
   });
 });
