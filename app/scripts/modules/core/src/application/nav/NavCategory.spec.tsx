@@ -82,20 +82,31 @@ describe('NavCategory', () => {
     expect(text.textContent).toBe('');
 
     const updatedApp = buildApp<IPipeline>(mockPipelineDataSourceConfig);
-    updatedApp.dataSources.push({ ...category, key: 'runningExecutions' } as ApplicationDataSource<IPipeline>);
+    updatedApp.dataSources.push({
+      ...category,
+      key: 'runningExecutions',
+    } as ApplicationDataSource<IPipeline>);
+    updatedApp.getDataSource(category.badge).status$ = new BehaviorSubject({
+      status: 'FETCHED',
+      loaded: true,
+      lastRefresh: 0,
+      error: null,
+      data: [mockPipelineDataSourceConfig, mockPipelineDataSourceConfig],
+    });
 
     wrapper.setProps({
       app: updatedApp,
       category,
       isActive: false,
     });
+    wrapper.update();
 
     const newNodes = wrapper.children();
-    expect(newNodes.find('.badge-running-count').length).toBe(0);
-    expect(newNodes.find('.badge-none').length).toBe(1);
+    expect(newNodes.find('.badge-running-count').length).toBe(1);
+    expect(newNodes.find('.badge-none').length).toBe(0);
 
     const newText = nodes.childAt(0).getDOMNode();
-    expect(newText.textContent).toBe('');
+    expect(newText.textContent).toBe('2');
   });
 
   it('should subscribe to alert updates', () => {
