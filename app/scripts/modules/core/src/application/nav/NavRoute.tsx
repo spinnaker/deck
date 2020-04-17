@@ -1,6 +1,5 @@
 import React from 'react';
-import { UIRouterContextComponent } from '@uirouter/react-hybrid';
-import { UISref } from '@uirouter/react';
+import { useSrefActive } from '@uirouter/react';
 
 import { NavCategory } from './NavCategory';
 import { ApplicationDataSource } from '../service/applicationDataSource';
@@ -12,12 +11,11 @@ export interface INavRouteProps {
   app: Application;
 }
 
-export const NavRoute = ({ app, category, isActive }: INavRouteProps) => (
-  <UIRouterContextComponent key={category.key}>
-    <UISref className={isActive ? 'active' : ''} to={category.sref}>
-      <a>
-        <NavCategory app={app} category={category} isActive={isActive} />
-      </a>
-    </UISref>
-  </UIRouterContextComponent>
-);
+export const NavRoute = ({ app, category, isActive }: INavRouteProps) => {
+  const sref = useSrefActive(category.sref, null, 'active');
+  return (
+    <a {...sref}>
+      <NavCategory app={app} category={category} isActive={isActive} />
+    </a>
+  );
+};

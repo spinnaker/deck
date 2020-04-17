@@ -1,10 +1,10 @@
 import React from 'react';
 
-import { DataSourceNotifications } from '../../entityTag/notifications/DataSourceNotifications';
-import { Icon, useDataSource, useObservable } from '../../presentation';
+import { DataSourceNotifications } from 'core/entityTag/notifications/DataSourceNotifications';
+import { Icon, useDataSource } from '../../presentation';
 
 import { ApplicationDataSource } from '../service/applicationDataSource';
-import { Application } from '../../application';
+import { Application } from '../application.model';
 import { IEntityTags } from '../../domain';
 
 export interface INavCategoryProps {
@@ -13,19 +13,16 @@ export interface INavCategoryProps {
   app: Application;
 }
 
-export const NavCategory: React.FC<INavCategoryProps> = ({ app, category, isActive }: INavCategoryProps) => {
-  const { alerts, badge, iconName, key, label, status$ } = category;
+export const NavCategory = ({ app, category, isActive }: INavCategoryProps) => {
+  const { alerts, badge, iconName, key, label } = category;
 
   const { data: badgeData } = useDataSource(app.getDataSource(badge || key));
   const runningCount = badge ? badgeData.length : 0;
 
-  const [tags, setTags] = React.useState<IEntityTags[]>(alerts || []);
-  useObservable(status$, () => {
-    setTags(category.alerts || []);
-  });
+  // useDataSource is enough to update alerts when needed
+  useDataSource(category);
+  const tags: IEntityTags[] = alerts || [];
 
-  // Helps with render latency from setting initial tags
-  const tagList = (alerts || []).length && !tags.length ? alerts : tags;
   const badgeClassNames = runningCount ? 'badge-running-count' : 'badge-none';
 
   return (
@@ -37,7 +34,7 @@ export const NavCategory: React.FC<INavCategoryProps> = ({ app, category, isActi
         )}
       </div>
       <div className="nav-item">{' ' + category.label}</div>
-      <DataSourceNotifications tags={tagList} application={app} tabName={label} />
+      <DataSourceNotifications tags={tags} application={app} tabName={label} />
     </div>
   );
 };
