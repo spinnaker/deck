@@ -102,6 +102,7 @@ export interface ISpinnakerSettings {
   additionalHelpLinks?: IAdditionalHelpLinks[];
   gateUrl: string;
   gitSources: string[];
+  hiddenStages: string[];
   managedDelivery?: {
     gettingStartedUrl?: string;
     defaultManifest: string;
