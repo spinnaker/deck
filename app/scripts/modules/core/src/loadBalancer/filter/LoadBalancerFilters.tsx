@@ -8,7 +8,6 @@ import { CloudProviderLabel, CloudProviderLogo } from 'core/cloudProvider';
 import { FilterCollapse, ISortFilter, digestDependentFilters } from 'core/filterModel';
 import { FilterSection } from 'core/cluster/filter/FilterSection';
 import { LoadBalancerState } from 'core/state';
-import { FilterSearch } from 'core/cluster/filter/FilterSearch';
 
 const poolValueCoordinates = [
   { filterField: 'providerType', on: 'loadBalancer', localField: 'type' },
@@ -200,13 +199,7 @@ export class LoadBalancerFilters extends React.Component<ILoadBalancerFiltersPro
           >
             Clear All
           </span>
-          <FilterSearch
-            helpKey={'loadBalancer.search'}
-            onBlur={this.handleSearchBlur}
-            onSearchChange={this.handleSearchChange}
-            value={sortFilter.filter}
-          />
-          {/* <FilterSection heading="Search" expanded={true} helpKey="loadBalancer.search">
+          <FilterSection heading="Search" expanded={true} helpKey="loadBalancer.search">
             <form className="form-horizontal" role="form">
               <div className="form-group nav-search">
                 <input
@@ -219,7 +212,7 @@ export class LoadBalancerFilters extends React.Component<ILoadBalancerFiltersPro
                 />
               </div>
             </form>
-          </FilterSection> */}
+          </FilterSection>
         </div>
         {loadBalancersLoaded && (
           <div className="content">
