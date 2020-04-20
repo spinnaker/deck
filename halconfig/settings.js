@@ -1,8 +1,6 @@
 'use strict';
 
 var gateHost = '{%gate.baseUrl%}';
-var artifactsEnabled = '{%features.artifacts%}' === 'true';
-var artifactsRewriteEnabled = '{%features.artifactsRewrite%}' === 'true';
 var atlasWebComponentsUrl = '{%canary.atlasWebComponentsUrl%}';
 var authEnabled = '{%features.auth%}' === 'true';
 var authEndpoint = gateHost + '/auth/user';
@@ -21,9 +19,7 @@ var entityTagsEnabled = false;
 var fiatEnabled = '{%features.fiat%}' === 'true';
 var gceScaleDownControlsEnabled = '{%features.gceScaleDownControlsEnabled%}' === 'true';
 var gceStatefulMigsEnabled = '{%features.gceStatefulMigsEnabled%}' === 'true';
-var gremlinEnabled = '{%features.gremlin%}' === 'true';
 var iapRefresherEnabled = '{%features.iapRefresherEnabled%}' === 'true';
-var infrastructureStagesEnabled = '{%features.infrastructureStages%}' === 'true';
 var maxPipelineAgeDays = '{%maxPipelineAgeDays%}';
 var mineCanaryEnabled = '{%features.mineCanary%}' === 'true';
 var notificationsEnabled = '{%notifications.enabled%}' === 'true';
@@ -42,10 +38,8 @@ var githubStatus = {
   enabled: '{%notifications.github-status.enabled%}' === 'true',
 };
 var templatesEnabled = '{%canary.templatesEnabled%}' === 'true';
-var travisEnabled = '{%features.travis%}' === 'true';
 var timezone = '{%timezone%}';
 var version = '{%version%}';
-var werckerEnabled = '{%features.wercker%}' === 'true';
 var functionsEnabled = '{%features.functions%}' === 'true';
 
 // Cloud Providers
@@ -158,8 +152,6 @@ window.spinnakerSettings = {
   ],
   defaultTimeZone: timezone, // see http://momentjs.com/timezone/docs/#/data-utilities/
   feature: {
-    artifacts: artifactsEnabled,
-    artifactsRewrite: artifactsRewriteEnabled,
     canary: mineCanaryEnabled,
     chaosMonkey: chaosEnabled,
     displayTimestampsInUserLocalTime: displayTimestampsInUserLocalTime,
@@ -167,9 +159,7 @@ window.spinnakerSettings = {
     fiatEnabled: fiatEnabled,
     gceScaleDownControlsEnabled: gceScaleDownControlsEnabled,
     gceStatefulMigsEnabled: gceStatefulMigsEnabled,
-    gremlinEnabled: gremlinEnabled,
     iapRefresherEnabled: iapRefresherEnabled,
-    infrastructureStages: infrastructureStagesEnabled,
     notifications: notificationsEnabled,
     pagerDuty: false,
     pipelines: true,
@@ -177,8 +167,6 @@ window.spinnakerSettings = {
     roscoMode: true,
     slack: false,
     snapshots: false,
-    travis: travisEnabled,
-    wercker: werckerEnabled,
     functions: functionsEnabled,
   },
   gateUrl: gateHost,
