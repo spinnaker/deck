@@ -21,7 +21,8 @@ export const mockOrchestratedItem: IOrchestratedItem = {
   runningTimeInMs: 40000,
 };
 
-export const createMockOrchestratedItem = (status: string): IOrchestratedItem => {
+type ITaskStatus = 'TERMINAL' | 'NOT_STARTED' | 'CANCELED' | RUNNING';
+export const createMockOrchestratedItem = (status: ITaskStatus): IOrchestratedItem => {
   if (status === 'TERMINAL') {
     return {
       ...mockOrchestratedItem,
@@ -67,12 +68,12 @@ export const createMockOrchestratedItem = (status: string): IOrchestratedItem =>
   }
 };
 
-export const createMockTaskStep = (status: string): ITaskStep => ({
+export const createMockTaskStep = (status: ITaskStatus): ITaskStep => ({
   name: 'test',
   ...createMockOrchestratedItem(status),
 });
 
-export const createMockTask = (status: string, steps?: ITaskStep[], variables?: ITaskVariable[]): ITask => ({
+export const createMockTask = (status: ITaskStatus, steps?: ITaskStep[], variables?: ITaskVariable[]): ITask => ({
   application: 'testapp',
   id: '123-456',
   name: 'running',
