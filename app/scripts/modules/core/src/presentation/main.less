@@ -195,7 +195,7 @@ html {
       margin-left: 0;
     }
     .dl-flex {
-      .dl-wide;
+      .dl-narrow;
     }
     .horizontal-when-filters-collapsed {
       .dl-horizontal;
@@ -225,20 +225,6 @@ html {
   }
 
   &.filters-expanded {
-    .detail-content {
-      @media (min-width: 768px) and (max-width: 992px) {
-        width: 180px;
-      }
-      @media (min-width: 992px) {
-        width: 210px;
-      }
-      @media (min-width: 1200px) {
-        width: 230px;
-      }
-      @media (min-width: 1400px) {
-        width: 310px;
-      }
-    }
     .dl-flex {
       .dl-narrow;
     }
@@ -294,27 +280,34 @@ html {
   }
 
   .detail-content {
-    overflow: visible;
-    margin: 0;
-    @media (max-width: 768px) {
-      top: 170px;
-      width: 95%;
+    z-index: var(--layer-high);
+    position: fixed;
+    top: 40px;
+    right: 0;
+    height: 100%;
+    width: 390px;
+    box-shadow: -2px 2px 3px 1px var(--color-alto);
+
+    @media (max-width: 390px) {
+      width: 100%;
     }
 
-    @media (min-width: 768px) and (max-width: 992px) {
-      top: 190px;
-      width: 250px;
+    @media (max-width: 678px) {
+      top: 110px;
     }
 
-    @media (min-width: 992px) {
-      width: 330px;
+    @media (min-width: 678px) and (max-width: 768px) {
+      top: 90px;
     }
-    @media (min-width: 1200px) {
-      width: 390px;
+
+    @media (min-width: 768px) and (max-width: 812px) {
+      top: 60px;
     }
-    @media (min-width: 1400px) {
-      width: 530px;
+
+    @media (min-width: 812px) {
+      top: 40px;
     }
+
     react-ui-view-adapter {
       width: 100%;
       overflow-x: visible !important;
