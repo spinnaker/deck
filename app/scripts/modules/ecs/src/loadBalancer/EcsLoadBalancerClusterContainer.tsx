@@ -29,9 +29,9 @@ export class EcsLoadBalancerClusterContainer extends React.Component<ILoadBalanc
 
   public render(): React.ReactElement<EcsLoadBalancerClusterContainer> {
     const { loadBalancer, showInstances, showServerGroups } = this.props;
-    const alb = loadBalancer as IEcsLoadBalancer;
+    const lb = loadBalancer as IEcsLoadBalancer;
 
-    const TargetGroups = alb.targetGroups.map(targetGroup => {
+    const TargetGroups = lb.targetGroups.map(targetGroup => {
       return (
         <EcsTargetGroup
           key={targetGroup.targetGroupName}

@@ -14,7 +14,7 @@ export interface IEcsLoadBalancer extends ILoadBalancer {
   cloudProvider: string;
   createdTime: number;
   dnsname: string;
-  listeners: IALBListener[];
+  listeners: IEcsListener[];
   targetGroups: IEcsTargetGroup[];
   ipAddressType?: string; // returned from clouddriver
   deletionProtection: boolean;
@@ -55,23 +55,24 @@ export interface IEcsTargetGroup {
   region: string;
   serverGroups?: string[];
   targetType?: string;
-  type: string; // returned from clouddriver
+  type: string;
   vpcId?: string;
   vpcName?: string;
 }
 
-export interface IALBListener {
-  certificates: any[];
+export interface IEcsListener {
+  certificates?: any[];
   defaultActions: IListenerAction[];
   port: number;
   protocol: string;
-  rules: any[]; // TODO: use & define IListenerRule
+  rules?: any[]; // TODO: use & define IListenerRule
   sslPolicy?: string;
 }
 
 // see https://docs.aws.amazon.com/elasticloadbalancing/latest/APIReference/API_Action.html
 export interface IListenerAction {
   authenticateOidcConfig?: IAuthenticateOidcActionConfig;
+  authenticateCognitoActionConfig?: IAuthenticateCognitoActionConfig;
   order?: number;
   forwardConfig?: IForwardConfig;
   fixedResponseConfig?: IFixedResponseConfig;
@@ -87,15 +88,29 @@ export interface IAuthenticateOidcActionConfig {
   clientSecret?: string;
   idpLogoutUrl?: string;
   issuer: string;
-  scope: string;
-  sessionCookieName: string;
+  onUnauthenticatedRequest?: 'deny' | 'allow' | 'authenticate';
+  scope?: string;
+  sessionCookieName?: string;
   sessionTimeout?: number;
   tokenEndpoint: string;
   userInfoEndpoint: string;
+  useExistingClientSecret?: boolean;
+}
+
+export interface IAuthenticateCognitoActionConfig {
+  authenticationRequestExtraParams?: { [key: string]: string };
+  onUnauthenticatedRequest?: 'deny' | 'allow' | 'authenticate';
+  scope?: string;
+  sessionCookieName?: string;
+  sessionTimeout?: number;
+  userPoolArn: string;
+  userPoolClientId: string;
+  userPoolDomain: string;
 }
 
 export interface IForwardConfig {
   targetGroups?: { targetGroupArn: string; weight: number }[];
+  targetGroupStickinessConfig?: any;
 }
 
 export interface IFixedResponseConfig {

@@ -160,9 +160,13 @@ export class EcsTargetGroupDetails extends React.Component<IEcsTargetGroupProps,
             <dd>
               {/* TODO: use UISref to display/highlight LBs in this app. See core/.../LoadBalancer.tsx */}
               <ul className="collapse-margin-on-filter-collapse">
-                {targetGroup.loadBalancerNames.map((lb, i) => {
-                  return <li key={i}>{lb}</li>;
-                })}
+                {targetGroup.loadBalancerNames ? (
+                  targetGroup.loadBalancerNames.map((lb, i) => {
+                    return <li key={i}>{lb}</li>;
+                  })
+                ) : (
+                  <li>No load balncers provided.</li>
+                )}
               </ul>
             </dd>
           </dl>
@@ -217,15 +221,15 @@ export class EcsTargetGroupDetails extends React.Component<IEcsTargetGroupProps,
             <dt>Unhealthy Threshold</dt>
             <dd>{targetGroup.unhealthyThresholdCount}</dd>
             <dt>Matcher</dt>
-            <dd>HTTP Code(s): {targetGroup.matcher.httpCode}</dd>
+            <dd>HTTP Code(s): {targetGroup && targetGroup.matcher ? targetGroup.matcher.httpCode : 'None'}</dd>
           </dl>
         </CollapsibleSection>
         <CollapsibleSection heading="Attributes" defaultExpanded={false}>
           <dl>
             <dt>Deregistration Delay Timeout</dt>
-            <dd>{targetGroup.attributes['deregistration_delay.timeout_seconds']} seconds</dd>
+            <dd>{targetGroup.attributes['deregistration_delay.timeout_seconds'] || 0} seconds</dd>
             <dt>Stickiness Enabled</dt>
-            <dd>{targetGroup.attributes['stickiness.enabled']}</dd>
+            <dd>{targetGroup.attributes['stickiness.enabled'] || 'N/A'}</dd>
           </dl>
         </CollapsibleSection>
       </div>

@@ -1,9 +1,9 @@
 import React from 'react';
 
-import { IALBListener } from '../domain/IEcsLoadBalancer';
+import { IEcsListener } from '../domain/IEcsLoadBalancer';
 
 export interface IEcsListenerProps {
-  listener: IALBListener;
+  listener: IEcsListener;
 }
 
 export class EcsListener extends React.Component<IEcsListenerProps> {
@@ -51,7 +51,8 @@ export class EcsListener extends React.Component<IEcsListenerProps> {
                     {action.type}:{' '}
                     {action.redirectConfig.statusCode ||
                       action.fixedResponseConfig.statusCode ||
-                      action.authenticateOidcConfig.clientId}
+                      action.authenticateOidcConfig.clientId ||
+                      action.authenticateCognitoActionConfig.userPoolDomain}
                   </li>
                 );
               }

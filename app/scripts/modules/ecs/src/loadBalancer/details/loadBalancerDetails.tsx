@@ -186,21 +186,29 @@ export class EcsLoadBalancerDetails extends React.Component<
           <span>Select a target group to check the instance health status from the view of its server groups.</span>
         </CollapsibleSection>
         <CollapsibleSection heading="Listeners" defaultExpanded={false}>
-          {loadBalancer.listeners.map((listener, index) => {
-            return (
-              <div key={index}>
-                <span>
-                  <EcsListener listener={listener}></EcsListener>
-                </span>
-              </div>
-            );
-          })}
+          {loadBalancer.listeners ? (
+            loadBalancer.listeners.map((listener, index) => {
+              return (
+                <div key={index}>
+                  <span>
+                    <EcsListener listener={listener}></EcsListener>
+                  </span>
+                </div>
+              );
+            })
+          ) : (
+            <li>No listeners provided.</li>
+          )}
         </CollapsibleSection>
         <CollapsibleSection heading="Firewalls" defaultExpanded={false}>
           <ul>
-            {loadBalancer.securityGroups.map(sg => {
-              return <li key={sg}>{sg}</li>;
-            })}
+            {loadBalancer.securityGroups ? (
+              loadBalancer.securityGroups.map(sg => {
+                return <li key={sg}>{sg}</li>;
+              })
+            ) : (
+              <li>No security groups provided.</li>
+            )}
           </ul>
         </CollapsibleSection>
         <CollapsibleSection heading="Subnets" defaultExpanded={false}>
