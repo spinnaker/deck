@@ -12,7 +12,9 @@ import org.redline_rpm.header.Flags
 group = "com.netflix.spinnaker.deck"
 apply plugin: "nebula.ospackage"
 
-
+// BintrayPublishPlugin looks for a task named "publish" to attach its tasks to,
+// so we need to make sure one exists. Normally this would be created by the
+// publishing plugin, but we aren't applying that here.
 project.tasks.register("publish")
 
 node {
@@ -86,10 +88,11 @@ project.tasks.register('test') {
   dependsOn 'karma'
 }
 copyFavicon.dependsOn 'test'
-buildDeb.dependsOn 'copyFavicon'
+buildDeb.dependsOn 'webpack', 'copyFavicon'
 buildRpm.dependsOn 'webpack'
 functionalTestsChrome.dependsOn 'yarn'
 functionalTestsFirefox.dependsOn 'yarn'
+build.dependsOn 'buildDeb'
 
 String toVers(String v) {
   int idx = v.indexOf('-')
@@ -99,10 +102,18 @@ String toVers(String v) {
   return v
 }
 
+String toRelease(String v) {
+  int idx = v.lastIndexOf('-')
+  if (idx != -1) {
+    return v.substring(idx + 1)
+  }
+  return ''
+}
+
 ospackage {
   packageName = "spinnaker-deck"
   version = toVers(project.version.toString())
-  release '3'
+  release toRelease(project.version.toString())
   into "/opt/deck/html"
   from "build/webpack"
   os = LINUX
