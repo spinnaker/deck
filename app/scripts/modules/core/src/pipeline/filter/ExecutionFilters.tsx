@@ -9,6 +9,7 @@ import { Subscription } from 'rxjs';
 
 import { Application } from 'core/application';
 import { FilterSection } from 'core/cluster/filter/FilterSection';
+import { FilterSearch } from 'core/cluster/filter/FilterSearch';
 import { IFilterTag } from 'core/filterModel';
 import { IExecution, IPipeline } from 'core/domain';
 import { PipelineConfigService } from '../config/services/PipelineConfigService';
@@ -192,6 +193,7 @@ export class ExecutionFilters extends React.Component<IExecutionFiltersProps, IE
 
   public render() {
     const { pipelineNames, strategyNames, pipelineReorderEnabled, tags } = this.state;
+    const sortFilter = ExecutionState.filterModel.asFilterModel.sortFilter;
 
     return (
       <div className="execution-filters">
@@ -204,20 +206,12 @@ export class ExecutionFilters extends React.Component<IExecutionFiltersProps, IE
             >
               Clear All
             </span>
-
-            <FilterSection heading="Search" expanded={true} helpKey="executions.search">
-              <form className="form-horizontal" role="form">
-                <div className="form-group nav-search">
-                  <input
-                    type="search"
-                    className="form-control input-sm"
-                    onBlur={this.searchFieldUpdated}
-                    onChange={this.searchFieldUpdated}
-                    style={{ width: '85%', display: 'inline-block' }}
-                  />
-                </div>
-              </form>
-            </FilterSection>
+            <FilterSearch
+              helpKey="executions.search"
+              value={sortFilter.filter}
+              onBlur={this.searchFieldUpdated}
+              onSearchChange={this.searchFieldUpdated}
+            />
           </div>
           <div className="content">
             <FilterSection heading="Pipelines" expanded={true}>

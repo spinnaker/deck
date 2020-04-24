@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 import { Application } from 'core/application';
 import { ISortFilter, digestDependentFilters, FilterCheckbox } from 'core/filterModel';
 import { FilterSection } from 'core/cluster/filter/FilterSection';
+import { FilterSearch } from 'core/cluster/filter/FilterSearch';
 import { FunctionState } from 'core/state';
 
 const poolValueCoordinates = [
@@ -145,20 +146,12 @@ export class FunctionFilters extends React.Component<IFunctionFiltersProps, IFun
           >
             Clear All
           </span>
-          <FilterSection heading="Search" expanded={true} helpKey="functions.search">
-            <form className="form-horizontal" role="form">
-              <div className="form-group nav-search">
-                <input
-                  type="search"
-                  className="form-control input-sm"
-                  value={sortFilter.filter}
-                  onBlur={this.handleSearchBlur}
-                  onChange={this.handleSearchChange}
-                  style={{ width: '85%', display: 'inline-block' }}
-                />
-              </div>
-            </form>
-          </FilterSection>
+          <FilterSearch
+            helpKey="functions.search"
+            value={sortFilter.filter}
+            onBlur={this.handleSearchBlur}
+            onSearchChange={this.handleSearchChange}
+          />
         </div>
         {fuctionsLoaded && (
           <div className="content">
