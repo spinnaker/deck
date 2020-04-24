@@ -5,7 +5,6 @@ import { Alert } from 'react-bootstrap';
 import { Option } from 'react-select';
 import {
   IEcsServerGroupCommand,
-  IEcsServiceDiscoveryRegistry,
   IEcsServiceDiscoveryRegistryAssociation,
 } from '../../serverGroupConfiguration.service';
 import { HelpField, TetheredSelect } from '@spinnaker/core';
@@ -14,6 +13,15 @@ export interface IServiceDiscoveryProps {
   command: IEcsServerGroupCommand;
   notifyAngular: (key: string, value: any) => void;
   configureCommand: (query: string) => IPromise<void>;
+}
+
+export interface IEcsServiceDiscoveryRegistry {
+  account: string;
+  region: string;
+  name: string;
+  id: string;
+  arn: string;
+  displayName: string;
 }
 
 interface IServiceDiscoveryState {
@@ -161,7 +169,7 @@ export class ServiceDiscovery extends React.Component<IServiceDiscoveryProps, IS
           <form name="ecsServiceDiscoveryRegistryMappings">
             <table className="table table-condensed packed tags">
               <thead>
-                <tr key="header">
+                <tr>
                   <th style={{ width: '75%' }}>
                     Registry
                     <HelpField id="ecs.serviceDiscoveryRegistry" />
