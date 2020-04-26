@@ -32,7 +32,6 @@
             <li><a href ng-if="ctrl.serverGroup.disabled" ng-click="ctrl.enableServerGroup()">Enable</a></li>
             <li><a href ng-click="ctrl.destroyServerGroup()">Destroy</a></li>
             <li><a href ng-click="ctrl.resizeServerGroup()">Resize</a></li>
-            <li><a href ng-click="ctrl.rollbackServerGroup()">Rollback</a></li>
           </ul>
         </div>
         <div class="dropdown" ng-if="ctrl.serverGroup.insightActions.length > 0" uib-dropdown dropdown-append-to-body>
@@ -61,10 +60,8 @@
           <account-tag account="ctrl.serverGroup.account" pad="right"></account-tag>
           {{ctrl.serverGroup.region}}
         </dd>
-        <dt>Subnet</dt>
-        <dd>{{ctrl.serverGroup.subnet.name}}</dd>
         <dt>Zones</dt>
-        <dd>{{ctrl.serverGroup.zone}}</dd>
+        <dd ng-repeat="zone in ctrl.serverGroup.zones">{{zone}}</dd>
       </dl>
     </collapsible-section>
     <collapsible-section heading="Size" expanded="true">
@@ -79,32 +76,27 @@
     </collapsible-section>
     <collapsible-section heading="Launch Configuration">
       <dl class="dl-horizontal dl-flex">
-        <dt>Name</dt>
-        <dd>{{ctrl.serverGroup.name}}</dd>
-        <dt ng-if="ctrl.serverGroup.launchConfig.image">Image</dt>
-        <dd ng-if="ctrl.serverGroup.launchConfig.image">
-          {{ctrl.serverGroup.launchConfig.image}}
+        <dt>Elastigroup ID</dt>
+        <dd>{{ctrl.serverGroup.elastigroup.id}}</dd>
+        <dt ng-if="ctrl.serverGroup.elastigroup.compute.launchSpecification.imageId">Image ID</dt>
+        <dd ng-if="ctrl.serverGroup.elastigroup.compute.launchSpecification.imageId">
+          {{ctrl.serverGroup.elastigroup.compute.launchSpecification.imageId}}
         </dd>
 
-        <dt ng-if="ctrl.serverGroup.launchConfig.iamRole.name">IAM Profile</dt>
-        <dd ng-if="ctrl.serverGroup.launchConfig.iamRole.name">
-          {{ctrl.serverGroup.launchConfig.iamRole.name}}
+        <dt ng-if="ctrl.serverGroup.elastigroup.compute.launchSpecification.loadBalancersConfig.loadBalancers">
+          Balancers
+        </dt>
+        <dd
+          ng-repeat="lb in ctrl.serverGroup.elastigroup.compute.launchSpecification.loadBalancersConfig.loadBalancers"
+        >
+          {{lb.name}}
         </dd>
-
-        <dt ng-if="ctrl.serverGroup.launchConfig.userData">User Data</dt>
-        <dd ng-if="ctrl.serverGroup.launchConfig.userData">
-          {{ctrl.serverGroup.launchConfig.userData}}
+        <dt ng-if="ctrl.serverGroup.elastigroup.compute.instanceTypes.onDemand">OD Type</dt>
+        <dd ng-if="ctrl.serverGroup.elastigroup.compute.instanceTypes.onDemand">
+          {{ctrl.serverGroup.elastigroup.compute.instanceTypes.onDemand}}
         </dd>
-
-        <dt ng-if="ctrl.serverGroup.instanceType">On-Demand Type</dt>
-        <dd ng-if="ctrl.serverGroup.instanceType">
-          {{ctrl.serverGroup.instanceType}}
-        </dd>
-
-        <dt ng-if="ctrl.serverGroup.instanceType">Spot Type</dt>
-        <dd ng-if="ctrl.serverGroup.instanceTypes">
-          {{ctrl.serverGroup.instanceType}}
-        </dd>
+        <dt ng-if="ctrl.serverGroup.`elastigroup.compute.instanceTypes.spot">Spot Types</dt>
+        <dd ng-repeat="type in ctrl.serverGroup.elastigroup.compute.instanceTypes.spot">{{type}}</dd>
       </dl>
     </collapsible-section>
   </div>

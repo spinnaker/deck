@@ -23,7 +23,6 @@ module(SPOT_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_CONTROLLER, [UIROUTER_ANGULAR
     'serverGroupWriter',
     function($scope, $state, $uibModal, app, serverGroup, serverGroupWriter) {
       const provider = 'spot';
-
       this.application = app;
       this.serverGroup = serverGroup;
 
@@ -45,6 +44,7 @@ module(SPOT_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_CONTROLLER, [UIROUTER_ANGULAR
           cancelLoader();
           details.account = serverGroup.accountId;
           this.serverGroup = details;
+          this.elastigroupId = this.serverGroup.elastigroup.id;
         });
       };
 
@@ -105,7 +105,20 @@ module(SPOT_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_CONTROLLER, [UIROUTER_ANGULAR
         ConfirmationModalService.confirm(confirmationModalParams);
       };
 
-      //todo yossi not been tested
+      //      this.cloneServerGroup = serverGroup => {
+      //        $uibModal.open({
+      //          templateUrl: require('../configure/wizard/serverGroupWizard.html'),
+      //          controller: 'spotCloneServerGroupCtrl as ctrl',
+      //          size: 'lg',
+      //          resolve: {
+      //            title: () => 'Clone ' + serverGroup.name,
+      //            application: () => app,
+      //            serverGroupCommand: () =>
+      //                     spotServerGroupCommandBuilder.buildServerGroupCommandFromExisting(app, serverGroup),
+      //          },
+      //        });
+      //      };
+
       this.disableServerGroup = () => {
         const serverGroup = this.serverGroup;
 
@@ -114,7 +127,8 @@ module(SPOT_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_CONTROLLER, [UIROUTER_ANGULAR
           title: 'Disabling ' + serverGroup.name,
         };
 
-        const submitMethod = params => serverGroupWriter.disableServerGroup(serverGroup, app, params);
+        const submitMethod = params =>
+          serverGroupWriter.disableServerGroup(serverGroup, app, { elastigroupId: serverGroup.elastigroup.id });
 
         const confirmationModalParams = {
           header: 'Really disable ' + serverGroup.name + '?',
@@ -136,7 +150,6 @@ module(SPOT_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_CONTROLLER, [UIROUTER_ANGULAR
         ConfirmationModalService.confirm(confirmationModalParams);
       };
 
-      //todo yossi not been tested
       this.enableServerGroup = () => {
         const serverGroup = this.serverGroup;
 
@@ -145,7 +158,8 @@ module(SPOT_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_CONTROLLER, [UIROUTER_ANGULAR
           title: 'Enabling ' + serverGroup.name,
         };
 
-        const submitMethod = params => serverGroupWriter.enableServerGroup(serverGroup, app, params);
+        const submitMethod = params =>
+          serverGroupWriter.enableServerGroup(serverGroup, app, { elastigroupId: serverGroup.elastigroup.id });
 
         const confirmationModalParams = {
           header: 'Really enable ' + serverGroup.name + '?',

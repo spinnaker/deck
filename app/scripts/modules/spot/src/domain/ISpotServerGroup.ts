@@ -13,6 +13,7 @@ export interface ISpotServerGroup extends IServerGroup {
   ciBuild: ISpotBuildInfo;
   appArtifact: ISpotArtifactInfo;
   pipelineId: string;
+  disabled: boolean;
 }
 
 export interface ISpotServiceInstance {
