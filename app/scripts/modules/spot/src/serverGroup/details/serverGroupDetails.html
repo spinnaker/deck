@@ -1,4 +1,4 @@
-<div class="details-panel" ng-class="{ disabled: ctrl.serverGroup.isDisabled }">
+<div class="details-panel" ng-class="{ disabled: ctrl.serverGroup.disabled }">
   <div class="header" ng-if="ctrl.state.loading">
     <div class="close-button">
       <a class="btn btn-link" ui-sref="^">
@@ -49,7 +49,6 @@
     </div>
   </div>
   <div class="content" ng-if="!ctrl.state.loading">
-    <h4 class="text-center" ng-if="ctrl.serverGroup.isDisabled">[SERVER GROUP IS DISABLED]</h4>
     <server-group-running-tasks-details server-group="ctrl.serverGroup"></server-group-running-tasks-details>
     <collapsible-section heading="Server Group Information" expanded="true">
       <dl class="dl-horizontal dl-flex">
@@ -95,7 +94,7 @@
         <dd ng-if="ctrl.serverGroup.elastigroup.compute.instanceTypes.onDemand">
           {{ctrl.serverGroup.elastigroup.compute.instanceTypes.onDemand}}
         </dd>
-        <dt ng-if="ctrl.serverGroup.`elastigroup.compute.instanceTypes.spot">Spot Types</dt>
+        <dt ng-if="ctrl.serverGroup.elastigroup.compute.instanceTypes.spot">Spot Types</dt>
         <dd ng-repeat="type in ctrl.serverGroup.elastigroup.compute.instanceTypes.spot">{{type}}</dd>
       </dl>
     </collapsible-section>
