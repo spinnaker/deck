@@ -51,6 +51,17 @@ describe('PluginRegistry', () => {
     expect(spy).toHaveBeenCalled();
   });
 
+  it('loadPluginManifest() should not throw if passed a metadata promise that will be rejected', async () => {
+    const promise = Promise.reject(new Error('Could not load metadata from Gate'));
+    let result;
+    try {
+      result = await pluginRegistry.loadPluginManifest('gate', '/plugins/deck/plugin-manifest.json', promise);
+    } catch (e) {
+      expect(e).not.toBeDefined();
+    }
+    expect(result).toEqual([]);
+  });
+
   describe('loadPlugins()', () => {
     let pluginModule: { plugin: IDeckPlugin };
     beforeEach(() => {

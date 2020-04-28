@@ -139,7 +139,7 @@ export class PluginRegistry {
       return plugins.map(pluginMetaData => this.registerPluginMetaData(source, pluginMetaData));
     } catch (error) {
       console.error(`Error loading plugin manifest from ${location}`);
-      throw error;
+      return [];
     }
   }
 
