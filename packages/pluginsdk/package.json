@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "check-peer-dependencies": "^2.0.1",
+    "lodash": "^4.17.15",
     "readline-sync": "^1.4.10",
     "strip-json-comments": "^3.1.0",
     "yargs": "^15.3.1"
