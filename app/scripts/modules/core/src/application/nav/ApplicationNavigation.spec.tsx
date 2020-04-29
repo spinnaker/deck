@@ -4,7 +4,7 @@ import { mock } from 'angular';
 import { UIRouterReact, UIRouterContext } from '@uirouter/react';
 import { StateMatcher } from '@uirouter/core';
 
-import { ReactInjector, REACT_MODULE } from '../../reactShims';
+import { REACT_MODULE } from '../../reactShims';
 import { OVERRIDE_REGISTRY } from '../../overrideRegistry';
 import {
   mockAppConfigDataSourceConfig,
@@ -27,11 +27,12 @@ describe('ApplicationNavigation', () => {
   beforeEach(
     mock.inject((_$uiRouter_: UIRouterReact) => {
       $uiRouter = _$uiRouter_;
+      $uiRouter.globals.current.name = '**.tasks.**';
     }),
   );
   beforeEach(() => {
     // Initialize current route
-    spyOn(ReactInjector.$state, 'includes').and.callFake((substate: any) => currentStates.includes(substate));
+    spyOn($uiRouter.stateService, 'includes').and.callFake((substate: any) => currentStates.includes(substate));
     spyOn(StateMatcher.prototype, 'find').and.callFake(() => undefined as any);
   });
 
@@ -102,7 +103,6 @@ describe('ApplicationNavigation', () => {
       data: [],
     });
     app.attributes.dataSources = app.dataSources;
-
     app.setActiveState(activeDataSource);
 
     const wrapper = mount(
@@ -110,13 +110,17 @@ describe('ApplicationNavigation', () => {
         <ApplicationNavigation app={app} />
       </UIRouterContext.Provider>,
     );
+
     const navSection = wrapper.find('NavSection').at(1);
     const taskRoute = navSection.find('NavRoute').at(0);
-    const isTaskRouteActive = taskRoute.prop('isActive');
-    expect(isTaskRouteActive).toEqual(true);
+
+    const taskCategory = taskRoute.find('NavCategory');
+    const isTaskCategoryActive = taskCategory.prop('isActive');
+    expect(isTaskCategoryActive).toEqual(true);
 
     const configRoute = navSection.find('NavRoute').at(1);
-    const isConfigRouteActive = configRoute.prop('isActive');
-    expect(isConfigRouteActive).toEqual(false);
+    const configCategory = configRoute.find('NavCategory');
+    const isConfigCategoryActive = configCategory.prop('isActive');
+    expect(isConfigCategoryActive).toEqual(false);
   });
 });

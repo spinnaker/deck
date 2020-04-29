@@ -1,6 +1,6 @@
 import React from 'react';
 import { useCurrentStateAndParams } from '@uirouter/react';
-import { find, isEqual, flatten } from 'lodash';
+import { find, isEqual } from 'lodash';
 
 import { ApplicationRefresher } from './ApplicationRefresher';
 import { ApplicationIcon } from '../ApplicationIcon';
@@ -11,7 +11,6 @@ import { navigationCategoryRegistry } from './navigationCategory.registry';
 import { PagerDutyWriter } from 'core/pagerDuty';
 import { Application } from '../application.model';
 import { ApplicationDataSource } from '../service/applicationDataSource';
-import { ReactInjector } from 'core/reactShims';
 
 import './verticalNav.less';
 
@@ -21,7 +20,8 @@ export interface IApplicationNavigationProps {
 
 export const ApplicationNavigation = ({ app }: IApplicationNavigationProps) => {
   const prevDataSourceAttr = usePrevious(app.attributes.dataSources);
-  const { state, params } = useCurrentStateAndParams();
+  const { state } = useCurrentStateAndParams();
+  console.log(state.name);
 
   const getNavigationCategories = (dataSources: ApplicationDataSource[]) => {
     const appSources = dataSources.filter(ds => ds.visible !== false && !ds.disabled && ds.sref);
@@ -36,15 +36,6 @@ export const ApplicationNavigation = ({ app }: IApplicationNavigationProps) => {
   const initialCategories = getNavigationCategories(app.dataSources);
   const [navSections, setNavSections] = React.useState(initialCategories);
 
-  const getActiveCategory = (categories: ApplicationDataSource[]) =>
-    categories.find(c => c.activeState && ReactInjector.$state.includes(c.activeState));
-  const [activeCategory, setActiveCategory] = React.useState(getActiveCategory(flatten(navSections)));
-
-  const resetActiveCategory = () => {
-    const newActive = getActiveCategory(app.dataSources);
-    setActiveCategory(newActive);
-  };
-
   const appRefreshSubscription = app.onRefresh(null, () => {
     if (!isEqual(app.attributes.dataSources, prevDataSourceAttr)) {
       const categories = getNavigationCategories(app.dataSources);
@@ -54,7 +45,6 @@ export const ApplicationNavigation = ({ app }: IApplicationNavigationProps) => {
 
   React.useEffect(() => {
     appRefreshSubscription();
-    resetActiveCategory();
 
     return () => {
       appRefreshSubscription();
@@ -79,7 +69,7 @@ export const ApplicationNavigation = ({ app }: IApplicationNavigationProps) => {
       {navSections
         .filter(section => section.length)
         .map((section, i) => (
-          <NavSection key={`section-${i}`} categories={section} app={app} activeCategoryName={activeCategory?.label} />
+          <NavSection key={`section-${i}`} categories={section} app={app} />
         ))}
       <div className="nav-section clickable">
         <div className="page-category flex-container-h middle" onClick={pageApplicationOwner}>
