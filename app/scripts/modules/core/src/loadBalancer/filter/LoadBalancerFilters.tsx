@@ -190,7 +190,6 @@ export class LoadBalancerFilters extends React.Component<ILoadBalancerFiltersPro
 
     return (
       <div>
-        {/* <FilterCollapse /> */}
         <div className="heading">
           <span
             className="btn btn-default btn-xs"
