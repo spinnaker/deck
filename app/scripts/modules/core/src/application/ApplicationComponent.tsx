@@ -1,5 +1,4 @@
-// import { ApplicationHeader } from './nav/ApplicationHeader';
-import { ApplicationNavigation } from './nav/ApplicationNavigation';
+import { ApplicationHeader } from './nav/ApplicationHeader';
 import React from 'react';
 import { UIView } from '@uirouter/react';
 
@@ -51,7 +50,7 @@ export class ApplicationComponent extends React.Component<IApplicationComponentP
     const { app } = this.props;
     return (
       <div className="application">
-        {!app.notFound && !app.hasError && <ApplicationNavigation app={app} />}
+        {!app.notFound && !app.hasError && <ApplicationHeader app={app} />}
         {app.notFound && (
           <div>
             <h2 className="text-center">Application Not Found</h2>

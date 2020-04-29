@@ -20,8 +20,7 @@ export interface IApplicationNavigationProps {
 
 export const ApplicationNavigation = ({ app }: IApplicationNavigationProps) => {
   const prevDataSourceAttr = usePrevious(app.attributes.dataSources);
-  const { state } = useCurrentStateAndParams();
-  console.log(state.name);
+  useCurrentStateAndParams();
 
   const getNavigationCategories = (dataSources: ApplicationDataSource[]) => {
     const appSources = dataSources.filter(ds => ds.visible !== false && !ds.disabled && ds.sref);
