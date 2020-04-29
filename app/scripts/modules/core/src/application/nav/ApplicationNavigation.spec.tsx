@@ -1,6 +1,6 @@
 import React from 'react';
 import { mount } from 'enzyme';
-import { BehaviorSubject } from 'rxjs';
+// import { BehaviorSubject } from 'rxjs';
 import { mock } from 'angular';
 import { UIRouterReact, UIRouterContext } from '@uirouter/react';
 import { StateMatcher } from '@uirouter/core';
@@ -47,7 +47,7 @@ describe('ApplicationNavigation', () => {
     );
     const activeDataSource = app.getDataSource('executions');
     app.dataSources.push({ ...activeDataSource, key: 'runningExecutions' } as ApplicationDataSource<IPipeline>);
-    app.getDataSource(activeDataSource.badge).status$ = new BehaviorSubject({
+    app.getDataSource(activeDataSource.badge).status$.next({
       status: 'FETCHED',
       loaded: true,
       lastRefresh: 0,
@@ -97,7 +97,7 @@ describe('ApplicationNavigation', () => {
     );
     const activeDataSource = app.getDataSource('tasks');
     app.dataSources.push({ ...activeDataSource, key: 'runningTasks' } as ApplicationDataSource<IPipeline>);
-    app.getDataSource(activeDataSource.badge).status$ = new BehaviorSubject({
+    app.getDataSource(activeDataSource.badge).status$.next({
       status: 'FETCHED',
       loaded: true,
       lastRefresh: 0,

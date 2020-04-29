@@ -1,7 +1,6 @@
 import React from 'react';
-import _find from 'lodash/find';
-import _isEqual from 'lodash/isEqual';
-import _flatten from 'lodash/flatten';
+// import { useCurrentStateAndParams } from '@uirouter/react';
+import { find, isEqual, flatten } from 'lodash';
 
 import { ApplicationRefresher } from './ApplicationRefresher';
 import { ApplicationIcon } from '../ApplicationIcon';
@@ -22,6 +21,7 @@ export interface IApplicationNavigationProps {
 
 export const ApplicationNavigation = ({ app }: IApplicationNavigationProps) => {
   const prevDataSourceAttr = usePrevious(app.attributes.dataSources);
+  // const { state, params } = useCurrentStateAndParams();
   let routerSubscription: Function;
 
   const getNavigationCategories = (dataSources: ApplicationDataSource[]) => {
@@ -29,7 +29,7 @@ export const ApplicationNavigation = ({ app }: IApplicationNavigationProps) => {
     const allCategories = navigationCategoryRegistry.getAll();
     const categories = allCategories.map(c => appSources.filter(as => as.category === c.key));
     const uncategorizedSources = appSources.filter(
-      as => !as.category || !_find(allCategories, c => c.key == as.category),
+      as => !as.category || !find(allCategories, c => c.key == as.category),
     );
     categories.push(uncategorizedSources);
     return categories;
@@ -39,7 +39,7 @@ export const ApplicationNavigation = ({ app }: IApplicationNavigationProps) => {
 
   const getActiveCategory = (categories: ApplicationDataSource[]) =>
     categories.find(c => c.activeState && ReactInjector.$state.includes(c.activeState));
-  const [activeCategory, setActiveCategory] = React.useState(getActiveCategory(_flatten(navSections)));
+  const [activeCategory, setActiveCategory] = React.useState(getActiveCategory(flatten(navSections)));
 
   const resetActiveCategory = () => {
     const newActive = getActiveCategory(app.dataSources);
@@ -47,7 +47,7 @@ export const ApplicationNavigation = ({ app }: IApplicationNavigationProps) => {
   };
 
   const appRefreshSubscription = app.onRefresh(null, () => {
-    if (!_isEqual(app.attributes.dataSources, prevDataSourceAttr)) {
+    if (!isEqual(app.attributes.dataSources, prevDataSourceAttr)) {
       const categories = getNavigationCategories(app.dataSources);
       setNavSections(categories);
     }

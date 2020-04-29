@@ -11,7 +11,7 @@ export interface INavigationSectionProps {
 }
 
 export const NavSection = ({ activeCategoryName, app, categories }: INavigationSectionProps) => (
-  <div className="nav-section sp-padding-s-yaxis text-semibold">
+  <div className="nav-section sp-padding-s-yaxis text-semibold">
     {categories.map(category => (
       <NavRoute key={category.key} category={category} app={app} isActive={category.label === activeCategoryName} />
     ))}
