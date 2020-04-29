@@ -1,6 +1,5 @@
 import React from 'react';
 import { mount } from 'enzyme';
-// import { BehaviorSubject } from 'rxjs';
 import { mock } from 'angular';
 import { UIRouterReact, UIRouterContext } from '@uirouter/react';
 import { StateMatcher } from '@uirouter/core';
@@ -28,14 +27,12 @@ describe('ApplicationNavigation', () => {
   beforeEach(
     mock.inject((_$uiRouter_: UIRouterReact) => {
       $uiRouter = _$uiRouter_;
-      // Inititalize base route
-      $uiRouter.stateRegistry.root().name = 'http://localhost:9000';
     }),
   );
   beforeEach(() => {
     // Initialize current route
     spyOn(ReactInjector.$state, 'includes').and.callFake((substate: any) => currentStates.includes(substate));
-    spyOn(StateMatcher.prototype, 'resolvePath').and.callFake(() => 'pipelines.executions');
+    spyOn(StateMatcher.prototype, 'find').and.callFake(() => undefined as any);
   });
 
   it('should render header, categories, and pagerduty button', () => {

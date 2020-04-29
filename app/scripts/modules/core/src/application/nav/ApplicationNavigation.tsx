@@ -1,5 +1,5 @@
 import React from 'react';
-// import { useCurrentStateAndParams } from '@uirouter/react';
+import { useCurrentStateAndParams } from '@uirouter/react';
 import { find, isEqual, flatten } from 'lodash';
 
 import { ApplicationRefresher } from './ApplicationRefresher';
@@ -21,8 +21,7 @@ export interface IApplicationNavigationProps {
 
 export const ApplicationNavigation = ({ app }: IApplicationNavigationProps) => {
   const prevDataSourceAttr = usePrevious(app.attributes.dataSources);
-  // const { state, params } = useCurrentStateAndParams();
-  let routerSubscription: Function;
+  const { state, params } = useCurrentStateAndParams();
 
   const getNavigationCategories = (dataSources: ApplicationDataSource[]) => {
     const appSources = dataSources.filter(ds => ds.visible !== false && !ds.disabled && ds.sref);
@@ -54,12 +53,10 @@ export const ApplicationNavigation = ({ app }: IApplicationNavigationProps) => {
   });
 
   React.useEffect(() => {
-    routerSubscription = ReactInjector.$uiRouter.transitionService.onSuccess({}, () => {
-      resetActiveCategory();
-    });
+    appRefreshSubscription();
+    resetActiveCategory();
 
     return () => {
-      routerSubscription();
       appRefreshSubscription();
     };
   }, []);
