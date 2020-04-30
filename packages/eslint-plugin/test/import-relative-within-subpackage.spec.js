@@ -57,25 +57,5 @@ ruleTester.run('import-relative-within-subpackage', rule, {
         'Do not use an alias to import from core/subpackage from code inside core/subpackage. Instead, use a relative import',
       ],
     },
-    {
-      // kubernetes subpackages are nested under v1 or v2 directory so treat them differently
-      filename:
-        '/Users/cthielen/netflix/spinnaker/deck/app/scripts/modules/kubernetes/src/v1/pipeline/stages/runJob/configureJob.controller.js',
-      code: `import { Anything } from 'kubernetes/v1/pipeline/lifecycleHook.component';`,
-      output: `import { Anything } from '../../lifecycleHook.component';`,
-      errors: [
-        'Do not use an alias to import from kubernetes/v1/pipeline from code inside kubernetes/v1/pipeline. Instead, use a relative import',
-      ],
-    },
-    {
-      // kubernetes subpackages are nested under v1 or v2 directory so treat them differently
-      filename:
-        '/Users/cthielen/netflix/spinnaker/deck/app/scripts/modules/kubernetes/src/v2/manifest/manifestImageDetails.component.ts',
-      code: `import { Anything } from 'kubernetes/v2/manifest/ManifestImageDetails';`,
-      output: `import { Anything } from './ManifestImageDetails';`,
-      errors: [
-        'Do not use an alias to import from kubernetes/v2/manifest from code inside kubernetes/v2/manifest. Instead, use a relative import',
-      ],
-    },
   ],
 });
