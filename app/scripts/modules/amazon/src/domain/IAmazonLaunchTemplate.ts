@@ -67,6 +67,9 @@ export interface ILaunchTemplateData {
   keyName?: string;
   licenseSpecifications?: ILicenseConfig[];
   metadataOptions: IMetadataOptions;
+  monitoring: {
+    enabled: boolean;
+  };
   ramDiskId?: string;
   tagSpecifications?: ITagSpecification[];
   userData?: string;
