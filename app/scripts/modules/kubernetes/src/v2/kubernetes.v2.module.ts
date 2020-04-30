@@ -38,7 +38,7 @@ import { KUBERNETES_DISABLE_MANIFEST_STAGE } from 'kubernetes/v2/pipelines/stage
 import { KubernetesSecurityGroupReader } from 'kubernetes/shared/securityGroup/securityGroup.reader';
 import { KUBERNETES_ROLLING_RESTART } from 'kubernetes/v2/manifest/rollout/RollingRestart';
 
-import kubernetesLogo from '../shared/logo/kubernetes.icon.svg';
+import kubernetesLogo from '../shared/logo/kubernetes.logo.svg';
 
 import 'kubernetes/shared/validation/applicationName.validator';
 import 'kubernetes/shared/help/kubernetes.help';
