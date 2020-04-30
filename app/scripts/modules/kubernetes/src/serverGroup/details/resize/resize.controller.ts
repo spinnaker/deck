@@ -63,9 +63,9 @@ class KubernetesServerGroupResizeController implements IController {
   }
 }
 
-export const KUBERNETES_V2_SERVER_GROUP_RESIZE_CTRL = 'spinnaker.kubernetes.v2.serverGroup.details.resize.controller';
+export const KUBERNETES_SERVER_GROUP_RESIZE_CTRL = 'spinnaker.kubernetes.serverGroup.details.resize.controller';
 
-module(KUBERNETES_V2_SERVER_GROUP_RESIZE_CTRL, [SERVER_GROUP_WRITER]).controller(
+module(KUBERNETES_SERVER_GROUP_RESIZE_CTRL, [SERVER_GROUP_WRITER]).controller(
   'kubernetesV2ServerGroupResizeCtrl',
   KubernetesServerGroupResizeController,
 );

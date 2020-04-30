@@ -111,8 +111,8 @@ class KubernetesLoadBalancerDetailsController implements IController {
   }
 }
 
-export const KUBERNETES_V2_LOAD_BALANCER_DETAILS_CTRL = 'spinnaker.kubernetes.v2.loadBalancerDetails.controller';
-module(KUBERNETES_V2_LOAD_BALANCER_DETAILS_CTRL, []).controller(
+export const KUBERNETES_LOAD_BALANCER_DETAILS_CTRL = 'spinnaker.kubernetes.loadBalancerDetails.controller';
+module(KUBERNETES_LOAD_BALANCER_DETAILS_CTRL, []).controller(
   'kubernetesV2LoadBalancerDetailsCtrl',
   KubernetesLoadBalancerDetailsController,
 );

@@ -223,9 +223,9 @@ class KubernetesServerGroupDetailsController implements IController {
   }
 }
 
-export const KUBERNETES_V2_SERVER_GROUP_DETAILS_CTRL = 'spinnaker.kubernetes.v2.serverGroup.details.controller';
+export const KUBERNETES_SERVER_GROUP_DETAILS_CTRL = 'spinnaker.kubernetes.serverGroup.details.controller';
 
-module(KUBERNETES_V2_SERVER_GROUP_DETAILS_CTRL, [SERVER_GROUP_WRITER]).controller(
+module(KUBERNETES_SERVER_GROUP_DETAILS_CTRL, [SERVER_GROUP_WRITER]).controller(
   'kubernetesV2ServerGroupDetailsCtrl',
   KubernetesServerGroupDetailsController,
 );

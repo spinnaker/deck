@@ -149,9 +149,9 @@ class KubernetesInstanceDetailsController implements IController {
   }
 }
 
-export const KUBERNETES_V2_INSTANCE_DETAILS_CTRL = 'spinnaker.kubernetes.v2.instanceDetails.controller';
+export const KUBERNETES_INSTANCE_DETAILS_CTRL = 'spinnaker.kubernetes.instanceDetails.controller';
 
-module(KUBERNETES_V2_INSTANCE_DETAILS_CTRL, []).controller(
+module(KUBERNETES_INSTANCE_DETAILS_CTRL, []).controller(
   'kubernetesV2InstanceDetailsCtrl',
   KubernetesInstanceDetailsController,
 );

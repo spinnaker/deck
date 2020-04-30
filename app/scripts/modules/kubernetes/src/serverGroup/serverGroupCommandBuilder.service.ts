@@ -12,9 +12,9 @@ export class KubernetesV2ServerGroupCommandBuilder {
   }
 }
 
-export const KUBERNETES_V2_SERVER_GROUP_COMMAND_BUILDER = 'spinnaker.kubernetes.v2.serverGroup.commandBuilder.service';
+export const KUBERNETES_SERVER_GROUP_COMMAND_BUILDER = 'spinnaker.kubernetes.serverGroup.commandBuilder.service';
 
-module(KUBERNETES_V2_SERVER_GROUP_COMMAND_BUILDER, []).service(
+module(KUBERNETES_SERVER_GROUP_COMMAND_BUILDER, []).service(
   'kubernetesV2ServerGroupCommandBuilder',
   KubernetesV2ServerGroupCommandBuilder,
 );

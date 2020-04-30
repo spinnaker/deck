@@ -93,8 +93,8 @@ class KubernetesSecurityGroupDetailsController implements IController {
   }
 }
 
-export const KUBERNETES_V2_SECURITY_GROUP_DETAILS_CTRL = 'spinnaker.kubernetes.v2.securityGroupDetails.controller';
-module(KUBERNETES_V2_SECURITY_GROUP_DETAILS_CTRL, [SECURITY_GROUP_READER]).controller(
+export const KUBERNETES_SECURITY_GROUP_DETAILS_CTRL = 'spinnaker.kubernetes.securityGroupDetails.controller';
+module(KUBERNETES_SECURITY_GROUP_DETAILS_CTRL, [SECURITY_GROUP_READER]).controller(
   'kubernetesV2SecurityGroupDetailsCtrl',
   KubernetesSecurityGroupDetailsController,
 );

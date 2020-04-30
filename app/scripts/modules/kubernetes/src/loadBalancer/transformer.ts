@@ -52,8 +52,8 @@ class KubernetesV2LoadBalancerTransformer {
   }
 }
 
-export const KUBERNETES_V2_LOAD_BALANCER_TRANSFORMER = 'spinnaker.kubernetes.v2.loadBalancerTransformer';
-module(KUBERNETES_V2_LOAD_BALANCER_TRANSFORMER, []).service(
+export const KUBERNETES_LOAD_BALANCER_TRANSFORMER = 'spinnaker.kubernetes.loadBalancerTransformer';
+module(KUBERNETES_LOAD_BALANCER_TRANSFORMER, []).service(
   'kubernetesV2LoadBalancerTransformer',
   KubernetesV2LoadBalancerTransformer,
 );

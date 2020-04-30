@@ -4,17 +4,17 @@ import { CloudProviderRegistry, STAGE_ARTIFACT_SELECTOR_COMPONENT_REACT, YAML_ED
 
 import { KUBERNETES_MANIFEST_DELETE_CTRL } from './manifest/delete/delete.controller';
 import { KUBERNETES_MANIFEST_SCALE_CTRL } from './manifest/scale/scale.controller';
-import { KUBERNETES_V2_INSTANCE_DETAILS_CTRL } from './instance/details/details.controller';
+import { KUBERNETES_INSTANCE_DETAILS_CTRL } from './instance/details/details.controller';
 import { KUBERNETES_SCALE_MANIFEST_STAGE } from './pipelines/stages/scaleManifest/scaleManifestStage';
 import { KUBERNETES_UNDO_ROLLOUT_MANIFEST_STAGE } from './pipelines/stages/undoRolloutManifest/undoRolloutManifestStage';
 import { KUBERNETES_FIND_ARTIFACTS_FROM_RESOURCE_STAGE } from './pipelines/stages/findArtifactsFromResource/findArtifactsFromResourceStage';
-import { KUBERNETES_V2_LOAD_BALANCER_DETAILS_CTRL } from './loadBalancer/details/details.controller';
-import { KUBERNETES_V2_SECURITY_GROUP_DETAILS_CTRL } from './securityGroup/details/details.controller';
-import { KUBERNETES_V2_SERVER_GROUP_TRANSFORMER } from './serverGroup/serverGroupTransformer.service';
-import { KUBERNETES_V2_SERVER_GROUP_DETAILS_CTRL } from './serverGroup/details/details.controller';
-import { KUBERNETES_V2_SERVER_GROUP_RESIZE_CTRL } from './serverGroup/details/resize/resize.controller';
-import { KUBERNETES_V2_SERVER_GROUP_COMMAND_BUILDER } from './serverGroup/serverGroupCommandBuilder.service';
-import { KUBERNETES_V2_SERVER_GROUP_MANAGER_DETAILS_CTRL } from './serverGroupManager/details/details.controller';
+import { KUBERNETES_LOAD_BALANCER_DETAILS_CTRL } from './loadBalancer/details/details.controller';
+import { KUBERNETES_SECURITY_GROUP_DETAILS_CTRL } from './securityGroup/details/details.controller';
+import { KUBERNETES_SERVER_GROUP_TRANSFORMER } from './serverGroup/serverGroupTransformer.service';
+import { KUBERNETES_SERVER_GROUP_DETAILS_CTRL } from './serverGroup/details/details.controller';
+import { KUBERNETES_SERVER_GROUP_RESIZE_CTRL } from './serverGroup/details/resize/resize.controller';
+import { KUBERNETES_SERVER_GROUP_COMMAND_BUILDER } from './serverGroup/serverGroupCommandBuilder.service';
+import { KUBERNETES_SERVER_GROUP_MANAGER_DETAILS_CTRL } from './serverGroupManager/details/details.controller';
 import { KUBERNETES_MANIFEST_UNDO_ROLLOUT_CTRL } from './manifest/rollout/undo.controller';
 import { KUBERNETES_MANIFEST_PAUSE_ROLLOUT_CTRL } from './manifest/rollout/pause.controller';
 import { KUBERNETES_MANIFEST_RESUME_ROLLOUT_CTRL } from './manifest/rollout/resume.controller';
@@ -26,10 +26,10 @@ import { KUBERNETES_MANIFEST_LABELS } from './manifest/manifestLabels.component'
 import { KUBERNETES_MANIFEST_EVENTS } from './manifest/manifestEvents.component';
 import { KUBERNETES_MANIFEST_RESOURCES } from './manifest/manifestResources.component';
 import { KUBERNETES_MANIFEST_QOS } from './manifest/manifestQos.component';
-import { KUBERNETES_V2_LOAD_BALANCER_TRANSFORMER } from './loadBalancer/transformer';
-import { KUBERNETES_V2_SECURITY_GROUP_TRANSFORMER } from './securityGroup/transformer';
+import { KUBERNETES_LOAD_BALANCER_TRANSFORMER } from './loadBalancer/transformer';
+import { KUBERNETES_SECURITY_GROUP_TRANSFORMER } from './securityGroup/transformer';
 import { KUBERNETES_ANNOTATION_CUSTOM_SECTIONS } from './manifest/annotationCustomSections.component';
-import { KUBERNETES_V2_RESOURCE_STATES } from './resources/resources.state';
+import { KUBERNETES_RESOURCE_STATES } from './resources/resources.state';
 import { KUBERNETES_MANIFEST_IMAGE_DETAILS } from './manifest/manifestImageDetails.component';
 import { JSON_EDITOR_COMPONENT } from './manifest/editor/json/jsonEditor.component';
 import { ManifestWizard } from './manifest/wizard/ManifestWizard';
@@ -52,18 +52,18 @@ templates.keys().forEach(function(key) {
   templates(key);
 });
 
-export const KUBERNETES_V2_MODULE = 'spinnaker.kubernetes.v2';
+export const KUBERNETES_MODULE = 'spinnaker.kubernetes';
 
-module(KUBERNETES_V2_MODULE, [
-  KUBERNETES_V2_INSTANCE_DETAILS_CTRL,
-  KUBERNETES_V2_LOAD_BALANCER_DETAILS_CTRL,
-  KUBERNETES_V2_SECURITY_GROUP_DETAILS_CTRL,
-  KUBERNETES_V2_SERVER_GROUP_COMMAND_BUILDER,
-  KUBERNETES_V2_SERVER_GROUP_DETAILS_CTRL,
-  KUBERNETES_V2_SERVER_GROUP_TRANSFORMER,
-  KUBERNETES_V2_SERVER_GROUP_MANAGER_DETAILS_CTRL,
-  KUBERNETES_V2_SERVER_GROUP_RESIZE_CTRL,
-  KUBERNETES_V2_SERVER_GROUP_MANAGER_DETAILS_CTRL,
+module(KUBERNETES_MODULE, [
+  KUBERNETES_INSTANCE_DETAILS_CTRL,
+  KUBERNETES_LOAD_BALANCER_DETAILS_CTRL,
+  KUBERNETES_SECURITY_GROUP_DETAILS_CTRL,
+  KUBERNETES_SERVER_GROUP_COMMAND_BUILDER,
+  KUBERNETES_SERVER_GROUP_DETAILS_CTRL,
+  KUBERNETES_SERVER_GROUP_TRANSFORMER,
+  KUBERNETES_SERVER_GROUP_MANAGER_DETAILS_CTRL,
+  KUBERNETES_SERVER_GROUP_RESIZE_CTRL,
+  KUBERNETES_SERVER_GROUP_MANAGER_DETAILS_CTRL,
   KUBERNETES_MANIFEST_DELETE_CTRL,
   KUBERNETES_MANIFEST_SCALE_CTRL,
   KUBERNETES_MANIFEST_UNDO_ROLLOUT_CTRL,
@@ -72,8 +72,8 @@ module(KUBERNETES_V2_MODULE, [
   KUBERNETES_MANIFEST_STATUS,
   KUBERNETES_MANIFEST_CONDITION,
   KUBERNETES_MANIFEST_ARTIFACT,
-  KUBERNETES_V2_LOAD_BALANCER_TRANSFORMER,
-  KUBERNETES_V2_SECURITY_GROUP_TRANSFORMER,
+  KUBERNETES_LOAD_BALANCER_TRANSFORMER,
+  KUBERNETES_SECURITY_GROUP_TRANSFORMER,
   KUBERNETES_SCALE_MANIFEST_STAGE,
   KUBERNETES_UNDO_ROLLOUT_MANIFEST_STAGE,
   KUBERNETES_FIND_ARTIFACTS_FROM_RESOURCE_STAGE,
@@ -84,7 +84,7 @@ module(KUBERNETES_V2_MODULE, [
   KUBERNETES_MANIFEST_QOS,
   KUBERNETES_ANNOTATION_CUSTOM_SECTIONS,
   KUBERNETES_MANIFEST_IMAGE_DETAILS,
-  KUBERNETES_V2_RESOURCE_STATES,
+  KUBERNETES_RESOURCE_STATES,
   YAML_EDITOR_COMPONENT,
   JSON_EDITOR_COMPONENT,
   KUBERNETES_ENABLE_MANIFEST_STAGE,

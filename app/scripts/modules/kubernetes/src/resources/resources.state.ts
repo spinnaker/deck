@@ -9,8 +9,8 @@ export interface IKubernetesResourceStateParams {
   kubernetesResource: string;
 }
 
-export const KUBERNETES_V2_RESOURCE_STATES = 'spinnaker.core.kubernetesResource.states';
-module(KUBERNETES_V2_RESOURCE_STATES, [APPLICATION_STATE_PROVIDER]).config([
+export const KUBERNETES_RESOURCE_STATES = 'spinnaker.core.kubernetesResource.states';
+module(KUBERNETES_RESOURCE_STATES, [APPLICATION_STATE_PROVIDER]).config([
   'applicationStateProvider',
   (applicationStateProvider: ApplicationStateProvider) => {
     const kubernetesResourceDetails: INestedState = {
