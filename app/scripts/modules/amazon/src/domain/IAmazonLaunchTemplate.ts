@@ -19,6 +19,19 @@ export interface IElasticInterfaceAccelerator {
   type?: string;
 }
 
+export interface ISpotMarketOptions {
+  blockDurationMinutes?: number;
+  instanceInterruptionBehavior?: string;
+  maxPrice?: string;
+  spotInstanceType?: 'one-time' | 'persistent';
+  validUntil?: string;
+}
+
+export interface IInstanceMarketOptions {
+  marketType?: string;
+  spotOptions?: ISpotMarketOptions;
+}
+
 export interface ILicenseConfig {
   licenseConfigurationArn?: string;
 }
@@ -48,6 +61,7 @@ export interface ILaunchTemplateData {
   iamInstanceProfile: IIamInstanceProfile;
   imageId: string;
   instanceInitiatedShutdownBehavior?: 'stop' | 'terminate';
+  instanceMarketOptions?: IInstanceMarketOptions;
   instanceType: string;
   kernelId?: string;
   keyName?: string;
