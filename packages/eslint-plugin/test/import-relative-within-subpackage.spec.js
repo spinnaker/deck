@@ -17,12 +17,6 @@ ruleTester.run('import-relative-within-subpackage', rule, {
       filename: '/root/spinnaker/deck/app/scripts/modules/amazon/src/package/amazon_source_file.ts',
       code: `import { Anything } from '../subpackage/foo';`,
     },
-    {
-      // kubernetes subpackages are nested under v1 or v2 directory so treat them differently
-      filename:
-        '/Users/cthielen/netflix/spinnaker/deck/app/scripts/modules/kubernetes/src/v1/pipeline/stages/runJob/configureJob.controller.js',
-      code: `import { Anything } from 'kubernetes/v1/container/lifecycleHook.component';`,
-    },
   ],
 
   invalid: [

@@ -1,4 +1,4 @@
-export { KUBERNETES_MODULE } from './kubernetes.module';
+export * from './kubernetes.module';
 export * from './serverGroupManager';
 export * from './serverGroup';
 export * from './securityGroup';
