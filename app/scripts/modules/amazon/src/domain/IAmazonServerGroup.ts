@@ -21,6 +21,7 @@ export interface IAmazonServerGroup extends IServerGroup {
   scalingPolicies?: IScalingPolicy[];
   targetGroups?: string[];
   asg: IAmazonAsg;
+  launchTemplate?: any;
 }
 
 export interface IScheduledAction {
