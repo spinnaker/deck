@@ -27,7 +27,6 @@ describe('ApplicationNavigation', () => {
   beforeEach(
     mock.inject((_$uiRouter_: UIRouterReact) => {
       $uiRouter = _$uiRouter_;
-      $uiRouter.globals.current.name = '**.tasks.**';
     }),
   );
   beforeEach(() => {
