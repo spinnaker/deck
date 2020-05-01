@@ -46,7 +46,8 @@ export interface IMetadataOptions {
 export interface ITagSpecification {
   resourceType?: string;
   tagSet?: Array<{
-    [key: string]: string;
+    key: string;
+    value: string;
   }>;
 }
 
