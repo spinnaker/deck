@@ -6,6 +6,7 @@ import { Icon } from '../presentation';
 
 import { StatusBubble } from './StatusBubble';
 
+import { EnvironmentBadge } from './EnvironmentBadge';
 import { useEnvironmentTypeFromResources } from './useEnvironmentTypeFromResources.hooks';
 
 import './EnvironmentRow.less';
@@ -19,24 +20,18 @@ interface IEnvironmentRowProps {
 
 export function EnvironmentRow({ name, resources = [], hasPinnedVersions, children }: IEnvironmentRowProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const isProd = useEnvironmentTypeFromResources(resources);
+  const isCritical = useEnvironmentTypeFromResources(resources);
 
   const envRowClasses = classNames({
     srow: true,
-    rowProd: isProd,
-  });
-
-  const envLabelClasses = classNames({
-    envLabel: true,
-    prod: isProd,
-    nonprod: !isProd,
+    rowProd: isCritical,
   });
 
   return (
     <div className="EnvironmentRow">
       <div className={envRowClasses}>
         <span className="clickableArea">
-          <span className={envLabelClasses}>{name}</span>
+          <EnvironmentBadge name={name} critical={isCritical} />
           <div className="environment-row-status flex-container-h flex-grow flex-pull-right">
             {hasPinnedVersions && <StatusBubble iconName="pin" appearance="warning" size="small" />}
           </div>
