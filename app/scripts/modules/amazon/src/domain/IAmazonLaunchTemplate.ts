@@ -65,13 +65,15 @@ export interface ILaunchTemplateData {
   instanceMarketOptions?: IInstanceMarketOptions;
   instanceType: string;
   kernelId?: string;
-  keyName?: string;
+  keyName: string;
   licenseSpecifications?: ILicenseConfig[];
   metadataOptions: IMetadataOptions;
   monitoring: {
     enabled: boolean;
   };
   ramDiskId?: string;
+  securityGroupIds: string[];
+  securityGroups: string[];
   tagSpecifications?: ITagSpecification[];
   userData?: string;
 }
