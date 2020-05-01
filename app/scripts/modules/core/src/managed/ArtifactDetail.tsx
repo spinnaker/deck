@@ -13,6 +13,8 @@ import { ManagedResourceObject } from './ManagedResourceObject';
 import { EnvironmentRow } from './EnvironmentRow';
 import { VersionStateCard } from './VersionStateCard';
 import { StatusCard } from './StatusCard';
+import { Button } from './Button';
+import { showPinArtifactModal } from './PinArtifactModal';
 
 import { ConstraintCard } from './constraints/ConstraintCard';
 import { isConstraintSupported } from './constraints/constraintRegistry';
@@ -164,13 +166,26 @@ export const ArtifactDetail = ({
   };
   useEventListener(document, 'keydown', keydownCallback);
 
+  const isPinnedEverywhere = environments.every(({ pinned }) => pinned);
+
   return (
     <>
       <ArtifactDetailHeader name={name} version={versionDetails} onRequestClose={onRequestClose} />
 
       <div className="ArtifactDetail">
-        <div className="flex-container-h">
-          {/* a short summary with actions/buttons will live here */}
+        <div className="flex-container-h sp-margin-xl-bottom">
+          <Button
+            iconName="pin"
+            appearance="primary"
+            disabled={isPinnedEverywhere}
+            onClick={() =>
+              showPinArtifactModal({ application, reference, version: versionDetails, resourcesByEnvironment }).then(
+                ({ status }) => status === 'CLOSED' && application.getDataSource('environments').refresh(),
+              )
+            }
+          >
+            Pin
+          </Button>
           <div className="detail-section-right">{/* artifact metadata will live here */}</div>
         </div>
         {environments.map(environment => {
