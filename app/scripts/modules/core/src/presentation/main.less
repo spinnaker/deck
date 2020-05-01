@@ -1119,6 +1119,11 @@ textarea.code {
   }
 }
 
+.modal-open {
+  .modal {
+    z-index: var(--layer-critical) !important;
+  }
+}
 // Works around Chrome 59 bug regarding: transform + box-shadow + position: sticky
 // This is apparently fixed in Chrome 61
 .modal.in .modal-dialog {
@@ -1126,6 +1131,7 @@ textarea.code {
 }
 
 .modal-backdrop {
+  z-index: 9500 !important;
   &.modal-backdrop-no-animate {
     background-color: var(--color-alabaster);
     transition: none;
