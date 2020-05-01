@@ -1,5 +1,6 @@
 import { IAccountDetails, IServerGroup, IAsg } from '@spinnaker/core';
 
+import { IAmazonLaunchTemplate } from './IAmazonLaunchTemplate';
 import { IScalingPolicyView } from './IAmazonScalingPolicy';
 import { ISuspendedProcess } from './IScalingProcess';
 
@@ -21,7 +22,7 @@ export interface IAmazonServerGroup extends IServerGroup {
   scalingPolicies?: IScalingPolicy[];
   targetGroups?: string[];
   asg: IAmazonAsg;
-  launchTemplate?: any;
+  launchTemplate?: IAmazonLaunchTemplate;
 }
 
 export interface IScheduledAction {
