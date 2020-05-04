@@ -1,24 +1,29 @@
 import React, { memo, useMemo } from 'react';
 import classNames from 'classnames';
 import { useTransition, animated, UseTransitionProps } from 'react-spring';
+import { DateTime } from 'luxon';
 
+import { relativeTime, timestamp } from '../utils';
 import { IManagedArtifactSummary, IManagedArtifactVersion, IManagedResourceSummary } from '../domain';
 import { Application } from '../application';
-import { useEventListener } from '../presentation';
+import { useEventListener, Markdown } from '../presentation';
 
 import { ArtifactDetailHeader } from './ArtifactDetailHeader';
 import { ManagedResourceObject } from './ManagedResourceObject';
 import { EnvironmentRow } from './EnvironmentRow';
 import { VersionStateCard } from './VersionStateCard';
+import { StatusCard } from './StatusCard';
+import { Button } from './Button';
+import { showPinArtifactModal } from './PinArtifactModal';
 
 import { ConstraintCard } from './constraints/ConstraintCard';
 import { isConstraintSupported } from './constraints/constraintRegistry';
 
 import './ArtifactDetail.less';
 
-function shouldDisplayResource(name: string, type: string, resource: IManagedResourceSummary) {
+function shouldDisplayResource(reference: string, resource: IManagedResourceSummary) {
   //TODO: naively filter on presence of moniker but how should we really decide what to display?
-  return !!resource.moniker && name === resource.artifact?.name && type === resource.artifact?.type;
+  return !!resource.moniker && reference === resource.artifact?.reference;
 }
 
 const inStyles = {
@@ -62,12 +67,29 @@ const EnvironmentCards = memo(
       deployedAt,
       replacedAt,
       replacedBy,
+      pinned,
       statefulConstraints,
       statelessConstraints,
     },
     version: { version },
     allVersions,
   }: IEnvironmentCardsProps) => {
+    const pinnedAtMillis = pinned?.at ? DateTime.fromISO(pinned.at).toMillis() : null;
+
+    const pinnedCard = pinned && (
+      <StatusCard
+        iconName="pin"
+        appearance="warning"
+        title={
+          <span className="sp-group-margin-xs-xaxis">
+            Pinned here {relativeTime(pinnedAtMillis)}{' '}
+            <span className="text-italic text-regular sp-margin-xs-left">({timestamp(pinnedAtMillis)})</span>{' '}
+            <span className="text-regular">—</span> <span className="text-regular">by {pinned.by}</span>
+          </span>
+        }
+        description={pinned.comment && <Markdown message={pinned.comment} tag="span" />}
+      />
+    );
     const versionStateCard = (
       <VersionStateCard
         key="versionStateCard"
@@ -94,7 +116,11 @@ const EnvironmentCards = memo(
       [application, environmentName, version, statefulConstraints, statelessConstraints],
     );
 
-    const transitions = useTransition([...constraintCards, versionStateCard], ({ key }) => key, cardTransitionConfig);
+    const transitions = useTransition(
+      [...constraintCards, ...[versionStateCard, pinnedCard].filter(Boolean)],
+      ({ key }) => key,
+      cardTransitionConfig,
+    );
 
     return (
       <>
@@ -115,7 +141,7 @@ const EnvironmentCards = memo(
 export interface IArtifactDetailProps {
   application: Application;
   name: string;
-  type: string;
+  reference: string;
   version: IManagedArtifactVersion;
   allVersions: IManagedArtifactSummary['versions'];
   resourcesByEnvironment: { [environment: string]: IManagedResourceSummary[] };
@@ -125,7 +151,7 @@ export interface IArtifactDetailProps {
 export const ArtifactDetail = ({
   application,
   name,
-  type,
+  reference,
   version: versionDetails,
   allVersions,
   resourcesByEnvironment,
@@ -140,13 +166,26 @@ export const ArtifactDetail = ({
   };
   useEventListener(document, 'keydown', keydownCallback);
 
+  const isPinnedEverywhere = environments.every(({ pinned }) => pinned);
+
   return (
     <>
       <ArtifactDetailHeader name={name} version={versionDetails} onRequestClose={onRequestClose} />
 
       <div className="ArtifactDetail">
-        <div className="flex-container-h">
-          {/* a short summary with actions/buttons will live here */}
+        <div className="flex-container-h sp-margin-xl-bottom">
+          <Button
+            iconName="pin"
+            appearance="primary"
+            disabled={isPinnedEverywhere}
+            onClick={() =>
+              showPinArtifactModal({ application, reference, version: versionDetails, resourcesByEnvironment }).then(
+                ({ status }) => status === 'CLOSED' && application.getDataSource('environments').refresh(),
+              )
+            }
+          >
+            Pin
+          </Button>
           <div className="detail-section-right">{/* artifact metadata will live here */}</div>
         </div>
         {environments.map(environment => {
@@ -167,7 +206,7 @@ export const ArtifactDetail = ({
               </div>
               <div className="sp-margin-l-top">
                 {resourcesByEnvironment[environmentName]
-                  .filter(resource => shouldDisplayResource(name, type, resource))
+                  .filter(resource => shouldDisplayResource(reference, resource))
                   .map(resource => (
                     <div key={resource.id} className="flex-container-h middle">
                       {state === 'deploying' && (
@@ -179,6 +218,7 @@ export const ArtifactDetail = ({
                         />
                       )}
                       <ManagedResourceObject
+                        application={application}
                         key={resource.id}
                         resource={resource}
                         depth={state === 'deploying' ? 0 : 1}
