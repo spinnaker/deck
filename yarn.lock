@@ -903,10 +903,10 @@
   resolved "https://registry.yarnpkg.com/@spinnaker/mocks/-/mocks-1.0.4.tgz#d9a5f683fa43c00b17491957551448c07973b9ad"
   integrity sha512-yg8UjBGOqSqA1Ar9CPkOwrYWM6sx9FZkMcg63wijI3iWjylJcRQIiJ2W7NhYf951WjlU69mVSMMxWMjY7RCeZg==
 
-"@spinnaker/styleguide@^1.0.18":
-  version "1.0.18"
-  resolved "https://registry.yarnpkg.com/@spinnaker/styleguide/-/styleguide-1.0.18.tgz#0d627331088e84a6e630d2cd127473f301587962"
-  integrity sha512-8XNYA2u32Ugi8d1XCExCj0CEY+QY8+u+pxC9upKaCTxKSjB8bcQIO93GSZB4cxtpLPkFNEspAGRHF5Ysq7bdJg==
+"@spinnaker/styleguide@^1.0.20":
+  version "1.0.20"
+  resolved "https://registry.yarnpkg.com/@spinnaker/styleguide/-/styleguide-1.0.20.tgz#ad397e134c29f4a33a2ecc5f1235950708aa1b4e"
+  integrity sha512-N3ebcvdZ/O/8KztAQvI9QIbD5zbgfJnHnGJg8Li/yHwBncGxMs3xat7I1Dd6UYKi/wpE/bUBRyASXuFhggh73w==
 
 "@svgr/babel-plugin-add-jsx-attribute@^5.0.1":
   version "5.0.1"
@@ -8475,10 +8475,10 @@ jquery-ui@1.12.0:
   resolved "https://registry.yarnpkg.com/jquery-ui/-/jquery-ui-1.12.0.tgz#59c6037a2d9c57e9a2521a9b7a497116d41b4246"
   integrity sha1-WcYDei2cV+miUhqbeklxFtQbQkY=
 
-jquery@3.4.0:
-  version "3.4.0"
-  resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.4.0.tgz#8de513fa0fa4b2c7d2e48a530e26f0596936efdf"
-  integrity sha512-ggRCXln9zEqv6OqAGXFEcshF5dSBvCkzj6Gm2gzuR5fWawaX8t7cxKVkkygKODrDAzKdoYw3l/e3pm3vlT4IbQ==
+jquery@3.5.0:
+  version "3.5.0"
+  resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.5.0.tgz#9980b97d9e4194611c36530e7dc46a58d7340fc9"
+  integrity sha512-Xb7SVYMvygPxbFMpTFQiHh1J7HClEaThguL15N/Gg37Lri/qKyhRGZYzHRyLH8Stq3Aow0LsHO2O2ci86fCrNQ==
 
 js-base64@^2.1.9:
   version "2.1.9"
