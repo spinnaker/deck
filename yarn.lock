@@ -766,6 +766,13 @@
   dependencies:
     regenerator-runtime "^0.12.0"
 
+"@babel/runtime@^7.3.1":
+  version "7.9.2"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.9.2.tgz#d90df0583a3a252f09aaa619665367bae518db06"
+  integrity sha512-NE2DtOdufG7R5vnfQUTehdTfNycfUANEtCa9PssN9O/xmTzP4E08UI797ixaei6hBEVL9BI/PsdJS5x7mWoB9Q==
+  dependencies:
+    regenerator-runtime "^0.13.4"
+
 "@babel/runtime@^7.4.5":
   version "7.7.4"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.7.4.tgz#b23a856751e4bf099262f867767889c0e3fe175b"
@@ -832,10 +839,10 @@
   dependencies:
     lodash "^4.17.15"
 
-"@spinnaker/kayenta@^0.0.89":
-  version "0.0.89"
-  resolved "https://registry.yarnpkg.com/@spinnaker/kayenta/-/kayenta-0.0.89.tgz#c0e8ff84f48376faea89c7fe1c4239e048bda9f4"
-  integrity sha512-4PmFFsYkT7yyPRGQVcA+glhgf7gqR+LUekY1lT6JA8qUEuAx4hhpypW75ySZwUR/cK0t4JtFSY/GBKaTWsuCBw==
+"@spinnaker/kayenta@^0.0.91":
+  version "0.0.91"
+  resolved "https://registry.yarnpkg.com/@spinnaker/kayenta/-/kayenta-0.0.91.tgz#595c79b6103273a08c9c5019e53f7f58561be1d1"
+  integrity sha512-zVuXsWufsX5aXhf4lgXdi6TrLwstCX08HXOaZzgxldJuaezy59AeDa41oJe/ee34iIdUaDnsh5x9TOMKhZI3KQ==
   dependencies:
     "@fortawesome/fontawesome-free" "5.5.0"
     "@uirouter/angularjs" "^1.0.15"
@@ -854,6 +861,7 @@
     lodash-decorators "^4.4.1"
     memoize-one "4.0.2"
     moment-timezone "^0.4.0"
+    n3-charts "^2.0.28"
     ngimport "^0.6.0"
     react "~16.8.0"
     react-ace "6.4.0"
@@ -887,16 +895,18 @@
     tslint-config-prettier "^1.14.0"
     ui-router-visualizer "^4.0.0"
     ui-select "^0.19.6"
+  optionalDependencies:
+    fsevents "1.2.11"
 
-"@spinnaker/mocks@1.0.2":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@spinnaker/mocks/-/mocks-1.0.2.tgz#c9f35e3ad5bf9c0b63d89281c47ee92a4a477d7f"
-  integrity sha512-oletA4vZZE6zmNkrwAvJ00mNp1BcJvcEdDem/CicvqOteIzVtPZtvVfNnGbNLQEChWd19br6TSYSx/F6PY8ucQ==
+"@spinnaker/mocks@1.0.4":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@spinnaker/mocks/-/mocks-1.0.4.tgz#d9a5f683fa43c00b17491957551448c07973b9ad"
+  integrity sha512-yg8UjBGOqSqA1Ar9CPkOwrYWM6sx9FZkMcg63wijI3iWjylJcRQIiJ2W7NhYf951WjlU69mVSMMxWMjY7RCeZg==
 
-"@spinnaker/styleguide@^1.0.17":
-  version "1.0.17"
-  resolved "https://registry.yarnpkg.com/@spinnaker/styleguide/-/styleguide-1.0.17.tgz#e12ec1814a281e128bf52a2855c2484beabebda7"
-  integrity sha512-Z/9zbZyeoE+9Js+oKJ0akZIFS2+9zfB5wJCxAN2FzkbENSR+GFoKdGJXzy4dyKA6YzyQv9YvLQJCZ4tlRz8m/w==
+"@spinnaker/styleguide@^1.0.20":
+  version "1.0.20"
+  resolved "https://registry.yarnpkg.com/@spinnaker/styleguide/-/styleguide-1.0.20.tgz#ad397e134c29f4a33a2ecc5f1235950708aa1b4e"
+  integrity sha512-N3ebcvdZ/O/8KztAQvI9QIbD5zbgfJnHnGJg8Li/yHwBncGxMs3xat7I1Dd6UYKi/wpE/bUBRyASXuFhggh73w==
 
 "@svgr/babel-plugin-add-jsx-attribute@^5.0.1":
   version "5.0.1"
@@ -1613,33 +1623,33 @@
     semver "^6.3.0"
     tsutils "^3.17.1"
 
-"@uirouter/angularjs@1.0.25", "@uirouter/angularjs@^1.0.15":
-  version "1.0.25"
-  resolved "https://registry.yarnpkg.com/@uirouter/angularjs/-/angularjs-1.0.25.tgz#9969788eca03bc3f8b1d1b39946713a18e824e33"
-  integrity sha512-kf9bxBhqa1ZUw0aDlz4H17VqAD30MVJY6HM7J628vDeNN9yZt7SDYpwqSrR3y6NBadZUPjaKsDoKsyQQSWArNA==
+"@uirouter/angularjs@1.0.26", "@uirouter/angularjs@^1.0.15":
+  version "1.0.26"
+  resolved "https://registry.yarnpkg.com/@uirouter/angularjs/-/angularjs-1.0.26.tgz#680ba48ac2c5608a6621c09fadb88a80ceb2e0cc"
+  integrity sha512-90kS4j0cBk1rpipE/CFC+/cNpc32WHI5536oHsJzAOIDY1NoSmb5TMOISrJslg7sBGF56NEtGoRVf42gaACrfA==
   dependencies:
-    "@uirouter/core" "6.0.4"
+    "@uirouter/core" "6.0.5"
 
-"@uirouter/core@6.0.4":
-  version "6.0.4"
-  resolved "https://registry.yarnpkg.com/@uirouter/core/-/core-6.0.4.tgz#fcdc75ab10f1035176acf87a27d9d27a0101ecf9"
-  integrity sha512-TQ9XOzZY+jmWKkU4993MAEBIy7Bs3kijDzj+A6RHR8gq/3UoQm3Q/l1igfao5GZyBjid7eRVeipPK14ovCYQ3g==
+"@uirouter/core@6.0.5":
+  version "6.0.5"
+  resolved "https://registry.yarnpkg.com/@uirouter/core/-/core-6.0.5.tgz#60f13fd530fc75daa283e2bece944516559d066b"
+  integrity sha512-WN2HyELsxvqLaCMYCWojGW/QLRBgFBfwyERp5jC3Vn1njo/FLI5hplVqWMu6LIGp6Hpz3pbdtSaiFb1iY7iTVw==
 
-"@uirouter/react-hybrid@0.3.9", "@uirouter/react-hybrid@1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@uirouter/react-hybrid/-/react-hybrid-1.0.0.tgz#ec7660616b6a34648db1e32fdaf839883af5ae0e"
-  integrity sha512-uAFxISnBNTs9Y9d41Z6bu8LRAg+LvvT66JKh6G+ZHyI9SZ3G5NMjoVfVRjt/2kI6cnWiHQnQURn4gln7TEwDPg==
+"@uirouter/react-hybrid@0.3.9", "@uirouter/react-hybrid@1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@uirouter/react-hybrid/-/react-hybrid-1.0.2.tgz#8fbe0126ab873b1f525cfdd5bb2303cf72428adf"
+  integrity sha512-bi+ul3BQdfj1/fYBemtNm2BZtwyNCOHbHDprE3IZZnejPRd6C+ZuHihi6cCUk0UFAVD14D8llqcjehbCW4Mp3Q==
   dependencies:
-    "@uirouter/angularjs" "1.0.25"
-    "@uirouter/core" "6.0.4"
-    "@uirouter/react" "1.0.1"
+    "@uirouter/angularjs" "1.0.26"
+    "@uirouter/core" "6.0.5"
+    "@uirouter/react" "1.0.3"
 
-"@uirouter/react@1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@uirouter/react/-/react-1.0.1.tgz#885011c77a20ac5921f9fa8461ec0c27e7f21cc6"
-  integrity sha512-fWWMGB6U1xJNStltUUZ+ENKEnYrqwXpOoJZj9jWgZnP0NXGbhRt+vHrVJPqc4VMwlpemNpkIjn+vO3KNG00ZWA==
+"@uirouter/react@1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@uirouter/react/-/react-1.0.3.tgz#fbfa63e9aa6ad8444198754ef732e63c187d44ed"
+  integrity sha512-LTZK2BFapYTTjAVOc1mQF1mSeC5v++SNzOizhGNn//0npjzbhzy4qSt0EsFwlDtIkuZscVMsxBVNBRxnuy6G/Q==
   dependencies:
-    "@uirouter/core" "6.0.4"
+    "@uirouter/core" "6.0.5"
     classnames "^2.2.5"
     prop-types "^15.6.1"
 
@@ -8465,10 +8475,10 @@ jquery-ui@1.12.0:
   resolved "https://registry.yarnpkg.com/jquery-ui/-/jquery-ui-1.12.0.tgz#59c6037a2d9c57e9a2521a9b7a497116d41b4246"
   integrity sha1-WcYDei2cV+miUhqbeklxFtQbQkY=
 
-jquery@3.4.0:
-  version "3.4.0"
-  resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.4.0.tgz#8de513fa0fa4b2c7d2e48a530e26f0596936efdf"
-  integrity sha512-ggRCXln9zEqv6OqAGXFEcshF5dSBvCkzj6Gm2gzuR5fWawaX8t7cxKVkkygKODrDAzKdoYw3l/e3pm3vlT4IbQ==
+jquery@3.5.0:
+  version "3.5.0"
+  resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.5.0.tgz#9980b97d9e4194611c36530e7dc46a58d7340fc9"
+  integrity sha512-Xb7SVYMvygPxbFMpTFQiHh1J7HClEaThguL15N/Gg37Lri/qKyhRGZYzHRyLH8Stq3Aow0LsHO2O2ci86fCrNQ==
 
 js-base64@^2.1.9:
   version "2.1.9"
@@ -9113,12 +9123,7 @@ lodash.zip@^4.2.0:
   resolved "https://registry.yarnpkg.com/lodash.zip/-/lodash.zip-4.2.0.tgz#ec6662e4896408ed4ab6c542a3990b72cc080020"
   integrity sha1-7GZi5IlkCO1KtsVCo5kLcswIACA=
 
-lodash@^4.12.0, lodash@^4.13.1, lodash@^4.14.0, lodash@^4.15.0, lodash@^4.16.1, lodash@^4.16.6, lodash@^4.17.11, lodash@^4.17.13, lodash@^4.17.2, lodash@^4.17.3, lodash@^4.17.4, lodash@^4.17.5, lodash@^4.2.0, lodash@^4.2.1:
-  version "4.17.13"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.13.tgz#0bdc3a6adc873d2f4e0c4bac285df91b64fc7b93"
-  integrity sha512-vm3/XWXfWtRua0FkUyEHBZy8kCPjErNBT9fJx8Zvs+U6zjqPbTUOpkaoum3O5uiA8sm+yNMHXfYkTUHFoMxFNA==
-
-lodash@^4.17.14, lodash@^4.17.15, lodash@~4.17.12:
+lodash@^4.12.0, lodash@^4.13.1, lodash@^4.14.0, lodash@^4.15.0, lodash@^4.16.1, lodash@^4.16.6, lodash@^4.17.11, lodash@^4.17.13, lodash@^4.17.14, lodash@^4.17.15, lodash@^4.17.2, lodash@^4.17.3, lodash@^4.17.4, lodash@^4.17.5, lodash@^4.2.0, lodash@^4.2.1, lodash@~4.17.12:
   version "4.17.15"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.15.tgz#b447f6670a0455bbfeedd11392eff330ea097548"
   integrity sha512-8xOcRHvCjnocdS5cpwXQXVzmmh5e5+saE2QGoeQmbKmRS6J3VQppPOIt0MnmE+4xlZoumy0GPG0D0MVIQbNA1A==
@@ -9233,10 +9238,10 @@ lru-cache@^5.1.1:
   dependencies:
     yallist "^3.0.2"
 
-luxon@^1.11.3:
-  version "1.11.3"
-  resolved "https://registry.yarnpkg.com/luxon/-/luxon-1.11.3.tgz#e1542026473f708b03b102d475be64b2a3055a6e"
-  integrity sha512-/0jMa+JfTRBx1ixsSBs5ZPAQ32H+TPeP9BvgRf0Gi4VxCqhUpRNWagwupy6wA8MckazneKWBLCcwwAH8hkQamg==
+luxon@^1.23.0:
+  version "1.23.0"
+  resolved "https://registry.yarnpkg.com/luxon/-/luxon-1.23.0.tgz#23b748ad0f2d5494dc4d2878c19278c1e651410c"
+  integrity sha512-+6a/bXsCWrrR8vfbL41iM92es12zwV2Rum/KPkT+ubOZnnU3Sqbqok/FmD1xsWlWN2Y9Hu0fU/vNgU24ns7bpA==
 
 macaddress@^0.2.8:
   version "0.2.9"
@@ -9578,10 +9583,10 @@ minimist@^1.2.0, minimist@^1.2.5, "minimist@~ 1.2.0":
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.5.tgz#67d66014b66a6a8aaa0c083c5fd58df4e4e97602"
   integrity sha512-FM9nNUYrRBAELZQT3xeZQ7fmMOBg6nWNmJKTcgsJeaLstP/UODVpGsr5OhXhhXg6f+qtJ8uiZ+PUxkDWcgIXLw==
 
-minimist@^1.2.2:
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.2.tgz#b00a00230a1108c48c169e69a291aafda3aacd63"
-  integrity sha512-rIqbOrKb8GJmx/5bc2M0QchhUouMXSpd1RTclXsB41JdL+VtnojfaJR+h7F9k18/4kHUsBFgk80Uk+q569vjPA==
+minimist@^1.2.3:
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.3.tgz#3db5c0765545ab8637be71f333a104a965a9ca3f"
+  integrity sha512-+bMdgqjMN/Z77a6NlY/I3U5LlRDbnmaAk6lDveAPKwSpcPM4tKAuYsvYF8xjhOPXhOYGe/73vVLVez5PW+jqhw==
 
 mississippi@^2.0.0:
   version "2.0.0"
@@ -9740,7 +9745,7 @@ mute-stream@0.0.8:
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-0.0.8.tgz#1630c42b2251ff81e2a283de96a5497ea92e5e0d"
   integrity sha512-nnbWWOkoWyUsTjKrhgD0dcz22mdkSnpYqbEjIm2nhwhuxlSkpywJmBo8h0ZqJdkp73mb90SssHkN4rsRaBAfAA==
 
-n3-charts@^2.0.18:
+n3-charts@^2.0.18, n3-charts@^2.0.28:
   version "2.0.28"
   resolved "https://registry.yarnpkg.com/n3-charts/-/n3-charts-2.0.28.tgz#e9abbe321e18d2619123f6fb327602a0017afd8e"
   integrity sha1-6au+Mh4Y0mGRI/b7MnYCoAF6/Y4=
@@ -11705,6 +11710,14 @@ react-sortable-hoc@^0.6.8:
     invariant "^2.2.1"
     lodash "^4.12.0"
     prop-types "^15.5.7"
+
+react-spring@^8.0.27:
+  version "8.0.27"
+  resolved "https://registry.yarnpkg.com/react-spring/-/react-spring-8.0.27.tgz#97d4dee677f41e0b2adcb696f3839680a3aa356a"
+  integrity sha512-nDpWBe3ZVezukNRandTeLSPcwwTMjNVu1IDq9qA/AMiUqHuRN4BeSWvKr3eIxxg1vtiYiOLy4FqdfCP5IoP77g==
+  dependencies:
+    "@babel/runtime" "^7.3.1"
+    prop-types "^15.5.8"
 
 react-test-renderer@16.3.2:
   version "16.3.2"

@@ -4,6 +4,7 @@ export enum ManagedResourceStatus {
   ACTUATING = 'ACTUATING',
   CREATED = 'CREATED',
   DIFF = 'DIFF',
+  CURRENTLY_UNRESOLVABLE = 'CURRENTLY_UNRESOLVABLE',
   ERROR = 'ERROR',
   HAPPY = 'HAPPY',
   PAUSED = 'PAUSED',
@@ -30,6 +31,15 @@ export interface IStatefulConstraint {
   comment?: string;
 }
 
+export interface IDependsOnConstraint {
+  type: 'depends-on';
+  currentlyPassing: boolean;
+  attributes: { environment: string };
+}
+
+// more stateless types coming soon
+export type IStatelessConstraint = IDependsOnConstraint;
+
 export interface IManagedResourceSummary {
   id: string;
   kind: string;
@@ -43,6 +53,7 @@ export interface IManagedResourceSummary {
   artifact?: {
     name: string;
     type: string;
+    reference: string;
   };
 }
 
@@ -52,7 +63,9 @@ export interface IManagedEnviromentSummary {
   artifacts: Array<{
     name: string;
     type: string;
+    reference: string;
     statuses: string[];
+    pinnedVersion?: string;
     versions: {
       current?: string;
       deploying?: string;
@@ -60,25 +73,40 @@ export interface IManagedEnviromentSummary {
       approved: string[];
       previous: string[];
       vetoed: string[];
+      skipped: string[];
     };
   }>;
 }
 
 export interface IManagedArtifactVersion {
   version: string;
+  displayName: string;
   environments: Array<{
     name: string;
-    state: 'current' | 'deploying' | 'approved' | 'pending' | 'previous' | 'vetoed';
+    state: 'current' | 'deploying' | 'approved' | 'pending' | 'previous' | 'vetoed' | 'skipped';
+    pinned?: {
+      at: string;
+      by: string;
+      comment?: string;
+    };
     deployedAt?: string;
     replacedAt?: string;
     replacedBy?: string;
-    statefulConstraints: IStatefulConstraint[];
+    statefulConstraints?: IStatefulConstraint[];
+    statelessConstraints?: IStatelessConstraint[];
   }>;
+  build?: {
+    id: number;
+  };
+  git?: {
+    commit: string;
+  };
 }
 
 export interface IManagedArtifactSummary {
   name: string;
   type: string;
+  reference: string;
   versions: IManagedArtifactVersion[];
 }
 

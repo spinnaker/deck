@@ -1,33 +1,149 @@
-import React from 'react';
+import React, { memo, useMemo } from 'react';
 import classNames from 'classnames';
+import { useTransition, animated, UseTransitionProps } from 'react-spring';
 import { DateTime } from 'luxon';
 
 import { relativeTime, timestamp } from '../utils';
-import { IManagedArtifactVersion, IManagedResourceSummary } from '../domain';
+import { IManagedArtifactSummary, IManagedArtifactVersion, IManagedResourceSummary } from '../domain';
 import { Application } from '../application';
-import { useEventListener } from '../presentation';
+import { useEventListener, Markdown } from '../presentation';
 
 import { ArtifactDetailHeader } from './ArtifactDetailHeader';
-import { NoticeCard } from './NoticeCard';
-import { Pill } from './Pill';
 import { ManagedResourceObject } from './ManagedResourceObject';
-import { parseName } from './Frigga';
 import { EnvironmentRow } from './EnvironmentRow';
+import { VersionStateCard } from './VersionStateCard';
+import { StatusCard } from './StatusCard';
+import { Button } from './Button';
+import { showPinArtifactModal } from './PinArtifactModal';
+
 import { ConstraintCard } from './constraints/ConstraintCard';
 import { isConstraintSupported } from './constraints/constraintRegistry';
 
 import './ArtifactDetail.less';
 
-function shouldDisplayResource(name: string, type: string, resource: IManagedResourceSummary) {
+function shouldDisplayResource(reference: string, resource: IManagedResourceSummary) {
   //TODO: naively filter on presence of moniker but how should we really decide what to display?
-  return !!resource.moniker && name === resource.artifact?.name && type === resource.artifact?.type;
+  return !!resource.moniker && reference === resource.artifact?.reference;
 }
+
+const inStyles = {
+  opacity: 1,
+  transform: 'scale(1.0, 1.0)',
+};
+
+const outStyles = {
+  opacity: 0,
+  transform: 'scale(0.95, 0.95)',
+};
+
+const cardTransitionConfig = {
+  from: outStyles,
+  // KLUDGE: all we're *actually* doing in this scary looking handler
+  // is delaying the start of any enter transitions for a fixed time
+  // so parent transitions for the overall layout have time to start.
+  // Unfortunately today useTransition doesn't support fixed delays
+  // without tapping into this promise-based orchestration feature (ew).
+  // When react-spring v9 is released, this can be changed
+  // to a function that returns { to: inStyles, delay: 180 }
+  enter: () => async (next: (_: React.CSSProperties) => any) => {
+    await new Promise(resolve => setTimeout(resolve, 180));
+    next(inStyles);
+  },
+  leave: outStyles,
+  trail: 40,
+  config: { mass: 1, tension: 600, friction: 40 },
+} as UseTransitionProps<JSX.Element, React.CSSProperties>;
+
+type IEnvironmentCardsProps = Pick<IArtifactDetailProps, 'application' | 'version' | 'allVersions'> & {
+  environment: IManagedArtifactSummary['versions'][0]['environments'][0];
+};
+
+const EnvironmentCards = memo(
+  ({
+    application,
+    environment: {
+      name: environmentName,
+      state,
+      deployedAt,
+      replacedAt,
+      replacedBy,
+      pinned,
+      statefulConstraints,
+      statelessConstraints,
+    },
+    version: { version },
+    allVersions,
+  }: IEnvironmentCardsProps) => {
+    const pinnedAtMillis = pinned?.at ? DateTime.fromISO(pinned.at).toMillis() : null;
+
+    const pinnedCard = pinned && (
+      <StatusCard
+        iconName="pin"
+        appearance="warning"
+        title={
+          <span className="sp-group-margin-xs-xaxis">
+            Pinned here {relativeTime(pinnedAtMillis)}{' '}
+            <span className="text-italic text-regular sp-margin-xs-left">({timestamp(pinnedAtMillis)})</span>{' '}
+            <span className="text-regular">—</span> <span className="text-regular">by {pinned.by}</span>
+          </span>
+        }
+        description={pinned.comment && <Markdown message={pinned.comment} tag="span" />}
+      />
+    );
+    const versionStateCard = (
+      <VersionStateCard
+        key="versionStateCard"
+        state={state}
+        deployedAt={deployedAt}
+        replacedAt={replacedAt}
+        replacedBy={replacedBy}
+        allVersions={allVersions}
+      />
+    );
+    const constraintCards = useMemo(
+      () =>
+        [...(statelessConstraints || []), ...(statefulConstraints || [])]
+          .filter(({ type }) => isConstraintSupported(type))
+          .map(constraint => (
+            <ConstraintCard
+              key={constraint.type}
+              application={application}
+              environment={environmentName}
+              version={version}
+              constraint={constraint}
+            />
+          )),
+      [application, environmentName, version, statefulConstraints, statelessConstraints],
+    );
+
+    const transitions = useTransition(
+      [...constraintCards, ...[versionStateCard, pinnedCard].filter(Boolean)],
+      ({ key }) => key,
+      cardTransitionConfig,
+    );
+
+    return (
+      <>
+        {/*
+         * Since transitions trail in ascending order, we need to reverse them
+         * to get the trail to go up the the list instead of down.
+         */
+        transitions.reverse().map(({ item: card, key, props }) => (
+          <animated.div key={key} className="sp-margin-2xs-bottom" style={props}>
+            {card}
+          </animated.div>
+        ))}
+      </>
+    );
+  },
+);
 
 export interface IArtifactDetailProps {
   application: Application;
   name: string;
-  type: string;
+  reference: string;
   version: IManagedArtifactVersion;
+  allVersions: IManagedArtifactSummary['versions'];
   resourcesByEnvironment: { [environment: string]: IManagedResourceSummary[] };
   onRequestClose: () => any;
 }
@@ -35,11 +151,14 @@ export interface IArtifactDetailProps {
 export const ArtifactDetail = ({
   application,
   name,
-  type,
-  version: { version, environments },
+  reference,
+  version: versionDetails,
+  allVersions,
   resourcesByEnvironment,
   onRequestClose,
 }: IArtifactDetailProps) => {
+  const { environments } = versionDetails;
+
   const keydownCallback = ({ keyCode }: KeyboardEvent) => {
     if (keyCode === 27 /* esc */) {
       onRequestClose();
@@ -47,121 +166,47 @@ export const ArtifactDetail = ({
   };
   useEventListener(document, 'keydown', keydownCallback);
 
+  const isPinnedEverywhere = environments.every(({ pinned }) => pinned);
+
   return (
     <>
-      <ArtifactDetailHeader name={name} version={version} onRequestClose={onRequestClose} />
+      <ArtifactDetailHeader name={name} version={versionDetails} onRequestClose={onRequestClose} />
 
       <div className="ArtifactDetail">
-        <div className="flex-container-h">
-          {/* a short summary with actions/buttons will live here */}
+        <div className="flex-container-h sp-margin-xl-bottom">
+          <Button
+            iconName="pin"
+            appearance="primary"
+            disabled={isPinnedEverywhere}
+            onClick={() =>
+              showPinArtifactModal({ application, reference, version: versionDetails, resourcesByEnvironment }).then(
+                ({ status }) => status === 'CLOSED' && application.getDataSource('environments').refresh(),
+              )
+            }
+          >
+            Pin
+          </Button>
           <div className="detail-section-right">{/* artifact metadata will live here */}</div>
         </div>
-        {environments.map(
-          ({ name: environmentName, state, deployedAt, replacedAt, replacedBy, statefulConstraints }) => {
-            const deployedAtMillis = DateTime.fromISO(deployedAt).toMillis();
-            const replacedAtMillis = DateTime.fromISO(replacedAt).toMillis();
-            const { version: replacedByPackageVersion, buildNumber: replacedByBuildNumber } =
-              parseName(replacedBy || '') || {};
-
-            return (
-              <EnvironmentRow key={environmentName} name={environmentName} isProd={true}>
-                {statefulConstraints &&
-                  statefulConstraints
-                    .filter(({ type }) => isConstraintSupported(type))
-                    .map(constraint => (
-                      <ConstraintCard
-                        key={constraint.type}
-                        className="sp-margin-l-right"
-                        application={application}
-                        environment={environmentName}
-                        version={version}
-                        constraint={constraint}
-                      />
-                    ))}
-                {state === 'deploying' && (
-                  <NoticeCard
-                    className="sp-margin-l-right sp-margin-l-bottom"
-                    icon="cloudProgress"
-                    text={undefined}
-                    title="Deploying"
-                    isActive={true}
-                    noticeType="info"
-                  />
-                )}
-                {state === 'current' && deployedAt && (
-                  <NoticeCard
-                    className="sp-margin-l-right sp-margin-l-bottom"
-                    icon="cloudDeployed"
-                    text={undefined}
-                    title={
-                      <span>
-                        Deployed {relativeTime(deployedAtMillis)}{' '}
-                        <span className="text-italic text-regular sp-margin-xs-left">
-                          ({timestamp(deployedAtMillis)})
-                        </span>
-                      </span>
-                    }
-                    isActive={true}
-                    noticeType="success"
-                  />
-                )}
-                {state === 'previous' && (
-                  <NoticeCard
-                    className="sp-margin-l-right sp-margin-l-bottom"
-                    icon="cloudDecommissioned"
-                    text={undefined}
-                    title={
-                      <span className="sp-group-margin-xs-xaxis">
-                        Decommissioned {relativeTime(replacedAtMillis)}{' '}
-                        <span className="text-italic text-regular sp-margin-xs-left">
-                          ({timestamp(replacedAtMillis)})
-                        </span>{' '}
-                        <span className="text-regular">—</span> <span className="text-regular">replaced by </span>
-                        <Pill
-                          text={
-                            replacedByBuildNumber ? `#${replacedByBuildNumber}` : replacedByPackageVersion || replacedBy
-                          }
-                        />
-                      </span>
-                    }
-                    isActive={true}
-                    noticeType="neutral"
-                  />
-                )}
-                {state === 'pending' && (
-                  <NoticeCard
-                    className="sp-margin-l-right sp-margin-l-bottom"
-                    icon="placeholder"
-                    text={undefined}
-                    title="Never deployed here"
-                    isActive={true}
-                    noticeType="neutral"
-                  />
-                )}
-                {state === 'vetoed' && (
-                  <NoticeCard
-                    className="sp-margin-l-right sp-margin-l-bottom"
-                    icon="cloudError"
-                    text={undefined}
-                    title={
-                      <span className="sp-group-margin-xs-xaxis">
-                        Marked as bad <span className="text-regular sp-margin-xs-left">—</span>{' '}
-                        {deployedAt ? (
-                          <>
-                            <span className="text-regular">last deployed {relativeTime(deployedAtMillis)}</span>{' '}
-                            <span className="text-italic text-regular">({timestamp(deployedAtMillis)})</span>
-                          </>
-                        ) : (
-                          <span className="text-regular">never deployed here</span>
-                        )}
-                      </span>
-                    }
-                    isActive={true}
-                    noticeType="error"
-                  />
-                )}
+        {environments.map(environment => {
+          const { name: environmentName, state } = environment;
+          return (
+            <EnvironmentRow
+              key={environmentName}
+              name={environmentName}
+              resources={resourcesByEnvironment[environmentName]}
+            >
+              <div className="sp-margin-l-right">
+                <EnvironmentCards
+                  application={application}
+                  environment={environment}
+                  version={versionDetails}
+                  allVersions={allVersions}
+                />
+              </div>
+              <div className="sp-margin-l-top">
                 {resourcesByEnvironment[environmentName]
-                  .filter(resource => shouldDisplayResource(name, type, resource))
+                  .filter(resource => shouldDisplayResource(reference, resource))
                   .map(resource => (
                     <div key={resource.id} className="flex-container-h middle">
                       {state === 'deploying' && (
@@ -173,16 +218,17 @@ export const ArtifactDetail = ({
                         />
                       )}
                       <ManagedResourceObject
+                        application={application}
                         key={resource.id}
                         resource={resource}
                         depth={state === 'deploying' ? 0 : 1}
                       />
                     </div>
                   ))}
-              </EnvironmentRow>
-            );
-          },
-        )}
+              </div>
+            </EnvironmentRow>
+          );
+        })}
       </div>
     </>
   );

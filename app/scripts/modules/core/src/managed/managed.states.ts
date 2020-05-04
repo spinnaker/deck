@@ -10,6 +10,16 @@ module(MANAGED_STATES, [APPLICATION_STATE_PROVIDER]).config([
   'applicationStateProvider',
   (applicationStateProvider: ApplicationStateProvider) => {
     if (SETTINGS.feature.managedDelivery) {
+      const artifactVersion: INestedState = {
+        name: 'artifactVersion',
+        url: '/{reference}/{version}',
+        params: {
+          reference: { dynamic: true },
+          version: { dynamic: true },
+        },
+        children: [],
+      };
+
       const environments: INestedState = {
         name: 'environments',
         url: '/environments',
@@ -21,8 +31,9 @@ module(MANAGED_STATES, [APPLICATION_STATE_PROVIDER]).config([
             title: 'Environments',
           },
         },
-        children: [],
+        children: [artifactVersion],
       };
+
       applicationStateProvider.addChildState(environments);
     }
   },

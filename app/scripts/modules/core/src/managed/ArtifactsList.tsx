@@ -1,36 +1,34 @@
 import React from 'react';
 import classNames from 'classnames';
 
-import { IManagedArtifactSummary, IManagedArtifactVersion } from '../domain/IManagedEntity';
-import { ISelectedArtifact } from './Environments';
 import { Pill } from './Pill';
-import { parseName } from './Frigga';
+import { StatusBubble } from './StatusBubble';
+
+import { IManagedArtifactSummary, IManagedArtifactVersion } from '../domain/IManagedEntity';
+import { ISelectedArtifactVersion } from './Environments';
 
 import styles from './ArtifactRow.module.css';
 
 interface IArtifactsListProps {
   artifacts: IManagedArtifactSummary[];
-  artifactSelected: (artifact: ISelectedArtifact) => void;
-  selectedArtifact: ISelectedArtifact;
+  versionSelected: (version: ISelectedArtifactVersion) => void;
+  selectedVersion: ISelectedArtifactVersion;
 }
 
-export function ArtifactsList({ artifacts, selectedArtifact, artifactSelected }: IArtifactsListProps) {
+export function ArtifactsList({ artifacts, selectedVersion, versionSelected }: IArtifactsListProps) {
   return (
     <div>
-      {artifacts.map(({ versions, name, type }) =>
-        versions.map((version, i) => (
+      {artifacts.map(({ versions, name, reference }) =>
+        versions.map(version => (
           <ArtifactRow
-            key={`${name}-${version.version}-${i}`} // appending index until name-version is guaranteed to be unique
+            key={`${name}-${version.version}`}
             isSelected={
-              selectedArtifact &&
-              selectedArtifact.name === name &&
-              selectedArtifact.type === type &&
-              selectedArtifact.version === version.version
+              selectedVersion && selectedVersion.reference === reference && selectedVersion.version === version.version
             }
-            clickHandler={artifactSelected}
+            clickHandler={versionSelected}
             version={version}
-            name={name}
-            type={type}
+            reference={reference}
+            name={artifacts.length > 1 ? name : null}
           />
         )),
       )}
@@ -40,35 +38,52 @@ export function ArtifactsList({ artifacts, selectedArtifact, artifactSelected }:
 
 interface IArtifactRowProps {
   isSelected: boolean;
-  clickHandler: (artifact: ISelectedArtifact) => void;
+  clickHandler: (artifact: ISelectedArtifactVersion) => void;
   version: IManagedArtifactVersion;
-  name: string;
-  type: string;
+  reference: string;
+  name?: string;
 }
 
-export function ArtifactRow({ isSelected, clickHandler, version, name, type }: IArtifactRowProps) {
-  const versionString = version.version;
-  const { packageName, version: packageVersion, buildNumber, commit } = parseName(versionString);
+export const ArtifactRow = ({
+  isSelected,
+  clickHandler,
+  version: { version, displayName, environments, build, git },
+  reference,
+  name,
+}: IArtifactRowProps) => {
+  const pinnedEnvironments = environments.filter(({ pinned }) => pinned).length;
+
   return (
     <div
       className={classNames(styles.ArtifactRow, { [styles.selected]: isSelected })}
-      onClick={() => clickHandler({ name, type, version: versionString })}
+      onClick={() => clickHandler({ reference, version })}
     >
       <div className={styles.content}>
-        <div className={styles.version}>
-          <Pill text={buildNumber ? `#${buildNumber}` : packageVersion || versionString} />
+        {build?.id && (
+          <div className={styles.version}>
+            <Pill text={`#${build.id}`} />
+          </div>
+        )}
+        <div className={classNames(styles.text, { 'sp-margin-m-left': !build?.id })}>
+          <div className={styles.sha}>{git?.commit || displayName}</div>
+          {name && <div className={styles.name}>{name}</div>}
         </div>
-        <div className={styles.text}>
-          <div className={styles.sha}>{commit}</div>
-          <div className={styles.name}>{name || packageName}</div>
-        </div>
-        {/* Holding spot for status bubbles */}
+        {pinnedEnvironments > 0 && (
+          <div className="sp-margin-s-right">
+            <StatusBubble
+              iconName="pin"
+              appearance="warning"
+              size="small"
+              quantity={pinnedEnvironments > 1 ? pinnedEnvironments : null}
+            />
+          </div>
+        )}
       </div>
       <div className={styles.stages}>
-        {version.environments
+        {environments
           .map(({ name, state }) => <span key={name} className={classNames(styles.stage, styles[state])} />)
           .reverse()}
       </div>
     </div>
   );
-}
+};

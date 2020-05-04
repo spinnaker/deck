@@ -13,6 +13,7 @@ import {
   standardGridTableLayout,
   usePollingData,
   usePrevious,
+  showModal,
 } from '../presentation';
 
 import { relativeTime, timestamp } from 'core/utils';
@@ -22,6 +23,7 @@ import { ManagedReader } from './ManagedReader';
 import { Spinner } from 'core/widgets';
 
 import { ManagedResourceDiffTable } from './ManagedResourceDiffTable';
+import { getResourceName } from './displayNames';
 
 import './ManagedResourceHistoryModal.less';
 
@@ -82,10 +84,10 @@ const viewConfigurationByEventType = {
     level: 'error',
   },
   ResourceCheckUnresolvable: {
-    displayName: 'Error',
+    displayName: 'Temporary issue',
     // Needs it's own icon, but could likely be same as ResourceCheckError
     iconClass: 'icon-md-error',
-    level: 'error',
+    level: 'warning',
   },
   ResourceActuationPaused: {
     displayName: 'Management paused',
@@ -171,10 +173,12 @@ const renderExpandedRowContent = (
   );
 };
 
+export const showManagedResourceHistoryModal = (props: IManagedResourceHistoryModalProps) =>
+  showModal(ManagedResourceHistoryModal, props);
+
 export const ManagedResourceHistoryModal = ({ resourceSummary, dismissModal }: IManagedResourceHistoryModalProps) => {
   const {
     id,
-    moniker: { app, stack, detail },
     locations: { account },
   } = resourceSummary;
 
@@ -188,13 +192,13 @@ export const ManagedResourceHistoryModal = ({ resourceSummary, dismissModal }: I
   );
   const previousHistoryEvents: IManagedResourceEvent[] = usePrevious(historyEvents);
 
-  const resourceDisplayName = [app, stack, detail].filter(Boolean).join('-');
+  const resourceDisplayName = getResourceName(resourceSummary);
   const isLoading = !historyEvents && ['NONE', 'PENDING'].includes(historyEventStatus);
   const shouldShowExistingData = !isLoading && historyEventStatus !== 'REJECTED';
 
   return (
     <>
-      <ModalHeader>Resource History</ModalHeader>
+      <ModalHeader>Resource history</ModalHeader>
       <ModalBody>
         <div
           className={classNames('ManagedResourceHistoryModal', {

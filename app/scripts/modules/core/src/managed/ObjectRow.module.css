@@ -6,11 +6,8 @@
   display: flex;
   align-items: center;
   flex: auto;
-
   box-shadow: inset 0 -1px 0 0 #cccccc;
-  height: 40px;
-
-  position: relative;
+  height: 44px;
   font-size: 14px;
 }
 
@@ -20,6 +17,7 @@
 
 .clickableArea {
   display: flex;
+  justify-content: space-between;
   width: 100%;
   height: 100%;
   padding-left: 8px;
@@ -30,15 +28,17 @@
   background-image: linear-gradient(to bottom, rgba(160, 180, 220, 0.15), rgba(160, 180, 220, 0.15));
 }
 
-.leftCol {
-  flex: 5 0 1px;
-  display: flex;
+.col {
   align-items: center;
+  display: flex;
+  margin-right: 8px;
+}
+
+.titleCol {
+  flex-basis: 50%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  margin-right: 16px;
-  /* background-color: rgba(255, 0, 0, 0.1); */
 }
 
 .rowTitle {
@@ -46,15 +46,6 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   flex: 1 1 auto;
-}
-
-.centerCol {
-  flex: 0 0 100px;
-  display: flex;
-  align-items: center;
-
-  pointer-events: none;
-  /* background-color: rgba(0, 255, 0, 0.1); */
 }
 
 .ObjectRow:hover .select,

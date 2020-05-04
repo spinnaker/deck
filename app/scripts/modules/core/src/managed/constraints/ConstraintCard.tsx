@@ -1,20 +1,33 @@
-import React, { useState } from 'react';
+import React, { memo, useState } from 'react';
 import classNames from 'classnames';
 
-import { IStatefulConstraint, StatefulConstraintStatus, IManagedApplicationEnvironmentSummary } from '../../domain';
+import {
+  IStatefulConstraint,
+  StatefulConstraintStatus,
+  IStatelessConstraint,
+  IManagedApplicationEnvironmentSummary,
+} from '../../domain';
 import { Application, ApplicationDataSource } from '../../application';
 import { IRequestStatus } from '../../presentation';
 
-import { NoticeCard } from '../NoticeCard';
+import { Button } from '../Button';
+import { StatusCard } from '../StatusCard';
+
 import { ManagedWriter, IUpdateConstraintStatusRequest } from '../ManagedWriter';
-import { isConstraintSupported, getStatefulConstraintConfig, getStatefulConstraintActions } from './constraintRegistry';
+import {
+  isConstraintSupported,
+  isConstraintStateful,
+  getConstraintIcon,
+  getConstraintSummary,
+  getConstraintActions,
+} from './constraintRegistry';
 
 import './ConstraintCard.less';
 
 const { NOT_EVALUATED, PENDING, PASS, FAIL, OVERRIDE_PASS, OVERRIDE_FAIL } = StatefulConstraintStatus;
 
 const constraintCardAppearanceByStatus = {
-  [NOT_EVALUATED]: 'neutral',
+  [NOT_EVALUATED]: 'inactive',
   [PENDING]: 'info',
   [PASS]: 'success',
   [FAIL]: 'error',
@@ -47,16 +60,25 @@ const overrideConstraintStatus = (
     return dataSource.refresh().catch(() => null);
   });
 
+const getCardAppearance = (constraint: IStatefulConstraint | IStatelessConstraint) => {
+  if (isConstraintStateful(constraint)) {
+    const { status } = constraint as IStatefulConstraint;
+    return constraintCardAppearanceByStatus[status];
+  } else {
+    const { currentlyPassing } = constraint as IStatelessConstraint;
+    return currentlyPassing ? 'success' : 'inactive';
+  }
+};
+
 export interface IConstraintCardProps {
   application: Application;
   environment: string;
   version: string;
-  constraint: IStatefulConstraint;
-  className?: string;
+  constraint: IStatefulConstraint | IStatelessConstraint;
 }
 
-export const ConstraintCard = ({ application, environment, version, constraint, className }: IConstraintCardProps) => {
-  const { type, status } = constraint;
+export const ConstraintCard = memo(({ application, environment, version, constraint }: IConstraintCardProps) => {
+  const { type } = constraint;
 
   const [actionStatus, setActionStatus] = useState<IRequestStatus>('NONE');
 
@@ -65,13 +87,13 @@ export const ConstraintCard = ({ application, environment, version, constraint, 
     return null;
   }
 
-  const { iconName, shortSummary } = getStatefulConstraintConfig(type);
-  const actions = getStatefulConstraintActions(constraint);
+  const actions = getConstraintActions(constraint);
 
   return (
-    <NoticeCard
-      className={classNames('ConstraintCard', className)}
-      icon={iconName}
+    <StatusCard
+      appearance={getCardAppearance(constraint)}
+      iconName={getConstraintIcon(type)}
+      title={getConstraintSummary(constraint)}
       actions={
         actions && (
           <div
@@ -82,9 +104,8 @@ export const ConstraintCard = ({ application, environment, version, constraint, 
             {actionStatus !== 'REJECTED' &&
               actions.map(({ title, pass }) => {
                 return (
-                  <button
+                  <Button
                     key={title + pass}
-                    className="flex-container-h center middle text-bold constraint-override-action"
                     disabled={actionStatus === 'PENDING'}
                     onClick={() => {
                       setActionStatus('PENDING');
@@ -101,26 +122,18 @@ export const ConstraintCard = ({ application, environment, version, constraint, 
                     }}
                   >
                     {title}
-                  </button>
+                  </Button>
                 );
               })}
             {actionStatus === 'REJECTED' && (
               <>
                 <span className="text-bold action-error-message sp-margin-l-right">Something went wrong</span>
-                <button
-                  className="flex-container-h center middle text-bold constraint-override-action"
-                  onClick={() => setActionStatus('NONE')}
-                >
-                  Try again
-                </button>
+                <Button onClick={() => setActionStatus('NONE')}>Try again</Button>
               </>
             )}
           </div>
         )
       }
-      title={shortSummary(constraint)}
-      isActive={true}
-      noticeType={constraintCardAppearanceByStatus[status]}
     />
   );
-};
+});

@@ -16,7 +16,7 @@
     "yarn": ">=1.21.1"
   },
   "scripts": {
-    "clean": "rimraf .awcache .cache-loader build node_modules transpiled",
+    "clean": "npx rimraf .awcache .cache-loader build node_modules/.cache transpiled",
     "build": "NODE_OPTIONS=--max_old_space_size=8192 webpack --bail --mode=production",
     "lint": "eslint --ext js,jsx,ts,tsx app",
     "start": "sh ./start.sh",
@@ -29,9 +29,9 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.4.1",
-    "@spinnaker/kayenta": "^0.0.89",
-    "@spinnaker/styleguide": "^1.0.17",
-    "@uirouter/react-hybrid": "1.0.0",
+    "@spinnaker/kayenta": "^0.0.91",
+    "@spinnaker/styleguide": "^1.0.20",
+    "@uirouter/react-hybrid": "1.0.2",
     "@uirouter/rx": "0.6.5",
     "@uirouter/visualizer": "^7.0.0",
     "Select2": "git://github.com/select2/select2.git#3.4.8",
@@ -56,14 +56,14 @@
     "dompurify": "^1.0.4",
     "formik": "^1.4.1",
     "human-readable-ids": "^1.0.4",
-    "jquery": "3.4.0",
+    "jquery": "3.5.0",
     "jquery-textcomplete": "1.6.1",
     "jquery-ui": "1.12.0",
     "js-worker-search": "^1.2.1",
     "js-yaml": "^3.13.1",
     "lodash": "^4.17.13",
     "lodash-decorators": "4.5.0",
-    "luxon": "^1.11.3",
+    "luxon": "^1.23.0",
     "memoize-one": "^4.0.2",
     "n3-charts": "^2.0.18",
     "ngimport": "^0.6.0",
@@ -80,6 +80,7 @@
     "react-redux": "^5.0.7",
     "react-select": "^1.2.1",
     "react-sortable-hoc": "^0.6.8",
+    "react-spring": "^8.0.27",
     "react-tether": "^1.0.5",
     "react-tooltip": "^3.10.0",
     "react-transition-group": "4.2.2",
@@ -99,7 +100,7 @@
   },
   "devDependencies": {
     "@spinnaker/eslint-plugin": "1.0.7",
-    "@spinnaker/mocks": "1.0.2",
+    "@spinnaker/mocks": "1.0.4",
     "@svgr/webpack": "^5.2.0",
     "@types/angular": "1.6.26",
     "@types/angular-mocks": "1.5.10",
@@ -184,7 +185,7 @@
     "less-loader": "4.1.0",
     "loader-utils": "1.2.3",
     "md5": "^2.2.1",
-    "minimist": "^1.2.2",
+    "minimist": "^1.2.3",
     "mountebank": "^1.15.0",
     "ngtemplate-loader": "2.0.1",
     "node-libs-browser": "^2.0.0",
@@ -219,10 +220,10 @@
   },
   "resolutionsPurpose": "This temporarily chooses the right versions of these libs, which are specified in both deck AND deck-kayenta",
   "resolutions": {
-    "@uirouter/react-hybrid": "1.0.0",
-    "@uirouter/react": "1.0.1",
-    "@uirouter/angularjs": "1.0.25",
-    "@uirouter/core": "6.0.4"
+    "@uirouter/react-hybrid": "1.0.2",
+    "@uirouter/react": "1.0.3",
+    "@uirouter/angularjs": "1.0.26",
+    "@uirouter/core": "6.0.5"
   },
   "husky": {
     "hooks": {

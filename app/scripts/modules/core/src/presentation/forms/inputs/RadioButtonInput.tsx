@@ -21,36 +21,33 @@ interface IRadioButtonOptions extends Option {
 }
 
 export const RadioButtonInput = (props: IRadioButtonInputProps) => {
-  const { inline, value: selectedValue, validation, inputClassName, options, stringOptions, ...otherProps } = props;
-  const radioOptions = isStringArray(stringOptions) ? stringOptions.map(value => ({ value, label: value })) : options;
+  const { inline, validation, value, inputClassName, options, stringOptions, ...otherProps } = props;
+  const radioOptions: IRadioButtonOptions[] = isStringArray(stringOptions)
+    ? stringOptions.map(opt => ({ value: opt, label: opt }))
+    : options;
 
   const userClassName = orEmptyString(inputClassName);
   const validClassName = validationClassName(validation);
-  const elementClassName = `RadioButtonInput radio ${userClassName} ${validClassName}`;
+  const layoutClassName = inline ? 'flex-container-h margin-between-md' : 'flex-container-v margin-between-sm';
+  const elementClassName = `RadioButtonInput radio ${userClassName} ${validClassName} ${layoutClassName}`;
 
-  const RadioButton = ({ option }: { option: IRadioButtonOptions }) => (
-    <label key={option.label} className={inline ? 'radio-inline clickable' : 'inline clickable'}>
-      <input type="radio" {...otherProps} value={option.value as any} checked={option.value === selectedValue} />
-      <Markdown message={option.label} style={option.help && { display: 'inline-block' }} />
-      {option.help && <> {option.help}</>}
-    </label>
-  );
-
-  const VerticalRadioButtons = ({ opts }: { opts: IRadioButtonOptions[] }) => (
-    <div className={`${elementClassName} vertical left`}>
-      {opts.map(option => (
-        <RadioButton key={option.label} option={option} />
-      ))}
-    </div>
-  );
-
-  const InlineRadioButtons = ({ opts }: { opts: IRadioButtonOptions[] }) => (
+  return (
     <div className={elementClassName}>
-      {opts.map(option => (
-        <RadioButton key={option.label} option={option} />
+      {radioOptions.map(option => (
+        <RadioButton key={option.label} value={value} option={option} {...otherProps} />
       ))}
     </div>
   );
-
-  return inline ? <InlineRadioButtons opts={radioOptions} /> : <VerticalRadioButtons opts={radioOptions} />;
 };
+
+interface IRadioButtonProps {
+  option: IRadioButtonOptions;
+  value: any;
+}
+const RadioButton = ({ option, value, ...otherProps }: IRadioButtonProps) => (
+  <label className={'clickable'}>
+    <input type="radio" {...otherProps} value={option.value as any} checked={option.value === value} />
+    <Markdown message={option.label} style={option.help && { display: 'inline-block' }} />
+    {option.help && <>{option.help}</>}
+  </label>
+);

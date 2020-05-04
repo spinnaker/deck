@@ -1,42 +1,48 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { useSref } from '@uirouter/react';
 
-import { IconNames } from '../presentation';
-import { IManagedResourceSummary, IManagedEnviromentSummary } from '../domain/IManagedEntity';
+import { Application } from 'core/application';
+import { Icon, IconNames } from '../presentation';
+import { IManagedResourceSummary, IManagedEnviromentSummary, IManagedArtifactSummary } from '../domain/IManagedEntity';
 
 import { getKindName } from './ManagedReader';
 import { ObjectRow } from './ObjectRow';
-import { Pill } from './Pill';
-import { parseName } from './Frigga';
+import { AnimatingPill, Pill } from './Pill';
+import { getResourceName, getArtifactVersionDisplayName } from './displayNames';
+import { StatusBubble } from './StatusBubble';
+import { viewConfigurationByStatus } from './managedResourceStatusConfig';
+import { ManagedResourceStatusPopover } from './ManagedResourceStatusPopover';
 
 export interface IManagedResourceObjectProps {
+  application: Application;
   resource: IManagedResourceSummary;
-  artifact?: IManagedEnviromentSummary['artifacts'][0];
+  artifactVersionsByState?: IManagedEnviromentSummary['artifacts'][0]['versions'];
+  artifactDetails?: IManagedArtifactSummary;
   depth?: number;
 }
 
 const kindIconMap: { [kind: string]: IconNames } = {
   cluster: 'cluster',
-  'security-group': 'cluster',
+  'security-group': 'securityGroup',
   'classic-load-balancer': 'loadBalancer',
   'application-load-balancer': 'loadBalancer',
 };
 
 const getIconTypeFromKind = (kind: string) => kindIconMap[getKindName(kind)] ?? 'placeholder';
 
-const getResourceName = ({ moniker: { app, stack, detail } }: IManagedResourceSummary) =>
-  [app, stack, detail].filter(Boolean).join('-');
-
 const getResourceRoutingInfo = (
   resource: IManagedResourceSummary,
 ): { state: string; params: { [key: string]: string } } | null => {
   const {
     kind,
+    moniker: { stack, detail },
     locations: { account },
   } = resource;
   const kindName = getKindName(kind);
   const params = {
     acct: account,
+    stack: stack ?? '(none)',
+    detail: detail ?? '(none)',
     q: getResourceName(resource),
   };
 
@@ -55,23 +61,48 @@ const getResourceRoutingInfo = (
   return null;
 };
 
-export const ManagedResourceObject = ({ resource, artifact, depth }: IManagedResourceObjectProps) => {
-  const { version: currentVersion, buildNumber: currentBuild } = parseName(artifact?.versions.current || '') || {};
-  const { kind } = resource;
-  const resourceName = getResourceName(resource);
-  const routingInfo = getResourceRoutingInfo(resource) ?? { state: '', params: {} };
-  const route = useSref(routingInfo.state, routingInfo.params);
+export const ManagedResourceObject = memo(
+  ({ application, resource, artifactVersionsByState, artifactDetails, depth }: IManagedResourceObjectProps) => {
+    const { kind } = resource;
+    const resourceName = getResourceName(resource);
+    const routingInfo = getResourceRoutingInfo(resource) ?? { state: '', params: {} };
+    const route = useSref(routingInfo.state, routingInfo.params);
 
-  return (
-    <ObjectRow
-      icon={getIconTypeFromKind(kind)}
-      title={route ? <a {...route}>{resourceName}</a> : resourceName}
-      depth={depth}
-      metadata={
-        artifact?.versions.current && (
-          <Pill text={currentBuild ? `#${currentBuild}` : currentVersion || artifact.versions.current || 'unknown'} />
-        )
-      }
-    />
-  );
-};
+    const current =
+      artifactVersionsByState?.current &&
+      artifactDetails?.versions.find(({ version }) => version === artifactVersionsByState?.current);
+    const deploying =
+      artifactVersionsByState?.deploying &&
+      artifactDetails?.versions.find(({ version }) => version === artifactVersionsByState?.deploying);
+
+    const currentPill = current && <Pill text={getArtifactVersionDisplayName(current)} />;
+    const deployingPill = deploying && (
+      <>
+        <Icon appearance="neutral" name="caretRight" size="medium" />
+        <AnimatingPill text={getArtifactVersionDisplayName(deploying)} />
+      </>
+    );
+
+    const viewConfig = viewConfigurationByStatus[resource.status];
+    const resourceStatus = resource.status !== 'HAPPY' && viewConfig && (
+      <ManagedResourceStatusPopover application={application} placement="left" resourceSummary={resource}>
+        <StatusBubble appearance={viewConfig.appearance} iconName={viewConfig.iconName} size="small" />
+      </ManagedResourceStatusPopover>
+    );
+
+    return (
+      <ObjectRow
+        icon={getIconTypeFromKind(kind)}
+        title={route ? <a {...route}>{resourceName}</a> : resourceName}
+        depth={depth}
+        content={resourceStatus}
+        metadata={
+          <>
+            {currentPill}
+            {deployingPill}
+          </>
+        }
+      />
+    );
+  },
+);

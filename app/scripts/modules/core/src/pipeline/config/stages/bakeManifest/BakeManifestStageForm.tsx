@@ -1,7 +1,7 @@
 import React from 'react';
+import { isNil } from 'lodash';
 
 import { ExpectedArtifactService } from 'core/artifact';
-import { SETTINGS } from 'core/config';
 import { IExpectedArtifact, IPipeline } from 'core/domain';
 import { ReactSelectInput } from 'core/presentation';
 
@@ -34,12 +34,18 @@ export function BakeManifestStageForm({
     }
   }, []);
 
-  const templateRenderers = React.useMemo(() => {
-    const renderers = [...HELM_RENDERERS];
-    if (SETTINGS.feature.kustomizeEnabled) {
-      renderers.push(ManifestRenderers.KUSTOMIZE);
+  // Clear renderer-specific fields when selected renderer changes
+  React.useEffect(() => {
+    if (stage.templateRenderer == ManifestRenderers.KUSTOMIZE && !isNil(stage.inputArtifacts)) {
+      formik.setFieldValue('inputArtifacts', null);
     }
-    return renderers;
+    if (HELM_RENDERERS.includes(stage.templateRenderer) && !isNil(stage.inputArtifact)) {
+      formik.setFieldValue('inputArtifact', null);
+    }
+  }, [stage.templateRenderer]);
+
+  const templateRenderers = React.useMemo(() => {
+    return [...HELM_RENDERERS, ManifestRenderers.KUSTOMIZE];
   }, []);
 
   return (
