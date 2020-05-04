@@ -51,7 +51,7 @@ export const ArtifactRow = ({
   reference,
   name,
 }: IArtifactRowProps) => {
-  const isPinned = environments.some(({ pinned }) => pinned);
+  const pinnedEnvironments = environments.filter(({ pinned }) => pinned).length;
 
   return (
     <div
@@ -68,9 +68,14 @@ export const ArtifactRow = ({
           <div className={styles.sha}>{git?.commit || displayName}</div>
           {name && <div className={styles.name}>{name}</div>}
         </div>
-        {isPinned && (
+        {pinnedEnvironments > 0 && (
           <div className="sp-margin-s-right">
-            <StatusBubble iconName="pin" appearance="warning" size="small" />
+            <StatusBubble
+              iconName="pin"
+              appearance="warning"
+              size="small"
+              quantity={pinnedEnvironments > 1 ? pinnedEnvironments : null}
+            />
           </div>
         )}
       </div>
