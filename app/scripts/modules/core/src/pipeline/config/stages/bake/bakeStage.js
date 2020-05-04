@@ -16,6 +16,7 @@ module(CORE_PIPELINE_CONFIG_STAGES_BAKE_BAKESTAGE, [CORE_PIPELINE_CONFIG_STAGES_
       description: 'Bakes an image',
       key: 'bake',
       restartable: true,
+      producesArtifacts: true,
       manualExecutionComponent: ManualExecutionBake,
     });
   })
