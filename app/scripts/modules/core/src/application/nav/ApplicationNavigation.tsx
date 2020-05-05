@@ -71,7 +71,7 @@ export const ApplicationNavigation = ({ app }: IApplicationNavigationProps) => {
           <NavSection key={`section-${i}`} dataSources={section} app={app} />
         ))}
       <div className="nav-section clickable">
-        <div className="page-category flex-container-h middle" onClick={pageApplicationOwner}>
+        <div className="page-category flex-container-h middle text-semibold" onClick={pageApplicationOwner}>
           <div className="nav-item sp-margin-s-right">
             <Icon className="nav-item-icon" name="spMenuPager" size="extraSmall" color="danger" />
           </div>
