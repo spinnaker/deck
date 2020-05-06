@@ -17,32 +17,36 @@ export const LaunchTemplateDetailsSection = ({ serverGroup }: IAmazonServerGroup
 
     return name;
   };
-
   const baseImage = getBaseImage(image?.description);
-  const maxSpotPrice = launchTemplate?.instanceMarketOptions?.spotOptions?.maxPrice;
 
   if (!launchTemplate) {
     return null;
   }
 
+  const { launchTemplateData } = launchTemplate;
+  const maxSpotPrice = launchTemplateData?.instanceMarketOptions?.spotOptions?.maxPrice;
+
   return (
     <CollapsibleSection heading="Launch Template">
       <LabeledValueList className="horizontal-when-filters-collapsed">
         <LabeledValue label="Name" value={launchTemplate.launchTemplateName} />
-        <LabeledValue label="Image ID" value={launchTemplate.imageId} />
+        <LabeledValue label="Image ID" value={launchTemplateData.imageId} />
         {image?.imageLocation && <LabeledValue label="Image Name" value={image?.imageLocation} />}
         {baseImage && <LabeledValue label="Base Image Name" value={baseImage} />}
-        <LabeledValue label="Instance Type" value={launchTemplate.instanceType} />
-        <LabeledValue label="IAM Profile" value={launchTemplate.iamInstanceProfile} />
-        <LabeledValue label="Instance Monitoring" value={launchTemplate.monitoring.enabled ? 'enabled' : 'disabled'} />
+        <LabeledValue label="Instance Type" value={launchTemplateData.instanceType} />
+        <LabeledValue label="IAM Profile" value={launchTemplateData.iamInstanceProfile.name} />
+        <LabeledValue
+          label="Instance Monitoring"
+          value={launchTemplateData.monitoring.enabled ? 'enabled' : 'disabled'}
+        />
         {maxSpotPrice && <LabeledValue label="Max Spot Price" value={maxSpotPrice} />}
-        {launchTemplate.keyName && <LabeledValue label="Key Name" value={launchTemplate.keyName} />}
-        {launchTemplate.kernelId && <LabeledValue label="Kernel ID" value={launchTemplate.kernelId} />}
-        {launchTemplate.ramDiskId && <LabeledValue label="Ramdisk ID" value={launchTemplate.ramDiskId} />}
-        {launchTemplate.userData && (
+        {launchTemplateData.keyName && <LabeledValue label="Key Name" value={launchTemplateData.keyName} />}
+        {launchTemplateData.kernelId && <LabeledValue label="Kernel ID" value={launchTemplateData.kernelId} />}
+        {launchTemplateData.ramDiskId && <LabeledValue label="Ramdisk ID" value={launchTemplateData.ramDiskId} />}
+        {launchTemplateData.userData && (
           <LabeledValue
             label="User Data"
-            value={<ShowUserData serverGroupName={name} userData={launchTemplate.userData} />}
+            value={<ShowUserData serverGroupName={name} userData={launchTemplateData.userData} />}
           />
         )}
       </LabeledValueList>
