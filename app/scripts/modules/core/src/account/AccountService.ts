@@ -24,7 +24,6 @@ export interface IAccount {
   name: string;
   requiredGroupMembership: string[];
   type: string;
-  providerVersion?: string;
 }
 
 export interface IArtifactAccount {
@@ -110,11 +109,8 @@ export class AccountService {
     return this.listAllAccounts().then(accounts => accounts.find(a => a.name === account));
   }
 
-  public static getAllAccountDetailsForProvider(
-    provider: string,
-    providerVersion: string = null,
-  ): IPromise<IAccountDetails[]> {
-    return this.listAccounts(provider, providerVersion).catch((error: any) => {
+  public static getAllAccountDetailsForProvider(provider: string): IPromise<IAccountDetails[]> {
+    return this.listAccounts(provider).catch((error: any) => {
       $log.warn(`Failed to load accounts for provider "${provider}"; exception:`, error);
       return [];
     });
@@ -172,19 +168,14 @@ export class AccountService {
     });
   }
 
-  public static listAllAccounts(provider: string = null, providerVersion: string = null): IPromise<IAccountDetails[]> {
+  public static listAllAccounts(provider: string = null): IPromise<IAccountDetails[]> {
     return $q
       .when(this.accounts$.toPromise())
-      .then((accounts: IAccountDetails[]) => accounts.filter(account => !provider || account.type === provider))
-      .then((accounts: IAccountDetails[]) =>
-        accounts.filter(account => !providerVersion || account.providerVersion === providerVersion),
-      );
+      .then((accounts: IAccountDetails[]) => accounts.filter(account => !provider || account.type === provider));
   }
 
-  public static listAccounts(provider: string = null, providerVersion: string = null): IPromise<IAccountDetails[]> {
-    return this.listAllAccounts(provider, providerVersion).then(accounts =>
-      accounts.filter(account => account.authorized !== false),
-    );
+  public static listAccounts(provider: string = null): IPromise<IAccountDetails[]> {
+    return this.listAllAccounts(provider).then(accounts => accounts.filter(account => account.authorized !== false));
   }
 
   public static applicationAccounts(application: Application = null): IPromise<IAccountDetails[]> {

@@ -10,7 +10,6 @@ export interface ICloudProviderLogo {
 export interface ICloudProviderConfig {
   name: string;
   logo?: ICloudProviderLogo;
-  providerVersion?: string;
   [attribute: string]: any;
 }
 
