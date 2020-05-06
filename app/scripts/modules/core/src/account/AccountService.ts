@@ -7,6 +7,7 @@ import { Application } from 'core/application/application.model';
 import { API } from 'core/api/ApiService';
 import { CloudProviderRegistry } from '../cloudProvider/CloudProviderRegistry';
 import { SETTINGS } from 'core/config/settings';
+import { ILoadBalancer, IServerGroup } from 'core/domain';
 
 export interface IRegion {
   account?: string;
@@ -24,7 +25,6 @@ export interface IAccount {
   requiredGroupMembership: string[];
   type: string;
   providerVersion?: string;
-  skin?: string;
 }
 
 export interface IArtifactAccount {
@@ -213,6 +213,27 @@ export class AccountService {
 
   public static listProviders(application: Application = null): IPromise<string[]> {
     return $q.when(this.listProviders$(application).toPromise());
+  }
+
+  public static getAccountForInstance(cloudProvider: string, instanceId: string, app: Application): IPromise<string> {
+    return app.ready().then(() => {
+      const serverGroups = app.getDataSource('serverGroups').data as IServerGroup[];
+      const loadBalancers = app.getDataSource('loadBalancers').data as ILoadBalancer[];
+      const loadBalancerServerGroups = loadBalancers.map(lb => lb.serverGroups).reduce((acc, sg) => acc.concat(sg), []);
+
+      const hasInstance = (obj: IServerGroup | ILoadBalancer) => {
+        return (
+          obj.cloudProvider === cloudProvider && (obj.instances || []).some(instance => instance.id === instanceId)
+        );
+      };
+
+      const all: Array<IServerGroup | ILoadBalancer> = []
+        .concat(serverGroups)
+        .concat(loadBalancers)
+        .concat(loadBalancerServerGroups);
+      const found = all.find(hasInstance);
+      return found && found.account;
+    });
   }
 }
 
