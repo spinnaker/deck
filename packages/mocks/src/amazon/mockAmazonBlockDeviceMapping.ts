@@ -1,10 +1,10 @@
 import { IEbsBlockDevice, IBlockDeviceMapping } from '@spinnaker/amazon';
 
-export const createMockEbsBlockDevice = (size?: number, type?: string): IEbsBlockDevice => ({
+export const createMockEbsBlockDevice = (options?: { size?: number; type?: string }): IEbsBlockDevice => ({
   deleteOnTermination: false,
   encrypted: true,
-  volumeSize: size || 40,
-  volumeType: type || 'standard',
+  volumeSize: options?.size || 40,
+  volumeType: options?.type || 'standard',
 });
 
 export const createMockBlockDeviceMapping = (customEbs?: IEbsBlockDevice) => ({
