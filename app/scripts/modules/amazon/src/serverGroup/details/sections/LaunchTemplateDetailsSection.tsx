@@ -2,22 +2,11 @@ import React from 'react';
 
 import { CollapsibleSection, LabeledValue, LabeledValueList, ShowUserData } from '@spinnaker/core';
 import { IAmazonServerGroupDetailsSectionProps } from './IAmazonServerGroupDetailsSectionProps';
+import { getBaseImageName } from '../utils';
 
 export const LaunchTemplateDetailsSection = ({ serverGroup }: IAmazonServerGroupDetailsSectionProps) => {
   const { image, launchTemplate, name } = serverGroup;
-  const getBaseImage = (description?: string) => {
-    let name;
-    const tags = (description || '').split(', ');
-    tags.forEach((tag: string) => {
-      const keyVal = tag.split('=');
-      if (keyVal.length === 2 && keyVal[0] === 'ancestor_name') {
-        name = keyVal[1];
-      }
-    });
-
-    return name;
-  };
-  const baseImage = getBaseImage(image?.description);
+  const baseImage = getBaseImageName(image?.description);
 
   if (!launchTemplate) {
     return null;
