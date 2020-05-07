@@ -1,4 +1,3 @@
-import { shallow } from 'enzyme';
 import { getBaseImageName } from './utils';
 
 describe('ServerGroup details utils: getBaseImageName', () => {
