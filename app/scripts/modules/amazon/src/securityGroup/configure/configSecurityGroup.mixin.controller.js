@@ -13,6 +13,7 @@ import {
   FirewallLabels,
   TaskMonitor,
   ModalWizard,
+  filterObjectValues,
 } from '@spinnaker/core';
 
 import { AWSProviderSettings } from 'amazon/aws.settings';
@@ -298,7 +299,10 @@ module(AMAZON_SECURITYGROUP_CONFIGURE_CONFIGSECURITYGROUP_MIXIN_CONTROLLER, [
         }
 
         $scope.availableSecurityGroups = _.map(availableGroups, 'name');
-        $scope.allSecurityGroups = securityGroups;
+        const securityGroupExclusionsList = AWSProviderSettings.securityGroupExclusionsList;
+        $scope.allSecurityGroups = securityGroupExclusionsList
+          ? filterObjectValues(securityGroups, name => !securityGroupExclusionsList.includes(name))
+          : securityGroups;
         $scope.allSecurityGroupsUpdated.next();
       });
     };
