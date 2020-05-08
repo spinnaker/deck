@@ -11,8 +11,14 @@ export interface IInsightLayoutProps {
 
 export const InsightLayout = ({ app }: IInsightLayoutProps) => {
   const [appIsReady, setAppIsReady] = React.useState(false);
-  const { filtersExpanded, filtersHidden } = ReactInjector.insightFilterStateModel;
-  const filterClass = filtersExpanded ? 'filters-expanded' : 'filters-collapsed';
+  const [expandFilters, setExpandFilters] = React.useState(ReactInjector.insightFilterStateModel.filtersExpanded);
+  const { filtersHidden } = ReactInjector.insightFilterStateModel;
+  const filterClass = expandFilters ? 'filters-expanded' : 'filters-collapsed';
+
+  const toggleFilters = (): void => {
+    ReactInjector.insightFilterStateModel.pinFilters(!expandFilters);
+    setExpandFilters(!expandFilters);
+  };
 
   React.useEffect(() => {
     app.ready().then(() => setAppIsReady(true));
@@ -24,8 +30,12 @@ export const InsightLayout = ({ app }: IInsightLayoutProps) => {
 
   return (
     <div className={`insight ${filterClass}`}>
-      {!filtersHidden && <FilterCollapse />}
-      {!filtersHidden && <UIView name="nav" className="nav" />}
+      {!filtersHidden && (
+        <div onClick={toggleFilters}>
+          <FilterCollapse />
+        </div>
+      )}
+      {(!filtersHidden || !expandFilters) && <UIView name="nav" className="nav" />}
       <UIView name="master" className="nav-content" data-scroll-id="nav-content" />
       {appIsReady && <UIView name="detail" className="detail-content" />}
     </div>
