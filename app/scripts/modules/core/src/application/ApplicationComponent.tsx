@@ -68,7 +68,7 @@ export class ApplicationComponent extends React.Component<IApplicationComponentP
           </div>
         )}
         <div className="container scrollable-columns">
-          <UIView className="secondary-panel" name="insight" />
+          <UIView className="secondary-panel" name="insight" app={app} />
         </div>
       </div>
     );
