@@ -16,7 +16,7 @@ export interface IAWSProviderSettings extends IProviderSettings {
   crossAccountIngressExclusions?: {
     [credentials: string]: string | string[];
   };
-  securityGroupExclusionsList?: string[];
+  securityGroupExclusions?: string[];
   defaults: {
     account?: string;
     iamRole?: string;
