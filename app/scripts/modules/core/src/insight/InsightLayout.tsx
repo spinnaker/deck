@@ -22,7 +22,7 @@ export const InsightLayout = ({ app }: IInsightLayoutProps) => {
 
   React.useEffect(() => {
     app.ready().then(() => setAppIsReady(true));
-  });
+  }, []);
 
   if (app.notFound || app.hasError) {
     return null;
