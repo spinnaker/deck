@@ -35,7 +35,7 @@ export const InsightLayout = ({ app }: IInsightLayoutProps) => {
           <FilterCollapse />
         </div>
       )}
-      {(!filtersHidden || !expandFilters) && <UIView name="nav" className="nav" />}
+      {!filtersHidden && <UIView name="nav" className="nav" />}
       <UIView name="master" className="nav-content" data-scroll-id="nav-content" />
       {appIsReady && <UIView name="detail" className="detail-content" />}
     </div>
