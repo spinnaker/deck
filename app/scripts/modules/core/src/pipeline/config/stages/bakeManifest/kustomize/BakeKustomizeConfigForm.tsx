@@ -37,10 +37,7 @@ export class BakeKustomizeConfigForm extends React.Component<
             helpKey="pipeline.config.bake.manifest.expectedArtifact"
             label="Expected Artifact"
             pipeline={this.props.pipeline}
-            selectedArtifactAccount={this.getInputArtifact().account}
-            selectedArtifactId={this.getInputArtifact().id}
             stage={stage}
-            updatePipeline={this.props.updatePipeline}
             onArtifactEdited={(artifact: IArtifact) => {
               this.props.formik.setFieldValue('inputArtifact.id', null);
               this.props.formik.setFieldValue('inputArtifact.artifact', artifact);
@@ -48,13 +45,6 @@ export class BakeKustomizeConfigForm extends React.Component<
             }}
             onExpectedArtifactSelected={(artifact: IArtifact) => {
               this.props.formik.setFieldValue('inputArtifact.id', artifact.id);
-              this.props.formik.setFieldValue('inputArtifact.artifact', null);
-            }}
-            setArtifactAccount={(account: string) => {
-              this.props.formik.setFieldValue('inputArtifact.account', account);
-            }}
-            setArtifactId={(id: string) => {
-              this.props.formik.setFieldValue('inputArtifact.id', id);
               this.props.formik.setFieldValue('inputArtifact.artifact', null);
             }}
           />

@@ -89,10 +89,6 @@ export class DeployManifestStageForm extends React.Component<
     this.props.formik.setFieldValue('manifestArtifact', artifact);
   };
 
-  private onManifestArtifactAccountSelected = (accountName: string): void => {
-    this.props.formik.setFieldValue('manifestArtifactAccount', accountName);
-  };
-
   private getRequiredArtifacts = (): IManifestBindArtifact[] => {
     const { requiredArtifactIds, requiredArtifacts } = this.props.formik.values;
     return (requiredArtifactIds || [])
@@ -171,12 +167,7 @@ export class DeployManifestStageForm extends React.Component<
               onArtifactEdited={this.onManifestArtifactEdited}
               onExpectedArtifactSelected={(artifact: IExpectedArtifact) => this.onManifestArtifactSelected(artifact.id)}
               pipeline={this.props.pipeline}
-              selectedArtifactAccount={stage.manifestArtifactAccount}
-              selectedArtifactId={stage.manifestArtifactId}
-              setArtifactAccount={this.onManifestArtifactAccountSelected}
-              setArtifactId={this.onManifestArtifactSelected}
               stage={stage}
-              updatePipeline={this.props.updatePipeline}
             />
             <StageConfigField label="Expression Evaluation" helpKey="kubernetes.manifest.skipExpressionEvaluation">
               <CheckboxInput

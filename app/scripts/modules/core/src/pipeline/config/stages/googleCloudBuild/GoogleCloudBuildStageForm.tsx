@@ -91,10 +91,6 @@ export function GoogleCloudBuildStageForm(props: IGoogleCloudBuildStageFormProps
     props.formik.setFieldValue('buildDefinitionArtifact.artifactId', null);
   };
 
-  const setArtifactAccount = (accountName: string): void => {
-    props.formik.setFieldValue('buildDefinitionArtifact.artifactAccount', accountName);
-  };
-
   // When build definition source changes, clear any no-longer-relevant fields.
   React.useEffect(() => {
     if (stage.buildDefinitionSource !== BuildDefinitionSource.TEXT && stage.buildDefinition) {
@@ -174,12 +170,7 @@ export function GoogleCloudBuildStageForm(props: IGoogleCloudBuildStageFormProps
             onArtifactEdited={setArtifact}
             onExpectedArtifactSelected={(artifact: IExpectedArtifact) => setArtifactId(artifact.id)}
             pipeline={props.pipeline}
-            selectedArtifactAccount={get(stage, 'buildDefinitionArtifact.artifactAccount')}
-            selectedArtifactId={get(stage, 'buildDefinitionArtifact.artifactId')}
-            setArtifactAccount={setArtifactAccount}
-            setArtifactId={setArtifactId}
             stage={stage}
-            updatePipeline={props.updatePipeline}
           />
         )}
         {stage.buildDefinitionSource === BuildDefinitionSource.TRIGGER && (

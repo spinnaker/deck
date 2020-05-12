@@ -118,10 +118,6 @@ export class KubernetesV2RunJobStageConfig extends React.Component<IStageConfigP
     });
   };
 
-  private onManifestArtifactAccountSelected = (accountName: string): void => {
-    this.props.updateStageField({ manifestArtifactAccount: accountName });
-  };
-
   private updatePropertyFile = (event: any) => {
     this.props.updateStageField({ propertyFile: event.target.value });
   };
@@ -218,12 +214,7 @@ export class KubernetesV2RunJobStageConfig extends React.Component<IStageConfigP
               onArtifactEdited={this.onManifestArtifactEdited}
               onExpectedArtifactSelected={(artifact: IExpectedArtifact) => this.onManifestArtifactSelected(artifact.id)}
               pipeline={this.props.pipeline}
-              selectedArtifactAccount={stage.manifestArtifactAccount}
-              selectedArtifactId={stage.manifestArtifactId}
-              setArtifactAccount={this.onManifestArtifactAccountSelected}
-              setArtifactId={this.onManifestArtifactSelected}
               stage={stage}
-              updatePipeline={this.props.updatePipeline}
             />
           </>
         )}
