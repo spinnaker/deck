@@ -21,7 +21,7 @@ import { ManifestBasicSettings } from '../../../manifest/wizard/BasicSettings';
 import { CopyFromTemplateButton } from './CopyFromTemplateButton';
 import { IManifestBindArtifact } from './ManifestBindArtifactsSelector';
 import { ManifestDeploymentOptions } from './ManifestDeploymentOptions';
-import { ManifestBindArtifactsSelectorDelegate } from './ManifestBindArtifactsSelectorDelegate';
+import { ManifestBindArtifactsSelector } from './ManifestBindArtifactsSelector';
 import { NamespaceSelector } from './NamespaceSelector';
 import { ManifestSource } from '../../../manifest/ManifestSource';
 
@@ -177,7 +177,7 @@ export class DeployManifestStageForm extends React.Component<
           </>
         )}
         <StageConfigField label="Required Artifacts to Bind" helpKey="kubernetes.manifest.requiredArtifactsToBind">
-          <ManifestBindArtifactsSelectorDelegate
+          <ManifestBindArtifactsSelector
             bindings={this.getRequiredArtifacts()}
             onChangeBindings={this.onRequiredArtifactsChanged}
             pipeline={this.props.pipeline}

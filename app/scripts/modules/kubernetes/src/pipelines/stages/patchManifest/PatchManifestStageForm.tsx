@@ -14,7 +14,7 @@ import {
   YamlEditor,
 } from '@spinnaker/core';
 
-import { ManifestBindArtifactsSelectorDelegate } from '../deployManifest/ManifestBindArtifactsSelectorDelegate';
+import { ManifestBindArtifactsSelector } from '../deployManifest/ManifestBindArtifactsSelector';
 import { IManifestBindArtifact } from '../deployManifest/ManifestBindArtifactsSelector';
 import { ManifestSelector } from '../../../manifest/selector/ManifestSelector';
 import { SelectorMode } from '../../../manifest/selector/IManifestSelector';
@@ -137,7 +137,7 @@ export class PatchManifestStageForm extends React.Component<
           </>
         )}
         <StageConfigField label="Required Artifacts to Bind" helpKey="kubernetes.manifest.requiredArtifactsToBind">
-          <ManifestBindArtifactsSelectorDelegate
+          <ManifestBindArtifactsSelector
             bindings={this.getRequiredArtifacts()}
             onChangeBindings={this.onRequiredArtifactsChanged}
             pipeline={this.props.pipeline}

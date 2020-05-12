@@ -18,7 +18,7 @@ import {
 } from '@spinnaker/core';
 
 import { ManifestBasicSettings } from '../../../manifest/wizard/BasicSettings';
-import { ManifestBindArtifactsSelectorDelegate } from '../deployManifest/ManifestBindArtifactsSelectorDelegate';
+import { ManifestBindArtifactsSelector } from '../deployManifest/ManifestBindArtifactsSelector';
 import { IManifestBindArtifact } from '../deployManifest/ManifestBindArtifactsSelector';
 import { ManifestSource } from '../../../manifest/ManifestSource';
 
@@ -219,7 +219,7 @@ export class KubernetesV2RunJobStageConfig extends React.Component<IStageConfigP
           </>
         )}
         <StageConfigField label="Required Artifacts to Bind" helpKey="kubernetes.manifest.requiredArtifactsToBind">
-          <ManifestBindArtifactsSelectorDelegate
+          <ManifestBindArtifactsSelector
             bindings={this.getRequiredArtifacts()}
             onChangeBindings={this.onRequiredArtifactsChanged}
             pipeline={this.props.pipeline}
