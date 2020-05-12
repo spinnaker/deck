@@ -10,7 +10,7 @@ import { IFormikStageConfigInjectedProps } from '../FormikStageConfig';
 import { BakeKustomizeConfigForm } from './kustomize/BakeKustomizeConfigForm';
 import { BakeHelmConfigForm } from './helm/BakeHelmConfigForm';
 import { ManifestRenderers, HELM_RENDERERS } from './ManifestRenderers';
-import { BASE_64_ARTIFACT_ACCOUNT, BASE_64_ARTIFACT_TYPE } from '../../triggers/artifacts/base64/base64.artifact';
+import { BASE_64_ARTIFACT_ACCOUNT, BASE_64_ARTIFACT_TYPE } from '../../triggers/artifacts/base64/Base64ArtifactEditor';
 
 export function BakeManifestStageForm({ application, formik, pipeline }: IFormikStageConfigInjectedProps) {
   const stage = formik.values;
