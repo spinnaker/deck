@@ -1,6 +1,6 @@
 import React from 'react';
 import { useOnStateChanged } from '@uirouter/react';
-import { compact, debounce, uniq, map } from 'lodash';
+import { compact, uniq, map } from 'lodash';
 
 import { Application } from 'core/application';
 import { ClusterState } from 'core/state';
@@ -60,14 +60,19 @@ export const ClusterFilters = ({ app }: IClusterFiltersProps) => {
 
   useObservable(ClusterState.filterService.groupsUpdatedStream, () => {
     setTags(ClusterState.filterModel.asFilterModel.tags);
+    setSortFilter(ClusterState.filterModel.asFilterModel.sortFilter);
   });
 
   useOnStateChanged(() => {
     ClusterState.filterModel.asFilterModel.activate();
-    ClusterState.filterService.updateClusterGroups(app);
   });
 
   const clearFilters = () => {
+    setSortFilter({
+      ...sortFilter,
+      minInstances: undefined,
+      maxInstances: undefined,
+    });
     ClusterState.filterService.clearFilters();
     ClusterState.filterModel.asFilterModel.applyParamsToUrl();
     ClusterState.filterService.updateClusterGroups(app);
@@ -96,11 +101,14 @@ export const ClusterFilters = ({ app }: IClusterFiltersProps) => {
   };
 
   const handleLabelFiltersChange = (filters: ILabelFilter[]): void => {
-    setLabelFilters(filters);
-    setSortFilter({
+    const newSortFilter = {
       ...sortFilter,
       labels: labelFiltersToTrueKeyObject(filters),
-    });
+    };
+
+    setLabelFilters(filters);
+    setSortFilter(newSortFilter);
+    ClusterState.filterModel.asFilterModel.sortFilter = newSortFilter;
     updateClusterGroups();
   };
 
@@ -119,8 +127,7 @@ export const ClusterFilters = ({ app }: IClusterFiltersProps) => {
     const target = event.target;
     const value = target.type === 'checkbox' ? target.checked : target.value;
     const name = target.name;
-    // eslint-disable-next-line
-    console.log(value, name);
+
     const newSortFilter = {
       ...sortFilter,
       status: {
@@ -134,7 +141,8 @@ export const ClusterFilters = ({ app }: IClusterFiltersProps) => {
   };
 
   const handleMinInstanceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const min = parseInt(event.target.value, 10);
+    const numInstances = event.target.value;
+    const min = numInstances ? parseInt(numInstances, 10) : undefined;
     const newSortFilter = {
       ...sortFilter,
       minInstances: min,
@@ -145,7 +153,8 @@ export const ClusterFilters = ({ app }: IClusterFiltersProps) => {
   };
 
   const handleMaxInstanceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const max = parseInt(event.target.value, 10);
+    const numInstances = event.target.value;
+    const max = numInstances ? parseInt(numInstances, 10) : undefined;
     const newSortFilter = {
       ...sortFilter,
       maxInstances: max,
@@ -169,7 +178,7 @@ export const ClusterFilters = ({ app }: IClusterFiltersProps) => {
         >
           Clear All
         </span>
-        <FilterSection heading="Search" expanded={true} helpKey="cluster.search">
+        <FilterSection key="filter-search" heading="Search" expanded={true} helpKey="cluster.search">
           <form className="form-horizontal" role="form">
             <div className="form-group nav-search">
               <input
@@ -177,7 +186,7 @@ export const ClusterFilters = ({ app }: IClusterFiltersProps) => {
                 className="form-control input-sm"
                 value={sortFilter.filter}
                 onBlur={handleSearchChange}
-                onChange={debounce(handleSearchChange)}
+                onChange={handleSearchChange}
                 style={{ width: '85%', display: 'inline-block' }}
               />
             </div>
@@ -187,7 +196,7 @@ export const ClusterFilters = ({ app }: IClusterFiltersProps) => {
       {clustersLoaded && (
         <div className="content">
           {headings.providerType.length > 1 && (
-            <FilterSection heading="Provider" expanded={true}>
+            <FilterSection key="filter-provider" heading="Provider" expanded={true}>
               {headings.providerType.map(heading => (
                 <FilterCheckbox
                   heading={heading}
@@ -199,7 +208,7 @@ export const ClusterFilters = ({ app }: IClusterFiltersProps) => {
               ))}
             </FilterSection>
           )}
-          <FilterSection heading="Account" expanded={true}>
+          <FilterSection key="filter-account" heading="Account" expanded={true}>
             {headings.account.map(heading => (
               <FilterCheckbox
                 heading={heading}
@@ -209,7 +218,7 @@ export const ClusterFilters = ({ app }: IClusterFiltersProps) => {
               />
             ))}
           </FilterSection>
-          <FilterSection heading="Region" expanded={true}>
+          <FilterSection key="filter-region" heading="Region" expanded={true}>
             {headings.region.map(heading => (
               <FilterCheckbox
                 heading={heading}
@@ -219,7 +228,7 @@ export const ClusterFilters = ({ app }: IClusterFiltersProps) => {
               />
             ))}
           </FilterSection>
-          <FilterSection heading="Category" expanded={true}>
+          <FilterSection key="filter-category" heading="Category" expanded={true}>
             {headings.category.map(heading => (
               <FilterCheckbox
                 heading={robotToHuman(heading)}
@@ -229,7 +238,7 @@ export const ClusterFilters = ({ app }: IClusterFiltersProps) => {
               />
             ))}
           </FilterSection>
-          <FilterSection heading="Stack" expanded={true}>
+          <FilterSection key="filter-stack" heading="Stack" expanded={true}>
             {headings.stack.map(heading => (
               <FilterCheckbox
                 heading={heading}
@@ -239,7 +248,7 @@ export const ClusterFilters = ({ app }: IClusterFiltersProps) => {
               />
             ))}
           </FilterSection>
-          <FilterSection heading="Detail" expanded={true}>
+          <FilterSection key="filter-detail" heading="Detail" expanded={true}>
             {headings.detail.map(heading => (
               <FilterCheckbox
                 heading={heading}
@@ -249,7 +258,7 @@ export const ClusterFilters = ({ app }: IClusterFiltersProps) => {
               />
             ))}
           </FilterSection>
-          <FilterSection heading="Status" expanded={true}>
+          <FilterSection key="filter-status" heading="Status" expanded={true}>
             <div className="form">
               {['Up', 'Down', 'Disabled', 'Starting', 'OutOfService', 'Unknown'].map(status => (
                 <div className="checkbox">
@@ -267,7 +276,7 @@ export const ClusterFilters = ({ app }: IClusterFiltersProps) => {
               ))}
             </div>
           </FilterSection>
-          <FilterSection heading="Availability Zones" expanded={true}>
+          <FilterSection key="filter-az" heading="Availability Zones" expanded={true}>
             {headings.availabilityZone.map(heading => (
               <FilterCheckbox
                 heading={heading}
@@ -277,7 +286,7 @@ export const ClusterFilters = ({ app }: IClusterFiltersProps) => {
               />
             ))}
           </FilterSection>
-          <FilterSection heading="Instance Types" expanded={true}>
+          <FilterSection key="filter-instance-types" heading="Instance Types" expanded={true}>
             {headings.instanceType.map(heading => (
               <FilterCheckbox
                 heading={heading}
@@ -287,30 +296,30 @@ export const ClusterFilters = ({ app }: IClusterFiltersProps) => {
               />
             ))}
           </FilterSection>
-          <FilterSection heading="Instance Count" expanded={true}>
+          <FilterSection key="filter-instance-count" heading="Instance Count" expanded={true}>
             <div className="form-inline">
               <div className="form-group">
-                Min:
+                {'Min:  '}
                 <input
                   type="number"
                   className="form-control input-sm"
-                  value={sortFilter.minInstances}
+                  value={sortFilter.minInstances || ''}
                   onChange={handleMinInstanceChange}
                 />
               </div>
               <div className="form-group">
-                Max:
+                {'Max:  '}
                 <input
                   type="number"
                   className="form-control input-sm"
-                  value={sortFilter.maxInstances}
+                  value={sortFilter.maxInstances || ''}
                   onChange={handleMaxInstanceChange}
                 />
               </div>
             </div>
           </FilterSection>
           {showLabelFilter && (
-            <FilterSection heading="Labels" expanded={true}>
+            <FilterSection key="filter-label" heading="Labels" expanded={true}>
               <LabelFilter
                 labelsMap={labelsMap}
                 labelFilters={labelFilters}
