@@ -1,6 +1,5 @@
 export * from './artifactIconList';
 export * from './ArtifactIconService';
-export * from './ArtifactsModeService';
 export * from './ArtifactReferenceService';
 export * from './artifactTab';
 export * from './expectedArtifact.service';
