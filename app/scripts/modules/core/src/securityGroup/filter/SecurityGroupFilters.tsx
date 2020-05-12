@@ -3,7 +3,8 @@ import { useOnStateChanged } from '@uirouter/react';
 import { chain, compact, uniq, map } from 'lodash';
 
 import { Application } from 'core/application';
-import { FilterCheckbox, ISortFilter, digestDependentFilters } from 'core/filterModel';
+import { CloudProviderLabel, CloudProviderLogo } from 'core/cloudProvider';
+import { ISortFilter, digestDependentFilters } from 'core/filterModel';
 import { useDataSource, useObservable } from 'core/presentation';
 import { FilterSection } from 'core/cluster/filter/FilterSection';
 import { SecurityGroupState } from 'core/state';
@@ -19,6 +20,8 @@ interface ISecurityGroupHeaders {
   region: string[];
   stack: string[];
 }
+
+type ISecurityGroupFilters = 'account' | 'detail' | 'providerType' | 'region' | 'stack';
 
 interface IPoolItem {
   providerType: string;
@@ -57,15 +60,6 @@ export const SecurityGroupFilters = ({ app }: ISecurityGroupFiltersProps) => {
     SecurityGroupState.filterModel.asFilterModel.sortFilter,
   );
 
-  useObservable(SecurityGroupState.filterService.groupsUpdatedStream, () => {
-    setTags(SecurityGroupState.filterModel.asFilterModel.tags);
-    setSortFilter(SecurityGroupState.filterModel.asFilterModel.sortFilter);
-  });
-
-  useOnStateChanged(() => {
-    SecurityGroupState.filterModel.asFilterModel.activate();
-  });
-
   const getHeadingsForOption = (option: string): string[] =>
     compact(uniq(map(securityGroupData, option) as string[])).sort();
   const [headings, setHeadings] = React.useState<ISecurityGroupHeaders>({
@@ -76,6 +70,15 @@ export const SecurityGroupFilters = ({ app }: ISecurityGroupFiltersProps) => {
     stack: ['(none)'].concat(getHeadingsForOption('stack')),
   });
 
+  useObservable(SecurityGroupState.filterService.groupsUpdatedStream, () => {
+    setTags(SecurityGroupState.filterModel.asFilterModel.tags);
+  });
+
+  useOnStateChanged(() => {
+    SecurityGroupState.filterModel.asFilterModel.activate();
+    SecurityGroupState.filterService.updateSecurityGroups(app);
+  });
+
   const updateSecurityGroups = (applyParamsToUrl = true): void => {
     const { account, region } = digestDependentFilters({
       sortFilter: SecurityGroupState.filterModel.asFilterModel.sortFilter,
@@ -84,9 +87,11 @@ export const SecurityGroupFilters = ({ app }: ISecurityGroupFiltersProps) => {
     });
 
     setHeadings({
-      ...headings,
       account,
+      detail: ['(none)'].concat(getHeadingsForOption('detail')),
+      providerType: getHeadingsForOption('provider'),
       region,
+      stack: ['(none)'].concat(getHeadingsForOption('stack')),
     });
 
     if (applyParamsToUrl) {
@@ -105,15 +110,33 @@ export const SecurityGroupFilters = ({ app }: ISecurityGroupFiltersProps) => {
     updateSecurityGroups();
   };
 
+  const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const target = event.target;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
+    const [header, filter] = target.name.split('.');
+
+    const newSortFilter = {
+      ...sortFilter,
+      [header]: {
+        ...sortFilter[header as ISecurityGroupFilters],
+        [filter]: Boolean(value),
+      },
+    };
+
+    setSortFilter(newSortFilter);
+    SecurityGroupState.filterModel.asFilterModel.sortFilter = newSortFilter;
+    updateSecurityGroups();
+  };
+
   const clearFilters = (): void => {
     SecurityGroupState.filterService.clearFilters();
+    SecurityGroupState.filterModel.asFilterModel.applyParamsToUrl();
     SecurityGroupState.filterService.updateSecurityGroups(app);
-    updateSecurityGroups(false);
   };
 
   React.useEffect(() => {
     updateSecurityGroups();
-  }, []);
+  }, [securityGroupData]);
 
   return (
     <div className="insight-filter-content">
@@ -150,7 +173,8 @@ export const SecurityGroupFilters = ({ app }: ISecurityGroupFiltersProps) => {
                   isCloudProvider={true}
                   key={heading}
                   sortFilterType={sortFilter.providerType}
-                  onChange={updateSecurityGroups}
+                  onChange={handleFilterChange}
+                  name={`providerType.${heading}`}
                 />
               ))}
             </FilterSection>
@@ -161,7 +185,8 @@ export const SecurityGroupFilters = ({ app }: ISecurityGroupFiltersProps) => {
                 heading={heading}
                 key={heading}
                 sortFilterType={sortFilter.account}
-                onChange={updateSecurityGroups}
+                onChange={handleFilterChange}
+                name={`account.${heading}`}
               />
             ))}
           </FilterSection>
@@ -170,8 +195,9 @@ export const SecurityGroupFilters = ({ app }: ISecurityGroupFiltersProps) => {
               <FilterCheckbox
                 heading={heading}
                 key={heading}
-                sortFilterType={sortFilter.region}
-                onChange={updateSecurityGroups}
+                sortFilterType={sortFilter.region || {}}
+                onChange={handleFilterChange}
+                name={`region.${heading}`}
               />
             ))}
           </FilterSection>
@@ -181,7 +207,8 @@ export const SecurityGroupFilters = ({ app }: ISecurityGroupFiltersProps) => {
                 heading={heading}
                 key={heading}
                 sortFilterType={sortFilter.stack}
-                onChange={updateSecurityGroups}
+                onChange={handleFilterChange}
+                name={`stack.${heading}`}
               />
             ))}
           </FilterSection>
@@ -191,12 +218,45 @@ export const SecurityGroupFilters = ({ app }: ISecurityGroupFiltersProps) => {
                 heading={heading}
                 key={heading}
                 sortFilterType={sortFilter.detail}
-                onChange={updateSecurityGroups}
+                onChange={handleFilterChange}
+                name={`detail.${heading}`}
               />
             ))}
           </FilterSection>
         </div>
       )}
+    </div>
+  );
+};
+
+// Security groups need a custom FilterCheckbox based on the way the Angular filter model and react state are synced
+const FilterCheckbox = (props: {
+  heading: string;
+  sortFilterType: { [key: string]: boolean };
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  isCloudProvider?: boolean;
+  name: string;
+}): JSX.Element => {
+  const { heading, isCloudProvider, name, onChange, sortFilterType } = props;
+
+  return (
+    <div className="checkbox">
+      <label>
+        <input
+          type="checkbox"
+          checked={Boolean(sortFilterType && sortFilterType[heading])}
+          onChange={onChange}
+          name={name}
+        />
+        {!isCloudProvider ? (
+          heading
+        ) : (
+          <>
+            <CloudProviderLogo provider="heading" height="'14px'" width="'14px'" />
+            <CloudProviderLabel provider={heading} />
+          </>
+        )}
+      </label>
     </div>
   );
 };
