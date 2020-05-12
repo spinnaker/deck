@@ -1,5 +1,3 @@
-import { SETTINGS } from 'core/config';
-
 /**
  * Currently, because there are two artifacts feature flags, there are four
  * possible configuration states:
@@ -29,9 +27,6 @@ export class ArtifactsModeService {
   public static readonly artifactsMode = ArtifactsModeService.getArtifactsMode();
 
   private static getArtifactsMode(): ArtifactsMode {
-    if (SETTINGS.feature.legacyArtifactsEnabled === true) {
-      return ArtifactsMode.LEGACY;
-    }
     return ArtifactsMode.STANDARD;
   }
 }
