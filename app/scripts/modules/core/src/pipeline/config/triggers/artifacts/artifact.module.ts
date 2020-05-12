@@ -1,6 +1,5 @@
 import { module } from 'angular';
 
-import { EXPECTED_ARTIFACT } from './expectedArtifact.component';
 import { GCS_ARTIFACT } from './gcs/gcs.artifact';
 import { DOCKER_ARTIFACT } from './docker/docker.artifact';
 import { DEFAULT_DOCKER_ARTIFACT } from './docker/defaultDocker.artifact';
@@ -9,7 +8,6 @@ import { DEFAULT_GITHUB_ARTIFACT } from './github/defaultGithub.artifact';
 import { DEFAULT_GITLAB_ARTIFACT } from './gitlab/defaultGitlab.artifact';
 import { DEFAULT_BITBUCKET_ARTIFACT } from './bitbucket/defaultBitbucket.artifact';
 import { DEFAULT_HTTP_ARTIFACT } from './http/defaultHttp.artifact';
-import { ARTIFACT } from './artifact.component';
 import { GITHUB_ARTIFACT } from './github/github.artifact';
 import { GITLAB_ARTIFACT } from './gitlab/gitlab.artifact';
 import { HELM_ARTIFACT } from './helm/helm.artifact';
@@ -26,7 +24,6 @@ import { CUSTOM_ARTIFACT } from './custom/custom.artifact';
 export const ARTIFACT_MODULE = 'spinnaker.core.pipeline.config.trigger.artifacts';
 
 module(ARTIFACT_MODULE, [
-  EXPECTED_ARTIFACT,
   CUSTOM_ARTIFACT,
   GCS_ARTIFACT,
   GITHUB_ARTIFACT,
@@ -47,5 +44,4 @@ module(ARTIFACT_MODULE, [
   DEFAULT_BITBUCKET_ARTIFACT,
   DEFAULT_BASE64_ARTIFACT,
   DEFAULT_HTTP_ARTIFACT,
-  ARTIFACT,
 ]);
