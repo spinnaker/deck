@@ -7,7 +7,6 @@ import {
   IArtifact,
   IExpectedArtifact,
   IFormikStageConfigInjectedProps,
-  IPipeline,
   RadioButtonInput,
   StageArtifactSelectorDelegate,
   StageConfigField,
@@ -24,7 +23,6 @@ import { ManifestSource } from '../../../manifest/ManifestSource';
 
 interface IPatchManifestStageConfigFormProps {
   stageFieldUpdated: () => void;
-  updatePipeline: (pipeline: IPipeline) => void;
 }
 
 interface IPatchManifestStageConfigFormState {

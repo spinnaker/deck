@@ -2,7 +2,7 @@ import React from 'react';
 import { isNil } from 'lodash';
 
 import { ExpectedArtifactService } from 'core/artifact';
-import { IExpectedArtifact, IPipeline } from 'core/domain';
+import { IExpectedArtifact } from 'core/domain';
 import { ReactSelectInput } from 'core/presentation';
 
 import { StageConfigField } from '../common';
@@ -12,16 +12,7 @@ import { BakeHelmConfigForm } from './helm/BakeHelmConfigForm';
 import { ManifestRenderers, HELM_RENDERERS } from './ManifestRenderers';
 import { BASE_64_ARTIFACT_ACCOUNT, BASE_64_ARTIFACT_TYPE } from '../../triggers/artifacts/base64/base64.artifact';
 
-interface IBakeManifestStageFormProps {
-  updatePipeline: (pipeline: IPipeline) => void;
-}
-
-export function BakeManifestStageForm({
-  application,
-  formik,
-  pipeline,
-  updatePipeline,
-}: IBakeManifestStageFormProps & IFormikStageConfigInjectedProps) {
+export function BakeManifestStageForm({ application, formik, pipeline }: IFormikStageConfigInjectedProps) {
   const stage = formik.values;
 
   React.useEffect(() => {
@@ -67,20 +58,10 @@ export function BakeManifestStageForm({
           />
         </StageConfigField>
         {stage.templateRenderer === ManifestRenderers.KUSTOMIZE && (
-          <BakeKustomizeConfigForm
-            pipeline={pipeline}
-            application={application}
-            formik={formik}
-            updatePipeline={updatePipeline}
-          />
+          <BakeKustomizeConfigForm pipeline={pipeline} application={application} formik={formik} />
         )}
         {HELM_RENDERERS.includes(stage.templateRenderer) && (
-          <BakeHelmConfigForm
-            pipeline={pipeline}
-            application={application}
-            formik={formik}
-            updatePipeline={updatePipeline}
-          />
+          <BakeHelmConfigForm pipeline={pipeline} application={application} formik={formik} />
         )}
       </div>
     </div>

@@ -10,7 +10,6 @@ import {
   IExpectedArtifact,
   IFormikStageConfigInjectedProps,
   IManifest,
-  IPipeline,
   RadioButtonInput,
   StageConfigField,
   StageArtifactSelectorDelegate,
@@ -28,7 +27,6 @@ import { ManifestSource } from '../../../manifest/ManifestSource';
 
 interface IDeployManifestStageConfigFormProps {
   accounts: IAccountDetails[];
-  updatePipeline: (pipeline: IPipeline) => void;
 }
 
 interface IDeployManifestStageConfigFormState {

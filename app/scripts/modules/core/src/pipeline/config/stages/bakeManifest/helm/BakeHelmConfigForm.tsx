@@ -3,15 +3,11 @@ import React from 'react';
 import { StageConfigField } from '../../common/stageConfigField/StageConfigField';
 import { CheckboxInput, TextInput } from 'core/presentation';
 import { MapEditor } from 'core/forms';
-import { IArtifact, IExpectedArtifact, IPipeline } from 'core/domain';
+import { IArtifact, IExpectedArtifact } from 'core/domain';
 import { excludeAllTypesExcept, ArtifactTypePatterns, StageArtifactSelectorDelegate } from 'core/artifact';
 import { IFormikStageConfigInjectedProps } from '../../FormikStageConfig';
 
-interface IBakeHelmConfigFormProps {
-  updatePipeline: (pipeline: IPipeline) => void;
-}
-
-export class BakeHelmConfigForm extends React.Component<IBakeHelmConfigFormProps & IFormikStageConfigInjectedProps> {
+export class BakeHelmConfigForm extends React.Component<IFormikStageConfigInjectedProps> {
   private static readonly excludedArtifactTypes = excludeAllTypesExcept(
     ArtifactTypePatterns.BITBUCKET_FILE,
     ArtifactTypePatterns.CUSTOM_OBJECT,

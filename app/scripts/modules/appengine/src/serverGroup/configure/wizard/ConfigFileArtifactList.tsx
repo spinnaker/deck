@@ -8,7 +8,6 @@ interface IConfigFileArtifactListProps {
   pipeline: IPipeline;
   stage: IStage;
   updateConfigArtifacts: (configArtifacts: any[]) => void;
-  updatePipeline: (changes: Partial<IPipeline>) => void;
 }
 
 export const ConfigFileArtifactList = (props: IConfigFileArtifactListProps) => {
