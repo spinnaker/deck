@@ -22,6 +22,9 @@ export class ApplicationStateProvider implements IServiceProvider {
         $type: 'react',
       },
     },
+    resolve: {
+      app: ['app', (app: Application) => app],
+    },
     children: this.insightStates,
   };
 
