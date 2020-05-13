@@ -10,8 +10,7 @@ interface IStageArtifactSelectorDelegateProps {
   fieldColumns?: number;
 }
 
-// Please consider this component deprecated. Use StageArtifactSelector
-// directly instead.
+/** @deprecated use StageArtifactSelector instead */
 export const StageArtifactSelectorDelegate = (
   props: IStageArtifactSelectorProps & IStageArtifactSelectorDelegateProps,
 ) => {
