@@ -3,9 +3,9 @@ import { useOnStateChanged } from '@uirouter/react';
 import { chain, compact, uniq, map } from 'lodash';
 
 import { Application } from 'core/application';
-import { CloudProviderLabel, CloudProviderLogo } from 'core/cloudProvider';
 import { ISortFilter, digestDependentFilters } from 'core/filterModel';
 import { useDataSource, useObservable } from 'core/presentation';
+import { FilterCheckbox } from 'core/filterModel/FilterCheckBox';
 import { FilterSection } from 'core/cluster/filter/FilterSection';
 import { SecurityGroupState } from 'core/state';
 
@@ -136,7 +136,7 @@ export const SecurityGroupFilters = ({ app }: ISecurityGroupFiltersProps) => {
 
   React.useEffect(() => {
     updateSecurityGroups();
-  }, [securityGroupData]);
+  }, [securityGroupData.length]);
 
   return (
     <div className="insight-filter-content">
@@ -173,7 +173,7 @@ export const SecurityGroupFilters = ({ app }: ISecurityGroupFiltersProps) => {
                   isCloudProvider={true}
                   key={heading}
                   sortFilterType={sortFilter.providerType}
-                  onChange={handleFilterChange}
+                  onChangeEvent={handleFilterChange}
                   name={`providerType.${heading}`}
                 />
               ))}
@@ -185,7 +185,7 @@ export const SecurityGroupFilters = ({ app }: ISecurityGroupFiltersProps) => {
                 heading={heading}
                 key={heading}
                 sortFilterType={sortFilter.account}
-                onChange={handleFilterChange}
+                onChangeEvent={handleFilterChange}
                 name={`account.${heading}`}
               />
             ))}
@@ -196,7 +196,7 @@ export const SecurityGroupFilters = ({ app }: ISecurityGroupFiltersProps) => {
                 heading={heading}
                 key={heading}
                 sortFilterType={sortFilter.region || {}}
-                onChange={handleFilterChange}
+                onChangeEvent={handleFilterChange}
                 name={`region.${heading}`}
               />
             ))}
@@ -207,7 +207,7 @@ export const SecurityGroupFilters = ({ app }: ISecurityGroupFiltersProps) => {
                 heading={heading}
                 key={heading}
                 sortFilterType={sortFilter.stack}
-                onChange={handleFilterChange}
+                onChangeEvent={handleFilterChange}
                 name={`stack.${heading}`}
               />
             ))}
@@ -218,45 +218,13 @@ export const SecurityGroupFilters = ({ app }: ISecurityGroupFiltersProps) => {
                 heading={heading}
                 key={heading}
                 sortFilterType={sortFilter.detail}
-                onChange={handleFilterChange}
+                onChangeEvent={handleFilterChange}
                 name={`detail.${heading}`}
               />
             ))}
           </FilterSection>
         </div>
       )}
-    </div>
-  );
-};
-
-// Security groups need a custom FilterCheckbox based on the way the Angular filter model and react state are synced
-const FilterCheckbox = (props: {
-  heading: string;
-  sortFilterType: { [key: string]: boolean };
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  isCloudProvider?: boolean;
-  name: string;
-}): JSX.Element => {
-  const { heading, isCloudProvider, name, onChange, sortFilterType } = props;
-
-  return (
-    <div className="checkbox">
-      <label>
-        <input
-          type="checkbox"
-          checked={Boolean(sortFilterType && sortFilterType[heading])}
-          onChange={onChange}
-          name={name}
-        />
-        {!isCloudProvider ? (
-          heading
-        ) : (
-          <>
-            <CloudProviderLogo provider="heading" height="'14px'" width="'14px'" />
-            <CloudProviderLabel provider={heading} />
-          </>
-        )}
-      </label>
     </div>
   );
 };
