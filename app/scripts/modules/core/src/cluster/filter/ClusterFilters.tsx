@@ -1,5 +1,5 @@
 import React from 'react';
-import { useOnStateChanged } from '@uirouter/react';
+import { useOnStateChanged, StateDeclaration } from '@uirouter/react';
 import { compact, uniq, map } from 'lodash';
 
 import { Application } from 'core/application';
@@ -42,7 +42,7 @@ export const ClusterFilters = ({ app }: IClusterFiltersProps) => {
     trueKeyObjectToLabelFilters(sortFilter.labels),
   );
 
-  const labelsMap = buildLabelsMap(serverGroupData);
+  const labelsMap = React.useMemo(() => buildLabelsMap(serverGroupData), [serverGroupData]);
   const showLabelFilter = Object.keys(labelsMap).length > 0;
 
   const getHeadingsForOption = (option: string): string[] =>
@@ -63,8 +63,10 @@ export const ClusterFilters = ({ app }: IClusterFiltersProps) => {
     setSortFilter(ClusterState.filterModel.asFilterModel.sortFilter);
   });
 
-  useOnStateChanged(() => {
-    ClusterState.filterModel.asFilterModel.activate();
+  useOnStateChanged((state: StateDeclaration) => {
+    if (state.name.includes('clusters')) {
+      ClusterState.filterModel.asFilterModel.activate();
+    }
   });
 
   const clearFilters = () => {
