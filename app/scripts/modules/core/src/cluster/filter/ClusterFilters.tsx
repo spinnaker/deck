@@ -61,6 +61,7 @@ export const ClusterFilters = ({ app }: IClusterFiltersProps) => {
   useObservable(ClusterState.filterService.groupsUpdatedStream, () => {
     setTags(ClusterState.filterModel.asFilterModel.tags);
     setSortFilter(ClusterState.filterModel.asFilterModel.sortFilter);
+    setLabelFilters(trueKeyObjectToLabelFilters(ClusterState.filterModel.asFilterModel.sortFilter.labels));
   });
 
   useOnStateChanged((state: StateDeclaration) => {
@@ -75,6 +76,7 @@ export const ClusterFilters = ({ app }: IClusterFiltersProps) => {
       minInstances: undefined,
       maxInstances: undefined,
     });
+    setLabelFilters([]);
     ClusterState.filterService.clearFilters();
     ClusterState.filterModel.asFilterModel.applyParamsToUrl();
     ClusterState.filterService.updateClusterGroups(app);
