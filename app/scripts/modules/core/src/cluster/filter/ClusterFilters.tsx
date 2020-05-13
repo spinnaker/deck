@@ -42,7 +42,7 @@ export const ClusterFilters = ({ app }: IClusterFiltersProps) => {
     trueKeyObjectToLabelFilters(sortFilter.labels),
   );
 
-  const labelsMap = React.useMemo(() => buildLabelsMap(serverGroupData), [serverGroupData]);
+  const labelsMap = React.useMemo(() => buildLabelsMap(serverGroupData), [serverGroupData.length]);
   const showLabelFilter = Object.keys(labelsMap).length > 0;
 
   const getHeadingsForOption = (option: string): string[] =>
@@ -88,12 +88,14 @@ export const ClusterFilters = ({ app }: IClusterFiltersProps) => {
     });
 
     setHeadings({
-      ...headings,
       account,
       availabilityZone,
+      category: getHeadingsForOption('category'),
+      detail: ['(none)'].concat(getHeadingsForOption('detail')),
       instanceType,
       providerType,
       region,
+      stack: ['(none)'].concat(getHeadingsForOption('stack')),
     });
 
     if (applyParamsToUrl) {
@@ -168,7 +170,7 @@ export const ClusterFilters = ({ app }: IClusterFiltersProps) => {
 
   React.useEffect(() => {
     updateClusterGroups();
-  }, []);
+  }, [serverGroupData.length]);
 
   return (
     <div className="insight-filter-content">
