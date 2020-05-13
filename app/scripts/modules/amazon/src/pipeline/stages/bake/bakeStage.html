@@ -6,11 +6,10 @@
     <stage-config-field label="Regions">
       <checklist items="regions" model="stage.regions" inline="true" include-select-all-button="true"></checklist>
     </stage-config-field>
-    <stage-config-field label="Skip Region Detection">
+    <stage-config-field label="Skip Region Detection" help-key="pipeline.config.bake.skipRegionDetection">
       <div class="checkbox" style="margin-bottom: 0">
         <label>
           <input type="checkbox" ng-model="stage.skipRegionDetection" />
-          Ensure bake happen only on selected regions.
         </label>
       </div>
     </stage-config-field>
