@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Option } from 'react-select';
+import { isNil } from 'lodash';
 
 import { Markdown } from '../../Markdown';
 import { OmitControlledInputPropsFrom } from './interface';
 
-import { isStringArray, orEmptyString, validationClassName } from './utils';
+import { createFakeReactSyntheticEvent, isStringArray, orEmptyString, validationClassName } from './utils';
 import { IFormInputProps } from './interface';
 
 interface IRadioButtonInputProps
@@ -13,7 +14,15 @@ interface IRadioButtonInputProps
   stringOptions?: string[];
   options?: IRadioButtonOptions[];
   inputClassName?: string;
+  /** When true, will render the radio buttons horizontally */
   inline?: boolean;
+  /**
+   * If the value prop does not match any of the options, this value will be used.
+   * This can be used to ensures that a valid option is always selected (for initial state, for example).
+   * This mechanism calls onChange with the defaultValue.
+   * If this is used, the options prop provided should be stable (useMemo)
+   */
+  defaultValue?: string;
 }
 
 interface IRadioButtonOptions extends Option {
@@ -21,20 +30,27 @@ interface IRadioButtonOptions extends Option {
 }
 
 export const RadioButtonInput = (props: IRadioButtonInputProps) => {
-  const { inline, validation, value, inputClassName, options, stringOptions, ...otherProps } = props;
-  const radioOptions: IRadioButtonOptions[] = isStringArray(stringOptions)
-    ? stringOptions.map(opt => ({ value: opt, label: opt }))
-    : options;
+  const { inline, validation, value, defaultValue, inputClassName, options, stringOptions, ...otherProps } = props;
+  const radioOptions: IRadioButtonOptions[] = useMemo(
+    () => (isStringArray(stringOptions) ? stringOptions.map(opt => ({ value: opt, label: opt })) : options),
+    [options],
+  );
+
+  useEffect(() => {
+    if (!isNil(defaultValue) && !radioOptions.map(opt => opt.value).includes(value)) {
+      props.onChange(createFakeReactSyntheticEvent({ name: props.name, value: defaultValue }));
+    }
+  }, [value, defaultValue, radioOptions]);
 
   const userClassName = orEmptyString(inputClassName);
   const validClassName = validationClassName(validation);
-  const verticalClassName = inline ? '' : 'vertical left';
-  const elementClassName = `RadioButtonInput radio ${userClassName} ${validClassName} ${verticalClassName}`;
+  const layoutClassName = inline ? 'flex-container-h margin-between-md' : 'flex-container-v margin-between-sm';
+  const elementClassName = `RadioButtonInput radio ${userClassName} ${validClassName} ${layoutClassName}`;
 
   return (
     <div className={elementClassName}>
       {radioOptions.map(option => (
-        <RadioButton inline={inline} key={option.label} value={value} option={option} {...otherProps} />
+        <RadioButton key={option.label} value={value} option={option} {...otherProps} />
       ))}
     </div>
   );
@@ -42,13 +58,12 @@ export const RadioButtonInput = (props: IRadioButtonInputProps) => {
 
 interface IRadioButtonProps {
   option: IRadioButtonOptions;
-  inline: boolean;
   value: any;
 }
-const RadioButton = ({ option, inline, value, ...otherProps }: IRadioButtonProps) => (
-  <label className={inline ? 'radio-inline clickable' : 'inline clickable'}>
+const RadioButton = ({ option, value, ...otherProps }: IRadioButtonProps) => (
+  <label className={'clickable'}>
     <input type="radio" {...otherProps} value={option.value as any} checked={option.value === value} />
     <Markdown message={option.label} style={option.help && { display: 'inline-block' }} />
-    {option.help && <> {option.help}</>}
+    {option.help && <>{option.help}</>}
   </label>
 );

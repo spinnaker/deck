@@ -1,5 +1,6 @@
 {
   "extends": "../tsconfig.base",
+  "exclude": ["scaffold", "dist"],
   "compilerOptions": {
     "outDir": "dist",
     "rootDir": "src",

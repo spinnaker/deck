@@ -4,6 +4,7 @@ export enum ManagedResourceStatus {
   ACTUATING = 'ACTUATING',
   CREATED = 'CREATED',
   DIFF = 'DIFF',
+  CURRENTLY_UNRESOLVABLE = 'CURRENTLY_UNRESOLVABLE',
   ERROR = 'ERROR',
   HAPPY = 'HAPPY',
   PAUSED = 'PAUSED',
@@ -52,6 +53,7 @@ export interface IManagedResourceSummary {
   artifact?: {
     name: string;
     type: string;
+    reference: string;
   };
 }
 
@@ -61,7 +63,9 @@ export interface IManagedEnviromentSummary {
   artifacts: Array<{
     name: string;
     type: string;
+    reference: string;
     statuses: string[];
+    pinnedVersion?: string;
     versions: {
       current?: string;
       deploying?: string;
@@ -80,6 +84,11 @@ export interface IManagedArtifactVersion {
   environments: Array<{
     name: string;
     state: 'current' | 'deploying' | 'approved' | 'pending' | 'previous' | 'vetoed' | 'skipped';
+    pinned?: {
+      at: string;
+      by: string;
+      comment?: string;
+    };
     deployedAt?: string;
     replacedAt?: string;
     replacedBy?: string;
@@ -97,6 +106,7 @@ export interface IManagedArtifactVersion {
 export interface IManagedArtifactSummary {
   name: string;
   type: string;
+  reference: string;
   versions: IManagedArtifactVersion[];
 }
 

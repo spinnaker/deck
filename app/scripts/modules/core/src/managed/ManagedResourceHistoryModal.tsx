@@ -13,6 +13,7 @@ import {
   standardGridTableLayout,
   usePollingData,
   usePrevious,
+  showModal,
 } from '../presentation';
 
 import { relativeTime, timestamp } from 'core/utils';
@@ -83,10 +84,10 @@ const viewConfigurationByEventType = {
     level: 'error',
   },
   ResourceCheckUnresolvable: {
-    displayName: 'Error',
+    displayName: 'Temporary issue',
     // Needs it's own icon, but could likely be same as ResourceCheckError
     iconClass: 'icon-md-error',
-    level: 'error',
+    level: 'warning',
   },
   ResourceActuationPaused: {
     displayName: 'Management paused',
@@ -172,6 +173,9 @@ const renderExpandedRowContent = (
   );
 };
 
+export const showManagedResourceHistoryModal = (props: IManagedResourceHistoryModalProps) =>
+  showModal(ManagedResourceHistoryModal, props);
+
 export const ManagedResourceHistoryModal = ({ resourceSummary, dismissModal }: IManagedResourceHistoryModalProps) => {
   const {
     id,
@@ -194,7 +198,7 @@ export const ManagedResourceHistoryModal = ({ resourceSummary, dismissModal }: I
 
   return (
     <>
-      <ModalHeader>Resource History</ModalHeader>
+      <ModalHeader>Resource history</ModalHeader>
       <ModalBody>
         <div
           className={classNames('ManagedResourceHistoryModal', {

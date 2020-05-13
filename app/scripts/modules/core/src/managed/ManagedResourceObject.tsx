@@ -1,6 +1,7 @@
 import React, { memo } from 'react';
 import { useSref } from '@uirouter/react';
 
+import { Application } from 'core/application';
 import { Icon, IconNames } from '../presentation';
 import { IManagedResourceSummary, IManagedEnviromentSummary, IManagedArtifactSummary } from '../domain/IManagedEntity';
 
@@ -8,8 +9,12 @@ import { getKindName } from './ManagedReader';
 import { ObjectRow } from './ObjectRow';
 import { AnimatingPill, Pill } from './Pill';
 import { getResourceName, getArtifactVersionDisplayName } from './displayNames';
+import { StatusBubble } from './StatusBubble';
+import { viewConfigurationByStatus } from './managedResourceStatusConfig';
+import { ManagedResourceStatusPopover } from './ManagedResourceStatusPopover';
 
 export interface IManagedResourceObjectProps {
+  application: Application;
   resource: IManagedResourceSummary;
   artifactVersionsByState?: IManagedEnviromentSummary['artifacts'][0]['versions'];
   artifactDetails?: IManagedArtifactSummary;
@@ -57,7 +62,7 @@ const getResourceRoutingInfo = (
 };
 
 export const ManagedResourceObject = memo(
-  ({ resource, artifactVersionsByState, artifactDetails, depth }: IManagedResourceObjectProps) => {
+  ({ application, resource, artifactVersionsByState, artifactDetails, depth }: IManagedResourceObjectProps) => {
     const { kind } = resource;
     const resourceName = getResourceName(resource);
     const routingInfo = getResourceRoutingInfo(resource) ?? { state: '', params: {} };
@@ -78,16 +83,24 @@ export const ManagedResourceObject = memo(
       </>
     );
 
+    const viewConfig = viewConfigurationByStatus[resource.status];
+    const resourceStatus = resource.status !== 'HAPPY' && viewConfig && (
+      <ManagedResourceStatusPopover application={application} placement="left" resourceSummary={resource}>
+        <StatusBubble appearance={viewConfig.appearance} iconName={viewConfig.iconName} size="small" />
+      </ManagedResourceStatusPopover>
+    );
+
     return (
       <ObjectRow
         icon={getIconTypeFromKind(kind)}
         title={route ? <a {...route}>{resourceName}</a> : resourceName}
         depth={depth}
+        content={resourceStatus}
         metadata={
-          <>
+          <span className="flex-container-h middle">
             {currentPill}
             {deployingPill}
-          </>
+          </span>
         }
       />
     );

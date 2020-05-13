@@ -1,6 +1,7 @@
 import React from 'react';
 import { pickBy, values } from 'lodash';
 
+import { Application } from 'core/application';
 import { IManagedEnviromentSummary, IManagedResourceSummary, IManagedArtifactSummary } from '../domain';
 
 import { ManagedResourceObject } from './ManagedResourceObject';
@@ -12,44 +13,52 @@ function shouldDisplayResource(resource: IManagedResourceSummary) {
 }
 
 interface IEnvironmentsListProps {
+  application: Application;
   environments: IManagedEnviromentSummary[];
   resourcesById: { [id: string]: IManagedResourceSummary };
   artifacts: IManagedArtifactSummary[];
 }
 
-export function EnvironmentsList({ environments, resourcesById, artifacts: allArtifacts }: IEnvironmentsListProps) {
+export function EnvironmentsList({
+  application,
+  environments,
+  resourcesById,
+  artifacts: allArtifacts,
+}: IEnvironmentsListProps) {
   return (
     <div>
-      {environments.map(({ name, resources, artifacts }) => (
-        <EnvironmentRow
-          key={name}
-          name={name}
-          resources={values(pickBy(resourcesById, resource => resources.indexOf(resource.id) > -1))}
-        >
-          {resources
-            .map(resourceId => resourcesById[resourceId])
-            .filter(shouldDisplayResource)
-            .map(resource => {
-              const artifactVersionsByState =
-                resource.artifact &&
-                artifacts.find(({ name, type }) => name === resource.artifact.name && type === resource.artifact.type)
-                  ?.versions;
-              const artifactDetails =
-                resource.artifact &&
-                allArtifacts.find(
-                  ({ name, type }) => name === resource.artifact.name && type === resource.artifact.type,
+      {environments.map(({ name, resources, artifacts }) => {
+        const hasPinnedVersions = artifacts.some(({ pinnedVersion }) => pinnedVersion);
+
+        return (
+          <EnvironmentRow
+            key={name}
+            name={name}
+            hasPinnedVersions={hasPinnedVersions}
+            resources={values(pickBy(resourcesById, resource => resources.indexOf(resource.id) > -1))}
+          >
+            {resources
+              .map(resourceId => resourcesById[resourceId])
+              .filter(shouldDisplayResource)
+              .map(resource => {
+                const artifactVersionsByState =
+                  resource.artifact &&
+                  artifacts.find(({ reference }) => reference === resource.artifact.reference)?.versions;
+                const artifactDetails =
+                  resource.artifact && allArtifacts.find(({ reference }) => reference === resource.artifact.reference);
+                return (
+                  <ManagedResourceObject
+                    application={application}
+                    key={resource.id}
+                    resource={resource}
+                    artifactVersionsByState={artifactVersionsByState}
+                    artifactDetails={artifactDetails}
+                  />
                 );
-              return (
-                <ManagedResourceObject
-                  key={resource.id}
-                  resource={resource}
-                  artifactVersionsByState={artifactVersionsByState}
-                  artifactDetails={artifactDetails}
-                />
-              );
-            })}
-        </EnvironmentRow>
-      ))}
+              })}
+          </EnvironmentRow>
+        );
+      })}
     </div>
   );
 }

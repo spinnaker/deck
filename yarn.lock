@@ -839,10 +839,10 @@
   dependencies:
     lodash "^4.17.15"
 
-"@spinnaker/kayenta@^0.0.91":
-  version "0.0.91"
-  resolved "https://registry.yarnpkg.com/@spinnaker/kayenta/-/kayenta-0.0.91.tgz#595c79b6103273a08c9c5019e53f7f58561be1d1"
-  integrity sha512-zVuXsWufsX5aXhf4lgXdi6TrLwstCX08HXOaZzgxldJuaezy59AeDa41oJe/ee34iIdUaDnsh5x9TOMKhZI3KQ==
+"@spinnaker/kayenta@^0.0.92":
+  version "0.0.92"
+  resolved "https://registry.yarnpkg.com/@spinnaker/kayenta/-/kayenta-0.0.92.tgz#231f9a6ce41e4a7e2373cee17e0966faa2115ff5"
+  integrity sha512-9ZyC0X1bfjkNRppYo+Yn3ipMQ0u4NOxkglEnnoN8eMpGAdqSWSknley45k/7d4bc4DsuX+dP0z4ZxquZ7H3wPA==
   dependencies:
     "@fortawesome/fontawesome-free" "5.5.0"
     "@uirouter/angularjs" "^1.0.15"
@@ -898,15 +898,15 @@
   optionalDependencies:
     fsevents "1.2.11"
 
-"@spinnaker/mocks@1.0.3":
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/@spinnaker/mocks/-/mocks-1.0.3.tgz#99883ebce324074fe222b673913e9e39d41f58bd"
-  integrity sha512-YVatQfuAq7l7IwtRkW8lX59RykxCqY/gK1OfVbMy/ieB4L+eiqappUpt4P1EbhTTk64QBnMMlZuiTjPJxMMFPQ==
+"@spinnaker/mocks@1.0.6":
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/@spinnaker/mocks/-/mocks-1.0.6.tgz#8514fdc2f9c6c149e6fdb1b533c3fbd3d8693db9"
+  integrity sha512-KfKtlBR6r1OLqafA9MgpzxDFYIC9Ohr79CvkWghnEXL73cNR+18OwGoJktgeeqk2tHP0J2Glrf2Wh3xU5/dRzw==
 
-"@spinnaker/styleguide@^1.0.18":
-  version "1.0.18"
-  resolved "https://registry.yarnpkg.com/@spinnaker/styleguide/-/styleguide-1.0.18.tgz#0d627331088e84a6e630d2cd127473f301587962"
-  integrity sha512-8XNYA2u32Ugi8d1XCExCj0CEY+QY8+u+pxC9upKaCTxKSjB8bcQIO93GSZB4cxtpLPkFNEspAGRHF5Ysq7bdJg==
+"@spinnaker/styleguide@^1.0.20":
+  version "1.0.20"
+  resolved "https://registry.yarnpkg.com/@spinnaker/styleguide/-/styleguide-1.0.20.tgz#ad397e134c29f4a33a2ecc5f1235950708aa1b4e"
+  integrity sha512-N3ebcvdZ/O/8KztAQvI9QIbD5zbgfJnHnGJg8Li/yHwBncGxMs3xat7I1Dd6UYKi/wpE/bUBRyASXuFhggh73w==
 
 "@svgr/babel-plugin-add-jsx-attribute@^5.0.1":
   version "5.0.1"
@@ -1623,33 +1623,33 @@
     semver "^6.3.0"
     tsutils "^3.17.1"
 
-"@uirouter/angularjs@1.0.25", "@uirouter/angularjs@^1.0.15":
-  version "1.0.25"
-  resolved "https://registry.yarnpkg.com/@uirouter/angularjs/-/angularjs-1.0.25.tgz#9969788eca03bc3f8b1d1b39946713a18e824e33"
-  integrity sha512-kf9bxBhqa1ZUw0aDlz4H17VqAD30MVJY6HM7J628vDeNN9yZt7SDYpwqSrR3y6NBadZUPjaKsDoKsyQQSWArNA==
+"@uirouter/angularjs@1.0.26", "@uirouter/angularjs@^1.0.15":
+  version "1.0.26"
+  resolved "https://registry.yarnpkg.com/@uirouter/angularjs/-/angularjs-1.0.26.tgz#680ba48ac2c5608a6621c09fadb88a80ceb2e0cc"
+  integrity sha512-90kS4j0cBk1rpipE/CFC+/cNpc32WHI5536oHsJzAOIDY1NoSmb5TMOISrJslg7sBGF56NEtGoRVf42gaACrfA==
   dependencies:
-    "@uirouter/core" "6.0.4"
+    "@uirouter/core" "6.0.5"
 
-"@uirouter/core@6.0.4":
-  version "6.0.4"
-  resolved "https://registry.yarnpkg.com/@uirouter/core/-/core-6.0.4.tgz#fcdc75ab10f1035176acf87a27d9d27a0101ecf9"
-  integrity sha512-TQ9XOzZY+jmWKkU4993MAEBIy7Bs3kijDzj+A6RHR8gq/3UoQm3Q/l1igfao5GZyBjid7eRVeipPK14ovCYQ3g==
+"@uirouter/core@6.0.5":
+  version "6.0.5"
+  resolved "https://registry.yarnpkg.com/@uirouter/core/-/core-6.0.5.tgz#60f13fd530fc75daa283e2bece944516559d066b"
+  integrity sha512-WN2HyELsxvqLaCMYCWojGW/QLRBgFBfwyERp5jC3Vn1njo/FLI5hplVqWMu6LIGp6Hpz3pbdtSaiFb1iY7iTVw==
 
-"@uirouter/react-hybrid@0.3.9", "@uirouter/react-hybrid@1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@uirouter/react-hybrid/-/react-hybrid-1.0.0.tgz#ec7660616b6a34648db1e32fdaf839883af5ae0e"
-  integrity sha512-uAFxISnBNTs9Y9d41Z6bu8LRAg+LvvT66JKh6G+ZHyI9SZ3G5NMjoVfVRjt/2kI6cnWiHQnQURn4gln7TEwDPg==
+"@uirouter/react-hybrid@0.3.9", "@uirouter/react-hybrid@1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@uirouter/react-hybrid/-/react-hybrid-1.0.2.tgz#8fbe0126ab873b1f525cfdd5bb2303cf72428adf"
+  integrity sha512-bi+ul3BQdfj1/fYBemtNm2BZtwyNCOHbHDprE3IZZnejPRd6C+ZuHihi6cCUk0UFAVD14D8llqcjehbCW4Mp3Q==
   dependencies:
-    "@uirouter/angularjs" "1.0.25"
-    "@uirouter/core" "6.0.4"
-    "@uirouter/react" "1.0.1"
+    "@uirouter/angularjs" "1.0.26"
+    "@uirouter/core" "6.0.5"
+    "@uirouter/react" "1.0.3"
 
-"@uirouter/react@1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@uirouter/react/-/react-1.0.1.tgz#885011c77a20ac5921f9fa8461ec0c27e7f21cc6"
-  integrity sha512-fWWMGB6U1xJNStltUUZ+ENKEnYrqwXpOoJZj9jWgZnP0NXGbhRt+vHrVJPqc4VMwlpemNpkIjn+vO3KNG00ZWA==
+"@uirouter/react@1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@uirouter/react/-/react-1.0.3.tgz#fbfa63e9aa6ad8444198754ef732e63c187d44ed"
+  integrity sha512-LTZK2BFapYTTjAVOc1mQF1mSeC5v++SNzOizhGNn//0npjzbhzy4qSt0EsFwlDtIkuZscVMsxBVNBRxnuy6G/Q==
   dependencies:
-    "@uirouter/core" "6.0.4"
+    "@uirouter/core" "6.0.5"
     classnames "^2.2.5"
     prop-types "^15.6.1"
 
@@ -8475,10 +8475,10 @@ jquery-ui@1.12.0:
   resolved "https://registry.yarnpkg.com/jquery-ui/-/jquery-ui-1.12.0.tgz#59c6037a2d9c57e9a2521a9b7a497116d41b4246"
   integrity sha1-WcYDei2cV+miUhqbeklxFtQbQkY=
 
-jquery@3.4.0:
-  version "3.4.0"
-  resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.4.0.tgz#8de513fa0fa4b2c7d2e48a530e26f0596936efdf"
-  integrity sha512-ggRCXln9zEqv6OqAGXFEcshF5dSBvCkzj6Gm2gzuR5fWawaX8t7cxKVkkygKODrDAzKdoYw3l/e3pm3vlT4IbQ==
+jquery@3.5.0:
+  version "3.5.0"
+  resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.5.0.tgz#9980b97d9e4194611c36530e7dc46a58d7340fc9"
+  integrity sha512-Xb7SVYMvygPxbFMpTFQiHh1J7HClEaThguL15N/Gg37Lri/qKyhRGZYzHRyLH8Stq3Aow0LsHO2O2ci86fCrNQ==
 
 js-base64@^2.1.9:
   version "2.1.9"
