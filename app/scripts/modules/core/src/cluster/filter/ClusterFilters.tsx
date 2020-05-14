@@ -15,6 +15,7 @@ import {
 
 import { poolBuilder } from './clusterDependentFilterHelper.service';
 import { FilterSection } from './FilterSection';
+import { FilterSearch } from './FilterSearch';
 import LabelFilter from './LabelFilter';
 
 export interface IClusterFiltersProps {
@@ -184,20 +185,12 @@ export const ClusterFilters = ({ app }: IClusterFiltersProps) => {
         >
           Clear All
         </span>
-        <FilterSection key="filter-search" heading="Search" expanded={true} helpKey="cluster.search">
-          <form className="form-horizontal" role="form">
-            <div className="form-group nav-search">
-              <input
-                type="search"
-                className="form-control input-sm"
-                value={sortFilter.filter}
-                onBlur={handleSearchChange}
-                onChange={handleSearchChange}
-                style={{ width: '85%', display: 'inline-block' }}
-              />
-            </div>
-          </form>
-        </FilterSection>
+        <FilterSearch
+          helpKey="cluster.search"
+          value={sortFilter.filter}
+          onBlur={handleSearchChange}
+          onSearchChange={handleSearchChange}
+        />
       </div>
       {clustersLoaded && (
         <div className="content">

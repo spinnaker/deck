@@ -1,5 +1,5 @@
 import React from 'react';
-import { UIView } from '@uirouter/react';
+import { UIView, useCurrentStateAndParams } from '@uirouter/react';
 
 import { ReactInjector } from 'core/reactShims';
 import { FilterCollapse } from 'core/filterModel/FilterCollapse';
@@ -19,6 +19,9 @@ export const InsightLayout = ({ app }: IInsightLayoutProps) => {
     ReactInjector.insightFilterStateModel.pinFilters(!expandFilters);
     setExpandFilters(!expandFilters);
   };
+
+  const { state: currentState } = useCurrentStateAndParams();
+  const showDetailsView = Boolean(Object.keys(currentState.views).find(v => v.indexOf('detail@') !== -1));
 
   React.useEffect(() => {
     app.ready().then(() => setAppIsReady(true));
@@ -42,8 +45,8 @@ export const InsightLayout = ({ app }: IInsightLayoutProps) => {
       )}
       <div>
         <UIView name="master" className="nav-content ng-scope" data-scroll-id="nav-content" />
-      </div>
-      {appIsReady && (
+      </div>    
+      {appIsReady && showDetailsView && (
         <div>
           <UIView name="detail" className="detail-content" />
         </div>

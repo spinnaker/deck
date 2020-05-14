@@ -21,7 +21,6 @@ export const FilterSearch = ({ helpKey, onBlur, onSearchChange, value }: IFilter
           onBlur={onBlur}
           onChange={onSearchChange}
           placeholder="Search"
-          ng-model={value}
         />
       </div>
       {helpKey && <HelpField id={helpKey} placement="right" />}
