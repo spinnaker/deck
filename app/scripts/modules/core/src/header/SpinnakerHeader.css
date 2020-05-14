@@ -3,6 +3,7 @@
   margin-bottom: 0;
   z-index: 25;
   min-height: 40px;
+  margin-left: 48px;
 }
 
 .spinnaker-header a {

@@ -1,10 +1,17 @@
 @import (reference) '~core/presentation/less/imports/commonImports.less';
 
 .vertical-navigation {
-  width: 240px;
+  min-width: 240px;
   height: 100%;
   background-color: var(--color-accent-g2);
   box-shadow: 2px 0 3px 1px var(--color-alto);
+
+  @media (min-width: 1600px) {
+    width: 270px;
+  }
+  @media (min-width: 1800px) {
+    width: 300px;
+  }
 
   .nav-header {
     color: var(--color-primary);
@@ -33,12 +40,12 @@
   }
 
   .nav-section {
-    font-size: 14px;
+    font-size: 16px;
     text-transform: uppercase;
 
     .nav-category {
       color: var(--color-accent);
-      padding-left: 40px;
+      padding-left: 34px;
       align-items: center;
 
       .badge-none {
@@ -52,7 +59,7 @@
         border-radius: 3px;
         color: var(--color-white);
         background-color: var(--color-primary);
-        padding: 3px;
+        padding: 2px;
         line-height: 14px;
         text-align: center;
         @media (max-width: 1400px) {
@@ -84,7 +91,7 @@
 
     .page-category {
       color: var(--color-accent);
-      padding-left: 68px;
+      padding-left: 62px;
       margin-top: -4px;
 
       .nav-item {

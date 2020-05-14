@@ -219,7 +219,7 @@ html {
 
     .nav-content {
       > .header {
-        margin-left: 72px;
+        margin-left: 88px;
       }
     }
   }
@@ -238,21 +238,25 @@ html {
         width: inherit;
         display: block;
       }
-      .heading {
-        margin-top: 32px;
-      }
+
       @media (min-width: 768px) and (max-width: 992px) {
-        width: 180px;
+        width: 100px;
       }
 
       @media (min-width: 992px) {
-        width: 200px;
+        width: 120px;
       }
       @media (min-width: 1200px) {
-        width: 230px;
+        width: 150px;
       }
       @media (min-width: 1400px) {
-        width: 260px;
+        width: 180px;
+      }
+      @media (min-width: 1600px) {
+        width: 210px;
+      }
+      @media (min-width: 1800px) {
+        width: 220px;
       }
       .filters-placeholder {
         display: none;
@@ -314,57 +318,11 @@ html {
   }
   .nav-content {
     margin-right: 25px;
-    @media (max-width: 768px) {
-      width: 70%;
-    }
-
-    @media (min-width: 768px) and (max-width: 992px) {
-      width: 450px;
-    }
-
-    @media (min-width: 992px) {
-      width: 540px;
-    }
-    @media (min-width: 1200px) {
-      width: 630px;
-    }
-    @media (min-width: 1400px) {
-      width: 720px;
-    }
   }
   .full-content {
     margin: 0 25px;
     flex-direction: column;
     width: 100%;
-    @media (max-width: 768px) {
-      width: 90%;
-    }
-
-    @media (min-width: 768px) and (max-width: 992px) {
-      width: 770px;
-      &.filters-expanded {
-        width: 650px;
-      }
-    }
-
-    @media (min-width: 992px) {
-      width: 900px;
-      &.filters-expanded {
-        width: 730px;
-      }
-    }
-    @media (min-width: 1200px) {
-      width: 1090px;
-      &.filters-expanded {
-        width: 900px;
-      }
-    }
-    @media (min-width: 1400px) {
-      width: 1290px;
-      &.filters-expanded {
-        width: 1070px;
-      }
-    }
   }
 }
 
@@ -1015,7 +973,7 @@ select:invalid {
   .content-body {
     .fade-in(0.15);
     .clearfix;
-    padding-left: 25px;
+    padding-left: 4px;
     ul {
       list-style-type: none;
       padding-left: 0;
@@ -1259,7 +1217,7 @@ html {
       }
       .insight {
         display: flex;
-        flex: 0 0 auto;
+        flex: 1;
         margin-left: 0;
         > div {
           display: flex;

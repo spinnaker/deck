@@ -30,7 +30,8 @@ export const InsightLayout = ({ app }: IInsightLayoutProps) => {
   if (app.notFound || app.hasError) {
     return null;
   }
-
+  // eslint-disable-next-line
+  console.log(filtersHidden, expandFilters);
   return (
     <div className={`insight ${filterClass}`}>
       {!filtersHidden && (
@@ -38,12 +39,12 @@ export const InsightLayout = ({ app }: IInsightLayoutProps) => {
           <FilterCollapse />
         </div>
       )}
-      {!filtersHidden && (
+      {!filtersHidden && expandFilters && (
         <div>
           <UIView name="nav" className="nav ng-scope" />
         </div>
       )}
-      <div>
+      <div className="flex-1">
         <UIView name="master" className="nav-content ng-scope" data-scroll-id="nav-content" />
       </div>    
       {appIsReady && showDetailsView && (

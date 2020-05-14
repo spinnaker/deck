@@ -61,7 +61,7 @@ export const ApplicationNavigation = ({ app }: IApplicationNavigationProps) => {
           <ApplicationIcon app={app} />
         </span>
         <span className="horizontal middle wrap">
-          <span className="application-name text-semibold">{app.name}</span>
+          <span className="application-name text-semibold heading-2">{app.name}</span>
           <ApplicationRefresher app={app} />
         </span>
       </h3>
@@ -73,7 +73,7 @@ export const ApplicationNavigation = ({ app }: IApplicationNavigationProps) => {
       <div className="nav-section clickable">
         <div className="page-category flex-container-h middle text-semibold" onClick={pageApplicationOwner}>
           <div className="nav-item sp-margin-s-right">
-            <Icon className="nav-item-icon" name="spMenuPager" size="extraSmall" color="danger" />
+            <Icon className="nav-item-icon" name="spMenuPager" size="medium" color="danger" />
           </div>
           <span> Page App Owner</span>
         </div>

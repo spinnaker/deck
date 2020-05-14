@@ -290,9 +290,13 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
               <FilterCollapse />
             </div>
 
-            <div className="nav">
-              {!loading && <ExecutionFilters application={app} setReloadingForFilters={this.setReloadingForFilters} />}
-            </div>
+            {filtersExpanded && (
+              <div className="nav">
+                {!loading && (
+                  <ExecutionFilters application={app} setReloadingForFilters={this.setReloadingForFilters} />
+                )}
+              </div>
+            )}
             <div
               className={`full-content ${filtersExpanded ? 'filters-expanded' : ''} ${
                 sortFilter.showDurations ? 'show-durations' : ''

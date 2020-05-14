@@ -20,7 +20,7 @@ export const FilterSearch = ({ helpKey, onBlur, onSearchChange, value }: IFilter
           value={value}
           onBlur={onBlur}
           onChange={onSearchChange}
-          placeholder="Search"
+          placeholder="Search by field"
         />
       </div>
       {helpKey && <HelpField id={helpKey} placement="right" />}

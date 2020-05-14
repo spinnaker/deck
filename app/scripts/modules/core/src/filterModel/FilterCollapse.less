@@ -2,7 +2,36 @@
   position: absolute;
 
   .filters-placeholder {
-    margin-top: 11px;
+    margin-top: 6px;
+  }
+
+  .filters-open {
+    background-color: var(--color-accent-g2);
+    height: 32px;
+    font-size: 16px;
+
+    @media (min-width: 768px) and (max-width: 992px) {
+      width: 104px;
+    }
+
+    @media (min-width: 992px) {
+      width: 124px;
+    }
+    @media (min-width: 1200px) {
+      width: 154px;
+    }
+    @media (min-width: 1400px) {
+      width: 184px;
+    }
+    @media (min-width: 1600px) {
+      width: 214px;
+    }
+    @media (min-width: 1800px) {
+      width: 224px;
+    }
+  }
+  button {
+    height: 24px;
   }
 
   .show-filter-text {

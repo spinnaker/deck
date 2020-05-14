@@ -30,7 +30,7 @@ export const NavItem = ({ app, dataSource, isActive }: INavCategoryProps) => {
       <div className={badgeClassNames}>{runningCount > 0 ? runningCount : ''}</div>
       <div className="nav-item">
         {iconName && (
-          <Icon className="nav-icon" name={iconName} size="extraSmall" color={isActive ? 'primary' : 'accent'} />
+          <Icon className="nav-icon" name={iconName} size="medium" color={isActive ? 'primary' : 'accent'} />
         )}
       </div>
       <div className="nav-item">{' ' + dataSource.label}</div>
