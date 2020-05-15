@@ -29,6 +29,11 @@ describe('Controller: PipelineConfigCtrl', function() {
       },
       app: application,
     });
+    application.pipelineConfigs.activate();
+    application.pipelineConfigs.refresh();
+    application.pipelineConfigs.data.push({ id: 'a' });
+    application.pipelineConfigs.dataUpdated();
+
     scope.$digest();
     expect(vm.state.pipelinesLoaded).toBe(true);
   });
