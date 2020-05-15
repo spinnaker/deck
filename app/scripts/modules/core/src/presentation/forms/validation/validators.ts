@@ -1,6 +1,8 @@
-import { IValidator } from './validation';
 import { isNumber } from 'lodash';
 import { robotToHuman } from 'core';
+
+export type IValidatorResult = undefined | string;
+export type IValidator = (value: any, label?: string) => IValidatorResult;
 
 const THIS_FIELD = 'This field';
 

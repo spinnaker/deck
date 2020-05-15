@@ -1,6 +1,5 @@
-import { Validators } from './validators';
+import { IValidator, Validators } from './validators';
 import { FormValidator } from './FormValidator';
-import { IValidator, IArrayItemValidator } from './validation';
 
 const { maxValue, arrayNotEmpty } = Validators;
 
@@ -8,43 +7,43 @@ describe('FormValidator validation', () => {
   describe('of optional fields', () => {
     it('returns empty errors when the value is present', () => {
       const values = { foo: 'bar' };
-      const formValidator = new FormValidator(values);
+      const formValidator = new FormValidator();
       formValidator.field('foo', 'Foo').optional();
 
-      const result = formValidator.validateForm();
+      const result = formValidator.validate(values);
       const expectedResult = {};
       expect(result).toEqual(expectedResult);
     });
 
     it('returns empty errors when the value is missing', () => {
       const values = {};
-      const formValidator = new FormValidator(values);
+      const formValidator = new FormValidator();
       formValidator.field('foo', 'Foo').optional();
 
-      const result = formValidator.validateForm();
+      const result = formValidator.validate(values);
       const expectedResult = {};
       expect(result).toEqual(expectedResult);
     });
 
     it('returns empty errors when the value is the empty string', () => {
       const values = { foo: '' };
-      const formValidator = new FormValidator(values);
+      const formValidator = new FormValidator();
       formValidator.field('foo', 'Foo').optional();
 
-      const result = formValidator.validateForm();
+      const result = formValidator.validate(values);
       const expectedResult = {};
       expect(result).toEqual(expectedResult);
     });
 
     it('returns correct error when the value is invalid', () => {
       const values = { foo: 42 };
-      const formValidator = new FormValidator(values);
+      const formValidator = new FormValidator();
       formValidator
         .field('foo', 'Foo')
         .optional()
         .withValidators(maxValue(1));
 
-      const result = formValidator.validateForm();
+      const result = formValidator.validate(values);
       const expectedResult = {
         foo: 'Foo cannot be greater than 1',
       };
@@ -53,26 +52,26 @@ describe('FormValidator validation', () => {
 
     it('returns empty errors when optionally validating a deep field that is absent', () => {
       const values = {};
-      const formValidator = new FormValidator(values);
+      const formValidator = new FormValidator();
       formValidator
         .field('foo.bar.baz', 'Foo')
         .optional()
         .withValidators(maxValue(1));
 
-      const result = formValidator.validateForm();
+      const result = formValidator.validate(values);
       const expectedResult = {};
       expect(result).toEqual(expectedResult);
     });
 
     it('returns correct error when optionally validating a deep field', () => {
       const values = { foo: { bar: { baz: 42 } } };
-      const formValidator = new FormValidator(values);
+      const formValidator = new FormValidator();
       formValidator
         .field('foo.bar.baz', 'Foo')
         .optional()
         .withValidators(maxValue(1));
 
-      const result = formValidator.validateForm();
+      const result = formValidator.validate(values);
       const expectedResult = {
         foo: {
           bar: {
@@ -87,43 +86,43 @@ describe('FormValidator validation', () => {
   describe('of required fields', () => {
     it('returns empty errors when the value is present', () => {
       const values = { foo: 'bar' };
-      const formValidator = new FormValidator(values);
+      const formValidator = new FormValidator();
       formValidator.field('foo', 'Foo').required();
 
-      const result = formValidator.validateForm();
+      const result = formValidator.validate(values);
       const expectedResult = {};
       expect(result).toEqual(expectedResult);
     });
 
     it('returns an error when the value is missing', () => {
       const values = {};
-      const formValidator = new FormValidator(values);
+      const formValidator = new FormValidator();
       formValidator.field('foo', 'Foo').required();
 
-      const result = formValidator.validateForm();
+      const result = formValidator.validate(values);
       const expectedResult = { foo: 'Foo is required.' };
       expect(result).toEqual(expectedResult);
     });
 
     it('returns a custom error message', () => {
       const values = { foo: '' };
-      const formValidator = new FormValidator(values);
+      const formValidator = new FormValidator();
       formValidator.field('foo', 'Foo').required('GIVE FOO');
 
-      const result = formValidator.validateForm();
+      const result = formValidator.validate(values);
       const expectedResult = { foo: 'GIVE FOO' };
       expect(result).toEqual(expectedResult);
     });
 
     it('returns correct error when the value is invalid', () => {
       const values = { foo: 42 };
-      const formValidator = new FormValidator(values);
+      const formValidator = new FormValidator();
       formValidator
         .field('foo', 'Foo')
         .required()
         .withValidators(maxValue(1));
 
-      const result = formValidator.validateForm();
+      const result = formValidator.validate(values);
       const expectedResult = {
         foo: 'Foo cannot be greater than 1',
       };
@@ -134,13 +133,13 @@ describe('FormValidator validation', () => {
   describe('spel aware fields', () => {
     it('returns the correct error if the value is invalid', () => {
       const values = { foo: 42 };
-      const formValidator = new FormValidator(values);
+      const formValidator = new FormValidator();
       formValidator
         .field('foo', 'Foo')
         .spelAware()
         .withValidators(maxValue(1));
 
-      const result = formValidator.validateForm();
+      const result = formValidator.validate(values);
       const expectedResult = {
         foo: 'Foo cannot be greater than 1',
       };
@@ -149,27 +148,27 @@ describe('FormValidator validation', () => {
 
     it('short circuits validation if the value contains SpEL', () => {
       const values = { foo: '${parameters.foo}' };
-      const formValidator = new FormValidator(values);
+      const formValidator = new FormValidator();
       formValidator
         .field('foo', 'Foo')
         .spelAware()
         .withValidators(maxValue(1));
 
-      const result = formValidator.validateForm();
+      const result = formValidator.validate(values);
       const expectedResult = {};
       expect(result).toEqual(expectedResult);
     });
 
     it('does not change the behavior of .required()', () => {
       const values = {};
-      const formValidator = new FormValidator(values);
+      const formValidator = new FormValidator();
       formValidator
         .field('foo', 'Foo')
         .required()
         .spelAware()
         .withValidators(maxValue(1));
 
-      const result = formValidator.validateForm();
+      const result = formValidator.validate(values);
       const expectedResult = { foo: 'Foo is required.' };
       expect(result).toEqual(expectedResult);
     });
@@ -178,22 +177,22 @@ describe('FormValidator validation', () => {
   describe('FormValidator.spelAware()', () => {
     it('applies spelAware(true) value to all ValidatableFields', () => {
       const values = { foo: '${spel}', bar: '${spel}' };
-      const formValidator = new FormValidator(values).spelAware();
+      const formValidator = new FormValidator().spelAware();
       formValidator.field('foo').withValidators(maxValue(1));
       formValidator.field('bar').withValidators(maxValue(1));
 
-      const result = formValidator.validateForm();
+      const result = formValidator.validate(values);
       const expectedResult = {};
       expect(result).toEqual(expectedResult);
     });
 
     it('applies spelAware(false) value to all ValidatableFields', () => {
       const values = { foo: '${spel}', bar: '${spel}' };
-      const formValidator = new FormValidator(values).spelAware(false);
+      const formValidator = new FormValidator().spelAware(false);
       formValidator.field('foo').withValidators(maxValue(1));
       formValidator.field('bar').withValidators(maxValue(1));
 
-      const result = formValidator.validateForm();
+      const result = formValidator.validate(values);
       const expectedResult = {
         foo: 'Foo must be a number',
         bar: 'Bar must be a number',
@@ -203,14 +202,14 @@ describe('FormValidator validation', () => {
 
     it('set to true can be overriden by a field calling .spelAware()', () => {
       const values = { foo: '${spel}', bar: '${spel}' };
-      const formValidator = new FormValidator(values).spelAware();
+      const formValidator = new FormValidator().spelAware();
       formValidator
         .field('foo')
         .withValidators(maxValue(1))
         .spelAware(false);
       formValidator.field('bar').withValidators(maxValue(1));
 
-      const result = formValidator.validateForm();
+      const result = formValidator.validate(values);
       const expectedResult = { foo: 'Foo must be a number' };
       expect(result).toEqual(expectedResult);
     });
@@ -218,14 +217,14 @@ describe('FormValidator validation', () => {
     it('set to false can be overriden by a field calling .spelAware(false', () => {
       const values = { foo: '${spel}', bar: '${spel}' };
 
-      const formValidator = new FormValidator(values).spelAware(false);
+      const formValidator = new FormValidator().spelAware(false);
       formValidator
         .field('foo')
         .withValidators(maxValue(1))
         .spelAware();
       formValidator.field('bar').withValidators(maxValue(1));
 
-      const result = formValidator.validateForm();
+      const result = formValidator.validate(values);
       const expectedResult = { bar: 'Bar must be a number' };
       expect(result).toEqual(expectedResult);
     });
@@ -233,13 +232,13 @@ describe('FormValidator validation', () => {
 
   it('.field() without a label argument derives a label from the field name', () => {
     const values = {};
-    const formValidator = new FormValidator(values);
+    const formValidator = new FormValidator();
     formValidator.field('foo').required();
     formValidator.field('bar').required();
     formValidator.field('camelCase').required();
     formValidator.field('camelCaseWithLotsOfHumps').required();
 
-    const result = formValidator.validateForm();
+    const result = formValidator.validate(values);
     const expectedResult = {
       foo: 'Foo is required.',
       bar: 'Bar is required.',
@@ -252,11 +251,11 @@ describe('FormValidator validation', () => {
 
   it('aggregates multiple levels of errors correctly', () => {
     const values = {};
-    const formValidator = new FormValidator(values);
+    const formValidator = new FormValidator();
     formValidator.field('foo', 'Foo').required();
     formValidator.field('bar.baz', 'Baz').required();
 
-    const result = formValidator.validateForm();
+    const result = formValidator.validate(values);
     const expectedResult = {
       foo: 'Foo is required.',
       bar: {
@@ -268,23 +267,19 @@ describe('FormValidator validation', () => {
 
   it('validates arrays and aggregates them correctly', () => {
     const values = { lotsastuff: [1, 2, 3, 4, 5] };
-    const formValidator = new FormValidator(values);
-    const { arrayForEach } = formValidator;
+    const formValidator = new FormValidator();
 
     formValidator
       .field('lotsastuff', 'Array')
       .required()
-      .withValidators(
-        arrayNotEmpty(),
-        arrayForEach(itemBuilder => {
-          itemBuilder
-            .item('Item')
-            .required()
-            .withValidators(maxValue(3));
-        }),
-      );
+      .withValidators(arrayNotEmpty())
+      .arrayForEach(path => {
+        const itemBuilder = new FormValidator(path, 'Item');
+        itemBuilder.required().withValidators(maxValue(3));
+        return itemBuilder;
+      });
 
-    const result = formValidator.validateForm();
+    const result = formValidator.validate(values);
     const expectedResult = {
       lotsastuff: [undefined, undefined, undefined, 'Item cannot be greater than 3', 'Item cannot be greater than 3'],
     };
@@ -296,20 +291,19 @@ describe('FormValidator validation', () => {
       lotsastuff: [1, 2, 3, 4, 5],
     };
 
-    const formValidator = new FormValidator(values);
-    const { arrayForEach } = formValidator;
+    const formValidator = new FormValidator();
 
     formValidator
       .field('lotsastuff', 'Array')
       .required()
-      .withValidators(
-        arrayNotEmpty(),
-        arrayForEach(itemBuilder => {
-          itemBuilder.item('Item').required();
-        }),
-      );
+      .withValidators(arrayNotEmpty())
+      .arrayForEach(path => {
+        const itemBuilder = new FormValidator(path, 'Item');
+        itemBuilder.required();
+        return itemBuilder;
+      });
 
-    const result = formValidator.validateForm();
+    const result = formValidator.validate(values);
     const expectedResult = {};
     expect(result).toEqual(expectedResult);
   });
@@ -319,20 +313,19 @@ describe('FormValidator validation', () => {
       lotsastuff: [{ key: 1 }, { value: 2 }, 3, 4, 5],
     };
 
-    const formValidator = new FormValidator(values);
-    const { arrayForEach } = formValidator;
+    const formValidator = new FormValidator();
     formValidator
-      .field('lotsastuff', 'Array')
+      .field('lotsastuff')
       .required()
-      .withValidators(
-        (array, label) => array.length < 1 && `${label} must have at least 1 item.`,
-        arrayForEach(itemBuilder => {
-          itemBuilder.field(`key`, `Item Key`).required();
-          itemBuilder.field(`value`, `Item Value`).required();
-        }),
-      );
+      .withValidators((array, label) => array.length < 1 && `${label} must have at least 1 item.`)
+      .arrayForEach(path => {
+        const itemBuilder = new FormValidator(path);
+        itemBuilder.field(`key`, `Item Key`).required();
+        itemBuilder.field(`value`, `Item Value`).required();
+        return itemBuilder;
+      });
 
-    const result = formValidator.validateForm();
+    const result = formValidator.validate(values);
     const expectedResult = {
       lotsastuff: [
         { value: 'Item Value is required.' },
@@ -367,30 +360,31 @@ describe('FormValidator validation', () => {
       ],
     };
 
-    const formValidator = new FormValidator(values);
+    const formValidator = new FormValidator();
     const isArray: IValidator = (array, label) => !Array.isArray(array) && `${label} must be an array.`;
-    const allOfTheThingsValidator: IArrayItemValidator = itemBuilder => {
-      itemBuilder.field(`all`, 'All').required();
-      itemBuilder.field(`of`, 'Of').required();
-      itemBuilder.field(`the`, 'The').required();
-      itemBuilder.field(`things`, 'Things').required();
-    };
 
-    const outerArrayItemValidator: IArrayItemValidator = itemBuilder => {
-      itemBuilder.field('key', 'Item key').required();
-      itemBuilder
-        .field('data', 'Item data')
-        .required()
-        .withValidators(isArray, arrayForEach(allOfTheThingsValidator));
-    };
-
-    const { arrayForEach } = formValidator;
     formValidator
       .field('letsgetcrazy', 'Outer array')
       .optional()
-      .withValidators(arrayForEach(outerArrayItemValidator));
+      .arrayForEach(path => {
+        const itemBuilder = new FormValidator(path, 'Item');
+        itemBuilder.field('key', 'Item key').required();
+        itemBuilder
+          .field('data', 'Item data')
+          .required()
+          .withValidators(isArray)
+          .arrayForEach(path => {
+            const itemBuilder = new FormValidator(path, 'Item');
+            itemBuilder.field(`all`, 'All').required();
+            itemBuilder.field(`of`, 'Of').required();
+            itemBuilder.field(`the`, 'The').required();
+            itemBuilder.field(`things`, 'Things').required();
+            return itemBuilder;
+          });
+        return itemBuilder;
+      });
 
-    const result = formValidator.validateForm();
+    const result = formValidator.validate(values);
     const expectedResult = {
       letsgetcrazy: [
         { key: 'Item key is required.', data: 'Item data is required.' },

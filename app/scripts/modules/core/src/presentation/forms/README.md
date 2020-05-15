@@ -67,12 +67,12 @@ import { FormValidator } from 'core/presentation';
   initialValues={{ email: '' }}
   validate={values => {
     const emailRegexp = /[^@]+@[^@]+/;
-    const formValidator = new FormValidator(values);
+    const formValidator = new FormValidator();
     formValidator
       .field('email')
       .required()
       .withValidators(value => (emailRegexp.exec(value) ? null : 'Please enter a valid email'));
-    return formValidator.result();
+    return formValidator.validate(values);
   }}
   render={formik => {
     return (
