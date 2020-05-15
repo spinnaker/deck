@@ -19,12 +19,12 @@ export class ExecutionRole extends React.Component<IExecutionRoleProps>
   }
 
   public validate(values: IAmazonFunctionUpsertCommand): FormikErrors<IAmazonFunctionUpsertCommand> {
-    const validator = new FormValidator(values);
+    const validator = new FormValidator();
     validator
       .field('role', 'Role ARN')
       .required()
       .withValidators(iamRoleValidator);
-    return validator.validateForm();
+    return validator.validate(values);
   }
 
   public render() {

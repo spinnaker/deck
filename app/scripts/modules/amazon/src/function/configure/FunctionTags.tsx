@@ -15,12 +15,12 @@ export interface IFunctionTagsProps {
 export class FunctionTags extends React.Component<IFunctionTagsProps>
   implements IWizardPageComponent<IAmazonFunctionUpsertCommand> {
   public validate = (values: IAmazonFunctionUpsertCommand) => {
-    const validator = new FormValidator(values);
+    const validator = new FormValidator();
     validator
       .field('tags', 'Tag')
       .required()
       .withValidators(awsTagsValidator);
-    return validator.validateForm();
+    return validator.validate(values);
   };
 
   public render() {

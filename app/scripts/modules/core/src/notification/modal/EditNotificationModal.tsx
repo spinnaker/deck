@@ -27,12 +27,12 @@ export class EditNotificationModal extends React.Component<IEditNotificationModa
   }
 
   private validate = (values: INotification): any => {
-    const formValidator = new FormValidator(values);
+    const formValidator = new FormValidator();
     formValidator
       .field('when', 'Notify when')
       .required()
       .withValidators((value: any[]) => !value.length && 'Please select when the notification should execute');
-    return formValidator.validateForm();
+    return formValidator.validate(values);
   };
 
   public render(): React.ReactElement<EditNotificationModal> {

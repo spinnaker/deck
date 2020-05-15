@@ -348,8 +348,8 @@ export class ManualExecutionModal extends React.Component<IManualExecutionModalP
   };
 
   private validate = (values: IPipelineCommand): any => {
-    const formValidator = new FormValidator(values);
-    return formValidator.validateForm();
+    const formValidator = new FormValidator();
+    return formValidator.validate(values);
   };
 
   public render(): React.ReactElement<ManualExecutionModal> {

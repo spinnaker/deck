@@ -22,12 +22,12 @@ export interface IFunctionEnvironmentVariablesProps {
 export class FunctionEnvironmentVariables extends React.Component<IFunctionEnvironmentVariablesProps>
   implements IWizardPageComponent<IAmazonFunctionUpsertCommand> {
   public validate = (values: IAmazonFunctionUpsertCommand) => {
-    const validator = new FormValidator(values);
+    const validator = new FormValidator();
     validator
       .field('KMSKeyArn', 'KMS Key ARN')
       .optional()
       .withValidators(awsArnValidator);
-    return validator.validateForm();
+    return validator.validate(values);
   };
 
   public render() {

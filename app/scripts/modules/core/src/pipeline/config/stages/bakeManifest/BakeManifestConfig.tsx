@@ -32,7 +32,7 @@ export function BakeManifestConfig({ application, pipeline, stage, updateStage }
 }
 
 export function validateBakeManifestStage(stage: IStage): FormikErrors<IStage> {
-  const formValidator = new FormValidator(stage);
+  const formValidator = new FormValidator();
 
   formValidator
     .field('expectedArtifacts', 'Produced artifacts')
@@ -48,5 +48,5 @@ export function validateBakeManifestStage(stage: IStage): FormikErrors<IStage> {
     formValidator.field('outputName', 'Name').required();
   }
 
-  return formValidator.validateForm();
+  return formValidator.validate(stage);
 }

@@ -53,52 +53,51 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
     const duplicateTargetGroups = uniq(
       flatten(filter(groupBy(values.targetGroups, 'name'), count => count.length > 1)).map(tg => tg.name),
     );
-    const formValidator = new FormValidator(values);
-    const { arrayForEach } = formValidator;
+    const formValidator = new FormValidator();
 
-    formValidator.field('targetGroups').withValidators(
-      arrayForEach(builder => {
-        builder
-          .field('name', 'Name')
-          .required()
-          .withValidators(
-            isNameInUse(this.state.existingTargetGroupNames, values.credentials, values.region),
-            isNameLong(this.props.app.name.length),
-            Validators.valueUnique(
-              duplicateTargetGroups,
-              'There is already a target group in this load balancer with the same name.',
-            ),
-          );
-        builder
-          .field('port', 'Port')
-          .required()
-          .spelAware()
-          .withValidators(value => spelNumberCheck(value));
-        builder
-          .field('healthCheckInterval', 'Health Check Interval')
-          .required()
-          .spelAware()
-          .withValidators(value => spelNumberCheck(value));
-        builder
-          .field('healthyThreshold', 'Healthy Threshold')
-          .required()
-          .spelAware()
-          .withValidators(value => spelNumberCheck(value));
-        builder
-          .field('unhealthyThreshold', 'Unhealthy Threshold')
-          .required()
-          .spelAware()
-          .withValidators(value => spelNumberCheck(value));
-        builder
-          .field('healthCheckPort', 'Health Check Port')
-          .required()
-          .spelAware()
-          .withValidators(value => (value === 'traffic-port' ? null : spelNumberCheck(value)));
-        builder.field('protocol', 'Protocol').required();
-        builder.field('healthCheckProtocol', 'Health Check Protocol').required();
-      }),
-    );
-    return formValidator.validateForm();
+    formValidator.field('targetGroups').arrayForEach(path => {
+      const builder = new FormValidator(path, 'Item');
+      builder
+        .field('name', 'Name')
+        .required()
+        .withValidators(
+          isNameInUse(this.state.existingTargetGroupNames, values.credentials, values.region),
+          isNameLong(this.props.app.name.length),
+          Validators.valueUnique(
+            duplicateTargetGroups,
+            'There is already a target group in this load balancer with the same name.',
+          ),
+        );
+      builder
+        .field('port', 'Port')
+        .required()
+        .spelAware()
+        .withValidators(value => spelNumberCheck(value));
+      builder
+        .field('healthCheckInterval', 'Health Check Interval')
+        .required()
+        .spelAware()
+        .withValidators(value => spelNumberCheck(value));
+      builder
+        .field('healthyThreshold', 'Healthy Threshold')
+        .required()
+        .spelAware()
+        .withValidators(value => spelNumberCheck(value));
+      builder
+        .field('unhealthyThreshold', 'Unhealthy Threshold')
+        .required()
+        .spelAware()
+        .withValidators(value => spelNumberCheck(value));
+      builder
+        .field('healthCheckPort', 'Health Check Port')
+        .required()
+        .spelAware()
+        .withValidators(value => (value === 'traffic-port' ? null : spelNumberCheck(value)));
+      builder.field('protocol', 'Protocol').required();
+      builder.field('healthCheckProtocol', 'Health Check Protocol').required();
+      return builder;
+    });
+    return formValidator.validate(values);
   }
 
   private removeAppName(name: string): string {

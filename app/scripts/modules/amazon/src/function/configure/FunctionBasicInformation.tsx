@@ -64,12 +64,12 @@ export class FunctionBasicInformation extends React.Component<IFunctionProps, IF
   private destroy$ = new Subject<void>();
 
   public validate(values: IAmazonFunctionUpsertCommand): FormikErrors<IAmazonFunctionUpsertCommand> {
-    const validator = new FormValidator(values);
+    const validator = new FormValidator();
     validator
       .field('s3bucket', 'S3 Bucket Name')
       .optional()
       .withValidators(s3BucketNameValidator);
-    const errors = validator.validateForm();
+    const errors = validator.validate(values);
 
     if (
       this.props.isNew &&

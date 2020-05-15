@@ -2,7 +2,7 @@ import { FormValidator, IContextualValidator, IStage } from 'core';
 import { BuildDefinitionSource } from './IGoogleCloudBuildStage';
 
 export const validate: IContextualValidator = (stage: IStage) => {
-  const formValidator = new FormValidator(stage);
+  const formValidator = new FormValidator();
   formValidator.field('account', 'Account').required();
   if (stage.buildDefinitionSource === BuildDefinitionSource.TEXT) {
     formValidator.field('buildDefinition', 'Build Definition').required();
@@ -14,5 +14,5 @@ export const validate: IContextualValidator = (stage: IStage) => {
     formValidator.field(`repoSource.${triggerType}`, 'Value').required();
   }
   // todo(mneterval): add reusable validator for stage artifacts
-  return formValidator.validateForm();
+  return formValidator.validate(stage);
 };

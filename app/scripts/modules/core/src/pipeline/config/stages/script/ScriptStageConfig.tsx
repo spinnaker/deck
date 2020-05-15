@@ -89,8 +89,8 @@ export const ScriptStageConfig: React.SFC<IStageConfigProps> = stageConfigProps 
 );
 
 export const validate: IContextualValidator = stage => {
-  const formValidator = new FormValidator(stage);
+  const formValidator = new FormValidator();
   formValidator.field('command', 'Command').required();
   formValidator.field('scriptPath', 'Script Path').required();
-  return formValidator.validateForm();
+  return formValidator.validate(stage);
 };

@@ -62,12 +62,12 @@ export class EditAwsCodeBuildSourceModal extends React.Component<IEditAwsCodeBui
   };
 
   private validate = (values: IAwsCodeBuildSource): any => {
-    const formValidator = new FormValidator(values);
+    const formValidator = new FormValidator();
     formValidator
       .field('sourceArtifact', 'Source Artifact') // display name should exist no matter if it's artifact or id
       .required()
       .withValidators((value: any[]) => !value && 'Artifact is required');
-    return formValidator.validateForm();
+    return formValidator.validate(values);
   };
 
   public render(): React.ReactElement<EditAwsCodeBuildSourceModal> {

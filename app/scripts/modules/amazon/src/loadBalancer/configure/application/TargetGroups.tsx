@@ -53,80 +53,79 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
       flatten(filter(groupBy(values.targetGroups, 'name'), count => count.length > 1)).map(tg => tg.name),
     );
 
-    const formValidator = new FormValidator(values);
-    const { arrayForEach } = formValidator;
+    const formValidator = new FormValidator();
 
-    formValidator.field('targetGroups').withValidators(
-      arrayForEach((builder, item) => {
-        builder
-          .field('name', 'Name')
-          .withValidators(
-            isNameInUse(this.state.existingTargetGroupNames, values.credentials, values.region),
-            isNameLong(this.props.app.name.length),
-            Validators.valueUnique(
-              duplicateTargetGroups,
-              'There is already a target group in this load balancer with the same name.',
-            ),
-          );
-        builder
-          .field('healthCheckInterval', 'Health Check Interval')
-          .withValidators(isValidHealthCheckInterval(item), Validators.checkBetween('healthCheckInterval', 5, 300));
+    formValidator.field('targetGroups').arrayForEach((path, item) => {
+      const builder = new FormValidator(path, 'Item');
+      builder
+        .field('name', 'Name')
+        .withValidators(
+          isNameInUse(this.state.existingTargetGroupNames, values.credentials, values.region),
+          isNameLong(this.props.app.name.length),
+          Validators.valueUnique(
+            duplicateTargetGroups,
+            'There is already a target group in this load balancer with the same name.',
+          ),
+        );
+      builder
+        .field('healthCheckInterval', 'Health Check Interval')
+        .withValidators(isValidHealthCheckInterval(item), Validators.checkBetween('healthCheckInterval', 5, 300));
+      builder
+        .field('healthyThreshold', 'Healthy Threshold')
+        .withValidators(Validators.checkBetween('healthyThreshold', 2, 10));
+      builder
+        .field('unhealthyThreshold', 'Unhealthy Threshold')
+        .spelAware()
+        .withValidators(Validators.checkBetween('unhealthyThreshold', 2, 10));
+      builder
+        .field('healthCheckTimeout', 'Timeout')
+        .withValidators(isValidTimeout(item), Validators.checkBetween('healthCheckTimeout', 2, 120));
+
+      if (item.targetType !== 'lambda') {
+        builder.field('protocol', 'Protocol').required();
+        builder.field('healthCheckPath', 'Health Check Path').required();
+        builder.field('healthCheckProtocol', 'Health Check Protocol').required();
+        builder.field('name', 'Name').required();
         builder
           .field('healthyThreshold', 'Healthy Threshold')
-          .withValidators(Validators.checkBetween('healthyThreshold', 2, 10));
+          .required()
+          .spelAware()
+          .withValidators(value => spelNumberCheck(value));
         builder
           .field('unhealthyThreshold', 'Unhealthy Threshold')
+          .required()
           .spelAware()
-          .withValidators(Validators.checkBetween('unhealthyThreshold', 2, 10));
+          .withValidators(value => spelNumberCheck(value));
         builder
-          .field('healthCheckTimeout', 'Timeout')
-          .withValidators(isValidTimeout(item), Validators.checkBetween('healthCheckTimeout', 2, 120));
+          .field('healthCheckInterval', 'Health Check Interval')
+          .required()
+          .spelAware()
+          .withValidators(value => spelNumberCheck(value));
+        builder
+          .field('healthCheckPort', 'Health Check Port')
+          .required()
+          .spelAware()
+          .withValidators(value => (value === 'traffic-port' ? null : spelNumberCheck(value)));
+        builder
+          .field('port', 'Port')
+          .required()
+          .spelAware()
+          .withValidators(value => spelNumberCheck(value));
+        builder
+          .field('healthyThreshold', 'Healthy Threshold')
+          .required()
+          .spelAware()
+          .withValidators(value => spelNumberCheck(value), Validators.checkBetween('healthyThreshold', 2, 10));
+        builder
+          .field('unhealthyThreshold', 'Unhealthy Threshold')
+          .required()
+          .spelAware()
+          .withValidators(value => spelNumberCheck(value), Validators.checkBetween('unhealthyThreshold', 2, 10));
+      }
+      return builder;
+    });
 
-        if (item.targetType !== 'lambda') {
-          builder.field('protocol', 'Protocol').required();
-          builder.field('healthCheckPath', 'Health Check Path').required();
-          builder.field('healthCheckProtocol', 'Health Check Protocol').required();
-          builder.field('name', 'Name').required();
-          builder
-            .field('healthyThreshold', 'Healthy Threshold')
-            .required()
-            .spelAware()
-            .withValidators(value => spelNumberCheck(value));
-          builder
-            .field('unhealthyThreshold', 'Unhealthy Threshold')
-            .required()
-            .spelAware()
-            .withValidators(value => spelNumberCheck(value));
-          builder
-            .field('healthCheckInterval', 'Health Check Interval')
-            .required()
-            .spelAware()
-            .withValidators(value => spelNumberCheck(value));
-          builder
-            .field('healthCheckPort', 'Health Check Port')
-            .required()
-            .spelAware()
-            .withValidators(value => (value === 'traffic-port' ? null : spelNumberCheck(value)));
-          builder
-            .field('port', 'Port')
-            .required()
-            .spelAware()
-            .withValidators(value => spelNumberCheck(value));
-          builder
-            .field('healthyThreshold', 'Healthy Threshold')
-            .required()
-            .spelAware()
-            .withValidators(value => spelNumberCheck(value), Validators.checkBetween('healthyThreshold', 2, 10));
-          builder
-            .field('unhealthyThreshold', 'Unhealthy Threshold')
-            .required()
-            .spelAware()
-            .withValidators(value => spelNumberCheck(value), Validators.checkBetween('unhealthyThreshold', 2, 10));
-        }
-      }),
-    );
-
-    return formValidator.validateForm();
+    return formValidator.validate(values);
   }
 
   private removeAppName(name: string): string {

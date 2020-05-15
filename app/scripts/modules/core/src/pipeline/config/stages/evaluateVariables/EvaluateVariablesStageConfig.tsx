@@ -45,18 +45,18 @@ const duplicateKeyValidatorFactory = (variables: IEvaluatedVariable[] = []) => {
 };
 
 export function validateEvaluateVariablesStage(stage: IStage) {
-  const formValidator = new FormValidator(stage);
+  const formValidator = new FormValidator();
   const duplicateKeyValidator = duplicateKeyValidatorFactory(stage.variables);
-  formValidator.field('variables').withValidators(
-    formValidator.arrayForEach(item => {
-      item
-        .field('key', 'Variable Name')
-        .required()
-        .withValidators(variableNameValidator, duplicateKeyValidator);
-      item.field('value', 'Expression').required();
-    }),
-  );
-  return formValidator.validateForm();
+  formValidator.field('variables').arrayForEach(path => {
+    const item = new FormValidator(path, 'Item');
+    item
+      .field('key', 'Variable Name')
+      .required()
+      .withValidators(variableNameValidator, duplicateKeyValidator);
+    item.field('value', 'Expression').required();
+    return item;
+  });
+  return formValidator.validate(stage);
 }
 
 function PreviewConfiguration(props: IExecutionAndStagePickerProps) {
