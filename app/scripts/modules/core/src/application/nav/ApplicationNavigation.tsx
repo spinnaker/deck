@@ -57,13 +57,11 @@ export const ApplicationNavigation = ({ app }: IApplicationNavigationProps) => {
   return (
     <div className="vertical-navigation layer-high">
       <h3 className="heading-2 horizontal middle nav-header sp-margin-l sp-padding-l-bottom">
-        <span className="hidden-xs sp-margin-l-right">
+        <div className="hidden-xs sp-margin-l-right vertical">
           <ApplicationIcon app={app} />
-        </span>
-        <span className="horizontal middle wrap">
-          <span className="application-name text-semibold heading-2">{app.name}</span>
           <ApplicationRefresher app={app} />
-        </span>
+        </div>
+        <span className="application-name text-semibold heading-2 self-left">{app.name}</span>
       </h3>
       {navSections
         .filter(section => section.length)

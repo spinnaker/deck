@@ -12,7 +12,7 @@ export interface IFilterSearchProps {
 
 export const FilterSearch = ({ helpKey, onBlur, onSearchChange, value }: IFilterSearchProps) => (
   <div className="filter-search">
-    <form className="horizontal middle space-between" role="form">
+    <form className="horizontal middle" role="form">
       <div className="form-group nav-search">
         <input
           type="search"

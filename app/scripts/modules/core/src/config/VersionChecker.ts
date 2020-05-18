@@ -30,20 +30,20 @@ export class VersionChecker {
 
   private static versionRetrieved(response: any): void {
     const data: IDeckVersion = response.data;
-    if (data.version === this.currentVersion.version) {
-      this.newVersionSeenCount = 0;
-    } else {
-      this.newVersionSeenCount++;
-      if (this.newVersionSeenCount > 5) {
-        $log.debug('New Deck version:', data.version, 'created', timestamp(data.created));
-        NotifierService.publish({
-          key: 'newVersion',
-          action: 'create',
-          body: `A new version of Spinnaker is available
+    // if (data.version === this.currentVersion.version) {
+    //   this.newVersionSeenCount = 0;
+    // } else {
+    //this.newVersionSeenCount++;
+    // if (this.newVersionSeenCount > 5) {
+    $log.debug('New Deck version:', data.version, 'created', timestamp(data.created));
+    NotifierService.publish({
+      key: 'newVersion',
+      action: 'create',
+      body: `A new version of Spinnaker is available
               <a role="button" class="action" onclick="document.location.reload(true)">Refresh</a>`,
-        });
-        this.scheduler.unsubscribe();
-      }
-    }
+    });
+    this.scheduler.unsubscribe();
+    // }
+    // }
   }
 }
