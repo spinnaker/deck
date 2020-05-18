@@ -6,6 +6,7 @@ import { NgReact } from 'core/reactShims';
 import { Overridable } from 'core/overrideRegistry';
 import { GlobalSearch } from 'core/search/global/GlobalSearch';
 import { HelpMenu } from 'core/help/HelpMenu';
+import { Icon } from 'core/presentation';
 
 import './SpinnakerHeader.css';
 
@@ -16,6 +17,7 @@ export class SpinnakerHeader extends React.Component<{}, {}> {
     return <SpinnakerHeaderContent />;
   }
 }
+
 
 /**
  * This needs to be a functional component to use an external module's hook.
@@ -32,7 +34,7 @@ export const SpinnakerHeaderContent = () => {
   const { UserMenu } = NgReact;
 
   const [navExpanded, setNavExpanded] = React.useState(!isDevicePhoneOrSmaller());
-  const toggleNavItems = () => setNavExpanded(!navExpanded);
+  const toggleNav = () => setNavExpanded(!navExpanded);
 
   const searchSref = useSrefActive('home.infrastructure', null, 'active');
   const projectsSref = useSrefActive('home.projects', null, 'active');
@@ -42,14 +44,12 @@ export const SpinnakerHeaderContent = () => {
   return (
     <nav className="container spinnaker-header" role="navigation" aria-label="Main Menu">
       <div className="navbar-header horizontal middle">
+        <div onClick={toggleNav} className="sp-margin-xl-right">
+            <Icon name={navExpanded ? 'menuClose' : 'menu'} size="medium" color="white" />
+        </div>
         <a className="navbar-brand flex-1" href="#">
           SPINNAKER
         </a>
-        <button type="button" className="navbar-toggle" onClick={toggleNavItems}>
-          <span className="icon-bar" />
-          <span className="icon-bar" />
-          <span className="icon-bar" />
-        </button>
       </div>
       {navExpanded && (
         <div className="nav-container nav-items">

@@ -30,8 +30,7 @@ export const InsightLayout = ({ app }: IInsightLayoutProps) => {
   if (app.notFound || app.hasError) {
     return null;
   }
-  // eslint-disable-next-line
-  console.log(filtersHidden, expandFilters);
+
   return (
     <div className={`insight ${filterClass}`}>
       {!filtersHidden && (
