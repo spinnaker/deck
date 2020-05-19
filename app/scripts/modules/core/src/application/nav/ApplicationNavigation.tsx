@@ -56,7 +56,7 @@ export const ApplicationNavigation = ({ app }: IApplicationNavigationProps) => {
 
   return (
     <div className="vertical-navigation layer-high">
-      <h3 className="heading-2 horizontal middle nav-header sp-margin-l sp-padding-l-bottom">
+      <h3 className="heading-2 horizontal middle nav-header sp-margin-l">
         <div className="hidden-xs sp-margin-l-right vertical">
           <ApplicationIcon app={app} />
           <ApplicationRefresher app={app} />

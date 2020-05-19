@@ -6,7 +6,7 @@ import { Application } from 'core/application';
 import { ISortFilter, digestDependentFilters } from 'core/filterModel';
 import { useDataSource, useObservable } from 'core/presentation';
 import { FilterCheckbox } from 'core/filterModel/FilterCheckBox';
-import { FilterSearch } from './FilterSearch';
+import { FilterSearch } from 'core/cluster/filter/FilterSearch';
 import { FilterSection } from 'core/cluster/filter/FilterSection';
 import { SecurityGroupState } from 'core/state';
 
