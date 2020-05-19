@@ -25,7 +25,8 @@ export class ApplicationComponent extends React.Component<IApplicationComponentP
     super(props);
     this.mountApplication(props.app);
     this.state = {
-      showVerticalNav: !CollapsibleSectionStateCache.isExpanded('verticalNav'),
+      showVerticalNav:
+        !CollapsibleSectionStateCache.isSet('verticalNav') || CollapsibleSectionStateCache.isExpanded('verticalNav'),
     };
   }
 
@@ -33,7 +34,11 @@ export class ApplicationComponent extends React.Component<IApplicationComponentP
     this.cacheRefresh = SchedulerFactory.createScheduler(500);
     this.cacheRefresh.subscribe(() => {
       if (CollapsibleSectionStateCache.isExpanded('verticalNav') !== this.state.showVerticalNav) {
-        this.setState({ showVerticalNav: CollapsibleSectionStateCache.isExpanded('verticalNav') });
+        this.setState({
+          showVerticalNav:
+            !CollapsibleSectionStateCache.isSet('verticalNav') ||
+            CollapsibleSectionStateCache.isExpanded('verticalNav'),
+        });
       }
     });
   }

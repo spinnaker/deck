@@ -61,7 +61,7 @@ export const ApplicationNavigation = ({ app }: IApplicationNavigationProps) => {
           <ApplicationIcon app={app} />
           <ApplicationRefresher app={app} />
         </div>
-        <span className="application-name text-semibold heading-2 self-left">{app.name}</span>
+        <span className="application-name text-semibold heading-2 sp-margin-xs-left self-left">{app.name}</span>
       </h3>
       {navSections
         .filter(section => section.length)
