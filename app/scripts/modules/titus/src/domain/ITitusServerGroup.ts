@@ -16,6 +16,7 @@ export interface ITitusServerGroup extends IServerGroup {
   capacityGroup?: string;
   disruptionBudget?: IJobDisruptionBudget;
   entryPoint: string;
+  cmd?: string;
   iamProfile: string;
   id?: string;
   image?: ITitusImage;

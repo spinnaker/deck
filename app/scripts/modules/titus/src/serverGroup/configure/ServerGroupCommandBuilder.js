@@ -100,6 +100,7 @@ angular.module(TITUS_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER, []).factor
         labels: serverGroup.labels,
         containerAttributes: serverGroup.containerAttributes,
         entryPoint: serverGroup.entryPoint,
+        cmd: serverGroup.cmd,
         iamProfile: serverGroup.iamProfile || application.name + 'InstanceProfile',
         capacityGroup: serverGroup.capacityGroup,
         migrationPolicy: serverGroup.migrationPolicy ? serverGroup.migrationPolicy : { type: 'systemDefault' },

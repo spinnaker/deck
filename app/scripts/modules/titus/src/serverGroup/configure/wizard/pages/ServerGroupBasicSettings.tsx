@@ -261,6 +261,15 @@ export class ServerGroupBasicSettings
 
         <div className="form-group">
           <div className="col-md-3 sm-label-right">
+            <b>Command</b>
+          </div>
+          <div className="col-md-7">
+            <Field type="text" className="form-control input-sm no-spel" name="cmd" />
+          </div>
+        </div>
+
+        <div className="form-group">
+          <div className="col-md-3 sm-label-right">
             Traffic <HelpField id="titus.serverGroup.traffic" />
           </div>
           <div className="col-md-7">

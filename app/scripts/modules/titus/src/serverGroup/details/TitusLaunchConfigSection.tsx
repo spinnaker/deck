@@ -14,7 +14,7 @@ export class TitusLaunchConfigSection extends React.Component<ILaunchConfigSecti
     }
 
     const {
-      serverGroup: { image, entryPoint, iamProfile, resources },
+      serverGroup: { image, entryPoint, cmd, iamProfile, resources },
     } = this.props;
 
     return (
@@ -22,6 +22,7 @@ export class TitusLaunchConfigSection extends React.Component<ILaunchConfigSecti
         {image.dockerImageName && <LabeledValue label="Image Name" value={image.dockerImageName} />}
         {image.dockerImageVersion && <LabeledValue label="Image Version" value={image.dockerImageVersion} />}
         {entryPoint && <LabeledValue label="Entrypoint" value={entryPoint} />}
+        {cmd && <LabeledValue label="Command" value={cmd} />}
         {iamProfile && <LabeledValue label="IAM Profile" value={iamProfile} />}
         <LabeledValue label="CPU(s)" value={resources.cpu} />
         <LabeledValue label="Memory" value={`${resources.memory} MB`} />
