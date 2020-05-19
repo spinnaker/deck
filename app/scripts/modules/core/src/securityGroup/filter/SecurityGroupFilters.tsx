@@ -6,6 +6,7 @@ import { Application } from 'core/application';
 import { ISortFilter, digestDependentFilters } from 'core/filterModel';
 import { useDataSource, useObservable } from 'core/presentation';
 import { FilterCheckbox } from 'core/filterModel/FilterCheckBox';
+import { FilterSearch } from './FilterSearch';
 import { FilterSection } from 'core/cluster/filter/FilterSection';
 import { SecurityGroupState } from 'core/state';
 
@@ -148,20 +149,12 @@ export const SecurityGroupFilters = ({ app }: ISecurityGroupFiltersProps) => {
         >
           Clear All
         </span>
-        <FilterSection key="filter-search" heading="Search" expanded={true} helpKey="securityGroup.search">
-          <form className="form-horizontal" role="form">
-            <div className="form-group nav-search">
-              <input
-                type="search"
-                className="form-control input-sm"
-                value={sortFilter.filter}
-                onBlur={handleSearchChange}
-                onChange={handleSearchChange}
-                style={{ width: '85%', display: 'inline-block' }}
-              />
-            </div>
-          </form>
-        </FilterSection>
+        <FilterSearch
+          helpKey="securityGroup.search"
+          value={sortFilter.filter}
+          onBlur={handleSearchChange}
+          onSearchChange={handleSearchChange}
+        />
       </div>
       {securityGroupsLoaded && (
         <div className="content">
