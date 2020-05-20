@@ -37,7 +37,10 @@ export interface ITitusRunJobStageConfigState {
 interface IClusterDefaults {
   application: string;
   containerAttributes: object;
-  constraints: object;
+  constraints: {
+    hard: { [key: string]: string };
+    soft: { [key: string]: string };
+  };
   efs?: {
     efsId: string;
     mountPoint: string;
@@ -236,11 +239,10 @@ export class TitusRunJobStageConfig extends React.Component<IStageConfigProps, I
           onChange={this.dockerChanged}
           deferInitialization={stage.deferredInitialization}
         />
-        <h4>
-          <b>
-            Elastic File System Options <HelpField id="titus.deploy.efs" />
-          </b>
-        </h4>
+
+        <b>
+          Elastic File System Options <HelpField id="titus.deploy.efs" />
+        </b>
         <div className="form-group">
           <div className="col-md-3 sm-label-right">
             <b>Mount Permission </b>
