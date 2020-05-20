@@ -21,7 +21,6 @@ import { ITitusResources } from 'titus/domain';
 import { TitusSecurityGroupPicker } from './TitusSecurityGroupPicker';
 import { TitusProviderSettings } from '../../../titus.settings';
 import Select, { Option } from 'react-select';
-import { string } from 'prop-types';
 
 const mountPermOptions = [
   { label: 'Read and Write', value: 'RW' },
@@ -39,7 +38,12 @@ interface IClusterDefaults {
   application: string;
   containerAttributes: object;
   constraints: object;
-  efs: object;
+  efs?: {
+    efsId: string;
+    mountPoint: string;
+    mountPerm: string;
+    efsRelativeMountPoint: string;
+  };
   env: object;
   labels: object;
   resources: ITitusResources;
@@ -90,12 +94,6 @@ export class TitusRunJobStageConfig extends React.Component<IStageConfigProps, I
       constraints: {
         soft: {},
         hard: {},
-      },
-      efs: {
-        efsId: string,
-        mountPoint: string,
-        mountPerm: string,
-        efsRelativeMountPoint: string,
       },
       env: {},
       labels: {},
@@ -250,7 +248,7 @@ export class TitusRunJobStageConfig extends React.Component<IStageConfigProps, I
           </div>
           <div className="col-md-8">
             <Select
-              value={stage.cluster.efs.mountPerm}
+              value={stage.cluster.efs?.mountPerm}
               clearable={false}
               options={mountPermOptions}
               onChange={(option: Option) => this.stageFieldChanged('cluster.efs.mountPerm', option.value)}
@@ -266,7 +264,7 @@ export class TitusRunJobStageConfig extends React.Component<IStageConfigProps, I
             <input
               type="text"
               className="form-control input-sm no-spel"
-              value={stage.cluster.efs.mountPoint}
+              value={stage.cluster.efs?.mountPoint}
               onChange={e => this.stageFieldChanged('cluster.efs.mountPoint', e.target.value)}
             />
           </div>
@@ -280,7 +278,7 @@ export class TitusRunJobStageConfig extends React.Component<IStageConfigProps, I
             <input
               type="text"
               className="form-control input-sm no-spel"
-              value={stage.cluster.efs.efsId}
+              value={stage.cluster.efs?.efsId}
               onChange={e => this.stageFieldChanged('cluster.efs.efsId', e.target.value)}
             />
           </div>
@@ -295,7 +293,7 @@ export class TitusRunJobStageConfig extends React.Component<IStageConfigProps, I
             <input
               type="text"
               className="form-control input-sm no-spel"
-              value={stage.cluster.efs.efsRelativeMountPoint}
+              value={stage.cluster.efs?.efsRelativeMountPoint}
               onChange={e => this.stageFieldChanged('cluster.efs.efsRelativeMountPoint', e.target.value)}
             />
           </div>
