@@ -14,19 +14,21 @@ export class FilterCollapse extends React.Component<{}> {
 
   public render() {
     return (
-      <div className="filters-toggle layer-medium sp-margin-s-xaxis">
-        <div className="filters-placeholder">
-          <Tooltip value="Show filters">
-            <button
-              className="btn btn-xs btn-default pin clickable sp-margin-s-xaxis sp-margin-2xs-yaxis sp-padding-xs"
-              onClick={() => this.onClick(true)}
-              style={{ display: ReactInjector.insightFilterStateModel.filtersExpanded ? 'none' : 'inherit' }}
-            >
-              <i className="fa fa-forward" />
-              <span className="show-filter-text"> Show filters</span>
-            </button>
-          </Tooltip>
-        </div>
+      <div className="filters-toggle layer-medium">
+        {!ReactInjector.insightFilterStateModel.filtersExpanded && (
+          <div className="filters-placeholder filters-hidden">
+            <Tooltip value="Show filters">
+              <button
+                className="btn btn-xs btn-default pin clickable sp-padding-xs"
+                onClick={() => this.onClick(true)}
+                style={{ display: ReactInjector.insightFilterStateModel.filtersExpanded ? 'none' : 'inherit' }}
+              >
+                <i className="fa fa-forward" />
+                <span className="show-filter-text"> Show filters</span>
+              </button>
+            </Tooltip>
+          </div>
+        )}
         {ReactInjector.insightFilterStateModel.filtersExpanded && (
           <div className="filters-placeholder filters-open horizontal middle">
             <Tooltip value="Hide filters">

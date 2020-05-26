@@ -11,7 +11,7 @@ export interface IFilterSearchProps {
 }
 
 export const FilterSearch = ({ helpKey, onBlur, onSearchChange, value }: IFilterSearchProps) => (
-  <div className="filter-search">
+  <div className="filter-search sp-margin-s-right">
     <form className="horizontal middle" role="form">
       <div className="form-group nav-search">
         <input

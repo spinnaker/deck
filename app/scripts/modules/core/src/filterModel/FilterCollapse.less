@@ -1,14 +1,15 @@
 .filters-toggle {
   position: absolute;
 
-  .filters-placeholder {
-    margin-top: 6px;
+  .filters-hidden {
+    margin-top: 11px;
   }
 
   .filters-open {
     background-color: var(--color-accent-g2);
     height: 32px;
     font-size: 16px;
+    margin-top: 6px;
 
     @media (min-width: 768px) and (max-width: 992px) {
       width: 104px;
@@ -31,7 +32,8 @@
     }
   }
   button {
-    height: 24px;
+    height: 22px;
+    line-height: 12px;
   }
 
   .show-filter-text {
