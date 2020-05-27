@@ -25,7 +25,7 @@ export const ApplicationNavigation = ({ app }: IApplicationNavigationProps) => {
   useCurrentStateAndParams();
   const isMobile = useIsMobile();
 
-  const cacheRefresh = SchedulerFactory.createScheduler(500);
+  const cacheRefresh = SchedulerFactory.createScheduler(400);
   const [isOpen, setIsOpen] = React.useState(
     !CollapsibleSectionStateCache.isSet('verticalNav') || CollapsibleSectionStateCache.isExpanded('verticalNav'),
   );
@@ -81,7 +81,7 @@ export const ApplicationNavigation = ({ app }: IApplicationNavigationProps) => {
   }
 
   return (
-    <div className={`vertical-navigation layer-high${isOpen ? ' collapsed' : ''}`}>
+    <div className={`vertical-navigation layer-high${!isOpen ? ' collapsed' : ''}`}>
       <h3 className="heading-2 horizontal middle nav-header sp-margin-l-xaxis sp-margin-l-top sp-margin-s-bottom">
         <div className="hidden-xs sp-margin-l-right vertical">
           <ApplicationIcon app={app} />
