@@ -18,7 +18,7 @@ describe('NavItem', () => {
       mockServerGroupDataSourceConfig,
     );
 
-    const wrapper = shallow(<NavSection app={app} dataSources={app.dataSources} />);
+    const wrapper = shallow(<NavSection app={app} dataSources={app.dataSources} isCollapsed={false} />);
     const nodes = wrapper.children();
     expect(nodes.length).toEqual(3);
   });
@@ -26,7 +26,7 @@ describe('NavItem', () => {
   it('should not render if no dataSources', () => {
     const app = ApplicationModelBuilder.createApplicationForTests('testapp');
 
-    const wrapper = shallow(<NavSection app={app} dataSources={[]} />);
+    const wrapper = shallow(<NavSection app={app} dataSources={[]} isCollapsed={false} />);
     const nodes = wrapper.children();
     expect(nodes.length).toEqual(0);
   });

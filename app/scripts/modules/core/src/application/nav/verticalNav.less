@@ -1,7 +1,6 @@
 @import (reference) '~core/presentation/less/imports/commonImports.less';
 
 .vertical-navigation {
-  min-width: 240px;
   height: 100%;
   background-color: var(--color-accent-g2);
   box-shadow: 2px 0 3px 1px var(--color-alto);
@@ -71,6 +70,10 @@
         min-width: 16px;
         margin-right: 8px;
         line-height: 10px;
+
+        .bs-tooltip-right {
+          display: none;
+        }
       }
     }
 
@@ -103,5 +106,34 @@
 
   .nav-section:not(:first-of-type):not(:last-of-type) {
     border-top: 1px solid var(--color-white);
+  }
+}
+
+.collapsed {
+  width: 54px;
+
+  .nav-header {
+    margin-left: 12px;
+  }
+
+  .application-name {
+    display: none;
+  }
+
+  .nav-section {
+    .nav-category,
+    .page-category {
+      padding-left: 16px;
+      .badge-none,
+      .badge-running-count,
+      .nav-name,
+      .HoverablePopover {
+        display: none;
+      }
+
+      .tooltip {
+        color: red;
+      }
+    }
   }
 }

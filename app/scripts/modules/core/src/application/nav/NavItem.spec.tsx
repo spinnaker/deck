@@ -17,7 +17,7 @@ describe('NavItem', () => {
     const dataSource = app.getDataSource('serverGroups');
     dataSource.iconName = 'spMenuClusters';
 
-    const wrapper = mount(<NavItem app={app} dataSource={dataSource} isActive={false} />);
+    const wrapper = mount(<NavItem app={app} dataSource={dataSource} isActive={false} isCollapsed />);
     const nodes = wrapper.children();
     const icon = nodes.childAt(1).children();
     expect(icon.find('svg').length).toEqual(1);
@@ -27,7 +27,7 @@ describe('NavItem', () => {
     const app = buildApp<IServerGroup>(mockServerGroupDataSourceConfig);
     const dataSource = app.getDataSource('serverGroups');
 
-    const wrapper = mount(<NavItem app={app} dataSource={dataSource} isActive={false} />);
+    const wrapper = mount(<NavItem app={app} dataSource={dataSource} isActive={false} isCollapsed={false}/>);
     const nodes = wrapper.children();
     const icon = nodes.childAt(1).children();
     expect(icon.find('svg').length).toEqual(0);
@@ -45,7 +45,7 @@ describe('NavItem', () => {
       data: [mockPipelineDataSourceConfig, mockPipelineDataSourceConfig],
     });
 
-    const wrapper = mount(<NavItem app={app} dataSource={dataSource} isActive={false} />);
+    const wrapper = mount(<NavItem app={app} dataSource={dataSource} isActive={false} isCollapsed={false}/>);
     const nodes = wrapper.children();
     expect(nodes.find('.badge-running-count').length).toBe(1);
     expect(nodes.find('.badge-none').length).toBe(0);
@@ -59,7 +59,7 @@ describe('NavItem', () => {
     const dataSource = app.getDataSource('executions');
     app.dataSources.push({ ...dataSource, key: 'runningExecutions' } as ApplicationDataSource<IPipeline>);
 
-    const wrapper = mount(<NavItem app={app} dataSource={dataSource} isActive={false} />);
+    const wrapper = mount(<NavItem app={app} dataSource={dataSource} isActive={false} isCollapsed={false} />);
     const nodes = wrapper.children();
     expect(nodes.find('.badge-running-count').length).toBe(0);
     expect(nodes.find('.badge-none').length).toBe(1);
@@ -73,7 +73,7 @@ describe('NavItem', () => {
     const dataSource = app.getDataSource('executions');
     app.dataSources.push({ ...dataSource, key: 'runningExecutions' } as ApplicationDataSource<IPipeline>);
 
-    const wrapper = mount(<NavItem app={app} dataSource={dataSource} isActive={false} />);
+    const wrapper = mount(<NavItem app={app} dataSource={dataSource} isActive={false} isCollapsed={false} />);
     const nodes = wrapper.children();
     expect(nodes.find('.badge-running-count').length).toBe(0);
     expect(nodes.find('.badge-none').length).toBe(1);
@@ -112,7 +112,7 @@ describe('NavItem', () => {
   it('should subscribe to alert updates', () => {
     const app = buildApp<IServerGroup>(mockServerGroupDataSourceConfig);
     const dataSource = app.getDataSource('serverGroups');
-    const wrapper = mount(<NavItem app={app} dataSource={dataSource} isActive={false} />);
+    const wrapper = mount(<NavItem app={app} dataSource={dataSource} isActive={false} isCollapsed={false} />);
     const nodes = wrapper.children();
     const tags: IEntityTags[] = nodes.find('DataSourceNotifications').prop('tags');
     expect(tags.length).toEqual(0);

@@ -5,8 +5,6 @@ import { UIView } from '@uirouter/react';
 import { Application } from './application.model';
 import { RecentHistoryService } from 'core/history';
 import { DebugWindow } from 'core/utils/consoleDebug';
-import { CollapsibleSectionStateCache } from 'core/cache';
-import { SchedulerFactory, IScheduler } from 'core/scheduler';
 
 import './application.less';
 
@@ -14,33 +12,10 @@ export interface IApplicationComponentProps {
   app: Application;
 }
 
-export interface IApplicationComponentState {
-  showVerticalNav: boolean;
-}
-
-export class ApplicationComponent extends React.Component<IApplicationComponentProps, IApplicationComponentState> {
-  private cacheRefresh: IScheduler;
-
+export class ApplicationComponent extends React.Component<IApplicationComponentProps> {
   constructor(props: IApplicationComponentProps) {
     super(props);
     this.mountApplication(props.app);
-    this.state = {
-      showVerticalNav:
-        !CollapsibleSectionStateCache.isSet('verticalNav') || CollapsibleSectionStateCache.isExpanded('verticalNav'),
-    };
-  }
-
-  public componentDidMount(): void {
-    this.cacheRefresh = SchedulerFactory.createScheduler(500);
-    this.cacheRefresh.subscribe(() => {
-      if (CollapsibleSectionStateCache.isExpanded('verticalNav') !== this.state.showVerticalNav) {
-        this.setState({
-          showVerticalNav:
-            !CollapsibleSectionStateCache.isSet('verticalNav') ||
-            CollapsibleSectionStateCache.isExpanded('verticalNav'),
-        });
-      }
-    });
   }
 
   public componentWillUnmount(): void {
@@ -69,16 +44,14 @@ export class ApplicationComponent extends React.Component<IApplicationComponentP
     }
     DebugWindow.application = undefined;
     app.disableAutoRefresh();
-    this.cacheRefresh.unsubscribe();
   }
 
   public render() {
     const { app } = this.props;
-    const { showVerticalNav } = this.state;
 
     return (
       <div className="application">
-        {!app.notFound && !app.hasError && showVerticalNav && <ApplicationNavigation app={app} />}
+        {!app.notFound && !app.hasError && <ApplicationNavigation app={app} />}
         {app.notFound && (
           <div>
             <h2 className="text-center">Application Not Found</h2>
