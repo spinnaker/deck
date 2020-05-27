@@ -26,7 +26,7 @@ export const ApplicationNavigation = ({ app }: IApplicationNavigationProps) => {
   const isMobile = useIsMobile();
 
   const cacheRefresh = SchedulerFactory.createScheduler(500);
-  const [isCollapsed, setIsCollapsed] = React.useState(
+  const [isOpen, setIsOpen] = React.useState(
     !CollapsibleSectionStateCache.isSet('verticalNav') || CollapsibleSectionStateCache.isExpanded('verticalNav'),
   );
 
@@ -62,26 +62,26 @@ export const ApplicationNavigation = ({ app }: IApplicationNavigationProps) => {
     cacheRefresh.subscribe(() => {
       const cacheStatus =
         !CollapsibleSectionStateCache.isSet('verticalNav') || CollapsibleSectionStateCache.isExpanded('verticalNav');
-      if (cacheStatus !== isCollapsed) {
-        setIsCollapsed(cacheStatus);
+      if (cacheStatus !== isOpen) {
+        setIsOpen(cacheStatus);
       }
     });
 
     return () => {
       cacheRefresh.unsubscribe();
     };
-  }, [isCollapsed]);
+  }, [isOpen]);
 
   const pageApplicationOwner = () => {
     PagerDutyWriter.pageApplicationOwnerModal(app);
   };
 
-  if (isCollapsed && isMobile) {
+  if (!isOpen && isMobile) {
     return null;
   }
 
   return (
-    <div className={`vertical-navigation layer-high${isCollapsed ? ' collapsed' : ''}`}>
+    <div className={`vertical-navigation layer-high${isOpen ? ' collapsed' : ''}`}>
       <h3 className="heading-2 horizontal middle nav-header sp-margin-l-xaxis sp-margin-l-top sp-margin-s-bottom">
         <div className="hidden-xs sp-margin-l-right vertical">
           <ApplicationIcon app={app} />
@@ -92,12 +92,12 @@ export const ApplicationNavigation = ({ app }: IApplicationNavigationProps) => {
       {navSections
         .filter(section => section.length)
         .map((section, i) => (
-          <NavSection key={`section-${i}`} dataSources={section} app={app} isCollapsed={isCollapsed}/>
+          <NavSection key={`section-${i}`} dataSources={section} app={app} isCollapsed={!isOpen}/>
         ))}
       <div className="nav-section clickable">
         <div className="page-category flex-container-h middle text-semibold" onClick={pageApplicationOwner}>
           <div className="nav-item sp-margin-s-right">
-            {isCollapsed ? (
+            {!isOpen ? (
               <Tooltip value="Page App Owner" placement="right">
                 <div>
                   <Icon className="nav-item-icon" name="spMenuPager" size="medium" color="danger" />
