@@ -140,7 +140,6 @@ window.spinnakerSettings = {
     fileName: changelogGistName,
     gistId: changelogGistId,
   },
-  checkForUpdates: false,
   defaultInstancePort: 80,
   defaultProviders: [
     'appengine',
