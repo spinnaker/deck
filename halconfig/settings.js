@@ -46,7 +46,6 @@ var functionsEnabled = '{%features.functions%}' === 'true';
 var appengine = {
   defaults: {
     account: '{%appengine.default.account%}',
-    editLoadBalancerStageEnabled: '{%appengine.enabled%}' === 'true',
   },
 };
 var aws = {
