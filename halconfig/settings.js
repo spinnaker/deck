@@ -14,12 +14,7 @@ var defaultCanaryJudge = '{%canary.defaultJudge%}';
 var defaultMetricsStore = '{%canary.defaultMetricsStore%}';
 var defaultMetricsAccountName = '{%canary.defaultMetricsAccount%}';
 var defaultStorageAccountName = '{%canary.defaultStorageAccount%}';
-var displayTimestampsInUserLocalTime = '{%features.displayTimestampsInUserLocalTime%}' === 'true';
-var entityTagsEnabled = false;
 var fiatEnabled = '{%features.fiat%}' === 'true';
-var gceScaleDownControlsEnabled = '{%features.gceScaleDownControlsEnabled%}' === 'true';
-var gceStatefulMigsEnabled = '{%features.gceStatefulMigsEnabled%}' === 'true';
-var iapRefresherEnabled = '{%features.iapRefresherEnabled%}' === 'true';
 var maxPipelineAgeDays = '{%maxPipelineAgeDays%}';
 var mineCanaryEnabled = '{%features.mineCanary%}' === 'true';
 var notificationsEnabled = '{%notifications.enabled%}' === 'true';
@@ -40,7 +35,6 @@ var githubStatus = {
 var templatesEnabled = '{%canary.templatesEnabled%}' === 'true';
 var timezone = '{%timezone%}';
 var version = '{%version%}';
-var functionsEnabled = '{%features.functions%}' === 'true';
 
 // Cloud Providers
 var appengine = {
@@ -132,20 +126,10 @@ window.spinnakerSettings = {
   feature: {
     canary: mineCanaryEnabled,
     chaosMonkey: chaosEnabled,
-    displayTimestampsInUserLocalTime: displayTimestampsInUserLocalTime,
-    entityTags: entityTagsEnabled,
     fiatEnabled: fiatEnabled,
-    gceScaleDownControlsEnabled: gceScaleDownControlsEnabled,
-    gceStatefulMigsEnabled: gceStatefulMigsEnabled,
-    iapRefresherEnabled: iapRefresherEnabled,
     notifications: notificationsEnabled,
-    pagerDuty: false,
-    pipelines: true,
     pipelineTemplates: pipelineTemplatesEnabled,
     roscoMode: true,
-    slack: false,
-    snapshots: false,
-    functions: functionsEnabled,
   },
   gateUrl: gateHost,
   maxPipelineAgeDays: maxPipelineAgeDays,
