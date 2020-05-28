@@ -81,7 +81,6 @@ var gce = {
     region: '{%google.default.region%}',
     zone: '{%google.default.zone%}',
   },
-  associatePublicIpAddress: true,
 };
 var kubernetes = {
   defaults: {

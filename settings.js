@@ -174,7 +174,6 @@ window.spinnakerSettings = {
       defaultSecurityGroups: [],
     },
     gce: {
-      associatePublicIpAddress: true,
       defaults: {
         account: 'my-google-account',
         instanceTypeStorage: {
