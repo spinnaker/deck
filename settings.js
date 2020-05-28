@@ -232,7 +232,7 @@ window.spinnakerSettings = {
   slack: {
     baseUrl: 'https://slack.com',
   },
-  pubsubProviders: ['google'], // TODO(joonlim): Add amazon once it is confirmed that amazon pub/sub works.
+  pubsubProviders: ['amazon', 'google'],
   plugins: [],
   searchVersion: 1,
   triggerTypes: [

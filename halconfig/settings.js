@@ -180,7 +180,6 @@ window.spinnakerSettings = {
     oracle: oracle,
     tencentcloud: tencentcloud,
   },
-  pubsubProviders: ['amazon', 'google'],
   triggerTypes: [
     'artifactory',
     'nexus',
