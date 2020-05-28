@@ -178,13 +178,6 @@ window.spinnakerSettings = {
     huaweicloud: huaweicloud,
     kubernetes: kubernetes,
     oracle: oracle,
-    titus: {
-      defaults: {
-        account: 'titustestvpc',
-        iamProfile: '{{application}}InstanceProfile',
-        region: 'us-east-1',
-      },
-    },
     tencentcloud: tencentcloud,
   },
   pubsubProviders: ['amazon', 'google'],
