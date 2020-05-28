@@ -180,9 +180,6 @@ window.spinnakerSettings = {
     sms: sms,
   },
   onDemandClusterThreshold: onDemandClusterThreshold,
-  pagerDuty: {
-    required: false,
-  },
   pollSchedule: 30000,
   providers: {
     appengine: appengine,
