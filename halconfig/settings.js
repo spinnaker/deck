@@ -141,20 +141,6 @@ window.spinnakerSettings = {
     gistId: changelogGistId,
   },
   defaultInstancePort: 80,
-  defaultProviders: [
-    'appengine',
-    'aws',
-    'azure',
-    'cloudfoundry',
-    'dcos',
-    'ecs',
-    'gce',
-    'huaweicloud',
-    'kubernetes',
-    'oracle',
-    'titus',
-    'tencentcloud',
-  ],
   defaultTimeZone: timezone, // see http://momentjs.com/timezone/docs/#/data-utilities/
   feature: {
     canary: mineCanaryEnabled,
