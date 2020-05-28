@@ -162,9 +162,6 @@ window.spinnakerSettings = {
   },
   gateUrl: gateHost,
   maxPipelineAgeDays: maxPipelineAgeDays,
-  newApplicationDefaults: {
-    chaosMonkey: false,
-  },
   notifications: {
     bearychat: {
       enabled: true,
