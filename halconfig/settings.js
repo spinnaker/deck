@@ -180,7 +180,6 @@ window.spinnakerSettings = {
     sms: sms,
   },
   onDemandClusterThreshold: onDemandClusterThreshold,
-  pollSchedule: 30000,
   providers: {
     appengine: appengine,
     aws: aws,
