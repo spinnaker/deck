@@ -123,7 +123,6 @@ var tencentcloud = {
 window.spinnakerSettings = {
   authEnabled: authEnabled,
   authEndpoint: authEndpoint,
-  authTtl: 600000,
   bakeryDetailUrl: bakeryDetailUrl,
   canary: {
     atlasWebComponentsUrl: atlasWebComponentsUrl,
