@@ -202,11 +202,7 @@ window.spinnakerSettings = {
     kubernetes: {
       defaults: {
         account: 'my-kubernetes-account',
-        apiPrefix: 'api/v1/proxy/namespaces/kube-system/services/kubernetes-dashboard/#',
-        instanceLinkTemplate: '{{host}}/api/v1/proxy/namespaces/{{namespace}}/pods/{{name}}',
-        internalDNSNameTemplate: '{{name}}.{{namespace}}.svc.cluster.local',
         namespace: 'default',
-        proxy: 'localhost:8001',
       },
     },
     oracle: {

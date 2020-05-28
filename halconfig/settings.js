@@ -85,10 +85,7 @@ var gce = {
 var kubernetes = {
   defaults: {
     account: '{%kubernetes.default.account%}',
-    instanceLinkTemplate: '{{host}}/api/v1/proxy/namespaces/{{namespace}}/pods/{{name}}',
-    internalDNSNameTemplate: '{{name}}.{{namespace}}.svc.cluster.local',
     namespace: '{%kubernetes.default.namespace%}',
-    proxy: '{%kubernetes.default.proxy%}',
   },
 };
 var huaweicloud = {
