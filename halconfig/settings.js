@@ -161,7 +161,6 @@ window.spinnakerSettings = {
     functions: functionsEnabled,
   },
   gateUrl: gateHost,
-  gitSources: ['bitbucket', 'gitlab', 'github', 'stash'],
   maxPipelineAgeDays: maxPipelineAgeDays,
   newApplicationDefaults: {
     chaosMonkey: false,
