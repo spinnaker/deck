@@ -51,16 +51,8 @@ var appengine = {
 var aws = {
   defaults: {
     account: '{%aws.default.account%}',
-    iamRole: 'BaseIAMRole',
     region: '{%aws.default.region%}',
   },
-  defaultSecurityGroups: [],
-  loadBalancers: {
-    // if true, VPC load balancers will be created as internal load balancers if the selected subnet has a purpose
-    // tag that starts with "internal"
-    inferInternalFlagFromSubnet: false,
-  },
-  useAmiBlockDeviceMappings: false,
 };
 var azure = {
   defaults: {
