@@ -15,10 +15,7 @@ var defaultMetricsStore = '{%canary.defaultMetricsStore%}';
 var defaultMetricsAccountName = '{%canary.defaultMetricsAccount%}';
 var defaultStorageAccountName = '{%canary.defaultStorageAccount%}';
 var fiatEnabled = '{%features.fiat%}' === 'true';
-var maxPipelineAgeDays = '{%maxPipelineAgeDays%}';
 var mineCanaryEnabled = '{%features.mineCanary%}' === 'true';
-var notificationsEnabled = '{%notifications.enabled%}' === 'true';
-var onDemandClusterThreshold = '{%onDemandClusterThreshold%}';
 var pipelineTemplatesEnabled = '{%features.pipelineTemplates%}' === 'true';
 var reduxLoggerEnabled = '{%canary.reduxLogger%}' === 'true';
 var showAllConfigsEnabled = '{%canary.showAllCanaryConfigs%}' === 'true';
@@ -127,12 +124,10 @@ window.spinnakerSettings = {
     canary: mineCanaryEnabled,
     chaosMonkey: chaosEnabled,
     fiatEnabled: fiatEnabled,
-    notifications: notificationsEnabled,
     pipelineTemplates: pipelineTemplatesEnabled,
     roscoMode: true,
   },
   gateUrl: gateHost,
-  maxPipelineAgeDays: maxPipelineAgeDays,
   notifications: {
     bearychat: {
       enabled: true,
@@ -150,7 +145,6 @@ window.spinnakerSettings = {
     slack: slack,
     sms: sms,
   },
-  onDemandClusterThreshold: onDemandClusterThreshold,
   providers: {
     appengine: appengine,
     aws: aws,
