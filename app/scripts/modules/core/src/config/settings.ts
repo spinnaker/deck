@@ -46,6 +46,7 @@ export interface IFeatures {
   snapshots?: boolean;
   savePipelinesStageEnabled?: boolean;
   functions?: boolean;
+  executionMarkerInformationPopover?: boolean;
 }
 
 export interface IDockerInsightSettings {
