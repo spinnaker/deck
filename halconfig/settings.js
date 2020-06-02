@@ -73,12 +73,6 @@ var gce = {
     zone: '{%google.default.zone%}',
   },
 };
-var kubernetes = {
-  defaults: {
-    account: '{%kubernetes.default.account%}',
-    namespace: '{%kubernetes.default.namespace%}',
-  },
-};
 var huaweicloud = {
   defaults: {
     account: '{%huaweicloud.default.account%}',
@@ -154,7 +148,6 @@ window.spinnakerSettings = {
     ecs: ecs,
     gce: gce,
     huaweicloud: huaweicloud,
-    kubernetes: kubernetes,
     oracle: oracle,
     tencentcloud: tencentcloud,
   },
