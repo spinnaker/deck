@@ -79,12 +79,6 @@ var huaweicloud = {
     region: '{%huaweicloud.default.region%}',
   },
 };
-var oracle = {
-  defaults: {
-    account: '{%oracle.default.account%}',
-    region: '{%oracle.default.region%}',
-  },
-};
 var tencentcloud = {
   defaults: {
     account: '{%tencentcloud.default.account%}',
@@ -148,7 +142,6 @@ window.spinnakerSettings = {
     ecs: ecs,
     gce: gce,
     huaweicloud: huaweicloud,
-    oracle: oracle,
     tencentcloud: tencentcloud,
   },
   version: version,
