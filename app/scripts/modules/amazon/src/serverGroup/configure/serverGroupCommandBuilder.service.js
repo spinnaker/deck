@@ -208,7 +208,11 @@ angular
 
         const serverGroupName = NameUtils.parseServerGroupName(serverGroup.asg.autoScalingGroupName);
 
-        const instanceType = serverGroup.launchConfig ? serverGroup.launchConfig.instanceType : null;
+        const instanceType = serverGroup.launchConfig
+          ? serverGroup.launchConfig.instanceType
+          : serverGroup.launchTemplate
+          ? serverGroup.launchTemplate.launchTemplateData.instanceType
+          : null;
         const instanceTypeCategoryLoader = instanceTypeService.getCategoryForInstanceType('aws', instanceType);
 
         const asyncLoader = $q.all({
@@ -337,6 +341,33 @@ angular
             command.viewState.imageId = serverGroup.launchConfig.imageId;
           }
 
+          if (serverGroup.launchTemplate) {
+            const { launchTemplateData } = serverGroup.launchTemplate;
+            const maxPrice =
+              launchTemplateData.metadataOptions &&
+              launchTemplateData.metadataOptions.spotOptions &&
+              launchTemplateData.metadataOptions.spotOptions.maxPrice;
+            const ipv6Addresses = _.flatMap(launchTemplateData.networkInterfaces, i => i.ipv6Addresses) || [];
+
+            angular.extend(command, {
+              instanceType: launchTemplateData.instanceType,
+              iamRole: launchTemplateData.iamInstanceProfile.name,
+              keyPair: launchTemplateData.keyName,
+              associatePublicIpAddress: ipv6Addresses.length > 0,
+              ramdiskId: launchTemplateData.ramdiskId,
+              instanceMonitoring: launchTemplateData.monitoring.enabled,
+              ebsOptimized: launchTemplateData.ebsOptimized,
+              spotPrice: maxPrice,
+              requireIMDSv2:
+                launchTemplateData.metadataOptions && launchTemplateData.metadataOptions.httpTokens === 'required',
+            });
+
+            if (launchTemplateData.userData) {
+              command.base64UserData = launchTemplateData.userData;
+            }
+            command.viewState.imageId = launchTemplateData.imageId;
+          }
+
           if (mode === 'clone' && serverGroup.image && serverGroup.image.name) {
             command.amiName = serverGroup.image.name;
           }
@@ -344,6 +375,11 @@ angular
           if (serverGroup.launchConfig && serverGroup.launchConfig.securityGroups.length) {
             command.securityGroups = serverGroup.launchConfig.securityGroups;
           }
+
+          if (serverGroup.launchTemplate && serverGroup.launchTemplate.launchTemplateData.securityGroups.length) {
+            command.securityGroups = serverGroup.launchTemplate.launchTemplateData.securityGroups;
+          }
+
           return command;
         });
       }
