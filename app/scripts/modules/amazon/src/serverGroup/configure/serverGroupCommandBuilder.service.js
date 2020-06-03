@@ -357,7 +357,7 @@ angular
               ramdiskId: launchTemplateData.ramdiskId,
               instanceMonitoring: launchTemplateData.monitoring.enabled,
               ebsOptimized: launchTemplateData.ebsOptimized,
-              spotPrice: maxPrice,
+              spotPrice: maxPrice || undefined,
               requireIMDSv2:
                 launchTemplateData.metadataOptions && launchTemplateData.metadataOptions.httpTokens === 'required',
             });
