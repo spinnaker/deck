@@ -280,29 +280,13 @@ html {
   .detail-content {
     z-index: var(--layer-high);
     position: fixed;
-    top: 40px;
+    margin-top: -20px;
     right: 0;
     height: 100%;
     width: 390px;
 
     @media (max-width: 390px) {
       width: 100%;
-    }
-
-    @media (max-width: 678px) {
-      top: 110px;
-    }
-
-    @media (min-width: 678px) and (max-width: 768px) {
-      top: 90px;
-    }
-
-    @media (min-width: 768px) and (max-width: 812px) {
-      top: 60px;
-    }
-
-    @media (min-width: 812px) {
-      top: 40px;
     }
 
     react-ui-view-adapter {

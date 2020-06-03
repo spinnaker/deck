@@ -45,12 +45,12 @@ export const InsightLayout = ({ app }: IInsightLayoutProps) => {
       )}
       <div className="flex-1">
         <UIView name="master" className="nav-content ng-scope" data-scroll-id="nav-content" />
-      </div>    
-      {appIsReady && showDetailsView && (
-        <div>
-          <UIView name="detail" className="detail-content" />
-        </div>
-      )}
+        {appIsReady && showDetailsView && (
+          <div>
+            <UIView name="detail" className="detail-content" />
+          </div>
+        )}
+      </div>
     </div>
   );
 };
