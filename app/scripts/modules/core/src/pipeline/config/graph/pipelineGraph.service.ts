@@ -7,6 +7,7 @@ export interface IExecutionViewState {
   canTriggerPipelineManually: boolean;
   section?: string;
   stageIndex?: number;
+  executionId?: string;
 }
 
 export interface IPipelineGraphLink {
