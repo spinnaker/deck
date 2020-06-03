@@ -111,6 +111,10 @@ angular
               command.interestingHealthProviderNames = ['Amazon'];
             }
 
+            if (AWSProviderSettings.serverGroups && AWSProviderSettings.serverGroups.enableIMDSv2) {
+              command.requireIMDSv2 = true;
+            }
+
             return command;
           });
       }
