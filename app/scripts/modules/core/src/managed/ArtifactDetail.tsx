@@ -16,6 +16,7 @@ import { StatusCard } from './StatusCard';
 import { Button } from './Button';
 import { showPinArtifactModal } from './PinArtifactModal';
 import { showUnpinArtifactModal } from './UnpinArtifactModal';
+import { showMarkArtifactAsBadModal } from './MarkArtifactAsBadModal';
 
 import { ConstraintCard } from './constraints/ConstraintCard';
 import { isConstraintSupported } from './constraints/constraintRegistry';
@@ -96,6 +97,7 @@ const EnvironmentCards = memo(
         description={pinned.comment && <Markdown message={pinned.comment} tag="span" />}
         actions={
           <Button
+            iconName="unpin"
             onClick={() =>
               showUnpinArtifactModal({
                 application,
@@ -188,6 +190,7 @@ export const ArtifactDetail = ({
   useEventListener(document, 'keydown', keydownCallback);
 
   const isPinnedEverywhere = environments.every(({ pinned }) => pinned);
+  const isBadEverywhere = environments.every(({ state }) => state === 'vetoed');
 
   return (
     <>
@@ -195,18 +198,35 @@ export const ArtifactDetail = ({
 
       <div className="ArtifactDetail">
         <div className="flex-container-h sp-margin-xl-bottom">
-          <Button
-            iconName="pin"
-            appearance="primary"
-            disabled={isPinnedEverywhere}
-            onClick={() =>
-              showPinArtifactModal({ application, reference, version: versionDetails, resourcesByEnvironment }).then(
-                ({ status }) => status === 'CLOSED' && application.getDataSource('environments').refresh(),
-              )
-            }
-          >
-            Pin
-          </Button>
+          <div className="flex-container-h sp-group-margin-s-xaxis">
+            <Button
+              iconName="pin"
+              appearance="primary"
+              disabled={isPinnedEverywhere || isBadEverywhere}
+              onClick={() =>
+                showPinArtifactModal({ application, reference, version: versionDetails, resourcesByEnvironment }).then(
+                  ({ status }) => status === 'CLOSED' && application.getDataSource('environments').refresh(),
+                )
+              }
+            >
+              Pin...
+            </Button>
+            <Button
+              iconName="cloudError"
+              appearance="primary"
+              disabled={isPinnedEverywhere || isBadEverywhere}
+              onClick={() =>
+                showMarkArtifactAsBadModal({
+                  application,
+                  reference,
+                  version: versionDetails,
+                  resourcesByEnvironment,
+                }).then(({ status }) => status === 'CLOSED' && application.getDataSource('environments').refresh())
+              }
+            >
+              Mark as bad...
+            </Button>
+          </div>
           <div className="detail-section-right">{/* artifact metadata will live here */}</div>
         </div>
         {environments.map(environment => {
