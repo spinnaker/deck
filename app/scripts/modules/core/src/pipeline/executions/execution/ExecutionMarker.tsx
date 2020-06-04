@@ -112,16 +112,10 @@ export class ExecutionMarker extends React.Component<IExecutionMarkerProps, IExe
           <MarkerIcon stage={stage} />
           <span className="duration">{this.state.duration}</span>
           {SETTINGS.feature.executionMarkerInformationPopover &&
-            stage.status.toLowerCase() === 'terminal' && stage.type === 'pipeline' && (
+            stage.status.toLowerCase() === 'terminal' &&
+            stage.type === 'pipeline' && (
               <i
                 className="fa fa-info-circle"
-                style={{
-                  color: '#fff',
-                  marginLeft: '2px',
-                  fontSize: '.8em',
-                  position: 'relative',
-                  top: '-1px',
-                }}
                 onClick={this.handleStageInformationClick}
                 key={`${execution.id}_${stage.id}`}
                 data-id={`${execution.id}_${stage.id}`}
@@ -137,11 +131,10 @@ export class ExecutionMarker extends React.Component<IExecutionMarkerProps, IExe
         </TooltipComponent>
         {this.state.showingExecutionMarkerInformationPopover && (
           <ExecutionMarkerInformationPopover
-            application={application}
             target={this.state.contextTarget}
-            execution={execution}
+            executionId={execution.id}
             onClose={this.hideExecutionMarkerInformationPopover}
-            stage={execution.stageSummaries[this.state.contextStageIndex]}
+            stageId={execution.stageSummaries[this.state.contextStageIndex].id}
           />
         )}
       </span>

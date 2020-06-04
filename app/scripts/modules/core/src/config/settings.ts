@@ -29,6 +29,7 @@ export interface IFeatures {
   displayTimestampsInUserLocalTime?: boolean;
   dockerBake?: boolean;
   entityTags?: boolean;
+  executionMarkerInformationPopover?: boolean;
   fiatEnabled?: boolean;
   gceScaleDownControlsEnabled?: boolean;
   gceStatefulMigsEnabled?: boolean;
@@ -46,7 +47,6 @@ export interface IFeatures {
   snapshots?: boolean;
   savePipelinesStageEnabled?: boolean;
   functions?: boolean;
-  executionMarkerInformationPopover?: boolean;
 }
 
 export interface IDockerInsightSettings {

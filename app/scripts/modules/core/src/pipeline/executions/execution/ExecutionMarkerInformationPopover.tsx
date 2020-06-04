@@ -1,20 +1,18 @@
-import * as React from 'react';
+import React from 'react';
 
-import { Application } from 'core/application/application.model';
 import { IExecution, IPipeline, IExecutionStageSummary } from 'core/domain';
 import { relativeTime, timestamp, duration } from 'core/utils';
 import { Spinner } from 'core';
 import { PipelineGraph } from '../../config/graph/PipelineGraph';
-import { AccountTag } from 'core/account';
 
 import { ExecutionInformationPopoverState } from './ExecutionInformationPopoverState';
+
 import './executionMarkerInformationPopover.less';
 
 export interface IExecutionErrorLocatorProps {
-  application: Application;
   target: Element;
-  execution: IExecution;
-  stage: IExecutionStageSummary;
+  executionId: string;
+  stageId: string;
   onClose: Function;
 }
 
@@ -31,16 +29,16 @@ export class ExecutionMarkerInformationPopover extends React.PureComponent<
   IExecutionErrorLocatorProps,
   IExecutionLocatorState
 > {
-  private allExecutions: any[];
-  private arrowLeftOffset: number;
-  private childExecution: any;
-  private childPipelineConfig: any;
-  private childTerminalPipelineStage: any;
-  private informationIconHeight: number;
-  private informationPopoverContainerScrollTop: number;
-  private informationState: ExecutionInformationPopoverState;
-  private popoverHalfWidth: number;
-
+  allExecutions: any[];
+  arrowLeftOffset: number;
+  childExecution: any;
+  childPipelineConfig: any;
+  childTerminalPipelineStage: any;
+  informationIconHeight: number;
+  informationPopoverContainerScrollTop: number;
+  informationState: ExecutionInformationPopoverState;
+  popoverHalfWidth: number;
+  popoverWidth: number;
   constructor(props: IExecutionErrorLocatorProps) {
     super(props);
     this.state = {
@@ -70,7 +68,7 @@ export class ExecutionMarkerInformationPopover extends React.PureComponent<
   }
 
   public componentDidMount() {
-    this.getPipelineLink(this.props.stage.id, this.props.execution.id);
+    this.getPipelineLink(this.props.stageId, this.props.executionId);
   }
 
   public componentWillUnmount() {
@@ -109,7 +107,7 @@ export class ExecutionMarkerInformationPopover extends React.PureComponent<
     } else if (movement === 'resize') {
       const targetClassname = this.props.target.className.replace(/\s/g, '.');
       const targetContainer = document.querySelector(
-        `.${targetClassname}[data-id="${this.props.execution.id}_${this.props.stage.id}"]`,
+        `.${targetClassname}[data-id="${this.props.executionId}_${this.props.stageId}"]`,
       );
       const targetClientRect = targetContainer.getBoundingClientRect();
       const newLeft = this.windowCanFit();
@@ -138,9 +136,10 @@ export class ExecutionMarkerInformationPopover extends React.PureComponent<
       if (stage.id === stageId) {
         // store the index for our pipeline graph
         stageIndex = index;
+        return stage;
       }
 
-      return stage.id === stageId;
+      return null;
     });
     // get the current configuration for this execution
     const currentPipelineConfig = await this.informationState.getPipelineConfig(
@@ -158,9 +157,7 @@ export class ExecutionMarkerInformationPopover extends React.PureComponent<
     // get the child execution aka clicking View Pipeline Details
     const childExecution = await this.informationState.getExecution(currentStage.masterStage.context.executionId);
     const childTerminalStage = childExecution.stageSummaries.find((stage: IExecutionStageSummary, index: number) => {
-      if (stage.status.toLocaleLowerCase() === 'terminal') {
-        stageIndex = index;
-      }
+      if (stage.status.toLocaleLowerCase() === 'terminal') stageIndex = index;
 
       return stage.status.toLowerCase() === 'terminal';
     });
@@ -275,7 +272,7 @@ export class ExecutionMarkerInformationPopover extends React.PureComponent<
       <div className="">
         {this.allExecutions.map(item => {
           return (
-            <div key={`${item.execution.id}_container`} className="execution-graph">
+            <div className="execution-graph">
               {item.execution.application} - {item.execution.name}
               <PipelineGraph
                 key={item.execution.id}
@@ -286,7 +283,6 @@ export class ExecutionMarkerInformationPopover extends React.PureComponent<
                   activeSubStageId: null,
                   canTriggerPipelineManually: false,
                   canConfigure: false,
-                  executionId: item.execution.id,
                 }}
               />
             </div>
@@ -306,11 +302,7 @@ export class ExecutionMarkerInformationPopover extends React.PureComponent<
             </div>
             <div style={{ fontWeight: 'bold' }}>PIPELINE</div>
             <div className="bottom-margin">
-              <div>
-                {executionDetails.deploymentTargets.map(account => (
-                  <AccountTag key={account} account={account} />
-                ))}
-              </div>
+              <div>{`[${executionDetails.authentication.user}] (${executionDetails.user})`}</div>
               <div>{relativeTime(executionDetails.startTime || executionDetails.buildTime)}</div>
               <div>
                 Status: <span className="status">{executionDetails.status}</span> by parent pipeline{' '}
@@ -324,12 +316,12 @@ export class ExecutionMarkerInformationPopover extends React.PureComponent<
                   this.toggleParameters(event.target);
                 }}
               >
-                <i className="fa fa-chevron-right" /> View all Parameters (
+                <i className="fa fa-chevron-right"></i> View all Parameters (
                 {Object.keys(executionDetails.trigger.parameters).length})
               </span>
               <div className="view-parameters closed">
                 {Object.keys(executionDetails.trigger.parameters).map(key => (
-                  <span key={key}>
+                  <span>
                     {key}: {executionDetails.trigger.parameters[key]}
                   </span>
                 ))}
@@ -346,7 +338,7 @@ export class ExecutionMarkerInformationPopover extends React.PureComponent<
                   <table className="information-pipeline-execution-history">
                     <thead>
                       <tr>
-                        <th />
+                        <th></th>
                         <th>APPLICATION</th>
                         <th>PIPELINE NAME</th>
                         <th>STAGE</th>
@@ -358,12 +350,11 @@ export class ExecutionMarkerInformationPopover extends React.PureComponent<
                       {this.allExecutions.map((item: any, index: number) => {
                         return (
                           <tr
-                            key={`${item.execution.id}-${item.stageIndex}`}
                             onClick={() => {
                               this.goToPipeline(item);
                             }}
                           >
-                            <td>{index === 0 && <i className="fa fa-circle" />}</td>
+                            <td>{index === 0 && <i className="fa fa-circle"></i>}</td>
                             <td className="information-app">{item.execution.application}</td>
                             <td className="information-execution">{item.execution.name}</td>
                             <td>{item.execution.stageSummaries[item.stageIndex].name}</td>
@@ -407,7 +398,7 @@ export class ExecutionMarkerInformationPopover extends React.PureComponent<
             onClick={() => {
               this.hidePipelineGraph();
             }}
-          />
+          ></i>
         </span>
         Pipeline Execution History Graphs <span className="information-history-note">(Decending order)</span>
       </span>
@@ -420,7 +411,7 @@ export class ExecutionMarkerInformationPopover extends React.PureComponent<
             onClick={() => {
               this.props.onClose();
             }}
-          />
+          ></i>
         </span>
       </span>
     );
@@ -428,7 +419,7 @@ export class ExecutionMarkerInformationPopover extends React.PureComponent<
     return (
       <div className="execution-marker-information-popover">
         <div className="popover fade in show bottom" style={{ position: 'absolute', top: targetTop, left: targetLeft }}>
-          <div className="arrow" style={{ left: arrowLeft }} />
+          <div className="arrow" style={{ left: arrowLeft }}></div>
           <h3 className="popover-title">{title}</h3>
           <div className="popover-content" style={{ maxHeight }}>
             {content}
