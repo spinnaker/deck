@@ -44,7 +44,7 @@ export class ExecutionInformationPopoverState {
     }
 
     const pipelineConfigs = await API.one('applications', application, 'pipelineConfigs').get();
-    // store for laser
+    // store for later
     this.calledPipelineConfigs[application] = pipelineConfigs;
 
     pipelineConfig = this.calledPipelineConfigs[application].find(
