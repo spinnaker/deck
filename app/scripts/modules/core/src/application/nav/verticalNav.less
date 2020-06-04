@@ -4,13 +4,10 @@
   height: 100%;
   background-color: var(--color-accent-g2);
   box-shadow: 2px 0 3px 1px var(--color-alto);
-  width: 280px;
+  min-width: 310px;
 
-  @media (min-width: 1600px) {
-    width: 280px;
-  }
   @media (min-width: 1800px) {
-    width: 310px;
+    width: 340px;
   }
 
   .nav-header {
@@ -119,6 +116,7 @@
 }
 
 .collapsed {
+  min-width: 54px;
   width: 54px;
 
   .nav-header {

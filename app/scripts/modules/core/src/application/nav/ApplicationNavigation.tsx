@@ -83,7 +83,7 @@ export const ApplicationNavigation = ({ app }: IApplicationNavigationProps) => {
   return (
     <div className={`vertical-navigation layer-high${!isOpen ? ' collapsed' : ''}`}>
       <h3 className="heading-2 horizontal middle nav-header sp-margin-l-xaxis sp-margin-l-top sp-margin-s-bottom">
-        <div className="hidden-xs sp-margin-l-right vertical">
+        <div className="sp-margin-l-right vertical">
           <ApplicationIcon app={app} />
           <ApplicationRefresher app={app} />
         </div>
