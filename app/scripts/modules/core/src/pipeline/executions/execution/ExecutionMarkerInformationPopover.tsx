@@ -1,4 +1,6 @@
 import React from 'react';
+import classNames from 'classnames';
+import { UISref } from '@uirouter/react';
 
 import { IExecution, IPipeline, IExecutionStageSummary } from 'core/domain';
 import { relativeTime, timestamp, duration } from 'core/utils';
@@ -9,18 +11,22 @@ import { ExecutionInformationPopoverState } from './ExecutionInformationPopoverS
 
 import './executionMarkerInformationPopover.less';
 
-export interface IExecutionErrorLocatorProps {
+interface IExecutionErrorLocatorProps {
   target: Element;
   executionId: string;
   stageId: string;
   onClose: Function;
 }
-
-export interface IExecutionLocatorState {
+interface IFailedStageExecutionLink {
+  application: string;
+  executionId: string;
+  stageIndex: number;
+}
+interface IExecutionLocatorState {
   pipelineConfigDetails: IPipeline;
   executionDetails: IExecution;
   failedInApplication: string;
-  link: string;
+  link: IFailedStageExecutionLink;
   showPipelineGraph: boolean;
   stageDetails: any;
 }
@@ -52,6 +58,11 @@ export class ExecutionMarkerInformationPopover extends React.PureComponent<
 
     const target = document.querySelector('.all-execution-groups');
 
+    /*
+      because this component is actually rendered (n) times for each stage in ./ExecutionMarker.tsk that meets the conditional we could potentional havec
+      (n) event handlers for scroll and resize, no real dom api to check if function X has been assinged already so just clear out remove the handlers
+      and add them back in
+    */
     if (target) {
       target.removeEventListener('scroll', this.onScroll);
       target.addEventListener('scroll', this.onScroll);
@@ -60,10 +71,25 @@ export class ExecutionMarkerInformationPopover extends React.PureComponent<
     window.addEventListener('resize', this.onResize);
 
     this.allExecutions = [];
+    /*
+      bootstrap popover max width is 400
+      since we are using the css for this custom popover and overriding to 800 pixels
+      we need to move the arrow's offset default
+    */
     this.arrowLeftOffset = 404;
     this.informationIconHeight = 29;
     this.informationPopoverContainerScrollTop = null;
     this.informationState = new ExecutionInformationPopoverState();
+    /*
+      bootstrap popover max width is 400
+      since we are using the css for this custom popover and overriding to 800 pixels
+      we need to set a halfwidth instead of just always using 800/2 or using 400 everywhere
+      this is used if a stage is close to the right hand side of the browsers view port
+      we don't want to overally extend so let's check the popover can fit
+      used in the:
+        this.windowCanFit
+        this.updatePosition
+    */
     this.popoverHalfWidth = 400;
   }
 
@@ -105,11 +131,7 @@ export class ExecutionMarkerInformationPopover extends React.PureComponent<
       informationPopoverContainer.style.top = targetTop + 'px';
       this.informationPopoverContainerScrollTop = targetTop;
     } else if (movement === 'resize') {
-      const targetClassname = this.props.target.className.replace(/\s/g, '.');
-      const targetContainer = document.querySelector(
-        `.${targetClassname}[data-id="${this.props.executionId}_${this.props.stageId}"]`,
-      );
-      const targetClientRect = targetContainer.getBoundingClientRect();
+      const targetClientRect = this.props.target.getBoundingClientRect();
       const newLeft = this.windowCanFit();
       const arrowElement = informationPopoverContainer.querySelector('.arrow') as HTMLDivElement;
       let left = targetClientRect.left;
@@ -128,76 +150,87 @@ export class ExecutionMarkerInformationPopover extends React.PureComponent<
 
   private getPipelineLink = async (stageId: string, executionId: string): Promise<any> => {
     // get the current execution id is from ExecutionMarker.tsx
-    const currentExecution = await this.informationState.getExecution(executionId);
-    let stageIndex;
+    try {
+      const currentExecution = await this.informationState.getExecution(executionId);
+      let stageIndex;
 
-    // get the current stage in the exeuction index is from ExecutionMarker.tsx
-    const currentStage = currentExecution.stageSummaries.find((stage: IExecutionStageSummary, index: number) => {
-      if (stage.id === stageId) {
-        // store the index for our pipeline graph
-        stageIndex = index;
-        return stage;
-      }
+      // get the current stage in the exeuction index is from ExecutionMarker.tsx
+      const currentStage = currentExecution.stageSummaries.find((stage: IExecutionStageSummary, index: number) => {
+        if (stage.id === stageId) {
+          // store the index for our pipeline graph
+          stageIndex = index;
+          return stage;
+        }
 
-      return null;
-    });
-    // get the current configuration for this execution
-    const currentPipelineConfig = await this.informationState.getPipelineConfig(
-      currentExecution.application,
-      currentExecution.pipelineConfigId,
-    );
-
-    // save this for rendering pipelines
-    this.allExecutions.push({
-      execution: currentExecution,
-      stageId,
-      stageIndex,
-    });
-
-    // get the child execution aka clicking View Pipeline Details
-    const childExecution = await this.informationState.getExecution(currentStage.masterStage.context.executionId);
-    const childTerminalStage = childExecution.stageSummaries.find((stage: IExecutionStageSummary, index: number) => {
-      if (stage.status.toLocaleLowerCase() === 'terminal') stageIndex = index;
-
-      return stage.status.toLowerCase() === 'terminal';
-    });
-    const childTerminalPipelineStage = childExecution.stageSummaries.find(
-      (stage: IExecutionStageSummary) => stage.status.toLowerCase() === 'terminal' && stage.type === 'pipeline',
-    );
-    // get the current configuration for this execution
-    const childPipelineConfig = await this.informationState.getPipelineConfig(
-      childExecution.application,
-      childExecution.pipelineConfigId,
-    );
-
-    if (childExecution && !childTerminalPipelineStage) {
-      this.childExecution = childExecution;
-      this.childPipelineConfig = childPipelineConfig;
+        return null;
+      });
+      // get the current configuration for this execution
+      const currentPipelineConfig = await this.informationState.getPipelineConfig(
+        currentExecution.application,
+        currentExecution.pipelineConfigId,
+      );
 
       // save this for rendering pipelines
       this.allExecutions.push({
-        execution: childExecution,
+        execution: currentExecution,
         stageId,
         stageIndex,
       });
-    }
 
-    if (childTerminalPipelineStage) {
-      this.getPipelineLink(childTerminalPipelineStage.id, childExecution.id);
-      this.childTerminalPipelineStage = childTerminalPipelineStage;
-    } else {
-      // now that we are complete let's fix up the allExecutions array
-      // we are using allExecutions as a breadcrumb so reverse them then pop the first one since there user is already at the first one
-      this.allExecutions.reverse();
-      this.allExecutions.pop();
+      // get the child execution aka clicking View Pipeline Details
+      const childExecution = await this.informationState.getExecution(currentStage.masterStage.context.executionId);
+      const childTerminalStage = childExecution.stageSummaries.find((stage: IExecutionStageSummary, index: number) => {
+        if (stage.status.toLocaleLowerCase() === 'terminal') stageIndex = index;
 
-      this.setState({
-        pipelineConfigDetails: this.childPipelineConfig || currentPipelineConfig,
-        executionDetails: this.childExecution || currentExecution,
-        failedInApplication: currentStage.masterStage.context.application,
-        link: `/#/applications/${currentStage.masterStage.context.application}/executions/details/${currentStage.masterStage.context.executionId}?stage=${this.allExecutions[0].stageIndex}&step=0`,
-        stageDetails: childTerminalStage || this.childTerminalPipelineStage || currentStage,
+        return stage.status.toLowerCase() === 'terminal';
       });
+      const childTerminalPipelineStage = childExecution.stageSummaries.find(
+        (stage: IExecutionStageSummary) => stage.status.toLowerCase() === 'terminal' && stage.type === 'pipeline',
+      );
+      // get the current configuration for this execution
+      const childPipelineConfig = await this.informationState.getPipelineConfig(
+        childExecution.application,
+        childExecution.pipelineConfigId,
+      );
+
+      if (childExecution && !childTerminalPipelineStage) {
+        this.childExecution = childExecution;
+        this.childPipelineConfig = childPipelineConfig;
+
+        // save this for rendering pipelines
+        this.allExecutions.push({
+          execution: childExecution,
+          stageId,
+          stageIndex,
+        });
+      }
+
+      if (childTerminalPipelineStage) {
+        this.getPipelineLink(childTerminalPipelineStage.id, childExecution.id);
+        this.childTerminalPipelineStage = childTerminalPipelineStage;
+      } else {
+        // now that we are complete let's fix up the allExecutions array
+        // we are using allExecutions as a breadcrumb so reverse them then pop the first one since there user is already at the first one
+        this.allExecutions.reverse();
+        this.allExecutions.pop();
+
+        this.setState({
+          pipelineConfigDetails: this.childPipelineConfig || currentPipelineConfig,
+          executionDetails: this.childExecution || currentExecution,
+          failedInApplication: currentStage.masterStage.context.application,
+          link: {
+            application: currentStage.masterStage.context.application,
+            executionId: currentStage.masterStage.context.executionId,
+            stageIndex: this.allExecutions[0].stageIndex,
+          },
+          stageDetails: childTerminalStage || this.childTerminalPipelineStage || currentStage,
+        });
+      }
+    } catch (err) {
+      if (console) {
+        console.error('Error retrieving pipeline execution data.');
+        this.props.onClose();
+      }
     }
   };
 
@@ -229,29 +262,22 @@ export class ExecutionMarkerInformationPopover extends React.PureComponent<
   private toggleParameters = (target: any) => {
     const container = target.nextElementSibling;
     const icon = target.children[0];
+    // since we are toggle to the next stage reverse condiontal here
+    const isClosed = container.classList.contains('closed');
 
-    if (icon.classList.contains('fa-chevron-right')) {
-      icon.classList.remove('fa-chevron-right');
-      icon.classList.add('fa-chevron-down');
-    } else {
-      icon.classList.remove('fa-chevron-down');
-      icon.classList.add('fa-chevron-right');
-    }
+    const iconClass = classNames({
+      'fa-chevron-down': isClosed,
+      'fa-chevron-right': !isClosed,
+      fa: true,
+    });
+    const containerClass = classNames({
+      'view-parameters': true,
+      closed: !isClosed,
+      opened: isClosed,
+    });
 
-    if (container.classList.contains('closed')) {
-      container.classList.remove('closed');
-      container.classList.add('opened');
-    } else {
-      container.classList.remove('opened');
-      container.classList.add('closed');
-    }
-  };
-
-  private goToPipeline = (item: any) => {
-    const { stageIndex } = item;
-    const { application, id } = item.execution;
-
-    window.open(`/#/applications/${application}/executions/details/${id}?stage=${stageIndex}&step=0`, '_blank');
+    icon.className = iconClass;
+    container.className = containerClass;
   };
 
   public render(): React.ReactElement<HTMLDivElement> {
@@ -272,7 +298,7 @@ export class ExecutionMarkerInformationPopover extends React.PureComponent<
       <div className="">
         {this.allExecutions.map(item => {
           return (
-            <div className="execution-graph">
+            <div key={`${item.execution.id}-${item.execution.name}`} className="execution-graph">
               {item.execution.application} - {item.execution.name}
               <PipelineGraph
                 key={item.execution.id}
@@ -320,8 +346,8 @@ export class ExecutionMarkerInformationPopover extends React.PureComponent<
                 {Object.keys(executionDetails.trigger.parameters).length})
               </span>
               <div className="view-parameters closed">
-                {Object.keys(executionDetails.trigger.parameters).map(key => (
-                  <span>
+                {Object.keys(executionDetails.trigger.parameters).map((key: string, index: number) => (
+                  <span key={`${key}-${index}`}>
                     {key}: {executionDetails.trigger.parameters[key]}
                   </span>
                 ))}
@@ -351,10 +377,30 @@ export class ExecutionMarkerInformationPopover extends React.PureComponent<
                         return (
                           <tr
                             onClick={() => {
-                              this.goToPipeline(item);
+                              (document.querySelector(`#stage-${item.stageId}`) as HTMLAnchorElement).click();
                             }}
                           >
-                            <td>{index === 0 && <i className="fa fa-circle"></i>}</td>
+                            <td>
+                              {index === 0 && <i className="fa fa-circle"></i>}
+                              <UISref
+                                to="home.applications.application.pipelines.executionDetails.execution"
+                                params={{
+                                  application: link.application,
+                                  executionId: link.executionId,
+                                  executionParams: {
+                                    application: link.application,
+                                    executionId: link.executionId,
+                                    stage: link.stageIndex,
+                                  },
+                                }}
+                                options={{
+                                  inherit: false,
+                                  reload: 'home.applications.application.pipelines.executionDetails',
+                                }}
+                              >
+                                <a id={`stage-${item.stageId}`} target="_blank"></a>
+                              </UISref>
+                            </td>
                             <td className="information-app">{item.execution.application}</td>
                             <td className="information-execution">{item.execution.name}</td>
                             <td>{item.execution.stageSummaries[item.stageIndex].name}</td>
@@ -381,10 +427,22 @@ export class ExecutionMarkerInformationPopover extends React.PureComponent<
                 Show Pipeline Execution History Graphs
               </button>
             </div>
-            <div>
-              <a href={link} className="btn btn-xs btn-link" aria-disabled="false">
-                Link to the Last Failed Execution Stage
-              </a>
+            <div className="graph-all-buttons">
+              <UISref
+                to="home.applications.application.pipelines.executionDetails.execution"
+                params={{
+                  application: link.application,
+                  executionId: link.executionId,
+                  executionParams: {
+                    application: link.application,
+                    executionId: link.executionId,
+                    stage: link.stageIndex,
+                  },
+                }}
+                options={{ inherit: false, reload: 'home.applications.application.pipelines.executionDetails' }}
+              >
+                <a target="_self">Link to the Last Failed Execution Stage</a>
+              </UISref>
             </div>
           </div>
         )}

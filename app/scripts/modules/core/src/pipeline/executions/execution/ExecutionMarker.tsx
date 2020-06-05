@@ -23,10 +23,10 @@ export interface IExecutionMarkerProps {
 }
 
 export interface IExecutionMarkerState {
-  duration: string;
-  hydrated: boolean;
   contextStageIndex: number;
   contextTarget: Element;
+  duration: string;
+  hydrated: boolean;
   showingExecutionMarkerInformationPopover: boolean;
 }
 
@@ -39,10 +39,10 @@ export class ExecutionMarker extends React.Component<IExecutionMarkerProps, IExe
     const { stage, execution } = props;
 
     this.state = {
-      duration: duration(stage.runningTimeInMs),
-      hydrated: execution.hydrated,
       contextStageIndex: null,
       contextTarget: null,
+      duration: duration(stage.runningTimeInMs),
+      hydrated: execution.hydrated,
       showingExecutionMarkerInformationPopover: false,
     };
   }
@@ -75,9 +75,9 @@ export class ExecutionMarker extends React.Component<IExecutionMarkerProps, IExe
 
   private showExecutionMarkerInformationPopover = (stageIndex: number, event: any) => {
     this.setState({
-      showingExecutionMarkerInformationPopover: true,
       contextStageIndex: stageIndex,
       contextTarget: event.target,
+      showingExecutionMarkerInformationPopover: true,
     });
   };
 
@@ -118,7 +118,6 @@ export class ExecutionMarker extends React.Component<IExecutionMarkerProps, IExe
                 className="fa fa-info-circle"
                 onClick={this.handleStageInformationClick}
                 key={`${execution.id}_${stage.id}`}
-                data-id={`${execution.id}_${stage.id}`}
               />
             )}
         </span>
