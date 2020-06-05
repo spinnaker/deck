@@ -106,20 +106,22 @@ export class ExecutionMarker extends React.Component<IExecutionMarkerProps, IExe
 
     const TooltipComponent = stage.useCustomTooltip ? stage.labelComponent : ExecutionBarLabel;
     const MarkerIcon = stage.markerIcon;
+    const showInfoIcon =
+      SETTINGS.feature.executionMarkerInformationPopover &&
+      stage.status.toLowerCase() === 'terminal' &&
+      stage.type === 'pipeline';
     const stageContents = (
       <div className={markerClassName} style={{ width, backgroundColor: stage.color }} onClick={this.handleStageClick}>
         <span className="horizontal center middle">
           <MarkerIcon stage={stage} />
           <span className="duration">{this.state.duration}</span>
-          {SETTINGS.feature.executionMarkerInformationPopover &&
-            stage.status.toLowerCase() === 'terminal' &&
-            stage.type === 'pipeline' && (
-              <i
-                className="fa fa-info-circle"
-                onClick={this.handleStageInformationClick}
-                key={`${execution.id}_${stage.id}`}
-              />
-            )}
+          {showInfoIcon && (
+            <i
+              className="fa fa-info-circle"
+              onClick={this.handleStageInformationClick}
+              key={`${execution.id}_${stage.id}`}
+            />
+          )}
         </span>
       </div>
     );
