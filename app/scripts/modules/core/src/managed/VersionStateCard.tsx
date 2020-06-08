@@ -82,7 +82,7 @@ const cardAppearanceByState = {
     ),
   },
   vetoed: {
-    icon: 'cloudError',
+    icon: 'artifactBad',
     appearance: 'error',
     title: ({ deployedAtMillis }: CardTitleMetadata) => (
       <span className="sp-group-margin-xs-xaxis">

@@ -212,7 +212,7 @@ export const ArtifactDetail = ({
               Pin...
             </Button>
             <Button
-              iconName="cloudError"
+              iconName="artifactBad"
               appearance="primary"
               disabled={isPinnedEverywhere || isBadEverywhere}
               onClick={() =>
