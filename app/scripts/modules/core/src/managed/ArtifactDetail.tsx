@@ -73,6 +73,7 @@ const EnvironmentCards = memo(
       replacedAt,
       replacedBy,
       pinned,
+      vetoed,
       statefulConstraints,
       statelessConstraints,
     },
@@ -120,6 +121,7 @@ const EnvironmentCards = memo(
         deployedAt={deployedAt}
         replacedAt={replacedAt}
         replacedBy={replacedBy}
+        vetoed={vetoed}
         allVersions={allVersions}
       />
     );
