@@ -1,5 +1,5 @@
 import React from 'react';
-import { useSrefActive } from '@uirouter/react';
+import { useCurrentStateAndParams, useSrefActive } from '@uirouter/react';
 import { UIRouterContext } from '@uirouter/react-hybrid';
 
 import { NgReact } from 'core/reactShims';
@@ -18,7 +18,6 @@ export class SpinnakerHeader extends React.Component<{}, {}> {
   }
 }
 
-
 /**
  * This needs to be a functional component to use an external module's hook.
  * Currently, @Overrides only works on a class component.
@@ -26,6 +25,9 @@ export class SpinnakerHeader extends React.Component<{}, {}> {
  */
 
 export const SpinnakerHeaderContent = () => {
+  const  { state: currentState } = useCurrentStateAndParams();
+  const isApplicationView = currentState.name.includes('applications.');
+
   const isDevicePhoneOrSmaller = () => {
     const bodyStyles = window.getComputedStyle(document.body);
     const isPhone = bodyStyles.getPropertyValue('--is-phone');
@@ -45,7 +47,7 @@ export const SpinnakerHeaderContent = () => {
     <nav className="container spinnaker-header" role="navigation" aria-label="Main Menu">
       <div className="navbar-header horizontal middle">
         <div onClick={toggleNav} className="sp-margin-xl-right">
-            <Icon name={navExpanded ? 'menuClose' : 'menu'} size="medium" color="white" />
+            {isApplicationView && <Icon name={navExpanded ? 'menuClose' : 'menu'} size="medium" color="white" />}
         </div>
         <a className="navbar-brand flex-1" href="#">
           SPINNAKER

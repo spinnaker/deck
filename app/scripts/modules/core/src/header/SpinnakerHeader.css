@@ -10,6 +10,10 @@
   margin-left: auto;
 }
 
+.spinnaker-header .navbar-menu-icon {
+  min-width: 24px;
+}
+
 .spinnaker-header a {
   color: var(--color-text-on-dark);
 }
