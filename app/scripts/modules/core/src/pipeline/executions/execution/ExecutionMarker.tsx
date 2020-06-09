@@ -13,13 +13,13 @@ import { SETTINGS } from 'core/config/settings';
 import './executionMarker.less';
 
 export interface IExecutionMarkerProps {
-  stage: IExecutionStageSummary;
+  active?: boolean;
   application: Application;
   execution: IExecution;
-  active?: boolean;
-  previousStageActive?: boolean;
-  width: string;
   onClick: (stageIndex: number) => void;
+  previousStageActive?: boolean;
+  stage: IExecutionStageSummary;
+  width: string;
 }
 
 export interface IExecutionMarkerState {
@@ -132,7 +132,6 @@ export class ExecutionMarker extends React.Component<IExecutionMarkerProps, IExe
         </TooltipComponent>
         {this.state.showingExecutionMarkerInformationPopover && (
           <ExecutionMarkerInformationPopover
-            target={this.state.contextTarget}
             executionId={execution.id}
             onClose={this.hideExecutionMarkerInformationPopover}
             stageId={execution.stageSummaries[this.state.contextStageIndex].id}

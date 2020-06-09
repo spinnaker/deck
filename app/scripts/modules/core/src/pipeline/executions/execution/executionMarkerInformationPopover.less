@@ -1,15 +1,9 @@
 .execution-marker-information-popover {
-  background-color: var(--color-white);
-
-  .popover {
-    max-width: 800px;
-    width: 800px;
-
-    .popover-content {
-      overflow: auto;
-    }
+  .modal-dialog {
+    max-width: calc(100vw - 20%);
+    width: calc(100vw - 20%);
+    min-width: 800px;
   }
-
   .pipeline-name {
     color: var(--color-accent);
     text-transform: uppercase;
@@ -57,6 +51,8 @@
   }
 
   .information-pipeline-execution-history {
+    width: 100%;
+
     thead {
       background-color: var(--color-alabaster);
     }

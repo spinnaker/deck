@@ -1,6 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 import { UISref } from '@uirouter/react';
+import { Modal } from 'react-bootstrap';
 
 import { IExecution, IPipeline, IExecutionStageSummary } from 'core/domain';
 import { relativeTime, timestamp, duration } from 'core/utils';
@@ -12,7 +13,6 @@ import { ExecutionInformationPopoverState } from './ExecutionInformationPopoverS
 import './executionMarkerInformationPopover.less';
 
 interface IExecutionErrorLocatorProps {
-  target: Element;
   executionId: string;
   stageId: string;
   onClose: Function;
@@ -36,15 +36,10 @@ export class ExecutionMarkerInformationPopover extends React.PureComponent<
   IExecutionLocatorState
 > {
   allExecutions: any[];
-  arrowLeftOffset: number;
   childExecution: any;
   childPipelineConfig: any;
   childTerminalPipelineStage: any;
-  informationIconHeight: number;
-  informationPopoverContainerScrollTop: number;
   informationState: ExecutionInformationPopoverState;
-  popoverHalfWidth: number;
-  popoverWidth: number;
   constructor(props: IExecutionErrorLocatorProps) {
     super(props);
     this.state = {
@@ -56,97 +51,13 @@ export class ExecutionMarkerInformationPopover extends React.PureComponent<
       stageDetails: null,
     };
 
-    const target = document.querySelector('.all-execution-groups');
-
-    /*
-      because this component is actually rendered (n) times for each stage in ./ExecutionMarker.tsk that meets the conditional we could potentional havec
-      (n) event handlers for scroll and resize, no real dom api to check if function X has been assinged already so just clear out remove the handlers
-      and add them back in
-    */
-    if (target) {
-      target.removeEventListener('scroll', this.onScroll);
-      target.addEventListener('scroll', this.onScroll);
-    }
-    window.removeEventListener('resize', this.onResize);
-    window.addEventListener('resize', this.onResize);
-
     this.allExecutions = [];
-    /*
-      bootstrap popover max width is 400
-      since we are using the css for this custom popover and overriding to 800 pixels
-      we need to move the arrow's offset default
-    */
-    this.arrowLeftOffset = 404;
-    this.informationIconHeight = 29;
-    this.informationPopoverContainerScrollTop = null;
     this.informationState = new ExecutionInformationPopoverState();
-    /*
-      bootstrap popover max width is 400
-      since we are using the css for this custom popover and overriding to 800 pixels
-      we need to set a halfwidth instead of just always using 800/2 or using 400 everywhere
-      this is used if a stage is close to the right hand side of the browsers view port
-      we don't want to overally extend so let's check the popover can fit
-      used in the:
-        this.windowCanFit
-        this.updatePosition
-    */
-    this.popoverHalfWidth = 400;
   }
 
   public componentDidMount() {
     this.getPipelineLink(this.props.stageId, this.props.executionId);
   }
-
-  public componentWillUnmount() {
-    const target = document.querySelector('.all-execution-groups');
-    if (target) {
-      target.removeEventListener('scroll', this.onScroll);
-    }
-    window.removeEventListener('resize', this.onResize);
-  }
-
-  private onScroll = () => {
-    this.updatePosition('scroll');
-  };
-
-  private onResize = () => {
-    this.updatePosition('resize');
-  };
-
-  private updatePosition = (movement: string) => {
-    const { top } = this.props.target.getBoundingClientRect();
-    const targetTop = top - this.informationIconHeight;
-    const informationPopoverContainer = document.querySelector(
-      '.execution-marker-information-popover > div.popover',
-    ) as HTMLDivElement;
-
-    if (movement === 'scroll') {
-      const container = document.querySelector('.all-execution-groups') as HTMLDivElement;
-      const containerTop = container.getBoundingClientRect().top;
-
-      if (targetTop < containerTop) {
-        this.props.onClose();
-      }
-
-      informationPopoverContainer.style.top = targetTop + 'px';
-      this.informationPopoverContainerScrollTop = targetTop;
-    } else if (movement === 'resize') {
-      const targetClientRect = this.props.target.getBoundingClientRect();
-      const newLeft = this.windowCanFit();
-      const arrowElement = informationPopoverContainer.querySelector('.arrow') as HTMLDivElement;
-      let left = targetClientRect.left;
-
-      if (newLeft > 0) {
-        arrowElement.style.left = this.arrowLeftOffset + newLeft + 'px';
-        left -= newLeft;
-      } else {
-        arrowElement.style.left = this.popoverHalfWidth + 'px';
-      }
-
-      informationPopoverContainer.style.top = targetClientRect.top - this.informationIconHeight + 'px';
-      informationPopoverContainer.style.left = left - this.popoverHalfWidth + 'px';
-    }
-  };
 
   private getPipelineLink = async (stageId: string, executionId: string): Promise<any> => {
     // get the current execution id is from ExecutionMarker.tsx
@@ -234,29 +145,12 @@ export class ExecutionMarkerInformationPopover extends React.PureComponent<
     }
   };
 
-  private windowCanFit = () => {
-    const { left, width } = this.props.target.getBoundingClientRect();
-    return this.popoverHalfWidth + left + width - window.innerWidth;
-  };
-
   private showPipelineGraph = () => {
     this.setState({ showPipelineGraph: true });
   };
 
   private hidePipelineGraph = () => {
     this.setState({ showPipelineGraph: false });
-  };
-
-  private getMaxHeight = (top: number) => {
-    const height = window.innerHeight - top - 100;
-
-    // user can open popover near the bottom of the screen
-    // always give the some room
-    if (height < 400) {
-      return 400;
-    }
-
-    return height;
   };
 
   private toggleParameters = (target: any) => {
@@ -282,17 +176,6 @@ export class ExecutionMarkerInformationPopover extends React.PureComponent<
 
   public render(): React.ReactElement<HTMLDivElement> {
     const { executionDetails, failedInApplication, link, pipelineConfigDetails, stageDetails } = this.state;
-    const { left, top } = this.props.target.getBoundingClientRect();
-    const targetTop = this.informationPopoverContainerScrollTop || top - this.informationIconHeight;
-    let targetLeft = left - this.popoverHalfWidth;
-    const newLeft = this.windowCanFit();
-    let arrowLeft = this.arrowLeftOffset;
-    const maxHeight = this.getMaxHeight(top);
-
-    if (newLeft > 0) {
-      targetLeft -= newLeft;
-      arrowLeft = this.arrowLeftOffset + newLeft;
-    }
 
     const content = this.state.showPipelineGraph ? (
       <div className="">
@@ -376,6 +259,7 @@ export class ExecutionMarkerInformationPopover extends React.PureComponent<
                       {this.allExecutions.map((item: any, index: number) => {
                         return (
                           <tr
+                            key={`execution-history-for-${item.execution.id}-${item.stageId}`}
                             onClick={() => {
                               (document.querySelector(`#stage-${item.stageId}`) as HTMLAnchorElement).click();
                             }}
@@ -461,29 +345,16 @@ export class ExecutionMarkerInformationPopover extends React.PureComponent<
         Pipeline Execution History Graphs <span className="information-history-note">(Decending order)</span>
       </span>
     ) : (
-      <span>
-        {failedInApplication ? failedInApplication : '-'}
-        <span className="pull-right clickable">
-          <i
-            className="fa fa-times"
-            onClick={() => {
-              this.props.onClose();
-            }}
-          ></i>
-        </span>
-      </span>
+      <span>{failedInApplication ? failedInApplication : '-'}</span>
     );
 
     return (
-      <div className="execution-marker-information-popover">
-        <div className="popover fade in show bottom" style={{ position: 'absolute', top: targetTop, left: targetLeft }}>
-          <div className="arrow" style={{ left: arrowLeft }}></div>
-          <h3 className="popover-title">{title}</h3>
-          <div className="popover-content" style={{ maxHeight }}>
-            {content}
-          </div>
-        </div>
-      </div>
+      <Modal show onHide={this.props.onClose} className="execution-marker-information-popover" backdrop="static">
+        <Modal.Header closeButton={true}>
+          <Modal.Title>{title}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>{content}</Modal.Body>
+      </Modal>
     );
   }
 }
