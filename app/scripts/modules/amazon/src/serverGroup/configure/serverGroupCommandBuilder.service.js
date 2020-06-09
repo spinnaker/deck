@@ -1,5 +1,3 @@
-'use strict';
-
 import * as angular from 'angular';
 import _ from 'lodash';
 
@@ -344,9 +342,9 @@ angular
           if (serverGroup.launchTemplate) {
             const { launchTemplateData } = serverGroup.launchTemplate;
             const maxPrice =
-              launchTemplateData.metadataOptions &&
-              launchTemplateData.metadataOptions.spotOptions &&
-              launchTemplateData.metadataOptions.spotOptions.maxPrice;
+              launchTemplateData.instanceMarketOptions &&
+              launchTemplateData.instanceMarketOptions.spotOptions &&
+              launchTemplateData.instanceMarketOptions.spotOptions.maxPrice;
             const ipv6Addresses = _.flatMap(launchTemplateData.networkInterfaces, i => i.ipv6Addresses) || [];
 
             angular.extend(command, {
@@ -359,7 +357,7 @@ angular
               ebsOptimized: launchTemplateData.ebsOptimized,
               spotPrice: maxPrice || undefined,
               requireIMDSv2:
-                launchTemplateData.metadataOptions && launchTemplateData.metadataOptions.httpTokens === 'required',
+                launchTemplateData.metadataOptions && launchTemplateData.metadataOptions.httpsTokens === 'required',
             });
 
             if (launchTemplateData.userData) {
