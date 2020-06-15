@@ -94,6 +94,7 @@ export interface IAmazonServerGroupCommand extends IServerGroupCommand {
   targetHealthyDeployPercentage: number;
   useAmiBlockDeviceMappings: boolean;
   targetGroups: string[];
+  setLaunchTemplate?: boolean;
   spelTargetGroups: string[];
   spelLoadBalancers: string[];
   viewState: IAmazonServerGroupCommandViewState;

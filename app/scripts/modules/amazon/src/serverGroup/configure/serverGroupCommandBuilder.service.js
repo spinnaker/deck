@@ -99,6 +99,8 @@ angular
                 dirty: {},
                 submitButtonLabel: getSubmitButtonLabel(defaults.mode || 'create'),
               },
+              // TO DO: Remove after temporary testing on feature branch
+              setLaunchTemplate: true,
             };
 
             if (
@@ -377,6 +379,9 @@ angular
           if (serverGroup.launchTemplate && serverGroup.launchTemplate.launchTemplateData.securityGroups.length) {
             command.securityGroups = serverGroup.launchTemplate.launchTemplateData.securityGroups;
           }
+
+          // TO DO: Remove after temporary feature branch testing
+          command.setLaunchTemplate = true;
 
           return command;
         });
