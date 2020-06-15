@@ -40,7 +40,7 @@ export class VersionChecker {
           key: 'newVersion',
           action: 'create',
           body: `A new version of Spinnaker is available
-                <a role="button" class="action" onclick="document.location.reload(true)">Refresh</a>`,
+              <a role="button" class="action" onclick="document.location.reload(true)">Refresh</a>`,
         });
         this.scheduler.unsubscribe();
       }
