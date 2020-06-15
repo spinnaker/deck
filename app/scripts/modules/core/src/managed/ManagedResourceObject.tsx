@@ -66,7 +66,10 @@ export const ManagedResourceObject = memo(
     const { kind } = resource;
     const resourceName = getResourceName(resource);
     const routingInfo = getResourceRoutingInfo(resource) ?? { state: '', params: {} };
-    const route = useSref(routingInfo.state, routingInfo.params);
+    let route = null;
+    if (routingInfo) {
+      route = useSref(routingInfo.state, routingInfo.params);
+    }
 
     const current =
       artifactVersionsByState?.current &&
