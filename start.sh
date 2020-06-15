@@ -16,12 +16,8 @@ if [ $CURRENT_VERSION != "v$DESIRED_VERSION" ]; then
       echo "Installing node $DESIRED_VERSION..."
       nvm install $DESIRED_VERSION
     fi
-  elif [ -f /usr/local/bin/n ]; then
-    echo "Node is currently $CURRENT_VERSION. Activating $DESIRED_VERSION using n..."
-    echo "Using $DESIRED_VERSION...";
-    n $DESIRED_VERSION
   else
-    echo "WARNING: could not update to node $DESIRED_VERSION, nvm nor n found..."
+    echo "WARNING: could not update to node $DESIRED_VERSION, nvm not found..."
   fi
 fi
 

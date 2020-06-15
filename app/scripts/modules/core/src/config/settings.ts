@@ -29,7 +29,7 @@ export interface IFeatures {
   displayTimestampsInUserLocalTime?: boolean;
   dockerBake?: boolean;
   entityTags?: boolean;
-  executionMarkerInformationPopover?: boolean;
+  executionMarkerInformationModal?: boolean;
   fiatEnabled?: boolean;
   gceScaleDownControlsEnabled?: boolean;
   gceStatefulMigsEnabled?: boolean;

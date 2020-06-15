@@ -2,20 +2,20 @@ import { API } from 'core/api/ApiService';
 import { ExecutionsTransformer } from '../../service/ExecutionsTransformer';
 import { IExecution, IPipeline } from 'core/domain';
 
-export class ExecutionInformationPopoverState {
-  private static instance: ExecutionInformationPopoverState;
+export class ExecutionInformationService {
+  private static instance: ExecutionInformationService;
   private calledExecutions: { [key: string]: IExecution };
   private calledPipelineConfigs: { [key: string]: IPipeline[] };
 
   constructor() {
-    if (!ExecutionInformationPopoverState.instance) {
+    if (!ExecutionInformationService.instance) {
       this.calledExecutions = {};
       this.calledPipelineConfigs = {};
 
-      ExecutionInformationPopoverState.instance = this;
+      ExecutionInformationService.instance = this;
     }
 
-    return ExecutionInformationPopoverState.instance;
+    return ExecutionInformationService.instance;
   }
 
   public getExecution = async (executionId: string): Promise<IExecution> => {
@@ -23,14 +23,15 @@ export class ExecutionInformationPopoverState {
       return this.calledExecutions[executionId];
     }
 
-    const execution = await API.one('pipelines', executionId).get();
-    // store for later
-    this.calledExecutions[executionId] = execution;
+    return API.one('pipelines', executionId)
+      .get()
+      .then((execution: IExecution) => {
+        this.calledExecutions[executionId] = execution;
+        // convert the IExecutionStage => IExecutionStageSummary
+        ExecutionsTransformer.processStageSummaries(execution);
 
-    // convert the IExecutionStage => IExecutionStageSummary
-    ExecutionsTransformer.processStageSummaries(execution);
-
-    return execution;
+        return execution;
+      });
   };
 
   public getPipelineConfig = async (application: string, pipelineConfigId: string): Promise<IPipeline> => {
@@ -40,17 +41,16 @@ export class ExecutionInformationPopoverState {
         (config: IPipeline) => config.id === pipelineConfigId,
       );
 
-      return pipelineConfig;
+      Promise.resolve(pipelineConfig);
     }
 
-    const pipelineConfigs = await API.one('applications', application, 'pipelineConfigs').get();
-    // store for later
-    this.calledPipelineConfigs[application] = pipelineConfigs;
+    return API.one('applications', application, 'pipelineConfigs')
+      .get()
+      .then((pipelineConfigs: IPipeline[]) => {
+        // store for later
+        this.calledPipelineConfigs[application] = pipelineConfigs;
 
-    pipelineConfig = this.calledPipelineConfigs[application].find(
-      (config: IPipeline) => config.id === pipelineConfigId,
-    );
-
-    return pipelineConfig;
+        return this.calledPipelineConfigs[application].find((config: IPipeline) => config.id === pipelineConfigId);
+      });
   };
 }

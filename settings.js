@@ -74,7 +74,7 @@ window.spinnakerSettings = {
     displayTimestampsInUserLocalTime: displayTimestampsInUserLocalTime,
     dryRunEnabled: dryRunEnabled,
     entityTags: entityTagsEnabled,
-    executionMarkerInformationPopover: false,
+    executionMarkerInformationModal: true,
     fiatEnabled: fiatEnabled,
     gceScaleDownControlsEnabled: gceScaleDownControlsEnabled,
     gceStatefulMigsEnabled: gceStatefulMigsEnabled,

@@ -7,7 +7,7 @@ import { duration } from 'core/utils/timeFormatters';
 
 import { Application } from 'core/application/application.model';
 import { ExecutionBarLabel } from '../../config/stages/common/ExecutionBarLabel';
-import { ExecutionMarkerInformationPopover } from './ExecutionMarkerInformationPopover';
+import { ExecutionMarkerInformationModal } from './ExecutionMarkerInformationModal';
 import { SETTINGS } from 'core/config/settings';
 
 import './executionMarker.less';
@@ -23,11 +23,10 @@ export interface IExecutionMarkerProps {
 }
 
 export interface IExecutionMarkerState {
-  contextStageIndex: number;
   contextTarget: Element;
   duration: string;
   hydrated: boolean;
-  showingExecutionMarkerInformationPopover: boolean;
+  showingExecutionMarkerInformationModal: boolean;
 }
 
 export class ExecutionMarker extends React.Component<IExecutionMarkerProps, IExecutionMarkerState> {
@@ -39,11 +38,10 @@ export class ExecutionMarker extends React.Component<IExecutionMarkerProps, IExe
     const { stage, execution } = props;
 
     this.state = {
-      contextStageIndex: null,
       contextTarget: null,
       duration: duration(stage.runningTimeInMs),
       hydrated: execution.hydrated,
-      showingExecutionMarkerInformationPopover: false,
+      showingExecutionMarkerInformationModal: false,
     };
   }
 
@@ -70,21 +68,19 @@ export class ExecutionMarker extends React.Component<IExecutionMarkerProps, IExe
     ReactGA.event({ category: 'Pipeline', action: 'Stage show context menu (bar)' });
     event.preventDefault();
     event.stopPropagation();
-    this.showExecutionMarkerInformationPopover(this.props.stage.index, event);
+    this.showExecutionMarkerInformationModal(event);
   };
 
-  private showExecutionMarkerInformationPopover = (stageIndex: number, event: any) => {
+  private showExecutionMarkerInformationModal = (event: any) => {
     this.setState({
-      contextStageIndex: stageIndex,
       contextTarget: event.target,
-      showingExecutionMarkerInformationPopover: true,
+      showingExecutionMarkerInformationModal: true,
     });
   };
 
-  private hideExecutionMarkerInformationPopover = () => {
+  private hideExecutionMarkerInformationModal = () => {
     this.setState({
-      showingExecutionMarkerInformationPopover: false,
-      contextStageIndex: null,
+      showingExecutionMarkerInformationModal: false,
       contextTarget: null,
     });
   };
@@ -107,7 +103,7 @@ export class ExecutionMarker extends React.Component<IExecutionMarkerProps, IExe
     const TooltipComponent = stage.useCustomTooltip ? stage.labelComponent : ExecutionBarLabel;
     const MarkerIcon = stage.markerIcon;
     const showInfoIcon =
-      SETTINGS.feature.executionMarkerInformationPopover &&
+      SETTINGS.feature.executionMarkerInformationModal &&
       stage.status.toLowerCase() === 'terminal' &&
       stage.type === 'pipeline';
     const stageContents = (
@@ -130,11 +126,11 @@ export class ExecutionMarker extends React.Component<IExecutionMarkerProps, IExe
         <TooltipComponent application={application} execution={execution} stage={stage} executionMarker={true}>
           {stageContents}
         </TooltipComponent>
-        {this.state.showingExecutionMarkerInformationPopover && (
-          <ExecutionMarkerInformationPopover
+        {this.state.showingExecutionMarkerInformationModal && (
+          <ExecutionMarkerInformationModal
             executionId={execution.id}
-            onClose={this.hideExecutionMarkerInformationPopover}
-            stageId={execution.stageSummaries[this.state.contextStageIndex].id}
+            onClose={this.hideExecutionMarkerInformationModal}
+            stageId={execution.stageSummaries[stage.index].id}
           />
         )}
       </span>

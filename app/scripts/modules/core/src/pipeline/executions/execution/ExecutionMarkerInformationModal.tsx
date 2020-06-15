@@ -1,5 +1,4 @@
 import React from 'react';
-import classNames from 'classnames';
 import { UISref } from '@uirouter/react';
 import { Modal } from 'react-bootstrap';
 
@@ -7,10 +6,11 @@ import { IExecution, IPipeline, IExecutionStageSummary } from 'core/domain';
 import { relativeTime, timestamp, duration } from 'core/utils';
 import { Spinner } from 'core';
 import { PipelineGraph } from '../../config/graph/PipelineGraph';
+import { ParametersAndArtifacts } from '../../status/ParametersAndArtifacts';
 
-import { ExecutionInformationPopoverState } from './ExecutionInformationPopoverState';
+import { ExecutionInformationService } from './executionInformation.service';
 
-import './executionMarkerInformationPopover.less';
+import './ExecutionMarkerInformationModal.less';
 
 interface IExecutionErrorLocatorProps {
   executionId: string;
@@ -31,7 +31,7 @@ interface IExecutionLocatorState {
   stageDetails: any;
 }
 
-export class ExecutionMarkerInformationPopover extends React.PureComponent<
+export class ExecutionMarkerInformationModal extends React.PureComponent<
   IExecutionErrorLocatorProps,
   IExecutionLocatorState
 > {
@@ -39,7 +39,7 @@ export class ExecutionMarkerInformationPopover extends React.PureComponent<
   childExecution: any;
   childPipelineConfig: any;
   childTerminalPipelineStage: any;
-  informationState: ExecutionInformationPopoverState;
+  informationService: ExecutionInformationService;
   constructor(props: IExecutionErrorLocatorProps) {
     super(props);
     this.state = {
@@ -52,17 +52,17 @@ export class ExecutionMarkerInformationPopover extends React.PureComponent<
     };
 
     this.allExecutions = [];
-    this.informationState = new ExecutionInformationPopoverState();
+    this.informationService = new ExecutionInformationService();
   }
 
   public componentDidMount() {
     this.getPipelineLink(this.props.stageId, this.props.executionId);
   }
 
-  private getPipelineLink = async (stageId: string, executionId: string): Promise<any> => {
+  private getPipelineLink = async (stageId: string, executionId: string): Promise<void> => {
     // get the current execution id is from ExecutionMarker.tsx
     try {
-      const currentExecution = await this.informationState.getExecution(executionId);
+      const currentExecution = await this.informationService.getExecution(executionId);
       let stageIndex;
 
       // get the current stage in the exeuction index is from ExecutionMarker.tsx
@@ -76,7 +76,7 @@ export class ExecutionMarkerInformationPopover extends React.PureComponent<
         return null;
       });
       // get the current configuration for this execution
-      const currentPipelineConfig = await this.informationState.getPipelineConfig(
+      const currentPipelineConfig = await this.informationService.getPipelineConfig(
         currentExecution.application,
         currentExecution.pipelineConfigId,
       );
@@ -89,7 +89,7 @@ export class ExecutionMarkerInformationPopover extends React.PureComponent<
       });
 
       // get the child execution aka clicking View Pipeline Details
-      const childExecution = await this.informationState.getExecution(currentStage.masterStage.context.executionId);
+      const childExecution = await this.informationService.getExecution(currentStage.masterStage.context.executionId);
       const childTerminalStage = childExecution.stageSummaries.find((stage: IExecutionStageSummary, index: number) => {
         if (stage.status.toLocaleLowerCase() === 'terminal') stageIndex = index;
 
@@ -99,7 +99,7 @@ export class ExecutionMarkerInformationPopover extends React.PureComponent<
         (stage: IExecutionStageSummary) => stage.status.toLowerCase() === 'terminal' && stage.type === 'pipeline',
       );
       // get the current configuration for this execution
-      const childPipelineConfig = await this.informationState.getPipelineConfig(
+      const childPipelineConfig = await this.informationService.getPipelineConfig(
         childExecution.application,
         childExecution.pipelineConfigId,
       );
@@ -153,27 +153,6 @@ export class ExecutionMarkerInformationPopover extends React.PureComponent<
     this.setState({ showPipelineGraph: false });
   };
 
-  private toggleParameters = (target: any) => {
-    const container = target.nextElementSibling;
-    const icon = target.children[0];
-    // since we are toggle to the next stage reverse condiontal here
-    const isClosed = container.classList.contains('closed');
-
-    const iconClass = classNames({
-      'fa-chevron-down': isClosed,
-      'fa-chevron-right': !isClosed,
-      fa: true,
-    });
-    const containerClass = classNames({
-      'view-parameters': true,
-      closed: !isClosed,
-      opened: isClosed,
-    });
-
-    icon.className = iconClass;
-    container.className = containerClass;
-  };
-
   public render(): React.ReactElement<HTMLDivElement> {
     const { executionDetails, failedInApplication, link, pipelineConfigDetails, stageDetails } = this.state;
 
@@ -219,22 +198,11 @@ export class ExecutionMarkerInformationPopover extends React.PureComponent<
               </div>
             </div>
             <div className="bottom-margin parameters">
-              <span
-                className="clickable"
-                onClick={event => {
-                  this.toggleParameters(event.target);
-                }}
-              >
-                <i className="fa fa-chevron-right"></i> View all Parameters (
-                {Object.keys(executionDetails.trigger.parameters).length})
-              </span>
-              <div className="view-parameters closed">
-                {Object.keys(executionDetails.trigger.parameters).map((key: string, index: number) => (
-                  <span key={`${key}-${index}`}>
-                    {key}: {executionDetails.trigger.parameters[key]}
-                  </span>
-                ))}
-              </div>
+              <ParametersAndArtifacts
+                execution={executionDetails}
+                expandParamsOnInit={false}
+                pipelineConfig={this.childPipelineConfig}
+              />
             </div>
             {stageDetails && (
               <div className="bottom-margin information-stage-details">
