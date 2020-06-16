@@ -226,14 +226,9 @@ export class ExecutionMarkerInformationModal extends React.PureComponent<
                     <tbody className="information-section">
                       {this.allExecutions.map((item: any, index: number) => {
                         return (
-                          <tr
-                            key={`execution-history-for-${item.execution.id}-${item.stageId}`}
-                            onClick={() => {
-                              (document.querySelector(`#stage-${item.stageId}`) as HTMLAnchorElement).click();
-                            }}
-                          >
-                            <td>
-                              {index === 0 && <i className="fa fa-circle"></i>}
+                          <tr key={`execution-history-for-${item.execution.id}-${item.stageId}`}>
+                            <td>{index === 0 && <i className="fa fa-circle"></i>}</td>
+                            <td className="information-app">
                               <UISref
                                 to="home.applications.application.pipelines.executionDetails.execution"
                                 params={{
@@ -250,15 +245,77 @@ export class ExecutionMarkerInformationModal extends React.PureComponent<
                                   reload: 'home.applications.application.pipelines.executionDetails',
                                 }}
                               >
-                                <a id={`stage-${item.stageId}`} target="_blank"></a>
+                                <a id={`stage-${item.stageId}`} target="_blank">
+                                  {item.execution.application}
+                                </a>
                               </UISref>
                             </td>
-                            <td className="information-app">{item.execution.application}</td>
-                            <td className="information-execution">{item.execution.name}</td>
-                            <td>{item.execution.stageSummaries[item.stageIndex].name}</td>
+                            <td className="information-execution">
+                              <UISref
+                                to="home.applications.application.pipelines.executionDetails.execution"
+                                params={{
+                                  application: link.application,
+                                  executionId: link.executionId,
+                                  executionParams: {
+                                    application: link.application,
+                                    executionId: link.executionId,
+                                    stage: link.stageIndex,
+                                  },
+                                }}
+                                options={{
+                                  inherit: false,
+                                  reload: 'home.applications.application.pipelines.executionDetails',
+                                }}
+                              >
+                                <a id={`stage-${item.stageId}`} target="_blank">
+                                  {item.execution.name}
+                                </a>
+                              </UISref>
+                            </td>
+                            <td>
+                              <UISref
+                                to="home.applications.application.pipelines.executionDetails.execution"
+                                params={{
+                                  application: link.application,
+                                  executionId: link.executionId,
+                                  executionParams: {
+                                    application: link.application,
+                                    executionId: link.executionId,
+                                    stage: link.stageIndex,
+                                  },
+                                }}
+                                options={{
+                                  inherit: false,
+                                  reload: 'home.applications.application.pipelines.executionDetails',
+                                }}
+                              >
+                                <a id={`stage-${item.stageId}`} target="_blank">
+                                  {item.execution.stageSummaries[item.stageIndex].name}
+                                </a>
+                              </UISref>
+                            </td>
                             <td className="information-stage-status">
-                              <span className="information-terminal-stage">
-                                {item.execution.stageSummaries[item.stageIndex].status}
+                              <span className="information-terminal-stage color-white">
+                                <UISref
+                                  to="home.applications.application.pipelines.executionDetails.execution"
+                                  params={{
+                                    application: link.application,
+                                    executionId: link.executionId,
+                                    executionParams: {
+                                      application: link.application,
+                                      executionId: link.executionId,
+                                      stage: link.stageIndex,
+                                    },
+                                  }}
+                                  options={{
+                                    inherit: false,
+                                    reload: 'home.applications.application.pipelines.executionDetails',
+                                  }}
+                                >
+                                  <a id={`stage-${item.stageId}`} target="_blank">
+                                    {item.execution.stageSummaries[item.stageIndex].status}
+                                  </a>
+                                </UISref>
                               </span>
                             </td>
                             <td>{duration(item.execution.endTime - item.execution.startTime)}</td>
