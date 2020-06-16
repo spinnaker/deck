@@ -6,8 +6,8 @@ import { SETTINGS } from 'core/config';
 
 import './HelpMenu.less';
 
-const DOCS_URL = 'https://spinnaker.io/docs';
-const COMMUNITY_URL = 'https://spinnaker.io/community';
+const DOCS_URL = 'https://www.spinnaker.io/docs';
+const COMMUNITY_URL = 'https://www.spinnaker.io/community';
 const VERSIONS_URL = 'https://www.spinnaker.io/community/releases/versions/';
 
 const Feedback = () =>
