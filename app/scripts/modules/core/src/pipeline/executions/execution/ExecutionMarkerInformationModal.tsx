@@ -10,7 +10,7 @@ import { ParametersAndArtifacts } from '../../status/ParametersAndArtifacts';
 
 import { ExecutionInformationService } from './executionInformation.service';
 
-import './ExecutionMarkerInformationModal.less';
+import './executionMarkerInformationModal.less';
 
 interface IExecutionErrorLocatorProps {
   executionId: string;
