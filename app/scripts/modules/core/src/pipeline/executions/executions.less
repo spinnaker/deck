@@ -6,6 +6,7 @@
 .executions-section {
   display: flex;
   flex: 1 1 auto;
+  width: 100%;
   margin-top: 6px;
 
   .execution-groups-header {
@@ -42,14 +43,29 @@
   }
 
   .insight {
+    width: 100%;
+
     .full-content {
+      margin-left: 0;
       margin-top: 6px;
+      display: flex;
+      flex-direction: row;
+
+      .nav {
+        flex-shrink: 0;
+        margin-top: 40px;
+      }
+
+      .nav-content {
+        max-width: 80%;
+        margin-left: 12px;
+      }
     }
   }
 
   .filters-collapsed {
     .execution-groups-header {
-      margin-left: 78px;
+      margin-left: 84px;
     }
   }
 

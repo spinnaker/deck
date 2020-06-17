@@ -289,135 +289,136 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
             <div onClick={this.toggleFilters}>
               <FilterCollapse />
             </div>
-
-            {filtersExpanded && (
-              <div className="nav">
+            <div className="full-content">
+              {filtersExpanded && (
+                <div className="nav">
+                  {!loading && (
+                    <ExecutionFilters application={app} setReloadingForFilters={this.setReloadingForFilters} />
+                  )}
+                </div>
+              )}
+              <div
+                className={`nav-content ${filtersExpanded ? 'filters-expanded' : ''} ${
+                  sortFilter.showDurations ? 'show-durations' : ''
+                }`}
+                data-scroll-id="nav-content"
+              >
                 {!loading && (
-                  <ExecutionFilters application={app} setReloadingForFilters={this.setReloadingForFilters} />
-                )}
-              </div>
-            )}
-            <div
-              className={`full-content ${filtersExpanded ? 'filters-expanded' : ''} ${
-                sortFilter.showDurations ? 'show-durations' : ''
-              }`}
-              data-scroll-id="nav-content"
-            >
-              {!loading && (
-                <div className="execution-groups-header">
-                  <div className="form-group pull-right">
-                    <a
-                      className="btn btn-sm btn-primary clickable"
-                      onClick={this.startManualExecutionClicked}
-                      style={{ pointerEvents: triggeringExecution ? 'none' : 'auto' }}
-                    >
-                      {triggeringExecution && (
-                        <span>
-                          <Tooltip value="Starting Execution">
-                            <span className="visible-md-inline visible-sm-inline">
+                  <div className="execution-groups-header">
+                    <div className="form-group pull-right">
+                      <a
+                        className="btn btn-sm btn-primary clickable"
+                        onClick={this.startManualExecutionClicked}
+                        style={{ pointerEvents: triggeringExecution ? 'none' : 'auto' }}
+                      >
+                        {triggeringExecution && (
+                          <span>
+                            <Tooltip value="Starting Execution">
+                              <span className="visible-md-inline visible-sm-inline">
+                                <Spinner size="nano" />
+                              </span>
+                            </Tooltip>
+                            <span className="visible-lg-inline">
                               <Spinner size="nano" />
                             </span>
-                          </Tooltip>
-                          <span className="visible-lg-inline">
-                            <Spinner size="nano" />
+                            <span className="visible-xl-inline">Starting Execution</span>
+                            &hellip;
                           </span>
-                          <span className="visible-xl-inline">Starting Execution</span>
-                          &hellip;
-                        </span>
-                      )}
-                      {!triggeringExecution && (
-                        <span>
-                          <span className="glyphicon glyphicon-play visible-lg-inline" />
-                          <Tooltip value="Start Manual Execution">
-                            <span className="glyphicon glyphicon-play visible-md-inline visible-sm-inline" />
+                        )}
+                        {!triggeringExecution && (
+                          <span>
+                            <span className="glyphicon glyphicon-play visible-lg-inline" />
+                            <Tooltip value="Start Manual Execution">
+                              <span className="glyphicon glyphicon-play visible-md-inline visible-sm-inline" />
+                            </Tooltip>
+                            <span className="visible-xl-inline"> Start Manual Execution</span>
+                          </span>
+                        )}
+                      </a>
+                    </div>
+                    <div className="pull-right">
+                      <CreatePipeline application={app} />
+                    </div>
+                    <form className="form-inline" style={{ marginBottom: '5px' }}>
+                      {sortFilter.groupBy && (
+                        <div className="form-group" style={{ marginRight: '20px' }}>
+                          <Tooltip value="expand all">
+                            <a className="btn btn-xs btn-default clickable" onClick={this.expand}>
+                              <span className="glyphicon glyphicon-plus" />
+                            </a>
                           </Tooltip>
-                          <span className="visible-xl-inline"> Start Manual Execution</span>
-                        </span>
+                          <Tooltip value="collapse all">
+                            <a className="btn btn-xs btn-default clickable" onClick={this.collapse}>
+                              <span className="glyphicon glyphicon-minus" />
+                            </a>
+                          </Tooltip>
+                        </div>
                       )}
-                    </a>
-                  </div>
-                  <div className="pull-right">
-                    <CreatePipeline application={app} />
-                  </div>
-                  <form className="form-inline" style={{ marginBottom: '5px' }}>
-                    {sortFilter.groupBy && (
-                      <div className="form-group" style={{ marginRight: '20px' }}>
-                        <Tooltip value="expand all">
-                          <a className="btn btn-xs btn-default clickable" onClick={this.expand}>
-                            <span className="glyphicon glyphicon-plus" />
-                          </a>
-                        </Tooltip>
-                        <Tooltip value="collapse all">
-                          <a className="btn btn-xs btn-default clickable" onClick={this.collapse}>
-                            <span className="glyphicon glyphicon-minus" />
-                          </a>
-                        </Tooltip>
+                      <div className="form-group">
+                        <label>Group by</label>
+                        <select
+                          className="form-control input-sm"
+                          value={sortFilter.groupBy}
+                          onChange={this.groupByChanged}
+                        >
+                          <option value="none">None</option>
+                          <option value="name">Pipeline</option>
+                          <option value="timeBoundary">Time Boundary</option>
+                        </select>
                       </div>
-                    )}
-                    <div className="form-group">
-                      <label>Group by</label>
-                      <select
-                        className="form-control input-sm"
-                        value={sortFilter.groupBy}
-                        onChange={this.groupByChanged}
-                      >
-                        <option value="none">None</option>
-                        <option value="name">Pipeline</option>
-                        <option value="timeBoundary">Time Boundary</option>
-                      </select>
-                    </div>
-                    <div className="form-group">
-                      <label>Show </label>
-                      <select
-                        className="form-control input-sm"
-                        value={sortFilter.count}
-                        onChange={this.showCountChanged}
-                      >
-                        {this.filterCountOptions.map(count => (
-                          <option key={count} value={count}>
-                            {count}
-                          </option>
-                        ))}
-                      </select>
-                      <span> executions per pipeline</span>
-                    </div>
-                    <div className="form-group checkbox">
-                      <label>
-                        <input
-                          type="checkbox"
-                          checked={sortFilter.showDurations}
-                          onChange={this.showDurationsChanged}
-                        />{' '}
-                        stage durations
-                      </label>
-                    </div>
-                  </form>
-                  <FilterTags
-                    tags={tags}
-                    tagCleared={this.forceUpdateExecutionGroups}
-                    clearFilters={this.clearFilters}
-                  />
-                </div>
-              )}
-              {loading && (
-                <div className="horizontal center middle spinner-container">
-                  <Spinner size="medium" />
-                </div>
-              )}
-              {reloadingForFilters && (
-                <div className="text-center transition-overlay" style={{ marginLeft: '-25px' }} />
-              )}
-              {!loading && !hasPipelines && (
-                <div className="text-center">
-                  <h4>No pipelines configured for this application.</h4>
-                </div>
-              )}
-              {app.executions.loadFailure && (
-                <div className="text-center">
-                  <h4>There was an error loading executions. We'll try again shortly.</h4>
-                </div>
-              )}
-              {!loading && hasPipelines && <ExecutionGroups application={app} />}
+                      <div className="form-group">
+                        <label>Show </label>
+                        <select
+                          className="form-control input-sm"
+                          value={sortFilter.count}
+                          onChange={this.showCountChanged}
+                        >
+                          {this.filterCountOptions.map(count => (
+                            <option key={count} value={count}>
+                              {count}
+                            </option>
+                          ))}
+                        </select>
+                        <span> executions per pipeline</span>
+                      </div>
+                      <div className="form-group checkbox">
+                        <label>
+                          <input
+                            type="checkbox"
+                            checked={sortFilter.showDurations}
+                            onChange={this.showDurationsChanged}
+                          />{' '}
+                          stage durations
+                        </label>
+                      </div>
+                    </form>
+                    <FilterTags
+                      tags={tags}
+                      tagCleared={this.forceUpdateExecutionGroups}
+                      clearFilters={this.clearFilters}
+                    />
+                  </div>
+                )}
+                {loading && (
+                  <div className="horizontal center middle spinner-container">
+                    <Spinner size="medium" />
+                  </div>
+                )}
+                {reloadingForFilters && (
+                  <div className="text-center transition-overlay" style={{ marginLeft: '-25px' }} />
+                )}
+                {!loading && !hasPipelines && (
+                  <div className="text-center">
+                    <h4>No pipelines configured for this application.</h4>
+                  </div>
+                )}
+                {app.executions.loadFailure && (
+                  <div className="text-center">
+                    <h4>There was an error loading executions. We'll try again shortly.</h4>
+                  </div>
+                )}
+                {!loading && hasPipelines && <ExecutionGroups application={app} />}
+              </div>
             </div>
           </div>
         </div>
