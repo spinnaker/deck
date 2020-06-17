@@ -232,12 +232,12 @@ export class ExecutionMarkerInformationModal extends React.PureComponent<
                               <UISref
                                 to="home.applications.application.pipelines.executionDetails.execution"
                                 params={{
-                                  application: link.application,
-                                  executionId: link.executionId,
+                                  application: item.execution.application,
+                                  executionId: item.execution.id,
                                   executionParams: {
-                                    application: link.application,
-                                    executionId: link.executionId,
-                                    stage: link.stageIndex,
+                                    application: item.execution.application,
+                                    executionId: item.execution.id,
+                                    stage: item.stageId,
                                   },
                                 }}
                                 options={{
@@ -254,12 +254,12 @@ export class ExecutionMarkerInformationModal extends React.PureComponent<
                               <UISref
                                 to="home.applications.application.pipelines.executionDetails.execution"
                                 params={{
-                                  application: link.application,
-                                  executionId: link.executionId,
+                                  application: item.execution.application,
+                                  executionId: item.execution.id,
                                   executionParams: {
-                                    application: link.application,
-                                    executionId: link.executionId,
-                                    stage: link.stageIndex,
+                                    application: item.execution.application,
+                                    executionId: item.execution.id,
+                                    stage: item.stageId,
                                   },
                                 }}
                                 options={{
@@ -276,12 +276,12 @@ export class ExecutionMarkerInformationModal extends React.PureComponent<
                               <UISref
                                 to="home.applications.application.pipelines.executionDetails.execution"
                                 params={{
-                                  application: link.application,
-                                  executionId: link.executionId,
+                                  application: item.execution.application,
+                                  executionId: item.execution.id,
                                   executionParams: {
-                                    application: link.application,
-                                    executionId: link.executionId,
-                                    stage: link.stageIndex,
+                                    application: item.execution.application,
+                                    executionId: item.execution.id,
+                                    stage: item.stageId,
                                   },
                                 }}
                                 options={{
@@ -299,12 +299,12 @@ export class ExecutionMarkerInformationModal extends React.PureComponent<
                                 <UISref
                                   to="home.applications.application.pipelines.executionDetails.execution"
                                   params={{
-                                    application: link.application,
-                                    executionId: link.executionId,
+                                    application: item.execution.application,
+                                    executionId: item.execution.id,
                                     executionParams: {
-                                      application: link.application,
-                                      executionId: link.executionId,
-                                      stage: link.stageIndex,
+                                      application: item.execution.application,
+                                      executionId: item.execution.id,
+                                      stage: item.stageId,
                                     },
                                   }}
                                   options={{
