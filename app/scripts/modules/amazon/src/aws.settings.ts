@@ -1,13 +1,13 @@
 import { IProviderSettings, SETTINGS } from '@spinnaker/core';
 
-export interface IClassicLaunchWhitelist {
+export interface IClassicLaunchAllowlist {
   region: string;
   credentials: string;
 }
 
 export interface IAWSProviderSettings extends IProviderSettings {
   classicLaunchLockout?: number;
-  classicLaunchWhitelist?: IClassicLaunchWhitelist[];
+  classicLaunchAllowlist?: IClassicLaunchAllowlist[];
   createLoadBalancerWarnings?: {
     application?: string;
     classic?: string;
@@ -16,6 +16,7 @@ export interface IAWSProviderSettings extends IProviderSettings {
   crossAccountIngressExclusions?: {
     [credentials: string]: string | string[];
   };
+  securityGroupExclusions?: string[];
   defaults: {
     account?: string;
     iamRole?: string;
@@ -40,6 +41,10 @@ export interface IAWSProviderSettings extends IProviderSettings {
     customNamespaces?: string[];
   };
   minRootVolumeSize?: number;
+  serverGroups?: {
+    enableIPv6?: boolean;
+    enableIMDSv2?: boolean;
+  };
   useAmiBlockDeviceMappings?: boolean;
 }
 

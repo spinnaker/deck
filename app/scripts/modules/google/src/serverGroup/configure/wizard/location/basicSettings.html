@@ -87,7 +87,6 @@
         image-sources="basicSettingsCtrl.imageSources"
         image-source-text="command.viewState.imageSourceText"
         help-field-key="gce.image.source"
-        artifacts-enabled="basicSettingsCtrl.artifactsEnabled"
       >
       </image-source-selector>
       <stage-artifact-selector-delegate
@@ -101,12 +100,7 @@
         on-artifact-edited="basicSettingsCtrl.onImageArtifactEdited"
         on-expected-artifact-selected="basicSettingsCtrl.onImageArtifactSelected"
         pipeline="command.viewState.pipeline"
-        selected-artifact-account="command.imageAccountName"
-        selected-artifact-id="command.imageArtifactId"
-        set-artifact-account="basicSettingsCtrl.onImageArtifactAccountSelected"
-        set-artifact-id="basicSettingsCtrl.onChangeImageArtifactId"
         stage="command.viewState.stage"
-        update-pipeline="basicSettingsCtrl.updatePipeline"
       >
       </stage-artifact-selector-delegate>
     </div>

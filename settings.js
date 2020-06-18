@@ -3,8 +3,6 @@
 // Use environment variables when developing locally via 'yarn start', i.e.:
 // API_HOST=https://gate.spinnaker.mycompany.com yarn start
 var apiHost = process.env.API_HOST || 'http://localhost:8084';
-var artifactsEnabled = process.env.ARTIFACTS_ENABLED === 'true';
-var artifactsRewriteEnabled = process.env.ARTIFACTS_REWRITE_ENABLED === 'true';
 var atlasWebComponentsUrl = process.env.ATLAS_WEB_COMPONENTS_URL;
 var authEndpoint = process.env.AUTH_ENDPOINT || apiHost + '/auth/user';
 var authEnabled = process.env.AUTH_ENABLED === 'false' ? false : true;
@@ -23,9 +21,7 @@ var entityTagsEnabled = process.env.ENTITY_TAGS_ENABLED === 'true' ? true : fals
 var fiatEnabled = process.env.FIAT_ENABLED === 'true' ? true : false;
 var gceScaleDownControlsEnabled = process.env.GCE_SCALE_DOWN_CONTROLS_ENABLED === 'true' ? true : false;
 var gceStatefulMigsEnabled = process.env.GCE_STATEFUL_MIGS_ENABLED === 'true' ? true : false;
-var gremlinEnabled = process.env.GREMLIN_ENABLED === 'false' ? false : true;
 var iapRefresherEnabled = process.env.IAP_REFRESHER_ENABLED === 'true' ? true : false;
-var infrastructureEnabled = process.env.INFRA_ENABLED === 'true' ? true : false;
 var managedDeliveryEnabled = process.env.MANAGED_DELIVERY_ENABLED === 'true';
 var managedServiceAccountsEnabled = process.env.MANAGED_SERVICE_ACCOUNTS_ENABLED === 'true';
 var managedResourcesEnabled = process.env.MANAGED_RESOURCES_ENABLED === 'true';
@@ -66,14 +62,13 @@ window.spinnakerSettings = {
     'huaweicloud',
     'kubernetes',
     'oracle',
+    'tencentcloud',
   ],
   defaultTimeZone: process.env.TIMEZONE || 'America/Los_Angeles', // see http://momentjs.com/timezone/docs/#/data-utilities/
   entityTags: {
     maxResults: 5000,
   },
   feature: {
-    artifacts: artifactsEnabled,
-    artifactsRewrite: artifactsRewriteEnabled,
     canary: canaryEnabled,
     chaosMonkey: chaosEnabled,
     displayTimestampsInUserLocalTime: displayTimestampsInUserLocalTime,
@@ -82,10 +77,7 @@ window.spinnakerSettings = {
     fiatEnabled: fiatEnabled,
     gceScaleDownControlsEnabled: gceScaleDownControlsEnabled,
     gceStatefulMigsEnabled: gceStatefulMigsEnabled,
-    gremlinEnabled: gremlinEnabled,
     iapRefresherEnabled: iapRefresherEnabled,
-    // whether stages affecting infrastructure (like "Create Load Balancer") should be enabled or not
-    infrastructureStages: infrastructureEnabled,
     managedDelivery: managedDeliveryEnabled,
     managedServiceAccounts: managedServiceAccountsEnabled,
     managedResources: managedResourcesEnabled,
@@ -97,12 +89,11 @@ window.spinnakerSettings = {
     roscoMode: false,
     slack: false,
     snapshots: false,
-    travis: false,
-    wercker: false,
     functions: functionsEnabled,
   },
   gateUrl: apiHost,
   gitSources: ['stash', 'github', 'bitbucket', 'gitlab'],
+  hiddenStages: [],
   managedDelivery: {
     defaultManifest: 'spinnaker.yml',
     manifestBasePath: '.spinnaker',
@@ -183,7 +174,6 @@ window.spinnakerSettings = {
       defaultSecurityGroups: [],
     },
     gce: {
-      associatePublicIpAddress: true,
       defaults: {
         account: 'my-google-account',
         instanceTypeStorage: {
@@ -209,16 +199,6 @@ window.spinnakerSettings = {
         region: 'cn-north-1',
       },
     },
-    kubernetes: {
-      defaults: {
-        account: 'my-kubernetes-account',
-        apiPrefix: 'api/v1/proxy/namespaces/kube-system/services/kubernetes-dashboard/#',
-        instanceLinkTemplate: '{{host}}/api/v1/proxy/namespaces/{{namespace}}/pods/{{name}}',
-        internalDNSNameTemplate: '{{name}}.{{namespace}}.svc.cluster.local',
-        namespace: 'default',
-        proxy: 'localhost:8001',
-      },
-    },
     oracle: {
       defaults: {
         account: 'DEFAULT',
@@ -233,6 +213,12 @@ window.spinnakerSettings = {
         region: 'us-east-1',
       },
     },
+    tencentcloud: {
+      defaults: {
+        account: 'test',
+        region: 'ap-guangzhou',
+      },
+    },
   },
   pagerDuty: {
     required: false,
@@ -240,7 +226,7 @@ window.spinnakerSettings = {
   slack: {
     baseUrl: 'https://slack.com',
   },
-  pubsubProviders: ['google'], // TODO(joonlim): Add amazon once it is confirmed that amazon pub/sub works.
+  pubsubProviders: ['amazon', 'google'],
   plugins: [],
   searchVersion: 1,
   triggerTypes: [
@@ -258,8 +244,4 @@ window.spinnakerSettings = {
     'wercker',
   ],
   useClassicFirewallLabels: useClassicFirewallLabels,
-  changelog: {
-    fileName: 'news.md',
-    gistId: '32526cd608db3d811b38',
-  },
 };

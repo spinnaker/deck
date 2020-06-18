@@ -1,6 +1,6 @@
 import React from 'react';
-import { get, isString } from 'lodash';
-import { FastField, Field, FieldProps, FormikConsumer, FormikContext, getIn } from 'formik';
+import { toPath, isString } from 'lodash';
+import { FastField, Field, FieldProps, FormikConsumer, FormikContext } from 'formik';
 
 import { firstDefined } from 'core/utils';
 
@@ -10,7 +10,7 @@ import { ICommonFormFieldProps, renderContent } from './index';
 import { IFormInputValidation } from '../inputs';
 import { ILayoutProps, LayoutContext } from '../layouts';
 import { FormikSpelContext, SimpleSpelInput, SpelAwareInputMode, SpelService, SpelToggle } from '../../spel';
-import { useIsFirstRender } from '../../hooks/useIsFirstRender.hook';
+import { useMountStatusRef } from '../../hooks/useMountStatusRef.hook';
 
 export interface IFormikFieldProps<T> {
   /**
@@ -53,6 +53,18 @@ function coalescedRevalidate(formik: FormikContext<any>) {
   }
 }
 
+/**
+ * Deeply get a value from an object via its path.
+ */
+function getIn(obj: any, key: string, defaultValue: any = undefined) {
+  let p = 0;
+  const path = toPath(key);
+  while (obj && p < path.length) {
+    obj = typeof obj == 'string' ? undefined : obj[path[p++]];
+  }
+  return obj === undefined ? defaultValue : obj;
+}
+
 function FormikFormFieldImpl<T = any>(props: IFormikFormFieldImplProps<T>) {
   const { formik } = props;
   const { name, onChange, fastField: fastFieldProp } = props;
@@ -74,9 +86,9 @@ function FormikFormFieldImpl<T = any>(props: IFormikFormFieldImplProps<T>) {
   const removeValidator = useCallback((v: IValidator) => setInternalValidators(list => list.filter(x => x !== v)), []);
 
   const revalidate = () => coalescedRevalidate(formik);
-  const isFirstRender = useIsFirstRender();
+  const mountStatus = useMountStatusRef();
   React.useEffect(() => {
-    if (isFirstRender && internalValidators.length === 0) {
+    if (mountStatus.current === 'FIRST_RENDER' && internalValidators.length === 0) {
       return;
     }
     revalidate();
@@ -100,7 +112,7 @@ function FormikFormFieldImpl<T = any>(props: IFormikFormFieldImplProps<T>) {
     if (!freeformInputEnabled) {
       return;
     }
-    const fieldValue = get(props.formik.values, name, '');
+    const fieldValue = getIn(props.formik.values, name, '');
     const isFieldValueSpel = SpelService.includesSpel(fieldValue);
     if (isFieldValueSpel) {
       setInputMode(SpelAwareInputMode.FREEFORM);

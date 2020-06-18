@@ -51,7 +51,7 @@ module(TITUS_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
     $scope.environment = environment;
     $scope.gateUrl = SETTINGS.gateUrl;
 
-    function extractHealthMetrics(instance, latest) {
+    function extractHealthMetrics(instance, latest, awsAccount) {
       // do not backfill on standalone instances
       if (app.isStandalone) {
         instance.health = latest.health;
@@ -64,7 +64,7 @@ module(TITUS_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
 
       // augment with target group healthcheck data
       const targetGroups = getAllTargetGroups(app.loadBalancers.data);
-      applyHealthCheckInfoToTargetGroups(displayableMetrics, targetGroups, instance.account);
+      applyHealthCheckInfoToTargetGroups(displayableMetrics, targetGroups, awsAccount);
 
       // backfill details where applicable
       if (latest.health) {
@@ -109,7 +109,7 @@ module(TITUS_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
           ])
           .then(([instanceDetails, accountDetails]) => {
             $scope.state.loading = false;
-            extractHealthMetrics(instanceSummary, instanceDetails);
+            extractHealthMetrics(instanceSummary, instanceDetails, accountDetails.awsAccount);
             $scope.instance = defaults(instanceDetails, instanceSummary);
             $scope.instance.account = account;
             $scope.instance.region = region;
@@ -121,16 +121,6 @@ module(TITUS_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
             $scope.instance.titusUiEndpoint = this.titusUiEndpoint;
             if (overrides.instanceDetailsLoaded) {
               overrides.instanceDetailsLoaded();
-            }
-
-            // Network interfaces are needed for any IPv6 addresses.
-            return InstanceReader.getInstanceDetails(accountDetails.environment, region, instanceDetails.agentId);
-          })
-          .then(instance => {
-            if (instance && instance.networkInterfaces) {
-              $scope.instance.ipv6Addresses = flatMap(instance.networkInterfaces, i =>
-                i.ipv6Addresses.map(a => a.ipv6Address),
-              );
             }
           }, autoClose);
       }

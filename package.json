@@ -16,7 +16,7 @@
     "yarn": ">=1.21.1"
   },
   "scripts": {
-    "clean": "rimraf .awcache .cache-loader build node_modules transpiled",
+    "clean": "npx rimraf .awcache .cache-loader build node_modules/.cache transpiled",
     "build": "NODE_OPTIONS=--max_old_space_size=8192 webpack --bail --mode=production",
     "lint": "eslint --ext js,jsx,ts,tsx app",
     "start": "sh ./start.sh",
@@ -25,13 +25,14 @@
     "int": "protractor protractor.conf.js",
     "modules": "./gradle/buildModules.sh",
     "prettier": "prettier --write 'app/**/*.{js,jsx,ts,tsx,html,css,less}'",
-    "functional": "npm run build && cd test/functional && yarn && npm run test"
+    "functional": "npm run build && cd test/functional && yarn && npm run test",
+    "functional:debug": "npm run build && cd test/functional && yarn && npm run open"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.4.1",
-    "@spinnaker/kayenta": "^0.0.91",
-    "@spinnaker/styleguide": "^1.0.18",
-    "@uirouter/react-hybrid": "1.0.0",
+    "@spinnaker/kayenta": "^0.0.92",
+    "@spinnaker/styleguide": "^1.0.20",
+    "@uirouter/react-hybrid": "1.0.2",
     "@uirouter/rx": "0.6.5",
     "@uirouter/visualizer": "^7.0.0",
     "Select2": "git://github.com/select2/select2.git#3.4.8",
@@ -56,14 +57,14 @@
     "dompurify": "^1.0.4",
     "formik": "^1.4.1",
     "human-readable-ids": "^1.0.4",
-    "jquery": "3.4.0",
+    "jquery": "3.5.0",
     "jquery-textcomplete": "1.6.1",
     "jquery-ui": "1.12.0",
     "js-worker-search": "^1.2.1",
     "js-yaml": "^3.13.1",
     "lodash": "^4.17.13",
     "lodash-decorators": "4.5.0",
-    "luxon": "^1.11.3",
+    "luxon": "^1.23.0",
     "memoize-one": "^4.0.2",
     "n3-charts": "^2.0.18",
     "ngimport": "^0.6.0",
@@ -99,8 +100,10 @@
     "webpack-dev-middleware": "^3.7.2"
   },
   "devDependencies": {
+    "@babel/core": "^7.9.6",
+    "@babel/preset-env": "^7.9.6",
     "@spinnaker/eslint-plugin": "1.0.7",
-    "@spinnaker/mocks": "1.0.3",
+    "@spinnaker/mocks": "1.0.6",
     "@svgr/webpack": "^5.2.0",
     "@types/angular": "1.6.26",
     "@types/angular-mocks": "1.5.10",
@@ -148,9 +151,7 @@
     "angulartics": "^1.1.2",
     "angulartics-google-analytics": "^0.2.0",
     "autoprefixer": "^7.1.2",
-    "babel-core": "^6.21.1",
-    "babel-loader": "^7.1.5",
-    "babel-preset-env": "^1.6.1",
+    "babel-loader": "^8.1.0",
     "cache-loader": "2.0.1",
     "copy-webpack-plugin": "4.6.0",
     "css-loader": "2.1.0",
@@ -220,10 +221,10 @@
   },
   "resolutionsPurpose": "This temporarily chooses the right versions of these libs, which are specified in both deck AND deck-kayenta",
   "resolutions": {
-    "@uirouter/react-hybrid": "1.0.0",
-    "@uirouter/react": "1.0.1",
-    "@uirouter/angularjs": "1.0.25",
-    "@uirouter/core": "6.0.4"
+    "@uirouter/react-hybrid": "1.0.2",
+    "@uirouter/react": "1.0.3",
+    "@uirouter/angularjs": "1.0.26",
+    "@uirouter/core": "6.0.5"
   },
   "husky": {
     "hooks": {

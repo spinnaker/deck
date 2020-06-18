@@ -24,8 +24,6 @@ export interface INotificationSettings {
 
 export interface IFeatures {
   [key: string]: any;
-  artifacts?: boolean;
-  artifactsRewrite?: boolean;
   canary?: boolean;
   chaosMonkey?: boolean;
   displayTimestampsInUserLocalTime?: boolean;
@@ -35,8 +33,6 @@ export interface IFeatures {
   gceScaleDownControlsEnabled?: boolean;
   gceStatefulMigsEnabled?: boolean;
   iapRefresherEnabled?: boolean;
-  // whether stages affecting infrastructure (like "Create Load Balancer") should be enabled or not
-  infrastructureStages?: boolean;
   managedDelivery?: boolean;
   managedServiceAccounts?: boolean;
   managedResources?: boolean;
@@ -48,8 +44,6 @@ export interface IFeatures {
   roscoMode?: boolean;
   slack?: boolean;
   snapshots?: boolean;
-  travis?: boolean;
-  wercker?: boolean;
   savePipelinesStageEnabled?: boolean;
   functions?: boolean;
 }
@@ -76,11 +70,6 @@ export interface ISpinnakerSettings {
   authEndpoint: string;
   authTtl: number;
   bakeryDetailUrl: string;
-  changelog?: {
-    accessToken?: string;
-    fileName: string;
-    gistId: string;
-  };
   checkForUpdates: boolean;
   debugEnabled: boolean;
   defaultInstancePort: number;
@@ -106,6 +95,7 @@ export interface ISpinnakerSettings {
   additionalHelpLinks?: IAdditionalHelpLinks[];
   gateUrl: string;
   gitSources: string[];
+  hiddenStages: string[];
   managedDelivery?: {
     gettingStartedUrl?: string;
     defaultManifest: string;
@@ -141,6 +131,7 @@ export const SETTINGS: ISpinnakerSettings = (window as any).spinnakerSettings;
 
 // Make sure to set up some reasonable default settings fields so we do not have to keep checking if they exist everywhere
 SETTINGS.feature = SETTINGS.feature || {};
+SETTINGS.feature.roscoMode = SETTINGS.feature.roscoMode || true;
 SETTINGS.analytics = SETTINGS.analytics || {};
 SETTINGS.providers = SETTINGS.providers || {};
 SETTINGS.defaultTimeZone = SETTINGS.defaultTimeZone || 'America/Los_Angeles';

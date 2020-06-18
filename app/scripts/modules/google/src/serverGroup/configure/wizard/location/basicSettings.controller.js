@@ -5,8 +5,6 @@ import { Observable, Subject } from 'rxjs';
 import { extend } from 'lodash';
 
 import {
-  ArtifactsMode,
-  ArtifactsModeService,
   ArtifactTypePatterns,
   ExpectedArtifactSelectorViewController,
   excludeAllTypesExcept,
@@ -131,19 +129,11 @@ angular
         });
       };
 
-      this.updatePipeline = changes => {
-        $scope.$applyAsync(() => {
-          extend($scope.$parent.pipeline, changes);
-        });
-      };
-
       const gceImageDelegate = new NgGCEImageArtifactDelegate($scope);
       $scope.gceImageArtifact = {
         showCreateArtifactForm: false,
         delegate: gceImageDelegate,
         controller: new ExpectedArtifactSelectorViewController(gceImageDelegate),
       };
-
-      this.artifactsEnabled = ArtifactsModeService.artifactsMode !== ArtifactsMode.DISABLED;
     },
   ]);
