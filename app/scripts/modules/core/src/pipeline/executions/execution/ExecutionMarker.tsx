@@ -23,7 +23,6 @@ export interface IExecutionMarkerProps {
 }
 
 export interface IExecutionMarkerState {
-  contextTarget: Element;
   duration: string;
   hydrated: boolean;
   showingExecutionMarkerInformationModal: boolean;
@@ -38,7 +37,6 @@ export class ExecutionMarker extends React.Component<IExecutionMarkerProps, IExe
     const { stage, execution } = props;
 
     this.state = {
-      contextTarget: null,
       duration: duration(stage.runningTimeInMs),
       hydrated: execution.hydrated,
       showingExecutionMarkerInformationModal: false,
@@ -68,12 +66,11 @@ export class ExecutionMarker extends React.Component<IExecutionMarkerProps, IExe
     ReactGA.event({ category: 'Pipeline', action: 'Stage show context menu (bar)' });
     event.preventDefault();
     event.stopPropagation();
-    this.showExecutionMarkerInformationModal(event);
+    this.showExecutionMarkerInformationModal();
   };
 
-  private showExecutionMarkerInformationModal = (event: any) => {
+  private showExecutionMarkerInformationModal = () => {
     this.setState({
-      contextTarget: event.target,
       showingExecutionMarkerInformationModal: true,
     });
   };
@@ -81,7 +78,6 @@ export class ExecutionMarker extends React.Component<IExecutionMarkerProps, IExe
   private hideExecutionMarkerInformationModal = () => {
     this.setState({
       showingExecutionMarkerInformationModal: false,
-      contextTarget: null,
     });
   };
 
@@ -111,13 +107,7 @@ export class ExecutionMarker extends React.Component<IExecutionMarkerProps, IExe
         <span className="horizontal center middle">
           <MarkerIcon stage={stage} />
           <span className="duration">{this.state.duration}</span>
-          {showInfoIcon && (
-            <i
-              className="fa fa-info-circle"
-              onClick={this.handleStageInformationClick}
-              key={`${execution.id}_${stage.id}`}
-            />
-          )}
+          {showInfoIcon && <i className="fa fa-info-circle" onClick={this.handleStageInformationClick} />}
         </span>
       </div>
     );

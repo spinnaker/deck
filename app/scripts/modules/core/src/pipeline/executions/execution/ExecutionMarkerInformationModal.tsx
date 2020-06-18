@@ -2,7 +2,7 @@ import React from 'react';
 import { UISref } from '@uirouter/react';
 import { Modal } from 'react-bootstrap';
 
-import { IExecution, IPipeline, IExecutionStageSummary } from 'core/domain';
+import { IExecution, IExecutionStageSummary } from 'core/domain';
 import { relativeTime, timestamp, duration } from 'core/utils';
 import { Spinner } from 'core';
 import { PipelineGraph } from '../../config/graph/PipelineGraph';
@@ -23,7 +23,6 @@ interface IFailedStageExecutionLink {
   stageIndex: number;
 }
 interface IExecutionLocatorState {
-  pipelineConfigDetails: IPipeline;
   executionDetails: IExecution;
   failedInApplication: string;
   link: IFailedStageExecutionLink;
@@ -46,7 +45,6 @@ export class ExecutionMarkerInformationModal extends React.PureComponent<
       executionDetails: null,
       failedInApplication: null,
       link: null,
-      pipelineConfigDetails: null,
       showPipelineGraph: false,
       stageDetails: null,
     };
@@ -75,11 +73,6 @@ export class ExecutionMarkerInformationModal extends React.PureComponent<
 
         return null;
       });
-      // get the current configuration for this execution
-      const currentPipelineConfig = await this.informationService.getPipelineConfig(
-        currentExecution.application,
-        currentExecution.pipelineConfigId,
-      );
 
       // save this for rendering pipelines
       this.allExecutions.push({
@@ -126,7 +119,6 @@ export class ExecutionMarkerInformationModal extends React.PureComponent<
         this.allExecutions.pop();
 
         this.setState({
-          pipelineConfigDetails: this.childPipelineConfig || currentPipelineConfig,
           executionDetails: this.childExecution || currentExecution,
           failedInApplication: currentStage.masterStage.context.application,
           link: {
@@ -154,7 +146,7 @@ export class ExecutionMarkerInformationModal extends React.PureComponent<
   };
 
   public render(): React.ReactElement<HTMLDivElement> {
-    const { executionDetails, failedInApplication, link, pipelineConfigDetails, stageDetails } = this.state;
+    const { executionDetails, failedInApplication, link, stageDetails } = this.state;
 
     const content = this.state.showPipelineGraph ? (
       <div className="">
@@ -163,7 +155,6 @@ export class ExecutionMarkerInformationModal extends React.PureComponent<
             <div key={`${item.execution.id}-${item.execution.name}`} className="execution-graph">
               {item.execution.application} - {item.execution.name}
               <PipelineGraph
-                key={item.execution.id}
                 execution={item.execution}
                 onNodeClick={() => {}}
                 viewState={{
@@ -185,12 +176,12 @@ export class ExecutionMarkerInformationModal extends React.PureComponent<
           </div>
         ) : (
           <div className="information-details">
-            <div className="pipeline-name bottom-margin">
-              {pipelineConfigDetails ? pipelineConfigDetails.name : '-'}
-            </div>
+            <h5 className="pipeline-name">{executionDetails.name}</h5>
             <div style={{ fontWeight: 'bold' }}>PIPELINE</div>
             <div className="bottom-margin">
-              <div>{`[${executionDetails.authentication.user}] (${executionDetails.user})`}</div>
+              <div>{`[${executionDetails.authentication.user}] ${
+                executionDetails.user ? `(${executionDetails.user})` : ''
+              }`}</div>
               <div>{relativeTime(executionDetails.startTime || executionDetails.buildTime)}</div>
               <div>
                 Status: <span className="status">{executionDetails.status}</span> by parent pipeline{' '}
