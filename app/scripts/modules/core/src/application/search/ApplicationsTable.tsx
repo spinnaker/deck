@@ -39,10 +39,10 @@ export const ApplicationTable = ({ currentSort, toggleSort, applications }: IApp
         const appName = app.name.toLowerCase();
 
         return (
-          <UISref key={appName} to=".application.insight.clusters" params={{ application: appName }}>
+          <UISref key={appName} to=".application.pipelines.executions" params={{ application: appName }}>
             <tr className="clickable">
               <td>
-                <UISref to=".application.insight.clusters" params={{ application: appName }}>
+                <UISref to=".application.pipelines.executions" params={{ application: appName }}>
                   <a>{appName}</a>
                 </UISref>
               </td>
