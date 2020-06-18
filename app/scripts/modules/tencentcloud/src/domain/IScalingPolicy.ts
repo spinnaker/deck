@@ -1,6 +1,7 @@
 import { IScalingPolicyAlarmView } from './ITencentcloudScalingPolicy';
 
 export interface IScalingPolicyAlarm {
+  comparator?: any;
   dimensions?: any[];
   namespace?: string;
   alarmName?: string;
@@ -66,6 +67,8 @@ export interface IStepAdjustment {
 }
 
 export interface IScalingPolicy {
+  scalingPolicyName?: any;
+  alarmName?: string;
   alarms?: IScalingPolicyAlarmView[];
   policyARN?: string;
   policyName?: string;

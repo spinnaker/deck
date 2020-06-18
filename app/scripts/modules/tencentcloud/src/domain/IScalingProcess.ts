@@ -3,6 +3,7 @@ export interface IScalingProcess {
   enabled?: boolean;
   description: string;
   suspensionDate?: number;
+  reason?: string;
 }
 
 export interface ISuspendedProcess {

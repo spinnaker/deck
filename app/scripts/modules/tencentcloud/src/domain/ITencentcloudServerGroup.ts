@@ -34,10 +34,12 @@ export interface IScheduledAction {
   scheduledActionName?: string;
   startTime?: string;
   endTime?: string;
-  recurrence: number;
-  minSize: number;
-  maxSize: number;
-  desiredCapacity: number;
+  recurrence?: number;
+  minSize?: number;
+  maxSize?: number;
+  desiredCapacity?: number;
+  repeat?: string;
+  operationType?: string;
 }
 
 export interface ITencentcloudServerGroupView extends ITencentcloudServerGroup {

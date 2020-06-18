@@ -8,6 +8,7 @@ import { TencentcloudImageReader } from './image';
 import { TENCENTCLOUD_SEARCH_SEARCHRESULTFORMATTER } from './search/searchResultFormatter';
 import { TENCENTCLOUD_REACT_MODULE } from './reactShims/tencentcloud.react.module';
 import './validation/ApplicationNameValidator';
+import { CreateSecurityGroupModal, SecurityGroupDetail } from './securityGroup';
 
 // load all templates into the $templateCache
 const templates = require.context('./', true, /\.html$/);
@@ -24,6 +25,10 @@ module(TENCENTCLOUD_MODULE, [TENCENTCLOUD_REACT_MODULE, TENCENTCLOUD_SEARCH_SEAR
     },
     image: {
       reader: TencentcloudImageReader,
+    },
+    securityGroup: {
+      CreateSecurityGroupModal,
+      details: SecurityGroupDetail,
     },
   });
 });
