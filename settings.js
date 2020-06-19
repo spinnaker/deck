@@ -245,8 +245,4 @@ window.spinnakerSettings = {
     'wercker',
   ],
   useClassicFirewallLabels: useClassicFirewallLabels,
-  changelog: {
-    fileName: 'news.md',
-    gistId: '32526cd608db3d811b38',
-  },
 };
