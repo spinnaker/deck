@@ -29,6 +29,7 @@ export interface IFeatures {
   displayTimestampsInUserLocalTime?: boolean;
   dockerBake?: boolean;
   entityTags?: boolean;
+  executionMarkerInformationModal?: boolean;
   fiatEnabled?: boolean;
   gceScaleDownControlsEnabled?: boolean;
   gceStatefulMigsEnabled?: boolean;
@@ -127,7 +128,7 @@ export interface ISpinnakerSettings {
   useClassicFirewallLabels: boolean;
 }
 
-export const SETTINGS: ISpinnakerSettings = (window as any).spinnakerSettings;
+export const SETTINGS: ISpinnakerSettings = (window as any).spinnakerSettings || {};
 
 // Make sure to set up some reasonable default settings fields so we do not have to keep checking if they exist everywhere
 SETTINGS.feature = SETTINGS.feature || {};
