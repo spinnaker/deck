@@ -18,6 +18,7 @@ import { ReactModal } from 'core/presentation';
 import { PRODUCES_ARTIFACTS_REACT } from './producesArtifacts/ProducesArtifacts';
 import { OVERRRIDE_FAILURE } from './overrideFailure/overrideFailure.module';
 import { OVERRIDE_TIMEOUT_COMPONENT } from './overrideTimeout/overrideTimeout.module';
+import { ApplicationReader } from 'core/application/service/ApplicationReader';
 import { CORE_PIPELINE_CONFIG_STAGES_OPTIONALSTAGE_OPTIONALSTAGE_DIRECTIVE } from './optionalStage/optionalStage.directive';
 import { CORE_PIPELINE_CONFIG_STAGES_FAILONFAILEDEXPRESSIONS_FAILONFAILEDEXPRESSIONS_DIRECTIVE } from './failOnFailedExpressions/failOnFailedExpressions.directive';
 import { CORE_PIPELINE_CONFIG_STAGES_COMMON_STAGECONFIGFIELD_STAGECONFIGFIELD_DIRECTIVE } from './common/stageConfigField/stageConfigField.directive';
@@ -59,10 +60,13 @@ module(CORE_PIPELINE_CONFIG_STAGES_STAGE_MODULE, [
     '$templateCache',
     function($scope, $element, $compile, $controller, $templateCache) {
       let lastStageScope, reactComponentMounted;
+      let appPermissions = {};
+      let appRoles = [];
 
       $scope.options = {
         stageTypes: [],
         selectedStageType: null,
+        stageRoles: [],
       };
 
       AccountService.applicationAccounts($scope.application).then(accounts => {
@@ -132,6 +136,33 @@ module(CORE_PIPELINE_CONFIG_STAGES_STAGE_MODULE, [
         });
       };
 
+      $scope.getApplicationPermissions = function() {
+
+          ApplicationReader.getApplicationPermissions($scope.application.name)
+              .then(result => {
+                  appPermissions = result;
+                  if (appPermissions) {
+                      const readArray = appPermissions.READ || [];
+                      const writeArray = appPermissions.WRITE || [];
+                      const executeArray = appPermissions.EXECUTE || [];
+                      appRoles = readArray.concat(writeArray, executeArray);
+                      appRoles = Array.from(new Set(appRoles));
+                      $scope.updateAvailableStageRoles();
+                  }
+              });
+      }
+
+      $scope.updateAvailableStageRoles = function() {
+          $scope.options.stageRoles = appRoles.map(function(value, index) {
+              return {
+                  name: value,
+                  roleId: value,
+                  id: index,
+                  available: true,
+              };
+          });
+      };
+
       this.editStageJson = () => {
         const modalProps = { dialogClassName: 'modal-lg modal-fullscreen' };
         ReactModal.show(EditStageJsonModal, { stage: $scope.stage }, modalProps)
@@ -170,11 +201,13 @@ module(CORE_PIPELINE_CONFIG_STAGES_STAGE_MODULE, [
 
         if (!$scope.stage.type) {
           $scope.options.selectedStageType = null;
+          $scope.options.selectedStageRoles = null;
         } else {
           $scope.options.selectedStageType = $scope.stage.type;
         }
 
         $scope.updateAvailableDependencyStages();
+        $scope.updateAvailableStageRoles();
         const type = $scope.stage.type;
         const stageScope = $scope.$new();
 
@@ -301,6 +334,7 @@ module(CORE_PIPELINE_CONFIG_STAGES_STAGE_MODULE, [
         });
       };
 
+      $scope.getApplicationPermissions();
       $scope.$on('pipeline-reverted', this.selectStage);
       $scope.$on('pipeline-json-edited', this.selectStage);
       $scope.$watch('stage.type', this.selectStage);

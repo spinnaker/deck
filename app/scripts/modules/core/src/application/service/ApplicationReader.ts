@@ -41,6 +41,17 @@ export class ApplicationReader {
       });
   }
 
+  public static getApplicationPermissions(applicationName: string): IPromise < any > {
+      return API.one('applications', applicationName)
+          .withParams({
+              expand: false
+          })
+          .get()
+          .then((fromServer: Application) => {
+              return fromServer.attributes.permissions;
+          });
+  }
+
   public static getApplication(name: string, expand = true): IPromise<Application> {
     return API.one('applications', name)
       .withParams({ expand: expand })
