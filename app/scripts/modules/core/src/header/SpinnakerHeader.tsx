@@ -7,11 +7,13 @@ import { GlobalSearch } from 'core/search/global/GlobalSearch';
 import { HelpMenu } from 'core/help/HelpMenu';
 
 import './SpinnakerHeader.css';
+import { Overridable } from '../overrideRegistry';
 
 export interface ISpinnakerHeaderState {
   navExpanded: boolean;
 }
 
+@Overridable('spinnakerHeader')
 @UIRouterContext
 export class SpinnakerHeader extends React.Component<{}, ISpinnakerHeaderState> {
   constructor(props: {}) {
