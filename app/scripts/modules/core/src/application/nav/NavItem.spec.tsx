@@ -3,7 +3,7 @@ import { mount } from 'enzyme';
 import { BehaviorSubject } from 'rxjs';
 
 import { mockEntityTags, mockServerGroupDataSourceConfig, mockPipelineDataSourceConfig } from '@spinnaker/mocks';
-import { Application, ApplicationModelBuilder } from '..';
+import { Application, ApplicationModelBuilder } from '../../application';
 import { ApplicationDataSource, IDataSourceConfig } from '../service/applicationDataSource';
 import { IEntityTags, IServerGroup, IPipeline } from '../../domain';
 import { NavItem } from './NavItem';
