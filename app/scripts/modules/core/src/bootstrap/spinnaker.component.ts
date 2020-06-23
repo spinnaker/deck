@@ -10,7 +10,9 @@ const template = `
 `;
 
 class SpinnakerController implements IController {
+  public authenticating: boolean;
   public feature: IFeatures;
+  public routing: boolean;
   public static $inject = ['$rootScope'];
   constructor($rootScope: IDeckRootScope) {
     this.feature = SETTINGS.feature;
