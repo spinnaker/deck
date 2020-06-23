@@ -6,7 +6,6 @@ import { IDeckRootScope } from 'core/domain';
 
 const template = `
   <spinnaker-container authenticating="$ctrl.authenticating" routing="$ctrl.routing"></spinnaker-container>
-  <notifier></notifier>
 `;
 
 class SpinnakerController implements IController {

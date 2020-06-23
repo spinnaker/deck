@@ -12,7 +12,7 @@ import './SpinnakerHeader.css';
 export interface ISpinnakerHeaderState {
   navExpanded: boolean;
 }
-git;
+
 @UIRouterContext
 @Overridable('spinnakerHeader')
 export class SpinnakerHeader extends React.Component<{}, ISpinnakerHeaderState> {
