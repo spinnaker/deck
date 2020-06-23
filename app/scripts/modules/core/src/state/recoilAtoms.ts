@@ -1,5 +1,5 @@
 import { atom } from 'recoil';
-import { CollapsibleSectionStateCache } from '../cache/CollapsibleSectionStateCache';
+import { CollapsibleSectionStateCache } from '../cache/collapsibleSectionStateCache';
 
 export const verticalNavExpandedAtom = atom({
   key: 'verticalNavExpanded',

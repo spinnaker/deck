@@ -1,7 +1,7 @@
 import { MutableSnapshot } from 'recoil';
 
 import * as atoms from './recoilAtoms';
-import { CollapsibleSectionStateCache } from '../cache/CollapsibleSectionStateCache';
+import { CollapsibleSectionStateCache } from '../cache/collapsibleSectionStateCache';
 
 export const initializeRecoilState = ({ set }: MutableSnapshot): void => {
   set(
