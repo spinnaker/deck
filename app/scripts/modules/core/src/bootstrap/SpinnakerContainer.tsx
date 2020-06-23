@@ -1,8 +1,6 @@
 import * as React from 'react';
 import { UIView } from '@uirouter/react';
 
-import { ReactInjector } from '../reactShims';
-
 import { CustomBanner } from '../header/customBanner/CustomBanner';
 import { SpinnakerHeader } from '../header/SpinnakerHeader';
 import { Spinner } from '../widgets/spinners/Spinner';
@@ -12,21 +10,17 @@ export interface ISpinnakerContainerProps {
   routing: boolean;
 }
 
-export const SpinnakerContainer = ({ authenticating, routing }: ISpinnakerContainerProps) => {
-  const HeaderComponent = ReactInjector.overrideRegistry.getComponent('spinnakerHeader') || SpinnakerHeader;
-
-  return (
-    <div className="spinnaker-container grid-container">
-      {!authenticating && routing && (
-        <div className="transition-overlay">
-          <Spinner size="medium" />
-        </div>
-      )}
-      <div className="navbar-inverse grid-header">
-        <CustomBanner />
-        <HeaderComponent />
+export const SpinnakerContainer = ({ authenticating, routing }: ISpinnakerContainerProps) => (
+  <div className="spinnaker-container grid-container">
+    {!authenticating && routing && (
+      <div className="transition-overlay">
+        <Spinner size="medium" />
       </div>
-      <div className="spinnaker-content grid-contents">{!authenticating && <UIView name="main" />}</div>
+    )}
+    <div className="navbar-inverse grid-header">
+      <CustomBanner />
+      <SpinnakerHeader />
     </div>
-  );
-};
+    <div className="spinnaker-content grid-contents">{!authenticating && <UIView name="main" />}</div>
+  </div>
+);

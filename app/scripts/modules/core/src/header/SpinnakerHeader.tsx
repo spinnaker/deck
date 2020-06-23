@@ -3,6 +3,7 @@ import { UISref, UISrefActive } from '@uirouter/react';
 import { UIRouterContext } from '@uirouter/react-hybrid';
 
 import { NgReact } from 'core/reactShims';
+import { Overridable } from 'core/overrideRegistry';
 import { GlobalSearch } from 'core/search/global/GlobalSearch';
 import { HelpMenu } from 'core/help/HelpMenu';
 
@@ -11,8 +12,9 @@ import './SpinnakerHeader.css';
 export interface ISpinnakerHeaderState {
   navExpanded: boolean;
 }
-
+git;
 @UIRouterContext
+@Overridable('spinnakerHeader')
 export class SpinnakerHeader extends React.Component<{}, ISpinnakerHeaderState> {
   constructor(props: {}) {
     super(props);
