@@ -13,8 +13,6 @@ export interface ISpinnakerContainerProps {
 }
 
 export const SpinnakerContainer = ({ authenticating, routing }: ISpinnakerContainerProps) => {
-  // eslint-disable-next-line
-  console.log(authenticating, routing);
   const HeaderComponent = ReactInjector.overrideRegistry.getComponent('spinnakerHeader') || SpinnakerHeader;
 
   return (
