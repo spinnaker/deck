@@ -148,12 +148,6 @@ export class LoadBalancerFilters extends React.Component<ILoadBalancerFiltersPro
     return compact(uniq(map(this.props.app.loadBalancers.data, option) as string[])).sort();
   };
 
-  private clearFilters = (): void => {
-    LoadBalancerState.filterService.clearFilters();
-    LoadBalancerState.filterModel.asFilterModel.applyParamsToUrl();
-    LoadBalancerState.filterService.updateLoadBalancerGroups(this.props.app);
-  };
-
   private handleStatusChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const target = event.target;
     const value = target.type === 'checkbox' ? target.checked : target.value;
@@ -185,19 +179,11 @@ export class LoadBalancerFilters extends React.Component<ILoadBalancerFiltersPro
       detailHeadings,
       availabilityZoneHeadings,
       sortFilter,
-      tags,
     } = this.state;
 
     return (
-      <div>
+      <div className="insight-filter-content">
         <div className="heading">
-          <span
-            className="btn btn-default btn-xs"
-            style={{ visibility: tags.length > 0 ? 'inherit' : 'hidden' }}
-            onClick={this.clearFilters}
-          >
-            Clear All
-          </span>
           <FilterSearch
             helpKey="loadBalancer.search"
             value={sortFilter.filter}

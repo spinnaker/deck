@@ -129,26 +129,13 @@ export const SecurityGroupFilters = ({ app }: ISecurityGroupFiltersProps) => {
     updateSecurityGroups();
   };
 
-  const clearFilters = (): void => {
-    SecurityGroupState.filterService.clearFilters();
-    SecurityGroupState.filterModel.asFilterModel.applyParamsToUrl();
-    SecurityGroupState.filterService.updateSecurityGroups(app);
-  };
-
   React.useEffect(() => {
     updateSecurityGroups();
-  }, [securityGroupData.length]);
+  }, [securityGroupData.length, tags.length]);
 
   return (
     <div className="insight-filter-content">
       <div className="heading">
-        <span
-          className="btn btn-default btn-xs"
-          style={{ visibility: tags.length > 0 ? 'inherit' : 'hidden' }}
-          onClick={clearFilters}
-        >
-          Clear All
-        </span>
         <FilterSearch
           helpKey="securityGroup.search"
           value={sortFilter.filter}

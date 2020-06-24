@@ -99,12 +99,6 @@ export class ExecutionFilters extends React.Component<IExecutionFiltersProps, IE
     });
   };
 
-  private clearFilters = (): void => {
-    ReactGA.event({ category: 'Pipelines', action: `Filter: clear all (side nav)` });
-    ExecutionFilterService.clearFilters();
-    this.refreshExecutions();
-  };
-
   private getPipelineNames(strategy: boolean): string[] {
     const { application } = this.props;
     if (application.pipelineConfigs.loadFailure) {
@@ -199,13 +193,6 @@ export class ExecutionFilters extends React.Component<IExecutionFiltersProps, IE
       <div className="execution-filters">
         <div className="filters-content">
           <div className="heading">
-            <span
-              onClick={this.clearFilters}
-              className="btn btn-default btn-xs"
-              style={{ visibility: tags.length > 0 ? 'visible' : 'hidden' }}
-            >
-              Clear All
-            </span>
             <FilterSearch
               helpKey="executions.search"
               value={sortFilter.filter}

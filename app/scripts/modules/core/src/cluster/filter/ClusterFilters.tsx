@@ -71,18 +71,6 @@ export const ClusterFilters = ({ app }: IClusterFiltersProps) => {
     }
   });
 
-  const clearFilters = () => {
-    setSortFilter({
-      ...sortFilter,
-      minInstances: undefined,
-      maxInstances: undefined,
-    });
-    setLabelFilters([]);
-    ClusterState.filterService.clearFilters();
-    ClusterState.filterModel.asFilterModel.applyParamsToUrl();
-    ClusterState.filterService.updateClusterGroups(app);
-  };
-
   const updateClusterGroups = (applyParamsToUrl = true) => {
     const { providerType, instanceType, account, availabilityZone, region } = digestDependentFilters({
       sortFilter: ClusterState.filterModel.asFilterModel.sortFilter,
@@ -173,18 +161,11 @@ export const ClusterFilters = ({ app }: IClusterFiltersProps) => {
 
   React.useEffect(() => {
     updateClusterGroups();
-  }, [serverGroupData.length]);
+  }, [serverGroupData.length, tags.length]);
 
   return (
     <div className="insight-filter-content">
       <div className="heading">
-        <span
-          className="btn btn-default btn-xs"
-          style={{ visibility: tags.length > 0 ? 'inherit' : 'hidden' }}
-          onClick={clearFilters}
-        >
-          Clear All
-        </span>
         <FilterSearch
           helpKey="cluster.search"
           value={sortFilter.filter}

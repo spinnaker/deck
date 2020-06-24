@@ -12,6 +12,7 @@
 
 .spinnaker-header .navbar-menu-icon {
   min-width: 24px;
+  cursor: pointer;
 }
 
 .spinnaker-header a {

@@ -113,12 +113,6 @@ export class FunctionFilters extends React.Component<IFunctionFiltersProps, IFun
     return compact(uniq(map(this.props.app.functions.data, option) as string[])).sort();
   };
 
-  private clearFilters = (): void => {
-    FunctionState.filterService.clearFilters();
-    FunctionState.filterModel.asFilterModel.applyParamsToUrl();
-    FunctionState.filterService.updateFunctionGroups(this.props.app);
-  };
-
   private handleSearchBlur = (event: React.ChangeEvent<HTMLInputElement>) => {
     const target = event.target;
     this.state.sortFilter.filter = target.value;
@@ -134,18 +128,11 @@ export class FunctionFilters extends React.Component<IFunctionFiltersProps, IFun
 
   public render() {
     const fuctionsLoaded = this.props.app.functions.loaded;
-    const { accountHeadings, providerTypeHeadings, regionHeadings, sortFilter, tags } = this.state;
+    const { accountHeadings, providerTypeHeadings, regionHeadings, sortFilter } = this.state;
 
     return (
-      <div>
+      <div className="insight-filter-content">
         <div className="heading">
-          <span
-            className="btn btn-default btn-xs"
-            style={{ visibility: tags.length > 0 ? 'inherit' : 'hidden' }}
-            onClick={this.clearFilters}
-          >
-            Clear All
-          </span>
           <FilterSearch
             helpKey="functions.search"
             value={sortFilter.filter}
