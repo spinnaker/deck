@@ -1,11 +1,11 @@
 import { IProviderSettings, SETTINGS } from '@spinnaker/core';
 
-export interface IClassicLaunchWhitelist {
+export interface IClassicLaunchAllowlist {
   region: string;
   credentials: string;
 }
 
-export interface ITencentCloudProviderSettings extends IProviderSettings {
+export interface ITencentcloudProviderSettings extends IProviderSettings {
   defaults: {
     account?: string;
     region?: string;
@@ -18,7 +18,7 @@ export interface ITencentCloudProviderSettings extends IProviderSettings {
     certificateTypes?: string[];
   };
   classicLaunchLockout?: number;
-  classicLaunchWhitelist?: IClassicLaunchWhitelist[];
+  classicLaunchAllowlist?: IClassicLaunchAllowlist[];
   metrics?: {
     customNamespaces?: string[];
   };
@@ -26,9 +26,9 @@ export interface ITencentCloudProviderSettings extends IProviderSettings {
   disableSpotPricing?: boolean;
 }
 
-export const TencentCloudProviderSettings: ITencentCloudProviderSettings = (SETTINGS.providers
-  .tencentcloud as ITencentCloudProviderSettings) || { defaults: {} };
+export const TencentcloudProviderSettings: ITencentcloudProviderSettings = (SETTINGS.providers
+  .tencentcloud as ITencentcloudProviderSettings) || { defaults: {} };
 
-if (TencentCloudProviderSettings) {
-  TencentCloudProviderSettings.resetToOriginal = SETTINGS.resetProvider('tencentcloud');
+if (TencentcloudProviderSettings) {
+  TencentcloudProviderSettings.resetToOriginal = SETTINGS.resetProvider('tencentcloud');
 }

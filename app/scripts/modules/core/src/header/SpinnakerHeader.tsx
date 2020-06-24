@@ -3,6 +3,7 @@ import { UISref, UISrefActive } from '@uirouter/react';
 import { UIRouterContext } from '@uirouter/react-hybrid';
 
 import { NgReact } from 'core/reactShims';
+import { Overridable } from 'core/overrideRegistry';
 import { GlobalSearch } from 'core/search/global/GlobalSearch';
 import { HelpMenu } from 'core/help/HelpMenu';
 
@@ -13,6 +14,7 @@ export interface ISpinnakerHeaderState {
 }
 
 @UIRouterContext
+@Overridable('spinnakerHeader')
 export class SpinnakerHeader extends React.Component<{}, ISpinnakerHeaderState> {
   constructor(props: {}) {
     super(props);
@@ -34,7 +36,7 @@ export class SpinnakerHeader extends React.Component<{}, ISpinnakerHeaderState> 
   };
 
   public render(): React.ReactElement<SpinnakerHeader> {
-    const { UserMenu, WhatsNew } = NgReact;
+    const { UserMenu } = NgReact;
 
     return (
       <nav className="container spinnaker-header" role="navigation" aria-label="Main Menu">
@@ -83,7 +85,6 @@ export class SpinnakerHeader extends React.Component<{}, ISpinnakerHeaderState> 
             <ul className="nav nav-items">
               <UserMenu />
               <GlobalSearch />
-              <WhatsNew />
               <HelpMenu />
             </ul>
           </div>

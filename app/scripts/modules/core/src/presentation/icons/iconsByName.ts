@@ -4,6 +4,7 @@ import { ReactComponent as accordionExpandAll } from './vectors/accordionExpandA
 import { ReactComponent as add } from './vectors/add.svg';
 import { ReactComponent as artifact } from './vectors/artifact.svg';
 import { ReactComponent as artifactApproved } from './vectors/artifactApproved.svg';
+import { ReactComponent as artifactBad } from './vectors/artifactBad.svg';
 import { ReactComponent as artifactPending } from './vectors/artifactPending.svg';
 import { ReactComponent as artifactSkipped } from './vectors/artifactSkipped.svg';
 import { ReactComponent as build } from './vectors/build.svg';
@@ -29,6 +30,8 @@ import { ReactComponent as environment } from './vectors/environment.svg';
 import { ReactComponent as fileJson } from './vectors/fileJson.svg';
 import { ReactComponent as fn } from './vectors/fn.svg';
 import { ReactComponent as fnNew } from './vectors/fnNew.svg';
+import { ReactComponent as heart } from './vectors/heart.svg';
+import { ReactComponent as history } from './vectors/history.svg';
 import { ReactComponent as instances } from './vectors/instances.svg';
 import { ReactComponent as loadBalancer } from './vectors/loadBalancer.svg';
 import { ReactComponent as manualJudgement } from './vectors/manualJudgement.svg';
@@ -38,6 +41,7 @@ import { ReactComponent as menu } from './vectors/menu.svg';
 import { ReactComponent as menuClose } from './vectors/menuClose.svg';
 import { ReactComponent as pin } from './vectors/pin.svg';
 import { ReactComponent as placeholder } from './vectors/placeholder.svg';
+import { ReactComponent as play } from './vectors/play.svg';
 import { ReactComponent as securityGroup } from './vectors/securityGroup.svg';
 import { ReactComponent as servergroupAws } from './vectors/servergroupAws.svg';
 import { ReactComponent as spel } from './vectors/spel.svg';
@@ -117,6 +121,7 @@ export const iconsByName = {
   add,
   artifact,
   artifactApproved,
+  artifactBad,
   artifactPending,
   artifactSkipped,
   build,
@@ -158,6 +163,8 @@ export const iconsByName = {
   formNetworkGood,
   formRefresh,
   formWarning,
+  heart,
+  history,
   instances,
   loadBalancer,
   manualJudgement,
@@ -183,6 +190,7 @@ export const iconsByName = {
   menuClose,
   pin,
   placeholder,
+  play,
   resourceT,
   securityGroup,
   servergroupAws,

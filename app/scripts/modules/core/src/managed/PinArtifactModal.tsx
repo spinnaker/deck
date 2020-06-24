@@ -13,7 +13,7 @@ import {
   showModal,
   SpinFormik,
   ValidationMessage,
-  Icon,
+  Illustration,
 } from '../presentation';
 import { HelpField } from '../help';
 import { IManagedArtifactVersion, IManagedResourceSummary } from '../domain';
@@ -35,24 +35,24 @@ const logClick = (label: string, application: string) =>
     label: application,
   });
 
-const EnvironmentOption = memo(
-  ({ label, disabled, allResources }: Option<string> & { allResources: IManagedResourceSummary[] }) => {
-    const isCritical = useEnvironmentTypeFromResources(allResources);
+type IEnvironmentOptionProps = Option<string> & { disabledReason: string; allResources: IManagedResourceSummary[] };
 
-    return (
-      <span>
-        <span className="sp-margin-s-right" style={{ opacity: disabled ? 0.66 : 1 }}>
-          <EnvironmentBadge name={label} critical={isCritical} size="extraSmall" />
-        </span>
-        {disabled && (
-          <span className="small" style={{ fontStyle: 'italic', color: '#666' }}>
-            Already pinned here
-          </span>
-        )}
+const EnvironmentOption = memo(({ label, disabled, disabledReason, allResources }: IEnvironmentOptionProps) => {
+  const isCritical = useEnvironmentTypeFromResources(allResources);
+
+  return (
+    <span>
+      <span className="sp-margin-s-right" style={{ opacity: disabled ? 0.66 : 1 }}>
+        <EnvironmentBadge name={label} critical={isCritical} size="extraSmall" />
       </span>
-    );
-  },
-);
+      {disabled && (
+        <span className="small" style={{ fontStyle: 'italic', color: '#666' }}>
+          Already {disabledReason} here
+        </span>
+      )}
+    </span>
+  );
+});
 
 export interface IPinArtifactModalProps extends IModalComponentProps {
   application: Application;
@@ -62,12 +62,14 @@ export interface IPinArtifactModalProps extends IModalComponentProps {
 }
 
 export const showPinArtifactModal = (props: IPinArtifactModalProps) =>
-  showModal(PinArtifactModal, props, { maxWidth: 628 });
+  showModal(PinArtifactModal, props, { maxWidth: 750 });
 
 export const PinArtifactModal = memo(
   ({ application, reference, version, resourcesByEnvironment, dismissModal, closeModal }: IPinArtifactModalProps) => {
     const optionRenderer = useCallback(
-      (option: Option<string>) => <EnvironmentOption {...option} allResources={resourcesByEnvironment[option.value]} />,
+      (option: Option<string> & { disabledReason: string }) => (
+        <EnvironmentOption {...option} allResources={resourcesByEnvironment[option.value]} />
+      ),
       [resourcesByEnvironment],
     );
 
@@ -79,7 +81,7 @@ export const PinArtifactModal = memo(
           comment?: string;
         }>
           initialValues={{
-            environment: version.environments.find(({ pinned }) => !pinned).name,
+            environment: version.environments.find(({ pinned, state }) => !pinned && state !== 'vetoed').name,
           }}
           onSubmit={({ environment, comment }, { setSubmitting, setStatus }) =>
             ManagedWriter.pinArtifactVersion({
@@ -103,21 +105,24 @@ export const PinArtifactModal = memo(
               <>
                 <ModalBody>
                   <div className="flex-container-v middle sp-padding-xl-yaxis">
-                    <div className="flex-container-h sp-margin-xl-bottom">
-                      <span className="flex-container-h middle sp-margin-m-right">
-                        <Icon name="pin" appearance="neutral" size="large" />
+                    <div className="flex-container-h middle sp-margin-xl-bottom">
+                      <span className="sp-margin-m-right" style={{ minWidth: 145 }}>
+                        <Illustration name="pinArtifactVersion" />
                       </span>
                       <span>
-                        Pinning ensures an environment uses a specific version, even if Spinnaker would've normally
-                        deployed a different one. When you pin a version, it'll remain pinned until you manually unpin
-                        it.{' '}
+                        <p>
+                          Pinning ensures an environment uses a specific version, even if Spinnaker would've normally
+                          deployed a different one. If you pin a version, it'll remain pinned until you manually unpin
+                          it.
+                        </p>{' '}
                         <a
                           target="_blank"
                           onClick={() => logClick('Pinning docs link', application.name)}
                           href={PINNING_DOCS_URL}
                         >
-                          Learn more
-                        </a>
+                          Check out our documentation
+                        </a>{' '}
+                        for more information.
                       </span>
                     </div>
                     <FormikFormField
@@ -126,10 +131,11 @@ export const PinArtifactModal = memo(
                       input={props => (
                         <ReactSelectInput
                           {...props}
-                          options={version.environments.map(({ name, pinned }) => ({
+                          options={version.environments.map(({ name, pinned, state }) => ({
                             label: name,
                             value: name,
-                            disabled: !!pinned,
+                            disabled: !!pinned || state === 'vetoed',
+                            disabledReason: !!pinned ? 'pinned' : 'marked as bad',
                           }))}
                           optionRenderer={optionRenderer}
                           valueRenderer={optionRenderer}
