@@ -1,5 +1,5 @@
 import React from 'react';
-import { UISref, UISrefActive } from '@uirouter/react';
+import { useSrefActive } from '@uirouter/react';
 import { UIRouterContext } from '@uirouter/react-hybrid';
 
 import { NgReact } from 'core/reactShims';
@@ -34,6 +34,11 @@ export const SpinnakerHeaderContent = () => {
   const [navExpanded, setNavExpanded] = React.useState(!isDevicePhoneOrSmaller());
   const toggleNavItems = () => setNavExpanded(!navExpanded);
 
+  const searchSref = useSrefActive('home.infrastructure', null, 'active');
+  const projectsSref = useSrefActive('home.projects', null, 'active');
+  const appsSref = useSrefActive('home.applications', null, 'active');
+  const templatesSref = useSrefActive('home.pipeline-templates', null, 'active');
+
   return (
     <nav className="container spinnaker-header" role="navigation" aria-label="Main Menu">
       <div className="navbar-header horizontal middle">
@@ -50,32 +55,16 @@ export const SpinnakerHeaderContent = () => {
         <div className="nav-container nav-items">
           <ul className="nav nav-items flex-1 page-nav">
             <li key="navHome">
-              <UISrefActive class="active">
-                <UISref to="home.infrastructure">
-                  <a>Search</a>
-                </UISref>
-              </UISrefActive>
+              <a {...searchSref}>Search</a>
             </li>
             <li key="navProjects">
-              <UISrefActive class="active">
-                <UISref to="home.projects">
-                  <a>Projects</a>
-                </UISref>
-              </UISrefActive>
+              <a {...projectsSref}>Projects</a>
             </li>
             <li key="navApplications">
-              <UISrefActive class="active">
-                <UISref to="home.applications">
-                  <a>Applications</a>
-                </UISref>
-              </UISrefActive>
+              <a {...appsSref}>Applications</a>
             </li>
             <li key="navPipelineTemplates">
-              <UISrefActive class="active">
-                <UISref to="home.pipeline-templates">
-                  <a>Pipeline Templates</a>
-                </UISref>
-              </UISrefActive>
+              <a {...templatesSref}>Pipeline Templates</a>
             </li>
           </ul>
           <ul className="nav nav-items">
