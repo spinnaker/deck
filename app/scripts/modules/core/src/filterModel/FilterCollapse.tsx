@@ -13,15 +13,17 @@ export class FilterCollapse extends React.Component<{}> {
   };
 
   public render() {
+    const { filtersExpanded } = ReactInjector.insightFilterStateModel;
+
     return (
       <div className="filters-toggle layer-medium">
-        {!ReactInjector.insightFilterStateModel.filtersExpanded && (
+        {!filtersExpanded && (
           <div className="filters-placeholder filters-hidden">
             <Tooltip value="Show filters">
               <button
                 className="btn btn-xs btn-default pin clickable sp-padding-xs"
                 onClick={() => this.onClick(true)}
-                style={{ display: ReactInjector.insightFilterStateModel.filtersExpanded ? 'none' : 'inherit' }}
+                style={{ display: filtersExpanded ? 'none' : 'inherit' }}
               >
                 <i className="fa fa-forward" />
                 <span className="show-filter-text"> Show filters</span>
@@ -29,13 +31,13 @@ export class FilterCollapse extends React.Component<{}> {
             </Tooltip>
           </div>
         )}
-        {ReactInjector.insightFilterStateModel.filtersExpanded && (
+        {filtersExpanded && (
           <div className="filters-placeholder filters-open horizontal middle">
             <Tooltip value="Hide filters">
               <button
                 className="btn btn-xs btn-default unpin clickable sp-margin-s-xaxis sp-margin-2xs-yaxis sp-padding-xs"
                 onClick={() => this.onClick(false)}
-                style={{ display: ReactInjector.insightFilterStateModel.filtersExpanded ? 'inherit' : 'none' }}
+                style={{ display: filtersExpanded ? 'inherit' : 'none' }}
               >
                 <i className="fa fa-backward" />
               </button>

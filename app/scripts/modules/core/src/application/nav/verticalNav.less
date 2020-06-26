@@ -4,14 +4,13 @@
   height: 100%;
   background-color: var(--color-accent-g2);
   box-shadow: 2px 0 3px 1px var(--color-alto);
-  min-width: 290px;
-
-  @media (min-width: 1800px) {
-    width: 320px;
-  }
+  min-width: 240px;
+  max-width: 330px;
 
   .nav-header {
     color: var(--color-primary);
+    // override
+    margin-bottom: unset;
 
     .application-header-icon {
       border-radius: 50%;
