@@ -1,8 +1,10 @@
 import React from 'react';
+import { useRecoilState } from 'recoil';
 import { useCurrentStateAndParams, useSrefActive } from '@uirouter/react';
 import { UIRouterContext } from '@uirouter/react-hybrid';
 
 import { NgReact } from 'core/reactShims';
+import { verticalNavExpandedAtom } from 'core/application/nav/navAtoms';
 import { Overridable } from 'core/overrideRegistry';
 import { GlobalSearch } from 'core/search/global/GlobalSearch';
 import { HelpMenu } from 'core/help/HelpMenu';
@@ -25,19 +27,20 @@ export class SpinnakerHeader extends React.Component<{}, {}> {
  */
 
 export const SpinnakerHeaderContent = () => {
-  const  { state: currentState } = useCurrentStateAndParams();
-  const isApplicationView = currentState.name.includes('applications.');
+  const { state: currentState } = useCurrentStateAndParams();
+  const isApplicationView = currentState.name.includes('application');
+
+  const [verticalNavExpanded, setVerticalNavExpanded] = useRecoilState(verticalNavExpandedAtom);
+  const toggleNav = () => setVerticalNavExpanded(!verticalNavExpanded);
 
   const isDevicePhoneOrSmaller = () => {
     const bodyStyles = window.getComputedStyle(document.body);
     const isPhone = bodyStyles.getPropertyValue('--is-phone');
     return isPhone.toLowerCase() === 'true';
   };
+  const [navExpanded] = React.useState(!isDevicePhoneOrSmaller());
+
   const { UserMenu } = NgReact;
-
-  const [navExpanded, setNavExpanded] = React.useState(!isDevicePhoneOrSmaller());
-  const toggleNav = () => setNavExpanded(!navExpanded);
-
   const searchSref = useSrefActive('home.infrastructure', null, 'active');
   const projectsSref = useSrefActive('home.projects', null, 'active');
   const appsSref = useSrefActive('home.applications', null, 'active');
@@ -47,7 +50,7 @@ export const SpinnakerHeaderContent = () => {
     <nav className="container spinnaker-header" role="navigation" aria-label="Main Menu">
       <div className="navbar-header horizontal middle">
         <div onClick={toggleNav} className="sp-margin-xl-right">
-            {isApplicationView && <Icon name={navExpanded ? 'menuClose' : 'menu'} size="medium" color="white" />}
+          {isApplicationView && <Icon name={verticalNavExpanded ? 'menuClose' : 'menu'} size="medium" color="white" />}
         </div>
         <a className="navbar-brand flex-1" href="#">
           SPINNAKER

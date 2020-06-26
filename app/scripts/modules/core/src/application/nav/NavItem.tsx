@@ -1,7 +1,9 @@
 import React from 'react';
+import { useRecoilValue } from 'recoil';
 
 import { DataSourceNotifications } from 'core/entityTag/notifications/DataSourceNotifications';
 import { Icon, Tooltip, useDataSource } from '../../presentation';
+import { verticalNavExpandedAtom } from './navAtoms';
 
 import { ApplicationDataSource } from '../service/applicationDataSource';
 import { Application } from '../application.model';
@@ -11,10 +13,10 @@ export interface INavItemProps {
   app: Application;
   dataSource: ApplicationDataSource;
   isActive: boolean;
-  isCollapsed: boolean;
 }
 
-export const NavItem = ({ app, dataSource, isActive, isCollapsed }: INavItemProps) => {
+export const NavItem = ({ app, dataSource, isActive }: INavItemProps) => {
+  const isExpanded = useRecoilValue(verticalNavExpandedAtom);
   const { alerts, badge, iconName, key, label } = dataSource;
 
   const { data: badgeData } = useDataSource(app.getDataSource(badge || key));
@@ -31,7 +33,7 @@ export const NavItem = ({ app, dataSource, isActive, isCollapsed }: INavItemProp
       <div className={badgeClassNames}>{runningCount > 0 ? runningCount : ''}</div>
       <div className="nav-item">
         {iconName &&
-          (isCollapsed ? (
+          (!isExpanded ? (
             <Tooltip value={dataSource.label} placement="right">
               <div>
                 <Icon className="nav-icon" name={iconName} size="medium" color={isActive ? 'primary' : 'accent'} />

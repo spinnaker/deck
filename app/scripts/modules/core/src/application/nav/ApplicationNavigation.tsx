@@ -1,4 +1,5 @@
 import React from 'react';
+import { useRecoilValue } from 'recoil';
 import { useCurrentStateAndParams } from '@uirouter/react';
 import { find, isEqual } from 'lodash';
 
@@ -6,10 +7,9 @@ import { ApplicationRefresher } from './ApplicationRefresher';
 import { ApplicationIcon } from '../ApplicationIcon';
 import { NavSection } from './NavSection';
 import { Icon, Tooltip, useIsMobile, usePrevious } from '../../presentation';
-import { SchedulerFactory } from '../../scheduler';
-import { CollapsibleSectionStateCache } from '../../cache';
 
 import { navigationCategoryRegistry } from './navigationCategory.registry';
+import { verticalNavExpandedAtom } from './navAtoms';
 import { PagerDutyWriter } from 'core/pagerDuty';
 import { Application } from '../application.model';
 import { ApplicationDataSource } from '../service/applicationDataSource';
@@ -25,10 +25,7 @@ export const ApplicationNavigation = ({ app }: IApplicationNavigationProps) => {
   useCurrentStateAndParams();
   const isMobile = useIsMobile();
 
-  const cacheRefresh = SchedulerFactory.createScheduler(400);
-  const [isOpen, setIsOpen] = React.useState(
-    !CollapsibleSectionStateCache.isSet('verticalNav') || CollapsibleSectionStateCache.isExpanded('verticalNav'),
-  );
+  const isExpanded = useRecoilValue(verticalNavExpandedAtom);
 
   const getNavigationCategories = (dataSources: ApplicationDataSource[]) => {
     const appSources = dataSources.filter(ds => ds.visible !== false && !ds.disabled && ds.sref);
@@ -58,30 +55,16 @@ export const ApplicationNavigation = ({ app }: IApplicationNavigationProps) => {
     };
   }, []);
 
-  React.useEffect(() => {
-    cacheRefresh.subscribe(() => {
-      const cacheStatus =
-        !CollapsibleSectionStateCache.isSet('verticalNav') || CollapsibleSectionStateCache.isExpanded('verticalNav');
-      if (cacheStatus !== isOpen) {
-        setIsOpen(cacheStatus);
-      }
-    });
-
-    return () => {
-      cacheRefresh.unsubscribe();
-    };
-  }, [isOpen]);
-
   const pageApplicationOwner = () => {
     PagerDutyWriter.pageApplicationOwnerModal(app);
   };
 
-  if (!isOpen && isMobile) {
+  if (!isExpanded && isMobile) {
     return null;
   }
 
   return (
-    <div className={`vertical-navigation flex-fill layer-high${!isOpen ? ' vertical-nav-collapsed' : ''}`}>
+    <div className={`vertical-navigation flex-fill layer-high${!isExpanded ? ' vertical-nav-collapsed' : ''}`}>
       <h3 className="heading-2 horizontal middle nav-header sp-margin-l-xaxis sp-margin-l-top">
         <div className="sp-margin-l-right vertical">
           <ApplicationIcon app={app} />
@@ -92,12 +75,12 @@ export const ApplicationNavigation = ({ app }: IApplicationNavigationProps) => {
       {navSections
         .filter(section => section.length)
         .map((section, i) => (
-          <NavSection key={`section-${i}`} dataSources={section} app={app} isCollapsed={!isOpen}/>
+          <NavSection key={`section-${i}`} dataSources={section} app={app} />
         ))}
       <div className="nav-section clickable">
         <div className="page-category flex-container-h middle text-semibold" onClick={pageApplicationOwner}>
           <div className="nav-item sp-margin-xs-right">
-            {!isOpen ? (
+            {!isExpanded ? (
               <Tooltip value="Page App Owner" placement="right">
                 <div>
                   <Icon className="nav-item-icon" name="spMenuPager" size="medium" color="danger" />
