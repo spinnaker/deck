@@ -31,5 +31,7 @@ export const AppRefresher = ({ app }: IAppRefresherProps) => {
     app.refresh(true);
   };
 
-  return <AppRefresherIcon lastRefresh={lastRefresh} refreshing={isRefreshing} refresh={handleRefresh} />;
+  return (
+    <AppRefresherIcon appName={app.name} lastRefresh={lastRefresh} refreshing={isRefreshing} refresh={handleRefresh} />
+  );
 };

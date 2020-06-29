@@ -7,12 +7,13 @@ import { Icon, Tooltip } from 'core/presentation';
 import { relativeTime, timestamp } from 'core/utils/timeFormatters';
 
 export interface IAppRefreshIconProps {
+  appName: string;
   lastRefresh: number;
   refresh: () => void;
   refreshing: boolean;
 }
 
-export const AppRefresherIcon = ({ lastRefresh, refresh, refreshing }: IAppRefreshIconProps) => {
+export const AppRefresherIcon = ({ appName, lastRefresh, refresh, refreshing }: IAppRefreshIconProps) => {
   const activeRefresher = SchedulerFactory.createScheduler(2000);
   const [timeSinceRefresh, setTimeSinceRefresh] = React.useState(relativeTime(lastRefresh));
   const [iconPulsing, setIconPulsing] = React.useState(false);
@@ -39,22 +40,14 @@ export const AppRefresherIcon = ({ lastRefresh, refresh, refreshing }: IAppRefre
 
   const RefresherTooltip = (
     <span>
-      {refreshing && (
-        <p>
-          Application is <strong>refreshing</strong>.
-        </p>
-      )}
-      {!refreshing && (
-        <p>
-          (click <span className="fa fa-sync-alt" /> to refresh)
-        </p>
-      )}
       <p>
-        Last refresh: {timestamp(lastRefresh)} <br /> ({timeSinceRefresh})
+        <strong>{appName}</strong>
       </p>
-      <p className="small">
-        <strong>Note:</strong> Due to caching, data may be delayed up to 2 minutes
+      <p>{`app data is ${refreshing ? 'refreshing' : 'up to date (click to refresh)'}`}</p>
+      <p>
+        Last refresh: {timestamp(lastRefresh)} <br /> {timeSinceRefresh}
       </p>
+      <p>Note: Due to caching, data may be delayed up to 2 minutes</p>
     </span>
   );
   const isRefreshing = iconPulsing || refreshing;
