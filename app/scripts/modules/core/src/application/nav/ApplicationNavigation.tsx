@@ -3,8 +3,6 @@ import { useRecoilValue } from 'recoil';
 import { useCurrentStateAndParams } from '@uirouter/react';
 import { find, isEqual } from 'lodash';
 
-import { ApplicationRefresher } from './ApplicationRefresher';
-import { ApplicationIcon } from '../ApplicationIcon';
 import { AppRefresher } from './AppRefresher';
 import { NavSection } from './NavSection';
 import { Icon, Tooltip, useIsMobile, usePrevious } from '../../presentation';
