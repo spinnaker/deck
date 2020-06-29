@@ -57,12 +57,13 @@ export const AppRefresherIcon = ({ lastRefresh, refresh, refreshing }: IAppRefre
       </p>
     </span>
   );
+  const isRefreshing = iconPulsing || refreshing;
 
   return (
     <Tooltip template={RefresherTooltip} placement={$window.innerWidth < 1100 ? 'bottom' : 'right'}>
-      <div className={`application-header-icon${iconPulsing ? ' header-icon-pulsing' : ''}`} onClick={refreshApp}>
-        {!isStale && !iconPulsing && <ApplicationFreshIcon />}
-        {(isStale || iconPulsing) && <Icon name="spMenuAppUnsynced" size="small" appearance="light" />}
+      <div className={`application-header-icon${isRefreshing ? ' header-icon-pulsing' : ''}`} onClick={refreshApp}>
+        {!isStale && !isRefreshing && <ApplicationFreshIcon />}
+        {(isStale || isRefreshing) && <Icon name="spMenuAppUnsynced" size="small" appearance="light" />}
       </div>
     </Tooltip>
   );
