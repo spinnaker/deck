@@ -2,18 +2,22 @@ import {
   AccountSelectInput,
   AccountService,
   Application,
+  FormikFormField,
   HelpField,
   IAccount,
   IMoniker,
   IRegion,
   IWizardPageComponent,
   NameUtils,
-  RegionSelectField,
+  RegionSelectInput,
   Spinner,
-  ValidationMessage,
+  TextAreaInput,
+  TextInput,
+  FormValidator,
+  FirewallLabels,
+  Validators,
 } from '@spinnaker/core';
-import * as classNames from 'classnames';
-import { Field, FormikErrors, FormikProps } from 'formik';
+import { FormikProps } from 'formik';
 import * as React from 'react';
 import { Observable, Subject } from 'rxjs';
 import { ITencentcloudLoadBalancer } from 'tencentcloud/domain';
@@ -53,25 +57,32 @@ export class LoadBalancerLocation extends React.Component<ILoadBalancerLocationP
   private destroy$ = new Subject<void>();
 
   public validate(values: ISecurityGroupDetail) {
-    const errors = {} as FormikErrors<ISecurityGroupDetail>;
+    const { credentials, region } = values;
+    const validator = new FormValidator(values);
 
-    if (this.state.existingLoadBalancerNames.includes(values.name)) {
-      errors.name = `There is already a load balancer in ${values.credentials}:${values.region} with that name.`;
-    }
+    validator
+      .field('name')
+      .withValidators(
+        Validators.valueUnique(
+          this.state.existingLoadBalancerNames,
+          `There is already a ${FirewallLabels.get('firewall')} in ${credentials}:${region} with that name.`,
+        ),
+        Validators.maxLength(32, `${FirewallLabels.get('Firewall')} names cannot exceed 32 characters in length`),
+      );
 
-    if (values.name && values.name.length > 32) {
-      errors.name = 'Load balancer names cannot exceed 32 characters in length';
-    }
+    validator
+      .field('stack')
+      .optional()
+      .withValidators(value => !value.match(/^[a-zA-Z0-9]*$/) && 'Stack can only contain letters and numbers.');
 
-    if (values.stack && !values.stack.match(/^[a-zA-Z0-9]*$/)) {
-      errors.stack = 'Stack can only contain letters and numbers.';
-    }
+    validator
+      .field('detail')
+      .optional()
+      .withValidators(
+        value => !value.match(/^[a-zA-Z0-9-]*$/) && 'Detail can only contain letters, numbers, and dashes.',
+      );
 
-    if (values.detail && !values.detail.match(/^[a-zA-Z0-9-]*$/)) {
-      errors.detail = 'Detail can only contain letters, numbers, and dashes.';
-    }
-
-    return errors;
+    return validator.validateForm();
   }
 
   public componentDidMount(): void {
@@ -137,35 +148,9 @@ export class LoadBalancerLocation extends React.Component<ILoadBalancerLocationP
     this.destroy$.next();
   }
 
-  private accountUpdated = (account: string): void => {
-    this.props.formik.setFieldValue('credentials', account);
-  };
-
-  private regionUpdated = (region: string): void => {
-    this.props.formik.setFieldValue('region', region);
-  };
-
-  private stackChanged = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    this.props.formik.setFieldValue('stack', event.target.value);
-  };
-
-  private detailChanged = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    this.props.formik.setFieldValue('detail', event.target.value);
-  };
-  private descriptionChanged = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    this.props.formik.setFieldValue('description', event.target.value);
-  };
-
   public render() {
-    const { errors, values } = this.props.formik;
+    const { values } = this.props.formik;
     const { accounts, regions } = this.state;
-
-    const className = classNames({
-      'col-md-12': true,
-      well: true,
-      'alert-danger': errors.name,
-      'alert-info': !errors.name,
-    });
 
     return (
       <div className="container-fluid form-horizontal">
@@ -175,82 +160,38 @@ export class LoadBalancerLocation extends React.Component<ILoadBalancerLocationP
           </div>
         )}
         {accounts && (
-          <div className="modal-body">
-            <div className="form-group">
-              <div className={className}>
-                <strong>Your load balancer will be named: </strong>
-                <span>{values.name}</span>
-                <HelpField id="tencentcloud.loadBalancer.name" />
-                <Field type="text" style={{ display: 'none' }} className="form-control input-sm no-spel" name="name" />
-                {errors.name && <ValidationMessage type="error" message={errors.name} />}
-              </div>
+          <div>
+            <div className="well alert-info">
+              <FormikFormField
+                name="name"
+                touched={true}
+                input={() => (
+                  <>
+                    <span>
+                      <strong>Your load balancer will be named: </strong>
+                      {values.name}
+                      <HelpField id="tencentcloud.loadBalancer.name" />
+                    </span>
+                  </>
+                )}
+              />
             </div>
-            <div className="form-group">
-              <div className="col-md-3 sm-label-right">Account</div>
-              <div className="col-md-8">
-                <AccountSelectInput
-                  value={values.credentials}
-                  onChange={(evt: any) => this.accountUpdated(evt.target.value)}
-                  accounts={accounts}
-                  provider="tencentcloud"
-                />
-              </div>
-            </div>
-            <RegionSelectField
-              labelColumns={3}
-              component={values}
-              field="region"
-              account={values.credentials}
-              onChange={this.regionUpdated}
-              regions={regions}
+
+            <FormikFormField
+              name="credentials"
+              label="Account"
+              input={props => <AccountSelectInput {...props} accounts={accounts} provider="tencentcloud" />}
             />
-            <div className="form-group">
-              <div className="col-md-3 sm-label-right">Stack</div>
-              <div className="col-md-3">
-                <input
-                  type="text"
-                  className={`form-control nput-sm no-spel ${errors.stack ? 'invalid' : ''}`}
-                  value={values.stack}
-                  name="stack"
-                  onChange={this.stackChanged}
-                />
-              </div>
-              <div className="col-md-2 sm-label-right">Detail</div>
-              <div className="col-md-3">
-                <input
-                  type="text"
-                  className={`form-control input-sm no-spel ${errors.detail ? 'invalid' : ''}`}
-                  value={values.detail}
-                  name="detail"
-                  onChange={this.detailChanged}
-                />
-              </div>
-              {errors.stack && (
-                <div className="col-md-7 col-md-offset-3">
-                  <ValidationMessage type="error" message={errors.stack} />
-                </div>
-              )}
-              {errors.detail && (
-                <div className="col-md-7 col-md-offset-3">
-                  <ValidationMessage type="error" message={errors.detail} />
-                </div>
-              )}
-            </div>
-            <div className="form-group">
-              <div className="col-md-3 sm-label-right">Description (required)</div>
-              <div className="col-md-8">
-                {
-                  <textarea
-                    required={true}
-                    className={`form-control input-sm no-spel`}
-                    value={values.description}
-                    name="description"
-                    // @ts-ignore
-                    onChange={this.descriptionChanged}
-                  />
-                }
-              </div>
-            </div>
+
+            <FormikFormField
+              name="region"
+              label="Region"
+              input={props => <RegionSelectInput {...props} account={values.credentials} regions={regions} />}
+            />
+
+            <FormikFormField name="stack" label="Stack" touched={true} input={props => <TextInput {...props} />} />
+            <FormikFormField name="detail" label="Detail" touched={true} input={props => <TextInput {...props} />} />
+            <FormikFormField name="description" label="Description" input={props => <TextAreaInput {...props} />} />
           </div>
         )}
       </div>
