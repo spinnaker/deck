@@ -5,6 +5,7 @@ import { find, isEqual } from 'lodash';
 
 import { ApplicationRefresher } from './ApplicationRefresher';
 import { ApplicationIcon } from '../ApplicationIcon';
+import { AppRefresher } from './AppRefresher';
 import { NavSection } from './NavSection';
 import { Icon, Tooltip, useIsMobile, usePrevious } from '../../presentation';
 
@@ -66,11 +67,8 @@ export const ApplicationNavigation = ({ app }: IApplicationNavigationProps) => {
   return (
     <div className={`vertical-navigation flex-fill layer-high${!isExpanded ? ' vertical-nav-collapsed' : ''}`}>
       <h3 className="heading-2 horizontal middle nav-header sp-margin-l-xaxis sp-margin-l-top">
-        <div className="sp-margin-l-right vertical">
-          <ApplicationIcon app={app} />
-          <ApplicationRefresher app={app} />
-        </div>
-        <span className="application-name text-semibold heading-2 sp-margin-xs-left self-left">{app.name}</span>
+        <AppRefresher app={app} />
+        <span className="application-name text-semibold heading-2 sp-margin-m-left">{app.name}</span>
       </h3>
       {navSections
         .filter(section => section.length)
