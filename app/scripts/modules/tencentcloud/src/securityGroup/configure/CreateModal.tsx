@@ -16,7 +16,7 @@ import { Subject } from 'rxjs';
 import { get, uniq, intersection } from 'lodash';
 import { ISecurityGroup } from '@spinnaker/core';
 import { ISecurityGroupProps, ISecurityGroupDetail } from '../define';
-import { LoadBalancerLocation } from './components/LoadBalancerLocation';
+import { SecurityGroupLocation } from './components/SecurityGroupLocation';
 import { Ingress } from './components/Ingress';
 export interface ICreateSecurityGroupState {
   taskMonitor: TaskMonitor;
@@ -259,7 +259,7 @@ export class CreateSecurityGroupModal extends React.Component<ISecurityGroupProp
                   wizard={wizard}
                   order={nextIdx()}
                   render={({ innerRef }) => (
-                    <LoadBalancerLocation app={application} formik={formik} isNew={isNew} ref={innerRef} />
+                    <SecurityGroupLocation app={application} formik={formik} isNew={isNew} ref={innerRef} />
                   )}
                 />
               }
