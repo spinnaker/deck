@@ -380,6 +380,12 @@ angular
             command.securityGroups = serverGroup.launchTemplate.launchTemplateData.securityGroups;
           }
 
+          if (serverGroup.launchTemplate && serverGroup.launchTemplate.launchTemplateData.networkInterfaces) {
+            const networkInterface =
+              serverGroup.launchTemplate.launchTemplateData.networkInterfaces.find(ni => ni.deviceIndex === 0) || {};
+            command.securityGroups = networkInterface.groups;
+          }
+
           // TO DO: Remove after temporary feature branch testing
           command.setLaunchTemplate = true;
 
