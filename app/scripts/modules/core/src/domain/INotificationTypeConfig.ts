@@ -1,11 +1,11 @@
 import React from 'react';
-import { INotificationSettings } from 'core/config';
 
 export interface INotificationTypeConfig {
   label: string;
-  key: keyof INotificationSettings;
+  key: string;
   config?: INotificationTypeCustomConfig;
   component?: React.ComponentType;
+  isExtensionNotification?: boolean;
 }
 
 export interface INotificationTypeCustomConfig {
