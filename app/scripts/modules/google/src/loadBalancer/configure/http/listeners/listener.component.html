@@ -55,11 +55,51 @@
           />
         </div>
 
-        <div class="col-md-1">
+        <div class="col-md-1" ng-if="!$ctrl.command.loadBalancer.isInternal">
           <button class="btn btn-sm btn-default" ng-click="$ctrl.deleteListener()">
             <span class="glyphicon glyphicon-trash visible-lg-inline"></span>
             <span>Delete</span>
           </button>
+        </div>
+      </div>
+
+      <div class="form-group" ng-if="$ctrl.command.loadBalancer.isInternal">
+        <div class="col-md-2 sm-label-right">Subnet</div>
+        <div class="col-md-8">
+          <select
+            class="form-control input-sm"
+            ng-model="$ctrl.listener.subnet"
+            ng-disabled="$ctrl.listener.created"
+            ng-required="true"
+          >
+            <option
+              ng-repeat="subnet in $ctrl.getSubnets()"
+              value="{{ subnet }}"
+              ng-selected="$ctrl.listener.subnet === subnet"
+              >{{ subnet }}</option
+            >
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group" ng-if="$ctrl.command.loadBalancer.isInternal">
+        <div class="col-md-2 sm-label-right">
+          Internal IP
+        </div>
+        <div class="col-md-8">
+          <select
+            class="form-control input-sm"
+            ng-model="$ctrl.listener.ipAddress"
+            ng-disabled="$ctrl.listener.created"
+            ng-required="true"
+          >
+            <option
+              ng-repeat="address in $ctrl.getInternalAddresses()"
+              value="{{ address.address }}"
+              ng-selected="$ctrl.listener.ipAddress === address.address"
+              >{{ address.name }}</option
+            >
+          </select>
         </div>
       </div>
 
@@ -108,7 +148,7 @@
         </div>
       </div>
 
-      <div class="form-group">
+      <div class="form-group" ng-if="!$ctrl.command.loadBalancer.isInternal">
         <div class="col-md-2 sm-label-right">
           External IP
           <help-field key="gce.httpLoadBalancer.externalIP" class="help-field-absolute"></help-field>

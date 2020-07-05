@@ -29,9 +29,9 @@ export interface IGceAddress {
 class GceAddressReader {
   public listAddresses(region?: string): IPromise<IGceAddress[]> {
     if (region) {
-      return this.listAddresses(null /* region */).then(addresses =>
-        addresses.filter(address => address.region === region),
-      );
+      return this.listAddresses(null /* region */).then(addresses => {
+        return addresses.filter(address => address.region === region);
+      });
     } else {
       return SearchService.search<IAddressSearchResults>(
         { q: '', type: 'addresses', allowShortQuery: 'true' },

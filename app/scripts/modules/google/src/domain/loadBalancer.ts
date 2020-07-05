@@ -24,6 +24,7 @@ export interface IGceHttpLoadBalancer extends IGceLoadBalancer {
   region: 'global';
   stack: string;
   urlMapName: string;
+  subnet?: string;
 }
 
 export interface IGceHostRule {
