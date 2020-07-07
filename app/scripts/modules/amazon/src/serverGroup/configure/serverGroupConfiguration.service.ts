@@ -81,6 +81,7 @@ export interface IAmazonServerGroupCommandViewState extends IServerGroupCommandV
 }
 
 export interface IAmazonServerGroupCommand extends IServerGroupCommand {
+  associateIPv6Address?: boolean;
   associatePublicIpAddress: boolean;
   backingData: IAmazonServerGroupCommandBackingData;
   copySourceCustomBlockDeviceMappings: boolean;

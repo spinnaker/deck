@@ -353,7 +353,7 @@ angular
               instanceType: launchTemplateData.instanceType,
               iamRole: launchTemplateData.iamInstanceProfile.name,
               keyPair: launchTemplateData.keyName,
-              associatePublicIpAddress: ipv6Addresses.length > 0,
+              associateIPv6Address: ipv6Addresses.length > 0,
               ramdiskId: launchTemplateData.ramdiskId,
               instanceMonitoring: launchTemplateData.monitoring.enabled,
               ebsOptimized: launchTemplateData.ebsOptimized,

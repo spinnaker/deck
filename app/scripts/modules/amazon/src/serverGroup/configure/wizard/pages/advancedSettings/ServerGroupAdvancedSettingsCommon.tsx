@@ -280,9 +280,9 @@ export class ServerGroupAdvancedSettingsCommon extends React.Component<IServerGr
               <label>
                 <input
                   type="checkbox"
-                  checked={values.associatePublicIpAddress === true}
-                  onChange={e => setFieldValue('associatePublicIpAddress', e.target.checked)}
-                  id="associatePublicIpAddressToggle"
+                  checked={values.associateIPv6Address === true}
+                  onChange={e => setFieldValue('associateIPv6Address', e.target.checked)}
+                  id="associateIPv6AddressToggle"
                 />{' '}
                 Assign an IPv6 address to instances{' '}
               </label>
