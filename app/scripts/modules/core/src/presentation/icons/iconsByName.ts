@@ -65,7 +65,7 @@ import { ReactComponent as spMenuCanaryReport } from './vectors/spMenuCanaryRepo
 import { ReactComponent as spMenuClusters } from './vectors/spMenuClusters.svg';
 import { ReactComponent as spMenuConfig } from './vectors/spMenuConfig.svg';
 import { ReactComponent as spMenuLoadBalancers } from './vectors/spMenuLoadBalancers.svg';
-import { ReactComponent as spMenuMeme } from './vectors/spMenuMeme';
+import { ReactComponent as spMenuMeme } from './vectors/spMenuMeme.svg';
 import { ReactComponent as spMenuPager } from './vectors/spMenuPager.svg';
 import { ReactComponent as spMenuPipelines } from './vectors/spMenuPipelines.svg';
 import { ReactComponent as spMenuProperties } from './vectors/spMenuProperties.svg';
