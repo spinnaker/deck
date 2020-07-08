@@ -3,6 +3,7 @@ import { ILoadBalancer } from '@spinnaker/core';
 import { IGceBackendService } from './backendService';
 
 export interface IGceLoadBalancer extends ILoadBalancer {
+  name: string;
   account: string;
   credentials: string;
   detail: string;
