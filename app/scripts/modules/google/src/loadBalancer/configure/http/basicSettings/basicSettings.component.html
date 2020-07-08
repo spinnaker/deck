@@ -40,7 +40,7 @@
         </div>
       </div>
       <gce-region-select-field
-        ng-if="$ctrl.loadBalancer.isInternal"
+        ng-if="$ctrl.loadBalancer.loadBalancerType === 'INTERNAL_MANAGED'"
         label-columns="2"
         field-columns="8"
         component="$ctrl.loadBalancer"
@@ -50,7 +50,7 @@
         regions="$ctrl.command.backingData.regions"
       ></gce-region-select-field>
       <gce-network-select-field
-        ng-if="$ctrl.loadBalancer.isInternal"
+        ng-if="$ctrl.loadBalancer.loadBalancerType === 'INTERNAL_MANAGED'"
         label-columns="2"
         field-columns="8"
         component="$ctrl.loadBalancer"

@@ -47,7 +47,7 @@ module(GOOGLE_LOADBALANCER_CONFIGURE_HTTP_BACKENDSERVICE_BACKENDSERVICE_COMPONEN
       };
 
       this.getSessionAffinitySuggestions = () => {
-        if (!this.loadBalancer.isInternal) {
+        if (this.loadBalancer.loadBalancerType === 'HTTP') {
           return ['None', 'Client IP', 'Generated Cookie'];
         } else {
           return ['None', 'Client IP', 'Generated Cookie', 'Header Field', 'HTTP Cookie'];

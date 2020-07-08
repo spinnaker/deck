@@ -9,7 +9,7 @@ interface IHealthCheckSearchResults {
   name: string;
   account: string;
   healthCheck: string; // JSON encoded string containing the real health check (it is missing the account).
-  region: string;
+  region?: string;
   kind: string;
   provider: string;
   type: string;

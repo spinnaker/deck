@@ -55,7 +55,7 @@
           />
         </div>
 
-        <div class="col-md-1" ng-if="!$ctrl.command.loadBalancer.isInternal">
+        <div class="col-md-1">
           <button class="btn btn-sm btn-default" ng-click="$ctrl.deleteListener()">
             <span class="glyphicon glyphicon-trash visible-lg-inline"></span>
             <span>Delete</span>
@@ -63,7 +63,7 @@
         </div>
       </div>
 
-      <div class="form-group" ng-if="$ctrl.command.loadBalancer.isInternal">
+      <div class="form-group" ng-if="$ctrl.command.loadBalancer.loadBalancerType === 'INTERNAL_MANAGED'">
         <div class="col-md-2 sm-label-right">Subnet</div>
         <div class="col-md-8">
           <select
@@ -82,7 +82,7 @@
         </div>
       </div>
 
-      <div class="form-group" ng-if="$ctrl.command.loadBalancer.isInternal">
+      <div class="form-group" ng-if="$ctrl.command.loadBalancer.loadBalancerType === 'INTERNAL_MANAGED'">
         <div class="col-md-2 sm-label-right">
           Internal IP
         </div>
@@ -148,7 +148,7 @@
         </div>
       </div>
 
-      <div class="form-group" ng-if="!$ctrl.command.loadBalancer.isInternal">
+      <div class="form-group" ng-if="$ctrl.command.loadBalancer.loadBalancerType === 'HTTP'">
         <div class="col-md-2 sm-label-right">
           External IP
           <help-field key="gce.httpLoadBalancer.externalIP" class="help-field-absolute"></help-field>

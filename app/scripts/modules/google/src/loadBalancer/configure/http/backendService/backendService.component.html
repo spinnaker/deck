@@ -128,7 +128,7 @@
       </div>
     </div>
 
-    <div ng-if="!$ctrl.loadBalancer.isInternal" class="form-group">
+    <div ng-if="$ctrl.loadBalancer.loadBalancerType === 'HTTP'" class="form-group">
       <div class="col-md-4 sm-label-right">
         <b>Enable CDN</b>
       </div>
