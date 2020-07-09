@@ -4,6 +4,5 @@ import { CollapsibleSectionStateCache } from '../../cache/collapsibleSectionStat
 export const verticalNavExpandedAtom = atom({
   key: 'verticalNavExpanded',
   default:
-    !CollapsibleSectionStateCache.isSet('verticalNav') ||
-    (CollapsibleSectionStateCache.isSet('verticalNav') && CollapsibleSectionStateCache.isExpanded('verticalNav')),
+    !CollapsibleSectionStateCache.isSet('verticalNav') || CollapsibleSectionStateCache.isExpanded('verticalNav'),
 });
