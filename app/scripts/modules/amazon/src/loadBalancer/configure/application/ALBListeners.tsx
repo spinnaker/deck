@@ -657,18 +657,34 @@ const Rule = SortableElement((props: IRuleProps) => (
             {(props.rule.conditions.length === 1 || condition.field === 'path-pattern') && (
               <option value="path-pattern">Path</option>
             )}
+            {(props.rule.conditions.length === 1 || condition.field === 'http-request-method') && (
+              <option value="http-request-method">Method(s)</option>
+            )}
           </select>
           {condition.field === 'path-pattern' && <HelpField id="aws.loadBalancer.ruleCondition.path" />}
           {condition.field === 'host-header' && <HelpField id="aws.loadBalancer.ruleCondition.host" />}
-          <input
-            className="form-control input-sm"
-            type="text"
-            value={condition.values[0]}
-            onChange={event => props.handleConditionValueChanged(condition, event.target.value)}
-            maxLength={128}
-            required={true}
-            style={{ width: '63%' }}
-          />
+          {condition.field !== 'http-request-method' && (
+            <input
+              className="form-control input-sm"
+              type="text"
+              value={condition.values[0]}
+              onChange={event => props.handleConditionValueChanged(condition, event.target.value)}
+              maxLength={128}
+              required={true}
+              style={{ width: '63%' }}
+            />
+          )}
+          {condition.field === 'http-request-method' && (
+            <input
+              className="form-control input-sm"
+              type="text"
+              value={condition.httpRequestMethodConfig.values[0]}
+              onChange={event => props.handleConditionValueChanged(condition, event.target.value)}
+              maxLength={128}
+              required={true}
+              style={{ width: '63%' }}
+            />
+          )}
           <span className="remove-condition">
             {cIndex === 1 && (
               <a
