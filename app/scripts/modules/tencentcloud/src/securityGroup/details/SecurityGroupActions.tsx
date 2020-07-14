@@ -9,9 +9,10 @@ import {
   ISecurityGroupJob,
   SETTINGS,
   NgReact,
+  ReactInjector,
 } from '@spinnaker/core';
 
-import { ISecurityGroupDetail } from '../define';
+import { ISecurityGroupDetail } from '../interface';
 import { EditSecurityGroupModal } from '../configure/EditSecurityGroup';
 
 export interface IActionsProps {
@@ -57,7 +58,9 @@ export class SecurityGroupActions extends React.Component<IActionsProps, IAction
       onTaskRetry: () => {
         isRetry = true;
       },
-      onTaskComplete: () => {},
+      onTaskComplete: () => {
+        ReactInjector.$state.go('^', { allowModalToStayOpen: true }, { location: 'replace' });
+      },
     };
 
     const submitMethod = () => {

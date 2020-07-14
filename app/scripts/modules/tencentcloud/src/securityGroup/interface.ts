@@ -17,5 +17,5 @@ export interface ISecurityGroupIngress {
 
 export interface ISecurityGroupDetail extends ISecurityGroup {
   inRules?: ISecurityGroupIngress[];
-  description: string;
+  description?: string;
 }

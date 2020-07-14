@@ -20,13 +20,7 @@ import {
 import { FormikProps } from 'formik';
 import { useEffect } from 'react';
 import * as React from 'react';
-import { ISecurityGroupDetail } from '../../define';
-
-export interface ISubnetOption {
-  vpcId: string;
-  id: string;
-  name: string;
-}
+import { ISecurityGroupDetail } from '../../interface';
 
 export interface ISecurityGroupLocationProps {
   app: Application;
@@ -51,6 +45,7 @@ export class SecurityGroupLocation extends React.Component<ISecurityGroupLocatio
     const { credentials, region } = values;
     const validator = new FormValidator(values);
 
+    validator.field('credentials').required();
     validator
       .field('name')
       .withValidators(

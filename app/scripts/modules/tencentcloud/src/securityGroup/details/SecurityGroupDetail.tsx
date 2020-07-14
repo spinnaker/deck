@@ -14,7 +14,7 @@ import {
 
 import { SecurityGroupActions } from './SecurityGroupActions';
 
-import { ISecurityGroupDetail } from '../define';
+import { ISecurityGroupDetail } from '../interface';
 
 interface ISecurityGroupDetailProps {
   app: Application;
@@ -73,7 +73,7 @@ export class SecurityGroupDetail extends React.Component<ISecurityGroupDetailPro
       }, this.fourOhFour);
   };
 
-  fourOhFour() {
+  fourOhFour = () => {
     if (this._isUnmounted) {
       return;
     }
@@ -89,9 +89,10 @@ export class SecurityGroupDetail extends React.Component<ISecurityGroupDetailPro
     } else {
       ReactInjector.$state.go('^', { allowModalToStayOpen: true }, { location: 'replace' });
     }
-  }
+  };
   public render() {
     const { notFound, loading, securityGroup } = this.state;
+    const { name, id, accountName, region, inRules, description } = securityGroup;
     const { app } = this.props;
     return (
       <>
@@ -105,47 +106,36 @@ export class SecurityGroupDetail extends React.Component<ISecurityGroupDetailPro
             </UISref>
           </section>
         ) : (
-          // @ts-ignore
           <Details loading={loading}>
-            <Details.Header
-              name={securityGroup.name || '(not found)'}
-              icon={<i className="glyphicon glyphicon-transfer" />}
-            >
+            <Details.Header name={name || '(not found)'} icon={<i className="glyphicon glyphicon-transfer" />}>
               <div className="actions">
                 <SecurityGroupActions application={app} securityGroup={securityGroup} />
               </div>
             </Details.Header>
             <div className="content">
-              {
-                // @ts-ignore
-                <CollapsibleSection heading={`${FirewallLabels.get('Firewall')} Details`} expanded>
-                  <dl className="dl-horizontal dl-medium">
-                    <dt>ID</dt>
-                    <dd>{securityGroup.id}</dd>
-                    <dt>Account</dt>
-                    <dd>
-                      {
-                        // @ts-ignore
-                        <AccountTag account={securityGroup.accountName} />
-                      }
-                    </dd>
-                    <dt>Region</dt>
-                    <dd>{securityGroup.region}</dd>
-                    <dt>Description</dt>
-                    <dd>{securityGroup.description}</dd>
-                  </dl>
-                </CollapsibleSection>
-              }
+              <CollapsibleSection heading={`${FirewallLabels.get('Firewall')} Details`}>
+                <dl className="dl-horizontal dl-medium">
+                  <dt>ID</dt>
+                  <dd>{id}</dd>
+                  <dt>Account</dt>
+                  <dd>
+                    <AccountTag account={accountName} />
+                  </dd>
+                  <dt>Region</dt>
+                  <dd>{region}</dd>
+                  <dt>Description</dt>
+                  <dd>{description}</dd>
+                </dl>
+              </CollapsibleSection>
               {!!securityGroup.inRules && (
-                // @ts-ignore
                 <CollapsibleSection
-                  defaultExpanded={securityGroup.inRules.length > 0}
-                  heading={`${FirewallLabels.get('Firewall')} Rules ${securityGroup.inRules.length || 0}`}
+                  defaultExpanded={inRules.length > 0}
+                  heading={`${FirewallLabels.get('Firewall')} Rules ${inRules.length || 0}`}
                 >
-                  {securityGroup.inRules.length === 0 ? (
+                  {inRules.length === 0 ? (
                     <div>None</div>
                   ) : (
-                    securityGroup.inRules.map(rule => (
+                    inRules.map(rule => (
                       <dl className="dl-horizontal dl-medium" key={rule.index}>
                         <dt>Source</dt>
                         <dd>{rule.cidrBlock}</dd>

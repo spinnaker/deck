@@ -1,2 +1,2 @@
 export * from './configure/CreateModal';
-export * from './details';
+export * from './details/SecurityGroupDetail';
