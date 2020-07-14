@@ -58,11 +58,14 @@ import { ReactComponent as spCIMerged } from './vectors/spCIMerged.svg';
 import { ReactComponent as spCIPullRequest } from './vectors/spCIPullRequest.svg';
 import { ReactComponent as spCIPullRequestClosed } from './vectors/spCIPullRequestClosed.svg';
 import { ReactComponent as spEnvironments } from './vectors/spEnvironments.svg';
+import { ReactComponent as spMenuAppInSync } from './vectors/spMenuAppInSync.svg';
+import { ReactComponent as spMenuAppUnsynced } from './vectors/spMenuAppUnsynced.svg';
 import { ReactComponent as spMenuCanaryConfig } from './vectors/spMenuCanaryConfig.svg';
 import { ReactComponent as spMenuCanaryReport } from './vectors/spMenuCanaryReport.svg';
 import { ReactComponent as spMenuClusters } from './vectors/spMenuClusters.svg';
 import { ReactComponent as spMenuConfig } from './vectors/spMenuConfig.svg';
 import { ReactComponent as spMenuLoadBalancers } from './vectors/spMenuLoadBalancers.svg';
+import { ReactComponent as spMenuMeme } from './vectors/spMenuMeme.svg';
 import { ReactComponent as spMenuPager } from './vectors/spMenuPager.svg';
 import { ReactComponent as spMenuPipelines } from './vectors/spMenuPipelines.svg';
 import { ReactComponent as spMenuProperties } from './vectors/spMenuProperties.svg';
@@ -202,11 +205,14 @@ export const iconsByName = {
   spCIPullRequest,
   spCIPullRequestClosed,
   spEnvironments,
+  spMenuAppInSync,
+  spMenuAppUnsynced,
   spMenuCanaryConfig,
   spMenuCanaryReport,
   spMenuClusters,
   spMenuConfig,
   spMenuLoadBalancers,
+  spMenuMeme,
   spMenuPager,
   spMenuPipelines,
   spMenuProperties,

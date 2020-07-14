@@ -31,7 +31,6 @@ export interface IFeatures {
   entityTags?: boolean;
   executionMarkerInformationModal?: boolean;
   fiatEnabled?: boolean;
-  gceScaleDownControlsEnabled?: boolean;
   gceStatefulMigsEnabled?: boolean;
   iapRefresherEnabled?: boolean;
   managedDelivery?: boolean;
@@ -132,7 +131,7 @@ export const SETTINGS: ISpinnakerSettings = (window as any).spinnakerSettings ||
 
 // Make sure to set up some reasonable default settings fields so we do not have to keep checking if they exist everywhere
 SETTINGS.feature = SETTINGS.feature || {};
-SETTINGS.feature.roscoMode = SETTINGS.feature.roscoMode || true;
+SETTINGS.feature.roscoMode = SETTINGS.feature.roscoMode ?? true;
 SETTINGS.analytics = SETTINGS.analytics || {};
 SETTINGS.providers = SETTINGS.providers || {};
 SETTINGS.defaultTimeZone = SETTINGS.defaultTimeZone || 'America/Los_Angeles';

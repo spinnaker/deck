@@ -19,7 +19,6 @@ var displayTimestampsInUserLocalTime = process.env.DISPLAY_TIMESTAMPS_IN_USER_LO
 var dryRunEnabled = process.env.DRYRUN_ENABLED === 'true' ? true : false;
 var entityTagsEnabled = process.env.ENTITY_TAGS_ENABLED === 'true' ? true : false;
 var fiatEnabled = process.env.FIAT_ENABLED === 'true' ? true : false;
-var gceScaleDownControlsEnabled = process.env.GCE_SCALE_DOWN_CONTROLS_ENABLED === 'true' ? true : false;
 var gceStatefulMigsEnabled = process.env.GCE_STATEFUL_MIGS_ENABLED === 'true' ? true : false;
 var iapRefresherEnabled = process.env.IAP_REFRESHER_ENABLED === 'true' ? true : false;
 var managedDeliveryEnabled = process.env.MANAGED_DELIVERY_ENABLED === 'true';
@@ -76,7 +75,6 @@ window.spinnakerSettings = {
     entityTags: entityTagsEnabled,
     executionMarkerInformationModal: false,
     fiatEnabled: fiatEnabled,
-    gceScaleDownControlsEnabled: gceScaleDownControlsEnabled,
     gceStatefulMigsEnabled: gceStatefulMigsEnabled,
     iapRefresherEnabled: iapRefresherEnabled,
     managedDelivery: managedDeliveryEnabled,
@@ -200,6 +198,7 @@ window.spinnakerSettings = {
         region: 'cn-north-1',
       },
     },
+    kubernetes: {},
     oracle: {
       defaults: {
         account: 'DEFAULT',
@@ -232,13 +231,14 @@ window.spinnakerSettings = {
   searchVersion: 1,
   triggerTypes: [
     'artifactory',
-    'nexus',
     'concourse',
     'cron',
     'docker',
     'git',
     'jenkins',
+    'nexus',
     'pipeline',
+    'plugin',
     'pubsub',
     'travis',
     'webhook',
