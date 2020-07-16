@@ -133,7 +133,15 @@ export class ALBListeners extends React.Component<IALBListenersProps, IALBListen
         const missingAuth = !!rule.actions.find(
           a => a.type === 'authenticate-oidc' && !a.authenticateOidcConfig.clientId,
         );
-        const missingValue = !!rule.conditions.find(c => c.values.includes(''));
+        const missingValue = !!rule.conditions.find(c => {
+          if (c.field !== 'http-request-method') {
+            return c.values.includes('');
+          }
+
+          return c.httpRequestMethodConfig && c.httpRequestMethodConfig.values.includes('');
+        });
+        // eslint-disable-next-line
+        console.log(missingValue);
         return missingTargets || missingAuth || missingValue;
       });
       return defaultActionsHaveMissingTarget || rulesHaveMissingFields;
@@ -328,6 +336,31 @@ export class ALBListeners extends React.Component<IALBListenersProps, IALBListen
     this.updateListeners();
   };
 
+  private handleHttpRequestMethodChanged = (
+    condition: IListenerRuleCondition,
+    newValue: string,
+    selected: boolean,
+  ): void => {
+    // eslint-disable-next-line
+    console.log(newValue, selected);
+    let newValues = condition.httpRequestMethodConfig ? condition.httpRequestMethodConfig.values : [];
+
+    if (selected) {
+      newValues.push(newValue);
+    } else {
+      newValues = newValues.filter(v => v !== newValue);
+    }
+    // eslint-disable-next-line
+    console.log(newValues);
+
+    condition.httpRequestMethodConfig = {
+      values: newValues,
+    };
+
+    // condition.httpRequestMethodConfig.values = newValues;
+    this.updateListeners();
+  };
+
   private addCondition = (rule: IListenerRule): void => {
     if (rule.conditions.length === 1) {
       const field = rule.conditions[0].field === 'path-pattern' ? 'host-header' : 'path-pattern';
@@ -458,7 +491,8 @@ export class ALBListeners extends React.Component<IALBListenersProps, IALBListen
   public render() {
     const { errors, values } = this.props.formik;
     const { certificates, certificateTypes, oidcConfigs } = this.state;
-
+    // eslint-disable-next-line
+    console.log(values.listeners);
     return (
       <div className="container-fluid form-horizontal">
         <div className="form-group">
@@ -563,6 +597,7 @@ export class ALBListeners extends React.Component<IALBListenersProps, IALBListen
                           distance={10}
                           handleConditionFieldChanged={this.handleConditionFieldChanged}
                           handleConditionValueChanged={this.handleConditionValueChanged}
+                          handleHttpRequestMethodChanged={this.handleHttpRequestMethodChanged}
                           handleRuleActionTargetChanged={this.handleRuleActionTargetChanged}
                           handleRuleActionTypeChanged={this.handleRuleActionTypeChanged}
                           listener={listener}
@@ -630,6 +665,7 @@ interface IRuleProps {
   removeCondition: (rule: IListenerRule, index: number) => void;
   handleConditionFieldChanged: (condition: IListenerRuleCondition, newField: ListenerRuleConditionField) => void;
   handleConditionValueChanged: (condition: IListenerRuleCondition, newValue: string) => void;
+  handleHttpRequestMethodChanged: (condition: IListenerRuleCondition, newValue: string, selected: boolean) => void;
   configureOidcClient: (action: IListenerAction) => void;
   configureRedirect: (action: IListenerAction) => void;
 }
@@ -648,7 +684,7 @@ const Rule = SortableElement((props: IRuleProps) => (
             onChange={event =>
               props.handleConditionFieldChanged(condition, event.target.value as ListenerRuleConditionField)
             }
-            style={{ width: '37%' }}
+            style={{ width: '40%' }}
             required={true}
           >
             {(props.rule.conditions.length === 1 || condition.field === 'host-header') && (
@@ -657,9 +693,8 @@ const Rule = SortableElement((props: IRuleProps) => (
             {(props.rule.conditions.length === 1 || condition.field === 'path-pattern') && (
               <option value="path-pattern">Path</option>
             )}
-            {(props.rule.conditions.length === 1 || condition.field === 'http-request-method') && (
-              <option value="http-request-method">Method(s)</option>
-            )}
+            {((props.rule.conditions.length === 1 && props.listener.protocol === 'HTTP') ||
+              condition.field === 'http-request-method') && <option value="http-request-method">Method(s)</option>}
           </select>
           {condition.field === 'path-pattern' && <HelpField id="aws.loadBalancer.ruleCondition.path" />}
           {condition.field === 'host-header' && <HelpField id="aws.loadBalancer.ruleCondition.host" />}
@@ -675,15 +710,23 @@ const Rule = SortableElement((props: IRuleProps) => (
             />
           )}
           {condition.field === 'http-request-method' && (
-            <input
-              className="form-control input-sm"
-              type="text"
-              value={condition.httpRequestMethodConfig.values[0]}
-              onChange={event => props.handleConditionValueChanged(condition, event.target.value)}
-              maxLength={128}
-              required={true}
-              style={{ width: '63%' }}
-            />
+            <div className="col-md-6 checkbox">
+              {['DELETE', 'GET', 'PATCH', 'POST', 'PUT'].map(httpMethod => (
+                <label key={`${httpMethod}-checkbox`}>
+                  <input
+                    type="checkbox"
+                    checked={
+                      Boolean(condition.httpRequestMethodConfig) &&
+                      condition.httpRequestMethodConfig.values.includes(httpMethod)
+                    }
+                    onChange={event =>
+                      props.handleHttpRequestMethodChanged(condition, httpMethod, event.target.checked)
+                    }
+                  />
+                  {httpMethod}
+                </label>
+              ))}
+            </div>
           )}
           <span className="remove-condition">
             {cIndex === 1 && (
@@ -887,6 +930,7 @@ interface IRulesProps {
   removeCondition: (rule: IListenerRule, index: number) => void;
   handleConditionFieldChanged: (condition: IListenerRuleCondition, newField: ListenerRuleConditionField) => void;
   handleConditionValueChanged: (condition: IListenerRuleCondition, newValue: string) => void;
+  handleHttpRequestMethodChanged: (condition: IListenerRuleCondition, newValue: string, selected: boolean) => void;
   listener: IListenerDescription;
   targetGroups: IALBTargetGroupDescription[];
   oidcConfigChanged: (action: IListenerAction, config: IAuthenticateOidcActionConfig) => void;
@@ -934,6 +978,7 @@ const Rules = SortableContainer((props: IRulesProps) => (
           addCondition={props.addCondition}
           handleConditionFieldChanged={props.handleConditionFieldChanged}
           handleConditionValueChanged={props.handleConditionValueChanged}
+          handleHttpRequestMethodChanged={props.handleHttpRequestMethodChanged}
           handleRuleActionTargetChanged={props.handleRuleActionTargetChanged}
           handleRuleActionTypeChanged={props.handleRuleActionTypeChanged}
           oidcConfigChanged={props.oidcConfigChanged}
@@ -949,7 +994,7 @@ const Rules = SortableContainer((props: IRulesProps) => (
           configureOidcClient={props.configureOidcClient}
           configureRedirect={props.configureRedirect}
         />
-      ))}
+    ))}
     <tr className="not-sortable">
       <td colSpan={5}>
         <button type="button" className="add-new col-md-12" onClick={() => props.addRule(props.listener)}>
