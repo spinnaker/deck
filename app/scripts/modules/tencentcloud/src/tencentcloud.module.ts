@@ -14,6 +14,9 @@ import './pipeline/stages/disableCluster/disableClusterStage';
 import './pipeline/stages/rollbackCluster/rollbackClusterStage';
 import './pipeline/stages/scaleDownCluster/scaleDownClusterStage';
 import './pipeline/stages/shrinkCluster/shrinkClusterStage';
+import './pipeline/stages/disableServerGroup/disableSGStage';
+import './pipeline/stages/enableServerGroup/enableSGStage';
+import './pipeline/stages/tagImage/tagImageStage';
 // load all templates into the $templateCache
 const templates = require.context('./', true, /\.html$/);
 templates.keys().forEach(function(key) {
