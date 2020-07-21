@@ -140,8 +140,6 @@ export class ALBListeners extends React.Component<IALBListenersProps, IALBListen
 
           return c.httpRequestMethodConfig && c.httpRequestMethodConfig.values.includes('');
         });
-        // eslint-disable-next-line
-        console.log(missingValue);
         return missingTargets || missingAuth || missingValue;
       });
       return defaultActionsHaveMissingTarget || rulesHaveMissingFields;
@@ -341,8 +339,6 @@ export class ALBListeners extends React.Component<IALBListenersProps, IALBListen
     newValue: string,
     selected: boolean,
   ): void => {
-    // eslint-disable-next-line
-    console.log(newValue, selected);
     let newValues = condition.httpRequestMethodConfig ? condition.httpRequestMethodConfig.values : [];
 
     if (selected) {
@@ -350,14 +346,14 @@ export class ALBListeners extends React.Component<IALBListenersProps, IALBListen
     } else {
       newValues = newValues.filter(v => v !== newValue);
     }
-    // eslint-disable-next-line
-    console.log(newValues);
 
     condition.httpRequestMethodConfig = {
       values: newValues,
     };
 
-    // condition.httpRequestMethodConfig.values = newValues;
+    /** Http-request-method does not have the values attribute, but we default this to an empty array when a new condition is created */
+    delete condition.values;
+
     this.updateListeners();
   };
 
@@ -491,8 +487,6 @@ export class ALBListeners extends React.Component<IALBListenersProps, IALBListen
   public render() {
     const { errors, values } = this.props.formik;
     const { certificates, certificateTypes, oidcConfigs } = this.state;
-    // eslint-disable-next-line
-    console.log(values.listeners);
     return (
       <div className="container-fluid form-horizontal">
         <div className="form-group">
@@ -693,8 +687,9 @@ const Rule = SortableElement((props: IRuleProps) => (
             {(props.rule.conditions.length === 1 || condition.field === 'path-pattern') && (
               <option value="path-pattern">Path</option>
             )}
-            {((props.rule.conditions.length === 1 && props.listener.protocol === 'HTTP') ||
-              condition.field === 'http-request-method') && <option value="http-request-method">Method(s)</option>}
+            {(props.rule.conditions.length === 1 || condition.field === 'http-request-method') && (
+              <option value="http-request-method">Method(s)</option>
+            )}
           </select>
           {condition.field === 'path-pattern' && <HelpField id="aws.loadBalancer.ruleCondition.path" />}
           {condition.field === 'host-header' && <HelpField id="aws.loadBalancer.ruleCondition.host" />}
