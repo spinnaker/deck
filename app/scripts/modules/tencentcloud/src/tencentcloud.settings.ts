@@ -26,9 +26,9 @@ export interface ITencentcloudProviderSettings extends IProviderSettings {
   disableSpotPricing?: boolean;
 }
 
-export const TencentcloudProviderSettings: ITencentcloudProviderSettings = (SETTINGS.providers
+export const TENCENTCLOUDProviderSettings: ITencentcloudProviderSettings = (SETTINGS.providers
   .tencentcloud as ITencentcloudProviderSettings) || { defaults: {} };
 
-if (TencentcloudProviderSettings) {
-  TencentcloudProviderSettings.resetToOriginal = SETTINGS.resetProvider('tencentcloud');
+if (TENCENTCLOUDProviderSettings) {
+  TENCENTCLOUDProviderSettings.resetToOriginal = SETTINGS.resetProvider('tencentcloud');
 }
