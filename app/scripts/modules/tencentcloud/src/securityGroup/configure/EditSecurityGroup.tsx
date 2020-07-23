@@ -73,6 +73,7 @@ export class EditSecurityGroupModal extends React.Component<IEditSecurityGroupPr
   public render() {
     const { securityGroup, dismissModal } = this.props;
     const { taskMonitor } = this.state;
+
     return (
       <WizardModal<ISecurityGroupDetail>
         heading={`Edit ${securityGroup.name}: ${securityGroup.region}: ${securityGroup.accountName}`}

@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { isEmpty } from 'lodash';
 import { UISref } from '@uirouter/react';
-
 import {
   RecentHistoryService,
   FirewallLabels,
@@ -11,9 +10,7 @@ import {
   CollapsibleSection,
   AccountTag,
 } from '@spinnaker/core';
-
 import { SecurityGroupActions } from './SecurityGroupActions';
-
 import { ISecurityGroupDetail } from '../interface';
 
 interface ISecurityGroupDetailProps {
@@ -24,19 +21,23 @@ interface ISecurityGroupDetailState {
   loading: boolean;
   notFound: boolean;
   securityGroup: ISecurityGroupDetail;
+  group: string;
 }
 
 export class SecurityGroupDetail extends React.Component<ISecurityGroupDetailProps, ISecurityGroupDetailState> {
   constructor(props: ISecurityGroupDetailProps) {
     super(props);
   }
+
   state = {
     loading: true,
     notFound: false,
     securityGroup: this.props.resolvedSecurityGroup,
+    group: '',
   };
-  private group = '';
+
   private _isUnmounted = false;
+
   componentDidMount() {
     const { app } = this.props;
     this.extractSecurityGroup().then(() => {
@@ -45,9 +46,11 @@ export class SecurityGroupDetail extends React.Component<ISecurityGroupDetailPro
       }
     });
   }
+
   public componentWillUnmount(): void {
     this._isUnmounted = true;
   }
+
   private extractSecurityGroup = () => {
     const { app } = this.props;
     const { accountId, provider, region, vpcId, name } = this.state.securityGroup || {};
@@ -66,9 +69,9 @@ export class SecurityGroupDetail extends React.Component<ISecurityGroupDetailPro
             region,
             name,
           );
-          this.setState({
-            securityGroup: Object.assign(this.state.securityGroup, applicationSecurityGroup, details),
-          });
+          this.setState(prevState => ({
+            securityGroup: Object.assign(prevState.securityGroup, applicationSecurityGroup, details),
+          }));
         }
       }, this.fourOhFour);
   };
@@ -77,29 +80,32 @@ export class SecurityGroupDetail extends React.Component<ISecurityGroupDetailPro
     if (this._isUnmounted) {
       return;
     }
+
     const { app } = this.props;
 
     if (app.isStandalone) {
-      this.group = this.state.securityGroup.name;
       this.setState({
         notFound: true,
         loading: false,
+        group: this.state.securityGroup.name,
       });
       RecentHistoryService.removeLastItem('securityGroups');
     } else {
       ReactInjector.$state.go('^', { allowModalToStayOpen: true }, { location: 'replace' });
     }
   };
+
   public render() {
-    const { notFound, loading, securityGroup } = this.state;
+    const { notFound, loading, securityGroup, group } = this.state;
     const { name, id, accountName, region, inRules, description } = securityGroup;
     const { app } = this.props;
+
     return (
       <>
         {notFound ? (
           <section>
             <h3>
-              Could not find {FirewallLabels.get('Firewall')} {this.group}.
+              Could not find {FirewallLabels.get('Firewall')} {group}.
             </h3>
             <UISref to="home.infrastructure">
               <a>Back to search results</a>

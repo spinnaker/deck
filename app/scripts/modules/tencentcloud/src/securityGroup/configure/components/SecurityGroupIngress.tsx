@@ -27,6 +27,7 @@ export class SecurityGroupIngress extends React.Component<IIngressProps> {
 
   public render() {
     const { inRules = [] } = this.props.formik.values;
+
     return (
       <div>
         <p className="info">

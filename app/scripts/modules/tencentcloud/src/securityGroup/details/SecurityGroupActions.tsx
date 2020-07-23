@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { Dropdown } from 'react-bootstrap';
-
 import {
   Application,
   ConfirmationModalService,
@@ -11,7 +10,6 @@ import {
   NgReact,
   ReactInjector,
 } from '@spinnaker/core';
-
 import { ISecurityGroupDetail } from '../interface';
 import { EditSecurityGroupModal } from '../configure/EditSecurityGroup';
 
@@ -20,14 +18,10 @@ export interface IActionsProps {
   securityGroup: ISecurityGroupDetail;
 }
 
-export interface IActionsState {}
-
-export class SecurityGroupActions extends React.Component<IActionsProps, IActionsState> {
+export class SecurityGroupActions extends React.Component<IActionsProps> {
   constructor(props: IActionsProps) {
     super(props);
   }
-  state = {};
-  public componentWillMount(): void {}
 
   public handleEdit = (): void => {
     EditSecurityGroupModal.show(this.props);
@@ -47,11 +41,9 @@ export class SecurityGroupActions extends React.Component<IActionsProps, IAction
       accountId: accountName,
       credentials,
     } = securityGroup;
+
     let isRetry = false;
 
-    const retryParams = {
-      removeDependencies: true,
-    };
     const taskMonitor = {
       application,
       title: 'Deleting ' + name,
@@ -72,7 +64,9 @@ export class SecurityGroupActions extends React.Component<IActionsProps, IAction
         credentials,
       } as unknown) as ISecurityGroupJob;
       if (isRetry) {
-        Object.assign(params, retryParams);
+        Object.assign(params, {
+          removeDependencies: true,
+        });
       }
       return SecurityGroupWriter.deleteSecurityGroup(securityGroup, application, params);
     };
@@ -104,7 +98,6 @@ export class SecurityGroupActions extends React.Component<IActionsProps, IAction
                 Edit {FirewallLabels.get('Firewall')}
               </a>
             </li>
-
             <li>
               <a className="clickable" onClick={this.handleDelete}>
                 Delete {FirewallLabels.get('Firewall')}

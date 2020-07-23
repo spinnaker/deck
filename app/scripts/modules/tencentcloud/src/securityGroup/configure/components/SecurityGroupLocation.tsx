@@ -1,3 +1,5 @@
+import * as React from 'react';
+import { FormikProps } from 'formik';
 import {
   AccountSelectInput,
   AccountService,
@@ -17,9 +19,6 @@ import {
   useData,
   useDataSource,
 } from '@spinnaker/core';
-import { FormikProps } from 'formik';
-import { useEffect } from 'react';
-import * as React from 'react';
 import { ISecurityGroupDetail } from '../../interface';
 
 export interface ISecurityGroupLocationProps {
@@ -104,7 +103,7 @@ function FirewallLocationForm(props: IFirewallLocationFormProps) {
   const regions = fetchRegions.result;
   const allSecurityGroups: ISecurityGroupDetail[] = useDataSource(app.getDataSource('securityGroups')).data;
 
-  useEffect(() => {
+  React.useEffect(() => {
     // Notify parent component when all security groups are loaded
     const regionalSecurityGroups = allSecurityGroups
       .filter(sg => sg.account === credentials && sg.region === region)
@@ -112,7 +111,7 @@ function FirewallLocationForm(props: IFirewallLocationFormProps) {
     props.onExistingSecurityGroupsChanged(regionalSecurityGroups);
   }, [allSecurityGroups, credentials, region]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     // Update the form values whenever app/stack/detail change
     const cluster = NameUtils.getClusterName(app.name, stack, detail);
     const moniker: IMoniker = { app: app.name, stack, detail, cluster: cluster };
@@ -120,7 +119,7 @@ function FirewallLocationForm(props: IFirewallLocationFormProps) {
     formik.setFieldValue('name', cluster);
   }, [app, stack, detail]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     // If the selected region doesn't exist in the new list of regions (for a new acct), select the first region.
     if (!regions.find(x => x.name === region)) {
       props.formik.setFieldValue('region', regions[0] && regions[0].name);

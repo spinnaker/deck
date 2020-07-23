@@ -8,8 +8,8 @@ import {
   TaskMonitor,
   ReactInjector,
   SecurityGroupWriter,
+  ISecurityGroup,
 } from '@spinnaker/core';
-import { ISecurityGroup } from '@spinnaker/core';
 import { ISecurityGroupProps, ISecurityGroupDetail } from '../interface';
 import { SecurityGroupLocation } from './components/SecurityGroupLocation';
 import { SecurityGroupIngress } from './components/SecurityGroupIngress';
@@ -17,7 +17,6 @@ export interface ICreateSecurityGroupState {
   taskMonitor: TaskMonitor;
   securityGroup: ISecurityGroupDetail;
 }
-
 export class CreateSecurityGroupModal extends React.Component<ISecurityGroupProps, ICreateSecurityGroupState> {
   public static defaultProps: Partial<ISecurityGroupProps> = {
     closeModal: noop,
@@ -36,8 +35,6 @@ export class CreateSecurityGroupModal extends React.Component<ISecurityGroupProp
       securityGroup: {},
     };
   }
-
-  componentDidMount() {}
 
   private getAccount = () => this.state.securityGroup.accountName || this.state.securityGroup.credentials;
 
@@ -109,6 +106,7 @@ export class CreateSecurityGroupModal extends React.Component<ISecurityGroupProp
   public render() {
     const { application, isNew, dismissModal } = this.props;
     const { taskMonitor, securityGroup } = this.state;
+
     return (
       <WizardModal<ISecurityGroupDetail>
         heading={`${isNew ? 'Creating' : 'Updating'} ${FirewallLabels.get('Firewall')}`}
