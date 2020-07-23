@@ -134,46 +134,46 @@
             </copy-to-clipboard>
           </dd>
         </div>
-      </dl>
-      <dl ng-if="ctrl.manifest.manifest.spec.rules.length">
-        <dt>Host Rules</dt>
-        <dd ng-repeat="ingressRule in ctrl.manifest.manifest.spec.rules">
-          <a ng-if="ingressRule.host" target="_blank" href="//{{ingressRule.host}}">
-            {{ingressRule.host}}
-          </a>
-          <copy-to-clipboard
-            ng-if="ingressRule.host"
-            class="copy-to-clipboard copy-to-clipboard-sm"
-            text="ingressRule.host"
-            tool-tip="'Copy ingress rule host to clipboard'"
-          >
-          </copy-to-clipboard>
-        </dd>
-      </dl>
-      <dl ng-if="ctrl.manifest.manifest.status.loadBalancer.ingress.length">
-        <dt>Ingress</dt>
-        <dd ng-repeat="ingress in ctrl.manifest.manifest.status.loadBalancer.ingress">
-          <a ng-if="ingress.hostname" target="_blank" href="//{{ingress.hostname}}">
-            {{ingress.hostname}}
-          </a>
-          <copy-to-clipboard
-            ng-if="ingress.hostname"
-            class="copy-to-clipboard copy-to-clipboard-sm"
-            text="ingress.hostname"
-            tool-tip="'Copy Ingress hostname to clipboard'"
-          >
-          </copy-to-clipboard>
-          <a ng-if="ingress.ip" target="_blank" href="//{{ingress.ip}}">
-            {{ingress.ip}}
-          </a>
-          <copy-to-clipboard
-            ng-if="ingress.ip"
-            class="copy-to-clipboard copy-to-clipboard-sm"
-            text="ingress.ip"
-            tool-tip="'Copy Ingress IP to clipboard'"
-          >
-          </copy-to-clipboard>
-        </dd>
+        <div ng-if="ctrl.manifest.manifest.spec.rules.length">
+          <dt>Host Rules</dt>
+          <dd ng-repeat="ingressRule in ctrl.manifest.manifest.spec.rules">
+            <a ng-if="ingressRule.host" target="_blank" href="//{{ingressRule.host}}">
+              {{ingressRule.host}}
+            </a>
+            <copy-to-clipboard
+              ng-if="ingressRule.host"
+              class="copy-to-clipboard copy-to-clipboard-sm"
+              text="ingressRule.host"
+              tool-tip="'Copy ingress rule host to clipboard'"
+            >
+            </copy-to-clipboard>
+          </dd>
+        </div>
+        <div ng-if="ctrl.manifest.manifest.status.loadBalancer.ingress.length">
+          <dt>Ingress</dt>
+          <dd ng-repeat="ingress in ctrl.manifest.manifest.status.loadBalancer.ingress">
+            <a ng-if="ingress.hostname" target="_blank" href="//{{ingress.hostname}}">
+              {{ingress.hostname}}
+            </a>
+            <copy-to-clipboard
+              ng-if="ingress.hostname"
+              class="copy-to-clipboard copy-to-clipboard-sm"
+              text="ingress.hostname"
+              tool-tip="'Copy Ingress hostname to clipboard'"
+            >
+            </copy-to-clipboard>
+            <a ng-if="ingress.ip" target="_blank" href="//{{ingress.ip}}">
+              {{ingress.ip}}
+            </a>
+            <copy-to-clipboard
+              ng-if="ingress.ip"
+              class="copy-to-clipboard copy-to-clipboard-sm"
+              text="ingress.ip"
+              tool-tip="'Copy Ingress IP to clipboard'"
+            >
+            </copy-to-clipboard>
+          </dd>
+        </div>
       </dl>
     </collapsible-section>
 
