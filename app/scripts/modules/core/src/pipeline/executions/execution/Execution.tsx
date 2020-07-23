@@ -23,11 +23,12 @@ import { ISortFilter } from 'core/filterModel';
 import { ExecutionState } from 'core/state';
 
 // react components
+import { CancelModal } from 'core/cancelModal/CancelModal';
+import { ExecutionBreadcrumbs } from './ExecutionBreadcrumbs';
 import { ExecutionMarker } from './ExecutionMarker';
+import { ExecutionPermalink } from './ExecutionPermalink';
 import { PipelineGraph } from '../../config/graph/PipelineGraph';
 import { Tooltip } from 'core/presentation/Tooltip';
-import { CancelModal } from 'core/cancelModal/CancelModal';
-import { ExecutionPermalink } from './ExecutionPermalink';
 
 import './execution.less';
 
@@ -335,6 +336,9 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
               {title || execution.name}
             </h4>
           )}
+          <div className="execution-breadcrumbs">
+            <ExecutionBreadcrumbs execution={execution} />
+          </div>
           <ExecutionStatus execution={execution} showingDetails={showingDetails} standalone={standalone} />
           <div className="execution-bar">
             <div className="stages">

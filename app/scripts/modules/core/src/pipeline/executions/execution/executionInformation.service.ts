@@ -34,6 +34,18 @@ export class ExecutionInformationService {
       });
   };
 
+  public getAllParentExecutions = async (execution: IExecution): Promise<any[]> => {
+    const executions: any[] = [];
+
+    executions.push(execution);
+
+    if (execution.trigger.parentExecution) {
+      executions.push(...(await this.getAllParentExecutions(execution.trigger.parentExecution)));
+    }
+
+    return executions;
+  };
+
   public getPipelineConfig = async (application: string, pipelineConfigId: string): Promise<IPipeline> => {
     let pipelineConfig;
     if (this.calledPipelineConfigs.hasOwnProperty(application)) {

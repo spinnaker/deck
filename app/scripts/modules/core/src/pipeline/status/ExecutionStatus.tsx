@@ -11,7 +11,6 @@ import { ISortFilter } from 'core/filterModel';
 import { ExecutionState } from 'core/state';
 
 import { buildDisplayName } from '../executionBuild/buildDisplayName.filter';
-import { ExecutionBuildLink } from '../executionBuild/ExecutionBuildLink';
 import { ExecutionUserStatus } from './ExecutionUserStatus';
 
 import './executionStatus.less';
@@ -88,9 +87,6 @@ export class ExecutionStatus extends React.Component<IExecutionStatusProps, IExe
     return (
       <div className="execution-status-section">
         <span className={`trigger-type ${this.state.sortFilter.groupBy !== name ? 'subheading' : ''}`}>
-          <h5 className="build-number">
-            <ExecutionBuildLink execution={execution} />
-          </h5>
           <h5 className={`execution-type ${trigger.dryRun ? 'execution-dry-run' : ''}`}>
             {trigger.dryRun && 'DRY RUN: '}
             {this.getExecutionTypeDisplay()}
