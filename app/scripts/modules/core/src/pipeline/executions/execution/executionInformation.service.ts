@@ -34,7 +34,7 @@ export class ExecutionInformationService {
       });
   };
 
-  public getAllParentExecutions = (execution: IExecution): Promise<any[]> => {
+  public getAllParentExecutions = (execution: IExecution): any[] => {
     const executions: any[] = [];
 
     executions.push(execution);
