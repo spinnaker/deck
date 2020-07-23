@@ -34,13 +34,13 @@ export class ExecutionInformationService {
       });
   };
 
-  public getAllParentExecutions = async (execution: IExecution): Promise<any[]> => {
+  public getAllParentExecutions = (execution: IExecution): Promise<any[]> => {
     const executions: any[] = [];
 
     executions.push(execution);
 
     if (execution.trigger.parentExecution) {
-      executions.push(...(await this.getAllParentExecutions(execution.trigger.parentExecution)));
+      executions.push(...this.getAllParentExecutions(execution.trigger.parentExecution));
     }
 
     return executions;

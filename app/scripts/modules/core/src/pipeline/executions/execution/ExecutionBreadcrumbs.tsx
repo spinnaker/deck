@@ -14,16 +14,14 @@ export const ExecutionBreadcrumbs: React.FC<IExecutionBreadcrumbsProps> = ({ exe
   const informationService = new ExecutionInformationService();
 
   useEffect(() => {
-    (async () => {
-      const execs = await informationService.getAllParentExecutions(execution);
-      setExecutions(execs);
-    })();
+    const execs = informationService.getAllParentExecutions(execution);
+    setExecutions(execs);
   }, []);
 
   return (
     <div>
-      {executions &&
-        executions.length > 1 &&
+      {executions.length > 1 && <span>Execution Path: </span>}
+      {executions.length > 1 &&
         [...executions].reverse().map((execution, index, array) => (
           <React.Fragment key={execution.id}>
             <UISref
@@ -45,7 +43,12 @@ export const ExecutionBreadcrumbs: React.FC<IExecutionBreadcrumbsProps> = ({ exe
                 {execution.name}
               </a>
             </UISref>
-            {index !== array.length - 1 && <span key={`span-${execution.id}`}> / </span>}
+            {index !== array.length - 1 && (
+              <span>
+                {' '}
+                <i className="fas fa-angle-right"></i>{' '}
+              </span>
+            )}
           </React.Fragment>
         ))}
     </div>
