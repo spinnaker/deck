@@ -10,7 +10,13 @@ export function PipelineParametersExecutionDetails(props: IExecutionDetailsSecti
   } = props;
 
   const { pipelineParameters: parameters = {} } = context;
-
+  // eslint-disable-next-line
+  console.log(
+    Object.keys(parameters),
+    Object.keys(parameters)
+      .sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))
+      .map(key => parameters[key]),
+  );
   return (
     <ExecutionDetailsSection name={name} current={current}>
       <div className="row">
@@ -22,7 +28,7 @@ export function PipelineParametersExecutionDetails(props: IExecutionDetailsSecti
               .map(key => (
                 <React.Fragment key={key}>
                   <dt>{key}</dt>
-                  <dd>{parameters[key]}</dd>
+                  <dd>{parameters[key].toString()}</dd>
                 </React.Fragment>
               ))}
           </dl>
