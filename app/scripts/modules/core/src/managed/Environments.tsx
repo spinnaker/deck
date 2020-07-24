@@ -67,7 +67,7 @@ interface IEnvironmentsProps {
 export function Environments({ app }: IEnvironmentsProps) {
   const dataSource: ApplicationDataSource<IManagedApplicationEnvironmentSummary> = app.getDataSource('environments');
   const {
-    data: { environments, artifacts, resources, hasManagedResources },
+    data: { environments, artifacts, resources },
     status,
     loaded,
   } = useDataSource(dataSource);
