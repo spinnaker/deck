@@ -34,6 +34,7 @@ export class ExecutionInformationService {
       });
   };
 
+  // Returns an array of parent executions starting with the one passed in.
   public getAllParentExecutions = (execution: IExecution): any[] => {
     const executions: any[] = [];
 

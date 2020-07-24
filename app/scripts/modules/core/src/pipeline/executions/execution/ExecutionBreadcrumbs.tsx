@@ -16,7 +16,7 @@ export const ExecutionBreadcrumbs: React.FC<IExecutionBreadcrumbsProps> = ({ exe
   useEffect(() => {
     const execs = informationService.getAllParentExecutions(execution);
     setExecutions(execs);
-  }, []);
+  });
 
   return (
     <div>
@@ -44,12 +44,7 @@ export const ExecutionBreadcrumbs: React.FC<IExecutionBreadcrumbsProps> = ({ exe
                 {execution.name}
               </a>
             </UISref>
-            {index !== array.length - 1 && (
-              <span>
-                {' '}
-                <i className="fas fa-angle-right"></i>{' '}
-              </span>
-            )}
+            {index !== array.length - 1 && <i className="fas fa-angle-right execution-breadcrumb-marker"></i>}
           </React.Fragment>
         ))}
     </div>
