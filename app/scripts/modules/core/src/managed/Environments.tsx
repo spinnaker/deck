@@ -124,7 +124,7 @@ export function Environments({ app }: IEnvironmentsProps) {
     );
   }
 
-  const unmanaged = loaded && !hasManagedResources;
+  const unmanaged = loaded && artifacts.length == 0 && resources.length == 0;
   const gettingStartedLink = SETTINGS.managedDelivery?.gettingStartedUrl || defaultGettingStartedUrl;
   if (unmanaged) {
     return (
