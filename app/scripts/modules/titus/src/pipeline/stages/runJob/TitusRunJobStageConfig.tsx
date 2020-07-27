@@ -20,6 +20,13 @@ import { ITitusResources } from 'titus/domain';
 
 import { TitusSecurityGroupPicker } from './TitusSecurityGroupPicker';
 import { TitusProviderSettings } from '../../../titus.settings';
+import Select, { Option } from 'react-select';
+
+const mountPermOptions = [
+  { label: 'Read and Write', value: 'RW' },
+  { label: 'Read Only', value: 'RO' },
+  { label: 'Write Only', value: 'WO' },
+];
 
 export interface ITitusRunJobStageConfigState {
   credentials: string[];
@@ -30,6 +37,16 @@ export interface ITitusRunJobStageConfigState {
 interface IClusterDefaults {
   application: string;
   containerAttributes: object;
+  constraints: {
+    hard: { [key: string]: string };
+    soft: { [key: string]: string };
+  };
+  efs?: {
+    efsId: string;
+    mountPoint: string;
+    mountPerm: string;
+    efsRelativeMountPoint: string;
+  };
   env: object;
   labels: object;
   resources: ITitusResources;
@@ -77,6 +94,10 @@ export class TitusRunJobStageConfig extends React.Component<IStageConfigProps, I
     const clusterDefaults: IClusterDefaults = {
       application: application.name,
       containerAttributes: {},
+      constraints: {
+        soft: {},
+        hard: {},
+      },
       env: {},
       labels: {},
       resources: {
@@ -219,6 +240,67 @@ export class TitusRunJobStageConfig extends React.Component<IStageConfigProps, I
           deferInitialization={stage.deferredInitialization}
         />
 
+        <b>
+          Elastic File System Options <HelpField id="titus.deploy.efs" />
+        </b>
+        <div className="form-group">
+          <div className="col-md-3 sm-label-right">
+            <b>Mount Permission </b>
+            <HelpField id="titus.deploy.mountPermissions" />
+          </div>
+          <div className="col-md-8">
+            <Select
+              value={stage.cluster.efs?.mountPerm}
+              clearable={false}
+              options={mountPermOptions}
+              onChange={(option: Option) => this.stageFieldChanged('cluster.efs.mountPerm', option.value)}
+            />
+          </div>
+        </div>
+        <div className="form-group">
+          <div className="col-md-3 sm-label-right">
+            <b>Mount Point </b>
+            <HelpField id="titus.deploy.mountPoint" />
+          </div>
+          <div className="col-md-8">
+            <input
+              type="text"
+              className="form-control input-sm no-spel"
+              value={stage.cluster.efs?.mountPoint}
+              onChange={e => this.stageFieldChanged('cluster.efs.mountPoint', e.target.value)}
+            />
+          </div>
+        </div>
+        <div className="form-group">
+          <div className="col-md-3 sm-label-right">
+            <b>EFS ID </b>
+            <HelpField id="titus.deploy.efsId" />
+          </div>
+          <div className="col-md-8">
+            <input
+              type="text"
+              className="form-control input-sm no-spel"
+              value={stage.cluster.efs?.efsId}
+              onChange={e => this.stageFieldChanged('cluster.efs.efsId', e.target.value)}
+            />
+          </div>
+          <div className="col-md-offset-3 col-md-8" />
+        </div>
+        <div className="form-group">
+          <div className="col-md-3 sm-label-right">
+            <b>EFS Relative Mount Point </b>
+            <HelpField id="titus.deploy.efsRelativeMountPoint" />
+          </div>
+          <div className="col-md-8">
+            <input
+              type="text"
+              className="form-control input-sm no-spel"
+              value={stage.cluster.efs?.efsRelativeMountPoint}
+              onChange={e => this.stageFieldChanged('cluster.efs.efsRelativeMountPoint', e.target.value)}
+            />
+          </div>
+        </div>
+        <hr />
         <StageConfigField label="CPU(s)">
           <input
             type="number"
@@ -275,6 +357,15 @@ export class TitusRunJobStageConfig extends React.Component<IStageConfigProps, I
             className="form-control input-sm"
             value={stage.cluster.entryPoint}
             onChange={e => this.stageFieldChanged('cluster.entryPoint', e.target.value)}
+          />
+        </StageConfigField>
+
+        <StageConfigField label="Command">
+          <input
+            type="text"
+            className="form-control input-sm"
+            value={stage.cluster.cmd}
+            onChange={e => this.stageFieldChanged('cluster.cmd', e.target.value)}
           />
         </StageConfigField>
 
@@ -397,6 +488,20 @@ export class TitusRunJobStageConfig extends React.Component<IStageConfigProps, I
               model={stage.cluster.env}
               allowEmpty={true}
               onChange={(v: any) => this.mapChanged('cluster.env', v)}
+            />
+          </StageConfigField>
+          <StageConfigField label="Soft Constraints (optional)">
+            <MapEditor
+              model={stage.cluster.constraints.soft}
+              allowEmpty={true}
+              onChange={(v: any) => this.mapChanged('cluster.constraints.soft', v)}
+            />
+          </StageConfigField>
+          <StageConfigField label="Hard Constraints (optional)">
+            <MapEditor
+              model={stage.cluster.constraints.hard}
+              allowEmpty={true}
+              onChange={(v: any) => this.mapChanged('cluster.constraints.hard', v)}
             />
           </StageConfigField>
         </div>
