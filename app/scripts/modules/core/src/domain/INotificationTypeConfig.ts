@@ -5,7 +5,6 @@ export interface INotificationTypeConfig {
   key: string;
   config?: INotificationTypeCustomConfig;
   component?: React.ComponentType;
-  isExtensionNotification?: boolean;
 }
 
 export interface INotificationTypeCustomConfig {

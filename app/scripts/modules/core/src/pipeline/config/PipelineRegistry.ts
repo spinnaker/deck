@@ -12,7 +12,7 @@ import {
   IArtifactEditorProps,
 } from 'core/domain';
 import { CloudProviderRegistry, ICloudProviderConfig } from 'core/cloudProvider';
-import { SETTINGS, INotificationSettings } from 'core/config/settings';
+import { SETTINGS } from 'core/config/settings';
 import { IAccountDetails } from 'core/account/AccountService';
 import { PreconfiguredJobReader } from './stages/preconfiguredJob';
 
@@ -67,19 +67,7 @@ export class PipelineRegistry {
   }
 
   public registerNotification(notificationConfig: INotificationTypeConfig): void {
-    if (notificationConfig.isExtensionNotification) {
-      this.notificationTypes.push({ config: {}, ...cloneDeep(notificationConfig) });
-    } else if (SETTINGS.notifications) {
-      const notificationSetting: { enabled: boolean; botName?: string } =
-        SETTINGS.notifications?.[notificationConfig.key as keyof INotificationSettings];
-      if (notificationSetting && notificationSetting.enabled) {
-        const config = cloneDeep(notificationConfig);
-        config.config = { ...notificationSetting };
-        this.notificationTypes.push(config);
-      }
-    } else {
-      this.notificationTypes.push(notificationConfig);
-    }
+    this.notificationTypes.push(notificationConfig);
   }
 
   public registerTrigger(triggerConfig: ITriggerTypeConfig): void {

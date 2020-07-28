@@ -1,5 +1,3 @@
-import { IPromise } from 'angular';
-
 import { API } from 'core/api/ApiService';
 
 export interface INotificationParameter {
@@ -13,10 +11,11 @@ export interface INotificationParameter {
 export interface INotificationTypeMetadata {
   notificationType: string;
   parameters: INotificationParameter[];
+  uiType: 'BASIC' | 'CUSTOM';
 }
 
 export class NotificationService {
-  public static getNotificationTypeMetadata(): IPromise<INotificationTypeMetadata[]> {
+  public static getNotificationTypeMetadata(): Promise<INotificationTypeMetadata[]> {
     return API.one('notifications')
       .all('metadata')
       .useCache()

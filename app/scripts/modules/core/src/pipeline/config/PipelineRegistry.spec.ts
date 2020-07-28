@@ -484,47 +484,4 @@ describe('PipelineRegistry: API', function() {
       expect(Registry.pipeline.getManualExecutionComponentForTriggerType('cron')).toEqual(CompA);
     });
   });
-
-  describe('registerNotification', () => {
-    it(
-      'always inserts notification types if notification config is unset',
-      mock.inject(() => {
-        SETTINGS.notifications = null;
-        Registry.pipeline.registerNotification({ label: 'Bearychat', key: 'bearychat' });
-        expect(Registry.pipeline.getNotificationTypes().filter(nt => nt.key === 'bearychat').length).toEqual(1);
-      }),
-    );
-
-    it(
-      'inserts enabled notification types',
-      mock.inject(() => {
-        SETTINGS.notifications.bearychat = { enabled: true };
-        Registry.pipeline.registerNotification({ label: 'Bearychat', key: 'bearychat' });
-        expect(Registry.pipeline.getNotificationTypes().filter(nt => nt.key === 'bearychat').length).toEqual(1);
-      }),
-    );
-
-    it(
-      'does not insert disabled notification types',
-      mock.inject(() => {
-        SETTINGS.notifications.bearychat = { enabled: false };
-        Registry.pipeline.registerNotification({ label: 'Bearychat', key: 'bearychat' });
-        expect(Registry.pipeline.getNotificationTypes().filter(nt => nt.key === 'bearychat').length).toEqual(0);
-      }),
-    );
-
-    it(
-      'always inserts extension notification types',
-      mock.inject(() => {
-        Registry.pipeline.registerNotification({
-          label: 'My Extension Notification',
-          key: 'my-extension-notification',
-          isExtensionNotification: true,
-        });
-        expect(
-          Registry.pipeline.getNotificationTypes().filter(nt => nt.key === 'my-extension-notification').length,
-        ).toEqual(1);
-      }),
-    );
-  });
 });
