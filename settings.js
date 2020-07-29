@@ -147,6 +147,10 @@ window.spinnakerSettings = {
         // tag that starts with "internal"
         inferInternalFlagFromSubnet: false,
       },
+      serverGroups: {
+        enableIPv6: true,
+        enableIMDSv2: true,
+      },
       useAmiBlockDeviceMappings: false,
     },
     azure: {
