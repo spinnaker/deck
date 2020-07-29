@@ -30,6 +30,10 @@ module(AMAZON_SECURITYGROUP_SECURITYGROUP_TRANSFORMER, []).factory('awsSecurityG
   }
 
   function decompress(groupedGroups) {
+    if (Array.isArray(groupedGroups)) {
+      return groupedGroups;
+    }
+
     const flattened = [];
     Object.keys(groupedGroups).forEach(vpcId => {
       groupedGroups[vpcId].forEach(g => {

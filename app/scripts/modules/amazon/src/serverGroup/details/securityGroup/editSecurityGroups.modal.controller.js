@@ -49,8 +49,6 @@ module(AMAZON_SERVERGROUP_DETAILS_SECURITYGROUP_EDITSECURITYGROUPS_MODAL_CONTROL
     this.isValid = () => this.state.verification.verified;
 
     securityGroupReader.getAllSecurityGroups().then(allGroups => {
-      // eslint-disable-next-line
-      console.log('allgroups', allGroups);
       const account = serverGroup.account;
       const region = serverGroup.region;
       const vpcId = serverGroup.vpcId;
