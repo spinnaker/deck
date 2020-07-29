@@ -344,7 +344,11 @@ export class SecurityGroupReader {
           const service: any = this.providerServiceDelegate.getDelegate(provider, 'securityGroup.transformer');
           if (service && service.supportsCompression) {
             Object.keys(data[account][provider]).forEach(region => {
-              data[account][provider][region] = service.decompress(data[account][provider][region]);
+              // Sometimes the data from the cache is already partially decompressed even if the conditionals are met
+              // The isFlattened check avoids a decompression error
+              const decompressData = data[account][provider][region];
+              const isFlattened = Array.isArray(decompressData);
+              data[account][provider][region] = isFlattened ? decompressData : service.decompress(decompressData);
             });
           }
         }

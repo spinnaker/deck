@@ -29,7 +29,7 @@ module(AMAZON_SERVERGROUP_DETAILS_SECURITYGROUP_EDITSECURITYGROUPS_MODAL_CONTROL
     securityGroups,
   ) {
     this.command = {
-      securityGroups: securityGroups.slice(0).sort((a, b) => a.name.localeCompare(b.name)),
+      securityGroups: (securityGroups || []).slice(0).sort((a, b) => a.name.localeCompare(b.name)),
     };
 
     this.state = {
