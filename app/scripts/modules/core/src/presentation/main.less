@@ -286,12 +286,11 @@ html {
 
   .detail-content {
     z-index: var(--layer-high);
-    position: fixed;
+    position: absolute;
     margin-top: -20px;
     right: 0;
     height: 100%;
     width: 390px;
-    padding-bottom: 24px;
 
     @media (max-width: 390px) {
       width: 100%;
@@ -1481,8 +1480,8 @@ div.modal-header.has-sticky-headers {
   background-color: var(--color-white);
   margin: 0;
   border-top: 1px solid var(--color-alto);
-  .col-md-9,
-  .col-md-3 {
+  .fixed-footer-button {
     padding: 0;
+    margin-left: auto;
   }
 }
