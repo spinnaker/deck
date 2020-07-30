@@ -55,15 +55,24 @@ class HelmEditor extends React.Component<IArtifactEditorProps, IHelmArtifactEdit
     }
   }
 
-  public componentDidUpdate(nextProps: IArtifactEditorProps) {
-    if (this.props.account.name !== nextProps.account.name) {
-      ArtifactService.getArtifactNames(TYPE, nextProps.account.name).then(names => {
-        this.setState({
-          names,
-          namesLoading: false,
-          versions: [],
-        });
-      });
+  public componentDidUpdate(prevProps: IArtifactEditorProps) {
+    if (this.props.account.name !== prevProps.account.name) {
+      ArtifactService.getArtifactNames(TYPE, this.props.account.name).then(
+        names => {
+          this.setState({
+            names,
+            namesLoading: false,
+            versions: [],
+          });
+        },
+        () => {
+          this.setState({
+            names: [],
+            namesLoading: false,
+            versions: [],
+          });
+        },
+      );
     }
   }
 
