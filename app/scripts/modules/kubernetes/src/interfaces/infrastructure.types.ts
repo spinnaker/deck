@@ -7,43 +7,27 @@ import {
   IServerGroupManager,
 } from '@spinnaker/core';
 
-export interface IKubernetesInstance extends IInstance {
+export interface IKubernetesResource {
+  apiVersion: string;
+  displayName: string;
   kind: string;
-  name: string;
+  namespace: string;
+}
+
+export interface IKubernetesInstance extends IInstance, IKubernetesResource {
   humanReadableName: string;
-  displayName: string;
-  apiVersion: string;
-  namespace: string;
   moniker: IMoniker;
 }
 
-export interface IKubernetesLoadBalancer extends ILoadBalancer {
-  kind: string;
-  displayName: string;
-  apiVersion: string;
-  namespace: string;
-}
+export interface IKubernetesLoadBalancer extends ILoadBalancer, IKubernetesResource {}
 
-export interface IKubernetesSecurityGroup extends ISecurityGroupDetail {
+export interface IKubernetesSecurityGroup extends ISecurityGroupDetail, IKubernetesResource {
   account: string;
-  kind: string;
-  displayName: string;
-  apiVersion: string;
   moniker: IMoniker;
-  namespace: string;
 }
 
-export interface IKubernetesServerGroup extends IServerGroup {
-  kind: string;
-  displayName: string;
-  apiVersion: string;
+export interface IKubernetesServerGroup extends IServerGroup, IKubernetesResource {
   disabled: boolean;
-  namespace: string;
 }
 
-export interface IKubernetesServerGroupManager extends IServerGroupManager {
-  kind: string;
-  displayName: string;
-  apiVersion: string;
-  namespace: string;
-}
+export interface IKubernetesServerGroupManager extends IServerGroupManager, IKubernetesResource {}
