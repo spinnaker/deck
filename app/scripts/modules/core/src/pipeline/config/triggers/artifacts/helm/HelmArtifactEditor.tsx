@@ -40,12 +40,22 @@ class HelmEditor extends React.Component<IArtifactEditorProps, IHelmArtifactEdit
       props.onChange(clonedArtifact);
     }
 
-    ArtifactService.getArtifactNames(TYPE, this.props.account.name).then(names => {
-      this.setState({
-        names,
-        namesLoading: false,
-      });
-    });
+    ArtifactService.getArtifactNames(TYPE, this.props.account.name).then(
+      names => {
+        this.setState({
+          names,
+          namesLoading: false,
+        });
+      },
+      () => {
+        this.setState({
+          names: [],
+          namesLoading: false,
+          versionsLoading: false,
+          versions: [],
+        });
+      },
+    );
   }
 
   public componentDidMount() {
