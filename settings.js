@@ -148,8 +148,8 @@ window.spinnakerSettings = {
         inferInternalFlagFromSubnet: false,
       },
       serverGroups: {
-        enableIPv6: true,
-        enableIMDSv2: true,
+        enableIPv6: false,
+        enableIMDSv2: false,
       },
       useAmiBlockDeviceMappings: false,
     },

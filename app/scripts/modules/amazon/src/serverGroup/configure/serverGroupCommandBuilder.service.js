@@ -99,8 +99,6 @@ angular
                 dirty: {},
                 submitButtonLabel: getSubmitButtonLabel(defaults.mode || 'create'),
               },
-              // TO DO: Remove after temporary testing on feature branch
-              setLaunchTemplate: true,
             };
 
             if (
@@ -385,9 +383,6 @@ angular
               serverGroup.launchTemplate.launchTemplateData.networkInterfaces.find(ni => ni.deviceIndex === 0) || {};
             command.securityGroups = networkInterface.groups;
           }
-
-          // TO DO: Remove after temporary feature branch testing
-          command.setLaunchTemplate = true;
 
           return command;
         });
