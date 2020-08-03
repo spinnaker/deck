@@ -133,13 +133,7 @@ export class ALBListeners extends React.Component<IALBListenersProps, IALBListen
         const missingAuth = !!rule.actions.find(
           a => a.type === 'authenticate-oidc' && !a.authenticateOidcConfig.clientId,
         );
-        const missingValue = !!rule.conditions.find(c => {
-          if (c.field !== 'http-request-method') {
-            return c.values.includes('');
-          }
-
-          return c.httpRequestMethodConfig && c.httpRequestMethodConfig.values.includes('');
-        });
+        const missingValue = !!rule.conditions.find(c => c.values.includes(''));
         return missingTargets || missingAuth || missingValue;
       });
       return defaultActionsHaveMissingTarget || rulesHaveMissingFields;
@@ -339,7 +333,7 @@ export class ALBListeners extends React.Component<IALBListenersProps, IALBListen
     newValue: string,
     selected: boolean,
   ): void => {
-    let newValues = condition.httpRequestMethodConfig ? condition.httpRequestMethodConfig.values : [];
+    let newValues = condition.values || [];
 
     if (selected) {
       newValues.push(newValue);
@@ -347,13 +341,10 @@ export class ALBListeners extends React.Component<IALBListenersProps, IALBListen
       newValues = newValues.filter(v => v !== newValue);
     }
 
+    condition.values = newValues;
     condition.httpRequestMethodConfig = {
       values: newValues,
     };
-
-    /** Http-request-method does not have the values attribute, but we default this to an empty array when a new condition is created */
-    delete condition.values;
-
     this.updateListeners();
   };
 
@@ -710,10 +701,7 @@ const Rule = SortableElement((props: IRuleProps) => (
                 <label key={`${httpMethod}-checkbox`}>
                   <input
                     type="checkbox"
-                    checked={
-                      Boolean(condition.httpRequestMethodConfig) &&
-                      condition.httpRequestMethodConfig.values.includes(httpMethod)
-                    }
+                    checked={condition.values.includes(httpMethod)}
                     onChange={event =>
                       props.handleHttpRequestMethodChanged(condition, httpMethod, event.target.checked)
                     }

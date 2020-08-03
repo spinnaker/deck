@@ -154,7 +154,7 @@ export class CreateApplicationLoadBalancer extends React.Component<
             return condition.values[0].length > 0;
           }
 
-          return condition.httpRequestMethodConfig && condition.httpRequestMethodConfig.values.length > 0;
+          return condition.values.length > 0;
         });
       });
     });
