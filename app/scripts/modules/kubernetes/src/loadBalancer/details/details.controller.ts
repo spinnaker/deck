@@ -4,7 +4,7 @@ import { StateService } from '@uirouter/angularjs';
 
 import { Application, ILoadBalancer, IManifest, ManifestReader } from '@spinnaker/core';
 
-import { IKubernetesLoadBalancer } from './IKubernetesLoadBalancer';
+import { IKubernetesLoadBalancer } from '../../interfaces';
 import { KubernetesManifestCommandBuilder } from '../../manifest/manifestCommandBuilder.service';
 import { ManifestWizard } from '../../manifest/wizard/ManifestWizard';
 
@@ -66,22 +66,17 @@ class KubernetesLoadBalancerDetailsController implements IController {
   }
 
   private extractLoadBalancer({ accountId, name, region }: ILoadBalancerFromStateParams): void {
-    const rawLoadBalancer = this.app.getDataSource('loadBalancers').data.find((test: ILoadBalancer) => {
+    const loadBalancer = this.app.getDataSource('loadBalancers').data.find((test: ILoadBalancer) => {
       return test.name === name && test.account === accountId && test.region === region;
     });
 
-    if (!rawLoadBalancer) {
+    if (!loadBalancer) {
       return this.autoClose();
     }
 
     ManifestReader.getManifest(accountId, region, name).then((manifest: IManifest) => {
       this.manifest = manifest;
-      this.loadBalancer = {
-        ...rawLoadBalancer,
-        apiVersion: manifest.manifest.apiVersion,
-        displayName: manifest.manifest.metadata.name,
-        namespace: rawLoadBalancer.region,
-      };
+      this.loadBalancer = loadBalancer;
       this.state.loading = false;
     });
   }

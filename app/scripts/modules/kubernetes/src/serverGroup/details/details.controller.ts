@@ -14,7 +14,7 @@ import {
   ManifestReader,
 } from '@spinnaker/core';
 
-import { IKubernetesServerGroup } from './IKubernetesServerGroup';
+import { IKubernetesServerGroup } from '../../interfaces';
 import { KubernetesManifestCommandBuilder } from '../../manifest/manifestCommandBuilder.service';
 import { ManifestWizard } from '../../manifest/wizard/ManifestWizard';
 import { ManifestTrafficService } from '../../manifest/traffic/ManifestTrafficService';
@@ -185,11 +185,7 @@ class KubernetesServerGroupDetailsController implements IController {
 
         ManifestReader.getManifest(accountId, region, name).then((manifest: IManifest) => {
           this.manifest = manifest;
-          this.serverGroup = {
-            ...serverGroupDetails,
-            displayName: manifest.manifest.metadata.name,
-            namespace: serverGroupDetails.region,
-          } as IKubernetesServerGroup;
+          this.serverGroup = serverGroupDetails as IKubernetesServerGroup;
           this.entityTagTargets = this.configureEntityTagTargets();
           this.state.loading = false;
         });
