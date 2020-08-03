@@ -99,8 +99,6 @@ export class TaskMonitor {
   }
 
   public setError(task?: ITask): void {
-    // eslint-disable-next-line
-    console.log(task);
     if (task) {
       this.task = task;
       this.errorMessage = task.failureMessage || 'There was an unknown server error.';
