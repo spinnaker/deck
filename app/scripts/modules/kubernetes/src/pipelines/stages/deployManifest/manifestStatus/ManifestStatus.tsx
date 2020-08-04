@@ -10,15 +10,14 @@ import { ManifestEvents } from './ManifestEvents';
 import './ManifestStatus.less';
 
 export interface IManifestStatusProps {
+  account: string;
   manifest: IManifest;
-  stage: any;
 }
 
 @Overridable('kubernetes.v2.pipeline.stages.deployManifest.manifestStatus')
 export class ManifestStatus extends React.Component<IManifestStatusProps> {
   public render() {
-    const { manifest, stage } = this.props;
-    const { account } = stage.context;
+    const { account, manifest } = this.props;
     return [
       <dl className="manifest-status" key="manifest-status">
         <dt>{manifest.manifest.kind}</dt>

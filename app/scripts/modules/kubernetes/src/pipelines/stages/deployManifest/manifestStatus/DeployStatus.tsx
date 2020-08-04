@@ -143,7 +143,7 @@ export class DeployStatus extends React.Component<IExecutionDetailsSectionProps,
                 {manifests.map(manifest => {
                   const uid =
                     manifest.manifest.metadata.uid || KubernetesManifestService.manifestIdentifier(manifest.manifest);
-                  return <ManifestStatus key={uid} manifest={manifest} stage={stage} />;
+                  return <ManifestStatus key={uid} manifest={manifest} account={stage.context.account} />;
                 })}
               </div>
             </div>
