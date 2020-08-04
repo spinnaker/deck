@@ -1,5 +1,5 @@
 import React from 'react';
-import { get, upperFirst } from 'lodash';
+import { get } from 'lodash';
 import {
   IExecutionDetailsSectionProps,
   ExecutionDetailsSection,
@@ -110,10 +110,10 @@ export class DeployStatus extends React.Component<IExecutionDetailsSectionProps,
 
   private scopedKind(manifest: IStageManifest): string {
     if (this.isCRDGroup(manifest)) {
-      return upperFirst(manifest.kind) + '.' + this.apiGroup(manifest);
+      return manifest.kind + '.' + this.apiGroup(manifest);
     }
 
-    return upperFirst(manifest.kind);
+    return manifest.kind;
   }
 
   private stageManifestToIManifest(manifest: IStageManifest, account: string): IManifest {
