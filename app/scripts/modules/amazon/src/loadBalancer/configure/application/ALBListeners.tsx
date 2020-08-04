@@ -341,6 +341,11 @@ export class ALBListeners extends React.Component<IALBListenersProps, IALBListen
       newValues = newValues.filter(v => v !== newValue);
     }
 
+    /**
+     * The `http-request-method` conditions have a differnt model.
+     * AWS uses `httpRequestMethodConfig` as the source of truth, while deck uses `values`.
+     * Both are updated for consistency.
+     */
     condition.values = newValues;
     condition.httpRequestMethodConfig = {
       values: newValues,
@@ -977,7 +982,7 @@ const Rules = SortableContainer((props: IRulesProps) => (
           configureOidcClient={props.configureOidcClient}
           configureRedirect={props.configureRedirect}
         />
-    ))}
+      ))}
     <tr className="not-sortable">
       <td colSpan={5}>
         <button type="button" className="add-new col-md-12" onClick={() => props.addRule(props.listener)}>
