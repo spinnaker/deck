@@ -19,10 +19,16 @@ module(GOOGLE_SERVERGROUP_CONFIGURE_WIZARD_SECURITYGROUPS_TAGSELECTOR_COMPONENT,
     'gceTagManager',
     function($scope, gceTagManager) {
       this.securityGroup = gceTagManager.securityGroupObjectsKeyedById[this.securityGroupId];
-      this.onSelect = gceTagManager.addTag;
+      this.onSelect = $item => {
+        // eslint-disable-next-line no-console
+        console.log('onSelect called in tagSelector');
+        gceTagManager.addTag($item);
+      };
       this.onRemove = gceTagManager.removeTag;
 
       $scope.$on('uis:select', function(event) {
+        // eslint-disable-next-line no-console
+        console.log('About to preventDefault on uis:select in tagSelector');
         event.preventDefault();
       });
     },

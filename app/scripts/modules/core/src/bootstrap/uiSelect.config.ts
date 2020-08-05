@@ -18,6 +18,8 @@ function uiSelectDecorator($provide: ng.auto.IProvideService) {
           if ($select.selected.length >= $select.limit) {
             return;
           }
+          // eslint-disable-next-line no-console
+          console.log('Is defaultPrevented? ', event.defaultPrevented ? 'yes' : 'no');
           if (!event.defaultPrevented) {
             $select.selected.push(item);
             scope.$selectMultiple.updateModel();
