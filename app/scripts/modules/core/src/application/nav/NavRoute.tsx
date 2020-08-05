@@ -11,8 +11,13 @@ export interface INavRouteProps {
 }
 
 export const NavRoute = ({ app, dataSource }: INavRouteProps) => {
-  const sref = useSrefActive(dataSource.sref, null, 'active');
+  const sref = useSrefActive(dataSource.sref, {}, 'active');
   const isActive = useIsActive(dataSource.activeState);
+
+  // useSrefActive does not assign the active class is not assigned for some nested states and hyperlinks, so we use isActive too
+  if (!sref.className && isActive) {
+    sref.className = 'active';
+  }
 
   return (
     <a {...sref}>
