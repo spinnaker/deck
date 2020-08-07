@@ -273,6 +273,7 @@ export class PipelineGraph extends React.Component<IPipelineGraphProps, IPipelin
       newState.maxLabelWidth = newState.maxLabelWidth / (newState.phaseCount + 1) - phaseOffset;
     }
     newState.maxLabelWidth = Math.max(this.minLabelWidth, newState.maxLabelWidth);
+
     if (newState.maxLabelWidth === this.minLabelWidth) {
       newState.graphWidth = (newState.phaseCount + 1) * (newState.maxLabelWidth + phaseOffset) + 5 + 'px';
     } else {

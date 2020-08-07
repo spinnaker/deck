@@ -9,6 +9,7 @@ import { Subscription } from 'rxjs';
 
 import { Application } from 'core/application';
 import { FilterSection } from 'core/cluster/filter/FilterSection';
+import { FilterSearch } from 'core/cluster/filter/FilterSearch';
 import { IFilterTag } from 'core/filterModel';
 import { IExecution, IPipeline } from 'core/domain';
 import { PipelineConfigService } from '../config/services/PipelineConfigService';
@@ -44,11 +45,14 @@ export class ExecutionFilters extends React.Component<IExecutionFiltersProps, IE
   constructor(props: IExecutionFiltersProps) {
     super(props);
 
+    const searchString = ExecutionState.filterModel.asFilterModel.sortFilter.filter;
     this.state = {
-      pipelineNames: this.getPipelineNames(false),
+      pipelineNames: this.getPipelineNames(false).filter(pipelineName =>
+        searchString ? pipelineName.toLocaleLowerCase().includes(searchString.toLocaleLowerCase()) : true,
+      ),
       strategyNames: this.getPipelineNames(true),
       pipelineReorderEnabled: false,
-      searchString: '',
+      searchString,
       tags: ExecutionState.filterModel.asFilterModel.tags,
     };
   }
@@ -96,12 +100,6 @@ export class ExecutionFilters extends React.Component<IExecutionFiltersProps, IE
       ExecutionFilterService.updateExecutionGroups(this.props.application);
       this.props.setReloadingForFilters(false);
     });
-  };
-
-  private clearFilters = (): void => {
-    ReactGA.event({ category: 'Pipelines', action: `Filter: clear all (side nav)` });
-    ExecutionFilterService.clearFilters();
-    this.refreshExecutions();
   };
 
   private getPipelineNames(strategy: boolean): string[] {
@@ -202,33 +200,18 @@ export class ExecutionFilters extends React.Component<IExecutionFiltersProps, IE
   };
 
   public render() {
-    const { pipelineNames, strategyNames, pipelineReorderEnabled, tags } = this.state;
+    const { pipelineNames, searchString, strategyNames, pipelineReorderEnabled, tags } = this.state;
 
     return (
       <div className="execution-filters">
         <div className="filters-content">
           <div className="heading">
-            <span
-              onClick={this.clearFilters}
-              className="btn btn-default btn-xs"
-              style={{ visibility: tags.length > 0 ? 'visible' : 'hidden' }}
-            >
-              Clear All
-            </span>
-
-            <FilterSection heading="Search" expanded={true} helpKey="executions.search">
-              <form className="form-horizontal" role="form">
-                <div className="form-group nav-search">
-                  <input
-                    type="search"
-                    className="form-control input-sm"
-                    onBlur={this.searchFieldUpdated}
-                    onChange={this.searchFieldUpdated}
-                    style={{ width: '85%', display: 'inline-block' }}
-                  />
-                </div>
-              </form>
-            </FilterSection>
+            <FilterSearch
+              helpKey="executions.search"
+              value={searchString}
+              onBlur={this.searchFieldUpdated}
+              onSearchChange={this.searchFieldUpdated}
+            />
           </div>
           <div className="content">
             <FilterSection heading="Pipelines" expanded={true}>
