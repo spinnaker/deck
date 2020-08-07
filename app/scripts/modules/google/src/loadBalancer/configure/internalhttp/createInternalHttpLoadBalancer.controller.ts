@@ -1,13 +1,11 @@
-'use strict';
-
 import { IScope, module } from 'angular';
+import { IModalInstanceService } from 'angular-ui-bootstrap';
+import UIROUTER_ANGULARJS, { StateService } from '@uirouter/angularjs';
 
 import { Application, TaskMonitor } from '@spinnaker/core';
 
 import { GCE_CACHE_REFRESH } from 'google/cache/cacheRefresh.component';
 import { BackendServiceTemplate, HealthCheckTemplate, HostRuleTemplate, ListenerTemplate } from '../http/templates';
-
-import '../http/httpLoadBalancerWizard.component.less';
 import { GOOGLE_LOADBALANCER_CONFIGURE_HTTP_BACKENDSERVICE_BACKENDSERVICE_COMPONENT } from '../http/backendService/backendService.component';
 import { GOOGLE_LOADBALANCER_CONFIGURE_HTTP_BASICSETTINGS_BASICSETTINGS_COMPONENT } from '../http/basicSettings/basicSettings.component';
 import { GOOGLE_LOADBALANCER_CONFIGURE_HTTP_COMMANDBUILDER_SERVICE } from '../http/commandBuilder.service';
@@ -17,9 +15,9 @@ import { GOOGLE_LOADBALANCER_CONFIGURE_HTTP_HOSTRULE_HOSTRULE_COMPONENT } from '
 import { GOOGLE_LOADBALANCER_CONFIGURE_HTTP_HTTPLOADBALANCER_WRITE_SERVICE } from '../http/httpLoadBalancer.write.service';
 import { GOOGLE_LOADBALANCER_CONFIGURE_HTTP_LISTENERS_LISTENER_COMPONENT } from '../http/listeners/listener.component';
 import { GOOGLE_LOADBALANCER_CONFIGURE_HTTP_TRANSFORMER_SERVICE } from '../http/transformer.service';
-import { IModalInstanceService } from 'angular-ui-bootstrap';
-import UIROUTER_ANGULARJS, { StateService } from '@uirouter/angularjs';
 import { IGceHttpLoadBalancer } from 'google/domain';
+
+import '../http/httpLoadBalancerWizard.component.less';
 
 export const GOOGLE_LOADBALANCER_CONFIGURE_INTERNAL_HTTP_CREATEHTTPLOADBALANCER_CONTROLLER =
   'spinnaker.deck.gce.loadBalancer.createInternalHttp.controller';
