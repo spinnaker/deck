@@ -1,5 +1,5 @@
 import React from 'react';
-import { useIsActive, useSrefActive } from '@uirouter/react';
+import { useIsActive, useSref } from '@uirouter/react';
 
 import { NavItem } from './NavItem';
 import { ApplicationDataSource } from '../service/applicationDataSource';
@@ -11,16 +11,11 @@ export interface INavRouteProps {
 }
 
 export const NavRoute = ({ app, dataSource }: INavRouteProps) => {
-  const sref = useSrefActive(dataSource.sref, {}, 'active');
+  const sref = useSref(dataSource.sref);
   const isActive = useIsActive(dataSource.activeState);
 
-  // useSrefActive does not assign the active class is not assigned for some nested states and hyperlinks, so we use isActive too
-  if (!sref.className && isActive) {
-    sref.className = 'active';
-  }
-
   return (
-    <a {...sref}>
+    <a {...sref} className={isActive ? 'active' : ''}>
       <NavItem app={app} dataSource={dataSource} isActive={isActive} />
     </a>
   );
