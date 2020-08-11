@@ -117,7 +117,7 @@ angular
               const creationDate = application.attributes.createTs;
 
               command.requireIMDSv2 =
-                appAgeRequirement && creationDate && Number(creationDate) >= appAgeRequirement ? true : false;
+                appAgeRequirement && creationDate && Number(creationDate) > appAgeRequirement ? true : false;
             }
 
             return command;
