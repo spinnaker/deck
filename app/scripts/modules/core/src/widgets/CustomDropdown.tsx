@@ -1,4 +1,8 @@
 import React from 'react';
+import { DropdownMenuProps } from 'react-bootstrap';
+import RootCloseWrapper from 'react-overlays/lib/RootCloseWrapper';
+
+import { noop } from '../utils';
 
 export interface IToggleProps {
   bsRole: string;
@@ -24,7 +28,7 @@ export class CustomToggle extends React.Component<IToggleProps, {}> {
   }
 }
 
-export interface IMenuProps {
+export interface IMenuProps extends DropdownMenuProps {
   bsRole: string;
 }
 
@@ -32,18 +36,23 @@ export interface IMenuState {
   value: string;
 }
 export class CustomMenu extends React.Component<IMenuProps, IMenuState> {
+  static defaultProps = {
+    onClose: noop,
+  };
   constructor(props: IMenuProps) {
     super(props);
     this.state = { value: '' };
   }
 
   public render() {
-    const { children } = this.props;
+    const { children, open, onClose } = this.props;
 
     return (
-      <ul className="dropdown-menu" style={{ padding: '' }}>
-        {React.Children.toArray(children)}
-      </ul>
+      <RootCloseWrapper disabled={!open} onRootClose={e => onClose(e, { source: 'rootClose' })}>
+        <ul className="dropdown-menu" style={{ padding: '' }}>
+          {React.Children.toArray(children)}
+        </ul>
+      </RootCloseWrapper>
     );
   }
 }
