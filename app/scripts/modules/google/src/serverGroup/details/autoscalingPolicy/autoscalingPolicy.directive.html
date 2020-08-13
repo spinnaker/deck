@@ -43,7 +43,7 @@
   <dt ng-if="$ctrl.scaleInControlsConfigured">
     Scale-in Time Window
   </dt>
-  <dd ng-if="$ctrl.scaleDownInConfigured">{{$ctrl.timeWindowSecMessage}}</dd>
+  <dd ng-if="$ctrl.scaleInControlsConfigured">{{$ctrl.timeWindowSecMessage}}</dd>
   <dt ng-if="$ctrl.serverGroup.autoscalingMessages">Messages</dt>
   <dd ng-if="$ctrl.serverGroup.autoscalingMessages" ng-repeat="message in $ctrl.serverGroup.autoscalingMessages">
     {{message}}
