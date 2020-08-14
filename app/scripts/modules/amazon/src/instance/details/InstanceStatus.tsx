@@ -5,14 +5,27 @@ import { IAmazonHealth } from '../../domain';
 
 export type MetricTypes = 'LoadBalancer' | 'TargetGroup';
 
+export interface CustomHealthLink {
+  type: string;
+  href: string;
+  text: string;
+}
+
 export interface IInstanceStatusProps {
   healthMetrics: IAmazonHealth[];
   healthState: string;
   metricTypes: MetricTypes[];
-  privateIpAddress: string;
+  customHealthUrl?: CustomHealthLink;
+  privateIpAddress?: string;
 }
 
-export const InstanceStatus = ({ healthMetrics, healthState, metricTypes, privateIpAddress }: IInstanceStatusProps) => {
+export const InstanceStatus = ({
+  healthMetrics,
+  healthState,
+  metricTypes,
+  customHealthUrl,
+  privateIpAddress,
+}: IInstanceStatusProps) => {
   const hasLoadBalancer = metricTypes.includes('LoadBalancer');
   const hasTargetGroup = metricTypes.includes('TargetGroup');
 
@@ -31,20 +44,33 @@ export const InstanceStatus = ({ healthMetrics, healthState, metricTypes, privat
                 {!metricTypes.includes(metric.type as MetricTypes) && (
                   <div>
                     <Tooltip value={metric.state.toLowerCase() === 'down' ? metric.description : ''} placement="left">
-                      <span className="pad-left small">
-                        {metric.healthCheckUrl && (
-                          <a target="_blank" href={metric.healthCheckUrl}>
-                            Health Check
-                          </a>
-                        )}
-                        {metric.healthCheckUrl && metric.statusPageUrl && <span> | </span>}
-                        {metric.statusPageUrl && (
-                          <a target="_blank" href={metric.statusPageUrl}>
-                            Status
-                          </a>
-                        )}
+                      <span>
+                        <span className={`glyphicon glyphicon-${metric.state}-triangle`} />
+                        <span>{robotToHuman(metric.state)}</span>
                       </span>
                     </Tooltip>
+                    <span className="pad-left small">
+                      {metric.healthCheckUrl && (
+                        <a target="_blank" href={metric.healthCheckUrl}>
+                          Health Check
+                        </a>
+                      )}
+                      {metric.healthCheckUrl && metric.statusPageUrl && <span> | </span>}
+                      {metric.statusPageUrl && (
+                        <a target="_blank" href={metric.statusPageUrl}>
+                          Status
+                        </a>
+                      )}
+                      {customHealthUrl && metric.type === customHealthUrl.type && (
+                        <span>
+                          {' '}
+                          |{' '}
+                          <a target="_blank" href={customHealthUrl.href}>
+                            {customHealthUrl.text}
+                          </a>
+                        </span>
+                      )}
+                    </span>
                   </div>
                 )}
                 {hasLoadBalancer &&

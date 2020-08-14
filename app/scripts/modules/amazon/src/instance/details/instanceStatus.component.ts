@@ -7,5 +7,5 @@ export const INSTANCE_STATUS_COMPONENT = 'spinnaker.application.instanceStatus.c
 
 module(INSTANCE_STATUS_COMPONENT, []).component(
   'instanceStatus',
-  react2angular(InstanceStatus, ['healthMetrics', 'healthState', 'metricTypes', 'privateIpAddress']),
+  react2angular(InstanceStatus, ['healthMetrics', 'healthState', 'metricTypes', 'customHealthUrl', 'privateIpAddress']),
 );
