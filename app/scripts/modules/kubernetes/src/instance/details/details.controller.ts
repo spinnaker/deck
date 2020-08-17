@@ -118,34 +118,32 @@ class KubernetesInstanceDetailsController implements IController {
     ]);
 
     const instanceManager = dataSources.find(instanceLocatorPredicate);
-    if (instanceManager) {
-      const recentHistoryExtraData: { [key: string]: string } = {
-        region: instanceManager.region,
-        account: instanceManager.account,
-      };
-
-      if (instanceManager.category === 'serverGroup') {
-        recentHistoryExtraData.serverGroup = instanceManager.name;
-      }
-
-      const instance = instanceManager.instances.find(i => i.id === instanceFromState.instanceId);
-
-      if (!instance) {
-        return this.$q.reject();
-      }
-
-      RecentHistoryService.addExtraDataToLatest('instances', recentHistoryExtraData);
-      return InstanceReader.getInstanceDetails(instanceManager.account, instanceManager.region, instance.name).then(
-        (instanceDetails: IKubernetesInstance) => {
-          instanceDetails.id = instance.id;
-          instanceDetails.name = instance.name;
-          instanceDetails.provider = 'kubernetes';
-          return instanceDetails;
-        },
-      );
-    } else {
+    if (!instanceManager) {
       return this.$q.reject();
     }
+    const recentHistoryExtraData: { [key: string]: string } = {
+      region: instanceManager.region,
+      account: instanceManager.account,
+    };
+
+    if (instanceManager.category === 'serverGroup') {
+      recentHistoryExtraData.serverGroup = instanceManager.name;
+    }
+
+    const instance = instanceManager.instances.find(i => i.id === instanceFromState.instanceId);
+    if (!instance) {
+      return this.$q.reject();
+    }
+
+    RecentHistoryService.addExtraDataToLatest('instances', recentHistoryExtraData);
+    return InstanceReader.getInstanceDetails(instanceManager.account, instanceManager.region, instance.name).then(
+      (instanceDetails: IKubernetesInstance) => {
+        instanceDetails.id = instance.id;
+        instanceDetails.name = instance.name;
+        instanceDetails.provider = 'kubernetes';
+        return instanceDetails;
+      },
+    );
   }
 
   private autoClose(): void {
