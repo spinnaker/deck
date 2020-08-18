@@ -5,6 +5,8 @@ import { bindAll } from 'lodash';
 
 import { InstanceReader, IInstanceConsoleOutput, IInstanceMultiOutputLog } from 'core/instance/InstanceReader';
 import { IPodNameProvider } from '../PodNameProvider';
+import DOMPurify from 'dompurify';
+import AnsiUp from 'ansi_up';
 
 // IJobManifestPodLogs is the data needed to get logs
 export interface IJobManifestPodLogsProps {
@@ -61,9 +63,14 @@ export class JobManifestPodLogs extends React.Component<IJobManifestPodLogsProps
     const region = this.resourceRegion();
     InstanceReader.getConsoleOutput(account, region, this.podName(), 'kubernetes')
       .then((response: IInstanceConsoleOutput) => {
+        const containerLogs = response.output as IInstanceMultiOutputLog[];
+        containerLogs.forEach((log: IInstanceMultiOutputLog) => {
+          log.formattedOutput = DOMPurify.sanitize(new AnsiUp().ansi_to_html(log.output));
+        });
+
         this.setState({
-          containerLogs: response.output as IInstanceMultiOutputLog[],
-          selectedContainerLog: response.output[0] as IInstanceMultiOutputLog,
+          containerLogs: containerLogs,
+          selectedContainerLog: containerLogs[0],
         });
         this.open();
       })
@@ -105,7 +112,10 @@ export class JobManifestPodLogs extends React.Component<IJobManifestPodLogsProps
                       </li>
                     ))}
                   </ul>
-                  <pre className="body-small flex-fill">{selectedContainerLog.output}</pre>
+                  <pre
+                    className="body-small fill"
+                    dangerouslySetInnerHTML={{ __html: selectedContainerLog.formattedOutput }}
+                  ></pre>
                 </>
               )}
               {errorMessage && <pre className="body-small">{errorMessage}</pre>}

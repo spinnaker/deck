@@ -4,8 +4,6 @@ import { InstanceReader } from '../../InstanceReader';
 
 import { module } from 'angular';
 
-import { default as AnsiUp } from 'ansi_up';
-
 export const CORE_INSTANCE_DETAILS_CONSOLE_CONSOLEOUTPUT_MODAL_CONTROLLER =
   'spinnaker.core.instance.details.console.controller';
 export const name = CORE_INSTANCE_DETAILS_CONSOLE_CONSOLEOUTPUT_MODAL_CONTROLLER; // for backwards compatibility
@@ -27,18 +25,7 @@ module(CORE_INSTANCE_DETAILS_CONSOLE_CONSOLEOUTPUT_MODAL_CONTROLLER, []).control
       $scope.vm.exception = null;
       InstanceReader.getConsoleOutput(instance.account, instance.region, instanceId, instance.provider).then(
         function(response) {
-          const ansiUp = new AnsiUp();
-
           $scope.vm.consoleOutput = response.output;
-
-          // Transform the console output to a colored HTML
-          if (Array.isArray($scope.vm.consoleOutput)) {
-            $scope.vm.consoleOutput.forEach(entry => {
-              entry.output = ansiUp.ansi_to_html(entry.output);
-            });
-          } else {
-            $scope.vm.consoleOutput = ansiUp.ansi_to_html($scope.vm.consoleOutput);
-          }
 
           $scope.vm.loading = false;
 
