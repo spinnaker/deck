@@ -36,7 +36,7 @@ export const getFallbackResults = (): ISearchResults<ISearchResult> => {
 
 export class SearchService {
   static get DEFAULT_PAGE_SIZE(): number {
-    return 500;
+    return 1000;
   }
 
   public static search<T extends ISearchResult>(
