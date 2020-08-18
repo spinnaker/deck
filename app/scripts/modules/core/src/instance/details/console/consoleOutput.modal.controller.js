@@ -26,7 +26,6 @@ module(CORE_INSTANCE_DETAILS_CONSOLE_CONSOLEOUTPUT_MODAL_CONTROLLER, []).control
       InstanceReader.getConsoleOutput(instance.account, instance.region, instanceId, instance.provider).then(
         function(response) {
           $scope.vm.consoleOutput = response.output;
-
           $scope.vm.loading = false;
 
           if ($scope.vm.usesMultiOutput) {
