@@ -17,10 +17,8 @@ class GitRepoArtifactEditor extends React.Component<IArtifactEditorProps, IGitRe
   public constructor(props: IArtifactEditorProps) {
     super(props);
     const { artifact } = this.props;
-    const location = get(artifact, 'location', '');
-    const metadataSubpath = get(artifact, 'metadata.subPath', '');
     this.state = {
-      includesSubPath: location !== '' || metadataSubpath !== '',
+      includesSubPath: (artifact.location ?? artifact.metadata?.subPath) !== undefined,
     };
   }
 
@@ -76,11 +74,7 @@ class GitRepoArtifactEditor extends React.Component<IArtifactEditorProps, IGitRe
           <StageConfigField label="Subpath" helpKey="pipeline.config.expectedArtifact.gitrepo.subpath">
             <SpelText
               placeholder="path/to/subdirectory"
-              value={
-                get(artifact, 'location', '') !== ''
-                  ? get(artifact, 'location', '')
-                  : get(artifact, 'metadata.subPath', '')
-              }
+              value={artifact.location ?? artifact.metadata?.subPath}
               onChange={this.onSubPathChanged}
               pipeline={this.props.pipeline}
               docLink={true}
