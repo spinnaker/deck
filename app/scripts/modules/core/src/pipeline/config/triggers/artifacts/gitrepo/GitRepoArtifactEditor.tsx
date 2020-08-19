@@ -1,4 +1,4 @@
-import { cloneDeep, get } from 'lodash';
+import { cloneDeep } from 'lodash';
 import React from 'react';
 
 import { ArtifactTypePatterns } from 'core/artifact';
