@@ -2,11 +2,11 @@ import React from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import classNames from 'classnames';
 import { bindAll } from 'lodash';
+import DOMPurify from 'dompurify';
+import AnsiUp from 'ansi_up';
 
 import { InstanceReader, IInstanceConsoleOutput, IInstanceMultiOutputLog } from 'core/instance/InstanceReader';
 import { IPodNameProvider } from '../PodNameProvider';
-import DOMPurify from 'dompurify';
-import AnsiUp from 'ansi_up';
 
 // IJobManifestPodLogs is the data needed to get logs
 export interface IJobManifestPodLogsProps {
@@ -25,6 +25,8 @@ export interface IJobManifestPodLogsState {
 
 // JobManifestPodLogs exposes pod logs for Job type manifests in the deploy manifest stage
 export class JobManifestPodLogs extends React.Component<IJobManifestPodLogsProps, IJobManifestPodLogsState> {
+  private ansiUp: AnsiUp;
+
   constructor(props: IJobManifestPodLogsProps) {
     super(props);
     this.state = {
@@ -34,6 +36,7 @@ export class JobManifestPodLogs extends React.Component<IJobManifestPodLogsProps
       errorMessage: null,
     };
     bindAll(this, ['open', 'close', 'onClick']);
+    this.ansiUp = new AnsiUp();
   }
 
   private canShow(): boolean {
@@ -65,7 +68,7 @@ export class JobManifestPodLogs extends React.Component<IJobManifestPodLogsProps
       .then((response: IInstanceConsoleOutput) => {
         const containerLogs = response.output as IInstanceMultiOutputLog[];
         containerLogs.forEach((log: IInstanceMultiOutputLog) => {
-          log.formattedOutput = DOMPurify.sanitize(new AnsiUp().ansi_to_html(log.output));
+          log.formattedOutput = DOMPurify.sanitize(this.ansiUp.ansi_to_html(log.output));
         });
 
         this.setState({
