@@ -116,7 +116,7 @@ export class JobManifestPodLogs extends React.Component<IJobManifestPodLogsProps
                     ))}
                   </ul>
                   <pre
-                    className="body-small fill"
+                    className="body-small fill-no-flex"
                     dangerouslySetInnerHTML={{ __html: selectedContainerLog.formattedOutput }}
                   ></pre>
                 </>
