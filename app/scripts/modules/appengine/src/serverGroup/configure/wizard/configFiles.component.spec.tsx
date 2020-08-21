@@ -1,12 +1,20 @@
 import { ConfigFileArtifactList } from './ConfigFileArtifactList';
 import { mount } from 'enzyme';
-import { IArtifactAccountPair } from 'core';
+import { API, IArtifactAccount, IArtifactAccountPair } from 'core';
 import React from 'react';
+import { mock } from 'angular';
 import { mockDeployStage, mockPipeline } from '@spinnaker/mocks';
 import { StageArtifactSelector } from '@spinnaker/core';
 
 describe('<ConfigFileArtifactList/>', () => {
   // let component: ReactWrapper<IConfigFileArtifactListProps, any>;
+
+  let $http: ng.IHttpBackendService;
+  beforeEach(
+    mock.inject(function($httpBackend: ng.IHttpBackendService) {
+      $http = $httpBackend;
+    }),
+  );
 
   it('renders empty children when null/empty artifacts are passed in', () => {
     const configArtifacts: IArtifactAccountPair[] = [];
@@ -22,7 +30,14 @@ describe('<ConfigFileArtifactList/>', () => {
   });
 
   fit('renders 1 children when 1 artifacts are passed in', () => {
-    //const configArtifacts: IArtifactAccountPair[] = [{'account': 'acc', 'id': '123', 'artifact': {'id': '123'}}]
+    const body: IArtifactAccount[] = [
+      {
+        name: 'arrrgh',
+        types: ['arrrgh', 'you'],
+      },
+    ];
+    $http.expectGET(`${API.baseUrl}/artifacts/credentials`).respond(200, body);
+
     const configArtifacts = [
       {
         account: 'acc',
@@ -32,14 +47,19 @@ describe('<ConfigFileArtifactList/>', () => {
         },
       },
     ];
+
     const wrapper = mount(
       <ConfigFileArtifactList
         configArtifacts={configArtifacts}
         pipeline={mockPipeline}
         stage={mockDeployStage}
-        updateConfigArtifacts={}
+        updateConfigArtifacts={() => {
+          console.log('configFiles.component.spec.tsx:::42@16:34');
+        }}
       />,
     );
-    expect(wrapper.find(StageArtifactSelector).length).toBe(0);
+
+    expect(wrapper.find(StageArtifactSelector).length).toBe(1);
+    $http.flush();
   });
 });
