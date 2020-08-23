@@ -44,18 +44,22 @@
         </button>
         <ul class="dropdown-menu" uib-dropdown-menu role="menu">
           <li>
-            <a href ng-click="ctrl.scaleServerGroupManager()">
-              Scale
+            <a href>
+              <scale-server-group-manager
+                server-group-manager="ctrl.serverGroupManager"
+                app="ctrl.app"
+                manifest="ctrl.manifest"
+              />
             </a>
           </li>
           <li ng-if="ctrl.canUndoRolloutServerGroupManager()">
-            <a href ng-click="ctrl.undoRolloutServerGroupManager()">
-              Undo Rollout
+            <a href>
+              <undo-roll-out-server-group-manager server-group-manager="ctrl.serverGroupManager" app="ctrl.app" />
             </a>
           </li>
-          <li ng-if="ctrl.manifest.status.paused.state">
-            <a href ng-click="ctrl.resumeRolloutServerGroupManager()">
-              Resume Rollout
+          <li>
+            <a href>
+              <resume-roll-out-server-group-manager server-group-manager="ctrl.serverGroupManager" app="ctrl.app" />
             </a>
           </li>
           <li ng-if="!ctrl.manifest.status.paused.state && !ctrl.manifest.status.stable.state">

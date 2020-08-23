@@ -1,10 +1,12 @@
 import { IController, IScope, module } from 'angular';
 import { IModalService } from 'angular-ui-bootstrap';
-import { orderBy } from 'lodash';
 import { StateService } from '@uirouter/angularjs';
+import { ScaleServerGroupManager } from './scaleServerGroupManager';
+import { UndoRollOutServerGroupManager } from './undoRollOutServerGroupManager';
+import { ResumeRollOutServerGroupManager } from './resumeRollOutServerGroupManager';
+import { react2angular } from 'react2angular';
 
 import {
-  NameUtils,
   Application,
   IManifest,
   IServerGroupManager,
@@ -58,66 +60,10 @@ class KubernetesServerGroupManagerDetailsController implements IController {
     });
   }
 
-  public resumeRolloutServerGroupManager(): void {
-    this.$uibModal.open({
-      templateUrl: require('../../manifest/rollout/resume.html'),
-      controller: 'kubernetesV2ManifestResumeRolloutCtrl',
-      controllerAs: 'ctrl',
-      resolve: {
-        coordinates: {
-          name: this.serverGroupManager.name,
-          namespace: this.serverGroupManager.namespace,
-          account: this.serverGroupManager.account,
-        },
-        application: this.app,
-      },
-    });
-  }
-
-  public canUndoRolloutServerGroupManager(): boolean {
+  public canUndoRollOutServerGroupManager(): boolean {
     return (
       this.serverGroupManager && this.serverGroupManager.serverGroups && this.serverGroupManager.serverGroups.length > 0
     );
-  }
-
-  public undoRolloutServerGroupManager(): void {
-    this.$uibModal.open({
-      templateUrl: require('../../manifest/rollout/undo.html'),
-      controller: 'kubernetesV2ManifestUndoRolloutCtrl',
-      controllerAs: 'ctrl',
-      resolve: {
-        coordinates: {
-          name: this.serverGroupManager.name,
-          namespace: this.serverGroupManager.namespace,
-          account: this.serverGroupManager.account,
-        },
-        revisions: () => {
-          const [, ...rest] = orderBy(this.serverGroupManager.serverGroups, ['moniker.sequence'], ['desc']);
-          return rest.map((serverGroup, index) => ({
-            label: `${NameUtils.getSequence(serverGroup.moniker.sequence)}${index > 0 ? '' : ' - previous revision'}`,
-            revision: serverGroup.moniker.sequence,
-          }));
-        },
-        application: this.app,
-      },
-    });
-  }
-
-  public scaleServerGroupManager(): void {
-    this.$uibModal.open({
-      templateUrl: require('../../manifest/scale/scale.html'),
-      controller: 'kubernetesV2ManifestScaleCtrl',
-      controllerAs: 'ctrl',
-      resolve: {
-        coordinates: {
-          name: this.serverGroupManager.name,
-          namespace: this.serverGroupManager.namespace,
-          account: this.serverGroupManager.account,
-        },
-        currentReplicas: this.manifest.manifest.spec.replicas,
-        application: this.app,
-      },
-    });
   }
 
   public editServerGroupManager(): void {
@@ -184,7 +130,17 @@ class KubernetesServerGroupManagerDetailsController implements IController {
 
 export const KUBERNETES_SERVER_GROUP_MANAGER_DETAILS_CTRL =
   'spinnaker.kubernetes.serverGroupManager.details.controller';
-module(KUBERNETES_SERVER_GROUP_MANAGER_DETAILS_CTRL, []).controller(
-  'kubernetesV2ServerGroupManagerDetailsCtrl',
-  KubernetesServerGroupManagerDetailsController,
-);
+module(KUBERNETES_SERVER_GROUP_MANAGER_DETAILS_CTRL, [])
+  .controller('kubernetesV2ServerGroupManagerDetailsCtrl', KubernetesServerGroupManagerDetailsController)
+  .component(
+    'scaleServerGroupManager',
+    react2angular(ScaleServerGroupManager, ['serverGroupManager', 'app', 'manifest']),
+  )
+  .component(
+    'undoRollOutServerGroupManager',
+    react2angular(UndoRollOutServerGroupManager, ['serverGroupManager', 'app']),
+  )
+  .component(
+    'resumeRollOutServerGroupManager',
+    react2angular(ResumeRollOutServerGroupManager, ['serverGroupManager', 'app']),
+  );
