@@ -1,10 +1,9 @@
 import { ConfigFileArtifactList } from './ConfigFileArtifactList';
 import { mount } from 'enzyme';
-import { API, IArtifactAccount, IArtifactAccountPair } from 'core';
+import { API, IArtifactAccount, IArtifactAccountPair, StageArtifactSelector } from '@spinnaker/core';
 import React from 'react';
 import { mock } from 'angular';
 import { mockDeployStage, mockPipeline } from '@spinnaker/mocks';
-import { StageArtifactSelector } from '@spinnaker/core';
 
 describe('<ConfigFileArtifactList/>', () => {
   let $http: ng.IHttpBackendService;

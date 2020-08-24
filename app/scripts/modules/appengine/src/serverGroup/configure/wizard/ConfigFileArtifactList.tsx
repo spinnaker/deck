@@ -6,7 +6,7 @@ import {
   IExpectedArtifact,
   IPipeline,
   IStage,
-  StageArtifactSelectorDelegate,
+  StageArtifactSelector,
   IArtifactAccountPair,
 } from '@spinnaker/core';
 
@@ -55,12 +55,9 @@ export const ConfigFileArtifactList = (props: IConfigFileArtifactListProps) => {
             })}
           >
             <div className="col-md-9">
-              <StageArtifactSelectorDelegate
+              <StageArtifactSelector
                 artifact={a.artifact}
                 excludedArtifactTypePatterns={[]}
-                /* expectedArtifactId={a.id} */
-                fieldColumns={7}
-                label={''}
                 onArtifactEdited={(artifact: IArtifact) => {
                   onExpectedArtifactEdited(artifact, i);
                 }}
