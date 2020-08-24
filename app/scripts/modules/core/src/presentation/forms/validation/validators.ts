@@ -48,6 +48,15 @@ const maxValue = (max: number, message?: string): IValidator => {
   };
 };
 
+const maxLength = (max: number, message?: string): IValidator => {
+  return function maxLength(val: string | any[], label = THIS_FIELD) {
+    if (val && typeof val.length !== 'undefined' && val.length > max) {
+      return message || `${label} must contain fewer than ${max} ${typeof val === 'string' ? 'characters' : 'items'}`;
+    }
+    return null;
+  };
+};
+
 const checkBetween = (fieldName: string, min: number, max: number): IValidator => {
   return function checkBetween(value: string) {
     const sanitizedField = Number.parseInt(value, 10);
@@ -132,6 +141,7 @@ export const Validators = {
   isValidJson,
   isValidXml,
   maxValue,
+  maxLength,
   minValue,
   oneOf,
   skipIfUndefined,
