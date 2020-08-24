@@ -27,6 +27,7 @@ export interface IEcsServiceDiscoveryRegistry {
 interface IServiceDiscoveryState {
   serviceDiscoveryAssociations: IEcsServiceDiscoveryRegistryAssociation[];
   serviceDiscoveryRegistriesAvailable: IEcsServiceDiscoveryRegistry[];
+  useTaskDefinitionArtifact: boolean;
 }
 
 export class ServiceDiscovery extends React.Component<IServiceDiscoveryProps, IServiceDiscoveryState> {
@@ -38,7 +39,14 @@ export class ServiceDiscovery extends React.Component<IServiceDiscoveryProps, IS
       serviceDiscoveryAssociations: cmd.serviceDiscoveryAssociations,
       serviceDiscoveryRegistriesAvailable:
         cmd.backingData && cmd.backingData.filtered ? cmd.backingData.filtered.serviceDiscoveryRegistries : [],
+      useTaskDefinitionArtifact: cmd.useTaskDefinitionArtifact ? true : false,
     };
+
+    if(!this.state.useTaskDefinitionArtifact){
+      for(let i = 0; i < cmd.serviceDiscoveryAssociations.length; i++){
+        cmd.serviceDiscoveryAssociations[i].containerName = null;
+      }
+    }
   }
 
   public componentDidMount() {
@@ -92,6 +100,14 @@ export class ServiceDiscovery extends React.Component<IServiceDiscoveryProps, IS
     this.setState({ serviceDiscoveryAssociations: currentAssociations });
   };
 
+  private updateContainerMappingName = (index: number, targetContainerName: string) => {
+    const currentAssociations = this.state.serviceDiscoveryAssociations;
+    const targetAssociations = currentAssociations[index];
+    targetAssociations.containerName = targetContainerName;
+    this.props.notifyAngular('serviceDiscoveryAssociations', currentAssociations);
+    this.setState({ serviceDiscoveryAssociations: currentAssociations });
+  };
+
   private pushServiceDiscoveryAssociation = () => {
     const registryAssociations = this.state.serviceDiscoveryAssociations;
     registryAssociations.push({ registry: this.getEmptyRegistry(), containerPort: 80 });
@@ -109,14 +125,27 @@ export class ServiceDiscovery extends React.Component<IServiceDiscoveryProps, IS
     const removeServiceDiscoveryAssociation = this.removeServiceDiscoveryAssociations;
     const updateServiceDiscoveryRegistry = this.updateServiceDiscoveryRegistry;
     const updateServiceDiscoveryPort = this.updateServiceDiscoveryPort;
+    const updateContainerMappingName = this.updateContainerMappingName;
 
     const registriesAvailable = this.state.serviceDiscoveryRegistriesAvailable.map(function(registry) {
       return { label: `${registry.displayName}`, value: registry.displayName };
     });
 
+    const useTaskDefinitionArtifact = this.state.useTaskDefinitionArtifact;
     const serviceDiscoveryInputs = this.state.serviceDiscoveryAssociations.map(function(mapping, index) {
       return (
         <tr key={index}>
+          {useTaskDefinitionArtifact &&
+          <td>
+            <input
+              className="form-control input-sm"
+              placeholder="Enter a container name ..."
+              required={true}
+              value={mapping.containerName}
+              onChange={e => updateContainerMappingName(index, e.target.value)}
+            />
+          </td>
+          }
           <td>
             <TetheredSelect
               placeholder="Select a registry..."
@@ -158,7 +187,6 @@ export class ServiceDiscovery extends React.Component<IServiceDiscoveryProps, IS
         <Alert color="warning">No registries found in the selected account/region/VPC</Alert>
       </div>
     );
-
     return (
       <div className="container-fluid form-horizontal">
         <div className="form-group">
@@ -170,11 +198,21 @@ export class ServiceDiscovery extends React.Component<IServiceDiscoveryProps, IS
             <table className="table table-condensed packed tags">
               <thead>
                 <tr>
-                  <th style={{ width: '75%' }}>
+                  {useTaskDefinitionArtifact && <th style={{ width: '30%' }}>
+                    Container name
+                    <HelpField id="ecs.loadBalancedContainer" />
+                  </th> }
+                  {useTaskDefinitionArtifact ?
+                    <th style={{ width: '55%' }}>
                     Registry
                     <HelpField id="ecs.serviceDiscoveryRegistry" />
-                  </th>
-                  <th style={{ width: '18%' }}>
+                    </th>
+                    :
+                    <th style={{ width: '80%' }}>
+                      Registry
+                      <HelpField id="ecs.serviceDiscoveryRegistry" />
+                    </th> }
+                  <th style={{ width: '15%' }}>
                     Port
                     <HelpField id="ecs.serviceDiscoveryContainerPort" />
                   </th>
