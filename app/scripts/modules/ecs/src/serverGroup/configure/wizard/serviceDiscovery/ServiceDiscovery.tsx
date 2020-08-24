@@ -132,11 +132,8 @@ export class ServiceDiscovery extends React.Component<IServiceDiscoveryProps, IS
     });
 
     const useTaskDefinitionArtifact = this.state.useTaskDefinitionArtifact;
-
     const serviceDiscoveryInputs = this.state.serviceDiscoveryAssociations.map(function(mapping, index) {
-
       return (
-
         <tr key={index}>
           {useTaskDefinitionArtifact &&
           <td>
@@ -149,7 +146,6 @@ export class ServiceDiscovery extends React.Component<IServiceDiscoveryProps, IS
             />
           </td>
           }
-
           <td>
             <TetheredSelect
               placeholder="Select a registry..."
@@ -191,8 +187,6 @@ export class ServiceDiscovery extends React.Component<IServiceDiscoveryProps, IS
         <Alert color="warning">No registries found in the selected account/region/VPC</Alert>
       </div>
     );
-// eslint-disable-next-line no-console
-    console.log("test - " + this.state.useTaskDefinitionArtifact)
     return (
       <div className="container-fluid form-horizontal">
         <div className="form-group">
