@@ -67,7 +67,7 @@
             ng-if="!ctrl.manifest.status.paused.state"
             application="ctrl.app"
             server-group-manager="ctrl.serverGroupManager"
-          />
+          ></kubernetes-rolling-restart>
           <li role="presentation" class="divider"></li>
           <li>
             <a href ng-click="ctrl.editServerGroupManager()">
@@ -99,7 +99,7 @@
         <dt>Created</dt>
         <dd>{{ctrl.serverGroupManager.createdTime | timestamp}}</dd>
         <dt>Account</dt>
-        <dd><account-tag account="ctrl.serverGroupManager.accountName"></account-tag></dd>
+        <dd><account-tag account="ctrl.serverGroupManager.account"></account-tag></dd>
         <dt>Namespace</dt>
         <dd>{{ctrl.serverGroupManager.namespace}}</dd>
         <dt>Kind</dt>
@@ -127,7 +127,7 @@
     </collapsible-section>
 
     <kubernetes-annotation-custom-sections
-      manifest="ctrl.serverGroupManager.manifest"
+      manifest="ctrl.manifest.manifest"
       resource="ctrl.serverGroupManager"
     ></kubernetes-annotation-custom-sections>
 
@@ -136,7 +136,7 @@
     </collapsible-section>
 
     <collapsible-section heading="Labels" expanded="true">
-      <kubernetes-manifest-labels manifest="ctrl.serverGroupManager.manifest"></kubernetes-manifest-labels>
+      <kubernetes-manifest-labels manifest="ctrl.manifest.manifest"></kubernetes-manifest-labels>
     </collapsible-section>
 
     <collapsible-section heading="Artifacts" expanded="true">
