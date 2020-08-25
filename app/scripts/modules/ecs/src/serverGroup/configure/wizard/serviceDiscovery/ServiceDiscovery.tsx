@@ -110,7 +110,7 @@ export class ServiceDiscovery extends React.Component<IServiceDiscoveryProps, IS
 
   private pushServiceDiscoveryAssociation = () => {
     const registryAssociations = this.state.serviceDiscoveryAssociations;
-    registryAssociations.push({ registry: this.getEmptyRegistry(), containerPort: 80 });
+    registryAssociations.push({ registry: this.getEmptyRegistry(), containerPort: 80, containerName: '' });
     this.setState({ serviceDiscoveryAssociations: registryAssociations });
   };
 
