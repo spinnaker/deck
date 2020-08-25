@@ -1,5 +1,5 @@
 import { validate } from './shrinkClusterValidators';
-import { Registry, IStageTypeConfig } from '@spinnaker/core';
+import { Registry } from '@spinnaker/core';
 import { ShrinkClusterConfig } from './ShrinkClusterConfig';
 
 Registry.pipeline.registerStage({
@@ -8,4 +8,4 @@ Registry.pipeline.registerStage({
   cloudProvider: 'tencentcloud',
   component: ShrinkClusterConfig,
   validateFn: validate,
-} as IStageTypeConfig);
+});
