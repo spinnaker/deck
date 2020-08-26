@@ -41,6 +41,7 @@ export class ServiceDiscovery extends React.Component<IServiceDiscoveryProps, IS
         cmd.backingData && cmd.backingData.filtered ? cmd.backingData.filtered.serviceDiscoveryRegistries : [],
       useTaskDefinitionArtifact: cmd.useTaskDefinitionArtifact,
     };
+
     if (!this.state.useTaskDefinitionArtifact) {
       this.state.serviceDiscoveryAssociations.forEach(serviceDiscoveryRegistryAssociation => {
         serviceDiscoveryRegistryAssociation.containerName = null
