@@ -39,13 +39,12 @@ export class ServiceDiscovery extends React.Component<IServiceDiscoveryProps, IS
       serviceDiscoveryAssociations: cmd.serviceDiscoveryAssociations,
       serviceDiscoveryRegistriesAvailable:
         cmd.backingData && cmd.backingData.filtered ? cmd.backingData.filtered.serviceDiscoveryRegistries : [],
-      useTaskDefinitionArtifact: cmd.useTaskDefinitionArtifact ? true : false,
+      useTaskDefinitionArtifact: cmd.useTaskDefinitionArtifact,
     };
-
-    if(!this.state.useTaskDefinitionArtifact){
-      for(let i = 0; i < cmd.serviceDiscoveryAssociations.length; i++){
-        cmd.serviceDiscoveryAssociations[i].containerName = null;
-      }
+    if (!this.state.useTaskDefinitionArtifact) {
+      this.state.serviceDiscoveryAssociations.forEach(serviceDiscoveryRegistryAssociation => {
+        serviceDiscoveryRegistryAssociation.containerName = null
+      });
     }
   }
 
@@ -100,7 +99,7 @@ export class ServiceDiscovery extends React.Component<IServiceDiscoveryProps, IS
     this.setState({ serviceDiscoveryAssociations: currentAssociations });
   };
 
-  private updateContainerMappingName = (index: number, targetContainerName: string) => {
+  private updateServiceDiscoveryContainerName = (index: number, targetContainerName: string) => {
     const currentAssociations = this.state.serviceDiscoveryAssociations;
     const targetAssociations = currentAssociations[index];
     targetAssociations.containerName = targetContainerName;
@@ -125,7 +124,7 @@ export class ServiceDiscovery extends React.Component<IServiceDiscoveryProps, IS
     const removeServiceDiscoveryAssociation = this.removeServiceDiscoveryAssociations;
     const updateServiceDiscoveryRegistry = this.updateServiceDiscoveryRegistry;
     const updateServiceDiscoveryPort = this.updateServiceDiscoveryPort;
-    const updateContainerMappingName = this.updateContainerMappingName;
+    const updateServiceDiscoveryContainerName = this.updateServiceDiscoveryContainerName;
 
     const registriesAvailable = this.state.serviceDiscoveryRegistriesAvailable.map(function(registry) {
       return { label: `${registry.displayName}`, value: registry.displayName };
@@ -142,7 +141,7 @@ export class ServiceDiscovery extends React.Component<IServiceDiscoveryProps, IS
               placeholder="Enter a container name ..."
               required={true}
               value={mapping.containerName}
-              onChange={e => updateContainerMappingName(index, e.target.value)}
+              onChange={e => updateServiceDiscoveryContainerName(index, e.target.value)}
             />
           </td>
           }
@@ -187,6 +186,7 @@ export class ServiceDiscovery extends React.Component<IServiceDiscoveryProps, IS
         <Alert color="warning">No registries found in the selected account/region/VPC</Alert>
       </div>
     );
+
     return (
       <div className="container-fluid form-horizontal">
         <div className="form-group">
