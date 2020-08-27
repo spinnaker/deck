@@ -58,6 +58,7 @@ export const ConfigFileArtifactList = (props: IConfigFileArtifactListProps) => {
               <StageArtifactSelector
                 artifact={a.artifact}
                 excludedArtifactTypePatterns={[]}
+                expectedArtifactId={a.artifact == null ? a.id : null}
                 onArtifactEdited={(artifact: IArtifact) => {
                   onExpectedArtifactEdited(artifact, i);
                 }}

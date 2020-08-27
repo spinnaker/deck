@@ -28,7 +28,7 @@ class ConfigArtifact implements IArtifactAccountPair {
 
   constructor($scope: IScope, pair: IArtifactAccountPair = { id: '', account: '' }) {
     const unserializable = { configurable: false, enumerable: false, writable: false };
-    this.id = null;
+    this.id = pair?.id;
     this.account = pair.account || pair?.artifact?.artifactAccount;
     this.artifact = pair?.artifact;
     Object.defineProperty(this, '$scope', { ...unserializable, value: $scope });
