@@ -78,6 +78,15 @@ angular
         }, []);
       }
 
+      function extractBackendServices(asg) {
+        return ['backend-service-names', 'region-backend-service-names'].reduce((backendServices, property) => {
+          if (asg[property]) {
+            backendServices = backendServices.concat(asg[property]);
+          }
+          return backendServices;
+        }, []);
+      }
+
       function extractLoadBalancersFromMetadata(metadata) {
         return ['load-balancer-names', 'global-load-balancer-names'].reduce((loadBalancers, property) => {
           if (metadata[property]) {
@@ -423,7 +432,7 @@ angular
           credentials: serverGroup.account,
           loadBalancers: extractLoadBalancers(serverGroup.asg),
           loadBalancingPolicy: _.cloneDeep(serverGroup.loadBalancingPolicy),
-          backendServiceMetadata: serverGroup.asg['backend-service-names'],
+          backendServiceMetadata: extractBackendServices(serverGroup.asg),
           securityGroups: serverGroup.securityGroups,
           region: serverGroup.region,
           capacity: {
@@ -567,6 +576,12 @@ angular
             extendedCommand.backendServiceMetadata = instanceMetadata['backend-service-names']
               ? instanceMetadata['backend-service-names'].split(',')
               : [];
+
+            if (instanceMetadata['region-backend-service-names']) {
+              extendedCommand.backendServiceMetadata = extendedCommand.backendServiceMetadata.concat(
+                instanceMetadata['region-backend-service-names'].split(','),
+              );
+            }
             extendedCommand.minCpuPlatform = pipelineCluster.minCpuPlatform || '(Automatic)';
             extendedCommand.instanceMetadata = {};
             populateCustomMetadata(instanceMetadata, extendedCommand);
