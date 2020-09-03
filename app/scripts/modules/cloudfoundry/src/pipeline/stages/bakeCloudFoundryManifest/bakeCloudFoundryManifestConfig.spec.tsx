@@ -45,10 +45,13 @@ describe('Bake Cloud Foundry Form Validators', () => {
           id: 'abc123',
           matchArtifact: {
             type: 'embedded/base64',
+            id: 'abc123',
           },
           usePriorArtifact: false,
           useDefaultArtifact: true,
-          defaultArtifact: {},
+          defaultArtifact: {
+            id: 'abc123',
+          },
           displayName: 'temp',
         },
       ];
@@ -61,10 +64,13 @@ describe('Bake Cloud Foundry Form Validators', () => {
           id: 'abc123',
           matchArtifact: {
             type: 'NOTembedded/base64',
+            id: 'abc123',
           },
           usePriorArtifact: false,
           useDefaultArtifact: true,
-          defaultArtifact: {},
+          defaultArtifact: {
+            id: 'abc123',
+          },
           displayName: 'temp',
         },
       ];
