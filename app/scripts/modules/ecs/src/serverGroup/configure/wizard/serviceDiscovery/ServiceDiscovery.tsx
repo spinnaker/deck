@@ -201,7 +201,7 @@ export class ServiceDiscovery extends React.Component<IServiceDiscoveryProps, IS
                 <tr>
                   {useTaskDefinitionArtifact && <th style={{ width: '30%' }}>
                     Container name
-                    <HelpField id="ecs.loadBalancedContainer" />
+                    <HelpField id="ecs.serviceDiscoveryContainerName" />
                   </th> }
                   {useTaskDefinitionArtifact ?
                     <th style={{ width: '55%' }}>
