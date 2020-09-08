@@ -54,7 +54,12 @@ export const SpinnakerHeaderContent = () => {
   return (
     <nav className="container spinnaker-header" role="navigation" aria-label="Main Menu">
       <div className="navbar-header horizontal middle">
-        <div onClick={toggleNav} className="sp-margin-xl-right navbar-menu-icon">
+        <div
+          onClick={toggleNav}
+          className={`nav-container navbar-menu-icon horizontal middle center sp-margin-xl-right ${
+            isApplicationView ? 'app-view-menu' : ''
+          }`}
+        >
           {isApplicationView && <Icon name={verticalNavExpanded ? 'menuClose' : 'menu'} size="medium" color="white" />}
         </div>
         <a className="navbar-brand flex-1" href="#">

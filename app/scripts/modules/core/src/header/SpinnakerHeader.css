@@ -13,6 +13,14 @@
 .spinnaker-header .navbar-menu-icon {
   min-width: 24px;
   cursor: pointer;
+  color: var(--color-primary);
+  width: 60px;
+  height: 40px;
+  cursor: pointer;
+}
+
+.spinnaker-header .app-view-menu {
+  background-color: var(--color-accent-g2);
 }
 
 .spinnaker-header a {
