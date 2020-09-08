@@ -76,10 +76,10 @@ export const SpinnakerHeaderContent = () => {
             <li key="navPipelineTemplates">
               <a {...templatesSref}>Pipeline Templates</a>
             </li>
+            <GlobalSearch />
           </ul>
           <ul className="nav nav-items">
             <UserMenu />
-            <GlobalSearch />
             <HelpMenu />
           </ul>
         </div>
