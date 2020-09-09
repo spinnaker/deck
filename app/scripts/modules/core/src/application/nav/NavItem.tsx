@@ -26,9 +26,11 @@ export const NavItem = ({ app, dataSource, isActive }: INavItemProps) => {
   useDataSource(dataSource);
   const tags: IEntityTags[] = alerts || [];
 
+  const badgeClassNames = runningCount ? 'badge-running-count' : 'badge-none';
+
   return (
     <div className="nav-category flex-container-h middle sp-padding-s-yaxis">
-      <div className={runningCount ? 'badge-running-count' : ''}>{runningCount > 0 ? runningCount : ''}</div>
+      <div className={badgeClassNames}>{runningCount > 0 ? runningCount : ''}</div>
       <div className="nav-row-item">
         {iconName &&
           (!isExpanded ? (

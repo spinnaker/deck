@@ -60,7 +60,9 @@ export const SpinnakerHeaderContent = () => {
             isApplicationView ? 'app-view-menu' : ''
           }`}
         >
-          {isApplicationView && <Icon name={verticalNavExpanded ? 'menuClose' : 'menu'} size="medium" color="white" />}
+          {isApplicationView && (
+            <Icon name={verticalNavExpanded ? 'menuClose' : 'menu'} size="medium" color="primary" />
+          )}
         </div>
         <a className="navbar-brand flex-1" href="#">
           SPINNAKER

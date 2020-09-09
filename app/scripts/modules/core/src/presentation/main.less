@@ -291,10 +291,8 @@ html {
     height: 100%;
     width: 390px;
     box-shadow: 2px 2px 6px -1px var(--color-alto);
-
-    @media (max-width: 1700px) {
-      right: 0;
-    }
+    right: 0;
+    overflow-y: hidden;
 
     @media (max-width: 390px) {
       width: 100%;
@@ -307,11 +305,10 @@ html {
   }
   .nav-content {
     margin-right: 25px;
-    max-width: 1000px;
+    max-width: calc(~'100% - 390px');
 
-    @media (max-width: 1440px) {
-      min-width: 640px;
-      max-width: 800px;
+    @media (max-width: 1740px) {
+      max-width: 100%;
     }
   }
   .full-content {
