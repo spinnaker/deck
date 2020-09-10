@@ -37,7 +37,7 @@ export const viewConfigurationByStatus: { [status in ManagedResourceStatus]: IVi
     popoverContents: (resourceSummary: IManagedResourceSummary) => (
       <>
         <p>
-          <b>Spinnaker is taking action to resolve a drift from this resource's desired state.</b>
+          <b>Spinnaker is taking action to resolve a difference from this resource's desired state.</b>
         </p>
         <p>
           You can click History to see more. <LearnMoreLink resourceSummary={resourceSummary} />
@@ -54,7 +54,7 @@ export const viewConfigurationByStatus: { [status in ManagedResourceStatus]: IVi
           <b>Spinnaker has started managing this resource.</b>
         </p>
         <p>
-          If a drift from the desired state is detected, Spinnaker will automatically act to correct it.{' '}
+          If a difference from the desired state is detected, Spinnaker will act to correct it.{' '}
           <LearnMoreLink resourceSummary={resourceSummary} />
         </p>
       </>
@@ -66,7 +66,7 @@ export const viewConfigurationByStatus: { [status in ManagedResourceStatus]: IVi
     popoverContents: (resourceSummary: IManagedResourceSummary) => (
       <>
         <p>
-          <b>Spinnaker detected a drift from the desired state.</b>
+          <b>Spinnaker detected a difference from the desired state.</b>
         </p>
         <p>
           In a moment, Spinnaker will take action to bring this resource back to its desired state. You can click
@@ -134,7 +134,7 @@ export const viewConfigurationByStatus: { [status in ManagedResourceStatus]: IVi
           <b>Spinnaker is managing this resource.</b>
         </p>
         <p>
-          If a drift from the desired state is detected, Spinnaker will automatically act to correct it.{' '}
+          If a difference from the desired state is detected, Spinnaker will act to correct it.{' '}
           <LearnMoreLink resourceSummary={resourceSummary} />
         </p>
       </>
@@ -172,7 +172,7 @@ export const viewConfigurationByStatus: { [status in ManagedResourceStatus]: IVi
           <b>Management was just resumed.</b>
         </p>
         <p>
-          Management was resumed after being temporarily paused. If Spinnaker detects that a drift from the desired
+          Management was resumed after being temporarily paused. If Spinnaker detects that a difference from the desired
           state occurred while paused, it will act to correct it. <LearnMoreLink resourceSummary={resourceSummary} />
         </p>
       </>
@@ -184,11 +184,11 @@ export const viewConfigurationByStatus: { [status in ManagedResourceStatus]: IVi
     popoverContents: (resourceSummary: IManagedResourceSummary) => (
       <>
         <p>
-          <b>Spinnaker detected a drift from the desired state, but hasn't been able to correct it.</b>
+          <b>Spinnaker detected a difference from the desired state, but hasn't been able to correct it.</b>
         </p>
         <p>
-          Spinnaker has been trying to correct a drift, but taking action hasn't helped. Manual intervention might be
-          required. You can click History to see more. <LearnMoreLink resourceSummary={resourceSummary} />
+          Spinnaker has been trying to correct a difference, but taking action hasn't helped. Manual intervention might
+          be required. You can click History to see more. <LearnMoreLink resourceSummary={resourceSummary} />
         </p>
       </>
     ),

@@ -43,7 +43,7 @@ export const ManagedResourceDetailsIndicator = ({
         <b>Spinnaker is managing this resource.</b>
       </p>
       <p>
-        If a drift from the desired state is detected, Spinnaker will automatically act to correct it.{' '}
+        If a difference from the desired state is detected, Spinnaker will act to correct it.{' '}
         <a
           target="_blank"
           onClick={() => logClick('Learn More', id)}
