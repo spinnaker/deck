@@ -52,6 +52,7 @@ import {
 import { KeyPairsReader } from 'amazon/keyPairs';
 import { AutoScalingProcessService } from '../details/scalingProcesses/AutoScalingProcessService';
 import { AMAZON_INSTANCE_AWSINSTANCETYPE_SERVICE } from 'amazon/instance/awsInstanceType.service';
+import { AWSProviderSettings } from 'amazon/aws.settings';
 
 export type IBlockDeviceMappingSource = 'source' | 'ami' | 'default';
 
@@ -166,7 +167,9 @@ export class AwsServerGroupConfigurationService {
       command.suspendedProcesses.includes(process);
 
     cmd.onStrategyChange = (command: IAmazonServerGroupCommand, strategy: IDeploymentStrategy): void => {
-      command.setLaunchTemplate = strategy.key === 'rollingpush' ? true : undefined;
+      if (AWSProviderSettings.serverGroups.enableLaunchTemplates) {
+        command.setLaunchTemplate = strategy.key === 'rollingpush' ? true : undefined;
+      }
 
       // Any strategy other than None or Custom should force traffic to be enabled
       if (strategy.key !== '' && strategy.key !== 'custom') {
