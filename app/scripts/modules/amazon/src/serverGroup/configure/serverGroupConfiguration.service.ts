@@ -167,7 +167,7 @@ export class AwsServerGroupConfigurationService {
       command.suspendedProcesses.includes(process);
 
     cmd.onStrategyChange = (command: IAmazonServerGroupCommand, strategy: IDeploymentStrategy): void => {
-      if (AWSProviderSettings.serverGroups.enableLaunchTemplates) {
+      if (AWSProviderSettings.serverGroups?.enableLaunchTemplates) {
         command.setLaunchTemplate = strategy.key === 'rollingpush' ? true : undefined;
       }
 
