@@ -166,6 +166,8 @@ export class AwsServerGroupConfigurationService {
       command.suspendedProcesses.includes(process);
 
     cmd.onStrategyChange = (command: IAmazonServerGroupCommand, strategy: IDeploymentStrategy): void => {
+      command.setLaunchTemplate = strategy.key === 'rollingpush' ? true : undefined;
+
       // Any strategy other than None or Custom should force traffic to be enabled
       if (strategy.key !== '' && strategy.key !== 'custom') {
         command.suspendedProcesses = (command.suspendedProcesses || []).filter(p => p !== 'AddToLoadBalancer');
