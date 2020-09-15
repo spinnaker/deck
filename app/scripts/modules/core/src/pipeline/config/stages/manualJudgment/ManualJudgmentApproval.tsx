@@ -5,6 +5,8 @@ import { IExecution, IExecutionStage } from 'core/domain';
 import { Application } from 'core/application/application.model';
 import { Markdown } from 'core/presentation/Markdown';
 import { NgReact, ReactInjector } from 'core/reactShims';
+import { ApplicationReader } from 'core/application/service/ApplicationReader';
+import { AuthenticationService } from 'core/authentication';
 
 export interface IManualJudgmentApprovalProps {
   execution: IExecution;
@@ -16,6 +18,8 @@ export interface IManualJudgmentApprovalState {
   submitting: boolean;
   judgmentDecision: string;
   judgmentInput: { value?: string };
+  applicationRoles: { READ?: string[]; WRITE?: string[]; EXECUTE?: string[]; CREATE?: string[] };
+  userRoles: string[];
   error: boolean;
 }
 
@@ -29,8 +33,25 @@ export class ManualJudgmentApproval extends React.Component<
       submitting: false,
       judgmentDecision: null,
       judgmentInput: {},
+      applicationRoles: {},
+      userRoles: [],
       error: false,
     };
+  }
+
+  public componentDidMount() {
+    const applicationName = this.props.execution.application;
+    ApplicationReader.getApplicationPermissions(applicationName).then(result => {
+      if (typeof result !== 'undefined') {
+        this.setState({
+          applicationRoles: result,
+        });
+        this.isManualJudgmentStageNotAuthorized();
+      }
+    });
+    this.setState({
+      userRoles: AuthenticationService.getAuthenticatedUser().roles,
+    });
   }
 
   private provideJudgment(judgmentDecision: string): void {
@@ -38,6 +59,32 @@ export class ManualJudgmentApproval extends React.Component<
     const judgmentInput: string = this.state.judgmentInput ? this.state.judgmentInput.value : null;
     this.setState({ submitting: true, error: false, judgmentDecision });
     ReactInjector.manualJudgmentService.provideJudgment(application, execution, stage, judgmentDecision, judgmentInput);
+  }
+
+  private isManualJudgmentStageNotAuthorized(): boolean {
+    let isStageNotAuthorized = true;
+    let usrRole;
+    const stageRoles = this.props.stage.context.selectedStageRoles || [];
+    const readArray = this.state.applicationRoles['READ'] || [];
+    const writeArray = this.state.applicationRoles['WRITE'] || [];
+    const executeArray = this.state.applicationRoles['EXECUTE'] || [];
+    const createArray = this.state.applicationRoles['CREATE'] || [];
+    const usrRoles = this.state.userRoles;
+    if (stageRoles.length === 0) {
+      isStageNotAuthorized = false;
+      return isStageNotAuthorized;
+    }
+    for (usrRole of usrRoles) {
+      if (stageRoles.includes(usrRole)) {
+        if (writeArray.includes(usrRole) || executeArray.includes(usrRole) || createArray.includes(usrRole)) {
+          isStageNotAuthorized = false;
+          return isStageNotAuthorized;
+        } else if (readArray.includes(usrRole)) {
+          isStageNotAuthorized = true;
+        }
+      }
+    }
+    return isStageNotAuthorized;
   }
 
   private isSubmitting(decision: string): boolean {
@@ -103,6 +150,7 @@ export class ManualJudgmentApproval extends React.Component<
                 className="btn btn-danger"
                 onClick={this.handleStopClick}
                 disabled={
+                  this.isManualJudgmentStageNotAuthorized() ||
                   this.state.submitting ||
                   stage.context.judgmentStatus ||
                   (options.length && !this.state.judgmentInput.value)
@@ -114,6 +162,7 @@ export class ManualJudgmentApproval extends React.Component<
               <button
                 className="btn btn-primary"
                 disabled={
+                  this.isManualJudgmentStageNotAuthorized() ||
                   this.state.submitting ||
                   stage.context.judgmentStatus ||
                   (options.length && !this.state.judgmentInput.value)
