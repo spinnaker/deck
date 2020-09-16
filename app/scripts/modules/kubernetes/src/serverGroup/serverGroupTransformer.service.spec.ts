@@ -1,11 +1,9 @@
-'use strict';
-
 import { KubernetesV2ServerGroupTransformer } from './serverGroupTransformer.service';
 import { Application } from '@spinnaker/core';
 import { IKubernetesServerGroup } from '../interfaces';
 
 describe('KubernetesV2ServerGroupTransformer', function() {
-  it('normalized server group name', async () => {
+  it('normalizes server group name', async () => {
     const transformer = new KubernetesV2ServerGroupTransformer();
     const ACCOUNT = 'myaccount';
     const LOCATION = 'myns';
@@ -13,7 +11,7 @@ describe('KubernetesV2ServerGroupTransformer', function() {
     const KIND = 'daemonSet';
 
     const sgMgrRef = { account: ACCOUNT, location: LOCATION, name: SG_MANAGER };
-    const sgAccount: IKubernetesServerGroup = ({
+    const sgAccount = ({
       account: ACCOUNT,
       name: 'myservergroup',
       region: LOCATION,
@@ -35,7 +33,7 @@ describe('KubernetesV2ServerGroupTransformer', function() {
     expect(sgMgrRef.name).toBe('daemonSet sgmanager');
   });
 
-  it('normalized server group different account', async () => {
+  it('does not normalize server group if different account', async () => {
     const transformer = new KubernetesV2ServerGroupTransformer();
     const ACCOUNT = 'myaccount';
     const ACCOUNT2 = 'account2';
