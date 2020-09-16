@@ -114,7 +114,7 @@ export const ManagedResourceDetailsIndicator = ({
               <a
                 target="_blank"
                 onClick={() => logClick('Raw Source', id)}
-                href={`${SETTINGS.gateUrl}/managed/resources/${id}`}
+                href={`${SETTINGS.gateUrl}/managed/resources/${id}.yml`}
               >
                 Raw Source
               </a>
