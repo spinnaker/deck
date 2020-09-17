@@ -5,13 +5,14 @@
   "module": "build/dist/index.js",
   "scripts": {
     "clean": "npx shx rm -rf build",
-    "build": "rollup -c",
-    "watch": "rollup -c -w",
-    "postinstall": "check-plugin && check-peer-dependencies || true"
+    "develop": "run-p watch proxy",
+    "build": "npm run clean && rollup -c",
+    "postinstall": "check-plugin && check-peer-dependencies || true",
+    "proxy": "dev-proxy",
+    "watch": "rollup -c -w --no-watch.clearScreen"
   },
   "dependencies": {
     "@spinnaker/pluginsdk": "latest"
   },
-  "devDependencies": {
-  }
+  "devDependencies": {}
 }
