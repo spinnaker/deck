@@ -5,7 +5,7 @@ import { UIRouterContextComponent } from '@uirouter/react-hybrid';
 import { AccountTag, LabeledValue, timestamp } from '@spinnaker/core';
 
 export interface IInstanceInformationProps {
-  accountId: string;
+  account: string;
   availabilityZone: string;
   customInfo?: React.Component;
   instanceType: string;
@@ -16,7 +16,7 @@ export interface IInstanceInformationProps {
 }
 
 export const InstanceInformation = ({
-  accountId,
+  account,
   availabilityZone,
   instanceType,
   launchTime,
@@ -30,7 +30,7 @@ export const InstanceInformation = ({
       label="In"
       value={
         <div>
-          <AccountTag account={accountId} />
+          <AccountTag account={account} />
           {availabilityZone || 'Unknown'}
         </div>
       }
@@ -38,7 +38,7 @@ export const InstanceInformation = ({
     <LabeledValue label="Type" value={instanceType || 'Unknown'} />
     {serverGroup && (
       <LabeledValue
-        label="ServerGroup"
+        label="Server Group"
         value={
           <div>
             <UIRouterContextComponent>
@@ -46,7 +46,7 @@ export const InstanceInformation = ({
                 to="^.serverGroup"
                 params={{
                   region,
-                  accountId,
+                  accountId: account,
                   serverGroup,
                   provider,
                 }}

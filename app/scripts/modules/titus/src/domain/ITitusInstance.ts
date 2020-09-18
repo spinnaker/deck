@@ -1,6 +1,6 @@
-import { IAmazonInstance } from '@spinnaker/amazon';
+import { IInstance } from '@spinnaker/core';
 
-export interface ITitusInstance extends IAmazonInstance {
+export interface ITitusInstance extends IInstance {
   instanceType?: string;
   jobId?: string;
 }

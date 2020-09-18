@@ -14,7 +14,7 @@ export const AmazonInstanceInformation = ({ instance }: IAmazonInstanceInformati
     <CollapsibleSection heading="Instance Information" defaultExpanded={true}>
       <dl className="dl-horizontal dl-narrow">
         <InstanceInformation
-          accountId={instance.account}
+          account={instance.account}
           availabilityZone={instance.availabilityZone}
           instanceType={instance.instanceType}
           launchTime={instance.launchTime}
