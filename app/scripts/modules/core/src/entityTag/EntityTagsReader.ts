@@ -18,8 +18,9 @@ import { SETTINGS } from 'core/config/settings';
 
 export class EntityTagsReader {
   public static getAllEntityTagsForApplication(application: string): IPromise<IEntityTags[]> {
+    const encodedAppName = encodeURIComponent(application);
     return API.one('tags')
-      .withParams({ maxResults: SETTINGS.entityTags.maxResults || 5000, application })
+      .withParams({ maxResults: SETTINGS.entityTags.maxResults || 5000, encodedAppName })
       .getList()
       .then((allTags: IEntityTags[]) => this.flattenTagsAndAddMetadata(allTags));
   }

@@ -44,7 +44,7 @@ export class ExecutionInformationService {
       Promise.resolve(pipelineConfig);
     }
 
-    return API.one('applications', application, 'pipelineConfigs')
+    return API.one('applications', encodeURIComponent(application), 'pipelineConfigs')
       .get()
       .then((pipelineConfigs: IPipeline[]) => {
         // store for later

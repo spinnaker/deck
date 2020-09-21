@@ -47,7 +47,7 @@ export function CopyStageModal(props: ICopyStageModalProps) {
     const configType = forStrategyConfig ? 'strategyConfigs' : 'pipelineConfigs';
 
     return API.one('applications')
-      .one(applicationName)
+      .one(encodeURIComponent(applicationName))
       .all(configType)
       .getList()
       .then((configs: Array<IPipeline | IStrategy>) => {

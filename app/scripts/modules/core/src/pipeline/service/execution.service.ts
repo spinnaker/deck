@@ -57,7 +57,7 @@ export class ExecutionService {
     const statusString = statuses.map(status => status.toUpperCase()).join(',') || null;
     const call = pipelineConfigIds
       ? API.all('executions').getList({ limit, pipelineConfigIds, statuses })
-      : API.one('applications', applicationName)
+      : API.one('applications', encodeURIComponent(applicationName))
           .all('pipelines')
           .getList({ limit, statuses: statusString, pipelineConfigIds, expand });
 
@@ -107,7 +107,7 @@ export class ExecutionService {
         execution.hydrated = true;
         this.cleanExecutionForDiffing(execution);
         if (application && name) {
-          return API.one('applications', application, 'pipelineConfigs', encodeURIComponent(name))
+          return API.one('applications', encodeURIComponent(application), 'pipelineConfigs', encodeURIComponent(name))
             .get()
             .then((pipelineConfig: IPipeline) => {
               execution.pipelineConfig = pipelineConfig;

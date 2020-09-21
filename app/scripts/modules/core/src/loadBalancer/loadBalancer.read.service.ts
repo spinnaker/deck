@@ -21,7 +21,7 @@ export class LoadBalancerReader {
   public constructor(private $q: IQService, private loadBalancerTransformer: any) {}
 
   public loadLoadBalancers(applicationName: string): IPromise<ILoadBalancerSourceData[]> {
-    return API.one('applications', applicationName)
+    return API.one('applications', encodeURIComponent(applicationName))
       .all('loadBalancers')
       .getList()
       .then((loadBalancers: ILoadBalancerSourceData[]) => {

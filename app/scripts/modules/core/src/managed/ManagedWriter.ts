@@ -35,7 +35,7 @@ export class ManagedWriter {
     comment,
   }: IArtifactVersionRequest): IPromise<void> {
     return API.one('managed')
-      .one('application', application)
+      .one('application', encodeURIComponent(application))
       .one('pin')
       .post({
         targetEnvironment: environment,
@@ -51,7 +51,7 @@ export class ManagedWriter {
     reference,
   }: IUnpinArtifactVersionRequest): IPromise<void> {
     return API.one('managed')
-      .one('application', application)
+      .one('application', encodeURIComponent(application))
       .one('pin')
       .one(environment)
       .withParams({ reference })
@@ -66,7 +66,7 @@ export class ManagedWriter {
     comment,
   }: IArtifactVersionRequest): IPromise<void> {
     return API.one('managed')
-      .one('application', application)
+      .one('application', encodeURIComponent(application))
       .one('veto')
       .post({
         targetEnvironment: environment,
@@ -85,7 +85,7 @@ export class ManagedWriter {
     status,
   }: IUpdateConstraintStatusRequest): IPromise<void> {
     return API.one('managed')
-      .one('application', application)
+      .one('application', encodeURIComponent(application))
       .one('environment', environment)
       .one('constraint')
       .post({
@@ -98,14 +98,14 @@ export class ManagedWriter {
 
   public static pauseApplicationManagement(applicationName: string): IPromise<void> {
     return API.one('managed')
-      .one('application', applicationName)
+      .one('application', encodeURIComponent(applicationName))
       .one('pause')
       .post();
   }
 
   public static resumeApplicationManagement(applicationName: string): IPromise<void> {
     return API.one('managed')
-      .one('application', applicationName)
+      .one('application', encodeURIComponent(applicationName))
       .one('pause')
       .remove();
   }

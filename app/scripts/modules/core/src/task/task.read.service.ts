@@ -10,7 +10,7 @@ export class TaskReader {
   private static activeStatuses: string[] = ['RUNNING', 'SUSPENDED', 'NOT_STARTED'];
 
   public static getTasks(applicationName: string, statuses: string[] = []): IPromise<ITask[]> {
-    return API.one('applications', applicationName)
+    return API.one('applications', encodeURIComponent(applicationName))
       .all('tasks')
       .getList({ statuses: statuses.join(',') })
       .then((tasks: ITask[]) => {

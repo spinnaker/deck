@@ -8,7 +8,7 @@ import { IServerGroup } from 'core/domain';
 export class ServerGroupReader {
   public static getScalingActivities(serverGroup: IServerGroup): IPromise<any[]> {
     return API.one('applications')
-      .one(serverGroup.app)
+      .one(encodeURIComponent(serverGroup.app))
       .all('clusters')
       .all(serverGroup.account)
       .all(serverGroup.cluster)
@@ -32,7 +32,7 @@ export class ServerGroupReader {
     serverGroupName: string,
   ): IPromise<IServerGroup> {
     return API.one('applications')
-      .one(application)
+      .one(encodeURIComponent(application))
       .all('serverGroups')
       .all(account)
       .all(region)

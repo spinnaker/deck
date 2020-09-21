@@ -22,7 +22,7 @@ export class PipelineConfigService {
 
   public static getPipelinesForApplication(applicationName: string): IPromise<IPipeline[]> {
     return API.one('applications')
-      .one(applicationName)
+      .one(encodeURIComponent(applicationName))
       .all('pipelineConfigs')
       .getList()
       .then((pipelines: IPipeline[]) => {
@@ -33,7 +33,7 @@ export class PipelineConfigService {
 
   public static getStrategiesForApplication(applicationName: string): IPromise<IPipeline[]> {
     return API.one('applications')
-      .one(applicationName)
+      .one(encodeURIComponent(applicationName))
       .all('strategyConfigs')
       .getList()
       .then((pipelines: IPipeline[]) => {
@@ -52,7 +52,7 @@ export class PipelineConfigService {
 
   public static deletePipeline(applicationName: string, pipeline: IPipeline, pipelineName: string): IPromise<void> {
     return API.one(pipeline.strategy ? 'strategies' : 'pipelines')
-      .one(applicationName, encodeURIComponent(pipelineName.trim()))
+      .one(encodeURIComponent(applicationName), encodeURIComponent(pipelineName.trim()))
       .remove();
   }
 

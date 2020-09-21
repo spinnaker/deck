@@ -84,7 +84,7 @@ export class ManagedReader {
 
   public static getApplicationSummary(app: string): IPromise<IManagedApplicationSummary<'resources'>> {
     return API.one('managed')
-      .one('application', app)
+      .one('application', encodeURIComponent(app))
       .withParams({ entities: 'resources' })
       .get()
       .then(this.decorateResources);
@@ -92,7 +92,7 @@ export class ManagedReader {
 
   public static getEnvironmentsSummary(app: string): IPromise<IManagedApplicationEnvironmentSummary> {
     return API.one('managed')
-      .one('application', app)
+      .one('application', encodeURIComponent(app))
       .withParams({ entities: ['resources', 'artifacts', 'environments'] })
       .get()
       .then(this.decorateResources);

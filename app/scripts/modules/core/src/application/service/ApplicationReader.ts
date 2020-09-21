@@ -32,7 +32,7 @@ export class ApplicationReader {
   }
 
   public static getApplicationAttributes(name: string): IPromise<any> {
-    return API.one('applications', name)
+    return API.one('applications', encodeURIComponent(name))
       .withParams({ expand: false })
       .get()
       .then((fromServer: Application) => {
@@ -42,7 +42,7 @@ export class ApplicationReader {
   }
 
   public static getApplication(name: string, expand = true): IPromise<Application> {
-    return API.one('applications', name)
+    return API.one('applications', encodeURIComponent(name))
       .withParams({ expand: expand })
       .get()
       .then((fromServer: Application) => {

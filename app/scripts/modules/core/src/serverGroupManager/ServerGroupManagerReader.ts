@@ -7,7 +7,7 @@ import { IServerGroupManager } from 'core/domain/IServerGroupManager';
 export class ServerGroupManagerReader {
   public static getServerGroupManagersForApplication(application: string): IPromise<IServerGroupManager[]> {
     return API.one('applications')
-      .one(application)
+      .one(encodeURIComponent(application))
       .one('serverGroupManagers')
       .get();
   }

@@ -11,7 +11,7 @@ export interface IAppNotifications {
 export class AppNotificationsService {
   public static getNotificationsForApplication(applicationName: string): IPromise<IAppNotifications> {
     return API.one('notifications')
-      .one('application', applicationName)
+      .one('application', encodeURIComponent(applicationName))
       .get();
   }
 
@@ -20,7 +20,7 @@ export class AppNotificationsService {
     notifications: IAppNotifications,
   ): IPromise<void> {
     return API.one('notifications')
-      .one('application', applicationName)
+      .one('application', encodeURIComponent(applicationName))
       .data(notifications)
       .post();
   }

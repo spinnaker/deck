@@ -21,7 +21,7 @@ export class FunctionReader {
   public constructor(private functionTransformer: IFunctionTransformer) {}
 
   public loadFunctions(applicationName: string): IPromise<IFunctionSourceData[]> {
-    return API.one('applications', applicationName)
+    return API.one('applications', encodeURIComponent(applicationName))
       .all('functions')
       .getList()
       .then((functions: IFunctionSourceData[]) => {
