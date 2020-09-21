@@ -1517,10 +1517,10 @@
   dependencies:
     lodash "^4.17.15"
 
-"@spinnaker/kayenta@^0.0.100":
-  version "0.0.100"
-  resolved "https://registry.yarnpkg.com/@spinnaker/kayenta/-/kayenta-0.0.100.tgz#3ec0ce30bf2e32a71f6745a05824e2ee3b1e2f55"
-  integrity sha512-Z0GQ5w1TlzDg+vGkEYzS1sOh9MSeqigS4n9wr65P22A2kiwQdGzAS2/fpJSOXt7B15LQfID0hzdCtia+0DvDpQ==
+"@spinnaker/kayenta@^0.0.102":
+  version "0.0.102"
+  resolved "https://registry.yarnpkg.com/@spinnaker/kayenta/-/kayenta-0.0.102.tgz#4cf71f510314cc5fd440aedb0b1308411f3ea5ea"
+  integrity sha512-v9QYFFuI5gBu9+1vqO0lbCqYAoRmQ5KTtbsCBFPB2IF+BI2J/yKnC6b6e89aI1kl68te/dswCvA2O8BBuTKmuQ==
   dependencies:
     "@fortawesome/fontawesome-free" "5.5.0"
     "@uirouter/angularjs" "1.0.26"
@@ -1544,13 +1544,13 @@
     moment-timezone "^0.4.0"
     n3-charts "^2.0.28"
     ngimport "^0.6.0"
-    react "~16.8.0"
+    react "~16.13.1"
     react-ace "6.4.0"
     react-bootstrap "^0.32.1"
     react-bootstrap-typeahead "^3.2.4"
     react-container-dimensions "^1.4.1"
     react-day-picker "~7.3.0"
-    react-dom "~16.8.0"
+    react-dom "~16.13.1"
     react-ga "^2.4.1"
     react-redux "^5.0.7"
     react-select "^1.2.1"
@@ -14328,7 +14328,7 @@ react-dom@^0.14.8:
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-0.14.9.tgz#05064a3dcf0fb1880a3b2bfc9d58c55d8d9f6293"
   integrity sha1-BQZKPc8PsYgKOyv8nVjFXY2fYpM=
 
-react-dom@^16.8.3:
+react-dom@^16.8.3, react-dom@~16.13.1:
   version "16.13.1"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.13.1.tgz#c1bd37331a0486c078ee54c4740720993b2e0e7f"
   integrity sha512-81PIMmVLnCNLO/fFOQxdQkvEq/+Hfpv24XNJfpyZhTRfO0QcmQIF/PgCa1zCOj2w1hrn12MFLyaJ/G0+Mxtfag==
@@ -14669,7 +14669,7 @@ react@^0.14.8:
     envify "^3.0.0"
     fbjs "^0.6.1"
 
-"react@^15.6.2 || ^16.0", react@^16.8.3:
+"react@^15.6.2 || ^16.0", react@^16.8.3, react@~16.13.1:
   version "16.13.1"
   resolved "https://registry.yarnpkg.com/react/-/react-16.13.1.tgz#2e818822f1a9743122c063d6410d85c1e3afe48e"
   integrity sha512-YMZQQq32xHLX0bz5Mnibv1/LHb3Sqzngu7xstSM+vrkE5Kzr9xE0yMByK5kMoTK30YVJE61WfbxIFFvfeDKT1w==
