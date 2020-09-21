@@ -11,6 +11,7 @@ export interface IGCEProviderSettings extends IProviderSettings {
   };
   feature: {
     predictiveAutoscaling?: boolean;
+    statefulMigsEnabled?: boolean;
   };
 }
 
