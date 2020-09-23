@@ -17,6 +17,7 @@ export interface INotificationSettings {
   email: { enabled: boolean };
   githubStatus: { enabled: boolean };
   googlechat: { enabled: boolean };
+  microsoftteams: { enabled: boolean };
   pubsub: { enabled: boolean };
   slack: { botName: string; enabled: boolean };
   sms: { enabled: boolean };
@@ -31,7 +32,6 @@ export interface IFeatures {
   entityTags?: boolean;
   executionMarkerInformationModal?: boolean;
   fiatEnabled?: boolean;
-  gceStatefulMigsEnabled?: boolean;
   iapRefresherEnabled?: boolean;
   managedDelivery?: boolean;
   managedServiceAccounts?: boolean;
