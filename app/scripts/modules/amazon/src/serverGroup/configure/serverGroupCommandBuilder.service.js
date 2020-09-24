@@ -110,7 +110,14 @@ angular
             }
 
             if (AWSProviderSettings.serverGroups && AWSProviderSettings.serverGroups.enableIMDSv2) {
-              command.requireIMDSv2 = true;
+              /**
+               * Older SDKs do not support IMDSv2. A timestamp can be optionally configured at which any apps created after can safely default to using IMDSv2.
+               */
+              const appAgeRequirement = AWSProviderSettings.serverGroups.defaultIMDSv2AppAgeLimit;
+              const creationDate = application.attributes.createTs;
+
+              command.requireIMDSv2 =
+                appAgeRequirement && creationDate && Number(creationDate) > appAgeRequirement ? true : false;
             }
 
             return command;
@@ -345,24 +352,22 @@ angular
               launchTemplateData.instanceMarketOptions &&
               launchTemplateData.instanceMarketOptions.spotOptions &&
               launchTemplateData.instanceMarketOptions.spotOptions.maxPrice;
-            const ipv6Addresses = _.flatMap(launchTemplateData.networkInterfaces, i => i.ipv6Addresses) || [];
+            const { ipv6AddressCount } = launchTemplateData.networkInterfaces[0];
 
             angular.extend(command, {
               instanceType: launchTemplateData.instanceType,
               iamRole: launchTemplateData.iamInstanceProfile.name,
               keyPair: launchTemplateData.keyName,
-              associateIPv6Address: ipv6Addresses.length > 0,
+              associateIPv6Address: Boolean(ipv6AddressCount),
               ramdiskId: launchTemplateData.ramdiskId,
               instanceMonitoring: launchTemplateData.monitoring.enabled,
               ebsOptimized: launchTemplateData.ebsOptimized,
               spotPrice: maxPrice || undefined,
-              requireIMDSv2:
+              requireIMDSv2: Boolean(
                 launchTemplateData.metadataOptions && launchTemplateData.metadataOptions.httpsTokens === 'required',
+              ),
             });
 
-            if (launchTemplateData.userData) {
-              command.base64UserData = launchTemplateData.userData;
-            }
             command.viewState.imageId = launchTemplateData.imageId;
           }
 

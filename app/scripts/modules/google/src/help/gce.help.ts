@@ -56,6 +56,8 @@ const helpContents: { [key: string]: string } = {
   'gce.instanceType.32core':
     '<p>32-core machine types are in Beta and are available only in Ivy Bridge and Haswell zones.</p>',
   'gce.internalLoadBalancer.ports': 'Use a comma to separate up to five TCP ports.',
+  'gce.internalHttpLoadBalancer.network':
+    "Network must have a subnet whose 'purpose' is 'INTERNAL_HTTPS_LOAD_BALANCER'",
   'gce.loadBalancer.connectionDraining':
     '(Optional) If set, enables connection draining for this backend service. This field defines the number of seconds to wait before instances that belong to this backend service are terminated in order to drain in-flight connections.',
   'gce.loadBalancer.detail':
@@ -91,6 +93,8 @@ const helpContents: { [key: string]: string } = {
     'How long to wait before collecting information from a new instance. This should be at least the time it takes to initialize the instance.',
   'gce.serverGroup.scalingPolicy.cpuUtilization':
     'Autoscaler adds or removes instances to maintain this CPU usage on each instance.',
+  'gce.serverGroup.scalingPolicy.predictiveAutoscaling':
+    'Autoscaler adds or removes instances based on forecasted load. You must set a CPU utilization target to enable predictive autoscaling.',
   'gce.serverGroup.scalingPolicy.loadBalancingUtilization':
     'Autoscaler adds or removes instances to maintain this usage of load-balancing capacity.',
   'gce.serverGroup.scalingPolicy.customMetricUtilizations':

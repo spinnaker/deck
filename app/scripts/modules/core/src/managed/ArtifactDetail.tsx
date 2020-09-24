@@ -20,12 +20,12 @@ import { showMarkArtifactAsBadModal } from './MarkArtifactAsBadModal';
 
 import { ConstraintCard } from './constraints/ConstraintCard';
 import { isConstraintSupported } from './constraints/constraintRegistry';
+import { isResourceKindSupported } from './resources/resourceRegistry';
 
 import './ArtifactDetail.less';
 
 function shouldDisplayResource(reference: string, resource: IManagedResourceSummary) {
-  //TODO: naively filter on presence of moniker but how should we really decide what to display?
-  return !!resource.moniker && reference === resource.artifact?.reference;
+  return isResourceKindSupported(resource.kind) && reference === resource.artifact?.reference;
 }
 
 const inStyles = {
@@ -134,6 +134,7 @@ const EnvironmentCards = memo(
               key={constraint.type}
               application={application}
               environment={environmentName}
+              reference={reference}
               version={versionDetails.version}
               constraint={constraint}
             />
@@ -163,6 +164,12 @@ const EnvironmentCards = memo(
   },
 );
 
+const VersionMetadataItem = ({ label, value }: { label: string; value: JSX.Element | string }) => (
+  <div className="flex-container-h sp-margin-xs-bottom">
+    <div className="metadata-label text-bold text-right sp-margin-l-right flex-none">{label}</div> <span>{value}</span>
+  </div>
+);
+
 export interface IArtifactDetailProps {
   application: Application;
   name: string;
@@ -182,7 +189,7 @@ export const ArtifactDetail = ({
   resourcesByEnvironment,
   onRequestClose,
 }: IArtifactDetailProps) => {
-  const { environments } = versionDetails;
+  const { environments, git } = versionDetails;
 
   const keydownCallback = ({ keyCode }: KeyboardEvent) => {
     if (keyCode === 27 /* esc */) {
@@ -199,8 +206,8 @@ export const ArtifactDetail = ({
       <ArtifactDetailHeader name={name} version={versionDetails} onRequestClose={onRequestClose} />
 
       <div className="ArtifactDetail">
-        <div className="flex-container-h sp-margin-xl-bottom">
-          <div className="flex-container-h sp-group-margin-s-xaxis">
+        <div className="flex-container-h top sp-margin-xl-bottom">
+          <div className="flex-container-h sp-group-margin-s-xaxis flex-none">
             <Button
               iconName="pin"
               appearance="primary"
@@ -229,7 +236,34 @@ export const ArtifactDetail = ({
               Mark as bad...
             </Button>
           </div>
-          <div className="detail-section-right">{/* artifact metadata will live here */}</div>
+          <div className="detail-section-right flex-container-v flex-pull-right sp-margin-l-right">
+            {git?.author && <VersionMetadataItem label="Author" value={git.author} />}
+            {git?.pullRequest?.number && git?.pullRequest?.url && (
+              <VersionMetadataItem
+                label="Pull Request"
+                value={
+                  <a href={git.pullRequest.url} target="_blank" rel="noopener noreferrer">
+                    #{git.pullRequest.number}
+                  </a>
+                }
+              />
+            )}
+            {git?.commitInfo && (
+              <>
+                <VersionMetadataItem
+                  label="Commit"
+                  value={
+                    <a href={git.commitInfo.link} target="_blank" rel="noopener noreferrer">
+                      {git.commitInfo.sha.substring(0, 7)}
+                    </a>
+                  }
+                />
+                <VersionMetadataItem label="Message" value={git.commitInfo.message} />
+              </>
+            )}
+            {git?.branch && <VersionMetadataItem label="Branch" value={git.branch} />}
+            {git?.repo && <VersionMetadataItem label="Repository" value={`${git.project}/${git.repo.name}`} />}
+          </div>
         </div>
         {environments.map(environment => {
           const { name: environmentName, state } = environment;

@@ -5,7 +5,7 @@
 const apiHost = process.env.API_HOST || 'http://localhost:8084';
 const atlasWebComponentsUrl = process.env.ATLAS_WEB_COMPONENTS_URL;
 const authEndpoint = process.env.AUTH_ENDPOINT || apiHost + '/auth/user';
-const authEnabled = process.env.AUTH_ENABLED === 'false' ? false : true;
+const authEnabled = process.env.AUTH_ENABLED === 'true';
 const bakeryDetailUrl =
   process.env.BAKERY_DETAIL_URL || apiHost + '/bakery/logs/{{context.region}}/{{context.status.resourceId}}';
 const canaryAccount = process.env.CANARY_ACCOUNT || '';
@@ -20,7 +20,6 @@ const dryRunEnabled = process.env.DRYRUN_ENABLED === 'true' ? true : false;
 const entityTagsEnabled = process.env.ENTITY_TAGS_ENABLED === 'true' ? true : false;
 const fiatEnabled = process.env.FIAT_ENABLED === 'true' ? true : false;
 const gceScaleDownControlsEnabled = process.env.GCE_SCALE_DOWN_CONTROLS_ENABLED === 'true' ? true : false;
-const gceStatefulMigsEnabled = process.env.GCE_STATEFUL_MIGS_ENABLED === 'true' ? true : false;
 const iapRefresherEnabled = process.env.IAP_REFRESHER_ENABLED === 'true' ? true : false;
 const managedDeliveryEnabled = process.env.MANAGED_DELIVERY_ENABLED === 'true';
 const managedServiceAccountsEnabled = process.env.MANAGED_SERVICE_ACCOUNTS_ENABLED === 'true';
@@ -76,7 +75,6 @@ window.spinnakerSettings = {
     entityTags: entityTagsEnabled,
     executionMarkerInformationModal: false,
     fiatEnabled: fiatEnabled,
-    gceStatefulMigsEnabled: gceStatefulMigsEnabled,
     iapRefresherEnabled: iapRefresherEnabled,
     managedDelivery: managedDeliveryEnabled,
     managedServiceAccounts: managedServiceAccountsEnabled,
@@ -115,6 +113,9 @@ window.spinnakerSettings = {
     googlechat: {
       enabled: true,
     },
+    microsoftteams: {
+      enabled: true,
+    },
     pubsub: {
       enabled: true,
     },
@@ -148,6 +149,7 @@ window.spinnakerSettings = {
         inferInternalFlagFromSubnet: false,
       },
       serverGroups: {
+        enableLaunchTemplates: false,
         enableIPv6: false,
         enableIMDSv2: false,
       },
