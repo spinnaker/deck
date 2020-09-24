@@ -4,10 +4,12 @@ import { HelmManualTriggerConfig } from './HelmManualTriggerConfig';
 import { HelmTriggerExecutionStatus } from './HelmTriggerExecutionStatus';
 import { HelmTriggerConfig } from './HelmTriggerConfig';
 
+export const HELM_TRIGGER_TYPE = 'helm';
+
 Registry.pipeline.registerTrigger({
   label: 'Helm Chart',
   description: 'Executes the pipeline on a Helm chart update',
-  key: 'helm',
+  key: HELM_TRIGGER_TYPE,
   component: HelmTriggerConfig,
   executionStatusComponent: HelmTriggerExecutionStatus,
   manualExecutionComponent: HelmManualTriggerConfig,
