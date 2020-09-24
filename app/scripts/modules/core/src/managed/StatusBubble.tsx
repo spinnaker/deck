@@ -23,6 +23,17 @@ const paddingBySize = {
   extraLarge: 'm',
 } as const;
 
+const iconColorByAppearance = {
+  inactive: 'light',
+  neutral: 'light',
+  info: 'neutral',
+  progress: 'neutral',
+  success: 'light',
+  warning: 'dark',
+  error: 'dark',
+  archived: 'light',
+} as const;
+
 const inStyles = {
   opacity: 1,
   transform: 'scale(1.0, 1.0)',
@@ -70,7 +81,7 @@ export const StatusBubble = memo(({ appearance, iconName, size, quantity }: ISta
             ])}
           >
             <div className="icon-container">
-              <Icon appearance="light" name={item} size={size} />
+              <Icon appearance={iconColorByAppearance[appearance]} name={item} size={size} />
             </div>
           </div>
 
