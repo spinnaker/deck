@@ -3,7 +3,7 @@ import { useSref } from '@uirouter/react';
 
 import { Application } from 'core/application';
 import { Icon } from '../presentation';
-import { IManagedResourceSummary, IManagedEnviromentSummary, IManagedArtifactSummary } from '../domain/IManagedEntity';
+import { IManagedResourceSummary, IManagedEnvironmentSummary, IManagedArtifactSummary } from '../domain/IManagedEntity';
 
 import { getKindName } from './ManagedReader';
 import { ObjectRow } from './ObjectRow';
@@ -17,7 +17,7 @@ import { ManagedResourceStatusPopover } from './ManagedResourceStatusPopover';
 export interface IManagedResourceObjectProps {
   application: Application;
   resource: IManagedResourceSummary;
-  artifactVersionsByState?: IManagedEnviromentSummary['artifacts'][0]['versions'];
+  artifactVersionsByState?: IManagedEnvironmentSummary['artifacts'][0]['versions'];
   artifactDetails?: IManagedArtifactSummary;
   depth?: number;
 }
