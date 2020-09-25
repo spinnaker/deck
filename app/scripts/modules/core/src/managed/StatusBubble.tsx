@@ -25,13 +25,13 @@ const paddingBySize = {
 
 const iconColorByAppearance = {
   inactive: 'neutral',
-  neutral: 'light',
+  neutral: 'neutral',
   info: 'neutral',
   progress: 'neutral',
-  success: 'light',
+  success: 'neutral',
   warning: 'dark',
   error: 'dark',
-  archived: 'light',
+  archived: 'neutral',
 } as const;
 
 const inStyles = {
