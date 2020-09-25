@@ -80,48 +80,17 @@
     </div>
   </div>
   <div class="content" ng-if="!state.loading && instance">
-    <collapsible-section heading="Instance Information" expanded="true">
-      <dl class="dl-horizontal dl-flex">
-        <dt>Launched</dt>
-        <dd ng-if="instance.launchTime">{{instance.launchTime | timestamp}}</dd>
-        <dd ng-if="!instance.launchTime">(Unknown)</dd>
-        <dt>In</dt>
-        <dd>
-          <account-tag account="instance.account" pad="right"></account-tag>
-          {{instance.placement.region || '(Unknown)'}}
-        </dd>
-        <dt ng-if="instance.serverGroup">Server Group</dt>
-        <dd ng-if="instance.serverGroup">
-          <a
-            ui-sref="^.serverGroup({region: instance.region,
-              accountId: instance.account,
-              serverGroup: instance.serverGroup,
-              provider: instance.provider})"
-            >{{instance.serverGroup}}</a
-          >
-        </dd>
-        <dt>Job Id</dt>
-        <dd><a href="{{ctrl.titusUiEndpoint}}jobs/{{instance.jobId}}" target="_blank">{{instance.jobId}}</a></dd>
-        <dt>Instance Id</dt>
-        <dd>
-          <a href="{{ctrl.titusUiEndpoint}}jobs/{{instance.jobId}}/tasks/{{instance.id}}" target="_blank"
-            >{{instance.id}}</a
-          >
-          <copy-to-clipboard class="copy-to-clipboard" text="instance.id" tool-tip="'Copy instance Id to clipboard'">
-          </copy-to-clipboard>
-        </dd>
-      </dl>
-    </collapsible-section>
+    <titus-instance-information instance="instance" titusUiEndpoint="ctrl.titusUiEndpoint"></titus-instance-information>
     <instance-status
       health-metrics="healthMetrics"
       health-state="instance.healthState"
       metric-types="['TargetGroup']"
       private-ip-address="instance.privateIpAddress"
-      custom-health-url="{ type: 'Discovery', href: 'instance.discoveryInfoLink', text: 'Discovery Info'}"
+      custom-health-url="instance.customHealthUrl"
     >
     </instance-status>
     <collapsible-section heading="DNS">
-      <dl class="dl-horizontal dl-flex">
+      <dl class="dl-horizontal dl-narrow">
         <dt ng-if="instance.placement.containerIp">Container IP</dt>
         <dd ng-if="instance.placement.containerIp">
           {{instance.placement.containerIp}}
@@ -153,7 +122,7 @@
       style="display: block"
     ></titus-security-groups>
     <!--<collapsible-section heading="Resources">
-      <dl class="dl-horizontal dl-flex">
+      <dl class="dl-horizontal dl-narrow">
         <dt>CPU(s)</dt>
         <dd>{{instance.resources.cpu}}</dd>
         <dt>Memory</dt>
