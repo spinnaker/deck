@@ -17,6 +17,7 @@ import { ManagedResourceStatusPopover } from './ManagedResourceStatusPopover';
 export interface IManagedResourceObjectProps {
   application: Application;
   resource: IManagedResourceSummary;
+  environment?: string;
   artifactVersionsByState?: IManagedEnvironmentSummary['artifacts'][0]['versions'];
   artifactDetails?: IManagedArtifactSummary;
   depth?: number;
@@ -58,7 +59,14 @@ const getNativeResourceRoutingInfo = (
 };
 
 export const ManagedResourceObject = memo(
-  ({ application, resource, artifactVersionsByState, artifactDetails, depth }: IManagedResourceObjectProps) => {
+  ({
+    application,
+    resource,
+    environment,
+    artifactVersionsByState,
+    artifactDetails,
+    depth,
+  }: IManagedResourceObjectProps) => {
     const { kind, displayName } = resource;
 
     const routingInfo = getNativeResourceRoutingInfo(resource) ?? { state: '', params: {} };
@@ -76,11 +84,18 @@ export const ManagedResourceObject = memo(
       artifactVersionsByState?.deploying &&
       artifactDetails?.versions.find(({ version }) => version === artifactVersionsByState?.deploying);
 
-    const currentPill = current && <Pill text={getArtifactVersionDisplayName(current)} />;
+    const isCurrentVersionPinned = !!current?.environments.find(({ name }) => name === environment)?.pinned;
+    const currentPill = current && (
+      <Pill
+        text={getArtifactVersionDisplayName(current)}
+        bgColor={isCurrentVersionPinned ? 'var(--color-status-warning)' : null}
+        textColor={isCurrentVersionPinned ? 'var(--color-icon-dark)' : null}
+      />
+    );
     const deployingPill = deploying && (
       <>
         <Icon appearance="neutral" name="caretRight" size="medium" />
-        <AnimatingPill text={getArtifactVersionDisplayName(deploying)} />
+        <AnimatingPill text={getArtifactVersionDisplayName(deploying)} textColor="var(--color-icon-neutral)" />
       </>
     );
 

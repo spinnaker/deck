@@ -52,6 +52,7 @@ export function EnvironmentsList({
                     application={application}
                     key={resource.id}
                     resource={resource}
+                    environment={name}
                     artifactVersionsByState={artifactVersionsByState}
                     artifactDetails={artifactDetails}
                   />
