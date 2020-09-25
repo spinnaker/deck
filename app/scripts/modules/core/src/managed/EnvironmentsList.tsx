@@ -53,6 +53,7 @@ export function EnvironmentsList({
                     key={resource.id}
                     resource={resource}
                     environment={name}
+                    showReferenceName={allArtifacts.length > 1}
                     artifactVersionsByState={artifactVersionsByState}
                     artifactDetails={artifactDetails}
                   />

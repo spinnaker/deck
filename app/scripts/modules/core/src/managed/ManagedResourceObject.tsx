@@ -18,6 +18,7 @@ export interface IManagedResourceObjectProps {
   application: Application;
   resource: IManagedResourceSummary;
   environment?: string;
+  showReferenceName?: boolean;
   artifactVersionsByState?: IManagedEnvironmentSummary['artifacts'][0]['versions'];
   artifactDetails?: IManagedArtifactSummary;
   depth?: number;
@@ -63,6 +64,7 @@ export const ManagedResourceObject = memo(
     application,
     resource,
     environment,
+    showReferenceName,
     artifactVersionsByState,
     artifactDetails,
     depth,
@@ -87,7 +89,7 @@ export const ManagedResourceObject = memo(
     const isCurrentVersionPinned = !!current?.environments.find(({ name }) => name === environment)?.pinned;
     const currentPill = current && (
       <Pill
-        text={getArtifactVersionDisplayName(current)}
+        text={`${getArtifactVersionDisplayName(current)}${showReferenceName ? ' ' + artifactDetails.reference : ''}`}
         bgColor={isCurrentVersionPinned ? 'var(--color-status-warning)' : null}
         textColor={isCurrentVersionPinned ? 'var(--color-icon-dark)' : null}
       />
@@ -95,7 +97,12 @@ export const ManagedResourceObject = memo(
     const deployingPill = deploying && (
       <>
         <Icon appearance="neutral" name="caretRight" size="medium" />
-        <AnimatingPill text={getArtifactVersionDisplayName(deploying)} textColor="var(--color-icon-neutral)" />
+        <AnimatingPill
+          text={`${getArtifactVersionDisplayName(deploying)}${
+            showReferenceName ? ' ' + artifactDetails.reference : ''
+          }`}
+          textColor="var(--color-icon-neutral)"
+        />
       </>
     );
 
