@@ -1,6 +1,6 @@
 import React, { memo, useMemo } from 'react';
 import classNames from 'classnames';
-import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
+import { useRouter } from '@uirouter/react';
 import { useTransition, animated, UseTransitionProps } from 'react-spring';
 import { DateTime } from 'luxon';
 
@@ -102,6 +102,7 @@ const EnvironmentCards = memo(
         <StatusCard
           iconName="cloudWaiting"
           appearance="warning"
+          background={true}
           title="A different version is pinned here"
           actions={<Button onClick={() => go('.', { version: pinnedVersion })}>See version</Button>}
         />
@@ -111,6 +112,7 @@ const EnvironmentCards = memo(
       <StatusCard
         iconName="pin"
         appearance="warning"
+        background={true}
         title={
           <span className="sp-group-margin-xs-xaxis">
             Pinned here {relativeTime(pinnedAtMillis)}{' '}
@@ -179,7 +181,7 @@ const EnvironmentCards = memo(
            * to get the trail to go up the the list instead of down.
            */
           transitions.reverse().map(({ item: card, key, props }) => (
-            <animated.div key={key} className="sp-margin-2xs-bottom" style={props}>
+            <animated.div key={key} style={props}>
               {card}
             </animated.div>
           ))

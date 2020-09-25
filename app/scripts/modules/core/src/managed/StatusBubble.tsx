@@ -24,7 +24,7 @@ const paddingBySize = {
 } as const;
 
 const iconColorByAppearance = {
-  inactive: 'light',
+  inactive: 'neutral',
   neutral: 'light',
   info: 'neutral',
   progress: 'neutral',
