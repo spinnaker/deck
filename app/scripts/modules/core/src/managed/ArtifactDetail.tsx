@@ -218,7 +218,7 @@ export const ArtifactDetail = ({
   resourcesByEnvironment,
   onRequestClose,
 }: IArtifactDetailProps) => {
-  const { environments, git } = versionDetails;
+  const { environments, git, createdAt } = versionDetails;
 
   const keydownCallback = ({ keyCode }: KeyboardEvent) => {
     if (keyCode === 27 /* esc */) {
@@ -229,6 +229,7 @@ export const ArtifactDetail = ({
 
   const isPinnedEverywhere = environments.every(({ pinned }) => pinned);
   const isBadEverywhere = environments.every(({ state }) => state === 'vetoed');
+  const createdAtMillis = createdAt && DateTime.fromISO(createdAt).toMillis();
 
   return (
     <>
@@ -266,6 +267,7 @@ export const ArtifactDetail = ({
             </Button>
           </div>
           <div className="detail-section-right flex-container-v flex-pull-right sp-margin-l-right">
+            {createdAtMillis && <VersionMetadataItem label="Created" value={timestamp(createdAtMillis)} />}
             {git?.author && <VersionMetadataItem label="Author" value={git.author} />}
             {git?.pullRequest?.number && git?.pullRequest?.url && (
               <VersionMetadataItem
