@@ -4,7 +4,7 @@ import { useRouter } from '@uirouter/react';
 import { useTransition, animated, UseTransitionProps } from 'react-spring';
 import { DateTime } from 'luxon';
 
-import { relativeTime, timestamp } from '../utils';
+import { timestamp } from '../utils';
 import {
   IManagedArtifactSummary,
   IManagedArtifactVersion,
@@ -94,8 +94,6 @@ const EnvironmentCards = memo(
       stateService: { go },
     } = useRouter();
 
-    const pinnedAtMillis = pinned?.at ? DateTime.fromISO(pinned.at).toMillis() : null;
-
     const differentVersionPinnedCard = pinnedVersion &&
       pinnedVersion !== versionDetails.version &&
       !['vetoed', 'skipped'].includes(state) && (
@@ -113,11 +111,11 @@ const EnvironmentCards = memo(
         iconName="pin"
         appearance="warning"
         background={true}
+        timestamp={pinned?.at ? DateTime.fromISO(pinned.at) : null}
         title={
           <span className="sp-group-margin-xs-xaxis">
-            Pinned here {relativeTime(pinnedAtMillis)}{' '}
-            <span className="text-italic text-regular sp-margin-xs-left">({timestamp(pinnedAtMillis)})</span>{' '}
-            <span className="text-regular">—</span> <span className="text-regular">by {pinned.by}</span>
+            <span>Pinned</span> <span className="text-regular">—</span>{' '}
+            <span className="text-regular">by {pinned.by}</span>
           </span>
         }
         description={pinned.comment && <Markdown message={pinned.comment} tag="span" />}
