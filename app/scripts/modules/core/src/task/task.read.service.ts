@@ -10,12 +10,12 @@ export class TaskReader {
   private static activeStatuses: string[] = ['RUNNING', 'SUSPENDED', 'NOT_STARTED'];
 
   public static getTasks(applicationName: string, statuses: string[] = []): IPromise<ITask[]> {
-    return API.one('applications', encodeURIComponent(applicationName))
+    return API.one('applications', applicationName)
       .all('tasks')
       .getList({ statuses: statuses.join(',') })
       .then((tasks: ITask[]) => {
-        tasks.forEach(task => this.setTaskProperties(task));
-        return tasks.filter(task => !task.getValueFor('dryRun'));
+        tasks.forEach((task) => this.setTaskProperties(task));
+        return tasks.filter((task) => !task.getValueFor('dryRun'));
       });
   }
 
@@ -55,7 +55,7 @@ export class TaskReader {
       deferred.reject(task);
     } else {
       task.poller = $timeout(() => {
-        this.getTask(task.id).then(updated => {
+        this.getTask(task.id).then((updated) => {
           this.updateTask(task, updated);
           notifier?.next();
           this.waitUntilTaskMatches(task, closure, failureClosure, interval, notifier).then(
@@ -71,8 +71,8 @@ export class TaskReader {
   public static waitUntilTaskCompletes(task: ITask, interval = 1000, notifier?: Subject<void>): IPromise<ITask> {
     return this.waitUntilTaskMatches(
       task,
-      t => t.isCompleted,
-      t => t.isFailed,
+      (t) => t.isCompleted,
+      (t) => t.isFailed,
       interval,
       notifier,
     );
@@ -97,7 +97,7 @@ export class TaskReader {
   private static setTaskProperties(task: ITask): void {
     OrchestratedItemTransformer.defineProperties(task);
     if (task.steps && task.steps.length) {
-      task.steps.forEach(step => OrchestratedItemTransformer.defineProperties(step));
+      task.steps.forEach((step) => OrchestratedItemTransformer.defineProperties(step));
     }
   }
 }

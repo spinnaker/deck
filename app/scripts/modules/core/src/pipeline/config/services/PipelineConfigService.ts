@@ -22,37 +22,34 @@ export class PipelineConfigService {
 
   public static getPipelinesForApplication(applicationName: string): IPromise<IPipeline[]> {
     return API.one('applications')
-      .one(encodeURIComponent(applicationName))
+      .one(applicationName)
       .all('pipelineConfigs')
       .getList()
       .then((pipelines: IPipeline[]) => {
-        pipelines.forEach(p => (p.stages = p.stages || []));
+        pipelines.forEach((p) => (p.stages = p.stages || []));
         return this.sortPipelines(pipelines);
       });
   }
 
   public static getStrategiesForApplication(applicationName: string): IPromise<IPipeline[]> {
     return API.one('applications')
-      .one(encodeURIComponent(applicationName))
+      .one(applicationName)
       .all('strategyConfigs')
       .getList()
       .then((pipelines: IPipeline[]) => {
-        pipelines.forEach(p => (p.stages = p.stages || []));
+        pipelines.forEach((p) => (p.stages = p.stages || []));
         return this.sortPipelines(pipelines);
       });
   }
 
   public static getHistory(id: string, isStrategy: boolean, count = 20): IPromise<IPipeline[]> {
     const endpoint = isStrategy ? 'strategyConfigs' : 'pipelineConfigs';
-    return API.one(endpoint, id)
-      .all('history')
-      .withParams({ limit: count })
-      .getList();
+    return API.one(endpoint, id).all('history').withParams({ limit: count }).getList();
   }
 
   public static deletePipeline(applicationName: string, pipeline: IPipeline, pipelineName: string): IPromise<void> {
     return API.one(pipeline.strategy ? 'strategies' : 'pipelines')
-      .one(encodeURIComponent(applicationName), encodeURIComponent(pipelineName.trim()))
+      .one(applicationName, pipelineName.trim())
       .remove();
   }
 
@@ -61,7 +58,7 @@ export class PipelineConfigService {
     delete pipeline.isNew;
     pipeline.name = pipeline.name.trim();
     if (Array.isArray(pipeline.stages)) {
-      pipeline.stages.forEach(function(stage) {
+      pipeline.stages.forEach(function (stage) {
         delete stage.isNew;
         if (!stage.name) {
           delete stage.name;
@@ -82,7 +79,7 @@ export class PipelineConfigService {
     idsToIndices: { [key: string]: number },
     isStrategy = false,
   ): IPromise<void> {
-    return API.one(`actions/${isStrategy ? 'strategies' : 'pipelines'}/reorder`)
+    return API.one('actions', `${isStrategy ? 'strategies' : 'pipelines'}`, 'reorder')
       .data({
         application,
         idsToIndices,
@@ -109,7 +106,7 @@ export class PipelineConfigService {
     return API.one('pipelines')
       .one('v2')
       .one(applicationName)
-      .one(encodeURIComponent(pipelineName))
+      .one(pipelineName)
       .data(body)
       .post()
       .then((result: ITriggerPipelineResponse) => {
@@ -123,8 +120,8 @@ export class PipelineConfigService {
       return stageToTest.requisiteStageRefIds && stageToTest.requisiteStageRefIds.includes(stage.refId);
     });
     if (children.length) {
-      downstream = children.map(c => c.refId);
-      children.forEach(child => {
+      downstream = children.map((c) => c.refId);
+      children.forEach((child) => {
         downstream = downstream.concat(this.getDownstreamStageIds(pipeline, child));
       });
     }

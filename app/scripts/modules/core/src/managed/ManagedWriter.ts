@@ -34,15 +34,12 @@ export class ManagedWriter {
     version,
     comment,
   }: IArtifactVersionRequest): IPromise<void> {
-    return API.one('managed')
-      .one('application', encodeURIComponent(application))
-      .one('pin')
-      .post({
-        targetEnvironment: environment,
-        reference,
-        version,
-        comment,
-      });
+    return API.one('managed').one('application', application).one('pin').post({
+      targetEnvironment: environment,
+      reference,
+      version,
+      comment,
+    });
   }
 
   public static unpinArtifactVersion({
@@ -51,7 +48,7 @@ export class ManagedWriter {
     reference,
   }: IUnpinArtifactVersionRequest): IPromise<void> {
     return API.one('managed')
-      .one('application', encodeURIComponent(application))
+      .one('application', application)
       .one('pin')
       .one(environment)
       .withParams({ reference })
@@ -65,15 +62,12 @@ export class ManagedWriter {
     version,
     comment,
   }: IArtifactVersionRequest): IPromise<void> {
-    return API.one('managed')
-      .one('application', encodeURIComponent(application))
-      .one('veto')
-      .post({
-        targetEnvironment: environment,
-        reference,
-        version,
-        comment,
-      });
+    return API.one('managed').one('application', application).one('veto').post({
+      targetEnvironment: environment,
+      reference,
+      version,
+      comment,
+    });
   }
 
   public static updateConstraintStatus({
@@ -84,43 +78,27 @@ export class ManagedWriter {
     version,
     status,
   }: IUpdateConstraintStatusRequest): IPromise<void> {
-    return API.one('managed')
-      .one('application', encodeURIComponent(application))
-      .one('environment', environment)
-      .one('constraint')
-      .post({
-        type,
-        artifactReference: reference,
-        artifactVersion: version,
-        status,
-      });
+    return API.one('managed').one('application', application).one('environment', environment).one('constraint').post({
+      type,
+      artifactReference: reference,
+      artifactVersion: version,
+      status,
+    });
   }
 
   public static pauseApplicationManagement(applicationName: string): IPromise<void> {
-    return API.one('managed')
-      .one('application', encodeURIComponent(applicationName))
-      .one('pause')
-      .post();
+    return API.one('managed').one('application', applicationName).one('pause').post();
   }
 
   public static resumeApplicationManagement(applicationName: string): IPromise<void> {
-    return API.one('managed')
-      .one('application', encodeURIComponent(applicationName))
-      .one('pause')
-      .remove();
+    return API.one('managed').one('application', applicationName).one('pause').remove();
   }
 
   public static pauseResourceManagement(resourceId: string): IPromise<void> {
-    return API.one('managed')
-      .one('resources', resourceId)
-      .one('pause')
-      .post();
+    return API.one('managed').one('resources', resourceId).one('pause').post();
   }
 
   public static resumeResourceManagement(resourceId: string): IPromise<void> {
-    return API.one('managed')
-      .one('resources', resourceId)
-      .one('pause')
-      .remove();
+    return API.one('managed').one('resources', resourceId).one('pause').remove();
   }
 }

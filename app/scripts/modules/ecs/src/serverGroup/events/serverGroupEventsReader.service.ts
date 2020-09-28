@@ -13,7 +13,7 @@ export interface IEventDescription {
 export class ServerGroupEventsReader {
   public static getEvents(serverGroup: IServerGroup): IPromise<IEventDescription[]> {
     return API.one('applications')
-      .one(encodeURIComponent(serverGroup.app))
+      .one(serverGroup.app)
       .one('serverGroups')
       .all(serverGroup.account)
       .one(serverGroup.name)
