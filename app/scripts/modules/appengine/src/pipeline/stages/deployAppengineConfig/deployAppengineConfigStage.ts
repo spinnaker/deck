@@ -8,7 +8,7 @@ import {
 export const DEPLOY_APPENGINE_CONFIG_STAGE_KEY = 'deployAppEngineConfiguration';
 
 Registry.pipeline.registerStage({
-  label: 'Deploy AppEngine Configuration',
+  label: 'Deploy App Engine Configuration',
   description: 'Deploy index, dispatch, cron, and queue configuration to AppEngine.',
   key: DEPLOY_APPENGINE_CONFIG_STAGE_KEY,
   component: DeployAppengineConfigurationConfig,
