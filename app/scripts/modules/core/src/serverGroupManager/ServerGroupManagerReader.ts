@@ -6,6 +6,9 @@ import { IServerGroupManager } from 'core/domain/IServerGroupManager';
 
 export class ServerGroupManagerReader {
   public static getServerGroupManagersForApplication(application: string): IPromise<IServerGroupManager[]> {
-    return API.one('applications').one(application).one('serverGroupManagers').get();
+    return API.one('applications')
+      .one(application)
+      .one('serverGroupManagers')
+      .get();
   }
 }

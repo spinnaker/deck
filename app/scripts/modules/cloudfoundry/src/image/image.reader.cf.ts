@@ -12,7 +12,7 @@ export class CloudFoundryImageReader {
         provider: 'cloudfoundry',
       })
       .get()
-      .then(function (results: any) {
+      .then(function(results: any) {
         return results;
       })
       .catch((): any[] => []);
