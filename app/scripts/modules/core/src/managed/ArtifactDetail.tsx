@@ -4,7 +4,6 @@ import { useRouter } from '@uirouter/react';
 import { useTransition, animated, UseTransitionProps } from 'react-spring';
 import { DateTime } from 'luxon';
 
-import { CopyToClipboard, timestamp } from '../utils';
 import {
   IManagedArtifactSummary,
   IManagedArtifactVersion,
@@ -14,6 +13,7 @@ import {
 import { Application } from '../application';
 import { useEventListener, Markdown } from '../presentation';
 
+import { AbsoluteTimestamp } from './AbsoluteTimestamp';
 import { ArtifactDetailHeader } from './ArtifactDetailHeader';
 import { ManagedResourceObject } from './ManagedResourceObject';
 import { EnvironmentRow } from './EnvironmentRow';
@@ -227,7 +227,7 @@ export const ArtifactDetail = ({
 
   const isPinnedEverywhere = environments.every(({ pinned }) => pinned);
   const isBadEverywhere = environments.every(({ state }) => state === 'vetoed');
-  const createdAtMillis = createdAt && DateTime.fromISO(createdAt).toMillis();
+  const createdAtTimestamp = useMemo(() => createdAt && DateTime.fromISO(createdAt), [createdAt]);
 
   return (
     <>
@@ -265,15 +265,10 @@ export const ArtifactDetail = ({
             </Button>
           </div>
           <div className="detail-section-right flex-container-v flex-pull-right sp-margin-l-right">
-            {createdAtMillis && (
+            {createdAtTimestamp && (
               <VersionMetadataItem
                 label="Created"
-                value={
-                  <>
-                    {timestamp(createdAtMillis)}{' '}
-                    <CopyToClipboard text={timestamp(createdAtMillis)} toolTip="Copy timestamp" />
-                  </>
-                }
+                value={<AbsoluteTimestamp timestamp={createdAtTimestamp} clickToCopy={true} />}
               />
             )}
             {git?.author && <VersionMetadataItem label="Author" value={git.author} />}
