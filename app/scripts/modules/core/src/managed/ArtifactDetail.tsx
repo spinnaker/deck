@@ -4,7 +4,7 @@ import { useRouter } from '@uirouter/react';
 import { useTransition, animated, UseTransitionProps } from 'react-spring';
 import { DateTime } from 'luxon';
 
-import { timestamp } from '../utils';
+import { CopyToClipboard, timestamp } from '../utils';
 import {
   IManagedArtifactSummary,
   IManagedArtifactVersion,
@@ -265,7 +265,17 @@ export const ArtifactDetail = ({
             </Button>
           </div>
           <div className="detail-section-right flex-container-v flex-pull-right sp-margin-l-right">
-            {createdAtMillis && <VersionMetadataItem label="Created" value={timestamp(createdAtMillis)} />}
+            {createdAtMillis && (
+              <VersionMetadataItem
+                label="Created"
+                value={
+                  <>
+                    {timestamp(createdAtMillis)}{' '}
+                    <CopyToClipboard text={timestamp(createdAtMillis)} toolTip="Copy timestamp" />
+                  </>
+                }
+              />
+            )}
             {git?.author && <VersionMetadataItem label="Author" value={git.author} />}
             {git?.pullRequest?.number && git?.pullRequest?.url && (
               <VersionMetadataItem
