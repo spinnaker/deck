@@ -182,7 +182,7 @@ export function Environments({ app }: IEnvironmentsProps) {
         {detailPaneTransition.map(
           ({ item, key, props }) =>
             item.selectedVersion && (
-              <animated.div key={key} className="environments-pane" style={props}>
+              <animated.div key={key} className="environments-pane flex-container-v" style={props}>
                 <ArtifactDetail
                   application={app}
                   name={item.selectedArtifactDetails.name}
