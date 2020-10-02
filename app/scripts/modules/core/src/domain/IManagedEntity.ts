@@ -59,7 +59,7 @@ export interface IManagedResourceSummary {
   };
 }
 
-export interface IManagedEnviromentSummary {
+export interface IManagedEnvironmentSummary {
   name: string;
   resources: string[];
   artifacts: Array<{
@@ -83,6 +83,7 @@ export interface IManagedEnviromentSummary {
 export interface IManagedArtifactVersion {
   version: string;
   displayName: string;
+  createdAt?: string;
   environments: Array<{
     name: string;
     state: 'current' | 'deploying' | 'approved' | 'pending' | 'previous' | 'vetoed' | 'skipped';
@@ -144,7 +145,7 @@ export interface IManagedArtifactSummary {
 
 interface IManagedApplicationEntities {
   resources: IManagedResourceSummary[];
-  environments: IManagedEnviromentSummary[];
+  environments: IManagedEnvironmentSummary[];
   artifacts: IManagedArtifactSummary[];
 }
 

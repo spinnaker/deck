@@ -4,7 +4,7 @@ import { isEmpty } from 'lodash';
 import { CollapsibleSection } from '@spinnaker/core';
 import { ICloudFoundryServerGroupDetailsSectionProps } from './ICloudFoundryServerGroupDetailsSectionProps';
 
-export class EvironmentVariablesSection extends React.Component<ICloudFoundryServerGroupDetailsSectionProps> {
+export class EnvironmentVariablesSection extends React.Component<ICloudFoundryServerGroupDetailsSectionProps> {
   constructor(props: ICloudFoundryServerGroupDetailsSectionProps) {
     super(props);
   }
@@ -15,7 +15,7 @@ export class EvironmentVariablesSection extends React.Component<ICloudFoundrySer
       <>
         {!isEmpty(serverGroup.env) && (
           <CollapsibleSection heading="Environment Variables" defaultExpanded={true}>
-            <dl className="dl-horizontal dl-flex">
+            <dl className="dl-horizontal dl-narrow">
               {Object.entries(serverGroup.env).map(([k, v], index) => {
                 return (
                   <div key={index}>
