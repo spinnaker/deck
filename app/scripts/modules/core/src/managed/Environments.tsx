@@ -158,16 +158,24 @@ export function Environments({ app }: IEnvironmentsProps) {
         {overviewPaneTransition.map(
           ({ item: show, key, props }) =>
             show && (
-              <animated.div key={key} className="environments-pane" style={props}>
-                <ColumnHeader text="Environments" icon="environment" />
-                <EnvironmentsHeader
-                  app={app}
-                  resourceInfo={{
-                    managed: resources.filter((r) => !r.isPaused).length,
-                    total: resources.length,
-                  }}
-                />
-                <EnvironmentsList application={app} {...{ environments, artifacts, resourcesById }} />
+              <animated.div key={key} className="environments-pane flex-container-v" style={props}>
+                <div className="flex-container-v" style={{ overflow: 'hidden' }}>
+                  <div className="sp-margin-m-right">
+                    <ColumnHeader text="Environments" icon="environment" />
+                  </div>
+                  <div className="environments-column-scroll-container">
+                    <div className="sp-margin-m-yaxis sp-margin-m-right">
+                      <EnvironmentsHeader
+                        app={app}
+                        resourceInfo={{
+                          managed: resources.filter((r) => !r.isPaused).length,
+                          total: resources.length,
+                        }}
+                      />
+                      <EnvironmentsList application={app} {...{ environments, artifacts, resourcesById }} />
+                    </div>
+                  </div>
+                </div>
               </animated.div>
             ),
         )}
