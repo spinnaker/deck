@@ -140,17 +140,19 @@ export function Environments({ app }: IEnvironmentsProps) {
 
   return (
     <div className="Environments">
-      <div className="artifacts-column">
+      <div className="artifacts-column flex-container-v">
         <ColumnHeader text="Versions" icon="artifact" />
-        <ArtifactsList
-          artifacts={artifacts}
-          selectedVersion={selectedVersion}
-          versionSelected={(clickedVersion) => {
-            if (!isEqual(clickedVersion, selectedVersion)) {
-              go(selectedVersion ? '.' : '.artifactVersion', clickedVersion);
-            }
-          }}
-        />
+        <div className="artifacts-column-scroll-container">
+          <ArtifactsList
+            artifacts={artifacts}
+            selectedVersion={selectedVersion}
+            versionSelected={(clickedVersion) => {
+              if (!isEqual(clickedVersion, selectedVersion)) {
+                go(selectedVersion ? '.' : '.artifactVersion', clickedVersion);
+              }
+            }}
+          />
+        </div>
       </div>
       <div className="environments-column">
         {overviewPaneTransition.map(
