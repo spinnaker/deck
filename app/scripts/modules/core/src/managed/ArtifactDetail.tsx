@@ -235,7 +235,7 @@ export const ArtifactDetail = ({
     <>
       <ArtifactDetailHeader name={name} version={versionDetails} onRequestClose={onRequestClose} />
 
-      <div className="ArtifactDetail">
+      <div className="ArtifactDetail flex-grow">
         <div className="flex-container-h top sp-margin-xl-bottom">
           <div className="flex-container-h sp-group-margin-s-xaxis flex-none">
             <Button
@@ -328,6 +328,7 @@ export const ArtifactDetail = ({
               <div className="sp-margin-l-top">
                 {resourcesByEnvironment[environmentName]
                   .filter((resource) => shouldDisplayResource(reference, resource))
+                  .sort((a, b) => `${a.kind}${a.displayName}`.localeCompare(`${b.kind}${b.displayName}`))
                   .map((resource) => (
                     <div key={resource.id} className="flex-container-h middle">
                       {state === 'deploying' && (
