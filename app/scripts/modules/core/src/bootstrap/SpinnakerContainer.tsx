@@ -6,16 +6,16 @@ import { CustomBanner } from '../header/customBanner/CustomBanner';
 import { Notifier } from '../widgets/notifier/Notifier';
 import { SpinnakerHeader } from '../header/SpinnakerHeader';
 import { Spinner } from '../widgets/spinners/Spinner';
+import { IDeckRootScope } from '../domain';
 
 export interface ISpinnakerContainerProps {
-  authenticating: boolean;
-  routing: boolean;
+  $rootScope: IDeckRootScope;
 }
 
-export const SpinnakerContainer = ({ authenticating, routing }: ISpinnakerContainerProps) => (
+export const SpinnakerContainer = ({ $rootScope }: ISpinnakerContainerProps) => (
   <RecoilRoot>
     <div className="spinnaker-container grid-container">
-      {!authenticating && routing && (
+      {!$rootScope.authenticating && $rootScope.routing && (
         <div className="transition-overlay">
           <Spinner size="medium" />
         </div>
@@ -24,7 +24,7 @@ export const SpinnakerContainer = ({ authenticating, routing }: ISpinnakerContai
         <CustomBanner />
         <SpinnakerHeader />
       </div>
-      <div className="spinnaker-content grid-contents">{!authenticating && <UIView name="main" />}</div>
+      <div className="spinnaker-content grid-contents">{!$rootScope.authenticating && <UIView name="main" />}</div>
     </div>
     <Notifier />
   </RecoilRoot>

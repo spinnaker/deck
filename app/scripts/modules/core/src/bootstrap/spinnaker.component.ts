@@ -5,7 +5,7 @@ import { IFeatures, SETTINGS } from 'core/config/settings';
 import { IDeckRootScope } from 'core/domain';
 
 const template = `
-  <spinnaker-container authenticating="$ctrl.authenticating" routing="$ctrl.routing"></spinnaker-container>
+  <spinnaker-container></spinnaker-container>
 `;
 
 class SpinnakerController implements IController {
