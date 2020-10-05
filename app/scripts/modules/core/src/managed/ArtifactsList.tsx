@@ -1,5 +1,6 @@
+import React, { useMemo, useState } from 'react';
 import classNames from 'classnames';
-import React, { useState } from 'react';
+import { DateTime } from 'luxon';
 
 import {
   IManagedArtifactSummary,
@@ -9,8 +10,11 @@ import {
 } from '../domain/IManagedEntity';
 import { Icon } from '../presentation';
 
+import { isConstraintSupported, getConstraintIcon } from './constraints/constraintRegistry';
+
 import { ISelectedArtifactVersion } from './Environments';
 import { Pill } from './Pill';
+import { RelativeTimestamp } from './RelativeTimestamp';
 import { IStatusBubbleStackProps, StatusBubbleStack } from './StatusBubbleStack';
 
 import './ArtifactRow.less';
@@ -71,11 +75,12 @@ interface IArtifactRowProps {
 }
 
 export const ArtifactRow = ({ isSelected, clickHandler, version: versionInfo, reference, name }: IArtifactRowProps) => {
-  const { version, displayName, environments, build, git } = versionInfo;
+  const { version, displayName, createdAt, environments, build, git } = versionInfo;
   const [isHovered, setIsHovered] = useState(false);
 
   const versionIcon = getVersionIcon(versionInfo);
   const secondarySummary = getVersionSecondarySummary(versionInfo);
+  const timestamp = useMemo(() => createdAt && DateTime.fromISO(createdAt), [createdAt]);
 
   return (
     <div
@@ -86,8 +91,9 @@ export const ArtifactRow = ({ isSelected, clickHandler, version: versionInfo, re
     >
       <div className="row-content flex-container-v left sp-padding-m-top sp-padding-l-bottom sp-padding-s-xaxis">
         {(build?.number || build?.id) && (
-          <div className="flex-container-h sp-margin-s-bottom">
+          <div className="row-middle-section flex-container-h space-between middle sp-margin-s-bottom">
             <Pill bgColor={isSelected ? '#2e4b5f' : undefined} text={`#${build.number || build.id} ${name || ''}`} />
+            {timestamp && <RelativeTimestamp timestamp={timestamp} />}
           </div>
         )}
         <div className="row-middle-section flex-container-h space-between">
@@ -134,14 +140,29 @@ function getArtifactStatuses({ environments }: IManagedArtifactVersion): Artifac
   // NOTE: The order in which entries are added to `statuses` is important. The highest priority
   // item must be inserted first.
 
-  const isConstraintPendingManualJudgement = (constraint: IStatefulConstraint) =>
-    constraint.type == 'manual-judgement' && constraint.status == StatefulConstraintStatus.PENDING;
-  const requiresManualApproval = environments.some((environment) =>
-    environment.statefulConstraints?.some(isConstraintPendingManualJudgement),
+  const pendingConstraintTypes = new Set<string>();
+  const failedConstraintTypes = new Set<string>();
+
+  environments.forEach((environment) =>
+    environment.statefulConstraints?.forEach(({ type, status }: IStatefulConstraint) => {
+      if (!isConstraintSupported(type)) {
+        return;
+      }
+
+      if (status === StatefulConstraintStatus.PENDING) {
+        pendingConstraintTypes.add(type);
+      } else if (status === StatefulConstraintStatus.FAIL || status === StatefulConstraintStatus.OVERRIDE_FAIL) {
+        failedConstraintTypes.add(type);
+      }
+    }),
   );
-  if (requiresManualApproval) {
-    statuses.push({ appearance: 'progress', iconName: 'manualJudgement' });
-  }
+
+  pendingConstraintTypes.forEach((type) => {
+    statuses.push({ appearance: 'progress', iconName: getConstraintIcon(type) });
+  });
+  failedConstraintTypes.forEach((type) => {
+    statuses.push({ appearance: 'error', iconName: getConstraintIcon(type) });
+  });
 
   const isPinned = environments.some(({ pinned }) => pinned);
   if (isPinned) {

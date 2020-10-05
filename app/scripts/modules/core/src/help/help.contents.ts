@@ -129,6 +129,10 @@ const helpContents: { [key: string]: string } = {
       <p>The S3 object name, in the form <code>s3://bucket/path/to/file.yml</code>.</p>`,
   'pipeline.config.expectedArtifact.defaultS3.reference': `
       <p>The S3 object name, <i>optionally</i> appending the version. An example: <code>s3://bucket/file.yml#123948581</code></p>`,
+  'pipeline.config.expectedArtifact.oracle.name': `
+      <p>The Oracle object artifact name, in the form <code>oci://bucket/path/file.yml</code>.</p>`,
+  'pipeline.config.expectedArtifact.defaultOracle.reference': `
+      <p>The  Oracle object artifact name, <i>optionally</i> appending the version. An example: <code>oci://bucket/file.yml#9ce463aa-d843-4438-b206-5365cd643e2e</code></p>`,
   'pipeline.config.expectedArtifact.docker.name': `
       <p>The Docker image name you want to trigger on changes to. By default, this does <i>not</i> include the image tag or digest, only the registry and image repository.</p>`,
   'pipeline.config.expectedArtifact.defaultDocker.reference': `
@@ -471,7 +475,7 @@ const helpContents: { [key: string]: string } = {
   'pipeline.config.webhook.waitBeforeMonitor':
     'Optional delay (in seconds) to wait before starting to poll the endpoint for monitoring status',
   'pipeline.config.webhook.statusJsonPath':
-    "JSON path to the status information in the webhook's response JSON. (e.g. <samp>$.buildInfo.status</samp>)",
+    "JSON path to the status information in the webhook's response JSON (e.g. <samp>$.buildInfo.status</samp>). <br>If left empty, a 200 response from the status endpoint will be treated as a success.",
   'pipeline.config.webhook.progressJsonPath':
     "JSON path to a descriptive message about the progress in the webhook's response JSON. (e.g. <samp>$.buildInfo.progress</samp>)",
   'pipeline.config.webhook.successStatuses':
