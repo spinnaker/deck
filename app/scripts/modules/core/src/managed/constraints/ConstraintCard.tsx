@@ -6,6 +6,7 @@ import {
   StatefulConstraintStatus,
   IStatelessConstraint,
   IManagedApplicationEnvironmentSummary,
+  IManagedArtifactVersionEnvironment,
 } from '../../domain';
 import { Application, ApplicationDataSource } from '../../application';
 import { IRequestStatus } from '../../presentation';
@@ -18,6 +19,7 @@ import {
   isConstraintSupported,
   isConstraintStateful,
   getConstraintIcon,
+  getConstraintTimestamp,
   getConstraintSummary,
   getConstraintActions,
 } from './constraintRegistry';
@@ -27,12 +29,21 @@ import './ConstraintCard.less';
 const { NOT_EVALUATED, PENDING, PASS, FAIL, OVERRIDE_PASS, OVERRIDE_FAIL } = StatefulConstraintStatus;
 
 const constraintCardAppearanceByStatus = {
-  [NOT_EVALUATED]: 'inactive',
+  [NOT_EVALUATED]: 'future',
   [PENDING]: 'info',
-  [PASS]: 'success',
+  [PASS]: 'neutral',
   [FAIL]: 'error',
-  [OVERRIDE_PASS]: 'success',
+  [OVERRIDE_PASS]: 'neutral',
   [OVERRIDE_FAIL]: 'error',
+} as const;
+
+const skippedConstraintCardAppearanceByStatus = {
+  [NOT_EVALUATED]: 'future',
+  [PENDING]: 'future',
+  [PASS]: 'neutral',
+  [FAIL]: 'neutral',
+  [OVERRIDE_PASS]: 'neutral',
+  [OVERRIDE_FAIL]: 'neutral',
 } as const;
 
 const logUnsupportedConstraintError = (type: string) => {
@@ -60,19 +71,26 @@ const overrideConstraintStatus = (
     return dataSource.refresh().catch(() => null);
   });
 
-const getCardAppearance = (constraint: IStatefulConstraint | IStatelessConstraint) => {
+const getCardAppearance = (
+  constraint: IStatefulConstraint | IStatelessConstraint,
+  environment: IManagedArtifactVersionEnvironment,
+) => {
   if (isConstraintStateful(constraint)) {
     const { status } = constraint as IStatefulConstraint;
-    return constraintCardAppearanceByStatus[status];
+    if (environment.state === 'skipped') {
+      return skippedConstraintCardAppearanceByStatus[status];
+    } else {
+      return constraintCardAppearanceByStatus[status];
+    }
   } else {
     const { currentlyPassing } = constraint as IStatelessConstraint;
-    return currentlyPassing ? 'success' : 'inactive';
+    return currentlyPassing ? 'neutral' : 'future';
   }
 };
 
 export interface IConstraintCardProps {
   application: Application;
-  environment: string;
+  environment: IManagedArtifactVersionEnvironment;
   reference: string;
   version: string;
   constraint: IStatefulConstraint | IStatelessConstraint;
@@ -89,13 +107,15 @@ export const ConstraintCard = memo(
       return null;
     }
 
-    const actions = getConstraintActions(constraint);
+    const actions = getConstraintActions(constraint, environment);
 
     return (
       <StatusCard
-        appearance={getCardAppearance(constraint)}
-        iconName={getConstraintIcon(type)}
-        title={getConstraintSummary(constraint)}
+        appearance={getCardAppearance(constraint, environment)}
+        active={environment.state !== 'skipped'}
+        iconName={getConstraintIcon(constraint)}
+        timestamp={getConstraintTimestamp(constraint, environment)}
+        title={getConstraintSummary(constraint, environment)}
         actions={
           actions && (
             <div
@@ -112,7 +132,7 @@ export const ConstraintCard = memo(
                       onClick={() => {
                         setActionStatus('PENDING');
                         overrideConstraintStatus(application, {
-                          environment,
+                          environment: environment.name,
                           type,
                           reference,
                           version,

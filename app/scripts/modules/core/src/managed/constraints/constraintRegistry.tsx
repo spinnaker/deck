@@ -1,8 +1,12 @@
 import React from 'react';
 import { DateTime } from 'luxon';
 
-import { relativeTime, timestamp } from '../../utils';
-import { IStatefulConstraint, StatefulConstraintStatus, IStatelessConstraint } from '../../domain';
+import {
+  IStatefulConstraint,
+  StatefulConstraintStatus,
+  IStatelessConstraint,
+  IManagedArtifactVersionEnvironment,
+} from '../../domain';
 import { IconNames } from '../../presentation';
 
 const NO_FAILURE_MESSAGE = 'no details available';
@@ -12,7 +16,7 @@ const throwUnhandledStatusError = (status: string) => {
   throw new Error(`Unhandled constraint status "${status}", no constraint summary available`);
 };
 
-const { NOT_EVALUATED, PENDING, FAIL, OVERRIDE_PASS, OVERRIDE_FAIL } = StatefulConstraintStatus;
+const { NOT_EVALUATED, PENDING, PASS, FAIL, OVERRIDE_PASS, OVERRIDE_FAIL } = StatefulConstraintStatus;
 
 export interface IConstraintOverrideAction {
   title: string;
@@ -20,8 +24,8 @@ export interface IConstraintOverrideAction {
 }
 
 interface IStatefulConstraintConfig {
-  iconName: IconNames;
-  shortSummary: (constraint: IStatefulConstraint) => React.ReactNode;
+  iconName: { [status in StatefulConstraintStatus | 'DEFAULT']?: IconNames };
+  shortSummary: (constraint: IStatefulConstraint, environment: IManagedArtifactVersionEnvironment) => React.ReactNode;
   overrideActions: { [status in StatefulConstraintStatus]?: IConstraintOverrideAction[] };
 }
 
@@ -30,6 +34,7 @@ interface IStatelessConstraintConfig {
   shortSummary: {
     pass: (constraint: IStatelessConstraint) => React.ReactNode;
     fail: (constraint: IStatelessConstraint) => React.ReactNode;
+    skipped: (constraint: IStatelessConstraint) => React.ReactNode;
   };
 }
 
@@ -39,12 +44,51 @@ export const isConstraintSupported = (type: string) =>
 export const isConstraintStateful = (constraint: IStatefulConstraint | IStatelessConstraint) =>
   statefulConstraintOptionsByType.hasOwnProperty(constraint.type);
 
-export const getConstraintIcon = (type: string) =>
-  (statefulConstraintOptionsByType[type]?.iconName || statelessConstraintOptionsByType[type]?.iconName) ??
-  UNKNOWN_CONSTRAINT_ICON;
-
-export const getConstraintActions = (constraint: IStatefulConstraint | IStatelessConstraint) => {
+export const getConstraintIcon = (constraint: IStatefulConstraint | IStatelessConstraint) => {
   if (!isConstraintStateful(constraint)) {
+    return statelessConstraintOptionsByType[constraint.type]?.iconName ?? UNKNOWN_CONSTRAINT_ICON;
+  }
+
+  const { type, status } = constraint as IStatefulConstraint;
+  const iconNamesByStatus = statefulConstraintOptionsByType[type]?.iconName;
+
+  return iconNamesByStatus?.[status] || iconNamesByStatus?.['DEFAULT'] || UNKNOWN_CONSTRAINT_ICON;
+};
+
+export const getConstraintTimestamp = (
+  constraint: IStatefulConstraint | IStatelessConstraint,
+  environment: IManagedArtifactVersionEnvironment,
+) => {
+  if (!isConstraintStateful(constraint)) {
+    return null;
+  }
+
+  const { status, startedAt, judgedAt } = constraint as IStatefulConstraint;
+
+  if (environment.state === 'skipped' && [PENDING, NOT_EVALUATED].includes(status)) {
+    return null;
+  }
+
+  switch (status) {
+    case PENDING:
+      return startedAt ? DateTime.fromISO(startedAt) : null;
+
+    case PASS:
+    case FAIL:
+    case OVERRIDE_PASS:
+    case OVERRIDE_FAIL:
+      return judgedAt ? DateTime.fromISO(judgedAt) : null;
+
+    default:
+      return null;
+  }
+};
+
+export const getConstraintActions = (
+  constraint: IStatefulConstraint | IStatelessConstraint,
+  environment: IManagedArtifactVersionEnvironment,
+) => {
+  if (!isConstraintStateful(constraint) || environment.state === 'skipped') {
     return null;
   }
 
@@ -52,20 +96,32 @@ export const getConstraintActions = (constraint: IStatefulConstraint | IStateles
   return statefulConstraintOptionsByType[type]?.overrideActions?.[status] ?? null;
 };
 
-export const getConstraintSummary = (constraint: IStatefulConstraint | IStatelessConstraint) => {
+export const getConstraintSummary = (
+  constraint: IStatefulConstraint | IStatelessConstraint,
+  environment: IManagedArtifactVersionEnvironment,
+) => {
   if (isConstraintStateful(constraint)) {
-    return getStatefulConstraintSummary(constraint as IStatefulConstraint);
+    return getStatefulConstraintSummary(constraint as IStatefulConstraint, environment);
   } else {
-    return getStatelessConstraintSummary(constraint as IStatelessConstraint);
+    return getStatelessConstraintSummary(constraint as IStatelessConstraint, environment);
   }
 };
 
-const getStatefulConstraintSummary = (constraint: IStatefulConstraint) =>
-  statefulConstraintOptionsByType[constraint.type]?.shortSummary(constraint) ?? null;
+const getStatefulConstraintSummary = (
+  constraint: IStatefulConstraint,
+  environment: IManagedArtifactVersionEnvironment,
+) => statefulConstraintOptionsByType[constraint.type]?.shortSummary(constraint, environment) ?? null;
 
-const getStatelessConstraintSummary = (constraint: IStatelessConstraint) => {
-  const { pass, fail } = statelessConstraintOptionsByType[constraint.type]?.shortSummary ?? {};
-  return (constraint.currentlyPassing ? pass?.(constraint) : fail?.(constraint)) ?? null;
+const getStatelessConstraintSummary = (
+  constraint: IStatelessConstraint,
+  environment: IManagedArtifactVersionEnvironment,
+) => {
+  const { pass, fail, skipped } = statelessConstraintOptionsByType[constraint.type]?.shortSummary ?? {};
+  if (environment.state === 'skipped') {
+    return skipped(constraint);
+  } else {
+    return (constraint.currentlyPassing ? pass?.(constraint) : fail?.(constraint)) ?? null;
+  }
 };
 
 // Later, this will become a "proper" registry so we can separate configs
@@ -73,27 +129,31 @@ const getStatelessConstraintSummary = (constraint: IStatelessConstraint) => {
 // For now let's get more of the details settled and iterated on.
 const statefulConstraintOptionsByType: { [type: string]: IStatefulConstraintConfig } = {
   'manual-judgement': {
-    iconName: 'manualJudgement',
-    shortSummary: ({ status, judgedAt, judgedBy, startedAt, comment }: IStatefulConstraint) => {
-      const startedAtMillis = DateTime.fromISO(startedAt).toMillis();
-      const judgedAtMillis = DateTime.fromISO(judgedAt).toMillis();
+    iconName: {
+      [PASS]: 'manualJudgementApproved',
+      [OVERRIDE_PASS]: 'manualJudgementApproved',
+      [FAIL]: 'manualJudgementRejected',
+      [OVERRIDE_FAIL]: 'manualJudgementRejected',
+      DEFAULT: 'manualJudgement',
+    },
+    shortSummary: (
+      { status, judgedBy, comment }: IStatefulConstraint,
+      environment: IManagedArtifactVersionEnvironment,
+    ) => {
+      if (environment.state === 'skipped' && [PENDING, NOT_EVALUATED].includes(status)) {
+        return 'Manual judgement skipped';
+      }
 
       switch (status) {
         case NOT_EVALUATED:
           return 'Manual judgement will be required before promotion';
         case PENDING:
-          return (
-            <span>
-              Awaiting manual judgement since {relativeTime(startedAtMillis)}{' '}
-              <span className="text-italic text-regular sp-margin-xs-left">({timestamp(startedAtMillis)})</span>
-            </span>
-          );
+          return 'Awaiting manual judgement';
         case OVERRIDE_PASS:
         case OVERRIDE_FAIL:
           return (
             <span className="sp-group-margin-xs-xaxis">
-              Manually {status === OVERRIDE_PASS ? 'approved' : 'rejected'} {relativeTime(judgedAtMillis)}{' '}
-              <span className="text-italic text-regular sp-margin-xs-left">({timestamp(judgedAtMillis)})</span>{' '}
+              <span>Manually {status === OVERRIDE_PASS ? 'approved' : 'rejected'}</span>{' '}
               <span className="text-regular">—</span> <span className="text-regular">by {judgedBy}</span>
             </span>
           );
@@ -131,6 +191,10 @@ const statelessConstraintOptionsByType: { [type: string]: IStatelessConstraintCo
         `Already deployed to prerequisite environment ${environment?.toUpperCase()}`,
       fail: ({ attributes: { environment } }) =>
         `Deployment to ${environment?.toUpperCase()} will be required before promotion`,
+      skipped: ({ currentlyPassing, attributes: { environment } }) =>
+        currentlyPassing
+          ? `Already deployed to prerequisite environment ${environment?.toUpperCase()}`
+          : `Skipped check for prerequisite environment ${environment?.toUpperCase()}`,
     },
   },
 };
