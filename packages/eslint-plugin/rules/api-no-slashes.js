@@ -42,13 +42,14 @@ const rule = function (context) {
         return;
       }
 
-      // finds 'foo/bad' from:
-      // ('foo/bad')
-      // ('ok', 'foo/bad')
+      // API.one('foo/bad')
+      //          ^^^^^^^
+      // API.all('ok').one('ok', 'foo/bad', 'ok')
+      //                          ^^^^^^^
       const literalArgs = args.filter((arg) => arg.type === 'Literal' && arg.raw.includes('/'));
 
-      // finds (badvar) from:
       // var badvar = 'foo/bad'; API.one(badvar);
+      //                                 ^^^^^^
       const variableArgs = args.filter((argument) => {
         if (argument.type !== 'Identifier') {
           return false;
@@ -59,12 +60,12 @@ const rule = function (context) {
       });
 
       if (literalArgs.length === 0 && variableArgs.length === 0) {
-        // console.log(args[0]);
         // console.log('no slashes');
         return;
       }
 
-      // API.*
+      // API.all('ok').one('ok', 'foo/bad', 'ok')
+      // ^^^
       if ((getCallingIdentifier(node) || {}).name !== 'API') {
         // console.log(getCallingIdentifier(callee));
         // console.log('calling identifier not API');
@@ -76,7 +77,7 @@ const rule = function (context) {
         `Instead, of API.one('foo/bar'), split into multiple arguments: API.one('foo', 'bar').`;
 
       const fix = (fixer) => {
-        // within the code:
+        // within:
         //   API.one('foo/bad')
         // replaces:
         //   'foo/bad'
@@ -91,13 +92,13 @@ const rule = function (context) {
           return fixer.replaceText(arg, varArgs);
         });
 
-        // within the code:
+        // within:
         //   let varDeclaration = 'foo/bad';
         //   API.one(varDeclaration)
-        // replaces:
-        //   (varDeclaration)
+        // replaces argument:
+        //   varDeclaration
         // with:
-        //   (...varDeclaration.split('/'))
+        //   ...varDeclaration.split('/')
         const variableArgFixes = variableArgs.map((arg) => {
           const spread = `...${arg.name}.split('/')`;
           return fixer.replaceText(arg, spread);
