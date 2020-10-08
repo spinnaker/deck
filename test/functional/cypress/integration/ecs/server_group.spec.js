@@ -28,37 +28,26 @@ describe('amazon ecs: ECSApp Server Group', () => {
   it('configure a new server group with artifacts', () => {
     cy.visit('#/applications/ecsapp/executions');
 
-    cy.get('a:contains("Configure")').click({ force: true });
+    cy.get('a:contains("Configure")').click();
+    cy.get('a:contains("Deploy")').click();
 
-    cy.get('a:contains("Deploy")').click({ force: true });
-
-    cy.get('.btn:contains("Add server group")').click();
-
+    cy.get('[data-test-id="Deploy.addServerGroup"]').click();
     cy.get('span:contains("Continue")').click();
 
-    cy.get('div[ng-model="command.ecsClusterName"]').type('spinnaker-deployment-cluster');
-
+    cy.get('[data-test-id="ServerGroup.clusterName"]').type('spinnaker-deployment-cluster');
     cy.get('span:contains("spinnaker-deployment-cluster")').click();
 
-    cy.get('input[ng-model="command.stack"]').type('functional');
+    cy.get('[data-test-id="ServerGroup.stack"]').type('create');
+    cy.get('[data-test-id="ServerGroup.details"]').type('artifact');
 
-    cy.get('input[ng-model="command.freeFormDetails"]').type('testing');
-
-    cy.get('div[ng-model="$ctrl.command.networkMode"]').type('awsvpc');
-
+    cy.get('[data-test-id="Networking.networkMode"]').type('awsvpc');
     cy.get('span:contains("awsvpc")').click();
 
-    cy.get('div[ng-model="$ctrl.command.subnetType"]').type('public');
-
+    cy.get('[data-test-id="Networking.subnetType"]').type('public');
     cy.get('span:contains("public-subnet")').click();
 
-    cy.get('input[ng-model="$ctrl.command.associatePublicIpAddress"]')
-      .eq(1)
-      .click();
-
-    cy.get('input[ng-model="command.useTaskDefinitionArtifact"]')
-      .eq(1)
-      .click();
+    cy.get('[data-test-id="Networking.associatePublicIpAddressFalse"]').click();
+    cy.get('[data-test-id="ServerGroup.useArtifacts"]').click();
 
     cy.get('task-definition-react .Select-placeholder:contains("Select an artifact")').type(' ');
 
@@ -77,180 +66,107 @@ describe('amazon ecs: ECSApp Server Group', () => {
       .eq(6)
       .type('someReference');
 
-    cy.get('task-definition-react button:contains("Add New Container Mapping")').click({ force: true });
-
-    cy.get('task-definition-react input[placeholder="enter container name..."]').type('v001-container');
-
-    cy.get('task-definition-react .Select-placeholder:contains("Select an image")').type('TRIGGER');
-
+    cy.get('[data-test-id="Artifacts.containerAdd"]').click();
+    cy.get('[data-test-id="Artifacts.containerName"]').type('v001-container');
+    cy.get('[data-test-id="Artifacts.containerImage"]').type('TRIGGER');
     cy.get('.Select-option:contains("TRIGGER")').click();
 
-    cy.get('task-definition-react button:contains("Add New Target Group Mapping")').click({ force: true });
-
-    cy.get('task-definition-react input[placeholder="Enter a container name ..."]').type('v001-container');
-
-    cy.get('task-definition-react .Select-placeholder:contains("Select a target group")').type('demo');
-
+    cy.get('[data-test-id="Artifacts.targetGroupAdd"]').click();
+    cy.get('[data-test-id="Artifacts.targetGroupContainer"]').type('v001-container');
+    cy.get('[data-test-id="Artifacts.targetGroup"]').type('demo');
     cy.get('.Select-option:contains("demo")').click();
 
-    cy.get('div[ng-model="$ctrl.command.launchType"]').type('FARGATE');
-
+    cy.get('[data-test-id="ServerGroup.launchType"]').type('FARGATE');
     cy.get('.ui-select-highlight:contains("FARGATE")').click();
 
-    cy.get('submit-button[label="command.viewState.submitButtonLabel"]').click();
+    cy.get('[data-test-id="ServerGroupWizard.submitButton"]').click();
 
     cy.get('.account-tag').should('have.length', 2);
-
     cy.get('td:contains("ecsapp-prod-ecsdemo")').should('have.length', 1);
-    cy.get('td:contains("ecsapp-functional-testing")').should('have.length', 1);
-
+    cy.get('td:contains("ecsapp-create-artifact")').should('have.length', 1);
     cy.get('td:contains("us-west-2")').should('have.length', 2);
 
-    cy.get('button[ng-click="pipelineConfigurerCtrl.revertPipelineChanges()"]').click();
+    cy.get('[data-test-id="Pipeline.revertChanges"]').click();
   });
 
   it('configure a new server group with container inputs', () => {
     cy.visit('#/applications/ecsapp/executions');
 
-    cy.get('a:contains("Configure")').click({ force: true });
+    cy.get('a:contains("Configure")').click();
+    cy.get('a:contains("Deploy")').click();
 
-    cy.get('a:contains("Deploy")').click({ force: true });
-
-    cy.get('.btn:contains("Add server group")').click();
-
+    cy.get('[data-test-id="Deploy.addServerGroup"]').click();
     cy.get('span:contains("Continue")').click();
 
-    cy.get('div[ng-model="command.ecsClusterName"]').type('spinnaker-deployment-cluster');
-
+    cy.get('[data-test-id="ServerGroup.clusterName"]').type('spinnaker-deployment-cluster');
     cy.get('span:contains("spinnaker-deployment-cluster")').click();
 
-    cy.get('input[ng-model="command.stack"]').type('functional');
+    cy.get('[data-test-id="ServerGroup.stack"]').type('create');
+    cy.get('[data-test-id="ServerGroup.details"]').type('inputs');
 
-    cy.get('input[ng-model="command.freeFormDetails"]').type('testing');
-
-    cy.get('div[ng-model="$ctrl.command.networkMode"]').type('awsvpc');
-
+    cy.get('[data-test-id="Networking.networkMode"]').type('awsvpc');
     cy.get('span:contains("awsvpc")').click();
 
-    cy.get('div[ng-model="$ctrl.command.subnetType"]').type('public');
-
+    cy.get('[data-test-id="Networking.subnetType"]').type('public');
     cy.get('span:contains("public-subnet")').click();
 
-    cy.get('input[ng-model="$ctrl.command.associatePublicIpAddress"]')
-      .eq(1)
-      .click();
+    cy.get('[data-test-id="Networking.associatePublicIpAddressFalse"]').click();
 
-    cy.get('.Select-placeholder:contains("Select an image")').type('TRIGGER');
-
+    cy.get('[data-test-id="ContainerInputs.containerImage"]').type('TRIGGER');
     cy.get('.Select-option:contains("TRIGGER")').click();
 
-    cy.get('container-react input[type=number]')
-      .eq(0)
-      .type(1024);
+    cy.get('[data-test-id="ContainerInputs.computeUnits"]').type(1024);
+    cy.get('[data-test-id="ContainerInputs.reservedMemory"]').type(1024);
 
-    cy.get('container-react input[type=number]')
-      .eq(1)
-      .type(1024);
-
-    cy.get('div[ng-model="$ctrl.command.launchType"]').type('FARGATE');
-
+    cy.get('[data-test-id="ServerGroup.launchType"]').type('FARGATE');
     cy.get('.ui-select-highlight:contains("FARGATE")').click();
 
-    cy.get('div[ng-model="$ctrl.command.logDriver"]').type('awslogs');
-
+    cy.get('[data-test-id="Logging.logDriver"]').type('awslogs');
     cy.get('span:contains("awslogs")').click();
 
-    cy.get('submit-button[label="command.viewState.submitButtonLabel"]').click();
+    cy.get('[data-test-id="ServerGroupWizard.submitButton"]').click();
 
     cy.get('.account-tag').should('have.length', 2);
-
     cy.get('td:contains("ecsapp-prod-ecsdemo")').should('have.length', 1);
-    cy.get('td:contains("ecsapp-functional-testing")').should('have.length', 1);
-
+    cy.get('td:contains("ecsapp-create-inputs")').should('have.length', 1);
     cy.get('td:contains("us-west-2")').should('have.length', 2);
 
-    cy.get('button[ng-click="pipelineConfigurerCtrl.revertPipelineChanges()"]').click();
-  });
-
-  it('edit an existing server group with artifact', () => {
-    cy.visit('#/applications/ecsapp/executions');
-
-    cy.get('a:contains("Configure")').click({ force: true });
-
-    cy.get('a:contains("Deploy")').click({ force: true });
-
-    cy.get('.glyphicon-edit').click({ force: true });
-
-    cy.get('input[ng-model="command.stack"]')
-      .clear()
-      .type('functional');
-
-    cy.get('input[ng-model="command.freeFormDetails"]')
-      .clear()
-      .type('testing');
-
-    cy.get('submit-button[label="command.viewState.submitButtonLabel"]').click();
-
-    cy.get('.account-tag').should('have.length', 1);
-
-    cy.get('td:contains("ecsapp-functional-testing")').should('have.length', 1);
-
-    cy.get('td:contains("us-west-2")').should('have.length', 1);
-
-    cy.get('button[ng-click="pipelineConfigurerCtrl.revertPipelineChanges()"]').click();
+    cy.get('[data-test-id="Pipeline.revertChanges"]').click();
   });
 
   it('edit an existing server group with container inputs', () => {
     cy.visit('#/applications/ecsapp/executions');
 
-    cy.get('a:contains("Configure")').click({ force: true });
+    cy.get('a:contains("Configure")').click();
+    cy.get('a:contains("Deploy")').click();
+    cy.get('.glyphicon-edit').click();
 
-    cy.get('a:contains("Deploy")').click({ force: true });
-
-    cy.get('.glyphicon-edit').click({ force: true });
-
-    cy.get('input[ng-model="command.stack"]')
+    cy.get('[data-test-id="ServerGroup.stack"]')
       .clear()
-      .type('functional');
-
-    cy.get('input[ng-model="command.freeFormDetails"]')
+      .type('edit');
+    cy.get('[data-test-id="ServerGroup.details"]')
       .clear()
-      .type('testing');
-
-    cy.get('input[ng-model="command.useTaskDefinitionArtifact"]')
-      .eq(0)
-      .click();
-
-    cy.get('container-react input[type=number]')
-      .eq(0)
+      .type('inputs');
+    cy.get('[data-test-id="ServerGroup.useInputs"]').click();
+    cy.get('[data-test-id="ContainerInputs.computeUnits"]')
       .clear()
       .type(1024);
-
-    cy.get('container-react input[type=number]')
-      .eq(1)
+    cy.get('[data-test-id="ContainerInputs.reservedMemory"]')
       .clear()
-      .type(1024);
+      .type(2048);
 
-    cy.get('submit-button[label="command.viewState.submitButtonLabel"]').click();
+    cy.get('[data-test-id="ServerGroupWizard.submitButton"]').click();
 
     cy.get('.account-tag').should('have.length', 1);
-
-    cy.get('td:contains("ecsapp-functional-testing")').should('have.length', 1);
-
+    cy.get('td:contains("ecsapp-edit-inputs")').should('have.length', 1);
     cy.get('td:contains("us-west-2")').should('have.length', 1);
 
-    cy.get('.glyphicon-edit').click({ force: true });
+    cy.get('.glyphicon-edit').click();
 
-    cy.get('container-react input[type=number]')
-      .eq(0)
-      .should('have.value', '1024');
+    cy.get('[data-test-id="ContainerInputs.computeUnits"]').should('have.value', '1024');
+    cy.get('[data-test-id="ContainerInputs.reservedMemory"]').should('have.value', '2048');
 
-    cy.get('container-react input[type=number]')
-      .eq(1)
-      .should('have.value', '1024');
-
-    cy.get('submit-button[label="command.viewState.submitButtonLabel"]').click();
-
-    cy.get('button[ng-click="pipelineConfigurerCtrl.revertPipelineChanges()"]').click();
+    cy.get('[data-test-id="ServerGroupWizard.submitButton"]').click();
+    cy.get('[data-test-id="Pipeline.revertChanges"]').click();
   });
 });
