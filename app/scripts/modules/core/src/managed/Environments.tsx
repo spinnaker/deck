@@ -82,7 +82,7 @@ export function Environments({ app }: IEnvironmentsProps) {
   const resourcesByEnvironment = useMemo(
     () =>
       environments.reduce((byEnvironment, { name, resources: resourceIds }) => {
-        byEnvironment[name] = resourceIds.map(id => resourcesById[id]);
+        byEnvironment[name] = resourceIds.map((id) => resourcesById[id]);
         return byEnvironment;
       }, {} as { [environment: string]: IManagedResourceSummary[] }),
     [environments, resourcesById],
@@ -140,45 +140,56 @@ export function Environments({ app }: IEnvironmentsProps) {
 
   return (
     <div className="Environments">
-      <div className="artifacts-column">
+      <div className="artifacts-column flex-container-v">
         <ColumnHeader text="Versions" icon="artifact" />
-        <ArtifactsList
-          artifacts={artifacts}
-          selectedVersion={selectedVersion}
-          versionSelected={clickedVersion => {
-            if (!isEqual(clickedVersion, selectedVersion)) {
-              go(selectedVersion ? '.' : '.artifactVersion', clickedVersion);
-            }
-          }}
-        />
+        <div className="artifacts-column-scroll-container">
+          <ArtifactsList
+            artifacts={artifacts}
+            selectedVersion={selectedVersion}
+            versionSelected={(clickedVersion) => {
+              if (!isEqual(clickedVersion, selectedVersion)) {
+                go(selectedVersion ? '.' : '.artifactVersion', clickedVersion);
+              }
+            }}
+          />
+        </div>
       </div>
       <div className="environments-column">
         {overviewPaneTransition.map(
           ({ item: show, key, props }) =>
             show && (
-              <animated.div key={key} className="environments-pane" style={props}>
-                <ColumnHeader text="Environments" icon="environment" />
-                <EnvironmentsHeader
-                  app={app}
-                  resourceInfo={{
-                    managed: resources.filter(r => !r.isPaused).length,
-                    total: resources.length,
-                  }}
-                />
-                <EnvironmentsList application={app} {...{ environments, artifacts, resourcesById }} />
+              <animated.div key={key} className="environments-pane flex-container-v" style={props}>
+                <div className="flex-container-v" style={{ overflow: 'hidden' }}>
+                  <div className="sp-margin-m-right">
+                    <ColumnHeader text="Environments" icon="environment" />
+                  </div>
+                  <div className="environments-column-scroll-container">
+                    <div className="sp-margin-m-yaxis sp-margin-m-right">
+                      <EnvironmentsHeader
+                        app={app}
+                        resourceInfo={{
+                          managed: resources.filter((r) => !r.isPaused).length,
+                          total: resources.length,
+                        }}
+                      />
+                      <EnvironmentsList application={app} {...{ environments, artifacts, resourcesById }} />
+                    </div>
+                  </div>
+                </div>
               </animated.div>
             ),
         )}
         {detailPaneTransition.map(
           ({ item, key, props }) =>
             item.selectedVersion && (
-              <animated.div key={key} className="environments-pane" style={props}>
+              <animated.div key={key} className="environments-pane flex-container-v" style={props}>
                 <ArtifactDetail
                   application={app}
                   name={item.selectedArtifactDetails.name}
                   reference={item.selectedArtifactDetails.reference}
                   version={item.selectedVersionDetails}
                   allVersions={item.selectedArtifactDetails.versions}
+                  allEnvironments={environments}
                   resourcesByEnvironment={resourcesByEnvironment}
                   onRequestClose={() => go('^')}
                 />
