@@ -10,13 +10,14 @@ type ActionGroup = Action[];
 
 export interface IInstanceActionsProps {
   actionGroups: ActionGroup[];
+  title?: string;
 }
 
-export const InstanceActions = ({ actionGroups }: IInstanceActionsProps) => (
+export const InstanceActions = ({ actionGroups, title }: IInstanceActionsProps) => (
   <div style={{ display: 'inline-block' }}>
     <Dropdown className="dropdown" id="instace-actions-dropdown">
       <Dropdown.Toggle className="btn btn-sm btn-primary dropdown-toggle">
-        <span>Instance Actions</span>
+        <span>{title || 'Instance Actions'}</span>
       </Dropdown.Toggle>
       <Dropdown.Menu>
         {(actionGroups || [])
