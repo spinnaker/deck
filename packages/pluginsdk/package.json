@@ -9,7 +9,6 @@
     "clean": "npx shx rm -rf dist",
     "build": "rollup -c",
     "watch": "rollup -c -w",
-    "postinstall": "./scripts/syncPeerDependencies.js",
     "prepublishOnly": "npm run build"
   },
   "bin": {
