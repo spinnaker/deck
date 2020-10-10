@@ -25,13 +25,13 @@ module(SERVER_GROUP_STATES, [APPLICATION_STATE_PROVIDER, STATE_CONFIG_PROVIDER])
           controllerAs: 'ctrl',
         },
       },
-      redirectTo: transition => {
+      redirectTo: (transition) => {
         return transition
           .injector()
           .getAsync('app')
           .then((app: Application) => {
             if (app.serverGroups.disabled) {
-              const relativeSref = app.dataSources.find(ds => ds.sref && !ds.disabled).sref;
+              const relativeSref = app.dataSources.find((ds) => ds.sref && !ds.disabled).sref;
               const params = transition.params();
               // Target the state relative to the `clusters` state
               const options = { relative: transition.to().name };
@@ -101,7 +101,5 @@ module(SERVER_GROUP_STATES, [APPLICATION_STATE_PROVIDER, STATE_CONFIG_PROVIDER])
     applicationStateProvider.addInsightState(clusters);
     applicationStateProvider.addInsightDetailState(serverGroupDetails);
     applicationStateProvider.addInsightDetailState(multipleServerGroups);
-
-    stateConfigProvider.addRewriteRule('/applications/{application}', '/applications/{application}/clusters');
   },
 ]);
