@@ -275,41 +275,45 @@ angular
         return ModalWizard.allPagesVisited();
       };
 
-      function buildLoadBalancerMetadata(loadBalancerNames, loadBalancerIndex, backendServices) {
-        let metadata = {};
+      function buildLoadBalancerMetadata(loadBalancerNames, loadBalancerIndex) {
+        let metadata = {
+          'load-balancer-names': [],
+          'global-load-balancer-names': [],
+          'backend-service-names': [],
+          'region-backend-service-names': [],
+        };
 
         if (_.get(loadBalancerNames, 'length') > 0) {
-          metadata = loadBalancerNames.reduce(
-            (metadata, name) => {
-              const loadBalancerDetails = loadBalancerIndex[name];
+          metadata = loadBalancerNames.reduce((metadata, name) => {
+            const loadBalancerDetails = loadBalancerIndex[name];
 
-              if (loadBalancerDetails.loadBalancerType === 'HTTP') {
-                metadata['global-load-balancer-names'] = metadata['global-load-balancer-names'].concat(
-                  loadBalancerDetails.listeners.map(listener => listener.name),
-                );
-              } else if (loadBalancerDetails.loadBalancerType === 'INTERNAL_MANAGED') {
-                metadata['load-balancer-names'] = metadata['load-balancer-names'].concat(
-                  loadBalancerDetails.listeners.map(listener => listener.name),
-                );
-              } else if (loadBalancerDetails.loadBalancerType === 'SSL') {
-                metadata['global-load-balancer-names'].push(name);
-              } else if (loadBalancerDetails.loadBalancerType === 'TCP') {
-                metadata['global-load-balancer-names'].push(name);
-              } else {
-                metadata['load-balancer-names'].push(name);
-              }
-              return metadata;
-            },
-            { 'load-balancer-names': [], 'global-load-balancer-names': [] },
-          );
-        }
+            if (loadBalancerDetails.loadBalancerType === 'HTTP') {
+              metadata['global-load-balancer-names'] = metadata['global-load-balancer-names'].concat(
+                loadBalancerDetails.listeners.map(listener => listener.name),
+              );
+            } else if (loadBalancerDetails.loadBalancerType === 'INTERNAL_MANAGED') {
+              metadata['load-balancer-names'] = metadata['load-balancer-names'].concat(
+                loadBalancerDetails.listeners.map(listener => listener.name),
+              );
+            } else if (loadBalancerDetails.loadBalancerType === 'SSL') {
+              metadata['global-load-balancer-names'].push(name);
+            } else if (loadBalancerDetails.loadBalancerType === 'TCP') {
+              metadata['global-load-balancer-names'].push(name);
+            } else {
+              metadata['load-balancer-names'].push(name);
+            }
 
-        if (_.isObject(backendServices) && Object.keys(backendServices).length > 0) {
-          metadata['backend-service-names'] = _.reduce(
-            backendServices,
-            (accumulatedBackends, backends) => accumulatedBackends.concat(backends),
-            [],
-          );
+            if (loadBalancerDetails.loadBalancerType === 'INTERNAL_MANAGED') {
+              metadata['region-backend-service-names'] = metadata['region-backend-service-names'].concat(
+                loadBalancerDetails.backendServices,
+              );
+            } else {
+              metadata['backend-service-names'] = metadata['backend-service-names'].concat(
+                loadBalancerDetails.backendServices,
+              );
+            }
+            return metadata;
+          }, metadata);
         }
 
         for (const key in metadata) {
@@ -357,7 +361,6 @@ angular
         const loadBalancerMetadata = buildLoadBalancerMetadata(
           $scope.command.loadBalancers,
           $scope.command.backingData.filtered.loadBalancerIndex,
-          $scope.command.backendServices,
         );
 
         const origLoadBalancers = $scope.command.loadBalancers;
