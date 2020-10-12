@@ -47,7 +47,7 @@ export class ExecutionFilters extends React.Component<IExecutionFiltersProps, IE
 
     const searchString = ExecutionState.filterModel.asFilterModel.sortFilter.filter;
     this.state = {
-      pipelineNames: this.getPipelineNames(false).filter(pipelineName =>
+      pipelineNames: this.getPipelineNames(false).filter((pipelineName) =>
         searchString ? pipelineName.toLocaleLowerCase().includes(searchString.toLocaleLowerCase()) : true,
       ),
       strategyNames: this.getPipelineNames(true),
@@ -111,7 +111,7 @@ export class ExecutionFilters extends React.Component<IExecutionFiltersProps, IE
     const otherSource = strategy ? 'pipelineConfigs' : 'strategyConfigs';
     const configs = get(application, `${source}.data`, []);
     const otherConfigs = get(application, `${otherSource}.data`, []);
-    const allConfigIds = configs.concat(otherConfigs).map(c => c.id);
+    const allConfigIds = configs.concat(otherConfigs).map((c) => c.id);
     // assume executions which don't have a match by pipelineConfigId are regular executions, not strategies
     const unmatchedExecutions = strategy
       ? []
@@ -127,7 +127,7 @@ export class ExecutionFilters extends React.Component<IExecutionFiltersProps, IE
     const { pipelineNames, strategyNames, searchString } = this.state;
     let newPipelineNames = this.getPipelineNames(false);
     if (searchString.length > 0) {
-      newPipelineNames = newPipelineNames.filter(pipelineName =>
+      newPipelineNames = newPipelineNames.filter((pipelineName) =>
         pipelineName.toLocaleLowerCase().includes(searchString.toLocaleLowerCase()),
       );
     }
@@ -270,6 +270,12 @@ export class ExecutionFilters extends React.Component<IExecutionFiltersProps, IE
                 <FilterStatus status="STOPPED" label="Stopped" refresh={this.refreshExecutions} />
                 <FilterStatus status="PAUSED" label="Paused" refresh={this.refreshExecutions} />
                 <FilterStatus status="BUFFERED" label="Buffered" refresh={this.refreshExecutions} />
+                <FilterStages
+                  status="RUNNING"
+                  stages="MANUAL_JUDGMENT"
+                  label="Manual Judgment"
+                  refresh={this.refreshExecutions}
+                />
               </div>
             </FilterSection>
           </div>
@@ -330,7 +336,7 @@ const Pipelines = SortableContainer(
   (props: { names: string[]; tags: IFilterTag[]; dragEnabled: boolean; update: () => void }) => (
     <div>
       {props.names.map((pipeline, index) => {
-        const tag = props.tags.find(t => t.key === 'pipeline' && t.value === pipeline);
+        const tag = props.tags.find((t) => t.key === 'pipeline' && t.value === pipeline);
 
         return (
           <Pipeline
@@ -358,7 +364,34 @@ const FilterStatus = (props: { status: string; label: string; refresh: () => voi
   return (
     <div className="checkbox">
       <label>
-        <input type="checkbox" checked={sortFilter.status[props.status] || false} onChange={changed} />
+        <input
+          type="checkbox"
+          checked={sortFilter.status[props.status] || false}
+          disabled={props.label.toUpperCase() == 'RUNNING' && sortFilter.filterStages}
+          onChange={changed}
+        />
+        {props.label}
+      </label>
+    </div>
+  );
+};
+
+const FilterStages = (props: { status: string; stages: string; label: string; refresh: () => void }): JSX.Element => {
+  const sortFilter = ExecutionState.filterModel.asFilterModel.sortFilter;
+  const applyParams = !ExecutionState.filterModel.asFilterModel.sortFilter.status['RUNNING'];
+
+  const changed = () => {
+    sortFilter.filterStages = !sortFilter.filterStages;
+    sortFilter.stages[props.stages] = sortFilter.filterStages ? true : false;
+    if (applyParams) {
+      sortFilter.status[props.status] = !sortFilter.status[props.status];
+    }
+    props.refresh();
+  };
+  return (
+    <div className="checkbox">
+      <label>
+        <input type="checkbox" checked={sortFilter.filterStages} onChange={changed} />
         {props.label}
       </label>
     </div>
