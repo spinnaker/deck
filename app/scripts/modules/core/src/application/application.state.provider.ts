@@ -33,19 +33,6 @@ export class ApplicationStateProvider implements IServiceProvider {
     this.childStates.push(this.insightState);
   }
 
-  private static getDefaultState(app: Application) {
-    const environments = app.getDataSource('environments');
-    const serverGroups = app.getDataSource('serverGroups');
-
-    if (environments && !environments.disabled) {
-      return '.environments';
-    } else if (serverGroups && !serverGroups.disabled) {
-      return '.insight.clusters';
-    } else {
-      return app.dataSources.find((ds) => ds.sref && !ds.disabled).sref;
-    }
-  }
-
   /**
    * Adds a direct child to the application that does not use the Insight (i.e. inspector) views, e.g. tasks
    * @param state
@@ -97,12 +84,13 @@ export class ApplicationStateProvider implements IServiceProvider {
           .injector()
           .getAsync('app')
           .then((app: Application) => {
-            const defaultState = ApplicationStateProvider.getDefaultState(app);
+            const defaultDataSource = app.dataSources.find((ds) => ds.sref && !ds.disabled)?.sref;
 
             const params = transition.params();
-            const options = { relative: transition.to().name };
+            // If there's no data source to route to, we need to use the absolute href 'home.search'
+            const options = { relative: defaultDataSource ? transition.to().name : undefined };
 
-            return transition.router.stateService.target(defaultState, params, options);
+            return transition.router.stateService.target(defaultDataSource || 'home.search', params, options);
           });
       },
       resolve: {
