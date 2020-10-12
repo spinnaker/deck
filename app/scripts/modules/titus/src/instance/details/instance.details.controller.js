@@ -309,7 +309,7 @@ module(TITUS_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
       return Object.keys($scope.instance.resources.ports).length > 0;
     };
 
-    const constructTaskActions = (instance) => {
+    const constructTaskActions = () => {
       const constantActions = [
         { label: 'Terminate', triggerAction: this.terminateInstance },
         { label: 'Terminate and Shrink Server Gorup', triggerAction: this.terminateInstanceAndShrinkServerGroup },
@@ -335,7 +335,7 @@ module(TITUS_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
     const initialize = app.isStandalone ? retrieveInstance() : app.serverGroups.ready().then(retrieveInstance);
 
     initialize.then(() => {
-      $scope.taskActions = constructTaskActions($scope.instance);
+      $scope.taskActions = constructTaskActions();
       // Two things to look out for here:
       //  1. If the retrieveInstance call completes *after* the user has navigated away from the view, there
       //     is no point in subscribing to the refresh
