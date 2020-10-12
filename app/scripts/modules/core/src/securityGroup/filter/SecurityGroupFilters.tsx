@@ -9,6 +9,7 @@ import { FilterCheckbox } from 'core/filterModel/FilterCheckBox';
 import { FilterSearch } from 'core/cluster/filter/FilterSearch';
 import { FilterSection } from 'core/cluster/filter/FilterSection';
 import { SecurityGroupState } from 'core/state';
+import { ISecurityGroup } from 'core/domain';
 
 export interface ISecurityGroupFiltersProps {
   app: Application;
@@ -37,7 +38,7 @@ const poolValueCoordinates = [
 ];
 
 const poolBuilder = (securityGroups: any[]): IPoolItem[] => {
-  const pool = securityGroups.map(sg => {
+  const pool = securityGroups.map((sg) => {
     const poolUnit = chain(poolValueCoordinates)
       .filter({ on: 'securityGroup' })
       .reduce((poolUnitTemplate: any, coordinate) => {
@@ -54,7 +55,7 @@ const poolBuilder = (securityGroups: any[]): IPoolItem[] => {
 
 export const SecurityGroupFilters = ({ app }: ISecurityGroupFiltersProps) => {
   const { securityGroups } = app;
-  const { data: securityGroupData, loaded: securityGroupsLoaded } = useDataSource(securityGroups);
+  const { data: securityGroupData, loaded: securityGroupsLoaded } = useDataSource<ISecurityGroup[]>(securityGroups);
 
   const [tags, setTags] = React.useState(SecurityGroupState.filterModel.asFilterModel.tags);
   const [sortFilter, setSortFilter] = React.useState<ISortFilter>(
@@ -149,7 +150,7 @@ export const SecurityGroupFilters = ({ app }: ISecurityGroupFiltersProps) => {
         <div className="content">
           {headings.providerType.length > 1 && (
             <FilterSection key="filter-provider" heading="Provider" expanded={true}>
-              {headings.providerType.map(heading => (
+              {headings.providerType.map((heading) => (
                 <FilterCheckbox
                   heading={heading}
                   isCloudProvider={true}
@@ -162,7 +163,7 @@ export const SecurityGroupFilters = ({ app }: ISecurityGroupFiltersProps) => {
             </FilterSection>
           )}
           <FilterSection key="filter-account" heading="Account" expanded={true}>
-            {headings.account.map(heading => (
+            {headings.account.map((heading) => (
               <FilterCheckbox
                 heading={heading}
                 key={heading}
@@ -173,7 +174,7 @@ export const SecurityGroupFilters = ({ app }: ISecurityGroupFiltersProps) => {
             ))}
           </FilterSection>
           <FilterSection key="filter-region" heading="Region" expanded={true}>
-            {headings.region.map(heading => (
+            {headings.region.map((heading) => (
               <FilterCheckbox
                 heading={heading}
                 key={heading}
@@ -184,7 +185,7 @@ export const SecurityGroupFilters = ({ app }: ISecurityGroupFiltersProps) => {
             ))}
           </FilterSection>
           <FilterSection key="filter-stack" heading="Stack" expanded={true}>
-            {headings.stack.map(heading => (
+            {headings.stack.map((heading) => (
               <FilterCheckbox
                 heading={heading}
                 key={heading}
@@ -195,7 +196,7 @@ export const SecurityGroupFilters = ({ app }: ISecurityGroupFiltersProps) => {
             ))}
           </FilterSection>
           <FilterSection key="filter-detail" heading="Detail" expanded={true}>
-            {headings.detail.map(heading => (
+            {headings.detail.map((heading) => (
               <FilterCheckbox
                 heading={heading}
                 key={heading}

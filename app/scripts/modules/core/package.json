@@ -1,13 +1,12 @@
 {
   "name": "@spinnaker/core",
   "license": "Apache-2.0",
-  "version": "0.0.504",
+  "version": "0.0.519",
   "main": "lib/lib.js",
   "typings": "lib/index.d.ts",
   "scripts": {
     "clean": "../../../../node_modules/rimraf/bin.js lib",
-    "lib": "npm run clean && npm run css-types && ../../../../node_modules/typescript/bin/tsc && node ../../../../node_modules/webpack/bin/webpack.js",
-    "css-types": "../../../../node_modules/typed-css-modules/lib/cli.js --p **/*.module.css src",
+    "lib": "npm run clean && ../../../../node_modules/typescript/bin/tsc && node ../../../../node_modules/webpack/bin/webpack.js",
     "prepublishOnly": "npm run lib"
   }
 }

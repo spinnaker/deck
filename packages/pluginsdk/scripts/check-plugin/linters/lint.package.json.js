@@ -1,47 +1,63 @@
+/* eslint-disable no-console */
+
 const { execSync } = require('child_process');
 const { assertJsonFile } = require('../asserters/assertJsonFile');
-const { readJson, writeJson } = require('../util/readWriteJson');
+const { readJson } = require('../util/readWriteJson');
 
-function getLatestSdkVersion() {
-  const versionsString = execSync('npm info @spinnaker/pluginsdk versions').toString();
+const PLUGIN_SDK = '@spinnaker/pluginsdk';
+const PEER_DEPS = '@spinnaker/pluginsdk-peerdeps';
+
+function getLatestPackageVersion(pkg) {
+  const versionsString = execSync(`npm info ${pkg} versions`).toString();
   return JSON.parse(versionsString.replace(/'/g, '"')).pop();
+}
+
+function getInstalledPackageVersion(pkgJson, pkg) {
+  return (
+    (pkgJson.dependencies && pkgJson.dependencies[pkg]) || (pkgJson.devDependencies && pkgJson.devDependencies[pkg])
+  );
 }
 
 function checkPackageJson(report) {
   const pkgJson = readJson('package.json');
-  const deps = pkgJson.dependencies || {};
-  const sdk = deps['@spinnaker/pluginsdk'];
-  const latest = getLatestSdkVersion();
 
-  const latestVersionFixer = () => {
-    execSync(`yarn add @spinnaker/pluginsdk@${latest}`, { stdio: 'inherit' });
-    console.log(`fixed: installed @spinnaker/pluginsdk@${latest}`);
-  };
-  const latestVersionResolution = '--fix: install latest @spinnaker/pluginsdk';
-  report('Uses latest @spinnaker/pluginsdk', sdk === latest, latestVersionResolution, latestVersionFixer);
+  const latestSdkVersion = getLatestPackageVersion(PLUGIN_SDK);
+  const installedSdkVersion = getInstalledPackageVersion(pkgJson, PLUGIN_SDK);
+
+  report(
+    installedSdkVersion
+      ? `This plugin uses an out of date ${PLUGIN_SDK}@${installedSdkVersion}`
+      : `This plugin does not have ${PLUGIN_SDK} installed`,
+    installedSdkVersion === latestSdkVersion,
+    {
+      description: `Install ${PLUGIN_SDK}@${latestSdkVersion}`,
+      command: `yarn add ${PLUGIN_SDK}@${latestSdkVersion}`,
+    },
+  );
+
+  // const latestPeerDepsVersion = getLatestPackageVersion(PEER_DEPS);
+  const latestPeerDepsVersion = getLatestPackageVersion(PLUGIN_SDK);
+  const installedPeerDepsVersion = getInstalledPackageVersion(pkgJson, PEER_DEPS);
+
+  report(
+    installedPeerDepsVersion
+      ? `This plugin uses an out of date ${PEER_DEPS}@${installedPeerDepsVersion}`
+      : `This plugin does not have ${PEER_DEPS} installed`,
+    installedPeerDepsVersion === latestPeerDepsVersion,
+    {
+      description: `Install ${PEER_DEPS}@${latestPeerDepsVersion}`,
+      command: `yarn add ${PEER_DEPS}@${latestPeerDepsVersion}`,
+    },
+  );
 
   const checkPackageJsonField = assertJsonFile(report, 'package.json', pkgJson);
 
-  checkPackageJsonField('module', 'build/dist/index.js');
+  checkPackageJsonField('scripts.build', 'npm run clean && rollup -c');
   checkPackageJsonField('scripts.clean', 'npx shx rm -rf build');
-  checkPackageJsonField('scripts.build', 'rollup -c');
-  checkPackageJsonField('scripts.watch', 'rollup -c -w');
-  checkPackageJsonField('scripts.proxy', 'dev-proxy');
+  checkPackageJsonField('scripts.develop', 'npm run clean && run-p watch proxy');
   checkPackageJsonField('scripts.postinstall', 'check-plugin && check-peer-dependencies || true');
-
-  const bundlesFiles = pkgJson.files && pkgJson.files.includes('build/dist');
-  const bundlesFilesFixer = () => {
-    const json = readJson('package.json');
-    if (!json.files) {
-      json.files = [];
-    }
-    json.files.push('build/dist');
-    writeJson('package.json', json);
-
-    console.log(`fixed: added "build/dist" to "files" in package.json`);
-  };
-  const resolution = `--fix: Add "build/dist" to files array in package.json`;
-  report('package.json: files includes "build/dist"', bundlesFiles, resolution, bundlesFilesFixer);
+  checkPackageJsonField('scripts.proxy', 'dev-proxy');
+  checkPackageJsonField('scripts.watch', 'rollup -c -w --no-watch.clearScreen');
 }
 
 module.exports = { checkPackageJson };

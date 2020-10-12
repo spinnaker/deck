@@ -76,8 +76,7 @@ export class SpelNumberInput extends React.Component<INumberInputProps, INumberI
               >
                 <Tooltip value="Toggle to enter expression">
                   <span>
-                    {'${'}
-                    &hellip;}
+                    {'${'}&hellip;{'}'}
                   </span>
                 </Tooltip>
               </button>

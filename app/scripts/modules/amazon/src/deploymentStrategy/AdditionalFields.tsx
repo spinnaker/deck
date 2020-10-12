@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { IDeploymentStrategyAdditionalFieldsProps, HelpField } from '@spinnaker/core';
+import { AWSProviderSettings } from '../aws.settings';
 import { IRollingPushCommand } from './rollingPush.strategy';
 
 export interface IRollingPushStrategyAdditionalFieldsProps extends IDeploymentStrategyAdditionalFieldsProps {
@@ -18,8 +19,11 @@ export class AdditionalFields extends React.Component<IRollingPushStrategyAdditi
     return (
       <div className="form-group" style={{ marginTop: '20px' }}>
         <div className="well-compact alert alert-warning">
-          <strong>Note:</strong> a rolling push only updates the <em>launch configuration</em> for the auto scaling
-          group.
+          <strong>Note:</strong> a rolling push only updates the{' '}
+          <em>
+            launch {Boolean(AWSProviderSettings.serverGroups?.enableLaunchTemplates) ? 'template' : 'configuration'}
+          </em>{' '}
+          for the auto scaling group.
           <br /> Changes to the following fields will be ignored:
           <ul>
             <li>Account, Region, Subnet Type</li>
@@ -35,7 +39,7 @@ export class AdditionalFields extends React.Component<IRollingPushStrategyAdditi
               <input
                 type="checkbox"
                 checked={command.termination.relaunchAllInstances}
-                onChange={e => this.handleChange('relaunchAllInstances', e.target.checked)}
+                onChange={(e) => this.handleChange('relaunchAllInstances', e.target.checked)}
               />
               <b>Relaunch all instances</b>
               <HelpField id="strategy.rollingPush.relaunchAll" />
@@ -54,7 +58,7 @@ export class AdditionalFields extends React.Component<IRollingPushStrategyAdditi
                 className="form-control input-sm"
                 type="number"
                 value={command.termination.totalRelaunches}
-                onChange={e => this.handleChange('totalRelaunches', e.target.value)}
+                onChange={(e) => this.handleChange('totalRelaunches', e.target.value)}
                 min="0"
               />
             </div>
@@ -72,7 +76,7 @@ export class AdditionalFields extends React.Component<IRollingPushStrategyAdditi
                 className="form-control input-sm"
                 type="number"
                 value={command.termination.concurrentRelaunches}
-                onChange={e => this.handleChange('concurrentRelaunches', e.target.value)}
+                onChange={(e) => this.handleChange('concurrentRelaunches', e.target.value)}
                 min="1"
               />
             </div>
@@ -90,7 +94,7 @@ export class AdditionalFields extends React.Component<IRollingPushStrategyAdditi
                 className="input input-sm"
                 style={{ width: '100px' }}
                 value={command.termination.order}
-                onChange={e => this.handleChange('order', e.target.value)}
+                onChange={(e) => this.handleChange('order', e.target.value)}
               >
                 <option value="oldest">oldest first</option>
                 <option value="newest">newest first</option>

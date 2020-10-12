@@ -18,9 +18,7 @@
     </div>
     <div class="header-text horizontal middle">
       <i class="fa fa-crosshairs icon" aria-hidden="true"></i>
-      <h3 class="horizontal middle space-between flex-1" select-on-dbl-click>
-        {{ctrl.targetGroup.name}}
-      </h3>
+      <h3 class="horizontal middle space-between flex-1" select-on-dbl-click>{{ctrl.targetGroup.name}}</h3>
     </div>
   </div>
   <managed-resource-details-indicator
@@ -31,7 +29,7 @@
   </managed-resource-details-indicator>
   <div ng-if="!ctrl.state.loading" class="content">
     <collapsible-section heading="Target Group Details" expanded="true">
-      <dl class="dl-horizontal dl-flex">
+      <dl class="dl-horizontal dl-narrow">
         <dt>In</dt>
         <dd><account-tag account="ctrl.targetGroup.account" pad="right"></account-tag> {{ctrl.targetGroup.region}}</dd>
         <dt>VPC</dt>

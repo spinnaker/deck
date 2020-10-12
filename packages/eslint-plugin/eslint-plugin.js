@@ -1,5 +1,6 @@
 module.exports = {
   rules: {
+    'api-no-slashes': require('./rules/api-no-slashes'),
     'import-from-alias-not-npm': require('./rules/import-from-alias-not-npm'),
     'import-from-npm-not-alias': require('./rules/import-from-npm-not-alias'),
     'import-from-npm-not-relative': require('./rules/import-from-npm-not-relative'),
@@ -9,6 +10,7 @@ module.exports = {
     'ng-no-require-angularjs': require('./rules/ng-no-require-angularjs'),
     'ng-no-require-module-deps': require('./rules/ng-no-require-module-deps'),
     'ng-strictdi': require('./rules/ng-strictdi'),
+    'react2angular-with-error-boundary.spec.js': require('./rules/react2angular-with-error-boundary'),
   },
   configs: {
     base: require('./base.config.js'),

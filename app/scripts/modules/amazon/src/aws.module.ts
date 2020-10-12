@@ -69,10 +69,12 @@ import { AMAZON_INSTANCE_AWSINSTANCETYPE_SERVICE } from './instance/awsInstanceT
 import { AMAZON_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER } from './instance/details/instance.details.controller';
 import { AMAZON_SEARCH_SEARCHRESULTFORMATTER } from './search/searchResultFormatter';
 import { AWS_EVALUATE_CLOUD_FORMATION_CHANGE_SET_EXECUTION_SERVICE } from './pipeline/stages/deployCloudFormation/evaluateCloudFormationChangeSetExecution.service';
+import { INSTANCE_STATUS_COMPONENT } from './instance/details/instanceStatus.component';
+import { AMAZON_INSTANCE_INFORMATION_COMPONENT } from './instance/details/amazonInstanceInformation.component';
 
 // load all templates into the $templateCache
 const templates = require.context('./', true, /\.html$/);
-templates.keys().forEach(function(key) {
+templates.keys().forEach(function (key) {
   templates(key);
 });
 
@@ -108,6 +110,8 @@ module(AMAZON_MODULE, [
   CLOUDFORMATION_TEMPLATE_ENTRY,
   CLOUD_FORMATION_CHANGE_SET_INFO,
   AWS_EVALUATE_CLOUD_FORMATION_CHANGE_SET_EXECUTION_SERVICE,
+  INSTANCE_STATUS_COMPONENT,
+  AMAZON_INSTANCE_INFORMATION_COMPONENT,
 ]).config(() => {
   CloudProviderRegistry.registerProvider('aws', {
     name: 'Amazon',

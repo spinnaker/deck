@@ -59,7 +59,7 @@ export interface IManagedResourceSummary {
   };
 }
 
-export interface IManagedEnviromentSummary {
+export interface IManagedEnvironmentSummary {
   name: string;
   resources: string[];
   artifacts: Array<{
@@ -83,6 +83,7 @@ export interface IManagedEnviromentSummary {
 export interface IManagedArtifactVersion {
   version: string;
   displayName: string;
+  createdAt?: string;
   environments: Array<{
     name: string;
     state: 'current' | 'deploying' | 'approved' | 'pending' | 'previous' | 'vetoed' | 'skipped';
@@ -103,12 +104,39 @@ export interface IManagedArtifactVersion {
     statelessConstraints?: IStatelessConstraint[];
   }>;
   build?: {
-    id: number;
+    id: number; // deprecated, use number
+    number: string;
+    uid: string;
+    job: {
+      link: string;
+      name: string;
+    };
+    startedAt: string;
+    completedAt?: string;
+    status: 'SUCCESS' | 'UNSTABLE' | 'BUILDING' | 'ABORTED' | 'FAILURE' | 'NOT_BUILT';
   };
   git?: {
-    commit: string;
+    commit: string; // deprecated, use commitInfo
+    author: string;
+    project: string;
+    branch: string;
+    repo: {
+      name: string;
+      link: string;
+    };
+    pullRequest?: {
+      number: string;
+      url: string;
+    };
+    commitInfo: {
+      sha: string;
+      link: string;
+      message: string;
+    };
   };
 }
+
+export type IManagedArtifactVersionEnvironment = IManagedArtifactSummary['versions'][0]['environments'][0];
 
 export interface IManagedArtifactSummary {
   name: string;
@@ -119,7 +147,7 @@ export interface IManagedArtifactSummary {
 
 interface IManagedApplicationEntities {
   resources: IManagedResourceSummary[];
-  environments: IManagedEnviromentSummary[];
+  environments: IManagedEnvironmentSummary[];
   artifacts: IManagedArtifactSummary[];
 }
 

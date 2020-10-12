@@ -86,7 +86,7 @@
   </div>
   <div class="content" ng-if="!state.loading && instance">
     <collapsible-section heading="Instance Information" expanded="true">
-      <dl class="dl-horizontal dl-flex">
+      <dl class="dl-horizontal dl-narrow">
         <dt>Launched</dt>
         <dd ng-if="instance.launchTime">{{instance.launchTime | timestamp}}</dd>
         <dd ng-if="!instance.launchTime">(Unknown)</dd>
@@ -220,9 +220,7 @@
           {{key}}
           <help-field key="gce.instance.labels.{{key}}"></help-field>
         </dt>
-        <dd ng-repeat-end>
-          {{value}}
-        </dd>
+        <dd ng-repeat-end>{{value}}</dd>
       </dl>
     </collapsible-section>
     <collapsible-section heading="SSH" ng-if="!instance.notFound">

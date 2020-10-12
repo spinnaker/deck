@@ -31,7 +31,7 @@ import {
 import { IAmazonLoadBalancer } from '@spinnaker/amazon';
 import { DockerImageReader, IDockerImage } from '@spinnaker/docker';
 import { IamRoleReader } from '../../iamRoles/iamRole.read.service';
-import { EscClusterReader } from '../../ecsCluster/ecsCluster.read.service';
+import { EcsClusterReader } from '../../ecsCluster/ecsCluster.read.service';
 import { MetricAlarmReader } from '../../metricAlarm/metricAlarm.read.service';
 import { IRoleDescriptor } from '../../iamRoles/IRole';
 import { IMetricAlarmDescriptor } from '../../metricAlarm/MetricAlarm';
@@ -111,6 +111,7 @@ export interface IEcsTargetGroupMapping {
 export interface IEcsServiceDiscoveryRegistryAssociation {
   registry: IServiceDiscoveryRegistryDescriptor;
   containerPort: number;
+  containerName: string;
 }
 
 export interface IEcsServerGroupCommand extends IServerGroupCommand {
@@ -130,6 +131,7 @@ export interface IEcsServerGroupCommand extends IServerGroupCommand {
   loadBalancedContainer: string;
   targetGroupMappings: IEcsTargetGroupMapping[];
   serviceDiscoveryAssociations: IEcsServiceDiscoveryRegistryAssociation[];
+  useTaskDefinitionArtifact: boolean;
 
   subnetTypeChanged: (command: IEcsServerGroupCommand) => IServerGroupCommandResult;
   placementStrategyNameChanged: (command: IEcsServerGroupCommand) => IServerGroupCommandResult;
@@ -161,7 +163,7 @@ export class EcsServerGroupConfigurationService {
     private loadBalancerReader: LoadBalancerReader,
     private serverGroupCommandRegistry: ServerGroupCommandRegistry,
     private iamRoleReader: IamRoleReader,
-    private ecsClusterReader: EscClusterReader,
+    private ecsClusterReader: EcsClusterReader,
     private metricAlarmReader: MetricAlarmReader,
     private placementStrategyService: PlacementStrategyService,
     private securityGroupReader: SecurityGroupReader,
@@ -194,14 +196,14 @@ export class EcsServerGroupConfigurationService {
     cmd.onStrategyChange = (command: IEcsServerGroupCommand, strategy: IDeploymentStrategy): void => {
       // Any strategy other than None or Custom should force traffic to be enabled
       if (strategy.key !== '' && strategy.key !== 'custom') {
-        command.suspendedProcesses = (command.suspendedProcesses || []).filter(p => p !== 'AddToLoadBalancer');
+        command.suspendedProcesses = (command.suspendedProcesses || []).filter((p) => p !== 'AddToLoadBalancer');
       }
     };
 
     cmd.regionIsDeprecated = (command: IEcsServerGroupCommand): boolean => {
       return (
         has(command, 'backingData.filtered.regions') &&
-        command.backingData.filtered.regions.some(region => region.name === command.region && region.deprecated)
+        command.backingData.filtered.regions.some((region) => region.name === command.region && region.deprecated)
       );
     };
 
@@ -215,7 +217,7 @@ export class EcsServerGroupConfigurationService {
     if (imageQueries.length) {
       imagesPromise = this.$q
         .all(
-          imageQueries.map(q =>
+          imageQueries.map((q) =>
             DockerImageReader.findImages({
               provider: 'dockerRegistry',
               count: 50,
@@ -223,7 +225,7 @@ export class EcsServerGroupConfigurationService {
             }),
           ),
         )
-        .then(promises => flatten(promises));
+        .then((promises) => flatten(promises));
     } else {
       imagesPromise = this.$q.when([]);
     }
@@ -308,7 +310,7 @@ export class EcsServerGroupConfigurationService {
 
   public configureAvailableImages(command: IEcsServerGroupCommand): void {
     // No filtering required, but need to decorate with the displayable image ID
-    command.backingData.filtered.images = command.backingData.images.map(image => this.mapImage(image));
+    command.backingData.filtered.images = command.backingData.images.map((image) => this.mapImage(image));
   }
 
   public configureAvailabilityZones(command: IEcsServerGroupCommand): void {
@@ -402,7 +404,7 @@ export class EcsServerGroupConfigurationService {
         account: command.credentials,
         region: command.region,
       })
-      .map(registry => this.mapServiceRegistry(registry))
+      .map((registry) => this.mapServiceRegistry(registry))
       .value();
   }
 
@@ -435,11 +437,7 @@ export class EcsServerGroupConfigurationService {
       .uniqBy('purpose')
       .value();
 
-    if (
-      !chain(filteredData.subnetPurposes)
-        .some({ purpose: command.subnetType })
-        .value()
-    ) {
+    if (!chain(filteredData.subnetPurposes).some({ purpose: command.subnetType }).value()) {
       command.subnetType = null;
       result.dirty.subnetType = true;
     }
@@ -461,21 +459,21 @@ export class EcsServerGroupConfigurationService {
 
   public getLoadBalancerNames(command: IEcsServerGroupCommand): string[] {
     const loadBalancers = this.getLoadBalancerMap(command).filter(
-      lb => (!lb.loadBalancerType || lb.loadBalancerType === 'classic') && lb.vpcId === command.vpcId,
+      (lb) => (!lb.loadBalancerType || lb.loadBalancerType === 'classic') && lb.vpcId === command.vpcId,
     );
-    return loadBalancers.map(lb => lb.name).sort();
+    return loadBalancers.map((lb) => lb.name).sort();
   }
 
   public getVpcLoadBalancerNames(command: IEcsServerGroupCommand): string[] {
     const loadBalancersForVpc = this.getLoadBalancerMap(command).filter(
-      lb => (!lb.loadBalancerType || lb.loadBalancerType === 'classic') && lb.vpcId,
+      (lb) => (!lb.loadBalancerType || lb.loadBalancerType === 'classic') && lb.vpcId,
     );
-    return loadBalancersForVpc.map(lb => lb.name).sort();
+    return loadBalancersForVpc.map((lb) => lb.name).sort();
   }
 
   public getTargetGroupNames(command: IEcsServerGroupCommand): string[] {
-    const loadBalancersV2 = this.getLoadBalancerMap(command).filter(lb => lb.loadBalancerType !== 'classic') as any[];
-    const allTargetGroups = flatten(loadBalancersV2.map<string[]>(lb => lb.targetGroups));
+    const loadBalancersV2 = this.getLoadBalancerMap(command).filter((lb) => lb.loadBalancerType !== 'classic') as any[];
+    const allTargetGroups = flatten(loadBalancersV2.map<string[]>((lb) => lb.targetGroups));
     return allTargetGroups.sort();
   }
 
@@ -508,7 +506,7 @@ export class EcsServerGroupConfigurationService {
   }
 
   public refreshLoadBalancers(command: IEcsServerGroupCommand, skipCommandReconfiguration?: boolean) {
-    return this.loadBalancerReader.listLoadBalancers('ecs').then(loadBalancers => {
+    return this.loadBalancerReader.listLoadBalancers('ecs').then((loadBalancers) => {
       command.backingData.loadBalancers = loadBalancers;
       if (!skipCommandReconfiguration) {
         this.configureLoadBalancerOptions(command);

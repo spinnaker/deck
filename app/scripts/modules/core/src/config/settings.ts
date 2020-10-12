@@ -17,6 +17,7 @@ export interface INotificationSettings {
   email: { enabled: boolean };
   githubStatus: { enabled: boolean };
   googlechat: { enabled: boolean };
+  microsoftteams: { enabled: boolean };
   pubsub: { enabled: boolean };
   slack: { botName: string; enabled: boolean };
   sms: { enabled: boolean };
@@ -31,7 +32,6 @@ export interface IFeatures {
   entityTags?: boolean;
   executionMarkerInformationModal?: boolean;
   fiatEnabled?: boolean;
-  gceStatefulMigsEnabled?: boolean;
   iapRefresherEnabled?: boolean;
   managedDelivery?: boolean;
   managedServiceAccounts?: boolean;
@@ -136,13 +136,17 @@ SETTINGS.analytics = SETTINGS.analytics || {};
 SETTINGS.providers = SETTINGS.providers || {};
 SETTINGS.defaultTimeZone = SETTINGS.defaultTimeZone || 'America/Los_Angeles';
 SETTINGS.dockerInsights = SETTINGS.dockerInsights || { enabled: false, url: '' };
+SETTINGS.managedDelivery = SETTINGS.managedDelivery || {
+  defaultManifest: 'spinnaker.yml',
+  manifestBasePath: '.spinnaker',
+};
 
 // A helper to make resetting settings to steady state after running tests easier
 const originalSettings: ISpinnakerSettings = cloneDeep(SETTINGS);
 SETTINGS.resetToOriginal = () => {
   Object.keys(SETTINGS)
-    .filter(k => typeof SETTINGS[k] !== 'function') // maybe don't self-destruct
-    .forEach(k => delete SETTINGS[k]);
+    .filter((k) => typeof SETTINGS[k] !== 'function') // maybe don't self-destruct
+    .forEach((k) => delete SETTINGS[k]);
   merge(SETTINGS, originalSettings);
 };
 
@@ -150,8 +154,8 @@ SETTINGS.resetProvider = (provider: string) => {
   return () => {
     const providerSettings: IProviderSettings = SETTINGS.providers[provider];
     Object.keys(providerSettings)
-      .filter(k => typeof (providerSettings as any)[k] !== 'function')
-      .forEach(k => delete (providerSettings as any)[k]);
+      .filter((k) => typeof (providerSettings as any)[k] !== 'function')
+      .forEach((k) => delete (providerSettings as any)[k]);
     merge(providerSettings, originalSettings.providers[provider]);
   };
 };

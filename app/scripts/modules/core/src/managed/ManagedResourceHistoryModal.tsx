@@ -62,12 +62,12 @@ const viewConfigurationByEventType = {
     level: 'info',
   },
   ResourceDeltaDetected: {
-    displayName: 'Drift detected',
+    displayName: 'Difference detected',
     iconClass: 'icon-md-delta-detected',
     level: 'info',
   },
   ResourceDeltaResolved: {
-    displayName: 'Drift resolved',
+    displayName: 'Difference resolved',
     iconClass: 'icon-md-delta-resolved',
     level: 'info',
   },
@@ -184,7 +184,7 @@ export const ManagedResourceHistoryModal = ({ resourceSummary, dismissModal }: I
   const tableLayout = useMemo(() => standardGridTableLayout([4, 2, 2.6]), []);
 
   const { status: historyEventStatus, result: historyEvents, refresh } = usePollingData(
-    () => ManagedReader.getResourceHistory(id).then(events => mergeNewEvents(events, previousHistoryEvents)),
+    () => ManagedReader.getResourceHistory(id).then((events) => mergeNewEvents(events, previousHistoryEvents)),
     null,
     EVENT_POLLING_INTERVAL,
     [],

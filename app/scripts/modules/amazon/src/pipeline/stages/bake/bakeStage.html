@@ -39,7 +39,7 @@
         {{storeType | uppercase}}
       </label>
     </stage-config-field>
-    <stage-config-field label="Base Label" ng-if="!viewState.roscoMode">
+    <stage-config-field label="Base Label">
       <label class="radio-inline" ng-repeat="baseLabel in baseLabelOptions">
         <input type="radio" ng-model="stage.baseLabel" ng-value="baseLabel" />
         {{baseLabel}}
@@ -80,8 +80,8 @@
         <table class="table table-condensed packed">
           <thead>
             <tr>
-              <th style="width:40%">Key</th>
-              <th style="width:60%">Value</th>
+              <th style="width: 40%">Key</th>
+              <th style="width: 60%">Value</th>
               <th class="text-right">Actions</th>
             </tr>
           </thead>

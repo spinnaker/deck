@@ -24,7 +24,7 @@ angular
     '$q',
     'instanceTypeService',
     'awsServerGroupConfigurationService',
-    function($q, instanceTypeService, awsServerGroupConfigurationService) {
+    function ($q, instanceTypeService, awsServerGroupConfigurationService) {
       function buildNewServerGroupCommand(application, defaults) {
         defaults = defaults || {};
         const credentialsLoader = AccountService.getCredentialsKeyedByAccount('aws');
@@ -45,7 +45,7 @@ angular
             preferredZones: preferredZonesLoader,
             credentialsKeyedByAccount: credentialsLoader,
           })
-          .then(function(asyncData) {
+          .then(function (asyncData) {
             const availabilityZones = asyncData.preferredZones;
 
             const credentials = asyncData.credentialsKeyedByAccount[defaultCredentials];
@@ -110,7 +110,14 @@ angular
             }
 
             if (AWSProviderSettings.serverGroups && AWSProviderSettings.serverGroups.enableIMDSv2) {
-              command.requireIMDSv2 = true;
+              /**
+               * Older SDKs do not support IMDSv2. A timestamp can be optionally configured at which any apps created after can safely default to using IMDSv2.
+               */
+              const appAgeRequirement = AWSProviderSettings.serverGroups.defaultIMDSv2AppAgeLimit;
+              const creationDate = application.attributes.createTs;
+
+              command.requireIMDSv2 =
+                appAgeRequirement && creationDate && Number(creationDate) > appAgeRequirement ? true : false;
             }
 
             return command;
@@ -130,7 +137,7 @@ angular
           instanceProfile: instanceTypeCategoryLoader,
         });
 
-        return asyncLoader.then(function(asyncData) {
+        return asyncLoader.then(function (asyncData) {
           const command = asyncData.command;
           const zones = pipelineCluster.availabilityZones[region];
           const usePreferredZones = zones.join(',') === command.availabilityZones.join(',');
@@ -190,7 +197,7 @@ angular
           type: 'modifyAsg',
           asgs: [{ asgName: serverGroup.name, region: serverGroup.region }],
           cooldown: serverGroup.asg.defaultCooldown,
-          enabledMetrics: _.get(serverGroup, 'asg.enabledMetrics', []).map(m => m.metric),
+          enabledMetrics: _.get(serverGroup, 'asg.enabledMetrics', []).map((m) => m.metric),
           healthCheckGracePeriod: serverGroup.asg.healthCheckGracePeriod,
           healthCheckType: serverGroup.asg.healthCheckType,
           terminationPolicies: angular.copy(serverGroup.asg.terminationPolicies),
@@ -219,7 +226,7 @@ angular
           instanceProfile: instanceTypeCategoryLoader,
         });
 
-        return asyncLoader.then(function(asyncData) {
+        return asyncLoader.then(function (asyncData) {
           const zones = serverGroup.asg.availabilityZones.sort();
           let usePreferredZones = false;
           const preferredZonesForAccount = asyncData.preferredZones[serverGroup.account];
@@ -240,8 +247,8 @@ angular
           const reservedTags = ['spinnaker:application', 'spinnaker:stack', 'spinnaker:details'];
           if (serverGroup.asg.tags) {
             serverGroup.asg.tags
-              .filter(t => !reservedTags.includes(t.key))
-              .forEach(tag => {
+              .filter((t) => !reservedTags.includes(t.key))
+              .forEach((tag) => {
                 existingTags[tag.key] = tag.value;
               });
           }
@@ -253,7 +260,7 @@ angular
             freeFormDetails: serverGroupName.freeFormDetails,
             credentials: serverGroup.account,
             cooldown: serverGroup.asg.defaultCooldown,
-            enabledMetrics: _.get(serverGroup, 'asg.enabledMetrics', []).map(m => m.metric),
+            enabledMetrics: _.get(serverGroup, 'asg.enabledMetrics', []).map((m) => m.metric),
             healthCheckGracePeriod: serverGroup.asg.healthCheckGracePeriod,
             healthCheckType: serverGroup.asg.healthCheckType,
             terminationPolicies: serverGroup.asg.terminationPolicies,
@@ -274,8 +281,8 @@ angular
               asgName: serverGroup.asg.autoScalingGroupName,
             },
             suspendedProcesses: (serverGroup.asg.suspendedProcesses || [])
-              .map(process => process.processName)
-              .filter(name => !enabledProcesses.includes(name)),
+              .map((process) => process.processName)
+              .filter((name) => !enabledProcesses.includes(name)),
             tags: Object.assign({}, serverGroup.tags, existingTags),
             targetGroups: serverGroup.targetGroups,
             useAmiBlockDeviceMappings: useAmiBlockDeviceMappings,
@@ -312,9 +319,7 @@ angular
           const vpcZoneIdentifier = serverGroup.asg.vpczoneIdentifier;
           if (vpcZoneIdentifier !== '') {
             const subnetId = vpcZoneIdentifier.split(',')[0];
-            const subnet = _.chain(asyncData.subnets)
-              .find({ id: subnetId })
-              .value();
+            const subnet = _.chain(asyncData.subnets).find({ id: subnetId }).value();
             command.subnetType = subnet.purpose;
             command.vpcId = subnet.vpcId;
           } else {
@@ -345,24 +350,25 @@ angular
               launchTemplateData.instanceMarketOptions &&
               launchTemplateData.instanceMarketOptions.spotOptions &&
               launchTemplateData.instanceMarketOptions.spotOptions.maxPrice;
-            const ipv6Addresses = _.flatMap(launchTemplateData.networkInterfaces, i => i.ipv6Addresses) || [];
+            const { ipv6AddressCount } =
+              launchTemplateData.networkInterfaces &&
+              launchTemplateData.networkInterfaces.length &&
+              launchTemplateData.networkInterfaces[0];
 
             angular.extend(command, {
               instanceType: launchTemplateData.instanceType,
               iamRole: launchTemplateData.iamInstanceProfile.name,
               keyPair: launchTemplateData.keyName,
-              associateIPv6Address: ipv6Addresses.length > 0,
+              associateIPv6Address: Boolean(ipv6AddressCount),
               ramdiskId: launchTemplateData.ramdiskId,
               instanceMonitoring: launchTemplateData.monitoring.enabled,
               ebsOptimized: launchTemplateData.ebsOptimized,
               spotPrice: maxPrice || undefined,
-              requireIMDSv2:
+              requireIMDSv2: Boolean(
                 launchTemplateData.metadataOptions && launchTemplateData.metadataOptions.httpsTokens === 'required',
+              ),
             });
 
-            if (launchTemplateData.userData) {
-              command.base64UserData = launchTemplateData.userData;
-            }
             command.viewState.imageId = launchTemplateData.imageId;
           }
 
@@ -380,7 +386,7 @@ angular
 
           if (serverGroup.launchTemplate && serverGroup.launchTemplate.launchTemplateData.networkInterfaces) {
             const networkInterface =
-              serverGroup.launchTemplate.launchTemplateData.networkInterfaces.find(ni => ni.deviceIndex === 0) || {};
+              serverGroup.launchTemplate.launchTemplateData.networkInterfaces.find((ni) => ni.deviceIndex === 0) || {};
             command.securityGroups = networkInterface.groups;
           }
 

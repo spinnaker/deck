@@ -4,6 +4,7 @@ module.exports = {
   plugins: ['@typescript-eslint', '@spinnaker/eslint-plugin', 'react-hooks'],
   extends: ['eslint:recommended', 'prettier', 'prettier/@typescript-eslint', 'plugin:@typescript-eslint/recommended'],
   rules: {
+    '@spinnaker/api-no-slashes': 2,
     '@spinnaker/import-from-alias-not-npm': 2,
     '@spinnaker/import-from-npm-not-alias': 2,
     '@spinnaker/import-from-npm-not-relative': 2,
@@ -13,6 +14,7 @@ module.exports = {
     '@spinnaker/ng-no-require-angularjs': 2,
     '@spinnaker/ng-no-require-module-deps': 2,
     '@spinnaker/ng-strictdi': 2,
+    '@spinnaker/react2angular-with-error-boundary.spec.js': 2,
     indent: 'off',
     'member-ordering': 'off',
     'no-console': ['error', { allow: ['warn', 'error'] }],
@@ -44,6 +46,9 @@ module.exports = {
     '@typescript-eslint/no-use-before-define': 'off',
     '@typescript-eslint/no-var-requires': 'off', // TODO: turn on once all code is using ES6 imports
     '@typescript-eslint/triple-slash-reference': 'off',
+    '@typescript-eslint/explicit-module-boundary-types': 'off',
+    '@typescript-eslint/ban-types': 'off',
+    '@typescript-eslint/ban-ts-comment': 'off',
   },
   overrides: [
     {

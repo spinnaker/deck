@@ -18,9 +18,7 @@
     </div>
     <div class="header-text horizontal middle">
       <cloud-provider-logo provider="ctrl.serverGroup.type" height="'36px'" width="'36px'"></cloud-provider-logo>
-      <h3 class="horizontal middle space-between flex-1" select-on-dbl-click>
-        {{ctrl.serverGroup.name}}
-      </h3>
+      <h3 class="horizontal middle space-between flex-1" select-on-dbl-click>{{ctrl.serverGroup.name}}</h3>
     </div>
     <div class="actions">
       <div class="dropdown" uib-dropdown dropdown-append-to-body>
@@ -29,24 +27,16 @@
         </button>
         <ul class="dropdown-menu" uib-dropdown-menu role="menu">
           <li ng-if="ctrl.canStopServerGroup()">
-            <a href ng-click="ctrl.stopServerGroup()">
-              Stop
-            </a>
+            <a href ng-click="ctrl.stopServerGroup()"> Stop </a>
           </li>
           <li ng-if="ctrl.canStartServerGroup()">
-            <a href ng-click="ctrl.startServerGroup()">
-              Start
-            </a>
+            <a href ng-click="ctrl.startServerGroup()"> Start </a>
           </li>
           <li ng-if="ctrl.serverGroup.disabled">
-            <a href ng-click="ctrl.enableServerGroup()">
-              Enable
-            </a>
+            <a href ng-click="ctrl.enableServerGroup()"> Enable </a>
           </li>
           <li ng-if="!ctrl.serverGroup.disabled && ctrl.canDisableServerGroup()">
-            <a href ng-click="ctrl.disableServerGroup()">
-              Disable
-            </a>
+            <a href ng-click="ctrl.disableServerGroup()"> Disable </a>
           </li>
           <li
             ng-if="!ctrl.serverGroup.disabled && !ctrl.canDisableServerGroup()"
@@ -54,9 +44,7 @@
                            only server group receiving traffic from a load balancer."
             class="disabled"
           >
-            <a href>
-              Disable
-            </a>
+            <a href> Disable </a>
           </li>
           <li ng-if="ctrl.canDestroyServerGroup()">
             <a href ng-click="ctrl.destroyServerGroup()">Destroy</a>
@@ -89,7 +77,7 @@
       application="ctrl.app"
     ></server-group-running-tasks-details>
     <collapsible-section heading="Server Group Information" expanded="true">
-      <dl class="dl-horizontal dl-flex">
+      <dl class="dl-horizontal dl-narrow">
         <dt>Created</dt>
         <dd>{{ctrl.serverGroup.createdTime | timestamp}}</dd>
         <dt>In</dt>
@@ -105,13 +93,13 @@
       </dl>
     </collapsible-section>
     <collapsible-section heading="Size" expanded="true">
-      <dl class="dl-horizontal dl-flex" ng-if="ctrl.serverGroup.capacity.min === ctrl.serverGroup.capacity.max">
+      <dl class="dl-horizontal dl-narrow" ng-if="ctrl.serverGroup.capacity.min === ctrl.serverGroup.capacity.max">
         <dt>Min/Max</dt>
         <dd>{{ctrl.serverGroup.capacity.min}}</dd>
         <dt>Current</dt>
         <dd>{{ctrl.serverGroup.instances.length}}</dd>
       </dl>
-      <dl class="dl-horizontal dl-flex" ng-if="ctrl.serverGroup.capacity.min !== ctrl.serverGroup.capacity.max">
+      <dl class="dl-horizontal dl-narrow" ng-if="ctrl.serverGroup.capacity.min !== ctrl.serverGroup.capacity.max">
         <dt>Min</dt>
         <dd>{{ctrl.serverGroup.capacity.min}}</dd>
         <dt>Max</dt>
@@ -121,7 +109,7 @@
       </dl>
     </collapsible-section>
     <collapsible-section heading="Health" expanded="true">
-      <dl class="dl-horizontal dl-flex" ng-if="ctrl.serverGroup">
+      <dl class="dl-horizontal dl-narrow" ng-if="ctrl.serverGroup">
         <dt>Instances</dt>
         <dd>
           <health-counts container="ctrl.serverGroup.instanceCounts" class="pull-left"></health-counts>

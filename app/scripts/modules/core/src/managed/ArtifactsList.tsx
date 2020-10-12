@@ -1,17 +1,23 @@
+import React, { useMemo, useEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
-import React, { useState } from 'react';
+import { DateTime } from 'luxon';
 
-import { ISelectedArtifactVersion } from './Environments';
 import {
   IManagedArtifactSummary,
   IManagedArtifactVersion,
   IStatefulConstraint,
   StatefulConstraintStatus,
 } from '../domain/IManagedEntity';
+import { Icon, IconNames } from '../presentation';
+
+import { isConstraintSupported, getConstraintIcon } from './constraints/constraintRegistry';
+
+import { ISelectedArtifactVersion } from './Environments';
 import { Pill } from './Pill';
+import { RelativeTimestamp } from './RelativeTimestamp';
 import { IStatusBubbleStackProps, StatusBubbleStack } from './StatusBubbleStack';
 
-import styles from './ArtifactRow.module.css';
+import './ArtifactRow.less';
 
 interface IArtifactsListProps {
   artifacts: IManagedArtifactSummary[];
@@ -21,9 +27,9 @@ interface IArtifactsListProps {
 
 export function ArtifactsList({ artifacts, selectedVersion, versionSelected }: IArtifactsListProps) {
   return (
-    <div>
+    <>
       {artifacts.map(({ versions, name, reference }) =>
-        versions.map(version => (
+        versions.map((version) => (
           <ArtifactRow
             key={`${name}-${version.version}`}
             isSelected={
@@ -32,13 +38,33 @@ export function ArtifactsList({ artifacts, selectedVersion, versionSelected }: I
             clickHandler={versionSelected}
             version={version}
             reference={reference}
-            name={artifacts.length > 1 ? name : null}
+            name={artifacts.length > 1 ? reference : null}
           />
         )),
       )}
-    </div>
+    </>
   );
 }
+
+const getVersionIcon = ({ git }: IManagedArtifactVersion) => {
+  if (git?.pullRequest?.number) {
+    return 'spCIPullRequest';
+  } else if (git?.commitInfo) {
+    return 'spCIBranch';
+  } else {
+    return null;
+  }
+};
+
+const getVersionSecondarySummary = ({ git }: IManagedArtifactVersion) => {
+  if (git?.pullRequest?.number) {
+    return `PR #${git.pullRequest.number} — ${git?.author}`;
+  } else if (git?.branch) {
+    return `${git.branch} — ${git?.author}`;
+  } else {
+    return null;
+  }
+};
 
 interface IArtifactRowProps {
   isSelected: boolean;
@@ -49,41 +75,84 @@ interface IArtifactRowProps {
 }
 
 export const ArtifactRow = ({ isSelected, clickHandler, version: versionInfo, reference, name }: IArtifactRowProps) => {
-  const { version, displayName, environments, build, git } = versionInfo;
+  const { version, displayName, createdAt, environments, build, git } = versionInfo;
   const [isHovered, setIsHovered] = useState(false);
+  const rowRef = useRef<HTMLDivElement>();
+
+  useEffect(() => {
+    // Why does the call to scrollIntoView() have to be deferred for 100ms? A couple reasons:
+    //
+    // 1. When quickly moving between versions, giving a very short window to cancel the scroll
+    //    makes the experience less janky. Nobody needs their sidebars to dance and shuffle.
+    // 2. For some reason trying to call scrollIntoView in the same event loop just does not
+    //    work at all. The same is true for a setTimeout with no delay. DOM read/write ops are weird
+    //    and there is not a great practical justification for solving that mystery here and now.
+    const timeout = setTimeout(() => {
+      if (isSelected && rowRef.current) {
+        // *** VERY BRITTLE ASSUMPTION WARNING ***
+        // This code assumes that the direct parent element of a row is the scrollable container.
+        // If a wrapper element of any kind is added, this code will need to be modified
+        // to search upward in the tree and find the scrollable container.
+        const { top, bottom } = rowRef.current.getBoundingClientRect();
+        const { top: parentTop, bottom: parentBottom } = rowRef.current.parentElement.getBoundingClientRect();
+        const isInView = top < parentBottom && bottom > parentTop;
+
+        !isInView && rowRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
+
+    return () => clearTimeout(timeout);
+  }, [isSelected, rowRef.current]);
+
+  const versionIcon = getVersionIcon(versionInfo);
+  const secondarySummary = getVersionSecondarySummary(versionInfo);
+  const timestamp = useMemo(() => createdAt && DateTime.fromISO(createdAt), [createdAt]);
 
   return (
     <div
-      className={classNames(styles.ArtifactRow, { [styles.selected]: isSelected })}
+      ref={rowRef}
+      className={classNames('ArtifactRow', { selected: isSelected })}
       onClick={() => clickHandler({ reference, version })}
       onMouseOver={() => setIsHovered(true)}
       onMouseOut={() => setIsHovered(false)}
     >
-      <div className={styles.content}>
-        {build?.id && (
-          <div className={styles.version}>
-            <Pill bgColor={isSelected ? '#2c4b5f' : undefined} text={`#${build.id}`} />
+      <div className="row-content flex-container-v left sp-padding-m-top sp-padding-l-bottom sp-padding-m-xaxis">
+        {(build?.number || build?.id) && (
+          <div className="row-middle-section flex-container-h space-between middle sp-margin-s-bottom">
+            <Pill bgColor={isSelected ? '#2e4b5f' : undefined} text={`#${build.number || build.id} ${name || ''}`} />
+            {timestamp && <RelativeTimestamp timestamp={timestamp} />}
           </div>
         )}
-        <div className={classNames(styles.text, { 'sp-margin-m-left': !build?.id })}>
-          <div className={styles.sha}>{git?.commit || displayName}</div>
-          {name && <div className={styles.name}>{name}</div>}
+        <div className="row-middle-section flex-container-h space-between">
+          <div className="version-title">
+            <div className="flex-container-h middle text-semibold">
+              {versionIcon && (
+                <span className="flex-container-h middle center sp-margin-xs-right">
+                  <Icon name={versionIcon} size="extraSmall" />
+                </span>
+              )}{' '}
+              <span className="version-name">{git?.commitInfo?.message || displayName}</span>
+            </div>
+            {secondarySummary && <div className="version-secondary-summary">{secondarySummary}</div>}
+          </div>
+          <div className="sp-margin-s-left">
+            <StatusBubbleStack
+              borderColor={isSelected ? '#dbe5eb' : isHovered ? '#e8eaf2' : 'var(--color-alabaster)'}
+              maxBubbles={3}
+              statuses={getArtifactStatuses(versionInfo)}
+            />
+          </div>
         </div>
-        <StatusBubbleStack
-          borderColor={isSelected ? '#c7def5' : isHovered ? '#e8eaf2' : 'var(--color-alabaster)'}
-          maxBubbles={3}
-          statuses={getArtifactStatuses(versionInfo)}
-        />
       </div>
-      <div className={styles.stages}>
+      <div className="environment-stages">
         {environments
           .map(({ name, state }) => (
             <span
               key={name}
-              className={classNames(styles.stage, styles[state], 'text-bold flex-container-h center middle')}
+              className={classNames('environment-stage', state, 'text-bold flex-container-h center middle')}
               style={{ width: `${environments.length / 100}%` }}
             >
-              <span className={styles.stageName}>{name}</span>
+              <span className="environment-stage-name">{name}</span>
             </span>
           ))
           .reverse()}
@@ -98,14 +167,36 @@ function getArtifactStatuses({ environments }: IManagedArtifactVersion): Artifac
   // NOTE: The order in which entries are added to `statuses` is important. The highest priority
   // item must be inserted first.
 
-  const isConstraintPendingManualJudgement = (constraint: IStatefulConstraint) =>
-    constraint.type == 'manual-judgement' && constraint.status == StatefulConstraintStatus.PENDING;
-  const requiresManualApproval = environments.some(environment =>
-    environment.statefulConstraints?.some(isConstraintPendingManualJudgement),
-  );
-  if (requiresManualApproval) {
-    statuses.push({ appearance: 'progress', iconName: 'manualJudgement' });
-  }
+  const pendingConstraintIcons = new Set<IconNames>();
+  const failedConstraintIcons = new Set<IconNames>();
+
+  environments.forEach((environment) => {
+    if (environment.state === 'skipped') {
+      return;
+    }
+
+    environment.statefulConstraints?.forEach((constraint: IStatefulConstraint) => {
+      if (!isConstraintSupported(constraint.type)) {
+        return;
+      }
+
+      if (constraint.status === StatefulConstraintStatus.PENDING) {
+        pendingConstraintIcons.add(getConstraintIcon(constraint));
+      } else if (
+        constraint.status === StatefulConstraintStatus.FAIL ||
+        constraint.status === StatefulConstraintStatus.OVERRIDE_FAIL
+      ) {
+        failedConstraintIcons.add(getConstraintIcon(constraint));
+      }
+    });
+  });
+
+  pendingConstraintIcons.forEach((iconName) => {
+    statuses.push({ appearance: 'progress', iconName });
+  });
+  failedConstraintIcons.forEach((iconName) => {
+    statuses.push({ appearance: 'error', iconName });
+  });
 
   const isPinned = environments.some(({ pinned }) => pinned);
   if (isPinned) {

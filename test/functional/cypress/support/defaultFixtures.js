@@ -20,6 +20,7 @@ export const registerDefaultFixtures = () => {
   cy.route('/applications/*/strategyConfigs', []);
   cy.route('/applications/*/tasks?statuses=RUNNING,SUSPENDED,NOT_STARTED', []);
   cy.route('/applications/compute?*', 'fixture:default/application.compute.json');
+  cy.route('/applications/ecsapp?*', 'fixture:default/application.ecsapp.json');
   cy.route('/auth/user', 'fixture:default/auth.user.anonymous.json');
   cy.route('/credentials?expand=true', 'fixture:default/credentials.expand.json');
   cy.route('/jobs/preconfigured', []);
@@ -30,6 +31,7 @@ export const registerDefaultFixtures = () => {
   cy.route('/plugins/deck/plugin-manifest.json', []);
   cy.route('/search*', []);
   cy.route('/securityGroups', []);
+  cy.route('notifications/metadata', []);
   cy.route('/subnets/gce', 'fixture:default/subnets.gce.json');
   cy.route('/webhooks/preconfigured', []);
 };

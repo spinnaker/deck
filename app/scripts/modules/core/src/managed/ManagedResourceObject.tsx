@@ -3,12 +3,12 @@ import { useSref } from '@uirouter/react';
 
 import { Application } from 'core/application';
 import { Icon } from '../presentation';
-import { IManagedResourceSummary, IManagedEnviromentSummary, IManagedArtifactSummary } from '../domain/IManagedEntity';
+import { IManagedResourceSummary, IManagedEnvironmentSummary, IManagedArtifactSummary } from '../domain/IManagedEntity';
 
 import { getKindName } from './ManagedReader';
 import { ObjectRow } from './ObjectRow';
 import { AnimatingPill, Pill } from './Pill';
-import { getResourceIcon } from './resources/resourceRegistry';
+import { getResourceIcon, getExperimentalDisplayLink } from './resources/resourceRegistry';
 import { getArtifactVersionDisplayName } from './displayNames';
 import { StatusBubble } from './StatusBubble';
 import { viewConfigurationByStatus } from './managedResourceStatusConfig';
@@ -17,7 +17,9 @@ import { ManagedResourceStatusPopover } from './ManagedResourceStatusPopover';
 export interface IManagedResourceObjectProps {
   application: Application;
   resource: IManagedResourceSummary;
-  artifactVersionsByState?: IManagedEnviromentSummary['artifacts'][0]['versions'];
+  environment?: string;
+  showReferenceName?: boolean;
+  artifactVersionsByState?: IManagedEnvironmentSummary['artifacts'][0]['versions'];
   artifactDetails?: IManagedArtifactSummary;
   depth?: number;
 }
@@ -58,10 +60,24 @@ const getNativeResourceRoutingInfo = (
 };
 
 export const ManagedResourceObject = memo(
-  ({ application, resource, artifactVersionsByState, artifactDetails, depth }: IManagedResourceObjectProps) => {
+  ({
+    application,
+    resource,
+    environment,
+    showReferenceName,
+    artifactVersionsByState,
+    artifactDetails,
+    depth,
+  }: IManagedResourceObjectProps) => {
     const { kind, displayName } = resource;
+
     const routingInfo = getNativeResourceRoutingInfo(resource) ?? { state: '', params: {} };
-    const route = useSref(routingInfo.state, routingInfo.params);
+    const routeProps = useSref(routingInfo.state, routingInfo.params);
+
+    const displayLink = getExperimentalDisplayLink(resource);
+    const displayLinkProps = displayLink && { href: displayLink, target: '_blank', rel: 'noopener noreferrer' };
+
+    const linkProps = routeProps.href ? routeProps : displayLinkProps;
 
     const current =
       artifactVersionsByState?.current &&
@@ -70,11 +86,23 @@ export const ManagedResourceObject = memo(
       artifactVersionsByState?.deploying &&
       artifactDetails?.versions.find(({ version }) => version === artifactVersionsByState?.deploying);
 
-    const currentPill = current && <Pill text={getArtifactVersionDisplayName(current)} />;
+    const isCurrentVersionPinned = !!current?.environments.find(({ name }) => name === environment)?.pinned;
+    const currentPill = current && (
+      <Pill
+        text={`${getArtifactVersionDisplayName(current)}${showReferenceName ? ' ' + artifactDetails.reference : ''}`}
+        bgColor={isCurrentVersionPinned ? 'var(--color-status-warning)' : null}
+        textColor={isCurrentVersionPinned ? 'var(--color-icon-dark)' : null}
+      />
+    );
     const deployingPill = deploying && (
       <>
         <Icon appearance="neutral" name="caretRight" size="medium" />
-        <AnimatingPill text={getArtifactVersionDisplayName(deploying)} />
+        <AnimatingPill
+          text={`${getArtifactVersionDisplayName(deploying)}${
+            showReferenceName ? ' ' + artifactDetails.reference : ''
+          }`}
+          textColor="var(--color-icon-neutral)"
+        />
       </>
     );
 
@@ -88,7 +116,7 @@ export const ManagedResourceObject = memo(
     return (
       <ObjectRow
         icon={getResourceIcon(kind)}
-        title={route ? <a {...route}>{displayName}</a> : displayName}
+        title={linkProps ? <a {...linkProps}>{displayName}</a> : displayName}
         depth={depth}
         content={resourceStatus}
         metadata={
