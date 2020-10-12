@@ -1,6 +1,6 @@
 'use strict';
 const { getCallingIdentifier, getVariableInScope } = require('../utils/utils');
-const _ = require('lodash');
+const { get } = require('lodash');
 
 /**
  * No slashes in string literals passed to API.one() / API.all()
@@ -20,33 +20,33 @@ const rule = function (context) {
         return;
       }
 
-      // API.one('foo/bad')
-      //          ^^^^^^^
-      // API.all('ok').one('ok', 'foo/bad', 'ok')
-      //                          ^^^^^^^
-      const literalArgs = args.filter((arg) => arg.type === 'Literal' && arg.raw.includes('/'));
-
-      // var badvar = 'foo/bad'; API.one(badvar);
-      //                                 ^^^^^^
-      const variableArgs = args.filter((argument) => {
-        if (argument.type !== 'Identifier') {
-          return false;
-        }
-        const variable = getVariableInScope(context, argument);
-        const literalValue = _.get(variable, 'defs[0].node.init.raw', '');
-        return literalValue.includes('/');
-      });
-
-      if (literalArgs.length === 0 && variableArgs.length === 0) {
-        // console.log('no slashes');
-        return;
-      }
-
       // API.all('ok').one('ok', 'foo/bad', 'ok')
       // ^^^
       if ((getCallingIdentifier(node) || {}).name !== 'API') {
         // console.log(getCallingIdentifier(callee));
         // console.log('calling identifier not API');
+        return;
+      }
+
+      // Get the source code and trigger the lint violation if any forward slashes are found in any of the args
+      // This isn't 100% accurate, but it's good enough.
+      const hasSlash = args.some((arg) => {
+        //  Check if the arg expression has a / anywhere, i.e.:
+        // .one(prevArg, 'foo/bar', nextarg)
+        // .one(prevArg, 'foo/' + barid, nextarg)
+        // .one(prevArg, `foo/${barid}`, nextarg)
+        const text = context.getSourceCode().getText(arg);
+        if (text.includes('/')) {
+          return true;
+        }
+
+        // Check if the arg is a variable, and check if that variable was initialized with a slash somewhere
+        const variable = getVariableInScope(context, arg);
+        return variable && context.getSourceCode().getText(variable.init).includes('/');
+      });
+
+      if (!hasSlash) {
+        // console.log('no slashes');
         return;
       }
 
@@ -61,26 +61,38 @@ const rule = function (context) {
         //   'foo/bad'
         // with:
         //   'foo', 'bad'
-        const literalArgFixes = literalArgs.map((arg) => {
-          const varArgs = arg.value
-            .split('/')
-            .map((segment) => "'" + segment + "'")
-            .join(', ');
-
-          return fixer.replaceText(arg, varArgs);
-        });
+        const literalArgFixes = args
+          .filter((arg) => arg.type === 'Literal' && arg.value.includes('/'))
+          .map((arg) => {
+            const varArgs = arg.value
+              .split('/')
+              .map((segment) => "'" + segment + "'")
+              .join(', ');
+            return fixer.replaceText(arg, varArgs);
+          });
 
         // within:
-        //   let varDeclaration = 'foo/bad';
-        //   API.one(varDeclaration)
+        //   let myVar = 'foo/bad';
+        //   API.one(myVar)
         // replaces argument:
-        //   varDeclaration
+        //   myVar
         // with:
-        //   ...varDeclaration.split('/')
-        const variableArgFixes = variableArgs.map((arg) => {
-          const spread = `...${arg.name}.split('/')`;
-          return fixer.replaceText(arg, spread);
-        });
+        //   ...myVar.split('/')
+        // i.e.:
+        //   API.one(...myVar.split('/'))
+        const variableArgFixes = args
+          .filter((arg) => {
+            const variable = getVariableInScope(context, arg);
+            const initializer = get(variable, 'defs[0].node.init', null);
+            // Gets the source code string of the actual variable initializer
+            // This includes any string concatenation, template string, or function calls
+            const initSource = initializer ? context.getSourceCode().getText(initializer) : '';
+            return arg.type === 'Identifier' && variable && initSource.includes('/');
+          })
+          .map((arg) => {
+            const spread = `...${arg.name}.split('/')`;
+            return fixer.replaceText(arg, spread);
+          });
 
         return literalArgFixes.concat(variableArgFixes);
       };
