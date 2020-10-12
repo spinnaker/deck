@@ -33,6 +33,19 @@ export class ApplicationStateProvider implements IServiceProvider {
     this.childStates.push(this.insightState);
   }
 
+  private static getDefaultState(app: Application) {
+    const environments = app.getDataSource('environments');
+    const serverGroups = app.getDataSource('serverGroups');
+
+    if (environments && !environments.disabled) {
+      return '.environments';
+    } else if (serverGroups && !serverGroups.disabled) {
+      return '.insight.clusters';
+    } else {
+      return app.dataSources.find((ds) => ds.sref && !ds.disabled).sref;
+    }
+  }
+
   /**
    * Adds a direct child to the application that does not use the Insight (i.e. inspector) views, e.g. tasks
    * @param state
@@ -84,8 +97,7 @@ export class ApplicationStateProvider implements IServiceProvider {
           .injector()
           .getAsync('app')
           .then((app: Application) => {
-            const environments = app.getDataSource('environments');
-            const defaultState = environments && !environments.disabled ? '.environments' : '.insight.clusters';
+            const defaultState = ApplicationStateProvider.getDefaultState(app);
 
             const params = transition.params();
             const options = { relative: transition.to().name };
