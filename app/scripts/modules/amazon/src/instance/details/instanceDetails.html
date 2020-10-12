@@ -34,7 +34,7 @@
     </div>
     <div>
       <div class="actions" ng-class="{ insights: instance.insightActions.length > 0 }" ng-if="instance.placement">
-        <instance-actions action-groups="instanceActions"></instance-actions>
+        <instance-actions actions="instanceActions"></instance-actions>
         <div class="dropdown" ng-if="instance.insightActions.length > 0" uib-dropdown dropdown-append-to-body>
           <button type="button" class="btn btn-sm btn-default dropdown-toggle" uib-dropdown-toggle>
             Insight <span class="caret"></span>

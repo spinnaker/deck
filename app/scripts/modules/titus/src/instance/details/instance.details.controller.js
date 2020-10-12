@@ -329,7 +329,7 @@ module(TITUS_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
           triggerAction: this.disableInstanceInDiscovery,
         });
       }
-      return [conditionalActions, constantActions];
+      return conditionalActions.concat(constantActions);
     };
 
     const initialize = app.isStandalone ? retrieveInstance() : app.serverGroups.ready().then(retrieveInstance);

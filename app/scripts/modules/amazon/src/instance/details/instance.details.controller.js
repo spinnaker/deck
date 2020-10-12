@@ -561,7 +561,7 @@ module(AMAZON_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
           triggerAction: this.deregisterInstanceFromTargetGroup,
         });
       }
-      return [conditionalActions, constantActions];
+      return conditionalActions.concat(constantActions);
     };
 
     const initialize = app.isStandalone
