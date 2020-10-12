@@ -19,6 +19,7 @@ git init
 git add .
 git commit -m "initial commit"
 node "$SCRIPTDIR"/sync-deck.js
+yarn
 
 echo ""
 echo ""
