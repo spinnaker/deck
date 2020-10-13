@@ -34,6 +34,8 @@ import './execution.less';
 export interface IExecutionProps {
   application: Application;
   execution: IExecution;
+  goToParent: (executionId: string, name: string) => void;
+  manualJudgment: any;
   pipelineConfig: IPipeline;
   showDurations?: boolean;
   standalone?: boolean;
@@ -79,7 +81,7 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
       canConfigure: false,
     };
 
-    const restartedStage = execution.stages.find(stage => stage.context.restartDetails !== undefined);
+    const restartedStage = execution.stages.find((stage) => stage.context.restartDetails !== undefined);
 
     this.state = {
       showingDetails: this.invalidateShowingDetails(props, true),
@@ -168,7 +170,8 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
     const { application, execution, cancelConfirmationText } = this.props;
     const { executionService } = ReactInjector;
     const hasDeployStage =
-      execution.stages && execution.stages.some(stage => stage.type === 'deploy' || stage.type === 'cloneServerGroup');
+      execution.stages &&
+      execution.stages.some((stage) => stage.type === 'deploy' || stage.type === 'cloneServerGroup');
     CancelModal.confirm({
       header: `Really stop execution of ${execution.name}?`,
       buttonText: `Stop running ${execution.name}`,
@@ -285,6 +288,15 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
       });
   };
 
+  private finalChild = (id: string, name: string) => {
+    const node = this.props.manualJudgment[id];
+    if (node) {
+      this.finalChild(node[0].id, node[0].name);
+    } else {
+      this.props.goToParent(id, name);
+    }
+  };
+
   public render() {
     const {
       application,
@@ -299,18 +311,24 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
     const { pipelinesUrl, restartDetails, showingDetails, sortFilter, viewState } = this.state;
     const { $state } = ReactInjector;
 
-    const accountLabels = this.props.execution.deploymentTargets.map(account => (
+    const accountLabels = this.props.execution.deploymentTargets.map((account) => (
       <AccountTag key={account} account={account} />
     ));
 
     const executionMarkerWidth = `${100 / execution.stageSummaries.length}%`;
     const showExecutionName = standalone || (!title && sortFilter.groupBy !== 'name');
-    const executionMarkers = execution.stageSummaries.map(stage => (
+    const executionMarkers = execution.stageSummaries.map((stage) => (
       <ExecutionMarker
         key={stage.refId}
         application={application}
         execution={execution}
         stage={stage}
+        manualJudgment={
+          this.props.manualJudgment !== undefined && this.props.manualJudgment[this.props.execution.id]
+            ? this.props.manualJudgment[this.props.execution.id]
+            : []
+        }
+        onWait={this.finalChild}
         onClick={this.toggleDetails}
         active={this.isActive(stage.index)}
         previousStageActive={this.isActive(stage.index - 1)}
