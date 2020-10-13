@@ -61,5 +61,15 @@ ruleTester.run('api-no-slashes', rule, {
       output: `const foo = "foo/bad"; API.all('api').one(...foo.split('/')).one('ok', 'bar', 'baz');`,
       errors: [errorMessage, errorMessage], // two errors
     },
+    // Detectable but unfixable
+    {
+      code: 'API.one(`foo/${cantfix}`);',
+      errors: [errorMessage], // two errors
+    },
+    // Detectable but unfixable
+    {
+      code: 'API.one("foo/" + cantfix);',
+      errors: [errorMessage], // two errors
+    },
   ],
 });

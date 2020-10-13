@@ -28,25 +28,46 @@ const rule = function (context) {
         return;
       }
 
-      // Get the source code and trigger the lint violation if any forward slashes are found in any of the args
+      // Get the source code (think .toString()) of the AST node and find a slash
       // This isn't 100% accurate, but it's good enough.
-      const hasSlash = args.some((arg) => {
-        //  Check if the arg expression has a / anywhere, i.e.:
-        // .one(prevArg, 'foo/bar', nextarg)
-        // .one(prevArg, 'foo/' + barid, nextarg)
-        // .one(prevArg, `foo/${barid}`, nextarg)
-        const text = context.getSourceCode().getText(arg);
-        if (text.includes('/')) {
-          return true;
+      function sourceCodeHasSlash(node) {
+        const text = context.getSourceCode().getText(node);
+        return !!(text && text.includes('/'));
+      }
+
+      function isArgLiteralWithSlash(arg) {
+        return arg.type === 'Literal' && sourceCodeHasSlash(arg);
+      }
+
+      const isVariableInitializedWithSlash = (arg) => {
+        if (arg.type !== 'Identifier') {
+          return false;
         }
 
-        // Check if the arg is a variable, and check if that variable was initialized with a slash somewhere
+        // Check if the arg is a variable
         const variable = getVariableInScope(context, arg);
-        return variable && context.getSourceCode().getText(variable.init).includes('/');
-      });
+        // Find the variable's initializer
+        const initializer = get(variable, 'defs[0].node.init', null);
+        // Check if that variable's initializer contains a slash
+        return sourceCodeHasSlash(initializer);
+      };
 
-      if (!hasSlash) {
-        // console.log('no slashes');
+      // Literal:
+      // .one(okArg, 'foo/' + barid)
+      // .one(okArg, `foo/${barid}`)
+      const literalsWithSlashes = args.filter((arg) => isArgLiteralWithSlash(arg));
+
+      // Initializer:
+      // var badArg = `foo/${barid}`;
+      // var badArg2 = 'foo/' + barid`;
+      // .one(badArg)
+      // .one(badArg2)
+      const varsWithSlashes = args.filter((arg) => isVariableInitializedWithSlash(arg));
+
+      // Detected an arg with a slash, but can't auto-fix
+      const argsWithSlashes = args.filter((arg) => !literalsWithSlashes.includes(arg) && sourceCodeHasSlash(arg));
+
+      if (literalsWithSlashes.length === 0 && varsWithSlashes.length === 0 && argsWithSlashes.length === 0) {
         return;
       }
 
@@ -61,15 +82,13 @@ const rule = function (context) {
         //   'foo/bad'
         // with:
         //   'foo', 'bad'
-        const literalArgFixes = args
-          .filter((arg) => arg.type === 'Literal' && arg.value.includes('/'))
-          .map((arg) => {
-            const varArgs = arg.value
-              .split('/')
-              .map((segment) => "'" + segment + "'")
-              .join(', ');
-            return fixer.replaceText(arg, varArgs);
-          });
+        const literalArgFixes = literalsWithSlashes.map((arg) => {
+          const varArgs = arg.value
+            .split('/')
+            .map((segment) => "'" + segment + "'")
+            .join(', ');
+          return fixer.replaceText(arg, varArgs);
+        });
 
         // within:
         //   let myVar = 'foo/bad';
@@ -80,22 +99,16 @@ const rule = function (context) {
         //   ...myVar.split('/')
         // i.e.:
         //   API.one(...myVar.split('/'))
-        const variableArgFixes = args
-          .filter((arg) => {
-            const variable = getVariableInScope(context, arg);
-            const initializer = get(variable, 'defs[0].node.init', null);
-            // Gets the source code string of the actual variable initializer
-            // This includes any string concatenation, template string, or function calls
-            const initSource = initializer ? context.getSourceCode().getText(initializer) : '';
-            return arg.type === 'Identifier' && variable && initSource.includes('/');
-          })
-          .map((arg) => {
-            const spread = `...${arg.name}.split('/')`;
-            return fixer.replaceText(arg, spread);
-          });
+        const variableArgFixes = varsWithSlashes.map((arg) => {
+          // Found a variable with an initializer containing a slash
+          // Change the argument to be a string-split + array-spread
+          const spread = `...${arg.name}.split('/')`;
+          return fixer.replaceText(arg, spread);
+        });
 
         return literalArgFixes.concat(variableArgFixes);
       };
+
       context.report({ fix, node, message });
     },
   };
