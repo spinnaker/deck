@@ -31,7 +31,7 @@ const rule = function (context) {
       // Get the source code (think .toString()) of the AST node and find a slash
       // This isn't 100% accurate, but it's good enough.
       function sourceCodeHasSlash(node) {
-        const text = context.getSourceCode().getText(node);
+        const text = node ? context.getSourceCode().getText(node) : '';
         return !!(text && text.includes('/'));
       }
 
