@@ -1,6 +1,7 @@
 import React from 'react';
 
 export interface IRenderWhenVisibleProps {
+  goToParent: (executionId: any, name: string) => void;
   // not valid without a container in px (IntersectionObserver doesn't do so good with null root but non-null rootMargin)
   bufferHeight?: number;
   // best guess to height of non-rendered content (in px)
@@ -32,7 +33,7 @@ export const RenderWhenVisible = ({
   React.useEffect(() => {
     let visible = isVisible;
     observer = new IntersectionObserver(
-      entries => {
+      (entries) => {
         const inView = entries[0].isIntersecting;
         if (inView && !visible) {
           visible = true;

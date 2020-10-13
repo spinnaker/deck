@@ -18,6 +18,7 @@ export interface IExecutionGroupsProps {
 export interface IExecutionGroupsState {
   groups: IExecutionGroup[];
   showingDetails: boolean;
+  goToParent: (executionId: string, name: string) => void;
   container?: HTMLDivElement; // need to pass the container down to children to use as root for IntersectionObserver
 }
 
@@ -25,11 +26,22 @@ export class ExecutionGroups extends React.Component<IExecutionGroupsProps, IExe
   private applicationRefreshUnsubscribe: () => void;
   private groupsUpdatedSubscription: Subscription;
   private stateChangeSuccessSubscription: Subscription;
+  private goToParent = (executionId: '', parent: '') => {
+    if (executionId !== '') {
+      var parentElement = document.getElementById('execution-groups-scroll');
+      var destination = document.getElementById('execution-' + executionId);
+      if (destination === null) {
+        var destination = document.getElementById(parent);
+      }
+      parentElement.scrollTo(0, destination.offsetTop - 110);
+    }
+  };
 
   constructor(props: IExecutionGroupsProps) {
     super(props);
     const { stateEvents } = ReactInjector;
     this.state = {
+      goToParent: this.goToParent,
       groups: ExecutionState.filterModel.asFilterModel.groups,
       showingDetails: ReactInjector.$state.includes('**.execution'),
     };
@@ -125,7 +137,9 @@ export class ExecutionGroups extends React.Component<IExecutionGroupsProps, IExe
       <ExecutionGroup
         parent={container}
         key={group.heading}
+        id={group.heading}
         group={group}
+        goToParent={this.state.goToParent}
         application={this.props.application}
         manualJudgment={this.nestedManualJudgment(groups)}
       />
@@ -139,7 +153,7 @@ export class ExecutionGroups extends React.Component<IExecutionGroupsProps, IExe
               <h4>No executions match the filters you've selected.</h4>
             </div>
           )}
-          <div className="execution-groups all-execution-groups" ref={this.setContainer}>
+          <div className="execution-groups all-execution-groups" ref={this.setContainer} id="execution-groups-scroll">
             {container && executionGroups}
           </div>
         </div>
