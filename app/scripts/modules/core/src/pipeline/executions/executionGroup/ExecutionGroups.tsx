@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React from 'react';
 import { Subscription } from 'rxjs';
 
@@ -59,7 +60,7 @@ export class ExecutionGroups extends React.Component<IExecutionGroupsProps, IExe
     // opacity (except when hovering over them).
     // Here, we are checking if there is an executionId deep linked - and also confirming it's actually present
     // on screen. If not, we will not apply the '.showing-details' class to the wrapper.
-    if (!executionId || this.state.groups.every(g => g.executions.every(e => e.id !== executionId))) {
+    if (!executionId || this.state.groups.every((g) => g.executions.every((e) => e.id !== executionId))) {
       return false;
     }
     return ReactInjector.$state.includes('**.execution');
@@ -83,13 +84,51 @@ export class ExecutionGroups extends React.Component<IExecutionGroupsProps, IExe
       this.stateChangeSuccessSubscription.unsubscribe();
     }
   }
+  public filterGroups(groups: IExecutionGroup[]) {
+    const filterStages = ExecutionState.filterModel.asFilterModel.sortFilter.filterStages;
+    return groups.filter(
+      (group) =>
+        group.executions.filter((execution) => {
+          if (filterStages && execution.originalStatus == 'RUNNING') {
+            return execution.stages.filter((stage) => stage.type === 'manualJudgment').length > 0;
+          } else return true;
+        }).length,
+    );
+  }
+  public nestedManualJudgment(groups: IExecutionGroup[]) {
+    const nestedObj: any = {};
+    groups.forEach(({ runningExecutions }) => {
+      if (runningExecutions && runningExecutions.length) {
+        const executions = runningExecutions.filter(
+          (exec) =>
+            exec.trigger.parentExecution &&
+            exec.stages.filter((stage) => stage.type == 'manualJudgment' && stage.status === 'RUNNING'),
+        );
+        executions.forEach((execution) => {
+          nestedObj[execution.trigger.parentExecution.id] = nestedObj[execution.trigger.parentExecution.id] ?? [];
+          nestedObj[execution.trigger.parentExecution.id].push({
+            name: execution.name,
+            id: execution.id,
+          });
+        });
+      }
+    });
+    return nestedObj;
+  }
 
   public render(): React.ReactElement<ExecutionGroups> {
     const { groups = [], container, showingDetails } = this.state;
     const hasGroups = groups.length > 0;
     const className = `row pipelines executions ${showingDetails ? 'showing-details' : ''}`;
-    const executionGroups = groups.map((group: IExecutionGroup) => (
-      <ExecutionGroup parent={container} key={group.heading} group={group} application={this.props.application} />
+    this.filterGroups(groups);
+    const executionGroups = this.filterGroups(groups).map((group: IExecutionGroup) => (
+      <ExecutionGroup
+        parent={container}
+        key={group.heading}
+        group={group}
+        application={this.props.application}
+        manualJudgment={this.nestedManualJudgment(groups)}
+      />
     ));
 
     return (

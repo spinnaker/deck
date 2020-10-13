@@ -12,6 +12,7 @@ export const filterModelConfig: IFilterConfig[] = [
   { model: 'filter', param: 'q', clearValue: '', type: 'string', filterLabel: 'search' },
   { model: 'pipeline', param: 'pipeline', type: 'trueKeyObject', clearValue: {} },
   { model: 'status', type: 'trueKeyObject', clearValue: {} },
+  { model: 'stages', type: 'trueKeyObject', clearValue: {} },
 ];
 
 const GLOBAL_CACHE_KEY = '#global';
@@ -30,6 +31,9 @@ export class ExecutionFilterModel {
   public asFilterModel: IExecutionFilterModel;
   public mostRecentApplication: string;
 
+  private filterStages: boolean;
+  private stages: Object;
+
   // This is definitely not the best way to do this, but already have a Subject in here, so just using the same
   // mechanism for now.
   public expandSubject: Subject<boolean> = new Subject<boolean>();
@@ -46,7 +50,7 @@ export class ExecutionFilterModel {
     FilterModelService.registerRouterHooks(this.asFilterModel, '**.application.pipelines.executions.**');
     this.asFilterModel.activate();
 
-    transitionService.onBefore({ entering: '**.application.pipelines.executions' }, trans => {
+    transitionService.onBefore({ entering: '**.application.pipelines.executions' }, (trans) => {
       this.mostRecentApplication = trans.params().application;
       this.assignViewStateFromCache();
     });
@@ -54,15 +58,31 @@ export class ExecutionFilterModel {
     // A nice way to avoid watches is to define a property on an object
     Object.defineProperty(this.asFilterModel.sortFilter, 'count', {
       get: () => this.groupCount,
-      set: count => {
+      set: (count) => {
         this.groupCount = count;
+        this.cacheConfigViewState();
+      },
+    });
+
+    Object.defineProperty(this.asFilterModel.sortFilter, 'filterStages', {
+      get: () => this.filterStages,
+      set: (filterVal) => {
+        this.filterStages = filterVal;
+        this.cacheConfigViewState();
+      },
+    });
+
+    Object.defineProperty(this.asFilterModel.sortFilter, 'stages', {
+      get: () => this.stages,
+      set: (filterVal) => {
+        this.stages = filterVal;
         this.cacheConfigViewState();
       },
     });
 
     Object.defineProperty(this.asFilterModel.sortFilter, 'groupBy', {
       get: () => this.groupBy,
-      set: grouping => {
+      set: (grouping) => {
         this.groupBy = grouping;
         this.cacheConfigViewState();
       },
@@ -70,7 +90,7 @@ export class ExecutionFilterModel {
 
     Object.defineProperty(this.asFilterModel.sortFilter, 'showDurations', {
       get: () => this.showDurations,
-      set: newVal => {
+      set: (newVal) => {
         this.showDurations = newVal;
         this.cacheConfigViewState();
       },
@@ -84,13 +104,17 @@ export class ExecutionFilterModel {
     this.groupCount = viewState.count;
     this.groupBy = viewState.groupBy;
     this.showDurations = viewState.showDurations;
+    this.filterStages = viewState.filterStages;
+    this.stages = viewState.stages;
   }
 
-  private getCachedViewState(key?: string): { count: number; groupBy: string; showDurations: boolean } {
+  private getCachedViewState(
+    key?: string,
+  ): { count: number; groupBy: string; showDurations: boolean; filterStages: boolean; stages: Object } {
     key = key || this.mostRecentApplication || GLOBAL_CACHE_KEY;
     const cachedApp = this.configViewStateCache.get(key) || {};
     const cachedGlobal = this.configViewStateCache.get(GLOBAL_CACHE_KEY) || {};
-    const defaults = { count: 2, groupBy: 'name', showDurations: true };
+    const defaults = { count: 2, groupBy: 'name', showDurations: true, filterStages: false, stages: {} };
     this.configViewStateCache.touch(key); // prevents cache from expiring just because it hasn't been changed
     return extend(
       defaults,
@@ -107,6 +131,8 @@ export class ExecutionFilterModel {
     if (!Object.keys(this.asFilterModel.sortFilter.pipeline).length) {
       appCacheData.count = this.groupCount;
       appCacheData.groupBy = this.groupBy;
+      appCacheData.filterStages = this.filterStages;
+      appCacheData.stages = this.stages;
     }
     const appCacheKey = this.mostRecentApplication || GLOBAL_CACHE_KEY;
     this.configViewStateCache.put(appCacheKey, appCacheData);
