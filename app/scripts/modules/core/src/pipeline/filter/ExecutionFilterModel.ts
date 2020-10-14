@@ -32,7 +32,6 @@ export class ExecutionFilterModel {
   public mostRecentApplication: string;
 
   private filterStages: boolean;
-  private stages: Object;
 
   // This is definitely not the best way to do this, but already have a Subject in here, so just using the same
   // mechanism for now.
@@ -72,14 +71,6 @@ export class ExecutionFilterModel {
       },
     });
 
-    Object.defineProperty(this.asFilterModel.sortFilter, 'stages', {
-      get: () => this.stages,
-      set: (filterVal) => {
-        this.stages = filterVal;
-        this.cacheConfigViewState();
-      },
-    });
-
     Object.defineProperty(this.asFilterModel.sortFilter, 'groupBy', {
       get: () => this.groupBy,
       set: (grouping) => {
@@ -105,7 +96,6 @@ export class ExecutionFilterModel {
     this.groupBy = viewState.groupBy;
     this.showDurations = viewState.showDurations;
     this.filterStages = viewState.filterStages;
-    this.stages = viewState.stages;
   }
 
   private getCachedViewState(
@@ -132,7 +122,6 @@ export class ExecutionFilterModel {
       appCacheData.count = this.groupCount;
       appCacheData.groupBy = this.groupBy;
       appCacheData.filterStages = this.filterStages;
-      appCacheData.stages = this.stages;
     }
     const appCacheKey = this.mostRecentApplication || GLOBAL_CACHE_KEY;
     this.configViewStateCache.put(appCacheKey, appCacheData);
