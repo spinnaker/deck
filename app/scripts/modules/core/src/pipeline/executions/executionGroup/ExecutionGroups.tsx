@@ -98,14 +98,16 @@ export class ExecutionGroups extends React.Component<IExecutionGroupsProps, IExe
   }
   public filterGroups(groups: IExecutionGroup[]) {
     const filterStages = ExecutionState.filterModel.asFilterModel.sortFilter.filterStages;
-    return groups.filter(
-      (group) =>
-        group.executions.filter((execution) => {
-          if (filterStages && execution.originalStatus == 'RUNNING') {
-            return execution.stages.filter((stage) => stage.type === 'manualJudgment').length > 0;
-          } else return true;
-        }).length,
-    );
+    if (filterStages) {
+      return groups.filter(
+        (group) =>
+          group.executions.filter((execution) => {
+            if (execution.originalStatus == 'RUNNING') {
+              return execution.stages.filter((stage) => stage.type === 'manualJudgment').length > 0;
+            } else return true;
+          }).length,
+      );
+    } else return groups;
   }
   public nestedManualJudgment(groups: IExecutionGroup[]) {
     const nestedObj: any = {};
