@@ -32,8 +32,8 @@ export class ExecutionGroups extends React.Component<IExecutionGroupsProps, IExe
       var destination = document.getElementById('execution-' + executionId);
       if (destination === null) {
         var destination = document.getElementById(parent);
-      }
-      parentElement.scrollTo(0, destination.offsetTop - 110);
+        parentElement.scrollTo(0, destination.offsetTop - 140);
+      } else parentElement.scrollTo(0, destination.offsetTop - destination.offsetHeight - 40);
     }
   };
 
