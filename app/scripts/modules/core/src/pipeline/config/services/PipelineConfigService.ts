@@ -49,7 +49,7 @@ export class PipelineConfigService {
 
   public static deletePipeline(applicationName: string, pipeline: IPipeline, pipelineName: string): IPromise<void> {
     return API.one(pipeline.strategy ? 'strategies' : 'pipelines')
-      .one(applicationName, encodeURIComponent(pipelineName.trim()))
+      .one(applicationName, pipelineName.trim())
       .remove();
   }
 
@@ -106,7 +106,7 @@ export class PipelineConfigService {
     return API.one('pipelines')
       .one('v2')
       .one(applicationName)
-      .one(encodeURIComponent(pipelineName))
+      .one(pipelineName)
       .data(body)
       .post()
       .then((result: ITriggerPipelineResponse) => {
