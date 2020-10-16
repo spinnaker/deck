@@ -1,6 +1,6 @@
 import { ApplicationNameValidator } from '@spinnaker/core';
 
-class KubernetesApplicationNameValidator {
+export class KubernetesApplicationNameValidator {
   // general k8s resource restriction: 253 characters - https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
   // safe bet is 63 characters - (see also RFC 1035 or RFC 1123 - both setting DNS label maximum to 63 chars)
   // for service names: - https://github.com/kubernetes/kubernetes/pull/29523 (until K8s 1.4.0 it was 24 characters https://github.com/kubernetes/kubernetes/issues/12463)
