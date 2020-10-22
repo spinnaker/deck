@@ -361,7 +361,7 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
                 <div className="text-center">
                   No stages found.{' '}
                   <a onClick={this.handleSourceNoStagesClick} target="_blank" href={pipelinesUrl + execution.id}>
-                    Source
+                    View as JSON
                   </a>
                 </div>
               )}
@@ -475,7 +475,7 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
             <div className="permalinks">
               <div className="permalinks-content">
                 <a onClick={this.handleSourceClick} target="_blank" href={pipelinesUrl + execution.id}>
-                  Source
+                  View as JSON
                 </a>
                 {' | '}
                 <ExecutionPermalink standalone={standalone} />
