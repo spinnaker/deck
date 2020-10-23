@@ -219,14 +219,10 @@ export class FilterModelService {
             clear() {
               // do not reuse the modelVal variable - it's possible it has been reassigned since the tag was created
               const toClearFrom: ITrueKeyModel = model.sortFilter[key] as ITrueKeyModel;
+              model.sortFilter.filterStages =
+                value === 'MANUAL_JUDGMENT' ? !model.sortFilter.filterStages : model.sortFilter.filterStages;
               delete toClearFrom[value];
               model.applyParamsToUrl();
-              if (!model.sortFilter.stages[value]) {
-                switch (value) {
-                  case 'MANUAL_JUDGMENT':
-                    model.sortFilter.filterStages = false;
-                }
-              }
             },
           });
         }
