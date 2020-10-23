@@ -25,6 +25,85 @@ export interface INLBListenersState {
   oidcConfigs: IAuthenticateOidcActionConfig[];
 }
 
+export interface INLBCertificateSelectorProps {
+  availableCertificates: IALBListenerCertificate[];
+  certificates: { [accountId: number]: IAmazonCertificate[] };
+  formik: FormikProps<IAmazonNetworkLoadBalancerUpsertCommand>;
+  app?: Application;
+  certificateTypes: string[];
+}
+
+export class CertificateSelector extends React.Component<INLBCertificateSelectorProps> {
+  public render() {
+    return <CertificateSelectorContent {...this.props} />;
+  }
+}
+
+export function CertificateSelectorContent(props: INLBCertificateSelectorProps) {
+  function certificateTypeChanged(certificate: IALBListenerCertificate, newType: string): void {
+    certificate.type = newType;
+    updateListeners();
+  }
+
+  function handleCertificateChanged(certificate: IALBListenerCertificate, newCertificateName: string): void {
+    certificate.name = newCertificateName;
+    updateListeners();
+  }
+
+  function updateListeners(): void {
+    props.formik.setFieldValue('listeners', props.formik.values.listeners);
+  }
+
+  function showCertificateSelect(certificate: IALBListenerCertificate): boolean {
+    return certificate.type === 'iam' && props.certificates && Object.keys(props.certificates).length > 0;
+  }
+
+  const availableCertificates = props.availableCertificates;
+  const certificateTypes = props.certificateTypes;
+  const certificates = props.certificates;
+  const { values } = props.formik;
+  return (
+    <div className="wizard-pod-row">
+      <div className="wizard-pod-row-title">Certificate</div>
+      <div className="wizard-pod-row-contents">
+        {availableCertificates.map((certificate, cIndex) => (
+          <div key={cIndex} style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
+            <select
+              className="form-control input-sm inline-number"
+              style={{ width: '45px' }}
+              value={certificate.type}
+              onChange={(event) => certificateTypeChanged(certificate, event.target.value)}
+            >
+              {certificateTypes.map((t) => (
+                <option key={t}>{t}</option>
+              ))}
+            </select>
+            {showCertificateSelect(certificate) && (
+              <AmazonCertificateSelectField
+                certificates={certificates}
+                accountName={values.credentials}
+                currentValue={certificate.name}
+                app={props.app}
+                onCertificateSelect={(value) => handleCertificateChanged(certificate, value)}
+              />
+            )}
+            {!showCertificateSelect(certificate) && (
+              <input
+                className="form-control input-sm no-spel"
+                style={{ display: 'inline-block' }}
+                type="text"
+                value={certificate.name}
+                onChange={(event) => handleCertificateChanged(certificate, event.target.value)}
+                required={true}
+              />
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export class NLBListeners
   extends React.Component<INLBListenersProps, INLBListenersState>
   implements IWizardPageComponent<IAmazonNetworkLoadBalancerUpsertCommand> {
@@ -68,26 +147,12 @@ export class NLBListeners
     return errors;
   }
 
-  private needsCert(listener: IListenerDescription): boolean {
-    return listener.protocol === 'TLS';
-  }
-
-  private showCertificateSelect(certificate: IALBListenerCertificate): boolean {
-    return certificate.type === 'iam' && this.state.certificates && Object.keys(this.state.certificates).length > 0;
+  private updateListeners(): void {
+    this.props.formik.setFieldValue('listeners', this.props.formik.values.listeners);
   }
 
   public componentDidMount(): void {
     this.loadCertificates();
-  }
-
-  private loadCertificates(): void {
-    AmazonCertificateReader.listCertificates().then((certificates) => {
-      this.setState({ certificates });
-    });
-  }
-
-  private updateListeners(): void {
-    this.props.formik.setFieldValue('listeners', this.props.formik.values.listeners);
   }
 
   private addListenerCertificate(listener: IListenerDescription): void {
@@ -96,6 +161,12 @@ export class NLBListeners
       certificateArn: undefined,
       type: 'iam',
       name: undefined,
+    });
+  }
+
+  private loadCertificates(): void {
+    AmazonCertificateReader.listCertificates().then((certificates) => {
+      this.setState({ certificates });
     });
   }
 
@@ -133,16 +204,6 @@ export class NLBListeners
 
   private listenerPortChanged(listener: IListenerDescription, newPort: string): void {
     listener.port = Number.parseInt(newPort, 10);
-    this.updateListeners();
-  }
-
-  private certificateTypeChanged(certificate: IALBListenerCertificate, newType: string): void {
-    certificate.type = newType;
-    this.updateListeners();
-  }
-
-  private handleCertificateChanged(certificate: IALBListenerCertificate, newCertificateName: string): void {
-    certificate.name = newCertificateName;
     this.updateListeners();
   }
 
@@ -221,46 +282,17 @@ export class NLBListeners
                       </div>
                     </div>
                   </div>
-                  {this.needsCert(listener) && (
-                    <div className="wizard-pod-row">
-                      <div className="wizard-pod-row-title">Certificate</div>
-                      <div className="wizard-pod-row-contents">
-                        {listener.certificates.map((certificate, cIndex) => (
-                          <div key={cIndex} style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                            <select
-                              className="form-control input-sm inline-number"
-                              style={{ width: '45px' }}
-                              value={certificate.type}
-                              onChange={(event) => this.certificateTypeChanged(certificate, event.target.value)}
-                            >
-                              {certificateTypes.map((t) => (
-                                <option key={t}>{t}</option>
-                              ))}
-                            </select>
-                            {this.showCertificateSelect(certificate) && (
-                              <AmazonCertificateSelectField
-                                certificates={certificates}
-                                accountName={values.credentials}
-                                currentValue={certificate.name}
-                                app={this.props.app}
-                                onCertificateSelect={(value) => this.handleCertificateChanged(certificate, value)}
-                              />
-                            )}
-                            {!this.showCertificateSelect(certificate) && (
-                              <input
-                                className="form-control input-sm no-spel"
-                                style={{ display: 'inline-block' }}
-                                type="text"
-                                value={certificate.name}
-                                onChange={(event) => this.handleCertificateChanged(certificate, event.target.value)}
-                                required={true}
-                              />
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                  <div>
+                    {listener.protocol === 'TLS' && (
+                      <CertificateSelector
+                        availableCertificates={listener.certificates}
+                        formik={this.props.formik}
+                        app={this.props.app}
+                        certificateTypes={certificateTypes}
+                        certificates={certificates}
+                      ></CertificateSelector>
+                    )}
+                  </div>
                   <div className="wizard-pod-row">
                     <div className="wizard-pod-row-title" style={{ height: '30px' }}>
                       Rules
