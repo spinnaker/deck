@@ -11,8 +11,8 @@ import {
 } from 'amazon/domain';
 import { FormikProps } from 'formik';
 import { IAuthenticateOidcActionConfig } from '../../OidcConfigReader';
-import { AmazonCertificateSelectField } from '../common/AmazonCertificateSelectField';
 import { AmazonCertificateReader, AWSProviderSettings } from 'amazon';
+import { CertificateSelector } from '../network/CertificateSelectors';
 
 export interface INLBListenersProps {
   app?: Application;
@@ -31,77 +31,6 @@ export interface INLBCertificateSelectorProps {
   formik: FormikProps<IAmazonNetworkLoadBalancerUpsertCommand>;
   app?: Application;
   certificateTypes: string[];
-}
-
-export class CertificateSelector extends React.Component<INLBCertificateSelectorProps> {
-  public render() {
-    return <CertificateSelectorContent {...this.props} />;
-  }
-}
-
-export function CertificateSelectorContent(props: INLBCertificateSelectorProps) {
-  function certificateTypeChanged(certificate: IALBListenerCertificate, newType: string): void {
-    certificate.type = newType;
-    updateListeners();
-  }
-
-  function handleCertificateChanged(certificate: IALBListenerCertificate, newCertificateName: string): void {
-    certificate.name = newCertificateName;
-    updateListeners();
-  }
-
-  function updateListeners(): void {
-    props.formik.setFieldValue('listeners', props.formik.values.listeners);
-  }
-
-  function showCertificateSelect(certificate: IALBListenerCertificate): boolean {
-    return certificate.type === 'iam' && props.certificates && Object.keys(props.certificates).length > 0;
-  }
-
-  const availableCertificates = props.availableCertificates;
-  const certificateTypes = props.certificateTypes;
-  const certificates = props.certificates;
-  const { values } = props.formik;
-  return (
-    <div className="wizard-pod-row">
-      <div className="wizard-pod-row-title">Certificate</div>
-      <div className="wizard-pod-row-contents">
-        {availableCertificates.map((certificate, cIndex) => (
-          <div key={cIndex} style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-            <select
-              className="form-control input-sm inline-number"
-              style={{ width: '45px' }}
-              value={certificate.type}
-              onChange={(event) => certificateTypeChanged(certificate, event.target.value)}
-            >
-              {certificateTypes.map((t) => (
-                <option key={t}>{t}</option>
-              ))}
-            </select>
-            {showCertificateSelect(certificate) && (
-              <AmazonCertificateSelectField
-                certificates={certificates}
-                accountName={values.credentials}
-                currentValue={certificate.name}
-                app={props.app}
-                onCertificateSelect={(value) => handleCertificateChanged(certificate, value)}
-              />
-            )}
-            {!showCertificateSelect(certificate) && (
-              <input
-                className="form-control input-sm no-spel"
-                style={{ display: 'inline-block' }}
-                type="text"
-                value={certificate.name}
-                onChange={(event) => handleCertificateChanged(certificate, event.target.value)}
-                required={true}
-              />
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
 }
 
 export class NLBListeners
