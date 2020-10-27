@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React from 'react';
 import { Subscription } from 'rxjs';
 
@@ -28,12 +27,12 @@ export class ExecutionGroups extends React.Component<IExecutionGroupsProps, IExe
   private stateChangeSuccessSubscription: Subscription;
   private goToParent = (executionId: '', parent: '') => {
     if (executionId !== '') {
-      var parentElement = document.getElementById('execution-groups-scroll');
-      var destination = document.getElementById('execution-' + executionId);
+      const parentElement = document.getElementById('execution-groups-scroll');
+      let destination = document.getElementById('execution-' + executionId);
       if (destination === null) {
-        var destination = document.getElementById(parent);
-        parentElement.scrollTo(0, destination.offsetTop - 140);
-      } else parentElement.scrollTo(0, destination.offsetTop - destination.offsetHeight - 40);
+        destination = document.getElementById(parent);
+        destination.scrollIntoView(true);
+      } else parentElement.scrollTo(0, destination.offsetTop - destination.offsetHeight);
     }
   };
 
