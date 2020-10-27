@@ -1,7 +1,7 @@
 import React from 'react';
 import { UISref } from '@uirouter/react';
 import { UIRouterContextComponent } from '@uirouter/react-hybrid';
-import _orderBy from 'lodash/orderBy';
+import { orderBy } from 'lodash';
 import { CollapsibleSection, FirewallLabels } from '@spinnaker/core';
 import { IAmazonInstance } from '../../domain';
 
@@ -11,7 +11,7 @@ export interface IInstanceSecurityGroupsProps {
 
 export const InstanceSecurityGroups = ({ instance }: IInstanceSecurityGroupsProps) => {
   const { account, region, provider, securityGroups, vpcId } = instance;
-  const sortedSecurityGroups = _orderBy(securityGroups, ['groupName'], ['asc']);
+  const sortedSecurityGroups = orderBy(securityGroups, ['groupName'], ['asc']);
   const securityGroupLabel = FirewallLabels.get('Firewalls');
 
   return (
@@ -30,7 +30,9 @@ export const InstanceSecurityGroups = ({ instance }: IInstanceSecurityGroupsProp
                   provider,
                 }}
               >
-                <a>{`${sg.groupName} (${sg.groupId})`}</a>
+                <a>
+                  {sg.groupName} ({sg.groupId})
+                </a>
               </UISref>
             </li>
           ))}

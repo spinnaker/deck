@@ -1,5 +1,5 @@
 import React from 'react';
-import _orderBy from 'lodash/orderBy';
+import { orderBy } from 'lodash';
 
 import { CollapsibleSection, LabeledValue } from '@spinnaker/core';
 
@@ -11,7 +11,7 @@ export interface IInstanceTagsProps {
 }
 
 export const InstanceTags = ({ tags }: IInstanceTagsProps) => {
-  const sortedTags = _orderBy(tags, ['key'], ['asc']);
+  const sortedTags = orderBy(tags, ['key'], ['asc']);
   return (
     <CollapsibleSection heading="Tags" defaultExpanded={true}>
       {!tags.length && <div>No tags associated with this server</div>}
