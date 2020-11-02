@@ -365,6 +365,7 @@ export class ExecutionFilterService {
   }
 
   public static clearFilters(): void {
+    ExecutionState.filterModel.asFilterModel.sortFilter.filterStages = false;
     ExecutionState.filterModel.asFilterModel.clearFilters();
     ExecutionState.filterModel.asFilterModel.applyParamsToUrl();
   }

@@ -20,6 +20,8 @@ export interface IExecutionMarkerProps {
   previousStageActive?: boolean;
   stage: IExecutionStageSummary;
   width: string;
+  manualJudgment: any;
+  onWait?: (id: string, name: string) => void;
 }
 
 export interface IExecutionMarkerState {
@@ -81,15 +83,31 @@ export class ExecutionMarker extends React.Component<IExecutionMarkerProps, IExe
     });
   };
 
+  private manualJudgmentStatus = (stageStatus: string, manualJudgment: any) => {
+    let status = '';
+    if (manualJudgment.length && stageStatus === 'running') {
+      const existStages = this.props.stage.stages.filter((stage) => stage.status.toLowerCase() === 'running');
+      existStages.forEach(({ context }) => {
+        if (manualJudgment.find((element: any) => element.id === context.executionId)) {
+          status = 'waiting';
+        }
+      });
+    } else {
+      status = stageStatus;
+    }
+    return status !== '' ? status : stageStatus;
+  };
+
   public render() {
-    const { stage, application, execution, active, previousStageActive, width } = this.props;
+    const { stage, application, execution, active, previousStageActive, width, manualJudgment, onWait } = this.props;
     const stageType = (stage.activeStageType || stage.type).toLowerCase(); // support groups
+    const PIPELINE_WAITING = this.manualJudgmentStatus(stage.status.toLowerCase(), manualJudgment) === 'waiting';
     const markerClassName = [
       stage.type !== 'group' ? 'clickable' : '',
       'stage',
       'execution-marker',
       `stage-type-${stageType}`,
-      `execution-marker-${stage.status.toLowerCase()}`,
+      `execution-marker-${this.manualJudgmentStatus(stage.status.toLowerCase(), manualJudgment)}`,
       active ? 'active' : '',
       previousStageActive ? 'after-active' : '',
       stage.isRunning ? 'glowing' : '',
@@ -102,7 +120,22 @@ export class ExecutionMarker extends React.Component<IExecutionMarkerProps, IExe
       SETTINGS.feature.executionMarkerInformationModal &&
       stage.status.toLowerCase() === 'terminal' &&
       stage.type === 'pipeline';
-    const stageContents = (
+    const stageContents = PIPELINE_WAITING ? (
+      <div
+        className={markerClassName}
+        style={{ width, backgroundColor: stage.color }}
+        onClick={() => onWait(stage.stages[0].context.executionId, stage.stages[0].context.executionName)}
+      >
+        <span className="horizontal center middle">
+          <MarkerIcon stage={stage} />
+
+          <span className="duration">
+            waiting <i className="fa fa-clock"></i>
+          </span>
+          {showInfoIcon && <i className="fa fa-info-circle" onClick={this.handleStageInformationClick} />}
+        </span>
+      </div>
+    ) : (
       <div className={markerClassName} style={{ width, backgroundColor: stage.color }} onClick={this.handleStageClick}>
         <span className="horizontal center middle">
           <MarkerIcon stage={stage} />

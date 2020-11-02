@@ -37,6 +37,9 @@ export interface IExecutionGroupProps {
   group: IExecutionGroup;
   application: Application;
   parent: HTMLDivElement;
+  goToParent: (executionId: string, name: string) => void;
+  manualJudgment: any;
+  id: string;
 }
 
 export interface IExecutionGroupState {
@@ -237,6 +240,8 @@ export class ExecutionGroup extends React.PureComponent<IExecutionGroupProps, IE
         {executions.map((execution) => (
           <Execution
             key={execution.id}
+            goToParent={this.props.goToParent}
+            manualJudgment={this.props.manualJudgment}
             execution={execution}
             pipelineConfig={pipelineConfig}
             application={this.props.application}
@@ -248,7 +253,7 @@ export class ExecutionGroup extends React.PureComponent<IExecutionGroupProps, IE
   }
 
   public render(): React.ReactElement<ExecutionGroup> {
-    const { group } = this.props;
+    const { group, goToParent } = this.props;
     const { displayExecutionActions, pipelineConfig, triggeringExecution, showingDetails } = this.state;
     const pipelineDisabled = pipelineConfig && pipelineConfig.disabled;
     const pipelineDescription = pipelineConfig && pipelineConfig.description;
@@ -286,7 +291,7 @@ export class ExecutionGroup extends React.PureComponent<IExecutionGroupProps, IE
     }
 
     return (
-      <div className={`execution-group ${showingDetails ? 'showing-details' : 'details-hidden'}`}>
+      <div className={`execution-group ${showingDetails ? 'showing-details' : 'details-hidden'}`} id={this.props.id}>
         {group.heading && (
           <div className="clickable sticky-header" onClick={this.handleHeadingClicked}>
             <div className={`execution-group-heading ${pipelineDisabled ? 'inactive' : 'active'}`}>
@@ -368,6 +373,7 @@ export class ExecutionGroup extends React.PureComponent<IExecutionGroupProps, IE
                 </div>
               )}
               <RenderWhenVisible
+                goToParent={goToParent}
                 container={this.props.parent}
                 disableHide={showingDetails}
                 initiallyVisible={showingDetails}
