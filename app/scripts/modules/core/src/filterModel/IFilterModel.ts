@@ -27,6 +27,8 @@ export interface ISortFilter {
   count: number;
   detail: ITrueKeyModel;
   filter: string;
+  filterStages: boolean;
+  stages: ITrueKeyModel;
   groupBy: string;
   instanceSort: string;
   instanceType: ITrueKeyModel;

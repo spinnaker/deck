@@ -44,6 +44,8 @@ export interface IExecutionProps {
   cancelHelpText?: string;
   cancelConfirmationText?: string;
   scrollIntoView?: boolean; // should really only be set to ensure scrolling on initial page load deep link
+  goToParent: (executionId: string, name: string) => void;
+  manualJudgment: any;
 }
 
 export interface IExecutionState {
@@ -286,6 +288,15 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
       });
   };
 
+  private finalChild = (id: string, name: string) => {
+    const node = this.props.manualJudgment[id];
+    if (node) {
+      this.finalChild(node[0].id, node[0].name);
+    } else {
+      this.props.goToParent(id, name);
+    }
+  };
+
   public render() {
     const {
       application,
@@ -311,6 +322,11 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
         key={stage.refId}
         application={application}
         execution={execution}
+        manualJudgment={
+          this.props.manualJudgment !== undefined && this.props.manualJudgment[this.props.execution.id]
+            ? this.props.manualJudgment[this.props.execution.id]
+            : []
+        }
         stage={stage}
         onClick={this.toggleDetails}
         active={this.isActive(stage.index)}
