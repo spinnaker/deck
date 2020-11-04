@@ -5,6 +5,7 @@
 <div class="details-panel" ng-if="!state.notFoundStandalone">
   <div class="header">
     <instance-details-header
+      health-state="instance.healthState"
       instance-id="instance.instanceId || instanceIdNotFound"
       loading="state.loading"
       standalone="state.standalone"

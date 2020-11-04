@@ -7,11 +7,17 @@ import { CopyToClipboard } from 'core/utils/clipboard/CopyToClipboard';
 import './InstanceDetailsHeader.less';
 
 export interface IInstanceDetailsHeaderProps {
+  healthState: string;
   instanceId: string;
   loading: boolean;
   standalone: boolean;
 }
-export const InstanceDetailsHeader = ({ instanceId, loading, standalone }: IInstanceDetailsHeaderProps) => (
+export const InstanceDetailsHeader = ({
+  healthState,
+  instanceId,
+  loading,
+  standalone,
+}: IInstanceDetailsHeaderProps) => (
   <div className="InstanceDetailsHeader">
     {!standalone && (
       <div className="close-button">
@@ -31,7 +37,7 @@ export const InstanceDetailsHeader = ({ instanceId, loading, standalone }: IInst
     )}
     {!loading && (
       <div className="header-text horizontal middle">
-        <span className="glyphicon glyphicon-hdd {{instance.healthState}}"></span>
+        <span className={`glyphicon glyphicon-hdd ${healthState}`}></span>
         <h3 className="horizontal middle space-between flex-1">{instanceId}</h3>
         <CopyToClipboard text={instanceId} toolTip="Copy to clipboard" />
       </div>
