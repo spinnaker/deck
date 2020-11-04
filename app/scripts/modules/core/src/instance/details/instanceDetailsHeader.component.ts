@@ -9,6 +9,7 @@ export const name = CORE_INSTANCE_DETAILS_HEADER_COMPONENT;
 module(name, []).component(
   'instanceDetailsHeader',
   react2angular(withErrorBoundary(InstanceDetailsHeader, 'instanceDetailsHeader'), [
+    'cloudProvider',
     'healthState',
     'instanceId',
     'loading',

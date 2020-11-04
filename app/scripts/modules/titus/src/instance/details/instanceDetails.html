@@ -5,8 +5,7 @@
       instance-id="instance.instanceId || instanceIdNotFound"
       loading="state.loading"
       standalone="state.standalone"
-    >
-    </instance-details-header>
+    ></instance-details-header>
     <div ng-if="!state.loading">
       <div class="actions" ng-class="{ insights: instance.insightActions.length > 0 }" ng-if="instance.placement">
         <instance-actions actions="taskActions" title="'Titus Task Actions'"></instance-actions>
