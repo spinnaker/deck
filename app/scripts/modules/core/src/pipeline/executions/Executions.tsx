@@ -1,4 +1,3 @@
-import { IPromise } from 'angular';
 import { CreatePipelineButton } from '../create/CreatePipelineButton';
 import { IScheduler } from 'core/scheduler/SchedulerFactory';
 import React from 'react';
@@ -102,7 +101,7 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
     const areEqual = (t1: IFilterTag, t2: IFilterTag) =>
       t1.key === t2.key && t1.label === t2.label && t1.value === t2.value;
     const tagsChanged =
-      newTags.length !== currentTags.length || newTags.some(t1 => !currentTags.some(t2 => areEqual(t1, t2)));
+      newTags.length !== currentTags.length || newTags.some((t1) => !currentTags.some((t2) => areEqual(t1, t2)));
     if (tagsChanged) {
       this.setState({ tags: newTags });
     }
@@ -139,12 +138,12 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
     ExecutionState.filterModel.expandSubject.next(false);
   };
 
-  private startPipeline(command: IPipelineCommand): IPromise<void> {
+  private startPipeline(command: IPipelineCommand): PromiseLike<void> {
     const { executionService } = ReactInjector;
     this.setState({ triggeringExecution: true });
     return executionService
       .startAndMonitorPipeline(this.props.app, command.pipelineName, command.trigger)
-      .then(monitor => {
+      .then((monitor) => {
         this.setState({ poll: monitor });
         return monitor.promise;
       })
@@ -163,7 +162,7 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
       pipeline: pipeline,
       application: this.props.app,
     })
-      .then(command => {
+      .then((command) => {
         this.startPipeline(command);
         this.clearManualExecutionParam();
       })
@@ -203,7 +202,7 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
         const { $state } = ReactInjector;
         if ($state.params.executionId) {
           const executions: IExecution[] = app.executions.data;
-          if (executions.every(e => e.id !== $state.params.executionId)) {
+          if (executions.every((e) => e.id !== $state.params.executionId)) {
             $state.go('.^');
           }
         }
@@ -372,7 +371,7 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
                         value={sortFilter.count}
                         onChange={this.showCountChanged}
                       >
-                        {this.filterCountOptions.map(count => (
+                        {this.filterCountOptions.map((count) => (
                           <option key={count} value={count}>
                             {count}
                           </option>

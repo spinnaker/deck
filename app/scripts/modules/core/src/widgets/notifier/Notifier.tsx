@@ -19,11 +19,11 @@ export class Notifier extends React.Component<{}, INotifierState> {
   }
 
   public componentDidMount() {
-    this.subscription = NotifierService.messageStream.subscribe(message => {
+    this.subscription = NotifierService.messageStream.subscribe((message) => {
       if (message.action === 'remove') {
         this.dismiss(message.key);
       } else {
-        const existing = this.state.messages.find(m => m.key === message.key);
+        const existing = this.state.messages.find((m) => m.key === message.key);
         if (existing) {
           existing.body = message.body;
           this.setState({ messages: this.state.messages });
@@ -39,12 +39,16 @@ export class Notifier extends React.Component<{}, INotifierState> {
   }
 
   private dismiss(key: string): void {
-    this.setState({ messages: this.state.messages.filter(m => m.key !== key) });
+    this.setState({ messages: this.state.messages.filter((m) => m.key !== key) });
   }
 
   private makeNotification = (message: INotifier) => (
     <div key={message.key} className="user-notification horizontal space-around">
-      <Markdown className="message" message={message.body} options={{ ADD_ATTR: ['onclick'] }} />
+      {message.content ? (
+        <div className="message">{message.content}</div>
+      ) : (
+        <Markdown className="message" message={message.body} options={{ ADD_ATTR: ['onclick'] }} />
+      )}
       <button className="btn btn-link close-notification" role="button" onClick={() => this.dismiss(message.key)}>
         <span className="fa fa-times" />
       </button>

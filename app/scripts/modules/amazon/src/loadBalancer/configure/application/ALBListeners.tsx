@@ -64,7 +64,8 @@ export interface IALBListenersProps {
   formik: FormikProps<IAmazonApplicationLoadBalancerUpsertCommand>;
 }
 
-export class ALBListeners extends React.Component<IALBListenersProps, IALBListenersState>
+export class ALBListeners
+  extends React.Component<IALBListenersProps, IALBListenersState>
   implements IWizardPageComponent<IAmazonApplicationLoadBalancerUpsertCommand> {
   public protocols = ['HTTP', 'HTTPS'];
 
@@ -80,12 +81,12 @@ export class ALBListeners extends React.Component<IALBListenersProps, IALBListen
       oidcConfigs: undefined,
     };
 
-    this.props.formik.initialValues.listeners.forEach(l => {
+    this.props.formik.initialValues.listeners.forEach((l) => {
       const hasDefaultAuth = l.defaultActions[0].type === 'authenticate-oidc';
       if (hasDefaultAuth) {
         this.initialListenersWithDefaultAuth.add(l);
       }
-      l.rules.forEach(r => {
+      l.rules.forEach((r) => {
         if (r.actions[0].type === 'authenticate-oidc') {
           this.initialActionsWithAuth.add(r.actions);
         }
@@ -94,10 +95,10 @@ export class ALBListeners extends React.Component<IALBListenersProps, IALBListen
   }
 
   private getAllTargetGroupsFromListeners(listeners: IListenerDescription[]): string[] {
-    const actions = flatten(listeners.map(l => l.defaultActions));
-    const rules = flatten(listeners.map(l => l.rules));
-    actions.push(...flatten(rules.map(r => r.actions)));
-    return uniq(actions.map(a => a.targetGroupName));
+    const actions = flatten(listeners.map((l) => l.defaultActions));
+    const rules = flatten(listeners.map((l) => l.rules));
+    actions.push(...flatten(rules.map((r) => r.actions)));
+    return uniq(actions.map((a) => a.targetGroupName));
   }
 
   public validate(
@@ -106,7 +107,7 @@ export class ALBListeners extends React.Component<IALBListenersProps, IALBListen
     const errors = {} as any;
 
     // Check to make sure all target groups have an associated listener
-    const targetGroupNames = values.targetGroups.map(tg => tg.name);
+    const targetGroupNames = values.targetGroups.map((tg) => tg.name);
     const usedTargetGroupNames = this.getAllTargetGroupsFromListeners(values.listeners);
     const unusedTargetGroupNames = difference(targetGroupNames, usedTargetGroupNames);
     if (unusedTargetGroupNames.length === 1) {
@@ -120,20 +121,26 @@ export class ALBListeners extends React.Component<IALBListenersProps, IALBListen
       errors.listenerPorts = 'Multiple listeners cannot use the same port.';
     }
 
-    const missingRuleFields = values.listeners.find(l => {
+    const missingRuleFields = values.listeners.find((l) => {
       const defaultActionsHaveMissingTarget = !!l.defaultActions.find(
-        da =>
+        (da) =>
           (da.type === 'forward' && !da.targetGroupName) ||
           (da.type === 'authenticate-oidc' && !da.authenticateOidcConfig.clientId) ||
           (da.type === 'redirect' &&
-            (!da.redirectActionConfig || !some(da.redirectActionConfig, field => field && field !== ''))),
+            (!da.redirectActionConfig || !some(da.redirectActionConfig, (field) => field && field !== ''))),
       );
-      const rulesHaveMissingFields = !!l.rules.find(rule => {
-        const missingTargets = !!rule.actions.find(a => a.type === 'forward' && !a.targetGroupName);
+      const rulesHaveMissingFields = !!l.rules.find((rule) => {
+        const missingTargets = !!rule.actions.find((a) => a.type === 'forward' && !a.targetGroupName);
         const missingAuth = !!rule.actions.find(
-          a => a.type === 'authenticate-oidc' && !a.authenticateOidcConfig.clientId,
+          (a) => a.type === 'authenticate-oidc' && !a.authenticateOidcConfig.clientId,
         );
-        const missingValue = !!rule.conditions.find(c => c.values.includes(''));
+        const missingValue = !!rule.conditions.find((c) => {
+          if (c.field === 'http-request-method') {
+            return !c.values.length;
+          }
+          return c.values.includes('');
+        });
+
         return missingTargets || missingAuth || missingValue;
       });
       return defaultActionsHaveMissingTarget || rulesHaveMissingFields;
@@ -152,14 +159,14 @@ export class ALBListeners extends React.Component<IALBListenersProps, IALBListen
   }
 
   private loadCertificates(): void {
-    AmazonCertificateReader.listCertificates().then(certificates => {
+    AmazonCertificateReader.listCertificates().then((certificates) => {
       this.setState({ certificates });
     });
   }
 
   private attachClientSecret = (action: IListenerAction, oidcConfigs: IAuthenticateOidcActionConfig[]) => {
     if (action.type === 'authenticate-oidc') {
-      const config = oidcConfigs.find(c => c.clientId === action.authenticateOidcConfig.clientId);
+      const config = oidcConfigs.find((c) => c.clientId === action.authenticateOidcConfig.clientId);
       if (config) {
         action.authenticateOidcConfig.clientSecret = config.clientSecret;
       }
@@ -168,13 +175,13 @@ export class ALBListeners extends React.Component<IALBListenersProps, IALBListen
 
   private loadOidcClients(): void {
     OidcConfigReader.getOidcConfigsByApp(this.props.app.name)
-      .then(oidcConfigs => {
+      .then((oidcConfigs) => {
         // make sure we have all the secrets for listener actions that need them
         if (oidcConfigs && oidcConfigs.length) {
-          this.props.formik.values.listeners.forEach(listener => {
-            listener.defaultActions.forEach(action => this.attachClientSecret(action, oidcConfigs));
-            listener.rules.forEach(rule =>
-              rule.actions.forEach(action => this.attachClientSecret(action, oidcConfigs)),
+          this.props.formik.values.listeners.forEach((listener) => {
+            listener.defaultActions.forEach((action) => this.attachClientSecret(action, oidcConfigs));
+            listener.rules.forEach((rule) =>
+              rule.actions.forEach((action) => this.attachClientSecret(action, oidcConfigs)),
             );
           });
         }
@@ -207,12 +214,12 @@ export class ALBListeners extends React.Component<IALBListenersProps, IALBListen
   }
 
   private removeAuthActions(listener: IListenerDescription): void {
-    const authIndex = listener.defaultActions.findIndex(a => a.type === 'authenticate-oidc');
+    const authIndex = listener.defaultActions.findIndex((a) => a.type === 'authenticate-oidc');
     if (authIndex !== -1) {
       this.removeAuthAction(listener, listener.defaultActions, authIndex, -1);
     }
     listener.rules.forEach((rule, ruleIndex) => {
-      const index = rule.actions.findIndex(a => a.type === 'authenticate-oidc');
+      const index = rule.actions.findIndex((a) => a.type === 'authenticate-oidc');
       if (index !== -1) {
         this.removeAuthAction(listener, rule.actions, index, ruleIndex);
       }
@@ -320,11 +327,41 @@ export class ALBListeners extends React.Component<IALBListenersProps, IALBListen
     newField: ListenerRuleConditionField,
   ): void => {
     condition.field = newField;
+
+    if (newField === 'http-request-method') {
+      condition.values = [];
+    }
+
     this.updateListeners();
   };
 
   private handleConditionValueChanged = (condition: IListenerRuleCondition, newValue: string): void => {
     condition.values[0] = newValue;
+    this.updateListeners();
+  };
+
+  private handleHttpRequestMethodChanged = (
+    condition: IListenerRuleCondition,
+    newValue: string,
+    selected: boolean,
+  ): void => {
+    let newValues = condition.values || [];
+
+    if (selected) {
+      newValues.push(newValue);
+    } else {
+      newValues = newValues.filter((v) => v !== newValue);
+    }
+
+    /**
+     * The `http-request-method` conditions have a differnt model.
+     * AWS uses `httpRequestMethodConfig` as the source of truth, while deck uses `values`.
+     * Both are updated for consistency.
+     */
+    condition.values = newValues;
+    condition.httpRequestMethodConfig = {
+      values: newValues,
+    };
     this.updateListeners();
   };
 
@@ -431,7 +468,7 @@ export class ALBListeners extends React.Component<IALBListenersProps, IALBListen
     const rules = listener.rules[ruleIndex];
     const actions = (rules && rules.actions) || listener.defaultActions;
     if (actions) {
-      const authIndex = actions.findIndex(a => a.type === 'authenticate-oidc');
+      const authIndex = actions.findIndex((a) => a.type === 'authenticate-oidc');
       if (authIndex !== -1) {
         this.removeAuthAction(listener, actions, authIndex, ruleIndex);
       } else {
@@ -458,7 +495,6 @@ export class ALBListeners extends React.Component<IALBListenersProps, IALBListen
   public render() {
     const { errors, values } = this.props.formik;
     const { certificates, certificateTypes, oidcConfigs } = this.state;
-
     return (
       <div className="container-fluid form-horizontal">
         <div className="form-group">
@@ -476,11 +512,11 @@ export class ALBListeners extends React.Component<IALBListenersProps, IALBListen
                             className="form-control input-sm inline-number"
                             style={{ width: '80px' }}
                             value={listener.protocol}
-                            onChange={event =>
+                            onChange={(event) =>
                               this.listenerProtocolChanged(listener, event.target.value as ALBListenerProtocol)
                             }
                           >
-                            {this.protocols.map(p => (
+                            {this.protocols.map((p) => (
                               <option key={p}>{p}</option>
                             ))}
                           </select>
@@ -492,7 +528,7 @@ export class ALBListeners extends React.Component<IALBListenersProps, IALBListen
                             type="text"
                             min={0}
                             value={listener.port || ''}
-                            onChange={event => this.listenerPortChanged(listener, event.target.value)}
+                            onChange={(event) => this.listenerPortChanged(listener, event.target.value)}
                             style={{ width: '80px' }}
                             required={true}
                           />
@@ -515,9 +551,9 @@ export class ALBListeners extends React.Component<IALBListenersProps, IALBListen
                               className="form-control input-sm inline-number"
                               style={{ width: '45px' }}
                               value={certificate.type}
-                              onChange={event => this.certificateTypeChanged(certificate, event.target.value)}
+                              onChange={(event) => this.certificateTypeChanged(certificate, event.target.value)}
                             >
-                              {certificateTypes.map(t => (
+                              {certificateTypes.map((t) => (
                                 <option key={t}>{t}</option>
                               ))}
                             </select>
@@ -527,7 +563,7 @@ export class ALBListeners extends React.Component<IALBListenersProps, IALBListen
                                 accountName={values.credentials}
                                 currentValue={certificate.name}
                                 app={this.props.app}
-                                onCertificateSelect={value => this.handleCertificateChanged(certificate, value)}
+                                onCertificateSelect={(value) => this.handleCertificateChanged(certificate, value)}
                               />
                             )}
                             {!this.showCertificateSelect(certificate) && (
@@ -536,7 +572,7 @@ export class ALBListeners extends React.Component<IALBListenersProps, IALBListen
                                 style={{ display: 'inline-block' }}
                                 type="text"
                                 value={certificate.name}
-                                onChange={event => this.handleCertificateChanged(certificate, event.target.value)}
+                                onChange={(event) => this.handleCertificateChanged(certificate, event.target.value)}
                                 required={true}
                               />
                             )}
@@ -563,6 +599,7 @@ export class ALBListeners extends React.Component<IALBListenersProps, IALBListen
                           distance={10}
                           handleConditionFieldChanged={this.handleConditionFieldChanged}
                           handleConditionValueChanged={this.handleConditionValueChanged}
+                          handleHttpRequestMethodChanged={this.handleHttpRequestMethodChanged}
                           handleRuleActionTargetChanged={this.handleRuleActionTargetChanged}
                           handleRuleActionTypeChanged={this.handleRuleActionTypeChanged}
                           listener={listener}
@@ -573,7 +610,7 @@ export class ALBListeners extends React.Component<IALBListenersProps, IALBListen
                           oidcConfigs={oidcConfigs}
                           oidcConfigChanged={this.oidcConfigChanged}
                           redirectConfigChanged={this.redirectConfigChanged}
-                          onSortEnd={sortEnd => this.handleSortEnd(sortEnd, listener)}
+                          onSortEnd={(sortEnd) => this.handleSortEnd(sortEnd, listener)}
                           configureOidcClient={this.configureOidcClient}
                           configureRedirect={this.configureRedirect}
                         />
@@ -630,6 +667,7 @@ interface IRuleProps {
   removeCondition: (rule: IListenerRule, index: number) => void;
   handleConditionFieldChanged: (condition: IListenerRuleCondition, newField: ListenerRuleConditionField) => void;
   handleConditionValueChanged: (condition: IListenerRuleCondition, newValue: string) => void;
+  handleHttpRequestMethodChanged: (condition: IListenerRuleCondition, newValue: string, selected: boolean) => void;
   configureOidcClient: (action: IListenerAction) => void;
   configureRedirect: (action: IListenerAction) => void;
 }
@@ -645,10 +683,10 @@ const Rule = SortableElement((props: IRuleProps) => (
           <select
             className="form-control input-sm inline-number"
             value={condition.field}
-            onChange={event =>
+            onChange={(event) =>
               props.handleConditionFieldChanged(condition, event.target.value as ListenerRuleConditionField)
             }
-            style={{ width: '37%' }}
+            style={{ width: '40%' }}
             required={true}
           >
             {(props.rule.conditions.length === 1 || condition.field === 'host-header') && (
@@ -657,18 +695,39 @@ const Rule = SortableElement((props: IRuleProps) => (
             {(props.rule.conditions.length === 1 || condition.field === 'path-pattern') && (
               <option value="path-pattern">Path</option>
             )}
+            {(props.rule.conditions.length === 1 || condition.field === 'http-request-method') && (
+              <option value="http-request-method">Method(s)</option>
+            )}
           </select>
           {condition.field === 'path-pattern' && <HelpField id="aws.loadBalancer.ruleCondition.path" />}
           {condition.field === 'host-header' && <HelpField id="aws.loadBalancer.ruleCondition.host" />}
-          <input
-            className="form-control input-sm"
-            type="text"
-            value={condition.values[0]}
-            onChange={event => props.handleConditionValueChanged(condition, event.target.value)}
-            maxLength={128}
-            required={true}
-            style={{ width: '63%' }}
-          />
+          {condition.field !== 'http-request-method' && (
+            <input
+              className="form-control input-sm"
+              type="text"
+              value={condition.values[0]}
+              onChange={(event) => props.handleConditionValueChanged(condition, event.target.value)}
+              maxLength={128}
+              required={true}
+              style={{ width: '63%' }}
+            />
+          )}
+          {condition.field === 'http-request-method' && (
+            <div className="col-md-6 checkbox">
+              {['DELETE', 'GET', 'PATCH', 'POST', 'PUT'].map((httpMethod) => (
+                <label key={`${httpMethod}-checkbox`}>
+                  <input
+                    type="checkbox"
+                    checked={condition.values.includes(httpMethod)}
+                    onChange={(event) =>
+                      props.handleHttpRequestMethodChanged(condition, httpMethod, event.target.checked)
+                    }
+                  />
+                  {httpMethod}
+                </label>
+              ))}
+            </div>
+          )}
           <span className="remove-condition">
             {cIndex === 1 && (
               <a
@@ -700,10 +759,10 @@ const Rule = SortableElement((props: IRuleProps) => (
         <Action
           key={index}
           action={action}
-          actionTypeChanged={type => props.handleRuleActionTypeChanged(action, type)}
-          oidcConfigChanged={config => props.oidcConfigChanged(action, config)}
-          redirectConfigChanged={config => props.redirectConfigChanged(action, config)}
-          targetChanged={target => props.handleRuleActionTargetChanged(action, target)}
+          actionTypeChanged={(type) => props.handleRuleActionTypeChanged(action, type)}
+          oidcConfigChanged={(config) => props.oidcConfigChanged(action, config)}
+          redirectConfigChanged={(config) => props.redirectConfigChanged(action, config)}
+          targetChanged={(target) => props.handleRuleActionTargetChanged(action, target)}
           targetGroups={props.targetGroups}
           oidcConfigs={props.oidcConfigs}
           configureOidcClient={props.configureOidcClient}
@@ -742,7 +801,7 @@ const Action = (props: {
           className="form-control input-sm"
           style={{ width: '80px' }}
           value={props.action.type}
-          onChange={event => props.actionTypeChanged(event.target.value)}
+          onChange={(event) => props.actionTypeChanged(event.target.value)}
         >
           <option value="forward">forward to</option>
           <option value="redirect">redirect to</option>
@@ -751,11 +810,11 @@ const Action = (props: {
           <select
             className="form-control input-sm"
             value={props.action.targetGroupName}
-            onChange={event => props.targetChanged(event.target.value)}
+            onChange={(event) => props.targetChanged(event.target.value)}
             required={true}
           >
             <option value="" />
-            {uniq(props.targetGroups.map(tg => tg.name)).map(name => (
+            {uniq(props.targetGroups.map((tg) => tg.name)).map((name) => (
               <option key={name}>{name}</option>
             ))}
           </select>
@@ -780,10 +839,10 @@ const Action = (props: {
       disableManualOidcDialog ||
       (props.oidcConfigs &&
         props.oidcConfigs.length > 0 &&
-        (!clientId || props.oidcConfigs.find(c => c.clientId === clientId)));
+        (!clientId || props.oidcConfigs.find((c) => c.clientId === clientId)));
 
     const oidcOptions = props.oidcConfigs?.length ? (
-      props.oidcConfigs.map(config => <option key={config.clientId}>{config.clientId}</option>)
+      props.oidcConfigs.map((config) => <option key={config.clientId}>{config.clientId}</option>)
     ) : (
       <option disabled>No {CustomLabels.get('OIDC client')} config found</option>
     );
@@ -796,7 +855,9 @@ const Action = (props: {
           <select
             className="form-control input-sm"
             value={clientId}
-            onChange={event => props.oidcConfigChanged(props.oidcConfigs.find(c => c.clientId === event.target.value))}
+            onChange={(event) =>
+              props.oidcConfigChanged(props.oidcConfigs.find((c) => c.clientId === event.target.value))
+            }
             required={true}
           >
             <option value="" />
@@ -826,7 +887,7 @@ const RuleActions = (props: {
   authenticateRuleToggle: (listener: IListenerDescription, index: number) => void;
   removeRule?: (listener: IListenerDescription, index: number) => void;
 }) => {
-  const hasAuth = Boolean(props.actions.find(a => a.type === 'authenticate-oidc'));
+  const hasAuth = Boolean(props.actions.find((a) => a.type === 'authenticate-oidc'));
   const allowAuth = props.listener.protocol === 'HTTPS';
   const tooltip = hasAuth ? 'Remove authentication from rule' : 'Authenticate rule';
   const icon = hasAuth ? 'fas fa-fw fa-lock-open' : 'fas fa-fw fa-user-lock';
@@ -871,6 +932,7 @@ interface IRulesProps {
   removeCondition: (rule: IListenerRule, index: number) => void;
   handleConditionFieldChanged: (condition: IListenerRuleCondition, newField: ListenerRuleConditionField) => void;
   handleConditionValueChanged: (condition: IListenerRuleCondition, newValue: string) => void;
+  handleHttpRequestMethodChanged: (condition: IListenerRuleCondition, newValue: string, selected: boolean) => void;
   listener: IListenerDescription;
   targetGroups: IALBTargetGroupDescription[];
   oidcConfigChanged: (action: IListenerAction, config: IAuthenticateOidcActionConfig) => void;
@@ -890,12 +952,12 @@ const Rules = SortableContainer((props: IRulesProps) => (
           <Action
             key={index}
             action={action}
-            actionTypeChanged={type => props.handleRuleActionTypeChanged(action, type)}
-            targetChanged={target => props.handleRuleActionTargetChanged(action, target)}
+            actionTypeChanged={(type) => props.handleRuleActionTypeChanged(action, type)}
+            targetChanged={(target) => props.handleRuleActionTargetChanged(action, target)}
             targetGroups={props.targetGroups}
             oidcConfigs={props.oidcConfigs}
-            oidcConfigChanged={config => props.oidcConfigChanged(action, config)}
-            redirectConfigChanged={config => props.redirectConfigChanged(action, config)}
+            oidcConfigChanged={(config) => props.oidcConfigChanged(action, config)}
+            redirectConfigChanged={(config) => props.redirectConfigChanged(action, config)}
             configureOidcClient={props.configureOidcClient}
             configureRedirect={props.configureRedirect}
           />
@@ -918,6 +980,7 @@ const Rules = SortableContainer((props: IRulesProps) => (
           addCondition={props.addCondition}
           handleConditionFieldChanged={props.handleConditionFieldChanged}
           handleConditionValueChanged={props.handleConditionValueChanged}
+          handleHttpRequestMethodChanged={props.handleHttpRequestMethodChanged}
           handleRuleActionTargetChanged={props.handleRuleActionTargetChanged}
           handleRuleActionTypeChanged={props.handleRuleActionTypeChanged}
           oidcConfigChanged={props.oidcConfigChanged}

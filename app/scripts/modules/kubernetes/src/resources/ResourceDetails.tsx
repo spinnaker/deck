@@ -40,7 +40,7 @@ export class KubernetesResourceDetails extends React.Component<
       location: kubernetesResource.region,
       name: kubernetesResource.kubernetesResource,
     };
-    this.unsubscribeManifest = KubernetesManifestService.subscribe(this.props.app, params, manifest => {
+    this.unsubscribeManifest = KubernetesManifestService.subscribe(this.props.app, params, (manifest) => {
       if (this.unsubscribeManifest != null) {
         this.setState({ manifest, loading: false });
       }
@@ -83,7 +83,7 @@ export class KubernetesResourceDetails extends React.Component<
         {!this.state.loading && (
           <div className="content">
             <CollapsibleSection heading="Information">
-              <dl className="dl-horizontal dl-flex">
+              <dl className="dl-horizontal dl-narrow">
                 <dt>Created</dt>
                 <dd>{timestamp(creationUnixMs)}</dd>
                 <dt>Account</dt>
@@ -98,7 +98,7 @@ export class KubernetesResourceDetails extends React.Component<
             </CollapsibleSection>
             <CollapsibleSection key="status" heading="status" defaultExpanded={true}>
               <ul>
-                {get(manifest, ['manifest', 'status', 'conditions'], []).map(condition => (
+                {get(manifest, ['manifest', 'status', 'conditions'], []).map((condition) => (
                   <li key={condition.type + condition.lastTransitionTime} style={{ marginBottom: '10px' }}>
                     <ManifestCondition condition={condition} />
                   </li>

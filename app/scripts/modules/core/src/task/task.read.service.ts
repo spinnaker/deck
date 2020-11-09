@@ -1,4 +1,4 @@
-import { IPromise } from 'angular';
+
 import { $log, $q, $timeout } from 'ngimport';
 import { Subject } from 'rxjs';
 
@@ -9,21 +9,21 @@ import { ITask } from 'core/domain';
 export class TaskReader {
   private static activeStatuses: string[] = ['RUNNING', 'SUSPENDED', 'NOT_STARTED'];
 
-  public static getTasks(applicationName: string, statuses: string[] = []): IPromise<ITask[]> {
+  public static getTasks(applicationName: string, statuses: string[] = []): PromiseLike<ITask[]> {
     return API.one('applications', applicationName)
       .all('tasks')
       .getList({ statuses: statuses.join(',') })
       .then((tasks: ITask[]) => {
-        tasks.forEach(task => this.setTaskProperties(task));
-        return tasks.filter(task => !task.getValueFor('dryRun'));
+        tasks.forEach((task) => this.setTaskProperties(task));
+        return tasks.filter((task) => !task.getValueFor('dryRun'));
       });
   }
 
-  public static getRunningTasks(applicationName: string): IPromise<ITask[]> {
+  public static getRunningTasks(applicationName: string): PromiseLike<ITask[]> {
     return this.getTasks(applicationName, this.activeStatuses);
   }
 
-  public static getTask(taskId: string): IPromise<ITask> {
+  public static getTask(taskId: string): PromiseLike<ITask> {
     return API.one('tasks', taskId)
       .get()
       .then((task: ITask) => {
@@ -45,7 +45,7 @@ export class TaskReader {
     failureClosure?: (task: ITask) => boolean,
     interval = 1000,
     notifier?: Subject<void>,
-  ): IPromise<ITask> {
+  ): PromiseLike<ITask> {
     const deferred = $q.defer<ITask>();
     if (!task) {
       deferred.reject(null);
@@ -55,7 +55,7 @@ export class TaskReader {
       deferred.reject(task);
     } else {
       task.poller = $timeout(() => {
-        this.getTask(task.id).then(updated => {
+        this.getTask(task.id).then((updated) => {
           this.updateTask(task, updated);
           notifier?.next();
           this.waitUntilTaskMatches(task, closure, failureClosure, interval, notifier).then(
@@ -68,11 +68,11 @@ export class TaskReader {
     return deferred.promise;
   }
 
-  public static waitUntilTaskCompletes(task: ITask, interval = 1000, notifier?: Subject<void>): IPromise<ITask> {
+  public static waitUntilTaskCompletes(task: ITask, interval = 1000, notifier?: Subject<void>): PromiseLike<ITask> {
     return this.waitUntilTaskMatches(
       task,
-      t => t.isCompleted,
-      t => t.isFailed,
+      (t) => t.isCompleted,
+      (t) => t.isFailed,
       interval,
       notifier,
     );
@@ -97,7 +97,7 @@ export class TaskReader {
   private static setTaskProperties(task: ITask): void {
     OrchestratedItemTransformer.defineProperties(task);
     if (task.steps && task.steps.length) {
-      task.steps.forEach(step => OrchestratedItemTransformer.defineProperties(step));
+      task.steps.forEach((step) => OrchestratedItemTransformer.defineProperties(step));
     }
   }
 }

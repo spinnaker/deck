@@ -6,6 +6,7 @@ import { ConfirmationModalService, SETTINGS } from '@spinnaker/core';
 import { GOOGLE_AUTOSCALINGPOLICY_AUTOSCALINGPOLICY_WRITE_SERVICE } from './../../../autoscalingPolicy/autoscalingPolicy.write.service';
 import { GOOGLE_SERVERGROUP_DETAILS_AUTOSCALINGPOLICY_MODAL_UPSERTAUTOSCALINGPOLICY_MODAL_CONTROLLER } from './modal/upsertAutoscalingPolicy.modal.controller';
 import ANGULAR_UI_BOOTSTRAP from 'angular-ui-bootstrap';
+import { GCEProviderSettings } from '../../../gce.settings';
 
 export const GOOGLE_SERVERGROUP_DETAILS_AUTOSCALINGPOLICY_AUTOSCALINGPOLICY_DIRECTIVE =
   'spinnaker.gce.instance.details.scalingPolicy.directive';
@@ -24,7 +25,7 @@ module(GOOGLE_SERVERGROUP_DETAILS_AUTOSCALINGPOLICY_AUTOSCALINGPOLICY_DIRECTIVE,
   controller: [
     '$uibModal',
     'gceAutoscalingPolicyWriter',
-    function($uibModal, gceAutoscalingPolicyWriter) {
+    function ($uibModal, gceAutoscalingPolicyWriter) {
       const policy = this.policy;
 
       policy.bases = [];
@@ -63,7 +64,7 @@ module(GOOGLE_SERVERGROUP_DETAILS_AUTOSCALINGPOLICY_AUTOSCALINGPOLICY_DIRECTIVE,
 
         if (policy.customMetricUtilizations.length > 0) {
           basis.targets = [];
-          policy.customMetricUtilizations.forEach(metric => {
+          policy.customMetricUtilizations.forEach((metric) => {
             let target = metric.metric + ': ' + metric.utilizationTarget;
 
             if (metric.utilizationTargetType === 'DELTA_PER_SECOND') {
@@ -92,6 +93,11 @@ module(GOOGLE_SERVERGROUP_DETAILS_AUTOSCALINGPOLICY_AUTOSCALINGPOLICY_DIRECTIVE,
 
         this.timeWindowSecMessage = `${policy.scaleInControl.timeWindowSec} seconds`;
       }
+
+      this.predictiveAutoscalingEnabled =
+        GCEProviderSettings.feature.predictiveAutoscaling &&
+        policy.cpuUtilization &&
+        policy.cpuUtilization.predictiveMethod;
 
       this.editPolicy = () => {
         $uibModal.open({

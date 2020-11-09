@@ -44,29 +44,19 @@
         </button>
         <ul class="dropdown-menu" uib-dropdown-menu role="menu">
           <li ng-if="ctrl.canEditServerGroup()">
-            <a href ng-click="ctrl.editServerGroup()">
-              Edit
-            </a>
+            <a href ng-click="ctrl.editServerGroup()"> Edit </a>
           </li>
           <li ng-if="ctrl.canScaleServerGroup()">
-            <a href ng-click="ctrl.scaleServerGroup()">
-              Scale
-            </a>
+            <a href ng-click="ctrl.scaleServerGroup()"> Scale </a>
           </li>
           <li ng-if="ctrl.canEnable()">
-            <a href ng-click="ctrl.enableServerGroup()">
-              Enable
-            </a>
+            <a href ng-click="ctrl.enableServerGroup()"> Enable </a>
           </li>
           <li ng-if="ctrl.canDisable()">
-            <a href ng-click="ctrl.disableServerGroup()">
-              Disable
-            </a>
+            <a href ng-click="ctrl.disableServerGroup()"> Disable </a>
           </li>
           <li>
-            <a href ng-click="ctrl.deleteServerGroup()">
-              Delete
-            </a>
+            <a href ng-click="ctrl.deleteServerGroup()"> Delete </a>
           </li>
           <render-if-feature feature="entityTags">
             <add-entity-tag-links
@@ -89,11 +79,11 @@
       application="ctrl.app"
     ></server-group-running-tasks-details>
     <collapsible-section heading="Information" expanded="true">
-      <dl class="dl-horizontal dl-flex">
+      <dl class="dl-horizontal dl-narrow">
         <dt>Created</dt>
         <dd>{{ctrl.serverGroup.createdTime | timestamp}}</dd>
         <dt>Account</dt>
-        <dd><account-tag account="ctrl.serverGroup.accountName"></account-tag></dd>
+        <dd><account-tag account="ctrl.serverGroup.account"></account-tag></dd>
         <dt>Namespace</dt>
         <dd>{{ctrl.serverGroup.namespace}}</dd>
         <dt>Kind</dt>
@@ -129,12 +119,12 @@
       <kubernetes-manifest-labels manifest="ctrl.manifest.manifest"></kubernetes-manifest-labels>
     </collapsible-section>
     <collapsible-section heading="Size" expanded="true">
-      <dl class="dl-horizontal dl-flex" ng-if="ctrl.serverGroup.capacity.min == null">
+      <dl class="dl-horizontal dl-narrow" ng-if="ctrl.serverGroup.capacity.min == null">
         <dt>Current</dt>
         <dd>{{ctrl.serverGroup.instances.length}}</dd>
       </dl>
       <dl
-        class="dl-horizontal dl-flex"
+        class="dl-horizontal dl-narrow"
         ng-if="ctrl.serverGroup.capacity.min != null && ctrl.serverGroup.capacity.min === ctrl.serverGroup.capacity.max"
       >
         <dt>Min/Max</dt>
@@ -142,7 +132,7 @@
         <dt>Current</dt>
         <dd>{{ctrl.serverGroup.instances.length}}</dd>
       </dl>
-      <dl class="dl-horizontal dl-flex" ng-if="ctrl.serverGroup.capacity.min !== ctrl.serverGroup.capacity.max">
+      <dl class="dl-horizontal dl-narrow" ng-if="ctrl.serverGroup.capacity.min !== ctrl.serverGroup.capacity.max">
         <dt>Min</dt>
         <dd>{{ctrl.serverGroup.capacity.min}}</dd>
         <dt>Max</dt>
@@ -152,7 +142,7 @@
       </dl>
     </collapsible-section>
     <collapsible-section heading="Health" expanded="true">
-      <dl class="dl-horizontal dl-flex" ng-if="ctrl.serverGroup">
+      <dl class="dl-horizontal dl-narrow" ng-if="ctrl.serverGroup">
         <dt>Instances</dt>
         <dd>
           <health-counts container="ctrl.serverGroup.instanceCounts" class="pull-left"></health-counts>

@@ -3,7 +3,6 @@ import React from 'react';
 import { capitalize, get } from 'lodash';
 import { Option } from 'react-select';
 import { $q } from 'ngimport';
-import { IPromise } from 'angular';
 
 import { Observable, Subject } from 'rxjs';
 
@@ -35,7 +34,7 @@ export class BaseBuildTriggerTemplate extends React.Component<
 > {
   private destroy$ = new Subject();
 
-  public static formatLabel(trigger: IBuildTrigger): IPromise<string> {
+  public static formatLabel(trigger: IBuildTrigger): PromiseLike<string> {
     return $q.when(`(${capitalize(trigger.type)}) ${trigger.master}: ${trigger.job}`);
   }
 
@@ -57,11 +56,11 @@ export class BaseBuildTriggerTemplate extends React.Component<
 
     const trigger = this.props.command.trigger as IBuildTrigger;
     newState.builds = (allBuilds || [])
-      .filter(build => !build.building && build.result === 'SUCCESS')
+      .filter((build) => !build.building && build.result === 'SUCCESS')
       .sort((a, b) => b.number - a.number);
     if (newState.builds.length) {
       // default to what is supplied by the trigger if possible; otherwise, use the latest
-      const defaultSelection = newState.builds.find(b => b.number === trigger.buildNumber) || newState.builds[0];
+      const defaultSelection = newState.builds.find((b) => b.number === trigger.buildNumber) || newState.builds[0];
       newState.selectedBuild = defaultSelection.number;
       this.updateSelectedBuild(defaultSelection);
     }

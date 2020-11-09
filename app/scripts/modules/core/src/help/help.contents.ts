@@ -129,6 +129,10 @@ const helpContents: { [key: string]: string } = {
       <p>The S3 object name, in the form <code>s3://bucket/path/to/file.yml</code>.</p>`,
   'pipeline.config.expectedArtifact.defaultS3.reference': `
       <p>The S3 object name, <i>optionally</i> appending the version. An example: <code>s3://bucket/file.yml#123948581</code></p>`,
+  'pipeline.config.expectedArtifact.oracle.name': `
+      <p>The Oracle object artifact name, in the form <code>oci://bucket/path/file.yml</code>.</p>`,
+  'pipeline.config.expectedArtifact.defaultOracle.reference': `
+      <p>The  Oracle object artifact name, <i>optionally</i> appending the version. An example: <code>oci://bucket/file.yml#9ce463aa-d843-4438-b206-5365cd643e2e</code></p>`,
   'pipeline.config.expectedArtifact.docker.name': `
       <p>The Docker image name you want to trigger on changes to. By default, this does <i>not</i> include the image tag or digest, only the registry and image repository.</p>`,
   'pipeline.config.expectedArtifact.defaultDocker.reference': `
@@ -163,6 +167,9 @@ const helpContents: { [key: string]: string } = {
       <p>An example is <code>https://api.bitbucket.org/1.0/repositories/$ORG/$REPO/raw/$VERSION/$FILEPATH</code>. See <a href="https://www.spinnaker.io/reference/artifacts/types/bitbucket-file/#fields">our docs</a> for more info.</p>`,
   'pipeline.config.expectedArtifact.defaultBitbucket.filepath': `
       <p>The file path within your repo. path/to/file.yml is an example.</p>`,
+  'pipeline.config.trigger.helm.chart': `The Helm chart name.`,
+  'pipeline.config.trigger.helm.version': `The Helm chart version, as semver.`,
+  'pipeline.config.trigger.helm.version.manual': `The Helm chart version, as an exact version.`,
   'pipeline.config.trigger.webhook.source': `
       <p>Determines the target URL required to trigger this pipeline, as well as how the payload can be transformed into artifacts.</p>
   `,
@@ -204,6 +211,8 @@ const helpContents: { [key: string]: string } = {
     '<p>Configures the number of healthy observations before reinstituting an instance into the ELB’s traffic rotation.</p><p>Default: <b>10</b></p>',
   'loadBalancer.advancedSettings.unhealthyThreshold':
     '<p>Configures the number of unhealthy observations before deservicing an instance from the ELB.</p><p>Default: <b>2</b></p>',
+  'loadBalancer.advancedSettings.loadBalancingCrossZone':
+    '<p>Cross-zone load balancing distributes traffic evenly across all targets in the Availability Zones enabled for the load balancer.</p><p> Default: <b>True</b></p>',
   'pipeline.config.resizeAsg.action': `
       <p>Configures the resize action for the target server group.
       <ul>
@@ -264,8 +273,9 @@ const helpContents: { [key: string]: string } = {
     '<p>(Optional) Instructions are shown to the user when making a manual judgment.</p><p>May contain HTML.</p>',
   'pipeline.config.manualJudgment.propagateAuthentication': `
       <p><strong>Checked</strong> - the pipeline will continue with the permissions of the approver.</p>
-      <p><strong>Unchecked</strong> - the pipeline will continue with its current permissions.</p>
-        pipeline.config.manualJudgment.judgmentInputs': '<p>(Optional) Entries populate a dropdown displayed when performing a manual judgment.</p>
+      <p><strong>Unchecked</strong> - the pipeline will continue with its current permissions.</p>`,
+  'pipeline.config.manualJudgment.judgmentInputs': `
+      <p>(Optional) Entries populate a dropdown displayed when performing a manual judgment.</p>
       <p>The selected value can be used in a subsequent <strong>Check Preconditions</strong> stage to determine branching.</p>
       <p>For example, if the user selects "rollback" from this list of options, that branch can be activated by using the expression:
         <samp class="small">execution.stages[n].context.judgmentInput=="rollback"</samp></p>`,
@@ -278,6 +288,21 @@ const helpContents: { [key: string]: string } = {
   'pipeline.config.bake.manifest.kustomize.filePath': `
     <p>This is the relative path to the kustomization.yaml file within your Git repo.</p>
     <p>e.g.: <b>examples/wordpress/mysql/kustomization.yaml</b></p>`,
+  'pipeline.config.bake.cf.manifest.name':
+    '<p> Name should be the same as the expected artifact in the Produces Artifact section. </p>',
+  'pipeline.config.bake.cf.manifest.templateArtifact': `
+    <p> This is the manifest template needing resolution. Variables in this template should use double parentheses notation.</p>
+    <p>e.g.: </p>
+    <p>---</p>
+    <p>buildpack: ((javabuildpack)) </p>
+    <p>foo: ((some.nestedKey)) </p>`,
+  'pipeline.config.bake.cf.manifest.varsArtifact': `
+    <p> These are the variables that will be substituted in the manifest template. These should be yaml files and follow standard convention. </p>
+    <p>e.g.: </p>
+    <p>---</p>
+    <p>javabuildpack: java_buildpack_offline </p>
+    <p>some: </p>
+    <p style="padding-left: 1em">nestedKey: bar </p>`,
   'pipeline.config.haltPipelineOnFailure':
     'Immediately halts execution of all running stages and fails the entire execution.',
   'pipeline.config.haltBranchOnFailure':
@@ -452,7 +477,7 @@ const helpContents: { [key: string]: string } = {
   'pipeline.config.webhook.waitBeforeMonitor':
     'Optional delay (in seconds) to wait before starting to poll the endpoint for monitoring status',
   'pipeline.config.webhook.statusJsonPath':
-    "JSON path to the status information in the webhook's response JSON. (e.g. <samp>$.buildInfo.status</samp>)",
+    "JSON path to the status information in the webhook's response JSON (e.g. <samp>$.buildInfo.status</samp>). <br>If left empty, a 200 response from the status endpoint will be treated as a success.",
   'pipeline.config.webhook.progressJsonPath':
     "JSON path to a descriptive message about the progress in the webhook's response JSON. (e.g. <samp>$.buildInfo.progress</samp>)",
   'pipeline.config.webhook.successStatuses':
@@ -487,13 +512,13 @@ const helpContents: { [key: string]: string } = {
   'pipeline.config.entitytags.value': `Value can either be a string or an object. If you want to use an object, input a valid JSON string.`,
   'pipeline.config.entitytags.region': `(Optional) Target a specific region, use * if you want to apply to all regions.`,
   'pipeline.config.deliveryConfig.manifest': `(Optional) Name of the file with your Delivery Config manifest. Leave blank to use the default name (<strong><i>${SETTINGS.managedDelivery?.defaultManifest}</i></strong>).`,
-  'pipeline.config.codebuild.source': `(Optional) Source of the build. It will be overrided to Spinnaker artifact if checked. If not checked, source configured in CodeBuild project will be used.`,
-  'pipeline.config.codebuild.sourceType': `(Optional) Type of the source. It can be specified explicitly, otherwise it will be inferred from source artifact.`,
+  'pipeline.config.codebuild.source': `(Optional) Source of the build. It will be overridden to Spinnaker artifact if checked. If not checked, source configured in CodeBuild project will be used.`,
+  'pipeline.config.codebuild.sourceType': `(Optional) Type of the source. It can be specified explicitly; otherwise, it will be inferred from source artifact.`,
   'pipeline.config.codebuild.sourceVersion': `(Optional) Source version of the build. If not specified, the artifact version will be used. If artifact doesn't have a version, the latest version will be used. See the <a href="https://docs.aws.amazon.com/codebuild/latest/APIReference/API_StartBuild.html#CodeBuild-StartBuild-request-sourceVersion">CodeBuild reference</a> for more information.`,
   'pipeline.config.codebuild.buildspec': `(Optional) Inline buildspec definition of the build. If not specified, buildspec configured in CodeBuild project will be used.`,
-  'pipeline.config.codebuild.secondarySources': `(Optional) Secondary sources of the build. It can be overrided by adding Spinnaker Artifacts. If not specified, secondary sources configured in CodeBuild project will be used.`,
-  'pipeline.config.codebuild.image': `(Optional) Image in which the build will run. It can be overrided by specifying the name of the image. If not specified, image configured in CodeBuild project will be used.`,
+  'pipeline.config.codebuild.secondarySources': `(Optional) Secondary sources of the build. It can be overridden by adding Spinnaker Artifacts. If not specified, secondary sources configured in CodeBuild project will be used.`,
+  'pipeline.config.codebuild.image': `(Optional) Image in which the build will run. It can be overridden by specifying the name of the image. If not specified, image configured in CodeBuild project will be used.`,
   'pipeline.config.codebuild.envVar': `(Optional) Environment variables that will be propagated into the build.`,
 };
 
-Object.keys(helpContents).forEach(key => HelpContentsRegistry.register(key, helpContents[key]));
+Object.keys(helpContents).forEach((key) => HelpContentsRegistry.register(key, helpContents[key]));

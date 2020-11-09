@@ -2,13 +2,14 @@ import React, { memo } from 'react';
 import { useSref } from '@uirouter/react';
 
 import { Application } from 'core/application';
-import { Icon, IconNames } from '../presentation';
-import { IManagedResourceSummary, IManagedEnviromentSummary, IManagedArtifactSummary } from '../domain/IManagedEntity';
+import { Icon } from '../presentation';
+import { IManagedResourceSummary, IManagedEnvironmentSummary, IManagedArtifactSummary } from '../domain/IManagedEntity';
 
 import { getKindName } from './ManagedReader';
 import { ObjectRow } from './ObjectRow';
 import { AnimatingPill, Pill } from './Pill';
-import { getResourceName, getArtifactVersionDisplayName } from './displayNames';
+import { getResourceIcon, getExperimentalDisplayLink } from './resources/resourceRegistry';
+import { getArtifactVersionDisplayName } from './displayNames';
 import { StatusBubble } from './StatusBubble';
 import { viewConfigurationByStatus } from './managedResourceStatusConfig';
 import { ManagedResourceStatusPopover } from './ManagedResourceStatusPopover';
@@ -16,34 +17,31 @@ import { ManagedResourceStatusPopover } from './ManagedResourceStatusPopover';
 export interface IManagedResourceObjectProps {
   application: Application;
   resource: IManagedResourceSummary;
-  artifactVersionsByState?: IManagedEnviromentSummary['artifacts'][0]['versions'];
+  environment?: string;
+  showReferenceName?: boolean;
+  artifactVersionsByState?: IManagedEnvironmentSummary['artifacts'][0]['versions'];
   artifactDetails?: IManagedArtifactSummary;
   depth?: number;
 }
 
-const kindIconMap: { [kind: string]: IconNames } = {
-  cluster: 'cluster',
-  'security-group': 'securityGroup',
-  'classic-load-balancer': 'loadBalancer',
-  'application-load-balancer': 'loadBalancer',
-};
-
-const getIconTypeFromKind = (kind: string) => kindIconMap[getKindName(kind)] ?? 'placeholder';
-
-const getResourceRoutingInfo = (
+// We'll add detail drawers for resources soon, but in the meantime let's link
+// to infrastructure views for 'native' Spinnaker resources in a one-off way
+// so the registry doesn't have to know about it.
+const getNativeResourceRoutingInfo = (
   resource: IManagedResourceSummary,
 ): { state: string; params: { [key: string]: string } } | null => {
   const {
     kind,
-    moniker: { stack, detail },
+    moniker,
+    displayName,
     locations: { account },
   } = resource;
   const kindName = getKindName(kind);
   const params = {
     acct: account,
-    stack: stack ?? '(none)',
-    detail: detail ?? '(none)',
-    q: getResourceName(resource),
+    stack: moniker?.stack ?? '(none)',
+    detail: moniker?.detail ?? '(none)',
+    q: displayName,
   };
 
   switch (kindName) {
@@ -62,11 +60,24 @@ const getResourceRoutingInfo = (
 };
 
 export const ManagedResourceObject = memo(
-  ({ application, resource, artifactVersionsByState, artifactDetails, depth }: IManagedResourceObjectProps) => {
-    const { kind } = resource;
-    const resourceName = getResourceName(resource);
-    const routingInfo = getResourceRoutingInfo(resource) ?? { state: '', params: {} };
-    const route = useSref(routingInfo.state, routingInfo.params);
+  ({
+    application,
+    resource,
+    environment,
+    showReferenceName,
+    artifactVersionsByState,
+    artifactDetails,
+    depth,
+  }: IManagedResourceObjectProps) => {
+    const { kind, displayName } = resource;
+
+    const routingInfo = getNativeResourceRoutingInfo(resource) ?? { state: '', params: {} };
+    const routeProps = useSref(routingInfo.state, routingInfo.params);
+
+    const displayLink = getExperimentalDisplayLink(resource);
+    const displayLinkProps = displayLink && { href: displayLink, target: '_blank', rel: 'noopener noreferrer' };
+
+    const linkProps = routeProps.href ? routeProps : displayLinkProps;
 
     const current =
       artifactVersionsByState?.current &&
@@ -75,11 +86,23 @@ export const ManagedResourceObject = memo(
       artifactVersionsByState?.deploying &&
       artifactDetails?.versions.find(({ version }) => version === artifactVersionsByState?.deploying);
 
-    const currentPill = current && <Pill text={getArtifactVersionDisplayName(current)} />;
+    const isCurrentVersionPinned = !!current?.environments.find(({ name }) => name === environment)?.pinned;
+    const currentPill = current && (
+      <Pill
+        text={`${getArtifactVersionDisplayName(current)}${showReferenceName ? ' ' + artifactDetails.reference : ''}`}
+        bgColor={isCurrentVersionPinned ? 'var(--color-status-warning)' : null}
+        textColor={isCurrentVersionPinned ? 'var(--color-icon-dark)' : null}
+      />
+    );
     const deployingPill = deploying && (
       <>
         <Icon appearance="neutral" name="caretRight" size="medium" />
-        <AnimatingPill text={getArtifactVersionDisplayName(deploying)} />
+        <AnimatingPill
+          text={`${getArtifactVersionDisplayName(deploying)}${
+            showReferenceName ? ' ' + artifactDetails.reference : ''
+          }`}
+          textColor="var(--color-icon-neutral)"
+        />
       </>
     );
 
@@ -92,8 +115,8 @@ export const ManagedResourceObject = memo(
 
     return (
       <ObjectRow
-        icon={getIconTypeFromKind(kind)}
-        title={route ? <a {...route}>{resourceName}</a> : resourceName}
+        icon={getResourceIcon(kind)}
+        title={linkProps ? <a {...linkProps}>{displayName}</a> : displayName}
         depth={depth}
         content={resourceStatus}
         metadata={

@@ -1,4 +1,4 @@
-import { module, IController, IScope, IHttpPromiseCallbackArg, IPromise } from 'angular';
+import { module, IController, IScope, IHttpPromiseCallbackArg } from 'angular';
 import { IModalInstanceService } from 'angular-ui-bootstrap';
 import { without, chain, has } from 'lodash';
 
@@ -103,14 +103,14 @@ export class ConfigurePipelineTemplateModalV2Controller implements IController {
   }
 
   public formIsValid(): boolean {
-    return this.variables.every(v => v.errors.length === 0);
+    return this.variables.every((v) => v.errors.length === 0);
   }
 
-  public submit(): IPromise<void> {
+  public submit(): PromiseLike<void> {
     const config = this.buildConfig();
 
     return PipelineTemplateReader.getPipelinePlan(config)
-      .then(plan => {
+      .then((plan) => {
         const { parameterConfig, notifications, triggers, expectedArtifacts } = plan;
         const { inheritTemplateParameters, inheritTemplateNotifications, inheritTemplateTriggers } = this.state;
 
@@ -159,9 +159,9 @@ export class ConfigurePipelineTemplateModalV2Controller implements IController {
     };
   }
 
-  private loadTemplate(): IPromise<void> {
+  private loadTemplate(): PromiseLike<void> {
     return PipelineTemplateReader.getPipelineTemplateFromSourceUrl(this.source, this.executionId, this.pipelineId).then(
-      template => {
+      (template) => {
         this.template = template;
       },
     );
@@ -170,7 +170,7 @@ export class ConfigurePipelineTemplateModalV2Controller implements IController {
   private transformVariablesForPipelinePlan(): { [key: string]: any } {
     return chain(this.variables || [])
       .cloneDeep()
-      .map(v => {
+      .map((v) => {
         switch (v.type) {
           case 'boolean':
             v.value = !!v.value;
@@ -204,12 +204,12 @@ export class ConfigurePipelineTemplateModalV2Controller implements IController {
   };
 
   private getVariable(name: string): IVariable {
-    return this.variables.find(v => v.name === name);
+    return this.variables.find((v) => v.name === name);
   }
 
   private groupVariableMetadata(): void {
     this.variableMetadataGroups = [];
-    (this.template.variables || []).forEach(v => {
+    (this.template.variables || []).forEach((v) => {
       if (v.group) {
         this.addToGroup(v.group, v);
       } else {
@@ -219,7 +219,7 @@ export class ConfigurePipelineTemplateModalV2Controller implements IController {
   }
 
   private addToGroup(groupName: string, metadata: IVariableMetadata): void {
-    const group = this.variableMetadataGroups.find(g => g.name === groupName);
+    const group = this.variableMetadataGroups.find((g) => g.name === groupName);
     if (group) {
       group.variableMetadata.push(metadata);
     } else {
@@ -228,7 +228,7 @@ export class ConfigurePipelineTemplateModalV2Controller implements IController {
   }
 
   private initializeVariables(): void {
-    this.variables = (this.template.variables || []).map(v => {
+    this.variables = (this.template.variables || []).map((v) => {
       return {
         name: v.name,
         type: v.type || 'string',
@@ -237,7 +237,7 @@ export class ConfigurePipelineTemplateModalV2Controller implements IController {
         hideErrors: true,
       };
     });
-    this.variables.forEach(v => (v.errors = VariableValidatorService.validate(v)));
+    this.variables.forEach((v) => (v.errors = VariableValidatorService.validate(v)));
   }
 
   private getInitialVariableValue(variable: IVariableMetadata): any {

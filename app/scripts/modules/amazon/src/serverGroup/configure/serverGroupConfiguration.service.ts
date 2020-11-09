@@ -1,4 +1,4 @@
-import { module, IPromise } from 'angular';
+import { module } from 'angular';
 import { $q } from 'ngimport';
 import {
   chain,
@@ -52,6 +52,7 @@ import {
 import { KeyPairsReader } from 'amazon/keyPairs';
 import { AutoScalingProcessService } from '../details/scalingProcesses/AutoScalingProcessService';
 import { AMAZON_INSTANCE_AWSINSTANCETYPE_SERVICE } from 'amazon/instance/awsInstanceType.service';
+import { AWSProviderSettings } from 'amazon/aws.settings';
 
 export type IBlockDeviceMappingSource = 'source' | 'ami' | 'default';
 
@@ -149,7 +150,7 @@ export class AwsServerGroupConfigurationService {
     } as IAmazonServerGroupCommandBackingData;
   }
 
-  public configureCommand(application: Application, cmd: IAmazonServerGroupCommand): IPromise<void> {
+  public configureCommand(application: Application, cmd: IAmazonServerGroupCommand): PromiseLike<void> {
     this.applyOverrides('beforeConfiguration', cmd);
     // TODO: Instead of attaching these to the command itself, they could be static methods
     cmd.toggleSuspendedProcess = (command: IAmazonServerGroupCommand, process: string): void => {
@@ -158,7 +159,7 @@ export class AwsServerGroupConfigurationService {
       if (processIndex === -1) {
         command.suspendedProcesses = command.suspendedProcesses.concat(process);
       } else {
-        command.suspendedProcesses = command.suspendedProcesses.filter(p => p !== process);
+        command.suspendedProcesses = command.suspendedProcesses.filter((p) => p !== process);
       }
     };
 
@@ -166,9 +167,13 @@ export class AwsServerGroupConfigurationService {
       command.suspendedProcesses.includes(process);
 
     cmd.onStrategyChange = (command: IAmazonServerGroupCommand, strategy: IDeploymentStrategy): void => {
+      if (AWSProviderSettings.serverGroups?.enableLaunchTemplates) {
+        command.setLaunchTemplate = strategy.key === 'rollingpush' ? true : undefined;
+      }
+
       // Any strategy other than None or Custom should force traffic to be enabled
       if (strategy.key !== '' && strategy.key !== 'custom') {
-        command.suspendedProcesses = (command.suspendedProcesses || []).filter(p => p !== 'AddToLoadBalancer');
+        command.suspendedProcesses = (command.suspendedProcesses || []).filter((p) => p !== 'AddToLoadBalancer');
       }
     };
 
@@ -200,48 +205,72 @@ export class AwsServerGroupConfigurationService {
     cmd.regionIsDeprecated = (command: IAmazonServerGroupCommand): boolean => {
       return (
         has(command, 'backingData.filtered.regions') &&
-        command.backingData.filtered.regions.some(region => region.name === command.region && region.deprecated)
+        command.backingData.filtered.regions.some((region) => region.name === command.region && region.deprecated)
       );
     };
 
     return $q
-      .all({
-        credentialsKeyedByAccount: AccountService.getCredentialsKeyedByAccount('aws'),
-        securityGroups: this.securityGroupReader.getAllSecurityGroups(),
-        subnets: SubnetReader.listSubnets(),
-        preferredZones: AccountService.getPreferredZonesByAccount('aws'),
-        keyPairs: KeyPairsReader.listKeyPairs(),
-        instanceTypes: this.awsInstanceTypeService.getAllTypesByRegion(),
-        enabledMetrics: $q.when(clone(this.enabledMetrics)),
-        healthCheckTypes: $q.when(clone(this.healthCheckTypes)),
-        terminationPolicies: $q.when(clone(this.terminationPolicies)),
-      })
-      .then((backingData: Partial<IAmazonServerGroupCommandBackingData>) => {
-        let securityGroupReloader = $q.when();
-        backingData.accounts = keys(backingData.credentialsKeyedByAccount);
-        backingData.filtered = {} as IAmazonServerGroupCommandBackingDataFiltered;
-        backingData.scalingProcesses = AutoScalingProcessService.listProcesses();
-        backingData.appLoadBalancers = application.getDataSource('loadBalancers').data;
-        backingData.managedResources = application.getDataSource('managedResources')?.data?.resources;
-        cmd.backingData = backingData as IAmazonServerGroupCommandBackingData;
-        this.configureVpcId(cmd);
-        backingData.filtered.securityGroups = this.getRegionalSecurityGroups(cmd);
-        if (cmd.viewState.disableImageSelection) {
-          this.configureInstanceTypes(cmd);
-        }
+      .all([
+        AccountService.getCredentialsKeyedByAccount('aws'),
+        this.securityGroupReader.getAllSecurityGroups(),
+        SubnetReader.listSubnets(),
+        AccountService.getPreferredZonesByAccount('aws'),
+        KeyPairsReader.listKeyPairs(),
+        this.awsInstanceTypeService.getAllTypesByRegion(),
+        $q.when(clone(this.enabledMetrics)),
+        $q.when(clone(this.healthCheckTypes)),
+        $q.when(clone(this.terminationPolicies)),
+      ])
+      .then(
+        ([
+          credentialsKeyedByAccount,
+          securityGroups,
+          subnets,
+          preferredZones,
+          keyPairs,
+          instanceTypes,
+          enabledMetrics,
+          healthCheckTypes,
+          terminationPolicies,
+        ]) => {
+          const backingData: Partial<IAmazonServerGroupCommandBackingData> = {
+            credentialsKeyedByAccount,
+            securityGroups,
+            subnets,
+            preferredZones,
+            keyPairs,
+            instanceTypes,
+            enabledMetrics,
+            healthCheckTypes,
+            terminationPolicies,
+          };
 
-        if (cmd.securityGroups && cmd.securityGroups.length) {
-          const regionalSecurityGroupIds = map(this.getRegionalSecurityGroups(cmd), 'id');
-          if (intersection(cmd.securityGroups, regionalSecurityGroupIds).length < cmd.securityGroups.length) {
-            securityGroupReloader = this.refreshSecurityGroups(cmd, true);
+          let securityGroupReloader: PromiseLike<void> = $q.when();
+          backingData.accounts = keys(backingData.credentialsKeyedByAccount);
+          backingData.filtered = {} as IAmazonServerGroupCommandBackingDataFiltered;
+          backingData.scalingProcesses = AutoScalingProcessService.listProcesses();
+          backingData.appLoadBalancers = application.getDataSource('loadBalancers').data;
+          backingData.managedResources = application.getDataSource('managedResources')?.data?.resources;
+          cmd.backingData = backingData as IAmazonServerGroupCommandBackingData;
+          this.configureVpcId(cmd);
+          backingData.filtered.securityGroups = this.getRegionalSecurityGroups(cmd);
+          if (cmd.viewState.disableImageSelection) {
+            this.configureInstanceTypes(cmd);
           }
-        }
 
-        return securityGroupReloader.then(() => {
-          this.applyOverrides('afterConfiguration', cmd);
-          this.attachEventHandlers(cmd);
-        });
-      });
+          if (cmd.securityGroups && cmd.securityGroups.length) {
+            const regionalSecurityGroupIds = map(this.getRegionalSecurityGroups(cmd), 'id');
+            if (intersection(cmd.securityGroups, regionalSecurityGroupIds).length < cmd.securityGroups.length) {
+              securityGroupReloader = this.refreshSecurityGroups(cmd, true);
+            }
+          }
+
+          return securityGroupReloader.then(() => {
+            this.applyOverrides('afterConfiguration', cmd);
+            this.attachEventHandlers(cmd);
+          });
+        },
+      );
   }
 
   public applyOverrides(phase: string, command: IAmazonServerGroupCommand): void {
@@ -258,7 +287,7 @@ export class AwsServerGroupConfigurationService {
       // isDefault is imperfect, since we don't know what the previous account/region was, but probably a safe bet
       const isDefault = some<any>(
         command.backingData.credentialsKeyedByAccount,
-        c =>
+        (c) =>
           c.defaultKeyPair &&
           command.keyPair &&
           command.keyPair.indexOf(c.defaultKeyPair.replace('{{region}}', '')) === 0,
@@ -355,11 +384,7 @@ export class AwsServerGroupConfigurationService {
       .uniqBy('purpose')
       .value();
 
-    if (
-      !chain(filteredData.subnetPurposes)
-        .some({ purpose: command.subnetType })
-        .value()
-    ) {
+    if (!chain(filteredData.subnetPurposes).some({ purpose: command.subnetType }).value()) {
       command.subnetType = null;
       result.dirty.subnetType = true;
     }
@@ -382,18 +407,18 @@ export class AwsServerGroupConfigurationService {
       typeof command.securityGroups === 'string' && (command.securityGroups as string).includes('${');
     if (currentOptions && command.securityGroups && !isExpression) {
       // not initializing - we are actually changing groups
-      const currentGroupNames = command.securityGroups.map(groupId => {
+      const currentGroupNames = command.securityGroups.map((groupId) => {
         const match = find(currentOptions, { id: groupId });
         return match ? match.name : groupId;
       });
 
       const matchedGroups = command.securityGroups
-        .map(groupId => {
+        .map((groupId) => {
           const securityGroup = find(currentOptions, { id: groupId }) || find(currentOptions, { name: groupId });
           return securityGroup ? securityGroup.name : null;
         })
-        .map(groupName => find(newRegionalSecurityGroups, { name: groupName }))
-        .filter(group => group);
+        .map((groupName) => find(newRegionalSecurityGroups, { name: groupName }))
+        .filter((group) => group);
 
       const matchedGroupNames = map(matchedGroups, 'name');
       const removed = xor(currentGroupNames, matchedGroupNames);
@@ -411,9 +436,9 @@ export class AwsServerGroupConfigurationService {
   public refreshSecurityGroups(
     command: IAmazonServerGroupCommand,
     skipCommandReconfiguration?: boolean,
-  ): IPromise<void> {
+  ): PromiseLike<void> {
     return this.cacheInitializer.refreshCache('securityGroups').then(() => {
-      return this.securityGroupReader.getAllSecurityGroups().then(securityGroups => {
+      return this.securityGroupReader.getAllSecurityGroups().then((securityGroups) => {
         command.backingData.securityGroups = securityGroups;
         if (!skipCommandReconfiguration) {
           this.configureSecurityGroupOptions(command);
@@ -437,37 +462,37 @@ export class AwsServerGroupConfigurationService {
     }
 
     const appLoadBalancers = command.backingData.appLoadBalancers || [];
-    return appLoadBalancers.filter(lb => lb.region === command.region && lb.account === command.credentials);
+    return appLoadBalancers.filter((lb) => lb.region === command.region && lb.account === command.credentials);
   }
 
   public getLoadBalancerNames(command: IAmazonServerGroupCommand): string[] {
     const loadBalancers = this.getLoadBalancerMap(command).filter(
-      lb => (!lb.loadBalancerType || lb.loadBalancerType === 'classic') && lb.vpcId === command.vpcId,
+      (lb) => (!lb.loadBalancerType || lb.loadBalancerType === 'classic') && lb.vpcId === command.vpcId,
     );
-    return loadBalancers.map(lb => lb.name).sort();
+    return loadBalancers.map((lb) => lb.name).sort();
   }
 
   public getVpcLoadBalancerNames(command: IAmazonServerGroupCommand): string[] {
     const loadBalancersForVpc = this.getLoadBalancerMap(command).filter(
-      lb => (!lb.loadBalancerType || lb.loadBalancerType === 'classic') && lb.vpcId,
+      (lb) => (!lb.loadBalancerType || lb.loadBalancerType === 'classic') && lb.vpcId,
     );
-    return loadBalancersForVpc.map(lb => lb.name).sort();
+    return loadBalancersForVpc.map((lb) => lb.name).sort();
   }
 
   public getTargetGroupNames(command: IAmazonServerGroupCommand): string[] {
     const loadBalancersV2 = this.getLoadBalancerMap(command).filter(
-      lb => lb.loadBalancerType !== 'classic',
+      (lb) => lb.loadBalancerType !== 'classic',
     ) as IApplicationLoadBalancerSourceData[];
     const instanceTargetGroups = flatten(
-      loadBalancersV2.map<any>(lb => lb.targetGroups.filter(tg => tg.targetType === 'instance')),
+      loadBalancersV2.map<any>((lb) => lb.targetGroups.filter((tg) => tg.targetType === 'instance')),
     );
-    return instanceTargetGroups.map(tg => tg.name).sort();
+    return instanceTargetGroups.map((tg) => tg.name).sort();
   }
 
   private getValidMatches(all: string[], current: string[]): { valid: string[]; invalid: string[]; spel: string[] } {
-    const spel = current.filter(v => v.includes('${'));
+    const spel = current.filter((v) => v.includes('${'));
     const matched = intersection(all, current);
-    const [valid, invalid] = partition(current, c => matched.includes(c) || spel.includes(c));
+    const [valid, invalid] = partition(current, (c) => matched.includes(c) || spel.includes(c));
     return { valid, invalid, spel };
   }
 
@@ -510,7 +535,7 @@ export class AwsServerGroupConfigurationService {
   }
 
   public refreshLoadBalancers(command: IAmazonServerGroupCommand, skipCommandReconfiguration?: boolean) {
-    return this.loadBalancerReader.listLoadBalancers('aws').then(loadBalancers => {
+    return this.loadBalancerReader.listLoadBalancers('aws').then((loadBalancers) => {
       command.backingData.loadBalancers = loadBalancers;
       if (!skipCommandReconfiguration) {
         this.configureLoadBalancerOptions(command);

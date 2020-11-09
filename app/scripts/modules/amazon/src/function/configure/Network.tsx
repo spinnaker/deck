@@ -1,6 +1,5 @@
 import React from 'react';
 import { Option } from 'react-select';
-import { IPromise } from 'angular';
 import { Observable, Subject } from 'rxjs';
 import { forOwn, uniqBy } from 'lodash';
 
@@ -43,7 +42,8 @@ export interface INetworkState {
   securityGroups: ISecurityGroupsByAccountSourceData;
 }
 
-export class Network extends React.Component<INetworkProps, INetworkState>
+export class Network
+  extends React.Component<INetworkProps, INetworkState>
   implements IWizardPageComponent<IAmazonFunctionUpsertCommand> {
   constructor(props: INetworkProps) {
     super(props);
@@ -64,7 +64,7 @@ export class Network extends React.Component<INetworkProps, INetworkState>
   private getAllVpcs(): void {
     Observable.fromPromise(VpcReader.listVpcs())
       .takeUntil(this.destroy$)
-      .subscribe(Vpcs => {
+      .subscribe((Vpcs) => {
         this.setState({ vpcOptions: Vpcs });
       });
   }
@@ -73,15 +73,15 @@ export class Network extends React.Component<INetworkProps, INetworkState>
     return {};
   }
 
-  private getAvailableSubnets(): IPromise<ISubnet[]> {
+  private getAvailableSubnets(): PromiseLike<ISubnet[]> {
     return SubnetReader.listSubnetsByProvider('aws');
   }
 
-  private getAvailableSecurityGroups(): IPromise<ISecurityGroupsByAccountSourceData> {
+  private getAvailableSecurityGroups(): PromiseLike<ISecurityGroupsByAccountSourceData> {
     return ReactInjector.securityGroupReader.getAllSecurityGroups();
   }
   private makeSubnetOptions(availableSubnets: ISubnet[]): ISubnetOption[] {
-    const subOptions: ISubnetOption[] = availableSubnets.map(s => ({ subnetId: s.id, vpcId: s.vpcId }));
+    const subOptions: ISubnetOption[] = availableSubnets.map((s) => ({ subnetId: s.id, vpcId: s.vpcId }));
     // we have to filter out any duplicate options
     const uniqueSubOptions = uniqBy(subOptions, 'subnetId');
     return uniqueSubOptions;
@@ -105,7 +105,7 @@ export class Network extends React.Component<INetworkProps, INetworkState>
             subnet.label += ' (deprecated)';
           }
         });
-        return subnets.filter(s => s.label);
+        return subnets.filter((s) => s.label);
       })
       .then((subnets: ISubnet[]) => {
         return this.makeSubnetOptions(subnets);
@@ -120,12 +120,12 @@ export class Network extends React.Component<INetworkProps, INetworkState>
   }
 
   private handleSubnetUpdate = (options: Array<Option<string>>) => {
-    const subnetsSelected = options.map(o => o.value);
+    const subnetsSelected = options.map((o) => o.value);
     this.props.formik.setFieldValue('subnetIds', subnetsSelected);
   };
 
   private handleSecurityGroupsUpdate = (options: Array<Option<string>>) => {
-    const sgSelected = options.map(o => o.value);
+    const sgSelected = options.map((o) => o.value);
     this.props.formik.setFieldValue('securityGroupIds', sgSelected);
   };
 
@@ -133,7 +133,7 @@ export class Network extends React.Component<INetworkProps, INetworkState>
     this.props.formik.setFieldValue('vpcId', vpcId);
     this.props.formik.setFieldValue('subnetIds', []);
     const { availableSubnets } = this.state;
-    const subs = availableSubnets.filter(function(s: ISubnetOption) {
+    const subs = availableSubnets.filter(function (s: ISubnetOption) {
       return s.vpcId.includes(vpcId);
     });
     this.setState({ subnets: subs });
@@ -147,16 +147,16 @@ export class Network extends React.Component<INetworkProps, INetworkState>
     const { values } = this.props.formik;
     const sgOptions: Array<Option<string>> = [];
     /** Get security groups that belong to current selected account */
-    forOwn(sgs, function(sgByAccount, acc) {
+    forOwn(sgs, function (sgByAccount, acc) {
       if (acc === values.credentials) {
         /** Get security groups that fall under the provider 'aws' */
-        forOwn(sgByAccount, function(sgByRegion, provider) {
+        forOwn(sgByAccount, function (sgByRegion, provider) {
           if (provider === 'aws') {
             /** Get security groups that are under the current selected region */
-            forOwn(sgByRegion, function(groups, region) {
+            forOwn(sgByRegion, function (groups, region) {
               if (region === values.region) {
                 /** Get security groups that fall under the current selected VPC */
-                groups.forEach(function(group) {
+                groups.forEach(function (group) {
                   if (group.vpcId === values.vpcId) {
                     sgOptions.push({ value: group.id, label: group.name });
                   }
@@ -175,7 +175,7 @@ export class Network extends React.Component<INetworkProps, INetworkState>
     const { values } = this.props.formik;
     if (!this.props.isNew && values.vpcId) {
       return availableSubnets
-        .filter(function(s: ISubnetOption) {
+        .filter(function (s: ISubnetOption) {
           return s.vpcId.includes(values.vpcId);
         })
         .map(this.toSubnetOption);
@@ -198,7 +198,7 @@ export class Network extends React.Component<INetworkProps, INetworkState>
                 name="vpcId"
                 label="VPC Id"
                 help={<HelpField id="aws.function.vpc.id" />}
-                input={props => (
+                input={(props) => (
                   <ReactSelectInput
                     {...props}
                     stringOptions={vpcOptions

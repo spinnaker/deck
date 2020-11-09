@@ -30,7 +30,7 @@ export class FunctionActions extends React.Component<IFunctionActionsProps, IFun
     super(props);
   }
 
-  public componentWillMount(): void {
+  public componentDidMount(): void {
     const { app, functionDef } = this.props;
     let application: Application;
 
@@ -41,7 +41,7 @@ export class FunctionActions extends React.Component<IFunctionActionsProps, IFun
     } else {
       // Load balancer is a part of a different application
       ApplicationReader.getApplication(functionAppName)
-        .then(functionApp => {
+        .then((functionApp) => {
           this.setState({ application: functionApp });
         })
         .catch(() => {

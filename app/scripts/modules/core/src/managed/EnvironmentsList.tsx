@@ -2,19 +2,20 @@ import React from 'react';
 import { pickBy, values } from 'lodash';
 
 import { Application } from 'core/application';
-import { IManagedEnviromentSummary, IManagedResourceSummary, IManagedArtifactSummary } from '../domain';
+import { IManagedEnvironmentSummary, IManagedResourceSummary, IManagedArtifactSummary } from '../domain';
 
 import { ManagedResourceObject } from './ManagedResourceObject';
 import { EnvironmentRow } from './EnvironmentRow';
 
+import { isResourceKindSupported } from './resources/resourceRegistry';
+
 function shouldDisplayResource(resource: IManagedResourceSummary) {
-  //TODO: naively filter on presence of moniker but how should we really decide what to display?
-  return !!resource.moniker;
+  return isResourceKindSupported(resource.kind);
 }
 
 interface IEnvironmentsListProps {
   application: Application;
-  environments: IManagedEnviromentSummary[];
+  environments: IManagedEnvironmentSummary[];
   resourcesById: { [id: string]: IManagedResourceSummary };
   artifacts: IManagedArtifactSummary[];
 }
@@ -28,19 +29,20 @@ export function EnvironmentsList({
   return (
     <div>
       {environments.map(({ name, resources, artifacts }) => {
-        const hasPinnedVersions = artifacts.some(({ pinnedVersion }) => pinnedVersion);
+        const pinnedVersions = artifacts.filter(({ pinnedVersion }) => pinnedVersion);
 
         return (
           <EnvironmentRow
             key={name}
             name={name}
-            hasPinnedVersions={hasPinnedVersions}
-            resources={values(pickBy(resourcesById, resource => resources.indexOf(resource.id) > -1))}
+            pinnedVersions={pinnedVersions}
+            resources={values(pickBy(resourcesById, (resource) => resources.indexOf(resource.id) > -1))}
           >
             {resources
-              .map(resourceId => resourcesById[resourceId])
+              .map((resourceId) => resourcesById[resourceId])
               .filter(shouldDisplayResource)
-              .map(resource => {
+              .sort((a, b) => `${a.kind}${a.displayName}`.localeCompare(`${b.kind}${b.displayName}`))
+              .map((resource) => {
                 const artifactVersionsByState =
                   resource.artifact &&
                   artifacts.find(({ reference }) => reference === resource.artifact.reference)?.versions;
@@ -51,6 +53,8 @@ export function EnvironmentsList({
                     application={application}
                     key={resource.id}
                     resource={resource}
+                    environment={name}
+                    showReferenceName={allArtifacts.length > 1}
                     artifactVersionsByState={artifactVersionsByState}
                     artifactDetails={artifactDetails}
                   />

@@ -1,4 +1,4 @@
-import { IHttpService, IPromise, IQService, ITimeoutService, module } from 'angular';
+import { IHttpService, IQService, ITimeoutService, module } from 'angular';
 import { get, identity, pickBy } from 'lodash';
 import { StateService } from '@uirouter/core';
 
@@ -43,7 +43,7 @@ export class ExecutionService {
     private $timeout: ITimeoutService,
   ) {}
 
-  public getRunningExecutions(applicationName: string): IPromise<IExecution[]> {
+  public getRunningExecutions(applicationName: string): PromiseLike<IExecution[]> {
     return this.getFilteredExecutions(applicationName, this.activeStatuses, this.runningLimit, null, true);
   }
 
@@ -53,8 +53,8 @@ export class ExecutionService {
     limit: number,
     pipelineConfigIds: string[] = null,
     expand = false,
-  ): IPromise<IExecution[]> {
-    const statusString = statuses.map(status => status.toUpperCase()).join(',') || null;
+  ): PromiseLike<IExecution[]> {
+    const statusString = statuses.map((status) => status.toUpperCase()).join(',') || null;
     const call = pipelineConfigIds
       ? API.all('executions').getList({ limit, pipelineConfigIds, statuses })
       : API.one('applications', applicationName)
@@ -86,20 +86,20 @@ export class ExecutionService {
     applicationName: string,
     application: Application = null,
     expand = false,
-  ): IPromise<IExecution[]> {
+  ): PromiseLike<IExecution[]> {
     const sortFilter: ISortFilter = ExecutionState.filterModel.asFilterModel.sortFilter;
     const pipelines = Object.keys(sortFilter.pipeline);
     const statuses = Object.keys(pickBy(sortFilter.status || {}, identity));
     const limit = sortFilter.count;
     if (application && pipelines.length) {
-      return this.getConfigIdsFromFilterModel(application).then(pipelineConfigIds => {
+      return this.getConfigIdsFromFilterModel(application).then((pipelineConfigIds) => {
         return this.getFilteredExecutions(application.name, statuses, limit, pipelineConfigIds, expand);
       });
     }
     return this.getFilteredExecutions(applicationName, statuses, limit, null, expand);
   }
 
-  public getExecution(executionId: string): IPromise<IExecution> {
+  public getExecution(executionId: string): PromiseLike<IExecution> {
     return API.one('pipelines', executionId)
       .get()
       .then((execution: IExecution) => {
@@ -123,7 +123,7 @@ export class ExecutionService {
     if (!executions || !executions.length) {
       return;
     }
-    executions.forEach(execution => {
+    executions.forEach((execution) => {
       const stringVal = this.stringifyExecution(execution);
       // do not transform if it hasn't changed
       const match = currentData.find((test: IExecution) => test.id === execution.id);
@@ -134,17 +134,17 @@ export class ExecutionService {
     });
   }
 
-  private getConfigIdsFromFilterModel(application: Application): IPromise<string[]> {
+  private getConfigIdsFromFilterModel(application: Application): PromiseLike<string[]> {
     const pipelines = Object.keys(ExecutionState.filterModel.asFilterModel.sortFilter.pipeline);
     application.pipelineConfigs.activate();
     return application.pipelineConfigs.ready().then(() => {
       const data = application.pipelineConfigs.data.concat(application.strategyConfigs.data);
       return pipelines
-        .map(p => {
+        .map((p) => {
           const match = data.find((c: IPipeline) => c.name === p);
           return match ? match.id : null;
         })
-        .filter(id => !!id);
+        .filter((id) => !!id);
     });
   }
 
@@ -217,9 +217,13 @@ export class ExecutionService {
     }
   }
 
-  public startAndMonitorPipeline(app: Application, pipeline: string, trigger: any): IPromise<IRetryablePromise<void>> {
+  public startAndMonitorPipeline(
+    app: Application,
+    pipeline: string,
+    trigger: any,
+  ): PromiseLike<IRetryablePromise<void>> {
     const { executionService } = ReactInjector;
-    return PipelineConfigService.triggerPipeline(app.name, pipeline, trigger).then(triggerResult =>
+    return PipelineConfigService.triggerPipeline(app.name, pipeline, trigger).then((triggerResult) =>
       executionService.waitUntilTriggeredPipelineAppears(app, triggerResult),
     );
   }
@@ -232,14 +236,14 @@ export class ExecutionService {
     return retryablePromise(closure, 1000, 10);
   }
 
-  private waitUntilPipelineIsCancelled(application: Application, executionId: string): IPromise<any> {
+  private waitUntilPipelineIsCancelled(application: Application, executionId: string): PromiseLike<any> {
     return this.waitUntilExecutionMatches(
       executionId,
       (execution: IExecution) => execution.status === 'CANCELED',
     ).then(() => application.executions.refresh());
   }
 
-  private waitUntilPipelineIsDeleted(application: Application, executionId: string): IPromise<any> {
+  private waitUntilPipelineIsDeleted(application: Application, executionId: string): PromiseLike<any> {
     const deferred = this.$q.defer();
     this.getExecution(executionId).then(
       () => this.$timeout(() => this.waitUntilPipelineIsDeleted(application, executionId).then(deferred.resolve), 1000),
@@ -254,7 +258,7 @@ export class ExecutionService {
     executionId: string,
     force?: boolean,
     reason?: string,
-  ): IPromise<any> {
+  ): PromiseLike<any> {
     const deferred = this.$q.defer();
     this.$http({
       method: 'PUT',
@@ -265,12 +269,12 @@ export class ExecutionService {
       },
     }).then(
       () => this.waitUntilPipelineIsCancelled(application, executionId).then(deferred.resolve),
-      exception => deferred.reject(exception && exception.data ? exception.message : null),
+      (exception) => deferred.reject(exception && exception.data ? exception.message : null),
     );
     return deferred.promise;
   }
 
-  public pauseExecution(application: Application, executionId: string): IPromise<any> {
+  public pauseExecution(application: Application, executionId: string): PromiseLike<any> {
     const deferred = this.$q.defer();
     const matcher = (execution: IExecution) => {
       return execution.status === 'PAUSED';
@@ -284,12 +288,12 @@ export class ExecutionService {
         this.waitUntilExecutionMatches(executionId, matcher)
           .then(() => application.executions.refresh())
           .then(deferred.resolve),
-      exception => deferred.reject(exception && exception.data ? exception.message : null),
+      (exception) => deferred.reject(exception && exception.data ? exception.message : null),
     );
     return deferred.promise;
   }
 
-  public resumeExecution(application: Application, executionId: string): IPromise<any> {
+  public resumeExecution(application: Application, executionId: string): PromiseLike<any> {
     const deferred = this.$q.defer();
     const matcher = (execution: IExecution) => {
       return execution.status === 'RUNNING';
@@ -303,19 +307,19 @@ export class ExecutionService {
         this.waitUntilExecutionMatches(executionId, matcher)
           .then(() => application.executions.refresh())
           .then(deferred.resolve),
-      exception => deferred.reject(exception && exception.data ? exception.message : null),
+      (exception) => deferred.reject(exception && exception.data ? exception.message : null),
     );
     return deferred.promise;
   }
 
-  public deleteExecution(application: Application, executionId: string): IPromise<any> {
+  public deleteExecution(application: Application, executionId: string): PromiseLike<any> {
     const deferred = this.$q.defer();
     this.$http({
       method: 'DELETE',
       url: [SETTINGS.gateUrl, 'pipelines', executionId].join('/'),
     }).then(
       () => this.waitUntilPipelineIsDeleted(application, executionId).then(deferred.resolve),
-      exception => deferred.reject(exception && exception.data ? exception.data.message : null),
+      (exception) => deferred.reject(exception && exception.data ? exception.data.message : null),
     );
     return deferred.promise;
   }
@@ -323,8 +327,8 @@ export class ExecutionService {
   public waitUntilExecutionMatches(
     executionId: string,
     closure: (execution: IExecution) => boolean,
-  ): IPromise<IExecution> {
-    return this.getExecution(executionId).then(execution => {
+  ): PromiseLike<IExecution> {
+    return this.getExecution(executionId).then((execution) => {
       if (closure(execution)) {
         return execution;
       }
@@ -336,7 +340,7 @@ export class ExecutionService {
     return ['pipeline', groupBy, application, heading].join('#');
   }
 
-  public getProjectExecutions(project: string, limit = 1): IPromise<IExecution[]> {
+  public getProjectExecutions(project: string, limit = 1): PromiseLike<IExecution[]> {
     return API.one('projects', project)
       .all('pipelines')
       .getList({ limit })
@@ -344,7 +348,7 @@ export class ExecutionService {
         if (!executions || !executions.length) {
           return [];
         }
-        executions.forEach(execution => ExecutionsTransformer.transformExecution({} as Application, execution));
+        executions.forEach((execution) => ExecutionsTransformer.transformExecution({} as Application, execution));
         return executions.sort((a, b) => b.startTime - (a.startTime || Date.now()));
       });
   }
@@ -360,7 +364,7 @@ export class ExecutionService {
       // remove any that have dropped off, update any that have changed
       const toRemove: number[] = [];
       existingData.forEach((execution: IExecution, idx: number) => {
-        const match = executions.find(test => test.id === execution.id);
+        const match = executions.find((test) => test.id === execution.id);
         const runningMatch = runningData.find((t: IExecution) => t.id === execution.id);
         if (match) {
           if (execution.stringVal && match.stringVal && execution.stringVal !== match.stringVal) {
@@ -380,10 +384,10 @@ export class ExecutionService {
         }
       });
 
-      toRemove.reverse().forEach(idx => existingData.splice(idx, 1));
+      toRemove.reverse().forEach((idx) => existingData.splice(idx, 1));
 
       // add any new ones
-      executions.forEach(execution => {
+      executions.forEach((execution) => {
         if (!existingData.filter((test: IExecution) => test.id === execution.id).length) {
           existingData.push(execution);
         }
@@ -412,7 +416,7 @@ export class ExecutionService {
     });
     application.executions.data.forEach((execution: IExecution) => {
       if (execution.isActive && application.runningExecutions.data.every((e: IExecution) => e.id !== execution.id)) {
-        this.getExecution(execution.id).then(updatedExecution => {
+        this.getExecution(execution.id).then((updatedExecution) => {
           this.updateExecution(application, updatedExecution);
         });
       }
@@ -477,7 +481,7 @@ export class ExecutionService {
     if (unhydrated.hydrated) {
       return Promise.resolve(unhydrated);
     }
-    const executionHydrator = this.getExecution(unhydrated.id).then(hydrated => {
+    const executionHydrator = this.getExecution(unhydrated.id).then((hydrated) => {
       ExecutionsTransformer.transformExecution(application, hydrated);
       unhydrated.stages.forEach((s, i) => {
         // stages *should* be in the same order, so getting the hydrated one by index should be fine.
@@ -485,7 +489,7 @@ export class ExecutionService {
         const hydratedStage =
           hydrated.stages.length === unhydrated.stages.length && hydrated.stages[i].id === s.id
             ? hydrated.stages[i]
-            : hydrated.stages.find(s2 => s.id === s2.id);
+            : hydrated.stages.find((s2) => s.id === s2.id);
         if (hydratedStage) {
           s.context = hydratedStage.context;
           s.outputs = hydratedStage.outputs;
@@ -501,14 +505,14 @@ export class ExecutionService {
     return unhydrated.hydrator;
   }
 
-  public getLastExecutionForApplicationByConfigId(appName: string, configId: string): IPromise<IExecution> {
+  public getLastExecutionForApplicationByConfigId(appName: string, configId: string): PromiseLike<IExecution> {
     return this.getFilteredExecutions(appName, [], 1)
       .then((executions: IExecution[]) => {
-        return executions.filter(execution => {
+        return executions.filter((execution) => {
           return execution.pipelineConfigId === configId;
         });
       })
-      .then(executionsByConfigId => {
+      .then((executionsByConfigId) => {
         return executionsByConfigId[0];
       });
   }
@@ -521,12 +525,12 @@ export class ExecutionService {
    *  application: if transform is true, the application to use when transforming the executions (default: null)
    *  limit: the number of executions per config ID to retrieve (default: whatever Gate sets)
    *  statuses: an optional set of execution statuses (default: all)
-   * @return {angular.IPromise<IExecution[]>}
+   * @return {PromiseLike<IExecution[]>}
    */
   public getExecutionsForConfigIds(
     pipelineConfigIds: string[],
     options: { limit?: number; statuses?: string; transform?: boolean; application?: Application } = {},
-  ): IPromise<IExecution[]> {
+  ): PromiseLike<IExecution[]> {
     const { limit, statuses, transform, application } = options;
     return API.all('executions')
       .getList({ limit, pipelineConfigIds: (pipelineConfigIds || []).join(','), statuses })
@@ -542,7 +546,7 @@ export class ExecutionService {
       .catch(() => [] as IExecution[]);
   }
 
-  public patchExecution(executionId: string, stageId: string, data: any): IPromise<any> {
+  public patchExecution(executionId: string, stageId: string, data: any): PromiseLike<any> {
     const targetUrl = [SETTINGS.gateUrl, 'pipelines', executionId, 'stages', stageId].join('/');
     const request = {
       method: 'PATCH',
@@ -550,12 +554,12 @@ export class ExecutionService {
       data,
       timeout: (SETTINGS.pollSchedule || 30000) * 2 + 5000,
     };
-    return this.$http(request).then(resp => resp.data);
+    return this.$http(request).then((resp) => resp.data);
   }
 
   private stringifyExecution(execution: IExecution): string {
     const transient = { ...execution };
-    transient.stages = transient.stages.filter(s => s.status !== 'SUCCEEDED' && s.status !== 'NOT_STARTED');
+    transient.stages = transient.stages.filter((s) => s.status !== 'SUCCEEDED' && s.status !== 'NOT_STARTED');
     return this.stringify(transient);
   }
 

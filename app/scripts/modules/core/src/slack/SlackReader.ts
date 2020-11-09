@@ -1,4 +1,3 @@
-import { IPromise } from 'angular';
 import { API } from 'core';
 
 export interface ISlackChannel {
@@ -12,8 +11,8 @@ export interface ISlackChannel {
 }
 
 export class SlackReader {
-  public static getChannels(): IPromise<ISlackChannel[]> {
-    return API.one('slack/channels')
+  public static getChannels(): PromiseLike<ISlackChannel[]> {
+    return API.one('slack', 'channels')
       .getList()
       .catch(() => [] as ISlackChannel[]);
   }

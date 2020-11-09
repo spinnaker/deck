@@ -1,4 +1,4 @@
-import { IPromise } from 'angular';
+
 import { Subject, Subscription } from 'rxjs';
 import { $log, $q } from 'ngimport';
 import { values, flatten, isNumber } from 'lodash';
@@ -46,7 +46,7 @@ export interface IStageOrTriggerValidator {
     stageOrTrigger: IStage | ITrigger,
     validator: IValidatorConfig,
     config: IStageOrTriggerTypeConfig,
-  ): string | IPromise<string>;
+  ): string | PromiseLike<string>;
 }
 
 export interface ICustomValidator extends IStageOrTriggerValidator, IValidatorConfig {
@@ -61,10 +61,10 @@ export class PipelineConfigValidator {
     this.validators.set(type, validator);
   }
 
-  public static validatePipeline(pipeline: IPipeline): IPromise<IPipelineValidationResults> {
+  public static validatePipeline(pipeline: IPipeline): PromiseLike<IPipelineValidationResults> {
     const stages: IStage[] = pipeline.stages || [];
     const triggers: ITrigger[] = pipeline.triggers || [];
-    const validations: Array<IPromise<void>> = [];
+    const validations: Array<PromiseLike<void>> = [];
     const pipelineValidations: string[] = this.getPipelineLevelValidations(pipeline);
     const stageValidations: Map<IStage, string[]> = new Map();
     let preventSave = false;
@@ -72,7 +72,7 @@ export class PipelineConfigValidator {
     triggers.forEach((trigger, index) => {
       const config: ITriggerTypeConfig = Registry.pipeline.getTriggerConfig(trigger.type);
       if (config && config.validators) {
-        config.validators.forEach(validator => {
+        config.validators.forEach((validator) => {
           const typedValidator = this.getValidator(validator);
           if (!typedValidator) {
             $log.warn(
@@ -82,7 +82,7 @@ export class PipelineConfigValidator {
             );
           } else {
             validations.push(
-              $q.resolve<string>(typedValidator.validate(pipeline, trigger, validator, config)).then(message => {
+              $q.resolve<string>(typedValidator.validate(pipeline, trigger, validator, config)).then((message) => {
                 if (message && !pipelineValidations.includes(message)) {
                   pipelineValidations.push(message);
                   if (validator.preventSave) {
@@ -98,17 +98,17 @@ export class PipelineConfigValidator {
           $q<FormikErrors<IStage>>((resolve, reject) =>
             Promise.resolve(config.validateFn(trigger, { pipeline })).then(resolve, reject),
           ).then((errors: FormikErrors<ITrigger>) => {
-            PipelineConfigValidator.flattenValues(errors).forEach(message => {
+            PipelineConfigValidator.flattenValues(errors).forEach((message) => {
               pipelineValidations.push(message);
             });
           }),
         );
       }
     });
-    stages.forEach(stage => {
+    stages.forEach((stage) => {
       const config: IStageTypeConfig = Registry.pipeline.getStageConfig(stage);
       if (config && config.validators) {
-        config.validators.forEach(validator => {
+        config.validators.forEach((validator) => {
           if (validator.skipValidation && validator.skipValidation(pipeline, stage)) {
             return;
           }
@@ -184,13 +184,13 @@ export class PipelineConfigValidator {
 
   private static getPipelineLevelValidations(pipeline: IPipeline): string[] {
     const messages: string[] = [];
-    if ((pipeline.parameterConfig || []).some(p => !p.name)) {
+    if ((pipeline.parameterConfig || []).some((p) => !p.name)) {
       messages.push('<b>Name</b> is a required field for parameters.');
     }
-    if (pipeline.strategy && !pipeline.stages.some(stage => stage.type === 'deploy')) {
+    if (pipeline.strategy && !pipeline.stages.some((stage) => stage.type === 'deploy')) {
       messages.push('To be able to create new server groups, a custom strategy should contain a Deploy stage.');
     }
-    if ((pipeline.expectedArtifacts || []).some(a => !a.matchArtifact || (a.matchArtifact as any) === {})) {
+    if ((pipeline.expectedArtifacts || []).some((a) => !a.matchArtifact || (a.matchArtifact as any) === {})) {
       messages.push('Every expected artifact must specify an artifact to match against.');
     }
     return messages;

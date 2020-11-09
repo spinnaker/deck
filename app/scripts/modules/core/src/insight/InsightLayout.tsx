@@ -1,16 +1,17 @@
 import React from 'react';
 import { UIView, useCurrentStateAndParams } from '@uirouter/react';
+import { useRecoilValue } from 'recoil';
 
 import { ReactInjector } from 'core/reactShims';
 import { FilterCollapse } from 'core/filterModel/FilterCollapse';
 import { Application } from 'core/application';
+import { verticalNavExpandedAtom } from 'core/application/nav/navAtoms';
 
 export interface IInsightLayoutProps {
   app: Application;
 }
 
 export const InsightLayout = ({ app }: IInsightLayoutProps) => {
-  const [appIsReady, setAppIsReady] = React.useState(false);
   const [expandFilters, setExpandFilters] = React.useState(ReactInjector.insightFilterStateModel.filtersExpanded);
   const { filtersHidden } = ReactInjector.insightFilterStateModel;
   const filterClass = expandFilters ? 'filters-expanded' : 'filters-collapsed';
@@ -20,19 +21,18 @@ export const InsightLayout = ({ app }: IInsightLayoutProps) => {
     setExpandFilters(!expandFilters);
   };
 
-  const { state: currentState } = useCurrentStateAndParams();
-  const showDetailsView = Boolean(Object.keys(currentState.views).find(v => v.indexOf('detail@') !== -1));
+  const navClass = useRecoilValue(verticalNavExpandedAtom) ? 'nav-expanded' : 'nav-collapsed';
 
-  React.useEffect(() => {
-    app.ready().then(() => setAppIsReady(true));
-  }, []);
+  const { state: currentState } = useCurrentStateAndParams();
+  const showDetailsView = Boolean(Object.keys(currentState.views).find((v) => v.indexOf('detail@') !== -1));
+  const detailsClass = showDetailsView ? 'details-open' : 'details-closed';
 
   if (app.notFound || app.hasError) {
     return null;
   }
 
   return (
-    <div className={`insight ${filterClass}`}>
+    <div className={`insight ${filterClass} ${navClass} ${detailsClass}`}>
       {!filtersHidden && (
         <div onClick={toggleFilters}>
           <FilterCollapse />
@@ -45,7 +45,7 @@ export const InsightLayout = ({ app }: IInsightLayoutProps) => {
       )}
       <div className="flex-1">
         <UIView name="master" className="nav-content ng-scope" data-scroll-id="nav-content" />
-        {appIsReady && showDetailsView && (
+        {showDetailsView && (
           <div>
             <UIView name="detail" className="detail-content" />
           </div>

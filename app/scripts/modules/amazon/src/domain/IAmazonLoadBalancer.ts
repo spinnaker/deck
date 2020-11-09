@@ -56,6 +56,7 @@ export interface IAmazonApplicationLoadBalancer extends IAmazonLoadBalancer {
   ipAddressType?: string; // returned from clouddriver
   deletionProtection: boolean;
   idleTimeout: number;
+  loadBalancingCrossZone: boolean;
 }
 
 export interface IAmazonNetworkLoadBalancer extends IAmazonLoadBalancer {
@@ -64,6 +65,7 @@ export interface IAmazonNetworkLoadBalancer extends IAmazonLoadBalancer {
   ipAddressType?: string; // returned from clouddriver
   deletionProtection: boolean;
   idleTimeout: number;
+  loadBalancingCrossZone: boolean;
 }
 
 export interface IRedirectActionConfig {
@@ -115,10 +117,13 @@ export interface IListenerRule {
   priority: number | 'default';
 }
 
-export type ListenerRuleConditionField = 'path-pattern' | 'host-header';
+export type ListenerRuleConditionField = 'path-pattern' | 'host-header' | 'http-request-method';
 
 export interface IListenerRuleCondition {
   field: ListenerRuleConditionField;
+  httpRequestMethodConfig?: {
+    values: string[];
+  };
   values: string[];
 }
 
@@ -264,6 +269,7 @@ export interface IAmazonApplicationLoadBalancerUpsertCommand extends IAmazonLoad
 
 export interface IAmazonNetworkLoadBalancerUpsertCommand extends IAmazonLoadBalancerUpsertCommand {
   deletionProtection: boolean;
+  loadBalancingCrossZone: boolean;
   listeners: IListenerDescription[];
   targetGroups: INLBTargetGroupDescription[];
 }

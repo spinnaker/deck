@@ -80,7 +80,7 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
       canConfigure: false,
     };
 
-    const restartedStage = execution.stages.find(stage => stage.context.restartDetails !== undefined);
+    const restartedStage = execution.stages.find((stage) => stage.context.restartDetails !== undefined);
 
     this.state = {
       showingDetails: this.invalidateShowingDetails(props, true),
@@ -169,7 +169,8 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
     const { application, execution, cancelConfirmationText } = this.props;
     const { executionService } = ReactInjector;
     const hasDeployStage =
-      execution.stages && execution.stages.some(stage => stage.type === 'deploy' || stage.type === 'cloneServerGroup');
+      execution.stages &&
+      execution.stages.some((stage) => stage.type === 'deploy' || stage.type === 'cloneServerGroup');
     CancelModal.confirm({
       header: `Really stop execution of ${execution.name}?`,
       buttonText: `Stop running ${execution.name}`,
@@ -300,13 +301,13 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
     const { pipelinesUrl, restartDetails, showingDetails, sortFilter, viewState } = this.state;
     const { $state } = ReactInjector;
 
-    const accountLabels = this.props.execution.deploymentTargets.map(account => (
+    const accountLabels = this.props.execution.deploymentTargets.map((account) => (
       <AccountTag key={account} account={account} />
     ));
 
     const executionMarkerWidth = `${100 / execution.stageSummaries.length}%`;
     const showExecutionName = standalone || (!title && sortFilter.groupBy !== 'name');
-    const executionMarkers = execution.stageSummaries.map(stage => (
+    const executionMarkers = execution.stageSummaries.map((stage) => (
       <ExecutionMarker
         key={stage.refId}
         application={application}
@@ -347,7 +348,7 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
                 <div className="text-center">
                   No stages found.{' '}
                   <a onClick={this.handleSourceNoStagesClick} target="_blank" href={pipelinesUrl + execution.id}>
-                    Source
+                    View as JSON
                   </a>
                 </div>
               )}
@@ -461,7 +462,7 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
             <div className="permalinks">
               <div className="permalinks-content">
                 <a onClick={this.handleSourceClick} target="_blank" href={pipelinesUrl + execution.id}>
-                  Source
+                  View as JSON
                 </a>
                 {' | '}
                 <ExecutionPermalink standalone={standalone} />

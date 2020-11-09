@@ -1,6 +1,6 @@
 import { uniq } from 'lodash';
 import { $q } from 'ngimport';
-import { IPromise } from 'angular';
+
 
 import { AccountService, IAccountDetails } from 'core/account';
 import { Application } from 'core/application';
@@ -15,11 +15,11 @@ export class ProviderSelectionService {
     application: Application,
     feature: string,
     filterFn?: IProviderSelectionFilter,
-  ): IPromise<string> {
+  ): PromiseLike<string> {
     return AccountService.applicationAccounts(application).then((accounts: IAccountDetails[]) => {
       let reducedAccounts: IAccountDetails[] = [];
       if (feature) {
-        reducedAccounts = accounts.filter(a => CloudProviderRegistry.hasValue(a.cloudProvider, feature));
+        reducedAccounts = accounts.filter((a) => CloudProviderRegistry.hasValue(a.cloudProvider, feature));
       }
 
       if (filterFn) {
@@ -30,7 +30,7 @@ export class ProviderSelectionService {
 
       // reduce the accounts to the smallest, unique collection taking into consideration the useProvider values
       const providerOptions = uniq(
-        reducedAccounts.map(a => {
+        reducedAccounts.map((a) => {
           const providerFeature = CloudProviderRegistry.getProvider(a.cloudProvider)[feature] || {};
           return providerFeature.useProvider || a.cloudProvider;
         }),

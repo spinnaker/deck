@@ -1,5 +1,9 @@
-FROM openjdk:8
-MAINTAINER sig-platform@spinnaker.io
+FROM openjdk:11-slim
+
+RUN apt-get update && apt-get install -y \
+  git
+
+LABEL maintainer="sig-platform@spinnaker.io"
 ENV GRADLE_USER_HOME /workspace/.gradle
 ENV GRADLE_OPTS -Xmx2048m
 CMD ./gradlew build --no-daemon -PskipTests

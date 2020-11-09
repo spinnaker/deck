@@ -1,4 +1,4 @@
-import { IPromise, module } from 'angular';
+import { module } from 'angular';
 
 import { InfrastructureCaches, ISearchResults, SearchService } from '@spinnaker/core';
 
@@ -10,14 +10,14 @@ export interface IGceCertificate {
 }
 
 export class GceCertificateReader {
-  public listCertificates(): IPromise<IGceCertificate[]> {
+  public listCertificates(): PromiseLike<IGceCertificate[]> {
     return SearchService.search<IGceCertificate>(
       { q: '', type: 'sslCertificates', allowShortQuery: 'true' },
       InfrastructureCaches.get('certificates'),
     )
       .then((searchResults: ISearchResults<IGceCertificate>) => {
         if (searchResults && searchResults.results) {
-          return searchResults.results.filter(certificate => certificate.provider === 'gce');
+          return searchResults.results.filter((certificate) => certificate.provider === 'gce');
         } else {
           return [];
         }

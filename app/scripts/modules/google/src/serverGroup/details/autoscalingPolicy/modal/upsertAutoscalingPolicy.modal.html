@@ -1,4 +1,4 @@
-<div modal-page class="scaling-policy-modal gce-scaling-policy-modal  form-inline">
+<div modal-page class="scaling-policy-modal gce-scaling-policy-modal form-inline">
   <task-monitor monitor="ctrl.taskMonitor"></task-monitor>
   <modal-close dismiss="$dismiss()"></modal-close>
   <div class="modal-header">
@@ -11,7 +11,11 @@
         <gce-autoscaling-policy-basic-settings policy="ctrl.policy" update-policy="ctrl.updatePolicy" />
       </div>
       <h4 class="section-heading">Metric Types</h4>
-      <gce-autoscaling-policy-metric-settings show-no-metrics-warning="ctrl.showNoMetricsWarning" policy="ctrl.policy">
+      <gce-autoscaling-policy-metric-settings
+        show-no-metrics-warning="ctrl.showNoMetricsWarning"
+        policy="ctrl.policy"
+        update-policy="ctrl.updatePolicy"
+      >
       </gce-autoscaling-policy-metric-settings>
     </div>
   </ng-form>

@@ -8,7 +8,6 @@ import { ConfirmationModalService } from 'core/confirmationModal';
 import { ManagedWriter } from './ManagedWriter';
 
 import './ManagedResourceStatusIndicator.less';
-import { IPromise } from 'angular';
 
 interface IToggleConfiguration {
   pauseWarning?: JSX.Element;
@@ -21,8 +20,8 @@ const viewConfigurationByStatus: { [status in ManagedResourceStatus]?: IToggleCo
         <div className="horizontal top sp-padding-m alert alert-warning">
           <i className="fa fa-exclamation-triangle sp-margin-m-right sp-margin-xs-top" />
           <span>
-            Pausing management will not interrupt the action Spinnaker is currently performing to resolve the drift in
-            configuration.
+            Pausing management will not interrupt the action Spinnaker is currently performing to resolve the difference
+            from desired state.
           </span>
         </div>
       </p>
@@ -37,7 +36,7 @@ const viewConfigurationByStatus: { [status in ManagedResourceStatus]?: IToggleCo
  * @param resource
  * @param application
  */
-export const confirmNotManaged = (resource: IManagedResource, application: Application): IPromise<boolean> => {
+export const confirmNotManaged = (resource: IManagedResource, application: Application): PromiseLike<boolean> => {
   const { managedResourceSummary, isManaged } = resource;
   if (!isManaged || managedResourceSummary.isPaused) {
     return $q.when(true);
@@ -85,17 +84,14 @@ const PopoverToggleBodyText = ({ resourceSummary }: { resourceSummary: IManagedR
   if (isPaused) {
     return (
       <>
-        <p>Spinnaker will resume taking action to resolve drift from the declarative configuration.</p>
+        <p>Spinnaker will resume taking action to correct differences from the desired state.</p>
         <MultiRegionWarning resourceSummary={resourceSummary} />
       </>
     );
   } else {
     return (
       <>
-        <p>
-          While a resource is paused, Spinnaker will not take action to resolve drift from the declarative
-          configuration.
-        </p>
+        <p>While a resource is paused, Spinnaker will not take action to correct differences from the desired state.</p>
         {viewConfigurationByStatus[status]?.pauseWarning}
         <MultiRegionWarning resourceSummary={resourceSummary} />
       </>
@@ -105,7 +101,7 @@ const PopoverToggleBodyText = ({ resourceSummary }: { resourceSummary: IManagedR
 
 const MultiRegionWarning = ({ resourceSummary }: { resourceSummary: IManagedResourceSummary }) => {
   const { isPaused, locations } = resourceSummary;
-  const regions = locations.regions.map(r => r.name).sort();
+  const regions = locations.regions.map((r) => r.name).sort();
   if (regions.length < 2) {
     return null;
   }
@@ -125,7 +121,7 @@ const BodyText = ({ resourceSummary }: { resourceSummary: IManagedResourceSummar
   return (
     <>
       <p>
-        🌈 <b>Spinnaker is continuously managing this resource.</b>
+        🌈 <b>Spinnaker is managing this resource.</b>
       </p>
       <p>
         If you need to temporarily stop Spinnaker from managing this resource — for example, if something is wrong and

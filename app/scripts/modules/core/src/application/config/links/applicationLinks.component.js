@@ -26,7 +26,7 @@ angular
     templateUrl: require('./applicationLinks.component.html'),
     controller: [
       '$uibModal',
-      function($uibModal) {
+      function ($uibModal) {
         const initialize = () => {
           if (this.application.notFound || this.application.hasError) {
             return;
@@ -36,14 +36,22 @@ angular
             ? this.application.attributes.cloudProviders
             : [];
 
-          this.sections = _.cloneDeep(
-            this.application.attributes.instanceLinks || SETTINGS.defaultInstanceLinks || [],
-          ).filter(
-            section =>
-              !section.cloudProviders ||
-              section.cloudProviders.length === 0 ||
-              _.intersection(section.cloudProviders, this.cloudProviders).length > 0,
-          );
+          this.sections = _.cloneDeep(this.application.attributes.instanceLinks || SETTINGS.defaultInstanceLinks || [])
+            .filter(
+              (section) =>
+                !section.cloudProviders ||
+                section.cloudProviders.length === 0 ||
+                _.intersection(section.cloudProviders, this.cloudProviders).length > 0,
+            )
+            .map((section) => {
+              // The absence of cloud providers may be represented as an empty array or a null value. Normalizing this
+              // value to an empty array so that we can accurately calculate `isDirty` check in `configChanged`
+              // function.
+              if (!section.cloudProviders) {
+                section.cloudProviders = [];
+              }
+              return section;
+            });
 
           this.viewState = {
             originalSections: _.cloneDeep(this.sections),
@@ -68,7 +76,7 @@ angular
           this.configChanged();
         };
 
-        this.addLink = section => {
+        this.addLink = (section) => {
           section.links.push({ title: '', path: '' });
           this.configChanged();
         };
@@ -84,7 +92,7 @@ angular
           this.addLink(section);
         };
 
-        this.removeSection = index => {
+        this.removeSection = (index) => {
           this.sections.splice(index, 1);
           this.configChanged();
         };
@@ -104,7 +112,7 @@ angular
                 sections: () => this.sections,
               },
             })
-            .result.then(newSections => {
+            .result.then((newSections) => {
               this.sections = newSections;
               this.configChanged();
             })

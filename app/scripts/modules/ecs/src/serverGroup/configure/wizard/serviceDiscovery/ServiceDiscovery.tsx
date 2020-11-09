@@ -1,5 +1,5 @@
 import React from 'react';
-import { module, IPromise } from 'angular';
+import { module } from 'angular';
 import { react2angular } from 'react2angular';
 import { Alert } from 'react-bootstrap';
 import { Option } from 'react-select';
@@ -7,12 +7,12 @@ import {
   IEcsServerGroupCommand,
   IEcsServiceDiscoveryRegistryAssociation,
 } from '../../serverGroupConfiguration.service';
-import { HelpField, TetheredSelect } from '@spinnaker/core';
+import { HelpField, TetheredSelect, withErrorBoundary } from '@spinnaker/core';
 
 export interface IServiceDiscoveryProps {
   command: IEcsServerGroupCommand;
   notifyAngular: (key: string, value: any) => void;
-  configureCommand: (query: string) => IPromise<void>;
+  configureCommand: (query: string) => PromiseLike<void>;
 }
 
 export interface IEcsServiceDiscoveryRegistry {
@@ -27,6 +27,7 @@ export interface IEcsServiceDiscoveryRegistry {
 interface IServiceDiscoveryState {
   serviceDiscoveryAssociations: IEcsServiceDiscoveryRegistryAssociation[];
   serviceDiscoveryRegistriesAvailable: IEcsServiceDiscoveryRegistry[];
+  useTaskDefinitionArtifact: boolean;
 }
 
 export class ServiceDiscovery extends React.Component<IServiceDiscoveryProps, IServiceDiscoveryState> {
@@ -38,7 +39,14 @@ export class ServiceDiscovery extends React.Component<IServiceDiscoveryProps, IS
       serviceDiscoveryAssociations: cmd.serviceDiscoveryAssociations,
       serviceDiscoveryRegistriesAvailable:
         cmd.backingData && cmd.backingData.filtered ? cmd.backingData.filtered.serviceDiscoveryRegistries : [],
+      useTaskDefinitionArtifact: cmd.useTaskDefinitionArtifact,
     };
+
+    if (!this.state.useTaskDefinitionArtifact) {
+      this.state.serviceDiscoveryAssociations.forEach((serviceDiscoveryRegistryAssociation) => {
+        serviceDiscoveryRegistryAssociation.containerName = null;
+      });
+    }
   }
 
   public componentDidMount() {
@@ -51,7 +59,7 @@ export class ServiceDiscovery extends React.Component<IServiceDiscoveryProps, IS
 
   private getNameToRegistryMap = (): Map<string, IEcsServiceDiscoveryRegistry> => {
     const displayNameToRegistry = new Map<string, IEcsServiceDiscoveryRegistry>();
-    this.props.command.backingData.filtered.serviceDiscoveryRegistries.forEach(e => {
+    this.props.command.backingData.filtered.serviceDiscoveryRegistries.forEach((e) => {
       displayNameToRegistry.set(e.displayName, e);
     });
 
@@ -92,9 +100,17 @@ export class ServiceDiscovery extends React.Component<IServiceDiscoveryProps, IS
     this.setState({ serviceDiscoveryAssociations: currentAssociations });
   };
 
+  private updateServiceDiscoveryContainerName = (index: number, targetContainerName: string) => {
+    const currentAssociations = this.state.serviceDiscoveryAssociations;
+    const targetAssociations = currentAssociations[index];
+    targetAssociations.containerName = targetContainerName;
+    this.props.notifyAngular('serviceDiscoveryAssociations', currentAssociations);
+    this.setState({ serviceDiscoveryAssociations: currentAssociations });
+  };
+
   private pushServiceDiscoveryAssociation = () => {
     const registryAssociations = this.state.serviceDiscoveryAssociations;
-    registryAssociations.push({ registry: this.getEmptyRegistry(), containerPort: 80 });
+    registryAssociations.push({ registry: this.getEmptyRegistry(), containerPort: 80, containerName: '' });
     this.setState({ serviceDiscoveryAssociations: registryAssociations });
   };
 
@@ -109,14 +125,27 @@ export class ServiceDiscovery extends React.Component<IServiceDiscoveryProps, IS
     const removeServiceDiscoveryAssociation = this.removeServiceDiscoveryAssociations;
     const updateServiceDiscoveryRegistry = this.updateServiceDiscoveryRegistry;
     const updateServiceDiscoveryPort = this.updateServiceDiscoveryPort;
+    const updateServiceDiscoveryContainerName = this.updateServiceDiscoveryContainerName;
 
-    const registriesAvailable = this.state.serviceDiscoveryRegistriesAvailable.map(function(registry) {
+    const registriesAvailable = this.state.serviceDiscoveryRegistriesAvailable.map(function (registry) {
       return { label: `${registry.displayName}`, value: registry.displayName };
     });
 
-    const serviceDiscoveryInputs = this.state.serviceDiscoveryAssociations.map(function(mapping, index) {
+    const useTaskDefinitionArtifact = this.state.useTaskDefinitionArtifact;
+    const serviceDiscoveryInputs = this.state.serviceDiscoveryAssociations.map(function (mapping, index) {
       return (
         <tr key={index}>
+          {useTaskDefinitionArtifact && (
+            <td>
+              <input
+                className="form-control input-sm"
+                placeholder="Enter a container name ..."
+                required={true}
+                value={mapping.containerName}
+                onChange={(e) => updateServiceDiscoveryContainerName(index, e.target.value)}
+              />
+            </td>
+          )}
           <td>
             <TetheredSelect
               placeholder="Select a registry..."
@@ -133,7 +162,7 @@ export class ServiceDiscovery extends React.Component<IServiceDiscoveryProps, IS
               className="form-control input-sm no-spel"
               required={true}
               value={mapping.containerPort}
-              onChange={e => updateServiceDiscoveryPort(index, e.target.valueAsNumber)}
+              onChange={(e) => updateServiceDiscoveryPort(index, e.target.valueAsNumber)}
             />
           </td>
           <td>
@@ -170,11 +199,24 @@ export class ServiceDiscovery extends React.Component<IServiceDiscoveryProps, IS
             <table className="table table-condensed packed tags">
               <thead>
                 <tr>
-                  <th style={{ width: '75%' }}>
-                    Registry
-                    <HelpField id="ecs.serviceDiscoveryRegistry" />
-                  </th>
-                  <th style={{ width: '18%' }}>
+                  {useTaskDefinitionArtifact && (
+                    <th style={{ width: '30%' }}>
+                      Container name
+                      <HelpField id="ecs.serviceDiscoveryContainerName" />
+                    </th>
+                  )}
+                  {useTaskDefinitionArtifact ? (
+                    <th style={{ width: '55%' }}>
+                      Registry
+                      <HelpField id="ecs.serviceDiscoveryRegistry" />
+                    </th>
+                  ) : (
+                    <th style={{ width: '80%' }}>
+                      Registry
+                      <HelpField id="ecs.serviceDiscoveryRegistry" />
+                    </th>
+                  )}
+                  <th style={{ width: '15%' }}>
                     Port
                     <HelpField id="ecs.serviceDiscoveryContainerPort" />
                   </th>
@@ -198,5 +240,9 @@ export class ServiceDiscovery extends React.Component<IServiceDiscoveryProps, IS
 export const SERVICE_DISCOVERY_REACT = 'spinnaker.ecs.serverGroup.configure.wizard.serviceDiscovery.react';
 module(SERVICE_DISCOVERY_REACT, []).component(
   'serviceDiscoveryReact',
-  react2angular(ServiceDiscovery, ['command', 'notifyAngular', 'configureCommand']),
+  react2angular(withErrorBoundary(ServiceDiscovery, 'serviceDiscoveryReact'), [
+    'command',
+    'notifyAngular',
+    'configureCommand',
+  ]),
 );

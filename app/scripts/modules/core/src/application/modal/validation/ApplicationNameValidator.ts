@@ -1,4 +1,3 @@
-import { IPromise } from 'angular';
 import { AccountService } from 'core/account/AccountService';
 
 export interface IApplicationNameValidationMessage {
@@ -40,6 +39,15 @@ export class ApplicationNameValidator {
   }
 
   /**
+   * Overwrites the validators of a cloud provider with the given array.
+   * @param cloudProvider the key of the cloud provider, e.g. "aws", "gce"
+   * @param validators the validators to use for the provider
+   */
+  public static setValidators(cloudProvider: string, validators: IApplicationNameValidator[]) {
+    this.providerMap.set(cloudProvider, validators);
+  }
+
+  /**
    * Performs the actual validation. If there are no providers supplied, all configured validators will fire
    * and add their messages to the result.
    * @param applicationName the name of the application
@@ -49,7 +57,7 @@ export class ApplicationNameValidator {
   public static validate(
     applicationName: string,
     providersToTest: string[],
-  ): IPromise<IApplicationNameValidationResult> {
+  ): PromiseLike<IApplicationNameValidationResult> {
     return AccountService.listProviders().then((availableProviders: string[]) => {
       const toCheck = providersToTest && providersToTest.length ? providersToTest : availableProviders;
 
@@ -57,10 +65,10 @@ export class ApplicationNameValidator {
       const warnings: IApplicationNameValidationMessage[] = [];
       toCheck.forEach((provider: string) => {
         if (this.providerMap.has(provider)) {
-          this.providerMap.get(provider).forEach(validator => {
+          this.providerMap.get(provider).forEach((validator) => {
             const results = validator.validate(applicationName);
-            results.warnings.forEach(message => warnings.push({ cloudProvider: provider, message }));
-            results.errors.forEach(message => errors.push({ cloudProvider: provider, message }));
+            results.warnings.forEach((message) => warnings.push({ cloudProvider: provider, message }));
+            results.errors.forEach((message) => errors.push({ cloudProvider: provider, message }));
           });
         }
       });

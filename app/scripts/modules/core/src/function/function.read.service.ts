@@ -1,8 +1,8 @@
-import { IPromise, IQService, module } from 'angular';
+import { module } from 'angular';
 
 import { API } from 'core/api/ApiService';
-import { IFunctionSourceData, IFunction } from 'core/domain';
-import { CORE_FUNCTION_FUNCTION_TRANSFORMER } from './function.transformer';
+import { IFunctionSourceData } from 'core/domain';
+import { CORE_FUNCTION_FUNCTION_TRANSFORMER, IFunctionTransformer } from './function.transformer';
 
 export interface IFunctionByAccount {
   name: string;
@@ -16,16 +16,17 @@ export interface IFunctionByAccount {
 }
 
 export class FunctionReader {
-  public static $inject = ['$q', 'functionTransformer'];
-  public constructor(private $q: IQService, private functionTransformer: any) {}
+  public static $inject = ['functionTransformer'];
 
-  public loadFunctions(applicationName: string): IPromise<IFunctionSourceData[]> {
+  public constructor(private functionTransformer: IFunctionTransformer) {}
+
+  public loadFunctions(applicationName: string): PromiseLike<IFunctionSourceData[]> {
     return API.one('applications', applicationName)
       .all('functions')
       .getList()
       .then((functions: IFunctionSourceData[]) => {
         functions = this.functionTransformer.normalizeFunctionSet(functions);
-        return this.$q.all(functions.map(fn => this.normalizeFunction(fn)));
+        return functions.map((fn) => this.normalizeFunction(fn));
       });
   }
 
@@ -34,27 +35,24 @@ export class FunctionReader {
     account: string,
     region: string,
     name: string,
-  ): IPromise<IFunctionSourceData[]> {
+  ): PromiseLike<IFunctionSourceData[]> {
     return API.all('functions')
       .withParams({ provider: cloudProvider, functionName: name, region: region, account: account })
       .get()
       .then((functions: IFunctionSourceData[]) => {
         functions = this.functionTransformer.normalizeFunctionSet(functions);
-        return this.$q.all(functions.map(fn => this.normalizeFunction(fn)));
+        return functions.map((fn) => this.normalizeFunction(fn));
       });
   }
 
-  public listFunctions(cloudProvider: string): IPromise<IFunctionByAccount[]> {
-    return API.all('functions')
-      .withParams({ provider: cloudProvider })
-      .getList();
+  public listFunctions(cloudProvider: string): PromiseLike<IFunctionByAccount[]> {
+    return API.all('functions').withParams({ provider: cloudProvider }).getList();
   }
 
-  private normalizeFunction(functionDef: IFunctionSourceData): IPromise<IFunction> {
-    return this.functionTransformer.normalizeFunction(functionDef).then((fn: IFunction) => {
-      fn.cloudProvider = fn.cloudProvider || 'aws';
-      return fn;
-    });
+  private normalizeFunction(functionDef: IFunctionSourceData): IFunctionSourceData {
+    const fn = this.functionTransformer.normalizeFunction(functionDef);
+    fn.cloudProvider = fn.cloudProvider || 'aws';
+    return fn;
   }
 }
 

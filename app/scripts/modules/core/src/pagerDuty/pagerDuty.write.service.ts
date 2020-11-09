@@ -1,4 +1,4 @@
-import { IPromise } from 'angular';
+
 
 import { Application } from 'core/application';
 import { ModalInjector } from 'core/reactShims';
@@ -23,7 +23,7 @@ export class PagerDutyWriter {
     reason: string,
     ownerApp: Application,
     details?: { [key: string]: any },
-  ): IPromise<any> {
+  ): PromiseLike<any> {
     const job = {
       type: 'pageApplicationOwner',
       message: reason,
@@ -31,7 +31,7 @@ export class PagerDutyWriter {
     } as IJob;
 
     if (applications && applications.length > 0) {
-      job.applications = applications.map(app => app.name);
+      job.applications = applications.map((app) => app.name);
     }
 
     if (keys && keys.length > 0) {
@@ -47,7 +47,7 @@ export class PagerDutyWriter {
     return TaskExecutor.executeTask(task);
   }
 
-  public static pageApplicationOwner(application: Application, reason: string, details?: string): IPromise<any> {
+  public static pageApplicationOwner(application: Application, reason: string, details?: string): PromiseLike<any> {
     return this.sendPage([application], undefined, reason, application, { details });
   }
 }

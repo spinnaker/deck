@@ -66,7 +66,9 @@ export class EcsTargetGroupDetails extends React.Component<IEcsTargetGroupProps,
         targetGroup: null,
       });
     } else {
-      const targetGroup: IEcsTargetGroup = loadBalancer.targetGroups.find(tg => tg.targetGroupName === targetGroupName);
+      const targetGroup: IEcsTargetGroup = loadBalancer.targetGroups.find(
+        (tg) => tg.targetGroupName === targetGroupName,
+      );
       if (!targetGroup) {
         this.setState({
           loading: false,
@@ -139,7 +141,7 @@ export class EcsTargetGroupDetails extends React.Component<IEcsTargetGroupProps,
     const targetGroupContent = () => (
       <div className="content">
         <CollapsibleSection heading="Target Group Details" defaultExpanded={true}>
-          <dl className="dl-horizontal dl-flex">
+          <dl className="dl-horizontal dl-narrow">
             <dt>In</dt>
             <dd>
               <AccountTag account={accountId}></AccountTag>

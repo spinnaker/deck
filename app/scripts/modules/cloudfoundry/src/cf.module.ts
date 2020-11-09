@@ -18,7 +18,7 @@ import {
   CloudFoundryServerGroupActions,
   CloudFoundryServerGroupCommandBuilderShim,
   CloudFoundryServerGroupTransformer,
-  EvironmentVariablesSection,
+  EnvironmentVariablesSection,
   HealthCheckSection,
   MetricsSection,
   PackageSection,
@@ -49,6 +49,7 @@ import './pipeline/stages/shareService/cloudfoundryShareServiceStage.module';
 import './pipeline/stages/unmapLoadBalancers/cloudfoundryUnmapLoadBalancersStage.module';
 import './pipeline/stages/unshareService/cloudfoundryUnshareServiceStage.module';
 import './pipeline/stages/runJob/cloudfoundryRunJob.module';
+import './pipeline/stages/bakeCloudFoundryManifest/bakeCloudFoundryManifestStage';
 
 CloudProviderRegistry.registerProvider('cloudfoundry', {
   name: 'Cloud Foundry',
@@ -74,7 +75,7 @@ CloudProviderRegistry.registerProvider('cloudfoundry', {
       BuildSection,
       PackageSection,
       BoundServicesSection,
-      EvironmentVariablesSection,
+      EnvironmentVariablesSection,
     ],
     CloneServerGroupModal: CloudFoundryCreateServerGroupModal,
     commandBuilder: CloudFoundryServerGroupCommandBuilderShim,

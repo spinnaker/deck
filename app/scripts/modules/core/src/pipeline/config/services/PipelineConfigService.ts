@@ -1,4 +1,4 @@
-import { IPromise } from 'angular';
+
 import { sortBy, uniq, cloneDeep } from 'lodash';
 import { $q } from 'ngimport';
 
@@ -20,48 +20,45 @@ export class PipelineConfigService {
     return `${applicationName}:${pipelineName}`;
   }
 
-  public static getPipelinesForApplication(applicationName: string): IPromise<IPipeline[]> {
+  public static getPipelinesForApplication(applicationName: string): PromiseLike<IPipeline[]> {
     return API.one('applications')
       .one(applicationName)
       .all('pipelineConfigs')
       .getList()
       .then((pipelines: IPipeline[]) => {
-        pipelines.forEach(p => (p.stages = p.stages || []));
+        pipelines.forEach((p) => (p.stages = p.stages || []));
         return this.sortPipelines(pipelines);
       });
   }
 
-  public static getStrategiesForApplication(applicationName: string): IPromise<IPipeline[]> {
+  public static getStrategiesForApplication(applicationName: string): PromiseLike<IPipeline[]> {
     return API.one('applications')
       .one(applicationName)
       .all('strategyConfigs')
       .getList()
       .then((pipelines: IPipeline[]) => {
-        pipelines.forEach(p => (p.stages = p.stages || []));
+        pipelines.forEach((p) => (p.stages = p.stages || []));
         return this.sortPipelines(pipelines);
       });
   }
 
-  public static getHistory(id: string, isStrategy: boolean, count = 20): IPromise<IPipeline[]> {
+  public static getHistory(id: string, isStrategy: boolean, count = 20): PromiseLike<IPipeline[]> {
     const endpoint = isStrategy ? 'strategyConfigs' : 'pipelineConfigs';
-    return API.one(endpoint, id)
-      .all('history')
-      .withParams({ limit: count })
-      .getList();
+    return API.one(endpoint, id).all('history').withParams({ limit: count }).getList();
   }
 
-  public static deletePipeline(applicationName: string, pipeline: IPipeline, pipelineName: string): IPromise<void> {
+  public static deletePipeline(applicationName: string, pipeline: IPipeline, pipelineName: string): PromiseLike<void> {
     return API.one(pipeline.strategy ? 'strategies' : 'pipelines')
       .one(applicationName, encodeURIComponent(pipelineName.trim()))
       .remove();
   }
 
-  public static savePipeline(toSave: IPipeline): IPromise<void> {
+  public static savePipeline(toSave: IPipeline): PromiseLike<void> {
     let pipeline = cloneDeep(toSave);
     delete pipeline.isNew;
     pipeline.name = pipeline.name.trim();
     if (Array.isArray(pipeline.stages)) {
-      pipeline.stages.forEach(function(stage) {
+      pipeline.stages.forEach(function (stage) {
         delete stage.isNew;
         if (!stage.name) {
           delete stage.name;
@@ -81,8 +78,9 @@ export class PipelineConfigService {
     application: string,
     idsToIndices: { [key: string]: number },
     isStrategy = false,
-  ): IPromise<void> {
-    return API.one(`actions/${isStrategy ? 'strategies' : 'pipelines'}/reorder`)
+  ): PromiseLike<void> {
+    const type = isStrategy ? 'strategies' : 'pipelines';
+    return API.one('actions', type, 'reorder')
       .data({
         application,
         idsToIndices,
@@ -95,7 +93,7 @@ export class PipelineConfigService {
     pipeline: IPipeline,
     currentName: string,
     newName: string,
-  ): IPromise<void> {
+  ): PromiseLike<void> {
     this.configViewStateCache.remove(this.buildViewStateCacheKey(applicationName, currentName));
     pipeline.name = newName.trim();
     return API.one(pipeline.strategy ? 'strategies' : 'pipelines')
@@ -104,7 +102,7 @@ export class PipelineConfigService {
       .put();
   }
 
-  public static triggerPipeline(applicationName: string, pipelineName: string, body: any = {}): IPromise<string> {
+  public static triggerPipeline(applicationName: string, pipelineName: string, body: any = {}): PromiseLike<string> {
     body.user = AuthenticationService.getAuthenticatedUser().name;
     return API.one('pipelines')
       .one('v2')
@@ -123,8 +121,8 @@ export class PipelineConfigService {
       return stageToTest.requisiteStageRefIds && stageToTest.requisiteStageRefIds.includes(stage.refId);
     });
     if (children.length) {
-      downstream = children.map(c => c.refId);
-      children.forEach(child => {
+      downstream = children.map((c) => c.refId);
+      children.forEach((child) => {
         downstream = downstream.concat(this.getDownstreamStageIds(pipeline, child));
       });
     }
@@ -160,11 +158,11 @@ export class PipelineConfigService {
     return uniq(upstreamStages);
   }
 
-  private static sortPipelines(pipelines: IPipeline[]): IPromise<IPipeline[]> {
+  private static sortPipelines(pipelines: IPipeline[]): PromiseLike<IPipeline[]> {
     const sorted = sortBy(pipelines, ['index', 'name']);
 
     // if there are pipelines with a bad index, fix that
-    const toReindex: Array<IPromise<void>> = [];
+    const toReindex: Array<PromiseLike<void>> = [];
     if (sorted && sorted.length) {
       sorted.forEach((pipeline, index) => {
         if (pipeline.index !== index) {

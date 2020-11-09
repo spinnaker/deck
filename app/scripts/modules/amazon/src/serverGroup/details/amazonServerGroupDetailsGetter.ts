@@ -1,4 +1,3 @@
-import { IPromise } from 'angular';
 import { isEmpty } from 'lodash';
 import { Observable } from 'rxjs';
 
@@ -8,7 +7,7 @@ import { AwsReactInjector } from 'amazon/reactShims';
 import { AutoScalingProcessService } from './scalingProcesses/AutoScalingProcessService';
 import { IAmazonLoadBalancer, IAmazonServerGroup, IAmazonServerGroupView } from 'amazon/domain';
 
-function extractServerGroupSummary(props: IServerGroupDetailsProps): IPromise<IAmazonServerGroup> {
+function extractServerGroupSummary(props: IServerGroupDetailsProps): PromiseLike<IAmazonServerGroup> {
   const { app, serverGroup } = props;
   return app.ready().then(() => {
     let summary: IAmazonServerGroup = app.serverGroups.data.find((toCheck: IAmazonServerGroup) => {
@@ -21,7 +20,7 @@ function extractServerGroupSummary(props: IServerGroupDetailsProps): IPromise<IA
     if (!summary) {
       app.loadBalancers.data.some((loadBalancer: IAmazonLoadBalancer) => {
         if (loadBalancer.account === serverGroup.accountId && loadBalancer.region === serverGroup.region) {
-          return loadBalancer.serverGroups.some(possibleServerGroup => {
+          return loadBalancer.serverGroups.some((possibleServerGroup) => {
             if (possibleServerGroup.name === serverGroup.name) {
               summary = possibleServerGroup;
               return true;
@@ -41,8 +40,8 @@ export function amazonServerGroupDetailsGetter(
   autoClose: () => void,
 ): Observable<IAmazonServerGroup> {
   const { app, serverGroup: serverGroupInfo } = props;
-  return new Observable<IAmazonServerGroupView>(observer => {
-    extractServerGroupSummary(props).then(summary => {
+  return new Observable<IAmazonServerGroupView>((observer) => {
+    extractServerGroupSummary(props).then((summary) => {
       ServerGroupReader.getServerGroup(
         app.name,
         serverGroupInfo.accountId,
@@ -54,7 +53,7 @@ export function amazonServerGroupDetailsGetter(
 
         const serverGroup = AwsReactInjector.awsServerGroupTransformer.normalizeServerGroupDetails(details);
 
-        AccountService.getAccountDetails(serverGroup.account).then(accountDetails => {
+        AccountService.getAccountDetails(serverGroup.account).then((accountDetails) => {
           serverGroup.accountDetails = accountDetails;
           observer.next(serverGroup);
         });
@@ -65,7 +64,7 @@ export function amazonServerGroupDetailsGetter(
           if (vpc !== '') {
             const subnetId = vpc.split(',')[0];
             SubnetReader.listSubnets().then((subnets: ISubnet[]) => {
-              const subnet = subnets.find(s => s.id === subnetId);
+              const subnet = subnets.find((s) => s.id === subnetId);
               serverGroup.subnetType = subnet.purpose;
               observer.next(serverGroup);
             });

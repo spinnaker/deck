@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactGA from 'react-ga';
-import { IPromise } from 'angular';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { flatten, uniq, without } from 'lodash';
 
@@ -122,12 +121,12 @@ export class ExecutionGroup extends React.PureComponent<IExecutionGroupProps, IE
     this.setState({ open });
   };
 
-  private startPipeline(command: IPipelineCommand): IPromise<void> {
+  private startPipeline(command: IPipelineCommand): PromiseLike<void> {
     const { executionService } = ReactInjector;
     this.setState({ triggeringExecution: true });
     return executionService
       .startAndMonitorPipeline(this.props.application, command.pipelineName, command.trigger)
-      .then(monitor => {
+      .then((monitor) => {
         this.setState({ poll: monitor });
         return monitor.promise;
       })
@@ -138,10 +137,10 @@ export class ExecutionGroup extends React.PureComponent<IExecutionGroupProps, IE
 
   public triggerPipeline(trigger: IExecutionTrigger = null, config = this.state.pipelineConfig): void {
     Observable.fromPromise(
-      new Promise(resolve => {
+      new Promise((resolve) => {
         if (PipelineTemplateV2Service.isV2PipelineConfig(config)) {
           PipelineTemplateReader.getPipelinePlan(config as IPipelineTemplateConfigV2)
-            .then(plan => resolve(plan))
+            .then((plan) => resolve(plan))
             .catch(() => resolve(config));
         } else {
           resolve(config);
@@ -149,21 +148,21 @@ export class ExecutionGroup extends React.PureComponent<IExecutionGroupProps, IE
       }),
     )
       .takeUntil(this.destroy$)
-      .subscribe(pipeline =>
+      .subscribe((pipeline) =>
         ManualExecutionModal.show({
           pipeline,
           application: this.props.application,
           trigger: trigger,
           currentlyRunningExecutions: this.props.group.runningExecutions,
         })
-          .then(command => this.startPipeline(command))
+          .then((command) => this.startPipeline(command))
           .catch(() => {}),
       );
   }
 
   public componentDidMount(): void {
     const { stateEvents } = ReactInjector;
-    this.expandUpdatedSubscription = ExecutionState.filterModel.expandSubject.subscribe(expanded => {
+    this.expandUpdatedSubscription = ExecutionState.filterModel.expandSubject.subscribe((expanded) => {
       if (this.state.open !== expanded) {
         this.toggle();
       }
@@ -227,7 +226,7 @@ export class ExecutionGroup extends React.PureComponent<IExecutionGroupProps, IE
   private getDeploymentAccounts(): string[] {
     return uniq(flatten<string>(this.props.group.executions.map((e: IExecution) => e.deploymentTargets)))
       .sort()
-      .filter(a => !!a);
+      .filter((a) => !!a);
   }
 
   private renderExecutions() {
@@ -235,7 +234,7 @@ export class ExecutionGroup extends React.PureComponent<IExecutionGroupProps, IE
     const { executions } = this.props.group;
     return (
       <>
-        {executions.map(execution => (
+        {executions.map((execution) => (
           <Execution
             key={execution.id}
             execution={execution}
@@ -262,7 +261,7 @@ export class ExecutionGroup extends React.PureComponent<IExecutionGroupProps, IE
     const groupTargetAccountLabels: React.ReactNode[] = [];
     let groupTargetAccountLabelsExtra: React.ReactNode[] = [];
     if (group.targetAccounts && group.targetAccounts.length > 0) {
-      group.targetAccounts.slice(0, ACCOUNT_TAG_OVERFLOW_LIMIT).map(account => {
+      group.targetAccounts.slice(0, ACCOUNT_TAG_OVERFLOW_LIMIT).map((account) => {
         groupTargetAccountLabels.push(<AccountTag key={account} account={account} />);
       });
     }
@@ -280,7 +279,7 @@ export class ExecutionGroup extends React.PureComponent<IExecutionGroupProps, IE
         </span>,
       );
       groupTargetAccountLabelsExtra = groupTargetAccountLabelsExtra.concat(
-        group.targetAccounts.slice(ACCOUNT_TAG_OVERFLOW_LIMIT).map(account => {
+        group.targetAccounts.slice(ACCOUNT_TAG_OVERFLOW_LIMIT).map((account) => {
           return <AccountTag key={account} account={account} />;
         }),
       );

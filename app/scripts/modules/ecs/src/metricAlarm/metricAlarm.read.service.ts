@@ -4,11 +4,8 @@ import { API } from '@spinnaker/core';
 import { IMetricAlarmDescriptor } from './MetricAlarm';
 
 export class MetricAlarmReader {
-  public listMetricAlarms(): ng.IPromise<IMetricAlarmDescriptor[]> {
-    return API.all('ecs')
-      .all('cloudMetrics')
-      .all('alarms')
-      .getList();
+  public listMetricAlarms(): PromiseLike<IMetricAlarmDescriptor[]> {
+    return API.all('ecs').all('cloudMetrics').all('alarms').getList();
   }
 }
 

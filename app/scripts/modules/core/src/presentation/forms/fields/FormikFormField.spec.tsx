@@ -23,7 +23,7 @@ const makeSpy = () => {
   return { inputProps, renderSpy, InputSpy };
 };
 
-const asyncTick = () => new Promise(resolve => setTimeout(resolve));
+const asyncTick = () => new Promise((resolve) => setTimeout(resolve));
 
 describe('<FormikFormField/>', () => {
   it(`renders the input`, () => {
@@ -84,7 +84,7 @@ describe('<FormikFormField/>', () => {
       <FormikFormField
         name="account"
         label="Account"
-        input={props => <ReactSelectInput {...props} />}
+        input={(props) => <ReactSelectInput {...props} />}
         spelAware={props.propsSpelAware}
       />
     );
@@ -118,7 +118,7 @@ describe('<FormikFormField/>', () => {
           renderSpelToggle: 1,
         },
       ];
-      contextAndPropConfigs.forEach(config => {
+      contextAndPropConfigs.forEach((config) => {
         const component = mount(
           <Test
             contextSpelAware={config.contextSpelAware}
@@ -136,6 +136,19 @@ describe('<FormikFormField/>', () => {
       );
       expect(component.find(TextAreaInput).length).toEqual(1);
       expect(component.find(ReactSelectInput).length).toEqual(0);
+    });
+
+    it('does not render the input even once if the field value is SpEL and freeform SpEL inputs are enabled', () => {
+      const spy = jasmine.createSpy();
+      const NeverRenderedComponent = () => {
+        spy();
+        return <span />;
+      };
+      const TestField = () => (
+        <FormikFormField name="account" label="Account" input={NeverRenderedComponent} spelAware={true} />
+      );
+      mount(<Test initialValues={{ account: '${spel_account}' }} render={() => <TestField />} />);
+      expect(spy).not.toHaveBeenCalled();
     });
 
     it('renders the default input if the field value is not SpEL', () => {

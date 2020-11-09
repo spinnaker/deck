@@ -1,6 +1,7 @@
-import { module, IPromise } from 'angular';
+import { module } from 'angular';
 
 import { OracleProviderSettings } from 'oracle/oracle.settings';
+import { OracleDefaultProviderSettings } from 'oracle/oracle.settings';
 import { Application } from '@spinnaker/core';
 
 import {
@@ -16,7 +17,7 @@ import {
 import { $q } from 'ngimport';
 
 export class OracleLoadBalancerTransformer {
-  public normalizeLoadBalancer(loadBalancer: IOracleLoadBalancer): IPromise<IOracleLoadBalancer> {
+  public normalizeLoadBalancer(loadBalancer: IOracleLoadBalancer): PromiseLike<IOracleLoadBalancer> {
     /*loadBalancer.serverGroups.forEach(function(serverGroup) {
       serverGroup.account = loadBalancer.account;
       serverGroup.region = loadBalancer.region;
@@ -45,7 +46,7 @@ export class OracleLoadBalancerTransformer {
 
   public convertLoadBalancerForEditing(loadBalancer: IOracleLoadBalancer): IOracleLoadBalancerUpsertCommand {
     if (loadBalancer.listeners) {
-      Object.keys(loadBalancer.listeners).forEach(key => {
+      Object.keys(loadBalancer.listeners).forEach((key) => {
         const lis = loadBalancer.listeners[key];
         lis.isSsl = !!lis.sslConfiguration; // use !! operator to get truthiness value
       });
@@ -57,7 +58,7 @@ export class OracleLoadBalancerTransformer {
       region: loadBalancer.region,
       shape: loadBalancer.shape,
       isPrivate: loadBalancer.isPrivate,
-      subnetIds: loadBalancer.subnets.map(subnet => subnet.id),
+      subnetIds: loadBalancer.subnets.map((subnet) => subnet.id),
       certificates: loadBalancer.certificates,
       listeners: loadBalancer.listeners,
       hostnames: loadBalancer.hostnames,
@@ -66,13 +67,22 @@ export class OracleLoadBalancerTransformer {
       loadBalancerType: loadBalancer.type,
       securityGroups: loadBalancer.securityGroups,
       vpcId: loadBalancer.vpcId,
+      subnetTypeMap: loadBalancer.subnetTypeMap,
     };
     return toEdit;
   }
 
   public constructNewLoadBalancerTemplate(application: Application): IOracleLoadBalancerUpsertCommand {
-    const defaultCredentials = application.defaultCredentials.oracle || OracleProviderSettings.defaults.account;
-    const defaultRegion = application.defaultRegions.oracle || OracleProviderSettings.defaults.region;
+    const defaultCredentials =
+      application.defaultCredentials.oracle ||
+      (OracleProviderSettings.defaults
+        ? OracleProviderSettings.defaults.account
+        : OracleDefaultProviderSettings.defaults.account);
+    const defaultRegion =
+      application.defaultRegions.oracle ||
+      (OracleProviderSettings.defaults
+        ? OracleProviderSettings.defaults.region
+        : OracleDefaultProviderSettings.defaults.region);
     return {
       name: undefined,
       cloudProvider: 'oracle',
@@ -88,6 +98,7 @@ export class OracleLoadBalancerTransformer {
       loadBalancerType: null,
       securityGroups: [],
       vpcId: null,
+      subnetTypeMap: {},
     };
   }
 

@@ -1,4 +1,3 @@
-import { IPromise } from 'angular';
 import { chain } from 'lodash';
 
 import { SearchService } from '@spinnaker/core';
@@ -14,15 +13,15 @@ interface IManifestKindSearchResults {
 }
 
 export class ManifestKindSearchService {
-  public static search(kind: string, namespace: string, account: string): IPromise<IManifestKindSearchResults[]> {
+  public static search(kind: string, namespace: string, account: string): PromiseLike<IManifestKindSearchResults[]> {
     return SearchService.search<IManifestKindSearchResults>({
       q: namespace,
       type: kind,
     })
-      .then(response =>
+      .then((response) =>
         chain(response ? response.results : [])
           .filter(
-            result => result.namespace === namespace && result.account === account && result.kubernetesKind === kind,
+            (result) => result.namespace === namespace && result.account === account && result.kubernetesKind === kind,
           )
           .uniqBy('name')
           .valueOf(),

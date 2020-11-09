@@ -42,7 +42,7 @@ export class OracleLoadBalancerDetailController implements IController {
     };
     $scope.firewallsLabel = FirewallLabels.get('Firewalls');
 
-    const extractLoadBalancer = () => {
+    const extractLoadBalancer = (): PromiseLike<any> => {
       $scope.loadBalancer = app.loadBalancers.data.filter((test: IOracleLoadBalancer) => {
         return (
           test.name === loadBalancer.name &&
@@ -59,7 +59,7 @@ export class OracleLoadBalancerDetailController implements IController {
           loadBalancer.name,
         );
 
-        return detailsLoader.then(details => {
+        return detailsLoader.then((details) => {
           // ILoadBalancerSourceData
           $scope.state.loading = false;
           const securityGroups: ISecurityGroup[] = [];
