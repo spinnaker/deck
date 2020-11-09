@@ -49,6 +49,7 @@ window.spinnakerSettings = {
   },
   checkForUpdates: true,
   debugEnabled: debugEnabled,
+  defaultExecutionResults: 10,
   defaultInstancePort: 80,
   defaultProviders: [
     'appengine',
