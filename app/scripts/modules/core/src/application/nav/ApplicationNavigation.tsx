@@ -2,6 +2,7 @@ import React from 'react';
 import { useRecoilValue } from 'recoil';
 import { useCurrentStateAndParams } from '@uirouter/react';
 import { find, isEqual } from 'lodash';
+import { SETTINGS } from 'core/config/settings';
 
 import { AppRefresher } from './AppRefresher';
 import { NavSection } from './NavSection';
@@ -73,7 +74,7 @@ export const ApplicationNavigation = ({ app }: IApplicationNavigationProps) => {
         .map((section, i) => (
           <NavSection key={`section-${i}`} dataSources={section} app={app} />
         ))}
-      {app.attributes.pdApiKey && (
+      {SETTINGS.feature.pagerDuty && app.attributes.pdApiKey && (
         <div className="nav-section clickable">
           <div className="page-category flex-container-h middle text-semibold" onClick={pageApplicationOwner}>
             <div className="nav-row-item sp-margin-s-right">

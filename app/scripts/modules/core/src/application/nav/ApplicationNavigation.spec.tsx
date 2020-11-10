@@ -19,6 +19,7 @@ import { IPipeline } from '../../domain';
 import { ApplicationDataSource } from '../service/applicationDataSource';
 
 import { ApplicationNavigation } from './ApplicationNavigation';
+import { SETTINGS } from 'core/config';
 
 describe('ApplicationNavigation', () => {
   let $uiRouter: UIRouterReact;
@@ -75,6 +76,7 @@ describe('ApplicationNavigation', () => {
   });
 
   it('should render pager button', () => {
+    SETTINGS.feature.pagerDuty = true;
     const app = ApplicationModelBuilder.createApplicationForTests('testapp');
     app.attributes.pdApiKey = 'fake-api-key';
 
