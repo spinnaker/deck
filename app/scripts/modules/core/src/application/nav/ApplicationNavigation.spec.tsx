@@ -69,6 +69,9 @@ describe('ApplicationNavigation', () => {
 
     const navSections = wrapper.find('NavSection');
     expect(navSections.length).toEqual(3);
+
+    const pagerDutyButton = wrapper.find('.page-category');
+    expect(pagerDutyButton.length).toEqual(0);
   });
 
   it('should render pager button', () => {
