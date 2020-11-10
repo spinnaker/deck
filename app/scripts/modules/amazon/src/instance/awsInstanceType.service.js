@@ -270,6 +270,7 @@ module(AMAZON_INSTANCE_AWSINSTANCETYPE_SERVICE, []).factory('awsInstanceTypeServ
       hvm: ['c3', 'c4', 'd2', 'i2', 'g2', 'm3', 'm4', 'm5', 'p2', 'r3', 'r4', 'r5', 't2', 'x1'],
       vpcOnly: ['c4', 'm4', 'm5', 'r4', 'r5', 't2', 'x1'],
       ebsOptimized: ['c4', 'd2', 'f1', 'g3', 'i3', 'm4', 'm5', 'p2', 'r4', 'r5', 'x1'],
+      burstablePerf: ['t2', 't3', 't3a', 't4g'],
     };
 
     function filterInstanceTypes(instanceTypes, virtualizationType, vpcOnly) {
@@ -297,12 +298,44 @@ module(AMAZON_INSTANCE_AWSINSTANCETYPE_SERVICE, []).factory('awsInstanceTypeServ
       return families.ebsOptimized.includes(family);
     }
 
+    function isBurstingSupported(instanceType) {
+      if (!instanceType) {
+        return false;
+      }
+      const [family] = instanceType.split('.');
+      return families.burstablePerf.includes(family);
+    }
+
+    function isInstanceTypeInCategory(instanceType, category) {
+      if (!instanceType || !category) {
+        return false;
+      }
+
+      if (category === 'custom') {
+        return true;
+      }
+
+      const [family] = instanceType.split('.');
+      let familyInCategory = defaultCategories
+        .filter((c) => c.type === category)[0]
+        .families.filter((t) => t.type === family);
+
+      let isTypeInCategory =
+        familyInCategory &&
+        familyInCategory.length > 0 &&
+        familyInCategory[0].instanceTypes.map((t) => t.name).includes(instanceType);
+
+      return isTypeInCategory;
+    }
+
     return {
       getCategories,
       getAvailableTypesForRegions,
       getAllTypesByRegion,
       filterInstanceTypes,
       isEbsOptimized,
+      isBurstingSupported,
+      isInstanceTypeInCategory,
     };
   },
 ]);

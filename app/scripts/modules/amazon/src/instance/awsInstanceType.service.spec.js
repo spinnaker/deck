@@ -133,4 +133,61 @@ describe('Service: InstanceType', function () {
       ]);
     });
   });
+
+  describe('isBurstingSupported', function () {
+    it('identifies burstable performance instance types correctly', function () {
+      let types = ['t2.small', 't3.nano', 't3a.medium', 't4g.large', 'm5.small', 'r5.4xlarge'];
+      let service = this.awsInstanceTypeService;
+
+      let supportedInstanceTypes = [];
+      for (it of types) {
+        const actualResult = service.isBurstingSupported(it);
+        if (actualResult) {
+          supportedInstanceTypes.push(it);
+        }
+      }
+
+      expect(supportedInstanceTypes).toEqual(['t2.small', 't3.nano', 't3a.medium', 't4g.large']);
+    });
+  });
+
+  describe('isInstanceTypeInCategory', function () {
+    it('identifies instance types in category correctly', function () {
+      let input = [
+        { type: 'm5.large', cat: 'general' },
+        { type: 't2.small', cat: 'general' },
+        { type: 't2.medium', cat: 'general' },
+        { type: 'r5.large', cat: 'memory' },
+        { type: 'r5.xlarge', cat: 'memory' },
+        { type: 't2.nano', cat: 'micro' },
+        { type: 't2.micro', cat: 'micro' },
+        { type: 't2.small', cat: 'micro' },
+        { type: 'm3.small', cat: 'custom' },
+        { type: 'a1.medium', cat: 'custom' },
+      ];
+      let service = this.awsInstanceTypeService;
+
+      for (input of input) {
+        expect(service.isInstanceTypeInCategory(input.type, input.cat)).toBeTrue();
+      }
+    });
+
+    it('identifies instance types NOT in category correctly', function () {
+      let input = [
+        { type: 'm5.large', cat: 'memory' },
+        { type: 't2.small', cat: 'memory' },
+        { type: 't2.medium', cat: 'memory' },
+        { type: 'r5.large', cat: 'general' },
+        { type: 'r5.xlarge', cat: 'micro' },
+        { type: 't2.nano', cat: 'general' },
+        { type: 't2.micro', cat: 'memory' },
+        { type: 't2.small', cat: 'memory' },
+      ];
+      let service = this.awsInstanceTypeService;
+
+      for (input of input) {
+        expect(service.isInstanceTypeInCategory(input.type, input.cat)).toBeFalse();
+      }
+    });
+  });
 });
