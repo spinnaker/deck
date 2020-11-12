@@ -1,7 +1,6 @@
 import React, { MouseEventHandler } from 'react';
-import { useSref } from '@uirouter/react';
+import { useSref, useCurrentStateAndParams } from '@uirouter/react';
 import ReactGA from 'react-ga';
-import { ReactInjector } from 'core/reactShims';
 
 import { ExecutionInformationService } from './executionInformation.service';
 import { IExecution } from 'core/domain';
@@ -25,7 +24,7 @@ export const ExecutionBreadcrumbs = ({ execution }: IExecutionBreadcrumbsProps) 
       <span>{label}: </span>
       {parentExecutions.map((execution, index, array) => (
         <React.Fragment key={execution.id}>
-          <ParentExecutionLink execution={execution} />
+          <ExecutionPermaLink execution={execution} />
           {index !== array.length - 1 && <i className="fas fa-angle-right execution-breadcrumb-marker"></i>}
         </React.Fragment>
       ))}
@@ -33,11 +32,11 @@ export const ExecutionBreadcrumbs = ({ execution }: IExecutionBreadcrumbsProps) 
   );
 };
 
-function ParentExecutionLink({ execution }: IExecutionBreadcrumbsProps) {
-  const { $state } = ReactInjector;
+function ExecutionPermaLink({ execution }: IExecutionBreadcrumbsProps) {
   const { application, id: executionId } = execution;
+  const { state } = useCurrentStateAndParams();
 
-  const isProject = $state.current.name.includes('.project.');
+  const isProject = state.name.includes('.project.');
   const executionDetails = `home.${isProject ? 'project.' : 'applications.'}application.pipelines.executionDetails`;
   const toState = executionDetails + '.execution';
   const srefParams = { application, executionId };
