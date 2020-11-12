@@ -1,6 +1,7 @@
 import React from 'react';
 import { has } from 'lodash';
 
+import { ExecutionBuildLink } from '../executionBuild/ExecutionBuildLink';
 import { IExecution } from 'core/domain';
 import { HoverablePopover } from 'core/presentation';
 import { IScheduler } from 'core/scheduler/SchedulerFactory';
@@ -87,6 +88,9 @@ export class ExecutionStatus extends React.Component<IExecutionStatusProps, IExe
     return (
       <div className="execution-status-section">
         <span className={`trigger-type ${this.state.sortFilter.groupBy !== name ? 'subheading' : ''}`}>
+          <h5 className="build-number">
+            <ExecutionBuildLink execution={execution} />
+          </h5>
           <h5 className={`execution-type ${trigger.dryRun ? 'execution-dry-run' : ''}`}>
             {trigger.dryRun && 'DRY RUN: '}
             {this.getExecutionTypeDisplay()}

@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { UISref } from '@uirouter/react';
+import React, { MouseEventHandler } from 'react';
+import { useSref } from '@uirouter/react';
+import ReactGA from 'react-ga';
+import { ReactInjector } from 'core/reactShims';
 
 import { ExecutionInformationService } from './executionInformation.service';
 import { IExecution } from 'core/domain';
@@ -8,45 +10,52 @@ export interface IExecutionBreadcrumbsProps {
   execution: IExecution;
 }
 
-export const ExecutionBreadcrumbs: React.FC<IExecutionBreadcrumbsProps> = ({ execution }) => {
-  const [executions, setExecutions] = useState([]);
-
-  const informationService = new ExecutionInformationService();
-
-  useEffect(() => {
-    const execs = informationService.getAllParentExecutions(execution);
-    setExecutions(execs);
-  });
+export const ExecutionBreadcrumbs = ({ execution }: IExecutionBreadcrumbsProps) => {
+  const parentExecutions = React.useMemo(() => {
+    return new ExecutionInformationService()
+      .getAllParentExecutions(execution)
+      .filter((x) => x !== execution)
+      .reverse();
+  }, []);
 
   return (
     <div>
-      {executions.length > 1 && <span>Parent Executions: </span>}
-      {executions.length > 1 &&
-        executions.shift() &&
-        [...executions].reverse().map((execution, index, array) => (
-          <React.Fragment key={execution.id}>
-            <UISref
-              to="home.applications.application.pipelines.executionDetails.execution"
-              params={{
-                application: execution.application,
-                executionId: execution.id,
-                executionParams: {
-                  application: execution.application,
-                  executionId: execution.id,
-                },
-              }}
-              options={{
-                inherit: false,
-                reload: 'home.applications.application.pipelines.executionDetails',
-              }}
-            >
-              <a style={{ display: 'inline' }} className="execution-build-number clickable">
-                {execution.name}
-              </a>
-            </UISref>
-            {index !== array.length - 1 && <i className="fas fa-angle-right execution-breadcrumb-marker"></i>}
-          </React.Fragment>
-        ))}
+      <span>Parent Executions: </span>
+      {parentExecutions.map((execution, index, array) => (
+        <React.Fragment key={execution.id}>
+          <ParentExecutionLink execution={execution} />
+          {index !== array.length - 1 && <i className="fas fa-angle-right execution-breadcrumb-marker"></i>}
+        </React.Fragment>
+      ))}
     </div>
   );
 };
+
+function ParentExecutionLink({ execution }: IExecutionBreadcrumbsProps) {
+  const { $state } = ReactInjector;
+  const { application, id: executionId } = execution;
+
+  const toState = `${$state.current.name.endsWith('.execution') ? '^' : ''}.^.executionDetails.execution`;
+  const srefParams = { application, executionId };
+  const srefOptions = {
+    inherit: false,
+    reload: 'home.applications.application.pipelines.executionDetails',
+  };
+  const sref = useSref(toState, srefParams, srefOptions);
+
+  const handleClick: MouseEventHandler<any> = (e) => {
+    ReactGA.event({ category: 'Pipeline', action: 'Execution build number clicked - parent pipeline' });
+    sref.onClick(e);
+  };
+
+  return (
+    <a
+      href={sref.href}
+      onClick={handleClick}
+      style={{ display: 'inline' }}
+      className="execution-build-number clickable"
+    >
+      {execution.name}
+    </a>
+  );
+}

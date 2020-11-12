@@ -327,6 +327,8 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
       'show-durations': showDurations,
     });
 
+    const hasParentExecution = !!execution.trigger?.parentExecution;
+
     return (
       <div className={className} id={`execution-${execution.id}`} ref={this.wrapperRef}>
         <div className={`execution-overview group-by-${sortFilter.groupBy}`}>
@@ -337,9 +339,11 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
               {title || execution.name}
             </h4>
           )}
-          <div className="execution-breadcrumbs">
-            <ExecutionBreadcrumbs execution={execution} />
-          </div>
+          {hasParentExecution && (
+            <div className="execution-breadcrumbs">
+              <ExecutionBreadcrumbs execution={execution} />
+            </div>
+          )}
           <ExecutionStatus execution={execution} showingDetails={showingDetails} standalone={standalone} />
           <div className="execution-bar">
             <div className="stages">
