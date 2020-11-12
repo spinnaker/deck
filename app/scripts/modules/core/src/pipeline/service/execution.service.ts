@@ -22,7 +22,7 @@ export class ExecutionService {
   public get activeStatuses(): string[] {
     return ['RUNNING', 'SUSPENDED', 'PAUSED', 'NOT_STARTED'];
   }
-  private runningLimit = SETTINGS.defaultExecutionResults || 30;
+  private runningLimit = SETTINGS.maxRunningExecutionsToRetrieve || 30;
 
   private ignoredStringValFields = [
     'asg',
