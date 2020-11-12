@@ -1,7 +1,6 @@
 import React from 'react';
 import { has } from 'lodash';
 
-import { ExecutionBuildLink } from '../executionBuild/ExecutionBuildLink';
 import { IExecution } from 'core/domain';
 import { HoverablePopover } from 'core/presentation';
 import { IScheduler } from 'core/scheduler/SchedulerFactory';
@@ -12,6 +11,7 @@ import { ISortFilter } from 'core/filterModel';
 import { ExecutionState } from 'core/state';
 
 import { buildDisplayName } from '../executionBuild/buildDisplayName.filter';
+import { ExecutionBuildLink } from '../executionBuild/ExecutionBuildLink';
 import { ExecutionUserStatus } from './ExecutionUserStatus';
 
 import './executionStatus.less';
