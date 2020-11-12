@@ -18,9 +18,11 @@ export const ExecutionBreadcrumbs = ({ execution }: IExecutionBreadcrumbsProps) 
       .reverse();
   }, []);
 
+  const label = parentExecutions.length === 1 ? 'Parent Execution' : 'Parent Executions';
+
   return (
     <div>
-      <span>Parent Executions: </span>
+      <span>{label}: </span>
       {parentExecutions.map((execution, index, array) => (
         <React.Fragment key={execution.id}>
           <ParentExecutionLink execution={execution} />
@@ -35,12 +37,11 @@ function ParentExecutionLink({ execution }: IExecutionBreadcrumbsProps) {
   const { $state } = ReactInjector;
   const { application, id: executionId } = execution;
 
-  const toState = `${$state.current.name.endsWith('.execution') ? '^' : ''}.^.executionDetails.execution`;
+  const isProject = $state.current.name.includes('.project.');
+  const executionDetails = `home.${isProject ? 'project.' : 'applications.'}application.pipelines.executionDetails`;
+  const toState = executionDetails + '.execution';
   const srefParams = { application, executionId };
-  const srefOptions = {
-    inherit: false,
-    reload: 'home.applications.application.pipelines.executionDetails',
-  };
+  const srefOptions = { reload: executionDetails };
   const sref = useSref(toState, srefParams, srefOptions);
 
   const handleClick: MouseEventHandler<any> = (e) => {
