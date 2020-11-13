@@ -201,18 +201,6 @@ html {
         width: 260px;
       }
     }
-
-    .main-content {
-      > .header {
-        margin-left: 68px;
-      }
-    }
-
-    .nav-content {
-      > .header {
-        margin-left: 80px;
-      }
-    }
   }
 
   &.filters-expanded {
@@ -287,7 +275,8 @@ html {
   .detail-content {
     z-index: var(--layer-high);
     position: absolute;
-    margin-top: -20px;
+    top: 0;
+    // margin-top: -20px;
     height: 100%;
     width: 390px;
     box-shadow: 2px 2px 6px -1px var(--color-alto);

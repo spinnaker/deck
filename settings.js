@@ -92,6 +92,7 @@ window.spinnakerSettings = {
   gateUrl: apiHost,
   gitSources: ['stash', 'github', 'bitbucket', 'gitlab'],
   hiddenStages: [],
+  migrations: [],
   managedDelivery: {
     defaultManifest: 'spinnaker.yml',
     manifestBasePath: '.spinnaker',

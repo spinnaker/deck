@@ -53,6 +53,13 @@ export interface IDockerInsightSettings {
   url: string;
 }
 
+export interface IMigrationSettings {
+  title: string;
+  details: string;
+  active: boolean;
+  routes: string[];
+}
+
 export interface INewApplicationDefaults {
   chaosMonkey?: boolean;
 }
@@ -103,6 +110,7 @@ export interface ISpinnakerSettings {
     manifestBasePath: string;
   };
   maxPipelineAgeDays: number;
+  migrations?: IMigrationSettings[];
   newApplicationDefaults: INewApplicationDefaults;
   notifications: INotificationSettings;
   onDemandClusterThreshold: number;
@@ -142,7 +150,7 @@ SETTINGS.managedDelivery = SETTINGS.managedDelivery || {
   manifestBasePath: '.spinnaker',
 };
 
-// A helper to make resetting settings to steady state after running tests easier
+// A helper to make resetting settings to steady Migrations after running tests easier
 const originalSettings: ISpinnakerSettings = cloneDeep(SETTINGS);
 SETTINGS.resetToOriginal = () => {
   Object.keys(SETTINGS)
