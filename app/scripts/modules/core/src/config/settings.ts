@@ -54,8 +54,9 @@ export interface IDockerInsightSettings {
 }
 
 export interface IMigrationSettings {
-  title: string;
-  details: string;
+  key: string;
+  title?: string;
+  details?: string;
   active: boolean;
   routes: string[];
 }
@@ -150,7 +151,7 @@ SETTINGS.managedDelivery = SETTINGS.managedDelivery || {
   manifestBasePath: '.spinnaker',
 };
 
-// A helper to make resetting settings to steady Migrations after running tests easier
+// A helper to make resetting settings to steady state after running tests easier
 const originalSettings: ISpinnakerSettings = cloneDeep(SETTINGS);
 SETTINGS.resetToOriginal = () => {
   Object.keys(SETTINGS)
