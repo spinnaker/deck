@@ -40,7 +40,7 @@ export interface IUnpinArtifactModalProps extends IModalComponentProps {
 
 export const showUnpinArtifactModal = (props: IUnpinArtifactModalProps) =>
   showModal(UnpinArtifactModal, props, { maxWidth: 628 }).then((result) => {
-    if (status === 'DISMISSED') {
+    if (result.status === 'DISMISSED') {
       logEvent('Modal dismissed', props.application.name);
     }
     return result;

@@ -63,7 +63,7 @@ export interface IPinArtifactModalProps extends IModalComponentProps {
 
 export const showPinArtifactModal = (props: IPinArtifactModalProps) =>
   showModal(PinArtifactModal, props, { maxWidth: 750 }).then((result) => {
-    if (status === 'DISMISSED') {
+    if (result.status === 'DISMISSED') {
       logEvent('Modal dismissed', props.application.name);
     }
     return result;
