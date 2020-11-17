@@ -27,6 +27,6 @@ export * from './tables';
 export * from './TetheredCreatable';
 export * from './TetheredSelect';
 export * from './text';
-export * from './ToggleButtonGroupInput';
+export * from './ToggleButtonGroup';
 export * from './Tooltip';
 export * from './WatchValue';

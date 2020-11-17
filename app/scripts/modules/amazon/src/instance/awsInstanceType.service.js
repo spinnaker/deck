@@ -316,16 +316,10 @@ module(AMAZON_INSTANCE_AWSINSTANCETYPE_SERVICE, []).factory('awsInstanceTypeServ
       }
 
       const [family] = instanceType.split('.');
-      let familyInCategory = defaultCategories
-        .filter((c) => c.type === category)[0]
-        .families.filter((t) => t.type === family);
+      const instanceCategory = _.find(defaultCategories, { type: category });
+      const familyInCategory = instanceCategory && _.find(instanceCategory.families, { type: family });
 
-      let isTypeInCategory =
-        familyInCategory &&
-        familyInCategory.length > 0 &&
-        familyInCategory[0].instanceTypes.map((t) => t.name).includes(instanceType);
-
-      return isTypeInCategory;
+      return familyInCategory && familyInCategory.instanceTypes.map((t) => t.name).includes(instanceType);
     }
 
     return {

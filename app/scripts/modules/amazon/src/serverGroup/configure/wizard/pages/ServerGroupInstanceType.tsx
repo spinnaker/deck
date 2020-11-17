@@ -66,6 +66,7 @@ export class ServerGroupInstanceType
     const showTypeSelector = !!(values.viewState.disableImageSelection || values.amiName);
 
     const isLaunchTemplatesEnabled = AWSProviderSettings.serverGroups?.enableLaunchTemplates;
+    const isCpuCreditsEnabled = AWSProviderSettings.serverGroups?.enableCpuCredits;
 
     if (showTypeSelector && values) {
       return (
@@ -82,7 +83,7 @@ export class ServerGroupInstanceType
               )}
             </div>
           </div>
-          {isLaunchTemplatesEnabled && (
+          {isLaunchTemplatesEnabled && isCpuCreditsEnabled && (
             <div className="row">
               <CpuCreditsToggle
                 command={values}
