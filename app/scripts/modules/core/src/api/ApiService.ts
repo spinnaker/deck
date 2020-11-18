@@ -5,8 +5,8 @@ import { SETTINGS } from 'core/config/settings';
 import { ICache } from 'core/cache';
 import { isNil } from 'lodash';
 
-type toStringable = { toString(): string };
-type IParams = Record<string, toStringable | toStringable[]>;
+type IPrimitive = string | boolean | number;
+type IParams = Record<string, IPrimitive | IPrimitive[]>;
 
 export interface IRequestBuilder {
   config?: IRequestConfig;
