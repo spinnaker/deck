@@ -11,7 +11,7 @@ export interface IWizardStepInjectedProps {
    *
    *  In component...
    *  validate = () => {
-   *    validatorSubscription(!errors.length)
+   *    isValid(!errors.length)
    *  }
    */
   validatorSubscription: Subject<boolean>;
