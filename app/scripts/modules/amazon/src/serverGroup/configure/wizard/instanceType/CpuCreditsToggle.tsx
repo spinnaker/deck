@@ -13,38 +13,32 @@ export interface ICpuCreditsToggleProps {
 }
 
 export function CpuCreditsToggle(props: ICpuCreditsToggleProps) {
-  const handleInstanceTypeChange = (): boolean => {
-    const isBurstingSupported = AwsReactInjector.awsInstanceTypeService.isBurstingSupported(props.newInstanceType);
-    if (!isBurstingSupported) {
-      props.setUnlimitedCpuCredits(undefined);
+  const [showToggle, setShowToggle] = React.useState(false);
+  React.useEffect(() => {
+    if (props.newInstanceType) {
+      const isBurstingSupportedForNewInstance = AwsReactInjector.awsInstanceTypeService.isBurstingSupported(
+        props.newInstanceType,
+      );
+      if (!isBurstingSupportedForNewInstance) {
+        props.setUnlimitedCpuCredits(undefined);
+      }
+      setShowToggle(isBurstingSupportedForNewInstance);
     }
-    return isBurstingSupported;
-  };
 
-  const handleProfileChange = (): boolean => {
-    const instanceType = props.command.instanceType;
-    const isTypeInProfile = AwsReactInjector.awsInstanceTypeService.isInstanceTypeInCategory(
-      instanceType,
-      props.newProfileType,
-    );
-    const isBurstingSupported = AwsReactInjector.awsInstanceTypeService.isBurstingSupported(instanceType);
-    if (instanceType && isTypeInProfile && isBurstingSupported) {
-      return true;
+    if (props.newProfileType) {
+      const { instanceType } = props.command;
+      const isTypeInProfile = AwsReactInjector.awsInstanceTypeService.isInstanceTypeInCategory(
+        instanceType,
+        props.newProfileType,
+      );
+      const isBurstingSupportedForInstance = AwsReactInjector.awsInstanceTypeService.isBurstingSupported(instanceType);
+      setShowToggle(instanceType && isTypeInProfile && isBurstingSupportedForInstance);
     }
-    return false;
-  };
+  }, [props.newProfileType, props.newInstanceType]);
 
   const handleToggleChange = (state: boolean) => {
     props.setUnlimitedCpuCredits(state);
   };
-
-  let showToggle = false;
-  if (props.newInstanceType) {
-    showToggle = handleInstanceTypeChange();
-  }
-  if (props.newProfileType) {
-    showToggle = handleProfileChange();
-  }
 
   return (
     <div>
