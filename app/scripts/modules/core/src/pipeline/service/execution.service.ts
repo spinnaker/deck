@@ -119,6 +119,10 @@ export class ExecutionService {
       });
   }
 
+  public getCrossApplicationExecutionContext(executionId: string): PromiseLike<IExecution> {
+    return API.one('pipelines', executionId).get();
+  }
+
   public transformExecutions(application: Application, executions: IExecution[], currentData: IExecution[] = []): void {
     if (!executions || !executions.length) {
       return;

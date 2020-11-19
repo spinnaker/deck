@@ -324,7 +324,7 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
         execution={execution}
         manualJudgment={
           this.props.manualJudgment !== undefined && this.props.manualJudgment[this.props.execution.id]
-            ? this.props.manualJudgment[this.props.execution.id]
+            ? this.props.manualJudgment
             : []
         }
         onWait={this.finalChild}
