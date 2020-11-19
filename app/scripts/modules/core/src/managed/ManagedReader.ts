@@ -1,4 +1,3 @@
-
 import { get, set, flatMap } from 'lodash';
 
 import { API } from 'core/api';
@@ -9,7 +8,6 @@ import {
   IManagedResourceEventHistory,
   IManagedResourceDiff,
   IManagedResourceEvent,
-  IManagedApplicationEnvironmentSummary,
 } from 'core/domain';
 
 const KIND_NAME_MATCHER = /.*\/(.*?)@/i;
@@ -90,7 +88,7 @@ export class ManagedReader {
       .then(this.decorateResources);
   }
 
-  public static getEnvironmentsSummary(app: string): PromiseLike<IManagedApplicationEnvironmentSummary> {
+  public static getEnvironmentsSummary(app: string): PromiseLike<IManagedApplicationSummary> {
     return API.one('managed')
       .one('application', app)
       .withParams({ entities: ['resources', 'artifacts', 'environments'], maxArtifactVersions: 30 })
