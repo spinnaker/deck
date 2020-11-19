@@ -22,6 +22,7 @@ export * from './sortToggle';
 export * from './SpanDropdownTrigger';
 export * from './SpinErrorBoundary';
 export * from './spel';
+export * from './stepWizard';
 export * from './TabBoundary';
 export * from './tables';
 export * from './TetheredCreatable';
