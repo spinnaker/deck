@@ -3,7 +3,7 @@ import * as React from 'react';
 import { Application } from 'core/application/application.model';
 import { FilterTags, IFilterTag } from 'core/filterModel/FilterTags';
 import { ISecurityGroupGroup } from 'core/domain';
-import { MigrationsContainer } from 'core/migration';
+import { BannerContainer } from 'core/banner';
 import { SecurityGroupState } from 'core/state';
 import { Spinner } from 'core/widgets/spinners/Spinner';
 import { ISortFilter } from 'core/filterModel';
@@ -149,7 +149,7 @@ export const SecurityGroups = ({ app }: ISecurityGroupsProps) => {
       </div>
 
       <div className="content">
-        <MigrationsContainer app={app} />
+        <BannerContainer app={app} />
         {groupings}
       </div>
     </div>

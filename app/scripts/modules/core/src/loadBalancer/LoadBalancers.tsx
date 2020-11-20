@@ -8,7 +8,7 @@ import { ISortFilter } from 'core/filterModel/IFilterModel';
 import { ILoadBalancerGroup } from 'core/domain';
 import { LoadBalancerState } from 'core/state';
 import { LoadBalancerPod } from './LoadBalancerPod';
-import { MigrationsContainer } from 'core/migration';
+import { BannerContainer } from 'core/banner';
 import { Spinner } from 'core/widgets/spinners/Spinner';
 
 import { NgReact, ReactInjector } from 'core/reactShims';
@@ -190,7 +190,7 @@ export class LoadBalancers extends React.Component<ILoadBalancersProps, ILoadBal
         </div>
 
         <div className="content">
-          <MigrationsContainer app={this.props.app} />
+          <BannerContainer app={this.props.app} />
           {groupings}
         </div>
       </div>

@@ -53,10 +53,8 @@ export interface IDockerInsightSettings {
   url: string;
 }
 
-export interface IMigrationSettings {
+export interface IBannerSettings {
   key: string;
-  title?: string;
-  details?: string;
   active: boolean;
   routes: string[];
 }
@@ -78,6 +76,7 @@ export interface ISpinnakerSettings {
   authEndpoint: string;
   authTtl: number;
   bakeryDetailUrl: string;
+  banners?: IBannerSettings[];
   checkForUpdates: boolean;
   debugEnabled: boolean;
   maxRunningExecutionsToRetrieve: number;
@@ -111,7 +110,6 @@ export interface ISpinnakerSettings {
     manifestBasePath: string;
   };
   maxPipelineAgeDays: number;
-  migrations?: IMigrationSettings[];
   newApplicationDefaults: INewApplicationDefaults;
   notifications: INotificationSettings;
   onDemandClusterThreshold: number;

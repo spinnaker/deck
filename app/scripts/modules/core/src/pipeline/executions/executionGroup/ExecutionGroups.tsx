@@ -7,7 +7,7 @@ import { IExecutionGroup } from 'core/domain';
 import { ReactInjector } from 'core/reactShims';
 import { ExecutionState } from 'core/state';
 import { ExecutionFilterService } from '../../filter/executionFilter.service';
-import { MigrationsContainer } from 'core/migration';
+import { BannerContainer } from 'core/banner';
 
 import './executionGroups.less';
 
@@ -102,7 +102,7 @@ export class ExecutionGroups extends React.Component<IExecutionGroupsProps, IExe
             </div>
           )}
           <div className="execution-groups all-execution-groups" ref={this.setContainer}>
-            <MigrationsContainer app={this.props.application} />
+            <BannerContainer app={this.props.application} />
             {container && executionGroups}
           </div>
         </div>

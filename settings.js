@@ -35,6 +35,7 @@ window.spinnakerSettings = {
   authEndpoint: authEndpoint,
   authTtl: 600000,
   bakeryDetailUrl: bakeryDetailUrl,
+  banners: [],
   canary: {
     atlasWebComponentsUrl: atlasWebComponentsUrl,
     defaultJudge: 'NetflixACAJudge-v1.0',
@@ -92,7 +93,6 @@ window.spinnakerSettings = {
   gateUrl: apiHost,
   gitSources: ['stash', 'github', 'bitbucket', 'gitlab'],
   hiddenStages: [],
-  migrations: [],
   managedDelivery: {
     defaultManifest: 'spinnaker.yml',
     manifestBasePath: '.spinnaker',
