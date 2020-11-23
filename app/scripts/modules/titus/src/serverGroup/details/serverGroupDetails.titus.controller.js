@@ -133,13 +133,16 @@ angular
         serverGroup.scalingPolicies = (serverGroup.scalingPolicies || [])
           .map((p) => {
             const { policy } = p;
-            const { stepPolicyDescriptor } = policy;
+            const { stepPolicyDescriptor, targetPolicyDescriptor } = policy;
             const policyType = stepPolicyDescriptor ? 'StepScaling' : 'TargetTrackingScaling';
             if (stepPolicyDescriptor) {
               const alarm = stepPolicyDescriptor.alarmConfig;
               alarm.period = alarm.periodSec;
               alarm.namespace = alarm.metricNamespace;
+              alarm.disableEditingDimensions = true;
               if (alarm.metricNamespace === 'NFLX/EPIC' && !alarm.dimensions) {
+                // NOTE: Titus creates the step scaling policy with these dimensions
+                // TODO: Remove this once Titus supports configuring dimensions
                 alarm.dimensions = [{ name: 'AutoScalingGroupName', value: serverGroup.name }];
               }
               if (!alarm.dimensions) {
@@ -167,6 +170,10 @@ angular
               }
               return policy;
             } else {
+              const { customizedMetricSpecification } = targetPolicyDescriptor;
+              if (customizedMetricSpecification.dimensions === undefined) {
+                customizedMetricSpecification.dimensions = [];
+              }
               policy.id = p.id;
               policy.targetTrackingConfiguration = policy.targetPolicyDescriptor;
               policy.targetTrackingConfiguration.scaleOutCooldown =
