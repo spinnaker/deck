@@ -32,7 +32,7 @@ export const BannerContainerContent = ({ app }: IBannerContainerProps) => {
     })
     .map((m: IBannerSettings) => {
       const CustomBanner = customBannersByName[m.key];
-      return <CustomBanner key={`migration-${m.key}`} app={app} />;
+      return <CustomBanner key={`banner-${m.key}`} app={app} />;
     });
 
   if (!validBanners.length) {
