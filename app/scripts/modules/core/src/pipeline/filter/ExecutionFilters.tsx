@@ -271,8 +271,8 @@ export class ExecutionFilters extends React.Component<IExecutionFiltersProps, IE
                 <FilterStatus status="BUFFERED" label="Buffered" refresh={this.refreshExecutions} />
                 <FilterStages
                   status="RUNNING"
-                  stages="MANUAL_JUDGMENT"
-                  label="Manual Judgment"
+                  stages="AWAITING_JUDGMENT"
+                  label="Awaiting Judgment"
                   refresh={this.refreshExecutions}
                 />
               </div>
