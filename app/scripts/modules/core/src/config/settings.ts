@@ -54,6 +54,12 @@ export interface IDockerInsightSettings {
   url: string;
 }
 
+export interface IBannerSettings {
+  key: string;
+  active: boolean;
+  routes: string[];
+}
+
 export interface INewApplicationDefaults {
   chaosMonkey?: boolean;
 }
@@ -71,6 +77,7 @@ export interface ISpinnakerSettings {
   authEndpoint: string;
   authTtl: number;
   bakeryDetailUrl: string;
+  banners?: IBannerSettings[];
   checkForUpdates: boolean;
   debugEnabled: boolean;
   maxRunningExecutionsToRetrieve: number;
