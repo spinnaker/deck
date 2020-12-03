@@ -3,48 +3,17 @@
   <a ui-sref="home.infrastructure">Back to search results</a>
 </div>
 <div class="details-panel" ng-if="!state.notFoundStandalone">
-  <div class="header" ng-if="state.loading">
-    <div class="close-button" ng-if="!state.standalone">
-      <a class="btn btn-link" ui-sref="^">
-        <span class="glyphicon glyphicon-remove"></span>
-      </a>
-    </div>
-    <div class="horizontal center spinner-container">
-      <loading-spinner size="'small'"></loading-spinner>
-    </div>
-  </div>
-
-  <div class="header" ng-if="!state.loading">
-    <div class="close-button" ng-if="!state.standalone">
-      <a class="btn btn-link" ui-sref="^">
-        <span class="glyphicon glyphicon-remove"></span>
-      </a>
-    </div>
-    <div class="header-text horizontal middle">
-      <span class="glyphicon glyphicon-hdd {{instance.healthState}}"></span>
-      <h3 class="horizontal middle space-between flex-1" select-on-dbl-click>
-        {{instance ? instance.instanceId : instanceIdNotFound }}
-      </h3>
-      <copy-to-clipboard
-        class="copy-to-clipboard copy-to-clipboard-sm"
-        text="instance.instanceId"
-        tool-tip="'Copy to clipboard'"
-      >
-      </copy-to-clipboard>
-    </div>
-    <div>
+  <div class="header">
+    <instance-details-header
+      health-state="instance.healthState"
+      instance-id="instance.instanceId || instanceIdNotFound"
+      loading="state.loading"
+      standalone="state.standalone"
+    ></instance-details-header>
+    <div ng-if="!state.loading">
       <div class="actions" ng-class="{ insights: instance.insightActions.length > 0 }" ng-if="instance.placement">
         <instance-actions actions="instanceActions"></instance-actions>
-        <div class="dropdown" ng-if="instance.insightActions.length > 0" uib-dropdown dropdown-append-to-body>
-          <button type="button" class="btn btn-sm btn-default dropdown-toggle" uib-dropdown-toggle>
-            Insight <span class="caret"></span>
-          </button>
-          <ul class="dropdown-menu" uib-dropdown-menu role="menu">
-            <li ng-repeat="action in instance.insightActions">
-              <a target="_blank" href="{{action.url}}">{{action.label}}</a>
-            </li>
-          </ul>
-        </div>
+        <instance-insights insights="instance.insightActions" instance="instance"></instance-insights>
       </div>
     </div>
   </div>
@@ -103,24 +72,8 @@
         </dd>
       </dl>
     </collapsible-section>
-    <collapsible-section heading="{{securityGroupsLabel}}">
-      <ul>
-        <li ng-repeat="securityGroup in instance.securityGroups | orderBy:'groupName'">
-          <a
-            ui-sref="^.firewallDetails({name:securityGroup.groupName, accountId: instance.account, region: instance.region, vpcId: instance.vpcId, provider: instance.provider})"
-          >
-            {{securityGroup.groupName}} ({{securityGroup.groupId}})
-          </a>
-        </li>
-      </ul>
-    </collapsible-section>
-    <collapsible-section heading="Tags">
-      <div ng-if=" !instance.tags.length">No tags associated with this server</div>
-      <dl ng-if="instance.tags.length">
-        <dt ng-repeat-start="tag in instance.tags | orderBy: 'key.toLowerCase()'">{{tag.key}}</dt>
-        <dd ng-repeat-end>{{tag.value}}</dd>
-      </dl>
-    </collapsible-section>
+    <instance-security-groups instance="instance"></instance-security-groups>
+    <instance-tags tags="instance.tags"></instance-tags>
     <collapsible-section heading="Console Output" ng-if="baseIpAddress">
       <ul>
         <li>

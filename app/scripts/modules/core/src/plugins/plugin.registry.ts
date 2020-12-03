@@ -1,5 +1,6 @@
 import { $http } from 'ngimport';
-import { API } from 'core/api';
+import { SETTINGS } from '../config/settings';
+import { API } from '../api/ApiService';
 import { registerPluginExtensions, IDeckPlugin } from './deck.plugin';
 
 /** The shape of plugin metadata objects in plugin-manifest.json */
@@ -98,7 +99,7 @@ export class PluginRegistry {
   public loadPluginManifestFromGate() {
     const source = 'gate';
     const uri = 'plugins/deck/plugin-manifest.json';
-    const loadPromise = API.one(...uri.split('/'))
+    const loadPromise: PromiseLike<IPluginMetaData[]> = API.one(...uri.split('/'))
       .get()
       .catch((error: any) => {
         console.error(`Failed to load ${uri} from ${source}`);
@@ -122,7 +123,7 @@ export class PluginRegistry {
   public async loadPluginManifest(
     source: ISource,
     location: string,
-    pluginsMetaDataPromise: Promise<IPluginMetaData[]>,
+    pluginsMetaDataPromise: PromiseLike<IPluginMetaData[]>,
   ): Promise<IPluginMetaData[]> {
     try {
       const plugins = await pluginsMetaDataPromise;
@@ -142,7 +143,7 @@ export class PluginRegistry {
 
     // Use `url` from the manifest, if it exists. This will be the case during local development.
     const { devUrl, url } = pluginMetaData;
-    const gateUrl = `${API.baseUrl}/plugins/deck/${pluginMetaData.id}/${pluginMetaData.version}/index.js`;
+    const gateUrl = `${SETTINGS.gateUrl}/plugins/deck/${pluginMetaData.id}/${pluginMetaData.version}/index.js`;
     const pluginUrl = url ?? devUrl ?? gateUrl;
 
     try {

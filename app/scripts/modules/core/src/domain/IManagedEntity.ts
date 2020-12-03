@@ -4,6 +4,7 @@ export enum ManagedResourceStatus {
   ACTUATING = 'ACTUATING',
   CREATED = 'CREATED',
   DIFF = 'DIFF',
+  DIFF_NOT_ACTIONABLE = 'DIFF_NOT_ACTIONABLE',
   CURRENTLY_UNRESOLVABLE = 'CURRENTLY_UNRESOLVABLE',
   MISSING_DEPENDENCY = 'MISSING_DEPENDENCY',
   ERROR = 'ERROR',
@@ -102,6 +103,17 @@ export interface IManagedArtifactVersion {
     replacedBy?: string;
     statefulConstraints?: IStatefulConstraint[];
     statelessConstraints?: IStatelessConstraint[];
+    compareLink?: string;
+  }>;
+  lifecycleSteps?: Array<{
+    // likely more scopes + types later, but hard-coding to avoid premature abstraction for now
+    scope: 'PRE_DEPLOYMENT';
+    type: 'BAKE';
+    id: string;
+    status: 'NOT_STARTED' | 'RUNNING' | 'SUCCEEDED' | 'FAILED';
+    startedAt?: string;
+    completedAt?: string;
+    link?: string;
   }>;
   build?: {
     id: number; // deprecated, use number
@@ -137,6 +149,7 @@ export interface IManagedArtifactVersion {
 }
 
 export type IManagedArtifactVersionEnvironment = IManagedArtifactSummary['versions'][0]['environments'][0];
+export type IManagedArtifactVersionLifecycleStep = IManagedArtifactSummary['versions'][0]['lifecycleSteps'][0];
 
 export interface IManagedArtifactSummary {
   name: string;

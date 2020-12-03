@@ -1,4 +1,4 @@
-import { IHttpPromiseCallbackArg, IPromise } from 'angular';
+import { IHttpPromiseCallbackArg } from 'angular';
 import { $log } from 'ngimport';
 
 import { API } from 'core/api/ApiService';
@@ -30,7 +30,7 @@ export interface ISearchResult {
   type: string;
 }
 
-export const getFallbackResults = (): ISearchResults<ISearchResult> => {
+const getFallbackResults = <T extends ISearchResult>(): ISearchResults<T> => {
   return { results: [] };
 };
 
@@ -42,23 +42,23 @@ export class SearchService {
   public static search<T extends ISearchResult>(
     searchParams: ISearchParams,
     cache: ICache = null,
-  ): IPromise<ISearchResults<T>> {
+  ): PromiseLike<ISearchResults<T>> {
     const defaultParams: ISearchParams = {
       pageSize: SearchService.DEFAULT_PAGE_SIZE,
     };
 
     const params = { ...searchParams, ...defaultParams };
 
-    const requestBuilder = API.one('search').withParams(params);
+    let requestBuilder = API.one('search').withParams(params);
 
     if (cache) {
-      requestBuilder.useCache(cache);
+      requestBuilder = requestBuilder.useCache(cache);
     }
 
     return requestBuilder
       .get()
       .then((response: Array<ISearchResults<T>>) => {
-        return response[0] || getFallbackResults();
+        return response[0] || getFallbackResults<T>();
       })
       .catch((response: IHttpPromiseCallbackArg<any>) => {
         $log.error(response.data, response);
