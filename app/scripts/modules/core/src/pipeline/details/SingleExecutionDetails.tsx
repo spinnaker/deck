@@ -152,8 +152,7 @@ export class SingleExecutionDetails extends React.Component<
     const { app } = this.props;
     const { execution, pipelineConfig, sortFilter, stateNotFound } = this.state;
 
-    const defaultExecutionParams = { application: app.name, executionId: execution ? execution.id : '' };
-    const executionParams = ReactInjector.$state.params.executionParams || defaultExecutionParams;
+    const executionParams = { application: app.name, pipeline: execution && execution.name };
 
     return (
       <div style={{ width: '100%', paddingTop: 0 }}>
@@ -164,13 +163,15 @@ export class SingleExecutionDetails extends React.Component<
                 <div className="flex-container-h baseline">
                   <h3>
                     <Tooltip value="Back to Executions">
-                      <UISref to="^.executions.execution" params={executionParams}>
+                      <UISref to="^.executions" params={executionParams}>
                         <a className="btn btn-configure">
                           <span className="glyphicon glyphicon glyphicon-circle-arrow-left" />
                         </a>
                       </UISref>
                     </Tooltip>
-                    {execution.name}
+                    <UISref to="^.executions" params={executionParams}>
+                      <a>{execution.name}</a>
+                    </UISref>
                   </h3>
 
                   <div className="form-group checkbox flex-pull-right">

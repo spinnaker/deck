@@ -203,7 +203,21 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
         if ($state.params.executionId) {
           const executions: IExecution[] = app.executions.data;
           if (executions.every((e) => e.id !== $state.params.executionId)) {
-            $state.go('.^');
+            const detailsState = $state.current.name.replace('executions.execution', 'executionDetails.execution');
+            const capturedParams = {
+              executionId: $state.params.executionId,
+              stage: $state.params.stage,
+              step: $state.params.step,
+              details: $state.params.details,
+            };
+            $state.go('.^', undefined, { location: 'replace' }).then(() => {
+              const { executionService } = ReactInjector;
+              if (capturedParams.executionId) {
+                executionService.getExecution(capturedParams.executionId).then(() => {
+                  $state.go(detailsState, capturedParams);
+                });
+              }
+            });
           }
         }
       },
