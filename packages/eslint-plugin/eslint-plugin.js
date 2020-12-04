@@ -1,6 +1,8 @@
 module.exports = {
   rules: {
+    'api-deprecation': require('./rules/api-deprecation'),
     'api-no-slashes': require('./rules/api-no-slashes'),
+    'api-no-unused-chaining': require('./rules/api-no-unused-chaining'),
     'import-from-alias-not-npm': require('./rules/import-from-alias-not-npm'),
     'import-from-npm-not-alias': require('./rules/import-from-npm-not-alias'),
     'import-from-npm-not-relative': require('./rules/import-from-npm-not-relative'),
@@ -12,6 +14,7 @@ module.exports = {
     'ng-strictdi': require('./rules/ng-strictdi'),
     'prefer-promise-like': require('./rules/prefer-promise-like'),
     'react2angular-with-error-boundary.spec.js': require('./rules/react2angular-with-error-boundary'),
+    'rest-prefer-static-strings-in-initializer': require('./rules/rest-prefer-static-strings-in-initializer'),
   },
   configs: {
     base: require('./base.config.js'),
