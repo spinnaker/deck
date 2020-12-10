@@ -34,6 +34,12 @@ import { isResourceKindSupported } from './resources/resourceRegistry';
 
 import './ArtifactDetail.less';
 
+const SUPPORTED_PRE_DEPLOYMENT_TYPES = [
+  // KLUDGE WARNING: disabling build events temporarily while we get the API in shape
+  // 'BUILD',
+  'BAKE',
+];
+
 function shouldDisplayResource(reference: string, resource: IManagedResourceSummary) {
   return isResourceKindSupported(resource.kind) && reference === resource.artifact?.reference;
 }
@@ -244,7 +250,11 @@ export const ArtifactDetail = ({
   const isPinnedEverywhere = environments.every(({ pinned }) => pinned);
   const isBadEverywhere = environments.every(({ state }) => state === 'vetoed');
   const createdAtTimestamp = useMemo(() => createdAt && DateTime.fromISO(createdAt), [createdAt]);
-  const preDeploymentSteps = lifecycleSteps?.filter(({ scope }) => scope === 'PRE_DEPLOYMENT');
+
+  // These steps come in with chronological ordering, but we need reverse-chronological orddering for display
+  const preDeploymentSteps = lifecycleSteps
+    ?.filter(({ scope, type }) => scope === 'PRE_DEPLOYMENT' && SUPPORTED_PRE_DEPLOYMENT_TYPES.includes(type))
+    .reverse();
 
   return (
     <>
@@ -350,7 +360,7 @@ export const ArtifactDetail = ({
               name={environmentName}
               resources={resourcesByEnvironment[environmentName]}
             >
-              <div className="sp-margin-l-right">
+              <div>
                 <EnvironmentCards
                   application={application}
                   environment={environment}
@@ -389,7 +399,7 @@ export const ArtifactDetail = ({
         })}
         {preDeploymentSteps && preDeploymentSteps.length > 0 && (
           <PreDeploymentRow>
-            {lifecycleSteps.map((step) => (
+            {preDeploymentSteps.map((step) => (
               <PreDeploymentStepCard key={step.id} step={step} application={application} reference={reference} />
             ))}
           </PreDeploymentRow>
