@@ -14,6 +14,7 @@ export interface ICloudProviderLogoProps {
 
 export interface ICloudProviderLogoState {
   tooltip?: string;
+  logo: React.ComponentType<React.SVGProps<HTMLOrSVGElement>>;
 }
 
 export class CloudProviderLogo extends React.Component<ICloudProviderLogoProps, ICloudProviderLogoState> {
@@ -26,9 +27,12 @@ export class CloudProviderLogo extends React.Component<ICloudProviderLogoProps, 
     if (props.showTooltip) {
       return {
         tooltip: CloudProviderRegistry.getValue(this.props.provider, 'name') || this.props.provider,
+        logo: CloudProviderRegistry.getValue(this.props.provider, 'cloudProviderLogo'),
       };
     }
-    return {};
+    return {
+      logo: CloudProviderRegistry.getValue(this.props.provider, 'cloudProviderLogo'),
+    };
   }
 
   public componentWillReceiveProps(nextProps: ICloudProviderLogoProps): void {
@@ -38,19 +42,20 @@ export class CloudProviderLogo extends React.Component<ICloudProviderLogoProps, 
   }
 
   public render(): React.ReactElement<CloudProviderLogo> {
-    const logo = (
-      <span className="cloud-provider-logo">
-        <span
-          className={`icon icon-${this.props.provider}`}
-          style={{ height: this.props.height, width: this.props.width }}
-        />
-      </span>
+    const RegistryLogo = this.state.logo;
+    const ProviderLogo = RegistryLogo ? (
+      <RegistryLogo height={this.props.height} width={this.props.width} />
+    ) : (
+      <span
+        className={`icon icon-${this.props.provider}`}
+        style={{ height: this.props.height, width: this.props.width }}
+      />
     );
 
     if (this.state.tooltip) {
-      return <Tooltip value={this.state.tooltip}>{logo}</Tooltip>;
-    } else {
-      return logo;
+      return <Tooltip value={this.state.tooltip}>{ProviderLogo}</Tooltip>;
     }
+
+    return <span className="cloud-provider-logo">{ProviderLogo}</span>;
   }
 }
