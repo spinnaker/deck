@@ -17,45 +17,25 @@ export interface ICloudProviderLogoState {
   logo: React.ComponentType<React.SVGProps<HTMLOrSVGElement>>;
 }
 
-export class CloudProviderLogo extends React.Component<ICloudProviderLogoProps, ICloudProviderLogoState> {
-  constructor(props: ICloudProviderLogoProps) {
-    super(props);
-    this.state = this.getState(props);
-  }
+export const CloudProviderLogo = ({ height, provider, showTooltip, width }: ICloudProviderLogoProps) => {
+  const [tooltip, setTooltip] = React.useState<string>(undefined);
+  const RegistryLogo = CloudProviderRegistry.getValue(provider, 'cloudProviderLogo');
 
-  private getState(props: ICloudProviderLogoProps): ICloudProviderLogoState {
-    if (props.showTooltip) {
-      return {
-        tooltip: CloudProviderRegistry.getValue(this.props.provider, 'name') || this.props.provider,
-        logo: CloudProviderRegistry.getValue(this.props.provider, 'cloudProviderLogo'),
-      };
+  React.useEffect(() => {
+    if (showTooltip) {
+      setTooltip(CloudProviderRegistry.getValue(provider, 'name') || provider);
     }
-    return {
-      logo: CloudProviderRegistry.getValue(this.props.provider, 'cloudProviderLogo'),
-    };
+  }, [showTooltip]);
+
+  const ProviderLogo = RegistryLogo ? (
+    <RegistryLogo height={height} width={width} />
+  ) : (
+    <span className={`icon icon-${provider}`} style={{ height, width }} />
+  );
+
+  if (tooltip) {
+    return <Tooltip value={tooltip}>{ProviderLogo}</Tooltip>;
   }
 
-  public componentWillReceiveProps(nextProps: ICloudProviderLogoProps): void {
-    if (nextProps.showTooltip !== this.props.showTooltip) {
-      this.setState(this.getState(nextProps));
-    }
-  }
-
-  public render(): React.ReactElement<CloudProviderLogo> {
-    const RegistryLogo = this.state.logo;
-    const ProviderLogo = RegistryLogo ? (
-      <RegistryLogo height={this.props.height} width={this.props.width} />
-    ) : (
-      <span
-        className={`icon icon-${this.props.provider}`}
-        style={{ height: this.props.height, width: this.props.width }}
-      />
-    );
-
-    if (this.state.tooltip) {
-      return <Tooltip value={this.state.tooltip}>{ProviderLogo}</Tooltip>;
-    }
-
-    return <span className="cloud-provider-logo">{ProviderLogo}</span>;
-  }
-}
+  return <span className="cloud-provider-logo">{ProviderLogo}</span>;
+};
