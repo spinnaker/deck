@@ -14,6 +14,14 @@ interface IRequest {
 
 type RequestListener = (request: ReceivedRequest) => void;
 
+/**
+ * A mock HTTP client for unit tests.
+ *
+ * This class (and its counterparts) enables unit tests to expect that the code
+ * being tested makes certain HTTP calls.  When the code makes the expected HTTP
+ * calls, the responses are deferred until the unit test calls .flush().  Then,
+ * any pending responses are flushed.
+ */
 export class MockHttpClient implements IHttpClientImplementation {
   public autoFlush = false;
   public failOnUnexpectedRequests = true;
@@ -22,7 +30,7 @@ export class MockHttpClient implements IHttpClientImplementation {
 
   private isFlushing = () => this.requestListeners.length > 0;
 
-  public expect(verb: Verb, url?: UrlArg): IExpectBuilder {
+  expect(verb: Verb, url?: UrlArg): IExpectBuilder {
     const expected = new ExpectedRequest(verb, url);
     this.expectedRequests.push(expected);
     return expected;
@@ -68,6 +76,21 @@ export class MockHttpClient implements IHttpClientImplementation {
     return hasUnflushedRequests || hasUnfulfilledExpects;
   }
 
+  /**
+   * Waits until all expected requests are received.
+   * This function is async and should be await'ed in the unit test.
+   *
+   * 1) Flushes the response data for all received requests.
+   *    The Promises in the code being tested will resolve or reject.
+   * 2) Resolves when all expected requests have been fulfilled by a received request.
+   *
+   * If more requests are received during the wait period, they are also flushed.
+   *
+   * For interop with AngularJS code, the $httpBackend is also flushed
+   *
+   * @param timeoutMs: How long to wait for all the expected requests to be received. (default: 100)
+   * @param delayAfterMs: How long to wait AFTER all the expected requests have been received (default: 0)
+   */
   async flush({ timeoutMs = 100, delayAfterMs = 0 } = {}): Promise<void> {
     // Run an AngularJS digest before checking if anything needs flushing
     kickAngularJS();
@@ -104,6 +127,7 @@ export class MockHttpClient implements IHttpClientImplementation {
           }
         };
 
+        // Re-run resolvePromiseWhenFlushed if a new request is received
         deregisterRequestListener = this.addRequestListener(resolvePromiseWhenFlushed);
 
         // If we haven't successfully flushed all requests and expects after timeoutMs, reject the promise returned from .flush()
@@ -137,7 +161,7 @@ export class MockHttpClient implements IHttpClientImplementation {
     return [
       `${outstanding.length} outstanding requests.`,
       'The following HTTP calls were expected, but were not received:',
-      ...outstanding.map((expected) => `\t- HTTP ${expected.verb} ${expected.url}`),
+      ...outstanding.map((expected) => `\t- HTTP ${expected.verb} ${expected.urlArg}`),
     ];
   }
 
@@ -154,7 +178,7 @@ export class MockHttpClient implements IHttpClientImplementation {
       const message = [
         `${outstanding.length} unflushed HTTP requests.  Call MockHttpClient.flush() to flush requests.`,
         'The following HTTP calls were initiated, but the responses were not flushed:',
-        ...outstanding.map((expected) => `\t- HTTP ${expected.verb} ${expected.url}`),
+        ...outstanding.map((request) => `\t- HTTP ${request.verb} ${request.url}`),
       ].join('\n');
 
       expect(outstanding.length).toBe(0, message);
@@ -168,7 +192,7 @@ export class MockHttpClient implements IHttpClientImplementation {
       const message = [
         `${unexpected.length} unexpected HTTP requests.  Call MockHttpClient.failOnUnexpectedRequests = false to ignore these requests.`,
         'The following HTTP calls were received but were not expected:',
-        ...unexpected.map((req) => `\t- HTTP ${req.verb} ${req.url}`),
+        ...unexpected.map((request) => `\t- HTTP ${request.verb} ${request.url}`),
       ].join('\n');
 
       expect(unexpected.length).toBe(0, message);

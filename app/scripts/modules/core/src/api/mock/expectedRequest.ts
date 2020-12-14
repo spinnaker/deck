@@ -3,7 +3,7 @@ import { SETTINGS } from 'core/config';
 import { isEqual, isMatch } from 'lodash';
 
 function parseParams(queryString: string): Record<string, string | string[]> {
-  const paramTuples = queryString.split('&').map((param) => param.split('='));
+  const paramTuples = queryString.split('&').map((param) => param.split('=')) as Array<[string, string]>;
 
   return paramTuples.reduce((paramsObj, [key, value]) => {
     const currentValue = paramsObj[key];
@@ -18,29 +18,38 @@ function parseParams(queryString: string): Record<string, string | string[]> {
   }, {} as Record<string, string | string[]>);
 }
 
+/**
+ * This internal class represents an HTTP request that is expected to be made by the code under test.
+ * Instances are created by MockHttpClient.expect -- this class should not be used directly.
+ *
+ * This class exposes a promise (this.fulfilledDeferred.promise).
+ * The promise will be resolved when the code under test makes the expected HTTP request.
+ *
+ * ExpectedRequest also stores the (optional) mock response status/data to return to the code under test.
+ */
 export class ExpectedRequest implements IExpectBuilder {
+  public verb: Verb;
+  public urlArg: UrlArg;
+  public path: string;
+  public expectedParams: {} = {};
+  public exactParams = false;
+
   /**
    * Creates a new ExpectRequest object
    * @param verb GET/PUT/POST/DELETE
-   * @param url string, regexp, or matcher
+   * @param urlArg the URL to match: string, regexp, or matcher
    *            If a string, query params are parsed out of the string and used as a partial match against each request
    *            e.g.: '/foo/bar?param1=val1&param2=val2'
    */
-  constructor(public verb: Verb, public url: UrlArg) {
-    this.predicates.verb = (requestVerb) => requestVerb === verb;
+  constructor(verb: Verb, urlArg: UrlArg = /.*/) {
+    this.verb = verb;
+    this.urlArg = urlArg;
 
-    if (typeof url === 'string') {
-      const [path, query] = url.split('?');
-      this.predicates.url = (requestUrl) => requestUrl === path || requestUrl === SETTINGS.gateUrl + path;
-      if (query) {
-        // If there is a query string in the url, parse into params and match
-        const parsedParams = parseParams(query);
-        this.predicates.params = (requestParams) => isMatch(parsedParams, requestParams);
-      }
-    } else if (url instanceof RegExp) {
-      this.predicates.url = (requestUrl) => !!url.exec(requestUrl);
-    } else if (typeof url === 'function') {
-      this.predicates.url = (requestUrl) => url(requestUrl);
+    if (typeof urlArg === 'string') {
+      const [path, query] = urlArg.split('?');
+      this.path = path;
+      // If there is a query string in the url, parse into params
+      this.expectedParams = query ? parseParams(query) : {};
     }
   }
 
@@ -52,6 +61,9 @@ export class ExpectedRequest implements IExpectBuilder {
   public isFulfilled = () => this.fulfilledDeferred.settled;
   public fulfilledDeferred = deferred();
 
+  /**
+   * Marks the expected response as fulfilled and settles the promise using the mock response.
+   */
   public fulfill() {
     const { status, data } = this.response;
     if (isSuccessStatus(status)) {
@@ -62,24 +74,33 @@ export class ExpectedRequest implements IExpectBuilder {
     }
   }
 
-  private predicates = {
-    verb: (_requestVerb: Verb) => true,
-    url: (_requestUrl: string) => true,
-    params: (_requestParams: object) => true,
-  };
-
   isMatchAndUnfulfilled(verb: Verb, url: string, params: object) {
-    const { predicates } = this;
-    return !this.isFulfilled() && predicates.verb(verb) && predicates.url(url) && predicates.params(params);
+    return !this.isFulfilled() && this.matchVerb(verb) && this.matchUrl(url) && this.matchParams(params);
   }
 
-  withParams(expectedParams: {}, exact = false): IExpectBuilder {
-    if (exact) {
-      this.predicates.params = (requestParams) => isEqual(requestParams, expectedParams);
-    } else {
-      this.predicates.params = (requestParams) => isMatch(requestParams, expectedParams);
-    }
+  matchVerb = (verb: Verb) => this.verb === verb;
 
+  matchUrl = (requestUrl: string) => {
+    const { urlArg, path } = this;
+
+    if (typeof path === 'string') {
+      return requestUrl === path || requestUrl === SETTINGS.gateUrl + path;
+    } else if (urlArg instanceof RegExp) {
+      return !!urlArg.exec(requestUrl);
+    } else if (typeof urlArg === 'function') {
+      return urlArg(requestUrl);
+    }
+    return false;
+  };
+
+  matchParams = (requestParams: object) => {
+    const { exactParams, expectedParams } = this;
+    return exactParams ? isEqual(requestParams, expectedParams) : isMatch(requestParams, expectedParams);
+  };
+
+  withParams(expectedParams: {}, exact = false): IExpectBuilder {
+    this.expectedParams = expectedParams;
+    this.exactParams = exact;
     return this;
   }
 
