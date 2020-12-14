@@ -258,7 +258,6 @@ export class ExecutionService {
       .withParams({ force, reason })
       .put()
       .then(() => this.waitUntilPipelineIsCancelled(application, executionId))
-      .then(() => application.executions.refresh())
       .catch((exception) => {
         throw exception && exception.data ? exception.message : null;
       });
