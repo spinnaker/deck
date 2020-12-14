@@ -1,3 +1,4 @@
+import { ReceivedRequest } from 'core/api/mock/receivedRequest';
 import { deferred, isSuccessStatus, UrlArg, Verb } from './mockHttpUtils';
 import { SETTINGS } from 'core/config';
 import { isEqual, isMatch } from 'lodash';
@@ -28,11 +29,12 @@ function parseParams(queryString: string): Record<string, string | string[]> {
  * ExpectedRequest also stores the (optional) mock response status/data to return to the code under test.
  */
 export class ExpectedRequest implements IExpectBuilder {
-  public verb: Verb;
-  public urlArg: UrlArg;
-  public path: string;
-  public expectedParams: {} = {};
-  public exactParams = false;
+  verb: Verb;
+  urlArg: UrlArg;
+  path: string;
+  expectedParams: {} = {};
+  exactParams = false;
+  onResponseReceivedCallback: (request: ReceivedRequest) => void;
 
   /**
    * Creates a new ExpectRequest object
@@ -98,6 +100,11 @@ export class ExpectedRequest implements IExpectBuilder {
     return exactParams ? isEqual(requestParams, expectedParams) : isMatch(requestParams, expectedParams);
   };
 
+  onRequestReceived(callback: (request: ReceivedRequest) => void) {
+    this.onResponseReceivedCallback = callback;
+    return this;
+  }
+
   withParams(expectedParams: {}, exact = false): IExpectBuilder {
     this.expectedParams = expectedParams;
     this.exactParams = exact;
@@ -112,7 +119,27 @@ export class ExpectedRequest implements IExpectBuilder {
 }
 
 export interface IExpectBuilder {
+  /**
+   * This callback is invoked when the expected request is received
+   * @param callback The callback to invoke.
+   *        The callback receives the ReceivedRequest object
+   */
+  onRequestReceived(callback: (request: ReceivedRequest) => void): IExpectBuilder;
+  /**
+   * Match only requests with the expected query parameters
+   * @param expectedParams the required params to match
+   * @param exact match exact params
+   *        false: (default) actual params must include expected params
+   *        true: actual params exactly match expected params
+   */
   withParams(expectedParams: {}, exact?: boolean): IExpectBuilder;
 
+  /**
+   * Set the response for the expected request
+   * @param status the HTTP status code
+   *        - For 2xx status codes, resolves the promise.
+   *        - For other status codes, rejects the promise
+   * @param data the response payload
+   */
   respond(status: number, data?: any): IExpectBuilder;
 }
