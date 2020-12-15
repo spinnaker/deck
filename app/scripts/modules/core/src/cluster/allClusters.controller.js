@@ -8,7 +8,6 @@ import { SERVER_GROUP_COMMAND_BUILDER_SERVICE } from 'core/serverGroup/configure
 import { ClusterState } from 'core/state';
 import { CLUSTER_FILTER } from './filter/clusterFilter.component';
 import { FILTER_TAGS_COMPONENT } from '../filterModel/filterTags.component';
-
 import './rollups.less';
 import { CORE_ACCOUNT_ACCOUNT_MODULE } from '../account/account.module';
 import { CORE_UTILS_WAYPOINTS_WAYPOINTCONTAINER_DIRECTIVE } from '../utils/waypoints/waypointContainer.directive';
@@ -39,7 +38,6 @@ module(CORE_CLUSTER_ALLCLUSTERS_CONTROLLER, [
       ClusterState.filterModel.activate();
       this.initialized = false;
       this.dataSource = app.getDataSource('serverGroups');
-      this.application = app;
 
       $scope.filterModel = ClusterState.filterModel;
       ProviderSelectionService.isDisabled(app).then((disabled) => {
