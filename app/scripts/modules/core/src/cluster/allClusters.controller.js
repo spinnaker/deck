@@ -42,7 +42,9 @@ module(CORE_CLUSTER_ALLCLUSTERS_CONTROLLER, [
       this.application = app;
 
       $scope.filterModel = ClusterState.filterModel;
-
+      ProviderSelectionService.isDisabled(app).then((disabled) => {
+        $scope.isDisabled = disabled;
+      });
       this.createLabel = 'Create Server Group';
 
       app

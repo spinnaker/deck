@@ -38,6 +38,8 @@ const getAngularModalOptions = (provider: any, selectedProvider: string, app: Ap
     application: () => {
       return app;
     },
+    isNew: () => true,
+    forPipelineConfig: () => false,
   },
 });
 

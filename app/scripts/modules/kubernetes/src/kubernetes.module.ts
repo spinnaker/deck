@@ -1,6 +1,11 @@
 import { module } from 'angular';
 
-import { CloudProviderRegistry, STAGE_ARTIFACT_SELECTOR_COMPONENT_REACT, YAML_EDITOR_COMPONENT } from '@spinnaker/core';
+import {
+  CloudProviderRegistry,
+  STAGE_ARTIFACT_SELECTOR_COMPONENT_REACT,
+  YAML_EDITOR_COMPONENT,
+  SETTINGS,
+} from '@spinnaker/core';
 
 import { KUBERNETES_MANIFEST_DELETE_CTRL } from './manifest/delete/delete.controller';
 import { KUBERNETES_MANIFEST_SCALE_CTRL } from './manifest/scale/scale.controller';
@@ -94,6 +99,7 @@ module(KUBERNETES_MODULE, [
 ]).config(() => {
   CloudProviderRegistry.registerProvider('kubernetes', {
     name: 'Kubernetes',
+    kubernetesAdHocInfraWritesEnabled: SETTINGS.kubernetesAdHocInfraWritesEnabled,
     logo: {
       path: kubernetesLogo,
     },
