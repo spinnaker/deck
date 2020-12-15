@@ -34,6 +34,8 @@ import { isResourceKindSupported } from './resources/resourceRegistry';
 
 import './ArtifactDetail.less';
 
+const SUPPORTED_PRE_DEPLOYMENT_TYPES = ['BUILD', 'BAKE'];
+
 function shouldDisplayResource(reference: string, resource: IManagedResourceSummary) {
   return isResourceKindSupported(resource.kind) && reference === resource.artifact?.reference;
 }
@@ -246,7 +248,9 @@ export const ArtifactDetail = ({
   const createdAtTimestamp = useMemo(() => createdAt && DateTime.fromISO(createdAt), [createdAt]);
 
   // These steps come in with chronological ordering, but we need reverse-chronological orddering for display
-  const preDeploymentSteps = lifecycleSteps?.filter(({ scope }) => scope === 'PRE_DEPLOYMENT').reverse();
+  const preDeploymentSteps = lifecycleSteps
+    ?.filter(({ scope, type }) => scope === 'PRE_DEPLOYMENT' && SUPPORTED_PRE_DEPLOYMENT_TYPES.includes(type))
+    .reverse();
 
   return (
     <>
