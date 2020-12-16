@@ -1,6 +1,6 @@
 import { IHttpClientImplementation } from '../ApiService';
 import { ExpectedRequest, IExpectBuilder } from './expectedRequest';
-import { IDeferred, kickAngularJS, tick, UrlArg, Verb } from './mockHttpUtils';
+import { IDeferred, flushAngularJS, tick, UrlArg, Verb } from './mockHttpUtils';
 import { ReceivedRequest } from './receivedRequest';
 
 interface IRequest {
@@ -95,7 +95,7 @@ export class MockHttpClient implements IHttpClientImplementation {
    */
   async flush({ timeoutMs = 100, delayAfterMs = 0 } = {}): Promise<void> {
     // Run an AngularJS digest before checking if anything needs flushing
-    kickAngularJS();
+    flushAngularJS();
 
     if (!this.needsFlush()) {
       const message = 'There are no unflushed HTTP requests, nor are there any unfulfilled expected requests.';
@@ -109,7 +109,7 @@ export class MockHttpClient implements IHttpClientImplementation {
         const resolvePromiseWhenFlushed = () => {
           // Poke AngularJS before checking for unflushed requests.
           // This enables code such as: $q.when().then(() => REST('/foo').get())
-          kickAngularJS();
+          flushAngularJS();
 
           const unflushedRequests = this.receivedRequests.filter((req) => !req.isFlushed());
           unflushedRequests.forEach((req) => req.flushResponse());
@@ -119,13 +119,13 @@ export class MockHttpClient implements IHttpClientImplementation {
             setTimeout(() => {
               resolve(message);
               // Poke AngularJS again after resolving the promise
-              kickAngularJS();
+              flushAngularJS();
             }, delayAfterMs);
           }
           // If we flushed any responses, wake AngularJS up
           // This enables code such as: $q.when(REST('/foo').get())
           if (unflushedRequests.length) {
-            setTimeout(kickAngularJS);
+            setTimeout(flushAngularJS);
           }
         };
 

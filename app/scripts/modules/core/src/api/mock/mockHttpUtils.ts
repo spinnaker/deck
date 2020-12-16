@@ -29,7 +29,11 @@ export function deferred() {
   return deferredObj;
 }
 
-export function kickAngularJS() {
+/**
+ * Tries to flush any outstanding $httpBackend calls
+ * This implicitly calls $rootScope.$digest() as the first step
+ */
+export function flushAngularJS() {
   try {
     $httpBackend.flush();
     // eslint-disable-next-line no-empty
