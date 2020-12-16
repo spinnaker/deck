@@ -1,4 +1,4 @@
-import { ReceivedRequest } from 'core/api/mock/receivedRequest';
+import { ReceivedRequest } from './receivedRequest';
 import { deferred, isSuccessStatus, UrlArg, Verb } from './mockHttpUtils';
 import { SETTINGS } from 'core/config';
 import { isEqual, isMatch } from 'lodash';
@@ -20,7 +20,7 @@ function parseParams(queryString: string): Record<string, string | string[]> {
 }
 
 /**
- * This internal class represents an HTTP request that is expected to be made by the code under test.
+ * This class represents an HTTP request that is expected to be made by the code under test.
  * Instances are created by MockHttpClient.expect -- this class should not be used directly.
  *
  * This class exposes a promise (this.fulfilledDeferred.promise).
