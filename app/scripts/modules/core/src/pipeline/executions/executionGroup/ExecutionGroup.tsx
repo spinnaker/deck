@@ -24,6 +24,7 @@ import { RenderWhenVisible } from 'core/utils/RenderWhenVisible';
 
 import { TriggersTag } from '../../triggers/TriggersTag';
 import { AccountTag } from 'core/account';
+import { MigrationTag } from './MigrationTag';
 import { ReactInjector } from 'core/reactShims';
 import { ManualExecutionModal } from '../../manualExecution';
 import { PipelineTemplateReader, PipelineTemplateV2Service } from '../../config/templates';
@@ -251,6 +252,7 @@ export class ExecutionGroup extends React.PureComponent<IExecutionGroupProps, IE
     const { group } = this.props;
     const { displayExecutionActions, pipelineConfig, triggeringExecution, showingDetails } = this.state;
     const pipelineDisabled = pipelineConfig && pipelineConfig.disabled;
+    const pipelineJustMigrated = pipelineConfig?.migrationStatus === 'STARTED';
     const pipelineDescription = pipelineConfig && pipelineConfig.description;
     const hasRunningExecutions = group.runningExecutions && group.runningExecutions.length > 0;
 
@@ -291,7 +293,10 @@ export class ExecutionGroup extends React.PureComponent<IExecutionGroupProps, IE
           <div className="clickable sticky-header" onClick={this.handleHeadingClicked}>
             <div className={`execution-group-heading ${pipelineDisabled ? 'inactive' : 'active'}`}>
               <span className={`glyphicon pipeline-toggle glyphicon-chevron-${this.state.open ? 'down' : 'right'}`} />
-              <div className="shadowed" style={{ position: 'relative' }}>
+              <div
+                className={`shadowed ${pipelineJustMigrated ? 'in-migration' : ''}`}
+                style={{ position: 'relative' }}
+              >
                 <div className={`heading-tag-overflow-group ${this.state.showOverflowAccountTags ? 'shown' : ''}`}>
                   {groupTargetAccountLabelsExtra}
                 </div>
@@ -317,6 +322,7 @@ export class ExecutionGroup extends React.PureComponent<IExecutionGroupProps, IE
                       <span className="badge">{group.runningExecutions.length}</span>
                     </span>
                   )}
+                  {pipelineJustMigrated && <MigrationTag />}
                 </h4>
                 {pipelineConfig && (
                   <EntityNotifications
@@ -329,7 +335,7 @@ export class ExecutionGroup extends React.PureComponent<IExecutionGroupProps, IE
                   />
                 )}
                 {displayExecutionActions && (
-                  <div className="text-right execution-group-actions">
+                  <div className={`text-right execution-group-actions ${pipelineJustMigrated ? 'in-migration' : ''}`}>
                     {pipelineConfig && <TriggersTag pipeline={pipelineConfig} />}
                     {pipelineConfig && <NextRunTag pipeline={pipelineConfig} />}
                     <ExecutionAction handleClick={this.handleConfigureClicked}>
