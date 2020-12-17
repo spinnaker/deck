@@ -22,16 +22,16 @@ export class ServerGroupResources
   public validate(values: ITitusServerGroupCommand) {
     const errors = {} as any;
 
-    if (!values.resources || typeof values.resources.cpu === 'string') {
+    if (!values.resources) {
       errors.resources = 'CPU is required.';
     }
-    if (!values.resources || typeof values.resources.memory === 'string') {
+    if (!values.resources) {
       errors.resources = 'Memory is required.';
     }
-    if (!values.resources || typeof values.resources.disk === 'string') {
+    if (!values.resources) {
       errors.resources = 'Disk is required.';
     }
-    if (!values.resources || typeof values.resources.networkMbps === 'string') {
+    if (!values.resources) {
       errors.resources = 'Network is required.';
     }
 
