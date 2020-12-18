@@ -43,6 +43,7 @@
           class="form-control input-sm"
           required
           on-select="fieldChanged()"
+          ng-change="clusterChanged(command.ecsClusterName)"
         >
           <ui-select-match>{{$select.selected}}</ui-select-match>
           <ui-select-choices

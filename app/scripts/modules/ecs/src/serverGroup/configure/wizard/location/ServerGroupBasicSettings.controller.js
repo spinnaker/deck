@@ -37,5 +37,13 @@ angular
           ModalWizard.markIncomplete('location');
         }
       });
+
+
+      $scope.clusterChanged = function ($clusterName){
+        $scope.$emit('clusterChanged', $clusterName);
+      };
+
+      $scope.clusterChanged.$inject = ['$scope'];
+
     },
   ]);
