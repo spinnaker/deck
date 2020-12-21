@@ -352,12 +352,17 @@ angular
                 launchTemplateData.networkInterfaces &&
                 launchTemplateData.networkInterfaces.length &&
                 launchTemplateData.networkInterfaces[0];
+              const enableIPv6InTest =
+                AWSProviderSettings.serverGroups &&
+                AWSProviderSettings.serverGroups.enableIPv6 &&
+                serverGroup.accountDetails &&
+                serverGroup.accountDetails.environment === 'test';
 
               angular.extend(command, {
                 instanceType: launchTemplateData.instanceType,
                 iamRole: launchTemplateData.iamInstanceProfile.name,
                 keyPair: launchTemplateData.keyName,
-                associateIPv6Address: Boolean(ipv6AddressCount),
+                associateIPv6Address: enableIPv6InTest || Boolean(ipv6AddressCount),
                 ramdiskId: launchTemplateData.ramdiskId,
                 instanceMonitoring: launchTemplateData.monitoring.enabled,
                 ebsOptimized: launchTemplateData.ebsOptimized,

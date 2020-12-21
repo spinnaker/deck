@@ -19,6 +19,7 @@ import {
 
 import { IAmazonImage } from 'amazon/image';
 import { SubnetSelectField } from 'amazon/subnet';
+import { AWSProviderSettings } from 'amazon/aws.settings';
 
 import { AmazonImageSelectInput } from '../../AmazonImageSelectInput';
 import { IAmazonServerGroupCommand } from '../../serverGroupConfiguration.service';
@@ -98,6 +99,15 @@ export class ServerGroupBasicSettings
     values.credentialsChanged(values);
     values.subnetChanged(values);
     setFieldValue('credentials', account);
+
+    const accountDetails = values.backingData.credentialsKeyedByAccount[account];
+    const enableIPv6InTest =
+      AWSProviderSettings.serverGroups &&
+      AWSProviderSettings.serverGroups.enableIPv6 &&
+      accountDetails.environment === 'test';
+    if (enableIPv6InTest) {
+      setFieldValue('associateIPv6Address', enableIPv6InTest);
+    }
   };
 
   private regionUpdated = (region: string): void => {
