@@ -41,7 +41,7 @@
       <div class="radio">
         <label>
           <input
-            data-test-id="CapacityProviders.default"
+            data-test-id="ServerGroup.capacityProviders.default"
             type="radio"
             ng-model="$ctrl.capacityProviderState.useDefaultCapacityProviders"
             ng-value="true"
@@ -54,7 +54,7 @@
       <div class="radio">
         <label>
           <input
-            data-test-id="CapacityProviders.custom"
+            data-test-id="ServerGroup.capacityProviders.custom"
             type="radio"
             ng-model="$ctrl.capacityProviderState.useDefaultCapacityProviders"
             ng-value="false"
@@ -77,14 +77,14 @@
             <input
               disabled= "{{$ctrl.capacityProviderState.useDefaultCapacityProviders}} ? 'disable' : 'enable'"
               type="text"
-              data-test-id="capacityProvider.name.{{ $index }}"
+              data-test-id="ServerGroup.defaultCapacityProvider.name.{{$index}}"
               class="form-control input-sm no-spel"
               ng-model="cp.capacityProvider"
             />
           </td>
           <td ng-if="!$ctrl.capacityProviderState.useDefaultCapacityProviders">
             <select ng-model="cp.capacityProvider"
-                    data-test-id="capacityProvider.base.{{ $index }}"
+                    data-test-id="ServerGroup.customCapacityProvider.name.{{$index}}"
                     class="form-control input-sm no-spel">
               <option ng-repeat="CP in $ctrl.command.capacityProviderNames" required>{{CP}}</option>
             </select>
@@ -93,7 +93,7 @@
             <input
               ng-disabled="$ctrl.capacityProviderState.useDefaultCapacityProviders"
               type="text"
-              data-test-id="capacityProvider.base.{{ $index }}"
+              data-test-id="ServerGroup.capacityProvider.base.{{$index}}"
               class="form-control input-sm no-spel"
               ng-model="cp.base"
             />
@@ -102,7 +102,7 @@
             <input
               ng-disabled="$ctrl.capacityProviderState.useDefaultCapacityProviders"
               type="text"
-              data-test-id="capacityProvider.weight.{{ $index }}"
+              data-test-id="ServerGroup.capacityProvider.weight.{{$index}}"
               class="form-control input-sm no-spel"
               ng-model="cp.weight"
             />
@@ -132,7 +132,7 @@
         </tfoot>
       </table>
       <div ng-if="$ctrl.command.capacityProviderStrategy.length == 0 && $ctrl.capacityProviderState.useDefaultCapacityProviders">
-        <span style="color:#c00">The cluster does not have a default capacity provider strategy defined. Set a default capacity provider strategy or use a custom strategy.</span>
+        <span style="color:#c00" data-test-id="ServerGroup.capacityProviders.default.error">The cluster does not have a default capacity provider strategy defined. Set a default capacity provider strategy or use a custom strategy.</span>
       </div>
     </div>
   </div>

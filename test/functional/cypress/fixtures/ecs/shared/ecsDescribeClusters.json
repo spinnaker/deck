@@ -1,0 +1,76 @@
+[
+
+  {
+    "activeServicesCount": 2,
+    "attachments": [],
+    "capacityProviders": [],
+    "clusterArn": "arn:aws:ecs:us-west-2:123123123:cluster/spinnaker-deployment-cluster",
+    "clusterName": "spinnaker-deployment-cluster",
+    "defaultCapacityProviderStrategy": [],
+    "pendingTasksCount": 6,
+    "registeredContainerInstancesCount": 0,
+    "runningTasksCount": 0,
+    "settings": [
+      {
+        "name": "containerInsights",
+        "value": "disabled"
+      }
+    ],
+    "statistics": [],
+    "status": "ACTIVE",
+    "tags": []
+  },
+
+  {
+    "activeServicesCount": 2,
+    "attachments": [],
+    "capacityProviders": [
+      "FARGATE_SPOT",
+      "FARGATE"
+    ],
+    "clusterArn": "arn:aws:ecs:us-west-2:123123123:cluster/example-app-test-Cluster-NSnYsTXmCfV2",
+    "clusterName": "example-app-test-Cluster-NSnYsTXmCfV2",
+    "defaultCapacityProviderStrategy": [
+      {
+        "base": 0,
+        "capacityProvider": "FARGATE_SPOT",
+        "weight": 1
+      }
+    ],
+    "pendingTasksCount": 3,
+    "registeredContainerInstancesCount": 0,
+    "runningTasksCount": 1,
+    "settings": [
+      {
+        "name": "containerInsights",
+        "value": "disabled"
+      }
+    ],
+    "statistics": [],
+    "status": "ACTIVE",
+    "tags": []
+  },
+  {
+    "activeServicesCount": 0,
+    "attachments": [],
+    "capacityProviders": [
+      "FARGATE_SPOT",
+      "FARGATE"
+    ],
+    "clusterArn": "arn:aws:ecs:us-west-2:12312312312:cluster/TestCluster",
+    "clusterName": "TestCluster",
+    "defaultCapacityProviderStrategy": [],
+    "pendingTasksCount": 0,
+    "registeredContainerInstancesCount": 0,
+    "runningTasksCount": 0,
+    "settings": [
+      {
+        "name": "containerInsights",
+        "value": "disabled"
+      }
+    ],
+    "statistics": [],
+    "status": "ACTIVE",
+    "tags": []
+  }
+]
