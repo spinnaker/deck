@@ -208,8 +208,12 @@ export class ExecutionGroups extends React.Component<IExecutionGroupsProps, IExe
     const { groups = [], container, showingDetails } = this.state;
     const hasGroups = groups.length > 0;
     const className = `row pipelines executions ${showingDetails ? 'showing-details' : ''}`;
-    this.filterGroups(groups);
-    const executionGroups = this.filterGroups(groups).map((group: IExecutionGroup) => (
+
+   const allGroups = this.filterGroups(groups)
+      .filter((g: IExecutionGroup) => g.config.migrationStatus === 'STARTED')
+      .concat(groups.filter((g) => g.config.migrationStatus !== 'STARTED'));
+
+    const executionGroups = allGroups.map((group: IExecutionGroup) => (
       <ExecutionGroup
         parent={container}
         key={group.heading}

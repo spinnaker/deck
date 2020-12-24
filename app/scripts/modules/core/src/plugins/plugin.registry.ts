@@ -1,6 +1,6 @@
 import { $http } from 'ngimport';
 import { SETTINGS } from '../config/settings';
-import { API } from '../api/ApiService';
+import { REST } from '../api/ApiService';
 import { registerPluginExtensions, IDeckPlugin } from './deck.plugin';
 
 /** The shape of plugin metadata objects in plugin-manifest.json */
@@ -98,8 +98,8 @@ export class PluginRegistry {
   /** Loads plugin manifest file served from gate */
   public loadPluginManifestFromGate() {
     const source = 'gate';
-    const uri = 'plugins/deck/plugin-manifest.json';
-    const loadPromise: PromiseLike<IPluginMetaData[]> = API.one(...uri.split('/'))
+    const uri = '/plugins/deck/plugin-manifest.json';
+    const loadPromise: PromiseLike<IPluginMetaData[]> = REST(uri)
       .get()
       .catch((error: any) => {
         console.error(`Failed to load ${uri} from ${source}`);

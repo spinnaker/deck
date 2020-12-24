@@ -2,7 +2,7 @@ import { IQService, module } from 'angular';
 import { flatten, forOwn, groupBy, has, head, keys, values, keyBy } from 'lodash';
 
 import { ArtifactReferenceService } from 'core/artifact';
-import { API } from 'core/api';
+import { REST } from 'core/api';
 import { Application } from 'core/application';
 import { NameUtils } from 'core/naming';
 import { FilterModelService } from 'core/filterModel';
@@ -35,11 +35,11 @@ export class ClusterService {
   public loadServerGroups(application: Application): PromiseLike<IServerGroup[]> {
     return this.getClusters(application.name).then((clusters: IClusterSummary[]) => {
       const dataSource = application.getDataSource('serverGroups');
-      let serverGroupLoader = API.one('applications').one(application.name).all('serverGroups');
+      let serverGroupLoader = REST('/applications').path(application.name, 'serverGroups');
       dataSource.fetchOnDemand = clusters.length > SETTINGS.onDemandClusterThreshold;
       if (dataSource.fetchOnDemand) {
         dataSource.clusters = clusters;
-        serverGroupLoader = serverGroupLoader.withParams({
+        serverGroupLoader = serverGroupLoader.query({
           clusters: FilterModelService.getCheckValues(
             ClusterState.filterModel.asFilterModel.sortFilter.clusters,
           ).join(),
@@ -47,7 +47,7 @@ export class ClusterService {
       } else {
         this.reconcileClusterDeepLink();
       }
-      return serverGroupLoader.getList().then((serverGroups: IServerGroup[]) => {
+      return serverGroupLoader.get().then((serverGroups: IServerGroup[]) => {
         serverGroups.forEach((sg) => this.addHealthStatusCheck(sg));
         serverGroups.forEach((sg) => this.addNameParts(sg));
         return this.$q
@@ -223,9 +223,8 @@ export class ClusterService {
   }
 
   private getClusters(application: string): PromiseLike<IClusterSummary[]> {
-    return API.one('applications')
-      .one(application)
-      .one('clusters')
+    return REST('/applications')
+      .path(application, 'clusters')
       .get()
       .then((clustersMap: { [account: string]: string[] }) => {
         const clusters: IClusterSummary[] = [];

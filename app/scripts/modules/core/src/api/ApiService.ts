@@ -29,8 +29,10 @@ export interface IRequestBuilder {
   post<T = any, P = any>(data?: P): PromiseLike<T>;
   /** issues a PUT request */
   put<T = any, P = any>(data?: P): PromiseLike<T>;
+  /** issues a PATCH request */
+  patch<T = any, P = any>(data?: P): PromiseLike<T>;
   /** issues a DELETE request */
-  delete<T = any>(): PromiseLike<T>;
+  delete<T = any, P = any>(data?: P): PromiseLike<T>;
 }
 
 /**
@@ -82,6 +84,7 @@ export interface IHttpClientImplementation {
   get<T = any>(config: IRequestBuilderConfig): PromiseLike<T>;
   post<T = any>(config: IRequestBuilderConfig): PromiseLike<T>;
   put<T = any>(config: IRequestBuilderConfig): PromiseLike<T>;
+  patch<T = any>(config: IRequestBuilderConfig): PromiseLike<T>;
   delete<T = any>(config: IRequestBuilderConfig): PromiseLike<T>;
 }
 
@@ -104,8 +107,12 @@ class AngularJSHttpClient implements IHttpClientImplementation {
   get = <T = any>(requestConfig: IRequestBuilderConfig) => this.request<T>('GET', requestConfig);
   post = <T = any>(requestConfig: IRequestBuilderConfig) => this.request<T>('POST', requestConfig);
   put = <T = any>(requestConfig: IRequestBuilderConfig) => this.request<T>('PUT', requestConfig);
+  patch = <T = any>(requestConfig: IRequestBuilderConfig) => this.request<T>('PATCH', requestConfig);
 
-  private request<T>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', requestConfig: IRequestBuilderConfig): PromiseLike<T> {
+  private request<T>(
+    method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE',
+    requestConfig: IRequestBuilderConfig,
+  ): PromiseLike<T> {
     return $http<T>({ ...requestConfig, method }).then((response) => {
       const contentType = response.headers('content-type');
 
@@ -140,7 +147,7 @@ function joinPaths(...paths: IPrimitive[]) {
 
 /** The base request builder implementation */
 export class RequestBuilder implements IRequestBuilder {
-  static defaultHttpClient = new AngularJSHttpClient();
+  static defaultHttpClient: IHttpClientImplementation = new AngularJSHttpClient();
 
   public constructor(
     protected config: IRequestBuilderConfig = makeRequestBuilderConfig(),
@@ -188,11 +195,17 @@ export class RequestBuilder implements IRequestBuilder {
     return this.httpClient.put<T>({ ...this.config, url, data });
   }
 
-  // queryParams argument for backwards compat
-  delete<T>(queryParams: object = {}) {
-    const params = { ...this.config.params, ...queryParams };
+  patch<T>(putData?: any) {
+    // Check this.config.data for backwards compat
+    const data = putData ?? this.config.data;
     const url = joinPaths(this.baseUrl, this.config.url);
-    return this.httpClient.delete<T>({ ...this.config, url, params });
+    return this.httpClient.patch<T>({ ...this.config, url, data });
+  }
+
+  delete<T>(deleteData?: any) {
+    const data = deleteData ?? this.config.data;
+    const url = joinPaths(this.baseUrl, this.config.url);
+    return this.httpClient.delete<T>({ ...this.config, url, data });
   }
 
   useCache(cache = true) {
@@ -236,7 +249,7 @@ export function makeRequestBuilderConfig(pathPrefix?: string): IRequestBuilderCo
     cache: false,
     data: undefined,
     params: {},
-    timeout: (SETTINGS.pollSchedule || 3000) * 2 + 5000,
+    timeout: (SETTINGS.pollSchedule || 30000) * 2 + 5000,
     headers: { 'X-RateLimit-App': 'deck' },
   };
 }

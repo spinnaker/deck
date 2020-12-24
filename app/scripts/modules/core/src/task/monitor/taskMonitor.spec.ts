@@ -1,26 +1,26 @@
+import { mockHttpClient } from 'core/api/mock/jasmine';
 import { mock } from 'angular';
 import { IModalServiceInstance } from 'angular-ui-bootstrap';
 import { $q, $timeout } from 'ngimport';
 import Spy = jasmine.Spy;
 
-import { API } from 'core/api/ApiService';
 import { ITask } from 'core/domain';
 import { TaskMonitor } from './TaskMonitor';
 import { OrchestratedItemTransformer } from 'core/orchestratedItem/orchestratedItem.transformer';
 import { ApplicationModelBuilder } from 'core/application/applicationModel.builder';
 
 describe('TaskMonitor', () => {
-  let $scope: ng.IScope, $http: ng.IHttpBackendService;
+  let $scope: ng.IScope;
 
   beforeEach(
-    mock.inject(($rootScope: ng.IRootScopeService, $httpBackend: ng.IHttpBackendService) => {
+    mock.inject(($rootScope: ng.IRootScopeService) => {
       $scope = $rootScope.$new();
-      $http = $httpBackend;
     }),
   );
 
   describe('task submit', () => {
-    it('waits for task to complete, then calls onComplete', () => {
+    it('waits for task to complete, then calls onComplete', async () => {
+      const http = mockHttpClient();
       let completeCalled = false;
       const task: any = { id: 'a', status: 'RUNNING' };
       OrchestratedItemTransformer.defineProperties(task);
@@ -45,15 +45,15 @@ describe('TaskMonitor', () => {
 
       $timeout.flush(); // still running first time
 
-      $http.expectGET([API.baseUrl, 'tasks', 'a'].join('/')).respond(200, { status: 'RUNNING' });
+      http.expectGET('/tasks/a').respond(200, { status: 'RUNNING' });
       $timeout.flush();
-      $http.flush();
+      await http.flush();
       expect(monitor.task.isCompleted).toBe(false);
       expect((monitor.application.getDataSource('runningTasks').refresh as Spy).calls.count()).toBe(1);
 
-      $http.expectGET([API.baseUrl, 'tasks', 'a'].join('/')).respond(200, { status: 'SUCCEEDED' });
+      http.expectGET('/tasks/a').respond(200, { status: 'SUCCEEDED' });
       $timeout.flush(); // complete second time
-      $http.flush();
+      await http.flush();
 
       expect(completeCalled).toBe(true);
       expect(monitor.task.isCompleted).toBe(true);
@@ -85,7 +85,8 @@ describe('TaskMonitor', () => {
       expect(completeCalled).toBe(false);
     });
 
-    it('sets error when task fails while polling', () => {
+    it('sets error when task fails while polling', async () => {
+      const http = mockHttpClient();
       let completeCalled = false;
       const task = { id: 'a', status: 'RUNNING' } as ITask;
       OrchestratedItemTransformer.defineProperties(task);
@@ -109,14 +110,14 @@ describe('TaskMonitor', () => {
 
       $timeout.flush(); // still running first time
 
-      $http.expectGET([API.baseUrl, 'tasks', 'a'].join('/')).respond(200, { status: 'RUNNING' });
+      http.expectGET('/tasks/a').respond(200, { status: 'RUNNING' });
       $timeout.flush();
-      $http.flush();
+      await http.flush();
       expect(monitor.task.isCompleted).toBe(false);
 
-      $http.expectGET([API.baseUrl, 'tasks', 'a'].join('/')).respond(200, { status: 'TERMINAL' });
+      http.expectGET('/tasks/a').respond(200, { status: 'TERMINAL' });
       $timeout.flush(); // complete second time
-      $http.flush();
+      await http.flush();
 
       expect(monitor.submitting).toBe(false);
       expect(monitor.error).toBe(true);

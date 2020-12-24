@@ -2514,17 +2514,17 @@
     prop-types "^15.6.1"
     react-lifecycles-compat "^3.0.4"
 
-"@spinnaker/eslint-plugin@1.0.8":
-  version "1.0.8"
-  resolved "https://registry.yarnpkg.com/@spinnaker/eslint-plugin/-/eslint-plugin-1.0.8.tgz#ae71ac210ae3bfdbb18119ffbf4caed94b745478"
-  integrity sha512-a1XvyHyMBwo9sPji1FnCHJcy38SrBdhCdZoffqBxzTYJmUH9wjy5e+j5rpXjk1jWxDNCWxpnxt2kfpPe2Rso7w==
+"@spinnaker/eslint-plugin@1.0.10":
+  version "1.0.10"
+  resolved "https://registry.yarnpkg.com/@spinnaker/eslint-plugin/-/eslint-plugin-1.0.10.tgz#f79b94716d84fe1656e71e0f92e6f42d80943644"
+  integrity sha512-9EUlp8003G6a4smxnsa3lnuvyV90EHJo3xnSkFOCGgMr/UuckKMtHTafjWF3oBNkbyYL2zb7PHcUJOmJEX9Y6A==
   dependencies:
-    lodash "^4.17.15"
+    lodash "^4.17.20"
 
-"@spinnaker/kayenta@^0.0.106":
-  version "0.0.106"
-  resolved "https://registry.yarnpkg.com/@spinnaker/kayenta/-/kayenta-0.0.106.tgz#7a27e4a67f22d4ffac4c91b47cc668d12f6881df"
-  integrity sha512-w+qpuycdhG/fcUxR+eBKn0BNzw9PSIpw2EaebTeI1HUjxdk+Fh97cMOZCVLVzlfu0kllui4i1av+nsJVFcw5Aw==
+"@spinnaker/kayenta@^0.0.107":
+  version "0.0.107"
+  resolved "https://registry.yarnpkg.com/@spinnaker/kayenta/-/kayenta-0.0.107.tgz#efde7aed6232962323681ddda0587d9644513971"
+  integrity sha512-+eivK6dwwQqcPCj4nBcHuktQ1Qs+SR5y+dAAHZMjjyNqkp3meeqoeaUR1L28osChEjPh+j7tv8OPYErV/6jpaw==
   dependencies:
     "@fortawesome/fontawesome-free" "5.5.0"
     "@uirouter/angularjs" "1.0.26"
@@ -12673,7 +12673,7 @@ lodash.uniq@4.5.0, lodash.uniq@^4.5.0:
   resolved "https://registry.yarnpkg.com/lodash.uniq/-/lodash.uniq-4.5.0.tgz#d0225373aeb652adc1bc82e4945339a842754773"
   integrity sha1-0CJTc662Uq3BvILklFM5qEJ1R3M=
 
-lodash@^4.0.1, lodash@^4.12.0, lodash@^4.13.1, lodash@^4.14.0, lodash@^4.15.0, lodash@^4.16.6, lodash@^4.17.11, lodash@^4.17.13, lodash@^4.17.14, lodash@^4.17.15, lodash@^4.17.19, lodash@^4.17.2, lodash@^4.17.3, lodash@^4.17.4, lodash@^4.17.5, lodash@^4.2.0, lodash@^4.2.1:
+lodash@^4.0.1, lodash@^4.12.0, lodash@^4.13.1, lodash@^4.14.0, lodash@^4.15.0, lodash@^4.16.6, lodash@^4.17.11, lodash@^4.17.13, lodash@^4.17.14, lodash@^4.17.15, lodash@^4.17.19, lodash@^4.17.2, lodash@^4.17.20, lodash@^4.17.3, lodash@^4.17.4, lodash@^4.17.5, lodash@^4.2.0, lodash@^4.2.1:
   version "4.17.20"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.20.tgz#b44a9b6297bcb698f1c51a3545a2b3b368d59c52"
   integrity sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==
@@ -15705,6 +15705,16 @@ react-dom@^16.8.3, react-dom@~16.13.1:
     prop-types "^15.6.2"
     scheduler "^0.19.1"
 
+react-dom@~16.14.0:
+  version "16.14.0"
+  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.14.0.tgz#7ad838ec29a777fb3c75c3a190f661cf92ab8b89"
+  integrity sha512-1gCeQXDLoIqMgqD3IO2Ah9bnf0w9kzhwN5q4FGnHZ67hBm9yePzB5JJAIQCc8x3pFnNlwFq4RidZggNAAkzWWw==
+  dependencies:
+    loose-envify "^1.1.0"
+    object-assign "^4.1.1"
+    prop-types "^15.6.2"
+    scheduler "^0.19.1"
+
 react-draggable@^4.0.3:
   version "4.4.3"
   resolved "https://registry.yarnpkg.com/react-draggable/-/react-draggable-4.4.3.tgz#0727f2cae5813e36b0e4962bf11b2f9ef2b406f3"
@@ -16032,7 +16042,7 @@ react@^0.14.8:
     envify "^3.0.0"
     fbjs "^0.6.1"
 
-"react@^15.6.2 || ^16.0", react@^16.8.3, react@^16.9.17:
+"react@^15.6.2 || ^16.0", react@^16.8.3, react@^16.9.17, react@~16.14.0:
   version "16.14.0"
   resolved "https://registry.yarnpkg.com/react/-/react-16.14.0.tgz#94d776ddd0aaa37da3eda8fc5b6b18a4c9a3114d"
   integrity sha512-0X2CImDkJGApiAlcf0ODKIneSwBPhqJawOa5wCtKbu7ZECrmS26NvtSILynQ66cgkT/RJ4LidJOc3bUESwmU8g==
