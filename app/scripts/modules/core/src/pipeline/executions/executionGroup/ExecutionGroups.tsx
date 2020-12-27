@@ -7,6 +7,7 @@ import { IExecutionGroup } from 'core/domain';
 import { ReactInjector } from 'core/reactShims';
 import { ExecutionState } from 'core/state';
 import { ExecutionFilterService } from '../../filter/executionFilter.service';
+import { BannerContainer } from 'core/banner';
 
 import './executionGroups.less';
 
@@ -59,7 +60,7 @@ export class ExecutionGroups extends React.Component<IExecutionGroupsProps, IExe
     // opacity (except when hovering over them).
     // Here, we are checking if there is an executionId deep linked - and also confirming it's actually present
     // on screen. If not, we will not apply the '.showing-details' class to the wrapper.
-    if (!executionId || this.state.groups.every(g => g.executions.every(e => e.id !== executionId))) {
+    if (!executionId || this.state.groups.every((g) => g.executions.every((e) => e.id !== executionId))) {
       return false;
     }
     return ReactInjector.$state.includes('**.execution');
@@ -88,7 +89,12 @@ export class ExecutionGroups extends React.Component<IExecutionGroupsProps, IExe
     const { groups = [], container, showingDetails } = this.state;
     const hasGroups = groups.length > 0;
     const className = `row pipelines executions ${showingDetails ? 'showing-details' : ''}`;
-    const executionGroups = groups.map((group: IExecutionGroup) => (
+
+    const allGroups = groups
+      .filter((g: IExecutionGroup) => g.config.migrationStatus === 'STARTED')
+      .concat(groups.filter((g) => g.config.migrationStatus !== 'STARTED'));
+
+    const executionGroups = allGroups.map((group: IExecutionGroup) => (
       <ExecutionGroup parent={container} key={group.heading} group={group} application={this.props.application} />
     ));
 
@@ -101,6 +107,7 @@ export class ExecutionGroups extends React.Component<IExecutionGroupsProps, IExe
             </div>
           )}
           <div className="execution-groups all-execution-groups" ref={this.setContainer}>
+            <BannerContainer app={this.props.application} />
             {container && executionGroups}
           </div>
         </div>

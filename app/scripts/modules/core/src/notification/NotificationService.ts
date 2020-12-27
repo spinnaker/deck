@@ -1,4 +1,4 @@
-import { API } from 'core/api/ApiService';
+import { REST } from 'core/api/ApiService';
 
 export interface INotificationParameter {
   name: string;
@@ -15,10 +15,7 @@ export interface INotificationTypeMetadata {
 }
 
 export class NotificationService {
-  public static getNotificationTypeMetadata(): Promise<INotificationTypeMetadata[]> {
-    return API.one('notifications')
-      .all('metadata')
-      .useCache()
-      .getList();
+  public static getNotificationTypeMetadata(): PromiseLike<INotificationTypeMetadata[]> {
+    return REST('/notifications/metadata').useCache().get();
   }
 }

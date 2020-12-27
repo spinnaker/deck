@@ -46,6 +46,9 @@ export interface IMetadataOptions {
 export interface INetworkInterface {
   deviceIndex: number;
   groups: string[];
+  ipv6AddressCount?: number;
+  associatePublicIpAddress?: boolean;
+  ipv6Addresses?: string[];
 }
 
 export interface ITagSpecification {
@@ -56,10 +59,15 @@ export interface ITagSpecification {
   }>;
 }
 
+export interface ICreditSpecification {
+  cpuCredits?: string;
+}
+
 export interface ILaunchTemplateData {
   [attribute: string]: any;
   blockDeviceMappings?: IBlockDeviceMapping[];
   cpuOptions?: ICpuOptions;
+  creditSpecification?: ICreditSpecification;
   disableApiTermination?: boolean;
   ebsOptimized: boolean;
   elasticGpuSpecifications?: IElasticGpuSpecification[];

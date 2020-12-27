@@ -1,8 +1,6 @@
-import { IPromise } from 'angular';
-
 import { $q } from 'ngimport';
 
-import { API } from 'core/api/ApiService';
+import { REST } from 'core/api/ApiService';
 import { IEntityTags, IEntityTag, ICreationMetadataTag } from '../domain/IEntityTags';
 import { Application } from 'core/application/application.model';
 import {
@@ -17,10 +15,10 @@ import {
 import { SETTINGS } from 'core/config/settings';
 
 export class EntityTagsReader {
-  public static getAllEntityTagsForApplication(application: string): IPromise<IEntityTags[]> {
-    return API.one('tags')
-      .withParams({ maxResults: SETTINGS.entityTags.maxResults || 5000, application })
-      .getList()
+  public static getAllEntityTagsForApplication(application: string): PromiseLike<IEntityTags[]> {
+    return REST('/tags')
+      .query({ maxResults: SETTINGS.entityTags.maxResults || 5000, application })
+      .get()
       .then((allTags: IEntityTags[]) => this.flattenTagsAndAddMetadata(allTags));
   }
 
@@ -33,7 +31,7 @@ export class EntityTagsReader {
     const clusterTags = allTags.filter(({ entityRef }) => entityRef.entityType === 'cluster');
     const serverGroups: IServerGroup[] = application.serverGroups.data;
 
-    serverGroups.forEach(serverGroup => {
+    serverGroups.forEach((serverGroup) => {
       serverGroup.entityTags = serverGroupTags.find(
         ({ entityRef }) =>
           entityRef.entityId === serverGroup.name &&
@@ -57,7 +55,7 @@ export class EntityTagsReader {
     const serverGroupManagerTags = allTags.filter(({ entityRef }) => entityRef.entityType === 'servergroupmanager');
     const serverGroupManagers: IServerGroupManager[] = application.serverGroupManagers.data;
 
-    serverGroupManagers.forEach(serverGroupManager => {
+    serverGroupManagers.forEach((serverGroupManager) => {
       serverGroupManager.entityTags = serverGroupManagerTags.find(
         ({ entityRef }) =>
           entityRef.entityId === serverGroupManager.name &&
@@ -75,7 +73,7 @@ export class EntityTagsReader {
     const loadBalancerTags = allTags.filter(({ entityRef }) => entityRef.entityType === 'loadbalancer');
     const loadBalancers: ILoadBalancer[] = application.loadBalancers.data;
 
-    loadBalancers.forEach(loadBalancer => {
+    loadBalancers.forEach((loadBalancer) => {
       loadBalancer.entityTags = loadBalancerTags.find(
         ({ entityRef }) =>
           entityRef.entityId === loadBalancer.name &&
@@ -93,7 +91,7 @@ export class EntityTagsReader {
     const functionTags = allTags.filter(({ entityRef }) => entityRef.entityType === 'function');
     const functions: IFunction[] = application.functions.data;
 
-    functions.forEach(fn => {
+    functions.forEach((fn) => {
       fn.entityTags = functionTags.find(
         ({ entityRef }) =>
           entityRef.entityId === fn.functionName && entityRef.account === fn.account && entityRef.region === fn.region,
@@ -108,7 +106,7 @@ export class EntityTagsReader {
     const securityGroupTags = allTags.filter(({ entityRef }) => entityRef.entityType === 'securitygroup');
     const securityGroups: ISecurityGroup[] = application.securityGroups.data;
 
-    securityGroups.forEach(securityGroup => {
+    securityGroups.forEach((securityGroup) => {
       securityGroup.entityTags = securityGroupTags.find(
         ({ entityRef }) =>
           entityRef.entityId === securityGroup.name &&
@@ -126,7 +124,7 @@ export class EntityTagsReader {
     const executionTags = allTags.filter(({ entityRef }) => entityRef.entityType === 'execution');
     const executions: IExecution[] = application.executions.data;
 
-    executions.forEach(execution => {
+    executions.forEach((execution) => {
       execution.entityTags = executionTags.find(({ entityRef }) => entityRef.entityId === execution.id);
     });
   }
@@ -139,21 +137,21 @@ export class EntityTagsReader {
     const pipelineTags = allTags.filter(({ entityRef }) => entityRef.entityType === 'pipeline');
     const pipelineConfigs: IPipeline[] = application.pipelineConfigs.data;
 
-    pipelineConfigs.forEach(pipeline => {
+    pipelineConfigs.forEach((pipeline) => {
       pipeline.entityTags = pipelineTags.find(({ entityRef }) => entityRef.entityId === pipeline.id);
     });
   }
 
-  public static getEntityTagsForId(entityType: string, entityId: string): IPromise<IEntityTags[]> {
+  public static getEntityTagsForId(entityType: string, entityId: string): PromiseLike<IEntityTags[]> {
     if (!entityId) {
       return $q.when([]);
     }
-    return API.one('tags')
-      .withParams({
+    return REST('/tags')
+      .query({
         entityType: entityType.toLowerCase(),
         entityId,
       })
-      .getList()
+      .get()
       .then((entityTagGroups: IEntityTags[]) => {
         return this.flattenTagsAndAddMetadata(entityTagGroups);
       })
@@ -164,18 +162,18 @@ export class EntityTagsReader {
 
   private static flattenTagsAndAddMetadata(entityTags: IEntityTags[]): IEntityTags[] {
     const allTags: IEntityTags[] = [];
-    entityTags.forEach(entityTag => {
-      entityTag.tags.forEach(tag => this.addTagMetadata(entityTag, tag));
-      entityTag.alerts = entityTag.tags.filter(t => t.name.startsWith('spinnaker_ui_alert:'));
-      entityTag.notices = entityTag.tags.filter(t => t.name.startsWith('spinnaker_ui_notice:'));
-      entityTag.creationMetadata = entityTag.tags.find(t => t.name === 'spinnaker:metadata') as ICreationMetadataTag;
+    entityTags.forEach((entityTag) => {
+      entityTag.tags.forEach((tag) => this.addTagMetadata(entityTag, tag));
+      entityTag.alerts = entityTag.tags.filter((t) => t.name.startsWith('spinnaker_ui_alert:'));
+      entityTag.notices = entityTag.tags.filter((t) => t.name.startsWith('spinnaker_ui_notice:'));
+      entityTag.creationMetadata = entityTag.tags.find((t) => t.name === 'spinnaker:metadata') as ICreationMetadataTag;
       allTags.push(entityTag);
     });
     return allTags;
   }
 
   private static addTagMetadata(entityTag: IEntityTags, tag: IEntityTag): void {
-    const metadata = entityTag.tagsMetadata.find(m => m.name === tag.name);
+    const metadata = entityTag.tagsMetadata.find((m) => m.name === tag.name);
     if (metadata) {
       tag.created = metadata.created;
       tag.createdBy = metadata.createdBy;

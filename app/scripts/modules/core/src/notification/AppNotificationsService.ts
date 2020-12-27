@@ -1,6 +1,4 @@
-import { IPromise } from 'angular';
-
-import { API } from 'core/api/ApiService';
+import { REST } from 'core/api/ApiService';
 import { INotification } from 'core/domain';
 
 export interface IAppNotifications {
@@ -9,19 +7,14 @@ export interface IAppNotifications {
 }
 
 export class AppNotificationsService {
-  public static getNotificationsForApplication(applicationName: string): IPromise<IAppNotifications> {
-    return API.one('notifications')
-      .one('application', applicationName)
-      .get();
+  public static getNotificationsForApplication(applicationName: string): PromiseLike<IAppNotifications> {
+    return REST('/notifications/application').path(applicationName).get();
   }
 
   public static saveNotificationsForApplication(
     applicationName: string,
     notifications: IAppNotifications,
-  ): IPromise<void> {
-    return API.one('notifications')
-      .one('application', applicationName)
-      .data(notifications)
-      .post();
+  ): PromiseLike<void> {
+    return REST('/notifications/application').path(applicationName).post(notifications);
   }
 }

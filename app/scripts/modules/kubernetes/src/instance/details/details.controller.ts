@@ -1,4 +1,4 @@
-import { IController, IPromise, IQService, IScope, module } from 'angular';
+import { IController, IQService, IScope, module } from 'angular';
 import { IModalService } from 'angular-ui-bootstrap';
 import { flattenDeep } from 'lodash';
 import { StateService } from '@uirouter/angularjs';
@@ -89,7 +89,7 @@ class KubernetesInstanceDetailsController implements IController {
       this.manifest.manifest,
       this.instance.moniker,
       this.instance.account,
-    ).then(builtCommand => {
+    ).then((builtCommand) => {
       ManifestWizard.show({ title: 'Edit Manifest', application: this.app, command: builtCommand });
     });
   }
@@ -121,7 +121,7 @@ class KubernetesInstanceDetailsController implements IController {
       });
   }
 
-  private fetchInstance(instance: InstanceIdentifier): IPromise<IKubernetesInstance> {
+  private fetchInstance(instance: InstanceIdentifier): PromiseLike<IKubernetesInstance> {
     return InstanceReader.getInstanceDetails(instance.account, instance.namespace, instance.name).then(
       (instanceDetails: IKubernetesInstance) => {
         instanceDetails.id = instance.id;
@@ -134,7 +134,7 @@ class KubernetesInstanceDetailsController implements IController {
 
   private retrieveInstance(instanceFromState: InstanceFromStateParams): InstanceIdentifier {
     const instanceLocatorPredicate = (dataSource: InstanceManager) => {
-      return dataSource.instances.some(possibleMatch => possibleMatch.id === instanceFromState.instanceId);
+      return dataSource.instances.some((possibleMatch) => possibleMatch.id === instanceFromState.instanceId);
     };
 
     const dataSources: InstanceManager[] = flattenDeep([
@@ -156,7 +156,7 @@ class KubernetesInstanceDetailsController implements IController {
       recentHistoryExtraData.serverGroup = instanceManager.name;
     }
 
-    const instance = instanceManager.instances.find(i => i.id === instanceFromState.instanceId);
+    const instance = instanceManager.instances.find((i) => i.id === instanceFromState.instanceId);
     if (!instance) {
       return null;
     }

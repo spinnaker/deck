@@ -1,5 +1,6 @@
 import { $http } from 'ngimport';
-import { API } from 'core/api';
+import { SETTINGS } from '../config/settings';
+import { REST } from '../api/ApiService';
 import { registerPluginExtensions, IDeckPlugin } from './deck.plugin';
 
 /** The shape of plugin metadata objects in plugin-manifest.json */
@@ -33,7 +34,7 @@ export class PluginRegistry {
 
   registerPluginMetaData(source: ISource, pluginMetaData: IPluginMetaData): INormalizedPluginMetaData | undefined {
     const metaData = this.normalize(source, pluginMetaData);
-    const duplicateMetaData = this.pluginManifests.find(x => x.id === metaData.id);
+    const duplicateMetaData = this.pluginManifests.find((x) => x.id === metaData.id);
 
     // Handle duplicate plugin ids
     if (duplicateMetaData) {
@@ -45,7 +46,7 @@ export class PluginRegistry {
         // eslint-disable-next-line no-console
         console.log(`Attempted to load plugin ${pluginMetaData.id} from gate and deck.   Using plugin from deck.`);
         if (source === 'deck') {
-          this.pluginManifests = this.pluginManifests.filter(x => x !== duplicateMetaData);
+          this.pluginManifests = this.pluginManifests.filter((x) => x !== duplicateMetaData);
         } else if (source === 'gate') {
           return undefined;
         }
@@ -74,7 +75,7 @@ export class PluginRegistry {
       throw new Error(`Invalid plugin manifest: received ${pluginMetaData} object`);
     }
     const keys: Array<keyof IPluginMetaData> = ['id', 'version'];
-    const missingKeys = keys.filter(key => !pluginMetaData[key]);
+    const missingKeys = keys.filter((key) => !pluginMetaData[key]);
     if (missingKeys.length) {
       throw new Error(`Invalid plugin manifest: Required key is missing: '${missingKeys.join(', ')}'`);
     }
@@ -85,7 +86,7 @@ export class PluginRegistry {
     const source = 'deck';
     const uri = '/plugin-manifest.json';
     const loadPromise = Promise.resolve($http.get<IPluginMetaData[]>(uri))
-      .then(response => response.data)
+      .then((response) => response.data)
       .catch((error: any) => {
         console.error(`Failed to load ${uri} from ${source}`);
         throw error;
@@ -98,7 +99,7 @@ export class PluginRegistry {
   public loadPluginManifestFromGate() {
     const source = 'gate';
     const uri = '/plugins/deck/plugin-manifest.json';
-    const loadPromise = API.one(uri)
+    const loadPromise: PromiseLike<IPluginMetaData[]> = REST(uri)
       .get()
       .catch((error: any) => {
         console.error(`Failed to load ${uri} from ${source}`);
@@ -122,11 +123,11 @@ export class PluginRegistry {
   public async loadPluginManifest(
     source: ISource,
     location: string,
-    pluginsMetaDataPromise: Promise<IPluginMetaData[]>,
+    pluginsMetaDataPromise: PromiseLike<IPluginMetaData[]>,
   ): Promise<IPluginMetaData[]> {
     try {
       const plugins = await pluginsMetaDataPromise;
-      return plugins.map(pluginMetaData => this.registerPluginMetaData(source, pluginMetaData));
+      return plugins.map((pluginMetaData) => this.registerPluginMetaData(source, pluginMetaData));
     } catch (error) {
       console.error(`Error loading plugin manifest from ${location}`);
       throw error;
@@ -134,7 +135,7 @@ export class PluginRegistry {
   }
 
   public loadPlugins(): Promise<any[]> {
-    return Promise.all(this.pluginManifests.map(plugin => this.load(plugin)));
+    return Promise.all(this.pluginManifests.map((plugin) => this.load(plugin)));
   }
 
   private async load(pluginMetaData: IPluginMetaData) {
@@ -142,7 +143,7 @@ export class PluginRegistry {
 
     // Use `url` from the manifest, if it exists. This will be the case during local development.
     const { devUrl, url } = pluginMetaData;
-    const gateUrl = `${API.baseUrl}/plugins/deck/${pluginMetaData.id}/${pluginMetaData.version}/index.js`;
+    const gateUrl = `${SETTINGS.gateUrl}/plugins/deck/${pluginMetaData.id}/${pluginMetaData.version}/index.js`;
     const pluginUrl = url ?? devUrl ?? gateUrl;
 
     try {

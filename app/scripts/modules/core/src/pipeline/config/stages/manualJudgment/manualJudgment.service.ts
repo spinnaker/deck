@@ -1,4 +1,4 @@
-import { IPromise, module } from 'angular';
+import { module } from 'angular';
 
 import { EXECUTION_SERVICE, ExecutionService } from '../../../service/execution.service';
 import { IExecution, IExecutionStage } from 'core/domain';
@@ -14,15 +14,15 @@ export class ManualJudgmentService {
     stage: IExecutionStage,
     judgmentStatus: string,
     judgmentInput?: string,
-  ): IPromise<void> {
+  ): PromiseLike<void> {
     const matcher = (result: IExecution) => {
-      const match = result.stages.find(test => test.id === stage.id);
+      const match = result.stages.find((test) => test.id === stage.id);
       return match && match.status !== 'RUNNING';
     };
     return this.executionService
       .patchExecution(execution.id, stage.id, { judgmentStatus, judgmentInput })
       .then(() => this.executionService.waitUntilExecutionMatches(execution.id, matcher))
-      .then(updated => this.executionService.updateExecution(application, updated));
+      .then((updated) => this.executionService.updateExecution(application, updated));
   }
 }
 

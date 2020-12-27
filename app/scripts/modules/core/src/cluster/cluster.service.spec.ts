@@ -1,4 +1,5 @@
-import { IHttpBackendService, mock } from 'angular';
+import { mockHttpClient } from 'core/api/mock/jasmine';
+import { mock } from 'angular';
 import { find } from 'lodash';
 
 import { REACT_MODULE } from 'core/reactShims';
@@ -8,16 +9,14 @@ import { IInstanceCounts, IServerGroup } from 'core/domain';
 import { Application } from 'core/application/application.model';
 
 import { CLUSTER_SERVICE, ClusterService } from './cluster.service';
-import { API } from '../api/ApiService';
 import { SETTINGS } from 'core/config/settings';
 
 const ClusterState = State.ClusterState;
 
-describe('Service: Cluster', function() {
+describe('Service: Cluster', function () {
   beforeEach(mock.module(CLUSTER_SERVICE, REACT_MODULE));
 
   let clusterService: ClusterService;
-  let $http: IHttpBackendService;
   let application: Application;
 
   function buildTask(config: { status: string; variables: { [key: string]: any } }) {
@@ -30,8 +29,7 @@ describe('Service: Cluster', function() {
   }
 
   beforeEach(
-    mock.inject(($httpBackend: IHttpBackendService, _clusterService_: ClusterService) => {
-      $http = $httpBackend;
+    mock.inject((_clusterService_: ClusterService) => {
       clusterService = _clusterService_;
 
       application = ApplicationModelBuilder.createApplicationForTests(
@@ -53,37 +51,40 @@ describe('Service: Cluster', function() {
   beforeEach(() => State.initialize());
 
   describe('lazy cluster fetching', () => {
-    it('switches to lazy cluster fetching if there are more than the on demand threshold for clusters', () => {
-      const clusters = Array(SETTINGS.onDemandClusterThreshold + 1);
-      $http.expectGET(API.baseUrl + '/applications/app/clusters').respond(200, { test: clusters });
-      $http.expectGET(API.baseUrl + '/applications/app/serverGroups?clusters=').respond(200, []);
+    it('switches to lazy cluster fetching if there are more than the on demand threshold for clusters', async () => {
+      const http = mockHttpClient();
+      const clusters = [...Array(SETTINGS.onDemandClusterThreshold + 1)];
+      http.expectGET('/applications/app/clusters').respond(200, { test: clusters });
+      http.expectGET('/applications/app/serverGroups?clusters=').respond(200, []);
       let serverGroups: IServerGroup[] = null;
       clusterService.loadServerGroups(application).then((result: IServerGroup[]) => (serverGroups = result));
-      $http.flush();
-      expect(application.serverGroups.fetchOnDemand).toBe(true);
+      await http.flush();
       expect(serverGroups).toEqual([]);
+      expect(application.serverGroups.fetchOnDemand).toBe(true);
     });
 
-    it('does boring regular fetching when there are less than the on demand threshold for clusters', () => {
+    it('does boring regular fetching when there are less than the on demand threshold for clusters', async () => {
+      const http = mockHttpClient();
       const clusters = Array(SETTINGS.onDemandClusterThreshold);
-      $http.expectGET(API.baseUrl + '/applications/app/clusters').respond(200, { test: clusters });
-      $http.expectGET(API.baseUrl + '/applications/app/serverGroups').respond(200, []);
+      http.expectGET('/applications/app/clusters').respond(200, { test: clusters });
+      http.expectGET('/applications/app/serverGroups').respond(200, []);
       let serverGroups: IServerGroup[] = null;
       clusterService.loadServerGroups(application).then((result: IServerGroup[]) => (serverGroups = result));
-      $http.flush();
+      await http.flush();
       expect(application.serverGroups.fetchOnDemand).toBe(false);
       expect(serverGroups).toEqual([]);
     });
 
-    it('converts clusters parameter to q and account params when there are fewer than 251 clusters', () => {
+    it('converts clusters parameter to q and account params when there are fewer than 251 clusters', async () => {
+      const http = mockHttpClient();
       spyOn(ClusterState.filterModel.asFilterModel, 'applyParamsToUrl').and.callFake(() => {});
       const clusters = Array(250);
       ClusterState.filterModel.asFilterModel.sortFilter.clusters = { 'test:myapp': true };
-      $http.expectGET(API.baseUrl + '/applications/app/clusters').respond(200, { test: clusters });
-      $http.expectGET(API.baseUrl + '/applications/app/serverGroups').respond(200, []);
+      http.expectGET('/applications/app/clusters').respond(200, { test: clusters });
+      http.expectGET('/applications/app/serverGroups').respond(200, []);
       let serverGroups: IServerGroup[] = null;
       clusterService.loadServerGroups(application).then((result: IServerGroup[]) => (serverGroups = result));
-      $http.flush();
+      await http.flush();
       expect(application.serverGroups.fetchOnDemand).toBe(false);
       expect(ClusterState.filterModel.asFilterModel.sortFilter.filter).toEqual('clusters:myapp');
       expect(ClusterState.filterModel.asFilterModel.sortFilter.account.test).toBe(true);
@@ -157,8 +158,8 @@ describe('Service: Cluster', function() {
   });
 
   describe('addTasksToServerGroups', () => {
-    describe('rollback tasks', function() {
-      it('attaches to source and target', function() {
+    describe('rollback tasks', function () {
+      it('attaches to source and target', function () {
         application.runningTasks.data = [
           buildTask({
             status: 'RUNNING',
@@ -282,7 +283,7 @@ describe('Service: Cluster', function() {
         'deregisterinstancesfromloadbalancer',
         'enableinstancesindiscovery',
         'disableinstancesindiscovery',
-      ].forEach(name => {
+      ].forEach((name) => {
         describe(name, () => {
           it('finds instance within server group (' + name + ')', () => {
             const serverGroups: IServerGroup[] = application.serverGroups.data;
@@ -375,8 +376,8 @@ describe('Service: Cluster', function() {
       });
     });
 
-    describe('extraction region from stage context', function() {
-      it('should return the region from the deploy.server.groups node', function() {
+    describe('extraction region from stage context', function () {
+      it('should return the region from the deploy.server.groups node', function () {
         const context = {
           'deploy.server.groups': {
             'us-west-1': ['mahe-prestaging-v001'],
@@ -387,7 +388,7 @@ describe('Service: Cluster', function() {
         expect(result).toBe('us-west-1');
       });
 
-      it('should return empty string if nothing is extracted', function() {
+      it('should return empty string if nothing is extracted', function () {
         const context = {};
 
         const result = clusterService.extractRegionFromContext(context);
@@ -396,7 +397,7 @@ describe('Service: Cluster', function() {
       });
     });
 
-    describe('add executions to server group for deploy stage', function() {
+    describe('add executions to server group for deploy stage', function () {
       beforeEach(() => {
         application.serverGroups.data = [
           {
@@ -407,7 +408,7 @@ describe('Service: Cluster', function() {
         ];
       });
 
-      it('should successfully add a matched execution to a server group', function() {
+      it('should successfully add a matched execution to a server group', function () {
         const executions = [
           {
             stages: [
@@ -430,7 +431,7 @@ describe('Service: Cluster', function() {
         expect(application.serverGroups.data[0].runningExecutions.length).toBe(1);
       });
 
-      it('should NOT add a execution to a server group if the region does not match', function() {
+      it('should NOT add a execution to a server group if the region does not match', function () {
         const executions = [
           {
             stages: [
@@ -453,7 +454,7 @@ describe('Service: Cluster', function() {
         expect(application.serverGroups.data[0].runningExecutions.length).toBe(0);
       });
 
-      it('should NOT add a execution to a server group if the account does not match', function() {
+      it('should NOT add a execution to a server group if the account does not match', function () {
         const executions = [
           {
             stages: [
@@ -477,7 +478,7 @@ describe('Service: Cluster', function() {
       });
     });
 
-    describe('add executions to server group for disableAsg stage', function() {
+    describe('add executions to server group for disableAsg stage', function () {
       beforeEach(() => {
         application.serverGroups.data = [
           {
@@ -488,7 +489,7 @@ describe('Service: Cluster', function() {
         ];
       });
 
-      it('should successfully add a matched execution to a server group', function() {
+      it('should successfully add a matched execution to a server group', function () {
         const executions = [
           {
             stages: [
@@ -510,7 +511,7 @@ describe('Service: Cluster', function() {
         expect(application.serverGroups.data[0].runningExecutions.length).toBe(1);
       });
 
-      it('should NOT add a execution to a server group if the region does not match', function() {
+      it('should NOT add a execution to a server group if the region does not match', function () {
         const executions = [
           {
             stages: [
@@ -532,7 +533,7 @@ describe('Service: Cluster', function() {
         expect(application.serverGroups.data[0].runningExecutions.length).toBe(0);
       });
 
-      it('should NOT add a execution to a server group if the account does not match', function() {
+      it('should NOT add a execution to a server group if the account does not match', function () {
         const executions = [
           {
             stages: [

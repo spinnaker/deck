@@ -1,4 +1,5 @@
 import React, { memo, useMemo } from 'react';
+import ReactGA from 'react-ga';
 import classNames from 'classnames';
 import { useRouter } from '@uirouter/react';
 import { useTransition, animated, UseTransitionProps } from 'react-spring';
@@ -9,6 +10,7 @@ import {
   IManagedArtifactVersion,
   IManagedEnvironmentSummary,
   IManagedResourceSummary,
+  IManagedArtifactVersionEnvironment,
 } from '../domain';
 import { Application } from '../application';
 import { useEventListener, Markdown } from '../presentation';
@@ -17,6 +19,8 @@ import { AbsoluteTimestamp } from './AbsoluteTimestamp';
 import { ArtifactDetailHeader } from './ArtifactDetailHeader';
 import { ManagedResourceObject } from './ManagedResourceObject';
 import { EnvironmentRow } from './EnvironmentRow';
+import { PreDeploymentRow } from './PreDeploymentRow';
+import { PreDeploymentStepCard } from './PreDeploymentStepCard';
 import { VersionStateCard } from './VersionStateCard';
 import { StatusCard } from './StatusCard';
 import { Button } from './Button';
@@ -30,9 +34,18 @@ import { isResourceKindSupported } from './resources/resourceRegistry';
 
 import './ArtifactDetail.less';
 
+const SUPPORTED_PRE_DEPLOYMENT_TYPES = ['BUILD', 'BAKE'];
+
 function shouldDisplayResource(reference: string, resource: IManagedResourceSummary) {
   return isResourceKindSupported(resource.kind) && reference === resource.artifact?.reference;
 }
+
+const logEvent = (label: string, application: string, environment: string, reference: string) =>
+  ReactGA.event({
+    category: 'Environments - version details',
+    action: label,
+    label: `${application}:${environment}:${reference}`,
+  });
 
 const inStyles = {
   opacity: 1,
@@ -66,14 +79,21 @@ type IEnvironmentCardsProps = Pick<
   IArtifactDetailProps,
   'application' | 'reference' | 'version' | 'allVersions' | 'resourcesByEnvironment'
 > & {
-  environment: IManagedArtifactSummary['versions'][0]['environments'][0];
+  environment: IManagedArtifactVersionEnvironment;
   pinnedVersion: string;
 };
 
 const EnvironmentCards = memo(
   ({
     application,
-    environment: {
+    environment,
+    reference,
+    version: versionDetails,
+    allVersions,
+    pinnedVersion,
+    resourcesByEnvironment,
+  }: IEnvironmentCardsProps) => {
+    const {
       name: environmentName,
       state,
       deployedAt,
@@ -83,13 +103,8 @@ const EnvironmentCards = memo(
       vetoed,
       statefulConstraints,
       statelessConstraints,
-    },
-    reference,
-    version: versionDetails,
-    allVersions,
-    pinnedVersion,
-    resourcesByEnvironment,
-  }: IEnvironmentCardsProps) => {
+      compareLink,
+    } = environment;
     const {
       stateService: { go },
     } = useRouter();
@@ -145,7 +160,9 @@ const EnvironmentCards = memo(
         replacedAt={replacedAt}
         replacedBy={replacedBy}
         vetoed={vetoed}
+        compareLink={compareLink}
         allVersions={allVersions}
+        logClick={(message) => logEvent(message, application.name, environmentName, reference)}
       />
     );
     const constraintCards = useMemo(
@@ -156,7 +173,7 @@ const EnvironmentCards = memo(
             <ConstraintCard
               key={constraint.type}
               application={application}
-              environment={environmentName}
+              environment={environment}
               reference={reference}
               version={versionDetails.version}
               constraint={constraint}
@@ -202,21 +219,22 @@ export interface IArtifactDetailProps {
   version: IManagedArtifactVersion;
   allVersions: IManagedArtifactSummary['versions'];
   allEnvironments: IManagedEnvironmentSummary[];
+  showReferenceNames: boolean;
   resourcesByEnvironment: { [environment: string]: IManagedResourceSummary[] };
   onRequestClose: () => any;
 }
 
 export const ArtifactDetail = ({
   application,
-  name,
   reference,
   version: versionDetails,
   allVersions,
   allEnvironments,
+  showReferenceNames,
   resourcesByEnvironment,
   onRequestClose,
 }: IArtifactDetailProps) => {
-  const { environments, git, createdAt } = versionDetails;
+  const { environments, lifecycleSteps, git, createdAt } = versionDetails;
 
   const keydownCallback = ({ keyCode }: KeyboardEvent) => {
     if (keyCode === 27 /* esc */) {
@@ -229,11 +247,20 @@ export const ArtifactDetail = ({
   const isBadEverywhere = environments.every(({ state }) => state === 'vetoed');
   const createdAtTimestamp = useMemo(() => createdAt && DateTime.fromISO(createdAt), [createdAt]);
 
+  // These steps come in with chronological ordering, but we need reverse-chronological orddering for display
+  const preDeploymentSteps = lifecycleSteps
+    ?.filter(({ scope, type }) => scope === 'PRE_DEPLOYMENT' && SUPPORTED_PRE_DEPLOYMENT_TYPES.includes(type))
+    .reverse();
+
   return (
     <>
-      <ArtifactDetailHeader name={name} version={versionDetails} onRequestClose={onRequestClose} />
+      <ArtifactDetailHeader
+        reference={showReferenceNames ? reference : null}
+        version={versionDetails}
+        onRequestClose={onRequestClose}
+      />
 
-      <div className="ArtifactDetail">
+      <div className="ArtifactDetail flex-grow">
         <div className="flex-container-h top sp-margin-xl-bottom">
           <div className="flex-container-h sp-group-margin-s-xaxis flex-none">
             <Button
@@ -276,7 +303,12 @@ export const ArtifactDetail = ({
               <VersionMetadataItem
                 label="Pull Request"
                 value={
-                  <a href={git.pullRequest.url} target="_blank" rel="noopener noreferrer">
+                  <a
+                    href={git.pullRequest.url}
+                    onClick={() => logEvent('PR link clicked', application.name, 'none', reference)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     #{git.pullRequest.number}
                   </a>
                 }
@@ -287,12 +319,24 @@ export const ArtifactDetail = ({
                 <VersionMetadataItem
                   label="Commit"
                   value={
-                    <a href={git.commitInfo.link} target="_blank" rel="noopener noreferrer">
+                    <a
+                      href={git.commitInfo.link}
+                      onClick={() => logEvent('Commit link clicked', application.name, 'none', reference)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       {git.commitInfo.sha.substring(0, 7)}
                     </a>
                   }
                 />
-                <VersionMetadataItem label="Message" value={git.commitInfo.message} />
+                <VersionMetadataItem
+                  label="Message"
+                  value={
+                    <span style={{ wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}>
+                      <Markdown message={git.commitInfo.message} tag="span" />
+                    </span>
+                  }
+                />
               </>
             )}
             {git?.branch && <VersionMetadataItem label="Branch" value={git.branch} />}
@@ -312,7 +356,7 @@ export const ArtifactDetail = ({
               name={environmentName}
               resources={resourcesByEnvironment[environmentName]}
             >
-              <div className="sp-margin-l-right">
+              <div>
                 <EnvironmentCards
                   application={application}
                   environment={environment}
@@ -326,6 +370,7 @@ export const ArtifactDetail = ({
               <div className="sp-margin-l-top">
                 {resourcesByEnvironment[environmentName]
                   .filter((resource) => shouldDisplayResource(reference, resource))
+                  .sort((a, b) => `${a.kind}${a.displayName}`.localeCompare(`${b.kind}${b.displayName}`))
                   .map((resource) => (
                     <div key={resource.id} className="flex-container-h middle">
                       {state === 'deploying' && (
@@ -348,6 +393,13 @@ export const ArtifactDetail = ({
             </EnvironmentRow>
           );
         })}
+        {preDeploymentSteps && preDeploymentSteps.length > 0 && (
+          <PreDeploymentRow>
+            {preDeploymentSteps.map((step) => (
+              <PreDeploymentStepCard key={step.id} step={step} application={application} reference={reference} />
+            ))}
+          </PreDeploymentRow>
+        )}
       </div>
     </>
   );

@@ -13,6 +13,7 @@ const canaryEnabled = process.env.CANARY_ENABLED === 'true';
 const canaryFeatureDisabled = process.env.CANARY_FEATURE_ENABLED !== 'true';
 const canaryStagesEnabled = process.env.CANARY_STAGES_ENABLED === 'true';
 const chaosEnabled = process.env.CHAOS_ENABLED === 'true' ? true : false;
+const ciEnabled = process.env.CI_ENABLED === 'true';
 const debugEnabled = process.env.DEBUG_ENABLED === 'false' ? false : true;
 const defaultMetricStore = process.env.METRIC_STORE || 'atlas';
 const displayTimestampsInUserLocalTime = process.env.DISPLAY_TIMESTAMPS_IN_USER_LOCAL_TIME === 'true';
@@ -35,6 +36,7 @@ window.spinnakerSettings = {
   authEndpoint: authEndpoint,
   authTtl: 600000,
   bakeryDetailUrl: bakeryDetailUrl,
+  banners: [],
   canary: {
     atlasWebComponentsUrl: atlasWebComponentsUrl,
     defaultJudge: 'NetflixACAJudge-v1.0',
@@ -70,6 +72,7 @@ window.spinnakerSettings = {
   feature: {
     canary: canaryEnabled,
     chaosMonkey: chaosEnabled,
+    ci: ciEnabled,
     displayTimestampsInUserLocalTime: displayTimestampsInUserLocalTime,
     dryRunEnabled: dryRunEnabled,
     entityTags: entityTagsEnabled,

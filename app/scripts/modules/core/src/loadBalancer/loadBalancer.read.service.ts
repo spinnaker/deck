@@ -1,6 +1,6 @@
-import { IPromise, IQService, module } from 'angular';
+import { IQService, module } from 'angular';
 
-import { API } from 'core/api/ApiService';
+import { REST } from 'core/api/ApiService';
 import { IComponentName, NameUtils } from 'core/naming';
 import { ILoadBalancer, ILoadBalancerSourceData } from 'core/domain';
 import { CORE_LOADBALANCER_LOADBALANCER_TRANSFORMER } from './loadBalancer.transformer';
@@ -20,13 +20,13 @@ export class LoadBalancerReader {
   public static $inject = ['$q', 'loadBalancerTransformer'];
   public constructor(private $q: IQService, private loadBalancerTransformer: any) {}
 
-  public loadLoadBalancers(applicationName: string): IPromise<ILoadBalancerSourceData[]> {
-    return API.one('applications', applicationName)
-      .all('loadBalancers')
-      .getList()
+  public loadLoadBalancers(applicationName: string): PromiseLike<ILoadBalancerSourceData[]> {
+    return REST('/applications')
+      .path(applicationName, 'loadBalancers')
+      .get()
       .then((loadBalancers: ILoadBalancerSourceData[]) => {
         loadBalancers = this.loadBalancerTransformer.normalizeLoadBalancerSet(loadBalancers);
-        return this.$q.all(loadBalancers.map(lb => this.normalizeLoadBalancer(lb)));
+        return this.$q.all(loadBalancers.map((lb) => this.normalizeLoadBalancer(lb)));
       });
   }
 
@@ -35,22 +35,15 @@ export class LoadBalancerReader {
     account: string,
     region: string,
     name: string,
-  ): IPromise<ILoadBalancerSourceData[]> {
-    return API.all('loadBalancers')
-      .all(account)
-      .all(region)
-      .all(name)
-      .withParams({ provider: cloudProvider })
-      .get();
+  ): PromiseLike<ILoadBalancerSourceData[]> {
+    return REST('/loadBalancers').path(account, region, name).query({ provider: cloudProvider }).get();
   }
 
-  public listLoadBalancers(cloudProvider: string): IPromise<ILoadBalancersByAccount[]> {
-    return API.all('loadBalancers')
-      .withParams({ provider: cloudProvider })
-      .getList();
+  public listLoadBalancers(cloudProvider: string): PromiseLike<ILoadBalancersByAccount[]> {
+    return REST('/loadBalancers').query({ provider: cloudProvider }).get();
   }
 
-  private normalizeLoadBalancer(loadBalancer: ILoadBalancerSourceData): IPromise<ILoadBalancer> {
+  private normalizeLoadBalancer(loadBalancer: ILoadBalancerSourceData): PromiseLike<ILoadBalancer> {
     return this.loadBalancerTransformer.normalizeLoadBalancer(loadBalancer).then((lb: ILoadBalancer) => {
       const nameParts: IComponentName = NameUtils.parseLoadBalancerName(lb.name);
       lb.stack = nameParts.stack;

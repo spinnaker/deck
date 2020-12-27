@@ -1,6 +1,4 @@
-import { IPromise } from 'angular';
-
-import { API } from 'core/api';
+import { REST } from 'core/api';
 
 export interface IDeploymentMonitorDefinition {
   id: string;
@@ -9,10 +7,7 @@ export interface IDeploymentMonitorDefinition {
 }
 
 export class DeploymentMonitorReader {
-  public static getDeploymentMonitors(): IPromise<IDeploymentMonitorDefinition[]> {
-    return API.all('capabilities')
-      .all('deploymentMonitors')
-      .useCache(true)
-      .get();
+  public static getDeploymentMonitors(): PromiseLike<IDeploymentMonitorDefinition[]> {
+    return REST('/capabilities/deploymentMonitors').useCache(true).get();
   }
 }

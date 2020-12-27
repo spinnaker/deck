@@ -12,7 +12,7 @@ import { StageExecutionDetails } from '../../details/StageExecutionDetails';
 import { ExecutionStatus } from '../../status/ExecutionStatus';
 import { ParametersAndArtifacts } from '../../status/ParametersAndArtifacts';
 import { ExecutionCancellationReason } from '../../status/ExecutionCancellationReason';
-import { IExecution, IRestartDetails, IPipeline } from 'core/domain';
+import type { IExecution, IRestartDetails, IPipeline } from 'core/domain';
 import { IExecutionViewState, IPipelineGraphNode } from '../../config/graph/pipelineGraph.service';
 import { OrchestratedItemRunningTime } from './OrchestratedItemRunningTime';
 import { SETTINGS } from 'core/config/settings';
@@ -23,11 +23,12 @@ import { ISortFilter } from 'core/filterModel';
 import { ExecutionState } from 'core/state';
 
 // react components
+import { CancelModal } from 'core/cancelModal/CancelModal';
+import { ExecutionBreadcrumbs } from './ExecutionBreadcrumbs';
 import { ExecutionMarker } from './ExecutionMarker';
+import { ExecutionPermalink } from './ExecutionPermalink';
 import { PipelineGraph } from '../../config/graph/PipelineGraph';
 import { Tooltip } from 'core/presentation/Tooltip';
-import { CancelModal } from 'core/cancelModal/CancelModal';
-import { ExecutionPermalink } from './ExecutionPermalink';
 
 import './execution.less';
 
@@ -79,7 +80,7 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
       canConfigure: false,
     };
 
-    const restartedStage = execution.stages.find(stage => stage.context.restartDetails !== undefined);
+    const restartedStage = execution.stages.find((stage) => stage.context.restartDetails !== undefined);
 
     this.state = {
       showingDetails: this.invalidateShowingDetails(props, true),
@@ -168,7 +169,8 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
     const { application, execution, cancelConfirmationText } = this.props;
     const { executionService } = ReactInjector;
     const hasDeployStage =
-      execution.stages && execution.stages.some(stage => stage.type === 'deploy' || stage.type === 'cloneServerGroup');
+      execution.stages &&
+      execution.stages.some((stage) => stage.type === 'deploy' || stage.type === 'cloneServerGroup');
     CancelModal.confirm({
       header: `Really stop execution of ${execution.name}?`,
       buttonText: `Stop running ${execution.name}`,
@@ -299,13 +301,13 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
     const { pipelinesUrl, restartDetails, showingDetails, sortFilter, viewState } = this.state;
     const { $state } = ReactInjector;
 
-    const accountLabels = this.props.execution.deploymentTargets.map(account => (
+    const accountLabels = this.props.execution.deploymentTargets.map((account) => (
       <AccountTag key={account} account={account} />
     ));
 
     const executionMarkerWidth = `${100 / execution.stageSummaries.length}%`;
     const showExecutionName = standalone || (!title && sortFilter.groupBy !== 'name');
-    const executionMarkers = execution.stageSummaries.map(stage => (
+    const executionMarkers = execution.stageSummaries.map((stage) => (
       <ExecutionMarker
         key={stage.refId}
         application={application}
@@ -325,6 +327,8 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
       'show-durations': showDurations,
     });
 
+    const hasParentExecution = !!execution.trigger?.parentExecution;
+
     return (
       <div className={className} id={`execution-${execution.id}`} ref={this.wrapperRef}>
         <div className={`execution-overview group-by-${sortFilter.groupBy}`}>
@@ -335,6 +339,11 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
               {title || execution.name}
             </h4>
           )}
+          {hasParentExecution && (
+            <div className="execution-breadcrumbs">
+              <ExecutionBreadcrumbs execution={execution} />
+            </div>
+          )}
           <ExecutionStatus execution={execution} showingDetails={showingDetails} standalone={standalone} />
           <div className="execution-bar">
             <div className="stages">
@@ -343,7 +352,7 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
                 <div className="text-center">
                   No stages found.{' '}
                   <a onClick={this.handleSourceNoStagesClick} target="_blank" href={pipelinesUrl + execution.id}>
-                    Source
+                    View as JSON
                   </a>
                 </div>
               )}
@@ -457,7 +466,7 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
             <div className="permalinks">
               <div className="permalinks-content">
                 <a onClick={this.handleSourceClick} target="_blank" href={pipelinesUrl + execution.id}>
-                  Source
+                  View as JSON
                 </a>
                 {' | '}
                 <ExecutionPermalink standalone={standalone} />

@@ -1,4 +1,4 @@
-import { IController, IPromise, IQService, IScope, module } from 'angular';
+import { IController, IQService, IScope, module } from 'angular';
 import { StateService } from '@uirouter/angularjs';
 import { head, sortBy } from 'lodash';
 
@@ -94,7 +94,7 @@ export class AwsLoadBalancerDetailsController implements IController {
     this.$state.go('^', null, { location: 'replace' });
   }
 
-  public extractLoadBalancer(): IPromise<void> {
+  public extractLoadBalancer(): PromiseLike<void> {
     const appLoadBalancer = this.app.loadBalancers.data.find((test: ILoadBalancer) => {
       return (
         test.name === this.loadBalancerFromParams.name &&
@@ -133,29 +133,29 @@ export class AwsLoadBalancerDetailsController implements IController {
                 this.listeners = [];
 
                 // Sort the actions by the order specified since amazon does not return them in order of order
-                elb.listeners.forEach(l => {
+                elb.listeners.forEach((l) => {
                   l.defaultActions.sort((a, b) => a.order - b.order);
-                  l.rules.forEach(r => r.actions.sort((a, b) => a.order - b.order));
+                  l.rules.forEach((r) => r.actions.sort((a, b) => a.order - b.order));
                 });
 
-                elb.listeners.forEach(listener => {
-                  listener.rules.map(rule => {
+                elb.listeners.forEach((listener) => {
+                  listener.rules.map((rule) => {
                     let inMatch = [
                       listener.protocol,
-                      (rule.conditions.find(c => c.field === 'host-header') || { values: [''] }).values[0],
+                      (rule.conditions.find((c) => c.field === 'host-header') || { values: [''] }).values[0],
                       listener.port,
                     ]
-                      .filter(f => f)
+                      .filter((f) => f)
                       .join(':');
-                    const path = (rule.conditions.find(c => c.field === 'path-pattern') || { values: [] }).values[0];
+                    const path = (rule.conditions.find((c) => c.field === 'path-pattern') || { values: [] }).values[0];
                     if (path) {
                       inMatch = `${inMatch}${path}`;
                     }
-                    const actions = rule.actions.map(a => {
+                    const actions = rule.actions.map((a) => {
                       const action = { ...a } as IActionDetails;
                       if (action.type === 'forward') {
                         action.targetGroup = (this.loadBalancer as IAmazonApplicationLoadBalancer).targetGroups.find(
-                          tg => tg.name === action.targetGroupName,
+                          (tg) => tg.name === action.targetGroupName,
                         );
                       }
                       return action;
@@ -224,7 +224,7 @@ export class AwsLoadBalancerDetailsController implements IController {
   }
 
   public getFirstSubnetPurpose(subnetDetailsList: ISubnet[] = []) {
-    return head(subnetDetailsList.map(subnet => subnet.purpose)) || '';
+    return head(subnetDetailsList.map((subnet) => subnet.purpose)) || '';
   }
 }
 

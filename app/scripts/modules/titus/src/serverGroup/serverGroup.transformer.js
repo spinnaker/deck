@@ -10,9 +10,9 @@ export const TITUS_SERVERGROUP_SERVERGROUP_TRANSFORMER = 'spinnaker.titus.server
 export const name = TITUS_SERVERGROUP_SERVERGROUP_TRANSFORMER; // for backwards compatibility
 module(TITUS_SERVERGROUP_SERVERGROUP_TRANSFORMER, []).factory('titusServerGroupTransformer', [
   '$q',
-  function($q) {
+  function ($q) {
     function normalizeServerGroup(serverGroup) {
-      return AccountService.getCredentialsKeyedByAccount('titus').then(credentialsKeyedByAccount => {
+      return AccountService.getCredentialsKeyedByAccount('titus').then((credentialsKeyedByAccount) => {
         if (serverGroup.account && credentialsKeyedByAccount[serverGroup.account]) {
           serverGroup.awsAccount = credentialsKeyedByAccount[serverGroup.account].awsAccount;
         }
@@ -48,6 +48,7 @@ module(TITUS_SERVERGROUP_SERVERGROUP_TRANSFORMER, []).factory('titusServerGroupT
             statistic: 'Average',
             comparisonOperator: 'GreaterThanThreshold',
             evaluationPeriods: 1,
+            disableEditingDimensions: true,
             dimensions: [{ name: 'AutoScalingGroupName', value: serverGroup.name }],
             period: 60,
           },

@@ -3,6 +3,7 @@ import * as React from 'react';
 import { Application } from 'core/application/application.model';
 import { FilterTags, IFilterTag } from 'core/filterModel/FilterTags';
 import { ISecurityGroupGroup } from 'core/domain';
+import { BannerContainer } from 'core/banner';
 import { SecurityGroupState } from 'core/state';
 import { Spinner } from 'core/widgets/spinners/Spinner';
 import { ISortFilter } from 'core/filterModel';
@@ -26,10 +27,10 @@ interface IFilterModel {
 
 const Groupings = ({ groups, app }: { groups: ISecurityGroupGroup[]; app: Application }) => (
   <div>
-    {groups.map(group => (
+    {groups.map((group) => (
       <div key={group.heading} className="rollup">
         {group.subgroups &&
-          group.subgroups.map(subgroup => (
+          group.subgroups.map((subgroup) => (
             <SecurityGroupPod
               key={subgroup.heading}
               grouping={subgroup}
@@ -147,7 +148,10 @@ export const SecurityGroups = ({ app }: ISecurityGroupsProps) => {
         <FilterTags tags={filterModel.tags} tagCleared={updateSecurityGroupGroups} clearFilters={clearFilters} />
       </div>
 
-      <div className="content">{groupings}</div>
+      <div className="content">
+        <BannerContainer app={app} />
+        {groupings}
+      </div>
     </div>
   );
 };

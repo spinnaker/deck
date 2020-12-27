@@ -6,7 +6,7 @@ import ReactDOM from 'react-dom';
 import { defaultsDeep, extend, omit } from 'lodash';
 
 import { AccountService } from 'core/account/AccountService';
-import { API } from 'core/api';
+import { REST } from 'core/api';
 import { BASE_EXECUTION_DETAILS_CTRL } from './common/baseExecutionDetails.controller';
 import { ConfirmationModalService } from 'core/confirmationModal';
 import { STAGE_NAME } from './StageName';
@@ -18,6 +18,7 @@ import { ReactModal } from 'core/presentation';
 import { PRODUCES_ARTIFACTS_REACT } from './producesArtifacts/ProducesArtifacts';
 import { OVERRRIDE_FAILURE } from './overrideFailure/overrideFailure.module';
 import { OVERRIDE_TIMEOUT_COMPONENT } from './overrideTimeout/overrideTimeout.module';
+import { ApplicationReader } from 'core/application/service/ApplicationReader';
 import { CORE_PIPELINE_CONFIG_STAGES_OPTIONALSTAGE_OPTIONALSTAGE_DIRECTIVE } from './optionalStage/optionalStage.directive';
 import { CORE_PIPELINE_CONFIG_STAGES_FAILONFAILEDEXPRESSIONS_FAILONFAILEDEXPRESSIONS_DIRECTIVE } from './failOnFailedExpressions/failOnFailedExpressions.directive';
 import { CORE_PIPELINE_CONFIG_STAGES_COMMON_STAGECONFIGFIELD_STAGECONFIGFIELD_DIRECTIVE } from './common/stageConfigField/stageConfigField.directive';
@@ -34,7 +35,7 @@ module(CORE_PIPELINE_CONFIG_STAGES_STAGE_MODULE, [
   CORE_PIPELINE_CONFIG_STAGES_FAILONFAILEDEXPRESSIONS_FAILONFAILEDEXPRESSIONS_DIRECTIVE,
   CORE_PIPELINE_CONFIG_STAGES_COMMON_STAGECONFIGFIELD_STAGECONFIGFIELD_DIRECTIVE,
 ])
-  .directive('pipelineConfigStage', function() {
+  .directive('pipelineConfigStage', function () {
     return {
       restrict: 'E',
       require: '^pipelineConfigurer',
@@ -46,7 +47,7 @@ module(CORE_PIPELINE_CONFIG_STAGES_STAGE_MODULE, [
       },
       controller: 'StageConfigCtrl as stageConfigCtrl',
       templateUrl: require('./stage.html'),
-      link: function(scope, elem, attrs, pipelineConfigurerCtrl) {
+      link: function (scope, elem, attrs, pipelineConfigurerCtrl) {
         scope.pipelineConfigurerCtrl = pipelineConfigurerCtrl;
       },
     };
@@ -57,21 +58,23 @@ module(CORE_PIPELINE_CONFIG_STAGES_STAGE_MODULE, [
     '$compile',
     '$controller',
     '$templateCache',
-    function($scope, $element, $compile, $controller, $templateCache) {
+    function ($scope, $element, $compile, $controller, $templateCache) {
       let lastStageScope, reactComponentMounted;
-
+      let appPermissions = {};
+      let appRoles = [];
       $scope.options = {
         stageTypes: [],
         selectedStageType: null,
+        stageRoles: [],
       };
 
-      AccountService.applicationAccounts($scope.application).then(accounts => {
+      AccountService.applicationAccounts($scope.application).then((accounts) => {
         $scope.options.stageTypes = Registry.pipeline.getConfigurableStageTypes(accounts);
-        $scope.showProviders = new Set(accounts.map(a => a.cloudProvider)).size > 1;
+        $scope.showProviders = new Set(accounts.map((a) => a.cloudProvider)).size > 1;
       });
 
       if ($scope.pipeline.strategy) {
-        $scope.options.stageTypes = $scope.options.stageTypes.filter(stageType => {
+        $scope.options.stageTypes = $scope.options.stageTypes.filter((stageType) => {
           return stageType.strategy || false;
         });
       }
@@ -80,7 +83,7 @@ module(CORE_PIPELINE_CONFIG_STAGES_STAGE_MODULE, [
         return Registry.pipeline.getStageConfig(stage);
       }
 
-      $scope.groupDependencyOptions = function(stage) {
+      $scope.groupDependencyOptions = function (stage) {
         const requisiteStageRefIds = $scope.stage.requisiteStageRefIds || [];
         return stage.available
           ? 'Available'
@@ -89,7 +92,7 @@ module(CORE_PIPELINE_CONFIG_STAGES_STAGE_MODULE, [
           : 'Downstream dependencies (unavailable)';
       };
 
-      $scope.stageProducesArtifacts = function() {
+      $scope.stageProducesArtifacts = function () {
         if (!$scope.stage) {
           return false;
         }
@@ -103,18 +106,18 @@ module(CORE_PIPELINE_CONFIG_STAGES_STAGE_MODULE, [
         }
       };
 
-      $scope.producesArtifactsChanged = function(artifacts) {
+      $scope.producesArtifactsChanged = function (artifacts) {
         $scope.$applyAsync(() => {
           $scope.stage.expectedArtifacts = artifacts;
         });
       };
 
-      $scope.updateAvailableDependencyStages = function() {
+      $scope.updateAvailableDependencyStages = function () {
         const availableDependencyStages = PipelineConfigService.getDependencyCandidateStages(
           $scope.pipeline,
           $scope.stage,
         );
-        $scope.options.dependencies = availableDependencyStages.map(function(stage) {
+        $scope.options.dependencies = availableDependencyStages.map(function (stage) {
           return {
             name: stage.name,
             refId: stage.refId,
@@ -122,7 +125,7 @@ module(CORE_PIPELINE_CONFIG_STAGES_STAGE_MODULE, [
           };
         });
 
-        $scope.pipeline.stages.forEach(function(stage) {
+        $scope.pipeline.stages.forEach(function (stage) {
           if (stage !== $scope.stage && !availableDependencyStages.includes(stage)) {
             $scope.options.dependencies.push({
               name: stage.name,
@@ -130,6 +133,31 @@ module(CORE_PIPELINE_CONFIG_STAGES_STAGE_MODULE, [
             });
           }
         });
+      };
+
+      $scope.getApplicationPermissions = function() {
+          ApplicationReader.getApplicationPermissions($scope.application.name).then(result => {
+              appPermissions = result;
+              if (appPermissions) {
+                  const readArray = appPermissions.READ || [];
+                  const writeArray = appPermissions.WRITE || [];
+                  const executeArray = appPermissions.EXECUTE || [];
+                  appRoles = _.union(readArray, writeArray, executeArray);
+                  appRoles = Array.from(new Set(appRoles));
+                  $scope.updateAvailableStageRoles();
+              }
+          });
+      };
+
+      $scope.updateAvailableStageRoles = function() {
+          $scope.options.stageRoles = appRoles.map(function(value, index) {
+              return {
+                  name: value,
+                  roleId: value,
+                  id: index,
+                  available: true,
+              };
+          });
       };
 
       this.editStageJson = () => {
@@ -141,23 +169,23 @@ module(CORE_PIPELINE_CONFIG_STAGES_STAGE_MODULE, [
           .catch(() => {}); // user closed modal
       };
 
-      this.selectStageType = stage => {
+      this.selectStageType = (stage) => {
         $scope.stage.type = stage.key;
         this.selectStage();
         // clear stage-specific fields
-        Object.keys($scope.stage).forEach(k => {
+        Object.keys($scope.stage).forEach((k) => {
           if (!['requisiteStageRefIds', 'refId', 'isNew', 'name', 'type'].includes(k)) {
             delete $scope.stage[k];
           }
         });
       };
 
-      this.updateStageField = changes => {
+      this.updateStageField = (changes) => {
         extend($scope.stage, changes);
         $scope.stageFieldUpdated();
       };
 
-      this.selectStage = function(newVal, oldVal) {
+      this.selectStage = function (newVal, oldVal) {
         const stageDetailsNode = $element.find('.stage-details').get(0);
         if ($scope.viewState.stageIndex >= $scope.pipeline.stages.length) {
           $scope.viewState.stageIndex = $scope.pipeline.stages.length - 1;
@@ -192,7 +220,7 @@ module(CORE_PIPELINE_CONFIG_STAGES_STAGE_MODULE, [
         }
         $scope.extendedDescription = '';
         lastStageScope = stageScope;
-        $scope.$on('$destroy', function() {
+        $scope.$on('$destroy', function () {
           stageScope.$destroy();
         });
 
@@ -220,7 +248,7 @@ module(CORE_PIPELINE_CONFIG_STAGES_STAGE_MODULE, [
             const props = {
               application: $scope.application,
               stageFieldUpdated: $scope.stageFieldUpdated,
-              updateStageField: changes => {
+              updateStageField: (changes) => {
                 // Reserved fields should not be mutated from with a StageConfig component
                 const allowedChanges = omit(changes, ['requisiteStageRefIds', 'refId', 'isNew', 'name', 'type']);
 
@@ -289,18 +317,19 @@ module(CORE_PIPELINE_CONFIG_STAGES_STAGE_MODULE, [
         });
       }
 
-      this.updateNotifications = function(notifications) {
+      this.updateNotifications = function (notifications) {
         $scope.$applyAsync(() => {
           $scope.stage.notifications = notifications;
         });
       };
 
-      this.handleSendNotificationsChanged = function() {
+      this.handleSendNotificationsChanged = function () {
         $scope.$applyAsync(() => {
           $scope.stage.sendNotifications = !$scope.stage.sendNotifications;
         });
       };
 
+      $scope.getApplicationPermissions();
       $scope.$on('pipeline-reverted', this.selectStage);
       $scope.$on('pipeline-json-edited', this.selectStage);
       $scope.$watch('stage.type', this.selectStage);
@@ -311,20 +340,17 @@ module(CORE_PIPELINE_CONFIG_STAGES_STAGE_MODULE, [
   .controller('RestartStageCtrl', [
     '$scope',
     '$stateParams',
-    function($scope, $stateParams) {
-      const restartStage = function() {
-        return API.one('pipelines')
-          .one($stateParams.executionId)
-          .one('stages', $scope.stage.id)
-          .one('restart')
-          .data({ skip: false })
-          .put()
-          .then(function() {
+    function ($scope, $stateParams) {
+      const restartStage = function () {
+        return REST('/pipelines')
+          .path($stateParams.executionId, 'stages', $scope.stage.id, 'restart')
+          .put({ skip: false })
+          .then(function () {
             $scope.stage.isRestarting = true;
           });
       };
 
-      this.restart = function() {
+      this.restart = function () {
         let body = null;
         if ($scope.execution.isRunning) {
           body =
@@ -343,7 +369,7 @@ module(CORE_PIPELINE_CONFIG_STAGES_STAGE_MODULE, [
     return (stageTypes, search) => {
       const q = search.toLowerCase();
       return stageTypes
-        .filter(s => s.label.toLowerCase().includes(q) || s.description.toLowerCase().includes(q))
+        .filter((s) => s.label.toLowerCase().includes(q) || s.description.toLowerCase().includes(q))
         .sort((a, b) => {
           const aLabel = a.label.toLowerCase();
           const bLabel = b.label.toLowerCase();

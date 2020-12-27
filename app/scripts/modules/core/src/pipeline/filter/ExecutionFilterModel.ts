@@ -46,15 +46,24 @@ export class ExecutionFilterModel {
     FilterModelService.registerRouterHooks(this.asFilterModel, '**.application.pipelines.executions.**');
     this.asFilterModel.activate();
 
-    transitionService.onBefore({ entering: '**.application.pipelines.executions' }, trans => {
-      this.mostRecentApplication = trans.params().application;
-      this.assignViewStateFromCache();
-    });
+    transitionService.onBefore(
+      {
+        entering: (state) =>
+          !!(
+            state.self.name.match('.application.pipelines.executions$') ||
+            state.self.name.match('.application.pipelines.executionDetails.execution$')
+          ),
+      },
+      (trans) => {
+        this.mostRecentApplication = trans.params().application;
+        this.assignViewStateFromCache();
+      },
+    );
 
     // A nice way to avoid watches is to define a property on an object
     Object.defineProperty(this.asFilterModel.sortFilter, 'count', {
       get: () => this.groupCount,
-      set: count => {
+      set: (count) => {
         this.groupCount = count;
         this.cacheConfigViewState();
       },
@@ -62,7 +71,7 @@ export class ExecutionFilterModel {
 
     Object.defineProperty(this.asFilterModel.sortFilter, 'groupBy', {
       get: () => this.groupBy,
-      set: grouping => {
+      set: (grouping) => {
         this.groupBy = grouping;
         this.cacheConfigViewState();
       },
@@ -70,7 +79,7 @@ export class ExecutionFilterModel {
 
     Object.defineProperty(this.asFilterModel.sortFilter, 'showDurations', {
       get: () => this.showDurations,
-      set: newVal => {
+      set: (newVal) => {
         this.showDurations = newVal;
         this.cacheConfigViewState();
       },

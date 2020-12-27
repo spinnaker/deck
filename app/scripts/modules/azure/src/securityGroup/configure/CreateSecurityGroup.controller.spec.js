@@ -1,16 +1,14 @@
 'use strict';
+import { mockHttpClient } from 'core/api/mock/jasmine';
+import { AccountService, SECURITY_GROUP_READER } from '@spinnaker/core';
 
-import { AccountService, API, SECURITY_GROUP_READER } from '@spinnaker/core';
-
-describe('Controller: Azure.CreateSecurityGroup', function() {
-  var $http;
-
+describe('Controller: Azure.CreateSecurityGroup', function () {
   beforeEach(window.module(SECURITY_GROUP_READER, require('./CreateSecurityGroupCtrl').name));
 
-  describe('filtering', function() {
+  describe('filtering', function () {
     // Initialize the controller and a mock scope
     beforeEach(
-      window.inject(function($controller, $rootScope, $q, securityGroupReader, azureSecurityGroupWriter) {
+      window.inject(function ($controller, $rootScope, $q, securityGroupReader, azureSecurityGroupWriter) {
         this.$scope = $rootScope.$new();
         this.$q = $q;
         this.securityGroupReader = securityGroupReader;
@@ -54,7 +52,7 @@ describe('Controller: Azure.CreateSecurityGroup', function() {
           }),
         );
 
-        this.initializeCtrl = function() {
+        this.initializeCtrl = function () {
           this.ctrl = $controller('azureCreateSecurityGroupCtrl', {
             $scope: this.$scope,
             $uibModalInstance: { result: this.$q.when(null) },
@@ -69,16 +67,11 @@ describe('Controller: Azure.CreateSecurityGroup', function() {
       }),
     );
 
-    beforeEach(
-      window.inject(function($httpBackend) {
-        // Set up the mock http service responses
-        $http = $httpBackend;
-      }),
-    );
-
-    it('initializes with no firewalls available for ingress permissions', function() {
-      $http.when('GET', API.baseUrl + '/networks').respond([]);
+    it('initializes with no firewalls available for ingress permissions', async function () {
+      const http = mockHttpClient();
+      http.expectGET('/networks').respond([]);
       this.initializeCtrl();
+      await http.flush();
       expect(this.$scope.securityGroup.securityRules.length).toBe(0);
     });
   });

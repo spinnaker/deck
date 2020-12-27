@@ -8,8 +8,6 @@ import { CollapsibleSection } from '../../presentation';
 import { Application } from '../../application';
 import { IInstance } from '../../domain';
 
-import './instanceLinks.component.less';
-
 export interface IInstanceLinksProps {
   address: string;
   application: Application;
@@ -43,7 +41,7 @@ export const InstanceLinks = ({ address, application, instance, moniker, environ
   );
 
   linkSections.forEach((section: LinkSection) => {
-    section.links = section.links.map(link => {
+    section.links = section.links.map((link) => {
       const linkPort = link.path.indexOf(':') === 0 || !port ? '' : ':' + port;
       let url = link.path;
       // handle interpolated variables

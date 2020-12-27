@@ -1,4 +1,4 @@
-import { module, IQService, IPromise } from 'angular';
+import { module, IQService } from 'angular';
 import { chain, camelCase } from 'lodash';
 
 import { IServerGroup, IInstanceCounts } from '@spinnaker/core';
@@ -9,13 +9,13 @@ class KubernetesV2LoadBalancerTransformer {
   public static $inject = ['$q'];
   constructor(private $q: IQService) {}
 
-  public normalizeLoadBalancer(loadBalancer: IKubernetesLoadBalancer): IPromise<IKubernetesLoadBalancer> {
+  public normalizeLoadBalancer(loadBalancer: IKubernetesLoadBalancer): PromiseLike<IKubernetesLoadBalancer> {
     loadBalancer.provider = loadBalancer.type;
     loadBalancer.instances = [];
     loadBalancer.instanceCounts = this.buildInstanceCounts(loadBalancer.serverGroups);
-    (loadBalancer.serverGroups || []).forEach(serverGroup => {
+    (loadBalancer.serverGroups || []).forEach((serverGroup) => {
       serverGroup.cloudProvider = loadBalancer.provider;
-      (serverGroup.instances || []).forEach(instance => {
+      (serverGroup.instances || []).forEach((instance) => {
         instance.cloudProvider = loadBalancer.provider;
       });
     });
@@ -24,7 +24,7 @@ class KubernetesV2LoadBalancerTransformer {
 
   private buildInstanceCounts(serverGroups: IServerGroup[]): IInstanceCounts {
     const instanceCounts = chain(serverGroups)
-      .map(serverGroup => serverGroup.instances)
+      .map((serverGroup) => serverGroup.instances)
       .flatten()
       .reduce(
         (acc: IInstanceCounts, instance: any) => {
@@ -44,7 +44,7 @@ class KubernetesV2LoadBalancerTransformer {
       .value();
 
     instanceCounts.outOfService += chain(serverGroups)
-      .map(serverGroup => serverGroup.detachedInstances)
+      .map((serverGroup) => serverGroup.detachedInstances)
       .flatten()
       .value().length;
 

@@ -1,27 +1,27 @@
-import { IPromise, module } from 'angular';
+import { module } from 'angular';
 
 import { ProviderServiceDelegate, PROVIDER_SERVICE_DELEGATE } from 'core/cloudProvider/providerService.delegate';
 
-export interface IFindImageParams {
+export type IFindImageParams = {
   provider: string;
   q?: string;
   region?: string;
   account?: string;
   count?: number;
-}
+};
 
-export interface IFindTagsParams {
+export type IFindTagsParams = {
   provider: string;
   account: string;
   repository: string;
-}
+};
 
 // marker interface
 export interface IImage {}
 
 export interface IImageReader {
-  findImages(params: IFindImageParams): IPromise<IImage[]>;
-  getImage(imageName: string, region: string, credentials: string): IPromise<IImage>;
+  findImages(params: IFindImageParams): PromiseLike<IImage[]>;
+  getImage(imageName: string, region: string, credentials: string): PromiseLike<IImage>;
 }
 
 export class ImageReader {
@@ -32,11 +32,11 @@ export class ImageReader {
     return this.providerServiceDelegate.getDelegate<IImageReader>(cloudProvider, 'image.reader');
   }
 
-  public findImages(params: IFindImageParams): IPromise<IImage[]> {
+  public findImages(params: IFindImageParams): PromiseLike<IImage[]> {
     return this.getDelegate(params.provider).findImages(params);
   }
 
-  public getImage(cloudProvider: string, imageName: string, region: string, credentials: string): IPromise<IImage> {
+  public getImage(cloudProvider: string, imageName: string, region: string, credentials: string): PromiseLike<IImage> {
     return this.getDelegate(cloudProvider).getImage(imageName, region, credentials);
   }
 }

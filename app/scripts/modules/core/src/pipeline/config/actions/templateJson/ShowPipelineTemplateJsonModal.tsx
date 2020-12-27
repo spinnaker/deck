@@ -1,5 +1,5 @@
 import React from 'react';
-import { IPromise } from 'angular';
+
 import classNames from 'classnames';
 
 import { Modal } from 'react-bootstrap';
@@ -17,7 +17,7 @@ export interface IShowPipelineTemplateJsonModalProps extends IModalComponentProp
   editable?: boolean;
   modalHeading?: string;
   descriptionText?: string;
-  saveTemplate?: (template: IPipelineTemplateV2) => IPromise<boolean>;
+  saveTemplate?: (template: IPipelineTemplateV2) => PromiseLike<boolean>;
 }
 
 export interface IShowPipelineTemplateJsonModalState {
@@ -119,7 +119,7 @@ export class ShowPipelineTemplateJsonModal extends React.Component<
                   className="form-control input-sm"
                   type="text"
                   value={template.metadata.name}
-                  onChange={e => this.onChange(e, 'name')}
+                  onChange={(e) => this.onChange(e, 'name')}
                   disabled={disabled}
                 />
               </div>
@@ -134,7 +134,7 @@ export class ShowPipelineTemplateJsonModal extends React.Component<
                   className="form-control input-sm"
                   type="text"
                   value={template.metadata.description}
-                  onChange={e => this.onChange(e, 'description')}
+                  onChange={(e) => this.onChange(e, 'description')}
                   placeholder="Template Description"
                   disabled={disabled}
                 />
@@ -150,7 +150,7 @@ export class ShowPipelineTemplateJsonModal extends React.Component<
                   className="form-control input-sm"
                   type="text"
                   value={template.metadata.owner}
-                  onChange={e => this.onChange(e, 'owner')}
+                  onChange={(e) => this.onChange(e, 'owner')}
                   disabled={disabled}
                 />
               </div>

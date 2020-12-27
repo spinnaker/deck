@@ -1,4 +1,4 @@
-import { IHttpPromiseCallbackArg, IPromise } from 'angular';
+import { IHttpPromiseCallbackArg } from 'angular';
 
 import { ITask } from 'core/domain';
 import { TaskReader } from './task.read.service';
@@ -25,7 +25,7 @@ export interface ITaskCommand {
 }
 
 export class TaskExecutor {
-  public static executeTask(taskCommand: ITaskCommand): IPromise<ITask> {
+  public static executeTask(taskCommand: ITaskCommand): PromiseLike<ITask> {
     const owner: any = taskCommand.application || taskCommand.project || { name: 'ad-hoc' };
     if (taskCommand.application && taskCommand.application.name) {
       taskCommand.application = taskCommand.application.name;
@@ -36,7 +36,7 @@ export class TaskExecutor {
     if (taskCommand.job[0].providerType === 'aws') {
       delete taskCommand.job[0].providerType;
     }
-    taskCommand.job.forEach(j => (j.user = AuthenticationService.getAuthenticatedUser().name));
+    taskCommand.job.forEach((j) => (j.user = AuthenticationService.getAuthenticatedUser().name));
 
     return TaskWriter.postTaskCommand(taskCommand).then(
       (task: any) => {

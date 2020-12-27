@@ -51,7 +51,7 @@ angular
     '$uibModal',
     'serverGroupWriter',
     'gceXpnNamingService',
-    function(
+    function (
       $scope,
       $state,
       $templateCache,
@@ -72,7 +72,7 @@ angular
       this.application = app;
 
       const extractServerGroupSummary = () => {
-        let summary = _.find(app.serverGroups.data, toCheck => {
+        let summary = _.find(app.serverGroups.data, (toCheck) => {
           return (
             toCheck.name === serverGroup.name &&
             toCheck.account === serverGroup.accountId &&
@@ -80,9 +80,9 @@ angular
           );
         });
         if (!summary) {
-          app.loadBalancers.data.some(loadBalancer => {
+          app.loadBalancers.data.some((loadBalancer) => {
             if (loadBalancer.account === serverGroup.accountId && loadBalancer.region === serverGroup.region) {
-              return loadBalancer.serverGroups.some(possibleServerGroup => {
+              return loadBalancer.serverGroups.some((possibleServerGroup) => {
                 if (possibleServerGroup.name === serverGroup.name) {
                   summary = possibleServerGroup;
                   return true;
@@ -112,7 +112,7 @@ angular
           serverGroup.accountId,
           serverGroup.region,
           serverGroup.name,
-        ).then(details => {
+        ).then((details) => {
           cancelLoader();
 
           angular.extend(details, summary);
@@ -124,7 +124,7 @@ angular
           if (!_.isEmpty(this.serverGroup)) {
             if (details.securityGroups) {
               this.securityGroups = _.chain(details.securityGroups)
-                .map(id => {
+                .map((id) => {
                   return (
                     _.find(app.securityGroups.data, { accountName: serverGroup.accountId, region: 'global', id: id }) ||
                     _.find(app.securityGroups.data, { accountName: serverGroup.accountId, region: 'global', name: id })
@@ -157,7 +157,6 @@ angular
             augmentTagsWithHelp();
             configureEntityTagTargets();
             processLabels();
-            retrieveComputeVersion(details.account);
           } else {
             autoClose();
           }
@@ -167,7 +166,7 @@ angular
       const findStartupScript = () => {
         if (_.has(this.serverGroup, 'launchConfig.instanceTemplate.properties.metadata.items')) {
           const metadataItems = this.serverGroup.launchConfig.instanceTemplate.properties.metadata.items;
-          const startupScriptItem = _.find(metadataItems, metadataItem => {
+          const startupScriptItem = _.find(metadataItems, (metadataItem) => {
             return metadataItem.key === 'startup-script';
           });
 
@@ -226,7 +225,7 @@ angular
             const serviceAccount = this.serverGroup.launchConfig.instanceTemplate.properties.serviceAccounts[0];
 
             this.serverGroup.serviceAccountEmail = serviceAccount.email;
-            this.serverGroup.authScopes = _.map(serviceAccount.scopes, authScope => {
+            this.serverGroup.authScopes = _.map(serviceAccount.scopes, (authScope) => {
               return authScope.replace('https://www.googleapis.com/auth/', '');
             });
           }
@@ -253,8 +252,8 @@ angular
         if (_.has(this.serverGroup, 'launchConfig.instanceTemplate.properties.tags.items') && this.securityGroups) {
           const helpMap = {};
 
-          this.serverGroup.launchConfig.instanceTemplate.properties.tags.items.forEach(tag => {
-            const securityGroupsMatches = _.filter(this.securityGroups, securityGroup =>
+          this.serverGroup.launchConfig.instanceTemplate.properties.tags.items.forEach((tag) => {
+            const securityGroupsMatches = _.filter(this.securityGroups, (securityGroup) =>
               _.includes(securityGroup.targetTags, tag),
             );
             const securityGroupMatchNames = _.map(securityGroupsMatches, 'name');
@@ -275,19 +274,13 @@ angular
         }
       };
 
-      const retrieveComputeVersion = accountId => {
-        AccountService.getAccountDetails(accountId).then(accountDetails => {
-          this.serverGroup.computeVersion = accountDetails.computeVersion;
-        });
-      };
-
       const processLabels = () => {
         if (!_.size(this.serverGroup.instanceTemplateLabels)) {
           delete this.serverGroup.instanceTemplateLabels;
         }
       };
 
-      const getNetwork = projectId => {
+      const getNetwork = (projectId) => {
         const networkUrl = _.get(
           this.serverGroup,
           'launchConfig.instanceTemplate.properties.networkInterfaces[0].network',
@@ -295,8 +288,8 @@ angular
         return gceXpnNamingService.decorateXpnResourceIfNecessary(projectId, networkUrl);
       };
 
-      const retrieveSubnet = projectId => {
-        NetworkReader.listNetworksByProvider('gce').then(networks => {
+      const retrieveSubnet = (projectId) => {
+        NetworkReader.listNetworksByProvider('gce').then((networks) => {
           const autoCreateSubnets = _.chain(networks)
             .filter({ account: this.serverGroup.account, id: this.serverGroup.network })
             .map('autoCreateSubnets')
@@ -343,7 +336,7 @@ angular
           },
         };
 
-        const submitMethod = params => serverGroupWriter.destroyServerGroup(serverGroup, app, params);
+        const submitMethod = (params) => serverGroupWriter.destroyServerGroup(serverGroup, app, params);
 
         const stateParams = {
           name: serverGroup.name,
@@ -379,7 +372,7 @@ angular
           title: 'Disabling ' + serverGroup.name,
         };
 
-        const submitMethod = params => serverGroupWriter.disableServerGroup(serverGroup, app, params);
+        const submitMethod = (params) => serverGroupWriter.disableServerGroup(serverGroup, app, params);
 
         const confirmationModalParams = {
           header: 'Really disable ' + serverGroup.name + '?',
@@ -409,7 +402,7 @@ angular
           title: 'Enabling ' + serverGroup.name,
         };
 
-        const submitMethod = params => serverGroupWriter.enableServerGroup(serverGroup, app, params);
+        const submitMethod = (params) => serverGroupWriter.enableServerGroup(serverGroup, app, params);
 
         const confirmationModalParams = {
           header: 'Really enable ' + serverGroup.name + '?',
@@ -462,7 +455,7 @@ angular
         });
       };
 
-      this.cloneServerGroup = serverGroup => {
+      this.cloneServerGroup = (serverGroup) => {
         $uibModal.open({
           templateUrl: require('../configure/wizard/serverGroupWizard.html'),
           controller: 'gceCloneServerGroupCtrl as ctrl',
@@ -509,10 +502,6 @@ angular
           return this.serverGroup.buildInfo.commit.substring(0, 8);
         }
         return null;
-      };
-
-      this.isAlphaListed = () => {
-        return this.serverGroup.computeVersion === 'ALPHA';
       };
 
       const configureEntityTagTargets = () => {

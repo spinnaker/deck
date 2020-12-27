@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { module, IPromise } from 'angular';
+import { module } from 'angular';
 import { uniqWith, isEqual } from 'lodash';
 import { react2angular } from 'react2angular';
 import {
@@ -7,14 +7,14 @@ import {
   IEcsServerGroupCommand,
   IEcsTargetGroupMapping,
 } from '../../serverGroupConfiguration.service';
-import { HelpField, TetheredSelect } from '@spinnaker/core';
+import { HelpField, TetheredSelect, withErrorBoundary } from '@spinnaker/core';
 import { Alert } from 'react-bootstrap';
 import { Option } from 'react-select';
 
 export interface IContainerProps {
   command: IEcsServerGroupCommand;
   notifyAngular: (key: string, value: any) => void;
-  configureCommand: (query: string) => IPromise<void>;
+  configureCommand: (query: string) => PromiseLike<void>;
 }
 
 interface IContainerState {
@@ -62,10 +62,9 @@ export class Container extends React.Component<IContainerProps, IContainerState>
       targetGroupsAvailable: cmd.backingData && cmd.backingData.filtered ? cmd.backingData.filtered.targetGroups : [],
     };
 
-    this.state.targetGroupMappings.forEach(targetGroupMapping => {
-      targetGroupMapping.containerName = "";
+    this.state.targetGroupMappings.forEach((targetGroupMapping) => {
+      targetGroupMapping.containerName = '';
     });
-
   }
 
   public componentDidMount() {
@@ -81,7 +80,7 @@ export class Container extends React.Component<IContainerProps, IContainerState>
 
   private getIdToImageMap = (): Map<string, IEcsDockerImage> => {
     const imageIdToDescription = new Map<string, IEcsDockerImage>();
-    this.props.command.backingData.filtered.images.forEach(e => {
+    this.props.command.backingData.filtered.images.forEach((e) => {
       imageIdToDescription.set(e.imageId, e);
     });
 
@@ -161,7 +160,7 @@ export class Container extends React.Component<IContainerProps, IContainerState>
     const updateComputeUnits = this.updateComputeUnits;
     const updateReservedMemory = this.updateReservedMemory;
 
-    const dockerImageOptions = this.state.dockerImages.map(function(image) {
+    const dockerImageOptions = this.state.dockerImages.map(function (image) {
       let msg = '';
       if (image.fromTrigger || image.fromContext) {
         msg = image.fromTrigger ? '(TRIGGER) ' : '(FIND IMAGE RESULT) ';
@@ -170,7 +169,11 @@ export class Container extends React.Component<IContainerProps, IContainerState>
     });
 
     const newTargetGroupMapping = this.state.targetGroupsAvailable.length ? (
-      <button className="btn btn-block btn-sm add-new" onClick={this.pushTargetGroupMapping}>
+      <button
+        className="btn btn-block btn-sm add-new"
+        data-test-id="ContainerInputs.targetGroupAdd"
+        onClick={this.pushTargetGroupMapping}
+      >
         <span className="glyphicon glyphicon-plus-sign" />
         Add New Target Group Mapping
       </button>
@@ -180,14 +183,14 @@ export class Container extends React.Component<IContainerProps, IContainerState>
       </div>
     );
 
-    const targetGroupsAvailable = this.state.targetGroupsAvailable.map(function(targetGroup) {
+    const targetGroupsAvailable = this.state.targetGroupsAvailable.map(function (targetGroup) {
       return { label: `${targetGroup}`, value: targetGroup };
     });
 
-    const targetGroupInputs = this.state.targetGroupMappings.map(function(mapping, index) {
+    const targetGroupInputs = this.state.targetGroupMappings.map(function (mapping, index) {
       return (
         <tr key={index}>
-          <td>
+          <td data-test-id="ContainerInputs.targetGroup">
             <TetheredSelect
               placeholder="Select a target group to use..."
               options={targetGroupsAvailable}
@@ -198,16 +201,21 @@ export class Container extends React.Component<IContainerProps, IContainerState>
           </td>
           <td>
             <input
+              data-test-id="ContainerInputs.targetGroupPort"
               type="number"
               className="form-control input-sm no-spel"
               required={true}
               value={mapping.containerPort.toString()}
-              onChange={e => updateTargetGroupMappingPort(index, e.target.valueAsNumber)}
+              onChange={(e) => updateTargetGroupMappingPort(index, e.target.valueAsNumber)}
             />
           </td>
           <td>
             <div className="form-control-static">
-              <a className="btn-link sm-label" onClick={() => removeTargetGroupMapping(index)}>
+              <a
+                className="btn-link sm-label"
+                data-test-id="ContainerInputs.targetGroupRemove"
+                onClick={() => removeTargetGroupMapping(index)}
+              >
                 <span className="glyphicon glyphicon-trash" />
                 <span className="sr-only">Remove</span>
               </a>
@@ -224,7 +232,7 @@ export class Container extends React.Component<IContainerProps, IContainerState>
             <b>Container Image</b>
             <HelpField id="ecs.containerMappingImage" />
           </div>
-          <div className="col-md-9">
+          <div className="col-md-9" data-test-id="ContainerInputs.containerImage">
             <TetheredSelect
               placeholder="Select an image to use..."
               options={dockerImageOptions}
@@ -243,11 +251,12 @@ export class Container extends React.Component<IContainerProps, IContainerState>
           </div>
           <div className="col-md-9" style={{ width: '100px' }}>
             <input
+              data-test-id="ContainerInputs.computeUnits"
               type="number"
               className="form-control input-sm no-spel"
               required={false}
               value={this.state.computeUnits}
-              onChange={e => updateComputeUnits(e.target.valueAsNumber)}
+              onChange={(e) => updateComputeUnits(e.target.valueAsNumber)}
             />
           </div>
         </div>
@@ -258,11 +267,12 @@ export class Container extends React.Component<IContainerProps, IContainerState>
           </div>
           <div className="col-md-9" style={{ width: '100px' }}>
             <input
+              data-test-id="ContainerInputs.reservedMemory"
               type="number"
               className="form-control input-sm no-spel"
               required={false}
               value={this.state.reservedMemory}
-              onChange={e => updateReservedMemory(e.target.valueAsNumber)}
+              onChange={(e) => updateReservedMemory(e.target.valueAsNumber)}
             />
           </div>
         </div>
@@ -303,5 +313,5 @@ export class Container extends React.Component<IContainerProps, IContainerState>
 export const CONTAINER_REACT = 'spinnaker.ecs.serverGroup.configure.wizard.container.react';
 module(CONTAINER_REACT, []).component(
   'containerReact',
-  react2angular(Container, ['command', 'notifyAngular', 'configureCommand']),
+  react2angular(withErrorBoundary(Container, 'containerReact'), ['command', 'notifyAngular', 'configureCommand']),
 );

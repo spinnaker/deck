@@ -1,6 +1,4 @@
-import { IPromise } from 'angular';
-
-import { API } from 'core/api';
+import { REST } from 'core/api';
 import { SchedulerFactory } from 'core/scheduler';
 import { Application } from '../application.model';
 import { ApplicationDataSource } from '../service/applicationDataSource';
@@ -9,7 +7,7 @@ import { InferredApplicationWarningService } from './InferredApplicationWarningS
 
 export interface IApplicationDataSourceAttribute {
   enabled: string[];
-  disabled: string[];
+  disabled: string[]; ///./app/scripts/modules/core/src/pipeline/service/execution.service.ts;
 }
 
 export interface IApplicationSummary {
@@ -25,15 +23,14 @@ export interface IApplicationSummary {
 }
 
 export class ApplicationReader {
-  public static listApplications(): IPromise<IApplicationSummary[]> {
-    return API.all('applications')
-      .useCache()
-      .getList();
+  public static listApplications(): PromiseLike<IApplicationSummary[]> {
+    return REST('/applications').useCache().get();
   }
 
-  public static getApplicationAttributes(name: string): IPromise<any> {
-    return API.one('applications', name)
-      .withParams({ expand: false })
+  public static getApplicationAttributes(name: string): PromiseLike<any> {
+    return REST('/applications')
+      .path(name)
+      .query({ expand: false })
       .get()
       .then((fromServer: Application) => {
         this.splitAttributes(fromServer.attributes, ['accounts', 'cloudProviders']);
@@ -41,9 +38,22 @@ export class ApplicationReader {
       });
   }
 
-  public static getApplication(name: string, expand = true): IPromise<Application> {
-    return API.one('applications', name)
-      .withParams({ expand: expand })
+  public static getApplicationPermissions(applicationName: string): PromiseLike<any> {
+    return REST('/applications')
+      .path(applicationName)
+      .query({
+        expand: false,
+      })
+      .get()
+      .then((application: Application) => {
+        return application.attributes.permissions;
+      });
+  }
+
+  public static getApplication(name: string, expand = true): PromiseLike<Application> {
+    return REST('/applications')
+      .path(name)
+      .query({ expand: expand })
       .get()
       .then((fromServer: Application) => {
         const configs = ApplicationDataSourceRegistry.getDataSources();
@@ -57,7 +67,7 @@ export class ApplicationReader {
   }
 
   private static splitAttributes(attributes: any, fields: string[]) {
-    fields.forEach(field => {
+    fields.forEach((field) => {
       if (attributes[field]) {
         if (!Array.isArray(attributes[field])) {
           attributes[field] = attributes[field].split(',');
@@ -73,14 +83,14 @@ export class ApplicationReader {
     const appDataSources: IApplicationDataSourceAttribute = application.attributes.dataSources;
 
     if (!appDataSources) {
-      allDataSources.filter(ds => ds.optIn).forEach(ds => this.setDataSourceDisabled(ds, application, true));
+      allDataSources.filter((ds) => ds.optIn).forEach((ds) => this.setDataSourceDisabled(ds, application, true));
       if (InferredApplicationWarningService.isInferredApplication(application)) {
         allDataSources
-          .filter(ds => ds.requireConfiguredApp)
-          .forEach(ds => this.setDataSourceDisabled(ds, application, true));
+          .filter((ds) => ds.requireConfiguredApp)
+          .forEach((ds) => this.setDataSourceDisabled(ds, application, true));
       }
     } else {
-      allDataSources.forEach(ds => {
+      allDataSources.forEach((ds) => {
         if (ds.optional) {
           if (ds.optIn) {
             this.setDataSourceDisabled(ds, application, !appDataSources.enabled.includes(ds.key));
@@ -91,9 +101,9 @@ export class ApplicationReader {
       });
     }
     allDataSources
-      .filter(ds => ds.requiresDataSource)
-      .forEach(ds => {
-        const parent = allDataSources.find(p => p.key === ds.requiresDataSource);
+      .filter((ds) => ds.requiresDataSource)
+      .forEach((ds) => {
+        const parent = allDataSources.find((p) => p.key === ds.requiresDataSource);
         if (parent) {
           this.setDataSourceDisabled(ds, application, parent.disabled);
         }
@@ -103,7 +113,7 @@ export class ApplicationReader {
   private static setDataSourceDisabled(dataSource: ApplicationDataSource, application: Application, disabled: boolean) {
     dataSource.disabled = disabled;
     if (dataSource.badge) {
-      application.dataSources.find(ds => ds.key === dataSource.badge).disabled = disabled;
+      application.dataSources.find((ds) => ds.key === dataSource.badge).disabled = disabled;
     }
   }
 }

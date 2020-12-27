@@ -15,7 +15,7 @@ import { ORACLE_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER } from './b
 export const ORACLE_PIPELINE_STAGES_BAKE_OCIBAKESTAGE = 'spinnaker.oracle.pipeline.stage.bakeStage';
 export const name = ORACLE_PIPELINE_STAGES_BAKE_OCIBAKESTAGE; // for backwards compatibility
 module(ORACLE_PIPELINE_STAGES_BAKE_OCIBAKESTAGE, [ORACLE_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER])
-  .config(function() {
+  .config(function () {
     Registry.pipeline.registerStage({
       provides: 'bake',
       cloudProvider: 'oracle',
@@ -40,7 +40,7 @@ module(ORACLE_PIPELINE_STAGES_BAKE_OCIBAKESTAGE, [ORACLE_PIPELINE_STAGES_BAKE_BA
     '$scope',
     '$q',
     '$uibModal',
-    function($scope, $q, $uibModal) {
+    function ($scope, $q, $uibModal) {
       const provider = 'oracle';
 
       if (!$scope.stage.cloudProvider) {
@@ -60,44 +60,43 @@ module(ORACLE_PIPELINE_STAGES_BAKE_OCIBAKESTAGE, [ORACLE_PIPELINE_STAGES_BAKE_BA
       function initialize() {
         $scope.viewState.providerSelected = true;
 
-        $q.all({
-          baseOsOptions: BakeryReader.getBaseOsOptions(provider),
-          accounts: AccountService.listAccounts(provider),
-        }).then(results => {
-          if (results.baseOsOptions.baseImages.length > 0) {
-            $scope.baseOsOptions = results.baseOsOptions;
-          }
-          if (!$scope.stage.user) {
-            $scope.stage.user = AuthenticationService.getAuthenticatedUser().name;
-          }
-          if (!$scope.stage.baseOs) {
-            $scope.stage.baseOs = $scope.baseOsOptions.baseImages[0].id;
-          }
-          if (!$scope.stage.upgrade) {
-            $scope.stage.upgrade = true;
-          }
+        $q.all([BakeryReader.getBaseOsOptions(provider), AccountService.listAccounts(provider)]).then(
+          ([baseOsOptions, accounts]) => {
+            if (baseOsOptions.baseImages.length > 0) {
+              $scope.baseOsOptions = baseOsOptions;
+            }
+            if (!$scope.stage.user) {
+              $scope.stage.user = AuthenticationService.getAuthenticatedUser().name;
+            }
+            if (!$scope.stage.baseOs) {
+              $scope.stage.baseOs = $scope.baseOsOptions.baseImages[0].id;
+            }
+            if (!$scope.stage.upgrade) {
+              $scope.stage.upgrade = true;
+            }
 
-          $scope.accounts = results.accounts;
+            $scope.accounts = accounts;
 
-          if ($scope.stage.accountName) {
-            AccountService.getRegionsForAccount($scope.stage.accountName).then(function(regions) {
-              if (Array.isArray(regions) && regions.length != 0) {
-                // there is exactly one region per account
-                $scope.stage.region = regions[0].name;
-              }
-            });
-          }
+            if ($scope.stage.accountName) {
+              AccountService.getRegionsForAccount($scope.stage.accountName).then(function (regions) {
+                if (Array.isArray(regions) && regions.length != 0) {
+                  // there is exactly one region per account
+                  $scope.stage.region = regions[0].name;
+                }
+              });
+            }
 
-          $scope.viewState.loading = false;
-        });
+            $scope.viewState.loading = false;
+          },
+        );
       }
 
-      this.getBaseOsDescription = function(baseOsOption) {
+      this.getBaseOsDescription = function (baseOsOption) {
         return baseOsOption.id + (baseOsOption.shortDescription ? ' (' + baseOsOption.shortDescription + ')' : '');
       };
 
-      this.accountUpdated = function() {
-        AccountService.getRegionsForAccount($scope.stage.accountName).then(function(regions) {
+      this.accountUpdated = function () {
+        AccountService.getRegionsForAccount($scope.stage.accountName).then(function (regions) {
           if (Array.isArray(regions) && regions.length != 0) {
             // there is exactly one region per account
             $scope.stage.region = regions[0].name;
@@ -105,7 +104,7 @@ module(ORACLE_PIPELINE_STAGES_BAKE_OCIBAKESTAGE, [ORACLE_PIPELINE_STAGES_BAKE_BA
         });
       };
 
-      this.addExtendedAttribute = function() {
+      this.addExtendedAttribute = function () {
         if (!$scope.stage.extendedAttributes) {
           $scope.stage.extendedAttributes = {};
         }
@@ -115,7 +114,7 @@ module(ORACLE_PIPELINE_STAGES_BAKE_OCIBAKESTAGE, [ORACLE_PIPELINE_STAGES_BAKE_BA
             controller: 'bakeStageAddExtendedAttributeController',
             controllerAs: 'addExtendedAttribute',
             resolve: {
-              extendedAttribute: function() {
+              extendedAttribute: function () {
                 return {
                   key: '',
                   value: '',
@@ -123,17 +122,17 @@ module(ORACLE_PIPELINE_STAGES_BAKE_OCIBAKESTAGE, [ORACLE_PIPELINE_STAGES_BAKE_BA
               },
             },
           })
-          .result.then(function(extendedAttribute) {
+          .result.then(function (extendedAttribute) {
             $scope.stage.extendedAttributes[extendedAttribute.key] = extendedAttribute.value;
           })
           .catch(() => {});
       };
 
-      this.removeExtendedAttribute = function(key) {
+      this.removeExtendedAttribute = function (key) {
         delete $scope.stage.extendedAttributes[key];
       };
 
-      this.showExtendedAttributes = function() {
+      this.showExtendedAttributes = function () {
         return (
           $scope.viewState.roscoMode || ($scope.stage.extendedAttributes && _.size($scope.stage.extendedAttributes) > 0)
         );

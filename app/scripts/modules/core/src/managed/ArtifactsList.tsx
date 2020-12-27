@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
 
@@ -8,7 +8,7 @@ import {
   IStatefulConstraint,
   StatefulConstraintStatus,
 } from '../domain/IManagedEntity';
-import { Icon } from '../presentation';
+import { Icon, IconNames } from '../presentation';
 
 import { isConstraintSupported, getConstraintIcon } from './constraints/constraintRegistry';
 
@@ -27,7 +27,7 @@ interface IArtifactsListProps {
 
 export function ArtifactsList({ artifacts, selectedVersion, versionSelected }: IArtifactsListProps) {
   return (
-    <div>
+    <>
       {artifacts.map(({ versions, name, reference }) =>
         versions.map((version) => (
           <ArtifactRow
@@ -42,7 +42,7 @@ export function ArtifactsList({ artifacts, selectedVersion, versionSelected }: I
           />
         )),
       )}
-    </div>
+    </>
   );
 }
 
@@ -77,6 +77,32 @@ interface IArtifactRowProps {
 export const ArtifactRow = ({ isSelected, clickHandler, version: versionInfo, reference, name }: IArtifactRowProps) => {
   const { version, displayName, createdAt, environments, build, git } = versionInfo;
   const [isHovered, setIsHovered] = useState(false);
+  const rowRef = useRef<HTMLDivElement>();
+
+  useEffect(() => {
+    // Why does the call to scrollIntoView() have to be deferred for 100ms? A couple reasons:
+    //
+    // 1. When quickly moving between versions, giving a very short window to cancel the scroll
+    //    makes the experience less janky. Nobody needs their sidebars to dance and shuffle.
+    // 2. For some reason trying to call scrollIntoView in the same event loop just does not
+    //    work at all. The same is true for a setTimeout with no delay. DOM read/write ops are weird
+    //    and there is not a great practical justification for solving that mystery here and now.
+    const timeout = setTimeout(() => {
+      if (isSelected && rowRef.current) {
+        // *** VERY BRITTLE ASSUMPTION WARNING ***
+        // This code assumes that the direct parent element of a row is the scrollable container.
+        // If a wrapper element of any kind is added, this code will need to be modified
+        // to search upward in the tree and find the scrollable container.
+        const { top, bottom } = rowRef.current.getBoundingClientRect();
+        const { top: parentTop, bottom: parentBottom } = rowRef.current.parentElement.getBoundingClientRect();
+        const isInView = top < parentBottom && bottom > parentTop;
+
+        !isInView && rowRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
+
+    return () => clearTimeout(timeout);
+  }, [isSelected, rowRef.current]);
 
   const versionIcon = getVersionIcon(versionInfo);
   const secondarySummary = getVersionSecondarySummary(versionInfo);
@@ -84,12 +110,13 @@ export const ArtifactRow = ({ isSelected, clickHandler, version: versionInfo, re
 
   return (
     <div
+      ref={rowRef}
       className={classNames('ArtifactRow', { selected: isSelected })}
       onClick={() => clickHandler({ reference, version })}
       onMouseOver={() => setIsHovered(true)}
       onMouseOut={() => setIsHovered(false)}
     >
-      <div className="row-content flex-container-v left sp-padding-m-top sp-padding-l-bottom sp-padding-s-xaxis">
+      <div className="row-content flex-container-v left sp-padding-m-top sp-padding-l-bottom sp-padding-m-xaxis">
         {(build?.number || build?.id) && (
           <div className="row-middle-section flex-container-h space-between middle sp-margin-s-bottom">
             <Pill bgColor={isSelected ? '#2e4b5f' : undefined} text={`#${build.number || build.id} ${name || ''}`} />
@@ -135,33 +162,55 @@ export const ArtifactRow = ({ isSelected, clickHandler, version: versionInfo, re
 };
 
 type ArtifactStatusList = IStatusBubbleStackProps['statuses'];
-function getArtifactStatuses({ environments }: IManagedArtifactVersion): ArtifactStatusList {
+function getArtifactStatuses({ environments, lifecycleSteps }: IManagedArtifactVersion): ArtifactStatusList {
   const statuses: ArtifactStatusList = [];
   // NOTE: The order in which entries are added to `statuses` is important. The highest priority
   // item must be inserted first.
 
-  const pendingConstraintTypes = new Set<string>();
-  const failedConstraintTypes = new Set<string>();
+  const preDeploymentSteps = lifecycleSteps?.filter(
+    ({ scope, type, status }) =>
+      scope === 'PRE_DEPLOYMENT' && ['BUILD', 'BAKE'].includes(type) && ['RUNNING', 'FAILED'].includes(status),
+  );
 
-  environments.forEach((environment) =>
-    environment.statefulConstraints?.forEach(({ type, status }: IStatefulConstraint) => {
-      if (!isConstraintSupported(type)) {
+  if (preDeploymentSteps?.length > 0) {
+    // These steps come in with chronological ordering, but we need reverse-chronological orddering for display
+    preDeploymentSteps.reverse().forEach(({ type, status }) => {
+      statuses.push({
+        iconName: type === 'BUILD' ? 'build' : 'bake',
+        appearance: status === 'RUNNING' ? 'progress' : 'error',
+      });
+    });
+  }
+
+  const pendingConstraintIcons = new Set<IconNames>();
+  const failedConstraintIcons = new Set<IconNames>();
+
+  environments.forEach((environment) => {
+    if (environment.state === 'skipped') {
+      return;
+    }
+
+    environment.statefulConstraints?.forEach((constraint: IStatefulConstraint) => {
+      if (!isConstraintSupported(constraint.type)) {
         return;
       }
 
-      if (status === StatefulConstraintStatus.PENDING) {
-        pendingConstraintTypes.add(type);
-      } else if (status === StatefulConstraintStatus.FAIL || status === StatefulConstraintStatus.OVERRIDE_FAIL) {
-        failedConstraintTypes.add(type);
+      if (constraint.status === StatefulConstraintStatus.PENDING) {
+        pendingConstraintIcons.add(getConstraintIcon(constraint));
+      } else if (
+        constraint.status === StatefulConstraintStatus.FAIL ||
+        constraint.status === StatefulConstraintStatus.OVERRIDE_FAIL
+      ) {
+        failedConstraintIcons.add(getConstraintIcon(constraint));
       }
-    }),
-  );
-
-  pendingConstraintTypes.forEach((type) => {
-    statuses.push({ appearance: 'progress', iconName: getConstraintIcon(type) });
+    });
   });
-  failedConstraintTypes.forEach((type) => {
-    statuses.push({ appearance: 'error', iconName: getConstraintIcon(type) });
+
+  pendingConstraintIcons.forEach((iconName) => {
+    statuses.push({ appearance: 'progress', iconName });
+  });
+  failedConstraintIcons.forEach((iconName) => {
+    statuses.push({ appearance: 'error', iconName });
   });
 
   const isPinned = environments.some(({ pinned }) => pinned);

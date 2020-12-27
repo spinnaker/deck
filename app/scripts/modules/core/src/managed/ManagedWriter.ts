@@ -1,6 +1,4 @@
-import { IPromise } from 'angular';
-
-import { API } from 'core/api';
+import { REST } from 'core/api';
 import { StatefulConstraintStatus } from 'core/domain';
 
 export interface IArtifactVersionRequest {
@@ -33,29 +31,21 @@ export class ManagedWriter {
     reference,
     version,
     comment,
-  }: IArtifactVersionRequest): IPromise<void> {
-    return API.one('managed')
-      .one('application', application)
-      .one('pin')
-      .post({
-        targetEnvironment: environment,
-        reference,
-        version,
-        comment,
-      });
+  }: IArtifactVersionRequest): PromiseLike<void> {
+    return REST('/managed/application').path(application, 'pin').post({
+      targetEnvironment: environment,
+      reference,
+      version,
+      comment,
+    });
   }
 
   public static unpinArtifactVersion({
     application,
     environment,
     reference,
-  }: IUnpinArtifactVersionRequest): IPromise<void> {
-    return API.one('managed')
-      .one('application', application)
-      .one('pin')
-      .one(environment)
-      .withParams({ reference })
-      .remove();
+  }: IUnpinArtifactVersionRequest): PromiseLike<void> {
+    return REST('/managed/application').path(application, 'pin', environment).query({ reference }).delete();
   }
 
   public static markArtifactVersionAsBad({
@@ -64,16 +54,13 @@ export class ManagedWriter {
     reference,
     version,
     comment,
-  }: IArtifactVersionRequest): IPromise<void> {
-    return API.one('managed')
-      .one('application', application)
-      .one('veto')
-      .post({
-        targetEnvironment: environment,
-        reference,
-        version,
-        comment,
-      });
+  }: IArtifactVersionRequest): PromiseLike<void> {
+    return REST('/managed/application').path(application, 'veto').post({
+      targetEnvironment: environment,
+      reference,
+      version,
+      comment,
+    });
   }
 
   public static updateConstraintStatus({
@@ -83,44 +70,28 @@ export class ManagedWriter {
     reference,
     version,
     status,
-  }: IUpdateConstraintStatusRequest): IPromise<void> {
-    return API.one('managed')
-      .one('application', application)
-      .one('environment', environment)
-      .one('constraint')
-      .post({
-        type,
-        artifactReference: reference,
-        artifactVersion: version,
-        status,
-      });
+  }: IUpdateConstraintStatusRequest): PromiseLike<void> {
+    return REST('/managed/application').path(application, 'environment', environment, 'constraint').post({
+      type,
+      artifactReference: reference,
+      artifactVersion: version,
+      status,
+    });
   }
 
-  public static pauseApplicationManagement(applicationName: string): IPromise<void> {
-    return API.one('managed')
-      .one('application', applicationName)
-      .one('pause')
-      .post();
+  public static pauseApplicationManagement(applicationName: string): PromiseLike<void> {
+    return REST('/managed/application').path(applicationName, 'pause').post();
   }
 
-  public static resumeApplicationManagement(applicationName: string): IPromise<void> {
-    return API.one('managed')
-      .one('application', applicationName)
-      .one('pause')
-      .remove();
+  public static resumeApplicationManagement(applicationName: string): PromiseLike<void> {
+    return REST('/managed/application').path(applicationName, 'pause').delete();
   }
 
-  public static pauseResourceManagement(resourceId: string): IPromise<void> {
-    return API.one('managed')
-      .one('resources', resourceId)
-      .one('pause')
-      .post();
+  public static pauseResourceManagement(resourceId: string): PromiseLike<void> {
+    return REST('/managed/resources').path(resourceId, 'pause').post();
   }
 
-  public static resumeResourceManagement(resourceId: string): IPromise<void> {
-    return API.one('managed')
-      .one('resources', resourceId)
-      .one('pause')
-      .remove();
+  public static resumeResourceManagement(resourceId: string): PromiseLike<void> {
+    return REST('/managed/resources').path(resourceId, 'pause').delete();
   }
 }

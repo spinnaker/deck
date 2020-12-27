@@ -73,6 +73,7 @@ module(PROJECTS_STATES_CONFIG, [
         },
         history: {
           type: 'projects',
+          keyParams: ['project'],
         },
       },
       children: [dashboard],
@@ -100,9 +101,5 @@ module(PROJECTS_STATES_CONFIG, [
     applicationStateProvider.addParentState(project, 'detail', '/applications');
 
     stateConfigProvider.addRewriteRule('/projects/{project}', '/projects/{project}/dashboard');
-    stateConfigProvider.addRewriteRule(
-      '/projects/{project}/applications/{application}',
-      '/projects/{project}/applications/{application}/clusters',
-    );
   },
 ]);

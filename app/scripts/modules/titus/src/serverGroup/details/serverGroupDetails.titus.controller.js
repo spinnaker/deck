@@ -54,7 +54,7 @@ angular
     '$uibModal',
     'serverGroupWriter',
     'awsServerGroupTransformer',
-    function(
+    function (
       $scope,
       $state,
       $templateCache,
@@ -76,7 +76,7 @@ angular
       };
 
       function extractServerGroupSummary() {
-        const summary = _.find(application.serverGroups.data, function(toCheck) {
+        const summary = _.find(application.serverGroups.data, function (toCheck) {
           return (
             toCheck.name === serverGroup.name &&
             toCheck.account === serverGroup.accountId &&
@@ -93,13 +93,13 @@ angular
           serverGroup.accountId,
           serverGroup.region,
           serverGroup.name,
-        ).then(function(details) {
+        ).then(function (details) {
           cancelLoader();
 
           // it's possible the summary was not found because the clusters are still loading
           details.account = serverGroup.accountId;
 
-          AccountService.getAccountDetails(details.account).then(accountDetails => {
+          AccountService.getAccountDetails(details.account).then((accountDetails) => {
             details.apiEndpoint = _.filter(accountDetails.regions, { name: details.region })[0].endpoint;
           });
 
@@ -111,7 +111,7 @@ angular
           delete labels['source'];
           delete labels['spinnakerAccount'];
 
-          Object.keys(labels).forEach(key => {
+          Object.keys(labels).forEach((key) => {
             if (key.startsWith('titus.')) {
               delete labels[key];
             }
@@ -131,15 +131,18 @@ angular
 
       function transformScalingPolicies(serverGroup) {
         serverGroup.scalingPolicies = (serverGroup.scalingPolicies || [])
-          .map(p => {
+          .map((p) => {
             const { policy } = p;
-            const { stepPolicyDescriptor } = policy;
+            const { stepPolicyDescriptor, targetPolicyDescriptor } = policy;
             const policyType = stepPolicyDescriptor ? 'StepScaling' : 'TargetTrackingScaling';
             if (stepPolicyDescriptor) {
               const alarm = stepPolicyDescriptor.alarmConfig;
               alarm.period = alarm.periodSec;
               alarm.namespace = alarm.metricNamespace;
+              alarm.disableEditingDimensions = true;
               if (alarm.metricNamespace === 'NFLX/EPIC' && !alarm.dimensions) {
+                // NOTE: Titus creates the step scaling policy with these dimensions
+                // TODO: Remove this once Titus supports configuring dimensions
                 alarm.dimensions = [{ name: 'AutoScalingGroupName', value: serverGroup.name }];
               }
               if (!alarm.dimensions) {
@@ -151,7 +154,7 @@ angular
               policy.alarms = [alarm];
               policy.id = p.id;
               if (policy.stepAdjustments) {
-                policy.stepAdjustments.forEach(step => {
+                policy.stepAdjustments.forEach((step) => {
                   // gRPC currently returns these values in upper camel case
                   step.metricIntervalUpperBound = _.get(
                     step,
@@ -167,6 +170,10 @@ angular
               }
               return policy;
             } else {
+              const { customizedMetricSpecification } = targetPolicyDescriptor;
+              if (customizedMetricSpecification.dimensions === undefined) {
+                customizedMetricSpecification.dimensions = [];
+              }
               policy.id = p.id;
               policy.targetTrackingConfiguration = policy.targetPolicyDescriptor;
               policy.targetTrackingConfiguration.scaleOutCooldown =
@@ -176,7 +183,7 @@ angular
               return policy;
             }
           })
-          .map(p => awsServerGroupTransformer.transformScalingPolicy(p));
+          .map((p) => awsServerGroupTransformer.transformScalingPolicy(p));
       }
 
       function autoClose() {
@@ -200,19 +207,13 @@ angular
         })
         .catch(() => {});
 
-      AccountService.getAccountDetails(serverGroup.accountId).then(details => {
+      AccountService.getAccountDetails(serverGroup.accountId).then((details) => {
         const awsAccount = details.awsAccount;
         $scope.titusUiEndpoint = _.filter(details.regions, { name: serverGroup.region })[0].endpoint;
-        AccountService.getAccountDetails(awsAccount).then(awsDetails => {
+        AccountService.getAccountDetails(awsAccount).then((awsDetails) => {
           this.awsAccountId = awsDetails.accountId;
           this.env = awsDetails.environment;
         });
-        if (
-          details.autoscalingEnabled &&
-          details.regions.some(r => r.name === serverGroup.region && r.autoscalingEnabled)
-        ) {
-          this.scalingPoliciesEnabled = true;
-        }
       });
 
       const configureEntityTagTargets = () => {
@@ -225,14 +226,14 @@ angular
         const taskMonitor = {
           application: application,
           title: 'Destroying ' + serverGroup.name,
-          onTaskComplete: function() {
+          onTaskComplete: function () {
             if ($state.includes('**.serverGroup', stateParams)) {
               $state.go('^');
             }
           },
         };
 
-        const submitMethod = function() {
+        const submitMethod = function () {
           return serverGroupWriter.destroyServerGroup(serverGroup, application, {
             cloudProvider: 'titus',
             serverGroupName: serverGroup.name,
@@ -259,7 +260,7 @@ angular
         ServerGroupWarningMessageService.addDestroyWarningMessage(app, serverGroup, confirmationModalParams);
 
         confirmNotManaged(serverGroup, app).then(
-          notManaged => notManaged && ConfirmationModalService.confirm(confirmationModalParams),
+          (notManaged) => notManaged && ConfirmationModalService.confirm(confirmationModalParams),
         );
       };
 
@@ -271,7 +272,7 @@ angular
           title: 'Disabling ' + serverGroup.name,
         };
 
-        const submitMethod = function() {
+        const submitMethod = function () {
           return serverGroupWriter.disableServerGroup(serverGroup, application, {
             cloudProvider: 'titus',
             serverGroupName: serverGroup.name,
@@ -293,12 +294,12 @@ angular
         ServerGroupWarningMessageService.addDisableWarningMessage(app, serverGroup, confirmationModalParams);
 
         confirmNotManaged(serverGroup, app).then(
-          notManaged => notManaged && ConfirmationModalService.confirm(confirmationModalParams),
+          (notManaged) => notManaged && ConfirmationModalService.confirm(confirmationModalParams),
         );
       };
 
       this.enableServerGroup = () => {
-        confirmNotManaged(serverGroup, app).then(notManaged => {
+        confirmNotManaged(serverGroup, app).then((notManaged) => {
           if (!notManaged) {
             return;
           }
@@ -318,7 +319,7 @@ angular
           ConfirmationModalService.confirm(confirmationModalParams)
             // Wait for the confirmation modal to go away first to avoid react/angular bootstrap fighting
             // over the body.modal-open class
-            .then(() => new Promise(resolve => setTimeout(resolve, 500)))
+            .then(() => new Promise((resolve) => setTimeout(resolve, 500)))
             .then(() => this.rollbackServerGroup())
             .catch(({ source }) => {
               // don't show the enable modal if the user cancels with the header button
@@ -330,7 +331,7 @@ angular
       };
 
       this.resizeServerGroup = () => {
-        confirmNotManaged(serverGroup, app).then(notManaged => {
+        confirmNotManaged(serverGroup, app).then((notManaged) => {
           notManaged && ReactModal.show(TitusResizeServerGroupModal, { serverGroup: $scope.serverGroup, application });
         });
       };
@@ -343,7 +344,7 @@ angular
           title: 'Enabling ' + serverGroup.name,
         };
 
-        const submitMethod = function() {
+        const submitMethod = function () {
           return serverGroupWriter.enableServerGroup(serverGroup, application, {
             cloudProvider: 'titus',
             serverGroupName: serverGroup.name,
@@ -368,7 +369,7 @@ angular
       this.cloneServerGroup = function cloneServerGroup() {
         TitusReactInjector.titusServerGroupCommandBuilder
           .buildServerGroupCommandFromExisting(application, $scope.serverGroup)
-          .then(command => {
+          .then((command) => {
             const title = `Clone ${serverGroup.name}`;
             TitusCloneServerGroupModal.show({ title, application, command });
           });
@@ -385,7 +386,7 @@ angular
         return application
           .getDataSource('serverGroups')
           .data.some(
-            g =>
+            (g) =>
               g.cluster === serverGroup.cluster &&
               g.region === serverGroup.region &&
               g.account === serverGroup.account &&
@@ -400,7 +401,7 @@ angular
         let allServerGroups = app
           .getDataSource('serverGroups')
           .data.filter(
-            g =>
+            (g) =>
               g.cluster === serverGroup.cluster && g.region === serverGroup.region && g.account === serverGroup.account,
           );
 
@@ -414,21 +415,21 @@ angular
            * isRollbackEnabled() ensures that at least one enabled server group exists.
            */
           serverGroup = _.orderBy(
-            allServerGroups.filter(g => g.name !== previousServerGroup.name && !g.isDisabled),
+            allServerGroups.filter((g) => g.name !== previousServerGroup.name && !g.isDisabled),
             ['instanceCounts.total', 'createdTime'],
             ['desc', 'desc'],
           )[0];
         }
 
         // the set of all server groups should not include the server group selected for rollback
-        allServerGroups = allServerGroups.filter(g => g.name !== serverGroup.name);
+        allServerGroups = allServerGroups.filter((g) => g.name !== serverGroup.name);
 
         if (allServerGroups.length === 1 && !previousServerGroup) {
           // if there is only one other server group, default to it being the rollback target
           previousServerGroup = allServerGroups[0];
         }
 
-        confirmNotManaged(serverGroup, app).then(notManaged => {
+        confirmNotManaged(serverGroup, app).then((notManaged) => {
           notManaged &&
             $uibModal.open({
               templateUrl: require('./rollback/rollbackServerGroup.html'),

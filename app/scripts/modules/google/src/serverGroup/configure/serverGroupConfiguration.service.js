@@ -49,7 +49,7 @@ angular
     'gceHealthCheckReader',
     'gceTagManager',
     'gceLoadBalancerSetTransformer',
-    function(
+    function (
       securityGroupReader,
       gceInstanceTypeService,
       cacheInitializer,
@@ -90,20 +90,45 @@ angular
 
       function configureCommand(application, command) {
         return $q
-          .all({
-            credentialsKeyedByAccount: AccountService.getCredentialsKeyedByAccount('gce'),
-            securityGroups: securityGroupReader.getAllSecurityGroups(),
-            networks: NetworkReader.listNetworksByProvider('gce'),
-            subnets: SubnetReader.listSubnetsByProvider('gce'),
-            loadBalancers: loadBalancerReader.listLoadBalancers('gce'),
-            allImages: loadAllImages(command.credentials),
-            instanceTypes: gceInstanceTypeService.getAllTypesByRegion(),
-            persistentDiskTypes: $q.when(angular.copy(persistentDiskTypes)),
-            authScopes: $q.when(angular.copy(authScopes)),
-            healthChecks: gceHealthCheckReader.listHealthChecks(),
-            accounts: AccountService.listAccounts('gce'),
-          })
-          .then(function(backingData) {
+          .all([
+            AccountService.getCredentialsKeyedByAccount('gce'),
+            securityGroupReader.getAllSecurityGroups(),
+            NetworkReader.listNetworksByProvider('gce'),
+            SubnetReader.listSubnetsByProvider('gce'),
+            loadBalancerReader.listLoadBalancers('gce'),
+            loadAllImages(command.credentials),
+            gceInstanceTypeService.getAllTypesByRegion(),
+            $q.when(angular.copy(persistentDiskTypes)),
+            $q.when(angular.copy(authScopes)),
+            gceHealthCheckReader.listHealthChecks(),
+            AccountService.listAccounts('gce'),
+          ])
+          .then(function ([
+            credentialsKeyedByAccount,
+            securityGroups,
+            networks,
+            subnets,
+            loadBalancers,
+            allImages,
+            instanceTypes,
+            persistentDiskTypes,
+            authScopes,
+            healthChecks,
+            accounts,
+          ]) {
+            const backingData = {
+              credentialsKeyedByAccount,
+              securityGroups,
+              networks,
+              subnets,
+              loadBalancers,
+              allImages,
+              instanceTypes,
+              persistentDiskTypes,
+              authScopes,
+              healthChecks,
+              accounts,
+            };
             let securityGroupReloader = $q.when(null);
             let networkReloader = $q.when(null);
             let healthCheckReloader = $q.when(null);
@@ -132,12 +157,7 @@ angular
             if (_.has(command, 'autoHealingPolicy.healthCheck')) {
               // Verify health check is accounted for; otherwise, try refreshing health checks cache.
               const healthChecks = getHealthChecks(command);
-              if (
-                !_.chain(healthChecks)
-                  .map('selfLink')
-                  .includes(command.autoHealingPolicy.healthCheckUrl)
-                  .value()
-              ) {
+              if (!_.chain(healthChecks).map('selfLink').includes(command.autoHealingPolicy.healthCheckUrl).value()) {
                 healthCheckReloader = refreshHealthChecks(command, true);
               }
             }
@@ -155,7 +175,7 @@ angular
 
       function configureDistributionPolicyTargetShape(command) {
         const accountDetails = command.backingData.credentialsKeyedByAccount[command.credentials];
-        if (accountDetails.computeVersion === 'ALPHA' && !command.distributionPolicy.targetShape) {
+        if (!command.distributionPolicy.targetShape) {
           command.distributionPolicy.targetShape = 'EVEN';
         }
       }
@@ -212,7 +232,7 @@ angular
         const { credentialsKeyedByAccount } = c.backingData;
         const { locationToInstanceTypesMap } = credentialsKeyedByAccount[c.credentials];
 
-        if (locations.every(l => !l)) {
+        if (locations.every((l) => !l)) {
           return result;
         }
 
@@ -299,7 +319,7 @@ angular
         const chosenAccelerators = _.get(command, 'acceleratorConfigs', []);
         if (chosenAccelerators.length > 0) {
           command.acceleratorConfigs = chosenAccelerators.filter(
-            chosen => !!acceleratorTypes.find(a => a.name === chosen.acceleratorType),
+            (chosen) => !!acceleratorTypes.find((a) => a.name === chosen.acceleratorType),
           );
           if (command.acceleratorConfigs.length === 0) {
             delete command.acceleratorConfigs;
@@ -310,7 +330,7 @@ angular
 
       // n1-standard-8 should come before n1-standard-16, so we must sort by the individual segments of the names.
       function sortInstanceTypes(instanceTypes) {
-        const tokenizedInstanceTypes = _.map(instanceTypes, instanceType => {
+        const tokenizedInstanceTypes = _.map(instanceTypes, (instanceType) => {
           const tokens = instanceType.split('-');
 
           return {
@@ -322,7 +342,7 @@ angular
 
         const sortedTokenizedInstanceTypes = _.sortBy(tokenizedInstanceTypes, ['class', 'group', 'index']);
 
-        return _.map(sortedTokenizedInstanceTypes, sortedTokenizedInstanceType => {
+        return _.map(sortedTokenizedInstanceTypes, (sortedTokenizedInstanceType) => {
           return (
             sortedTokenizedInstanceType.class +
             '-' +
@@ -337,11 +357,7 @@ angular
         const result = { dirty: {} };
         if (command.credentials !== command.viewState.lastImageAccount) {
           command.viewState.lastImageAccount = command.credentials;
-          if (
-            !_.chain(command.backingData.allImages)
-              .find({ imageName: command.image })
-              .value()
-          ) {
+          if (!_.chain(command.backingData.allImages).find({ imageName: command.image }).value()) {
             command.image = null;
             result.dirty.imageName = true;
           }
@@ -363,11 +379,7 @@ angular
           // TODO(duftler): Remove this once we finish deprecating the old style regions/zones in clouddriver GCE credentials.
           filteredData.zones = regions[command.region];
         }
-        if (
-          !_.chain(filteredData.zones)
-            .includes(command.zone)
-            .value()
-        ) {
+        if (!_.chain(filteredData.zones).includes(command.zone).value()) {
           delete command.zone;
           if (!command.regional) {
             result.dirty.zone = true;
@@ -393,10 +405,7 @@ angular
 
         if (
           _.has(command, 'autoHealingPolicy.healthCheck') &&
-          !_.chain(filteredData.healthChecks)
-            .map('selfLink')
-            .includes(command.autoHealingPolicy.healthCheckUrl)
-            .value()
+          !_.chain(filteredData.healthChecks).map('selfLink').includes(command.autoHealingPolicy.healthCheckUrl).value()
         ) {
           delete command.autoHealingPolicy.healthCheck;
           result.dirty.autoHealingPolicy = true;
@@ -475,7 +484,7 @@ angular
       }
 
       function refreshLoadBalancers(command, skipCommandReconfiguration) {
-        return loadBalancerReader.listLoadBalancers('gce').then(function(loadBalancers) {
+        return loadBalancerReader.listLoadBalancers('gce').then(function (loadBalancers) {
           command.backingData.loadBalancers = loadBalancers;
           if (!skipCommandReconfiguration) {
             configureLoadBalancerOptions(command);
@@ -486,10 +495,10 @@ angular
       function refreshHealthChecks(command, skipCommandReconfiguration) {
         return cacheInitializer
           .refreshCache('healthChecks')
-          .then(function() {
+          .then(function () {
             return gceHealthCheckReader.listHealthChecks();
           })
-          .then(function(healthChecks) {
+          .then(function (healthChecks) {
             command.backingData.healthChecks = healthChecks;
             if (!skipCommandReconfiguration) {
               configureHealthChecks(command);
@@ -508,11 +517,7 @@ angular
           .map('id')
           .value();
 
-        if (
-          !_.chain(filteredData.subnets)
-            .includes(command.subnet)
-            .value()
-        ) {
+        if (!_.chain(filteredData.subnets).includes(command.subnet).value()) {
           command.subnet = '';
           result.dirty.subnet = true;
         }
@@ -521,12 +526,10 @@ angular
 
       function getSecurityGroups(command) {
         let newSecurityGroups = command.backingData.securityGroups[command.credentials] || { gce: {} };
-        newSecurityGroups = _.filter(newSecurityGroups.gce.global, function(securityGroup) {
+        newSecurityGroups = _.filter(newSecurityGroups.gce.global, function (securityGroup) {
           return securityGroup.network === command.network;
         });
-        return _.chain(newSecurityGroups)
-          .sortBy('name')
-          .value();
+        return _.chain(newSecurityGroups).sortBy('name').value();
       }
 
       function getXpnHostProjectIfAny(network) {
@@ -543,25 +546,19 @@ angular
         const newSecurityGroups = getSecurityGroups(command);
         if (currentOptions && command.securityGroups) {
           // not initializing - we are actually changing groups
-          const currentGroupNames = command.securityGroups.map(function(groupId) {
-            const match = _.chain(currentOptions)
-              .find({ id: groupId })
-              .value();
+          const currentGroupNames = command.securityGroups.map(function (groupId) {
+            const match = _.chain(currentOptions).find({ id: groupId }).value();
             return match ? match.id : groupId;
           });
           const matchedGroups = command.securityGroups
-            .map(function(groupId) {
-              const securityGroup = _.chain(currentOptions)
-                .find({ id: groupId })
-                .value();
+            .map(function (groupId) {
+              const securityGroup = _.chain(currentOptions).find({ id: groupId }).value();
               return securityGroup ? securityGroup.id : null;
             })
-            .map(function(groupName) {
-              return _.chain(newSecurityGroups)
-                .find({ id: groupName })
-                .value();
+            .map(function (groupName) {
+              return _.chain(newSecurityGroups).find({ id: groupName }).value();
             })
-            .filter(function(group) {
+            .filter(function (group) {
               return group;
             });
           command.securityGroups = _.map(matchedGroups, 'id');
@@ -572,18 +569,18 @@ angular
         }
 
         // Only include explicit firewall options in the pulldown list.
-        command.backingData.filtered.securityGroups = _.filter(newSecurityGroups, function(securityGroup) {
+        command.backingData.filtered.securityGroups = _.filter(newSecurityGroups, function (securityGroup) {
           return !_.isEmpty(securityGroup.targetTags);
         });
 
         // Identify implicit firewalls so they can be optionally listed in a read-only state.
-        command.implicitSecurityGroups = _.filter(newSecurityGroups, function(securityGroup) {
+        command.implicitSecurityGroups = _.filter(newSecurityGroups, function (securityGroup) {
           return _.isEmpty(securityGroup.targetTags);
         });
 
         // Only include explicitly-selected firewalls in the body of the command.
         const xpnHostProject = getXpnHostProjectIfAny(command.network);
-        const decoratedSecurityGroups = _.map(command.securityGroups, sg =>
+        const decoratedSecurityGroups = _.map(command.securityGroups, (sg) =>
           !sg.startsWith(xpnHostProject) ? xpnHostProject + sg : sg,
         );
         command.securityGroups = _.difference(decoratedSecurityGroups, _.map(command.implicitSecurityGroups, 'id'));
@@ -592,8 +589,8 @@ angular
       }
 
       function refreshSecurityGroups(command, skipCommandReconfiguration) {
-        return cacheInitializer.refreshCache('securityGroups').then(function() {
-          return securityGroupReader.getAllSecurityGroups().then(function(securityGroups) {
+        return cacheInitializer.refreshCache('securityGroups').then(function () {
+          return securityGroupReader.getAllSecurityGroups().then(function (securityGroups) {
             command.backingData.securityGroups = securityGroups;
             if (!skipCommandReconfiguration) {
               configureSecurityGroupOptions(command);
@@ -607,14 +604,14 @@ angular
       }
 
       function refreshNetworks(command) {
-        NetworkReader.listNetworksByProvider('gce').then(function(gceNetworks) {
+        NetworkReader.listNetworksByProvider('gce').then(function (gceNetworks) {
           command.backingData.networks = gceNetworks;
         });
       }
 
       function refreshInstanceTypes(command) {
-        return cacheInitializer.refreshCache('instanceTypes').then(function() {
-          return gceInstanceTypeService.getAllTypesByRegion().then(function(instanceTypes) {
+        return cacheInitializer.refreshCache('instanceTypes').then(function () {
+          return gceInstanceTypeService.getAllTypesByRegion().then(function (instanceTypes) {
             command.backingData.instanceTypes = instanceTypes;
             configureInstanceTypes(command);
           });

@@ -30,7 +30,7 @@ angular
     'cacheInitializer',
     'loadBalancerReader',
     'azureInstanceTypeService',
-    function(
+    function (
       $q,
       azureImageReader,
       securityGroupReader,
@@ -59,17 +59,21 @@ angular
 
       function configureCommand(application, command) {
         return $q
-          .all({
-            credentialsKeyedByAccount: AccountService.getCredentialsKeyedByAccount('azure'),
-            securityGroups: securityGroupReader.loadSecurityGroups(),
-            loadBalancers: loadBalancerReader.loadLoadBalancers(application.name),
-            dataDiskTypes: $q.when(angular.copy(dataDiskTypes)),
-            dataDiskCachingTypes: $q.when(angular.copy(dataDiskCachingTypes)),
-          })
-          .then(function(backingData) {
-            backingData.accounts = _.keys(backingData.credentialsKeyedByAccount);
-            backingData.filtered = {};
-            command.backingData = backingData;
+          .all([
+            AccountService.getCredentialsKeyedByAccount('azure'),
+            securityGroupReader.loadSecurityGroups(),
+            loadBalancerReader.loadLoadBalancers(application.name),
+          ])
+          .then(function ([credentialsKeyedByAccount, securityGroups, loadBalancers]) {
+            command.backingData = {
+              credentialsKeyedByAccount,
+              securityGroups,
+              loadBalancers,
+              dataDiskTypes: angular.copy(dataDiskTypes),
+              dataDiskCachingTypes: angular.copy(dataDiskCachingTypes),
+              accounts: _.keys(credentialsKeyedByAccount),
+              filtered: {},
+            };
             attachEventHandlers(command);
           });
       }
@@ -101,13 +105,13 @@ angular
         const { credentialsKeyedByAccount } = c.backingData;
         const { locationToInstanceTypesMap } = credentialsKeyedByAccount[c.credentials];
 
-        if (locations.every(l => !l)) {
+        if (locations.every((l) => !l)) {
           return result;
         }
 
         const filtered = azureInstanceTypeService
           .getAvailableTypesForRegions(locationToInstanceTypesMap, locations)
-          .map(type => type.name);
+          .map((type) => type.name);
 
         const instanceType = c.instanceType;
         if (_.every([instanceType, !_.startsWith(instanceType, 'custom'), !_.includes(filtered, instanceType)])) {
@@ -128,10 +132,10 @@ angular
         }
         if (command.region) {
           regionalImages = command.backingData.packageImages
-            .filter(function(image) {
+            .filter(function (image) {
               return image.amis && image.amis[command.region];
             })
-            .map(function(image) {
+            .map(function (image) {
               return {
                 imageName: image.imageName,
                 ami: image.amis ? image.amis[command.region][0] : null,
@@ -139,7 +143,7 @@ angular
             });
           if (
             command.amiName &&
-            !regionalImages.some(function(image) {
+            !regionalImages.some(function (image) {
               return image.imageName === command.amiName;
             })
           ) {
@@ -173,9 +177,7 @@ angular
         const newSecurityGroups = command.backingData.securityGroups[command.credentials] || {
           azure: {},
         };
-        return _.chain(newSecurityGroups[command.region])
-          .sortBy('name')
-          .value();
+        return _.chain(newSecurityGroups[command.region]).sortBy('name').value();
       }
 
       function configureSecurityGroupOptions(command) {
@@ -208,8 +210,8 @@ angular
       }
 
       function refreshSecurityGroups(command, skipCommandReconfiguration) {
-        return cacheInitializer.refreshCache('securityGroups').then(function() {
-          return securityGroupReader.getAllSecurityGroups().then(function(securityGroups) {
+        return cacheInitializer.refreshCache('securityGroups').then(function () {
+          return securityGroupReader.getAllSecurityGroups().then(function (securityGroups) {
             command.backingData.securityGroups = securityGroups;
             if (!skipCommandReconfiguration) {
               configureSecurityGroupOptions(command);
@@ -219,11 +221,7 @@ angular
       }
 
       function getLoadBalancerNames(loadBalancers) {
-        return _.chain(loadBalancers)
-          .map('name')
-          .uniq()
-          .value()
-          .sort();
+        return _.chain(loadBalancers).map('name').uniq().value().sort();
       }
 
       function configureLoadBalancerOptions(command) {
@@ -246,7 +244,7 @@ angular
       }
 
       function refreshLoadBalancers(command, skipCommandReconfiguration) {
-        return loadBalancerReader.listLoadBalancers('azure').then(function(loadBalancers) {
+        return loadBalancerReader.listLoadBalancers('azure').then(function (loadBalancers) {
           command.backingData.loadBalancers = loadBalancers;
           if (!skipCommandReconfiguration) {
             configureLoadBalancerOptions(command);
@@ -259,7 +257,7 @@ angular
           dirty: {},
         };
         const temp = command.backingData.loadBalancers;
-        const filterlist = _.filter(temp, function(lb) {
+        const filterlist = _.filter(temp, function (lb) {
           return lb.account === command.credentials && lb.region === command.region;
         });
 
@@ -335,8 +333,8 @@ angular
       }
 
       function refreshInstanceTypes(command) {
-        return cacheInitializer.refreshCache('instanceTypes').then(function() {
-          return azureInstanceTypeService.getAllTypesByRegion().then(function(instanceTypes) {
+        return cacheInitializer.refreshCache('instanceTypes').then(function () {
+          return azureInstanceTypeService.getAllTypesByRegion().then(function (instanceTypes) {
             command.backingData.instanceTypes = instanceTypes;
             configureInstanceTypes(command);
           });

@@ -2,6 +2,7 @@ import React from 'react';
 import { useRecoilValue } from 'recoil';
 import { useCurrentStateAndParams } from '@uirouter/react';
 import { find, isEqual } from 'lodash';
+import { SETTINGS } from 'core/config/settings';
 
 import { AppRefresher } from './AppRefresher';
 import { NavSection } from './NavSection';
@@ -27,11 +28,11 @@ export const ApplicationNavigation = ({ app }: IApplicationNavigationProps) => {
   const isExpanded = useRecoilValue(verticalNavExpandedAtom);
 
   const getNavigationCategories = (dataSources: ApplicationDataSource[]) => {
-    const appSources = dataSources.filter(ds => ds.visible !== false && !ds.disabled && ds.sref);
+    const appSources = dataSources.filter((ds) => ds.visible !== false && !ds.disabled && ds.sref);
     const allCategories = navigationCategoryRegistry.getAll();
-    const categories = allCategories.map(c => appSources.filter(as => as.category === c.key));
+    const categories = allCategories.map((c) => appSources.filter((as) => as.category === c.key));
     const uncategorizedSources = appSources.filter(
-      as => !as.category || !find(allCategories, c => c.key == as.category),
+      (as) => !as.category || !find(allCategories, (c) => c.key == as.category),
     );
     categories.push(uncategorizedSources);
     return categories;
@@ -69,26 +70,28 @@ export const ApplicationNavigation = ({ app }: IApplicationNavigationProps) => {
         <span className="application-name text-semibold heading-2 sp-margin-m-left">{app.name}</span>
       </h3>
       {navSections
-        .filter(section => section.length)
+        .filter((section) => section.length)
         .map((section, i) => (
           <NavSection key={`section-${i}`} dataSources={section} app={app} />
         ))}
-      <div className="nav-section clickable">
-        <div className="page-category flex-container-h middle text-semibold" onClick={pageApplicationOwner}>
-          <div className="nav-row-item sp-margin-xs-right">
-            {!isExpanded ? (
-              <Tooltip value="Page App Owner" placement="right">
-                <div>
-                  <Icon className="nav-item-icon" name="spMenuPager" size="medium" color="danger" />
-                </div>
-              </Tooltip>
-            ) : (
-              <Icon className="nav-item-icon" name="spMenuPager" size="medium" color="danger" />
-            )}
+      {SETTINGS.feature.pagerDuty && app.attributes.pdApiKey && (
+        <div className="nav-section clickable">
+          <div className="page-category flex-container-h middle text-semibold" onClick={pageApplicationOwner}>
+            <div className="nav-row-item sp-margin-s-right">
+              {!isExpanded ? (
+                <Tooltip value="Page App Owner" placement="right">
+                  <div>
+                    <Icon className="nav-item-icon" name="spMenuPager" size="medium" color="danger" />
+                  </div>
+                </Tooltip>
+              ) : (
+                <Icon className="nav-item-icon" name="spMenuPager" size="medium" color="danger" />
+              )}
+            </div>
+            <span className="nav-name"> Page App Owner</span>
           </div>
-          <span className="nav-name"> Page App Owner</span>
         </div>
-      </div>
+      )}
     </div>
   );
 };

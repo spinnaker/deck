@@ -45,11 +45,11 @@ export class CloudFoundryLoadBalancerTransformer {
   public static $inject = ['$q'];
   constructor(private $q: ng.IQService) {}
 
-  public normalizeLoadBalancer(loadBalancer: ILoadBalancer): ng.IPromise<ILoadBalancer> {
+  public normalizeLoadBalancer(loadBalancer: ILoadBalancer): PromiseLike<ILoadBalancer> {
     loadBalancer.provider = loadBalancer.type;
     loadBalancer.instanceCounts = this.buildInstanceCounts(loadBalancer.serverGroups);
     loadBalancer.instances = [];
-    loadBalancer.serverGroups.forEach(serverGroup => {
+    loadBalancer.serverGroups.forEach((serverGroup) => {
       serverGroup.account = loadBalancer.account;
       serverGroup.region = loadBalancer.region;
       serverGroup.cloudProvider = loadBalancer.provider;
@@ -62,11 +62,8 @@ export class CloudFoundryLoadBalancerTransformer {
         .map((instance: any) => this.transformInstance(instance, loadBalancer));
     });
 
-    const activeServerGroups = loadBalancer.serverGroups.filter(sg => !sg.isDisabled);
-    loadBalancer.instances = chain(activeServerGroups)
-      .map('instances')
-      .flatten()
-      .value() as IInstance[];
+    const activeServerGroups = loadBalancer.serverGroups.filter((sg) => !sg.isDisabled);
+    loadBalancer.instances = chain(activeServerGroups).map('instances').flatten().value() as IInstance[];
     return this.$q.resolve(loadBalancer);
   }
 
@@ -90,7 +87,7 @@ export class CloudFoundryLoadBalancerTransformer {
   public convertLoadBalancerForEditing(
     loadBalancer: ICloudFoundryLoadBalancer,
     application: Application,
-  ): ng.IPromise<ICloudFoundryLoadBalancer> {
+  ): PromiseLike<ICloudFoundryLoadBalancer> {
     return application
       .getDataSource('loadBalancers')
       .ready()
@@ -129,10 +126,7 @@ export class CloudFoundryLoadBalancerTransformer {
       )
       .value();
 
-    instanceCounts.outOfService += chain(serverGroups)
-      .map('detachedInstances')
-      .flatten()
-      .value().length;
+    instanceCounts.outOfService += chain(serverGroups).map('detachedInstances').flatten().value().length;
     return instanceCounts;
   }
 

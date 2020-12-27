@@ -1,10 +1,7 @@
-///<reference path="./q.d.ts" />
-
-import { IPromise } from 'angular';
 import { $q } from 'ngimport';
 import { Observable } from 'rxjs';
 
-export function toIPromise<T>(source: Observable<T>): IPromise<T> {
+export function toIPromise<T>(source: Observable<T>): PromiseLike<T> {
   return $q((resolve, reject) => {
     let value: any;
     source.subscribe(

@@ -4,8 +4,9 @@ import { IDataSourceConfig } from './applicationDataSource';
 
 export class ApplicationDataSourceRegistry {
   private static defaultDataSourceOrder: string[] = [
-    'executions',
+    'environments',
     'serverGroups',
+    'executions',
     'loadBalancers',
     'securityGroups',
     'tasks',
@@ -24,7 +25,7 @@ export class ApplicationDataSourceRegistry {
     if (this.dataSourceOrder.length) {
       order = this.dataSourceOrder;
     }
-    this.dataSources.forEach(ds => {
+    this.dataSources.forEach((ds) => {
       if (!order.includes(ds.key)) {
         order.push(ds.key);
       }

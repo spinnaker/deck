@@ -1,7 +1,6 @@
 import React from 'react';
 import { Option } from 'react-select';
 import { get } from 'lodash';
-import { IPromise } from 'angular';
 import { $q } from 'ngimport';
 import { Observable, Subject, Subscription } from 'rxjs';
 
@@ -37,7 +36,7 @@ export class DockerTriggerTemplate extends React.Component<
   private queryStream = new Subject();
   private subscription: Subscription;
 
-  public static formatLabel(trigger: IDockerTrigger): IPromise<string> {
+  public static formatLabel(trigger: IDockerTrigger): PromiseLike<string> {
     return $q.when(`(Docker Registry) ${trigger.account ? trigger.account + ':' : ''} ${trigger.repository || ''}`);
   }
 
@@ -115,7 +114,7 @@ export class DockerTriggerTemplate extends React.Component<
     const newState = {} as IDockerTriggerTemplateState;
     newState.tags = tags || [];
     // default to what is supplied by the trigger if possible
-    const defaultSelection = newState.tags.find(t => t === trigger.tag);
+    const defaultSelection = newState.tags.find((t) => t === trigger.tag);
     if (defaultSelection) {
       newState.selectedTag = defaultSelection;
       this.updateSelectedTag(defaultSelection);
@@ -176,7 +175,7 @@ export class DockerTriggerTemplate extends React.Component<
   public render() {
     const { digest, tags, tagsLoading, loadError, selectedTag, lookupType } = this.state;
 
-    const options = tags.map(tag => {
+    const options = tags.map((tag) => {
       return { value: tag } as Option<string>;
     });
 
@@ -214,10 +213,10 @@ export class DockerTriggerTemplate extends React.Component<
                 {tags.length > 0 && (
                   <TetheredSelect
                     options={options}
-                    optionRenderer={o => <span>{o.value}</span>}
+                    optionRenderer={(o) => <span>{o.value}</span>}
                     clearable={false}
                     value={selectedTag}
-                    valueRenderer={o => (
+                    valueRenderer={(o) => (
                       <span>
                         <strong>{o.value}</strong>
                       </span>
@@ -238,7 +237,7 @@ export class DockerTriggerTemplate extends React.Component<
             <div className="col-md-6">
               <input
                 value={digest}
-                onChange={e => this.updateDigest(e.target.value)}
+                onChange={(e) => this.updateDigest(e.target.value)}
                 className="form-control input-sm"
                 required={true}
               />

@@ -1,8 +1,8 @@
 import { mock } from 'angular';
+import { mockHttpClient } from 'core/api/mock/jasmine';
 
 import Spy = jasmine.Spy;
 import { IApplicationDataSourceAttribute, ApplicationReader } from './ApplicationReader';
-import { API } from 'core/api/ApiService';
 import { ApplicationDataSourceRegistry } from './ApplicationDataSourceRegistry';
 import { Application } from '../application.model';
 import { LOAD_BALANCER_DATA_SOURCE } from 'core/loadBalancer/loadBalancer.dataSource';
@@ -12,12 +12,11 @@ import { CLUSTER_SERVICE, ClusterService } from 'core/cluster/cluster.service';
 import { SERVER_GROUP_DATA_SOURCE } from 'core/serverGroup/serverGroup.dataSource';
 import { SECURITY_GROUP_DATA_SOURCE } from 'core/securityGroup/securityGroup.dataSource';
 
-describe('ApplicationReader', function() {
+describe('ApplicationReader', function () {
   let securityGroupReader: SecurityGroupReader;
   let loadBalancerReader: any;
   let clusterService: ClusterService;
   let $q: ng.IQService;
-  let $scope: ng.IScope;
 
   beforeEach(() => ApplicationDataSourceRegistry.clearDataSources());
 
@@ -33,69 +32,64 @@ describe('ApplicationReader', function() {
   );
 
   beforeEach(
-    mock.inject(function(
+    mock.inject(function (
       _securityGroupReader_: SecurityGroupReader,
       _clusterService_: ClusterService,
       _$q_: ng.IQService,
       _loadBalancerReader_: LoadBalancerReader,
-      $rootScope: ng.IRootScopeService,
     ) {
       securityGroupReader = _securityGroupReader_;
       clusterService = _clusterService_;
       loadBalancerReader = _loadBalancerReader_;
       $q = _$q_;
-      $scope = $rootScope.$new();
     }),
   );
 
-  describe('load application', function() {
+  describe('load application', function () {
     let application: Application = null;
 
-    function loadApplication(dataSources?: IApplicationDataSourceAttribute) {
+    async function loadApplication(dataSources?: IApplicationDataSourceAttribute) {
+      const http = mockHttpClient();
       const response = { applicationName: 'deck', attributes: {} as any };
       if (dataSources !== undefined) {
         response.attributes['dataSources'] = dataSources;
       }
-      spyOn(API, 'one').and.returnValue({
-        withParams: () => {
-          return { get: () => $q.when(response) };
-        },
-      });
+      http.expectGET('/applications/deck').respond(200, response);
       spyOn(securityGroupReader, 'loadSecurityGroupsByApplicationName').and.returnValue($q.when([]));
       spyOn(loadBalancerReader, 'loadLoadBalancers').and.returnValue($q.when([]));
       spyOn(clusterService, 'loadServerGroups').and.returnValue($q.when([]));
       spyOn(securityGroupReader, 'loadSecurityGroups').and.returnValue($q.when([]));
-      spyOn(securityGroupReader, 'getApplicationSecurityGroups').and.callFake(function(
+      spyOn(securityGroupReader, 'getApplicationSecurityGroups').and.callFake(function (
         _app: Application,
         groupsByName: any,
       ) {
         return $q.when(groupsByName || []);
       });
 
-      ApplicationReader.getApplication('deck').then(app => {
+      ApplicationReader.getApplication('deck').then((app) => {
         application = app;
       });
-      $scope.$digest();
+      await http.flush();
     }
 
-    it('loads all data sources if dataSource attribute is missing', function() {
-      loadApplication();
+    it('loads all data sources if dataSource attribute is missing', async function () {
+      await loadApplication();
       expect(application.attributes.dataSources).toBeUndefined();
       expect((clusterService.loadServerGroups as Spy).calls.count()).toBe(1);
       expect((securityGroupReader.getApplicationSecurityGroups as Spy).calls.count()).toBe(1);
       expect(loadBalancerReader.loadLoadBalancers.calls.count()).toBe(1);
     });
 
-    it('loads all data sources if disabled dataSource attribute is an empty array', function() {
-      loadApplication({ enabled: [], disabled: [] });
+    it('loads all data sources if disabled dataSource attribute is an empty array', async function () {
+      await loadApplication({ enabled: [], disabled: [] });
       expect((clusterService.loadServerGroups as Spy).calls.count()).toBe(1);
       expect((securityGroupReader.getApplicationSecurityGroups as Spy).calls.count()).toBe(1);
       expect(loadBalancerReader.loadLoadBalancers.calls.count()).toBe(1);
     });
 
-    it('only loads configured dataSources if attribute is non-empty', function() {
+    it('only loads configured dataSources if attribute is non-empty', async function () {
       const dataSources = { enabled: ['serverGroups'], disabled: ['securityGroups', 'loadBalancers'] };
-      loadApplication(dataSources);
+      await loadApplication(dataSources);
       expect((clusterService.loadServerGroups as Spy).calls.count()).toBe(1);
       expect((securityGroupReader.getApplicationSecurityGroups as Spy).calls.count()).toBe(0);
       expect(loadBalancerReader.loadLoadBalancers.calls.count()).toBe(0);
@@ -105,8 +99,8 @@ describe('ApplicationReader', function() {
       expect(application.getDataSource('securityGroups').disabled).toBe(true);
     });
 
-    describe('opt-in data sources', function() {
-      beforeEach(function() {
+    describe('opt-in data sources', function () {
+      beforeEach(function () {
         ApplicationDataSourceRegistry.registerDataSource({
           key: 'optInSource',
           visible: true,
@@ -116,18 +110,18 @@ describe('ApplicationReader', function() {
         });
       });
 
-      it('disables opt-in data sources when nothing configured on application dataSources attribute', function() {
-        loadApplication();
+      it('disables opt-in data sources when nothing configured on application dataSources attribute', async function () {
+        await loadApplication();
         expect(application.getDataSource('optInSource').disabled).toBe(true);
       });
 
-      it('disables opt-in data sources when nothing configured on application dataSources.disabled attribute', function() {
-        loadApplication({ enabled: [], disabled: [] });
+      it('disables opt-in data sources when nothing configured on application dataSources.disabled attribute', async function () {
+        await loadApplication({ enabled: [], disabled: [] });
         expect(application.getDataSource('optInSource').disabled).toBe(true);
       });
 
-      it('enables opt-in data source when configured on application dataSources.disabled attribute', function() {
-        loadApplication({ enabled: ['optInSource'], disabled: [] });
+      it('enables opt-in data source when configured on application dataSources.disabled attribute', async function () {
+        await loadApplication({ enabled: ['optInSource'], disabled: [] });
         expect(application.getDataSource('optInSource').disabled).toBe(false);
       });
     });

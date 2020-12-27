@@ -1,4 +1,4 @@
-import { IController, IPromise } from 'angular';
+import { IController } from 'angular';
 
 import { AccountService, StageConstants } from '@spinnaker/core';
 
@@ -12,7 +12,7 @@ export class AppengineStageCtrl implements IController {
   }
 
   public setStageRegion(): void {
-    const selected = this.$scope.accounts.find(account => account.name === this.$scope.stage.credentials);
+    const selected = this.$scope.accounts.find((account) => account.name === this.$scope.stage.credentials);
     if (selected && selected.name) {
       AccountService.getAccountDetails(selected.name).then((accountDetails: IAppengineAccount) => {
         this.$scope.stage.region = accountDetails.region;
@@ -24,7 +24,7 @@ export class AppengineStageCtrl implements IController {
     this.$scope.stage.cloudProvider = 'appengine';
   }
 
-  protected setAccounts(): IPromise<void> {
+  protected setAccounts(): PromiseLike<void> {
     return AccountService.listAccounts('appengine').then((accounts: IAppengineAccount[]) => {
       this.$scope.accounts = accounts;
     });

@@ -1,6 +1,5 @@
-import { IPromise } from 'angular';
-
-import { API } from 'core/api/ApiService';
+import { REST } from 'core/api/ApiService';
+import { ITask } from '../domain';
 import { TaskReader } from './task.read.service';
 import { ITaskCommand } from './taskExecutor';
 import { DebugWindow } from 'core/utils/consoleDebug';
@@ -10,17 +9,17 @@ export interface ITaskCreateResult {
 }
 
 export class TaskWriter {
-  public static postTaskCommand(taskCommand: ITaskCommand): IPromise<ITaskCreateResult> {
-    return API.all('tasks').post(taskCommand);
+  public static postTaskCommand(taskCommand: ITaskCommand): PromiseLike<ITaskCreateResult> {
+    return REST('/tasks').post(taskCommand);
   }
 
-  public static cancelTask(taskId: string): IPromise<void> {
-    return API.all('tasks')
-      .one(taskId, 'cancel')
+  public static cancelTask(taskId: string): PromiseLike<ITask> {
+    return REST('/tasks')
+      .path(taskId, 'cancel')
       .put()
       .then(() =>
-        TaskReader.getTask(taskId).then(task =>
-          TaskReader.waitUntilTaskMatches(task, updatedTask => updatedTask.status === 'CANCELED'),
+        TaskReader.getTask(taskId).then((task) =>
+          TaskReader.waitUntilTaskMatches(task, (updatedTask) => updatedTask.status === 'CANCELED'),
         ),
       );
   }

@@ -1,7 +1,6 @@
-import { IPromise } from 'angular';
 import { get, set, flatMap } from 'lodash';
 
-import { API } from 'core/api';
+import { REST } from 'core/api';
 import {
   IManagedApplicationSummary,
   ManagedResourceStatus,
@@ -9,7 +8,6 @@ import {
   IManagedResourceEventHistory,
   IManagedResourceDiff,
   IManagedResourceEvent,
-  IManagedApplicationEnvironmentSummary,
 } from 'core/domain';
 
 const KIND_NAME_MATCHER = /.*\/(.*?)@/i;
@@ -36,7 +34,7 @@ export const getResourceKindForLoadBalancerType = (type: string) => {
 const transformManagedResourceDiff = (diff: IManagedResourceEventHistoryResponse[0]['delta']): IManagedResourceDiff =>
   Object.keys(diff).reduce((transformed, key) => {
     const diffNode = diff[key];
-    const fieldKeys = flatMap<string, string>(key.split('/').filter(Boolean), fieldKey => {
+    const fieldKeys = flatMap<string, string>(key.split('/').filter(Boolean), (fieldKey) => {
       // Region keys currently come wrapped in {}, which is distracting and not useful. Let's trim those off.
       if (fieldKey.startsWith('{') && fieldKey.endsWith('}')) {
         return fieldKey.substring(1, fieldKey.length - 1);
@@ -74,36 +72,33 @@ export class ManagedReader {
     // Individual resources don't update their status when an application is paused/resumed,
     // so for now let's swap to a PAUSED status and keep things simpler in downstream components.
     if (response.applicationPaused) {
-      response.resources.forEach(resource => (resource.status = ManagedResourceStatus.PAUSED));
+      response.resources.forEach((resource) => (resource.status = ManagedResourceStatus.PAUSED));
     }
 
-    response.resources.forEach(resource => (resource.isPaused = resource.status === ManagedResourceStatus.PAUSED));
+    response.resources.forEach((resource) => (resource.isPaused = resource.status === ManagedResourceStatus.PAUSED));
 
     return response;
   }
 
-  public static getApplicationSummary(app: string): IPromise<IManagedApplicationSummary<'resources'>> {
-    return API.one('managed')
-      .one('application', app)
-      .withParams({ entities: 'resources' })
+  public static getApplicationSummary(app: string): PromiseLike<IManagedApplicationSummary<'resources'>> {
+    return REST('/managed/application').path(app).query({ entities: 'resources' }).get().then(this.decorateResources);
+  }
+
+  public static getEnvironmentsSummary(app: string): PromiseLike<IManagedApplicationSummary> {
+    return REST('/managed/application')
+      .path(app)
+      .query({ entities: ['resources', 'artifacts', 'environments'], maxArtifactVersions: 30 })
       .get()
       .then(this.decorateResources);
   }
 
-  public static getEnvironmentsSummary(app: string): IPromise<IManagedApplicationEnvironmentSummary> {
-    return API.one('managed')
-      .one('application', app)
-      .withParams({ entities: ['resources', 'artifacts', 'environments'] })
-      .get()
-      .then(this.decorateResources);
-  }
-
-  public static getResourceHistory(resourceId: string): IPromise<IManagedResourceEventHistory> {
-    return API.one('history', resourceId)
-      .withParams({ limit: 100 })
+  public static getResourceHistory(resourceId: string): PromiseLike<IManagedResourceEventHistory> {
+    return REST('/history')
+      .path(resourceId)
+      .query({ limit: 100 })
       .get()
       .then((response: IManagedResourceEventHistoryResponse) => {
-        response.forEach(event => {
+        response.forEach((event) => {
           if (event.delta) {
             ((event as unknown) as IManagedResourceEvent).delta = transformManagedResourceDiff(event.delta);
           }

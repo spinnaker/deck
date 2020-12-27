@@ -1,4 +1,4 @@
-import { module, IPromise, IQService } from 'angular';
+import { module, IQService } from 'angular';
 import { chain, clone, extend, find, flatten, has, intersection, keys, some, xor } from 'lodash';
 
 import {
@@ -71,7 +71,7 @@ export interface IEcsServerGroupCommandBackingDataFiltered extends IServerGroupC
   iamRoles: string[];
   ecsClusters: string[];
   metricAlarms: IMetricAlarmDescriptor[];
-  subnetTypes: string[];
+  subnetTypes: ISubnet[];
   securityGroupNames: string[];
   secrets: string[];
   serviceDiscoveryRegistries: IServiceDiscoveryRegistryDescriptor[];
@@ -85,8 +85,7 @@ export interface IEcsServerGroupCommandBackingData extends IServerGroupCommandBa
   iamRoles: IRoleDescriptor[];
   metricAlarms: IMetricAlarmDescriptor[];
   launchTypes: string[];
-  // subnetTypes: string;
-  // securityGroups: string[]
+  networkModes: string[];
   secrets: ISecretDescriptor[];
   serviceDiscoveryRegistries: IServiceDiscoveryRegistryDescriptor[];
   images: IEcsDockerImage[];
@@ -115,6 +114,7 @@ export interface IEcsServiceDiscoveryRegistryAssociation {
 }
 
 export interface IEcsServerGroupCommand extends IServerGroupCommand {
+  associatePublicIpAddress: boolean;
   backingData: IEcsServerGroupCommandBackingData;
   computeUnits: number;
   reservedMemory: number;
@@ -124,6 +124,10 @@ export interface IEcsServerGroupCommand extends IServerGroupCommand {
   placementStrategyName: string;
   placementStrategySequence: IPlacementStrategy[];
   imageDescription: IEcsDockerImage;
+  networkMode: string;
+  subnetType: string;
+  subnetTypes: string[];
+  securityGroups: string[];
   viewState: IEcsServerGroupCommandViewState;
   taskDefinitionArtifact: IEcsTaskDefinitionArtifact;
   taskDefinitionArtifactAccount: string;
@@ -135,7 +139,6 @@ export interface IEcsServerGroupCommand extends IServerGroupCommand {
 
   subnetTypeChanged: (command: IEcsServerGroupCommand) => IServerGroupCommandResult;
   placementStrategyNameChanged: (command: IEcsServerGroupCommand) => IServerGroupCommandResult;
-  // subnetTypeChanged: (command: IEcsServerGroupCommand) => IServerGroupCommandResult;
   regionIsDeprecated: (command: IEcsServerGroupCommand) => boolean;
 
   clusterChanged: (command: IServerGroupCommand) => void;
@@ -146,6 +149,7 @@ export class EcsServerGroupConfigurationService {
   // private healthCheckTypes = ['EC2', 'ELB'];
   // private terminationPolicies = ['OldestInstance', 'NewestInstance', 'OldestLaunchConfiguration', 'ClosestToNextInstanceHour', 'Default'];
   private launchTypes = ['EC2', 'FARGATE'];
+  private networkModes = ['bridge', 'host', 'awsvpc', 'none', 'default'];
 
   public static $inject = [
     '$q',
@@ -174,11 +178,12 @@ export class EcsServerGroupConfigurationService {
     command.backingData = {
       // terminationPolicies: clone(this.terminationPolicies)
       launchTypes: clone(this.launchTypes),
+      networkModes: clone(this.networkModes),
     } as IEcsServerGroupCommandBackingData;
   }
 
   // TODO (Bruno Carrier): Why do we need to inject an Application into this constructor so that the app works?  This is strange, and needs investigating
-  public configureCommand(cmd: IEcsServerGroupCommand, imageQuery = ''): IPromise<void> {
+  public configureCommand(cmd: IEcsServerGroupCommand, imageQuery = ''): PromiseLike<void> {
     this.applyOverrides('beforeConfiguration', cmd);
     cmd.toggleSuspendedProcess = (command: IEcsServerGroupCommand, process: string): void => {
       command.suspendedProcesses = command.suspendedProcesses || [];
@@ -196,14 +201,14 @@ export class EcsServerGroupConfigurationService {
     cmd.onStrategyChange = (command: IEcsServerGroupCommand, strategy: IDeploymentStrategy): void => {
       // Any strategy other than None or Custom should force traffic to be enabled
       if (strategy.key !== '' && strategy.key !== 'custom') {
-        command.suspendedProcesses = (command.suspendedProcesses || []).filter(p => p !== 'AddToLoadBalancer');
+        command.suspendedProcesses = (command.suspendedProcesses || []).filter((p) => p !== 'AddToLoadBalancer');
       }
     };
 
     cmd.regionIsDeprecated = (command: IEcsServerGroupCommand): boolean => {
       return (
         has(command, 'backingData.filtered.regions') &&
-        command.backingData.filtered.regions.some(region => region.name === command.region && region.deprecated)
+        command.backingData.filtered.regions.some((region) => region.name === command.region && region.deprecated)
       );
     };
 
@@ -217,7 +222,7 @@ export class EcsServerGroupConfigurationService {
     if (imageQueries.length) {
       imagesPromise = this.$q
         .all(
-          imageQueries.map(q =>
+          imageQueries.map((q) =>
             DockerImageReader.findImages({
               provider: 'dockerRegistry',
               count: 50,
@@ -225,7 +230,7 @@ export class EcsServerGroupConfigurationService {
             }),
           ),
         )
-        .then(promises => flatten(promises));
+        .then((promises) => flatten(promises));
     } else {
       imagesPromise = this.$q.when([]);
     }
@@ -240,6 +245,7 @@ export class EcsServerGroupConfigurationService {
         metricAlarms: this.metricAlarmReader.listMetricAlarms(),
         securityGroups: this.securityGroupReader.getAllSecurityGroups(),
         launchTypes: this.$q.when(clone(this.launchTypes)),
+        networkModes: this.$q.when(clone(this.networkModes)),
         secrets: this.secretReader.listSecrets(),
         serviceDiscoveryRegistries: ServiceDiscoveryReader.listServiceDiscoveryRegistries(),
         images: imagesPromise,
@@ -310,7 +316,7 @@ export class EcsServerGroupConfigurationService {
 
   public configureAvailableImages(command: IEcsServerGroupCommand): void {
     // No filtering required, but need to decorate with the displayable image ID
-    command.backingData.filtered.images = command.backingData.images.map(image => this.mapImage(image));
+    command.backingData.filtered.images = command.backingData.images.map((image) => this.mapImage(image));
   }
 
   public configureAvailabilityZones(command: IEcsServerGroupCommand): void {
@@ -322,7 +328,7 @@ export class EcsServerGroupConfigurationService {
   }
 
   public configureAvailableSecurityGroups(command: IEcsServerGroupCommand): void {
-    if (command.subnetType == null) {
+    if (command.subnetType == null && (command.subnetTypes == null || command.subnetTypes.length == 0)) {
       command.backingData.filtered.securityGroups = [];
       return;
     }
@@ -331,7 +337,7 @@ export class EcsServerGroupConfigurationService {
       .filter({
         account: command.credentials,
         region: command.region,
-        purpose: command.subnetType,
+        purpose: command.subnetTypes ? command.subnetTypes[0] : command.subnetType,
       })
       .compact()
       .uniqBy('purpose')
@@ -359,8 +365,10 @@ export class EcsServerGroupConfigurationService {
       })
       .compact()
       .uniqBy('purpose')
-      .map('purpose')
-      .value();
+      .value()
+      .filter(function (e: ISubnet) {
+        return e.purpose && e.purpose.length > 0;
+      });
   }
 
   public configureAvailableEcsClusters(command: IEcsServerGroupCommand): void {
@@ -404,7 +412,7 @@ export class EcsServerGroupConfigurationService {
         account: command.credentials,
         region: command.region,
       })
-      .map(registry => this.mapServiceRegistry(registry))
+      .map((registry) => this.mapServiceRegistry(registry))
       .value();
   }
 
@@ -437,14 +445,19 @@ export class EcsServerGroupConfigurationService {
       .uniqBy('purpose')
       .value();
 
-    if (
-      !chain(filteredData.subnetPurposes)
-        .some({ purpose: command.subnetType })
-        .value()
-    ) {
-      command.subnetType = null;
+    if (command.subnetTypes) {
+      result.dirty.subnetType = !command.subnetTypes.every((subnetType) =>
+        chain(filteredData.subnetPurposes).some({ purpose: subnetType }).value(),
+      );
+    } else if (!chain(filteredData.subnetPurposes).some({ purpose: command.subnetType }).value()) {
       result.dirty.subnetType = true;
     }
+
+    if (result.dirty.subnetType) {
+      command.subnetTypes = null;
+      command.subnetType = null;
+    }
+
     return result;
   }
 
@@ -463,21 +476,21 @@ export class EcsServerGroupConfigurationService {
 
   public getLoadBalancerNames(command: IEcsServerGroupCommand): string[] {
     const loadBalancers = this.getLoadBalancerMap(command).filter(
-      lb => (!lb.loadBalancerType || lb.loadBalancerType === 'classic') && lb.vpcId === command.vpcId,
+      (lb) => (!lb.loadBalancerType || lb.loadBalancerType === 'classic') && lb.vpcId === command.vpcId,
     );
-    return loadBalancers.map(lb => lb.name).sort();
+    return loadBalancers.map((lb) => lb.name).sort();
   }
 
   public getVpcLoadBalancerNames(command: IEcsServerGroupCommand): string[] {
     const loadBalancersForVpc = this.getLoadBalancerMap(command).filter(
-      lb => (!lb.loadBalancerType || lb.loadBalancerType === 'classic') && lb.vpcId,
+      (lb) => (!lb.loadBalancerType || lb.loadBalancerType === 'classic') && lb.vpcId,
     );
-    return loadBalancersForVpc.map(lb => lb.name).sort();
+    return loadBalancersForVpc.map((lb) => lb.name).sort();
   }
 
   public getTargetGroupNames(command: IEcsServerGroupCommand): string[] {
-    const loadBalancersV2 = this.getLoadBalancerMap(command).filter(lb => lb.loadBalancerType !== 'classic') as any[];
-    const allTargetGroups = flatten(loadBalancersV2.map<string[]>(lb => lb.targetGroups));
+    const loadBalancersV2 = this.getLoadBalancerMap(command).filter((lb) => lb.loadBalancerType !== 'classic') as any[];
+    const allTargetGroups = flatten(loadBalancersV2.map<string[]>((lb) => lb.targetGroups));
     return allTargetGroups.sort();
   }
 
@@ -510,7 +523,7 @@ export class EcsServerGroupConfigurationService {
   }
 
   public refreshLoadBalancers(command: IEcsServerGroupCommand, skipCommandReconfiguration?: boolean) {
-    return this.loadBalancerReader.listLoadBalancers('ecs').then(loadBalancers => {
+    return this.loadBalancerReader.listLoadBalancers('ecs').then((loadBalancers) => {
       command.backingData.loadBalancers = loadBalancers;
       if (!skipCommandReconfiguration) {
         this.configureLoadBalancerOptions(command);
@@ -520,9 +533,18 @@ export class EcsServerGroupConfigurationService {
 
   public configureVpcId(command: IEcsServerGroupCommand): IEcsServerGroupCommandResult {
     const result: IEcsServerGroupCommandResult = { dirty: {} };
-    if (!command.subnetType) {
+    if (command.subnetType == null && (command.subnetTypes == null || command.subnetTypes.length == 0)) {
       command.vpcId = null;
       result.dirty.vpcId = true;
+    } else if (command.subnetTypes != null && command.subnetTypes.length > 0) {
+      command.subnetTypes.forEach(function (subnetType) {
+        const subnet = find<ISubnet>(command.backingData.subnets, {
+          purpose: subnetType,
+          account: command.credentials,
+          region: command.region,
+        });
+        command.vpcId = subnet ? subnet.vpcId : null;
+      });
     } else {
       const subnet = find<ISubnet>(command.backingData.subnets, {
         purpose: command.subnetType,

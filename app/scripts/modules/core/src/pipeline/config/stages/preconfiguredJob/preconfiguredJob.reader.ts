@@ -1,5 +1,4 @@
-import { IPromise } from 'angular';
-import { API } from 'core/api';
+import { REST } from 'core/api';
 
 export interface IPreconfiguredJobParameter {
   name: string;
@@ -21,10 +20,7 @@ export interface IPreconfiguredJob {
 }
 
 export const PreconfiguredJobReader = {
-  list(): IPromise<IPreconfiguredJob[]> {
-    return API.one('jobs')
-      .all('preconfigured')
-      .useCache()
-      .getList();
+  list(): PromiseLike<IPreconfiguredJob[]> {
+    return REST('/jobs/preconfigured').useCache().get();
   },
 };
