@@ -113,6 +113,12 @@ export interface IEcsServiceDiscoveryRegistryAssociation {
   containerName: string;
 }
 
+export interface IEcsCapacityProviderStrategy {
+  capacityProvider: string;
+  base: number;
+  weight: number
+}
+
 export interface IEcsServerGroupCommand extends IServerGroupCommand {
   associatePublicIpAddress: boolean;
   backingData: IEcsServerGroupCommandBackingData;
@@ -137,6 +143,7 @@ export interface IEcsServerGroupCommand extends IServerGroupCommand {
   serviceDiscoveryAssociations: IEcsServiceDiscoveryRegistryAssociation[];
   useTaskDefinitionArtifact: boolean;
 
+  capacityProviderStrategy: IEcsCapacityProviderStrategy[];
   subnetTypeChanged: (command: IEcsServerGroupCommand) => IServerGroupCommandResult;
   placementStrategyNameChanged: (command: IEcsServerGroupCommand) => IServerGroupCommandResult;
   regionIsDeprecated: (command: IEcsServerGroupCommand) => boolean;

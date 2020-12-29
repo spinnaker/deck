@@ -33,7 +33,7 @@
   </div>
 
   <div class="form-group" ng-if="$ctrl.capacityProviderState.useCapacityProviders">
-    <div class="sm-label-left">
+    <!--<div class="sm-label-left">
       <b>Capacity Provider Strategy</b>
       <help-field key="ecs.capacityProviderStrategy"></help-field>
     </div>
@@ -95,7 +95,9 @@
           </tr>
         </tfoot>
       </table>
-    </div>
+    </div>-->
+    <capacity-provider-react command="$ctrl.command" capacity-provider-state="$ctrl.capacityProviderState"
+                             notify-angular="$ctrl.notifyAngular" configure-command="$ctrl.configureCommand"/>
   </div>
 
   <div class="form-group" ng-if="!$ctrl.capacityProviderState.useCapacityProviders" style="padding-top: 10px">
