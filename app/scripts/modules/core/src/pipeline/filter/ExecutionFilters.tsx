@@ -262,6 +262,13 @@ export class ExecutionFilters extends React.Component<IExecutionFiltersProps, IE
             <FilterSection heading="Status" expanded={true}>
               <div className="form">
                 <FilterStatus status="RUNNING" label="Running" refresh={this.refreshExecutions} />
+                <FilterStages
+                  status="RUNNING"
+                  stages="AWAITING_JUDGMENT"
+                  label="Awaiting Judgment"
+                  tags={this.state.tags}
+                  refresh={this.refreshExecutions}
+                />
                 <FilterStatus status="TERMINAL" label="Terminal" refresh={this.refreshExecutions} />
                 <FilterStatus status="SUCCEEDED" label="Succeeded" refresh={this.refreshExecutions} />
                 <FilterStatus status="NOT_STARTED" label="Not Started" refresh={this.refreshExecutions} />
@@ -349,6 +356,7 @@ const Pipelines = SortableContainer(
 
 const FilterStatus = (props: { status: string; label: string; refresh: () => void }): JSX.Element => {
   const sortFilter = ExecutionState.filterModel.asFilterModel.sortFilter;
+  const tag = ExecutionState.filterModel.asFilterModel.tags.find(({ key }) => key === 'stages');
   const changed = () => {
     ReactGA.event({ category: 'Pipelines', action: 'Filter: status', label: props.label.toUpperCase() });
     sortFilter.status[props.status] = !sortFilter.status[props.status];
@@ -357,7 +365,40 @@ const FilterStatus = (props: { status: string; label: string; refresh: () => voi
   return (
     <div className="checkbox">
       <label>
-        <input type="checkbox" checked={sortFilter.status[props.status] || false} onChange={changed} />
+        <input
+          type="checkbox"
+          checked={sortFilter.status[props.status] || false}
+          disabled={props.label.toUpperCase() == 'RUNNING' && tag}
+          onChange={changed}
+        />
+        {props.label}
+      </label>
+    </div>
+  );
+};
+
+const FilterStages = (props: {
+  status: string;
+  tags: IFilterTag[];
+  stages: string;
+  label: string;
+  refresh: () => void;
+}): JSX.Element => {
+  const sortFilter = ExecutionState.filterModel.asFilterModel.sortFilter;
+  const tag = props.tags.find(({ key }) => key === 'stages');
+  const changed = () => {
+    if (tag) {
+      tag.clear();
+    } else {
+      sortFilter.status[props.status] = true;
+      sortFilter.stages[props.stages] = true;
+    }
+    props.refresh();
+  };
+  return (
+    <div className="checkbox">
+      <label>
+        <input type="checkbox" checked={get(sortFilter, ['stages', props.stages], false)} onChange={changed} />
         {props.label}
       </label>
     </div>

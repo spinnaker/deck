@@ -37,6 +37,7 @@ export interface IFeatures {
   managedDelivery?: boolean;
   managedServiceAccounts?: boolean;
   managedResources?: boolean;
+  manualJudgementEnabled?: boolean;
   notifications?: boolean;
   pagerDuty?: boolean;
   pipelines?: boolean;

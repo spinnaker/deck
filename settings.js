@@ -25,6 +25,7 @@ const iapRefresherEnabled = process.env.IAP_REFRESHER_ENABLED === 'true' ? true 
 const managedDeliveryEnabled = process.env.MANAGED_DELIVERY_ENABLED === 'true';
 const managedServiceAccountsEnabled = process.env.MANAGED_SERVICE_ACCOUNTS_ENABLED === 'true';
 const managedResourcesEnabled = process.env.MANAGED_RESOURCES_ENABLED === 'true';
+const manualJudgementEnabled = process.env.MANUAL_JUDGEMENT_ENABLED === 'true';
 const onDemandClusterThreshold = process.env.ON_DEMAND_CLUSTER_THRESHOLD || '350';
 const reduxLoggerEnabled = process.env.REDUX_LOGGER === 'true';
 const templatesEnabled = process.env.TEMPLATES_ENABLED === 'true';
@@ -82,6 +83,7 @@ window.spinnakerSettings = {
     managedDelivery: managedDeliveryEnabled,
     managedServiceAccounts: managedServiceAccountsEnabled,
     managedResources: managedResourcesEnabled,
+    manualJudgementEnabled: manualJudgementEnabled,
     notifications: false,
     pagerDuty: false,
     pipelineTemplates: false,

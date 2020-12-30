@@ -219,6 +219,7 @@ export class FilterModelService {
             clear() {
               // do not reuse the modelVal variable - it's possible it has been reassigned since the tag was created
               const toClearFrom: ITrueKeyModel = model.sortFilter[key] as ITrueKeyModel;
+              value === 'RUNNING' ? delete model.sortFilter.stages.AWAITING_JUDGMENT : false;
               delete toClearFrom[value];
               model.applyParamsToUrl();
             },

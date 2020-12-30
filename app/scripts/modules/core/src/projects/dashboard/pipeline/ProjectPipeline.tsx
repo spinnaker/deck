@@ -53,6 +53,7 @@ export class ProjectPipeline extends React.Component<IProjectPipelineProps, IPro
     const execution = this.props.execution;
     const stages = execution.stageSummaries.map((stage) => (
       <ExecutionMarker
+        manualJudgment={[]}
         key={stage.refId}
         {...this.props}
         stage={stage}

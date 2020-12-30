@@ -117,6 +117,10 @@ export class ExecutionService {
       });
   }
 
+  public getCrossApplicationExecutionContext(executionId: string): PromiseLike<IExecution> {
+    return REST('/pipelines').path(executionId).get();
+  }
+
   public transformExecutions(application: Application, executions: IExecution[], currentData: IExecution[] = []): void {
     if (!executions || !executions.length) {
       return;

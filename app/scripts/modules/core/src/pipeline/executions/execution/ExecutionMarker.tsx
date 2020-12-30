@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactGA from 'react-ga';
+import { UISref } from '@uirouter/react';
 
 import { IExecution, IExecutionStageSummary } from 'core/domain';
 import { OrchestratedItemRunningTime } from './OrchestratedItemRunningTime';
@@ -11,6 +12,7 @@ import { ExecutionMarkerInformationModal } from './ExecutionMarkerInformationMod
 import { SETTINGS } from 'core/config/settings';
 
 import './executionMarker.less';
+import { isEmpty } from 'lodash';
 
 export interface IExecutionMarkerProps {
   active?: boolean;
@@ -20,6 +22,7 @@ export interface IExecutionMarkerProps {
   previousStageActive?: boolean;
   stage: IExecutionStageSummary;
   width: string;
+  manualJudgment: any;
 }
 
 export interface IExecutionMarkerState {
@@ -81,15 +84,65 @@ export class ExecutionMarker extends React.Component<IExecutionMarkerProps, IExe
     });
   };
 
+  private manualJudgmentStatus = (stageStatus: string, manualJudgment: any) => {
+    let status = stageStatus;
+    if (manualJudgment !== undefined && manualJudgment.length && stageStatus === 'running') {
+      const existStages = this.props.stage.stages.filter((stage) => stage.status.toLowerCase() === 'running');
+      existStages.forEach(({ context, type }) => {
+        if (this.leafNodeExist(context.executionId, manualJudgment) && type === 'pipeline') {
+          status = 'waiting';
+        }
+      });
+    }
+    return status;
+  };
+
+  private leafNodeExist = (executionContextId: string, manualJudgment: any): string => {
+    const nestedLeafnodeObj = this.props.manualJudgment[executionContextId];
+    const leafNodeObj = manualJudgment.find(
+      (leafnode: any) => leafnode.currentChild === executionContextId || leafnode.id === executionContextId,
+    );
+    if (!nestedLeafnodeObj && !leafNodeObj) return null;
+    if (nestedLeafnodeObj) {
+      return this.leafNodeExist(nestedLeafnodeObj[0].pipelineId ?? nestedLeafnodeObj[0].id, nestedLeafnodeObj);
+    } else if (leafNodeObj) {
+      return leafNodeObj;
+    }
+    return null;
+  };
+
+  private redirectLeafNode = (type: string, manualJudgment: any, contextExecutionId: string): any => {
+    if (manualJudgment !== undefined) {
+      const leafnode = this.leafNodeExist(contextExecutionId, manualJudgment);
+      if (leafnode) {
+        return this.fetchLeafNodeParameter(type, leafnode);
+      }
+    }
+  };
+
+  private fetchLeafNodeParameter = (type: string, leafNodeObject: any) => {
+    let leafNodeVal = '';
+    if (!isEmpty(leafNodeObject)) {
+      if (type === 'application') {
+        leafNodeVal = leafNodeObject.app ?? this.props.application.name;
+      } else {
+        leafNodeVal = leafNodeObject.id;
+      }
+    }
+    return leafNodeVal;
+  };
+
   public render() {
-    const { stage, application, execution, active, previousStageActive, width } = this.props;
+    const { stage, application, execution, active, previousStageActive, width, manualJudgment } = this.props;
     const stageType = (stage.activeStageType || stage.type).toLowerCase(); // support groups
+    const PIPELINE_WAITING =
+      this.manualJudgmentStatus(stage.status.toLowerCase(), manualJudgment[execution.id]) === 'waiting';
     const markerClassName = [
       stage.type !== 'group' ? 'clickable' : '',
       'stage',
       'execution-marker',
       `stage-type-${stageType}`,
-      `execution-marker-${stage.status.toLowerCase()}`,
+      `execution-marker-${this.manualJudgmentStatus(stage.status.toLowerCase(), manualJudgment[execution.id])}`,
       active ? 'active' : '',
       previousStageActive ? 'after-active' : '',
       stage.isRunning ? 'glowing' : '',
@@ -102,7 +155,33 @@ export class ExecutionMarker extends React.Component<IExecutionMarkerProps, IExe
       SETTINGS.feature.executionMarkerInformationModal &&
       stage.status.toLowerCase() === 'terminal' &&
       stage.type === 'pipeline';
-    const stageContents = (
+    const stageContents = PIPELINE_WAITING ? (
+      <div className={markerClassName} style={{ width, backgroundColor: stage.color }}>
+        <UISref
+          to="home.applications.application.pipelines.executionDetails.execution"
+          params={{
+            application: this.redirectLeafNode(
+              'application',
+              manualJudgment[execution.id],
+              stage.stages[0].context.executionId,
+            ),
+            executionId: this.redirectLeafNode(
+              'executionId',
+              manualJudgment[execution.id],
+              stage.stages[0].context.executionId,
+            ),
+            executionParams: { application: application.name, executionId: execution.id },
+          }}
+        >
+          <a target="_self" style={{ textDecoration: 'none', color: 'black' }}>
+            <span className="horizontal center middle">
+              <span className="duration">waiting </span>
+              {<i className="fa fa-clock"></i>}
+            </span>
+          </a>
+        </UISref>
+      </div>
+    ) : (
       <div className={markerClassName} style={{ width, backgroundColor: stage.color }} onClick={this.handleStageClick}>
         <span className="horizontal center middle">
           <MarkerIcon stage={stage} />
