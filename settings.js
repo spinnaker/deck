@@ -92,6 +92,13 @@ window.spinnakerSettings = {
     snapshots: false,
     functions: functionsEnabled,
   },
+  filterRelations: {
+    Type: null,
+    Falcon_Instance: null,
+    Falcon_Domain: 'Falcon_Instance',
+    Falcon_Cell: 'Falcon_Domain',
+    Service_Instance: null,
+  },
   gateUrl: apiHost,
   gitSources: ['stash', 'github', 'bitbucket', 'gitlab'],
   hiddenStages: [],

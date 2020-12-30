@@ -45,6 +45,7 @@ export interface ISortFilter {
   showDurations: boolean;
   stack: ITrueKeyModel;
   status: ITrueKeyModel;
+  [param: string]: any;
 }
 
 export interface IFilterModel {

@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactGA from 'react-ga';
-import { get, isEmpty, orderBy, uniq, isEqual } from 'lodash';
+import { get, isEmpty, orderBy, uniq, isEqual, flatten } from 'lodash';
 import { Debounce } from 'lodash-decorators';
 import classNames from 'classnames';
 import { SortableContainer, SortableElement, SortableHandle, arrayMove, SortEnd } from 'react-sortable-hoc';
@@ -29,6 +29,7 @@ export interface IExecutionFiltersState {
   pipelineReorderEnabled: boolean;
   searchString: string;
   tags: IFilterTag[];
+  filters: any;
 }
 
 const DragHandle = SortableHandle(() => (
@@ -53,6 +54,7 @@ export class ExecutionFilters extends React.Component<IExecutionFiltersProps, IE
       pipelineReorderEnabled: false,
       searchString,
       tags: ExecutionState.filterModel.asFilterModel.tags,
+      filters: {},
     };
   }
 
@@ -74,6 +76,11 @@ export class ExecutionFilters extends React.Component<IExecutionFiltersProps, IE
       ExecutionState.filterModel.asFilterModel.activate();
       ExecutionFilterService.updateExecutionGroups(application);
     });
+  }
+  componentDidUpdate(_prevProps: IExecutionFiltersProps, prevState: IExecutionFiltersState) {
+    if (this.state.tags !== prevState.tags) {
+      this.getCustomExecutionFilters();
+    }
   }
 
   private enablePipelineReorder = (): void => {
@@ -98,6 +105,49 @@ export class ExecutionFilters extends React.Component<IExecutionFiltersProps, IE
     dataSource.refresh(true).then(() => {
       ExecutionFilterService.updateExecutionGroups(this.props.application);
       this.props.setReloadingForFilters(false);
+    });
+    this.getCustomExecutionFilters();
+  };
+  private getCustomExecutionFilters = (): any => {
+    const { application } = this.props;
+    const sortFilter = ExecutionState.filterModel.asFilterModel.sortFilter;
+    if (application.pipelineConfigs.loadFailure) {
+      return [];
+    }
+    let configs = get(application, `pipelineConfigs.data`, []);
+    configs = configs.map((config) => config.customFilters).filter((element) => element);
+    if (!configs.length) return null;
+
+    const customFilters = ExecutionFilterService.getRelations();
+
+    const FILTER_PARAMS: any = {};
+    const Filters: any = {};
+
+    flatten(customFilters).forEach((filter: any) => {
+      FILTER_PARAMS[filter] = Object.keys(sortFilter[filter]);
+      Filters[filter] = {};
+    });
+
+    customFilters.forEach((filters: string[]) => {
+      let filterOn = configs;
+      filters.forEach((filter, index) => {
+        if (index > 0) {
+          const prevFilter = filters[index - 1];
+          const filterParams = FILTER_PARAMS[prevFilter];
+          if (filterParams.length > 0) {
+            filterOn = filterOn.filter((filterOn) => filterParams.includes(filterOn[prevFilter]));
+          }
+        }
+        filterOn.map((customFilter) => {
+          if (customFilter[filter])
+            Filters[filter][customFilter[filter]] = FILTER_PARAMS[filter].includes(customFilter[filter]);
+        });
+      });
+    });
+
+    this.setState({
+      ...this.state,
+      filters: Filters,
     });
   };
 
@@ -271,6 +321,21 @@ export class ExecutionFilters extends React.Component<IExecutionFiltersProps, IE
                 <FilterStatus status="BUFFERED" label="Buffered" refresh={this.refreshExecutions} />
               </div>
             </FilterSection>
+
+            {Object.keys(this.state.filters).map((x, index) => {
+              return (
+                <FilterSection key={index} heading={x.replace('_', ' ').toUpperCase()} expanded={true}>
+                  <div className="form">
+                    <Types
+                      filterSectionName={x}
+                      filters={this.state.filters[x]}
+                      update={this.refreshExecutions}
+                      tags={this.state.tags}
+                    />
+                  </div>
+                </FilterSection>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -360,6 +425,51 @@ const FilterStatus = (props: { status: string; label: string; refresh: () => voi
         <input type="checkbox" checked={sortFilter.status[props.status] || false} onChange={changed} />
         {props.label}
       </label>
+    </div>
+  );
+};
+
+const Types: any = (props: {
+  filters: string[];
+  filterSectionName: string;
+  update: () => void;
+  tags: IFilterTag[];
+}) => {
+  return Object.entries(props.filters).map(([filter, _value], index) => {
+    const tag = props.tags
+      ? props.tags.find((t) => t.key === props.filterSectionName && t.value === filter)
+      : undefined;
+    return (
+      <Type key={index} tag={tag} filter={filter} update={props.update} filterSectionName={props.filterSectionName} />
+    );
+  });
+};
+
+const Type = (props: { filter: string; update: () => void; filterSectionName: string; tag: IFilterTag }) => {
+  const { filter, filterSectionName, tag, update } = props;
+  const sortFilter = ExecutionState.filterModel.asFilterModel.sortFilter as any; // string cannot be used to index
+  const changeHandler = () => {
+    ReactGA.event({ category: filterSectionName, action: `Falcon Filter: ${filter}`, label: filter });
+    if (tag) {
+      tag.clear();
+    } else {
+      sortFilter[filterSectionName][filter] = true;
+    }
+    update();
+  };
+  return (
+    <div className="checkbox">
+      <div>
+        <label>
+          <input
+            type="checkbox"
+            id={filter}
+            onChange={changeHandler}
+            checked={get(sortFilter, [filterSectionName, filter], false)}
+          />
+          {filter}
+        </label>
+      </div>
     </div>
   );
 };

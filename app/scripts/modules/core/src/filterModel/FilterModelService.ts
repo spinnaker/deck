@@ -5,7 +5,7 @@ import { ReactInjector } from 'core/reactShims';
 
 export class FilterModelService {
   public static configureFilterModel(filterModel: IFilterModel, filterModelConfig: IFilterConfig[]) {
-    filterModelConfig.forEach((property) => (property.param = property.param || property.model));
+    filterModelConfig.forEach((property: any) => (property.param = property.param || property.model));
     filterModel.config = filterModelConfig;
     filterModel.groups = [];
     filterModel.tags = [];

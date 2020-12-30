@@ -24,4 +24,11 @@ describe('ExecutionFilterService', function () {
       expect(sorted).toEqual([firstGroup, secondGroup, strategy, adHocA, adHocB]);
     });
   });
+
+  describe('configurable filters', () => {
+    it('The filterRelation property in setting.js is not exist', () => {
+      const relations = ExecutionFilterService.getRelation();
+      expect(relations.length).toBeDefined();
+    });
+  });
 });
