@@ -196,7 +196,6 @@ export class CloudFoundryCreateServiceBindingsStageConfigForm extends React.Comp
                         this.onTemplateArtifactEdited(artifact, index);
                       }}
                       onExpectedArtifactSelected={(artifact) => this.onTemplateArtifactSelected(artifact.id, index)}
-                      helpKey={'pipeline.config.bake.cf.manifest.varsArtifact'}
                       pipeline={this.props.pipeline}
                       stage={stage}
                     />
