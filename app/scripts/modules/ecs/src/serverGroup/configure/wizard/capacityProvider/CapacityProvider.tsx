@@ -19,9 +19,6 @@ class CapacityProvider extends React.Component<ICapacityProviderProps, ICapacity
     super(props);
     const cmd = this.props.command;
 
-    cmd.launchType = '';
-    cmd.capacityProviderStrategy = cmd.capacityProviderStrategy || [];
-
     this.state = {
       capacityProviderStrategy: cmd.capacityProviderStrategy,
     };
@@ -74,6 +71,7 @@ class CapacityProvider extends React.Component<ICapacityProviderProps, ICapacity
         <tr key={index}>
           <td>
             <input
+              data-test-id={"capacityProvider.name." +  index }
               type="string"
               className="form-control input-sm no-spel"
               required={true}
@@ -83,6 +81,7 @@ class CapacityProvider extends React.Component<ICapacityProviderProps, ICapacity
           </td>
           <td>
             <input
+              data-test-id={"capacityProvider.base." + index }
               type="number"
               className="form-control input-sm no-spel"
               required={true}
@@ -92,6 +91,7 @@ class CapacityProvider extends React.Component<ICapacityProviderProps, ICapacity
           </td>
           <td>
             <input
+              data-test-id={"capacityProvider.weight." +  index }
               type="number"
               className="form-control input-sm no-spel"
               required={true}
@@ -112,7 +112,7 @@ class CapacityProvider extends React.Component<ICapacityProviderProps, ICapacity
     });
 
     const newCapacityProviderStrategy = (
-      <button className="btn btn-block btn-sm add-new" onClick={pushCapacityProviderStrategy}>
+      <button className="btn btn-block btn-sm add-new" onClick={pushCapacityProviderStrategy} data-test-id="ServerGroup.addCapacityProvider">
         <span className="glyphicon glyphicon-plus-sign" />
         Add New Capacity Provider
     </button>
@@ -150,5 +150,5 @@ class CapacityProvider extends React.Component<ICapacityProviderProps, ICapacity
 export const CAPACITY_PROVIDER_REACT = 'spinnaker.ecs.serverGroup.configure.wizard.capacityProvider.react';
 module(CAPACITY_PROVIDER_REACT, []).component(
   'capacityProviderReact',
-  react2angular(withErrorBoundary(CapacityProvider, 'capacityProviderReact'), ['command', 'notifyAngular', 'configureCommand', 'capacityProviderState']),
+  react2angular(withErrorBoundary(CapacityProvider, 'capacityProviderReact'), ['command', 'notifyAngular', 'configureCommand']),
 );

@@ -33,7 +33,7 @@
   </div>
 
   <div class="form-group" ng-if="$ctrl.capacityProviderState.useCapacityProviders">
-    <capacity-provider-react command="$ctrl.command"
+    <capacity-provider-react command="$ctrl.command" capacity-provider-state="$ctrl.capacityProviderState"
                              notify-angular="$ctrl.notifyAngular" configure-command="$ctrl.configureCommand"/>
   </div>
 
