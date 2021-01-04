@@ -8,12 +8,10 @@ export interface ICapacityProviderProps {
   command: IEcsServerGroupCommand;
   notifyAngular: (key: string, value: any) => void;
   configureCommand: (query: string) => PromiseLike<void>;
-  capacityProviderState: () => void;
 }
 
 interface ICapacityProviderState {
   capacityProviderStrategy: IEcsCapacityProviderStrategy[],
-  capacityProviderState: {}
 }
 
 class CapacityProvider extends React.Component<ICapacityProviderProps, ICapacityProviderState>{
@@ -21,9 +19,11 @@ class CapacityProvider extends React.Component<ICapacityProviderProps, ICapacity
     super(props);
     const cmd = this.props.command;
 
+    cmd.launchType = '';
+    cmd.capacityProviderStrategy = cmd.capacityProviderStrategy || [];
+
     this.state = {
       capacityProviderStrategy: cmd.capacityProviderStrategy,
-      capacityProviderState: this.props.capacityProviderState
     };
   }
 
@@ -36,7 +36,6 @@ class CapacityProvider extends React.Component<ICapacityProviderProps, ICapacity
   private removeCapacityProviderStrategy = (index: number) => {
     const capacityProviderStrategy = this.state.capacityProviderStrategy;
     capacityProviderStrategy.splice(index, 1);
-    this.props.notifyAngular('capacityProviderStrategy', capacityProviderStrategy);
     this.setState({capacityProviderStrategy : capacityProviderStrategy });
   }
 
@@ -44,7 +43,6 @@ class CapacityProvider extends React.Component<ICapacityProviderProps, ICapacity
     const currentCapacityProviderStartegy = this.state.capacityProviderStrategy;
     const targetCapacityProviderStrategy = currentCapacityProviderStartegy[index];
     targetCapacityProviderStrategy.capacityProvider = targetCapacityProviderName;
-    this.props.notifyAngular('capacityProviderStrategy', currentCapacityProviderStartegy);
     this.setState({ capacityProviderStrategy: currentCapacityProviderStartegy });
   };
 
@@ -52,7 +50,6 @@ class CapacityProvider extends React.Component<ICapacityProviderProps, ICapacity
     const currentCapacityProviderStartegy = this.state.capacityProviderStrategy;
     const targetCapacityProviderStrategy = currentCapacityProviderStartegy[index];
     targetCapacityProviderStrategy.base = targetCapacityProviderBase;
-    this.props.notifyAngular('capacityProviderStrategy', currentCapacityProviderStartegy);
     this.setState({ capacityProviderStrategy: currentCapacityProviderStartegy });
   };
 
@@ -60,7 +57,6 @@ class CapacityProvider extends React.Component<ICapacityProviderProps, ICapacity
     const currentCapacityProviderStartegy = this.state.capacityProviderStrategy;
     const targetCapacityProviderStrategy = currentCapacityProviderStartegy[index];
     targetCapacityProviderStrategy.weight= targetCapacityProviderWeight;
-    this.props.notifyAngular('capacityProviderStrategy', currentCapacityProviderStartegy);
     this.setState({ capacityProviderStrategy: currentCapacityProviderStartegy });
   };
 
