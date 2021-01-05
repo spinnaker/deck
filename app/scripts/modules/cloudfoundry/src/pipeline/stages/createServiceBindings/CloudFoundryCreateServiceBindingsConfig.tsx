@@ -6,7 +6,7 @@ import { IStage, FormValidator, FormikStageConfig, IStageConfigProps } from '@sp
 
 import { CloudFoundryCreateServiceBindingsStageConfigForm } from './CloudFoundryCreateServiceBindingsStageConfigForm';
 
-export interface ServiceBindingRequests {
+interface ServiceBindingRequests {
   serviceInstanceName: String;
 }
 
