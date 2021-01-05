@@ -61,13 +61,5 @@ export function validateCloudFoundryCreateServiceBindingsStage(stage: IStage): F
 }
 
 export function validateServiceBindingRequests(serviceBindingRequests: ServiceBindingRequests[]): boolean {
-  if (serviceBindingRequests?.length < 1) {
-    return false;
-  }
-  for (let i = 0; i < serviceBindingRequests.length; i++) {
-    if (!serviceBindingRequests[i].serviceInstanceName) {
-      return false;
-    }
-  }
-  return true;
+  return serviceBindingRequests.every((req) => req.serviceInstanceName);
 }
