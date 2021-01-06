@@ -81,10 +81,6 @@ module(ECS_SERVERGROUP_CONFIGURE_WIZARD_CLONESERVERGROUP_ECS_CONTROLLER, [
         'ecs.serverGroup.serviceDiscovery',
         require('./serviceDiscovery/serviceDiscovery.html'),
       ),
-      capacityProvider: overrideRegistry.getTemplate(
-        'ecs.serverGroup.capacityProvider',
-        require('./capacityProvider/capacityProvider.html'),
-      ),
       advancedSettings: overrideRegistry.getTemplate(
         'ecs.serverGroup.advancedSettings',
         require('./advancedSettings/advancedSettings.html'),

@@ -1,21 +1,21 @@
 import React from 'react';
 import { module } from 'angular';
 import { react2angular } from 'react2angular';
-import {IEcsCapacityProviderStrategy, IEcsServerGroupCommand} from '../../serverGroupConfiguration.service';
+import {IEcsCapacityProviderStrategyItem, IEcsServerGroupCommand} from '../../serverGroupConfiguration.service';
 import { HelpField, withErrorBoundary } from  '@spinnaker/core';
 
-export interface ICapacityProviderProps {
+export interface IEcsCapacityProviderProps {
   command: IEcsServerGroupCommand;
   notifyAngular: (key: string, value: any) => void;
   configureCommand: (query: string) => PromiseLike<void>;
 }
 
-interface ICapacityProviderState {
-  capacityProviderStrategy: IEcsCapacityProviderStrategy[],
+interface IEcsCapacityProviderState {
+  capacityProviderStrategy: IEcsCapacityProviderStrategyItem[],
 }
 
-class CapacityProvider extends React.Component<ICapacityProviderProps, ICapacityProviderState>{
-  constructor(props: ICapacityProviderProps) {
+class CapacityProvider extends React.Component<IEcsCapacityProviderProps, IEcsCapacityProviderState>{
+  constructor(props: IEcsCapacityProviderProps) {
     super(props);
     const cmd = this.props.command;
 
