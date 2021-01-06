@@ -407,6 +407,7 @@ export class ALBListeners
     ConfigureOidcConfigModal.show({ config: action.authenticateOidcConfig })
       .then((config: any) => {
         action.authenticateOidcConfig = config;
+        this.updateListeners(); // pushes change to formik, needed due to prop mutation
       })
       .catch(() => {});
   };
@@ -415,6 +416,7 @@ export class ALBListeners
     ConfigureRedirectConfigModal.show({ config: action.redirectActionConfig })
       .then((config: any) => {
         action.redirectActionConfig = config;
+        this.updateListeners(); // pushes change to formik, needed due to prop mutation
       })
       .catch(() => {});
   };
@@ -796,7 +798,7 @@ const Action = (props: {
   if (props.action.type !== 'authenticate-oidc') {
     // TODO: Support redirect
     return (
-      <div className="horizontal middle" style={{ height: '30px' }}>
+      <div className="horizontal top">
         <select
           className="form-control input-sm"
           style={{ width: '80px' }}
@@ -820,13 +822,27 @@ const Action = (props: {
           </select>
         )}
         {props.action.type === 'redirect' && (
-          <button
-            className="btn btn-link no-padding"
-            type="button"
-            onClick={() => props.configureRedirect(props.action)}
-          >
-            Configure...
-          </button>
+          <dl className="dl-horizontal dl-narrow">
+            <dt>Host</dt>
+            <dd>{(props.action.redirectActionConfig || props.action.redirectConfig).host}</dd>
+            <dt>Path</dt>
+            <dd>{(props.action.redirectActionConfig || props.action.redirectConfig).path}</dd>
+            <dt>Port</dt>
+            <dd>{(props.action.redirectActionConfig || props.action.redirectConfig).port}</dd>
+            <dt>Protocol</dt>
+            <dd>{(props.action.redirectActionConfig || props.action.redirectConfig).protocol}</dd>
+            <dt>Status Code</dt>
+            <dd>{(props.action.redirectActionConfig || props.action.redirectConfig).statusCode}</dd>
+            <dt>
+              <button
+                className="btn btn-link no-padding"
+                type="button"
+                onClick={() => props.configureRedirect(props.action)}
+              >
+                Configure...
+              </button>
+            </dt>
+          </dl>
         )}
       </div>
     );
