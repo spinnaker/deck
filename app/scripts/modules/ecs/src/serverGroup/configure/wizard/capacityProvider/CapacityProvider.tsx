@@ -7,7 +7,6 @@ import { HelpField, withErrorBoundary } from  '@spinnaker/core';
 export interface IEcsCapacityProviderProps {
   command: IEcsServerGroupCommand;
   notifyAngular: (key: string, value: any) => void;
-  configureCommand: (query: string) => PromiseLike<void>;
 }
 
 interface IEcsCapacityProviderState {
@@ -24,37 +23,42 @@ class CapacityProvider extends React.Component<IEcsCapacityProviderProps, IEcsCa
     };
   }
 
-  private pushCapacityProviderStrategy = () => {
+  private addCapacityProviderStrategy = () => {
     const capacityProviderStrategy = this.state.capacityProviderStrategy;
     capacityProviderStrategy.push({ capacityProvider: '', base: null, weight: null});
+    this.props.notifyAngular('capacityProviderStrategy', capacityProviderStrategy);
     this.setState({ capacityProviderStrategy : capacityProviderStrategy });
   };
 
   private removeCapacityProviderStrategy = (index: number) => {
     const capacityProviderStrategy = this.state.capacityProviderStrategy;
     capacityProviderStrategy.splice(index, 1);
+    this.props.notifyAngular('capacityProviderStrategy', capacityProviderStrategy);
     this.setState({capacityProviderStrategy : capacityProviderStrategy });
   }
 
   private updateCapacityProviderName = (index: number, targetCapacityProviderName: string) => {
-    const currentCapacityProviderStartegy = this.state.capacityProviderStrategy;
-    const targetCapacityProviderStrategy = currentCapacityProviderStartegy[index];
+    const capacityProviderStrategy = this.state.capacityProviderStrategy;
+    const targetCapacityProviderStrategy = capacityProviderStrategy[index];
     targetCapacityProviderStrategy.capacityProvider = targetCapacityProviderName;
-    this.setState({ capacityProviderStrategy: currentCapacityProviderStartegy });
+    this.props.notifyAngular('capacityProviderStrategy', capacityProviderStrategy);
+    this.setState({ capacityProviderStrategy: capacityProviderStrategy });
   };
 
   private updateCapacityProviderBase = (index: number, targetCapacityProviderBase: number) => {
-    const currentCapacityProviderStartegy = this.state.capacityProviderStrategy;
-    const targetCapacityProviderStrategy = currentCapacityProviderStartegy[index];
+    const capacityProviderStrategy = this.state.capacityProviderStrategy;
+    const targetCapacityProviderStrategy = capacityProviderStrategy[index];
     targetCapacityProviderStrategy.base = targetCapacityProviderBase;
-    this.setState({ capacityProviderStrategy: currentCapacityProviderStartegy });
+    this.props.notifyAngular('capacityProviderStrategy', capacityProviderStrategy);
+    this.setState({ capacityProviderStrategy: capacityProviderStrategy });
   };
 
   private updateCapacityProviderWeight = (index: number, targetCapacityProviderWeight: number) => {
-    const currentCapacityProviderStartegy = this.state.capacityProviderStrategy;
-    const targetCapacityProviderStrategy = currentCapacityProviderStartegy[index];
+    const capacityProviderStrategy = this.state.capacityProviderStrategy;
+    const targetCapacityProviderStrategy = capacityProviderStrategy[index];
     targetCapacityProviderStrategy.weight= targetCapacityProviderWeight;
-    this.setState({ capacityProviderStrategy: currentCapacityProviderStartegy });
+    this.props.notifyAngular('capacityProviderStrategy', capacityProviderStrategy);
+    this.setState({ capacityProviderStrategy: capacityProviderStrategy });
   };
 
 
@@ -63,7 +67,7 @@ class CapacityProvider extends React.Component<IEcsCapacityProviderProps, IEcsCa
     const updateCapacityProviderName = this.updateCapacityProviderName;
     const updateCapacityProviderBase = this.updateCapacityProviderBase;
     const updateCapacityProviderWeight = this.updateCapacityProviderWeight;
-    const pushCapacityProviderStrategy = this.pushCapacityProviderStrategy;
+    const addCapacityProviderStrategy = this.addCapacityProviderStrategy;
     const removeCapacityProviderStrategy = this.removeCapacityProviderStrategy;
 
     const capacityProviderInputs = this.state.capacityProviderStrategy.map(function (mapping, index) {
@@ -112,7 +116,7 @@ class CapacityProvider extends React.Component<IEcsCapacityProviderProps, IEcsCa
     });
 
     const newCapacityProviderStrategy = (
-      <button className="btn btn-block btn-sm add-new" onClick={pushCapacityProviderStrategy} data-test-id="ServerGroup.addCapacityProvider">
+      <button className="btn btn-block btn-sm add-new" onClick={addCapacityProviderStrategy} data-test-id="ServerGroup.addCapacityProvider">
         <span className="glyphicon glyphicon-plus-sign" />
         Add New Capacity Provider
     </button>
@@ -150,5 +154,5 @@ class CapacityProvider extends React.Component<IEcsCapacityProviderProps, IEcsCa
 export const CAPACITY_PROVIDER_REACT = 'spinnaker.ecs.serverGroup.configure.wizard.capacityProvider.react';
 module(CAPACITY_PROVIDER_REACT, []).component(
   'capacityProviderReact',
-  react2angular(withErrorBoundary(CapacityProvider, 'capacityProviderReact'), ['command', 'notifyAngular', 'configureCommand']),
+  react2angular(withErrorBoundary(CapacityProvider, 'capacityProviderReact'), ['command', 'notifyAngular']),
 );
