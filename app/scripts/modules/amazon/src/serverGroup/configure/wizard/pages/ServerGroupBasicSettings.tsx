@@ -102,8 +102,8 @@ export class ServerGroupBasicSettings
 
     const accountDetails = values.backingData.credentialsKeyedByAccount[account];
     const enableIPv6InTest =
-      AWSProviderSettings.serverGroups &&
-      AWSProviderSettings.serverGroups.enableIPv6 &&
+      AWSProviderSettings?.serverGroups?.enableIPv6 &&
+      AWSProviderSettings?.serverGroups?.setIPv6InTest &&
       accountDetails.environment === 'test';
     if (enableIPv6InTest) {
       setFieldValue('associateIPv6Address', enableIPv6InTest);

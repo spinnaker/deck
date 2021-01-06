@@ -154,6 +154,7 @@ window.spinnakerSettings = {
       serverGroups: {
         enableLaunchTemplates: false,
         enableIPv6: false,
+        setIPv6InTest: false,
         enableIMDSv2: false,
       },
       useAmiBlockDeviceMappings: false,
