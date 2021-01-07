@@ -1,5 +1,3 @@
-import { module } from 'angular';
-
 import {
   Application,
   IMultiInstanceGroup,
@@ -92,6 +90,3 @@ export class AmazonInstanceWriter extends InstanceWriter {
     });
   }
 }
-
-export const AMAZON_INSTANCE_WRITE_SERVICE = 'spinnaker.amazon.instance.write.service';
-module(AMAZON_INSTANCE_WRITE_SERVICE, []).factory('amazonInstanceWriter', () => AmazonInstanceWriter);

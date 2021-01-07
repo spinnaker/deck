@@ -13,7 +13,6 @@ import {
   FirewallLabels,
 } from '@spinnaker/core';
 
-import { AMAZON_INSTANCE_WRITE_SERVICE } from '../amazon.instance.write.service';
 import { AMAZON_VPC_VPCTAG_DIRECTIVE } from '../../vpc/vpcTag.directive';
 import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 import ANGULAR_UI_BOOTSTRAP from 'angular-ui-bootstrap';
@@ -23,19 +22,17 @@ export const name = AMAZON_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER; // for 
 module(AMAZON_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
   UIROUTER_ANGULARJS,
   ANGULAR_UI_BOOTSTRAP,
-  AMAZON_INSTANCE_WRITE_SERVICE,
   AMAZON_VPC_VPCTAG_DIRECTIVE,
 ]).controller('awsInstanceDetailsCtrl', [
   '$scope',
   '$state',
-  'amazonInstanceWriter',
   'instance',
   'app',
   'moniker',
   'environment',
   '$q',
   'overrides',
-  function ($scope, $state, amazonInstanceWriter, instance, app, moniker, environment, $q, overrides) {
+  function ($scope, $state, instance, app, moniker, environment, $q, overrides) {
     // needed for standalone instances
     $scope.detailsTemplateUrl = CloudProviderRegistry.getValue('aws', 'instance.detailsTemplateUrl');
 
@@ -309,7 +306,7 @@ module(AMAZON_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
       };
 
       const submitMethod = function () {
-        return amazonInstanceWriter.terminateInstance(instance, app);
+        return AmazonInstanceWriter.terminateInstance(instance, app);
       };
 
       ConfirmationModalService.confirm({
@@ -335,7 +332,7 @@ module(AMAZON_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
       };
 
       const submitMethod = function () {
-        return amazonInstanceWriter.terminateInstanceAndShrinkServerGroup(instance, app);
+        return AmazonInstanceWriter.terminateInstanceAndShrinkServerGroup(instance, app);
       };
 
       ConfirmationModalService.confirm({
@@ -360,7 +357,7 @@ module(AMAZON_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
           params.interestingHealthProviderNames = ['Amazon'];
         }
 
-        return amazonInstanceWriter.rebootInstance(instance, app, params);
+        return AmazonInstanceWriter.rebootInstance(instance, app, params);
       };
 
       ConfirmationModalService.confirm({
@@ -384,7 +381,7 @@ module(AMAZON_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
       };
 
       const submitMethod = function () {
-        return amazonInstanceWriter.registerInstanceWithLoadBalancer(instance, app);
+        return AmazonInstanceWriter.registerInstanceWithLoadBalancer(instance, app);
       };
 
       ConfirmationModalService.confirm({
@@ -406,7 +403,7 @@ module(AMAZON_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
       };
 
       const submitMethod = function () {
-        return amazonInstanceWriter.deregisterInstanceFromLoadBalancer(instance, app);
+        return AmazonInstanceWriter.deregisterInstanceFromLoadBalancer(instance, app);
       };
 
       ConfirmationModalService.confirm({
@@ -428,7 +425,7 @@ module(AMAZON_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
       };
 
       const submitMethod = function () {
-        return amazonInstanceWriter.registerInstanceWithTargetGroup(instance, app);
+        return AmazonInstanceWriter.registerInstanceWithTargetGroup(instance, app);
       };
 
       ConfirmationModalService.confirm({
@@ -450,7 +447,7 @@ module(AMAZON_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
       };
 
       const submitMethod = function () {
-        return amazonInstanceWriter.deregisterInstanceFromTargetGroup(instance, app);
+        return AmazonInstanceWriter.deregisterInstanceFromTargetGroup(instance, app);
       };
 
       ConfirmationModalService.confirm({
@@ -471,7 +468,7 @@ module(AMAZON_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
       };
 
       const submitMethod = function () {
-        return amazonInstanceWriter.enableInstanceInDiscovery(instance, app);
+        return AmazonInstanceWriter.enableInstanceInDiscovery(instance, app);
       };
 
       ConfirmationModalService.confirm({
@@ -492,7 +489,7 @@ module(AMAZON_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
       };
 
       const submitMethod = function () {
-        return amazonInstanceWriter.disableInstanceInDiscovery(instance, app);
+        return AmazonInstanceWriter.disableInstanceInDiscovery(instance, app);
       };
 
       ConfirmationModalService.confirm({
