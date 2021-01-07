@@ -796,6 +796,7 @@ const Action = (props: {
   configureRedirect: (action: IListenerAction) => void;
 }) => {
   if (props.action.type !== 'authenticate-oidc') {
+    const redirectConfig = props.action.redirectActionConfig || props.action.redirectConfig;
     // TODO: Support redirect
     return (
       <div className="horizontal top">
@@ -824,15 +825,15 @@ const Action = (props: {
         {props.action.type === 'redirect' && (
           <dl className="dl-horizontal dl-narrow">
             <dt>Host</dt>
-            <dd>{(props.action.redirectActionConfig || props.action.redirectConfig).host}</dd>
+            <dd>{redirectConfig.host}</dd>
             <dt>Path</dt>
-            <dd>{(props.action.redirectActionConfig || props.action.redirectConfig).path}</dd>
+            <dd>{redirectConfig.path}</dd>
             <dt>Port</dt>
-            <dd>{(props.action.redirectActionConfig || props.action.redirectConfig).port}</dd>
+            <dd>{redirectConfig.port}</dd>
             <dt>Protocol</dt>
-            <dd>{(props.action.redirectActionConfig || props.action.redirectConfig).protocol}</dd>
+            <dd>{redirectConfig.protocol}</dd>
             <dt>Status Code</dt>
-            <dd>{(props.action.redirectActionConfig || props.action.redirectConfig).statusCode}</dd>
+            <dd>{redirectConfig.statusCode}</dd>
             <dt>
               <button
                 className="btn btn-link no-padding"
