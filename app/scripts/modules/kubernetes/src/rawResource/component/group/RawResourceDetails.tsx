@@ -21,7 +21,7 @@ import { ManifestWizard } from '../../../manifest/wizard/ManifestWizard';
 import { KubernetesManifestService } from '../../../manifest/manifest.service';
 import { ManifestEvents } from '../../../pipelines/stages/deployManifest/manifestStatus/ManifestEvents';
 import { ManifestLabels } from '../../../manifest/ManifestLabels';
-import { ManifestCondition } from '../../../manifest/status/ManifestCondition';
+import { IKubernetesManifestCondition, ManifestCondition } from '../../../manifest/status/ManifestCondition';
 import { RawResourceUtils } from '../RawResourceUtils';
 
 export interface IRawResourceDetailsProps {
@@ -43,7 +43,7 @@ export interface IRawResourcesDetailState {
   manifest?: IManifest;
 }
 
-Overridable('rawResource.details');
+Overridable('k8s.rawResource.details');
 export class RawResourceDetails extends React.Component<IRawResourceDetailsProps, IRawResourcesDetailState> {
   constructor(props: IRawResourceDetailsProps) {
     super(props);
@@ -146,10 +146,10 @@ export class RawResourceDetails extends React.Component<IRawResourceDetailsProps
 
   public render() {
     const { account, region, manifest } = this.state;
-    const kind = get(manifest, ['manifest', 'kind'], null);
-    const apiVersion = get(manifest, ['manifest', 'apiVersion'], null);
-    const metadata = get(manifest, ['manifest', 'metadata'], null);
-    const name = get(metadata, ['name'], null);
+    const kind = manifest?.manifest?.kind;
+    const apiVersion = manifest?.manifest?.apiVersion;
+    const metadata = manifest?.manifest?.metadata;
+    const name = metadata?.name;
     const creationUnixMs =
       get(metadata, 'creationTimestamp') && DateTime.fromISO(metadata.creationTimestamp).toMillis();
 
@@ -211,7 +211,7 @@ export class RawResourceDetails extends React.Component<IRawResourceDetailsProps
             </CollapsibleSection>
             <CollapsibleSection key="status" heading="status" defaultExpanded={true}>
               <ul>
-                {get(manifest, ['manifest', 'status', 'conditions'], []).map((condition) => (
+                {(manifest?.manifest?.status?.conditions ?? []).map((condition: IKubernetesManifestCondition) => (
                   <li key={condition.type + condition.lastTransitionTime} style={{ marginBottom: '10px' }}>
                     <ManifestCondition condition={condition} />
                   </li>

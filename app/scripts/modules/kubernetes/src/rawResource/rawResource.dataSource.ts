@@ -1,4 +1,4 @@
-import { IPromise, IQService, module } from 'angular';
+import { IQService, module } from 'angular';
 import { REST, Application, ApplicationDataSourceRegistry, INFRASTRUCTURE_KEY } from '@spinnaker/core';
 
 export const KUBERNETS_RAW_RESOURCE_DATA_SOURCE = 'spinnaker.core.rawresource.dataSource';
@@ -7,13 +7,10 @@ const KUBERNETS_RAW_RESOURCE_DATA_SOURCE_SREF = `.insight.${KUBERNETS_RAW_RESOUR
 
 type ApiK8sResource = any;
 
-const fetchK8sResources = ($q: IQService) => (application: Application): IPromise<ApiK8sResource> =>
-  REST('applications')
-    .path(application.name, 'rawResources')
-    .get()
-    .then((kubernetesResources: IApiKubernetesResource[]) => $q.resolve(kubernetesResources));
+const fetchK8sResources = (application: Application): PromiseLike<ApiK8sResource> =>
+  REST('applications').path(application.name, 'rawResources').get();
 
-const formatK8sResources = ($q: IQService) => (_: Application, result: ApiK8sResource): IPromise<ApiK8sResource> =>
+const formatK8sResources = ($q: IQService) => (_: Application, result: ApiK8sResource): PromiseLike<ApiK8sResource> =>
   $q.resolve(result);
 
 module(KUBERNETS_RAW_RESOURCE_DATA_SOURCE, []).run([
@@ -27,7 +24,7 @@ module(KUBERNETS_RAW_RESOURCE_DATA_SOURCE, []).run([
       primary: true,
       icon: 'fas fa-xs fa-fw fa-th-large',
       iconName: 'spMenuK8s',
-      loader: fetchK8sResources($q),
+      loader: fetchK8sResources,
       onLoad: formatK8sResources($q),
       providerField: 'cloudProvider',
       credentialsField: 'account',

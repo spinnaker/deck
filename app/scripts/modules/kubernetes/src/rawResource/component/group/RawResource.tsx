@@ -32,22 +32,22 @@ export class RawResource extends React.Component<IRawResourceProps, IRawResource
     return (
       <UISrefActive class="active">
         <UISref to=".rawResourceDetails" params={params}>
-          <div id={key} className="raw-resource-card clickable clickable-row">
-            <h4 className="raw-resource-title">
+          <div id={key} className="RawResource card clickable clickable-row">
+            <h4 className="title">
               <CloudProviderLogo provider="kubernetes" height="20px" width="20px" />
               {this.props.resource.kind} {this.props.resource.displayName}
             </h4>
-            <div className="raw-resource-details">
-              <div className="raw-resource-details-column">
-                <div className="raw-resource-details-column-label">account:</div>
+            <div className="details">
+              <div className="column">
+                <div className="title">account:</div>
                 <div>{this.props.resource.account}</div>
               </div>
-              <div className="raw-resource-details-column">
-                <div className="raw-resource-details-column-label">namespace:</div>
+              <div className="column">
+                <div className="title">namespace:</div>
                 <div>{RawResourceUtils.namespaceDisplayName(this.props.resource.namespace)}</div>
               </div>
-              <div className="raw-resource-details-column">
-                <div className="raw-resource-details-column-label">apiVersion:</div>
+              <div className="column">
+                <div className="title">apiVersion:</div>
                 <div>{this.props.resource.apiVersion}</div>
               </div>
             </div>

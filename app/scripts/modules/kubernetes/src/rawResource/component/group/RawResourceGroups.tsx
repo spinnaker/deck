@@ -35,11 +35,13 @@ export class RawResourceGroups extends React.Component<IRawResourceGroupsProps, 
   public render() {
     const groups = this.buildGroupByModel(this.props.resources);
     return (
-      <div className="raw-resource-groups">
-        {...Object.entries(groups).map((entry) => {
-          return entry[0] !== 'undefined' ? (
-            <RawResourceGroup title={this.groupTitle(entry[0])}>
-              {...entry[1].map((resource) => <RawResource resource={resource}></RawResource>)}
+      <div className="RawResourceGroups">
+        {...Object.entries(groups).map(([key, value]) => {
+          return key !== 'undefined' ? (
+            <RawResourceGroup title={this.groupTitle(key)} key={key}>
+              {...value.map((resource) => (
+                <RawResource resource={resource} key={RawResourceUtils.resourceKey(resource)}></RawResource>
+              ))}
             </RawResourceGroup>
           ) : (
             <></>

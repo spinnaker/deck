@@ -21,14 +21,14 @@ export class RawResourceGroup extends React.Component<IRawResourceGroupProps, IR
 
   public render() {
     return (
-      <div className="raw-resource-group">
-        <div className="clickable sticky-header raw-resource-group-header" onClick={this.onHeaderClick.bind(this)}>
+      <div className="RawResourceGroup">
+        <div className="clickable sticky-header header" onClick={this.onHeaderClick.bind(this)}>
           <span className={`glyphicon pipeline-toggle glyphicon-chevron-${this.state.open ? 'down' : 'right'}`} />
           <div className="shadowed">
             <h4 className="group-title">{this.props.title}</h4>
           </div>
         </div>
-        <div className={`raw-resource-items${this.state.open ? '' : ' hidden'}`}>{this.props.children}</div>
+        <div className={`items${this.state.open ? '' : ' hidden'}`}>{this.props.children}</div>
       </div>
     );
   }

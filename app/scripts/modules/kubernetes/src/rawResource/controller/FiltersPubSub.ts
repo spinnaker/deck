@@ -1,11 +1,9 @@
 import { IK8sResourcesFiltersState } from '../component/K8sResourcesFilters';
 
-export interface ISubcriber {
-  notify(message: IK8sResourcesFiltersState): void;
-}
+type ISubscriber = (message: IK8sResourcesFiltersState) => void;
 
 export class FiltersPubSub {
-  private subcribers: ISubcriber[] = [];
+  private subscribers: ISubscriber[] = [];
   private static intances: Record<string, FiltersPubSub> = {};
 
   private constructor() {}
@@ -19,11 +17,19 @@ export class FiltersPubSub {
     return instance;
   }
 
-  public subscribe(subcriber: (message: IK8sResourcesFiltersState) => void) {
-    this.subcribers.push({ notify: subcriber });
+  public subscribe(subscriber: ISubscriber) {
+    this.subscribers.push(subscriber);
+    return () => (this.subscribers = this.subscribers.filter((x) => x !== subscriber));
+  }
+
+  public unsubscribe(subscriber: ISubscriber) {
+    const index = this.subscribers.indexOf(subscriber);
+    if (index > -1) {
+      this.subscribers.splice(index, 1);
+    }
   }
 
   public publish(message: IK8sResourcesFiltersState) {
-    this.subcribers.forEach((sub) => sub.notify(message));
+    this.subscribers.forEach((sub) => sub(message));
   }
 }

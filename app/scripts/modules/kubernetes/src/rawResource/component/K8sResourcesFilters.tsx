@@ -52,7 +52,7 @@ export class K8sResourcesFilters extends React.Component<IK8sResourcesFiltersPro
       <div className="content">
         <FilterSection heading={'Kind'} expanded={true}>
           {...Object.keys(this.state.kinds)
-            .sort((a, b) => (a.toLowerCase() > b.toLowerCase() ? 1 : -1))
+            .sort((a, b) => a.localeCompare(b))
             .map((key) => (
               <FilterCheckbox
                 heading={key}
@@ -64,7 +64,7 @@ export class K8sResourcesFilters extends React.Component<IK8sResourcesFiltersPro
         </FilterSection>
         <FilterSection heading={'Account'} expanded={true}>
           {...Object.keys(this.state.accounts)
-            .sort((a, b) => (a.toLowerCase() > b.toLowerCase() ? 1 : -1))
+            .sort((a, b) => a.localeCompare(b))
             .map((key) => (
               <FilterCheckbox
                 heading={key}
@@ -76,7 +76,7 @@ export class K8sResourcesFilters extends React.Component<IK8sResourcesFiltersPro
         </FilterSection>
         <FilterSection heading={'Namespace'} expanded={true}>
           {...Object.keys(this.state.displayNamespaces)
-            .sort((a, b) => (a.toLowerCase() > b.toLowerCase() ? 1 : -1))
+            .sort((a, b) => a.localeCompare(b))
             .map((key) => (
               <FilterCheckbox
                 heading={key}
@@ -91,13 +91,14 @@ export class K8sResourcesFilters extends React.Component<IK8sResourcesFiltersPro
   }
 
   private onNsCheckbox() {
-    for (const p in this.state.displayNamespaces) {
+    const st = { ...this.state };
+    for (const p in st.displayNamespaces) {
       if (p == RawResourceUtils.GLOBAL_LABEL) {
-        this.state.namespaces[''] = this.state.displayNamespaces[p];
+        st.namespaces[''] = st.displayNamespaces[p];
       }
-      this.state.namespaces[p] = this.state.displayNamespaces[p];
+      st.namespaces[p] = st.displayNamespaces[p];
     }
-    this.setState(this.state);
+    this.setState(st);
     this.filterPubSub.publish(this.state);
   }
 
