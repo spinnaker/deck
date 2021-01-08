@@ -1,11 +1,11 @@
 import { module } from 'angular';
 
-import { API } from '@spinnaker/core';
+import { REST } from '@spinnaker/core';
 import { IRoleDescriptor } from './IRole';
 
 export class IamRoleReader {
   public listRoles(provider: string): PromiseLike<IRoleDescriptor[]> {
-    return API.all('roles').all(provider).getList();
+    return REST('/roles').path(provider).get();
   }
 }
 

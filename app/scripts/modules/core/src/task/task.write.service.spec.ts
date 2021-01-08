@@ -1,45 +1,38 @@
-import { mock, IHttpBackendService, ITimeoutService } from 'angular';
-
-import { API } from 'core/api/ApiService';
+import { mockHttpClient } from 'core/api/mock/jasmine';
+import { mock, ITimeoutService } from 'angular';
 import { TaskWriter } from './task.write.service';
 
 describe('Service: TaskWriter', () => {
-  let $httpBackend: IHttpBackendService;
   let timeout: ITimeoutService;
 
   beforeEach(
-    mock.inject((_$httpBackend_: IHttpBackendService, _$timeout_: ITimeoutService) => {
-      $httpBackend = _$httpBackend_;
+    mock.inject((_$timeout_: ITimeoutService) => {
       timeout = _$timeout_;
     }),
   );
 
-  afterEach(() => {
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
-  });
-
   describe('cancelling task', () => {
-    it('should wait until task is canceled, then resolve', () => {
+    it('should wait until task is canceled, then resolve', async () => {
+      const http = mockHttpClient();
       const taskId = 'abc';
-      const cancelUrl = [API.baseUrl, 'tasks', taskId, 'cancel'].join('/');
-      const checkUrl = [API.baseUrl, 'tasks', taskId].join('/');
+      const cancelUrl = `/tasks/${taskId}/cancel`;
+      const checkUrl = `/tasks/${taskId}`;
       let completed = false;
 
-      $httpBackend.expectPUT(cancelUrl).respond(200, []);
-      $httpBackend.expectGET(checkUrl).respond(200, { id: taskId });
+      http.expectPUT(cancelUrl).respond(200, []);
+      http.expectGET(checkUrl).respond(200, { id: taskId });
 
       TaskWriter.cancelTask(taskId).then(() => (completed = true));
-      $httpBackend.flush();
+      await http.flush();
       expect(completed).toBe(false);
 
-      $httpBackend.expectGET(checkUrl).respond(200, { id: taskId });
+      http.expectGET(checkUrl).respond(200, { id: taskId });
       timeout.flush();
-      $httpBackend.flush();
+      await http.flush();
 
-      $httpBackend.expectGET(checkUrl).respond(200, { status: 'CANCELED' });
+      http.expectGET(checkUrl).respond(200, { status: 'CANCELED' });
       timeout.flush();
-      $httpBackend.flush();
+      await http.flush();
       expect(completed).toBe(true);
     });
   });
