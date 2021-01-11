@@ -162,6 +162,7 @@ window.spinnakerSettings = {
         enableLaunchTemplates: false,
         enableIPv6: false,
         enableIMDSv2: false,
+        enableCpuCredits: false,
       },
       useAmiBlockDeviceMappings: false,
     },
