@@ -156,6 +156,7 @@ window.spinnakerSettings = {
         enableIPv6: false,
         setIPv6InTest: false,
         enableIMDSv2: false,
+        enableCpuCredits: false,
       },
       useAmiBlockDeviceMappings: false,
     },
