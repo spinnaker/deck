@@ -13,7 +13,7 @@ interface IEcsCapacityProviderState {
   capacityProviderStrategy: IEcsCapacityProviderStrategyItem[],
 }
 
-class CapacityProvider extends React.Component<IEcsCapacityProviderProps, IEcsCapacityProviderState>{
+class EcsCapacityProvider extends React.Component<IEcsCapacityProviderProps, IEcsCapacityProviderState>{
   constructor(props: IEcsCapacityProviderProps) {
     super(props);
     const cmd = this.props.command;
@@ -62,7 +62,7 @@ class CapacityProvider extends React.Component<IEcsCapacityProviderProps, IEcsCa
   };
 
 
-  render(): React.ReactElement<CapacityProvider> {
+  render(): React.ReactElement<EcsCapacityProvider> {
 
     const updateCapacityProviderName = this.updateCapacityProviderName;
     const updateCapacityProviderBase = this.updateCapacityProviderBase;
@@ -151,8 +151,8 @@ class CapacityProvider extends React.Component<IEcsCapacityProviderProps, IEcsCa
   }
 }
 
-export const CAPACITY_PROVIDER_REACT = 'spinnaker.ecs.serverGroup.configure.wizard.capacityProvider.react';
-module(CAPACITY_PROVIDER_REACT, []).component(
-  'capacityProviderReact',
-  react2angular(withErrorBoundary(CapacityProvider, 'capacityProviderReact'), ['command', 'notifyAngular']),
+export const ECS_CAPACITY_PROVIDER_REACT = 'spinnaker.ecs.serverGroup.configure.wizard.capacityProvider.react';
+module(ECS_CAPACITY_PROVIDER_REACT, []).component(
+  'ecsCapacityProviderReact',
+  react2angular(withErrorBoundary(EcsCapacityProvider, 'ecsCapacityProviderReact'), ['command', 'notifyAngular']),
 );
