@@ -16,23 +16,12 @@ export class RawResource extends React.Component<IRawResourceProps, IRawResource
   }
 
   public render() {
-    const key =
-      this.props.resource.account +
-      '-' +
-      this.props.resource.namespace +
-      '-' +
-      this.props.resource.kind +
-      '-' +
-      this.props.resource.displayName;
-    const params = {
-      account: this.props.resource.account,
-      name: this.props.resource.name,
-      region: this.props.resource.region,
-    };
+    const { account, name, region } = this.props.resource;
+    const params = { account, name, region };
     return (
       <UISrefActive class="active">
         <UISref to=".rawResourceDetails" params={params}>
-          <div id={key} className="RawResource card clickable clickable-row">
+          <div className="RawResource card clickable clickable-row">
             <h4 className="title">
               <CloudProviderLogo provider="kubernetes" height="20px" width="20px" />
               {this.props.resource.kind} {this.props.resource.displayName}

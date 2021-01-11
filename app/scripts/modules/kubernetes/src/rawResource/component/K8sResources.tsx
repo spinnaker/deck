@@ -1,12 +1,12 @@
-import { Application, ApplicationDataSource, FormikFormField, ReactSelectInput } from '@spinnaker/core';
+import { Application, ApplicationDataSource, FormField, ReactSelectInput } from '@spinnaker/core';
 import React from 'react';
 import { FiltersPubSub } from '../controller/FiltersPubSub';
 import { KUBERNETS_RAW_RESOURCE_DATA_SOURCE_KEY } from '../rawResource.dataSource';
 import { RawResource } from './group/RawResource';
 import { RawResourceGroups } from './group/RawResourceGroups';
 import { IK8sResourcesFiltersState } from './K8sResourcesFilters';
-import { Formik } from 'formik';
 import './K8sResources.less';
+import { RawResourceUtils } from './RawResourceUtils';
 
 export interface IK8sResourcesProps {
   app: Application;
@@ -53,8 +53,8 @@ export class K8sResources extends React.Component<IK8sResourcesProps, IK8sResour
     });
   }
 
-  public groupByChanged = (groupBy: string): void => {
-    this.setState({ ...this.state, groupBy: groupBy.toLowerCase() });
+  private groupByChanged = (e: React.ChangeEvent<any>): void => {
+    this.setState({ groupBy: e.target.value.toLowerCase() });
   };
 
   public render() {
@@ -62,29 +62,24 @@ export class K8sResources extends React.Component<IK8sResourcesProps, IK8sResour
     return (
       <div className="K8sResources">
         <div className="header row">
-          <Formik
-            onSubmit={() => null}
-            initialValues={{ groupBy: 'None' }}
-            render={() => {
-              return (
-                <FormikFormField
-                  onChange={this.groupByChanged}
-                  name="groupBy"
-                  label="Group By"
-                  input={(props) => (
-                    <ReactSelectInput {...props} inputClassName="groupby" stringOptions={opts} clearable={false} />
-                  )}
-                />
-              );
-            }}
+          <FormField
+            onChange={this.groupByChanged}
+            value={this.state.groupBy.charAt(0).toUpperCase() + this.state.groupBy.substr(1)}
+            name="groupBy"
+            label="Group By"
+            input={(props) => (
+              <ReactSelectInput {...props} inputClassName="groupby" stringOptions={opts} clearable={false} />
+            )}
           />
         </div>
-        <div className="Content">
+        <div className="content">
           {this.state.groupBy === 'none' ? (
             <>
               {...this.state.rawResources
                 .filter((resource) => this.matchFilters(resource))
-                .map((resource) => <RawResource resource={resource}></RawResource>)}
+                .map((resource) => (
+                  <RawResource key={RawResourceUtils.resourceKey(resource)} resource={resource}></RawResource>
+                ))}
             </>
           ) : (
             <RawResourceGroups

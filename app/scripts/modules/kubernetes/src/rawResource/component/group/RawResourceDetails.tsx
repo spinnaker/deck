@@ -108,8 +108,8 @@ export class RawResourceDetails extends React.Component<IRawResourceDetailsProps
   private deletedRawResource = () => {
     const { app } = this.props;
     const { account, manifest } = this.state;
-    const name = get(manifest, ['manifest', 'metadata', 'name'], null);
-    const kind = get(manifest, ['manifest', 'kind']);
+    const name = manifest?.manifest?.metadata?.name ?? null;
+    const kind = manifest?.manifest?.kind;
     const taskMonitor = {
       application: app,
       title: 'Deleting ' + name,

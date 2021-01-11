@@ -91,14 +91,14 @@ export class K8sResourcesFilters extends React.Component<IK8sResourcesFiltersPro
   }
 
   private onNsCheckbox() {
-    const st = { ...this.state };
-    for (const p in st.displayNamespaces) {
+    const { namespaces, displayNamespaces } = { ...this.state };
+    for (const p in displayNamespaces) {
       if (p == RawResourceUtils.GLOBAL_LABEL) {
-        st.namespaces[''] = st.displayNamespaces[p];
+        namespaces[''] = displayNamespaces[p];
       }
-      st.namespaces[p] = st.displayNamespaces[p];
+      namespaces[p] = displayNamespaces[p];
     }
-    this.setState(st);
+    this.setState({ namespaces });
     this.filterPubSub.publish(this.state);
   }
 
