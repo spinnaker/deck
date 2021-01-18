@@ -2,7 +2,6 @@ import React from 'react';
 import { cloneDeep, get } from 'lodash';
 import { FormikErrors } from 'formik';
 
-
 import {
   AccountService,
   ILoadBalancerModalProps,
@@ -196,6 +195,9 @@ export class CreateNetworkLoadBalancer extends React.Component<
 
     const descriptor = isNew ? 'Create' : 'Update';
     const loadBalancerCommandFormatted = cloneDeep(values);
+    loadBalancerCommandFormatted.ipAddressType = loadBalancerCommandFormatted.dualstack ? 'dualstack' : 'ipv4';
+    delete loadBalancerCommandFormatted.dualstack;
+
     if (forPipelineConfig) {
       // don't submit to backend for creation. Just return the loadBalancerCommand object
       this.formatListeners(loadBalancerCommandFormatted).then(() => {
