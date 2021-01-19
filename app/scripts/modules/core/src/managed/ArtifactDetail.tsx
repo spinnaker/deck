@@ -19,6 +19,8 @@ import { AbsoluteTimestamp } from './AbsoluteTimestamp';
 import { ArtifactDetailHeader } from './ArtifactDetailHeader';
 import { ManagedResourceObject } from './ManagedResourceObject';
 import { EnvironmentRow } from './EnvironmentRow';
+import { PreDeploymentRow } from './PreDeploymentRow';
+import { PreDeploymentStepCard } from './PreDeploymentStepCard';
 import { VersionStateCard } from './VersionStateCard';
 import { StatusCard } from './StatusCard';
 import { Button } from './Button';
@@ -31,6 +33,8 @@ import { isConstraintSupported } from './constraints/constraintRegistry';
 import { isResourceKindSupported } from './resources/resourceRegistry';
 
 import './ArtifactDetail.less';
+
+const SUPPORTED_PRE_DEPLOYMENT_TYPES = ['BUILD', 'BAKE'];
 
 function shouldDisplayResource(reference: string, resource: IManagedResourceSummary) {
   return isResourceKindSupported(resource.kind) && reference === resource.artifact?.reference;
@@ -230,7 +234,7 @@ export const ArtifactDetail = ({
   resourcesByEnvironment,
   onRequestClose,
 }: IArtifactDetailProps) => {
-  const { environments, git, createdAt } = versionDetails;
+  const { environments, lifecycleSteps, git, createdAt } = versionDetails;
 
   const keydownCallback = ({ keyCode }: KeyboardEvent) => {
     if (keyCode === 27 /* esc */) {
@@ -242,6 +246,11 @@ export const ArtifactDetail = ({
   const isPinnedEverywhere = environments.every(({ pinned }) => pinned);
   const isBadEverywhere = environments.every(({ state }) => state === 'vetoed');
   const createdAtTimestamp = useMemo(() => createdAt && DateTime.fromISO(createdAt), [createdAt]);
+
+  // These steps come in with chronological ordering, but we need reverse-chronological orddering for display
+  const preDeploymentSteps = lifecycleSteps
+    ?.filter(({ scope, type }) => scope === 'PRE_DEPLOYMENT' && SUPPORTED_PRE_DEPLOYMENT_TYPES.includes(type))
+    .reverse();
 
   return (
     <>
@@ -347,7 +356,7 @@ export const ArtifactDetail = ({
               name={environmentName}
               resources={resourcesByEnvironment[environmentName]}
             >
-              <div className="sp-margin-l-right">
+              <div>
                 <EnvironmentCards
                   application={application}
                   environment={environment}
@@ -384,6 +393,13 @@ export const ArtifactDetail = ({
             </EnvironmentRow>
           );
         })}
+        {preDeploymentSteps && preDeploymentSteps.length > 0 && (
+          <PreDeploymentRow>
+            {preDeploymentSteps.map((step) => (
+              <PreDeploymentStepCard key={step.id} step={step} application={application} reference={reference} />
+            ))}
+          </PreDeploymentRow>
+        )}
       </div>
     </>
   );

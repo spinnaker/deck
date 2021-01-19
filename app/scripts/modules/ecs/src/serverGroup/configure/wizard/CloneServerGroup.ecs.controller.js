@@ -241,5 +241,19 @@ module(ECS_SERVERGROUP_CONFIGURE_WIZARD_CLONESERVERGROUP_ECS_CONTROLLER, [
     $scope.configureCommand = function (query) {
       return ecsServerGroupConfigurationService.configureCommand($scope.command, query);
     };
+
+    // TODO: Migrate horizontalScaling component to react and move this logic there
+    $scope.capacityProviderState = {
+      useCapacityProviders:
+        $scope.command.capacityProviderStrategy && $scope.command.capacityProviderStrategy.length > 0,
+      updateComputeOption: function (chosenOption) {
+        if (chosenOption == 'launchType') {
+          $scope.command.capacityProviderStrategy = [];
+        } else if (chosenOption == 'capacityProviders') {
+          $scope.command.launchType = '';
+          $scope.command.capacityProviderStrategy = $scope.command.capacityProviderStrategy || [];
+        }
+      },
+    };
   },
 ]);

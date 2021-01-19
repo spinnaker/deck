@@ -1,4 +1,4 @@
-import { API } from 'core/api';
+import { REST } from 'core/api';
 import { SchedulerFactory } from 'core/scheduler';
 import { Application } from '../application.model';
 import { ApplicationDataSource } from '../service/applicationDataSource';
@@ -7,7 +7,7 @@ import { InferredApplicationWarningService } from './InferredApplicationWarningS
 
 export interface IApplicationDataSourceAttribute {
   enabled: string[];
-  disabled: string[];
+  disabled: string[]; ///./app/scripts/modules/core/src/pipeline/service/execution.service.ts;
 }
 
 export interface IApplicationSummary {
@@ -24,12 +24,13 @@ export interface IApplicationSummary {
 
 export class ApplicationReader {
   public static listApplications(): PromiseLike<IApplicationSummary[]> {
-    return API.all('applications').useCache().getList();
+    return REST('/applications').useCache().get();
   }
 
   public static getApplicationAttributes(name: string): PromiseLike<any> {
-    return API.one('applications', name)
-      .withParams({ expand: false })
+    return REST('/applications')
+      .path(name)
+      .query({ expand: false })
       .get()
       .then((fromServer: Application) => {
         this.splitAttributes(fromServer.attributes, ['accounts', 'cloudProviders']);
@@ -37,9 +38,22 @@ export class ApplicationReader {
       });
   }
 
+  public static getApplicationPermissions(applicationName: string): PromiseLike<any> {
+    return REST('/applications')
+      .path(applicationName)
+      .query({
+        expand: false,
+      })
+      .get()
+      .then((application: Application) => {
+        return application.attributes.permissions;
+      });
+  }
+
   public static getApplication(name: string, expand = true): PromiseLike<Application> {
-    return API.one('applications', name)
-      .withParams({ expand: expand })
+    return REST('/applications')
+      .path(name)
+      .query({ expand: expand })
       .get()
       .then((fromServer: Application) => {
         const configs = ApplicationDataSourceRegistry.getDataSources();

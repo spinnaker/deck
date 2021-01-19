@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { API } from 'core/api/ApiService';
+import { REST } from 'core/api/ApiService';
 import { IStageConfigProps, StageConfigField } from '../common';
 import { Observable } from 'rxjs';
 import Select from 'react-select';
@@ -43,7 +43,7 @@ export class GremlinStageConfig extends React.Component<IStageConfigProps> {
 
   private fetchCommands = (apiKey: string) => {
     return Observable.fromPromise(
-      API.one('integrations', 'gremlin', 'templates', 'command')
+      REST('/integrations/gremlin/templates/command')
         .post({
           apiKey,
         })
@@ -61,7 +61,7 @@ export class GremlinStageConfig extends React.Component<IStageConfigProps> {
 
   private fetchTargets = (apiKey: string) => {
     return Observable.fromPromise(
-      API.one('integrations', 'gremlin', 'templates', 'target')
+      REST('/integrations/gremlin/templates/target')
         .post({
           apiKey,
         })

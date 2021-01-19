@@ -1,7 +1,8 @@
+import { mockHttpClient } from 'core/api/mock/jasmine';
 import { IControllerService, IRootScopeService, IScope, mock, noop } from 'angular';
 import { StateService } from '@uirouter/core';
 
-import { API, ApplicationModelBuilder } from '@spinnaker/core';
+import { ApplicationModelBuilder } from '@spinnaker/core';
 
 import { ORACLE_LOAD_BALANCER_CREATE_CONTROLLER, OracleLoadBalancerController } from './createLoadBalancer.controller';
 import {
@@ -12,8 +13,8 @@ import {
 import { OracleProviderSettings } from 'oracle/oracle.settings';
 
 describe('Controller: oracleCreateLoadBalancerCtrl', function () {
-  let $http: ng.IHttpBackendService;
   let controller: OracleLoadBalancerController;
+  let initController: Function;
   const loadBalancer: IOracleLoadBalancer = null;
   let $scope: IScope;
   let $state: StateService;
@@ -32,26 +33,21 @@ describe('Controller: oracleCreateLoadBalancerCtrl', function () {
       });
 
       const isNew = true;
-      controller = $controller(OracleLoadBalancerController, {
-        $scope,
-        $uibModalInstance: { dismiss: noop, result: { then: noop } },
-        loadBalancer,
-        application,
-        $state,
-        isNew,
-      });
-      controller.addBackendSet();
-      controller.addListener();
-      controller.addCert();
+      initController = () => {
+        controller = $controller(OracleLoadBalancerController, {
+          $scope,
+          $uibModalInstance: { dismiss: noop, result: { then: noop } },
+          loadBalancer,
+          application,
+          $state,
+          isNew,
+        });
+        controller.addBackendSet();
+        controller.addListener();
+        controller.addCert();
 
-      controller.listeners[0].defaultBackendSetName = controller.backendSets[0].name;
-    }),
-  );
-
-  beforeEach(
-    mock.inject(function ($httpBackend: ng.IHttpBackendService) {
-      // Set up the mock http service responses
-      $http = $httpBackend;
+        controller.listeners[0].defaultBackendSetName = controller.backendSets[0].name;
+      };
     }),
   );
 
@@ -61,10 +57,12 @@ describe('Controller: oracleCreateLoadBalancerCtrl', function () {
   }
 
   it('should have an instantiated controller', function () {
+    initController();
     expect(controller).toBeDefined();
   });
 
   it('correctly creates a default loadbalancer', function () {
+    initController();
     const lb: IOracleLoadBalancerUpsertCommand = $scope.loadBalancerCmd;
     expect(lb.cloudProvider).toEqual('oracle');
     expect(lb.credentials).toEqual(OracleProviderSettings.defaults.account);
@@ -74,6 +72,7 @@ describe('Controller: oracleCreateLoadBalancerCtrl', function () {
   });
 
   it('correctly creates default listener', function () {
+    initController();
     expect(controller.listeners).toBeDefined();
     expect(controller.listeners.length).toEqual(1);
     expect(controller.listeners[0].name).toEqual('HTTP_80');
@@ -82,6 +81,7 @@ describe('Controller: oracleCreateLoadBalancerCtrl', function () {
   });
 
   it('correctly creates default subnet', function () {
+    initController();
     expect(controller.backendSets).toBeDefined();
     expect(controller.backendSets.length).toEqual(1);
     expect(controller.backendSets[0].name).toEqual('backendSet1');
@@ -92,12 +92,14 @@ describe('Controller: oracleCreateLoadBalancerCtrl', function () {
   });
 
   it('correctly creates default certificate', function () {
+    initController();
     expect(controller.certificates).toBeDefined();
     expect(controller.certificates.length).toEqual(1);
     expect(controller.certificates[0].certificateName).toEqual('certificate1');
   });
 
   it('adds & removes certificate', function () {
+    initController();
     controller.addCert();
     expect(controller.certificates).toBeDefined();
     expect(controller.certificates.length).toEqual(2);
@@ -108,6 +110,7 @@ describe('Controller: oracleCreateLoadBalancerCtrl', function () {
   });
 
   it('cannot remove certificate if used by listener', function () {
+    initController();
     const newCertName = 'myCert';
     controller.addCert();
     expect(controller.certificates.length).toEqual(2);
@@ -127,6 +130,7 @@ describe('Controller: oracleCreateLoadBalancerCtrl', function () {
   });
 
   it('changed backend set name updates listener', function () {
+    initController();
     expect(controller.listeners[0].defaultBackendSetName).toEqual('backendSet1');
     controller.backendSets[0].name = 'UpdatedBackendSetName';
     controller.backendSetNameChanged(0);
@@ -134,6 +138,7 @@ describe('Controller: oracleCreateLoadBalancerCtrl', function () {
   });
 
   it('cannot remove backendset if used by listener', function () {
+    initController();
     const newBackendSetName = 'myBackendSet';
     controller.addBackendSet();
     controller.addListener();
@@ -147,17 +152,20 @@ describe('Controller: oracleCreateLoadBalancerCtrl', function () {
   });
 
   it('remove backend set updates listener', function () {
+    initController();
     controller.removeBackendSet(0);
     expect(controller.listeners[0].defaultBackendSetName).not.toBeDefined();
   });
 
   it('sslConfiguration created on listener', function () {
+    initController();
     expect(controller.listeners[0].sslConfiguration).not.toBeDefined();
     initListenerSslConfig();
     expect(controller.listeners[0].sslConfiguration).toBeDefined();
   });
 
   it('sslConfiguration removed on listener when isSsl turned off', function () {
+    initController();
     initListenerSslConfig();
     expect(controller.listeners[0].sslConfiguration).toBeDefined();
     controller.listeners[0].isSsl = false;
@@ -166,6 +174,7 @@ describe('Controller: oracleCreateLoadBalancerCtrl', function () {
   });
 
   it('changed certificate name updates listener', function () {
+    initController();
     initListenerSslConfig();
     controller.listeners[0].sslConfiguration.certificateName = controller.certificates[0].certificateName;
     expect(controller.listeners[0].sslConfiguration.certificateName).toEqual('certificate1');
@@ -175,17 +184,19 @@ describe('Controller: oracleCreateLoadBalancerCtrl', function () {
   });
 
   it('remove certificate updates listener', function () {
+    initController();
     initListenerSslConfig();
     controller.listeners[0].sslConfiguration.certificateName = controller.certificates[0].certificateName;
     controller.removeCert(0);
     expect(controller.listeners[0].sslConfiguration.certificateName).not.toBeDefined();
   });
 
-  it('makes the expected REST calls for data for a new loadbalancer', function () {
-    $http.expect('GET', API.baseUrl + '/networks/oracle').respond([]);
-    $http.expect('GET', API.baseUrl + '/subnets/oracle').respond([]);
-    $http.flush();
-    $http.verifyNoOutstandingExpectation();
-    $http.verifyNoOutstandingRequest();
+  it('makes the expected REST calls for data for a new loadbalancer', async function () {
+    const http = mockHttpClient();
+    http.expectGET('/networks/oracle').respond(200, []);
+    http.expectGET('/subnets/oracle').respond(200, []);
+    initController();
+
+    await http.flush();
   });
 });

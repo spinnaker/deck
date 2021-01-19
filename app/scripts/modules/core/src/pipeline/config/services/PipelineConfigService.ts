@@ -1,8 +1,7 @@
-
 import { sortBy, uniq, cloneDeep } from 'lodash';
 import { $q } from 'ngimport';
 
-import { API } from 'core/api/ApiService';
+import { REST } from 'core/api/ApiService';
 import { AuthenticationService } from 'core/authentication/AuthenticationService';
 import { PipelineTemplateV2Service } from '../templates/v2/pipelineTemplateV2.service';
 import { ViewStateCache } from 'core/cache';
@@ -21,10 +20,9 @@ export class PipelineConfigService {
   }
 
   public static getPipelinesForApplication(applicationName: string): PromiseLike<IPipeline[]> {
-    return API.one('applications')
-      .one(applicationName)
-      .all('pipelineConfigs')
-      .getList()
+    return REST('/applications')
+      .path(applicationName, 'pipelineConfigs')
+      .get()
       .then((pipelines: IPipeline[]) => {
         pipelines.forEach((p) => (p.stages = p.stages || []));
         return this.sortPipelines(pipelines);
@@ -32,10 +30,9 @@ export class PipelineConfigService {
   }
 
   public static getStrategiesForApplication(applicationName: string): PromiseLike<IPipeline[]> {
-    return API.one('applications')
-      .one(applicationName)
-      .all('strategyConfigs')
-      .getList()
+    return REST('/applications')
+      .path(applicationName, 'strategyConfigs')
+      .get()
       .then((pipelines: IPipeline[]) => {
         pipelines.forEach((p) => (p.stages = p.stages || []));
         return this.sortPipelines(pipelines);
@@ -44,13 +41,12 @@ export class PipelineConfigService {
 
   public static getHistory(id: string, isStrategy: boolean, count = 20): PromiseLike<IPipeline[]> {
     const endpoint = isStrategy ? 'strategyConfigs' : 'pipelineConfigs';
-    return API.one(endpoint, id).all('history').withParams({ limit: count }).getList();
+    return REST(endpoint).path(id, 'history').query({ limit: count }).get();
   }
 
   public static deletePipeline(applicationName: string, pipeline: IPipeline, pipelineName: string): PromiseLike<void> {
-    return API.one(pipeline.strategy ? 'strategies' : 'pipelines')
-      .one(applicationName, encodeURIComponent(pipelineName.trim()))
-      .remove();
+    const endpoint = pipeline.strategy ? 'strategies' : 'pipelines';
+    return REST(endpoint).path(applicationName, encodeURIComponent(pipelineName.trim())).delete();
   }
 
   public static savePipeline(toSave: IPipeline): PromiseLike<void> {
@@ -69,9 +65,8 @@ export class PipelineConfigService {
       pipeline = PipelineTemplateV2Service.filterInheritedConfig(pipeline) as IPipeline;
     }
 
-    return API.one(pipeline.strategy ? 'strategies' : 'pipelines')
-      .data(pipeline)
-      .post();
+    const endpoint = pipeline.strategy ? 'strategies' : 'pipelines';
+    return REST(endpoint).post(pipeline);
   }
 
   public static reorderPipelines(
@@ -80,12 +75,10 @@ export class PipelineConfigService {
     isStrategy = false,
   ): PromiseLike<void> {
     const type = isStrategy ? 'strategies' : 'pipelines';
-    return API.one('actions', type, 'reorder')
-      .data({
-        application,
-        idsToIndices,
-      })
-      .post();
+    return REST('/actions').path(type, 'reorder').post({
+      application,
+      idsToIndices,
+    });
   }
 
   public static renamePipeline(
@@ -96,20 +89,15 @@ export class PipelineConfigService {
   ): PromiseLike<void> {
     this.configViewStateCache.remove(this.buildViewStateCacheKey(applicationName, currentName));
     pipeline.name = newName.trim();
-    return API.one(pipeline.strategy ? 'strategies' : 'pipelines')
-      .one(pipeline.id)
-      .data(pipeline)
-      .put();
+    const endpoint = pipeline.strategy ? 'strategies' : 'pipelines';
+    return REST(endpoint).path(pipeline.id).put(pipeline);
   }
 
   public static triggerPipeline(applicationName: string, pipelineName: string, body: any = {}): PromiseLike<string> {
     body.user = AuthenticationService.getAuthenticatedUser().name;
-    return API.one('pipelines')
-      .one('v2')
-      .one(applicationName)
-      .one(encodeURIComponent(pipelineName))
-      .data(body)
-      .post()
+    return REST('/pipelines/v2')
+      .path(applicationName, encodeURIComponent(pipelineName))
+      .post(body)
       .then((result: ITriggerPipelineResponse) => {
         return result.ref.split('/').pop();
       });

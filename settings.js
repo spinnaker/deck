@@ -13,6 +13,7 @@ const canaryEnabled = process.env.CANARY_ENABLED === 'true';
 const canaryFeatureDisabled = process.env.CANARY_FEATURE_ENABLED !== 'true';
 const canaryStagesEnabled = process.env.CANARY_STAGES_ENABLED === 'true';
 const chaosEnabled = process.env.CHAOS_ENABLED === 'true' ? true : false;
+const ciEnabled = process.env.CI_ENABLED === 'true';
 const debugEnabled = process.env.DEBUG_ENABLED === 'false' ? false : true;
 const defaultMetricStore = process.env.METRIC_STORE || 'atlas';
 const displayTimestampsInUserLocalTime = process.env.DISPLAY_TIMESTAMPS_IN_USER_LOCAL_TIME === 'true';
@@ -29,12 +30,14 @@ const reduxLoggerEnabled = process.env.REDUX_LOGGER === 'true';
 const templatesEnabled = process.env.TEMPLATES_ENABLED === 'true';
 const useClassicFirewallLabels = process.env.USE_CLASSIC_FIREWALL_LABELS === 'true';
 const functionsEnabled = process.env.FUNCTIONS_ENABLED === 'true' ? true : false;
+const k8sRawResourcesEnabled = process.env.K8S_RAW_RESOURCES_ENABLED === 'true' ? true : false;
 
 window.spinnakerSettings = {
   authEnabled: authEnabled,
   authEndpoint: authEndpoint,
   authTtl: 600000,
   bakeryDetailUrl: bakeryDetailUrl,
+  banners: [],
   canary: {
     atlasWebComponentsUrl: atlasWebComponentsUrl,
     defaultJudge: 'NetflixACAJudge-v1.0',
@@ -70,6 +73,7 @@ window.spinnakerSettings = {
   feature: {
     canary: canaryEnabled,
     chaosMonkey: chaosEnabled,
+    ci: ciEnabled,
     displayTimestampsInUserLocalTime: displayTimestampsInUserLocalTime,
     dryRunEnabled: dryRunEnabled,
     entityTags: entityTagsEnabled,
@@ -88,6 +92,7 @@ window.spinnakerSettings = {
     slack: false,
     snapshots: false,
     functions: functionsEnabled,
+    kubernetesRawResources: k8sRawResourcesEnabled,
   },
   gateUrl: apiHost,
   gitSources: ['stash', 'github', 'bitbucket', 'gitlab'],
@@ -151,7 +156,9 @@ window.spinnakerSettings = {
       serverGroups: {
         enableLaunchTemplates: false,
         enableIPv6: false,
+        setIPv6InTest: false,
         enableIMDSv2: false,
+        enableCpuCredits: false,
       },
       useAmiBlockDeviceMappings: false,
     },
