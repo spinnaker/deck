@@ -49,10 +49,12 @@ export class SearchService {
 
     const params = { ...searchParams, ...defaultParams };
 
-    const requestBuilder = API.one('search').withParams(params);
+    // eslint-disable-next-line @spinnaker/api-deprecation
+    let requestBuilder = API.one('search').query(params);
 
     if (cache) {
-      requestBuilder.useCache(cache);
+      // TODO: This is the only usage of ICache in deck, investigate how we can avoid this and migrate to REST()
+      requestBuilder = requestBuilder.useCache(cache);
     }
 
     return requestBuilder

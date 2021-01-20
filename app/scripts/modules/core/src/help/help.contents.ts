@@ -283,6 +283,9 @@ const helpContents: { [key: string]: string } = {
   'pipeline.config.bake.manifest.overrideExpressionEvaluation':
     '<p>Explicitly evaluate SpEL expressions in overrides just prior to manifest baking. Can be paired with the "Skip SpEL evaluation" option in the Deploy Manifest stage when baking a third-party manifest artifact with expressions not meant for Spinnaker to evaluate as SpEL.</p>',
   'pipeline.config.bake.manifest.templateRenderer': '<p>This is the engine used for rendering your manifest.</p>',
+  'pipeline.config.bake.manifest.helm.chartFilePath': `
+    <p>This is the relative path to the Chart.yaml file within your Git repo.</p>
+    <p>e.g.: <b>helm/my-chart/Chart.yaml</b></p>`,
   'pipeline.config.bake.manifest.helm.rawOverrides':
     'Use <i>--set</i> instead of <i>--set-string</i> when injecting override values. Values injected using <i>--set</i> will be converted to primitive types by Helm.',
   'pipeline.config.bake.manifest.kustomize.filePath': `
@@ -353,6 +356,8 @@ const helpContents: { [key: string]: string } = {
       </p>`,
   'pipeline.config.trigger.runAsUser':
     "The current user must have access to the specified service account, and the service account must have access to the current application. Otherwise, you'll receive an 'Access is denied' error.",
+  'pipeline.config.trigger.authorizedUser':
+      "The current user must have the permission to approve the manual judgment stage. Otherwise, you'll not be able continue to the next pipeline stage.",
   'pipeline.config.script.repoUrl':
     '<p>Path to the repo hosting the scripts in Stash. (e.g. <samp>CDL/mimir-scripts</samp>). Leave empty to use the default.</p>',
   'pipeline.config.script.repoBranch':

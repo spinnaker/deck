@@ -1,7 +1,7 @@
 import { $log, $q, $timeout } from 'ngimport';
 import { Subject } from 'rxjs';
 
-import { API } from 'core/api/ApiService';
+import { REST } from 'core/api/ApiService';
 import { OrchestratedItemTransformer } from 'core/orchestratedItem/orchestratedItem.transformer';
 import { ITask } from 'core/domain';
 
@@ -9,9 +9,10 @@ export class TaskReader {
   private static activeStatuses: string[] = ['RUNNING', 'SUSPENDED', 'NOT_STARTED'];
 
   public static getTasks(applicationName: string, statuses: string[] = []): PromiseLike<ITask[]> {
-    return API.one('applications', applicationName)
-      .all('tasks')
-      .getList({ statuses: statuses.join(',') })
+    return REST('/applications')
+      .path(applicationName, 'tasks')
+      .query({ statuses: statuses.join(',') })
+      .get()
       .then((tasks: ITask[]) => {
         tasks.forEach((task) => this.setTaskProperties(task));
         return tasks.filter((task) => !task.getValueFor('dryRun'));
@@ -23,7 +24,8 @@ export class TaskReader {
   }
 
   public static getTask(taskId: string): PromiseLike<ITask> {
-    return API.one('tasks', taskId)
+    return REST('/tasks')
+      .path(taskId)
       .get()
       .then((task: ITask) => {
         this.setTaskProperties(task);
@@ -35,7 +37,7 @@ export class TaskReader {
         }
         return task;
       })
-      .catch((error: any) => {
+      .catch((error: any): undefined => {
         $log.warn('There was an issue retrieving taskId: ', taskId, error);
         return undefined;
       });

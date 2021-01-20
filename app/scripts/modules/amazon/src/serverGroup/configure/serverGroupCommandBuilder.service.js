@@ -117,7 +117,7 @@ angular
                * Older SDKs do not support IMDSv2. A timestamp can be optionally configured at which any apps created after can safely default to using IMDSv2.
                */
               const appAgeRequirement = AWSProviderSettings.serverGroups.defaultIMDSv2AppAgeLimit;
-              const creationDate = application.attributes.createTs;
+              const creationDate = application.attributes && application.attributes.createTs;
 
               command.requireIMDSv2 =
                 appAgeRequirement && creationDate && Number(creationDate) > appAgeRequirement ? true : false;
@@ -353,11 +353,16 @@ angular
                 launchTemplateData.networkInterfaces.length &&
                 launchTemplateData.networkInterfaces[0];
 
+              const asgSettings = AWSProviderSettings.serverGroups;
+              const isTestEnv = serverGroup.accountDetails && serverGroup.accountDetails.environment === 'test';
+              const shouldAutoEnableIPv6 =
+                asgSettings && asgSettings.enableIPv6 && asgSettings.setIPv6InTest && isTestEnv;
+
               angular.extend(command, {
                 instanceType: launchTemplateData.instanceType,
                 iamRole: launchTemplateData.iamInstanceProfile.name,
                 keyPair: launchTemplateData.keyName,
-                associateIPv6Address: Boolean(ipv6AddressCount),
+                associateIPv6Address: shouldAutoEnableIPv6 || Boolean(ipv6AddressCount),
                 ramdiskId: launchTemplateData.ramdiskId,
                 instanceMonitoring: launchTemplateData.monitoring.enabled,
                 ebsOptimized: launchTemplateData.ebsOptimized,

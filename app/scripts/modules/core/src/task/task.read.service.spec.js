@@ -1,62 +1,42 @@
 'use strict';
-
-import { API } from 'core/api/ApiService';
+import { mockHttpClient } from 'core/api/mock/jasmine';
 import { TaskReader } from './task.read.service';
 
 describe('Service: taskReader', function () {
-  var $http, scope, timeout, task;
+  let scope, timeout;
 
   beforeEach(
-    window.inject(function ($httpBackend, $rootScope, $timeout) {
-      $http = $httpBackend;
+    window.inject(function ($rootScope, $timeout) {
       timeout = $timeout;
       scope = $rootScope.$new();
     }),
   );
 
-  beforeEach(function () {
-    $http.verifyNoOutstandingExpectation();
-    $http.verifyNoOutstandingRequest();
-  });
+  async function getTask(http, taskDef) {
+    http.expectGET(`/tasks/${taskDef.id}`).respond(200, taskDef);
+    const promise = TaskReader.getTask(taskDef.id);
+    await http.flush();
+    return promise;
+  }
 
   describe('waitUntilTaskMatches', function () {
-    function cycle() {
-      timeout.flush();
-      $http.flush();
-    }
+    it('resolves immediately if task already matches', async function () {
+      const http = mockHttpClient();
+      const task = await getTask(http, { id: 1, foo: 3, status: 'SUCCEEDED' });
 
-    beforeEach(function () {
-      TaskReader.getTask(1).then((result) => (task = result));
-    });
-
-    it('resolves immediately if task already matches', function () {
-      $http.whenGET(API.baseUrl + '/tasks/1').respond(200, {
-        id: 1,
-        foo: 3,
-        status: 'SUCCEEDED',
-      });
-
-      var completed = false;
-
-      $http.flush();
-
+      let completed = false;
       TaskReader.waitUntilTaskMatches(task, (task) => task.foo === 3).then(() => (completed = true));
       scope.$digest();
 
       expect(completed).toBe(true);
     });
 
-    it('fails immediate if failure closure provided and task matches it', function () {
-      $http.whenGET(API.baseUrl + '/tasks/1').respond(200, {
-        id: 1,
-        foo: 3,
-        status: 'SUCCEEDED',
-      });
+    it('fails immediate if failure closure provided and task matches it', async function () {
+      const http = mockHttpClient();
+      const task = await getTask(http, { id: 1, foo: 3, status: 'SUCCEEDED' });
 
-      var completed = false,
+      let completed = false,
         failed = false;
-
-      $http.flush();
 
       TaskReader.waitUntilTaskMatches(
         task,
@@ -72,13 +52,12 @@ describe('Service: taskReader', function () {
       expect(failed).toBe(true);
     });
 
-    it('polls task and resolves when it matches', function () {
-      $http.expectGET(API.baseUrl + '/tasks/1').respond(200, { id: 1, status: 'RUNNING' });
+    it('polls task and resolves when it matches', async function () {
+      const http = mockHttpClient();
+      const task = await getTask(http, { id: 1, status: 'RUNNING' });
 
-      var completed = false,
+      let completed = false,
         failed = false;
-
-      $http.flush();
 
       TaskReader.waitUntilTaskMatches(
         task,
@@ -88,32 +67,34 @@ describe('Service: taskReader', function () {
         () => (completed = true),
         () => (failed = true),
       );
-      scope.$digest();
 
       // still running
       expect(completed).toBe(false);
       expect(failed).toBe(false);
 
       // still running
-      $http.expectGET(API.baseUrl + '/tasks/1').respond(200, { id: 1, status: 'RUNNING' });
-      cycle();
+      http.expectGET('/tasks/1').respond(200, { id: 1, status: 'RUNNING' });
+      timeout.flush();
+      await http.flush();
+
       expect(completed).toBe(false);
       expect(failed).toBe(false);
 
       // succeeds
-      $http.expectGET(API.baseUrl + '/tasks/1').respond(200, { id: 1, status: 'SUCCEEDED' });
-      cycle();
+      http.expectGET('/tasks/1').respond(200, { id: 1, status: 'SUCCEEDED' });
+      timeout.flush();
+      await http.flush();
+
       expect(completed).toBe(true);
       expect(failed).toBe(false);
     });
 
-    it('polls task and rejects when it matches failure closure', function () {
-      $http.expectGET(API.baseUrl + '/tasks/1').respond(200, { id: 1, status: 'RUNNING' });
+    it('polls task and rejects when it matches failure closure', async function () {
+      const http = mockHttpClient();
+      const task = await getTask(http, { id: 1, status: 'RUNNING' });
 
-      var completed = false,
+      let completed = false,
         failed = false;
-
-      $http.flush();
 
       TaskReader.waitUntilTaskMatches(
         task,
@@ -130,25 +111,27 @@ describe('Service: taskReader', function () {
       expect(failed).toBe(false);
 
       // still running
-      $http.expectGET(API.baseUrl + '/tasks/1').respond(200, { id: 1, status: 'RUNNING' });
-      cycle();
+      http.expectGET('/tasks/1').respond(200, { id: 1, status: 'RUNNING' });
+      timeout.flush();
+      await http.flush();
       expect(completed).toBe(false);
       expect(failed).toBe(false);
 
       // succeeds
-      $http.expectGET(API.baseUrl + '/tasks/1').respond(200, { id: 1, status: 'TERMINAL' });
-      cycle();
+      http.expectGET('/tasks/1').respond(200, { id: 1, status: 'TERMINAL' });
+      timeout.flush();
+      await http.flush();
       expect(completed).toBe(false);
       expect(failed).toBe(true);
     });
 
-    it('polls task and rejects if task is not returned from getTask call', function () {
-      $http.expectGET(API.baseUrl + '/tasks/1').respond(500, {});
+    it('polls task and rejects if task is not returned from getTask call', async function () {
+      const http = mockHttpClient({ autoFlush: true });
+      http.expectGET('/tasks/1').respond(500, {});
+      const task = await TaskReader.getTask(1);
 
-      var completed = false,
+      let completed = false,
         failed = false;
-
-      $http.flush();
 
       TaskReader.waitUntilTaskMatches(
         task,
@@ -166,66 +149,31 @@ describe('Service: taskReader', function () {
   });
 
   describe('task running time', function () {
-    function execute() {
-      TaskReader.getTask(1).then(function (resolved) {
-        task = resolved;
-      });
-
-      $http.flush();
-      scope.$digest();
-    }
-
-    it('uses start time to calculate running time if endTime is zero', function () {
-      $http.whenGET(API.baseUrl + '/tasks/1').respond(200, {
-        id: 2,
-        status: 'SUCCEEDED',
-        startTime: Date.now(),
-        endTime: 0,
-      });
-
-      execute();
-
+    it('uses start time to calculate running time if endTime is zero', async function () {
+      const http = mockHttpClient();
+      const task = await getTask(http, { id: 2, status: 'SUCCEEDED', startTime: Date.now(), endTime: 0 });
       expect(task.runningTime).toBe('less than 5 seconds');
     });
 
-    it('uses start time to calculate running time if endTime is not present', function () {
-      $http.whenGET(API.baseUrl + '/tasks/1').respond(200, {
-        id: 2,
-        status: 'SUCCEEDED',
-        startTime: Date.now(),
-      });
-
-      execute();
-
+    it('uses start time to calculate running time if endTime is not present', async function () {
+      const http = mockHttpClient();
+      const task = await getTask(http, { id: 2, status: 'SUCCEEDED', startTime: Date.now() });
       expect(task.runningTime).toBe('less than 5 seconds');
     });
 
-    it('calculates running time based on start and end times', function () {
-      var start = Date.now(),
-        end = start + 120 * 1000;
-      $http.whenGET(API.baseUrl + '/tasks/1').respond(200, {
-        id: 2,
-        status: 'SUCCEEDED',
-        startTime: start,
-        endTime: end,
-      });
-
-      execute();
-
+    it('calculates running time based on start and end times', async function () {
+      const http = mockHttpClient();
+      const start = Date.now();
+      const end = start + 120 * 1000;
+      const task = await getTask(http, { id: 2, status: 'SUCCEEDED', startTime: start, endTime: end });
       expect(task.runningTime).toBe('2 minutes');
     });
 
-    it('handles offset between server and client by taking the max value of current time and start time', function () {
-      let now = Date.now(),
-        offset = 200000;
-      $http.whenGET(API.baseUrl + '/tasks/1').respond(200, {
-        id: 2,
-        status: 'SUCCEEDED',
-        startTime: now + offset,
-      });
-
-      execute();
-
+    it('handles offset between server and client by taking the max value of current time and start time', async function () {
+      const http = mockHttpClient();
+      const now = Date.now();
+      const offset = 200000;
+      const task = await getTask(http, { id: 2, status: 'SUCCEEDED', startTime: now + offset });
       expect(task.runningTimeInMs).toBe(0);
     });
   });

@@ -1,6 +1,5 @@
 'use strict';
-
-import { API } from '@spinnaker/core';
+import { mockHttpClient } from 'core/api/mock/jasmine';
 
 describe('Service: InstanceType', function () {
   beforeEach(function () {
@@ -8,9 +7,8 @@ describe('Service: InstanceType', function () {
   });
 
   beforeEach(
-    window.inject(function (_awsInstanceTypeService_, _$httpBackend_) {
+    window.inject(function (_awsInstanceTypeService_) {
       this.awsInstanceTypeService = _awsInstanceTypeService_;
-      this.$httpBackend = _$httpBackend_;
 
       this.allTypes = [
         { account: 'test', region: 'us-west-2', name: 'm1.small', availabilityZone: 'us-west-2a' },
@@ -31,28 +29,26 @@ describe('Service: InstanceType', function () {
     }),
   );
 
-  afterEach(function () {
-    this.$httpBackend.verifyNoOutstandingRequest();
-  });
-
   describe('getAllTypesByRegion', function () {
-    it('returns types, indexed by region', function () {
-      this.$httpBackend.expectGET(API.baseUrl + '/instanceTypes').respond(200, this.allTypes);
+    it('returns types, indexed by region', async function () {
+      const http = mockHttpClient();
+      http.expectGET('/instanceTypes').respond(200, this.allTypes);
 
       let results = null;
       this.awsInstanceTypeService.getAllTypesByRegion().then(function (result) {
         results = result;
       });
 
-      this.$httpBackend.flush();
+      await http.flush();
       expect(results['us-west-2'].length).toBe(2);
       expect(_.map(results['us-west-2'], 'name').sort()).toEqual(['m1.small', 'm2.xlarge']);
     });
   });
 
   describe('getAvailableTypesForRegions', function () {
-    it('returns results for a single region', function () {
-      this.$httpBackend.expectGET(API.baseUrl + '/instanceTypes').respond(200, this.allTypes);
+    it('returns results for a single region', async function () {
+      const http = mockHttpClient();
+      http.expectGET('/instanceTypes').respond(200, this.allTypes);
 
       let results = null,
         service = this.awsInstanceTypeService;
@@ -61,12 +57,13 @@ describe('Service: InstanceType', function () {
         results = service.getAvailableTypesForRegions(result, ['us-west-2']);
       });
 
-      this.$httpBackend.flush();
+      await http.flush();
       expect(results).toEqual(['m1.small', 'm2.xlarge']);
     });
 
-    it('returns empty list for region with no instance types', function () {
-      this.$httpBackend.expectGET(API.baseUrl + '/instanceTypes').respond(200, this.allTypes);
+    it('returns empty list for region with no instance types', async function () {
+      const http = mockHttpClient();
+      http.expectGET('/instanceTypes').respond(200, this.allTypes);
 
       let results = null,
         service = this.awsInstanceTypeService;
@@ -75,12 +72,13 @@ describe('Service: InstanceType', function () {
         results = service.getAvailableTypesForRegions(result, ['us-west-3']);
       });
 
-      this.$httpBackend.flush();
+      await http.flush();
       expect(results).toEqual([]);
     });
 
-    it('returns an intersection when multiple regions are provided', function () {
-      this.$httpBackend.expectGET(API.baseUrl + '/instanceTypes').respond(200, this.allTypes);
+    it('returns an intersection when multiple regions are provided', async function () {
+      const http = mockHttpClient();
+      http.expectGET('/instanceTypes').respond(200, this.allTypes);
 
       let results = null,
         service = this.awsInstanceTypeService;
@@ -89,7 +87,7 @@ describe('Service: InstanceType', function () {
         results = service.getAvailableTypesForRegions(result, ['us-west-2', 'eu-west-1']);
       });
 
-      this.$httpBackend.flush();
+      await http.flush();
       expect(results).toEqual(['m2.xlarge']);
     });
 
@@ -108,8 +106,9 @@ describe('Service: InstanceType', function () {
       expect(service.filterInstanceTypes(types, 'hvm', true)).toEqual(['c400.a', 'c300.a', 'c3.a']);
     });
 
-    it('sorts instance types by family then class size', function () {
-      this.$httpBackend.expectGET(API.baseUrl + '/instanceTypes').respond(200, this.allTypes);
+    it('sorts instance types by family then class size', async function () {
+      const http = mockHttpClient();
+      http.expectGET('/instanceTypes').respond(200, this.allTypes);
 
       let results = null,
         service = this.awsInstanceTypeService;
@@ -118,7 +117,7 @@ describe('Service: InstanceType', function () {
         results = service.getAvailableTypesForRegions(result, ['us-east-1']);
       });
 
-      this.$httpBackend.flush();
+      await http.flush();
       expect(results).toEqual([
         'm4.large',
         'm4.xlarge',
@@ -162,6 +161,9 @@ describe('Service: InstanceType', function () {
         { type: 't2.nano', cat: 'micro' },
         { type: 't2.micro', cat: 'micro' },
         { type: 't2.small', cat: 'micro' },
+        { type: 't3.nano', cat: 'micro' },
+        { type: 't3.micro', cat: 'micro' },
+        { type: 't3.small', cat: 'micro' },
         { type: 'm3.small', cat: 'custom' },
         { type: 'a1.medium', cat: 'custom' },
       ];
@@ -175,8 +177,11 @@ describe('Service: InstanceType', function () {
     it('returns false for instance types NOT in category', function () {
       const input = [
         { type: 't2.nano', cat: 'general' },
+        { type: 't3.nano', cat: 'general' },
         { type: 't2.micro', cat: 'general' },
+        { type: 't3.micro', cat: 'general' },
         { type: 't2.medium', cat: 'micro' },
+        { type: 't3.medium', cat: 'micro' },
       ];
       let service = this.awsInstanceTypeService;
 
@@ -189,9 +194,11 @@ describe('Service: InstanceType', function () {
       const input = [
         { type: 'm5.large', cat: 'memory' },
         { type: 't2.small', cat: 'memory' },
+        { type: 't3.something', cat: 'memory' },
         { type: 'r5.xlarge', cat: 'micro' },
         { type: 'm5.large', cat: 'invalid' },
         { type: 't2.invalid', cat: 'memory' },
+        { type: 't3.invalid', cat: 'memory' },
         { type: 'invalid', cat: 'micro' },
         { type: 'invalid', cat: 'invalid' },
       ];

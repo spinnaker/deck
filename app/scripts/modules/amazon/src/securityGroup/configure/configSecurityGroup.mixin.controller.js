@@ -322,7 +322,8 @@ module(AMAZON_SECURITYGROUP_CONFIGURE_CONFIGSECURITYGROUP_MIXIN_CONTROLLER, [
 
     ctrl.updateName = function () {
       const { securityGroup } = $scope;
-      const name = NameUtils.getClusterName(application.name, securityGroup.stack, securityGroup.detail);
+      const appName = application.isStandalone ? application.name.split('-')[0] : application.name;
+      const name = NameUtils.getClusterName(appName, securityGroup.stack, securityGroup.detail);
       securityGroup.name = name;
       $scope.namePreview = name;
     };
@@ -347,7 +348,7 @@ module(AMAZON_SECURITYGROUP_CONFIGURE_CONFIGSECURITYGROUP_MIXIN_CONTROLLER, [
 
     ctrl.updateRuleType = function (type, ruleset, index) {
       const rule = ruleset[index];
-      if (type === 'icmp') {
+      if (type === 'icmp' || type === 'icmpv6') {
         rule.startPort = 0;
         rule.endPort = 0;
       }

@@ -162,10 +162,25 @@ export const ArtifactRow = ({ isSelected, clickHandler, version: versionInfo, re
 };
 
 type ArtifactStatusList = IStatusBubbleStackProps['statuses'];
-function getArtifactStatuses({ environments }: IManagedArtifactVersion): ArtifactStatusList {
+function getArtifactStatuses({ environments, lifecycleSteps }: IManagedArtifactVersion): ArtifactStatusList {
   const statuses: ArtifactStatusList = [];
   // NOTE: The order in which entries are added to `statuses` is important. The highest priority
   // item must be inserted first.
+
+  const preDeploymentSteps = lifecycleSteps?.filter(
+    ({ scope, type, status }) =>
+      scope === 'PRE_DEPLOYMENT' && ['BUILD', 'BAKE'].includes(type) && ['RUNNING', 'FAILED'].includes(status),
+  );
+
+  if (preDeploymentSteps?.length > 0) {
+    // These steps come in with chronological ordering, but we need reverse-chronological orddering for display
+    preDeploymentSteps.reverse().forEach(({ type, status }) => {
+      statuses.push({
+        iconName: type === 'BUILD' ? 'build' : 'bake',
+        appearance: status === 'RUNNING' ? 'progress' : 'error',
+      });
+    });
+  }
 
   const pendingConstraintIcons = new Set<IconNames>();
   const failedConstraintIcons = new Set<IconNames>();

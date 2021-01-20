@@ -1,5 +1,4 @@
-
-import { API } from 'core/api';
+import { REST } from 'core/api';
 
 export interface IPreconfiguredJobParameter {
   name: string;
@@ -22,6 +21,6 @@ export interface IPreconfiguredJob {
 
 export const PreconfiguredJobReader = {
   list(): PromiseLike<IPreconfiguredJob[]> {
-    return API.one('jobs').all('preconfigured').useCache().getList();
+    return REST('/jobs/preconfigured').useCache().get();
   },
 };

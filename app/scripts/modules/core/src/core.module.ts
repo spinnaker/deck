@@ -33,6 +33,7 @@ import { APPLICATION_BOOTSTRAP_MODULE } from './bootstrap';
 import { APPLICATION_MODULE } from './application/application.module';
 import { ARTIFACT_MODULE } from './artifact/artifact.module';
 import { AUTHENTICATION_MODULE } from './authentication/authentication.module';
+import { CI_MODULE } from './ci/ci.module';
 import { CLOUD_PROVIDER_MODULE } from './cloudProvider/cloudProvider.module';
 import { CLUSTER_MODULE } from './cluster/cluster.module';
 import { CUSTOM_BANNER_CONFIG } from './application/config/customBanner/customBannerConfig.component';
@@ -84,6 +85,7 @@ import { CORE_SECURITYGROUP_SECURITYGROUP_MODULE } from './securityGroup/securit
 import { CORE_TASK_TASK_MODULE } from './task/task.module';
 import { CORE_UTILS_UTILS_MODULE } from './utils/utils.module';
 import { CORE_VALIDATION_VALIDATION_MODULE } from './validation/validation.module';
+import { CORE_BANNER_CONTAINER_MODULE } from './banner/bannerContainer.module';
 import ANGULAR_MESSAGES from 'angular-messages';
 import ANGULAR_SANITIZE from 'angular-sanitize';
 import { angularSpinner } from 'angular-spinner';
@@ -115,6 +117,7 @@ module(CORE_MODULE, [
   ARTIFACT_MODULE,
   AUTHENTICATION_MODULE,
 
+  CI_MODULE,
   CLOUD_PROVIDER_MODULE,
   CLUSTER_MODULE,
   CUSTOM_BANNER_CONFIG,
@@ -174,6 +177,7 @@ module(CORE_MODULE, [
   WIDGETS_MODULE,
 
   CORE_VALIDATION_VALIDATION_MODULE,
+  CORE_BANNER_CONTAINER_MODULE,
 ]).run(() => {
   // initialize all the stateful services
   State.initialize();

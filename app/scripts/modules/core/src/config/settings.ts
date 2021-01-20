@@ -27,6 +27,7 @@ export interface IFeatures {
   [key: string]: any;
   canary?: boolean;
   chaosMonkey?: boolean;
+  ci?: boolean;
   displayTimestampsInUserLocalTime?: boolean;
   dockerBake?: boolean;
   entityTags?: boolean;
@@ -46,11 +47,18 @@ export interface IFeatures {
   snapshots?: boolean;
   savePipelinesStageEnabled?: boolean;
   functions?: boolean;
+  kubernetesRawResources?: boolean;
 }
 
 export interface IDockerInsightSettings {
   enabled: boolean;
   url: string;
+}
+
+export interface IBannerSettings {
+  key: string;
+  active: boolean;
+  routes: string[];
 }
 
 export interface INewApplicationDefaults {
@@ -70,6 +78,7 @@ export interface ISpinnakerSettings {
   authEndpoint: string;
   authTtl: number;
   bakeryDetailUrl: string;
+  banners?: IBannerSettings[];
   checkForUpdates: boolean;
   debugEnabled: boolean;
   maxRunningExecutionsToRetrieve: number;
