@@ -6,7 +6,7 @@ import ReactDOM from 'react-dom';
 import { defaultsDeep, extend, omit } from 'lodash';
 
 import { AccountService } from 'core/account/AccountService';
-import { API } from 'core/api';
+import { REST } from 'core/api';
 import { BASE_EXECUTION_DETAILS_CTRL } from './common/baseExecutionDetails.controller';
 import { ConfirmationModalService } from 'core/confirmationModal';
 import { STAGE_NAME } from './StageName';
@@ -342,12 +342,9 @@ module(CORE_PIPELINE_CONFIG_STAGES_STAGE_MODULE, [
     '$stateParams',
     function ($scope, $stateParams) {
       const restartStage = function () {
-        return API.one('pipelines')
-          .one($stateParams.executionId)
-          .one('stages', $scope.stage.id)
-          .one('restart')
-          .data({ skip: false })
-          .put()
+        return REST('/pipelines')
+          .path($stateParams.executionId, 'stages', $scope.stage.id, 'restart')
+          .put({ skip: false })
           .then(function () {
             $scope.stage.isRestarting = true;
           });

@@ -32,7 +32,7 @@ export interface IRequestBuilder {
   /** issues a PATCH request */
   patch<T = any, P = any>(data?: P): PromiseLike<T>;
   /** issues a DELETE request */
-  delete<T = any>(): PromiseLike<T>;
+  delete<T = any, P = any>(data?: P): PromiseLike<T>;
 }
 
 /**
@@ -147,7 +147,7 @@ function joinPaths(...paths: IPrimitive[]) {
 
 /** The base request builder implementation */
 export class RequestBuilder implements IRequestBuilder {
-  static defaultHttpClient = new AngularJSHttpClient();
+  static defaultHttpClient: IHttpClientImplementation = new AngularJSHttpClient();
 
   public constructor(
     protected config: IRequestBuilderConfig = makeRequestBuilderConfig(),
@@ -169,7 +169,7 @@ export class RequestBuilder implements IRequestBuilder {
   }
 
   path(...paths: IPrimitive[]) {
-    const url = joinPaths(this.config.url, ...paths);
+    const url = joinPaths(this.config.url, ...paths.map((path) => encodeURIComponent(path)));
     return this.builder({ ...this.config, url });
   }
 
@@ -202,11 +202,10 @@ export class RequestBuilder implements IRequestBuilder {
     return this.httpClient.patch<T>({ ...this.config, url, data });
   }
 
-  // queryParams argument for backwards compat
-  delete<T>(queryParams: object = {}) {
-    const params = { ...this.config.params, ...queryParams };
+  delete<T>(deleteData?: any) {
+    const data = deleteData ?? this.config.data;
     const url = joinPaths(this.baseUrl, this.config.url);
-    return this.httpClient.delete<T>({ ...this.config, url, params });
+    return this.httpClient.delete<T>({ ...this.config, url, data });
   }
 
   useCache(cache = true) {
@@ -242,6 +241,18 @@ export class DeprecatedRequestBuilder extends RequestBuilder implements IDepreca
   useCache = (cache: boolean | ICache = true) => this.builder({ ...this.config, cache: cache as boolean });
 }
 
+class DeprecatedRequestBuilderRoot extends DeprecatedRequestBuilder {
+  // Do not encode paths for the root API.one() call
+  one = (...paths: string[]) => {
+    const url = joinPaths(this.config.url, ...paths);
+    return this.builder({ ...this.config, url });
+  };
+  all = (...paths: string[]) => {
+    const url = joinPaths(this.config.url, ...paths);
+    return this.builder({ ...this.config, url });
+  };
+}
+
 export const invalidContentMessage = 'API response was neither JSON nor zero-length html or text';
 
 export function makeRequestBuilderConfig(pathPrefix?: string): IRequestBuilderConfig {
@@ -250,13 +261,13 @@ export function makeRequestBuilderConfig(pathPrefix?: string): IRequestBuilderCo
     cache: false,
     data: undefined,
     params: {},
-    timeout: (SETTINGS.pollSchedule || 3000) * 2 + 5000,
+    timeout: (SETTINGS.pollSchedule || 30000) * 2 + 5000,
     headers: { 'X-RateLimit-App': 'deck' },
   };
 }
 
 /** @deprecated use REST('/path/to/gate/endpoint') */
-export const API: IDeprecatedRequestBuilder = new DeprecatedRequestBuilder(makeRequestBuilderConfig());
+export const API: IDeprecatedRequestBuilder = new DeprecatedRequestBuilderRoot(makeRequestBuilderConfig());
 
 /**
  * A REST client used to access Gate endpoints

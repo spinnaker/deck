@@ -1,7 +1,6 @@
-
 import { $q } from 'ngimport';
 
-import { API } from 'core/api/ApiService';
+import { REST } from 'core/api/ApiService';
 import { IBuild, IJobConfig, IGcbTrigger } from 'core/domain';
 
 export enum BuildServiceType {
@@ -13,7 +12,7 @@ export enum BuildServiceType {
 
 export class IgorService {
   public static listMasters(buildType: BuildServiceType = null): PromiseLike<string[]> {
-    const allMasters: PromiseLike<string[]> = API.one('v2').one('builds').withParams({ type: buildType }).get();
+    const allMasters: PromiseLike<string[]> = REST('/v2/builds').query({ type: buildType }).get();
     if (!allMasters) {
       return $q.reject('An error occurred when retrieving build masters');
     }
@@ -30,30 +29,30 @@ export class IgorService {
   }
 
   public static listJobsForMaster(master: string): PromiseLike<string[]> {
-    return API.one('v2').one('builds').one(master).one('jobs').get();
+    return REST('/v2/builds').path(master, 'jobs').get();
   }
 
   public static listBuildsForJob(master: string, job: string): PromiseLike<IBuild[]> {
-    return API.one('v2').one('builds').one(master).one('builds').one(job).get();
+    return REST('/v2/builds').path(master, 'builds', job).get();
   }
 
   public static getJobConfig(master: string, job: string): PromiseLike<IJobConfig> {
-    return API.one('v2').one('builds').one(master).one('jobs').one(job).get();
+    return REST('/v2/builds').path(master, 'jobs', job).get();
   }
 
   public static getGcbAccounts(): PromiseLike<string[]> {
-    return API.one('gcb').one('accounts').get();
+    return REST('/gcb/accounts').get();
   }
 
   public static getGcbTriggers(account: string): PromiseLike<IGcbTrigger[]> {
-    return API.one('gcb').one('triggers').one(account).get();
+    return REST('/gcb/triggers').path(account).get();
   }
 
   public static getCodeBuildAccounts(): PromiseLike<string[]> {
-    return API.one('codebuild').one('accounts').get();
+    return REST('/codebuild/accounts').get();
   }
 
   public static getCodeBuildProjects(account: string): PromiseLike<string[]> {
-    return API.one('codebuild').one('projects').one(account).get();
+    return REST('/codebuild/projects').path(account).get();
   }
 }

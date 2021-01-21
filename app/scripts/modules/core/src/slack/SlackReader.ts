@@ -1,4 +1,4 @@
-import { API } from 'core';
+import { REST } from 'core';
 
 export interface ISlackChannel {
   id: string;
@@ -12,8 +12,8 @@ export interface ISlackChannel {
 
 export class SlackReader {
   public static getChannels(): PromiseLike<ISlackChannel[]> {
-    return API.one('slack', 'channels')
-      .getList()
+    return REST('/slack/channels')
+      .get()
       .catch(() => [] as ISlackChannel[]);
   }
 }
