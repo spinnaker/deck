@@ -82,8 +82,8 @@ export class ExecutionFilterService {
     this.groupsUpdatedStream.next(groups);
   }
 
-  private static doesPipelineMatchCheckedCategories(config: IPipeline, checkedCategories: string[]): boolean {
-    if (!config.categories || config.categories.length === 0) {
+  public static doesPipelineMatchCheckedCategories(config: IPipeline, checkedCategories: string[]): boolean {
+    if (checkedCategories.length === 0 || !config.categories || config.categories.length === 0) {
       return false;
     }
     const decoded: IPipelineCategory[] = checkedCategories
