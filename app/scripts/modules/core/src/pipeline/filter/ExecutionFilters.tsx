@@ -51,12 +51,15 @@ export class ExecutionFilters extends React.Component<IExecutionFiltersProps, IE
     super(props);
 
     const searchString = ExecutionState.filterModel.asFilterModel.sortFilter.filter;
+    const pipelineConfigs = this.props.application.pipelineConfigs.loadFailure
+      ? []
+      : get(this.props.application, 'pipelineConfigs.data', []);
     this.state = {
       pipelineNames: this.getPipelineNames(false).filter((pipelineName) =>
         searchString ? pipelineName.toLocaleLowerCase().includes(searchString.toLocaleLowerCase()) : true,
       ),
       strategyNames: this.getPipelineNames(true),
-      categories: this.getCategories(),
+      categories: this.getCategories(pipelineConfigs),
       pipelineReorderEnabled: false,
       searchString,
       tags: ExecutionState.filterModel.asFilterModel.tags,
@@ -108,14 +111,10 @@ export class ExecutionFilters extends React.Component<IExecutionFiltersProps, IE
     });
   };
 
-  private getCategories(): IOrderedCategoryFilters {
-    const pipelines = this.props.application.pipelineConfigs.loadFailure
-      ? []
-      : get(this.props.application, 'pipelineConfigs.data', []);
-
+  private getCategories(pipelineConfigs: IPipeline[]): IOrderedCategoryFilters {
     // Since pipeline.category is an array of categories, we'll need to flatten
     const extractedCategories: IPipelineCategory[] = flatten(
-      pipelines.filter((pipeline) => pipeline.categories).map((pipeline) => pipeline.categories),
+      pipelineConfigs.filter((pipeline) => pipeline.categories).map((pipeline) => pipeline.categories),
     );
 
     return extractedCategories.reduce(
