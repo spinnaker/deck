@@ -1,5 +1,5 @@
 import { IQService, ITimeoutService, module } from 'angular';
-import { get, identity, pickBy } from 'lodash';
+import { get, identity, pickBy, uniq } from 'lodash';
 import { StateService } from '@uirouter/core';
 
 import { REST } from 'core/api/ApiService';
@@ -11,12 +11,13 @@ import { SETTINGS } from 'core/config/settings';
 import { ApplicationDataSource } from 'core/application/service/applicationDataSource';
 import { DebugWindow } from 'core/utils/consoleDebug';
 import { IPipeline } from 'core/domain/IPipeline';
-import { ISortFilter } from 'core/filterModel';
+import { FilterModelService, ISortFilter } from 'core/filterModel';
 import { ExecutionState } from 'core/state';
 import { IRetryablePromise, retryablePromise } from 'core/utils/retryablePromise';
 import { ReactInjector } from 'core/reactShims';
 import { PipelineConfigService } from '../config/services/PipelineConfigService';
 import UIROUTER_ANGULARJS from '@uirouter/angularjs';
+import { ExecutionFilterService } from '../filter/executionFilter.service';
 
 export class ExecutionService {
   public get activeStatuses(): string[] {
@@ -84,10 +85,11 @@ export class ExecutionService {
     expand = false,
   ): PromiseLike<IExecution[]> {
     const sortFilter: ISortFilter = ExecutionState.filterModel.asFilterModel.sortFilter;
+    const categories = FilterModelService.getCheckValues(sortFilter.category);
     const pipelines = Object.keys(sortFilter.pipeline);
     const statuses = Object.keys(pickBy(sortFilter.status || {}, identity));
     const limit = sortFilter.count;
-    if (application && pipelines.length) {
+    if (application && (pipelines.length || categories.length)) {
       return this.getConfigIdsFromFilterModel(application).then((pipelineConfigIds) => {
         return this.getFilteredExecutions(application.name, statuses, limit, pipelineConfigIds, expand);
       });
@@ -133,16 +135,22 @@ export class ExecutionService {
   }
 
   private getConfigIdsFromFilterModel(application: Application): PromiseLike<string[]> {
-    const pipelines = Object.keys(ExecutionState.filterModel.asFilterModel.sortFilter.pipeline);
+    const sortFilter = ExecutionState.filterModel.asFilterModel.sortFilter;
+    const categories = FilterModelService.getCheckValues(sortFilter.category);
+    const pipelines = Object.keys(sortFilter.pipeline);
     application.pipelineConfigs.activate();
     return application.pipelineConfigs.ready().then(() => {
       const data = application.pipelineConfigs.data.concat(application.strategyConfigs.data);
-      return pipelines
+      const configIdsFromCheckedPipelines = pipelines
         .map((p) => {
           const match = data.find((c: IPipeline) => c.name === p);
           return match ? match.id : null;
         })
         .filter((id) => !!id);
+      const configIdsFromCheckedCategories = data
+        .filter((p: IPipeline) => ExecutionFilterService.doesPipelineMatchCheckedCategories(p, categories))
+        .map((p: IPipeline) => p.id);
+      return configIdsFromCheckedPipelines.concat(uniq(configIdsFromCheckedCategories));
     });
   }
 
