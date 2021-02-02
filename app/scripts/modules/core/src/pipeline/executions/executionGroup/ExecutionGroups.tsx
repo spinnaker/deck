@@ -202,7 +202,6 @@ export class ExecutionGroups extends React.Component<IExecutionGroupsProps, IExe
         key={group.heading}
         group={group}
         application={this.props.application}
-        id={group.heading}
         manualJudgment={this.nestedManualJudgment(groups)}
       />
     ));

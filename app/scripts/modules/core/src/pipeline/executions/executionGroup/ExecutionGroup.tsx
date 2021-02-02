@@ -41,7 +41,6 @@ export interface IExecutionGroupProps {
   application: Application;
   parent: HTMLDivElement;
   manualJudgment: any;
-  id: string;
 }
 
 export interface IExecutionGroupState {
@@ -311,7 +310,7 @@ export class ExecutionGroup extends React.PureComponent<IExecutionGroupProps, IE
     });
 
     return (
-      <div className={`execution-group ${showingDetails ? 'showing-details' : 'details-hidden'}`} id={this.props.id}>
+      <div className={`execution-group ${showingDetails ? 'showing-details' : 'details-hidden'}`}>
         {group.heading && (
           <div className="clickable sticky-header" onClick={this.handleHeadingClicked}>
             <div ref={this.headerRef} className={`execution-group-heading ${pipelineDisabled ? 'inactive' : 'active'}`}>
