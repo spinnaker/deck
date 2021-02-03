@@ -2,7 +2,7 @@ import React from 'react';
 import ReactGA from 'react-ga';
 import { UISref } from '@uirouter/react';
 
-import { IExecution, IExecutionStageSummary } from 'core/domain';
+import { IExecution, IExecutionStageSummary, IManualJudgment } from 'core/domain';
 import { OrchestratedItemRunningTime } from './OrchestratedItemRunningTime';
 import { duration } from 'core/utils/timeFormatters';
 
@@ -22,7 +22,7 @@ export interface IExecutionMarkerProps {
   previousStageActive?: boolean;
   stage: IExecutionStageSummary;
   width: string;
-  manualJudgment: any;
+  manualJudgment?: IManualJudgment;
 }
 
 export interface IExecutionMarkerState {
@@ -87,12 +87,14 @@ export class ExecutionMarker extends React.Component<IExecutionMarkerProps, IExe
   private manualJudgmentStatus = (stageStatus: string, manualJudgment: any) => {
     let status = stageStatus;
     if (manualJudgment !== undefined && manualJudgment.length && stageStatus === 'running') {
-      const existStages = this.props.stage.stages.filter((stage) => stage.status.toLowerCase() === 'running');
-      existStages.forEach(({ context, type }) => {
-        if (this.leafNodeExist(context.executionId, manualJudgment) && type === 'pipeline') {
-          status = 'waiting';
-        }
-      });
+      this.props.stage.stages
+        .filter(
+          (stage) =>
+            stage.status.toLowerCase() === 'running' &&
+            stage.type === 'pipeline' &&
+            this.leafNodeExist(stage.context.executionId, manualJudgment),
+        )
+        .forEach((_stage) => (status = 'waiting'));
     }
     return status;
   };
@@ -121,28 +123,20 @@ export class ExecutionMarker extends React.Component<IExecutionMarkerProps, IExe
   };
 
   private fetchLeafNodeParameter = (type: string, leafNodeObject: any) => {
-    let leafNodeVal = '';
-    if (!isEmpty(leafNodeObject)) {
-      if (type === 'application') {
-        leafNodeVal = leafNodeObject.app ?? this.props.application.name;
-      } else {
-        leafNodeVal = leafNodeObject.id;
-      }
-    }
-    return leafNodeVal;
+    const appName = leafNodeObject?.app ?? this.props.application.name;
+    return isEmpty(leafNodeObject) ? '' : type === 'application' ? appName : leafNodeObject.id;
   };
 
   public render() {
     const { stage, application, execution, active, previousStageActive, width, manualJudgment } = this.props;
     const stageType = (stage.activeStageType || stage.type).toLowerCase(); // support groups
-    const PIPELINE_WAITING =
-      this.manualJudgmentStatus(stage.status.toLowerCase(), manualJudgment[execution.id]) === 'waiting';
+    const PIPELINE_STATUS = this.manualJudgmentStatus(stage.status.toLowerCase(), manualJudgment[execution.id]);
     const markerClassName = [
       stage.type !== 'group' ? 'clickable' : '',
       'stage',
       'execution-marker',
       `stage-type-${stageType}`,
-      `execution-marker-${this.manualJudgmentStatus(stage.status.toLowerCase(), manualJudgment[execution.id])}`,
+      `execution-marker-${PIPELINE_STATUS}`,
       active ? 'active' : '',
       previousStageActive ? 'after-active' : '',
       stage.isRunning ? 'glowing' : '',
@@ -155,41 +149,46 @@ export class ExecutionMarker extends React.Component<IExecutionMarkerProps, IExe
       SETTINGS.feature.executionMarkerInformationModal &&
       stage.status.toLowerCase() === 'terminal' &&
       stage.type === 'pipeline';
-    const stageContents = PIPELINE_WAITING ? (
-      <div className={markerClassName} style={{ width, backgroundColor: stage.color }}>
-        <UISref
-          to="home.applications.application.pipelines.executionDetails.execution"
-          params={{
-            application: this.redirectLeafNode(
-              'application',
-              manualJudgment[execution.id],
-              stage.stages[0].context.executionId,
-            ),
-            executionId: this.redirectLeafNode(
-              'executionId',
-              manualJudgment[execution.id],
-              stage.stages[0].context.executionId,
-            ),
-            executionParams: { application: application.name, executionId: execution.id },
-          }}
+    const stageContents =
+      PIPELINE_STATUS === 'waiting' ? (
+        <div className={markerClassName} style={{ width, backgroundColor: stage.color }}>
+          <UISref
+            to="home.applications.application.pipelines.executionDetails.execution"
+            params={{
+              application: this.redirectLeafNode(
+                'application',
+                manualJudgment[execution.id],
+                stage.stages[0].context.executionId,
+              ),
+              executionId: this.redirectLeafNode(
+                'executionId',
+                manualJudgment[execution.id],
+                stage.stages[0].context.executionId,
+              ),
+              executionParams: { application: application.name, executionId: execution.id },
+            }}
+          >
+            <a target="_self" style={{ textDecoration: 'none', color: 'black' }}>
+              <span className="horizontal center middle">
+                <span className="duration">waiting </span>
+                {<i className="fa fa-clock"></i>}
+              </span>
+            </a>
+          </UISref>
+        </div>
+      ) : (
+        <div
+          className={markerClassName}
+          style={{ width, backgroundColor: stage.color }}
+          onClick={this.handleStageClick}
         >
-          <a target="_self" style={{ textDecoration: 'none', color: 'black' }}>
-            <span className="horizontal center middle">
-              <span className="duration">waiting </span>
-              {<i className="fa fa-clock"></i>}
-            </span>
-          </a>
-        </UISref>
-      </div>
-    ) : (
-      <div className={markerClassName} style={{ width, backgroundColor: stage.color }} onClick={this.handleStageClick}>
-        <span className="horizontal center middle">
-          <MarkerIcon stage={stage} />
-          <span className="duration">{this.state.duration}</span>
-          {showInfoIcon && <i className="fa fa-info-circle" onClick={this.handleStageInformationClick} />}
-        </span>
-      </div>
-    );
+          <span className="horizontal center middle">
+            <MarkerIcon stage={stage} />
+            <span className="duration">{this.state.duration}</span>
+            {showInfoIcon && <i className="fa fa-info-circle" onClick={this.handleStageInformationClick} />}
+          </span>
+        </div>
+      );
     return (
       <span>
         <TooltipComponent application={application} execution={execution} stage={stage} executionMarker={true}>

@@ -7,7 +7,7 @@ import { SETTINGS } from '../../../config/settings';
 
 import { Application } from 'core/application/application.model';
 import { ExecutionGroup } from './ExecutionGroup';
-import { IExecution, IExecutionGroup } from 'core/domain';
+import { IExecution, IExecutionGroup, IManualJudgment } from 'core/domain';
 import { Observable } from 'rxjs';
 import { ReactInjector } from 'core/reactShims';
 import { ExecutionState } from 'core/state';
@@ -97,10 +97,17 @@ export class ExecutionGroups extends React.Component<IExecutionGroupsProps, IExe
       this.stateChangeSuccessSubscription.unsubscribe();
     }
   }
+  public filterExecutions = (runningExecutions: IExecution[]) =>
+    runningExecutions.filter(
+      (exec) =>
+        exec.trigger.parentExecution &&
+        exec.stages.filter((stage) => (stage.type == 'manualJudgment' || 'PIPELINE') && stage.status === 'RUNNING')
+          .length,
+    );
 
   public nestedManualJudgment(groups: IExecutionGroup[]) {
     if (SETTINGS.feature.manualJudgementEnabled) {
-      const nestedObj: any = {};
+      const nestedObj: IManualJudgment = {};
       const crossApplicationChildExist: Array<{ parent: string; currentChild: string; child: string }> = [];
       groups.forEach(({ runningExecutions }) => {
         if (runningExecutions && runningExecutions.length) {
@@ -108,13 +115,7 @@ export class ExecutionGroups extends React.Component<IExecutionGroupsProps, IExe
           if (childPipeline.length > 0) {
             crossApplicationChildExist.push(...childPipeline);
           }
-          const executions = runningExecutions.filter(
-            (exec) =>
-              exec.trigger.parentExecution &&
-              exec.stages.filter(
-                (stage) => (stage.type == 'manualJudgment' || 'PIPELINE') && stage.status === 'RUNNING',
-              ).length,
-          );
+          const executions = this.filterExecutions(runningExecutions);
           executions.forEach((execution) => {
             const stageType = execution.stages.filter((stage) => stage.type == 'manualJudgment').length
               ? 'id'
@@ -149,6 +150,7 @@ export class ExecutionGroups extends React.Component<IExecutionGroupsProps, IExe
     return childAcrossAppliocation;
   }
 
+  // Below function is use to fetch execution context if child pipeline is exist in another application
   crossAppDataFetch = (executions: Array<{ parent: string; currentChild: string; child: string }>, nestedObj: any) => {
     const manualJudgementDataObj = nestedObj;
     executions.forEach((exec) => {
@@ -159,17 +161,10 @@ export class ExecutionGroups extends React.Component<IExecutionGroupsProps, IExe
           executionContext.stages.forEach((stage) => {
             if (stage.type === 'manualJudgment' && stage.status === 'RUNNING') {
               manualJudgementDataObj[exec.parent] = manualJudgementDataObj[exec.parent] ?? [];
-              const leafeNode =
-                exec.child === exec.currentChild
-                  ? { name: executionContext.name, id: exec.child, app: executionContext.application }
-                  : {
-                      name: executionContext.name,
-                      id: exec.child,
-                      currentChild: exec.currentChild,
-                      app: executionContext.application,
-                    };
+              const leafeNode = this.getLeafNode(exec, executionContext);
               manualJudgementDataObj[exec.parent].push(leafeNode);
             }
+            // Below condition is checking whether stage contains child pipeline in it.
             if (stage.context.executionId !== undefined) {
               nestedpipeline.push({
                 parent: exec.parent,
@@ -187,16 +182,31 @@ export class ExecutionGroups extends React.Component<IExecutionGroupsProps, IExe
     return manualJudgementDataObj;
   };
 
+  public getLeafNode = (
+    execution: { parent: string; currentChild: string; child: string },
+    executionContext: IExecution,
+  ) => {
+    return execution.child === execution.currentChild
+      ? { name: executionContext.name, id: execution.child, app: executionContext.application }
+      : {
+          name: executionContext.name,
+          id: execution.child,
+          currentChild: execution.currentChild,
+          app: executionContext.application,
+        };
+  };
+
   public render(): React.ReactElement<ExecutionGroups> {
     const { groups = [], container, showingDetails } = this.state;
-    const hasGroups = groups.length > 0;
     const className = `row pipelines executions ${showingDetails ? 'showing-details' : ''}`;
-
     const allGroups = (groups || [])
       .filter((g: IExecutionGroup) => g?.config?.migrationStatus === 'Started')
       .concat(groups.filter((g) => g?.config?.migrationStatus !== 'Started'));
 
-    const executionGroups = ExecutionFilterService.awaitingJudgment(allGroups).map((group: IExecutionGroup) => (
+    const filteredGroups = ExecutionFilterService.awaitingJudgment(allGroups);
+    const hasGroups = filteredGroups.length > 0;
+
+    const executionGroups = filteredGroups.map((group: IExecutionGroup) => (
       <ExecutionGroup
         parent={container}
         key={group.heading}

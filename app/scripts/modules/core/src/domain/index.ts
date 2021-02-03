@@ -38,6 +38,7 @@ export * from './ILoadBalancerIncompatibility';
 
 export * from './IManagedEntity';
 export * from './IManifest';
+export * from './IManualJudgment';
 
 export * from './INotification';
 export * from './INotificationTypeConfig';

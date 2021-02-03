@@ -13,6 +13,7 @@ import {
   IExecution,
   IExecutionGroup,
   IExecutionTrigger,
+  IManualJudgment,
   IPipeline,
   IPipelineCommand,
   IPipelineTemplateConfigV2,
@@ -40,7 +41,7 @@ export interface IExecutionGroupProps {
   group: IExecutionGroup;
   application: Application;
   parent: HTMLDivElement;
-  manualJudgment: any;
+  manualJudgment: IManualJudgment;
 }
 
 export interface IExecutionGroupState {
