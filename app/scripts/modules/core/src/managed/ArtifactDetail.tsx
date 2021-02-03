@@ -13,7 +13,7 @@ import {
   IManagedArtifactVersionEnvironment,
 } from '../domain';
 import { Application } from '../application';
-import { useEventListener, Markdown } from '../presentation';
+import { useEventListener, Markdown, CollapsibleElement } from '../presentation';
 
 import { AbsoluteTimestamp } from './AbsoluteTimestamp';
 import { ArtifactDetailHeader } from './ArtifactDetailHeader';
@@ -206,46 +206,10 @@ const EnvironmentCards = memo(
   },
 );
 
-const CollapsibleElement: React.FC = ({ children }) => {
-  const [isCollapsed, setIsCollapsed] = React.useState(true);
-  const [isOverflowing, setIsOverflowing] = React.useState(false);
-  const contentRef = React.useRef<HTMLDivElement>(null);
-
-  const checkIsOverflowing = React.useCallback(() => {
-    if (!contentRef.current) return;
-    setIsOverflowing(contentRef.current.offsetHeight < contentRef.current.scrollHeight);
-  }, []);
-
-  React.useEffect(() => {
-    checkIsOverflowing();
-  }, [children, checkIsOverflowing]);
-
-  React.useEffect(() => {
-    window.addEventListener('resize', checkIsOverflowing);
-    return () => window.removeEventListener('resize', checkIsOverflowing);
-  }, []);
-
-  return (
-    <div className="collapsible-element">
-      <div
-        className={classNames(['content', { ['collapsed']: isCollapsed, ['faded']: isOverflowing }])}
-        ref={contentRef}
-      >
-        {children}
-      </div>
-      {(isOverflowing || !isCollapsed) && (
-        <button className="btn btn-link expand-button" onClick={() => setIsCollapsed((state) => !state)}>
-          {isCollapsed ? 'Read more' : 'Read less'}
-        </button>
-      )}
-    </div>
-  );
-};
-
 const VersionMetadataItem = ({ label, value }: { label: string; value: JSX.Element | string }) => (
   <div className="flex-container-h sp-margin-xs-bottom">
     <div className="metadata-label text-bold text-right sp-margin-l-right flex-none">{label}</div>
-    <CollapsibleElement>{value}</CollapsibleElement>
+    <CollapsibleElement maxHeight={150}>{value}</CollapsibleElement>
   </div>
 );
 

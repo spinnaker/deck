@@ -33,45 +33,4 @@
       background-color: var(--color-status-info);
     }
   }
-
-  .collapsible-element {
-    position: relative;
-
-    .content {
-      position: relative;
-      overflow: hidden;
-
-      &.collapsed {
-        max-height: 150px;
-
-        &.faded:after {
-          content: '';
-          width: 100%;
-          height: 100%;
-          position: absolute;
-          left: 0;
-          top: 0;
-          background: linear-gradient(180deg, transparent 120px, var(--color-white) 140px);
-        }
-      }
-    }
-    .expand-button {
-      display: none;
-      position: absolute;
-      bottom: 0;
-      text-align: center;
-      padding-top: 2px;
-      border-top: 2px solid #009cb8;
-      color: #009cb8;
-      width: 100%;
-      background-color: var(--color-white);
-    }
-
-    &:hover {
-      .expand-button {
-        display: block;
-        outline: none;
-      }
-    }
-  }
 }
