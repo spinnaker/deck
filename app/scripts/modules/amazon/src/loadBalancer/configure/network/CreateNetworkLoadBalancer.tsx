@@ -1,5 +1,5 @@
 import React from 'react';
-import { cloneDeep, get } from 'lodash';
+import { cloneDeep, every, get } from 'lodash';
 import { FormikErrors } from 'formik';
 
 import {
@@ -287,7 +287,12 @@ export class CreateNetworkLoadBalancer extends React.Component<
               label="Advanced Settings"
               wizard={wizard}
               order={nextIdx()}
-              render={({ innerRef }) => <NLBAdvancedSettings ref={innerRef} formik={formik} />}
+              render={({ innerRef }) => (
+                <NLBAdvancedSettings
+                  ref={innerRef}
+                  showDualstack={!formik.values.isInternal && every(formik.values.targetGroups, { targetType: 'ip' })}
+                />
+              )}
             />
           </>
         )}
