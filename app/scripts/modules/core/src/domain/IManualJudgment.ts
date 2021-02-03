@@ -1,3 +1,11 @@
 export interface IManualJudgment {
-  [key: string]: Array<{ id?: string; name: string; pipelineId?: string; app?: string; currentChild?: string }>;
+  [key: string]: IManualJudgmentConfig[];
+}
+
+export interface IManualJudgmentConfig {
+  id?: string;
+  name: string;
+  pipelineId?: string;
+  app?: string;
+  currentChild?: string;
 }

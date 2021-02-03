@@ -2,7 +2,7 @@ import React from 'react';
 import ReactGA from 'react-ga';
 import { UISref } from '@uirouter/react';
 
-import { IExecution, IExecutionStageSummary, IManualJudgment } from 'core/domain';
+import { IExecution, IExecutionStageSummary, IManualJudgment, IManualJudgmentConfig } from 'core/domain';
 import { OrchestratedItemRunningTime } from './OrchestratedItemRunningTime';
 import { duration } from 'core/utils/timeFormatters';
 
@@ -84,7 +84,7 @@ export class ExecutionMarker extends React.Component<IExecutionMarkerProps, IExe
     });
   };
 
-  private manualJudgmentStatus = (stageStatus: string, manualJudgment: any) => {
+  private manualJudgmentStatus = (stageStatus: string, manualJudgment: IManualJudgmentConfig[]) => {
     let status = stageStatus;
     if (manualJudgment !== undefined && manualJudgment.length && stageStatus === 'running') {
       this.props.stage.stages
@@ -99,10 +99,14 @@ export class ExecutionMarker extends React.Component<IExecutionMarkerProps, IExe
     return status;
   };
 
-  private leafNodeExist = (executionContextId: string, manualJudgment: any): string => {
+  private leafNodeExist = (
+    executionContextId: string,
+    manualJudgment: IManualJudgmentConfig[],
+  ): IManualJudgmentConfig => {
     const nestedLeafnodeObj = this.props.manualJudgment[executionContextId];
     const leafNodeObj = manualJudgment.find(
-      (leafnode: any) => leafnode.currentChild === executionContextId || leafnode.id === executionContextId,
+      (leafnode: IManualJudgmentConfig) =>
+        leafnode.currentChild === executionContextId || leafnode.id === executionContextId,
     );
     if (!nestedLeafnodeObj && !leafNodeObj) return null;
     if (nestedLeafnodeObj) {
@@ -113,7 +117,11 @@ export class ExecutionMarker extends React.Component<IExecutionMarkerProps, IExe
     return null;
   };
 
-  private redirectLeafNode = (type: string, manualJudgment: any, contextExecutionId: string): any => {
+  private redirectLeafNode = (
+    type: string,
+    manualJudgment: IManualJudgmentConfig[],
+    contextExecutionId: string,
+  ): any => {
     if (manualJudgment !== undefined) {
       const leafnode = this.leafNodeExist(contextExecutionId, manualJudgment);
       if (leafnode) {
@@ -122,7 +130,7 @@ export class ExecutionMarker extends React.Component<IExecutionMarkerProps, IExe
     }
   };
 
-  private fetchLeafNodeParameter = (type: string, leafNodeObject: any) => {
+  private fetchLeafNodeParameter = (type: string, leafNodeObject: IManualJudgmentConfig) => {
     const appName = leafNodeObject?.app ?? this.props.application.name;
     return isEmpty(leafNodeObject) ? '' : type === 'application' ? appName : leafNodeObject.id;
   };
