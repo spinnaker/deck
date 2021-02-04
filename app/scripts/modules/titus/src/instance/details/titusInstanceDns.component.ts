@@ -4,7 +4,7 @@ import { react2angular } from 'react2angular';
 
 import { TitusInstanceDns } from './TitusInstanceDns';
 
-export const TITUS_INSTANCE_DNS_COMPONENT = 'spinnaker.application.titusInstanceInformation.component';
+export const TITUS_INSTANCE_DNS_COMPONENT = 'spinnaker.application.titusInstanceDns.component';
 
 module(TITUS_INSTANCE_DNS_COMPONENT, []).component(
   'titusInstanceDns',
