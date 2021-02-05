@@ -17,8 +17,8 @@ import {
   YamlEditor,
 } from 'core';
 import { CheckboxInput } from 'core/presentation';
-import { EXCLUDED_ARTIFACT_TYPES, SOURCE_TYPES, IAwsCodeBuildSource } from './IAwsCodeBuildSource';
-import { AwsCodeBuildSourceList } from './AwsCodeBuildSourceList';
+import { EXCLUDED_ARTIFACT_TYPES, SOURCE_TYPES, IAwsCodeBuildSource, IAwsCodeBuildSecondarySourcesVersion } from './IAwsCodeBuildSource';
+import { AwsCodeBuildSourceList, AwsCodeBuildSecondarySourcesVersionList } from './AwsCodeBuildSourceList';
 
 export function AwsCodeBuildStageForm(props: IFormikStageConfigInjectedProps) {
   const stage = props.formik.values;
@@ -136,6 +136,20 @@ export function AwsCodeBuildStageForm(props: IFormikStageConfigInjectedProps) {
             {...inputProps}
             sources={get(stage, 'secondarySources')}
             updateSources={(sources: IAwsCodeBuildSource[]) => onFieldChange('secondarySources', sources)}
+            stage={stage}
+            pipeline={props.pipeline}
+          />
+        )}
+      />
+      <FormikFormField
+        help={<HelpField id="pipeline.config.codebuild.secondarySourcesVersionOverride" />}
+        label="Secondary Sources Version"
+        name="secondarySourcesVersionOverride"
+        input={(inputProps: IFormInputProps) => (
+          <AwsCodeBuildSecondarySourcesVersionList
+            {...inputProps}
+            secondarySourcesVersionOverride={get(stage, 'secondarySourcesVersionOverride')}
+            updateSecondarySourcesVersion={(secondarySourcesVersionOverride: IAwsCodeBuildSecondarySourcesVersion[]) => onFieldChange('secondarySourcesVersionOverride', secondarySourcesVersionOverride)}
             stage={stage}
             pipeline={props.pipeline}
           />
