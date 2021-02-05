@@ -176,10 +176,10 @@ export class ExecutionMarker extends React.Component<IExecutionMarkerProps, IExe
               executionParams: { application: application.name, executionId: execution.id },
             }}
           >
-            <a target="_self" style={{ textDecoration: 'none', color: 'black' }}>
+            <a target="_self" className="execution-waiting-link">
               <span className="horizontal center middle">
                 <span className="duration">waiting </span>
-                {<i className="fa fa-clock"></i>}
+                {<i className="fa fa-clock execution-waiting-fa"></i>}
               </span>
             </a>
           </UISref>
