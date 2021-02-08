@@ -44,20 +44,27 @@ export const InstanceDns = ({
         value={<LinkWithClipboard text={privateIpAddress} url={`http://${privateIpAddress}:${instancePort}`} />}
       />
     )}
-    {permanentIps && <dt>Permanent IP Address</dt>}
-    <dd>
-      {permanentIps &&
-        permanentIps.map((ip) => <LinkWithClipboard key={ip} text={ip} url={`http://${ip}:${instancePort}`} />)}
-    </dd>
+    {permanentIps?.length && (
+      <LabeledValue
+        label="Permanent IP Address"
+        value={permanentIps.map((ip) => (
+          <LinkWithClipboard key={ip} text={ip} url={`http://${ip}:${instancePort}`} />
+        ))}
+      />
+    )}
     {publicIpAddress && (
       <LabeledValue
         label="Public IP Address"
         value={<LinkWithClipboard text={publicIpAddress} url={`http://${publicIpAddress}:${instancePort}`} />}
       />
     )}
-    {ipv6Addresses && Boolean(ipv6Addresses.length) && <dt>IPv6 Address{ipv6Addresses.length > 1 ? 'es' : ''}</dt>}
-    <dd>
-      {ipv6Addresses && ipv6Addresses.map((ipv6) => <LinkWithClipboard key={ipv6.ip} text={ipv6.ip} url={ipv6.url} />)}
-    </dd>
+    {ipv6Addresses?.length && (
+      <LabeledValue
+        label={`IPv6 Address${ipv6Addresses.length > 1 ? 'es' : ''}`}
+        value={ipv6Addresses.map((ipv6) => (
+          <LinkWithClipboard key={ipv6.ip} text={ipv6.ip} url={ipv6.url} />
+        ))}
+      />
+    )}
   </LabeledValueList>
 );
