@@ -17,6 +17,7 @@ import { IRetryablePromise, retryablePromise } from 'core/utils/retryablePromise
 import { ReactInjector } from 'core/reactShims';
 import { PipelineConfigService } from '../config/services/PipelineConfigService';
 import UIROUTER_ANGULARJS from '@uirouter/angularjs';
+import { ExecutionFilterService } from '../filter/executionFilter.service';
 
 export class ExecutionService {
   public get activeStatuses(): string[] {
@@ -87,7 +88,7 @@ export class ExecutionService {
     const pipelines = Object.keys(sortFilter.pipeline);
     const statuses = Object.keys(pickBy(sortFilter.status || {}, identity));
     const limit = sortFilter.count;
-    if (application && pipelines.length) {
+    if (application && (pipelines.length || ExecutionFilterService.isCustomFiltersChecked())) {
       return this.getConfigIdsFromFilterModel(application).then((pipelineConfigIds) => {
         return this.getFilteredExecutions(application.name, statuses, limit, pipelineConfigIds, expand);
       });
@@ -137,12 +138,19 @@ export class ExecutionService {
     application.pipelineConfigs.activate();
     return application.pipelineConfigs.ready().then(() => {
       const data = application.pipelineConfigs.data.concat(application.strategyConfigs.data);
-      return pipelines
+      const pipelineFilterConfigIds = pipelines
         .map((p) => {
           const match = data.find((c: IPipeline) => c.name === p);
           return match ? match.id : null;
         })
         .filter((id) => !!id);
+
+      const customFilterConfigIds = ExecutionFilterService.filterPipelineConfigs(data);
+      if (pipelineFilterConfigIds.length > 1 && customFilterConfigIds.length > 1) {
+        return pipelineFilterConfigIds.filter((x) => customFilterConfigIds.includes(x));
+      } else if (pipelineFilterConfigIds.length > 1) {
+        return pipelineFilterConfigIds;
+      } else return customFilterConfigIds;
     });
   }
 

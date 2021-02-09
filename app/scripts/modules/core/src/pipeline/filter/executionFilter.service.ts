@@ -75,7 +75,7 @@ export class ExecutionFilterService {
     }
     const executions = application.executions.data || [];
     executions.forEach((execution: IExecution) => this.fixName(execution, application));
-    const filtered: IExecution[] = this.filterExecutionsForDisplay(application.executions.data);
+    const filtered: IExecution[] = this.filterExecutionsForDisplay(application);
 
     const groups = this.groupExecutions(filtered, application);
     this.applyGroupsToModel(groups);
@@ -148,11 +148,44 @@ export class ExecutionFilterService {
     }
   }
 
-  public static filterExecutionsForDisplay(executions: IExecution[]): IExecution[] {
+  public static isCustomFiltersChecked() {
+    const filters: any[] = this.getRelation();
+    return filters.some((filter) => {
+      return Object.keys(ExecutionState.filterModel.asFilterModel.sortFilter[filter]).length > 0;
+    });
+  }
+
+  public static filterConfig(filter: string, config: any) {
+    const sortFilter: ISortFilter = ExecutionState.filterModel.asFilterModel.sortFilter;
+    if (this.isFilterable(sortFilter[filter])) {
+      const instanceFilters = FilterModelService.getCheckValues(sortFilter[filter]);
+      return config.customFilters ? includes(instanceFilters, config.customFilters[filter]) : false;
+    }
+    return true;
+  }
+
+  public static filterPipelineConfigs(pipelineConfigs: any[]): any[] {
+    const filters: any[] = this.getRelation();
+
+    for (let i = filters.length - 1; i >= 0; i--) {
+      pipelineConfigs = pipelineConfigs.filter((config) => this.filterConfig(filters[i], config));
+    }
+    return uniq(pipelineConfigs.map((config) => config.id));
+  }
+
+  public static configurableFilter(execution: IExecution, application: Application) {
+    const pipelineConfigs = application.pipelineConfigs.data;
+    const FilteredPipelineConfigs = this.filterPipelineConfigs(pipelineConfigs);
+    return FilteredPipelineConfigs.includes(execution.pipelineConfigId);
+  }
+
+  public static filterExecutionsForDisplay(application: Application): IExecution[] {
+    const executions = application.executions.data;
     return chain(executions)
       .filter((e: IExecution) => this.textFilter(e))
       .filter((e: IExecution) => this.pipelineNameFilter(e))
       .filter((e: IExecution) => this.statusFilter(e))
+      .filter((e: IExecution) => this.configurableFilter(e, application))
       .value();
   }
 
@@ -162,7 +195,12 @@ export class ExecutionFilterService {
     const groupNames: { [key: string]: any } = {};
     groups.forEach((g) => (groupNames[g.heading] = true));
     let toAdd = [];
-    if (!this.isFilterable(sortFilter.pipeline) && !this.isFilterable(sortFilter.status) && !sortFilter.filter) {
+    if (
+      !this.isFilterable(sortFilter.pipeline) &&
+      !this.isFilterable(sortFilter.status) &&
+      !sortFilter.filter &&
+      !this.isCustomFiltersChecked()
+    ) {
       toAdd = configs.filter((config: any) => !groupNames[config.name]);
     } else {
       toAdd = configs.filter((config: any) => {
