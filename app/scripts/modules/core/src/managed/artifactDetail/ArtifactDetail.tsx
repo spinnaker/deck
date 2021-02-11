@@ -9,7 +9,6 @@ import {
   IManagedEnvironmentSummary,
   IManagedResourceSummary,
   IManagedArtifactVersionEnvironment,
-  IVerification,
 } from '../../domain';
 import { Application } from '../../application';
 import { useEventListener, Markdown, CollapsibleElement } from '../../presentation';
