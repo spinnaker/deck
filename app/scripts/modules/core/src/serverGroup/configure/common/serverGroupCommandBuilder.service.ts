@@ -29,6 +29,13 @@ export interface IServerGroupCommandDirty {
   vpcId?: boolean;
 }
 
+export interface IServerGroupCommandBlockDevice {
+  deleteOnTermination: boolean;
+  deviceName: string;
+  size: number;
+  volumeType: string;
+}
+
 export interface IServerGroupCommandResult {
   dirty?: IServerGroupCommandDirty;
 }
@@ -75,6 +82,7 @@ export interface IServerGroupCommandBackingData {
   credentialsKeyedByAccount: IAggregatedAccounts;
   enabledMetrics: string[];
   healthCheckTypes: string[];
+  volumeTypes: string[];
   instanceTypes: string[];
   managedResources: IManagedResourceSummary[];
   loadBalancers: ILoadBalancer[];
@@ -132,6 +140,7 @@ export interface IServerGroupCommand {
   viewState: IServerGroupCommandViewState;
   virtualizationType: string;
   vpcId: string;
+  blockDevices: IServerGroupCommandBlockDevice[];
 
   processIsSuspended: (command: IServerGroupCommand, process: string) => boolean;
   toggleSuspendedProcess: (command: IServerGroupCommand, process: string) => void;

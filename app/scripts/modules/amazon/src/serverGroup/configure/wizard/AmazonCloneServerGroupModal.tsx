@@ -25,6 +25,7 @@ import {
   ServerGroupZones,
   ServerGroupLoadBalancers,
   ServerGroupSecurityGroups,
+  ServerGroupVolumes,
   ServerGroupAdvancedSettings,
 } from './pages';
 import { ServerGroupTemplateSelection } from './ServerGroupTemplateSelection';
@@ -246,6 +247,13 @@ export class AmazonCloneServerGroupModal extends React.Component<
               render={({ innerRef }) => (
                 <ServerGroupAdvancedSettings ref={innerRef} formik={formik} app={application} />
               )}
+            />
+
+            <WizardPage
+              label="Volumes"
+              wizard={wizard}
+              order={nextIdx()}
+              render={({ innerRef }) => <ServerGroupVolumes ref={innerRef} formik={formik} app={application} />}
             />
           </>
         )}
