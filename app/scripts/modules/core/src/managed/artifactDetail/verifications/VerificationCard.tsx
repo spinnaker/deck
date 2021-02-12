@@ -21,20 +21,14 @@ const statusToAppearance: { [key in IVerification['status']]?: IStatusCardProps[
   FAIL: 'error',
 };
 
-interface VerificationCardProps extends IVerification {
+interface VerificationCardProps {
+  verification: IVerification;
   logClick: (action: string) => void;
   wasHalted: boolean;
 }
 
-export const VerificationCard: React.FC<VerificationCardProps> = ({
-  startedAt,
-  completedAt,
-  link,
-  status,
-  // type, - TODO: use this
-  logClick,
-  wasHalted,
-}) => {
+export const VerificationCard: React.FC<VerificationCardProps> = ({ verification, logClick, wasHalted }) => {
+  const { startedAt, completedAt, link, status } = verification;
   return (
     <StatusCard
       appearance={statusToAppearance[status] ?? 'neutral'}

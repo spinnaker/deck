@@ -140,7 +140,7 @@ const EnvironmentCards = memo(
         {environment.verifications?.map((verification) => (
           <VerificationCard
             key={verification.id}
-            {...verification}
+            verification={verification}
             wasHalted={environment.state === 'skipped'}
             logClick={(action) => logEvent({ action, label: `${environmentName}:${reference}` })}
           />
