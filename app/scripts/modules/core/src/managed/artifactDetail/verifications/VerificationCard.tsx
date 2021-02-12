@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { IVerification } from '../../../domain';
+import { IVerification } from 'domain/IManagedEntity';
+
 import { IStatusCardProps, StatusCard } from '../../StatusCard';
 import { Button } from '../../Button';
 import { DurationRender } from '../../RelativeTimestamp';
