@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 
 const { execSync } = require('child_process');
-const { assertJsonFile } = require('../asserters/assertJsonFile');
+const { assertJsonFile, DELETED_FIELD } = require('../asserters/assertJsonFile');
 const { readJson } = require('../util/readWriteJson');
 
 const PLUGIN_SDK = '@spinnaker/pluginsdk';
@@ -51,6 +51,8 @@ function checkPackageJson(report) {
 
   const checkPackageJsonField = assertJsonFile(report, 'package.json', pkgJson);
 
+  checkPackageJsonField('dependencies.check-peer-dependencies', DELETED_FIELD);
+  checkPackageJsonField('devDependencies.check-peer-dependencies', DELETED_FIELD);
   checkPackageJsonField('scripts.build', 'npm run clean && rollup -c');
   checkPackageJsonField('scripts.clean', 'npx shx rm -rf build');
   checkPackageJsonField('scripts.lint', 'eslint --ext js,jsx,ts,tsx src');
