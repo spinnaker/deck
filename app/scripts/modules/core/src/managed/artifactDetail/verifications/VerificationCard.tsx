@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { IVerification } from 'domain/IManagedEntity';
+import { IVerification } from 'core/domain';
 
 import { IStatusCardProps, StatusCard } from '../../StatusCard';
 import { Button } from '../../Button';
