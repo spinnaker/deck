@@ -1,6 +1,5 @@
-import React from 'react';
 import ReactGA from 'react-ga';
-import { ApplicationContext } from '../../application/ApplicationContext';
+import { useApplicationContext } from '../../presentation/hooks/useApplicationContext.hook';
 
 interface LogProps {
   category: string;
@@ -18,7 +17,7 @@ export const logEvent = ({ category, action, application, label }: LogProps) => 
 };
 
 export const useLogEvent = (category: string) => {
-  const app = React.useContext(ApplicationContext);
+  const app = useApplicationContext();
   return (props: Omit<LogProps, 'application' | 'category'>) => {
     logEvent({ ...props, category, application: app?.name });
   };
