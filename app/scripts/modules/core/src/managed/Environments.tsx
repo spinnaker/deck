@@ -14,7 +14,6 @@ import { ArtifactsList } from './artifactsList/ArtifactsList';
 import { EnvironmentsList } from './EnvironmentsList';
 import { ArtifactDetail } from './artifactDetail/ArtifactDetail';
 import { EnvironmentsHeader } from './EnvironmentsHeader';
-import { ApplicationContextProvider } from './utils/ApplicationContext';
 
 import './Environments.less';
 
@@ -65,7 +64,7 @@ interface IEnvironmentsProps {
   app: Application;
 }
 
-const EnvironmentsInner: React.FC<IEnvironmentsProps> = ({ app }) => {
+export const Environments: React.FC<IEnvironmentsProps> = ({ app }) => {
   const dataSource: ApplicationDataSource<IManagedApplicationEnvironmentSummary> = app.getDataSource('environments');
   const {
     data: { environments, artifacts, resources },
@@ -200,13 +199,5 @@ const EnvironmentsInner: React.FC<IEnvironmentsProps> = ({ app }) => {
         )}
       </div>
     </div>
-  );
-};
-
-export const Environments: React.FC<IEnvironmentsProps> = ({ app }) => {
-  return (
-    <ApplicationContextProvider app={app}>
-      <EnvironmentsInner app={app} />
-    </ApplicationContextProvider>
   );
 };

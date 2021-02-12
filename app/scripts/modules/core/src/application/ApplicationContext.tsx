@@ -1,5 +1,6 @@
-import { Application } from 'core/application';
 import React from 'react';
+
+import { Application } from '.';
 
 export const ApplicationContext = React.createContext<Application | null>(null);
 

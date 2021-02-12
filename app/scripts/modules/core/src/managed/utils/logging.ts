@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactGA from 'react-ga';
-import { ApplicationContext } from './ApplicationContext';
+import { ApplicationContext } from '../../application/ApplicationContext';
 
 interface LogProps {
   category: string;
