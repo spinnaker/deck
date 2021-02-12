@@ -73,7 +73,7 @@ describe('Filter: timeFormatters', function () {
       });
     });
 
-    fdescribe('timeDiffToString', function () {
+    describe('timeDiffToString', function () {
       const startTime = DateTime.fromISO('2021-02-10T16:00:00.000Z');
       it('Show only the correct units', () => {
         expect(timeDiffToString(startTime, DateTime.fromISO('2021-02-10T16:00:01.000Z'))).toBe('1s');
