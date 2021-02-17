@@ -6,7 +6,7 @@ import { SETTINGS } from 'core/config/settings';
 
 import { AppRefresher } from './AppRefresher';
 import { NavSection } from './NavSection';
-import { Icon, Tooltip, useIsMobile, usePrevious } from '../../presentation';
+import { Tooltip, useIsMobile, usePrevious } from '../../presentation';
 
 import { navigationCategoryRegistry } from './navigationCategory.registry';
 import { verticalNavExpandedAtom } from './navAtoms';
@@ -15,6 +15,8 @@ import { Application } from '../application.model';
 import { ApplicationDataSource } from '../service/applicationDataSource';
 
 import './verticalNav.less';
+
+import { Icon } from '@spinnaker/presentation';
 
 export interface IApplicationNavigationProps {
   app: Application;
@@ -75,8 +77,11 @@ export const ApplicationNavigation = ({ app }: IApplicationNavigationProps) => {
           <NavSection key={`section-${i}`} dataSources={section} app={app} />
         ))}
       {SETTINGS.feature.pagerDuty && app.attributes.pdApiKey && (
-        <div className="nav-section clickable">
-          <div className="page-category flex-container-h middle text-semibold" onClick={pageApplicationOwner}>
+        <div className="nav-section sp-padding-s-yaxis">
+          <div
+            className="page-category flex-container-h middle text-semibold sp-padding-s-yaxis clickable"
+            onClick={pageApplicationOwner}
+          >
             <div className="nav-row-item sp-margin-s-right">
               {!isExpanded ? (
                 <Tooltip value="Page App Owner" placement="right">

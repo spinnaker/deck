@@ -1,13 +1,14 @@
 import React from 'react';
 import { DateTime } from 'luxon';
 
+import { IconNames } from '@spinnaker/presentation';
+
 import {
   IStatefulConstraint,
   StatefulConstraintStatus,
   IStatelessConstraint,
   IManagedArtifactVersionEnvironment,
-} from '../../domain';
-import { IconNames } from '../../presentation';
+} from '../../../domain';
 
 const NO_FAILURE_MESSAGE = 'no details available';
 const UNKNOWN_CONSTRAINT_ICON = 'mdConstraintGeneric';
@@ -65,6 +66,8 @@ export const getConstraintTimestamp = (
 
   const { status, startedAt, judgedAt } = constraint as IStatefulConstraint;
 
+  // PENDING and NOT_EVALUATED constraints stop running once an environment is skipped, however, their status do not change.
+  // We need to ignore them
   if (environment.state === 'skipped' && [PENDING, NOT_EVALUATED].includes(status)) {
     return null;
   }

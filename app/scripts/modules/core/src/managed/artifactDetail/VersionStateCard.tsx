@@ -1,13 +1,15 @@
 import React, { memo, useMemo } from 'react';
 import { DateTime } from 'luxon';
 
-import { IManagedArtifactVersion } from '../domain';
-import { Markdown, IconNames } from '../presentation';
+import { IconNames } from '@spinnaker/presentation';
 
-import { getArtifactVersionDisplayName } from './displayNames';
-import { StatusCard, IStatusCardProps } from './StatusCard';
-import { Pill } from './Pill';
-import { Button } from './Button';
+import { IManagedArtifactVersion } from '../../domain';
+import { Markdown } from '../../presentation';
+
+import { getArtifactVersionDisplayName } from '../displayNames';
+import { StatusCard, IStatusCardProps } from '../StatusCard';
+import { Pill } from '../Pill';
+import { Button } from '../Button';
 
 interface CardTitleMetadata {
   deployedAt?: string;
@@ -103,7 +105,7 @@ const cardAppearanceByState: { [state: string]: CardAppearance } = {
 export type IVersionStateCardProps = Pick<
   IManagedArtifactVersion['environments'][0],
   'state' | 'deployedAt' | 'replacedAt' | 'replacedBy' | 'vetoed' | 'compareLink'
-> & { allVersions: IManagedArtifactVersion[]; logClick: (message: string) => any };
+> & { allVersions: IManagedArtifactVersion[]; logClick: (message: string) => void };
 
 export const VersionStateCard = memo(
   ({

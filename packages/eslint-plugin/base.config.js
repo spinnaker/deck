@@ -1,15 +1,17 @@
 module.exports = {
   parser: '@typescript-eslint/parser',
   parserOptions: { sourceType: 'module' },
-  plugins: ['@typescript-eslint', '@spinnaker/eslint-plugin', 'react-hooks'],
+  plugins: ['@typescript-eslint', '@spinnaker/eslint-plugin', 'react-hooks', 'prettier'],
   extends: ['eslint:recommended', 'prettier', 'prettier/@typescript-eslint', 'plugin:@typescript-eslint/recommended'],
   rules: {
+    '@spinnaker/import-sort': 2,
     '@spinnaker/api-deprecation': 2,
     '@spinnaker/api-no-slashes': 2,
     '@spinnaker/api-no-unused-chaining': 2,
     '@spinnaker/import-from-alias-not-npm': 2,
     '@spinnaker/import-from-npm-not-alias': 2,
     '@spinnaker/import-from-npm-not-relative': 2,
+    '@spinnaker/import-from-presentation-not-core': 2,
     '@spinnaker/import-relative-within-subpackage': 2,
     '@spinnaker/migrate-to-mock-http-client': 2,
     '@spinnaker/ng-no-component-class': 2,
@@ -30,6 +32,7 @@ module.exports = {
     'prefer-spread': 'off',
     // turn back on if https://github.com/eslint/eslint/issues/11899 fixes false positives
     'require-atomic-updates': 'off',
+    'prettier/prettier': 'error',
     'react-hooks/rules-of-hooks': 'error',
     // turn back on after addressing all violations
     // 'react-hooks/exhaustive-deps': 'warn',

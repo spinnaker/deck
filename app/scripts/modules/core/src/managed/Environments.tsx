@@ -10,9 +10,9 @@ import { Application, ApplicationDataSource } from '../application';
 import { IManagedApplicationEnvironmentSummary, IManagedResourceSummary } from '../domain';
 
 import { ColumnHeader } from './ColumnHeader';
-import { ArtifactsList } from './ArtifactsList';
+import { ArtifactsList } from './artifactsList/ArtifactsList';
 import { EnvironmentsList } from './EnvironmentsList';
-import { ArtifactDetail } from './ArtifactDetail';
+import { ArtifactDetail } from './artifactDetail/ArtifactDetail';
 import { EnvironmentsHeader } from './EnvironmentsHeader';
 
 import './Environments.less';
@@ -64,7 +64,7 @@ interface IEnvironmentsProps {
   app: Application;
 }
 
-export function Environments({ app }: IEnvironmentsProps) {
+export const Environments: React.FC<IEnvironmentsProps> = ({ app }) => {
   const dataSource: ApplicationDataSource<IManagedApplicationEnvironmentSummary> = app.getDataSource('environments');
   const {
     data: { environments, artifacts, resources },
@@ -200,4 +200,4 @@ export function Environments({ app }: IEnvironmentsProps) {
       </div>
     </div>
   );
-}
+};
