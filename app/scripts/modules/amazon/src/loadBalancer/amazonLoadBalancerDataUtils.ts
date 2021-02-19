@@ -1,8 +1,7 @@
-import { $q } from 'ngimport';
 import { flatten } from 'lodash';
+import { $q } from 'ngimport';
 
 import { AccountService, Application, ILoadBalancer } from '@spinnaker/core';
-
 import { IAmazonApplicationLoadBalancer, IAmazonHealth, IAmazonServerGroup, ITargetGroup } from 'amazon/domain';
 
 export class AmazonLoadBalancerDataUtils {

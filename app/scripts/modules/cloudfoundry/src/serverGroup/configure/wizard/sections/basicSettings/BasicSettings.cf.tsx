@@ -1,25 +1,22 @@
-import React from 'react';
-
-import { Observable, Subject } from 'rxjs';
-
-import { get } from 'lodash';
-
 import { FormikErrors, FormikProps } from 'formik';
+import { get } from 'lodash';
+import React from 'react';
+import { Observable, Subject } from 'rxjs';
 
 import {
   AccountService,
   CheckboxInput,
   FormikFormField,
+  HelpField,
   IAccount,
   IRegion,
   IWizardPageComponent,
-  HelpField,
   ReactSelectInput,
   TextInput,
 } from '@spinnaker/core';
+import { CloudFoundryDeploymentStrategySelector } from 'cloudfoundry/deploymentStrategy/CloudFoundryDeploymentStrategySelector';
 
 import { ICloudFoundryCreateServerGroupCommand } from '../../../serverGroupConfigurationModel.cf';
-import { CloudFoundryDeploymentStrategySelector } from 'cloudfoundry/deploymentStrategy/CloudFoundryDeploymentStrategySelector';
 
 import 'cloudfoundry/common/cloudFoundry.less';
 

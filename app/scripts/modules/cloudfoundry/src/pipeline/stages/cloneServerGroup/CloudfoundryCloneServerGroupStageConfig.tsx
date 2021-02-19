@@ -1,9 +1,8 @@
 import React from 'react';
 
 import { IStageConfigProps, StageConstants } from '@spinnaker/core';
-
-import { CloudFoundryCreateServerGroupModal } from 'cloudfoundry/serverGroup/configure/wizard/CreateServerGroupModal';
 import { CloudFoundryServerGroupCommandBuilder } from 'cloudfoundry/serverGroup/configure';
+import { CloudFoundryCreateServerGroupModal } from 'cloudfoundry/serverGroup/configure/wizard/CreateServerGroupModal';
 
 export interface ICloudfoundryCloneServerGroupStageConfigState {
   buttonText: string;
