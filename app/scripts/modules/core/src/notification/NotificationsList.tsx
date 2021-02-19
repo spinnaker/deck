@@ -38,9 +38,9 @@ export const NotificationsList = ({
     [],
   );
   const { result: appNotifications, refresh: refreshAppNotifications } = useData(
-    () => AppNotificationsService.getNotificationsForApplication(application.name),
+    () => AppNotificationsService.getNotificationsForApplication(application?.name),
     {} as IAppNotifications,
-    [application.name],
+    [application?.name],
   );
 
   const transfromNotifications = () => {
@@ -81,7 +81,7 @@ export const NotificationsList = ({
 
   const saveNotifications = (newNotifications: INotification[]) => {
     const toSaveNotifications: IAppNotifications = {
-      application: application.name,
+      application: application?.name,
     };
 
     newNotifications.forEach((n) => {
@@ -91,7 +91,7 @@ export const NotificationsList = ({
       (toSaveNotifications[n.type] as INotification[]).push(n);
     });
 
-    return AppNotificationsService.saveNotificationsForApplication(application.name, toSaveNotifications).then(() =>
+    return AppNotificationsService.saveNotificationsForApplication(application?.name, toSaveNotifications).then(() =>
       refreshAppNotifications(),
     );
   };
