@@ -89,13 +89,7 @@ export interface ISecurityGroupDetail {
   securityGroupRules: ISecurityGroupRule[];
 }
 
-type AwaitingResponseList = Array<
-  [resolve: (value: ISecurityGroupsByAccountSourceData) => void, reject: (reason: any) => void]
->;
-
 export class SecurityGroupReader {
-  private isFetchingGroups = false;
-  private awaitingGroupsResponseList: AwaitingResponseList = [];
   private static indexSecurityGroups(securityGroups: IReaderSecurityGroup[]): ISecurityGroupsByAccount {
     const securityGroupIndex: ISecurityGroupsByAccount = {};
     securityGroups.forEach((securityGroup: IReaderSecurityGroup) => {
@@ -301,39 +295,30 @@ export class SecurityGroupReader {
     private providerServiceDelegate: ProviderServiceDelegate,
   ) {}
 
+  private getAllSecurityGroupsPromise: PromiseLike<ISecurityGroupsByAccountSourceData>;
+
   public getAllSecurityGroups(): PromiseLike<ISecurityGroupsByAccountSourceData> {
-    if (this.isFetchingGroups) {
-      return new Promise((resolve, reject) => {
-        this.awaitingGroupsResponseList.push([resolve, reject]);
-      });
-    }
     const cache = InfrastructureCaches.get('securityGroups');
     const cached = cache ? cache.get('allGroups') : null;
     if (cached) {
       return this.$q.resolve(this.decompress(cloneDeep(cached)));
+    } else if (this.getAllSecurityGroupsPromise) {
+      return this.getAllSecurityGroupsPromise;
     }
-    this.isFetchingGroups = true;
-    return REST('/securityGroups')
+
+    this.getAllSecurityGroupsPromise = REST('/securityGroups')
       .get()
       .then((groupsByAccount: ISecurityGroupsByAccountSourceData) => {
         if (cache) {
           cache.put('allGroups', this.compress(groupsByAccount));
         }
-        for (const [resolve, _] of this.awaitingGroupsResponseList) {
-          resolve(groupsByAccount);
-        }
         return groupsByAccount;
       })
-      .catch((e) => {
-        for (const [_, reject] of this.awaitingGroupsResponseList) {
-          reject(e);
-        }
-        throw new Error(e);
-      })
       .finally(() => {
-        this.awaitingGroupsResponseList = [];
-        this.isFetchingGroups = false;
+        delete this.getAllSecurityGroupsPromise;
       });
+
+    return this.getAllSecurityGroupsPromise;
   }
 
   private compress(data: ISecurityGroupsByAccountSourceData): any {
