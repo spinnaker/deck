@@ -1,5 +1,4 @@
 import { Application, IJob, IMetricAlarmDimension, IServerGroup, ITask, TaskExecutor } from '@spinnaker/core';
-
 import {
   AlarmComparisonOperator,
   AlarmStatisticType,

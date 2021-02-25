@@ -1,7 +1,9 @@
 import { IComponentOptions, IController, module } from 'angular';
-import { set, get, has, without, intersection, chain } from 'lodash';
-import './loadBalancingPolicySelector.component.less';
+import { chain, get, has, intersection, set, without } from 'lodash';
+
 import { IGceBackendService, INamedPort } from 'google/domain';
+
+import './loadBalancingPolicySelector.component.less';
 
 class GceLoadBalancingPolicySelectorController implements IController {
   public maxPort = 65535;

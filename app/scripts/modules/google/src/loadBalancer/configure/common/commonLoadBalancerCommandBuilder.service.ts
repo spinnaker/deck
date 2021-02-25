@@ -12,7 +12,6 @@ import {
   NetworkReader,
   SubnetReader,
 } from '@spinnaker/core';
-
 import { GCE_CERTIFICATE_READER, GceCertificateReader, IGceCertificate } from 'google/certificate/certificate.reader';
 import { IGceHealthCheck } from 'google/domain/healthCheck';
 import { GCE_HEALTH_CHECK_READER, GceHealthCheckReader } from 'google/healthCheck/healthCheck.read.service';
