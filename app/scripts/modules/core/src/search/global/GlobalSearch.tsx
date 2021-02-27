@@ -5,7 +5,6 @@ import React from 'react';
 import ReactGA from 'react-ga';
 import { Observable, Subject } from 'rxjs';
 
-import { IApplicationSearchResult } from 'core/application/applicationSearchResultType';
 import { Tooltip } from 'core/presentation/Tooltip';
 import { ReactInjector } from 'core/reactShims';
 import { ClusterState } from 'core/state';
@@ -17,6 +16,7 @@ import { IChildComponentProps, RecentlyViewedItems } from '../infrastructure/Rec
 import { ISearchResultSet } from '../infrastructure/infrastructureSearch.service';
 import { ISearchResult } from '../search.service';
 import { searchRank } from '../searchRank.filter';
+import { findMatchingApplicationResultToQuery, getSearchQuery as getSearchQueryParams } from './utils';
 
 const SLASH_KEY = '/';
 const MIN_SEARCH_LENGTH = 3;
@@ -140,29 +140,21 @@ export class GlobalSearch extends React.Component<{}, IGlobalSearchState> {
         this.focusFirstSearchResult();
       }
     } else if (key === 'Enter') {
-      let matchFound = false;
       const { $state } = ReactInjector;
       if (this.state.categories) {
-        for (const category of this.state.categories) {
-          if (category.type.id === 'applications') {
-            const matchingApp = (category.results as IApplicationSearchResult[]).find(
-              (result) => result.application.toLowerCase() === this.state.query.toLowerCase(),
-            );
-            if (matchingApp) {
-              $state.go('home.applications.application', {
-                application: matchingApp.application,
-              });
-              this.hideDropdown();
-              matchFound = true;
-            }
-          }
+        const matchingQueryResult = findMatchingApplicationResultToQuery(this.state.categories, this.state.query);
+        // eslint-disable-next-line no-console
+        console.log('matching', matchingQueryResult);
+        if (matchingQueryResult) {
+          $state.go('home.applications.application', {
+            application: matchingQueryResult.result.application,
+          });
+          this.hideDropdown();
+        } else {
+          $state.go('home.search', getSearchQueryParams(this.state.query));
         }
       }
-      if (!matchFound) {
-        $state.go('home.search', {
-          q: this.state.query,
-        });
-      }
+
       event.preventDefault();
     }
   };
@@ -292,7 +284,7 @@ export class GlobalSearch extends React.Component<{}, IGlobalSearchState> {
 
     return (
       <li ref={(ref) => (this.container = ref)} className="global-search open">
-        <form className="right global-search">
+        <form className="right global-search" onSubmit={(e) => e.preventDefault()}>
           <div className="form-group has-feedback">
             <div className="input-group">
               <input
