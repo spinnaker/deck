@@ -2,7 +2,6 @@ import { module } from 'angular';
 import { uniqWith } from 'lodash';
 
 import { InfrastructureCaches, ISearchResults, SearchService } from '@spinnaker/core';
-
 import { IGceHealthCheck } from 'google/domain';
 
 interface IHealthCheckSearchResults {

@@ -1,12 +1,11 @@
-import React from 'react';
 import { pickBy, values } from 'lodash';
+import React from 'react';
 
 import { Application } from 'core/application';
-import { IManagedEnvironmentSummary, IManagedResourceSummary, IManagedArtifactSummary } from '../domain';
 
 import { ManagedResourceObject } from './ManagedResourceObject';
-import { EnvironmentRow } from './EnvironmentRow';
-
+import { IManagedArtifactSummary, IManagedEnvironmentSummary, IManagedResourceSummary } from '../domain';
+import { EnvironmentRow } from './environment/EnvironmentRow';
 import { isResourceKindSupported } from './resources/resourceRegistry';
 
 function shouldDisplayResource(resource: IManagedResourceSummary) {
@@ -45,9 +44,9 @@ export function EnvironmentsList({
               .map((resource) => {
                 const artifactVersionsByState =
                   resource.artifact &&
-                  artifacts.find(({ reference }) => reference === resource.artifact.reference)?.versions;
+                  artifacts.find(({ reference }) => reference === resource.artifact?.reference)?.versions;
                 const artifactDetails =
-                  resource.artifact && allArtifacts.find(({ reference }) => reference === resource.artifact.reference);
+                  resource.artifact && allArtifacts.find(({ reference }) => reference === resource.artifact?.reference);
                 return (
                   <ManagedResourceObject
                     application={application}
@@ -57,6 +56,7 @@ export function EnvironmentsList({
                     showReferenceName={allArtifacts.length > 1}
                     artifactVersionsByState={artifactVersionsByState}
                     artifactDetails={artifactDetails}
+                    depth={0}
                   />
                 );
               })}

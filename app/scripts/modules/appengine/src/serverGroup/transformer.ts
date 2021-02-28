@@ -1,8 +1,8 @@
 import { module } from 'angular';
 
-import { IServerGroup, IArtifactAccountPair } from '@spinnaker/core';
-
+import { IArtifactAccountPair, IServerGroup } from '@spinnaker/core';
 import { GitCredentialType, IAppengineGitTrigger, IAppengineJenkinsTrigger } from 'appengine/domain/index';
+
 import { IAppengineServerGroupCommand } from './configure/serverGroupCommandBuilder.service';
 
 export class AppengineDeployDescription {

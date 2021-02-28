@@ -1,6 +1,8 @@
-import React from 'react';
-import { IPipeline } from 'core/domain';
 import { isString } from 'lodash';
+import React from 'react';
+
+import { IPipeline } from 'core/domain';
+
 import { IMapPair, MapPair } from './MapPair';
 
 export interface IMapEditorProps {
@@ -39,6 +41,13 @@ export class MapEditor extends React.Component<IMapEditorProps, IMapEditorState>
     this.state = {
       backingModel: !isParameterized ? this.mapModel(props.model as { [key: string]: string }) : null,
     };
+  }
+
+  componentDidUpdate(prevProps: IMapEditorProps) {
+    const isModelObj = !isString(this.props.model);
+    if (isModelObj && Object.keys(prevProps.model).length !== Object.keys(this.props.model).length) {
+      this.setState({ backingModel: this.mapModel(this.props.model as { [key: string]: string }) });
+    }
   }
 
   private mapModel(model: { [key: string]: string }): IMapPair[] {

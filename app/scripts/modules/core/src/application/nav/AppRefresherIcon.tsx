@@ -1,10 +1,12 @@
-import React from 'react';
 import { $window } from 'ngimport';
+import React from 'react';
+
+import { Illustration } from '@spinnaker/presentation';
+import { Tooltip } from 'core/presentation';
+import { SchedulerFactory } from 'core/scheduler';
+import { relativeTime, timestamp } from 'core/utils/timeFormatters';
 
 import { ApplicationFreshIcon } from '../ApplicationFreshIcon';
-import { SchedulerFactory } from 'core/scheduler';
-import { Illustration, Tooltip } from 'core/presentation';
-import { relativeTime, timestamp } from 'core/utils/timeFormatters';
 
 export interface IAppRefreshIconProps {
   appName: string;
