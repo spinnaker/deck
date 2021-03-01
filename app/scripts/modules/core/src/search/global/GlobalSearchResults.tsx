@@ -34,8 +34,6 @@ export const GlobalSearchResults = ({
   }
 
   const matchingApp = findMatchingApplicationResultToQuery(categories, query);
-  // eslint-disable-next-line no-console
-  console.log(matchingApp);
 
   return (
     <ul className="dropdown-menu" role="menu">
