@@ -390,13 +390,13 @@ const Pipelines = SortableContainer(
   ),
 );
 
-const CategoryFilter = (props: any): JSX.Element => {
+const CategoryFilter = (props: { group: string; value: string; refresh: () => void }): JSX.Element => {
   const sortFilter = ExecutionState.filterModel.asFilterModel.sortFilter;
-  const { group, value } = props;
+  const { group, value, refresh } = props;
   const key = `${encodeURIComponent(group)}:${encodeURIComponent(value)}`;
   const changed = () => {
     sortFilter.category[key] = !sortFilter.category[key];
-    props.refresh();
+    refresh();
   };
   return (
     <div className="checkbox">
