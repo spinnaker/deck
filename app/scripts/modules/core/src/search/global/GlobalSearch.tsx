@@ -143,8 +143,6 @@ export class GlobalSearch extends React.Component<{}, IGlobalSearchState> {
       const { $state } = ReactInjector;
       if (this.state.categories) {
         const matchingQueryResult = findMatchingApplicationResultToQuery(this.state.categories, this.state.query);
-        // eslint-disable-next-line no-console
-        console.log('matching', matchingQueryResult);
         if (matchingQueryResult) {
           $state.go('home.applications.application', {
             application: matchingQueryResult.result.application,
