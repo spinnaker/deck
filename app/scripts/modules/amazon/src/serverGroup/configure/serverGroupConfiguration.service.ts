@@ -133,7 +133,7 @@ export class AwsServerGroupConfigurationService {
     'GroupTotalInstances',
   ];
   private healthCheckTypes = ['EC2', 'ELB'];
-  private volumeTypes = ['gp2'];
+  private volumeTypes = ['gp2', 'st1', 'io1', 'sc1'];
   private terminationPolicies = [
     'OldestInstance',
     'NewestInstance',
