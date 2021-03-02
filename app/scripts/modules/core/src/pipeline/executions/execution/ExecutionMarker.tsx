@@ -81,9 +81,24 @@ export class ExecutionMarker extends React.Component<IExecutionMarkerProps, IExe
     });
   };
 
+  private getStageOutputStatusCode = (): number => {
+    const { stage } = this.props;
+    return stage.masterStage.outputs.status && stage.masterStage.outputs.status.code;
+  };
+
+  private getClassNameByStatusCode = (code: number): string => {
+    switch (code) {
+      case 2:
+        return 'success-with-diff';
+      default:
+        return '';
+    }
+  };
+
   public render() {
     const { stage, application, execution, active, previousStageActive, width } = this.props;
     const stageType = (stage.activeStageType || stage.type).toLowerCase(); // support groups
+    const stageOutputStatusCode = this.getStageOutputStatusCode();
     const markerClassName = [
       stage.type !== 'group' ? 'clickable' : '',
       'stage',
@@ -94,6 +109,7 @@ export class ExecutionMarker extends React.Component<IExecutionMarkerProps, IExe
       previousStageActive ? 'after-active' : '',
       stage.isRunning ? 'glowing' : '',
       stage.requiresAttention ? 'requires-attention' : '',
+      this.getClassNameByStatusCode(stageOutputStatusCode),
     ].join(' ');
 
     const TooltipComponent = stage.useCustomTooltip ? stage.labelComponent : ExecutionBarLabel;

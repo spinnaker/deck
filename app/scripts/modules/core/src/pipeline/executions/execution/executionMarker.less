@@ -1,4 +1,5 @@
 @import (reference) '~core/presentation/less/imports/commonImports.less';
+@color-success: #8aad6a;
 
 .execution-marker.stage {
   margin-top: 0;
@@ -34,6 +35,15 @@
   }
   &.requires-attention {
     background-color: var(--color-alert);
+  }
+  &.success-with-diff {
+    background: repeating-linear-gradient(
+      45deg,
+      var(--color-success),
+      var(--color-success) 10px,
+      lighten(@color-success, 10%) 10px,
+      lighten(@color-success, 10%) 20px
+    );
   }
   i {
     color: var(--color-white);
