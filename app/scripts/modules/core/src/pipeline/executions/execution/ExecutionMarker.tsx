@@ -83,7 +83,7 @@ export class ExecutionMarker extends React.Component<IExecutionMarkerProps, IExe
 
   private getStageOutputStatusCode = (): number => {
     const { stage } = this.props;
-    return stage.masterStage.outputs.status && stage.masterStage.outputs.status.code;
+    return stage.masterStage.outputs.status?.code;
   };
 
   private getClassNameByStatusCode = (code: number): string => {
