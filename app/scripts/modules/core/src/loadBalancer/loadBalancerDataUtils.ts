@@ -1,7 +1,5 @@
-
-
 import { Application } from 'core/application';
-import { ILoadBalancer, IServerGroup, IHealth } from 'core/domain';
+import { IHealth, ILoadBalancer, IServerGroup } from 'core/domain';
 
 export class LoadBalancerDataUtils {
   private static buildLoadBalancer(match: ILoadBalancer, serverGroup: IServerGroup): ILoadBalancer {
@@ -29,7 +27,10 @@ export class LoadBalancerDataUtils {
     return loadBalancer;
   }
 
-  public static populateLoadBalancers(application: Application, serverGroup: IServerGroup): PromiseLike<ILoadBalancer[]> {
+  public static populateLoadBalancers(
+    application: Application,
+    serverGroup: IServerGroup,
+  ): PromiseLike<ILoadBalancer[]> {
     return application
       .getDataSource('loadBalancers')
       .ready()

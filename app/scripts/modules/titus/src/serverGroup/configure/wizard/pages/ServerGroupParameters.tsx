@@ -1,22 +1,23 @@
-import React from 'react';
 import { Field, FormikProps } from 'formik';
+import { intersection, set, union } from 'lodash';
+import React from 'react';
 import Select, { Option } from 'react-select';
 
 import {
+  AccountTag,
+  Application,
+  CheckboxInput,
+  ChecklistInput,
   HelpField,
   IWizardPageComponent,
-  AccountTag,
   MapEditor,
   PlatformHealthOverride,
-  Application,
-  ChecklistInput,
   robotToHuman,
 } from '@spinnaker/core';
+import { ITitusServiceJobProcesses } from 'titus/domain/ITitusServiceJobProcesses';
 
 import { ITitusServerGroupCommand } from '../../../configure/serverGroupConfiguration.service';
-import { intersection, set, union } from 'lodash';
 import { enabledProcesses, processesList } from '../../../details/serviceJobProcesses/ServiceJobProcesses';
-import { ITitusServiceJobProcesses } from 'titus/domain/ITitusServiceJobProcesses';
 
 export interface IServerGroupParametersProps {
   app: Application;
@@ -72,6 +73,19 @@ export class ServerGroupParameters
 
   private platformHealthOverrideChanged = (healthNames: string[]) => {
     this.props.formik.setFieldValue('interestingHealthProviderNames', healthNames);
+  };
+
+  private ipv6Changed = (value: boolean) => {
+    const { values } = this.props.formik;
+    const newAttr = {
+      ...values.containerAttributes,
+      'titusParameter.agent.assignIPv6Address': `${value}`,
+    };
+    if (!value) {
+      // Remove this attribute if false
+      delete newAttr['titusParameter.agent.assignIPv6Address'];
+    }
+    this.mapChanged('containerAttributes', newAttr, false);
   };
 
   public render() {
@@ -148,6 +162,18 @@ export class ServerGroupParameters
                   ),
                 )
               }
+            />
+          </div>
+        </div>
+        <div className="form-group">
+          <div className="col-md-4 sm-label-right">
+            <b>Associate IPv6 Address</b>
+          </div>
+          <div className="col-md-4">
+            <CheckboxInput
+              text="Assign an IPv6 address to the container"
+              value={values.containerAttributes['titusParameter.agent.assignIPv6Address'] === 'true'}
+              onChange={(e) => this.ipv6Changed(e.target.checked)}
             />
           </div>
         </div>

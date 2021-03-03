@@ -1,10 +1,8 @@
-import React from 'react';
-
-import { Dropdown } from 'react-bootstrap';
 import { cloneDeep } from 'lodash';
+import React from 'react';
+import { Dropdown } from 'react-bootstrap';
 
 import { Application, ConfirmationModalService, InstanceWriter, ReactInjector } from '@spinnaker/core';
-
 import { ICloudFoundryInstance } from 'cloudfoundry/domain';
 
 export interface ICloudFoundryInstanceActionsProps {

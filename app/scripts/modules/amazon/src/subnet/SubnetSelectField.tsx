@@ -1,8 +1,10 @@
+import { some } from 'lodash';
 import React from 'react';
 
-import { Application, ISubnet, HelpField } from '@spinnaker/core';
+import { Application, HelpField, ISubnet, Markdown } from '@spinnaker/core';
 
 import { SubnetSelectInput } from './SubnetSelectInput';
+import { AWSProviderSettings } from '../aws.settings';
 
 export interface ISubnetSelectFieldProps {
   application: Application;
@@ -15,6 +17,7 @@ export interface ISubnetSelectFieldProps {
   readOnly?: boolean;
   region: string;
   subnets: ISubnet[];
+  showSubnetWarning?: boolean;
 }
 
 export class SubnetSelectField extends React.Component<ISubnetSelectFieldProps> {
@@ -25,15 +28,18 @@ export class SubnetSelectField extends React.Component<ISubnetSelectFieldProps> 
   };
 
   public render() {
-    const { labelColumns, helpKey, component, region, field, ...otherProps } = this.props;
+    const { labelColumns, helpKey, component, region, field, showSubnetWarning, ...otherProps } = this.props;
     const value = component[field];
-
+    const isRecommended = some(
+      AWSProviderSettings.serverGroups?.recommendedSubnets || [],
+      (subnet) => value && value.includes(subnet),
+    );
+    const { subnetWarning } = AWSProviderSettings.serverGroups;
     return (
       <div className="form-group">
         <div className={`col-md-${labelColumns} sm-label-right`}>
           VPC Subnet <HelpField id={helpKey} />
         </div>
-
         <div className="col-md-7">
           {region ? (
             <SubnetSelectInput
@@ -46,6 +52,14 @@ export class SubnetSelectField extends React.Component<ISubnetSelectFieldProps> 
             />
           ) : (
             '(Select an account)'
+          )}
+          {showSubnetWarning && !isRecommended && Boolean(subnetWarning) && (
+            <div className="alert alert-warning sp-margin-s-top horizontal center">
+              <i className="fa fa-exclamation-triangle sp-margin-s-top" />
+              <div className="sp-margin-s-left">
+                <Markdown message={subnetWarning} style={{ display: 'inline-block', marginLeft: '2px' }} />
+              </div>
+            </div>
           )}
         </div>
       </div>

@@ -1,19 +1,18 @@
+import { FormikProps } from 'formik';
 import React from 'react';
 
-import { FormikProps } from 'formik';
-
 import {
+  ArtifactTypePatterns,
   IArtifact,
   IExpectedArtifact,
-  IWizardPageComponent,
   IPipeline,
   IStage,
+  IWizardPageComponent,
   StageArtifactSelector,
-  ArtifactTypePatterns,
 } from '@spinnaker/core';
+import { FormikConfigField } from 'cloudfoundry/presentation';
 
 import { ICloudFoundryCreateServerGroupCommand } from '../../../serverGroupConfigurationModel.cf';
-import { FormikConfigField } from 'cloudfoundry/presentation';
 
 export interface ICloudFoundryCreateServerGroupArtifactSettingsProps {
   formik: FormikProps<ICloudFoundryCreateServerGroupCommand>;
@@ -30,7 +29,6 @@ export class CloudFoundryServerGroupArtifactSettings
 
   private excludedArtifactTypePatterns = [
     ArtifactTypePatterns.KUBERNETES,
-    ArtifactTypePatterns.DOCKER_IMAGE,
     ArtifactTypePatterns.FRONT50_PIPELINE_TEMPLATE,
   ];
 

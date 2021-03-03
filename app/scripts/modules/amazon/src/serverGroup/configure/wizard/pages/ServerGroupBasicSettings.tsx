@@ -1,26 +1,26 @@
-import React from 'react';
 import { Field, FormikErrors, FormikProps } from 'formik';
+import React from 'react';
 
 import {
   AccountSelectInput,
+  Application,
+  DeployingIntoManagedClusterWarning,
   DeploymentStrategySelector,
   HelpField,
-  NameUtils,
-  RegionSelectField,
-  Application,
-  ReactInjector,
   IServerGroup,
   IWizardPageComponent,
   Markdown,
-  DeployingIntoManagedClusterWarning,
-  TaskReason,
+  NameUtils,
+  ReactInjector,
+  RegionSelectField,
   ServerGroupDetailsField,
   ServerGroupNamePreview,
+  SETTINGS,
+  TaskReason,
 } from '@spinnaker/core';
-
+import { AWSProviderSettings } from 'amazon/aws.settings';
 import { IAmazonImage } from 'amazon/image';
 import { SubnetSelectField } from 'amazon/subnet';
-import { AWSProviderSettings } from 'amazon/aws.settings';
 
 import { AmazonImageSelectInput } from '../../AmazonImageSelectInput';
 import { IAmazonServerGroupCommand } from '../../serverGroupConfiguration.service';
@@ -89,6 +89,13 @@ export class ServerGroupBasicSettings
     setFieldValue('virtualizationType', virtualizationType);
     setFieldValue('amiName', imageName);
     values.imageChanged(values);
+
+    if (image && SETTINGS.disabledImages?.length && AWSProviderSettings.serverGroups?.enableIPv6) {
+      const isImageDisabled = SETTINGS.disabledImages.some((i) => image.imageName.includes(i));
+      if (isImageDisabled) {
+        setFieldValue('associateIPv6Address', false);
+      }
+    }
   };
 
   private accountUpdated = (account: string): void => {
@@ -103,9 +110,8 @@ export class ServerGroupBasicSettings
       AWSProviderSettings?.serverGroups?.enableIPv6 &&
       AWSProviderSettings?.serverGroups?.setIPv6InTest &&
       accountDetails.environment === 'test';
-    if (enableIPv6InTest) {
-      setFieldValue('associateIPv6Address', enableIPv6InTest);
-    }
+
+    setFieldValue('associateIPv6Address', enableIPv6InTest);
   };
 
   private regionUpdated = (region: string): void => {
@@ -203,7 +209,6 @@ export class ServerGroupBasicSettings
 
     const accounts = values.backingData.accounts;
     const readOnlyFields = values.viewState.readOnlyFields || {};
-
     return (
       <div className="container-fluid form-horizontal">
         {values.regionIsDeprecated(values) && (
@@ -247,6 +252,7 @@ export class ServerGroupBasicSettings
           application={app}
           subnets={values.backingData.filtered.subnetPurposes}
           onChange={this.subnetUpdated}
+          showSubnetWarning={true}
         />
         <div className="form-group">
           <div className="col-md-3 sm-label-right">
