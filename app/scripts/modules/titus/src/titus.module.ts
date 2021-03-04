@@ -4,6 +4,7 @@ import { AmazonLoadBalancersTag } from '@spinnaker/amazon';
 import { CloudProviderRegistry, DeploymentStrategyRegistry } from '@spinnaker/core';
 
 import './help/titus.help';
+import { TitusInstanceDetails } from './instance/details/TitusInstanceDetails';
 import { TITUS_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER } from './instance/details/instance.details.controller';
 import { TITUS_INSTANCE_DNS_COMPONENT } from './instance/details/titusInstanceDns.component';
 import { TITUS_INSTANCE_INFORMATION_COMPONENT } from './instance/details/titusInstanceInformation.component';
@@ -92,6 +93,7 @@ module(TITUS_MODULE, [
     instance: {
       detailsTemplateUrl: require('./instance/details/instanceDetails.html'),
       detailsController: 'titusInstanceDetailsCtrl',
+      details: TitusInstanceDetails,
     },
   });
 });
