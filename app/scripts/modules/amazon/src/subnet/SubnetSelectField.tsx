@@ -28,8 +28,11 @@ export class SubnetSelectField extends React.Component<ISubnetSelectFieldProps> 
   public render() {
     const { labelColumns, helpKey, component, region, field, ...otherProps } = this.props;
     const value = component[field];
-    const isRecommended = (AWSProviderSettings.serverGroups?.recommendedSubnets || []).includes(value);
-    const { subnetWarning } = AWSProviderSettings.serverGroups;
+    const isRecommended = some(
+      AWSProviderSettings.serverGroups?.recommendedSubnets || [],
+      (subnet) => value && value.includes(subnet),
+    );
+    const subnetWarning = AWSProviderSettings.serverGroups?.subnetWarning;
     return (
       <div className="form-group">
         <div className={`col-md-${labelColumns} sm-label-right`}>
