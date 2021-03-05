@@ -63,6 +63,8 @@ export function Overrides(key: string, cloudProvider?: string) {
 }
 
 /**
+ * Registers a component as a replacement for some other component.
+ *
  * This should be applied to a React Function Component, since they cannot utilize decorators.
  * The component class will be used instead of the OverridableComponent with the same key.
  *
