@@ -1,3 +1,4 @@
+import { useLatestCallback } from '../../hooks';
 import React from 'react';
 import { IFormInputProps, OmitControlledInputPropsFrom } from './interface';
 
@@ -35,6 +36,7 @@ export function ChecklistInput(props: IChecklistInputProps) {
   function touchField() {
     props.onBlur && props.onBlur(createFakeReactSyntheticEvent({ name: props.name, value }));
   }
+
   useEffect(touchField, []);
 
   const className = `${orEmptyString(inputClassName)} ${validationClassName(validation)}`;
@@ -48,7 +50,7 @@ export function ChecklistInput(props: IChecklistInputProps) {
 
   const labelClassName = !!inline ? 'clickable checkbox-inline' : 'clickable';
 
-  function CheckBox(checkboxProps: { option: IChecklistInputOption }) {
+  const CheckBox = useLatestCallback((checkboxProps: { option: IChecklistInputOption }) => {
     const { option } = checkboxProps;
 
     function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -71,9 +73,9 @@ export function ChecklistInput(props: IChecklistInputProps) {
         {option.label}
       </label>
     );
-  }
+  });
 
-  function SelectAllButton() {
+  const SelectAllButton = useLatestCallback(() => {
     const allSelected = checkListOptions.every((option) => isChecked(option.value));
     const anchorClassName = `btn btn-default btn-xs ${inline ? '' : 'push-left'}`;
     const style = inline ? { margin: '8px 0 0 10px' } : {};
@@ -89,37 +91,33 @@ export function ChecklistInput(props: IChecklistInputProps) {
         {allSelected ? 'Deselect All' : 'Select All'}
       </a>
     );
-  }
+  });
 
-  function InlineOptions() {
-    return (
-      <>
-        {checkListOptions.map((option) => (
-          <CheckBox key={option.label} option={option} />
-        ))}
+  const InlineOptions = useLatestCallback(() => (
+    <>
+      {checkListOptions.map((option) => (
+        <CheckBox key={option.label} option={option} />
+      ))}
 
-        {showSelectAll && checkListOptions.length > 1 && <SelectAllButton />}
-      </>
-    );
-  }
+      {showSelectAll && checkListOptions.length > 1 && <SelectAllButton />}
+    </>
+  ));
 
-  function VerticalOptions() {
-    return (
-      <ul className="checklist">
-        {checkListOptions.map((option) => (
-          <li key={option.label}>
-            <CheckBox option={option} />
-          </li>
-        ))}
+  const VerticalOptions = useLatestCallback(() => (
+    <ul className="checklist">
+      {checkListOptions.map((option) => (
+        <li key={option.label}>
+          <CheckBox option={option} />
+        </li>
+      ))}
 
-        {showSelectAll && checkListOptions.length > 1 && (
-          <li key={'select_all_button'}>
-            <SelectAllButton />
-          </li>
-        )}
-      </ul>
-    );
-  }
+      {showSelectAll && checkListOptions.length > 1 && (
+        <li key={'select_all_button'}>
+          <SelectAllButton />
+        </li>
+      )}
+    </ul>
+  ));
 
   return <div className="checkbox">{inline ? <InlineOptions /> : <VerticalOptions />}</div>;
 }
