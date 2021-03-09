@@ -91,8 +91,6 @@ module(TITUS_MODULE, [
       useProvider: 'aws',
     },
     instance: {
-      detailsTemplateUrl: require('./instance/details/instanceDetails.html'),
-      detailsController: 'titusInstanceDetailsCtrl',
       details: TitusInstanceDetails,
     },
   });

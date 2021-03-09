@@ -16,7 +16,7 @@ import {
   ReactInjector,
 } from '@spinnaker/core';
 
-const applyTargetGroupInfoToHealthMetric = (
+export const applyTargetGroupInfoToHealthMetric = (
   metricGroups: IAmazonTargetGroupHealth[],
   targetGroups: ITargetGroup[],
   account: string,
@@ -29,7 +29,9 @@ const applyTargetGroupInfoToHealthMetric = (
     return {
       ...tg,
       name: group?.name,
-      healthCheckPath: `:${useTrafficPort ? group?.port : group.healthCheckPort}${group?.healthCheckPath || ''}`,
+      healthCheckPath: group
+        ? `:${useTrafficPort ? group?.port : group.healthCheckPort}${group?.healthCheckPath || ''}`
+        : undefined,
       healthCheckProtocol: group?.healthCheckProtocol?.toLowerCase(),
     };
   });
@@ -169,7 +171,7 @@ export const buildTaskActions = (instance: IInstance, app: Application): Action[
 
   if (discoveryHealth.length && discoveryHealth[0].state === 'OutOfService') {
     taskActions.push({
-      label: 'Enable In Discovery',
+      label: 'Enable in Discovery',
       triggerAction: enableInstanceInDiscovery(instance, app),
     });
   }
