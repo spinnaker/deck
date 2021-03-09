@@ -1,5 +1,4 @@
 import { REST } from '@spinnaker/core';
-
 import { ICloudFoundryCluster } from 'cloudfoundry/domain';
 
 export class CloudFoundryImageReader {

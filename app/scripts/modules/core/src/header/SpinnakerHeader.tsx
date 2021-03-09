@@ -1,31 +1,16 @@
+import { useCurrentStateAndParams, useSrefActive } from '@uirouter/react';
 import React from 'react';
 import { useRecoilState } from 'recoil';
-import { useCurrentStateAndParams, useSrefActive } from '@uirouter/react';
-import { UIRouterContext } from '@uirouter/react-hybrid';
-
-import { NgReact } from 'core/reactShims';
-import { verticalNavExpandedAtom } from 'core/application/nav/navAtoms';
-import { CollapsibleSectionStateCache } from 'core/cache';
-import { Overridable } from 'core/overrideRegistry';
-import { GlobalSearch } from 'core/search/global/GlobalSearch';
-import { HelpMenu } from 'core/help/HelpMenu';
-import './SpinnakerHeader.css';
 
 import { Icon } from '@spinnaker/presentation';
+import { verticalNavExpandedAtom } from 'core/application/nav/navAtoms';
+import { CollapsibleSectionStateCache } from 'core/cache';
+import { HelpMenu } from 'core/help/HelpMenu';
+import { overridableComponent } from 'core/overrideRegistry';
+import { NgReact } from 'core/reactShims';
+import { GlobalSearch } from 'core/search/global/GlobalSearch';
 
-@UIRouterContext
-@Overridable('spinnakerHeader')
-export class SpinnakerHeader extends React.Component<{}, {}> {
-  public render(): React.ReactElement<SpinnakerHeader> {
-    return <SpinnakerHeaderContent />;
-  }
-}
-
-/**
- * This needs to be a functional component to use an external module's hook.
- * Currently, @Overrides only works on a class component.
- * This is temproary until we can refactor the override component to work for functional components.
- */
+import './SpinnakerHeader.css';
 
 export const SpinnakerHeaderContent = () => {
   const { state: currentState } = useCurrentStateAndParams();
@@ -94,3 +79,5 @@ export const SpinnakerHeaderContent = () => {
     </nav>
   );
 };
+
+export const SpinnakerHeader = overridableComponent(SpinnakerHeaderContent, 'spinnakerHeader');

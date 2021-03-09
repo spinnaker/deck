@@ -1,27 +1,27 @@
-import React from 'react';
 import { UIRouterContext } from '@uirouter/react-hybrid';
-
-import { Debounce } from 'lodash-decorators';
 import { flatten } from 'lodash';
+import { Debounce } from 'lodash-decorators';
+import React from 'react';
 import ReactGA from 'react-ga';
 import { Observable, Subject } from 'rxjs';
 
+import { Tooltip } from 'core/presentation/Tooltip';
+import { ReactInjector } from 'core/reactShims';
+import { ClusterState } from 'core/state';
+import { Spinner } from 'core/widgets/spinners/Spinner';
+
+import { GlobalSearchRecentItems } from './GlobalSearchRecentItems';
+import { GlobalSearchResults } from './GlobalSearchResults';
+import { IChildComponentProps, RecentlyViewedItems } from '../infrastructure/RecentlyViewedItems';
 import { ISearchResultSet } from '../infrastructure/infrastructureSearch.service';
 import { ISearchResult } from '../search.service';
-import { ReactInjector } from 'core/reactShims';
-import { Tooltip } from 'core/presentation/Tooltip';
-import { Spinner } from 'core/widgets/spinners/Spinner';
 import { searchRank } from '../searchRank.filter';
-import { RecentlyViewedItems, IChildComponentProps } from '../infrastructure/RecentlyViewedItems';
-import { ClusterState } from 'core/state';
+import { findMatchingApplicationResultToQuery, getSearchQuery as getSearchQueryParams } from './utils';
 
-import { GlobalSearchResults } from './GlobalSearchResults';
-import { GlobalSearchRecentItems } from './GlobalSearchRecentItems';
-
-const SLASH_KEY = 191;
+const SLASH_KEY = '/';
 const MIN_SEARCH_LENGTH = 3;
 
-const isQuestionMark = ({ which, shiftKey }: KeyboardEvent) => which === SLASH_KEY && shiftKey;
+const isQuestionMark = ({ key, shiftKey }: KeyboardEvent) => key === '/' && shiftKey;
 
 export interface IGlobalSearchState {
   showDropdown: boolean;
@@ -90,12 +90,12 @@ export class GlobalSearch extends React.Component<{}, IGlobalSearchState> {
   }
 
   private handleWindowKeyup = (event: KeyboardEvent) => {
-    const { target, which } = event;
+    const { target, key } = event;
     if (
       target instanceof HTMLInputElement ||
       target instanceof HTMLTextAreaElement ||
       isQuestionMark(event) ||
-      which !== SLASH_KEY
+      key !== SLASH_KEY
     ) {
       return;
     }
@@ -120,32 +120,39 @@ export class GlobalSearch extends React.Component<{}, IGlobalSearchState> {
       return;
     }
 
-    const { which, shiftKey } = event;
+    const { key, shiftKey } = event;
 
-    if (which === 27) {
-      // escape
+    if (key === 'Escape') {
       ReactGA.event({ category: 'Global Search', action: 'Keyboard Nav', label: 'escape (from input)' });
       this.searchField.blur();
-    } else if (which === 40) {
-      // down
+    } else if (key === 'ArrowDown') {
       ReactGA.event({ category: 'Global Search', action: 'Keyboard Nav', label: 'arrow down (from input)' });
       event.preventDefault();
       this.focusFirstSearchResult();
-    } else if (which === 38) {
-      // up
+    } else if (key === 'ArrowUp') {
       ReactGA.event({ category: 'Global Search', action: 'Keyboard Nav', label: 'arrow up (from input)' });
       event.preventDefault();
       this.focusLastSearchResult();
-    } else if (which === 9) {
-      // tab
+    } else if (key === 'Tab') {
       if (!shiftKey) {
         ReactGA.event({ category: 'Global Search', action: 'Keyboard Nav', label: 'tab (from input)' });
         event.preventDefault();
         this.focusFirstSearchResult();
       }
-    } else if (which === 13) {
-      // enter
-      // do not submit the form and reload the page
+    } else if (key === 'Enter') {
+      const { $state } = ReactInjector;
+      if (this.state.categories) {
+        const matchingQueryResult = findMatchingApplicationResultToQuery(this.state.categories, this.state.query);
+        if (matchingQueryResult) {
+          $state.go('home.applications.application', {
+            application: matchingQueryResult.result.application,
+          });
+          this.hideDropdown();
+        } else {
+          $state.go('home.search', getSearchQueryParams(this.state.query));
+        }
+      }
+
       event.preventDefault();
     }
   };
@@ -162,9 +169,8 @@ export class GlobalSearch extends React.Component<{}, IGlobalSearchState> {
   };
 
   private navigateResult = (event: React.KeyboardEvent<HTMLElement>) => {
-    const { which, target } = event;
-    if (which === 27) {
-      // escape
+    const { key, target } = event;
+    if (key === 'Escape') {
       ReactGA.event({ category: 'Global Search', action: 'Keyboard Nav', label: 'escape (from result)' });
       this.setState({
         showDropdown: false,
@@ -173,7 +179,7 @@ export class GlobalSearch extends React.Component<{}, IGlobalSearchState> {
         querying: false,
         categories: null,
       });
-    } else if (which === 9) {
+    } else if (key === 'Tab') {
       // tab - let it navigate automatically, but close menu if on the last result
       const flattenedRefs = flatten(this.resultRefs);
       const lastResultRef = flattenedRefs[flattenedRefs.length - 1];
@@ -182,8 +188,7 @@ export class GlobalSearch extends React.Component<{}, IGlobalSearchState> {
         this.hideDropdown();
         return;
       }
-    } else if (which === 40) {
-      // down
+    } else if (key === 'ArrowDown') {
       ReactGA.event({ category: 'Global Search', action: 'Keyboard Nav', label: 'down (from result)' });
       const flattenedRefs = flatten(this.resultRefs);
       const currentRefIndex = flattenedRefs.indexOf(target as HTMLElement);
@@ -191,8 +196,7 @@ export class GlobalSearch extends React.Component<{}, IGlobalSearchState> {
 
       nextResultRef && nextResultRef.focus();
       event.preventDefault();
-    } else if (which === 38) {
-      // up
+    } else if (key === 'ArrowUp') {
       ReactGA.event({ category: 'Global Search', action: 'Keyboard Nav', label: 'up (from result)' });
       const flattenedRefs = flatten(this.resultRefs);
       const currentRefIndex = flattenedRefs.indexOf(target as HTMLElement);
@@ -200,8 +204,7 @@ export class GlobalSearch extends React.Component<{}, IGlobalSearchState> {
 
       prevResultRef && prevResultRef.focus();
       event.preventDefault();
-    } else if (which === 13) {
-      // enter
+    } else if (key === 'Enter') {
       ReactGA.event({ category: 'Global Search', action: 'Keyboard Nav', label: 'enter (from result)' });
       // Allow keyboard event to activate the href, then hide the drop down
       setTimeout(() => this.hideDropdown(), 100);
@@ -279,7 +282,7 @@ export class GlobalSearch extends React.Component<{}, IGlobalSearchState> {
 
     return (
       <li ref={(ref) => (this.container = ref)} className="global-search open">
-        <form className="right global-search">
+        <form className="right global-search" onSubmit={(e) => e.preventDefault()}>
           <div className="form-group has-feedback">
             <div className="input-group">
               <input

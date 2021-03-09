@@ -11,7 +11,6 @@ import {
   StageConstants,
   TextInput,
 } from '@spinnaker/core';
-
 import { AccountRegionClusterSelector } from 'cloudfoundry/presentation';
 
 export interface ICloudfoundryRunTaskStageConfigState {

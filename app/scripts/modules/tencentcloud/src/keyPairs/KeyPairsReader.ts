@@ -1,5 +1,4 @@
 import { REST } from '@spinnaker/core';
-
 import { IKeyPair } from 'tencentcloud/domain';
 
 export class KeyPairsReader {

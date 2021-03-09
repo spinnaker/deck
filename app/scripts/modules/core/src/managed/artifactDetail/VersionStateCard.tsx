@@ -1,15 +1,14 @@
-import React, { memo, useMemo } from 'react';
 import { DateTime } from 'luxon';
+import React, { memo, useMemo } from 'react';
 
 import { IconNames } from '@spinnaker/presentation';
 
+import { Button } from '../Button';
+import { Pill } from '../Pill';
+import { IStatusCardProps, StatusCard } from '../StatusCard';
+import { getArtifactVersionDisplayName } from '../displayNames';
 import { IManagedArtifactVersion } from '../../domain';
 import { Markdown } from '../../presentation';
-
-import { getArtifactVersionDisplayName } from '../displayNames';
-import { StatusCard, IStatusCardProps } from '../StatusCard';
-import { Pill } from '../Pill';
-import { Button } from '../Button';
 
 interface CardTitleMetadata {
   deployedAt?: string;
@@ -21,9 +20,9 @@ interface CardTitleMetadata {
 interface CardAppearance {
   icon: IconNames;
   appearance: IStatusCardProps['appearance'];
-  timestamp?: (metadata: CardTitleMetadata) => DateTime;
+  timestamp?: (metadata: CardTitleMetadata) => DateTime | undefined;
   title: (metadata: CardTitleMetadata) => string | JSX.Element;
-  description?: (metadata: CardTitleMetadata) => string | JSX.Element;
+  description?: (metadata: CardTitleMetadata) => string | JSX.Element | undefined;
 }
 
 const cardAppearanceByState: { [state: string]: CardAppearance } = {
@@ -46,7 +45,7 @@ const cardAppearanceByState: { [state: string]: CardAppearance } = {
   previous: {
     icon: 'cloudDecommissioned',
     appearance: 'archived',
-    timestamp: ({ replacedAt }: CardTitleMetadata) => (replacedAt ? DateTime.fromISO(replacedAt) : null),
+    timestamp: ({ replacedAt }: CardTitleMetadata) => (replacedAt ? DateTime.fromISO(replacedAt) : undefined),
     title: ({ replacedByVersionName }: CardTitleMetadata) => (
       <span className="sp-group-margin-xs-xaxis">
         <span>Decommissioned</span>{' '}
@@ -77,7 +76,7 @@ const cardAppearanceByState: { [state: string]: CardAppearance } = {
   current: {
     icon: 'cloudDeployed',
     appearance: 'success',
-    timestamp: ({ deployedAt }: CardTitleMetadata) => (deployedAt ? DateTime.fromISO(deployedAt) : null),
+    timestamp: ({ deployedAt }: CardTitleMetadata) => (deployedAt ? DateTime.fromISO(deployedAt) : undefined),
     title: (_: CardTitleMetadata) => <span>Deployed</span>,
   },
   vetoed: {
@@ -85,7 +84,7 @@ const cardAppearanceByState: { [state: string]: CardAppearance } = {
     appearance: 'error',
     timestamp: ({ vetoed }: CardTitleMetadata) =>
       // we have to tolerate some older vetoes (from before June 2020) in the DB that don't have times/user attribution
-      !!vetoed ? DateTime.fromISO(vetoed.at) : null,
+      !!vetoed ? DateTime.fromISO(vetoed.at) : undefined,
     title: ({ vetoed }: CardTitleMetadata) => {
       return (
         <span className="sp-group-margin-xs-xaxis">
@@ -98,14 +97,15 @@ const cardAppearanceByState: { [state: string]: CardAppearance } = {
         </span>
       );
     },
-    description: ({ vetoed }: CardTitleMetadata) => vetoed?.comment && <Markdown message={vetoed.comment} tag="span" />,
+    description: ({ vetoed }: CardTitleMetadata) =>
+      vetoed?.comment ? <Markdown message={vetoed.comment} tag="span" /> : undefined,
   },
 } as const;
 
 export type IVersionStateCardProps = Pick<
   IManagedArtifactVersion['environments'][0],
   'state' | 'deployedAt' | 'replacedAt' | 'replacedBy' | 'vetoed' | 'compareLink'
-> & { allVersions: IManagedArtifactVersion[]; logClick: (message: string) => any };
+> & { allVersions: IManagedArtifactVersion[]; logClick: (message: string) => void };
 
 export const VersionStateCard = memo(
   ({

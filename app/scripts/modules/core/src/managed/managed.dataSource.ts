@@ -1,15 +1,15 @@
 import { IQService, module } from 'angular';
-
-import { noop } from 'core/utils';
-import { SETTINGS } from 'core/config/settings';
-import { ApplicationDataSourceRegistry } from 'core/application/service/ApplicationDataSourceRegistry';
 import { Application, DELIVERY_KEY } from 'core/application';
+import { ApplicationDataSourceRegistry } from 'core/application/service/ApplicationDataSourceRegistry';
+import { SETTINGS } from 'core/config/settings';
 import { IManagedApplicationSummary } from 'core/domain';
+import { noop } from 'core/utils';
+
 import { ManagedReader } from './ManagedReader';
 import {
-  addManagedResourceMetadataToServerGroups,
   addManagedResourceMetadataToLoadBalancers,
   addManagedResourceMetadataToSecurityGroups,
+  addManagedResourceMetadataToServerGroups,
 } from './managedResourceDecorators';
 
 export const MANAGED_RESOURCES_DATA_SOURCE = 'spinnaker.core.managed.dataSource';
@@ -64,7 +64,7 @@ module(MANAGED_RESOURCES_DATA_SOURCE, []).run([
       label: 'Environments',
       icon: 'fa fa-fw fa-xs fa-code-branch',
       iconName: 'spEnvironments',
-      description: '[beta] Artifacts and environments managed by Spinnaker',
+      description: 'Artifacts and environments managed by Spinnaker',
       loader: loadEnvironments,
       onLoad: addEnvironments,
       defaultData: {

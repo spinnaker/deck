@@ -1,5 +1,5 @@
-import React, { memo } from 'react';
 import { DateTime } from 'luxon';
+import React, { memo } from 'react';
 
 import { SETTINGS } from '../config';
 import { CopyToClipboard } from '../utils';
@@ -13,7 +13,7 @@ const TIMEZONE = SETTINGS.feature.displayTimestampsInUserLocalTime ? undefined :
 
 export const AbsoluteTimestamp = memo(
   ({ timestamp: timestampInOriginalZone, clickToCopy }: IAbsoluteTimestampProps) => {
-    const timestamp = timestampInOriginalZone.setZone(TIMEZONE);
+    const timestamp = TIMEZONE ? timestampInOriginalZone.setZone(TIMEZONE) : timestampInOriginalZone;
 
     const fullTimestamp = timestamp.toFormat('yyyy-MM-dd HH:mm:ss ZZZZ');
     const formattedTimestamp = timestamp.toFormat('MMM d, y HH:mm');

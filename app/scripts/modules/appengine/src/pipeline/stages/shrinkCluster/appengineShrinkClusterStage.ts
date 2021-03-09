@@ -1,8 +1,8 @@
 import { module } from 'angular';
 
 import { Registry } from '@spinnaker/core';
-
 import { IAppengineStage, IAppengineStageScope } from 'appengine/domain/index';
+
 import { AppengineStageCtrl } from '../appengineStage.controller';
 
 interface IAppengineShrinkClusterStage extends IAppengineStage {
