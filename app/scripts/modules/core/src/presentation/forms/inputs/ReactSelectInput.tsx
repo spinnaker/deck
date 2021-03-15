@@ -78,9 +78,11 @@ export function ReactSelectInput<T = string>(props: IReactSelectInputProps<T>) {
   const className = orEmptyString(inputClassName);
   const { category } = useValidationData(validation.messageNode, validation.touched);
   const style = category === 'error' ? reactSelectValidationErrorStyle : {};
+  const fieldValue = props.multi ? (isNil(value) ? [] : value) : orEmptyString(value);
+
   const fieldProps = {
     name,
-    value: orEmptyString(value),
+    value: fieldValue,
     onBlur: reactSelectOnBlurAdapter(name, value, onBlur),
     onChange: reactSelectOnChangeAdapter(name, onChange),
   };
