@@ -1,6 +1,6 @@
 import { isNil } from 'lodash';
 import React from 'react';
-import Select, { Option, OptionValues, ReactSelectProps } from 'react-select';
+import Select, { Option, OptionValues, ReactSelectProps, Creatable } from 'react-select';
 import VirtualizedSelect from 'react-virtualized-select';
 
 import { noop } from 'core/utils';
@@ -15,7 +15,7 @@ export interface IReactSelectInputProps<T = OptionValues>
   extends IFormInputProps,
     OmitControlledInputPropsFrom<ReactSelectProps<T>> {
   stringOptions?: string[];
-  mode?: 'TETHERED' | 'VIRTUALIZED' | 'PLAIN';
+  mode?: 'TETHERED' | 'VIRTUALIZED' | 'PLAIN' | 'CREATABLE';
 }
 
 // TODO: use standard css classes (from style guide?)
@@ -92,6 +92,8 @@ export function ReactSelectInput<T = string>(props: IReactSelectInputProps<T>) {
       <TetheredSelect {...commonProps} options={options} />
     ) : mode === 'VIRTUALIZED' ? (
       <VirtualizedSelect {...commonProps} options={options} optionRenderer={null} />
+    ) : mode === 'CREATABLE' ? (
+      <CreatableSelect {...commonProps} options={options} />
     ) : (
       <Select {...commonProps} options={options} />
     );
@@ -103,4 +105,18 @@ export function ReactSelectInput<T = string>(props: IReactSelectInputProps<T>) {
   } else {
     return <SelectElement options={optionOptions} />;
   }
+}
+
+function CreatableSelect(props: IReactSelectInputProps<any>) {
+  // React select 1.x requires the options array to contain any created values
+  const options = React.useMemo(() => {
+    const options = props.options ?? [];
+    const optionsValues = options.map((o) => o.value);
+    const createdOptions = ((props.value as string[]) ?? [])
+      .filter((val) => !optionsValues.includes(val))
+      .map((opt) => ({ label: opt, value: opt }));
+    return options.concat(createdOptions);
+  }, [props.options, props.value]);
+
+  return <Creatable {...props} options={options} />;
 }
