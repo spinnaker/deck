@@ -1,20 +1,18 @@
-import React from 'react';
-import { sortBy } from 'lodash';
-
 import { UISref } from '@uirouter/react';
 import { UIRouterContextComponent } from '@uirouter/react-hybrid';
+import { sortBy } from 'lodash';
+import React from 'react';
 
 import {
   AccountService,
   Application,
   CollapsibleSection,
-  ISecurityGroup,
   FirewallLabels,
+  ISecurityGroup,
   ReactInjector,
 } from '@spinnaker/core';
-
-import { TitusReactInjector } from 'titus/reactShims';
 import { ITitusServerGroupView } from 'titus/domain';
+import { TitusReactInjector } from 'titus/reactShims';
 
 export interface ITitusServerGroupDetailsSectionProps {
   app: Application;

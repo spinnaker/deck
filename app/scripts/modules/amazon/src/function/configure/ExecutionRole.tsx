@@ -1,10 +1,10 @@
+import { FormikErrors, FormikProps } from 'formik';
 import React from 'react';
 
-import { FormikFormField, IWizardPageComponent, TextInput, FormValidator } from '@spinnaker/core';
-import { FormikProps, FormikErrors } from 'formik';
-import { IAmazonFunctionUpsertCommand } from 'amazon/index';
-import { IAmazonFunction } from 'amazon/domain';
+import { FormikFormField, FormValidator, IWizardPageComponent, TextInput } from '@spinnaker/core';
 import { iamRoleValidator } from 'amazon/aws.validators';
+import { IAmazonFunction } from 'amazon/domain';
+import { IAmazonFunctionUpsertCommand } from 'amazon/index';
 
 export interface IExecutionRoleProps {
   formik: FormikProps<IAmazonFunctionUpsertCommand>;

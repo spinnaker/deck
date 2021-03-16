@@ -1,9 +1,9 @@
-import React, { memo, useEffect, useState } from 'react';
 import { DateTime, Duration } from 'luxon';
+import React, { memo, useEffect, useState } from 'react';
 
 import { SETTINGS } from '../config';
-import { CopyToClipboard } from '../utils';
-import { useInterval, Tooltip } from '../presentation';
+import { Tooltip, useInterval } from '../presentation';
+import { CopyToClipboard, timeDiffToString } from '../utils';
 
 export interface IRelativeTimestampProps {
   timestamp: DateTime;
@@ -12,9 +12,28 @@ export interface IRelativeTimestampProps {
 
 const TIMEZONE = SETTINGS.feature.displayTimestampsInUserLocalTime ? undefined : SETTINGS.defaultTimeZone;
 
+export const DurationRender: React.FC<{ startedAt: string; completedAt?: string }> = ({ startedAt, completedAt }) => {
+  const [, setRefresh] = React.useState<boolean>(false);
+  useInterval(
+    () => {
+      if (!completedAt) {
+        setRefresh((state) => !state);
+      }
+    },
+    !completedAt ? 1000 : 0,
+  );
+  const startAtDateTime = DateTime.fromISO(startedAt);
+  const endTime = !completedAt ? DateTime.utc() : DateTime.fromISO(completedAt);
+  return <>{timeDiffToString(startAtDateTime, endTime)}</>;
+};
+
 const formatTimestamp = (timestamp: DateTime, distance: Duration) => {
   if (distance.years || distance.months) {
-    if (timestamp.year === DateTime.local().setZone(TIMEZONE).year) {
+    let currentTime = DateTime.local();
+    if (TIMEZONE) {
+      currentTime = currentTime.setZone(TIMEZONE);
+    }
+    if (timestamp.year === currentTime.year) {
       return timestamp.toFormat('MMM d');
     } else {
       return timestamp.toFormat('MMM d, y');
@@ -37,7 +56,7 @@ const getDistanceFromNow = (timestamp: DateTime) =>
 
 export const RelativeTimestamp = memo(
   ({ timestamp: timestampInOriginalZone, clickToCopy }: IRelativeTimestampProps) => {
-    const timestamp = timestampInOriginalZone.setZone(TIMEZONE);
+    const timestamp = TIMEZONE ? timestampInOriginalZone.setZone(TIMEZONE) : timestampInOriginalZone;
     const [formattedTimestamp, setFormattedTimestamp] = useState(
       formatTimestamp(timestamp, getDistanceFromNow(timestamp)),
     );

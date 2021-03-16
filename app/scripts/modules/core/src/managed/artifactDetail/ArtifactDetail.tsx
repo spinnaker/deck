@@ -1,210 +1,36 @@
-import React, { memo, useMemo } from 'react';
-import ReactGA from 'react-ga';
 import classNames from 'classnames';
-import { useRouter } from '@uirouter/react';
-import { useTransition, animated, UseTransitionProps } from 'react-spring';
 import { DateTime } from 'luxon';
+import React, { useMemo } from 'react';
 
 import {
   IManagedArtifactSummary,
   IManagedArtifactVersion,
   IManagedEnvironmentSummary,
   IManagedResourceSummary,
-  IManagedArtifactVersionEnvironment,
-} from '../../domain';
-import { Application } from '../../application';
-import { useEventListener, Markdown, CollapsibleElement } from '../../presentation';
+} from 'core/domain';
 
 import { AbsoluteTimestamp } from '../AbsoluteTimestamp';
 import { ArtifactDetailHeader } from './ArtifactDetailHeader';
+import { Button } from '../Button';
+import { EnvironmentCards } from './EnvironmentCards';
 import { ManagedResourceObject } from '../ManagedResourceObject';
-import { EnvironmentRow } from '../environment/EnvironmentRow';
+import { showMarkArtifactAsBadModal } from './MarkArtifactAsBadModal';
+import { showPinArtifactModal } from './PinArtifactModal';
 import { PreDeploymentRow } from './PreDeploymentRow';
 import { PreDeploymentStepCard } from './PreDeploymentStepCard';
-import { VersionStateCard } from './VersionStateCard';
-import { StatusCard } from '../StatusCard';
-import { Button } from '../Button';
-import { showPinArtifactModal } from './PinArtifactModal';
-import { showUnpinArtifactModal } from './UnpinArtifactModal';
-import { showMarkArtifactAsBadModal } from './MarkArtifactAsBadModal';
-
-import { ConstraintCard } from './constraints/ConstraintCard';
-import { isConstraintSupported } from './constraints/constraintRegistry';
-import { isResourceKindSupported } from '../resources/resourceRegistry';
+import { Application } from '../../application';
+import { EnvironmentRow } from '../environment/EnvironmentRow';
+import { CollapsibleElement, Markdown, useEventListener } from '../../presentation';
+import { resourceManager } from '../resources/resourceRegistry';
+import { logCategories, useLogEvent } from '../utils/logging';
 
 import './ArtifactDetail.less';
 
 const SUPPORTED_PRE_DEPLOYMENT_TYPES = ['BUILD', 'BAKE'];
 
 function shouldDisplayResource(reference: string, resource: IManagedResourceSummary) {
-  return isResourceKindSupported(resource.kind) && reference === resource.artifact?.reference;
+  return resourceManager.isResourceSupported(resource.kind) && reference === resource.artifact?.reference;
 }
-
-const logEvent = (label: string, application: string, environment: string, reference: string) =>
-  ReactGA.event({
-    category: 'Environments - version details',
-    action: label,
-    label: `${application}:${environment}:${reference}`,
-  });
-
-const inStyles = {
-  opacity: 1,
-  transform: 'scale(1.0, 1.0)',
-};
-
-const outStyles = {
-  opacity: 0,
-  transform: 'scale(0.95, 0.95)',
-};
-
-const cardTransitionConfig = {
-  from: outStyles,
-  // KLUDGE: all we're *actually* doing in this scary looking handler
-  // is delaying the start of any enter transitions for a fixed time
-  // so parent transitions for the overall layout have time to start.
-  // Unfortunately today useTransition doesn't support fixed delays
-  // without tapping into this promise-based orchestration feature (ew).
-  // When react-spring v9 is released, this can be changed
-  // to a function that returns { to: inStyles, delay: 180 }
-  enter: () => async (next: (_: React.CSSProperties) => any) => {
-    await new Promise((resolve) => setTimeout(resolve, 180));
-    next(inStyles);
-  },
-  leave: outStyles,
-  trail: 40,
-  config: { mass: 1, tension: 600, friction: 40 },
-} as UseTransitionProps<JSX.Element, React.CSSProperties>;
-
-type IEnvironmentCardsProps = Pick<
-  IArtifactDetailProps,
-  'application' | 'reference' | 'version' | 'allVersions' | 'resourcesByEnvironment'
-> & {
-  environment: IManagedArtifactVersionEnvironment;
-  pinnedVersion: string;
-};
-
-const EnvironmentCards = memo(
-  ({
-    application,
-    environment,
-    reference,
-    version: versionDetails,
-    allVersions,
-    pinnedVersion,
-    resourcesByEnvironment,
-  }: IEnvironmentCardsProps) => {
-    const {
-      name: environmentName,
-      state,
-      deployedAt,
-      replacedAt,
-      replacedBy,
-      pinned,
-      vetoed,
-      statefulConstraints,
-      statelessConstraints,
-      compareLink,
-    } = environment;
-    const {
-      stateService: { go },
-    } = useRouter();
-
-    const differentVersionPinnedCard = pinnedVersion &&
-      pinnedVersion !== versionDetails.version &&
-      !['vetoed', 'skipped'].includes(state) && (
-        <StatusCard
-          iconName="cloudWaiting"
-          appearance="warning"
-          background={true}
-          title="A different version is pinned here"
-          actions={<Button onClick={() => go('.', { version: pinnedVersion })}>See version</Button>}
-        />
-      );
-
-    const pinnedCard = pinned && (
-      <StatusCard
-        iconName="pin"
-        appearance="warning"
-        background={true}
-        timestamp={pinned?.at ? DateTime.fromISO(pinned.at) : null}
-        title={
-          <span className="sp-group-margin-xs-xaxis">
-            <span>Pinned</span> <span className="text-regular">—</span>{' '}
-            <span className="text-regular">by {pinned.by}</span>
-          </span>
-        }
-        description={pinned.comment && <Markdown message={pinned.comment} tag="span" />}
-        actions={
-          <Button
-            iconName="unpin"
-            onClick={() =>
-              showUnpinArtifactModal({
-                application,
-                reference,
-                version: versionDetails,
-                resourcesByEnvironment,
-                environment: environmentName,
-              }).then(({ status }) => status === 'CLOSED' && application.getDataSource('environments').refresh())
-            }
-          >
-            Unpin
-          </Button>
-        }
-      />
-    );
-    const versionStateCard = (
-      <VersionStateCard
-        key="versionStateCard"
-        state={state}
-        deployedAt={deployedAt}
-        replacedAt={replacedAt}
-        replacedBy={replacedBy}
-        vetoed={vetoed}
-        compareLink={compareLink}
-        allVersions={allVersions}
-        logClick={(message) => logEvent(message, application.name, environmentName, reference)}
-      />
-    );
-    const constraintCards = useMemo(
-      () =>
-        [...(statelessConstraints || []), ...(statefulConstraints || [])]
-          .filter(({ type }) => isConstraintSupported(type))
-          .map((constraint) => (
-            <ConstraintCard
-              key={constraint.type}
-              application={application}
-              environment={environment}
-              reference={reference}
-              version={versionDetails.version}
-              constraint={constraint}
-            />
-          )),
-      [application, environmentName, versionDetails.version, statefulConstraints, statelessConstraints],
-    );
-
-    const transitions = useTransition(
-      [...constraintCards, ...[versionStateCard, pinnedCard, differentVersionPinnedCard].filter(Boolean)],
-      ({ key }) => key,
-      cardTransitionConfig,
-    );
-
-    return (
-      <>
-        {
-          /*
-           * Since transitions trail in ascending order, we need to reverse them
-           * to get the trail to go up the the list instead of down.
-           */
-          transitions.reverse().map(({ item: card, key, props }) => (
-            <animated.div key={key} style={props}>
-              {card}
-            </animated.div>
-          ))
-        }
-      </>
-    );
-  },
-);
 
 const VersionMetadataItem = ({ label, value }: { label: string; value: JSX.Element | string }) => (
   <div className="flex-container-h sp-margin-xs-bottom">
@@ -236,9 +62,10 @@ export const ArtifactDetail = ({
   onRequestClose,
 }: IArtifactDetailProps) => {
   const { environments, lifecycleSteps, git, createdAt } = versionDetails;
+  const logEvent = useLogEvent(logCategories.artifactDetails);
 
-  const keydownCallback = ({ keyCode }: KeyboardEvent) => {
-    if (keyCode === 27 /* esc */) {
+  const keydownCallback = ({ key }: KeyboardEvent) => {
+    if (key === 'Esc') {
       onRequestClose();
     }
   };
@@ -253,10 +80,16 @@ export const ArtifactDetail = ({
     ?.filter(({ scope, type }) => scope === 'PRE_DEPLOYMENT' && SUPPORTED_PRE_DEPLOYMENT_TYPES.includes(type))
     .reverse();
 
+  const getPinnedVersion = (environmentName: string) => {
+    const envData = allEnvironments.find(({ name }) => name === environmentName);
+    const artifactData = envData?.artifacts.find(({ reference: referenceToMatch }) => referenceToMatch === reference);
+    return artifactData?.pinnedVersion;
+  };
+
   return (
     <>
       <ArtifactDetailHeader
-        reference={showReferenceNames ? reference : null}
+        reference={showReferenceNames ? reference : undefined}
         version={versionDetails}
         onRequestClose={onRequestClose}
       />
@@ -306,7 +139,7 @@ export const ArtifactDetail = ({
                 value={
                   <a
                     href={git.pullRequest.url}
-                    onClick={() => logEvent('PR link clicked', application.name, 'none', reference)}
+                    onClick={() => logEvent({ action: 'PR link clicked', label: reference })}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -322,7 +155,7 @@ export const ArtifactDetail = ({
                   value={
                     <a
                       href={git.commitInfo.link}
-                      onClick={() => logEvent('Commit link clicked', application.name, 'none', reference)}
+                      onClick={() => logEvent({ action: 'Commit link clicked', label: reference })}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -347,28 +180,22 @@ export const ArtifactDetail = ({
         {environments.map((environment) => {
           const { name: environmentName, state } = environment;
 
-          const { pinnedVersion } = allEnvironments
-            .find(({ name }) => name === environmentName)
-            .artifacts.find(({ reference: referenceToMatch }) => referenceToMatch === reference);
-
           return (
             <EnvironmentRow
               key={environmentName}
               name={environmentName}
               resources={resourcesByEnvironment[environmentName]}
             >
-              <div>
-                <EnvironmentCards
-                  application={application}
-                  environment={environment}
-                  reference={reference}
-                  version={versionDetails}
-                  allVersions={allVersions}
-                  pinnedVersion={pinnedVersion}
-                  resourcesByEnvironment={resourcesByEnvironment}
-                />
-              </div>
-              <div className="sp-margin-l-top">
+              <EnvironmentCards
+                application={application}
+                environment={environment}
+                reference={reference}
+                version={versionDetails}
+                allVersions={allVersions}
+                pinnedVersion={getPinnedVersion(environmentName)}
+                resourcesByEnvironment={resourcesByEnvironment}
+              />
+              <div className="resources-section">
                 {resourcesByEnvironment[environmentName]
                   .filter((resource) => shouldDisplayResource(reference, resource))
                   .sort((a, b) => `${a.kind}${a.displayName}`.localeCompare(`${b.kind}${b.displayName}`))

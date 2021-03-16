@@ -1,5 +1,5 @@
-import React from 'react';
 import { get } from 'lodash';
+import React from 'react';
 
 import { AccountTag, ExecutionDetailsSection, IExecutionDetailsSectionProps } from '@spinnaker/core';
 import {

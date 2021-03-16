@@ -1,9 +1,7 @@
 import React from 'react';
-
 import { Observable, Subject } from 'rxjs';
 
 import { AccountService, IAccount, IPipeline, IStageConfigProps, StageConfigField } from '@spinnaker/core';
-
 import { AccountRegionClusterSelector } from 'cloudfoundry/presentation';
 
 export interface ICloudfoundryRollbackClusterStageProps extends IStageConfigProps {

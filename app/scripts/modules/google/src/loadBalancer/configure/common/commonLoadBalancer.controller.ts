@@ -1,10 +1,9 @@
+import { StateService } from '@uirouter/angularjs';
 import { IScope } from 'angular';
 import { IModalInstanceService } from 'angular-ui-bootstrap';
-import { StateService } from '@uirouter/angularjs';
 import { trimEnd } from 'lodash';
 
 import { Application, InfrastructureCaches } from '@spinnaker/core';
-
 import { IGceLoadBalancer } from 'google/domain/loadBalancer';
 
 export class CommonGceLoadBalancerCtrl {

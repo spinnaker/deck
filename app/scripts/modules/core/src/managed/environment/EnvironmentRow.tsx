@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
 import classNames from 'classnames';
+import React, { useState } from 'react';
 
 import { Icon } from '@spinnaker/presentation';
 
-import { IManagedResourceSummary, IManagedEnvironmentSummary } from '../../domain';
-import { StatusBubble } from '../StatusBubble';
 import { EnvironmentBadge } from '../EnvironmentBadge';
+import { StatusBubble } from '../StatusBubble';
+import { IManagedEnvironmentSummary, IManagedResourceSummary } from '../../domain';
 import { useEnvironmentTypeFromResources } from '../useEnvironmentTypeFromResources.hooks';
 
 import './EnvironmentRow.less';
@@ -33,23 +33,19 @@ export function EnvironmentRow({ name, resources = [], pinnedVersions, children 
             <EnvironmentBadge name={name} critical={isCritical} />
           </div>
           <div className="flex-container-h flex-grow flex-pull-right">
-            {pinnedVersions?.length > 0 ? (
+            {pinnedVersions && pinnedVersions?.length > 0 ? (
               <StatusBubble
                 iconName="pin"
                 appearance="warning"
                 size="small"
-                quantity={pinnedVersions.length > 1 ? pinnedVersions.length : null}
+                quantity={pinnedVersions.length > 1 ? pinnedVersions.length : undefined}
               />
             ) : null}
           </div>
           <div className="expand" onClick={() => setIsCollapsed(!isCollapsed)}>
-            {isCollapsed && <Icon name="accordionExpand" size="extraSmall" />}
-            {!isCollapsed && <Icon name="accordionCollapse" size="extraSmall" />}
+            <Icon name={isCollapsed ? 'accordionExpand' : 'accordionCollapse'} size="extraSmall" />
           </div>
         </span>
-        {/* <div className="select">
-            <i className={`ico icon-checkbox-unchecked`}/>
-          </div> */}
       </div>
 
       {!isCollapsed && <div style={{ margin: '16px 0 40px 8px' }}>{children}</div>}

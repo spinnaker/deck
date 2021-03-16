@@ -1,34 +1,32 @@
-import React from 'react';
 import { get } from 'lodash';
+import React from 'react';
 
 import {
   Application,
   FirewallLabels,
   IModalComponentProps,
   IStage,
+  noop,
   ReactInjector,
   ReactModal,
   TaskMonitor,
   WizardModal,
   WizardPage,
-  noop,
 } from '@spinnaker/core';
-
 import { AwsReactInjector } from 'amazon/reactShims';
 
-import { IAmazonServerGroupCommand } from '../serverGroupConfiguration.service';
-
+import { ServerGroupTemplateSelection } from './ServerGroupTemplateSelection';
 import {
+  ServerGroupAdvancedSettings,
   ServerGroupBasicSettings,
   ServerGroupCapacity,
   ServerGroupInstanceType,
-  ServerGroupZones,
   ServerGroupLoadBalancers,
   ServerGroupSecurityGroups,
   ServerGroupVolumes,
-  ServerGroupAdvancedSettings,
+  ServerGroupZones,
 } from './pages';
-import { ServerGroupTemplateSelection } from './ServerGroupTemplateSelection';
+import { IAmazonServerGroupCommand } from '../serverGroupConfiguration.service';
 
 export interface IAmazonCloneServerGroupModalProps extends IModalComponentProps {
   title: string;
