@@ -40,7 +40,7 @@ export class ServerGroupVolumes
 
   private tagsChanged = (tags: { [key: string]: string }, duplicateKeys: boolean) => {
     this.duplicateKeys = duplicateKeys;
-    this.props.formik.setFieldValue('blockDevicesTags', tags);
+    this.props.formik.setFieldValue('blockDeviceTags', tags);
   };
 
   constructor(props: IServerGroupVolumesProps) {
@@ -49,7 +49,7 @@ export class ServerGroupVolumes
 
   public render() {
     const { values } = this.props.formik;
-    const blockTags = isNil(values.blockDevicesTags) ? [] : values.blockDevicesTags;
+    const blockTags = isNil(values.blockDeviceTags) ? [] : values.blockDeviceTags;
 
     return (
       <div className="container-fluid form-horizontal">

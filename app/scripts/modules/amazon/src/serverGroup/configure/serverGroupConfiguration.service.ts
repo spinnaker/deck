@@ -113,7 +113,7 @@ export interface IAmazonServerGroupCommand extends IServerGroupCommand {
   unlimitedCpuCredits?: boolean;
   viewState: IAmazonServerGroupCommandViewState;
   blockDevices: IServerGroupCommandBlockDevice[];
-  blockDevicesTags: string[];
+  blockDeviceTags: string[];
 
   getBlockDeviceMappingsSource: (command: IServerGroupCommand) => IBlockDeviceMappingSource;
   selectBlockDeviceMappingsSource: (command: IServerGroupCommand, selection: string) => void;
