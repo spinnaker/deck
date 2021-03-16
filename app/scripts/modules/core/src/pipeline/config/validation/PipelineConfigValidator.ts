@@ -136,14 +136,16 @@ export class PipelineConfigValidator {
             );
           }
         });
-      } else if (config && config.validateFn) {
+      }
+      if (config && config.validateFn) {
         validations.push(
           $q<FormikErrors<IStage>>((resolve, reject) =>
             Promise.resolve(config.validateFn(stage, { pipeline })).then(resolve, reject),
           ).then((errors: FormikErrors<IStage>) => {
             const array: string[] = PipelineConfigValidator.flattenValues(errors);
-            if (array && array.length > 0) {
-              stageValidations.set(stage, array);
+            if (array?.length) {
+              const existingValidations = stageValidations.get(stage) ?? [];
+              stageValidations.set(stage, existingValidations.concat(array));
             }
           }),
         );
