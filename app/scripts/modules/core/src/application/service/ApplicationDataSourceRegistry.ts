@@ -21,6 +21,8 @@ export class ApplicationDataSourceRegistry {
   }
 
   private static sortDataSources(): void {
+    // eslint-disable-next-line no-console
+    console.log(this.dataSources);
     let order = this.defaultDataSourceOrder;
     if (this.dataSourceOrder.length) {
       order = this.dataSourceOrder;
@@ -40,6 +42,12 @@ export class ApplicationDataSourceRegistry {
 
   public static getDataSources(): Array<IDataSourceConfig<any>> {
     return cloneDeep(this.dataSources);
+  }
+
+  public static removeDataSource(key: string): void {
+    this.dataSources = this.dataSources.filter((data) => {
+      return data.key !== key;
+    });
   }
 
   public static clearDataSources(): void {
