@@ -23,7 +23,7 @@ describe('core: Create Application', () => {
 
     cy.get('input[name=name]').type('testapp1');
     cy.get('input[name=email]').type('user@testcompany.com');
-    cy.get('button:contains("Create")').click();
+    cy.get('submit-button > button:contains("Create")').click();
     cy.url().should('include', '#/applications/testapp1/clusters');
   });
 });
