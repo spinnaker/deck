@@ -65,7 +65,7 @@ export const ArtifactDetail = ({
   const logEvent = useLogEvent(logCategories.artifactDetails);
 
   const keydownCallback = ({ key }: KeyboardEvent) => {
-    if (key === 'Esc') {
+    if (key === 'Escape') {
       onRequestClose();
     }
   };
