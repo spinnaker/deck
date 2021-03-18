@@ -7,7 +7,6 @@ import { Subscription } from 'rxjs';
 import { Application } from 'core/application';
 import { IExecution, IPipeline, IPipelineCommand } from 'core/domain';
 import { FilterCollapse, FilterTags, IFilterTag, ISortFilter } from 'core/filterModel';
-import { Overridable } from 'core/overrideRegistry';
 import { Tooltip } from 'core/presentation/Tooltip';
 import { ReactInjector } from 'core/reactShims';
 import { SchedulerFactory } from 'core/scheduler';
@@ -45,7 +44,6 @@ const forwardedExecutions = new Set();
 // This ensures we only forward to permalink on landing, not on future refreshes
 let disableForwarding = false;
 
-@Overridable('createExecutions')
 export class Executions extends React.Component<IExecutionsProps, IExecutionsState> {
   private executionsRefreshUnsubscribe: Function;
   private groupsUpdatedSubscription: Subscription;
@@ -449,3 +447,5 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
     return null;
   }
 }
+
+export default Executions;
