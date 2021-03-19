@@ -21,8 +21,6 @@ export class ApplicationDataSourceRegistry {
   }
 
   private static sortDataSources(): void {
-    // eslint-disable-next-line no-console
-    console.log(this.dataSources);
     let order = this.defaultDataSourceOrder;
     if (this.dataSourceOrder.length) {
       order = this.dataSourceOrder;
