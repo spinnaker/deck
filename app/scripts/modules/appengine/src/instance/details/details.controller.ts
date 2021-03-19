@@ -4,12 +4,11 @@ import { cloneDeep, flattenDeep } from 'lodash';
 import {
   Application,
   ConfirmationModalService,
+  ILoadBalancer,
   InstanceReader,
   InstanceWriter,
   RecentHistoryService,
-  ILoadBalancer,
 } from '@spinnaker/core';
-
 import { IAppengineInstance } from 'appengine/domain';
 
 interface InstanceFromStateParams {

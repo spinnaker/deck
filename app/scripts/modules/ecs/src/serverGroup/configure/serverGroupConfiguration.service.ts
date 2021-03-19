@@ -1,6 +1,7 @@
-import { module, IQService } from 'angular';
+import { IQService, module } from 'angular';
 import { chain, clone, extend, find, flatten, has, intersection, keys, some, xor } from 'lodash';
 
+import { IAmazonLoadBalancer } from '@spinnaker/amazon';
 import {
   AccountService,
   CACHE_INITIALIZER_SERVICE,
@@ -8,7 +9,6 @@ import {
   IArtifact,
   IDeploymentStrategy,
   IPipeline,
-  IStage,
   IRegion,
   IServerGroupCommand,
   IServerGroupCommandBackingData,
@@ -16,35 +16,37 @@ import {
   IServerGroupCommandDirty,
   IServerGroupCommandResult,
   IServerGroupCommandViewState,
+  IStage,
   ISubnet,
   LOAD_BALANCER_READ_SERVICE,
   LoadBalancerReader,
   NameUtils,
+  SECURITY_GROUP_READER,
+  SecurityGroupReader,
   SERVER_GROUP_COMMAND_REGISTRY_PROVIDER,
   ServerGroupCommandRegistry,
   SubnetReader,
-  SECURITY_GROUP_READER,
-  SecurityGroupReader,
-  // ISecurityGroup,
 } from '@spinnaker/core';
-
-import { IAmazonLoadBalancer } from '@spinnaker/amazon';
 import { DockerImageReader, IDockerImage } from '@spinnaker/docker';
-import { IamRoleReader } from '../../iamRoles/iamRole.read.service';
-import { EcsClusterReader } from '../../ecsCluster/ecsCluster.read.service';
-import { MetricAlarmReader } from '../../metricAlarm/metricAlarm.read.service';
-import { IRoleDescriptor } from '../../iamRoles/IRole';
-import { IMetricAlarmDescriptor } from '../../metricAlarm/MetricAlarm';
-import { PlacementStrategyService } from '../../placementStrategy/placementStrategy.service';
-import { IPlacementStrategy } from '../../placementStrategy/IPlacementStrategy';
+
+import { IEcsCapacityProviderDetails } from '../../ecsCluster/IEcsCapacityProviderDetails';
 import { IEcsClusterDescriptor } from '../../ecsCluster/IEcsCluster';
-import { SecretReader } from '../../secrets/secret.read.service';
+import { EcsClusterReader } from '../../ecsCluster/ecsCluster.read.service';
+import { IRoleDescriptor } from '../../iamRoles/IRole';
+import { IamRoleReader } from '../../iamRoles/iamRole.read.service';
+import { IMetricAlarmDescriptor } from '../../metricAlarm/MetricAlarm';
+import { MetricAlarmReader } from '../../metricAlarm/metricAlarm.read.service';
+import { IPlacementStrategy } from '../../placementStrategy/IPlacementStrategy';
+import { PlacementStrategyService } from '../../placementStrategy/placementStrategy.service';
 import { ISecretDescriptor } from '../../secrets/ISecret';
-import { ServiceDiscoveryReader } from '../../serviceDiscovery/serviceDiscovery.read.service';
+import { SecretReader } from '../../secrets/secret.read.service';
 import { IServiceDiscoveryRegistryDescriptor } from '../../serviceDiscovery/IServiceDiscovery';
+import { ServiceDiscoveryReader } from '../../serviceDiscovery/serviceDiscovery.read.service';
 
 export interface IEcsServerGroupCommandDirty extends IServerGroupCommandDirty {
-  targetGroup?: string;
+  targetGroups?: string[];
+  defaulCapacityProviders?: string[];
+  customCapacityProviders?: string[];
 }
 
 export interface IEcsServerGroupCommandResult extends IServerGroupCommandResult {
@@ -64,12 +66,15 @@ export interface IEcsServerGroupCommandViewState extends IServerGroupCommandView
   contextImages: IEcsDockerImage[];
   pipeline: IPipeline;
   currentStage: IStage;
+  dirty: IEcsServerGroupCommandDirty;
 }
 
 export interface IEcsServerGroupCommandBackingDataFiltered extends IServerGroupCommandBackingDataFiltered {
   targetGroups: string[];
   iamRoles: string[];
   ecsClusters: string[];
+  availableCapacityProviders: string[];
+  defaultCapacityProviderStrategy: IEcsCapacityProviderStrategyItem[];
   metricAlarms: IMetricAlarmDescriptor[];
   subnetTypes: ISubnet[];
   securityGroupNames: string[];
@@ -82,6 +87,7 @@ export interface IEcsServerGroupCommandBackingData extends IServerGroupCommandBa
   filtered: IEcsServerGroupCommandBackingDataFiltered;
   targetGroups: string[];
   ecsClusters: IEcsClusterDescriptor[];
+  capacityProviderDetails: IEcsCapacityProviderDetails[];
   iamRoles: IRoleDescriptor[];
   metricAlarms: IMetricAlarmDescriptor[];
   launchTypes: string[];
@@ -116,7 +122,7 @@ export interface IEcsServiceDiscoveryRegistryAssociation {
 export interface IEcsCapacityProviderStrategyItem {
   capacityProvider: string;
   base: number;
-  weight: number
+  weight: number;
 }
 
 export interface IEcsServerGroupCommand extends IServerGroupCommand {
@@ -144,6 +150,8 @@ export interface IEcsServerGroupCommand extends IServerGroupCommand {
   useTaskDefinitionArtifact: boolean;
 
   capacityProviderStrategy: IEcsCapacityProviderStrategyItem[];
+  useDefaultCapacityProviders: boolean;
+  ecsClusterName: string;
   subnetTypeChanged: (command: IEcsServerGroupCommand) => IServerGroupCommandResult;
   placementStrategyNameChanged: (command: IEcsServerGroupCommand) => IServerGroupCommandResult;
   regionIsDeprecated: (command: IEcsServerGroupCommand) => boolean;
@@ -249,6 +257,7 @@ export class EcsServerGroupConfigurationService {
         subnets: SubnetReader.listSubnetsByProvider('ecs'),
         iamRoles: this.iamRoleReader.listRoles('ecs'),
         ecsClusters: this.ecsClusterReader.listClusters(),
+        capacityProviderDetails: this.ecsClusterReader.describeClusters(cmd.credentials, cmd.region),
         metricAlarms: this.metricAlarmReader.listMetricAlarms(),
         securityGroups: this.securityGroupReader.getAllSecurityGroups(),
         launchTypes: this.$q.when(clone(this.launchTypes)),
@@ -270,6 +279,7 @@ export class EcsServerGroupConfigurationService {
         this.configureAvailableSubnetTypes(cmd);
         this.configureAvailableSecurityGroups(cmd);
         this.configureAvailableEcsClusters(cmd);
+        this.setCapacityProviderDetails(cmd);
         this.configureAvailableSecrets(cmd);
         this.configureAvailableServiceDiscoveryRegistries(cmd);
         this.configureAvailableImages(cmd);
@@ -278,6 +288,52 @@ export class EcsServerGroupConfigurationService {
         this.applyOverrides('afterConfiguration', cmd);
         this.attachEventHandlers(cmd);
       });
+  }
+
+  public setCapacityProviderDetails(command: IEcsServerGroupCommand): void {
+    this.$q
+      .all({
+        capacityProviderDetails: this.ecsClusterReader.describeClusters(command.credentials, command.region),
+      })
+      .then((result: Partial<IEcsServerGroupCommandBackingData>) => {
+        command.backingData.capacityProviderDetails = chain(result.capacityProviderDetails)
+          .map((cluster) => this.mapCapacityProviderDetails(cluster))
+          .value();
+      });
+
+    if (command.ecsClusterName != null && command.ecsClusterName.length > 0) {
+      this.configureAvailableCapacityProviders(command);
+    } else {
+      command.backingData.filtered.availableCapacityProviders = [];
+      command.backingData.filtered.defaultCapacityProviderStrategy = [];
+    }
+    this.checkDirtyCapacityProviders(command);
+  }
+
+  public configureAvailableCapacityProviders(command: IEcsServerGroupCommand): void {
+    command.backingData.filtered.availableCapacityProviders = chain(command.backingData.capacityProviderDetails)
+      .filter({
+        clusterName: command.ecsClusterName,
+      })
+      .map((availableCPs) => availableCPs.capacityProviders)
+      .flattenDeep<string>()
+      .value();
+
+    command.backingData.filtered.defaultCapacityProviderStrategy = chain(command.backingData.capacityProviderDetails)
+      .filter({
+        clusterName: command.ecsClusterName,
+      })
+      .map((availableCPs) => availableCPs.defaultCapacityProviderStrategy)
+      .flattenDeep<IEcsCapacityProviderStrategyItem>()
+      .value();
+  }
+
+  public mapCapacityProviderDetails(describeClusters: IEcsCapacityProviderDetails): IEcsCapacityProviderDetails {
+    return {
+      capacityProviders: describeClusters.capacityProviders,
+      clusterName: describeClusters.clusterName,
+      defaultCapacityProviderStrategy: describeClusters.defaultCapacityProviderStrategy,
+    };
   }
 
   public applyOverrides(phase: string, command: IEcsServerGroupCommand): void {
@@ -507,7 +563,7 @@ export class EcsServerGroupConfigurationService {
     const newLoadBalancers = this.getLoadBalancerNames(command);
     const vpcLoadBalancers = this.getVpcLoadBalancerNames(command);
     const allTargetGroups = this.getTargetGroupNames(command);
-
+    const currentTargetGroups = command.targetGroupMappings.map((tg) => tg.targetGroup);
     if (currentLoadBalancers && command.loadBalancers) {
       const valid = command.vpcId ? newLoadBalancers : newLoadBalancers.concat(vpcLoadBalancers);
       const matched = intersection(valid, currentLoadBalancers);
@@ -520,6 +576,16 @@ export class EcsServerGroupConfigurationService {
       }
       if (removedLoadBalancers.length) {
         result.dirty.loadBalancers = removedLoadBalancers;
+      }
+    }
+
+    if (currentTargetGroups) {
+      const matched = intersection(allTargetGroups, currentTargetGroups);
+      const removedTargetGroups = xor(matched, currentTargetGroups);
+      if (removedTargetGroups && removedTargetGroups.length > 0) {
+        command.viewState.dirty.targetGroups = removedTargetGroups;
+      } else if (command.viewState.dirty && command.viewState.dirty.targetGroups) {
+        command.viewState.dirty.targetGroups = [];
       }
     }
 
@@ -563,6 +629,36 @@ export class EcsServerGroupConfigurationService {
     return result;
   }
 
+  public checkDirtyCapacityProviders(command: IEcsServerGroupCommand): void {
+    if (command.capacityProviderStrategy) {
+      const availableCustomCapacityProviders = command.backingData.filtered.availableCapacityProviders;
+      const currentCapacityProviders = command.capacityProviderStrategy.map((cp) => cp.capacityProvider);
+      const matchedCustomCapacityProviders = intersection(availableCustomCapacityProviders, currentCapacityProviders);
+      const removedCustomCapacityProviders = xor(matchedCustomCapacityProviders, currentCapacityProviders);
+
+      if (removedCustomCapacityProviders && removedCustomCapacityProviders.length > 0) {
+        command.viewState.dirty.customCapacityProviders = removedCustomCapacityProviders;
+      } else if (command.viewState.dirty && command.viewState.dirty.customCapacityProviders) {
+        command.viewState.dirty.customCapacityProviders = [];
+      }
+
+      if (command.useDefaultCapacityProviders) {
+        const availableDefaultCapacityProvider = command.backingData.filtered.defaultCapacityProviderStrategy.map(
+          (cp) => cp.capacityProvider,
+        );
+        const matchedDefaultCapacityProviders = intersection(
+          availableDefaultCapacityProvider,
+          currentCapacityProviders,
+        );
+        const removedDefaultCapacityProviders = xor(matchedDefaultCapacityProviders, currentCapacityProviders);
+
+        if (removedDefaultCapacityProviders && removedDefaultCapacityProviders.length > 0) {
+          command.viewState.dirty.defaulCapacityProviders = removedDefaultCapacityProviders;
+        }
+      }
+    }
+  }
+
   public attachEventHandlers(cmd: IEcsServerGroupCommand): void {
     cmd.subnetChanged = (command: IEcsServerGroupCommand): IServerGroupCommandResult => {
       const result = this.configureVpcId(command);
@@ -583,6 +679,7 @@ export class EcsServerGroupConfigurationService {
         this.configureAvailableSecurityGroups(command);
         this.configureAvailableSecrets(command);
         this.configureAvailableServiceDiscoveryRegistries(command);
+        this.setCapacityProviderDetails(command);
       }
 
       return result;
@@ -609,6 +706,7 @@ export class EcsServerGroupConfigurationService {
         this.configureAvailableSecrets(command);
         this.configureAvailableServiceDiscoveryRegistries(command);
         this.configureAvailableRegions(command);
+        this.setCapacityProviderDetails(command);
 
         if (!some(backingData.filtered.regions, { name: command.region })) {
           command.region = null;

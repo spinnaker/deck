@@ -9,7 +9,6 @@ import {
   ILoadBalancerUpsertCommand,
   IServerGroup,
 } from '@spinnaker/core';
-
 import { IAppengineLoadBalancer, IAppengineTrafficSplit, ShardBy } from 'appengine/domain/index';
 
 export interface IAppengineAllocationDescription {

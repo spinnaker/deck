@@ -1,13 +1,13 @@
-import { get, set, flatMap } from 'lodash';
+import { flatMap, get, set } from 'lodash';
 
 import { REST } from 'core/api';
 import {
   IManagedApplicationSummary,
-  ManagedResourceStatus,
-  IManagedResourceEventHistoryResponse,
-  IManagedResourceEventHistory,
   IManagedResourceDiff,
   IManagedResourceEvent,
+  IManagedResourceEventHistory,
+  IManagedResourceEventHistoryResponse,
+  ManagedResourceStatus,
 } from 'core/domain';
 
 const KIND_NAME_MATCHER = /.*\/(.*?)@/i;
@@ -31,8 +31,9 @@ export const getResourceKindForLoadBalancerType = (type: string) => {
   }
 };
 
-const transformManagedResourceDiff = (diff: IManagedResourceEventHistoryResponse[0]['delta']): IManagedResourceDiff =>
-  Object.keys(diff).reduce((transformed, key) => {
+const transformManagedResourceDiff = (diff: IManagedResourceEventHistoryResponse[0]['delta']): IManagedResourceDiff => {
+  if (!diff) return {};
+  return Object.keys(diff).reduce((transformed, key) => {
     const diffNode = diff[key];
     const fieldKeys = flatMap<string, string>(key.split('/').filter(Boolean), (fieldKey) => {
       // Region keys currently come wrapped in {}, which is distracting and not useful. Let's trim those off.
@@ -66,6 +67,7 @@ const transformManagedResourceDiff = (diff: IManagedResourceEventHistoryResponse
     });
     return transformed;
   }, {} as IManagedResourceDiff);
+};
 
 export class ManagedReader {
   private static decorateResources(response: IManagedApplicationSummary) {

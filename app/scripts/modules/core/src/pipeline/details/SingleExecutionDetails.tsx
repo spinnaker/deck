@@ -1,30 +1,23 @@
-import React from 'react';
+import { UISref, useCurrentStateAndParams } from '@uirouter/react';
+import { set } from 'lodash';
+import React, { useEffect, useState } from 'react';
 import ReactGA from 'react-ga';
-import { Subscription } from 'rxjs';
-import { UISref } from '@uirouter/react';
 
 import { Application } from 'core/application/application.model';
 import { IExecution, IPipeline } from 'core/domain';
-import { Execution } from '../executions/execution/Execution';
-import { IScheduler, SchedulerFactory } from 'core/scheduler';
-import { ManualExecutionModal } from '../manualExecution';
-import { ReactInjector, IStateChange } from 'core/reactShims';
-import { Tooltip } from 'core/presentation';
-import { ISortFilter } from 'core/filterModel';
+import { Tooltip, useData, useLatestPromise } from 'core/presentation';
+import { IStateChange, ReactInjector } from 'core/reactShims';
+import { SchedulerFactory } from 'core/scheduler';
 import { ExecutionState } from 'core/state';
+
+import { Execution } from '../executions/execution/Execution';
+import { ManualExecutionModal } from '../manualExecution';
 import { ExecutionsTransformer } from '../service/ExecutionsTransformer';
 
 import './singleExecutionDetails.less';
 
 export interface ISingleExecutionDetailsProps {
   app: Application;
-}
-
-export interface ISingleExecutionDetailsState {
-  execution: IExecution;
-  pipelineConfig?: IPipeline;
-  sortFilter: ISortFilter;
-  stateNotFound: boolean;
 }
 
 export interface ISingleExecutionStateParams {
@@ -37,201 +30,237 @@ export interface ISingleExecutionRouterStateChange extends IStateChange {
   toParams: ISingleExecutionStateParams;
 }
 
-export class SingleExecutionDetails extends React.Component<
-  ISingleExecutionDetailsProps,
-  ISingleExecutionDetailsState
-> {
-  private executionScheduler: IScheduler;
-  private executionLoader: Subscription;
-  private stateChangeSuccessSubscription: Subscription;
+export function getAndTransformExecution(id: string, app: Application) {
+  return ReactInjector.executionService.getExecution(id).then((execution) => {
+    ExecutionsTransformer.transformExecution(app, execution);
+    return execution;
+  });
+}
 
-  constructor(props: ISingleExecutionDetailsProps) {
-    super(props);
+// 3 generations is probably the most reasonable window to render?
+function traverseLineage(execution: IExecution, maxGenerations = 3): string[] {
+  const lineage: string[] = [];
+  if (!execution) {
+    return lineage;
+  }
+  let current = execution;
+  // Including the deepest child (topmost, aka current, execution) in the lineage lets us
+  // also cache it as part of the ancestry state (we just don't render it).
+  // This buys us snappier navigation to descendants because the entire lineage will be local.
+  lineage.unshift(current.id);
+  while (current.trigger?.parentExecution && lineage.length < maxGenerations) {
+    current = current.trigger.parentExecution;
+    lineage.unshift(current.id);
+  }
+  return lineage;
+}
 
-    this.state = {
-      execution: null,
-      sortFilter: ExecutionState.filterModel.asFilterModel.sortFilter,
-      stateNotFound: false,
+export function SingleExecutionDetails(props: ISingleExecutionDetailsProps) {
+  const scheduler = SchedulerFactory.createScheduler(5000);
+  const { sortFilter } = ExecutionState.filterModel.asFilterModel;
+  const { app } = props;
+
+  const [showDurations, setShowDurations] = useState(sortFilter.showDurations);
+  const { params } = useCurrentStateAndParams();
+  const { executionId } = params;
+
+  const getAncestry = (execution: IExecution): Promise<IExecution[]> => {
+    const youngest = ancestry[ancestry.length - 1];
+    // youngest and execution don't match only during navigating between executions
+    const navigating = execution && youngest && youngest.id !== execution.id;
+    const lineage = traverseLineage(execution);
+
+    // used when navigating between executions so clicking between generations is snappy
+    const ancestryCache = ancestry.reduce((acc, curr) => set(acc, curr.id, curr), {
+      [execution.id]: execution,
+    });
+
+    // used to skip re-fetching ancestors that are no longer active
+    const inactiveCache = ancestry
+      .filter((ancestor) => !ancestor.isActive)
+      .reduce((acc, curr) => set(acc, curr.id, curr), { [execution.id]: execution });
+
+    const cache = navigating ? ancestryCache : inactiveCache;
+
+    return Promise.all(
+      lineage.map((generation) =>
+        cache[generation] ? Promise.resolve(cache[generation]) : getAndTransformExecution(generation, app),
+      ),
+    );
+  };
+
+  // responsible for getting execution whenever executionId (route param) changes
+  const { result: execution, status: getExecutionStatus, refresh: refreshExecution } = useLatestPromise(
+    () => getAndTransformExecution(executionId, app),
+    [executionId],
+  );
+
+  const lineage = traverseLineage(execution);
+  const transitioningToAncestor = lineage.includes(executionId) && executionId !== execution?.id ? executionId : '';
+
+  // responsible for getting ancestry whenever execution changes or refreshes
+  const { result: ancestry } = useData(() => getAncestry(execution), [], [execution, executionId]);
+
+  // Manages the scheduled refresh until the entire lineage has no active executions
+  const someActive = [execution]
+    .concat(ancestry)
+    .filter((x) => x)
+    .some((x) => x.isActive);
+  useEffect(() => {
+    const subscription = someActive && scheduler.subscribe(() => refreshExecution());
+
+    return () => {
+      subscription && subscription.unsubscribe();
     };
-  }
+  }, [someActive]);
 
-  private getExecution() {
-    const { executionService, $state } = ReactInjector;
-    const { app } = this.props;
+  const { result: pipelineConfigs } = useLatestPromise<IPipeline[]>(() => {
+    app.pipelineConfigs.activate();
+    return app.pipelineConfigs.ready();
+  }, []);
+  const pipelineConfig =
+    pipelineConfigs && execution && pipelineConfigs.find((p: IPipeline) => p.id === execution.pipelineConfigId);
 
-    if (!app || app.notFound || app.hasError) {
-      return;
-    }
-
-    executionService.getExecution($state.params.executionId).then(
-      (execution) => {
-        ExecutionsTransformer.transformExecution(app, execution);
-        if (execution.isActive && !this.executionScheduler) {
-          this.executionScheduler = SchedulerFactory.createScheduler(5000);
-          this.executionLoader = this.executionScheduler.subscribe(() => this.getExecution());
-        }
-        if (!execution.isActive && this.executionScheduler) {
-          this.executionScheduler.unsubscribe();
-          this.executionLoader.unsubscribe();
-        }
-        this.setState({ execution });
-
-        app.pipelineConfigs.activate();
-        app.pipelineConfigs.ready().then(() => {
-          const pipelineConfig = app.pipelineConfigs.data.find((p: IPipeline) => p.id === execution.pipelineConfigId);
-          this.setState({ pipelineConfig });
-        });
-      },
-      () => {
-        this.setState({ execution: null, stateNotFound: true });
-      },
-    );
-  }
-
-  public componentDidMount(): void {
-    this.stateChangeSuccessSubscription = ReactInjector.stateEvents.stateChangeSuccess.subscribe(
-      (stateChange: ISingleExecutionRouterStateChange) => {
-        if (
-          !stateChange.to.name.includes('pipelineConfig') &&
-          !stateChange.to.name.includes('executions') &&
-          (stateChange.toParams.application !== stateChange.fromParams.application ||
-            stateChange.toParams.executionId !== stateChange.fromParams.executionId)
-        ) {
-          this.getExecution();
-        }
-      },
-    );
-    this.getExecution();
-  }
-
-  public componentWillUnmount(): void {
-    if (this.executionScheduler) {
-      this.executionScheduler.unsubscribe();
-    }
-    if (this.executionLoader) {
-      this.executionLoader.unsubscribe();
-    }
-    this.stateChangeSuccessSubscription.unsubscribe();
-  }
-
-  private showDurationsChanged = (event: React.ChangeEvent<HTMLInputElement>): void => {
+  const showDurationsChanged = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const checked = event.target.checked;
-    // TODO: Since we treat sortFilter like a store, we can force the setState for now
-    //       but we should eventually convert all the sortFilters to be a valid redux
-    //       (or similar) store.
-    this.state.sortFilter.showDurations = checked;
-    this.setState({ sortFilter: this.state.sortFilter });
+    setShowDurations(checked);
+    ExecutionState.filterModel.asFilterModel.sortFilter.showDurations = showDurations;
     ReactGA.event({ category: 'Pipelines', action: 'Toggle Durations', label: checked.toString() });
   };
 
-  private handleConfigureClicked = (e: React.MouseEvent<HTMLElement>): void => {
+  const handleConfigureClicked = (e: React.MouseEvent<HTMLElement>): void => {
     ReactGA.event({ category: 'Execution', action: 'Configuration' });
     ReactInjector.$state.go('^.pipelineConfig', {
-      application: this.props.app.name,
-      pipelineId: this.state.execution.pipelineConfigId,
+      application: app.name,
+      pipelineId: execution.pipelineConfigId,
     });
     e.stopPropagation();
   };
 
-  private rerunExecution = (execution: IExecution) => {
-    const { app } = this.props;
-    const { pipelineConfig: pipeline } = this.state;
-
+  const rerunExecution = (execution: IExecution, application: Application, pipeline: IPipeline) => {
     ManualExecutionModal.show({
-      pipeline: pipeline,
-      application: app,
+      pipeline,
+      application,
       trigger: execution.trigger,
     }).then((command) => {
       const { executionService } = ReactInjector;
-      executionService.startAndMonitorPipeline(app, command.pipelineName, command.trigger);
+      executionService.startAndMonitorPipeline(application, command.pipelineName, command.trigger);
       ReactInjector.$state.go('^.^.executions');
     });
   };
 
-  public render() {
-    const { app } = this.props;
-    const { execution, pipelineConfig, sortFilter, stateNotFound } = this.state;
+  const defaultExecutionParams = { application: app.name, executionId: execution?.id || '' };
+  const executionParams = ReactInjector.$state.params.executionParams || defaultExecutionParams;
 
-    const defaultExecutionParams = { application: app.name, executionId: execution ? execution.id : '' };
-    const executionParams = ReactInjector.$state.params.executionParams || defaultExecutionParams;
+  let truncateAncestry = ancestry.length - 1;
+  if (executionId && execution && executionId !== execution.id) {
+    // We are on the eager end of a transition to a different executionId
+    const idx = ancestry.findIndex((a) => a.id === executionId);
+    if (idx > -1) {
+      // If the incoming executionId is part of the ancestry, we can eagerly truncate the ancestry at that generation
+      // for a smoother experience during the transition. That is, if we are navigating from e to b in [a, b, c, d, e],
+      // [a, b, c, d] is rendered as part of the ancestry, while [e] is the main execution.
+      // We eagerly truncate the ancestry to [a, b] since that will be the end state anyways (transitioningToAncestor hides [e])
+      // Once [b] loads, the ancestry is recomputed to just [a] and the rendered executions remain [a, b]
+      truncateAncestry = idx + 1;
+    }
+  }
 
-    return (
-      <div style={{ width: '100%', paddingTop: 0 }}>
-        {execution && (
-          <div className="row">
-            <div className="col-md-10 col-md-offset-1">
-              <div className="single-execution-details">
-                <div className="flex-container-h baseline">
-                  <h3>
-                    <Tooltip value="Back to Executions">
-                      <UISref to="^.executions.execution" params={executionParams}>
-                        <a className="btn btn-configure">
-                          <span className="glyphicon glyphicon glyphicon-circle-arrow-left" />
-                        </a>
-                      </UISref>
-                    </Tooltip>
-                    {execution.name}
-                  </h3>
+  // Eagerly hide the main execution when we are transitioning to an ancestor and are not rendering that ancestor
+  // Once we've reached it, an effect will re-setTransitioningToAncestor to blank
+  const hideMainExecution = !(!transitioningToAncestor || transitioningToAncestor === execution.id);
 
-                  <div className="form-group checkbox flex-pull-right">
-                    <label>
-                      <input
-                        type="checkbox"
-                        checked={sortFilter.showDurations || false}
-                        onChange={this.showDurationsChanged}
-                      />
-                      <span> stage durations</span>
-                    </label>
-                  </div>
-                  <Tooltip value="Navigate to Pipeline Configuration">
-                    <UISref
-                      to="^.pipelineConfig"
-                      params={{ application: this.props.app.name, pipelineId: this.state.execution.pipelineConfigId }}
-                    >
-                      <button
-                        className="btn btn-sm btn-default single-execution-details__configure"
-                        onClick={this.handleConfigureClicked}
-                      >
-                        <span className="glyphicon glyphicon-cog" />
-                        <span className="visible-md-inline visible-lg-inline"> Configure</span>
-                      </button>
+  return (
+    <div style={{ width: '100%', paddingTop: 0 }}>
+      {execution && (
+        <div className="row">
+          <div className="col-md-10 col-md-offset-1">
+            <div className="single-execution-details">
+              <div className="flex-container-h baseline">
+                <h3>
+                  <Tooltip value="Back to Executions">
+                    <UISref to="^.executions.execution" params={executionParams}>
+                      <a className="btn btn-configure">
+                        <span className="glyphicon glyphicon glyphicon-circle-arrow-left" />
+                      </a>
                     </UISref>
                   </Tooltip>
+                  {execution.name}
+                </h3>
+
+                <div className="form-group checkbox flex-pull-right">
+                  <label>
+                    <input type="checkbox" checked={showDurations || false} onChange={showDurationsChanged} />
+                    <span> stage durations</span>
+                  </label>
                 </div>
+                <Tooltip value="Navigate to Pipeline Configuration">
+                  <UISref
+                    to="^.pipelineConfig"
+                    params={{ application: app.name, pipelineId: execution.pipelineConfigId }}
+                  >
+                    <button
+                      className="btn btn-sm btn-default single-execution-details__configure"
+                      onClick={handleConfigureClicked}
+                    >
+                      <span className="glyphicon glyphicon-cog" />
+                      <span className="visible-md-inline visible-lg-inline"> Configure</span>
+                    </button>
+                  </UISref>
+                </Tooltip>
               </div>
             </div>
           </div>
-        )}
-        {execution && (
-          <div className="row">
-            <div className="col-md-10 col-md-offset-1 executions">
-              <Execution
-                execution={execution}
-                application={app}
-                pipelineConfig={null}
-                standalone={true}
-                showDurations={sortFilter.showDurations}
-                onRerun={
-                  pipelineConfig &&
-                  (() => {
-                    this.rerunExecution(execution);
-                  })
-                }
-              />
+        </div>
+      )}
+      {execution &&
+        ancestry
+          .filter((_ancestor, i) => i < truncateAncestry)
+          .map((ancestor, i) => (
+            <div className="row" key={ancestor.id}>
+              <div className="col-md-10 col-md-offset-1 executions">
+                <Execution
+                  key={ancestor.id}
+                  execution={ancestor}
+                  descendantExecutionId={i < ancestry.length - 1 ? ancestry[i + 1].id : execution.id}
+                  application={app}
+                  pipelineConfig={null}
+                  standalone={true}
+                  showDurations={showDurations}
+                />
+              </div>
             </div>
+          ))}
+      {execution && !hideMainExecution && (
+        <div className="row">
+          <div className="col-md-10 col-md-offset-1 executions">
+            <Execution
+              execution={execution}
+              key={execution.id}
+              application={app}
+              pipelineConfig={null}
+              standalone={true}
+              showDurations={showDurations}
+              onRerun={
+                pipelineConfig &&
+                (() => {
+                  rerunExecution(execution, app, pipelineConfig);
+                })
+              }
+            />
           </div>
-        )}
-        {stateNotFound && (
-          <div className="row" style={{ minHeight: '300px' }}>
-            <h4 className="text-center">
-              <p>The execution cannot be found.</p>
-              <UISref to="^.executions" params={{ application: app.name }}>
-                <a>Back to Executions.</a>
-              </UISref>
-            </h4>
-          </div>
-        )}
-      </div>
-    );
-  }
+        </div>
+      )}
+      {getExecutionStatus === 'REJECTED' && (
+        <div className="row" style={{ minHeight: '300px' }}>
+          <h4 className="text-center">
+            <p>The execution cannot be found.</p>
+            <UISref to="^.executions" params={{ application: app.name }}>
+              <a>Back to Executions.</a>
+            </UISref>
+          </h4>
+        </div>
+      )}
+    </div>
+  );
 }

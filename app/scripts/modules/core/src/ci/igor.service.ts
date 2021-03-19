@@ -1,7 +1,7 @@
 import { $q } from 'ngimport';
 
 import { REST } from 'core/api/ApiService';
-import { IBuild, IJobConfig, IGcbTrigger } from 'core/domain';
+import { IBuild, IGcbTrigger, IJobConfig } from 'core/domain';
 
 export enum BuildServiceType {
   Jenkins = 'jenkins',
@@ -29,15 +29,15 @@ export class IgorService {
   }
 
   public static listJobsForMaster(master: string): PromiseLike<string[]> {
-    return REST('/v2/builds').path(master, 'jobs').get();
+    return REST('/v3/builds').path(master, 'jobs').get();
   }
 
   public static listBuildsForJob(master: string, job: string): PromiseLike<IBuild[]> {
-    return REST('/v2/builds').path(master, 'builds', job).get();
+    return REST('/v3/builds').path(master, 'builds').query({ job }).get();
   }
 
   public static getJobConfig(master: string, job: string): PromiseLike<IJobConfig> {
-    return REST('/v2/builds').path(master, 'jobs', job).get();
+    return REST('/v3/builds').path(master, 'job').query({ job }).get();
   }
 
   public static getGcbAccounts(): PromiseLike<string[]> {

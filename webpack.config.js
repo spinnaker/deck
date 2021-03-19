@@ -39,6 +39,10 @@ function configure(env, webpackOpts) {
     }),
   ];
 
+  if (process.env.NODE_ENV !== 'production') {
+    plugins.push(new webpack.HotModuleReplacementPlugin());
+  }
+
   if (DISPLAY_PROGRESS) {
     plugins.push(new webpack.ProgressPlugin({ profile: false }));
   }
@@ -197,10 +201,16 @@ function configure(env, webpackOpts) {
           test: /ui-sortable/,
           use: ['imports-loader?$UI=jquery-ui/ui/widgets/sortable'],
         },
+        {
+          test: /\.js$/,
+          enforce: 'pre',
+          use: ['source-map-loader'],
+        },
       ],
     },
     plugins,
     devServer: {
+      hot: true,
       disableHostCheck: true,
       port: process.env.DECK_PORT || 9000,
       host: process.env.DECK_HOST || 'localhost',
