@@ -1,25 +1,8 @@
 import { FormikProps } from 'formik';
-import { intersection, union, set } from 'lodash';
+import { intersection, set, union } from 'lodash';
 import React from 'react';
 
-import {
-  AccountTag,
-  Application,
-  CheckboxInput,
-  ChecklistInput,
-  FormikFormField,
-  FormValidator,
-  HelpField,
-  IFormInputProps,
-  IWizardPageComponent,
-  LayoutProvider,
-  MapEditorInput,
-  PlatformHealthOverrideInput,
-  robotToHuman,
-  SelectInput,
-  TextInput,
-  useFormInputValueMapper,
-} from '@spinnaker/core';
+import { AccountTag, Application, CheckboxInput, ChecklistInput, FormikFormField, FormValidator, HelpField, IFormInputProps, IWizardPageComponent, LayoutProvider, MapEditorInput, PlatformHealthOverrideInput, robotToHuman, SelectInput, TextInput, useFormInputValueMapper } from '@spinnaker/core';
 
 import { TitusMapLayout } from './TitusMapLayout';
 import { ITitusServerGroupCommand } from '../../../configure/serverGroupConfiguration.service';
@@ -111,9 +94,9 @@ export class ServerGroupParameters
     Object.keys(_values.env || {})
       .filter((key) => !key.startsWith('__MapEditorDuplicateKey'))
       .forEach((key) => {
-        if (!key.match(/^[A-Za-z].*/)) {
-          set(errors, `env.${key}`, 'Environment variable names must start with a letter');
-        } else if (!key.match(/[A-Za-z][a-zA-Z0-9_]*$/)) {
+        if (!key.match(/^[A-Za-z_].*/)) {
+          set(errors, `env.${key}`, 'Environment variable names must start with a letter or underscore');
+        } else if (!key.match(/[A-Za-z_][a-zA-Z0-9_]*$/)) {
           set(errors, `env.${key}`, 'Environment variable names must contain only letter, numbers, or underscores');
         }
       });
