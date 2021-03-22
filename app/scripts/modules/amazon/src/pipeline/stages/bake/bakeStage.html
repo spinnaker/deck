@@ -42,7 +42,7 @@
         {{vmType | uppercase}}
       </label>
     </stage-config-field>
-    <stage-config-field label="Store Type" ng-if="!viewState.roscoMode">
+    <stage-config-field label="Store Type" ng-if="!viewState.roscoMode && viewState.showMigrationFields">
       <label class="radio-inline" ng-repeat="storeType in storeTypes">
         <input type="radio" ng-model="stage.storeType" ng-value="storeType" />
         {{storeType | uppercase}}
