@@ -1,8 +1,7 @@
-import { $q } from 'ngimport';
 import { flatten } from 'lodash';
+import { $q } from 'ngimport';
 
 import { AccountService, Application, ILoadBalancer } from '@spinnaker/core';
-
 import { IAmazonApplicationLoadBalancer, IAmazonHealth, IAmazonServerGroup, ITargetGroup } from 'amazon/domain';
 
 export class AmazonLoadBalancerDataUtils {
@@ -24,9 +23,7 @@ export class AmazonLoadBalancerDataUtils {
     serverGroup.instances.forEach((instance) => {
       const tgHealth: IAmazonHealth = instance.health.find((h) => h.type === 'TargetGroup') as IAmazonHealth;
       if (tgHealth) {
-        const matchedHealth: ILoadBalancer = tgHealth.targetGroups.find(
-          (tg) => tg.name === match.name && tg.region === match.region && tg.account === match.account,
-        );
+        const matchedHealth: ILoadBalancer = tgHealth.targetGroups.find((tg) => tg.name === match.name);
 
         if (matchedHealth !== undefined && matchedHealth.healthState !== undefined) {
           const healthState = matchedHealth.healthState.toLowerCase();

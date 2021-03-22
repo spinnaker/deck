@@ -1,6 +1,7 @@
-import React from 'react';
-import { IManifest, ReactInjector, AccountService } from '@spinnaker/core';
 import { get, trim } from 'lodash';
+import React from 'react';
+
+import { AccountService, IManifest, ReactInjector } from '@spinnaker/core';
 
 const UNMAPPED_K8S_RESOURCE_STATE_KEY = 'kubernetesResource';
 
@@ -57,6 +58,9 @@ export class ManifestDetailsLink extends React.Component<IManifestDetailsProps, 
     };
     if (!params.region && kind === 'namespace' && stateKey === UNMAPPED_K8S_RESOURCE_STATE_KEY) {
       params.region = name;
+    }
+    if (!params.region || params.region === '') {
+      params.region = '_';
     }
     return params;
   }

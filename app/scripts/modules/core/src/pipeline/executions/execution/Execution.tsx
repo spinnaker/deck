@@ -1,40 +1,42 @@
-import React from 'react';
-import ReactGA from 'react-ga';
 import { UISref } from '@uirouter/react';
+import classNames from 'classnames';
 import { isEqual } from 'lodash';
 import { $location } from 'ngimport';
+import React from 'react';
+import ReactGA from 'react-ga';
 import { Subscription } from 'rxjs';
-import classNames from 'classnames';
 
-import { Application } from 'core/application/application.model';
-import { ConfirmationModalService } from 'core/confirmationModal';
-import { StageExecutionDetails } from '../../details/StageExecutionDetails';
-import { ExecutionStatus } from '../../status/ExecutionStatus';
-import { ParametersAndArtifacts } from '../../status/ParametersAndArtifacts';
-import { ExecutionCancellationReason } from '../../status/ExecutionCancellationReason';
-import type { IExecution, IRestartDetails, IPipeline } from 'core/domain';
-import { IExecutionViewState, IPipelineGraphNode } from '../../config/graph/pipelineGraph.service';
-import { OrchestratedItemRunningTime } from './OrchestratedItemRunningTime';
-import { SETTINGS } from 'core/config/settings';
 import { AccountTag } from 'core/account';
-import { ReactInjector } from 'core/reactShims';
-import { duration, timestamp } from 'core/utils/timeFormatters';
-import { ISortFilter } from 'core/filterModel';
-import { ExecutionState } from 'core/state';
-
+import { Application } from 'core/application/application.model';
 // react components
 import { CancelModal } from 'core/cancelModal/CancelModal';
+import { SETTINGS } from 'core/config/settings';
+import { ConfirmationModalService } from 'core/confirmationModal';
+import { IExecution, IExecutionStageSummary, IPipeline, IRestartDetails } from 'core/domain';
+import { ISortFilter } from 'core/filterModel';
+import { Tooltip } from 'core/presentation/Tooltip';
+import { ReactInjector } from 'core/reactShims';
+import { ExecutionState } from 'core/state';
+import { duration, timestamp } from 'core/utils/timeFormatters';
+
 import { ExecutionBreadcrumbs } from './ExecutionBreadcrumbs';
 import { ExecutionMarker } from './ExecutionMarker';
 import { ExecutionPermalink } from './ExecutionPermalink';
+import { OrchestratedItemRunningTime } from './OrchestratedItemRunningTime';
 import { PipelineGraph } from '../../config/graph/PipelineGraph';
-import { Tooltip } from 'core/presentation/Tooltip';
+import { IExecutionViewState, IPipelineGraphNode } from '../../config/graph/pipelineGraph.service';
+import { StageExecutionDetails } from '../../details/StageExecutionDetails';
+import { ExecutionCancellationReason } from '../../status/ExecutionCancellationReason';
+import { ExecutionStatus } from '../../status/ExecutionStatus';
+import { ParametersAndArtifacts } from '../../status/ParametersAndArtifacts';
 
 import './execution.less';
 
 export interface IExecutionProps {
   application: Application;
   execution: IExecution;
+  descendantExecutionId?: string;
+  showConfigureButton?: boolean;
   pipelineConfig: IPipeline;
   showDurations?: boolean;
   standalone?: boolean;
@@ -56,6 +58,13 @@ export interface IExecutionState {
   restartDetails: IRestartDetails;
   runningTimeInMs: number;
 }
+
+const findChildIndex = (child: string, execution: IExecution) => {
+  const result = execution.stageSummaries?.findIndex(
+    (s) => s.type === 'pipeline' && s.masterStage?.context?.executionId === child,
+  );
+  return result;
+};
 
 export class Execution extends React.PureComponent<IExecutionProps, IExecutionState> {
   public static defaultProps: Partial<IExecutionProps> = {
@@ -80,6 +89,11 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
       canConfigure: false,
     };
 
+    // Used when rendering ancestors in SingleExecutionView to mark descendents as "selected"
+    if ($stateParams.executionId !== props.execution.id && props.descendantExecutionId) {
+      initialViewState.activeStageId = findChildIndex(props.descendantExecutionId, props.execution);
+    }
+
     const restartedStage = execution.stages.find((stage) => stage.context.restartDetails !== undefined);
 
     this.state = {
@@ -94,13 +108,20 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
   }
 
   private updateViewStateDetails(toParams: any, fromParams: any): void {
-    const executionId = this.props.execution.id;
+    const { descendantExecutionId, execution } = this.props;
     const { viewState } = this.state;
-    const shouldShowDetails = toParams.executionId === executionId;
-    const shouldScroll = toParams.executionId === executionId && fromParams.executionId !== executionId;
+
+    const shouldShowDetails = toParams.executionId === execution.id;
+    const shouldScroll = toParams.executionId === execution.id && fromParams.executionId !== execution.id;
     const newViewState = { ...viewState };
     newViewState.activeStageId = Number(toParams.stage);
     newViewState.activeSubStageId = Number(toParams.subStage);
+
+    // Used when rendering ancestors in SingleExecutionView to mark descendents as "selected"
+    if (toParams.executionId !== execution.id && descendantExecutionId) {
+      newViewState.activeStageId = findChildIndex(descendantExecutionId, execution);
+    }
+
     if (this.state.showingDetails !== shouldShowDetails) {
       this.setState({
         showingDetails: this.invalidateShowingDetails(this.props, shouldScroll),
@@ -130,8 +151,21 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
     return showing;
   }
 
-  public isActive(stageIndex: number): boolean {
-    return this.state.showingDetails && Number(ReactInjector.$stateParams.stage) === stageIndex;
+  public isActive(stage: IExecutionStageSummary): boolean {
+    if (!stage) {
+      return false;
+    }
+
+    // When execution.id doesn't match, we're' rendering the ancestors in <SingleExecutionDetails>
+    if (this.props.execution.id !== ReactInjector.$stateParams.executionId) {
+      return (
+        this.props.descendantExecutionId &&
+        stage &&
+        stage.type === 'pipeline' &&
+        stage.masterStage?.context?.executionId === this.props.descendantExecutionId
+      );
+    }
+    return this.state.showingDetails && Number(ReactInjector.$stateParams.stage) === stage.index;
   }
 
   public toggleDetails = (stageIndex?: number, subIndex?: number): void => {
@@ -187,8 +221,6 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
     ConfirmationModalService.confirm({
       header: 'Really pause execution?',
       buttonText: 'Pause',
-      body:
-        '<p>This will pause the pipeline for up to 72 hours.</p><p>After 72 hours the pipeline will automatically timeout and fail.</p>',
       submitMethod: () => executionService.pauseExecution(this.props.application, this.props.execution.id),
     });
   }
@@ -272,6 +304,16 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
     showingDetails ? this.toggleDetails() : this.toggleDetails(0, 0);
   };
 
+  private handleConfigureClicked = (e: React.MouseEvent<HTMLElement>): void => {
+    const { application, execution } = this.props;
+    ReactGA.event({ category: 'Execution', action: 'Configuration' });
+    ReactInjector.$state.go('^.pipelineConfig', {
+      application: application.name,
+      pipelineId: execution.pipelineConfigId,
+    });
+    e.stopPropagation();
+  };
+
   private scrollIntoView = (forceScroll = false) => {
     const element = this.wrapperRef.current;
     const { scrollIntoView, execution } = this.props;
@@ -290,8 +332,10 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
   public render() {
     const {
       application,
+      descendantExecutionId,
       execution,
       showAccountLabels,
+      showConfigureButton,
       showDurations,
       standalone,
       title,
@@ -299,7 +343,7 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
       pipelineConfig,
     } = this.props;
     const { pipelinesUrl, restartDetails, showingDetails, sortFilter, viewState } = this.state;
-    const { $state } = ReactInjector;
+    const { $state, $stateParams } = ReactInjector;
 
     const accountLabels = this.props.execution.deploymentTargets.map((account) => (
       <AccountTag key={account} account={account} />
@@ -307,15 +351,15 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
 
     const executionMarkerWidth = `${100 / execution.stageSummaries.length}%`;
     const showExecutionName = standalone || (!title && sortFilter.groupBy !== 'name');
-    const executionMarkers = execution.stageSummaries.map((stage) => (
+    const executionMarkers = execution.stageSummaries.map((stage, index, allStages) => (
       <ExecutionMarker
         key={stage.refId}
         application={application}
         execution={execution}
         stage={stage}
         onClick={this.toggleDetails}
-        active={this.isActive(stage.index)}
-        previousStageActive={this.isActive(stage.index - 1)}
+        active={this.isActive(stage)}
+        previousStageActive={this.isActive(index > 0 ? allStages[index - 1] : null)}
         width={executionMarkerWidth}
       />
     ));
@@ -332,13 +376,33 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
     return (
       <div className={className} id={`execution-${execution.id}`} ref={this.wrapperRef}>
         <div className={`execution-overview group-by-${sortFilter.groupBy}`}>
-          {(title || showExecutionName) && (
-            <h4 className="execution-name">
-              {(showAccountLabels || showExecutionName) && accountLabels}
-              {execution.fromTemplate && <i className="from-template fa fa-table" title="Pipeline from template" />}
-              {title || execution.name}
-            </h4>
-          )}
+          <div className="flex-container-h">
+            {(title || showExecutionName) && (
+              <h4 className="execution-name">
+                {(showAccountLabels || showExecutionName) && accountLabels}
+                {execution.fromTemplate && <i className="from-template fa fa-table" title="Pipeline from template" />}
+                {title || execution.name}
+              </h4>
+            )}
+            {showConfigureButton && (
+              <div className="flex-pull-right">
+                <Tooltip value="Navigate to Pipeline Configuration">
+                  <UISref
+                    to="^.pipelineConfig"
+                    params={{ application: application.name, pipelineId: execution.pipelineConfigId }}
+                  >
+                    <button
+                      className="btn btn-xs btn-default single-execution-details__configure"
+                      onClick={this.handleConfigureClicked}
+                    >
+                      <span className="glyphicon glyphicon-cog" />
+                      <span className="visible-md-inline visible-lg-inline"> Configure</span>
+                    </button>
+                  </UISref>
+                </Tooltip>
+              </div>
+            )}
+          </div>
           {hasParentExecution && (
             <div className="execution-breadcrumbs">
               <ExecutionBreadcrumbs execution={execution} />
@@ -439,7 +503,7 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
 
           <ParametersAndArtifacts
             execution={execution}
-            expandParamsOnInit={standalone}
+            expandParamsOnInit={standalone && !descendantExecutionId}
             pipelineConfig={pipelineConfig}
           />
 
@@ -460,7 +524,7 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
             <PipelineGraph execution={execution} onNodeClick={this.handleNodeClick} viewState={viewState} />
           </div>
         )}
-        {showingDetails && (
+        {showingDetails && (!standalone || execution.id === $stateParams.executionId) && (
           <div className="execution-details-container">
             <StageExecutionDetails execution={execution} application={application} standalone={standalone} />
             <div className="permalinks">

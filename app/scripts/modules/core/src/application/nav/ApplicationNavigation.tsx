@@ -1,17 +1,18 @@
-import React from 'react';
-import { useRecoilValue } from 'recoil';
 import { useCurrentStateAndParams } from '@uirouter/react';
 import { find, isEqual } from 'lodash';
+import React from 'react';
+import { useRecoilValue } from 'recoil';
+
+import { Icon } from '@spinnaker/presentation';
 import { SETTINGS } from 'core/config/settings';
+import { PagerDutyWriter } from 'core/pagerDuty';
 
 import { AppRefresher } from './AppRefresher';
 import { NavSection } from './NavSection';
-import { Icon, Tooltip, useIsMobile, usePrevious } from '../../presentation';
-
-import { navigationCategoryRegistry } from './navigationCategory.registry';
-import { verticalNavExpandedAtom } from './navAtoms';
-import { PagerDutyWriter } from 'core/pagerDuty';
 import { Application } from '../application.model';
+import { verticalNavExpandedAtom } from './navAtoms';
+import { navigationCategoryRegistry } from './navigationCategory.registry';
+import { Tooltip, useIsMobile, usePrevious } from '../../presentation';
 import { ApplicationDataSource } from '../service/applicationDataSource';
 
 import './verticalNav.less';
@@ -75,8 +76,11 @@ export const ApplicationNavigation = ({ app }: IApplicationNavigationProps) => {
           <NavSection key={`section-${i}`} dataSources={section} app={app} />
         ))}
       {SETTINGS.feature.pagerDuty && app.attributes.pdApiKey && (
-        <div className="nav-section clickable">
-          <div className="page-category flex-container-h middle text-semibold" onClick={pageApplicationOwner}>
+        <div className="nav-section sp-padding-s-yaxis">
+          <div
+            className="page-category flex-container-h middle text-semibold sp-padding-s-yaxis clickable"
+            onClick={pageApplicationOwner}
+          >
             <div className="nav-row-item sp-margin-s-right">
               {!isExpanded ? (
                 <Tooltip value="Page App Owner" placement="right">

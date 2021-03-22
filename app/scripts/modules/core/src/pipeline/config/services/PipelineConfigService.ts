@@ -1,12 +1,13 @@
-import { sortBy, uniq, cloneDeep } from 'lodash';
+import { cloneDeep, sortBy, uniq } from 'lodash';
 import { $q } from 'ngimport';
 
 import { REST } from 'core/api/ApiService';
 import { AuthenticationService } from 'core/authentication/AuthenticationService';
-import { PipelineTemplateV2Service } from '../templates/v2/pipelineTemplateV2.service';
 import { ViewStateCache } from 'core/cache';
-import { IStage } from 'core/domain/IStage';
 import { IPipeline } from 'core/domain/IPipeline';
+import { IStage } from 'core/domain/IStage';
+
+import { PipelineTemplateV2Service } from '../templates/v2/pipelineTemplateV2.service';
 
 export interface ITriggerPipelineResponse {
   eventId: string;
@@ -46,7 +47,7 @@ export class PipelineConfigService {
 
   public static deletePipeline(applicationName: string, pipeline: IPipeline, pipelineName: string): PromiseLike<void> {
     const endpoint = pipeline.strategy ? 'strategies' : 'pipelines';
-    return REST(endpoint).path(applicationName, encodeURIComponent(pipelineName.trim())).delete();
+    return REST(endpoint).path(applicationName, pipelineName.trim()).delete();
   }
 
   public static savePipeline(toSave: IPipeline): PromiseLike<void> {
@@ -96,7 +97,7 @@ export class PipelineConfigService {
   public static triggerPipeline(applicationName: string, pipelineName: string, body: any = {}): PromiseLike<string> {
     body.user = AuthenticationService.getAuthenticatedUser().name;
     return REST('/pipelines/v2')
-      .path(applicationName, encodeURIComponent(pipelineName))
+      .path(applicationName, pipelineName)
       .post(body)
       .then((result: ITriggerPipelineResponse) => {
         return result.ref.split('/').pop();

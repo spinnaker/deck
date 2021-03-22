@@ -8,8 +8,8 @@ import {
   NameUtils,
   SubnetReader,
 } from '@spinnaker/core';
-
 import { AWSProviderSettings } from 'amazon/aws.settings';
+
 import { AWS_SERVER_GROUP_CONFIGURATION_SERVICE } from './serverGroupConfiguration.service';
 
 export const AMAZON_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER_SERVICE =
@@ -353,11 +353,16 @@ angular
                 launchTemplateData.networkInterfaces.length &&
                 launchTemplateData.networkInterfaces[0];
 
+              const asgSettings = AWSProviderSettings.serverGroups;
+              const isTestEnv = serverGroup.accountDetails && serverGroup.accountDetails.environment === 'test';
+              const shouldAutoEnableIPv6 =
+                asgSettings && asgSettings.enableIPv6 && asgSettings.setIPv6InTest && isTestEnv;
+
               angular.extend(command, {
                 instanceType: launchTemplateData.instanceType,
                 iamRole: launchTemplateData.iamInstanceProfile.name,
                 keyPair: launchTemplateData.keyName,
-                associateIPv6Address: Boolean(ipv6AddressCount),
+                associateIPv6Address: shouldAutoEnableIPv6 || Boolean(ipv6AddressCount),
                 ramdiskId: launchTemplateData.ramdiskId,
                 instanceMonitoring: launchTemplateData.monitoring.enabled,
                 ebsOptimized: launchTemplateData.ebsOptimized,

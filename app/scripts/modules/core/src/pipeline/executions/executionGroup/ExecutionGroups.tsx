@@ -2,12 +2,13 @@ import React from 'react';
 import { Subscription } from 'rxjs';
 
 import { Application } from 'core/application/application.model';
-import { ExecutionGroup } from './ExecutionGroup';
+import { BannerContainer } from 'core/banner';
 import { IExecutionGroup } from 'core/domain';
 import { ReactInjector } from 'core/reactShims';
 import { ExecutionState } from 'core/state';
+
+import { ExecutionGroup } from './ExecutionGroup';
 import { ExecutionFilterService } from '../../filter/executionFilter.service';
-import { BannerContainer } from 'core/banner';
 
 import './executionGroups.less';
 
@@ -90,9 +91,9 @@ export class ExecutionGroups extends React.Component<IExecutionGroupsProps, IExe
     const hasGroups = groups.length > 0;
     const className = `row pipelines executions ${showingDetails ? 'showing-details' : ''}`;
 
-    const allGroups = groups
-      .filter((g: IExecutionGroup) => g.config.migrationStatus === 'STARTED')
-      .concat(groups.filter((g) => g.config.migrationStatus !== 'STARTED'));
+    const allGroups = (groups || [])
+      .filter((g: IExecutionGroup) => g?.config?.migrationStatus === 'Started')
+      .concat(groups.filter((g) => g?.config?.migrationStatus !== 'Started'));
 
     const filteredGroups = ExecutionFilterService.awaitingJudgment(allGroups);
 

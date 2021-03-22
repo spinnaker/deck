@@ -1,10 +1,10 @@
-import { module } from 'angular';
-import { Duration } from 'luxon';
-import { omit, omitBy, isUndefined, sortBy, find } from 'lodash';
-
-import { UUIDGenerator } from 'core/utils/uuid.service';
-import { ICache, DeckCacheFactory } from 'core/cache';
 import { Ng1StateDeclaration } from '@uirouter/angularjs';
+import { module } from 'angular';
+import { find, isUndefined, omit, omitBy, sortBy } from 'lodash';
+import { Duration } from 'luxon';
+
+import { DeckCacheFactory, ICache } from 'core/cache';
+import { UUIDGenerator } from 'core/utils/uuid.service';
 import IAngularEvent = angular.IAngularEvent;
 
 export interface ICacheEntryStateMigrator {
@@ -136,9 +136,11 @@ module(RECENT_HISTORY_SERVICE, []).run([
   '$rootScope',
   ($rootScope: ng.IRootScopeService) => {
     $rootScope.$on('$stateChangeSuccess', (_event: IAngularEvent, toState: Ng1StateDeclaration, toParams: any) => {
-      if (toState.data && toState.data.history) {
+      const history = toState.data?.history;
+      if (history) {
         const params = omit(toParams || {}, ['debug', 'vis', 'trace']);
-        RecentHistoryService.addItem(toState.data.history.type, toState.name, params, toState.data.history.keyParams);
+        const state = history.state || toState.name;
+        RecentHistoryService.addItem(history.type, state, params, history.keyParams);
       }
     });
   },

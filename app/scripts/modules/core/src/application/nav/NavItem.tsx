@@ -1,13 +1,14 @@
 import React from 'react';
 import { useRecoilValue } from 'recoil';
 
+import { Icon } from '@spinnaker/presentation';
 import { DataSourceNotifications } from 'core/entityTag/notifications/DataSourceNotifications';
-import { Icon, Tooltip, useDataSource } from '../../presentation';
-import { verticalNavExpandedAtom } from './navAtoms';
 
-import { ApplicationDataSource } from '../service/applicationDataSource';
 import { Application } from '../application.model';
 import { IEntityTags } from '../../domain';
+import { verticalNavExpandedAtom } from './navAtoms';
+import { Tooltip, useDataSource } from '../../presentation';
+import { ApplicationDataSource } from '../service/applicationDataSource';
 
 export interface INavItemProps {
   app: Application;
@@ -35,9 +36,9 @@ export const NavItem = ({ app, dataSource, isActive }: INavItemProps) => {
         {iconName &&
           (!isExpanded ? (
             <Tooltip value={dataSource.label} placement="right">
-              <span>
+              <div>
                 <Icon className="nav-icon" name={iconName} size="medium" color={isActive ? 'primary' : 'accent'} />
-              </span>
+              </div>
             </Tooltip>
           ) : (
             <Icon

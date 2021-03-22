@@ -4,12 +4,11 @@ import { Dropdown } from 'react-bootstrap';
 import {
   Application,
   ApplicationReader,
-  FunctionWriter,
-  SETTINGS,
-  NgReact,
   ConfirmationModalService,
+  FunctionWriter,
+  NgReact,
+  SETTINGS,
 } from '@spinnaker/core';
-
 import { IAmazonFunction, IAmazonFunctionDeleteCommand } from 'amazon/domain';
 
 import { IFunctionFromStateParams } from './AmazonFunctionDetails';

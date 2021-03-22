@@ -1,3 +1,6 @@
+import { chain, filter, flatten, map } from 'lodash';
+import { $q } from 'ngimport';
+
 import {
   AccountService,
   Application,
@@ -16,18 +19,15 @@ import {
   IAmazonClassicLoadBalancer,
   IAmazonClassicLoadBalancerUpsertCommand,
   IAmazonLoadBalancer,
+  IAmazonNetworkLoadBalancerUpsertCommand,
   IAmazonServerGroup,
   IApplicationLoadBalancerSourceData,
   IClassicListenerDescription,
   IClassicLoadBalancerSourceData,
   INetworkLoadBalancerSourceData,
-  IAmazonNetworkLoadBalancerUpsertCommand,
   ITargetGroup,
 } from 'amazon/domain';
 import { VpcReader } from 'amazon/vpc/VpcReader';
-import { chain, filter, flatten, map } from 'lodash';
-
-import { $q } from 'ngimport';
 
 export class AwsLoadBalancerTransformer {
   private updateHealthCounts(container: IServerGroup | ITargetGroup | IAmazonLoadBalancer): void {
@@ -280,6 +280,8 @@ export class AwsLoadBalancerTransformer {
       vpcId: undefined,
       idleTimeout: loadBalancer.idleTimeout || 60,
       deletionProtection: loadBalancer.deletionProtection || false,
+      ipAddressType: loadBalancer.ipAddressType || 'ipv4',
+      dualstack: loadBalancer.ipAddressType === 'dualstack',
     };
 
     if (loadBalancer.elb) {
@@ -392,6 +394,8 @@ export class AwsLoadBalancerTransformer {
       vpcId: undefined,
       deletionProtection: loadBalancer.deletionProtection,
       loadBalancingCrossZone: loadBalancer.loadBalancingCrossZone,
+      ipAddressType: loadBalancer.ipAddressType || 'ipv4',
+      dualstack: loadBalancer.ipAddressType === 'dualstack',
     };
 
     if (loadBalancer.elb) {
@@ -463,6 +467,9 @@ export class AwsLoadBalancerTransformer {
             healthCheckPath: targetGroup.healthCheckPath,
             attributes: {
               deregistrationDelay: Number(targetGroup.attributes['deregistration_delay.timeout_seconds']),
+              deregistrationDelayConnectionTermination: Boolean(
+                targetGroup.attributes['deregistration_delay.connection_termination.enabled'] === 'true',
+              ),
             },
           };
         });
@@ -525,6 +532,8 @@ export class AwsLoadBalancerTransformer {
       stack: '',
       detail: '',
       loadBalancerType: 'application',
+      ipAddressType: 'ipv4',
+      dualstack: false,
       isInternal: false,
       cloudProvider: 'aws',
       credentials: defaultCredentials,
@@ -588,6 +597,8 @@ export class AwsLoadBalancerTransformer {
       detail: '',
       loadBalancerType: 'network',
       isInternal: false,
+      ipAddressType: 'ipv4',
+      dualstack: false,
       cloudProvider: 'aws',
       credentials: defaultCredentials,
       region: defaultRegion,

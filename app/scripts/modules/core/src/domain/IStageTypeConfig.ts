@@ -1,6 +1,8 @@
-import { IStage } from './IStage';
 import { IExecutionDetailsSectionProps } from 'core/pipeline/config/stages/common';
+import { IStageSummaryProps } from 'core/pipeline/details/StageSummary';
+
 import { IExecutionContext, IExecutionStageLabelProps, IExecutionStageSummary } from './IExecutionStage';
+import { IStage } from './IStage';
 import { IStageOrTriggerTypeConfig } from './IStageOrTriggerTypeConfig';
 
 export type IExecutionDetailsSection = React.ComponentType<IExecutionDetailsSectionProps> & { title: string };
@@ -23,6 +25,7 @@ export interface IStageTypeConfig extends IStageOrTriggerTypeConfig {
   executionLabelComponent?: React.ComponentType<IExecutionStageLabelProps>;
   executionStepLabelUrl?: string;
   executionSummaryUrl?: string;
+  executionSummaryComponent?: React.ComponentType<IStageSummaryProps>;
   extraLabelLines?: (stage: IStage) => number;
   markerIcon?: React.ComponentClass<{ stage: IExecutionStageSummary }>;
   nameToCheckInTest?: string;

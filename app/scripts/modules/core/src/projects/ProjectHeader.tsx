@@ -1,14 +1,14 @@
-import React from 'react';
-
-import '@uirouter/rx';
 import { Transition } from '@uirouter/core';
 import { UISref, UIView } from '@uirouter/react';
+import '@uirouter/rx';
+import React from 'react';
 import { Dropdown, MenuItem } from 'react-bootstrap';
 import { Subject } from 'rxjs';
 
-import { ReactInjector } from 'core/reactShims';
 import { IProject } from 'core/domain';
 import { SpanDropdownTrigger } from 'core/presentation';
+import { ReactInjector } from 'core/reactShims';
+
 import { ConfigureProjectModal } from './configure/ConfigureProjectModal';
 
 import './project.less';
@@ -67,7 +67,7 @@ export class ProjectHeader extends React.Component<IProjectHeaderProps, IProject
 
     if (project.notFound) {
       return (
-        <div className="project-header">
+        <div className="flex-fill application">
           <div className="row" ng-if="vm.project.notFound">
             <h1 className="text-center">&lt;404&gt;</h1>
 

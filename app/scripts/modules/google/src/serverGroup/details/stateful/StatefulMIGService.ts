@@ -1,7 +1,6 @@
 import { has } from 'lodash';
 
 import { TaskExecutor } from '@spinnaker/core';
-
 import { IGceServerGroup } from 'google/domain';
 import { GCEProviderSettings } from 'google/gce.settings';
 
