@@ -94,7 +94,9 @@ export class ExecutionGroups extends React.Component<IExecutionGroupsProps, IExe
       .filter((g: IExecutionGroup) => g.config.migrationStatus === 'STARTED')
       .concat(groups.filter((g) => g.config.migrationStatus !== 'STARTED'));
 
-    const executionGroups = allGroups.map((group: IExecutionGroup) => (
+    const filteredGroups = ExecutionFilterService.awaitingJudgment(allGroups);
+
+    const executionGroups = filteredGroups.map((group: IExecutionGroup) => (
       <ExecutionGroup parent={container} key={group.heading} group={group} application={this.props.application} />
     ));
 
