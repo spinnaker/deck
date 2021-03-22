@@ -168,8 +168,8 @@ export function SingleExecutionDetails(props: ISingleExecutionDetailsProps) {
                 <h3>
                   <UISref to="^.executions">
                     <a className="clickable">{app.name}</a>
-                  </UISref>{' '}
-                  <i className="fas fa-angle-right"></i>{' '}
+                  </UISref>
+                  {' - '}
                   <UISref to="^.executions" params={{ pipeline: execution.name }}>
                     <a className="clickable">{execution.name}</a>
                   </UISref>
