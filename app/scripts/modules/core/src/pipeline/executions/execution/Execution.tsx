@@ -13,7 +13,6 @@ import { SETTINGS } from 'core/config/settings';
 import { ConfirmationModalService } from 'core/confirmationModal';
 import { IExecution, IExecutionStageSummary, IPipeline, IRestartDetails } from 'core/domain';
 import { ISortFilter } from 'core/filterModel';
-// react components
 import { Overridable } from 'core/overrideRegistry';
 import { Tooltip } from 'core/presentation/Tooltip';
 import { ReactInjector } from 'core/reactShims';
