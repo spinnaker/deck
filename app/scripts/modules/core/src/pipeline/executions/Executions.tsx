@@ -449,5 +449,3 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
     return null;
   }
 }
-
-export default Executions;
