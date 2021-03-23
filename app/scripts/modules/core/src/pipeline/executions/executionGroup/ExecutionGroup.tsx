@@ -56,7 +56,7 @@ export interface IExecutionGroupState {
   placement: Placement;
 }
 
-@Overridable('createExecutionGroup')
+@Overridable('PipelineExecutionGroup')
 export class ExecutionGroup extends React.PureComponent<IExecutionGroupProps, IExecutionGroupState> {
   public state: IExecutionGroupState;
   private expandUpdatedSubscription: Subscription;
