@@ -65,7 +65,7 @@ const findChildIndex = (child: string, execution: IExecution) => {
   return result;
 };
 
-@Overridable('createExecution')
+@Overridable('PipelineExecution')
 export class Execution extends React.PureComponent<IExecutionProps, IExecutionState> {
   public static defaultProps: Partial<IExecutionProps> = {
     dataSourceKey: 'executions',
