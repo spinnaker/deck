@@ -223,6 +223,10 @@ angular.module(TITUS_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER, []).factor
         };
 
         pipelineCluster.strategy = pipelineCluster.strategy || '';
+        pipelineCluster.containerAttributes = {
+          ...command.containerAttributes,
+          ...pipelineCluster.containerAttributes,
+        };
         const extendedCommand = angular.extend({}, command, pipelineCluster, viewOverrides);
         return extendedCommand;
       });
