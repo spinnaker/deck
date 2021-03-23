@@ -45,7 +45,7 @@ const forwardedExecutions = new Set();
 // This ensures we only forward to permalink on landing, not on future refreshes
 let disableForwarding = false;
 
-@Overridable('createExecutions')
+@Overridable('PipelineExecutions')
 export class Executions extends React.Component<IExecutionsProps, IExecutionsState> {
   private executionsRefreshUnsubscribe: Function;
   private groupsUpdatedSubscription: Subscription;
