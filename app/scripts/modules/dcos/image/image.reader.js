@@ -1,15 +1,16 @@
 'use strict';
 
-import { API } from '@spinnaker/core';
-
 import { module } from 'angular';
+
+import { REST } from '@spinnaker/core';
 
 export const DCOS_IMAGE_IMAGE_READER = 'spinnaker.dcos.image.reader';
 export const name = DCOS_IMAGE_IMAGE_READER; // for backwards compatibility
 module(DCOS_IMAGE_IMAGE_READER, []).factory('dcosImageReader', function () {
   function findImages(params) {
-    return API.all('images', 'find')
-      .getList(params)
+    return REST('/images/find')
+      .query(params)
+      .get()
       .then(
         function (results) {
           return results;

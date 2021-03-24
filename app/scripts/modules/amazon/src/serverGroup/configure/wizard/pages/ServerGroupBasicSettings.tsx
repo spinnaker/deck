@@ -1,22 +1,24 @@
-import React from 'react';
 import { Field, FormikErrors, FormikProps } from 'formik';
+import React from 'react';
 
 import {
   AccountSelectInput,
+  Application,
+  DeployingIntoManagedClusterWarning,
   DeploymentStrategySelector,
   HelpField,
-  NameUtils,
-  RegionSelectField,
-  Application,
-  ReactInjector,
   IServerGroup,
   IWizardPageComponent,
   Markdown,
-  DeployingIntoManagedClusterWarning,
-  TaskReason,
+  NameUtils,
+  ReactInjector,
+  RegionSelectField,
   ServerGroupDetailsField,
+  ServerGroupNamePreview,
+  SETTINGS,
+  TaskReason,
 } from '@spinnaker/core';
-
+import { AWSProviderSettings } from 'amazon/aws.settings';
 import { IAmazonImage } from 'amazon/image';
 import { SubnetSelectField } from 'amazon/subnet';
 
@@ -39,7 +41,6 @@ export interface IServerGroupBasicSettingsState {
   namePreview: string;
   createsNewCluster: boolean;
   latestServerGroup: IServerGroup;
-  showPreviewAsWarning: boolean;
 }
 
 export class ServerGroupBasicSettings
@@ -59,11 +60,9 @@ export class ServerGroupBasicSettings
   private getStateFromProps(props: IServerGroupBasicSettingsProps) {
     const { app } = props;
     const { values } = props.formik;
-    const { mode } = values.viewState;
 
     const namePreview = NameUtils.getClusterName(app.name, values.stack, values.freeFormDetails);
     const createsNewCluster = !app.clusters.find((c) => c.name === namePreview);
-    const showPreviewAsWarning = (mode === 'create' && !createsNewCluster) || (mode !== 'create' && createsNewCluster);
 
     const inCluster = (app.serverGroups.data as IServerGroup[])
       .filter((serverGroup) => {
@@ -76,7 +75,7 @@ export class ServerGroupBasicSettings
       .sort((a, b) => a.createdTime - b.createdTime);
     const latestServerGroup = inCluster.length ? inCluster.pop() : null;
 
-    return { namePreview, createsNewCluster, latestServerGroup, showPreviewAsWarning };
+    return { namePreview, createsNewCluster, latestServerGroup };
   }
 
   private imageChanged = (image: IAmazonImage) => {
@@ -90,6 +89,13 @@ export class ServerGroupBasicSettings
     setFieldValue('virtualizationType', virtualizationType);
     setFieldValue('amiName', imageName);
     values.imageChanged(values);
+
+    if (image && SETTINGS.disabledImages?.length && AWSProviderSettings.serverGroups?.enableIPv6) {
+      const isImageDisabled = SETTINGS.disabledImages.some((i) => image.imageName.includes(i));
+      if (isImageDisabled) {
+        setFieldValue('associateIPv6Address', false);
+      }
+    }
   };
 
   private accountUpdated = (account: string): void => {
@@ -98,6 +104,14 @@ export class ServerGroupBasicSettings
     values.credentialsChanged(values);
     values.subnetChanged(values);
     setFieldValue('credentials', account);
+
+    const accountDetails = values.backingData.credentialsKeyedByAccount[account];
+    const enableIPv6InTest =
+      AWSProviderSettings?.serverGroups?.enableIPv6 &&
+      AWSProviderSettings?.serverGroups?.setIPv6InTest &&
+      accountDetails.environment === 'test';
+
+    setFieldValue('associateIPv6Address', enableIPv6InTest);
   };
 
   private regionUpdated = (region: string): void => {
@@ -191,11 +205,10 @@ export class ServerGroupBasicSettings
   public render() {
     const { app, formik } = this.props;
     const { errors, values } = formik;
-    const { createsNewCluster, latestServerGroup, namePreview, showPreviewAsWarning } = this.state;
+    const { createsNewCluster, latestServerGroup, namePreview } = this.state;
 
     const accounts = values.backingData.accounts;
     const readOnlyFields = values.viewState.readOnlyFields || {};
-
     return (
       <div className="container-fluid form-horizontal">
         {values.regionIsDeprecated(values) && (
@@ -239,6 +252,7 @@ export class ServerGroupBasicSettings
           application={app}
           subnets={values.backingData.filtered.subnetPurposes}
           onChange={this.subnetUpdated}
+          showSubnetWarning={true}
         />
         <div className="form-group">
           <div className="col-md-3 sm-label-right">
@@ -311,39 +325,13 @@ export class ServerGroupBasicSettings
           />
         )}
         {!values.viewState.hideClusterNamePreview && (
-          <div className="form-group">
-            <div className="col-md-12">
-              <div className={`well-compact ${showPreviewAsWarning ? 'alert alert-warning' : 'well'}`}>
-                <h5 className="text-center">
-                  <p>Your server group will be in the cluster:</p>
-                  <p>
-                    <strong>
-                      {namePreview}
-                      {createsNewCluster && <span> (new cluster)</span>}
-                    </strong>
-                  </p>
-                  {!createsNewCluster && values.viewState.mode === 'create' && latestServerGroup && (
-                    <div className="text-left">
-                      <p>There is already a server group in this cluster. Do you want to clone it?</p>
-                      <p>
-                        Cloning copies the entire configuration from the selected server group, allowing you to modify
-                        whichever fields (e.g. image) you need to change in the new server group.
-                      </p>
-                      <p>
-                        To clone a server group, select "Clone" from the "Server Group Actions" menu in the details view
-                        of the server group.
-                      </p>
-                      <p>
-                        <a className="clickable" onClick={this.navigateToLatestServerGroup}>
-                          Go to details for {latestServerGroup.name}
-                        </a>
-                      </p>
-                    </div>
-                  )}
-                </h5>
-              </div>
-            </div>
-          </div>
+          <ServerGroupNamePreview
+            createsNewCluster={createsNewCluster}
+            latestServerGroupName={latestServerGroup?.name}
+            mode={values.viewState.mode}
+            namePreview={namePreview}
+            navigateToLatestServerGroup={this.navigateToLatestServerGroup}
+          />
         )}
         <TaskReason reason={values.reason} onChange={this.handleReasonChanged} />
       </div>

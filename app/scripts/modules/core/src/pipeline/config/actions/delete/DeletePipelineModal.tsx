@@ -1,13 +1,14 @@
+import { get, isEmpty, set } from 'lodash';
+import { $log } from 'ngimport';
 import React from 'react';
 import { Modal } from 'react-bootstrap';
-import { isEmpty, set } from 'lodash';
-import { $log } from 'ngimport';
 
 import { Application } from 'core/application';
 import { IPipeline } from 'core/domain';
 import { ModalClose } from 'core/modal';
 import { IModalComponentProps } from 'core/presentation';
 import { ReactInjector } from 'core/reactShims';
+
 import { PipelineConfigService } from '../../services/PipelineConfigService';
 
 export interface IDeletePipelineModalProps extends IModalComponentProps {
@@ -49,7 +50,7 @@ export function DeletePipelineModal(props: IDeletePipelineModalProps) {
         $log.warn(response);
         setDeleting(false);
         setDeleteError(true);
-        setErrorMessage(response.message || 'No message provided');
+        setErrorMessage(get(response, 'data.message', 'No message provided'));
       },
     );
   }

@@ -1,22 +1,23 @@
-import React from 'react';
-import { filter, flatten, groupBy, set, uniq } from 'lodash';
 import { FormikErrors, FormikProps } from 'formik';
+import { filter, flatten, groupBy, set, uniq } from 'lodash';
+import React from 'react';
 import { Observable, Subject } from 'rxjs';
 
 import {
   Application,
+  CheckboxInput,
+  FormValidator,
   HelpField,
   IWizardPageComponent,
   spelNumberCheck,
-  SpInput,
   SpelNumberInput,
+  SpInput,
   ValidationMessage,
-  FormValidator,
   Validators,
 } from '@spinnaker/core';
-import { isNameLong, isNameInUse } from '../common/targetGroupValidators';
-
 import { IAmazonApplicationLoadBalancer, IAmazonNetworkLoadBalancerUpsertCommand } from 'amazon/domain';
+
+import { isNameInUse, isNameLong } from '../common/targetGroupValidators';
 
 export interface ITargetGroupsProps {
   app: Application;
@@ -386,6 +387,21 @@ export class TargetGroups
                                 )
                               }
                             />
+                          </span>
+                          <span className="wizard-pod-content">
+                            <CheckboxInput
+                              name="deregistrationDelayConnectionTermination"
+                              text="Connection Termination"
+                              checked={targetGroup.attributes.deregistrationDelayConnectionTermination}
+                              onChange={(event: { target: { checked: boolean } }) => {
+                                this.targetGroupFieldChanged(
+                                  index,
+                                  'attributes.deregistrationDelayConnectionTermination',
+                                  event.target.checked,
+                                );
+                              }}
+                            />
+                            <HelpField id="aws.targetGroup.attributes.deregistrationDelayConnectionTermination" />
                           </span>
                         </div>
                       </div>

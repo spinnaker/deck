@@ -1,27 +1,28 @@
 'use strict';
 
 import { module } from 'angular';
+import { defaultsDeep, extend, omit } from 'lodash';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { defaultsDeep, extend, omit } from 'lodash';
 
 import { AccountService } from 'core/account/AccountService';
-import { API } from 'core/api';
-import { BASE_EXECUTION_DETAILS_CTRL } from './common/baseExecutionDetails.controller';
+import { REST } from 'core/api';
+import { ApplicationReader } from 'core/application/service/ApplicationReader';
 import { ConfirmationModalService } from 'core/confirmationModal';
-import { STAGE_NAME } from './StageName';
-import { PipelineConfigService } from '../services/PipelineConfigService';
-import { Registry } from 'core/registry';
-import { StageConfigWrapper } from './StageConfigWrapper';
-import { EditStageJsonModal } from './common/EditStageJsonModal';
 import { ReactModal } from 'core/presentation';
-import { PRODUCES_ARTIFACTS_REACT } from './producesArtifacts/ProducesArtifacts';
+import { Registry } from 'core/registry';
+
+import { StageConfigWrapper } from './StageConfigWrapper';
+import { STAGE_NAME } from './StageName';
+import { EditStageJsonModal } from './common/EditStageJsonModal';
+import { BASE_EXECUTION_DETAILS_CTRL } from './common/baseExecutionDetails.controller';
+import { CORE_PIPELINE_CONFIG_STAGES_COMMON_STAGECONFIGFIELD_STAGECONFIGFIELD_DIRECTIVE } from './common/stageConfigField/stageConfigField.directive';
+import { CORE_PIPELINE_CONFIG_STAGES_FAILONFAILEDEXPRESSIONS_FAILONFAILEDEXPRESSIONS_DIRECTIVE } from './failOnFailedExpressions/failOnFailedExpressions.directive';
+import { CORE_PIPELINE_CONFIG_STAGES_OPTIONALSTAGE_OPTIONALSTAGE_DIRECTIVE } from './optionalStage/optionalStage.directive';
 import { OVERRRIDE_FAILURE } from './overrideFailure/overrideFailure.module';
 import { OVERRIDE_TIMEOUT_COMPONENT } from './overrideTimeout/overrideTimeout.module';
-import { ApplicationReader } from 'core/application/service/ApplicationReader';
-import { CORE_PIPELINE_CONFIG_STAGES_OPTIONALSTAGE_OPTIONALSTAGE_DIRECTIVE } from './optionalStage/optionalStage.directive';
-import { CORE_PIPELINE_CONFIG_STAGES_FAILONFAILEDEXPRESSIONS_FAILONFAILEDEXPRESSIONS_DIRECTIVE } from './failOnFailedExpressions/failOnFailedExpressions.directive';
-import { CORE_PIPELINE_CONFIG_STAGES_COMMON_STAGECONFIGFIELD_STAGECONFIGFIELD_DIRECTIVE } from './common/stageConfigField/stageConfigField.directive';
+import { PRODUCES_ARTIFACTS_REACT } from './producesArtifacts/ProducesArtifacts';
+import { PipelineConfigService } from '../services/PipelineConfigService';
 
 export const CORE_PIPELINE_CONFIG_STAGES_STAGE_MODULE = 'spinnaker.core.pipeline.config.stage';
 export const name = CORE_PIPELINE_CONFIG_STAGES_STAGE_MODULE; // for backwards compatibility
@@ -135,29 +136,29 @@ module(CORE_PIPELINE_CONFIG_STAGES_STAGE_MODULE, [
         });
       };
 
-      $scope.getApplicationPermissions = function() {
-          ApplicationReader.getApplicationPermissions($scope.application.name).then(result => {
-              appPermissions = result;
-              if (appPermissions) {
-                  const readArray = appPermissions.READ || [];
-                  const writeArray = appPermissions.WRITE || [];
-                  const executeArray = appPermissions.EXECUTE || [];
-                  appRoles = _.union(readArray, writeArray, executeArray);
-                  appRoles = Array.from(new Set(appRoles));
-                  $scope.updateAvailableStageRoles();
-              }
-          });
+      $scope.getApplicationPermissions = function () {
+        ApplicationReader.getApplicationPermissions($scope.application.name).then((result) => {
+          appPermissions = result;
+          if (appPermissions) {
+            const readArray = appPermissions.READ || [];
+            const writeArray = appPermissions.WRITE || [];
+            const executeArray = appPermissions.EXECUTE || [];
+            appRoles = _.union(readArray, writeArray, executeArray);
+            appRoles = Array.from(new Set(appRoles));
+            $scope.updateAvailableStageRoles();
+          }
+        });
       };
 
-      $scope.updateAvailableStageRoles = function() {
-          $scope.options.stageRoles = appRoles.map(function(value, index) {
-              return {
-                  name: value,
-                  roleId: value,
-                  id: index,
-                  available: true,
-              };
-          });
+      $scope.updateAvailableStageRoles = function () {
+        $scope.options.stageRoles = appRoles.map(function (value, index) {
+          return {
+            name: value,
+            roleId: value,
+            id: index,
+            available: true,
+          };
+        });
       };
 
       this.editStageJson = () => {
@@ -342,12 +343,9 @@ module(CORE_PIPELINE_CONFIG_STAGES_STAGE_MODULE, [
     '$stateParams',
     function ($scope, $stateParams) {
       const restartStage = function () {
-        return API.one('pipelines')
-          .one($stateParams.executionId)
-          .one('stages', $scope.stage.id)
-          .one('restart')
-          .data({ skip: false })
-          .put()
+        return REST('/pipelines')
+          .path($stateParams.executionId, 'stages', $scope.stage.id, 'restart')
+          .put({ skip: false })
           .then(function () {
             $scope.stage.isRestarting = true;
           });

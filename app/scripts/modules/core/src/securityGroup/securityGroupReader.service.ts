@@ -1,23 +1,24 @@
+import { ILogService, IQService, module } from 'angular';
 import { filter, forOwn, has, uniq } from 'lodash';
-import { module, ILogService, IQService } from 'angular';
+import { cloneDeep } from 'lodash';
 
-import { API } from 'core/api/ApiService';
-import { IComponentName, NameUtils } from 'core/naming';
-import { InfrastructureCaches } from 'core/cache';
+import { REST } from 'core/api/ApiService';
 import { Application } from 'core/application/application.model';
-import { ISecurityGroup, ILoadBalancer, IServerGroup, IServerGroupUsage } from 'core/domain';
+import { InfrastructureCaches } from 'core/cache';
+import { PROVIDER_SERVICE_DELEGATE, ProviderServiceDelegate } from 'core/cloudProvider/providerService.delegate';
+import { SETTINGS } from 'core/config/settings';
+import { ILoadBalancer, ISecurityGroup, IServerGroup, IServerGroupUsage } from 'core/domain';
+import { IEntityTags } from 'core/domain/IEntityTags';
+import { EntityTagsReader } from 'core/entityTag/EntityTagsReader';
+import { IComponentName, NameUtils } from 'core/naming';
+import { IMoniker } from 'core/naming/IMoniker';
+import { ISearchResults, SearchService } from 'core/search/search.service';
+
+import { ISecurityGroupSearchResult } from './securityGroupSearchResultType';
 import {
   SECURITY_GROUP_TRANSFORMER_SERVICE,
   SecurityGroupTransformerService,
 } from './securityGroupTransformer.service';
-import { EntityTagsReader } from 'core/entityTag/EntityTagsReader';
-import { SETTINGS } from 'core/config/settings';
-import { SearchService, ISearchResults } from 'core/search/search.service';
-import { ISecurityGroupSearchResult } from './securityGroupSearchResultType';
-import { ProviderServiceDelegate, PROVIDER_SERVICE_DELEGATE } from 'core/cloudProvider/providerService.delegate';
-import { IMoniker } from 'core/naming/IMoniker';
-import { IEntityTags } from 'core/domain/IEntityTags';
-import { cloneDeep } from 'lodash';
 
 export interface ISecurityGroupsByAccount {
   [account: string]: {
@@ -294,20 +295,30 @@ export class SecurityGroupReader {
     private providerServiceDelegate: ProviderServiceDelegate,
   ) {}
 
+  private getAllSecurityGroupsPromise: PromiseLike<ISecurityGroupsByAccountSourceData>;
+
   public getAllSecurityGroups(): PromiseLike<ISecurityGroupsByAccountSourceData> {
     const cache = InfrastructureCaches.get('securityGroups');
     const cached = cache ? cache.get('allGroups') : null;
     if (cached) {
       return this.$q.resolve(this.decompress(cloneDeep(cached)));
+    } else if (this.getAllSecurityGroupsPromise) {
+      return this.getAllSecurityGroupsPromise;
     }
-    return API.one('securityGroups')
+
+    this.getAllSecurityGroupsPromise = REST('/securityGroups')
       .get()
       .then((groupsByAccount: ISecurityGroupsByAccountSourceData) => {
         if (cache) {
           cache.put('allGroups', this.compress(groupsByAccount));
         }
         return groupsByAccount;
+      })
+      .finally(() => {
+        delete this.getAllSecurityGroupsPromise;
       });
+
+    return this.getAllSecurityGroupsPromise;
   }
 
   private compress(data: ISecurityGroupsByAccountSourceData): any {
@@ -391,11 +402,9 @@ export class SecurityGroupReader {
     vpcId: string,
     id: string,
   ): PromiseLike<ISecurityGroupDetail> {
-    return API.one('securityGroups')
-      .one(account)
-      .one(region)
-      .one(id)
-      .withParams({ provider, vpcId })
+    return REST('/securityGroups')
+      .path(account, region, id)
+      .query({ provider, vpcId })
       .get()
       .then((details: ISecurityGroupDetail) => {
         if (details && details.inboundRules) {

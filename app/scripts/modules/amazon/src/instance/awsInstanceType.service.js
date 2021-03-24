@@ -3,8 +3,7 @@
 import { module } from 'angular';
 import _ from 'lodash';
 
-import { API } from '@spinnaker/core';
-
+import { REST } from '@spinnaker/core';
 import { AWSProviderSettings } from 'amazon/aws.settings';
 
 export const AMAZON_INSTANCE_AWSINSTANCETYPE_SERVICE = 'spinnaker.amazon.instanceType.service';
@@ -286,7 +285,7 @@ module(AMAZON_INSTANCE_AWSINSTANCETYPE_SERVICE, []).factory('awsInstanceTypeServ
     }
 
     const getAllTypesByRegion = function getAllTypesByRegion() {
-      return API.one('instanceTypes')
+      return REST('/instanceTypes')
         .get()
         .then(function (types) {
           return _.chain(types)

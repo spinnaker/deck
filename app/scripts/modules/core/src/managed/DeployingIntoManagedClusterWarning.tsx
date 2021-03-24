@@ -1,7 +1,9 @@
-import React from 'react';
-import { IServerGroupCommand } from 'core/serverGroup';
 import { FormikProps } from 'formik';
+import React from 'react';
+
 import { Application } from 'core/application';
+import { IServerGroupCommand } from 'core/serverGroup';
+
 import { toggleResourcePause } from './toggleResourceManagement';
 
 export interface IDeployingIntoManagedClusterWarningProps {
@@ -15,6 +17,7 @@ export const DeployingIntoManagedClusterWarning = ({ app, formik }: IDeployingIn
   const command = formik.values;
   const pauseResource = React.useCallback(() => {
     const { resourceSummary, backingData } = formik.values;
+    if (!resourceSummary) return;
     toggleResourcePause(resourceSummary, app).then(
       () => {
         backingData.managedResources = app.getDataSource('managedResources')?.data?.resources;

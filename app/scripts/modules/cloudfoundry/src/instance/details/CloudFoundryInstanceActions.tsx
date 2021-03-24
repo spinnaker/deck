@@ -1,21 +1,18 @@
-import React from 'react';
-
-import { Dropdown } from 'react-bootstrap';
 import { cloneDeep } from 'lodash';
+import React from 'react';
+import { Dropdown } from 'react-bootstrap';
 
 import { Application, ConfirmationModalService, InstanceWriter, ReactInjector } from '@spinnaker/core';
-
 import { ICloudFoundryInstance } from 'cloudfoundry/domain';
 
 export interface ICloudFoundryInstanceActionsProps {
   application: Application;
   instance: ICloudFoundryInstance;
-  instanceWriter: InstanceWriter;
 }
 
 export class CloudFoundryInstanceActions extends React.Component<ICloudFoundryInstanceActionsProps> {
   private terminateInstance = () => {
-    const { application, instance, instanceWriter } = this.props;
+    const { application, instance } = this.props;
     const instanceClone = cloneDeep(instance) as any;
     instanceClone.placement = {};
     instanceClone.id = instance.name;
@@ -30,7 +27,7 @@ export class CloudFoundryInstanceActions extends React.Component<ICloudFoundryIn
     };
 
     const submitMethod = () => {
-      return instanceWriter.terminateInstance(instance, application, { cloudProvider: 'cloudfoundry' });
+      return InstanceWriter.terminateInstance(instance, application, { cloudProvider: 'cloudfoundry' });
     };
 
     ConfirmationModalService.confirm({

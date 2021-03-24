@@ -1,8 +1,8 @@
+import { IEntityTags } from './IEntityTags';
+import { IExpectedArtifact } from './IExpectedArtifact';
+import { INotification } from './INotification';
 import { IStage } from './IStage';
 import { ITrigger } from './ITrigger';
-import { IExpectedArtifact } from './IExpectedArtifact';
-import { IEntityTags } from './IEntityTags';
-import { INotification } from './INotification';
 
 export interface IPipeline {
   application: string;
@@ -16,6 +16,7 @@ export interface IPipeline {
   locked?: IPipelineLock;
   limitConcurrent: boolean;
   manualStartAlert?: IPipelineManualStartAlert;
+  migrationStatus?: string;
   name: string;
   notifications?: INotification[];
   respectQuietPeriod?: boolean;

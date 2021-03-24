@@ -1,6 +1,4 @@
-
-
-import { API, IFindImageParams, IFindTagsParams, IImage, RetryService } from '@spinnaker/core';
+import { IFindImageParams, IFindTagsParams, IImage, REST, RetryService } from '@spinnaker/core';
 
 export interface IDockerImage extends IImage {
   account: string;
@@ -11,11 +9,9 @@ export interface IDockerImage extends IImage {
 
 export class DockerImageReader {
   public static getImage(imageName: string, region: string, credentials: string): PromiseLike<IDockerImage> {
-    return API.all('images')
-      .one(credentials)
-      .one(region)
-      .one(imageName)
-      .withParams({ provider: 'docker' })
+    return REST('/images')
+      .path(credentials, region, imageName)
+      .query({ provider: 'docker' })
       .get()
       .then((results: IDockerImage[]) => (results && results.length ? results[0] : null))
       .catch((): IDockerImage => null);
@@ -23,7 +19,7 @@ export class DockerImageReader {
 
   public static findImages(params: IFindImageParams): PromiseLike<IDockerImage[]> {
     return RetryService.buildRetrySequence<IDockerImage[]>(
-      () => API.all('images', 'find').getList(params),
+      () => REST('/images/find').query(params).get(),
       (results: IDockerImage[]) => results.length > 0,
       10,
       1000,
@@ -34,7 +30,7 @@ export class DockerImageReader {
 
   public static findTags(params: IFindTagsParams): PromiseLike<string[]> {
     return RetryService.buildRetrySequence<string[]>(
-      () => API.all('images', 'tags').getList(params),
+      () => REST('/images/tags').query(params).get(),
       (results: string[]) => results.length > 0,
       10,
       1000,

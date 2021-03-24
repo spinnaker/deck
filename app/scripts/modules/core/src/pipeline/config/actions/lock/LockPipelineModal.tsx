@@ -1,10 +1,12 @@
+import { get } from 'lodash';
 import React from 'react';
 import { Modal } from 'react-bootstrap';
 
 import { IPipeline, IPipelineLock } from 'core/domain';
+import { HelpField } from 'core/help';
 import { ModalClose } from 'core/modal';
 import { CheckboxInput, FormField, IModalComponentProps, TextInput } from 'core/presentation';
-import { HelpField } from 'core/help';
+
 import { PipelineConfigService } from '../../services/PipelineConfigService';
 
 export interface ILockPipelineModalProps extends IModalComponentProps {
@@ -29,7 +31,7 @@ export function LockPipelineModal(props: ILockPipelineModalProps) {
       () => closeModal(newPipeline),
       (response) => {
         setSaveError(true);
-        setErrorMessage(response.message || 'No message provided');
+        setErrorMessage(get(response, 'data.message', 'No message provided'));
       },
     );
   }

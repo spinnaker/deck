@@ -1,11 +1,12 @@
+
 import { uniq } from 'lodash';
 import { $q } from 'ngimport';
-import { IPromise } from 'angular';
 
 import { AccountService, IAccountDetails } from 'core/account';
 import { Application } from 'core/application';
-import { CloudProviderRegistry, ICloudProviderConfig } from '../CloudProviderRegistry';
 import { SETTINGS } from 'core/config';
+
+import { CloudProviderRegistry, ICloudProviderConfig } from '../CloudProviderRegistry';
 import { ProviderSelectionModal } from './ProviderSelectionModal';
 
 export type IProviderSelectionFilter = (app: Application, acc: IAccountDetails, prov: ICloudProviderConfig) => boolean;
@@ -51,7 +52,7 @@ export class ProviderSelectionService {
     });
   }
 
-  public static isDisabled(app: Application): IPromise<boolean> {
+  public static isDisabled(app: Application): PromiseLike<boolean> {
     return AccountService.applicationAccounts(app).then((accounts: IAccountDetails[]) => {
       let isDisable = false;
       if (accounts.length === 1) {

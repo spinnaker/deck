@@ -1,23 +1,23 @@
 import React from 'react';
-import { Observable, Subject, BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 
-import { API } from 'core/api';
-import { IServerGroup, IInstanceCounts } from 'core/domain';
+import { REST } from 'core/api';
+import { IInstanceCounts, IServerGroup } from 'core/domain';
 import {
   AccountCell,
   BasicCell,
-  HrefCell,
-  HealthCountsCell,
-  searchResultTypeRegistry,
-  ISearchColumn,
   DefaultSearchResultTab,
-  ISearchResult,
   HeaderCell,
+  HealthCountsCell,
+  HrefCell,
+  ISearchColumn,
+  ISearchResult,
+  ISearchResultSet,
+  SearchResultType,
+  searchResultTypeRegistry,
   SearchTableBody,
   SearchTableHeader,
   SearchTableRow,
-  SearchResultType,
-  ISearchResultSet,
 } from 'core/search';
 
 import './serverGroup.less';
@@ -58,8 +58,8 @@ const makeServerGroupTuples = (sgToFetch: IServerGroupSearchResult[], fetched: I
 };
 
 const fetchServerGroups = (toFetch: IServerGroupSearchResult[]): Observable<IServerGroupTuple[]> => {
-  const fetchPromise = API.one('serverGroups')
-    .withParams({ ids: toFetch.map((sg) => `${sg.account}:${sg.region}:${sg.serverGroup}`) })
+  const fetchPromise = REST('/serverGroups')
+    .query({ ids: toFetch.map((sg) => `${sg.account}:${sg.region}:${sg.serverGroup}`) })
     .get()
     .then((fetched: IServerGroup[]) => makeServerGroupTuples(toFetch, fetched));
 

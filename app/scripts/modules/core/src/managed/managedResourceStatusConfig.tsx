@@ -1,9 +1,9 @@
 import React from 'react';
 import ReactGA from 'react-ga';
 
+import { IconNames } from '@spinnaker/presentation';
 import { Application } from 'core/application';
 import { IManagedResourceSummary, ManagedResourceStatus } from 'core/domain';
-import { IconNames } from 'core/presentation';
 
 interface IViewConfiguration {
   appearance: 'info' | 'warning' | 'error';
@@ -219,6 +219,23 @@ export const viewConfigurationByStatus: { [status in ManagedResourceStatus]: IVi
         <p>
           Spinnaker is configured to manage this resource, but can't calculate its current status.{' '}
           <LearnMoreLink resourceSummary={resourceSummary} />
+        </p>
+      </>
+    ),
+  },
+  WAITING: {
+    appearance: 'info',
+    iconName: 'mdCreated',
+    popoverContents: (resourceSummary: IManagedResourceSummary) => (
+      <>
+        <p>
+          <b>Waiting for information.</b>
+        </p>
+        <p>
+          This resource is part of a brand new environment. Spinnaker is waiting for an artifact to become available to
+          deploy. It normally takes less than 5 minutes for a newly created artifact to be seen, and after that all
+          constraints need to pass in order for it to start deploying. You can click History to see a more detailed
+          message. <LearnMoreLink resourceSummary={resourceSummary} />
         </p>
       </>
     ),

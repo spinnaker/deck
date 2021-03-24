@@ -1,4 +1,4 @@
-import { API } from 'core/api/ApiService';
+import { REST } from 'core/api/ApiService';
 import { ICloudMetricDescriptor, ICloudMetricStatistics } from 'core/domain';
 
 export class CloudMetricsReader {
@@ -8,7 +8,7 @@ export class CloudMetricsReader {
     region: string,
     filters: any,
   ): PromiseLike<ICloudMetricDescriptor[]> {
-    return API.all('cloudMetrics').all(provider).all(account).all(region).withParams(filters).getList();
+    return REST('/cloudMetrics').path(provider, account, region).query(filters).get();
   }
 
   public static getMetricStatistics(
@@ -18,12 +18,6 @@ export class CloudMetricsReader {
     name: string,
     filters: any,
   ): PromiseLike<ICloudMetricStatistics> {
-    return API.all('cloudMetrics')
-      .all(provider)
-      .all(account)
-      .all(region)
-      .one(name, 'statistics')
-      .withParams(filters)
-      .get();
+    return REST('/cloudMetrics').path(provider, account, region, name, 'statistics').query(filters).get();
   }
 }

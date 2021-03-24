@@ -1,8 +1,8 @@
-import React from 'react';
-import { $q } from 'ngimport';
-import { SortableContainer, SortableElement, SortableHandle, arrayMove, SortEnd } from 'react-sortable-hoc';
-import { difference, flatten, get, some, uniq, uniqBy } from 'lodash';
 import { FormikErrors, FormikProps } from 'formik';
+import { difference, flatten, get, some, uniq, uniqBy } from 'lodash';
+import { $q } from 'ngimport';
+import React from 'react';
+import { arrayMove, SortableContainer, SortableElement, SortableHandle, SortEnd } from 'react-sortable-hoc';
 
 import {
   Application,
@@ -13,28 +13,27 @@ import {
   Tooltip,
   ValidationMessage,
 } from '@spinnaker/core';
-
 import { AWSProviderSettings } from 'amazon/aws.settings';
+import { AmazonCertificateReader } from 'amazon/certificates/AmazonCertificateReader';
 import {
   ALBListenerProtocol,
   IALBListenerCertificate,
-  IAmazonCertificate,
-  IListenerDescription,
   IALBTargetGroupDescription,
   IAmazonApplicationLoadBalancerUpsertCommand,
+  IAmazonCertificate,
   IListenerAction,
+  IListenerActionType,
+  IListenerDescription,
   IListenerRule,
   IListenerRuleCondition,
-  ListenerRuleConditionField,
   IRedirectActionConfig,
-  IListenerActionType,
+  ListenerRuleConditionField,
 } from 'amazon/domain';
-import { AmazonCertificateReader } from 'amazon/certificates/AmazonCertificateReader';
-import { IAuthenticateOidcActionConfig, OidcConfigReader } from '../../OidcConfigReader';
 
 import { ConfigureOidcConfigModal } from './ConfigureOidcConfigModal';
-import { AmazonCertificateSelectField } from '../common/AmazonCertificateSelectField';
 import { ConfigureRedirectConfigModal } from './ConfigureRedirectConfigModal';
+import { IAuthenticateOidcActionConfig, OidcConfigReader } from '../../OidcConfigReader';
+import { AmazonCertificateSelectField } from '../common/AmazonCertificateSelectField';
 
 export interface IALBListenersState {
   certificates: { [accountId: number]: IAmazonCertificate[] };
@@ -407,6 +406,7 @@ export class ALBListeners
     ConfigureOidcConfigModal.show({ config: action.authenticateOidcConfig })
       .then((config: any) => {
         action.authenticateOidcConfig = config;
+        this.updateListeners(); // pushes change to formik, needed due to prop mutation
       })
       .catch(() => {});
   };
@@ -415,6 +415,7 @@ export class ALBListeners
     ConfigureRedirectConfigModal.show({ config: action.redirectActionConfig })
       .then((config: any) => {
         action.redirectActionConfig = config;
+        this.updateListeners(); // pushes change to formik, needed due to prop mutation
       })
       .catch(() => {});
   };
@@ -794,9 +795,10 @@ const Action = (props: {
   configureRedirect: (action: IListenerAction) => void;
 }) => {
   if (props.action.type !== 'authenticate-oidc') {
+    const redirectConfig = props.action.redirectActionConfig || props.action.redirectConfig;
     // TODO: Support redirect
     return (
-      <div className="horizontal middle" style={{ height: '30px' }}>
+      <div className="horizontal top">
         <select
           className="form-control input-sm"
           style={{ width: '80px' }}
@@ -820,13 +822,29 @@ const Action = (props: {
           </select>
         )}
         {props.action.type === 'redirect' && (
-          <button
-            className="btn btn-link no-padding"
-            type="button"
-            onClick={() => props.configureRedirect(props.action)}
-          >
-            Configure...
-          </button>
+          <dl className="dl-horizontal dl-narrow">
+            <dt>Host</dt>
+            <dd>{redirectConfig.host}</dd>
+            <dt>Path</dt>
+            <dd>{redirectConfig.path}</dd>
+            <dt>Port</dt>
+            <dd>{redirectConfig.port}</dd>
+            <dt>Protocol</dt>
+            <dd>{redirectConfig.protocol}</dd>
+            <dt>Query</dt>
+            <dd>{redirectConfig.query}</dd>
+            <dt>Status Code</dt>
+            <dd>{redirectConfig.statusCode}</dd>
+            <dt>
+              <button
+                className="btn btn-link no-padding"
+                type="button"
+                onClick={() => props.configureRedirect(props.action)}
+              >
+                Configure...
+              </button>
+            </dt>
+          </dl>
         )}
       </div>
     );

@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { AccountTag, CollapsibleSection, timestamp } from '@spinnaker/core';
-
 import { ICloudFoundryInstance } from 'cloudfoundry/domain';
 
 export interface ICloudFoundryInstanceDetailsSectionProps {

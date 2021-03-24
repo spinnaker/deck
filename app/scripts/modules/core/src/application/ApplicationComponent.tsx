@@ -1,10 +1,12 @@
-import { ApplicationNavigation } from './nav/ApplicationNavigation';
-import React from 'react';
 import { UIView } from '@uirouter/react';
+import React from 'react';
 
-import { Application } from './application.model';
 import { RecentHistoryService } from 'core/history';
 import { DebugWindow } from 'core/utils/consoleDebug';
+
+import { ApplicationContextProvider } from './ApplicationContext';
+import { Application } from './application.model';
+import { ApplicationNavigation } from './nav/ApplicationNavigation';
 
 import './application.less';
 
@@ -68,9 +70,11 @@ export class ApplicationComponent extends React.Component<IApplicationComponentP
             </p>
           </div>
         )}
-        <div className="container scrollable-columns">
-          <UIView className="secondary-panel" name="insight" />
-        </div>
+        <ApplicationContextProvider app={app}>
+          <div className="container scrollable-columns">
+            <UIView className="secondary-panel" name="insight" />
+          </div>
+        </ApplicationContextProvider>
       </div>
     );
   }

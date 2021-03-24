@@ -1,22 +1,23 @@
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
+import { StateService } from '@uirouter/core';
 import { IQService, ITimeoutService, module } from 'angular';
 import { get, identity, pickBy } from 'lodash';
-import { StateService } from '@uirouter/core';
 
-import { API } from 'core/api/ApiService';
+import { REST } from 'core/api/ApiService';
 import { Application } from 'core/application/application.model';
-import { ExecutionsTransformer } from './ExecutionsTransformer';
-import { IExecution, IExecutionStage, IExecutionStageSummary } from 'core/domain';
-import { JsonUtils } from 'core/utils';
-import { SETTINGS } from 'core/config/settings';
 import { ApplicationDataSource } from 'core/application/service/applicationDataSource';
-import { DebugWindow } from 'core/utils/consoleDebug';
+import { SETTINGS } from 'core/config/settings';
+import { IExecution, IExecutionStage, IExecutionStageSummary } from 'core/domain';
 import { IPipeline } from 'core/domain/IPipeline';
 import { ISortFilter } from 'core/filterModel';
-import { ExecutionState } from 'core/state';
-import { IRetryablePromise, retryablePromise } from 'core/utils/retryablePromise';
 import { ReactInjector } from 'core/reactShims';
+import { ExecutionState } from 'core/state';
+import { JsonUtils } from 'core/utils';
+import { DebugWindow } from 'core/utils/consoleDebug';
+import { IRetryablePromise, retryablePromise } from 'core/utils/retryablePromise';
+
+import { ExecutionsTransformer } from './ExecutionsTransformer';
 import { PipelineConfigService } from '../config/services/PipelineConfigService';
-import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
 export class ExecutionService {
   public get activeStatuses(): string[] {
@@ -51,10 +52,11 @@ export class ExecutionService {
   ): PromiseLike<IExecution[]> {
     const statusString = statuses.map((status) => status.toUpperCase()).join(',') || null;
     const call = pipelineConfigIds
-      ? API.all('executions').getList({ limit, pipelineConfigIds, statuses })
-      : API.one('applications', applicationName)
-          .all('pipelines')
-          .getList({ limit, statuses: statusString, pipelineConfigIds, expand });
+      ? REST('/executions').query({ limit, pipelineConfigIds, statuses }).get()
+      : REST('/applications')
+          .path(applicationName, 'pipelines')
+          .query({ limit, statuses: statusString, pipelineConfigIds, expand })
+          .get();
 
     return call.then((data: IExecution[]) => {
       if (data) {
@@ -95,14 +97,16 @@ export class ExecutionService {
   }
 
   public getExecution(executionId: string): PromiseLike<IExecution> {
-    return API.one('pipelines', executionId)
+    return REST('/pipelines')
+      .path(executionId)
       .get()
       .then((execution: IExecution) => {
         const { application, name } = execution;
         execution.hydrated = true;
         this.cleanExecutionForDiffing(execution);
         if (application && name) {
-          return API.one('applications', application, 'pipelineConfigs', encodeURIComponent(name))
+          return REST('/applications')
+            .path(application, 'pipelineConfigs', name)
             .get()
             .then((pipelineConfig: IPipeline) => {
               execution.pipelineConfig = pipelineConfig;
@@ -254,8 +258,9 @@ export class ExecutionService {
     force?: boolean,
     reason?: string,
   ): PromiseLike<any> {
-    return API.one('pipelines', executionId, 'cancel')
-      .withParams({ force, reason })
+    return REST('/pipelines')
+      .path(executionId, 'cancel')
+      .query({ force, reason })
       .put()
       .then(() => this.waitUntilPipelineIsCancelled(application, executionId))
       .catch((exception) => {
@@ -264,7 +269,8 @@ export class ExecutionService {
   }
 
   public pauseExecution(application: Application, executionId: string): PromiseLike<any> {
-    return API.one('pipelines', executionId, 'pause')
+    return REST('/pipelines')
+      .path(executionId, 'pause')
       .put()
       .then(() => this.waitUntilExecutionMatches(executionId, (execution) => execution.status === 'PAUSED'))
       .then(() => application.executions.refresh())
@@ -274,7 +280,8 @@ export class ExecutionService {
   }
 
   public resumeExecution(application: Application, executionId: string): PromiseLike<any> {
-    return API.one('pipelines', executionId, 'resume')
+    return REST('/pipelines')
+      .path(executionId, 'resume')
       .put()
       .then(() => this.waitUntilExecutionMatches(executionId, (execution) => execution.status === 'RUNNING'))
       .then(() => application.executions.refresh())
@@ -284,7 +291,8 @@ export class ExecutionService {
   }
 
   public deleteExecution(application: Application, executionId: string): PromiseLike<any> {
-    const promiseLike = API.one('pipelines', executionId)
+    const promiseLike = REST('/pipelines')
+      .path(executionId)
       .delete()
       .then(() => this.waitUntilPipelineIsDeleted(application, executionId))
       .then(() => application.executions.refresh())
@@ -311,9 +319,10 @@ export class ExecutionService {
   }
 
   public getProjectExecutions(project: string, limit = 1): PromiseLike<IExecution[]> {
-    return API.one('projects', project)
-      .all('pipelines')
-      .getList({ limit })
+    return REST('/projects')
+      .path(project, 'pipelines')
+      .query({ limit })
+      .get()
       .then((executions: IExecution[]) => {
         if (!executions || !executions.length) {
           return [];
@@ -502,8 +511,9 @@ export class ExecutionService {
     options: { limit?: number; statuses?: string; transform?: boolean; application?: Application } = {},
   ): PromiseLike<IExecution[]> {
     const { limit, statuses, transform, application } = options;
-    return API.all('executions')
-      .getList({ limit, pipelineConfigIds: (pipelineConfigIds || []).join(','), statuses })
+    return REST('/executions')
+      .query({ limit, pipelineConfigIds: (pipelineConfigIds || []).join(','), statuses })
+      .get()
       .then((data: IExecution[]) => {
         if (data) {
           if (transform && application) {
@@ -517,7 +527,7 @@ export class ExecutionService {
   }
 
   public patchExecution(executionId: string, stageId: string, data: any): PromiseLike<any> {
-    return API.one('pipelines', executionId, 'stages', stageId).patch(data);
+    return REST('/pipelines').path(executionId, 'stages', stageId).patch(data);
   }
 
   private stringifyExecution(execution: IExecution): string {
