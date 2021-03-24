@@ -2,25 +2,18 @@ import classNames from 'classnames';
 import React, { memo, useState } from 'react';
 import ReactGA from 'react-ga';
 
-import { Button } from '../../Button';
-import { IUpdateConstraintStatusRequest, ManagedWriter } from '../../ManagedWriter';
-import { IStatusCardProps, StatusCard } from '../../StatusCard';
-import { Application, ApplicationDataSource } from '../../../application';
-import {
-  getConstraintActions,
-  getConstraintIcon,
-  getConstraintTimestamp,
-  hasSkippedConstraint,
-  isConstraintSupported,
-  renderConstraint,
-} from './constraintRegistry';
+import { Button } from '../Button';
+import { IUpdateConstraintStatusRequest, ManagedWriter } from '../ManagedWriter';
+import { IStatusCardProps, StatusCard } from '../StatusCard';
+import { Application, ApplicationDataSource } from '../../application';
 import {
   ConstraintStatus,
   IConstraint,
   IManagedApplicationEnvironmentSummary,
   IManagedArtifactVersionEnvironment,
-} from '../../../domain';
-import { IRequestStatus } from '../../../presentation';
+} from '../../domain';
+import { IRequestStatus } from '../../presentation';
+import { constraintsManager, hasSkippedConstraint } from './registry';
 
 import './ConstraintCard.less';
 
@@ -91,25 +84,28 @@ export const ConstraintCard = memo(
 
     const [actionStatus, setActionStatus] = useState<IRequestStatus>('NONE');
 
-    const actions = getConstraintActions(constraint, environment);
+    const actions = constraintsManager.getOverrideActions(constraint, environment);
 
-    if (!isConstraintSupported(type)) {
+    if (!constraintsManager.isSupported(type)) {
       console.warn(
         new Error(`Unsupported constraint type ${type} — did you check for constraint support before rendering?`),
       );
     }
 
+    const hasSkipped = hasSkippedConstraint(constraint, environment);
+
     return (
       <StatusCard
         appearance={getCardAppearance(constraint, environment)}
         active={environment.state !== 'skipped'}
-        iconName={getConstraintIcon(constraint)}
-        timestamp={getConstraintTimestamp(constraint, environment)}
+        iconName={constraintsManager.getIcon(constraint)}
+        timestamp={constraintsManager.getTimestamp(constraint, environment)}
         title={
-          hasSkippedConstraint(constraint, environment)
+          hasSkipped
             ? 'Environment was skipped before evaluating constraint'
-            : renderConstraint(constraint)
+            : constraintsManager.renderTitle(constraint)
         }
+        description={!hasSkipped ? constraintsManager.renderDescription(constraint) : undefined}
         actions={
           actions && (
             <div
