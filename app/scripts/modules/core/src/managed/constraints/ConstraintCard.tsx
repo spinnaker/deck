@@ -2,47 +2,37 @@ import classNames from 'classnames';
 import React, { memo, useState } from 'react';
 import ReactGA from 'react-ga';
 
-import { Button } from '../../Button';
-import { IUpdateConstraintStatusRequest, ManagedWriter } from '../../ManagedWriter';
-import { StatusCard } from '../../StatusCard';
-import { Application, ApplicationDataSource } from '../../../application';
+import { Button } from '../Button';
+import { IUpdateConstraintStatusRequest, ManagedWriter } from '../ManagedWriter';
+import { IStatusCardProps, StatusCard } from '../StatusCard';
+import { Application, ApplicationDataSource } from '../../application';
 import {
-  getConstraintActions,
-  getConstraintIcon,
-  getConstraintSummary,
-  getConstraintTimestamp,
-  isConstraintStateful,
-  isConstraintSupported,
-} from './constraintRegistry';
-import {
+  ConstraintStatus,
+  IConstraint,
   IManagedApplicationEnvironmentSummary,
   IManagedArtifactVersionEnvironment,
-  IStatefulConstraint,
-  IStatelessConstraint,
-  StatefulConstraintStatus,
-} from '../../../domain';
-import { IRequestStatus } from '../../../presentation';
+} from '../../domain';
+import { IRequestStatus } from '../../presentation';
+import { constraintsManager, hasSkippedConstraint } from './registry';
 
 import './ConstraintCard.less';
 
-const { NOT_EVALUATED, PENDING, PASS, FAIL, OVERRIDE_PASS, OVERRIDE_FAIL } = StatefulConstraintStatus;
-
-const constraintCardAppearanceByStatus = {
-  [NOT_EVALUATED]: 'future',
-  [PENDING]: 'info',
-  [PASS]: 'neutral',
-  [FAIL]: 'error',
-  [OVERRIDE_PASS]: 'neutral',
-  [OVERRIDE_FAIL]: 'error',
+const constraintCardAppearanceByStatus: { [key in ConstraintStatus]: IStatusCardProps['appearance'] } = {
+  NOT_EVALUATED: 'future',
+  PENDING: 'info',
+  PASS: 'neutral',
+  FAIL: 'error',
+  OVERRIDE_PASS: 'neutral',
+  OVERRIDE_FAIL: 'error',
 } as const;
 
-const skippedConstraintCardAppearanceByStatus = {
-  [NOT_EVALUATED]: 'future',
-  [PENDING]: 'future',
-  [PASS]: 'neutral',
-  [FAIL]: 'neutral',
-  [OVERRIDE_PASS]: 'neutral',
-  [OVERRIDE_FAIL]: 'neutral',
+const skippedConstraintCardAppearanceByStatus: { [key in ConstraintStatus]: IStatusCardProps['appearance'] } = {
+  NOT_EVALUATED: 'future',
+  PENDING: 'future',
+  PASS: 'neutral',
+  FAIL: 'neutral',
+  OVERRIDE_PASS: 'neutral',
+  OVERRIDE_FAIL: 'neutral',
 } as const;
 
 const logEvent = (label: string, application: string, environment: string, reference: string) =>
@@ -52,12 +42,7 @@ const logEvent = (label: string, application: string, environment: string, refer
     label: `${application}:${environment}:${reference}`,
   });
 
-const logUnsupportedConstraintError = (type: string) => {
-  console.error(
-    new Error(`Unsupported constraint type ${type} — did you check for constraint support before rendering?`),
-  );
-};
-
+// TODO: improve this logic below
 const overrideConstraintStatus = (
   application: Application,
   options: Omit<IUpdateConstraintStatusRequest, 'application'>,
@@ -77,20 +62,11 @@ const overrideConstraintStatus = (
     return dataSource.refresh().catch(() => null);
   });
 
-const getCardAppearance = (
-  constraint: IStatefulConstraint | IStatelessConstraint,
-  environment: IManagedArtifactVersionEnvironment,
-) => {
-  if (isConstraintStateful(constraint)) {
-    const { status } = constraint as IStatefulConstraint;
-    if (environment.state === 'skipped') {
-      return skippedConstraintCardAppearanceByStatus[status];
-    } else {
-      return constraintCardAppearanceByStatus[status];
-    }
+const getCardAppearance = (constraint: IConstraint, environment: IManagedArtifactVersionEnvironment) => {
+  if (environment.state === 'skipped') {
+    return skippedConstraintCardAppearanceByStatus[constraint.status];
   } else {
-    const { currentlyPassing } = constraint as IStatelessConstraint;
-    return currentlyPassing ? 'neutral' : 'future';
+    return constraintCardAppearanceByStatus[constraint.status];
   }
 };
 
@@ -99,7 +75,7 @@ export interface IConstraintCardProps {
   environment: IManagedArtifactVersionEnvironment;
   reference: string;
   version: string;
-  constraint: IStatefulConstraint | IStatelessConstraint;
+  constraint: IConstraint;
 }
 
 export const ConstraintCard = memo(
@@ -108,20 +84,28 @@ export const ConstraintCard = memo(
 
     const [actionStatus, setActionStatus] = useState<IRequestStatus>('NONE');
 
-    if (!isConstraintSupported(type)) {
-      logUnsupportedConstraintError(type);
-      return null;
+    const actions = constraintsManager.getOverrideActions(constraint, environment);
+
+    if (!constraintsManager.isSupported(type)) {
+      console.warn(
+        new Error(`Unsupported constraint type ${type} — did you check for constraint support before rendering?`),
+      );
     }
 
-    const actions = getConstraintActions(constraint, environment);
+    const hasSkipped = hasSkippedConstraint(constraint, environment);
 
     return (
       <StatusCard
         appearance={getCardAppearance(constraint, environment)}
         active={environment.state !== 'skipped'}
-        iconName={getConstraintIcon(constraint)}
-        timestamp={getConstraintTimestamp(constraint, environment)}
-        title={getConstraintSummary(constraint, environment)}
+        iconName={constraintsManager.getIcon(constraint)}
+        timestamp={constraintsManager.getTimestamp(constraint, environment)}
+        title={
+          hasSkipped
+            ? 'Environment was skipped before evaluating constraint'
+            : constraintsManager.renderTitle(constraint)
+        }
+        description={!hasSkipped ? constraintsManager.renderDescription(constraint) : undefined}
         actions={
           actions && (
             <div
@@ -142,7 +126,7 @@ export const ConstraintCard = memo(
                           type,
                           reference,
                           version,
-                          status: pass ? OVERRIDE_PASS : OVERRIDE_FAIL,
+                          status: pass ? 'OVERRIDE_PASS' : 'OVERRIDE_FAIL',
                         })
                           .then(() => {
                             setActionStatus('RESOLVED');
