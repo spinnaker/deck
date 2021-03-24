@@ -249,13 +249,7 @@ export class ExecutionFilters extends React.Component<IExecutionFiltersProps, IE
             />
           </div>
           <div className="content">
-            {categories.names.map((name) => (
-              <FilterSection heading={name} expanded={true}>
-                {(categories.values[name] || []).map((value) => (
-                  <CategoryFilter group={name} value={value} refresh={this.refreshExecutions} />
-                ))}
-              </FilterSection>
-            ))}
+            <CategoryFilters categories={categories} refresh={this.refreshExecutions} />
             <FilterSection heading="Pipelines" expanded={true}>
               <div className="form">
                 {pipelineReorderEnabled && (
@@ -388,6 +382,18 @@ const Pipelines = SortableContainer(
       })}
     </div>
   ),
+);
+
+const CategoryFilters = (props: { categories: IOrderedCategoryFilters; refresh: () => void }): JSX.Element => (
+  <>
+    {props.categories.names.map((name) => (
+      <FilterSection heading={name} expanded={true}>
+        {(props.categories.values[name] || []).map((value) => (
+          <CategoryFilter group={name} value={value} refresh={props.refresh} />
+        ))}
+      </FilterSection>
+    ))}
+  </>
 );
 
 const CategoryFilter = (props: { group: string; value: string; refresh: () => void }): JSX.Element => {
