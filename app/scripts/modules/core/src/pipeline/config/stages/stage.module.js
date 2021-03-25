@@ -21,6 +21,7 @@ import { OVERRIDE_TIMEOUT_COMPONENT } from './overrideTimeout/overrideTimeout.mo
 import { ApplicationReader } from 'core/application/service/ApplicationReader';
 import { CORE_PIPELINE_CONFIG_STAGES_OPTIONALSTAGE_OPTIONALSTAGE_DIRECTIVE } from './optionalStage/optionalStage.directive';
 import { CORE_PIPELINE_CONFIG_STAGES_FAILONFAILEDEXPRESSIONS_FAILONFAILEDEXPRESSIONS_DIRECTIVE } from './failOnFailedExpressions/failOnFailedExpressions.directive';
+import { CORE_PIPELINE_CONFIG_STAGES_ALLOWIGNOREFAILURE_ALLOWIGNOREFAILURE_DIRECTIVE } from './allowIgnoreFailure/allowIgnoreFailure.directive';
 import { CORE_PIPELINE_CONFIG_STAGES_COMMON_STAGECONFIGFIELD_STAGECONFIGFIELD_DIRECTIVE } from './common/stageConfigField/stageConfigField.directive';
 
 export const CORE_PIPELINE_CONFIG_STAGES_STAGE_MODULE = 'spinnaker.core.pipeline.config.stage';
@@ -34,6 +35,7 @@ module(CORE_PIPELINE_CONFIG_STAGES_STAGE_MODULE, [
   CORE_PIPELINE_CONFIG_STAGES_OPTIONALSTAGE_OPTIONALSTAGE_DIRECTIVE,
   CORE_PIPELINE_CONFIG_STAGES_FAILONFAILEDEXPRESSIONS_FAILONFAILEDEXPRESSIONS_DIRECTIVE,
   CORE_PIPELINE_CONFIG_STAGES_COMMON_STAGECONFIGFIELD_STAGECONFIGFIELD_DIRECTIVE,
+  CORE_PIPELINE_CONFIG_STAGES_ALLOWIGNOREFAILURE_ALLOWIGNOREFAILURE_DIRECTIVE,
 ])
   .directive('pipelineConfigStage', function () {
     return {
@@ -135,29 +137,29 @@ module(CORE_PIPELINE_CONFIG_STAGES_STAGE_MODULE, [
         });
       };
 
-      $scope.getApplicationPermissions = function() {
-          ApplicationReader.getApplicationPermissions($scope.application.name).then(result => {
-              appPermissions = result;
-              if (appPermissions) {
-                  const readArray = appPermissions.READ || [];
-                  const writeArray = appPermissions.WRITE || [];
-                  const executeArray = appPermissions.EXECUTE || [];
-                  appRoles = _.union(readArray, writeArray, executeArray);
-                  appRoles = Array.from(new Set(appRoles));
-                  $scope.updateAvailableStageRoles();
-              }
-          });
+      $scope.getApplicationPermissions = function () {
+        ApplicationReader.getApplicationPermissions($scope.application.name).then((result) => {
+          appPermissions = result;
+          if (appPermissions) {
+            const readArray = appPermissions.READ || [];
+            const writeArray = appPermissions.WRITE || [];
+            const executeArray = appPermissions.EXECUTE || [];
+            appRoles = _.union(readArray, writeArray, executeArray);
+            appRoles = Array.from(new Set(appRoles));
+            $scope.updateAvailableStageRoles();
+          }
+        });
       };
 
-      $scope.updateAvailableStageRoles = function() {
-          $scope.options.stageRoles = appRoles.map(function(value, index) {
-              return {
-                  name: value,
-                  roleId: value,
-                  id: index,
-                  available: true,
-              };
-          });
+      $scope.updateAvailableStageRoles = function () {
+        $scope.options.stageRoles = appRoles.map(function (value, index) {
+          return {
+            name: value,
+            roleId: value,
+            id: index,
+            available: true,
+          };
+        });
       };
 
       this.editStageJson = () => {
