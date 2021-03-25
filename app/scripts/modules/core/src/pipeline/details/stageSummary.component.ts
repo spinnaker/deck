@@ -68,6 +68,10 @@ export class StageSummaryController implements IController {
     return index === this.getCurrentStep();
   }
 
+  public hasActions(stage?: IStage): boolean {
+    return this.isRestartable(stage) || this.canManuallySkip() || this.canIgnoreFailure();
+  }
+
   public isRestartable(stage?: IStage): boolean {
     if (stage.isRunning || stage.isCompleted) {
       return false;
@@ -89,6 +93,10 @@ export class StageSummaryController implements IController {
   public canManuallySkip(): boolean {
     const topLevelStage = this.getTopLevelStage();
     return this.stage.isRunning && topLevelStage && topLevelStage.context.canManuallySkip;
+  }
+
+  public canIgnoreFailure(): boolean {
+    return this.stage.isHalted && this.stage.context.allowIgnoreFailure;
   }
 
   public getTopLevelStage(): IExecutionStage {
