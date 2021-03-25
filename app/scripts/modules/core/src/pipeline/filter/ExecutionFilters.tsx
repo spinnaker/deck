@@ -114,7 +114,7 @@ export class ExecutionFilters extends React.Component<IExecutionFiltersProps, IE
       ? []
       : get(this.props.application, 'pipelineConfigs.data', []);
 
-    // Since pipeline.category is an array of categories, we'll need to flatten
+    // Since pipeline.tags is an array of tags, we'll need to flatten
     const extractedPipelineTags: IPipelineTag[] = flatten(
       pipelineConfigs.filter((pipeline) => pipeline.tags).map((pipeline) => pipeline.tags),
     );
