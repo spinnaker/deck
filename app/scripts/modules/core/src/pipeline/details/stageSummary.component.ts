@@ -109,6 +109,32 @@ export class StageSummaryController implements IController {
     return topLevelStage;
   }
 
+  public openIgnoreStageFailureModal(): void {
+    ConfirmationModalService.confirm({
+      header: 'Really ignore this failure?',
+      buttonText: 'Ignore',
+      askForReason: true,
+      submitJustWithReason: true,
+      body: `<div class="alert alert-warning">
+          <b>Warning:</b> Ignoring this failure may have unpredictable results.
+          <ul>
+            <li>Downstream stages that depend on the outputs of this stage may fail or behave unexpectedly.</li>
+          </ul>
+        </div>
+      `,
+      submitMethod: (reason: string) =>
+        this.executionService
+          .ignoreStageFailureInExecution(this.execution.id, this.stage.id, reason)
+          .then(() =>
+            this.executionService.waitUntilExecutionMatches(this.execution.id, (execution) => {
+              const updatedStage = execution.stages.find((stage) => stage.id === this.stage.id);
+              return updatedStage && updatedStage.status === 'FAILED_CONTINUE';
+            }),
+          )
+          .then((updated) => this.executionService.updateExecution(this.application, updated)),
+    });
+  }
+
   public openManualSkipStageModal(): void {
     const topLevelStage = this.getTopLevelStage();
     ConfirmationModalService.confirm({
