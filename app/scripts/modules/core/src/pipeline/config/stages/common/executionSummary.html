@@ -60,8 +60,9 @@
     {{$ctrl.getTopLevelStage().lastModified.lastModifiedTime | timestamp}}
   </h6>
   <h6 ng-if="stage.context.ignoreFailureDetails" uib-tooltip="{{stage.context.ignoreFailureDetails.reason}}">
-    Failure ignored manually by {{stage.ignoreFailureDetails.by}} &mdash; {{stage.ignoreFailureDetails.time |
-    timestamp}} Previous exception: {{stage.ignoreFailureDetails.previousException}}
+    Failure ignored manually by {{stage.context.ignoreFailureDetails.by}} &mdash;
+    {{stage.context.ignoreFailureDetails.time | timestamp}} Previous exception:
+    {{stage.context.ignoreFailureDetails.previousException}}
   </h6>
 
   <table class="table">
