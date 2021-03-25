@@ -61,8 +61,8 @@
   </h6>
   <h6 ng-if="stage.context.ignoreFailureDetails" uib-tooltip="{{stage.context.ignoreFailureDetails.reason}}">
     Failure ignored manually by {{stage.context.ignoreFailureDetails.by}} &mdash;
-    {{stage.context.ignoreFailureDetails.time | timestamp}} Previous exception:
-    {{stage.context.ignoreFailureDetails.previousException}}
+    {{stage.context.ignoreFailureDetails.time | timestamp}} {{stage.context.ignoreFailureDetails.previousException?
+    'Previous exception:' + stage.context.ignoreFailureDetails.previousException : ''}}
   </h6>
 
   <table class="table">
