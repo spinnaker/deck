@@ -529,6 +529,10 @@ export class ExecutionService {
     return REST('/pipelines').path(executionId, 'stages', stageId).patch(data);
   }
 
+  public ignoreStageFailureInExecution(executionId: string, stageId: string, reason: string): PromiseLike<any> {
+    return REST('/pipelines').path(executionId, 'stages', stageId, 'ignoreFailure').put({ reason });
+  }
+
   private stringifyExecution(execution: IExecution): string {
     const transient = { ...execution };
     transient.stages = transient.stages.filter((s) => s.status !== 'SUCCEEDED' && s.status !== 'NOT_STARTED');
