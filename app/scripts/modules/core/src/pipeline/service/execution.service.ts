@@ -86,11 +86,11 @@ export class ExecutionService {
     expand = false,
   ): PromiseLike<IExecution[]> {
     const sortFilter: ISortFilter = ExecutionState.filterModel.asFilterModel.sortFilter;
-    const categories = FilterModelService.getCheckValues(sortFilter.category);
+    const tags = FilterModelService.getCheckValues(sortFilter.tags);
     const pipelines = Object.keys(sortFilter.pipeline);
     const statuses = Object.keys(pickBy(sortFilter.status || {}, identity));
     const limit = sortFilter.count;
-    if (application && (pipelines.length || categories.length)) {
+    if (application && (pipelines.length || tags.length)) {
       return this.getConfigIdsFromFilterModel(application).then((pipelineConfigIds) => {
         return this.getFilteredExecutions(application.name, statuses, limit, pipelineConfigIds, expand);
       });
@@ -137,7 +137,7 @@ export class ExecutionService {
 
   private getConfigIdsFromFilterModel(application: Application): PromiseLike<string[]> {
     const sortFilter = ExecutionState.filterModel.asFilterModel.sortFilter;
-    const categories = FilterModelService.getCheckValues(sortFilter.category);
+    const tags = FilterModelService.getCheckValues(sortFilter.tags);
     const pipelines = Object.keys(sortFilter.pipeline);
     application.pipelineConfigs.activate();
     return application.pipelineConfigs.ready().then(() => {
@@ -148,10 +148,10 @@ export class ExecutionService {
           return match ? match.id : null;
         })
         .filter((id) => !!id);
-      const configIdsFromCheckedCategories = data
-        .filter((p: IPipeline) => ExecutionFilterService.doesPipelineMatchCheckedCategories(p, categories))
+      const configIdsFromCheckedTags = data
+        .filter((p: IPipeline) => ExecutionFilterService.doesPipelineMatchCheckedTags(p, tags))
         .map((p: IPipeline) => p.id);
-      return configIdsFromCheckedPipelines.concat(uniq(configIdsFromCheckedCategories));
+      return configIdsFromCheckedPipelines.concat(uniq(configIdsFromCheckedTags));
     });
   }
 

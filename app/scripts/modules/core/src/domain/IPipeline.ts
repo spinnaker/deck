@@ -35,7 +35,7 @@ export interface IPipeline {
   type?: string;
   updateTs?: number;
   spelEvaluator?: string;
-  categories?: IPipelineCategory[];
+  tags?: IPipelineTag[];
 }
 
 export interface IPipelineManualStartAlert {
@@ -95,7 +95,7 @@ export interface ITemplateInheritable {
   inherited?: boolean;
 }
 
-export interface IPipelineCategory {
+export interface IPipelineTag {
   name: string;
   value: string;
 }
