@@ -122,7 +122,7 @@ export class StageSummaryController implements IController {
           </ul>
         </div>
       `,
-      submitMethod: (reason: string) =>
+      submitMethod: (reason: object) =>
         this.executionService
           .ignoreStageFailureInExecution(this.execution.id, this.stage.id, reason)
           .then(() =>
