@@ -389,7 +389,7 @@ const CategoryFilters = (props: { categories: IOrderedCategoryFilters; refresh: 
     {props.categories.names.map((name) => (
       <FilterSection heading={name} expanded={true}>
         {(props.categories.values[name] || []).map((value) => (
-          <CategoryFilter group={name} value={value} refresh={props.refresh} />
+          <CategoryFilter key={name} group={name} value={value} refresh={props.refresh} />
         ))}
       </FilterSection>
     ))}
