@@ -387,9 +387,9 @@ const Pipelines = SortableContainer(
 const PipelineTagFilters = (props: { pipelineTags: IOrderedPipelineTagFilters; refresh: () => void }): JSX.Element => (
   <>
     {props.pipelineTags.names.map((name) => (
-      <FilterSection heading={name} expanded={true}>
+      <FilterSection key={name} heading={name} expanded={true}>
         {(props.pipelineTags.values[name] || []).map((value) => (
-          <PipelineTagFilter key={name} group={name} value={value} refresh={props.refresh} />
+          <PipelineTagFilter key={value} group={name} value={value} refresh={props.refresh} />
         ))}
       </FilterSection>
     ))}
@@ -407,7 +407,7 @@ const PipelineTagFilter = (props: { group: string; value: string; refresh: () =>
   return (
     <div className="checkbox">
       <label>
-        <input type="checkbox" checked={sortFilter.tags[key]} onChange={changed} />
+        <input type="checkbox" checked={sortFilter.tags[key] || false} onChange={changed} />
         {value}
       </label>
     </div>
