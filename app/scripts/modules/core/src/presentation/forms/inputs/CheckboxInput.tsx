@@ -1,12 +1,14 @@
 import React from 'react';
 
-import { orEmptyString, validationClassName } from './utils';
 import { IFormInputProps, OmitControlledInputPropsFrom } from './interface';
+import { orEmptyString, validationClassName } from './utils';
 
 interface ICheckBoxInputProps extends IFormInputProps, OmitControlledInputPropsFrom<React.InputHTMLAttributes<any>> {
   inputClassName?: string;
   text?: React.ReactNode;
 }
+
+const Nbsp = () => <>&nbsp;</>;
 
 export class CheckboxInput extends React.Component<ICheckBoxInputProps> {
   public render() {
@@ -17,7 +19,7 @@ export class CheckboxInput extends React.Component<ICheckBoxInputProps> {
       <div className="checkbox">
         <label>
           <input className={className} type="checkbox" checked={!!value} {...otherProps} />
-          {text}
+          {text ? text : <Nbsp />}
         </label>
       </div>
     );

@@ -1,3 +1,6 @@
+import { chain, filter, flatten, map } from 'lodash';
+import { $q } from 'ngimport';
+
 import {
   AccountService,
   Application,
@@ -16,18 +19,15 @@ import {
   IAmazonClassicLoadBalancer,
   IAmazonClassicLoadBalancerUpsertCommand,
   IAmazonLoadBalancer,
+  IAmazonNetworkLoadBalancerUpsertCommand,
   IAmazonServerGroup,
   IApplicationLoadBalancerSourceData,
   IClassicListenerDescription,
   IClassicLoadBalancerSourceData,
   INetworkLoadBalancerSourceData,
-  IAmazonNetworkLoadBalancerUpsertCommand,
   ITargetGroup,
 } from 'amazon/domain';
 import { VpcReader } from 'amazon/vpc/VpcReader';
-import { chain, filter, flatten, map } from 'lodash';
-
-import { $q } from 'ngimport';
 
 export class AwsLoadBalancerTransformer {
   private updateHealthCounts(container: IServerGroup | ITargetGroup | IAmazonLoadBalancer): void {

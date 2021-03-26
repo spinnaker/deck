@@ -2,10 +2,10 @@ import { isEmpty } from 'lodash';
 import { Observable } from 'rxjs';
 
 import { AccountService, IServerGroupDetailsProps, ISubnet, ServerGroupReader, SubnetReader } from '@spinnaker/core';
-
-import { AwsReactInjector } from 'amazon/reactShims';
-import { AutoScalingProcessService } from './scalingProcesses/AutoScalingProcessService';
 import { IAmazonLoadBalancer, IAmazonServerGroup, IAmazonServerGroupView } from 'amazon/domain';
+import { AwsReactInjector } from 'amazon/reactShims';
+
+import { AutoScalingProcessService } from './scalingProcesses/AutoScalingProcessService';
 
 function extractServerGroupSummary(props: IServerGroupDetailsProps): PromiseLike<IAmazonServerGroup> {
   const { app, serverGroup } = props;

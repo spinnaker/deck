@@ -1,16 +1,17 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import { Overlay, Popover, PopoverProps } from 'react-bootstrap';
+import ReactDOM from 'react-dom';
 import { Observable, Subject } from 'rxjs';
 
-import { Placement } from './Placement';
 import { UUIDGenerator } from 'core/utils';
+
+import { Placement } from './Placement';
 
 import './HoverablePopover.css';
 
 export interface IHoverablePopoverContentsProps extends IHoverablePopoverProps {
   // The popover contents can forcibly hide the popover by calling this function
-  hidePopover: () => void;
+  hidePopover?: () => void;
 }
 
 export interface IHoverablePopoverProps extends React.HTMLProps<any> {

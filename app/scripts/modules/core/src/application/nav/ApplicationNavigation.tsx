@@ -1,17 +1,18 @@
-import React from 'react';
-import { useRecoilValue } from 'recoil';
 import { useCurrentStateAndParams } from '@uirouter/react';
 import { find, isEqual } from 'lodash';
+import React from 'react';
+import { useRecoilValue } from 'recoil';
+
+import { Icon } from '@spinnaker/presentation';
 import { SETTINGS } from 'core/config/settings';
+import { PagerDutyWriter } from 'core/pagerDuty';
 
 import { AppRefresher } from './AppRefresher';
 import { NavSection } from './NavSection';
-import { Icon, Tooltip, useIsMobile, usePrevious } from '../../presentation';
-
-import { navigationCategoryRegistry } from './navigationCategory.registry';
-import { verticalNavExpandedAtom } from './navAtoms';
-import { PagerDutyWriter } from 'core/pagerDuty';
 import { Application } from '../application.model';
+import { verticalNavExpandedAtom } from './navAtoms';
+import { navigationCategoryRegistry } from './navigationCategory.registry';
+import { Tooltip, useIsMobile, usePrevious } from '../../presentation';
 import { ApplicationDataSource } from '../service/applicationDataSource';
 
 import './verticalNav.less';

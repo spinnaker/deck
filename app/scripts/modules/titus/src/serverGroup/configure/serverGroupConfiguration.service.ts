@@ -1,35 +1,34 @@
 import { module } from 'angular';
-import { chain, flatten, intersection, xor, cloneDeep } from 'lodash';
+import { chain, cloneDeep, flatten, intersection, xor } from 'lodash';
 import { $q } from 'ngimport';
 import { Subject } from 'rxjs';
 
-import {
-  AccountService,
-  Application,
-  IServerGroupCommand,
-  IServerGroupCommandViewState,
-  IDeploymentStrategy,
-  IServerGroupCommandBackingData,
-  CacheInitializerService,
-  CACHE_INITIALIZER_SERVICE,
-  LoadBalancerReader,
-  LOAD_BALANCER_READ_SERVICE,
-  ICluster,
-  IAccountDetails,
-  SECURITY_GROUP_READER,
-  SecurityGroupReader,
-  IVpc,
-  ISecurityGroup,
-  NameUtils,
-  setMatchingResourceSummary,
-} from '@spinnaker/core';
 import {
   IAmazonApplicationLoadBalancer,
   IAmazonLoadBalancer,
   IAmazonServerGroupCommandDirty,
   VpcReader,
 } from '@spinnaker/amazon';
-
+import {
+  AccountService,
+  Application,
+  CACHE_INITIALIZER_SERVICE,
+  CacheInitializerService,
+  IAccountDetails,
+  ICluster,
+  IDeploymentStrategy,
+  ISecurityGroup,
+  IServerGroupCommand,
+  IServerGroupCommandBackingData,
+  IServerGroupCommandViewState,
+  IVpc,
+  LOAD_BALANCER_READ_SERVICE,
+  LoadBalancerReader,
+  NameUtils,
+  SECURITY_GROUP_READER,
+  SecurityGroupReader,
+  setMatchingResourceSummary,
+} from '@spinnaker/core';
 import { IJobDisruptionBudget, ITitusResources } from 'titus/domain';
 import { ITitusServiceJobProcesses } from 'titus/domain/ITitusServiceJobProcesses';
 

@@ -6,6 +6,7 @@ export interface IClassicLaunchAllowlist {
 }
 
 export interface IAWSProviderSettings extends IProviderSettings {
+  bakeWarning?: string;
   classicLaunchLockout?: number;
   classicLaunchAllowlist?: IClassicLaunchAllowlist[];
   createLoadBalancerWarnings?: {
@@ -50,6 +51,8 @@ export interface IAWSProviderSettings extends IProviderSettings {
     enableIMDSv2?: boolean;
     defaultIMDSv2AppAgeLimit?: number;
     enableCpuCredits?: boolean;
+    recommendedSubnets?: string[];
+    subnetWarning?: string;
   };
   useAmiBlockDeviceMappings?: boolean;
 }

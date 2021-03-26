@@ -1,14 +1,12 @@
-import React from 'react';
 import { UISref } from '@uirouter/react';
-
-import { IExecutionDetailsSectionProps, ExecutionDetailsSection } from '../common';
-import { StageFailureMessage } from '../../../details';
 import _ from 'lodash';
+import React from 'react';
+
+import { ExecutionDetailsSection, IExecutionDetailsSectionProps } from '../common';
+import { StageFailureMessage } from '../../../details';
 
 export function MonitorPipelineStageExecutionDetails(props: IExecutionDetailsSectionProps) {
   const {
-    application,
-    execution,
     stage: { context = {}, outputs = {} },
     stage,
     name,
@@ -54,7 +52,6 @@ export function MonitorPipelineStageExecutionDetails(props: IExecutionDetailsSec
                   params={{
                     application: status.application,
                     executionId: status.executionId,
-                    executionParams: { application: application.name, executionId: execution.id },
                   }}
                   options={{ inherit: false, reload: 'home.applications.application.pipelines.executionDetails' }}
                 >
