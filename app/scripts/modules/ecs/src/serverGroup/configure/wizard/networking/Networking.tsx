@@ -87,7 +87,7 @@ export class EcsNetworking extends React.Component<IEcsNetworkingProps, IEcsNetw
     const updatedSecurityGroups = Array.isArray(newSecurityGroups)
       ? newSecurityGroups.map((securityGroups) => securityGroups.value)
       : [];
-    this.props.notifyAngular('securityGroups', updatedSecurityGroups);
+    this.props.notifyAngular('securityGroupNames', updatedSecurityGroups);
     this.setState({ securityGroupNames: updatedSecurityGroups });
   };
 
