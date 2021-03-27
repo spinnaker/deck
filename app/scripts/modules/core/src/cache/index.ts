@@ -7,3 +7,5 @@ export * from './infrastructureCaches';
 export * from './infrastructureCacheConfig';
 
 export * from './viewStateCache';
+
+export * from './pinExecutionIdCache'
