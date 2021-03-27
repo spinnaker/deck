@@ -5,16 +5,22 @@
   box-shadow: 2px 0 3px 1px var(--color-alto);
   min-width: 226px;
   max-width: 300px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  overflow: auto;
+  display: grid;
+  height: 100%;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr auto;
+
+  grid-template-areas:
+    'nav-header'
+    'nav-content'
+    'nav-bottom';
 
   @media (max-width: 1640px) {
     max-width: 226px;
   }
 
   .nav-header {
+    grid-area: nav-header;
     color: var(--color-primary);
     // override
     margin-bottom: unset;
@@ -45,6 +51,7 @@
   }
 
   .nav-content {
+    grid-area: nav-content;
     overflow: auto;
 
     .nav-section {
@@ -123,6 +130,12 @@
     .nav-section:not(:first-of-type) {
       border-top: 1px solid var(--color-white);
     }
+  }
+
+  .nav-bottom {
+    max-height: 100px;
+    grid-area: nav-bottom;
+    overflow: auto;
   }
 }
 
