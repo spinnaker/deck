@@ -8,12 +8,12 @@ import { Subscription } from 'rxjs';
 
 import { AccountTag } from 'core/account';
 import { Application } from 'core/application/application.model';
-// react components
 import { CancelModal } from 'core/cancelModal/CancelModal';
 import { SETTINGS } from 'core/config/settings';
 import { ConfirmationModalService } from 'core/confirmationModal';
 import { IExecution, IExecutionStageSummary, IPipeline, IRestartDetails } from 'core/domain';
 import { ISortFilter } from 'core/filterModel';
+import { Overridable } from 'core/overrideRegistry';
 import { Tooltip } from 'core/presentation/Tooltip';
 import { ReactInjector } from 'core/reactShims';
 import { ExecutionState } from 'core/state';
@@ -36,6 +36,7 @@ export interface IExecutionProps {
   application: Application;
   execution: IExecution;
   descendantExecutionId?: string;
+  showConfigureButton?: boolean;
   pipelineConfig: IPipeline;
   showDurations?: boolean;
   standalone?: boolean;
@@ -65,6 +66,7 @@ const findChildIndex = (child: string, execution: IExecution) => {
   return result;
 };
 
+@Overridable('PipelineExecution')
 export class Execution extends React.PureComponent<IExecutionProps, IExecutionState> {
   public static defaultProps: Partial<IExecutionProps> = {
     dataSourceKey: 'executions',
@@ -303,6 +305,16 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
     showingDetails ? this.toggleDetails() : this.toggleDetails(0, 0);
   };
 
+  private handleConfigureClicked = (e: React.MouseEvent<HTMLElement>): void => {
+    const { application, execution } = this.props;
+    ReactGA.event({ category: 'Execution', action: 'Configuration' });
+    ReactInjector.$state.go('^.pipelineConfig', {
+      application: application.name,
+      pipelineId: execution.pipelineConfigId,
+    });
+    e.stopPropagation();
+  };
+
   private scrollIntoView = (forceScroll = false) => {
     const element = this.wrapperRef.current;
     const { scrollIntoView, execution } = this.props;
@@ -321,8 +333,10 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
   public render() {
     const {
       application,
+      descendantExecutionId,
       execution,
       showAccountLabels,
+      showConfigureButton,
       showDurations,
       standalone,
       title,
@@ -363,13 +377,33 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
     return (
       <div className={className} id={`execution-${execution.id}`} ref={this.wrapperRef}>
         <div className={`execution-overview group-by-${sortFilter.groupBy}`}>
-          {(title || showExecutionName) && (
-            <h4 className="execution-name">
-              {(showAccountLabels || showExecutionName) && accountLabels}
-              {execution.fromTemplate && <i className="from-template fa fa-table" title="Pipeline from template" />}
-              {title || execution.name}
-            </h4>
-          )}
+          <div className="flex-container-h">
+            {(title || showExecutionName) && (
+              <h4 className="execution-name">
+                {(showAccountLabels || showExecutionName) && accountLabels}
+                {execution.fromTemplate && <i className="from-template fa fa-table" title="Pipeline from template" />}
+                {title || execution.name}
+              </h4>
+            )}
+            {showConfigureButton && (
+              <div className="flex-pull-right">
+                <Tooltip value="Navigate to Pipeline Configuration">
+                  <UISref
+                    to="^.pipelineConfig"
+                    params={{ application: application.name, pipelineId: execution.pipelineConfigId }}
+                  >
+                    <button
+                      className="btn btn-xs btn-default single-execution-details__configure"
+                      onClick={this.handleConfigureClicked}
+                    >
+                      <span className="glyphicon glyphicon-cog" />
+                      <span className="visible-md-inline visible-lg-inline"> Configure</span>
+                    </button>
+                  </UISref>
+                </Tooltip>
+              </div>
+            )}
+          </div>
           {hasParentExecution && (
             <div className="execution-breadcrumbs">
               <ExecutionBreadcrumbs execution={execution} />
@@ -470,7 +504,7 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
 
           <ParametersAndArtifacts
             execution={execution}
-            expandParamsOnInit={standalone}
+            expandParamsOnInit={standalone && !descendantExecutionId}
             pipelineConfig={pipelineConfig}
           />
 
