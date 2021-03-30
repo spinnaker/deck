@@ -6,6 +6,7 @@ import { Application } from 'core/application';
 import { ManagedResourceObject } from './ManagedResourceObject';
 import { IManagedArtifactSummary, IManagedEnvironmentSummary, IManagedResourceSummary } from '../domain';
 import { EnvironmentRow } from './environment/EnvironmentRow';
+import { ResourceDeploymentStatus } from './overview/ResourceDeploymentStatus';
 import { resourceManager } from './resources/resourceRegistry';
 
 interface IEnvironmentsListProps {
@@ -48,11 +49,14 @@ export function EnvironmentsList({
                     application={application}
                     key={resource.id}
                     resource={resource}
-                    environment={name}
-                    showReferenceName={allArtifacts.length > 1}
-                    artifactVersionsByState={artifactVersionsByState}
-                    artifactDetails={artifactDetails}
-                    depth={0}
+                    metadata={
+                      <ResourceDeploymentStatus
+                        environment={name}
+                        showReferenceName={allArtifacts.length > 1}
+                        artifactVersionsByState={artifactVersionsByState}
+                        artifactDetails={artifactDetails}
+                      />
+                    }
                   />
                 );
               })}
