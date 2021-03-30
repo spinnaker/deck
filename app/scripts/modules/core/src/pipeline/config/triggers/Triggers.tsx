@@ -4,7 +4,6 @@ import { Application } from 'core/application';
 import { IPipeline } from 'core/domain';
 import { PageNavigator, PageSection } from 'core/presentation';
 
-import { DescriptionPageContent } from './DescriptionPageContent';
 import { ExecutionOptionsPageContent } from './ExecutionOptionsPageContent';
 import { MetadataPageContent } from './MetadataPageContent';
 import { NotificationsPageContent } from './NotificationsPageContent';
