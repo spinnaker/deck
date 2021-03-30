@@ -6,6 +6,7 @@ import { PageNavigator, PageSection } from 'core/presentation';
 
 import { DescriptionPageContent } from './DescriptionPageContent';
 import { ExecutionOptionsPageContent } from './ExecutionOptionsPageContent';
+import { MetadataPageContent } from './MetadataPageContent';
 import { NotificationsPageContent } from './NotificationsPageContent';
 import { ParametersPageContent } from './ParametersPageContent';
 import { TriggersPageContent } from './TriggersPageContent';
@@ -53,8 +54,8 @@ export function Triggers(props: ITriggersProps) {
       >
         <NotificationsPageContent {...props} />
       </PageSection>
-      <PageSection pageKey="description" label="Description" noWrapper={true}>
-        <DescriptionPageContent {...props} />
+      <PageSection pageKey="description" label="Metadata" noWrapper={true}>
+        <MetadataPageContent {...props} />
       </PageSection>
     </PageNavigator>
   );
