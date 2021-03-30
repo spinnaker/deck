@@ -201,7 +201,7 @@ export const ArtifactDetail = ({
                   .sort((a, b) => `${a.kind}${a.displayName}`.localeCompare(`${b.kind}${b.displayName}`))
                   .map((resource) => (
                     <div key={resource.id} className="flex-container-h middle">
-                      {state === 'deploying' && (
+                      {state && (
                         <div
                           className={classNames(
                             'resource-badge flex-container-h center middle sp-margin-s-right',
