@@ -16,13 +16,13 @@ const PopoverActions = ({
 }: {
   resourceSummary: IManagedResourceSummary;
   application: Application;
-  hidePopover: () => void;
+  hidePopover?: () => void;
 }) => {
   const historyButton = (
     <button
       className="passive flex-none"
       onClick={() => {
-        hidePopover();
+        hidePopover?.();
         showManagedResourceHistoryModal({ resourceSummary });
       }}
     >

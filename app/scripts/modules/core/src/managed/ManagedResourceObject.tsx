@@ -1,15 +1,17 @@
 import { useSref } from '@uirouter/react';
 import React, { memo } from 'react';
 
+import { Icon } from '@spinnaker/presentation';
 import { Application } from 'core/application';
 
 import { getKindName } from './ManagedReader';
 import { ManagedResourceStatusPopover } from './ManagedResourceStatusPopover';
-import { ObjectRow } from './ObjectRow';
 import { StatusBubble } from './StatusBubble';
 import { IManagedResourceSummary } from '../domain/IManagedEntity';
 import { viewConfigurationByStatus } from './managedResourceStatusConfig';
 import { resourceManager } from './resources/resourceRegistry';
+
+import './ObjectRow.less';
 
 export interface IManagedResourceObjectProps {
   application: Application;
@@ -53,33 +55,41 @@ const getNativeResourceRoutingInfo = (
   return null;
 };
 
-export const ManagedResourceObject = memo(({ application, resource, metadata, depth }: IManagedResourceObjectProps) => {
-  const { kind, displayName } = resource;
+export const ManagedResourceObject = memo(
+  ({ application, resource, metadata, depth = 0 }: IManagedResourceObjectProps) => {
+    const { kind, displayName } = resource;
 
-  const routingInfo = getNativeResourceRoutingInfo(resource) ?? { state: '', params: {} };
-  const routeProps = useSref(routingInfo.state, routingInfo.params);
+    const routingInfo = getNativeResourceRoutingInfo(resource) ?? { state: '', params: {} };
+    const routeProps = useSref(routingInfo.state, routingInfo.params);
 
-  const displayLink = resourceManager.getExperimentalDisplayLink(resource);
-  const displayLinkProps = displayLink && { href: displayLink, target: '_blank', rel: 'noopener noreferrer' };
+    const displayLink = resourceManager.getExperimentalDisplayLink(resource);
+    const displayLinkProps = displayLink && { href: displayLink, target: '_blank', rel: 'noopener noreferrer' };
 
-  const linkProps = routeProps.href ? routeProps : displayLinkProps;
+    const linkProps = routeProps.href ? routeProps : displayLinkProps;
+    const title = linkProps ? <a {...linkProps}>{displayName}</a> : displayName;
 
-  const viewConfig = viewConfigurationByStatus[resource.status];
+    const viewConfig = viewConfigurationByStatus[resource.status];
 
-  const resourceStatus =
-    resource.status !== 'HAPPY' && viewConfig ? (
-      <ManagedResourceStatusPopover application={application} placement="left" resourceSummary={resource}>
-        <StatusBubble appearance={viewConfig.appearance} iconName={viewConfig.iconName} size="small" />
-      </ManagedResourceStatusPopover>
-    ) : undefined;
+    const resourceStatus =
+      resource.status !== 'HAPPY' && viewConfig ? (
+        <ManagedResourceStatusPopover application={application} placement="left" resourceSummary={resource}>
+          <StatusBubble appearance={viewConfig.appearance} iconName={viewConfig.iconName} size="small" />
+        </ManagedResourceStatusPopover>
+      ) : undefined;
 
-  return (
-    <ObjectRow
-      icon={resourceManager.getIcon(kind)}
-      title={linkProps ? <a {...linkProps}>{displayName}</a> : displayName}
-      depth={depth}
-      content={resourceStatus}
-      metadata={metadata}
-    />
-  );
-});
+    return (
+      <div className="ObjectRow" style={{ marginLeft: 16 * depth }}>
+        <span className="object-row-content">
+          <div className="object-row-column object-row-title-column">
+            <Icon name={resourceManager.getIcon(kind)} size="medium" appearance="dark" className="sp-margin-s-right" />
+            <span className="object-row-title">{title}</span>
+          </div>
+          <div className="object-row-column flex-grow">
+            {resourceStatus}
+            {metadata && <div className="flex-pull-right flex-container-h middle">{metadata}</div>}
+          </div>
+        </span>
+      </div>
+    );
+  },
+);
