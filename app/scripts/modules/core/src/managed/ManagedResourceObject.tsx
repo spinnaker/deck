@@ -3,12 +3,14 @@ import React, { memo } from 'react';
 
 import { Icon } from '@spinnaker/presentation';
 import { Application } from 'core/application';
+import { Tooltip } from 'core/presentation';
 
 import { getKindName } from './ManagedReader';
 import { ManagedResourceStatusPopover } from './ManagedResourceStatusPopover';
 import { StatusBubble } from './StatusBubble';
 import { IManagedResourceSummary } from '../domain/IManagedEntity';
 import { viewConfigurationByStatus } from './managedResourceStatusConfig';
+import { showManagedResourceHistoryModal } from './resourceHistory/ManagedResourceHistoryModal';
 import { resourceManager } from './resources/resourceRegistry';
 
 import './ObjectRow.less';
@@ -55,6 +57,23 @@ const getNativeResourceRoutingInfo = (
   return null;
 };
 
+const EventsLink = (props: Pick<IManagedResourceSummary, 'id' | 'displayName'>) => {
+  return (
+    <Tooltip placement="top" value="Open resource history">
+      <a
+        href="#"
+        className="resource-events-link"
+        onClick={(e) => {
+          e.preventDefault();
+          showManagedResourceHistoryModal(props);
+        }}
+      >
+        <Icon name="history" size="extraSmall" />
+      </a>
+    </Tooltip>
+  );
+};
+
 export const ManagedResourceObject = memo(
   ({ application, resource, metadata, depth = 0 }: IManagedResourceObjectProps) => {
     const { kind, displayName } = resource;
@@ -86,7 +105,10 @@ export const ManagedResourceObject = memo(
           </div>
           <div className="object-row-column flex-grow">
             {resourceStatus}
-            {metadata && <div className="flex-pull-right flex-container-h middle">{metadata}</div>}
+            <div className="flex-pull-right flex-container-h middle">
+              <EventsLink id={resource.id} displayName={resource.displayName} />
+              {metadata}
+            </div>
           </div>
         </span>
       </div>

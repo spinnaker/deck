@@ -23,7 +23,7 @@ const PopoverActions = ({
       className="passive flex-none"
       onClick={() => {
         hidePopover?.();
-        showManagedResourceHistoryModal({ resourceSummary });
+        showManagedResourceHistoryModal(resourceSummary);
       }}
     >
       <i className="fa fa-history" /> History
