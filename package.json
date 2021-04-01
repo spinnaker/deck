@@ -45,7 +45,7 @@
     "angular-ui-bootstrap": "^2.5.0",
     "angular-ui-sortable": "^0.17.0",
     "angular2react": "^3.0.2",
-    "ansi_up": "^4.0.4",
+    "ansi_up": "^5.0.0",
     "bootstrap": "3.4.1",
     "cachefactory": "^3.0.0",
     "chart.js": "^3.0.0-rc.5",
