@@ -6,7 +6,7 @@ import { IManagedArtifactSummary, IManagedEnvironmentSummary } from 'core/domain
 import { AnimatingPill, Pill } from '../Pill';
 import { getArtifactVersionDisplayName } from '../displayNames';
 
-interface Props {
+export interface ResourceDeploymentStatusProps {
   environment?: string;
   artifactVersionsByState?: IManagedEnvironmentSummary['artifacts'][0]['versions'];
   artifactDetails?: IManagedArtifactSummary;
@@ -18,7 +18,7 @@ export const ResourceDeploymentStatus = ({
   artifactVersionsByState,
   artifactDetails,
   showReferenceName,
-}: Props) => {
+}: ResourceDeploymentStatusProps) => {
   const current = artifactVersionsByState?.current
     ? artifactDetails?.versions.find(({ version }) => version === artifactVersionsByState?.current)
     : undefined;

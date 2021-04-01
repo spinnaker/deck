@@ -6,7 +6,6 @@ import { Application } from 'core/application';
 import { ManagedResourceObject } from './ManagedResourceObject';
 import { IManagedArtifactSummary, IManagedEnvironmentSummary, IManagedResourceSummary } from '../domain';
 import { EnvironmentRow } from './environment/EnvironmentRow';
-import { ResourceDeploymentStatus } from './overview/ResourceDeploymentStatus';
 import { resourceManager } from './resources/resourceRegistry';
 
 interface IEnvironmentsListProps {
@@ -26,7 +25,6 @@ export function EnvironmentsList({
     <div>
       {environments.map(({ name, resources, artifacts }) => {
         const pinnedVersions = artifacts.filter(({ pinnedVersion }) => pinnedVersion);
-
         return (
           <EnvironmentRow
             key={name}
@@ -49,14 +47,12 @@ export function EnvironmentsList({
                     application={application}
                     key={resource.id}
                     resource={resource}
-                    metadata={
-                      <ResourceDeploymentStatus
-                        environment={name}
-                        showReferenceName={allArtifacts.length > 1}
-                        artifactVersionsByState={artifactVersionsByState}
-                        artifactDetails={artifactDetails}
-                      />
-                    }
+                    metadata={{
+                      environment: name,
+                      showReferenceName: allArtifacts.length > 1,
+                      artifactVersionsByState: artifactVersionsByState,
+                      artifactDetails: artifactDetails,
+                    }}
                   />
                 );
               })}

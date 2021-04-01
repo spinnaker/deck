@@ -10,6 +10,7 @@ import { ManagedResourceStatusPopover } from './ManagedResourceStatusPopover';
 import { StatusBubble } from './StatusBubble';
 import { IManagedResourceSummary } from '../domain/IManagedEntity';
 import { viewConfigurationByStatus } from './managedResourceStatusConfig';
+import { ResourceDeploymentStatus, ResourceDeploymentStatusProps } from './overview/ResourceDeploymentStatus';
 import { showManagedResourceHistoryModal } from './resourceHistory/ManagedResourceHistoryModal';
 import { resourceManager } from './resources/resourceRegistry';
 
@@ -19,7 +20,7 @@ export interface IManagedResourceObjectProps {
   application: Application;
   resource: IManagedResourceSummary;
   depth?: number;
-  metadata?: React.ReactNode;
+  metadata?: ResourceDeploymentStatusProps;
 }
 
 // We'll add detail drawers for resources soon, but in the meantime let's link
@@ -107,7 +108,7 @@ export const ManagedResourceObject = memo(
             {resourceStatus}
             <div className="flex-pull-right flex-container-h middle">
               <EventsLink id={resource.id} displayName={resource.displayName} />
-              {metadata}
+              {metadata && <ResourceDeploymentStatus {...metadata} />}
             </div>
           </div>
         </span>
