@@ -12,17 +12,17 @@ const DAYS_TO_STRING: { [key: number]: string } = {
   7: 'Sun',
 };
 
-const timeWindowToString = (window: AllowedTimeWindow) => {
+const timeWindowToString = (window: AllowedTimeWindow, timeZone = 'PST') => {
   // TODO: group by hours on the backend.
   const daysString = window.days.map((day) => DAYS_TO_STRING[day]);
-  return `${window.hours.join(', ')} PST on ${daysString.join(', ')}`;
+  return `${window.hours.join(', ')} (${timeZone}) on ${daysString.join(', ')}`;
 };
 
-export const DeploymentWindow: React.FC<{ windows: AllowedTimeWindow[] }> = ({ windows }) => {
+const DeploymentWindow = ({ allowedTimes, timezone }: IAllowedTimesConstraint['attributes']) => {
   return (
     <div className="text-regular">
-      {windows.map((window, index) => (
-        <div key={index}>{timeWindowToString(window)}</div>
+      {allowedTimes.map((window, index) => (
+        <div key={index}>{timeWindowToString(window, timezone)}</div>
       ))}
     </div>
   );
