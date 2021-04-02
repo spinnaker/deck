@@ -78,7 +78,7 @@ const getBaseResponse = () => {
   return { response, versionEnviroments };
 };
 
-fdescribe('sort environments', () => {
+describe('sort environments', () => {
   it('verify correct order in artifacts', () => {
     const { response } = getBaseResponse();
     sortEnvironments(response);

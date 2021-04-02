@@ -23,10 +23,10 @@ const compareEnvironments = (a: IManagedArtifactVersionEnvironment, b: IManagedA
   }
   // Prioritize if has any depends on
   const aHasDependsOn = envHasAnyDependsOn(a);
-  const BHasDependsOn = envHasAnyDependsOn(b);
-  if (aHasDependsOn && BHasDependsOn) return 0;
+  const bHasDependsOn = envHasAnyDependsOn(b);
+  if (aHasDependsOn && bHasDependsOn) return 0;
   if (aHasDependsOn) return -1;
-  if (BHasDependsOn) return 1;
+  if (bHasDependsOn) return 1;
   return 0;
 };
 
@@ -35,8 +35,8 @@ export const sortEnvironments = (response: IManagedApplicationEnvironmentSummary
   try {
     const allEnvironments: { [env: string]: IManagedArtifactVersionEnvironment } = {};
 
-    response.artifacts.map((artifact) => {
-      artifact.versions.map((version) => {
+    response.artifacts.forEach((artifact) => {
+      artifact.versions.forEach((version) => {
         // This will be used for sorting the environments later.
         // We pick the first occurence of each environment, could be risky once we have versioned environments
         version.environments.forEach((env) => {
