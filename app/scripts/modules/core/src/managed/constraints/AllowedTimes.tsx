@@ -1,6 +1,22 @@
+import { padStart, sortBy } from 'lodash';
 import React from 'react';
 
 import { AllowedTimeWindow, IAllowedTimesConstraint } from 'core/domain';
+
+import './AllowedTimes.less';
+
+const groupConsecutiveNumbers = (values: number[]) => {
+  const groups: Array<{ start: number; end: number }> = [];
+  for (const value of sortBy(values)) {
+    const lastGroup = groups[groups.length - 1];
+    if (!lastGroup || lastGroup.end !== value - 1) {
+      groups.push({ start: value, end: value });
+    } else {
+      lastGroup.end = value;
+    }
+  }
+  return groups;
+};
 
 const DAYS_TO_STRING: { [key: number]: string } = {
   1: 'Mon',
@@ -12,19 +28,37 @@ const DAYS_TO_STRING: { [key: number]: string } = {
   7: 'Sun',
 };
 
+const hourToString = (hour: number) => {
+  const hourString = padStart(`${hour === 25 ? 1 : hour}`, 2, '0');
+  return `${hourString}:00`;
+};
+
 const timeWindowToString = (window: AllowedTimeWindow, timeZone = 'PST') => {
-  // TODO: group by hours on the backend.
-  const daysString = window.days.map((day) => DAYS_TO_STRING[day]);
-  return `${window.hours.join(', ')} (${timeZone}) on ${daysString.join(', ')}`;
+  const dayGroups = groupConsecutiveNumbers(window.days);
+  const daysString = dayGroups.map((group) => {
+    if (group.start === group.end) {
+      return DAYS_TO_STRING[group.start];
+    }
+    return `${DAYS_TO_STRING[group.start]}-${DAYS_TO_STRING[group.end]}`;
+  });
+
+  const hourGroups = groupConsecutiveNumbers(window.hours);
+  // We add an hour to the end of the range, as the backend treats the range as inclusive (e.g. can promote until the end of the last hour)
+  const hoursString = hourGroups.map((group) => `${hourToString(group.start)}-${hourToString(group.end + 1)}`);
+
+  // A special treatment for PST as it's the most common timezone
+  const prettyTimezone = timeZone === 'America/Los_Angeles' ? 'PST' : timeZone;
+
+  return `${hoursString.join(', ')} on ${daysString.join(', ')} (${prettyTimezone})`;
 };
 
 const DeploymentWindow = ({ allowedTimes, timezone }: IAllowedTimesConstraint['attributes']) => {
   return (
-    <div className="text-regular">
+    <ul className="DeploymentWindow">
       {allowedTimes.map((window, index) => (
-        <div key={index}>{timeWindowToString(window, timezone)}</div>
+        <li key={index}>{timeWindowToString(window, timezone)}</li>
       ))}
-    </div>
+    </ul>
   );
 };
 
@@ -50,5 +84,5 @@ export const AllowedTimesTitle = ({ constraint }: { constraint: IAllowedTimesCon
 };
 
 export const AllowedTimesDescription = ({ constraint }: { constraint: IAllowedTimesConstraint }) => {
-  return <DeploymentWindow windows={constraint.attributes.allowedTimes} />;
+  return <DeploymentWindow {...constraint.attributes} />;
 };
