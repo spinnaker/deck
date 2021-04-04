@@ -5,8 +5,13 @@ import { AllowedTimeWindow, IAllowedTimesConstraint } from 'core/domain';
 
 import './AllowedTimes.less';
 
-const groupConsecutiveNumbers = (values: number[]) => {
-  const groups: Array<{ start: number; end: number }> = [];
+export interface GroupRange {
+  start: number;
+  end: number;
+}
+
+export const groupConsecutiveNumbers = (values: number[]) => {
+  const groups: GroupRange[] = [];
   for (const value of sortBy(values)) {
     const lastGroup = groups[groups.length - 1];
     if (!lastGroup || lastGroup.end !== value - 1) {
@@ -33,19 +38,26 @@ const hourToString = (hour: number) => {
   return `${hourString}:00`;
 };
 
-const timeWindowToString = (window: AllowedTimeWindow, timeZone = 'PST') => {
-  const dayGroups = groupConsecutiveNumbers(window.days);
+export const groupHours = (hours: number[]) => {
+  const hourGroups = groupConsecutiveNumbers(hours);
+  // We add an hour to the end of the range, as the backend treats the range as inclusive (e.g. can promote until the end of the last hour)
+  return hourGroups.map((group) => `${hourToString(group.start)}-${hourToString(group.end + 1)}`);
+};
+
+export const groupDays = (days: number[]) => {
+  const dayGroups = groupConsecutiveNumbers(days);
   const daysString = dayGroups.map((group) => {
     if (group.start === group.end) {
       return DAYS_TO_STRING[group.start];
     }
     return `${DAYS_TO_STRING[group.start]}-${DAYS_TO_STRING[group.end]}`;
   });
+  return daysString;
+};
 
-  const hourGroups = groupConsecutiveNumbers(window.hours);
-  // We add an hour to the end of the range, as the backend treats the range as inclusive (e.g. can promote until the end of the last hour)
-  const hoursString = hourGroups.map((group) => `${hourToString(group.start)}-${hourToString(group.end + 1)}`);
-
+const timeWindowToString = (window: AllowedTimeWindow, timeZone = 'PST') => {
+  const hoursString = groupHours(window.hours);
+  const daysString = groupDays(window.days);
   // A special treatment for PST as it's the most common timezone
   const prettyTimezone = timeZone === 'America/Los_Angeles' ? 'PST' : timeZone;
 
