@@ -13,6 +13,7 @@ export const filterModelConfig: IFilterConfig[] = [
   { model: 'pipeline', param: 'pipeline', type: 'trueKeyObject', clearValue: {} },
   { model: 'status', type: 'trueKeyObject', clearValue: {} },
   { model: 'stages', type: 'trueKeyObject', clearValue: {} },
+  { model: 'tags', type: 'trueKeyObject', clearValue: {} },
 ];
 
 const GLOBAL_CACHE_KEY = '#global';

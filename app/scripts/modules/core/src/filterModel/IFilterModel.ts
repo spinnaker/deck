@@ -47,6 +47,7 @@ export interface ISortFilter {
   stack: ITrueKeyModel;
   status: ITrueKeyModel;
   stages: ITrueKeyModel;
+  tags: { [key: string]: any };
 }
 
 export interface IFilterModel {
