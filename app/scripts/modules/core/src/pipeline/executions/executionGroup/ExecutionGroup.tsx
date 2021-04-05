@@ -13,7 +13,6 @@ import {
   IExecution,
   IExecutionGroup,
   IExecutionTrigger,
-  IManualJudgment,
   IPipeline,
   IPipelineCommand,
   IPipelineTemplateConfigV2,
@@ -41,7 +40,6 @@ export interface IExecutionGroupProps {
   group: IExecutionGroup;
   application: Application;
   parent: HTMLDivElement;
-  manualJudgment: IManualJudgment;
 }
 
 export interface IExecutionGroupState {
@@ -253,7 +251,6 @@ export class ExecutionGroup extends React.PureComponent<IExecutionGroupProps, IE
         {executions.map((execution) => (
           <Execution
             key={execution.id}
-            manualJudgment={this.props.manualJudgment}
             execution={execution}
             pipelineConfig={pipelineConfig}
             application={this.props.application}

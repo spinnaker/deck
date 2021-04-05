@@ -12,7 +12,6 @@ export const filterModelConfig: IFilterConfig[] = [
   { model: 'filter', param: 'q', clearValue: '', type: 'string', filterLabel: 'search' },
   { model: 'pipeline', param: 'pipeline', type: 'trueKeyObject', clearValue: {} },
   { model: 'status', type: 'trueKeyObject', clearValue: {} },
-  { model: 'stages', type: 'trueKeyObject', clearValue: {} },
 ];
 
 const GLOBAL_CACHE_KEY = '#global';
@@ -96,11 +95,11 @@ export class ExecutionFilterModel {
     this.showDurations = viewState.showDurations;
   }
 
-  private getCachedViewState(key?: string): { count: number; groupBy: string; showDurations: boolean; stages: Object } {
+  private getCachedViewState(key?: string): { count: number; groupBy: string; showDurations: boolean } {
     key = key || this.mostRecentApplication || GLOBAL_CACHE_KEY;
     const cachedApp = this.configViewStateCache.get(key) || {};
     const cachedGlobal = this.configViewStateCache.get(GLOBAL_CACHE_KEY) || {};
-    const defaults = { count: 2, groupBy: 'name', showDurations: true, stages: {} };
+    const defaults = { count: 2, groupBy: 'name', showDurations: true };
     this.configViewStateCache.touch(key); // prevents cache from expiring just because it hasn't been changed
     return extend(
       defaults,

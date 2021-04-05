@@ -12,7 +12,7 @@ import { StageExecutionDetails } from '../../details/StageExecutionDetails';
 import { ExecutionStatus } from '../../status/ExecutionStatus';
 import { ParametersAndArtifacts } from '../../status/ParametersAndArtifacts';
 import { ExecutionCancellationReason } from '../../status/ExecutionCancellationReason';
-import type { IExecution, IRestartDetails, IPipeline, IManualJudgment } from 'core/domain';
+import type { IExecution, IRestartDetails, IPipeline } from 'core/domain';
 import { IExecutionViewState, IPipelineGraphNode } from '../../config/graph/pipelineGraph.service';
 import { OrchestratedItemRunningTime } from './OrchestratedItemRunningTime';
 import { SETTINGS } from 'core/config/settings';
@@ -45,7 +45,6 @@ export interface IExecutionProps {
   cancelHelpText?: string;
   cancelConfirmationText?: string;
   scrollIntoView?: boolean; // should really only be set to ensure scrolling on initial page load deep link
-  manualJudgment: IManualJudgment;
 }
 
 export interface IExecutionState {
@@ -296,7 +295,6 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
       title,
       cancelHelpText,
       pipelineConfig,
-      manualJudgment,
     } = this.props;
     const { pipelinesUrl, restartDetails, showingDetails, sortFilter, viewState } = this.state;
     const { $state } = ReactInjector;
@@ -312,7 +310,6 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
         key={stage.refId}
         application={application}
         execution={execution}
-        manualJudgment={manualJudgment && manualJudgment[execution.id] ? manualJudgment : {}}
         stage={stage}
         onClick={this.toggleDetails}
         active={this.isActive(stage.index)}
