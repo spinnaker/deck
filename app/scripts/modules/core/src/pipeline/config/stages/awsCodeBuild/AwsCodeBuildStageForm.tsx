@@ -148,7 +148,7 @@ export function AwsCodeBuildStageForm(props: IFormikStageConfigInjectedProps) {
         input={(inputProps: IFormInputProps) => (
           <AwsCodeBuildSecondarySourcesVersionList
             {...inputProps}
-            secondarySourcesVersionOverride={get(stage, 'secondarySourcesVersionOverride')}
+            secondarySourcesVersionOverride={stage?.secondarySourcesVersionOverride}
             updateSecondarySourcesVersion={(secondarySourcesVersionOverride: IAwsCodeBuildSecondarySourcesVersion[]) => onFieldChange('secondarySourcesVersionOverride', secondarySourcesVersionOverride)}
             stage={stage}
             pipeline={props.pipeline}
