@@ -3,8 +3,6 @@ import React from 'react';
 
 import { AllowedTimeWindow, IAllowedTimesConstraint } from 'core/domain';
 
-import './AllowedTimes.less';
-
 export interface GroupRange {
   start: number;
   end: number;
@@ -66,7 +64,7 @@ const timeWindowToString = (window: AllowedTimeWindow, timeZone = 'PST') => {
 
 const DeploymentWindow = ({ allowedTimes, timezone }: IAllowedTimesConstraint['attributes']) => {
   return (
-    <ul className="DeploymentWindow">
+    <ul className="sp-margin-xs-top sp-padding-l-left">
       {allowedTimes.map((window, index) => (
         <li key={index}>{timeWindowToString(window, timezone)}</li>
       ))}
