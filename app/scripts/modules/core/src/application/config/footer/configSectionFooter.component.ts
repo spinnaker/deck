@@ -1,8 +1,8 @@
-import { copy, IComponentOptions, IController, module, toJson } from 'angular';
+import { IController, IComponentOptions, copy, module, toJson } from 'angular';
 import { cloneDeep } from 'lodash';
 
-import { Application } from '../../application.model';
 import { ApplicationWriter } from '../../service/ApplicationWriter';
+import { Application } from '../../application.model';
 
 export interface IConfigSectionFooterViewState {
   originalConfig: any;
@@ -10,6 +10,7 @@ export interface IConfigSectionFooterViewState {
   saving: boolean;
   saveError: boolean;
   isDirty: boolean;
+  saveErrorMessage: string;
 }
 
 export class ConfigSectionFooterController implements IController {
@@ -18,6 +19,7 @@ export class ConfigSectionFooterController implements IController {
   public config: any;
   public configField: string;
   public saveDisabled: boolean;
+  public displayErrorMessage = false;
 
   public revert(): void {
     copy(this.viewState.originalConfig, this.config);
@@ -48,9 +50,28 @@ export class ConfigSectionFooterController implements IController {
     updateCommand[this.configField] = this.config;
 
     ApplicationWriter.updateApplication(updateCommand).then(
-      () => this.saveSuccess(),
-      () => this.saveError(),
+      () => {
+        this.saveSuccess();
+      },
+      (error) => {
+        this.saveError();
+        if (error != null) {
+          try {
+            const responseBody = JSON.parse(error.variables[0].value.details.responseBody);
+            this.viewState.saveErrorMessage = responseBody.errors;
+          } catch {
+            this.viewState.saveErrorMessage = error.toString();
+          }
+          if (this.viewState.saveErrorMessage == undefined) {
+            this.viewState.saveErrorMessage = error.variables[0].value.details.responseBody;
+          }
+        }
+      },
     );
+  }
+
+  public toggleErrorMessage() {
+    this.displayErrorMessage = !this.displayErrorMessage;
   }
 }
 

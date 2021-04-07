@@ -1,14 +1,14 @@
 <p>If you don't need or want certain features for your application, you can disable them here.</p>
 <p>Disabling a feature only changes the display in Spinnaker - it won't delete any actual data.</p>
 <div ng-repeat="dataSource in $ctrl.dataSources" class="checkbox">
-  <label
-    ><input
-      type="checkbox"
-      ng-model="$ctrl.model[dataSource.key]"
-      ng-change="$ctrl.dataSourceChanged(dataSource.key)"
+  <label>
+    <input
+    type="checkbox"
+    ng-model="$ctrl.model[dataSource.key]"
+    ng-change="$ctrl.dataSourceChanged(dataSource.key)"
     />
-    {{ dataSource.label }}</label
-  >
+    {{ dataSource.label }}
+  </label>
   <p ng-if="dataSource.description" ng-bind-html="dataSource.description"></p>
 </div>
 <div class="row footer">
@@ -22,9 +22,24 @@
       <span ng-if="!$ctrl.saving"> <span class="far fa-check-circle"></span> Save Changes </span>
       <span ng-if="$ctrl.saving" class="pulsing"> <span class="fa fa-cog fa-spin"></span> Saving&hellip; </span>
     </button>
-    <div class="error-message" ng-if="$ctrl.saveError">There was an error saving your changes. Please try again.</div>
+    <div class="error-message" ng-if="$ctrl.saveError">
+      There was an error saving your changes. Please try again.
+      <div class="text-left" ng-if="$ctrl.saveError">
+        <div ng-click="$ctrl.toggleErrorMessage()">
+          More information
+          <span
+            ng-class="
+              $ctrl.displayErrorMessage ? 'glyphicon glyphicon-chevron-down' : 'glyphicon glyphicon-chevron-right'
+            "
+          ></span>
+        </div>
+        <div ng-if="$ctrl.displayErrorMessage">
+          <p ng-if="$ctrl.displayErrorMessage" ng-bind="$ctrl.saveErrorMessage"></p>
+        </div>
+      </div>
+    </div>
     <span ng-if="!$ctrl.isDirty" class="btn btn-link disabled"
-      ><span class="far fa-check-circle"></span> In sync with server</span
+    ><span class="far fa-check-circle"></span> In sync with server</span
     >
   </div>
 </div>

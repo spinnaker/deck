@@ -44,6 +44,7 @@ export class ChaosMonkeyConfigController implements IController {
     originalStringVal: null,
     saving: false,
     saveError: false,
+    saveErrorMessage: null,
     isDirty: false,
   };
 
