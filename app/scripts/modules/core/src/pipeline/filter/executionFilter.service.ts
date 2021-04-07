@@ -411,12 +411,13 @@ export class ExecutionFilterService {
   public static awaitingJudgment(groups: IExecutionGroup[]) {
     const filterAwaitingJudgment = ExecutionState.filterModel.asFilterModel.sortFilter.stages.AWAITING_JUDGMENT;
     if (filterAwaitingJudgment) {
-      return groups.filter(
-        (group) =>
-          group.executions.filter((execution) => {
-            return execution.stages.filter((stage) => stage.type === 'manualJudgment').length > 0;
-          }).length,
-      );
-    } else return groups;
+      return groups.map((group: IExecutionGroup) => {
+        group.executions = group.executions.filter((execution) => {
+          return execution.stages.filter((stage) => stage.type === 'manualJudgment').length > 0;
+        });
+        return group;
+      });
+    }
+    return groups;
   }
 }
