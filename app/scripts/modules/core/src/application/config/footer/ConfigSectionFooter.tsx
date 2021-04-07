@@ -1,5 +1,4 @@
 import React from 'react';
-
 import { Spinner } from 'core/widgets/spinners/Spinner';
 
 export interface IConfigSectionFooterProps {
@@ -7,14 +6,26 @@ export interface IConfigSectionFooterProps {
   isValid: boolean;
   isSaving: boolean;
   saveError: boolean;
+  saveErrorMessage: string;
   onRevertClicked: () => void;
   onSaveClicked: () => void;
+  toggleErrorMessage: () => void;
+  displayErrorMessage: boolean;
 }
 
 export class ConfigSectionFooter extends React.Component<IConfigSectionFooterProps> {
   public render() {
-    const { isValid, isDirty, isSaving, saveError, onRevertClicked, onSaveClicked } = this.props;
-
+    const {
+      isValid,
+      isDirty,
+      isSaving,
+      saveError,
+      saveErrorMessage,
+      onRevertClicked,
+      onSaveClicked,
+      toggleErrorMessage,
+      displayErrorMessage,
+    } = this.props;
     if (!isDirty) {
       return (
         <div className="row footer">
@@ -54,7 +65,28 @@ export class ConfigSectionFooter extends React.Component<IConfigSectionFooterPro
         <div className="col-md-9 text-right">
           {isSaving ? savingButton : saveButton}
           {!!saveError && (
-            <div className="error-message">There was an error saving your changes. Please try again.</div>
+            <div className="error-message">
+              There was an error saving your changes. Please try again.
+              {!!saveError && (
+                <div className="text-left">
+                  <div onClick={toggleErrorMessage}>
+                    More information
+                    <span
+                      className={`glyphicon ${
+                        displayErrorMessage ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right'
+                      }`}
+                    >
+                      {' '}
+                    </span>
+                  </div>
+                  {!!displayErrorMessage && (
+                    <div>
+                      <p>{saveErrorMessage}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           )}
         </div>
       </div>

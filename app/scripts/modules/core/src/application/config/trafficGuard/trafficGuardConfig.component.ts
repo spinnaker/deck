@@ -26,6 +26,7 @@ export class TrafficGuardConfigController {
     originalStringVal: null,
     saving: false,
     saveError: false,
+    saveErrorMessage: null,
     isDirty: false,
   };
 
