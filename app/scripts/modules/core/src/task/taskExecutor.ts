@@ -55,8 +55,10 @@ export class TaskExecutor {
         };
         if (response.data && response.data.message) {
           error.log = response.data.message;
+          error.failureMessage = response.data.message;
         } else {
           error.log = 'Sorry, no more information.';
+          error.failureMessage = 'Sorry, no more information.';
         }
         return $q.reject(error);
       },
