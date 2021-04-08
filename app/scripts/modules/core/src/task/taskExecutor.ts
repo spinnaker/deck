@@ -53,13 +53,9 @@ export class TaskExecutor {
           status: response.status,
           message: response.statusText,
         };
-        if (response.data && response.data.message) {
-          error.log = response.data.message;
-          error.failureMessage = response.data.message;
-        } else {
-          error.log = 'Sorry, no more information.';
-          error.failureMessage = 'Sorry, no more information.';
-        }
+        const message = response.data?.message || 'Sorry, no more information.';
+        error.log = message;
+        error.failureMessage = message;
         return $q.reject(error);
       },
     );
