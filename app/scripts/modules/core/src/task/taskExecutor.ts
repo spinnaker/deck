@@ -49,13 +49,13 @@ export class TaskExecutor {
         return TaskReader.getTask(taskId);
       },
       (response: IHttpPromiseCallbackArg<any>) => {
+        const message: string = response.data?.message || 'Sorry, no more information.';
         const error: any = {
           status: response.status,
           message: response.statusText,
+          log: message,
+          failureMessage: message,
         };
-        const message = response.data?.message || 'Sorry, no more information.';
-        error.log = message;
-        error.failureMessage = message;
         return $q.reject(error);
       },
     );
