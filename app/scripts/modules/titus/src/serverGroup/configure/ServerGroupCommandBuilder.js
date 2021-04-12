@@ -96,7 +96,9 @@ angular.module(TITUS_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER, []).factor
       const serverGroupName = NameUtils.parseServerGroupName(serverGroup.name);
 
       const isTestEnv = serverGroup.awsAccount === 'test';
-      const isIPv6Set = serverGroup.containerAttributes['titusParameter.agent.assignIPv6Address'] !== undefined;
+      const isIPv6Set =
+        serverGroup.containerAttributes &&
+        serverGroup.containerAttributes['titusParameter.agent.assignIPv6Address'] !== undefined;
 
       // If IPv6 hasn't been explicitly set by the user, auto-assign based on the environment.
       const assignIPv6Address = isIPv6Set
