@@ -15,11 +15,9 @@ export interface IAwsCodeBuildSourceListProps {
   updateSources: (notifications: IAwsCodeBuildSource[]) => void;
 }
 
-export interface IAwsCodeBuildSecondarySourceVersionListProps {
+export interface IAwsCodeBuildSecondarySourceVersionListProps extends IFormInputProps {
   stage: IStage;
   pipeline: IPipeline;
-  secondarySourcesVersionOverride: IAwsCodeBuildSecondarySourcesVersion[];
-  updateSecondarySourcesVersion: (notifications: IAwsCodeBuildSecondarySourcesVersion[]) => void;
 }
 
 export class AwsCodeBuildSecondarySourcesVersionList extends React.Component<IAwsCodeBuildSecondarySourceVersionListProps> {
