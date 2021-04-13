@@ -1,23 +1,24 @@
+import { StateService } from '@uirouter/angularjs';
 import { IController, IQService, IScope, module } from 'angular';
 import { IModalService } from 'angular-ui-bootstrap';
-import { StateService } from '@uirouter/angularjs';
 
 import {
   Application,
   ClusterTargetBuilder,
+  ConfirmationModalService,
   IManifest,
   IOwnerOption,
   IServerGroup,
+  ManifestReader,
   SERVER_GROUP_WRITER,
   ServerGroupReader,
-  ConfirmationModalService,
-  ManifestReader,
+  SETTINGS,
 } from '@spinnaker/core';
 
 import { IKubernetesServerGroup } from '../../interfaces';
 import { KubernetesManifestCommandBuilder } from '../../manifest/manifestCommandBuilder.service';
-import { ManifestWizard } from '../../manifest/wizard/ManifestWizard';
 import { ManifestTrafficService } from '../../manifest/traffic/ManifestTrafficService';
+import { ManifestWizard } from '../../manifest/wizard/ManifestWizard';
 
 interface IServerGroupFromStateParams {
   accountId: string;
@@ -45,6 +46,7 @@ class KubernetesServerGroupDetailsController implements IController {
       .ready()
       .then(() => {
         this.extractServerGroup(serverGroup);
+        this.$scope.isDisabled = !SETTINGS.kubernetesAdHocInfraWritesEnabled;
         dataSource.onRefresh(this.$scope, () => this.extractServerGroup(serverGroup));
       })
       .catch(() => this.autoClose());

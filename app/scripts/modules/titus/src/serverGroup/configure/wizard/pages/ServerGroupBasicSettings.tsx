@@ -1,22 +1,21 @@
-import React from 'react';
 import { Field, FormikErrors, FormikProps } from 'formik';
+import React from 'react';
 
 import {
-  DeploymentStrategySelector,
-  DeployingIntoManagedClusterWarning,
-  HelpField,
-  NameUtils,
-  RegionSelectField,
-  Application,
-  ReactInjector,
-  IServerGroup,
-  IWizardPageComponent,
   AccountSelectInput,
   AccountTag,
+  Application,
+  DeployingIntoManagedClusterWarning,
+  DeploymentStrategySelector,
+  HelpField,
+  IServerGroup,
+  IWizardPageComponent,
+  NameUtils,
+  ReactInjector,
+  RegionSelectField,
   ServerGroupDetailsField,
   ServerGroupNamePreview,
 } from '@spinnaker/core';
-
 import { DockerImageAndTagSelector, DockerImageUtils } from '@spinnaker/docker';
 
 import { ITitusServerGroupCommand } from '../../../configure/serverGroupConfiguration.service';
@@ -87,6 +86,14 @@ export class ServerGroupBasicSettings
     values.credentialsChanged(values);
     setFieldValue('account', account);
     setFieldValue('credentials', account);
+
+    const accountDetails = values.backingData.credentialsKeyedByAccount[account];
+
+    const newAttr = {
+      ...values.containerAttributes,
+      'titusParameter.agent.assignIPv6Address': accountDetails.environment === 'test' ? 'true' : 'false',
+    };
+    setFieldValue('containerAttributes', newAttr);
   };
 
   private regionUpdated = (region: string): void => {

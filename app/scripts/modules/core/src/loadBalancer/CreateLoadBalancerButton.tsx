@@ -1,12 +1,13 @@
 import React from 'react';
 
-import { Application } from 'core/application';
 import { IAccountDetails } from 'core/account';
-import { CloudProviderRegistry, ProviderSelectionService, ICloudProviderConfig } from 'core/cloudProvider';
+import { Application } from 'core/application';
+import { CloudProviderRegistry, ICloudProviderConfig, ProviderSelectionService } from 'core/cloudProvider';
 import { ILoadBalancer } from 'core/domain';
-import { ILoadBalancerUpsertCommand } from './loadBalancer.write.service';
-import { ModalInjector } from 'core/reactShims';
 import { IModalComponentProps, Tooltip } from 'core/presentation';
+import { ModalInjector } from 'core/reactShims';
+
+import { ILoadBalancerUpsertCommand } from './loadBalancer.write.service';
 
 export interface ILoadBalancerModalProps extends IModalComponentProps {
   className?: string;
@@ -23,9 +24,19 @@ export interface ICreateLoadBalancerButtonProps {
   app: Application;
 }
 
-export class CreateLoadBalancerButton extends React.Component<ICreateLoadBalancerButtonProps> {
+export class CreateLoadBalancerButton extends React.Component<ICreateLoadBalancerButtonProps, { isDisabled: boolean }> {
   constructor(props: ICreateLoadBalancerButtonProps) {
     super(props);
+    this.state = { isDisabled: false };
+  }
+
+  componentDidMount() {
+    const { app } = this.props;
+    ProviderSelectionService.isDisabled(app).then((val) => {
+      this.setState({
+        isDisabled: val,
+      });
+    });
   }
 
   private createLoadBalancerProviderFilterFn = (
@@ -76,16 +87,20 @@ export class CreateLoadBalancerButton extends React.Component<ICreateLoadBalance
   };
 
   public render() {
-    return (
-      <div>
-        <button className="btn btn-sm btn-default" onClick={this.createLoadBalancer}>
-          <span className="glyphicon glyphicon-plus-sign visible-lg-inline" />
-          <Tooltip value="Create Load Balancer">
-            <span className="glyphicon glyphicon-plus-sign visible-md-inline visible-sm-inline" />
-          </Tooltip>
-          <span className="visible-lg-inline"> Create Load Balancer</span>
-        </button>
-      </div>
-    );
+    if (!this.state.isDisabled) {
+      return (
+        <div>
+          <button className="btn btn-sm btn-default" onClick={this.createLoadBalancer}>
+            <span className="glyphicon glyphicon-plus-sign visible-lg-inline" />
+            <Tooltip value="Create Load Balancer">
+              <span className="glyphicon glyphicon-plus-sign visible-md-inline visible-sm-inline" />
+            </Tooltip>
+            <span className="visible-lg-inline"> Create Load Balancer</span>
+          </button>
+        </div>
+      );
+    } else {
+      return <div></div>;
+    }
   }
 }

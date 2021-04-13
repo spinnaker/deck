@@ -1,12 +1,12 @@
+import { Form, Formik, FormikErrors, FormikProps } from 'formik';
+import { pickBy } from 'lodash';
 import React from 'react';
 import { Modal } from 'react-bootstrap';
-import { FormikErrors, Form, Formik, FormikProps } from 'formik';
-import { pickBy } from 'lodash';
 
 import {
   Application,
-  confirmNotManaged,
   CheckboxInput,
+  confirmNotManaged,
   FormikFormField,
   HelpField,
   ICapacity,
@@ -15,6 +15,7 @@ import {
   MinMaxDesiredChanges,
   ModalClose,
   NgReact,
+  noop,
   NumberInput,
   PlatformHealthOverride,
   ReactInjector,
@@ -23,9 +24,7 @@ import {
   TaskMonitor,
   TaskReason,
   ValidationMessage,
-  noop,
 } from '@spinnaker/core';
-
 import { AwsModalFooter } from 'amazon/common';
 import { IAmazonServerGroup } from 'amazon/domain';
 

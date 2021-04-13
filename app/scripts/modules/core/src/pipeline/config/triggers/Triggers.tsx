@@ -3,11 +3,12 @@ import React from 'react';
 import { Application } from 'core/application';
 import { IPipeline } from 'core/domain';
 import { PageNavigator, PageSection } from 'core/presentation';
+
 import { ExecutionOptionsPageContent } from './ExecutionOptionsPageContent';
-import { TriggersPageContent } from './TriggersPageContent';
-import { ParametersPageContent } from './ParametersPageContent';
+import { MetadataPageContent } from './MetadataPageContent';
 import { NotificationsPageContent } from './NotificationsPageContent';
-import { DescriptionPageContent } from './DescriptionPageContent';
+import { ParametersPageContent } from './ParametersPageContent';
+import { TriggersPageContent } from './TriggersPageContent';
 
 export interface ITriggersProps {
   application: Application;
@@ -52,8 +53,8 @@ export function Triggers(props: ITriggersProps) {
       >
         <NotificationsPageContent {...props} />
       </PageSection>
-      <PageSection pageKey="description" label="Description" noWrapper={true}>
-        <DescriptionPageContent {...props} />
+      <PageSection pageKey="description" label="Metadata" noWrapper={true}>
+        <MetadataPageContent {...props} />
       </PageSection>
     </PageNavigator>
   );

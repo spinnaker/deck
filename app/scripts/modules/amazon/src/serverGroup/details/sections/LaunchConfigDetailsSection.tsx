@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { CollapsibleSection, ShowUserData } from '@spinnaker/core';
-
 import { IAmazonServerGroupView } from 'amazon/domain';
 
 import { IAmazonServerGroupDetailsSectionProps } from './IAmazonServerGroupDetailsSectionProps';

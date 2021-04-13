@@ -4,27 +4,25 @@ import { Option } from 'react-select';
 
 import { Illustration } from '@spinnaker/presentation';
 
-import {
-  IModalComponentProps,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  ReactSelectInput,
-  FormikFormField,
-  TextAreaInput,
-  showModal,
-  SpinFormik,
-  ValidationMessage,
-} from '../../presentation';
-import { HelpField } from '../../help';
-import { IManagedArtifactVersion, IManagedResourceSummary } from '../../domain';
-import { Application } from '../../application';
-
-import { ManagedWriter } from '../ManagedWriter';
 import { Button } from '../Button';
 import { EnvironmentBadge } from '../EnvironmentBadge';
-
+import { ManagedWriter } from '../ManagedWriter';
+import { Application } from '../../application';
 import { getArtifactVersionDisplayName } from '../displayNames';
+import { IManagedArtifactVersion, IManagedResourceSummary } from '../../domain';
+import { HelpField } from '../../help';
+import {
+  FormikFormField,
+  IModalComponentProps,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+  ReactSelectInput,
+  showModal,
+  SpinFormik,
+  TextAreaInput,
+  ValidationMessage,
+} from '../../presentation';
 import { useEnvironmentTypeFromResources } from '../useEnvironmentTypeFromResources.hooks';
 
 const MARK_BAD_DOCS_URL = 'https://www.spinnaker.io/guides/user/managed-delivery/marking-as-bad/';
@@ -36,7 +34,10 @@ const logEvent = (label: string, application: string, environment?: string, refe
     label: environment ? `${application}:${environment}:${reference}` : application,
   });
 
-type IEnvironmentOptionProps = Option<string> & { disabledReason: string; allResources: IManagedResourceSummary[] };
+type IEnvironmentOptionProps = Required<Option<string>> & {
+  disabledReason: string;
+  allResources: IManagedResourceSummary[];
+};
 
 const EnvironmentOption = memo(({ label, disabled, disabledReason, allResources }: IEnvironmentOptionProps) => {
   const isCritical = useEnvironmentTypeFromResources(allResources);
@@ -80,7 +81,7 @@ export const MarkArtifactAsBadModal = memo(
     closeModal,
   }: IMarkArtifactAsBadModalProps) => {
     const optionRenderer = useCallback(
-      (option: Option<string> & { disabledReason: string }) => (
+      (option: Required<Option<string>> & { disabledReason: string }) => (
         <EnvironmentOption {...option} allResources={resourcesByEnvironment[option.value]} />
       ),
       [resourcesByEnvironment],
@@ -92,13 +93,14 @@ export const MarkArtifactAsBadModal = memo(
       <>
         <ModalHeader>Mark {getArtifactVersionDisplayName(version)} as bad</ModalHeader>
         <SpinFormik<{
-          environment: string;
+          environment?: string;
           comment?: string;
         }>
           initialValues={{
-            environment: version.environments.find(({ pinned, state }) => !pinned && state !== 'vetoed').name,
+            environment: version.environments.find(({ pinned, state }) => !pinned && state !== 'vetoed')?.name,
           }}
-          onSubmit={({ environment, comment }, { setSubmitting, setStatus }) =>
+          onSubmit={({ environment, comment }, { setSubmitting, setStatus }) => {
+            if (!environment || !comment) return;
             ManagedWriter.markArtifactVersionAsBad({
               environment,
               reference,
@@ -108,14 +110,14 @@ export const MarkArtifactAsBadModal = memo(
             })
               .then(() => {
                 logEvent('Version marked bad', application.name, environment, reference);
-                closeModal();
+                closeModal?.();
               })
               .catch((error: { data: { error: string; message: string } }) => {
                 setSubmitting(false);
                 setStatus({ error: error.data });
                 logEvent('Error marking version bad', application.name, environment, reference);
-              })
-          }
+              });
+          }}
           render={({ status, isValid, isSubmitting, submitForm }) => {
             const errorTitle = status?.error?.error;
             const errorMessage = status?.error?.message;
@@ -192,7 +194,7 @@ export const MarkArtifactAsBadModal = memo(
                 <ModalFooter
                   primaryActions={
                     <div className="flex-container-h sp-group-margin-s-xaxis">
-                      <Button onClick={() => dismissModal()}>Cancel</Button>
+                      <Button onClick={() => dismissModal?.()}>Cancel</Button>
                       <Button appearance="primary" disabled={!isValid || isSubmitting} onClick={() => submitForm()}>
                         Mark as bad
                       </Button>

@@ -1,7 +1,4 @@
-
-
 import { Application, IJob, IMetricAlarmDimension, IServerGroup, ITask, TaskExecutor } from '@spinnaker/core';
-
 import {
   AlarmComparisonOperator,
   AlarmStatisticType,
@@ -60,7 +57,10 @@ export interface IUpsertAlarmDescription extends IConfigurableMetric {
 }
 
 export class ScalingPolicyWriter {
-  public static upsertScalingPolicy(application: Application, command: IUpsertScalingPolicyCommand): PromiseLike<ITask> {
+  public static upsertScalingPolicy(
+    application: Application,
+    command: IUpsertScalingPolicyCommand,
+  ): PromiseLike<ITask> {
     command.type = command.type || 'upsertScalingPolicy';
     return TaskExecutor.executeTask({
       application,

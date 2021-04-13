@@ -1,5 +1,4 @@
 import { ILoadBalancerModalProps } from '@spinnaker/core';
-
 import { IAmazonLoadBalancerUpsertCommand } from 'amazon/domain';
 
 import { CreateApplicationLoadBalancer } from './application/CreateApplicationLoadBalancer';

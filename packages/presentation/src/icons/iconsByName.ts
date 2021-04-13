@@ -1,3 +1,5 @@
+/* eslint-disable @spinnaker/import-sort */
+
 import { ReactComponent as accordionCollapse } from './vectors/accordionCollapse.svg';
 import { ReactComponent as accordionExpand } from './vectors/accordionExpand.svg';
 import { ReactComponent as accordionExpandAll } from './vectors/accordionExpandAll.svg';
@@ -49,6 +51,7 @@ import { ReactComponent as servergroupAws } from './vectors/servergroupAws.svg';
 import { ReactComponent as spel } from './vectors/spel.svg';
 import { ReactComponent as toggleOff } from './vectors/toggleOff.svg';
 import { ReactComponent as toggleOn } from './vectors/toggleOn.svg';
+import { ReactComponent as trash } from './vectors/trash.svg';
 import { ReactComponent as unpin } from './vectors/unpin.svg';
 
 // Icons prefixed sp* are intended for use with the current Spinnaker UI design. They are visually heavier.
@@ -99,6 +102,7 @@ import { ReactComponent as mdUnknown } from './vectors/mdUnknown.svg';
 import { ReactComponent as mdConstraintGeneric } from './vectors/mdConstraintGeneric.svg';
 import { ReactComponent as mdConstraintDependsOn } from './vectors/mdConstraintDependsOn.svg';
 import { ReactComponent as mdConstraintAllowedTimes } from './vectors/mdConstraintAllowedTimes.svg';
+import { ReactComponent as mdVerification } from './vectors/mdVerification.svg';
 import { ReactComponent as md } from './vectors/md.svg';
 
 // MEME Templating
@@ -194,6 +198,7 @@ export const iconsByName = {
   mdConstraintDependsOn,
   mdConstraintAllowedTimes,
   md,
+  mdVerification,
   menu,
   menuClose,
   pin,
@@ -231,5 +236,6 @@ export const iconsByName = {
   templateWorkflow,
   toggleOff,
   toggleOn,
+  trash,
   unpin,
 } as const;

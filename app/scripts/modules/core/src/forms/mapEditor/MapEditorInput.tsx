@@ -1,10 +1,11 @@
+import { defaults, isFunction, isNil, isString } from 'lodash';
 import React from 'react';
-import { defaults, isNil, isFunction, isString } from 'lodash';
 
 import { IPipeline } from 'core/domain';
 import { createFakeReactSyntheticEvent, IFormInputProps, IValidator, IValidatorResult } from 'core/presentation';
 
 import { IMapPair, MapPair } from './MapPair';
+import './MapEditor.less';
 
 export interface IMapEditorInputProps extends IFormInputProps {
   addButtonLabel?: string;
@@ -118,7 +119,7 @@ export function MapEditorInput({
   };
 
   return (
-    <div>
+    <div className="MapEditor">
       {label && (
         <div className="sm-label-left">
           <b>{label}</b>

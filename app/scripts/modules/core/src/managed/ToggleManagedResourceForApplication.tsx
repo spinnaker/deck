@@ -1,8 +1,11 @@
 import React, { memo, useState } from 'react';
 import ReactGA from 'react-ga';
 
-import { Application } from '../application';
+import { Illustration, IllustrationName } from '@spinnaker/presentation';
+
 import { Button } from './Button';
+import { ManagedWriter } from './ManagedWriter';
+import { Application } from '../application';
 import {
   IModalComponentProps,
   ModalBody,
@@ -11,9 +14,6 @@ import {
   showModal,
   ValidationMessage,
 } from '../presentation';
-import { ManagedWriter } from './ManagedWriter';
-
-import { Illustration, IllustrationName } from '@spinnaker/presentation';
 
 const logClick = (label: string, application: string) =>
   ReactGA.event({
@@ -95,7 +95,7 @@ export const ToggleManagedResourceForApplicationModal = memo(
       call
         .then(() => dataSource.refresh(true).catch(() => null))
         .then(() => {
-          closeModal();
+          closeModal?.();
         })
         .catch((error: Error) => {
           setActionError(error.data);

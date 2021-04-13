@@ -1,17 +1,12 @@
-import React from 'react';
 import { pickBy, values } from 'lodash';
+import React from 'react';
 
 import { Application } from 'core/application';
-import { IManagedEnvironmentSummary, IManagedResourceSummary, IManagedArtifactSummary } from '../domain';
 
 import { ManagedResourceObject } from './ManagedResourceObject';
+import { IManagedArtifactSummary, IManagedEnvironmentSummary, IManagedResourceSummary } from '../domain';
 import { EnvironmentRow } from './environment/EnvironmentRow';
-
-import { isResourceKindSupported } from './resources/resourceRegistry';
-
-function shouldDisplayResource(resource: IManagedResourceSummary) {
-  return isResourceKindSupported(resource.kind);
-}
+import { resourceManager } from './resources/resourceRegistry';
 
 interface IEnvironmentsListProps {
   application: Application;
@@ -30,7 +25,6 @@ export function EnvironmentsList({
     <div>
       {environments.map(({ name, resources, artifacts }) => {
         const pinnedVersions = artifacts.filter(({ pinnedVersion }) => pinnedVersion);
-
         return (
           <EnvironmentRow
             key={name}
@@ -40,23 +34,25 @@ export function EnvironmentsList({
           >
             {resources
               .map((resourceId) => resourcesById[resourceId])
-              .filter(shouldDisplayResource)
+              .filter((resource) => resourceManager.isSupported(resource.kind))
               .sort((a, b) => `${a.kind}${a.displayName}`.localeCompare(`${b.kind}${b.displayName}`))
               .map((resource) => {
                 const artifactVersionsByState =
                   resource.artifact &&
-                  artifacts.find(({ reference }) => reference === resource.artifact.reference)?.versions;
+                  artifacts.find(({ reference }) => reference === resource.artifact?.reference)?.versions;
                 const artifactDetails =
-                  resource.artifact && allArtifacts.find(({ reference }) => reference === resource.artifact.reference);
+                  resource.artifact && allArtifacts.find(({ reference }) => reference === resource.artifact?.reference);
                 return (
                   <ManagedResourceObject
                     application={application}
                     key={resource.id}
                     resource={resource}
-                    environment={name}
-                    showReferenceName={allArtifacts.length > 1}
-                    artifactVersionsByState={artifactVersionsByState}
-                    artifactDetails={artifactDetails}
+                    metadata={{
+                      environment: name,
+                      showReferenceName: allArtifacts.length > 1,
+                      artifactVersionsByState: artifactVersionsByState,
+                      artifactDetails: artifactDetails,
+                    }}
                   />
                 );
               })}

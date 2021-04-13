@@ -1,12 +1,13 @@
-import React from 'react';
 import { find, get } from 'lodash';
+import React from 'react';
 
 import { AccountTag } from 'core/account';
+import { UrlBuilder } from 'core/navigation';
 import { ReactInjector } from 'core/reactShims';
+import { ClusterState } from 'core/state';
+
 import { ExecutionDetailsSection, IExecutionDetailsSectionProps } from '../common';
 import { StageFailureMessage } from '../../../details';
-import { ClusterState } from 'core/state';
-import { UrlBuilder } from 'core/navigation';
 
 export interface IDeployResult {
   type: string;
@@ -35,7 +36,8 @@ export class CloneServerGroupExecutionDetails extends React.Component<
   }
 
   private addDeployedArtifacts(props: IExecutionDetailsSectionProps): void {
-    const tasks = get(props, ['stage', 'context', 'kato.tasks'], []);
+    const context = get(props, 'stage.context', {} as any);
+    const tasks = context['kato.tasks'] ?? [];
     if (tasks.length === 0) {
       return;
     }
@@ -44,7 +46,6 @@ export class CloneServerGroupExecutionDetails extends React.Component<
       return;
     }
 
-    const context = get(props, 'stage.context', {} as any);
     // Find the result object that contains the passed in key
     let deployResults: IDeployResult[] = [];
     const deployedArtifacts = find(resultObjects, 'serverGroupNames');
@@ -58,7 +59,7 @@ export class CloneServerGroupExecutionDetails extends React.Component<
           serverGroup: serverGroupName,
           account: context.credentials,
           region,
-          provider: 'aws',
+          provider: context.cloudProvider ?? 'aws',
           project: ReactInjector.$stateParams.project,
         };
         result.href = UrlBuilder.buildFromMetadata(result);

@@ -1,27 +1,26 @@
-import React, { memo } from 'react';
 import { useSref } from '@uirouter/react';
+import React, { memo } from 'react';
 
-import { Application } from 'core/application';
-import { IManagedResourceSummary, IManagedEnvironmentSummary, IManagedArtifactSummary } from '../domain/IManagedEntity';
-import { getKindName } from './ManagedReader';
-
-import { ObjectRow } from './ObjectRow';
-import { AnimatingPill, Pill } from './Pill';
-import { getResourceIcon, getExperimentalDisplayLink } from './resources/resourceRegistry';
-import { getArtifactVersionDisplayName } from './displayNames';
-import { StatusBubble } from './StatusBubble';
-import { viewConfigurationByStatus } from './managedResourceStatusConfig';
-import { ManagedResourceStatusPopover } from './ManagedResourceStatusPopover';
 import { Icon } from '@spinnaker/presentation';
+import { Application } from 'core/application';
+import { Tooltip } from 'core/presentation';
+
+import { getKindName } from './ManagedReader';
+import { ManagedResourceStatusPopover } from './ManagedResourceStatusPopover';
+import { StatusBubble } from './StatusBubble';
+import { IManagedResourceSummary } from '../domain/IManagedEntity';
+import { viewConfigurationByStatus } from './managedResourceStatusConfig';
+import { ResourceDeploymentStatus, ResourceDeploymentStatusProps } from './overview/ResourceDeploymentStatus';
+import { showManagedResourceHistoryModal } from './resourceHistory/ManagedResourceHistoryModal';
+import { resourceManager } from './resources/resourceRegistry';
+
+import './ObjectRow.less';
 
 export interface IManagedResourceObjectProps {
   application: Application;
   resource: IManagedResourceSummary;
-  environment?: string;
-  showReferenceName?: boolean;
-  artifactVersionsByState?: IManagedEnvironmentSummary['artifacts'][0]['versions'];
-  artifactDetails?: IManagedArtifactSummary;
   depth?: number;
+  metadata?: ResourceDeploymentStatusProps;
 }
 
 // We'll add detail drawers for resources soon, but in the meantime let's link
@@ -59,73 +58,61 @@ const getNativeResourceRoutingInfo = (
   return null;
 };
 
+const EventsLink = (props: Pick<IManagedResourceSummary, 'id' | 'displayName'>) => {
+  return (
+    <Tooltip placement="top" value="Open resource history">
+      <a
+        href="#"
+        className="resource-events-link"
+        onClick={(e) => {
+          e.preventDefault();
+          showManagedResourceHistoryModal(props);
+        }}
+      >
+        <Icon name="history" size="extraSmall" />
+      </a>
+    </Tooltip>
+  );
+};
+
 export const ManagedResourceObject = memo(
-  ({
-    application,
-    resource,
-    environment,
-    showReferenceName,
-    artifactVersionsByState,
-    artifactDetails,
-    depth,
-  }: IManagedResourceObjectProps) => {
+  ({ application, resource, metadata, depth = 0 }: IManagedResourceObjectProps) => {
     const { kind, displayName } = resource;
 
     const routingInfo = getNativeResourceRoutingInfo(resource) ?? { state: '', params: {} };
     const routeProps = useSref(routingInfo.state, routingInfo.params);
 
-    const displayLink = getExperimentalDisplayLink(resource);
+    const displayLink = resourceManager.getExperimentalDisplayLink(resource);
     const displayLinkProps = displayLink && { href: displayLink, target: '_blank', rel: 'noopener noreferrer' };
 
     const linkProps = routeProps.href ? routeProps : displayLinkProps;
-
-    const current =
-      artifactVersionsByState?.current &&
-      artifactDetails?.versions.find(({ version }) => version === artifactVersionsByState?.current);
-    const deploying =
-      artifactVersionsByState?.deploying &&
-      artifactDetails?.versions.find(({ version }) => version === artifactVersionsByState?.deploying);
-
-    const isCurrentVersionPinned = !!current?.environments.find(({ name }) => name === environment)?.pinned;
-    const currentPill = current && (
-      <Pill
-        text={`${getArtifactVersionDisplayName(current)}${showReferenceName ? ' ' + artifactDetails.reference : ''}`}
-        bgColor={isCurrentVersionPinned ? 'var(--color-status-warning)' : null}
-        textColor={isCurrentVersionPinned ? 'var(--color-icon-dark)' : null}
-      />
-    );
-    const deployingPill = deploying && (
-      <>
-        <Icon appearance="neutral" name="caretRight" size="medium" />
-        <AnimatingPill
-          text={`${getArtifactVersionDisplayName(deploying)}${
-            showReferenceName ? ' ' + artifactDetails.reference : ''
-          }`}
-          textColor="var(--color-icon-neutral)"
-        />
-      </>
-    );
+    const title = linkProps ? <a {...linkProps}>{displayName}</a> : displayName;
 
     const viewConfig = viewConfigurationByStatus[resource.status];
-    const resourceStatus = resource.status !== 'HAPPY' && viewConfig && (
-      <ManagedResourceStatusPopover application={application} placement="left" resourceSummary={resource}>
-        <StatusBubble appearance={viewConfig.appearance} iconName={viewConfig.iconName} size="small" />
-      </ManagedResourceStatusPopover>
-    );
+
+    const resourceStatus =
+      resource.status !== 'HAPPY' && viewConfig ? (
+        <ManagedResourceStatusPopover application={application} placement="left" resourceSummary={resource}>
+          <StatusBubble appearance={viewConfig.appearance} iconName={viewConfig.iconName} size="small" />
+        </ManagedResourceStatusPopover>
+      ) : undefined;
 
     return (
-      <ObjectRow
-        icon={getResourceIcon(kind)}
-        title={linkProps ? <a {...linkProps}>{displayName}</a> : displayName}
-        depth={depth}
-        content={resourceStatus}
-        metadata={
-          <span className="flex-container-h middle">
-            {currentPill}
-            {deployingPill}
-          </span>
-        }
-      />
+      <div className="ObjectRow" style={{ marginLeft: 16 * depth }}>
+        <span className="object-row-content">
+          <div className="object-row-column object-row-title-column">
+            <Icon name={resourceManager.getIcon(kind)} size="medium" appearance="dark" className="sp-margin-s-right" />
+            <span className="object-row-title">{title}</span>
+          </div>
+          <div className="object-row-column flex-grow">
+            {resourceStatus}
+            <div className="flex-pull-right flex-container-h middle">
+              <EventsLink id={resource.id} displayName={resource.displayName} />
+              {metadata && <ResourceDeploymentStatus {...metadata} />}
+            </div>
+          </div>
+        </span>
+      </div>
     );
   },
 );
