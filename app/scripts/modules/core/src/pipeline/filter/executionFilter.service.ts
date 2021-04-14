@@ -5,7 +5,7 @@ import { $log } from 'ngimport';
 import { Subject } from 'rxjs';
 
 import { Application } from 'core/application/application.model';
-import { IExecution, IExecutionGroup, IPipeline, IPipelineTag } from 'core/domain';
+import { IExecution, IExecutionGroup, IExecutionStage, IPipeline, IPipelineTag } from 'core/domain';
 import { FilterModelService, ISortFilter } from 'core/filterModel';
 import { Registry } from 'core/registry';
 import { ExecutionState } from 'core/state';
@@ -412,8 +412,12 @@ export class ExecutionFilterService {
     const filterAwaitingJudgment = ExecutionState.filterModel.asFilterModel.sortFilter.stages.AWAITING_JUDGMENT;
     if (filterAwaitingJudgment) {
       return groups.map((group: IExecutionGroup) => {
-        group.executions = group.executions.filter((execution) => {
-          return execution.stages.filter((stage) => stage.type === 'manualJudgment').length > 0;
+        group.executions = group.executions.filter((execution: IExecution) => {
+          return (
+            execution.stages.filter(
+              ({ type, status }: IExecutionStage) => type === 'manualJudgment' && status === 'RUNNING',
+            ).length > 0
+          );
         });
         return group;
       });
