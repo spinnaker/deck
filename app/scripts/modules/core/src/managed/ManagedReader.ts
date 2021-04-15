@@ -10,6 +10,8 @@ import {
   ManagedResourceStatus,
 } from 'core/domain';
 
+import { sortEnvironments } from './utils/sortEnvironments';
+
 const KIND_NAME_MATCHER = /.*\/(.*?)@/i;
 const RESOURCE_DIFF_LIST_MATCHER = /^(.*)\[(.*)\]$/i;
 
@@ -91,7 +93,8 @@ export class ManagedReader {
       .path(app)
       .query({ entities: ['resources', 'artifacts', 'environments'], maxArtifactVersions: 30 })
       .get()
-      .then(this.decorateResources);
+      .then(this.decorateResources)
+      .then(sortEnvironments);
   }
 
   public static getResourceHistory(resourceId: string): PromiseLike<IManagedResourceEventHistory> {

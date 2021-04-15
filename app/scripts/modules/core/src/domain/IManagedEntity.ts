@@ -16,32 +16,37 @@ export enum ManagedResourceStatus {
   WAITING = 'WAITING',
 }
 
-export enum StatefulConstraintStatus {
-  NOT_EVALUATED = 'NOT_EVALUATED',
-  PENDING = 'PENDING',
-  PASS = 'PASS',
-  FAIL = 'FAIL',
-  OVERRIDE_PASS = 'OVERRIDE_PASS',
-  OVERRIDE_FAIL = 'OVERRIDE_FAIL',
-}
+export type ConstraintStatus = 'NOT_EVALUATED' | 'PENDING' | 'PASS' | 'FAIL' | 'OVERRIDE_PASS' | 'OVERRIDE_FAIL';
 
-export interface IStatefulConstraint {
+// Warning! Chaning this interface might affect existing plugins. Please make sure you don't break the API
+export interface IBaseConstraint {
   type: string;
-  status: StatefulConstraintStatus;
+  status: ConstraintStatus;
   startedAt?: string;
   judgedAt?: string;
   judgedBy?: string;
   comment?: string;
 }
 
-export interface IDependsOnConstraint {
+export interface IDependsOnConstraint extends IBaseConstraint {
   type: 'depends-on';
-  currentlyPassing: boolean;
-  attributes: { environment: string };
+  attributes: { dependsOnEnvironment: string };
 }
 
-// more stateless types coming soon
-export type IStatelessConstraint = IDependsOnConstraint;
+export interface AllowedTimeWindow {
+  days: number[];
+  hours: number[];
+}
+export interface IAllowedTimesConstraint extends IBaseConstraint {
+  type: 'allowed-times';
+  attributes: { allowedTimes: AllowedTimeWindow[]; timezone?: string };
+}
+
+export interface IManualJudgementConstraint extends IBaseConstraint {
+  type: 'manual-judgement';
+}
+
+export type IConstraint = IManualJudgementConstraint | IDependsOnConstraint | IAllowedTimesConstraint;
 
 export interface IManagedResourceSummary {
   id: string;
@@ -109,8 +114,7 @@ export interface IManagedArtifactVersionEnvironment {
   deployedAt?: string;
   replacedAt?: string;
   replacedBy?: string;
-  statefulConstraints?: IStatefulConstraint[];
-  statelessConstraints?: IStatelessConstraint[];
+  constraints?: IConstraint[];
   compareLink?: string;
   verifications?: IVerification[];
 }

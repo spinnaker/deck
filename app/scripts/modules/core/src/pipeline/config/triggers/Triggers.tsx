@@ -4,8 +4,8 @@ import { Application } from 'core/application';
 import { IPipeline } from 'core/domain';
 import { PageNavigator, PageSection } from 'core/presentation';
 
-import { DescriptionPageContent } from './DescriptionPageContent';
 import { ExecutionOptionsPageContent } from './ExecutionOptionsPageContent';
+import { MetadataPageContent } from './MetadataPageContent';
 import { NotificationsPageContent } from './NotificationsPageContent';
 import { ParametersPageContent } from './ParametersPageContent';
 import { TriggersPageContent } from './TriggersPageContent';
@@ -15,15 +15,15 @@ export interface ITriggersProps {
   pipeline: IPipeline;
   fieldUpdated: () => void;
   updatePipelineConfig: (changes: Partial<IPipeline>) => void;
-  viewState: { revertCount: number };
+  revertCount: number;
 }
 
 export function Triggers(props: ITriggersProps) {
-  const { pipeline, viewState } = props;
-
+  const pipeline = props.pipeline;
   // KLUDGE: This value is used as a React key when rendering the Triggers.
   // Whenever the pipeline is reverted, this causes the Triggers to remount and reset formik state.
-  const revertCountKLUDGE = viewState.revertCount;
+  const revertCountKLUDGE = props.revertCount;
+
   return (
     <PageNavigator scrollableContainer="[ui-view]">
       <PageSection pageKey="concurrent" label="Execution Options" visible={!pipeline.strategy}>
@@ -53,8 +53,8 @@ export function Triggers(props: ITriggersProps) {
       >
         <NotificationsPageContent {...props} />
       </PageSection>
-      <PageSection pageKey="description" label="Description" noWrapper={true}>
-        <DescriptionPageContent {...props} />
+      <PageSection pageKey="description" label="Metadata" noWrapper={true}>
+        <MetadataPageContent {...props} key={revertCountKLUDGE} />
       </PageSection>
     </PageNavigator>
   );

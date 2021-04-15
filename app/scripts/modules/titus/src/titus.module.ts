@@ -4,9 +4,7 @@ import { AmazonLoadBalancersTag } from '@spinnaker/amazon';
 import { CloudProviderRegistry, DeploymentStrategyRegistry } from '@spinnaker/core';
 
 import './help/titus.help';
-import { TITUS_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER } from './instance/details/instance.details.controller';
-import { TITUS_INSTANCE_DNS_COMPONENT } from './instance/details/titusInstanceDns.component';
-import { TITUS_INSTANCE_INFORMATION_COMPONENT } from './instance/details/titusInstanceInformation.component';
+import { TitusInstanceDetails } from './instance/details/TitusInstanceDetails';
 import { TITUS_PIPELINE_STAGES_BAKE_TITUSBAKESTAGE } from './pipeline/stages/bake/titusBakeStage';
 import { TITUS_PIPELINE_STAGES_CLONESERVERGROUP_TITUSCLONESERVERGROUPSTAGE } from './pipeline/stages/cloneServerGroup/titusCloneServerGroupStage';
 import { TITUS_PIPELINE_STAGES_DESTROYASG_TITUSDESTROYASGSTAGE } from './pipeline/stages/destroyAsg/titusDestroyAsgStage';
@@ -45,7 +43,6 @@ module(TITUS_MODULE, [
   TITUS_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER,
   TITUS_SERVERGROUP_CONFIGURE_SERVERGROUP_CONFIGURE_TITUS_MODULE,
   TITUS_SERVERGROUP_SERVERGROUP_TRANSFORMER,
-  TITUS_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER,
   TITUS_PIPELINE_STAGES_FINDAMI_TITUSFINDAMISTAGE,
   TITUS_PIPELINE_STAGES_ENABLEASG_TITUSENABLEASGSTAGE,
   TITUS_PIPELINE_STAGES_DISABLEASG_TITUSDISABLEASGSTAGE,
@@ -58,8 +55,6 @@ module(TITUS_MODULE, [
   TITUS_PIPELINE_STAGES_SCALEDOWNCLUSTER_TITUSSCALEDOWNCLUSTERSTAGE,
   TITUS_SERVERGROUP_DETAILS_CAPACITYDETAILSSECTION,
   TITUS_SERVERGROUP_DETAILS_LAUNCHCONFIGSECTION,
-  TITUS_INSTANCE_INFORMATION_COMPONENT,
-  TITUS_INSTANCE_DNS_COMPONENT,
 ]).config(() => {
   CloudProviderRegistry.registerProvider('titus', {
     name: 'Titus',
@@ -90,8 +85,7 @@ module(TITUS_MODULE, [
       useProvider: 'aws',
     },
     instance: {
-      detailsTemplateUrl: require('./instance/details/instanceDetails.html'),
-      detailsController: 'titusInstanceDetailsCtrl',
+      details: TitusInstanceDetails,
     },
   });
 });
