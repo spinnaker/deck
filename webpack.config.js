@@ -4,6 +4,7 @@ const md5 = require('md5');
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const webpack = require('webpack');
@@ -95,7 +96,6 @@ function configure(env, webpackOpts) {
     },
     resolve: {
       extensions: ['.json', '.ts', '.tsx', '.js', '.jsx', '.css', '.less', '.html'],
-      modules: [NODE_MODULE_PATH, path.join(__dirname, 'app', 'scripts', 'modules')],
       alias: {
         root: __dirname,
         core: path.join(__dirname, 'app', 'scripts', 'modules', 'core', 'src'),
@@ -137,6 +137,7 @@ function configure(env, webpackOpts) {
         tencentcloud: path.join(__dirname, 'app', 'scripts', 'modules', 'tencentcloud', 'src'),
         '@spinnaker/tencentcloud': path.join(__dirname, 'app', 'scripts', 'modules', 'tencentcloud', 'src'),
       },
+      plugins: [new TsconfigPathsPlugin({ logLevel: 'info' })],
     },
     module: {
       rules: [
