@@ -18,6 +18,7 @@ export enum ManagedResourceStatus {
 
 export type ConstraintStatus = 'NOT_EVALUATED' | 'PENDING' | 'PASS' | 'FAIL' | 'OVERRIDE_PASS' | 'OVERRIDE_FAIL';
 
+// Warning! Chaning this interface might affect existing plugins. Please make sure you don't break the API
 export interface IBaseConstraint {
   type: string;
   status: ConstraintStatus;
@@ -38,7 +39,7 @@ export interface AllowedTimeWindow {
 }
 export interface IAllowedTimesConstraint extends IBaseConstraint {
   type: 'allowed-times';
-  attributes: { allowedTimes: AllowedTimeWindow[] };
+  attributes: { allowedTimes: AllowedTimeWindow[]; timezone?: string };
 }
 
 export interface IManualJudgementConstraint extends IBaseConstraint {
