@@ -168,7 +168,14 @@ export class Execution extends React.PureComponent<IExecutionProps, IExecutionSt
     const { application, execution, cancelConfirmationText } = this.props;
     const { executionService } = ReactInjector;
     const hasDeployStage =
-      execution.stages && execution.stages.some(stage => stage.type === 'deploy' || stage.type === 'cloneServerGroup');
+      execution.stages &&
+      execution.stages.some(
+        stage =>
+          stage.type === 'deploy' ||
+          stage.type === 'cloneServerGroup' ||
+          stage.type === 'createServerGroup' ||
+          stage.type === 'deployElastigroup',
+      );
     CancelModal.confirm({
       header: `Really stop execution of ${execution.name}?`,
       buttonText: `Stop running ${execution.name}`,

@@ -6,6 +6,7 @@ import { NOTIFY_DEPLOY_STARTING_STAGE } from './config/stages/monitoreddeploy/no
 import './config/stages/bakeManifest/bakeManifestStage';
 import { CHECK_PRECONDITIONS_STAGE_MODULE } from './config/stages/checkPreconditions/checkPreconditionsStage.module';
 import { CLONE_SERVER_GROUP_STAGE } from './config/stages/cloneServerGroup/cloneServerGroupStage.module';
+import { CREATE_SERVER_GROUP_STAGE } from './config/stages/createServerGroup/createServerGroupStage.module';
 import './config/stages/deployService/deployServiceStage';
 import './config/stages/destroyService/destroyServiceStage';
 import { CREATE_LOAD_BALANCER_STAGE } from './config/stages/createLoadBalancer/createLoadBalancerStage.module';
@@ -94,6 +95,7 @@ module(PIPELINE_MODULE, [
   CORE_PIPELINE_CONFIG_STAGES_BAKE_BAKESTAGE_MODULE,
   CHECK_PRECONDITIONS_STAGE_MODULE,
   CLONE_SERVER_GROUP_STAGE,
+  CREATE_SERVER_GROUP_STAGE,
   STAGE_COMMON_MODULE,
   CORE_PIPELINE_CONFIG_STAGES_DEPLOY_DEPLOYSTAGE_MODULE,
   DESTROY_ASG_STAGE,

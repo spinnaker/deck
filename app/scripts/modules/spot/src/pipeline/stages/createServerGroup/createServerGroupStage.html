@@ -1,0 +1,15 @@
+<div ng-controller="spotCreateServerGroupStageCtrl as createServerGroupStageCtrl">
+  <div ng-if="!pipeline.strategy">
+    <div ng-if="viewState.loading" class="horizontal center middle">
+      <loading-spinner size="'small'"></loading-spinner>
+    </div>
+    <stage-config-field label="Account">
+      <account-select-field component="stage" field="credentials" accounts="accounts"> </account-select-field>
+    </stage-config-field>
+  </div>
+  <stage-config-field label="Payload">
+    <textarea placeholder="{}" class="code form-control flex-fill" rows="6" ng-model="stage.payload"></textarea>
+  </stage-config-field>
+  <stage-platform-health-override application="application" stage="stage" platform-health-type="'Spot'">
+  </stage-platform-health-override>
+</div>
