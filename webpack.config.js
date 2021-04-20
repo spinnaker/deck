@@ -56,7 +56,7 @@ function configure(env, webpackOpts) {
     entry: {
       settings: SETTINGS_PATH,
       'settings-local': './settings-local.js',
-      app: './app/scripts/app.ts',
+      app: './app/scripts/modules/app.ts',
     },
     output: {
       path: path.join(__dirname, 'build', 'webpack', process.env.SPINNAKER_ENV || ''),
@@ -111,7 +111,7 @@ function configure(env, webpackOpts) {
           'commonImports.less',
         ),
       },
-      plugins: [new TsconfigPathsPlugin({ logLevel: 'info' })],
+      plugins: [new TsconfigPathsPlugin({ logLevel: 'info', extensions: ['.ts', '.tsx', '.js', '.jsx'] })],
     },
     module: {
       rules: [
