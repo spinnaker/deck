@@ -8,8 +8,8 @@ import { IPipeline, IStage } from 'core/domain';
 import { EditAwsCodeBuildSourceModal } from './EditAwsCodeBuildSourceModal';
 import { EditAwsCodeBuildSecondarySourceVersionModal } from './EditAwsCodeBuildSecondarySourceVersionModal';
 import { IAwsCodeBuildSource, IAwsCodeBuildSecondarySourcesVersion } from './IAwsCodeBuildSource';
-import { IPipeline, IStage } from 'core/domain';
-import { ArtifactIcon } from 'core/artifact';
+import { IFormInputProps } from 'core';
+import { createFakeReactSyntheticEvent } from 'core/presentation'
 
 export interface IAwsCodeBuildSourceListProps {
   stage: IStage;
@@ -24,14 +24,9 @@ export interface IAwsCodeBuildSecondarySourceVersionListProps extends IFormInput
 }
 
 export class AwsCodeBuildSecondarySourcesVersionList extends React.Component<IAwsCodeBuildSecondarySourceVersionListProps> {
-  private destroy$ = new Subject();
 
   constructor(props: IAwsCodeBuildSecondarySourceVersionListProps) {
     super(props);
-  }
-
-  public componentWillUnmount() {
-    this.destroy$.next();
   }
 
   private addSecondarySourcesVersion = () => {
@@ -39,33 +34,33 @@ export class AwsCodeBuildSecondarySourcesVersionList extends React.Component<IAw
   };
 
   private editSecondarySourceVersion = (source?: IAwsCodeBuildSecondarySourcesVersion, index?: number) => {
-    const { secondarySourcesVersionOverride, updateSecondarySourcesVersion, stage, pipeline } = this.props;
+    const { value, onChange, stage, pipeline } = this.props;
     EditAwsCodeBuildSecondarySourceVersionModal.show({
       secondarySourcesVersionOverride: source || {},
       stage,
       pipeline,
     })
       .then((newSecondarySource) => {
-        const secondarySourceCopy = secondarySourcesVersionOverride || [];
+        const secondarySourceCopy = value || [];
         if (!source) {
-          updateSecondarySourcesVersion(secondarySourceCopy.concat(newSecondarySource));
+          onChange(secondarySourceCopy.concat(newSecondarySource));
         } else {
           const updateSeconary = [...secondarySourceCopy];
           updateSeconary[index] = newSecondarySource;
-          updateSecondarySourcesVersion(updateSeconary);
+          onChange(createFakeReactSyntheticEvent({ value: updateSeconary, name: this.props.name }));
         }
       })
       .catch(() => { });
   };
 
   private removeSource = (index: number) => {
-    const secondarySourcesVersionOverride = [...this.props.secondarySourcesVersionOverride];
+    const secondarySourcesVersionOverride = [...this.props.value];
     secondarySourcesVersionOverride.splice(index, 1);
-    this.props.updateSecondarySourcesVersion(secondarySourcesVersionOverride);
+    this.props.onChange(createFakeReactSyntheticEvent({ value: secondarySourcesVersionOverride, name: this.props.name }));
   };
 
   public render() {
-    const { secondarySourcesVersionOverride } = this.props;
+    const value = this.props.value as IAwsCodeBuildSecondarySourcesVersion[];
     return (
       <div className="row">
         <div className={'col-md-12'}>
@@ -78,8 +73,8 @@ export class AwsCodeBuildSecondarySourcesVersionList extends React.Component<IAw
               </tr>
             </thead>
             <tbody>
-              {secondarySourcesVersionOverride &&
-                secondarySourcesVersionOverride.map((secondarySourceVersion, i) => {
+              {value &&
+                value.map((secondarySourceVersion, i) => {
                   return (
                     <tr key={i} className={classNames({ 'templated-pipeline-item': false })}>
                       <td>{secondarySourceVersion.sourceIdentifier}</td>
