@@ -54,7 +54,6 @@ export class CloudFoundryMapLoadBalancerModal extends React.Component<
 
   private destroy$ = new Subject();
   private formikRef = React.createRef<Formik<ICloudFoundryLoadBalancerModalValues>>();
-  private refreshUnsubscribe: () => void;
   private $uibModalInstanceEmulation: IModalServiceInstance & { deferred?: IDeferred<any> };
 
   constructor(props: ICloudFoundryLoadBalancerModalProps) {
@@ -109,14 +108,10 @@ export class CloudFoundryMapLoadBalancerModal extends React.Component<
   }
 
   public componentWillUnmount(): void {
-    if (this.refreshUnsubscribe) {
-      this.refreshUnsubscribe();
-    }
     this.destroy$.next();
   }
 
   protected onApplicationRefresh(): void {
-    this.refreshUnsubscribe = undefined;
     this.props.dismissModal();
   }
 
