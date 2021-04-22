@@ -111,10 +111,6 @@ export class CloudFoundryMapLoadBalancerModal extends React.Component<
     this.destroy$.next();
   }
 
-  protected onApplicationRefresh(): void {
-    this.props.dismissModal();
-  }
-
   private submit = (values: ICloudFoundryLoadBalancerModalValues): void => {
     const { routes } = values;
     const serverGroup: ICloudFoundryServerGroup = this.props.application.serverGroups?.data?.find(
