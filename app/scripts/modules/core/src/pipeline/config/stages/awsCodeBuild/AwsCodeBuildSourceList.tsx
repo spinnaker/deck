@@ -1,15 +1,14 @@
 import classNames from 'classnames';
+import { IFormInputProps } from 'core';
 import React from 'react';
-import { Subject } from 'rxjs';
 
 import { ArtifactIcon } from 'core/artifact';
 import { IPipeline, IStage } from 'core/domain';
+import { createFakeReactSyntheticEvent } from 'core/presentation';
 
-import { EditAwsCodeBuildSourceModal } from './EditAwsCodeBuildSourceModal';
 import { EditAwsCodeBuildSecondarySourceVersionModal } from './EditAwsCodeBuildSecondarySourceVersionModal';
-import { IAwsCodeBuildSource, IAwsCodeBuildSecondarySourcesVersion } from './IAwsCodeBuildSource';
-import { IFormInputProps } from 'core';
-import { createFakeReactSyntheticEvent } from 'core/presentation'
+import { EditAwsCodeBuildSourceModal } from './EditAwsCodeBuildSourceModal';
+import { IAwsCodeBuildSecondarySourcesVersion, IAwsCodeBuildSource } from './IAwsCodeBuildSource';
 
 export interface IAwsCodeBuildSourceListProps {
   stage: IStage;
@@ -23,8 +22,9 @@ export interface IAwsCodeBuildSecondarySourceVersionListProps extends IFormInput
   pipeline: IPipeline;
 }
 
-export class AwsCodeBuildSecondarySourcesVersionList extends React.Component<IAwsCodeBuildSecondarySourceVersionListProps> {
-
+export class AwsCodeBuildSecondarySourcesVersionList extends React.Component<
+  IAwsCodeBuildSecondarySourceVersionListProps
+> {
   constructor(props: IAwsCodeBuildSecondarySourceVersionListProps) {
     super(props);
   }
@@ -33,30 +33,31 @@ export class AwsCodeBuildSecondarySourcesVersionList extends React.Component<IAw
     this.editSecondarySourceVersion();
   };
 
+  private onChange(value: any) {
+    this.props.onChange(createFakeReactSyntheticEvent({ value, name: this.props.name }));
+  }
+
   private editSecondarySourceVersion = (source?: IAwsCodeBuildSecondarySourcesVersion, index?: number) => {
-    const { value, onChange, stage, pipeline } = this.props;
-    EditAwsCodeBuildSecondarySourceVersionModal.show({
-      secondarySourcesVersionOverride: source || {},
-      stage,
-      pipeline,
-    })
+    const { value, stage, pipeline } = this.props;
+    const secondarySourcesVersionOverride = source ?? {};
+    EditAwsCodeBuildSecondarySourceVersionModal.show({ secondarySourcesVersionOverride, stage, pipeline })
       .then((newSecondarySource) => {
-        const secondarySourceCopy = value || [];
+        const secondarySource = value || [];
+        const secondarySourceCopy = [...secondarySource];
         if (!source) {
-          onChange(secondarySourceCopy.concat(newSecondarySource));
+          secondarySourceCopy.push(newSecondarySource);
         } else {
-          const updateSeconary = [...secondarySourceCopy];
-          updateSeconary[index] = newSecondarySource;
-          onChange(createFakeReactSyntheticEvent({ value: updateSeconary, name: this.props.name }));
+          secondarySourceCopy[index] = newSecondarySource;
         }
+        this.onChange(secondarySourceCopy);
       })
-      .catch(() => { });
+      .catch(() => {});
   };
 
   private removeSource = (index: number) => {
     const secondarySourcesVersionOverride = [...this.props.value];
     secondarySourcesVersionOverride.splice(index, 1);
-    this.props.onChange(createFakeReactSyntheticEvent({ value: secondarySourcesVersionOverride, name: this.props.name }));
+    this.onChange(secondarySourcesVersionOverride);
   };
 
   public render() {
@@ -80,7 +81,10 @@ export class AwsCodeBuildSecondarySourcesVersionList extends React.Component<IAw
                       <td>{secondarySourceVersion.sourceIdentifier}</td>
                       <td>{secondarySourceVersion.sourceVersion}</td>
                       <td>
-                        <button className="btn btn-xs btn-link" onClick={() => this.editSecondarySourceVersion(secondarySourceVersion, i)}>
+                        <button
+                          className="btn btn-xs btn-link"
+                          onClick={() => this.editSecondarySourceVersion(secondarySourceVersion, i)}
+                        >
                           Edit
                         </button>
                         <button className="btn btn-xs btn-link" onClick={() => this.removeSource(i)}>
@@ -108,27 +112,14 @@ export class AwsCodeBuildSecondarySourcesVersionList extends React.Component<IAw
 }
 
 export class AwsCodeBuildSourceList extends React.Component<IAwsCodeBuildSourceListProps> {
-  private destroy$ = new Subject();
-
-  constructor(props: IAwsCodeBuildSourceListProps) {
-    super(props);
-  }
-
-  public componentWillUnmount() {
-    this.destroy$.next();
-  }
-
   private addSource = () => {
     this.editSource();
   };
 
-  private editSource = (source?: IAwsCodeBuildSource, index?: number) => {
+  private editSource = (buildSource?: IAwsCodeBuildSource, index?: number) => {
     const { sources, updateSources, stage, pipeline } = this.props;
-    EditAwsCodeBuildSourceModal.show({
-      source: source || {},
-      stage,
-      pipeline,
-    })
+    const source = buildSource ?? {};
+    EditAwsCodeBuildSourceModal.show({ source, stage, pipeline })
       .then((newSource) => {
         const sourceCopy = sources || [];
         if (!source) {
@@ -139,7 +130,7 @@ export class AwsCodeBuildSourceList extends React.Component<IAwsCodeBuildSourceL
           updateSources(update);
         }
       })
-      .catch(() => { });
+      .catch(() => {});
   };
 
   private removeSource = (index: number) => {
