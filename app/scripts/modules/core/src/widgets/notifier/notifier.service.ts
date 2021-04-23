@@ -1,11 +1,12 @@
 import React from 'react';
+import { ToastOptions } from 'react-toastify';
 import { Subject } from 'rxjs';
 
 export interface INotifier {
   key: string;
   action: 'remove' | 'create';
-  body?: string /* Deprecated in favor of `content` */;
   content?: React.ReactNode;
+  options?: ToastOptions;
 }
 
 export class NotifierService {

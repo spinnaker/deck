@@ -1,62 +1,39 @@
 import React from 'react';
+import { toast, ToastContainer } from 'react-toastify';
 import { Subscription } from 'rxjs';
 
-import { Markdown } from 'core/presentation';
-
-import { INotifier, NotifierService } from './notifier.service';
+import { NotifierService } from './notifier.service';
 
 import './notifier.component.less';
+import 'react-toastify/dist/ReactToastify.min.css';
 
-export interface INotifierState {
-  messages: INotifier[];
-}
-
-export class Notifier extends React.Component<{}, INotifierState> {
+export class Notifier extends React.Component {
   private subscription: Subscription;
 
   constructor(props: {}) {
     super(props);
-    this.state = { messages: [] };
   }
 
   public componentDidMount() {
     this.subscription = NotifierService.messageStream.subscribe((message) => {
       if (message.action === 'remove') {
-        this.dismiss(message.key);
+        toast.dismiss(message.key);
       } else {
-        const existing = this.state.messages.find((m) => m.key === message.key);
+        const existing = toast.isActive(message.key);
         if (existing) {
-          existing.body = message.body;
-          this.setState({ messages: this.state.messages });
+          toast.update(message.key, { render: message.content, ...message.options });
         } else {
-          this.setState({ messages: this.state.messages.concat([message]) });
+          toast(message.content, { toastId: message.key, ...message.options });
         }
       }
     });
   }
 
   public componentWillUnmount() {
-    this.subscription && this.subscription.unsubscribe();
+    this.subscription?.unsubscribe();
   }
-
-  private dismiss(key: string): void {
-    this.setState({ messages: this.state.messages.filter((m) => m.key !== key) });
-  }
-
-  private makeNotification = (message: INotifier) => (
-    <div key={message.key} className="user-notification horizontal space-around">
-      {message.content ? (
-        <div className="message">{message.content}</div>
-      ) : (
-        <Markdown className="message" message={message.body} options={{ ADD_ATTR: ['onclick'] }} />
-      )}
-      <button className="btn btn-link close-notification" role="button" onClick={() => this.dismiss(message.key)}>
-        <span className="fa fa-times" />
-      </button>
-    </div>
-  );
 
   public render() {
-    return <div className="user-notifications">{this.state.messages.map(this.makeNotification)}</div>;
+    return <ToastContainer position="bottom-right" autoClose={false} newestOnTop={true} closeOnClick={false} />;
   }
 }
