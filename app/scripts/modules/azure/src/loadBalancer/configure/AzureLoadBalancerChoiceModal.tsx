@@ -50,6 +50,7 @@ export class AzureLoadBalancerChoiceModal extends React.Component<
     const provider: any = CloudProviderRegistry.getValue('azure', 'loadBalancer');
     ModalInjector.modalService
       .open({
+        windowClass: 'modal-z-index',
         templateUrl: provider.createLoadBalancerTemplateUrl,
         controller: `${provider.createLoadBalancerController} as ctrl`,
         size: 'lg',
