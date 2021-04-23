@@ -108,6 +108,11 @@ angular
           delete labels['source'];
           delete labels['spinnakerAccount'];
 
+          // Server groups with no instances have an empty key/value pair that causes validation issues in the clone modal
+          if (labels[''] === '') {
+            delete labels[''];
+          }
+
           Object.keys(labels).forEach((key) => {
             if (key.startsWith('titus.')) {
               delete labels[key];
