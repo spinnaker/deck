@@ -2,7 +2,24 @@ import { FormikProps } from 'formik';
 import { intersection, set, union } from 'lodash';
 import React from 'react';
 
-import { AccountTag, Application, CheckboxInput, ChecklistInput, FormikFormField, FormValidator, HelpField, IFormInputProps, IWizardPageComponent, LayoutProvider, MapEditorInput, PlatformHealthOverrideInput, robotToHuman, SelectInput, TextInput, useFormInputValueMapper } from '@spinnaker/core';
+import {
+  AccountTag,
+  Application,
+  CheckboxInput,
+  ChecklistInput,
+  FormikFormField,
+  FormValidator,
+  HelpField,
+  IFormInputProps,
+  IWizardPageComponent,
+  LayoutProvider,
+  MapEditorInput,
+  PlatformHealthOverrideInput,
+  robotToHuman,
+  SelectInput,
+  TextInput,
+  useFormInputValueMapper,
+} from '@spinnaker/core';
 
 import { TitusMapLayout } from './TitusMapLayout';
 import { ITitusServerGroupCommand } from '../../../configure/serverGroupConfiguration.service';
@@ -48,7 +65,7 @@ function IPv6CheckboxInput(props: IFormInputProps) {
   const mappedProps = useFormInputValueMapper(
     props,
     (val: string) => val === 'true', // formik -> checkbox
-    (_val, e) => (e.target.checked ? 'true' : undefined), // checkbox -> formik
+    (_val, e) => (e.target.checked ? 'true' : 'false'), // checkbox -> formik
   );
   return <CheckboxInput {...mappedProps} />;
 }

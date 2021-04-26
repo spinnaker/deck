@@ -9,9 +9,11 @@ import { IFilterConfig, IFilterModel } from 'core/filterModel/IFilterModel';
 import { ReactInjector } from 'core/reactShims';
 
 export const filterModelConfig: IFilterConfig[] = [
+  { model: 'awaitingJudgement', type: 'boolean', clearValue: false },
   { model: 'filter', param: 'q', clearValue: '', type: 'string', filterLabel: 'search' },
   { model: 'pipeline', param: 'pipeline', type: 'trueKeyObject', clearValue: {} },
   { model: 'status', type: 'trueKeyObject', clearValue: {} },
+  { model: 'tags', type: 'trueKeyObject', clearValue: {} },
 ];
 
 const GLOBAL_CACHE_KEY = '#global';
