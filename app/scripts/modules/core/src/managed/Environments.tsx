@@ -65,10 +65,29 @@ interface IEnvironmentsProps {
   app: Application;
 }
 
+const featureFlag = 'newMD_UI';
+
 export const Environments: React.FC<IEnvironmentsProps> = (props) => {
   const urlParams = new URLSearchParams(window.location.search);
-  if (urlParams.get('newMD_UI')) {
-    return <EnvironmentsOverview {...props} />;
+  if (urlParams.get(featureFlag)) {
+    localStorage.setItem(featureFlag, '1');
+  }
+  if (localStorage.getItem(featureFlag)) {
+    return (
+      <>
+        <EnvironmentsOverview {...props} />
+        <a
+          href="#"
+          onClick={() => {
+            localStorage.removeItem(featureFlag);
+            window.location.reload();
+          }}
+          style={{ position: 'absolute', bottom: 4, right: 4 }}
+        >
+          Switch to old view
+        </a>
+      </>
+    );
   }
   return <EnvironmentsOld {...props} />;
 };
