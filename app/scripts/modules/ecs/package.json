@@ -1,13 +1,15 @@
 {
   "name": "@spinnaker/ecs",
   "license": "Apache-2.0",
-  "version": "0.0.278",
+  "version": "0.0.282",
   "main": "lib/lib.js",
   "typings": "lib/index.d.ts",
   "scripts": {
     "clean": "../../../../node_modules/.bin/rimraf lib",
     "lib": "npm run build",
     "prepublishOnly": "npm run lib",
-    "build": "npm run clean && ../../../../node_modules/.bin/tsc && node ../../../../node_modules/.bin/webpack"
+    "generate-types": "../../../../node_modules/.bin/tsc --emitDeclarationOnly",
+    "webpack": "node ../../../../node_modules/.bin/webpack",
+    "build": "npm run clean && npm run generate-types && npm run webpack"
   }
 }
