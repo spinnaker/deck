@@ -83,17 +83,11 @@ export class DeploymentStrategySelector extends React.Component<
     this.selectStrategy(this.props.command.strategy, true);
   }
 
-  public onChange = (key: string, value: any) => {
-    this.props.onFieldChange(key, value);
-
-    // This hack is needed to force the component to re-render when the angular deployment-strategy-selector updates the underlying command
-    this.setState({ AdditionalFieldsComponent: this.state.AdditionalFieldsComponent });
-  };
-
   public render() {
-    const { command, fieldColumns, labelColumns } = this.props;
+    const { command, fieldColumns, labelColumns, onFieldChange } = this.props;
     const { AdditionalFieldsComponent, currentStrategy, strategies } = this.state;
     const hasAdditionalFields = Boolean(AdditionalFieldsComponent);
+
     if (strategies && strategies.length) {
       return (
         <div className="form-group">
@@ -116,7 +110,7 @@ export class DeploymentStrategySelector extends React.Component<
           </div>
           {hasAdditionalFields && (
             <div className="col-md-9 col-md-offset-3" style={{ marginTop: '5px' }}>
-              <AdditionalFieldsComponent command={command} onChange={this.onChange} />
+              <AdditionalFieldsComponent command={command} onChange={onFieldChange} />
             </div>
           )}
         </div>

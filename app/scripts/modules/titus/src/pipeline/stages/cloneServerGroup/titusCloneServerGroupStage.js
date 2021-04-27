@@ -95,11 +95,7 @@ module(TITUS_PIPELINE_STAGES_CLONESERVERGROUP_TITUSCLONESERVERGROUPSTAGE, [
       };
 
       this.onRedBlackFieldChange = (key, value) => {
-        if (key === 'rollback.onFailure') {
-          stage.rollback.onFailure = value;
-        } else {
-          stage[key] = value;
-        }
+        _.set(stage, key, value);
       };
     },
   ]);
