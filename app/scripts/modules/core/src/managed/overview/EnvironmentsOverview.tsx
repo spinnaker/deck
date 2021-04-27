@@ -41,7 +41,7 @@ const Environment = ({ environment }: { environment: QueryEnvironment }) => {
           <Artifact key={artifact.reference} artifact={artifact} />
         ))}
       </CollapsibleSection>
-      <CollapsibleSection title="Resources" expandedByDefault>
+      <CollapsibleSection title="Resources">
         {state.resources?.map((resource) => (
           <Resource key={resource.id} resource={resource} />
         ))}
