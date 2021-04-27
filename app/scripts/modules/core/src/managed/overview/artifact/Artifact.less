@@ -1,7 +1,6 @@
 .Artifact {
   .artifact-current-version {
     margin-top: var(--m-spacing);
-    min-width: 0;
     display: flex;
     flex-direction: column;
     background-color: var(--color-alabaster);
@@ -74,10 +73,6 @@
         display: flex;
         flex-direction: row;
         white-space: pre-wrap;
-
-        & > span {
-          flex-shrink: 0;
-        }
       }
 
       .pending-version-constraints {

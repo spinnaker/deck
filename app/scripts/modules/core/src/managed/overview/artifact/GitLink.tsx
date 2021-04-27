@@ -10,8 +10,8 @@ export const GitLink = ({
   gitMetadata: NonNullable<QueryGitMetadata>;
 }) => {
   const link = pullRequest?.link || commitInfo?.link;
-  const sha = commitInfo ? `SHA: ${commitInfo.sha}` : ``;
-  const tooltip = commitInfo?.message ? `${commitInfo?.message}\n\n${sha}` : sha;
+  const sha = commit ? `SHA: ${commit}` : undefined;
+  const tooltip = [sha, commitInfo?.message].filter(Boolean).join('\n\n');
   return (
     <div className="git-link">
       <HoverablePopover
@@ -19,12 +19,9 @@ export const GitLink = ({
         placement="top"
         Component={() => <Markdown className="git-commit-tooltip" message={tooltip} />}
       >
-        <div className="git-commit-message-sha">
-          <a href={link || '#'} target="_blank" rel="noopener noreferrer">
-            {commit}
-            {commitInfo?.message && `:`} {commitInfo?.message}
-          </a>
-        </div>
+        <a href={link || '#'} target="_blank" rel="noopener noreferrer">
+          {commitInfo?.message || commit}
+        </a>
       </HoverablePopover>
     </div>
   );

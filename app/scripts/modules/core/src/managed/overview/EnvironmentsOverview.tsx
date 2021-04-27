@@ -2,9 +2,9 @@ import React from 'react';
 
 import { Application } from 'core/index';
 
-import { Artifact } from './Artifact/Artifact';
 import { CollapsibleSection } from './CollapsibleSection';
 import { Resource } from './Resource';
+import { Artifact } from './artifact/Artifact';
 import { useFetchApplicationQuery } from '../graphql/graphql-sdk';
 import { QueryEnvironment } from './types';
 
