@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/array-type */
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
-export type Maybe<T> = T | null;
+export type Maybe<T> = T | undefined;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
@@ -13,7 +13,8 @@ export interface Scalars {
   Boolean: boolean;
   Int: number;
   Float: number;
-  InstantTime: Date;
+  InstantTime: string;
+  JSON: any;
 }
 
 export interface DgsApplication {
@@ -49,7 +50,9 @@ export type DgsArtifactStatusInEnvironment =
 export interface DgsArtifactVersionInEnvironment {
   __typename?: 'DgsArtifactVersionInEnvironment';
   version: Scalars['String'];
-  createdAt?: Maybe<Scalars['String']>;
+  buildNumber?: Maybe<Scalars['String']>;
+  createdAt?: Maybe<Scalars['InstantTime']>;
+  deployedAt?: Maybe<Scalars['InstantTime']>;
   resources?: Maybe<Array<DgsResource>>;
   gitMetadata?: Maybe<DgsGitMetadata>;
   environment?: Maybe<Scalars['String']>;
@@ -57,6 +60,7 @@ export interface DgsArtifactVersionInEnvironment {
   status?: Maybe<DgsArtifactStatusInEnvironment>;
   lifecycleSteps?: Maybe<Array<DgsLifecycleStep>>;
   constraints?: Maybe<Array<DgsConstraint>>;
+  verifications?: Maybe<Array<DgsVerification>>;
 }
 
 export interface DgsCommitInfo {
@@ -74,7 +78,7 @@ export interface DgsConstraint {
   judgedAt?: Maybe<Scalars['InstantTime']>;
   judgedBy?: Maybe<Scalars['String']>;
   comment?: Maybe<Scalars['String']>;
-  attributes?: Maybe<Scalars['String']>;
+  attributes?: Maybe<Scalars['JSON']>;
 }
 
 export type DgsConstraintStatus = 'NOT_EVALUATED' | 'PENDING' | 'PASS' | 'FAIL' | 'OVERRIDE_PASS' | 'OVERRIDE_FAIL';
@@ -87,7 +91,6 @@ export interface DgsEnvironment {
 
 export interface DgsEnvironmentState {
   __typename?: 'DgsEnvironmentState';
-  version: Scalars['String'];
   resources?: Maybe<Array<DgsResource>>;
   artifacts?: Maybe<Array<DgsArtifact>>;
 }
@@ -103,22 +106,36 @@ export interface DgsGitMetadata {
   commitInfo?: Maybe<DgsCommitInfo>;
 }
 
+export type DgsLifecycleEventScope = 'PRE_DEPLOYMENT';
+
+export type DgsLifecycleEventStatus = 'NOT_STARTED' | 'RUNNING' | 'SUCCEEDED' | 'FAILED' | 'ABORTED' | 'UNKNOWN';
+
+export type DgsLifecycleEventType = 'BAKE' | 'BUILD';
+
 export interface DgsLifecycleStep {
   __typename?: 'DgsLifecycleStep';
-  scope: Scalars['String'];
-  type: Scalars['String'];
+  scope?: Maybe<DgsLifecycleEventScope>;
+  type: DgsLifecycleEventType;
   id?: Maybe<Scalars['String']>;
-  status: Scalars['String'];
+  status: DgsLifecycleEventStatus;
   text?: Maybe<Scalars['String']>;
   link?: Maybe<Scalars['String']>;
-  startedAt?: Maybe<Scalars['String']>;
-  completedAt?: Maybe<Scalars['String']>;
+  startedAt?: Maybe<Scalars['InstantTime']>;
+  completedAt?: Maybe<Scalars['InstantTime']>;
   artifactVersion?: Maybe<Scalars['String']>;
 }
 
 export interface DgsLocation {
   __typename?: 'DgsLocation';
+  account?: Maybe<Scalars['String']>;
   regions?: Maybe<Array<Scalars['String']>>;
+}
+
+export interface DgsMoniker {
+  __typename?: 'DgsMoniker';
+  app?: Maybe<Scalars['String']>;
+  stack?: Maybe<Scalars['String']>;
+  detail?: Maybe<Scalars['String']>;
 }
 
 export interface DgsPinnedVersion {
@@ -126,7 +143,7 @@ export interface DgsPinnedVersion {
   name: Scalars['String'];
   reference: Scalars['String'];
   version: Scalars['String'];
-  pinnedAt?: Maybe<Scalars['String']>;
+  pinnedAt?: Maybe<Scalars['InstantTime']>;
   pinnedBy?: Maybe<Scalars['String']>;
   comment?: Maybe<Scalars['String']>;
 }
@@ -141,19 +158,35 @@ export interface DgsResource {
   __typename?: 'DgsResource';
   id: Scalars['String'];
   kind: Scalars['String'];
-  status?: Maybe<Scalars['String']>;
+  moniker?: Maybe<DgsMoniker>;
+  status?: Maybe<DgsResourceStatus>;
   artifact?: Maybe<DgsArtifact>;
   displayName?: Maybe<Scalars['String']>;
   location?: Maybe<DgsLocation>;
 }
+
+export type DgsResourceStatus =
+  | 'CREATED'
+  | 'DIFF'
+  | 'ACTUATING'
+  | 'HAPPY'
+  | 'UNHAPPY'
+  | 'MISSING_DEPENDENCY'
+  | 'CURRENTLY_UNRESOLVABLE'
+  | 'ERROR'
+  | 'PAUSED'
+  | 'RESUMED'
+  | 'UNKNOWN'
+  | 'DIFF_NOT_ACTIONABLE'
+  | 'WAITING';
 
 export interface DgsVerification {
   __typename?: 'DgsVerification';
   id: Scalars['String'];
   type: Scalars['String'];
   status?: Maybe<DgsConstraintStatus>;
-  startedAt?: Maybe<Scalars['String']>;
-  completedAt?: Maybe<Scalars['String']>;
+  startedAt?: Maybe<Scalars['InstantTime']>;
+  completedAt?: Maybe<Scalars['InstantTime']>;
   link?: Maybe<Scalars['String']>;
 }
 
@@ -183,7 +216,7 @@ export type FetchApplicationQuery = { __typename?: 'Query' } & {
                           Array<
                             { __typename?: 'DgsArtifactVersionInEnvironment' } & Pick<
                               DgsArtifactVersionInEnvironment,
-                              'version' | 'createdAt' | 'status'
+                              'buildNumber' | 'version' | 'createdAt' | 'status' | 'deployedAt'
                             > & {
                                 gitMetadata?: Maybe<
                                   { __typename?: 'DgsGitMetadata' } & Pick<
@@ -201,6 +234,22 @@ export type FetchApplicationQuery = { __typename?: 'Query' } & {
                                       >;
                                     }
                                 >;
+                                lifecycleSteps?: Maybe<
+                                  Array<
+                                    { __typename?: 'DgsLifecycleStep' } & Pick<
+                                      DgsLifecycleStep,
+                                      'startedAt' | 'completedAt' | 'type' | 'status'
+                                    >
+                                  >
+                                >;
+                                constraints?: Maybe<
+                                  Array<
+                                    { __typename?: 'DgsConstraint' } & Pick<
+                                      DgsConstraint,
+                                      'type' | 'status' | 'attributes'
+                                    >
+                                  >
+                                >;
                               }
                           >
                         >;
@@ -213,9 +262,8 @@ export type FetchApplicationQuery = { __typename?: 'Query' } & {
                 resources?: Maybe<
                   Array<
                     { __typename?: 'DgsResource' } & Pick<DgsResource, 'id' | 'kind' | 'status' | 'displayName'> & {
-                        artifact?: Maybe<
-                          { __typename?: 'DgsArtifact' } & Pick<DgsArtifact, 'name' | 'type' | 'reference'>
-                        >;
+                        moniker?: Maybe<{ __typename?: 'DgsMoniker' } & Pick<DgsMoniker, 'app' | 'stack' | 'detail'>>;
+                        location?: Maybe<{ __typename?: 'DgsLocation' } & Pick<DgsLocation, 'regions'>>;
                       }
                   >
                 >;
@@ -239,6 +287,7 @@ export const FetchApplicationDocument = gql`
             type
             reference
             versions(statuses: [PENDING, APPROVED, DEPLOYING, CURRENT]) {
+              buildNumber
               version
               createdAt
               status
@@ -256,6 +305,18 @@ export const FetchApplicationDocument = gql`
                   link
                 }
               }
+              deployedAt
+              lifecycleSteps {
+                startedAt
+                completedAt
+                type
+                status
+              }
+              constraints {
+                type
+                status
+                attributes
+              }
             }
             pinnedVersion {
               name
@@ -267,10 +328,13 @@ export const FetchApplicationDocument = gql`
             kind
             status
             displayName
-            artifact {
-              name
-              type
-              reference
+            moniker {
+              app
+              stack
+              detail
+            }
+            location {
+              regions
             }
           }
         }

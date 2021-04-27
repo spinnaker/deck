@@ -13,6 +13,7 @@ import { Application, ApplicationDataSource } from '../application';
 import { ArtifactDetail } from './artifactDetail/ArtifactDetail';
 import { ArtifactsList } from './artifactsList/ArtifactsList';
 import { IManagedApplicationEnvironmentSummary, IManagedResourceSummary } from '../domain';
+import { EnvironmentsOverview } from './overview/EnvironmentsOverview';
 import { useDataSource } from '../presentation/hooks';
 
 import './Environments.less';
@@ -64,7 +65,15 @@ interface IEnvironmentsProps {
   app: Application;
 }
 
-export const Environments: React.FC<IEnvironmentsProps> = ({ app }) => {
+export const Environments: React.FC<IEnvironmentsProps> = (props) => {
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('newMD_UI')) {
+    return <EnvironmentsOverview {...props} />;
+  }
+  return <EnvironmentsOld {...props} />;
+};
+
+export const EnvironmentsOld: React.FC<IEnvironmentsProps> = ({ app }) => {
   const dataSource: ApplicationDataSource<IManagedApplicationEnvironmentSummary> = app.getDataSource('environments');
   const {
     data: { environments, artifacts, resources },
