@@ -10,6 +10,7 @@ query fetchApplication($appName: String!) {
           type
           reference
           versions(statuses: [PENDING, APPROVED, DEPLOYING, CURRENT]) {
+            buildNumber
             version
             createdAt
             status
@@ -27,6 +28,18 @@ query fetchApplication($appName: String!) {
                 link
               }
             }
+            deployedAt
+            lifecycleSteps {
+              startedAt
+              completedAt
+              type
+              status
+            }
+            constraints {
+              type
+              status
+              attributes
+            }
           }
           pinnedVersion {
             name
@@ -38,10 +51,13 @@ query fetchApplication($appName: String!) {
           kind
           status
           displayName
-          artifact {
-            name
-            type
-            reference
+          moniker {
+            app
+            stack
+            detail
+          }
+          location {
+            regions
           }
         }
       }

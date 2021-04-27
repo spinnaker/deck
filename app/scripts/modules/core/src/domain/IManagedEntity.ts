@@ -46,7 +46,7 @@ export interface IManualJudgementConstraint extends IBaseConstraint {
   type: 'manual-judgement';
 }
 
-export type IConstraint = IManualJudgementConstraint | IDependsOnConstraint | IAllowedTimesConstraint;
+export type IConstraint = IBaseConstraint | IManualJudgementConstraint | IDependsOnConstraint | IAllowedTimesConstraint;
 
 export interface IManagedResourceSummary {
   id: string;

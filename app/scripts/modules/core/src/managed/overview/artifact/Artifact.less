@@ -1,0 +1,98 @@
+.Artifact {
+  .artifact-current-version {
+    margin-top: var(--m-spacing);
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-alabaster);
+    padding: var(--s-spacing);
+    border-radius: 5px;
+  }
+
+  .artifact-pending-versions {
+    margin-top: var(--l-spacing);
+    padding-left: var(--xs-spacing);
+    position: relative;
+
+    .artifact-pending-version {
+      display: flex;
+      flex-direction: column;
+      padding-right: var(--l-spacing);
+      border-radius: 5px;
+      position: relative;
+      padding-left: 48px;
+
+      &:not(:last-of-type) {
+        padding-bottom: var(--l-spacing);
+      }
+
+      // Line
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 24px;
+        height: 100%;
+        border-left: 2px solid var(--color-accent-g2);
+      }
+
+      // circle
+      &::after {
+        content: '';
+        position: absolute;
+        top: 4px;
+        left: 20px;
+        width: 10px;
+        height: 10px;
+        background: var(--color-accent-g2);
+        border-radius: 50%;
+      }
+
+      &:last-of-type {
+        &::before {
+          height: 4px;
+        }
+      }
+
+      &:first-of-type {
+        &::before {
+          top: 4px;
+        }
+      }
+
+      .artifact-pending-version-timestamp {
+        position: absolute;
+        // Align the right side of the text
+        right: calc(100% - 10px);
+        top: 0px;
+        white-space: nowrap;
+        color: var(--color-concrete);
+      }
+
+      .artifact-pending-version-commit {
+        font-weight: 600;
+        display: flex;
+        flex-direction: row;
+        white-space: pre-wrap;
+
+        & > span {
+          flex-shrink: 0;
+        }
+      }
+
+      .pending-version-constraints {
+        margin-top: var(--s-spacing);
+
+        .pending-version-constraint {
+          display: grid;
+          grid-template-columns: 20px auto;
+          align-items: center;
+
+          & > i {
+            font-size: 12px;
+          }
+        }
+      }
+    }
+  }
+}
