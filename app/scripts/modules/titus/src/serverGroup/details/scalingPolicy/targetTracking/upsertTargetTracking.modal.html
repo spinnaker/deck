@@ -54,17 +54,13 @@
 
         <div class="row">
           <div class="col-md-10 col-md-offset-1">
-            <div style="height: 220px">
+            <div>
               <target-tracking-chart
                 config="$ctrl.command.targetTrackingConfiguration"
                 alarm-updated="$ctrl.alarmUpdated"
                 state="$ctrl.state"
                 server-group="$ctrl.alarmServerGroup"
               ></target-tracking-chart>
-              <div class="small help-contents" style="margin-left: 45px">
-                <b>Note:</b> to zoom in, hold down the alt key and use your mouse to select an area. Double-click to
-                zoom back out.
-              </div>
             </div>
           </div>
         </div>
@@ -81,15 +77,15 @@
                   ng-model="$ctrl.command.targetTrackingConfiguration.disableScaleIn"
                   ng-change="$ctrl.scaleInChanged()"
                 />
-                Disable Scale In Events
+                Disable Scale-downs
               </label>
               <div class="small" style="margin-top: 5px">
                 <p>
-                  This option disables scale in events for the target tracking policy, while keeping the scale out
-                  events. This means that ASG will not scale in unless you explicitly set up a separate step policy to
-                  scale it in.
+                  This option disables scale-downs for the target tracking policy, while keeping the scale-ups. This
+                  means that Server Group will not scale down unless you explicitly set up a separate step policy to
+                  scale it down.
                 </p>
-                <p>This is useful when you have special requirements, such as gradual or delayed scale in.</p>
+                <p>This is useful when you have special requirements, such as gradual or delayed scale-down.</p>
               </div>
             </div>
           </div>
