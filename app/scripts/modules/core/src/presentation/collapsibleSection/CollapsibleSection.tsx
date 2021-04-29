@@ -1,13 +1,16 @@
+import cx from 'classnames';
 import React from 'react';
 
 import { CollapsibleSectionStateCache } from 'core/cache';
+import { Icon } from 'core/index';
 
 export interface ICollapsibleSectionProps {
   outerDivClassName?: string;
   toggleClassName?: string;
   headingClassName?: string;
   bodyClassName?: string;
-
+  useGlyphiconChevron?: boolean;
+  chevronColor?: string;
   cacheKey?: string;
   defaultExpanded?: boolean;
   heading: ((props: { chevron: JSX.Element }) => JSX.Element) | string;
@@ -19,12 +22,13 @@ export interface ICollapsibleSectionState {
 }
 
 export class CollapsibleSection extends React.Component<ICollapsibleSectionProps, ICollapsibleSectionState> {
-  public static defaultProps = {
+  public static defaultProps: Partial<ICollapsibleSectionProps> = {
     outerDivClassName: 'collapsible-section',
     toggleClassName: 'clickable section-heading',
     headingClassName: 'collapsible-heading',
     bodyClassName: 'content-body',
     cacheKey: undefined as string,
+    useGlyphiconChevron: true,
   };
 
   constructor(props: ICollapsibleSectionProps) {
@@ -45,15 +49,31 @@ export class CollapsibleSection extends React.Component<ICollapsibleSectionProps
   };
 
   public render() {
-    const { outerDivClassName, toggleClassName, headingClassName, bodyClassName, children, heading } = this.props;
+    const {
+      outerDivClassName,
+      toggleClassName,
+      headingClassName,
+      bodyClassName,
+      children,
+      heading,
+      useGlyphiconChevron,
+      chevronColor,
+    } = this.props;
     const { expanded } = this.state;
 
-    const chevronStyle = {
-      transform: `rotate(${expanded ? 90 : 0}deg)`,
-      transition: 'transform 0.15s ease',
-    };
-
-    const chevron = <span className="glyphicon glyphicon-chevron-right" style={chevronStyle} />;
+    const chevron = useGlyphiconChevron ? (
+      <span
+        className="glyphicon glyphicon-chevron-right section-heading-chevron"
+        style={{ transform: `rotate(${expanded ? 90 : 0}deg)`, color: chevronColor }}
+      />
+    ) : (
+      <Icon
+        name="accordionCollapse"
+        size="16px"
+        className={cx(['section-heading-chevron', { 'rotated-90': !expanded }])}
+        color={chevronColor || 'concrete'}
+      />
+    );
     const Heading =
       typeof heading === 'string' ? (
         <h4 className={headingClassName}>
