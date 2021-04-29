@@ -1,7 +1,7 @@
 .environment-row-element {
   display: grid;
   grid-template-columns: [icon] 40px [details] 1fr;
-  padding: var(--xl-spacing) var(--base-horizontal-padding);
+  padding: var(--l-spacing) var(--base-horizontal-padding) var(--s-spacing) var(--base-horizontal-padding);
 
   .row-details {
     grid-column: details;
@@ -35,16 +35,18 @@
     color: var(--color-concrete);
     white-space: pre-wrap;
 
-    .metatdata-separator {
-      margin: 0 6px;
+    .metadata-element {
+      display: flex;
+
+      &:not(:first-of-type)::before {
+        content: '•';
+        margin: 0 6px;
+      }
     }
 
     .metadata-icon {
       margin-right: 6px;
-
-      & > div {
-        display: flex;
-      }
+      display: flex;
     }
   }
 
