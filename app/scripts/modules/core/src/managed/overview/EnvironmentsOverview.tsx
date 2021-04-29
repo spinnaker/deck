@@ -1,8 +1,7 @@
 import React from 'react';
 
-import { Application } from 'core/index';
+import { Application, CollapsibleSection, ICollapsibleSectionProps } from 'core/index';
 
-import { CollapsibleSection } from './CollapsibleSection';
 import { Resource } from './Resource';
 import { Artifact } from './artifact/Artifact';
 import { useFetchApplicationQuery } from '../graphql/graphql-sdk';
@@ -31,17 +30,23 @@ export const EnvironmentsOverview = ({ app }: IEnvironmentsProps) => {
   );
 };
 
+const sectionProps: Partial<ICollapsibleSectionProps> = {
+  outerDivClassName: 'environment-section',
+  headingClassName: 'environment-section-heading',
+  useGlyphiconChevron: false,
+};
+
 const Environment = ({ environment }: { environment: QueryEnvironment }) => {
   const state = environment.state;
   return (
     <section className="Environment">
       <EnvironmentTitle title={environment.name} />
-      <CollapsibleSection title="Artifacts" expandedByDefault>
+      <CollapsibleSection heading="Artifacts" {...sectionProps} defaultExpanded>
         {state.artifacts?.map((artifact) => (
           <Artifact key={artifact.reference} artifact={artifact} />
         ))}
       </CollapsibleSection>
-      <CollapsibleSection title="Resources">
+      <CollapsibleSection heading="Resources" {...sectionProps}>
         {state.resources?.map((resource) => (
           <Resource key={resource.id} resource={resource} />
         ))}
