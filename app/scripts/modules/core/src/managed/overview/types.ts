@@ -10,4 +10,4 @@ export type QueryArtifactVersion = NonNullable<QueryArtifact['versions']>[number
 export type QueryLifecycleStep = NonNullable<QueryArtifactVersion['lifecycleSteps']>[number];
 
 export type QueryGitMetadata = QueryArtifactVersion['gitMetadata'];
-export type QueryConstraints = NonNullable<QueryArtifactVersion['constraints']>[number];
+export type QueryConstraint = NonNullable<QueryArtifactVersion['constraints']>[number];

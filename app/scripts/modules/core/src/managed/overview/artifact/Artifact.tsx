@@ -8,6 +8,7 @@ import { PendingVersion } from './PendingVersion';
 import { VersionMetadata } from './VersionMetadata';
 import { QueryArtifact, QueryArtifactVersion } from '../types';
 import { getLifecycleEventDuration } from './utils';
+import { TOOLTIP_DELAY } from '../../utils/defaults';
 
 import './Artifact.less';
 
@@ -33,14 +34,14 @@ const hasCreatedAt = (version: QueryArtifactVersion): version is RequiredKeys<Qu
 };
 
 const filterVersionNewerThanCurrent = (versions: QueryArtifact['versions'], currentVersion?: QueryArtifactVersion) => {
-  if (!currentVersion?.deployedAt) {
+  if (!currentVersion?.createdAt) {
     // Everything is newer than current
     return versions;
   }
-  const currentVersionDeployedAt = new Date(currentVersion.deployedAt);
+  const currentVersionCreatedAt = new Date(currentVersion.createdAt);
   const newerVersions = versions
     ?.filter(hasCreatedAt)
-    ?.filter((version) => new Date(version.createdAt) > currentVersionDeployedAt);
+    ?.filter((version) => new Date(version.createdAt) > currentVersionCreatedAt);
   // Sort from newest to oldest
   return sortBy(newerVersions || [], (version) => -1 * new Date(version.createdAt).getTime());
 };
@@ -51,16 +52,26 @@ export const Artifact = ({ artifact }: { artifact: QueryArtifact }) => {
   return (
     <div className="Artifact environment-row-element">
       <div className="row-icon">
-        <IconTooltip tooltip={`Artifact - ${artifact.type}`} name="artifact" color="primary-g1" />
+        <IconTooltip
+          tooltip={`Artifact - ${artifact.type}`}
+          name="artifact"
+          color="primary-g1"
+          delayShow={TOOLTIP_DELAY}
+        />
       </div>
       <div className="row-details">
         <div className="row-title">{artifact.reference}</div>
         {currentVersion ? <CurrentVersion data={currentVersion} /> : <div>No version is deployed</div>}
-        <div className="artifact-pending-versions">
-          {newerVersions?.map((version) => (
-            <PendingVersion key={version.version} data={version} />
-          ))}
-        </div>
+        {newerVersions?.length ? (
+          <section className="artifact-pending-versions">
+            <div className="artifact-pending-versions-title">Pending Versions</div>
+            <div>
+              {newerVersions?.map((version) => (
+                <PendingVersion key={version.version} data={version} />
+              ))}
+            </div>
+          </section>
+        ) : undefined}
       </div>
     </div>
   );

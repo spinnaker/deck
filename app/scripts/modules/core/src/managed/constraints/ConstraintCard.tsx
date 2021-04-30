@@ -24,6 +24,7 @@ const constraintCardAppearanceByStatus: { [key in ConstraintStatus]: IStatusCard
   FAIL: 'error',
   OVERRIDE_PASS: 'neutral',
   OVERRIDE_FAIL: 'error',
+  FORCE_PASS: 'neutral',
 } as const;
 
 const skippedConstraintCardAppearanceByStatus: { [key in ConstraintStatus]: IStatusCardProps['appearance'] } = {
@@ -33,6 +34,7 @@ const skippedConstraintCardAppearanceByStatus: { [key in ConstraintStatus]: ISta
   FAIL: 'neutral',
   OVERRIDE_PASS: 'neutral',
   OVERRIDE_FAIL: 'neutral',
+  FORCE_PASS: 'neutral',
 } as const;
 
 const logEvent = (label: string, application: string, environment: string, reference: string) =>
