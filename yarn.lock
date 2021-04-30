@@ -3178,10 +3178,10 @@
   dependencies:
     lodash "^4.17.20"
 
-"@spinnaker/kayenta@1.0.5":
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/@spinnaker/kayenta/-/kayenta-1.0.5.tgz#ef5200cbbf8be552fbd800935e0fd8b86eff577a"
-  integrity sha512-yCoDmnl/NqL6tTyXsRYGFBsonopAPAst/VQSGp3fUyjaf1hnYvGwZlTSPTAN1XzzeiEJg3PjIFTIyqb79uikjQ==
+"@spinnaker/kayenta@2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@spinnaker/kayenta/-/kayenta-2.0.0.tgz#0fc18a641ee2577c21c0bdf5eb24ac1a5ab1caf5"
+  integrity sha512-h0Vu1X6wXBJwqXfrosc4d3DbyWuv7u7cSfMAt+BPFcbu3qU9Ua2TF9jSGRcMvI0Vo3C+fC+HxufvKJh7ZQ83vg==
   dependencies:
     "@uirouter/core" "6.0.4"
     "@uirouter/react" "1.0.2"
@@ -3229,14 +3229,14 @@
   resolved "https://registry.yarnpkg.com/@spinnaker/mocks/-/mocks-1.0.7.tgz#3e30fde4d691b310910e7fa5201c7424609042c0"
   integrity sha512-WXoNtZoFZFNDTrckCbbTShxoRN088IN+awWweNNv89EU4GsMX8HnnG/9J6N9rAt0R3ZgzhJmaNG06/JHHBzxEw==
 
-"@spinnaker/presentation@^0.0.4":
+"@spinnaker/presentation@0.0.4":
   version "0.0.4"
   resolved "https://registry.yarnpkg.com/@spinnaker/presentation/-/presentation-0.0.4.tgz#021ea6336a729a6af9126fbdf2564c2fb37dc65c"
   integrity sha512-IOdtVnRGAHayJjPOUAXw7jqE2FtVheguwHR+Ztq1lQxW4LUsBDb4Ti2xB44qvtMxfmqAlYr9OLOTl2RY8jYPDw==
   dependencies:
     formik "^1.4.1"
 
-"@spinnaker/styleguide@^1.0.22":
+"@spinnaker/styleguide@1.0.22":
   version "1.0.22"
   resolved "https://registry.yarnpkg.com/@spinnaker/styleguide/-/styleguide-1.0.22.tgz#84b5523deb110eb02d5a511cf6b24ee8a5cb318b"
   integrity sha512-/K+sF8AFmuShbFABkg57/VWNu6S8PBaYZUsGv1XF0TR1kPN6P/NcHbr6223EuyRQpArPKN7RMqmgxg5CcXzutQ==
