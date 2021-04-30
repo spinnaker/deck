@@ -1,15 +1,21 @@
 query fetchApplication($appName: String!) {
   application(appName: $appName) {
+    id
     name
     account
     environments {
+      id
       name
       state {
+        id
         artifacts {
+          id
           name
+          environment
           type
           reference
           versions(statuses: [PENDING, APPROVED, DEPLOYING, CURRENT]) {
+            id
             buildNumber
             version
             createdAt
@@ -49,7 +55,6 @@ query fetchApplication($appName: String!) {
         resources {
           id
           kind
-          status
           displayName
           moniker {
             app
@@ -59,6 +64,25 @@ query fetchApplication($appName: String!) {
           location {
             regions
           }
+        }
+      }
+    }
+  }
+}
+
+query fetchResourceStatus($appName: String!) {
+  application(appName: $appName) {
+    id
+    name
+    environments {
+      id
+      name
+      state {
+        id
+        resources {
+          id
+          kind
+          status
         }
       }
     }

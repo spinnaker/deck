@@ -19,6 +19,7 @@ export interface Scalars {
 
 export interface DgsApplication {
   __typename?: 'DgsApplication';
+  id: Scalars['String'];
   name: Scalars['String'];
   account: Scalars['String'];
   environments: Array<DgsEnvironment>;
@@ -26,6 +27,7 @@ export interface DgsApplication {
 
 export interface DgsArtifact {
   __typename?: 'DgsArtifact';
+  id: Scalars['String'];
   environment: Scalars['String'];
   name: Scalars['String'];
   type: Scalars['String'];
@@ -49,6 +51,7 @@ export type DgsArtifactStatusInEnvironment =
 
 export interface DgsArtifactVersionInEnvironment {
   __typename?: 'DgsArtifactVersionInEnvironment';
+  id: Scalars['String'];
   version: Scalars['String'];
   buildNumber?: Maybe<Scalars['String']>;
   createdAt?: Maybe<Scalars['InstantTime']>;
@@ -81,16 +84,18 @@ export interface DgsConstraint {
   attributes?: Maybe<Scalars['JSON']>;
 }
 
-export type DgsConstraintStatus = 'NOT_EVALUATED' | 'PENDING' | 'PASS' | 'FAIL' | 'OVERRIDE_PASS' | 'OVERRIDE_FAIL';
+export type DgsConstraintStatus = 'PENDING' | 'PASS' | 'FAIL' | 'FORCE_PASS';
 
 export interface DgsEnvironment {
   __typename?: 'DgsEnvironment';
+  id: Scalars['String'];
   name: Scalars['String'];
   state: DgsEnvironmentState;
 }
 
 export interface DgsEnvironmentState {
   __typename?: 'DgsEnvironmentState';
+  id: Scalars['String'];
   resources?: Maybe<Array<DgsResource>>;
   artifacts?: Maybe<Array<DgsArtifact>>;
 }
@@ -140,9 +145,12 @@ export interface DgsMoniker {
 
 export interface DgsPinnedVersion {
   __typename?: 'DgsPinnedVersion';
+  id: Scalars['String'];
   name: Scalars['String'];
   reference: Scalars['String'];
   version: Scalars['String'];
+  gitMetadata?: Maybe<DgsGitMetadata>;
+  buildNumber?: Maybe<Scalars['String']>;
   pinnedAt?: Maybe<Scalars['InstantTime']>;
   pinnedBy?: Maybe<Scalars['String']>;
   comment?: Maybe<Scalars['String']>;
@@ -205,69 +213,92 @@ export type FetchApplicationQueryVariables = Exact<{
 
 export type FetchApplicationQuery = { __typename?: 'Query' } & {
   application?: Maybe<
-    { __typename?: 'DgsApplication' } & Pick<DgsApplication, 'name' | 'account'> & {
+    { __typename?: 'DgsApplication' } & Pick<DgsApplication, 'id' | 'name' | 'account'> & {
         environments: Array<
-          { __typename?: 'DgsEnvironment' } & Pick<DgsEnvironment, 'name'> & {
-              state: { __typename?: 'DgsEnvironmentState' } & {
-                artifacts?: Maybe<
-                  Array<
-                    { __typename?: 'DgsArtifact' } & Pick<DgsArtifact, 'name' | 'type' | 'reference'> & {
-                        versions?: Maybe<
-                          Array<
-                            { __typename?: 'DgsArtifactVersionInEnvironment' } & Pick<
-                              DgsArtifactVersionInEnvironment,
-                              'buildNumber' | 'version' | 'createdAt' | 'status' | 'deployedAt'
-                            > & {
-                                gitMetadata?: Maybe<
-                                  { __typename?: 'DgsGitMetadata' } & Pick<
-                                    DgsGitMetadata,
-                                    'commit' | 'author' | 'branch'
-                                  > & {
-                                      commitInfo?: Maybe<
-                                        { __typename?: 'DgsCommitInfo' } & Pick<
-                                          DgsCommitInfo,
-                                          'sha' | 'link' | 'message'
-                                        >
-                                      >;
-                                      pullRequest?: Maybe<
-                                        { __typename?: 'DgsPullRequest' } & Pick<DgsPullRequest, 'number' | 'link'>
-                                      >;
-                                    }
-                                >;
-                                lifecycleSteps?: Maybe<
-                                  Array<
-                                    { __typename?: 'DgsLifecycleStep' } & Pick<
-                                      DgsLifecycleStep,
-                                      'startedAt' | 'completedAt' | 'type' | 'status'
+          { __typename?: 'DgsEnvironment' } & Pick<DgsEnvironment, 'id' | 'name'> & {
+              state: { __typename?: 'DgsEnvironmentState' } & Pick<DgsEnvironmentState, 'id'> & {
+                  artifacts?: Maybe<
+                    Array<
+                      { __typename?: 'DgsArtifact' } & Pick<
+                        DgsArtifact,
+                        'id' | 'name' | 'environment' | 'type' | 'reference'
+                      > & {
+                          versions?: Maybe<
+                            Array<
+                              { __typename?: 'DgsArtifactVersionInEnvironment' } & Pick<
+                                DgsArtifactVersionInEnvironment,
+                                'id' | 'buildNumber' | 'version' | 'createdAt' | 'status' | 'deployedAt'
+                              > & {
+                                  gitMetadata?: Maybe<
+                                    { __typename?: 'DgsGitMetadata' } & Pick<
+                                      DgsGitMetadata,
+                                      'commit' | 'author' | 'branch'
+                                    > & {
+                                        commitInfo?: Maybe<
+                                          { __typename?: 'DgsCommitInfo' } & Pick<
+                                            DgsCommitInfo,
+                                            'sha' | 'link' | 'message'
+                                          >
+                                        >;
+                                        pullRequest?: Maybe<
+                                          { __typename?: 'DgsPullRequest' } & Pick<DgsPullRequest, 'number' | 'link'>
+                                        >;
+                                      }
+                                  >;
+                                  lifecycleSteps?: Maybe<
+                                    Array<
+                                      { __typename?: 'DgsLifecycleStep' } & Pick<
+                                        DgsLifecycleStep,
+                                        'startedAt' | 'completedAt' | 'type' | 'status'
+                                      >
                                     >
-                                  >
-                                >;
-                                constraints?: Maybe<
-                                  Array<
-                                    { __typename?: 'DgsConstraint' } & Pick<
-                                      DgsConstraint,
-                                      'type' | 'status' | 'attributes'
+                                  >;
+                                  constraints?: Maybe<
+                                    Array<
+                                      { __typename?: 'DgsConstraint' } & Pick<
+                                        DgsConstraint,
+                                        'type' | 'status' | 'attributes'
+                                      >
                                     >
-                                  >
-                                >;
-                              }
-                          >
-                        >;
-                        pinnedVersion?: Maybe<
-                          { __typename?: 'DgsPinnedVersion' } & Pick<DgsPinnedVersion, 'name' | 'reference'>
-                        >;
-                      }
-                  >
-                >;
-                resources?: Maybe<
-                  Array<
-                    { __typename?: 'DgsResource' } & Pick<DgsResource, 'id' | 'kind' | 'status' | 'displayName'> & {
-                        moniker?: Maybe<{ __typename?: 'DgsMoniker' } & Pick<DgsMoniker, 'app' | 'stack' | 'detail'>>;
-                        location?: Maybe<{ __typename?: 'DgsLocation' } & Pick<DgsLocation, 'regions'>>;
-                      }
-                  >
-                >;
-              };
+                                  >;
+                                }
+                            >
+                          >;
+                          pinnedVersion?: Maybe<
+                            { __typename?: 'DgsPinnedVersion' } & Pick<DgsPinnedVersion, 'name' | 'reference'>
+                          >;
+                        }
+                    >
+                  >;
+                  resources?: Maybe<
+                    Array<
+                      { __typename?: 'DgsResource' } & Pick<DgsResource, 'id' | 'kind' | 'displayName'> & {
+                          moniker?: Maybe<{ __typename?: 'DgsMoniker' } & Pick<DgsMoniker, 'app' | 'stack' | 'detail'>>;
+                          location?: Maybe<{ __typename?: 'DgsLocation' } & Pick<DgsLocation, 'regions'>>;
+                        }
+                    >
+                  >;
+                };
+            }
+        >;
+      }
+  >;
+};
+
+export type FetchResourceStatusQueryVariables = Exact<{
+  appName: Scalars['String'];
+}>;
+
+export type FetchResourceStatusQuery = { __typename?: 'Query' } & {
+  application?: Maybe<
+    { __typename?: 'DgsApplication' } & Pick<DgsApplication, 'id' | 'name'> & {
+        environments: Array<
+          { __typename?: 'DgsEnvironment' } & Pick<DgsEnvironment, 'id' | 'name'> & {
+              state: { __typename?: 'DgsEnvironmentState' } & Pick<DgsEnvironmentState, 'id'> & {
+                  resources?: Maybe<
+                    Array<{ __typename?: 'DgsResource' } & Pick<DgsResource, 'id' | 'kind' | 'status'>>
+                  >;
+                };
             }
         >;
       }
@@ -277,16 +308,22 @@ export type FetchApplicationQuery = { __typename?: 'Query' } & {
 export const FetchApplicationDocument = gql`
   query fetchApplication($appName: String!) {
     application(appName: $appName) {
+      id
       name
       account
       environments {
+        id
         name
         state {
+          id
           artifacts {
+            id
             name
+            environment
             type
             reference
             versions(statuses: [PENDING, APPROVED, DEPLOYING, CURRENT]) {
+              id
               buildNumber
               version
               createdAt
@@ -326,7 +363,6 @@ export const FetchApplicationDocument = gql`
           resources {
             id
             kind
-            status
             displayName
             moniker {
               app
@@ -374,3 +410,64 @@ export function useFetchApplicationLazyQuery(
 export type FetchApplicationQueryHookResult = ReturnType<typeof useFetchApplicationQuery>;
 export type FetchApplicationLazyQueryHookResult = ReturnType<typeof useFetchApplicationLazyQuery>;
 export type FetchApplicationQueryResult = Apollo.QueryResult<FetchApplicationQuery, FetchApplicationQueryVariables>;
+export const FetchResourceStatusDocument = gql`
+  query fetchResourceStatus($appName: String!) {
+    application(appName: $appName) {
+      id
+      name
+      environments {
+        id
+        name
+        state {
+          id
+          resources {
+            id
+            kind
+            status
+          }
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useFetchResourceStatusQuery__
+ *
+ * To run a query within a React component, call `useFetchResourceStatusQuery` and pass it any options that fit your needs.
+ * When your component renders, `useFetchResourceStatusQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useFetchResourceStatusQuery({
+ *   variables: {
+ *      appName: // value for 'appName'
+ *   },
+ * });
+ */
+export function useFetchResourceStatusQuery(
+  baseOptions: Apollo.QueryHookOptions<FetchResourceStatusQuery, FetchResourceStatusQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<FetchResourceStatusQuery, FetchResourceStatusQueryVariables>(
+    FetchResourceStatusDocument,
+    options,
+  );
+}
+export function useFetchResourceStatusLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<FetchResourceStatusQuery, FetchResourceStatusQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<FetchResourceStatusQuery, FetchResourceStatusQueryVariables>(
+    FetchResourceStatusDocument,
+    options,
+  );
+}
+export type FetchResourceStatusQueryHookResult = ReturnType<typeof useFetchResourceStatusQuery>;
+export type FetchResourceStatusLazyQueryHookResult = ReturnType<typeof useFetchResourceStatusLazyQuery>;
+export type FetchResourceStatusQueryResult = Apollo.QueryResult<
+  FetchResourceStatusQuery,
+  FetchResourceStatusQueryVariables
+>;

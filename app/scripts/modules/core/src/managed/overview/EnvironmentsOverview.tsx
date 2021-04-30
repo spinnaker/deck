@@ -48,7 +48,7 @@ const Environment = ({ environment }: { environment: QueryEnvironment }) => {
       </CollapsibleSection>
       <CollapsibleSection heading="Resources" {...sectionProps}>
         {state.resources?.map((resource) => (
-          <Resource key={resource.id} resource={resource} />
+          <Resource key={resource.id} resource={resource} environment={environment.name} />
         ))}
       </CollapsibleSection>
     </section>

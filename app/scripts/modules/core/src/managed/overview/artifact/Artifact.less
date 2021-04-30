@@ -9,9 +9,18 @@
   }
 
   .artifact-pending-versions {
-    margin-top: var(--l-spacing);
+    margin-top: var(--m-spacing);
     padding-left: var(--xs-spacing);
     position: relative;
+    --circle-shift: 6px;
+
+    .artifact-pending-versions-title {
+      margin-bottom: var(--s-spacing);
+      text-transform: uppercase;
+      color: var(--color-titanium);
+      font-size: 14px;
+      font-weight: 600;
+    }
 
     .artifact-pending-version {
       display: flex;
@@ -39,7 +48,7 @@
       &::after {
         content: '';
         position: absolute;
-        top: 4px;
+        top: var(--circle-shift);
         left: 20px;
         width: 10px;
         height: 10px;
@@ -49,13 +58,13 @@
 
       &:last-of-type {
         &::before {
-          height: 4px;
+          height: var(--circle-shift);
         }
       }
 
       &:first-of-type {
         &::before {
-          top: 4px;
+          top: var(--circle-shift);
         }
       }
 
@@ -77,10 +86,16 @@
 
       .pending-version-constraints {
         margin-top: var(--s-spacing);
+        color: var(--color-dovegray);
+
+        .pending-version-constraint-title {
+          font-weight: 600;
+        }
 
         .pending-version-constraint {
           display: grid;
-          grid-template-columns: 20px auto;
+          grid-template-columns: 14px auto;
+          column-gap: 6px;
           align-items: center;
 
           & > i {

@@ -2,7 +2,9 @@ import { DateTime } from 'luxon';
 import React from 'react';
 
 import { IconTooltip } from 'core/index';
+
 import { RelativeTimestamp } from '../../RelativeTimestamp';
+import { TOOLTIP_DELAY } from '../../utils/defaults';
 
 const MetadataElement: React.FC = ({ children }) => {
   return <span className="metadata-element">{children}</span>;
@@ -13,13 +15,13 @@ export const VersionMetadata = ({
   author,
   deployedAt,
   buildDuration,
-  commitsBehind,
+  buildsBehind,
 }: {
   buildNumber?: string;
   author?: string;
   deployedAt?: string;
   buildDuration?: string;
-  commitsBehind?: number;
+  buildsBehind?: number;
 }) => {
   return (
     <div>
@@ -28,17 +30,39 @@ export const VersionMetadata = ({
         {author && <MetadataElement>By {author}</MetadataElement>}
         {deployedAt && (
           <MetadataElement>
-            <IconTooltip tooltip="Deployed at" name="cloudDeployed" size="12px" wrapperClassName="metadata-icon" />
-            <RelativeTimestamp timestamp={DateTime.fromISO(deployedAt)} className="" style={{}} /> ago
+            <IconTooltip
+              tooltip="Deployed at"
+              name="cloudDeployed"
+              size="12px"
+              wrapperClassName="metadata-icon"
+              delayShow={TOOLTIP_DELAY}
+            />
+            <RelativeTimestamp
+              timestamp={DateTime.fromISO(deployedAt)}
+              className=""
+              style={{}}
+              delayShow={TOOLTIP_DELAY}
+            />{' '}
+            ago
           </MetadataElement>
         )}
         {buildDuration && (
           <MetadataElement>
-            <IconTooltip tooltip="Build duration" name="build" size="12px" wrapperClassName="metadata-icon" />
+            <IconTooltip
+              tooltip="Build duration"
+              name="build"
+              size="12px"
+              wrapperClassName="metadata-icon"
+              delayShow={TOOLTIP_DELAY}
+            />
             {buildDuration}
           </MetadataElement>
         )}
-        {commitsBehind && <MetadataElement>{commitsBehind}</MetadataElement>}
+        {buildsBehind && (
+          <MetadataElement>
+            {buildsBehind} build{buildsBehind > 1 ? 's' : ''} behind
+          </MetadataElement>
+        )}
       </div>
     </div>
   );

@@ -10,6 +10,7 @@ export interface IRelativeTimestampProps {
   clickToCopy?: boolean;
   className?: string;
   style?: React.CSSProperties;
+  delayShow?: number;
 }
 
 const TIMEZONE = SETTINGS.feature.displayTimestampsInUserLocalTime ? undefined : SETTINGS.defaultTimeZone;
@@ -57,7 +58,7 @@ const getDistanceFromNow = (timestamp: DateTime) =>
   timestamp.diffNow().negate().shiftTo('years', 'months', 'days', 'hours', 'minutes', 'seconds');
 
 export const RelativeTimestamp = memo(
-  ({ timestamp: timestampInOriginalZone, clickToCopy, className, style }: IRelativeTimestampProps) => {
+  ({ timestamp: timestampInOriginalZone, clickToCopy, className, style, delayShow }: IRelativeTimestampProps) => {
     const timestamp = TIMEZONE ? timestampInOriginalZone.setZone(TIMEZONE) : timestampInOriginalZone;
     const [formattedTimestamp, setFormattedTimestamp] = useState(
       formatTimestamp(timestamp, getDistanceFromNow(timestamp)),
@@ -92,7 +93,11 @@ export const RelativeTimestamp = memo(
         />
       );
     } else {
-      return <Tooltip value={absoluteTimestamp}>{relativeTimestamp}</Tooltip>;
+      return (
+        <Tooltip value={absoluteTimestamp} delayShow={delayShow}>
+          {relativeTimestamp}
+        </Tooltip>
+      );
     }
   },
 );

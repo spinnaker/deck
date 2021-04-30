@@ -6,31 +6,38 @@ type Query {
 }
 
 type DgsApplication {
+  id: String!
   name: String!
   account: String!
   environments: [DgsEnvironment!]!
 }
 
 type DgsEnvironment {
+  id: String!
   name: String!
   state: DgsEnvironmentState!
 }
 
 type DgsEnvironmentState {
+  id: String!
   resources: [DgsResource!]
   artifacts: [DgsArtifact!]
 }
 
 type DgsPinnedVersion {
+  id: String!
   name: String!
   reference: String!
   version: String!
+  gitMetadata: DgsGitMetadata
+  buildNumber: String
   pinnedAt: InstantTime
   pinnedBy: String
   comment: String
 }
 
 type DgsArtifact {
+  id: String!
   environment: String!
   name: String!
   type: String!
@@ -40,6 +47,7 @@ type DgsArtifact {
 }
 
 type DgsArtifactVersionInEnvironment {
+  id: String!
   version: String!
   buildNumber: String
   createdAt: InstantTime
@@ -143,12 +151,10 @@ type DgsLocation {
 }
 
 enum DgsConstraintStatus {
-  NOT_EVALUATED
   PENDING
   PASS
   FAIL
-  OVERRIDE_PASS
-  OVERRIDE_FAIL
+  FORCE_PASS
 }
 
 enum DgsArtifactStatusInEnvironment {
