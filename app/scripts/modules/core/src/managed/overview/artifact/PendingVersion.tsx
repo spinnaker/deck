@@ -83,7 +83,7 @@ const Constraints = ({ constraints }: { constraints: NonNullable<QueryArtifactVe
 };
 
 export const PendingVersion = ({ data }: { data: QueryArtifactVersion }) => {
-  const { buildNumber, gitMetadata, constraints } = data;
+  const { buildNumber, gitMetadata, constraints, status } = data;
   return (
     <div className="artifact-pending-version">
       {data.createdAt && (
@@ -98,6 +98,7 @@ export const PendingVersion = ({ data }: { data: QueryArtifactVersion }) => {
         buildNumber={buildNumber}
         author={gitMetadata?.author}
         buildDuration={getLifecycleEventDuration(data, 'BUILD')}
+        isDeploying={status === 'DEPLOYING'}
       />
       {constraints && <Constraints constraints={constraints} />}
     </div>

@@ -1,3 +1,4 @@
+import cx from 'classnames';
 import { DateTime } from 'luxon';
 import React from 'react';
 
@@ -6,8 +7,8 @@ import { IconTooltip } from 'core/index';
 import { RelativeTimestamp } from '../../RelativeTimestamp';
 import { TOOLTIP_DELAY } from '../../utils/defaults';
 
-const MetadataElement: React.FC = ({ children }) => {
-  return <span className="metadata-element">{children}</span>;
+const MetadataElement: React.FC<{ className?: string }> = ({ className, children }) => {
+  return <span className={cx('metadata-element', className)}>{children}</span>;
 };
 
 export const VersionMetadata = ({
@@ -16,12 +17,14 @@ export const VersionMetadata = ({
   deployedAt,
   buildDuration,
   buildsBehind,
+  isDeploying,
 }: {
   buildNumber?: string;
   author?: string;
   deployedAt?: string;
   buildDuration?: string;
   buildsBehind?: number;
+  isDeploying?: boolean;
 }) => {
   return (
     <div>
@@ -42,8 +45,8 @@ export const VersionMetadata = ({
               className=""
               style={{}}
               delayShow={TOOLTIP_DELAY}
-            />{' '}
-            ago
+            />
+            {' ago'}
           </MetadataElement>
         )}
         {buildDuration && (
@@ -61,6 +64,11 @@ export const VersionMetadata = ({
         {buildsBehind && (
           <MetadataElement>
             {buildsBehind} build{buildsBehind > 1 ? 's' : ''} behind
+          </MetadataElement>
+        )}
+        {isDeploying && (
+          <MetadataElement>
+            <span className="version-deploying">Deploying</span>
           </MetadataElement>
         )}
       </div>
