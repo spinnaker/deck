@@ -12,7 +12,7 @@ import { TOOLTIP_DELAY } from '../../utils/defaults';
 
 import './Artifact.less';
 
-const CurrentVersion = ({ data }: { data: QueryArtifactVersion }) => {
+const CurrentVersion = ({ data, numNewerVersions }: { data: QueryArtifactVersion; numNewerVersions?: number }) => {
   const gitMetadata = data.gitMetadata;
   return (
     <div className="artifact-current-version">
@@ -22,6 +22,7 @@ const CurrentVersion = ({ data }: { data: QueryArtifactVersion }) => {
         author={gitMetadata?.author}
         deployedAt={data.deployedAt}
         buildDuration={getLifecycleEventDuration(data, 'BUILD')}
+        buildsBehind={numNewerVersions}
       />
     </div>
   );
@@ -61,7 +62,11 @@ export const Artifact = ({ artifact }: { artifact: QueryArtifact }) => {
       </div>
       <div className="row-details">
         <div className="row-title">{artifact.reference}</div>
-        {currentVersion ? <CurrentVersion data={currentVersion} /> : <div>No version is deployed</div>}
+        {currentVersion ? (
+          <CurrentVersion data={currentVersion} numNewerVersions={newerVersions?.length} />
+        ) : (
+          <div>No version is deployed</div>
+        )}
         {newerVersions?.length ? (
           <section className="artifact-pending-versions">
             <div className="artifact-pending-versions-title">Pending Versions</div>
