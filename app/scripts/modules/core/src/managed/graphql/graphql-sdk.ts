@@ -265,7 +265,18 @@ export type FetchApplicationQuery = { __typename?: 'Query' } & {
                             >
                           >;
                           pinnedVersion?: Maybe<
-                            { __typename?: 'DgsPinnedVersion' } & Pick<DgsPinnedVersion, 'name' | 'reference'>
+                            { __typename?: 'DgsPinnedVersion' } & Pick<
+                              DgsPinnedVersion,
+                              'id' | 'version' | 'buildNumber' | 'pinnedAt' | 'pinnedBy' | 'comment'
+                            > & {
+                                gitMetadata?: Maybe<
+                                  { __typename?: 'DgsGitMetadata' } & {
+                                    commitInfo?: Maybe<
+                                      { __typename?: 'DgsCommitInfo' } & Pick<DgsCommitInfo, 'message'>
+                                    >;
+                                  }
+                                >;
+                              }
                           >;
                         }
                     >
@@ -356,8 +367,17 @@ export const FetchApplicationDocument = gql`
               }
             }
             pinnedVersion {
-              name
-              reference
+              id
+              version
+              buildNumber
+              pinnedAt
+              pinnedBy
+              comment
+              gitMetadata {
+                commitInfo {
+                  message
+                }
+              }
             }
           }
           resources {
