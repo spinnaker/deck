@@ -4,10 +4,10 @@ import React from 'react';
 
 import { GitLink } from './GitLink';
 import { RelativeTimestamp } from '../../RelativeTimestamp';
-import { VersionMetadata } from './VersionMetadata';
+import { PinData, VersionMetadata } from './VersionMetadata';
 import { constraintsManager } from '../../constraints/registry';
 import { QueryArtifactVersion, QueryConstraint } from '../types';
-import { getLifecycleEventDuration } from './utils';
+import { getLifecycleEventDuration, useCreateVersionActions } from './utils';
 import { TOOLTIP_DELAY } from '../../utils/defaults';
 
 const constraintStatusUtils: {
@@ -82,8 +82,25 @@ const Constraints = ({ constraints }: { constraints: NonNullable<QueryArtifactVe
   );
 };
 
-export const PendingVersion = ({ data }: { data: QueryArtifactVersion }) => {
-  const { buildNumber, gitMetadata, constraints, status } = data;
+export const PendingVersion = ({
+  data,
+  reference,
+  environment,
+  pinData,
+}: {
+  data: QueryArtifactVersion;
+  reference: string;
+  environment: string;
+  pinData?: PinData;
+}) => {
+  const { buildNumber, version, gitMetadata, constraints, status } = data;
+  const actions = useCreateVersionActions({
+    environment,
+    reference,
+    buildNumber,
+    version,
+    commitMessage: gitMetadata?.commitInfo?.message,
+  });
   return (
     <div className="artifact-pending-version">
       {data.createdAt && (
@@ -99,6 +116,8 @@ export const PendingVersion = ({ data }: { data: QueryArtifactVersion }) => {
         author={gitMetadata?.author}
         buildDuration={getLifecycleEventDuration(data, 'BUILD')}
         isDeploying={status === 'DEPLOYING'}
+        pinData={pinData}
+        actions={actions}
       />
       {constraints && <Constraints constraints={constraints} />}
     </div>

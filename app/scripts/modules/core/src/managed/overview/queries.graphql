@@ -48,8 +48,17 @@ query fetchApplication($appName: String!) {
             }
           }
           pinnedVersion {
-            name
-            reference
+            id
+            version
+            buildNumber
+            pinnedAt
+            pinnedBy
+            comment
+            gitMetadata {
+              commitInfo {
+                message
+              }
+            }
           }
         }
         resources {
