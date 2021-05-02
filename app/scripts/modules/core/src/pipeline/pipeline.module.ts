@@ -8,6 +8,7 @@ import { CORE_PIPELINE_CONFIG_PRECONDITIONS_TYPES_EXPRESSION_EXPRESSION_PRECONDI
 import { STAGE_STATUS_PRECONDITION } from './config/preconditions/types/stageStatus/stageStatus.precondition.type.module';
 import { APPLY_SOURCE_SERVER_GROUP_CAPACITY_STAGE } from './config/stages/applySourceServerGroupCapacity/applySourceServerGroupCapacityStage.module';
 import './config/stages/awsCodeBuild/awsCodeBuildStage';
+import './config/stages/awsDeleteLambda/awsDeleteLambdaStage';
 import { CORE_PIPELINE_CONFIG_STAGES_BAKE_BAKESTAGE_MODULE } from './config/stages/bake/bakeStage.module';
 import './config/stages/bakeManifest/bakeManifestStage';
 import { CHECK_PRECONDITIONS_STAGE_MODULE } from './config/stages/checkPreconditions/checkPreconditionsStage.module';
