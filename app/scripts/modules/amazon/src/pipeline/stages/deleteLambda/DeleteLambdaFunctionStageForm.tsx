@@ -1,6 +1,7 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
+import { IAmazonFunctionSourceData } from 'amazon';
 import {
   AccountService,
   FormikFormField,
@@ -16,8 +17,6 @@ import {
   useData,
 } from 'core';
 import React from 'react';
-
-import { IAmazonFunctionSourceData } from '@spinnaker/amazon';
 
 import { DeleteVersionList, DeleteVersionPicker } from './constants';
 
@@ -46,7 +45,7 @@ export function DeleteLambdaFunctionStageForm(props: IFormikStageConfigInjectedP
 
   const availableFunctions =
     values.account && values.region
-      ? functions.data
+      ? functions?.data
           .filter((f: IFunction) => f.account === values.account)
           .filter((f: IFunction) => f.region === values.region)
           .map((f: IFunction) => f.functionName)

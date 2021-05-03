@@ -70,7 +70,7 @@ export class FunctionFilters extends React.Component<IFunctionFiltersProps, IFun
       this.setState({ tags: FunctionState.filterModel.asFilterModel.tags });
     });
 
-    if (app.functions && app.functions.loaded) {
+    if (app.functions?.loaded) {
       this.updateFunctionGroups();
     }
 

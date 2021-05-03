@@ -25,6 +25,7 @@ import { AwsLoadBalancerTransformer } from './loadBalancer/loadBalancer.transfor
 import amazonLogo from './logo/amazon.logo.svg';
 import { AMAZON_PIPELINE_STAGES_BAKE_AWSBAKESTAGE } from './pipeline/stages/bake/awsBakeStage';
 import { AMAZON_PIPELINE_STAGES_CLONESERVERGROUP_AWSCLONESERVERGROUPSTAGE } from './pipeline/stages/cloneServerGroup/awsCloneServerGroupStage';
+import './pipeline/stages/deleteLambda/deleteLambdaStage';
 import { CLOUD_FORMATION_CHANGE_SET_INFO } from './pipeline/stages/deployCloudFormation/CloudFormationChangeSetInfo';
 import { CLOUDFORMATION_TEMPLATE_ENTRY } from './pipeline/stages/deployCloudFormation/cloudFormationTemplateEntry.component';
 import { DEPLOY_CLOUDFORMATION_STACK_STAGE } from './pipeline/stages/deployCloudFormation/deployCloudFormationStackStage';
