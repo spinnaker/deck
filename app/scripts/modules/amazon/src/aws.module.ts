@@ -25,11 +25,12 @@ import { AwsLoadBalancerTransformer } from './loadBalancer/loadBalancer.transfor
 import amazonLogo from './logo/amazon.logo.svg';
 import { AMAZON_PIPELINE_STAGES_BAKE_AWSBAKESTAGE } from './pipeline/stages/bake/awsBakeStage';
 import { AMAZON_PIPELINE_STAGES_CLONESERVERGROUP_AWSCLONESERVERGROUPSTAGE } from './pipeline/stages/cloneServerGroup/awsCloneServerGroupStage';
-import './pipeline/stages/deleteLambda/deleteLambdaStage';
+import './pipeline/stages/deleteLambda';
 import { CLOUD_FORMATION_CHANGE_SET_INFO } from './pipeline/stages/deployCloudFormation/CloudFormationChangeSetInfo';
 import { CLOUDFORMATION_TEMPLATE_ENTRY } from './pipeline/stages/deployCloudFormation/cloudFormationTemplateEntry.component';
 import { DEPLOY_CLOUDFORMATION_STACK_STAGE } from './pipeline/stages/deployCloudFormation/deployCloudFormationStackStage';
 import { AWS_EVALUATE_CLOUD_FORMATION_CHANGE_SET_EXECUTION_SERVICE } from './pipeline/stages/deployCloudFormation/evaluateCloudFormationChangeSetExecution.service';
+import './pipeline/stages/deployLambda';
 import { AMAZON_PIPELINE_STAGES_DESTROYASG_AWSDESTROYASGSTAGE } from './pipeline/stages/destroyAsg/awsDestroyAsgStage';
 import { AMAZON_PIPELINE_STAGES_DISABLEASG_AWSDISABLEASGSTAGE } from './pipeline/stages/disableAsg/awsDisableAsgStage';
 import { AMAZON_PIPELINE_STAGES_DISABLECLUSTER_AWSDISABLECLUSTERSTAGE } from './pipeline/stages/disableCluster/awsDisableClusterStage';

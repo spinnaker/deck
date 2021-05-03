@@ -1,4 +1,4 @@
-import { ExecutionDetailsTasks, ISpinnakerSettings, Registry } from 'core';
+import { ExecutionDetailsTasks, ISpinnakerSettings, Registry } from '@spinnaker/core';
 
 import { DeleteLambdaConfig } from './DeleteLambdaConfig';
 import { DeleteLambdaExecutionDetails } from './DeleteLambdaExecutionDetails';

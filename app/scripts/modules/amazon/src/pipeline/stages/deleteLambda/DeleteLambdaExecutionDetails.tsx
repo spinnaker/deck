@@ -1,5 +1,6 @@
-import { ExecutionDetailsSection, IExecutionDetailsSectionProps, StageFailureMessage } from 'core';
 import React from 'react';
+
+import { ExecutionDetailsSection, IExecutionDetailsSectionProps, StageFailureMessage } from '@spinnaker/core';
 
 export class DeleteLambdaExecutionDetails extends React.Component<IExecutionDetailsSectionProps> {
   public static title = 'Delete Lambda Stage';

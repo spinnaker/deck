@@ -25,3 +25,8 @@ export const awsArnValidator = (value: string, label: string) => {
 export const awsTagsValidator = (value: string | { [key: string]: string }, label: string) => {
   return isEmpty(value) ? `At least one ${label} is required` : undefined;
 };
+
+export const simpleStringValidator = (value: string, label: string) => {
+  const simpleString = value.match(/^[0-9A-Za-z]*$/);
+  return simpleString ? undefined : `Invalid String Value. ${label} must match regular expression: [0-9A-Za-z]`;
+};
