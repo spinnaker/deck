@@ -1,8 +1,9 @@
 import React from 'react';
 
 import { Button } from '../../Button';
-import { ManagedWriter } from '../../ManagedWriter';
+import { MarkAsBadIntro } from '../../artifactDetail/MarkArtifactAsBadModal';
 import { PinVersionIntro } from '../../artifactDetail/PinArtifactModal';
+import { UnpinVersionIntro } from '../../artifactDetail/UnpinArtifactModal';
 import {
   FormikFormField,
   IModalComponentProps,
@@ -15,54 +16,45 @@ import {
 } from '../../../presentation';
 import { logEvent } from '../../utils/logging';
 
-export interface IPinArtifactModalProps extends IModalComponentProps {
-  application: string;
-  environment: string;
-  reference: string;
-  version: string;
+export interface IArtifactActionModalProps extends IModalComponentProps {
   title: string;
+  actionName: string;
+  withComment?: boolean;
+  onAction: (comment?: string) => Promise<void> | PromiseLike<void>;
+  onSuccess?: () => void;
 }
 
-const LOG_CATEGORY = 'Environments - pin version modal';
-
-export const ArtifactActionModal = ({
-  application,
-  environment,
-  reference,
-  version,
+const ArtifactActionModal: React.FC<IArtifactActionModalProps> = ({
   title,
   dismissModal,
   closeModal,
-}: IPinArtifactModalProps) => {
+  onAction,
+  onSuccess,
+  actionName,
+  withComment = true,
+  children,
+}) => {
+  const LOG_CATEGORY = `Environments::Artifact::${actionName}`;
   return (
     <>
-      <ModalHeader>{title}</ModalHeader>
-      <SpinFormik<{
-        comment?: string;
-      }>
+      <ModalHeader className="truncate">{title}</ModalHeader>
+      <SpinFormik<{ comment?: string }>
         initialValues={{}}
         onSubmit={async ({ comment }, { setSubmitting, setStatus }) => {
-          if (!comment) return;
+          if (withComment && !comment) return;
           try {
-            await ManagedWriter.pinArtifactVersion({
-              environment,
-              reference,
-              comment,
-              application,
-              version,
-            });
+            await onAction(comment);
+            onSuccess?.();
             logEvent({
               category: LOG_CATEGORY,
-              action: 'Version pinned',
-              label: environment,
+              action: actionName,
             });
             closeModal?.();
           } catch (error) {
             setStatus({ error: error.data });
             logEvent({
               category: LOG_CATEGORY,
-              action: 'Error pinning version',
-              label: environment,
+              action: `${actionName} - Failed`,
             });
           } finally {
             setSubmitting(false);
@@ -76,20 +68,22 @@ export const ArtifactActionModal = ({
             <>
               <ModalBody>
                 <div className="flex-container-v middle sp-padding-xl-yaxis">
-                  <PinVersionIntro application={application} />
-                  <FormikFormField
-                    label="Reason"
-                    name="comment"
-                    required={true}
-                    input={(props) => (
-                      <TextAreaInput
-                        {...props}
-                        rows={5}
-                        required={true}
-                        placeholder="Please provide a reason. Markdown is supported :)"
-                      />
-                    )}
-                  />
+                  {children}
+                  {withComment && (
+                    <FormikFormField
+                      label="Reason"
+                      name="comment"
+                      required={true}
+                      input={(props) => (
+                        <TextAreaInput
+                          {...props}
+                          rows={5}
+                          required={true}
+                          placeholder="Please provide a reason. Markdown is supported :)"
+                        />
+                      )}
+                    />
+                  )}
                   {status?.error && (
                     <div className="sp-margin-xl-top">
                       <ValidationMessage
@@ -111,7 +105,7 @@ export const ArtifactActionModal = ({
                   <div className="flex-container-h sp-group-margin-s-xaxis">
                     <Button onClick={() => dismissModal?.()}>Cancel</Button>
                     <Button appearance="primary" disabled={!isValid || isSubmitting} onClick={() => submitForm()}>
-                      Pin
+                      {actionName}
                     </Button>
                   </div>
                 }
@@ -121,5 +115,36 @@ export const ArtifactActionModal = ({
         }}
       />
     </>
+  );
+};
+
+export const PinActionModal = ({ application, ...props }: IArtifactActionModalProps & { application: string }) => {
+  return (
+    <ArtifactActionModal {...props}>
+      <PinVersionIntro application={application} />
+    </ArtifactActionModal>
+  );
+};
+
+export const UnpinActionModal = ({
+  application,
+  environment,
+  ...props
+}: IArtifactActionModalProps & { application: string; environment: string }) => {
+  return (
+    <ArtifactActionModal {...props}>
+      <UnpinVersionIntro application={application} environment={environment} />
+    </ArtifactActionModal>
+  );
+};
+
+export const MarkAsBadActionModal = ({
+  application,
+  ...props
+}: IArtifactActionModalProps & { application: string }) => {
+  return (
+    <ArtifactActionModal {...props}>
+      <MarkAsBadIntro application={application} />
+    </ArtifactActionModal>
   );
 };

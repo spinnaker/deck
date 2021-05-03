@@ -1,53 +1,14 @@
 import { sortBy } from 'lodash';
 import React from 'react';
 
-import { IconTooltip } from 'core/presentation';
+import { HoverablePopover, IconTooltip, Markdown } from 'core/presentation';
 
-import { GitLink } from './GitLink';
+import { CurrentVersion } from './CurrentVersion';
 import { PendingVersion } from './PendingVersion';
-import { PinData, VersionMetadata } from './VersionMetadata';
 import { QueryArtifact, QueryArtifactVersion } from '../types';
-import { getLifecycleEventDuration, useCreateVersionActions } from './utils';
 import { TOOLTIP_DELAY } from '../../utils/defaults';
 
 import './Artifact.less';
-
-const CurrentVersion = ({
-  data,
-  environment,
-  reference,
-  numNewerVersions,
-  pinData,
-}: {
-  data: QueryArtifactVersion;
-  environment: string;
-  reference: string;
-  numNewerVersions?: number;
-  pinData?: PinData;
-}) => {
-  const { gitMetadata } = data;
-  const actions = useCreateVersionActions({
-    environment,
-    reference,
-    version: data.version,
-    buildNumber: data.buildNumber,
-    commitMessage: gitMetadata?.commitInfo?.message,
-  });
-  return (
-    <div className="artifact-current-version">
-      {gitMetadata ? <GitLink gitMetadata={gitMetadata} /> : <div>Build {data?.version}</div>}
-      <VersionMetadata
-        buildNumber={data.buildNumber}
-        author={gitMetadata?.author}
-        deployedAt={data.deployedAt}
-        buildDuration={getLifecycleEventDuration(data, 'BUILD')}
-        buildsBehind={numNewerVersions}
-        actions={actions}
-        pinData={pinData}
-      />
-    </div>
-  );
-};
 
 type RequiredKeys<T, K extends keyof T> = Exclude<T, K> & Required<Pick<T, K>>;
 
@@ -68,13 +29,33 @@ const filterPendingVersions = (versions: QueryArtifact['versions'], currentVersi
   return sortBy(newerVersions || [], (version) => -1 * new Date(version.createdAt).getTime());
 };
 
+export const PinnedVersion = ({ version }: { version: NonNullable<QueryArtifact['pinnedVersion']> }) => {
+  const commitMessage = version.gitMetadata?.commitInfo?.message;
+  const build = `#${version.buildNumber}`;
+  return (
+    <div className="another-version-pinned-warning">
+      <i className="fas fa-exclamation-triangle" /> Version{' '}
+      {commitMessage ? (
+        <HoverablePopover
+          delayHide={300}
+          placement="top"
+          Component={() => <Markdown className="git-commit-tooltip" message={commitMessage} />}
+        >
+          {build}
+        </HoverablePopover>
+      ) : (
+        build
+      )}{' '}
+      was pinned and will be deployed shortly
+    </div>
+  );
+};
+
 export const Artifact = ({ artifact }: { artifact: QueryArtifact }) => {
   const currentVersion = artifact.versions?.find((version) => version.status === 'CURRENT');
   const newerVersions = filterPendingVersions(artifact.versions, currentVersion);
-  const pinnedVersion = artifact.pinnedVersion;
-  const pinData: PinData | undefined = pinnedVersion
-    ? { at: pinnedVersion.pinnedAt, by: pinnedVersion.pinnedBy, reason: pinnedVersion.comment }
-    : undefined;
+  const { pinnedVersion } = artifact;
+
   return (
     <div className="Artifact environment-row-element">
       <div className="row-icon">
@@ -93,10 +74,13 @@ export const Artifact = ({ artifact }: { artifact: QueryArtifact }) => {
             environment={artifact.environment}
             reference={artifact.reference}
             numNewerVersions={newerVersions?.length}
-            pinData={pinnedVersion?.version === currentVersion.version ? pinData : undefined}
+            isPinned={pinnedVersion?.version === currentVersion.version}
           />
         ) : (
           <div>No version is deployed</div>
+        )}
+        {pinnedVersion && pinnedVersion.buildNumber !== currentVersion?.buildNumber && (
+          <PinnedVersion version={pinnedVersion} />
         )}
         {newerVersions?.length ? (
           <section className="artifact-pending-versions">
@@ -108,7 +92,7 @@ export const Artifact = ({ artifact }: { artifact: QueryArtifact }) => {
                   environment={artifact.environment}
                   reference={artifact.reference}
                   data={version}
-                  pinData={pinnedVersion?.version === version.version ? pinData : undefined}
+                  isPinned={pinnedVersion?.version === version.version}
                 />
               ))}
             </div>
