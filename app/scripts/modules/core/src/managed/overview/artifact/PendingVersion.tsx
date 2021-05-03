@@ -4,7 +4,7 @@ import React from 'react';
 
 import { GitLink } from './GitLink';
 import { RelativeTimestamp } from '../../RelativeTimestamp';
-import { PinData, VersionMetadata } from './VersionMetadata';
+import { VersionMetadata } from './VersionMetadata';
 import { constraintsManager } from '../../constraints/registry';
 import { QueryArtifactVersion, QueryConstraint } from '../types';
 import { getLifecycleEventDuration, useCreateVersionActions } from './utils';
@@ -86,12 +86,12 @@ export const PendingVersion = ({
   data,
   reference,
   environment,
-  pinData,
+  isPinned,
 }: {
   data: QueryArtifactVersion;
   reference: string;
   environment: string;
-  pinData?: PinData;
+  isPinned: boolean;
 }) => {
   const { buildNumber, version, gitMetadata, constraints, status } = data;
   const actions = useCreateVersionActions({
@@ -100,6 +100,7 @@ export const PendingVersion = ({
     buildNumber,
     version,
     commitMessage: gitMetadata?.commitInfo?.message,
+    isPinned,
   });
   return (
     <div className="artifact-pending-version">
@@ -116,7 +117,7 @@ export const PendingVersion = ({
         author={gitMetadata?.author}
         buildDuration={getLifecycleEventDuration(data, 'BUILD')}
         isDeploying={status === 'DEPLOYING'}
-        pinData={pinData}
+        isPinned={isPinned}
         actions={actions}
       />
       {constraints && <Constraints constraints={constraints} />}

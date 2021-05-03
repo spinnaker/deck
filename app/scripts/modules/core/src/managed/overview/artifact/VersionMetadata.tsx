@@ -19,12 +19,6 @@ export interface VersionAction {
   disabled?: boolean;
 }
 
-export interface PinData {
-  by?: string;
-  at?: string;
-  reason?: string;
-}
-
 export const VersionMetadata = ({
   buildNumber,
   author,
@@ -32,7 +26,7 @@ export const VersionMetadata = ({
   buildDuration,
   buildsBehind,
   isDeploying,
-  pinData,
+  isPinned,
   actions,
 }: {
   buildNumber?: string;
@@ -41,7 +35,7 @@ export const VersionMetadata = ({
   buildDuration?: string;
   buildsBehind?: number;
   isDeploying?: boolean;
-  pinData?: PinData;
+  isPinned?: boolean;
   actions?: VersionAction[];
 }) => {
   return (
@@ -52,7 +46,7 @@ export const VersionMetadata = ({
             <span className="version-deploying version-badge">Deploying</span>
           </MetadataElement>
         )}
-        {pinData && (
+        {isPinned && (
           <MetadataElement>
             <span className="version-pinned version-badge">
               <Icon name="pin" size="12px" color="black" /> Pinned

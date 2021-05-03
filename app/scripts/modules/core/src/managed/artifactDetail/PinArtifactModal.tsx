@@ -82,11 +82,7 @@ export const PinVersionIntro = ({ application }: { application: string }) => {
           Pinning ensures an environment uses a specific version, even if Spinnaker would've normally deployed a
           different one. If you pin a version, it'll remain pinned until you manually unpin it.
         </p>{' '}
-        <a
-          target="_blank"
-          onClick={() => logEvent('Pinning docs link clicked', application || 'unknown')}
-          href={PINNING_DOCS_URL}
-        >
+        <a target="_blank" onClick={() => logEvent('Pinning docs link clicked', application)} href={PINNING_DOCS_URL}>
           Check out our documentation
         </a>{' '}
         for more information.
