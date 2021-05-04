@@ -12,6 +12,7 @@ export interface ICollapsibleSectionProps {
   useGlyphiconChevron?: boolean;
   chevronColor?: string;
   cacheKey?: string;
+  enableCaching?: boolean;
   defaultExpanded?: boolean;
   heading: ((props: { chevron: JSX.Element }) => JSX.Element) | string;
 }
@@ -29,15 +30,17 @@ export class CollapsibleSection extends React.Component<ICollapsibleSectionProps
     bodyClassName: 'content-body',
     cacheKey: undefined as string,
     useGlyphiconChevron: true,
+    enableCaching: true,
   };
 
   constructor(props: ICollapsibleSectionProps) {
     super(props);
 
     const cacheKey = props.cacheKey || (typeof props.heading === 'string' ? (props.heading as string) : undefined);
-    const expanded = CollapsibleSectionStateCache.isSet(cacheKey)
-      ? CollapsibleSectionStateCache.isExpanded(cacheKey)
-      : props.defaultExpanded;
+    const expanded =
+      props.enableCaching && CollapsibleSectionStateCache.isSet(cacheKey)
+        ? CollapsibleSectionStateCache.isExpanded(cacheKey)
+        : props.defaultExpanded;
 
     this.state = { cacheKey, expanded };
   }
@@ -45,7 +48,9 @@ export class CollapsibleSection extends React.Component<ICollapsibleSectionProps
   private toggle = (): void => {
     const { cacheKey, expanded } = this.state;
     this.setState({ expanded: !expanded });
-    CollapsibleSectionStateCache.setExpanded(cacheKey, !expanded);
+    if (this.props.enableCaching) {
+      CollapsibleSectionStateCache.setExpanded(cacheKey, !expanded);
+    }
   };
 
   public render() {
