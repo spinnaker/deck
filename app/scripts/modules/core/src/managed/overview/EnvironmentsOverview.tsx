@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Application, CollapsibleSection, ICollapsibleSectionProps } from 'core/index';
+import { Application, CollapsibleSection, ICollapsibleSectionProps, Spinner } from 'core/index';
 
 import { Resource } from './Resource';
 import { Artifact } from './artifact/Artifact';
@@ -15,10 +15,19 @@ interface IEnvironmentsProps {
 }
 
 export const EnvironmentsOverview = ({ app }: IEnvironmentsProps) => {
-  const { data, error } = useFetchApplicationQuery({ variables: { appName: app.name } });
+  const { data, error, loading } = useFetchApplicationQuery({ variables: { appName: app.name } });
+
+  if (loading && !data) {
+    return (
+      <div style={{ width: '100%' }}>
+        <Spinner size="medium" message="Loading environments ..." />
+      </div>
+    );
+  }
+
   if (error) {
-    // TODO: notify users
     console.warn(error);
+    return <div style={{ width: '100%' }}>Failed to load environments data, please refresh and try again.</div>;
   }
 
   return (
