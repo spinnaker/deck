@@ -50,12 +50,12 @@ const Environment = ({ environment }: { environment: QueryEnvironment }) => {
   return (
     <section className="Environment">
       <EnvironmentTitle title={environment.name} />
-      <CollapsibleSection heading="Artifacts" {...sectionProps} defaultExpanded>
+      <CollapsibleSection heading="Artifacts" {...sectionProps} defaultExpanded enableCaching={false}>
         {state.artifacts?.map((artifact) => (
           <Artifact key={artifact.reference} artifact={artifact} />
         ))}
       </CollapsibleSection>
-      <CollapsibleSection heading="Resources" {...sectionProps}>
+      <CollapsibleSection heading="Resources" {...sectionProps} enableCaching={false}>
         {state.resources?.map((resource) => (
           <Resource key={resource.id} resource={resource} environment={environment.name} />
         ))}
