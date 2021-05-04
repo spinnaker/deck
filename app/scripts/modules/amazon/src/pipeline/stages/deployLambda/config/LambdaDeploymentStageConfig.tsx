@@ -13,8 +13,6 @@ import { upsertDefaults } from 'amazon/utils/UpsertDefaults';
 import { AwsLambdaFunctionStageForm } from '../components/AwsLambdaFunctionStageForm';
 import { constructNewAwsFunctionTemplate } from './function.defaults';
 
-import './LambdaDeploymentStage.less';
-
 export function LambdaDeploymentConfig(props: IStageConfigProps) {
   const defaultFunction = constructNewAwsFunctionTemplate();
 

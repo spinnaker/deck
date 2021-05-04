@@ -1,23 +1,22 @@
-import { IAmazonFunctionSourceData } from 'amazon';
+import React from 'react';
+
 import {
   AccountService,
   FormikFormField,
-  HelpField,
   IAccount,
   IAccountDetails,
   IFormikStageConfigInjectedProps,
   IFormInputProps,
   IFunction,
   IRegion,
-  NumberInput,
   ReactSelectInput,
+  TextInput,
   useData,
-} from 'core';
-import React from 'react';
+} from '@spinnaker/core';
 
-import { DeleteVersionList, DeleteVersionPicker } from './constants';
+import { InvokeLambdaOperation } from './components';
 
-export function DeleteLambdaFunctionStageForm(props: IFormikStageConfigInjectedProps) {
+export function InvokeLambdaFunctionStageForm(props: IFormikStageConfigInjectedProps) {
   const { values } = props.formik;
   const { functions } = props.application;
 
@@ -27,22 +26,21 @@ export function DeleteLambdaFunctionStageForm(props: IFormikStageConfigInjectedP
     [],
   );
 
-  const onAccountChange = (fieldName: string, fieldValue: any): void => {
+  const onAccountChange = (fieldValue: any): void => {
     props.formik.setFieldValue('region', null);
     props.formik.setFieldValue('functionName', null);
 
-    props.formik.setFieldValue(fieldName, fieldValue);
+    props.formik.setFieldValue('account', fieldValue);
   };
 
-  const onRegionChange = (fieldName: string, fieldValue: any): void => {
+  const onRegionChange = (fieldValue: any): void => {
     props.formik.setFieldValue('functionName', null);
-
-    props.formik.setFieldValue(fieldName, fieldValue);
+    props.formik.setFieldValue('region', fieldValue);
   };
 
   const availableFunctions =
     values.account && values.region
-      ? functions?.data
+      ? functions.data
           .filter((f: IFunction) => f.account === values.account)
           .filter((f: IFunction) => f.region === values.region)
           .map((f: IFunction) => f.functionName)
@@ -50,6 +48,7 @@ export function DeleteLambdaFunctionStageForm(props: IFormikStageConfigInjectedP
 
   return (
     <div className="form-horizontal">
+      <h4> Basic Settings </h4>
       <FormikFormField
         label="Account"
         name="account"
@@ -95,50 +94,15 @@ export function DeleteLambdaFunctionStageForm(props: IFormikStageConfigInjectedP
           />
         )}
       />
+
       <FormikFormField
-        label="Target Version"
-        name="version"
-        input={(inputProps: IFormInputProps) => (
-          <ReactSelectInput
-            {...inputProps}
-            clearable={false}
-            options={DeleteVersionList}
-            optionRenderer={(option) => (
-              <DeleteVersionPicker config={props} value={option.value as any} showingDetails={true} />
-            )}
-          />
-        )}
+        label="Alias"
+        name="aliasName"
+        input={(inputProps: IFormInputProps) => <TextInput {...inputProps} />}
       />
-      {values.version === '$PROVIDED' ? (
-        <FormikFormField
-          label="Version Number"
-          name="versionNumber"
-          input={(inputProps: IFormInputProps) => (
-            <ReactSelectInput
-              {...inputProps}
-              clearable={false}
-              stringOptions={functions.data
-                .filter((f: IAmazonFunctionSourceData) => f.account === values.account)
-                .filter((f: IAmazonFunctionSourceData) => f.region === values.region)
-                .filter((f: IAmazonFunctionSourceData) => f.functionName === values.functionName)
-                .flatMap((f: IAmazonFunctionSourceData) =>
-                  Object.values(f.revisions).sort(function (a: number, b: number) {
-                    return b - a;
-                  }),
-                )
-                .filter((r: any) => r !== '$LATEST')}
-            />
-          )}
-        />
-      ) : null}
-      {values.version === '$MOVING' ? (
-        <FormikFormField
-          name="retentionNumber"
-          help={<HelpField content="The number of Lambda versions to retain" />}
-          label="Prior Versions to Retain"
-          input={(props) => <NumberInput {...props} min={1} max={100} />}
-        />
-      ) : null}
+
+      <h4> Invoke Settings </h4>
+      <InvokeLambdaOperation {...props} />
     </div>
   );
 }

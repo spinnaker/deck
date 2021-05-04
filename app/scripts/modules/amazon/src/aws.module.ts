@@ -37,6 +37,7 @@ import { AMAZON_PIPELINE_STAGES_DISABLECLUSTER_AWSDISABLECLUSTERSTAGE } from './
 import { AMAZON_PIPELINE_STAGES_ENABLEASG_AWSENABLEASGSTAGE } from './pipeline/stages/enableAsg/awsEnableAsgStage';
 import { AMAZON_PIPELINE_STAGES_FINDAMI_AWSFINDAMISTAGE } from './pipeline/stages/findAmi/awsFindAmiStage';
 import { AMAZON_PIPELINE_STAGES_FINDIMAGEFROMTAGS_AWSFINDIMAGEFROMTAGSSTAGE } from './pipeline/stages/findImageFromTags/awsFindImageFromTagsStage';
+import './pipeline/stages/invokeLambda';
 import { AMAZON_PIPELINE_STAGES_MODIFYSCALINGPROCESS_MODIFYSCALINGPROCESSSTAGE } from './pipeline/stages/modifyScalingProcess/modifyScalingProcessStage';
 import { AMAZON_PIPELINE_STAGES_RESIZEASG_AWSRESIZEASGSTAGE } from './pipeline/stages/resizeAsg/awsResizeAsgStage';
 import { AMAZON_PIPELINE_STAGES_ROLLBACKCLUSTER_AWSROLLBACKCLUSTERSTAGE } from './pipeline/stages/rollbackCluster/awsRollbackClusterStage';
