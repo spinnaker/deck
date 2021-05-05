@@ -44,6 +44,7 @@ query fetchApplication($appName: String!) {
             constraints {
               type
               status
+              judgedBy
               attributes
             }
             verifications {
@@ -79,6 +80,7 @@ query fetchApplication($appName: String!) {
             detail
           }
           location {
+            account
             regions
           }
         }
@@ -99,7 +101,11 @@ query fetchResourceStatus($appName: String!) {
         resources {
           id
           kind
-          status
+          state {
+            status
+            reason
+            event
+          }
         }
       }
     }
