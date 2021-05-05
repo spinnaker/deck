@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { GitLink } from './GitLink';
+import { Verifications } from './Verifications';
 import { VersionMetadata } from './VersionMetadata';
 import { QueryArtifactVersion } from '../types';
 import { getLifecycleEventDuration, useCreateVersionActions } from './utils';
@@ -18,7 +19,7 @@ export const CurrentVersion = ({
   numNewerVersions?: number;
   isPinned: boolean;
 }) => {
-  const { gitMetadata } = data;
+  const { gitMetadata, verifications } = data;
   const actions = useCreateVersionActions({
     environment,
     reference,
@@ -39,6 +40,7 @@ export const CurrentVersion = ({
         actions={actions}
         isPinned={isPinned}
       />
+      {verifications && <Verifications verifications={verifications} />}
     </div>
   );
 };

@@ -46,6 +46,14 @@ query fetchApplication($appName: String!) {
               status
               attributes
             }
+            verifications {
+              id
+              type
+              status
+              startedAt
+              completedAt
+              link
+            }
           }
           pinnedVersion {
             id
