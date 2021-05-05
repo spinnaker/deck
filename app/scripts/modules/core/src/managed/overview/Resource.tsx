@@ -1,10 +1,9 @@
 import React from 'react';
 
-import { useApplicationContext } from 'core/presentation';
+import { Icon, useApplicationContextSafe } from 'core/presentation';
 import { IconTooltip } from 'core/presentation/IconTooltip';
-import { NotifierService } from 'core/widgets';
 
-import { useFetchResourceStatusQuery } from '../graphql/graphql-sdk';
+import { DgsResourceActuationState, useFetchResourceStatusQuery } from '../graphql/graphql-sdk';
 import spinner from './loadingIndicator.svg';
 import { ResourceTitle } from '../resources/ResourceTitle';
 import { IResourceLinkProps, resourceManager } from '../resources/resourceRegistry';
@@ -12,6 +11,19 @@ import { QueryResource } from './types';
 import { TOOLTIP_DELAY } from '../utils/defaults';
 
 import './Resource.less';
+
+const statusUtils: {
+  [key in Exclude<DgsResourceActuationState['status'], 'UP_TO_DATE'>]: {
+    color?: string;
+    icon: string;
+    defaultReason: string;
+  };
+} = {
+  ERROR: { color: 'var(--color-status-error)', icon: 'fas fa-times', defaultReason: 'Failed to update resource' },
+  NOT_MANAGED: { color: 'var(--color-status-warning)', icon: 'fas fa-pause', defaultReason: 'Resource is not manged' },
+  WAITING: { icon: 'far fa-hourglass', defaultReason: 'Resource is currently locked and can not be updated' },
+  PROCESSING: { icon: 'far fa-hourglass', defaultReason: 'Resource is being updated' },
+};
 
 const Status = ({
   appName,
@@ -23,38 +35,47 @@ const Status = ({
   resourceId: string;
 }) => {
   const { data: resourceStatuses, error, loading } = useFetchResourceStatusQuery({ variables: { appName } });
-  React.useEffect(() => {
-    if (error) {
-      NotifierService.publish({
-        action: 'create',
-        key: 'md-failed-resource-status-fetch',
-        content: 'Failed to fetch resource status',
-        options: { type: 'error' },
-      });
-    }
-  }, [error]);
-
-  const currentResourceStatus = resourceStatuses?.application?.environments
+  const state = resourceStatuses?.application?.environments
     .find((env) => env.name === environmentName)
-    ?.state.resources?.find((resource) => resource.id === resourceId)?.status;
+    ?.state.resources?.find((resource) => resource.id === resourceId)?.state;
 
-  if (resourceStatuses && currentResourceStatus) {
-    return <div>{currentResourceStatus}</div>;
+  if (error || (!loading && !state)) {
+    return (
+      <div className="resource-status">
+        <Icon name="mdUnknown" size="14px" color="status-warning" />
+        <span>Failed to fetch resource status</span>
+      </div>
+    );
   }
-  if (error || (!loading && !currentResourceStatus)) {
-    return <IconTooltip name="mdError" size="14px" tooltip="Failed to fetch resource status" />;
+
+  if (state) {
+    if (state.status === 'UP_TO_DATE') return null;
+
+    return (
+      <div className="resource-status">
+        <i
+          className={statusUtils[state.status].icon}
+          style={{ color: statusUtils[state.status].color || 'var(--color-titanium)' }}
+        />
+        <div>
+          <div>{state.reason || statusUtils[state.status].defaultReason}</div>
+          {state.event && <div>{state.event}</div>}
+        </div>
+      </div>
+    );
   }
+
   return <img src={spinner} height={18} />;
 };
 
 export const Resource = ({ resource, environment }: { resource: QueryResource; environment: string }) => {
   const icon = resourceManager.getIcon(resource.kind);
-  const app = useApplicationContext();
+  const app = useApplicationContextSafe();
 
   const resourceLinkProps: IResourceLinkProps = {
     kind: resource.kind,
     displayName: resource.displayName,
-    account: 'FIXME',
+    account: resource.location?.account,
     detail: resource.moniker?.detail,
     stack: resource.moniker?.stack,
   };
@@ -69,7 +90,6 @@ export const Resource = ({ resource, environment }: { resource: QueryResource; e
       <div className="row-details">
         <div className="row-title">
           <ResourceTitle props={resourceLinkProps} />
-          {app && <Status appName={app.name} environmentName={environment} resourceId={resource.id} />}
         </div>
         <div className="resource-regions">
           {regions.map((region, index) => (
@@ -78,6 +98,9 @@ export const Resource = ({ resource, environment }: { resource: QueryResource; e
               {index < regions.length - 1 && ', '}
             </span>
           ))}
+        </div>
+        <div>
+          <Status appName={app.name} environmentName={environment} resourceId={resource.id} />
         </div>
       </div>
     </div>

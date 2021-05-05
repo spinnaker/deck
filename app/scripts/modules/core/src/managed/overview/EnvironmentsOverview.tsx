@@ -35,6 +35,8 @@ export const EnvironmentsOverview = ({ app }: IEnvironmentsProps) => {
       {data?.application?.environments.map((env) => (
         <Environment key={env.name} environment={env} />
       ))}
+      {/* Some padding at the bottom */}
+      <div style={{ minHeight: 24, minWidth: 24 }}></div>
     </div>
   );
 };

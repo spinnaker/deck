@@ -89,8 +89,8 @@ export type DgsConstraintStatus = 'PENDING' | 'PASS' | 'FAIL' | 'FORCE_PASS';
 export interface DgsConstraintStatusUpdate {
   type: Scalars['String'];
   artifactVersion: Scalars['String'];
-  artifactReference?: Maybe<Scalars['String']>;
-  status?: Maybe<DgsConstraintStatus>;
+  artifactReference: Scalars['String'];
+  status: DgsConstraintStatus;
 }
 
 export interface DgsEnvironment {
@@ -174,36 +174,32 @@ export interface DgsResource {
   id: Scalars['String'];
   kind: Scalars['String'];
   moniker?: Maybe<DgsMoniker>;
-  status?: Maybe<DgsResourceStatus>;
+  state?: Maybe<DgsResourceActuationState>;
   artifact?: Maybe<DgsArtifact>;
   displayName?: Maybe<Scalars['String']>;
   location?: Maybe<DgsLocation>;
 }
 
-export type DgsResourceStatus =
-  | 'CREATED'
-  | 'DIFF'
-  | 'ACTUATING'
-  | 'HAPPY'
-  | 'UNHAPPY'
-  | 'MISSING_DEPENDENCY'
-  | 'CURRENTLY_UNRESOLVABLE'
-  | 'ERROR'
-  | 'PAUSED'
-  | 'RESUMED'
-  | 'UNKNOWN'
-  | 'DIFF_NOT_ACTIONABLE'
-  | 'WAITING';
+export interface DgsResourceActuationState {
+  __typename?: 'DgsResourceActuationState';
+  status: DgsResourceActuationStatus;
+  reason?: Maybe<Scalars['String']>;
+  event?: Maybe<Scalars['String']>;
+}
+
+export type DgsResourceActuationStatus = 'PROCESSING' | 'UP_TO_DATE' | 'ERROR' | 'WAITING' | 'NOT_MANAGED';
 
 export interface DgsVerification {
   __typename?: 'DgsVerification';
   id: Scalars['String'];
   type: Scalars['String'];
-  status?: Maybe<DgsConstraintStatus>;
+  status: DgsVerificationStatus;
   startedAt?: Maybe<Scalars['InstantTime']>;
   completedAt?: Maybe<Scalars['InstantTime']>;
   link?: Maybe<Scalars['String']>;
 }
+
+export type DgsVerificationStatus = 'NOT_EVALUATED' | 'PENDING' | 'PASS' | 'FAIL' | 'FORCE_PASS';
 
 export interface Mutation {
   __typename?: 'Mutation';
@@ -275,7 +271,7 @@ export type FetchApplicationQuery = { __typename?: 'Query' } & {
                                     Array<
                                       { __typename?: 'DgsConstraint' } & Pick<
                                         DgsConstraint,
-                                        'type' | 'status' | 'attributes'
+                                        'type' | 'status' | 'judgedBy' | 'attributes'
                                       >
                                     >
                                   >;
@@ -311,7 +307,7 @@ export type FetchApplicationQuery = { __typename?: 'Query' } & {
                     Array<
                       { __typename?: 'DgsResource' } & Pick<DgsResource, 'id' | 'kind' | 'displayName'> & {
                           moniker?: Maybe<{ __typename?: 'DgsMoniker' } & Pick<DgsMoniker, 'app' | 'stack' | 'detail'>>;
-                          location?: Maybe<{ __typename?: 'DgsLocation' } & Pick<DgsLocation, 'regions'>>;
+                          location?: Maybe<{ __typename?: 'DgsLocation' } & Pick<DgsLocation, 'account' | 'regions'>>;
                         }
                     >
                   >;
@@ -333,7 +329,16 @@ export type FetchResourceStatusQuery = { __typename?: 'Query' } & {
           { __typename?: 'DgsEnvironment' } & Pick<DgsEnvironment, 'id' | 'name'> & {
               state: { __typename?: 'DgsEnvironmentState' } & Pick<DgsEnvironmentState, 'id'> & {
                   resources?: Maybe<
-                    Array<{ __typename?: 'DgsResource' } & Pick<DgsResource, 'id' | 'kind' | 'status'>>
+                    Array<
+                      { __typename?: 'DgsResource' } & Pick<DgsResource, 'id' | 'kind'> & {
+                          state?: Maybe<
+                            { __typename?: 'DgsResourceActuationState' } & Pick<
+                              DgsResourceActuationState,
+                              'status' | 'reason' | 'event'
+                            >
+                          >;
+                        }
+                    >
                   >;
                 };
             }
@@ -397,6 +402,7 @@ export const FetchApplicationDocument = gql`
               constraints {
                 type
                 status
+                judgedBy
                 attributes
               }
               verifications {
@@ -432,6 +438,7 @@ export const FetchApplicationDocument = gql`
               detail
             }
             location {
+              account
               regions
             }
           }
@@ -485,7 +492,11 @@ export const FetchResourceStatusDocument = gql`
           resources {
             id
             kind
-            status
+            state {
+              status
+              reason
+              event
+            }
           }
         }
       }

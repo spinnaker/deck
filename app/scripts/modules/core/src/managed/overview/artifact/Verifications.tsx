@@ -14,10 +14,9 @@ const statusToText: {
 } = {
   FAIL: 'failed',
   FORCE_PASS: 'has been overridden',
-
   PASS: 'passed',
   PENDING: 'in progress',
-  // NOT_EVALUATED: 'Verification has not started yet',
+  NOT_EVALUATED: 'has not started yet',
 };
 
 const Verification = ({ verification }: { verification: QueryVerification }) => {
@@ -52,7 +51,7 @@ export const Verifications = ({ verifications }: { verifications: QueryVerificat
   return (
     <div className="Verifications">
       {verifications.map((verification) => (
-        <Verification verification={verification} />
+        <Verification key={verification.id} verification={verification} />
       ))}
     </div>
   );
