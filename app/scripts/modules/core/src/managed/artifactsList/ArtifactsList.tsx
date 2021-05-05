@@ -1,29 +1,22 @@
-import React, { useMemo, useEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { Icon, IconNames } from '@spinnaker/presentation';
-
-import {
-  IManagedArtifactSummary,
-  IManagedArtifactVersion,
-  IStatefulConstraint,
-  StatefulConstraintStatus,
-} from '../../domain/IManagedEntity';
-
-import { isConstraintSupported, getConstraintIcon } from '../artifactDetail/constraints/constraintRegistry';
 
 import { ISelectedArtifactVersion } from '../Environments';
 import { Pill } from '../Pill';
 import { RelativeTimestamp } from '../RelativeTimestamp';
 import { IStatusBubbleStackProps, StatusBubbleStack } from './StatusBubbleStack';
+import { constraintsManager } from '../constraints/registry';
+import { IConstraint, IManagedArtifactSummary, IManagedArtifactVersion } from '../../domain/IManagedEntity';
 
 import './ArtifactRow.less';
 
 interface IArtifactsListProps {
   artifacts: IManagedArtifactSummary[];
   versionSelected: (version: ISelectedArtifactVersion) => void;
-  selectedVersion: ISelectedArtifactVersion;
+  selectedVersion?: ISelectedArtifactVersion;
 }
 
 export function ArtifactsList({ artifacts, selectedVersion, versionSelected }: IArtifactsListProps) {
@@ -33,13 +26,13 @@ export function ArtifactsList({ artifacts, selectedVersion, versionSelected }: I
         versions.map((version) => (
           <ArtifactRow
             key={`${name}-${version.version}`}
-            isSelected={
-              selectedVersion && selectedVersion.reference === reference && selectedVersion.version === version.version
-            }
+            isSelected={Boolean(
+              selectedVersion && selectedVersion.reference === reference && selectedVersion.version === version.version,
+            )}
             clickHandler={versionSelected}
             version={version}
             reference={reference}
-            name={artifacts.length > 1 ? reference : null}
+            name={artifacts.length > 1 ? reference : undefined}
           />
         )),
       )}
@@ -78,7 +71,7 @@ interface IArtifactRowProps {
 export const ArtifactRow = ({ isSelected, clickHandler, version: versionInfo, reference, name }: IArtifactRowProps) => {
   const { version, displayName, createdAt, environments, build, git } = versionInfo;
   const [isHovered, setIsHovered] = useState(false);
-  const rowRef = useRef<HTMLDivElement>();
+  const rowRef = React.useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     // Why does the call to scrollIntoView() have to be deferred for 100ms? A couple reasons:
@@ -89,7 +82,7 @@ export const ArtifactRow = ({ isSelected, clickHandler, version: versionInfo, re
     //    work at all. The same is true for a setTimeout with no delay. DOM read/write ops are weird
     //    and there is not a great practical justification for solving that mystery here and now.
     const timeout = setTimeout(() => {
-      if (isSelected && rowRef.current) {
+      if (isSelected && rowRef.current && rowRef.current.parentElement) {
         // *** VERY BRITTLE ASSUMPTION WARNING ***
         // This code assumes that the direct parent element of a row is the scrollable container.
         // If a wrapper element of any kind is added, this code will need to be modified
@@ -162,9 +155,12 @@ export const ArtifactRow = ({ isSelected, clickHandler, version: versionInfo, re
   );
 };
 
+const ignoredConstraintTypes: Array<IConstraint['type']> = ['depends-on'];
+
 type ArtifactStatusList = IStatusBubbleStackProps['statuses'];
 function getArtifactStatuses({ environments, lifecycleSteps }: IManagedArtifactVersion): ArtifactStatusList {
   const statuses: ArtifactStatusList = [];
+
   // NOTE: The order in which entries are added to `statuses` is important. The highest priority
   // item must be inserted first.
 
@@ -173,7 +169,7 @@ function getArtifactStatuses({ environments, lifecycleSteps }: IManagedArtifactV
       scope === 'PRE_DEPLOYMENT' && ['BUILD', 'BAKE'].includes(type) && ['RUNNING', 'FAILED'].includes(status),
   );
 
-  if (preDeploymentSteps?.length > 0) {
+  if (preDeploymentSteps && preDeploymentSteps.length > 0) {
     // These steps come in with chronological ordering, but we need reverse-chronological orddering for display
     preDeploymentSteps.reverse().forEach(({ type, status }) => {
       statuses.push({
@@ -191,18 +187,12 @@ function getArtifactStatuses({ environments, lifecycleSteps }: IManagedArtifactV
       return;
     }
 
-    environment.statefulConstraints?.forEach((constraint: IStatefulConstraint) => {
-      if (!isConstraintSupported(constraint.type)) {
-        return;
-      }
-
-      if (constraint.status === StatefulConstraintStatus.PENDING) {
-        pendingConstraintIcons.add(getConstraintIcon(constraint));
-      } else if (
-        constraint.status === StatefulConstraintStatus.FAIL ||
-        constraint.status === StatefulConstraintStatus.OVERRIDE_FAIL
-      ) {
-        failedConstraintIcons.add(getConstraintIcon(constraint));
+    environment.constraints?.forEach((constraint: IConstraint) => {
+      const icon = constraintsManager.getIcon(constraint);
+      if (constraint.status === 'PENDING' && !ignoredConstraintTypes.includes(constraint.type)) {
+        pendingConstraintIcons.add(icon);
+      } else if (constraint.status === 'FAIL' || constraint.status === 'OVERRIDE_FAIL') {
+        failedConstraintIcons.add(icon);
       }
     });
   });

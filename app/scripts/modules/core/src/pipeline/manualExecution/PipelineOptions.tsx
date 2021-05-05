@@ -1,12 +1,14 @@
-import React from 'react';
-import { Observable, Subject } from 'rxjs';
-import { Option } from 'react-select';
 import { FormikProps } from 'formik';
 import { head } from 'lodash';
+import React from 'react';
+import { Option } from 'react-select';
+import { from as observableFrom, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import { IParameter, IPipeline, IPipelineCommand, ITrigger } from 'core/domain';
-import { IPipelineTemplateConfig, PipelineTemplateReader, PipelineTemplateV2Service } from '../config/templates';
 import { FormField, TetheredSelect } from 'core/presentation';
+
+import { IPipelineTemplateConfig, PipelineTemplateReader, PipelineTemplateV2Service } from '../config/templates';
 
 export interface IPipelineOptionsProps {
   formatParameterConfig: (p: IParameter[]) => { [key: string]: any };
@@ -45,8 +47,8 @@ export class PipelineOptions extends React.Component<IPipelineOptionsProps, IPip
         type: 'templatedPipeline',
         ...pipeline,
       };
-      Observable.fromPromise(PipelineTemplateReader.getPipelinePlan(pipelineTemplateConfig))
-        .takeUntil(this.destroy$)
+      observableFrom(PipelineTemplateReader.getPipelinePlan(pipelineTemplateConfig))
+        .pipe(takeUntil(this.destroy$))
         .subscribe(
           (plan: IPipeline) => {
             this.setPipelineSelectedValues(isV2Pipeline ? formatPipeline(plan) : pipeline);

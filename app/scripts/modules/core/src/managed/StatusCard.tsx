@@ -1,13 +1,13 @@
-import React from 'react';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
-
-import { StatusBubble } from './StatusBubble';
-
-import { RelativeTimestamp } from './RelativeTimestamp';
-import './StatusCard.less';
+import React from 'react';
 
 import { IconNames } from '@spinnaker/presentation';
+
+import { RelativeTimestamp } from './RelativeTimestamp';
+import { StatusBubble } from './StatusBubble';
+
+import './StatusCard.less';
 
 export interface IStatusCardProps {
   appearance: 'future' | 'neutral' | 'info' | 'progress' | 'success' | 'warning' | 'error' | 'archived';
@@ -30,9 +30,11 @@ export const StatusCard: React.FC<IStatusCardProps> = ({
   description,
   actions,
 }) => {
-  let timestampAsDateTime: DateTime;
+  let timestampAsDateTime: DateTime | undefined = undefined;
   try {
-    timestampAsDateTime = typeof timestamp === 'string' ? DateTime.fromISO(timestamp) : timestamp;
+    if (timestamp) {
+      timestampAsDateTime = typeof timestamp === 'string' ? DateTime.fromISO(timestamp) : timestamp;
+    }
   } catch (e) {
     console.error(`Failed to parse timestamp ${timestamp}`);
   }
@@ -50,7 +52,7 @@ export const StatusCard: React.FC<IStatusCardProps> = ({
           <StatusBubble iconName={iconName} appearance={appearance} size="small" />
         </div>
         <div className="sp-margin-m-right" style={{ minWidth: 33 }}>
-          {timestamp && <RelativeTimestamp timestamp={timestampAsDateTime} clickToCopy={true} />}
+          {timestampAsDateTime && <RelativeTimestamp timestamp={timestampAsDateTime} clickToCopy={true} />}
         </div>
         <div className="flex-container-v sp-margin-xs-yaxis">
           <div className="text-bold">{title}</div>

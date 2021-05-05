@@ -1,24 +1,25 @@
+import { FormikErrors, FormikProps } from 'formik';
+import { forOwn, uniqBy } from 'lodash';
 import React from 'react';
 import { Option } from 'react-select';
-import { Observable, Subject } from 'rxjs';
-import { forOwn, uniqBy } from 'lodash';
+import { combineLatest as observableCombineLatest, from as observableFrom, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import {
   Application,
   FormikFormField,
-  IWizardPageComponent,
-  IVpc,
-  ISubnet,
   HelpField,
   IAccount,
   IRegion,
-  ReactSelectInput,
-  TetheredSelect,
-  SubnetReader,
-  ReactInjector,
   ISecurityGroupsByAccountSourceData,
+  ISubnet,
+  IVpc,
+  IWizardPageComponent,
+  ReactInjector,
+  ReactSelectInput,
+  SubnetReader,
+  TetheredSelect,
 } from '@spinnaker/core';
-import { FormikErrors, FormikProps } from 'formik';
 import { IAmazonFunctionUpsertCommand } from 'amazon/index';
 import { VpcReader } from 'amazon/vpc';
 
@@ -62,8 +63,8 @@ export class Network
   private destroy$ = new Subject<void>();
 
   private getAllVpcs(): void {
-    Observable.fromPromise(VpcReader.listVpcs())
-      .takeUntil(this.destroy$)
+    observableFrom(VpcReader.listVpcs())
+      .pipe(takeUntil(this.destroy$))
       .subscribe((Vpcs) => {
         this.setState({ vpcOptions: Vpcs });
       });
@@ -112,8 +113,8 @@ export class Network
       });
 
     const secGroups$ = Promise.resolve(this.getAvailableSecurityGroups());
-    Observable.combineLatest(allSubnets, secGroups$)
-      .takeUntil(this.destroy$)
+    observableCombineLatest([allSubnets, secGroups$])
+      .pipe(takeUntil(this.destroy$))
       .subscribe(([availableSubnets, securityGroups]) => {
         return this.setState({ availableSubnets, securityGroups });
       });

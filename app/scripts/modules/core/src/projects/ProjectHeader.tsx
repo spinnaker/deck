@@ -1,14 +1,16 @@
-import React from 'react';
-
-import '@uirouter/rx';
 import { Transition } from '@uirouter/core';
 import { UISref, UIView } from '@uirouter/react';
+import '@uirouter/rx';
+import React from 'react';
 import { Dropdown, MenuItem } from 'react-bootstrap';
 import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
-import { ReactInjector } from 'core/reactShims';
 import { IProject } from 'core/domain';
+import { Overridable } from 'core/overrideRegistry';
 import { SpanDropdownTrigger } from 'core/presentation';
+import { ReactInjector } from 'core/reactShims';
+
 import { ConfigureProjectModal } from './configure/ConfigureProjectModal';
 
 import './project.less';
@@ -24,13 +26,14 @@ export interface IProjectHeaderState {
   isOpen: boolean;
 }
 
+@Overridable('createProjectHeader')
 export class ProjectHeader extends React.Component<IProjectHeaderProps, IProjectHeaderState> {
   public state: IProjectHeaderState = { state: null, application: null, isOpen: false };
   private destroy$ = new Subject();
 
   public componentDidMount() {
     const { success$ } = this.props.transition.router.globals;
-    success$.takeUntil(this.destroy$).subscribe((success) => {
+    success$.pipe(takeUntil(this.destroy$)).subscribe((success) => {
       const state = success.to().name;
       const application = success.params().application;
       this.setState({ state, application });

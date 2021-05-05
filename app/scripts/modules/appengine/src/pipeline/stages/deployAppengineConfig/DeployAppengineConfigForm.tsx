@@ -1,16 +1,17 @@
 import React from 'react';
+import { from as observableFrom, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import {
+  AccountService,
+  ArtifactTypePatterns,
+  excludeAllTypesExcept,
+  IAccount,
   IArtifact,
   IExpectedArtifact,
-  excludeAllTypesExcept,
-  ArtifactTypePatterns,
-  StageArtifactSelectorDelegate,
   IFormikStageConfigInjectedProps,
-  IAccount,
-  AccountService,
+  StageArtifactSelectorDelegate,
 } from '@spinnaker/core';
-import { Subject, Observable } from 'rxjs';
 import { FormikAccountRegionSelector } from 'appengine/common/FormikAccountRegionSelector';
 
 export interface IAppEngineDeployConfigSettingsState {
@@ -38,8 +39,8 @@ export class DeployAppengineConfigForm extends React.Component<
   };
 
   public componentDidMount() {
-    Observable.fromPromise(AccountService.listAccounts('appengine'))
-      .takeUntil(this.destroy$)
+    observableFrom(AccountService.listAccounts('appengine'))
+      .pipe(takeUntil(this.destroy$))
       .subscribe((accounts) => this.setState({ accounts }));
   }
 

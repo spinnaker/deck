@@ -1,11 +1,11 @@
 import * as React from 'react';
 
+import { IAccountDetails } from 'core/account';
 import { Application } from 'core/application';
 import { CloudProviderRegistry, ICloudProviderConfig, ProviderSelectionService } from 'core/cloudProvider';
-import { ModalInjector } from 'core/reactShims';
-import { Tooltip } from 'core/presentation';
-import { IAccountDetails } from 'core/account';
 import { SETTINGS } from 'core/config/settings';
+import { Tooltip } from 'core/presentation';
+import { ModalInjector } from 'core/reactShims';
 
 import { FirewallLabels } from './label/FirewallLabels';
 
@@ -26,6 +26,7 @@ const getDefaultRegion = (app: Application, provider: string) =>
 const getAngularModalOptions = (provider: any, selectedProvider: string, app: Application) => ({
   templateUrl: provider.createSecurityGroupTemplateUrl,
   controller: `${provider.createSecurityGroupController} as ctrl`,
+  windowClass: 'modal-z-index',
   size: 'lg',
   resolve: {
     securityGroup: () => {

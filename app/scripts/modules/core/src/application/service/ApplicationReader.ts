@@ -1,9 +1,10 @@
 import { REST } from 'core/api';
 import { SchedulerFactory } from 'core/scheduler';
-import { Application } from '../application.model';
-import { ApplicationDataSource } from '../service/applicationDataSource';
+
 import { ApplicationDataSourceRegistry } from './ApplicationDataSourceRegistry';
 import { InferredApplicationWarningService } from './InferredApplicationWarningService';
+import { Application } from '../application.model';
+import { ApplicationDataSource } from '../service/applicationDataSource';
 
 export interface IApplicationDataSourceAttribute {
   enabled: string[];
@@ -19,6 +20,7 @@ export interface IApplicationSummary {
   email?: string;
   name: string;
   pdApiKey?: string;
+  slackChannel?: { name: string };
   updateTs?: string;
 }
 
@@ -70,7 +72,7 @@ export class ApplicationReader {
     fields.forEach((field) => {
       if (attributes[field]) {
         if (!Array.isArray(attributes[field])) {
-          attributes[field] = attributes[field].split(',');
+          attributes[field] = attributes[field].split(',').map((s: string) => s.trim());
         }
       } else {
         attributes[field] = [];

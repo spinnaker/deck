@@ -2,22 +2,23 @@ import React from 'react';
 
 import { IVerification } from 'core/domain';
 
-import { IStatusCardProps, StatusCard } from '../../StatusCard';
 import { Button } from '../../Button';
 import { DurationRender } from '../../RelativeTimestamp';
+import { IStatusCardProps, StatusCard } from '../../StatusCard';
 
 const statusToText: { [key in IVerification['status']]: string } = {
   NOT_EVALUATED: 'Verification has not started yet',
   PENDING: `Verification in progress`,
   PASS: `Verification passed`,
   FAIL: `Verification failed`,
-  OVERRIDE_FAIL: `TBD`,
-  OVERRIDE_PASS: `TBD`,
+  OVERRIDE_FAIL: `Failed verification has been overridden`,
+  OVERRIDE_PASS: `Verification has been overridden`,
 };
 
 const FINISHED_STATES: Array<IVerification['status']> = ['PASS', 'FAIL', 'OVERRIDE_FAIL', 'OVERRIDE_PASS'];
 
 const statusToAppearance: { [key in IVerification['status']]?: IStatusCardProps['appearance'] } = {
+  PENDING: 'progress',
   PASS: 'success',
   FAIL: 'error',
 };
@@ -37,7 +38,7 @@ export const VerificationCard: React.FC<VerificationCardProps> = ({ verification
       title={
         <>
           {wasHalted ? 'Verification was halted' : statusToText[status]}
-          {FINISHED_STATES.includes(status) && (
+          {FINISHED_STATES.includes(status) && startedAt && (
             <>
               {' '}
               —{' '}

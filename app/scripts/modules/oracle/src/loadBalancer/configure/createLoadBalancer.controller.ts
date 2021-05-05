@@ -1,24 +1,22 @@
+import UIROUTER_ANGULARJS, { StateService } from '@uirouter/angularjs';
 import { IController, module } from 'angular';
 import ANGULAR_UI_BOOTSTRAP, { IModalServiceInstance } from 'angular-ui-bootstrap';
-import UIROUTER_ANGULARJS, { StateService } from '@uirouter/angularjs';
-
-import { trimEnd, cloneDeep } from 'lodash';
+import { cloneDeep, trimEnd } from 'lodash';
 
 import {
   AccountService,
   Application,
+  IAccountDetails,
+  ILoadBalancer,
+  INetwork,
+  IRegion,
+  ISubnet,
   LoadBalancerWriter,
   NameUtils,
   NetworkReader,
-  TaskMonitor,
-  INetwork,
-  IAccountDetails,
-  IRegion,
-  ISubnet,
   SubnetReader,
-  ILoadBalancer,
+  TaskMonitor,
 } from '@spinnaker/core';
-
 import {
   IOracleBackEndSet,
   IOracleListener,

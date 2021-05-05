@@ -1,12 +1,14 @@
+import { isEqual } from 'lodash';
 import React from 'react';
 import { Subject } from 'rxjs';
-import { isEqual } from 'lodash';
+import { distinctUntilChanged, map, takeUntil } from 'rxjs/operators';
 
-import { IServerGroup, IInstance } from 'core/domain';
-import { InstanceListBody } from './InstanceListBody';
+import { IInstance, IServerGroup } from 'core/domain';
 import { SortToggle } from 'core/presentation/sortToggle/SortToggle';
 import { ReactInjector } from 'core/reactShims';
 import { ClusterState } from 'core/state';
+
+import { InstanceListBody } from './InstanceListBody';
 
 export interface IInstanceListProps {
   hasDiscovery: boolean;
@@ -48,14 +50,16 @@ export class InstanceList extends React.Component<IInstanceListProps, IInstanceL
   }
 
   public componentDidMount() {
-    ClusterState.multiselectModel.instancesStream.takeUntil(this.destroy$).subscribe(() => {
+    ClusterState.multiselectModel.instancesStream.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.setState({ allSelected: this.instanceGroup.selectAll });
     });
 
     this.$uiRouter.globals.params$
-      .map((params) => [params.multiselect, params.instanceSort])
-      .distinctUntilChanged(isEqual)
-      .takeUntil(this.destroy$)
+      .pipe(
+        map((params) => [params.multiselect, params.instanceSort]),
+        distinctUntilChanged(isEqual),
+        takeUntil(this.destroy$),
+      )
       .subscribe(() => {
         this.setState({
           multiselect: this.$state.params.multiselect,

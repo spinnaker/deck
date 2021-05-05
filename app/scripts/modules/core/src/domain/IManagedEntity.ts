@@ -16,32 +16,37 @@ export enum ManagedResourceStatus {
   WAITING = 'WAITING',
 }
 
-export enum StatefulConstraintStatus {
-  NOT_EVALUATED = 'NOT_EVALUATED',
-  PENDING = 'PENDING',
-  PASS = 'PASS',
-  FAIL = 'FAIL',
-  OVERRIDE_PASS = 'OVERRIDE_PASS',
-  OVERRIDE_FAIL = 'OVERRIDE_FAIL',
-}
+export type ConstraintStatus = 'NOT_EVALUATED' | 'PENDING' | 'PASS' | 'FAIL' | 'OVERRIDE_PASS' | 'OVERRIDE_FAIL';
 
-export interface IStatefulConstraint {
+// Warning! Chaning this interface might affect existing plugins. Please make sure you don't break the API
+export interface IBaseConstraint {
   type: string;
-  status: StatefulConstraintStatus;
+  status: ConstraintStatus;
   startedAt?: string;
   judgedAt?: string;
   judgedBy?: string;
   comment?: string;
 }
 
-export interface IDependsOnConstraint {
+export interface IDependsOnConstraint extends IBaseConstraint {
   type: 'depends-on';
-  currentlyPassing: boolean;
-  attributes: { environment: string };
+  attributes: { dependsOnEnvironment: string };
 }
 
-// more stateless types coming soon
-export type IStatelessConstraint = IDependsOnConstraint;
+export interface AllowedTimeWindow {
+  days: number[];
+  hours: number[];
+}
+export interface IAllowedTimesConstraint extends IBaseConstraint {
+  type: 'allowed-times';
+  attributes: { allowedTimes: AllowedTimeWindow[]; timezone?: string };
+}
+
+export interface IManualJudgementConstraint extends IBaseConstraint {
+  type: 'manual-judgement';
+}
+
+export type IConstraint = IManualJudgementConstraint | IDependsOnConstraint | IAllowedTimesConstraint;
 
 export interface IManagedResourceSummary {
   id: string;
@@ -91,41 +96,46 @@ export interface IVerification {
   link?: string;
 }
 
+export interface IPinned {
+  at: string;
+  by: string;
+  comment?: string;
+}
+
+export interface IManagedArtifactVersionEnvironment {
+  name: string;
+  state: 'current' | 'deploying' | 'approved' | 'pending' | 'previous' | 'vetoed' | 'skipped';
+  pinned?: IPinned;
+  vetoed?: {
+    at: string;
+    by: string;
+    comment?: string;
+  };
+  deployedAt?: string;
+  replacedAt?: string;
+  replacedBy?: string;
+  constraints?: IConstraint[];
+  compareLink?: string;
+  verifications?: IVerification[];
+}
+
+export interface IManagedArtifactVersionLifecycleStep {
+  // likely more scopes + types later, but hard-coding to avoid premature abstraction for now
+  scope: 'PRE_DEPLOYMENT';
+  type: 'BUILD' | 'BAKE';
+  id: string;
+  status: 'NOT_STARTED' | 'RUNNING' | 'SUCCEEDED' | 'FAILED' | 'ABORTED' | 'UNKNOWN';
+  startedAt?: string;
+  completedAt?: string;
+  link?: string;
+}
+
 export interface IManagedArtifactVersion {
   version: string;
   displayName: string;
   createdAt?: string;
-  environments: Array<{
-    name: string;
-    state: 'current' | 'deploying' | 'approved' | 'pending' | 'previous' | 'vetoed' | 'skipped';
-    pinned?: {
-      at: string;
-      by: string;
-      comment?: string;
-    };
-    vetoed?: {
-      at: string;
-      by: string;
-      comment?: string;
-    };
-    deployedAt?: string;
-    replacedAt?: string;
-    replacedBy?: string;
-    statefulConstraints?: IStatefulConstraint[];
-    statelessConstraints?: IStatelessConstraint[];
-    compareLink?: string;
-    verifications?: IVerification[];
-  }>;
-  lifecycleSteps?: Array<{
-    // likely more scopes + types later, but hard-coding to avoid premature abstraction for now
-    scope: 'PRE_DEPLOYMENT';
-    type: 'BUILD' | 'BAKE';
-    id: string;
-    status: 'NOT_STARTED' | 'RUNNING' | 'SUCCEEDED' | 'FAILED' | 'ABORTED' | 'UNKNOWN';
-    startedAt?: string;
-    completedAt?: string;
-    link?: string;
-  }>;
+  environments: IManagedArtifactVersionEnvironment[];
+  lifecycleSteps?: IManagedArtifactVersionLifecycleStep[];
   build?: {
     id: number; // deprecated, use number
     number: string;
@@ -159,9 +169,6 @@ export interface IManagedArtifactVersion {
   };
 }
 
-export type IManagedArtifactVersionEnvironment = IManagedArtifactSummary['versions'][0]['environments'][0];
-export type IManagedArtifactVersionLifecycleStep = IManagedArtifactSummary['versions'][0]['lifecycleSteps'][0];
-
 export interface IManagedArtifactSummary {
   name: string;
   type: string;
@@ -192,20 +199,20 @@ export interface IManagedResource {
   isManaged?: boolean;
 }
 
-export enum ManagedResourceEventType {
-  ResourceCreated = 'ResourceCreated',
-  ResourceUpdated = 'ResourceUpdated',
-  ResourceDeleted = 'ResourceDeleted',
-  ResourceMissing = 'ResourceMissing',
-  ResourceValid = 'ResourceValid',
-  ResourceDeltaDetected = 'ResourceDeltaDetected',
-  ResourceDeltaResolved = 'ResourceDeltaResolved',
-  ResourceActuationLaunched = 'ResourceActuationLaunched',
-  ResourceCheckError = 'ResourceCheckError',
-  ResourceCheckUnresolvable = 'ResourceCheckUnresolvable',
-  ResourceActuationPaused = 'ResourceActuationPaused',
-  ResourceActuationResumed = 'ResourceActuationResumed',
-}
+export type ManagedResourceEventType =
+  | 'ResourceCreated'
+  | 'ResourceUpdated'
+  | 'ResourceDeleted'
+  | 'ResourceMissing'
+  | 'ResourceValid'
+  | 'ResourceDeltaDetected'
+  | 'ResourceDeltaResolved'
+  | 'ResourceActuationLaunched'
+  | 'ResourceCheckError'
+  | 'ResourceCheckUnresolvable'
+  | 'ResourceActuationPaused'
+  | 'ResourceActuationVetoed'
+  | 'ResourceActuationResumed';
 
 export interface IManagedResourceDiff {
   [fieldName: string]: {
@@ -223,6 +230,8 @@ export interface IManagedResourceEvent {
   id: string;
   application: string;
   timestamp: string;
+  displayName: string;
+  level: 'SUCCESS' | 'INFO' | 'WARNING' | 'ERROR';
   plugin?: string;
   tasks?: Array<{ id: string; name: string }>;
   delta?: IManagedResourceDiff;

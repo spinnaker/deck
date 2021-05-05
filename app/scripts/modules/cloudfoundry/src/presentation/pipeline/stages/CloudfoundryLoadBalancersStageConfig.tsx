@@ -1,6 +1,7 @@
+import { Formik } from 'formik';
 import React from 'react';
-
-import { Observable, Subject } from 'rxjs';
+import { from as observableFrom, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import {
   AccountService,
@@ -14,9 +15,8 @@ import {
   StageConstants,
 } from '@spinnaker/core';
 
-import { AccountRegionClusterSelector } from '../../widgets/accountRegionClusterSelector';
 import { Routes } from '../../forms/serverGroup';
-import { Formik } from 'formik';
+import { AccountRegionClusterSelector } from '../../widgets/accountRegionClusterSelector';
 
 interface ICloudfoundryLoadBalancerStageConfigProps extends IStageConfigProps {
   pipeline: IPipeline;
@@ -59,8 +59,8 @@ export class CloudfoundryLoadBalancersStageConfig extends React.Component<
   }
 
   public componentDidMount(): void {
-    Observable.fromPromise(AccountService.listAccounts('cloudfoundry'))
-      .takeUntil(this.destroy$)
+    observableFrom(AccountService.listAccounts('cloudfoundry'))
+      .pipe(takeUntil(this.destroy$))
       .subscribe((accounts) => this.setState({ accounts }));
   }
 

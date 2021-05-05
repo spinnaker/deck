@@ -1,20 +1,21 @@
 import React from 'react';
-import { Observable, Subject } from 'rxjs';
+import { from as observableFrom, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import {
-  StageConfigField,
-  IArtifact,
-  excludeAllTypesExcept,
-  ArtifactTypePatterns,
-  StageArtifactSelectorDelegate,
-  IFormikStageConfigInjectedProps,
-  TextInput,
   AccountService,
+  Application,
+  ArtifactTypePatterns,
+  excludeAllTypesExcept,
   IAccount,
+  IArtifact,
+  IFormikStageConfigInjectedProps,
   IRegion,
   NgReact,
-  Application,
+  StageArtifactSelectorDelegate,
+  StageConfigField,
   StageConstants,
+  TextInput,
 } from '@spinnaker/core';
 
 import { AccountRegionClusterSelector } from '../../../presentation/widgets/accountRegionClusterSelector';
@@ -49,8 +50,8 @@ export class CloudFoundryCreateServiceBindingsStageConfigForm extends React.Comp
       regions: [],
       application: props.application,
     };
-    Observable.fromPromise(AccountService.listAccounts('cloudfoundry'))
-      .takeUntil(this.destroy$)
+    observableFrom(AccountService.listAccounts('cloudfoundry'))
+      .pipe(takeUntil(this.destroy$))
       .subscribe((rawAccounts: IAccount[]) => this.setState({ accounts: rawAccounts }));
   }
 
@@ -76,8 +77,8 @@ export class CloudFoundryCreateServiceBindingsStageConfigForm extends React.Comp
 
   private loadRegions = (creds: string) => {
     this.setState({ regions: [] });
-    Observable.fromPromise(AccountService.getRegionsForAccount(creds))
-      .takeUntil(this.destroy$)
+    observableFrom(AccountService.getRegionsForAccount(creds))
+      .pipe(takeUntil(this.destroy$))
       .subscribe((regionList: IRegion[]) => {
         const regions = regionList.map((r) => r.name);
         regions.sort((a, b) => a.localeCompare(b));

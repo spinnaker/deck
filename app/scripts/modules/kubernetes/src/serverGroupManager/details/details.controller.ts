@@ -1,17 +1,18 @@
+import { StateService } from '@uirouter/angularjs';
 import { IController, IScope, module } from 'angular';
 import { IModalService } from 'angular-ui-bootstrap';
 import { orderBy } from 'lodash';
-import { StateService } from '@uirouter/angularjs';
 
 import {
-  NameUtils,
   Application,
+  ClusterTargetBuilder,
   IManifest,
+  IOwnerOption,
   IServerGroupManager,
   IServerGroupManagerStateParams,
-  ClusterTargetBuilder,
-  IOwnerOption,
   ManifestReader,
+  NameUtils,
+  SETTINGS,
 } from '@spinnaker/core';
 
 import { IKubernetesServerGroupManager } from '../../interfaces';
@@ -37,9 +38,11 @@ class KubernetesServerGroupManagerDetailsController implements IController {
       .ready()
       .then(() => {
         this.extractServerGroupManager(serverGroupManager);
+        this.$scope.isDisabled = !SETTINGS.kubernetesAdHocInfraWritesEnabled;
         dataSource.onRefresh(this.$scope, () => this.extractServerGroupManager(serverGroupManager));
       })
       .catch(() => this.autoClose());
+    this.$scope.isDisabled = !SETTINGS.kubernetesAdHocInfraWritesEnabled;
   }
 
   public pauseRolloutServerGroupManager(): void {

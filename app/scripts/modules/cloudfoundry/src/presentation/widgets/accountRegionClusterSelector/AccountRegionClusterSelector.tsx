@@ -1,10 +1,8 @@
-import React from 'react';
-
-import { Observable, Subject } from 'rxjs';
-
 import { first, isNil, uniq } from 'lodash';
-
-import Select, { Option, Creatable } from 'react-select';
+import React from 'react';
+import Select, { Creatable, Option } from 'react-select';
+import { from as observableFrom, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import {
   Application,
@@ -71,8 +69,8 @@ export class AccountRegionClusterSelector extends React.Component<
     const { application } = this.props;
     const accountFilter: IServerGroupFilter = (serverGroup: IServerGroup) =>
       serverGroup ? serverGroup.account === credentials : true;
-    Observable.fromPromise(application.ready())
-      .takeUntil(this.destroy$)
+    observableFrom(application.ready())
+      .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
         const availableRegions = AppListExtractor.getRegions([application], accountFilter);
         availableRegions.sort();
@@ -82,8 +80,8 @@ export class AccountRegionClusterSelector extends React.Component<
 
   private setClusterList = (credentials: string, regions: string[]): void => {
     const { application } = this.props;
-    Observable.fromPromise(application.ready())
-      .takeUntil(this.destroy$)
+    observableFrom(application.ready())
+      .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
         const clusterFilter = AppListExtractor.clusterFilterForCredentialsAndRegion(credentials, regions);
         const clusters = AppListExtractor.getClusters([application], clusterFilter);

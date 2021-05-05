@@ -43,8 +43,11 @@ import * as Select from 'react-select';
     },
     {
       code: `
-import React, {useState, useCallback} from 'react';
+import React  from 'react';
 
+const {useState, useCallback} = React;
+
+import { Application } from 'core/application';
 import Bar from "./bar";
 import angular from 'angular';
 // Some comment about react-select
@@ -63,17 +66,20 @@ import 'bootstrap.less';
       output: `
 import angular from 'angular';
 import 'jquery';
-import React, { useCallback, useState } from 'react';
+import React from 'react';
 // Some comment about react-select
 import * as Select from 'react-select';
 
 import { LabeledValueList as LabeledValueL, SomeThingElse } from '@spinnaker/core';
+import { Application } from 'core/application';
 
 import Bar from './bar';
 import Baz from '../../../test/baz';
 
 import 'bootstrap.less';
 import './styles.less';
+
+const {useState, useCallback} = React;
       `,
       errors: ['Sort the import statements'],
     },

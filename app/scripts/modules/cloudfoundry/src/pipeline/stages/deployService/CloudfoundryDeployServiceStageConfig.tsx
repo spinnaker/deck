@@ -1,20 +1,19 @@
 import React from 'react';
-
 import { Option } from 'react-select';
-
-import { Observable, Subject } from 'rxjs';
+import { from as observableFrom, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import {
   AccountService,
+  ArtifactTypePatterns,
   IAccount,
+  IArtifact,
   IExpectedArtifact,
   IRegion,
   IStageConfigProps,
   ReactSelectInput,
-  StageConfigField,
   StageArtifactSelector,
-  IArtifact,
-  ArtifactTypePatterns,
+  StageConfigField,
 } from '@spinnaker/core';
 
 import { CreateServiceInstanceDirectInput } from './CreateServiceInstanceDirectInput';
@@ -63,8 +62,8 @@ export class CloudfoundryDeployServiceStageConfig extends React.Component<
   };
 
   public componentDidMount(): void {
-    Observable.fromPromise(AccountService.listAccounts('cloudfoundry'))
-      .takeUntil(this.destroy$)
+    observableFrom(AccountService.listAccounts('cloudfoundry'))
+      .pipe(takeUntil(this.destroy$))
       .subscribe((accounts) => this.setState({ accounts }));
     this.reloadRegions();
   }
@@ -76,8 +75,8 @@ export class CloudfoundryDeployServiceStageConfig extends React.Component<
   private reloadRegions = () => {
     const { credentials } = this.props.stage;
     if (credentials) {
-      Observable.fromPromise(AccountService.getRegionsForAccount(credentials))
-        .takeUntil(this.destroy$)
+      observableFrom(AccountService.getRegionsForAccount(credentials))
+        .pipe(takeUntil(this.destroy$))
         .subscribe((regions) => this.setState({ regions }));
     }
   };

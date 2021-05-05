@@ -1,19 +1,19 @@
-import React, { useMemo } from 'react';
-import { pick, isEqual, keyBy } from 'lodash';
 import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
-import { useTransition, animated } from 'react-spring';
+import { isEqual, keyBy, pick } from 'lodash';
+import React, { useMemo } from 'react';
+import { animated, useTransition } from 'react-spring';
 
 import { SETTINGS } from 'core/config/settings';
 import { Spinner } from 'core/widgets';
-import { useDataSource } from '../presentation/hooks';
-import { Application, ApplicationDataSource } from '../application';
-import { IManagedApplicationEnvironmentSummary, IManagedResourceSummary } from '../domain';
 
 import { ColumnHeader } from './ColumnHeader';
-import { ArtifactsList } from './artifactsList/ArtifactsList';
-import { EnvironmentsList } from './EnvironmentsList';
-import { ArtifactDetail } from './artifactDetail/ArtifactDetail';
 import { EnvironmentsHeader } from './EnvironmentsHeader';
+import { EnvironmentsList } from './EnvironmentsList';
+import { Application, ApplicationDataSource } from '../application';
+import { ArtifactDetail } from './artifactDetail/ArtifactDetail';
+import { ArtifactsList } from './artifactsList/ArtifactsList';
+import { IManagedApplicationEnvironmentSummary, IManagedResourceSummary } from '../domain';
+import { useDataSource } from '../presentation/hooks';
 
 import './Environments.less';
 
@@ -88,8 +88,8 @@ export const Environments: React.FC<IEnvironmentsProps> = ({ app }) => {
     [environments, resourcesById],
   );
 
-  const selectedVersion = useMemo<ISelectedArtifactVersion>(
-    () => (params.version ? pick(params, ['reference', 'version']) : null),
+  const selectedVersion = useMemo<ISelectedArtifactVersion | undefined>(
+    () => (params.version ? (pick(params, ['reference', 'version']) as ISelectedArtifactVersion) : undefined),
     [params.reference, params.version],
   );
   const selectedArtifactDetails = useMemo(
@@ -97,7 +97,7 @@ export const Environments: React.FC<IEnvironmentsProps> = ({ app }) => {
     [selectedVersion?.reference, artifacts],
   );
   const selectedVersionDetails = useMemo(
-    () => selectedArtifactDetails?.versions.find(({ version }) => version === selectedVersion.version),
+    () => selectedArtifactDetails?.versions.find(({ version }) => version === selectedVersion?.version),
     [selectedVersion, selectedArtifactDetails],
   );
 
@@ -181,7 +181,9 @@ export const Environments: React.FC<IEnvironmentsProps> = ({ app }) => {
         )}
         {detailPaneTransition.map(
           ({ item, key, props }) =>
-            item.selectedVersion && (
+            item.selectedVersion &&
+            item.selectedArtifactDetails &&
+            item.selectedVersionDetails && (
               <animated.div key={key} className="environments-pane flex-container-v" style={props}>
                 <ArtifactDetail
                   application={app}

@@ -1,20 +1,18 @@
-import React from 'react';
-import { sortBy } from 'lodash';
-
 import { UISref } from '@uirouter/react';
 import { UIRouterContextComponent } from '@uirouter/react-hybrid';
+import { sortBy } from 'lodash';
+import React from 'react';
 
 import {
   AccountService,
   Application,
   CollapsibleSection,
-  ISecurityGroup,
   FirewallLabels,
+  ISecurityGroup,
   ReactInjector,
 } from '@spinnaker/core';
-
-import { TitusReactInjector } from 'titus/reactShims';
 import { ITitusServerGroupView } from 'titus/domain';
+import { TitusReactInjector } from 'titus/reactShims';
 
 export interface ITitusServerGroupDetailsSectionProps {
   app: Application;
@@ -87,24 +85,26 @@ export class TitusSecurityGroupsDetailsSection extends React.Component<
         <ul>
           {initializing && serverGroup.securityGroups.map((sgId) => <li key={sgId}>...</li>)}
           <UIRouterContextComponent>
-            {sortBy(securityGroups, 'name').map((securityGroup) => (
-              <li key={securityGroup.name}>
-                <UISref
-                  to="^.firewallDetails"
-                  params={{
-                    name: securityGroup.name,
-                    accountId: securityGroup.account,
-                    region: serverGroup.region,
-                    vpcId: securityGroup.vpcId,
-                    provider: 'aws',
-                  }}
-                >
-                  <a>
-                    {securityGroup.name} ({securityGroup.id})
-                  </a>
-                </UISref>
-              </li>
-            ))}
+            <>
+              {sortBy(securityGroups, 'name').map((securityGroup) => (
+                <li key={securityGroup.name}>
+                  <UISref
+                    to="^.firewallDetails"
+                    params={{
+                      name: securityGroup.name,
+                      accountId: securityGroup.account,
+                      region: serverGroup.region,
+                      vpcId: securityGroup.vpcId,
+                      provider: 'aws',
+                    }}
+                  >
+                    <a>
+                      {securityGroup.name} ({securityGroup.id})
+                    </a>
+                  </UISref>
+                </li>
+              ))}
+            </>
           </UIRouterContextComponent>
         </ul>
       </CollapsibleSection>

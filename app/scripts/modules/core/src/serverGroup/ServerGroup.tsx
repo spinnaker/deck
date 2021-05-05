@@ -1,19 +1,20 @@
+import classNames from 'classnames';
+import { has } from 'lodash';
+import { $interpolate } from 'ngimport';
 import React from 'react';
 import ReactGA from 'react-ga';
-import { has } from 'lodash';
-import classNames from 'classnames';
 import { Subscription } from 'rxjs';
-import { $interpolate } from 'ngimport';
+import { merge } from 'rxjs/operators';
 
-import { ReactInjector } from 'core/reactShims';
 import { Application } from 'core/application';
+import { SETTINGS } from 'core/config';
 import { IInstance, IServerGroup } from 'core/domain';
+import { ISortFilter } from 'core/filterModel';
 import { InstanceList } from 'core/instance/InstanceList';
 import { Instances } from 'core/instance/Instances';
-import { ScrollToService } from 'core/utils';
-import { ISortFilter } from 'core/filterModel';
+import { ReactInjector } from 'core/reactShims';
 import { ClusterState } from 'core/state';
-import { SETTINGS } from 'core/config';
+import { ScrollToService } from 'core/utils';
 
 import { ServerGroupHeader } from './ServerGroupHeader';
 
@@ -144,7 +145,9 @@ export class ServerGroup extends React.Component<IServerGroupProps, IServerGroup
   public componentDidMount(): void {
     const { serverGroupsStream, instancesStream } = ClusterState.multiselectModel;
 
-    this.serverGroupsSubscription = serverGroupsStream.merge(instancesStream).subscribe(this.onServerGroupsChanged);
+    this.serverGroupsSubscription = serverGroupsStream
+      .pipe(merge(instancesStream))
+      .subscribe(this.onServerGroupsChanged);
     this.stateChangeSubscription = ReactInjector.$uiRouter.globals.success$.subscribe(this.onStateChanged);
     this.onStateChanged();
   }

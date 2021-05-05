@@ -125,6 +125,7 @@ export interface ISpinnakerSettings {
   slack?: {
     baseUrl: string;
   };
+  stashTriggerInfo?: string;
   pollSchedule: number;
   providers?: {
     [key: string]: IProviderSettings; // allows custom providers not typed in here (good for testing too)
@@ -136,6 +137,8 @@ export interface ISpinnakerSettings {
   searchVersion: 1 | 2;
   triggerTypes: string[];
   useClassicFirewallLabels: boolean;
+  kubernetesAdHocInfraWritesEnabled: boolean;
+  changelogUrl: string;
 }
 
 export const SETTINGS: ISpinnakerSettings = (window as any).spinnakerSettings || {};
@@ -147,6 +150,8 @@ SETTINGS.analytics = SETTINGS.analytics || {};
 SETTINGS.providers = SETTINGS.providers || {};
 SETTINGS.defaultTimeZone = SETTINGS.defaultTimeZone || 'America/Los_Angeles';
 SETTINGS.dockerInsights = SETTINGS.dockerInsights || { enabled: false, url: '' };
+SETTINGS.changelogUrl =
+  SETTINGS.changelogUrl || 'https://www.spinnaker.io/community/releases/versions/:version-changelog';
 SETTINGS.managedDelivery = SETTINGS.managedDelivery || {
   defaultManifest: 'spinnaker.yml',
   manifestBasePath: '.spinnaker',

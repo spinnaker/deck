@@ -1,15 +1,16 @@
-import React from 'react';
-import { Observable, Subject } from 'rxjs';
 import classNames from 'classnames';
-
-import { capitalize, isEmpty, filter, flatten, get } from 'lodash';
+import { capitalize, filter, flatten, get, isEmpty } from 'lodash';
+import React from 'react';
+import { from as observableFrom, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import { Application } from 'core/application';
 import { INotification, INotificationTypeConfig } from 'core/domain';
 import { Registry } from 'core/registry';
+
 import { AppNotificationsService } from './AppNotificationsService';
-import { NotificationTransformer } from './notification.transformer';
 import { EditNotificationModal } from './modal/EditNotificationModal';
+import { NotificationTransformer } from './notification.transformer';
 
 export interface INotificationsListProps {
   application?: Application;
@@ -22,6 +23,7 @@ export interface INotificationsListProps {
 }
 
 export interface INotificationsListState {
+  indexEdited: number;
   isNotificationsDirty: boolean;
   supportedNotificationTypes: string[];
 }
@@ -32,6 +34,7 @@ export class NotificationsList extends React.Component<INotificationsListProps, 
   constructor(props: INotificationsListProps) {
     super(props);
     this.state = {
+      indexEdited: null,
       isNotificationsDirty: false,
       supportedNotificationTypes: Registry.pipeline
         .getNotificationTypes()
@@ -49,8 +52,16 @@ export class NotificationsList extends React.Component<INotificationsListProps, 
     this.destroy$.next();
   }
 
+  private getEditFunctionality = (notification?: INotification, index?: number) => {
+    if (this.props.level === 'application') {
+      this.showEditModal(notification, index);
+    } else {
+      this.editNotification(notification, index);
+    }
+  };
+
   private addNotification = () => {
-    this.editNotification();
+    this.getEditFunctionality();
   };
 
   private editNotification = (notification?: INotification, index?: number) => {
@@ -74,6 +85,49 @@ export class NotificationsList extends React.Component<INotificationsListProps, 
       .catch(() => {});
   };
 
+  private saveAppNotifications = (newNotifications: INotification[]) => {
+    const { application } = this.props;
+    const toSaveNotifications: any = {
+      application: application.name,
+    };
+
+    newNotifications.forEach((n) => {
+      if (isEmpty(get(toSaveNotifications, n.type))) {
+        toSaveNotifications[n.type] = [];
+      }
+      toSaveNotifications[n.type].push(n);
+    });
+
+    return AppNotificationsService.saveNotificationsForApplication(application.name, toSaveNotifications).then(() =>
+      this.revertNotificationChanges(),
+    );
+  };
+
+  public editAppNotification = (newNotification: INotification) => {
+    const { notifications } = this.props;
+    const { indexEdited } = this.state;
+    let notificationsToSave = notifications || [];
+    if (indexEdited || indexEdited === 0) {
+      notificationsToSave[indexEdited] = newNotification;
+    } else {
+      notificationsToSave = notificationsToSave.concat(newNotification);
+    }
+
+    return this.saveAppNotifications(notificationsToSave);
+  };
+
+  private showEditModal = (notification?: INotification, index?: number) => {
+    const { level, stageType } = this.props;
+    this.setState({ indexEdited: index });
+
+    EditNotificationModal.show({
+      notification: notification || { level, when: [] },
+      level,
+      stageType,
+      editNotification: this.editAppNotification,
+    });
+  };
+
   private removeNotification = (index: number) => {
     const notifications = [...this.props.notifications];
     notifications.splice(index, 1);
@@ -90,7 +144,7 @@ export class NotificationsList extends React.Component<INotificationsListProps, 
            "application": "ayuda",
            "email": [ { ... } ]
       }
-      the code below unwraps it into a table friendly format and the saveNotifications code will
+      the code below unwraps it into a table friendly format and the saveAppNotifications code will
       write it back into the right format.
 
       We will change the format in front50 when we rewrite notifications to use CQL so this transformation
@@ -98,8 +152,8 @@ export class NotificationsList extends React.Component<INotificationsListProps, 
    */
     const { application, updateNotifications } = this.props;
     const { supportedNotificationTypes } = this.state;
-    Observable.fromPromise(AppNotificationsService.getNotificationsForApplication(application.name))
-      .takeUntil(this.destroy$)
+    observableFrom(AppNotificationsService.getNotificationsForApplication(application.name))
+      .pipe(takeUntil(this.destroy$))
       .subscribe((notifications) => {
         const results = filter(
           flatten(
@@ -112,28 +166,6 @@ export class NotificationsList extends React.Component<INotificationsListProps, 
         updateNotifications(results);
       });
     this.setState({ isNotificationsDirty: false });
-  };
-
-  private saveNotifications = () => {
-    const { application, notifications } = this.props;
-    const toSaveNotifications: any = {
-      application: application.name,
-    };
-
-    notifications.forEach((n) => {
-      if (isEmpty(get(toSaveNotifications, n.type))) {
-        toSaveNotifications[n.type] = [];
-      }
-      toSaveNotifications[n.type].push(n);
-    });
-
-    Observable.fromPromise(
-      AppNotificationsService.saveNotificationsForApplication(application.name, toSaveNotifications),
-    )
-      .takeUntil(this.destroy$)
-      .subscribe(() => {
-        this.revertNotificationChanges();
-      });
   };
 
   public render() {
@@ -185,7 +217,7 @@ export class NotificationsList extends React.Component<INotificationsListProps, 
                           <td>
                             {!n.inherited && (
                               <>
-                                <button className="btn btn-xs btn-link" onClick={() => this.editNotification(n, i)}>
+                                <button className="btn btn-xs btn-link" onClick={() => this.getEditFunctionality(n, i)}>
                                   Edit
                                 </button>
                                 <button
@@ -230,7 +262,7 @@ export class NotificationsList extends React.Component<INotificationsListProps, 
             </div>
             <div className="col-md-9 text-right">
               {isNotificationsDirty && (
-                <button className="btn btn-primary" onClick={() => this.saveNotifications()}>
+                <button className="btn btn-primary" onClick={() => this.saveAppNotifications(this.props.notifications)}>
                   <span className="far fa-check-circle" /> Save Changes
                 </button>
               )}

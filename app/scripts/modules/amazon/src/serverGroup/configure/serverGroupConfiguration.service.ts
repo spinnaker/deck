@@ -1,5 +1,4 @@
 import { module } from 'angular';
-import { $q } from 'ngimport';
 import {
   chain,
   clone,
@@ -15,6 +14,7 @@ import {
   some,
   xor,
 } from 'lodash';
+import { $q } from 'ngimport';
 
 import {
   AccountService,
@@ -30,6 +30,7 @@ import {
   IServerGroupCommandBackingDataFiltered,
   IServerGroupCommandDirty,
   IServerGroupCommandResult,
+  IServerGroupCommandViewState,
   ISubnet,
   LOAD_BALANCER_READ_SERVICE,
   LoadBalancerReader,
@@ -37,22 +38,21 @@ import {
   SECURITY_GROUP_READER,
   SecurityGroupReader,
   SERVER_GROUP_COMMAND_REGISTRY_PROVIDER,
-  setMatchingResourceSummary,
   ServerGroupCommandRegistry,
+  setMatchingResourceSummary,
   SubnetReader,
-  IServerGroupCommandViewState,
 } from '@spinnaker/core';
-
+import { AWSProviderSettings } from 'amazon/aws.settings';
 import {
-  IKeyPair,
   IAmazonLoadBalancerSourceData,
   IApplicationLoadBalancerSourceData,
+  IKeyPair,
   IScalingProcess,
 } from 'amazon/domain';
-import { KeyPairsReader } from 'amazon/keyPairs';
-import { AutoScalingProcessService } from '../details/scalingProcesses/AutoScalingProcessService';
 import { AMAZON_INSTANCE_AWSINSTANCETYPE_SERVICE } from 'amazon/instance/awsInstanceType.service';
-import { AWSProviderSettings } from 'amazon/aws.settings';
+import { KeyPairsReader } from 'amazon/keyPairs';
+
+import { AutoScalingProcessService } from '../details/scalingProcesses/AutoScalingProcessService';
 
 export type IBlockDeviceMappingSource = 'source' | 'ami' | 'default';
 
@@ -79,6 +79,8 @@ export interface IAmazonServerGroupCommandBackingData extends IServerGroupComman
 
 export interface IAmazonServerGroupCommandViewState extends IServerGroupCommandViewState {
   dirty: IAmazonServerGroupCommandDirty;
+  spelTargetGroups: string[];
+  spelLoadBalancers: string[];
 }
 
 export interface IAmazonServerGroupCommand extends IServerGroupCommand {
@@ -97,8 +99,6 @@ export interface IAmazonServerGroupCommand extends IServerGroupCommand {
   useAmiBlockDeviceMappings: boolean;
   targetGroups: string[];
   setLaunchTemplate?: boolean;
-  spelTargetGroups: string[];
-  spelLoadBalancers: string[];
   unlimitedCpuCredits?: boolean;
   viewState: IAmazonServerGroupCommandViewState;
 
@@ -517,7 +517,7 @@ export class AwsServerGroupConfigurationService {
       if (invalid.length) {
         result.dirty.loadBalancers = invalid;
       }
-      command.spelLoadBalancers = spel || [];
+      command.viewState.spelLoadBalancers = spel || [];
     }
 
     if (currentTargetGroups && command.targetGroups && !currentTargetGroups.includes('${')) {
@@ -526,7 +526,7 @@ export class AwsServerGroupConfigurationService {
       if (invalid.length) {
         result.dirty.targetGroups = invalid;
       }
-      command.spelTargetGroups = spel || [];
+      command.viewState.spelTargetGroups = spel || [];
     }
 
     command.backingData.filtered.loadBalancers = newLoadBalancers;

@@ -1,28 +1,29 @@
+import { get, isEmpty } from 'lodash';
+import { $q } from 'ngimport';
 import React from 'react';
 import Select, { Creatable, Option } from 'react-select';
-import { Observable, Subject } from 'rxjs';
-import { $q } from 'ngimport';
-import { get, isEmpty } from 'lodash';
+import { from as observableFrom, Subject } from 'rxjs';
+import { switchMap, takeUntil, tap } from 'rxjs/operators';
 
 import {
-  AppListExtractor,
-  Application,
-  NgReact,
-  StageConstants,
-  IAccountDetails,
-  SETTINGS,
-  StageConfigField,
   AccountSelectInput,
   AccountService,
+  Application,
+  AppListExtractor,
+  IAccountDetails,
+  IServerGroup,
+  NgReact,
   noop,
   ScopeClusterSelector,
-  IServerGroup,
+  SETTINGS,
+  StageConfigField,
+  StageConstants,
 } from '@spinnaker/core';
 
+import { IManifestLabelSelector } from './IManifestLabelSelector';
 import { IManifestSelector, SelectorMode, SelectorModeDataMap } from './IManifestSelector';
 import { ManifestKindSearchService } from '../ManifestKindSearch';
 import LabelEditor from './labelEditor/LabelEditor';
-import { IManifestLabelSelector } from './IManifestLabelSelector';
 
 export interface IManifestSelectorProps {
   selector: IManifestSelector;
@@ -149,9 +150,11 @@ export class ManifestSelector extends React.Component<IManifestSelectorProps, IM
     this.loadAccounts();
 
     this.search$
-      .do(() => this.setStateAndUpdateStage({ loading: true }))
-      .switchMap(({ kind, namespace, account }) => Observable.fromPromise(this.search(kind, namespace, account)))
-      .takeUntil(this.destroy$)
+      .pipe(
+        tap(() => this.setStateAndUpdateStage({ loading: true })),
+        switchMap(({ kind, namespace, account }) => observableFrom(this.search(kind, namespace, account))),
+        takeUntil(this.destroy$),
+      )
       .subscribe((resources) => {
         if (this.state.selector.manifestName == null && this.getSelectedMode() === SelectorMode.Static) {
           this.handleNameChange('');

@@ -1,13 +1,12 @@
-import React from 'react';
 import { Field } from 'formik';
+import React from 'react';
 import Select, { Option } from 'react-select';
 
 import { HelpField, MapEditor, PlatformHealthOverride } from '@spinnaker/core';
-
 import { AWSProviderSettings } from 'amazon/aws.settings';
-import { IAmazonServerGroupCommand } from '../../../serverGroupConfiguration.service';
 
 import { IServerGroupAdvancedSettingsProps } from './ServerGroupAdvancedSettings';
+import { IAmazonServerGroupCommand } from '../../../serverGroupConfiguration.service';
 
 export class ServerGroupAdvancedSettingsCommon extends React.Component<IServerGroupAdvancedSettingsProps> {
   private duplicateKeys = false;
@@ -225,7 +224,7 @@ export class ServerGroupAdvancedSettingsCommon extends React.Component<IServerGr
         {!AWSProviderSettings.disableSpotPricing && (
           <div className="form-group">
             <div className="col-md-5 sm-label-right">
-              <b>Spot Instances Price (optional)</b> <HelpField id="aws.serverGroup.spotPrice" />
+              <b>Spot Instances Price (optional)</b> <HelpField id="aws.serverGroup.spotMaxPrice" />
             </div>
             <div className="col-md-2">
               <Field type="text" className="form-control input-sm" name="spotPrice" />

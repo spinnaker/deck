@@ -2,13 +2,14 @@ import { UIRouterContext } from '@uirouter/react-hybrid';
 import React from 'react';
 import { AutoSizer, CellMeasurer, CellMeasurerCache, List, ListRowProps } from 'react-virtualized';
 import { Subscription } from 'rxjs';
+import { take } from 'rxjs/operators';
 
-import { ReactInjector, IStateChange } from 'core/reactShims';
 import { Application } from 'core/application';
-import { ClusterPod } from './ClusterPod';
 import { ISortFilter } from 'core/filterModel';
+import { IStateChange, ReactInjector } from 'core/reactShims';
 import { ClusterState } from 'core/state';
 
+import { ClusterPod } from './ClusterPod';
 import { IClusterGroup, IClusterSubgroup } from './filter/ClusterFilterService';
 
 export interface IAllClustersGroupingsProps {
@@ -116,7 +117,7 @@ export class AllClustersGroupings extends React.Component<IAllClustersGroupingsP
   private scrollToRow = () => {
     const { $stateParams } = ReactInjector;
     // Automatically scroll server group into view if deep linkedif ($stateParams.serverGroup) {
-    this.clusterFilterService.groupsUpdatedStream.take(1).subscribe(() => {
+    this.clusterFilterService.groupsUpdatedStream.pipe(take(1)).subscribe(() => {
       const scrollToRow = this.state.groups.findIndex((group) =>
         group.subgroups.some((subgroup) =>
           subgroup.serverGroups.some(

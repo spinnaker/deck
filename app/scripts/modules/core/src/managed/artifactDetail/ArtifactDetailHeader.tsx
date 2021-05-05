@@ -2,13 +2,13 @@ import React from 'react';
 
 import { Icon } from '@spinnaker/presentation';
 
-import { IManagedArtifactVersion } from '../../domain';
 import { getArtifactVersionDisplayName } from '../displayNames';
+import { IManagedArtifactVersion } from '../../domain';
 
 import './ArtifactDetailHeader.less';
 
 export interface IArtifactDetailHeaderProps {
-  reference: string;
+  reference?: string;
   version: IManagedArtifactVersion;
   onRequestClose: () => any;
 }

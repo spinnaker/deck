@@ -1,6 +1,6 @@
+import { Form, Formik, FormikProps } from 'formik';
 import React from 'react';
 import { Modal, ModalFooter } from 'react-bootstrap';
-import { Form, Formik, FormikProps } from 'formik';
 
 import {
   Application,
@@ -18,7 +18,6 @@ import {
   TaskMonitor,
   TaskReason,
 } from '@spinnaker/core';
-
 import { ICloudFoundryServerGroup } from 'cloudfoundry/domain';
 
 export interface ICloudFoundryResizeServerGroupModalProps extends IModalComponentProps {

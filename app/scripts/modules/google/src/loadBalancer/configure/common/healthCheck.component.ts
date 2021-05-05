@@ -1,5 +1,6 @@
-import { get } from 'lodash';
 import { IController, module } from 'angular';
+import { get } from 'lodash';
+
 import { IGceHealthCheck } from 'google/domain/index';
 
 class HealthCheckCreateCtrl implements IController {
