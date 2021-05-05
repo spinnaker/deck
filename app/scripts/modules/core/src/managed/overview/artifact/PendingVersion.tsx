@@ -29,6 +29,7 @@ export const PendingVersion = ({
     commitMessage: gitMetadata?.commitInfo?.message,
     isPinned,
   });
+
   return (
     <div className="artifact-pending-version">
       {data.createdAt && (

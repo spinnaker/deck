@@ -11,6 +11,8 @@ export type QueryLifecycleStep = NonNullable<QueryArtifactVersion['lifecycleStep
 
 export type QueryGitMetadata = QueryArtifactVersion['gitMetadata'];
 export type QueryConstraint = NonNullable<QueryArtifactVersion['constraints']>[number];
+export type QueryVerification = NonNullable<QueryArtifactVersion['verifications']>[number];
+export type QueryVerificationStatus = NonNullable<QueryVerification['status']>;
 
 export interface ArtifactVersionProps {
   environment: string;

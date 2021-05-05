@@ -113,27 +113,25 @@ type DgsCommitInfo {
   message: String
 }
 
-enum DgsResourceStatus {
-  CREATED
-  DIFF
-  ACTUATING
-  HAPPY
-  UNHAPPY
-  MISSING_DEPENDENCY
-  CURRENTLY_UNRESOLVABLE
+enum DgsResourceActuationStatus {
+  PROCESSING
+  UP_TO_DATE
   ERROR
-  PAUSED
-  RESUMED
-  UNKNOWN
-  DIFF_NOT_ACTIONABLE
   WAITING
+  NOT_MANAGED
+}
+
+type DgsResourceActuationState {
+  status: DgsResourceActuationStatus!
+  reason: String
+  event: String
 }
 
 type DgsResource {
   id: String!
   kind: String!
   moniker: DgsMoniker
-  status: DgsResourceStatus
+  state: DgsResourceActuationState
   artifact: DgsArtifact
   displayName: String
   location: DgsLocation
@@ -177,10 +175,18 @@ type DgsConstraint {
   attributes: JSON
 }
 
+enum DgsVerificationStatus {
+  NOT_EVALUATED
+  PENDING
+  PASS
+  FAIL
+  FORCE_PASS
+}
+
 type DgsVerification {
   id: String!
   type: String!
-  status: DgsConstraintStatus
+  status: DgsVerificationStatus!
   startedAt: InstantTime
   completedAt: InstantTime
   link: String
@@ -193,6 +199,6 @@ type Mutation {
 input DgsConstraintStatusUpdate {
   type: String!
   artifactVersion: String!
-  artifactReference: String
-  status: DgsConstraintStatus
+  artifactReference: String!
+  status: DgsConstraintStatus!
 }

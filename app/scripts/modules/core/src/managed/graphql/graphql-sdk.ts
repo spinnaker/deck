@@ -279,6 +279,14 @@ export type FetchApplicationQuery = { __typename?: 'Query' } & {
                                       >
                                     >
                                   >;
+                                  verifications?: Maybe<
+                                    Array<
+                                      { __typename?: 'DgsVerification' } & Pick<
+                                        DgsVerification,
+                                        'id' | 'type' | 'status' | 'startedAt' | 'completedAt' | 'link'
+                                      >
+                                    >
+                                  >;
                                 }
                             >
                           >;
@@ -390,6 +398,14 @@ export const FetchApplicationDocument = gql`
                 type
                 status
                 attributes
+              }
+              verifications {
+                id
+                type
+                status
+                startedAt
+                completedAt
+                link
               }
             }
             pinnedVersion {

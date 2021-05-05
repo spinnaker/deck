@@ -6,27 +6,12 @@ import { Icon } from '@spinnaker/presentation';
 import { useApplicationContextSafe } from 'core/presentation';
 import { NotifierService } from 'core/widgets';
 
+import { VersionOperationIcon } from './VersionOperation';
 import { constraintsManager } from '../../constraints/registry';
 import { FetchApplicationDocument, useUpdateConstraintMutation } from '../../graphql/graphql-sdk';
 import { ArtifactVersionProps, QueryConstraint } from '../types';
 
-const constraintStatusUtils: {
-  [key in QueryConstraint['status']]: { color?: string; icon: string; displayName: string };
-} = {
-  FAIL: { color: 'var(--color-status-error)', icon: 'far fa-times', displayName: 'failed' },
-  FORCE_PASS: { color: 'var(--color-status-success)', icon: 'fas fa-check', displayName: 'overridden' },
-  PASS: { color: 'var(--color-status-success)', icon: 'fas fa-check', displayName: 'passed' },
-  PENDING: { icon: 'far fa-hourglass', displayName: 'pending' },
-};
-
-const ConstraintIcon = ({ status }: { status: QueryConstraint['status'] }) => {
-  return (
-    <i
-      className={constraintStatusUtils[status].icon}
-      style={{ color: constraintStatusUtils[status].color || 'var(--color-titanium)' }}
-    />
-  );
-};
+import './Constraints.less';
 
 const ConstraintContent = ({
   constraint,
@@ -102,7 +87,7 @@ const Constraint = ({
   const title = constraintsManager.renderTitle(constraint);
   return (
     <div className="pending-version-constraint">
-      <ConstraintIcon status={constraint.status} />
+      <VersionOperationIcon status={constraint.status} />
       <div>
         {hasContent ? (
           <a
@@ -133,7 +118,7 @@ export const Constraints = ({
   versionProps: ArtifactVersionProps;
 }) => {
   return (
-    <div className="pending-version-constraints">
+    <div className="Constraints">
       {constraints?.map((constraint, index) => (
         <Constraint key={index} constraint={constraint} versionProps={versionProps} />
       ))}
