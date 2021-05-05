@@ -86,7 +86,7 @@ export const ConstraintCard = memo(
 
     const [actionStatus, setActionStatus] = useState<IRequestStatus>('NONE');
 
-    const actions = constraintsManager.getOverrideActions(constraint, environment);
+    const actions = constraintsManager.getActions(constraint, environment.state);
 
     if (!constraintsManager.isSupported(type)) {
       console.warn(

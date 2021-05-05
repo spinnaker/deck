@@ -79,7 +79,7 @@ const getTitle = (constraint: IAllowedTimesConstraint) => {
     case 'FORCE_PASS':
       return 'Deployment window constraint was overridden';
     case 'PASS':
-      return 'Deployed during one of the previous open windows';
+      return 'Deployed during one of the allowed windows';
     case 'PENDING':
       return `Deployment can only occur during the provided window${
         constraint.attributes.allowedTimes.length > 1 ? 's' : ''
