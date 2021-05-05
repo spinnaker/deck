@@ -97,3 +97,7 @@ query fetchResourceStatus($appName: String!) {
     }
   }
 }
+
+mutation UpdateConstraint($application: String, $environment: String, $status: DgsConstraintStatusUpdate) {
+  updateConstraintStatus(application: $application, environment: $environment, status: $status)
+}

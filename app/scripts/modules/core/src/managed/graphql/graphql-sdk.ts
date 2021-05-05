@@ -86,6 +86,13 @@ export interface DgsConstraint {
 
 export type DgsConstraintStatus = 'PENDING' | 'PASS' | 'FAIL' | 'FORCE_PASS';
 
+export interface DgsConstraintStatusUpdate {
+  type: Scalars['String'];
+  artifactVersion: Scalars['String'];
+  artifactReference?: Maybe<Scalars['String']>;
+  status?: Maybe<DgsConstraintStatus>;
+}
+
 export interface DgsEnvironment {
   __typename?: 'DgsEnvironment';
   id: Scalars['String'];
@@ -196,6 +203,17 @@ export interface DgsVerification {
   startedAt?: Maybe<Scalars['InstantTime']>;
   completedAt?: Maybe<Scalars['InstantTime']>;
   link?: Maybe<Scalars['String']>;
+}
+
+export interface Mutation {
+  __typename?: 'Mutation';
+  updateConstraintStatus?: Maybe<Scalars['Boolean']>;
+}
+
+export interface MutationUpdateConstraintStatusArgs {
+  application?: Maybe<Scalars['String']>;
+  environment?: Maybe<Scalars['String']>;
+  status?: Maybe<DgsConstraintStatusUpdate>;
 }
 
 export interface Query {
@@ -315,6 +333,14 @@ export type FetchResourceStatusQuery = { __typename?: 'Query' } & {
       }
   >;
 };
+
+export type UpdateConstraintMutationVariables = Exact<{
+  application?: Maybe<Scalars['String']>;
+  environment?: Maybe<Scalars['String']>;
+  status?: Maybe<DgsConstraintStatusUpdate>;
+}>;
+
+export type UpdateConstraintMutation = { __typename?: 'Mutation' } & Pick<Mutation, 'updateConstraintStatus'>;
 
 export const FetchApplicationDocument = gql`
   query fetchApplication($appName: String!) {
@@ -490,4 +516,48 @@ export type FetchResourceStatusLazyQueryHookResult = ReturnType<typeof useFetchR
 export type FetchResourceStatusQueryResult = Apollo.QueryResult<
   FetchResourceStatusQuery,
   FetchResourceStatusQueryVariables
+>;
+export const UpdateConstraintDocument = gql`
+  mutation UpdateConstraint($application: String, $environment: String, $status: DgsConstraintStatusUpdate) {
+    updateConstraintStatus(application: $application, environment: $environment, status: $status)
+  }
+`;
+export type UpdateConstraintMutationFn = Apollo.MutationFunction<
+  UpdateConstraintMutation,
+  UpdateConstraintMutationVariables
+>;
+
+/**
+ * __useUpdateConstraintMutation__
+ *
+ * To run a mutation, you first call `useUpdateConstraintMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateConstraintMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateConstraintMutation, { data, loading, error }] = useUpdateConstraintMutation({
+ *   variables: {
+ *      application: // value for 'application'
+ *      environment: // value for 'environment'
+ *      status: // value for 'status'
+ *   },
+ * });
+ */
+export function useUpdateConstraintMutation(
+  baseOptions?: Apollo.MutationHookOptions<UpdateConstraintMutation, UpdateConstraintMutationVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<UpdateConstraintMutation, UpdateConstraintMutationVariables>(
+    UpdateConstraintDocument,
+    options,
+  );
+}
+export type UpdateConstraintMutationHookResult = ReturnType<typeof useUpdateConstraintMutation>;
+export type UpdateConstraintMutationResult = Apollo.MutationResult<UpdateConstraintMutation>;
+export type UpdateConstraintMutationOptions = Apollo.BaseMutationOptions<
+  UpdateConstraintMutation,
+  UpdateConstraintMutationVariables
 >;

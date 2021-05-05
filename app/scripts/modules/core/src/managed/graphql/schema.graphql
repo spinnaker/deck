@@ -185,3 +185,14 @@ type DgsVerification {
   completedAt: InstantTime
   link: String
 }
+
+type Mutation {
+  updateConstraintStatus(application: String, environment: String, status: DgsConstraintStatusUpdate): Boolean
+}
+
+input DgsConstraintStatusUpdate {
+  type: String!
+  artifactVersion: String!
+  artifactReference: String
+  status: DgsConstraintStatus
+}

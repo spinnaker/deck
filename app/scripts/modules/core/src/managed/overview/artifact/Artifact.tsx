@@ -37,7 +37,7 @@ export const PinnedVersion = ({ version }: { version: NonNullable<QueryArtifact[
       <i className="fas fa-exclamation-triangle" /> Version{' '}
       {commitMessage ? (
         <HoverablePopover
-          delayHide={300}
+          delayHide={TOOLTIP_DELAY}
           placement="top"
           Component={() => <Markdown className="git-commit-tooltip" message={commitMessage} />}
         >
