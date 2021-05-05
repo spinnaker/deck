@@ -99,7 +99,7 @@ const Constraint = ({
             }}
           >
             {title}
-            <Icon name="accordionExpand" size="12px" style={{ transform: isExpanded ? 'rotate(-90deg)' : undefined }} />
+            <Icon name="accordionExpand" size="12px" className={isExpanded ? 'rotated-90' : undefined} />
           </a>
         ) : (
           title

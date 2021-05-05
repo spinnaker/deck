@@ -10,7 +10,6 @@ export type IIconProps = {
   size?: 'extraSmall' | 'small' | 'medium' | 'large' | 'extraLarge' | string;
   color?: string;
   className?: string;
-  style?: React.CSSProperties;
 };
 
 const DEFAULT_SIZE = 'small';
@@ -28,7 +27,7 @@ const throwInvalidIconError = (name: string) => {
   throw new Error(`No icon with the name ${name} exists`);
 };
 
-export const Icon = memo(({ name, appearance, size, color, className, style }: IIconProps) => {
+export const Icon = memo(({ name, appearance, size, color, className }: IIconProps) => {
   const Component = iconsByName[name];
 
   if (!Component) {
@@ -38,5 +37,5 @@ export const Icon = memo(({ name, appearance, size, color, className, style }: I
   const width = size ? pxDimensionsBySize[size] || size : pxDimensionsBySize[DEFAULT_SIZE];
   const fill = color ? `var(--color-${color})` : `var(--color-icon-${appearance || DEFAULT_APPEARANCE})`;
 
-  return <Component className={className} style={{ width, fill, ...style }} />;
+  return <Component className={className} style={{ width, fill }} />;
 });
