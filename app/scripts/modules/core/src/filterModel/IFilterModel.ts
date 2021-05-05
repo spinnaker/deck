@@ -46,7 +46,6 @@ export interface ISortFilter {
   showDurations: boolean;
   stack: ITrueKeyModel;
   status: ITrueKeyModel;
-  stages: ITrueKeyModel;
 }
 
 export interface IFilterModel {
