@@ -2,76 +2,76 @@ scalar InstantTime
 scalar JSON
 
 type Query {
-  application(appName: String!): DgsApplication
+  application(appName: String!): MdApplication
 }
 
-type DgsApplication {
+type MdApplication {
   id: String!
   name: String!
   account: String!
-  environments: [DgsEnvironment!]!
+  environments: [MdEnvironment!]!
 }
 
-type DgsEnvironment {
+type MdEnvironment {
   id: String!
   name: String!
-  state: DgsEnvironmentState!
+  state: MdEnvironmentState!
 }
 
-type DgsEnvironmentState {
+type MdEnvironmentState {
   id: String!
-  resources: [DgsResource!]
-  artifacts: [DgsArtifact!]
+  resources: [MdResource!]
+  artifacts: [MdArtifact!]
 }
 
-type DgsPinnedVersion {
+type MdPinnedVersion {
   id: String!
   name: String!
   reference: String!
   version: String!
-  gitMetadata: DgsGitMetadata
+  gitMetadata: MdGitMetadata
   buildNumber: String
   pinnedAt: InstantTime
   pinnedBy: String
   comment: String
 }
 
-type DgsArtifact {
+type MdArtifact {
   id: String!
   environment: String!
   name: String!
   type: String!
   reference: String!
-  versions(statuses: [DgsArtifactStatusInEnvironment!]): [DgsArtifactVersionInEnvironment!]
-  pinnedVersion: DgsPinnedVersion
+  versions(statuses: [MdArtifactStatusInEnvironment!]): [MdArtifactVersionInEnvironment!]
+  pinnedVersion: MdPinnedVersion
 }
 
-type DgsArtifactVersionInEnvironment {
+type MdArtifactVersionInEnvironment {
   id: String!
   version: String!
   buildNumber: String
   createdAt: InstantTime
   deployedAt: InstantTime
-  resources: [DgsResource!]
-  gitMetadata: DgsGitMetadata
+  resources: [MdResource!]
+  gitMetadata: MdGitMetadata
   environment: String
   reference: String!
-  status: DgsArtifactStatusInEnvironment
-  lifecycleSteps: [DgsLifecycleStep!]
-  constraints: [DgsConstraint!]
-  verifications: [DgsVerification!]
+  status: MdArtifactStatusInEnvironment
+  lifecycleSteps: [MdLifecycleStep!]
+  constraints: [MdConstraint!]
+  verifications: [MdVerification!]
 }
 
-enum DgsLifecycleEventScope {
+enum MdLifecycleEventScope {
   PRE_DEPLOYMENT
 }
 
-enum DgsLifecycleEventType {
+enum MdLifecycleEventType {
   BAKE
   BUILD
 }
 
-enum DgsLifecycleEventStatus {
+enum MdLifecycleEventStatus {
   NOT_STARTED
   RUNNING
   SUCCEEDED
@@ -80,11 +80,11 @@ enum DgsLifecycleEventStatus {
   UNKNOWN
 }
 
-type DgsLifecycleStep {
-  scope: DgsLifecycleEventScope
-  type: DgsLifecycleEventType!
+type MdLifecycleStep {
+  scope: MdLifecycleEventScope
+  type: MdLifecycleEventType!
   id: String
-  status: DgsLifecycleEventStatus!
+  status: MdLifecycleEventStatus!
   text: String
   link: String
   startedAt: InstantTime
@@ -92,28 +92,28 @@ type DgsLifecycleStep {
   artifactVersion: String
 }
 
-type DgsGitMetadata {
+type MdGitMetadata {
   commit: String
   author: String
   project: String
   branch: String
   repoName: String
-  pullRequest: DgsPullRequest
-  commitInfo: DgsCommitInfo
+  pullRequest: MdPullRequest
+  commitInfo: MdCommitInfo
 }
 
-type DgsPullRequest {
+type MdPullRequest {
   number: String
   link: String
 }
 
-type DgsCommitInfo {
+type MdCommitInfo {
   sha: String
   link: String
   message: String
 }
 
-enum DgsResourceActuationStatus {
+enum MdResourceActuationStatus {
   PROCESSING
   UP_TO_DATE
   ERROR
@@ -121,41 +121,41 @@ enum DgsResourceActuationStatus {
   NOT_MANAGED
 }
 
-type DgsResourceActuationState {
-  status: DgsResourceActuationStatus!
+type MdResourceActuationState {
+  status: MdResourceActuationStatus!
   reason: String
   event: String
 }
 
-type DgsResource {
+type MdResource {
   id: String!
   kind: String!
-  moniker: DgsMoniker
-  state: DgsResourceActuationState
-  artifact: DgsArtifact
+  moniker: MdMoniker
+  state: MdResourceActuationState
+  artifact: MdArtifact
   displayName: String
-  location: DgsLocation
+  location: MdLocation
 }
 
-type DgsMoniker {
+type MdMoniker {
   app: String
   stack: String
   detail: String
 }
 
-type DgsLocation {
+type MdLocation {
   account: String
   regions: [String!]
 }
 
-enum DgsConstraintStatus {
+enum MdConstraintStatus {
   PENDING
   PASS
   FAIL
   FORCE_PASS
 }
 
-enum DgsArtifactStatusInEnvironment {
+enum MdArtifactStatusInEnvironment {
   PENDING
   APPROVED
   DEPLOYING
@@ -165,9 +165,9 @@ enum DgsArtifactStatusInEnvironment {
   SKIPPED
 }
 
-type DgsConstraint {
+type MdConstraint {
   type: String!
-  status: DgsConstraintStatus!
+  status: MdConstraintStatus!
   startedAt: InstantTime
   judgedAt: InstantTime
   judgedBy: String
@@ -175,7 +175,7 @@ type DgsConstraint {
   attributes: JSON
 }
 
-enum DgsVerificationStatus {
+enum MdVerificationStatus {
   NOT_EVALUATED
   PENDING
   PASS
@@ -183,22 +183,22 @@ enum DgsVerificationStatus {
   FORCE_PASS
 }
 
-type DgsVerification {
+type MdVerification {
   id: String!
   type: String!
-  status: DgsVerificationStatus!
+  status: MdVerificationStatus!
   startedAt: InstantTime
   completedAt: InstantTime
   link: String
 }
 
 type Mutation {
-  updateConstraintStatus(application: String, environment: String, status: DgsConstraintStatusUpdate): Boolean
+  updateConstraintStatus(application: String, environment: String, status: MdConstraintStatusUpdate): Boolean
 }
 
-input DgsConstraintStatusUpdate {
+input MdConstraintStatusUpdate {
   type: String!
   artifactVersion: String!
   artifactReference: String!
-  status: DgsConstraintStatus!
+  status: MdConstraintStatus!
 }

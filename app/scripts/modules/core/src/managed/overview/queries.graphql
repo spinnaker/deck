@@ -112,6 +112,6 @@ query fetchResourceStatus($appName: String!) {
   }
 }
 
-mutation UpdateConstraint($application: String, $environment: String, $status: DgsConstraintStatusUpdate) {
+mutation UpdateConstraint($application: String, $environment: String, $status: MdConstraintStatusUpdate) {
   updateConstraintStatus(application: $application, environment: $environment, status: $status)
 }

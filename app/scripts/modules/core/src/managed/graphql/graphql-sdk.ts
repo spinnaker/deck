@@ -17,30 +17,30 @@ export interface Scalars {
   JSON: any;
 }
 
-export interface DgsApplication {
-  __typename?: 'DgsApplication';
+export interface MdApplication {
+  __typename?: 'MdApplication';
   id: Scalars['String'];
   name: Scalars['String'];
   account: Scalars['String'];
-  environments: Array<DgsEnvironment>;
+  environments: Array<MdEnvironment>;
 }
 
-export interface DgsArtifact {
-  __typename?: 'DgsArtifact';
+export interface MdArtifact {
+  __typename?: 'MdArtifact';
   id: Scalars['String'];
   environment: Scalars['String'];
   name: Scalars['String'];
   type: Scalars['String'];
   reference: Scalars['String'];
-  versions?: Maybe<Array<DgsArtifactVersionInEnvironment>>;
-  pinnedVersion?: Maybe<DgsPinnedVersion>;
+  versions?: Maybe<Array<MdArtifactVersionInEnvironment>>;
+  pinnedVersion?: Maybe<MdPinnedVersion>;
 }
 
-export interface DgsArtifactVersionsArgs {
-  statuses?: Maybe<Array<DgsArtifactStatusInEnvironment>>;
+export interface MdArtifactVersionsArgs {
+  statuses?: Maybe<Array<MdArtifactStatusInEnvironment>>;
 }
 
-export type DgsArtifactStatusInEnvironment =
+export type MdArtifactStatusInEnvironment =
   | 'PENDING'
   | 'APPROVED'
   | 'DEPLOYING'
@@ -49,34 +49,34 @@ export type DgsArtifactStatusInEnvironment =
   | 'VETOED'
   | 'SKIPPED';
 
-export interface DgsArtifactVersionInEnvironment {
-  __typename?: 'DgsArtifactVersionInEnvironment';
+export interface MdArtifactVersionInEnvironment {
+  __typename?: 'MdArtifactVersionInEnvironment';
   id: Scalars['String'];
   version: Scalars['String'];
   buildNumber?: Maybe<Scalars['String']>;
   createdAt?: Maybe<Scalars['InstantTime']>;
   deployedAt?: Maybe<Scalars['InstantTime']>;
-  resources?: Maybe<Array<DgsResource>>;
-  gitMetadata?: Maybe<DgsGitMetadata>;
+  resources?: Maybe<Array<MdResource>>;
+  gitMetadata?: Maybe<MdGitMetadata>;
   environment?: Maybe<Scalars['String']>;
   reference: Scalars['String'];
-  status?: Maybe<DgsArtifactStatusInEnvironment>;
-  lifecycleSteps?: Maybe<Array<DgsLifecycleStep>>;
-  constraints?: Maybe<Array<DgsConstraint>>;
-  verifications?: Maybe<Array<DgsVerification>>;
+  status?: Maybe<MdArtifactStatusInEnvironment>;
+  lifecycleSteps?: Maybe<Array<MdLifecycleStep>>;
+  constraints?: Maybe<Array<MdConstraint>>;
+  verifications?: Maybe<Array<MdVerification>>;
 }
 
-export interface DgsCommitInfo {
-  __typename?: 'DgsCommitInfo';
+export interface MdCommitInfo {
+  __typename?: 'MdCommitInfo';
   sha?: Maybe<Scalars['String']>;
   link?: Maybe<Scalars['String']>;
   message?: Maybe<Scalars['String']>;
 }
 
-export interface DgsConstraint {
-  __typename?: 'DgsConstraint';
+export interface MdConstraint {
+  __typename?: 'MdConstraint';
   type: Scalars['String'];
-  status: DgsConstraintStatus;
+  status: MdConstraintStatus;
   startedAt?: Maybe<Scalars['InstantTime']>;
   judgedAt?: Maybe<Scalars['InstantTime']>;
   judgedBy?: Maybe<Scalars['String']>;
@@ -84,52 +84,52 @@ export interface DgsConstraint {
   attributes?: Maybe<Scalars['JSON']>;
 }
 
-export type DgsConstraintStatus = 'PENDING' | 'PASS' | 'FAIL' | 'FORCE_PASS';
+export type MdConstraintStatus = 'PENDING' | 'PASS' | 'FAIL' | 'FORCE_PASS';
 
-export interface DgsConstraintStatusUpdate {
+export interface MdConstraintStatusUpdate {
   type: Scalars['String'];
   artifactVersion: Scalars['String'];
   artifactReference: Scalars['String'];
-  status: DgsConstraintStatus;
+  status: MdConstraintStatus;
 }
 
-export interface DgsEnvironment {
-  __typename?: 'DgsEnvironment';
+export interface MdEnvironment {
+  __typename?: 'MdEnvironment';
   id: Scalars['String'];
   name: Scalars['String'];
-  state: DgsEnvironmentState;
+  state: MdEnvironmentState;
 }
 
-export interface DgsEnvironmentState {
-  __typename?: 'DgsEnvironmentState';
+export interface MdEnvironmentState {
+  __typename?: 'MdEnvironmentState';
   id: Scalars['String'];
-  resources?: Maybe<Array<DgsResource>>;
-  artifacts?: Maybe<Array<DgsArtifact>>;
+  resources?: Maybe<Array<MdResource>>;
+  artifacts?: Maybe<Array<MdArtifact>>;
 }
 
-export interface DgsGitMetadata {
-  __typename?: 'DgsGitMetadata';
+export interface MdGitMetadata {
+  __typename?: 'MdGitMetadata';
   commit?: Maybe<Scalars['String']>;
   author?: Maybe<Scalars['String']>;
   project?: Maybe<Scalars['String']>;
   branch?: Maybe<Scalars['String']>;
   repoName?: Maybe<Scalars['String']>;
-  pullRequest?: Maybe<DgsPullRequest>;
-  commitInfo?: Maybe<DgsCommitInfo>;
+  pullRequest?: Maybe<MdPullRequest>;
+  commitInfo?: Maybe<MdCommitInfo>;
 }
 
-export type DgsLifecycleEventScope = 'PRE_DEPLOYMENT';
+export type MdLifecycleEventScope = 'PRE_DEPLOYMENT';
 
-export type DgsLifecycleEventStatus = 'NOT_STARTED' | 'RUNNING' | 'SUCCEEDED' | 'FAILED' | 'ABORTED' | 'UNKNOWN';
+export type MdLifecycleEventStatus = 'NOT_STARTED' | 'RUNNING' | 'SUCCEEDED' | 'FAILED' | 'ABORTED' | 'UNKNOWN';
 
-export type DgsLifecycleEventType = 'BAKE' | 'BUILD';
+export type MdLifecycleEventType = 'BAKE' | 'BUILD';
 
-export interface DgsLifecycleStep {
-  __typename?: 'DgsLifecycleStep';
-  scope?: Maybe<DgsLifecycleEventScope>;
-  type: DgsLifecycleEventType;
+export interface MdLifecycleStep {
+  __typename?: 'MdLifecycleStep';
+  scope?: Maybe<MdLifecycleEventScope>;
+  type: MdLifecycleEventType;
   id?: Maybe<Scalars['String']>;
-  status: DgsLifecycleEventStatus;
+  status: MdLifecycleEventStatus;
   text?: Maybe<Scalars['String']>;
   link?: Maybe<Scalars['String']>;
   startedAt?: Maybe<Scalars['InstantTime']>;
@@ -137,69 +137,69 @@ export interface DgsLifecycleStep {
   artifactVersion?: Maybe<Scalars['String']>;
 }
 
-export interface DgsLocation {
-  __typename?: 'DgsLocation';
+export interface MdLocation {
+  __typename?: 'MdLocation';
   account?: Maybe<Scalars['String']>;
   regions?: Maybe<Array<Scalars['String']>>;
 }
 
-export interface DgsMoniker {
-  __typename?: 'DgsMoniker';
+export interface MdMoniker {
+  __typename?: 'MdMoniker';
   app?: Maybe<Scalars['String']>;
   stack?: Maybe<Scalars['String']>;
   detail?: Maybe<Scalars['String']>;
 }
 
-export interface DgsPinnedVersion {
-  __typename?: 'DgsPinnedVersion';
+export interface MdPinnedVersion {
+  __typename?: 'MdPinnedVersion';
   id: Scalars['String'];
   name: Scalars['String'];
   reference: Scalars['String'];
   version: Scalars['String'];
-  gitMetadata?: Maybe<DgsGitMetadata>;
+  gitMetadata?: Maybe<MdGitMetadata>;
   buildNumber?: Maybe<Scalars['String']>;
   pinnedAt?: Maybe<Scalars['InstantTime']>;
   pinnedBy?: Maybe<Scalars['String']>;
   comment?: Maybe<Scalars['String']>;
 }
 
-export interface DgsPullRequest {
-  __typename?: 'DgsPullRequest';
+export interface MdPullRequest {
+  __typename?: 'MdPullRequest';
   number?: Maybe<Scalars['String']>;
   link?: Maybe<Scalars['String']>;
 }
 
-export interface DgsResource {
-  __typename?: 'DgsResource';
+export interface MdResource {
+  __typename?: 'MdResource';
   id: Scalars['String'];
   kind: Scalars['String'];
-  moniker?: Maybe<DgsMoniker>;
-  state?: Maybe<DgsResourceActuationState>;
-  artifact?: Maybe<DgsArtifact>;
+  moniker?: Maybe<MdMoniker>;
+  state?: Maybe<MdResourceActuationState>;
+  artifact?: Maybe<MdArtifact>;
   displayName?: Maybe<Scalars['String']>;
-  location?: Maybe<DgsLocation>;
+  location?: Maybe<MdLocation>;
 }
 
-export interface DgsResourceActuationState {
-  __typename?: 'DgsResourceActuationState';
-  status: DgsResourceActuationStatus;
+export interface MdResourceActuationState {
+  __typename?: 'MdResourceActuationState';
+  status: MdResourceActuationStatus;
   reason?: Maybe<Scalars['String']>;
   event?: Maybe<Scalars['String']>;
 }
 
-export type DgsResourceActuationStatus = 'PROCESSING' | 'UP_TO_DATE' | 'ERROR' | 'WAITING' | 'NOT_MANAGED';
+export type MdResourceActuationStatus = 'PROCESSING' | 'UP_TO_DATE' | 'ERROR' | 'WAITING' | 'NOT_MANAGED';
 
-export interface DgsVerification {
-  __typename?: 'DgsVerification';
+export interface MdVerification {
+  __typename?: 'MdVerification';
   id: Scalars['String'];
   type: Scalars['String'];
-  status: DgsVerificationStatus;
+  status: MdVerificationStatus;
   startedAt?: Maybe<Scalars['InstantTime']>;
   completedAt?: Maybe<Scalars['InstantTime']>;
   link?: Maybe<Scalars['String']>;
 }
 
-export type DgsVerificationStatus = 'NOT_EVALUATED' | 'PENDING' | 'PASS' | 'FAIL' | 'FORCE_PASS';
+export type MdVerificationStatus = 'NOT_EVALUATED' | 'PENDING' | 'PASS' | 'FAIL' | 'FORCE_PASS';
 
 export interface Mutation {
   __typename?: 'Mutation';
@@ -209,12 +209,12 @@ export interface Mutation {
 export interface MutationUpdateConstraintStatusArgs {
   application?: Maybe<Scalars['String']>;
   environment?: Maybe<Scalars['String']>;
-  status?: Maybe<DgsConstraintStatusUpdate>;
+  status?: Maybe<MdConstraintStatusUpdate>;
 }
 
 export interface Query {
   __typename?: 'Query';
-  application?: Maybe<DgsApplication>;
+  application?: Maybe<MdApplication>;
 }
 
 export interface QueryApplicationArgs {
@@ -227,58 +227,58 @@ export type FetchApplicationQueryVariables = Exact<{
 
 export type FetchApplicationQuery = { __typename?: 'Query' } & {
   application?: Maybe<
-    { __typename?: 'DgsApplication' } & Pick<DgsApplication, 'id' | 'name' | 'account'> & {
+    { __typename?: 'MdApplication' } & Pick<MdApplication, 'id' | 'name' | 'account'> & {
         environments: Array<
-          { __typename?: 'DgsEnvironment' } & Pick<DgsEnvironment, 'id' | 'name'> & {
-              state: { __typename?: 'DgsEnvironmentState' } & Pick<DgsEnvironmentState, 'id'> & {
+          { __typename?: 'MdEnvironment' } & Pick<MdEnvironment, 'id' | 'name'> & {
+              state: { __typename?: 'MdEnvironmentState' } & Pick<MdEnvironmentState, 'id'> & {
                   artifacts?: Maybe<
                     Array<
-                      { __typename?: 'DgsArtifact' } & Pick<
-                        DgsArtifact,
+                      { __typename?: 'MdArtifact' } & Pick<
+                        MdArtifact,
                         'id' | 'name' | 'environment' | 'type' | 'reference'
                       > & {
                           versions?: Maybe<
                             Array<
-                              { __typename?: 'DgsArtifactVersionInEnvironment' } & Pick<
-                                DgsArtifactVersionInEnvironment,
+                              { __typename?: 'MdArtifactVersionInEnvironment' } & Pick<
+                                MdArtifactVersionInEnvironment,
                                 'id' | 'buildNumber' | 'version' | 'createdAt' | 'status' | 'deployedAt'
                               > & {
                                   gitMetadata?: Maybe<
-                                    { __typename?: 'DgsGitMetadata' } & Pick<
-                                      DgsGitMetadata,
+                                    { __typename?: 'MdGitMetadata' } & Pick<
+                                      MdGitMetadata,
                                       'commit' | 'author' | 'branch'
                                     > & {
                                         commitInfo?: Maybe<
-                                          { __typename?: 'DgsCommitInfo' } & Pick<
-                                            DgsCommitInfo,
+                                          { __typename?: 'MdCommitInfo' } & Pick<
+                                            MdCommitInfo,
                                             'sha' | 'link' | 'message'
                                           >
                                         >;
                                         pullRequest?: Maybe<
-                                          { __typename?: 'DgsPullRequest' } & Pick<DgsPullRequest, 'number' | 'link'>
+                                          { __typename?: 'MdPullRequest' } & Pick<MdPullRequest, 'number' | 'link'>
                                         >;
                                       }
                                   >;
                                   lifecycleSteps?: Maybe<
                                     Array<
-                                      { __typename?: 'DgsLifecycleStep' } & Pick<
-                                        DgsLifecycleStep,
+                                      { __typename?: 'MdLifecycleStep' } & Pick<
+                                        MdLifecycleStep,
                                         'startedAt' | 'completedAt' | 'type' | 'status'
                                       >
                                     >
                                   >;
                                   constraints?: Maybe<
                                     Array<
-                                      { __typename?: 'DgsConstraint' } & Pick<
-                                        DgsConstraint,
+                                      { __typename?: 'MdConstraint' } & Pick<
+                                        MdConstraint,
                                         'type' | 'status' | 'judgedBy' | 'attributes'
                                       >
                                     >
                                   >;
                                   verifications?: Maybe<
                                     Array<
-                                      { __typename?: 'DgsVerification' } & Pick<
-                                        DgsVerification,
+                                      { __typename?: 'MdVerification' } & Pick<
+                                        MdVerification,
                                         'id' | 'type' | 'status' | 'startedAt' | 'completedAt' | 'link'
                                       >
                                     >
@@ -287,15 +287,13 @@ export type FetchApplicationQuery = { __typename?: 'Query' } & {
                             >
                           >;
                           pinnedVersion?: Maybe<
-                            { __typename?: 'DgsPinnedVersion' } & Pick<
-                              DgsPinnedVersion,
+                            { __typename?: 'MdPinnedVersion' } & Pick<
+                              MdPinnedVersion,
                               'id' | 'version' | 'buildNumber' | 'pinnedAt' | 'pinnedBy' | 'comment'
                             > & {
                                 gitMetadata?: Maybe<
-                                  { __typename?: 'DgsGitMetadata' } & {
-                                    commitInfo?: Maybe<
-                                      { __typename?: 'DgsCommitInfo' } & Pick<DgsCommitInfo, 'message'>
-                                    >;
+                                  { __typename?: 'MdGitMetadata' } & {
+                                    commitInfo?: Maybe<{ __typename?: 'MdCommitInfo' } & Pick<MdCommitInfo, 'message'>>;
                                   }
                                 >;
                               }
@@ -305,9 +303,9 @@ export type FetchApplicationQuery = { __typename?: 'Query' } & {
                   >;
                   resources?: Maybe<
                     Array<
-                      { __typename?: 'DgsResource' } & Pick<DgsResource, 'id' | 'kind' | 'displayName'> & {
-                          moniker?: Maybe<{ __typename?: 'DgsMoniker' } & Pick<DgsMoniker, 'app' | 'stack' | 'detail'>>;
-                          location?: Maybe<{ __typename?: 'DgsLocation' } & Pick<DgsLocation, 'account' | 'regions'>>;
+                      { __typename?: 'MdResource' } & Pick<MdResource, 'id' | 'kind' | 'displayName'> & {
+                          moniker?: Maybe<{ __typename?: 'MdMoniker' } & Pick<MdMoniker, 'app' | 'stack' | 'detail'>>;
+                          location?: Maybe<{ __typename?: 'MdLocation' } & Pick<MdLocation, 'account' | 'regions'>>;
                         }
                     >
                   >;
@@ -324,16 +322,16 @@ export type FetchResourceStatusQueryVariables = Exact<{
 
 export type FetchResourceStatusQuery = { __typename?: 'Query' } & {
   application?: Maybe<
-    { __typename?: 'DgsApplication' } & Pick<DgsApplication, 'id' | 'name'> & {
+    { __typename?: 'MdApplication' } & Pick<MdApplication, 'id' | 'name'> & {
         environments: Array<
-          { __typename?: 'DgsEnvironment' } & Pick<DgsEnvironment, 'id' | 'name'> & {
-              state: { __typename?: 'DgsEnvironmentState' } & Pick<DgsEnvironmentState, 'id'> & {
+          { __typename?: 'MdEnvironment' } & Pick<MdEnvironment, 'id' | 'name'> & {
+              state: { __typename?: 'MdEnvironmentState' } & Pick<MdEnvironmentState, 'id'> & {
                   resources?: Maybe<
                     Array<
-                      { __typename?: 'DgsResource' } & Pick<DgsResource, 'id' | 'kind'> & {
+                      { __typename?: 'MdResource' } & Pick<MdResource, 'id' | 'kind'> & {
                           state?: Maybe<
-                            { __typename?: 'DgsResourceActuationState' } & Pick<
-                              DgsResourceActuationState,
+                            { __typename?: 'MdResourceActuationState' } & Pick<
+                              MdResourceActuationState,
                               'status' | 'reason' | 'event'
                             >
                           >;
@@ -350,7 +348,7 @@ export type FetchResourceStatusQuery = { __typename?: 'Query' } & {
 export type UpdateConstraintMutationVariables = Exact<{
   application?: Maybe<Scalars['String']>;
   environment?: Maybe<Scalars['String']>;
-  status?: Maybe<DgsConstraintStatusUpdate>;
+  status?: Maybe<MdConstraintStatusUpdate>;
 }>;
 
 export type UpdateConstraintMutation = { __typename?: 'Mutation' } & Pick<Mutation, 'updateConstraintStatus'>;
@@ -545,7 +543,7 @@ export type FetchResourceStatusQueryResult = Apollo.QueryResult<
   FetchResourceStatusQueryVariables
 >;
 export const UpdateConstraintDocument = gql`
-  mutation UpdateConstraint($application: String, $environment: String, $status: DgsConstraintStatusUpdate) {
+  mutation UpdateConstraint($application: String, $environment: String, $status: MdConstraintStatusUpdate) {
     updateConstraintStatus(application: $application, environment: $environment, status: $status)
   }
 `;

@@ -3,7 +3,7 @@ import React from 'react';
 import { Icon, useApplicationContextSafe } from 'core/presentation';
 import { IconTooltip } from 'core/presentation/IconTooltip';
 
-import { DgsResourceActuationState, useFetchResourceStatusQuery } from '../graphql/graphql-sdk';
+import { MdResourceActuationState, useFetchResourceStatusQuery } from '../graphql/graphql-sdk';
 import spinner from './loadingIndicator.svg';
 import { ResourceTitle } from '../resources/ResourceTitle';
 import { IResourceLinkProps, resourceManager } from '../resources/resourceRegistry';
@@ -13,7 +13,7 @@ import { TOOLTIP_DELAY } from '../utils/defaults';
 import './Resource.less';
 
 const statusUtils: {
-  [key in Exclude<DgsResourceActuationState['status'], 'UP_TO_DATE'>]: {
+  [key in Exclude<MdResourceActuationState['status'], 'UP_TO_DATE'>]: {
     color?: string;
     icon: string;
     defaultReason: string;
