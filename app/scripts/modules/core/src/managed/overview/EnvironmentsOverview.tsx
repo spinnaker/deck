@@ -4,7 +4,7 @@ import { Application, CollapsibleSection, ICollapsibleSectionProps, Spinner } fr
 
 import { Resource } from './Resource';
 import { Artifact } from './artifact/Artifact';
-import { useFetchApplicationQuery } from '../graphql/graphql-sdk';
+import { useFetchApplicationQuery, useFetchResourceStatusQuery } from '../graphql/graphql-sdk';
 import { QueryEnvironment } from './types';
 
 import './EnvironmentsOverview.less';
@@ -33,7 +33,7 @@ export const EnvironmentsOverview = ({ app }: IEnvironmentsProps) => {
   return (
     <div className="EnvironmentOverview">
       {data?.application?.environments.map((env) => (
-        <Environment key={env.name} environment={env} />
+        <Environment key={env.name} environment={env} appName={app.name} />
       ))}
       {/* Some padding at the bottom */}
       <div style={{ minHeight: 24, minWidth: 24 }}></div>
@@ -47,7 +47,10 @@ const sectionProps: Partial<ICollapsibleSectionProps> = {
   useGlyphiconChevron: false,
 };
 
-const Environment = ({ environment }: { environment: QueryEnvironment }) => {
+const Environment = ({ appName, environment }: { appName: string; environment: QueryEnvironment }) => {
+  const { data } = useFetchResourceStatusQuery({ variables: { appName } });
+  const resources = data?.application?.environments.find((env) => env.name === environment.name)?.state.resources;
+  const hasResourcesWithIssues = resources?.some((resource) => resource.state?.status !== 'UP_TO_DATE');
   const state = environment.state;
   return (
     <section className="Environment">
@@ -57,7 +60,13 @@ const Environment = ({ environment }: { environment: QueryEnvironment }) => {
           <Artifact key={artifact.reference} artifact={artifact} />
         ))}
       </CollapsibleSection>
-      <CollapsibleSection heading="Resources" {...sectionProps} enableCaching={false}>
+      <CollapsibleSection
+        heading="Resources"
+        key={`resources-section-${Boolean(data)}`} // This is used remount the section for defaultExpanded to work
+        {...sectionProps}
+        enableCaching={false}
+        defaultExpanded={hasResourcesWithIssues}
+      >
         {state.resources?.map((resource) => (
           <Resource key={resource.id} resource={resource} environment={environment.name} />
         ))}
