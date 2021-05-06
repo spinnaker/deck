@@ -21,6 +21,7 @@ export interface VersionAction {
 
 export const VersionMetadata = ({
   buildNumber,
+  buildLink,
   author,
   deployedAt,
   buildDuration,
@@ -30,6 +31,7 @@ export const VersionMetadata = ({
   actions,
 }: {
   buildNumber?: string;
+  buildLink?: string;
   author?: string;
   deployedAt?: string;
   buildDuration?: string;
@@ -53,7 +55,9 @@ export const VersionMetadata = ({
             </span>
           </MetadataElement>
         )}
-        <MetadataElement>Build #{buildNumber}</MetadataElement>
+        <MetadataElement>
+          Build <a href={buildLink}>#{buildNumber}</a>
+        </MetadataElement>
         {author && <MetadataElement>By {author}</MetadataElement>}
         {deployedAt && (
           <MetadataElement>

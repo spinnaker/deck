@@ -6,7 +6,7 @@ import { GitLink } from './GitLink';
 import { RelativeTimestamp } from '../../RelativeTimestamp';
 import { VersionMetadata } from './VersionMetadata';
 import { QueryArtifactVersion } from '../types';
-import { getLifecycleEventDuration, useCreateVersionActions } from './utils';
+import { getLifecycleEventDuration, getLifecycleEventLink, useCreateVersionActions } from './utils';
 import { TOOLTIP_DELAY } from '../../utils/defaults';
 
 export const PendingVersion = ({
@@ -42,6 +42,7 @@ export const PendingVersion = ({
       </div>
       <VersionMetadata
         buildNumber={buildNumber}
+        buildLink={getLifecycleEventLink(data, 'BUILD')}
         author={gitMetadata?.author}
         buildDuration={getLifecycleEventDuration(data, 'BUILD')}
         isDeploying={status === 'DEPLOYING'}

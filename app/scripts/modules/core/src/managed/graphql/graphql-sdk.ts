@@ -263,7 +263,7 @@ export type FetchApplicationQuery = { __typename?: 'Query' } & {
                                     Array<
                                       { __typename?: 'MdLifecycleStep' } & Pick<
                                         MdLifecycleStep,
-                                        'startedAt' | 'completedAt' | 'type' | 'status'
+                                        'startedAt' | 'completedAt' | 'type' | 'status' | 'link'
                                       >
                                     >
                                   >;
@@ -396,6 +396,7 @@ export const FetchApplicationDocument = gql`
                 completedAt
                 type
                 status
+                link
               }
               constraints {
                 type
