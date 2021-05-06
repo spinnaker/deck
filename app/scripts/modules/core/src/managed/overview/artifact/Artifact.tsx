@@ -68,6 +68,7 @@ export const Artifact = ({ artifact }: { artifact: QueryArtifact }) => {
       </div>
       <div className="row-details">
         <div className="row-title">{artifact.reference}</div>
+        <div className="artifact-versions-title sp-margin-m-top">Current version</div>
         {currentVersion ? (
           <CurrentVersion
             data={currentVersion}
@@ -84,8 +85,8 @@ export const Artifact = ({ artifact }: { artifact: QueryArtifact }) => {
         )}
         {newerVersions?.length ? (
           <section className="artifact-pending-versions">
-            <div className="artifact-pending-versions-title">Pending Versions</div>
-            <div>
+            <div className="artifact-versions-title">Pending Versions</div>
+            <div className="artifact-pending-versions-list">
               {newerVersions?.map((version) => (
                 <PendingVersion
                   key={version.version}
