@@ -85,11 +85,11 @@ export const VersionMetadata = ({
             {buildDuration}
           </MetadataElement>
         )}
-        {buildsBehind && (
+        {buildsBehind ? (
           <MetadataElement>
             {buildsBehind} build{buildsBehind > 1 ? 's' : ''} behind
           </MetadataElement>
-        )}
+        ) : null}
         {actions && (
           <MetadataElement>
             <Dropdown id={`${buildNumber}-actions`}>
