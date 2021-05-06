@@ -97,3 +97,23 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+button.md-btn {
+  background-color: transparent;
+  font-weight: 600;
+  &:hover {
+    background-color: var(--color-cirrus);
+  }
+}
+
+button.md-btn-success,
+button.md-btn-success:hover {
+  color: var(--color-validation-success);
+  border-color: var(--color-validation-success);
+}
+
+button.md-btn-danger,
+button.md-btn-danger:hover {
+  color: var(--color-danger);
+  border: 1px solid var(--color-danger);
+}

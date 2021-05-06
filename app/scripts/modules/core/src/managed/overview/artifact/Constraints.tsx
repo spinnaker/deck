@@ -1,6 +1,6 @@
+import cx from 'classnames';
 import { isEmpty } from 'lodash';
 import React from 'react';
-import { Button } from 'react-bootstrap';
 
 import { Icon } from '@spinnaker/presentation';
 import { useApplicationContextSafe } from 'core/presentation';
@@ -45,11 +45,9 @@ const ConstraintContent = ({
       {!isEmpty(actions) && (
         <dd>
           {actions?.map(({ title, pass }) => (
-            <Button
-              className="constraint-action-button"
+            <button
+              className={cx('btn md-btn constraint-action-button', pass ? 'md-btn-success' : 'md-btn-danger')}
               key={title}
-              bsStyle={pass ? 'success' : 'danger'}
-              bsSize="small"
               disabled={loading}
               onClick={() => {
                 updateConstraint({
@@ -67,7 +65,7 @@ const ConstraintContent = ({
               }}
             >
               {title}
-            </Button>
+            </button>
           ))}
         </dd>
       )}
