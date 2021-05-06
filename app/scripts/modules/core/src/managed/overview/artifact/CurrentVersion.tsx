@@ -4,7 +4,7 @@ import { GitLink } from './GitLink';
 import { Verifications } from './Verifications';
 import { VersionMetadata } from './VersionMetadata';
 import { QueryArtifactVersion } from '../types';
-import { getLifecycleEventDuration, useCreateVersionActions } from './utils';
+import { getLifecycleEventDuration, getLifecycleEventLink, useCreateVersionActions } from './utils';
 
 export const CurrentVersion = ({
   data,
@@ -33,6 +33,7 @@ export const CurrentVersion = ({
       {gitMetadata ? <GitLink gitMetadata={gitMetadata} /> : <div>Build {data?.version}</div>}
       <VersionMetadata
         buildNumber={data.buildNumber}
+        buildLink={getLifecycleEventLink(data, 'BUILD')}
         author={gitMetadata?.author}
         deployedAt={data.deployedAt}
         buildDuration={getLifecycleEventDuration(data, 'BUILD')}
