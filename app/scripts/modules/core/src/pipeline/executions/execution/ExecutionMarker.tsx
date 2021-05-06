@@ -1,4 +1,3 @@
-/*eslint-disable*/
 import React from 'react';
 import ReactGA from 'react-ga';
 import { UISref } from '@uirouter/react';
@@ -86,10 +85,10 @@ export class ExecutionMarker extends React.Component<IExecutionMarkerProps, IExe
 
   private stageStatus = (stageStatus: string) => {
     if (stageStatus === 'running') {
-      let temp = this.props.stage.stages.filter(
+      const currentStatus = this.props.stage.stages.filter(
         (stage) => stage.status.toLowerCase() === 'running' && stage.type === 'pipeline' && !isEmpty(stage.others),
       );
-      if (!isEmpty(temp)) return 'waiting';
+      if (!isEmpty(currentStatus)) return 'waiting';
     }
     return stageStatus;
   };
@@ -97,13 +96,13 @@ export class ExecutionMarker extends React.Component<IExecutionMarkerProps, IExe
   public render() {
     const { stage, application, execution, active, previousStageActive, width } = this.props;
     const stageType = (stage.activeStageType || stage.type).toLowerCase(); // support groups
-    const PIPELINE_STATUS = this.stageStatus(stage.status.toLowerCase());
+    const pipelineStatus = this.stageStatus(stage.status.toLowerCase());
     const markerClassName = [
       stage.type !== 'group' ? 'clickable' : '',
       'stage',
       'execution-marker',
       `stage-type-${stageType}`,
-      `execution-marker-${PIPELINE_STATUS}`,
+      `execution-marker-${pipelineStatus}`,
       active ? 'active' : '',
       previousStageActive ? 'after-active' : '',
       stage.isRunning ? 'glowing' : '',
@@ -117,7 +116,7 @@ export class ExecutionMarker extends React.Component<IExecutionMarkerProps, IExe
       stage.status.toLowerCase() === 'terminal' &&
       stage.type === 'pipeline';
     const stageContents =
-      PIPELINE_STATUS === 'waiting' ? (
+    pipelineStatus === 'waiting' ? (
         <div className={markerClassName} style={{ width, backgroundColor: stage.color }}>
           <UISref
             to="home.applications.application.pipelines.executionDetails.execution"
