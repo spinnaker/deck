@@ -100,9 +100,9 @@ const Constraint = ({
             <Icon name="accordionExpand" size="12px" className={isExpanded ? 'rotated-90' : undefined} />
           </a>
         ) : (
-          title
+          <span className="constraint-title">{title}</span>
         )}
-        {isExpanded && <ConstraintContent constraint={constraint} versionProps={versionProps} />}
+        {isExpanded && hasContent && <ConstraintContent constraint={constraint} versionProps={versionProps} />}
       </div>
     </div>
   );
