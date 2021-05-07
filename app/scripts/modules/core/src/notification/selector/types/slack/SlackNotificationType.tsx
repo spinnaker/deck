@@ -5,7 +5,7 @@ import { FormikFormField, TextInput } from 'core/presentation';
 
 export class SlackNotificationType extends React.Component<INotificationTypeCustomConfig> {
   public render() {
-    const { botName, fieldName } = this.props;
+    const { fieldName } = this.props;
     return (
       <>
         <FormikFormField
@@ -16,16 +16,6 @@ export class SlackNotificationType extends React.Component<INotificationTypeCust
           )}
           required={true}
         />
-        {!!botName && (
-          <div className="row">
-            <div className="col-md-6 col-md-offset-4">
-              <strong>Note:</strong> You will need to invite the
-              <strong> {botName} </strong>
-              bot to this channel to receive Slack notifications
-              <br />
-            </div>
-          </div>
-        )}
       </>
     );
   }
