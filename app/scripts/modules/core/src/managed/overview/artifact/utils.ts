@@ -22,9 +22,9 @@ export const getLifecycleEventDuration = (
 };
 
 export const getLifecycleEventLink = (version: QueryArtifactVersion | undefined, type: QueryLifecycleStep['type']) => {
-  const event = version?.lifecycleSteps?.find((step) => step.type === type);
-  return event?.link?.replace('builds', 'build');
+  return version?.lifecycleSteps?.find((step) => step.type === type)?.link;
 };
+
 const MODAL_MAX_WIDTH = 750;
 
 export const useCreateVersionActions = ({
