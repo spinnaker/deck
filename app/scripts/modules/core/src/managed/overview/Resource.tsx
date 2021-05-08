@@ -65,7 +65,7 @@ const Status = ({
     );
   }
 
-  return <img src={spinner} height={18} />;
+  return <img src={spinner} height={14} />;
 };
 
 export const Resource = ({ resource, environment }: { resource: QueryResource; environment: string }) => {
