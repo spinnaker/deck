@@ -9,6 +9,7 @@ import { NotifierService } from 'core/widgets';
 import { VersionOperationIcon } from './VersionOperation';
 import { constraintsManager } from '../../constraints/registry';
 import { FetchApplicationDocument, useUpdateConstraintMutation } from '../../graphql/graphql-sdk';
+import spinner from '../loadingIndicator.svg';
 import { ArtifactVersionProps, QueryConstraint } from '../types';
 
 import './Constraints.less';
@@ -34,7 +35,7 @@ const ConstraintContent = ({
         action: 'create',
         key: 'updateConstraintError',
         content: `Failed to update constraint - ${error.message}`,
-        options: { type: 'error' },
+        options: { type: 'warning' },
       });
     }
   }, [error]);
@@ -67,6 +68,7 @@ const ConstraintContent = ({
               {title}
             </button>
           ))}
+          {loading && <img src={spinner} height={14} />}
         </dd>
       )}
     </dl>
