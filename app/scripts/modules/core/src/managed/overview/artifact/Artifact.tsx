@@ -87,9 +87,10 @@ export const Artifact = ({ artifact }: { artifact: QueryArtifact }) => {
           <section className="artifact-pending-versions">
             <div className="artifact-versions-title">Pending Versions</div>
             <div className="artifact-pending-versions-list">
-              {newerVersions?.map((version) => (
+              {newerVersions?.map((version, index) => (
                 <PendingVersion
                   key={version.version}
+                  index={index}
                   environment={artifact.environment}
                   reference={artifact.reference}
                   data={version}

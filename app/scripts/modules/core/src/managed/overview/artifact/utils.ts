@@ -1,3 +1,4 @@
+import { groupBy } from 'lodash';
 import { DateTime } from 'luxon';
 
 import { ManagedWriter, showModal, useApplicationContext } from 'core/index';
@@ -5,9 +6,36 @@ import { timeDiffToString } from 'core/utils';
 
 import { MarkAsBadActionModal, PinActionModal, UnpinActionModal } from './ActionModal';
 import { VersionAction } from './VersionMetadata';
+import { actionStatusUtils } from './VersionOperation';
 import { useFetchApplicationLazyQuery } from '../../graphql/graphql-sdk';
-import { QueryArtifactVersion, QueryLifecycleStep } from '../types';
+import { QueryArtifactVersion, QueryConstraint, QueryLifecycleStep } from '../types';
 import { DEFAULT_VERSION_STATUSES } from '../utils';
+
+const ALL_CONSTRAINT_STATUSES: Array<QueryConstraint['status']> = ['PASS', 'FORCE_PASS', 'PENDING', 'FAIL'];
+
+export const getConstraintsStatusSummary = (constraints: QueryConstraint[]) => {
+  let finalStatus: QueryConstraint['status'] = 'PASS';
+  for (const { status } of constraints) {
+    if (status === 'FAIL') {
+      finalStatus = 'FAIL';
+      break;
+    } else if (status === 'PENDING') {
+      finalStatus = 'PENDING';
+    } else if (status === 'FORCE_PASS' && finalStatus !== 'PENDING') {
+      finalStatus = 'FORCE_PASS';
+    }
+  }
+
+  const byStatus = groupBy(constraints, (c) => c.status);
+  const summary = ALL_CONSTRAINT_STATUSES.map((status) => {
+    const constraintsOfStatus = byStatus[status];
+    return constraintsOfStatus ? `${constraintsOfStatus.length} ${actionStatusUtils[status].displayName}` : undefined;
+  })
+    .filter(Boolean)
+    .join(', ');
+
+  return { text: summary, status: finalStatus };
+};
 
 export const getLifecycleEventDuration = (
   version: QueryArtifactVersion | undefined,

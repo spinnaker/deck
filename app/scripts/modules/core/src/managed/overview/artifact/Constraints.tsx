@@ -11,6 +11,7 @@ import { constraintsManager } from '../../constraints/registry';
 import { FetchApplicationDocument, useUpdateConstraintMutation } from '../../graphql/graphql-sdk';
 import spinner from '../loadingIndicator.svg';
 import { ArtifactVersionProps, QueryConstraint } from '../types';
+import { getConstraintsStatusSummary } from './utils';
 
 import './Constraints.less';
 
@@ -83,7 +84,7 @@ const Constraint = ({
   versionProps: ArtifactVersionProps;
 }) => {
   const hasContent = constraintsManager.hasContent(constraint);
-  const [isExpanded, setIsExpanded] = React.useState(hasContent && constraint.status !== 'PASS');
+  const [isExpanded, setIsExpanded] = React.useState(hasContent);
   const title = constraintsManager.renderTitle(constraint);
   return (
     <div className="pending-version-constraint">
@@ -113,15 +114,38 @@ const Constraint = ({
 export const Constraints = ({
   constraints,
   versionProps,
+  expandedByDefault,
 }: {
   constraints: QueryConstraint[];
   versionProps: ArtifactVersionProps;
+  expandedByDefault?: boolean;
 }) => {
+  const [showSummary, setShowSummary] = React.useState(Boolean(expandedByDefault));
+  const summary = getConstraintsStatusSummary(constraints);
   return (
     <div className="Constraints">
-      {constraints?.map((constraint, index) => (
-        <Constraint key={index} constraint={constraint} versionProps={versionProps} />
-      ))}
+      {showSummary ? (
+        constraints?.map((constraint, index) => (
+          <Constraint key={index} constraint={constraint} versionProps={versionProps} />
+        ))
+      ) : (
+        <div className="pending-version-constraint">
+          <VersionOperationIcon status={summary.status} />
+          <span className="constraint-title">
+            Constraints: {summary.text} (
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                setShowSummary(true);
+              }}
+            >
+              expand
+            </a>
+            )
+          </span>
+        </div>
+      )}
     </div>
   );
 };
