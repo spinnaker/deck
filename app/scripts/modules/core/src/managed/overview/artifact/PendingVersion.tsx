@@ -1,3 +1,4 @@
+import { isEmpty } from 'lodash';
 import { DateTime } from 'luxon';
 import React from 'react';
 
@@ -14,11 +15,13 @@ export const PendingVersion = ({
   reference,
   environment,
   isPinned,
+  index,
 }: {
   data: QueryArtifactVersion;
   reference: string;
   environment: string;
   isPinned: boolean;
+  index: number;
 }) => {
   const { buildNumber, version, gitMetadata, constraints, status } = data;
   const actions = useCreateVersionActions({
@@ -49,8 +52,13 @@ export const PendingVersion = ({
         isPinned={isPinned}
         actions={actions}
       />
-      {constraints && (
-        <Constraints constraints={constraints} versionProps={{ environment, reference, version: data.version }} />
+      {constraints && !isEmpty(constraints) && (
+        <Constraints
+          key={index} // This is needed on refresh if a new version was added
+          constraints={constraints}
+          versionProps={{ environment, reference, version: data.version }}
+          expandedByDefault={index === 0}
+        />
       )}
     </div>
   );
