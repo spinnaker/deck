@@ -1,4 +1,4 @@
-query fetchApplication($appName: String!) {
+query fetchApplication($appName: String!, $statuses: [MdArtifactStatusInEnvironment!]) {
   application(appName: $appName) {
     id
     name
@@ -14,7 +14,7 @@ query fetchApplication($appName: String!) {
           environment
           type
           reference
-          versions(statuses: [PENDING, APPROVED, DEPLOYING, CURRENT]) {
+          versions(statuses: $statuses) {
             id
             buildNumber
             version

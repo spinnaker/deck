@@ -6,6 +6,7 @@ import { Resource } from './Resource';
 import { Artifact } from './artifact/Artifact';
 import { useFetchApplicationQuery, useFetchResourceStatusQuery } from '../graphql/graphql-sdk';
 import { QueryEnvironment } from './types';
+import { DEFAULT_VERSION_STATUSES } from './utils';
 
 import './EnvironmentsOverview.less';
 import './baseStyles.less';
@@ -15,7 +16,9 @@ interface IEnvironmentsProps {
 }
 
 export const EnvironmentsOverview = ({ app }: IEnvironmentsProps) => {
-  const { data, error, loading } = useFetchApplicationQuery({ variables: { appName: app.name } });
+  const { data, error, loading } = useFetchApplicationQuery({
+    variables: { appName: app.name, statuses: DEFAULT_VERSION_STATUSES },
+  });
 
   if (loading && !data) {
     return (
@@ -54,7 +57,7 @@ const Environment = ({ appName, environment }: { appName: string; environment: Q
   const state = environment.state;
   return (
     <section className="Environment">
-      <EnvironmentTitle title={environment.name} />
+      <div className="EnvironmentTitle">{environment.name}</div>
       <CollapsibleSection heading="Artifacts" {...sectionProps} defaultExpanded enableCaching={false}>
         {state.artifacts?.map((artifact) => (
           <Artifact key={artifact.reference} artifact={artifact} />
@@ -73,8 +76,4 @@ const Environment = ({ appName, environment }: { appName: string; environment: Q
       </CollapsibleSection>
     </section>
   );
-};
-
-const EnvironmentTitle = ({ title }: { title: string }) => {
-  return <div className="EnvironmentTitle">{title}</div>;
 };

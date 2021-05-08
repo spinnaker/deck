@@ -7,6 +7,7 @@ import { MarkAsBadActionModal, PinActionModal, UnpinActionModal } from './Action
 import { VersionAction } from './VersionMetadata';
 import { useFetchApplicationLazyQuery } from '../../graphql/graphql-sdk';
 import { QueryArtifactVersion, QueryLifecycleStep } from '../types';
+import { DEFAULT_VERSION_STATUSES } from '../utils';
 
 export const getLifecycleEventDuration = (
   version: QueryArtifactVersion | undefined,
@@ -45,7 +46,7 @@ export const useCreateVersionActions = ({
   const application = useApplicationContext();
   if (!application) throw new Error('Application context is empty');
   const [refetch] = useFetchApplicationLazyQuery({
-    variables: { appName: application.name },
+    variables: { appName: application.name, statuses: DEFAULT_VERSION_STATUSES },
     fetchPolicy: 'network-only',
   });
   const actions: VersionAction[] = [
