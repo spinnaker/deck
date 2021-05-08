@@ -35,7 +35,7 @@ const ConstraintContent = ({
         action: 'create',
         key: 'updateConstraintError',
         content: `Failed to update constraint - ${error.message}`,
-        options: { type: 'warning' },
+        options: { type: 'error' },
       });
     }
   }, [error]);
