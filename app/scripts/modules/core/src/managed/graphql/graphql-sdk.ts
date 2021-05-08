@@ -223,6 +223,7 @@ export interface QueryApplicationArgs {
 
 export type FetchApplicationQueryVariables = Exact<{
   appName: Scalars['String'];
+  statuses?: Maybe<Array<MdArtifactStatusInEnvironment> | MdArtifactStatusInEnvironment>;
 }>;
 
 export type FetchApplicationQuery = { __typename?: 'Query' } & {
@@ -354,7 +355,7 @@ export type UpdateConstraintMutationVariables = Exact<{
 export type UpdateConstraintMutation = { __typename?: 'Mutation' } & Pick<Mutation, 'updateConstraintStatus'>;
 
 export const FetchApplicationDocument = gql`
-  query fetchApplication($appName: String!) {
+  query fetchApplication($appName: String!, $statuses: [MdArtifactStatusInEnvironment!]) {
     application(appName: $appName) {
       id
       name
@@ -370,7 +371,7 @@ export const FetchApplicationDocument = gql`
             environment
             type
             reference
-            versions(statuses: [PENDING, APPROVED, DEPLOYING, CURRENT]) {
+            versions(statuses: $statuses) {
               id
               buildNumber
               version
@@ -460,6 +461,7 @@ export const FetchApplicationDocument = gql`
  * const { data, loading, error } = useFetchApplicationQuery({
  *   variables: {
  *      appName: // value for 'appName'
+ *      statuses: // value for 'statuses'
  *   },
  * });
  */
