@@ -2,11 +2,12 @@ import React from 'react';
 
 import { Application, CollapsibleSection, ICollapsibleSectionProps, Spinner } from 'core/index';
 
+import { Loading } from '../Loading';
 import { Resource } from './Resource';
 import { Artifact } from './artifact/Artifact';
 import { useFetchApplicationQuery, useFetchResourceStatusQuery } from '../graphql/graphql-sdk';
 import { QueryEnvironment } from './types';
-import { DEFAULT_VERSION_STATUSES } from './utils';
+import { OVERVIEW_VERSION_STATUSES } from './utils';
 
 import './EnvironmentsOverview.less';
 import './baseStyles.less';
@@ -17,15 +18,11 @@ interface IEnvironmentsProps {
 
 export const EnvironmentsOverview = ({ app }: IEnvironmentsProps) => {
   const { data, error, loading } = useFetchApplicationQuery({
-    variables: { appName: app.name, statuses: DEFAULT_VERSION_STATUSES },
+    variables: { appName: app.name, statuses: OVERVIEW_VERSION_STATUSES },
   });
 
   if (loading && !data) {
-    return (
-      <div style={{ width: '100%' }}>
-        <Spinner size="medium" message="Loading environments ..." />
-      </div>
-    );
+    return <Loading message="Loading environments..." />;
   }
 
   if (error) {
@@ -38,8 +35,6 @@ export const EnvironmentsOverview = ({ app }: IEnvironmentsProps) => {
       {data?.application?.environments.map((env) => (
         <Environment key={env.name} environment={env} appName={app.name} />
       ))}
-      {/* Some padding at the bottom */}
-      <div style={{ minHeight: 24, minWidth: 24 }}></div>
     </div>
   );
 };
@@ -47,6 +42,7 @@ export const EnvironmentsOverview = ({ app }: IEnvironmentsProps) => {
 const sectionProps: Partial<ICollapsibleSectionProps> = {
   outerDivClassName: 'environment-section',
   headingClassName: 'environment-section-heading',
+  bodyClassName: 'environment-section-body',
   useGlyphiconChevron: false,
 };
 

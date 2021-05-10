@@ -9,7 +9,7 @@ import { VersionAction } from './VersionMetadata';
 import { actionStatusUtils } from './VersionOperation';
 import { useFetchApplicationLazyQuery } from '../../graphql/graphql-sdk';
 import { QueryArtifactVersion, QueryConstraint, QueryLifecycleStep } from '../types';
-import { DEFAULT_VERSION_STATUSES } from '../utils';
+import { OVERVIEW_VERSION_STATUSES } from '../utils';
 
 const ALL_CONSTRAINT_STATUSES: Array<QueryConstraint['status']> = ['PASS', 'FORCE_PASS', 'PENDING', 'FAIL'];
 
@@ -79,7 +79,7 @@ export const useCreateVersionActions = ({
   const application = useApplicationContext();
   if (!application) throw new Error('Application context is empty');
   const [refetch] = useFetchApplicationLazyQuery({
-    variables: { appName: application.name, statuses: DEFAULT_VERSION_STATUSES },
+    variables: { appName: application.name, statuses: OVERVIEW_VERSION_STATUSES },
     fetchPolicy: 'network-only',
   });
   const actions: VersionAction[] = [

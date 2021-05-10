@@ -8,6 +8,7 @@ import { IconTooltip } from 'core/index';
 
 import { RelativeTimestamp } from '../../RelativeTimestamp';
 import { TOOLTIP_DELAY } from '../../utils/defaults';
+import './VersionMetadata.less';
 
 const MetadataElement: React.FC<{ className?: string }> = ({ className, children }) => {
   return <span className={cx('metadata-element', className)}>{children}</span>;
@@ -43,7 +44,7 @@ export const VersionMetadata = ({
 }) => {
   return (
     <div>
-      <div className="version-metadata">
+      <div className="VersionMetadata">
         {isDeploying && (
           <MetadataElement>
             <span className="version-deploying version-badge">Deploying</span>
@@ -57,7 +58,7 @@ export const VersionMetadata = ({
           </MetadataElement>
         )}
         <MetadataElement>
-          Build <a href={buildLink}>#{buildNumber}</a>
+          <a href={buildLink}>Build #{buildNumber}</a>
         </MetadataElement>
         {author && <MetadataElement>By {author}</MetadataElement>}
         {deployedAt && (

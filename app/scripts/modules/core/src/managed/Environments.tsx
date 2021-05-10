@@ -7,13 +7,13 @@ import { SETTINGS } from 'core/config/settings';
 import { Spinner } from 'core/widgets';
 
 import { ColumnHeader } from './ColumnHeader';
+import { Environments2, featureFlag } from './Environments2';
 import { EnvironmentsHeader } from './EnvironmentsHeader';
 import { EnvironmentsList } from './EnvironmentsList';
 import { Application, ApplicationDataSource } from '../application';
 import { ArtifactDetail } from './artifactDetail/ArtifactDetail';
 import { ArtifactsList } from './artifactsList/ArtifactsList';
 import { IManagedApplicationEnvironmentSummary, IManagedResourceSummary } from '../domain';
-import { EnvironmentsOverview } from './overview/EnvironmentsOverview';
 import { useDataSource } from '../presentation/hooks';
 
 import './Environments.less';
@@ -65,29 +65,13 @@ interface IEnvironmentsProps {
   app: Application;
 }
 
-const featureFlag = 'newMD_UI';
-
 export const Environments: React.FC<IEnvironmentsProps> = (props) => {
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.get(featureFlag)) {
     localStorage.setItem(featureFlag, '1');
   }
   if (localStorage.getItem(featureFlag)) {
-    return (
-      <>
-        <EnvironmentsOverview {...props} />
-        <a
-          href="#"
-          onClick={() => {
-            localStorage.removeItem(featureFlag);
-            window.location.reload();
-          }}
-          style={{ position: 'absolute', bottom: 4, right: 4 }}
-        >
-          Switch to old view
-        </a>
-      </>
-    );
+    return <Environments2 app={props.app} />;
   }
   return <EnvironmentsOld {...props} />;
 };
