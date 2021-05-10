@@ -21,9 +21,6 @@ export const AddEntityTagLinks = ({
   onUpdate,
   ownerOptions,
 }: IAddEntityTagLinksProps) => {
-  // eslint-disable-next-line
-  console.log(component, entityType, onUpdate, ownerOptions);
-
   const addTag = (tagType: string) => {
     const tagProps = {
       application,
