@@ -1,0 +1,35 @@
+.HorizontalTabs {
+  > ul {
+    list-style-type: none;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    border-bottom: 1px solid var(--color-alto);
+    padding: 0;
+    margin-bottom: var(--xl-spacing);
+  }
+
+  @tab-border-width: 3px;
+
+  .tab {
+    background: none;
+    color: inherit;
+    border: none;
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
+    outline: inherit;
+    min-width: 150px;
+    max-width: 33%;
+    padding: var(--xs-spacing) var(--m-spacing);
+    color: var(--color-concrete);
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    border-bottom: @tab-border-width solid transparent;
+  }
+
+  .selected-tab {
+    color: var(--color-black);
+    border-bottom: @tab-border-width solid var(--color-accent);
+  }
+}
