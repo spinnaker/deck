@@ -279,7 +279,7 @@ export class ExecutionGroup extends React.PureComponent<IExecutionGroupProps, IE
     let groupTargetAccountLabelsExtra: React.ReactNode[] = [];
     if (group.targetAccounts && group.targetAccounts.length > 0) {
       group.targetAccounts.slice(0, ACCOUNT_TAG_OVERFLOW_LIMIT).map((account) => {
-        groupTargetAccountLabels.push(<AccountTag key={account} account={account} className="account-tag-name" />);
+        groupTargetAccountLabels.push(<AccountTag key={account} account={account} className="account-tag-wrapper" />);
       });
     }
     if (group.targetAccounts && group.targetAccounts.length > ACCOUNT_TAG_OVERFLOW_LIMIT) {
