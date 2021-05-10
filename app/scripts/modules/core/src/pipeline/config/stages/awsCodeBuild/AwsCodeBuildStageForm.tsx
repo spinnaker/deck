@@ -18,7 +18,7 @@ import React from 'react';
 
 import { CheckboxInput } from 'core/presentation';
 
-import { AwsCodeBuildSourceList } from './AwsCodeBuildSourceList';
+import { AwsCodeBuildSecondarySourcesVersionList, AwsCodeBuildSourceList } from './AwsCodeBuildSourceList';
 import { EXCLUDED_ARTIFACT_TYPES, IAwsCodeBuildSource, SOURCE_TYPES } from './IAwsCodeBuildSource';
 
 export function AwsCodeBuildStageForm(props: IFormikStageConfigInjectedProps) {
@@ -140,6 +140,14 @@ export function AwsCodeBuildStageForm(props: IFormikStageConfigInjectedProps) {
             stage={stage}
             pipeline={props.pipeline}
           />
+        )}
+      />
+      <FormikFormField
+        help={<HelpField id="pipeline.config.codebuild.secondarySourcesVersionOverride" />}
+        label="Secondary Sources Version"
+        name="secondarySourcesVersionOverride"
+        input={(inputProps: IFormInputProps) => (
+          <AwsCodeBuildSecondarySourcesVersionList {...inputProps} stage={stage} pipeline={props.pipeline} />
         )}
       />
       <h4>Environment Configuration</h4>
