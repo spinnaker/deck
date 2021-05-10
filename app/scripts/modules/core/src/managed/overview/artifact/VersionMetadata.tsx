@@ -14,7 +14,8 @@ const MetadataElement: React.FC<{ className?: string }> = ({ className, children
 };
 
 export interface VersionAction {
-  onClick: () => void;
+  onClick?: () => void;
+  href?: string;
   content: React.ReactNode;
   disabled?: boolean;
 }
@@ -100,7 +101,13 @@ export const VersionMetadata = ({
               <Dropdown.Toggle className="element-actions-menu-toggle">Actions</Dropdown.Toggle>
               <Dropdown.Menu>
                 {actions.map((action, index) => (
-                  <MenuItem key={index} disabled={action.disabled} onClick={action.onClick}>
+                  <MenuItem
+                    key={index}
+                    disabled={action.disabled}
+                    onClick={action.onClick}
+                    href={action.href}
+                    target="_blank"
+                  >
                     {action.content}
                   </MenuItem>
                 ))}

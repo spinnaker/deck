@@ -63,6 +63,7 @@ export const useCreateVersionActions = ({
   buildNumber,
   commitMessage,
   isPinned,
+  compareLinks,
 }: {
   environment: string;
   reference: string;
@@ -70,6 +71,10 @@ export const useCreateVersionActions = ({
   buildNumber?: string;
   commitMessage?: string;
   isPinned: boolean;
+  compareLinks?: {
+    previous?: string;
+    current?: string;
+  };
 }): VersionAction[] | undefined => {
   const application = useApplicationContext();
   if (!application) throw new Error('Application context is empty');
@@ -151,6 +156,12 @@ export const useCreateVersionActions = ({
       },
     },
   ];
+  if (compareLinks?.current) {
+    actions.push({ content: 'Compare to current version', href: compareLinks.current });
+  }
+  if (compareLinks?.previous) {
+    actions.push({ content: 'Compare to previous version', href: compareLinks.previous });
+  }
 
   return actions.length ? actions : undefined;
 };

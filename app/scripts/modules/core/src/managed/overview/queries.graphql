@@ -33,6 +33,10 @@ query fetchApplication($appName: String!, $statuses: [MdArtifactStatusInEnvironm
                 number
                 link
               }
+              comparisonLinks {
+                toPreviousVersion
+                toCurrentVersion
+              }
             }
             deployedAt
             lifecycleSteps {

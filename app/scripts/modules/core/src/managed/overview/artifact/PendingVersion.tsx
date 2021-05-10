@@ -31,6 +31,9 @@ export const PendingVersion = ({
     version,
     commitMessage: gitMetadata?.commitInfo?.message,
     isPinned,
+    compareLinks: {
+      current: gitMetadata?.comparisonLinks?.toCurrentVersion,
+    },
   });
 
   return (

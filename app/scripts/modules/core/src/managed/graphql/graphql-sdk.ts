@@ -17,6 +17,21 @@ export interface Scalars {
   JSON: any;
 }
 
+export interface MdAction {
+  __typename?: 'MdAction';
+  id: Scalars['String'];
+  type: Scalars['String'];
+  status: MdActionStatus;
+  startedAt?: Maybe<Scalars['InstantTime']>;
+  completedAt?: Maybe<Scalars['InstantTime']>;
+  link?: Maybe<Scalars['String']>;
+  actionType: MdActionType;
+}
+
+export type MdActionStatus = 'NOT_EVALUATED' | 'PENDING' | 'PASS' | 'FAIL' | 'FORCE_PASS';
+
+export type MdActionType = 'VERIFICATION' | 'POST_DEPLOY';
+
 export interface MdApplication {
   __typename?: 'MdApplication';
   id: Scalars['String'];
@@ -38,6 +53,7 @@ export interface MdArtifact {
 
 export interface MdArtifactVersionsArgs {
   statuses?: Maybe<Array<MdArtifactStatusInEnvironment>>;
+  versions?: Maybe<Array<Scalars['String']>>;
 }
 
 export type MdArtifactStatusInEnvironment =
@@ -63,7 +79,8 @@ export interface MdArtifactVersionInEnvironment {
   status?: Maybe<MdArtifactStatusInEnvironment>;
   lifecycleSteps?: Maybe<Array<MdLifecycleStep>>;
   constraints?: Maybe<Array<MdConstraint>>;
-  verifications?: Maybe<Array<MdVerification>>;
+  verifications?: Maybe<Array<MdAction>>;
+  postDeploy?: Maybe<Array<MdAction>>;
 }
 
 export interface MdCommitInfo {
@@ -71,6 +88,12 @@ export interface MdCommitInfo {
   sha?: Maybe<Scalars['String']>;
   link?: Maybe<Scalars['String']>;
   message?: Maybe<Scalars['String']>;
+}
+
+export interface MdComparisonLinks {
+  __typename?: 'MdComparisonLinks';
+  toPreviousVersion?: Maybe<Scalars['String']>;
+  toCurrentVersion?: Maybe<Scalars['String']>;
 }
 
 export interface MdConstraint {
@@ -116,6 +139,7 @@ export interface MdGitMetadata {
   repoName?: Maybe<Scalars['String']>;
   pullRequest?: Maybe<MdPullRequest>;
   commitInfo?: Maybe<MdCommitInfo>;
+  comparisonLinks?: Maybe<MdComparisonLinks>;
 }
 
 export type MdLifecycleEventScope = 'PRE_DEPLOYMENT';
@@ -189,18 +213,6 @@ export interface MdResourceActuationState {
 
 export type MdResourceActuationStatus = 'PROCESSING' | 'UP_TO_DATE' | 'ERROR' | 'WAITING' | 'NOT_MANAGED';
 
-export interface MdVerification {
-  __typename?: 'MdVerification';
-  id: Scalars['String'];
-  type: Scalars['String'];
-  status: MdVerificationStatus;
-  startedAt?: Maybe<Scalars['InstantTime']>;
-  completedAt?: Maybe<Scalars['InstantTime']>;
-  link?: Maybe<Scalars['String']>;
-}
-
-export type MdVerificationStatus = 'NOT_EVALUATED' | 'PENDING' | 'PASS' | 'FAIL' | 'FORCE_PASS';
-
 export interface Mutation {
   __typename?: 'Mutation';
   updateConstraintStatus?: Maybe<Scalars['Boolean']>;
@@ -258,6 +270,12 @@ export type FetchApplicationQuery = { __typename?: 'Query' } & {
                                         pullRequest?: Maybe<
                                           { __typename?: 'MdPullRequest' } & Pick<MdPullRequest, 'number' | 'link'>
                                         >;
+                                        comparisonLinks?: Maybe<
+                                          { __typename?: 'MdComparisonLinks' } & Pick<
+                                            MdComparisonLinks,
+                                            'toPreviousVersion' | 'toCurrentVersion'
+                                          >
+                                        >;
                                       }
                                   >;
                                   lifecycleSteps?: Maybe<
@@ -278,8 +296,8 @@ export type FetchApplicationQuery = { __typename?: 'Query' } & {
                                   >;
                                   verifications?: Maybe<
                                     Array<
-                                      { __typename?: 'MdVerification' } & Pick<
-                                        MdVerification,
+                                      { __typename?: 'MdAction' } & Pick<
+                                        MdAction,
                                         'id' | 'type' | 'status' | 'startedAt' | 'completedAt' | 'link'
                                       >
                                     >
@@ -389,6 +407,10 @@ export const FetchApplicationDocument = gql`
                 pullRequest {
                   number
                   link
+                }
+                comparisonLinks {
+                  toPreviousVersion
+                  toCurrentVersion
                 }
               }
               deployedAt

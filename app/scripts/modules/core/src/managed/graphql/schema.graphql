@@ -42,7 +42,7 @@ type MdArtifact {
   name: String!
   type: String!
   reference: String!
-  versions(statuses: [MdArtifactStatusInEnvironment!]): [MdArtifactVersionInEnvironment!]
+  versions(statuses: [MdArtifactStatusInEnvironment!], versions: [String!]): [MdArtifactVersionInEnvironment!]
   pinnedVersion: MdPinnedVersion
 }
 
@@ -59,7 +59,8 @@ type MdArtifactVersionInEnvironment {
   status: MdArtifactStatusInEnvironment
   lifecycleSteps: [MdLifecycleStep!]
   constraints: [MdConstraint!]
-  verifications: [MdVerification!]
+  verifications: [MdAction!]
+  postDeploy: [MdAction!]
 }
 
 enum MdLifecycleEventScope {
@@ -100,6 +101,12 @@ type MdGitMetadata {
   repoName: String
   pullRequest: MdPullRequest
   commitInfo: MdCommitInfo
+  comparisonLinks: MdComparisonLinks
+}
+
+type MdComparisonLinks {
+  toPreviousVersion: String
+  toCurrentVersion: String
 }
 
 type MdPullRequest {
@@ -175,7 +182,7 @@ type MdConstraint {
   attributes: JSON
 }
 
-enum MdVerificationStatus {
+enum MdActionStatus {
   NOT_EVALUATED
   PENDING
   PASS
@@ -183,13 +190,19 @@ enum MdVerificationStatus {
   FORCE_PASS
 }
 
-type MdVerification {
+enum MdActionType {
+  VERIFICATION
+  POST_DEPLOY
+}
+
+type MdAction {
   id: String!
   type: String!
-  status: MdVerificationStatus!
+  status: MdActionStatus!
   startedAt: InstantTime
   completedAt: InstantTime
   link: String
+  actionType: MdActionType!
 }
 
 type Mutation {

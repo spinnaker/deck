@@ -27,6 +27,9 @@ export const CurrentVersion = ({
     buildNumber: data.buildNumber,
     commitMessage: gitMetadata?.commitInfo?.message,
     isPinned,
+    compareLinks: {
+      previous: gitMetadata?.comparisonLinks?.toPreviousVersion,
+    },
   });
   return (
     <div className="artifact-current-version">
