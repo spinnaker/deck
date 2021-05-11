@@ -1,9 +1,5 @@
 import React from 'react';
 
-import { Button } from '../../Button';
-import { MarkAsBadIntro } from '../../artifactDetail/MarkArtifactAsBadModal';
-import { PinVersionIntro } from '../../artifactDetail/PinArtifactModal';
-import { UnpinVersionIntro } from '../../artifactDetail/UnpinArtifactModal';
 import {
   FormikFormField,
   IModalComponentProps,
@@ -13,18 +9,21 @@ import {
   SpinFormik,
   TextAreaInput,
   ValidationMessage,
-} from '../../../presentation';
-import { logEvent } from '../../utils/logging';
+} from 'core/index';
+
+import { Button } from '../Button';
+import { logEvent } from './logging';
 
 export interface IArtifactActionModalProps extends IModalComponentProps {
   title: string;
   actionName: string;
   withComment?: boolean;
+  logCategory?: string;
   onAction: (comment?: string) => Promise<void> | PromiseLike<void>;
   onSuccess?: () => void;
 }
 
-const ArtifactActionModal: React.FC<IArtifactActionModalProps> = ({
+export const ActionModal: React.FC<IArtifactActionModalProps> = ({
   title,
   dismissModal,
   closeModal,
@@ -32,9 +31,9 @@ const ArtifactActionModal: React.FC<IArtifactActionModalProps> = ({
   onSuccess,
   actionName,
   withComment = true,
+  logCategory,
   children,
 }) => {
-  const LOG_CATEGORY = `Environments::Artifact::${actionName}`;
   return (
     <>
       <ModalHeader className="truncate">{title}</ModalHeader>
@@ -45,17 +44,19 @@ const ArtifactActionModal: React.FC<IArtifactActionModalProps> = ({
           try {
             await onAction(comment);
             onSuccess?.();
-            logEvent({
-              category: LOG_CATEGORY,
-              action: actionName,
-            });
+            logCategory &&
+              logEvent({
+                category: [logCategory, actionName].join('::'),
+                action: actionName,
+              });
             closeModal?.();
           } catch (error) {
             setStatus({ error: error.data });
-            logEvent({
-              category: LOG_CATEGORY,
-              action: `${actionName} - Failed`,
-            });
+            logCategory &&
+              logEvent({
+                category: [logCategory, actionName].join('::'),
+                action: `${actionName} - Failed`,
+              });
           } finally {
             setSubmitting(false);
           }
@@ -115,36 +116,5 @@ const ArtifactActionModal: React.FC<IArtifactActionModalProps> = ({
         }}
       />
     </>
-  );
-};
-
-export const PinActionModal = ({ application, ...props }: IArtifactActionModalProps & { application: string }) => {
-  return (
-    <ArtifactActionModal {...props}>
-      <PinVersionIntro application={application} />
-    </ArtifactActionModal>
-  );
-};
-
-export const UnpinActionModal = ({
-  application,
-  environment,
-  ...props
-}: IArtifactActionModalProps & { application: string; environment: string }) => {
-  return (
-    <ArtifactActionModal {...props}>
-      <UnpinVersionIntro application={application} environment={environment} />
-    </ArtifactActionModal>
-  );
-};
-
-export const MarkAsBadActionModal = ({
-  application,
-  ...props
-}: IArtifactActionModalProps & { application: string }) => {
-  return (
-    <ArtifactActionModal {...props}>
-      <MarkAsBadIntro application={application} />
-    </ArtifactActionModal>
   );
 };

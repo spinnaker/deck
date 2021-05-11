@@ -4,12 +4,13 @@ import { DateTime } from 'luxon';
 import { ManagedWriter, showModal, useApplicationContext } from 'core/index';
 import { timeDiffToString } from 'core/utils';
 
-import { MarkAsBadActionModal, PinActionModal, UnpinActionModal } from './ActionModal';
+import { MarkAsBadActionModal, PinActionModal, UnpinActionModal } from './ArtifactActionModal';
 import { VersionAction } from './VersionMetadata';
 import { actionStatusUtils } from './VersionOperation';
 import { useFetchApplicationLazyQuery } from '../../graphql/graphql-sdk';
 import { QueryArtifactVersion, QueryConstraint, QueryLifecycleStep } from '../types';
 import { OVERVIEW_VERSION_STATUSES } from '../utils';
+import { MODAL_MAX_WIDTH } from '../../utils/defaults';
 
 const ALL_CONSTRAINT_STATUSES: Array<QueryConstraint['status']> = ['PASS', 'FORCE_PASS', 'PENDING', 'FAIL'];
 
@@ -53,8 +54,6 @@ export const getLifecycleEventDuration = (
 export const getLifecycleEventLink = (version: QueryArtifactVersion | undefined, type: QueryLifecycleStep['type']) => {
   return version?.lifecycleSteps?.find((step) => step.type === type)?.link;
 };
-
-const MODAL_MAX_WIDTH = 750;
 
 export const useCreateVersionActions = ({
   environment,
