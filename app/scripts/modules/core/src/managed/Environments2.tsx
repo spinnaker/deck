@@ -1,12 +1,14 @@
 import React from 'react';
-import { Tab } from 'react-bootstrap';
 
 import { Application } from 'core/application';
-import { HorizontalTabs } from 'core/presentation/horizontalTabs/HorizontalTabs';
+import { HorizontalTabs, Tab } from 'core/presentation/horizontalTabs/HorizontalTabs';
 
+import { Configuration } from './config/Configuration';
+import { ManagementWarning } from './config/ManagementWarning';
 import { EnvironmentsOverview } from './overview/EnvironmentsOverview';
 
 import './Environments2.less';
+import './overview/baseStyles.less';
 
 export const featureFlag = 'newMD_UI';
 
@@ -16,7 +18,11 @@ export const Environments2 = ({ app }: { app: Application }) => {
     <div className="vertical Environments2">
       <HorizontalTabs>
         <Tab title="Overview">
+          <ManagementWarning appName={app.name} />
           <EnvironmentsOverview app={app} />
+        </Tab>
+        <Tab title="Configuration">
+          <Configuration appName={app.name} />
         </Tab>
       </HorizontalTabs>
       {/* Some padding at the bottom */}

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Application, CollapsibleSection, ICollapsibleSectionProps, Spinner } from 'core/index';
+import { Application, CollapsibleSection, ICollapsibleSectionProps } from 'core/index';
 
 import { Loading } from '../Loading';
 import { Resource } from './Resource';
@@ -10,7 +10,6 @@ import { QueryEnvironment } from './types';
 import { OVERVIEW_VERSION_STATUSES } from './utils';
 
 import './EnvironmentsOverview.less';
-import './baseStyles.less';
 
 interface IEnvironmentsProps {
   app: Application;
