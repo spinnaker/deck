@@ -1,4 +1,6 @@
 import { IAmazonFunctionSourceData } from 'amazon';
+import React from 'react';
+
 import {
   AccountService,
   FormikFormField,
@@ -12,8 +14,7 @@ import {
   NumberInput,
   ReactSelectInput,
   useData,
-} from 'core';
-import React from 'react';
+} from '@spinnaker/core';
 
 import { DeleteVersionList, DeleteVersionPicker } from './constants';
 
@@ -103,7 +104,7 @@ export function DeleteLambdaFunctionStageForm(props: IFormikStageConfigInjectedP
             {...inputProps}
             clearable={false}
             options={DeleteVersionList}
-            optionRenderer={(option) => (
+            optionRenderer={(option: any) => (
               <DeleteVersionPicker config={props} value={option.value as any} showingDetails={true} />
             )}
           />
@@ -136,7 +137,7 @@ export function DeleteLambdaFunctionStageForm(props: IFormikStageConfigInjectedP
           name="retentionNumber"
           help={<HelpField content="The number of Lambda versions to retain" />}
           label="Prior Versions to Retain"
-          input={(props) => <NumberInput {...props} min={1} max={100} />}
+          input={(props: any) => <NumberInput {...props} min={1} max={100} />}
         />
       ) : null}
     </div>

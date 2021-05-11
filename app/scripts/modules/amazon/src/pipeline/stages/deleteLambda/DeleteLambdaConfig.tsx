@@ -1,5 +1,6 @@
-import { FormikStageConfig, IFormikStageConfigInjectedProps, IStageConfigProps } from 'core';
 import React from 'react';
+
+import { FormikStageConfig, IFormikStageConfigInjectedProps, IStageConfigProps } from '@spinnaker/core';
 
 import { DeleteLambdaFunctionStageForm } from './DeleteLambdaFunctionStageForm';
 import { validate } from './DeleteLambdaValidator';

@@ -1,5 +1,6 @@
-import { IFormikStageConfigInjectedProps } from 'core';
 import React from 'react';
+
+import { IFormikStageConfigInjectedProps } from '@spinnaker/core';
 
 import { DeleteVersionList, IDeleteVersionConstant } from './deleteVersion.constants';
 
