@@ -37,6 +37,7 @@ export interface MdApplication {
   id: Scalars['String'];
   name: Scalars['String'];
   account: Scalars['String'];
+  isPaused?: Maybe<Scalars['Boolean']>;
   environments: Array<MdEnvironment>;
 }
 
@@ -216,12 +217,18 @@ export type MdResourceActuationStatus = 'PROCESSING' | 'UP_TO_DATE' | 'ERROR' | 
 export interface Mutation {
   __typename?: 'Mutation';
   updateConstraintStatus?: Maybe<Scalars['Boolean']>;
+  toggleManagement?: Maybe<Scalars['Boolean']>;
 }
 
 export interface MutationUpdateConstraintStatusArgs {
   application?: Maybe<Scalars['String']>;
   environment?: Maybe<Scalars['String']>;
   status?: Maybe<MdConstraintStatusUpdate>;
+}
+
+export interface MutationToggleManagementArgs {
+  application?: Maybe<Scalars['String']>;
+  isPaused?: Maybe<Scalars['Boolean']>;
 }
 
 export interface Query {
@@ -364,6 +371,14 @@ export type FetchResourceStatusQuery = { __typename?: 'Query' } & {
   >;
 };
 
+export type FetchApplicationManagementStatusQueryVariables = Exact<{
+  appName: Scalars['String'];
+}>;
+
+export type FetchApplicationManagementStatusQuery = { __typename?: 'Query' } & {
+  application?: Maybe<{ __typename?: 'MdApplication' } & Pick<MdApplication, 'id' | 'name' | 'isPaused'>>;
+};
+
 export type UpdateConstraintMutationVariables = Exact<{
   application?: Maybe<Scalars['String']>;
   environment?: Maybe<Scalars['String']>;
@@ -371,6 +386,13 @@ export type UpdateConstraintMutationVariables = Exact<{
 }>;
 
 export type UpdateConstraintMutation = { __typename?: 'Mutation' } & Pick<Mutation, 'updateConstraintStatus'>;
+
+export type ToggleManagementMutationVariables = Exact<{
+  application?: Maybe<Scalars['String']>;
+  isPaused?: Maybe<Scalars['Boolean']>;
+}>;
+
+export type ToggleManagementMutation = { __typename?: 'Mutation' } & Pick<Mutation, 'toggleManagement'>;
 
 export const FetchApplicationDocument = gql`
   query fetchApplication($appName: String!, $statuses: [MdArtifactStatusInEnvironment!]) {
@@ -567,6 +589,66 @@ export type FetchResourceStatusQueryResult = Apollo.QueryResult<
   FetchResourceStatusQuery,
   FetchResourceStatusQueryVariables
 >;
+export const FetchApplicationManagementStatusDocument = gql`
+  query fetchApplicationManagementStatus($appName: String!) {
+    application(appName: $appName) {
+      id
+      name
+      isPaused
+    }
+  }
+`;
+
+/**
+ * __useFetchApplicationManagementStatusQuery__
+ *
+ * To run a query within a React component, call `useFetchApplicationManagementStatusQuery` and pass it any options that fit your needs.
+ * When your component renders, `useFetchApplicationManagementStatusQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useFetchApplicationManagementStatusQuery({
+ *   variables: {
+ *      appName: // value for 'appName'
+ *   },
+ * });
+ */
+export function useFetchApplicationManagementStatusQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    FetchApplicationManagementStatusQuery,
+    FetchApplicationManagementStatusQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<FetchApplicationManagementStatusQuery, FetchApplicationManagementStatusQueryVariables>(
+    FetchApplicationManagementStatusDocument,
+    options,
+  );
+}
+export function useFetchApplicationManagementStatusLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    FetchApplicationManagementStatusQuery,
+    FetchApplicationManagementStatusQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<FetchApplicationManagementStatusQuery, FetchApplicationManagementStatusQueryVariables>(
+    FetchApplicationManagementStatusDocument,
+    options,
+  );
+}
+export type FetchApplicationManagementStatusQueryHookResult = ReturnType<
+  typeof useFetchApplicationManagementStatusQuery
+>;
+export type FetchApplicationManagementStatusLazyQueryHookResult = ReturnType<
+  typeof useFetchApplicationManagementStatusLazyQuery
+>;
+export type FetchApplicationManagementStatusQueryResult = Apollo.QueryResult<
+  FetchApplicationManagementStatusQuery,
+  FetchApplicationManagementStatusQueryVariables
+>;
 export const UpdateConstraintDocument = gql`
   mutation UpdateConstraint($application: String, $environment: String, $status: MdConstraintStatusUpdate) {
     updateConstraintStatus(application: $application, environment: $environment, status: $status)
@@ -610,4 +692,47 @@ export type UpdateConstraintMutationResult = Apollo.MutationResult<UpdateConstra
 export type UpdateConstraintMutationOptions = Apollo.BaseMutationOptions<
   UpdateConstraintMutation,
   UpdateConstraintMutationVariables
+>;
+export const ToggleManagementDocument = gql`
+  mutation ToggleManagement($application: String, $isPaused: Boolean) {
+    toggleManagement(application: $application, isPaused: $isPaused)
+  }
+`;
+export type ToggleManagementMutationFn = Apollo.MutationFunction<
+  ToggleManagementMutation,
+  ToggleManagementMutationVariables
+>;
+
+/**
+ * __useToggleManagementMutation__
+ *
+ * To run a mutation, you first call `useToggleManagementMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useToggleManagementMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [toggleManagementMutation, { data, loading, error }] = useToggleManagementMutation({
+ *   variables: {
+ *      application: // value for 'application'
+ *      isPaused: // value for 'isPaused'
+ *   },
+ * });
+ */
+export function useToggleManagementMutation(
+  baseOptions?: Apollo.MutationHookOptions<ToggleManagementMutation, ToggleManagementMutationVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<ToggleManagementMutation, ToggleManagementMutationVariables>(
+    ToggleManagementDocument,
+    options,
+  );
+}
+export type ToggleManagementMutationHookResult = ReturnType<typeof useToggleManagementMutation>;
+export type ToggleManagementMutationResult = Apollo.MutationResult<ToggleManagementMutation>;
+export type ToggleManagementMutationOptions = Apollo.BaseMutationOptions<
+  ToggleManagementMutation,
+  ToggleManagementMutationVariables
 >;

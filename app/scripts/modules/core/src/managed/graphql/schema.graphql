@@ -9,6 +9,7 @@ type MdApplication {
   id: String!
   name: String!
   account: String!
+  isPaused: Boolean
   environments: [MdEnvironment!]!
 }
 
@@ -207,6 +208,7 @@ type MdAction {
 
 type Mutation {
   updateConstraintStatus(application: String, environment: String, status: MdConstraintStatusUpdate): Boolean
+  toggleManagement(application: String, isPaused: Boolean): Boolean
 }
 
 input MdConstraintStatusUpdate {

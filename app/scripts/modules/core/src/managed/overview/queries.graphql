@@ -117,6 +117,18 @@ query fetchResourceStatus($appName: String!) {
   }
 }
 
+query fetchApplicationManagementStatus($appName: String!) {
+  application(appName: $appName) {
+    id
+    name
+    isPaused
+  }
+}
+
 mutation UpdateConstraint($application: String, $environment: String, $status: MdConstraintStatusUpdate) {
   updateConstraintStatus(application: $application, environment: $environment, status: $status)
+}
+
+mutation ToggleManagement($application: String, $isPaused: Boolean) {
+  toggleManagement(application: $application, isPaused: $isPaused)
 }
