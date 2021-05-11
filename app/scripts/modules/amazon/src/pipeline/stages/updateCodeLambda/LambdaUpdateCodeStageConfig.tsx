@@ -5,8 +5,6 @@ import { FormikStageConfig, IFormikStageConfigInjectedProps, IStageConfigProps }
 import { validate } from './LambdaUpdateCodeValidator';
 import { UpdateCodeLambdaFunctionStageForm } from './components/UpdateCodeStageForm';
 
-import './LambdaUpdateCodeStage.less';
-
 export function LambdaUpdateCodeConfig(props: IStageConfigProps) {
   return (
     <div className="LambdaUpdateCodeConfig">
