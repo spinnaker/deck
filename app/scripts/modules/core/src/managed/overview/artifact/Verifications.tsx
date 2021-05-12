@@ -19,7 +19,11 @@ const statusToText: {
   NOT_EVALUATED: 'has not started yet',
 };
 
-const Verification = ({ verification }: { verification: QueryVerification }) => {
+interface IVerificationProps {
+  verification: QueryVerification;
+}
+
+const Verification = ({ verification }: IVerificationProps) => {
   const status = verification.status || 'PENDING';
   const { link, startedAt, completedAt } = verification;
   return (
@@ -47,7 +51,11 @@ const Verification = ({ verification }: { verification: QueryVerification }) => 
   );
 };
 
-export const Verifications = ({ verifications }: { verifications: QueryVerification[] }) => {
+interface IVerificationsProps {
+  verifications: QueryVerification[];
+}
+
+export const Verifications = ({ verifications }: IVerificationsProps) => {
   return (
     <div className="Verifications">
       {verifications.map((verification) => (

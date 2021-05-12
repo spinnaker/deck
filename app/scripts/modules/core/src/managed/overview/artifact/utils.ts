@@ -56,15 +56,7 @@ export const getLifecycleEventLink = (version: QueryArtifactVersion | undefined,
   return version?.lifecycleSteps?.find((step) => step.type === type)?.link;
 };
 
-export const useCreateVersionActions = ({
-  environment,
-  reference,
-  version,
-  buildNumber,
-  commitMessage,
-  isPinned,
-  compareLinks,
-}: {
+interface ICreateVersionActionsProps {
   environment: string;
   reference: string;
   version: string;
@@ -75,7 +67,17 @@ export const useCreateVersionActions = ({
     previous?: string;
     current?: string;
   };
-}): VersionAction[] | undefined => {
+}
+
+export const useCreateVersionActions = ({
+  environment,
+  reference,
+  version,
+  buildNumber,
+  commitMessage,
+  isPinned,
+  compareLinks,
+}: ICreateVersionActionsProps): VersionAction[] | undefined => {
   const application = useApplicationContext();
   if (!application) throw new Error('Application context is empty');
   const [refetch] = useFetchApplicationLazyQuery({

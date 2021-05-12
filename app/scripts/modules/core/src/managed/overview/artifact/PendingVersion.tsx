@@ -10,19 +10,15 @@ import { QueryArtifactVersion } from '../types';
 import { getLifecycleEventDuration, getLifecycleEventLink, useCreateVersionActions } from './utils';
 import { TOOLTIP_DELAY } from '../../utils/defaults';
 
-export const PendingVersion = ({
-  data,
-  reference,
-  environment,
-  isPinned,
-  index,
-}: {
+interface IPendingVersionProps {
   data: QueryArtifactVersion;
   reference: string;
   environment: string;
   isPinned: boolean;
   index: number;
-}) => {
+}
+
+export const PendingVersion = ({ data, reference, environment, isPinned, index }: IPendingVersionProps) => {
   const { buildNumber, version, gitMetadata, constraints, status } = data;
   const actions = useCreateVersionActions({
     environment,

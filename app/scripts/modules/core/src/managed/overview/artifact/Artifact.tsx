@@ -51,7 +51,11 @@ export const PinnedVersion = ({ version }: { version: NonNullable<QueryArtifact[
   );
 };
 
-export const Artifact = ({ artifact }: { artifact: QueryArtifact }) => {
+interface IArtifactProps {
+  artifact: QueryArtifact;
+}
+
+export const Artifact = ({ artifact }: IArtifactProps) => {
   const currentVersion = artifact.versions?.find((version) => version.status === 'CURRENT');
   const newerVersions = filterPendingVersions(artifact.versions, currentVersion);
   const { pinnedVersion } = artifact;

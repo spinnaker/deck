@@ -6,19 +6,15 @@ import { VersionMetadata } from './VersionMetadata';
 import { QueryArtifactVersion } from '../types';
 import { getLifecycleEventDuration, getLifecycleEventLink, useCreateVersionActions } from './utils';
 
-export const CurrentVersion = ({
-  data,
-  environment,
-  reference,
-  numNewerVersions,
-  isPinned,
-}: {
+interface ICurrentVersionProps {
   data: QueryArtifactVersion;
   environment: string;
   reference: string;
   numNewerVersions?: number;
   isPinned: boolean;
-}) => {
+}
+
+export const CurrentVersion = ({ data, environment, reference, numNewerVersions, isPinned }: ICurrentVersionProps) => {
   const { gitMetadata, verifications } = data;
   const actions = useCreateVersionActions({
     environment,

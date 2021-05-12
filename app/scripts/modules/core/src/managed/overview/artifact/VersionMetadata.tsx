@@ -21,6 +21,18 @@ export interface VersionAction {
   disabled?: boolean;
 }
 
+interface IVersionMetadataProps {
+  buildNumber?: string;
+  buildLink?: string;
+  author?: string;
+  deployedAt?: string;
+  buildDuration?: string;
+  buildsBehind?: number;
+  isDeploying?: boolean;
+  isPinned?: boolean;
+  actions?: VersionAction[];
+}
+
 export const VersionMetadata = ({
   buildNumber,
   buildLink,
@@ -31,17 +43,7 @@ export const VersionMetadata = ({
   isDeploying,
   isPinned,
   actions,
-}: {
-  buildNumber?: string;
-  buildLink?: string;
-  author?: string;
-  deployedAt?: string;
-  buildDuration?: string;
-  buildsBehind?: number;
-  isDeploying?: boolean;
-  isPinned?: boolean;
-  actions?: VersionAction[];
-}) => {
+}: IVersionMetadataProps) => {
   return (
     <div>
       <div className="VersionMetadata">

@@ -7,11 +7,11 @@ import { TOOLTIP_DELAY } from '../../utils/defaults';
 
 import './GitLink.less';
 
-export const GitLink = ({
-  gitMetadata: { commit, commitInfo, pullRequest },
-}: {
+interface IGitLinkProps {
   gitMetadata: NonNullable<QueryGitMetadata>;
-}) => {
+}
+
+export const GitLink = ({ gitMetadata: { commit, commitInfo, pullRequest } }: IGitLinkProps) => {
   const link = pullRequest?.link || commitInfo?.link;
   const sha = commit ? `SHA: ${commit}` : undefined;
   const tooltip = [sha, commitInfo?.message].filter(Boolean).join('\n\n');

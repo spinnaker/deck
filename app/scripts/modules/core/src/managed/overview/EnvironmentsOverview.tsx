@@ -44,7 +44,12 @@ const sectionProps: Partial<ICollapsibleSectionProps> = {
   useGlyphiconChevron: false,
 };
 
-const Environment = ({ appName, environment }: { appName: string; environment: QueryEnvironment }) => {
+interface IEnvironmentProps {
+  appName: string;
+  environment: QueryEnvironment;
+}
+
+const Environment = ({ appName, environment }: IEnvironmentProps) => {
   const { data } = useFetchResourceStatusQuery({ variables: { appName } });
   const resources = data?.application?.environments.find((env) => env.name === environment.name)?.state.resources;
   const hasResourcesWithIssues = resources?.some((resource) => resource.state?.status !== 'UP_TO_DATE');

@@ -14,7 +14,11 @@ export const actionStatusUtils: {
   NOT_EVALUATED: { icon: 'far fa-hourglass', displayName: 'pending' },
 };
 
-export const VersionOperationIcon = ({ status }: { status: AllStatuses }) => {
+interface IVersionOperationIconProps {
+  status: AllStatuses;
+}
+
+export const VersionOperationIcon = ({ status }: IVersionOperationIconProps) => {
   return (
     <i
       className={actionStatusUtils[status].icon}

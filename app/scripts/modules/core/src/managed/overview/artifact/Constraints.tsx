@@ -15,13 +15,12 @@ import { getConstraintsStatusSummary } from './utils';
 
 import './Constraints.less';
 
-const ConstraintContent = ({
-  constraint,
-  versionProps,
-}: {
+interface IConstraintContentProps {
   constraint: QueryConstraint;
   versionProps: ArtifactVersionProps;
-}) => {
+}
+
+const ConstraintContent = ({ constraint, versionProps }: IConstraintContentProps) => {
   const description = constraintsManager.renderDescription(constraint);
   const actions = constraintsManager.getActions(constraint)?.sort((action) => (action.pass ? -1 : 1)); // positive actions first
   const application = useApplicationContextSafe();
@@ -76,13 +75,12 @@ const ConstraintContent = ({
   );
 };
 
-const Constraint = ({
-  constraint,
-  versionProps,
-}: {
+interface IConstraintProps {
   constraint: QueryConstraint;
   versionProps: ArtifactVersionProps;
-}) => {
+}
+
+const Constraint = ({ constraint, versionProps }: IConstraintProps) => {
   const hasContent = constraintsManager.hasContent(constraint);
   const [isExpanded, setIsExpanded] = React.useState(hasContent);
   const title = constraintsManager.renderTitle(constraint);
