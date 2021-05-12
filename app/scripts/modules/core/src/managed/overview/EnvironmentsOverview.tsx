@@ -1,14 +1,15 @@
 import React from 'react';
 
 import { CollapsibleSection, ICollapsibleSectionProps, useApplicationContextSafe } from 'core/presentation';
+import { Spinner } from 'core/widgets';
 
-import { Loading } from '../Loading';
 import { Resource } from './Resource';
 import { Artifact } from './artifact/Artifact';
 import { ManagementWarning } from '../config/ManagementWarning';
 import { useFetchApplicationQuery, useFetchResourceStatusQuery } from '../graphql/graphql-sdk';
 import { QueryEnvironment } from './types';
 import { OVERVIEW_VERSION_STATUSES } from './utils';
+import { spinnerProps } from '../utils/defaults';
 
 import './EnvironmentsOverview.less';
 
@@ -19,7 +20,7 @@ export const EnvironmentsOverview = () => {
   });
 
   if (loading && !data) {
-    return <Loading message="Loading environments..." />;
+    return <Spinner {...spinnerProps} message="Loading environments..." />;
   }
 
   if (error) {

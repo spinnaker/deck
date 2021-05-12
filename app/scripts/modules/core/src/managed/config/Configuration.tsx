@@ -3,12 +3,12 @@ import React from 'react';
 
 import { Illustration } from '@spinnaker/presentation';
 import { showModal, useApplicationContextSafe } from 'core/presentation';
+import { Spinner } from 'core/widgets';
 
-import { Loading } from '../Loading';
 import { useFetchApplicationManagementStatusQuery, useToggleManagementMutation } from '../graphql/graphql-sdk';
 import spinner from '../overview/loadingIndicator.svg';
 import { ActionModal, IArtifactActionModalProps } from '../utils/ActionModal';
-import { MODAL_MAX_WIDTH } from '../utils/defaults';
+import { MODAL_MAX_WIDTH, spinnerProps } from '../utils/defaults';
 
 const BTN_CLASSNAMES = 'btn md-btn sp-margin-s-top';
 
@@ -49,7 +49,7 @@ export const Configuration = () => {
   }, []);
 
   if (loading) {
-    return <Loading message="Loading settings..." />;
+    return <Spinner {...spinnerProps} message="Loading settings..." />;
   }
   if (!data) {
     return <div>Failed to load app config</div>;
