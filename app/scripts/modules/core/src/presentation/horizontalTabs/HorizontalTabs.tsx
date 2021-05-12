@@ -3,8 +3,6 @@ import classnames from 'classnames';
 import React from 'react';
 import './HorizontalTabs.less';
 
-export const TopNav = () => {};
-
 type TabsProps = {
   tabs: Array<{ title: string; path: string }>;
   className?: string;
