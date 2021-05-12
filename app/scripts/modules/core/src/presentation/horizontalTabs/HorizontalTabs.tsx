@@ -3,13 +3,13 @@ import classnames from 'classnames';
 import React from 'react';
 import './HorizontalTabs.less';
 
-type TabsProps = {
+export interface IHorizontalTabsProps {
   tabs: Array<{ title: string; path: string }>;
   className?: string;
   style?: React.CSSProperties;
-};
+}
 
-export const HorizontalTabs = ({ tabs, className, style }: TabsProps) => {
+export const HorizontalTabs = ({ tabs, className, style }: IHorizontalTabsProps) => {
   return (
     <div className={classnames(className, 'HorizontalTabs')} style={style}>
       {tabs.map((tab) => (
