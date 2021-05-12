@@ -7,7 +7,7 @@ import { SETTINGS } from 'core/config/settings';
 import { Spinner } from 'core/widgets';
 
 import { ColumnHeader } from './ColumnHeader';
-import { Environments2, featureFlag } from './Environments2';
+import { Environments2 } from './Environments2';
 import { EnvironmentsHeader } from './EnvironmentsHeader';
 import { EnvironmentsList } from './EnvironmentsList';
 import { Application, ApplicationDataSource } from '../application';
@@ -66,12 +66,9 @@ interface IEnvironmentsProps {
 }
 
 export const Environments: React.FC<IEnvironmentsProps> = (props) => {
-  const urlParams = new URLSearchParams(window.location.search);
-  if (urlParams.get(featureFlag)) {
-    localStorage.setItem(featureFlag, '1');
-  }
-  if (localStorage.getItem(featureFlag)) {
-    return <Environments2 app={props.app} />;
+  const { params } = useCurrentStateAndParams();
+  if (params.new_ui === '1') {
+    return <Environments2 />;
   }
   return <EnvironmentsOld {...props} />;
 };

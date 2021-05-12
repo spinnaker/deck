@@ -1,21 +1,20 @@
 import React from 'react';
 
-import { Application, CollapsibleSection, ICollapsibleSectionProps } from 'core/index';
+import { CollapsibleSection, ICollapsibleSectionProps } from 'core/index';
+import { useApplicationContextSafe } from 'core/presentation';
 
 import { Loading } from '../Loading';
 import { Resource } from './Resource';
 import { Artifact } from './artifact/Artifact';
+import { ManagementWarning } from '../config/ManagementWarning';
 import { useFetchApplicationQuery, useFetchResourceStatusQuery } from '../graphql/graphql-sdk';
 import { QueryEnvironment } from './types';
 import { OVERVIEW_VERSION_STATUSES } from './utils';
 
 import './EnvironmentsOverview.less';
 
-interface IEnvironmentsProps {
-  app: Application;
-}
-
-export const EnvironmentsOverview = ({ app }: IEnvironmentsProps) => {
+export const EnvironmentsOverview = () => {
+  const app = useApplicationContextSafe();
   const { data, error, loading } = useFetchApplicationQuery({
     variables: { appName: app.name, statuses: OVERVIEW_VERSION_STATUSES },
   });
@@ -31,6 +30,7 @@ export const EnvironmentsOverview = ({ app }: IEnvironmentsProps) => {
 
   return (
     <div className="EnvironmentOverview">
+      <ManagementWarning appName={app.name} />
       {data?.application?.environments.map((env) => (
         <Environment key={env.name} environment={env} appName={app.name} />
       ))}

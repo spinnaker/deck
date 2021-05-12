@@ -2,7 +2,7 @@ import cx from 'classnames';
 import React from 'react';
 
 import { Illustration } from '@spinnaker/presentation';
-import { showModal } from 'core/index';
+import { showModal, useApplicationContextSafe } from 'core/index';
 
 import { Loading } from '../Loading';
 import { useFetchApplicationManagementStatusQuery, useToggleManagementMutation } from '../graphql/graphql-sdk';
@@ -25,7 +25,9 @@ const managementStatusToContent = {
   },
 };
 
-export const Configuration = ({ appName }: { appName: string }) => {
+export const Configuration = () => {
+  const app = useApplicationContextSafe();
+  const appName = app.name;
   const { data, loading, refetch } = useFetchApplicationManagementStatusQuery({ variables: { appName } });
   const [toggleManagement, { loading: mutationInFlight }] = useToggleManagementMutation();
 

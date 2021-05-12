@@ -1,53 +1,36 @@
-import cx from 'classnames';
+import { useSrefActive } from '@uirouter/react';
+import classnames from 'classnames';
 import React from 'react';
 import './HorizontalTabs.less';
 
 export const TopNav = () => {};
 
 type TabsProps = {
-  children: Array<React.ReactElement<TabProps>> | React.ReactElement<TabProps>;
+  tabs: Array<{ title: string; path: string }>;
   className?: string;
   style?: React.CSSProperties;
 };
 
-export const HorizontalTabs = ({ children, className, style }: TabsProps) => {
-  const [selectedTab, setSelectedTab] = React.useState(0);
-
+export const HorizontalTabs = ({ tabs, className, style }: TabsProps) => {
   return (
-    <div className={cx(className, 'HorizontalTabs')} style={style}>
-      <ul>
-        {React.Children.map(children, (item, index) => (
-          <TabTitle
-            key={index}
-            title={item.props.title}
-            setSelected={() => setSelectedTab(index)}
-            isSelected={index == selectedTab}
-          />
-        ))}
-      </ul>
-      {Array.isArray(children) ? children[selectedTab] : children}
+    <div className={classnames(className, 'HorizontalTabs')} style={style}>
+      {tabs.map((tab) => (
+        <TabTitle key={tab.path} title={tab.title} path={tab.path} />
+      ))}
     </div>
   );
 };
 
-type TabProps = { title: string; className?: string; children: React.ReactNode };
-
-export const Tab = ({ children, className }: TabProps) => {
-  return <div className={className}>{children}</div>;
-};
-
 interface TabTitleProps {
   title: string;
-  isSelected: boolean;
-  setSelected: () => void;
+  path: string;
 }
 
-const TabTitle = ({ title, isSelected, setSelected }: TabTitleProps) => {
+const TabTitle = ({ title, path }: TabTitleProps) => {
+  const { href, className } = useSrefActive(path, {}, 'selected-tab');
   return (
-    <li>
-      <button onClick={setSelected} className={cx('tab', { 'selected-tab': isSelected })}>
-        {title}
-      </button>
-    </li>
+    <a href={href} className={classnames('tab', className)}>
+      {title}
+    </a>
   );
 };

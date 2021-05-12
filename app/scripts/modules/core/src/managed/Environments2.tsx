@@ -1,37 +1,35 @@
+import { UIView, useSref } from '@uirouter/react';
 import React from 'react';
 
-import { Application } from 'core/application';
-import { HorizontalTabs, Tab } from 'core/presentation/horizontalTabs/HorizontalTabs';
+import { HorizontalTabs } from 'core/presentation/horizontalTabs/HorizontalTabs';
 
-import { Configuration } from './config/Configuration';
-import { ManagementWarning } from './config/ManagementWarning';
-import { EnvironmentsOverview } from './overview/EnvironmentsOverview';
+import { Routes } from './managed.states';
 
 import './Environments2.less';
 import './overview/baseStyles.less';
 
 export const featureFlag = 'newMD_UI';
 
+const tabsInternal: { [key in Routes]: string } = {
+  overview: 'Overview',
+  config: 'Configuration',
+};
+
+const tabs = Object.entries(tabsInternal).map(([key, title]) => ({ title, path: `.${key}` }));
+
 // TODO: this is a temporary name until we remove the old view
-export const Environments2 = ({ app }: { app: Application }) => {
+export const Environments2 = () => {
+  const { href } = useSref('home.applications.application.environments', { new_ui: '0' });
   return (
     <div className="vertical Environments2">
-      <HorizontalTabs>
-        <Tab title="Overview">
-          <ManagementWarning appName={app.name} />
-          <EnvironmentsOverview app={app} />
-        </Tab>
-        <Tab title="Configuration">
-          <Configuration appName={app.name} />
-        </Tab>
-      </HorizontalTabs>
+      <HorizontalTabs tabs={tabs} />
+      <UIView />
       {/* Some padding at the bottom */}
       <div style={{ minHeight: 32, minWidth: 32 }} />
       <a
-        href="#"
+        href={href}
         onClick={() => {
           localStorage.removeItem(featureFlag);
-          window.location.reload();
         }}
         style={{ position: 'absolute', bottom: 4, right: 36 }}
       >
