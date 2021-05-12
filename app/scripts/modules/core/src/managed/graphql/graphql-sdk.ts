@@ -66,6 +66,14 @@ export type MdArtifactStatusInEnvironment =
   | 'VETOED'
   | 'SKIPPED';
 
+export interface MdArtifactVersionActionPayload {
+  application: Scalars['String'];
+  environment: Scalars['String'];
+  reference: Scalars['String'];
+  comment: Scalars['String'];
+  version: Scalars['String'];
+}
+
 export interface MdArtifactVersionInEnvironment {
   __typename?: 'MdArtifactVersionInEnvironment';
   id: Scalars['String'];
@@ -110,10 +118,12 @@ export interface MdConstraint {
 
 export type MdConstraintStatus = 'PENDING' | 'PASS' | 'FAIL' | 'FORCE_PASS';
 
-export interface MdConstraintStatusUpdate {
+export interface MdConstraintStatusPayload {
+  application: Scalars['String'];
+  environment: Scalars['String'];
   type: Scalars['String'];
-  artifactVersion: Scalars['String'];
-  artifactReference: Scalars['String'];
+  version: Scalars['String'];
+  reference: Scalars['String'];
   status: MdConstraintStatus;
 }
 
@@ -168,6 +178,13 @@ export interface MdLocation {
   regions?: Maybe<Array<Scalars['String']>>;
 }
 
+export interface MdMarkArtifactVersionAsGoodPayload {
+  application: Scalars['String'];
+  environment: Scalars['String'];
+  reference: Scalars['String'];
+  version: Scalars['String'];
+}
+
 export interface MdMoniker {
   __typename?: 'MdMoniker';
   app?: Maybe<Scalars['String']>;
@@ -214,21 +231,45 @@ export interface MdResourceActuationState {
 
 export type MdResourceActuationStatus = 'PROCESSING' | 'UP_TO_DATE' | 'ERROR' | 'WAITING' | 'NOT_MANAGED';
 
+export interface MdUnpinArtifactVersionPayload {
+  application: Scalars['String'];
+  environment: Scalars['String'];
+  reference: Scalars['String'];
+}
+
 export interface Mutation {
   __typename?: 'Mutation';
   updateConstraintStatus?: Maybe<Scalars['Boolean']>;
   toggleManagement?: Maybe<Scalars['Boolean']>;
+  pinArtifactVersion?: Maybe<Scalars['Boolean']>;
+  markArtifactVersionAsBad?: Maybe<Scalars['Boolean']>;
+  unpinArtifactVersion?: Maybe<Scalars['Boolean']>;
+  markArtifactVersionAsGood?: Maybe<Scalars['Boolean']>;
 }
 
 export interface MutationUpdateConstraintStatusArgs {
-  application?: Maybe<Scalars['String']>;
-  environment?: Maybe<Scalars['String']>;
-  status?: Maybe<MdConstraintStatusUpdate>;
+  payload: MdConstraintStatusPayload;
 }
 
 export interface MutationToggleManagementArgs {
-  application?: Maybe<Scalars['String']>;
-  isPaused?: Maybe<Scalars['Boolean']>;
+  application: Scalars['String'];
+  isPaused: Scalars['Boolean'];
+}
+
+export interface MutationPinArtifactVersionArgs {
+  payload: MdArtifactVersionActionPayload;
+}
+
+export interface MutationMarkArtifactVersionAsBadArgs {
+  payload: MdArtifactVersionActionPayload;
+}
+
+export interface MutationUnpinArtifactVersionArgs {
+  payload: MdUnpinArtifactVersionPayload;
+}
+
+export interface MutationMarkArtifactVersionAsGoodArgs {
+  payload: MdMarkArtifactVersionAsGoodPayload;
 }
 
 export interface Query {
@@ -380,16 +421,14 @@ export type FetchApplicationManagementStatusQuery = { __typename?: 'Query' } & {
 };
 
 export type UpdateConstraintMutationVariables = Exact<{
-  application?: Maybe<Scalars['String']>;
-  environment?: Maybe<Scalars['String']>;
-  status?: Maybe<MdConstraintStatusUpdate>;
+  payload: MdConstraintStatusPayload;
 }>;
 
 export type UpdateConstraintMutation = { __typename?: 'Mutation' } & Pick<Mutation, 'updateConstraintStatus'>;
 
 export type ToggleManagementMutationVariables = Exact<{
-  application?: Maybe<Scalars['String']>;
-  isPaused?: Maybe<Scalars['Boolean']>;
+  application: Scalars['String'];
+  isPaused: Scalars['Boolean'];
 }>;
 
 export type ToggleManagementMutation = { __typename?: 'Mutation' } & Pick<Mutation, 'toggleManagement'>;
@@ -650,8 +689,8 @@ export type FetchApplicationManagementStatusQueryResult = Apollo.QueryResult<
   FetchApplicationManagementStatusQueryVariables
 >;
 export const UpdateConstraintDocument = gql`
-  mutation UpdateConstraint($application: String, $environment: String, $status: MdConstraintStatusUpdate) {
-    updateConstraintStatus(application: $application, environment: $environment, status: $status)
+  mutation UpdateConstraint($payload: MdConstraintStatusPayload!) {
+    updateConstraintStatus(payload: $payload)
   }
 `;
 export type UpdateConstraintMutationFn = Apollo.MutationFunction<
@@ -672,9 +711,7 @@ export type UpdateConstraintMutationFn = Apollo.MutationFunction<
  * @example
  * const [updateConstraintMutation, { data, loading, error }] = useUpdateConstraintMutation({
  *   variables: {
- *      application: // value for 'application'
- *      environment: // value for 'environment'
- *      status: // value for 'status'
+ *      payload: // value for 'payload'
  *   },
  * });
  */
@@ -694,7 +731,7 @@ export type UpdateConstraintMutationOptions = Apollo.BaseMutationOptions<
   UpdateConstraintMutationVariables
 >;
 export const ToggleManagementDocument = gql`
-  mutation ToggleManagement($application: String, $isPaused: Boolean) {
+  mutation ToggleManagement($application: String!, $isPaused: Boolean!) {
     toggleManagement(application: $application, isPaused: $isPaused)
   }
 `;

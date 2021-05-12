@@ -125,10 +125,10 @@ query fetchApplicationManagementStatus($appName: String!) {
   }
 }
 
-mutation UpdateConstraint($application: String, $environment: String, $status: MdConstraintStatusUpdate) {
-  updateConstraintStatus(application: $application, environment: $environment, status: $status)
+mutation UpdateConstraint($payload: MdConstraintStatusPayload!) {
+  updateConstraintStatus(payload: $payload)
 }
 
-mutation ToggleManagement($application: String, $isPaused: Boolean) {
+mutation ToggleManagement($application: String!, $isPaused: Boolean!) {
   toggleManagement(application: $application, isPaused: $isPaused)
 }

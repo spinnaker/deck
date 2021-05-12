@@ -207,13 +207,40 @@ type MdAction {
 }
 
 type Mutation {
-  updateConstraintStatus(application: String, environment: String, status: MdConstraintStatusUpdate): Boolean
-  toggleManagement(application: String, isPaused: Boolean): Boolean
+  updateConstraintStatus(payload: MdConstraintStatusPayload!): Boolean
+  toggleManagement(application: String!, isPaused: Boolean!): Boolean
+  pinArtifactVersion(payload: MdArtifactVersionActionPayload!): Boolean
+  markArtifactVersionAsBad(payload: MdArtifactVersionActionPayload!): Boolean
+  unpinArtifactVersion(payload: MdUnpinArtifactVersionPayload!): Boolean
+  markArtifactVersionAsGood(payload: MdMarkArtifactVersionAsGoodPayload!): Boolean
 }
 
-input MdConstraintStatusUpdate {
+input MdConstraintStatusPayload {
+  application: String!
+  environment: String!
   type: String!
-  artifactVersion: String!
-  artifactReference: String!
+  version: String!
+  reference: String!
   status: MdConstraintStatus!
+}
+
+input MdArtifactVersionActionPayload {
+  application: String!
+  environment: String!
+  reference: String!
+  comment: String!
+  version: String!
+}
+
+input MdMarkArtifactVersionAsGoodPayload {
+  application: String!
+  environment: String!
+  reference: String!
+  version: String!
+}
+
+input MdUnpinArtifactVersionPayload {
+  application: String!
+  environment: String!
+  reference: String!
 }

@@ -54,12 +54,12 @@ const ConstraintContent = ({
               onClick={() => {
                 updateConstraint({
                   variables: {
-                    application: application.name,
-                    environment: versionProps.environment,
-                    status: {
-                      artifactVersion: versionProps.version,
+                    payload: {
+                      application: application.name,
+                      environment: versionProps.environment,
+                      version: versionProps.version,
                       type: constraint.type,
-                      artifactReference: versionProps.reference,
+                      reference: versionProps.reference,
                       status: pass ? 'FORCE_PASS' : 'FAIL',
                     },
                   },
