@@ -4,7 +4,7 @@ import { Tooltip } from 'core/presentation';
 
 import { DurationRender } from '../../RelativeTimestamp';
 import { VersionOperationIcon } from './VersionOperation';
-import { QueryVerification, QueryVerificationStatus } from '../types';
+import { QueryArtifactVersionTask, QueryVerificationStatus } from '../types';
 import { TOOLTIP_DELAY } from '../../utils/defaults';
 
 import './Verifications.less';
@@ -19,18 +19,19 @@ const statusToText: {
   NOT_EVALUATED: 'has not started yet',
 };
 
-interface IVerificationProps {
-  verification: QueryVerification;
+interface IArtifactVersionTaskProps {
+  type: string;
+  task: QueryArtifactVersionTask;
 }
 
-const Verification = ({ verification }: IVerificationProps) => {
-  const status = verification.status || 'PENDING';
-  const { link, startedAt, completedAt } = verification;
+const ArtifactVersionTask = ({ type, task }: IArtifactVersionTaskProps) => {
+  const status = task.status || 'PENDING';
+  const { link, startedAt, completedAt } = task;
   return (
     <div className="version-verification">
       <VersionOperationIcon status={status} />
       <div className="verification-content">
-        Verification {verification.id} {statusToText[status]}{' '}
+        {type} {task.id} {statusToText[status]}{' '}
         {startedAt && (
           <span className="verification-metadata verification-runtime">
             <Tooltip value="Runtime duration" delayShow={TOOLTIP_DELAY}>
@@ -52,14 +53,15 @@ const Verification = ({ verification }: IVerificationProps) => {
 };
 
 interface IVerificationsProps {
-  verifications: QueryVerification[];
+  type: string;
+  tasks: QueryArtifactVersionTask[];
 }
 
-export const Verifications = ({ verifications }: IVerificationsProps) => {
+export const ArtifactVersionTasks = ({ type, tasks }: IVerificationsProps) => {
   return (
     <div className="Verifications">
-      {verifications.map((verification) => (
-        <Verification key={verification.id} verification={verification} />
+      {tasks.map((verification) => (
+        <ArtifactVersionTask key={verification.id} type={type} task={verification} />
       ))}
     </div>
   );
