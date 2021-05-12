@@ -1,7 +1,7 @@
 import React from 'react';
 
+import { ArtifactVersionTasks } from './ArtifactVersionTasks';
 import { GitLink } from './GitLink';
-import { ArtifactVersionTasks } from './Verifications';
 import { VersionMetadata } from './VersionMetadata';
 import { QueryArtifactVersion } from '../types';
 import { getLifecycleEventDuration, getLifecycleEventLink, useCreateVersionActions } from './utils';
