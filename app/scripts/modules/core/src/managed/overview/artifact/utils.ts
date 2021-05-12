@@ -84,78 +84,85 @@ export const useCreateVersionActions = ({
     variables: { appName: application.name, statuses: OVERVIEW_VERSION_STATUSES },
     fetchPolicy: 'network-only',
   });
+
+  const onUnpin = () => {
+    showModal(
+      UnpinActionModal,
+      {
+        application: application.name,
+        environment,
+        title: [`Unpin #${buildNumber}`, commitMessage].filter(Boolean).join(' - '),
+        actionName: 'Unpin',
+        onAction: () =>
+          ManagedWriter.unpinArtifactVersion({
+            application: application.name,
+            environment,
+            reference,
+          }),
+        onSuccess: refetch,
+        withComment: false,
+      },
+      { maxWidth: MODAL_MAX_WIDTH },
+    );
+  };
+
+  const onPin = () => {
+    showModal(
+      PinActionModal,
+      {
+        application: application.name,
+        title: [`Pin #${buildNumber}`, commitMessage].filter(Boolean).join(' - '),
+        actionName: 'Pin',
+        onAction: (comment: string) =>
+          ManagedWriter.pinArtifactVersion({
+            application: application.name,
+            environment,
+            reference,
+            comment,
+            version,
+          }),
+        onSuccess: refetch,
+      },
+      { maxWidth: MODAL_MAX_WIDTH },
+    );
+  };
+
+  const onMarkAsBad = () => {
+    if (!application) throw new Error('Application context is empty');
+    showModal(
+      MarkAsBadActionModal,
+      {
+        application: application.name,
+        title: [`Mark as Bad #${buildNumber}`, commitMessage].filter(Boolean).join(' - '),
+        actionName: 'Mark as Bad',
+        onAction: (comment: string) =>
+          ManagedWriter.markArtifactVersionAsBad({
+            application: application.name,
+            environment,
+            reference,
+            comment,
+            version,
+          }),
+        onSuccess: refetch,
+      },
+      { maxWidth: MODAL_MAX_WIDTH },
+    );
+  };
+
   const actions: VersionAction[] = [
     isPinned
       ? {
           content: 'Unpin version',
-          onClick: () => {
-            showModal(
-              UnpinActionModal,
-              {
-                application: application.name,
-                environment,
-                title: [`Unpin #${buildNumber}`, commitMessage].filter(Boolean).join(' - '),
-                actionName: 'Unpin',
-                onAction: () =>
-                  ManagedWriter.unpinArtifactVersion({
-                    application: application.name,
-                    environment,
-                    reference,
-                  }),
-                onSuccess: refetch,
-                withComment: false,
-              },
-              { maxWidth: MODAL_MAX_WIDTH },
-            );
-          },
+          onClick: onUnpin,
         }
       : {
           content: 'Pin version',
-          onClick: () => {
-            showModal(
-              PinActionModal,
-              {
-                application: application.name,
-                title: [`Pin #${buildNumber}`, commitMessage].filter(Boolean).join(' - '),
-                actionName: 'Pin',
-                onAction: (comment: string) =>
-                  ManagedWriter.pinArtifactVersion({
-                    application: application.name,
-                    environment,
-                    reference,
-                    comment,
-                    version,
-                  }),
-                onSuccess: refetch,
-              },
-              { maxWidth: MODAL_MAX_WIDTH },
-            );
-          },
+          onClick: onPin,
         },
 
     {
       content: 'Mark as bad',
-      onClick: () => {
-        if (!application) throw new Error('Application context is empty');
-        showModal(
-          MarkAsBadActionModal,
-          {
-            application: application.name,
-            title: [`Mark as Bad #${buildNumber}`, commitMessage].filter(Boolean).join(' - '),
-            actionName: 'Mark as Bad',
-            onAction: (comment: string) =>
-              ManagedWriter.markArtifactVersionAsBad({
-                application: application.name,
-                environment,
-                reference,
-                comment,
-                version,
-              }),
-            onSuccess: refetch,
-          },
-          { maxWidth: MODAL_MAX_WIDTH },
-        );
-      },
+      onClick: onMarkAsBad,
     },
   ];
   if (compareLinks?.current) {
