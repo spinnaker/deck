@@ -91,17 +91,15 @@ const Constraint = ({
       <VersionOperationIcon status={constraint.status} />
       <div>
         {hasContent ? (
-          <a
-            href="#"
-            className="constraint-title"
-            onClick={(e) => {
-              e.preventDefault();
+          <button
+            className="btn-link constraint-title"
+            onClick={() => {
               setIsExpanded((state) => !state);
             }}
           >
             {title}
             <Icon name="accordionExpand" size="12px" className={isExpanded ? 'rotated-90' : undefined} />
-          </a>
+          </button>
         ) : (
           <span className="constraint-title">{title}</span>
         )}
