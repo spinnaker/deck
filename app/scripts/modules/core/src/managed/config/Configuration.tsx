@@ -1,4 +1,4 @@
-import cx from 'classnames';
+import classnames from 'classnames';
 import React from 'react';
 
 import { Illustration } from '@spinnaker/presentation';
@@ -66,7 +66,7 @@ export const Configuration = () => {
         </div>
         <div>
           <button
-            className={cx(BTN_CLASSNAMES, state.btnClassName)}
+            className={classnames(BTN_CLASSNAMES, state.btnClassName)}
             onClick={() => onShowToggleManagementModal(!isPaused)}
           >
             {state.btnText}

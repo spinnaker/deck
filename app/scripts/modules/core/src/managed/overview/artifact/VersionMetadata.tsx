@@ -1,4 +1,4 @@
-import cx from 'classnames';
+import classnames from 'classnames';
 import { DateTime } from 'luxon';
 import React from 'react';
 import { Dropdown, MenuItem } from 'react-bootstrap';
@@ -11,7 +11,7 @@ import { TOOLTIP_DELAY } from '../../utils/defaults';
 import './VersionMetadata.less';
 
 const MetadataElement: React.FC<{ className?: string }> = ({ className, children }) => {
-  return <span className={cx('metadata-element', className)}>{children}</span>;
+  return <span className={classnames('metadata-element', className)}>{children}</span>;
 };
 
 export interface VersionAction {

@@ -1,4 +1,4 @@
-import cx from 'classnames';
+import classnames from 'classnames';
 import { isEmpty } from 'lodash';
 import React from 'react';
 
@@ -47,7 +47,7 @@ const ConstraintContent = ({ constraint, versionProps }: IConstraintContentProps
         <dd>
           {actions?.map(({ title, pass }) => (
             <button
-              className={cx('btn md-btn constraint-action-button', pass ? 'md-btn-success' : 'md-btn-danger')}
+              className={classnames('btn md-btn constraint-action-button', pass ? 'md-btn-success' : 'md-btn-danger')}
               key={title}
               disabled={loading}
               onClick={() => {
