@@ -28,12 +28,12 @@ const ArtifactVersionTask = ({ type, task }: IArtifactVersionTaskProps) => {
   const status = task.status || 'PENDING';
   const { link, startedAt, completedAt } = task;
   return (
-    <div className="version-verification">
+    <div className="version-task">
       <VersionOperationIcon status={status} />
-      <div className="verification-content">
+      <div className="task-content">
         {type} {task.id} {statusToText[status]}{' '}
         {startedAt && (
-          <span className="verification-metadata verification-runtime">
+          <span className="task-metadata task-runtime">
             <Tooltip value="Runtime duration" delayShow={TOOLTIP_DELAY}>
               <i className="far fa-clock" />
             </Tooltip>
@@ -41,7 +41,7 @@ const ArtifactVersionTask = ({ type, task }: IArtifactVersionTaskProps) => {
           </span>
         )}
         {link && (
-          <span className="verification-metadata">
+          <span className="task-metadata">
             <a href={link} target="_blank" rel="noreferrer">
               View logs
             </a>
@@ -59,9 +59,9 @@ interface IVerificationsProps {
 
 export const ArtifactVersionTasks = ({ type, tasks }: IVerificationsProps) => {
   return (
-    <div className="Verifications">
-      {tasks.map((verification) => (
-        <ArtifactVersionTask key={verification.id} type={type} task={verification} />
+    <div className="ArtifactVersionTasks">
+      {tasks.map((task) => (
+        <ArtifactVersionTask key={task.id} type={type} task={task} />
       ))}
     </div>
   );
