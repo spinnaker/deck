@@ -7,7 +7,7 @@ import { VersionOperationIcon } from './VersionOperation';
 import { QueryArtifactVersionTask, QueryVerificationStatus } from '../types';
 import { TOOLTIP_DELAY } from '../../utils/defaults';
 
-import './Verifications.less';
+import './ArtifactVersionTasks.less';
 
 const statusToText: {
   [key in QueryVerificationStatus]: string;
