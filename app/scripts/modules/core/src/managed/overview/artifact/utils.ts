@@ -1,10 +1,11 @@
 import { groupBy } from 'lodash';
 import { DateTime } from 'luxon';
 
-import { ManagedWriter, showModal, useApplicationContext } from 'core/index';
+import { showModal, useApplicationContext } from 'core/presentation';
 import { timeDiffToString } from 'core/utils';
 
 import { MarkAsBadActionModal, PinActionModal, UnpinActionModal } from './ArtifactActionModal';
+import { ManagedWriter } from '../../ManagedWriter';
 import { VersionAction } from './VersionMetadata';
 import { actionStatusUtils } from './VersionOperation';
 import { useFetchApplicationLazyQuery } from '../../graphql/graphql-sdk';

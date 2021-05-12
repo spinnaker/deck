@@ -9,7 +9,7 @@ import {
   SpinFormik,
   TextAreaInput,
   ValidationMessage,
-} from 'core/index';
+} from 'core/presentation';
 
 import { Button } from '../Button';
 import { logEvent } from './logging';

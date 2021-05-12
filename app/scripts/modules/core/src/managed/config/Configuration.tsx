@@ -2,7 +2,7 @@ import cx from 'classnames';
 import React from 'react';
 
 import { Illustration } from '@spinnaker/presentation';
-import { showModal, useApplicationContextSafe } from 'core/index';
+import { showModal, useApplicationContextSafe } from 'core/presentation';
 
 import { Loading } from '../Loading';
 import { useFetchApplicationManagementStatusQuery, useToggleManagementMutation } from '../graphql/graphql-sdk';

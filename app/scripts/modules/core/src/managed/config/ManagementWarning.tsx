@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { showModal } from 'core/index';
+import { showModal } from 'core/presentation';
 
 import { ResumeManagementModal } from './Configuration';
 import { useFetchApplicationManagementStatusQuery, useToggleManagementMutation } from '../graphql/graphql-sdk';

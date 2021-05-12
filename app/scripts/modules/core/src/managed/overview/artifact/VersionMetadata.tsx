@@ -4,7 +4,7 @@ import React from 'react';
 import { Dropdown, MenuItem } from 'react-bootstrap';
 
 import { Icon } from '@spinnaker/presentation';
-import { IconTooltip } from 'core/index';
+import { IconTooltip } from 'core/presentation';
 
 import { RelativeTimestamp } from '../../RelativeTimestamp';
 import { TOOLTIP_DELAY } from '../../utils/defaults';

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { HoverablePopover, Markdown } from 'core/index';
+import { HoverablePopover, Markdown } from 'core/presentation';
 
 import { QueryGitMetadata } from '../types';
 import { TOOLTIP_DELAY } from '../../utils/defaults';

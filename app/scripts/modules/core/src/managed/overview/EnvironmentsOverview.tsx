@@ -1,7 +1,6 @@
 import React from 'react';
 
-import { CollapsibleSection, ICollapsibleSectionProps } from 'core/index';
-import { useApplicationContextSafe } from 'core/presentation';
+import { CollapsibleSection, ICollapsibleSectionProps, useApplicationContextSafe } from 'core/presentation';
 
 import { Loading } from '../Loading';
 import { Resource } from './Resource';
