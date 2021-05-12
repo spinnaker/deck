@@ -19,6 +19,7 @@ export const GitLink = ({
   return (
     <div className="GitLink">
       <HoverablePopover
+        wrapperClassName="git-link-inner"
         delayShow={TOOLTIP_DELAY}
         placement="top"
         Component={() => <Markdown className="git-commit-tooltip" message={tooltip} />}
