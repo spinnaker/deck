@@ -70,12 +70,7 @@ export const VersionMetadata = ({
               wrapperClassName="metadata-icon"
               delayShow={TOOLTIP_DELAY}
             />
-            <RelativeTimestamp
-              timestamp={DateTime.fromISO(deployedAt)}
-              className=""
-              style={{}}
-              delayShow={TOOLTIP_DELAY}
-            />
+            <RelativeTimestamp timestamp={DateTime.fromISO(deployedAt)} delayShow={TOOLTIP_DELAY} removeStyles />
             {' ago'}
           </MetadataElement>
         )}

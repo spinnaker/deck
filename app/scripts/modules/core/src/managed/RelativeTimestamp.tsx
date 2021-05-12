@@ -8,8 +8,7 @@ import { CopyToClipboard, timeDiffToString } from '../utils';
 export interface IRelativeTimestampProps {
   timestamp: DateTime;
   clickToCopy?: boolean;
-  className?: string;
-  style?: React.CSSProperties;
+  removeStyles?: boolean;
   delayShow?: number;
 }
 
@@ -58,7 +57,7 @@ const getDistanceFromNow = (timestamp: DateTime) =>
   timestamp.diffNow().negate().shiftTo('years', 'months', 'days', 'hours', 'minutes', 'seconds');
 
 export const RelativeTimestamp = memo(
-  ({ timestamp: timestampInOriginalZone, clickToCopy, className, style, delayShow }: IRelativeTimestampProps) => {
+  ({ timestamp: timestampInOriginalZone, clickToCopy, delayShow, removeStyles }: IRelativeTimestampProps) => {
     const timestamp = TIMEZONE ? timestampInOriginalZone.setZone(TIMEZONE) : timestampInOriginalZone;
     const [formattedTimestamp, setFormattedTimestamp] = useState(
       formatTimestamp(timestamp, getDistanceFromNow(timestamp)),
@@ -77,8 +76,8 @@ export const RelativeTimestamp = memo(
     const absoluteTimestamp = timestamp.toFormat('yyyy-MM-dd HH:mm:ss ZZZZ');
     const relativeTimestamp = (
       <span
-        className={className !== undefined ? className : 'text-regular text-italic'}
-        style={style || { fontSize: 13, lineHeight: 1 }}
+        className={removeStyles ? undefined : 'text-regular text-italic'}
+        style={removeStyles ? undefined : { fontSize: 13, lineHeight: 1 }}
       >
         {formattedTimestamp}
       </span>
