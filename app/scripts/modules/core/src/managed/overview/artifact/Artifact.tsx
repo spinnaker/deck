@@ -12,12 +12,12 @@ import './Artifact.less';
 
 type RequiredKeys<T, K extends keyof T> = Exclude<T, K> & Required<Pick<T, K>>;
 
-const hasCreatedAt = (version: QueryArtifactVersion): version is RequiredKeys<QueryArtifactVersion, 'createdAt'> => {
-  return Boolean(version.createdAt);
+const hasCreatedAt = (version?: QueryArtifactVersion): version is RequiredKeys<QueryArtifactVersion, 'createdAt'> => {
+  return Boolean(version?.createdAt);
 };
 
 const filterPendingVersions = (versions: QueryArtifact['versions'], currentVersion?: QueryArtifactVersion) => {
-  if (!currentVersion?.createdAt) {
+  if (!hasCreatedAt(currentVersion)) {
     // Everything is newer than current
     return versions;
   }
