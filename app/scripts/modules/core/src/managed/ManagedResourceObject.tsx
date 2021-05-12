@@ -22,7 +22,7 @@ export interface IManagedResourceObjectProps {
   metadata?: ResourceDeploymentStatusProps;
 }
 
-const EventsLink = (props: Pick<IManagedResourceSummary, 'id' | 'displayName'>) => {
+export const EventsLink = (props: Pick<IManagedResourceSummary, 'id' | 'displayName'>) => {
   return (
     <Tooltip placement="top" value="Open resource history">
       <a

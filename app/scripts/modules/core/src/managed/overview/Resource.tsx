@@ -5,6 +5,7 @@ import { IconTooltip } from 'core/presentation/IconTooltip';
 
 import { MdResourceActuationState, useFetchResourceStatusQuery } from '../graphql/graphql-sdk';
 import spinner from './loadingIndicator.svg';
+import { showManagedResourceHistoryModal } from '../resourceHistory/ManagedResourceHistoryModal';
 import { ResourceTitle } from '../resources/ResourceTitle';
 import { IResourceLinkProps, resourceManager } from '../resources/resourceRegistry';
 import { QueryResource } from './types';
@@ -91,13 +92,26 @@ export const Resource = ({ resource, environment }: { resource: QueryResource; e
         <div className="row-title">
           <ResourceTitle props={resourceLinkProps} />
         </div>
-        <div className="resource-regions">
-          {regions.map((region, index) => (
-            <span key={region}>
-              {region}
-              {index < regions.length - 1 && ', '}
-            </span>
-          ))}
+        <div className="resource-metadata">
+          <span>
+            {regions.map((region, index) => (
+              <span key={region}>
+                {region}
+                {index < regions.length - 1 && ', '}
+              </span>
+            ))}
+          </span>
+          <span>
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                showManagedResourceHistoryModal({ id: resource.id, displayName: resource.displayName || resource.id });
+              }}
+            >
+              View logs
+            </a>
+          </span>
         </div>
         <div>
           <Status appName={app.name} environmentName={environment} resourceId={resource.id} />
