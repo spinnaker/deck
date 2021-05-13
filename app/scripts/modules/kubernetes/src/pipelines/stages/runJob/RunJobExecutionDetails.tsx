@@ -1,4 +1,4 @@
-import { get, last, sortBy } from 'lodash';
+import { get } from 'lodash';
 import React from 'react';
 
 import {
@@ -6,7 +6,6 @@ import {
   DefaultPodNameProvider,
   ExecutionDetailsSection,
   IExecutionDetailsSectionProps,
-  IJobOwnedPodStatus,
   JobStageExecutionLogs,
   StageFailureMessage,
 } from '@spinnaker/core';
