@@ -7,7 +7,7 @@ import { timeDiffToString } from 'core/utils';
 import { MarkAsBadActionModal, PinActionModal, UnpinActionModal } from './ArtifactActionModal';
 import { ManagedWriter } from '../../ManagedWriter';
 import { VersionAction } from './VersionMetadata';
-import { ACTION_DISPLAY_NAMES, actionStatusUtils } from './VersionOperation';
+import { ACTION_DISPLAY_NAMES, getActionStatusData } from './VersionOperation';
 import { useFetchApplicationLazyQuery } from '../../graphql/graphql-sdk';
 import { QueryArtifactVersion, QueryConstraint, QueryLifecycleStep } from '../types';
 import { OVERVIEW_VERSION_STATUSES } from '../utils';
@@ -26,7 +26,7 @@ export const getConstraintsStatusSummary = (constraints: QueryConstraint[]) => {
     }
   }
 
-  const byStatus = groupBy(constraints, (c) => actionStatusUtils[c.status]?.displayName || 'pending');
+  const byStatus = groupBy(constraints, (c) => getActionStatusData(c.status)?.displayName || 'pending');
   const summary = ACTION_DISPLAY_NAMES.map((displayName) => {
     const constraintsOfStatus = byStatus[displayName];
     return constraintsOfStatus ? `${constraintsOfStatus.length} ${displayName}` : undefined;

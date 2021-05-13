@@ -12,7 +12,7 @@ type ActionStatusUtils = {
   [key in AllStatuses]: { color?: string; icon: string; displayName: ActionDisplayName };
 };
 
-// This ensures that we cover all of the options
+// This ensures that we cover all of the options in AllStatuses (e.g. it will complain if BLOCKED is missing)
 const actionStatusUtilsInternal: ActionStatusUtils = {
   FAIL: { color: 'var(--color-status-error)', icon: 'fas fa-times', displayName: 'failed' },
   FORCE_PASS: { color: 'var(--color-status-success)', icon: 'fas fa-check', displayName: 'overridden' },
@@ -22,8 +22,13 @@ const actionStatusUtilsInternal: ActionStatusUtils = {
   BLOCKED: { icon: DEFAULT_ICON, displayName: 'pending' },
 };
 
-// This forces the consumer to verify that the value exists (important in the case of a breaking change on the backend)
-export const actionStatusUtils: Partial<ActionStatusUtils> = actionStatusUtilsInternal;
+export const getActionStatusData = (status: AllStatuses): ActionStatusUtils[keyof ActionStatusUtils] | undefined => {
+  const data = actionStatusUtilsInternal[status];
+  if (!data) {
+    console.error(`Missing data for action status ${status}`);
+  }
+  return data;
+};
 
 interface IVersionOperationIconProps {
   status: AllStatuses;
@@ -32,8 +37,8 @@ interface IVersionOperationIconProps {
 export const VersionOperationIcon = ({ status }: IVersionOperationIconProps) => {
   return (
     <i
-      className={actionStatusUtils[status]?.icon || DEFAULT_ICON}
-      style={{ color: actionStatusUtils[status]?.color || 'var(--color-titanium)' }}
+      className={getActionStatusData(status)?.icon || DEFAULT_ICON}
+      style={{ color: getActionStatusData(status)?.color || 'var(--color-titanium)' }}
     />
   );
 };
