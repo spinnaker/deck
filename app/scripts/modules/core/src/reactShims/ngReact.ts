@@ -3,9 +3,7 @@ import React from 'react';
 
 import { IViewChangesLinkProps } from 'core/diffs/ViewChangesLink';
 import { viewChangesLinkWrapper } from 'core/diffs/viewChangesLink.component';
-import { IAddEntityTagLinksProps } from 'core/entityTag/AddEntityTagLinks';
 import { IEntitySourceProps } from 'core/entityTag/EntitySource';
-import { addEntityTagLinksWrapperComponent } from 'core/entityTag/addEntityTagLinks.component';
 import { entitySourceComponent } from 'core/entityTag/entitySource.component';
 import { INumberListProps } from 'core/forms/numberList/NumberList';
 import { numberListWrapperComponent } from 'core/forms/numberList/numberList.component';
@@ -30,7 +28,6 @@ import { buttonBusyIndicatorComponent } from '../forms/buttonBusyIndicator/butto
 import { IHelpFieldProps } from '../help/HelpField';
 import { helpFieldWrapperComponent } from '../help/helpField.component';
 import { ReactInject } from './react.injector';
-import { IRunningTasksTagProps, runningTasksTagBindings } from '../serverGroup/pod/RunningTasksTag';
 import { ILegacySpinnerProps, spinnerWrapperComponent } from '../widgets/Spinner';
 
 import IInjectorService = angular.auto.IInjectorService;
@@ -41,7 +38,6 @@ export class NgReactInjector extends ReactInject {
 
   // Reactified components
   public AccountRegionClusterSelector: React.ComponentClass<IAccountRegionClusterSelectorProps> = angular2react('accountRegionClusterSelectorWrapper', accountRegionClusterSelectorWrapperComponent, this.$injectorProxy) as any;
-  public AddEntityTagLinks: React.ComponentClass<IAddEntityTagLinksProps>                       = angular2react('addEntityTagLinksWrapper', addEntityTagLinksWrapperComponent, this.$injectorProxy) as any;
   public ButtonBusyIndicator: React.ComponentClass<IButtonBusyIndicatorProps>                   = angular2react('buttonBusyIndicator', buttonBusyIndicatorComponent, this.$injectorProxy) as any;
   public EntitySource: React.ComponentClass<IEntitySourceProps>                                 = angular2react('entitySource', entitySourceComponent, this.$injectorProxy) as any;
   public HelpField: React.ComponentClass<IHelpFieldProps>                                       = angular2react('helpFieldWrapper', helpFieldWrapperComponent, this.$injectorProxy) as any;
@@ -49,7 +45,6 @@ export class NgReactInjector extends ReactInject {
   public InstanceTypeSelector: React.ComponentClass<IInstanceTypeSelectorProps>                 = angular2react('v2InstanceTypeSelector', v2InstanceTypeSelector, this.$injectorProxy);
   public LegacySpinner: React.ComponentClass<ILegacySpinnerProps>                               = angular2react('spinnerWrapper', spinnerWrapperComponent, this.$injectorProxy) as any;
   public NumberList: React.ComponentClass<INumberListProps>                                     = angular2react('numberListWrapper', numberListWrapperComponent, this.$injectorProxy) as any;
-  public RunningTasksTag: React.ComponentClass<IRunningTasksTagProps>                           = angular2react('runningTasksTag', { bindings: runningTasksTagBindings }, this.$injectorProxy) as any;
   public StageSummaryWrapper: React.ComponentClass<IStageSummaryWrapperProps>                   = angular2react('stageSummary', stageSummaryComponent, this.$injectorProxy) as any;
   public StepExecutionDetailsWrapper: React.ComponentClass<IStepExecutionDetailsWrapperProps>   = angular2react('stepExecutionDetails', stepExecutionDetailsComponent, this.$injectorProxy) as any;
   public TargetSelect: React.ComponentClass<ITargetSelectProps>                                 = angular2react('targetSelect', targetSelectComponent, this.$injectorProxy) as any;
