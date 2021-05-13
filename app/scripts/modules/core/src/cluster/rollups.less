@@ -253,6 +253,24 @@ running-tasks-tag {
   }
 }
 
+.popover.menu-running-tasks {
+  border: 1px solid var(--color-dovegray);
+  text-transform: none;
+  color: var(--color-mineshaft);
+  font-weight: 400;
+  font-size: 80%;
+  border-radius: 0;
+
+  &.bottom .arrow {
+    border-bottom-color: var(--color-dovegray);
+  }
+
+  .popover-content {
+    max-height: 350px;
+    overflow-y: scroll;
+  }
+}
+
 .menu-load-balancers {
   &.popover.bottom div.arrow:after {
     border-bottom-color: var(--color-dovegray);
