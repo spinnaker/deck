@@ -122,7 +122,7 @@ export function MetadataPageContent(props: IMetadataPageContentProps) {
         name="tags"
         label="Tags"
         value={pipeline.tags}
-        onChange={(e) => updatePipelineConfig({ description: e.target.value })}
+        onChange={(e) => updatePipelineConfig({ tags: e.target.value })}
         help={<HelpField id="pipeline.config.tags" />}
         input={(inputProps) => <TagsInput {...inputProps} />}
       />
