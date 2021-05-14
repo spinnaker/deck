@@ -19,20 +19,24 @@ import './ConstraintCard.less';
 
 const constraintCardAppearanceByStatus: { [key in ConstraintStatus]: IStatusCardProps['appearance'] } = {
   NOT_EVALUATED: 'future',
+  BLOCKED: 'future',
   PENDING: 'info',
   PASS: 'neutral',
   FAIL: 'error',
   OVERRIDE_PASS: 'neutral',
   OVERRIDE_FAIL: 'error',
+  FORCE_PASS: 'neutral',
 } as const;
 
 const skippedConstraintCardAppearanceByStatus: { [key in ConstraintStatus]: IStatusCardProps['appearance'] } = {
   NOT_EVALUATED: 'future',
+  BLOCKED: 'future',
   PENDING: 'future',
   PASS: 'neutral',
   FAIL: 'neutral',
   OVERRIDE_PASS: 'neutral',
   OVERRIDE_FAIL: 'neutral',
+  FORCE_PASS: 'neutral',
 } as const;
 
 const logEvent = (label: string, application: string, environment: string, reference: string) =>
@@ -84,7 +88,7 @@ export const ConstraintCard = memo(
 
     const [actionStatus, setActionStatus] = useState<IRequestStatus>('NONE');
 
-    const actions = constraintsManager.getOverrideActions(constraint, environment);
+    const actions = constraintsManager.getActions(constraint, environment.state);
 
     if (!constraintsManager.isSupported(type)) {
       console.warn(
