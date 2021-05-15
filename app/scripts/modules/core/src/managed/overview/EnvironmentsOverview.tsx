@@ -42,7 +42,6 @@ const sectionProps: Partial<ICollapsibleSectionProps> = {
   outerDivClassName: 'environment-section',
   headingClassName: 'environment-section-heading',
   bodyClassName: 'environment-section-body',
-  useGlyphiconChevron: false,
 };
 
 interface IEnvironmentProps {

@@ -96,7 +96,7 @@ const Constraint = ({ constraint, versionProps }: IConstraintProps) => {
             }}
           >
             {title}
-            <Icon name="accordionExpand" size="12px" className={isExpanded ? 'rotated-90' : undefined} />
+            <Icon name="accordionExpand" size="12px" className={isExpanded ? 'rotate-m90' : undefined} />
           </button>
         ) : (
           <span className="constraint-title">{title}</span>
