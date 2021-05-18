@@ -116,7 +116,7 @@ export interface MdConstraint {
   attributes?: Maybe<Scalars['JSON']>;
 }
 
-export type MdConstraintStatus = 'PENDING' | 'PASS' | 'FAIL' | 'FORCE_PASS';
+export type MdConstraintStatus = 'BLOCKED' | 'PENDING' | 'PASS' | 'FAIL' | 'FORCE_PASS';
 
 export interface MdConstraintStatusPayload {
   application: Scalars['String'];
@@ -350,6 +350,14 @@ export type FetchApplicationQuery = { __typename?: 'Query' } & {
                                       >
                                     >
                                   >;
+                                  postDeploy?: Maybe<
+                                    Array<
+                                      { __typename?: 'MdAction' } & Pick<
+                                        MdAction,
+                                        'id' | 'type' | 'status' | 'startedAt' | 'completedAt' | 'link'
+                                      >
+                                    >
+                                  >;
                                 }
                             >
                           >;
@@ -489,6 +497,14 @@ export const FetchApplicationDocument = gql`
                 attributes
               }
               verifications {
+                id
+                type
+                status
+                startedAt
+                completedAt
+                link
+              }
+              postDeploy {
                 id
                 type
                 status
