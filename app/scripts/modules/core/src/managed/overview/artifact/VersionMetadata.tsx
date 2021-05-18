@@ -4,7 +4,7 @@ import React from 'react';
 import { Dropdown, MenuItem } from 'react-bootstrap';
 
 import { Icon } from '@spinnaker/presentation';
-import { IconTooltip } from 'core/presentation';
+import { IconTooltip, Tooltip } from 'core/presentation';
 
 import { RelativeTimestamp } from '../../RelativeTimestamp';
 import { TOOLTIP_DELAY } from '../../utils/defaults';
@@ -26,6 +26,7 @@ interface IVersionMetadataProps {
   buildLink?: string;
   author?: string;
   deployedAt?: string;
+  createdAt?: string | Date;
   buildDuration?: string;
   buildsBehind?: number;
   isDeploying?: boolean;
@@ -38,6 +39,7 @@ export const VersionMetadata = ({
   buildLink,
   author,
   deployedAt,
+  createdAt,
   buildDuration,
   buildsBehind,
   isDeploying,
@@ -59,9 +61,11 @@ export const VersionMetadata = ({
             </span>
           </MetadataElement>
         )}
-        <MetadataElement>
-          <a href={buildLink}>Build #{buildNumber}</a>
-        </MetadataElement>
+        {buildNumber && (
+          <MetadataElement>
+            {buildLink ? <a href={buildLink}>Build #{buildNumber}</a> : `Build #${buildNumber}`}
+          </MetadataElement>
+        )}
         {author && <MetadataElement>By {author}</MetadataElement>}
         {deployedAt && (
           <MetadataElement>
@@ -72,8 +76,25 @@ export const VersionMetadata = ({
               wrapperClassName="metadata-icon"
               delayShow={TOOLTIP_DELAY}
             />
-            <RelativeTimestamp timestamp={DateTime.fromISO(deployedAt)} delayShow={TOOLTIP_DELAY} removeStyles />
-            {' ago'}
+            <RelativeTimestamp
+              timestamp={DateTime.fromISO(deployedAt)}
+              delayShow={TOOLTIP_DELAY}
+              removeStyles
+              withSuffix
+            />
+          </MetadataElement>
+        )}
+        {createdAt && (
+          <MetadataElement>
+            <Tooltip delayShow={TOOLTIP_DELAY} value="Created at">
+              <i className="far fa-calendar-alt metadata-icon" />
+            </Tooltip>
+            <RelativeTimestamp
+              timestamp={createdAt instanceof Date ? DateTime.fromJSDate(createdAt) : DateTime.fromISO(createdAt)}
+              delayShow={TOOLTIP_DELAY}
+              removeStyles
+              withSuffix
+            />
           </MetadataElement>
         )}
         {buildDuration && (
