@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {
   decodeUnicodeBase64,
   ExecutionDetailsSection,
@@ -6,8 +8,7 @@ import {
   ManifestYaml,
   Overridable,
   StageFailureMessage,
-} from 'core';
-import React from 'react';
+} from '@spinnaker/core';
 
 @Overridable('bakeManifest.bakeManifestDetailsTab')
 export class BakeCloudFoundryManifestDetailsTab extends React.Component<IExecutionDetailsSectionProps> {
