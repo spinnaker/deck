@@ -2,9 +2,9 @@ import React from 'react';
 
 import { BaseEnvironment } from '../environmentBaseElements/BaseEnvironment';
 import { BaseEnvironmentItem } from '../environmentBaseElements/BaseEnvironmentItem';
-import { VersionMetadata } from '../overview/artifact/VersionMetadata';
 import { getLifecycleEventDuration, getLifecycleEventLink, useCreateVersionActions } from '../overview/artifact/utils';
 import { PinnedVersions, VersionData, VersionInEnvironment } from './types';
+import { VersionMetadata } from '../versionMetadata/VersionMetadata';
 
 import './VersionsHistory.less';
 

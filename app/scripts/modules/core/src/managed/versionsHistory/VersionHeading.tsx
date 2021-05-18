@@ -1,9 +1,11 @@
 import classnames from 'classnames';
 import { sortBy, toNumber } from 'lodash';
 import React from 'react';
+
 import { GitLink } from '../overview/artifact/GitLink';
-import { VersionMetadata } from '../overview/artifact/VersionMetadata';
 import { HistoryArtifactVersion, VersionData } from './types';
+import { VersionAuthor, VersionBuilds, VersionCreatedAt } from '../versionMetadata/MetadataComponents';
+
 import './VersionsHistory.less';
 
 type VersionStatus = NonNullable<HistoryArtifactVersion['status']>;
@@ -63,7 +65,11 @@ export const VersionHeading = ({ group, chevron }: IVersionHeadingProps) => {
         ) : (
           <div>Build {Array.from(group.buildNumbers).join(', ')}</div>
         )}
-        <VersionMetadata createdAt={group.createdAt} author={gitMetadata?.author} />
+        <div className="VersionMetadata">
+          <VersionAuthor author={gitMetadata?.author} />
+          <VersionBuilds builds={Array.from(group.buildNumbers).map((buildNumber) => ({ buildNumber }))} />
+          <VersionCreatedAt createdAt={group.createdAt} />
+        </div>
         {/* Shows a badge for each environment with the status of the artifacts in it */}
         <div className="version-environments">
           {Object.entries(group.environments).map(([env, artifacts]) => {

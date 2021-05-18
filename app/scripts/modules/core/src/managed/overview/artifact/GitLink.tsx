@@ -23,6 +23,7 @@ export const GitLink = ({ gitMetadata: { commit, commitInfo, pullRequest }, asLi
       <HoverablePopover
         wrapperClassName="git-link-inner"
         delayShow={TOOLTIP_DELAY}
+        delayHide={0}
         placement="top"
         Component={() => <Markdown className="git-commit-tooltip" message={tooltip} />}
       >
