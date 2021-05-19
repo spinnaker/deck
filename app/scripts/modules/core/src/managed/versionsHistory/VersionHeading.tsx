@@ -45,14 +45,14 @@ const getEnvStatusSummary = (artifacts: HistoryArtifactVersion[]): VersionStatus
   return status;
 };
 
-const statusToColor: { [key in VersionStatus]: string } = {
-  APPROVED: `--color-status-progress`,
-  PENDING: `--color-status-progress`,
-  CURRENT: `--color-status-success`,
-  VETOED: `--color-status-error`,
-  PREVIOUS: `--color-accent-g3`,
-  DEPLOYING: `--color-accent`,
-  SKIPPED: '',
+const statusToClassName: { [key in VersionStatus]: string } = {
+  APPROVED: `approved`,
+  PENDING: `pending`,
+  CURRENT: `current`,
+  VETOED: `vetoed`,
+  PREVIOUS: `previous`,
+  DEPLOYING: `deploying`,
+  SKIPPED: 'chip-outlined',
 };
 
 const statusToText: { [key in VersionStatus]: string } = {
@@ -97,14 +97,10 @@ export const VersionHeading = ({ group, chevron }: IVersionHeadingProps) => {
         <div className="version-environments">
           {Object.entries(group.environments).map(([env, artifacts]) => {
             const statusSummary = getEnvStatusSummary(artifacts);
-            const statusColor = statusToColor[statusSummary];
+            const statusClassName = statusToClassName[statusSummary];
             return (
               <Tooltip delayShow={TOOLTIP_DELAY} value={statusToText[statusSummary]}>
-                <div
-                  key={env}
-                  className={classnames('chip', { 'chip-outlined': !statusColor })}
-                  style={{ backgroundColor: `var(${statusColor})` }}
-                >
+                <div key={env} className={classnames('chip', statusClassName)}>
                   {env}
                 </div>
               </Tooltip>
