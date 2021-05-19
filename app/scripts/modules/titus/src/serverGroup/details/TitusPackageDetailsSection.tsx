@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { CollapsibleSection, LabeledValue, LabeledValueList } from '@spinnaker/core';
-import { DockerImageUtils } from '@spinnaker/docker';
 import { ITitusBuildInfo } from 'titus/domain';
 
 export interface ITitusPackageDetailsSectionProps {
@@ -12,7 +11,6 @@ export const TitusPackageDetailsSection = ({ buildInfo }: ITitusPackageDetailsSe
   const hasPackageInfo = Boolean(Object.keys(packageInfo).length);
 
   const { commitId, host, name, number, version } = packageInfo;
-  const { repository } = DockerImageUtils.splitImageId(buildInfo.docker?.image);
   const jenkinsLink = `${host}job/${name}/${number}`;
 
   return (
@@ -21,7 +19,7 @@ export const TitusPackageDetailsSection = ({ buildInfo }: ITitusPackageDetailsSe
       {hasPackageInfo && (
         <LabeledValueList className="horizontal-when-filters-collapsed">
           {name && <LabeledValue label="Job" value={name} />}
-          {repository && <LabeledValue label="Package" value={repository} />}
+          {buildInfo.docker?.image && <LabeledValue label="Image Name" value={buildInfo.docker?.image} />}
           {number && <LabeledValue label="Build" value={number} />}
           {commitId && <LabeledValue label="Commit" value={commitId.substring(0, 8)} />}
           {version && <LabeledValue label="Version" value={version} />}
