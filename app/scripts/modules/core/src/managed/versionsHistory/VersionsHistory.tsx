@@ -42,11 +42,13 @@ const groupVersionsByShaOrBuild = (environments: HistoryEnvironment[]) => {
         const type: VersionData['type'] = version.gitMetadata?.commit ? 'SHA' : 'BUILD_NUMBER';
 
         if (!groupedVersions[key]) {
-          groupedVersions[key] = { key, environments: {}, type, buildNumbers: new Set() };
+          groupedVersions[key] = { key, environments: {}, type, buildNumbers: new Set(), versions: new Set() };
         }
         if (version.buildNumber) {
           groupedVersions[key].buildNumbers.add(version.buildNumber);
         }
+        groupedVersions[key].versions.add(version.version);
+
         setValueIfMissing(groupedVersions[key], 'createdAt', undefined, () =>
           version.createdAt ? new Date(version.createdAt) : undefined,
         );

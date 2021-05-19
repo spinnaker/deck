@@ -112,11 +112,12 @@ export const Constraints = ({
   versionProps,
   expandedByDefault,
 }: {
-  constraints: QueryConstraint[];
+  constraints?: QueryConstraint[];
   versionProps: ArtifactVersionProps;
   expandedByDefault?: boolean;
 }) => {
   const [showSummary, setShowSummary] = React.useState(Boolean(expandedByDefault));
+  if (!constraints || !constraints.length) return null;
   const summary = getConstraintsStatusSummary(constraints);
   return (
     <div className="Constraints">

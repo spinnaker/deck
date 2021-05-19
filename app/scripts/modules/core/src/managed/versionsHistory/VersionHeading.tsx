@@ -1,7 +1,11 @@
+import { useApolloClient } from '@apollo/client';
 import classnames from 'classnames';
 import { sortBy, toNumber } from 'lodash';
 import React from 'react';
 
+import { useApplicationContextSafe } from 'core/presentation';
+
+import { FetchVersionDocument, FetchVersionQueryVariables, useFetchVersionLazyQuery } from '../graphql/graphql-sdk';
 import { GitLink } from '../overview/artifact/GitLink';
 import { HistoryArtifactVersion, VersionData } from './types';
 import { VersionAuthor, VersionBuilds, VersionCreatedAt } from '../versionMetadata/MetadataComponents';
@@ -57,8 +61,16 @@ interface IVersionHeadingProps {
 
 export const VersionHeading = ({ group, chevron }: IVersionHeadingProps) => {
   const gitMetadata = group.gitMetadata;
+  const client = useApolloClient();
+  const app = useApplicationContextSafe();
+  const prefetchData = () => {
+    client.query<any, FetchVersionQueryVariables>({
+      query: FetchVersionDocument,
+      variables: { appName: app.name, versions: Array.from(group.versions) },
+    });
+  };
   return (
-    <div className="version-heading">
+    <div className="version-heading" onMouseOver={prefetchData}>
       <div>
         {gitMetadata ? (
           <GitLink gitMetadata={gitMetadata} asLink={false} />

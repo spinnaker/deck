@@ -12,6 +12,7 @@ export interface VersionInEnvironment extends HistoryArtifactVersion {
 export interface VersionData {
   type: 'BUILD_NUMBER' | 'SHA';
   buildNumbers: Set<string>;
+  versions: Set<string>;
   createdAt?: Date;
   environments: { [env: string]: VersionInEnvironment[] };
   gitMetadata?: HistoryArtifactVersion['gitMetadata'];
