@@ -4,7 +4,7 @@ import ContentLoader from 'react-content-loader';
 import { useApplicationContextSafe } from 'core/presentation';
 
 import { BaseEnvironment } from '../environmentBaseElements/BaseEnvironment';
-import { BaseEnvironmentItem } from '../environmentBaseElements/BaseEnvironmentItem';
+import { EnvironmentItem } from '../environmentBaseElements/EnvironmentItem';
 import { useFetchVersionQuery } from '../graphql/graphql-sdk';
 import { ArtifactVersionTasks } from '../overview/artifact/ArtifactVersionTasks';
 import { Constraints } from '../overview/artifact/Constraints';
@@ -49,7 +49,7 @@ const VersionInEnvironment = ({ environment, version, envPinnedVersions }: IVers
   });
 
   return (
-    <BaseEnvironmentItem
+    <EnvironmentItem
       title={version.reference}
       iconName="artifact"
       iconTooltip={`Artifact - ${version.type}`}
@@ -78,7 +78,7 @@ const VersionInEnvironment = ({ environment, version, envPinnedVersions }: IVers
       />
       <ArtifactVersionTasks type="Verification" tasks={detailedVersionData?.verifications} />
       <ArtifactVersionTasks type="Post deploy" tasks={detailedVersionData?.postDeploy} />
-    </BaseEnvironmentItem>
+    </EnvironmentItem>
   );
 };
 

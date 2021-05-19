@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Icon, useApplicationContextSafe } from 'core/presentation';
 
-import { BaseEnvironmentItem } from '../environmentBaseElements/BaseEnvironmentItem';
+import { EnvironmentItem } from '../environmentBaseElements/EnvironmentItem';
 import { MdResourceActuationState, useFetchResourceStatusQuery } from '../graphql/graphql-sdk';
 import spinner from './loadingIndicator.svg';
 import { showManagedResourceHistoryModal } from '../resourceHistory/ManagedResourceHistoryModal';
@@ -83,7 +83,7 @@ export const Resource = ({ resource, environment }: { resource: QueryResource; e
   const regions = resource.location?.regions || [];
 
   return (
-    <BaseEnvironmentItem
+    <EnvironmentItem
       iconName={icon}
       iconTooltip={resource.kind}
       className="Resource"
@@ -113,6 +113,6 @@ export const Resource = ({ resource, environment }: { resource: QueryResource; e
       <div>
         <Status appName={app.name} environmentName={environment} resourceId={resource.id} />
       </div>
-    </BaseEnvironmentItem>
+    </EnvironmentItem>
   );
 };

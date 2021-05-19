@@ -5,7 +5,7 @@ import { HoverablePopover, Markdown } from 'core/presentation';
 
 import { CurrentVersion } from './CurrentVersion';
 import { PendingVersion } from './PendingVersion';
-import { BaseEnvironmentItem } from '../../environmentBaseElements/BaseEnvironmentItem';
+import { EnvironmentItem } from '../../environmentBaseElements/EnvironmentItem';
 import { QueryArtifact, QueryArtifactVersion } from '../types';
 import { TOOLTIP_DELAY } from '../../utils/defaults';
 
@@ -62,7 +62,7 @@ export const Artifact = ({ artifact }: IArtifactProps) => {
   const { pinnedVersion } = artifact;
 
   return (
-    <BaseEnvironmentItem
+    <EnvironmentItem
       iconName="artifact"
       iconTooltip={`Artifact - ${artifact.type}`}
       className="Artifact"
@@ -100,6 +100,6 @@ export const Artifact = ({ artifact }: IArtifactProps) => {
           </div>
         </section>
       ) : undefined}
-    </BaseEnvironmentItem>
+    </EnvironmentItem>
   );
 };

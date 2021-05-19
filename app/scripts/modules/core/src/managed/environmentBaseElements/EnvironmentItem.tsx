@@ -6,7 +6,7 @@ import { IconTooltip } from 'core/presentation';
 
 import { TOOLTIP_DELAY } from '../utils/defaults';
 
-interface IBaseEnvironmentItemProps {
+interface IEnvironmentItemProps {
   title: string | React.ReactElement;
   className?: string;
   iconTooltip: string;
@@ -14,7 +14,7 @@ interface IBaseEnvironmentItemProps {
   size?: 'regular' | 'small';
 }
 
-export const BaseEnvironmentItem: React.FC<IBaseEnvironmentItemProps> = ({
+export const EnvironmentItem: React.FC<IEnvironmentItemProps> = ({
   title,
   size = 'regular',
   iconName,
