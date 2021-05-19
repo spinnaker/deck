@@ -3,11 +3,12 @@ import classnames from 'classnames';
 import { sortBy, toNumber } from 'lodash';
 import React from 'react';
 
-import { useApplicationContextSafe } from 'core/presentation';
+import { Tooltip, useApplicationContextSafe } from 'core/presentation';
 
-import { FetchVersionDocument, FetchVersionQueryVariables, useFetchVersionLazyQuery } from '../graphql/graphql-sdk';
+import { FetchVersionDocument, FetchVersionQueryVariables } from '../graphql/graphql-sdk';
 import { GitLink } from '../overview/artifact/GitLink';
 import { HistoryArtifactVersion, VersionData } from './types';
+import { TOOLTIP_DELAY } from '../utils/defaults';
 import { VersionAuthor, VersionBuilds, VersionCreatedAt } from '../versionMetadata/MetadataComponents';
 
 import './VersionsHistory.less';
@@ -54,6 +55,16 @@ const statusToColor: { [key in VersionStatus]: string } = {
   SKIPPED: '',
 };
 
+const statusToText: { [key in VersionStatus]: string } = {
+  APPROVED: `Ready to deploy`,
+  PENDING: `Pending`,
+  CURRENT: `Currently deployed`,
+  VETOED: `Marked as bad`,
+  PREVIOUS: `Previously deployed`,
+  DEPLOYING: `Deploying`,
+  SKIPPED: 'Skipped',
+};
+
 interface IVersionHeadingProps {
   group: VersionData;
   chevron: JSX.Element;
@@ -85,15 +96,18 @@ export const VersionHeading = ({ group, chevron }: IVersionHeadingProps) => {
         {/* Shows a badge for each environment with the status of the artifacts in it */}
         <div className="version-environments">
           {Object.entries(group.environments).map(([env, artifacts]) => {
-            const statusColor = statusToColor[getEnvStatusSummary(artifacts)];
+            const statusSummary = getEnvStatusSummary(artifacts);
+            const statusColor = statusToColor[statusSummary];
             return (
-              <div
-                key={env}
-                className={classnames('chip', { 'chip-outlined': !statusColor })}
-                style={{ backgroundColor: `var(${statusColor})` }}
-              >
-                {env} - {getEnvStatusSummary(artifacts)}
-              </div>
+              <Tooltip delayShow={TOOLTIP_DELAY} value={statusToText[statusSummary]}>
+                <div
+                  key={env}
+                  className={classnames('chip', { 'chip-outlined': !statusColor })}
+                  style={{ backgroundColor: `var(${statusColor})` }}
+                >
+                  {env}
+                </div>
+              </Tooltip>
             );
           })}
         </div>
