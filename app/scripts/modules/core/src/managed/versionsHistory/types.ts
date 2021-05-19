@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon';
 import { FetchVersionsHistoryQuery } from '../graphql/graphql-sdk';
 
 export type HistoryEnvironment = NonNullable<FetchVersionsHistoryQuery['application']>['environments'][number];
@@ -13,7 +14,7 @@ export interface VersionData {
   type: 'BUILD_NUMBER' | 'SHA';
   buildNumbers: Set<string>;
   versions: Set<string>;
-  createdAt?: Date;
+  createdAt?: DateTime;
   environments: { [env: string]: VersionInEnvironment[] };
   gitMetadata?: HistoryArtifactVersion['gitMetadata'];
   key: string;

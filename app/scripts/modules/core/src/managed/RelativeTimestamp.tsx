@@ -6,7 +6,7 @@ import { Tooltip, useInterval } from '../presentation';
 import { CopyToClipboard, timeDiffToString } from '../utils';
 
 export interface IRelativeTimestampProps {
-  timestamp: DateTime;
+  timestamp: DateTime | string;
   clickToCopy?: boolean;
   removeStyles?: boolean;
   delayShow?: number;
@@ -60,13 +60,15 @@ const getDistanceFromNow = (timestamp: DateTime) =>
 
 export const RelativeTimestamp = memo(
   ({
-    timestamp: timestampInOriginalZone,
+    timestamp: originalTimestamp,
     clickToCopy,
     delayShow,
     removeStyles,
     withSuffix = false,
   }: IRelativeTimestampProps) => {
-    const timestamp = TIMEZONE ? timestampInOriginalZone.setZone(TIMEZONE) : timestampInOriginalZone;
+    const dateTimeTimestamp =
+      typeof originalTimestamp === 'string' ? DateTime.fromISO(originalTimestamp) : originalTimestamp;
+    const timestamp = TIMEZONE ? dateTimeTimestamp.setZone(TIMEZONE) : dateTimeTimestamp;
     const [formattedTimestamp, setFormattedTimestamp] = useState(
       formatTimestamp(timestamp, getDistanceFromNow(timestamp), withSuffix),
     );

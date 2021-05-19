@@ -1,4 +1,3 @@
-import { DateTime } from 'luxon';
 import React from 'react';
 
 import { IconTooltip } from 'core/presentation';
@@ -45,12 +44,7 @@ export const VersionMetadata = ({
             wrapperClassName="metadata-icon"
             delayShow={TOOLTIP_DELAY}
           />
-          <RelativeTimestamp
-            timestamp={DateTime.fromISO(deployedAt)}
-            delayShow={TOOLTIP_DELAY}
-            removeStyles
-            withSuffix
-          />
+          <RelativeTimestamp timestamp={deployedAt} delayShow={TOOLTIP_DELAY} removeStyles withSuffix />
         </MetadataElement>
       )}
       <VersionCreatedAt createdAt={createdAt} />

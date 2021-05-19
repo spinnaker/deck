@@ -64,7 +64,7 @@ export const VersionMetadataActions = ({ id, actions }: IVersionMetadataActionsP
 };
 
 interface IVersionCreatedAtProps {
-  createdAt?: string | Date;
+  createdAt?: string | DateTime;
 }
 
 export const VersionCreatedAt = ({ createdAt }: IVersionCreatedAtProps) => {
@@ -74,12 +74,7 @@ export const VersionCreatedAt = ({ createdAt }: IVersionCreatedAtProps) => {
       <Tooltip delayShow={TOOLTIP_DELAY} value="Created at">
         <i className="far fa-calendar-alt metadata-icon" />
       </Tooltip>
-      <RelativeTimestamp
-        timestamp={createdAt instanceof Date ? DateTime.fromJSDate(createdAt) : DateTime.fromISO(createdAt)}
-        delayShow={TOOLTIP_DELAY}
-        removeStyles
-        withSuffix
-      />
+      <RelativeTimestamp timestamp={createdAt} delayShow={TOOLTIP_DELAY} removeStyles withSuffix />
     </MetadataElement>
   );
 };

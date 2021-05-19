@@ -1,4 +1,5 @@
 import { sortBy } from 'lodash';
+import { DateTime } from 'luxon';
 import React from 'react';
 
 import { CollapsibleSection, useApplicationContextSafe } from 'core/presentation';
@@ -50,7 +51,7 @@ const groupVersionsByShaOrBuild = (environments: HistoryEnvironment[]) => {
         groupedVersions[key].versions.add(version.version);
 
         setValueIfMissing(groupedVersions[key], 'createdAt', undefined, () =>
-          version.createdAt ? new Date(version.createdAt) : undefined,
+          version.createdAt ? DateTime.fromISO(version.createdAt) : undefined,
         );
         setValueIfMissing(groupedVersions[key], 'gitMetadata', version.gitMetadata);
 
@@ -62,7 +63,7 @@ const groupVersionsByShaOrBuild = (environments: HistoryEnvironment[]) => {
       }
     }
   }
-  return sortBy(Object.values(groupedVersions), (g) => (g.createdAt ? -1 * g.createdAt.getTime() : -1));
+  return sortBy(Object.values(groupedVersions), (g) => (g.createdAt ? -1 * g.createdAt.toMillis() : -1));
 };
 
 const getPinnedVersions = (environments: HistoryEnvironment[]) => {
