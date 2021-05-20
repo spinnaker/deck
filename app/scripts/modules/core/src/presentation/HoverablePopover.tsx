@@ -1,16 +1,17 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import { Overlay, Popover, PopoverProps } from 'react-bootstrap';
+import ReactDOM from 'react-dom';
 import { Observable, Subject } from 'rxjs';
 
-import { Placement } from 'core/presentation';
 import { UUIDGenerator } from 'core/utils';
+
+import { Placement } from './Placement';
 
 import './HoverablePopover.css';
 
 export interface IHoverablePopoverContentsProps extends IHoverablePopoverProps {
   // The popover contents can forcibly hide the popover by calling this function
-  hidePopover: () => void;
+  hidePopover?: () => void;
 }
 
 export interface IHoverablePopoverProps extends React.HTMLProps<any> {
@@ -88,7 +89,7 @@ export class HoverablePopover extends React.Component<IHoverablePopoverProps, IH
 
     Observable.merge(showHideMouseEvents$, hideProgramatically$)
       .map(({ shouldOpen, eventDelay, animation }) => Observable.of({ shouldOpen, animation }).delay(eventDelay))
-      .switchMap(result => result)
+      .switchMap((result) => result)
       .filter(({ shouldOpen }) => shouldOpen !== this.state.popoverIsOpen)
       .takeUntil(this.destroy$)
       .subscribe(({ shouldOpen, animation }) => this.setPopoverOpen(shouldOpen, animation));

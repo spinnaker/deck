@@ -1,8 +1,8 @@
 import { IPipeline, IStage, IStageOrTriggerTypeConfig } from 'core/domain';
 import { NameUtils } from 'core/naming';
 
-import { PipelineConfigService } from '../services/PipelineConfigService';
 import { IStageOrTriggerValidator, IValidatorConfig, PipelineConfigValidator } from './PipelineConfigValidator';
+import { PipelineConfigService } from '../services/PipelineConfigService';
 
 export interface ITargetImpedanceValidationConfig extends IValidatorConfig {
   stageTypes?: string[];
@@ -21,9 +21,9 @@ export class TargetImpedanceValidator implements IStageOrTriggerValidator {
     const regions: string[] = stage['regions'] || [];
     let allRegionsFound = true;
 
-    regions.forEach(region => {
+    regions.forEach((region) => {
       let regionFound = false;
-      stagesToTest.forEach(toTest => {
+      stagesToTest.forEach((toTest) => {
         if (toTest.type === 'deploy' && toTest['clusters'] && toTest['clusters'].length) {
           toTest['clusters'].forEach((cluster: any) => {
             const clusterName: string = NameUtils.getClusterName(

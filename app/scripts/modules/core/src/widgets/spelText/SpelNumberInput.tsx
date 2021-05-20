@@ -1,5 +1,6 @@
-import React from 'react';
 import { isString } from 'lodash';
+import React from 'react';
+
 import { Tooltip } from 'core/presentation';
 
 export interface INumberInputProps {
@@ -76,8 +77,7 @@ export class SpelNumberInput extends React.Component<INumberInputProps, INumberI
               >
                 <Tooltip value="Toggle to enter expression">
                   <span>
-                    {'${'}
-                    &hellip;}
+                    {'${'}&hellip;{'}'}
                   </span>
                 </Tooltip>
               </button>

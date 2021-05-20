@@ -1,19 +1,19 @@
+import classNames from 'classnames';
+import { has } from 'lodash';
+import { $interpolate } from 'ngimport';
 import React from 'react';
 import ReactGA from 'react-ga';
-import { has } from 'lodash';
-import classNames from 'classnames';
 import { Subscription } from 'rxjs';
-import { $interpolate } from 'ngimport';
 
-import { ReactInjector } from 'core/reactShims';
 import { Application } from 'core/application';
+import { SETTINGS } from 'core/config';
 import { IInstance, IServerGroup } from 'core/domain';
+import { ISortFilter } from 'core/filterModel';
 import { InstanceList } from 'core/instance/InstanceList';
 import { Instances } from 'core/instance/Instances';
-import { ScrollToService } from 'core/utils';
-import { ISortFilter } from 'core/filterModel';
+import { ReactInjector } from 'core/reactShims';
 import { ClusterState } from 'core/state';
-import { SETTINGS } from 'core/config';
+import { ScrollToService } from 'core/utils';
 
 import { ServerGroupHeader } from './ServerGroupHeader';
 
@@ -60,7 +60,7 @@ export class ServerGroup extends React.Component<IServerGroupProps, IServerGroup
 
   private getState(props: IServerGroupProps): IServerGroupState {
     const { serverGroup } = props;
-    const instances = serverGroup.instances.filter(i => ClusterState.filterService.shouldShowInstance(i));
+    const instances = serverGroup.instances.filter((i) => ClusterState.filterService.shouldShowInstance(i));
     const isSelected = this.isSelected(serverGroup);
     const isMultiSelected = this.isMultiSelected(props.sortFilter.multiselect, serverGroup);
     const jenkinsConfig = serverGroup.buildInfo && serverGroup.buildInfo.jenkins;
@@ -93,7 +93,7 @@ export class ServerGroup extends React.Component<IServerGroupProps, IServerGroup
           (dockerConfig.tag || dockerConfig.digest),
       };
     } else if (has(serverGroup, 'buildInfo.images')) {
-      images = serverGroup.buildInfo.images;
+      images = serverGroup.buildInfo.images.map((val: string) => this.getShortSha(val));
     }
 
     return {
@@ -104,6 +104,15 @@ export class ServerGroup extends React.Component<IServerGroupProps, IServerGroup
       isSelected,
       isMultiSelected,
     };
+  }
+
+  private getShortSha(val: string): string {
+    const sha = val.lastIndexOf('sha256:');
+    if (sha > -1) {
+      // 14 = "sha256:" + 7 characters of hash
+      val = val.substring(0, sha + 14) + '...';
+    }
+    return val;
   }
 
   private isSelected(serverGroup: IServerGroup) {

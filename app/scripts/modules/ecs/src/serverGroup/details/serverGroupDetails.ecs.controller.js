@@ -1,24 +1,24 @@
 'use strict';
 
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 import * as angular from 'angular';
 import { chain, filter, find, has, isEmpty } from 'lodash';
-
-import { ECS_SERVER_GROUP_TRANSFORMER } from '../serverGroup.transformer';
 
 import {
   AccountService,
   ConfirmationModalService,
   FirewallLabels,
   OVERRIDE_REGISTRY,
-  ServerGroupReader,
   SERVER_GROUP_WRITER,
+  ServerGroupReader,
   ServerGroupWarningMessageService,
   SubnetReader,
 } from '@spinnaker/core';
+
 import { ECS_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER_SERVICE } from '../configure/serverGroupCommandBuilder.service';
 import { ECS_SERVERGROUP_DETAILS_RESIZE_RESIZESERVERGROUP_CONTROLLER } from './resize/resizeServerGroup.controller';
 import { ECS_SERVERGROUP_DETAILS_ROLLBACK_ROLLBACKSERVERGROUP_CONTROLLER } from './rollback/rollbackServerGroup.controller';
-import UIROUTER_ANGULARJS from '@uirouter/angularjs';
+import { ECS_SERVER_GROUP_TRANSFORMER } from '../serverGroup.transformer';
 
 export const ECS_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_ECS_CONTROLLER = 'spinnaker.ecs.serverGroup.details.controller';
 export const name = ECS_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_ECS_CONTROLLER; // for backwards compatibility
@@ -42,7 +42,7 @@ angular
     'serverGroupWriter',
     'ecsServerGroupTransformer',
     'overrideRegistry',
-    function(
+    function (
       $scope,
       $state,
       app,
@@ -63,7 +63,7 @@ angular
 
       const extractServerGroupSummary = () => {
         return app.ready().then(() => {
-          let summary = find(app.serverGroups.data, toCheck => {
+          let summary = find(app.serverGroups.data, (toCheck) => {
             return (
               toCheck.name === serverGroup.name &&
               toCheck.account === serverGroup.accountId &&
@@ -71,9 +71,9 @@ angular
             );
           });
           if (!summary) {
-            app.loadBalancers.data.some(loadBalancer => {
+            app.loadBalancers.data.some((loadBalancer) => {
               if (loadBalancer.account === serverGroup.accountId && loadBalancer.region === serverGroup.region) {
-                return loadBalancer.serverGroups.some(possibleServerGroup => {
+                return loadBalancer.serverGroups.some((possibleServerGroup) => {
                   if (possibleServerGroup.name === serverGroup.name) {
                     summary = possibleServerGroup;
                     return true;
@@ -99,13 +99,13 @@ angular
 
       const retrieveServerGroup = () => {
         return extractServerGroupSummary()
-          .then(summary => {
+          .then((summary) => {
             return ServerGroupReader.getServerGroup(
               app.name,
               serverGroup.accountId,
               serverGroup.region,
               serverGroup.name,
-            ).then(details => {
+            ).then((details) => {
               cancelLoader();
 
               // it's possible the summary was not found because the clusters are still loading
@@ -121,17 +121,15 @@ angular
 
                 if (vpc !== '') {
                   const subnetId = vpc.split(',')[0];
-                  SubnetReader.listSubnets().then(subnets => {
-                    const subnet = chain(subnets)
-                      .find({ id: subnetId })
-                      .value();
+                  SubnetReader.listSubnets().then((subnets) => {
+                    const subnet = chain(subnets).find({ id: subnetId }).value();
                     this.serverGroup.subnetType = subnet.purpose;
                   });
                 }
 
                 if (details.image && details.image.description) {
                   const tags = details.image.description.split(', ');
-                  tags.forEach(tag => {
+                  tags.forEach((tag) => {
                     const keyVal = tag.split('=');
                     if (keyVal.length === 2 && keyVal[0] === 'ancestor_name') {
                       details.image.baseImage = keyVal[1];
@@ -140,7 +138,7 @@ angular
                 }
 
                 if (details.image && details.image.tags) {
-                  const baseAmiVersionTag = details.image.tags.find(tag => tag.key === 'base_ami_version');
+                  const baseAmiVersionTag = details.image.tags.find((tag) => tag.key === 'base_ami_version');
                   if (baseAmiVersionTag) {
                     details.baseAmiVersion = baseAmiVersionTag.value;
                   }
@@ -196,7 +194,7 @@ angular
           },
         };
 
-        const submitMethod = params => serverGroupWriter.destroyServerGroup(serverGroup, app, params);
+        const submitMethod = (params) => serverGroupWriter.destroyServerGroup(serverGroup, app, params);
 
         const stateParams = {
           name: serverGroup.name,
@@ -232,7 +230,7 @@ angular
           title: 'Disabling ' + serverGroup.name,
         };
 
-        const submitMethod = params => {
+        const submitMethod = (params) => {
           return serverGroupWriter.disableServerGroup(serverGroup, app, params);
         };
 
@@ -264,7 +262,7 @@ angular
           title: 'Enabling ' + serverGroup.name,
         };
 
-        const submitMethod = params => {
+        const submitMethod = (params) => {
           return serverGroupWriter.enableServerGroup(serverGroup, app, params);
         };
 
@@ -292,6 +290,7 @@ angular
             'ecs.rollback.modal',
             require('./rollback/rollbackServerGroup.html'),
           ),
+          windowClass: 'modal-z-index',
           controller: 'ecsRollbackServerGroupCtrl as ctrl',
           resolve: {
             serverGroup: () => this.serverGroup,
@@ -303,7 +302,7 @@ angular
               app
                 .getDataSource('serverGroups')
                 .data.filter(
-                  g =>
+                  (g) =>
                     g.cluster === this.serverGroup.cluster &&
                     g.region === this.serverGroup.region &&
                     g.account === this.serverGroup.account &&
@@ -318,6 +317,7 @@ angular
         $uibModal.open({
           templateUrl: overrideRegistry.getTemplate('ecs.resize.modal', require('./resize/resizeServerGroup.html')),
           controller: 'ecsResizeServerGroupCtrl as ctrl',
+          windowClass: 'modal-z-index',
           resolve: {
             serverGroup: () => this.serverGroup,
             application: () => app,
@@ -325,11 +325,12 @@ angular
         });
       };
 
-      this.cloneServerGroup = serverGroup => {
+      this.cloneServerGroup = (serverGroup) => {
         $uibModal.open({
           templateUrl: require('../configure/wizard/serverGroupWizard.html'),
           controller: 'ecsCloneServerGroupCtrl as ctrl',
           size: 'lg',
+          windowClass: 'modal-z-index',
           resolve: {
             title: () => 'Clone ' + serverGroup.name,
             application: () => app,
@@ -356,8 +357,8 @@ angular
         return null;
       };
 
-      this.applyAccountDetails = serverGroup => {
-        return AccountService.getAccountDetails(serverGroup.account).then(details => {
+      this.applyAccountDetails = (serverGroup) => {
+        return AccountService.getAccountDetails(serverGroup.account).then((details) => {
           serverGroup.accountDetails = details;
         });
       };

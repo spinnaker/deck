@@ -1,11 +1,10 @@
 import React from 'react';
 
 import { CollapsibleSection, ModalInjector, Tooltip } from '@spinnaker/core';
-
 import { IScalingProcess } from 'amazon/domain';
-import { AutoScalingProcessService } from '../scalingProcesses/AutoScalingProcessService';
 
 import { IAmazonServerGroupDetailsSectionProps } from './IAmazonServerGroupDetailsSectionProps';
+import { AutoScalingProcessService } from '../scalingProcesses/AutoScalingProcessService';
 import { ScheduledAction } from '../scheduledAction/ScheduledAction';
 
 export interface IScheduledActionsDetailsSectionState {
@@ -29,8 +28,8 @@ export class ScheduledActionsDetailsSection extends React.Component<
     const scheduledActionsDisabled =
       serverGroup.scheduledActions.length > 0 &&
       autoScalingProcesses
-        .filter(p => !p.enabled)
-        .some(p => ['Launch', 'Terminate', 'ScheduledAction'].includes(p.name));
+        .filter((p) => !p.enabled)
+        .some((p) => ['Launch', 'Terminate', 'ScheduledAction'].includes(p.name));
 
     return { scheduledActionsDisabled };
   }

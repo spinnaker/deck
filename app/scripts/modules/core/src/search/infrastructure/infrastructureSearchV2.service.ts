@@ -1,18 +1,19 @@
 import { isEmpty } from 'lodash';
+import { uniqBy } from 'lodash';
 import { Observable, Subject } from 'rxjs';
 
-import { UrlBuilder, IQueryParams } from 'core/navigation';
+import { IQueryParams, UrlBuilder } from 'core/navigation';
 
 import { ISearchResultSet } from './infrastructureSearch.service';
 import { ISearchResult, ISearchResults } from '../search.service';
-import { SearchResultType } from '../searchResult/searchResultType';
 import { SearchStatus } from '../searchResult/SearchResults';
+import { SearchResultType } from '../searchResult/searchResultType';
 import { searchResultTypeRegistry } from '../searchResult/searchResultType.registry';
 
 export class InfrastructureSearchServiceV2 {
   private static EMPTY_RESULTS: ISearchResultSet[] = searchResultTypeRegistry
     .getAll()
-    .map(type => ({ type, results: [], status: SearchStatus.FINISHED }));
+    .map((type) => ({ type, results: [], status: SearchStatus.FINISHED }));
 
   public static search(apiParams: IQueryParams): Observable<ISearchResultSet> {
     if (isEmpty(apiParams)) {
@@ -33,8 +34,11 @@ export class InfrastructureSearchServiceV2 {
     };
 
     const makeResultSet = (searchResults: ISearchResults<any>, type: SearchResultType): ISearchResultSet => {
-      // Add URLs to each search result
-      const results = searchResults.results.map(result => addComputedAttributes(result, type));
+      // Add URLs to each search result (discard duplicate results)
+      const results = uniqBy(
+        searchResults.results.map((result) => addComputedAttributes(result, type)),
+        (r) => r.href,
+      );
       const query: string = apiParams.key as string;
       return { type, results, status: SearchStatus.FINISHED, query };
     };

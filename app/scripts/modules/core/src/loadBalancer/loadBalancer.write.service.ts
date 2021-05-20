@@ -1,9 +1,7 @@
-import { IPromise } from 'angular';
-
 import { Application } from 'core/application/application.model';
 import { ITask } from 'core/domain';
-import { IJob, TaskExecutor } from 'core/task/taskExecutor';
 import { IMoniker } from 'core/naming/IMoniker';
+import { IJob, TaskExecutor } from 'core/task/taskExecutor';
 
 export interface ILoadBalancerUpsertCommand extends IJob {
   name: string;
@@ -28,7 +26,7 @@ export interface ILoadBalancerDeleteCommand extends IJob {
 }
 
 export class LoadBalancerWriter {
-  public static deleteLoadBalancer(command: ILoadBalancerDeleteCommand, application: Application): ng.IPromise<ITask> {
+  public static deleteLoadBalancer(command: ILoadBalancerDeleteCommand, application: Application): PromiseLike<ITask> {
     command.type = 'deleteLoadBalancer';
 
     return TaskExecutor.executeTask({
@@ -43,7 +41,7 @@ export class LoadBalancerWriter {
     application: Application,
     descriptor: string,
     params: any = {},
-  ): IPromise<ITask> {
+  ): PromiseLike<ITask> {
     Object.assign(command, params);
     command.type = 'upsertLoadBalancer';
 

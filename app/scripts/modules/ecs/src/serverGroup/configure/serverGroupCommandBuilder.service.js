@@ -19,10 +19,10 @@ angular
     '$q',
     'instanceTypeService',
     'ecsServerGroupConfigurationService',
-    function($q, instanceTypeService, ecsServerGroupConfigurationService) {
+    function ($q, instanceTypeService, ecsServerGroupConfigurationService) {
       function reconcileUpstreamImages(image, upstreamImages) {
         if (image.fromContext) {
-          const matchingImage = upstreamImages.find(otherImage => image.stageId === otherImage.stageId);
+          const matchingImage = upstreamImages.find((otherImage) => image.stageId === otherImage.stageId);
 
           if (matchingImage) {
             image.cluster = matchingImage.cluster;
@@ -33,7 +33,7 @@ angular
             return null;
           }
         } else if (image.fromTrigger) {
-          const matchingImage = upstreamImages.find(otherImage => {
+          const matchingImage = upstreamImages.find((otherImage) => {
             return (
               image.registry === otherImage.registry &&
               image.repository === otherImage.repository &&
@@ -66,8 +66,8 @@ angular
             stageId: current.refId,
           });
         }
-        current.requisiteStageRefIds.forEach(function(id) {
-          const next = all.find(stage => stage.refId === id);
+        current.requisiteStageRefIds.forEach(function (id) {
+          const next = all.find((stage) => stage.refId === id);
           if (next) {
             result = result.concat(findUpstreamImages(next, all, visited));
           }
@@ -78,10 +78,10 @@ angular
 
       function findTriggerImages(triggers) {
         const result = triggers
-          .filter(trigger => {
+          .filter((trigger) => {
             return trigger.type === 'docker';
           })
-          .map(trigger => {
+          .map((trigger) => {
             return {
               fromTrigger: true,
               repository: trigger.repository,
@@ -113,7 +113,7 @@ angular
             preferredZones: preferredZonesLoader,
             credentialsKeyedByAccount: credentialsLoader,
           })
-          .then(function(asyncData) {
+          .then(function (asyncData) {
             const availabilityZones = asyncData.preferredZones;
 
             let defaultIamRole = 'None (No IAM role)';
@@ -149,6 +149,7 @@ angular
               ecsClusterName: '',
               targetGroup: '',
               copySourceScalingPoliciesAndActions: true,
+              preferSourceCapacity: true,
               useSourceCapacity: true,
               viewState: {
                 useAllImageSelection: false,
@@ -176,11 +177,9 @@ angular
         const pipelineCluster = _.cloneDeep(originalCluster);
         const region = Object.keys(pipelineCluster.availabilityZones)[0];
         // var instanceTypeCategoryLoader = instanceTypeService.getCategoryForInstanceType('ecs', pipelineCluster.instanceType);
-        const commandOptions = { account: pipelineCluster.account, region: region };
-        const asyncLoader = $q.all({ command: buildNewServerGroupCommand(application, commandOptions) });
 
-        return asyncLoader.then(function(asyncData) {
-          const command = asyncData.command;
+        const commandOptions = { account: pipelineCluster.account, region: region };
+        return buildNewServerGroupCommand(application, commandOptions).then(function (command) {
           const zones = pipelineCluster.availabilityZones[region];
           const usePreferredZones = zones.join(',') === command.availabilityZones.join(',');
 
@@ -192,7 +191,7 @@ angular
           }
 
           const viewState = {
-            instanceProfile: asyncData.instanceProfile,
+            instanceProfile: undefined,
             disableImageSelection: true,
             useSimpleCapacity:
               pipelineCluster.capacity.min === pipelineCluster.capacity.max &&
@@ -254,14 +253,10 @@ angular
       }
 
       function buildServerGroupCommandFromExisting(application, serverGroup, mode = 'clone') {
-        const commandOptions = { account: serverGroup.account, region: serverGroup.region };
-        const asyncLoader = $q.all({ command: buildNewServerGroupCommand(application, commandOptions) });
-
         // do NOT copy: deployment strategy. DO copy: account, region, cluster name, stack
         // TODO: query for & pull in ECS-specific data that would be useful, e.g, network mode, launch type
-        return asyncLoader.then(function(asyncData) {
-          const command = asyncData.command;
-
+        const commandOptions = { account: serverGroup.account, region: serverGroup.region };
+        return buildNewServerGroupCommand(application, commandOptions).then(function (command) {
           command.credentials = serverGroup.account;
           command.app = serverGroup.moniker.app;
           command.stack = serverGroup.moniker.stack;

@@ -1,9 +1,10 @@
-import { ICommonFormFieldProps } from './interface';
-import { firstDefined } from 'core/utils';
 import React from 'react';
+
+import { firstDefined } from 'core/utils';
 
 import { FormikFormField, IFormikFormFieldProps } from './FormikFormField';
 import { ExpressionError, ExpressionInput, ExpressionPreview, IExpressionChange, ISpelError } from '../inputs';
+import { ICommonFormFieldProps } from './interface';
 import { useValidationData } from '../validation';
 
 export interface IExpressionFieldProps {
@@ -42,8 +43,8 @@ export function FormikExpressionField(props: IFormikExpressionFieldProps) {
   return (
     <FormikFormField
       name={name}
-      input={inputProps => (
-        <ExpressionInput onExpressionChange={changes => setSpelData(changes)} context={context} {...inputProps} />
+      input={(inputProps) => (
+        <ExpressionInput onExpressionChange={(changes) => setSpelData(changes)} context={context} {...inputProps} />
       )}
       label={label}
       help={help}

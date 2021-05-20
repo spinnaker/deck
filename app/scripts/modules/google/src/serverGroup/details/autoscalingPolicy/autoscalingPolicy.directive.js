@@ -1,11 +1,13 @@
 'use strict';
 
 import { module } from 'angular';
+import ANGULAR_UI_BOOTSTRAP from 'angular-ui-bootstrap';
 
 import { ConfirmationModalService, SETTINGS } from '@spinnaker/core';
+
 import { GOOGLE_AUTOSCALINGPOLICY_AUTOSCALINGPOLICY_WRITE_SERVICE } from './../../../autoscalingPolicy/autoscalingPolicy.write.service';
+import { GCEProviderSettings } from '../../../gce.settings';
 import { GOOGLE_SERVERGROUP_DETAILS_AUTOSCALINGPOLICY_MODAL_UPSERTAUTOSCALINGPOLICY_MODAL_CONTROLLER } from './modal/upsertAutoscalingPolicy.modal.controller';
-import ANGULAR_UI_BOOTSTRAP from 'angular-ui-bootstrap';
 
 export const GOOGLE_SERVERGROUP_DETAILS_AUTOSCALINGPOLICY_AUTOSCALINGPOLICY_DIRECTIVE =
   'spinnaker.gce.instance.details.scalingPolicy.directive';
@@ -24,7 +26,7 @@ module(GOOGLE_SERVERGROUP_DETAILS_AUTOSCALINGPOLICY_AUTOSCALINGPOLICY_DIRECTIVE,
   controller: [
     '$uibModal',
     'gceAutoscalingPolicyWriter',
-    function($uibModal, gceAutoscalingPolicyWriter) {
+    function ($uibModal, gceAutoscalingPolicyWriter) {
       const policy = this.policy;
 
       policy.bases = [];
@@ -63,7 +65,7 @@ module(GOOGLE_SERVERGROUP_DETAILS_AUTOSCALINGPOLICY_AUTOSCALINGPOLICY_DIRECTIVE,
 
         if (policy.customMetricUtilizations.length > 0) {
           basis.targets = [];
-          policy.customMetricUtilizations.forEach(metric => {
+          policy.customMetricUtilizations.forEach((metric) => {
             let target = metric.metric + ': ' + metric.utilizationTarget;
 
             if (metric.utilizationTargetType === 'DELTA_PER_SECOND') {
@@ -79,21 +81,24 @@ module(GOOGLE_SERVERGROUP_DETAILS_AUTOSCALINGPOLICY_AUTOSCALINGPOLICY_DIRECTIVE,
         policy.bases.push(basis);
       }
 
-      this.scaleDownControlsEnabled = SETTINGS.feature.gceScaleDownControlsEnabled;
-      this.scaleDownControlsConfigured =
-        this.scaleDownControlsEnabled &&
-        policy.scaleDownControl &&
-        policy.scaleDownControl.timeWindowSec &&
-        policy.scaleDownControl.maxScaledDownReplicas &&
-        (policy.scaleDownControl.maxScaledDownReplicas.percent || policy.scaleDownControl.maxScaledDownReplicas.fixed);
+      this.scaleInControlsConfigured =
+        policy.scaleInControl &&
+        policy.scaleInControl.timeWindowSec &&
+        policy.scaleInControl.maxScaledInReplicas &&
+        (policy.scaleInControl.maxScaledInReplicas.percent || policy.scaleInControl.maxScaledInReplicas.fixed);
 
-      if (this.scaleDownControlsConfigured) {
-        this.maxScaledDownReplicasMessage = policy.scaleDownControl.maxScaledDownReplicas.percent
-          ? `${policy.scaleDownControl.maxScaledDownReplicas.percent}%`
-          : `${policy.scaleDownControl.maxScaledDownReplicas.fixed}`;
+      if (this.scaleInControlsConfigured) {
+        this.maxScaledInReplicasMessage = policy.scaleInControl.maxScaledInReplicas.percent
+          ? `${policy.scaleInControl.maxScaledInReplicas.percent}%`
+          : `${policy.scaleInControl.maxScaledInReplicas.fixed}`;
 
-        this.timeWindowSecMessage = `${policy.scaleDownControl.timeWindowSec} seconds`;
+        this.timeWindowSecMessage = `${policy.scaleInControl.timeWindowSec} seconds`;
       }
+
+      this.predictiveAutoscalingEnabled =
+        GCEProviderSettings.feature.predictiveAutoscaling &&
+        policy.cpuUtilization &&
+        policy.cpuUtilization.predictiveMethod;
 
       this.editPolicy = () => {
         $uibModal.open({

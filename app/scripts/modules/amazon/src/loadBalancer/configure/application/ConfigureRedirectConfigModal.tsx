@@ -1,21 +1,20 @@
-import React from 'react';
-import { Modal } from 'react-bootstrap';
 import { Form } from 'formik';
 import { pickBy } from 'lodash';
+import React from 'react';
+import { Modal } from 'react-bootstrap';
 
 import {
-  TextInput,
   FormikFormField,
+  HelpField,
   ModalClose,
-  ReactModal,
-  SubmitButton,
   noop,
+  ReactModal,
+  ReactSelectInput,
   SelectInput,
   SpinFormik,
-  HelpField,
-  ReactSelectInput,
+  SubmitButton,
+  TextInput,
 } from '@spinnaker/core';
-
 import { IRedirectActionConfig } from 'amazon/domain';
 
 import './ConfigureConfigModal.css';
@@ -84,28 +83,28 @@ export class ConfigureRedirectConfigModal extends React.Component<IConfigureRedi
                   name="host"
                   label="Host"
                   required={false}
-                  input={props => <TextInput {...props} />}
+                  input={(props) => <TextInput {...props} />}
                   help={<HelpField id="aws.loadBalancer.redirect.host" />}
                 />
                 <FormikFormField
                   name="path"
                   label="Path"
                   required={false}
-                  input={props => <TextInput {...props} />}
+                  input={(props) => <TextInput {...props} />}
                   help={<HelpField id="aws.loadBalancer.redirect.path" />}
                 />
                 <FormikFormField
                   name="port"
                   label="Port"
                   required={false}
-                  input={props => <TextInput {...props} />}
+                  input={(props) => <TextInput {...props} />}
                   help={<HelpField id="aws.loadBalancer.redirect.port" />}
                 />
                 <FormikFormField
                   name="protocol"
                   label="Protocol"
                   required={false}
-                  input={props => (
+                  input={(props) => (
                     <ReactSelectInput
                       {...props}
                       stringOptions={['HTTP', 'HTTPS', '#{protocol}']}
@@ -120,14 +119,14 @@ export class ConfigureRedirectConfigModal extends React.Component<IConfigureRedi
                   name="query"
                   label="Query"
                   required={false}
-                  input={props => <TextInput {...props} />}
+                  input={(props) => <TextInput {...props} />}
                   help={<HelpField id="aws.loadBalancer.redirect.query" />}
                 />
                 <FormikFormField
                   name="statusCode"
                   label="Status Code"
                   required={true}
-                  input={props => <SelectInput {...props} options={['HTTP_301', 'HTTP_302']} />}
+                  input={(props) => <SelectInput {...props} options={['HTTP_301', 'HTTP_302']} />}
                   help={<HelpField id="aws.loadBalancer.redirect.statusCode" />}
                 />
               </Modal.Body>

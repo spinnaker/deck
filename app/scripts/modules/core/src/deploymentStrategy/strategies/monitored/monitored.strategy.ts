@@ -1,7 +1,7 @@
-import { isEmpty, defaultsDeep } from 'lodash';
-import { DeploymentStrategyRegistry } from '../../deploymentStrategy.registry';
+import { defaultsDeep, isEmpty } from 'lodash';
 
 import { AdditionalFields, RollbackType } from './AdditionalFields';
+import { DeploymentStrategyRegistry } from '../../deploymentStrategy.registry';
 
 DeploymentStrategyRegistry.registerStrategy({
   label: 'Monitored Deploy',
@@ -10,7 +10,7 @@ DeploymentStrategyRegistry.registerStrategy({
   providerRestricted: true,
   additionalFields: ['deploySteps', 'scaleDown'],
   AdditionalFieldsComponent: AdditionalFields,
-  initializationMethod: command => {
+  initializationMethod: (command) => {
     defaultsDeep(command, {
       failureActions: {
         destroyInstances: false,

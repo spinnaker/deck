@@ -1,10 +1,17 @@
 import { module } from 'angular';
 import { react2angular } from 'react2angular';
 
+import { withErrorBoundary } from 'core/presentation/SpinErrorBoundary';
+
 import { DeploymentStrategySelector } from './DeploymentStrategySelector';
 
 export const DEPLOYMENT_STRATEGY_SELECTOR_COMPONENT = 'spinnaker.core.deploymentStrategy.deploymentStrategySelector';
 module(DEPLOYMENT_STRATEGY_SELECTOR_COMPONENT, []).component(
   'deploymentStrategySelector',
-  react2angular(DeploymentStrategySelector, ['command', 'onStrategyChange', 'labelColumns', 'fieldColumns']),
+  react2angular(withErrorBoundary(DeploymentStrategySelector, 'deploymentStrategySelector'), [
+    'command',
+    'onStrategyChange',
+    'labelColumns',
+    'fieldColumns',
+  ]),
 );

@@ -1,8 +1,10 @@
+import { get } from 'lodash';
 import React from 'react';
 import { Modal } from 'react-bootstrap';
-import { get } from 'lodash';
+
 import { IPipelineTemplateV2 } from 'core/domain/IPipelineTemplateV2';
 import { ModalClose } from 'core/modal';
+
 import { PipelineTemplateWriter } from '../PipelineTemplateWriter';
 
 import './DeletePipelineTemplateV2Modal.less';
@@ -30,7 +32,7 @@ export class DeletePipelineTemplateV2Modal extends React.Component<
   private deleteTemplate = () => {
     PipelineTemplateWriter.deleteTemplate(this.props.template).then(
       () => this.props.onClose(),
-      err => this.setState({ deleteError: err }),
+      (err) => this.setState({ deleteError: err }),
     );
   };
 

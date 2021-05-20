@@ -1,17 +1,17 @@
-import React from 'react';
 import { get, has } from 'lodash';
+import React from 'react';
 import { Option } from 'react-select';
-import { IPromise } from 'angular';
 
 import { IExecution, IPipeline, IPipelineTrigger } from 'core/domain';
-import { ITriggerTemplateComponentProps } from '../../../manualExecution/TriggerTemplate';
-import { PipelineConfigService } from '../../services/PipelineConfigService';
-import { ReactInjector } from 'core/reactShims';
-import { Spinner } from 'core/widgets/spinners/Spinner';
-import { ExecutionBuildTitle } from '../../../executionBuild/ExecutionBuildTitle';
-import { timestamp } from 'core/utils/timeFormatters';
 import { TetheredSelect } from 'core/presentation/TetheredSelect';
+import { ReactInjector } from 'core/reactShims';
+import { timestamp } from 'core/utils/timeFormatters';
+import { Spinner } from 'core/widgets/spinners/Spinner';
+
+import { ExecutionBuildTitle } from '../../../executionBuild/ExecutionBuildTitle';
+import { ITriggerTemplateComponentProps } from '../../../manualExecution/TriggerTemplate';
 import { ExecutionsTransformer } from '../../../service/ExecutionsTransformer';
+import { PipelineConfigService } from '../../services/PipelineConfigService';
 
 export interface IPipelineTriggerTemplateState {
   executions: IExecution[];
@@ -24,14 +24,14 @@ export class PipelineTriggerTemplate extends React.Component<
   ITriggerTemplateComponentProps,
   IPipelineTriggerTemplateState
 > {
-  public static formatLabel(trigger: IPipelineTrigger): IPromise<string> {
+  public static formatLabel(trigger: IPipelineTrigger): PromiseLike<string> {
     // if this is a re-run, the trigger info will be on the parentExecution; otherwise, check the trigger itself
     // (normalization occurs in the pipelineTriggerOptions component, but that renders after this method is called)
     const application = get(trigger, 'parentExecution.application', trigger.application);
     const pipelineConfigId = get(trigger, 'parentExecution.pipelineConfigId', trigger.pipeline);
 
     const loadSuccess = (pipelines: IPipeline[]) => {
-      const pipeline = pipelines.find(config => config.id === pipelineConfigId);
+      const pipeline = pipelines.find((config) => config.id === pipelineConfigId);
       return pipeline ? `(Pipeline) ${application}: ${pipeline.name}` : '[pipeline not found]';
     };
 
@@ -93,9 +93,9 @@ export class PipelineTriggerTemplate extends React.Component<
     const trigger = this.props.command.trigger as IPipelineTrigger;
 
     if (executions.length) {
-      executions.forEach(execution => ExecutionsTransformer.addBuildInfo(execution));
+      executions.forEach((execution) => ExecutionsTransformer.addBuildInfo(execution));
       // default to what is supplied by the trigger if possible; otherwise, use the latest
-      const defaultSelection = executions.find(e => e.id === trigger.parentPipelineId) || executions[0];
+      const defaultSelection = executions.find((e) => e.id === trigger.parentPipelineId) || executions[0];
       newState.selectedExecution = defaultSelection.id;
       this.updateSelectedExecution(defaultSelection);
     }
@@ -123,7 +123,7 @@ export class PipelineTriggerTemplate extends React.Component<
   };
 
   private getExecutionFromId = (id: string) => {
-    return this.state.executions.find(e => e.id === id);
+    return this.state.executions.find((e) => e.id === id);
   };
 
   private optionRenderer = (option: Option<string>) => {
@@ -160,7 +160,7 @@ export class PipelineTriggerTemplate extends React.Component<
   public render() {
     const { executions, executionsLoading, loadError, selectedExecution } = this.state;
 
-    const options = executions.map(execution => {
+    const options = executions.map((execution) => {
       return {
         value: execution.id,
       };

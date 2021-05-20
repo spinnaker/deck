@@ -1,22 +1,26 @@
-import React from 'react';
+import { isNumber } from 'lodash';
+import React, { useMemo } from 'react';
 import ReactDOM from 'react-dom';
 import { CSSTransition } from 'react-transition-group';
 
-const { useMemo } = React;
-
-import { useEventListener, useContainerClassNames, useLatestCallback, TabBoundary } from 'core/presentation';
-
 import { ModalContext } from './ModalContext';
-import styles from './Modal.module.css';
+import { TabBoundary } from '../TabBoundary';
+import { useContainerClassNames, useEventListener, useLatestCallback } from '../hooks';
+
+import './Modal.less';
+
+const DEFAULT_MAX_WIDTH = '1400px';
 
 export interface IModalProps {
   isOpen: boolean;
+  maxWidth?: number | string;
   onRequestClose?: () => any;
+  onAfterClose?: () => any;
   children?: React.ReactNode;
 }
 
-export const Modal = ({ onRequestClose, isOpen, children }: IModalProps) => {
-  useContainerClassNames(isOpen ? [styles.backdropBlurEffect] : []);
+export const Modal = ({ isOpen, maxWidth, onRequestClose, onAfterClose, children }: IModalProps) => {
+  useContainerClassNames(isOpen ? ['sp-modal-backdrop-blur-effect'] : []);
 
   const keydownCallback = ({ keyCode }: KeyboardEvent) => {
     if (keyCode === 27 /* esc */) {
@@ -32,12 +36,19 @@ export const Modal = ({ onRequestClose, isOpen, children }: IModalProps) => {
     <ModalContext.Provider value={modalContext}>
       {ReactDOM.createPortal(
         <TabBoundary>
-          <CSSTransition in={isOpen} timeout={300} mountOnEnter={true} unmountOnExit={true} classNames={styles}>
-            <div className={styles.backdrop} />
+          <CSSTransition in={isOpen} timeout={300} mountOnEnter={true} unmountOnExit={true}>
+            <div className="sp-modal-backdrop" />
           </CSSTransition>
-          <CSSTransition in={isOpen} timeout={300} mountOnEnter={true} unmountOnExit={true} classNames={styles}>
-            <div className={styles.dialogWrapper}>
-              <div className={styles.dialog}>{children}</div>
+          <CSSTransition in={isOpen} timeout={300} mountOnEnter={true} unmountOnExit={true} onExited={onAfterClose}>
+            <div className="Modal">
+              <div
+                className="sp-dialog-sizer"
+                style={{
+                  maxWidth: (isNumber(maxWidth) ? `${maxWidth}px` : maxWidth) ?? DEFAULT_MAX_WIDTH,
+                }}
+              >
+                <div className="sp-dialog-content">{children}</div>
+              </div>
             </div>
           </CSSTransition>
         </TabBoundary>,

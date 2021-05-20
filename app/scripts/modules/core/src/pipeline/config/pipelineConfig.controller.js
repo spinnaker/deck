@@ -1,13 +1,12 @@
 'use strict';
 
-import _ from 'lodash';
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
+import { module } from 'angular';
 import { hri as HumanReadableIds } from 'human-readable-ids';
+import _ from 'lodash';
 
 import { PipelineTemplateReader } from './templates/PipelineTemplateReader';
-import { PipelineTemplateV2Service } from 'core/pipeline';
-import UIROUTER_ANGULARJS from '@uirouter/angularjs';
-
-import { module } from 'angular';
+import { PipelineTemplateV2Service } from './templates/v2/pipelineTemplateV2.service';
 
 export const CORE_PIPELINE_CONFIG_PIPELINECONFIG_CONTROLLER = 'spinnaker.core.pipeline.config.controller';
 export const name = CORE_PIPELINE_CONFIG_PIPELINECONFIG_CONTROLLER; // for backwards compatibility
@@ -16,13 +15,13 @@ module(CORE_PIPELINE_CONFIG_PIPELINECONFIG_CONTROLLER, [UIROUTER_ANGULARJS]).con
   '$state',
   '$stateParams',
   'app',
-  function($scope, $state, $stateParams, app) {
+  function ($scope, $state, $stateParams, app) {
     this.application = app;
     this.state = {
       pipelinesLoaded: false,
     };
 
-    this.containsJinja = source => source && (source.includes('{{') || source.includes('{%'));
+    this.containsJinja = (source) => source && (source.includes('{{') || source.includes('{%'));
 
     this.initialize = () => {
       this.pipelineConfig = _.find(app.pipelineConfigs.data, { id: $stateParams.pipelineId });
@@ -54,8 +53,8 @@ module(CORE_PIPELINE_CONFIG_PIPELINECONFIG_CONTROLLER, [UIROUTER_ANGULARJS]).con
 
         if (!this.pipelineConfig.isNew || isV2PipelineConfig) {
           return PipelineTemplateReader.getPipelinePlan(this.pipelineConfig, $stateParams.executionId)
-            .then(plan => (this.pipelinePlan = plan))
-            .catch(error => {
+            .then((plan) => (this.pipelinePlan = plan))
+            .catch((error) => {
               this.templateError = error;
               this.pipelineConfig.isNew = true;
             });
@@ -74,7 +73,7 @@ module(CORE_PIPELINE_CONFIG_PIPELINECONFIG_CONTROLLER, [UIROUTER_ANGULARJS]).con
     if (!app.notFound && !app.hasError) {
       app.pipelineConfigs.activate();
       app.pipelineConfigs
-        .ready()
+        .refresh()
         .then(this.initialize)
         .then(() => (this.state.pipelinesLoaded = true));
     }

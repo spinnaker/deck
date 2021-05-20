@@ -1,4 +1,4 @@
-import { module, IController, IComponentOptions } from 'angular';
+import { IComponentOptions, IController, module } from 'angular';
 
 import { AccountService } from './AccountService';
 
@@ -10,7 +10,7 @@ class AccountTagController implements IController {
   public accountType: string;
 
   public $onInit(): void {
-    AccountService.challengeDestructiveActions(this.account).then(isProdAccount => {
+    AccountService.challengeDestructiveActions(this.account).then((isProdAccount) => {
       this.accountType = isProdAccount ? 'prod' : this.account;
     });
   }

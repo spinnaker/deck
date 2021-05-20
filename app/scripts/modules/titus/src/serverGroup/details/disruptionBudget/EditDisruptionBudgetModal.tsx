@@ -3,20 +3,20 @@ import { Modal } from 'react-bootstrap';
 
 import {
   Application,
-  TaskMonitor,
   IJob,
   IModalComponentProps,
   ModalClose,
-  SubmitButton,
-  SpinFormik,
   NgReact,
   ReactModal,
+  SpinFormik,
+  SubmitButton,
   TaskExecutor,
+  TaskMonitor,
 } from '@spinnaker/core';
-
-import { JobDisruptionBudget } from '../../configure/wizard/pages/disruptionBudget/JobDisruptionBudget';
-import { ITitusServerGroupCommand } from '../../configure/serverGroupConfiguration.service';
 import { ITitusServerGroup } from 'titus/domain';
+
+import { ITitusServerGroupCommand } from '../../configure/serverGroupConfiguration.service';
+import { JobDisruptionBudget } from '../../configure/wizard/pages/disruptionBudget/JobDisruptionBudget';
 
 export interface IEditDisruptionBudgetModalProps extends IModalComponentProps {
   application: Application;
@@ -65,7 +65,7 @@ export class EditDisruptionBudgetModal extends React.Component<IEditDisruptionBu
         <SpinFormik<ITitusServerGroupCommand>
           initialValues={command}
           onSubmit={(values: ITitusServerGroupCommand) => this.submit(values, taskMonitor)}
-          render={formik => (
+          render={(formik) => (
             <>
               <ModalClose dismiss={dismissModal} />
               <Modal.Header>

@@ -1,14 +1,13 @@
-import React from 'react';
 import classNames from 'classnames';
 import { FormikProps } from 'formik';
 import { isEqual, pick } from 'lodash';
+import React from 'react';
 import { Option } from 'react-select';
 
 import { Application } from 'core/application';
 import { SETTINGS } from 'core/config/settings';
 import { IExpectedArtifact, IPipeline, ITrigger, ITriggerTypeConfig } from 'core/domain';
 import { HelpField } from 'core/help/HelpField';
-import { TriggerArtifactConstraintSelectorInput } from './artifacts';
 import {
   CheckboxInput,
   FormField,
@@ -23,6 +22,8 @@ import {
 import { Registry } from 'core/registry';
 
 import { RunAsUserInput } from './RunAsUser';
+import { TriggerArtifactConstraintSelectorInput } from './artifacts';
+
 import './Trigger.less';
 
 export interface ITriggerProps {
@@ -30,14 +31,18 @@ export interface ITriggerProps {
   index: number;
   pipeline: IPipeline;
   removeTrigger: (index: number) => void;
-  trigger: ITrigger;
-  updateExpectedArtifacts: (expectedArtifacts: IExpectedArtifact[]) => void;
+  triggerInitialValues: ITrigger;
   updateTrigger: (index: number, changes: { [key: string]: any }) => void;
+  addExpectedArtifact: (artifact: IExpectedArtifact) => void;
+  updateExpectedArtifact: (artifact: IExpectedArtifact) => void;
+  removeExpectedArtifact: (artifact: IExpectedArtifact) => void;
 }
 
 export const Trigger = (props: ITriggerProps) => {
   function getValidateFn() {
-    const triggerType = Registry.pipeline.getTriggerTypes().find(type => type.key === props.trigger.type);
+    const triggerType = Registry.pipeline
+      .getTriggerTypes()
+      .find((type) => type.key === props.triggerInitialValues.type);
     const validateWithContext = (values: ITrigger) => triggerType.validateFn(values, { pipeline: props.pipeline });
     return triggerType && triggerType.validateFn ? validateWithContext : undefined;
   }
@@ -45,9 +50,9 @@ export const Trigger = (props: ITriggerProps) => {
   return (
     <SpinFormik<ITrigger>
       onSubmit={() => null}
-      initialValues={props.trigger}
+      initialValues={props.triggerInitialValues}
       validate={getValidateFn()}
-      render={formik => <TriggerForm {...props} formik={formik} />}
+      render={(formik) => <TriggerForm {...props} formik={formik} />}
     />
   );
 };
@@ -63,12 +68,20 @@ const commonTriggerFields: Array<keyof ITrigger> = [
 ];
 
 function TriggerForm(triggerFormProps: ITriggerProps & { formik: FormikProps<ITrigger> }) {
-  const { formik, pipeline, index, updateTrigger, updateExpectedArtifacts } = triggerFormProps;
+  const {
+    formik,
+    pipeline,
+    index,
+    updateTrigger,
+    addExpectedArtifact,
+    updateExpectedArtifact,
+    removeExpectedArtifact,
+  } = triggerFormProps;
   const trigger = formik.values as Readonly<ITrigger>;
 
   const { type } = trigger;
   const triggerTypes = React.useMemo(() => Registry.pipeline.getTriggerTypes(), []);
-  const triggerConfig = React.useMemo(() => triggerTypes.find(x => x.key === trigger.type), [
+  const triggerConfig = React.useMemo(() => triggerTypes.find((x) => x.key === trigger.type), [
     triggerTypes,
     trigger.type,
   ]);
@@ -87,6 +100,13 @@ function TriggerForm(triggerFormProps: ITriggerProps & { formik: FormikProps<ITr
     formik.setValues(updatedTrigger);
   };
 
+  const updateTriggerExpectedArtifacts = (availableExpectedArtifactIds: string[]) => {
+    formik.setFieldValue(
+      'expectedArtifactIds',
+      (trigger.expectedArtifactIds || []).filter((artifactId) => availableExpectedArtifactIds.includes(artifactId)),
+    );
+  };
+
   const triggerComponentProps = {
     ...triggerFormProps,
     trigger: formik.values,
@@ -99,42 +119,23 @@ function TriggerForm(triggerFormProps: ITriggerProps & { formik: FormikProps<ITr
   // The actual trigger component for the specific trigger type
   const TriggerComponent = (triggerConfig && triggerConfig.component) || EmptyComponent;
 
-  const defineExpectedArtifact = (expectedArtifact: IExpectedArtifact) => {
-    const pipelineExpectedArtifacts = (pipeline.expectedArtifacts || []).slice();
-    const triggerExpectedArtifactIds = (trigger.expectedArtifactIds || []).slice();
-
-    const editArtifactIdx = pipelineExpectedArtifacts.findIndex(artifact => artifact.id === expectedArtifact.id);
-
-    if (editArtifactIdx !== -1) {
-      pipelineExpectedArtifacts.splice(editArtifactIdx, 1, expectedArtifact);
-    } else {
-      pipelineExpectedArtifacts.push(expectedArtifact);
-      triggerExpectedArtifactIds.push(expectedArtifact.id);
-    }
-
-    updateExpectedArtifacts(pipelineExpectedArtifacts);
-    updateTriggerFields({ expectedArtifactIds: triggerExpectedArtifactIds });
-  };
-
   const showRunAsUser = SETTINGS.feature.fiatEnabled && !SETTINGS.feature.managedServiceAccounts;
   const fieldSetClassName = classNames({ 'templated-pipeline-item': trigger.inherited, Trigger: true });
 
-  const expectedArtifactOptions =
-    pipeline.expectedArtifacts && pipeline.expectedArtifacts.map(e => ({ label: e.displayName, value: e.id }));
-
-  const showArtifactConstraints = SETTINGS.feature['artifactsRewrite'];
-  const showOldArtifactConstraints =
-    !showArtifactConstraints &&
-    SETTINGS.feature['artifacts'] &&
-    pipeline.expectedArtifacts &&
-    pipeline.expectedArtifacts.length > 0;
+  const availableExpectedArtifacts = pipeline.expectedArtifacts || [];
+  const availableExpectedArtifactIds = availableExpectedArtifacts.map((a) => a.id);
 
   return (
     <fieldset disabled={trigger.inherited} className={fieldSetClassName}>
       <WatchValue
         value={trigger}
         isEqual={isEqual} // deep compare
-        onChange={updatedTrigger => updateTrigger(index, updatedTrigger)}
+        onChange={(updatedTrigger) => updateTrigger(index, updatedTrigger)}
+      />
+      <WatchValue
+        value={availableExpectedArtifactIds}
+        isEqual={isEqual} // deep compare
+        onChange={updateTriggerExpectedArtifacts}
       />
 
       <div className="form-horizontal panel-pipeline-phase">
@@ -148,8 +149,8 @@ function TriggerForm(triggerFormProps: ITriggerProps & { formik: FormikProps<ITr
             )
           }
           value={trigger.type}
-          onChange={e => handleTypeChange(e.target.value)}
-          input={props => <TriggerTypeSelectInput {...props} triggerConfig={triggerConfig} />}
+          onChange={(e) => handleTypeChange(e.target.value)}
+          input={(props) => <TriggerTypeSelectInput {...props} triggerConfig={triggerConfig} />}
         />
 
         <TriggerComponent {...triggerComponentProps} />
@@ -159,35 +160,25 @@ function TriggerForm(triggerFormProps: ITriggerProps & { formik: FormikProps<ITr
             name="runAsUser"
             label="Run As User"
             help={<HelpField id="pipeline.config.trigger.runAsUser" />}
-            input={props => <RunAsUserInput {...props} />}
+            input={(props) => <RunAsUserInput {...props} application={triggerFormProps.application.name} />}
           />
         )}
 
-        {showOldArtifactConstraints && (
-          <FormikFormField
-            name="expectedArtifactIds"
-            label="Artifact Constraints"
-            help={<HelpField id="pipeline.config.expectedArtifact" />}
-            input={props => <ReactSelectInput {...props} multi={true} options={expectedArtifactOptions} />}
-          />
-        )}
-
-        {showArtifactConstraints && (
-          <FormikFormField
-            fastField={false}
-            name="expectedArtifactIds"
-            label="Artifact Constraints"
-            help={<HelpField id="pipeline.config.expectedArtifact" />}
-            input={props => (
-              <TriggerArtifactConstraintSelectorInput
-                {...props}
-                pipeline={pipeline}
-                triggerType={trigger.type}
-                onDefineExpectedArtifact={defineExpectedArtifact}
-              />
-            )}
-          />
-        )}
+        <FormikFormField
+          name="expectedArtifactIds"
+          label="Artifact Constraints"
+          help={<HelpField id="pipeline.config.expectedArtifact" />}
+          input={(props) => (
+            <TriggerArtifactConstraintSelectorInput
+              {...props}
+              pipeline={pipeline}
+              triggerType={trigger.type}
+              addExpectedArtifact={addExpectedArtifact}
+              updateExpectedArtifact={updateExpectedArtifact}
+              removeExpectedArtifact={removeExpectedArtifact}
+            />
+          )}
+        />
 
         {type && disableAutoTriggering.includes(type) && <AutoTriggeringDisabledMessage />}
 
@@ -196,7 +187,9 @@ function TriggerForm(triggerFormProps: ITriggerProps & { formik: FormikProps<ITr
             label=""
             value={trigger.enabled}
             onChange={() => formik.setFieldValue('enabled', !trigger.enabled)}
-            input={props => <CheckboxInput {...props} text="Trigger Enabled" />}
+            input={(props) => (
+              <CheckboxInput {...props} inputClassName="enable-trigger-checkbox" text="Trigger Enabled" />
+            )}
           />
         )}
       </div>
@@ -207,7 +200,7 @@ function TriggerForm(triggerFormProps: ITriggerProps & { formik: FormikProps<ITr
 function TriggerTypeSelectInput(props: IFormInputProps & { triggerConfig: ITriggerTypeConfig }) {
   const triggerTypes = Registry.pipeline
     .getTriggerTypes()
-    .map(t => ({ label: t.label, value: t.key, description: t.description }));
+    .map((t) => ({ label: t.label, value: t.key, description: t.description }));
 
   const optionRenderer = (option: Option<any>) => (
     <p className="flex-container-h baseline margin-between-md">

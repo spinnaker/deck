@@ -1,5 +1,5 @@
+import { get, has } from 'lodash';
 import React from 'react';
-import { has, get } from 'lodash';
 
 import {
   AccountTag,
@@ -10,7 +10,6 @@ import {
   SETTINGS,
   timestamp,
 } from '@spinnaker/core';
-
 import { IAmazonServerGroupView } from 'amazon/domain';
 import { VpcTag } from 'amazon/vpc/VpcTag';
 
@@ -58,7 +57,7 @@ export class AmazonInfoDetailsSection extends React.Component<
 
     return (
       <CollapsibleSection heading="Server Group Information" defaultExpanded={true}>
-        <dl className="dl-horizontal dl-flex">
+        <dl className="dl-horizontal dl-narrow">
           <dt>Created</dt>
           <dd>{timestamp(serverGroup.createdTime)}</dd>
           {showEntityTags && <EntitySource metadata={entityTags.creationMetadata} />}
@@ -85,7 +84,7 @@ export class AmazonInfoDetailsSection extends React.Component<
           {serverGroup.asg && (
             <dd>
               <ul>
-                {serverGroup.asg.availabilityZones.map(zone => (
+                {serverGroup.asg.availabilityZones.map((zone) => (
                   <li key={zone}>{zone}</li>
                 ))}
               </ul>

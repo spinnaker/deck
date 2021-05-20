@@ -1,22 +1,24 @@
-'use strict';
-
-import _ from 'lodash';
-
 import * as angular from 'angular';
+import _ from 'lodash';
+import { react2angular } from 'react2angular';
 
-import { FirewallLabels } from 'core/securityGroup/label';
-import { SEARCH_RANK_FILTER } from '../searchRank.filter';
+import { InsightMenu as SearchInsightMenu } from 'core/insight/InsightMenu';
 import { OVERRIDE_REGISTRY } from 'core/overrideRegistry/override.registry';
 import { PAGE_TITLE_SERVICE } from 'core/pageTitle/pageTitle.service';
-import { INFRASTRUCTURE_SEARCH_SERVICE } from './infrastructureSearch.service';
+import { withErrorBoundary } from 'core/presentation/SpinErrorBoundary';
+import { ConfigureProjectModal } from 'core/projects';
+import { FirewallLabels } from 'core/securityGroup/label';
+import { ClusterState } from 'core/state';
 import { SPINNER_COMPONENT } from 'core/widgets/spinners/spinner.component';
-import { SEARCH_RESULT_COMPONENT } from '../infrastructure/searchResult.component';
+
 import { PROJECT_SUMMARY_POD_COMPONENT } from '../infrastructure/projectSummaryPod.component';
 import { RECENTLY_VIEWED_ITEMS_COMPONENT } from '../infrastructure/recentlyViewedItems.component';
-import { ClusterState } from 'core/state';
-
+import { SEARCH_RESULT_COMPONENT } from '../infrastructure/searchResult.component';
+import { INFRASTRUCTURE_SEARCH_SERVICE } from './infrastructureSearch.service';
 import { SearchService } from '../search.service';
-import { ConfigureProjectModal } from 'core/projects';
+import { SEARCH_RANK_FILTER } from '../searchRank.filter';
+
+('use strict');
 
 export const CORE_SEARCH_INFRASTRUCTURE_INFRASTRUCTURE_CONTROLLER = 'spinnaker.search.infrastructure.controller';
 export const name = CORE_SEARCH_INFRASTRUCTURE_INFRASTRUCTURE_CONTROLLER; // for backwards compatibility
@@ -31,6 +33,14 @@ angular
     RECENTLY_VIEWED_ITEMS_COMPONENT,
     SPINNER_COMPONENT,
   ])
+  .component(
+    'searchInsightMenu',
+    react2angular(withErrorBoundary(SearchInsightMenu, 'searchInsightMenu'), [
+      'createApp',
+      'createProject',
+      'refreshCaches',
+    ]),
+  )
   .controller('InfrastructureCtrl', [
     '$scope',
     'infrastructureSearchService',
@@ -40,7 +50,7 @@ angular
     'pageTitleService',
     '$uibModal',
     '$state',
-    function(
+    function (
       $scope,
       infrastructureSearchService,
       $stateParams,
@@ -62,7 +72,7 @@ angular
         minCharactersToSearch: 3,
       };
 
-      this.clearFilters = r => ClusterState.filterService.overrideFiltersForUrl(r);
+      this.clearFilters = (r) => ClusterState.filterService.overrideFiltersForUrl(r);
 
       function updateLocation() {
         $location.search('q', $scope.query || null);
@@ -79,7 +89,7 @@ angular
         // we don't want to automatically route the user or have them copy this as a link
         $location.search('route', null);
       }
-      $scope.$watch('query', function(query) {
+      $scope.$watch('query', function (query) {
         $scope.categories = [];
         $scope.projects = [];
         if (query && query.length < $scope.viewState.minCharactersToSearch) {
@@ -88,8 +98,8 @@ angular
           return;
         }
         $scope.viewState.searching = true;
-        search.query(query).then(function(resultSets) {
-          const allResults = _.flatten(resultSets.map(r => r.results));
+        search.query(query).then(function (resultSets) {
+          const allResults = _.flatten(resultSets.map((r) => r.results));
           if (allResults.length === 1 && autoNavigate) {
             $location.url(allResults[0].href.substring(1));
           } else {
@@ -98,13 +108,13 @@ angular
             autoNavigate = false;
           }
           $scope.categories = resultSets
-            .filter(resultSet => resultSet.type.id !== 'projects' && resultSet.results.length)
+            .filter((resultSet) => resultSet.type.id !== 'projects' && resultSet.results.length)
             .sort((a, b) => a.type.id - b.type.id);
           $scope.projects = resultSets.filter(
-            resultSet => resultSet.type.id === 'projects' && resultSet.results.length,
+            (resultSet) => resultSet.type.id === 'projects' && resultSet.results.length,
           );
           $scope.moreResults =
-            _.sumBy(resultSets, function(resultSet) {
+            _.sumBy(resultSets, function (resultSet) {
               return resultSet.results.length;
             }) === $scope.pageSize;
           updateLocation();
@@ -135,19 +145,19 @@ angular
       };
 
       function routeToApplication(app) {
-        $state.go('home.applications.application.insight.clusters', {
+        $state.go('home.applications.application', {
           application: app.name,
         });
       }
 
       this.menuActions = [
         {
-          displayName: 'Create Application',
-          action: this.createApplicationForTests,
-        },
-        {
           displayName: 'Create Project',
           action: this.createProject,
+        },
+        {
+          displayName: 'Create Application',
+          action: this.createApplicationForTests,
         },
       ];
 
@@ -160,10 +170,10 @@ angular
       this.showRecentResults = () =>
         !$scope.viewState.searching &&
         !$scope.projects.length &&
-        $scope.categories.every(category => !category.results.length);
+        $scope.categories.every((category) => !category.results.length);
     },
   ])
-  .directive('infrastructureSearchV1', function() {
+  .directive('infrastructureSearchV1', function () {
     return {
       restrict: 'E',
       templateUrl: require('./infrastructure.html'),

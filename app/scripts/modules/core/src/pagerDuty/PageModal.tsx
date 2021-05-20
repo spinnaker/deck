@@ -1,15 +1,16 @@
+import { get } from 'lodash';
 import React from 'react';
 import { Button, Modal } from 'react-bootstrap';
-import { get } from 'lodash';
 
 import { Application, ApplicationModelBuilder } from 'core/application';
-import { IPagerDutyService, PagerDutyWriter } from 'core/pagerDuty';
-import { NgReact, ReactInjector } from 'core/reactShims';
 import { SETTINGS } from 'core/config';
 import { SubmitButton } from 'core/modal';
+import { NgReact, ReactInjector } from 'core/reactShims';
 import { TaskMonitor } from 'core/task';
 
 import { IPageButtonProps } from './PageButton';
+import { IPagerDutyService } from './pagerDuty.read.service';
+import { PagerDutyWriter } from './pagerDuty.write.service';
 
 export interface IPageModalProps {
   applications?: Application[];
@@ -94,7 +95,7 @@ export class PageModal extends React.Component<IPageModalProps, IPageModalState>
 
       return PagerDutyWriter.sendPage(
         applications,
-        services.map(s => s.integration_key),
+        services.map((s) => s.integration_key),
         subject,
         ownerApp,
         {
@@ -131,7 +132,7 @@ export class PageModal extends React.Component<IPageModalProps, IPageModalState>
               <div>
                 <label>Services to Page</label>
                 <div>
-                  {services.map(service => (
+                  {services.map((service) => (
                     <span className="service-to-page" key={service.integration_key}>
                       <a
                         title={service.name}

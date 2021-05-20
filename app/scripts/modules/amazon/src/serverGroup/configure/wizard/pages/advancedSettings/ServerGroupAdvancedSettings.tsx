@@ -1,17 +1,18 @@
-import React from 'react';
 import { FormikProps } from 'formik';
+import React from 'react';
 
 import { Application, IWizardPageComponent } from '@spinnaker/core';
 
-import { IAmazonServerGroupCommand } from '../../../serverGroupConfiguration.service';
 import { ServerGroupAdvancedSettingsInner } from './ServerGroupAdvancedSettingsInner';
+import { IAmazonServerGroupCommand } from '../../../serverGroupConfiguration.service';
 
 export interface IServerGroupAdvancedSettingsProps {
   app: Application;
   formik: FormikProps<IAmazonServerGroupCommand>;
 }
 
-export class ServerGroupAdvancedSettings extends React.Component<IServerGroupAdvancedSettingsProps>
+export class ServerGroupAdvancedSettings
+  extends React.Component<IServerGroupAdvancedSettingsProps>
   implements IWizardPageComponent<IAmazonServerGroupCommand> {
   private ref: any = React.createRef();
 

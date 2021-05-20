@@ -1,13 +1,14 @@
 import { IController, IScope } from 'angular';
 import { extend } from 'lodash';
 import { $q } from 'ngimport';
+
 import {
-  ExpectedArtifactSelectorViewController,
-  NgGenericArtifactDelegate,
   AccountService,
+  ExpectedArtifactSelectorViewController,
   IAccountDetails,
   IArtifact,
   IExpectedArtifact,
+  NgGenericArtifactDelegate,
 } from '@spinnaker/core';
 
 export class DeployCloudFormationStackConfigController implements IController {
@@ -30,7 +31,7 @@ export class DeployCloudFormationStackConfigController implements IController {
       accounts: AccountService.getAllAccountDetailsForProvider('aws'),
       artifactAccounts: AccountService.getArtifactAccounts(),
     };
-    $q.all(dataToFetch).then(backingData => {
+    $q.all(dataToFetch).then((backingData) => {
       const { accounts, artifactAccounts } = backingData;
       this.accounts = accounts;
       this.state.loaded = true;

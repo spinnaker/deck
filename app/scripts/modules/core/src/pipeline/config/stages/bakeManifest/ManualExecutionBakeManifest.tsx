@@ -1,15 +1,46 @@
 import React from 'react';
 
+import { IArtifact, IExpectedArtifact, ITrigger } from 'core/domain';
 import { CheckboxInput } from 'core/presentation';
+
 import { ITriggerTemplateComponentProps } from '../../../manualExecution/TriggerTemplate';
-import { IArtifact, IExpectedArtifact } from 'core/domain';
 import { HelmMatch } from '../../triggers/artifacts/helm/HelmArtifactEditor';
-import { BAKE_MANIFEST_STAGE_KEY } from './bakeManifestStage';
+import { HELM_TRIGGER_TYPE } from '../../triggers/helm/helm.trigger';
 
 const HelmEditor = HelmMatch.editCmp;
 
 export function ManualExecutionBakeManifest(props: ITriggerTemplateComponentProps) {
   const [overrideArtifact, setOverrideArtifact] = React.useState(true);
+
+  const defaultArtifact: IArtifact = React.useMemo(() => {
+    const expectedHelmArtifacts = (props.command.pipeline.expectedArtifacts || []).filter(
+      (artifact: IExpectedArtifact) => artifact.matchArtifact.type === HelmMatch.type,
+    );
+    if (expectedHelmArtifacts.length === 0) {
+      return null;
+    }
+    // If we have a Helm trigger configured, use the trigger's manual execution component instead
+    const helmTriggersConfigured = (props.command.pipeline.triggers || []).filter(
+      (trigger: ITrigger) => trigger.type === HELM_TRIGGER_TYPE,
+    );
+    if (helmTriggersConfigured.length !== 0) {
+      return null;
+    }
+    return {
+      ...expectedHelmArtifacts[0].matchArtifact,
+      version: null,
+    };
+  }, []);
+
+  React.useEffect(() => {
+    if (overrideArtifact === false) {
+      removeHelmArtifact();
+    } else if (defaultArtifact) {
+      updateHelmArtifact(defaultArtifact);
+    }
+  }, [defaultArtifact, overrideArtifact]);
+
+  const helmArtifact = (props.command.extraFields.artifacts || []).find((a: IArtifact) => a.type === HelmMatch.type);
 
   const updateHelmArtifact = (artifact: IArtifact) => {
     const updatedArtifacts = (props.command.extraFields.artifacts || []).filter(
@@ -26,35 +57,9 @@ export function ManualExecutionBakeManifest(props: ITriggerTemplateComponentProp
     props.updateCommand('extraFields.artifacts', updatedArtifacts);
   };
 
-  /*
-  Only allow manual override of a helm chart artifact when there is exactly one Helm
-  Bake (Manifest) stage and exactly one artifact of type `helm/chart`.
-   */
-  const bakeManifestStages = props.command.pipeline.stages.filter(stage => stage.type === BAKE_MANIFEST_STAGE_KEY);
-  if (bakeManifestStages.length !== 1 || bakeManifestStages[0].templateRenderer !== 'HELM2') {
+  if (!defaultArtifact) {
     return null;
   }
-  const expectedArtifacts = props.command.pipeline.expectedArtifacts || [];
-  const expectedHelmArtifacts = expectedArtifacts.filter(
-    (artifact: IExpectedArtifact) => artifact.matchArtifact.type === HelmMatch.type,
-  );
-  if (expectedHelmArtifacts.length !== 1) {
-    return null;
-  }
-
-  const helmArtifact = (props.command.extraFields.artifacts || []).find((a: IArtifact) => a.type === HelmMatch.type);
-  const defaultArtifact: IArtifact = {
-    ...expectedHelmArtifacts[0].matchArtifact,
-    version: null,
-  };
-
-  React.useEffect(() => {
-    if (overrideArtifact === false) {
-      removeHelmArtifact();
-    } else {
-      updateHelmArtifact(defaultArtifact);
-    }
-  }, [overrideArtifact]);
 
   return (
     <>
@@ -73,7 +78,7 @@ export function ManualExecutionBakeManifest(props: ITriggerTemplateComponentProp
           <div className="col-md-2" />
           <div className="col-md-10">
             <HelmEditor
-              account={{ name: expectedHelmArtifacts[0].matchArtifact.artifactAccount, types: [HelmMatch.type] }}
+              account={{ name: defaultArtifact.artifactAccount, types: [HelmMatch.type] }}
               artifact={helmArtifact || defaultArtifact}
               pipeline={props.command.pipeline}
               onChange={updateHelmArtifact}

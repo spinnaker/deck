@@ -1,24 +1,27 @@
 import { module } from 'angular';
 import { cloneDeep, groupBy, map, partition } from 'lodash';
 
+import { IGceHttpLoadBalancer, IGceLoadBalancer } from 'google/domain/loadBalancer';
+
 import { GCE_HTTP_LOAD_BALANCER_UTILS, GceHttpLoadBalancerUtils } from './httpLoadBalancerUtils.service';
-import { IGceLoadBalancer, IGceHttpLoadBalancer } from 'google/domain/loadBalancer';
 
 export class GceLoadBalancerSetTransformer {
   private static normalizeHttpLoadBalancerGroup(group: IGceHttpLoadBalancer[]): IGceHttpLoadBalancer {
     const normalized = cloneDeep(group[0]);
 
-    normalized.listeners = group.map(loadBalancer => {
+    normalized.listeners = group.map((loadBalancer) => {
       const port = loadBalancer.portRange ? GceLoadBalancerSetTransformer.parsePortRange(loadBalancer.portRange) : null;
       return {
         port,
         name: loadBalancer.name,
         certificate: loadBalancer.certificate,
         ipAddress: loadBalancer.ipAddress,
+        subnet: loadBalancer.subnet,
       };
     });
 
     normalized.name = normalized.urlMapName;
+    delete normalized.subnet;
     return normalized;
   }
 
@@ -30,7 +33,7 @@ export class GceLoadBalancerSetTransformer {
   constructor(private gceHttpLoadBalancerUtils: GceHttpLoadBalancerUtils) {}
 
   public normalizeLoadBalancerSet = (loadBalancers: IGceLoadBalancer[]): IGceLoadBalancer[] => {
-    const [httpLoadBalancers, otherLoadBalancers] = partition(loadBalancers, lb =>
+    const [httpLoadBalancers, otherLoadBalancers] = partition(loadBalancers, (lb) =>
       this.gceHttpLoadBalancerUtils.isHttpLoadBalancer(lb),
     );
 

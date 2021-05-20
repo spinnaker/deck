@@ -1,5 +1,5 @@
-import { IController, IComponentOptions, module } from 'angular';
-import { isEmpty } from 'lodash';
+import { IComponentOptions, IController, module } from 'angular';
+import { SETTINGS } from 'core/config/settings';
 
 export interface IBaseOsOption {
   id: string;
@@ -21,11 +21,19 @@ export class BakeStageChooseOSController implements IController {
   }
 
   public getBaseOsDescription(baseOsOption: IBaseOsOption): string {
-    const baseOsName = isEmpty(baseOsOption.displayName) ? baseOsOption.id : baseOsOption.displayName;
-    return baseOsName + (baseOsOption.shortDescription ? ' (' + baseOsOption.shortDescription + ')' : '');
+    const baseOsName = baseOsOption?.displayName || baseOsOption?.id || '';
+    if (baseOsOption?.shortDescription) {
+      return `${baseOsName} (${baseOsOption.shortDescription})`;
+    }
+    return baseOsName;
   }
   public getBaseOsDetailedDescription(baseOsOption: IBaseOsOption): string {
     return baseOsOption.detailedDescription + (baseOsOption.isImageFamily ? ' (family)' : '');
+  }
+
+  public getBaseOsDisabled(baseOsOption: IBaseOsOption): boolean {
+    const disabledImages = SETTINGS.disabledImages || [];
+    return disabledImages.includes(baseOsOption.id);
   }
 }
 

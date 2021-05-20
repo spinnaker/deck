@@ -1,9 +1,9 @@
 import React from 'react';
-import { useInternalValidator } from 'core/presentation';
-import { composeValidators, IValidator, Validators } from '../validation';
-import { IFormInputProps, OmitControlledInputPropsFrom } from './interface';
 
+import { useInternalValidator } from './hooks/useInternalValidator.hook';
+import { IFormInputProps, OmitControlledInputPropsFrom } from './interface';
 import { orEmptyString, validationClassName } from './utils';
+import { composeValidators, IValidator, Validators } from '../validation';
 
 import './NumberInput.css';
 
@@ -26,5 +26,5 @@ export function NumberInput(props: INumberInputProps) {
   useInternalValidator(validation, minMaxValidator);
 
   const className = `NumberInput form-control ${orEmptyString(inputClassName)} ${validationClassName(validation)}`;
-  return <input className={className} type="number" value={value} {...otherProps} />;
+  return <input className={className} type="number" value={orEmptyString(value)} {...otherProps} />;
 }

@@ -1,21 +1,21 @@
-import React from 'react';
-import Select, { Option, OptionValues, ReactSelectProps } from 'react-select';
-import VirtualizedSelect from 'react-virtualized-select';
 import { isNil } from 'lodash';
+import React from 'react';
+import Select, { Creatable, Option, OptionValues, ReactSelectProps } from 'react-select';
+import VirtualizedSelect from 'react-virtualized-select';
 
 import { noop } from 'core/utils';
 
+import { StringsAsOptions } from './StringsAsOptions';
+import { TetheredSelect } from '../../TetheredSelect';
 import { IFormInputProps, IFormInputValidation, OmitControlledInputPropsFrom } from './interface';
 import { createFakeReactSyntheticEvent, isStringArray, orEmptyString } from './utils';
-import { StringsAsOptions } from './StringsAsOptions';
 import { useValidationData } from '../validation';
-import { TetheredSelect } from '../../TetheredSelect';
 
 export interface IReactSelectInputProps<T = OptionValues>
   extends IFormInputProps,
     OmitControlledInputPropsFrom<ReactSelectProps<T>> {
   stringOptions?: string[];
-  mode?: 'TETHERED' | 'VIRTUALIZED' | 'PLAIN';
+  mode?: 'TETHERED' | 'VIRTUALIZED' | 'PLAIN' | 'CREATABLE';
 }
 
 // TODO: use standard css classes (from style guide?)
@@ -32,7 +32,7 @@ export const reactSelectValidationErrorStyle = {
  */
 export const reactSelectOnChangeAdapter = (name: string, onChange: IReactSelectInputProps['onChange']) => {
   return (selection: Option | Option[]) => {
-    const value = !selection ? null : Array.isArray(selection) ? selection.map(x => x.value) : selection.value;
+    const value = !selection ? null : Array.isArray(selection) ? selection.map((x) => x.value) : selection.value;
     const target = { name, value };
     const event = createFakeReactSyntheticEvent(target);
     return (onChange || noop)(event);
@@ -78,9 +78,11 @@ export function ReactSelectInput<T = string>(props: IReactSelectInputProps<T>) {
   const className = orEmptyString(inputClassName);
   const { category } = useValidationData(validation.messageNode, validation.touched);
   const style = category === 'error' ? reactSelectValidationErrorStyle : {};
+  const fieldValue = props.multi ? (isNil(value) ? [] : value) : orEmptyString(value);
+
   const fieldProps = {
     name,
-    value: orEmptyString(value),
+    value: fieldValue,
     onBlur: reactSelectOnBlurAdapter(name, value, onBlur),
     onChange: reactSelectOnChangeAdapter(name, onChange),
   };
@@ -92,15 +94,31 @@ export function ReactSelectInput<T = string>(props: IReactSelectInputProps<T>) {
       <TetheredSelect {...commonProps} options={options} />
     ) : mode === 'VIRTUALIZED' ? (
       <VirtualizedSelect {...commonProps} options={options} optionRenderer={null} />
+    ) : mode === 'CREATABLE' ? (
+      <CreatableSelect {...commonProps} options={options} />
     ) : (
       <Select {...commonProps} options={options} />
     );
 
   if (isStringArray(stringOptions)) {
     return (
-      <StringsAsOptions strings={stringOptions}>{options => <SelectElement options={options} />}</StringsAsOptions>
+      <StringsAsOptions strings={stringOptions}>{(options) => <SelectElement options={options} />}</StringsAsOptions>
     );
   } else {
     return <SelectElement options={optionOptions} />;
   }
+}
+
+function CreatableSelect(props: IReactSelectInputProps<any>) {
+  // React select 1.x requires the options array to contain any created values
+  const options = React.useMemo(() => {
+    const options = props.options ?? [];
+    const optionsValues = options.map((o) => o.value);
+    const createdOptions = ((props.value as string[]) ?? [])
+      .filter((val) => !optionsValues.includes(val))
+      .map((opt) => ({ label: opt, value: opt }));
+    return options.concat(createdOptions);
+  }, [props.options, props.value]);
+
+  return <Creatable {...props} options={options} />;
 }

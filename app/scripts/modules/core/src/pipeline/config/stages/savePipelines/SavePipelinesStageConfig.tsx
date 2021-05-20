@@ -1,9 +1,9 @@
+import { IArtifact, IExpectedArtifact, StageArtifactSelector } from 'core';
 import React from 'react';
 
-import { IStageConfigProps, StageConfigField } from 'core/pipeline';
-import { IArtifact, IExpectedArtifact, StageArtifactSelector } from 'core';
+import { IStageConfigProps, StageConfigField } from '../common';
 
-export const SavePipelinesStageConfig: React.SFC<IStageConfigProps> = props => {
+export const SavePipelinesStageConfig: React.SFC<IStageConfigProps> = (props) => {
   const { stage, pipeline } = props;
   return (
     <div className="container-fluid form-horizontal">

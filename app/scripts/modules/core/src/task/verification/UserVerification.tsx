@@ -1,6 +1,7 @@
 import React from 'react';
-import { HelpField } from 'core/help/HelpField';
+
 import { AccountService } from 'core/account';
+import { HelpField } from 'core/help/HelpField';
 import { Markdown } from 'core/presentation';
 
 const { useEffect, useState } = React;
@@ -48,7 +49,7 @@ export function UserVerification(props: IUserVerificationProps) {
           <div className="form-group">
             <div className="form-control-static">{label ? <Markdown tag="span" message={label} /> : defaultLabel}</div>{' '}
             <HelpField id="user.verification" />
-            <input type="text" className={className} value={value} onChange={evt => setValue(evt.target.value)} />
+            <input type="text" className={className} value={value} onChange={(evt) => setValue(evt.target.value)} />
           </div>
         </div>
       </div>

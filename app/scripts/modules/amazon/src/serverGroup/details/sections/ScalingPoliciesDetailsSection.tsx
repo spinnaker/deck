@@ -1,13 +1,12 @@
 import React from 'react';
 
 import { CollapsibleSection, Overridable, Tooltip } from '@spinnaker/core';
-
 import { IAmazonServerGroupView, IScalingProcess } from 'amazon/domain';
 import { AwsNgReact } from 'amazon/reactShims';
-import { AutoScalingProcessService } from '../scalingProcesses/AutoScalingProcessService';
 
-import { IAmazonServerGroupDetailsSectionProps } from './IAmazonServerGroupDetailsSectionProps';
+import type { IAmazonServerGroupDetailsSectionProps } from './IAmazonServerGroupDetailsSectionProps';
 import { CreateScalingPolicyButton } from '../scalingPolicy/CreateScalingPolicyButton';
+import { AutoScalingProcessService } from '../scalingProcesses/AutoScalingProcessService';
 
 @Overridable('aws.serverGroup.ScalingPoliciesDetailsSection')
 export class ScalingPoliciesDetailsSection extends React.Component<IAmazonServerGroupDetailsSectionProps> {
@@ -20,8 +19,8 @@ export class ScalingPoliciesDetailsSection extends React.Component<IAmazonServer
     return (
       serverGroup.scalingPolicies.length > 0 &&
       autoScalingProcesses
-        .filter(p => !p.enabled)
-        .some(p => ['Launch', 'Terminate', 'AlarmNotification'].includes(p.name))
+        .filter((p) => !p.enabled)
+        .some((p) => ['Launch', 'Terminate', 'AlarmNotification'].includes(p.name))
     );
   }
 
@@ -53,7 +52,7 @@ export class ScalingPoliciesDetailsSection extends React.Component<IAmazonServer
             Some scaling processes are disabled that may prevent scaling policies from working.
           </div>
         )}
-        {serverGroup.scalingPolicies.map(policy => (
+        {serverGroup.scalingPolicies.map((policy) => (
           <ScalingPolicySummary key={policy.policyARN} policy={policy} serverGroup={serverGroup} application={app} />
         ))}
         <CreateScalingPolicyButton serverGroup={serverGroup} application={app} />

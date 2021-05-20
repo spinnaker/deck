@@ -1,10 +1,10 @@
 import React from 'react';
 
+import { PolicyTypeSelectionModal } from '@spinnaker/amazon';
 import { AccountService, Application, IServerGroup, ModalInjector } from '@spinnaker/core';
 
-import { PolicyTypeSelectionModal } from '@spinnaker/amazon';
-import { UpsertTargetTrackingController } from './targetTracking/upsertTargetTracking.controller';
 import { TitusReactInjector } from '../../../reactShims';
+import { UpsertTargetTrackingController } from './targetTracking/upsertTargetTracking.controller';
 
 export interface ICreateScalingPolicyButtonProps {
   application: Application;
@@ -30,7 +30,7 @@ export class CreateScalingPolicyButton extends React.Component<
       typeSelection: null,
       awsAccount: null,
     };
-    AccountService.getAccountDetails(props.serverGroup.account).then(details => {
+    AccountService.getAccountDetails(props.serverGroup.account).then((details) => {
       this.setState({ awsAccount: details.awsAccount });
     });
   }

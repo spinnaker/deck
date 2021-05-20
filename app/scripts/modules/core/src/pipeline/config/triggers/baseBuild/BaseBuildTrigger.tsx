@@ -1,5 +1,5 @@
-import React from 'react';
 import { FormikProps } from 'formik';
+import React from 'react';
 
 import { BuildServiceType, IgorService } from 'core/ci/igor.service';
 import { IBuildTrigger } from 'core/domain';
@@ -41,8 +41,7 @@ export function BaseBuildTrigger(buildTriggerProps: IBaseBuildTriggerConfigProps
       <FormikFormField
         name="master"
         label={label}
-        fastField={false}
-        input={props => (
+        input={(props) => (
           <RefreshableReactSelectInput
             {...props}
             stringOptions={fetchMasters.result}
@@ -58,8 +57,7 @@ export function BaseBuildTrigger(buildTriggerProps: IBaseBuildTriggerConfigProps
       <FormikFormField
         name="job"
         label="Job"
-        fastField={false}
-        input={props => (
+        input={(props) => (
           <RefreshableReactSelectInput
             {...props}
             mode="VIRTUALIZED"
@@ -77,7 +75,7 @@ export function BaseBuildTrigger(buildTriggerProps: IBaseBuildTriggerConfigProps
         name="propertyFile"
         label="Property File"
         help={<HelpField id={`pipeline.config.${type}.trigger.propertyFile`} />}
-        input={props => <TextInput {...props} />}
+        input={(props) => <TextInput {...props} />}
       />
     </>
   );

@@ -1,9 +1,9 @@
 'use strict';
 
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 import * as angular from 'angular';
 
 import { AccountService, InfrastructureCaches } from '@spinnaker/core';
-import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
 export const GOOGLE_SECURITYGROUP_CONFIGURE_CREATESECURITYGROUP_CONTROLLER =
   'spinnaker.gce.securityGroup.create.controller';
@@ -17,7 +17,7 @@ angular
     '$controller',
     'application',
     'securityGroup',
-    function($scope, $uibModalInstance, $state, $controller, application, securityGroup) {
+    function ($scope, $uibModalInstance, $state, $controller, application, securityGroup) {
       $scope.pages = {
         location: require('./createSecurityGroupProperties.html'),
         targets: require('./createSecurityGroupTargets.html'),
@@ -44,16 +44,16 @@ angular
         }),
       );
 
-      AccountService.listAccounts('gce').then(function(accounts) {
+      AccountService.listAccounts('gce').then(function (accounts) {
         $scope.accounts = accounts;
         ctrl.accountUpdated();
       });
 
-      this.getSecurityGroupRefreshTime = function() {
+      this.getSecurityGroupRefreshTime = function () {
         return InfrastructureCaches.get('securityGroups').getStats().ageMax;
       };
 
-      ctrl.upsert = function() {
+      ctrl.upsert = function () {
         ctrl.mixinUpsert('Create');
       };
 

@@ -1,10 +1,10 @@
 'use strict';
 
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 import * as angular from 'angular';
 import _ from 'lodash';
 
-import { SecurityGroupWriter, TaskMonitor, FirewallLabels } from '@spinnaker/core';
-import UIROUTER_ANGULARJS from '@uirouter/angularjs';
+import { FirewallLabels, SecurityGroupWriter, TaskMonitor } from '@spinnaker/core';
 
 export const AMAZON_SECURITYGROUP_CONFIGURE_EDITSECURITYGROUPCTRL = 'spinnaker.amazon.securityGroup.edit.controller';
 export const name = AMAZON_SECURITYGROUP_CONFIGURE_EDITSECURITYGROUPCTRL; // for backwards compatibility
@@ -17,7 +17,7 @@ angular
     'application',
     'securityGroup',
     '$controller',
-    function($scope, $uibModalInstance, $state, application, securityGroup, $controller) {
+    function ($scope, $uibModalInstance, $state, application, securityGroup, $controller) {
       $scope.self = $scope;
       $scope.pages = {
         ingress: require('./createSecurityGroupIngress.html'),
@@ -52,9 +52,9 @@ angular
       });
 
       securityGroup.securityGroupIngress = _.chain(securityGroup.inboundRules)
-        .filter(rule => rule.securityGroup)
-        .map(rule =>
-          rule.portRanges.map(portRange => {
+        .filter((rule) => rule.securityGroup)
+        .map((rule) =>
+          rule.portRanges.map((portRange) => {
             const vpcId = rule.securityGroup.vpcId === securityGroup.vpcId ? null : rule.securityGroup.vpcId;
             return {
               accountName: rule.securityGroup.accountName || rule.securityGroup.accountId,
@@ -73,11 +73,11 @@ angular
         .value();
 
       securityGroup.ipIngress = _.chain(securityGroup.inboundRules)
-        .filter(function(rule) {
+        .filter(function (rule) {
           return rule.range;
         })
-        .map(function(rule) {
-          return rule.portRanges.map(function(portRange) {
+        .map(function (rule) {
+          return rule.portRanges.map(function (portRange) {
             return {
               cidr: rule.range.ip + rule.range.cidr,
               type: rule.protocol,
@@ -89,7 +89,7 @@ angular
         .flatten()
         .value();
 
-      this.upsert = function() {
+      this.upsert = function () {
         const group = $scope.securityGroup;
         const command = {
           credentials: group.accountName,
@@ -101,12 +101,12 @@ angular
           ipIngress: group.ipIngress,
         };
 
-        $scope.taskMonitor.submit(function() {
+        $scope.taskMonitor.submit(function () {
           return SecurityGroupWriter.upsertSecurityGroup(command, application, 'Update');
         });
       };
 
-      this.cancel = function() {
+      this.cancel = function () {
         $uibModalInstance.dismiss();
       };
 

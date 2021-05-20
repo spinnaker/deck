@@ -1,13 +1,14 @@
 'use strict';
 
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 import * as angular from 'angular';
 import _ from 'lodash';
 
 import { FirewallLabels, INSTANCE_TYPE_SERVICE, ModalWizard, TaskMonitor } from '@spinnaker/core';
 import { GOOGLE_INSTANCE_CUSTOM_CUSTOMINSTANCEBUILDER_GCE_SERVICE } from 'google/instance/custom/customInstanceBuilder.gce.service';
+
 import { GOOGLE_SERVERGROUP_CONFIGURE_WIZARD_HIDDENMETADATAKEYS_VALUE } from './hiddenMetadataKeys.value';
 import { GOOGLE_SERVERGROUP_CONFIGURE_WIZARD_SECURITYGROUPS_TAGMANAGER_SERVICE } from './securityGroups/tagManager.service';
-import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
 export const GOOGLE_SERVERGROUP_CONFIGURE_WIZARD_CLONESERVERGROUP_GCE_CONTROLLER =
   'spinnaker.serverGroup.configure.gce.cloneServerGroup';
@@ -36,7 +37,7 @@ angular
     'wizardSubFormValidation',
     'gceServerGroupHiddenMetadataKeys',
     'gceTagManager',
-    function(
+    function (
       $scope,
       $uibModalInstance,
       $q,
@@ -101,7 +102,7 @@ angular
         if ($scope.$$destroyed) {
           return;
         }
-        const cloneStage = $scope.taskMonitor.task.execution.stages.find(stage => stage.type === 'cloneServerGroup');
+        const cloneStage = $scope.taskMonitor.task.execution.stages.find((stage) => stage.type === 'cloneServerGroup');
         if (cloneStage && cloneStage.context['deploy.server.groups']) {
           const newServerGroupName = cloneStage.context['deploy.server.groups'][$scope.command.region];
           if (newServerGroupName) {
@@ -144,7 +145,7 @@ angular
       function configureCommand() {
         gceServerGroupConfigurationService
           .configureCommand(application, serverGroupCommand)
-          .then(function() {
+          .then(function () {
             $scope.state.loaded = true;
             initializeSelectOptions();
             initializeWatches();
@@ -156,7 +157,7 @@ angular
               .register({ page: 'load-balancers', subForm: 'loadBalancerSubForm' })
               .register({ page: 'autohealing-policy', subForm: 'autoHealingPolicySubForm' });
           })
-          .catch(e => {
+          .catch((e) => {
             $log.error('Error generating server group command: ', e);
           });
       }
@@ -191,7 +192,7 @@ angular
       }
 
       function createResultProcessor(method) {
-        return function() {
+        return function () {
           processCommandUpdateResult(method($scope.command));
         };
       }
@@ -217,6 +218,7 @@ angular
         const { locationToInstanceTypesMap } = c.backingData.credentialsKeyedByAccount[c.credentials];
 
         const customInstanceChoices = [
+          _.get(c, 'viewState.customInstance.instanceFamily'),
           _.get(c, 'viewState.customInstance.vCpuCount'),
           _.get(c, 'viewState.customInstance.memory'),
         ];
@@ -233,14 +235,14 @@ angular
         ) {
           c.instanceType = gceCustomInstanceBuilderService.generateInstanceTypeString(...customInstanceChoices);
 
-          instanceTypeService.getInstanceTypeDetails(c.selectedProvider, 'buildCustom').then(instanceTypeDetails => {
+          instanceTypeService.getInstanceTypeDetails(c.selectedProvider, 'buildCustom').then((instanceTypeDetails) => {
             c.viewState.instanceTypeDetails = instanceTypeDetails;
           });
         }
       }
 
       function updateStorageSettingsFromInstanceType() {
-        return function(instanceTypeDetails) {
+        return function (instanceTypeDetails) {
           if ($scope.command.viewState.initialized) {
             if (instanceTypeDetails && instanceTypeDetails.storage && instanceTypeDetails.storage.defaultSettings) {
               $scope.command.disks = instanceTypeDetails.storage.defaultSettings.disks;
@@ -252,7 +254,7 @@ angular
         };
       }
 
-      this.isValid = function() {
+      this.isValid = function () {
         const selectedZones =
           $scope.command.selectZones && _.get($scope, 'command.distributionPolicy.zones.length') >= 1;
         return (
@@ -270,7 +272,7 @@ angular
         );
       };
 
-      this.showSubmitButton = function() {
+      this.showSubmitButton = function () {
         return ModalWizard.allPagesVisited();
       };
 
@@ -284,7 +286,11 @@ angular
 
               if (loadBalancerDetails.loadBalancerType === 'HTTP') {
                 metadata['global-load-balancer-names'] = metadata['global-load-balancer-names'].concat(
-                  loadBalancerDetails.listeners.map(listener => listener.name),
+                  loadBalancerDetails.listeners.map((listener) => listener.name),
+                );
+              } else if (loadBalancerDetails.loadBalancerType === 'INTERNAL_MANAGED') {
+                metadata['load-balancer-names'] = metadata['load-balancer-names'].concat(
+                  loadBalancerDetails.listeners.map((listener) => listener.name),
                 );
               } else if (loadBalancerDetails.loadBalancerType === 'SSL') {
                 metadata['global-load-balancer-names'].push(name);
@@ -347,7 +353,7 @@ angular
         return loadBalancerNames.concat(selectedSslLoadBalancerNames).concat(selectedTcpLoadBalancerNames);
       }
 
-      this.submit = function() {
+      this.submit = function () {
         // We use this list of load balancer names when 'Enabling' a server group.
         const loadBalancerMetadata = buildLoadBalancerMetadata(
           $scope.command.loadBalancers,
@@ -370,7 +376,7 @@ angular
         const origTags = $scope.command.tags;
         const transformedTags = [];
         // The tags are stored using a 'value' attribute to enable the Add/Remove behavior in the wizard.
-        $scope.command.tags.forEach(function(tag) {
+        $scope.command.tags.forEach(function (tag) {
           transformedTags.push(tag.value);
         });
         $scope.command.tags = transformedTags;
@@ -391,7 +397,7 @@ angular
           return $uibModalInstance.close($scope.command);
         }
 
-        $scope.taskMonitor.submit(function() {
+        $scope.taskMonitor.submit(function () {
           const promise = serverGroupWriter.cloneServerGroup(angular.copy($scope.command), application);
 
           // Copy back the original objects so the wizard can still be used if the command needs to be resubmitted.
@@ -405,11 +411,11 @@ angular
         });
       };
 
-      this.onHealthCheckRefresh = function() {
+      this.onHealthCheckRefresh = function () {
         gceServerGroupConfigurationService.refreshHealthChecks($scope.command);
       };
 
-      this.onEnableAutoHealingChange = function() {
+      this.onEnableAutoHealingChange = function () {
         // Prevent empty auto-healing policies from being overwritten by those of their ancestors
         $scope.command.overwriteAncestorAutoHealingPolicy =
           $scope.command.viewState.mode === 'clone' &&
@@ -417,18 +423,18 @@ angular
           $scope.command.enableAutoHealing === false;
       };
 
-      this.setAutoHealingPolicy = function(autoHealingPolicy) {
+      this.setAutoHealingPolicy = function (autoHealingPolicy) {
         $scope.command.autoHealingPolicy = autoHealingPolicy;
       };
 
-      this.cancel = function() {
+      this.cancel = function () {
         $uibModalInstance.dismiss();
       };
 
       this.specialInstanceProfiles = new Set(['custom', 'buildCustom']);
 
       // This function is called from within React, and without $apply, Angular does not know when it has been called.
-      $scope.command.setCustomInstanceViewState = customInstanceChoices => {
+      $scope.command.setCustomInstanceViewState = (customInstanceChoices) => {
         $scope.$apply(() => ($scope.command.viewState.customInstance = customInstanceChoices));
       };
 

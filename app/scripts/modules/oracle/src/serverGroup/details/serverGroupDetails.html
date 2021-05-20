@@ -16,9 +16,7 @@
       </a>
     </div>
     <div class="header-text horizontal middle">
-      <h3 class="horizontal middle space-between flex-1" select-on-dbl-click>
-        {{ctrl.serverGroup.name}}
-      </h3>
+      <h3 class="horizontal middle space-between flex-1" select-on-dbl-click>{{ctrl.serverGroup.name}}</h3>
     </div>
     <div>
       <div class="actions" ng-class="{ insights: ctrl.serverGroup.insightActions.length > 0 }">
@@ -52,7 +50,7 @@
     <h4 class="text-center" ng-if="ctrl.serverGroup.isDisabled">[SERVER GROUP IS DISABLED]</h4>
     <server-group-running-tasks-details server-group="ctrl.serverGroup"></server-group-running-tasks-details>
     <collapsible-section heading="Server Group Information" expanded="true">
-      <dl class="dl-horizontal dl-flex">
+      <dl class="dl-horizontal dl-narrow">
         <dt>Created</dt>
         <dd>{{ctrl.serverGroup.createdTime | timestamp}}</dd>
         <dt>In</dt>
@@ -69,7 +67,7 @@
       </dl>
     </collapsible-section>
     <collapsible-section heading="Size" expanded="true">
-      <dl class="dl-horizontal dl-flex">
+      <dl class="dl-horizontal dl-narrow">
         <dt>Desired</dt>
         <dd>{{ctrl.serverGroup.capacity.desired}}</dd>
         <dt>Current</dt>
@@ -77,7 +75,7 @@
       </dl>
     </collapsible-section>
     <collapsible-section heading="Launch Configuration">
-      <dl class="dl-horizontal dl-flex">
+      <dl class="dl-horizontal dl-narrow">
         <dt>Name</dt>
         <dd>{{ctrl.serverGroup.name}}</dd>
         <dt>Image</dt>

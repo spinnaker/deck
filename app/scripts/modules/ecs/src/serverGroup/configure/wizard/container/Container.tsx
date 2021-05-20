@@ -1,20 +1,22 @@
+import { module } from 'angular';
+import { isEqual, uniqWith } from 'lodash';
 import * as React from 'react';
-import { module, IPromise } from 'angular';
-import { uniqWith, isEqual } from 'lodash';
+import { Alert } from 'react-bootstrap';
+import { Option } from 'react-select';
 import { react2angular } from 'react2angular';
+
+import { HelpField, TetheredSelect, withErrorBoundary } from '@spinnaker/core';
+
 import {
   IEcsDockerImage,
   IEcsServerGroupCommand,
   IEcsTargetGroupMapping,
 } from '../../serverGroupConfiguration.service';
-import { HelpField, TetheredSelect } from '@spinnaker/core';
-import { Alert } from 'react-bootstrap';
-import { Option } from 'react-select';
 
 export interface IContainerProps {
   command: IEcsServerGroupCommand;
   notifyAngular: (key: string, value: any) => void;
-  configureCommand: (query: string) => IPromise<void>;
+  configureCommand: (query: string) => PromiseLike<void>;
 }
 
 interface IContainerState {
@@ -47,9 +49,11 @@ export class Container extends React.Component<IContainerProps, IContainerState>
         containerPort: cmd.containerPort,
       });
       cmd.targetGroup = '';
+      cmd.loadBalancedContainer = '';
     }
 
     cmd.targetGroupMappings = uniqWith(defaultTargetGroup, isEqual);
+    cmd.containerMappings = null;
 
     this.state = {
       imageDescription: cmd.imageDescription ? cmd.imageDescription : this.getEmptyImageDescription(),
@@ -59,6 +63,10 @@ export class Container extends React.Component<IContainerProps, IContainerState>
       targetGroupMappings: cmd.targetGroupMappings,
       targetGroupsAvailable: cmd.backingData && cmd.backingData.filtered ? cmd.backingData.filtered.targetGroups : [],
     };
+
+    this.state.targetGroupMappings.forEach((targetGroupMapping) => {
+      targetGroupMapping.containerName = '';
+    });
   }
 
   public componentDidMount() {
@@ -74,7 +82,7 @@ export class Container extends React.Component<IContainerProps, IContainerState>
 
   private getIdToImageMap = (): Map<string, IEcsDockerImage> => {
     const imageIdToDescription = new Map<string, IEcsDockerImage>();
-    this.props.command.backingData.filtered.images.forEach(e => {
+    this.props.command.backingData.filtered.images.forEach((e) => {
       imageIdToDescription.set(e.imageId, e);
     });
 
@@ -129,6 +137,7 @@ export class Container extends React.Component<IContainerProps, IContainerState>
     targetMapping.targetGroup = newTargetGroup.value;
     this.props.notifyAngular('targetGroupMappings', currentMappings);
     this.setState({ targetGroupMappings: currentMappings });
+    this.updateDirtyTargetGroups();
   };
 
   private updateTargetGroupMappingPort = (index: number, targetPort: number) => {
@@ -146,6 +155,10 @@ export class Container extends React.Component<IContainerProps, IContainerState>
     this.setState({ targetGroupMappings: currentMappings });
   };
 
+  private updateDirtyTargetGroups = () => {
+    this.props.command.viewState.dirty.targetGroups = [];
+  };
+
   public render(): React.ReactElement<Container> {
     const removeTargetGroupMapping = this.removeTargetGroupMapping;
     const updateContainerMappingImage = this.updateContainerMappingImage;
@@ -153,8 +166,12 @@ export class Container extends React.Component<IContainerProps, IContainerState>
     const updateTargetGroupMappingPort = this.updateTargetGroupMappingPort;
     const updateComputeUnits = this.updateComputeUnits;
     const updateReservedMemory = this.updateReservedMemory;
+    const dirtyTagetGroups =
+      this.props.command.viewState.dirty && this.props.command.viewState.dirty.targetGroups
+        ? this.props.command.viewState.dirty.targetGroups
+        : [];
 
-    const dockerImageOptions = this.state.dockerImages.map(function(image) {
+    const dockerImageOptions = this.state.dockerImages.map(function (image) {
       let msg = '';
       if (image.fromTrigger || image.fromContext) {
         msg = image.fromTrigger ? '(TRIGGER) ' : '(FIND IMAGE RESULT) ';
@@ -162,8 +179,30 @@ export class Container extends React.Component<IContainerProps, IContainerState>
       return { label: `${msg} (${image.imageId})`, value: image.imageId };
     });
 
+    const dirtyTargetGroupList = dirtyTagetGroups
+      ? dirtyTagetGroups.map(function (targetGroup, index) {
+          return <li key={index}>{targetGroup}</li>;
+        })
+      : '';
+
+    const dirtyTargetGroupSection = (
+      <div className="alert alert-warning">
+        <p>
+          <i className="fa fa-exclamation-triangle"></i>
+          The following target groups could not be found in the selected account/region/VPC and were removed:
+        </p>
+        <ul>{dirtyTargetGroupList}</ul>
+        <br />
+        <p className="text-left">Please select the target group(s) from the dropdown to resolve this error.</p>
+      </div>
+    );
+
     const newTargetGroupMapping = this.state.targetGroupsAvailable.length ? (
-      <button className="btn btn-block btn-sm add-new" onClick={this.pushTargetGroupMapping}>
+      <button
+        className="btn btn-block btn-sm add-new"
+        data-test-id="ContainerInputs.targetGroupAdd"
+        onClick={this.pushTargetGroupMapping}
+      >
         <span className="glyphicon glyphicon-plus-sign" />
         Add New Target Group Mapping
       </button>
@@ -173,14 +212,14 @@ export class Container extends React.Component<IContainerProps, IContainerState>
       </div>
     );
 
-    const targetGroupsAvailable = this.state.targetGroupsAvailable.map(function(targetGroup) {
+    const targetGroupsAvailable = this.state.targetGroupsAvailable.map(function (targetGroup) {
       return { label: `${targetGroup}`, value: targetGroup };
     });
 
-    const targetGroupInputs = this.state.targetGroupMappings.map(function(mapping, index) {
+    const targetGroupInputs = this.state.targetGroupMappings.map(function (mapping, index) {
       return (
         <tr key={index}>
-          <td>
+          <td data-test-id="ContainerInputs.targetGroup">
             <TetheredSelect
               placeholder="Select a target group to use..."
               options={targetGroupsAvailable}
@@ -191,16 +230,21 @@ export class Container extends React.Component<IContainerProps, IContainerState>
           </td>
           <td>
             <input
+              data-test-id="ContainerInputs.targetGroupPort"
               type="number"
               className="form-control input-sm no-spel"
               required={true}
               value={mapping.containerPort.toString()}
-              onChange={e => updateTargetGroupMappingPort(index, e.target.valueAsNumber)}
+              onChange={(e) => updateTargetGroupMappingPort(index, e.target.valueAsNumber)}
             />
           </td>
           <td>
             <div className="form-control-static">
-              <a className="btn-link sm-label" onClick={() => removeTargetGroupMapping(index)}>
+              <a
+                className="btn-link sm-label"
+                data-test-id="ContainerInputs.targetGroupRemove"
+                onClick={() => removeTargetGroupMapping(index)}
+              >
                 <span className="glyphicon glyphicon-trash" />
                 <span className="sr-only">Remove</span>
               </a>
@@ -212,12 +256,13 @@ export class Container extends React.Component<IContainerProps, IContainerState>
 
     return (
       <div className="container-fluid form-horizontal">
+        {dirtyTagetGroups.length > 0 ? <div>{dirtyTargetGroupSection}</div> : ''}
         <div className="form-group">
           <div className="col-md-3 sm-label-right">
             <b>Container Image</b>
             <HelpField id="ecs.containerMappingImage" />
           </div>
-          <div className="col-md-9">
+          <div className="col-md-9" data-test-id="ContainerInputs.containerImage">
             <TetheredSelect
               placeholder="Select an image to use..."
               options={dockerImageOptions}
@@ -236,11 +281,12 @@ export class Container extends React.Component<IContainerProps, IContainerState>
           </div>
           <div className="col-md-9" style={{ width: '100px' }}>
             <input
+              data-test-id="ContainerInputs.computeUnits"
               type="number"
               className="form-control input-sm no-spel"
               required={false}
               value={this.state.computeUnits}
-              onChange={e => updateComputeUnits(e.target.valueAsNumber)}
+              onChange={(e) => updateComputeUnits(e.target.valueAsNumber)}
             />
           </div>
         </div>
@@ -251,11 +297,12 @@ export class Container extends React.Component<IContainerProps, IContainerState>
           </div>
           <div className="col-md-9" style={{ width: '100px' }}>
             <input
+              data-test-id="ContainerInputs.reservedMemory"
               type="number"
               className="form-control input-sm no-spel"
               required={false}
               value={this.state.reservedMemory}
-              onChange={e => updateReservedMemory(e.target.valueAsNumber)}
+              onChange={(e) => updateReservedMemory(e.target.valueAsNumber)}
             />
           </div>
         </div>
@@ -296,5 +343,5 @@ export class Container extends React.Component<IContainerProps, IContainerState>
 export const CONTAINER_REACT = 'spinnaker.ecs.serverGroup.configure.wizard.container.react';
 module(CONTAINER_REACT, []).component(
   'containerReact',
-  react2angular(Container, ['command', 'notifyAngular', 'configureCommand']),
+  react2angular(withErrorBoundary(Container, 'containerReact'), ['command', 'notifyAngular', 'configureCommand']),
 );

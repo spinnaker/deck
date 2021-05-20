@@ -1,30 +1,28 @@
 'use strict';
 
+import { module } from 'angular';
 import _ from 'lodash';
 
 import {
   CloudProviderRegistry,
   ConfirmationModalService,
   InstanceReader,
-  INSTANCE_WRITE_SERVICE,
+  InstanceWriter,
   RecentHistoryService,
   ServerGroupTemplates,
 } from '@spinnaker/core';
 
-import { module } from 'angular';
-
 export const DCOS_INSTANCE_DETAILS_DETAILS_CONTROLLER = 'spinnaker.dcos.instance.details.controller';
 export const name = DCOS_INSTANCE_DETAILS_DETAILS_CONTROLLER; // for backwards compatibility
-module(DCOS_INSTANCE_DETAILS_DETAILS_CONTROLLER, [INSTANCE_WRITE_SERVICE]).controller('dcosInstanceDetailsController', [
+module(DCOS_INSTANCE_DETAILS_DETAILS_CONTROLLER).controller('dcosInstanceDetailsController', [
   '$scope',
   '$state',
   '$uibModal',
-  'instanceWriter',
   'instance',
   'app',
   'dcosProxyUiService',
   '$q',
-  function($scope, $state, $uibModal, instanceWriter, instance, app, dcosProxyUiService, $q) {
+  function ($scope, $state, $uibModal, instance, app, dcosProxyUiService, $q) {
     // needed for standalone instances
     $scope.detailsTemplateUrl = CloudProviderRegistry.getValue('dcos', 'instance.detailsTemplateUrl');
 
@@ -55,8 +53,8 @@ module(DCOS_INSTANCE_DETAILS_DETAILS_CONTROLLER, [INSTANCE_WRITE_SERVICE]).contr
     function retrieveInstance() {
       const extraData = {};
       let instanceSummary, loadBalancers, account, region;
-      app.serverGroups.data.some(function(serverGroup) {
-        return serverGroup.instances.some(function(possibleInstance) {
+      app.serverGroups.data.some(function (serverGroup) {
+        return serverGroup.instances.some(function (possibleInstance) {
           if (possibleInstance.id === instance.instanceId) {
             instanceSummary = possibleInstance;
             loadBalancers = serverGroup.loadBalancers;
@@ -72,7 +70,7 @@ module(DCOS_INSTANCE_DETAILS_DETAILS_CONTROLLER, [INSTANCE_WRITE_SERVICE]).contr
         extraData.account = account;
         extraData.region = region;
         RecentHistoryService.addExtraDataToLatest('instances', extraData);
-        return InstanceReader.getInstanceDetails(account, region, instance.instanceId).then(function(details) {
+        return InstanceReader.getInstanceDetails(account, region, instance.instanceId).then(function (details) {
           $scope.state.loading = false;
           $scope.instance = _.defaults(details, instanceSummary);
           $scope.instance.account = account;
@@ -101,14 +99,14 @@ module(DCOS_INSTANCE_DETAILS_DETAILS_CONTROLLER, [INSTANCE_WRITE_SERVICE]).contr
       const taskMonitor = {
         application: app,
         title: 'Terminating ' + instance.instanceId,
-        onTaskComplete: function() {
+        onTaskComplete: function () {
           if ($state.includes('**.instanceDetails', { instanceId: instance.instanceId })) {
             $state.go('^');
           }
         },
       };
 
-      const submitMethod = function() {
+      const submitMethod = function () {
         const params = { cloudProvider: 'dcos' };
 
         if (instance.serverGroup) {
@@ -118,7 +116,7 @@ module(DCOS_INSTANCE_DETAILS_DETAILS_CONTROLLER, [INSTANCE_WRITE_SERVICE]).contr
         params.namespace = instance.namespace;
         instance.placement = {};
 
-        return instanceWriter.terminateInstance(instance, app, params);
+        return InstanceWriter.terminateInstance(instance, app, params);
       };
 
       ConfirmationModalService.confirm({
@@ -139,8 +137,8 @@ module(DCOS_INSTANCE_DETAILS_DETAILS_CONTROLLER, [INSTANCE_WRITE_SERVICE]).contr
         title: 'Registering ' + instance.name + ' with ' + loadBalancerNames,
       };
 
-      const submitMethod = function() {
-        return instanceWriter.registerInstanceWithLoadBalancer(instance, app, {
+      const submitMethod = function () {
+        return InstanceWriter.registerInstanceWithLoadBalancer(instance, app, {
           interestingHealthProviderNames: ['Dcos'],
         });
       };
@@ -163,8 +161,8 @@ module(DCOS_INSTANCE_DETAILS_DETAILS_CONTROLLER, [INSTANCE_WRITE_SERVICE]).contr
         title: 'Deregistering ' + instance.name + ' from ' + loadBalancerNames,
       };
 
-      const submitMethod = function() {
-        return instanceWriter.deregisterInstanceFromLoadBalancer(instance, app, {
+      const submitMethod = function () {
+        return InstanceWriter.deregisterInstanceFromLoadBalancer(instance, app, {
           interestingHealthProviderNames: ['Dcos'],
         });
       };
@@ -178,17 +176,17 @@ module(DCOS_INSTANCE_DETAILS_DETAILS_CONTROLLER, [INSTANCE_WRITE_SERVICE]).contr
       });
     };
 
-    this.canRegisterWithLoadBalancer = function() {
+    this.canRegisterWithLoadBalancer = function () {
       return false;
     };
 
-    this.canDeregisterFromLoadBalancer = function() {
+    this.canDeregisterFromLoadBalancer = function () {
       return false;
     };
 
     this.hasHealthState = function hasHealthState(healthProviderType, state) {
       const instance = $scope.instance;
-      return instance.health.some(function(health) {
+      return instance.health.some(function (health) {
         return health.type === healthProviderType && health.state === state;
       });
     };

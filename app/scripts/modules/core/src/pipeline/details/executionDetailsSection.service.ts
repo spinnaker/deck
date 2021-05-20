@@ -1,9 +1,9 @@
-import { IPromise, ITimeoutService, module } from 'angular';
 import { StateParams, StateService } from '@uirouter/angularjs';
 import UIROUTER_ANGULARJS from '@uirouter/angularjs';
+import { ITimeoutService, module } from 'angular';
 
 export class ExecutionDetailsSectionService {
-  private pendingOnComplete: IPromise<any>;
+  private pendingOnComplete: PromiseLike<any>;
 
   public static $inject = ['$stateParams', '$state', '$timeout'];
   public constructor(
@@ -26,8 +26,12 @@ export class ExecutionDetailsSectionService {
       details = availableSections[0];
     }
     if (!this.sectionIsValid(availableSections)) {
-      // use { location: 'replace' } to overwrite the invalid browser history state
-      this.$state.go('.', { details }, { location: 'replace' });
+      // Wrapping in a $timeout because for a React stage, this block is executed during a transitionSuccess hook
+      // meaning there is no location record to replace yet. Otherwise we incorrectly replace the previous record.
+      this.$timeout(() => {
+        // use { location: 'replace' } to overwrite the invalid browser history state
+        this.$state.go('.', { details }, { location: 'replace' });
+      });
     }
     if (onComplete) {
       this.pendingOnComplete = this.$timeout(onComplete);

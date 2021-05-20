@@ -2,10 +2,10 @@ import {
   IPipeline,
   IStage,
   IStageOrTriggerTypeConfig,
-  NameUtils,
-  PipelineConfigService,
   IStageOrTriggerValidator,
   IValidatorConfig,
+  NameUtils,
+  PipelineConfigService,
   PipelineConfigValidator,
 } from '@spinnaker/core';
 
@@ -26,9 +26,9 @@ export class CfTargetImpedanceValidator implements IStageOrTriggerValidator {
     const regions: string[] = stage.regions || [];
     let allRegionsFound = true;
 
-    regions.forEach(region => {
+    regions.forEach((region) => {
       let regionFound = false;
-      stagesToTest.forEach(toTest => {
+      stagesToTest.forEach((toTest) => {
         if (toTest.type === 'deploy' && toTest.clusters && toTest.clusters.length) {
           toTest.clusters.forEach((cluster: any) => {
             const clusterName: string = NameUtils.getClusterName(

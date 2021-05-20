@@ -1,5 +1,4 @@
-import { module, IComponentController, IScope, IComponentOptions } from 'angular';
-
+import { IComponentController, IComponentOptions, IScope, module } from 'angular';
 import { InstanceTypeService, IPreferredInstanceType } from 'core/instance';
 
 import { IServerGroupCommand } from './serverGroupCommandBuilder.service';
@@ -46,13 +45,13 @@ class V2InstanceTypeSelectorController implements IComponentController {
     if (this.command.backingData && this.command.backingData.filtered) {
       availableTypes = this.command.backingData.filtered.instanceTypes || [];
     }
-    this.instanceTypeService.getCategories(this.command.selectedProvider).then(categories => {
-      categories.forEach(profile => {
+    this.instanceTypeService.getCategories(this.command.selectedProvider).then((categories) => {
+      categories.forEach((profile) => {
         if (profile.type === this.command.viewState.instanceProfile) {
           if (!this.command.viewState.disableImageSelection) {
-            profile.families.forEach(family => {
-              family.instanceTypes.forEach(instanceType => {
-                instanceType.unavailable = availableTypes.every(available => available !== instanceType.name);
+            profile.families.forEach((family) => {
+              family.instanceTypes.forEach((instanceType) => {
+                instanceType.unavailable = availableTypes.every((available) => available !== instanceType.name);
               });
             });
           }
@@ -73,7 +72,7 @@ class V2InstanceTypeSelectorController implements IComponentController {
 
     this.instanceTypeService
       .getInstanceTypeDetails(this.command.selectedProvider, type.name)
-      .then(instanceTypeDetails => {
+      .then((instanceTypeDetails) => {
         this.command.viewState.instanceTypeDetails = instanceTypeDetails;
       });
 

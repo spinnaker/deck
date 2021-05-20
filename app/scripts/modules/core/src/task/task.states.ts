@@ -1,9 +1,9 @@
 import { module } from 'angular';
-
-import { INestedState, StateConfigProvider } from 'core/navigation/state.provider';
 import { APPLICATION_STATE_PROVIDER, ApplicationStateProvider } from 'core/application/application.state.provider';
-import { TaskReader } from './task.read.service';
+import { INestedState, StateConfigProvider } from 'core/navigation/state.provider';
+
 import { TaskNotFound } from './TaskNotFound';
+import { TaskReader } from './task.read.service';
 
 export const TASK_STATES = 'spinnaker.core.task.states';
 module(TASK_STATES, [APPLICATION_STATE_PROVIDER]).config([
@@ -49,7 +49,7 @@ module(TASK_STATES, [APPLICATION_STATE_PROVIDER]).config([
       params: {
         taskId: { dynamic: true },
       },
-      redirectTo: transition => {
+      redirectTo: (transition) => {
         const { taskId } = transition.params();
 
         if (!taskId) {
@@ -57,7 +57,7 @@ module(TASK_STATES, [APPLICATION_STATE_PROVIDER]).config([
         }
 
         return Promise.resolve(TaskReader.getTask(taskId))
-          .then(task =>
+          .then((task) =>
             transition.router.stateService.target('home.applications.application.tasks.taskDetails', {
               application: task.application,
               taskId,

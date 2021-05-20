@@ -1,11 +1,13 @@
+import { get } from 'lodash';
 import React from 'react';
 import { Modal } from 'react-bootstrap';
 
 import { IPipeline, IPipelineLock } from 'core/domain';
+import { HelpField } from 'core/help';
 import { ModalClose } from 'core/modal';
 import { CheckboxInput, FormField, IModalComponentProps, TextInput } from 'core/presentation';
-import { HelpField } from 'core/help';
-import { PipelineConfigService } from 'core/pipeline';
+
+import { PipelineConfigService } from '../../services/PipelineConfigService';
 
 export interface ILockPipelineModalProps extends IModalComponentProps {
   pipeline: IPipeline;
@@ -27,9 +29,9 @@ export function LockPipelineModal(props: ILockPipelineModalProps) {
     const newPipeline = { ...pipeline, locked };
     PipelineConfigService.savePipeline(newPipeline).then(
       () => closeModal(newPipeline),
-      response => {
+      (response) => {
         setSaveError(true);
-        setErrorMessage(response.message || 'No message provided');
+        setErrorMessage(get(response, 'data.message', 'No message provided'));
       },
     );
   }
@@ -52,7 +54,7 @@ export function LockPipelineModal(props: ILockPipelineModalProps) {
               <p>
                 <a
                   className="btn btn-link"
-                  onClick={e => {
+                  onClick={(e) => {
                     e.preventDefault();
                     setSaveError(false);
                   }}
@@ -72,17 +74,17 @@ export function LockPipelineModal(props: ILockPipelineModalProps) {
             <FormField
               label="Unlock via UI"
               help={<HelpField id="pipeline.config.lock.allowUnlockUi" />}
-              input={inputProps => <CheckboxInput {...inputProps} />}
+              input={(inputProps) => <CheckboxInput {...inputProps} />}
               onChange={() => setAllowUnlockUi(!allowUnlockUi)}
               value={allowUnlockUi}
             />
             <FormField
               label="Description"
               help={<HelpField id="pipeline.config.lock.description" />}
-              input={inputProps => (
+              input={(inputProps) => (
                 <TextInput {...inputProps} placeholder="This pipeline is locked and does not allow modification" />
               )}
-              onChange={e => setDescription(e.target.value)}
+              onChange={(e) => setDescription(e.target.value)}
               value={description}
             />
           </form>

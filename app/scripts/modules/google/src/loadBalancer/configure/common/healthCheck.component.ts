@@ -1,5 +1,6 @@
-import { get } from 'lodash';
 import { IController, module } from 'angular';
+import { get } from 'lodash';
+
 import { IGceHealthCheck } from 'google/domain/index';
 
 class HealthCheckCreateCtrl implements IController {
@@ -43,7 +44,7 @@ class HealthCheckCreateCtrl implements IController {
         this.healthCheck.healthCheckType,
       ]) || [];
 
-    if (!this.existingHealthChecksForProtocol.find(healthCheck => healthCheck.name === this.healthCheck.name)) {
+    if (!this.existingHealthChecksForProtocol.find((healthCheck) => healthCheck.name === this.healthCheck.name)) {
       delete this.healthCheck.name;
       delete this.healthCheckPlaceholder;
     }

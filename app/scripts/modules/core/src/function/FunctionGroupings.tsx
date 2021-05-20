@@ -1,6 +1,8 @@
-import React from 'react';
 import { Application } from 'core';
+import React from 'react';
+
 import { IFunctionGroup } from 'core/domain';
+
 import { FunctionPod } from './FunctionPod';
 
 export interface IFunctionGroupingsProps {
@@ -14,10 +16,10 @@ export class FunctionGroupings extends React.Component<IFunctionGroupingsProps> 
   public render() {
     return (
       <div>
-        {this.props.groups.map(group => (
+        {this.props.groups.map((group) => (
           <div key={group.heading} className="rollup">
             {group.subgroups &&
-              group.subgroups.map(subgroup => (
+              group.subgroups.map((subgroup) => (
                 <FunctionPod
                   key={subgroup.heading}
                   grouping={subgroup}

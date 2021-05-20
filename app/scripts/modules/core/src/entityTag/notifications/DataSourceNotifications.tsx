@@ -1,10 +1,11 @@
 import { module } from 'angular';
-
 import React from 'react';
 import { react2angular } from 'react2angular';
 
-import { IEntityTags, IEntityTag } from 'core/domain';
 import { Application } from 'core/application';
+import { IEntityTag, IEntityTags } from 'core/domain';
+import { withErrorBoundary } from 'core/presentation/SpinErrorBoundary';
+
 import { NotificationsPopover } from './NotificationsPopover';
 
 export interface IDataSourceNotificationsProps {
@@ -22,7 +23,7 @@ export interface IDataSourceNotificationsProps {
 export class DataSourceNotifications extends React.Component<IDataSourceNotificationsProps> {
   public getDataSourceAnalyticsLabel = (): string => {
     const { tabName, application, tags } = this.props;
-    const alertsStr = tags.map(tag => tag.alerts.map((alert: IEntityTag) => alert.name).join(','));
+    const alertsStr = tags.map((tag) => tag.alerts.map((alert: IEntityTag) => alert.name).join(','));
     return [tabName, application.name, alertsStr].join(':');
   };
 
@@ -37,7 +38,7 @@ export class DataSourceNotifications extends React.Component<IDataSourceNotifica
         gaLabelFn={this.getDataSourceAnalyticsLabel}
         grouped={true}
         categorized={true}
-        placement="bottom"
+        placement="right"
       />
     );
   }
@@ -48,5 +49,9 @@ const ngmodule = module(DATA_SOURCE_NOTIFICATIONS, []);
 
 ngmodule.component(
   'dataSourceNotifications',
-  react2angular(DataSourceNotifications, ['tags', 'application', 'tabName']),
+  react2angular(withErrorBoundary(DataSourceNotifications, 'dataSourceNotifications'), [
+    'tags',
+    'application',
+    'tabName',
+  ]),
 );

@@ -1,5 +1,5 @@
 import { ComponentType, SFC } from 'react';
-import { IArtifactEditorProps, IArtifact } from 'core/domain';
+import { IArtifactEditorProps } from './IArtifactEditorProps';
 
 export interface IArtifactKindConfig {
   label: string;
@@ -11,8 +11,5 @@ export interface IArtifactKindConfig {
   type?: string;
   key: string;
   isMatch: boolean;
-  controller?: (artifact: IArtifact) => void;
-  controllerAs?: string;
-  template?: string;
   customKind?: boolean;
 }

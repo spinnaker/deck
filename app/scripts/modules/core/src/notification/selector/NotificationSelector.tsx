@@ -2,8 +2,8 @@ import React from 'react';
 import { Option } from 'react-select';
 
 import { INotificationTypeConfig } from 'core/domain';
-import { Registry } from 'core/registry';
 import { FormikFormField, ReactSelectInput } from 'core/presentation';
+import { Registry } from 'core/registry';
 
 import './notificationSelector.less';
 
@@ -49,7 +49,7 @@ export class NotificationSelector extends React.Component<INotificationSelectorP
         <FormikFormField
           label="Notify via"
           name={fieldName ? `${fieldName}.type` : 'type'}
-          input={props => (
+          input={(props) => (
             <ReactSelectInput
               clearable={false}
               {...props}

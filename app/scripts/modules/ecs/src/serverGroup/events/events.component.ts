@@ -1,5 +1,6 @@
-import { IController, IComponentOptions, module } from 'angular';
+import { IComponentOptions, IController, module } from 'angular';
 import { IModalService } from 'angular-ui-bootstrap';
+
 import { EVENTS_CTRL, EventsController } from './events.controller';
 
 class ViewEventsLinkCtrl implements IController {
@@ -13,6 +14,7 @@ class ViewEventsLinkCtrl implements IController {
       templateUrl: require('./events.html'),
       controller: EventsController,
       controllerAs: '$ctrl',
+      windowClass: 'modal-z-index',
       resolve: {
         serverGroup: () => this.serverGroup,
       },

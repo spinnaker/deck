@@ -1,3 +1,4 @@
+/* eslint-disable @spinnaker/import-sort */
 import React from 'react';
 import AceEditor, { AceEditorProps, Annotation } from 'react-ace';
 
@@ -36,7 +37,7 @@ export class JsonEditor extends React.Component<IJsonEditorProps> {
     if (!annotations || !annotations.length) {
       onValidation(null);
     }
-    const errors = annotations.map(a => {
+    const errors = annotations.map((a) => {
       return `Line ${a.row + 1}, column ${a.column + 1}: ${a.text}`;
     });
     onValidation(errors.join('; '));

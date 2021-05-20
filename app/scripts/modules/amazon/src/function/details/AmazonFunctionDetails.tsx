@@ -1,19 +1,21 @@
+import { isEmpty } from 'lodash';
 import React from 'react';
+import { Observable } from 'rxjs/Observable';
+import { Subject } from 'rxjs/Subject';
+
 import {
-  Details,
-  CollapsibleSection,
-  IFunction,
-  Application,
   AccountTag,
+  Application,
+  CollapsibleSection,
+  Details,
+  IFunction,
   IOverridableProps,
   Overrides,
 } from '@spinnaker/core';
-import { IAmazonFunctionSourceData, IAmazonFunction } from 'amazon/domain';
-import { FunctionActions } from './FunctionActions';
+import { IAmazonFunction, IAmazonFunctionSourceData } from 'amazon/domain';
 import { AwsReactInjector } from 'amazon/reactShims';
-import { isEmpty } from 'lodash';
-import { Observable } from 'rxjs/Observable';
-import { Subject } from 'rxjs/Subject';
+
+import { FunctionActions } from './FunctionActions';
 
 export interface IFunctionFromStateParams {
   account: string;
@@ -98,7 +100,7 @@ export class AmazonFunctionDetails extends React.Component<IAmazonFunctionDetail
     }
 
     const functionDetails = (
-      <dl className="horizontal-when-filters-collapsed dl-horizontal dl-flex">
+      <dl className="horizontal-when-filters-collapsed dl-horizontal dl-narrow">
         <dt>Last Modified </dt>
         <dd>{functionDef.lastModified}</dd>
         <dt>In</dt>

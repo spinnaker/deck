@@ -1,18 +1,17 @@
+import { get } from 'lodash';
 import React from 'react';
 import { Option } from 'react-select';
-import { get } from 'lodash';
 
 import {
   Application,
+  arePropsEqual,
+  createFakeReactSyntheticEvent,
   ISelectInputProps,
   ISubnet,
   Omit,
-  SETTINGS,
   SelectInput,
-  arePropsEqual,
-  createFakeReactSyntheticEvent,
+  SETTINGS,
 } from '@spinnaker/core';
-
 import { AWSProviderSettings } from 'amazon/aws.settings';
 
 export interface ISubnetSelectInputProps extends Omit<ISelectInputProps, 'options'> {
@@ -34,12 +33,12 @@ export class SubnetSelectInput extends React.Component<ISubnetSelectInputProps, 
   public state: ISubnetSelectInputState = { options: [] };
 
   private isClassicLockout(region: string, credentials: string, application: Application): boolean {
-    const { classicLaunchLockout, classicLaunchWhitelist: whitelist } = AWSProviderSettings;
+    const { classicLaunchLockout, classicLaunchAllowlist: allowlist } = AWSProviderSettings;
 
     const appCreationDate = Number(get(application, 'attributes.createTs', 0));
     const appCreatedAfterLockout = appCreationDate > (classicLaunchLockout || 0);
-    const isWhitelisted = !!whitelist && whitelist.some(e => e.region === region && e.credentials === credentials);
-    return appCreatedAfterLockout || !isWhitelisted;
+    const isAllowlisted = !!allowlist && allowlist.some((e) => e.region === region && e.credentials === credentials);
+    return appCreatedAfterLockout || !isAllowlisted;
   }
 
   private getOptions(subnets: ISubnet[], isClassicHidden: boolean): Array<Option<string>> {
@@ -49,12 +48,12 @@ export class SubnetSelectInput extends React.Component<ISubnetSelectInputProps, 
     const classicOption = isClassicHidden ? [] : [{ label: 'None (EC2 Classic)', value: '' } as Option];
 
     const activeOptions = subnets
-      .filter(x => !x.deprecated)
+      .filter((x) => !x.deprecated)
       .sort(sortByLabel)
       .map(asOption);
 
     const deprecatedOptions = subnets
-      .filter(x => x.deprecated)
+      .filter((x) => x.deprecated)
       .sort(sortByLabel)
       .map(asOption);
 
@@ -90,7 +89,7 @@ export class SubnetSelectInput extends React.Component<ISubnetSelectInputProps, 
   public applyDefaultSubnet() {
     const { value, onChange, subnets } = this.props;
     const defaultSubnetType = get(SETTINGS, 'providers.aws.defaults.subnetType');
-    const defaultSubnet = subnets.find(subnet => defaultSubnetType === subnet.purpose) || subnets[0];
+    const defaultSubnet = subnets.find((subnet) => defaultSubnetType === subnet.purpose) || subnets[0];
     if (!value && defaultSubnet) {
       onChange(createFakeReactSyntheticEvent({ name, value: defaultSubnet.purpose }));
     }

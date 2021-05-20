@@ -2,23 +2,23 @@ import { module } from 'angular';
 import { uniqWith } from 'lodash';
 
 import { InfrastructureCaches, ISearchResults, SearchService } from '@spinnaker/core';
-
 import { IGceHealthCheck } from 'google/domain';
 
 interface IHealthCheckSearchResults {
   name: string;
   account: string;
   healthCheck: string; // JSON encoded string containing the real health check (it is missing the account).
+  region?: string;
   kind: string;
   provider: string;
   type: string;
 }
 
 export class GceHealthCheckReader {
-  public listHealthChecks(type?: string): ng.IPromise<IGceHealthCheck[]> {
+  public listHealthChecks(type?: string): PromiseLike<IGceHealthCheck[]> {
     if (type) {
-      return this.listHealthChecks().then(healthChecks =>
-        healthChecks.filter(healthCheck => healthCheck.healthCheckType === type),
+      return this.listHealthChecks().then((healthChecks) =>
+        healthChecks.filter((healthCheck) => healthCheck.healthCheckType === type),
       );
     } else {
       return SearchService.search(
@@ -28,8 +28,8 @@ export class GceHealthCheckReader {
         .then((searchResults: ISearchResults<IHealthCheckSearchResults>) => {
           if (searchResults && searchResults.results) {
             const healthChecks = searchResults.results
-              .filter(result => result.provider === 'gce')
-              .map(result => {
+              .filter((result) => result.provider === 'gce')
+              .map((result) => {
                 const healthCheck = JSON.parse(result.healthCheck) as IGceHealthCheck;
                 healthCheck.account = result.account;
                 return healthCheck;

@@ -1,11 +1,11 @@
 import { module } from 'angular';
 
-import './pipeline/trigger/DockerTrigger';
 import { DOCKER_PIPELINE_STAGES_BAKE_DOCKERBAKESTAGE } from './pipeline/stages/bake/dockerBakeStage';
+import './pipeline/trigger/DockerTrigger';
 
 // load all templates into the $templateCache
 const templates = require.context('./', true, /\.html$/);
-templates.keys().forEach(function(key) {
+templates.keys().forEach(function (key) {
   templates(key);
 });
 

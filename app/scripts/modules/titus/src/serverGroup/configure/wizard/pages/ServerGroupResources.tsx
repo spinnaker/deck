@@ -1,10 +1,10 @@
+import { FormikProps } from 'formik';
 import React from 'react';
 import Select, { Option } from 'react-select';
 
-import { HelpField, IWizardPageComponent } from '@spinnaker/core';
+import { HelpField, IWizardPageComponent, SpelNumberInput } from '@spinnaker/core';
 
 import { ITitusServerGroupCommand } from '../../../configure/serverGroupConfiguration.service';
-import { FormikProps } from 'formik';
 
 const mountPermOptions = [
   { label: 'Read and Write', value: 'RW' },
@@ -16,21 +16,22 @@ export interface IServerGroupResourcesProps {
   formik: FormikProps<ITitusServerGroupCommand>;
 }
 
-export class ServerGroupResources extends React.Component<IServerGroupResourcesProps>
+export class ServerGroupResources
+  extends React.Component<IServerGroupResourcesProps>
   implements IWizardPageComponent<ITitusServerGroupCommand> {
   public validate(values: ITitusServerGroupCommand) {
     const errors = {} as any;
 
-    if (!values.resources || typeof values.resources.cpu === 'string') {
+    if (!values.resources) {
       errors.resources = 'CPU is required.';
     }
-    if (!values.resources || typeof values.resources.memory === 'string') {
+    if (!values.resources) {
       errors.resources = 'Memory is required.';
     }
-    if (!values.resources || typeof values.resources.disk === 'string') {
+    if (!values.resources) {
       errors.resources = 'Disk is required.';
     }
-    if (!values.resources || typeof values.resources.networkMbps === 'string') {
+    if (!values.resources) {
       errors.resources = 'Network is required.';
     }
 
@@ -45,15 +46,13 @@ export class ServerGroupResources extends React.Component<IServerGroupResourcesP
           <div className="col-md-3 sm-label-right">
             <b>CPU(s)</b>
           </div>
-          <div className="col-md-3">
-            <input
-              type="number"
-              className="form-control input-sm"
+          <div className="col-md-8">
+            <SpelNumberInput
               value={values.resources.cpu}
-              onChange={e =>
+              onChange={(value) =>
                 setFieldValue('resources', {
                   ...values.resources,
-                  ...{ cpu: Number.parseInt(e.target.value, 10) || e.target.value },
+                  ...{ cpu: value },
                 })
               }
               required={true}
@@ -64,15 +63,13 @@ export class ServerGroupResources extends React.Component<IServerGroupResourcesP
           <div className="col-md-3 sm-label-right">
             <b>Memory (MB)</b>
           </div>
-          <div className="col-md-3">
-            <input
-              type="number"
-              className="form-control input-sm"
+          <div className="col-md-8">
+            <SpelNumberInput
               value={values.resources.memory}
-              onChange={e =>
+              onChange={(value) =>
                 setFieldValue('resources', {
                   ...values.resources,
-                  ...{ memory: Number.parseInt(e.target.value, 10) || e.target.value },
+                  ...{ memory: value },
                 })
               }
               required={true}
@@ -83,15 +80,13 @@ export class ServerGroupResources extends React.Component<IServerGroupResourcesP
           <div className="col-md-3 sm-label-right">
             <b>Disk (MB)</b>
           </div>
-          <div className="col-md-3">
-            <input
-              type="number"
-              className="form-control input-sm"
+          <div className="col-md-8">
+            <SpelNumberInput
               value={values.resources.disk}
-              onChange={e =>
+              onChange={(value) =>
                 setFieldValue('resources', {
                   ...values.resources,
-                  ...{ disk: Number.parseInt(e.target.value, 10) || e.target.value },
+                  ...{ disk: value },
                 })
               }
               required={true}
@@ -103,15 +98,13 @@ export class ServerGroupResources extends React.Component<IServerGroupResourcesP
             <b>Network (Mbps)</b>
             <HelpField id="titus.deploy.network" />
           </div>
-          <div className="col-md-3">
-            <input
-              type="number"
-              className="form-control input-sm"
+          <div className="col-md-8">
+            <SpelNumberInput
               value={values.resources.networkMbps}
-              onChange={e =>
+              onChange={(value) =>
                 setFieldValue('resources', {
                   ...values.resources,
-                  ...{ networkMbps: Number.parseInt(e.target.value, 10) || e.target.value },
+                  ...{ networkMbps: value },
                 })
               }
               required={true}
@@ -123,15 +116,13 @@ export class ServerGroupResources extends React.Component<IServerGroupResourcesP
             <b>Gpu</b>
             <HelpField id="titus.deploy.gpu" />
           </div>
-          <div className="col-md-3">
-            <input
-              type="number"
-              className="form-control input-sm"
+          <div className="col-md-8">
+            <SpelNumberInput
               value={values.resources.gpu}
-              onChange={e =>
+              onChange={(value) =>
                 setFieldValue('resources', {
                   ...values.resources,
-                  ...{ gpu: Number.parseInt(e.target.value, 10) || e.target.value },
+                  ...{ gpu: value },
                 })
               }
             />
@@ -168,7 +159,7 @@ export class ServerGroupResources extends React.Component<IServerGroupResourcesP
               type="text"
               className="form-control input-sm no-spel"
               value={values.efs.mountPoint}
-              onChange={e => setFieldValue('efs', { ...values.efs, ...{ mountPoint: e.target.value } })}
+              onChange={(e) => setFieldValue('efs', { ...values.efs, ...{ mountPoint: e.target.value } })}
             />
           </div>
         </div>
@@ -182,7 +173,7 @@ export class ServerGroupResources extends React.Component<IServerGroupResourcesP
               type="text"
               className="form-control input-sm no-spel"
               value={values.efs.efsId}
-              onChange={e => setFieldValue('efs', { ...values.efs, ...{ efsId: e.target.value } })}
+              onChange={(e) => setFieldValue('efs', { ...values.efs, ...{ efsId: e.target.value } })}
             />
           </div>
           <div className="col-md-offset-3 col-md-8" />
@@ -197,7 +188,7 @@ export class ServerGroupResources extends React.Component<IServerGroupResourcesP
               type="text"
               className="form-control input-sm no-spel"
               value={values.efs.efsRelativeMountPoint}
-              onChange={e => setFieldValue('efs', { ...values.efs, ...{ efsRelativeMountPoint: e.target.value } })}
+              onChange={(e) => setFieldValue('efs', { ...values.efs, ...{ efsRelativeMountPoint: e.target.value } })}
             />
           </div>
         </div>

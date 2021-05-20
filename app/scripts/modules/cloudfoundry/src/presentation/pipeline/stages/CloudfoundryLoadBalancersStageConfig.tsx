@@ -1,5 +1,5 @@
+import { Formik } from 'formik';
 import React from 'react';
-
 import { Observable, Subject } from 'rxjs';
 
 import {
@@ -14,8 +14,8 @@ import {
   StageConstants,
 } from '@spinnaker/core';
 
-import { AccountRegionClusterSelector, Routes } from 'cloudfoundry/presentation';
-import { Formik } from 'formik';
+import { Routes } from '../../forms/serverGroup';
+import { AccountRegionClusterSelector } from '../../widgets/accountRegionClusterSelector';
 
 interface ICloudfoundryLoadBalancerStageConfigProps extends IStageConfigProps {
   pipeline: IPipeline;
@@ -60,7 +60,7 @@ export class CloudfoundryLoadBalancersStageConfig extends React.Component<
   public componentDidMount(): void {
     Observable.fromPromise(AccountService.listAccounts('cloudfoundry'))
       .takeUntil(this.destroy$)
-      .subscribe(accounts => this.setState({ accounts }));
+      .subscribe((accounts) => this.setState({ accounts }));
   }
 
   public componentWillUnmount(): void {

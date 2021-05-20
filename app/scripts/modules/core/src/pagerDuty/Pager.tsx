@@ -1,10 +1,9 @@
-import React from 'react';
 import { UISref } from '@uirouter/react';
 import SearchApi from 'js-worker-search';
 import { groupBy } from 'lodash';
 import { Debounce } from 'lodash-decorators';
 import { DateTime } from 'luxon';
-import { Observable } from 'rxjs';
+import React, { ReactNode } from 'react';
 import {
   AutoSizer,
   CellMeasurer,
@@ -16,20 +15,21 @@ import {
   TableCellProps,
   TableHeaderProps,
 } from 'react-virtualized';
-
-// defined in react-virtualized but TS complains about not finding it so we duplicate it here
-type SortDirectionType = 'ASC' | 'DESC';
+import { Observable } from 'rxjs';
 
 import { ApplicationReader, IApplicationSummary } from 'core/application';
-import { relativeTime } from 'core/utils/timeFormatters';
-import { IOnCall, IPagerDutyService, PagerDutyReader } from './pagerDuty.read.service';
-import { ReactInjector } from 'core/reactShims';
 import { SETTINGS } from 'core/config';
+import { Overridable } from 'core/overrideRegistry';
 import { Markdown } from 'core/presentation';
+import { ReactInjector } from 'core/reactShims';
+import { relativeTime } from 'core/utils/timeFormatters';
+
+import { PageButton } from './PageButton';
+import { IOnCall, IPagerDutyService, PagerDutyReader } from './pagerDuty.read.service';
 
 import './pager.less';
 
-import { PageButton } from './PageButton';
+type SortDirectionType = 'ASC' | 'DESC';
 
 export interface IUserDisplay {
   level: number;
@@ -84,6 +84,13 @@ const SortIndicator = (props: { direction: SortDirectionType; sorted: boolean })
   }
   return <span className="fa fa-caret-down disabled" />;
 };
+
+@Overridable('pager.banner')
+class PagerBanner extends React.Component {
+  render(): ReactNode {
+    return null;
+  }
+}
 
 export class Pager extends React.Component<IPagerProps, IPagerState> {
   private cache = new CellMeasurerCache({
@@ -164,7 +171,7 @@ export class Pager extends React.Component<IPagerProps, IPagerState> {
   }
 
   private findServiceByApplicationName(applicationName: string): IOnCallsByService {
-    return this.allData.find(data => data.applications.some(application => application.name === applicationName));
+    return this.allData.find((data) => data.applications.some((application) => application.name === applicationName));
   }
 
   @Debounce(25)
@@ -181,7 +188,7 @@ export class Pager extends React.Component<IPagerProps, IPagerState> {
       const foundServices: IOnCallsByService[] = [];
       const notFoundApps: string[] = [];
 
-      app.split(',').forEach(applicationName => {
+      app.split(',').forEach((applicationName) => {
         const service = this.findServiceByApplicationName(applicationName);
         if (service) {
           foundServices.push(service);
@@ -191,7 +198,7 @@ export class Pager extends React.Component<IPagerProps, IPagerState> {
       });
 
       if (foundServices.length > 0) {
-        foundServices.forEach(foundService =>
+        foundServices.forEach((foundService) =>
           selectedKeys.set(foundService.service.integration_key, foundService.service),
         );
         this.setState({ sortedData: foundServices, selectedKeys, notFoundApps });
@@ -205,8 +212,8 @@ export class Pager extends React.Component<IPagerProps, IPagerState> {
     }
 
     if (keys && keys.length > 0) {
-      const selectedServices = this.allData.filter(data => keys.includes(data.service.integration_key));
-      selectedServices.forEach(s => selectedKeys.set(s.service.integration_key, s.service));
+      const selectedServices = this.allData.filter((data) => keys.includes(data.service.integration_key));
+      selectedServices.forEach((s) => selectedKeys.set(s.service.integration_key, s.service));
       this.setState({ selectedKeys });
     }
 
@@ -220,9 +227,9 @@ export class Pager extends React.Component<IPagerProps, IPagerState> {
     });
 
     this.searchApi.search(filterString).then((results: string[]) => {
-      let data = results.map(serviceId => this.allData.find(service => service.service.id === serviceId));
+      let data = results.map((serviceId) => this.allData.find((service) => service.service.id === serviceId));
       if (hideNoApps) {
-        data = data.filter(s => s.applications.length);
+        data = data.filter((s) => s.applications.length);
       }
       this.sortList(data, sortBy, sortDirection);
       this.cache.clearAll();
@@ -231,18 +238,18 @@ export class Pager extends React.Component<IPagerProps, IPagerState> {
     });
   }
 
-  public componentWillUpdate(_nextProps: IPagerProps, nextState: IPagerState): void {
-    if (nextState.filterString !== this.state.filterString || nextState.hideNoApps !== this.state.hideNoApps) {
+  public componentDidUpdate(_prevProps: IPagerProps, prevState: IPagerState): void {
+    if (prevState.filterString !== this.state.filterString || prevState.hideNoApps !== this.state.hideNoApps) {
       this.runFilter(
-        nextState.app,
-        nextState.initialKeys,
-        nextState.filterString,
-        nextState.sortBy,
-        nextState.sortDirection,
-        nextState.hideNoApps,
+        this.state.app,
+        this.state.initialKeys,
+        this.state.filterString,
+        this.state.sortBy,
+        this.state.sortDirection,
+        this.state.hideNoApps,
       );
     } else {
-      this.sort({ sortBy: nextState.sortBy, sortDirection: nextState.sortDirection });
+      this.sort({ sortBy: this.state.sortBy, sortDirection: this.state.sortDirection });
     }
   }
 
@@ -253,8 +260,8 @@ export class Pager extends React.Component<IPagerProps, IPagerState> {
   ): IOnCallsByService[] {
     const appsByApiKey = groupBy(applications, 'pdApiKey');
     return services
-      .filter(a => a.integration_key) // filter out services without an integration_key
-      .map(service => {
+      .filter((a) => a.integration_key) // filter out services without an integration_key
+      .map((service) => {
         // connect the users attached to the service by way of escalation policy
         let users: IUserList;
         const searchTokens: string[] = [service.name];
@@ -262,21 +269,21 @@ export class Pager extends React.Component<IPagerProps, IPagerState> {
         if (levels) {
           users = groupBy(
             levels
-              .map(level => {
+              .map((level) => {
                 return level.user
                   ? { name: level.user.summary, url: level.user.html_url, level: level.escalation_level }
                   : undefined;
               })
-              .filter(a => a),
+              .filter((a) => a),
             'level',
           );
-          searchTokens.push(...levels.map(level => (level.user ? level.user.summary : undefined)).filter(n => n));
+          searchTokens.push(...levels.map((level) => (level.user ? level.user.summary : undefined)).filter((n) => n));
         }
 
         // Get applications associated with the service key
         const apiKey = service.integration_key;
         const associatedApplications = appsByApiKey[apiKey] ?? [];
-        searchTokens.push(...associatedApplications.map(app => `${app.name},${app.aliases || ''}`));
+        searchTokens.push(...associatedApplications.map((app) => `${app.name},${app.aliases || ''}`));
 
         const onCallsByService = {
           users,
@@ -329,7 +336,7 @@ export class Pager extends React.Component<IPagerProps, IPagerState> {
 
   private applicationRenderer = (data: TableCellProps): React.ReactNode => {
     const apps: IApplicationSummary[] = data.cellData;
-    const appList = apps.map(app => {
+    const appList = apps.map((app) => {
       let displayName = app.name;
       if (app.aliases) {
         displayName = `${displayName} (${app.aliases.replace(/,/g, ', ')})`;
@@ -337,7 +344,7 @@ export class Pager extends React.Component<IPagerProps, IPagerState> {
 
       return (
         <li key={app.name}>
-          <UISref to="home.applications.application.insight.clusters" params={{ application: app.name }}>
+          <UISref to="home.applications.application" params={{ application: app.name }}>
             <a>
               <Markdown message={this.highlight(displayName)} tag="span" />
             </a>
@@ -382,13 +389,13 @@ export class Pager extends React.Component<IPagerProps, IPagerState> {
       >
         <div style={paddingStyle}>
           {onCalls
-            ? Object.keys(onCalls).map(level => {
+            ? Object.keys(onCalls).map((level) => {
                 return (
                   <div key={level} className="users">
                     <div className="user-level">{level}</div>
                     <div className="user-names">
                       {onCalls[Number(level)]
-                        .filter(user => !user.name.includes('ExcludeFromAudit'))
+                        .filter((user) => !user.name.includes('ExcludeFromAudit'))
                         .map((user, index) => (
                           <a key={index} target="_blank" href={user.url}>
                             <Markdown tag="span" message={this.highlight(user.name)} />
@@ -499,6 +506,7 @@ export class Pager extends React.Component<IPagerProps, IPagerState> {
               </div>
             </h2>
           </div>
+          <PagerBanner />
         </div>
 
         <div className="container main-content on-call scrollable-columns">
@@ -508,10 +516,7 @@ export class Pager extends React.Component<IPagerProps, IPagerState> {
                 PagerDuty Services were not found for the following applications:{' '}
                 {notFoundApps.map((applicationName, i) => (
                   <>
-                    <UISref
-                      to="home.applications.application.insight.clusters"
-                      params={{ application: applicationName }}
-                    >
+                    <UISref to="home.applications.application" params={{ application: applicationName }}>
                       <a className="clickable">{applicationName}</a>
                     </UISref>
                     {i + 1 < notFoundApps.length && ', '}
@@ -605,7 +610,7 @@ export class Pager extends React.Component<IPagerProps, IPagerState> {
               {selectedKeys.size} {selectedKeys.size === 1 ? 'policy' : 'policies'} selected{' '}
             </span>
             <div className="selected-pills">
-              {Array.from(selectedKeys.values()).map(service => (
+              {Array.from(selectedKeys.values()).map((service) => (
                 <ServicePill key={service.integration_key} service={service} changeCallback={this.selectedChanged} />
               ))}
             </div>

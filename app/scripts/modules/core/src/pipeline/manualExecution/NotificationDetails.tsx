@@ -1,11 +1,11 @@
-import React from 'react';
 import { FormikProps } from 'formik';
+import React from 'react';
 import { Option } from 'react-select';
 
 import { INotification, INotificationTypeConfig, IPipelineCommand } from 'core/domain';
+import { NotificationSelector, NotificationTransformer } from 'core/notification';
 import { CheckboxInput, FormikFormField, HoverablePopover } from 'core/presentation';
 import { Registry } from 'core/registry';
-import { NotificationSelector, NotificationTransformer } from 'core/notification';
 
 export interface INotificationDetailsProps {
   formik: FormikProps<IPipelineCommand>;
@@ -66,8 +66,7 @@ export class NotificationDetails extends React.Component<INotificationDetailsPro
         <FormikFormField
           name="notificationEnabled"
           label="Notifications"
-          fastField={false}
-          input={props => <CheckboxInput {...props} text={'Notify me when the pipeline completes'} />}
+          input={(props) => <CheckboxInput {...props} text={'Notify me when the pipeline completes'} />}
         />
         <div className="form-group">
           {notifications.length === 1 && (

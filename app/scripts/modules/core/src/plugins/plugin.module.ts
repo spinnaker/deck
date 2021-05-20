@@ -1,5 +1,6 @@
-import { module } from 'angular';
 import { UIRouter } from '@uirouter/core';
+import { IRootScopeService, module } from 'angular';
+
 import { PluginRegistry } from './plugin.registry';
 import { sharedLibraries } from './sharedLibraries';
 
@@ -14,8 +15,9 @@ module(PLUGINS_MODULE, ['ui.router'])
     },
   ])
   .run([
+    '$rootScope',
     '$uiRouter',
-    async ($uiRouter: UIRouter) => {
+    async ($rootScope: IRootScopeService, $uiRouter: UIRouter) => {
       // TODO: find a better home for this registry
       const pluginRegistry = new PluginRegistry();
       try {
@@ -24,8 +26,10 @@ module(PLUGINS_MODULE, ['ui.router'])
         await pluginRegistry.loadPlugins();
       } finally {
         // When done, tell the router to initialize
-        $uiRouter.urlService.listen();
-        $uiRouter.urlService.sync();
+        $rootScope.$applyAsync(() => {
+          $uiRouter.urlService.listen();
+          $uiRouter.urlService.sync();
+        });
       }
     },
   ]);

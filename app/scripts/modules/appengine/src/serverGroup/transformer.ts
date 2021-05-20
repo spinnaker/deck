@@ -1,8 +1,8 @@
 import { module } from 'angular';
 
-import { IServerGroup, IArtifactAccountPair } from '@spinnaker/core';
-
+import { IArtifact, IArtifactAccountPair, IServerGroup } from '@spinnaker/core';
 import { GitCredentialType, IAppengineGitTrigger, IAppengineJenkinsTrigger } from 'appengine/domain/index';
+
 import { IAppengineServerGroupCommand } from './configure/serverGroupCommandBuilder.service';
 
 export class AppengineDeployDescription {
@@ -31,6 +31,7 @@ export class AppengineDeployDescription {
   public gitCredentialType: GitCredentialType;
   public interestingHealthProviderNames: string[];
   public expectedArtifactId: string;
+  public expectedArtifact: IArtifact;
   public fromArtifact: boolean;
   public sourceType: string;
   public storageAccountName?: string;
@@ -57,10 +58,11 @@ export class AppengineDeployDescription {
     this.trigger = command.trigger;
     this.gitCredentialType = command.gitCredentialType;
     this.configFiles = command.configFiles;
-    this.configArtifacts = command.configArtifacts.filter(a => !!a.id || !!a.artifact);
+    this.configArtifacts = command.configArtifacts.filter((a) => !!a.id || !!a.artifact);
     this.applicationDirectoryRoot = command.applicationDirectoryRoot;
     this.interestingHealthProviderNames = command.interestingHealthProviderNames || [];
     this.expectedArtifactId = command.expectedArtifactId;
+    this.expectedArtifact = command.expectedArtifact;
     this.fromArtifact = command.fromArtifact;
     this.sourceType = command.sourceType;
     this.storageAccountName = command.storageAccountName;
@@ -69,11 +71,11 @@ export class AppengineDeployDescription {
   }
 }
 
-class AppengineServerGroupTransformer {
+export class AppengineServerGroupTransformer {
   public static $inject = ['$q'];
   constructor(private $q: ng.IQService) {}
 
-  public normalizeServerGroup(serverGroup: IServerGroup): ng.IPromise<IServerGroup> {
+  public normalizeServerGroup(serverGroup: IServerGroup): PromiseLike<IServerGroup> {
     return this.$q.resolve(serverGroup);
   }
 

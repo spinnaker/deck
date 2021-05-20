@@ -1,14 +1,14 @@
-import React from 'react';
-import { uniq } from 'lodash';
 import { FormikProps } from 'formik';
+import { uniq } from 'lodash';
+import React from 'react';
 
 import { Application } from 'core/application';
 import { BuildServiceType, IgorService } from 'core/ci/igor.service';
 import { IWerckerTrigger } from 'core/domain';
 import { FormikFormField, ReactSelectInput, useLatestPromise } from 'core/presentation';
-import { IBaseBuildTriggerConfigProps } from '../baseBuild/BaseBuildTrigger';
 
 import { RefreshableReactSelectInput } from '../RefreshableReactSelectInput';
+import { IBaseBuildTriggerConfigProps } from '../baseBuild/BaseBuildTrigger';
 
 export interface IWerckerTriggerConfigProps extends IBaseBuildTriggerConfigProps {
   formik: FormikProps<IWerckerTrigger>;
@@ -39,7 +39,7 @@ export function WerckerTrigger(werckerTriggerProps: IWerckerTriggerConfigProps) 
   const mastersLoaded = fetchMasters.status === 'RESOLVED';
 
   const fetchJobs = useLatestPromise(() => {
-    return master && IgorService.listJobsForMaster(master).then(x => x.map(getJobParts));
+    return master && IgorService.listJobsForMaster(master).then((x) => x.map(getJobParts));
   }, [master]);
 
   const jobs = fetchJobs.result;
@@ -47,11 +47,11 @@ export function WerckerTrigger(werckerTriggerProps: IWerckerTriggerConfigProps) 
   const jobsLoaded = fetchJobs.status === 'RESOLVED';
 
   const apps = React.useMemo(() => {
-    return jobsLoaded ? uniq(jobs.map(job => job.app)) : [];
+    return jobsLoaded ? uniq(jobs.map((job) => job.app)) : [];
   }, [jobsLoaded, jobs]);
 
   const pipelines = React.useMemo(() => {
-    return jobsLoaded ? jobs.filter(parts => parts.app === app).map(parts => parts.pipeline) : [];
+    return jobsLoaded ? jobs.filter((parts) => parts.app === app).map((parts) => parts.pipeline) : [];
   }, [jobsLoaded, app, jobs]);
 
   // Clear out app or pipeline if they aren't in the fetched jobs data
@@ -76,8 +76,7 @@ export function WerckerTrigger(werckerTriggerProps: IWerckerTriggerConfigProps) 
       <FormikFormField
         name="master"
         label="Build Service"
-        fastField={false}
-        input={props => (
+        input={(props) => (
           <RefreshableReactSelectInput
             {...props}
             stringOptions={fetchMasters.result}
@@ -93,8 +92,7 @@ export function WerckerTrigger(werckerTriggerProps: IWerckerTriggerConfigProps) 
       <FormikFormField
         name="app"
         label="Application"
-        fastField={false}
-        input={props => (
+        input={(props) => (
           <RefreshableReactSelectInput
             {...props}
             stringOptions={apps}
@@ -110,8 +108,7 @@ export function WerckerTrigger(werckerTriggerProps: IWerckerTriggerConfigProps) 
       <FormikFormField
         name="pipeline"
         label="Pipeline"
-        fastField={false}
-        input={props => (
+        input={(props) => (
           <ReactSelectInput
             {...props}
             disabled={!master || !jobsLoaded}

@@ -1,12 +1,13 @@
-import React from 'react';
 import { get } from 'lodash';
+import React from 'react';
 
-import { IExecution, IExecutionStage } from 'core/domain';
 import { Application } from 'core/application/application.model';
 import { ConfirmationModalService } from 'core/confirmationModal';
+import { IExecution, IExecutionStage } from 'core/domain';
 import { ReactInjector } from 'core/reactShims';
-import { timePickerTime } from 'core/utils/timeFormatters';
 import { SystemTimezone } from 'core/utils/SystemTimezone';
+import { timePickerTime } from 'core/utils/timeFormatters';
+
 import { DAYS_OF_WEEK } from './daysOfWeek';
 
 export interface IExecutionWindowActionsProps {
@@ -19,7 +20,7 @@ export interface IExecutionWindowActionsState {
   dayText: string;
 }
 
-export interface IExecutionWindowWhitelistEntry {
+export interface IExecutionWindowAllowlistEntry {
   startHour: number;
   startMin: number;
   endHour: number;
@@ -35,7 +36,7 @@ export class ExecutionWindowActions extends React.Component<
 > {
   constructor(props: IExecutionWindowActionsProps) {
     super(props);
-    const days = props.stage.context.restrictedExecutionWindow.days;
+    const days = props.stage.context.restrictedExecutionWindow?.days;
     let dayText = 'Everyday';
     if (days && days.length > 0) {
       dayText = this.replaceDays(days).join(', ');
@@ -51,7 +52,7 @@ export class ExecutionWindowActions extends React.Component<
     const { application, execution, stage } = this.props;
 
     const matcher = (updated: IExecution) => {
-      const match = updated.stages.find(test => test.id === stage.id);
+      const match = updated.stages.find((test) => test.id === stage.id);
       return match.status !== 'RUNNING';
     };
 
@@ -64,14 +65,14 @@ export class ExecutionWindowActions extends React.Component<
         return executionService
           .patchExecution(execution.id, stage.id, data)
           .then(() => executionService.waitUntilExecutionMatches(execution.id, matcher))
-          .then(updated => executionService.updateExecution(application, updated));
+          .then((updated) => executionService.updateExecution(application, updated));
       },
     });
   };
 
   private replaceDays(days: number[]): string[] {
     const daySet = new Set(days);
-    return DAYS_OF_WEEK.filter(day => daySet.has(day.ordinal)).map(day => day.label);
+    return DAYS_OF_WEEK.filter((day) => daySet.has(day.ordinal)).map((day) => day.label);
   }
 
   public render() {
@@ -82,7 +83,7 @@ export class ExecutionWindowActions extends React.Component<
         <strong>Stage execution can only run:</strong>
         <dl className="dl-narrow dl-horizontal">
           {get(stage, 'context.restrictedExecutionWindow.whitelist', []).map(
-            (entry: IExecutionWindowWhitelistEntry, index: number) => {
+            (entry: IExecutionWindowAllowlistEntry, index: number) => {
               return (
                 <div key={index}>
                   <dt>From</dt>

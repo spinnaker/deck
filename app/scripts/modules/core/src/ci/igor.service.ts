@@ -1,8 +1,7 @@
-import { IPromise } from 'angular';
 import { $q } from 'ngimport';
 
-import { API } from 'core/api/ApiService';
-import { IBuild, IJobConfig, IGcbTrigger } from 'core/domain';
+import { REST } from 'core/api/ApiService';
+import { IBuild, IGcbTrigger, IJobConfig } from 'core/domain';
 
 export enum BuildServiceType {
   Jenkins = 'jenkins',
@@ -12,68 +11,48 @@ export enum BuildServiceType {
 }
 
 export class IgorService {
-  public static listMasters(buildType: BuildServiceType = null): IPromise<string[]> {
-    const allMasters: IPromise<string[]> = API.one('v2')
-      .one('builds')
-      .withParams({ type: buildType })
-      .get();
+  public static listMasters(buildType: BuildServiceType = null): PromiseLike<string[]> {
+    const allMasters: PromiseLike<string[]> = REST('/v2/builds').query({ type: buildType }).get();
     if (!allMasters) {
       return $q.reject('An error occurred when retrieving build masters');
     }
     switch (buildType) {
       case BuildServiceType.Jenkins:
-        return allMasters.then(masters => masters.filter(master => !/^travis-/.test(master)));
+        return allMasters.then((masters) => masters.filter((master) => !/^travis-/.test(master)));
       case BuildServiceType.Travis:
-        return allMasters.then(masters => masters.filter(master => /^travis-/.test(master)));
+        return allMasters.then((masters) => masters.filter((master) => /^travis-/.test(master)));
       case BuildServiceType.Concourse:
-        return allMasters.then(masters => masters.filter(master => /^concourse-/.test(master)));
+        return allMasters.then((masters) => masters.filter((master) => /^concourse-/.test(master)));
       default:
         return allMasters;
     }
   }
 
-  public static listJobsForMaster(master: string): IPromise<string[]> {
-    return API.one('v2')
-      .one('builds')
-      .one(master)
-      .one('jobs')
-      .get();
+  public static listJobsForMaster(master: string): PromiseLike<string[]> {
+    return REST('/v3/builds').path(master, 'jobs').get();
   }
 
-  public static listBuildsForJob(master: string, job: string): IPromise<IBuild[]> {
-    return API.one('v2')
-      .one('builds')
-      .one(master)
-      .one('builds')
-      .one(job)
-      .get();
+  public static listBuildsForJob(master: string, job: string): PromiseLike<IBuild[]> {
+    return REST('/v3/builds').path(master, 'builds').query({ job }).get();
   }
 
-  public static getJobConfig(master: string, job: string): IPromise<IJobConfig> {
-    return API.one('v2')
-      .one('builds')
-      .one(master)
-      .one('jobs')
-      .one(job)
-      .get();
+  public static getJobConfig(master: string, job: string): PromiseLike<IJobConfig> {
+    return REST('/v3/builds').path(master, 'job').query({ job }).get();
   }
 
-  public static getGcbAccounts(): IPromise<string[]> {
-    return API.one('gcb')
-      .one('accounts')
-      .get();
+  public static getGcbAccounts(): PromiseLike<string[]> {
+    return REST('/gcb/accounts').get();
   }
 
-  public static getGcbTriggers(account: string): IPromise<IGcbTrigger[]> {
-    return API.one('gcb')
-      .one('triggers')
-      .one(account)
-      .get();
+  public static getGcbTriggers(account: string): PromiseLike<IGcbTrigger[]> {
+    return REST('/gcb/triggers').path(account).get();
   }
 
-  public static getCodeBuildAccounts(): IPromise<string[]> {
-    return API.one('codebuild')
-      .one('accounts')
-      .get();
+  public static getCodeBuildAccounts(): PromiseLike<string[]> {
+    return REST('/codebuild/accounts').get();
+  }
+
+  public static getCodeBuildProjects(account: string): PromiseLike<string[]> {
+    return REST('/codebuild/projects').path(account).get();
   }
 }

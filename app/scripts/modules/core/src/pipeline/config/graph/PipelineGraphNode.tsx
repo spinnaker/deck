@@ -1,14 +1,14 @@
-import React from 'react';
-import ReactGA from 'react-ga';
 import classNames from 'classnames';
 import { get } from 'lodash';
+import React from 'react';
+import ReactGA from 'react-ga';
 
 import { IExecutionStageSummary } from 'core/domain';
-import { GroupExecutionPopover } from '../stages/group/GroupExecutionPopover';
 import { LabelComponent, Markdown } from 'core/presentation';
 import { Popover } from 'core/presentation/Popover';
 
 import { IPipelineGraphNode } from './pipelineGraph.service';
+import { GroupExecutionPopover } from '../stages/group/GroupExecutionPopover';
 
 export interface IPipelineGraphNodeProps {
   isExecution: boolean;
@@ -68,7 +68,7 @@ export class PipelineGraphNode extends React.Component<IPipelineGraphNodeProps> 
         <p>The following errors may affect the ability to run this pipeline:</p>
         <ul>
           {node.hasWarnings &&
-            node.warnings.messages.map(message => (
+            node.warnings.messages.map((message) => (
               <li key={message}>
                 <Markdown message={message} trim={true} />
               </li>

@@ -1,7 +1,7 @@
+import { Form, FormikContext } from 'formik';
 import React from 'react';
 import { Modal } from 'react-bootstrap';
-import { Form, FormikContext } from 'formik';
-import { ITitusServerGroup } from 'titus/domain';
+
 import {
   Application,
   FormikFormField,
@@ -17,6 +17,8 @@ import {
   UserVerification,
   ValidationMessage,
 } from '@spinnaker/core';
+import { ITitusServerGroup } from 'titus/domain';
+
 import { useTaskMonitor } from './useTaskMonitor';
 
 const { useState, useEffect, useMemo } = React;
@@ -37,7 +39,7 @@ interface ITitusResizeServerGroupCommand {
 function surfacedErrorMessage(formik: FormikContext<ITitusResizeServerGroupCommand>) {
   const capacityErrors = formik.errors.capacity || ({} as any);
   const { min, max, desired } = capacityErrors;
-  return [min, max, desired].find(x => !!x);
+  return [min, max, desired].find((x) => !!x);
 }
 
 function SimpleMode({ formik, serverGroup, toggleMode }: IAdvancedModeProps) {
@@ -81,7 +83,7 @@ function SimpleMode({ formik, serverGroup, toggleMode }: IAdvancedModeProps) {
           <div className="horizontal middle">
             <FormikFormField
               name="capacity.desired"
-              input={props => <NumberInput {...props} min={0} />}
+              input={(props) => <NumberInput {...props} min={0} />}
               layout={({ input }) => <>{input}</>}
               touched={true}
               onChange={() => {}}
@@ -151,9 +153,8 @@ function AdvancedMode({ formik, serverGroup, toggleMode }: IAdvancedModeProps) {
         <div className="col-md-3 sm-label-right">Resize to</div>
         <div className="col-md-2">
           <FormikFormField
-            fastField={false}
             name="capacity.min"
-            input={props => <NumberInput {...props} min={0} max={max} />}
+            input={(props) => <NumberInput {...props} min={0} max={max} />}
             layout={({ input }) => <>{input}</>}
             touched={true}
           />
@@ -161,9 +162,8 @@ function AdvancedMode({ formik, serverGroup, toggleMode }: IAdvancedModeProps) {
 
         <div className="col-md-2">
           <FormikFormField
-            fastField={false}
             name="capacity.max"
-            input={props => <NumberInput {...props} min={min} />}
+            input={(props) => <NumberInput {...props} min={min} />}
             layout={({ input }) => <>{input}</>}
             touched={true}
           />
@@ -171,9 +171,8 @@ function AdvancedMode({ formik, serverGroup, toggleMode }: IAdvancedModeProps) {
 
         <div className="col-md-2">
           <FormikFormField
-            fastField={false}
             name="capacity.desired"
-            input={props => <NumberInput {...props} min={min} max={max} />}
+            input={(props) => <NumberInput {...props} min={min} max={max} />}
             layout={({ input }) => <>{input}</>}
             touched={true}
           />
@@ -228,7 +227,7 @@ export function TitusResizeServerGroupModal(props: ITitusResizeServerGroupModalP
 
   const platformHealthOnlyShowOverride =
     application.attributes && application.attributes.platformHealthOnlyShowOverride;
-  const [verified, setVerified] = useState();
+  const [verified, setVerified] = useState<boolean>();
 
   const taskMonitor = useTaskMonitor(
     {
@@ -251,7 +250,7 @@ export function TitusResizeServerGroupModal(props: ITitusResizeServerGroupModalP
         initialValues={initialValues}
         validate={validateResizeCommand}
         onSubmit={submit}
-        render={formik => {
+        render={(formik) => {
           return (
             <>
               <ModalClose dismiss={dismissModal} />
@@ -272,7 +271,7 @@ export function TitusResizeServerGroupModal(props: ITitusResizeServerGroupModalP
                       interestingHealthProviderNames={formik.values.interestingHealthProviderNames}
                       platformHealthType="Titus"
                       showHelpDetails={true}
-                      onChange={names =>
+                      onChange={(names) =>
                         formik.setFieldValue('interestingHealthProviderNames', names ? names : undefined)
                       }
                     />

@@ -1,19 +1,18 @@
-import React from 'react';
 import { chain, xor } from 'lodash';
 import { $q } from 'ngimport';
+import React from 'react';
 
+import { SecurityGroupSelector, ServerGroupSecurityGroupsRemoved, VpcReader } from '@spinnaker/amazon';
 import {
+  AccountService,
   AccountTag,
   FirewallLabels,
-  ISecurityGroup,
-  IAggregatedAccounts,
-  IVpc,
   IAccountDetails,
+  IAggregatedAccounts,
+  ISecurityGroup,
+  IVpc,
   ReactInjector,
-  AccountService,
 } from '@spinnaker/core';
-
-import { ServerGroupSecurityGroupsRemoved, SecurityGroupSelector, VpcReader } from '@spinnaker/amazon';
 
 export interface ITitusSecurityGroupPickerProps {
   account: string;
@@ -64,7 +63,7 @@ export class TitusSecurityGroupPicker extends React.Component<
   private getVpcId(): string {
     const credentials = this.getCredentials();
     const match = this.vpcs.find(
-      vpc =>
+      (vpc) =>
         vpc.name === credentials.awsVpc &&
         vpc.account === credentials.awsAccount &&
         vpc.region === this.getRegion() &&
@@ -83,7 +82,7 @@ export class TitusSecurityGroupPicker extends React.Component<
 
   public refreshSecurityGroups(skipCommandReconfiguration?: boolean) {
     return ReactInjector.cacheInitializer.refreshCache('securityGroups').then(() => {
-      return ReactInjector.securityGroupReader.getAllSecurityGroups().then(securityGroups => {
+      return ReactInjector.securityGroupReader.getAllSecurityGroups().then((securityGroups) => {
         this.securityGroups = securityGroups;
         if (!skipCommandReconfiguration) {
           this.configureSecurityGroupOptions();
@@ -101,21 +100,21 @@ export class TitusSecurityGroupPicker extends React.Component<
     if (availableGroups && this.props.groupsToEdit) {
       // not initializing - we are actually changing groups
       const oldGroupNames: string[] = groupsToEdit.map((groupId: string) => {
-        const match = oldAvailableGroups.find(o => o.id === groupId);
+        const match = oldAvailableGroups.find((o) => o.id === groupId);
         return match ? match.name : groupId;
       });
 
       const matchedGroups: ISecurityGroup[] = oldGroupNames
         .map((groupId: string) => {
-          const securityGroup: any = availableGroups.find(o => o.id === groupId || o.name === groupId);
+          const securityGroup: any = availableGroups.find((o) => o.id === groupId || o.name === groupId);
           return securityGroup ? securityGroup.name : null;
         })
-        .map((groupName: string) => availableGroups.find(g => g.name === groupName))
+        .map((groupName: string) => availableGroups.find((g) => g.name === groupName))
         .filter((group: any) => group);
 
-      const matchedGroupNames: string[] = matchedGroups.map(g => g.name);
+      const matchedGroupNames: string[] = matchedGroups.map((g) => g.name);
       removedGroups = xor(oldGroupNames, matchedGroupNames);
-      groupsToEdit = matchedGroups.map(g => g.id);
+      groupsToEdit = matchedGroups.map((g) => g.id);
       this.props.onChange(groupsToEdit);
     }
     availableGroups = availableGroups.sort((a, b) => a.name.localeCompare(b.name));
@@ -132,7 +131,7 @@ export class TitusSecurityGroupPicker extends React.Component<
         this.credentials = credentials;
       },
     );
-    const groupLoader = ReactInjector.securityGroupReader.getAllSecurityGroups().then(groups => {
+    const groupLoader = ReactInjector.securityGroupReader.getAllSecurityGroups().then((groups) => {
       this.securityGroups = groups;
     });
     const vpcLoader = VpcReader.listVpcs().then((vpcs: IVpc[]) => (this.vpcs = vpcs));

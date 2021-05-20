@@ -1,6 +1,6 @@
+import { Form, Formik } from 'formik';
 import React from 'react';
 import { Modal, ModalFooter } from 'react-bootstrap';
-import { Form, Formik } from 'formik';
 
 import {
   Application,
@@ -15,7 +15,6 @@ import {
   SpinFormik,
   TaskMonitor,
 } from '@spinnaker/core';
-
 import { ICloudFoundryServerGroup } from 'cloudfoundry/domain';
 import { Routes } from 'cloudfoundry/presentation/forms/serverGroup';
 
@@ -106,7 +105,7 @@ export class CloudFoundryUnmapLoadBalancersModal extends React.Component<
           ref={this.formikRef}
           initialValues={initialValues}
           onSubmit={this.submit}
-          render={formik => {
+          render={(formik) => {
             return (
               <>
                 <ModalClose dismiss={this.close} />

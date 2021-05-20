@@ -1,14 +1,12 @@
-import React from 'react';
-import { IPromise } from 'angular';
 import classNames from 'classnames';
-
+import React from 'react';
 import { Modal } from 'react-bootstrap';
 
-import { Spinner } from 'core/widgets/spinners/Spinner';
-import { IModalComponentProps, JsonEditor } from 'core/presentation';
 import { IPipelineTemplateV2 } from 'core/domain';
-import { CopyToClipboard, noop, JsonUtils } from 'core/utils';
 import { ModalClose } from 'core/modal';
+import { IModalComponentProps, JsonEditor } from 'core/presentation';
+import { CopyToClipboard, JsonUtils, noop } from 'core/utils';
+import { Spinner } from 'core/widgets/spinners/Spinner';
 
 import './ShowPipelineTemplateJsonModal.less';
 
@@ -17,7 +15,7 @@ export interface IShowPipelineTemplateJsonModalProps extends IModalComponentProp
   editable?: boolean;
   modalHeading?: string;
   descriptionText?: string;
-  saveTemplate?: (template: IPipelineTemplateV2) => IPromise<boolean>;
+  saveTemplate?: (template: IPipelineTemplateV2) => PromiseLike<boolean>;
 }
 
 export interface IShowPipelineTemplateJsonModalState {
@@ -119,7 +117,7 @@ export class ShowPipelineTemplateJsonModal extends React.Component<
                   className="form-control input-sm"
                   type="text"
                   value={template.metadata.name}
-                  onChange={e => this.onChange(e, 'name')}
+                  onChange={(e) => this.onChange(e, 'name')}
                   disabled={disabled}
                 />
               </div>
@@ -134,7 +132,7 @@ export class ShowPipelineTemplateJsonModal extends React.Component<
                   className="form-control input-sm"
                   type="text"
                   value={template.metadata.description}
-                  onChange={e => this.onChange(e, 'description')}
+                  onChange={(e) => this.onChange(e, 'description')}
                   placeholder="Template Description"
                   disabled={disabled}
                 />
@@ -150,7 +148,7 @@ export class ShowPipelineTemplateJsonModal extends React.Component<
                   className="form-control input-sm"
                   type="text"
                   value={template.metadata.owner}
-                  onChange={e => this.onChange(e, 'owner')}
+                  onChange={(e) => this.onChange(e, 'owner')}
                   disabled={disabled}
                 />
               </div>

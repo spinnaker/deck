@@ -1,12 +1,17 @@
-import React from 'react';
 import { cloneDeep, head } from 'lodash';
+import React from 'react';
+
 import { IArtifactAccount } from 'core/account';
-import { ArtifactAccountSelector } from 'core/artifact';
 import { IArtifact, IPipeline } from 'core/domain';
-import { TYPE as CUSTOM_TYPE, CUSTOM_ARTIFACT_ACCOUNT } from 'core/pipeline/config/triggers/artifacts/custom';
 import { StageConfigField } from 'core/pipeline/config/stages/common';
+import {
+  CUSTOM_ARTIFACT_ACCOUNT,
+  TYPE as CUSTOM_TYPE,
+} from 'core/pipeline/config/triggers/artifacts/custom/CustomArtifactEditor';
 import { Registry } from 'core/registry';
 import { UUIDGenerator } from 'core/utils';
+
+import { ArtifactAccountSelector } from './ArtifactAccountSelector';
 
 export interface IArtifactEditorProps {
   pipeline: IPipeline;
@@ -43,8 +48,8 @@ export class ArtifactEditor extends React.Component<IArtifactEditorProps> {
     const { artifact, artifactAccounts } = this.props;
     if (!artifact.artifactAccount && artifactAccounts.length > 0) {
       this.onArtifactAccountChanged(
-        head(artifactAccounts.filter(a => a.types.includes(artifact.type))) ||
-          head(artifactAccounts.filter(a => a.types.includes(CUSTOM_TYPE))) ||
+        head(artifactAccounts.filter((a) => a.types.includes(artifact.type))) ||
+          head(artifactAccounts.filter((a) => a.types.includes(CUSTOM_TYPE))) ||
           head(artifactAccounts),
       );
     }
@@ -60,10 +65,11 @@ export class ArtifactEditor extends React.Component<IArtifactEditorProps> {
 
   public render(): React.ReactNode {
     const { pipeline, artifact, artifactAccounts, onArtifactEdit, isDefault } = this.props;
-    const artifactAccount = artifactAccounts.find(acc => acc.name === artifact.artifactAccount) || artifactAccounts[0];
+    const artifactAccount =
+      artifactAccounts.find((acc) => acc.name === artifact.artifactAccount) || artifactAccounts[0];
     const accountTypes = artifactAccount ? artifactAccount.types : undefined;
     const kinds = isDefault ? Registry.pipeline.getDefaultArtifactKinds() : Registry.pipeline.getMatchArtifactKinds();
-    const kind = accountTypes ? kinds.find(a => accountTypes.some(typ => a.typePattern.test(typ))) : undefined;
+    const kind = accountTypes ? kinds.find((a) => accountTypes.some((typ) => a.typePattern.test(typ))) : undefined;
     const EditCmp = kind && kind.editCmp;
 
     return (

@@ -1,8 +1,7 @@
 'use strict';
 
-import _ from 'lodash';
-
 import { module } from 'angular';
+import _ from 'lodash';
 
 export const GOOGLE_AUTOSCALINGPOLICY_COMPONENTS_METRICSETTINGS_METRICSETTINGS_COMPONENT =
   'spinnaker.deck.gce.autoscalingPolicy.metricSettings.component';
@@ -13,9 +12,10 @@ module(GOOGLE_AUTOSCALINGPOLICY_COMPONENTS_METRICSETTINGS_METRICSETTINGS_COMPONE
     bindings: {
       policy: '=',
       showNoMetricsWarning: '=',
+      updatePolicy: '<',
     },
     templateUrl: require('./metricSettings.component.html'),
-    controller: function() {
+    controller: function () {
       const multipleAllowedFor = {
         cpuUtilization: false,
         loadBalancingUtilization: false,
@@ -30,7 +30,7 @@ module(GOOGLE_AUTOSCALINGPOLICY_COMPONENTS_METRICSETTINGS_METRICSETTINGS_COMPONE
         DELTA_PER_MINUTE: 'Delta / minute',
       };
 
-      this.addMetric = metricType => {
+      this.addMetric = (metricType) => {
         if (multipleAllowedFor[metricType]) {
           this.policy[metricType] = this.policy[metricType] || [];
           this.policy[metricType].push({});
@@ -48,7 +48,7 @@ module(GOOGLE_AUTOSCALINGPOLICY_COMPONENTS_METRICSETTINGS_METRICSETTINGS_COMPONE
         }
       };
 
-      this.showMetric = metricType => {
+      this.showMetric = (metricType) => {
         const metric = this.policy[metricType];
         // should not show policy form if the policy is undefined or an empty object.
         return !emptyOrUndefined(metric);
@@ -56,7 +56,7 @@ module(GOOGLE_AUTOSCALINGPOLICY_COMPONENTS_METRICSETTINGS_METRICSETTINGS_COMPONE
 
       this.showNoMetricsWarning = () => {
         return _.every(
-          metricTypes.map(type => {
+          metricTypes.map((type) => {
             return _.some([
               multipleAllowedFor[type] && !_.get(this.policy, [type, 'length']),
               emptyOrUndefined(this.policy[type]),
@@ -69,7 +69,7 @@ module(GOOGLE_AUTOSCALINGPOLICY_COMPONENTS_METRICSETTINGS_METRICSETTINGS_COMPONE
         this.policy[metricType].utilizationTarget = value / 100;
       };
 
-      this.initializeTargetDisplay = metricType => {
+      this.initializeTargetDisplay = (metricType) => {
         this[`${metricType}TargetDisplay`] = safeDecimalToPercent(this.policy[metricType].utilizationTarget);
       };
 

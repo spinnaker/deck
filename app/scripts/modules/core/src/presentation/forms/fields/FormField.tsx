@@ -2,13 +2,12 @@ import React from 'react';
 
 import { firstDefined, noop } from 'core/utils';
 
-import { IControlledInputProps, IFormInputProps, IFormInputValidation } from '../inputs';
-import { ILayoutProps, LayoutContext } from '../layouts';
-import { IValidator, useValidationData } from '../validation';
-
-import { ICommonFormFieldProps } from './interface';
 import { createFieldValidator } from './FormikFormField';
+import { IControlledInputProps, IFormInputProps, IFormInputValidation } from '../inputs';
+import { ICommonFormFieldProps } from './interface';
+import { ILayoutProps, LayoutContext } from '../layouts';
 import { renderContent } from './renderContent';
+import { IValidator, useValidationData } from '../validation';
 
 import '../forms.less';
 
@@ -23,8 +22,11 @@ export function FormField(props: IFormFieldProps): JSX.Element {
   // Internal validators are defined by an Input component
   const [internalValidators, setInternalValidators] = useState([]);
   const [revalidateRequestId, setRevalidateRequestId] = useState(0);
-  const addValidator = useCallback((v: IValidator) => setInternalValidators(list => list.concat(v)), []);
-  const removeValidator = useCallback((v: IValidator) => setInternalValidators(list => list.filter(x => x !== v)), []);
+  const addValidator = useCallback((v: IValidator) => setInternalValidators((list) => list.concat(v)), []);
+  const removeValidator = useCallback(
+    (v: IValidator) => setInternalValidators((list) => list.filter((x) => x !== v)),
+    [],
+  );
 
   // Capture props.validate when the component initializes (to allow for inline arrow functions)
   const validate = useMemo(() => props.validate, []);
@@ -43,7 +45,7 @@ export function FormField(props: IFormFieldProps): JSX.Element {
   const touched = firstDefined(props.touched, hasBlurred);
 
   // When called, this bumps a revalidateRequestId which in causes validatorResult to be updated
-  const revalidate = () => setRevalidateRequestId(prev => prev + 1);
+  const revalidate = () => setRevalidateRequestId((prev) => prev + 1);
   const validatorResult = useMemo(() => fieldValidator(value), [fieldValidator, value, revalidateRequestId]);
   const validationMessage = firstDefined(props.validationMessage, validatorResult ? validatorResult : undefined);
   const validationData = useValidationData(validationMessage, touched);

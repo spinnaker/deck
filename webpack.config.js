@@ -4,9 +4,10 @@ const md5 = require('md5');
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
-const { TypedCssModulesPlugin } = require('typed-css-modules-webpack-plugin');
+const webpack = require('webpack');
 
 const CACHE_INVALIDATE = getCacheInvalidateString();
 const NODE_MODULE_PATH = path.join(__dirname, 'node_modules');
@@ -18,9 +19,34 @@ const ESLINT_FAIL_ON_ERROR = process.env.ESLINT_FAIL_ON_ERROR === 'true';
 function configure(env, webpackOpts) {
   const WEBPACK_MODE = (webpackOpts && webpackOpts.mode) || 'development';
   const IS_PRODUCTION = WEBPACK_MODE === 'production';
+  const IS_CI = !!process.env.TRAVIS || !!process.env.GITHUB_ACTIONS;
+  const DISPLAY_PROGRESS = process.stdout.isTTY && !IS_CI;
 
   // eslint-disable-next-line no-console
   console.log('Webpack mode: ' + WEBPACK_MODE);
+
+  const plugins = [
+    new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true }),
+    new CopyWebpackPlugin([
+      { from: `${NODE_MODULE_PATH}/@spinnaker/styleguide/public/styleguide.html`, to: `./styleguide.html` },
+      { from: `./plugin-manifest.json`, to: `./plugin-manifest.json` },
+    ]),
+    new HtmlWebpackPlugin({
+      title: 'Spinnaker',
+      template: './app/index.deck',
+      favicon: process.env.NODE_ENV === 'production' ? 'app/prod-favicon.ico' : 'app/dev-favicon.ico',
+      inject: true,
+      hash: IS_PRODUCTION,
+    }),
+  ];
+
+  if (process.env.NODE_ENV !== 'production') {
+    plugins.push(new webpack.HotModuleReplacementPlugin());
+  }
+
+  if (DISPLAY_PROGRESS) {
+    plugins.push(new webpack.ProgressPlugin({ profile: false }));
+  }
 
   const config = {
     context: __dirname,
@@ -30,7 +56,7 @@ function configure(env, webpackOpts) {
     entry: {
       settings: SETTINGS_PATH,
       'settings-local': './settings-local.js',
-      app: './app/scripts/app.ts',
+      app: './app/scripts/modules/app.ts',
     },
     output: {
       path: path.join(__dirname, 'build', 'webpack', process.env.SPINNAKER_ENV || ''),
@@ -70,23 +96,8 @@ function configure(env, webpackOpts) {
     },
     resolve: {
       extensions: ['.json', '.ts', '.tsx', '.js', '.jsx', '.css', '.less', '.html'],
-      modules: [NODE_MODULE_PATH, path.join(__dirname, 'app', 'scripts', 'modules')],
       alias: {
         root: __dirname,
-        core: path.join(__dirname, 'app', 'scripts', 'modules', 'core', 'src'),
-        '@spinnaker/core': path.join(__dirname, 'app', 'scripts', 'modules', 'core', 'src'),
-        docker: path.join(__dirname, 'app', 'scripts', 'modules', 'docker', 'src'),
-        '@spinnaker/docker': path.join(__dirname, 'app', 'scripts', 'modules', 'docker', 'src'),
-        amazon: path.join(__dirname, 'app', 'scripts', 'modules', 'amazon', 'src'),
-        '@spinnaker/amazon': path.join(__dirname, 'app', 'scripts', 'modules', 'amazon', 'src'),
-        google: path.join(__dirname, 'app', 'scripts', 'modules', 'google', 'src'),
-        '@spinnaker/google': path.join(__dirname, 'app', 'scripts', 'modules', 'google', 'src'),
-        kubernetes: path.join(__dirname, 'app', 'scripts', 'modules', 'kubernetes', 'src'),
-        '@spinnaker/kubernetes': path.join(__dirname, 'app', 'scripts', 'modules', 'kubernetes', 'src'),
-        ecs: path.join(__dirname, 'app', 'scripts', 'modules', 'ecs', 'src'),
-        '@spinnaker/ecs': path.join(__dirname, 'app', 'scripts', 'modules', 'ecs', 'src'),
-        huaweicloud: path.join(__dirname, 'app', 'scripts', 'modules', 'huaweicloud', 'src'),
-        '@spinnaker/huaweicloud': path.join(__dirname, 'app', 'scripts', 'modules', 'huaweicloud', 'src'),
         coreImports: path.resolve(
           __dirname,
           'app',
@@ -99,17 +110,8 @@ function configure(env, webpackOpts) {
           'imports',
           'commonImports.less',
         ),
-        appengine: path.join(__dirname, 'app', 'scripts', 'modules', 'appengine', 'src'),
-        '@spinnaker/appengine': path.join(__dirname, 'app', 'scripts', 'modules', 'appengine', 'src'),
-        oracle: path.join(__dirname, 'app', 'scripts', 'modules', 'oracle', 'src'),
-        '@spinnaker/oracle': path.join(__dirname, 'app', 'scripts', 'modules', 'oracle', 'src'),
-        cloudfoundry: path.join(__dirname, 'app', 'scripts', 'modules', 'cloudfoundry', 'src'),
-        '@spinnaker/cloudfoundry': path.join(__dirname, 'app', 'scripts', 'modules', 'cloudfoundry', 'src'),
-        titus: path.join(__dirname, 'app', 'scripts', 'modules', 'titus', 'src'),
-        '@spinnaker/titus': path.join(__dirname, 'app', 'scripts', 'modules', 'titus', 'src'),
-        azure: path.join(__dirname, 'app', 'scripts', 'modules', 'azure', 'src'),
-        '@spinnaker/azure': path.join(__dirname, 'app', 'scripts', 'modules', 'azure', 'src'),
       },
+      plugins: [new TsconfigPathsPlugin({ logLevel: 'info', extensions: ['.ts', '.tsx', '.js', '.jsx'] })],
     },
     module: {
       rules: [
@@ -148,22 +150,15 @@ function configure(env, webpackOpts) {
         },
         {
           test: /\.css$/,
-          exclude: /\.module\.css$/,
           use: [{ loader: 'style-loader' }, { loader: 'css-loader' }, { loader: 'postcss-loader' }],
         },
         {
-          test: /\.module\.css$/i,
-          use: [
-            { loader: 'style-loader' },
-            {
-              loader: 'css-loader',
-              options: {
-                modules: true,
-                localIdentName: '[name]__[local]--[hash:base64:8]',
-              },
-            },
-            { loader: 'postcss-loader' },
-          ],
+          test: /\.svg$/,
+          issuer: {
+            test: /\.(tsx?|js)$/,
+          },
+          use: [{ loader: '@svgr/webpack' }],
+          exclude: /node_modules/,
         },
         {
           test: /\.html$/,
@@ -181,32 +176,16 @@ function configure(env, webpackOpts) {
           test: /ui-sortable/,
           use: ['imports-loader?$UI=jquery-ui/ui/widgets/sortable'],
         },
+        {
+          test: /\.js$/,
+          enforce: 'pre',
+          use: ['source-map-loader'],
+        },
       ],
     },
-    plugins: [
-      new TypedCssModulesPlugin({
-        globPattern: '**/*.module.css',
-      }),
-      new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true }),
-      new CopyWebpackPlugin([
-        {
-          from: `${NODE_MODULE_PATH}/@spinnaker/styleguide/public/styleguide.html`,
-          to: `./styleguide.html`,
-        },
-        {
-          from: `./plugin-manifest.js`,
-          to: `./plugin-manifest.js`,
-        },
-      ]),
-      new HtmlWebpackPlugin({
-        title: 'Spinnaker',
-        template: './app/index.deck',
-        favicon: process.env.NODE_ENV === 'production' ? 'app/prod-favicon.ico' : 'app/dev-favicon.ico',
-        inject: true,
-        hash: IS_PRODUCTION,
-      }),
-    ],
+    plugins,
     devServer: {
+      hot: true,
       disableHostCheck: true,
       port: process.env.DECK_PORT || 9000,
       host: process.env.DECK_HOST || 'localhost',
@@ -231,28 +210,21 @@ function configure(env, webpackOpts) {
   return config;
 }
 
-// invalidate webpack cache when webpack config is changed or cache-loader is updated,
+// invalidate cache-loader cache when these change
 function getCacheInvalidateString() {
   return JSON.stringify({
-    CACHE_LOADER: require('cache-loader/package.json').version,
+    YARN_LOCK: md5(fs.readFileSync('yarn.lock')),
     WEBPACK_CONFIG: md5(fs.readFileSync(__filename)),
   });
 }
 
-// When running locally, use one less than the physical number of cpus
-// When running on travis, use max of 2 threads
-// https://docs.travis-ci.com/user/reference/overview/#Virtualization-environments
 function getThreadLoaderThreads() {
-  const bareMetalThreads = Math.max(require('physical-cpu-count') - 1, 1);
-  const travisThreads = Math.min(require('physical-cpu-count'), 2);
-  const autoThreads = !!process.env.TRAVIS ? travisThreads : bareMetalThreads;
-  const threads = process.env.THREADS || autoThreads;
+  const cpus = require('os').cpus().length;
+  const physicalCpus = require('physical-cpu-count');
+  const threads = process.env.THREADS || (physicalCpus > 3 ? 2 : 1);
 
-  console.log(
-    `INFO: cpus: ${
-      require('os').cpus().length
-    } physical: ${require('physical-cpu-count')} thread-loader threads: ${threads}`,
-  );
+  // eslint-disable-next-line no-console
+  console.log(`INFO: cpus: ${cpus} physical: ${physicalCpus} thread-loader threads: ${threads}`);
 
   return threads;
 }

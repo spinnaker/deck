@@ -1,8 +1,7 @@
-import React from 'react';
 import { FieldArray, getIn } from 'formik';
+import React from 'react';
 
 import { FormikFormField, HelpField, TextInput } from '@spinnaker/core';
-
 import { ICloudFoundryCreateServerGroupCommand } from 'cloudfoundry/serverGroup/configure/serverGroupConfigurationModel.cf';
 
 export interface IRoutesProps {
@@ -25,7 +24,7 @@ export class Routes extends React.Component<IRoutesProps> {
             {!!isRequired && <HelpField id="cf.serverGroup.requiredRoutes" />}
             <FieldArray
               name={fieldName}
-              render={arrayHelpers => {
+              render={(arrayHelpers) => {
                 const serverGroupCommand: ICloudFoundryCreateServerGroupCommand = arrayHelpers.form.values;
                 const routes: string[] = getIn(serverGroupCommand, fieldName) || [];
 
@@ -41,7 +40,7 @@ export class Routes extends React.Component<IRoutesProps> {
                                 onChange={() => {
                                   onChange && onChange(getIn(serverGroupCommand, fieldName) || []);
                                 }}
-                                input={props => <TextInput {...props} />}
+                                input={(props) => <TextInput {...props} />}
                                 required={true}
                               />
                             </div>

@@ -3,7 +3,7 @@
 import { module } from 'angular';
 import _ from 'lodash';
 
-import { SECURITY_GROUP_READER, SERVER_GROUP_WRITER, TaskMonitor, FirewallLabels } from '@spinnaker/core';
+import { FirewallLabels, SECURITY_GROUP_READER, SERVER_GROUP_WRITER, TaskMonitor } from '@spinnaker/core';
 
 export const AMAZON_SERVERGROUP_DETAILS_SECURITYGROUP_EDITSECURITYGROUPS_MODAL_CONTROLLER =
   'spinnaker.amazon.serverGroup.details.securityGroup.editSecurityGroups.modal.controller';
@@ -19,7 +19,7 @@ module(AMAZON_SERVERGROUP_DETAILS_SECURITYGROUP_EDITSECURITYGROUPS_MODAL_CONTROL
   'application',
   'serverGroup',
   'securityGroups',
-  function(
+  function (
     $scope,
     $uibModalInstance,
     serverGroupWriter,
@@ -29,7 +29,7 @@ module(AMAZON_SERVERGROUP_DETAILS_SECURITYGROUP_EDITSECURITYGROUPS_MODAL_CONTROL
     securityGroups,
   ) {
     this.command = {
-      securityGroups: securityGroups.slice(0).sort((a, b) => a.name.localeCompare(b.name)),
+      securityGroups: (securityGroups || []).slice(0).sort((a, b) => a.name.localeCompare(b.name)),
     };
 
     this.state = {
@@ -48,17 +48,17 @@ module(AMAZON_SERVERGROUP_DETAILS_SECURITYGROUP_EDITSECURITYGROUPS_MODAL_CONTROL
 
     this.isValid = () => this.state.verification.verified;
 
-    securityGroupReader.getAllSecurityGroups().then(allGroups => {
+    securityGroupReader.getAllSecurityGroups().then((allGroups) => {
       const account = serverGroup.account;
       const region = serverGroup.region;
       const vpcId = serverGroup.vpcId;
       this.availableSecurityGroups = _.get(allGroups, [account, 'aws', region].join('.'), [])
-        .filter(group => group.vpcId === vpcId)
+        .filter((group) => group.vpcId === vpcId)
         .sort((a, b) => {
-          if (this.command.securityGroups.some(g => g.id === a.id)) {
+          if (this.command.securityGroups.some((g) => g.id === a.id)) {
             return -1;
           }
-          if (this.command.securityGroups.some(g => g.id === b.id)) {
+          if (this.command.securityGroups.some((g) => g.id === b.id)) {
             return 1;
           }
           return a.name.localeCompare(b.name);
@@ -78,7 +78,13 @@ module(AMAZON_SERVERGROUP_DETAILS_SECURITYGROUP_EDITSECURITYGROUPS_MODAL_CONTROL
     this.submit = () => {
       const submitMethod = () => {
         this.state.submitting = true;
-        return serverGroupWriter.updateSecurityGroups(serverGroup, this.command.securityGroups, application);
+        const hasLaunchTemplate = Boolean(serverGroup.launchTemplate);
+        return serverGroupWriter.updateSecurityGroups(
+          serverGroup,
+          this.command.securityGroups,
+          application,
+          hasLaunchTemplate,
+        );
       };
 
       this.taskMonitor.submit(submitMethod);

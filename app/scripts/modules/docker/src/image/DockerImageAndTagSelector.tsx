@@ -1,6 +1,6 @@
+import { groupBy, reduce, trim, uniq } from 'lodash';
 import React from 'react';
 import Select, { Option } from 'react-select';
-import { groupBy, reduce, trim, uniq } from 'lodash';
 
 import { AccountService, HelpField, IAccount, IFindImageParams, Tooltip, ValidationMessage } from '@spinnaker/core';
 
@@ -66,6 +66,7 @@ export class DockerImageAndTagSelector extends React.Component<
     allowManualDefinition: true,
   };
 
+  private unmounted = false;
   private images: IDockerImage[];
   private accounts: string[];
 
@@ -104,21 +105,13 @@ export class DockerImageAndTagSelector extends React.Component<
 
   private getAccountMap(images: IDockerImage[]): { [key: string]: string[] } {
     const groupedImages = groupBy(
-      images.filter(image => image.account),
+      images.filter((image) => image.account),
       'account',
     );
     return reduce<IDockerImage[], { [key: string]: string[] }>(
       groupedImages,
       (acc, image, key) => {
-        acc[key] = uniq(
-          image.map(
-            i =>
-              `${i.repository
-                .split('/')
-                .slice(0, -1)
-                .join('/')}`,
-          ),
-        );
+        acc[key] = uniq(image.map((i) => `${i.repository.split('/').slice(0, -1).join('/')}`));
         return acc;
       },
       {},
@@ -134,18 +127,15 @@ export class DockerImageAndTagSelector extends React.Component<
 
   private getOrganizationMap(images: IDockerImage[]): { [key: string]: string[] } {
     const extractGroupByKey = (image: IDockerImage) =>
-      `${image.account}/${image.repository
-        .split('/')
-        .slice(0, -1)
-        .join('/')}`;
+      `${image.account}/${image.repository.split('/').slice(0, -1).join('/')}`;
     const groupedImages = groupBy(
-      images.filter(image => image.repository),
+      images.filter((image) => image.repository),
       extractGroupByKey,
     );
     return reduce<IDockerImage[], { [key: string]: string[] }>(
       groupedImages,
       (acc, image, key) => {
-        acc[key] = uniq(image.map(i => i.repository));
+        acc[key] = uniq(image.map((i) => i.repository));
         return acc;
       },
       {},
@@ -154,13 +144,13 @@ export class DockerImageAndTagSelector extends React.Component<
 
   private getRepositoryMap(images: IDockerImage[]) {
     const groupedImages = groupBy(
-      images.filter(image => image.account),
+      images.filter((image) => image.account),
       'repository',
     );
     return reduce<IDockerImage[], { [key: string]: string[] }>(
       groupedImages,
       (acc, image, key) => {
-        acc[key] = uniq(image.map(i => i.tag));
+        acc[key] = uniq(image.map((i) => i.tag));
         return acc;
       },
       {},
@@ -218,6 +208,10 @@ export class DockerImageAndTagSelector extends React.Component<
     }
   }
 
+  componentWillUnmount() {
+    this.unmounted = true;
+  }
+
   private synchronizeChanges(values: IDockerImageParts, registry: string) {
     const { organization, repository, tag, digest } = values;
     if (this.props.onChange) {
@@ -248,7 +242,7 @@ export class DockerImageAndTagSelector extends React.Component<
   }
 
   private updateThings(props: IDockerImageAndTagSelectorProps, allowAutoSwitchToManualEntry = false) {
-    if (!this.repositoryMap) {
+    if (!this.repositoryMap || this.unmounted) {
       return;
     }
 
@@ -275,14 +269,14 @@ export class DockerImageAndTagSelector extends React.Component<
     const tagFound = tag === props.tag || specifyTagByRegex;
 
     const newState = {
-      accountOptions: this.newAccounts.sort().map(a => ({ label: a, value: a })),
+      accountOptions: this.newAccounts.sort().map((a) => ({ label: a, value: a })),
       organizationOptions: this.organizations
-        .filter(o => o)
+        .filter((o) => o)
         .sort()
-        .map(o => ({ label: o, value: o })),
+        .map((o) => ({ label: o, value: o })),
       imagesLoaded: true,
-      repositoryOptions: repositories.sort().map(r => ({ label: r, value: r })),
-      tagOptions: tags.sort().map(t => ({ label: t, value: t })),
+      repositoryOptions: repositories.sort().map((r) => ({ label: r, value: r })),
+      tagOptions: tags.sort().map((t) => ({ label: t, value: t })),
     } as IDockerImageAndTagSelectorState;
 
     if (
@@ -328,9 +322,7 @@ export class DockerImageAndTagSelector extends React.Component<
       account: showRegistry ? account : registry,
     };
 
-    this.setState({
-      imagesLoading: true,
-    });
+    this.setState({ imagesLoading: true });
     DockerImageReader.findImages(imageConfig)
       .then((images: IDockerImage[]) => {
         this.images = images;
@@ -344,9 +336,9 @@ export class DockerImageAndTagSelector extends React.Component<
         this.updateThings(props, true);
       })
       .finally(() => {
-        this.setState({
-          imagesLoading: false,
-        });
+        if (!this.unmounted) {
+          this.setState({ imagesLoading: false });
+        }
       });
   }
 
@@ -383,7 +375,7 @@ export class DockerImageAndTagSelector extends React.Component<
 
   private valueChanged(name: string, value: string) {
     const changes = { [name]: value };
-    if (imageFields.some(n => n === name)) {
+    if (imageFields.some((n) => n === name)) {
       // values are parts of the image
       const { organization, repository, tag, digest } = this.props;
       const imageParts = { ...{ organization, repository, tag, digest }, ...changes };
@@ -480,7 +472,7 @@ export class DockerImageAndTagSelector extends React.Component<
             message={
               <>
                 {switchedManualWarning}
-                {(missingFields || []).map(f => (
+                {(missingFields || []).map((f) => (
                   <div key={f}>
                     <HelpField expand={true} id={`pipeline.config.docker.trigger.missing.${f}`} />
                   </div>
@@ -509,7 +501,7 @@ export class DockerImageAndTagSelector extends React.Component<
                   <input
                     className="form-control input-sm"
                     value={imageId || ''}
-                    onChange={e => this.valueChanged('imageId', e.target.value)}
+                    onChange={(e) => this.valueChanged('imageId', e.target.value)}
                   />
                 </span>
               </div>
@@ -565,7 +557,7 @@ export class DockerImageAndTagSelector extends React.Component<
                   disabled={imagesLoading}
                   className="form-control input-sm"
                   value={organization || ''}
-                  onChange={e => this.valueChanged('organization', e.target.value)}
+                  onChange={(e) => this.valueChanged('organization', e.target.value)}
                 />
               ) : (
                 <Select
@@ -597,7 +589,7 @@ export class DockerImageAndTagSelector extends React.Component<
                   className="form-control input-sm"
                   disabled={imagesLoading}
                   value={repository || ''}
-                  onChange={e => this.valueChanged('repository', e.target.value)}
+                  onChange={(e) => this.valueChanged('repository', e.target.value)}
                 />
               ) : (
                 <Select
@@ -620,9 +612,7 @@ export class DockerImageAndTagSelector extends React.Component<
         specifyTagByRegex ? (
           <div className="sp-formItem">
             <div className="sp-formItem__left">
-              <div className="sp-formLabel">
-                Tag <HelpField id="pipeline.config.docker.trigger.tag" />
-              </div>
+              <div className="sp-formLabel">Tag</div>
             </div>
 
             <div className="sp-formItem__right">
@@ -633,10 +623,11 @@ export class DockerImageAndTagSelector extends React.Component<
                     className="form-control input-sm"
                     value={tag || ''}
                     disabled={imagesLoading || !repository}
-                    onChange={e => this.valueChanged('tag', e.target.value)}
+                    onChange={(e) => this.valueChanged('tag', e.target.value)}
                   />
                 </span>
               </div>
+              <HelpField id="pipeline.config.docker.trigger.tag" expand={true} />
             </div>
           </div>
         ) : (
@@ -653,7 +644,7 @@ export class DockerImageAndTagSelector extends React.Component<
                       className="form-control input-sm"
                       disabled={imagesLoading}
                       value={tag || ''}
-                      onChange={e => this.valueChanged('tag', e.target.value)}
+                      onChange={(e) => this.valueChanged('tag', e.target.value)}
                       required={true}
                     />
                   ) : (
@@ -692,7 +683,7 @@ export class DockerImageAndTagSelector extends React.Component<
                   className="form-control input-sm"
                   placeholder="sha256:abc123"
                   value={digest || parsedImageId.digest || ''}
-                  onChange={e => this.valueChanged('digest', e.target.value)}
+                  onChange={(e) => this.valueChanged('digest', e.target.value)}
                   required={true}
                 />
               </span>

@@ -1,8 +1,10 @@
-import { CloudProviderRegistry } from 'core/cloudProvider';
 import React from 'react';
 import { Modal } from 'react-bootstrap';
-import { IModalComponentProps, ReactModal } from 'core/presentation';
+
 import { ModalClose } from 'core/modal';
+import { IModalComponentProps, ReactModal } from 'core/presentation';
+
+import { CloudProviderRegistry } from '../CloudProviderRegistry';
 
 export interface IProviderSelectionModalProps extends IModalComponentProps {
   providerOptions: string[];
@@ -50,7 +52,7 @@ export class ProviderSelectionModal extends React.Component<
         </Modal.Header>
         <Modal.Body>
           <div className="card-choices">
-            {providerOptions.map(provider => (
+            {providerOptions.map((provider) => (
               <div
                 className={`card vertical center middle ${selectedProvider === provider && 'active'}`}
                 key={provider}

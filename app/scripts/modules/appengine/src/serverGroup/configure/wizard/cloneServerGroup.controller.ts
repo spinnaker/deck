@@ -1,13 +1,13 @@
-import { IController, IScope, copy, module } from 'angular';
+import { copy, IController, IScope, module } from 'angular';
 import { IModalInstanceService } from 'angular-ui-bootstrap';
 import { get, merge } from 'lodash';
 
 import { Application, SERVER_GROUP_WRITER, ServerGroupWriter, TaskMonitor } from '@spinnaker/core';
-
 import { AppengineHealth } from 'appengine/common/appengineHealth';
-import { AppengineServerGroupCommandBuilder, IAppengineServerGroupCommand } from '../serverGroupCommandBuilder.service';
+
 import { APPENGINE_CONFIG_FILE_CONFIGURER } from './configFiles.component';
 import { APPENGINE_DYNAMIC_BRANCH_LABEL } from './dynamicBranchLabel.component';
+import { AppengineServerGroupCommandBuilder, IAppengineServerGroupCommand } from '../serverGroupCommandBuilder.service';
 
 import './serverGroupWizard.less';
 
@@ -44,7 +44,7 @@ class AppengineCloneServerGroupCtrl implements IController {
     } else {
       appengineServerGroupCommandBuilder
         .buildNewServerGroupCommand(application, 'appengine', 'createPipeline')
-        .then(constructedCommand => {
+        .then((constructedCommand) => {
           this.$scope.command = merge(constructedCommand, serverGroupCommand);
           // Re-establish references to the original pipeline and stage objects so that
           // we don't mutate copies of them when assigning expected artifacts.

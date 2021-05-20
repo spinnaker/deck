@@ -1,9 +1,8 @@
 import React from 'react';
 import { Modal } from 'react-bootstrap';
 
-import { ValidationMessage } from '../../validation';
-
 import { ISpelError } from './evaluateExpression';
+import { ValidationMessage } from '../../validation';
 
 export interface IExpressionErrorProps {
   spelError: ISpelError;
@@ -22,7 +21,7 @@ export class ExpressionError extends React.Component<IExpressionErrorProps, IExp
       return null;
     }
 
-    const toggleModal = () => this.setState(state => ({ showContextModal: !state.showContextModal }));
+    const toggleModal = () => this.setState((state) => ({ showContextModal: !state.showContextModal }));
 
     return (
       <div>

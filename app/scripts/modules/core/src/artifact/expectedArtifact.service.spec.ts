@@ -39,17 +39,10 @@ describe('ExpectedArtifactService', () => {
         key: 'bar-default',
         isDefault: true,
       },
-    ].map(k => ({ ...baseKindConfig, ...k }));
-    const customKindConfig = {
-      ...baseKindConfig,
-      key: 'custom',
-      customKind: true,
-      isMatch: true,
-      isDefault: true,
-    };
+    ].map((k) => ({ ...baseKindConfig, ...k }));
+
     beforeAll(() => {
-      kindConfigs.forEach(kindConfig => Registry.pipeline.registerArtifactKind(kindConfig));
-      Registry.pipeline.registerCustomArtifactKind(customKindConfig);
+      kindConfigs.forEach((kindConfig) => Registry.pipeline.registerArtifactKind(kindConfig));
     });
 
     it('infers kind from type', () => {
@@ -77,7 +70,7 @@ describe('ExpectedArtifactService', () => {
         type: 'bar-type',
       };
       const kindConfig = ExpectedArtifactService.getKindConfig(artifact, false);
-      expect(kindConfig).toEqual(customKindConfig);
+      expect(kindConfig).toEqual(Registry.pipeline.getCustomArtifactKind());
     });
 
     it('returns the custom kind when customKind is true, regardless of type, when isDefault is true', () => {
@@ -87,7 +80,7 @@ describe('ExpectedArtifactService', () => {
         type: 'bar-type',
       };
       const kindConfig = ExpectedArtifactService.getKindConfig(artifact, true);
-      expect(kindConfig).toEqual(customKindConfig);
+      expect(kindConfig).toEqual(Registry.pipeline.getCustomArtifactKind());
     });
 
     it('returns the default kind if neither kind nor type are stored on artifact', () => {
@@ -95,7 +88,7 @@ describe('ExpectedArtifactService', () => {
         id: 'artifact-id',
       };
       const kindConfig = ExpectedArtifactService.getKindConfig(artifact, false);
-      expect(kindConfig).toEqual(customKindConfig);
+      expect(kindConfig).toEqual(Registry.pipeline.getCustomArtifactKind());
     });
 
     it('returns the default kind if neither kind nor type are stored on artifact when isDefault is true', () => {
@@ -103,7 +96,7 @@ describe('ExpectedArtifactService', () => {
         id: 'artifact-id',
       };
       const kindConfig = ExpectedArtifactService.getKindConfig(artifact, true);
-      expect(kindConfig).toEqual(customKindConfig);
+      expect(kindConfig).toEqual(Registry.pipeline.getCustomArtifactKind());
     });
   });
 });

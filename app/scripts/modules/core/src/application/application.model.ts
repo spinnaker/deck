@@ -1,4 +1,4 @@
-import { IPromise, IScope } from 'angular';
+import { IScope } from 'angular';
 import { map, union, uniq } from 'lodash';
 import { $log, $q } from 'ngimport';
 import { Observable, ReplaySubject, Subject, Subscription } from 'rxjs';
@@ -93,6 +93,8 @@ export class Application {
    */
   public activeState: ApplicationDataSource = null;
 
+  private refreshListeners: Array<() => void> = [];
+
   public activeDataSource$ = new ReplaySubject<ApplicationDataSource>(1);
   /** @deprecated use activeDataSource$ */
   public activeStateChangeStream: Subject<any> = new Subject();
@@ -110,8 +112,8 @@ export class Application {
     private scheduler: any,
     dataSourceConfigs: Array<IDataSourceConfig<any>>,
   ) {
-    dataSourceConfigs.forEach(config => this.addDataSource(config));
-    this.status$ = Observable.combineLatest(this.dataSources.map(ds => ds.status$)).map(statuses =>
+    dataSourceConfigs.forEach((config) => this.addDataSource(config));
+    this.status$ = Observable.combineLatest(this.dataSources.map((ds) => ds.status$)).map((statuses) =>
       this.getDerivedApplicationStatus(statuses),
     );
   }
@@ -126,10 +128,12 @@ export class Application {
 
     const noneLeftToFetch = statuses.every(({ status }) => ['FETCHED', 'NOT_INITIALIZED'].includes(status));
     const lastFetch = statuses.reduce((latest, status) => Math.max(latest, status.lastRefresh || 0), 0);
+    const allLoaded = statuses.every(({ loaded }) => loaded);
 
     return {
       status: rolledUpStatus,
       lastRefresh: noneLeftToFetch ? lastFetch : this.lastRefresh,
+      loaded: allLoaded,
       data: undefined,
     };
   }
@@ -146,34 +150,35 @@ export class Application {
    * @param key
    */
   public getDataSource(key: string): ApplicationDataSource {
-    return this.dataSources.find(ds => ds.key === key);
+    return this.dataSources.find((ds) => ds.key === key);
   }
 
   /**
    * Refreshes all dataSources for the application
    * @param forceRefresh if true, will trigger a refresh on all data sources, even if the data source is currently
    * loading
-   * @returns {IPromise<void>} a promise that resolves when the application finishes loading, rejecting with an error if
+   * @returns {PromiseLike<void>} a promise that resolves when the application finishes loading, rejecting with an error if
    * one of the data sources fails to refresh
    */
-  public refresh(forceRefresh?: boolean): IPromise<any> {
+  public refresh(forceRefresh?: boolean): PromiseLike<any> {
     // refresh hidden data sources but do not consider their results when determining when the refresh completes
-    this.dataSources.filter(ds => !ds.visible).forEach(ds => ds.refresh(forceRefresh));
-    return $q.all(this.dataSources.filter(ds => ds.visible).map(source => source.refresh(forceRefresh))).then(
+    this.dataSources.filter((ds) => !ds.visible).forEach((ds) => ds.refresh(forceRefresh));
+    this.refreshListeners.forEach((cb) => cb());
+    return $q.all(this.dataSources.filter((ds) => ds.visible).map((source) => source.refresh(forceRefresh))).then(
       () => this.applicationLoadSuccess(),
-      error => this.applicationLoadError(error),
+      (error) => this.applicationLoadError(error),
     );
   }
 
   /**
    * A promise that resolves immediately if all data sources are ready (i.e. loaded), or once all data sources have
    * loaded
-   * @returns {IPromise<any>} the return value is a promise, but its value is
+   * @returns {PromiseLike<any>} the return value is a promise, but its value is
    * not useful - it's only useful to watch the promise itself
    */
-  public ready(): IPromise<any> {
+  public ready(): PromiseLike<any> {
     return $q.all(
-      this.dataSources.filter(ds => ds.onLoad !== undefined && ds.visible).map(dataSource => dataSource.ready()),
+      this.dataSources.filter((ds) => ds.onLoad !== undefined && ds.visible).map((dataSource) => dataSource.ready()),
     );
   }
 
@@ -239,9 +244,9 @@ export class Application {
   private setApplicationAccounts(): void {
     let accounts = this.accounts.concat(this.attributes.accounts || []);
     this.dataSources
-      .filter(ds => Array.isArray(ds.data) && ds.credentialsField !== undefined)
+      .filter((ds) => Array.isArray(ds.data) && ds.credentialsField !== undefined)
       .forEach(
-        (ds: ApplicationDataSource<any[]>) => (accounts = accounts.concat(ds.data.map(d => d[ds.credentialsField]))),
+        (ds: ApplicationDataSource<any[]>) => (accounts = accounts.concat(ds.data.map((d) => d[ds.credentialsField]))),
       );
 
     this.accounts = uniq(accounts);
@@ -250,19 +255,21 @@ export class Application {
   private extractProviderDefault(field: string): Map<string, string> {
     const results = new Map<string, string>();
     const sources: Array<ApplicationDataSource<any[]>> = this.dataSources.filter(
-      ds => ds[field] !== undefined && Array.isArray(ds.data) && ds.providerField !== undefined,
+      (ds) => ds[field] !== undefined && Array.isArray(ds.data) && ds.providerField !== undefined,
     );
-    const providers: string[][] = sources.map(ds => ds.data.map(d => d[ds.providerField])).filter(p => p.length > 0);
+    const providers: string[][] = sources
+      .map((ds) => ds.data.map((d) => d[ds.providerField]))
+      .filter((p) => p.length > 0);
     const allProviders = union(...providers);
     allProviders.forEach((provider: string) => {
       const vals = sources
-        .map(ds =>
+        .map((ds) =>
           map(
             ds.data.filter((d: any) => typeof d === 'object' && d[ds.providerField] === provider),
             ds[field],
           ),
         )
-        .filter(v => v.length > 0);
+        .filter((v) => v.length > 0);
       const allValues = union(...vals);
       if (allValues.length === 1) {
         (results as any)[provider] = allValues[0];
@@ -274,5 +281,13 @@ export class Application {
   private setDefaults(): void {
     this.defaultCredentials = this.extractProviderDefault('credentialsField');
     this.defaultRegions = this.extractProviderDefault('regionField');
+  }
+
+  public subscribeToRefresh(onRefreshCb: () => void) {
+    this.refreshListeners.push(onRefreshCb);
+    const unsubscribeCb = () => {
+      this.refreshListeners.filter((cb) => cb !== onRefreshCb);
+    };
+    return unsubscribeCb;
   }
 }

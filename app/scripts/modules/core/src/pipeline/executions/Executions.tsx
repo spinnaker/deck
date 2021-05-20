@@ -1,27 +1,27 @@
-import { IPromise } from 'angular';
-import { CreatePipelineButton } from '../create/CreatePipelineButton';
-import { IScheduler } from 'core/scheduler/SchedulerFactory';
-import React from 'react';
-import ReactGA from 'react-ga';
 import { get } from 'lodash';
 import { $q } from 'ngimport';
+import React from 'react';
+import ReactGA from 'react-ga';
 import { Subscription } from 'rxjs';
 
 import { Application } from 'core/application';
-import { IPipeline, IPipelineCommand, IExecution } from 'core/domain';
-import { ReactInjector } from 'core/reactShims';
-import { ManualExecutionModal } from 'core/pipeline';
+import { IExecution, IPipeline, IPipelineCommand } from 'core/domain';
+import { FilterCollapse, FilterTags, IFilterTag, ISortFilter } from 'core/filterModel';
+import { Overridable } from 'core/overrideRegistry';
 import { Tooltip } from 'core/presentation/Tooltip';
-
-import { CreatePipeline } from '../config/CreatePipeline';
-import { ExecutionFilters } from '../filter/ExecutionFilters';
-import { ExecutionFilterService } from '../filter/executionFilter.service';
-import { ExecutionGroups } from './executionGroup/ExecutionGroups';
-import { FilterTags, IFilterTag, ISortFilter } from 'core/filterModel';
-import { Spinner } from 'core/widgets/spinners/Spinner';
+import { ReactInjector } from 'core/reactShims';
+import { SchedulerFactory } from 'core/scheduler';
+import { IScheduler } from 'core/scheduler/SchedulerFactory';
 import { ExecutionState } from 'core/state';
 import { IRetryablePromise } from 'core/utils/retryablePromise';
-import { SchedulerFactory } from 'core/scheduler';
+import { Spinner } from 'core/widgets/spinners/Spinner';
+
+import { CreatePipeline } from '../config/CreatePipeline';
+import { CreatePipelineButton } from '../create/CreatePipelineButton';
+import { ExecutionGroups } from './executionGroup/ExecutionGroups';
+import { ExecutionFilters } from '../filter/ExecutionFilters';
+import { ExecutionFilterService } from '../filter/executionFilter.service';
+import { ManualExecutionModal } from '../manualExecution';
 
 import './executions.less';
 
@@ -40,13 +40,19 @@ export interface IExecutionsState {
   reloadingForFilters: boolean;
 }
 
+// This Set ensures we only forward once from .executions to .executionDetails for an aged out execution
+const forwardedExecutions = new Set();
+// This ensures we only forward to permalink on landing, not on future refreshes
+let disableForwarding = false;
+
+@Overridable('PipelineExecutions')
 export class Executions extends React.Component<IExecutionsProps, IExecutionsState> {
   private executionsRefreshUnsubscribe: Function;
   private groupsUpdatedSubscription: Subscription;
   private insightFilterStateModel = ReactInjector.insightFilterStateModel;
   private activeRefresher: IScheduler;
 
-  private filterCountOptions = [1, 2, 5, 10, 20, 30, 40, 50];
+  private filterCountOptions = [1, 2, 5, 10, 20, 30, 40, 50, 100, 200];
 
   constructor(props: IExecutionsProps) {
     super(props);
@@ -102,7 +108,7 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
     const areEqual = (t1: IFilterTag, t2: IFilterTag) =>
       t1.key === t2.key && t1.label === t2.label && t1.value === t2.value;
     const tagsChanged =
-      newTags.length !== currentTags.length || newTags.some(t1 => !currentTags.some(t2 => areEqual(t1, t2)));
+      newTags.length !== currentTags.length || newTags.some((t1) => !currentTags.some((t2) => areEqual(t1, t2)));
     if (tagsChanged) {
       this.setState({ tags: newTags });
     }
@@ -139,12 +145,12 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
     ExecutionState.filterModel.expandSubject.next(false);
   };
 
-  private startPipeline(command: IPipelineCommand): IPromise<void> {
+  private startPipeline(command: IPipelineCommand): PromiseLike<void> {
     const { executionService } = ReactInjector;
     this.setState({ triggeringExecution: true });
     return executionService
       .startAndMonitorPipeline(this.props.app, command.pipelineName, command.trigger)
-      .then(monitor => {
+      .then((monitor) => {
         this.setState({ poll: monitor });
         return monitor.promise;
       })
@@ -163,7 +169,7 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
       pipeline: pipeline,
       application: this.props.app,
     })
-      .then(command => {
+      .then((command) => {
         this.startPipeline(command);
         this.clearManualExecutionParam();
       })
@@ -172,6 +178,22 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
 
   private clearManualExecutionParam(): void {
     ReactInjector.$state.go('.', { startManualExecution: null }, { inherit: true, location: 'replace' });
+  }
+
+  private handleAgedOutExecutions(executionId: string, forwardToPermalink: boolean): void {
+    const { $state, executionService } = ReactInjector;
+    if (forwardToPermalink && executionId && !forwardedExecutions.has(executionId)) {
+      // We only want to forward to permalink on initial load
+      executionService.getExecution(executionId).then(() => {
+        const detailsState = $state.current.name.replace('executions.execution', 'executionDetails.execution');
+        const { stage, step, details } = $state.params;
+        forwardedExecutions.add(executionId);
+        $state.go(detailsState, { executionId, stage, step, details });
+      });
+    } else {
+      // Handles the case where we already forwarded once and user navigated back, so do not forward again.
+      $state.go('.^');
+    }
   }
 
   public componentDidMount(): void {
@@ -203,10 +225,12 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
         const { $state } = ReactInjector;
         if ($state.params.executionId) {
           const executions: IExecution[] = app.executions.data;
-          if (executions.every(e => e.id !== $state.params.executionId)) {
-            $state.go('.^');
+          if (executions.every((e) => e.id !== $state.params.executionId)) {
+            this.handleAgedOutExecutions($state.params.executionId, !disableForwarding);
           }
         }
+        // After the very first refresh interval (landing), we do not want to forward the user to the permalink
+        disableForwarding = true;
       },
       () => this.dataInitializationFailure(),
     );
@@ -236,14 +260,10 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
     this.state.poll && this.state.poll.cancel();
   }
 
-  private showFilters = (): void => {
-    this.setState({ filtersExpanded: true });
-    this.insightFilterStateModel.pinFilters(true);
-  };
-
-  private hideFilters = (): void => {
-    this.setState({ filtersExpanded: false });
-    this.insightFilterStateModel.pinFilters(false);
+  private toggleFilters = (): void => {
+    const newState = !this.state.filtersExpanded;
+    this.setState({ filtersExpanded: newState });
+    this.insightFilterStateModel.pinFilters(newState);
   };
 
   private groupByChanged = (event: React.ChangeEvent<HTMLSelectElement>): void => {
@@ -289,30 +309,21 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
       }
       return (
         <div className="executions-section">
-          <div className={`insight ${filtersExpanded ? 'filters-expanded' : 'filters-collapsed'}`}>
-            <div className="nav">
-              <h3 className="filters-placeholder">
-                <Tooltip value="Show filters">
-                  <a className="btn btn-xs btn-default pin clickable" onClick={this.showFilters}>
-                    <i className="fa fa-forward" />
-                  </a>
-                </Tooltip>
-              </h3>
-              <a
-                className="btn btn-xs btn-default pull-right unpin clickable"
-                style={{ display: filtersExpanded ? '' : 'none' }}
-                onClick={this.hideFilters}
-              >
-                <Tooltip value="Hide filters">
-                  <i className="fa fa-backward" />
-                </Tooltip>
-              </a>
-              {!loading && <ExecutionFilters application={app} setReloadingForFilters={this.setReloadingForFilters} />}
+          {!loading && (
+            <div onClick={this.toggleFilters}>
+              <FilterCollapse />
             </div>
+          )}
+          <div className={`insight ${filtersExpanded ? 'filters-expanded' : 'filters-collapsed'}`}>
+            {filtersExpanded && (
+              <div className="nav ng-scope">
+                {!loading && (
+                  <ExecutionFilters application={app} setReloadingForFilters={this.setReloadingForFilters} />
+                )}
+              </div>
+            )}
             <div
-              className={`full-content ${filtersExpanded ? 'filters-expanded' : ''} ${
-                sortFilter.showDurations ? 'show-durations' : ''
-              }`}
+              className={`nav-content ng-scope ${sortFilter.showDurations ? 'show-durations' : ''}`}
               data-scroll-id="nav-content"
             >
               {!loading && (
@@ -385,7 +396,7 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
                         value={sortFilter.count}
                         onChange={this.showCountChanged}
                       >
-                        {this.filterCountOptions.map(count => (
+                        {this.filterCountOptions.map((count) => (
                           <option key={count} value={count}>
                             {count}
                           </option>

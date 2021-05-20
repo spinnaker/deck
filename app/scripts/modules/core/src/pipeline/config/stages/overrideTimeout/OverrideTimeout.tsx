@@ -1,10 +1,10 @@
-import React from 'react';
 import { get } from 'lodash';
 import { Duration } from 'luxon';
+import React from 'react';
 
 import { IStage } from 'core/domain';
-import { CheckboxInput, NumberInput } from 'core/presentation';
 import { HelpField } from 'core/help';
+import { CheckboxInput, NumberInput } from 'core/presentation';
 
 const { useEffect, useState } = React;
 
@@ -22,9 +22,7 @@ const toHoursAndMinutes = (ms: number) => {
   if (!ms) {
     return { hours: 0, minutes: 0 };
   } else {
-    const { hours, minutes } = Duration.fromMillis(ms)
-      .shiftTo('hours', 'minutes')
-      .toObject();
+    const { hours, minutes } = Duration.fromMillis(ms).shiftTo('hours', 'minutes').toObject();
 
     return {
       hours: Math.floor(hours),

@@ -1,12 +1,13 @@
 'use strict';
 
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 import * as angular from 'angular';
 import _ from 'lodash';
 
-import { SECURITY_GROUP_READER, ConfirmationModalService, FirewallLabels } from '@spinnaker/core';
-import { AZURE_SECURITYGROUP_SECURITYGROUP_WRITE_SERVICE } from '../securityGroup.write.service';
+import { ConfirmationModalService, FirewallLabels, SECURITY_GROUP_READER } from '@spinnaker/core';
+
 import { AZURE_SECURITYGROUP_CLONE_CLONESECURITYGROUP_CONTROLLER } from '../clone/cloneSecurityGroup.controller';
-import UIROUTER_ANGULARJS from '@uirouter/angularjs';
+import { AZURE_SECURITYGROUP_SECURITYGROUP_WRITE_SERVICE } from '../securityGroup.write.service';
 
 export const AZURE_SECURITYGROUP_DETAILS_SECURITYGROUPDETAIL_CONTROLLER =
   'spinnaker.azure.securityGroup.azure.details.controller';
@@ -26,7 +27,7 @@ angular
     'azureSecurityGroupWriter',
     'securityGroupReader',
     '$uibModal',
-    function($scope, $state, resolvedSecurityGroup, app, azureSecurityGroupWriter, securityGroupReader, $uibModal) {
+    function ($scope, $state, resolvedSecurityGroup, app, azureSecurityGroupWriter, securityGroupReader, $uibModal) {
       const application = app;
       const securityGroup = resolvedSecurityGroup;
 
@@ -47,7 +48,7 @@ angular
             securityGroup.name,
           )
           .then(
-            function(details) {
+            function (details) {
               $scope.state.loading = false;
 
               if (!details || _.isEmpty(details)) {
@@ -56,7 +57,7 @@ angular
                 $scope.securityGroup = details;
               }
             },
-            function() {
+            function () {
               fourOhFour();
             },
           );
@@ -79,10 +80,10 @@ angular
           templateUrl: require('../configure/editSecurityGroup.html'),
           controller: 'azureEditSecurityGroupCtrl as ctrl',
           resolve: {
-            securityGroup: function() {
+            securityGroup: function () {
               return angular.copy($scope.securityGroup);
             },
-            application: function() {
+            application: function () {
               return application;
             },
           },
@@ -94,14 +95,14 @@ angular
           templateUrl: require('../clone/cloneSecurityGroup.html'),
           controller: 'azureCloneSecurityGroupController as ctrl',
           resolve: {
-            securityGroup: function() {
+            securityGroup: function () {
               const securityGroup = angular.copy($scope.securityGroup);
               if (securityGroup.region) {
                 securityGroup.regions = [securityGroup.region];
               }
               return securityGroup;
             },
-            application: function() {
+            application: function () {
               return application;
             },
           },
@@ -114,7 +115,7 @@ angular
           title: 'Deleting ' + securityGroup.name,
         };
 
-        const submitMethod = function() {
+        const submitMethod = function () {
           $scope.securityGroup.type = 'deleteSecurityGroup';
           return azureSecurityGroupWriter.deleteSecurityGroup(securityGroup, application, {
             cloudProvider: 'azure',

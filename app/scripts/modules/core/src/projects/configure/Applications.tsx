@@ -1,10 +1,11 @@
-import React from 'react';
-import { FormikErrors, getIn, FormikProps } from 'formik';
+import { FormikErrors, FormikProps, getIn } from 'formik';
 import { isEqual } from 'lodash';
+import React from 'react';
 
 import { IProject, IProjectPipeline } from 'core/domain';
 import { IWizardPageComponent } from 'core/modal';
-import { FormikApplicationsPicker } from './FormikApplicationsPicker';
+import { FormikFormField } from 'core/presentation';
+import { ApplicationsPickerInput } from 'core/widgets';
 
 export interface IApplicationsProps {
   formik: FormikProps<IProject>;
@@ -18,7 +19,7 @@ export class Applications extends React.Component<IApplicationsProps> implements
       this.props.allApplications.includes(app) ? undefined : `Application '${app}' does not exist.`;
 
     const applicationErrors = configuredApps.map(getApplicationError);
-    if (!applicationErrors.some(err => !!err)) {
+    if (!applicationErrors.some((err) => !!err)) {
       return {};
     }
 
@@ -42,13 +43,10 @@ export class Applications extends React.Component<IApplicationsProps> implements
   }
 
   public render() {
-    const { allApplications } = this.props;
-
     return (
-      <FormikApplicationsPicker
-        className="ConfigureProject-Applications"
+      <FormikFormField
         name="config.applications"
-        applications={allApplications}
+        input={(props) => <ApplicationsPickerInput multi={true} {...props} />}
       />
     );
   }

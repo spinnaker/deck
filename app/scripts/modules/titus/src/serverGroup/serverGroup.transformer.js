@@ -1,16 +1,22 @@
 'use strict';
 
+import { module } from 'angular';
 import _ from 'lodash';
 
-import { module } from 'angular';
+import { AccountService } from '@spinnaker/core';
 
 export const TITUS_SERVERGROUP_SERVERGROUP_TRANSFORMER = 'spinnaker.titus.serverGroup.transformer';
 export const name = TITUS_SERVERGROUP_SERVERGROUP_TRANSFORMER; // for backwards compatibility
 module(TITUS_SERVERGROUP_SERVERGROUP_TRANSFORMER, []).factory('titusServerGroupTransformer', [
   '$q',
-  function($q) {
+  function ($q) {
     function normalizeServerGroup(serverGroup) {
-      return $q.when(serverGroup); // no-op
+      return AccountService.getCredentialsKeyedByAccount('titus').then((credentialsKeyedByAccount) => {
+        if (serverGroup.account && credentialsKeyedByAccount[serverGroup.account]) {
+          serverGroup.awsAccount = credentialsKeyedByAccount[serverGroup.account].awsAccount;
+        }
+        return serverGroup;
+      });
     }
 
     function convertServerGroupCommandToDeployConfiguration(base) {
@@ -41,6 +47,7 @@ module(TITUS_SERVERGROUP_SERVERGROUP_TRANSFORMER, []).factory('titusServerGroupT
             statistic: 'Average',
             comparisonOperator: 'GreaterThanThreshold',
             evaluationPeriods: 1,
+            disableEditingDimensions: true,
             dimensions: [{ name: 'AutoScalingGroupName', value: serverGroup.name }],
             period: 60,
           },

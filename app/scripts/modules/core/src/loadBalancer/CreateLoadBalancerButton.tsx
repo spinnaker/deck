@@ -1,11 +1,13 @@
 import React from 'react';
 
+import { IAccountDetails } from 'core/account';
 import { Application } from 'core/application';
-import { CloudProviderRegistry, ProviderSelectionService } from 'core/cloudProvider';
+import { CloudProviderRegistry, ICloudProviderConfig, ProviderSelectionService } from 'core/cloudProvider';
 import { ILoadBalancer } from 'core/domain';
-import { ILoadBalancerUpsertCommand } from 'core/loadBalancer';
-import { ModalInjector, ReactInjector } from 'core/reactShims';
 import { IModalComponentProps, Tooltip } from 'core/presentation';
+import { ModalInjector } from 'core/reactShims';
+
+import { ILoadBalancerUpsertCommand } from './loadBalancer.write.service';
 
 export interface ILoadBalancerModalProps extends IModalComponentProps {
   className?: string;
@@ -22,17 +24,39 @@ export interface ICreateLoadBalancerButtonProps {
   app: Application;
 }
 
-export class CreateLoadBalancerButton extends React.Component<ICreateLoadBalancerButtonProps> {
+export class CreateLoadBalancerButton extends React.Component<ICreateLoadBalancerButtonProps, { isDisabled: boolean }> {
   constructor(props: ICreateLoadBalancerButtonProps) {
     super(props);
+    this.state = { isDisabled: false };
   }
 
-  private createLoadBalancer = (): void => {
-    const { skinSelectionService } = ReactInjector;
+  componentDidMount() {
     const { app } = this.props;
-    ProviderSelectionService.selectProvider(app, 'loadBalancer').then(selectedProvider => {
-      skinSelectionService.selectSkin(selectedProvider).then(selectedSkin => {
-        const provider = CloudProviderRegistry.getValue(selectedProvider, 'loadBalancer', selectedSkin);
+    ProviderSelectionService.isDisabled(app).then((val) => {
+      this.setState({
+        isDisabled: val,
+      });
+    });
+  }
+
+  private createLoadBalancerProviderFilterFn = (
+    _app: Application,
+    _acc: IAccountDetails,
+    provider: ICloudProviderConfig,
+  ): boolean => {
+    const lbConfig = provider.loadBalancer;
+    return (
+      lbConfig &&
+      (lbConfig.CreateLoadBalancerModal ||
+        (lbConfig.createLoadBalancerTemplateUrl && lbConfig.createLoadBalancerController))
+    );
+  };
+
+  private createLoadBalancer = (): void => {
+    const { app } = this.props;
+    ProviderSelectionService.selectProvider(app, 'loadBalancer', this.createLoadBalancerProviderFilterFn).then(
+      (selectedProvider) => {
+        const provider = CloudProviderRegistry.getValue(selectedProvider, 'loadBalancer');
 
         if (provider.CreateLoadBalancerModal) {
           provider.CreateLoadBalancerModal.show({
@@ -58,21 +82,25 @@ export class CreateLoadBalancerButton extends React.Component<ICreateLoadBalance
             })
             .result.catch(() => {});
         }
-      });
-    });
+      },
+    );
   };
 
   public render() {
-    return (
-      <div>
-        <button className="btn btn-sm btn-default" onClick={this.createLoadBalancer}>
-          <span className="glyphicon glyphicon-plus-sign visible-lg-inline" />
-          <Tooltip value="Create Load Balancer">
-            <span className="glyphicon glyphicon-plus-sign visible-md-inline visible-sm-inline" />
-          </Tooltip>
-          <span className="visible-lg-inline"> Create Load Balancer</span>
-        </button>
-      </div>
-    );
+    if (!this.state.isDisabled) {
+      return (
+        <div>
+          <button className="btn btn-sm btn-default" onClick={this.createLoadBalancer}>
+            <span className="glyphicon glyphicon-plus-sign visible-lg-inline" />
+            <Tooltip value="Create Load Balancer">
+              <span className="glyphicon glyphicon-plus-sign visible-md-inline visible-sm-inline" />
+            </Tooltip>
+            <span className="visible-lg-inline"> Create Load Balancer</span>
+          </button>
+        </div>
+      );
+    } else {
+      return <div></div>;
+    }
   }
 }

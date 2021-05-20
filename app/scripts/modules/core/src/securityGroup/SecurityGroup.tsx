@@ -1,12 +1,12 @@
-import * as React from 'react';
 import { UISref } from '@uirouter/react';
 import classNames from 'classnames';
+import * as React from 'react';
 
 import { Application } from 'core/application';
-import { ILoadBalancerUsage, ISecurityGroup, ISecurityGroupGroup, IServerGroupUsage } from 'core/domain';
-import { ManagedResourceStatusIndicator } from 'core/managed';
-import { EntityNotifications } from 'core/entityTag/notifications/EntityNotifications';
 import { CloudProviderLogo } from 'core/cloudProvider';
+import { ILoadBalancerUsage, ISecurityGroup, ISecurityGroupGroup, IServerGroupUsage } from 'core/domain';
+import { EntityNotifications } from 'core/entityTag/notifications/EntityNotifications';
+import { ManagedResourceStatusIndicator } from 'core/managed';
 import { ReactInjector } from 'core/reactShims';
 import { SecurityGroupState } from 'core/state';
 
@@ -35,7 +35,7 @@ const Heading = ({ application, parentGrouping, securityGroup, heading }: ISecur
       <EntityNotifications
         entity={securityGroup}
         application={application}
-        placement="top"
+        placement="bottom"
         entityType="securityGroup"
         pageLocation="details"
         onUpdate={() => application.securityGroups.refresh()}
@@ -81,7 +81,7 @@ const ServerGroups = ({ serverGroups }: { serverGroups: IServerGroupUsage[] }) =
       {serverGroups.length === 0 && <div className="small">No server groups</div>}
       {serverGroups.length > 0 && (
         <>
-          {serverGroups.map(serverGroup => (
+          {serverGroups.map((serverGroup) => (
             <ServerGroup key={serverGroup.name} serverGroup={serverGroup} />
           ))}
         </>
@@ -124,7 +124,7 @@ const LoadBalancers = ({ securityGroup }: { securityGroup: ISecurityGroup }) => 
       {securityGroup.usages.loadBalancers.length === 0 && <div className="small">No load balancers</div>}
       {securityGroup.usages.loadBalancers.length > 0 && (
         <>
-          {securityGroup.usages.loadBalancers.map(loadBalancer => (
+          {securityGroup.usages.loadBalancers.map((loadBalancer) => (
             <LoadBalancer key={loadBalancer.name} loadBalancer={loadBalancer} securityGroup={securityGroup} />
           ))}
         </>

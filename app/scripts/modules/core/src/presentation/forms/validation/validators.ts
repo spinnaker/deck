@@ -1,27 +1,32 @@
-import { IValidator } from './validation';
-import { isNumber } from 'lodash';
 import { robotToHuman } from 'core';
+import { isNumber } from 'lodash';
+
+import { IValidator } from './validation';
 
 const THIS_FIELD = 'This field';
 
 const emailValue = (message?: string): IValidator => {
-  return (val: string, label = THIS_FIELD) => {
+  return function emailValue(val: string, label = THIS_FIELD) {
     message = message || `${label} is not a valid email address.`;
     return val && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(val) && message;
   };
 };
 
 const isRequired = (message?: string): IValidator => {
-  return (val: any, label = THIS_FIELD) => {
+  return function isRequired(val: any, label = THIS_FIELD) {
     message = message || `${label} is required.`;
     return (val === undefined || val === null || val === '') && message;
   };
 };
 
-const isNum = (message?: string) => (value: any) => (isNumber(value) ? null : message || 'Must be a number');
+const isNum = (message?: string): IValidator => {
+  return function isNum(value: any) {
+    return isNumber(value) ? null : message || 'Must be a number';
+  };
+};
 
 const minValue = (min: number, message?: string): IValidator => {
-  return (val: number, label = THIS_FIELD) => {
+  return function minValue(val: number, label = THIS_FIELD) {
     if (!isNumber(val)) {
       return message || `${label} must be a number`;
     } else if (val < min) {
@@ -33,7 +38,7 @@ const minValue = (min: number, message?: string): IValidator => {
 };
 
 const maxValue = (max: number, message?: string): IValidator => {
-  return (val: number, label = THIS_FIELD) => {
+  return function maxValue(val: number, label = THIS_FIELD) {
     if (!isNumber(val)) {
       return message || `${label} must be a number`;
     } else if (val > max) {
@@ -44,21 +49,23 @@ const maxValue = (max: number, message?: string): IValidator => {
   };
 };
 
-const checkBetween = (fieldName: string, min: number, max: number): IValidator => (value: string) => {
-  const sanitizedField = Number.parseInt(value, 10);
+const checkBetween = (fieldName: string, min: number, max: number): IValidator => {
+  return function checkBetween(value: string) {
+    const sanitizedField = Number.parseInt(value, 10);
 
-  if (!Number.isNaN(sanitizedField)) {
-    const error =
-      Validators.minValue(min)(sanitizedField, robotToHuman(fieldName)) ||
-      Validators.maxValue(max)(sanitizedField, robotToHuman(fieldName));
+    if (!Number.isNaN(sanitizedField)) {
+      const error =
+        Validators.minValue(min)(sanitizedField, robotToHuman(fieldName)) ||
+        Validators.maxValue(max)(sanitizedField, robotToHuman(fieldName));
 
-    return error;
-  }
-  return null;
+      return error;
+    }
+    return null;
+  };
 };
 
 const oneOf = (list: any[], message?: string): IValidator => {
-  return (val: any, label = THIS_FIELD) => {
+  return function oneOf(val: any, label = THIS_FIELD) {
     list = list || [];
     message = message || `${label} must be one of (${list.join(', ')})`;
     return !list.includes(val) && message;
@@ -66,23 +73,47 @@ const oneOf = (list: any[], message?: string): IValidator => {
 };
 
 const arrayNotEmpty = (message?: string): IValidator => {
-  return (val: string | any[], label = THIS_FIELD) => {
+  return function arrayNotEmpty(val: string | any[], label = THIS_FIELD) {
     message = message || `${label} must contain at least one entry`;
     return val && val.length < 1 && message;
   };
 };
 
 const skipIfUndefined = (actualValidator: IValidator): IValidator => {
-  return (val: any, label = THIS_FIELD) => {
+  return function skipIfUndefined(val: any, label = THIS_FIELD) {
     return val !== undefined && actualValidator(val, label);
   };
 };
 
 const valueUnique = (list: any[], message?: string): IValidator => {
-  return (val: any, label = THIS_FIELD) => {
+  return function valueUnique(val: any, label = THIS_FIELD) {
     list = list || [];
     message = message || `${label} must be not be included in (${list.join(', ')})`;
     return list.includes(val) && message;
+  };
+};
+
+const isValidJson = (message?: string): IValidator => {
+  return function isValidJson(val: string, label = 'this field') {
+    try {
+      JSON.parse(val);
+    } catch (parseError) {
+      message = message || `${label} must be valid JSON: ${parseError.message}`;
+      return message;
+    }
+    return undefined;
+  };
+};
+
+const isValidXml = (message?: string): IValidator => {
+  return function isValidXml(val: string, label = 'this field') {
+    const xmlDoc = new DOMParser().parseFromString(val, 'text/xml');
+    const elements = xmlDoc.getElementsByTagName('parsererror');
+    if (elements && elements.length > 0) {
+      message = message || `${label} must be valid XML`;
+      return message;
+    }
+    return undefined;
   };
 };
 
@@ -95,12 +126,14 @@ const valueUnique = (list: any[], message?: string): IValidator => {
  */
 export const Validators = {
   arrayNotEmpty,
+  checkBetween,
   emailValue,
-  isRequired,
   isNum,
+  isRequired,
+  isValidJson,
+  isValidXml,
   maxValue,
   minValue,
-  checkBetween,
   oneOf,
   skipIfUndefined,
   valueUnique,

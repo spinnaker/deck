@@ -1,10 +1,11 @@
 FROM debian:stable-slim
-MAINTAINER delivery-engineering@netflix.com
-COPY --from=compile /compiled_sources/build/webpack /opt/deck/html
-COPY --from=compile /compiled_sources/docker        /opt/deck/docker
-WORKDIR /opt/deck
+LABEL maintainer="sig-platform@spinnaker.io"
 
+WORKDIR /opt/deck
+COPY docker        /opt/deck/docker
 RUN docker/setup-apache2.sh
+
+COPY build/webpack /opt/deck/html
 RUN chown -R www-data:www-data /opt/deck
 USER www-data
 

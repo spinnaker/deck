@@ -1,9 +1,8 @@
-import { IPromise } from 'angular';
 import { cloneDeep } from 'lodash';
 
 import { ITask } from 'core/domain';
-import { IJob, TaskExecutor } from 'core/task/taskExecutor';
 import { RecentHistoryService } from 'core/history/recentHistory.service';
+import { IJob, TaskExecutor } from 'core/task/taskExecutor';
 
 export interface IApplicationAttributes {
   name: string;
@@ -13,7 +12,7 @@ export interface IApplicationAttributes {
 }
 
 export class ApplicationWriter {
-  public static createApplication(application: IApplicationAttributes): IPromise<ITask> {
+  public static createApplication(application: IApplicationAttributes): PromiseLike<ITask> {
     const jobs: IJob[] = this.buildJobs(application, 'createApplication', cloneDeep);
     return TaskExecutor.executeTask({
       job: jobs,
@@ -22,7 +21,7 @@ export class ApplicationWriter {
     });
   }
 
-  public static updateApplication(application: IApplicationAttributes): IPromise<ITask> {
+  public static updateApplication(application: IApplicationAttributes): PromiseLike<ITask> {
     const jobs: IJob[] = this.buildJobs(application, 'updateApplication', cloneDeep);
     return TaskExecutor.executeTask({
       job: jobs,
@@ -31,7 +30,7 @@ export class ApplicationWriter {
     });
   }
 
-  public static deleteApplication(application: IApplicationAttributes): IPromise<ITask> {
+  public static deleteApplication(application: IApplicationAttributes): PromiseLike<ITask> {
     const jobs: IJob[] = this.buildJobs(application, 'deleteApplication', (app: IApplicationAttributes): any => {
       return { name: app.name };
     });

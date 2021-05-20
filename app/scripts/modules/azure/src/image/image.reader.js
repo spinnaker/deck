@@ -2,36 +2,35 @@
 
 import { module } from 'angular';
 
-import { API } from '@spinnaker/core';
+import { REST } from '@spinnaker/core';
 
 export const AZURE_IMAGE_IMAGE_READER = 'spinnaker.azure.image.reader';
 export const name = AZURE_IMAGE_IMAGE_READER; // for backwards compatibility
-module(AZURE_IMAGE_IMAGE_READER, []).factory('azureImageReader', function() {
+module(AZURE_IMAGE_IMAGE_READER, []).factory('azureImageReader', function () {
   function findImages(params) {
-    return API.one('images/find')
-      .get(params)
+    return REST('/images/find')
+      .query(params)
+      .get()
       .then(
-        function(results) {
+        function (results) {
           return results;
         },
-        function() {
+        function () {
           return [];
         },
       );
   }
 
   function getImage(amiName, region, credentials) {
-    return API.one('images')
-      .one(credentials)
-      .one(region)
-      .one(amiName)
-      .withParams({ provider: 'azure' })
+    return REST('/images')
+      .path(credentials, region, amiName)
+      .query({ provider: 'azure' })
       .get()
       .then(
-        function(results) {
+        function (results) {
           return results && results.length ? results[0] : null;
         },
-        function() {
+        function () {
           return null;
         },
       );

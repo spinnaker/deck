@@ -1,4 +1,5 @@
-import { IController, IComponentOptions, module } from 'angular';
+import { IComponentOptions, IController, module } from 'angular';
+
 import { AppengineLoadBalancerUpsertDescription } from '../../transformer';
 
 class AppengineLoadBalancerAdvancedSettingsCtrl implements IController {
@@ -11,7 +12,7 @@ class AppengineLoadBalancerAdvancedSettingsCtrl implements IController {
     } else {
       const targetServerGroupName = this.loadBalancer.splitDescription.allocationDescriptions[0].serverGroupName;
       const targetServerGroup = this.loadBalancer.serverGroups.find(
-        candidate => candidate.name === targetServerGroupName,
+        (candidate) => candidate.name === targetServerGroupName,
       );
 
       if (targetServerGroup) {

@@ -1,11 +1,13 @@
 import React from 'react';
 
-import { IExecutionDetailsSectionProps, StageFailureMessage } from 'core/pipeline';
 import { IStage } from 'core/domain';
 import { robotToHuman } from 'core/presentation/robotToHumanFilter/robotToHuman.filter';
 import { timestamp } from 'core/utils/timeFormatters';
-import { ExecutionDetailsSection } from '../common';
+
 import { ManualJudgmentApproval } from './ManualJudgmentApproval';
+import { IExecutionDetailsSectionProps } from '../common';
+import { ExecutionDetailsSection } from '../common';
+import { StageFailureMessage } from '../../../details';
 
 export interface IManualJudgmentExecutionDetailsState {
   parentDeployStage: IStage;

@@ -1,14 +1,14 @@
-import React from 'react';
-import { IScope } from 'angular';
-import { DropdownButton, MenuItem } from 'react-bootstrap';
 import { StateService } from '@uirouter/core';
+import { IScope } from 'angular';
 import { IModalService } from 'angular-ui-bootstrap';
+import React from 'react';
+import { Button } from 'react-bootstrap';
 
 import { Application } from 'core/application';
+import { CacheInitializerService } from 'core/cache';
+import { Overridable, OverrideRegistry } from 'core/overrideRegistry';
 import { ConfigureProjectModal } from 'core/projects';
 import { ModalInjector, ReactInjector } from 'core/reactShims';
-import { OverrideRegistry } from 'core/overrideRegistry';
-import { CacheInitializerService } from 'core/cache';
 
 export interface IInsightMenuProps {
   createApp?: boolean;
@@ -20,6 +20,7 @@ export interface IInsightMenuState {
   refreshingCache: boolean;
 }
 
+@Overridable('createInsightMenu')
 export class InsightMenu extends React.Component<IInsightMenuProps, IInsightMenuState> {
   public static defaultProps: IInsightMenuProps = { createApp: true, createProject: true, refreshCaches: true };
 
@@ -41,7 +42,7 @@ export class InsightMenu extends React.Component<IInsightMenuProps, IInsightMenu
 
   private createProject = () =>
     ConfigureProjectModal.show()
-      .then(result => {
+      .then((result) => {
         this.$state.go('home.project.dashboard', { project: result.name });
       })
       .catch(() => {});
@@ -62,7 +63,7 @@ export class InsightMenu extends React.Component<IInsightMenuProps, IInsightMenu
   };
 
   private routeToApplication = (app: Application) => {
-    this.$state.go('home.applications.application.insight.clusters', { application: app.name });
+    this.$state.go('home.applications.application', { application: app.name });
   };
 
   private refreshAllCaches = () => {
@@ -87,23 +88,35 @@ export class InsightMenu extends React.Component<IInsightMenuProps, IInsightMenu
     );
 
     return (
-      <DropdownButton pullRight={true} title="Actions" id="insight-menu">
-        {createApp && (
-          <MenuItem href="javascript:void(0)" onClick={this.createApplication}>
-            Create Application
-          </MenuItem>
-        )}
+      <div id="insight-menu">
         {createProject && (
-          <MenuItem href="javascript:void(0)" onClick={this.createProject}>
+          <Button
+            bsStyle={createApp ? 'default' : 'primary'}
+            href="javascript:void(0)"
+            onClick={this.createProject}
+            style={{ marginRight: createApp ? '5px' : '' }}
+          >
             Create Project
-          </MenuItem>
+          </Button>
         )}
+
+        {createApp && (
+          <Button
+            bsStyle="primary"
+            href="javascript:void(0)"
+            onClick={this.createApplication}
+            style={{ marginRight: refreshCaches ? '5px' : '' }}
+          >
+            Create Application
+          </Button>
+        )}
+
         {refreshCaches && (
-          <MenuItem href="javascript:void(0)" onClick={this.refreshAllCaches}>
+          <Button href="javascript:void(0)" onClick={this.refreshAllCaches}>
             {refreshMarkup}
-          </MenuItem>
+          </Button>
         )}
-      </DropdownButton>
+      </div>
     );
   }
 }

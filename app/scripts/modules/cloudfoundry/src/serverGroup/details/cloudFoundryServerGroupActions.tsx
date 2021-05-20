@@ -1,7 +1,6 @@
-import React from 'react';
-
-import { Dropdown, Tooltip } from 'react-bootstrap';
 import { filter, find, get, orderBy } from 'lodash';
+import React from 'react';
+import { Dropdown, Tooltip } from 'react-bootstrap';
 
 import {
   ClusterTargetBuilder,
@@ -14,14 +13,14 @@ import {
   ServerGroupWarningMessageService,
   SETTINGS,
 } from '@spinnaker/core';
-
 import { ICloudFoundryServerGroup } from 'cloudfoundry/domain';
+
+import { CloudFoundryServerGroupCommandBuilder } from '../configure';
 import { CloudFoundryCreateServerGroupModal } from '../configure/wizard/CreateServerGroupModal';
-import { CloudFoundryResizeServerGroupModal } from './resize/CloudFoundryResizeServerGroupModal';
-import { CloudFoundryRollbackServerGroupModal } from './rollback/CloudFoundryRollbackServerGroupModal';
 import { CloudFoundryMapLoadBalancersModal } from './mapLoadBalancers/CloudFoundryMapLoadBalancersModal';
 import { CloudFoundryUnmapLoadBalancersModal } from './mapLoadBalancers/CloudFoundryUnmapLoadBalancersModal';
-import { CloudFoundryServerGroupCommandBuilder } from '../configure';
+import { CloudFoundryResizeServerGroupModal } from './resize/CloudFoundryResizeServerGroupModal';
+import { CloudFoundryRollbackServerGroupModal } from './rollback/CloudFoundryRollbackServerGroupModal';
 
 export interface ICloudFoundryServerGroupActionsProps extends IServerGroupActionsProps {
   serverGroup: ICloudFoundryServerGroup;
@@ -34,8 +33,8 @@ export interface ICloudFoundryServerGroupJob extends IServerGroupJob {
 export class CloudFoundryServerGroupActions extends React.Component<ICloudFoundryServerGroupActionsProps> {
   private isEnableLocked(): boolean {
     if (this.props.serverGroup.isDisabled) {
-      const resizeTasks = (this.props.serverGroup.runningTasks || []).filter(task =>
-        get(task, 'execution.stages', []).some(stage => stage.type === 'resizeServerGroup'),
+      const resizeTasks = (this.props.serverGroup.runningTasks || []).filter((task) =>
+        get(task, 'execution.stages', []).some((stage) => stage.type === 'resizeServerGroup'),
       );
       if (resizeTasks.length) {
         return true;
@@ -209,7 +208,7 @@ export class CloudFoundryServerGroupActions extends React.Component<ICloudFoundr
     let serverGroup: ICloudFoundryServerGroup = this.props.serverGroup;
     let previousServerGroup: ICloudFoundryServerGroup;
     let allServerGroups = (app.serverGroups.data as ICloudFoundryServerGroup[]).filter(
-      g => g.cluster === serverGroup.cluster && g.region === serverGroup.region && g.account === serverGroup.account,
+      (g) => g.cluster === serverGroup.cluster && g.region === serverGroup.region && g.account === serverGroup.account,
     );
 
     if (serverGroup.isDisabled) {
@@ -229,7 +228,7 @@ export class CloudFoundryServerGroupActions extends React.Component<ICloudFoundr
     }
 
     // the set of all server groups should not include the server group selected for rollback
-    allServerGroups = allServerGroups.filter(g => g.name !== serverGroup.name);
+    allServerGroups = allServerGroups.filter((g) => g.name !== serverGroup.name);
 
     if (allServerGroups.length === 1 && !previousServerGroup) {
       // if there is only one other server group, default to it being the rollback target

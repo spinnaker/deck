@@ -4,6 +4,7 @@ import { react2angular } from 'react2angular';
 
 import { IArtifactAccount } from 'core/account';
 import { TetheredSelect } from 'core/presentation';
+import { withErrorBoundary } from 'core/presentation/SpinErrorBoundary';
 
 import { ArtifactIcon } from './ArtifactIcon';
 
@@ -38,6 +39,7 @@ export class ArtifactAccountSelector extends React.Component<IArtifactAccountSel
         optionRenderer={this.renderOption}
         valueRenderer={this.renderOption}
         clearable={false}
+        valueKey="name"
       />
     );
   }
@@ -46,5 +48,10 @@ export class ArtifactAccountSelector extends React.Component<IArtifactAccountSel
 export const ARTIFACT_ACCOUNT_SELECTOR_COMPONENT_REACT = 'spinnaker.core.artifacts.account.selector.react';
 module(ARTIFACT_ACCOUNT_SELECTOR_COMPONENT_REACT, []).component(
   'artifactAccountSelectorReact',
-  react2angular(ArtifactAccountSelector, ['accounts', 'className', 'onChange', 'selected']),
+  react2angular(withErrorBoundary(ArtifactAccountSelector, 'artifactAccountSelectorReact'), [
+    'accounts',
+    'className',
+    'onChange',
+    'selected',
+  ]),
 );

@@ -1,9 +1,9 @@
-import React from 'react';
 import { isEqual } from 'lodash';
+import React from 'react';
 
-import { IFormInputProps, TextInput } from 'core/presentation';
-
-import { IExpressionChange, evaluateExpression } from './evaluateExpression';
+import { TextInput } from '../TextInput';
+import { evaluateExpression, IExpressionChange } from './evaluateExpression';
+import { IFormInputProps } from '../interface';
 
 export interface IExpressionInputProps extends IFormInputProps {
   onExpressionChange: (expressionChange: IExpressionChange) => void;

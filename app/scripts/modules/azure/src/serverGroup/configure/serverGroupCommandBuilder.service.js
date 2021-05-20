@@ -19,51 +19,45 @@ angular
     '$q',
     'azureImageReader',
     'azureServerGroupTransformer',
-    function($q, azureImageReader, azureServerGroupTransformer) {
+    function ($q, azureImageReader, azureServerGroupTransformer) {
       function buildNewServerGroupCommand(application, defaults) {
         defaults = defaults || {};
-
-        const imageLoader = azureImageReader.findImages({ provider: 'azure' });
 
         const defaultCredentials = defaults.account || application.defaultCredentials.azure;
         const defaultRegion = defaults.region || application.defaultRegions.azure;
 
-        return $q
-          .all({
-            images: imageLoader,
-          })
-          .then(function(backingData) {
-            return {
-              application: application.name,
-              credentials: defaultCredentials,
-              region: defaultRegion,
-              images: backingData.images,
-              loadBalancers: [],
-              selectedVnetSubnets: [],
-              strategy: '',
-              sku: {
-                capacity: 1,
-              },
-              zonesEnabled: false,
-              zones: [],
-              instanceTags: {},
-              dataDisks: [],
-              selectedProvider: 'azure',
-              viewState: {
-                instanceProfile: 'custom',
-                allImageSelection: null,
-                useAllImageSelection: false,
-                useSimpleCapacity: true,
-                usePreferredZones: true,
-                mode: defaults.mode || 'create',
-                disableStrategySelection: true,
-                loadBalancersConfigured: false,
-                networkSettingsConfigured: false,
-                securityGroupsConfigured: false,
-              },
-              enableInboundNAT: false,
-            };
-          });
+        return azureImageReader.findImages({ provider: 'azure' }).then(function (images) {
+          return {
+            application: application.name,
+            credentials: defaultCredentials,
+            region: defaultRegion,
+            images,
+            loadBalancers: [],
+            selectedVnetSubnets: [],
+            strategy: '',
+            sku: {
+              capacity: 1,
+            },
+            zonesEnabled: false,
+            zones: [],
+            instanceTags: {},
+            dataDisks: [],
+            selectedProvider: 'azure',
+            viewState: {
+              instanceProfile: 'custom',
+              allImageSelection: null,
+              useAllImageSelection: false,
+              useSimpleCapacity: true,
+              usePreferredZones: true,
+              mode: defaults.mode || 'create',
+              disableStrategySelection: true,
+              loadBalancersConfigured: false,
+              networkSettingsConfigured: false,
+              securityGroupsConfigured: false,
+            },
+            enableInboundNAT: false,
+          };
+        });
       }
 
       // Only used to prepare view requiring template selecting
@@ -142,14 +136,9 @@ angular
       function buildServerGroupCommandFromPipeline(application, originalCluster) {
         const pipelineCluster = _.cloneDeep(originalCluster);
         const region = pipelineCluster.region;
+
         const commandOptions = { account: pipelineCluster.account, region: region };
-        const asyncLoader = $q.all({
-          command: buildNewServerGroupCommand(application, commandOptions),
-        });
-
-        return asyncLoader.then(function(asyncData) {
-          const command = asyncData.command;
-
+        return buildNewServerGroupCommand(application, commandOptions).then(function (command) {
           const viewState = {
             disableImageSelection: true,
             useSimpleCapacity: true,

@@ -1,5 +1,5 @@
-import { extend, IController, IControllerService, IScope, module } from 'angular';
 import { StateService } from '@uirouter/angularjs';
+import { extend, IController, IControllerService, IScope, module } from 'angular';
 import { set } from 'lodash';
 
 import {
@@ -8,11 +8,10 @@ import {
   ExpectedArtifactSelectorViewController,
   IArtifact,
   IExpectedArtifact,
-  IPipeline,
   NgAppEngineDeployArtifactDelegate,
 } from '@spinnaker/core';
-
 import { GitCredentialType, IAppengineAccount } from 'appengine/domain/index';
+
 import { AppengineSourceType, IAppengineServerGroupCommand } from '../serverGroupCommandBuilder.service';
 
 interface IAppengineBasicSettingsScope extends IScope {
@@ -133,12 +132,6 @@ class AppengineServerGroupBasicSettingsCtrl implements IController {
   public onExpectedArtifactAccountSelected = (accountName: string): void => {
     this.$scope.$applyAsync(() => {
       this.$scope.command.storageAccountName = accountName;
-    });
-  };
-
-  public updatePipeline = (changes: Partial<IPipeline>): void => {
-    this.$scope.$applyAsync(() => {
-      extend(this.$scope.$parent.pipeline, changes);
     });
   };
 

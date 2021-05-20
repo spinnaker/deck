@@ -1,5 +1,3 @@
-import { IServiceProvider, module } from 'angular';
-import { isEqual, isPlainObject } from 'lodash';
 import {
   Ng1StateDeclaration,
   Ng1ViewDeclaration,
@@ -7,13 +5,15 @@ import {
   UrlRouterProvider,
   UrlService,
 } from '@uirouter/angularjs';
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
+import { ParamTypeDefinition, ReactViewDeclaration } from '@uirouter/react';
+import { IServiceProvider, module } from 'angular';
+import { isEqual, isPlainObject } from 'lodash';
 
-import { STATE_HELPER, StateHelper } from './stateHelper.provider';
 import { IFilterConfig } from '../filterModel/IFilterModel';
+import { STATE_HELPER, StateHelper } from './stateHelper.provider';
 
 import './navigation.less';
-import { ReactViewDeclaration, ParamTypeDefinition } from '@uirouter/react';
-import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
 // Typescript kludge to widen interfaces so INestedState can support both react and angular views
 export interface IReactHybridIntermediate extends Ng1StateDeclaration {
@@ -48,7 +48,7 @@ export class StateConfigProvider implements IServiceProvider {
    * @param child the state to add
    */
   public addToRootState(child: INestedState): void {
-    const current = this.root.children.find(c => c.name === child.name);
+    const current = this.root.children.find((c) => c.name === child.name);
     if (!current) {
       this.root.children.push(child);
     }
@@ -87,7 +87,7 @@ export class StateConfigProvider implements IServiceProvider {
   }
 
   public paramsToQuery(paramConfig: IFilterConfig[]): string {
-    return paramConfig.map(p => p.param || p.model).join('&');
+    return paramConfig.map((p) => p.param || p.model).join('&');
   }
 
   public $get(): StateConfigProvider {
@@ -101,19 +101,19 @@ export const trueKeyObjectParamType: ParamTypeDefinition = {
       const r: any = {};
       val
         .split(',')
-        .map(k => k.replace(/%2c/g, ','))
-        .forEach(k => (r[k] = true));
+        .map((k) => k.replace(/%2c/g, ','))
+        .forEach((k) => (r[k] = true));
       return r;
     }
     return {};
   },
   encode: (val: any) => {
     if (val) {
-      const r = Object.keys(val).filter(k => val[k]);
+      const r = Object.keys(val).filter((k) => val[k]);
       return r.length
         ? r
             .sort()
-            .map(k => k.replace(/,/g, '%2c'))
+            .map((k) => k.replace(/,/g, '%2c'))
             .join(',')
         : null;
     }

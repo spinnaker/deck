@@ -1,6 +1,7 @@
 import React from 'react';
-import { FormikFormField, TextInput } from 'core/presentation';
+
 import { INotificationTypeCustomConfig } from 'core/domain';
+import { FormikFormField, TextInput } from 'core/presentation';
 
 export class GooglechatNotificationType extends React.Component<INotificationTypeCustomConfig> {
   public render() {
@@ -9,7 +10,7 @@ export class GooglechatNotificationType extends React.Component<INotificationTyp
       <FormikFormField
         label="Chat Webhook URL"
         name={fieldName ? `${fieldName}.address` : 'address'}
-        input={props => (
+        input={(props) => (
           <TextInput
             inputClassName={'form-control input-sm'}
             {...props}

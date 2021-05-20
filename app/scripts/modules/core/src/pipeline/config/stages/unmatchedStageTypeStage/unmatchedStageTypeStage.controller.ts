@@ -1,7 +1,8 @@
-import { module, IController, IScope, isDefined } from 'angular';
+import { IController, IScope, isDefined, module } from 'angular';
 import { cloneDeep, isEqual } from 'lodash';
-import { JsonUtils } from 'core/utils';
+
 import { IStage } from 'core/domain/IStage';
+import { JsonUtils } from 'core/utils';
 
 export class UnmatchedStageTypeStageCtrl implements IController {
   public stageJson: string;
@@ -45,7 +46,7 @@ export class UnmatchedStageTypeStageCtrl implements IController {
     }
 
     if (!this.errorMessage) {
-      Object.keys(this.$scope.stage).forEach(key => {
+      Object.keys(this.$scope.stage).forEach((key) => {
         if (!this.keysToHide.has(key)) {
           delete this.$scope.stage[key];
         }
@@ -66,7 +67,7 @@ export class UnmatchedStageTypeStageCtrl implements IController {
 
   private makeCleanStageCopy(stage: IStage): IStage {
     const stageCopy = cloneDeep(stage);
-    this.keysToHide.forEach(key => {
+    this.keysToHide.forEach((key) => {
       if (isDefined(stageCopy[key])) {
         delete stageCopy[key];
       }

@@ -1,13 +1,9 @@
+import { FormikErrors, FormikProps } from 'formik';
 import React from 'react';
-
+import Select, { Option } from 'react-select';
 import { Observable, Subject } from 'rxjs';
 
-import Select, { Option } from 'react-select';
-
-import { FormikErrors, FormikProps } from 'formik';
-
 import { AccountService, Application, IAccount, IRegion, IWizardPageComponent } from '@spinnaker/core';
-
 import { ICloudFoundryAccount, ICloudFoundryDomain, ICloudFoundryLoadBalancerUpsertCommand } from 'cloudfoundry/domain';
 import { RouteDomainSelectField } from 'cloudfoundry/routeDomains';
 
@@ -25,7 +21,8 @@ export interface ILoadBalancerDetailsState {
   regions: IRegion[];
 }
 
-export class LoadBalancerDetails extends React.Component<ILoadBalancerDetailsProps, ILoadBalancerDetailsState>
+export class LoadBalancerDetails
+  extends React.Component<ILoadBalancerDetailsProps, ILoadBalancerDetailsState>
   implements IWizardPageComponent<ICloudFoundryLoadBalancerUpsertCommand> {
   private destroy$ = new Subject();
   public state: ILoadBalancerDetailsState = {
@@ -70,7 +67,7 @@ export class LoadBalancerDetails extends React.Component<ILoadBalancerDetailsPro
   private loadAccounts(): void {
     Observable.fromPromise(AccountService.listAccounts('cloudfoundry'))
       .takeUntil(this.destroy$)
-      .subscribe(accounts => {
+      .subscribe((accounts) => {
         this.setState({ accounts });
         this.loadDomainsAndRegions();
       });
@@ -90,7 +87,7 @@ export class LoadBalancerDetails extends React.Component<ILoadBalancerDetailsPro
         .subscribe((accountDetails: ICloudFoundryAccount) => this.setState({ domains: accountDetails.domains }));
       Observable.fromPromise(AccountService.getRegionsForAccount(account))
         .takeUntil(this.destroy$)
-        .subscribe(regions => this.setState({ regions }));
+        .subscribe((regions) => this.setState({ regions }));
     }
   }
 
@@ -105,7 +102,7 @@ export class LoadBalancerDetails extends React.Component<ILoadBalancerDetailsPro
           const { domains } = accountDetails;
           this.setState({
             domains: domains.filter(
-              domain => domain.organization === undefined || region.match('^' + domain.organization.name),
+              (domain) => domain.organization === undefined || region.match('^' + domain.organization.name),
             ),
           });
         });

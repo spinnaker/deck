@@ -1,14 +1,14 @@
 import { module } from 'angular';
 
+import { CANARY_ACATASK_ACATASKSTAGE_MODULE } from './acaTask/acaTaskStage.module';
 import './canary.help';
+import { CANARY_CANARY_CANARYSTAGE_MODULE } from './canary/canaryStage.module';
 
 import './canary.less';
-import { CANARY_ACATASK_ACATASKSTAGE_MODULE } from './acaTask/acaTaskStage.module';
-import { CANARY_CANARY_CANARYSTAGE_MODULE } from './canary/canaryStage.module';
 
 // load all templates into the $templateCache
 const templates = require.context('./', true, /\.html$/);
-templates.keys().forEach(function(key) {
+templates.keys().forEach(function (key) {
   templates(key);
 });
 

@@ -1,25 +1,22 @@
-import React from 'react';
-
-import { Observable, Subject } from 'rxjs';
-
-import { get } from 'lodash';
-
 import { FormikErrors, FormikProps } from 'formik';
+import { get } from 'lodash';
+import React from 'react';
+import { Observable, Subject } from 'rxjs';
 
 import {
   AccountService,
   CheckboxInput,
   FormikFormField,
+  HelpField,
   IAccount,
   IRegion,
   IWizardPageComponent,
-  HelpField,
   ReactSelectInput,
   TextInput,
 } from '@spinnaker/core';
+import { CloudFoundryDeploymentStrategySelector } from 'cloudfoundry/deploymentStrategy/CloudFoundryDeploymentStrategySelector';
 
 import { ICloudFoundryCreateServerGroupCommand } from '../../../serverGroupConfigurationModel.cf';
-import { CloudFoundryDeploymentStrategySelector } from 'cloudfoundry/deploymentStrategy/CloudFoundryDeploymentStrategySelector';
 
 import 'cloudfoundry/common/cloudFoundry.less';
 
@@ -44,7 +41,7 @@ export class CloudFoundryServerGroupBasicSettings
   public componentDidMount(): void {
     Observable.fromPromise(AccountService.listAccounts('cloudfoundry'))
       .takeUntil(this.destroy$)
-      .subscribe(accounts => {
+      .subscribe((accounts) => {
         this.setState({ accounts });
         this.updateRegionList();
       });
@@ -64,7 +61,7 @@ export class CloudFoundryServerGroupBasicSettings
     if (credentials) {
       Observable.fromPromise(AccountService.getRegionsForAccount(credentials))
         .takeUntil(this.destroy$)
-        .subscribe(regions => this.setState({ regions }));
+        .subscribe((regions) => this.setState({ regions }));
     }
   };
 
@@ -87,8 +84,7 @@ export class CloudFoundryServerGroupBasicSettings
             <FormikFormField
               name="credentials"
               label="Account"
-              fastField={false}
-              input={props => (
+              input={(props) => (
                 <ReactSelectInput
                   inputClassName="cloudfoundry-react-select"
                   {...props}
@@ -104,8 +100,7 @@ export class CloudFoundryServerGroupBasicSettings
             <FormikFormField
               name="region"
               label="Region"
-              fastField={false}
-              input={props => (
+              input={(props) => (
                 <ReactSelectInput
                   {...props}
                   stringOptions={regions && regions.map((region: IRegion) => region.name)}
@@ -120,7 +115,7 @@ export class CloudFoundryServerGroupBasicSettings
             <FormikFormField
               name="stack"
               label="Stack"
-              input={props => <TextInput {...props} />}
+              input={(props) => <TextInput {...props} />}
               help={<HelpField id="cf.serverGroup.stack" />}
             />
           </div>
@@ -128,7 +123,7 @@ export class CloudFoundryServerGroupBasicSettings
             <FormikFormField
               name="freeFormDetails"
               label="Detail"
-              input={props => <TextInput {...props} />}
+              input={(props) => <TextInput {...props} />}
               help={<HelpField id="cf.serverGroup.detail" />}
             />
           </div>
@@ -136,8 +131,7 @@ export class CloudFoundryServerGroupBasicSettings
             <FormikFormField
               name="startApplication"
               label="Start on creation"
-              fastField={false}
-              input={props => <CheckboxInput {...props} />}
+              input={(props) => <CheckboxInput {...props} />}
               help={<HelpField id="cf.serverGroup.startApplication" />}
             />
           </div>

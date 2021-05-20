@@ -1,6 +1,6 @@
+import { StateService } from '@uirouter/angularjs';
 import { IController, IScope, module } from 'angular';
 import { IModalService } from 'angular-ui-bootstrap';
-import { StateService } from '@uirouter/angularjs';
 import { cloneDeep } from 'lodash';
 
 import {
@@ -10,7 +10,6 @@ import {
   ILoadBalancerDeleteCommand,
   LoadBalancerWriter,
 } from '@spinnaker/core';
-
 import { IAppengineLoadBalancer } from 'appengine/domain';
 
 interface ILoadBalancerFromStateParams {
@@ -100,7 +99,7 @@ class AppengineLoadBalancerDetailsController implements IController {
   private buildDispatchRules(): void {
     this.dispatchRules = [];
     if (this.loadBalancer && this.loadBalancer.dispatchRules) {
-      this.loadBalancer.dispatchRules.forEach(rule => {
+      this.loadBalancer.dispatchRules.forEach((rule) => {
         if (rule.service === this.loadBalancer.name) {
           this.dispatchRules.push(rule.domain + rule.path);
         }
@@ -109,14 +108,14 @@ class AppengineLoadBalancerDetailsController implements IController {
   }
 
   private getConfirmationModalBodyHtml(): string {
-    const serverGroupNames = this.loadBalancer.serverGroups.map(serverGroup => serverGroup.name);
+    const serverGroupNames = this.loadBalancer.serverGroups.map((serverGroup) => serverGroup.name);
     const hasAny = serverGroupNames ? serverGroupNames.length > 0 : false;
     const hasMoreThanOne = serverGroupNames ? serverGroupNames.length > 1 : false;
 
     // HTML accepted by the confirmationModalService is static (i.e., not managed by angular).
     if (hasAny) {
       if (hasMoreThanOne) {
-        const listOfServerGroupNames = serverGroupNames.map(name => `<li>${name}</li>`).join('');
+        const listOfServerGroupNames = serverGroupNames.map((name) => `<li>${name}</li>`).join('');
         return `<div class="alert alert-warning">
             <p>
               Deleting <b>${this.loadBalancer.name}</b> will destroy the following server groups:

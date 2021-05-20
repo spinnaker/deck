@@ -39,7 +39,7 @@ describe('ProviderSelectionService: API', () => {
   beforeEach(() => {
     spyOn(AccountService, 'applicationAccounts').and.callFake(() => $q.when(accounts));
     spyOn(CloudProviderRegistry, 'hasValue').and.callFake(() => hasValue);
-    spyOn(ProviderSelectionModal, 'show').and.returnValue($q.when('modalProvider'));
+    spyOn(ProviderSelectionModal, 'show').and.returnValue($q.when('modalProvider') as any);
   });
 
   beforeEach(() => {
@@ -73,7 +73,7 @@ describe('ProviderSelectionService: API', () => {
     SETTINGS.defaultProvider = 'defaultProvider';
 
     CloudProviderRegistry.registerProvider('fakeProvider', config);
-    ProviderSelectionService.selectProvider(application, 'securityGroup').then(_provider => {
+    ProviderSelectionService.selectProvider(application, 'securityGroup').then((_provider) => {
       provider = _provider;
     });
     $scope.$digest();
@@ -83,7 +83,7 @@ describe('ProviderSelectionService: API', () => {
   it('should use "aws" as the default provider if the requested provider cannot be found and there is no default set', () => {
     let provider = '';
     CloudProviderRegistry.registerProvider('fakeProvider', config);
-    ProviderSelectionService.selectProvider(application, 'securityGroup').then(_provider => {
+    ProviderSelectionService.selectProvider(application, 'securityGroup').then((_provider) => {
       provider = _provider;
     });
     $scope.$digest();
@@ -95,7 +95,7 @@ describe('ProviderSelectionService: API', () => {
     hasValue = true;
     accounts = [fakeAccount('testProvider')];
     CloudProviderRegistry.registerProvider('testProvider', config);
-    ProviderSelectionService.selectProvider(application, 'securityGroup').then(_provider => {
+    ProviderSelectionService.selectProvider(application, 'securityGroup').then((_provider) => {
       provider = _provider;
     });
     $scope.$digest();
@@ -108,7 +108,7 @@ describe('ProviderSelectionService: API', () => {
     accounts = [fakeAccount('testProvider')];
     config.securityGroup.useProvider = 'titus';
     CloudProviderRegistry.registerProvider('testProvider', config);
-    ProviderSelectionService.selectProvider(application, 'securityGroup').then(_provider => {
+    ProviderSelectionService.selectProvider(application, 'securityGroup').then((_provider) => {
       provider = _provider;
     });
     $scope.$digest();
@@ -122,7 +122,7 @@ describe('ProviderSelectionService: API', () => {
     CloudProviderRegistry.registerProvider('aws', { securityGroup: {} } as any);
     CloudProviderRegistry.registerProvider('titus', { securityGroup: { useProvider: 'aws' } } as any);
 
-    ProviderSelectionService.selectProvider(application, 'securityGroup').then(_provider => {
+    ProviderSelectionService.selectProvider(application, 'securityGroup').then((_provider) => {
       provider = _provider;
     });
     $scope.$digest();
@@ -137,7 +137,7 @@ describe('ProviderSelectionService: API', () => {
     CloudProviderRegistry.registerProvider('titus', { securityGroup: { useProvider: 'aws' } } as any);
     CloudProviderRegistry.registerProvider('testProvider', config);
 
-    ProviderSelectionService.selectProvider(application, 'securityGroup').then(_provider => {
+    ProviderSelectionService.selectProvider(application, 'securityGroup').then((_provider) => {
       provider = _provider;
     });
     $scope.$digest();
@@ -148,13 +148,12 @@ describe('ProviderSelectionService: API', () => {
     let provider = '';
     hasValue = true;
     const k8s = fakeAccount('kubernetes');
-    k8s.skin = 'v2';
     accounts = [k8s];
     CloudProviderRegistry.registerProvider('kubernetes', config);
     SETTINGS.defaultProvider = 'defaultProvider';
 
     const filterFn = (_app: Application, acc: IAccountDetails) => acc.cloudProvider !== 'kubernetes';
-    ProviderSelectionService.selectProvider(application, 'securityGroup', filterFn).then(_provider => {
+    ProviderSelectionService.selectProvider(application, 'securityGroup', filterFn).then((_provider) => {
       provider = _provider;
     });
     $scope.$digest();
@@ -165,16 +164,106 @@ describe('ProviderSelectionService: API', () => {
     let provider = '';
     hasValue = true;
     const k8s = fakeAccount('kubernetes');
-    k8s.skin = 'v2';
     accounts = [k8s, fakeAccount('titus')];
     CloudProviderRegistry.registerProvider('titus', config);
     CloudProviderRegistry.registerProvider('kubernetes', config);
 
     const filterFn = (_app: Application, acc: IAccountDetails) => acc.cloudProvider !== 'kubernetes';
-    ProviderSelectionService.selectProvider(application, 'securityGroup', filterFn).then(_provider => {
+    ProviderSelectionService.selectProvider(application, 'securityGroup', filterFn).then((_provider) => {
       provider = _provider;
     });
     $scope.$digest();
     expect(provider).toBe('titus');
+  });
+
+  it('should return k8s provider in case the kubernetesAdHocInfraWritesEnabled is set to true and is the only provider configured', () => {
+    let provider = '';
+    hasValue = true;
+    const k8s = fakeAccount('kubernetes');
+    k8s.type = 'kubernetes';
+    accounts = [k8s];
+    let configuration = {
+      name: 'Kubernetes',
+      kubernetesAdHocInfraWritesEnabled: true,
+    };
+    CloudProviderRegistry.registerProvider('kubernetes', configuration);
+    ProviderSelectionService.selectProvider(application, 'securityGroup').then((_provider) => {
+      provider = _provider;
+    });
+    $scope.$digest();
+    expect(provider).toBe('kubernetes');
+  });
+
+  it('should use "aws" as the default provider in case the only provider is k8s and the kubernetesAdHocInfraWritesEnabled is set to false', () => {
+    let provider = '';
+    hasValue = true;
+    const k8s = fakeAccount('kubernetes');
+    k8s.type = 'kubernetes';
+    accounts = [k8s];
+    let configuration = {
+      name: 'Kubernetes',
+      kubernetesAdHocInfraWritesEnabled: false,
+    };
+    CloudProviderRegistry.registerProvider('kubernetes', configuration);
+    ProviderSelectionService.selectProvider(application, 'securityGroup').then((_provider) => {
+      provider = _provider;
+    });
+    $scope.$digest();
+    expect(provider).toBe('aws');
+  });
+
+  it('should use "aws" as the default provider in case the only provider is k8s and the kubernetesAdHocInfraWritesEnabled is not specified', () => {
+    let provider = '';
+    hasValue = true;
+    const k8s = fakeAccount('kubernetes');
+    k8s.type = 'kubernetes';
+    accounts = [k8s];
+    let configuration = {
+      name: 'Kubernetes',
+    };
+    CloudProviderRegistry.registerProvider('kubernetes', configuration);
+    ProviderSelectionService.selectProvider(application, 'securityGroup').then((_provider) => {
+      provider = _provider;
+    });
+    $scope.$digest();
+    expect(provider).toBe('aws');
+  });
+
+  it('should not use "k8s" as an option for the modal when the k8s kubernetesAdHocInfraWritesEnabled is set to false and there are others providers', () => {
+    let provider = '';
+    hasValue = true;
+    const k8s = fakeAccount('kubernetes');
+    k8s.type = 'kubernetes';
+    accounts = [k8s, fakeAccount('gce')];
+    let configuration = {
+      name: 'Kubernetes',
+      kubernetesAdHocInfraWritesEnabled: false,
+    };
+    CloudProviderRegistry.registerProvider('kubernetes', configuration);
+    CloudProviderRegistry.registerProvider('gce', config);
+    ProviderSelectionService.selectProvider(application, 'securityGroup').then((_provider) => {
+      provider = _provider;
+    });
+    $scope.$digest();
+    expect(provider).toBe('gce');
+  });
+
+  it('should use "modalProvider" when the k8s kubernetesAdHocInfraWritesEnabled is set to true and there are others providers', () => {
+    let provider = '';
+    hasValue = true;
+    const k8s = fakeAccount('kubernetes');
+    k8s.type = 'kubernetes';
+    accounts = [k8s, fakeAccount('gce')];
+    let configuration = {
+      name: 'Kubernetes',
+      kubernetesAdHocInfraWritesEnabled: true,
+    };
+    CloudProviderRegistry.registerProvider('kubernetes', configuration);
+    CloudProviderRegistry.registerProvider('gce', config);
+    ProviderSelectionService.selectProvider(application, 'securityGroup').then((_provider) => {
+      provider = _provider;
+    });
+    $scope.$digest();
+    expect(provider).toBe('modalProvider');
   });
 });

@@ -1,14 +1,14 @@
 import { module } from 'angular';
+import { SETTINGS } from 'core/config/settings';
 
 import { AuthenticationInitializer } from '../AuthenticationInitializer';
 import { AuthenticationService } from '../AuthenticationService';
-import { SETTINGS } from 'core/config/settings';
 
 export const AUTHENTICATION_USER_MENU = 'spinnaker.core.authentication.userMenu.directive';
 
 const ngmodule = module(AUTHENTICATION_USER_MENU, []);
 
-ngmodule.directive('userMenu', function() {
+ngmodule.directive('userMenu', function () {
   return {
     restrict: 'E',
     replace: true,

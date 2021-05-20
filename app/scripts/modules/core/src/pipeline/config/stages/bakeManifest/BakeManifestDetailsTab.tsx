@@ -1,14 +1,15 @@
-import React from 'react';
-
 import {
   decodeUnicodeBase64,
   ExecutionDetailsSection,
   IArtifact,
   IExecutionDetailsSectionProps,
   ManifestYaml,
+  Overridable,
   StageFailureMessage,
 } from 'core';
+import React from 'react';
 
+@Overridable('bakeManifest.bakeManifestDetailsTab')
 export class BakeManifestDetailsTab extends React.Component<IExecutionDetailsSectionProps> {
   public static title = 'bakedManifest';
 

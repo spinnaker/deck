@@ -6,17 +6,17 @@ import {
   Application,
   ConfirmationModalService,
   IConfirmationModalParams,
+  ILoadBalancer,
   IServerGroup,
   ITaskMonitorConfig,
   SERVER_GROUP_WRITER,
   ServerGroupReader,
   ServerGroupWarningMessageService,
   ServerGroupWriter,
-  ILoadBalancer,
 } from '@spinnaker/core';
-
 import { AppengineHealth } from 'appengine/common/appengineHealth';
 import { IAppengineLoadBalancer, IAppengineServerGroup } from 'appengine/domain/index';
+
 import { AppengineServerGroupCommandBuilder } from '../configure/serverGroupCommandBuilder.service';
 import { APPENGINE_SERVER_GROUP_WRITER, AppengineServerGroupWriter } from '../writer/serverGroup.write.service';
 
@@ -396,7 +396,7 @@ class AppengineServerGroupDetailsController implements IController {
       const precision = loadBalancer.split.shardBy === 'COOKIE' ? 1000 : 100;
       allocations = mapValues(
         allocations,
-        allocation => Math.round((allocation / denominator) * precision) / precision,
+        (allocation) => Math.round((allocation / denominator) * precision) / precision,
       );
       return allocations;
     } else {
@@ -413,7 +413,7 @@ class AppengineServerGroupDetailsController implements IController {
     }
   }
 
-  private extractServerGroup(fromParams: IServerGroupFromStateParams): ng.IPromise<void> {
+  private extractServerGroup(fromParams: IServerGroupFromStateParams): PromiseLike<void> {
     return ServerGroupReader.getServerGroup(
       this.app.name,
       fromParams.accountId,

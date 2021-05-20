@@ -1,7 +1,7 @@
 import { IPipeline, IStage, IStageOrTriggerTypeConfig } from 'core/domain';
 
-import { PipelineConfigService } from '../services/PipelineConfigService';
 import { IStageOrTriggerValidator, IValidatorConfig, PipelineConfigValidator } from './PipelineConfigValidator';
+import { PipelineConfigService } from '../services/PipelineConfigService';
 
 export interface IStageBeforeTypeValidationConfig extends IValidatorConfig {
   stageTypes?: string[];
@@ -22,7 +22,7 @@ export class StageBeforeTypeValidator implements IStageOrTriggerValidator {
 
     const stageTypes: string[] = validator.stageTypes || [validator.stageType];
     const stagesToTest = PipelineConfigService.getAllUpstreamDependencies(pipeline, stage);
-    if (stagesToTest.every(test => !stageTypes.includes(test.type))) {
+    if (stagesToTest.every((test) => !stageTypes.includes(test.type))) {
       return validator.message;
     }
     return null;

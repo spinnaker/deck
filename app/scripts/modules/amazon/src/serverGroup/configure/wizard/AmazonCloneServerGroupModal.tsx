@@ -1,33 +1,31 @@
-import React from 'react';
 import { get } from 'lodash';
+import React from 'react';
 
 import {
   Application,
   FirewallLabels,
   IModalComponentProps,
   IStage,
+  noop,
   ReactInjector,
   ReactModal,
   TaskMonitor,
   WizardModal,
   WizardPage,
-  noop,
 } from '@spinnaker/core';
-
 import { AwsReactInjector } from 'amazon/reactShims';
 
-import { IAmazonServerGroupCommand } from '../serverGroupConfiguration.service';
-
+import { ServerGroupTemplateSelection } from './ServerGroupTemplateSelection';
 import {
+  ServerGroupAdvancedSettings,
   ServerGroupBasicSettings,
   ServerGroupCapacity,
   ServerGroupInstanceType,
-  ServerGroupZones,
   ServerGroupLoadBalancers,
   ServerGroupSecurityGroups,
-  ServerGroupAdvancedSettings,
+  ServerGroupZones,
 } from './pages';
-import { ServerGroupTemplateSelection } from './ServerGroupTemplateSelection';
+import { IAmazonServerGroupCommand } from '../serverGroupConfiguration.service';
 
 export interface IAmazonCloneServerGroupModalProps extends IModalComponentProps {
   title: string;
@@ -145,7 +143,7 @@ export class AmazonCloneServerGroupModal extends React.Component<
     if (!tags) {
       return;
     }
-    Object.keys(tags).forEach(key => {
+    Object.keys(tags).forEach((key) => {
       if (!key.length && !tags[key].length) {
         delete tags[key];
       }

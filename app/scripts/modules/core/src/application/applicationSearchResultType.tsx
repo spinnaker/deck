@@ -3,17 +3,17 @@ import React from 'react';
 import {
   AccountCell,
   BasicCell,
-  HrefCell,
-  searchResultTypeRegistry,
-  ISearchResult,
   DefaultSearchResultTab,
   HeaderCell,
-  TableBody,
-  TableHeader,
-  TableRow,
+  HrefCell,
   ISearchColumn,
+  ISearchResult,
   ISearchResultSet,
   SearchResultType,
+  searchResultTypeRegistry,
+  SearchTableBody,
+  SearchTableHeader,
+  SearchTableRow,
 } from 'core/search';
 
 export interface IApplicationSearchResult extends ISearchResult {
@@ -49,11 +49,11 @@ class ApplicationSearchResultType extends SearchResultType<IApplicationSearchRes
   public TabComponent = DefaultSearchResultTab;
 
   public HeaderComponent = () => (
-    <TableHeader>
+    <SearchTableHeader>
       <HeaderCell col={this.cols.APPLICATION} />
       <HeaderCell col={this.cols.ACCOUNT} />
       <HeaderCell col={this.cols.EMAIL} />
-    </TableHeader>
+    </SearchTableHeader>
   );
 
   public DataComponent = ({ resultSet }: { resultSet: ISearchResultSet<IApplicationSearchResult> }) => {
@@ -63,15 +63,15 @@ class ApplicationSearchResultType extends SearchResultType<IApplicationSearchRes
     const results = resultSet.results.slice().sort(itemSortFn);
 
     return (
-      <TableBody>
-        {results.map(item => (
-          <TableRow key={itemKeyFn(item)}>
+      <SearchTableBody>
+        {results.map((item) => (
+          <SearchTableRow key={itemKeyFn(item)}>
             <HrefCell item={item} col={this.cols.APPLICATION} />
             <AccountCell item={item} col={this.cols.ACCOUNT} />
             <BasicCell item={item} col={this.cols.EMAIL} />
-          </TableRow>
+          </SearchTableRow>
         ))}
-      </TableBody>
+      </SearchTableBody>
     );
   };
 

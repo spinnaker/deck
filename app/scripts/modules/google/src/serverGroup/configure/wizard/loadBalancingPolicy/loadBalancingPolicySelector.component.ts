@@ -1,7 +1,9 @@
 import { IComponentOptions, IController, module } from 'angular';
-import { set, get, has, without, intersection, chain } from 'lodash';
-import './loadBalancingPolicySelector.component.less';
+import { chain, get, has, intersection, set, without } from 'lodash';
+
 import { IGceBackendService, INamedPort } from 'google/domain';
+
+import './loadBalancingPolicySelector.component.less';
 
 class GceLoadBalancingPolicySelectorController implements IController {
   public maxPort = 65535;
@@ -37,7 +39,7 @@ class GceLoadBalancingPolicySelectorController implements IController {
         break;
     }
 
-    toDelete.forEach(key => delete this.command.loadBalancingPolicy[key]);
+    toDelete.forEach((key) => delete this.command.loadBalancingPolicy[key]);
   }
 
   public getBalancingModes(): string[] {
@@ -109,7 +111,7 @@ class GceLoadBalancingPolicySelectorController implements IController {
           );
           const portNames = filteredBackendServices.map((service: IGceBackendService) => service.portName);
           const portNameIntersection = intersection(portNames, inUsePortNames);
-          return portNames.filter(portName => !portNameIntersection.includes(portName));
+          return portNames.filter((portName) => !portNameIntersection.includes(portName));
         }
         default:
           return [];

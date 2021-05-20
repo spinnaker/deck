@@ -1,5 +1,6 @@
-import { IExpectedArtifact, IArtifactSource, IArtifactKindConfig } from 'core/domain';
 import { IArtifactAccount } from 'core/account';
+import { IArtifactKindConfig, IArtifactSource, IExpectedArtifact } from 'core/domain';
+
 import { ExpectedArtifactService } from './expectedArtifact.service';
 
 export interface IExpectedArtifactSelectorViewControllerDelegate {
@@ -31,10 +32,10 @@ export class ExpectedArtifactSelectorViewController {
       const allAccounts = this.delegate.getExpectedArtifactAccounts();
       this.accountsForArtifact =
         artifact.type === 'helm/chart'
-          ? allAccounts.filter(a => a.types.includes(artifact.type) && a.name === artifact.artifactAccount)
-          : allAccounts.filter(a => a.types.includes(artifact.type));
+          ? allAccounts.filter((a) => a.types.includes(artifact.type) && a.name === artifact.artifactAccount)
+          : allAccounts.filter((a) => a.types.includes(artifact.type));
       const selected = this.delegate.getSelectedAccount();
-      if (!selected || !this.accountsForArtifact.find(a => a.name === selected.name)) {
+      if (!selected || !this.accountsForArtifact.find((a) => a.name === selected.name)) {
         if (this.accountsForArtifact.length) {
           this.delegate.setSelectedArtifactAccount(this.accountsForArtifact[0]);
         } else {

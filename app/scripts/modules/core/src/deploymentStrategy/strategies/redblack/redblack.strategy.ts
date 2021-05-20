@@ -1,9 +1,9 @@
 import { defaultsDeep } from 'lodash';
 
-import { DeploymentStrategyRegistry } from '../../deploymentStrategy.registry';
 import { IServerGroupCommand } from 'core/serverGroup';
 
 import { AdditionalFields } from './AdditionalFields';
+import { DeploymentStrategyRegistry } from '../../deploymentStrategy.registry';
 
 export interface IRedBlackCommand extends IServerGroupCommand {
   maxRemainingAsgs: number;
@@ -28,7 +28,7 @@ DeploymentStrategyRegistry.registerStrategy({
       rollback: {
         onFailure: false,
       },
-      maxRemainingAsgs: !command.strategy ? 2 : command.maxRemainingAsgs,
+      maxRemainingAsgs: command.maxRemainingAsgs ?? 2,
       delayBeforeDisableSec: 0,
       delayBeforeScaleDownSec: 0,
       scaleDown: false,

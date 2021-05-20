@@ -1,5 +1,5 @@
-import React from 'react';
 import { FormikProps } from 'formik';
+import React from 'react';
 import { Option } from 'react-select';
 
 import { BuildServiceType, IgorService } from 'core/ci';
@@ -39,8 +39,8 @@ export function ConcourseTrigger({ formik, trigger }: IConcourseTriggerConfigPro
   const fetchPipelines = useData(() => ConcourseService.listPipelinesForTeam(master, team), [], [master, team]);
   const fetchJobs = useData(
     () =>
-      ConcourseService.listJobsForPipeline(master, team, pipeline).then(jobs =>
-        jobs.map(job => `${team}/${pipeline}/${job}`),
+      ConcourseService.listJobsForPipeline(master, team, pipeline).then((jobs) =>
+        jobs.map((job) => `${team}/${pipeline}/${job}`),
       ),
     [],
     [master, team, pipeline],
@@ -53,8 +53,7 @@ export function ConcourseTrigger({ formik, trigger }: IConcourseTriggerConfigPro
       <FormikFormField
         name="master"
         label="Build Service"
-        fastField={false}
-        input={props => (
+        input={(props) => (
           <ReactSelectInput
             {...props}
             clearable={false}
@@ -69,9 +68,8 @@ export function ConcourseTrigger({ formik, trigger }: IConcourseTriggerConfigPro
       <FormikFormField
         name="team"
         label="Team"
-        fastField={false}
         onChange={onTeamChanged}
-        input={props => (
+        input={(props) => (
           <ReactSelectInput
             {...props}
             clearable={false}
@@ -86,9 +84,8 @@ export function ConcourseTrigger({ formik, trigger }: IConcourseTriggerConfigPro
       <FormikFormField
         name="project"
         label="Pipeline"
-        fastField={false}
         onChange={onProjectChanged}
-        input={props => (
+        input={(props) => (
           <ReactSelectInput
             {...props}
             clearable={false}
@@ -105,9 +102,8 @@ export function ConcourseTrigger({ formik, trigger }: IConcourseTriggerConfigPro
       <FormikFormField
         name="job"
         label="Job"
-        fastField={false}
         onChange={onJobChanged}
-        input={props => (
+        input={(props) => (
           <ReactSelectInput
             {...props}
             clearable={false}

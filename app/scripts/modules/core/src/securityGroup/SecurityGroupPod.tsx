@@ -1,8 +1,10 @@
 import * as React from 'react';
+
 import { AccountTag } from 'core/account';
+import { Application } from 'core/application';
 import { ISecurityGroupGroup } from 'core/domain';
 import { ManagedResourceStatusIndicator } from 'core/managed';
-import { Application } from 'core/application';
+
 import { SecurityGroup } from './SecurityGroup';
 
 interface ISecurityGroupPodProps {
@@ -34,7 +36,7 @@ export const SecurityGroupPod = ({ grouping, application, parentHeading }: ISecu
       </div>
     </div>
     <div className="rollup-details">
-      {grouping.subgroups.map(subgroup => (
+      {grouping.subgroups.map((subgroup) => (
         <div className="pod-subgroup" key={subgroup.heading}>
           <SecurityGroup
             application={application}

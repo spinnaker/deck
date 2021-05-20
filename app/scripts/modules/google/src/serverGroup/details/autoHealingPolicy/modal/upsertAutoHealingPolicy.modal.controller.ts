@@ -3,13 +3,12 @@ import { IModalServiceInstance } from 'angular-ui-bootstrap';
 import { cloneDeep } from 'lodash';
 
 import { Application, TaskMonitor } from '@spinnaker/core';
-
+import { GOOGLE_AUTOSCALINGPOLICY_AUTOSCALINGPOLICY_WRITE_SERVICE } from 'google/autoscalingPolicy/autoscalingPolicy.write.service';
 import { IGceAutoHealingPolicy, IGceServerGroup } from 'google/domain/index';
 import { GCE_HEALTH_CHECK_READER, GceHealthCheckReader } from 'google/healthCheck/healthCheck.read.service';
 import { getHealthCheckOptions, IGceHealthCheckOption } from 'google/healthCheck/healthCheckUtils';
 
 import './upsertAutoHealingPolicy.modal.less';
-import { GOOGLE_AUTOSCALINGPOLICY_AUTOSCALINGPOLICY_WRITE_SERVICE } from 'google/autoscalingPolicy/autoscalingPolicy.write.service';
 
 class GceUpsertAutoHealingPolicyModalCtrl implements IController {
   public autoHealingPolicy: IGceAutoHealingPolicy;
@@ -56,8 +55,8 @@ class GceUpsertAutoHealingPolicyModalCtrl implements IController {
   }
 
   public onHealthCheckRefresh(): void {
-    this.gceHealthCheckReader.listHealthChecks().then(healthChecks => {
-      const matchingHealthChecks = healthChecks.filter(hc => hc.account === this.serverGroup.account);
+    this.gceHealthCheckReader.listHealthChecks().then((healthChecks) => {
+      const matchingHealthChecks = healthChecks.filter((hc) => hc.account === this.serverGroup.account);
       this.healthChecks = getHealthCheckOptions(matchingHealthChecks);
     });
   }

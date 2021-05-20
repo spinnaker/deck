@@ -1,20 +1,18 @@
-import React from 'react';
-
 import { capitalize, get } from 'lodash';
-import { Option } from 'react-select';
 import { $q } from 'ngimport';
-import { IPromise } from 'angular';
-
+import React from 'react';
+import { Option } from 'react-select';
 import { Observable, Subject } from 'rxjs';
 
+import { BuildServiceType, IgorService } from 'core/ci';
 import { IBuild, IBuildInfo, IBuildTrigger, IPipelineCommand } from 'core/domain';
-import { ITriggerTemplateComponentProps } from '../../../manualExecution/TriggerTemplate';
-import { IgorService, BuildServiceType } from 'core/ci';
-import { Spinner } from 'core/widgets/spinners/Spinner';
-import { buildDisplayName } from '../../../executionBuild/buildDisplayName.filter';
-import { timestamp } from 'core/utils/timeFormatters';
-import { TetheredSelect } from 'core/presentation/TetheredSelect';
 import { TextInput } from 'core/presentation';
+import { TetheredSelect } from 'core/presentation/TetheredSelect';
+import { timestamp } from 'core/utils/timeFormatters';
+import { Spinner } from 'core/widgets/spinners/Spinner';
+
+import { buildDisplayName } from '../../../executionBuild/buildDisplayName.filter';
+import { ITriggerTemplateComponentProps } from '../../../manualExecution/TriggerTemplate';
 
 export interface IBaseBuildTriggerTemplateProps extends ITriggerTemplateComponentProps {
   buildTriggerType: BuildServiceType;
@@ -35,7 +33,7 @@ export class BaseBuildTriggerTemplate extends React.Component<
 > {
   private destroy$ = new Subject();
 
-  public static formatLabel(trigger: IBuildTrigger): IPromise<string> {
+  public static formatLabel(trigger: IBuildTrigger): PromiseLike<string> {
     return $q.when(`(${capitalize(trigger.type)}) ${trigger.master}: ${trigger.job}`);
   }
 
@@ -57,11 +55,11 @@ export class BaseBuildTriggerTemplate extends React.Component<
 
     const trigger = this.props.command.trigger as IBuildTrigger;
     newState.builds = (allBuilds || [])
-      .filter(build => !build.building && build.result === 'SUCCESS')
+      .filter((build) => !build.building && build.result === 'SUCCESS')
       .sort((a, b) => b.number - a.number);
     if (newState.builds.length) {
       // default to what is supplied by the trigger if possible; otherwise, use the latest
-      const defaultSelection = newState.builds.find(b => b.number === trigger.buildNumber) || newState.builds[0];
+      const defaultSelection = newState.builds.find((b) => b.number === trigger.buildNumber) || newState.builds[0];
       newState.selectedBuild = defaultSelection.number;
       this.updateSelectedBuild(defaultSelection);
     }

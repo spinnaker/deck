@@ -1,13 +1,10 @@
 import React from 'react';
 
-import {
-  ExecutionDetailsSection,
-  IExecutionDetailsSectionProps,
-  StageExecutionLogs,
-  StageFailureMessage,
-} from 'core/pipeline';
 import { AccountTag } from 'core/account';
+
+import { ExecutionDetailsSection, IExecutionDetailsSectionProps } from '../common';
 import { ServerGroupStageContext } from '../common/ServerGroupStageContext';
+import { StageExecutionLogs, StageFailureMessage } from '../../../details';
 
 export function ShrinkClusterExecutionDetails(props: IExecutionDetailsSectionProps) {
   const { stage } = props;

@@ -1,9 +1,9 @@
-import { IPromise, IScope } from 'angular';
+import { IScope } from 'angular';
 import { $log, $q } from 'ngimport';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 
 import { IEntityTags } from 'core/domain';
-import { robotToHuman } from 'core/presentation';
+import { IconNames, robotToHuman } from 'core/presentation';
 import { ReactInjector } from 'core/reactShims';
 import { FirewallLabels } from 'core/securityGroup';
 import { toIPromise } from 'core/utils';
@@ -12,6 +12,7 @@ import { Application } from '../application.model';
 
 export interface IFetchStatus {
   status: 'NOT_INITIALIZED' | 'FETCHING' | 'FETCHED' | 'ERROR';
+  loaded: boolean;
   error?: any;
   lastRefresh: number;
   data: any;
@@ -65,6 +66,11 @@ export interface IDataSourceConfig<T> {
   icon?: string;
 
   /**
+   * Represents the name of the svg to be used with the svg loader (Icon.tsx)
+   */
+  iconName?: IconNames;
+
+  /**
    * unique value for this data source; the data source will be available on the Application directly via this key,
    * e.g. if the key is "serverGroups", you can access the data source via application.serverGroups
    */
@@ -95,7 +101,7 @@ export interface IDataSourceConfig<T> {
    * It does *not* automatically populate the "data" field of the data source - that is the responsibility of the
    * "onLoad" method.
    */
-  loader?: (application: Application) => IPromise<any>;
+  loader?: (application: Application) => PromiseLike<any>;
 
   /**
    * (Optional) A method that is called when the "loader" method resolves. The method must return a promise. If the "loader"
@@ -105,7 +111,7 @@ export interface IDataSourceConfig<T> {
    * If the onLoad method resolves with a null value, the result will be discarded and the data source's "data" field
    * will remain unchanged.
    */
-  onLoad?: (application: Application, result: any) => IPromise<T>;
+  onLoad?: (application: Application, result: any) => PromiseLike<T>;
 
   /**
    * (Optional) whether this data source should be included in the application by default
@@ -195,12 +201,13 @@ export class ApplicationDataSource<T = any> implements IDataSourceConfig<T> {
   public credentialsField: string;
   public description: string;
   public icon: string;
+  public iconName: IconNames;
   public key: string;
   public label: string;
   public category: string;
   public lazy = false;
-  public loader: (application: Application) => IPromise<any>;
-  public onLoad: (application: Application, result: any) => IPromise<T>;
+  public loader: (application: Application) => PromiseLike<any>;
+  public onLoad: (application: Application, result: any) => PromiseLike<T>;
   public optIn = false;
   public optional = false;
   public primary = false;
@@ -273,42 +280,35 @@ export class ApplicationDataSource<T = any> implements IDataSourceConfig<T> {
   public lastRefresh: number;
 
   /** This subject is used to cancel the internal subscription */
-  private destroy$ = new Subject<void>();
+  private destroy$: Subject<void>;
 
   /** This subject is used to trigger a new fetch */
-  private fetchRequest$ = new Subject<void>();
+  private fetchRequest$: Subject<void>;
 
   /**
    * Stream of IFetchStatus.
    * Updated when the status and/or data changes.
    * Starts with NOT_INITIALIZED
    */
-  public status$ = new BehaviorSubject<IFetchStatus>({
-    status: 'NOT_INITIALIZED',
-    lastRefresh: 0,
-    error: null,
-    data: this.data,
-  });
+  public status$: BehaviorSubject<IFetchStatus>;
 
   /** BehaviorSubject of data changes, starts by emitting the current value */
-  public data$ = new BehaviorSubject<T>(this.data);
+  public data$: BehaviorSubject<T>;
 
   /**
    * Stream of data changes
    * @deprecated use data$.skip(1) instead
    */
-  public refresh$: Observable<T> = this.data$.skip(1);
+  public refresh$: Observable<T>;
 
   /** Stream of failed IFetchStatus */
-  private refreshFailure$ = this.status$.skip(1).filter(({ status }) => status === 'ERROR');
+  private refreshFailure$: Observable<IFetchStatus>;
 
   /** Stream that throws fetch failures. */
-  private throwFailures$ = this.refreshFailure$.map(({ error }) => {
-    throw error;
-  });
+  private throwFailures$: Observable<never>;
 
   /** A stream that either emits the next data change, or throws */
-  private nextRefresh$ = Observable.merge(this.data$.skip(1), this.throwFailures$).take(1);
+  private nextRefresh$: Observable<T>;
 
   /**
    * A flag to toggle debug messages on. To use, open the JS console and enter:
@@ -323,6 +323,8 @@ export class ApplicationDataSource<T = any> implements IDataSourceConfig<T> {
   public dataUpdated(data?: T): void {
     if (this.loaded) {
       this.updateData(data !== undefined ? data : this.data);
+      const updatedStatus = { data: this.data, ...this.status$.value };
+      this.status$.next(updatedStatus);
     }
   }
 
@@ -362,13 +364,37 @@ export class ApplicationDataSource<T = any> implements IDataSourceConfig<T> {
       ReactInjector.$uiRouter.transitionService.onSuccess({ exiting: this.activeState }, () => this.deactivate());
     }
 
+    // While we can initialize these fields directly on the class to give them private/public
+    // status, we have to configure their initial values down here or else things like this.data
+    // and this.defaultData will be undefined. This is because member initialization gets transpiled
+    // to the *top* of the constructor, so all custom constructor code runs last.
+    this.destroy$ = new Subject();
+    this.fetchRequest$ = new Subject();
+
+    this.status$ = new BehaviorSubject({
+      status: 'NOT_INITIALIZED',
+      loaded: this.loaded,
+      lastRefresh: 0,
+      error: null,
+      data: this.data,
+    });
+
+    this.data$ = new BehaviorSubject(this.data);
+
+    this.refresh$ = this.data$.skip(1);
+    this.refreshFailure$ = this.status$.skip(1).filter(({ status }) => status === 'ERROR');
+    this.throwFailures$ = this.refreshFailure$.map(({ error }) => {
+      throw error;
+    });
+    this.nextRefresh$ = Observable.merge(this.data$.skip(1), this.throwFailures$).take(1);
+
     const fetchStream$ = this.fetchRequest$
       .do(() => this.debug('fetch requested...'))
       .switchMap(() => {
         return Observable.fromPromise(this.loader(this.application))
-          .mergeMap(data => this.onLoad(this.application, data))
-          .map(data => ({ status: 'FETCHED', lastRefresh: Date.now(), data }))
-          .catch(error => Observable.of({ status: 'ERROR', lastRefresh: this.lastRefresh, data: this.data, error }))
+          .mergeMap((data) => this.onLoad(this.application, data))
+          .map((data) => ({ status: 'FETCHED', lastRefresh: Date.now(), data }))
+          .catch((error) => Observable.of({ status: 'ERROR', lastRefresh: this.lastRefresh, data: this.data, error }))
           .startWith({ status: 'FETCHING', lastRefresh: this.lastRefresh, data: this.data });
       })
       .startWith(this.status$.value)
@@ -381,6 +407,7 @@ export class ApplicationDataSource<T = any> implements IDataSourceConfig<T> {
     fetchStream$.withLatestFrom(nextTick$).subscribe(([fetchStatus, _void]) => {
       // Update mutable flags
       this.statusUpdated(fetchStatus);
+      fetchStatus.loaded = this.loaded;
 
       if (fetchStatus.status === 'FETCHED') {
         this.updateData(fetchStatus.data);
@@ -407,8 +434,8 @@ export class ApplicationDataSource<T = any> implements IDataSourceConfig<T> {
    */
   public onNextRefresh($scope: IScope, callback: (data?: any) => void, onError?: (err?: any) => void): () => void {
     const subscription = this.nextRefresh$.subscribe(
-      data => callback(data),
-      error => onError && onError(error),
+      (data) => callback(data),
+      (error) => onError && onError(error),
     );
 
     $scope && $scope.$on('$destroy', () => subscription.unsubscribe());
@@ -431,7 +458,7 @@ export class ApplicationDataSource<T = any> implements IDataSourceConfig<T> {
       return Observable.empty();
     });
 
-    const subscription = Observable.merge(this.data$.skip(1), failures$).subscribe(data => callback(data));
+    const subscription = Observable.merge(this.data$.skip(1), failures$).subscribe((data) => callback(data));
 
     $scope && $scope.$on('$destroy', () => subscription.unsubscribe());
     return () => subscription.unsubscribe();
@@ -447,9 +474,9 @@ export class ApplicationDataSource<T = any> implements IDataSourceConfig<T> {
    *
    * The promise will reject if the data source has failed to load, or fails to load the next time it tries to load
    *
-   * @returns {IPromise<T>}
+   * @returns {PromiseLike<T>}
    */
-  public ready(): IPromise<T> {
+  public ready(): PromiseLike<T> {
     if (this.disabled || this.loaded || (this.lazy && !this.active)) {
       return $q.resolve(this.data);
     }
@@ -498,7 +525,7 @@ export class ApplicationDataSource<T = any> implements IDataSourceConfig<T> {
    * @param forceRefresh
    * @returns {any}
    */
-  public refresh(forceRefresh?: boolean): IPromise<any> {
+  public refresh(forceRefresh?: boolean): PromiseLike<any> {
     this.debug(`refresh(${forceRefresh})`);
     if (!this.loader || this.disabled || (this.lazy && !this.active)) {
       this.loaded = false;

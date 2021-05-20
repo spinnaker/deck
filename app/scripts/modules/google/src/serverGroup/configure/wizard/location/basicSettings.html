@@ -1,9 +1,7 @@
 <div class="container-fluid form-horizontal" ng-controller="gceServerGroupBasicSettingsCtrl as basicSettingsCtrl">
   <ng-form name="basicSettings">
     <div class="form-group">
-      <div class="col-md-3 sm-label-right">
-        Account
-      </div>
+      <div class="col-md-3 sm-label-right">Account</div>
       <div class="col-md-7">
         <account-select-field
           component="command"
@@ -100,12 +98,7 @@
         on-artifact-edited="basicSettingsCtrl.onImageArtifactEdited"
         on-expected-artifact-selected="basicSettingsCtrl.onImageArtifactSelected"
         pipeline="command.viewState.pipeline"
-        selected-artifact-account="command.imageAccountName"
-        selected-artifact-id="command.imageArtifactId"
-        set-artifact-account="basicSettingsCtrl.onImageArtifactAccountSelected"
-        set-artifact-id="basicSettingsCtrl.onChangeImageArtifactId"
         stage="command.viewState.stage"
-        update-pipeline="basicSettingsCtrl.updatePipeline"
       >
       </stage-artifact-selector-delegate>
     </div>
@@ -119,7 +112,7 @@
           available-images="command.backingData.allImages"
           selected-image="command.image"
           select-image="basicSettingsCtrl.selectImage"
-        />
+        ></gce-image-select>
       </div>
     </div>
     <div class="form-group">
@@ -150,9 +143,7 @@
               class="text-left"
               ng-if="!basicSettingsCtrl.createsNewCluster() && command.viewState.mode === 'create' && latestServerGroup"
             >
-              <p>
-                There is already a server group in this cluster. Do you want to clone it?
-              </p>
+              <p>There is already a server group in this cluster. Do you want to clone it?</p>
               <p>
                 Cloning copies the entire configuration from the selected server group, allowing you to modify whichever
                 fields (e.g. image) you need to change in the new server group.

@@ -1,4 +1,4 @@
-import { API } from 'core/api/ApiService';
+import { REST } from 'core/api/ApiService';
 
 export class CronValidatorService {
   public static validate(expression: string) {
@@ -8,9 +8,6 @@ export class CronValidatorService {
       segments.pop();
       expression = segments.join(' ');
     }
-    return API.one('cron')
-      .one('validate')
-      .withParams({ expression: expression })
-      .get();
+    return REST('/cron/validate').query({ expression: expression }).get();
   }
 }

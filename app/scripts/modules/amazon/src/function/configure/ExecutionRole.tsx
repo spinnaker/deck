@@ -1,10 +1,10 @@
+import { FormikErrors, FormikProps } from 'formik';
 import React from 'react';
 
-import { FormikFormField, IWizardPageComponent, TextInput, FormValidator } from '@spinnaker/core';
-import { FormikProps, FormikErrors } from 'formik';
-import { IAmazonFunctionUpsertCommand } from 'amazon/index';
-import { IAmazonFunction } from 'amazon/domain';
+import { FormikFormField, FormValidator, IWizardPageComponent, TextInput } from '@spinnaker/core';
 import { iamRoleValidator } from 'amazon/aws.validators';
+import { IAmazonFunction } from 'amazon/domain';
+import { IAmazonFunctionUpsertCommand } from 'amazon/index';
 
 export interface IExecutionRoleProps {
   formik: FormikProps<IAmazonFunctionUpsertCommand>;
@@ -12,7 +12,8 @@ export interface IExecutionRoleProps {
   functionDef: IAmazonFunction;
 }
 
-export class ExecutionRole extends React.Component<IExecutionRoleProps>
+export class ExecutionRole
+  extends React.Component<IExecutionRoleProps>
   implements IWizardPageComponent<IAmazonFunctionUpsertCommand> {
   constructor(props: IExecutionRoleProps) {
     super(props);
@@ -20,10 +21,7 @@ export class ExecutionRole extends React.Component<IExecutionRoleProps>
 
   public validate(values: IAmazonFunctionUpsertCommand): FormikErrors<IAmazonFunctionUpsertCommand> {
     const validator = new FormValidator(values);
-    validator
-      .field('role', 'Role ARN')
-      .required()
-      .withValidators(iamRoleValidator);
+    validator.field('role', 'Role ARN').required().withValidators(iamRoleValidator);
     return validator.validateForm();
   }
 
@@ -35,8 +33,7 @@ export class ExecutionRole extends React.Component<IExecutionRoleProps>
             <FormikFormField
               name="role"
               label="Role ARN"
-              fastField={false}
-              input={props => <TextInput {...props} placeholder="Enter role ARN" name="role" />}
+              input={(props) => <TextInput {...props} placeholder="Enter role ARN" name="role" />}
               required={true}
             />
           </div>

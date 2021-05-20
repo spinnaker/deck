@@ -1,23 +1,23 @@
 import React from 'react';
-import { Observable, Subject, BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 
-import { API } from 'core/api';
-import { IServerGroup, IInstanceCounts } from 'core/domain';
+import { REST } from 'core/api';
+import { IInstanceCounts, IServerGroup } from 'core/domain';
 import {
   AccountCell,
   BasicCell,
-  HrefCell,
-  HealthCountsCell,
-  searchResultTypeRegistry,
-  ISearchColumn,
   DefaultSearchResultTab,
-  ISearchResult,
   HeaderCell,
-  TableBody,
-  TableHeader,
-  TableRow,
-  SearchResultType,
+  HealthCountsCell,
+  HrefCell,
+  ISearchColumn,
+  ISearchResult,
   ISearchResultSet,
+  SearchResultType,
+  searchResultTypeRegistry,
+  SearchTableBody,
+  SearchTableHeader,
+  SearchTableRow,
 } from 'core/search';
 
 import './serverGroup.less';
@@ -52,14 +52,14 @@ interface IServerGroupTuple {
 const makeServerGroupTuples = (sgToFetch: IServerGroupSearchResult[], fetched: IServerGroup[]): IServerGroupTuple[] => {
   const findFetchedValue = (toFetch: IServerGroupSearchResult) =>
     fetched.find(
-      sg => sg.name === toFetch.serverGroup && sg.account === toFetch.account && sg.region === toFetch.region,
+      (sg) => sg.name === toFetch.serverGroup && sg.account === toFetch.account && sg.region === toFetch.region,
     );
-  return sgToFetch.map(toFetch => ({ toFetch, fetched: findFetchedValue(toFetch) }));
+  return sgToFetch.map((toFetch) => ({ toFetch, fetched: findFetchedValue(toFetch) }));
 };
 
 const fetchServerGroups = (toFetch: IServerGroupSearchResult[]): Observable<IServerGroupTuple[]> => {
-  const fetchPromise = API.one('serverGroups')
-    .withParams({ ids: toFetch.map(sg => `${sg.account}:${sg.region}:${sg.serverGroup}`) })
+  const fetchPromise = REST('/serverGroups')
+    .query({ ids: toFetch.map((sg) => `${sg.account}:${sg.region}:${sg.serverGroup}`) })
     .get()
     .then((fetched: IServerGroup[]) => makeServerGroupTuples(toFetch, fetched));
 
@@ -87,7 +87,7 @@ const AddHealthCounts = (
 
       // results to use when a fetch has failed.
       const failedFetch = (failedFetches: IServerGroupSearchResult[]) =>
-        Observable.of(failedFetches.map(toFetch => ({ toFetch, fetched: { instanceCounts: null } as IServerGroup })));
+        Observable.of(failedFetches.map((toFetch) => ({ toFetch, fetched: { instanceCounts: null } as IServerGroup })));
 
       // fetch a batch of server groups.
       const processBatch = (batch: IServerGroupSearchResult[]): Observable<IServerGroupTuple[]> =>
@@ -97,7 +97,7 @@ const AddHealthCounts = (
         .mergeMap((searchResults: IServerGroupSearchResult[]) => {
           return (
             Observable.from(searchResults)
-              .filter(result => result.instanceCounts === undefined)
+              .filter((result) => result.instanceCounts === undefined)
               // Serially fetch instance counts in batches of 25
               .bufferCount(25)
               .concatMap(processBatch)
@@ -105,7 +105,7 @@ const AddHealthCounts = (
         })
         .takeUntil(this.stop$)
         .subscribe((tuples: IServerGroupTuple[]) => {
-          tuples.forEach(result => (result.toFetch.instanceCounts = result.fetched.instanceCounts));
+          tuples.forEach((result) => (result.toFetch.instanceCounts = result.fetched.instanceCounts));
           const resultSet = { ...this.props.resultSet, results: this.results$.value.slice() };
           this.setState({ resultSet });
         });
@@ -158,13 +158,13 @@ class ServerGroupSearchResultType extends SearchResultType<IServerGroupSearchRes
   public TabComponent = DefaultSearchResultTab;
 
   public HeaderComponent = () => (
-    <TableHeader>
+    <SearchTableHeader>
       <HeaderCell col={this.cols.SERVERGROUP} />
       <HeaderCell col={this.cols.ACCOUNT} />
       <HeaderCell col={this.cols.REGION} />
       <HeaderCell col={this.cols.EMAIL} />
       <HeaderCell col={this.cols.HEALTH} />
-    </TableHeader>
+    </SearchTableHeader>
   );
 
   private RawDataComponent = ({ resultSet }: { resultSet: ISearchResultSet<IServerGroupSearchResult> }) => {
@@ -173,17 +173,17 @@ class ServerGroupSearchResultType extends SearchResultType<IServerGroupSearchRes
     const results = resultSet.results.slice();
 
     return (
-      <TableBody>
-        {results.map(item => (
-          <TableRow key={itemKeyFn(item)}>
+      <SearchTableBody>
+        {results.map((item) => (
+          <SearchTableRow key={itemKeyFn(item)}>
             <HrefCell item={item} col={this.cols.SERVERGROUP} />
             <AccountCell item={item} col={this.cols.ACCOUNT} />
             <BasicCell item={item} col={this.cols.REGION} />
             <BasicCell item={item} col={this.cols.EMAIL} />
             <HealthCountsCell item={item} col={this.cols.HEALTH} />
-          </TableRow>
+          </SearchTableRow>
         ))}
-      </TableBody>
+      </SearchTableBody>
     );
   };
 

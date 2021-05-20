@@ -1,7 +1,7 @@
 import React from 'react';
 import { ModalFooter } from 'react-bootstrap';
 
-import { AccountService, UserVerification, IAccountDetails } from '@spinnaker/core';
+import { AccountService, IAccountDetails, UserVerification } from '@spinnaker/core';
 
 export interface IAwsModalFooterProps {
   account: string;
@@ -25,7 +25,7 @@ export class AwsModalFooter extends React.Component<IAwsModalFooterProps, IAwsMo
   public componentDidMount() {
     AccountService.accounts$
       .take(1)
-      .map((accounts: IAccountDetails[]) => accounts.find(account => account.name === this.props.account))
+      .map((accounts: IAccountDetails[]) => accounts.find((account) => account.name === this.props.account))
       .subscribe((account: IAccountDetails) => {
         this.setState({ requireVerification: !!account && account.challengeDestructiveActions });
       });

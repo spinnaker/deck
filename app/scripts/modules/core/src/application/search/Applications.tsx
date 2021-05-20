@@ -1,15 +1,16 @@
-import React from 'react';
 import { isEqual } from 'lodash';
+import React from 'react';
 import { SelectCallback } from 'react-bootstrap';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 
 import { IAccount } from 'core/account';
 import { ICache, ViewStateCache } from 'core/cache';
-import { ApplicationReader, IApplicationSummary } from 'core/application';
-import { ApplicationTable } from './ApplicationsTable';
-import { PaginationControls } from './PaginationControls';
 import { InsightMenu } from 'core/insight/InsightMenu';
 import { Spinner } from 'core/widgets';
+
+import { ApplicationTable } from './ApplicationsTable';
+import { PaginationControls } from './PaginationControls';
+import { ApplicationReader, IApplicationSummary } from '../service/ApplicationReader';
 
 import '../applications.less';
 
@@ -61,9 +62,9 @@ export class Applications extends React.Component<{}, IApplicationsState> {
   public componentDidMount() {
     const appMatchesQuery = (query: string, app: IApplicationSummary) => {
       const searchableValues = [app.name, app.email, app.accounts, app.description]
-        .filter(f => !!f)
-        .map(f => f.toLowerCase());
-      return searchableValues.some(value => value.includes(query));
+        .filter((f) => !!f)
+        .map((f) => f.toLowerCase());
+      return searchableValues.some((value) => value.includes(query));
     };
 
     const appSort = (column: string, a: any, b: any) => {
@@ -73,14 +74,14 @@ export class Applications extends React.Component<{}, IApplicationsState> {
     };
 
     Observable.fromPromise(ApplicationReader.listApplications())
-      .map(apps => apps.map(app => this.fixAccount(app)))
+      .map((apps) => apps.map((app) => this.fixAccount(app)))
 
       // Apply filter/sort
       .combineLatest(this.filter$, this.sort$)
       .map(([apps, filter, sort]) => {
         const viewState: IViewState = { filter, sort };
         this.applicationsCache.put('#global', viewState);
-        return apps.filter(app => appMatchesQuery(filter, app)).sort((a, b) => appSort(sort, a, b));
+        return apps.filter((app) => appMatchesQuery(filter, app)).sort((a, b) => appSort(sort, a, b));
       })
 
       // validate and update pagination
@@ -101,7 +102,7 @@ export class Applications extends React.Component<{}, IApplicationsState> {
           const end = start + itemsPerPage;
           this.setState({ applications: applications.slice(start, end), pagination });
         },
-        error => {
+        (error) => {
           this.setState({ errorState: true });
           throw error;
         },
@@ -116,10 +117,7 @@ export class Applications extends React.Component<{}, IApplicationsState> {
 
   private fixAccount(application: IApplicationSummary): IApplicationSummary {
     if (application.accounts) {
-      application.accounts = application.accounts
-        .split(',')
-        .sort()
-        .join(', ');
+      application.accounts = application.accounts.split(',').sort().join(', ');
     }
     return application;
   }
@@ -174,7 +172,7 @@ export class Applications extends React.Component<{}, IApplicationsState> {
           <ApplicationTable
             currentSort={currentSort}
             applications={applications}
-            toggleSort={column => this.toggleSort(column)}
+            toggleSort={(column) => this.toggleSort(column)}
           />
           <PaginationControls
             onPageChanged={changePage}
@@ -195,8 +193,8 @@ export class Applications extends React.Component<{}, IApplicationsState> {
                 type="search"
                 placeholder="Search applications"
                 className="form-control input-md"
-                ref={input => input && input.focus()}
-                onChange={evt => this.filter$.next(evt.target.value)}
+                ref={(input) => input && input.focus()}
+                onChange={(evt) => this.filter$.next(evt.target.value)}
                 value={this.filter$.value}
               />
             </h2>

@@ -1,13 +1,6 @@
 import { IController, IScope } from 'angular';
 
-import {
-  ApplicationReader,
-  ExpectedArtifactService,
-  IExpectedArtifact,
-  IPipeline,
-  IStage,
-  PipelineConfigService,
-} from 'core';
+import { ApplicationReader, ExpectedArtifactService, IExpectedArtifact, IPipeline, PipelineConfigService } from 'core';
 
 export interface IFindArtifactFromExecutionStage {
   application: string;
@@ -61,8 +54,8 @@ export class FindArtifactFromExecutionCtrl implements IController {
   }
 
   private loadApplications() {
-    ApplicationReader.listApplications().then(apps => {
-      this.state.applications = apps.map(a => a.name);
+    ApplicationReader.listApplications().then((apps) => {
+      this.state.applications = apps.map((a) => a.name);
       this.state.applicationsLoaded = true;
     });
   }
@@ -70,7 +63,7 @@ export class FindArtifactFromExecutionCtrl implements IController {
   private loadPipelines() {
     this.state.pipelinesLoaded = false;
     if (this.stage.application) {
-      PipelineConfigService.getPipelinesForApplication(this.stage.application).then(ps => {
+      PipelineConfigService.getPipelinesForApplication(this.stage.application).then((ps) => {
         this.state.pipelines = ps;
         this.state.pipelinesLoaded = true;
       });
@@ -84,12 +77,4 @@ export class FindArtifactFromExecutionCtrl implements IController {
   public onApplicationSelect() {
     this.loadPipelines();
   }
-
-  public addExpectedArtifact = () => {
-    ExpectedArtifactService.addNewArtifactTo(this.stage);
-  };
-
-  public removeExpectedArtifact = (stage: IStage, expectedArtifact: IExpectedArtifact) => {
-    stage.expectedArtifacts = stage.expectedArtifacts.filter((a: IExpectedArtifact) => a.id !== expectedArtifact.id);
-  };
 }

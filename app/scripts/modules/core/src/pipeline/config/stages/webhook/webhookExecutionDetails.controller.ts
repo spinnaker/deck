@@ -1,13 +1,13 @@
-import { IController, IScope, module } from 'angular';
 import { StateParams } from '@uirouter/angularjs';
+import { IController, IScope, module } from 'angular';
 import { get } from 'lodash';
+
+import { EXECUTION_ARTIFACT_TAB } from 'core/artifact/artifactTab';
 
 import {
   EXECUTION_DETAILS_SECTION_SERVICE,
   ExecutionDetailsSectionService,
 } from '../../../details/executionDetailsSection.service';
-
-import { EXECUTION_ARTIFACT_TAB } from 'core/artifact/artifactTab';
 
 export class WebhookExecutionDetailsCtrl implements IController {
   public configSections = ['webhookConfig', 'taskStatus', 'artifactStatus'];
@@ -39,8 +39,15 @@ export class WebhookExecutionDetailsCtrl implements IController {
 
   private getProgressMessage(): string {
     const context = this.stage.context || {};
+    const webhook = context.webhook || {};
+    const monitor = webhook.monitor || {};
     const buildInfo = context.buildInfo || {};
-    return buildInfo.progressMessage;
+
+    if (monitor.progressMessage) {
+      return monitor.progressMessage;
+    } else {
+      return buildInfo.progressMessage;
+    }
   }
 
   private getFailureMessage(): string {
@@ -52,8 +59,6 @@ export class WebhookExecutionDetailsCtrl implements IController {
 
     if (error) {
       failureMessage = `Webhook failed: ${error}`;
-    } else if (monitor.progressMessage) {
-      failureMessage = `Webhook failed. Last known progress message: ${monitor.progressMessage}`;
     }
 
     return failureMessage;

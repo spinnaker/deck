@@ -1,20 +1,21 @@
-import React from 'react';
 import { Field, FormikErrors, FormikProps } from 'formik';
+import React from 'react';
 
 import {
-  DeploymentStrategySelector,
-  DeployingIntoManagedClusterWarning,
-  HelpField,
-  NameUtils,
-  RegionSelectField,
-  Application,
-  ReactInjector,
-  IServerGroup,
-  IWizardPageComponent,
   AccountSelectInput,
   AccountTag,
+  Application,
+  DeployingIntoManagedClusterWarning,
+  DeploymentStrategySelector,
+  HelpField,
+  IServerGroup,
+  IWizardPageComponent,
+  NameUtils,
+  ReactInjector,
+  RegionSelectField,
+  ServerGroupDetailsField,
+  ServerGroupNamePreview,
 } from '@spinnaker/core';
-
 import { DockerImageAndTagSelector, DockerImageUtils } from '@spinnaker/docker';
 
 import { ITitusServerGroupCommand } from '../../../configure/serverGroupConfiguration.service';
@@ -37,7 +38,6 @@ export interface IServerGroupBasicSettingsState {
   namePreview: string;
   createsNewCluster: boolean;
   latestServerGroup: IServerGroup;
-  showPreviewAsWarning: boolean;
 }
 
 export class ServerGroupBasicSettings
@@ -63,13 +63,11 @@ export class ServerGroupBasicSettings
   private getStateFromProps(props: IServerGroupBasicSettingsProps) {
     const { app } = props;
     const { values } = props.formik;
-    const { mode } = values.viewState;
     const namePreview = NameUtils.getClusterName(app.name, values.stack, values.freeFormDetails);
-    const createsNewCluster = !app.clusters.find(c => c.name === namePreview);
-    const showPreviewAsWarning = (mode === 'create' && !createsNewCluster) || (mode !== 'create' && createsNewCluster);
+    const createsNewCluster = !app.clusters.find((c) => c.name === namePreview);
 
     const inCluster = (app.serverGroups.data as IServerGroup[])
-      .filter(serverGroup => {
+      .filter((serverGroup) => {
         return (
           serverGroup.cluster === namePreview &&
           serverGroup.account === values.credentials &&
@@ -79,7 +77,7 @@ export class ServerGroupBasicSettings
       .sort((a, b) => a.createdTime - b.createdTime);
     const latestServerGroup = inCluster.length ? inCluster.pop() : null;
 
-    return { namePreview, createsNewCluster, latestServerGroup, showPreviewAsWarning };
+    return { namePreview, createsNewCluster, latestServerGroup };
   }
 
   private accountUpdated = (account: string): void => {
@@ -88,6 +86,14 @@ export class ServerGroupBasicSettings
     values.credentialsChanged(values);
     setFieldValue('account', account);
     setFieldValue('credentials', account);
+
+    const accountDetails = values.backingData.credentialsKeyedByAccount[account];
+
+    const newAttr = {
+      ...values.containerAttributes,
+      'titusParameter.agent.assignIPv6Address': accountDetails.environment === 'test' ? 'true' : 'false',
+    };
+    setFieldValue('containerAttributes', newAttr);
   };
 
   private regionUpdated = (region: string): void => {
@@ -149,12 +155,6 @@ export class ServerGroupBasicSettings
     formik.values.clusterChanged(formik.values);
   };
 
-  private freeFormDetailsChanged = (freeFormDetails: string) => {
-    const { formik } = this.props;
-    formik.setFieldValue('freeFormDetails', freeFormDetails);
-    formik.values.clusterChanged(formik.values);
-  };
-
   public componentWillReceiveProps(nextProps: IServerGroupBasicSettingsProps) {
     this.setState(this.getStateFromProps(nextProps));
   }
@@ -165,7 +165,7 @@ export class ServerGroupBasicSettings
   };
 
   private dockerValuesChanged = (dockerValues: any) => {
-    Object.keys(dockerValues).forEach(key => {
+    Object.keys(dockerValues).forEach((key) => {
       this.props.formik.setFieldValue(key, dockerValues[key]);
     });
   };
@@ -177,7 +177,7 @@ export class ServerGroupBasicSettings
   public render() {
     const { app, formik } = this.props;
     const { errors, setFieldValue, values } = formik;
-    const { createsNewCluster, latestServerGroup, namePreview, showPreviewAsWarning } = this.state;
+    const { createsNewCluster, latestServerGroup, namePreview } = this.state;
 
     const accounts = values.backingData.accounts;
     const readOnlyFields = values.viewState.readOnlyFields || {};
@@ -225,8 +225,8 @@ export class ServerGroupBasicSettings
             <input
               type="text"
               className="form-control input-sm no-spel"
-              value={values.stack}
-              onChange={e => this.stackChanged(e.target.value)}
+              value={values.stack || ''}
+              onChange={(e) => this.stackChanged(e.target.value)}
             />
           </div>
         </div>
@@ -237,26 +237,8 @@ export class ServerGroupBasicSettings
             </div>
           </div>
         )}
-        <div className="form-group">
-          <div className="col-md-3 sm-label-right">
-            Detail <HelpField id="aws.serverGroup.detail" />
-          </div>
-          <div className="col-md-7">
-            <input
-              type="text"
-              className="form-control input-sm no-spel"
-              value={values.freeFormDetails}
-              onChange={e => this.freeFormDetailsChanged(e.target.value)}
-            />
-          </div>
-        </div>
-        {errors.freeFormDetails && (
-          <div className="form-group row slide-in">
-            <div className="col-sm-9 col-sm-offset-2 error-message">
-              <span>{errors.freeFormDetails}</span>
-            </div>
-          </div>
-        )}
+
+        <ServerGroupDetailsField app={app} formik={formik} />
 
         {!values.viewState.disableImageSelection && (
           <DockerImageAndTagSelector
@@ -292,7 +274,7 @@ export class ServerGroupBasicSettings
                 <input
                   type="checkbox"
                   checked={values.inService}
-                  onChange={e => setFieldValue('inService', e.target.checked)}
+                  onChange={(e) => setFieldValue('inService', e.target.checked)}
                   disabled={values.strategy !== '' && values.strategy !== 'custom'}
                 />{' '}
                 Send client requests to new instances
@@ -308,39 +290,13 @@ export class ServerGroupBasicSettings
           />
         )}
         {!values.viewState.hideClusterNamePreview && (
-          <div className="form-group">
-            <div className="col-md-12">
-              <div className={`well-compact ${showPreviewAsWarning ? 'alert alert-warning' : 'well'}`}>
-                <h5 className="text-center">
-                  <p>Your Titus Job name will be:</p>
-                  <p>
-                    <strong>
-                      {namePreview}
-                      {createsNewCluster && <span> (new cluster)</span>}
-                    </strong>
-                  </p>
-                  {!createsNewCluster && values.viewState.mode === 'create' && latestServerGroup && (
-                    <div className="text-left">
-                      <p>There is already a server group in this cluster. Do you want to clone it?</p>
-                      <p>
-                        Cloning copies the entire configuration from the selected server group, allowing you to modify
-                        whichever fields (e.g. image) you need to change in the new server group.
-                      </p>
-                      <p>
-                        To clone a server group, select "Clone" from the "Server Group Actions" menu in the details view
-                        of the server group.
-                      </p>
-                      <p>
-                        <a className="clickable" onClick={this.navigateToLatestServerGroup}>
-                          Go to details for {latestServerGroup.name}
-                        </a>
-                      </p>
-                    </div>
-                  )}
-                </h5>
-              </div>
-            </div>
-          </div>
+          <ServerGroupNamePreview
+            createsNewCluster={createsNewCluster}
+            latestServerGroupName={latestServerGroup?.name}
+            mode={values.viewState.mode}
+            namePreview={namePreview}
+            navigateToLatestServerGroup={this.navigateToLatestServerGroup}
+          />
         )}
       </div>
     );

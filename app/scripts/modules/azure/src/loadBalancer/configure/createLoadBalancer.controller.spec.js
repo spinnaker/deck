@@ -1,16 +1,13 @@
 'use strict';
+import { ApplicationModelBuilder } from '@spinnaker/core';
 
-import { API, ApplicationModelBuilder } from '@spinnaker/core';
-
-describe('Controller: azureCreateLoadBalancerCtrl', function() {
-  var $http;
-
+describe('Controller: azureCreateLoadBalancerCtrl', function () {
   // load the controller's module
   beforeEach(window.module(require('./createLoadBalancer.controller').name));
 
   // Initialize the controller and a mock scope
   beforeEach(
-    window.inject(function($controller, $rootScope) {
+    window.inject(function ($controller, $rootScope) {
       const app = ApplicationModelBuilder.createApplicationForTests('app', {
         key: 'loadBalancers',
         lazy: true,
@@ -28,14 +25,7 @@ describe('Controller: azureCreateLoadBalancerCtrl', function() {
     }),
   );
 
-  beforeEach(
-    window.inject(function($httpBackend) {
-      // Set up the mock http service responses
-      $http = $httpBackend;
-    }),
-  );
-
-  it('correctly creates a default loadbalancer', function() {
+  it('correctly creates a default loadbalancer', function () {
     var lb = this.$scope.loadBalancer;
 
     expect(lb.probes.length).toEqual(1);
@@ -45,12 +35,5 @@ describe('Controller: azureCreateLoadBalancerCtrl', function() {
 
     expect(this.$scope.existingLoadBalancerNames).toEqual(undefined);
     expect(lb.providerType).toEqual(undefined);
-  });
-
-  it('makes the expected REST calls for data for a new loadbalancer', function() {
-    $http.when('GET', API.baseUrl + '/networks').respond([]);
-    $http.when('GET', API.baseUrl + '/securityGroups').respond({});
-    $http.when('GET', API.baseUrl + '/credentials?expand=true').respond([]);
-    $http.when('GET', API.baseUrl + '/subnets').respond([]);
   });
 });

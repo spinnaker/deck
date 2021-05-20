@@ -1,0 +1,19 @@
+{
+  "extends": "../../../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "declaration": true,
+    "declarationDir": "lib",
+    "outDir": "lib",
+    "rootDir": "./src",
+    "typeRoots": ["../../../../node_modules/@types"],
+    "paths": {
+      "@spinnaker/core": ["../../core/lib"],
+      "core/*": ["../../core/lib/*"],
+      "tencentcloud/*": ["./*"],
+      "tencentcloud": ["."]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["./lib", "**/*.spec.*"]
+}

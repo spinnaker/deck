@@ -1,63 +1,50 @@
 import { module } from 'angular';
-
-import { API } from 'core/api/ApiService';
+import { IStageTypeConfig } from 'core/domain';
 import { Registry } from 'core/registry';
 
-import { ExecutionDetailsTasks } from '../common';
 import { PreconfiguredJobExecutionDetails } from './PreconfiguredJobExecutionDetails';
 import { PreconfiguredJobStageConfig } from './PreconfiguredJobStageConfig';
+import { ExecutionDetailsTasks } from '../common';
+import { PreconfiguredJobReader } from './preconfiguredJob.reader';
 
-export interface IPreconfiguredJobParameter {
-  name: string;
-  label: string;
-  description?: string;
-  type: string;
-  defaultValue?: string;
-}
-
-interface IPreconfiguredJob {
-  type: string;
-  label: string;
-  noUserConfigurableFields: boolean;
-  description?: string;
-  waitForCompletion?: boolean;
-  parameters?: IPreconfiguredJobParameter[];
-  producesArtifacts: boolean;
+/**
+ * Builds a skeleton preconfigured job stage
+ *
+ * After building a skeleton, register it with PipelineRegistry.registerPreconfiguredJobStage().
+ * The skeleton will be filled in with details pulled from gate via the /jobs/preconfigured endpoint.
+ *
+ * @param preconfiguredJobKey the preconfigured job's 'type' (registered in orca)
+ */
+export function makePreconfiguredJobStage(preconfiguredJobType: string): IStageTypeConfig {
+  return {
+    label: '',
+    description: '',
+    key: preconfiguredJobType,
+    alias: 'preconfiguredJob',
+    addAliasToConfig: true,
+    restartable: true,
+    // Overriden with parameter metadata from /jobs/preconfigured
+    defaults: { parameters: {} },
+    component: PreconfiguredJobStageConfig,
+    executionDetailsSections: [PreconfiguredJobExecutionDetails, ExecutionDetailsTasks],
+    configuration: {
+      waitForCompletion: true,
+      parameters: [],
+    },
+    producesArtifacts: false,
+  };
 }
 
 export const PRECONFIGUREDJOB_STAGE = 'spinnaker.core.pipeline.stage.preconfiguredJobStage';
 
 module(PRECONFIGUREDJOB_STAGE, []).run(() => {
-  API.one('jobs')
-    .all('preconfigured')
-    .getList()
-    .then((preconfiguredJobs: IPreconfiguredJob[]) => {
-      preconfiguredJobs.forEach(preconfiguredJob => {
-        const { label, description, type, waitForCompletion, parameters, producesArtifacts } = preconfiguredJob;
-        const defaults = {
-          parameters: parameters.reduce((acc, parameter) => {
-            if (parameter.defaultValue) {
-              acc[parameter.name] = parameter.defaultValue;
-            }
-            return acc;
-          }, {} as any),
-        };
-        Registry.pipeline.registerStage({
-          label,
-          description,
-          key: type,
-          alias: 'preconfiguredJob',
-          addAliasToConfig: true,
-          restartable: true,
-          defaults,
-          component: PreconfiguredJobStageConfig,
-          executionDetailsSections: [PreconfiguredJobExecutionDetails, ExecutionDetailsTasks],
-          configuration: {
-            waitForCompletion,
-            parameters,
-          },
-          producesArtifacts,
-        });
-      });
-    });
+  PreconfiguredJobReader.list().then((preconfiguredJobs) => {
+    const basicPreconfiguredJobs = preconfiguredJobs.filter((job) => job.uiType !== 'CUSTOM');
+    return Promise.all(
+      basicPreconfiguredJobs.map((job) => {
+        const stageConfig = makePreconfiguredJobStage(job.type);
+        return Registry.pipeline.registerPreconfiguredJobStage(stageConfig);
+      }),
+    );
+  });
 });

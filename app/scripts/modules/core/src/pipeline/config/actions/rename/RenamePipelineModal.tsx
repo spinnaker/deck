@@ -1,12 +1,11 @@
-import React from 'react';
-import { map, without } from 'lodash';
-import { Modal } from 'react-bootstrap';
 import { Form } from 'formik';
+import { get, map, without } from 'lodash';
+import React from 'react';
+import { Modal } from 'react-bootstrap';
 
 import { Application } from 'core/application';
 import { IPipeline } from 'core/domain';
 import { ModalClose } from 'core/modal';
-import { PipelineConfigService } from 'core/pipeline';
 import {
   FormikFormField,
   IModalComponentProps,
@@ -15,6 +14,8 @@ import {
   TextInput,
   Validators,
 } from 'core/presentation';
+
+import { PipelineConfigService } from '../../services/PipelineConfigService';
 
 export interface IRenamePipelineModalProps extends IModalComponentProps {
   application: Application;
@@ -48,10 +49,10 @@ export function RenamePipelineModal(props: IRenamePipelineModalProps) {
         application.pipelineConfigs.refresh();
         closeModal(command.name);
       },
-      response => {
+      (response) => {
         setSaving(false);
         setSaveError(true);
-        setErrorMessage(response.message || 'No message provided');
+        setErrorMessage(get(response, 'data.message', 'No message provided'));
       },
     );
   }
@@ -61,7 +62,7 @@ export function RenamePipelineModal(props: IRenamePipelineModalProps) {
       <SpinFormik<IRenamePipelineCommand>
         initialValues={initialValues}
         onSubmit={renamePipeline}
-        render={formik => (
+        render={(formik) => (
           <Form className="form-horizontal">
             <Modal key="modal" show={true} onHide={() => {}}>
               <ModalClose dismiss={dismissModal} />
@@ -79,7 +80,7 @@ export function RenamePipelineModal(props: IRenamePipelineModalProps) {
                     <p>
                       <a
                         className="btn btn-link"
-                        onClick={e => {
+                        onClick={(e) => {
                           e.preventDefault();
                           setSaveError(false);
                         }}
@@ -92,7 +93,7 @@ export function RenamePipelineModal(props: IRenamePipelineModalProps) {
                 <FormikFormField
                   name="name"
                   label={`${pipelineType} Name`}
-                  input={inputProps => <TextInput {...inputProps} className="form-control input-sm" />}
+                  input={(inputProps) => <TextInput {...inputProps} className="form-control input-sm" />}
                   required={true}
                   validate={[
                     Validators.valueUnique(existingNames, `There is already a ${pipelineType} with that name.`),

@@ -4,9 +4,10 @@ import * as angular from 'angular';
 import _ from 'lodash';
 
 import { AccountService, ExpectedArtifactService, INSTANCE_TYPE_SERVICE } from '@spinnaker/core';
+import { GOOGLE_COMMON_XPNNAMING_GCE_SERVICE } from 'google/common/xpnNaming.gce.service';
 import { GCEProviderSettings } from 'google/gce.settings';
 import { parseHealthCheckUrl } from 'google/healthCheck/healthCheckUtils';
-import { GOOGLE_COMMON_XPNNAMING_GCE_SERVICE } from 'google/common/xpnNaming.gce.service';
+
 import { GOOGLE_INSTANCE_CUSTOM_CUSTOMINSTANCEBUILDER_GCE_SERVICE } from './../../instance/custom/customInstanceBuilder.gce.service';
 import { GOOGLE_SERVERGROUP_CONFIGURE_WIZARD_HIDDENMETADATAKEYS_VALUE } from './wizard/hiddenMetadataKeys.value';
 
@@ -26,7 +27,7 @@ angular
     'gceCustomInstanceBuilderService',
     'gceServerGroupHiddenMetadataKeys',
     'gceXpnNamingService',
-    function(
+    function (
       $q,
       instanceTypeService,
       gceCustomInstanceBuilderService,
@@ -37,10 +38,10 @@ angular
       //   1) All GCE machine types are represented in the tree of choices.
       //   2) Each machine type appears in exactly one category.
       function determineInstanceCategoryFromInstanceType(command) {
-        return instanceTypeService.getCategories('gce').then(function(categories) {
-          categories.forEach(function(category) {
-            category.families.forEach(function(family) {
-              family.instanceTypes.forEach(function(instanceType) {
+        return instanceTypeService.getCategories('gce').then(function (categories) {
+          categories.forEach(function (category) {
+            category.families.forEach(function (family) {
+              family.instanceTypes.forEach(function (instanceType) {
                 if (instanceType.name === command.instanceType) {
                   command.viewState.instanceProfile = category.type;
                 }
@@ -102,17 +103,17 @@ angular
             };
           }
         });
-        const localSSDDisks = disks.filter(disk => disk.type === 'local-ssd');
-        const persistentDisks = disks.filter(disk => disk.type.startsWith('pd-'));
+        const localSSDDisks = disks.filter((disk) => disk.type === 'local-ssd');
+        const persistentDisks = disks.filter((disk) => disk.type.startsWith('pd-'));
 
         if (persistentDisks.length) {
           command.disks = persistentDisks.concat(localSSDDisks);
           return instanceTypeService
             .getInstanceTypeDetails(
               command.selectedProvider,
-              _.startsWith(command.instanceType, 'custom') ? 'buildCustom' : command.instanceType,
+              _.includes(command.instanceType, 'custom-') ? 'buildCustom' : command.instanceType,
             )
-            .then(instanceTypeDetails => {
+            .then((instanceTypeDetails) => {
               command.viewState.instanceTypeDetails = instanceTypeDetails;
               calculateOverriddenStorageDescription(instanceTypeDetails, command);
             });
@@ -131,9 +132,9 @@ angular
           return instanceTypeService
             .getInstanceTypeDetails(
               command.selectedProvider,
-              _.startsWith(command.instanceType, 'custom') ? 'buildCustom' : command.instanceType,
+              _.includes(command.instanceType, 'custom-') ? 'buildCustom' : command.instanceType,
             )
-            .then(instanceTypeDetails => {
+            .then((instanceTypeDetails) => {
               command.viewState.instanceTypeDetails = instanceTypeDetails;
               calculateOverriddenStorageDescription(instanceTypeDetails, command);
             });
@@ -144,18 +145,18 @@ angular
       }
 
       function getLocalSSDDisks(command) {
-        return (command.disks || []).filter(disk => disk.type === 'local-ssd');
+        return (command.disks || []).filter((disk) => disk.type === 'local-ssd');
       }
 
       function getPersistentDisks(command) {
-        return (command.disks || []).filter(disk => disk.type.startsWith('pd-'));
+        return (command.disks || []).filter((disk) => disk.type.startsWith('pd-'));
       }
 
       function calculatePersistentDiskOverriddenStorageDescription(command) {
         const persistentDisks = getPersistentDisks(command);
 
         const diskCountBySizeGb = new Map();
-        persistentDisks.forEach(disk => {
+        persistentDisks.forEach((disk) => {
           if (diskCountBySizeGb.has(disk.sizeGb)) {
             diskCountBySizeGb.set(disk.sizeGb, diskCountBySizeGb.get(disk.sizeGb) + 1);
           } else {
@@ -177,7 +178,7 @@ angular
         } else {
           const persistentDisks = getPersistentDisks(command);
           const overrideStorageDescription =
-            persistentDisks.some(disk => disk.sizeGb !== instanceTypeDetails.storage.size) ||
+            persistentDisks.some((disk) => disk.sizeGb !== instanceTypeDetails.storage.size) ||
             persistentDisks.length !== instanceTypeDetails.storage.count;
 
           if (overrideStorageDescription) {
@@ -237,13 +238,13 @@ angular
           let customUserData = '';
           let customUserDataKeys = [];
           if (angular.isArray(metadataItems)) {
-            const customUserDataItem = metadataItems.find(metadataItem => metadataItem.key === 'customUserData');
+            const customUserDataItem = metadataItems.find((metadataItem) => metadataItem.key === 'customUserData');
             if (customUserDataItem) {
               customUserData = customUserDataItem.value;
               customUserDataKeys = getCustomUserDataKeys(customUserData);
               command.userData = customUserData;
             }
-            metadataItems.forEach(function(metadataItem) {
+            metadataItems.forEach(function (metadataItem) {
               if (
                 !_.includes(customUserDataKeys, metadataItem.key) &&
                 !_.includes(gceServerGroupHiddenMetadataKeys, metadataItem.key)
@@ -269,7 +270,7 @@ angular
 
       function getCustomUserDataKeys(customUserData) {
         const customUserDataKeys = [];
-        customUserData.split(/\n|,/).forEach(function(userDataItem) {
+        customUserData.split(/\n|,/).forEach(function (userDataItem) {
           const customUserDataKey = userDataItem.split('=')[0];
           customUserDataKeys.push(customUserDataKey);
         });
@@ -278,7 +279,7 @@ angular
 
       function populateTags(instanceTemplateTags, command) {
         if (instanceTemplateTags && instanceTemplateTags.items) {
-          _.map(instanceTemplateTags.items, function(tag) {
+          _.map(instanceTemplateTags.items, function (tag) {
             command.tags.push({ value: tag });
           });
         }
@@ -306,7 +307,7 @@ angular
       function populateAuthScopes(serviceAccounts, command) {
         if (serviceAccounts && serviceAccounts.length) {
           command.serviceAccountEmail = serviceAccounts[0].email;
-          command.authScopes = _.map(serviceAccounts[0].scopes, authScope => {
+          command.authScopes = _.map(serviceAccounts[0].scopes, (authScope) => {
             return authScope.replace('https://www.googleapis.com/auth/', '');
           });
         } else {
@@ -315,7 +316,7 @@ angular
       }
 
       function attemptToSetValidCredentials(application, defaultCredentials, command) {
-        return AccountService.listAccounts('gce').then(function(gceAccounts) {
+        return AccountService.listAccounts('gce').then(function (gceAccounts) {
           const gceAccountNames = _.map(gceAccounts, 'name');
           const firstGCEAccount = gceAccountNames[0];
 
@@ -447,7 +448,10 @@ angular
           enableTraffic: true,
           cloudProvider: 'gce',
           selectedProvider: 'gce',
-          distributionPolicy: serverGroup.distributionPolicy,
+          distributionPolicy: {
+            zones: serverGroup.distributionPolicy ? serverGroup.distributionPolicy.zones : [],
+            targetShape: serverGroup.distributionPolicy ? serverGroup.distributionPolicy.targetShape : null,
+          },
           selectZones: serverGroup.selectZones,
           source: {
             account: serverGroup.account,
@@ -485,13 +489,13 @@ angular
             instanceType: instanceType,
           });
 
-          if (_.startsWith(instanceType, 'custom')) {
+          if (_.includes(instanceType, 'custom-')) {
             command.viewState.customInstance = gceCustomInstanceBuilderService.parseInstanceTypeString(instanceType);
             command.viewState.instanceProfile = 'buildCustom';
           }
 
           command.viewState.imageId = serverGroup.launchConfig.imageId;
-          return determineInstanceCategoryFromInstanceType(command).then(function() {
+          return determineInstanceCategoryFromInstanceType(command).then(function () {
             populateAvailabilityPolicies(serverGroup.launchConfig.instanceTemplate.properties.scheduling, command);
             populateCustomMetadata(serverGroup.launchConfig.instanceTemplate.properties.metadata.items, command);
             populateTags(serverGroup.launchConfig.instanceTemplate.properties.tags, command);
@@ -499,7 +503,7 @@ angular
             populateAuthScopes(serverGroup.launchConfig.instanceTemplate.properties.serviceAccounts, command);
 
             return populateDisksFromExisting(serverGroup.launchConfig.instanceTemplate.properties.disks, command).then(
-              function() {
+              function () {
                 return command;
               },
             );
@@ -517,66 +521,62 @@ angular
           'gce',
           pipelineCluster.instanceType,
         );
+
         const commandOptions = { account: pipelineCluster.account, region: region, zone: zone };
-        const asyncLoader = $q.all({
-          command: buildNewServerGroupCommand(application, commandOptions),
-          instanceProfile: instanceTypeCategoryLoader,
-        });
+        return $q
+          .all([buildNewServerGroupCommand(application, commandOptions), instanceTypeCategoryLoader])
+          .then(function ([command, instanceProfile]) {
+            const expectedArtifacts = ExpectedArtifactService.getExpectedArtifactsAvailableToStage(
+              currentStage,
+              pipeline,
+            );
+            const viewState = {
+              pipeline,
+              stage: currentStage,
+              instanceProfile,
+              disableImageSelection: true,
+              expectedArtifacts: expectedArtifacts,
+              showImageSourceSelector: true,
+              useSimpleCapacity: !pipelineCluster.autoscalingPolicy,
+              mode: 'editPipeline',
+              submitButtonLabel: 'Done',
+              customInstance:
+                instanceProfile === 'buildCustom'
+                  ? gceCustomInstanceBuilderService.parseInstanceTypeString(pipelineCluster.instanceType)
+                  : null,
+              templatingEnabled: true,
+            };
 
-        return asyncLoader.then(function(asyncData) {
-          const command = asyncData.command;
+            const viewOverrides = {
+              region: region,
+              credentials: pipelineCluster.account,
+              enableTraffic: !pipelineCluster.disableTraffic,
+              viewState: viewState,
+            };
 
-          const expectedArtifacts = ExpectedArtifactService.getExpectedArtifactsAvailableToStage(
-            currentStage,
-            pipeline,
-          );
-          const viewState = {
-            pipeline,
-            stage: currentStage,
-            instanceProfile: asyncData.instanceProfile,
-            disableImageSelection: true,
-            expectedArtifacts: expectedArtifacts,
-            showImageSourceSelector: true,
-            useSimpleCapacity: !pipelineCluster.autoscalingPolicy,
-            mode: 'editPipeline',
-            submitButtonLabel: 'Done',
-            customInstance:
-              asyncData.instanceProfile === 'buildCustom'
-                ? gceCustomInstanceBuilderService.parseInstanceTypeString(pipelineCluster.instanceType)
-                : null,
-            templatingEnabled: true,
-          };
+            pipelineCluster.strategy = pipelineCluster.strategy || '';
 
-          const viewOverrides = {
-            region: region,
-            credentials: pipelineCluster.account,
-            enableTraffic: !pipelineCluster.disableTraffic,
-            viewState: viewState,
-          };
+            const extendedCommand = angular.extend({}, command, pipelineCluster, viewOverrides);
 
-          pipelineCluster.strategy = pipelineCluster.strategy || '';
+            return populateDisksFromPipeline(extendedCommand).then(function () {
+              const instanceMetadata = extendedCommand.instanceMetadata;
+              extendedCommand.loadBalancers = extractLoadBalancersFromMetadata(instanceMetadata);
+              extendedCommand.backendServiceMetadata = instanceMetadata['backend-service-names']
+                ? instanceMetadata['backend-service-names'].split(',')
+                : [];
+              extendedCommand.minCpuPlatform = pipelineCluster.minCpuPlatform || '(Automatic)';
+              extendedCommand.instanceMetadata = {};
+              populateCustomMetadata(instanceMetadata, extendedCommand);
+              populateAutoHealingPolicy(pipelineCluster, extendedCommand);
+              populateShieldedVmConfig(pipelineCluster, extendedCommand);
 
-          const extendedCommand = angular.extend({}, command, pipelineCluster, viewOverrides);
+              const instanceTemplateTags = { items: extendedCommand.tags };
+              extendedCommand.tags = [];
+              populateTags(instanceTemplateTags, extendedCommand);
 
-          return populateDisksFromPipeline(extendedCommand).then(function() {
-            const instanceMetadata = extendedCommand.instanceMetadata;
-            extendedCommand.loadBalancers = extractLoadBalancersFromMetadata(instanceMetadata);
-            extendedCommand.backendServiceMetadata = instanceMetadata['backend-service-names']
-              ? instanceMetadata['backend-service-names'].split(',')
-              : [];
-            extendedCommand.minCpuPlatform = pipelineCluster.minCpuPlatform || '(Automatic)';
-            extendedCommand.instanceMetadata = {};
-            populateCustomMetadata(instanceMetadata, extendedCommand);
-            populateAutoHealingPolicy(pipelineCluster, extendedCommand);
-            populateShieldedVmConfig(pipelineCluster, extendedCommand);
-
-            const instanceTemplateTags = { items: extendedCommand.tags };
-            extendedCommand.tags = [];
-            populateTags(instanceTemplateTags, extendedCommand);
-
-            return extendedCommand;
+              return extendedCommand;
+            });
           });
-        });
       }
 
       return {

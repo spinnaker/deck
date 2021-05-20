@@ -1,22 +1,21 @@
+import { get, values } from 'lodash';
 import React from 'react';
 import { Dropdown } from 'react-bootstrap';
-import { get, values } from 'lodash';
 
 import {
   Application,
   ApplicationReader,
   ConfirmationModalService,
+  HelpField,
   LoadBalancerWriter,
   ManagedMenuItem,
-  SETTINGS,
   NgReact,
-  HelpField,
+  SETTINGS,
 } from '@spinnaker/core';
-
 import { IAmazonLoadBalancer, IAmazonLoadBalancerDeleteCommand } from 'amazon/domain';
 
-import { ILoadBalancerFromStateParams } from './loadBalancerDetails.controller';
 import { LoadBalancerTypes } from '../configure/LoadBalancerTypes';
+import { ILoadBalancerFromStateParams } from './loadBalancerDetails.controller';
 
 export interface ILoadBalancerActionsProps {
   app: Application;
@@ -43,7 +42,7 @@ export class LoadBalancerActions extends React.Component<ILoadBalancerActionsPro
     } else {
       // Load balancer is a part of a different application
       ApplicationReader.getApplication(loadBalancerAppName)
-        .then(loadBalancerApp => {
+        .then((loadBalancerApp) => {
           this.setState({ application: loadBalancerApp });
         })
         .catch(() => {
@@ -62,7 +61,7 @@ export class LoadBalancerActions extends React.Component<ILoadBalancerActionsPro
   public editLoadBalancer = (): void => {
     const { loadBalancer } = this.props;
     const { application } = this.state;
-    const LoadBalancerModal = LoadBalancerTypes.find(t => t.type === loadBalancer.loadBalancerType).component;
+    const LoadBalancerModal = LoadBalancerTypes.find((t) => t.type === loadBalancer.loadBalancerType).component;
     LoadBalancerModal.show({ app: application, loadBalancer });
   };
 

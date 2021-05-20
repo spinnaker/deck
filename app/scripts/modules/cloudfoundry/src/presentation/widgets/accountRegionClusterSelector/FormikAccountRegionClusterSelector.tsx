@@ -1,8 +1,7 @@
-import React from 'react';
-
-import { Observable, Subject } from 'rxjs';
-
+import { FormikProps } from 'formik';
 import { get } from 'lodash';
+import React from 'react';
+import { Observable, Subject } from 'rxjs';
 
 import {
   Application,
@@ -13,7 +12,6 @@ import {
   IServerGroupFilter,
   ReactSelectInput,
 } from '@spinnaker/core';
-import { FormikProps } from 'formik';
 import { ICloudFoundryCreateServerGroupCommand } from 'cloudfoundry/serverGroup';
 
 export interface IFormikAccountRegionClusterSelectorProps {
@@ -121,8 +119,7 @@ export class FormikAccountRegionClusterSelector extends React.Component<
           <FormikFormField
             name={componentName ? `${componentName}.${credentialsField}` : `${credentialsField}`}
             label="Account"
-            fastField={false}
-            input={props => (
+            input={(props) => (
               <ReactSelectInput
                 inputClassName="cloudfoundry-react-select"
                 {...props}
@@ -139,8 +136,7 @@ export class FormikAccountRegionClusterSelector extends React.Component<
           <FormikFormField
             name={componentName ? `${componentName}.region` : 'region'}
             label="Region"
-            fastField={false}
-            input={props => (
+            input={(props) => (
               <ReactSelectInput
                 inputClassName="cloudfoundry-react-select"
                 {...props}
@@ -157,8 +153,7 @@ export class FormikAccountRegionClusterSelector extends React.Component<
           <FormikFormField
             name={componentName ? `${componentName}.${clusterField}` : `${clusterField}`}
             label="Cluster"
-            fastField={false}
-            input={props => (
+            input={(props) => (
               <ReactSelectInput
                 inputClassName="cloudfoundry-react-select"
                 {...props}

@@ -1,17 +1,15 @@
 import React from 'react';
 
-import { IFormikStageConfigInjectedProps, StageConfigField } from 'core/pipeline';
-import { StageArtifactSelectorDelegate, ArtifactTypePatterns, excludeAllTypesExcept } from 'core/artifact';
-import { IArtifact, IPipeline } from 'core/domain';
+import { ArtifactTypePatterns, excludeAllTypesExcept, StageArtifactSelectorDelegate } from 'core/artifact';
+import { IArtifact } from 'core/domain';
+import { Overridable } from 'core/overrideRegistry';
 import { TextInput } from 'core/presentation';
 
-interface IBakeKustomizeConfigFormProps {
-  updatePipeline: (pipeline: IPipeline) => void;
-}
+import { IFormikStageConfigInjectedProps } from '../../FormikStageConfig';
+import { StageConfigField } from '../../common/stageConfigField/StageConfigField';
 
-export class BakeKustomizeConfigForm extends React.Component<
-  IBakeKustomizeConfigFormProps & IFormikStageConfigInjectedProps
-> {
+@Overridable('bakeKustomizeConfigForm')
+export class BakeKustomizeConfigForm extends React.Component<IFormikStageConfigInjectedProps> {
   private getInputArtifact = () => {
     const stage = this.props.formik.values;
     if (!stage.inputArtifact) {
@@ -36,10 +34,7 @@ export class BakeKustomizeConfigForm extends React.Component<
             helpKey="pipeline.config.bake.manifest.expectedArtifact"
             label="Expected Artifact"
             pipeline={this.props.pipeline}
-            selectedArtifactAccount={this.getInputArtifact().account}
-            selectedArtifactId={this.getInputArtifact().id}
             stage={stage}
-            updatePipeline={this.props.updatePipeline}
             onArtifactEdited={(artifact: IArtifact) => {
               this.props.formik.setFieldValue('inputArtifact.id', null);
               this.props.formik.setFieldValue('inputArtifact.artifact', artifact);
@@ -47,13 +42,6 @@ export class BakeKustomizeConfigForm extends React.Component<
             }}
             onExpectedArtifactSelected={(artifact: IArtifact) => {
               this.props.formik.setFieldValue('inputArtifact.id', artifact.id);
-              this.props.formik.setFieldValue('inputArtifact.artifact', null);
-            }}
-            setArtifactAccount={(account: string) => {
-              this.props.formik.setFieldValue('inputArtifact.account', account);
-            }}
-            setArtifactId={(id: string) => {
-              this.props.formik.setFieldValue('inputArtifact.id', id);
               this.props.formik.setFieldValue('inputArtifact.artifact', null);
             }}
           />

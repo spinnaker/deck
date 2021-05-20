@@ -1,10 +1,9 @@
-import { IController, IPromise, IQService, IScope, module } from 'angular';
 import { StateService } from '@uirouter/angularjs';
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
+import { IController, IQService, IScope, module } from 'angular';
 
 import { Application, ILoadBalancer, MANAGED_RESOURCE_DETAILS_INDICATOR } from '@spinnaker/core';
-
 import { IAmazonApplicationLoadBalancer, ITargetGroup } from 'amazon/domain/IAmazonLoadBalancer';
-import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
 export interface ITargetGroupFromStateParams {
   accountId: string;
@@ -53,7 +52,7 @@ export class AwsTargetGroupDetailsController implements IController {
     this.$state.go('^', null, { location: 'replace' });
   }
 
-  public extractTargetGroup(): IPromise<void> {
+  public extractTargetGroup(): PromiseLike<void> {
     const { loadBalancerName, region, accountId, name } = this.targetGroupFromParams;
 
     const appLoadBalancer: IAmazonApplicationLoadBalancer = this.app.loadBalancers.data.find((test: ILoadBalancer) => {
@@ -64,7 +63,7 @@ export class AwsTargetGroupDetailsController implements IController {
       return this.$q.when(null);
     }
 
-    const targetGroup = appLoadBalancer.targetGroups.find(tg => tg.name === name);
+    const targetGroup = appLoadBalancer.targetGroups.find((tg) => tg.name === name);
     if (!targetGroup) {
       this.autoClose();
       return this.$q.when(null);
@@ -79,7 +78,7 @@ export class AwsTargetGroupDetailsController implements IController {
     this.state.loading = false;
 
     this.elbProtocol = 'http:';
-    if (this.loadBalancer.listeners && this.loadBalancer.listeners.some(l => l.protocol === 'HTTPS')) {
+    if (this.loadBalancer.listeners && this.loadBalancer.listeners.some((l) => l.protocol === 'HTTPS')) {
       this.elbProtocol = 'https:';
     }
 

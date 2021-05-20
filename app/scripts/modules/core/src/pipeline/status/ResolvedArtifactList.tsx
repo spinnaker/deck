@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { IArtifact, IExpectedArtifact } from 'core/domain';
+
 import { Artifact } from './Artifact';
 
 import './artifactList.less';
@@ -32,7 +33,7 @@ export class ResolvedArtifactList extends React.Component<IResolvedArtifactListP
 
     const decoratedArtifacts = artifacts.filter(({ name, reference, type }) => (name || reference) && type);
     const decoratedExpectedArtifacts = resolvedExpectedArtifacts
-      .map(rea => rea.boundArtifact)
+      .map((rea) => rea.boundArtifact)
       .filter(({ name, reference, type }) => (name || reference) && type);
 
     // if there's none, don't show it

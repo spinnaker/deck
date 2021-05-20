@@ -1,6 +1,6 @@
 import { Task, WorkerPool } from './workerPool';
 
-const delay = (millis = 0) => new Promise<void>(resolve => setTimeout(resolve, millis));
+const delay = (millis = 0) => new Promise<void>((resolve) => setTimeout(resolve, millis));
 
 // Testing class to track running tasks
 class TaskTracker {
@@ -34,14 +34,14 @@ class TaskTracker {
 
 describe('Worker pool', () => {
   describe('.task()', () => {
-    it('registers a task and returns a promise that resolves to the task result', done => {
+    it('registers a task and returns a promise that resolves to the task result', (done) => {
       new WorkerPool(1)
         .task(() => Promise.resolve(2))
-        .then(val => expect(val).toBe(2))
+        .then((val) => expect(val).toBe(2))
         .then(done);
     });
 
-    it('runs one task at a time when concurrency === 1', async done => {
+    it('runs one task at a time when concurrency === 1', async () => {
       const pool = new WorkerPool(1);
       const tracker = new TaskTracker();
 
@@ -56,11 +56,9 @@ describe('Worker pool', () => {
       const result2 = await promise2;
       expect(result2).toEqual('two');
       expect(tracker.runningTasks).toEqual([]);
-
-      done();
     });
 
-    it('runs two tasks at a time when concurrency === 2', async done => {
+    it('runs two tasks at a time when concurrency === 2', async () => {
       const pool = new WorkerPool(2);
       const tracker = new TaskTracker();
 
@@ -86,13 +84,11 @@ describe('Worker pool', () => {
       const result4 = await promise4;
       expect(result4).toEqual('four');
       expect(tracker.runningTasks).toEqual([]);
-
-      done();
     });
   });
 
   describe('.cancelAll()', () => {
-    it('cancels running tasks and rejects their promises', async done => {
+    it('cancels running tasks and rejects their promises', async () => {
       const pool = new WorkerPool(1);
       const tracker = new TaskTracker();
 
@@ -108,11 +104,10 @@ describe('Worker pool', () => {
         fail(`promise2 should have been rejected but was ${result2}`);
       } catch (error) {
         expect(error).toBe('cancel reason');
-        done();
       }
     });
 
-    it('cancels running AND pending tasks and rejects their promises', async done => {
+    it('cancels running AND pending tasks and rejects their promises', async () => {
       const pool = new WorkerPool(1);
       const tracker = new TaskTracker();
 
@@ -141,7 +136,6 @@ describe('Worker pool', () => {
         fail(`promise3 should have been rejected but was ${result3}`);
       } catch (error) {
         expect(error).toBe('cancel reason');
-        done();
       }
     });
   });

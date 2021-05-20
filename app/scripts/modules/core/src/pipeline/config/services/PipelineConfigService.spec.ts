@@ -1,12 +1,11 @@
+import { mockHttpClient } from 'core/api/mock/jasmine';
 import { mock } from 'angular';
-
-import { API } from 'core/api/ApiService';
 import { IStage } from 'core/domain/IStage';
 import { IPipeline } from 'core/domain/IPipeline';
 import { PipelineConfigService } from 'core/pipeline/config/services/PipelineConfigService';
 
 describe('PipelineConfigService', () => {
-  let $http: ng.IHttpBackendService, $scope: ng.IScope;
+  let $scope: ng.IScope;
 
   const buildStage = (base: any): IStage => {
     const stageDefaults: IStage = {
@@ -46,14 +45,14 @@ describe('PipelineConfigService', () => {
   };
 
   beforeEach(
-    mock.inject(($httpBackend: ng.IHttpBackendService, $rootScope: ng.IRootScopeService) => {
-      $http = $httpBackend;
+    mock.inject(($rootScope: ng.IRootScopeService) => {
       $scope = $rootScope.$new();
     }),
   );
 
   describe('savePipeline', () => {
-    it('clears isNew flags, stage name if not present', () => {
+    it('clears isNew flags, stage name if not present', async () => {
+      const http = mockHttpClient();
       const pipeline: IPipeline = buildPipeline({
         stages: [
           { name: 'explicit name', type: 'bake', isNew: true },
@@ -62,40 +61,42 @@ describe('PipelineConfigService', () => {
         ],
       });
 
-      $http
-        .expectPOST(API.baseUrl + '/pipelines', (requestString: string) => {
-          const request = JSON.parse(requestString) as IPipeline;
-          return (
-            request.stages[0].name === 'explicit name' &&
-            !request.stages[1].name &&
-            !request.stages[2].name &&
-            request.stages.every(s => !s.isNew)
-          );
-        })
-        .respond(200, '');
+      const postSpy = spyOn(http, 'post');
 
-      PipelineConfigService.savePipeline(pipeline);
-      $scope.$digest();
-      $http.flush();
-      $http.verifyNoOutstandingRequest();
+      await PipelineConfigService.savePipeline(pipeline);
+      expect(postSpy).toHaveBeenCalled();
+
+      const payload = postSpy.calls.first().args[0].data;
+      expect(payload).toBeDefined();
+
+      expect(payload.stages[0].name).toBe('explicit name');
+      expect(payload.stages[0].isNew).toBeFalsy();
+
+      expect(payload.stages[1].name).toBeUndefined();
+      expect(payload.stages[1].isNew).toBeFalsy();
+
+      expect(payload.stages[2].name).toBeUndefined();
+      expect(payload.stages[2].isNew).toBeFalsy();
     });
   });
 
   describe('deletePipeline', () => {
-    it('escapes special characters in pipeline name', () => {
+    it('escapes special characters in pipeline name', async () => {
+      const http = mockHttpClient();
       const pipeline: IPipeline = buildPipeline({});
 
-      $http.expectDELETE(API.baseUrl + '/pipelines/foo/bar%5Bbaz%5D').respond(200, '');
+      http.expectDELETE('/pipelines/foo/bar%5Bbaz%5D').respond(200, '');
 
       PipelineConfigService.deletePipeline('foo', pipeline, 'bar[baz]');
 
       $scope.$digest();
-      $http.flush();
+      await http.flush();
     });
   });
 
   describe('getPipelines', () => {
-    it('should return pipelines sorted by index', () => {
+    it('should return pipelines sorted by index', async () => {
+      const http = mockHttpClient();
       let result: IPipeline[] = null;
       const fromServer: IPipeline[] = [
         buildPipeline({ id: 'a', name: 'second', application: 'app', index: 1, stages: [], triggers: [] }),
@@ -103,18 +104,19 @@ describe('PipelineConfigService', () => {
         buildPipeline({ id: 'c', name: 'first', application: 'app', index: 0, stages: [] }),
         buildPipeline({ id: 'd', name: 'third', application: 'app', index: 2, stages: [] }),
       ];
-      $http.expectGET(API.baseUrl + '/applications/app/pipelineConfigs').respond(200, fromServer);
+      http.expectGET('/applications/app/pipelineConfigs').respond(200, fromServer);
 
       PipelineConfigService.getPipelinesForApplication('app').then((pipelines: IPipeline[]) => {
         result = pipelines;
       });
       $scope.$digest();
-      $http.flush();
+      await http.flush();
 
-      expect(result.map(r => r.name)).toEqual(['first', 'second', 'third', 'last']);
+      expect(result.map((r) => r.name)).toEqual(['first', 'second', 'third', 'last']);
     });
 
-    it('should fix sort order of pipelines on initialization: 0..n, index collisions sorted alphabetically', () => {
+    it('should fix sort order of pipelines on initialization: 0..n, index collisions sorted alphabetically', async () => {
+      const http = mockHttpClient();
       const fromServer: IPipeline[] = [
         buildPipeline({ name: 'second', index: 1, stages: [] }),
         buildPipeline({ name: 'last', index: 5, stages: [] }),
@@ -123,24 +125,19 @@ describe('PipelineConfigService', () => {
       ];
 
       const posted: any[] = [];
-      $http.expectGET(API.baseUrl + '/applications/app/pipelineConfigs').respond(200, fromServer);
-      $http
-        .whenPOST(API.baseUrl + '/pipelines', (data: string) => {
-          const json: any = JSON.parse(data);
-          posted.push({ index: json.index, name: json.name });
-          return true;
-        })
-        .respond(200, {});
+      http.expectGET('/applications/app/pipelineConfigs').respond(200, fromServer);
+      spyOn(http, 'post').and.callFake((request: any) => {
+        posted.push(request.data);
+        return Promise.resolve(undefined);
+      });
 
       PipelineConfigService.getPipelinesForApplication('app');
-      $scope.$digest();
-      $http.flush();
+      await http.flush();
 
-      expect(posted).toEqual([
-        { name: 'first', index: 0 },
-        { name: 'duplicateIndex', index: 2 },
-        { name: 'last', index: 3 },
-      ]);
+      expect(posted.length).toEqual(3);
+      expect(posted[0]).toEqual(jasmine.objectContaining({ name: 'first', index: 0 }));
+      expect(posted[1]).toEqual(jasmine.objectContaining({ name: 'duplicateIndex', index: 2 }));
+      expect(posted[2]).toEqual(jasmine.objectContaining({ name: 'last', index: 3 }));
     });
   });
 

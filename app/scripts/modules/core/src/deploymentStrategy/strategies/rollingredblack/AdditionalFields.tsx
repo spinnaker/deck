@@ -1,12 +1,12 @@
+import { set } from 'lodash';
 import React from 'react';
 
-import { IDeploymentStrategyAdditionalFieldsProps } from '../../deploymentStrategy.registry';
 import { HelpField } from 'core/help/HelpField';
 import { NgReact } from 'core/reactShims';
 import { IServerGroupCommand } from 'core/serverGroup';
 
 import { PipelineSelector } from '../PipelineSelector';
-import { set } from 'lodash';
+import { IDeploymentStrategyAdditionalFieldsProps } from '../../deploymentStrategy.registry';
 
 export interface IRollingRedBlackCommand extends IServerGroupCommand {
   delayBeforeDisableSec: string;
@@ -82,7 +82,7 @@ export class AdditionalFields extends React.Component<IRollingRedBlackStrategyAd
               min="0"
               type="number"
               value={command.delayBeforeScaleDownSec}
-              onChange={e => this.handleChange('delayBeforeScaleDownSec', e.target.value)}
+              onChange={(e) => this.handleChange('delayBeforeScaleDownSec', e.target.value)}
               placeholder="0"
             />
             seconds

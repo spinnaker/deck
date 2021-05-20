@@ -4,6 +4,7 @@ import { react2angular } from 'react2angular';
 import { CACHE_INITIALIZER_SERVICE } from 'core/cache/cacheInitializer.service';
 import { OVERRIDE_REGISTRY } from 'core/overrideRegistry/override.registry';
 import { PAGE_TITLE_SERVICE } from 'core/pageTitle/pageTitle.service';
+import { withErrorBoundary } from 'core/presentation/SpinErrorBoundary';
 
 import { SearchV2 } from './SearchV2';
 
@@ -12,4 +13,4 @@ module(SEARCH_INFRASTRUCTURE_V2_CONTROLLER, [
   PAGE_TITLE_SERVICE,
   CACHE_INITIALIZER_SERVICE,
   OVERRIDE_REGISTRY,
-]).component('infrastructureSearchV2', react2angular(SearchV2));
+]).component('infrastructureSearchV2', react2angular(withErrorBoundary(SearchV2, 'infrastructureSearchV2')));

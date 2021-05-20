@@ -1,12 +1,13 @@
 import React from 'react';
 import { Modal } from 'react-bootstrap';
 
-import { TaskMonitor, TaskReason, UserVerification } from 'core/task';
-import { IModalComponentProps, Markdown } from 'core/presentation';
-import { NgReact } from 'core/reactShims';
-import { MultiTaskMonitor } from 'core/task/monitor/MultiTaskMonitor';
-import { ModalClose } from 'core/modal';
 import { PlatformHealthOverride } from 'core/application/modal/PlatformHealthOverride';
+import { ModalClose } from 'core/modal';
+import { IModalComponentProps, Markdown, useEscapeKeyPressed } from 'core/presentation';
+import { NgReact } from 'core/reactShims';
+import { TaskMonitor, TaskReason, UserVerification } from 'core/task';
+import { MultiTaskMonitor } from 'core/task/monitor/MultiTaskMonitor';
+
 import { IConfirmationModalPassthroughProps } from './confirmationModal.service';
 
 export interface IConfirmModalProps extends IModalComponentProps, IConfirmationModalPassthroughProps {
@@ -25,6 +26,8 @@ export const ConfirmModal = (props: IConfirmModalProps) => {
 
   const [reason, setReason] = useState<string>();
   const [interestingHealthProviderNames, setInterestingHealthProviderNames] = useState<string[]>();
+
+  useEscapeKeyPressed(() => dismissModal());
 
   useEffect(() => {
     if (taskMonitor && !taskMonitor.modalInstance) {
@@ -55,7 +58,7 @@ export const ConfirmModal = (props: IConfirmModalProps) => {
     }
     setIsSubmitting(true);
     if (taskMonitors) {
-      taskMonitors.forEach(m => m.callPreconfiguredSubmit({ reason }));
+      taskMonitors.forEach((m) => m.callPreconfiguredSubmit({ reason }));
     } else if (taskMonitor) {
       taskMonitor.submit(() => {
         return submitMethod({
@@ -64,7 +67,7 @@ export const ConfirmModal = (props: IConfirmModalProps) => {
         });
       });
     } else if (submitJustWithReason) {
-      submitMethod({ reason }).then(closeModal);
+      submitMethod({ reason }).then(closeModal, showError);
     } else {
       if (submitMethod) {
         submitMethod().then(closeModal, showError);

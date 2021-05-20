@@ -1,11 +1,9 @@
-import React from 'react';
-import { IPromise } from 'angular';
 import { $q } from 'ngimport';
-import { ReactSelectProps, HandlerRendererResult, MenuRendererProps, Option, OptionValues } from 'react-select';
-import { Subject, Observable, BehaviorSubject } from 'rxjs';
+import React from 'react';
+import { HandlerRendererResult, MenuRendererProps, Option, OptionValues, ReactSelectProps } from 'react-select';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 
 import { Application, HelpField, TetheredSelect, ValidationMessage } from '@spinnaker/core';
-
 import { AwsImageReader, IAmazonImage } from 'amazon/image';
 
 export interface IAmazonImageSelectorProps {
@@ -57,7 +55,7 @@ export class AmazonImageSelectInput extends React.Component<IAmazonImageSelector
     return { imageName, amis, attributes } as IAmazonImage;
   }
 
-  private loadImagesFromApplicationName(application: Application): IPromise<IAmazonImage[]> {
+  private loadImagesFromApplicationName(application: Application): PromiseLike<IAmazonImage[]> {
     const query = application.name.replace(/_/g, '[_\\-]') + '*';
     return this.awsImageReader.findImages({ q: query });
   }
@@ -75,11 +73,11 @@ export class AmazonImageSelectInput extends React.Component<IAmazonImageSelector
     return tooShort ? null : packageBase + (addDashToQuery ? '-*' : '*');
   }
 
-  private loadImageById(imageId: string, region: string, credentials: string): IPromise<IAmazonImage> {
+  private loadImageById(imageId: string, region: string, credentials: string): PromiseLike<IAmazonImage> {
     return !imageId ? $q.when(null) : this.awsImageReader.getImage(imageId, region, credentials).catch(() => null);
   }
 
-  private searchForImages(query: string): IPromise<IAmazonImage[]> {
+  private searchForImages(query: string): PromiseLike<IAmazonImage[]> {
     const hasMinLength = query && query.length >= 3;
     return hasMinLength ? this.awsImageReader.findImages({ q: query }) : $q.when([]);
   }
@@ -89,16 +87,16 @@ export class AmazonImageSelectInput extends React.Component<IAmazonImageSelector
     region: string,
     credentials: string,
     application: Application,
-  ): IPromise<IAmazonImage[]> {
+  ): PromiseLike<IAmazonImage[]> {
     const imageId = value && value.amis && value.amis[region] && value.amis[region][0];
 
-    return this.loadImageById(imageId, region, credentials).then(image => {
+    return this.loadImageById(imageId, region, credentials).then((image) => {
       if (!image) {
         return this.loadImagesFromApplicationName(application);
       }
 
-      return this.searchForImages(this.buildQueryForSimilarImages(image.imageName)).then(similarImages => {
-        if (!similarImages.find(img => img.imageName === image.imageName)) {
+      return this.searchForImages(this.buildQueryForSimilarImages(image.imageName)).then((similarImages) => {
+        if (!similarImages.find((img) => img.imageName === image.imageName)) {
           // findImages has a limit of 1000 and may not always include the current image, which is confusing
           return similarImages.concat(image);
         }
@@ -114,18 +112,18 @@ export class AmazonImageSelectInput extends React.Component<IAmazonImageSelector
   }
 
   private findMatchingImage(images: IAmazonImage[], selectedImage: IAmazonImage) {
-    return images.find(img => selectedImage && selectedImage.imageName === img.imageName);
+    return images.find((img) => selectedImage && selectedImage.imageName === img.imageName);
   }
 
   public componentDidMount() {
-    const region$ = this.props$.map(x => x.region).distinctUntilChanged();
+    const region$ = this.props$.map((x) => x.region).distinctUntilChanged();
     const { value, region, credentials, application } = this.props;
 
     this.setState({ isLoadingPackageImages: true });
     const fetchPromise = this.fetchPackageImages(value, region, credentials, application);
 
     const packageImages$ = Observable.fromPromise(fetchPromise)
-      .catch(err => {
+      .catch((err) => {
         console.error(err);
         this.setState({ errorMessage: 'Unable to load package images' });
         return Observable.of([] as IAmazonImage[]);
@@ -135,19 +133,19 @@ export class AmazonImageSelectInput extends React.Component<IAmazonImageSelector
     const packageImagesInRegion$ = packageImages$
       .combineLatest(region$, this.sortImagesBy$)
       .map(([packageImages, latestRegion, sortImagesBy]) => {
-        const images = packageImages.filter(img => !!img.amis[latestRegion]);
+        const images = packageImages.filter((img) => !!img.amis[latestRegion]);
         return this.sortImages(images, sortImagesBy);
       });
 
     const searchString$ = this.searchInput$
-      .do(searchString => this.setState({ searchString }))
+      .do((searchString) => this.setState({ searchString }))
       .distinctUntilChanged()
       .debounceTime(250);
 
     const searchImages$ = searchString$
       .do(() => this.setState({ isSearching: true }))
-      .switchMap(searchString => this.searchForImages(searchString))
-      .catch(err => {
+      .switchMap((searchString) => this.searchForImages(searchString))
+      .catch((err) => {
         console.error(err);
         this.setState({ errorMessage: 'Unable to search for images' });
         return Observable.of([] as IAmazonImage[]);
@@ -161,27 +159,27 @@ export class AmazonImageSelectInput extends React.Component<IAmazonImageSelector
         // allow 'advanced' users to continue with just an ami id (backing image may not have been indexed yet)
         if (searchResults.length === 0 && !!/ami-[0-9a-f]{8,17}/.exec(searchString)) {
           const fakeImage = AmazonImageSelectInput.makeFakeImage(searchString, searchString, latestRegion);
-          return [fakeImage].filter(x => !!x);
+          return [fakeImage].filter((x) => !!x);
         }
 
         // Filter down to only images which have an ami in the currently selected region
-        const images = searchResults.filter(img => !!img.amis[latestRegion]);
+        const images = searchResults.filter((img) => !!img.amis[latestRegion]);
         return this.sortImages(images, sortImagesBy);
       });
 
-    searchImagesInRegion$.takeUntil(this.destroy$).subscribe(searchResults => this.setState({ searchResults }));
-    packageImagesInRegion$.takeUntil(this.destroy$).subscribe(packageImages => {
+    searchImagesInRegion$.takeUntil(this.destroy$).subscribe((searchResults) => this.setState({ searchResults }));
+    packageImagesInRegion$.takeUntil(this.destroy$).subscribe((packageImages) => {
       this.setState({ packageImages });
       this.selectImage(this.findMatchingImage(packageImages, this.props.value));
     });
 
     // Clear out the selected image if the region changes and the image is not found in the new region
     region$
-      .switchMap(selectedRegion => {
+      .switchMap((selectedRegion) => {
         const image = this.props.value;
         if (this.state.selectionMode === 'packageImages') {
           // in packageImages mode, wait for the packageImages to load then find the matching one, or undefined
-          return packageImagesInRegion$.map(images => this.findMatchingImage(images, image));
+          return packageImagesInRegion$.map((images) => this.findMatchingImage(images, image));
         } else {
           // in searchImages mode, return undefined if the selected image is not found in the new region
           const hasAmiInRegion = !!(image && image.amis && image.amis[selectedRegion]);
@@ -189,7 +187,7 @@ export class AmazonImageSelectInput extends React.Component<IAmazonImageSelector
         }
       })
       .takeUntil(this.destroy$)
-      .subscribe(image => this.selectImage(image));
+      .subscribe((image) => this.selectImage(image));
   }
 
   private setSortImagesBy(sortImagesBy: sortImagesByOptions) {
@@ -203,7 +201,7 @@ export class AmazonImageSelectInput extends React.Component<IAmazonImageSelector
       <div className="Select-menu-outer">
         <div className="Select-menu" role="listbox">
           {options.length > 0 && <ImageMenuHeading />}
-          {options.map(o => (
+          {options.map((o) => (
             <ImageLabel key={o.imageName} option={o} params={params} />
           ))}
         </div>
@@ -343,7 +341,7 @@ export class AmazonImageSelectInput extends React.Component<IAmazonImageSelector
             filterOptions={false as any}
             noResultsText={searchNoResultsText}
             options={searchResults}
-            onInputChange={searchInput => {
+            onInputChange={(searchInput) => {
               this.searchInput$.next(searchInput);
               return searchInput;
             }}
@@ -380,7 +378,7 @@ export class AmazonImageSelectInput extends React.Component<IAmazonImageSelector
             {...commonReactSelectProps}
             isLoading={isLoadingPackageImages}
             disabled={true}
-            options={[value].filter(x => !!x)}
+            options={[value].filter((x) => !!x)}
           />
           {error}
           <button type="button" className="link" onClick={() => this.setState({ selectionMode: 'searchAllImages' })}>

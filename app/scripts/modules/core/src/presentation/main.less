@@ -49,12 +49,6 @@ body {
   padding-right: 15px;
 }
 
-.container {
-  @media (min-width: 1400px) {
-    width: 1370px;
-  }
-}
-
 /* Custom page header */
 .header {
   border-bottom: 1px solid var(--color-seashell);
@@ -146,6 +140,7 @@ html {
   .main-content {
     width: 100%;
     overflow-x: visible;
+    height: 100%;
 
     display: flex;
     flex-direction: column;
@@ -159,6 +154,7 @@ html {
       overflow-y: auto;
     }
   }
+
   .filters-content {
     overflow-x: hidden;
     @media (min-width: 708px) and (max-width: 992px) {
@@ -192,9 +188,6 @@ html {
     .collapse-margin-on-filter-collapse {
       margin-left: 0;
     }
-    .dl-flex {
-      .dl-wide;
-    }
     .horizontal-when-filters-collapsed {
       .dl-horizontal;
       .dl-wide;
@@ -208,25 +201,21 @@ html {
         width: 260px;
       }
     }
+
+    .main-content {
+      > .header {
+        margin-left: 68px;
+      }
+    }
+
+    .nav-content {
+      > .header {
+        margin-left: 80px;
+      }
+    }
   }
+
   &.filters-expanded {
-    .detail-content {
-      @media (min-width: 768px) and (max-width: 992px) {
-        width: 180px;
-      }
-      @media (min-width: 992px) {
-        width: 210px;
-      }
-      @media (min-width: 1200px) {
-        width: 230px;
-      }
-      @media (min-width: 1400px) {
-        width: 310px;
-      }
-    }
-    .dl-flex {
-      .dl-narrow;
-    }
     .nav {
       .content {
         padding-bottom: 20px;
@@ -237,19 +226,36 @@ html {
         width: inherit;
         display: block;
       }
+
+      ::-webkit-scrollbar {
+        background: transparent;
+        width: 0;
+      }
+
       @media (min-width: 768px) and (max-width: 992px) {
-        width: 180px;
+        width: 104px;
       }
 
       @media (min-width: 992px) {
-        width: 200px;
+        width: 124px;
       }
       @media (min-width: 1200px) {
-        width: 230px;
+        width: 154px;
       }
       @media (min-width: 1400px) {
-        width: 260px;
+        width: 184px;
       }
+      @media (min-width: 1600px) {
+        width: 214px;
+      }
+      @media (min-width: 1800px) {
+        width: 234px;
+      }
+
+      @media (min-width: 2000px) {
+        width: 254px;
+      }
+
       .filters-placeholder {
         display: none;
       }
@@ -258,15 +264,8 @@ html {
   .nav {
     overflow-x: hidden;
     position: relative;
-    width: 39px;
     padding-top: 5px;
-    .pin,
-    .unpin {
-      position: absolute;
-      right: 7px;
-      top: 5px;
-      padding: 1px 3px;
-    }
+
     .pin {
       padding-left: 5px;
     }
@@ -278,90 +277,82 @@ html {
       margin: 10px;
     }
     .filters-placeholder {
-      margin-top: 20px;
       font-size: 120%;
     }
+    .insight-filter-content {
+      width: 100%;
+    }
   }
+
   .detail-content {
-    overflow: visible;
-    margin: 0;
-    @media (max-width: 768px) {
-      top: 170px;
-      width: 95%;
+    z-index: var(--layer-high);
+    position: absolute;
+    margin-top: -20px;
+    height: 100%;
+    width: 390px;
+    box-shadow: 2px 2px 6px -1px var(--color-alto);
+    right: 0;
+    overflow-y: hidden;
+
+    @media (max-width: 390px) {
+      width: 100%;
     }
 
-    @media (min-width: 768px) and (max-width: 992px) {
-      top: 190px;
-      width: 250px;
-    }
-
-    @media (min-width: 992px) {
-      width: 330px;
-    }
-    @media (min-width: 1200px) {
-      width: 390px;
-    }
-    @media (min-width: 1400px) {
-      width: 530px;
-    }
     react-ui-view-adapter {
       width: 100%;
       overflow-x: visible !important;
     }
   }
   .nav-content {
-    margin: 0 25px;
-    @media (max-width: 768px) {
-      width: 70%;
-    }
+    margin-right: 25px;
+  }
 
-    @media (min-width: 768px) and (max-width: 992px) {
-      width: 450px;
-    }
-
-    @media (min-width: 992px) {
-      width: 540px;
-    }
-    @media (min-width: 1200px) {
-      width: 630px;
-    }
-    @media (min-width: 1400px) {
-      width: 720px;
+  &.details-closed {
+    .nav-content {
+      max-width: 100%;
     }
   }
+
+  &.details-open.filters-collapsed.nav-collapsed {
+    .nav-content {
+      max-width: calc(~'100% - 390px');
+      @media (max-width: 1170px) {
+        max-width: 100%;
+      }
+    }
+  }
+
+  &.details-open.filters-expanded.nav-collapsed {
+    .nav-content {
+      max-width: calc(~'100% - 390px');
+      @media (max-width: 1340px) {
+        max-width: 100%;
+      }
+    }
+  }
+
+  &.details-open.filters-collapsed.nav-expanded {
+    .nav-content {
+      max-width: calc(~'100% - 390px');
+      @media (max-width: 1410px) {
+        max-width: 100%;
+      }
+    }
+  }
+
+  &.details-open.filters-expanded.nav-expanded {
+    .nav-content {
+      max-width: calc(~'100% - 390px');
+      @media (max-width: 1580px) {
+        max-width: 100%;
+      }
+    }
+  }
+
   .full-content {
     margin: 0 25px;
     flex-direction: column;
     width: 100%;
-    @media (max-width: 768px) {
-      width: 90%;
-    }
-
-    @media (min-width: 768px) and (max-width: 992px) {
-      width: 770px;
-      &.filters-expanded {
-        width: 650px;
-      }
-    }
-
-    @media (min-width: 992px) {
-      width: 900px;
-      &.filters-expanded {
-        width: 730px;
-      }
-    }
-    @media (min-width: 1200px) {
-      width: 1090px;
-      &.filters-expanded {
-        width: 900px;
-      }
-    }
-    @media (min-width: 1400px) {
-      width: 1290px;
-      &.filters-expanded {
-        width: 1070px;
-      }
-    }
   }
 }
 
@@ -400,6 +391,13 @@ html {
     float: right;
     margin-top: -15px;
     margin-right: -10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+
     a {
       padding: 0;
       font-size: 125%;
@@ -522,6 +520,8 @@ dl {
 
 .tooltip-inner {
   overflow-wrap: break-word;
+  max-width: 350px;
+  text-align: left;
   p:last-child {
     margin-bottom: 0;
   }
@@ -558,6 +558,10 @@ body > .container {
 .navbar-inverse {
   background-color: var(--color-primary);
   border: none;
+
+  .container {
+    padding: 0;
+  }
 
   .navbar-brand {
     color: var(--color-white);
@@ -652,7 +656,7 @@ body > .container {
 
 .form-control {
   &.inline-number {
-    width: 60px;
+    width: 100px;
     display: inline-block;
   }
   &.inline-text {
@@ -683,6 +687,11 @@ body > .container {
       background: var(--color-silver);
     }
   }
+}
+
+/* This class is used to override the uibModal default z-index value of 1050 */
+.modal-z-index {
+  z-index: var(--layer-critical) !important;
 }
 
 .modal-pages {
@@ -963,7 +972,7 @@ select:invalid {
     }
   }
   padding: 0;
-  border-bottom: 1px solid var(--color-silver);
+  border-top: 1px solid var(--color-silver);
 
   &:last-child {
     border-bottom-width: 0;
@@ -977,15 +986,31 @@ select:invalid {
 .collapsible-filter-section {
   a.section-heading {
     color: var(--color-black);
+    text-decoration: none;
   }
+
   h4 {
-    padding: 10px 5px 0;
-    background-color: var(--color-cirrus);
+    padding: 10px 5px;
     margin: 0;
+    display: flex;
+    align-items: center;
+
     .glyphicon {
       font-size: 13px;
-      opacity: 0.7;
       margin-right: 4px;
+      margin-left: auto;
+    }
+
+    .arrow {
+      visibility: hidden;
+    }
+
+    &:hover {
+      background-color: var(--color-accent-g3);
+      .arrow {
+        visibility: visible;
+        text-decoration: none;
+      }
     }
     font-weight: 600;
     text-transform: uppercase;
@@ -994,7 +1019,7 @@ select:invalid {
   .content-body {
     .fade-in(0.15);
     .clearfix;
-    padding-left: 25px;
+    padding-left: 4px;
     ul {
       list-style-type: none;
       padding-left: 0;
@@ -1082,7 +1107,6 @@ div.text-only {
 
 textarea.code {
   font-family: monospace;
-  font-size: 80%;
   width: 100%;
 }
 
@@ -1099,6 +1123,11 @@ textarea.code {
   }
 }
 
+.modal-open {
+  .modal {
+    z-index: var(--layer-critical) !important;
+  }
+}
 // Works around Chrome 59 bug regarding: transform + box-shadow + position: sticky
 // This is apparently fixed in Chrome 61
 .modal.in .modal-dialog {
@@ -1106,6 +1135,7 @@ textarea.code {
 }
 
 .modal-backdrop {
+  z-index: 9500 !important;
   &.modal-backdrop-no-animate {
     background-color: var(--color-alabaster);
     transition: none;
@@ -1193,7 +1223,7 @@ html {
   @media (min-width: 768px) and (max-width: 1200px) {
     .container {
       width: 100%;
-      padding: 0 10px;
+      padding: 0;
     }
   }
   width: 100%;
@@ -1207,7 +1237,7 @@ html {
     overflow-y: auto;
     flex-direction: column;
     align-items: stretch;
-    > [ui-view='main'] {
+    > [name='main'] {
       display: flex;
       flex-direction: column;
       flex: 1 1 auto;
@@ -1226,6 +1256,8 @@ html {
       display: flex;
       overflow-y: hidden;
       padding-top: 20px;
+      padding-left: 15px;
+
       > div {
         display: flex;
         flex: 1 1 auto;
@@ -1233,7 +1265,7 @@ html {
       }
       .insight {
         display: flex;
-        flex: 0 0 auto;
+        flex: 1;
         margin-left: 0;
         > div {
           display: flex;
@@ -1411,6 +1443,7 @@ ul.checkmap {
 // duplicated from bootstrap core
 // needed to render components in dropdowns correctly
 .dropdown-menu {
+  z-index: var(--layer-critical);
   li {
     > a {
       display: block;
@@ -1502,8 +1535,8 @@ div.modal-header.has-sticky-headers {
   background-color: var(--color-white);
   margin: 0;
   border-top: 1px solid var(--color-alto);
-  .col-md-9,
-  .col-md-3 {
+  .fixed-footer-button {
     padding: 0;
+    margin-left: auto;
   }
 }

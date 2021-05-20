@@ -1,11 +1,11 @@
-import React from 'react';
 import { UISref } from '@uirouter/react';
 import { UIRouterContext } from '@uirouter/react-hybrid';
+import React from 'react';
 
-import { ISearchResult } from './SearchResultPods';
 import { Tooltip } from 'core/presentation';
 
 import { SearchResult } from './SearchResult';
+import { ISearchResult } from './SearchResultPods';
 
 export interface ISearchResultPodItemProps {
   categoryName: string;
@@ -42,7 +42,7 @@ export class SearchResultPodItem extends React.Component<ISearchResultPodItemPro
             {showRemoveButton && (
               <span
                 className="small clickable remove-result-link"
-                onClick={evt => this.handleRemoveClicked(evt, categoryName, result.id)}
+                onClick={(evt) => this.handleRemoveClicked(evt, categoryName, result.id)}
               >
                 <Tooltip value="remove from history" placement="left" delayShow={300}>
                   <span className="glyphicon glyphicon-remove" />

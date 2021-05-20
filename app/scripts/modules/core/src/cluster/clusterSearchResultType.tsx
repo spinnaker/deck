@@ -1,28 +1,27 @@
-import React from 'react';
 import { uniqBy } from 'lodash';
+import React from 'react';
 import { Observable } from 'rxjs';
 
 import { IQueryParams } from 'core/navigation';
 import { ReactInjector } from 'core/reactShims';
 import { Registry } from 'core/registry';
-import { IServerGroupSearchResult } from 'core/serverGroup/serverGroupSearchResultType';
-
 import {
-  searchResultTypeRegistry,
   AccountCell,
+  DefaultSearchResultTab,
+  HeaderCell,
   HrefCell,
   ISearchColumn,
-  DefaultSearchResultTab,
-  SearchStatus,
-  HeaderCell,
-  TableBody,
-  TableHeader,
-  TableRow,
   ISearchResult,
-  SearchResultType,
-  ISearchResultSet,
   ISearchResults,
+  ISearchResultSet,
+  SearchResultType,
+  searchResultTypeRegistry,
+  SearchStatus,
+  SearchTableBody,
+  SearchTableHeader,
+  SearchTableRow,
 } from 'core/search';
+import { IServerGroupSearchResult } from 'core/serverGroup/serverGroupSearchResultType';
 
 export interface IClusterSearchResult extends ISearchResult {
   account: string;
@@ -45,10 +44,10 @@ class ClustersSearchResultType extends SearchResultType<IClusterSearchResult> {
   public TabComponent = DefaultSearchResultTab;
 
   public HeaderComponent = () => (
-    <TableHeader>
+    <SearchTableHeader>
       <HeaderCell col={this.cols.CLUSTER} />
       <HeaderCell col={this.cols.ACCOUNT} />
-    </TableHeader>
+    </SearchTableHeader>
   );
 
   public DataComponent = ({ resultSet }: { resultSet: ISearchResultSet<IClusterSearchResult> }) => {
@@ -57,14 +56,14 @@ class ClustersSearchResultType extends SearchResultType<IClusterSearchResult> {
     const results = resultSet.results.slice().sort(itemSortFn);
 
     return (
-      <TableBody>
-        {results.map(item => (
-          <TableRow key={itemKeyFn(item)}>
+      <SearchTableBody>
+        {results.map((item) => (
+          <SearchTableRow key={itemKeyFn(item)}>
             <HrefCell item={item} col={this.cols.CLUSTER} />
             <AccountCell item={item} col={this.cols.ACCOUNT} />
-          </TableRow>
+          </SearchTableRow>
         ))}
-      </TableBody>
+      </SearchTableBody>
     );
   };
 
@@ -84,7 +83,7 @@ class ClustersSearchResultType extends SearchResultType<IClusterSearchResult> {
     otherResults: Observable<ISearchResultSet>,
   ): Observable<ISearchResults<IClusterSearchResult>> {
     return otherResults
-      .filter(resultSet => resultSet.type.id === 'serverGroups')
+      .filter((resultSet) => resultSet.type.id === 'serverGroups')
       .first()
       .map((resultSet: ISearchResultSet) => {
         const { status, results, error } = resultSet;
@@ -93,8 +92,8 @@ class ClustersSearchResultType extends SearchResultType<IClusterSearchResult> {
         }
 
         const serverGroups = results as IServerGroupSearchResult[];
-        const searchResults = serverGroups.map(sg => this.makeSearchResult(sg));
-        const clusters: IClusterSearchResult[] = uniqBy(searchResults, sg => `${sg.account}-${sg.cluster}`);
+        const searchResults = serverGroups.map((sg) => this.makeSearchResult(sg));
+        const clusters: IClusterSearchResult[] = uniqBy(searchResults, (sg) => `${sg.account}-${sg.cluster}`);
         return { results: clusters };
       });
   }

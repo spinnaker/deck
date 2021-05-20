@@ -1,35 +1,34 @@
-import { IPromise, module } from 'angular';
-import { chain, flatten, intersection, xor, cloneDeep } from 'lodash';
+import { module } from 'angular';
+import { chain, cloneDeep, flatten, intersection, xor } from 'lodash';
 import { $q } from 'ngimport';
 import { Subject } from 'rxjs';
 
-import {
-  AccountService,
-  Application,
-  IServerGroupCommand,
-  IServerGroupCommandViewState,
-  IDeploymentStrategy,
-  IServerGroupCommandBackingData,
-  CacheInitializerService,
-  CACHE_INITIALIZER_SERVICE,
-  LoadBalancerReader,
-  LOAD_BALANCER_READ_SERVICE,
-  ICluster,
-  IAccountDetails,
-  SECURITY_GROUP_READER,
-  SecurityGroupReader,
-  IVpc,
-  ISecurityGroup,
-  NameUtils,
-  setMatchingResourceSummary,
-} from '@spinnaker/core';
 import {
   IAmazonApplicationLoadBalancer,
   IAmazonLoadBalancer,
   IAmazonServerGroupCommandDirty,
   VpcReader,
 } from '@spinnaker/amazon';
-
+import {
+  AccountService,
+  Application,
+  CACHE_INITIALIZER_SERVICE,
+  CacheInitializerService,
+  IAccountDetails,
+  ICluster,
+  IDeploymentStrategy,
+  ISecurityGroup,
+  IServerGroupCommand,
+  IServerGroupCommandBackingData,
+  IServerGroupCommandViewState,
+  IVpc,
+  LOAD_BALANCER_READ_SERVICE,
+  LoadBalancerReader,
+  NameUtils,
+  SECURITY_GROUP_READER,
+  SecurityGroupReader,
+  setMatchingResourceSummary,
+} from '@spinnaker/core';
 import { IJobDisruptionBudget, ITitusResources } from 'titus/domain';
 import { ITitusServiceJobProcesses } from 'titus/domain/ITitusServiceJobProcesses';
 
@@ -43,6 +42,7 @@ export interface ITitusServerGroupCommandViewState extends IServerGroupCommandVi
   regionChangedStream: Subject<{}>;
   groupsRemovedStream: Subject<{}>;
   dirty: IAmazonServerGroupCommandDirty;
+  defaultIamProfile: string;
 }
 
 export const defaultJobDisruptionBudget: IJobDisruptionBudget = {
@@ -97,6 +97,7 @@ export interface ITitusServerGroupCommand extends IServerGroupCommand {
   labels: { [key: string]: string };
   containerAttributes: { [key: string]: string };
   env: { [key: string]: string };
+  iamProfile: string;
   migrationPolicy: {
     type: string;
   };
@@ -127,7 +128,7 @@ export class TitusServerGroupConfigurationService {
       if (command.credentials) {
         command.registry = (backingData.credentialsKeyedByAccount[command.credentials] as any).registry;
         backingData.filtered.regions = backingData.credentialsKeyedByAccount[command.credentials].regions;
-        if (!backingData.filtered.regions.some(r => r.name === command.region)) {
+        if (!backingData.filtered.regions.some((r) => r.name === command.region)) {
           command.region = null;
           command.regionChanged(command);
         }
@@ -167,24 +168,30 @@ export class TitusServerGroupConfigurationService {
     };
     cmd.image = cmd.viewState.imageId;
     return $q
-      .all({
-        credentialsKeyedByAccount: AccountService.getCredentialsKeyedByAccount('titus'),
-        securityGroups: this.securityGroupReader.getAllSecurityGroups(),
-        vpcs: VpcReader.listVpcs(),
-        images: [],
-      })
-      .then((backingData: any) => {
-        backingData.accounts = Object.keys(backingData.credentialsKeyedByAccount);
+      .all([
+        AccountService.getCredentialsKeyedByAccount('titus'),
+        this.securityGroupReader.getAllSecurityGroups(),
+        VpcReader.listVpcs(),
+      ])
+      .then(([credentialsKeyedByAccount, securityGroups, vpcs]) => {
+        const backingData: any = {
+          credentialsKeyedByAccount,
+          securityGroups,
+          vpcs,
+        };
+        backingData.images = [];
+        backingData.accounts = Object.keys(credentialsKeyedByAccount);
         backingData.filtered = {};
         if (cmd.credentials.includes('${')) {
           // If our dependency is an expression, the only thing we can really do is to just preserve current selections
           backingData.filtered.regions = [{ name: cmd.region }];
         } else {
-          backingData.filtered.regions = (backingData.credentialsKeyedByAccount[cmd.credentials] || []).regions || [];
+          backingData.filtered.regions = credentialsKeyedByAccount[cmd.credentials]?.regions ?? [];
         }
         cmd.backingData = backingData;
         backingData.filtered.securityGroups = this.getRegionalSecurityGroups(cmd);
-        let securityGroupRefresher = $q.when();
+
+        let securityGroupRefresher: PromiseLike<any> = $q.when();
         if (cmd.securityGroups && cmd.securityGroups.length) {
           const regionalSecurityGroupIds = backingData.filtered.securityGroups.map((g: ISecurityGroup) => g.id);
           if (intersection(cmd.securityGroups, regionalSecurityGroupIds).length < cmd.securityGroups.length) {
@@ -201,7 +208,7 @@ export class TitusServerGroupConfigurationService {
   private getVpcId(command: ITitusServerGroupCommand): string {
     const credentials = this.getCredentials(command);
     const match = command.backingData.vpcs.find(
-      vpc =>
+      (vpc) =>
         vpc.name === credentials.awsVpc &&
         vpc.account === credentials.awsAccount &&
         vpc.region === this.getRegion(command) &&
@@ -220,9 +227,9 @@ export class TitusServerGroupConfigurationService {
 
   private configureSecurityGroupOptions(command: ITitusServerGroupCommand): void {
     const currentOptions = command.backingData.filtered.securityGroups;
-    if (command.credentials.includes('${') || command.region.includes('${')) {
+    if (command.credentials.includes('${') || (command.region && command.region.includes('${'))) {
       // If any of our dependencies are expressions, the only thing we can do is preserve current values
-      command.backingData.filtered.securityGroups = command.securityGroups.map(group => ({ name: group, id: group }));
+      command.backingData.filtered.securityGroups = command.securityGroups.map((group) => ({ name: group, id: group }));
     } else {
       const newRegionalSecurityGroups = this.getRegionalSecurityGroups(command);
       const isExpression =
@@ -230,21 +237,21 @@ export class TitusServerGroupConfigurationService {
       if (currentOptions && command.securityGroups && !isExpression) {
         // not initializing - we are actually changing groups
         const currentGroupNames: string[] = command.securityGroups.map((groupId: string) => {
-          const match = currentOptions.find(o => o.id === groupId);
+          const match = currentOptions.find((o) => o.id === groupId);
           return match ? match.name : groupId;
         });
 
         const matchedGroups = command.securityGroups
           .map((groupId: string) => {
-            const securityGroup: any = currentOptions.find(o => o.id === groupId || o.name === groupId);
+            const securityGroup: any = currentOptions.find((o) => o.id === groupId || o.name === groupId);
             return securityGroup ? securityGroup.name : null;
           })
-          .map((groupName: string) => newRegionalSecurityGroups.find(g => g.name === groupName))
+          .map((groupName: string) => newRegionalSecurityGroups.find((g) => g.name === groupName))
           .filter((group: any) => group);
 
-        const matchedGroupNames: string[] = matchedGroups.map(g => g.name);
+        const matchedGroupNames: string[] = matchedGroups.map((g) => g.name);
         const removed: string[] = xor(currentGroupNames, matchedGroupNames);
-        command.securityGroups = matchedGroups.map(g => g.id);
+        command.securityGroups = matchedGroups.map((g) => g.id);
         if (removed.length) {
           command.viewState.dirty.securityGroups = removed;
         }
@@ -261,7 +268,10 @@ export class TitusServerGroupConfigurationService {
     }
   }
 
-  public refreshSecurityGroups(command: ITitusServerGroupCommand, skipCommandReconfiguration: boolean): IPromise<void> {
+  public refreshSecurityGroups(
+    command: ITitusServerGroupCommand,
+    skipCommandReconfiguration: boolean,
+  ): PromiseLike<void> {
     return this.cacheInitializer.refreshCache('securityGroups').then(() => {
       return this.securityGroupReader.getAllSecurityGroups().then((securityGroups: any) => {
         command.backingData.securityGroups = securityGroups;
@@ -286,12 +296,12 @@ export class TitusServerGroupConfigurationService {
 
   public getTargetGroupNames(command: ITitusServerGroupCommand): string[] {
     const loadBalancersV2 = this.getLoadBalancerMap(command).filter(
-      lb => lb.loadBalancerType !== 'classic',
+      (lb) => lb.loadBalancerType !== 'classic',
     ) as IAmazonApplicationLoadBalancer[];
     const instanceTargetGroups = flatten(
-      loadBalancersV2.map<any>(lb => lb.targetGroups.filter(tg => tg.targetType === 'ip')),
+      loadBalancersV2.map<any>((lb) => lb.targetGroups.filter((tg) => tg.targetType === 'ip')),
     );
-    return instanceTargetGroups.map(tg => tg.name).sort();
+    return instanceTargetGroups.map((tg) => tg.name).sort();
   }
 
   private getLoadBalancerMap(command: ITitusServerGroupCommand): IAmazonLoadBalancer[] {
@@ -309,7 +319,7 @@ export class TitusServerGroupConfigurationService {
 
   public configureLoadBalancerOptions(command: ITitusServerGroupCommand) {
     const currentTargetGroups = command.targetGroups || [];
-    if (command.credentials.includes('${') || command.region.includes('${')) {
+    if (command.credentials.includes('${') || (command.region && command.region.includes('${'))) {
       // If any of our dependencies are expressions, the only thing we can do is preserve current values
       command.targetGroups = currentTargetGroups;
       (command.backingData.filtered as any).targetGroups = currentTargetGroups;
@@ -331,7 +341,7 @@ export class TitusServerGroupConfigurationService {
   }
 
   public refreshLoadBalancers(command: ITitusServerGroupCommand) {
-    return this.loadBalancerReader.listLoadBalancers('aws').then(loadBalancers => {
+    return this.loadBalancerReader.listLoadBalancers('aws').then((loadBalancers) => {
       command.backingData.loadBalancers = loadBalancers;
       this.configureLoadBalancerOptions(command);
     });

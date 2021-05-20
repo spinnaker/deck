@@ -16,9 +16,8 @@ export function NexusTrigger() {
       name="nexusSearchName"
       label="Nexus Name"
       touched={true}
-      fastField={false}
       validationMessage={validationMessage}
-      input={props => (
+      input={(props) => (
         <ReactSelectInput
           {...props}
           isLoading={status === 'PENDING'}

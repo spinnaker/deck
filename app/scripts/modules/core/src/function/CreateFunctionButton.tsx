@@ -3,9 +3,9 @@ import React from 'react';
 import { Application } from 'core/application';
 import { CloudProviderRegistry, ProviderSelectionService } from 'core/cloudProvider';
 import { IFunction } from 'core/domain';
-import { IFunctionUpsertCommand } from 'core/function';
-import { ReactInjector } from 'core/reactShims';
 import { IModalComponentProps, Tooltip } from 'core/presentation';
+
+import { IFunctionUpsertCommand } from './function.write.service';
 
 export interface IFunctionModalProps extends IModalComponentProps {
   className?: string;
@@ -24,19 +24,16 @@ export interface ICreateFunctionButtonProps {
 
 export class CreateFunctionButton extends React.Component<ICreateFunctionButtonProps> {
   private createFunction = (): void => {
-    const { skinSelectionService } = ReactInjector;
     const { app } = this.props;
 
-    ProviderSelectionService.selectProvider(app, 'function').then(selectedProvider => {
-      skinSelectionService.selectSkin(selectedProvider).then(selectedSkin => {
-        const provider = CloudProviderRegistry.getValue(selectedProvider, 'function', selectedSkin);
-        provider.CreateFunctionModal.show({
-          app: app,
-          application: app,
-          forPipelineConfig: false,
-          function: null,
-          isNew: true,
-        });
+    ProviderSelectionService.selectProvider(app, 'function').then((selectedProvider) => {
+      const provider = CloudProviderRegistry.getValue(selectedProvider, 'function');
+      provider.CreateFunctionModal.show({
+        app: app,
+        application: app,
+        forPipelineConfig: false,
+        function: null,
+        isNew: true,
       });
     });
   };

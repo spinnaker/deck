@@ -1,17 +1,17 @@
+import { FormikProps } from 'formik';
 import React from 'react';
 
 import {
-  IWizardPageComponent,
-  HelpField,
-  TextInput,
   FormikFormField,
   FormValidator,
+  HelpField,
+  IWizardPageComponent,
   MapEditorInput,
+  TextInput,
 } from '@spinnaker/core';
-import { FormikProps } from 'formik';
-import { IAmazonFunctionUpsertCommand } from 'amazon/index';
-import { IAmazonFunction } from 'amazon/domain';
 import { awsArnValidator } from 'amazon/aws.validators';
+import { IAmazonFunction } from 'amazon/domain';
+import { IAmazonFunctionUpsertCommand } from 'amazon/index';
 
 export interface IFunctionEnvironmentVariablesProps {
   formik: FormikProps<IAmazonFunctionUpsertCommand>;
@@ -19,14 +19,12 @@ export interface IFunctionEnvironmentVariablesProps {
   functionDef: IAmazonFunction;
 }
 
-export class FunctionEnvironmentVariables extends React.Component<IFunctionEnvironmentVariablesProps>
+export class FunctionEnvironmentVariables
+  extends React.Component<IFunctionEnvironmentVariablesProps>
   implements IWizardPageComponent<IAmazonFunctionUpsertCommand> {
   public validate = (values: IAmazonFunctionUpsertCommand) => {
     const validator = new FormValidator(values);
-    validator
-      .field('KMSKeyArn', 'KMS Key ARN')
-      .optional()
-      .withValidators(awsArnValidator);
+    validator.field('kmskeyArn', 'KMS Key ARN').optional().withValidators(awsArnValidator);
     return validator.validateForm();
   };
 
@@ -34,16 +32,15 @@ export class FunctionEnvironmentVariables extends React.Component<IFunctionEnvir
     return (
       <div className="container-fluid form-horizontal ">
         <FormikFormField
-          fastField={false}
           name="envVariables"
           label="Env Variables"
-          input={props => <MapEditorInput {...props} allowEmptyValues={true} addButtonLabel="Add" />}
+          input={(props) => <MapEditorInput {...props} allowEmptyValues={true} addButtonLabel="Add" />}
         />
         <FormikFormField
-          name="KMSKeyArn"
+          name="kmskeyArn"
           label="Key ARN"
           help={<HelpField id="aws.function.kmsKeyArn" />}
-          input={props => <TextInput {...props} />}
+          input={(props) => <TextInput {...props} />}
         />
       </div>
     );

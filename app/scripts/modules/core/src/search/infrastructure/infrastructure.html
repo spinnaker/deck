@@ -19,27 +19,7 @@
         </div>
       </h2>
       <div class="header-actions">
-        <div class="dropdown" uib-dropdown dropdown-append-to-body>
-          <button type="button" class="btn btn-default dropdown-toggle" uib-dropdown-toggle>
-            Actions <span class="caret"></span>
-          </button>
-          <ul uib-dropdown-menu class="uib-dropdown-menu">
-            <li ng-repeat="action in ctrl.menuActions">
-              <a
-                href
-                ng-if="action.disableAutoClose"
-                ng-click="action.action(status)"
-                ng-bind-html="action.displayName"
-              ></a>
-              <a
-                href
-                ng-if="!action.disableAutoClose"
-                ng-click="action.action(); status.isOpen = false"
-                ng-bind-html="action.displayName"
-              ></a>
-            </li>
-          </ul>
-        </div>
+        <search-insight-menu create-app="true" createProject="true" refresh-caches="false" />
       </div>
     </div>
   </div>
@@ -108,7 +88,7 @@
       </div>
     </div>
   </div>
-  <div ng-if="viewState.searching" class="horizontal center middle flex-1" style="margin: 25px 0; height: 100%;">
+  <div ng-if="viewState.searching" class="horizontal center middle flex-1" style="margin: 25px 0; height: 100%">
     <loading-spinner size="'large'"></loading-spinner>
   </div>
   <div ng-if="ctrl.noMatches() && !viewState.searching" class="container">

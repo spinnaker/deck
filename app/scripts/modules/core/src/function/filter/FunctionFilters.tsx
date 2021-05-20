@@ -1,12 +1,12 @@
-import React from 'react';
-import { chain, compact, debounce, uniq, map } from 'lodash';
+import { chain, compact, debounce, map, uniq } from 'lodash';
 import { $rootScope } from 'ngimport';
+import React from 'react';
 import { Subscription } from 'rxjs';
 
 import { Application } from 'core/application';
-import { CloudProviderLabel, CloudProviderLogo } from 'core/cloudProvider';
-import { FilterCollapse, ISortFilter, digestDependentFilters } from 'core/filterModel';
+import { FilterSearch } from 'core/cluster/filter/FilterSearch';
 import { FilterSection } from 'core/cluster/filter/FilterSection';
+import { digestDependentFilters, FilterCheckbox, ISortFilter } from 'core/filterModel';
 import { FunctionState } from 'core/state';
 
 const poolValueCoordinates = [
@@ -17,7 +17,7 @@ const poolValueCoordinates = [
 
 function poolBuilder(functions: any[]) {
   const pool = chain(functions)
-    .map(fn => {
+    .map((fn) => {
       const poolUnits = chain(poolValueCoordinates)
         .filter({ on: 'function' })
         .reduce((acc, coordinate) => {
@@ -113,12 +113,6 @@ export class FunctionFilters extends React.Component<IFunctionFiltersProps, IFun
     return compact(uniq(map(this.props.app.functions.data, option) as string[])).sort();
   };
 
-  private clearFilters = (): void => {
-    FunctionState.filterService.clearFilters();
-    FunctionState.filterModel.asFilterModel.applyParamsToUrl();
-    FunctionState.filterService.updateFunctionGroups(this.props.app);
-  };
-
   private handleSearchBlur = (event: React.ChangeEvent<HTMLInputElement>) => {
     const target = event.target;
     this.state.sortFilter.filter = target.value;
@@ -134,39 +128,23 @@ export class FunctionFilters extends React.Component<IFunctionFiltersProps, IFun
 
   public render() {
     const fuctionsLoaded = this.props.app.functions.loaded;
-    const { accountHeadings, providerTypeHeadings, regionHeadings, sortFilter, tags } = this.state;
+    const { accountHeadings, providerTypeHeadings, regionHeadings, sortFilter } = this.state;
 
     return (
-      <div>
-        <FilterCollapse />
+      <div className="insight-filter-content">
         <div className="heading">
-          <span
-            className="btn btn-default btn-xs"
-            style={{ visibility: tags.length > 0 ? 'inherit' : 'hidden' }}
-            onClick={this.clearFilters}
-          >
-            Clear All
-          </span>
-          <FilterSection heading="Search" expanded={true} helpKey="functions.search">
-            <form className="form-horizontal" role="form">
-              <div className="form-group nav-search">
-                <input
-                  type="search"
-                  className="form-control input-sm"
-                  value={sortFilter.filter}
-                  onBlur={this.handleSearchBlur}
-                  onChange={this.handleSearchChange}
-                  style={{ width: '85%', display: 'inline-block' }}
-                />
-              </div>
-            </form>
-          </FilterSection>
+          <FilterSearch
+            helpKey="functions.search"
+            value={sortFilter.filter}
+            onBlur={this.handleSearchBlur}
+            onSearchChange={this.handleSearchChange}
+          />
         </div>
         {fuctionsLoaded && (
           <div className="content">
             {providerTypeHeadings.length > 1 && (
               <FilterSection heading="Provider" expanded={true}>
-                {providerTypeHeadings.map(heading => (
+                {providerTypeHeadings.map((heading) => (
                   <FilterCheckbox
                     heading={heading}
                     isCloudProvider={true}
@@ -179,7 +157,7 @@ export class FunctionFilters extends React.Component<IFunctionFiltersProps, IFun
             )}
 
             <FilterSection heading="Account" expanded={true}>
-              {accountHeadings.map(heading => (
+              {accountHeadings.map((heading) => (
                 <FilterCheckbox
                   heading={heading}
                   key={heading}
@@ -190,7 +168,7 @@ export class FunctionFilters extends React.Component<IFunctionFiltersProps, IFun
             </FilterSection>
 
             <FilterSection heading="Region" expanded={true}>
-              {regionHeadings.map(heading => (
+              {regionHeadings.map((heading) => (
                 <FilterCheckbox
                   heading={heading}
                   key={heading}
@@ -205,33 +183,3 @@ export class FunctionFilters extends React.Component<IFunctionFiltersProps, IFun
     );
   }
 }
-
-const FilterCheckbox = (props: {
-  heading: string;
-  sortFilterType: { [key: string]: boolean };
-  onChange: () => void;
-  isCloudProvider?: boolean;
-}): JSX.Element => {
-  const { heading, isCloudProvider, onChange, sortFilterType } = props;
-  const changeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const target = event.target;
-    const value = target.type === 'checkbox' ? target.checked : target.value;
-    sortFilterType[heading] = Boolean(value);
-    onChange();
-  };
-  return (
-    <div className="checkbox">
-      <label>
-        <input type="checkbox" checked={Boolean(sortFilterType[heading])} onChange={changeHandler} />
-        {!isCloudProvider ? (
-          heading
-        ) : (
-          <>
-            <CloudProviderLogo provider="heading" height="'14px'" width="'14px'" />
-            <CloudProviderLabel provider={heading} />
-          </>
-        )}
-      </label>
-    </div>
-  );
-};

@@ -1,12 +1,13 @@
-import { module, IQService } from 'angular';
-import { ApplicationDataSourceRegistry } from '../application/service/ApplicationDataSourceRegistry';
-import { INFRASTRUCTURE_KEY } from 'core/application/nav/defaultCategories';
-import { EntityTagsReader } from '../entityTag/EntityTagsReader';
-import { CLUSTER_SERVICE, ClusterService } from 'core/cluster/cluster.service';
-import { JsonUtils } from 'core/utils';
+import { IQService, module } from 'angular';
 import { Application } from 'core/application/application.model';
+import { INFRASTRUCTURE_KEY } from 'core/application/nav/defaultCategories';
+import { CLUSTER_SERVICE, ClusterService } from 'core/cluster/cluster.service';
 import { IServerGroup } from 'core/domain';
 import { addManagedResourceMetadataToServerGroups } from 'core/managed';
+import { JsonUtils } from 'core/utils';
+
+import { ApplicationDataSourceRegistry } from '../application/service/ApplicationDataSourceRegistry';
+import { EntityTagsReader } from '../entityTag/EntityTagsReader';
 
 export const SERVER_GROUP_DATA_SOURCE = 'spinnaker.core.serverGroup.dataSource';
 
@@ -20,7 +21,7 @@ module(SERVER_GROUP_DATA_SOURCE, [CLUSTER_SERVICE]).run([
 
     const addServerGroups = (application: Application, serverGroups: IServerGroup[]) => {
       serverGroups.forEach(
-        serverGroup =>
+        (serverGroup) =>
           (serverGroup.stringVal = JsonUtils.makeSortedStringFromAngularObject(serverGroup, [
             'executions',
             'runningTasks',
@@ -46,6 +47,7 @@ module(SERVER_GROUP_DATA_SOURCE, [CLUSTER_SERVICE]).run([
       optional: true,
       primary: true,
       icon: 'fas fa-xs fa-fw fa-th-large',
+      iconName: 'spMenuClusters',
       loader: loadServerGroups,
       onLoad: addServerGroups,
       afterLoad: addTags,

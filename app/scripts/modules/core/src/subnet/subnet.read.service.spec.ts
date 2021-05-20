@@ -1,22 +1,22 @@
-import { mock, IHttpBackendService, IRootScopeService, IScope } from 'angular';
+import { mockHttpClient } from 'core/api/mock/jasmine';
+import { mock, IRootScopeService, IScope } from 'angular';
 
-import { API } from 'core/api/ApiService';
 import { SubnetReader } from 'core/subnet/subnet.read.service';
 import { ISubnet } from 'core/domain';
 
-describe('SubnetReader', function() {
-  let $http: IHttpBackendService, $scope: IScope;
+describe('SubnetReader', function () {
+  let $scope: IScope;
 
   beforeEach(
-    mock.inject(function($httpBackend: IHttpBackendService, $rootScope: IRootScopeService) {
-      $http = $httpBackend;
+    mock.inject(function ($rootScope: IRootScopeService) {
       $scope = $rootScope.$new();
     }),
   );
 
-  it('adds label to subnet, including (deprecated) if deprecated field is true', function() {
-    $http
-      .whenGET(API.baseUrl + '/subnets')
+  it('adds label to subnet, including (deprecated) if deprecated field is true', async function () {
+    const http = mockHttpClient();
+    http
+      .expectGET('/subnets')
       .respond(200, [
         { purpose: 'internal', deprecated: true },
         { purpose: 'external', deprecated: false },
@@ -29,7 +29,7 @@ describe('SubnetReader', function() {
       result = subnets;
     });
 
-    $http.flush();
+    await http.flush();
     $scope.$digest();
 
     expect(result[0].label).toBe('internal (deprecated)');

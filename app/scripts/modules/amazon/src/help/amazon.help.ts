@@ -59,6 +59,26 @@ const helpContents: { [key: string]: string } = {
     '(Optional) <b>Detail</b> is a string of free-form alphanumeric characters and hyphens to describe any other variables.',
   'aws.serverGroup.imageName':
     '(Required) <b>Image</b> is the deployable Amazon Machine Image. Images are restricted to the account and region selected.',
+  'aws.serverGroup.spotMaxPrice':
+    'The maximum price per unit hour to pay for a Spot instance. By default (empty), Amazon EC2 Auto Scaling uses the On-Demand price as the maximum Spot price',
+  'aws.serverGroup.spotAllocationStrategy': `<p>Indicates how to allocate instances across Spot Instance pools.</p>
+      <ul>
+        <li><b>capacity-optimized (recommended)</b>: Instances launched using Spot pools that are optimally chosen based on the available Spot capacity.</li>
+        <li><b>lowest-price</b>: Instances launched using Spot pools with the lowest price, and evenly allocated across the number of Spot pools specified</li>
+      </ul>`,
+  'aws.serverGroup.spotInstancePoolCount': `Number of lowest priced Spot Instance pools to diversify across. Only applicable for strategy 'lowest-price'.`,
+  'aws.serverGroup.odAllocationStrategy': `The only strategy / default is 'prioritized'. The order of instance types in the list of launch template overrides is used to determine which instance type to use first when fulfilling On-Demand capacity.`,
+  'aws.serverGroup.odBase': `Minimum amount of the Auto Scaling Group's capacity that must be fulfilled by On-Demand Instances. This base portion is provisioned first as the group scales.`,
+  'aws.serverGroup.odPercentAboveBase': `Percentages of On-Demand and Spot instances for additional capacity beyond OnDemandBaseCapacity.`,
+  'aws.serverGroup.instanceTypeWeight': `The number of capacity units gives the instance type a proportional weight to other instance types. When specified, weights count towards desired capacity.`,
+  'aws.serverGroup.instanceTypes': `Specify up to 20 instance types.`,
+  'aws.serverGroup.unlimitedCpuCredits': `<p>CPU credits can be configured with 2 modes:</p><br/>
+      <ul>
+        <li><b>Unlimited (i.e. Unlimited On)</b>: Can sustain high CPU utilization for any period of time whenever required.<br/>
+            If the average CPU usage over a rolling 24-hour period exceeds the baseline, charges for surplus credits will apply.</li>
+        <li><b>Standard (i.e. Unlimited Off)</b>: <b>Default mode in Spinnaker.</b> Suited to workloads with an average CPU utilization that is consistently below the baseline CPU utilization of the instance.<br/>
+            To burst above the baseline, the instance spends credits that it has accrued in its CPU credit balance.</li>
+      </ul>`,
   'aws.serverGroup.legacyUdf': `<p>(Optional) <b>User Data Format</b> allows overriding of the format used when generating user data during deployment. The default format used is configured
       in the application's attributes, editable via the 'Config' tab.</p>
       <p><b>Default</b> will use the value from the application's configuration.</p>
@@ -68,12 +88,13 @@ const helpContents: { [key: string]: string } = {
   'aws.serverGroup.base64UserData': '(Optional) <b>UserData</b> is a base64 encoded string.',
   'aws.serverGroup.enabledMetrics':
     '(Optional) <b>Enabled Metrics</b> are the Auto Scaling Group metrics to enable on this group. Existing metrics are not modified.',
+  'aws.serverGroup.imdsv2':
+    "(Recommended) <b>IMDSv2</b> helps mitigate AWS credential theft from the exploitation of SSRF vulnerabilities in web applications. All modern AWS SDKs support IMDSv2 and it should not be disabled unless you're using a legacy SDK.",
   'aws.serverGroup.instanceMonitoring':
     '(Optional) <b>Instance Monitoring</b> whether to enable detailed monitoring of instances. Group metrics must be disabled to update an ASG with Instance Monitoring set to false.',
   'aws.serverGroup.tags': '(Optional) <b>Tags</b> are propagated to the instances in this cluster.',
   'aws.serverGroup.allImages': 'Search for an image that does not match the name of your application.',
   'aws.serverGroup.filterImages': 'Select from a pre-filtered list of images matching the name of your application.',
-  'aws.serverGroup.spotPrice': 'The maximum price to pay per hour per instance',
   'aws.serverGroup.traffic': `<p>Enables the "AddToLoadBalancer" scaling process, which is used by Spinnaker and discovery services to determine if the server group is enabled.</p>
      <p>Will be automatically enabled when any non "custom" deployment strategy is selected.</p>`,
   'aws.securityGroup.vpc': `
@@ -90,12 +111,12 @@ const helpContents: { [key: string]: string } = {
   'aws.blockDeviceMappings.useSource': `
     <p>Spinnaker will use the block device mappings of the existing server group when deploying a new server group.</p>
     <p>In the event that there is no existing server group, the
-        <a target="_blank" href="https://github.com/spinnaker/clouddriver/blob/master/clouddriver-aws/src/main/groovy/com/netflix/spinnaker/clouddriver/aws/deploy/BlockDeviceConfig.groovy">defaults</a>
+        <a target="_blank" href="https://github.com/spinnaker/clouddriver/blob/master/clouddriver-aws/src/main/groovy/com/netflix/spinnaker/clouddriver/aws/deploy/InstanceTypeUtils.java">defaults</a>
         for the selected instance type will be used.</p>`,
   'aws.blockDeviceMappings.useAMI':
     '<p>Spinnaker will use the block device mappings from the selected AMI when deploying a new server group.</p>',
   'aws.blockDeviceMappings.useDefaults':
-    '<p>Spinnaker will use the <a target="_blank" href="https://github.com/spinnaker/clouddriver/blob/master/clouddriver-aws/src/main/groovy/com/netflix/spinnaker/clouddriver/aws/deploy/BlockDeviceConfig.groovy">default block device mappings</a> for the selected instance type when deploying a new server group.</p>',
+    '<p>Spinnaker will use the <a target="_blank" href="https://github.com/spinnaker/clouddriver/blob/master/clouddriver-aws/src/main/groovy/com/netflix/spinnaker/clouddriver/aws/deploy/InstanceTypeUtils.java">default block device mappings</a> for the selected instance type when deploying a new server group.</p>',
   'aws.targetGroup.protocol':
     'The protocol to use for routing traffic to the targets. Cannot be edited after being saved; if you want to use a different protocol, create a new target group, save the load balancer, move your targets, and then delete this target group.',
   'aws.targetGroup.targetType':
@@ -105,6 +126,8 @@ const helpContents: { [key: string]: string } = {
   'aws.targetGroup.attributes.deregistrationDelay':
     'The amount of time for the load balancer to wait before changing the state of a deregistering target from draining to unused. The range is 0-3600 seconds. The default value is 300 seconds.',
   'aws.targetGroup.attributes.stickinessEnabled': ' Indicates whether sticky sessions are enabled.',
+  'aws.targetGroup.attributes.deregistrationDelayConnectionTermination':
+    'If enabled, your Network Load Balancer will terminate active connections when deregistration delay is reached.',
   'aws.targetGroup.attributes.stickinessType':
     'The type of sticky sessions. The only current possible value is <code>lb_cookie</code>.',
   'aws.targetGroup.attributes.stickinessDuration':
@@ -114,6 +137,8 @@ const helpContents: { [key: string]: string } = {
   'aws.targetGroup.healthCheckProtocol': 'TCP health checks only support 10s and 30s intervals',
   'aws.targetGroup.healthCheckTimeout':
     'Target groups with TCP or TLS protocol must have a 6s timeout for HTTP health checks or a 10s timeout for HTTPS/TLS health checks.',
+  'aws.targetGroup.nlbHealthcheckThreshold':
+    'The healthy and unhealthy threshold for NLBs must be equal. This represents the number of successful and failed healthchecks required for healthy and unhealthy targets, respectively.',
   'aws.serverGroup.capacityConstraint': `
       <p>Ensures that the capacity of this server group has not changed in the background (i.e. due to autoscaling activity).</p>
       <p>If the capacity has changed, this resize operation will be rejected.</p>`,
@@ -174,4 +199,4 @@ const helpContents: { [key: string]: string } = {
         </p>`,
 };
 
-Object.keys(helpContents).forEach(key => HelpContentsRegistry.register(key, helpContents[key]));
+Object.keys(helpContents).forEach((key) => HelpContentsRegistry.register(key, helpContents[key]));

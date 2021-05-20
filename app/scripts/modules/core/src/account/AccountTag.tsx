@@ -1,4 +1,3 @@
-import { IPromise } from 'angular';
 import React from 'react';
 import { AccountService } from './AccountService';
 
@@ -13,7 +12,7 @@ export interface IAccountTagState {
 
 export class AccountTag extends React.Component<IAccountTagProps, IAccountTagState> {
   private static cache: {
-    [account: string]: boolean | IPromise<boolean>;
+    [account: string]: boolean | PromiseLike<boolean>;
   } = {};
 
   public state = { isProdAccount: false };
@@ -34,15 +33,17 @@ export class AccountTag extends React.Component<IAccountTagProps, IAccountTagSta
   private updateAccount(account: string) {
     const { cache } = AccountTag;
     if (!cache.hasOwnProperty(account)) {
-      cache[account] = AccountService.challengeDestructiveActions(account).then(result => (cache[account] = !!result));
+      cache[account] = AccountService.challengeDestructiveActions(account).then(
+        (result) => (cache[account] = !!result),
+      );
     }
 
-    const cachedVal: boolean | IPromise<boolean> = cache[account];
+    const cachedVal: boolean | PromiseLike<boolean> = cache[account];
 
     if (typeof cachedVal === 'boolean') {
       this.setState({ isProdAccount: cachedVal });
     } else {
-      cachedVal.then(isProdAccount => this.mounted && this.setState({ isProdAccount }));
+      cachedVal.then((isProdAccount) => this.mounted && this.setState({ isProdAccount }));
     }
   }
 

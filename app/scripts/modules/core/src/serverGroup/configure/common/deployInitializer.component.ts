@@ -1,11 +1,11 @@
-import { IController, IComponentOptions, IPromise, module } from 'angular';
-
+import { IComponentOptions, IController, module } from 'angular';
 import { groupBy, sortBy } from 'lodash';
 
-import { IServerGroup } from 'core/domain';
 import { Application } from 'core/application';
 import { PROVIDER_SERVICE_DELEGATE, ProviderServiceDelegate } from 'core/cloudProvider/providerService.delegate';
-import { ServerGroupReader } from 'core/serverGroup';
+import { IServerGroup } from 'core/domain';
+
+import { ServerGroupReader } from '../../serverGroupReader.service';
 
 export interface IDeployTemplate {
   key?: string;
@@ -56,11 +56,11 @@ export class DeployInitializerController implements IController {
       .getDataSource('serverGroups')
       .data.filter((s: IServerGroup) => s.cloudProvider === this.cloudProvider && s.category === 'serverGroup');
 
-    const grouped = groupBy(serverGroups, serverGroup =>
+    const grouped = groupBy(serverGroups, (serverGroup) =>
       [serverGroup.cluster, serverGroup.account, serverGroup.region].join(':'),
     );
 
-    Object.keys(grouped).forEach(key => {
+    Object.keys(grouped).forEach((key) => {
       const latest = sortBy(grouped[key], 'name').pop();
       this.templates.push({
         cluster: latest.cluster,
@@ -96,7 +96,7 @@ export class DeployInitializerController implements IController {
     Object.assign(baseCommand, command);
   }
 
-  private buildCommandFromTemplate(serverGroup: IServerGroup): IPromise<any> {
+  private buildCommandFromTemplate(serverGroup: IServerGroup): PromiseLike<any> {
     const commandBuilder: any = this.providerServiceDelegate.getDelegate(
       this.cloudProvider,
       'serverGroup.commandBuilder',
@@ -106,13 +106,13 @@ export class DeployInitializerController implements IController {
       serverGroup.account,
       serverGroup.region,
       serverGroup.name,
-    ).then(details => {
+    ).then((details) => {
       details.account = serverGroup.account;
       return commandBuilder.buildServerGroupCommandFromExisting(this.application, details, 'editPipeline');
     });
   }
 
-  private buildEmptyCommand(): IPromise<any> {
+  private buildEmptyCommand(): PromiseLike<any> {
     const commandBuilder: any = this.providerServiceDelegate.getDelegate(
       this.cloudProvider,
       'serverGroup.commandBuilder',
@@ -120,7 +120,7 @@ export class DeployInitializerController implements IController {
     return commandBuilder.buildNewServerGroupCommand(this.application, { mode: 'createPipeline' });
   }
 
-  private selectTemplate(): IPromise<void> {
+  private selectTemplate(): PromiseLike<void> {
     const buildCommand =
       this.selectedTemplate === this.noTemplate
         ? this.buildEmptyCommand()

@@ -1,29 +1,31 @@
 'use strict';
 
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 import * as angular from 'angular';
 import _ from 'lodash';
 
 import {
-  ConfirmationModalService,
+  AccountService,
   ClusterTargetBuilder,
+  ConfirmationModalService,
   FirewallLabels,
   NetworkReader,
-  ServerGroupReader,
-  ServerGroupWarningMessageService,
   SERVER_GROUP_WRITER,
+  ServerGroupReader,
   ServerGroupTemplates,
+  ServerGroupWarningMessageService,
 } from '@spinnaker/core';
-
-require('../configure/serverGroup.configure.gce.module');
-
-import './serverGroupDetails.less';
-import { GOOGLE_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER_SERVICE } from '../configure/serverGroupCommandBuilder.service';
 import { GOOGLE_COMMON_XPNNAMING_GCE_SERVICE } from 'google/common/xpnNaming.gce.service';
+
+import { GOOGLE_SERVERGROUP_DETAILS_AUTOSCALINGPOLICY_ADDAUTOSCALINGPOLICYBUTTON_COMPONENT } from './autoscalingPolicy/addAutoscalingPolicyButton.component';
+import { GOOGLE_SERVERGROUP_DETAILS_AUTOSCALINGPOLICY_AUTOSCALINGPOLICY_DIRECTIVE } from './autoscalingPolicy/autoscalingPolicy.directive';
+import { GOOGLE_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER_SERVICE } from '../configure/serverGroupCommandBuilder.service';
 import { GOOGLE_SERVERGROUP_DETAILS_RESIZE_RESIZESERVERGROUP_CONTROLLER } from './resize/resizeServerGroup.controller';
 import { GOOGLE_SERVERGROUP_DETAILS_ROLLBACK_ROLLBACKSERVERGROUP_CONTROLLER } from './rollback/rollbackServerGroup.controller';
-import { GOOGLE_SERVERGROUP_DETAILS_AUTOSCALINGPOLICY_AUTOSCALINGPOLICY_DIRECTIVE } from './autoscalingPolicy/autoscalingPolicy.directive';
-import { GOOGLE_SERVERGROUP_DETAILS_AUTOSCALINGPOLICY_ADDAUTOSCALINGPOLICYBUTTON_COMPONENT } from './autoscalingPolicy/addAutoscalingPolicyButton.component';
-import UIROUTER_ANGULARJS from '@uirouter/angularjs';
+
+import './serverGroupDetails.less';
+
+require('../configure/serverGroup.configure.gce.module');
 
 export const GOOGLE_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_GCE_CONTROLLER =
   'spinnaker.serverGroup.details.gce.controller';
@@ -50,7 +52,7 @@ angular
     '$uibModal',
     'serverGroupWriter',
     'gceXpnNamingService',
-    function(
+    function (
       $scope,
       $state,
       $templateCache,
@@ -71,7 +73,7 @@ angular
       this.application = app;
 
       const extractServerGroupSummary = () => {
-        let summary = _.find(app.serverGroups.data, toCheck => {
+        let summary = _.find(app.serverGroups.data, (toCheck) => {
           return (
             toCheck.name === serverGroup.name &&
             toCheck.account === serverGroup.accountId &&
@@ -79,9 +81,9 @@ angular
           );
         });
         if (!summary) {
-          app.loadBalancers.data.some(loadBalancer => {
+          app.loadBalancers.data.some((loadBalancer) => {
             if (loadBalancer.account === serverGroup.accountId && loadBalancer.region === serverGroup.region) {
-              return loadBalancer.serverGroups.some(possibleServerGroup => {
+              return loadBalancer.serverGroups.some((possibleServerGroup) => {
                 if (possibleServerGroup.name === serverGroup.name) {
                   summary = possibleServerGroup;
                   return true;
@@ -111,7 +113,7 @@ angular
           serverGroup.accountId,
           serverGroup.region,
           serverGroup.name,
-        ).then(details => {
+        ).then((details) => {
           cancelLoader();
 
           angular.extend(details, summary);
@@ -123,7 +125,7 @@ angular
           if (!_.isEmpty(this.serverGroup)) {
             if (details.securityGroups) {
               this.securityGroups = _.chain(details.securityGroups)
-                .map(id => {
+                .map((id) => {
                   return (
                     _.find(app.securityGroups.data, { accountName: serverGroup.accountId, region: 'global', id: id }) ||
                     _.find(app.securityGroups.data, { accountName: serverGroup.accountId, region: 'global', name: id })
@@ -165,7 +167,7 @@ angular
       const findStartupScript = () => {
         if (_.has(this.serverGroup, 'launchConfig.instanceTemplate.properties.metadata.items')) {
           const metadataItems = this.serverGroup.launchConfig.instanceTemplate.properties.metadata.items;
-          const startupScriptItem = _.find(metadataItems, metadataItem => {
+          const startupScriptItem = _.find(metadataItems, (metadataItem) => {
             return metadataItem.key === 'startup-script';
           });
 
@@ -224,7 +226,7 @@ angular
             const serviceAccount = this.serverGroup.launchConfig.instanceTemplate.properties.serviceAccounts[0];
 
             this.serverGroup.serviceAccountEmail = serviceAccount.email;
-            this.serverGroup.authScopes = _.map(serviceAccount.scopes, authScope => {
+            this.serverGroup.authScopes = _.map(serviceAccount.scopes, (authScope) => {
               return authScope.replace('https://www.googleapis.com/auth/', '');
             });
           }
@@ -251,8 +253,8 @@ angular
         if (_.has(this.serverGroup, 'launchConfig.instanceTemplate.properties.tags.items') && this.securityGroups) {
           const helpMap = {};
 
-          this.serverGroup.launchConfig.instanceTemplate.properties.tags.items.forEach(tag => {
-            const securityGroupsMatches = _.filter(this.securityGroups, securityGroup =>
+          this.serverGroup.launchConfig.instanceTemplate.properties.tags.items.forEach((tag) => {
+            const securityGroupsMatches = _.filter(this.securityGroups, (securityGroup) =>
               _.includes(securityGroup.targetTags, tag),
             );
             const securityGroupMatchNames = _.map(securityGroupsMatches, 'name');
@@ -279,7 +281,7 @@ angular
         }
       };
 
-      const getNetwork = projectId => {
+      const getNetwork = (projectId) => {
         const networkUrl = _.get(
           this.serverGroup,
           'launchConfig.instanceTemplate.properties.networkInterfaces[0].network',
@@ -287,8 +289,8 @@ angular
         return gceXpnNamingService.decorateXpnResourceIfNecessary(projectId, networkUrl);
       };
 
-      const retrieveSubnet = projectId => {
-        NetworkReader.listNetworksByProvider('gce').then(networks => {
+      const retrieveSubnet = (projectId) => {
+        NetworkReader.listNetworksByProvider('gce').then((networks) => {
           const autoCreateSubnets = _.chain(networks)
             .filter({ account: this.serverGroup.account, id: this.serverGroup.network })
             .map('autoCreateSubnets')
@@ -335,7 +337,7 @@ angular
           },
         };
 
-        const submitMethod = params => serverGroupWriter.destroyServerGroup(serverGroup, app, params);
+        const submitMethod = (params) => serverGroupWriter.destroyServerGroup(serverGroup, app, params);
 
         const stateParams = {
           name: serverGroup.name,
@@ -371,7 +373,7 @@ angular
           title: 'Disabling ' + serverGroup.name,
         };
 
-        const submitMethod = params => serverGroupWriter.disableServerGroup(serverGroup, app, params);
+        const submitMethod = (params) => serverGroupWriter.disableServerGroup(serverGroup, app, params);
 
         const confirmationModalParams = {
           header: 'Really disable ' + serverGroup.name + '?',
@@ -401,7 +403,7 @@ angular
           title: 'Enabling ' + serverGroup.name,
         };
 
-        const submitMethod = params => serverGroupWriter.enableServerGroup(serverGroup, app, params);
+        const submitMethod = (params) => serverGroupWriter.enableServerGroup(serverGroup, app, params);
 
         const confirmationModalParams = {
           header: 'Really enable ' + serverGroup.name + '?',
@@ -454,7 +456,7 @@ angular
         });
       };
 
-      this.cloneServerGroup = serverGroup => {
+      this.cloneServerGroup = (serverGroup) => {
         $uibModal.open({
           templateUrl: require('../configure/wizard/serverGroupWizard.html'),
           controller: 'gceCloneServerGroupCtrl as ctrl',

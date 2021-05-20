@@ -1,9 +1,11 @@
+import { isUndefined } from 'lodash';
 import React from 'react';
 import ReactGA from 'react-ga';
-import { isUndefined } from 'lodash';
 
-import { HelpContentsRegistry, HelpTextExpandedContext } from 'core/help';
 import { HoverablePopover, Markdown, Placement } from 'core/presentation';
+
+import { HelpTextExpandedContext } from './HelpTextExpandedContext';
+import { HelpContentsRegistry } from './helpContents.registry';
 
 export interface IHelpFieldProps {
   id?: string;
@@ -29,7 +31,7 @@ function HelpFieldContents(props: Pick<IHelpFieldProps, 'id' | 'fallback' | 'con
 export function HelpField(props: IHelpFieldProps) {
   const { content, expand, fallback, id, label, placement } = props;
 
-  const [popoverShownStart, setPopoverShownStart] = React.useState();
+  const [popoverShownStart, setPopoverShownStart] = React.useState<number>();
   const onShow = (): void => setPopoverShownStart(Date.now());
   const onHide = (): void => {
     if (Date.now() - popoverShownStart > 500) {

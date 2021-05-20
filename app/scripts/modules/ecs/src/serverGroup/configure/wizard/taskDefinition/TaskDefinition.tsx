@@ -1,30 +1,32 @@
+import { module } from 'angular';
+import { isEqual, uniqWith } from 'lodash';
 import React from 'react';
-import { module, IPromise } from 'angular';
-import { concat, uniq, uniqWith, isEqual } from 'lodash';
-import { react2angular } from 'react2angular';
 import { Alert } from 'react-bootstrap';
 import { Option } from 'react-select';
-import {
-  IEcsContainerMapping,
-  IEcsDockerImage,
-  IEcsServerGroupCommand,
-  IEcsTaskDefinitionArtifact,
-  IEcsTargetGroupMapping,
-} from '../../serverGroupConfiguration.service';
+import { react2angular } from 'react2angular';
+
 import {
   ArtifactTypePatterns,
   HelpField,
   IArtifact,
   IExpectedArtifact,
-  IPipeline,
   StageArtifactSelectorDelegate,
   TetheredSelect,
+  withErrorBoundary,
 } from '@spinnaker/core';
+
+import {
+  IEcsContainerMapping,
+  IEcsDockerImage,
+  IEcsServerGroupCommand,
+  IEcsTargetGroupMapping,
+  IEcsTaskDefinitionArtifact,
+} from '../../serverGroupConfiguration.service';
 
 export interface ITaskDefinitionProps {
   command: IEcsServerGroupCommand;
   notifyAngular: (key: string, value: any) => void;
-  configureCommand: (query: string) => IPromise<void>;
+  configureCommand: (query: string) => PromiseLike<void>;
 }
 
 interface ITaskDefinitionState {
@@ -58,6 +60,7 @@ export class TaskDefinition extends React.Component<ITaskDefinitionProps, ITaskD
         containerPort: cmd.containerPort,
       });
       cmd.targetGroup = '';
+      cmd.loadBalancedContainer = '';
     }
 
     cmd.targetGroupMappings = uniqWith(defaultTargetGroup, isEqual);
@@ -85,7 +88,7 @@ export class TaskDefinition extends React.Component<ITaskDefinitionProps, ITaskD
 
   private getIdToImageMap = (): Map<string, IEcsDockerImage> => {
     const imageIdToDescription = new Map<string, IEcsDockerImage>();
-    this.props.command.backingData.filtered.images.forEach(e => {
+    this.props.command.backingData.filtered.images.forEach((e) => {
       imageIdToDescription.set(e.imageId, e);
     });
 
@@ -111,7 +114,6 @@ export class TaskDefinition extends React.Component<ITaskDefinitionProps, ITaskD
     ArtifactTypePatterns.KUBERNETES,
     ArtifactTypePatterns.DOCKER_IMAGE,
     ArtifactTypePatterns.FRONT50_PIPELINE_TEMPLATE,
-    ArtifactTypePatterns.EMBEDDED_BASE64,
   ];
 
   private onExpectedArtifactSelected = (expectedArtifactId: string): void => {
@@ -124,11 +126,6 @@ export class TaskDefinition extends React.Component<ITaskDefinitionProps, ITaskD
     const newArtifact = { artifact: artifact };
     this.props.notifyAngular('taskDefinitionArtifact', newArtifact);
     this.setState({ taskDefArtifact: newArtifact });
-  };
-
-  private setArtifactAccount = (accountName: string): void => {
-    this.props.notifyAngular('taskDefinitionArtifactAccount', accountName);
-    this.setState({ taskDefArtifactAccount: accountName });
   };
 
   private pushMapping = () => {
@@ -203,15 +200,6 @@ export class TaskDefinition extends React.Component<ITaskDefinitionProps, ITaskD
     this.setState({ targetGroupMappings: currentMappings });
   };
 
-  private updatePipeline = (pipeline: IPipeline): void => {
-    if (pipeline.expectedArtifacts && pipeline.expectedArtifacts.length > 0) {
-      const oldArtifacts = this.props.command.viewState.pipeline.expectedArtifacts;
-      const updatedArtifacts = concat(pipeline.expectedArtifacts, oldArtifacts);
-      pipeline.expectedArtifacts = uniq(updatedArtifacts);
-      this.props.notifyAngular('pipeline', pipeline);
-    }
-  };
-
   public render(): React.ReactElement<TaskDefinition> {
     const { command } = this.props;
     const removeMapping = this.removeMapping;
@@ -222,7 +210,7 @@ export class TaskDefinition extends React.Component<ITaskDefinitionProps, ITaskD
     const updateTargetGroupMappingTargetGroup = this.updateTargetGroupMappingTargetGroup;
     const updateTargetGroupMappingPort = this.updateTargetGroupMappingPort;
 
-    const dockerImageOptions = this.state.dockerImages.map(function(image) {
+    const dockerImageOptions = this.state.dockerImages.map(function (image) {
       let msg = '';
       if (image.fromTrigger || image.fromContext) {
         msg = image.fromTrigger ? '(TRIGGER) ' : '(FIND IMAGE RESULT) ';
@@ -230,23 +218,24 @@ export class TaskDefinition extends React.Component<ITaskDefinitionProps, ITaskD
       return { label: `${msg} (${image.imageId})`, value: image.imageId };
     });
 
-    const targetGroupsAvailable = this.state.targetGroupsAvailable.map(function(targetGroup) {
+    const targetGroupsAvailable = this.state.targetGroupsAvailable.map(function (targetGroup) {
       return { label: `${targetGroup}`, value: targetGroup };
     });
 
-    const mappingInputs = this.state.containerMappings.map(function(mapping, index) {
+    const mappingInputs = this.state.containerMappings.map(function (mapping, index) {
       return (
         <tr key={index}>
           <td>
             <input
+              data-test-id="Artifacts.containerName"
               className="form-control input-sm"
               required={true}
               placeholder="enter container name..."
               value={mapping.containerName.toString()}
-              onChange={e => updateContainerMappingName(index, e.target.value)}
+              onChange={(e) => updateContainerMappingName(index, e.target.value)}
             />
           </td>
-          <td>
+          <td data-test-id="Artifacts.containerImage">
             <TetheredSelect
               placeholder="Select an image to use..."
               options={dockerImageOptions}
@@ -259,7 +248,11 @@ export class TaskDefinition extends React.Component<ITaskDefinitionProps, ITaskD
           </td>
           <td>
             <div className="form-control-static">
-              <a className="btn-link sm-label" onClick={() => removeMapping(index)}>
+              <a
+                className="btn-link sm-label"
+                data-test-id="Artifacts.containerRemove"
+                onClick={() => removeMapping(index)}
+              >
                 <span className="glyphicon glyphicon-trash" />
                 <span className="sr-only">Remove</span>
               </a>
@@ -269,19 +262,20 @@ export class TaskDefinition extends React.Component<ITaskDefinitionProps, ITaskD
       );
     });
 
-    const targetGroupInputs = this.state.targetGroupMappings.map(function(mapping, index) {
+    const targetGroupInputs = this.state.targetGroupMappings.map(function (mapping, index) {
       return (
         <tr key={index}>
           <td>
             <input
+              data-test-id="Artifacts.targetGroupContainer"
               className="form-control input-sm"
               required={true}
               placeholder="Enter a container name ..."
               value={mapping.containerName.toString()}
-              onChange={e => updateTargetGroupMappingContainer(index, e.target.value)}
+              onChange={(e) => updateTargetGroupMappingContainer(index, e.target.value)}
             />
           </td>
-          <td>
+          <td data-test-id="Artifacts.targetGroup">
             <TetheredSelect
               placeholder="Select a target group to use..."
               options={targetGroupsAvailable}
@@ -292,16 +286,21 @@ export class TaskDefinition extends React.Component<ITaskDefinitionProps, ITaskD
           </td>
           <td>
             <input
+              data-test-id="Artifacts.targetGroupPort"
               type="number"
               className="form-control input-sm no-spel"
               required={true}
               value={mapping.containerPort.toString()}
-              onChange={e => updateTargetGroupMappingPort(index, e.target.valueAsNumber)}
+              onChange={(e) => updateTargetGroupMappingPort(index, e.target.valueAsNumber)}
             />
           </td>
           <td>
             <div className="form-control-static">
-              <a className="btn-link sm-label" onClick={() => removeTargetGroupMapping(index)}>
+              <a
+                className="btn-link sm-label"
+                data-test-id="Artifacts.targetGroupRemove"
+                onClick={() => removeTargetGroupMapping(index)}
+              >
                 <span className="glyphicon glyphicon-trash" />
                 <span className="sr-only">Remove</span>
               </a>
@@ -312,7 +311,11 @@ export class TaskDefinition extends React.Component<ITaskDefinitionProps, ITaskD
     });
 
     const newTargetGroupMapping = this.state.targetGroupsAvailable.length ? (
-      <button className="btn btn-block btn-sm add-new" onClick={this.pushTargetGroupMapping}>
+      <button
+        className="btn btn-block btn-sm add-new"
+        data-test-id="Artifacts.targetGroupAdd"
+        onClick={this.pushTargetGroupMapping}
+      >
         <span className="glyphicon glyphicon-plus-sign" />
         Add New Target Group Mapping
       </button>
@@ -335,12 +338,7 @@ export class TaskDefinition extends React.Component<ITaskDefinitionProps, ITaskD
               onExpectedArtifactSelected={(artifact: IExpectedArtifact) => this.onExpectedArtifactSelected(artifact.id)}
               onArtifactEdited={this.onArtifactEdited}
               pipeline={command.viewState.pipeline}
-              selectedArtifactId={this.state.taskDefArtifact.artifactId}
-              selectedArtifactAccount={this.state.taskDefArtifactAccount}
-              setArtifactAccount={this.setArtifactAccount}
-              setArtifactId={this.onExpectedArtifactSelected}
               stage={command.viewState.currentStage}
-              updatePipeline={this.updatePipeline}
             />
           </div>
         </div>
@@ -368,7 +366,11 @@ export class TaskDefinition extends React.Component<ITaskDefinitionProps, ITaskD
               <tfoot>
                 <tr>
                   <td colSpan={3}>
-                    <button className="btn btn-block btn-sm add-new" onClick={this.pushMapping}>
+                    <button
+                      className="btn btn-block btn-sm add-new"
+                      data-test-id="Artifacts.containerAdd"
+                      onClick={this.pushMapping}
+                    >
                       <span className="glyphicon glyphicon-plus-sign" />
                       Add New Container Mapping
                     </button>
@@ -419,5 +421,9 @@ export class TaskDefinition extends React.Component<ITaskDefinitionProps, ITaskD
 export const TASK_DEFINITION_REACT = 'spinnaker.ecs.serverGroup.configure.wizard.taskDefinition.react';
 module(TASK_DEFINITION_REACT, []).component(
   'taskDefinitionReact',
-  react2angular(TaskDefinition, ['command', 'notifyAngular', 'configureCommand']),
+  react2angular(withErrorBoundary(TaskDefinition, 'taskDefinitionReact'), [
+    'command',
+    'notifyAngular',
+    'configureCommand',
+  ]),
 );

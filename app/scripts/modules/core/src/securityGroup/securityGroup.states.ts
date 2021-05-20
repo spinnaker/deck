@@ -1,20 +1,20 @@
-import { module } from 'angular';
 import { StateParams } from '@uirouter/angularjs';
-
-import { INestedState, STATE_CONFIG_PROVIDER, StateConfigProvider } from 'core/navigation';
+import { module } from 'angular';
 import {
-  APPLICATION_STATE_PROVIDER,
-  ApplicationStateProvider,
   Application,
+  APPLICATION_STATE_PROVIDER,
   ApplicationModelBuilder,
+  ApplicationStateProvider,
 } from 'core/application';
-import { SkinService } from 'core/cloudProvider';
-import { FirewallLabels } from './label';
+import { CloudProviderRegistry } from 'core/cloudProvider';
+import { INestedState, STATE_CONFIG_PROVIDER, StateConfigProvider } from 'core/navigation';
 
-import { SecurityGroupReader } from './securityGroupReader.service';
-import { filterModelConfig } from './filter/SecurityGroupFilterModel';
 import { SecurityGroupDetails } from './SecurityGroupDetails';
 import { SecurityGroups } from './SecurityGroups';
+import { filterModelConfig } from './filter/SecurityGroupFilterModel';
+import { SecurityGroupFilters } from './filter/SecurityGroupFilters';
+import { FirewallLabels } from './label';
+import { SecurityGroupReader } from './securityGroupReader.service';
 
 export const SECURITY_GROUP_STATES = 'spinnaker.core.securityGroup.states';
 module(SECURITY_GROUP_STATES, [APPLICATION_STATE_PROVIDER, STATE_CONFIG_PROVIDER]).config([
@@ -68,9 +68,7 @@ module(SECURITY_GROUP_STATES, [APPLICATION_STATE_PROVIDER, STATE_CONFIG_PROVIDER
       url: `/firewalls?${stateConfigProvider.paramsToQuery(filterModelConfig)}`,
       name: 'firewalls',
       views: {
-        nav: {
-          template: '<security-group-filter app="$resolve.app"></security-group-filter>',
-        },
+        nav: { component: SecurityGroupFilters, $type: 'react' },
         master: {
           component: SecurityGroups,
           $type: 'react',
@@ -99,11 +97,7 @@ module(SECURITY_GROUP_STATES, [APPLICATION_STATE_PROVIDER, STATE_CONFIG_PROVIDER
           controllerProvider: [
             '$stateParams',
             ($stateParams: StateParams) => {
-              return SkinService.getValue(
-                $stateParams.provider,
-                $stateParams.accountId,
-                'securityGroup.detailsController',
-              );
+              return CloudProviderRegistry.getValue($stateParams.provider, 'securityGroup.detailsController');
             },
           ],
           controllerAs: 'ctrl',
@@ -125,10 +119,10 @@ module(SECURITY_GROUP_STATES, [APPLICATION_STATE_PROVIDER, STATE_CONFIG_PROVIDER
         app: [
           '$stateParams',
           'securityGroupReader',
-          ($stateParams: StateParams, securityGroupReader: SecurityGroupReader): ng.IPromise<Application> => {
+          ($stateParams: StateParams, securityGroupReader: SecurityGroupReader): PromiseLike<Application> => {
             // we need the application to have a firewall index (so rules get attached and linked properly)
             // and its name should just be the name of the firewall (so cloning works as expected)
-            return securityGroupReader.loadSecurityGroups().then(securityGroupsIndex => {
+            return securityGroupReader.loadSecurityGroups().then((securityGroupsIndex) => {
               const application: Application = ApplicationModelBuilder.createStandaloneApplication($stateParams.name);
               application['securityGroupsIndex'] = securityGroupsIndex; // TODO: refactor the securityGroupsIndex out
               return application;

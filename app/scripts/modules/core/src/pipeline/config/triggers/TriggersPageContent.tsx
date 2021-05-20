@@ -1,17 +1,16 @@
 import React from 'react';
 
-import { findIndex } from 'lodash';
-
 import { Application } from 'core/application';
-import { ArtifactReferenceService } from 'core/artifact/ArtifactReferenceService';
+import { ArtifactReferenceService } from 'core/artifact';
+import { SETTINGS } from 'core/config/settings';
 import { IExpectedArtifact, IPipeline, ITrigger } from 'core/domain';
 import { HelpField } from 'core/help';
-import { PipelineConfigValidator } from 'core/pipeline';
 import { CheckboxInput, FormField } from 'core/presentation';
 import { Registry } from 'core/registry';
-import { SETTINGS } from 'core/config/settings';
+
 import { PipelineRoles } from './PipelineRoles';
 import { Trigger } from './Trigger';
+import { PipelineConfigValidator } from '../validation/PipelineConfigValidator';
 
 const { useState } = React;
 
@@ -23,16 +22,9 @@ export interface ITriggersPageContentProps {
 
 export function TriggersPageContent(props: ITriggersPageContentProps) {
   const showProperties = SETTINGS.feature.quietPeriod || SETTINGS.feature.managedServiceAccounts;
-  const {
-    pipeline,
-    pipeline: { triggers = [] },
-    application,
-    updatePipelineConfig,
-  } = props;
-  // must keep track of state to avoid race condition -- Remove once PipelineConfigurer is converted over to React
-  const [expectedArtifacts, setExpectedArtifacts] = useState<IExpectedArtifact[]>(
-    props.pipeline.expectedArtifacts ? props.pipeline.expectedArtifacts : [],
-  );
+  const { pipeline, application, updatePipelineConfig } = props;
+  const expectedArtifacts = pipeline?.expectedArtifacts ?? [];
+  const triggers = pipeline?.triggers ?? [];
   // KLUDGE: because we don't have a stable identifier to use for each trigger object, we need to reset the keys
   // used for each trigger in the list when a delete happens (because the array of triggers shifts by one).
   // For now, we do this by incrementing a counter every time a delete happens, and sticking that number
@@ -44,6 +36,10 @@ export function TriggersPageContent(props: ITriggersPageContentProps) {
     updatePipelineConfig({ roles });
   }
 
+  /**
+   * Adds a new trigger to the pipeline. If only one trigger type is registered,
+   * defaults the new trigger to that type.
+   */
   function addTrigger(): void {
     const triggerTypes = Registry.pipeline.getTriggerTypes();
     let newTrigger: ITrigger = { enabled: true, type: null };
@@ -53,45 +49,95 @@ export function TriggersPageContent(props: ITriggersPageContentProps) {
     updatePipelineConfig({ triggers: [...triggers, newTrigger] });
   }
 
-  function removeTrigger(triggerIndex: number): void {
-    const newTriggers = triggers.slice(0);
-    newTriggers.splice(triggerIndex, 1);
-    setDeleteCount(deleteCount + 1);
-    updatePipelineConfig({ triggers: newTriggers });
-  }
-
-  function updateTrigger(index: number, updatedTrigger: ITrigger) {
-    const updatedTriggers = triggers.slice(0);
-    updatedTriggers[index] = updatedTrigger;
-    PipelineConfigValidator.validatePipeline(pipeline);
-    updatePipelineConfig({ triggers: updatedTriggers });
-    if (SETTINGS.feature['artifactsRewrite']) {
-      removeUnusedExpectedArtifacts(pipeline);
-    }
-  }
-
-  // Expected Artifacts
-  function updateExpectedArtifacts(e: IExpectedArtifact[]) {
-    setExpectedArtifacts(e);
-    updatePipelineConfig({ expectedArtifacts });
-  }
-
-  function removeUnusedExpectedArtifacts(pipelineParam: IPipeline) {
-    // remove unused expected artifacts from the pipeline
-    const newExpectedArtifacts: IExpectedArtifact[] = expectedArtifacts;
-    newExpectedArtifacts.forEach(expectedArtifact => {
-      if (
-        !pipelineParam.triggers.find(t => t.expectedArtifactIds && t.expectedArtifactIds.includes(expectedArtifact.id))
-      ) {
-        newExpectedArtifacts.splice(
-          findIndex(newExpectedArtifacts, e => e.id === expectedArtifact.id),
-          1,
-        );
-      }
-      ArtifactReferenceService.removeReferenceFromStages(expectedArtifact.id, pipelineParam.stages);
+  /**
+   * Removes a trigger from the pipeline. Also handles removing each of the
+   * trigger's associated expected artifacts (that are associated with no other
+   * trigger) from the pipeline if the standard artifacts UI is enabled.
+   *
+   * @param indexToRemove The index of the trigger to remove
+   */
+  function removeTrigger(indexToRemove: number): void {
+    const triggerToRemove = triggers[indexToRemove];
+    const updatedTriggers = triggers.filter((_t, i) => i !== indexToRemove);
+    const artifactIdsToRemove = (triggerToRemove?.expectedArtifactIds ?? []).filter((id) => {
+      return !updatedTriggers.some((trigger) => (trigger.expectedArtifactIds || []).includes(id));
     });
-    setExpectedArtifacts(newExpectedArtifacts);
-    updatePipelineConfig({ expectedArtifacts });
+    const pipelineUpdate: Partial<IPipeline> = {
+      triggers: updatedTriggers,
+    };
+
+    if (artifactIdsToRemove.length > 0) {
+      const updatedExpectedArtifacts = expectedArtifacts.filter(({ id }) => !artifactIdsToRemove.includes(id));
+      pipelineUpdate.expectedArtifacts = updatedExpectedArtifacts;
+      ArtifactReferenceService.removeReferencesFromStages(artifactIdsToRemove, pipeline.stages);
+    }
+
+    updatePipelineConfig(pipelineUpdate);
+    setDeleteCount(deleteCount + 1);
+  }
+
+  /**
+   * Updates a pipeline trigger.
+   *
+   * @param indexToUpdate The index of the trigger to update
+   * @param updatedTrigger The updated trigger
+   */
+  function updateTrigger(indexToUpdate: number, updatedTrigger: ITrigger): void {
+    PipelineConfigValidator.validatePipeline(pipeline);
+    updatePipelineConfig({
+      triggers: triggers.map((trigger, index) => {
+        if (index === indexToUpdate) {
+          return updatedTrigger;
+        }
+        return trigger;
+      }),
+    });
+  }
+
+  /**
+   * Adds an expected artifact to the pipeline.
+   *
+   * @param artifact The expected artifact to add to the pipeline
+   */
+  function addExpectedArtifact(artifact: IExpectedArtifact): void {
+    updatePipelineConfig({
+      expectedArtifacts: expectedArtifacts.concat([artifact]),
+    });
+  }
+
+  /**
+   * Updates an expected artifact.
+   *
+   * @param updatedArtifact The updated artifact
+   */
+  function updateExpectedArtifact(updatedArtifact: IExpectedArtifact): void {
+    updatePipelineConfig({
+      expectedArtifacts: expectedArtifacts.map((artifact) => {
+        if (artifact.id === updatedArtifact.id) {
+          return updatedArtifact;
+        }
+        return artifact;
+      }),
+    });
+  }
+
+  /**
+   * Removes an expected artifact from the pipeline. Also handles removing
+   * any references to the artifact from pipeline stages.
+   *
+   * Because each trigger's state is managed by Formik within the Trigger
+   * component, we cannot make a top-down update of triggers that reference the
+   * removed artifact, so each trigger is responsible for updating its own list
+   * of associated artifacts in response to changes to
+   * `pipeline.expectedArtifacts`.
+   *
+   * @param artifact The artifact to remove
+   */
+  function removeExpectedArtifact(artifactToRemove: IExpectedArtifact): void {
+    updatePipelineConfig({
+      expectedArtifacts: expectedArtifacts.filter((a) => a.id !== artifactToRemove.id),
+    });
+    ArtifactReferenceService.removeReferenceFromStages(artifactToRemove.id, pipeline.stages);
   }
 
   return (
@@ -114,7 +160,7 @@ export function TriggersPageContent(props: ITriggersPageContentProps) {
                             updatePipelineConfig({ respectQuietPeriod: !pipeline.respectQuietPeriod });
                           }}
                           value={pipeline.respectQuietPeriod}
-                          input={inputProps => (
+                          input={(inputProps) => (
                             <CheckboxInput
                               {...inputProps}
                               text={
@@ -143,9 +189,11 @@ export function TriggersPageContent(props: ITriggersPageContentProps) {
             index={index}
             pipeline={pipeline}
             removeTrigger={removeTrigger}
-            trigger={trigger}
-            updateExpectedArtifacts={updateExpectedArtifacts}
+            triggerInitialValues={trigger}
             updateTrigger={updateTrigger}
+            addExpectedArtifact={addExpectedArtifact}
+            updateExpectedArtifact={updateExpectedArtifact}
+            removeExpectedArtifact={removeExpectedArtifact}
           />
         </div>
       ))}

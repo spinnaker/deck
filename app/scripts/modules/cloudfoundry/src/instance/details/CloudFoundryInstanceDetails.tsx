@@ -1,20 +1,13 @@
-import React from 'react';
 import { UISref } from '@uirouter/react';
 import { UIRouterContext } from '@uirouter/react-hybrid';
-
-import {
-  Application,
-  InstanceReader,
-  InstanceWriter,
-  RecentHistoryService,
-  Spinner,
-  ILoadBalancer,
-} from '@spinnaker/core';
-
-import { ICloudFoundryInstance } from 'cloudfoundry/domain';
-import { CloudFoundryInstanceDetailsSection } from './sections';
-import { CloudFoundryInstanceActions } from './CloudFoundryInstanceActions';
 import { flattenDeep } from 'lodash';
+import React from 'react';
+
+import { Application, ILoadBalancer, InstanceReader, RecentHistoryService, Spinner } from '@spinnaker/core';
+import { ICloudFoundryInstance } from 'cloudfoundry/domain';
+
+import { CloudFoundryInstanceActions } from './CloudFoundryInstanceActions';
+import { CloudFoundryInstanceDetailsSection } from './sections';
 
 interface InstanceFromStateParams {
   instanceId: string;
@@ -37,7 +30,6 @@ interface ICloudFoundryInstanceDetailsState {
 interface ICloudFoundryInstanceDetailsProps {
   app: Application;
   instance: InstanceFromStateParams;
-  instanceWriter: InstanceWriter;
   loading: boolean;
 }
 
@@ -61,7 +53,7 @@ export class CloudFoundryInstanceDetails extends React.Component<
 
   private retrieveInstance(instanceFromParams: InstanceFromStateParams): void {
     const instanceLocatorPredicate = (dataSource: InstanceManager) => {
-      return dataSource.instances.some(possibleMatch => possibleMatch.id === instanceFromParams.instanceId);
+      return dataSource.instances.some((possibleMatch) => possibleMatch.id === instanceFromParams.instanceId);
     };
 
     const dataSources: InstanceManager[] = flattenDeep([
@@ -89,7 +81,7 @@ export class CloudFoundryInstanceDetails extends React.Component<
           instanceDetails.region = instanceManager.region;
           return instanceDetails;
         })
-        .then(instance => {
+        .then((instance) => {
           this.setState({
             instance,
             loading: false,
@@ -99,7 +91,7 @@ export class CloudFoundryInstanceDetails extends React.Component<
   }
 
   public render(): JSX.Element {
-    const { app, instanceWriter } = this.props;
+    const { app } = this.props;
     const { instance, instanceIdNotFound, loading } = this.state;
     const CloseButton = (
       <div className="close-button">
@@ -131,7 +123,7 @@ export class CloudFoundryInstanceDetails extends React.Component<
           <span className={'glyphicon glyphicon-hdd ' + instance.healthState} />
           <h3 className="horizontal middle space-between flex-1">{instance.name}</h3>
         </div>
-        <CloudFoundryInstanceActions application={app} instance={instance} instanceWriter={instanceWriter} />
+        <CloudFoundryInstanceActions application={app} instance={instance} />
       </div>
     );
     const notFoundContent = () => (

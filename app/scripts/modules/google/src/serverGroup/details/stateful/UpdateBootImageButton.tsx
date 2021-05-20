@@ -9,10 +9,10 @@ import {
   WizardModal,
   WizardPage,
 } from '@spinnaker/core';
-
 import { IGceServerGroup } from 'google/domain';
-import { StatefulMIGService } from './StatefulMIGService';
 import { GceImageReader, IGceImage, ImageSelect } from 'google/image';
+
+import { StatefulMIGService } from './StatefulMIGService';
 
 interface IUpdateBootImageButtonProps {
   application: Application;
@@ -65,7 +65,7 @@ class UpdateBootImageModal extends React.Component<IUpdateBootImageModalProps, I
       account: this.props.serverGroup.account,
       provider: 'gce',
       q: '*',
-    }).then(images => {
+    }).then((images) => {
       this.setState({ availableImages: images });
     });
   }
@@ -92,8 +92,7 @@ class UpdateBootImageModal extends React.Component<IUpdateBootImageModalProps, I
             order={nextIdx()}
             render={() => (
               <FormikFormField
-                fastField={false}
-                input={props => (
+                input={(props) => (
                   <div className="full-width" style={{ height: '225px' }}>
                     <ImageSelect
                       availableImages={this.state.availableImages}

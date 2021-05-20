@@ -1,10 +1,13 @@
+import { StateParams, StateService } from '@uirouter/core';
 import { IController, module } from 'angular';
-import { PageNavigationState } from './PageNavigationState';
 import { isFunction, throttle } from 'lodash';
-import { StateService, StateParams } from '@uirouter/core';
+
 import { ScrollToService } from 'core/utils/scrollTo/scrollTo.service';
-import { PAGE_SECTION_COMPONENT } from './pageSection.component';
 import { UUIDGenerator } from 'core/utils/uuid.service';
+
+import { PageNavigationState } from './PageNavigationState';
+import { PAGE_SECTION_COMPONENT } from './pageSection.component';
+
 import './pageNavigation.less';
 
 class PageNavigatorController implements IController {
@@ -57,7 +60,7 @@ class PageNavigatorController implements IController {
     const navigatorRect = this.$element.get(0).getBoundingClientRect();
     const scrollableContainerTop = this.container.get(0).getBoundingClientRect().top;
 
-    const currentPage = PageNavigationState.pages.find(p => {
+    const currentPage = PageNavigationState.pages.find((p) => {
       const content = this.container.find(`[data-page-content=${p.key}]`);
       if (content.length) {
         return content.get(0).getBoundingClientRect().bottom > scrollableContainerTop;
@@ -102,8 +105,8 @@ const pageNavigatorComponent: ng.IComponentOptions = {
   controller: PageNavigatorController,
   transclude: true,
   template: `
-    <div class="row">
-      <div class="col-md-3 hidden-sm hidden-xs" ng-show="!$ctrl.hideNavigation">
+    <div class="row flex-1">
+      <div class="col-md-3 hidden-sm hidden-xs flex-1" ng-show="!$ctrl.hideNavigation">
         <ul class="page-navigation">
           <li ng-repeat="page in $ctrl.pageNavigationState.pages"
               data-page-navigation-link="{{page.key}}"

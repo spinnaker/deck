@@ -1,12 +1,12 @@
 import React from 'react';
-import { Subject, Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 
-import { Overridable, IOverridableProps } from 'core/overrideRegistry';
-import { Application } from 'core/application';
 import { AccountService } from 'core/account/AccountService';
+import { Application } from 'core/application';
+import { IMoniker, NameUtils } from 'core/naming';
+import { IOverridableProps, Overridable } from 'core/overrideRegistry';
 import { Spinner } from 'core/widgets';
-import { SkinService } from 'core/cloudProvider/skin.service';
-import { IMoniker } from 'core/naming';
+
 import { InstanceDetailsPane } from './InstanceDetailsPane';
 
 export interface IInstanceDetailsProps extends IOverridableProps {
@@ -47,9 +47,9 @@ export class InstanceDetails extends React.Component<IInstanceDetailsProps, IIns
       })
       .switchMap(({ app, $stateParams }) => {
         const { provider, instanceId } = $stateParams;
-        const accountId = Observable.fromPromise(SkinService.getAccountForInstance(provider, instanceId, app));
-        const moniker = Observable.fromPromise(SkinService.getMonikerForInstance(provider, instanceId, app));
-        const accountDetails = accountId.mergeMap(id => AccountService.getAccountDetails(id));
+        const accountId = Observable.fromPromise(AccountService.getAccountForInstance(provider, instanceId, app));
+        const moniker = Observable.fromPromise(NameUtils.getMonikerForInstance(provider, instanceId, app));
+        const accountDetails = accountId.mergeMap((id) => AccountService.getAccountDetails(id));
         return Observable.forkJoin(accountId, moniker, accountDetails);
       })
       .takeUntil(this.destroy$)

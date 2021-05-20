@@ -1,22 +1,22 @@
-import React from 'react';
-import { filter, flatten, groupBy, set, uniq } from 'lodash';
 import { FormikErrors, FormikProps } from 'formik';
+import { filter, flatten, groupBy, set, uniq } from 'lodash';
+import React from 'react';
 import { Observable, Subject } from 'rxjs';
 
 import {
   Application,
+  FormValidator,
   HelpField,
   IWizardPageComponent,
-  SpInput,
-  SpelNumberInput,
-  ValidationMessage,
-  FormValidator,
-  Validators,
   spelNumberCheck,
+  SpelNumberInput,
+  SpInput,
+  ValidationMessage,
+  Validators,
 } from '@spinnaker/core';
-import { isNameLong, isNameInUse, isValidTimeout, isValidHealthCheckInterval } from '../common/targetGroupValidators';
-
 import { IAmazonApplicationLoadBalancer, IAmazonApplicationLoadBalancerUpsertCommand } from 'amazon/domain';
+
+import { isNameInUse, isNameLong, isValidHealthCheckInterval, isValidTimeout } from '../common/targetGroupValidators';
 
 export interface ITargetGroupsProps {
   app: Application;
@@ -30,7 +30,8 @@ export interface ITargetGroupsState {
   oldTargetGroupCount: number;
 }
 
-export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGroupsState>
+export class TargetGroups
+  extends React.Component<ITargetGroupsProps, ITargetGroupsState>
   implements IWizardPageComponent<IAmazonApplicationLoadBalancerUpsertCommand> {
   public protocols = ['HTTP', 'HTTPS'];
   public targetTypes = ['instance', 'ip', 'lambda'];
@@ -50,7 +51,7 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
     values: IAmazonApplicationLoadBalancerUpsertCommand,
   ): FormikErrors<IAmazonApplicationLoadBalancerUpsertCommand> {
     const duplicateTargetGroups = uniq(
-      flatten(filter(groupBy(values.targetGroups, 'name'), count => count.length > 1)).map(tg => tg.name),
+      flatten(filter(groupBy(values.targetGroups, 'name'), (count) => count.length > 1)).map((tg) => tg.name),
     );
 
     const formValidator = new FormValidator(values);
@@ -91,37 +92,37 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
             .field('healthyThreshold', 'Healthy Threshold')
             .required()
             .spelAware()
-            .withValidators(value => spelNumberCheck(value));
+            .withValidators((value) => spelNumberCheck(value));
           builder
             .field('unhealthyThreshold', 'Unhealthy Threshold')
             .required()
             .spelAware()
-            .withValidators(value => spelNumberCheck(value));
+            .withValidators((value) => spelNumberCheck(value));
           builder
             .field('healthCheckInterval', 'Health Check Interval')
             .required()
             .spelAware()
-            .withValidators(value => spelNumberCheck(value));
+            .withValidators((value) => spelNumberCheck(value));
           builder
             .field('healthCheckPort', 'Health Check Port')
             .required()
             .spelAware()
-            .withValidators(value => (value === 'traffic-port' ? null : spelNumberCheck(value)));
+            .withValidators((value) => (value === 'traffic-port' ? null : spelNumberCheck(value)));
           builder
             .field('port', 'Port')
             .required()
             .spelAware()
-            .withValidators(value => spelNumberCheck(value));
+            .withValidators((value) => spelNumberCheck(value));
           builder
             .field('healthyThreshold', 'Healthy Threshold')
             .required()
             .spelAware()
-            .withValidators(value => spelNumberCheck(value), Validators.checkBetween('healthyThreshold', 2, 10));
+            .withValidators((value) => spelNumberCheck(value), Validators.checkBetween('healthyThreshold', 2, 10));
           builder
             .field('unhealthyThreshold', 'Unhealthy Threshold')
             .required()
             .spelAware()
-            .withValidators(value => spelNumberCheck(value), Validators.checkBetween('unhealthyThreshold', 2, 10));
+            .withValidators((value) => spelNumberCheck(value), Validators.checkBetween('unhealthyThreshold', 2, 10));
         }
       }),
     );
@@ -143,7 +144,7 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
         app.getDataSource('loadBalancers').data.forEach((lb: IAmazonApplicationLoadBalancer) => {
           if (lb.loadBalancerType !== 'classic') {
             if (!loadBalancer || lb.name !== loadBalancer.name) {
-              lb.targetGroups.forEach(targetGroup => {
+              lb.targetGroups.forEach((targetGroup) => {
                 targetGroupsByAccountAndRegion[lb.account] = targetGroupsByAccountAndRegion[lb.account] || {};
                 targetGroupsByAccountAndRegion[lb.account][lb.region] =
                   targetGroupsByAccountAndRegion[lb.account][lb.region] || [];
@@ -185,7 +186,7 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
       healthyThreshold: 10,
       unhealthyThreshold: 2,
       attributes: {
-        deregistrationDelay: 600,
+        deregistrationDelay: 300,
         stickinessEnabled: false,
         stickinessType: 'lb_cookie',
         stickinessDuration: 8400,
@@ -219,8 +220,8 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
     const { errors, values } = this.props.formik;
     const { oldTargetGroupCount } = this.state;
 
-    const ProtocolOptions = this.protocols.map(p => <option key={p}>{p}</option>);
-    const TargetTypeOptions = this.targetTypes.map(p => <option key={p}>{p}</option>);
+    const ProtocolOptions = this.protocols.map((p) => <option key={p}>{p}</option>);
+    const TargetTypeOptions = this.targetTypes.map((p) => <option key={p}>{p}</option>);
     return (
       <div className="container-fluid form-horizontal">
         <div className="form-group">
@@ -246,7 +247,7 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
                             className="form-control input-sm target-group-name"
                             type="text"
                             value={targetGroup.name}
-                            onChange={event => this.targetGroupFieldChanged(index, 'name', event.target.value)}
+                            onChange={(event) => this.targetGroupFieldChanged(index, 'name', event.target.value)}
                             required={true}
                             disabled={index < oldTargetGroupCount}
                           />
@@ -271,7 +272,9 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
                             <select
                               className="form-control input-sm"
                               value={targetGroup.targetType}
-                              onChange={event => this.targetGroupFieldChanged(index, 'targetType', event.target.value)}
+                              onChange={(event) =>
+                                this.targetGroupFieldChanged(index, 'targetType', event.target.value)
+                              }
                               disabled={index < oldTargetGroupCount}
                             >
                               {TargetTypeOptions}
@@ -291,7 +294,9 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
                               <select
                                 className="form-control input-sm inline-number"
                                 value={targetGroup.protocol}
-                                onChange={event => this.targetGroupFieldChanged(index, 'protocol', event.target.value)}
+                                onChange={(event) =>
+                                  this.targetGroupFieldChanged(index, 'protocol', event.target.value)
+                                }
                                 disabled={index < oldTargetGroupCount}
                               >
                                 {ProtocolOptions}
@@ -303,7 +308,7 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
                               <input
                                 className="form-control input-sm inline-number"
                                 value={targetGroup.port}
-                                onChange={event => this.targetGroupFieldChanged(index, 'port', event.target.value)}
+                                onChange={(event) => this.targetGroupFieldChanged(index, 'port', event.target.value)}
                                 type="text"
                                 required={true}
                                 disabled={index < oldTargetGroupCount}
@@ -320,10 +325,13 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
                           {targetGroup.targetType !== 'lambda' && (
                             <span className="wizard-pod-content">
                               <label>Protocol </label>
+                              {targetGroup.healthCheckProtocol === 'TCP' && (
+                                <HelpField id="aws.targetGroup.healthCheckProtocol" />
+                              )}{' '}
                               <select
                                 className="form-control input-sm inline-number"
                                 value={targetGroup.healthCheckProtocol}
-                                onChange={event =>
+                                onChange={(event) =>
                                   this.targetGroupFieldChanged(index, 'healthCheckProtocol', event.target.value)
                                 }
                               >
@@ -339,7 +347,7 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
                                 className="form-control input-sm inline-number"
                                 style={{ width: '90px' }}
                                 value={targetGroup.healthCheckPort === 'traffic-port' ? 'traffic-port' : 'manual'}
-                                onChange={event =>
+                                onChange={(event) =>
                                   this.targetGroupFieldChanged(
                                     index,
                                     'healthCheckPort',
@@ -359,59 +367,12 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
                                 name="healthCheckPort"
                                 required={true}
                                 value={targetGroup.healthCheckPort}
-                                onChange={event =>
+                                onChange={(event) =>
                                   this.targetGroupFieldChanged(index, 'healthCheckPort', event.target.value)
                                 }
                               />
                             </span>
                           )}
-                          <span className="wizard-pod-content">
-                            <label>Protocol </label>
-                            {targetGroup.healthCheckProtocol === 'TCP' && (
-                              <HelpField id="aws.targetGroup.healthCheckProtocol" />
-                            )}{' '}
-                            <select
-                              className="form-control input-sm inline-number"
-                              value={targetGroup.healthCheckProtocol}
-                              onChange={event =>
-                                this.targetGroupFieldChanged(index, 'healthCheckProtocol', event.target.value)
-                              }
-                            >
-                              {ProtocolOptions}
-                            </select>
-                          </span>
-                          <span className="wizard-pod-content">
-                            <label>Port </label>
-                            <HelpField id="aws.targetGroup.attributes.healthCheckPort.trafficPort" />{' '}
-                            <select
-                              className="form-control input-sm inline-number"
-                              style={{ width: '90px' }}
-                              value={targetGroup.healthCheckPort === 'traffic-port' ? 'traffic-port' : 'manual'}
-                              onChange={event =>
-                                this.targetGroupFieldChanged(
-                                  index,
-                                  'healthCheckPort',
-                                  event.target.value === 'traffic-port' ? 'traffic-port' : '',
-                                )
-                              }
-                            >
-                              <option value="traffic-port">Traffic Port</option>
-                              <option value="manual">Manual</option>
-                            </select>{' '}
-                            <SpInput
-                              className="form-control input-sm inline-number"
-                              error={tgErrors.healthCheckPort}
-                              style={{
-                                visibility: targetGroup.healthCheckPort === 'traffic-port' ? 'hidden' : 'inherit',
-                              }}
-                              name="healthCheckPort"
-                              required={true}
-                              value={targetGroup.healthCheckPort}
-                              onChange={event =>
-                                this.targetGroupFieldChanged(index, 'healthCheckPort', event.target.value)
-                              }
-                            />
-                          </span>
                           <span className="wizard-pod-content">
                             <label>Path </label>
                             <SpInput
@@ -419,7 +380,7 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
                               name="healthCheckPath"
                               required={true}
                               value={targetGroup.healthCheckPath}
-                              onChange={event =>
+                              onChange={(event) =>
                                 this.targetGroupFieldChanged(index, 'healthCheckPath', event.target.value)
                               }
                             />
@@ -499,7 +460,7 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
                                 className="form-control input-sm inline-number"
                                 type="text"
                                 value={targetGroup.attributes.deregistrationDelay}
-                                onChange={event =>
+                                onChange={(event) =>
                                   this.targetGroupFieldChanged(
                                     index,
                                     'attributes.deregistrationDelay',
@@ -513,7 +474,7 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
                                 <input
                                   type="checkbox"
                                   checked={targetGroup.attributes.stickinessEnabled}
-                                  onChange={event =>
+                                  onChange={(event) =>
                                     this.targetGroupFieldChanged(
                                       index,
                                       'attributes.stickinessEnabled',
@@ -532,7 +493,7 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
                                 <input
                                   className="form-control input-sm inline-number"
                                   value={targetGroup.attributes.stickinessDuration}
-                                  onChange={event =>
+                                  onChange={(event) =>
                                     this.targetGroupFieldChanged(
                                       index,
                                       'attributes.stickinessDuration',
@@ -551,7 +512,7 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
                             <input
                               type="checkbox"
                               checked={targetGroup.attributes.multiValueHeadersEnabled}
-                              onChange={event =>
+                              onChange={(event) =>
                                 this.targetGroupFieldChanged(
                                   index,
                                   'attributes.multiValueHeadersEnabled',

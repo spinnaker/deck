@@ -1,13 +1,10 @@
-import { IPromise } from 'angular';
-
 import { isEmpty } from 'lodash';
 import { Observable } from 'rxjs';
 
 import { IServerGroupDetailsProps, ServerGroupReader } from '@spinnaker/core';
-
 import { ICloudFoundryLoadBalancer, ICloudFoundryServerGroup } from 'cloudfoundry/domain';
 
-function extractServerGroupSummary(props: IServerGroupDetailsProps): IPromise<ICloudFoundryServerGroup> {
+function extractServerGroupSummary(props: IServerGroupDetailsProps): PromiseLike<ICloudFoundryServerGroup> {
   const { app, serverGroup } = props;
   return app.ready().then(() => {
     let summary: ICloudFoundryServerGroup = app.serverGroups.data.find((toCheck: ICloudFoundryServerGroup) => {
@@ -20,7 +17,7 @@ function extractServerGroupSummary(props: IServerGroupDetailsProps): IPromise<IC
     if (!summary) {
       app.loadBalancers.data.some((loadBalancer: ICloudFoundryLoadBalancer) => {
         if (loadBalancer.account === serverGroup.accountId && loadBalancer.region === serverGroup.region) {
-          return loadBalancer.serverGroups.some(possibleServerGroup => {
+          return loadBalancer.serverGroups.some((possibleServerGroup) => {
             if (possibleServerGroup.name === serverGroup.name) {
               summary = possibleServerGroup;
               return true;
@@ -40,8 +37,8 @@ export function cfServerGroupDetailsGetter(
   autoClose: () => void,
 ): Observable<ICloudFoundryServerGroup> {
   const { app, serverGroup: serverGroupInfo } = props;
-  return new Observable<ICloudFoundryServerGroup>(observer => {
-    extractServerGroupSummary(props).then(summary => {
+  return new Observable<ICloudFoundryServerGroup>((observer) => {
+    extractServerGroupSummary(props).then((summary) => {
       ServerGroupReader.getServerGroup(
         app.name,
         serverGroupInfo.accountId,

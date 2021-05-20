@@ -1,12 +1,11 @@
-import React from 'react';
+import 'brace/mode/json';
 import { cloneDeepWith } from 'lodash';
+import React from 'react';
 import { Modal } from 'react-bootstrap';
 
-import 'brace/mode/json';
-
 import { IStage } from 'core/domain';
-import { JsonUtils, noop } from 'core/utils';
 import { IModalComponentProps, JsonEditor } from 'core/presentation';
+import { JsonUtils, noop } from 'core/utils';
 
 export interface IEditStageJsonModalProps extends IModalComponentProps {
   stage: IStage;
@@ -33,7 +32,7 @@ export class EditStageJsonModal extends React.Component<IEditStageJsonModalProps
       }
       return undefined; // required for clone operation and typescript happiness
     });
-    this.immutableFields.forEach(k => delete copy[k]);
+    this.immutableFields.forEach((k) => delete copy[k]);
 
     this.state = {
       stageJSON: JsonUtils.makeSortedStringFromObject(copy),
@@ -48,8 +47,8 @@ export class EditStageJsonModal extends React.Component<IEditStageJsonModalProps
       const parsed = JSON.parse(stageJSON);
 
       Object.keys(stage)
-        .filter(k => !this.immutableFields.includes(k))
-        .forEach(k => delete stage[k]);
+        .filter((k) => !this.immutableFields.includes(k))
+        .forEach((k) => delete stage[k]);
       Object.assign(stage, parsed);
 
       this.props.closeModal();

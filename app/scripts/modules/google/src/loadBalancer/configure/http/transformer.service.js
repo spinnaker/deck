@@ -11,7 +11,7 @@ export const GOOGLE_LOADBALANCER_CONFIGURE_HTTP_TRANSFORMER_SERVICE = 'spinnaker
 export const name = GOOGLE_LOADBALANCER_CONFIGURE_HTTP_TRANSFORMER_SERVICE; // for backwards compatibility
 module(GOOGLE_LOADBALANCER_CONFIGURE_HTTP_TRANSFORMER_SERVICE, []).factory(
   'gceHttpLoadBalancerTransformer',
-  function() {
+  function () {
     // SERIALIZE
 
     const keysToOmit = ['backendServices', 'healthChecks', 'listeners', 'stack', 'detail'];
@@ -24,7 +24,7 @@ module(GOOGLE_LOADBALANCER_CONFIGURE_HTTP_TRANSFORMER_SERVICE, []).factory(
 
       loadBalancer.hostRules = loadBalancer.hostRules.reduce((hostRules, hostRule) => {
         return hostRules.concat(
-          hostRule.hostPatterns.map(hostPattern => {
+          hostRule.hostPatterns.map((hostPattern) => {
             return {
               hostPatterns: [hostPattern],
               pathMatcher: _.cloneDeep(hostRule.pathMatcher),
@@ -55,7 +55,7 @@ module(GOOGLE_LOADBALANCER_CONFIGURE_HTTP_TRANSFORMER_SERVICE, []).factory(
         _.keyBy(loadBalancer.backendServices, 'name'),
       );
 
-      _.forEach(unifiedBackendServicesKeyedByName, service => {
+      _.forEach(unifiedBackendServicesKeyedByName, (service) => {
         service.healthCheck = unifiedHealthChecksKeyedByName[service.healthCheck];
         // Map human readable text back to session affinity code.
         service.sessionAffinity = sessionAffinityViewToModelMap[service.sessionAffinity] || service.sessionAffinity;
@@ -66,25 +66,26 @@ module(GOOGLE_LOADBALANCER_CONFIGURE_HTTP_TRANSFORMER_SERVICE, []).factory(
     }
 
     function mapBackendServiceNamesToObjects(hostRules, servicesByName) {
-      hostRules.forEach(hostRule => {
+      hostRules.forEach((hostRule) => {
         const p = hostRule.pathMatcher;
 
         p.defaultService = servicesByName[p.defaultService];
 
-        p.pathRules.forEach(pathRule => {
+        p.pathRules.forEach((pathRule) => {
           pathRule.backendService = servicesByName[pathRule.backendService];
         });
       });
     }
 
     function buildCommandForEachListener(loadBalancer) {
-      return loadBalancer.listeners.map(listener => {
+      return loadBalancer.listeners.map((listener) => {
         let command = _.cloneDeep(loadBalancer);
         command = _.omit(command, keysToOmit);
         command.name = listener.name;
         command.portRange = listener.port;
         command.certificate = listener.certificate || null;
         command.ipAddress = listener.ipAddress;
+        command.subnet = listener.subnet;
 
         return command;
       });
@@ -103,6 +104,8 @@ module(GOOGLE_LOADBALANCER_CONFIGURE_HTTP_TRANSFORMER_SERVICE, []).factory(
         healthChecks,
         hostRules,
         listeners,
+        network: loadBalancer.network,
+        region: loadBalancer.region,
         urlMapName: loadBalancer.urlMapName,
         credentials: loadBalancer.credentials || loadBalancer.account,
       };
@@ -122,17 +125,13 @@ module(GOOGLE_LOADBALANCER_CONFIGURE_HTTP_TRANSFORMER_SERVICE, []).factory(
         }, backendServices);
       }
 
-      const healthChecks = _.chain(backendServices)
-        .map('healthCheck')
-        .uniqBy('name')
-        .cloneDeep()
-        .value();
-      healthChecks.forEach(hc => {
+      const healthChecks = _.chain(backendServices).map('healthCheck').uniqBy('name').cloneDeep().value();
+      healthChecks.forEach((hc) => {
         hc.account = loadBalancer.account || loadBalancer.credentials;
       });
       backendServices = _.uniqBy(backendServices, 'name');
 
-      backendServices.forEach(service => {
+      backendServices.forEach((service) => {
         // Map health check to health check name so we don't have to deal with object references
         service.healthCheck = service.healthCheck.name;
         // Map session affinity code to more human readable text.
@@ -147,7 +146,7 @@ module(GOOGLE_LOADBALANCER_CONFIGURE_HTTP_TRANSFORMER_SERVICE, []).factory(
     }
 
     function getListeners(loadBalancer) {
-      loadBalancer.listeners.forEach(listener => {
+      loadBalancer.listeners.forEach((listener) => {
         const { stack, freeFormDetails } = NameUtils.parseLoadBalancerName(listener.name);
         listener.stack = stack;
         listener.detail = freeFormDetails;
@@ -159,12 +158,12 @@ module(GOOGLE_LOADBALANCER_CONFIGURE_HTTP_TRANSFORMER_SERVICE, []).factory(
 
     function mapBackendServicesToNames(hostRules) {
       // Map backend service to backend service name so we don't have to deal with object references
-      hostRules.forEach(hostRule => {
+      hostRules.forEach((hostRule) => {
         const p = hostRule.pathMatcher;
 
         p.defaultService = p.defaultService.name;
 
-        p.pathRules.forEach(pathRule => {
+        p.pathRules.forEach((pathRule) => {
           pathRule.backendService = pathRule.backendService.name;
         });
       });

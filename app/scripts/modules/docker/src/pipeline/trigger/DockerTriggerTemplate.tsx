@@ -1,17 +1,16 @@
+import { get } from 'lodash';
+import { $q } from 'ngimport';
 import React from 'react';
 import { Option } from 'react-select';
-import { get } from 'lodash';
-import { IPromise } from 'angular';
-import { $q } from 'ngimport';
 import { Observable, Subject, Subscription } from 'rxjs';
 
 import {
+  HelpField,
   IDockerTrigger,
+  IPipelineCommand,
   ITriggerTemplateComponentProps,
   Spinner,
   TetheredSelect,
-  IPipelineCommand,
-  HelpField,
 } from '@spinnaker/core';
 
 import { DockerImageReader, IDockerLookupType } from '../../image';
@@ -37,7 +36,7 @@ export class DockerTriggerTemplate extends React.Component<
   private queryStream = new Subject();
   private subscription: Subscription;
 
-  public static formatLabel(trigger: IDockerTrigger): IPromise<string> {
+  public static formatLabel(trigger: IDockerTrigger): PromiseLike<string> {
     return $q.when(`(Docker Registry) ${trigger.account ? trigger.account + ':' : ''} ${trigger.repository || ''}`);
   }
 
@@ -66,12 +65,12 @@ export class DockerTriggerTemplate extends React.Component<
 
   private lookupTypeChanged = (o: Option<IDockerLookupType>) => {
     const newType = o.value;
-    this.props.updateCommand('extraFields.tag', newType === 'tag' ? this.state.selectedTag : this.state.digest);
+    this.updateArtifact(this.props.command, newType === 'tag' ? this.state.selectedTag : this.state.digest);
     this.setState({ lookupType: newType });
   };
 
-  private updateArtifact(command: IPipelineCommand, tag: string) {
-    this.props.updateCommand('extraFields.tag', tag);
+  private updateArtifact(command: IPipelineCommand, tagOrDigest: string) {
+    this.props.updateCommand('extraFields.tag', tagOrDigest);
     const trigger = command.trigger as IDockerTrigger;
     if (trigger && trigger.repository) {
       let imageName = '';
@@ -79,12 +78,20 @@ export class DockerTriggerTemplate extends React.Component<
         imageName += trigger.registry + '/';
       }
       imageName += trigger.repository;
+
+      let imageReference = '';
+      if (this.state.lookupType === 'digest') {
+        imageReference = `${imageName}@${tagOrDigest}`;
+      } else {
+        imageReference = `${imageName}:${tagOrDigest}`;
+      }
+
       this.props.updateCommand('extraFields.artifacts', [
         {
           type: 'docker/image',
           name: imageName,
-          version: tag,
-          reference: imageName + ':' + tag,
+          version: tagOrDigest,
+          reference: imageReference,
         },
       ]);
     }
@@ -105,10 +112,10 @@ export class DockerTriggerTemplate extends React.Component<
     const { command } = this.props;
     const trigger = command.trigger as IDockerTrigger;
     const newState = {} as IDockerTriggerTemplateState;
-    newState.tags = tags;
-    if (newState.tags.length) {
-      // default to what is supplied by the trigger if possible; otherwise, use the latest
-      const defaultSelection = newState.tags.find(t => t === trigger.tag) || newState.tags[0];
+    newState.tags = tags || [];
+    // default to what is supplied by the trigger if possible
+    const defaultSelection = newState.tags.find((t) => t === trigger.tag);
+    if (defaultSelection) {
       newState.selectedTag = defaultSelection;
       this.updateSelectedTag(defaultSelection);
     }
@@ -168,7 +175,7 @@ export class DockerTriggerTemplate extends React.Component<
   public render() {
     const { digest, tags, tagsLoading, loadError, selectedTag, lookupType } = this.state;
 
-    const options = tags.map(tag => {
+    const options = tags.map((tag) => {
       return { value: tag } as Option<string>;
     });
 
@@ -206,15 +213,16 @@ export class DockerTriggerTemplate extends React.Component<
                 {tags.length > 0 && (
                   <TetheredSelect
                     options={options}
-                    optionRenderer={o => <span>{o.value}</span>}
+                    optionRenderer={(o) => <span>{o.value}</span>}
                     clearable={false}
                     value={selectedTag}
-                    valueRenderer={o => (
+                    valueRenderer={(o) => (
                       <span>
                         <strong>{o.value}</strong>
                       </span>
                     )}
                     onChange={(o: Option<string>) => this.updateSelectedTag(o.value)}
+                    placeholder="Search tags..."
                   />
                 )}
               </div>
@@ -229,7 +237,7 @@ export class DockerTriggerTemplate extends React.Component<
             <div className="col-md-6">
               <input
                 value={digest}
-                onChange={e => this.updateDigest(e.target.value)}
+                onChange={(e) => this.updateDigest(e.target.value)}
                 className="form-control input-sm"
                 required={true}
               />

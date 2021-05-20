@@ -1,15 +1,16 @@
+import { sortBy } from 'lodash';
 import React from 'react';
 import ReactGA from 'react-ga';
-import { sortBy } from 'lodash';
 
 import { ILoadBalancer } from 'core/domain';
-import { ILoadBalancersTagProps } from './LoadBalancersTagWrapper';
 import { HealthCounts } from 'core/healthCounts/HealthCounts';
-import { LoadBalancerDataUtils } from './loadBalancerDataUtils';
+import { HoverablePopover } from 'core/presentation';
 import { Tooltip } from 'core/presentation/Tooltip';
 import { ReactInjector } from 'core/reactShims';
-import { HoverablePopover } from 'core/presentation';
 import { Spinner } from 'core/widgets';
+
+import { ILoadBalancersTagProps } from './LoadBalancersTagWrapper';
+import { LoadBalancerDataUtils } from './loadBalancerDataUtils';
 
 interface ILoadBalancerListItemProps {
   loadBalancer: ILoadBalancer;
@@ -91,7 +92,7 @@ export class LoadBalancersTag extends React.Component<ILoadBalancersTagProps, IL
   };
 
   public componentDidMount(): void {
-    LoadBalancerDataUtils.populateLoadBalancers(this.props.application, this.props.serverGroup).then(loadBalancers =>
+    LoadBalancerDataUtils.populateLoadBalancers(this.props.application, this.props.serverGroup).then((loadBalancers) =>
       this.setState({ loadBalancers, isLoading: false }),
     );
 
@@ -120,7 +121,7 @@ export class LoadBalancersTag extends React.Component<ILoadBalancersTagProps, IL
     const popover = (
       <div className="menu-load-balancers">
         <div className="menu-load-balancers-header"> Load Balancers </div>
-        {sortBy(loadBalancers, 'name').map(loadBalancer => (
+        {sortBy(loadBalancers, 'name').map((loadBalancer) => (
           <LoadBalancerListItem
             key={loadBalancer.name}
             loadBalancer={loadBalancer}
@@ -156,7 +157,7 @@ export class LoadBalancersTag extends React.Component<ILoadBalancersTagProps, IL
 
         {totalCount === 1 && (
           <span className="btn-load-balancer">
-            {sortBy(loadBalancers, 'name').map(loadBalancer => (
+            {sortBy(loadBalancers, 'name').map((loadBalancer) => (
               <LoadBalancerButton
                 key={loadBalancer.name}
                 loadBalancer={loadBalancer}

@@ -1,10 +1,10 @@
+import { kebabCase, startCase } from 'lodash';
 import React from 'react';
-import { startCase, kebabCase } from 'lodash';
 
 import { AccountTag } from 'core/account';
-import { Spinner } from 'core/widgets';
 import { IInstanceCounts } from 'core/domain';
 import { HealthCounts } from 'core/healthCounts';
+import { Spinner } from 'core/widgets';
 
 export interface ISearchColumn {
   key: string;
@@ -15,19 +15,19 @@ export interface ISearchColumn {
 
 /****** Layout Renderers ******/
 
-export class TableHeader extends React.Component {
+export class SearchTableHeader extends React.Component {
   public render() {
     return <div className="table-header">{this.props.children}</div>;
   }
 }
 
-export class TableRow extends React.Component {
+export class SearchTableRow extends React.Component {
   public render() {
     return <div className="table-row small">{this.props.children}</div>;
   }
 }
 
-export class TableBody extends React.Component {
+export class SearchTableBody extends React.Component {
   public render() {
     return <div className="table-contents flex-fill">{this.props.children}</div>;
   }

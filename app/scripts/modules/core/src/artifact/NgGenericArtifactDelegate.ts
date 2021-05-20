@@ -1,12 +1,12 @@
 import { IScope } from 'angular';
-
-import { IArtifactKindConfig, IExpectedArtifact, IArtifactSource, IStage, IPipeline } from 'core/domain';
-import { ExpectedArtifactService, IExpectedArtifactSelectorViewControllerDelegate } from 'core/artifact';
-import { Registry } from 'core/registry';
 import { IArtifactAccount } from 'core/account';
+import { IArtifactKindConfig, IArtifactSource, IExpectedArtifact, IPipeline, IStage } from 'core/domain';
+import { Registry } from 'core/registry';
 
-import { ExpectedArtifactSelectorViewControllerAngularDelegate } from './ExpectedArtifactSelectorViewControllerAngularDelegate';
 import { ArtifactTypePatterns } from './ArtifactTypes';
+import { IExpectedArtifactSelectorViewControllerDelegate } from './ExpectedArtifactSelectorViewController';
+import { ExpectedArtifactSelectorViewControllerAngularDelegate } from './ExpectedArtifactSelectorViewControllerAngularDelegate';
+import { ExpectedArtifactService } from './expectedArtifact.service';
 
 export const defaultExcludedArtifactTypes = [ArtifactTypePatterns.KUBERNETES, ArtifactTypePatterns.DOCKER_IMAGE];
 
@@ -25,7 +25,7 @@ export class NgGenericArtifactDelegate
     );
     this.kinds = Registry.pipeline
       .getMatchArtifactKinds()
-      .filter((a: IArtifactKindConfig) => !this.getExcludedArtifactTypes().find(t => t.test(a.type)));
+      .filter((a: IArtifactKindConfig) => !this.getExcludedArtifactTypes().find((t) => t.test(a.type)));
     this.refreshExpectedArtifacts();
   }
 
@@ -45,7 +45,7 @@ export class NgGenericArtifactDelegate
     if (id == null) {
       return null;
     }
-    return this.getExpectedArtifacts().find(ea => ea.id === id);
+    return this.getExpectedArtifacts().find((ea) => ea.id === id);
   };
 
   public getSelectedAccount = (): IArtifactAccount => {
@@ -53,7 +53,7 @@ export class NgGenericArtifactDelegate
     if (accountName == null) {
       return null;
     }
-    return this.getExpectedArtifactAccounts().find(a => a.name === accountName);
+    return this.getExpectedArtifactAccounts().find((a) => a.name === accountName);
   };
 
   public setSelectedExpectedArtifact = (expectedArtifact: IExpectedArtifact) => {

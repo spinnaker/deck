@@ -2,8 +2,9 @@
 
 import { module } from 'angular';
 
-import './regionFilter.component.less';
 import { CORE_PROJECTS_DASHBOARD_REGIONFILTER_REGIONFILTER_SERVICE } from './regionFilter.service';
+
+import './regionFilter.component.less';
 
 export const CORE_PROJECTS_DASHBOARD_REGIONFILTER_REGIONFILTER_COMPONENT =
   'spinnaker.deck.projects.dashboard.regionFilter.component';
@@ -18,7 +19,7 @@ module(CORE_PROJECTS_DASHBOARD_REGIONFILTER_REGIONFILTER_COMPONENT, [
   templateUrl: require('./regionFilter.component.html'),
   controller: [
     'regionFilterService',
-    function(regionFilterService) {
+    function (regionFilterService) {
       this.clearFilter = regionFilterService.clearFilter;
       this.toggleRegion = regionFilterService.toggleRegion;
       this.sortFilter = regionFilterService.sortFilter;

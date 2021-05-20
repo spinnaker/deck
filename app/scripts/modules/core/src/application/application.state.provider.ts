@@ -1,12 +1,12 @@
-import { IServiceProvider, module } from 'angular';
 import { StateParams } from '@uirouter/angularjs';
+import { IServiceProvider, module } from 'angular';
+import { InsightLayout } from 'core/insight/InsightLayout';
+import { INestedState, STATE_CONFIG_PROVIDER, StateConfigProvider } from 'core/navigation/state.provider';
 
-import { Application } from './application.model';
 import { ApplicationComponent } from './ApplicationComponent';
+import { Application } from './application.model';
 import { ApplicationModelBuilder } from './applicationModel.builder';
 import { ApplicationReader } from './service/ApplicationReader';
-import { INestedState, STATE_CONFIG_PROVIDER, StateConfigProvider } from 'core/navigation/state.provider';
-import { NgReact } from 'core/reactShims';
 import { InferredApplicationWarningService } from './service/InferredApplicationWarningService';
 
 export class ApplicationStateProvider implements IServiceProvider {
@@ -18,9 +18,12 @@ export class ApplicationStateProvider implements IServiceProvider {
     abstract: true,
     views: {
       insight: {
-        component: NgReact.InsightLayout,
+        component: InsightLayout,
         $type: 'react',
       },
+    },
+    resolve: {
+      app: ['app', (app: Application) => app],
     },
     children: this.insightStates,
   };
@@ -57,9 +60,9 @@ export class ApplicationStateProvider implements IServiceProvider {
    */
   public addInsightDetailState(state: INestedState): void {
     this.detailStates.push(state);
-    this.insightState.children.forEach(c => {
+    this.insightState.children.forEach((c) => {
       c.children = c.children || [];
-      if (!c.children.some(child => child.name === state.name)) {
+      if (!c.children.some((child) => child.name === state.name)) {
         c.children.push(state);
       }
     });
@@ -75,8 +78,21 @@ export class ApplicationStateProvider implements IServiceProvider {
   public addParentState(parentState: INestedState, mainView: string, relativeUrl = '') {
     const applicationConfig: INestedState = {
       name: 'application',
-      abstract: true,
       url: `${relativeUrl}/:application`,
+      redirectTo: (transition) => {
+        return transition
+          .injector()
+          .getAsync('app')
+          .then((app: Application) => {
+            const defaultDataSource = app.dataSources.find((ds) => ds.sref && !ds.disabled)?.sref;
+
+            const params = transition.params();
+            // If there's no data source to route to, we need to use the absolute href 'home.search'
+            const options = { relative: defaultDataSource ? transition.to().name : undefined };
+
+            return transition.router.stateService.target(defaultDataSource || 'home.search', params, options);
+          });
+      },
       resolve: {
         app: [
           '$stateParams',
@@ -88,7 +104,7 @@ export class ApplicationStateProvider implements IServiceProvider {
                   return app || ApplicationModelBuilder.createNotFoundApplication($stateParams.application);
                 },
               )
-              .catch(error => {
+              .catch((error) => {
                 if (error.status && error.status === 404) {
                   return ApplicationModelBuilder.createNotFoundApplication($stateParams.application);
                 } else {
@@ -106,6 +122,7 @@ export class ApplicationStateProvider implements IServiceProvider {
         },
         history: {
           type: 'applications',
+          state: 'home.applications.application',
           keyParams: ['application'],
         },
       },

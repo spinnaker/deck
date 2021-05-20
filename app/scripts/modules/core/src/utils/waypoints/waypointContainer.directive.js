@@ -1,12 +1,12 @@
 'use strict';
 
-import { WaypointService } from './waypoint.service';
-
 import { module } from 'angular';
+
+import { WaypointService } from './waypoint.service';
 
 export const CORE_UTILS_WAYPOINTS_WAYPOINTCONTAINER_DIRECTIVE = 'spinnaker.core.utils.waypoints.container.directive';
 export const name = CORE_UTILS_WAYPOINTS_WAYPOINTCONTAINER_DIRECTIVE; // for backwards compatibility
-module(CORE_UTILS_WAYPOINTS_WAYPOINTCONTAINER_DIRECTIVE, []).directive('waypointContainer', function() {
+module(CORE_UTILS_WAYPOINTS_WAYPOINTCONTAINER_DIRECTIVE, []).directive('waypointContainer', function () {
   return {
     restrict: 'A',
     scope: {
@@ -14,7 +14,7 @@ module(CORE_UTILS_WAYPOINTS_WAYPOINTCONTAINER_DIRECTIVE, []).directive('waypoint
       offsetHeight: '=waypointOffset',
     },
     link: {
-      post: function(scope, elem) {
+      post: function (scope, elem) {
         const offset = scope.offsetHeight || 0;
         WaypointService.registerWaypointContainer(scope, elem, scope.key, offset);
       },

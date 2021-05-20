@@ -1,7 +1,8 @@
 import { isString } from 'lodash';
 
-import { API } from 'core/api';
-import { parseSpelExpressions } from 'core/presentation';
+import { REST } from 'core/api';
+
+import { parseSpelExpressions } from '../forms/inputs/expression';
 
 interface IEvaluationException {
   description: string;
@@ -20,11 +21,9 @@ interface IServerSideEvaluatedExpression {
 export class SpelService {
   /** Evaluates a spel expression on the server against a previous executionId and stageId */
   public static evaluateExpression(expression: string, executionId: string, stageId: string) {
-    return API.all('pipelines')
-      .one(executionId)
-      .one(stageId)
-      .one('evaluateExpression')
-      .withParams({ expression })
+    return REST('/pipelines')
+      .path(executionId, stageId, 'evaluateExpression')
+      .query({ expression })
       .get()
       .then((result: IServerSideEvaluatedExpression) => {
         const errors = result.detail || {};

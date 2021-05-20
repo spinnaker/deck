@@ -32,7 +32,7 @@ describe('pipelineConfigValidator', () => {
         stage.requisiteStageRefIds = [];
       }
     });
-    triggers.forEach(t => (t.enabled = true));
+    triggers.forEach((t) => (t.enabled = true));
 
     return {
       id: 'a',
@@ -65,7 +65,7 @@ describe('pipelineConfigValidator', () => {
 
   beforeEach(mock.module(require('../pipelineConfig.module').name));
 
-  beforeEach(function() {
+  beforeEach(function () {
     SETTINGS.feature.fiatEnabled = true;
   });
 
@@ -74,7 +74,7 @@ describe('pipelineConfigValidator', () => {
       $q = _$q_;
       validate = () => {
         validationResults = null;
-        PipelineConfigValidator.validatePipeline(pipeline).then(result => (validationResults = result));
+        PipelineConfigValidator.validatePipeline(pipeline).then((result) => (validationResults = result));
         $rootScope.$new().$digest();
       };
     });
@@ -247,7 +247,7 @@ describe('pipelineConfigValidator', () => {
 
       it('checks parent pipeline triggers for match', () => {
         spyOn(PipelineConfigService, 'getPipelinesForApplication').and.returnValue(
-          $q.when([{ id: 'abcd', triggers: [{ type: 'prereq' }] }]),
+          $q.when([{ id: 'abcd', triggers: [{ type: 'prereq' }] }]) as any,
         );
 
         pipeline = buildPipeline(
@@ -261,7 +261,7 @@ describe('pipelineConfigValidator', () => {
 
       it('caches pipeline configs', () => {
         spyOn(PipelineConfigService, 'getPipelinesForApplication').and.returnValue(
-          $q.when([{ id: 'abcd', triggers: [{ type: 'prereq' }] }]),
+          $q.when([{ id: 'abcd', triggers: [{ type: 'prereq' }] }] as any),
         );
 
         pipeline = buildPipeline(
@@ -281,7 +281,7 @@ describe('pipelineConfigValidator', () => {
           $q.when([
             { id: 'abcd', triggers: [{ type: 'not-prereq' }] },
             { id: 'other', triggers: [{ type: 'prereq' }] },
-          ]),
+          ] as any),
         );
 
         pipeline = buildPipeline(
@@ -295,7 +295,7 @@ describe('pipelineConfigValidator', () => {
 
       it('does not check parent triggers unless specified in validator', () => {
         spyOn(PipelineConfigService, 'getPipelinesForApplication').and.returnValue(
-          $q.when([{ id: 'abcd', triggers: [{ type: 'prereq' }] }]),
+          $q.when([{ id: 'abcd', triggers: [{ type: 'prereq' }] }] as any),
         );
 
         pipeline = buildPipeline(

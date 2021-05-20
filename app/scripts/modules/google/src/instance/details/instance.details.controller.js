@@ -1,6 +1,8 @@
 'use strict';
 
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 import { module } from 'angular';
+import ANGULAR_UI_BOOTSTRAP from 'angular-ui-bootstrap';
 import _ from 'lodash';
 
 import {
@@ -8,14 +10,11 @@ import {
   ConfirmationModalService,
   FirewallLabels,
   InstanceReader,
-  INSTANCE_WRITE_SERVICE,
+  InstanceWriter,
   RecentHistoryService,
 } from '@spinnaker/core';
-
-import { GCE_HTTP_LOAD_BALANCER_UTILS } from 'google/loadBalancer/httpLoadBalancerUtils.service';
 import { GOOGLE_COMMON_XPNNAMING_GCE_SERVICE } from 'google/common/xpnNaming.gce.service';
-import UIROUTER_ANGULARJS from '@uirouter/angularjs';
-import ANGULAR_UI_BOOTSTRAP from 'angular-ui-bootstrap';
+import { GCE_HTTP_LOAD_BALANCER_UTILS } from 'google/loadBalancer/httpLoadBalancerUtils.service';
 
 export const GOOGLE_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER = 'spinnaker.instance.detail.gce.controller';
 export const name = GOOGLE_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER; // for backwards compatibility
@@ -23,13 +22,11 @@ module(GOOGLE_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
   UIROUTER_ANGULARJS,
   ANGULAR_UI_BOOTSTRAP,
   GOOGLE_COMMON_XPNNAMING_GCE_SERVICE,
-  INSTANCE_WRITE_SERVICE,
   GCE_HTTP_LOAD_BALANCER_UTILS,
 ]).controller('gceInstanceDetailsCtrl', [
   '$scope',
   '$state',
   '$uibModal',
-  'instanceWriter',
   'instance',
   'app',
   'moniker',
@@ -37,11 +34,10 @@ module(GOOGLE_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
   '$q',
   'gceHttpLoadBalancerUtils',
   'gceXpnNamingService',
-  function(
+  function (
     $scope,
     $state,
     $uibModal,
-    instanceWriter,
     instance,
     app,
     moniker,
@@ -71,14 +67,14 @@ module(GOOGLE_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
       }
 
       instance.health = instance.health || [];
-      const displayableMetrics = instance.health.filter(function(metric) {
+      const displayableMetrics = instance.health.filter(function (metric) {
         return metric.type !== 'Google' || metric.state !== 'Unknown';
       });
 
       // backfill details where applicable
       if (latest.health) {
-        displayableMetrics.forEach(function(metric) {
-          const detailsMatch = latest.health.filter(function(latestHealth) {
+        displayableMetrics.forEach(function (metric) {
+          const detailsMatch = latest.health.filter(function (latestHealth) {
             return latestHealth.type === metric.type;
           });
           if (detailsMatch.length) {
@@ -99,8 +95,8 @@ module(GOOGLE_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
         account = instance.account;
         region = instance.region;
       } else {
-        app.serverGroups.data.some(function(serverGroup) {
-          return serverGroup.instances.some(function(possibleInstance) {
+        app.serverGroups.data.some(function (serverGroup) {
+          return serverGroup.instances.some(function (possibleInstance) {
             if (possibleInstance.id === instance.instanceId) {
               instanceSummary = possibleInstance;
               loadBalancers = serverGroup.loadBalancers;
@@ -113,8 +109,8 @@ module(GOOGLE_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
         });
         if (!instanceSummary) {
           // perhaps it is in a server group that is part of another application
-          app.loadBalancers.data.some(function(loadBalancer) {
-            return loadBalancer.instances.some(function(possibleInstance) {
+          app.loadBalancers.data.some(function (loadBalancer) {
+            return loadBalancer.instances.some(function (possibleInstance) {
               if (possibleInstance.id === instance.instanceId) {
                 instanceSummary = possibleInstance;
                 loadBalancers = [loadBalancer.name];
@@ -127,12 +123,12 @@ module(GOOGLE_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
           });
           if (!instanceSummary) {
             // perhaps it is in a disabled server group via a load balancer
-            app.loadBalancers.data.some(function(loadBalancer) {
-              return loadBalancer.serverGroups.some(function(serverGroup) {
+            app.loadBalancers.data.some(function (loadBalancer) {
+              return loadBalancer.serverGroups.some(function (serverGroup) {
                 if (!serverGroup.isDisabled) {
                   return false;
                 }
-                return serverGroup.instances.some(function(possibleInstance) {
+                return serverGroup.instances.some(function (possibleInstance) {
                   if (possibleInstance.id === instance.instanceId) {
                     instanceSummary = possibleInstance;
                     loadBalancers = [loadBalancer.name];
@@ -152,7 +148,7 @@ module(GOOGLE_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
         extraData.account = account;
         extraData.region = region;
         RecentHistoryService.addExtraDataToLatest('instances', extraData);
-        return InstanceReader.getInstanceDetails(account, region, instance.instanceId).then(function(details) {
+        return InstanceReader.getInstanceDetails(account, region, instance.instanceId).then(function (details) {
           $scope.state.loading = false;
           extractHealthMetrics(instanceSummary, details);
           $scope.instance = _.defaults(details, instanceSummary);
@@ -222,7 +218,7 @@ module(GOOGLE_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
     function augmentTagsWithHelp() {
       if (_.has($scope, 'instance.tags.items') && _.has($scope, 'instance.securityGroups')) {
         const securityGroups = _.chain($scope.instance.securityGroups)
-          .map(securityGroup => {
+          .map((securityGroup) => {
             return _.find(app.securityGroups.data, {
               accountName: $scope.instance.account,
               region: 'global',
@@ -234,8 +230,8 @@ module(GOOGLE_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
 
         const helpMap = {};
 
-        $scope.instance.tags.items.forEach(tag => {
-          const securityGroupsMatches = _.filter(securityGroups, securityGroup =>
+        $scope.instance.tags.items.forEach((tag) => {
+          const securityGroupsMatches = _.filter(securityGroups, (securityGroup) =>
             _.includes(securityGroup.targetTags, tag),
           );
           const securityGroupMatchNames = _.map(securityGroupsMatches, 'name');
@@ -266,12 +262,12 @@ module(GOOGLE_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
       return gceXpnNamingService.decorateXpnResourceIfNecessary(projectId, subnetUrl);
     }
 
-    this.canRegisterWithLoadBalancer = function() {
+    this.canRegisterWithLoadBalancer = function () {
       const instance = $scope.instance;
       const instanceLoadBalancerDoesNotSupportRegister =
         !app.loadBalancers ||
         _.chain(app.loadBalancers.data)
-          .filter(lb => lb.loadBalancerType !== 'NETWORK' && lb.account === instance.account)
+          .filter((lb) => lb.loadBalancerType !== 'NETWORK' && lb.account === instance.account)
           .map('name')
           .intersection(instance.loadBalancers || [])
           .value().length;
@@ -279,21 +275,21 @@ module(GOOGLE_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
       if (!instance.loadBalancers || !instance.loadBalancers.length || instanceLoadBalancerDoesNotSupportRegister) {
         return false;
       }
-      const outOfService = instance.health.some(function(health) {
+      const outOfService = instance.health.some(function (health) {
         return health.type === 'LoadBalancer' && health.state === 'OutOfService';
       });
-      const hasLoadBalancerHealth = instance.health.some(function(health) {
+      const hasLoadBalancerHealth = instance.health.some(function (health) {
         return health.type === 'LoadBalancer';
       });
       return outOfService || !hasLoadBalancerHealth;
     };
 
-    this.canDeregisterFromLoadBalancer = function() {
+    this.canDeregisterFromLoadBalancer = function () {
       const instance = $scope.instance;
       const instanceLoadBalancerDoesNotSupportDeregister =
         !app.loadBalancers ||
         _.chain(app.loadBalancers.data)
-          .filter(lb => lb.loadBalancerType !== 'NETWORK' && lb.account === instance.account)
+          .filter((lb) => lb.loadBalancerType !== 'NETWORK' && lb.account === instance.account)
           .map('name')
           .intersection(instance.loadBalancers || [])
           .value().length;
@@ -301,21 +297,21 @@ module(GOOGLE_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
       if (!instance.loadBalancers || !instance.loadBalancers.length || instanceLoadBalancerDoesNotSupportDeregister) {
         return false;
       }
-      const hasLoadBalancerHealth = instance.health.some(function(health) {
+      const hasLoadBalancerHealth = instance.health.some(function (health) {
         return health.type === 'LoadBalancer';
       });
       return hasLoadBalancerHealth;
     };
 
-    this.canRegisterWithDiscovery = function() {
+    this.canRegisterWithDiscovery = function () {
       const instance = $scope.instance;
-      const discoveryHealth = instance.health.filter(function(health) {
+      const discoveryHealth = instance.health.filter(function (health) {
         return health.type === 'Discovery';
       });
       return discoveryHealth.length ? discoveryHealth[0].state === 'OutOfService' : false;
     };
 
-    this.showInstanceActionsDivider = function() {
+    this.showInstanceActionsDivider = function () {
       return (
         this.canRegisterWithDiscovery() ||
         this.hasHealthState('Discovery', 'Up') ||
@@ -330,21 +326,21 @@ module(GOOGLE_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
       const taskMonitor = {
         application: app,
         title: 'Terminating ' + instance.instanceId,
-        onTaskComplete: function() {
+        onTaskComplete: function () {
           if ($state.includes('**.instanceDetails', { instanceId: instance.instanceId })) {
             $state.go('^');
           }
         },
       };
 
-      const submitMethod = function() {
+      const submitMethod = function () {
         const params = { cloudProvider: 'gce' };
 
         if (instance.serverGroup) {
           params.managedInstanceGroupName = instance.serverGroup;
         }
 
-        return instanceWriter.terminateInstance(instance, app, params);
+        return InstanceWriter.terminateInstance(instance, app, params);
       };
 
       ConfirmationModalService.confirm({
@@ -362,15 +358,15 @@ module(GOOGLE_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
       const taskMonitor = {
         application: app,
         title: 'Terminating ' + instance.instanceId + ' and shrinking server group',
-        onTaskComplete: function() {
+        onTaskComplete: function () {
           if ($state.includes('**.instanceDetails', { instanceId: instance.instanceId })) {
             $state.go('^');
           }
         },
       };
 
-      const submitMethod = function() {
-        return instanceWriter.terminateInstanceAndShrinkServerGroup(instance, app, {
+      const submitMethod = function () {
+        return InstanceWriter.terminateInstanceAndShrinkServerGroup(instance, app, {
           serverGroupName: instance.serverGroup,
           instanceIds: [instance.instanceId],
           zone: instance.placement.availabilityZone,
@@ -394,8 +390,8 @@ module(GOOGLE_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
         title: 'Rebooting ' + instance.instanceId,
       };
 
-      const submitMethod = function() {
-        return instanceWriter.rebootInstance(instance, app, {
+      const submitMethod = function () {
+        return InstanceWriter.rebootInstance(instance, app, {
           // We can't really reliably do anything other than ignore health here.
           interestingHealthProviderNames: [],
         });
@@ -419,8 +415,8 @@ module(GOOGLE_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
         title: 'Registering ' + instance.instanceId + ' with ' + loadBalancerNames,
       };
 
-      const submitMethod = function() {
-        return instanceWriter.registerInstanceWithLoadBalancer(instance, app);
+      const submitMethod = function () {
+        return InstanceWriter.registerInstanceWithLoadBalancer(instance, app);
       };
 
       ConfirmationModalService.confirm({
@@ -441,8 +437,8 @@ module(GOOGLE_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
         title: 'Deregistering ' + instance.instanceId + ' from ' + loadBalancerNames,
       };
 
-      const submitMethod = function() {
-        return instanceWriter.deregisterInstanceFromLoadBalancer(instance, app);
+      const submitMethod = function () {
+        return InstanceWriter.deregisterInstanceFromLoadBalancer(instance, app);
       };
 
       ConfirmationModalService.confirm({
@@ -462,8 +458,8 @@ module(GOOGLE_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
         title: 'Enabling ' + instance.instanceId + ' in discovery',
       };
 
-      const submitMethod = function() {
-        return instanceWriter.enableInstanceInDiscovery(instance, app);
+      const submitMethod = function () {
+        return InstanceWriter.enableInstanceInDiscovery(instance, app);
       };
 
       ConfirmationModalService.confirm({
@@ -483,8 +479,8 @@ module(GOOGLE_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
         title: 'Disabling ' + instance.instanceId + ' in discovery',
       };
 
-      const submitMethod = function() {
-        return instanceWriter.disableInstanceInDiscovery(instance, app);
+      const submitMethod = function () {
+        return InstanceWriter.disableInstanceInDiscovery(instance, app);
       };
 
       ConfirmationModalService.confirm({
@@ -498,7 +494,7 @@ module(GOOGLE_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [
 
     this.hasHealthState = function hasHealthState(healthProviderType, state) {
       const instance = $scope.instance;
-      return instance.health.some(function(health) {
+      return instance.health.some(function (health) {
         return health.type === healthProviderType && health.state === state;
       });
     };

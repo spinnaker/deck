@@ -2,32 +2,30 @@
 
 import { module } from 'angular';
 
-import { API } from '@spinnaker/core';
+import { REST } from '@spinnaker/core';
 
 export const ORACLE_IMAGE_IMAGE_READER = 'spinnaker.oracle.image.reader';
 export const name = ORACLE_IMAGE_IMAGE_READER; // for backwards compatibility
-module(ORACLE_IMAGE_IMAGE_READER, []).factory('oracleImageReader', function() {
+module(ORACLE_IMAGE_IMAGE_READER, []).factory('oracleImageReader', function () {
   function findImages(params) {
-    return API.one('images/find')
-      .withParams(params)
+    return REST('/images/find')
+      .query(params)
       .get()
-      .catch(function() {
+      .catch(function () {
         return [];
       });
   }
 
   function getImage(imageId, region, credentials) {
-    return API.one('images')
-      .one(credentials)
-      .one(region)
-      .one(imageId)
-      .withParams({ provider: 'oracle' })
+    return REST('/images')
+      .path(credentials, region, imageId)
+      .query({ provider: 'oracle' })
       .get()
       .then(
-        function(results) {
+        function (results) {
           return results && results.length ? results[0] : null;
         },
-        function() {
+        function () {
           return null;
         },
       );

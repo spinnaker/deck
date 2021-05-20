@@ -1,13 +1,16 @@
-import React from 'react';
 import { module } from 'angular';
+import React from 'react';
 import Select from 'react-select';
 import { react2angular } from 'react2angular';
 import { Observable, Subject } from 'rxjs';
 
-import { IArtifact, IExpectedArtifact, IPipeline, IStage } from 'core/domain';
-import { ArtifactIcon, ExpectedArtifactService } from 'core/artifact';
 import { AccountService, IArtifactAccount } from 'core/account';
+import { IArtifact, IExpectedArtifact, IPipeline, IStage } from 'core/domain';
+import { withErrorBoundary } from 'core/presentation/SpinErrorBoundary';
+
 import { ArtifactEditor } from './ArtifactEditor';
+import { ArtifactIcon } from './ArtifactIcon';
+import { ExpectedArtifactService } from '../expectedArtifact.service';
 
 export interface IStageArtifactSelectorProps {
   pipeline: IPipeline;
@@ -57,11 +60,11 @@ export class StageArtifactSelector extends React.Component<IStageArtifactSelecto
     const excludedPatterns = this.props.excludedArtifactTypePatterns;
     Observable.fromPromise(AccountService.getArtifactAccounts())
       .takeUntil(this.destroy$)
-      .subscribe(artifactAccounts => {
+      .subscribe((artifactAccounts) => {
         this.setState({
           artifactAccounts: excludedPatterns
             ? artifactAccounts.filter(
-                account => !account.types.some(typ => excludedPatterns.some(typPattern => typPattern.test(typ))),
+                (account) => !account.types.some((typ) => excludedPatterns.some((typPattern) => typPattern.test(typ))),
               )
             : artifactAccounts,
         });
@@ -101,7 +104,7 @@ export class StageArtifactSelector extends React.Component<IStageArtifactSelecto
     const { pipeline, stage, expectedArtifactId, artifact, excludedArtifactIds, renderLabel } = this.props;
     const expectedArtifacts = ExpectedArtifactService.getExpectedArtifactsAvailableToStage(stage, pipeline);
     const expectedArtifact = expectedArtifactId
-      ? expectedArtifacts.find(a => a.id === expectedArtifactId)
+      ? expectedArtifacts.find((a) => a.id === expectedArtifactId)
       : artifact
       ? {
           id: DEFINE_NEW_ARTIFACT,
@@ -131,7 +134,9 @@ export class StageArtifactSelector extends React.Component<IStageArtifactSelecto
 
     return (
       <>
-        <div className="sp-margin-m-bottom">{renderLabel ? renderLabel(select) : select}</div>
+        <div className="sp-margin-m-bottom" data-test-id="Stage.artifactSelector">
+          {renderLabel ? renderLabel(select) : select}
+        </div>
         {!!artifact && (
           <ArtifactEditor
             pipeline={pipeline}
@@ -149,7 +154,7 @@ export class StageArtifactSelector extends React.Component<IStageArtifactSelecto
 export const STAGE_ARTIFACT_SELECTOR_COMPONENT_REACT = 'spinnaker.core.artifacts.stage.artifact.selector.react';
 module(STAGE_ARTIFACT_SELECTOR_COMPONENT_REACT, []).component(
   'stageArtifactSelectorReact',
-  react2angular(StageArtifactSelector, [
+  react2angular(withErrorBoundary(StageArtifactSelector, 'stageArtifactSelectorReact'), [
     'pipeline',
     'stage',
     'expectedArtifactId',

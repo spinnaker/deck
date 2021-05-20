@@ -3,17 +3,17 @@ import React from 'react';
 import {
   AccountCell,
   BasicCell,
-  HrefCell,
-  searchResultTypeRegistry,
   DefaultSearchResultTab,
-  ISearchResult,
   HeaderCell,
-  TableBody,
-  TableHeader,
-  TableRow,
+  HrefCell,
   ISearchColumn,
-  SearchResultType,
+  ISearchResult,
   ISearchResultSet,
+  SearchResultType,
+  searchResultTypeRegistry,
+  SearchTableBody,
+  SearchTableHeader,
+  SearchTableRow,
 } from 'core/search';
 
 export interface IInstanceSearchResult extends ISearchResult {
@@ -45,12 +45,12 @@ class InstancesSearchResultType extends SearchResultType<IInstanceSearchResult> 
   public TabComponent = DefaultSearchResultTab;
 
   public HeaderComponent = () => (
-    <TableHeader>
+    <SearchTableHeader>
       <HeaderCell col={this.cols.INSTANCE} />
       <HeaderCell col={this.cols.ACCOUNT} />
       <HeaderCell col={this.cols.REGION} />
       <HeaderCell col={this.cols.SERVERGROUP} />
-    </TableHeader>
+    </SearchTableHeader>
   );
 
   public DataComponent = ({ resultSet }: { resultSet: ISearchResultSet<IInstanceSearchResult> }) => {
@@ -60,19 +60,19 @@ class InstancesSearchResultType extends SearchResultType<IInstanceSearchResult> 
     const results = resultSet.results.slice().sort(itemSortFn);
 
     return (
-      <TableBody>
+      <SearchTableBody>
         {results
           .slice()
           .sort(itemSortFn)
-          .map(item => (
-            <TableRow key={itemKeyFn(item)}>
+          .map((item) => (
+            <SearchTableRow key={itemKeyFn(item)}>
               <HrefCell item={item} col={this.cols.INSTANCE} />
               <AccountCell item={item} col={this.cols.ACCOUNT} />
               <BasicCell item={item} col={this.cols.REGION} />
               <BasicCell item={item} col={this.cols.SERVERGROUP} defaultValue="Standalone Instance" />
-            </TableRow>
+            </SearchTableRow>
           ))}
-      </TableBody>
+      </SearchTableBody>
     );
   };
 

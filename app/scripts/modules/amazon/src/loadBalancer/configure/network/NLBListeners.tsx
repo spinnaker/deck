@@ -1,37 +1,42 @@
-import React from 'react';
-import { difference, flatten, uniq } from 'lodash';
-
-import { ValidationMessage, IWizardPageComponent } from '@spinnaker/core';
-
-import { NLBListenerProtocol, IListenerDescription, IAmazonNetworkLoadBalancerUpsertCommand } from 'amazon/domain';
 import { FormikProps } from 'formik';
+import { difference, flatten, uniq, uniqBy } from 'lodash';
+import React from 'react';
+
+import { IWizardPageComponent, ValidationMessage } from '@spinnaker/core';
+import { IAmazonNetworkLoadBalancerUpsertCommand, IListenerDescription, NLBListenerProtocol } from 'amazon/domain';
 
 export interface INLBListenersProps {
   formik: FormikProps<IAmazonNetworkLoadBalancerUpsertCommand>;
 }
 
-export class NLBListeners extends React.Component<INLBListenersProps>
+export class NLBListeners
+  extends React.Component<INLBListenersProps>
   implements IWizardPageComponent<IAmazonNetworkLoadBalancerUpsertCommand> {
   public protocols = ['TCP'];
 
   private getAllTargetGroupsFromListeners(listeners: IListenerDescription[]): string[] {
-    const actions = flatten(listeners.map(l => l.defaultActions));
-    const rules = flatten(listeners.map(l => l.rules));
-    actions.push(...flatten(rules.map(r => r.actions)));
-    return uniq(actions.map(a => a.targetGroupName));
+    const actions = flatten(listeners.map((l) => l.defaultActions));
+    const rules = flatten(listeners.map((l) => l.rules));
+    actions.push(...flatten(rules.map((r) => r.actions)));
+    return uniq(actions.map((a) => a.targetGroupName));
   }
 
   public validate(values: IAmazonNetworkLoadBalancerUpsertCommand) {
     const errors = {} as any;
 
     // Check to make sure all target groups have an associated listener
-    const targetGroupNames = values.targetGroups.map(tg => tg.name);
+    const targetGroupNames = values.targetGroups.map((tg) => tg.name);
     const usedTargetGroupNames = this.getAllTargetGroupsFromListeners(values.listeners);
     const unusedTargetGroupNames = difference(targetGroupNames, usedTargetGroupNames);
     if (unusedTargetGroupNames.length === 1) {
       errors.listeners = `Target group ${unusedTargetGroupNames[0]} is unused.`;
     } else if (unusedTargetGroupNames.length > 1) {
       errors.listeners = `Target groups ${unusedTargetGroupNames.join(', ')} are unused.`;
+    }
+
+    const { listeners } = values;
+    if (uniqBy(listeners, 'port').length < listeners.length) {
+      errors.listenerPorts = 'Multiple listeners cannot use the same port.';
     }
 
     return errors;
@@ -99,11 +104,11 @@ export class NLBListeners extends React.Component<INLBListenersProps>
                             className="form-control input-sm inline-number"
                             style={{ width: '80px' }}
                             value={listener.protocol}
-                            onChange={event =>
+                            onChange={(event) =>
                               this.listenerProtocolChanged(listener, event.target.value as NLBListenerProtocol)
                             }
                           >
-                            {this.protocols.map(p => (
+                            {this.protocols.map((p) => (
                               <option key={p}>{p}</option>
                             ))}
                           </select>
@@ -115,7 +120,7 @@ export class NLBListeners extends React.Component<INLBListenersProps>
                             type="text"
                             min={0}
                             value={listener.port || ''}
-                            onChange={event => this.listenerPortChanged(listener, event.target.value)}
+                            onChange={(event) => this.listenerPortChanged(listener, event.target.value)}
                             style={{ width: '80px' }}
                             required={true}
                           />
@@ -152,11 +157,11 @@ export class NLBListeners extends React.Component<INLBListenersProps>
                               <select
                                 className="form-control input-sm"
                                 value={listener.defaultActions[0].targetGroupName}
-                                onChange={event => this.handleDefaultTargetChanged(listener, event.target.value)}
+                                onChange={(event) => this.handleDefaultTargetChanged(listener, event.target.value)}
                                 required={true}
                               >
                                 <option value="" />
-                                {uniq(values.targetGroups.map(tg => tg.name)).map(name => (
+                                {uniq(values.targetGroups.map((tg) => tg.name)).map((name) => (
                                   <option key={name}>{name}</option>
                                 ))}
                               </select>
@@ -170,6 +175,11 @@ export class NLBListeners extends React.Component<INLBListenersProps>
                 </div>
               </div>
             ))}
+            {errors.listenerPorts && (
+              <div className="wizard-pod-row-errors">
+                <ValidationMessage type="error" message={errors.listenerPorts} />
+              </div>
+            )}
             {errors.listeners && (
               <div className="wizard-pod-row-errors">
                 <ValidationMessage type="error" message={errors.listeners} />

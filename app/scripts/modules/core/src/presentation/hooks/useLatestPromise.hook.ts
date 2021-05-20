@@ -1,4 +1,3 @@
-import { IPromise } from 'angular';
 import { DependencyList, useEffect, useRef, useState } from 'react';
 import { useIsMountedRef } from './useIsMountedRef.hook';
 
@@ -38,22 +37,22 @@ const initialPromiseState: IPromiseState<any> = {
  *         fetch.status === 'REJECTED' ? <span>Error: {fetch.error}</span> :
  *         fetch.status === 'PENDING' ? <span>Loading...</span> : null);
  *
- * @param callback a callback that returns an IPromise
+ * @param callback a callback that returns a PromiseLike
  * @param deps array of dependencies, which (when changed) cause the callback to be invoked again
  * @returns an object with the result and current status of the promise
  */
-export function useLatestPromise<T>(callback: () => IPromise<T>, deps: DependencyList): IUseLatestPromiseResult<T> {
+export function useLatestPromise<T>(callback: () => PromiseLike<T>, deps: DependencyList): IUseLatestPromiseResult<T> {
   const isMountedRef = useIsMountedRef();
   // Capture the isMountedRef.current value before effects run
   const isInitialRender = !isMountedRef.current;
-  const requestInFlight = useRef<IPromise<T>>();
+  const requestInFlight = useRef<PromiseLike<T>>();
   // A counter that is used to trigger the promise handling useEffect
   const [requestIdTrigger, setRequestIdTrigger] = useState(0);
   const [promiseState, setPromiseState] = useState<IPromiseState<T>>(initialPromiseState);
   const { result, error, status, requestId } = promiseState;
 
   // Starts a new request (runs the callback again)
-  const refresh = () => setRequestIdTrigger(id => id + 1);
+  const refresh = () => setRequestIdTrigger((id) => id + 1);
 
   // refresh whenever any dependency in the dependency list changes
   useEffect(() => {

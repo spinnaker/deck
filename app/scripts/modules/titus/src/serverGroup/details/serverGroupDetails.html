@@ -77,9 +77,7 @@
     </div>
   </div>
   <div class="content" ng-if="!state.loading">
-    <div class="band band-info" ng-if="serverGroup.isDisabled">
-      Job is Disabled
-    </div>
+    <div class="band band-info" ng-if="serverGroup.isDisabled">Job is Disabled</div>
     <managed-resource-details-indicator
       ng-if="!state.loading && serverGroup.isManaged"
       resource-summary="serverGroup.managedResourceSummary"
@@ -90,7 +88,7 @@
       application="ctrl.application"
     ></server-group-running-tasks-details>
     <collapsible-section heading="Server Group Information" expanded="true">
-      <dl class="dl-horizontal dl-flex">
+      <dl class="dl-horizontal dl-narrow">
         <dt>Created</dt>
         <dd>{{serverGroup.createdTime | timestamp}}</dd>
         <dt>In</dt>
@@ -110,7 +108,7 @@
       ></titus-capacity-details-section>
     </collapsible-section>
     <collapsible-section heading="Health" expanded="true" ng-if="serverGroup.instanceCounts.total > 0">
-      <dl class="dl-horizontal dl-flex" ng-if="serverGroup">
+      <dl class="dl-horizontal dl-narrow" ng-if="serverGroup">
         <dt>Tasks</dt>
         <dd>
           <health-counts container="serverGroup.instanceCounts" class="pull-left"></health-counts>
@@ -135,7 +133,7 @@
       ></titus-service-job-processes-section>
     </collapsible-section>
 
-    <collapsible-section heading="Scaling Policies" ng-if="ctrl.scalingPoliciesEnabled">
+    <collapsible-section heading="Scaling Policies">
       <titus-scaling-policy-summary
         ng-repeat="policy in serverGroup.scalingPolicies"
         policy="policy"
@@ -156,6 +154,10 @@
           cloud-provider="'titus'"
         ></config-bin-link>
       </div>
+      <titus-custom-scaling-policy
+        application="ctrl.application"
+        server-group="serverGroup"
+      ></titus-custom-scaling-policy>
     </collapsible-section>
     <collapsible-section heading="Job Disruption Budget">
       <titus-disruption-budget-section

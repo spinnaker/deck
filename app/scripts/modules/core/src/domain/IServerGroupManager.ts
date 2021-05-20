@@ -1,10 +1,9 @@
 import { IMoniker } from 'core/naming';
-import { IEntityTags } from 'core/domain';
+import { IEntityTags } from './IEntityTags';
 
 export interface IServerGroupManager {
   account: string;
   cloudProvider: string;
-  displayName?: string;
   entityTags?: IEntityTags;
   moniker: IMoniker;
   name: string;

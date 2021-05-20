@@ -1,19 +1,18 @@
+import { groupBy, sortBy } from 'lodash';
 import React from 'react';
 import { Modal } from 'react-bootstrap';
 import { Option } from 'react-select';
-import { IPromise } from 'angular';
-import { groupBy, sortBy } from 'lodash';
 
 import { AccountTag } from 'core/account';
 import { Application } from 'core/application';
 import { IServerGroup } from 'core/domain';
-import { ReactInjector } from 'core/reactShims';
-import { ServerGroupReader } from 'core/serverGroup';
 import { ModalClose } from 'core/modal';
 import { TetheredSelect } from 'core/presentation/TetheredSelect';
+import { ReactInjector } from 'core/reactShims';
 
+import { IDeployTemplate, ITemplateSelectionText } from './deployInitializer.component';
 import { IServerGroupCommand } from './serverGroupCommandBuilder.service';
-import { ITemplateSelectionText, IDeployTemplate } from './deployInitializer.component';
+import { ServerGroupReader } from '../../serverGroupReader.service';
 
 export interface IDeployInitializerProps {
   application: Application;
@@ -49,11 +48,11 @@ export class DeployInitializer extends React.Component<IDeployInitializerProps, 
       .getDataSource('serverGroups')
       .data.filter((s: IServerGroup) => s.cloudProvider === props.cloudProvider && s.category === 'serverGroup');
 
-    const grouped = groupBy(serverGroups, serverGroup =>
+    const grouped = groupBy(serverGroups, (serverGroup) =>
       [serverGroup.cluster, serverGroup.account, serverGroup.region].join(':'),
     );
 
-    Object.keys(grouped).forEach(key => {
+    Object.keys(grouped).forEach((key) => {
       const latest = sortBy(grouped[key], 'name').pop();
       templates.push({
         cluster: latest.cluster,
@@ -94,7 +93,7 @@ export class DeployInitializer extends React.Component<IDeployInitializerProps, 
     Object.assign(baseCommand, command);
   }
 
-  private buildCommandFromTemplate(serverGroup: IServerGroup): IPromise<any> {
+  private buildCommandFromTemplate(serverGroup: IServerGroup): PromiseLike<any> {
     const { application, cloudProvider } = this.props;
 
     const commandBuilder: any = ReactInjector.providerServiceDelegate.getDelegate(
@@ -106,13 +105,13 @@ export class DeployInitializer extends React.Component<IDeployInitializerProps, 
       serverGroup.account,
       serverGroup.region,
       serverGroup.name,
-    ).then(details => {
+    ).then((details) => {
       details.account = serverGroup.account;
       return commandBuilder.buildServerGroupCommandFromExisting(application, details, 'editPipeline');
     });
   }
 
-  private buildEmptyCommand = (): IPromise<any> => {
+  private buildEmptyCommand = (): PromiseLike<any> => {
     const { application, cloudProvider } = this.props;
     const commandBuilder: any = ReactInjector.providerServiceDelegate.getDelegate(
       cloudProvider,
@@ -121,7 +120,7 @@ export class DeployInitializer extends React.Component<IDeployInitializerProps, 
     return commandBuilder.buildNewServerGroupCommand(application, { mode: 'createPipeline' });
   };
 
-  private selectTemplate = (): IPromise<void> => {
+  private selectTemplate = (): PromiseLike<void> => {
     const buildCommand =
       this.state.selectedTemplate === this.noTemplate
         ? this.buildEmptyCommand()

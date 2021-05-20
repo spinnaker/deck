@@ -1,9 +1,9 @@
 'use strict';
 
-import { defaults } from 'lodash';
-import { GCE_HTTP_LOAD_BALANCER_UTILS } from 'google/loadBalancer/httpLoadBalancerUtils.service';
-
 import { module } from 'angular';
+import { defaults } from 'lodash';
+
+import { GCE_HTTP_LOAD_BALANCER_UTILS } from 'google/loadBalancer/httpLoadBalancerUtils.service';
 
 export const GOOGLE_SERVERGROUP_SERVERGROUP_TRANSFORMER = 'spinnaker.gce.serverGroup.transformer';
 export const name = GOOGLE_SERVERGROUP_SERVERGROUP_TRANSFORMER; // for backwards compatibility
@@ -11,7 +11,7 @@ module(GOOGLE_SERVERGROUP_SERVERGROUP_TRANSFORMER, [GCE_HTTP_LOAD_BALANCER_UTILS
   'gceServerGroupTransformer',
   [
     'gceHttpLoadBalancerUtils',
-    function(gceHttpLoadBalancerUtils) {
+    function (gceHttpLoadBalancerUtils) {
       function normalizeServerGroup(serverGroup, application) {
         return application
           .getDataSource('loadBalancers')

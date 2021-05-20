@@ -1,9 +1,9 @@
-import React from 'react';
 import { UISref } from '@uirouter/react';
 import { UIRouterContext } from '@uirouter/react-hybrid';
+import React from 'react';
 
-import { SearchResultType } from './searchResultType';
 import { ISearchResultSet } from '../infrastructure/infrastructureSearch.service';
+import { SearchResultType } from './searchResultType';
 
 export interface ISearchResultTabsProps {
   resultSets: ISearchResultSet[];
@@ -18,7 +18,7 @@ export class SearchResultTabs extends React.Component<ISearchResultTabsProps> {
 
     return (
       <ul className="search-groups nostyle">
-        {resultSets.map(resultSet => {
+        {resultSets.map((resultSet) => {
           const { type } = resultSet;
           const { TabComponent } = type;
           const active = type === activeSearchResultType;

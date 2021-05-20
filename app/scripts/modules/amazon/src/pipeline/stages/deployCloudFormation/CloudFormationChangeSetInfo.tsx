@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
 import { module } from 'angular';
+import React, { useState } from 'react';
 import { react2angular } from 'react2angular';
 
 import {
-  StageConfigField,
-  TextInput,
   CheckboxInput,
-  ReactSelectInput,
   IStage,
   IStageConfigProps,
+  ReactSelectInput,
+  StageConfigField,
+  TextInput,
+  withErrorBoundary,
 } from '@spinnaker/core';
 
 export interface ICloudFormationChangeSetInfoProps {
@@ -55,11 +56,11 @@ export const CloudFormationChangeSetInfo = (props: ICloudFormationChangeSetInfoP
           className="form-control"
           type="text"
           value={changeSetName}
-          onChange={e => modifyChangeSetName(e.target.value)}
+          onChange={(e) => modifyChangeSetName(e.target.value)}
         />
       </StageConfigField>
       <StageConfigField label="Execute ChangeSet">
-        <CheckboxInput checked={executeChangeSet} onChange={e => toggleExecuteChangeSet(e.target.checked)} />
+        <CheckboxInput checked={executeChangeSet} onChange={(e) => toggleExecuteChangeSet(e.target.checked)} />
       </StageConfigField>
       {executeChangeSet && (
         <StageConfigField label="If ChangeSet contains a replacement" help-key="aws.cloudformation.changeSet.options">
@@ -67,7 +68,7 @@ export const CloudFormationChangeSetInfo = (props: ICloudFormationChangeSetInfoP
             clearable={false}
             value={actionOnReplacement}
             options={actionOnReplacementOptions}
-            onChange={e => modifyActionOnReplacement(e.target.value)}
+            onChange={(e) => modifyActionOnReplacement(e.target.value)}
           />
         </StageConfigField>
       )}
@@ -79,5 +80,8 @@ export const CLOUD_FORMATION_CHANGE_SET_INFO = 'spinnaker.amazon.cloudformation.
 
 module(CLOUD_FORMATION_CHANGE_SET_INFO, []).component(
   'cloudFormationChangeSetInfo',
-  react2angular(CloudFormationChangeSetInfo, ['stage', 'stageconfig']),
+  react2angular(withErrorBoundary(CloudFormationChangeSetInfo, 'cloudFormationChangeSetInfo'), [
+    'stage',
+    'stageconfig',
+  ]),
 );

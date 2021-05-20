@@ -1,11 +1,11 @@
 import { IScope } from 'angular';
-
-import { Registry } from 'core/registry';
-import { IExpectedArtifact, IArtifactSource, IStage, IPipeline } from 'core/domain';
-import { ExpectedArtifactService, IExpectedArtifactSelectorViewControllerDelegate } from 'core/artifact';
 import { IArtifactAccount } from 'core/account';
+import { IArtifactSource, IExpectedArtifact, IPipeline, IStage } from 'core/domain';
+import { Registry } from 'core/registry';
 
+import { IExpectedArtifactSelectorViewControllerDelegate } from './ExpectedArtifactSelectorViewController';
 import { ExpectedArtifactSelectorViewControllerAngularDelegate } from './ExpectedArtifactSelectorViewControllerAngularDelegate';
+import { ExpectedArtifactService } from './expectedArtifact.service';
 
 export class NgAppengineConfigArtifactDelegate
   extends ExpectedArtifactSelectorViewControllerAngularDelegate<IArtifactSource<IStage | IPipeline>>
@@ -37,11 +37,11 @@ export class NgAppengineConfigArtifactDelegate
   }
 
   public getSelectedExpectedArtifact(): IExpectedArtifact {
-    return this.expectedArtifacts.find(ea => ea.id === this.artifact.id);
+    return this.expectedArtifacts.find((ea) => ea.id === this.artifact.id);
   }
 
   public getSelectedAccount(): IArtifactAccount {
-    return this.accounts.find(a => a.name === this.artifact.account);
+    return this.accounts.find((a) => a.name === this.artifact.account);
   }
 
   public setSelectedExpectedArtifact(e: IExpectedArtifact): void {

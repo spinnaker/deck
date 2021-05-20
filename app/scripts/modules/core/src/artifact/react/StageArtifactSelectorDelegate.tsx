@@ -1,10 +1,8 @@
 import React from 'react';
 
 import { StageConfigField } from 'core/pipeline';
-import { SETTINGS } from 'core/config/settings';
 
-import { StageArtifactSelector, IStageArtifactSelectorProps } from './StageArtifactSelector';
-import { PreRewriteStageArtifactSelector, IPreRewriteArtifactSelectorProps } from './PreRewriteStageArtifactSelector';
+import { IStageArtifactSelectorProps, StageArtifactSelector } from './StageArtifactSelector';
 
 interface IStageArtifactSelectorDelegateProps {
   helpKey?: string;
@@ -12,14 +10,13 @@ interface IStageArtifactSelectorDelegateProps {
   fieldColumns?: number;
 }
 
+/** @deprecated use StageArtifactSelector instead */
 export const StageArtifactSelectorDelegate = (
-  props: IStageArtifactSelectorProps & IPreRewriteArtifactSelectorProps & IStageArtifactSelectorDelegateProps,
+  props: IStageArtifactSelectorProps & IStageArtifactSelectorDelegateProps,
 ) => {
-  return SETTINGS.feature['artifactsRewrite'] ? (
+  return (
     <StageConfigField label={props.label} helpKey={props.helpKey} fieldColumns={props.fieldColumns}>
       <StageArtifactSelector {...props} />
     </StageConfigField>
-  ) : (
-    <PreRewriteStageArtifactSelector {...props} />
   );
 };

@@ -1,10 +1,11 @@
-import { IPromise, IDeferred } from 'angular';
+import { IDeferred } from 'angular';
 import { IModalServiceInstance } from 'angular-ui-bootstrap';
-import { $timeout, $q } from 'ngimport';
+import { $q, $timeout } from 'ngimport';
 import { Subject } from 'rxjs';
 
 import { Application } from 'core/application/application.model';
 import { ITask } from 'core/domain';
+
 import { TaskReader } from '../task.read.service';
 
 export interface ITaskMonitorConfig {
@@ -14,7 +15,7 @@ export interface ITaskMonitorConfig {
   onTaskComplete?: () => any;
   onTaskRetry?: () => void;
   monitorInterval?: number;
-  submitMethod?: () => IPromise<ITask>;
+  submitMethod?: () => PromiseLike<ITask>;
 }
 
 export interface IModalServiceInstanceEmulation<T = any> extends IModalServiceInstance {
@@ -28,7 +29,7 @@ export class TaskMonitor {
   public errorMessage: string;
   public title: string;
   public application: Application;
-  public submitMethod: (params?: any) => IPromise<ITask>;
+  public submitMethod: (params?: any) => PromiseLike<ITask>;
   public modalInstance: IModalServiceInstance;
   private monitorInterval: number;
   private onTaskComplete: () => any;
@@ -80,8 +81,9 @@ export class TaskMonitor {
     }
   }
 
-  public closeModal = (): void => {
+  public closeModal = (evt?: React.MouseEvent<any>): void => {
     try {
+      evt && evt.stopPropagation();
       this.modalInstance.dismiss();
     } catch (ignored) {
       // modal was already closed
@@ -130,9 +132,10 @@ export class TaskMonitor {
     if (this.onTaskRetry) {
       this.onTaskRetry();
     }
+    this.statusUpdatedStream.next();
   };
 
-  public submit = (submitMethod?: () => IPromise<ITask>) => {
+  public submit = (submitMethod?: () => PromiseLike<ITask>) => {
     this.startSubmit();
     (submitMethod || this.submitMethod)()
       .then((task: ITask) => this.handleTaskSuccess(task))

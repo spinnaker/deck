@@ -2,21 +2,19 @@
 
 import { module } from 'angular';
 
-import 'n3-charts/build/LineChart';
 import { TaskMonitor } from '@spinnaker/core';
 
-import { STEP_POLICY_ACTION } from './step/stepPolicyAction.component';
 import { ScalingPolicyWriter } from '../ScalingPolicyWriter';
+import { AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_ALARM_ALARMCONFIGURER_COMPONENT } from './alarm/alarmConfigurer.component';
+import { AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_SIMPLE_SIMPLEPOLICYACTION_COMPONENT } from './simple/simplePolicyAction.component';
+import { STEP_POLICY_ACTION } from './step/stepPolicyAction.component';
 
 import './upsertScalingPolicy.modal.less';
-import { AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_SIMPLE_SIMPLEPOLICYACTION_COMPONENT } from './simple/simplePolicyAction.component';
-import { AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_ALARM_ALARMCONFIGURER_COMPONENT } from './alarm/alarmConfigurer.component';
 
 export const AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_UPSERTSCALINGPOLICY_CONTROLLER =
   'spinnaker.amazon.serverGroup.details.scalingPolicy.upsertScalingPolicy.controller';
 export const name = AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_UPSERTSCALINGPOLICY_CONTROLLER; // for backwards compatibility
 module(AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_UPSERTSCALINGPOLICY_CONTROLLER, [
-  'n3-line-chart',
   AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_SIMPLE_SIMPLEPOLICYACTION_COMPONENT,
   STEP_POLICY_ACTION,
   AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_ALARM_ALARMCONFIGURER_COMPONENT,
@@ -25,7 +23,7 @@ module(AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_UPSERTSCALINGPOLICY_CONTR
   'serverGroup',
   'application',
   'policy',
-  function($uibModalInstance, serverGroup, application, policy) {
+  function ($uibModalInstance, serverGroup, application, policy) {
     this.serverGroup = serverGroup;
 
     this.viewState = {
@@ -101,7 +99,7 @@ module(AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_UPSERTSCALINGPOLICY_CONTR
         estimatedInstanceWarmup: policy.estimatedInstanceWarmup || command.cooldown || 600,
         metricAggregationType: 'Average',
       };
-      command.step.stepAdjustments = policy.stepAdjustments.map(adjustment => {
+      command.step.stepAdjustments = policy.stepAdjustments.map((adjustment) => {
         const step = {
           scalingAdjustment: Math.abs(adjustment.scalingAdjustment),
         };
@@ -176,7 +174,7 @@ module(AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_UPSERTSCALINGPOLICY_CONTR
 
       if (command.step) {
         // adjust metricIntervalLowerBound/UpperBound for each step based on alarm threshold
-        command.step.stepAdjustments.forEach(step => {
+        command.step.stepAdjustments.forEach((step) => {
           if (this.viewState.operator === 'Remove') {
             step.scalingAdjustment = 0 - step.scalingAdjustment;
             delete command.step.estimatedInstanceWarmup;

@@ -1,9 +1,8 @@
 import { IController, module } from 'angular';
 import { IModalService } from 'angular-ui-bootstrap';
-
-import { API } from 'core/api/ApiService';
-import { JsonUtils } from 'core/utils';
+import { REST } from 'core/api/ApiService';
 import { Registry } from 'core/registry';
+import { JsonUtils } from 'core/utils';
 
 export interface IWebhookStageViewState {
   waitForCompletion?: boolean;
@@ -148,15 +147,15 @@ export class WebhookStage implements IController {
   }
 
   public failFastCodesChanged(): void {
-    const failFastCodes = this.viewState.failFastStatusCodes.split(',').map(x => x.trim());
+    const failFastCodes = this.viewState.failFastStatusCodes.split(',').map((x) => x.trim());
 
-    this.stage.failFastStatusCodes = failFastCodes.map(x => parseInt(x, 10)).filter(x => !isNaN(x));
+    this.stage.failFastStatusCodes = failFastCodes.map((x) => parseInt(x, 10)).filter((x) => !isNaN(x));
   }
 
   public retryCodesChanged(): void {
-    const retryCodes = this.viewState.retryStatusCodes.split(',').map(x => x.trim());
+    const retryCodes = this.viewState.retryStatusCodes.split(',').map((x) => x.trim());
 
-    this.stage.retryStatusCodes = retryCodes.map(x => parseInt(x, 10)).filter(x => !isNaN(x));
+    this.stage.retryStatusCodes = retryCodes.map((x) => parseInt(x, 10)).filter((x) => !isNaN(x));
   }
 
   public customHeaderCount(): number {
@@ -184,7 +183,7 @@ export class WebhookStage implements IController {
   }
 
   public displayField(field: string): boolean {
-    return !this.preconfiguredProperties || !this.preconfiguredProperties.some(property => property === field);
+    return !this.preconfiguredProperties || !this.preconfiguredProperties.some((property) => property === field);
   }
 }
 
@@ -210,9 +209,8 @@ module(WEBHOOK_STAGE, [])
     });
   })
   .run(() => {
-    API.one('webhooks')
-      .all('preconfigured')
-      .getList()
+    REST('/webhooks/preconfigured')
+      .get()
       .then((preconfiguredWebhooks: IPreconfiguredWebhook[]) => {
         preconfiguredWebhooks.forEach((preconfiguredWebhook: IPreconfiguredWebhook) =>
           Registry.pipeline.registerStage({

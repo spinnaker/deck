@@ -2,11 +2,12 @@ import React from 'react';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 import { IExecutionStageLabelProps } from 'core/domain';
-import { ExecutionWindowActions } from '../executionWindows/ExecutionWindowActions';
-import { SkipConditionWait } from '../waitForCondition/SkipConditionWait';
 import { HoverablePopover } from 'core/presentation/HoverablePopover';
 import { ReactInjector } from 'core/reactShims';
 import { Spinner } from 'core/widgets';
+
+import { ExecutionWindowActions } from '../executionWindows/ExecutionWindowActions';
+import { SkipConditionWait } from '../waitForCondition/SkipConditionWait';
 
 export interface IExecutionBarLabelProps extends IExecutionStageLabelProps {
   tooltip?: JSX.Element;
@@ -45,7 +46,7 @@ export class ExecutionBarLabel extends React.Component<IExecutionBarLabelProps, 
     const { stage } = this.props;
     const { suspendedStageTypes } = stage;
     const requireHydration = ['restrictExecutionDuringTimeWindow', 'waitForCondition'];
-    return stage.labelComponent !== ExecutionBarLabel || requireHydration.some(s => suspendedStageTypes.has(s));
+    return stage.labelComponent !== ExecutionBarLabel || requireHydration.some((s) => suspendedStageTypes.has(s));
   };
 
   public componentDidMount() {
@@ -73,7 +74,7 @@ export class ExecutionBarLabel extends React.Component<IExecutionBarLabelProps, 
 
   private getExecutionWindowTemplate = () => {
     const { stage, application, execution } = this.props;
-    const executionWindowStage = stage.stages.find(s => s.type === 'restrictExecutionDuringTimeWindow');
+    const executionWindowStage = stage.stages.find((s) => s.type === 'restrictExecutionDuringTimeWindow');
     return (
       <div>
         <div>
@@ -86,7 +87,7 @@ export class ExecutionBarLabel extends React.Component<IExecutionBarLabelProps, 
 
   private getWaitForConditionTemplate = () => {
     const { stage, application, execution } = this.props;
-    const waitForConditionStage = stage.stages.find(s => s.type === 'waitForCondition');
+    const waitForConditionStage = stage.stages.find((s) => s.type === 'waitForCondition');
     return (
       <div>
         <p>

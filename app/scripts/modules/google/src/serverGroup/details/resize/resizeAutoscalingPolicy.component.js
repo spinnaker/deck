@@ -1,9 +1,9 @@
 'use strict';
 
-import _ from 'lodash';
-import { GOOGLE_AUTOSCALINGPOLICY_AUTOSCALINGPOLICY_WRITE_SERVICE } from '../../../autoscalingPolicy/autoscalingPolicy.write.service';
-
 import * as angular from 'angular';
+import _ from 'lodash';
+
+import { GOOGLE_AUTOSCALINGPOLICY_AUTOSCALINGPOLICY_WRITE_SERVICE } from '../../../autoscalingPolicy/autoscalingPolicy.write.service';
 
 export const GOOGLE_SERVERGROUP_DETAILS_RESIZE_RESIZEAUTOSCALINGPOLICY_COMPONENT =
   'spinnaker.deck.gce.serverGroup.details.resizeAutoscalingPolicy.component';
@@ -23,15 +23,15 @@ angular
     controller: [
       '$scope',
       'gceAutoscalingPolicyWriter',
-      function($scope, gceAutoscalingPolicyWriter) {
+      function ($scope, gceAutoscalingPolicyWriter) {
         const newPolicyBounds = ['newMinNumReplicas', 'newMaxNumReplicas'];
-        newPolicyBounds.forEach(prop => (this.command[prop] = null));
+        newPolicyBounds.forEach((prop) => (this.command[prop] = null));
 
         angular.extend(this.formMethods, {
           formIsValid: () =>
             _.every([
               _.chain(newPolicyBounds)
-                .map(bound => this.command[bound] !== null)
+                .map((bound) => this.command[bound] !== null)
                 .every()
                 .value(),
               $scope.resizeAutoscalingPolicyForm.$valid,

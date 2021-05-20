@@ -1,12 +1,13 @@
-import { Registry } from 'core/registry';
+import { map, uniq } from 'lodash';
+
 import { IPipeline, IStage, IStageOrTriggerTypeConfig } from 'core/domain';
+import { Registry } from 'core/registry';
 
 import { IValidatorConfig, PipelineConfigValidator } from './PipelineConfigValidator';
 import {
-  StageOrTriggerBeforeTypeValidator,
   IStageOrTriggerBeforeTypeValidationConfig,
+  StageOrTriggerBeforeTypeValidator,
 } from './stageOrTriggerBeforeType.validator';
-import { uniq, map } from 'lodash';
 
 export interface IUpstreamFlagProvidedValidationConfig extends IValidatorConfig {
   getProviders?: Function;
@@ -22,8 +23,8 @@ export const buildUpstreamHasFlagValidator = (flag: keyof IStageOrTriggerTypeCon
       validator: IUpstreamFlagProvidedValidationConfig,
       _config: IStageOrTriggerTypeConfig,
     ) => {
-      const providingStages = Registry.pipeline.getStageTypes().filter(x => x[flag]);
-      const providingTriggers = Registry.pipeline.getTriggerTypes().filter(x => x[flag]);
+      const providingStages = Registry.pipeline.getStageTypes().filter((x) => x[flag]);
+      const providingTriggers = Registry.pipeline.getTriggerTypes().filter((x) => x[flag]);
       const defaultProviders = providingStages.concat(providingTriggers);
 
       const genericUpstreamValidator = new StageOrTriggerBeforeTypeValidator();

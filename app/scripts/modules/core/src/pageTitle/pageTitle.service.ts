@@ -1,6 +1,6 @@
-import { module, IScope } from 'angular';
-import { TransitionService, Rejection, RejectType, StateParams } from '@uirouter/core';
 import UIROUTER_ANGULARJS from '@uirouter/angularjs';
+import { Rejection, RejectType, StateParams, TransitionService } from '@uirouter/core';
+import { IScope, module } from 'angular';
 
 export interface IMainConfig {
   field: string;
@@ -37,7 +37,7 @@ export class PageTitleService {
   public static $inject = ['$rootScope', '$stateParams', '$transitions'];
   constructor(private $rootScope: IScope, private $stateParams: StateParams, $transitions: TransitionService) {
     document.title = 'Spinnaker: Loading...';
-    $transitions.onStart({}, transition => {
+    $transitions.onStart({}, (transition) => {
       this.handleRoutingStart();
       const onSuccess = () => this.handleRoutingSuccess(transition.to().data);
       const onReject = (err: Rejection) => this.handleRoutingError(err);

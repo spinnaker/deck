@@ -1,28 +1,26 @@
-import React from 'react';
 import { cloneDeep, get } from 'lodash';
-import { IPromise } from 'angular';
+import React from 'react';
 
 import {
   AccountService,
   FirewallLabels,
   ILoadBalancerModalProps,
   LoadBalancerWriter,
+  noop,
   ReactInjector,
   ReactModal,
   TaskMonitor,
   WizardModal,
   WizardPage,
-  noop,
 } from '@spinnaker/core';
-
 import { AWSProviderSettings } from 'amazon/aws.settings';
 import { IAmazonApplicationLoadBalancer, IAmazonApplicationLoadBalancerUpsertCommand } from 'amazon/domain';
 
-import { ALBListeners } from './ALBListeners';
 import { ALBAdvancedSettings } from './ALBAdvancedSettings';
+import { ALBListeners } from './ALBListeners';
 import { TargetGroups } from './TargetGroups';
-import { SecurityGroups } from '../common/SecurityGroups';
 import { LoadBalancerLocation } from '../common/LoadBalancerLocation';
+import { SecurityGroups } from '../common/SecurityGroups';
 import { AwsLoadBalancerTransformer } from '../../loadBalancer.transformer';
 
 import '../common/configure.less';
@@ -94,14 +92,14 @@ export class CreateApplicationLoadBalancer extends React.Component<
     return certificateId;
   }
 
-  private formatListeners(command: IAmazonApplicationLoadBalancerUpsertCommand): IPromise<void> {
-    return AccountService.getAccountDetails(command.credentials).then(account => {
-      command.listeners.forEach(listener => {
+  private formatListeners(command: IAmazonApplicationLoadBalancerUpsertCommand): PromiseLike<void> {
+    return AccountService.getAccountDetails(command.credentials).then((account) => {
+      command.listeners.forEach((listener) => {
         if (listener.protocol === 'HTTP') {
           delete listener.sslPolicy;
           listener.certificates = [];
         }
-        listener.certificates.forEach(certificate => {
+        listener.certificates.forEach((certificate) => {
           certificate.certificateArn = this.certificateIdAsARN(
             account.accountId,
             certificate.name,
@@ -124,17 +122,17 @@ export class CreateApplicationLoadBalancer extends React.Component<
   }
 
   private manageTargetGroupNames(command: IAmazonApplicationLoadBalancerUpsertCommand): void {
-    (command.targetGroups || []).forEach(targetGroupDescription => {
+    (command.targetGroups || []).forEach((targetGroupDescription) => {
       targetGroupDescription.name = this.addAppName(targetGroupDescription.name);
     });
-    (command.listeners || []).forEach(listenerDescription => {
-      listenerDescription.defaultActions.forEach(actionDescription => {
+    (command.listeners || []).forEach((listenerDescription) => {
+      listenerDescription.defaultActions.forEach((actionDescription) => {
         if (actionDescription.targetGroupName) {
           actionDescription.targetGroupName = this.addAppName(actionDescription.targetGroupName);
         }
       });
-      (listenerDescription.rules || []).forEach(ruleDescription => {
-        ruleDescription.actions.forEach(actionDescription => {
+      (listenerDescription.rules || []).forEach((ruleDescription) => {
+        ruleDescription.actions.forEach((actionDescription) => {
           if (actionDescription.targetGroupName) {
             actionDescription.targetGroupName = this.addAppName(actionDescription.targetGroupName);
           }
@@ -144,20 +142,32 @@ export class CreateApplicationLoadBalancer extends React.Component<
   }
 
   private manageRules(command: IAmazonApplicationLoadBalancerUpsertCommand): void {
-    command.listeners.forEach(listener => {
+    command.listeners.forEach((listener) => {
       listener.rules.forEach((rule, index) => {
         // Set the priority in array order, starting with 1
         rule.priority = index + 1;
         // Remove conditions that have no value
-        rule.conditions = rule.conditions.filter(condition => condition.values[0].length > 0);
+        rule.conditions = rule.conditions.filter((condition) => {
+          if (condition.field !== 'http-request-method') {
+            return condition.values[0].length > 0;
+          }
+
+          return condition.values.length > 0;
+        });
       });
     });
+  }
+
+  private setIpAddressType(command: IAmazonApplicationLoadBalancerUpsertCommand): void {
+    command.ipAddressType = command.dualstack ? 'dualstack' : 'ipv4';
+    delete command.dualstack;
   }
 
   private formatCommand(command: IAmazonApplicationLoadBalancerUpsertCommand): void {
     this.setAvailabilityZones(command);
     this.manageTargetGroupNames(command);
     this.manageRules(command);
+    this.setIpAddressType(command);
   }
 
   protected onApplicationRefresh(values: IAmazonApplicationLoadBalancerUpsertCommand): void {
@@ -203,14 +213,14 @@ export class CreateApplicationLoadBalancer extends React.Component<
     const loadBalancerCommandFormatted = cloneDeep(values);
 
     // replace all authenticateOidcConfig with authenticateOidcActionConfig because aws
-    loadBalancerCommandFormatted.listeners.forEach(listener => {
+    loadBalancerCommandFormatted.listeners.forEach((listener) => {
       listener.defaultActions.forEach((a: any) => {
         if (a.authenticateOidcConfig) {
           a.authenticateOidcActionConfig = a.authenticateOidcConfig;
           delete a.authenticateOidcConfig;
         }
       });
-      listener.rules.forEach(r =>
+      listener.rules.forEach((r) =>
         r.actions.forEach((a: any) => {
           if (a.authenticateOidcConfig) {
             a.authenticateOidcActionConfig = a.authenticateOidcConfig;
@@ -223,6 +233,7 @@ export class CreateApplicationLoadBalancer extends React.Component<
     if (forPipelineConfig) {
       // don't submit to backend for creation. Just return the loadBalancerCommand object
       this.formatListeners(loadBalancerCommandFormatted).then(() => {
+        this.setIpAddressType(loadBalancerCommandFormatted);
         closeModal && closeModal(loadBalancerCommandFormatted);
       });
     } else {
@@ -315,7 +326,7 @@ export class CreateApplicationLoadBalancer extends React.Component<
                 label="Advanced Settings"
                 wizard={wizard}
                 order={nextIdx()}
-                render={({ innerRef }) => <ALBAdvancedSettings ref={innerRef} />}
+                render={({ innerRef }) => <ALBAdvancedSettings ref={innerRef} isInternal={formik.values.isInternal} />}
               />
             </>
           );

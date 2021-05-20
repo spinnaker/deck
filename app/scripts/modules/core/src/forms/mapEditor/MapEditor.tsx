@@ -1,7 +1,10 @@
-import React from 'react';
-import { IPipeline } from 'core/domain';
 import { isString } from 'lodash';
+import React from 'react';
+
+import { IPipeline } from 'core/domain';
+
 import { IMapPair, MapPair } from './MapPair';
+import './MapEditor.less';
 
 export interface IMapEditorProps {
   addButtonLabel?: string;
@@ -41,8 +44,15 @@ export class MapEditor extends React.Component<IMapEditorProps, IMapEditorState>
     };
   }
 
+  componentDidUpdate(prevProps: IMapEditorProps) {
+    const isModelObj = !isString(this.props.model);
+    if (isModelObj && Object.keys(prevProps.model).length !== Object.keys(this.props.model).length) {
+      this.setState({ backingModel: this.mapModel(this.props.model as { [key: string]: string }) });
+    }
+  }
+
   private mapModel(model: { [key: string]: string }): IMapPair[] {
-    return Object.keys(model).map(key => ({ key: key, value: model[key] }));
+    return Object.keys(model).map((key) => ({ key: key, value: model[key] }));
   }
 
   private reduceModel(backingModel: IMapPair[]): { [key: string]: string } {
@@ -59,7 +69,7 @@ export class MapEditor extends React.Component<IMapEditorProps, IMapEditorState>
 
     const usedKeys = new Set();
 
-    model.forEach(p => {
+    model.forEach((p) => {
       if (usedKeys.has(p.key)) {
         p.error = 'Duplicate key';
         error = true;
@@ -114,7 +124,7 @@ export class MapEditor extends React.Component<IMapEditorProps, IMapEditorState>
     const isParameterized = isString(this.props.model);
 
     return (
-      <div>
+      <div className="MapEditor">
         {label && (
           <div className="sm-label-left">
             <b>{label}</b>
@@ -135,12 +145,12 @@ export class MapEditor extends React.Component<IMapEditorProps, IMapEditorState>
             </thead>
             <tbody>
               {backingModel
-                .filter(p => !hiddenKeys.includes(p.key))
+                .filter((p) => !hiddenKeys.includes(p.key))
                 .map((pair, index) => (
                   <MapPair
                     key={index}
                     {...rowProps}
-                    onChange={value => this.onChange(value, index)}
+                    onChange={(value) => this.onChange(value, index)}
                     onDelete={() => this.onDelete(index)}
                     pair={pair}
                     valueCanContainSpel={valueCanContainSpel}

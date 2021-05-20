@@ -1,19 +1,19 @@
 import { ApplicationModelBuilder } from 'core/application/applicationModel.builder';
 
-describe('Controller: PipelineConfigCtrl', function() {
+describe('Controller: PipelineConfigCtrl', function () {
   var controller;
   var scope;
 
   beforeEach(window.module(require('./pipelineConfig.controller').name));
 
   beforeEach(
-    window.inject(function($rootScope, $controller) {
+    window.inject(function ($rootScope, $controller) {
       scope = $rootScope.$new();
       controller = $controller;
     }),
   );
 
-  it('should initialize immediately if pipeline configs are already present', function() {
+  it('should reload pipeline configs even if are already loaded before initializing', function () {
     const application = ApplicationModelBuilder.createApplicationForTests('app', {
       key: 'pipelineConfigs',
       lazy: true,
@@ -29,11 +29,16 @@ describe('Controller: PipelineConfigCtrl', function() {
       },
       app: application,
     });
+    application.pipelineConfigs.activate();
+    application.pipelineConfigs.refresh();
+    application.pipelineConfigs.data.push({ id: 'a' });
+    application.pipelineConfigs.dataUpdated();
+
     scope.$digest();
     expect(vm.state.pipelinesLoaded).toBe(true);
   });
 
-  it('should wait until pipeline configs are loaded before initializing', function() {
+  it('should wait until pipeline configs are loaded before initializing', function () {
     const application = ApplicationModelBuilder.createApplicationForTests('app', {
       key: 'pipelineConfigs',
       lazy: true,

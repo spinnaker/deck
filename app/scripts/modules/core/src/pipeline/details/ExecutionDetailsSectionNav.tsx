@@ -2,8 +2,8 @@ import React from 'react';
 import ReactGA from 'react-ga';
 import { Subscription } from 'rxjs';
 
-import { ReactInjector } from 'core/reactShims';
 import { robotToHuman } from 'core/presentation/robotToHumanFilter/robotToHuman.filter';
+import { ReactInjector } from 'core/reactShims';
 
 export interface IExecutionDetailsSectionNavProps {
   sections: string[];
@@ -47,7 +47,7 @@ export class ExecutionDetailsSectionNav extends React.Component<
   public render() {
     return (
       <ul className="nav nav-pills">
-        {this.props.sections.map(section => (
+        {this.props.sections.map((section) => (
           <Section key={section} section={section} active={this.state.activeSection === section} />
         ))}
       </ul>

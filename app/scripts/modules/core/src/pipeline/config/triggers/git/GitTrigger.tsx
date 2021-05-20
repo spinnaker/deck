@@ -72,7 +72,7 @@ export function GitTrigger(gitTriggerProps: IGitTriggerConfigProps) {
         <FormikFormField
           name="source"
           label="Repo Type"
-          input={props => (
+          input={(props) => (
             <ReactSelectInput
               {...props}
               placeholder="Select Repo Type"
@@ -82,12 +82,18 @@ export function GitTrigger(gitTriggerProps: IGitTriggerConfigProps) {
           )}
         />
       )}
-
+      {SETTINGS.stashTriggerInfo && trigger.source === 'stash' && (
+        <div className="flex-container-h center">
+          <a className="sp-margin-m-yaxis" href={SETTINGS.stashTriggerInfo} target="_blank">
+            See how to add a stash trigger to Spinnaker
+          </a>
+        </div>
+      )}
       <FormikFormField
         name="project"
         label={projectLabel}
         required={true}
-        input={props => <TextInput {...props} placeholder={projectPlaceholder} />}
+        input={(props) => <TextInput {...props} placeholder={projectPlaceholder} />}
       />
 
       <FormikFormField
@@ -97,14 +103,14 @@ export function GitTrigger(gitTriggerProps: IGitTriggerConfigProps) {
         validate={(value: string, label) =>
           value && value.match(/:\/\//) && `${label} is a simple name should not contain ://`
         }
-        input={props => <TextInput {...props} placeholder={slugPlaceholder} />}
+        input={(props) => <TextInput {...props} placeholder={slugPlaceholder} />}
       />
 
       <FormikFormField
         name="branch"
         label="Branch"
         help={<HelpField id="pipeline.config.git.trigger.branch" />}
-        input={props => <TextInput {...props} />}
+        input={(props) => <TextInput {...props} />}
       />
 
       {source === 'github' && (
@@ -112,7 +118,7 @@ export function GitTrigger(gitTriggerProps: IGitTriggerConfigProps) {
           name="secret"
           label="Secret"
           help={<HelpField id="pipeline.config.git.trigger.githubSecret" />}
-          input={props => <TextInput {...props} />}
+          input={(props) => <TextInput {...props} />}
         />
       )}
     </>

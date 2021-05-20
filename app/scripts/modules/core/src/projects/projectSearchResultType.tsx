@@ -1,20 +1,20 @@
 import React from 'react';
 
-import {
-  searchResultTypeRegistry,
-  BasicCell,
-  HrefCell,
-  ISearchResult,
-  HeaderCell,
-  DefaultSearchResultTab,
-  TableBody,
-  TableHeader,
-  TableRow,
-  ISearchColumn,
-  SearchResultType,
-  ISearchResultSet,
-} from 'core/search';
 import { IProjectConfig } from 'core/domain';
+import {
+  BasicCell,
+  DefaultSearchResultTab,
+  HeaderCell,
+  HrefCell,
+  ISearchColumn,
+  ISearchResult,
+  ISearchResultSet,
+  SearchResultType,
+  searchResultTypeRegistry,
+  SearchTableBody,
+  SearchTableHeader,
+  SearchTableRow,
+} from 'core/search';
 
 export interface IProjectSearchResult extends ISearchResult {
   applications: string[];
@@ -48,10 +48,10 @@ class ProjectsSearchResultType extends SearchResultType<IProjectSearchResult> {
   public TabComponent = DefaultSearchResultTab;
 
   public HeaderComponent = () => (
-    <TableHeader>
+    <SearchTableHeader>
       <HeaderCell col={this.cols.NAME} />
       <HeaderCell col={this.cols.EMAIL} />
-    </TableHeader>
+    </SearchTableHeader>
   );
 
   public DataComponent = ({ resultSet }: { resultSet: ISearchResultSet<IProjectSearchResult> }) => {
@@ -61,17 +61,17 @@ class ProjectsSearchResultType extends SearchResultType<IProjectSearchResult> {
     const results = resultSet.results.slice().sort(itemSortFn);
 
     return (
-      <TableBody>
+      <SearchTableBody>
         {results
           .slice()
           .sort(itemSortFn)
-          .map(item => (
-            <TableRow key={itemKeyFn(item)}>
+          .map((item) => (
+            <SearchTableRow key={itemKeyFn(item)}>
               <HrefCell item={item} col={this.cols.NAME} />
               <BasicCell item={item} col={this.cols.EMAIL} />
-            </TableRow>
+            </SearchTableRow>
           ))}
-      </TableBody>
+      </SearchTableBody>
     );
   };
 

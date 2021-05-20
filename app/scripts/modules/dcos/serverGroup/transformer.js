@@ -1,14 +1,13 @@
 'use strict';
 
-import _ from 'lodash';
-
 import { module } from 'angular';
+import _ from 'lodash';
 
 export const DCOS_SERVERGROUP_TRANSFORMER = 'spinnaker.dcos.serverGroup.transformer';
 export const name = DCOS_SERVERGROUP_TRANSFORMER; // for backwards compatibility
 module(DCOS_SERVERGROUP_TRANSFORMER, []).factory('dcosServerGroupTransformer', [
   '$q',
-  function($q) {
+  function ($q) {
     function normalizeServerGroup(serverGroup) {
       return $q.when(serverGroup); // no-op
     }

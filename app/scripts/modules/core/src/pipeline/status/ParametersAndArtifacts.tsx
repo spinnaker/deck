@@ -1,9 +1,8 @@
-import React from 'react';
 import { keyBy, truncate } from 'lodash';
 import memoizeOne from 'memoize-one';
+import React from 'react';
 
 import { IExecution, IPipeline } from 'core/domain';
-import { SETTINGS } from 'core/config/settings';
 
 import { ExecutionParameters, IDisplayableParameter } from './ExecutionParameters';
 import { ResolvedArtifactList } from './ResolvedArtifactList';
@@ -131,14 +130,11 @@ export class ParametersAndArtifacts extends React.Component<
           displayableParameters={displayableParameters}
           pinnedDisplayableParameters={pinnedDisplayableParameters}
         />
-
-        {(SETTINGS.feature.artifacts || SETTINGS.feature.artifactsRewrite) && (
-          <ResolvedArtifactList
-            artifacts={artifacts}
-            resolvedExpectedArtifacts={resolvedExpectedArtifacts}
-            showingExpandedArtifacts={showingParams}
-          />
-        )}
+        <ResolvedArtifactList
+          artifacts={artifacts}
+          resolvedExpectedArtifacts={resolvedExpectedArtifacts}
+          showingExpandedArtifacts={showingParams}
+        />
       </>
     );
   }

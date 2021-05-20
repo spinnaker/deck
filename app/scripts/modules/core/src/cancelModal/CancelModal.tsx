@@ -1,17 +1,16 @@
+import { Field, FieldProps, Form, Formik } from 'formik';
 import React from 'react';
 import { Modal } from 'react-bootstrap';
-import { Field, FieldProps, Form, Formik } from 'formik';
-import { IPromise } from 'angular';
 
-import { SubmitButton, ModalClose } from 'core/modal';
-import { ReactModal, Markdown } from 'core/presentation';
+import { ModalClose, SubmitButton } from 'core/modal';
+import { Markdown, ReactModal } from 'core/presentation';
 
 export interface ICancelModalProps {
   body?: string;
   buttonText: string;
   cancelButtonText?: string;
   header: string;
-  submitMethod: (reason: string, force?: boolean) => IPromise<any>;
+  submitMethod: (reason: string, force?: boolean) => PromiseLike<any>;
   closeModal?(result?: any): void; // provided by ReactModal
   dismissModal?(rejection?: any): void; // provided by ReactModal
 }

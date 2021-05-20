@@ -1,6 +1,6 @@
+import { hri as HumanReadableIds } from 'human-readable-ids';
 import { get } from 'lodash';
-import { PipelineConfigService } from 'core/pipeline';
-import { Registry } from 'core/registry';
+
 import {
   IArtifact,
   IArtifactKindConfig,
@@ -10,8 +10,9 @@ import {
   IPipeline,
   IStage,
 } from 'core/domain';
+import { PipelineConfigService } from 'core/pipeline';
+import { Registry } from 'core/registry';
 import { UUIDGenerator } from 'core/utils';
-import { hri as HumanReadableIds } from 'human-readable-ids';
 
 export class ExpectedArtifactService {
   public static getExpectedArtifactsAvailableToStage(stage: IStage, pipeline: IPipeline): IExpectedArtifact[] {
@@ -19,7 +20,7 @@ export class ExpectedArtifactService {
       return [];
     }
     let result = pipeline.expectedArtifacts || [];
-    PipelineConfigService.getAllUpstreamDependencies(pipeline, stage).forEach(s => {
+    PipelineConfigService.getAllUpstreamDependencies(pipeline, stage).forEach((s) => {
       const expectedArtifact = (s as any).expectedArtifact;
       if (expectedArtifact) {
         result = result.concat(expectedArtifact);
@@ -40,7 +41,7 @@ export class ExpectedArtifactService {
     return (stageContext: IExecutionContext) =>
       fields
         .map((field): string => get(stageContext, field))
-        .filter(v => v)
+        .filter((v) => v)
         .reduce((array, value) => array.concat(value), []);
   }
 
@@ -95,9 +96,9 @@ export class ExpectedArtifactService {
       },
     ];
     PipelineConfigService.getAllUpstreamDependencies(pipelineGetter(), stage)
-      .filter(s => Registry.pipeline.getStageConfig(s).producesArtifacts)
-      .map(s => ({ source: s, label: 'Stage (' + s.name + ')' }))
-      .forEach(s => sources.push(s));
+      .filter((s) => Registry.pipeline.getStageConfig(s).producesArtifacts)
+      .map((s) => ({ source: s, label: 'Stage (' + s.name + ')' }))
+      .forEach((s) => sources.push(s));
     return sources;
   }
 
@@ -106,7 +107,7 @@ export class ExpectedArtifactService {
       return Registry.pipeline.getCustomArtifactKind();
     }
     const kinds = isDefault ? Registry.pipeline.getDefaultArtifactKinds() : Registry.pipeline.getMatchArtifactKinds();
-    const inferredKindConfig = kinds.find(k => k.type === artifact.type);
+    const inferredKindConfig = kinds.find((k) => k.type === artifact.type);
     if (inferredKindConfig !== undefined) {
       return inferredKindConfig;
     }

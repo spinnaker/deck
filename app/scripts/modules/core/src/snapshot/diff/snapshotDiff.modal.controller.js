@@ -7,6 +7,7 @@ import { ConfirmationModalService } from 'core/confirmationModal';
 import { DIFF_SUMMARY_COMPONENT } from 'core/pipeline/config/actions/history/diffSummary.component';
 import { DIFF_VIEW_COMPONENT } from 'core/pipeline/config/actions/history/diffView.component';
 import { JsonUtils } from 'core/utils/json/JsonUtils';
+
 import { SnapshotReader } from '../SnapshotReader';
 import { SnapshotWriter } from '../SnapshotWriter';
 
@@ -21,7 +22,7 @@ module(CORE_SNAPSHOT_DIFF_SNAPSHOTDIFF_MODAL_CONTROLLER, [DIFF_SUMMARY_COMPONENT
     'application',
     '$filter',
     '$uibModalInstance',
-    function(availableAccounts, application, $filter, $uibModalInstance) {
+    function (availableAccounts, application, $filter, $uibModalInstance) {
       this.availableAccounts = availableAccounts;
       this.selectedAccount = _.head(availableAccounts);
       this.compareOptions = ['most recent', 'previous version'];
@@ -47,7 +48,7 @@ module(CORE_SNAPSHOT_DIFF_SNAPSHOTDIFF_MODAL_CONTROLLER, [DIFF_SUMMARY_COMPONENT
         this.version = 0;
       };
 
-      const formatSnapshots = snapshots => {
+      const formatSnapshots = (snapshots) => {
         const formatted = snapshots
           .sort((a, b) => b.timestamp - a.timestamp)
           .map((s, index) => {
@@ -64,7 +65,7 @@ module(CORE_SNAPSHOT_DIFF_SNAPSHOTDIFF_MODAL_CONTROLLER, [DIFF_SUMMARY_COMPONENT
         return formatted;
       };
 
-      const loadSuccess = snapshots => {
+      const loadSuccess = (snapshots) => {
         this.state.loading = false;
         if (!snapshots.length) {
           return;
@@ -79,7 +80,7 @@ module(CORE_SNAPSHOT_DIFF_SNAPSHOTDIFF_MODAL_CONTROLLER, [DIFF_SUMMARY_COMPONENT
         this.state.error = true;
       };
 
-      this.getSnapshotHistoryForAccount = account => {
+      this.getSnapshotHistoryForAccount = (account) => {
         resetView();
         if (account) {
           SnapshotReader.getSnapshotHistory(application.name, account).then(loadSuccess, loadError);

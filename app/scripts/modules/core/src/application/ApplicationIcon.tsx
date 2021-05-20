@@ -1,8 +1,7 @@
 import React from 'react';
 
-import { Application } from 'core/application';
-
-import { Overridable, IOverridableProps } from '../overrideRegistry/Overridable';
+import { Application } from './application.model';
+import { IOverridableProps, Overridable } from '../overrideRegistry/Overridable';
 
 export interface IApplicationIconProps extends IOverridableProps {
   app: Application;

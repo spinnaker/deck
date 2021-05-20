@@ -21,5 +21,4 @@ export * from './react/ExpectedArtifactEditor';
 export * from './react/ExpectedArtifactSourceSelector';
 export * from './react/ExpectedArtifactModal';
 export * from './react/StageArtifactSelector';
-export * from './react/PreRewriteStageArtifactSelector';
 export * from './react/StageArtifactSelectorDelegate';

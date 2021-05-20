@@ -1,10 +1,11 @@
 import React from 'react';
 
 import { Application } from 'core/application';
-import { IServerGroupManager, IServerGroup } from 'core/domain';
-import { ReactInjector } from 'core/reactShims';
+import { IServerGroup, IServerGroupManager } from 'core/domain';
 import { Tooltip } from 'core/presentation/Tooltip';
-import { IServerGroupManagerStateParams } from 'core/serverGroupManager';
+import { ReactInjector } from 'core/reactShims';
+
+import { IServerGroupManagerStateParams } from './serverGroupManager.states';
 
 export interface IServerGroupManagerTagProps {
   application: Application;
@@ -37,7 +38,7 @@ export class ServerGroupManagerTag extends React.Component<IServerGroupManagerTa
       .getDataSource('serverGroupManagers')
       .data.find((manager: IServerGroupManager) =>
         manager.serverGroups.some(
-          group =>
+          (group) =>
             serverGroup.name === group.name &&
             serverGroup.region === manager.region &&
             serverGroup.account === manager.account,

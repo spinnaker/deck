@@ -1,6 +1,6 @@
+import { unset } from 'lodash';
 import React from 'react';
 import Select, { Option } from 'react-select';
-import { unset } from 'lodash';
 
 import { HelpField } from 'core/help/HelpField';
 import { Markdown } from 'core/presentation';
@@ -43,14 +43,14 @@ export class DeploymentStrategySelector extends React.Component<
     AdditionalFieldsComponent: undefined,
   };
 
-  public selectStrategy(strategy: string): void {
+  public selectStrategy(strategy: string, onMount = false): void {
     const { command, onStrategyChange } = this.props;
 
     const oldStrategy = DeploymentStrategyRegistry.getStrategy(this.state.currentStrategy);
     const newStrategy = DeploymentStrategyRegistry.getStrategy(strategy);
 
     if (oldStrategy && oldStrategy.additionalFields) {
-      oldStrategy.additionalFields.forEach(field => {
+      oldStrategy.additionalFields.forEach((field) => {
         if (!newStrategy || !newStrategy.additionalFields || !newStrategy.additionalFields.includes(field)) {
           unset(command, field);
         }
@@ -60,7 +60,8 @@ export class DeploymentStrategySelector extends React.Component<
     let AdditionalFieldsComponent;
     if (newStrategy) {
       AdditionalFieldsComponent = newStrategy.AdditionalFieldsComponent;
-      if (newStrategy.initializationMethod) {
+      // do not run on mount otherwise we'll confusingly fill in things that weren't there
+      if (newStrategy.initializationMethod && !onMount) {
         newStrategy.initializationMethod(command);
       }
     }
@@ -79,7 +80,7 @@ export class DeploymentStrategySelector extends React.Component<
   };
 
   public componentDidMount() {
-    this.selectStrategy(this.props.command.strategy);
+    this.selectStrategy(this.props.command.strategy, true);
   }
 
   public render() {
@@ -102,7 +103,7 @@ export class DeploymentStrategySelector extends React.Component<
               valueKey="key"
               value={currentStrategy}
               optionRenderer={this.strategyOptionRenderer}
-              valueRenderer={o => <>{o.label}</>}
+              valueRenderer={(o) => <>{o.label}</>}
               onChange={this.strategyChanged}
             />
           </div>

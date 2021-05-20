@@ -1,7 +1,9 @@
 import { compact, flatten, uniq } from 'lodash';
+
 import { IInstance, IServerGroup } from 'core/domain';
-import { Application } from '../application.model';
 import { IMoniker } from 'core/naming/IMoniker';
+
+import { Application } from '../application.model';
 
 export type IServerGroupFilter = (s: IServerGroup) => boolean;
 
@@ -11,7 +13,7 @@ const defaultFilter = () => true;
 
 export class AppListExtractor {
   public static getMonikers(applications: Application[], filter: IServerGroupFilter = defaultFilter): IMoniker[] {
-    const allMonikers: IMoniker[][] = applications.map(a =>
+    const allMonikers: IMoniker[][] = applications.map((a) =>
       a
         .getDataSource('serverGroups')
         .data.filter(filter)
@@ -21,7 +23,7 @@ export class AppListExtractor {
   }
 
   public static getRegions(applications: Application[], filter: IServerGroupFilter = defaultFilter): string[] {
-    const allRegions: string[][] = applications.map(a =>
+    const allRegions: string[][] = applications.map((a) =>
       a
         .getDataSource('serverGroups')
         .data.filter(filter)
@@ -31,7 +33,7 @@ export class AppListExtractor {
   }
 
   public static getStacks(applications: Application[], filter: IServerGroupFilter = defaultFilter): string[] {
-    const allStacks: string[][] = applications.map(a =>
+    const allStacks: string[][] = applications.map((a) =>
       a
         .getDataSource('serverGroups')
         .data.filter(filter)
@@ -41,7 +43,7 @@ export class AppListExtractor {
   }
 
   public static getClusters(applications: Application[], filter: IServerGroupFilter = defaultFilter): string[] {
-    const allClusters: string[][] = applications.map(a =>
+    const allClusters: string[][] = applications.map((a) =>
       a
         .getDataSource('serverGroups')
         .data.filter(filter)
@@ -51,7 +53,7 @@ export class AppListExtractor {
   }
 
   public static getAsgs(applications: Application[], clusterFilter: IServerGroupFilter = defaultFilter): string[] {
-    const allNames: string[][] = applications.map(a =>
+    const allNames: string[][] = applications.map((a) =>
       a
         .getDataSource('serverGroups')
         .data.filter(clusterFilter)
@@ -66,7 +68,7 @@ export class AppListExtractor {
     regionFilter: IServerGroupFilter = defaultFilter,
     nameFilter: IServerGroupFilter = defaultFilter,
   ): string[] {
-    const allInstances: IInstance[][][] = applications.map(a =>
+    const allInstances: IInstance[][][] = applications.map((a) =>
       a
         .getDataSource('serverGroups')
         .data.filter(clusterFilter)
@@ -86,7 +88,7 @@ export class AppListExtractor {
     serverGroupFilter: IServerGroupFilter = defaultFilter,
     instanceFilter: IInstanceFilter = defaultFilter,
   ): IInstance[] {
-    const allInstances: IInstance[][][] = applications.map(a =>
+    const allInstances: IInstance[][][] = applications.map((a) =>
       a
         .getDataSource('serverGroups')
         .data.filter(clusterFilter)

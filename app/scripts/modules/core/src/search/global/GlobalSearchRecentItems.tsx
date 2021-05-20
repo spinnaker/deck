@@ -1,8 +1,8 @@
-import React from 'react';
 import { UISref } from '@uirouter/react';
+import React from 'react';
 
-import { ISearchResultPodData } from '../infrastructure/SearchResultPods';
 import { SearchResult } from '../infrastructure/SearchResult';
+import { ISearchResultPodData } from '../infrastructure/SearchResultPods';
 
 export interface IGlobalSearchRecentItemsProps {
   categories: ISearchResultPodData[];
@@ -34,7 +34,7 @@ export const GlobalSearchRecentItems = ({
           return (
             <li key={result.id} className="result" onClick={() => onResultClick(category.category)}>
               <UISref to={result.state} params={result.params}>
-                <a ref={ref => resultRef(categoryIndex, index, ref)} onKeyDown={onItemKeyDown}>
+                <a ref={(ref) => resultRef(categoryIndex, index, ref)} onKeyDown={onItemKeyDown}>
                   <SearchResult displayName={result.displayName} account={account} />
                 </a>
               </UISref>

@@ -1,24 +1,24 @@
-import React from 'react';
-import { isEqual } from 'lodash';
 import { module } from 'angular';
-import { react2angular } from 'react2angular';
+import { isEqual } from 'lodash';
 import prettyMilliseconds from 'pretty-ms';
+import React from 'react';
+import { react2angular } from 'react2angular';
 
-import { IServerGroupDetailsSectionProps, HelpField } from '@spinnaker/core';
+import { HelpField, IServerGroupDetailsSectionProps, withErrorBoundary } from '@spinnaker/core';
 import { TitusReactInjector } from 'titus/reactShims';
 
+import { EditDisruptionBudgetModal } from './EditDisruptionBudgetModal';
 import {
   getDefaultJobDisruptionBudgetForApp,
   ITitusServerGroupCommand,
 } from '../../configure/serverGroupConfiguration.service';
+import {
+  DisruptionBudgetDescription,
+  IFieldOption,
+} from '../../configure/wizard/pages/disruptionBudget/JobDisruptionBudget';
 import { policyOptions } from '../../configure/wizard/pages/disruptionBudget/PolicyOptions';
 import { rateOptions } from '../../configure/wizard/pages/disruptionBudget/RateOptions';
-import {
-  IFieldOption,
-  DisruptionBudgetDescription,
-} from '../../configure/wizard/pages/disruptionBudget/JobDisruptionBudget';
-import { ITitusServerGroup, IJobDisruptionBudget } from '../../../domain';
-import { EditDisruptionBudgetModal } from './EditDisruptionBudgetModal';
+import { IJobDisruptionBudget, ITitusServerGroup } from '../../../domain';
 
 interface IDisruptionBudgetSection extends IServerGroupDetailsSectionProps {
   serverGroup: ITitusServerGroup;
@@ -34,7 +34,7 @@ export class DisruptionBudgetSection extends React.Component<IDisruptionBudgetSe
     options: IFieldOption[];
     label: string;
   }): JSX.Element => {
-    const selected = options.find(o => !!budget[o.field]);
+    const selected = options.find((o) => !!budget[o.field]);
     if (!selected) {
       return null;
     }
@@ -134,7 +134,7 @@ export class DisruptionBudgetSection extends React.Component<IDisruptionBudgetSe
     const sortedDays = days.sort((d1, d2) => allDays.indexOf(d1) - allDays.indexOf(d2));
     const groups: string[] = [];
     const currentGroup: string[] = [];
-    allDays.slice(allDays.indexOf(sortedDays[0])).forEach(d => {
+    allDays.slice(allDays.indexOf(sortedDays[0])).forEach((d) => {
       if (sortedDays.includes(d)) {
         currentGroup.push(d);
       } else {
@@ -225,5 +225,5 @@ export const DISRUPTION_BUDGET_DETAILS_SECTION = 'spinnaker.titus.disruptionbudg
 
 module(DISRUPTION_BUDGET_DETAILS_SECTION, []).component(
   'titusDisruptionBudgetSection',
-  react2angular(DisruptionBudgetSection, ['serverGroup', 'app']),
+  react2angular(withErrorBoundary(DisruptionBudgetSection, 'titusDisruptionBudgetSection'), ['serverGroup', 'app']),
 );

@@ -1,15 +1,16 @@
 import { Application } from 'core/application';
 import { SETTINGS } from 'core/config';
-import { IServerGroup, ILoadBalancer, IManagedResourceSummary, ISecurityGroup } from 'core/domain';
+import { ILoadBalancer, IManagedResourceSummary, ISecurityGroup, IServerGroup } from 'core/domain';
 import { IMoniker } from 'core/naming';
 
-import { getResourceKindForLoadBalancerType } from './ManagedReader';
+import { getKindName, getResourceKindForLoadBalancerType } from './ManagedReader';
 
-const isMonikerEqual = (a: IMoniker, b: IMoniker) => a.app === b.app && a.stack === b.stack && a.detail === b.detail;
+const isMonikerEqual = (a?: IMoniker, b?: IMoniker) =>
+  a && b && a.app === b.app && a.stack === b.stack && a.detail === b.detail;
 
 const getResourcesOfKind = (application: Application, kinds: string[]) => {
   const resources: IManagedResourceSummary[] = application.managedResources.data.resources;
-  return resources.filter(({ kind }) => kinds.includes(kind));
+  return resources.filter(({ kind }) => kinds.includes(getKindName(kind)));
 };
 
 export const addManagedResourceMetadataToServerGroups = (application: Application) => {
@@ -20,7 +21,7 @@ export const addManagedResourceMetadataToServerGroups = (application: Applicatio
   const clusterResources = getResourcesOfKind(application, ['cluster']);
   const serverGroups: IServerGroup[] = application.serverGroups.data;
 
-  serverGroups.forEach(serverGroup => {
+  serverGroups.forEach((serverGroup) => {
     const matchingResource = clusterResources.find(
       ({ moniker, locations: { account, regions } }) =>
         isMonikerEqual(moniker, serverGroup.moniker) &&
@@ -42,10 +43,11 @@ export const addManagedResourceMetadataToLoadBalancers = (application: Applicati
   const loadBalancerResources = getResourcesOfKind(application, ['classic-load-balancer', 'application-load-balancer']);
   const loadBalancers: ILoadBalancer[] = application.loadBalancers.data;
 
-  loadBalancers.forEach(loadBalancer => {
+  loadBalancers.forEach((loadBalancer) => {
     const matchingResource = loadBalancerResources.find(
       ({ kind, moniker, locations: { account, regions } }) =>
-        kind === getResourceKindForLoadBalancerType(loadBalancer.loadBalancerType) &&
+        loadBalancer.loadBalancerType &&
+        getKindName(kind) === getResourceKindForLoadBalancerType(loadBalancer.loadBalancerType) &&
         isMonikerEqual(moniker, loadBalancer.moniker) &&
         account === loadBalancer.account &&
         regions.some(({ name }) => name === loadBalancer.region),
@@ -65,7 +67,7 @@ export const addManagedResourceMetadataToSecurityGroups = (application: Applicat
   const securityGroupResources = getResourcesOfKind(application, ['security-group']);
   const securityGroups: ISecurityGroup[] = application.securityGroups.data;
 
-  securityGroups.forEach(securityGroup => {
+  securityGroups.forEach((securityGroup) => {
     const matchingResource = securityGroupResources.find(
       ({ moniker, locations: { account, regions } }) =>
         isMonikerEqual(moniker, securityGroup.moniker) &&

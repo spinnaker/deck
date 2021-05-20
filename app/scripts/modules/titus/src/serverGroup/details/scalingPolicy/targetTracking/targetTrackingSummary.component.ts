@@ -1,6 +1,7 @@
 import { IComponentController, IComponentOptions, module } from 'angular';
 import { IModalService } from 'angular-ui-bootstrap';
 
+import { ITargetTrackingConfiguration, ITargetTrackingPolicy } from '@spinnaker/amazon';
 import {
   AccountService,
   Application,
@@ -10,7 +11,6 @@ import {
   TaskExecutor,
 } from '@spinnaker/core';
 
-import { ITargetTrackingConfiguration, ITargetTrackingPolicy } from '@spinnaker/amazon';
 import { UpsertTargetTrackingController } from './upsertTargetTracking.controller';
 
 export interface IAlarmRenderingServerGroup {
@@ -37,7 +37,7 @@ class TargetTrackingSummaryController implements IComponentController {
 
   public $onInit() {
     this.config = this.policy.targetTrackingConfiguration;
-    AccountService.getAccountDetails(this.serverGroup.account).then(details => {
+    AccountService.getAccountDetails(this.serverGroup.account).then((details) => {
       // alarmServerGroup is used to trick the chart rendering into using AWS metrics
       this.alarmServerGroup = {
         type: 'aws',

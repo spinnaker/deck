@@ -1,5 +1,5 @@
-import React from 'react';
 import { uniq } from 'lodash';
+import React from 'react';
 
 import { GroupedNotificationList } from './GroupedNotificationList';
 import { NotificationCategory } from './NotificationCategory';
@@ -98,8 +98,9 @@ export class CategorizedNotifications extends React.Component<
       return null;
     }
 
-    const selectedNotifications: INotification[] = categorizedAlerts.find(tuple => tuple.category === selectedCategory)
-      .notifications;
+    const selectedNotifications: INotification[] = categorizedAlerts.find(
+      (tuple) => tuple.category === selectedCategory,
+    ).notifications;
 
     return (
       <div className="flex-container-h">

@@ -1,12 +1,12 @@
 'use strict';
 
+import { module } from 'angular';
 import { get } from 'lodash';
 
-import { module } from 'angular';
-
-import { OVERRIDE_REGISTRY } from 'core/overrideRegistry/override.registry';
-import { CORE_APPLICATION_MODAL_EDITAPPLICATION_CONTROLLER_MODAL } from '../modal/editApplication.controller.modal';
 import { SETTINGS } from 'core/config/settings';
+import { OVERRIDE_REGISTRY } from 'core/overrideRegistry/override.registry';
+
+import { CORE_APPLICATION_MODAL_EDITAPPLICATION_CONTROLLER_MODAL } from '../modal/editApplication.controller.modal';
 
 export const CORE_APPLICATION_CONFIG_APPLICATIONATTRIBUTES_DIRECTIVE =
   'spinnaker.core.application.config.attributes.directive';
@@ -17,7 +17,7 @@ module(CORE_APPLICATION_CONFIG_APPLICATIONATTRIBUTES_DIRECTIVE, [
 ])
   .directive('applicationAttributes', [
     'overrideRegistry',
-    function(overrideRegistry) {
+    function (overrideRegistry) {
       return {
         restrict: 'E',
         templateUrl: overrideRegistry.getTemplate(
@@ -36,7 +36,7 @@ module(CORE_APPLICATION_CONFIG_APPLICATIONATTRIBUTES_DIRECTIVE, [
   .controller('ApplicationAttributesCtrl', [
     '$uibModal',
     'overrideRegistry',
-    function($uibModal, overrideRegistry) {
+    function ($uibModal, overrideRegistry) {
       const cpHealthMsg = 'considers only cloud provider health when executing tasks';
       const healthOverrideMsg = 'shows a health override option for each operation';
       const setHealthMessage = () => {
@@ -60,17 +60,17 @@ module(CORE_APPLICATION_CONFIG_APPLICATIONATTRIBUTES_DIRECTIVE, [
         const permissions = get(this.application, 'attributes.permissions');
         if (permissions) {
           const permissionsMap = new Map();
-          (permissions.READ || []).forEach(role => {
+          (permissions.READ || []).forEach((role) => {
             permissionsMap.set(role, 'read');
           });
-          (permissions.EXECUTE || []).forEach(role => {
+          (permissions.EXECUTE || []).forEach((role) => {
             if (permissionsMap.has(role)) {
               permissionsMap.set(role, permissionsMap.get(role) + ', execute');
             } else {
               permissionsMap.set(role, 'execute');
             }
           });
-          (permissions.WRITE || []).forEach(role => {
+          (permissions.WRITE || []).forEach((role) => {
             if (permissionsMap.has(role)) {
               permissionsMap.set(role, permissionsMap.get(role) + ', write');
             } else {
@@ -103,7 +103,7 @@ module(CORE_APPLICATION_CONFIG_APPLICATIONATTRIBUTES_DIRECTIVE, [
               },
             },
           })
-          .result.then(newAttributes => {
+          .result.then((newAttributes) => {
             this.application.attributes = newAttributes;
             setHealthMessage();
             setPermissions();

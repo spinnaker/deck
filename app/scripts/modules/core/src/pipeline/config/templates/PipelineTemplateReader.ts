@@ -1,11 +1,12 @@
-import { IPromise } from 'angular';
-import { $q } from 'ngimport';
 import { flatten } from 'lodash';
-import { API } from 'core/api/ApiService';
+import { $q } from 'ngimport';
+
+import { REST } from 'core/api/ApiService';
+import { IPipelineTemplateConfigV2 } from 'core/domain';
 import { IPipeline } from 'core/domain/IPipeline';
 import { IPipelineTemplateV2Collections } from 'core/domain/IPipelineTemplateV2';
-import { IPipelineTemplateConfigV2 } from 'core/domain';
-import { PipelineTemplateV2Service } from 'core/pipeline';
+
+import { PipelineTemplateV2Service } from './v2/pipelineTemplateV2.service';
 
 export interface IPipelineTemplate {
   id: string;
@@ -83,10 +84,9 @@ export class PipelineTemplateReader {
     source: string,
     executionId?: string,
     pipelineConfigId?: string,
-  ): IPromise<IPipelineTemplate> {
-    return API.one('pipelineTemplates')
-      .one('resolve')
-      .withParams({ source, executionId, pipelineConfigId })
+  ): PromiseLike<IPipelineTemplate> {
+    return REST('/pipelineTemplates/resolve')
+      .query({ source, executionId, pipelineConfigId })
       .get()
       .then((template: IPipelineTemplate) => {
         template.selfLink = source;
@@ -97,26 +97,23 @@ export class PipelineTemplateReader {
   public static getPipelinePlan(
     config: IPipelineTemplateConfig | IPipelineTemplateConfigV2,
     executionId?: string,
-  ): IPromise<IPipeline> {
-    const urls = PipelineTemplateV2Service.isV2PipelineConfig(config)
-      ? ['v2', 'pipelineTemplates', 'plan']
-      : ['pipelines', 'start'];
-
-    return API.one(...urls).post({ ...config, plan: true, executionId });
+  ): PromiseLike<IPipeline> {
+    const endpoint = PipelineTemplateV2Service.isV2PipelineConfig(config)
+      ? '/v2/pipelineTemplates/plan'
+      : '/pipelines/start';
+    return REST(endpoint).post({ ...config, plan: true, executionId });
   }
 
-  public static getPipelineTemplatesByScope = (scope: string): IPromise<IPipelineTemplate[]> => {
-    return API.one('pipelineTemplates')
-      .withParams({ scope })
-      .get();
+  public static getPipelineTemplatesByScope = (scope: string): PromiseLike<IPipelineTemplate[]> => {
+    return REST('/pipelineTemplates').query({ scope }).get();
   };
 
-  public static getPipelineTemplatesByScopes(scopes: string[]): IPromise<IPipelineTemplate[]> {
+  public static getPipelineTemplatesByScopes(scopes: string[]): PromiseLike<IPipelineTemplate[]> {
     return $q
       .all(scopes.map(this.getPipelineTemplatesByScope))
-      .then(templates => flatten(templates))
-      .then(templates => {
-        templates.forEach(template => (template.selfLink = `spinnaker://${template.id}`));
+      .then((templates) => flatten(templates))
+      .then((templates) => {
+        templates.forEach((template) => (template.selfLink = `spinnaker://${template.id}`));
         return templates;
       });
   }
@@ -142,7 +139,7 @@ export class PipelineTemplateReader {
     };
   }
 
-  public static getV2PipelineTemplateList(): IPromise<IPipelineTemplateV2Collections> {
-    return API.one('v2', 'pipelineTemplates', 'versions').get();
+  public static getV2PipelineTemplateList(): PromiseLike<IPipelineTemplateV2Collections> {
+    return REST('/v2/pipelineTemplates/versions').get();
   }
 }

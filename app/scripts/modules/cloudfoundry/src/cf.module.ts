@@ -1,14 +1,14 @@
 import { CloudProviderRegistry } from '@spinnaker/core';
-
-import './help/cloudfoundry.help';
-import './logo/cf.logo.less';
-
+import 'cloudfoundry/common/applicationName.validator';
+import { CloudFoundryInstanceDetails } from 'cloudfoundry/instance/details';
 import {
   CloudFoundryLoadBalancerDetails,
   CloudFoundryLoadBalancerTransformer,
-  CloudFoundryNoLoadBalancerModal,
+  CloudFoundryMapLoadBalancerModal,
 } from 'cloudfoundry/loadBalancer';
-
+import 'cloudfoundry/pipeline/config/validation/cfTargetImpedance.validator';
+import 'cloudfoundry/pipeline/config/validation/instanceSize.validator';
+import 'cloudfoundry/pipeline/config/validation/requiredRoutes.validator';
 import {
   ApplicationManagerSection,
   BoundServicesSection,
@@ -18,7 +18,7 @@ import {
   CloudFoundryServerGroupActions,
   CloudFoundryServerGroupCommandBuilderShim,
   CloudFoundryServerGroupTransformer,
-  EvironmentVariablesSection,
+  EnvironmentVariablesSection,
   HealthCheckSection,
   MetricsSection,
   PackageSection,
@@ -26,12 +26,11 @@ import {
   ServerGroupSizingSection,
 } from 'cloudfoundry/serverGroup';
 
-import { CloudFoundryInstanceDetails } from 'cloudfoundry/instance/details';
-
-import 'cloudfoundry/pipeline/config/validation/cfTargetImpedance.validator';
-import 'cloudfoundry/pipeline/config/validation/instanceSize.validator';
-import 'cloudfoundry/pipeline/config/validation/requiredRoutes.validator';
+import './help/cloudfoundry.help';
+import cloudFoundryLogo from './logo/cf.logo.svg';
+import './pipeline/stages/bakeCloudFoundryManifest/bakeCloudFoundryManifestStage';
 import './pipeline/stages/cloneServerGroup/cloudfoundryCloneServerGroupStage.module';
+import './pipeline/stages/createServiceBindings/cloudFoundryCreateServiceBindingsStage';
 import './pipeline/stages/createServiceKey/cloudfoundryCreateServiceKeyStage.module';
 import './pipeline/stages/deleteServiceKey/cloudfoundryDeleteServiceKeyStage.module';
 import './pipeline/stages/deployService/cloudfoundryDeployServiceStage.module';
@@ -42,20 +41,22 @@ import './pipeline/stages/enableAsg/cloudfoundryEnableAsgStage.module';
 import './pipeline/stages/mapLoadBalancers/cloudfoundryMapLoadBalancersStage.module';
 import './pipeline/stages/resizeAsg/cloudfoundryResizeAsgStage.module';
 import './pipeline/stages/rollbackCluster/cloudfoundryRollbackClusterStage.module';
+import './pipeline/stages/runJob/cloudfoundryRunJob.module';
 import './pipeline/stages/shareService/cloudfoundryShareServiceStage.module';
 import './pipeline/stages/unmapLoadBalancers/cloudfoundryUnmapLoadBalancersStage.module';
 import './pipeline/stages/unshareService/cloudfoundryUnshareServiceStage.module';
-import './pipeline/stages/runJob/cloudfoundryRunJob.module';
+
+import './logo/cf.logo.less';
 
 CloudProviderRegistry.registerProvider('cloudfoundry', {
   name: 'Cloud Foundry',
   logo: {
-    path: require('./logo/cf.logo.svg'),
+    path: cloudFoundryLogo,
   },
   loadBalancer: {
     transformer: CloudFoundryLoadBalancerTransformer,
     details: CloudFoundryLoadBalancerDetails,
-    CreateLoadBalancerModal: CloudFoundryNoLoadBalancerModal,
+    CreateLoadBalancerModal: CloudFoundryMapLoadBalancerModal,
   },
   serverGroup: {
     skipUpstreamStageCheck: true,
@@ -71,7 +72,7 @@ CloudProviderRegistry.registerProvider('cloudfoundry', {
       BuildSection,
       PackageSection,
       BoundServicesSection,
-      EvironmentVariablesSection,
+      EnvironmentVariablesSection,
     ],
     CloneServerGroupModal: CloudFoundryCreateServerGroupModal,
     commandBuilder: CloudFoundryServerGroupCommandBuilderShim,

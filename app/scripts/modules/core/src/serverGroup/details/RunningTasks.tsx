@@ -3,10 +3,10 @@ import React from 'react';
 import { Application } from 'core/application/application.model';
 import { IExecution, IServerGroup, ITask } from 'core/domain';
 import { CollapsibleSection, robotToHuman } from 'core/presentation';
-import { displayableTasks } from 'core/task/displayableTasks.filter';
-import { StatusGlyph } from 'core/task/StatusGlyph';
-import { duration } from 'core/utils/timeFormatters';
 import { PlatformHealthOverrideMessage } from 'core/task/PlatformHealthOverrideMessage';
+import { StatusGlyph } from 'core/task/StatusGlyph';
+import { displayableTasks } from 'core/task/displayableTasks.filter';
+import { duration } from 'core/utils/timeFormatters';
 
 export interface IRunningTasksProps {
   application: Application;
@@ -29,10 +29,10 @@ export class RunningTasks extends React.Component<IRunningTasksProps> {
         >
           {tasks
             .sort((a, b) => a.startTime - b.startTime)
-            .map(task => (
+            .map((task) => (
               <Task key={task.id} task={task} application={application} />
             ))}
-          {executions.map(execution => (
+          {executions.map((execution) => (
             <Execution key={execution.id} execution={execution} />
           ))}
         </CollapsibleSection>
@@ -66,7 +66,7 @@ const Task = (props: { task: ITask; application: Application }): JSX.Element => 
 const Execution = (props: { execution: IExecution }): JSX.Element => (
   <div>
     <strong>Pipeline: {props.execution.name}</strong>
-    {props.execution.stages.map(stage => (
+    {props.execution.stages.map((stage) => (
       <div className="flex-container-h baseline margin-between-sm">
         <span className="small">
           <StatusGlyph item={stage} />

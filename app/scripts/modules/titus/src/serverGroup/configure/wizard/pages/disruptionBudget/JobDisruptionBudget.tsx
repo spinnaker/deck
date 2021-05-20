@@ -1,31 +1,27 @@
-import React from 'react';
 import { FormikProps } from 'formik';
+import { get, isEqual } from 'lodash';
+import React from 'react';
 import { Option } from 'react-select';
-import { isEqual, get } from 'lodash';
 
 import {
   Application,
-  FormikFormField,
   CheckboxInput,
+  FormikFormField,
   HelpField,
-  TetheredSelect,
   LayoutProvider,
   ResponsiveFieldLayout,
+  TetheredSelect,
 } from '@spinnaker/core';
-
-import { WindowPicker } from './WindowPicker';
-
-import {
-  ITitusServerGroupCommand,
-  defaultJobDisruptionBudget,
-  getDefaultJobDisruptionBudgetForApp,
-} from '../../../serverGroupConfiguration.service';
-
 import { IJobDisruptionBudget } from 'titus/domain';
 
-import { rateOptions } from './RateOptions';
-
 import { policyOptions } from './PolicyOptions';
+import { rateOptions } from './RateOptions';
+import { WindowPicker } from './WindowPicker';
+import {
+  defaultJobDisruptionBudget,
+  getDefaultJobDisruptionBudgetForApp,
+  ITitusServerGroupCommand,
+} from '../../../serverGroupConfiguration.service';
 
 export interface IJobDisruptionBudgetProps {
   formik: FormikProps<ITitusServerGroupCommand>;
@@ -100,12 +96,12 @@ export class JobDisruptionBudget extends React.Component<IJobDisruptionBudgetPro
     if (!disruptionBudget) {
       return options[0];
     }
-    return options.find(o => !!disruptionBudget[o.field]);
+    return options.find((o) => !!disruptionBudget[o.field]);
   }
 
   private optionTypeChanged = (e: IFieldOption, options: IFieldOption[]) => {
-    const deselected = options.filter(o => o !== e);
-    deselected.forEach(o => this.props.formik.setFieldValue('disruptionBudget.' + o.field, undefined));
+    const deselected = options.filter((o) => o !== e);
+    deselected.forEach((o) => this.props.formik.setFieldValue('disruptionBudget.' + o.field, undefined));
     this.props.formik.setFieldValue('disruptionBudget.' + e.field, e.defaultValues);
   };
 
@@ -120,19 +116,19 @@ export class JobDisruptionBudget extends React.Component<IJobDisruptionBudgetPro
   private getTimeWindowSelection(): IFieldOption {
     const windows = get(this.props.formik.values, 'disruptionBudget.timeWindows');
     if (windows) {
-      return this.timeWindowOptions.find(o => o.defaultValues);
+      return this.timeWindowOptions.find((o) => o.defaultValues);
     }
-    return this.timeWindowOptions.find(o => !o.defaultValues);
+    return this.timeWindowOptions.find((o) => !o.defaultValues);
   }
 
   private toggleHealthProvider(provider: string) {
     const { values, setFieldValue } = this.props.formik;
     const providers = values.disruptionBudget.containerHealthProviders;
-    const existing = providers.find(p => p.name === provider);
+    const existing = providers.find((p) => p.name === provider);
     if (existing) {
       setFieldValue(
         'disruptionBudget.containerHealthProviders',
-        providers.filter(p => p !== existing),
+        providers.filter((p) => p !== existing),
       );
     } else {
       setFieldValue('disruptionBudget.containerHealthProviders', providers.concat({ name: provider }));
@@ -151,7 +147,7 @@ export class JobDisruptionBudget extends React.Component<IJobDisruptionBudgetPro
 
     const windowType = this.getTimeWindowSelection();
 
-    const selectedProviders = budget.containerHealthProviders.map(p => p.name);
+    const selectedProviders = budget.containerHealthProviders.map((p) => p.name);
 
     const isSelfManaged = !!budget.selfManaged;
 
@@ -162,7 +158,6 @@ export class JobDisruptionBudget extends React.Component<IJobDisruptionBudgetPro
 
           <FormikFormField
             name="usingDefault"
-            fastField={false}
             input={() => (
               <CheckboxInput
                 checked={usingDefault}
@@ -178,8 +173,7 @@ export class JobDisruptionBudget extends React.Component<IJobDisruptionBudgetPro
                 <FormikFormField
                   name="policyType"
                   label="Policy"
-                  fastField={false}
-                  input={props => (
+                  input={(props) => (
                     <div>
                       <TetheredSelect
                         {...props}
@@ -212,8 +206,7 @@ export class JobDisruptionBudget extends React.Component<IJobDisruptionBudgetPro
                     <FormikFormField
                       name="rates"
                       label="Rates"
-                      fastField={false}
-                      input={props => (
+                      input={(props) => (
                         <TetheredSelect
                           {...props}
                           style={{ width: '300px' }}
@@ -237,8 +230,7 @@ export class JobDisruptionBudget extends React.Component<IJobDisruptionBudgetPro
                     <FormikFormField
                       name="timeWindows"
                       label="When Can Disruption Occur?"
-                      fastField={false}
-                      input={props => (
+                      input={(props) => (
                         <TetheredSelect
                           {...props}
                           style={{ width: '300px' }}
@@ -256,19 +248,12 @@ export class JobDisruptionBudget extends React.Component<IJobDisruptionBudgetPro
                 <FormikFormField
                   name="healthProviders"
                   label="Container Health Provider"
-                  fastField={false}
                   input={() => (
                     <div>
                       <CheckboxInput
                         checked={selectedProviders.includes('eureka')}
                         onChange={() => this.toggleHealthProvider('eureka')}
                         text="Discovery"
-                        disabled={usingDefault}
-                      />
-                      <CheckboxInput
-                        checked={selectedProviders.includes('atlasHealthCheckPoller')}
-                        onChange={() => this.toggleHealthProvider('atlasHealthCheckPoller')}
-                        text="Atlas Health Check"
                         disabled={usingDefault}
                       />
                     </div>

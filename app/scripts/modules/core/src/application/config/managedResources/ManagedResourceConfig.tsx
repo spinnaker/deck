@@ -1,13 +1,15 @@
-import React from 'react';
 import { module } from 'angular';
-import { react2angular } from 'react2angular';
-import ReactGA from 'react-ga';
 import classNames from 'classnames';
+import React from 'react';
+import ReactGA from 'react-ga';
+import { react2angular } from 'react2angular';
 
-import { NgReact } from 'core/reactShims';
-import { Application } from 'core/application';
-import { ValidationMessage, useLatestCallback } from 'core/presentation';
 import { ManagedWriter } from 'core/managed';
+import { useLatestCallback, ValidationMessage } from 'core/presentation';
+import { withErrorBoundary } from 'core/presentation/SpinErrorBoundary';
+import { NgReact } from 'core/reactShims';
+
+import { Application } from '../../application.model';
 
 import './ManagedResourceConfig.less';
 
@@ -30,11 +32,11 @@ const getManagementStatus = (paused: boolean) => {
     return (
       <>
         <div className="sp-padding-m sp-margin-m-bottom paused-warning">
-          <i className="fa fa-pause sp-margin-xs-right" /> <b>Continuous management of resources is paused.</b>
+          <i className="fa fa-pause sp-margin-xs-right" /> <b>Resource management is paused.</b>
         </div>
         <p className="sp-margin-l-bottom">
-          Spinnaker is configured to continuously manage some of this application's resources, but management has been
-          paused. When resumed, Spinnaker will take action to make each resource match its declarative configuration.
+          Spinnaker is configured to manage some of this application's resources, but management has been paused. When
+          resumed, Spinnaker will take action to make each resource match its desired state.
         </p>
       </>
     );
@@ -42,7 +44,7 @@ const getManagementStatus = (paused: boolean) => {
     return (
       <>
         <p>
-          <span className="rainbow-icon">🌈</span> <b>Spinnaker is continuously managing some resources.</b>
+          <span className="rainbow-icon">🌈</span> <b>Spinnaker is managing some resources.</b>
         </p>
         <p className="sp-margin-l-bottom">
           If you need to temporarily stop Spinnaker from managing resources — for example, if something is wrong and
@@ -116,7 +118,7 @@ const ManagedResourceConfig = ({ application }: IManagedResourceConfigProps) => 
         <a
           target="_blank"
           onClick={() => logClick('Documentation', application.name)}
-          href="https://www.spinnaker.io/reference/managed-delivery"
+          href="https://www.spinnaker.io/guides/user/managed-delivery"
         >
           Check out our documentation
         </a>
@@ -128,5 +130,5 @@ const ManagedResourceConfig = ({ application }: IManagedResourceConfigProps) => 
 export const MANAGED_RESOURCE_CONFIG = 'spinnaker.core.managedResourceConfig.component';
 module(MANAGED_RESOURCE_CONFIG, []).component(
   'managedResourceConfig',
-  react2angular(ManagedResourceConfig, ['application']),
+  react2angular(withErrorBoundary(ManagedResourceConfig, 'managedResourceConfig'), ['application']),
 );

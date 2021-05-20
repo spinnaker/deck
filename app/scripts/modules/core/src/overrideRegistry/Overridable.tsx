@@ -1,10 +1,10 @@
-import React from 'react';
-import { Subject, Observable } from 'rxjs';
 import { get } from 'lodash';
+import React from 'react';
+import { Observable, Subject } from 'rxjs';
 
-import { CloudProviderRegistry } from 'core/cloudProvider';
-import { ReactInjector, AngularJSAdapter } from 'core/reactShims';
 import { AccountService, IAccountDetails } from 'core/account/AccountService';
+import { CloudProviderRegistry } from 'core/cloudProvider';
+import { AngularJSAdapter, ReactInjector } from 'core/reactShims';
 import { Spinner } from 'core/widgets';
 
 export interface IOverridableProps {
@@ -34,7 +34,7 @@ export interface IOverridableProps {
  * <MyCmp accountId={accountId} />
  */
 export function Overridable(key: string) {
-  return function<P, T extends React.ComponentClass<P>>(targetComponent: T): T {
+  return function <P, T extends React.ComponentClass<P>>(targetComponent: T): T {
     return overridableComponent(targetComponent, key);
   };
 }
@@ -50,7 +50,7 @@ export function Overridable(key: string) {
  *
  * export const MyOverridableCmp = overridableComponent(MyCmp);
  */
-export function overridableComponent<P extends IOverridableProps, T extends React.ComponentClass<P>>(
+export function overridableComponent<P extends IOverridableProps, T extends React.ComponentType<P>>(
   OriginalComponent: T,
   key: string,
 ): T {
@@ -66,16 +66,16 @@ export function overridableComponent<P extends IOverridableProps, T extends Reac
       let constructing = true;
 
       this.account$
-        .switchMap(accountName => {
+        .switchMap((accountName) => {
           if (!accountName) {
             return Observable.of(null);
           }
 
-          return AccountService.accounts$.map(accts => accts.find(acct => acct.name === accountName));
+          return AccountService.accounts$.map((accts) => accts.find((acct) => acct.name === accountName));
         })
         .map((accountDetails: IAccountDetails) => this.getComponent(accountDetails))
         .takeUntil(this.destroy$)
-        .subscribe(Component => {
+        .subscribe((Component) => {
           // The component may be ready synchronously (when the constructor is run), or it might require async.
           // Handle either case here
           if (constructing) {
@@ -101,19 +101,19 @@ export function overridableComponent<P extends IOverridableProps, T extends Reac
     }
 
     private getComponentFromCloudProvider(accountDetails: IAccountDetails): T {
-      const { cloudProvider, skin } = accountDetails;
+      const { cloudProvider } = accountDetails;
       if (!cloudProvider) {
         return null;
       }
 
-      const CloudProviderComponentOverride = CloudProviderRegistry.getValue(cloudProvider, key, skin);
+      const CloudProviderComponentOverride = CloudProviderRegistry.getValue(cloudProvider, key);
       if (CloudProviderComponentOverride) {
         return CloudProviderComponentOverride as T;
       }
 
-      const cloudProviderTemplateOverride = CloudProviderRegistry.getValue(cloudProvider, key + 'TemplateUrl', skin);
+      const cloudProviderTemplateOverride = CloudProviderRegistry.getValue(cloudProvider, key + 'TemplateUrl');
       if (cloudProviderTemplateOverride) {
-        const cloudProviderController = CloudProviderRegistry.getValue(cloudProvider, key + 'Controller', skin);
+        const cloudProviderController = CloudProviderRegistry.getValue(cloudProvider, key + 'Controller');
         const controllerAs = cloudProviderController && cloudProviderController.includes(' as ') ? undefined : 'ctrl';
         const Component = (props: any) => (
           <AngularJSAdapter
@@ -174,7 +174,9 @@ export function overridableComponent<P extends IOverridableProps, T extends Reac
         return <Spinner />;
       }
 
-      const isClassComponent = ['render', 'prototype.render'].some(prop => typeof get(Component, prop) === 'function');
+      const isClassComponent = ['render', 'prototype.render'].some(
+        (prop) => typeof get(Component, prop) === 'function',
+      );
       return isClassComponent ? <Component {...props} ref={this.props.forwardedRef} /> : <Component {...props} />;
     }
   }
@@ -185,8 +187,8 @@ export function overridableComponent<P extends IOverridableProps, T extends Reac
 
   // Copy static properties
   Object.getOwnPropertyNames(OriginalComponent)
-    .filter(propName => propName !== 'constructor' && !OverridableComponent.hasOwnProperty(propName))
-    .forEach(propName => ((forwardRef as any)[propName] = (OriginalComponent as any)[propName]));
+    .filter((propName) => propName !== 'constructor' && !OverridableComponent.hasOwnProperty(propName))
+    .forEach((propName) => ((forwardRef as any)[propName] = (OriginalComponent as any)[propName]));
 
   return forwardRef;
 }

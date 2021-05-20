@@ -1,7 +1,7 @@
-import { IController, module } from 'angular';
-import { cloneDeep } from 'lodash';
-import { IModalServiceInstance } from 'angular-ui-bootstrap';
 import { StateService } from '@uirouter/angularjs';
+import { IController, module } from 'angular';
+import { IModalServiceInstance } from 'angular-ui-bootstrap';
+import { cloneDeep } from 'lodash';
 
 import { Application, LoadBalancerWriter, TaskMonitor } from '@spinnaker/core';
 
@@ -54,7 +54,7 @@ class AppengineLoadBalancerWizardController implements IController {
       ].join(':')}`;
       this.appengineLoadBalancerTransformer
         .convertLoadBalancerForEditing(loadBalancer, application)
-        .then(convertedLoadBalancer => {
+        .then((convertedLoadBalancer) => {
           this.loadBalancer = this.appengineLoadBalancerTransformer.convertLoadBalancerToUpsertDescription(
             convertedLoadBalancer,
           );

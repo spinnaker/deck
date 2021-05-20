@@ -1,5 +1,5 @@
-import React from 'react';
 import { UISref } from '@uirouter/react';
+import React from 'react';
 
 import { Spinner } from 'core/widgets/spinners/Spinner';
 
@@ -26,7 +26,7 @@ const CloseButton = (
   </div>
 );
 
-const DetailsHeader: React.SFC<IDetailsHeaderProps> = props => (
+const DetailsHeader: React.SFC<IDetailsHeaderProps> = (props) => (
   <div className="header">
     {CloseButton}
     <div className="header-text horizontal middle">
@@ -45,7 +45,7 @@ const loading = (
   </div>
 );
 
-const Details: IDetailsSFCWithExtras = props => (
+const Details: IDetailsSFCWithExtras = (props) => (
   <div className="details-panel">{props.loading ? loading : props.children}</div>
 );
 

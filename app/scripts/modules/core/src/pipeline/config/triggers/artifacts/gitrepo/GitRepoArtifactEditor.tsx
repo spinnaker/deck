@@ -1,11 +1,12 @@
-import { cloneDeep, get } from 'lodash';
+import { cloneDeep } from 'lodash';
 import React from 'react';
 
 import { ArtifactTypePatterns } from 'core/artifact';
 import { IArtifactEditorProps, IArtifactKindConfig } from 'core/domain';
-import { StageConfigField } from 'core/pipeline';
-import { SpelText } from 'core/widgets';
 import { CheckboxInput } from 'core/presentation';
+import { SpelText } from 'core/widgets';
+
+import { StageConfigField } from '../../../stages/common';
 
 const TYPE = 'git/repo';
 
@@ -18,7 +19,7 @@ class GitRepoArtifactEditor extends React.Component<IArtifactEditorProps, IGitRe
     super(props);
     const { artifact } = this.props;
     this.state = {
-      includesSubPath: get(artifact, 'metadata.subPath', '') !== '',
+      includesSubPath: (artifact.location ?? artifact.metadata?.subPath) !== undefined,
     };
   }
 
@@ -40,9 +41,7 @@ class GitRepoArtifactEditor extends React.Component<IArtifactEditorProps, IGitRe
 
   private onSubPathChanged = (subPath: string) => {
     const clonedArtifact = cloneDeep(this.props.artifact);
-    const metadata = get(clonedArtifact, 'metadata', {}) as any;
-    metadata.subPath = subPath;
-    clonedArtifact.metadata = metadata;
+    clonedArtifact.location = subPath;
     this.props.onChange(clonedArtifact);
   };
 
@@ -76,7 +75,7 @@ class GitRepoArtifactEditor extends React.Component<IArtifactEditorProps, IGitRe
           <StageConfigField label="Subpath" helpKey="pipeline.config.expectedArtifact.gitrepo.subpath">
             <SpelText
               placeholder="path/to/subdirectory"
-              value={get(artifact, 'metadata.subPath', '')}
+              value={artifact.location ?? artifact.metadata?.subPath}
               onChange={this.onSubPathChanged}
               pipeline={this.props.pipeline}
               docLink={true}

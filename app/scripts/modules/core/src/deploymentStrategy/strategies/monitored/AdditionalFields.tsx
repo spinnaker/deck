@@ -1,15 +1,16 @@
+import { set } from 'lodash';
 import React from 'react';
 import Select, { Option } from 'react-select';
-import { set } from 'lodash';
 
-import { IDeploymentStrategyAdditionalFieldsProps } from '../../deploymentStrategy.registry';
 import { HelpField } from 'core/help/HelpField';
-import { NgReact } from 'core/reactShims';
-import { IServerGroupCommand } from 'core/serverGroup';
 import {
   DeploymentMonitorReader,
   IDeploymentMonitorDefinition,
 } from 'core/pipeline/config/stages/monitoreddeploy/DeploymentMonitorReader';
+import { NgReact } from 'core/reactShims';
+import { IServerGroupCommand } from 'core/serverGroup';
+
+import { IDeploymentStrategyAdditionalFieldsProps } from '../../deploymentStrategy.registry';
 
 export interface IMonitoredDeployCommand extends IServerGroupCommand {
   delayBeforeScaleDownSec: string;
@@ -49,7 +50,7 @@ export class AdditionalFields extends React.Component<
   };
 
   public componentDidMount() {
-    DeploymentMonitorReader.getDeploymentMonitors().then(deploymentMonitors => {
+    DeploymentMonitorReader.getDeploymentMonitors().then((deploymentMonitors) => {
       this.setState({ deploymentMonitors });
     });
   }
@@ -106,12 +107,12 @@ export class AdditionalFields extends React.Component<
             <Select
               clearable={false}
               required={true}
-              options={this.state.deploymentMonitors.map(deploymentMonitor => ({
-                label: deploymentMonitor.name,
-                value: deploymentMonitor.id,
+              options={this.state.deploymentMonitors.map((deploymentMonitor) => ({
+                label: deploymentMonitor?.name || '',
+                value: deploymentMonitor?.id || '',
               }))}
               placeholder="select deployment monitor"
-              value={command.deploymentMonitor.id || ''}
+              value={command.deploymentMonitor?.id || ''}
               onChange={this.handleDeploymentMonitorChange}
             />
           </div>
@@ -166,7 +167,7 @@ export class AdditionalFields extends React.Component<
               min="0"
               type="number"
               value={command.delayBeforeScaleDownSec}
-              onChange={e => this.handleChange('delayBeforeScaleDownSec', e.target.value)}
+              onChange={(e) => this.handleChange('delayBeforeScaleDownSec', e.target.value)}
               placeholder="0"
             />
             seconds

@@ -1,7 +1,7 @@
-import { IController, IComponentOptions, IPromise, ITimeoutService, module } from 'angular';
+import { IComponentOptions, IController, ITimeoutService, module } from 'angular';
+import ANGULARTICS from 'angulartics';
 
 import { HelpContentsRegistry } from './helpContents.registry';
-import ANGULARTICS from 'angulartics';
 
 export interface IHelpFieldContents {
   content: string;
@@ -20,7 +20,7 @@ export class HelpFieldCtrl implements IController {
   private fallback: string;
   private placement: string;
   private popoverShownStart: number;
-  private popoverClose: IPromise<void>;
+  private popoverClose: PromiseLike<void>;
 
   public static $inject = ['$timeout', '$analytics'];
   constructor(private $timeout: ITimeoutService, private $analytics: any) {}

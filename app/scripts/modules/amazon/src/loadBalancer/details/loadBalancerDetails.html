@@ -66,7 +66,7 @@
   </managed-resource-details-indicator>
   <div ng-if="!ctrl.state.loading" class="content">
     <collapsible-section heading="Load Balancer Details" expanded="true">
-      <dl class="dl-horizontal dl-flex">
+      <dl class="dl-horizontal dl-narrow">
         <dt>Created</dt>
         <dd>{{ctrl.loadBalancer.elb.createdTime | timestamp}}</dd>
         <dt>In</dt>
@@ -79,6 +79,8 @@
         </dd>
         <dt>Subnet</dt>
         <dd>{{ctrl.getFirstSubnetPurpose(ctrl.loadBalancer.subnetDetails)}}</dd>
+        <dt>Scheme</dt>
+        <dd>{{ ctrl.loadBalancer.scheme }}</dd>
         <dt ng-if="ctrl.loadBalancer.loadBalancerType">Type</dt>
         <dd ng-if="ctrl.loadBalancer.loadBalancerType">{{ctrl.loadBalancer.loadBalancerType}}</dd>
         <dt ng-if="ctrl.ipAddressTypeDescription">IP Type</dt>
@@ -166,9 +168,7 @@
     </collapsible-section>
     <collapsible-section ng-if="ctrl.loadBalancer.loadBalancerType !== 'classic'" heading="Listeners">
       <div ng-repeat="listener in ctrl.listeners">
-        <div class="listener-targets">
-          {{listener.in}} &rarr;
-        </div>
+        <div class="listener-targets">{{listener.in}} &rarr;</div>
         <div class="listener-targets">
           <div ng-repeat="action in listener.actions">
             <!-- redirect -->
@@ -176,18 +176,10 @@
               <span ng-if="action.redirectConfig.protocol !== listener.protocol">
                 {{action.redirectConfig.protocol}}:
               </span>
-              <span ng-if="action.redirectConfig.host !== '#{host}'">
-                {{action.redirectConfig.host}}
-              </span>
-              <span ng-if="action.redirectConfig.port !== '#{port}'">
-                {{action.redirectConfig.port}}
-              </span>
-              <span ng-if="action.redirectConfig.path !== '/#{path}'">
-                {{action.redirectConfig.path}}
-              </span>
-              <span ng-if="action.redirectConfig.query !== '#{query}'">
-                ?{{action.redirectConfig.query}}
-              </span>
+              <span ng-if="action.redirectConfig.host !== '#{host}'"> {{action.redirectConfig.host}} </span>
+              <span ng-if="action.redirectConfig.port !== '#{port}'"> {{action.redirectConfig.port}} </span>
+              <span ng-if="action.redirectConfig.path !== '/#{path}'"> {{action.redirectConfig.path}} </span>
+              <span ng-if="action.redirectConfig.query !== '#{query}'"> ?{{action.redirectConfig.query}} </span>
               ({{action.redirectConfig.statusCode}})
             </span>
             <!-- authenticate-oidc -->
@@ -200,9 +192,7 @@
               >
                 {{action.authenticateOidcConfig.clientId}}
               </a>
-              <span ng-if="!ctrl.oidcConfigPath">
-                {{action.authenticateOidcConfig.clientId}}
-              </span>
+              <span ng-if="!ctrl.oidcConfigPath"> {{action.authenticateOidcConfig.clientId}} </span>
             </span>
             <!-- forward -->
             <span ng-if="action.targetGroupName && action.targetGroup">
@@ -243,7 +233,7 @@
       </div>
       <div ng-repeat="subnet in ctrl.loadBalancer.subnetDetails" ng-class="{'bottom-border': !$last}">
         <h5><strong>{{subnet.id}}</strong></h5>
-        <dl class="dl-horizontal dl-flex">
+        <dl class="dl-horizontal dl-narrow">
           <dt>Purpose</dt>
           <dd>{{subnet.purpose}}</dd>
 

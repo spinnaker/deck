@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { FormikFormField, ReactSelectInput, errorMessage, useLatestPromise } from 'core/presentation';
+import { errorMessage, FormikFormField, ReactSelectInput, useLatestPromise } from 'core/presentation';
 
 import { ArtifactoryReaderService } from './artifactoryReader.service';
 
@@ -16,9 +16,8 @@ export function ArtifactoryTrigger() {
       name="artifactorySearchName"
       label="Artifactory Name"
       touched={true}
-      fastField={false}
       validationMessage={validationMessage}
-      input={props => (
+      input={(props) => (
         <ReactSelectInput
           {...props}
           isLoading={status === 'PENDING'}

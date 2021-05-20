@@ -1,15 +1,15 @@
 import { IQService, module } from 'angular';
-
-import { noop } from 'core/utils';
-import { SETTINGS } from 'core/config/settings';
+import { Application, DELIVERY_KEY } from 'core/application';
 import { ApplicationDataSourceRegistry } from 'core/application/service/ApplicationDataSourceRegistry';
-import { Application } from 'core/application';
+import { SETTINGS } from 'core/config/settings';
 import { IManagedApplicationSummary } from 'core/domain';
+import { noop } from 'core/utils';
+
 import { ManagedReader } from './ManagedReader';
 import {
-  addManagedResourceMetadataToServerGroups,
   addManagedResourceMetadataToLoadBalancers,
   addManagedResourceMetadataToSecurityGroups,
+  addManagedResourceMetadataToServerGroups,
 } from './managedResourceDecorators';
 
 export const MANAGED_RESOURCES_DATA_SOURCE = 'spinnaker.core.managed.dataSource';
@@ -34,6 +34,18 @@ module(MANAGED_RESOURCES_DATA_SOURCE, []).run([
       application.securityGroups.ready().then(() => addManagedResourceMetadataToSecurityGroups(application), noop);
     };
 
+    const loadEnvironments = (application: Application) => {
+      return ManagedReader.getEnvironmentsSummary(application.name);
+    };
+
+    const addEnvironments = (
+      application: Application,
+      data: IManagedApplicationSummary<'resources' | 'artifacts' | 'environments'>,
+    ) => {
+      application.isManagementPaused = data.applicationPaused;
+      return $q.when(data);
+    };
+
     ApplicationDataSourceRegistry.registerDataSource({
       key: 'managedResources',
       visible: false,
@@ -41,6 +53,27 @@ module(MANAGED_RESOURCES_DATA_SOURCE, []).run([
       onLoad: addManagedResources,
       afterLoad: addManagedMetadataToResources,
       defaultData: { applicationPaused: false, hasManagedResources: false, resources: [] },
+    });
+
+    ApplicationDataSourceRegistry.registerDataSource({
+      key: 'environments',
+      sref: '.environments',
+      category: DELIVERY_KEY,
+      optional: true,
+      optIn: true,
+      label: 'Environments',
+      icon: 'fa fa-fw fa-xs fa-code-branch',
+      iconName: 'spEnvironments',
+      description: 'Artifacts and environments managed by Spinnaker',
+      loader: loadEnvironments,
+      onLoad: addEnvironments,
+      defaultData: {
+        applicationPaused: false,
+        hasManagedResources: false,
+        environments: [],
+        artifacts: [],
+        resources: [],
+      },
     });
   },
 ]);

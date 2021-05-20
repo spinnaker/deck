@@ -1,12 +1,12 @@
-import { module, IController, IComponentOptions, IScope } from 'angular';
 import { StateParams, StateService } from '@uirouter/angularjs';
+import { IComponentOptions, IController, IScope, module } from 'angular';
 import { HtmlRenderer, Parser } from 'commonmark';
-
 import { Application } from 'core/application';
+import { ConfirmationModalService } from 'core/confirmationModal';
 import { IExecution, IExecutionStage, IExecutionStageSummary, IStage } from 'core/domain';
 import { Registry } from 'core/registry';
-import { ConfirmationModalService } from 'core/confirmationModal';
-import { ExecutionService } from 'core/pipeline';
+
+import { ExecutionService } from '../service/execution.service';
 
 export class StageSummaryController implements IController {
   public application: Application;
@@ -95,7 +95,7 @@ export class StageSummaryController implements IController {
     let parentStageId = this.stage.parentStageId;
     let topLevelStage: IExecutionStage = this.stage;
     while (parentStageId) {
-      topLevelStage = this.execution.stages.find(stage => stage.id === parentStageId);
+      topLevelStage = this.execution.stages.find((stage) => stage.id === parentStageId);
       parentStageId = topLevelStage.parentStageId;
     }
     return topLevelStage;
@@ -120,12 +120,12 @@ export class StageSummaryController implements IController {
         this.executionService
           .patchExecution(this.execution.id, topLevelStage.id, { manualSkip: true, reason })
           .then(() =>
-            this.executionService.waitUntilExecutionMatches(this.execution.id, execution => {
-              const updatedStage = execution.stages.find(stage => stage.id === topLevelStage.id);
+            this.executionService.waitUntilExecutionMatches(this.execution.id, (execution) => {
+              const updatedStage = execution.stages.find((stage) => stage.id === topLevelStage.id);
               return updatedStage && updatedStage.status === 'SKIPPED';
             }),
           )
-          .then(updated => this.executionService.updateExecution(this.application, updated)),
+          .then((updated) => this.executionService.updateExecution(this.application, updated)),
     });
   }
 

@@ -1,22 +1,23 @@
-import { uniq, isNil, cloneDeep, intersection, memoize, defaults } from 'lodash';
+import { cloneDeep, fromPairs, intersection, isNil, memoize, uniq } from 'lodash';
+import { ComponentType, SFC } from 'react';
 
+import { IAccountDetails } from 'core/account/AccountService';
 import { Application } from 'core/application/application.model';
+import { CloudProviderRegistry, ICloudProviderConfig } from 'core/cloudProvider';
+import { SETTINGS } from 'core/config/settings';
 import {
+  IArtifactEditorProps,
+  IArtifactKindConfig,
   IExecution,
   INotificationTypeConfig,
   IStage,
-  ITriggerTypeConfig,
-  IStageTypeConfig,
-  IArtifactKindConfig,
   IStageOrTriggerTypeConfig,
-  IArtifactEditorProps,
+  IStageTypeConfig,
+  ITriggerTypeConfig,
 } from 'core/domain';
-import { CloudProviderRegistry, ICloudProviderConfig } from 'core/cloudProvider';
-import { SETTINGS } from 'core/config/settings';
-import { IAccountDetails } from 'core/account/AccountService';
 
 import { ITriggerTemplateComponentProps } from '../manualExecution/TriggerTemplate';
-import { ComponentType, SFC } from 'react';
+import { PreconfiguredJobReader } from './stages/preconfiguredJob';
 import { artifactKindConfigs } from './triggers/artifacts';
 
 export interface ITransformer {
@@ -29,7 +30,6 @@ export class PipelineRegistry {
   private transformers: ITransformer[] = [];
   private notificationTypes: INotificationTypeConfig[] = [];
   private artifactKinds: IArtifactKindConfig[] = artifactKindConfigs;
-  private customArtifactKind: IArtifactKindConfig;
 
   constructor() {
     this.getStageConfig = memoize(this.getStageConfig.bind(this), (stage: IStage) =>
@@ -39,11 +39,11 @@ export class PipelineRegistry {
 
   private normalizeStageTypes(): void {
     this.stageTypes
-      .filter(stageType => {
+      .filter((stageType) => {
         return stageType.provides;
       })
-      .forEach(stageType => {
-        const parent = this.stageTypes.find(parentType => {
+      .forEach((stageType) => {
+        const parent = this.stageTypes.find((parentType) => {
           return parentType.key === stageType.provides && !parentType.provides;
         });
         if (parent) {
@@ -67,17 +67,7 @@ export class PipelineRegistry {
   }
 
   public registerNotification(notificationConfig: INotificationTypeConfig): void {
-    if (SETTINGS.notifications) {
-      const notificationSetting: { enabled: boolean; botName?: string } =
-        SETTINGS.notifications?.[notificationConfig.key];
-      if (notificationSetting && notificationSetting.enabled) {
-        const config = cloneDeep(notificationConfig);
-        config.config = { ...notificationSetting };
-        this.notificationTypes.push(config);
-      }
-    } else {
-      this.notificationTypes.push(notificationConfig);
-    }
+    this.notificationTypes.push(notificationConfig);
   }
 
   public registerTrigger(triggerConfig: ITriggerTypeConfig): void {
@@ -95,8 +85,64 @@ export class PipelineRegistry {
   }
 
   public registerStage(stageConfig: IStageTypeConfig): void {
+    if ((SETTINGS.hiddenStages || []).includes(stageConfig.key)) {
+      return;
+    }
     this.stageTypes.push(stageConfig);
     this.normalizeStageTypes();
+  }
+
+  /**
+   * Registers a custom UI for a preconfigured run job stage.
+   *
+   * Fetches and applies the preconfigured job configuration from Gate.
+   * The following IStageTypeConfig fields are overwritten:
+   *
+   * - configuration.parameters
+   * - configuration.waitForCompletion
+   * - defaults
+   * - description
+   * - label
+   * - producesArtifacts
+   *
+   * @param stageConfigSkeleton a partial IStageTypeConfig (typically from makePreconfiguredJobStage())
+   * @returns a promise for the IStageTypeConfig that got registered
+   */
+  public async registerPreconfiguredJobStage(stageConfigSkeleton: IStageTypeConfig): Promise<IStageTypeConfig> {
+    const preconfiguredJobsFromGate = await PreconfiguredJobReader.list();
+    const job = preconfiguredJobsFromGate.find((j) => j.type === stageConfigSkeleton.key);
+
+    if (!job) {
+      throw new Error(
+        `Preconfigured Job of type '${stageConfigSkeleton.key}' not found in /jobs/preconfigured from gate.  ` +
+          'Is the preconfigured job registered in orca?',
+      );
+    }
+
+    const parameters = job?.parameters ?? [];
+    const paramsWithDefaults = parameters.filter((p) => !isNil(p.defaultValue));
+    const defaultParameterValues = fromPairs(paramsWithDefaults.map((p) => [p.name, p.defaultValue]));
+
+    const { label, description, waitForCompletion, producesArtifacts } = job;
+
+    // Apply job configuration from Gate to the skeleton
+    const stageConfig: IStageTypeConfig = {
+      ...stageConfigSkeleton,
+      configuration: {
+        ...stageConfigSkeleton.configuration,
+        parameters,
+        waitForCompletion,
+      },
+      defaults: {
+        parameters: defaultParameterValues,
+      },
+      description,
+      label,
+      producesArtifacts,
+    };
+
+    this.registerStage(stageConfig);
+    return stageConfig;
   }
 
   public registerArtifactKind(
@@ -104,20 +150,6 @@ export class PipelineRegistry {
   ): ComponentType<IArtifactEditorProps> | SFC<IArtifactEditorProps> {
     this.artifactKinds.push(artifactKindConfig);
     return artifactKindConfig.editCmp;
-  }
-
-  public mergeArtifactKind(artifactKindConfig: IArtifactKindConfig): void {
-    const index = this.artifactKinds.findIndex(ak => ak.key === artifactKindConfig.key);
-    if (index === -1) {
-      throw new Error(`could not find existing artifact kind config for key ${artifactKindConfig.key}`);
-    }
-    const originalArtifactKind = this.artifactKinds[index];
-    defaults(originalArtifactKind, artifactKindConfig);
-  }
-
-  public registerCustomArtifactKind(artifactKindConfig: IArtifactKindConfig): void {
-    this.customArtifactKind = artifactKindConfig;
-    this.registerArtifactKind(artifactKindConfig);
   }
 
   public getExecutionTransformers(): ITransformer[] {
@@ -137,15 +169,15 @@ export class PipelineRegistry {
   }
 
   public getMatchArtifactKinds(): IArtifactKindConfig[] {
-    return cloneDeep(this.artifactKinds.filter(k => k.isMatch));
+    return cloneDeep(this.artifactKinds.filter((k) => k.isMatch));
   }
 
   public getDefaultArtifactKinds(): IArtifactKindConfig[] {
-    return cloneDeep(this.artifactKinds.filter(k => k.isDefault));
+    return cloneDeep(this.artifactKinds.filter((k) => k.isDefault));
   }
 
   public getCustomArtifactKind(): IArtifactKindConfig {
-    return cloneDeep(this.customArtifactKind);
+    return cloneDeep(this.artifactKinds.find((k) => k.key === 'custom'));
   }
 
   private getCloudProvidersForStage(
@@ -153,15 +185,15 @@ export class PipelineRegistry {
     allStageTypes: IStageTypeConfig[],
     accounts: IAccountDetails[],
   ): string[] {
-    const providersFromAccounts = uniq(accounts.map(acc => acc.cloudProvider));
+    const providersFromAccounts = uniq(accounts.map((acc) => acc.cloudProvider));
     let providersFromStage: string[] = [];
     if (type.providesFor) {
       providersFromStage = type.providesFor;
     } else if (type.cloudProvider) {
       providersFromStage = [type.cloudProvider];
     } else if (type.useBaseProvider) {
-      const stageProviders: IStageTypeConfig[] = allStageTypes.filter(s => s.provides === type.key);
-      stageProviders.forEach(sp => {
+      const stageProviders: IStageTypeConfig[] = allStageTypes.filter((s) => s.provides === type.key);
+      stageProviders.forEach((sp) => {
         if (sp.providesFor) {
           providersFromStage = providersFromStage.concat(sp.providesFor);
         } else {
@@ -174,9 +206,9 @@ export class PipelineRegistry {
 
     // Remove a provider if none of the given accounts support the stage type.
     providersFromStage = providersFromStage.filter((providerKey: string) => {
-      const providerAccounts = accounts.filter(acc => acc.cloudProvider === providerKey);
-      return !!providerAccounts.find(acc => {
-        const provider = CloudProviderRegistry.getProvider(acc.cloudProvider, acc.skin);
+      const providerAccounts = accounts.filter((acc) => acc.cloudProvider === providerKey);
+      return !!providerAccounts.find((acc) => {
+        const provider = CloudProviderRegistry.getProvider(acc.cloudProvider);
         return !isExcludedStageType(type, provider);
       });
     });
@@ -190,23 +222,23 @@ export class PipelineRegistry {
   }
 
   public getConfigurableStageTypes(accounts?: IAccountDetails[]): IStageTypeConfig[] {
-    const providers: string[] = isNil(accounts) ? [] : Array.from(new Set(accounts.map(a => a.cloudProvider)));
+    const providers: string[] = isNil(accounts) ? [] : Array.from(new Set(accounts.map((a) => a.cloudProvider)));
     const allStageTypes = this.getStageTypes();
-    let configurableStageTypes = allStageTypes.filter(stageType => !stageType.synthetic && !stageType.provides);
+    let configurableStageTypes = allStageTypes.filter((stageType) => !stageType.synthetic && !stageType.provides);
     if (providers.length === 0) {
       return configurableStageTypes;
     }
     configurableStageTypes.forEach(
-      type => (type.cloudProviders = this.getCloudProvidersForStage(type, allStageTypes, accounts)),
+      (type) => (type.cloudProviders = this.getCloudProvidersForStage(type, allStageTypes, accounts)),
     );
-    configurableStageTypes = configurableStageTypes.filter(type => {
-      return !accounts.every(a => {
-        const p = CloudProviderRegistry.getProvider(a.cloudProvider, a.skin);
+    configurableStageTypes = configurableStageTypes.filter((type) => {
+      return !accounts.every((a) => {
+        const p = CloudProviderRegistry.getProvider(a.cloudProvider);
         return isExcludedStageType(type, p);
       });
     });
     return configurableStageTypes
-      .filter(stageType => stageType.cloudProviders.length)
+      .filter((stageType) => stageType.cloudProviders.length)
       .sort((a, b) => a.label.localeCompare(b.label));
   }
 
@@ -220,24 +252,24 @@ export class PipelineRegistry {
     if (candidates.length) {
       baseKey = candidates[0].provides;
     }
-    return this.getStageTypes().filter(stageType => {
+    return this.getStageTypes().filter((stageType) => {
       return stageType.provides && stageType.provides === baseKey;
     });
   }
 
   public getNotificationConfig(type: string): INotificationTypeConfig {
-    return this.getNotificationTypes().find(notificationType => notificationType.key === type);
+    return this.getNotificationTypes().find((notificationType) => notificationType.key === type);
   }
 
   public getTriggerConfig(type: string): ITriggerTypeConfig {
-    return this.getTriggerTypes().find(triggerType => triggerType.key === type);
+    return this.getTriggerTypes().find((triggerType) => triggerType.key === type);
   }
 
   public overrideManualExecutionComponent(
     triggerType: string,
     component: React.ComponentType<ITriggerTemplateComponentProps>,
   ): void {
-    const triggerConfig = this.triggerTypes.find(t => t.key === triggerType);
+    const triggerConfig = this.triggerTypes.find((t) => t.key === triggerType);
     if (triggerConfig) {
       triggerConfig.manualExecutionComponent = component;
     }
@@ -249,7 +281,7 @@ export class PipelineRegistry {
    * @param stage
    */
   private checkAliasedStageTypes(stage: IStage): IStageTypeConfig {
-    const aliasedMatches = this.getStageTypes().filter(stageType => stageType.alias === stage.type);
+    const aliasedMatches = this.getStageTypes().filter((stageType) => stageType.alias === stage.type);
     if (aliasedMatches.length === 1) {
       return aliasedMatches[0];
     }
@@ -265,7 +297,7 @@ export class PipelineRegistry {
   private checkAliasFallback(stage: IStage): IStageTypeConfig {
     if (stage.alias) {
       // Allow fallback to an exact match with stage.alias
-      const aliasMatches = this.getStageTypes().filter(stageType => stageType.key === stage.alias);
+      const aliasMatches = this.getStageTypes().filter((stageType) => stageType.key === stage.alias);
       if (aliasMatches.length === 1) {
         return aliasMatches[0];
       }
@@ -277,7 +309,7 @@ export class PipelineRegistry {
     if (!stage || !stage.type) {
       return null;
     }
-    const matches = this.getStageTypes().filter(stageType => {
+    const matches = this.getStageTypes().filter((stageType) => {
       return stageType.key === stage.type || stageType.provides === stage.type;
     });
 
@@ -287,28 +319,18 @@ export class PipelineRegistry {
         // - to allow deck to still find a match for legacy stage types
         // - to have stages that actually run as their 'alias' in orca (addAliasToConfig) because their 'key' doesn't actually exist
         const aliasMatch = this.checkAliasedStageTypes(stage) || this.checkAliasFallback(stage);
-        if (aliasMatch) {
-          return aliasMatch;
-        }
-        return this.getStageTypes().find(s => s.key === 'unmatched') || null;
+        const unmatchedStageType = this.getStageTypes().find((s) => s.key === 'unmatched');
+        return aliasMatch ?? unmatchedStageType;
       }
       case 1:
         return matches[0];
       default: {
+        // More than one stage definition matched the stage's 'type' field.
+        // Try to narrow it down by cloud provider.
         const provider = PipelineRegistry.resolveCloudProvider(stage);
-        const matchesForStageCloudProvider = matches.filter(stageType => {
-          return stageType.cloudProvider === provider;
-        });
-
-        if (!matchesForStageCloudProvider.length) {
-          return (
-            matches.find(stageType => {
-              return !!stageType.cloudProvider;
-            }) || null
-          );
-        } else {
-          return matchesForStageCloudProvider[0];
-        }
+        const matchesThisCloudProvider = matches.find((stageType) => stageType.cloudProvider === provider);
+        const matchesAnyCloudProvider = matches.find((stageType) => !!stageType.cloudProvider);
+        return matchesThisCloudProvider ?? matchesAnyCloudProvider ?? matches[0];
       }
     }
   }

@@ -1,8 +1,8 @@
 import { module } from 'angular';
 
 import { Registry } from '@spinnaker/core';
-
 import { IAppengineStage, IAppengineStageScope } from 'appengine/domain/index';
+
 import { AppengineStageCtrl } from '../appengineStage.controller';
 
 interface IAppengineShrinkClusterStage extends IAppengineStage {
@@ -46,7 +46,7 @@ class AppengineShrinkClusterStageCtrl extends AppengineStageCtrl {
 export const APPENGINE_SHRINK_CLUSTER_STAGE = 'spinnaker.appengine.pipeline.stage.shrinkClusterStage';
 
 module(APPENGINE_SHRINK_CLUSTER_STAGE, [])
-  .config(function() {
+  .config(function () {
     Registry.pipeline.registerStage({
       provides: 'shrinkCluster',
       key: 'shrinkCluster',

@@ -1,5 +1,5 @@
-import React from 'react';
 import { get } from 'lodash';
+import React from 'react';
 
 import { ICustomBannerConfig } from 'core/application/config/customBanner/CustomBannerConfig';
 import { ApplicationReader } from 'core/application/service/ApplicationReader';
@@ -47,7 +47,7 @@ export class CustomBanner extends React.Component<{}, ICustomBannerState> {
 
   public updateBannerConfig(attributes: any): void {
     const bannerConfigs: ICustomBannerConfig[] = get(attributes, 'customBanners') || [];
-    const bannerConfig = bannerConfigs.find(config => config.enabled) || null;
+    const bannerConfig = bannerConfigs.find((config) => config.enabled) || null;
     this.setState({
       bannerConfig,
     });

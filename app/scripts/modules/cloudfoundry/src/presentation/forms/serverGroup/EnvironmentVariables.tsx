@@ -1,10 +1,9 @@
-import React from 'react';
 import { FieldArray, getIn } from 'formik';
+import React from 'react';
 
 import { FormikFormField, TextInput } from '@spinnaker/core';
-
-import { ICloudFoundryCreateServerGroupCommand } from 'cloudfoundry/serverGroup/configure/serverGroupConfigurationModel.cf';
 import { ICloudFoundryEnvVar } from 'cloudfoundry/domain';
+import { ICloudFoundryCreateServerGroupCommand } from 'cloudfoundry/serverGroup/configure/serverGroupConfigurationModel.cf';
 
 export interface IEnvironmentVariablesProps {
   fieldName: string;
@@ -21,7 +20,7 @@ export class EnvironmentVariables extends React.Component<IEnvironmentVariablesP
             <b>Environment Variables</b>
             <FieldArray
               name={fieldName}
-              render={arrayHelpers => {
+              render={(arrayHelpers) => {
                 const serverGroupCommand: ICloudFoundryCreateServerGroupCommand = arrayHelpers.form.values;
                 const environmentVariables: string[] = getIn(serverGroupCommand, fieldName) || [];
 
@@ -44,7 +43,7 @@ export class EnvironmentVariables extends React.Component<IEnvironmentVariablesP
                                 onChange={() => {
                                   onChange && onChange(getIn(serverGroupCommand, fieldName) || []);
                                 }}
-                                input={props => <TextInput {...props} />}
+                                input={(props) => <TextInput {...props} />}
                                 required={true}
                               />
                             </td>
@@ -54,7 +53,7 @@ export class EnvironmentVariables extends React.Component<IEnvironmentVariablesP
                                 onChange={() => {
                                   onChange && onChange(getIn(serverGroupCommand, fieldName) || []);
                                 }}
-                                input={props => <TextInput {...props} />}
+                                input={(props) => <TextInput {...props} />}
                                 required={true}
                               />
                             </td>

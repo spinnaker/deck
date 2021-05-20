@@ -1,13 +1,13 @@
-import React from 'react';
 import { set } from 'lodash';
+import React from 'react';
 import { Option } from 'react-select';
 
 import { IEntityTag } from 'core/domain';
 import { HelpField } from 'core/help/HelpField';
+import { FormField, ReactSelectInput, TextInput } from 'core/presentation';
 import { UUIDGenerator } from 'core/utils';
 
 import './TagEditor.less';
-import { FormField, TextInput, ReactSelectInput } from 'core/presentation';
 
 export type EntityTagType = 'notice' | 'alert' | 'custom';
 
@@ -87,7 +87,7 @@ export class TagEditor extends React.Component<ITagEditorProps, ITagEditorState>
           </label>
           <div className="col-md-8">
             <FormField
-              input={props => <TextInput {...props} />}
+              input={(props) => <TextInput {...props} />}
               value={tag.namespace || ''}
               onChange={(event: any) => this.tagValueChanged('namespace', event.target.value)}
             />
@@ -101,7 +101,7 @@ export class TagEditor extends React.Component<ITagEditorProps, ITagEditorState>
           <label className="col-md-3 sm-label-right">Name</label>
           <div className="col-md-8">
             <FormField
-              input={props => <TextInput {...props} />}
+              input={(props) => <TextInput {...props} />}
               value={tag.name || ''}
               onChange={(event: any) => this.tagValueChanged('name', event.target.value)}
             />
@@ -117,7 +117,7 @@ export class TagEditor extends React.Component<ITagEditorProps, ITagEditorState>
           </label>
           <div className="col-md-8">
             <FormField
-              input={props => <TextInput {...props} />}
+              input={(props) => <TextInput {...props} />}
               value={value || ''}
               onChange={(event: any) => this.tagValueChanged('value', event.target.value)}
             />
@@ -128,7 +128,7 @@ export class TagEditor extends React.Component<ITagEditorProps, ITagEditorState>
           <label className="col-md-3 sm-label-right">Message</label>
           <div className="col-md-8">
             <FormField
-              input={props => <TextInput {...props} />}
+              input={(props) => <TextInput {...props} />}
               value={tag.value.message || ''}
               onChange={(event: any) => this.tagValueChanged('value.message', event.target.value)}
             />
@@ -142,7 +142,7 @@ export class TagEditor extends React.Component<ITagEditorProps, ITagEditorState>
           <label className="col-md-3 sm-label-right">Type</label>
           <div className="col-md-8">
             <FormField
-              input={props => (
+              input={(props) => (
                 <ReactSelectInput {...props} options={typeOptions} clearable={false} className="full-width" />
               )}
               required={true}

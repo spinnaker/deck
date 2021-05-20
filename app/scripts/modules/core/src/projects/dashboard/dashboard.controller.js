@@ -4,16 +4,17 @@ import { module } from 'angular';
 import _ from 'lodash';
 
 import { ApplicationModelBuilder } from 'core/application/applicationModel.builder';
-import { EXECUTION_SERVICE } from 'core/pipeline/service/execution.service';
 import { RecentHistoryService } from 'core/history/recentHistory.service';
+import { EXECUTION_SERVICE } from 'core/pipeline/service/execution.service';
 import { SchedulerFactory } from 'core/scheduler/SchedulerFactory';
+
+import { CORE_PROJECTS_DASHBOARD_CLUSTER_PROJECTCLUSTER_DIRECTIVE } from './cluster/projectCluster.directive';
 import { PROJECT_PIPELINE_COMPONENT } from './pipeline/projectPipeline.component';
+import { CORE_PROJECTS_DASHBOARD_REGIONFILTER_REGIONFILTER_COMPONENT } from './regionFilter/regionFilter.component';
+import { CORE_PROJECTS_DASHBOARD_REGIONFILTER_REGIONFILTER_SERVICE } from './regionFilter/regionFilter.service';
 import { ProjectReader } from '../service/ProjectReader';
 
 import './dashboard.less';
-import { CORE_PROJECTS_DASHBOARD_CLUSTER_PROJECTCLUSTER_DIRECTIVE } from './cluster/projectCluster.directive';
-import { CORE_PROJECTS_DASHBOARD_REGIONFILTER_REGIONFILTER_COMPONENT } from './regionFilter/regionFilter.component';
-import { CORE_PROJECTS_DASHBOARD_REGIONFILTER_REGIONFILTER_SERVICE } from './regionFilter/regionFilter.service';
 
 export const CORE_PROJECTS_DASHBOARD_DASHBOARD_CONTROLLER = 'spinnaker.core.projects.dashboard.controller';
 export const name = CORE_PROJECTS_DASHBOARD_DASHBOARD_CONTROLLER; // for backwards compatibility
@@ -30,7 +31,7 @@ module(CORE_PROJECTS_DASHBOARD_DASHBOARD_CONTROLLER, [
   'executionService',
   'regionFilterService',
   '$q',
-  function($scope, $rootScope, projectConfiguration, executionService, regionFilterService, $q) {
+  function ($scope, $rootScope, projectConfiguration, executionService, regionFilterService, $q) {
     this.project = projectConfiguration;
     this.application = ApplicationModelBuilder.createStandaloneApplication('project');
 
@@ -83,7 +84,7 @@ module(CORE_PROJECTS_DASHBOARD_DASHBOARD_CONTROLLER, [
       }
 
       return clustersPromise
-        .then(clusters => {
+        .then((clusters) => {
           this.clusters = clusters;
           this.allRegions = getAllRegions(clusters);
           state.initializing = false;
@@ -104,7 +105,7 @@ module(CORE_PROJECTS_DASHBOARD_DASHBOARD_CONTROLLER, [
       state.refreshing = true;
       return executionService
         .getProjectExecutions(projectConfiguration.name)
-        .then(executions => {
+        .then((executions) => {
           this.executions = executions;
           state.initializing = false;
           state.loaded = true;
@@ -120,15 +121,8 @@ module(CORE_PROJECTS_DASHBOARD_DASHBOARD_CONTROLLER, [
         });
     };
 
-    const getAllRegions = clusters => {
-      return _.chain(clusters)
-        .map('applications')
-        .flatten()
-        .map('clusters')
-        .flatten()
-        .map('region')
-        .uniq()
-        .value();
+    const getAllRegions = (clusters) => {
+      return _.chain(clusters).map('applications').flatten().map('clusters').flatten().map('region').uniq().value();
     };
 
     const clusterScheduler = SchedulerFactory.createScheduler(3 * 60 * 1000);

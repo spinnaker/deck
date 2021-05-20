@@ -1,11 +1,12 @@
+import { get, unset } from 'lodash';
 import React from 'react';
 import { Modal } from 'react-bootstrap';
-import { unset } from 'lodash';
 
 import { IPipeline } from 'core/domain';
 import { ModalClose } from 'core/modal';
 import { IModalComponentProps } from 'core/presentation';
-import { PipelineConfigService } from 'core/pipeline';
+
+import { PipelineConfigService } from '../../services/PipelineConfigService';
 
 export interface IUnlockPipelineModalProps extends IModalComponentProps {
   pipeline: IPipeline;
@@ -21,9 +22,9 @@ export function UnlockPipelineModal(props: IUnlockPipelineModalProps) {
     unset(newPipeline, 'locked');
     PipelineConfigService.savePipeline(newPipeline).then(
       () => closeModal(),
-      response => {
+      (response) => {
         setSaveError(true);
-        setErrorMessage(response.message || 'No message provided');
+        setErrorMessage(get(response, 'data.message', 'No message provided'));
       },
     );
   }
@@ -46,7 +47,7 @@ export function UnlockPipelineModal(props: IUnlockPipelineModalProps) {
               <p>
                 <a
                   className="btn btn-link"
-                  onClick={e => {
+                  onClick={(e) => {
                     e.preventDefault();
                     setSaveError(false);
                   }}

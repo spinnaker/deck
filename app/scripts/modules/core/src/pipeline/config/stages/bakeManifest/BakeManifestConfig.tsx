@@ -1,36 +1,52 @@
+import { FormikErrors } from 'formik';
+import { cloneDeep } from 'lodash';
 import React from 'react';
-import { defaults } from 'lodash';
 
-import { IStage } from 'core/domain';
-import { FormikStageConfig, IStageConfigProps } from 'core/pipeline';
-import { BakeManifestStageForm } from './BakeManifestStageForm';
+import { IExpectedArtifact, IStage } from 'core/domain';
+import { FormValidator } from 'core/presentation';
 
-export class BakeManifestConfig extends React.Component<IStageConfigProps> {
-  private readonly stage: IStage;
+import { BakeManifestStageForm, validateProducedArtifacts } from './BakeManifestStageForm';
+import { FormikStageConfig } from '../FormikStageConfig';
+import { HELM_RENDERERS } from './ManifestRenderers';
+import { IStageConfigProps } from '../common';
 
-  public constructor(props: IStageConfigProps) {
-    super(props);
-
-    // Intentionally initializing the stage config only once in the constructor
-    // The stage config is then completely owned within FormikStageConfig's Formik state
-    this.stage = props.stage;
-  }
-
-  public componentDidMount() {
-    defaults(this.stage, {
+export function BakeManifestConfig({ application, pipeline, stage, updateStage }: IStageConfigProps) {
+  const stageWithDefaults = React.useMemo(() => {
+    return {
       inputArtifacts: [],
       overrides: {},
+      ...cloneDeep(stage),
+    };
+  }, []);
+
+  return (
+    <FormikStageConfig
+      application={application}
+      onChange={updateStage}
+      pipeline={pipeline}
+      stage={stageWithDefaults}
+      validate={validateBakeManifestStage}
+      render={(props) => <BakeManifestStageForm {...props} />}
+    />
+  );
+}
+
+export function validateBakeManifestStage(stage: IStage): FormikErrors<IStage> {
+  const formValidator = new FormValidator(stage);
+
+  formValidator
+    .field('expectedArtifacts', 'Produced artifacts')
+    .required()
+    .withValidators((artifacts: IExpectedArtifact[]) => {
+      if (validateProducedArtifacts(artifacts)) {
+        return undefined;
+      }
+      return 'Exactly one expected artifact of type embedded/base64 must be configured in the Produces Artifacts section';
     });
+
+  if (HELM_RENDERERS.includes(stage.templateRenderer)) {
+    formValidator.field('outputName', 'Name').required();
   }
 
-  public render() {
-    return (
-      <FormikStageConfig
-        {...this.props}
-        stage={this.stage}
-        onChange={this.props.updateStage}
-        render={props => <BakeManifestStageForm {...props} updatePipeline={this.props.updatePipeline} />}
-      />
-    );
-  }
+  return formValidator.validateForm();
 }

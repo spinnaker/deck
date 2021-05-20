@@ -1,8 +1,8 @@
 import React from 'react';
 
 import { AccountTag, CollapsibleSection, timestamp } from '@spinnaker/core';
-
 import { ICloudFoundryBuildpack } from 'cloudfoundry/domain';
+
 import { ICloudFoundryServerGroupDetailsSectionProps } from './ICloudFoundryServerGroupDetailsSectionProps';
 
 export class ServerGroupInformationSection extends React.Component<ICloudFoundryServerGroupDetailsSectionProps> {
@@ -14,7 +14,7 @@ export class ServerGroupInformationSection extends React.Component<ICloudFoundry
     const { serverGroup } = this.props;
     return (
       <CollapsibleSection heading="Server Group Information" defaultExpanded={true}>
-        <dl className="dl-horizontal dl-flex">
+        <dl className="dl-horizontal dl-narrow">
           <dt>Created</dt>
           {serverGroup.pipelineId ? (
             <dd>
@@ -39,7 +39,7 @@ export class ServerGroupInformationSection extends React.Component<ICloudFoundry
               <dd>{serverGroup.droplet.stack}</dd>
               <dt>Buildpack</dt>
               {serverGroup.droplet.buildpacks ? (
-                serverGroup.droplet.buildpacks.map(function(buildpack: ICloudFoundryBuildpack, index: number) {
+                serverGroup.droplet.buildpacks.map(function (buildpack: ICloudFoundryBuildpack, index: number) {
                   return (
                     <dd key={index}>
                       {buildpack.name} {buildpack.version}

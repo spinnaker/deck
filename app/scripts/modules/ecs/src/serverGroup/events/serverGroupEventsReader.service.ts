@@ -1,7 +1,6 @@
-import { IPromise } from 'angular';
 import { $log } from 'ngimport';
 
-import { API, IServerGroup } from '@spinnaker/core';
+import { IServerGroup, REST } from '@spinnaker/core';
 
 export interface IEventDescription {
   createdAt: number;
@@ -11,18 +10,14 @@ export interface IEventDescription {
 }
 
 export class ServerGroupEventsReader {
-  public static getEvents(serverGroup: IServerGroup): IPromise<IEventDescription[]> {
-    return API.one('applications')
-      .one(serverGroup.app)
-      .one('serverGroups')
-      .all(serverGroup.account)
-      .one(serverGroup.name)
-      .all('events')
-      .withParams({
+  public static getEvents(serverGroup: IServerGroup): PromiseLike<IEventDescription[]> {
+    return REST('/applications')
+      .path(serverGroup.app, 'serverGroups', serverGroup.account, serverGroup.name, 'events')
+      .query({
         region: serverGroup.region,
         provider: serverGroup.cloudProvider,
       })
-      .getList()
+      .get()
       .catch((error: any): any[] => {
         $log.error(error, 'error retrieving events');
         return [];

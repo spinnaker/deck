@@ -1,13 +1,12 @@
-import React from 'react';
 import { Field } from 'formik';
+import React from 'react';
 import Select, { Option } from 'react-select';
 
 import { HelpField, MapEditor, PlatformHealthOverride } from '@spinnaker/core';
-
 import { AWSProviderSettings } from 'amazon/aws.settings';
-import { IAmazonServerGroupCommand } from '../../../serverGroupConfiguration.service';
 
 import { IServerGroupAdvancedSettingsProps } from './ServerGroupAdvancedSettings';
+import { IAmazonServerGroupCommand } from '../../../serverGroupConfiguration.service';
 
 export class ServerGroupAdvancedSettingsCommon extends React.Component<IServerGroupAdvancedSettingsProps> {
   private duplicateKeys = false;
@@ -53,6 +52,7 @@ export class ServerGroupAdvancedSettingsCommon extends React.Component<IServerGr
 
     const blockDeviceMappingsSource = values.getBlockDeviceMappingsSource(values);
     const keyPairs = values.backingData.filtered.keyPairs || [];
+    const asgSettings = AWSProviderSettings.serverGroups;
 
     return (
       <div className="container-fluid form-horizontal">
@@ -74,11 +74,11 @@ export class ServerGroupAdvancedSettingsCommon extends React.Component<IServerGr
             <Select
               multi={true}
               value={values.enabledMetrics}
-              options={values.backingData.enabledMetrics.map(m => ({ label: m, value: m }))}
+              options={values.backingData.enabledMetrics.map((m) => ({ label: m, value: m }))}
               onChange={(option: Option[]) =>
                 setFieldValue(
                   'enabledMetrics',
-                  option.map(o => o.value),
+                  option.map((o) => o.value),
                 )
               }
             />
@@ -94,7 +94,7 @@ export class ServerGroupAdvancedSettingsCommon extends React.Component<IServerGr
               value={values.healthCheckType}
               clearable={false}
               placeholder="Select..."
-              options={values.backingData.healthCheckTypes.map(t => ({ label: t, value: t }))}
+              options={values.backingData.healthCheckTypes.map((t) => ({ label: t, value: t }))}
               onChange={(option: Option) => setFieldValue('healthCheckType', option.value)}
             />
           </div>
@@ -121,11 +121,11 @@ export class ServerGroupAdvancedSettingsCommon extends React.Component<IServerGr
             <Select
               multi={true}
               value={values.terminationPolicies}
-              options={values.backingData.terminationPolicies.map(m => ({ label: m, value: m }))}
+              options={values.backingData.terminationPolicies.map((m) => ({ label: m, value: m }))}
               onChange={(option: Option[]) =>
                 setFieldValue(
                   'terminationPolicies',
-                  option.map(o => o.value),
+                  option.map((o) => o.value),
                 )
               }
             />
@@ -141,7 +141,7 @@ export class ServerGroupAdvancedSettingsCommon extends React.Component<IServerGr
               value={values.keyPair}
               required={true}
               clearable={false}
-              options={keyPairs.map(t => ({ label: t, value: t }))}
+              options={keyPairs.map((t) => ({ label: t, value: t }))}
               onChange={(option: Option) => setFieldValue('keyPair', option.value)}
             />
           </div>
@@ -182,9 +182,9 @@ export class ServerGroupAdvancedSettingsCommon extends React.Component<IServerGr
               <input
                 type="checkbox"
                 checked={values.instanceMonitoring}
-                onChange={e => setFieldValue('instanceMonitoring', e.target.checked)}
+                onChange={(e) => setFieldValue('instanceMonitoring', e.target.checked)}
               />{' '}
-              Enable Instance Monitoring{' '}
+              Enforce Instance Monitoring{' '}
             </label>
           </div>
         </div>
@@ -197,16 +197,34 @@ export class ServerGroupAdvancedSettingsCommon extends React.Component<IServerGr
               <input
                 type="checkbox"
                 checked={values.ebsOptimized}
-                onChange={e => setFieldValue('ebsOptimized', e.target.checked)}
+                onChange={(e) => setFieldValue('ebsOptimized', e.target.checked)}
               />{' '}
               Optimize Instances for EBS
             </label>
           </div>
         </div>
+        {asgSettings?.enableIMDSv2 && (
+          <div className="form-group">
+            <div className="col-md-5 sm-label-right">
+              <b>IMDSv2 </b>
+              <HelpField id="aws.serverGroup.imdsv2" />
+            </div>
+            <div className="col-md-6 checkbox">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={values.requireIMDSv2 === true}
+                  onChange={(e) => setFieldValue('requireIMDSv2', e.target.checked)}
+                />{' '}
+                Enable IMDSv2{' '}
+              </label>
+            </div>
+          </div>
+        )}
         {!AWSProviderSettings.disableSpotPricing && (
           <div className="form-group">
             <div className="col-md-5 sm-label-right">
-              <b>Spot Instances Price (optional)</b> <HelpField id="aws.serverGroup.spotPrice" />
+              <b>Spot Instances Price (optional)</b> <HelpField id="aws.serverGroup.spotMaxPrice" />
             </div>
             <div className="col-md-2">
               <Field type="text" className="form-control input-sm" name="spotPrice" />
@@ -255,48 +273,65 @@ export class ServerGroupAdvancedSettingsCommon extends React.Component<IServerGr
         </div>
         <div className="form-group">
           <div className="col-md-5 sm-label-right">
-            <b>Associate Public IP Address</b>
+            <b>{`Associate ${asgSettings?.enableIPv6 ? 'IPv6' : 'Public IPv4'} Address`}</b>
           </div>
-          <div className="col-md-2 radio">
-            <label>
-              <input
-                type="radio"
-                checked={values.associatePublicIpAddress === true}
-                onChange={() => setFieldValue('associatePublicIpAddress', true)}
-                id="associatePublicIpAddressTrue"
-              />
-              Yes
-            </label>
-          </div>
-          <div className="col-md-2 radio">
-            <label>
-              <input
-                type="radio"
-                checked={values.associatePublicIpAddress === false}
-                onChange={() => setFieldValue('associatePublicIpAddress', false)}
-                id="associatePublicIpAddressFalse"
-              />
-              No
-            </label>
-          </div>
-          <div className="col-md-2 radio">
-            <label>
-              <input
-                type="radio"
-                checked={values.associatePublicIpAddress === null}
-                onChange={() => setFieldValue('associatePublicIpAddress', null)}
-                id="associatePublicIpAddressDefault"
-              />
-              Default
-            </label>
-          </div>
+          {asgSettings?.enableIPv6 && (
+            <div className="col-md-6 checkbox">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={values.associateIPv6Address === true}
+                  onChange={(e) => setFieldValue('associateIPv6Address', e.target.checked)}
+                  id="associateIPv6AddressToggle"
+                />{' '}
+                Assign an IPv6 address to instances{' '}
+              </label>
+            </div>
+          )}
+          {!asgSettings?.enableIPv6 && (
+            <div>
+              <div className="col-md-2 radio">
+                <label>
+                  <input
+                    type="radio"
+                    checked={values.associatePublicIpAddress === true}
+                    onChange={() => setFieldValue('associatePublicIpAddress', true)}
+                    id="associatePublicIpAddressTrue"
+                  />
+                  Yes
+                </label>
+              </div>
+              <div className="col-md-2 radio">
+                <label>
+                  <input
+                    type="radio"
+                    checked={values.associatePublicIpAddress === false}
+                    onChange={() => setFieldValue('associatePublicIpAddress', false)}
+                    id="associatePublicIpAddressFalse"
+                  />
+                  No
+                </label>
+              </div>
+              <div className="col-md-2 radio">
+                <label>
+                  <input
+                    type="radio"
+                    checked={values.associatePublicIpAddress === null}
+                    onChange={() => setFieldValue('associatePublicIpAddress', null)}
+                    id="associatePublicIpAddressDefault"
+                  />
+                  Default
+                </label>
+              </div>
+            </div>
+          )}
         </div>
         <div className="form-group">
           <div className="col-md-5 sm-label-right">
             <b>Scaling Processes</b>
           </div>
           <div className="col-md-6 checkbox">
-            {values.backingData.scalingProcesses.map(process => (
+            {values.backingData.scalingProcesses.map((process) => (
               <div key={process.name}>
                 <label>
                   <input

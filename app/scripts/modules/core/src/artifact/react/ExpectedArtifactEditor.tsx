@@ -1,23 +1,24 @@
 import { module } from 'angular';
+import { cloneDeep } from 'lodash';
 import React from 'react';
 import { react2angular } from 'react2angular';
-import { cloneDeep } from 'lodash';
 
-import { IExpectedArtifact, IArtifactKindConfig, IArtifact, IPipeline } from 'core/domain';
 import { IArtifactAccount } from 'core/account';
+import { IArtifact, IArtifactKindConfig, IExpectedArtifact, IPipeline } from 'core/domain';
 import { StageConfigField } from 'core/pipeline';
+import { withErrorBoundary } from 'core/presentation/SpinErrorBoundary';
 
-import { ExpectedArtifactService } from '../expectedArtifact.service';
+import { ArtifactAccountSelector } from './ArtifactAccountSelector';
 import {
-  ExpectedArtifactKindSelector,
   EXPECTED_ARTIFACT_KIND_SELECTOR_COMPONENT_REACT,
+  ExpectedArtifactKindSelector,
 } from './ExpectedArtifactKindSelector';
 import {
+  EXPECTED_ARTIFACT_SOURCE_SELECTOR_COMPONENT_REACT,
   ExpectedArtifactSourceSelector,
   IExpectedArtifactSourceOption,
-  EXPECTED_ARTIFACT_SOURCE_SELECTOR_COMPONENT_REACT,
 } from './ExpectedArtifactSourceSelector';
-import { ArtifactAccountSelector } from './ArtifactAccountSelector';
+import { ExpectedArtifactService } from '../expectedArtifact.service';
 
 export interface IExpectedArtifactEditorProps {
   default?: IExpectedArtifact;
@@ -79,7 +80,7 @@ export class ExpectedArtifactEditor extends React.Component<
     if (!artifact || !this.props.accounts) {
       return [];
     }
-    return this.props.accounts.filter(a => a.types.includes(artifact.type));
+    return this.props.accounts.filter((a) => a.types.includes(artifact.type));
   }
 
   private onSourceChange = (e: IExpectedArtifactSourceOption) => {
@@ -129,7 +130,7 @@ export class ExpectedArtifactEditor extends React.Component<
     const kinds = this.props.kinds || [];
     const accounts = this.props.accounts || [];
     if (this.props.showAccounts) {
-      return kinds.filter(k => k.customKind || accounts.find(a => a.types.includes(k.type)));
+      return kinds.filter((k) => k.customKind || accounts.find((a) => a.types.includes(k.type)));
     } else {
       return kinds.slice(0);
     }
@@ -208,7 +209,7 @@ module(EXPECTED_ARTIFACT_EDITOR_COMPONENT_REACT, [
   EXPECTED_ARTIFACT_SOURCE_SELECTOR_COMPONENT_REACT,
 ]).component(
   'expectedArtifactEditorReact',
-  react2angular(ExpectedArtifactEditor, [
+  react2angular(withErrorBoundary(ExpectedArtifactEditor, 'expectedArtifactEditorReact'), [
     'default',
     'kinds',
     'sources',

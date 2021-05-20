@@ -1,4 +1,4 @@
-import { distanceInWords } from 'date-fns';
+import { formatDistance } from 'date-fns';
 import { $log } from 'ngimport';
 
 import { IOrchestratedItem, IOrchestratedItemVariable, ITask, ITaskStep } from 'core/domain';
@@ -51,11 +51,7 @@ export class OrchestratedItemTransformer {
 
     Object.defineProperties(item, {
       failureMessage: {
-        get: (): string =>
-          this.getCustomException(item) ||
-          this.getGeneralException(item) ||
-          this.getOrchestrationException(item) ||
-          null,
+        get: (): string => this.mergeExceptions(item),
       },
       isCompleted: {
         get: (): boolean => ['SUCCEEDED', 'SKIPPED'].includes(item.status),
@@ -90,7 +86,7 @@ export class OrchestratedItemTransformer {
       status: {
         // Returns either SUCCEEDED, RUNNING, FAILED, CANCELED, or NOT_STARTED
         get: (): string => this.normalizeStatus(item),
-        set: status => {
+        set: (status) => {
           item.originalStatus = status;
           this.normalizeStatus(item);
         },
@@ -99,7 +95,7 @@ export class OrchestratedItemTransformer {
         get: () => {
           const now = Date.now();
           const start = new Date(now - this.calculateRunningTime(item)());
-          return distanceInWords(start, now, { includeSeconds: true });
+          return formatDistance(start, now, { includeSeconds: true });
         },
         configurable: true,
       },
@@ -110,10 +106,22 @@ export class OrchestratedItemTransformer {
     });
   }
 
+  private static mergeExceptions(item: any): string | null {
+    const exceptions = [
+      this.getCustomException(item),
+      this.getGeneralException(item),
+      this.getOrchestrationException(item),
+    ].filter((it) => !!it);
+    if (exceptions.length === 0) {
+      return null;
+    }
+    return exceptions.join('\n\n');
+  }
+
   private static getOrchestrationException(task: ITask): string {
     const katoTasks: any[] = task.getValueFor('kato.tasks');
     if (katoTasks && katoTasks.length) {
-      const failedTask: any = katoTasks.find(t => t.status && t.status.failed);
+      const failedTask: any = katoTasks.find((t) => t.status && t.status.failed);
       if (!failedTask) {
         return null;
       }

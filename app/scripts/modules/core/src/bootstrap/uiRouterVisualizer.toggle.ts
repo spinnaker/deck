@@ -1,4 +1,4 @@
-import { UIRouter, Transition, Glob, UIRouterPlugin } from '@uirouter/core';
+import { Glob, Transition, UIRouter, UIRouterPlugin } from '@uirouter/core';
 
 import { bootstrapModule } from './bootstrap.module';
 
@@ -15,12 +15,12 @@ bootstrapModule.run([
     function loadVisualizer() {
       // Auto-collapse certain states with lots of children
       const collapseGlobs = ['home.*', 'home.*.application.*', 'home.*.application.insight.*'].map(
-        globStr => new Glob(globStr),
+        (globStr) => new Glob(globStr),
       );
       const collapsedStates = $uiRouter.stateRegistry
         .get()
-        .filter(state => collapseGlobs.some(glob => glob.matches(state.name)));
-      collapsedStates.forEach(state => ((state.$$state() as any)._collapsed = true));
+        .filter((state) => collapseGlobs.some((glob) => glob.matches(state.name)));
+      collapsedStates.forEach((state) => ((state.$$state() as any)._collapsed = true));
 
       return import('@uirouter/visualizer')
         .then((vis: any) => (VisualizerPlugin = vis.Visualizer))

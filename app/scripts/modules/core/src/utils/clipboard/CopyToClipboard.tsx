@@ -1,6 +1,6 @@
 import React from 'react';
-import ReactGA from 'react-ga';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import ReactGA from 'react-ga';
 
 import './CopyToClipboard.less';
 
@@ -131,7 +131,7 @@ export class CopyToClipboard extends React.Component<ICopyToClipboardProps, ICop
     return (
       <>
         <textarea
-          onChange={e => e} // no-op to prevent warnings
+          onChange={(e) => e} // no-op to prevent warnings
           ref={this.inputRef}
           value={text}
           tabIndex={-1}

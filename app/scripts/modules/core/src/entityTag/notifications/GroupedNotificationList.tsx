@@ -1,9 +1,10 @@
-import React from 'react';
 import { groupBy } from 'lodash';
+import React from 'react';
+
+import { Markdown } from 'core/presentation';
 
 import { EntityName } from './EntityName';
 import { INotification } from './NotificationsPopover';
-import { Markdown } from 'core/presentation';
 
 export interface IMessageNotifications {
   message: string;
@@ -48,7 +49,7 @@ export class GroupedNotificationList extends React.Component<
   private getAlertsByMessage(notifications: INotification[]): IMessageNotifications[] {
     const grouped = groupBy(notifications, 'entityTag.value.message');
 
-    return Object.keys(grouped).map(message => ({
+    return Object.keys(grouped).map((message) => ({
       message,
       // assume all the taglines and titles are the same for identical messages
       tagline: grouped[message][0].entityTag.value.tagline,
@@ -60,7 +61,7 @@ export class GroupedNotificationList extends React.Component<
   public render() {
     return (
       <div className="notification-list">
-        {this.state.alertsByMessage.map(alertsForMessage => (
+        {this.state.alertsByMessage.map((alertsForMessage) => (
           <AlertsForMessage key={alertsForMessage.message} alertsForMessage={alertsForMessage} />
         ))}
       </div>

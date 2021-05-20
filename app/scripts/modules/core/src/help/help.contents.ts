@@ -1,11 +1,14 @@
-import { HelpContentsRegistry } from './helpContents.registry';
 import { SETTINGS } from 'core/config/settings';
+
+import { HelpContentsRegistry } from './helpContents.registry';
 
 export interface IHelpContents {
   [key: string]: string;
 }
 
 const helpContents: { [key: string]: string } = {
+  'core.serverGroup.detail':
+    '(Optional) <b>Detail</b> is a string of free-form alphanumeric characters and hyphens to describe any other variables in naming a cluster.',
   'core.serverGroup.strategy':
     'The deployment strategy tells Spinnaker what to do with the previous version of the server group.',
   'cluster.search': `
@@ -127,6 +130,10 @@ const helpContents: { [key: string]: string } = {
       <p>The S3 object name, in the form <code>s3://bucket/path/to/file.yml</code>.</p>`,
   'pipeline.config.expectedArtifact.defaultS3.reference': `
       <p>The S3 object name, <i>optionally</i> appending the version. An example: <code>s3://bucket/file.yml#123948581</code></p>`,
+  'pipeline.config.expectedArtifact.oracle.name': `
+      <p>The Oracle object artifact name, in the form <code>oci://bucket/path/file.yml</code>.</p>`,
+  'pipeline.config.expectedArtifact.defaultOracle.reference': `
+      <p>The  Oracle object artifact name, <i>optionally</i> appending the version. An example: <code>oci://bucket/file.yml#9ce463aa-d843-4438-b206-5365cd643e2e</code></p>`,
   'pipeline.config.expectedArtifact.docker.name': `
       <p>The Docker image name you want to trigger on changes to. By default, this does <i>not</i> include the image tag or digest, only the registry and image repository.</p>`,
   'pipeline.config.expectedArtifact.defaultDocker.reference': `
@@ -161,6 +168,9 @@ const helpContents: { [key: string]: string } = {
       <p>An example is <code>https://api.bitbucket.org/1.0/repositories/$ORG/$REPO/raw/$VERSION/$FILEPATH</code>. See <a href="https://www.spinnaker.io/reference/artifacts/types/bitbucket-file/#fields">our docs</a> for more info.</p>`,
   'pipeline.config.expectedArtifact.defaultBitbucket.filepath': `
       <p>The file path within your repo. path/to/file.yml is an example.</p>`,
+  'pipeline.config.trigger.helm.chart': `The Helm chart name.`,
+  'pipeline.config.trigger.helm.version': `The Helm chart version, as semver.`,
+  'pipeline.config.trigger.helm.version.manual': `The Helm chart version, as an exact version.`,
   'pipeline.config.trigger.webhook.source': `
       <p>Determines the target URL required to trigger this pipeline, as well as how the payload can be transformed into artifacts.</p>
   `,
@@ -190,6 +200,7 @@ const helpContents: { [key: string]: string } = {
       <p>Select the types of executions to consider. When no selection is made, the default is "any execution".</p>
       <p>This will always evaluate to the most recent execution matching your provided criteria.</p>
   `,
+  'pipeline.config.tags': `<p>Pipeline tags let you filter pipelines/executions by addition dimensions in the executions page</p>`,
   'loadBalancer.advancedSettings.healthTimeout':
     '<p>Configures the timeout, in seconds, for reaching the healthCheck target.  Must be less than the interval.</p><p> Default: <b>5</b></p>',
   'loadBalancer.advancedSettings.idleTimeout':
@@ -202,6 +213,12 @@ const helpContents: { [key: string]: string } = {
     '<p>Configures the number of healthy observations before reinstituting an instance into the ELB’s traffic rotation.</p><p>Default: <b>10</b></p>',
   'loadBalancer.advancedSettings.unhealthyThreshold':
     '<p>Configures the number of unhealthy observations before deservicing an instance from the ELB.</p><p>Default: <b>2</b></p>',
+  'loadBalancer.advancedSettings.loadBalancingCrossZone':
+    '<p>Cross-zone load balancing distributes traffic evenly across all targets in the Availability Zones enabled for the load balancer.</p><p> Default: <b>True</b></p>',
+  'loadBalancer.advancedSettings.albIpAddressType':
+    '<p>Assigns both a v4 and v6 IP address to the load balancer. This option is only valid for an external load balancer. If left unchecked, this value will default to <b>"ipv4"</b>.</p>',
+  'loadBalancer.advancedSettings.nlbIpAddressType':
+    '<p>Assigns both a v4 and v6 IP address to the load balancer. This option is only valid for NLBs which are external and only have Ip targets (not instance targets). If left unchecked, this value will default to <b>"ipv4"</b>.</p>',
   'pipeline.config.resizeAsg.action': `
       <p>Configures the resize action for the target server group.
       <ul>
@@ -230,6 +247,10 @@ const helpContents: { [key: string]: string } = {
     '<p>(Optional) Configures the name to the Travis artifact file used to pass in properties to later stages in the Spinnaker pipeline. The contents of this file will now be available as a map under the trigger and accessible via <em>trigger.properties</em>. See <a target="_blank" href="https://www.spinnaker.io/guides/user/pipeline-expressions/">Pipeline Expressions docs</a> for more information.</p>',
   'pipeline.config.travis.propertyFile':
     '<p>(Optional) Configures the name to the Travis artifact file used to pass in properties to later stages in the Spinnaker pipeline. The contents of this file will now be available as a map under the stage context. See <a target="_blank" href="https://www.spinnaker.io/guides/user/pipeline-expressions/">Pipeline Expressions docs</a> for more information.</p>',
+  'pipeline.config.bake.skipRegionDetection': `
+        <p>By default, Spinnaker will detect regions to bake in from downstream deploy stages.</p>
+        <p>To prevent failed deploys from accidentally missed regions during the bake process.</p>
+        <p>This setting will disable this detection mechanism.</p>`,
   'pipeline.config.bake.package': `
       <p>The name of the package you want installed (without any version identifiers).</p>
       <p>If your build produces a deb file named "myapp_1.27-h343", you would want to enter "myapp" here.</p>
@@ -258,8 +279,9 @@ const helpContents: { [key: string]: string } = {
     '<p>(Optional) Instructions are shown to the user when making a manual judgment.</p><p>May contain HTML.</p>',
   'pipeline.config.manualJudgment.propagateAuthentication': `
       <p><strong>Checked</strong> - the pipeline will continue with the permissions of the approver.</p>
-      <p><strong>Unchecked</strong> - the pipeline will continue with its current permissions.</p>
-        pipeline.config.manualJudgment.judgmentInputs': '<p>(Optional) Entries populate a dropdown displayed when performing a manual judgment.</p>
+      <p><strong>Unchecked</strong> - the pipeline will continue with its current permissions.</p>`,
+  'pipeline.config.manualJudgment.judgmentInputs': `
+      <p>(Optional) Entries populate a dropdown displayed when performing a manual judgment.</p>
       <p>The selected value can be used in a subsequent <strong>Check Preconditions</strong> stage to determine branching.</p>
       <p>For example, if the user selects "rollback" from this list of options, that branch can be activated by using the expression:
         <samp class="small">execution.stages[n].context.judgmentInput=="rollback"</samp></p>`,
@@ -267,11 +289,29 @@ const helpContents: { [key: string]: string } = {
   'pipeline.config.bake.manifest.overrideExpressionEvaluation':
     '<p>Explicitly evaluate SpEL expressions in overrides just prior to manifest baking. Can be paired with the "Skip SpEL evaluation" option in the Deploy Manifest stage when baking a third-party manifest artifact with expressions not meant for Spinnaker to evaluate as SpEL.</p>',
   'pipeline.config.bake.manifest.templateRenderer': '<p>This is the engine used for rendering your manifest.</p>',
+  'pipeline.config.bake.manifest.helm.chartFilePath': `
+    <p>This is the relative path to the Chart.yaml file within your Git repo.</p>
+    <p>e.g.: <b>helm/my-chart/Chart.yaml</b></p>`,
   'pipeline.config.bake.manifest.helm.rawOverrides':
     'Use <i>--set</i> instead of <i>--set-string</i> when injecting override values. Values injected using <i>--set</i> will be converted to primitive types by Helm.',
   'pipeline.config.bake.manifest.kustomize.filePath': `
     <p>This is the relative path to the kustomization.yaml file within your Git repo.</p>
     <p>e.g.: <b>examples/wordpress/mysql/kustomization.yaml</b></p>`,
+  'pipeline.config.bake.cf.manifest.name':
+    '<p> Name should be the same as the expected artifact in the Produces Artifact section. </p>',
+  'pipeline.config.bake.cf.manifest.templateArtifact': `
+    <p> This is the manifest template needing resolution. Variables in this template should use double parentheses notation.</p>
+    <p>e.g.: </p>
+    <p>---</p>
+    <p>buildpack: ((javabuildpack)) </p>
+    <p>foo: ((some.nestedKey)) </p>`,
+  'pipeline.config.bake.cf.manifest.varsArtifact': `
+    <p> These are the variables that will be substituted in the manifest template. These should be yaml files and follow standard convention. </p>
+    <p>e.g.: </p>
+    <p>---</p>
+    <p>javabuildpack: java_buildpack_offline </p>
+    <p>some: </p>
+    <p style="padding-left: 1em">nestedKey: bar </p>`,
   'pipeline.config.haltPipelineOnFailure':
     'Immediately halts execution of all running stages and fails the entire execution.',
   'pipeline.config.haltBranchOnFailure':
@@ -322,6 +362,8 @@ const helpContents: { [key: string]: string } = {
       </p>`,
   'pipeline.config.trigger.runAsUser':
     "The current user must have access to the specified service account, and the service account must have access to the current application. Otherwise, you'll receive an 'Access is denied' error.",
+  'pipeline.config.trigger.authorizedUser':
+    "The current user must have the permission to approve the manual judgment stage. Otherwise, you'll not be able continue to the next pipeline stage.",
   'pipeline.config.script.repoUrl':
     '<p>Path to the repo hosting the scripts in Stash. (e.g. <samp>CDL/mimir-scripts</samp>). Leave empty to use the default.</p>',
   'pipeline.config.script.repoBranch':
@@ -425,8 +467,10 @@ const helpContents: { [key: string]: string } = {
     'if unchecked, marks the stage as successful right away without waiting for the Wercker job to complete',
   'script.waitForCompletion':
     'if unchecked, marks the stage as successful right away without waiting for the script to complete',
-  'markdown.examples':
-    'Some examples of markdown syntax: <br/> *<em>emphasis</em>* <br/> **<b>strong</b>** <br/> [link text](http://url-goes-here)',
+  // eslint-disable-next-line no-useless-escape
+  'markdown.examples': `
+    Some examples of markdown syntax: <br/> \`*italic*\` <br/> \`**bold**\` <br/> \`[link text](http://url-goes-here)\`
+  `,
   'pipeline.config.webhook.payload': 'JSON payload to be added to the webhook call.',
   'pipeline.config.webhook.cancelPayload':
     'JSON payload to be added to the webhook call when it is called in response to a cancellation.',
@@ -444,7 +488,7 @@ const helpContents: { [key: string]: string } = {
   'pipeline.config.webhook.waitBeforeMonitor':
     'Optional delay (in seconds) to wait before starting to poll the endpoint for monitoring status',
   'pipeline.config.webhook.statusJsonPath':
-    "JSON path to the status information in the webhook's response JSON. (e.g. <samp>$.buildInfo.status</samp>)",
+    "JSON path to the status information in the webhook's response JSON (e.g. <samp>$.buildInfo.status</samp>). <br>If left empty, a 200 response from the status endpoint will be treated as a success.",
   'pipeline.config.webhook.progressJsonPath':
     "JSON path to a descriptive message about the progress in the webhook's response JSON. (e.g. <samp>$.buildInfo.progress</samp>)",
   'pipeline.config.webhook.successStatuses':
@@ -479,6 +523,13 @@ const helpContents: { [key: string]: string } = {
   'pipeline.config.entitytags.value': `Value can either be a string or an object. If you want to use an object, input a valid JSON string.`,
   'pipeline.config.entitytags.region': `(Optional) Target a specific region, use * if you want to apply to all regions.`,
   'pipeline.config.deliveryConfig.manifest': `(Optional) Name of the file with your Delivery Config manifest. Leave blank to use the default name (<strong><i>${SETTINGS.managedDelivery?.defaultManifest}</i></strong>).`,
+  'pipeline.config.codebuild.source': `(Optional) Source of the build. It will be overridden to Spinnaker artifact if checked. If not checked, source configured in CodeBuild project will be used.`,
+  'pipeline.config.codebuild.sourceType': `(Optional) Type of the source. It can be specified explicitly; otherwise, it will be inferred from source artifact.`,
+  'pipeline.config.codebuild.sourceVersion': `(Optional) Source version of the build. If not specified, the artifact version will be used. If artifact doesn't have a version, the latest version will be used. See the <a href="https://docs.aws.amazon.com/codebuild/latest/APIReference/API_StartBuild.html#CodeBuild-StartBuild-request-sourceVersion">CodeBuild reference</a> for more information.`,
+  'pipeline.config.codebuild.buildspec': `(Optional) Inline buildspec definition of the build. If not specified, buildspec configured in CodeBuild project will be used.`,
+  'pipeline.config.codebuild.secondarySources': `(Optional) Secondary sources of the build. It can be overridden by adding Spinnaker Artifacts. If not specified, secondary sources configured in CodeBuild project will be used.`,
+  'pipeline.config.codebuild.image': `(Optional) Image in which the build will run. It can be overridden by specifying the name of the image. If not specified, image configured in CodeBuild project will be used.`,
+  'pipeline.config.codebuild.envVar': `(Optional) Environment variables that will be propagated into the build.`,
 };
 
-Object.keys(helpContents).forEach(key => HelpContentsRegistry.register(key, helpContents[key]));
+Object.keys(helpContents).forEach((key) => HelpContentsRegistry.register(key, helpContents[key]));

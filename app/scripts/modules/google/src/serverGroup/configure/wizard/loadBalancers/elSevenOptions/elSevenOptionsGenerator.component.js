@@ -1,7 +1,8 @@
-import { GOOGLE_SERVERGROUP_CONFIGURE_WIZARD_LOADBALANCERS_ELSEVENOPTIONS_BACKENDSERVICESELECTOR_COMPONENT } from './backendServiceSelector.component';
-('use strict');
-
 import * as angular from 'angular';
+
+import { GOOGLE_SERVERGROUP_CONFIGURE_WIZARD_LOADBALANCERS_ELSEVENOPTIONS_BACKENDSERVICESELECTOR_COMPONENT } from './backendServiceSelector.component';
+
+('use strict');
 
 export const GOOGLE_SERVERGROUP_CONFIGURE_WIZARD_LOADBALANCERS_ELSEVENOPTIONS_ELSEVENOPTIONSGENERATOR_COMPONENT =
   'spinnaker.deck.gce.elSevenOptionsGenerator.component';
@@ -12,7 +13,7 @@ angular
   ])
   .directive('gceElSevenOptionsGenerator', [
     '$compile',
-    function($compile) {
+    function ($compile) {
       const template = `<gce-backend-service-selector load-balancer-name="loadBalancerName" command="command">
                     </gce-backend-service-selector>`;
 
@@ -22,7 +23,7 @@ angular
           command: '=',
           loadBalancerName: '@',
         },
-        link: function(scope, element) {
+        link: function (scope, element) {
           const compiledTemplate = $compile(template)(scope);
 
           // Look up DOM to find container for selected load balancer.

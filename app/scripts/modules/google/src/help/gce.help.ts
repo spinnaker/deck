@@ -56,6 +56,8 @@ const helpContents: { [key: string]: string } = {
   'gce.instanceType.32core':
     '<p>32-core machine types are in Beta and are available only in Ivy Bridge and Haswell zones.</p>',
   'gce.internalLoadBalancer.ports': 'Use a comma to separate up to five TCP ports.',
+  'gce.internalHttpLoadBalancer.network':
+    "Network must have a subnet whose 'purpose' is 'INTERNAL_HTTPS_LOAD_BALANCER'",
   'gce.loadBalancer.connectionDraining':
     '(Optional) If set, enables connection draining for this backend service. This field defines the number of seconds to wait before instances that belong to this backend service are terminated in order to drain in-flight connections.',
   'gce.loadBalancer.detail':
@@ -91,6 +93,8 @@ const helpContents: { [key: string]: string } = {
     'How long to wait before collecting information from a new instance. This should be at least the time it takes to initialize the instance.',
   'gce.serverGroup.scalingPolicy.cpuUtilization':
     'Autoscaler adds or removes instances to maintain this CPU usage on each instance.',
+  'gce.serverGroup.scalingPolicy.predictiveAutoscaling':
+    'Autoscaler adds or removes instances based on forecasted load. You must set a CPU utilization target to enable predictive autoscaling.',
   'gce.serverGroup.scalingPolicy.loadBalancingUtilization':
     'Autoscaler adds or removes instances to maintain this usage of load-balancing capacity.',
   'gce.serverGroup.scalingPolicy.customMetricUtilizations':
@@ -151,7 +155,7 @@ const helpContents: { [key: string]: string } = {
   'gce.serverGroup.autoscaling.cooldown':
     'How long to wait before collecting information from a new instance. This should be at least the time it takes to initialize the instance. To find the minimum, create an instance from the same image and note how long it takes to start.',
   'gce.serverGroup.autoscaling.mode':
-    'Mode of operation of the autoscaling policy. This guides the autoscaler by defining the types of scaling operations it can perform. Options are ON, ONLY_UP, and OFF.',
+    'Mode of operation of the autoscaling policy. This guides the autoscaler by defining the types of scaling operations it can perform. Options are ON, ONLY_SCALE_OUT, and OFF.',
   'gce.serverGroup.autoHealing':
     'VMs in the group are recreated as needed. You can use a health check to recreate a VM if the health check finds the VM unresponsive. If you do not select a health check, VMs are recreated only when stopped.',
   'gce.serverGroup.initialDelaySec':
@@ -208,4 +212,4 @@ const helpContents: { [key: string]: string } = {
     '<p>Google Cloud Platform (GCP) TCP Proxy Load Balancing allows you to use a single IP address for all users around the world. GCP TCP proxy load balancing automatically routes traffic to the instances that are closest to the user.</p>',
 };
 
-Object.keys(helpContents).forEach(key => HelpContentsRegistry.register(key, helpContents[key]));
+Object.keys(helpContents).forEach((key) => HelpContentsRegistry.register(key, helpContents[key]));

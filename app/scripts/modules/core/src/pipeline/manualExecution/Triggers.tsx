@@ -1,8 +1,8 @@
-import React from 'react';
-import { Observable, Subject } from 'rxjs';
-import Select, { Option } from 'react-select';
-import { clone, head } from 'lodash';
 import { FormikProps } from 'formik';
+import { clone, head } from 'lodash';
+import React from 'react';
+import Select, { Option } from 'react-select';
+import { Observable, Subject } from 'rxjs';
 
 import { IPipelineCommand, ITrigger } from 'core/domain';
 import { FormField } from 'core/presentation';
@@ -34,7 +34,7 @@ export class Triggers extends React.Component<ITriggersProps> {
   };
 
   private updateTriggerDescription = (trigger: ITrigger) => {
-    if (trigger && !trigger.description) {
+    if (trigger && !trigger.description && Registry.pipeline.hasManualExecutionComponentForTriggerType(trigger.type)) {
       Observable.fromPromise(
         (Registry.pipeline.getManualExecutionComponentForTriggerType(trigger.type) as any).formatLabel(trigger),
       )
@@ -53,7 +53,7 @@ export class Triggers extends React.Component<ITriggersProps> {
   private triggerSelected = (option: Option<string>) => {
     const triggerDescription = option.value;
     const { formik, triggers, triggerChanged } = this.props;
-    const trigger = triggers.find(t => t.description === triggerDescription);
+    const trigger = triggers.find((t) => t.description === triggerDescription);
     formik.setFieldValue('trigger', trigger);
     formik.setFieldValue('triggerInvalid', false);
     triggerChanged(trigger);
@@ -67,14 +67,14 @@ export class Triggers extends React.Component<ITriggersProps> {
           label="Trigger"
           onChange={this.triggerSelected}
           value={formik.values.trigger ? formik.values.trigger.description : ''}
-          input={props => (
+          input={(props) => (
             <>
               {triggers.length > 1 && (
                 <Select
                   {...props}
                   className="trigger-select"
                   clearable={false}
-                  options={triggers.map(t => ({
+                  options={triggers.map((t) => ({
                     label: t.description,
                     value: t.description,
                   }))}

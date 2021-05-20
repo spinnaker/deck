@@ -1,19 +1,17 @@
-import { API } from 'core/api';
+import { RequestBuilder } from 'core/api';
 import { SpelService } from './SpelService';
 
 describe('SpelService', () => {
-  it('extracts "result" from the payload', async done => {
-    const spy = jasmine.createSpy('get', () => new Promise(resolve => resolve({ result: 'data' }))).and.callThrough();
-    spyOn(API as any, 'getFn').and.callFake(() => spy);
-
+  it('extracts "result" from the payload', async () => {
+    const spy = spyOn(RequestBuilder.defaultHttpClient, 'get').and.callFake(() =>
+      Promise.resolve({ result: 'data' } as any),
+    );
     const result = await SpelService.evaluateExpression('expression', null, null);
     expect(spy).toHaveBeenCalledTimes(1);
     expect(result).toBe('data');
-
-    done();
   });
 
-  it('throws when the payload has "details"', async done => {
+  it('throws when the payload has "details"', async () => {
     const serverExpressionEvaluationFailure = {
       detail: {
         'bad expression': [
@@ -32,11 +30,9 @@ describe('SpelService', () => {
     const errorDetail = serverExpressionEvaluationFailure.detail['bad expression'][0];
 
     // If expressions fail to evaluate, the server still returns 200 OK
-    const spy = jasmine
-      .createSpy('get', () => new Promise(resolve => resolve(serverExpressionEvaluationFailure)))
-      .and.callThrough();
-
-    spyOn(API as any, 'getFn').and.callFake(() => spy);
+    const spy = spyOn(RequestBuilder.defaultHttpClient, 'get').and.callFake(() => {
+      return Promise.resolve(serverExpressionEvaluationFailure as any);
+    });
 
     let rejection = null;
     try {
@@ -47,7 +43,5 @@ describe('SpelService', () => {
 
     expect(spy).toHaveBeenCalledTimes(1);
     expect(rejection.message).toBe(`${errorDetail.exceptionType}: ${errorDetail.description}`);
-
-    done();
   });
 });

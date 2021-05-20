@@ -1,6 +1,5 @@
-import { IPromise } from 'angular';
+import { $log, $timeout, $window } from 'ngimport';
 import { Observable, Subject, Subscription } from 'rxjs';
-import { $log, $window, $timeout } from 'ngimport';
 
 import { SETTINGS } from 'core/config/settings';
 
@@ -11,11 +10,11 @@ export interface IScheduler {
 }
 
 export class SchedulerFactory {
-  public static createScheduler(pollSchedule = SETTINGS.pollSchedule): IScheduler {
+  public static createScheduler(pollSchedule = SETTINGS.pollSchedule || 30000): IScheduler {
     let scheduler = new Subject();
 
     let lastRunTimestamp = new Date().getTime();
-    let pendingRun: IPromise<void> = null;
+    let pendingRun: PromiseLike<void> = null;
     let suspended = false;
 
     // When creating the timer, use last run as the dueTime (first arg); zero can lead to concurrency issues

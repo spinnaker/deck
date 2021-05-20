@@ -1,21 +1,21 @@
 'use strict';
 
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 import { module } from 'angular';
 
 import {
+  ModalWizard,
   OVERRIDE_REGISTRY,
   SERVER_GROUP_COMMAND_REGISTRY_PROVIDER,
   SERVER_GROUP_WRITER,
-  TaskMonitor,
-  ModalWizard,
   STAGE_ARTIFACT_SELECTOR_COMPONENT_REACT,
+  TaskMonitor,
 } from '@spinnaker/core';
 
-import { ECS_SERVER_GROUP_CONFIGURATION_SERVICE } from '../serverGroupConfiguration.service';
 import { ECS_CLUSTER_READ_SERVICE } from '../../../ecsCluster/ecsCluster.read.service';
 import { IAM_ROLE_READ_SERVICE } from '../../../iamRoles/iamRole.read.service';
 import { ECS_SECRET_READ_SERVICE } from '../../../secrets/secret.read.service';
-import UIROUTER_ANGULARJS from '@uirouter/angularjs';
+import { ECS_SERVER_GROUP_CONFIGURATION_SERVICE } from '../serverGroupConfiguration.service';
 
 export const ECS_SERVERGROUP_CONFIGURE_WIZARD_CLONESERVERGROUP_ECS_CONTROLLER =
   'spinnaker.ecs.cloneServerGroup.controller';
@@ -45,7 +45,7 @@ module(ECS_SERVERGROUP_CONFIGURE_WIZARD_CLONESERVERGROUP_ECS_CONTROLLER, [
   'secretReader',
   'application',
   'title',
-  function(
+  function (
     $scope,
     $uibModalInstance,
     $q,
@@ -118,7 +118,7 @@ module(ECS_SERVERGROUP_CONFIGURE_WIZARD_CLONESERVERGROUP_ECS_CONTROLLER, [
       if ($scope.$$destroyed) {
         return;
       }
-      const cloneStage = $scope.taskMonitor.task.execution.stages.find(stage => stage.type === 'cloneServerGroup');
+      const cloneStage = $scope.taskMonitor.task.execution.stages.find((stage) => stage.type === 'cloneServerGroup');
       if (cloneStage && cloneStage.context['deploy.server.groups']) {
         const newServerGroupName = cloneStage.context['deploy.server.groups'][$scope.command.region];
         if (newServerGroupName) {
@@ -159,7 +159,7 @@ module(ECS_SERVERGROUP_CONFIGURE_WIZARD_CLONESERVERGROUP_ECS_CONTROLLER, [
     });
 
     function configureCommand() {
-      ecsServerGroupConfigurationService.configureCommand($scope.command).then(function() {
+      ecsServerGroupConfigurationService.configureCommand($scope.command).then(function () {
         $scope.state.loaded = true;
         initializeCommand();
         initializeSelectOptions();
@@ -185,7 +185,7 @@ module(ECS_SERVERGROUP_CONFIGURE_WIZARD_CLONESERVERGROUP_ECS_CONTROLLER, [
     }
 
     function createResultProcessor(method) {
-      return function() {
+      return function () {
         processCommandUpdateResult(method(serverGroupCommand));
       };
     }
@@ -196,24 +196,24 @@ module(ECS_SERVERGROUP_CONFIGURE_WIZARD_CLONESERVERGROUP_ECS_CONTROLLER, [
 
     function initializeCommand() {}
 
-    this.isValid = function() {
+    this.isValid = function () {
       return true; // TODO(Bruno Carrier) - Implement validation of the form
     };
 
-    this.showSubmitButton = function() {
+    this.showSubmitButton = function () {
       return ModalWizard.allPagesVisited();
     };
 
-    this.submit = function() {
+    this.submit = function () {
       if ($scope.command.viewState.mode === 'editPipeline' || $scope.command.viewState.mode === 'createPipeline') {
         return $uibModalInstance.close($scope.command);
       }
-      $scope.taskMonitor.submit(function() {
+      $scope.taskMonitor.submit(function () {
         return serverGroupWriter.cloneServerGroup($scope.command, application);
       });
     };
 
-    this.cancel = function() {
+    this.cancel = function () {
       $uibModalInstance.dismiss();
     };
 
@@ -229,7 +229,7 @@ module(ECS_SERVERGROUP_CONFIGURE_WIZARD_CLONESERVERGROUP_ECS_CONTROLLER, [
     };
 
     // used by react components to update command fields in parent (angular) scope
-    $scope.notifyAngular = function(commandKey, value) {
+    $scope.notifyAngular = function (commandKey, value) {
       if (commandKey == 'pipeline') {
         $scope.command.viewState.pipeline = value;
       } else {
@@ -238,8 +238,22 @@ module(ECS_SERVERGROUP_CONFIGURE_WIZARD_CLONESERVERGROUP_ECS_CONTROLLER, [
     };
 
     // used by react components to configure command for image queries
-    $scope.configureCommand = function(query) {
+    $scope.configureCommand = function (query) {
       return ecsServerGroupConfigurationService.configureCommand($scope.command, query);
+    };
+
+    // TODO: Migrate horizontalScaling component to react and move this logic there
+    $scope.capacityProviderState = {
+      useCapacityProviders:
+        $scope.command.capacityProviderStrategy && $scope.command.capacityProviderStrategy.length > 0,
+      updateComputeOption: function (chosenOption) {
+        if (chosenOption == 'launchType') {
+          $scope.command.capacityProviderStrategy = [];
+        } else if (chosenOption == 'capacityProviders') {
+          $scope.command.launchType = '';
+          $scope.command.capacityProviderStrategy = $scope.command.capacityProviderStrategy || [];
+        }
+      },
     };
   },
 ]);

@@ -1,14 +1,11 @@
-import { IPromise } from 'angular';
-
-import { API } from '@spinnaker/core';
-
+import { REST } from '@spinnaker/core';
 import { IKeyPair } from 'amazon/domain';
 
 export class KeyPairsReader {
-  public static listKeyPairs(): IPromise<IKeyPair[]> {
-    return API.all('keyPairs')
+  public static listKeyPairs(): PromiseLike<IKeyPair[]> {
+    return REST('/keyPairs')
       .useCache()
-      .getList()
+      .get()
       .then((keyPairs: IKeyPair[]) => keyPairs.sort((a, b) => a.keyName.localeCompare(b.keyName)));
   }
 }

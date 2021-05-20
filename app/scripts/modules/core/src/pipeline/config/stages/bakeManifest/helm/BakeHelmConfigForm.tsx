@@ -1,17 +1,37 @@
 import React from 'react';
 
-import { StageConfigField } from 'core/pipeline';
-import { CheckboxInput, TextInput } from 'core/presentation';
+import { AccountService } from 'core/account';
+import { ArtifactTypePatterns, excludeAllTypesExcept, StageArtifactSelectorDelegate } from 'core/artifact';
+import { IArtifact, IExpectedArtifact } from 'core/domain';
 import { MapEditor } from 'core/forms';
-import { IArtifact, IExpectedArtifact, IPipeline } from 'core/domain';
-import { StageArtifactSelectorDelegate } from 'core/artifact';
-import { IFormikStageConfigInjectedProps } from '../../FormikStageConfig';
+import { CheckboxInput, TextInput } from 'core/presentation';
 
-interface IBakeHelmConfigFormProps {
-  updatePipeline: (pipeline: IPipeline) => void;
+import { IFormikStageConfigInjectedProps } from '../../FormikStageConfig';
+import { StageConfigField } from '../../common/stageConfigField/StageConfigField';
+
+export interface IBakeHelmConfigFormState {
+  gitRepoArtifactAccountNames: string[];
 }
 
-export class BakeHelmConfigForm extends React.Component<IBakeHelmConfigFormProps & IFormikStageConfigInjectedProps> {
+export class BakeHelmConfigForm extends React.Component<IFormikStageConfigInjectedProps, IBakeHelmConfigFormState> {
+  constructor(props: IFormikStageConfigInjectedProps) {
+    super(props);
+    this.state = { gitRepoArtifactAccountNames: [] };
+  }
+
+  private static readonly excludedArtifactTypes = excludeAllTypesExcept(
+    ArtifactTypePatterns.BITBUCKET_FILE,
+    ArtifactTypePatterns.CUSTOM_OBJECT,
+    ArtifactTypePatterns.EMBEDDED_BASE64,
+    ArtifactTypePatterns.GCS_OBJECT,
+    ArtifactTypePatterns.GIT_REPO,
+    ArtifactTypePatterns.GITHUB_FILE,
+    ArtifactTypePatterns.GITLAB_FILE,
+    ArtifactTypePatterns.S3_OBJECT,
+    ArtifactTypePatterns.HELM_CHART,
+    ArtifactTypePatterns.HTTP_FILE,
+  );
+
   public componentDidMount() {
     const stage = this.props.formik.values;
     if (stage.inputArtifacts && stage.inputArtifacts.length === 0) {
@@ -22,6 +42,13 @@ export class BakeHelmConfigForm extends React.Component<IBakeHelmConfigFormProps
         },
       ]);
     }
+    AccountService.getArtifactAccounts().then((artifactAccounts) => {
+      this.setState({
+        gitRepoArtifactAccountNames: artifactAccounts
+          .filter((account) => account.types.some((type) => ArtifactTypePatterns.GIT_REPO.test(type)))
+          .map((account) => account.name),
+      });
+    });
   }
 
   private onTemplateArtifactEdited = (artifact: IArtifact, index: number) => {
@@ -33,10 +60,6 @@ export class BakeHelmConfigForm extends React.Component<IBakeHelmConfigFormProps
   private onTemplateArtifactSelected = (id: string, index: number) => {
     this.props.formik.setFieldValue(`inputArtifacts[${index}].id`, id);
     this.props.formik.setFieldValue(`inputArtifacts[${index}].artifact`, null);
-  };
-
-  private onTemplateArtifactAccountSelected = (account: string, index: number) => {
-    this.props.formik.setFieldValue(`inputArtifacts[${index}].account`, account);
   };
 
   private addInputArtifact = () => {
@@ -121,22 +144,27 @@ export class BakeHelmConfigForm extends React.Component<IBakeHelmConfigFormProps
         <h4>Template Artifact</h4>
         <StageArtifactSelectorDelegate
           artifact={this.getInputArtifact(stage, 0).artifact}
-          excludedArtifactTypePatterns={[]}
+          excludedArtifactTypePatterns={BakeHelmConfigForm.excludedArtifactTypes}
           expectedArtifactId={this.getInputArtifact(stage, 0).id}
           helpKey="pipeline.config.bake.manifest.expectedArtifact"
           label="Expected Artifact"
-          onArtifactEdited={artifact => {
+          onArtifactEdited={(artifact) => {
             this.onTemplateArtifactEdited(artifact, 0);
           }}
           onExpectedArtifactSelected={(artifact: IExpectedArtifact) => this.onTemplateArtifactSelected(artifact.id, 0)}
           pipeline={this.props.pipeline}
-          selectedArtifactAccount={this.getInputArtifact(stage, 0).account}
-          selectedArtifactId={this.getInputArtifact(stage, 0).id}
-          setArtifactAccount={account => this.onTemplateArtifactAccountSelected(account, 0)}
-          setArtifactId={id => this.onTemplateArtifactSelected(id, 0)}
           stage={stage}
-          updatePipeline={this.props.updatePipeline}
         />
+        {this.state.gitRepoArtifactAccountNames.includes(this.getInputArtifact(stage, 0).account) && (
+          <StageConfigField label="Helm Chart File Path" helpKey="pipeline.config.bake.manifest.helm.chartFilePath">
+            <TextInput
+              onChange={(e: React.ChangeEvent<any>) => {
+                this.props.formik.setFieldValue('helmChartFilePath', e.target.value);
+              }}
+              value={stage.helmChartFilePath}
+            />
+          </StageConfigField>
+        )}
         <h4>Overrides</h4>
         {stage.inputArtifacts && stage.inputArtifacts.length > 1 && (
           <div className="row form-group">
@@ -149,19 +177,14 @@ export class BakeHelmConfigForm extends React.Component<IBakeHelmConfigFormProps
                       excludedArtifactTypePatterns={[]}
                       expectedArtifactId={a.id}
                       label="Expected Artifact"
-                      onArtifactEdited={artifact => {
+                      onArtifactEdited={(artifact) => {
                         this.onTemplateArtifactEdited(artifact, index + 1);
                       }}
                       onExpectedArtifactSelected={(artifact: IExpectedArtifact) =>
                         this.onTemplateArtifactSelected(artifact.id, index + 1)
                       }
                       pipeline={this.props.pipeline}
-                      selectedArtifactAccount={this.getInputArtifact(stage, index + 1).account}
-                      selectedArtifactId={this.getInputArtifact(stage, index + 1).id}
-                      setArtifactAccount={account => this.onTemplateArtifactAccountSelected(account, index + 1)}
-                      setArtifactId={id => this.onTemplateArtifactSelected(id, index + 1)}
                       stage={stage}
-                      updatePipeline={this.props.updatePipeline}
                     />
                   </div>
                   <div className="col-md-1">

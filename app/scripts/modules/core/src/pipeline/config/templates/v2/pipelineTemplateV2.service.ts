@@ -1,8 +1,9 @@
 import { hri as HumanReadableIds } from 'human-readable-ids';
 
 import { IPipeline, IPipelineTemplateConfigV2, IPipelineTemplateV2 } from 'core/domain';
-import { PipelineJSONService } from '../../services/pipelineJSON.service';
 import { UUIDGenerator } from 'core/utils';
+
+import { PipelineJSONService } from '../../services/pipelineJSON.service';
 
 enum InheritedItem {
   Triggers = 'triggers',
@@ -71,10 +72,10 @@ export class PipelineTemplateV2Service {
   }
 
   public static filterInheritedConfig(pipelineConfig: Partial<IPipeline>) {
-    PipelineTemplateV2Service.inheritedKeys.forEach(key => {
+    PipelineTemplateV2Service.inheritedKeys.forEach((key) => {
       if (Array.isArray(pipelineConfig[key])) {
         const configCollection = pipelineConfig[key];
-        pipelineConfig[key] = (configCollection as any[]).filter(item => !item.inherited);
+        pipelineConfig[key] = (configCollection as any[]).filter((item) => !item.inherited);
       }
     });
     return pipelineConfig;

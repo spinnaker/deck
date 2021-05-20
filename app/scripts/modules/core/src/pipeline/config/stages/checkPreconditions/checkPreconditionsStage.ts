@@ -1,10 +1,9 @@
 import { IScope, module } from 'angular';
-
 import { Registry } from 'core/registry';
-import { PipelineConfigService } from 'core/pipeline';
 
 import { CheckPreconditionsExecutionDetails } from './CheckPreconditionsExecutionDetails';
 import { ExecutionDetailsTasks } from '../common/ExecutionDetailsTasks';
+import { PipelineConfigService } from '../../services/PipelineConfigService';
 
 export const CHECK_PRECONDITIONS_STAGE = 'spinnaker.pipelines.stage.checkPreconditionsStage';
 
@@ -24,7 +23,7 @@ module(CHECK_PRECONDITIONS_STAGE, [])
   })
   .controller('CheckPreconditionsStageCtrl', [
     '$scope',
-    function($scope: IScope) {
+    function ($scope: IScope) {
       $scope.stage.preconditions = $scope.stage.preconditions || [];
       $scope.upstreamStages = PipelineConfigService.getAllUpstreamDependencies($scope.pipeline, $scope.stage);
     },

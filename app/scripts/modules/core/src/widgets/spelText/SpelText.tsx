@@ -1,16 +1,16 @@
-import React from 'react';
-
-import 'jquery-textcomplete';
-import './spel.less';
-
+import { StateService } from '@uirouter/core';
 import classNames from 'classnames';
 import $ from 'jquery';
-import { $q, $http, $timeout } from 'ngimport';
-import { SpelAutocompleteService } from './SpelAutocompleteService';
-import { ExecutionService } from '../../pipeline/service/execution.service';
-import { StateService } from '@uirouter/core';
-import { IPipeline } from '../../domain';
+import 'jquery-textcomplete';
+import { $q, $timeout } from 'ngimport';
+import React from 'react';
 import { Observable, Subject } from 'rxjs';
+
+import { SpelAutocompleteService } from './SpelAutocompleteService';
+import { IPipeline } from '../../domain';
+import { ExecutionService } from '../../pipeline/service/execution.service';
+
+import './spel.less';
 
 export interface ISpelTextProps {
   placeholder: string;
@@ -37,13 +37,10 @@ export class SpelText extends React.Component<ISpelTextProps, ISpelTextState> {
   constructor(props: ISpelTextProps) {
     super(props);
     this.state = { textcompleteConfig: [] };
-    this.autocompleteService = new SpelAutocompleteService(
-      $q,
-      new ExecutionService($http, $q, {} as StateService, $timeout),
-    );
+    this.autocompleteService = new SpelAutocompleteService($q, new ExecutionService($q, {} as StateService, $timeout));
     Observable.fromPromise(this.autocompleteService.addPipelineInfo(this.props.pipeline))
       .takeUntil(this.destroy$)
-      .subscribe(textcompleteConfig => {
+      .subscribe((textcompleteConfig) => {
         this.setState({ textcompleteConfig: textcompleteConfig });
       });
     this.spelInputRef = React.createRef();

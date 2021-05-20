@@ -1,9 +1,11 @@
-import React from 'react';
 import { get, isEmpty } from 'lodash';
+import React from 'react';
 
-import { StageFailureMessage, IExecutionDetailsSectionProps, ExecutionDetailsSection } from 'core/pipeline';
 import { IExecutionStage } from 'core/domain';
+
 import { DeploymentMonitorReader, IDeploymentMonitorDefinition } from './DeploymentMonitorReader';
+import { ExecutionDetailsSection, IExecutionDetailsSectionProps } from '../common';
+import { StageFailureMessage } from '../../../details';
 
 interface IAdditionalData {
   link: string;
@@ -21,11 +23,11 @@ function getDeploymentMonitorSummary(stage: IExecutionStage) {
 }
 
 function getDeploymentMonitorName(stage: IExecutionStage, monitors: IDeploymentMonitorDefinition[]) {
-  return monitors.find(x => x.id === stage.context.deploymentMonitor.id).name;
+  return monitors.find((x) => x.id === stage.context.deploymentMonitor.id).name;
 }
 
 function getDeploymentMonitorSupportUrl(stage: IExecutionStage, monitors: IDeploymentMonitorDefinition[]) {
-  return monitors.find(x => x.id === stage.context.deploymentMonitor.id).supportContact;
+  return monitors.find((x) => x.id === stage.context.deploymentMonitor.id).supportContact;
 }
 
 function getDeploymentMonitorDetails(stage: IExecutionStage) {
@@ -82,7 +84,7 @@ export class DeploymentMonitorExecutionDetails extends React.Component<
   public state: IDeploymentMonitorExecutionDetailsSectionState = { deploymentMonitors: null };
 
   public componentDidMount(): void {
-    DeploymentMonitorReader.getDeploymentMonitors().then(deploymentMonitors => {
+    DeploymentMonitorReader.getDeploymentMonitors().then((deploymentMonitors) => {
       this.setState({ deploymentMonitors });
     });
   }

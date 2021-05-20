@@ -23,17 +23,16 @@ global-search {
     min-height: 30px;
   }
   .dropdown-menu {
-    min-width: 202px;
+    width: 400px;
     top: 34px;
     right: 0;
     margin: 2px 19px;
     border-radius: 0;
-    z-index: 10000;
+    z-index: 10001;
     overflow-y: auto;
 
     li {
       color: var(--color-concrete);
-      max-width: 300px;
       strong {
         font-weight: 600;
       }
@@ -67,6 +66,9 @@ global-search {
         }
         &.sublink {
           padding: 3px 4px;
+        }
+        &.query-match {
+          background-color: var(--color-primary-g1);
         }
       }
       .sublink-label {

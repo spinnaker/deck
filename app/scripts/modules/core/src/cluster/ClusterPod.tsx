@@ -1,18 +1,19 @@
-import React from 'react';
 import classNames from 'classnames';
-import { orderBy, partition, groupBy, map } from 'lodash';
+import { groupBy, map, orderBy, partition } from 'lodash';
+import React from 'react';
 
-import { ClusterState } from 'core/state';
-import { ServerGroup } from 'core/serverGroup/ServerGroup';
 import { Application } from 'core/application';
-import { EntityNotifications } from 'core/entityTag/notifications/EntityNotifications';
 import { IServerGroup } from 'core/domain';
-import { Tooltip } from 'core/presentation';
-import { IClusterSubgroup, IServerGroupSubgroup } from './filter/ClusterFilterService';
+import { EntityNotifications } from 'core/entityTag/notifications/EntityNotifications';
 import { ISortFilter } from 'core/filterModel';
-import { ClusterPodTitleWrapper } from './ClusterPodTitleWrapper';
-import { ServerGroupManager } from 'core/serverGroupManager/ServerGroupManager';
 import { ManagedResourceStatusIndicator } from 'core/managed';
+import { Tooltip } from 'core/presentation';
+import { ServerGroup } from 'core/serverGroup/ServerGroup';
+import { ServerGroupManager } from 'core/serverGroupManager/ServerGroupManager';
+import { ClusterState } from 'core/state';
+
+import { ClusterPodTitleWrapper } from './ClusterPodTitleWrapper';
+import { IClusterSubgroup, IServerGroupSubgroup } from './filter/ClusterFilterService';
 
 export interface IClusterPodProps {
   grouping: IClusterSubgroup;
@@ -70,7 +71,7 @@ export class ClusterPod extends React.Component<IClusterPodProps, IClusterPodSta
 
   private renderSubGroup = (subgroup: IServerGroupSubgroup) => {
     const { grouping, application, sortFilter } = this.props;
-    const hasMoniker = subgroup.serverGroups.every(sg => {
+    const hasMoniker = subgroup.serverGroups.every((sg) => {
       return !!sg.moniker;
     });
     let iteratee;
@@ -88,9 +89,9 @@ export class ClusterPod extends React.Component<IClusterPodProps, IClusterPodSta
     // this logic here seems fine while the server group manager grouping is still experimental.
     const [managedServerGroups, standaloneServerGroups] = partition(
       sortedServerGroups,
-      group => group.serverGroupManagers && group.serverGroupManagers.length,
+      (group) => group.serverGroupManagers && group.serverGroupManagers.length,
     );
-    const serverGroupManagers = groupBy(managedServerGroups, serverGroup => serverGroup.serverGroupManagers[0].name);
+    const serverGroupManagers = groupBy(managedServerGroups, (serverGroup) => serverGroup.serverGroupManagers[0].name);
     const showManagedIndicator = !grouping.isManaged && subgroup.isManaged;
     return (
       <div className="pod-subgroup" key={subgroup.key}>

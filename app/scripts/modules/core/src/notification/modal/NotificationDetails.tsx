@@ -1,13 +1,14 @@
-import React from 'react';
 import { FormikProps } from 'formik';
+import React from 'react';
 import { Option } from 'react-select';
 
 import { INotification, INotificationTypeConfig } from 'core/domain';
-import { Registry } from 'core/registry';
 import { FormikFormField, TextAreaInput } from 'core/presentation';
-import { NotificationSelector } from 'core/notification';
-import { NotificationTransformer } from '../notification.transformer';
+import { Registry } from 'core/registry';
+
 import { WhenChecklistInput } from './WhenChecklistInput';
+import { NotificationTransformer } from '../notification.transformer';
+import { NotificationSelector } from '../selector/NotificationSelector';
 import { MANUAL_JUDGEMENT_WHEN_OPTIONS, PIPELINE_WHEN_OPTIONS, STAGE_WHEN_OPTIONS } from './whenOptions';
 
 import './editNotification.less';
@@ -54,11 +55,11 @@ export class NotificationDetails extends React.Component<INotificationDetailsPro
   }
 
   private renderCustomMessage = (type: string, whenOption: string): React.ReactNode => {
-    if (whenOption !== 'manualJudgment' && ['email', 'slack', 'googlechat'].includes(type)) {
+    if (whenOption !== 'manualJudgment' && ['email', 'slack', 'googlechat', 'microsoftteams'].includes(type)) {
       return (
         <FormikFormField
           name={`message["${whenOption}"].text`}
-          input={props => <TextAreaInput {...props} placeholder="enter a custom notification message (optional)" />}
+          input={(props) => <TextAreaInput {...props} placeholder="enter a custom notification message (optional)" />}
         />
       );
     } else {
@@ -90,10 +91,10 @@ export class NotificationDetails extends React.Component<INotificationDetailsPro
                 <div className="col-md-6">
                   <FormikFormField
                     name="when"
-                    input={props => (
+                    input={(props) => (
                       <WhenChecklistInput
                         {...props}
-                        options={whenOptions.map(o => ({
+                        options={whenOptions.map((o) => ({
                           value: o,
                           label: NotificationTransformer.getNotificationWhenDisplayName(o, level, stageType),
                           additionalFields: renderCustomMessage(values.type, o),

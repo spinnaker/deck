@@ -1,5 +1,7 @@
-import { IArtifact, IPipeline } from 'core/domain';
 import { IArtifactAccount } from 'core/account';
+
+import { IArtifact } from './IArtifact';
+import { IPipeline } from './IPipeline';
 
 export interface IArtifactEditorProps {
   account: IArtifactAccount;

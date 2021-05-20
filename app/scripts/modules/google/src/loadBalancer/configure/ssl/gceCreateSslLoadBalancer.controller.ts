@@ -1,6 +1,6 @@
-import { module, IScope, IController } from 'angular';
-import { IModalInstanceService } from 'angular-ui-bootstrap';
 import { StateService } from '@uirouter/angularjs';
+import { IController, IScope, module } from 'angular';
+import { IModalInstanceService } from 'angular-ui-bootstrap';
 import _ from 'lodash';
 
 import {
@@ -8,15 +8,15 @@ import {
   Application,
   IAccount,
   ICredentials,
-  ILoadBalancerUpsertCommand,
   IInstance,
+  ILoadBalancerUpsertCommand,
   IRegion,
   LoadBalancerWriter,
   TaskMonitor,
 } from '@spinnaker/core';
-
 import { IGceBackendService, IGceHealthCheck, IGceLoadBalancer } from 'google/domain/index';
 import { GCEProviderSettings } from 'google/gce.settings';
+
 import { CommonGceLoadBalancerCtrl } from '../common/commonLoadBalancer.controller';
 import {
   GCE_COMMON_LOAD_BALANCER_COMMAND_BUILDER,
@@ -113,7 +113,7 @@ class SslLoadBalancerCtrl extends CommonGceLoadBalancerCtrl implements IControll
   public $onInit(): void {
     this.gceCommonLoadBalancerCommandBuilder
       .getBackingData(['existingLoadBalancerNamesByAccount', 'accounts', 'healthChecks', 'certificates'])
-      .then(backingData => {
+      .then((backingData) => {
         if (!this.isNew) {
           this.initializeEditMode();
         } else {
@@ -162,7 +162,7 @@ class SslLoadBalancerCtrl extends CommonGceLoadBalancerCtrl implements IControll
   }
 
   public onHealthCheckRefresh(): void {
-    this.gceCommonLoadBalancerCommandBuilder.getBackingData(['healthChecks']).then(data => {
+    this.gceCommonLoadBalancerCommandBuilder.getBackingData(['healthChecks']).then((data) => {
       this.healthChecksByAccountAndType = this.gceCommonLoadBalancerCommandBuilder.groupHealthChecksByAccountAndType(
         data.healthChecks as IGceHealthCheck[],
       );
@@ -176,7 +176,7 @@ class SslLoadBalancerCtrl extends CommonGceLoadBalancerCtrl implements IControll
   }
 
   public onCertificateRefresh(): void {
-    this.gceCommonLoadBalancerCommandBuilder.getBackingData(['certificates']).then(data => {
+    this.gceCommonLoadBalancerCommandBuilder.getBackingData(['certificates']).then((data) => {
       this.certificateWrappers = data.certificates as any[];
     });
   }

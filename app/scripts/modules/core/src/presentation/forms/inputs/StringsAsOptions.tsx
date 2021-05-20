@@ -1,7 +1,7 @@
-import React from 'react';
-import { Option } from 'react-select';
 import { isEqual } from 'lodash';
 import memoizeOne from 'memoize-one';
+import React from 'react';
+import { Option } from 'react-select';
 
 interface IStringOptionsProps {
   strings?: string[];
@@ -15,7 +15,7 @@ interface IStringOptionsState {
 
 const makeOptions = (options: string[]): Array<Option<string>> => {
   options = options || [];
-  return options.map(str => ({ label: str, value: str }));
+  return options.map((str) => ({ label: str, value: str }));
 };
 
 /**

@@ -1,11 +1,12 @@
 'use strict';
 
-import { IMAGE_READER, ModalWizard } from '@spinnaker/core';
-import { AZURE_SERVERGROUP_CONFIGURE_WIZARD_BASICSETTINGS_IMAGE_REGIONAL_FILTER } from './image.regional.filter';
 import UIROUTER_ANGULARJS from '@uirouter/angularjs';
+import * as angular from 'angular';
 import ANGULAR_UI_BOOTSTRAP from 'angular-ui-bootstrap';
 
-import * as angular from 'angular';
+import { IMAGE_READER, ModalWizard } from '@spinnaker/core';
+
+import { AZURE_SERVERGROUP_CONFIGURE_WIZARD_BASICSETTINGS_IMAGE_REGIONAL_FILTER } from './image.regional.filter';
 
 export const AZURE_SERVERGROUP_CONFIGURE_WIZARD_BASICSETTINGS_SERVERGROUPBASICSETTINGS_CONTROLLER =
   'spinnaker.azure.serverGroup.configure.basicSettings';
@@ -23,8 +24,8 @@ angular
     '$uibModalStack',
     '$state',
     'imageReader',
-    function($scope, $controller, $uibModalStack, $state, imageReader) {
-      $scope.$watch('form.$valid', function(newVal) {
+    function ($scope, $controller, $uibModalStack, $state, imageReader) {
+      $scope.$watch('form.$valid', function (newVal) {
         if (newVal) {
           ModalWizard.markClean('basic-settings');
           ModalWizard.markComplete('basic-settings');
@@ -33,7 +34,7 @@ angular
         }
       });
 
-      this.imageChanged = image => {
+      this.imageChanged = (image) => {
         $scope.command.imageName = image.imageName;
         $scope.command.selectedImage = image;
         ModalWizard.markClean('basic-settings');
@@ -50,7 +51,7 @@ angular
       );
 
       this.stackPattern = {
-        test: function(stack) {
+        test: function (stack) {
           const pattern = $scope.command.viewState.templatingEnabled ? /^([a-zA-Z0-9]*(\${.+})*)*$/ : /^[a-zA-Z0-9]*$/;
 
           return pattern.test(stack);
@@ -58,7 +59,7 @@ angular
       };
 
       this.detailPattern = {
-        test: function(detail) {
+        test: function (detail) {
           const pattern = $scope.command.viewState.templatingEnabled
             ? /^([a-zA-Z0-9-]*(\${.+})*)*$/
             : /^[a-zA-Z0-9-]*$/;

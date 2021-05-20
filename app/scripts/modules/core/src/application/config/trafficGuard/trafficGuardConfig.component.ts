@@ -2,10 +2,12 @@ import { ILogService, module, toJson } from 'angular';
 import { cloneDeep, uniq } from 'lodash';
 
 import { AccountService, IAccountDetails, IAggregatedAccounts, IRegion } from 'core/account/AccountService';
-import { Application, IConfigSectionFooterViewState } from 'core/application';
-import { CLUSTER_MATCHES_COMPONENT, IClusterMatch } from 'core/widgets/cluster/clusterMatches.component';
-import './trafficGuardConfig.help';
 import { ClusterMatcher, IClusterMatchRule } from 'core/cluster/ClusterRuleMatcher';
+import { CLUSTER_MATCHES_COMPONENT, IClusterMatch } from 'core/widgets/cluster/clusterMatches.component';
+
+import { Application } from '../../application.model';
+import { IConfigSectionFooterViewState } from '../footer/configSectionFooter.component';
+import './trafficGuardConfig.help';
 
 export interface ITrafficGuardRule extends IClusterMatchRule {
   enabled: boolean;
@@ -93,22 +95,22 @@ export class TrafficGuardConfigController {
 
   public configureMatches(): void {
     this.clusterMatches.length = 0;
-    this.config.forEach(guard => {
+    this.config.forEach((guard) => {
       this.clusterMatches.push(
         this.application.clusters
-          .filter(c =>
-            c.serverGroups.some(s => ClusterMatcher.getMatchingRule(c.account, s.region, c.name, [guard]) !== null),
+          .filter((c) =>
+            c.serverGroups.some((s) => ClusterMatcher.getMatchingRule(c.account, s.region, c.name, [guard]) !== null),
           )
-          .map(c => {
+          .map((c) => {
             return {
               name: c.name,
               account: guard.account,
-              regions: guard.location === '*' ? uniq(c.serverGroups.map(g => g.region)).sort() : [guard.location],
+              regions: guard.location === '*' ? uniq(c.serverGroups.map((g) => g.region)).sort() : [guard.location],
             };
           }),
       );
     });
-    this.clusterMatches.forEach(m => m.sort((a: IClusterMatch, b: IClusterMatch) => a.name.localeCompare(b.name)));
+    this.clusterMatches.forEach((m) => m.sort((a: IClusterMatch, b: IClusterMatch) => a.name.localeCompare(b.name)));
   }
 }
 

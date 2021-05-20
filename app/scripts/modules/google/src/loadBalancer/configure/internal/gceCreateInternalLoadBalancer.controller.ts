@@ -1,6 +1,6 @@
+import { StateService } from '@uirouter/angularjs';
 import { IController, IScope, module } from 'angular';
 import { IModalInstanceService } from 'angular-ui-bootstrap';
-import { StateService } from '@uirouter/angularjs';
 import _ from 'lodash';
 
 import {
@@ -12,16 +12,16 @@ import {
   LoadBalancerWriter,
   TaskMonitor,
 } from '@spinnaker/core';
-
+import { GOOGLE_COMMON_XPNNAMING_GCE_SERVICE } from 'google/common/xpnNaming.gce.service';
 import { IGceBackendService, IGceHealthCheck, IGceLoadBalancer, IGceNetwork, IGceSubnet } from 'google/domain/index';
 import { GCEProviderSettings } from 'google/gce.settings';
+
 import { CommonGceLoadBalancerCtrl } from '../common/commonLoadBalancer.controller';
 import {
   GCE_COMMON_LOAD_BALANCER_COMMAND_BUILDER,
   GceCommonLoadBalancerCommandBuilder,
 } from '../common/commonLoadBalancerCommandBuilder.service';
 import { GCE_HEALTH_CHECK_SELECTOR_COMPONENT } from '../common/healthCheck.component';
-import { GOOGLE_COMMON_XPNNAMING_GCE_SERVICE } from 'google/common/xpnNaming.gce.service';
 
 class ViewState {
   constructor(public sessionAffinity: string) {}
@@ -114,7 +114,7 @@ class InternalLoadBalancerCtrl extends CommonGceLoadBalancerCtrl implements ICon
   public $onInit(): void {
     this.gceCommonLoadBalancerCommandBuilder
       .getBackingData(['existingLoadBalancerNamesByAccount', 'accounts', 'networks', 'subnets', 'healthChecks'])
-      .then(backingData => {
+      .then((backingData) => {
         if (!this.isNew) {
           this.initializeEditMode();
         } else {
@@ -166,7 +166,7 @@ class InternalLoadBalancerCtrl extends CommonGceLoadBalancerCtrl implements ICon
   }
 
   public onHealthCheckRefresh(): void {
-    this.gceCommonLoadBalancerCommandBuilder.getBackingData(['healthChecks']).then(data => {
+    this.gceCommonLoadBalancerCommandBuilder.getBackingData(['healthChecks']).then((data) => {
       this.healthChecksByAccountAndType = this.gceCommonLoadBalancerCommandBuilder.groupHealthChecksByAccountAndType(
         data.healthChecks as IGceHealthCheck[],
       );
@@ -181,14 +181,14 @@ class InternalLoadBalancerCtrl extends CommonGceLoadBalancerCtrl implements ICon
 
   public networkUpdated(): void {
     this.subnetOptions = this.subnets
-      .filter(subnet => {
+      .filter((subnet) => {
         return (
           subnet.region === this.loadBalancer.region &&
           (subnet.account === this.loadBalancer.credentials || subnet.account === this.loadBalancer.account) &&
           subnet.network === this.loadBalancer.network
         );
       })
-      .map(subnet => subnet.id);
+      .map((subnet) => subnet.id);
 
     if (!this.subnetOptions.includes(this.loadBalancer.subnet)) {
       this.loadBalancer.subnet = this.subnetOptions[0];
@@ -217,7 +217,7 @@ class InternalLoadBalancerCtrl extends CommonGceLoadBalancerCtrl implements ICon
 
     this.networkOptions = this.networks
       .filter((network: IGceNetwork) => network.account === this.loadBalancer.credentials)
-      .map(network => network.id);
+      .map((network) => network.id);
 
     AccountService.getRegionsForAccount(this.loadBalancer.credentials).then((regions: IRegion[]) => {
       this.regions = regions.map((region: IRegion) => region.name);

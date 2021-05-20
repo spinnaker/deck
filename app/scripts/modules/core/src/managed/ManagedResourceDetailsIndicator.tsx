@@ -1,17 +1,19 @@
 import React from 'react';
-import ReactGA from 'react-ga';
 import { Dropdown, MenuItem } from 'react-bootstrap';
+import ReactGA from 'react-ga';
 
-import { SETTINGS } from 'core/config/settings';
-import { HoverablePopover } from 'core/presentation';
-
-import { IManagedResourceSummary } from 'core/domain';
 import { Application } from 'core/application';
+import { SETTINGS } from 'core/config/settings';
+import { IManagedResourceSummary } from 'core/domain';
+import { HelpField } from 'core/help';
+import { HoverablePopover } from 'core/presentation';
 import { ReactInjector } from 'core/reactShims';
 
-import './ManagedResourceDetailsIndicator.css';
+import managedDeliveryLogo from './icons/md-logo-color.svg';
+import { showManagedResourceHistoryModal } from './resourceHistory/ManagedResourceHistoryModal';
 import { toggleResourcePause } from './toggleResourceManagement';
-import { HelpField } from 'core/help';
+
+import './ManagedResourceDetailsIndicator.css';
 
 export interface IManagedResourceDetailsIndicatorProps {
   resourceSummary: IManagedResourceSummary;
@@ -38,14 +40,14 @@ export const ManagedResourceDetailsIndicator = ({
   const helpText = (
     <>
       <p>
-        <b>Spinnaker is continuously managing this resource.</b>
+        <b>Spinnaker is managing this resource.</b>
       </p>
       <p>
-        Changes made in the UI will be stomped in favor of the existing declarative configuration.{' '}
+        If a difference from the desired state is detected, Spinnaker will act to correct it.{' '}
         <a
           target="_blank"
           onClick={() => logClick('Learn More', id)}
-          href="https://www.spinnaker.io/reference/managed-delivery"
+          href="https://www.spinnaker.io/guides/user/managed-delivery/"
         >
           Learn More
         </a>
@@ -56,8 +58,9 @@ export const ManagedResourceDetailsIndicator = ({
   // events are getting trapped by React bootstrap menu
   const allowNavigation = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
-    if (target && target.hasAttribute('href')) {
-      window.location.href = target.getAttribute('href');
+    const href = target?.getAttribute('href');
+    if (href) {
+      window.location.href = href;
     }
   };
 
@@ -76,7 +79,7 @@ export const ManagedResourceDetailsIndicator = ({
     <div className="flex-container-h middle ManagedResourceDetailsIndicator">
       <HoverablePopover template={helpText} placement="left">
         <div className="md-logo flex-container-h middle">
-          <img src={require('./icons/md-logo-color.svg')} width="36px" />
+          <img src={managedDeliveryLogo} width="36px" />
         </div>
       </HoverablePopover>
       <div className="flex-container-v middle flex-1 sp-margin-l-left">
@@ -99,7 +102,12 @@ export const ManagedResourceDetailsIndicator = ({
               </MenuItem>
             )}
             <li>
-              <a target="_blank" onClick={() => logClick('History', id)} href={`${SETTINGS.gateUrl}/history/${id}`}>
+              <a
+                onClick={() => {
+                  showManagedResourceHistoryModal(resourceSummary);
+                  logClick('History', id);
+                }}
+              >
                 History
               </a>
             </li>

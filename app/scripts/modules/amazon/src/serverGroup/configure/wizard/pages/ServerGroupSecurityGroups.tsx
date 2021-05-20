@@ -1,16 +1,18 @@
-import React from 'react';
 import { FormikProps } from 'formik';
+import React from 'react';
+
 import { IWizardPageComponent } from '@spinnaker/core';
 
 import { SecurityGroupSelector } from '../securityGroups/SecurityGroupSelector';
-import { IAmazonServerGroupCommand } from '../../serverGroupConfiguration.service';
 import { ServerGroupSecurityGroupsRemoved } from '../securityGroups/ServerGroupSecurityGroupsRemoved';
+import { IAmazonServerGroupCommand } from '../../serverGroupConfiguration.service';
 
 export interface IServerGroupSecurityGroupsProps {
   formik: FormikProps<IAmazonServerGroupCommand>;
 }
 
-export class ServerGroupSecurityGroups extends React.Component<IServerGroupSecurityGroupsProps>
+export class ServerGroupSecurityGroups
+  extends React.Component<IServerGroupSecurityGroupsProps>
   implements IWizardPageComponent<IAmazonServerGroupCommand> {
   public validate(values: IAmazonServerGroupCommand) {
     const errors = {} as any;

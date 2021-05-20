@@ -1,10 +1,9 @@
-import { isDate, isObject, isUndefined } from 'lodash';
 import { StateService } from '@uirouter/core';
+import { isDate, isObject, isUndefined } from 'lodash';
 
-import { ReactInjector } from 'core/reactShims';
 import { ITask } from 'core/domain';
 import { NameUtils } from 'core/naming';
-
+import { ReactInjector } from 'core/reactShims';
 import { Registry } from 'core/registry';
 
 // TODO: refactor to marker interface and have input types declare expected fields
@@ -103,13 +102,13 @@ class ApplicationsUrlBuilder implements IUrlBuilder {
     let result: string;
     if (input.project) {
       result = $state.href(
-        'home.project.application.insight.clusters',
+        'home.project.application',
         { application: input.application, project: input.project },
         { inherit: false },
       );
     } else {
       result = $state.href(
-        'home.applications.application.insight.clusters',
+        'home.applications.application',
         {
           application: input.application,
         },

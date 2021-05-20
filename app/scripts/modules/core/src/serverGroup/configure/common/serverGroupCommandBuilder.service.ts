@@ -1,14 +1,15 @@
 import { module } from 'angular';
-
+import { IAggregatedAccounts, IRegion } from 'core/account/AccountService';
 import { Application } from 'core/application/application.model';
-import { IMoniker } from 'core/naming/IMoniker';
-import { ILoadBalancer, ISecurityGroup, ISubnet, IPipeline, IStage, IManagedResourceSummary } from 'core/domain';
-import { ICapacity } from '../../serverGroupWriter.service';
-import { IDeploymentStrategy } from 'core/deploymentStrategy';
-import { ISecurityGroupsByAccountSourceData } from 'core/securityGroup/securityGroupReader.service';
-import { IRegion, IAggregatedAccounts } from 'core/account/AccountService';
 import { PROVIDER_SERVICE_DELEGATE, ProviderServiceDelegate } from 'core/cloudProvider';
+import { IDeploymentStrategy } from 'core/deploymentStrategy';
+import { ILoadBalancer, IManagedResourceSummary, IPipeline, ISecurityGroup, IStage, ISubnet } from 'core/domain';
 import { IPreferredInstanceType } from 'core/instance';
+import { getKindName } from 'core/managed';
+import { IMoniker } from 'core/naming/IMoniker';
+import { ISecurityGroupsByAccountSourceData } from 'core/securityGroup/securityGroupReader.service';
+
+import { ICapacity } from '../../serverGroupWriter.service';
 
 export interface IServerGroupCommandBuilderOptions {
   account: string;
@@ -120,7 +121,6 @@ export interface IServerGroupCommand {
   };
   stack?: string;
   moniker?: IMoniker;
-  spelLoadBalancers: string[];
   strategy: string;
   subnetType: string;
   suspendedProcesses: string[];
@@ -145,10 +145,10 @@ export interface IServerGroupCommand {
 
 export const setMatchingResourceSummary = (command: IServerGroupCommand) => {
   command.resourceSummary = (command.backingData.managedResources ?? []).find(
-    resource =>
+    (resource) =>
       !resource.isPaused &&
-      resource.kind === 'cluster' &&
-      resource.locations.regions.some(r => r.name === command.region) &&
+      getKindName(resource.kind) === 'cluster' &&
+      resource.locations.regions.some((r) => r.name === command.region) &&
       (resource.moniker.stack ?? '') === command.stack &&
       (resource.moniker.detail ?? '') === command.freeFormDetails &&
       resource.locations.account === command.credentials,
@@ -156,8 +156,8 @@ export const setMatchingResourceSummary = (command: IServerGroupCommand) => {
 };
 
 export class ServerGroupCommandBuilderService {
-  private getDelegate(provider: string, skin?: string): any {
-    return this.providerServiceDelegate.getDelegate(provider, 'serverGroup.commandBuilder', skin);
+  private getDelegate(provider: string): any {
+    return this.providerServiceDelegate.getDelegate(provider, 'serverGroup.commandBuilder');
   }
 
   public static $inject = ['providerServiceDelegate'];
@@ -167,9 +167,8 @@ export class ServerGroupCommandBuilderService {
     application: Application,
     provider: string,
     options: IServerGroupCommandBuilderOptions,
-    skin?: string,
   ): any {
-    return this.getDelegate(provider, skin).buildNewServerGroupCommand(application, options);
+    return this.getDelegate(provider).buildNewServerGroupCommand(application, options);
   }
 
   public buildServerGroupCommandFromExisting(application: Application, serverGroup: any, mode?: string): any {

@@ -1,22 +1,23 @@
-import React from 'react';
-import { filter, flatten, groupBy, set, uniq } from 'lodash';
 import { FormikErrors, FormikProps } from 'formik';
+import { filter, flatten, groupBy, set, uniq } from 'lodash';
+import React from 'react';
 import { Observable, Subject } from 'rxjs';
 
 import {
   Application,
+  CheckboxInput,
+  FormValidator,
   HelpField,
   IWizardPageComponent,
   spelNumberCheck,
-  SpInput,
   SpelNumberInput,
+  SpInput,
   ValidationMessage,
-  FormValidator,
   Validators,
 } from '@spinnaker/core';
-import { isNameLong, isNameInUse } from '../common/targetGroupValidators';
-
 import { IAmazonApplicationLoadBalancer, IAmazonNetworkLoadBalancerUpsertCommand } from 'amazon/domain';
+
+import { isNameInUse, isNameLong } from '../common/targetGroupValidators';
 
 export interface ITargetGroupsProps {
   app: Application;
@@ -30,7 +31,8 @@ export interface ITargetGroupsState {
   oldTargetGroupCount: number;
 }
 
-export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGroupsState>
+export class TargetGroups
+  extends React.Component<ITargetGroupsProps, ITargetGroupsState>
   implements IWizardPageComponent<IAmazonNetworkLoadBalancerUpsertCommand> {
   public protocols = ['TCP'];
   public healthProtocols = ['TCP', 'HTTP', 'HTTPS'];
@@ -51,13 +53,13 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
     values: IAmazonNetworkLoadBalancerUpsertCommand,
   ): FormikErrors<IAmazonNetworkLoadBalancerUpsertCommand> {
     const duplicateTargetGroups = uniq(
-      flatten(filter(groupBy(values.targetGroups, 'name'), count => count.length > 1)).map(tg => tg.name),
+      flatten(filter(groupBy(values.targetGroups, 'name'), (count) => count.length > 1)).map((tg) => tg.name),
     );
     const formValidator = new FormValidator(values);
     const { arrayForEach } = formValidator;
 
     formValidator.field('targetGroups').withValidators(
-      arrayForEach(builder => {
+      arrayForEach((builder) => {
         builder
           .field('name', 'Name')
           .required()
@@ -73,27 +75,27 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
           .field('port', 'Port')
           .required()
           .spelAware()
-          .withValidators(value => spelNumberCheck(value));
+          .withValidators((value) => spelNumberCheck(value));
         builder
           .field('healthCheckInterval', 'Health Check Interval')
           .required()
           .spelAware()
-          .withValidators(value => spelNumberCheck(value));
+          .withValidators((value) => spelNumberCheck(value));
         builder
           .field('healthyThreshold', 'Healthy Threshold')
           .required()
           .spelAware()
-          .withValidators(value => spelNumberCheck(value));
+          .withValidators((value) => spelNumberCheck(value));
         builder
           .field('unhealthyThreshold', 'Unhealthy Threshold')
           .required()
           .spelAware()
-          .withValidators(value => spelNumberCheck(value));
+          .withValidators((value) => spelNumberCheck(value));
         builder
           .field('healthCheckPort', 'Health Check Port')
           .required()
           .spelAware()
-          .withValidators(value => (value === 'traffic-port' ? null : spelNumberCheck(value)));
+          .withValidators((value) => (value === 'traffic-port' ? null : spelNumberCheck(value)));
         builder.field('protocol', 'Protocol').required();
         builder.field('healthCheckProtocol', 'Health Check Protocol').required();
       }),
@@ -115,7 +117,7 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
         app.getDataSource('loadBalancers').data.forEach((lb: IAmazonApplicationLoadBalancer) => {
           if (lb.loadBalancerType !== 'classic') {
             if (!loadBalancer || lb.name !== loadBalancer.name) {
-              lb.targetGroups.forEach(targetGroup => {
+              lb.targetGroups.forEach((targetGroup) => {
                 targetGroupsByAccountAndRegion[lb.account] = targetGroupsByAccountAndRegion[lb.account] || {};
                 targetGroupsByAccountAndRegion[lb.account][lb.region] =
                   targetGroupsByAccountAndRegion[lb.account][lb.region] || [];
@@ -157,7 +159,7 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
       healthyThreshold: 10,
       unhealthyThreshold: 10,
       attributes: {
-        deregistrationDelay: 600,
+        deregistrationDelay: 300,
       },
     });
     setFieldValue('targetGroups', values.targetGroups);
@@ -188,9 +190,9 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
     const { errors, values } = this.props.formik;
     const { oldTargetGroupCount } = this.state;
 
-    const ProtocolOptions = this.protocols.map(p => <option key={p}>{p}</option>);
-    const HealthProtocolOptions = this.healthProtocols.map(p => <option key={p}>{p}</option>);
-    const TargetTypeOptions = this.targetTypes.map(p => <option key={p}>{p}</option>);
+    const ProtocolOptions = this.protocols.map((p) => <option key={p}>{p}</option>);
+    const HealthProtocolOptions = this.healthProtocols.map((p) => <option key={p}>{p}</option>);
+    const TargetTypeOptions = this.targetTypes.map((p) => <option key={p}>{p}</option>);
 
     return (
       <div className="container-fluid form-horizontal">
@@ -210,7 +212,7 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
                             className="form-control input-sm target-group-name"
                             type="text"
                             value={targetGroup.name}
-                            onChange={event => this.targetGroupFieldChanged(index, 'name', event.target.value)}
+                            onChange={(event) => this.targetGroupFieldChanged(index, 'name', event.target.value)}
                             required={true}
                             disabled={index < oldTargetGroupCount}
                           />
@@ -235,7 +237,9 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
                             <select
                               className="form-control input-sm"
                               value={targetGroup.targetType}
-                              onChange={event => this.targetGroupFieldChanged(index, 'targetType', event.target.value)}
+                              onChange={(event) =>
+                                this.targetGroupFieldChanged(index, 'targetType', event.target.value)
+                              }
                               disabled={index < oldTargetGroupCount}
                             >
                               {TargetTypeOptions}
@@ -254,7 +258,7 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
                             <select
                               className="form-control input-sm inline-number"
                               value={targetGroup.protocol}
-                              onChange={event => this.targetGroupFieldChanged(index, 'protocol', event.target.value)}
+                              onChange={(event) => this.targetGroupFieldChanged(index, 'protocol', event.target.value)}
                               disabled={index < oldTargetGroupCount}
                             >
                               {ProtocolOptions}
@@ -266,7 +270,7 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
                             <input
                               className="form-control input-sm inline-number"
                               value={targetGroup.port}
-                              onChange={event => this.targetGroupFieldChanged(index, 'port', event.target.value)}
+                              onChange={(event) => this.targetGroupFieldChanged(index, 'port', event.target.value)}
                               type="text"
                               required={true}
                               disabled={index < oldTargetGroupCount}
@@ -285,7 +289,7 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
                               disabled={index < oldTargetGroupCount}
                               className="form-control input-sm inline-number"
                               value={targetGroup.healthCheckProtocol}
-                              onChange={event =>
+                              onChange={(event) =>
                                 this.targetGroupFieldChanged(index, 'healthCheckProtocol', event.target.value)
                               }
                             >
@@ -300,7 +304,7 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
                               name="healthCheckPort"
                               required={true}
                               value={targetGroup.healthCheckPort}
-                              onChange={event =>
+                              onChange={(event) =>
                                 this.targetGroupFieldChanged(index, 'healthCheckPort', event.target.value)
                               }
                             />
@@ -314,7 +318,7 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
                                 name="healthCheckPath"
                                 required={true}
                                 value={targetGroup.healthCheckPath}
-                                onChange={event =>
+                                onChange={(event) =>
                                   this.targetGroupFieldChanged(index, 'healthCheckPath', event.target.value)
                                 }
                               />
@@ -346,7 +350,10 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
                       </div>
                     </div>
                     <div className="wizard-pod-row">
-                      <div className="wizard-pod-row-title">Healthcheck Threshold</div>
+                      <div className="wizard-pod-row-title">
+                        <HelpField id="aws.targetGroup.nlbHealthcheckThreshold" />{' '}
+                        <span>Healthcheck Threshold&nbsp;</span>
+                      </div>
                       <div className="wizard-pod-row-contents">
                         <div className="wizard-pod-row-data">
                           <span className="wizard-pod-content">
@@ -372,7 +379,7 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
                               className="form-control input-sm inline-number"
                               type="text"
                               value={targetGroup.attributes.deregistrationDelay}
-                              onChange={event =>
+                              onChange={(event) =>
                                 this.targetGroupFieldChanged(
                                   index,
                                   'attributes.deregistrationDelay',
@@ -380,6 +387,21 @@ export class TargetGroups extends React.Component<ITargetGroupsProps, ITargetGro
                                 )
                               }
                             />
+                          </span>
+                          <span className="wizard-pod-content">
+                            <CheckboxInput
+                              name="deregistrationDelayConnectionTermination"
+                              text="Connection Termination"
+                              checked={targetGroup.attributes.deregistrationDelayConnectionTermination}
+                              onChange={(event: { target: { checked: boolean } }) => {
+                                this.targetGroupFieldChanged(
+                                  index,
+                                  'attributes.deregistrationDelayConnectionTermination',
+                                  event.target.checked,
+                                );
+                              }}
+                            />
+                            <HelpField id="aws.targetGroup.attributes.deregistrationDelayConnectionTermination" />
                           </span>
                         </div>
                       </div>

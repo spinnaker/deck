@@ -1,10 +1,11 @@
-import { IHttpPromiseCallbackArg, IPromise } from 'angular';
+import { IHttpPromiseCallbackArg } from 'angular';
+import { $q } from 'ngimport';
 
 import { ITask } from 'core/domain';
+
+import { AuthenticationService } from '../authentication/AuthenticationService';
 import { TaskReader } from './task.read.service';
 import { TaskWriter } from './task.write.service';
-import { AuthenticationService } from '../authentication/AuthenticationService';
-import { $q } from 'ngimport';
 
 export interface IJob {
   [attribute: string]: any;
@@ -25,7 +26,7 @@ export interface ITaskCommand {
 }
 
 export class TaskExecutor {
-  public static executeTask(taskCommand: ITaskCommand): IPromise<ITask> {
+  public static executeTask(taskCommand: ITaskCommand): PromiseLike<ITask> {
     const owner: any = taskCommand.application || taskCommand.project || { name: 'ad-hoc' };
     if (taskCommand.application && taskCommand.application.name) {
       taskCommand.application = taskCommand.application.name;
@@ -36,7 +37,7 @@ export class TaskExecutor {
     if (taskCommand.job[0].providerType === 'aws') {
       delete taskCommand.job[0].providerType;
     }
-    taskCommand.job.forEach(j => (j.user = AuthenticationService.getAuthenticatedUser().name));
+    taskCommand.job.forEach((j) => (j.user = AuthenticationService.getAuthenticatedUser().name));
 
     return TaskWriter.postTaskCommand(taskCommand).then(
       (task: any) => {
@@ -48,15 +49,13 @@ export class TaskExecutor {
         return TaskReader.getTask(taskId);
       },
       (response: IHttpPromiseCallbackArg<any>) => {
+        const message: string = response.data?.message || 'Sorry, no more information.';
         const error: any = {
           status: response.status,
           message: response.statusText,
+          log: message,
+          failureMessage: message,
         };
-        if (response.data && response.data.message) {
-          error.log = response.data.message;
-        } else {
-          error.log = 'Sorry, no more information.';
-        }
         return $q.reject(error);
       },
     );

@@ -1,10 +1,12 @@
+import { get } from 'lodash';
 import React from 'react';
 import { Modal } from 'react-bootstrap';
 
 import { IPipeline } from 'core/domain';
 import { ModalClose } from 'core/modal';
 import { IModalComponentProps } from 'core/presentation';
-import { PipelineConfigService } from 'core/pipeline';
+
+import { PipelineConfigService } from '../../services/PipelineConfigService';
 
 export interface IDisablePipelineModalProps extends IModalComponentProps {
   pipeline: IPipeline;
@@ -18,9 +20,9 @@ export function DisablePipelineModal(props: IDisablePipelineModalProps) {
   function disablePipeline() {
     PipelineConfigService.savePipeline({ ...pipeline, disabled: true }).then(
       () => closeModal(),
-      response => {
+      (response) => {
         setSaveError(true);
-        setErrorMessage(response.message || 'No message provided');
+        setErrorMessage(get(response, 'data.message', 'No message provided'));
       },
     );
   }
@@ -43,7 +45,7 @@ export function DisablePipelineModal(props: IDisablePipelineModalProps) {
               <p>
                 <a
                   className="btn btn-link"
-                  onClick={e => {
+                  onClick={(e) => {
                     e.preventDefault();
                     setSaveError(false);
                   }}

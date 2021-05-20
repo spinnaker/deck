@@ -1,17 +1,17 @@
 'use strict';
 
+import { module } from 'angular';
 import _ from 'lodash';
 
-import { module } from 'angular';
-
 import { AccountService } from '@spinnaker/core';
+
 import { DcosProviderSettings } from '../dcos.settings';
 
 export const DCOS_LOADBALANCER_TRANSFORMER = 'spinnaker.dcos.loadBalancer.transformer';
 export const name = DCOS_LOADBALANCER_TRANSFORMER; // for backwards compatibility
 module(DCOS_LOADBALANCER_TRANSFORMER, []).factory('dcosLoadBalancerTransformer', [
   '$q',
-  function($q) {
+  function ($q) {
     function normalizeLoadBalancer(loadBalancer) {
       loadBalancer.provider = loadBalancer.type;
       loadBalancer.instances = [];
@@ -20,7 +20,7 @@ module(DCOS_LOADBALANCER_TRANSFORMER, []).factory('dcosLoadBalancerTransformer',
     }
 
     function attemptToSetValidAccount(defaultAccount, defaultDcosCluster, loadBalancer) {
-      return AccountService.getCredentialsKeyedByAccount('dcos').then(function(dcosAccountsByName) {
+      return AccountService.getCredentialsKeyedByAccount('dcos').then(function (dcosAccountsByName) {
         const dcosAccountNames = _.keys(dcosAccountsByName);
         let firstDcosAccount = null;
 
@@ -74,10 +74,7 @@ module(DCOS_LOADBALANCER_TRANSFORMER, []).factory('dcosLoadBalancerTransformer',
         )
         .value();
 
-      instanceCounts.outOfService += _.chain(serverGroups)
-        .map('detachedInstances')
-        .flatten()
-        .value().length;
+      instanceCounts.outOfService += _.chain(serverGroups).map('detachedInstances').flatten().value().length;
 
       return instanceCounts;
     }

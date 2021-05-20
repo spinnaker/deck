@@ -1,10 +1,11 @@
 import React from 'react';
 
 import { IExecutionStage } from 'core/domain';
+import { robotToHuman } from 'core/presentation/robotToHumanFilter/robotToHuman.filter';
 import { StatusGlyph } from 'core/task/StatusGlyph';
 import { displayableTasks } from 'core/task/displayableTasks.filter';
 import { duration } from 'core/utils/timeFormatters';
-import { robotToHuman } from 'core/presentation/robotToHumanFilter/robotToHuman.filter';
+
 import { OrchestratedItemRunningTime } from '../../../executions/execution/OrchestratedItemRunningTime';
 
 export interface IExecutionStepDetailsProps {
@@ -24,7 +25,7 @@ export class ExecutionStepDetails extends React.Component<IExecutionStepDetailsP
 
   public componentDidMount(): void {
     const { item } = this.props;
-    const runningTask = (item.tasks || []).find(t => t.status === 'RUNNING');
+    const runningTask = (item.tasks || []).find((t) => t.status === 'RUNNING');
     if (runningTask) {
       this.runningTime = new OrchestratedItemRunningTime(runningTask, (time: number) =>
         this.setState({ runningTimeInMs: time }),

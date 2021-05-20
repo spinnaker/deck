@@ -1,4 +1,8 @@
-import { padStart, isNil, pickBy } from 'lodash';
+import { isNil, padStart, pickBy } from 'lodash';
+
+import { Application } from 'core/application';
+import { ILoadBalancer, IServerGroup } from 'core/domain';
+
 import { IMoniker } from './IMoniker';
 
 export interface IComponentName {
@@ -103,5 +107,32 @@ export class NameUtils {
 
   public static getMoniker(app: string, stack: string, detail: string): IMoniker {
     return pickBy({ app, stack, detail });
+  }
+
+  public static getMonikerForInstance(
+    cloudProvider: string,
+    instanceId: string,
+    app: Application,
+  ): PromiseLike<IMoniker> {
+    return app.ready().then(() => {
+      const serverGroups = app.getDataSource('serverGroups').data as IServerGroup[];
+      const loadBalancers = app.getDataSource('loadBalancers').data as ILoadBalancer[];
+      const loadBalancerServerGroups = loadBalancers
+        .map((lb) => lb.serverGroups)
+        .reduce((acc, sg) => acc.concat(sg), []);
+
+      const hasInstance = (obj: IServerGroup | ILoadBalancer) => {
+        return (
+          obj.cloudProvider === cloudProvider && (obj.instances || []).some((instance) => instance.id === instanceId)
+        );
+      };
+
+      const all: Array<IServerGroup | ILoadBalancer> = []
+        .concat(serverGroups)
+        .concat(loadBalancers)
+        .concat(loadBalancerServerGroups);
+      const found = all.find(hasInstance);
+      return found && found.moniker;
+    });
   }
 }

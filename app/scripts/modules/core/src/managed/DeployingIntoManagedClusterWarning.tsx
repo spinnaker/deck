@@ -1,7 +1,9 @@
-import React from 'react';
-import { IServerGroupCommand } from 'core/serverGroup';
 import { FormikProps } from 'formik';
+import React from 'react';
+
 import { Application } from 'core/application';
+import { IServerGroupCommand } from 'core/serverGroup';
+
 import { toggleResourcePause } from './toggleResourceManagement';
 
 export interface IDeployingIntoManagedClusterWarningProps {
@@ -15,6 +17,7 @@ export const DeployingIntoManagedClusterWarning = ({ app, formik }: IDeployingIn
   const command = formik.values;
   const pauseResource = React.useCallback(() => {
     const { resourceSummary, backingData } = formik.values;
+    if (!resourceSummary) return;
     toggleResourcePause(resourceSummary, app).then(
       () => {
         backingData.managedResources = app.getDataSource('managedResources')?.data?.resources;
@@ -45,9 +48,9 @@ export const DeployingIntoManagedClusterWarning = ({ app, formik }: IDeployingIn
   return (
     <div className="alert alert-danger">
       <p>
-        <b>🌈 Spinnaker is continuously managing this resource.</b>
+        <b>🌈 Spinnaker is managing this resource.</b>
       </p>
-      <p>Any changes you make to this cluster will be stomped in favor of the declarative configuration.</p>
+      <p>Any changes you make to this cluster will be overridden in favor of the desired state.</p>
       <p>If you need to manually deploy a new version of this server group, you should pause management.</p>
       <div className="sp-margin-m-top">
         <button className="passive" onClick={pauseResource}>

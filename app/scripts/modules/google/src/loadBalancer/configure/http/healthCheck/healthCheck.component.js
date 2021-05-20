@@ -1,8 +1,9 @@
 'use strict';
 
 import { module } from 'angular';
-import { HealthCheckTemplate } from '../templates';
 import _ from 'lodash';
+
+import { HealthCheckTemplate } from '../templates';
 
 export const GOOGLE_LOADBALANCER_CONFIGURE_HTTP_HEALTHCHECK_HEALTHCHECK_COMPONENT =
   'spinnaker.deck.httpLoadBalancer.healthCheck.component';
@@ -17,20 +18,20 @@ module(GOOGLE_LOADBALANCER_CONFIGURE_HTTP_HEALTHCHECK_HEALTHCHECK_COMPONENT, [])
       index: '=',
     },
     templateUrl: require('./healthCheck.component.html'),
-    controller: function() {
+    controller: function () {
       this.max = Number.MAX_SAFE_INTEGER;
       this.backingData = this.command.backingData;
       this.loadBalancer = this.command.loadBalancer;
       const healthChecksByName = this.backingData.healthChecksKeyedByName;
 
-      this.onHealthCheckSelect = selectedHealthCheck => {
+      this.onHealthCheckSelect = (selectedHealthCheck) => {
         assign(selectedHealthCheck);
       };
 
       this.getAllHealthCheckNames = () => {
         return this.command.backingData.healthChecks
-          .filter(hc => hc.account === this.loadBalancer.credentials)
-          .map(hc => hc.name);
+          .filter((hc) => hc.account === this.loadBalancer.credentials)
+          .map((hc) => hc.name);
       };
 
       this.toggleEditExisting = () => {
@@ -42,7 +43,7 @@ module(GOOGLE_LOADBALANCER_CONFIGURE_HTTP_HEALTHCHECK_HEALTHCHECK_COMPONENT, [])
         }
       };
 
-      const assign = toAssign => {
+      const assign = (toAssign) => {
         this.loadBalancer.healthChecks[this.index] = this.healthCheck = toAssign;
       };
 

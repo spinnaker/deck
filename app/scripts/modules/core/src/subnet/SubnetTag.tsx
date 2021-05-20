@@ -1,4 +1,7 @@
 import React from 'react';
+
+import { CopyToClipboard } from 'core/utils';
+
 import { SubnetReader } from './subnet.read.service';
 
 export interface ISubnetTagProps {
@@ -15,7 +18,7 @@ export class SubnetTag extends React.Component<ISubnetTagProps, ISubnetTagState>
   public componentDidMount() {
     const { subnetId } = this.props;
     if (subnetId) {
-      SubnetReader.getSubnetPurpose(subnetId).then(name => {
+      SubnetReader.getSubnetPurpose(subnetId).then((name) => {
         this.setState({
           subnetLabel: name,
         });
@@ -24,6 +27,12 @@ export class SubnetTag extends React.Component<ISubnetTagProps, ISubnetTagState>
   }
 
   public render() {
-    return <span className="subnet-tag">{this.state.subnetLabel}</span>;
+    const { subnetId } = this.props;
+    return (
+      <span className="subnet-tag">
+        {this.state.subnetLabel}
+        <CopyToClipboard text={subnetId} toolTip={`${subnetId} (click to copy)`} />
+      </span>
+    );
   }
 }

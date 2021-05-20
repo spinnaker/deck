@@ -1,9 +1,9 @@
 'use strict';
 
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 import * as angular from 'angular';
 
 import { CACHE_INITIALIZER_SERVICE, FirewallLabels } from '@spinnaker/core';
-import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
 export const AMAZON_SECURITYGROUP_CONFIGURE_CREATESECURITYGROUPCTRL =
   'spinnaker.amazon.securityGroup.create.controller';
@@ -18,7 +18,7 @@ angular
     'cacheInitializer',
     'application',
     'securityGroup',
-    function($scope, $uibModalInstance, $state, $controller, cacheInitializer, application, securityGroup) {
+    function ($scope, $uibModalInstance, $state, $controller, cacheInitializer, application, securityGroup) {
       $scope.pages = {
         location: require('./createSecurityGroupProperties.html'),
         ingress: require('./createSecurityGroupIngress.html'),
@@ -26,7 +26,7 @@ angular
 
       const ctrl = this;
 
-      ctrl.translate = label => FirewallLabels.get(label);
+      ctrl.translate = (label) => FirewallLabels.get(label);
 
       angular.extend(
         this,

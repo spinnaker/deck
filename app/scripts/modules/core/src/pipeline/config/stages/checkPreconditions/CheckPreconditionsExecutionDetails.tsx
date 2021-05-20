@@ -1,10 +1,10 @@
-import React from 'react';
 import { get, isBoolean, isString } from 'lodash';
+import React from 'react';
 
-import { StageFailureMessage } from 'core/pipeline';
+import { robotToHuman } from 'core/presentation/robotToHumanFilter/robotToHuman.filter';
 
 import { ExecutionDetailsSection, IExecutionDetailsSectionProps } from '../common';
-import { robotToHuman } from 'core/presentation/robotToHumanFilter/robotToHuman.filter';
+import { StageFailureMessage } from '../../../details';
 
 export function CheckPreconditionsExecutionDetails(props: IExecutionDetailsSectionProps) {
   const context = get(props.stage, 'context.context', {} as any);
@@ -17,8 +17,8 @@ export function CheckPreconditionsExecutionDetails(props: IExecutionDetailsSecti
         <div className="col-md-12">
           <dl className="dl-horizontal">
             {Object.keys(context)
-              .filter(key => !['failureMessage'].includes(key) && context[key] !== null)
-              .map(key => (
+              .filter((key) => !['failureMessage'].includes(key) && context[key] !== null)
+              .map((key) => (
                 <div key={key}>
                   <dt>{robotToHuman(key)}</dt>
                   <dd>
@@ -33,7 +33,7 @@ export function CheckPreconditionsExecutionDetails(props: IExecutionDetailsSecti
           </dl>
         </div>
       </div>
-      <StageFailureMessage stage={props.stage} message={stageFailureMessage} />
+      {props.stage.status !== 'SUCCEEDED' && <StageFailureMessage stage={props.stage} message={stageFailureMessage} />}
     </ExecutionDetailsSection>
   );
 }

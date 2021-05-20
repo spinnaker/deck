@@ -1,3 +1,5 @@
+/// <reference path="./types/index.d.ts" />
+
 import './utils/failedToInstantiateModule';
 
 export * from './account';
@@ -5,6 +7,8 @@ export * from './api';
 export * from './application';
 export * from './artifact';
 export * from './authentication';
+
+export * from './banner';
 
 export * from './cache';
 export * from './certificates';

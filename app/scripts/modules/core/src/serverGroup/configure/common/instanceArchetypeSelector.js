@@ -1,9 +1,10 @@
-import { CORE_SERVERGROUP_CONFIGURE_COMMON_COSTFACTOR } from './costFactor';
-import { CORE_PRESENTATION_ISVISIBLE_ISVISIBLE_DIRECTIVE } from '../../../presentation/isVisible/isVisible.directive';
-import { CORE_SERVERGROUP_CONFIGURE_COMMON_DIRTYINSTANCETYPENOTIFICATION_COMPONENT } from './dirtyInstanceTypeNotification.component';
-('use strict');
-
 import { module } from 'angular';
+
+import { CORE_SERVERGROUP_CONFIGURE_COMMON_COSTFACTOR } from './costFactor';
+import { CORE_SERVERGROUP_CONFIGURE_COMMON_DIRTYINSTANCETYPENOTIFICATION_COMPONENT } from './dirtyInstanceTypeNotification.component';
+import { CORE_PRESENTATION_ISVISIBLE_ISVISIBLE_DIRECTIVE } from '../../../presentation/isVisible/isVisible.directive';
+
+('use strict');
 
 export const CORE_SERVERGROUP_CONFIGURE_COMMON_INSTANCEARCHETYPESELECTOR =
   'spinnaker.core.serverGroup.configure.common.instanceArchetypeSelector';
@@ -13,7 +14,7 @@ module(CORE_SERVERGROUP_CONFIGURE_COMMON_INSTANCEARCHETYPESELECTOR, [
   CORE_PRESENTATION_ISVISIBLE_ISVISIBLE_DIRECTIVE,
   CORE_SERVERGROUP_CONFIGURE_COMMON_DIRTYINSTANCETYPENOTIFICATION_COMPONENT,
 ])
-  .directive('instanceArchetypeSelector', function() {
+  .directive('instanceArchetypeSelector', function () {
     return {
       restrict: 'E',
       scope: {
@@ -27,9 +28,9 @@ module(CORE_SERVERGROUP_CONFIGURE_COMMON_INSTANCEARCHETYPESELECTOR, [
   .controller('InstanceArchetypeSelectorCtrl', [
     '$scope',
     'instanceTypeService',
-    function($scope, instanceTypeService) {
+    function ($scope, instanceTypeService) {
       const controller = this;
-      instanceTypeService.getCategories($scope.command.selectedProvider).then(function(categories) {
+      instanceTypeService.getCategories($scope.command.selectedProvider).then(function (categories) {
         $scope.instanceProfiles = categories;
         if ($scope.instanceProfiles.length % 3 === 0) {
           $scope.columns = 3;
@@ -43,23 +44,23 @@ module(CORE_SERVERGROUP_CONFIGURE_COMMON_INSTANCEARCHETYPESELECTOR, [
         controller.selectInstanceType($scope.command.viewState.instanceProfile);
       });
 
-      this.selectInstanceType = function(type) {
+      this.selectInstanceType = function (type) {
         if ($scope.selectedInstanceProfile && $scope.selectedInstanceProfile.type === type) {
           type = null;
           $scope.selectedInstanceProfile = null;
         }
         $scope.command.viewState.instanceProfile = type;
-        $scope.instanceProfiles.forEach(function(profile) {
+        $scope.instanceProfiles.forEach(function (profile) {
           if (profile.type === type) {
             $scope.selectedInstanceProfile = profile;
           }
         });
       };
 
-      this.updateInstanceTypeDetails = function() {
+      this.updateInstanceTypeDetails = function () {
         instanceTypeService
           .getInstanceTypeDetails($scope.command.selectedProvider, $scope.command.instanceType)
-          .then(function(instanceTypeDetails) {
+          .then(function (instanceTypeDetails) {
             $scope.command.viewState.instanceTypeDetails = instanceTypeDetails;
           });
       };

@@ -2,12 +2,12 @@ import React from 'react';
 import { Button, Modal } from 'react-bootstrap';
 
 import {
+  CloudProviderRegistry,
   ILoadBalancerModalProps,
   ModalClose,
-  ReactModal,
-  noop,
-  CloudProviderRegistry,
   ModalInjector,
+  noop,
+  ReactModal,
 } from '@spinnaker/core';
 
 import { AzureLoadBalancerTypes, IAzureLoadBalancer } from '../../utility';
@@ -80,7 +80,7 @@ export class AzureLoadBalancerChoiceModal extends React.Component<
         <Modal.Body>
           <div className="modal-body">
             <div className="card-choices">
-              {choices.map(choice => (
+              {choices.map((choice) => (
                 <div
                   key={choice.type}
                   className={`card ${selectedChoice === choice ? 'active' : ''}`}

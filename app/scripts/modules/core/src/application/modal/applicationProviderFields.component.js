@@ -1,10 +1,10 @@
 'use strict';
 
+import { module } from 'angular';
 import _ from 'lodash';
+
 import { CloudProviderRegistry } from 'core/cloudProvider';
 import { SETTINGS } from 'core/config/settings';
-
-import { module } from 'angular';
 
 export const CORE_APPLICATION_MODAL_APPLICATIONPROVIDERFIELDS_COMPONENT =
   'spinnaker.core.application.modal.applicationProviderFields.directive';
@@ -18,11 +18,11 @@ module(CORE_APPLICATION_MODAL_APPLICATIONPROVIDERFIELDS_COMPONENT, [])
     },
     controller: 'ApplicationProviderFieldsCtrl',
   })
-  .controller('ApplicationProviderFieldsCtrl', function() {
+  .controller('ApplicationProviderFieldsCtrl', function () {
     const templateUrlPath = 'applicationProviderFields.templateUrl';
     const defaultProviderFields = SETTINGS.providers;
 
-    this.initializeApplicationField = fieldPath => {
+    this.initializeApplicationField = (fieldPath) => {
       const applicationFieldPath = 'providerSettings.' + fieldPath;
 
       if (_.has(defaultProviderFields, fieldPath) && !_.has(this.application, applicationFieldPath)) {
@@ -41,7 +41,7 @@ module(CORE_APPLICATION_MODAL_APPLICATIONPROVIDERFIELDS_COMPONENT, [])
       }
 
       return (candidateProvidersToShow || [])
-        .filter(provider => CloudProviderRegistry.hasValue(provider, templateUrlPath))
-        .map(provider => CloudProviderRegistry.getValue(provider, templateUrlPath));
+        .filter((provider) => CloudProviderRegistry.hasValue(provider, templateUrlPath))
+        .map((provider) => CloudProviderRegistry.getValue(provider, templateUrlPath));
     };
   });

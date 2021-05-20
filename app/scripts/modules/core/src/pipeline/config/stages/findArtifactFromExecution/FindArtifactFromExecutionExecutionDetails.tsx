@@ -1,12 +1,9 @@
 import React from 'react';
 
-import {
-  ExecutionDetailsSection,
-  IExecutionDetailsSectionProps,
-  StageExecutionLogs,
-  StageFailureMessage,
-} from 'core/pipeline';
 import { JsonUtils } from 'core/utils';
+
+import { ExecutionDetailsSection, IExecutionDetailsSectionProps } from '../common';
+import { StageExecutionLogs, StageFailureMessage } from '../../../details';
 
 export class FindArtifactFromExecutionExecutionDetails extends React.Component<IExecutionDetailsSectionProps> {
   public static title = 'artifactDetails';
@@ -21,7 +18,7 @@ export class FindArtifactFromExecutionExecutionDetails extends React.Component<I
     return (
       <ExecutionDetailsSection name={name} current={current}>
         <div className="row">
-          {expectedArtifacts.map(expectedArtifact => (
+          {expectedArtifacts.map((expectedArtifact) => (
             <div key={expectedArtifact.id}>
               <h5>{expectedArtifact.displayName}</h5>
               <div>Match Artifact</div>

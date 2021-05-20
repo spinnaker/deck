@@ -1,20 +1,18 @@
-import React from 'react';
-import { sortBy } from 'lodash';
-
 import { UISref } from '@uirouter/react';
 import { UIRouterContextComponent } from '@uirouter/react-hybrid';
+import { sortBy } from 'lodash';
+import React from 'react';
 
 import {
   AccountService,
   Application,
   CollapsibleSection,
-  ISecurityGroup,
   FirewallLabels,
+  ISecurityGroup,
   ReactInjector,
 } from '@spinnaker/core';
-
-import { TitusReactInjector } from 'titus/reactShims';
 import { ITitusServerGroupView } from 'titus/domain';
+import { TitusReactInjector } from 'titus/reactShims';
 
 export interface ITitusServerGroupDetailsSectionProps {
   app: Application;
@@ -42,7 +40,7 @@ export class TitusSecurityGroupsDetailsSection extends React.Component<
     const { app, serverGroup } = props;
     const { region } = serverGroup;
     if (app.securityGroupsIndex && serverGroup.accountDetails) {
-      const securityGroups = serverGroup.securityGroups.map(sgId =>
+      const securityGroups = serverGroup.securityGroups.map((sgId) =>
         TitusReactInjector.titusSecurityGroupReader.resolveIndexedSecurityGroup(
           app.securityGroupsIndex,
           { account: serverGroup.accountDetails.awsAccount, region },
@@ -51,15 +49,15 @@ export class TitusSecurityGroupsDetailsSection extends React.Component<
       );
       this.setState({ securityGroups });
     } else {
-      AccountService.listAllAccounts('titus').then(accounts => {
-        const titusAccount = accounts.find(a => a.name === serverGroup.account);
+      AccountService.listAllAccounts('titus').then((accounts) => {
+        const titusAccount = accounts.find((a) => a.name === serverGroup.account);
         if (titusAccount && titusAccount.awsAccount) {
-          ReactInjector.securityGroupReader.getAllSecurityGroups().then(allSecurityGroups => {
+          ReactInjector.securityGroupReader.getAllSecurityGroups().then((allSecurityGroups) => {
             const regionalGroups = allSecurityGroups[titusAccount.awsAccount]['aws'][region];
             const securityGroups = serverGroup.securityGroups
-              .map(sgId => regionalGroups.find(rg => rg.id === sgId))
-              .filter(g => g)
-              .map(sg => ({
+              .map((sgId) => regionalGroups.find((rg) => rg.id === sgId))
+              .filter((g) => g)
+              .map((sg) => ({
                 account: titusAccount.awsAccount,
                 name: sg.name,
                 id: sg.id,
@@ -85,9 +83,9 @@ export class TitusSecurityGroupsDetailsSection extends React.Component<
     return (
       <CollapsibleSection heading={FirewallLabels.get('Firewalls')} outerDivClassName="">
         <ul>
-          {initializing && serverGroup.securityGroups.map(sgId => <li key={sgId}>...</li>)}
+          {initializing && serverGroup.securityGroups.map((sgId) => <li key={sgId}>...</li>)}
           <UIRouterContextComponent>
-            {sortBy(securityGroups, 'name').map(securityGroup => (
+            {sortBy(securityGroups, 'name').map((securityGroup) => (
               <li key={securityGroup.name}>
                 <UISref
                   to="^.firewallDetails"

@@ -1,20 +1,16 @@
-import { IPromise } from 'angular';
-
-import { API } from 'core/api';
+import { REST } from 'core/api';
 import { IProject, IProjectCluster } from 'core/domain';
 
 export class ProjectReader {
-  public static listProjects(): IPromise<IProject[]> {
-    return API.all('projects').getList();
+  public static listProjects(): PromiseLike<IProject[]> {
+    return REST('/projects').get();
   }
 
-  public static getProjectConfig(projectName: string): IPromise<IProject> {
-    return API.one('projects', projectName).get();
+  public static getProjectConfig(projectName: string): PromiseLike<IProject> {
+    return REST('/projects').path(projectName).get();
   }
 
-  public static getProjectClusters(projectName: string): IPromise<IProjectCluster[]> {
-    return API.one('projects', projectName)
-      .all('clusters')
-      .getList();
+  public static getProjectClusters(projectName: string): PromiseLike<IProjectCluster[]> {
+    return REST('/projects').path(projectName, 'clusters').get();
   }
 }

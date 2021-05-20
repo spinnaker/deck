@@ -1,23 +1,23 @@
 'use strict';
 
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 import * as angular from 'angular';
-import { Observable, Subject } from 'rxjs';
+import ANGULAR_UI_BOOTSTRAP from 'angular-ui-bootstrap';
 import { extend } from 'lodash';
+import { Observable, Subject } from 'rxjs';
 
 import {
   ArtifactTypePatterns,
-  ExpectedArtifactSelectorViewController,
   excludeAllTypesExcept,
+  ExpectedArtifactSelectorViewController,
   IMAGE_READER,
   NgGCEImageArtifactDelegate,
 } from '@spinnaker/core';
-
 import { GceImageReader } from 'google/image';
-import { GOOGLE_GCEREGIONSELECTFIELD_DIRECTIVE } from '../../../../gceRegionSelectField.directive';
+
 import { GOOGLE_GCENETWORKSELECTFIELD_DIRECTIVE } from '../../../../gceNetworkSelectField.directive';
+import { GOOGLE_GCEREGIONSELECTFIELD_DIRECTIVE } from '../../../../gceRegionSelectField.directive';
 import { GOOGLE_SUBNET_SUBNETSELECTFIELD_DIRECTIVE } from '../../../../subnet/subnetSelectField.directive';
-import UIROUTER_ANGULARJS from '@uirouter/angularjs';
-import ANGULAR_UI_BOOTSTRAP from 'angular-ui-bootstrap';
 
 export const GOOGLE_SERVERGROUP_CONFIGURE_WIZARD_LOCATION_BASICSETTINGS_CONTROLLER =
   'spinnaker.google.serverGroup.configure.wizard.basicSettings.controller';
@@ -36,7 +36,7 @@ angular
     '$controller',
     '$uibModalStack',
     '$state',
-    function($scope, $controller, $uibModalStack, $state) {
+    function ($scope, $controller, $uibModalStack, $state) {
       function fetchImagesForAccount() {
         return Observable.fromPromise(
           GceImageReader.findImages({
@@ -48,7 +48,7 @@ angular
       }
 
       const imageSearchResultsStream = new Subject();
-      imageSearchResultsStream.switchMap(fetchImagesForAccount).subscribe(images => {
+      imageSearchResultsStream.switchMap(fetchImagesForAccount).subscribe((images) => {
         $scope.command.backingData.allImages = images;
       });
 
@@ -56,7 +56,7 @@ angular
         imageSearchResultsStream.next();
       };
 
-      this.selectImage = image => {
+      this.selectImage = (image) => {
         // called from a React component
         $scope.$apply(() => {
           $scope.command.image = image;
@@ -74,14 +74,14 @@ angular
       );
 
       this.stackPattern = {
-        test: function(stack) {
+        test: function (stack) {
           const pattern = $scope.command.viewState.templatingEnabled ? /^([a-zA-Z0-9]*(\${.+})*)*$/ : /^[a-zA-Z0-9]*$/;
           return pattern.test(stack);
         },
       };
 
       this.detailPattern = {
-        test: function(detail) {
+        test: function (detail) {
           const pattern = $scope.command.viewState.templatingEnabled
             ? /^([a-zA-Z0-9-]*(\${.+})*)*$/
             : /^[a-zA-Z0-9-]*$/;
@@ -105,33 +105,27 @@ angular
 
       this.excludedImageArtifactTypes = excludeAllTypesExcept(ArtifactTypePatterns.CUSTOM_OBJECT);
 
-      this.onImageArtifactEdited = artifact => {
+      this.onImageArtifactEdited = (artifact) => {
         $scope.$applyAsync(() => {
           $scope.command.imageArtifactId = null;
           $scope.command.imageArtifact = artifact;
         });
       };
 
-      this.onImageArtifactSelected = expectedArtifact => {
+      this.onImageArtifactSelected = (expectedArtifact) => {
         this.onChangeImageArtifactId(expectedArtifact.id);
       };
 
-      this.onChangeImageArtifactId = artifactId => {
+      this.onChangeImageArtifactId = (artifactId) => {
         $scope.$applyAsync(() => {
           $scope.command.imageArtifactId = artifactId;
           $scope.command.imageArtifact = null;
         });
       };
 
-      this.onImageArtifactAccountSelected = accountName => {
+      this.onImageArtifactAccountSelected = (accountName) => {
         $scope.$applyAsync(() => {
           $scope.command.imageAccountName = accountName;
-        });
-      };
-
-      this.updatePipeline = changes => {
-        $scope.$applyAsync(() => {
-          extend($scope.$parent.pipeline, changes);
         });
       };
 

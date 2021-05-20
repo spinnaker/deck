@@ -1,11 +1,12 @@
-import { uniq } from 'lodash';
 import { module } from 'angular';
+import { uniq } from 'lodash';
 
-import { AccountService, IAccountDetails, IRegion, IAggregatedAccounts } from 'core/account/AccountService';
+import { AccountService, IAccountDetails, IAggregatedAccounts, IRegion } from 'core/account/AccountService';
 import { Application } from 'core/application/application.model';
-import { ChaosMonkeyConfig, IChaosMonkeyExceptionRule } from './chaosMonkeyConfig.component';
-import { IClusterMatch } from 'core/widgets/cluster/clusterMatches.component';
 import { ClusterMatcher, IClusterMatchRule } from 'core/cluster/ClusterRuleMatcher';
+import { IClusterMatch } from 'core/widgets/cluster/clusterMatches.component';
+
+import { ChaosMonkeyConfig, IChaosMonkeyExceptionRule } from './chaosMonkeyConfig.component';
 
 import './chaosMonkeyExceptions.component.less';
 
@@ -52,19 +53,19 @@ export class ChaosMonkeyExceptionsController {
       const rule: IClusterMatchRule = { ...clusterMatchRule, location };
       this.clusterMatches.push(
         this.application.clusters
-          .filter(c =>
-            c.serverGroups.some(s => ClusterMatcher.getMatchingRule(c.account, s.region, c.name, [rule]) !== null),
+          .filter((c) =>
+            c.serverGroups.some((s) => ClusterMatcher.getMatchingRule(c.account, s.region, c.name, [rule]) !== null),
           )
-          .map(c => {
+          .map((c) => {
             return {
               name: c.name,
               account: exception.account,
-              regions: exception.region === '*' ? uniq(c.serverGroups.map(g => g.region)).sort() : [exception.region],
+              regions: exception.region === '*' ? uniq(c.serverGroups.map((g) => g.region)).sort() : [exception.region],
             };
           }),
       );
     });
-    this.clusterMatches.forEach(m => m.sort((a: IClusterMatch, b: IClusterMatch) => a.name.localeCompare(b.name)));
+    this.clusterMatches.forEach((m) => m.sort((a: IClusterMatch, b: IClusterMatch) => a.name.localeCompare(b.name)));
   }
 
   public updateConfig(): void {

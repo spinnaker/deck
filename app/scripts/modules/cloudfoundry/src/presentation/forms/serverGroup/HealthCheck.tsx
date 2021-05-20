@@ -32,9 +32,8 @@ export class HealthCheck extends React.Component<IHealthCheckProps> {
           <FormikFormField
             name={healthCheckTypeFieldName}
             label="Health Check Type"
-            fastField={false}
-            input={props => <RadioButtonInput {...props} inline={true} options={this.HEALTH_CHECK_TYPE_OPTIONS} />}
-            onChange={value => {
+            input={(props) => <RadioButtonInput {...props} inline={true} options={this.HEALTH_CHECK_TYPE_OPTIONS} />}
+            onChange={(value) => {
               onHealthCheckTypeChange && onHealthCheckTypeChange(value);
             }}
           />
@@ -44,8 +43,8 @@ export class HealthCheck extends React.Component<IHealthCheckProps> {
             <FormikFormField
               name={healthCheckHttpEndpointFieldName}
               label="Endpoint"
-              input={props => <TextInput {...props} required={true} />}
-              onChange={value => {
+              input={(props) => <TextInput {...props} required={true} />}
+              onChange={(value) => {
                 onHealthCheckHttpEndpointChange && onHealthCheckHttpEndpointChange(value);
               }}
               required={true}

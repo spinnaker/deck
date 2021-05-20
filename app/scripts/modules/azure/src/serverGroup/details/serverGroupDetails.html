@@ -18,9 +18,7 @@
     </div>
     <div class="header-text horizontal middle">
       <span class="glyphicon glyphicon-th"></span>
-      <h3 class="horizontal middle space-between flex-1" select-on-dbl-click>
-        {{serverGroup.name}}
-      </h3>
+      <h3 class="horizontal middle space-between flex-1" select-on-dbl-click>{{serverGroup.name}}</h3>
     </div>
     <div class="actions" ng-class="{ insights: serverGroup.insightActions.length > 0 }">
       <div class="dropdown" uib-dropdown dropdown-append-to-body>
@@ -59,7 +57,7 @@
     ></server-group-running-tasks-details>
 
     <collapsible-section heading="Server Group Information" expanded="true">
-      <dl class="dl-horizontal dl-flex">
+      <dl class="dl-horizontal dl-narrow">
         <dt>Created</dt>
         <dd>{{serverGroup.createdTime | timestamp}}</dd>
         <dt>Region</dt>
@@ -75,14 +73,14 @@
     </collapsible-section>
 
     <collapsible-section heading="Size" expanded="true">
-      <dl class="dl-horizontal dl-flex">
+      <dl class="dl-horizontal dl-narrow">
         <dt>Current</dt>
         <dd>{{serverGroup.instances.length}}</dd>
       </dl>
     </collapsible-section>
 
     <collapsible-section heading="Health" expanded="true">
-      <dl class="dl-horizontal dl-flex" ng-if="serverGroup">
+      <dl class="dl-horizontal dl-narrow" ng-if="serverGroup">
         <dt>Instances</dt>
         <dd>
           <health-counts container="serverGroup.instanceCounts" class="pull-left"></health-counts>
@@ -91,7 +89,7 @@
     </collapsible-section>
 
     <collapsible-section heading="{{firewallsLabel}}">
-      <dl class="dl-horizontal dl-flex">
+      <dl class="dl-horizontal dl-narrow">
         <dt>Name</dt>
         <dd>{{serverGroup.securityGroupName}}</dd>
       </dl>

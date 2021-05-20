@@ -1,15 +1,14 @@
-import { IAmazonLoadBalancerSourceData } from './IAmazonLoadBalancerSourceData';
 import {
+  IInstance,
+  IInstanceCounts,
   ILoadBalancer,
   ILoadBalancerDeleteCommand,
   ILoadBalancerUpsertCommand,
-  IInstance,
-  IInstanceCounts,
   ISubnet,
 } from '@spinnaker/core';
-
 import { IAuthenticateOidcActionConfig } from 'amazon/loadBalancer/OidcConfigReader';
 
+import { IAmazonLoadBalancerSourceData } from './IAmazonLoadBalancerSourceData';
 import { IAmazonServerGroup } from './IAmazonServerGroup';
 
 export type ClassicListenerProtocol = 'HTTP' | 'HTTPS' | 'TCP' | 'SSL';
@@ -56,6 +55,7 @@ export interface IAmazonApplicationLoadBalancer extends IAmazonLoadBalancer {
   ipAddressType?: string; // returned from clouddriver
   deletionProtection: boolean;
   idleTimeout: number;
+  loadBalancingCrossZone: boolean;
 }
 
 export interface IAmazonNetworkLoadBalancer extends IAmazonLoadBalancer {
@@ -64,6 +64,7 @@ export interface IAmazonNetworkLoadBalancer extends IAmazonLoadBalancer {
   ipAddressType?: string; // returned from clouddriver
   deletionProtection: boolean;
   idleTimeout: number;
+  loadBalancingCrossZone: boolean;
 }
 
 export interface IRedirectActionConfig {
@@ -115,10 +116,13 @@ export interface IListenerRule {
   priority: number | 'default';
 }
 
-export type ListenerRuleConditionField = 'path-pattern' | 'host-header';
+export type ListenerRuleConditionField = 'path-pattern' | 'host-header' | 'http-request-method';
 
 export interface IListenerRuleCondition {
   field: ListenerRuleConditionField;
+  httpRequestMethodConfig?: {
+    values: string[];
+  };
   values: string[];
 }
 
@@ -204,6 +208,7 @@ export interface INLBTargetGroupDescription {
   attributes: {
     // Defaults to 300
     deregistrationDelay?: number;
+    deregistrationDelayConnectionTermination?: boolean;
   };
   // Defaults to 10
   healthCheckInterval?: number;
@@ -239,6 +244,7 @@ export interface IAmazonLoadBalancerDeleteCommand extends ILoadBalancerDeleteCom
 export interface IClassicListenerDescription extends IClassicListener {
   sslCertificateId?: string;
   sslCertificateName?: string;
+  policyNames?: string[];
 }
 
 export interface IAmazonClassicLoadBalancerUpsertCommand extends IAmazonLoadBalancerUpsertCommand {
@@ -256,6 +262,7 @@ export interface IAmazonClassicLoadBalancerUpsertCommand extends IAmazonLoadBala
 
 export interface IAmazonApplicationLoadBalancerUpsertCommand extends IAmazonLoadBalancerUpsertCommand {
   deletionProtection: boolean;
+  ipAddressType?: string;
   idleTimeout: number;
   listeners: IListenerDescription[];
   targetGroups: IALBTargetGroupDescription[];
@@ -263,6 +270,7 @@ export interface IAmazonApplicationLoadBalancerUpsertCommand extends IAmazonLoad
 
 export interface IAmazonNetworkLoadBalancerUpsertCommand extends IAmazonLoadBalancerUpsertCommand {
   deletionProtection: boolean;
+  loadBalancingCrossZone: boolean;
   listeners: IListenerDescription[];
   targetGroups: INLBTargetGroupDescription[];
 }

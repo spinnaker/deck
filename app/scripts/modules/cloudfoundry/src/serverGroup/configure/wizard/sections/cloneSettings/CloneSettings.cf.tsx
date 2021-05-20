@@ -1,8 +1,6 @@
-import React from 'react';
-
-import { Observable, Subject } from 'rxjs';
-
 import { FormikErrors, FormikProps } from 'formik';
+import React from 'react';
+import { Observable, Subject } from 'rxjs';
 
 import {
   AccountService,
@@ -15,9 +13,9 @@ import {
   ReactSelectInput,
   StageConstants,
 } from '@spinnaker/core';
+import { FormikAccountRegionClusterSelector } from 'cloudfoundry/presentation';
 
 import { ICloudFoundryCreateServerGroupCommand } from '../../../serverGroupConfigurationModel.cf';
-import { FormikAccountRegionClusterSelector } from 'cloudfoundry/presentation';
 
 import 'cloudfoundry/common/cloudFoundry.less';
 
@@ -41,7 +39,7 @@ export class CloudFoundryServerGroupCloneSettings
   public componentDidMount(): void {
     Observable.fromPromise(AccountService.listAccounts('cloudfoundry'))
       .takeUntil(this.destroy$)
-      .subscribe(accounts => this.setState({ accounts }));
+      .subscribe((accounts) => this.setState({ accounts }));
   }
 
   public componentWillUnmount(): void {
@@ -80,11 +78,11 @@ export class CloudFoundryServerGroupCloneSettings
             <FormikFormField
               name={'target'}
               label="Target"
-              input={props => (
+              input={(props) => (
                 <ReactSelectInput
                   inputClassName="cloudfoundry-react-select"
                   {...props}
-                  options={StageConstants.TARGET_LIST.map(t => {
+                  options={StageConstants.TARGET_LIST.map((t) => {
                     return {
                       label: t.label,
                       value: t.val,

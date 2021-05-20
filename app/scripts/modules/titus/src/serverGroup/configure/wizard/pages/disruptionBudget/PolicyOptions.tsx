@@ -2,15 +2,14 @@ import React from 'react';
 
 import { FormikFormField, HelpField, NumberInput } from '@spinnaker/core';
 
-import { defaultJobDisruptionBudget } from '../../../serverGroupConfiguration.service';
-
 import { IFieldOption, IFieldOptionComponentProps } from './JobDisruptionBudget';
+import { defaultJobDisruptionBudget } from '../../../serverGroupConfiguration.service';
 
 const SelfManagedField = () => (
   <FormikFormField
     name="disruptionBudget.selfManaged.relocationTimeMs"
     label="Relocation Time"
-    input={props => (
+    input={(props) => (
       <div>
         <NumberInput {...props} />
         <HelpField expand={true} content="(milliseconds)" />
@@ -23,7 +22,7 @@ const UnhealthyTasksLimitsField = () => (
   <FormikFormField
     name="disruptionBudget.unhealthyTasksLimit.limitOfUnhealthyContainers"
     label="Limit of Unhealthy Containers"
-    input={props => (
+    input={(props) => (
       <div>
         <NumberInput {...props} />
         <HelpField expand={true} content="(integer)" />
@@ -35,9 +34,8 @@ const UnhealthyTasksLimitsField = () => (
 const AvailabilityPercentageLimit = (componentProps: IFieldOptionComponentProps) => (
   <FormikFormField
     name="disruptionBudget.availabilityPercentageLimit.percentageOfHealthyContainers"
-    fastField={false}
     label="Percentage of Healthy Containers"
-    input={props => (
+    input={(props) => (
       <div>
         <NumberInput {...props} disabled={componentProps.isDisabled} />
         <HelpField expand={true} content="0.0-100.0 (double)" />
@@ -50,7 +48,7 @@ const RelocationLimit = () => (
   <FormikFormField
     name="disruptionBudget.relocationLimit.limit"
     label="Limit"
-    input={props => (
+    input={(props) => (
       <div>
         <NumberInput {...props} />
         <HelpField expand={true} content="(tasks)" />

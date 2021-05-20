@@ -1,9 +1,7 @@
 import React from 'react';
-
 import { Observable, Subject } from 'rxjs';
 
 import { AccountService, IAccount, IPipeline, IStageConfigProps, StageConfigField } from '@spinnaker/core';
-
 import { AccountRegionClusterSelector } from 'cloudfoundry/presentation';
 
 export interface ICloudfoundryRollbackClusterStageProps extends IStageConfigProps {
@@ -35,7 +33,7 @@ export class CloudfoundryRollbackClusterStageConfig extends React.Component<
   public componentDidMount(): void {
     Observable.fromPromise(AccountService.listAccounts('cloudfoundry'))
       .takeUntil(this.destroy$)
-      .subscribe(accounts => this.setState({ accounts }));
+      .subscribe((accounts) => this.setState({ accounts }));
   }
 
   public componentWillUnmount(): void {

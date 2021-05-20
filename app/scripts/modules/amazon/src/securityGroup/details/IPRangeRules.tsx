@@ -1,5 +1,6 @@
 import React from 'react';
-import { Overridable, CollapsibleSection, LabeledValue, LabeledValueList } from '@spinnaker/core';
+
+import { CollapsibleSection, LabeledValue, LabeledValueList, Overridable } from '@spinnaker/core';
 
 export interface IIPRangeRulesProps {
   ipRules: IIPRangeRulesDetails[];
@@ -13,6 +14,7 @@ export interface IRangeRule {
   startPort: number;
   endPort: number;
   protocol: string;
+  description: string;
 }
 
 @Overridable('aws.securityGroup.ip.rules')
@@ -22,12 +24,12 @@ export class IPRangeRules extends React.Component<IIPRangeRulesProps> {
     const heading = `IP Range Rules (${ipRules.length})`;
     return (
       <CollapsibleSection heading={heading}>
-        {ipRules.map(rule => (
+        {ipRules.map((rule) => (
           <LabeledValueList className="horizontal-when-filters-collapsed">
             <LabeledValue label="IP Range" value={rule.address} />
             <LabeledValue
               label="Port Ranges"
-              value={rule.rules.map(r =>
+              value={rule.rules.map((r) =>
                 r.protocol === '-1' ? (
                   <span>
                     All ports and protocols

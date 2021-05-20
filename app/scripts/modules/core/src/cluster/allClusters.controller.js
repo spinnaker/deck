@@ -1,32 +1,27 @@
 'use strict';
 
 import { module } from 'angular';
-
+import ANGULAR_UI_BOOTSTRAP from 'angular-ui-bootstrap';
 import { CloudProviderRegistry, ProviderSelectionService } from 'core/cloudProvider';
-import { noop } from 'core/utils';
 import { SERVER_GROUP_COMMAND_BUILDER_SERVICE } from 'core/serverGroup/configure/common/serverGroupCommandBuilder.service';
-import { INSIGHT_FILTER_COMPONENT } from 'core/insight/insightFilter.component';
 import { ClusterState } from 'core/state';
-import { SKIN_SELECTION_SERVICE } from 'core/cloudProvider/skinSelection/skinSelection.service';
+import { noop } from 'core/utils';
 
+import { CORE_ACCOUNT_ACCOUNT_MODULE } from '../account/account.module';
 import { CLUSTER_FILTER } from './filter/clusterFilter.component';
 import { FILTER_TAGS_COMPONENT } from '../filterModel/filterTags.component';
+import { CORE_UTILS_WAYPOINTS_WAYPOINTCONTAINER_DIRECTIVE } from '../utils/waypoints/waypointContainer.directive';
 
 import './rollups.less';
-import { CORE_ACCOUNT_ACCOUNT_MODULE } from '../account/account.module';
-import { CORE_UTILS_WAYPOINTS_WAYPOINTCONTAINER_DIRECTIVE } from '../utils/waypoints/waypointContainer.directive';
-import ANGULAR_UI_BOOTSTRAP from 'angular-ui-bootstrap';
 
 export const CORE_CLUSTER_ALLCLUSTERS_CONTROLLER = 'spinnaker.core.cluster.allClusters.controller';
 export const name = CORE_CLUSTER_ALLCLUSTERS_CONTROLLER; // for backwards compatibility
 module(CORE_CLUSTER_ALLCLUSTERS_CONTROLLER, [
   CLUSTER_FILTER,
   CORE_ACCOUNT_ACCOUNT_MODULE,
-  SKIN_SELECTION_SERVICE,
   SERVER_GROUP_COMMAND_BUILDER_SERVICE,
   FILTER_TAGS_COMPONENT,
   CORE_UTILS_WAYPOINTS_WAYPOINTCONTAINER_DIRECTIVE,
-  INSIGHT_FILTER_COMPONENT,
   ANGULAR_UI_BOOTSTRAP,
 ]).controller('AllClustersCtrl', [
   '$scope',
@@ -35,10 +30,8 @@ module(CORE_CLUSTER_ALLCLUSTERS_CONTROLLER, [
   '$timeout',
   'insightFilterStateModel',
   'serverGroupCommandBuilder',
-  'skinSelectionService',
-  function($scope, app, $uibModal, $timeout, insightFilterStateModel, serverGroupCommandBuilder, skinSelectionService) {
+  function ($scope, app, $uibModal, $timeout, insightFilterStateModel, serverGroupCommandBuilder) {
     this.$onInit = () => {
-      insightFilterStateModel.filtersHidden = true; // hidden to prevent filter flashing for on-demand apps
       const groupsUpdatedSubscription = ClusterState.filterService.groupsUpdatedStream.subscribe(() =>
         clusterGroupsUpdated(),
       );
@@ -46,10 +39,11 @@ module(CORE_CLUSTER_ALLCLUSTERS_CONTROLLER, [
       ClusterState.filterModel.activate();
       this.initialized = false;
       this.dataSource = app.getDataSource('serverGroups');
-      this.application = app;
 
-      $scope.sortFilter = ClusterState.filterModel.sortFilter;
-
+      $scope.filterModel = ClusterState.filterModel;
+      ProviderSelectionService.isDisabled(app).then((disabled) => {
+        $scope.isDisabled = disabled;
+      });
       this.createLabel = 'Create Server Group';
 
       app
@@ -57,7 +51,7 @@ module(CORE_CLUSTER_ALLCLUSTERS_CONTROLLER, [
         .ready()
         .then(
           () => {
-            insightFilterStateModel.filtersHidden = false;
+            insightFilterStateModel.filtersHidden = Boolean(this.dataSource.fetchOnDemand);
             updateClusterGroups();
           },
           () => this.clustersLoadError(),
@@ -103,45 +97,44 @@ module(CORE_CLUSTER_ALLCLUSTERS_CONTROLLER, [
       this.updateClusterGroups();
     };
 
-    this.clearFilters = function() {
+    this.clearFilters = function () {
       ClusterState.filterService.clearFilters();
       updateClusterGroups();
     };
 
     this.createServerGroup = function createServerGroup() {
       ProviderSelectionService.selectProvider(app, 'serverGroup')
-        .then(function(provider) {
-          skinSelectionService.selectSkin(provider).then(function(selected) {
-            serverGroupCommandBuilder.buildNewServerGroupCommand(app, provider, null, selected).then(command => {
-              const providerConfig = CloudProviderRegistry.getValue(provider, 'serverGroup', selected);
-              const title = 'Create New Server Group';
-              const serverGroup = null;
-              if (providerConfig.CloneServerGroupModal) {
-                // React
-                providerConfig.CloneServerGroupModal.show({
-                  title,
-                  application: app,
-                  serverGroup,
-                  command,
-                  provider,
-                  isNew: true,
-                });
-              } else {
-                // angular
-                $uibModal.open({
-                  templateUrl: providerConfig.cloneServerGroupTemplateUrl,
-                  controller: `${providerConfig.cloneServerGroupController} as ctrl`,
-                  size: 'lg',
-                  resolve: {
-                    title: () => title,
-                    application: () => app,
-                    serverGroup: () => serverGroup,
-                    serverGroupCommand: () => command,
-                    provider: () => provider,
-                  },
-                });
-              }
-            });
+        .then(function (provider) {
+          serverGroupCommandBuilder.buildNewServerGroupCommand(app, provider, null).then((command) => {
+            const providerConfig = CloudProviderRegistry.getValue(provider, 'serverGroup');
+            const title = 'Create New Server Group';
+            const serverGroup = null;
+            if (providerConfig.CloneServerGroupModal) {
+              // React
+              providerConfig.CloneServerGroupModal.show({
+                title,
+                application: app,
+                serverGroup,
+                command,
+                provider,
+                isNew: true,
+              });
+            } else {
+              // angular
+              $uibModal.open({
+                templateUrl: providerConfig.cloneServerGroupTemplateUrl,
+                controller: `${providerConfig.cloneServerGroupController} as ctrl`,
+                windowClass: 'modal-z-index',
+                size: 'lg',
+                resolve: {
+                  title: () => title,
+                  application: () => app,
+                  serverGroup: () => serverGroup,
+                  serverGroupCommand: () => command,
+                  provider: () => provider,
+                },
+              });
+            }
           });
         })
         .catch(noop);

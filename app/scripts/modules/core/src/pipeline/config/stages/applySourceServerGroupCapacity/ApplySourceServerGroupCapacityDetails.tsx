@@ -1,10 +1,11 @@
-import React from 'react';
 import { find, get } from 'lodash';
+import React from 'react';
 
-import { StageFailureMessage } from 'core/pipeline';
 import { IStage } from 'core/domain';
+
 import { IExecutionDetailsSectionProps } from '../common';
 import { ExecutionDetailsSection } from '../common/ExecutionDetailsSection';
+import { StageFailureMessage } from '../../../details/StageFailureMessage';
 
 export interface IApplySourceServerGroupCapacityDetailsState {
   parentDeployStage: IStage;
@@ -18,7 +19,7 @@ export class ApplySourceServerGroupCapacityDetails extends React.Component<
 
   constructor(props: IExecutionDetailsSectionProps) {
     super(props);
-    this.state = { parentDeployStage: find(props.execution.stages, stage => stage.id === props.stage.parentStageId) };
+    this.state = { parentDeployStage: find(props.execution.stages, (stage) => stage.id === props.stage.parentStageId) };
   }
 
   public render() {

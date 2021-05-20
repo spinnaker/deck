@@ -1,19 +1,20 @@
 'use strict';
 
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 import { module } from 'angular';
 
 import {
   ConfirmationModalService,
   NetworkReader,
+  SERVER_GROUP_WRITER,
   ServerGroupReader,
   ServerGroupWarningMessageService,
-  SERVER_GROUP_WRITER,
   SubnetReader,
 } from '@spinnaker/core';
+
 import { ORACLE_IMAGE_IMAGE_READER } from '../../image/image.reader';
 import { ORACLE_SERVERGROUP_DETAILS_RESIZE_RESIZESERVERGROUP_CONTROLLER } from './resize/resizeServerGroup.controller';
 import { ORACLE_SERVERGROUP_DETAILS_ROLLBACK_ROLLBACKSERVERGROUP_CONTROLLER } from './rollback/rollbackServerGroup.controller';
-import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
 export const ORACLE_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_CONTROLLER =
   'spinnaker.oracle.serverGroup.details.controller';
@@ -32,7 +33,7 @@ module(ORACLE_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_CONTROLLER, [
   'serverGroup',
   'serverGroupWriter',
   'oracleImageReader',
-  function($scope, $state, $uibModal, app, serverGroup, serverGroupWriter, oracleImageReader) {
+  function ($scope, $state, $uibModal, app, serverGroup, serverGroupWriter, oracleImageReader) {
     const provider = 'oracle';
 
     this.application = app;
@@ -52,7 +53,7 @@ module(ORACLE_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_CONTROLLER, [
         serverGroup.accountId,
         serverGroup.region,
         serverGroup.name,
-      ).then(details => {
+      ).then((details) => {
         cancelLoader();
         details.account = serverGroup.accountId;
         this.serverGroup = details;
@@ -63,7 +64,7 @@ module(ORACLE_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_CONTROLLER, [
     };
 
     const retrieveNetwork = () => {
-      NetworkReader.listNetworksByProvider(provider).then(networks => {
+      NetworkReader.listNetworksByProvider(provider).then((networks) => {
         this.serverGroup.network = _.chain(networks)
           .filter({ account: this.serverGroup.account, id: this.serverGroup.launchConfig.vpcId })
           .head()
@@ -72,7 +73,7 @@ module(ORACLE_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_CONTROLLER, [
     };
 
     const retrieveSubnet = () => {
-      SubnetReader.getSubnetByIdAndProvider(this.serverGroup.launchConfig.subnetId, provider).then(subnet => {
+      SubnetReader.getSubnetByIdAndProvider(this.serverGroup.launchConfig.subnetId, provider).then((subnet) => {
         this.serverGroup.subnet = subnet;
       });
     };
@@ -80,7 +81,7 @@ module(ORACLE_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_CONTROLLER, [
     const retrieveImage = () => {
       oracleImageReader
         .getImage(this.serverGroup.launchConfig.imageId, this.serverGroup.region, this.serverGroup.account)
-        .then(image => {
+        .then((image) => {
           if (!image) {
             image = { id: this.serverGroup.launchConfig.imageId, name: this.serverGroup.launchConfig.imageId };
           }
@@ -97,14 +98,14 @@ module(ORACLE_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_CONTROLLER, [
       const taskMonitor = {
         application: app,
         title: 'Destroying ' + serverGroup.name,
-        onTaskComplete: function() {
+        onTaskComplete: function () {
           if ($state.includes('**.serverGroup', stateParams)) {
             $state.go('^');
           }
         },
       };
 
-      const submitMethod = function() {
+      const submitMethod = function () {
         return serverGroupWriter.destroyServerGroup(serverGroup, app);
       };
 
@@ -166,7 +167,7 @@ module(ORACLE_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_CONTROLLER, [
         title: 'Disabling ' + serverGroup.name,
       };
 
-      const submitMethod = params => serverGroupWriter.disableServerGroup(serverGroup, app, params);
+      const submitMethod = (params) => serverGroupWriter.disableServerGroup(serverGroup, app, params);
 
       const confirmationModalParams = {
         header: 'Really disable ' + serverGroup.name + '?',
@@ -196,7 +197,7 @@ module(ORACLE_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_CONTROLLER, [
         title: 'Enabling ' + serverGroup.name,
       };
 
-      const submitMethod = params => serverGroupWriter.enableServerGroup(serverGroup, app, params);
+      const submitMethod = (params) => serverGroupWriter.enableServerGroup(serverGroup, app, params);
 
       const confirmationModalParams = {
         header: 'Really enable ' + serverGroup.name + '?',

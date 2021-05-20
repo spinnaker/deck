@@ -1,33 +1,26 @@
 import React, { useEffect } from 'react';
-import { CSSTransition } from 'react-transition-group';
 import { Modal } from 'react-bootstrap';
+import { CSSTransition } from 'react-transition-group';
 
-import { TaskMonitor } from 'core/task';
 import { useForceUpdate } from 'core/presentation/hooks';
 
-import { TaskMonitorStatus } from './TaskMonitorStatus';
+import { TaskMonitor } from './TaskMonitor';
 import { TaskMonitorError } from './TaskMonitorError';
+import { TaskMonitorStatus } from './TaskMonitorStatus';
 
 export interface ITaskMonitorProps {
   monitor: TaskMonitor;
 }
 
 export const TaskMonitorWrapper = ({ monitor }: ITaskMonitorProps) => {
-  if (!monitor) {
-    return null;
-  }
-
   const forceUpdate = useForceUpdate();
-  if (!monitor) {
-    return null;
-  }
 
   useEffect(() => {
-    const subscription = monitor.statusUpdatedStream.subscribe(() => forceUpdate());
-    return () => subscription.unsubscribe();
-  }, []);
+    const subscription = monitor?.statusUpdatedStream?.subscribe(() => forceUpdate());
+    return () => subscription?.unsubscribe();
+  }, [monitor]);
 
-  if (!monitor.submitting && !monitor.error) {
+  if (!monitor || (!monitor.submitting && !monitor.error)) {
     return null;
   }
 

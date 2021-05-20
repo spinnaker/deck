@@ -5,10 +5,10 @@ import VirtualizedSelect from 'react-virtualized-select';
 import {
   FirewallLabels,
   HelpField,
-  timestamp,
-  ISecurityGroup,
   InfrastructureCaches,
+  ISecurityGroup,
   ReactInjector,
+  timestamp,
 } from '@spinnaker/core';
 
 import { IAmazonServerGroupCommand } from '../../serverGroupConfiguration.service';
@@ -57,7 +57,7 @@ export class SecurityGroupSelector extends React.Component<ISecurityGroupSelecto
   };
 
   private onChange = (options: Option[]) => {
-    const securityGroups = options.map(o => o.value as string);
+    const securityGroups = options.map((o) => o.value as string);
     this.props.onChange(securityGroups);
   };
 
@@ -65,7 +65,7 @@ export class SecurityGroupSelector extends React.Component<ISecurityGroupSelecto
     const { availableGroups, groupsToEdit, helpKey, hideLabel } = this.props;
     const { refreshing, refreshTime } = this.state;
 
-    const availableGroupOptions = availableGroups.map(g => ({ label: `${g.name} (${g.id})`, value: g.id }));
+    const availableGroupOptions = availableGroups.map((g) => ({ label: `${g.name} (${g.id})`, value: g.id }));
 
     return (
       <>

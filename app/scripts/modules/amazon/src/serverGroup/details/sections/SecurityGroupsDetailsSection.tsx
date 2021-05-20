@@ -1,18 +1,18 @@
-import React from 'react';
-import { chain, find, sortBy } from 'lodash';
 import { UISref } from '@uirouter/react';
+import { chain, find, sortBy } from 'lodash';
+import React from 'react';
 
 import {
   CollapsibleSection,
   confirmNotManaged,
-  ISecurityGroup,
-  ModalInjector,
   FirewallLabels,
+  ISecurityGroup,
   ISecurityGroupsByAccount,
+  ModalInjector,
 } from '@spinnaker/core';
+import { AwsSecurityGroupReader } from 'amazon/securityGroup/securityGroup.reader';
 
 import { IAmazonServerGroupDetailsSectionProps } from './IAmazonServerGroupDetailsSectionProps';
-import { AwsSecurityGroupReader } from 'amazon/securityGroup/securityGroup.reader';
 
 export interface ISecurityGroupsDetailsSectionState {
   securityGroups: ISecurityGroup[];
@@ -44,8 +44,9 @@ export class SecurityGroupsDetailsSection extends React.Component<
   private getSecurityGroups(props: IAmazonServerGroupDetailsSectionProps): ISecurityGroup[] {
     let securityGroups: ISecurityGroup[];
     const { app, serverGroup } = props;
-    if (props.serverGroup.launchConfig && serverGroup.launchConfig.securityGroups) {
-      securityGroups = chain(serverGroup.launchConfig.securityGroups)
+
+    if (serverGroup.securityGroups && serverGroup.securityGroups.length) {
+      securityGroups = chain(serverGroup.securityGroups)
         .map((id: string) => {
           return (
             find(app.securityGroups.data, { accountName: serverGroup.account, region: serverGroup.region, id }) ||
@@ -68,7 +69,7 @@ export class SecurityGroupsDetailsSection extends React.Component<
   private updateSecurityGroups = (): void => {
     const { app, serverGroup } = this.props;
     confirmNotManaged(serverGroup, app).then(
-      notManaged =>
+      (notManaged) =>
         notManaged &&
         ModalInjector.modalService.open({
           templateUrl: require('../securityGroup/editSecurityGroups.modal.html'),
@@ -93,7 +94,7 @@ export class SecurityGroupsDetailsSection extends React.Component<
     return (
       <CollapsibleSection heading={FirewallLabels.get('Firewalls')}>
         <ul>
-          {sortBy(securityGroups, 'name').map(securityGroup => (
+          {sortBy(securityGroups, 'name').map((securityGroup) => (
             <li key={securityGroup.name}>
               <UISref
                 to="^.firewallDetails"

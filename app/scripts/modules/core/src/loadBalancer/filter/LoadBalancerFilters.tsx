@@ -1,12 +1,12 @@
-import React from 'react';
-import { chain, cloneDeep, compact, debounce, uniq, map } from 'lodash';
+import { chain, cloneDeep, compact, debounce, map, uniq } from 'lodash';
 import { $rootScope } from 'ngimport';
+import React from 'react';
 import { Subscription } from 'rxjs';
 
 import { Application } from 'core/application';
-import { CloudProviderLabel, CloudProviderLogo } from 'core/cloudProvider';
-import { FilterCollapse, ISortFilter, digestDependentFilters } from 'core/filterModel';
+import { FilterSearch } from 'core/cluster/filter/FilterSearch';
 import { FilterSection } from 'core/cluster/filter/FilterSection';
+import { digestDependentFilters, FilterCheckbox, ISortFilter } from 'core/filterModel';
 import { LoadBalancerState } from 'core/state';
 
 const poolValueCoordinates = [
@@ -18,7 +18,7 @@ const poolValueCoordinates = [
 
 function poolBuilder(loadBalancers: any[]) {
   const pool = chain(loadBalancers)
-    .map(lb => {
+    .map((lb) => {
       const poolUnitTemplate = chain(poolValueCoordinates)
         .filter({ on: 'loadBalancer' })
         .reduce((acc, coordinate) => {
@@ -28,9 +28,9 @@ function poolBuilder(loadBalancers: any[]) {
         .value();
 
       const poolUnits = chain(['instances', 'detachedInstances'])
-        .map(instanceStatus => lb[instanceStatus])
+        .map((instanceStatus) => lb[instanceStatus])
         .flatten<any>()
-        .map(instance => {
+        .map((instance) => {
           const poolUnit = cloneDeep(poolUnitTemplate);
           if (!instance) {
             return poolUnit;
@@ -66,6 +66,7 @@ export interface ILoadBalancerFiltersState {
   sortFilter: ISortFilter;
   tags: any[];
   availabilityZoneHeadings: string[];
+  loadBalancerTypeHeadings: string[];
   providerTypeHeadings: string[];
   accountHeadings: string[];
   regionHeadings: string[];
@@ -85,6 +86,7 @@ export class LoadBalancerFilters extends React.Component<ILoadBalancerFiltersPro
       sortFilter: LoadBalancerState.filterModel.asFilterModel.sortFilter,
       tags: LoadBalancerState.filterModel.asFilterModel.tags,
       availabilityZoneHeadings: [],
+      loadBalancerTypeHeadings: [],
       providerTypeHeadings: [],
       accountHeadings: [],
       regionHeadings: [],
@@ -138,6 +140,7 @@ export class LoadBalancerFilters extends React.Component<ILoadBalancerFiltersPro
       accountHeadings: account,
       regionHeadings: region,
       availabilityZoneHeadings: availabilityZone,
+      loadBalancerTypeHeadings: this.getHeadingsForOption('loadBalancerType'),
       stackHeadings: ['(none)'].concat(this.getHeadingsForOption('stack')),
       detailHeadings: ['(none)'].concat(this.getHeadingsForOption('detail')),
       providerTypeHeadings: this.getHeadingsForOption('type'),
@@ -146,12 +149,6 @@ export class LoadBalancerFilters extends React.Component<ILoadBalancerFiltersPro
 
   private getHeadingsForOption = (option: string): string[] => {
     return compact(uniq(map(this.props.app.loadBalancers.data, option) as string[])).sort();
-  };
-
-  private clearFilters = (): void => {
-    LoadBalancerState.filterService.clearFilters();
-    LoadBalancerState.filterModel.asFilterModel.applyParamsToUrl();
-    LoadBalancerState.filterService.updateLoadBalancerGroups(this.props.app);
   };
 
   private handleStatusChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -179,46 +176,30 @@ export class LoadBalancerFilters extends React.Component<ILoadBalancerFiltersPro
     const loadBalancersLoaded = this.props.app.loadBalancers.loaded;
     const {
       accountHeadings,
+      loadBalancerTypeHeadings,
       providerTypeHeadings,
       regionHeadings,
       stackHeadings,
       detailHeadings,
       availabilityZoneHeadings,
       sortFilter,
-      tags,
     } = this.state;
 
     return (
-      <div>
-        <FilterCollapse />
+      <div className="insight-filter-content">
         <div className="heading">
-          <span
-            className="btn btn-default btn-xs"
-            style={{ visibility: tags.length > 0 ? 'inherit' : 'hidden' }}
-            onClick={this.clearFilters}
-          >
-            Clear All
-          </span>
-          <FilterSection heading="Search" expanded={true} helpKey="loadBalancer.search">
-            <form className="form-horizontal" role="form">
-              <div className="form-group nav-search">
-                <input
-                  type="search"
-                  className="form-control input-sm"
-                  value={sortFilter.filter}
-                  onBlur={this.handleSearchBlur}
-                  onChange={this.handleSearchChange}
-                  style={{ width: '85%', display: 'inline-block' }}
-                />
-              </div>
-            </form>
-          </FilterSection>
+          <FilterSearch
+            helpKey="loadBalancer.search"
+            value={sortFilter.filter}
+            onBlur={this.handleSearchBlur}
+            onSearchChange={this.handleSearchChange}
+          />
         </div>
         {loadBalancersLoaded && (
           <div className="content">
             {providerTypeHeadings.length > 1 && (
               <FilterSection heading="Provider" expanded={true}>
-                {providerTypeHeadings.map(heading => (
+                {providerTypeHeadings.map((heading) => (
                   <FilterCheckbox
                     heading={heading}
                     isCloudProvider={true}
@@ -231,7 +212,7 @@ export class LoadBalancerFilters extends React.Component<ILoadBalancerFiltersPro
             )}
 
             <FilterSection heading="Account" expanded={true}>
-              {accountHeadings.map(heading => (
+              {accountHeadings.map((heading) => (
                 <FilterCheckbox
                   heading={heading}
                   key={heading}
@@ -242,7 +223,7 @@ export class LoadBalancerFilters extends React.Component<ILoadBalancerFiltersPro
             </FilterSection>
 
             <FilterSection heading="Region" expanded={true}>
-              {regionHeadings.map(heading => (
+              {regionHeadings.map((heading) => (
                 <FilterCheckbox
                   heading={heading}
                   key={heading}
@@ -253,7 +234,7 @@ export class LoadBalancerFilters extends React.Component<ILoadBalancerFiltersPro
             </FilterSection>
 
             <FilterSection heading="Stack" expanded={true}>
-              {stackHeadings.map(heading => (
+              {stackHeadings.map((heading) => (
                 <FilterCheckbox
                   heading={heading}
                   key={heading}
@@ -264,11 +245,22 @@ export class LoadBalancerFilters extends React.Component<ILoadBalancerFiltersPro
             </FilterSection>
 
             <FilterSection heading="Detail" expanded={true}>
-              {detailHeadings.map(heading => (
+              {detailHeadings.map((heading) => (
                 <FilterCheckbox
                   heading={heading}
                   key={heading}
                   sortFilterType={sortFilter.detail}
+                  onChange={this.updateLoadBalancerGroups}
+                />
+              ))}
+            </FilterSection>
+
+            <FilterSection heading="Type" expanded={true}>
+              {loadBalancerTypeHeadings.map((heading) => (
+                <FilterCheckbox
+                  heading={heading}
+                  key={heading}
+                  sortFilterType={sortFilter.loadBalancerType}
                   onChange={this.updateLoadBalancerGroups}
                 />
               ))}
@@ -313,7 +305,7 @@ export class LoadBalancerFilters extends React.Component<ILoadBalancerFiltersPro
             </FilterSection>
 
             <FilterSection heading="Availability Zones" expanded={true}>
-              {availabilityZoneHeadings.map(heading => (
+              {availabilityZoneHeadings.map((heading) => (
                 <FilterCheckbox
                   heading={heading}
                   key={heading}
@@ -328,33 +320,3 @@ export class LoadBalancerFilters extends React.Component<ILoadBalancerFiltersPro
     );
   }
 }
-
-const FilterCheckbox = (props: {
-  heading: string;
-  sortFilterType: { [key: string]: boolean };
-  onChange: () => void;
-  isCloudProvider?: boolean;
-}): JSX.Element => {
-  const { heading, isCloudProvider, onChange, sortFilterType } = props;
-  const changeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const target = event.target;
-    const value = target.type === 'checkbox' ? target.checked : target.value;
-    sortFilterType[heading] = Boolean(value);
-    onChange();
-  };
-  return (
-    <div className="checkbox">
-      <label>
-        <input type="checkbox" checked={Boolean(sortFilterType[heading])} onChange={changeHandler} />
-        {!isCloudProvider ? (
-          heading
-        ) : (
-          <>
-            <CloudProviderLogo provider="heading" height="'14px'" width="'14px'" />
-            <CloudProviderLabel provider={heading} />
-          </>
-        )}
-      </label>
-    </div>
-  );
-};

@@ -10,10 +10,9 @@ import { GCE_INSTANCE_TYPE_DISK_DEFAULTS } from './gceInstanceTypeDisks';
 export const GOOGLE_INSTANCE_GCEINSTANCETYPE_SERVICE = 'spinnaker.gce.instanceType.service';
 export const name = GOOGLE_INSTANCE_GCEINSTANCETYPE_SERVICE; // for backwards compatibility
 module(GOOGLE_INSTANCE_GCEINSTANCETYPE_SERVICE, []).factory('gceInstanceTypeService', [
-  '$http',
   '$q',
   '$log',
-  function($http, $q, $log) {
+  function ($q, $log) {
     const cachedResult = null;
 
     const n1standard = {
@@ -60,10 +59,23 @@ module(GOOGLE_INSTANCE_GCEINSTANCETYPE_SERVICE, []).factory('gceInstanceTypeServ
         },
         {
           name: 'n1-standard-32',
-          helpFieldKey: 'gce.instanceType.32core',
           label: '4XLarge',
           cpu: 32,
           memory: 120,
+          costFactor: 4,
+        },
+        {
+          name: 'n1-standard-64',
+          label: '8XLarge',
+          cpu: 64,
+          memory: 240,
+          costFactor: 4,
+        },
+        {
+          name: 'n1-standard-96',
+          label: '12XLarge',
+          cpu: 96,
+          memory: 360,
           costFactor: 4,
         },
       ],
@@ -89,6 +101,27 @@ module(GOOGLE_INSTANCE_GCEINSTANCETYPE_SERVICE, []).factory('gceInstanceTypeServ
           cpu: 1,
           memory: 1.7,
           costFactor: 1,
+        },
+        {
+          name: 'e2-micro',
+          label: 'E2 Micro',
+          cpu: 2,
+          memory: 1,
+          costFactor: 1,
+        },
+        {
+          name: 'e2-small',
+          label: 'E2 Small',
+          cpu: 2,
+          memory: 2,
+          costFactor: 2,
+        },
+        {
+          name: 'e2-medium',
+          label: 'E2 Medium',
+          cpu: 2,
+          memory: 4,
+          costFactor: 2,
         },
       ],
     };
@@ -130,10 +163,23 @@ module(GOOGLE_INSTANCE_GCEINSTANCETYPE_SERVICE, []).factory('gceInstanceTypeServ
         },
         {
           name: 'n1-highmem-32',
-          helpFieldKey: 'gce.instanceType.32core',
           label: '4XLarge',
           cpu: 32,
           memory: 208,
+          costFactor: 4,
+        },
+        {
+          name: 'n1-highmem-64',
+          label: '8XLarge',
+          cpu: 64,
+          memory: 416,
+          costFactor: 4,
+        },
+        {
+          name: 'n1-highmem-96',
+          label: '12XLarge',
+          cpu: 96,
+          memory: 624,
           costFactor: 4,
         },
       ],
@@ -176,10 +222,23 @@ module(GOOGLE_INSTANCE_GCEINSTANCETYPE_SERVICE, []).factory('gceInstanceTypeServ
         },
         {
           name: 'n1-highcpu-32',
-          helpFieldKey: 'gce.instanceType.32core',
           label: '4XLarge',
           cpu: 32,
           memory: 28.8,
+          costFactor: 4,
+        },
+        {
+          name: 'n1-highcpu-64',
+          label: '8XLarge',
+          cpu: 64,
+          memory: 57.6,
+          costFactor: 4,
+        },
+        {
+          name: 'n1-highcpu-96',
+          label: '12XLarge',
+          cpu: 96,
+          memory: 86.4,
           costFactor: 4,
         },
       ],
@@ -189,8 +248,22 @@ module(GOOGLE_INSTANCE_GCEINSTANCETYPE_SERVICE, []).factory('gceInstanceTypeServ
       type: 'buildCustom',
       instanceTypes: [
         {
-          name: 'buildCustom',
+          name: 'n1buildCustom',
           nameRegex: /custom-\d{1,2}-\d{4,6}/,
+          storage: {
+            localSSDSupported: true,
+          },
+        },
+        {
+          name: 'e2buildCustom',
+          nameRegex: /e2-custom-(\d{1,2})-(\d{3,6})/,
+          storage: {
+            localSSDSupported: false,
+          },
+        },
+        {
+          name: 'otherbuildCustom',
+          nameRegex: /(.*)-?custom-(\d{1,2})-(\d{3,6})/,
           storage: {
             localSSDSupported: true,
           },
@@ -239,22 +312,22 @@ module(GOOGLE_INSTANCE_GCEINSTANCETYPE_SERVICE, []).factory('gceInstanceTypeServ
 
     const getCategories = _.memoize(() => {
       const initializedCategories = _.cloneDeep(categories);
-      return AccountService.getAllAccountDetailsForProvider('gce').then(accountDetails => {
+      return AccountService.getAllAccountDetailsForProvider('gce').then((accountDetails) => {
         // All GCE accounts have the same instance type disk defaults, so we can pick the first one.
         let instanceTypeDisks = _.get(accountDetails, '[0].instanceTypeDisks');
         if (_.isEmpty(instanceTypeDisks)) {
           instanceTypeDisks = GCE_INSTANCE_TYPE_DISK_DEFAULTS;
         }
         if (instanceTypeDisks) {
-          const families = _.flatten(initializedCategories.map(category => category.families));
-          families.forEach(family => {
-            family.instanceTypes.forEach(instanceType => {
+          const families = _.flatten(initializedCategories.map((category) => category.families));
+          families.forEach((family) => {
+            family.instanceTypes.forEach((instanceType) => {
               const diskDefaults = instanceTypeDisks.find(
-                instanceTypeDisk => instanceTypeDisk.instanceType === instanceType.name,
+                (instanceTypeDisk) => instanceTypeDisk.instanceType === instanceType.name,
               );
               if (diskDefaults) {
                 const disks = diskDefaults.disks
-                  .map(disk => {
+                  .map((disk) => {
                     switch (disk.type) {
                       case 'PD_SSD':
                         return {
@@ -276,22 +349,22 @@ module(GOOGLE_INSTANCE_GCEINSTANCETYPE_SERVICE, []).factory('gceInstanceTypeServ
                         return null;
                     }
                   })
-                  .filter(disk => !!disk);
+                  .filter((disk) => !!disk);
 
                 let size = 0;
                 let count = 0;
                 if (diskDefaults.supportsLocalSSD) {
-                  count = disks.filter(disk => disk.type === 'local-ssd').length;
+                  count = disks.filter((disk) => disk.type === 'local-ssd').length;
                   size = 375;
                 } else {
                   // TODO(dpeach): This will render the disk defaults incorrectly for f1-micro and g1-small instance types
                   // if the disk defaults set in Clouddriver have different sizes. Fixing it will require updating
                   // the core instance type selector.
                   // This logic will render the count of the largest disk.
-                  const persistentDisks = disks.filter(disk => disk.type.startsWith('pd-'));
+                  const persistentDisks = disks.filter((disk) => disk.type.startsWith('pd-'));
                   if (persistentDisks.length) {
                     size = persistentDisks.reduce((maxSizeGb, disk) => Math.max(maxSizeGb, disk.sizeGb), 0);
-                    count = persistentDisks.filter(disk => disk.sizeGb === size).length;
+                    count = persistentDisks.filter((disk) => disk.sizeGb === size).length;
                   }
                 }
 
@@ -314,14 +387,14 @@ module(GOOGLE_INSTANCE_GCEINSTANCETYPE_SERVICE, []).factory('gceInstanceTypeServ
         return $q.when(cachedResult);
       }
 
-      return getCategories().then(categories => {
+      return getCategories().then((categories) => {
         return _.chain(categories)
           .map('families')
           .flatten()
           .map('instanceTypes')
           .flatten()
           .map('name')
-          .filter(name => name !== 'buildCustom')
+          .filter((name) => name !== 'n1buildCustom' && name !== 'e2buildCustom' && name !== 'otherbuildCustom')
           .value();
       });
     }
@@ -334,7 +407,7 @@ module(GOOGLE_INSTANCE_GCEINSTANCETYPE_SERVICE, []).factory('gceInstanceTypeServ
 
     const getAvailableTypesForRegions = getAvailableTypesForLocations;
 
-    const resolveInstanceTypeDetails = instanceType => {
+    const resolveInstanceTypeDetails = (instanceType) => {
       return {
         name: instanceType,
         storage: Object.assign({ isDefault: true }, SETTINGS.providers.gce.defaults.instanceTypeStorage),

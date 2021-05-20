@@ -1,7 +1,3 @@
-import React from 'react';
-import { Option } from 'react-select';
-import { get } from 'lodash';
-
 import {
   ArtifactTypePatterns,
   excludeAllTypesExcept,
@@ -9,10 +5,9 @@ import {
   FormikSpelContextProvider,
   IArtifact,
   IExpectedArtifact,
-  IFormInputProps,
   IFormikStageConfigInjectedProps,
+  IFormInputProps,
   IgorService,
-  IPipeline,
   RadioButtonInput,
   ReactSelectInput,
   SpelService,
@@ -22,12 +17,11 @@ import {
   yamlDocumentsToString,
   YamlEditor,
 } from 'core';
+import { get } from 'lodash';
+import React from 'react';
+import { Option } from 'react-select';
 
 import { BuildDefinitionSource, TriggerType } from './IGoogleCloudBuildStage';
-
-interface IGoogleCloudBuildStageFormProps {
-  updatePipeline: (pipeline: IPipeline) => void;
-}
 
 const SOURCE_OPTIONS: Array<Option<string>> = [
   { value: BuildDefinitionSource.TEXT, label: 'Text' },
@@ -51,7 +45,7 @@ const EXCLUDED_ARTIFACT_TYPES: RegExp[] = excludeAllTypesExcept(
   ArtifactTypePatterns.S3_OBJECT,
 );
 
-export function GoogleCloudBuildStageForm(props: IGoogleCloudBuildStageFormProps & IFormikStageConfigInjectedProps) {
+export function GoogleCloudBuildStageForm(props: IFormikStageConfigInjectedProps) {
   const stage = props.formik.values;
 
   const [rawBuildDefinitionYaml, setRawBuildDefinitionYaml] = React.useState(() =>
@@ -89,10 +83,6 @@ export function GoogleCloudBuildStageForm(props: IGoogleCloudBuildStageFormProps
   const setArtifact = (artifact: IArtifact): void => {
     props.formik.setFieldValue('buildDefinitionArtifact.artifact', artifact);
     props.formik.setFieldValue('buildDefinitionArtifact.artifactId', null);
-  };
-
-  const setArtifactAccount = (accountName: string): void => {
-    props.formik.setFieldValue('buildDefinitionArtifact.artifactAccount', accountName);
   };
 
   // When build definition source changes, clear any no-longer-relevant fields.
@@ -138,7 +128,6 @@ export function GoogleCloudBuildStageForm(props: IGoogleCloudBuildStageFormProps
     <FormikSpelContextProvider value={true}>
       <div className="form-horizontal">
         <FormikFormField
-          fastField={false}
           label="Account"
           name="account"
           input={(inputProps: IFormInputProps) => (
@@ -151,7 +140,6 @@ export function GoogleCloudBuildStageForm(props: IGoogleCloudBuildStageFormProps
           )}
         />
         <FormikFormField
-          fastField={false}
           label="Build Definition Source"
           name="buildDefinitionSource"
           input={(inputProps: IFormInputProps) => <RadioButtonInput {...inputProps} options={SOURCE_OPTIONS} />}
@@ -159,7 +147,6 @@ export function GoogleCloudBuildStageForm(props: IGoogleCloudBuildStageFormProps
         />
         {stage.buildDefinitionSource === BuildDefinitionSource.TEXT && (
           <FormikFormField
-            fastField={false}
             label="Build Definition"
             name="buildDefinition"
             input={(inputProps: IFormInputProps) => (
@@ -177,18 +164,12 @@ export function GoogleCloudBuildStageForm(props: IGoogleCloudBuildStageFormProps
             onArtifactEdited={setArtifact}
             onExpectedArtifactSelected={(artifact: IExpectedArtifact) => setArtifactId(artifact.id)}
             pipeline={props.pipeline}
-            selectedArtifactAccount={get(stage, 'buildDefinitionArtifact.artifactAccount')}
-            selectedArtifactId={get(stage, 'buildDefinitionArtifact.artifactId')}
-            setArtifactAccount={setArtifactAccount}
-            setArtifactId={setArtifactId}
             stage={stage}
-            updatePipeline={props.updatePipeline}
           />
         )}
         {stage.buildDefinitionSource === BuildDefinitionSource.TRIGGER && (
           <>
             <FormikFormField
-              fastField={false}
               name="triggerId"
               label="Trigger Name"
               input={(inputProps: IFormInputProps) => (
@@ -197,7 +178,7 @@ export function GoogleCloudBuildStageForm(props: IGoogleCloudBuildStageFormProps
                   clearable={false}
                   disabled={!stage.account}
                   isLoading={fetchTriggersStatus === 'PENDING'}
-                  options={(fetchTriggersResult || []).map(trigger => ({
+                  options={(fetchTriggersResult || []).map((trigger) => ({
                     label: trigger.name,
                     value: trigger.id,
                   }))}
@@ -205,7 +186,6 @@ export function GoogleCloudBuildStageForm(props: IGoogleCloudBuildStageFormProps
               )}
             />
             <FormikFormField
-              fastField={false}
               name="triggerType"
               label="Trigger Type"
               input={(inputProps: IFormInputProps) => (
@@ -219,7 +199,6 @@ export function GoogleCloudBuildStageForm(props: IGoogleCloudBuildStageFormProps
               spelAware={false}
             />
             <FormikFormField
-              fastField={false}
               label="Value"
               name={`repoSource.${stage.triggerType}`}
               input={(inputProps: IFormInputProps) => <TextInput {...inputProps} disabled={!stage.triggerType} />}

@@ -1,21 +1,22 @@
-import { FirewallLabels } from './label';
 import React from 'react';
 
 import {
   AccountCell,
   BasicCell,
-  HrefCell,
-  searchResultTypeRegistry,
-  ISearchColumn,
   DefaultSearchResultTab,
-  ISearchResult,
   HeaderCell,
-  TableBody,
-  TableHeader,
-  TableRow,
-  SearchResultType,
+  HrefCell,
+  ISearchColumn,
+  ISearchResult,
   ISearchResultSet,
+  SearchResultType,
+  searchResultTypeRegistry,
+  SearchTableBody,
+  SearchTableHeader,
+  SearchTableRow,
 } from 'core/search';
+
+import { FirewallLabels } from './label';
 
 export interface ISecurityGroupSearchResult extends ISearchResult {
   account: string;
@@ -45,11 +46,11 @@ class SecurityGroupsSearchResultType extends SearchResultType<ISecurityGroupSear
   public TabComponent = DefaultSearchResultTab;
 
   public HeaderComponent = () => (
-    <TableHeader>
+    <SearchTableHeader>
       <HeaderCell col={this.cols.NAME} />
       <HeaderCell col={this.cols.ACCOUNT} />
       <HeaderCell col={this.cols.REGION} />
-    </TableHeader>
+    </SearchTableHeader>
   );
 
   public DataComponent = ({ resultSet }: { resultSet: ISearchResultSet<ISecurityGroupSearchResult> }) => {
@@ -62,18 +63,18 @@ class SecurityGroupsSearchResultType extends SearchResultType<ISecurityGroupSear
     const results = resultSet.results.slice().sort(itemSortFn);
 
     return (
-      <TableBody>
+      <SearchTableBody>
         {results
           .slice()
           .sort(itemSortFn)
-          .map(item => (
-            <TableRow key={itemKeyFn(item)}>
+          .map((item) => (
+            <SearchTableRow key={itemKeyFn(item)}>
               <HrefCell item={item} col={this.cols.NAME} />
               <AccountCell item={item} col={this.cols.ACCOUNT} />
               <BasicCell item={item} col={this.cols.REGION} />
-            </TableRow>
+            </SearchTableRow>
           ))}
-      </TableBody>
+      </SearchTableBody>
     );
   };
 

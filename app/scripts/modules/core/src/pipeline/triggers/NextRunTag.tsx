@@ -1,11 +1,11 @@
-import React from 'react';
 import { DateTime } from 'luxon';
+import React from 'react';
 
-import { IPipeline, ICronTrigger } from 'core/domain';
-import { Popover } from 'core/presentation/Popover';
 import { SETTINGS } from 'core/config/settings';
+import { ICronTrigger, IPipeline } from 'core/domain';
+import { Popover } from 'core/presentation/Popover';
 import { later } from 'core/utils/later/later';
-import { timestamp, relativeTime } from 'core/utils/timeFormatters';
+import { relativeTime, timestamp } from 'core/utils/timeFormatters';
 
 export interface INextRunTagProps {
   pipeline: IPipeline;
@@ -29,7 +29,7 @@ export class NextRunTag extends React.Component<INextRunTagProps, INextRunTagSta
         (t: ICronTrigger) => t.type === 'cron' && t.enabled && t.cronExpression,
       ) as ICronTrigger[];
       const nextTimes: number[] = [];
-      crons.forEach(cron => {
+      crons.forEach((cron) => {
         const timezoneOffsetInMs = DateTime.local().setZone(SETTINGS.defaultTimeZone).offset * 60 * 1000;
         const nextRun = later
           .schedule(later.parse.cron(cron.cronExpression, true))

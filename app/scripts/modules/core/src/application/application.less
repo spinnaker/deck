@@ -2,7 +2,7 @@
 
 .application {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   flex: 1 1 auto;
   overflow-y: hidden;
 }
@@ -36,6 +36,19 @@
       font-size: 90%;
       color: var(--color-dovegray);
     }
+  }
+  .filter-toggle {
+    background-color: var(--color-accent);
+    border-radius: 2px;
+    color: var(--color-white);
+    cursor: pointer;
+    display: inline-block;
+    font-size: 90%;
+    font-weight: 600;
+    margin-bottom: 5px;
+    margin-right: 10px;
+    padding: 3px 5px;
+    text-transform: uppercase;
   }
   .clear-filters {
     display: inline-block;

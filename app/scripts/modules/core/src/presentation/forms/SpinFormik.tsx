@@ -1,7 +1,6 @@
-import React from 'react';
-
-import { set } from 'lodash';
 import { Formik, FormikConfig } from 'formik';
+import { set } from 'lodash';
+import React from 'react';
 
 import { traverseObject } from 'core/utils';
 
@@ -10,7 +9,8 @@ import { traverseObject } from 'core/utils';
  * Use this component like you would use the <Formik/> component
  */
 function SpinFormikImpl<Values extends {}>(props: FormikConfig<Values>, ref?: React.MutableRefObject<Formik<Values>>) {
-  const formikRef = ref || React.useRef<Formik<Values>>();
+  const defaultRef = React.useRef<Formik<Values>>();
+  const formikRef = ref || defaultRef;
   const [refSaved, setRefSaved] = React.useState(false);
   const [ready, setReady] = React.useState(false);
 
@@ -43,7 +43,7 @@ function SpinFormikImpl<Values extends {}>(props: FormikConfig<Values>, ref?: Re
       ref={saveRef}
       {...props}
       isInitialValid={props.isInitialValid || defaultIsInitialValid}
-      render={renderProps => ready && props.render && props.render(renderProps)}
+      render={(renderProps) => ready && props.render && props.render(renderProps)}
     />
   );
 }

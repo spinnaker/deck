@@ -1,9 +1,8 @@
 import React from 'react';
 
 import { IStageConfigProps, StageConstants } from '@spinnaker/core';
-
-import { CloudFoundryCreateServerGroupModal } from 'cloudfoundry/serverGroup/configure/wizard/CreateServerGroupModal';
 import { CloudFoundryServerGroupCommandBuilder } from 'cloudfoundry/serverGroup/configure';
+import { CloudFoundryCreateServerGroupModal } from 'cloudfoundry/serverGroup/configure/wizard/CreateServerGroupModal';
 
 export interface ICloudfoundryCloneServerGroupStageConfigState {
   buttonText: string;
@@ -80,7 +79,9 @@ export class CloudfoundryCloneServerGroupStageConfig extends React.Component<
                 <td>{stage.source ? stage.source.account : ''}</td>
                 <td>{stage.source ? stage.source.region : ''}</td>
                 <td>{stage.source ? stage.source.clusterName : ''}</td>
-                <td>{stage.source ? cloneTargets.filter(t => t.val === stage.source.target).map(t => t.label) : ''}</td>
+                <td>
+                  {stage.source ? cloneTargets.filter((t) => t.val === stage.source.target).map((t) => t.label) : ''}
+                </td>
               </tr>
             </tbody>
           </table>

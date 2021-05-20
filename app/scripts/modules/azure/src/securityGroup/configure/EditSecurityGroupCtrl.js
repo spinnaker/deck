@@ -1,6 +1,7 @@
 'use strict';
 
 const _ = require('lodash');
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 import { module } from 'angular';
 
 import {
@@ -10,8 +11,8 @@ import {
   SECURITY_GROUP_READER,
   TaskMonitor,
 } from '@spinnaker/core';
+
 import { AZURE_SECURITYGROUP_SECURITYGROUP_WRITE_SERVICE } from '../securityGroup.write.service';
-import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
 export const AZURE_SECURITYGROUP_CONFIGURE_EDITSECURITYGROUPCTRL =
   'spinnaker.azure.securityGroup.azure.edit.controller';
@@ -31,7 +32,7 @@ module(AZURE_SECURITYGROUP_CONFIGURE_EDITSECURITYGROUPCTRL, [
   'application',
   'securityGroup',
   'azureSecurityGroupWriter',
-  function(
+  function (
     $scope,
     $uibModalInstance,
     $exceptionHandler,
@@ -46,7 +47,7 @@ module(AZURE_SECURITYGROUP_CONFIGURE_EDITSECURITYGROUPCTRL, [
       ingress: require('./createSecurityGroupIngress.html'),
     };
 
-    securityGroup.securityRules = _.map(securityGroup.securityRules, function(rule) {
+    securityGroup.securityRules = _.map(securityGroup.securityRules, function (rule) {
       if (!_.isEmpty(rule.protocol)) {
         rule.protocolUI = rule.protocol.toLowerCase();
       }
@@ -70,21 +71,21 @@ module(AZURE_SECURITYGROUP_CONFIGURE_EDITSECURITYGROUPCTRL, [
       onTaskComplete: onTaskComplete,
     });
 
-    this.getSecurityGroupRefreshTime = function() {
+    this.getSecurityGroupRefreshTime = function () {
       return InfrastructureCaches.get('securityGroups').getStats().ageMax;
     };
 
-    this.refreshSecurityGroups = function() {
+    this.refreshSecurityGroups = function () {
       $scope.state.refreshingSecurityGroups = true;
-      return cacheInitializer.refreshCache('securityGroups').then(function() {
-        initializeSecurityGroups().then(function() {
+      return cacheInitializer.refreshCache('securityGroups').then(function () {
+        initializeSecurityGroups().then(function () {
           $scope.state.refreshingSecurityGroups = false;
         });
       });
     };
 
     function initializeSecurityGroups() {
-      return securityGroupReader.getAllSecurityGroups().then(function(securityGroups) {
+      return securityGroupReader.getAllSecurityGroups().then(function (securityGroups) {
         const account = securityGroup.accountName;
         const region = securityGroup.region;
         const availableGroups = _.filter(securityGroups[account].azure[region], {
@@ -94,7 +95,7 @@ module(AZURE_SECURITYGROUP_CONFIGURE_EDITSECURITYGROUPCTRL, [
       });
     }
 
-    this.addRule = function(ruleset) {
+    this.addRule = function (ruleset) {
       ruleset.push({
         name: $scope.securityGroup.name + '-Rule' + ruleset.length,
         priority: ruleset.length === 0 ? 100 : 100 * (ruleset.length + 1),
@@ -136,12 +137,12 @@ module(AZURE_SECURITYGROUP_CONFIGURE_EDITSECURITYGROUPCTRL, [
       application.securityGroups.onNextRefresh($scope, onApplicationRefresh);
     }
 
-    this.portUpdated = function(ruleset, index) {
+    this.portUpdated = function (ruleset, index) {
       if (!_.isEmpty(ruleset[index].sourceIPCIDRRanges)) {
         const ruleRanges = ruleset[index].destPortRanges.split(',');
         if (ruleRanges.length > 1) {
           ruleset[index].destinationPortRanges = [];
-          ruleRanges.forEach(v => ruleset[index].destinationPortRanges.push(v));
+          ruleRanges.forEach((v) => ruleset[index].destinationPortRanges.push(v));
 
           // If there are multiple port ranges then set null to the single port parameter otherwise ARM template will fail in validation.
           ruleset[index].destinationPortRange = null;
@@ -154,12 +155,12 @@ module(AZURE_SECURITYGROUP_CONFIGURE_EDITSECURITYGROUPCTRL, [
       }
     };
 
-    this.sourceIPCIDRUpdated = function(ruleset, index) {
+    this.sourceIPCIDRUpdated = function (ruleset, index) {
       if (!_.isEmpty(ruleset[index].sourceIPCIDRRanges)) {
         const ruleRanges = ruleset[index].sourceIPCIDRRanges.split(',');
         if (ruleRanges.length > 1) {
           ruleset[index].sourceAddressPrefixes = [];
-          ruleRanges.forEach(v => ruleset[index].sourceAddressPrefixes.push(v));
+          ruleRanges.forEach((v) => ruleset[index].sourceAddressPrefixes.push(v));
 
           // If there are multiple IP/CIDR ranges then set null to the single sourceAddressPrefix parameter otherwise ARM template will fail in validation
           ruleset[index].sourceAddressPrefix = null;
@@ -172,15 +173,15 @@ module(AZURE_SECURITYGROUP_CONFIGURE_EDITSECURITYGROUPCTRL, [
       }
     };
 
-    this.removeRule = function(ruleset, index) {
+    this.removeRule = function (ruleset, index) {
       ruleset.splice(index, 1);
     };
 
-    this.moveUp = function(ruleset, index) {
+    this.moveUp = function (ruleset, index) {
       if (index === 0) return;
       swapRules(ruleset, index, index - 1);
     };
-    this.moveDown = function(ruleset, index) {
+    this.moveDown = function (ruleset, index) {
       if (index === ruleset.length - 1) return;
       swapRules(ruleset, index, index + 1);
     };
@@ -199,8 +200,8 @@ module(AZURE_SECURITYGROUP_CONFIGURE_EDITSECURITYGROUPCTRL, [
 
     $scope.taskMonitor.onTaskComplete = $uibModalInstance.dismiss;
 
-    this.upsert = function() {
-      $scope.taskMonitor.submit(function() {
+    this.upsert = function () {
+      $scope.taskMonitor.submit(function () {
         const params = {
           cloudProvider: 'azure',
           appName: application.name,
@@ -214,7 +215,7 @@ module(AZURE_SECURITYGROUP_CONFIGURE_EDITSECURITYGROUPCTRL, [
       });
     };
 
-    this.cancel = function() {
+    this.cancel = function () {
       $uibModalInstance.dismiss();
     };
   },

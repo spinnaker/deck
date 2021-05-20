@@ -1,12 +1,13 @@
+import { isEmpty, template } from 'lodash';
 import React from 'react';
-import { template, isEmpty } from 'lodash';
 import { Observable, Subject } from 'rxjs';
 
-import { JobManifestPodLogs } from './JobManifestPodLogs';
-import { IManifest } from 'core/domain/IManifest';
 import { Application } from 'core/application';
+import { IManifest } from 'core/domain/IManifest';
+
+import { JobManifestPodLogs } from './JobManifestPodLogs';
+import { ManifestReader } from '../ManifestReader';
 import { IPodNameProvider } from '../PodNameProvider';
-import { ManifestReader } from 'core/manifest';
 
 interface IJobStageExecutionLogsProps {
   deployedName: string;
@@ -33,7 +34,7 @@ export class JobStageExecutionLogs extends React.Component<IJobStageExecutionLog
     Observable.from(ManifestReader.getManifest(account, location, deployedName))
       .takeUntil(this.destroy$)
       .subscribe(
-        manifest => this.setState({ manifest }),
+        (manifest) => this.setState({ manifest }),
         () => {},
       );
   }

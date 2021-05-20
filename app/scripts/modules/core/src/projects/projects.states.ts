@@ -1,12 +1,13 @@
-import { module } from 'angular';
 import { StateParams } from '@uirouter/angularjs';
+import { module } from 'angular';
 import { APPLICATION_STATE_PROVIDER, ApplicationStateProvider } from 'core/application/application.state.provider';
 import { INestedState, STATE_CONFIG_PROVIDER, StateConfigProvider } from 'core/navigation/state.provider';
+
 import { ProjectHeader } from './ProjectHeader';
-import { IProject } from '../domain/IProject';
-import { ProjectReader } from './service/ProjectReader';
-import { CORE_PROJECTS_PROJECTS_CONTROLLER } from './projects.controller';
 import { CORE_PROJECTS_DASHBOARD_DASHBOARD_CONTROLLER } from './dashboard/dashboard.controller';
+import { IProject } from '../domain/IProject';
+import { CORE_PROJECTS_PROJECTS_CONTROLLER } from './projects.controller';
+import { ProjectReader } from './service/ProjectReader';
 
 export interface IProjectStateParms extends StateParams {
   project: string;
@@ -73,6 +74,8 @@ module(PROJECTS_STATES_CONFIG, [
         },
         history: {
           type: 'projects',
+          state: 'home.project',
+          keyParams: ['project'],
         },
       },
       children: [dashboard],
@@ -100,9 +103,5 @@ module(PROJECTS_STATES_CONFIG, [
     applicationStateProvider.addParentState(project, 'detail', '/applications');
 
     stateConfigProvider.addRewriteRule('/projects/{project}', '/projects/{project}/dashboard');
-    stateConfigProvider.addRewriteRule(
-      '/projects/{project}/applications/{application}',
-      '/projects/{project}/applications/{application}/clusters',
-    );
   },
 ]);

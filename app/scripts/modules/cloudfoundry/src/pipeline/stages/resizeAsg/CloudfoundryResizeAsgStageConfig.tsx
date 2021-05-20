@@ -1,5 +1,4 @@
 import React from 'react';
-
 import { Observable, Subject } from 'rxjs';
 
 import {
@@ -7,10 +6,9 @@ import {
   IAccount,
   IStageConfigProps,
   NgReact,
-  StageConstants,
   StageConfigField,
+  StageConstants,
 } from '@spinnaker/core';
-
 import { AccountRegionClusterSelector } from 'cloudfoundry/presentation';
 
 export interface ICloudfoundryResizeAsgStageConfigState {
@@ -50,7 +48,7 @@ export class CloudfoundryResizeAsgStageConfig extends React.Component<
   public componentDidMount(): void {
     Observable.fromPromise(AccountService.listAccounts('cloudfoundry'))
       .takeUntil(this.destroy$)
-      .subscribe(accounts => this.setState({ accounts }));
+      .subscribe((accounts) => this.setState({ accounts }));
     this.props.stageFieldUpdated();
   }
 

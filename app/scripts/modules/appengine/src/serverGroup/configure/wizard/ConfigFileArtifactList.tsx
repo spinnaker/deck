@@ -1,19 +1,25 @@
-import React from 'react';
 import classNames from 'classnames';
+import React from 'react';
 
-import { IArtifact, IExpectedArtifact, IPipeline, IStage, StageArtifactSelectorDelegate } from '@spinnaker/core';
+import {
+  IArtifact,
+  IArtifactAccountPair,
+  IExpectedArtifact,
+  IPipeline,
+  IStage,
+  StageArtifactSelector,
+} from '@spinnaker/core';
 
 interface IConfigFileArtifactListProps {
-  configArtifacts: any[];
+  configArtifacts: IArtifactAccountPair[];
   pipeline: IPipeline;
   stage: IStage;
   updateConfigArtifacts: (configArtifacts: any[]) => void;
-  updatePipeline: (changes: Partial<IPipeline>) => void;
 }
 
 export const ConfigFileArtifactList = (props: IConfigFileArtifactListProps) => {
   const addConfigArtifact = () => {
-    props.updateConfigArtifacts(props.configArtifacts.concat([{}]));
+    props.updateConfigArtifacts(props.configArtifacts.concat([{ id: '', account: '' }]));
   };
 
   const deleteConfigArtifact = (index: number) => {
@@ -38,12 +44,6 @@ export const ConfigFileArtifactList = (props: IConfigFileArtifactListProps) => {
     props.updateConfigArtifacts(newConfigArtifacts);
   };
 
-  const onExpectedArtifactAccountSelected = (account: string, index: number): void => {
-    const newConfigArtifacts = [...props.configArtifacts];
-    newConfigArtifacts.splice(index, 1, { ...newConfigArtifacts[index], account });
-    props.updateConfigArtifacts(newConfigArtifacts);
-  };
-
   return (
     <>
       {props.configArtifacts.map((a, i) => {
@@ -55,12 +55,10 @@ export const ConfigFileArtifactList = (props: IConfigFileArtifactListProps) => {
             })}
           >
             <div className="col-md-9">
-              <StageArtifactSelectorDelegate
+              <StageArtifactSelector
                 artifact={a.artifact}
                 excludedArtifactTypePatterns={[]}
-                expectedArtifactId={a.id}
-                fieldColumns={7}
-                label={''}
+                expectedArtifactId={a.artifact == null ? a.id : null}
                 onArtifactEdited={(artifact: IArtifact) => {
                   onExpectedArtifactEdited(artifact, i);
                 }}
@@ -68,16 +66,7 @@ export const ConfigFileArtifactList = (props: IConfigFileArtifactListProps) => {
                   onExpectedArtifactSelected(expectedArtifact, i);
                 }}
                 pipeline={props.pipeline}
-                selectedArtifactAccount={a.account}
-                selectedArtifactId={a.id}
-                setArtifactAccount={(account: string) => {
-                  onExpectedArtifactAccountSelected(account, i);
-                }}
-                setArtifactId={(artifactId: string) => {
-                  onChangeExpectedArtifactId(artifactId, i);
-                }}
                 stage={props.stage}
-                updatePipeline={props.updatePipeline}
               />
             </div>
             <div className="col-md-1">

@@ -1,12 +1,13 @@
-import { module, IComponentController, IScope, IComponentOptions } from 'angular';
+import { IComponentController, IComponentOptions, IScope, module } from 'angular';
 import { includes } from 'lodash';
 
 import { CloudProviderRegistry } from 'core/cloudProvider';
+import { IInstanceTypeCategory, InstanceTypeService } from 'core/instance';
 import { ModalWizard } from 'core/modal/wizard/ModalWizard';
-import { InstanceTypeService, IInstanceTypeCategory } from 'core/instance';
-import { IServerGroupCommand } from './serverGroupCommandBuilder.service';
-import { CORE_SERVERGROUP_CONFIGURE_COMMON_COSTFACTOR } from './costFactor';
 import { CORE_PRESENTATION_ISVISIBLE_ISVISIBLE_DIRECTIVE } from 'core/presentation/isVisible/isVisible.directive';
+
+import { CORE_SERVERGROUP_CONFIGURE_COMMON_COSTFACTOR } from './costFactor';
+import { IServerGroupCommand } from './serverGroupCommandBuilder.service';
 
 class V2InstanceArchetypeSelectorController implements IComponentController {
   private command: IServerGroupCommand;
@@ -19,7 +20,7 @@ class V2InstanceArchetypeSelectorController implements IComponentController {
 
   public $onInit(): void {
     const { $scope } = this;
-    this.instanceTypeService.getCategories(this.command.selectedProvider).then(categories => {
+    this.instanceTypeService.getCategories(this.command.selectedProvider).then((categories) => {
       $scope.instanceProfiles = categories;
       if ($scope.instanceProfiles.length % 3 === 0) {
         $scope.columns = 3;
@@ -59,8 +60,8 @@ class V2InstanceArchetypeSelectorController implements IComponentController {
         $scope.selectedInstanceProfile = profile;
         const current = this.command.instanceType;
         if (current && !includes(['custom', 'buildCustom'], profile.type)) {
-          const found = profile.families.some(family =>
-            family.instanceTypes.some(instanceType => instanceType.name === current && !instanceType.unavailable),
+          const found = profile.families.some((family) =>
+            family.instanceTypes.some((instanceType) => instanceType.name === current && !instanceType.unavailable),
           );
           if (!found) {
             this.command.instanceType = null;
@@ -83,7 +84,7 @@ class V2InstanceArchetypeSelectorController implements IComponentController {
   public updateInstanceTypeDetails = () => {
     this.instanceTypeService
       .getInstanceTypeDetails(this.command.selectedProvider, this.command.instanceType)
-      .then(instanceTypeDetails => {
+      .then((instanceTypeDetails) => {
         this.command.viewState.instanceTypeDetails = instanceTypeDetails;
       });
 

@@ -1,29 +1,29 @@
+import { UISref } from '@uirouter/react';
+import { IHttpPromiseCallbackArg } from 'angular';
+import { cloneDeep, get, uniqBy } from 'lodash';
+import { Debounce } from 'lodash-decorators';
+import { $log } from 'ngimport';
 import React from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import Select, { Option } from 'react-select';
-import { Debounce } from 'lodash-decorators';
-import { $log } from 'ngimport';
-import { IHttpPromiseCallbackArg } from 'angular';
-import { cloneDeep, get, uniqBy } from 'lodash';
-import { UISref } from '@uirouter/react';
 
-import { Overridable } from 'core/overrideRegistry';
 import { Application } from 'core/application/application.model';
-import { IPipeline } from 'core/domain/IPipeline';
-import { SubmitButton } from 'core/modal/buttons/SubmitButton';
 import { SETTINGS } from 'core/config/settings';
+import { IPipeline } from 'core/domain/IPipeline';
+import { IPipelineTemplateV2 } from 'core/domain/IPipelineTemplateV2';
+import { SubmitButton } from 'core/modal/buttons/SubmitButton';
+import { Overridable } from 'core/overrideRegistry';
+import { Spinner } from 'core/widgets/spinners/Spinner';
+
+import { ManagedTemplateSelector } from './ManagedTemplateSelector';
+import { TemplateDescription } from './TemplateDescription';
+import { PipelineConfigService } from '../config/services/PipelineConfigService';
 import {
-  IPipelineTemplateConfig,
   IPipelineTemplate,
+  IPipelineTemplateConfig,
   PipelineTemplateReader,
 } from '../config/templates/PipelineTemplateReader';
-import { Spinner } from 'core/widgets/spinners/Spinner';
-import { IPipelineTemplateV2 } from 'core/domain/IPipelineTemplateV2';
-import { PipelineConfigService } from '../config/services/PipelineConfigService';
-import { PipelineTemplateV2Service } from 'core/pipeline';
-
-import { TemplateDescription } from './TemplateDescription';
-import { ManagedTemplateSelector } from './ManagedTemplateSelector';
+import { PipelineTemplateV2Service } from '../config/templates/v2/pipelineTemplateV2.service';
 
 import './createPipelineModal.less';
 
@@ -75,8 +75,8 @@ export class CreatePipelineModal extends React.Component<ICreatePipelineModalPro
     preselectedTemplate: null,
   };
 
-  public componentWillUpdate(nextProps: ICreatePipelineModalProps): void {
-    if (nextProps.show && !this.props.show && !this.state.loading) {
+  public componentDidUpdate(prevProps: ICreatePipelineModalProps): void {
+    if (!prevProps.show && this.props.show && !this.state.loading) {
       this.loadPipelineTemplates();
     }
   }
@@ -89,6 +89,7 @@ export class CreatePipelineModal extends React.Component<ICreatePipelineModalPro
       application: this.props.application.name,
       limitConcurrent: true,
       keepWaitingPipelines: false,
+      spelEvaluator: 'v4',
     };
   }
 
@@ -96,11 +97,11 @@ export class CreatePipelineModal extends React.Component<ICreatePipelineModalPro
     const defaultConfig = this.getDefaultConfig();
     const { application } = this.props;
     const configs: Array<Partial<IPipeline>> = [defaultConfig].concat(get(application, 'pipelineConfigs.data', []));
-    const configOptions: Option[] = configs.map(config => ({ value: config.name, label: config.name }));
+    const configOptions: Option[] = configs.map((config) => ({ value: config.name, label: config.name }));
     const existingNames: string[] = [defaultConfig]
       .concat(get(application, 'pipelineConfigs.data', []))
       .concat(get(application, 'strategyConfigs.data', []))
-      .map(config => config.name);
+      .map((config) => config.name);
 
     return {
       submitting: false,
@@ -187,7 +188,7 @@ export class CreatePipelineModal extends React.Component<ICreatePipelineModalPro
       const configs: IPipeline[] = config.strategy
         ? application.strategyConfigs.data
         : application.pipelineConfigs.data;
-      const newPipeline = configs.find(_config => _config.name === config.name);
+      const newPipeline = configs.find((_config) => _config.name === config.name);
 
       if (!newPipeline) {
         $log.warn('Could not find new pipeline after save succeeded.');
@@ -229,7 +230,7 @@ export class CreatePipelineModal extends React.Component<ICreatePipelineModalPro
   };
 
   private handleConfigChange = (option: Option): void => {
-    const config = this.state.configs.find(t => t.name === option.value);
+    const config = this.state.configs.find((t) => t.name === option.value);
     this.setState({ command: { ...this.state.command, config } });
   };
 
@@ -267,7 +268,7 @@ export class CreatePipelineModal extends React.Component<ICreatePipelineModalPro
   };
 
   private configOptionRenderer = (option: Option) => {
-    const config = this.state.configs.find(t => t.name === option.value);
+    const config = this.state.configs.find((t) => t.name === option.value);
     return (
       <div>
         <h5>{config.name}</h5>
@@ -275,7 +276,7 @@ export class CreatePipelineModal extends React.Component<ICreatePipelineModalPro
           <div className="small">
             <b>Stages: </b>
             <ul>
-              {config.stages.map(stage => (
+              {config.stages.map((stage) => (
                 <li key={stage.refId}>{stage.name || stage.type}</li>
               ))}
             </ul>
@@ -290,14 +291,14 @@ export class CreatePipelineModal extends React.Component<ICreatePipelineModalPro
   }
 
   public validateNameIsUnique(): boolean {
-    return this.state.existingNames.every(name => name !== this.state.command.name.trim());
+    return this.state.existingNames.every((name) => name !== this.state.command.name.trim());
   }
 
   public loadPipelineTemplates(): void {
     if (SETTINGS.feature.pipelineTemplates) {
       this.setState({ loading: true });
       PipelineTemplateReader.getPipelineTemplatesByScopes([this.props.application.name, 'global'])
-        .then(templates => {
+        .then((templates) => {
           templates = uniqBy(templates, 'id').filter(({ schema }) => schema !== 'v2');
           this.setState({ templates, loading: false });
         })
@@ -321,7 +322,7 @@ export class CreatePipelineModal extends React.Component<ICreatePipelineModalPro
     if (sourceUrl) {
       this.setState({ loadingTemplateFromSource: true, loadingTemplateFromSourceError: false });
       PipelineTemplateReader.getPipelineTemplateFromSourceUrl(sourceUrl)
-        .then(template => (this.state.command.template = template))
+        .then((template) => (this.state.command.template = template))
         .catch(() => this.setState({ loadingTemplateFromSourceError: true }))
         .finally(() => this.setState({ loadingTemplateFromSource: false }));
     }

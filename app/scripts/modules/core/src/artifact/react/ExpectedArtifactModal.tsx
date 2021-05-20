@@ -1,17 +1,18 @@
+import { FormikProps } from 'formik';
 import React from 'react';
 
 import { AccountService, IArtifactAccount } from 'core/account';
-import { ExpectedArtifactService } from 'core/artifact';
 import { IArtifact, IExpectedArtifact, IPipeline } from 'core/domain';
 import { HelpField } from 'core/help';
 import { WizardModal, WizardPage } from 'core/modal/wizard';
 import { IModalComponentProps, ReactModal } from 'core/presentation';
 import { FormikFormField } from 'core/presentation/forms';
-import { TextInput, CheckboxInput } from 'core/presentation/forms/inputs';
+import { CheckboxInput, TextInput } from 'core/presentation/forms/inputs';
 import { TaskMonitor } from 'core/task';
 import { noop } from 'core/utils';
+
 import { ArtifactEditor } from './ArtifactEditor';
-import { FormikProps } from 'formik';
+import { ExpectedArtifactService } from '../expectedArtifact.service';
 
 export interface IExpectedArtifactModalProps extends IModalComponentProps {
   expectedArtifact?: IExpectedArtifact;
@@ -44,19 +45,19 @@ export class ExpectedArtifactModal extends React.Component<IExpectedArtifactModa
 
   public componentDidMount(): void {
     const { excludedArtifactTypePatterns, excludedDefaultArtifactTypePatterns } = this.props;
-    AccountService.getArtifactAccounts().then(artifactAccounts => {
+    AccountService.getArtifactAccounts().then((artifactAccounts) => {
       this.setState({
         matchArtifactAccounts: excludedArtifactTypePatterns
           ? artifactAccounts.filter(
-              account =>
-                !account.types.some(typ => excludedArtifactTypePatterns.some(typPattern => typPattern.test(typ))),
+              (account) =>
+                !account.types.some((typ) => excludedArtifactTypePatterns.some((typPattern) => typPattern.test(typ))),
             )
           : artifactAccounts,
         defaultArtifactAccounts: excludedDefaultArtifactTypePatterns
           ? artifactAccounts.filter(
-              account =>
-                !account.types.some(typ =>
-                  excludedDefaultArtifactTypePatterns.some(typPattern => typPattern.test(typ)),
+              (account) =>
+                !account.types.some((typ) =>
+                  excludedDefaultArtifactTypePatterns.some((typPattern) => typPattern.test(typ)),
                 ),
             )
           : artifactAccounts,
@@ -94,7 +95,7 @@ export class ExpectedArtifactModal extends React.Component<IExpectedArtifactModa
                 <FormikFormField
                   name="displayName"
                   label="Display Name"
-                  input={props => <TextInput {...props} />}
+                  input={(props) => <TextInput {...props} />}
                   required={true}
                 />
               )}
@@ -123,15 +124,13 @@ export class ExpectedArtifactModal extends React.Component<IExpectedArtifactModa
                   <FormikFormField
                     name="usePriorArtifact"
                     label="Use prior execution"
-                    fastField={false}
-                    input={props => <CheckboxInput {...props} />}
+                    input={(props) => <CheckboxInput {...props} />}
                     help={<HelpField id="pipeline.config.expectedArtifact.usePriorExecution" />}
                   />
                   <FormikFormField
                     name="useDefaultArtifact"
                     label="Use default artifact"
-                    fastField={false}
-                    input={props => <CheckboxInput {...props} />}
+                    input={(props) => <CheckboxInput {...props} />}
                     help={<HelpField id="pipeline.config.expectedArtifact.defaultArtifact" />}
                   />
                   {formik.values.useDefaultArtifact && (

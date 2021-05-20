@@ -1,8 +1,9 @@
+import { defaultsDeep, unset } from 'lodash';
 import React from 'react';
 import Select, { Option } from 'react-select';
-import { defaultsDeep, unset } from 'lodash';
 
 import {
+  CoreRedBlackAdditionalFields,
   HelpField,
   IDeploymentStrategy,
   IDeploymentStrategyAdditionalFieldsProps,
@@ -11,7 +12,6 @@ import {
 } from '@spinnaker/core';
 
 import { IRedBlackCommand } from './strategies/redblack/redblack.strategy';
-import { AdditionalFields as AdditionalRedBlackFields } from './strategies/redblack/AdditionalFields';
 import {
   AdditionalFields as AdditionalRollingRedBlackFields,
   IRollingRedBlackCommand,
@@ -52,7 +52,7 @@ export class CloudFoundryDeploymentStrategySelector extends React.Component<
           'Disables <i>all</i> previous server groups in the cluster as soon as new server group passes health checks',
         key: 'redblack',
         additionalFields: ['maxRemainingAsgs'],
-        AdditionalFieldsComponent: AdditionalRedBlackFields,
+        AdditionalFieldsComponent: CoreRedBlackAdditionalFields,
         initializationMethod: (command: IRedBlackCommand) => {
           defaultsDeep(command, {
             rollback: {
@@ -92,11 +92,11 @@ export class CloudFoundryDeploymentStrategySelector extends React.Component<
 
   public selectStrategy(strategy: string): void {
     const { command, onStrategyChange } = this.props;
-    const oldStrategy = this.state.strategies.find(s => s.key === this.state.currentStrategy);
-    const newStrategy = this.state.strategies.find(s => s.key === strategy);
+    const oldStrategy = this.state.strategies.find((s) => s.key === this.state.currentStrategy);
+    const newStrategy = this.state.strategies.find((s) => s.key === strategy);
 
     if (oldStrategy && oldStrategy.additionalFields) {
-      oldStrategy.additionalFields.forEach(field => {
+      oldStrategy.additionalFields.forEach((field) => {
         if (!newStrategy || !newStrategy.additionalFields || !newStrategy.additionalFields.includes(field)) {
           unset(command, field);
         }
@@ -146,7 +146,7 @@ export class CloudFoundryDeploymentStrategySelector extends React.Component<
                 valueKey="key"
                 value={currentStrategy}
                 optionRenderer={this.strategyOptionRenderer}
-                valueRenderer={o => <>{o.label}</>}
+                valueRenderer={(o) => <>{o.label}</>}
                 onChange={this.strategyChanged}
               />
             </div>

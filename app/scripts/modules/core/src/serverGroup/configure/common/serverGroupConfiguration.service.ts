@@ -1,6 +1,6 @@
-import { IPromise, module } from 'angular';
+import { module } from 'angular';
+import { PROVIDER_SERVICE_DELEGATE, ProviderServiceDelegate } from 'core/cloudProvider/providerService.delegate';
 
-import { ProviderServiceDelegate, PROVIDER_SERVICE_DELEGATE } from 'core/cloudProvider/providerService.delegate';
 import { IServerGroupCommand } from './serverGroupCommandBuilder.service';
 
 export class ServerGroupConfigurationService {
@@ -13,7 +13,7 @@ export class ServerGroupConfigurationService {
     return this.providerServiceDelegate.getDelegate(provider, 'serverGroup.configurationService');
   }
 
-  public refreshInstanceTypes(provider: string, command: IServerGroupCommand): IPromise<void> {
+  public refreshInstanceTypes(provider: string, command: IServerGroupCommand): PromiseLike<void> {
     return this.getDelegate(provider).refreshInstanceTypes(command);
   }
 }

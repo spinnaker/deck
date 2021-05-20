@@ -1,9 +1,9 @@
 'use strict';
 
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 import { module } from 'angular';
 
 import { SETTINGS } from '@spinnaker/core';
-import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
 export const GOOGLE_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER =
   'spinnaker.gce.pipeline.stage.bake.executionDetails.controller';
@@ -15,7 +15,7 @@ module(GOOGLE_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER, [UIROUTER_AN
     '$stateParams',
     'executionDetailsSectionService',
     '$interpolate',
-    function($scope, $stateParams, executionDetailsSectionService, $interpolate) {
+    function ($scope, $stateParams, executionDetailsSectionService, $interpolate) {
       $scope.configSections = ['bakeConfig', 'taskStatus', 'artifactStatus'];
 
       const initialized = () => {

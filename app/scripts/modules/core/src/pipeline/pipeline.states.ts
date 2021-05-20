@@ -1,13 +1,12 @@
-import { module } from 'angular';
 import { Transition } from '@uirouter/core';
-
+import { module } from 'angular';
 import { APPLICATION_STATE_PROVIDER, ApplicationStateProvider } from 'core/application/application.state.provider';
 import { INestedState, StateConfigProvider } from 'core/navigation/state.provider';
-import { filterModelConfig } from './filter/ExecutionFilterModel';
 
-import { Executions } from './executions/Executions';
-import { ExecutionNotFound } from './executions/ExecutionNotFound';
 import { SingleExecutionDetails } from './details/SingleExecutionDetails';
+import { ExecutionNotFound } from './executions/ExecutionNotFound';
+import { Executions } from './executions/Executions';
+import { filterModelConfig } from './filter/ExecutionFilterModel';
 import { ExecutionService } from './service/execution.service';
 
 export const PIPELINE_STATES = 'spinnaker.core.pipeline.states';
@@ -102,7 +101,7 @@ module(PIPELINE_STATES, [APPLICATION_STATE_PROVIDER]).config([
       params: {
         executionId: { dynamic: true },
       },
-      redirectTo: transition => {
+      redirectTo: (transition) => {
         const { executionId, refId, stage, subStage, step, details, stageId } = transition.params();
         const executionService: ExecutionService = transition.injector().get('executionService');
 
@@ -111,7 +110,7 @@ module(PIPELINE_STATES, [APPLICATION_STATE_PROVIDER]).config([
         }
 
         return Promise.resolve(executionService.getExecution(executionId))
-          .then(execution =>
+          .then((execution) =>
             transition.router.stateService.target(
               'home.applications.application.pipelines.executionDetails.execution',
               {

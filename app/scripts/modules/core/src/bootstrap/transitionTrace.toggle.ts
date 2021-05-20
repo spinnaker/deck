@@ -1,7 +1,7 @@
-import { UIRouter, Category } from '@uirouter/core';
+import { Category, UIRouter } from '@uirouter/core';
 
 import { bootstrapModule } from './bootstrap.module';
-import { paramChangedHelper } from 'core/bootstrap';
+import { paramChangedHelper } from './paramChangedHelper';
 
 /** Changes UI-Router console tracing based on the query parameter `trace` */
 bootstrapModule.run([
@@ -16,7 +16,7 @@ bootstrapModule.run([
         } else if (newValue.toUpperCase() === 'ALL') {
           trace.enable();
         } else {
-          const traceValues = newValue.split(',').map(str => str.trim().toUpperCase());
+          const traceValues = newValue.split(',').map((str) => str.trim().toUpperCase());
           trace.enable(...(traceValues as any));
         }
       }
