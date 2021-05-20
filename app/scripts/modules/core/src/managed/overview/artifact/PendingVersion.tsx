@@ -6,9 +6,9 @@ import { Constraints } from './Constraints';
 import { GitLink } from './GitLink';
 import { RelativeTimestamp } from '../../RelativeTimestamp';
 import { QueryArtifact, QueryArtifactVersion } from '../types';
-import { getLifecycleEventDuration, getLifecycleEventLink, useCreateVersionActions } from './utils';
-import { TOOLTIP_DELAY } from '../../utils/defaults';
-import { VersionMetadata } from '../../versionMetadata/VersionMetadata';
+import { useCreateVersionActions } from './utils';
+import { TOOLTIP_DELAY_SHOW } from '../../utils/defaults';
+import { getBaseMetadata, VersionMetadata } from '../../versionMetadata/VersionMetadata';
 
 export interface IPendingVersionsProps {
   artifact: QueryArtifact;
@@ -67,7 +67,7 @@ interface IPendingVersionProps {
 }
 
 const PendingVersion = ({ data, reference, environment, isPinned, index }: IPendingVersionProps) => {
-  const { buildNumber, version, gitMetadata, constraints, status } = data;
+  const { buildNumber, version, gitMetadata, constraints } = data;
   const actions = useCreateVersionActions({
     environment,
     reference,
@@ -84,21 +84,13 @@ const PendingVersion = ({ data, reference, environment, isPinned, index }: IPend
     <div className="artifact-pending-version">
       {data.createdAt && (
         <div className="artifact-pending-version-timestamp">
-          <RelativeTimestamp timestamp={DateTime.fromISO(data.createdAt)} delayShow={TOOLTIP_DELAY} />
+          <RelativeTimestamp timestamp={DateTime.fromISO(data.createdAt)} delayShow={TOOLTIP_DELAY_SHOW} />
         </div>
       )}
       <div className="artifact-pending-version-commit">
         {gitMetadata ? <GitLink gitMetadata={gitMetadata} /> : `Build ${buildNumber}`}
       </div>
-      <VersionMetadata
-        buildNumber={buildNumber}
-        buildLink={getLifecycleEventLink(data, 'BUILD')}
-        author={gitMetadata?.author}
-        buildDuration={getLifecycleEventDuration(data, 'BUILD')}
-        isDeploying={status === 'DEPLOYING'}
-        isPinned={isPinned}
-        actions={actions}
-      />
+      <VersionMetadata {...getBaseMetadata(data)} isPinned={isPinned} actions={actions} />
       {constraints && !isEmpty(constraints) && (
         <Constraints
           key={index} // This is needed on refresh if a new version was added

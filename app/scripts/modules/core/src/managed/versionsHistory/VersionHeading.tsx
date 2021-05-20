@@ -8,7 +8,7 @@ import { Tooltip, useApplicationContextSafe } from 'core/presentation';
 import { FetchVersionDocument, FetchVersionQueryVariables } from '../graphql/graphql-sdk';
 import { GitLink } from '../overview/artifact/GitLink';
 import { HistoryArtifactVersion, VersionData } from './types';
-import { TOOLTIP_DELAY } from '../utils/defaults';
+import { TOOLTIP_DELAY_SHOW } from '../utils/defaults';
 import {
   BaseVersionMetadata,
   VersionAuthor,
@@ -108,10 +108,8 @@ export const VersionHeading = ({ group, chevron }: IVersionHeadingProps) => {
               const statusSummary = getEnvStatusSummary(artifacts);
               const statusClassName = statusToClassName[statusSummary];
               return (
-                <Tooltip delayShow={TOOLTIP_DELAY} value={statusToText[statusSummary]}>
-                  <div key={env} className={classnames('chip', statusClassName)}>
-                    {env}
-                  </div>
+                <Tooltip key={env} delayShow={TOOLTIP_DELAY_SHOW} value={statusToText[statusSummary]}>
+                  <div className={classnames('chip', statusClassName)}>{env}</div>
                 </Tooltip>
               );
             })}

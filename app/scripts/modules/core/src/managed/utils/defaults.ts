@@ -1,6 +1,12 @@
+import { IHoverablePopoverProps } from 'core/presentation';
 import { ISpinnerProps } from 'core/widgets';
 
-export const TOOLTIP_DELAY = 300;
+export const TOOLTIP_DELAY_SHOW = 400;
+export const TOOLTIP_DELAY_HIDE = 100;
+export const tooltipShowHideProps: Partial<IHoverablePopoverProps> = {
+  delayShow: TOOLTIP_DELAY_SHOW,
+  delayHide: TOOLTIP_DELAY_HIDE,
+};
 export const MODAL_MAX_WIDTH = 750;
 export const spinnerProps: ISpinnerProps = {
   size: 'medium',

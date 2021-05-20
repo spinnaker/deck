@@ -8,9 +8,9 @@ import { EnvironmentItem } from '../environmentBaseElements/EnvironmentItem';
 import { useFetchVersionQuery } from '../graphql/graphql-sdk';
 import { ArtifactVersionTasks } from '../overview/artifact/ArtifactVersionTasks';
 import { Constraints } from '../overview/artifact/Constraints';
-import { getLifecycleEventDuration, getLifecycleEventLink, useCreateVersionActions } from '../overview/artifact/utils';
+import { useCreateVersionActions } from '../overview/artifact/utils';
 import { PinnedVersions, VersionData, VersionInEnvironment } from './types';
-import { VersionMetadata } from '../versionMetadata/VersionMetadata';
+import { getBaseMetadata, VersionMetadata } from '../versionMetadata/VersionMetadata';
 
 import './VersionsHistory.less';
 
@@ -65,10 +65,8 @@ const VersionInEnvironment = ({ environment, version, envPinnedVersions }: IVers
       <VersionMetadata
         key={version.id}
         buildNumber={version.buildNumber}
-        buildLink={getLifecycleEventLink(detailedVersionData, 'BUILD')}
         author={version.gitMetadata?.author}
-        deployedAt={detailedVersionData?.deployedAt}
-        buildDuration={getLifecycleEventDuration(detailedVersionData, 'BUILD')}
+        {...(detailedVersionData ? getBaseMetadata(detailedVersionData) : undefined)}
         actions={actions}
         isPinned={isPinned}
       />
