@@ -9,7 +9,12 @@ import { FetchVersionDocument, FetchVersionQueryVariables } from '../graphql/gra
 import { GitLink } from '../overview/artifact/GitLink';
 import { HistoryArtifactVersion, VersionData } from './types';
 import { TOOLTIP_DELAY } from '../utils/defaults';
-import { VersionAuthor, VersionBuilds, VersionCreatedAt } from '../versionMetadata/MetadataComponents';
+import {
+  BaseVersionMetadata,
+  VersionAuthor,
+  VersionBuilds,
+  VersionCreatedAt,
+} from '../versionMetadata/MetadataComponents';
 
 import './VersionsHistory.less';
 
@@ -90,11 +95,11 @@ export const VersionHeading = ({ group, chevron }: IVersionHeadingProps) => {
         ) : (
           <div>Build {Array.from(group.buildNumbers).join(', ')}</div>
         )}
-        <div className="VersionMetadata">
+        <BaseVersionMetadata>
           <VersionAuthor author={gitMetadata?.author} />
           <VersionBuilds builds={Array.from(group.buildNumbers).map((buildNumber) => ({ buildNumber }))} />
           <VersionCreatedAt createdAt={group.createdAt} />
-        </div>
+        </BaseVersionMetadata>
         {/* Shows a badge for each environment with the status of the artifacts in it */}
         <div className="version-environments">
           {Object.entries(group.environments).map(([env, artifacts]) => {
