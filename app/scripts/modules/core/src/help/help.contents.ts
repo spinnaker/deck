@@ -216,7 +216,7 @@ const helpContents: { [key: string]: string } = {
   'loadBalancer.advancedSettings.loadBalancingCrossZone':
     '<p>Cross-zone load balancing distributes traffic evenly across all targets in the Availability Zones enabled for the load balancer.</p><p> Default: <b>True</b></p>',
   'loadBalancer.advancedSettings.albIpAddressType':
-    '<p>Assigns both a v4 and v6 IP address to the load balancer. This option is only valid for an external load balancer. If left unchecked, this value will default to <b>"ipv4"</b>.</p>',
+    '<p>Assigns both a v4 and v6 IP address to the load balancer. If left unchecked, this value will default to <b>"ipv4"</b>.</p>',
   'loadBalancer.advancedSettings.nlbIpAddressType':
     '<p>Assigns both a v4 and v6 IP address to the load balancer. This option is only valid for NLBs which are external and only have Ip targets (not instance targets). If left unchecked, this value will default to <b>"ipv4"</b>.</p>',
   'pipeline.config.resizeAsg.action': `
@@ -386,6 +386,7 @@ const helpContents: { [key: string]: string } = {
     '<p>(Optional) If specified, only pushes to the branches that match this Java Regular Expression will be triggered. Leave empty to trigger builds for every branch.</p>',
   'pipeline.config.git.trigger.githubSecret':
     '<p>(Optional, but recommended) If specified, verifies GitHub as the sender of this trigger. See <a target="_blank" href="https://developer.github.com/webhooks/securing/">GitHub docs</a> for more information.</p>',
+  'serverGroup.ipv6': `<p>Associating an IPv6 address to nodes allows for ingress and egress communication over IPv6. Most modern software supports IPv6 and enablement is transparent. This is an incremental addition to IPv4 and will not remove the ability for connectivity over IPv4.</p>`,
   'serverGroupCapacity.useSourceCapacityTrue': `
       <p>Spinnaker will use the current capacity of the existing server group when deploying a new server group.</p>
       <p>This setting is intended to support a server group with auto-scaling enabled, where the bounds and desired capacity are controlled by an external process.</p>

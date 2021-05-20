@@ -1,15 +1,126 @@
-query fetchApplication($appName: String!) {
+query fetchApplication($appName: String!, $statuses: [MdArtifactStatusInEnvironment!]) {
   application(appName: $appName) {
+    id
     name
     account
     environments {
+      id
       name
       state {
+        id
         artifacts {
+          id
           name
+          environment
           type
           reference
-          versions(statuses: [PENDING, APPROVED, DEPLOYING, CURRENT]) {
+          versions(statuses: $statuses) {
+            id
+            buildNumber
+            version
+            createdAt
+            status
+            gitMetadata {
+              commit
+              author
+              branch
+              commitInfo {
+                sha
+                link
+                message
+              }
+              pullRequest {
+                number
+                link
+              }
+              comparisonLinks {
+                toPreviousVersion
+                toCurrentVersion
+              }
+            }
+            deployedAt
+            lifecycleSteps {
+              startedAt
+              completedAt
+              type
+              status
+              link
+            }
+            constraints {
+              type
+              status
+              judgedBy
+              attributes
+            }
+            verifications {
+              id
+              type
+              status
+              startedAt
+              completedAt
+              link
+            }
+            postDeploy {
+              id
+              type
+              status
+              startedAt
+              completedAt
+              link
+            }
+          }
+          pinnedVersion {
+            id
+            version
+            buildNumber
+            pinnedAt
+            pinnedBy
+            comment
+            gitMetadata {
+              commitInfo {
+                message
+              }
+            }
+          }
+        }
+        resources {
+          id
+          kind
+          displayName
+          moniker {
+            app
+            stack
+            detail
+          }
+          location {
+            account
+            regions
+          }
+        }
+      }
+    }
+  }
+}
+
+query fetchVersionsHistory($appName: String!) {
+  application(appName: $appName) {
+    id
+    name
+    account
+    environments {
+      id
+      name
+      state {
+        id
+        artifacts {
+          id
+          name
+          environment
+          type
+          reference
+          versions {
+            id
+            buildNumber
             version
             createdAt
             status
@@ -29,22 +140,131 @@ query fetchApplication($appName: String!) {
             }
           }
           pinnedVersion {
-            name
-            reference
-          }
-        }
-        resources {
-          id
-          kind
-          status
-          displayName
-          artifact {
-            name
-            type
-            reference
+            id
+            version
+            buildNumber
+            pinnedAt
+            pinnedBy
+            comment
           }
         }
       }
     }
   }
+}
+
+query fetchVersion($appName: String!, $versions: [String!]) {
+  application(appName: $appName) {
+    id
+    name
+    account
+    environments {
+      id
+      name
+      state {
+        id
+        artifacts {
+          id
+          name
+          environment
+          type
+          reference
+          versions(versions: $versions) {
+            id
+            buildNumber
+            version
+            createdAt
+            status
+            gitMetadata {
+              commit
+              author
+              branch
+              commitInfo {
+                sha
+                link
+                message
+              }
+              pullRequest {
+                number
+                link
+              }
+              comparisonLinks {
+                toPreviousVersion
+                toCurrentVersion
+              }
+            }
+            deployedAt
+            lifecycleSteps {
+              startedAt
+              completedAt
+              type
+              status
+              link
+            }
+            constraints {
+              type
+              status
+              judgedBy
+              attributes
+            }
+            verifications {
+              id
+              type
+              status
+              startedAt
+              completedAt
+              link
+            }
+            postDeploy {
+              id
+              type
+              status
+              startedAt
+              completedAt
+              link
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+query fetchResourceStatus($appName: String!) {
+  application(appName: $appName) {
+    id
+    name
+    environments {
+      id
+      name
+      state {
+        id
+        resources {
+          id
+          kind
+          state {
+            status
+            reason
+            event
+          }
+        }
+      }
+    }
+  }
+}
+
+query fetchApplicationManagementStatus($appName: String!) {
+  application(appName: $appName) {
+    id
+    name
+    isPaused
+  }
+}
+
+mutation UpdateConstraint($payload: MdConstraintStatusPayload!) {
+  updateConstraintStatus(payload: $payload)
+}
+
+mutation ToggleManagement($application: String!, $isPaused: Boolean!) {
+  toggleManagement(application: $application, isPaused: $isPaused)
 }

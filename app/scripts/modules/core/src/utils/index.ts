@@ -1,4 +1,3 @@
-///<reference path="./classnames.d.ts" />
 ///<reference path="./angular-messages.d.ts" />
 ///<reference path="./angular-sanitize.d.ts" />
 ///<reference path="./angular-spinner.d.ts" />
@@ -19,3 +18,4 @@ export * from './unicodeBase64';
 export * from './uuid.service';
 export * from './workerPool';
 export * from './json/filterObjectValues';
+export * from './Logger';
