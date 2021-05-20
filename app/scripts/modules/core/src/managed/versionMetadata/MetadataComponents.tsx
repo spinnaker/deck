@@ -7,7 +7,8 @@ import { Icon } from '@spinnaker/presentation';
 import { Tooltip } from 'core/presentation';
 
 import { RelativeTimestamp } from '../RelativeTimestamp';
-import { TOOLTIP_DELAY } from '../utils/defaults';
+import { LifecycleEventSummary } from '../overview/artifact/utils';
+import { TOOLTIP_DELAY_SHOW } from '../utils/defaults';
 
 import './VersionMetadata.less';
 
@@ -31,6 +32,7 @@ export interface IVersionMetadataProps {
   buildDuration?: string;
   buildsBehind?: number;
   isDeploying?: boolean;
+  baking?: LifecycleEventSummary;
   isPinned?: boolean;
   actions?: VersionAction[];
 }
@@ -71,30 +73,54 @@ export const VersionCreatedAt = ({ createdAt }: IVersionCreatedAtProps) => {
   if (!createdAt) return null;
   return (
     <MetadataElement>
-      <Tooltip delayShow={TOOLTIP_DELAY} value="Created at">
+      <Tooltip delayShow={TOOLTIP_DELAY_SHOW} value="Created at">
         <i className="far fa-calendar-alt metadata-icon" />
       </Tooltip>
-      <RelativeTimestamp timestamp={createdAt} delayShow={TOOLTIP_DELAY} removeStyles withSuffix />
+      <RelativeTimestamp timestamp={createdAt} delayShow={TOOLTIP_DELAY_SHOW} removeStyles withSuffix />
     </MetadataElement>
   );
 };
 
-export const DeployingBadge = () => {
-  return (
-    <MetadataElement>
-      <span className="version-deploying version-badge">Deploying</span>
-    </MetadataElement>
-  );
-};
-
-export const PinnedBadge = () => {
-  return (
-    <MetadataElement>
-      <span className="version-pinned version-badge">
+const badgeTypeToDetails = {
+  deploying: { className: 'version-deploying', text: 'Deploying' },
+  baking: { className: 'version-baking', text: 'Baking' },
+  pinned: {
+    className: 'version-pinned',
+    text: (
+      <>
         <Icon name="pin" size="12px" color="black" /> Pinned
-      </span>
-    </MetadataElement>
+      </>
+    ),
+  },
+};
+
+interface IMetadataBadgeProps {
+  type: keyof typeof badgeTypeToDetails;
+  tooltip?: string;
+  link?: string;
+}
+
+export const MetadataBadge = ({ type, link, tooltip }: IMetadataBadgeProps) => {
+  const details = badgeTypeToDetails[type];
+  const className = classnames('version-badge', details.className);
+  const baseBadge = link ? (
+    <a href={link} className={className}>
+      {details.text}
+    </a>
+  ) : (
+    <span className={className}>{details.text}</span>
   );
+  if (tooltip) {
+    return (
+      <MetadataElement>
+        <Tooltip value={tooltip} delayShow={TOOLTIP_DELAY_SHOW}>
+          {baseBadge}
+        </Tooltip>
+      </MetadataElement>
+    );
+  } else {
+    return <MetadataElement>{baseBadge}</MetadataElement>;
+  }
 };
 
 interface IVersionAuthorProps {

@@ -3,7 +3,7 @@ import React from 'react';
 import { HoverablePopover, Markdown } from 'core/presentation';
 
 import { QueryGitMetadata } from '../types';
-import { TOOLTIP_DELAY } from '../../utils/defaults';
+import { tooltipShowHideProps } from '../../utils/defaults';
 
 import './GitLink.less';
 
@@ -21,9 +21,8 @@ export const GitLink = ({ gitMetadata: { commit, commitInfo, pullRequest }, asLi
   return (
     <div className="GitLink">
       <HoverablePopover
-        wrapperClassName="git-link-inner"
-        delayShow={TOOLTIP_DELAY}
-        delayHide={0}
+        {...tooltipShowHideProps}
+        wrapperClassName="git-link-inner no-underline"
         placement="top"
         Component={() => <Markdown className="git-commit-tooltip" message={tooltip} />}
       >

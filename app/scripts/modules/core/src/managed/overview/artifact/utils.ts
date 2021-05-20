@@ -37,11 +37,18 @@ export const getConstraintsStatusSummary = (constraints: QueryConstraint[]) => {
   return { text: summary, status: finalStatus };
 };
 
+export const getLifecycleEventByType = (
+  version: QueryArtifactVersion | undefined,
+  type: QueryLifecycleStep['type'],
+): QueryLifecycleStep | undefined => {
+  return version?.lifecycleSteps?.find((step) => step.type === type);
+};
+
 export const getLifecycleEventDuration = (
   version: QueryArtifactVersion | undefined,
   type: QueryLifecycleStep['type'],
 ) => {
-  const event = version?.lifecycleSteps?.find((step) => step.type === type);
+  const event = getLifecycleEventByType(version, type);
   if (!event) return undefined;
   const { startedAt, completedAt } = event;
   if (startedAt && completedAt) {
@@ -52,6 +59,27 @@ export const getLifecycleEventDuration = (
 
 export const getLifecycleEventLink = (version: QueryArtifactVersion | undefined, type: QueryLifecycleStep['type']) => {
   return version?.lifecycleSteps?.find((step) => step.type === type)?.link;
+};
+
+export interface LifecycleEventSummary {
+  startedAt?: DateTime;
+  duration?: string;
+  link?: string;
+  isRunning: boolean;
+}
+
+export const getLifecycleEventSummary = (
+  version: QueryArtifactVersion | undefined,
+  type: QueryLifecycleStep['type'],
+): LifecycleEventSummary | undefined => {
+  const event = getLifecycleEventByType(version, type);
+  if (!event) return undefined;
+  return {
+    startedAt: event.startedAt ? DateTime.fromISO(event.startedAt) : undefined,
+    duration: getLifecycleEventDuration(version, type),
+    isRunning: event.status === 'RUNNING',
+    link: event.link,
+  };
 };
 
 interface ICreateVersionActionsProps {

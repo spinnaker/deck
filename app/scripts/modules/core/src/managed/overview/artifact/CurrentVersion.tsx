@@ -3,8 +3,8 @@ import React from 'react';
 import { ArtifactVersionTasks } from './ArtifactVersionTasks';
 import { GitLink } from './GitLink';
 import { QueryArtifactVersion } from '../types';
-import { getLifecycleEventDuration, getLifecycleEventLink, useCreateVersionActions } from './utils';
-import { VersionMetadata } from '../../versionMetadata/VersionMetadata';
+import { useCreateVersionActions } from './utils';
+import { getBaseMetadata, VersionMetadata } from '../../versionMetadata/VersionMetadata';
 
 interface ICurrentVersionProps {
   data: QueryArtifactVersion;
@@ -31,11 +31,7 @@ export const CurrentVersion = ({ data, environment, reference, numNewerVersions,
     <div className="artifact-current-version">
       {gitMetadata ? <GitLink gitMetadata={gitMetadata} /> : <div>Build {data?.version}</div>}
       <VersionMetadata
-        buildNumber={data.buildNumber}
-        buildLink={getLifecycleEventLink(data, 'BUILD')}
-        author={gitMetadata?.author}
-        deployedAt={data.deployedAt}
-        buildDuration={getLifecycleEventDuration(data, 'BUILD')}
+        {...getBaseMetadata(data)}
         buildsBehind={numNewerVersions}
         actions={actions}
         isPinned={isPinned}
