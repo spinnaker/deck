@@ -30,6 +30,13 @@ const useGetDetailedVersionData = ({ environment, version }: Omit<IVersionInEnvi
   return { detailedVersionData: artifactData?.versions?.find((v) => v.version === version.version), error, loading };
 };
 
+const LoadingAnimation = () => (
+  <ContentLoader width="100%" height={30}>
+    <rect x="0" y="8" rx="5" ry="5" width="60%" height="8" />
+    <rect x="0" y="22" rx="5" ry="5" width="50%" height="8" />
+  </ContentLoader>
+);
+
 const VersionInEnvironment = ({ environment, version, envPinnedVersions }: IVersionInEnvironmentProps) => {
   const { detailedVersionData, loading } = useGetDetailedVersionData({ environment, version });
   const isPinned = Boolean(
@@ -65,12 +72,8 @@ const VersionInEnvironment = ({ environment, version, envPinnedVersions }: IVers
         actions={actions}
         isPinned={isPinned}
       />
-      {loading && (
-        <ContentLoader width="100%" height={30}>
-          <rect x="0" y="8" rx="5" ry="5" width="60%" height="8" />
-          <rect x="0" y="22" rx="5" ry="5" width="50%" height="8" />
-        </ContentLoader>
-      )}
+
+      {loading && <LoadingAnimation />}
       <Constraints
         constraints={detailedVersionData?.constraints}
         versionProps={{ environment, reference: version.reference, version: version.version }}
