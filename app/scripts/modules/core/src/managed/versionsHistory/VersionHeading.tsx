@@ -74,7 +74,9 @@ export const VersionHeading = ({ group, chevron }: IVersionHeadingProps) => {
   const gitMetadata = group.gitMetadata;
   const client = useApolloClient();
   const app = useApplicationContextSafe();
+
   const prefetchData = () => {
+    // This function is pre-loading the content of the version and caching it before mounting the VersionContent component
     client.query<any, FetchVersionQueryVariables>({
       query: FetchVersionDocument,
       variables: { appName: app.name, versions: Array.from(group.versions) },
