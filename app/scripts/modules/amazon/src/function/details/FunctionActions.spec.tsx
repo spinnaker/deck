@@ -6,9 +6,9 @@ import { IAmazonFunction, FunctionActions } from 'amazon';
 
 describe('FunctionActions', () => {
   it('should render correct state when all attributes exist', () => {
-    let app = {} as Application;
+    let app = { name: 'app' } as Application;
 
-    let functionDef = {} as IAmazonFunction;
+    let functionDef = { functionName: 'app-function' } as IAmazonFunction;
 
     const wrapper = shallow(
       <FunctionActions
