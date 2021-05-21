@@ -2,7 +2,6 @@ import classnames from 'classnames';
 import { isEmpty } from 'lodash';
 import React from 'react';
 
-import { Icon } from '@spinnaker/presentation';
 import { CollapsibleSection, useApplicationContextSafe } from 'core/presentation';
 import { NotifierService } from 'core/widgets';
 
@@ -120,33 +119,30 @@ export const Constraints = ({
   versionProps: ArtifactVersionProps;
   expandedByDefault?: boolean;
 }) => {
-  const [showSummary, setShowSummary] = React.useState(Boolean(expandedByDefault));
   if (!constraints || !constraints.length) return null;
   const summary = getConstraintsStatusSummary(constraints);
   return (
     <div className="Constraints">
-      {showSummary ? (
-        constraints?.map((constraint, index) => (
-          <Constraint key={index} constraint={constraint} versionProps={versionProps} />
-        ))
-      ) : (
-        <div className="pending-version-constraint">
-          <VersionOperationIcon status={summary.status} />
-          <span className="constraint-title">
-            Constraints: {summary.text} (
-            <a
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                setShowSummary(true);
-              }}
-            >
-              expand
-            </a>
-            )
-          </span>
-        </div>
-      )}
+      <div className="pending-version-constraint">
+        <VersionOperationIcon status={summary.status} />
+        <CollapsibleSection
+          heading={({ chevron }) => (
+            <div className="horizontal">
+              Constraints: {summary.text} {chevron}
+            </div>
+          )}
+          outerDivClassName=""
+          toggleClassName="constraint-toggle"
+          bodyClassName="sp-margin-xs-top sp-margin-xs-bottom"
+          expandIconSize="12px"
+          defaultExpanded={expandedByDefault}
+          enableCaching={false}
+        >
+          {constraints?.map((constraint, index) => (
+            <Constraint key={index} constraint={constraint} versionProps={versionProps} />
+          ))}
+        </CollapsibleSection>
+      </div>
     </div>
   );
 };
