@@ -75,7 +75,7 @@ export const ScalingActivitiesModal = ({ dismissModal, serverGroup }: IScalingAc
       <ModalHeader>{`Scaling Activities for ${serverGroup.name}`}</ModalHeader>
       <ModalBody>
         {loading && (
-          <div className="ScalingAcivitiesModalBody flex-container-v middle sp-margin-xl-yaxis">
+          <div className="ScalingAcivitiesModalBody flex-container-v middle center sp-margin-xl-yaxis">
             <Spinner />
           </div>
         )}
