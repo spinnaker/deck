@@ -7,6 +7,7 @@ import { timestamp } from 'core/utils';
 import { Spinner } from 'core/widgets';
 
 import { ServerGroupReader } from '../../serverGroupReader.service';
+import './ScalingActivitiesModal.less';
 
 export interface IScalingEvent {
   description: string;
@@ -74,17 +75,17 @@ export const ScalingActivitiesModal = ({ dismissModal, serverGroup }: IScalingAc
       <ModalHeader>{`Scaling Activities for ${serverGroup.name}`}</ModalHeader>
       <ModalBody>
         {loading && (
-          <div className="flex-container-v middle center sp-margin-xl">
+          <div className="ScalingAcivitiesModalBody flex-container-v middle sp-margin-xl-yaxis">
             <Spinner />
           </div>
         )}
         {!loading && Boolean(error) && (
-          <div className="flex-container-v middle center sp-margin-xl">
+          <div className="ScalingAcivitiesModalBody flex-container-v middle sp-margin-xl-yaxis">
             <p>{`There was an error loading scaling activities for ${serverGroup.name}. Please try again later.`}</p>
           </div>
         )}
         {!loading && !error && !scalingActivities.length && (
-          <div className="flex-container-v middle center sp-margin-xl">
+          <div className="ScalingAcivitiesModalBody flex-container-v middle sp-margin-xl-yaxis">
             <p>{`No scaling activities found for ${serverGroup.name}.`}</p>
           </div>
         )}
@@ -92,7 +93,7 @@ export const ScalingActivitiesModal = ({ dismissModal, serverGroup }: IScalingAc
           !error &&
           scalingActivities.length &&
           scalingActivities.map((a, i) => (
-            <div key={a.cause} className="flex-container-v middle center sp-margin-xl">
+            <div key={a.cause} className="ScalingAcivitiesModalBody flex-container-v middle sp-margin-xl-yaxis">
               <p className="clearfix">
                 <span className={`label label-${a.isSuccessful ? 'success' : 'danger'} pull-left`}>{a.statusCode}</span>
                 <span className="label label-default pull-right">{timestamp(a.startTime)}</span>

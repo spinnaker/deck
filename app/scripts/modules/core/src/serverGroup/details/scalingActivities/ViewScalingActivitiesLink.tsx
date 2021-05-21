@@ -8,7 +8,7 @@ export interface IViewScalingActivitiesLinkProps {
 }
 
 export const ViewScalingActivitiesLink = ({ serverGroup }: IViewScalingActivitiesLinkProps) => (
-  <div className="link" onClick={() => showModal(ScalingActivitiesModal, { serverGroup })}>
+  <a className="clickable" onClick={() => showModal(ScalingActivitiesModal, { serverGroup }, { maxWidth: '1000px' })}>
     View Scaling Activities
-  </div>
+  </a>
 );
