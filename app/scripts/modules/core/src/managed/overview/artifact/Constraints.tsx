@@ -3,9 +3,10 @@ import { isEmpty } from 'lodash';
 import React from 'react';
 
 import { Icon } from '@spinnaker/presentation';
-import { useApplicationContextSafe } from 'core/presentation';
+import { CollapsibleSection, useApplicationContextSafe } from 'core/presentation';
 import { NotifierService } from 'core/widgets';
 
+import { RelativeTimestamp } from '../../RelativeTimestamp';
 import { VersionOperationIcon } from './VersionOperation';
 import { constraintsManager } from '../../constraints/registry';
 import { FetchApplicationDocument, useUpdateConstraintMutation } from '../../graphql/graphql-sdk';
@@ -82,27 +83,30 @@ interface IConstraintProps {
 
 const Constraint = ({ constraint, versionProps }: IConstraintProps) => {
   const hasContent = constraintsManager.hasContent(constraint);
-  const [isExpanded, setIsExpanded] = React.useState(hasContent);
   const title = constraintsManager.renderTitle(constraint);
   return (
     <div className="pending-version-constraint">
       <VersionOperationIcon status={constraint.status} />
-      <div>
-        {hasContent ? (
-          <button
-            className="btn-link constraint-title"
-            onClick={() => {
-              setIsExpanded((state) => !state);
-            }}
-          >
-            {title}
-            <Icon name="accordionExpand" size="12px" className={isExpanded ? 'rotate-m90' : undefined} />
-          </button>
-        ) : (
-          <span className="constraint-title">{title}</span>
+      <CollapsibleSection
+        outerDivClassName=""
+        defaultExpanded
+        toggleClassName="constraint-toggle"
+        enableCaching={false}
+        expandIconSize="12px"
+        heading={({ chevron }) => (
+          <div className="constraint-title">
+            {title}{' '}
+            {constraint.judgedAt && (
+              <span className="sp-margin-xs-left">
+                (<RelativeTimestamp timestamp={constraint.judgedAt} withSuffix />)
+              </span>
+            )}
+            {chevron}
+          </div>
         )}
-        {isExpanded && hasContent && <ConstraintContent constraint={constraint} versionProps={versionProps} />}
-      </div>
+      >
+        {hasContent ? <ConstraintContent constraint={constraint} versionProps={versionProps} /> : undefined}
+      </CollapsibleSection>
     </div>
   );
 };
