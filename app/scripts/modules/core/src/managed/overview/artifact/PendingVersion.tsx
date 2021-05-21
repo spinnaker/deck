@@ -8,6 +8,7 @@ import { RelativeTimestamp } from '../../RelativeTimestamp';
 import { QueryArtifact, QueryArtifactVersion } from '../types';
 import { useCreateVersionActions } from './utils';
 import { TOOLTIP_DELAY_SHOW } from '../../utils/defaults';
+import { PinnedMetadata, toPinnedMetadata } from '../../versionMetadata/MetadataComponents';
 import { getBaseMetadata, VersionMetadata } from '../../versionMetadata/VersionMetadata';
 
 export interface IPendingVersionsProps {
@@ -39,7 +40,7 @@ export const PendingVersions = ({ artifact, pendingVersions }: IPendingVersionsP
             environment={artifact.environment}
             reference={artifact.reference}
             data={version}
-            isPinned={pinnedVersion?.version === version.version}
+            pinned={pinnedVersion?.version === version.version ? toPinnedMetadata(pinnedVersion) : undefined}
           />
         ))}
         {numVersions > NUM_VERSIONS_WHEN_COLLAPSED ? (
@@ -62,11 +63,11 @@ interface IPendingVersionProps {
   data: QueryArtifactVersion;
   reference: string;
   environment: string;
-  isPinned: boolean;
+  pinned?: PinnedMetadata;
   index: number;
 }
 
-const PendingVersion = ({ data, reference, environment, isPinned, index }: IPendingVersionProps) => {
+const PendingVersion = ({ data, reference, environment, pinned, index }: IPendingVersionProps) => {
   const { buildNumber, version, gitMetadata, constraints } = data;
   const actions = useCreateVersionActions({
     environment,
@@ -74,7 +75,7 @@ const PendingVersion = ({ data, reference, environment, isPinned, index }: IPend
     buildNumber,
     version,
     commitMessage: gitMetadata?.commitInfo?.message,
-    isPinned,
+    isPinned: Boolean(pinned),
     compareLinks: {
       current: gitMetadata?.comparisonLinks?.toCurrentVersion,
     },
@@ -90,7 +91,7 @@ const PendingVersion = ({ data, reference, environment, isPinned, index }: IPend
       <div className="artifact-pending-version-commit">
         {gitMetadata ? <GitLink gitMetadata={gitMetadata} /> : `Build ${buildNumber}`}
       </div>
-      <VersionMetadata {...getBaseMetadata(data)} isPinned={isPinned} actions={actions} />
+      <VersionMetadata {...getBaseMetadata(data)} pinned={pinned} actions={actions} />
       {constraints && !isEmpty(constraints) && (
         <Constraints
           key={index} // This is needed on refresh if a new version was added

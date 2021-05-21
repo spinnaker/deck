@@ -10,6 +10,7 @@ import { ArtifactVersionTasks } from '../overview/artifact/ArtifactVersionTasks'
 import { Constraints } from '../overview/artifact/Constraints';
 import { useCreateVersionActions } from '../overview/artifact/utils';
 import { PinnedVersions, VersionData, VersionInEnvironment } from './types';
+import { PinnedMetadata, toPinnedMetadata } from '../versionMetadata/MetadataComponents';
 import { getBaseMetadata, VersionMetadata } from '../versionMetadata/VersionMetadata';
 
 import './VersionsHistory.less';
@@ -39,16 +40,19 @@ const LoadingAnimation = () => (
 
 const VersionInEnvironment = ({ environment, version, envPinnedVersions }: IVersionInEnvironmentProps) => {
   const { detailedVersionData, loading } = useGetDetailedVersionData({ environment, version });
-  const isPinned = Boolean(
-    version.buildNumber !== undefined && envPinnedVersions?.[version.reference]?.buildNumber === version.buildNumber,
-  );
+  let pinnedData: PinnedMetadata | undefined;
+  const currentPinnedVersion = envPinnedVersions?.[version.reference];
+  if (currentPinnedVersion && currentPinnedVersion.buildNumber === version.buildNumber) {
+    pinnedData = toPinnedMetadata(currentPinnedVersion);
+  }
+
   const actions = useCreateVersionActions({
     environment,
     reference: version.reference,
     version: version.version,
     buildNumber: version.buildNumber,
     commitMessage: version.gitMetadata?.commitInfo?.message,
-    isPinned,
+    isPinned: Boolean(pinnedData),
     compareLinks: {
       previous: detailedVersionData?.gitMetadata?.comparisonLinks?.toPreviousVersion,
       current: detailedVersionData?.gitMetadata?.comparisonLinks?.toCurrentVersion,
@@ -68,7 +72,7 @@ const VersionInEnvironment = ({ environment, version, envPinnedVersions }: IVers
         author={version.gitMetadata?.author}
         {...(detailedVersionData ? getBaseMetadata(detailedVersionData) : undefined)}
         actions={actions}
-        isPinned={isPinned}
+        pinned={pinnedData}
       />
 
       {loading && <LoadingAnimation />}

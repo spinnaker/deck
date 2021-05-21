@@ -8,6 +8,7 @@ import { PendingVersions } from './PendingVersion';
 import { EnvironmentItem } from '../../environmentBaseElements/EnvironmentItem';
 import { QueryArtifact, QueryArtifactVersion } from '../types';
 import { tooltipShowHideProps } from '../../utils/defaults';
+import { toPinnedMetadata } from '../../versionMetadata/MetadataComponents';
 
 import './Artifact.less';
 
@@ -81,7 +82,7 @@ export const Artifact = ({ artifact }: IArtifactProps) => {
           environment={artifact.environment}
           reference={artifact.reference}
           numNewerVersions={newerVersions?.length}
-          isPinned={pinnedVersion?.version === currentVersion.version}
+          pinned={pinnedVersion?.version === currentVersion.version ? toPinnedMetadata(pinnedVersion) : undefined}
         />
       ) : (
         <div>No version is deployed</div>

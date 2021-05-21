@@ -4,11 +4,11 @@ import React from 'react';
 import { Dropdown, MenuItem } from 'react-bootstrap';
 
 import { Icon } from '@spinnaker/presentation';
-import { Tooltip } from 'core/presentation';
+import { HoverablePopover, IHoverablePopoverProps, Tooltip } from 'core/presentation';
 
 import { RelativeTimestamp } from '../RelativeTimestamp';
 import { LifecycleEventSummary } from '../overview/artifact/utils';
-import { TOOLTIP_DELAY_SHOW } from '../utils/defaults';
+import { TOOLTIP_DELAY_SHOW, tooltipShowHideProps } from '../utils/defaults';
 
 import './VersionMetadata.less';
 
@@ -23,6 +23,16 @@ export interface VersionAction {
   disabled?: boolean;
 }
 
+export interface PinnedMetadata {
+  by?: string;
+  at?: string;
+}
+
+export const toPinnedMetadata = (version: { pinnedAt?: string; pinnedBy?: string }): PinnedMetadata => ({
+  by: version.pinnedBy,
+  at: version.pinnedAt,
+});
+
 export interface IVersionMetadataProps {
   buildNumber?: string;
   buildLink?: string;
@@ -33,7 +43,7 @@ export interface IVersionMetadataProps {
   buildsBehind?: number;
   isDeploying?: boolean;
   baking?: LifecycleEventSummary;
-  isPinned?: boolean;
+  pinned?: PinnedMetadata;
   actions?: VersionAction[];
 }
 
@@ -96,7 +106,7 @@ const badgeTypeToDetails = {
 
 interface IMetadataBadgeProps {
   type: keyof typeof badgeTypeToDetails;
-  tooltip?: string;
+  tooltip?: IHoverablePopoverProps['Component'];
   link?: string;
 }
 
@@ -113,9 +123,9 @@ export const MetadataBadge = ({ type, link, tooltip }: IMetadataBadgeProps) => {
   if (tooltip) {
     return (
       <MetadataElement>
-        <Tooltip value={tooltip} delayShow={TOOLTIP_DELAY_SHOW}>
+        <HoverablePopover {...tooltipShowHideProps} Component={tooltip} wrapperClassName="no-underline">
           {baseBadge}
-        </Tooltip>
+        </HoverablePopover>
       </MetadataElement>
     );
   } else {

@@ -12,3 +12,5 @@ export const spinnerProps: ISpinnerProps = {
   size: 'medium',
   fullWidth: true,
 };
+
+export const ABSOLUTE_TIME_FORMAT = 'yyyy-MM-dd HH:mm:ss ZZZZ';

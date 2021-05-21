@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon';
 import React from 'react';
 
 import { IconTooltip } from 'core/presentation';
@@ -15,7 +16,7 @@ import {
 import { RelativeTimestamp } from '../RelativeTimestamp';
 import { getLifecycleEventDuration, getLifecycleEventLink, getLifecycleEventSummary } from '../overview/artifact/utils';
 import { QueryArtifactVersion } from '../overview/types';
-import { TOOLTIP_DELAY_SHOW } from '../utils/defaults';
+import { ABSOLUTE_TIME_FORMAT, TOOLTIP_DELAY_SHOW } from '../utils/defaults';
 import { SingleVersionArtifactVersion } from '../versionsHistory/types';
 
 export const getBaseMetadata = (
@@ -42,7 +43,7 @@ export const VersionMetadata = ({
   buildsBehind,
   baking,
   isDeploying,
-  isPinned,
+  pinned,
   actions,
 }: IVersionMetadataProps) => {
   return (
@@ -52,13 +53,27 @@ export const VersionMetadata = ({
         <MetadataBadge
           type="baking"
           link={baking.link}
-          tooltip={
-            (baking.startedAt ? `Started at: ${baking.startedAt.toFormat('yyyy-MM-dd HH:mm:ss ZZZZ')}. ` : '') +
-            `Click to view task`
-          }
+          tooltip={() => (
+            <div>
+              <div>
+                {baking.startedAt ? `Started at: ${baking.startedAt.toFormat(ABSOLUTE_TIME_FORMAT)}` : undefined}
+              </div>
+              <div className="sp-margin-xs-top">Click to view task</div>
+            </div>
+          )}
         />
       )}
-      {isPinned && <MetadataBadge type="pinned" />}
+      {pinned && (
+        <MetadataBadge
+          type="pinned"
+          tooltip={() => (
+            <>
+              <div>{pinned.by ? `By: ${pinned.by}` : undefined}</div>
+              <div>{pinned.at ? `At: ${DateTime.fromISO(pinned.at).toFormat(ABSOLUTE_TIME_FORMAT)}` : undefined}</div>
+            </>
+          )}
+        />
+      )}
 
       {buildNumber && <VersionBuilds builds={[{ buildNumber, buildLink }]} />}
       <VersionAuthor author={author} />
