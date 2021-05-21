@@ -54,7 +54,10 @@ export class NgReactInjector extends ReactInject {
   public TaskMonitorWrapper: React.FunctionComponent<ITaskMonitorProps>                         = TaskMonitorWrapper;
   public UserMenu: React.ComponentClass<{}>                                                     = angular2react('userMenu', {}, this.$injectorProxy) as any;
   public ViewChangesLink: React.ComponentClass<IViewChangesLinkProps>                           = angular2react('viewChangesLinkWrapper', viewChangesLinkWrapper, this.$injectorProxy) as any;
+<<<<<<< HEAD
   public ViewScalingActivitiesLink: React.FunctionComponent<IViewScalingActivitiesLinkProps> = ViewScalingActivitiesLinkComponent;
+=======
+>>>>>>> refactor(core/serverGroup): Remove from NgReact and update css
 
   public initialize($injector: IInjectorService) {
     const realInjector: { [key: string]: Function } = $injector as any;
