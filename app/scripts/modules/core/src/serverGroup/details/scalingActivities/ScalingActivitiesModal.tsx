@@ -8,11 +8,6 @@ import { Spinner } from 'core/widgets';
 
 import { ServerGroupReader } from '../../serverGroupReader.service';
 
-export interface IScalingActivitiesViewState {
-  loading: boolean;
-  error: boolean;
-}
-
 export interface IScalingEvent {
   description: string;
   availabilityZone: string;
