@@ -4,11 +4,11 @@ import React from 'react';
 import { Dropdown, MenuItem } from 'react-bootstrap';
 
 import { Icon } from '@spinnaker/presentation';
-import { HoverablePopover, IHoverablePopoverProps, Tooltip } from 'core/presentation';
+import { Tooltip } from 'core/presentation';
 
 import { RelativeTimestamp } from '../RelativeTimestamp';
 import { LifecycleEventSummary } from '../overview/artifact/utils';
-import { TOOLTIP_DELAY_SHOW, tooltipShowHideProps } from '../utils/defaults';
+import { TOOLTIP_DELAY_SHOW } from '../utils/defaults';
 
 import './VersionMetadata.less';
 
@@ -106,7 +106,7 @@ const badgeTypeToDetails = {
 
 interface IMetadataBadgeProps {
   type: keyof typeof badgeTypeToDetails;
-  tooltip?: IHoverablePopoverProps['Component'];
+  tooltip?: string;
   link?: string;
 }
 
@@ -123,9 +123,9 @@ export const MetadataBadge = ({ type, link, tooltip }: IMetadataBadgeProps) => {
   if (tooltip) {
     return (
       <MetadataElement>
-        <HoverablePopover {...tooltipShowHideProps} Component={tooltip} wrapperClassName="no-underline">
+        <Tooltip value={tooltip} delayShow={TOOLTIP_DELAY_SHOW}>
           {baseBadge}
-        </HoverablePopover>
+        </Tooltip>
       </MetadataElement>
     );
   } else {

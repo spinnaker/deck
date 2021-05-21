@@ -13,10 +13,10 @@ import {
   VersionCreatedAt,
   VersionMetadataActions,
 } from './MetadataComponents';
-import { RelativeTimestamp } from '../RelativeTimestamp';
+import { formatToRelativeTimestamp, RelativeTimestamp } from '../RelativeTimestamp';
 import { getLifecycleEventDuration, getLifecycleEventLink, getLifecycleEventSummary } from '../overview/artifact/utils';
 import { QueryArtifactVersion } from '../overview/types';
-import { ABSOLUTE_TIME_FORMAT, TOOLTIP_DELAY_SHOW } from '../utils/defaults';
+import { TOOLTIP_DELAY_SHOW } from '../utils/defaults';
 import { SingleVersionArtifactVersion } from '../versionsHistory/types';
 
 export const getBaseMetadata = (
@@ -53,25 +53,15 @@ export const VersionMetadata = ({
         <MetadataBadge
           type="baking"
           link={baking.link}
-          tooltip={() => (
-            <div>
-              <div>
-                {baking.startedAt ? `Started at: ${baking.startedAt.toFormat(ABSOLUTE_TIME_FORMAT)}` : undefined}
-              </div>
-              <div className="sp-margin-xs-top">Click to view task</div>
-            </div>
-          )}
+          tooltip={`${baking.startedAt ? formatToRelativeTimestamp(baking.startedAt, true) : ''} (Click to view task)`}
         />
       )}
       {pinned && (
         <MetadataBadge
           type="pinned"
-          tooltip={() => (
-            <>
-              <div>{pinned.by ? `By: ${pinned.by}` : undefined}</div>
-              <div>{pinned.at ? `At: ${DateTime.fromISO(pinned.at).toFormat(ABSOLUTE_TIME_FORMAT)}` : undefined}</div>
-            </>
-          )}
+          tooltip={`${pinned.by ? `By ${pinned.by}, ` : ''}${
+            pinned.at ? `${formatToRelativeTimestamp(DateTime.fromISO(pinned.at), true)}` : ''
+          }`}
         />
       )}
 
