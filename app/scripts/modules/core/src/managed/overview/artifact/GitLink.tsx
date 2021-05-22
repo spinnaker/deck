@@ -9,24 +9,38 @@ import './GitLink.less';
 
 interface IGitLinkProps {
   gitMetadata: NonNullable<QueryGitMetadata>;
+  asLink?: boolean;
 }
 
-export const GitLink = ({ gitMetadata: { commit, commitInfo, pullRequest } }: IGitLinkProps) => {
+export const GitLink = ({ gitMetadata: { commit, commitInfo, pullRequest }, asLink = true }: IGitLinkProps) => {
   const link = pullRequest?.link || commitInfo?.link;
-  const sha = commit ? `SHA: ${commit}` : undefined;
-  const tooltip = [sha, commitInfo?.message].filter(Boolean).join('\n\n');
-  const message = commitInfo?.message || commit;
+  let message = commitInfo?.message || commit;
+  message = (commit ? `[${commit}] ` : ``) + message?.split('\n')[0];
   return (
     <div className="GitLink">
       <HoverablePopover
         wrapperClassName="git-link-inner"
         delayShow={TOOLTIP_DELAY}
+        delayHide={0}
         placement="top"
-        Component={() => <Markdown className="git-commit-tooltip" message={tooltip} />}
+        Component={() => (
+          <div className="git-commit-tooltip">
+            {commit && (
+              <a href={link} target="_blank" className="">
+                Open commit {commit}
+              </a>
+            )}
+            {commitInfo?.message && <Markdown className="sp-margin-m-top" message={commitInfo?.message} />}
+          </div>
+        )}
       >
-        <a href={link || '#'} target="_blank" rel="noopener noreferrer">
-          {message?.split('\n')[0]}
-        </a>
+        {asLink ? (
+          <a href={link || '#'} className="commit-message" target="_blank" rel="noopener noreferrer">
+            {message}
+          </a>
+        ) : (
+          <span className="commit-message">{message}</span>
+        )}
       </HoverablePopover>
     </div>
   );
