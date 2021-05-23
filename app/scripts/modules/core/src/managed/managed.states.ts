@@ -19,6 +19,11 @@ const routes: Array<INestedState & { name: Routes }> = [
     component: EnvironmentsOverview,
     $type: 'react',
     children: [],
+    data: {
+      pageTitleSection: {
+        title: 'Environments overview',
+      },
+    },
   },
   {
     name: 'config',
@@ -26,6 +31,11 @@ const routes: Array<INestedState & { name: Routes }> = [
     component: Configuration,
     $type: 'react',
     children: [],
+    data: {
+      pageTitleSection: {
+        title: 'Environments config',
+      },
+    },
   },
   {
     name: 'history',
@@ -36,6 +46,11 @@ const routes: Array<INestedState & { name: Routes }> = [
     params: {
       version: { isOptional: true, value: null },
       sha: { isOptional: true, value: null },
+    },
+    data: {
+      pageTitleSection: {
+        title: 'Environments history',
+      },
     },
   },
 ];
