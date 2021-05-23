@@ -5,7 +5,7 @@ import { Constraints } from './Constraints';
 import { GitLink } from './GitLink';
 import { QueryArtifactVersion } from '../types';
 import { useCreateVersionActions } from './utils';
-import { PinnedMetadata } from '../../versionMetadata/MetadataComponents';
+import { VersionMessageData } from '../../versionMetadata/MetadataComponents';
 import { getBaseMetadata, VersionMetadata } from '../../versionMetadata/VersionMetadata';
 
 interface ICurrentVersionProps {
@@ -13,7 +13,7 @@ interface ICurrentVersionProps {
   environment: string;
   reference: string;
   numNewerVersions?: number;
-  pinned?: PinnedMetadata;
+  pinned?: VersionMessageData;
 }
 
 export const CurrentVersion = ({ data, environment, reference, numNewerVersions, pinned }: ICurrentVersionProps) => {

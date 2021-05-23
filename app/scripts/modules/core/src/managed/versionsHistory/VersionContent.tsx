@@ -10,7 +10,7 @@ import { ArtifactVersionTasks } from '../overview/artifact/ArtifactVersionTasks'
 import { Constraints } from '../overview/artifact/Constraints';
 import { useCreateVersionActions } from '../overview/artifact/utils';
 import { PinnedVersions, VersionData, VersionInEnvironment } from './types';
-import { PinnedMetadata, toPinnedMetadata } from '../versionMetadata/MetadataComponents';
+import { toPinnedMetadata, VersionMessageData } from '../versionMetadata/MetadataComponents';
 import { getBaseMetadata, VersionMetadata } from '../versionMetadata/VersionMetadata';
 
 import './VersionsHistory.less';
@@ -40,7 +40,7 @@ const LoadingAnimation = () => (
 
 const VersionInEnvironment = ({ environment, version, envPinnedVersions }: IVersionInEnvironmentProps) => {
   const { detailedVersionData, loading } = useGetDetailedVersionData({ environment, version });
-  let pinnedData: PinnedMetadata | undefined;
+  let pinnedData: VersionMessageData | undefined;
   const currentPinnedVersion = envPinnedVersions?.[version.reference];
   if (currentPinnedVersion && currentPinnedVersion.buildNumber === version.buildNumber) {
     pinnedData = toPinnedMetadata(currentPinnedVersion);

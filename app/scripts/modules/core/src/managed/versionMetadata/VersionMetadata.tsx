@@ -1,4 +1,3 @@
-import { DateTime } from 'luxon';
 import React from 'react';
 
 import { IconTooltip } from 'core/presentation';
@@ -11,6 +10,7 @@ import {
   VersionAuthor,
   VersionBuilds,
   VersionCreatedAt,
+  VersionMessage,
   VersionMetadataActions,
 } from './MetadataComponents';
 import { formatToRelativeTimestamp, RelativeTimestamp } from '../RelativeTimestamp';
@@ -56,15 +56,6 @@ export const VersionMetadata = ({
           tooltip={`${baking.startedAt ? formatToRelativeTimestamp(baking.startedAt, true) : ''} (Click to view task)`}
         />
       )}
-      {pinned && (
-        <MetadataBadge
-          type="pinned"
-          tooltip={`${pinned.by ? `By ${pinned.by}, ` : ''}${
-            pinned.at ? `${formatToRelativeTimestamp(DateTime.fromISO(pinned.at), true)}` : ''
-          }`}
-        />
-      )}
-
       {buildNumber && <VersionBuilds builds={[{ buildNumber, buildLink }]} />}
       <VersionAuthor author={author} />
       {deployedAt && (
@@ -98,6 +89,7 @@ export const VersionMetadata = ({
         </MetadataElement>
       ) : null}
       {actions && <VersionMetadataActions id={`${buildNumber}-actions`} actions={actions} />}
+      {pinned && <VersionMessage type="pinned" data={pinned} />}
     </BaseVersionMetadata>
   );
 };

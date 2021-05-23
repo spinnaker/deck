@@ -2,10 +2,11 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  margin-top: var(~'--2xs-spacing');
+  margin-top: var(--xs-spacing);
   color: var(--color-concrete);
   white-space: pre-wrap;
   font-size: 13px;
+  flex-wrap: wrap;
 
   .metadata-element {
     display: flex;
@@ -63,7 +64,16 @@
   }
 
   .version-pinned {
-    background-color: var(--color-warning);
-    color: var(--color-black);
+    background-color: var(--color-status-warning-light);
+    color: var(--color-mineshaft);
+  }
+
+  .version-message {
+    border-radius: 4px;
+    padding: var(--s-spacing);
+    padding-right: var(--xl-spacing);
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
   }
 }

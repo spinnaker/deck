@@ -3,7 +3,7 @@ import { DateTime } from 'luxon';
 import React from 'react';
 import { Dropdown, MenuItem } from 'react-bootstrap';
 
-import { Icon } from '@spinnaker/presentation';
+import { Icon, IconNames } from '@spinnaker/presentation';
 import { Tooltip } from 'core/presentation';
 
 import { RelativeTimestamp } from '../RelativeTimestamp';
@@ -23,14 +23,20 @@ export interface VersionAction {
   disabled?: boolean;
 }
 
-export interface PinnedMetadata {
+export interface VersionMessageData {
   by?: string;
   at?: string;
+  comment?: string;
 }
 
-export const toPinnedMetadata = (version: { pinnedAt?: string; pinnedBy?: string }): PinnedMetadata => ({
-  by: version.pinnedBy,
-  at: version.pinnedAt,
+export const toPinnedMetadata = (data: {
+  pinnedAt?: string;
+  pinnedBy?: string;
+  comment?: string;
+}): VersionMessageData => ({
+  by: data.pinnedBy,
+  at: data.pinnedAt,
+  comment: data.comment,
 });
 
 export interface IVersionMetadataProps {
@@ -43,7 +49,7 @@ export interface IVersionMetadataProps {
   buildsBehind?: number;
   isDeploying?: boolean;
   baking?: LifecycleEventSummary;
-  pinned?: PinnedMetadata;
+  pinned?: VersionMessageData;
   actions?: VersionAction[];
 }
 
@@ -94,14 +100,6 @@ export const VersionCreatedAt = ({ createdAt }: IVersionCreatedAtProps) => {
 const badgeTypeToDetails = {
   deploying: { className: 'version-deploying', text: 'Deploying' },
   baking: { className: 'version-baking', text: 'Baking' },
-  pinned: {
-    className: 'version-pinned',
-    text: (
-      <>
-        <Icon name="pin" size="12px" color="black" /> Pinned
-      </>
-    ),
-  },
 };
 
 interface IMetadataBadgeProps {
@@ -131,6 +129,46 @@ export const MetadataBadge = ({ type, link, tooltip }: IMetadataBadgeProps) => {
   } else {
     return <MetadataElement>{baseBadge}</MetadataElement>;
   }
+};
+
+interface IVersionMessage {
+  data: VersionMessageData;
+  type: 'pinned' | 'vetoed';
+  newRow?: boolean;
+}
+
+const versionTypeProps: { [key in IVersionMessage['type']]: { text: string; className: string; icon: IconNames } } = {
+  pinned: {
+    text: 'Pinned by',
+    className: 'version-pinned',
+    icon: 'pin',
+  },
+  vetoed: {
+    text: 'Marked as bad by',
+    className: 'version-vetoed',
+    icon: 'artifactBad',
+  },
+};
+
+export const VersionMessage = ({ data, type, newRow = true }: IVersionMessage) => {
+  const typeProps = versionTypeProps[type];
+  return (
+    <>
+      {newRow && <div className="flex-break sp-margin-s-top" />}
+      <div className={classnames('version-message', typeProps.className)}>
+        <Icon name={typeProps.icon} size="12px" color="black" className="sp-margin-s-right sp-margin-2xs-top" />
+        <div>
+          <div>
+            {typeProps.text} {data.by},{' '}
+            {data.at && (
+              <RelativeTimestamp timestamp={data.at} delayShow={TOOLTIP_DELAY_SHOW} withSuffix removeStyles />
+            )}
+          </div>
+          {data.comment && <div>Reason: {data.comment}</div>}
+        </div>
+      </div>
+    </>
+  );
 };
 
 interface IVersionAuthorProps {

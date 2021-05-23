@@ -8,7 +8,7 @@ import { RelativeTimestamp } from '../../RelativeTimestamp';
 import { QueryArtifact, QueryArtifactVersion } from '../types';
 import { useCreateVersionActions } from './utils';
 import { TOOLTIP_DELAY_SHOW } from '../../utils/defaults';
-import { PinnedMetadata, toPinnedMetadata } from '../../versionMetadata/MetadataComponents';
+import { toPinnedMetadata, VersionMessageData } from '../../versionMetadata/MetadataComponents';
 import { getBaseMetadata, VersionMetadata } from '../../versionMetadata/VersionMetadata';
 
 export interface IPendingVersionsProps {
@@ -63,7 +63,7 @@ interface IPendingVersionProps {
   data: QueryArtifactVersion;
   reference: string;
   environment: string;
-  pinned?: PinnedMetadata;
+  pinned?: VersionMessageData;
   index: number;
 }
 
