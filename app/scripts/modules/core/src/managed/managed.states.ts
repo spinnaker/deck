@@ -29,10 +29,14 @@ const routes: Array<INestedState & { name: Routes }> = [
   },
   {
     name: 'history',
-    url: '/history',
+    url: '/history/:version?sha',
     component: VersionsHistory,
     $type: 'react',
     children: [],
+    params: {
+      version: { isOptional: true, value: null },
+      sha: { isOptional: true, value: null },
+    },
   },
 ];
 

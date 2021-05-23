@@ -1,3 +1,4 @@
+import { useCurrentStateAndParams } from '@uirouter/react';
 import { sortBy } from 'lodash';
 import { DateTime } from 'luxon';
 import React from 'react';
@@ -111,20 +112,41 @@ export const VersionsHistory = () => {
     <main className="VersionsHistory">
       <ManagementWarning appName={app.name} />
       {groupedVersions.map((group) => {
-        return (
-          <div key={group.key}>
-            <CollapsibleSection
-              outerDivClassName="version-item"
-              toggleClassName="version-toggle"
-              bodyClassName="version-body"
-              expandIconType="plus"
-              heading={({ chevron }) => <VersionHeading group={group} chevron={chevron} />}
-            >
-              <VersionContent versionData={group} pinnedVersions={pinnedVersions} />
-            </CollapsibleSection>
-          </div>
-        );
+        return <SingleVersion key={group.key} versionData={group} pinnedVersions={pinnedVersions} />;
       })}
     </main>
+  );
+};
+
+interface ISingleVersionProps {
+  versionData: VersionData;
+  pinnedVersions?: PinnedVersions;
+}
+
+const SingleVersion = ({ versionData, pinnedVersions }: ISingleVersionProps) => {
+  const { params } = useCurrentStateAndParams();
+  const isFocused = params.sha && params.sha === versionData.gitMetadata?.commit;
+
+  const ref = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    if (isFocused && ref.current) {
+      ref.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, []);
+
+  return (
+    <div ref={ref}>
+      <CollapsibleSection
+        outerDivClassName="version-item"
+        toggleClassName="version-toggle"
+        bodyClassName="version-body"
+        expandIconType="plus"
+        defaultExpanded={isFocused}
+        heading={({ chevron }) => <VersionHeading group={versionData} chevron={chevron} />}
+      >
+        <VersionContent versionData={versionData} pinnedVersions={pinnedVersions} />
+      </CollapsibleSection>
+    </div>
   );
 };
