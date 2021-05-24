@@ -39,7 +39,7 @@ const routes: Array<INestedState & { name: Routes }> = [
   },
   {
     name: 'history',
-    url: '/history/:version?sha',
+    url: '/history/{version:.*}?sha',
     component: VersionsHistory,
     $type: 'react',
     children: [],

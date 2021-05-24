@@ -1,4 +1,4 @@
-import { useCurrentStateAndParams } from '@uirouter/react';
+import { RawParams, useCurrentStateAndParams } from '@uirouter/react';
 import { sortBy } from 'lodash';
 import { DateTime } from 'luxon';
 import React from 'react';
@@ -11,7 +11,7 @@ import { VersionHeading } from './VersionHeading';
 import { ManagementWarning } from '../config/ManagementWarning';
 import { useFetchVersionsHistoryQuery } from '../graphql/graphql-sdk';
 import { isBaking } from '../overview/artifact/utils';
-import { HistoryEnvironment, PinnedVersions, VersionData } from './types';
+import { HistoryArtifactVersion, HistoryEnvironment, PinnedVersions, VersionData } from './types';
 import { spinnerProps } from '../utils/defaults';
 
 import './VersionsHistory.less';
@@ -35,7 +35,17 @@ const setValueIfMissing = <Obj extends Record<string, any>, Key extends keyof Ob
   }
 };
 
-const groupVersionsByShaOrBuild = (environments: HistoryEnvironment[]) => {
+const getIsFocused = (version: HistoryArtifactVersion, params: RawParams) => {
+  if (params.sha && params.sha === version.gitMetadata?.commit) {
+    return true;
+  }
+  if (params.version?.includes(version.version)) {
+    return true;
+  }
+  return false;
+};
+
+const groupVersionsByShaOrBuild = (environments: HistoryEnvironment[], params: RawParams) => {
   const groupedVersions: GroupedVersions = {};
   for (const env of environments) {
     for (const artifact of env.state.artifacts || []) {
@@ -53,6 +63,10 @@ const groupVersionsByShaOrBuild = (environments: HistoryEnvironment[]) => {
 
         if (isBaking(version)) {
           groupedVersions[key].isBaking = true;
+        }
+
+        if (getIsFocused(version, params)) {
+          groupedVersions[key].isFocused = true;
         }
 
         groupedVersions[key].versions.add(version.version);
@@ -91,6 +105,7 @@ const getPinnedVersions = (environments: HistoryEnvironment[]) => {
 
 export const VersionsHistory = () => {
   const app = useApplicationContextSafe();
+  const { params } = useCurrentStateAndParams();
 
   const { data, error, loading } = useFetchVersionsHistoryQuery({
     variables: { appName: app.name, limit: 100 }, // Fetch the last 100 versions
@@ -105,7 +120,7 @@ export const VersionsHistory = () => {
     return <div style={{ width: '100%' }}>Failed to load history, please refresh and try again.</div>;
   }
 
-  const groupedVersions = groupVersionsByShaOrBuild(data?.application?.environments || []);
+  const groupedVersions = groupVersionsByShaOrBuild(data?.application?.environments || [], params);
   const pinnedVersions = getPinnedVersions(data?.application?.environments || []);
 
   return (
@@ -124,13 +139,10 @@ interface ISingleVersionProps {
 }
 
 const SingleVersion = ({ versionData, pinnedVersions }: ISingleVersionProps) => {
-  const { params } = useCurrentStateAndParams();
-  const isFocused = params.sha && params.sha === versionData.gitMetadata?.commit;
-
   const ref = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
-    if (isFocused && ref.current) {
+    if (versionData.isFocused && ref.current) {
       ref.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, []);
@@ -142,7 +154,7 @@ const SingleVersion = ({ versionData, pinnedVersions }: ISingleVersionProps) => 
         toggleClassName="version-toggle"
         bodyClassName="version-body"
         expandIconType="plus"
-        defaultExpanded={isFocused}
+        defaultExpanded={versionData.isFocused}
         heading={({ chevron }) => <VersionHeading group={versionData} chevron={chevron} />}
       >
         <VersionContent versionData={versionData} pinnedVersions={pinnedVersions} />
