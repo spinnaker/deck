@@ -95,10 +95,10 @@ interface IVersionContentProps {
 export const VersionContent = ({ versionData, pinnedVersions }: IVersionContentProps) => {
   return (
     <React.Fragment>
-      {Object.entries(versionData.environments).map(([env, artifactVersions]) => {
+      {Object.entries(versionData.environments).map(([env, { versions }]) => {
         return (
           <BaseEnvironment key={env} title={env} size="small">
-            {artifactVersions.map((version) => (
+            {versions.map((version) => (
               <VersionInEnvironment
                 environment={env}
                 key={version.id}

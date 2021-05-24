@@ -118,17 +118,17 @@ export const MetadataBadge = ({ type, link, tooltip }: IMetadataBadgeProps) => {
   ) : (
     <span className={className}>{details.text}</span>
   );
-  if (tooltip) {
-    return (
-      <MetadataElement>
+  return (
+    <MetadataElement>
+      {tooltip ? (
         <Tooltip value={tooltip} delayShow={TOOLTIP_DELAY_SHOW}>
           {baseBadge}
         </Tooltip>
-      </MetadataElement>
-    );
-  } else {
-    return <MetadataElement>{baseBadge}</MetadataElement>;
-  }
+      ) : (
+        baseBadge
+      )}
+    </MetadataElement>
+  );
 };
 
 interface IVersionMessage {

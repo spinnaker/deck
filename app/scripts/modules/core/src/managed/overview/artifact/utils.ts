@@ -58,7 +58,11 @@ export const getLifecycleEventDuration = (
 };
 
 export const getLifecycleEventLink = (version: QueryArtifactVersion | undefined, type: QueryLifecycleStep['type']) => {
-  return version?.lifecycleSteps?.find((step) => step.type === type)?.link;
+  return getLifecycleEventByType(version, type)?.link;
+};
+
+export const isBaking = (version: QueryArtifactVersion) => {
+  return getLifecycleEventByType(version, 'BAKE')?.status === 'RUNNING';
 };
 
 export interface LifecycleEventSummary {

@@ -19,7 +19,8 @@ export interface VersionData {
   buildNumbers: Set<string>;
   versions: Set<string>;
   createdAt?: DateTime;
-  environments: { [env: string]: VersionInEnvironment[] };
+  isBaking?: boolean;
+  environments: { [env: string]: { versions: VersionInEnvironment[]; isPinned?: boolean } };
   gitMetadata?: HistoryArtifactVersion['gitMetadata'];
   key: string;
 }
