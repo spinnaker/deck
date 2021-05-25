@@ -347,6 +347,7 @@ export type DetailedVersionFieldsFragment = { __typename?: 'MdArtifactVersionInE
         { __typename?: 'MdAction' } & Pick<MdAction, 'id' | 'type' | 'status' | 'startedAt' | 'completedAt' | 'link'>
       >
     >;
+    veto?: Maybe<{ __typename?: 'MdVersionVeto' } & Pick<MdVersionVeto, 'vetoedBy' | 'vetoedAt' | 'comment'>>;
   };
 
 export type FetchApplicationQueryVariables = Exact<{
@@ -595,6 +596,11 @@ export const DetailedVersionFieldsFragmentDoc = gql`
       startedAt
       completedAt
       link
+    }
+    veto {
+      vetoedBy
+      vetoedAt
+      comment
     }
   }
 `;

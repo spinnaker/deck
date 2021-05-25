@@ -53,6 +53,11 @@ fragment detailedVersionFields on MdArtifactVersionInEnvironment {
     completedAt
     link
   }
+  veto {
+    vetoedBy
+    vetoedAt
+    comment
+  }
 }
 
 query fetchApplication($appName: String!, $statuses: [MdArtifactStatusInEnvironment!]) {
