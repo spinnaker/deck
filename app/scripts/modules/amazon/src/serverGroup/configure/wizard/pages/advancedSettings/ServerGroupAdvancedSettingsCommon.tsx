@@ -224,7 +224,7 @@ export class ServerGroupAdvancedSettingsCommon extends React.Component<IServerGr
         {!AWSProviderSettings.disableSpotPricing && (
           <div className="form-group">
             <div className="col-md-5 sm-label-right">
-              <b>Spot Instances Price (optional)</b> <HelpField id="aws.serverGroup.spotPrice" />
+              <b>Spot Instances Price (optional)</b> <HelpField id="aws.serverGroup.spotMaxPrice" />
             </div>
             <div className="col-md-2">
               <Field type="text" className="form-control input-sm" name="spotPrice" />
@@ -273,7 +273,8 @@ export class ServerGroupAdvancedSettingsCommon extends React.Component<IServerGr
         </div>
         <div className="form-group">
           <div className="col-md-5 sm-label-right">
-            <b>{`Associate ${asgSettings?.enableIPv6 ? 'IPv6' : 'Public IPv4'} Address`}</b>
+            <b>{`Associate ${asgSettings?.enableIPv6 ? 'IPv6 (Recommended)' : 'Public IPv4'} Address`}</b>
+            <HelpField id="serverGroup.ipv6" />
           </div>
           {asgSettings?.enableIPv6 && (
             <div className="col-md-6 checkbox">

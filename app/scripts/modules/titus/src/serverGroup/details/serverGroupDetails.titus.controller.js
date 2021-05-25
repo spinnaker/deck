@@ -24,6 +24,7 @@ import { TitusResizeServerGroupModal } from './resize/TitusResizeServerGroupModa
 import { TITUS_SERVERGROUP_DETAILS_ROLLBACK_ROLLBACKSERVERGROUP_CONTROLLER } from './rollback/rollbackServerGroup.controller';
 import { SCALING_POLICY_MODULE } from './scalingPolicy/scalingPolicy.module';
 import { SERVICE_JOB_PROCESSES_DETAILS_SECTION } from './serviceJobProcesses/ServiceJobProcessesSection';
+import { TITUS_PACKAGE_DETAILS_SECTION } from './titusPackageDetailsSection.component';
 import { TITUS_SECURITY_GROUPS_DETAILS } from './titusSecurityGroups.component';
 
 export const TITUS_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_TITUS_CONTROLLER =
@@ -39,6 +40,7 @@ angular
     SERVICE_JOB_PROCESSES_DETAILS_SECTION,
     SCALING_POLICY_MODULE,
     TITUS_SECURITY_GROUPS_DETAILS,
+    TITUS_PACKAGE_DETAILS_SECTION,
   ])
   .controller('titusServerGroupDetailsCtrl', [
     '$scope',
@@ -100,6 +102,8 @@ angular
             details.apiEndpoint = _.filter(accountDetails.regions, { name: details.region })[0].endpoint;
           });
 
+          $scope.buildInfo = details.buildInfo;
+
           angular.extend(details, summary);
 
           $scope.serverGroup = details;
@@ -107,6 +111,8 @@ angular
           delete labels['name'];
           delete labels['source'];
           delete labels['spinnakerAccount'];
+
+          delete labels[''];
 
           Object.keys(labels).forEach((key) => {
             if (key.startsWith('titus.')) {

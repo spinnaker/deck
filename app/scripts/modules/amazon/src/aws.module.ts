@@ -52,6 +52,7 @@ import {
   AmazonCapacityDetailsSection,
   AmazonInfoDetailsSection,
   HealthDetailsSection,
+  InstancesDiversificationDetailsSection,
   LaunchConfigDetailsSection,
   LaunchTemplateDetailsSection,
   LogsDetailsSection,
@@ -69,12 +70,6 @@ import './validation/ApplicationNameValidator';
 import { VPC_MODULE } from './vpc/vpc.module';
 
 import './logo/aws.logo.less';
-
-// load all templates into the $templateCache
-const templates = require.context('./', true, /\.html$/);
-templates.keys().forEach(function (key) {
-  templates(key);
-});
 
 export const AMAZON_MODULE = 'spinnaker.amazon';
 module(AMAZON_MODULE, [
@@ -130,6 +125,7 @@ module(AMAZON_MODULE, [
         AmazonInfoDetailsSection,
         AmazonCapacityDetailsSection,
         HealthDetailsSection,
+        InstancesDiversificationDetailsSection,
         LaunchConfigDetailsSection,
         LaunchTemplateDetailsSection,
         SecurityGroupsDetailsSection,

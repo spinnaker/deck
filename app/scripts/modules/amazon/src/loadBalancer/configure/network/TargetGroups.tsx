@@ -1,7 +1,8 @@
 import { FormikErrors, FormikProps } from 'formik';
 import { filter, flatten, groupBy, set, uniq } from 'lodash';
 import React from 'react';
-import { Observable, Subject } from 'rxjs';
+import { from as observableFrom, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import {
   Application,
@@ -111,8 +112,8 @@ export class TargetGroups
     const { app, loadBalancer } = props;
 
     const targetGroupsByAccountAndRegion: { [account: string]: { [region: string]: string[] } } = {};
-    Observable.fromPromise(app.getDataSource('loadBalancers').refresh(true))
-      .takeUntil(this.destroy$)
+    observableFrom(app.getDataSource('loadBalancers').refresh(true))
+      .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
         app.getDataSource('loadBalancers').data.forEach((lb: IAmazonApplicationLoadBalancer) => {
           if (lb.loadBalancerType !== 'classic') {
@@ -160,6 +161,7 @@ export class TargetGroups
       unhealthyThreshold: 10,
       attributes: {
         deregistrationDelay: 300,
+        preserveClientIp: true,
       },
     });
     setFieldValue('targetGroups', values.targetGroups);
@@ -402,6 +404,21 @@ export class TargetGroups
                               }}
                             />
                             <HelpField id="aws.targetGroup.attributes.deregistrationDelayConnectionTermination" />
+                          </span>
+                          <span className="wizard-pod-content">
+                            <CheckboxInput
+                              name="preserveClientIp"
+                              text="Preserve Client IP"
+                              checked={targetGroup.attributes.preserveClientIp}
+                              onChange={(event: { target: { checked: boolean } }) => {
+                                this.targetGroupFieldChanged(
+                                  index,
+                                  'attributes.preserveClientIp',
+                                  event.target.checked,
+                                );
+                              }}
+                            />
+                            <HelpField id="aws.targetGroup.attributes.preserveClientIp" />
                           </span>
                         </div>
                       </div>

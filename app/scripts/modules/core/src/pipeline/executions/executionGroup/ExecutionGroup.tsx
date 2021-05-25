@@ -2,7 +2,8 @@ import classnames from 'classnames';
 import { flatten, uniq, without } from 'lodash';
 import React from 'react';
 import ReactGA from 'react-ga';
-import { Observable, Subject, Subscription } from 'rxjs';
+import { from as observableFrom, Subject, Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import { AccountTag } from 'core/account';
 import { Application } from 'core/application/application.model';
@@ -35,7 +36,7 @@ import { TriggersTag } from '../../triggers/TriggersTag';
 
 import './executionGroup.less';
 
-const ACCOUNT_TAG_OVERFLOW_LIMIT = 2;
+const ACCOUNT_TAG_OVERFLOW_LIMIT = 1;
 
 export interface IExecutionGroupProps {
   group: IExecutionGroup;
@@ -144,7 +145,7 @@ export class ExecutionGroup extends React.PureComponent<IExecutionGroupProps, IE
   }
 
   public triggerPipeline(trigger: IExecutionTrigger = null, config = this.state.pipelineConfig): void {
-    Observable.fromPromise(
+    observableFrom(
       new Promise((resolve) => {
         if (PipelineTemplateV2Service.isV2PipelineConfig(config)) {
           PipelineTemplateReader.getPipelinePlan(config as IPipelineTemplateConfigV2)
@@ -155,7 +156,7 @@ export class ExecutionGroup extends React.PureComponent<IExecutionGroupProps, IE
         }
       }),
     )
-      .takeUntil(this.destroy$)
+      .pipe(takeUntil(this.destroy$))
       .subscribe((pipeline) =>
         ManualExecutionModal.show({
           pipeline,
@@ -279,7 +280,7 @@ export class ExecutionGroup extends React.PureComponent<IExecutionGroupProps, IE
     let groupTargetAccountLabelsExtra: React.ReactNode[] = [];
     if (group.targetAccounts && group.targetAccounts.length > 0) {
       group.targetAccounts.slice(0, ACCOUNT_TAG_OVERFLOW_LIMIT).map((account) => {
-        groupTargetAccountLabels.push(<AccountTag key={account} account={account} />);
+        groupTargetAccountLabels.push(<AccountTag key={account} account={account} className="account-tag-wrapper" />);
       });
     }
     if (group.targetAccounts && group.targetAccounts.length > ACCOUNT_TAG_OVERFLOW_LIMIT) {

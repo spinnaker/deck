@@ -21,10 +21,16 @@ import { Modal } from 'react-bootstrap';
 
 import { ModalClose, SubmitButton } from 'core/modal';
 
-import { EXCLUDED_ARTIFACT_TYPES, IAwsCodeBuildSource, SOURCE_TYPES } from './IAwsCodeBuildSource';
+import {
+  EXCLUDED_ARTIFACT_TYPES,
+  IAwsCodeBuildSecondarySourcesVersion,
+  IAwsCodeBuildSource,
+  SOURCE_TYPES,
+} from './IAwsCodeBuildSource';
 
 export interface IEditAwsCodeBuildSourceModalProps extends IModalComponentProps {
   source: IAwsCodeBuildSource;
+  secondarySourcesVersionOverride: IAwsCodeBuildSecondarySourcesVersion;
   stage: IStage;
   pipeline: IPipeline;
 }

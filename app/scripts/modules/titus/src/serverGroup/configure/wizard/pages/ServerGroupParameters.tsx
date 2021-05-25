@@ -65,7 +65,7 @@ function IPv6CheckboxInput(props: IFormInputProps) {
   const mappedProps = useFormInputValueMapper(
     props,
     (val: string) => val === 'true', // formik -> checkbox
-    (_val, e) => (e.target.checked ? 'true' : undefined), // checkbox -> formik
+    (_val, e) => (e.target.checked ? 'true' : 'false'), // checkbox -> formik
   );
   return <CheckboxInput {...mappedProps} />;
 }
@@ -163,7 +163,8 @@ export class ServerGroupParameters
 
         <FormikFormField
           name="containerAttributes['titusParameter.agent.assignIPv6Address']"
-          label="Associate IPv6 Address"
+          label="Associate IPv6 Address (Recommended)"
+          help={<HelpField id="serverGroup.ipv6" />}
           input={(props) => <IPv6CheckboxInput {...props} />}
         />
 
