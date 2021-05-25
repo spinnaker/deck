@@ -55,6 +55,7 @@ export interface MdArtifact {
 export interface MdArtifactVersionsArgs {
   statuses?: Maybe<Array<MdArtifactStatusInEnvironment>>;
   versions?: Maybe<Array<Scalars['String']>>;
+  limit?: Maybe<Scalars['Int']>;
 }
 
 export type MdArtifactStatusInEnvironment =
@@ -83,6 +84,7 @@ export interface MdArtifactVersionInEnvironment {
   deployedAt?: Maybe<Scalars['InstantTime']>;
   resources?: Maybe<Array<MdResource>>;
   gitMetadata?: Maybe<MdGitMetadata>;
+  packageDiff?: Maybe<MdPackageDiff>;
   environment?: Maybe<Scalars['String']>;
   reference: Scalars['String'];
   status?: Maybe<MdArtifactStatusInEnvironment>;
@@ -90,6 +92,7 @@ export interface MdArtifactVersionInEnvironment {
   constraints?: Maybe<Array<MdConstraint>>;
   verifications?: Maybe<Array<MdAction>>;
   postDeploy?: Maybe<Array<MdAction>>;
+  veto?: Maybe<MdVersionVeto>;
 }
 
 export interface MdCommitInfo {
@@ -192,6 +195,26 @@ export interface MdMoniker {
   detail?: Maybe<Scalars['String']>;
 }
 
+export interface MdPackageAndVersion {
+  __typename?: 'MdPackageAndVersion';
+  package: Scalars['String'];
+  version: Scalars['String'];
+}
+
+export interface MdPackageAndVersionChange {
+  __typename?: 'MdPackageAndVersionChange';
+  package: Scalars['String'];
+  oldVersion: Scalars['String'];
+  newVersion: Scalars['String'];
+}
+
+export interface MdPackageDiff {
+  __typename?: 'MdPackageDiff';
+  added?: Maybe<Array<MdPackageAndVersion>>;
+  removed?: Maybe<Array<MdPackageAndVersion>>;
+  changed?: Maybe<Array<MdPackageAndVersionChange>>;
+}
+
 export interface MdPinnedVersion {
   __typename?: 'MdPinnedVersion';
   id: Scalars['String'];
@@ -235,6 +258,13 @@ export interface MdUnpinArtifactVersionPayload {
   application: Scalars['String'];
   environment: Scalars['String'];
   reference: Scalars['String'];
+}
+
+export interface MdVersionVeto {
+  __typename?: 'MdVersionVeto';
+  vetoedBy?: Maybe<Scalars['String']>;
+  vetoedAt?: Maybe<Scalars['InstantTime']>;
+  comment?: Maybe<Scalars['String']>;
 }
 
 export interface Mutation {
@@ -281,6 +311,45 @@ export interface QueryApplicationArgs {
   appName: Scalars['String'];
 }
 
+export type DetailedVersionFieldsFragment = { __typename?: 'MdArtifactVersionInEnvironment' } & Pick<
+  MdArtifactVersionInEnvironment,
+  'id' | 'buildNumber' | 'version' | 'createdAt' | 'status' | 'deployedAt'
+> & {
+    gitMetadata?: Maybe<
+      { __typename?: 'MdGitMetadata' } & Pick<MdGitMetadata, 'commit' | 'author' | 'branch'> & {
+          commitInfo?: Maybe<{ __typename?: 'MdCommitInfo' } & Pick<MdCommitInfo, 'sha' | 'link' | 'message'>>;
+          pullRequest?: Maybe<{ __typename?: 'MdPullRequest' } & Pick<MdPullRequest, 'number' | 'link'>>;
+          comparisonLinks?: Maybe<
+            { __typename?: 'MdComparisonLinks' } & Pick<MdComparisonLinks, 'toPreviousVersion' | 'toCurrentVersion'>
+          >;
+        }
+    >;
+    lifecycleSteps?: Maybe<
+      Array<
+        { __typename?: 'MdLifecycleStep' } & Pick<
+          MdLifecycleStep,
+          'startedAt' | 'completedAt' | 'type' | 'status' | 'link'
+        >
+      >
+    >;
+    constraints?: Maybe<
+      Array<
+        { __typename?: 'MdConstraint' } & Pick<MdConstraint, 'type' | 'status' | 'judgedBy' | 'judgedAt' | 'attributes'>
+      >
+    >;
+    verifications?: Maybe<
+      Array<
+        { __typename?: 'MdAction' } & Pick<MdAction, 'id' | 'type' | 'status' | 'startedAt' | 'completedAt' | 'link'>
+      >
+    >;
+    postDeploy?: Maybe<
+      Array<
+        { __typename?: 'MdAction' } & Pick<MdAction, 'id' | 'type' | 'status' | 'startedAt' | 'completedAt' | 'link'>
+      >
+    >;
+    veto?: Maybe<{ __typename?: 'MdVersionVeto' } & Pick<MdVersionVeto, 'vetoedBy' | 'vetoedAt' | 'comment'>>;
+  };
+
 export type FetchApplicationQueryVariables = Exact<{
   appName: Scalars['String'];
   statuses?: Maybe<Array<MdArtifactStatusInEnvironment> | MdArtifactStatusInEnvironment>;
@@ -299,67 +368,7 @@ export type FetchApplicationQuery = { __typename?: 'Query' } & {
                         'id' | 'name' | 'environment' | 'type' | 'reference'
                       > & {
                           versions?: Maybe<
-                            Array<
-                              { __typename?: 'MdArtifactVersionInEnvironment' } & Pick<
-                                MdArtifactVersionInEnvironment,
-                                'id' | 'buildNumber' | 'version' | 'createdAt' | 'status' | 'deployedAt'
-                              > & {
-                                  gitMetadata?: Maybe<
-                                    { __typename?: 'MdGitMetadata' } & Pick<
-                                      MdGitMetadata,
-                                      'commit' | 'author' | 'branch'
-                                    > & {
-                                        commitInfo?: Maybe<
-                                          { __typename?: 'MdCommitInfo' } & Pick<
-                                            MdCommitInfo,
-                                            'sha' | 'link' | 'message'
-                                          >
-                                        >;
-                                        pullRequest?: Maybe<
-                                          { __typename?: 'MdPullRequest' } & Pick<MdPullRequest, 'number' | 'link'>
-                                        >;
-                                        comparisonLinks?: Maybe<
-                                          { __typename?: 'MdComparisonLinks' } & Pick<
-                                            MdComparisonLinks,
-                                            'toPreviousVersion' | 'toCurrentVersion'
-                                          >
-                                        >;
-                                      }
-                                  >;
-                                  lifecycleSteps?: Maybe<
-                                    Array<
-                                      { __typename?: 'MdLifecycleStep' } & Pick<
-                                        MdLifecycleStep,
-                                        'startedAt' | 'completedAt' | 'type' | 'status' | 'link'
-                                      >
-                                    >
-                                  >;
-                                  constraints?: Maybe<
-                                    Array<
-                                      { __typename?: 'MdConstraint' } & Pick<
-                                        MdConstraint,
-                                        'type' | 'status' | 'judgedBy' | 'judgedAt' | 'attributes'
-                                      >
-                                    >
-                                  >;
-                                  verifications?: Maybe<
-                                    Array<
-                                      { __typename?: 'MdAction' } & Pick<
-                                        MdAction,
-                                        'id' | 'type' | 'status' | 'startedAt' | 'completedAt' | 'link'
-                                      >
-                                    >
-                                  >;
-                                  postDeploy?: Maybe<
-                                    Array<
-                                      { __typename?: 'MdAction' } & Pick<
-                                        MdAction,
-                                        'id' | 'type' | 'status' | 'startedAt' | 'completedAt' | 'link'
-                                      >
-                                    >
-                                  >;
-                                }
-                            >
+                            Array<{ __typename?: 'MdArtifactVersionInEnvironment' } & DetailedVersionFieldsFragment>
                           >;
                           pinnedVersion?: Maybe<
                             { __typename?: 'MdPinnedVersion' } & Pick<
@@ -393,6 +402,7 @@ export type FetchApplicationQuery = { __typename?: 'Query' } & {
 
 export type FetchVersionsHistoryQueryVariables = Exact<{
   appName: Scalars['String'];
+  limit?: Maybe<Scalars['Int']>;
 }>;
 
 export type FetchVersionsHistoryQuery = { __typename?: 'Query' } & {
@@ -428,6 +438,9 @@ export type FetchVersionsHistoryQuery = { __typename?: 'Query' } & {
                                           { __typename?: 'MdPullRequest' } & Pick<MdPullRequest, 'number' | 'link'>
                                         >;
                                       }
+                                  >;
+                                  lifecycleSteps?: Maybe<
+                                    Array<{ __typename?: 'MdLifecycleStep' } & Pick<MdLifecycleStep, 'type' | 'status'>>
                                   >;
                                 }
                             >
@@ -466,67 +479,7 @@ export type FetchVersionQuery = { __typename?: 'Query' } & {
                         'id' | 'name' | 'environment' | 'type' | 'reference'
                       > & {
                           versions?: Maybe<
-                            Array<
-                              { __typename?: 'MdArtifactVersionInEnvironment' } & Pick<
-                                MdArtifactVersionInEnvironment,
-                                'id' | 'buildNumber' | 'version' | 'createdAt' | 'status' | 'deployedAt'
-                              > & {
-                                  gitMetadata?: Maybe<
-                                    { __typename?: 'MdGitMetadata' } & Pick<
-                                      MdGitMetadata,
-                                      'commit' | 'author' | 'branch'
-                                    > & {
-                                        commitInfo?: Maybe<
-                                          { __typename?: 'MdCommitInfo' } & Pick<
-                                            MdCommitInfo,
-                                            'sha' | 'link' | 'message'
-                                          >
-                                        >;
-                                        pullRequest?: Maybe<
-                                          { __typename?: 'MdPullRequest' } & Pick<MdPullRequest, 'number' | 'link'>
-                                        >;
-                                        comparisonLinks?: Maybe<
-                                          { __typename?: 'MdComparisonLinks' } & Pick<
-                                            MdComparisonLinks,
-                                            'toPreviousVersion' | 'toCurrentVersion'
-                                          >
-                                        >;
-                                      }
-                                  >;
-                                  lifecycleSteps?: Maybe<
-                                    Array<
-                                      { __typename?: 'MdLifecycleStep' } & Pick<
-                                        MdLifecycleStep,
-                                        'startedAt' | 'completedAt' | 'type' | 'status' | 'link'
-                                      >
-                                    >
-                                  >;
-                                  constraints?: Maybe<
-                                    Array<
-                                      { __typename?: 'MdConstraint' } & Pick<
-                                        MdConstraint,
-                                        'type' | 'status' | 'judgedBy' | 'judgedAt' | 'attributes'
-                                      >
-                                    >
-                                  >;
-                                  verifications?: Maybe<
-                                    Array<
-                                      { __typename?: 'MdAction' } & Pick<
-                                        MdAction,
-                                        'id' | 'type' | 'status' | 'startedAt' | 'completedAt' | 'link'
-                                      >
-                                    >
-                                  >;
-                                  postDeploy?: Maybe<
-                                    Array<
-                                      { __typename?: 'MdAction' } & Pick<
-                                        MdAction,
-                                        'id' | 'type' | 'status' | 'startedAt' | 'completedAt' | 'link'
-                                      >
-                                    >
-                                  >;
-                                }
-                            >
+                            Array<{ __typename?: 'MdArtifactVersionInEnvironment' } & DetailedVersionFieldsFragment>
                           >;
                         }
                     >
@@ -588,6 +541,69 @@ export type ToggleManagementMutationVariables = Exact<{
 
 export type ToggleManagementMutation = { __typename?: 'Mutation' } & Pick<Mutation, 'toggleManagement'>;
 
+export const DetailedVersionFieldsFragmentDoc = gql`
+  fragment detailedVersionFields on MdArtifactVersionInEnvironment {
+    id
+    buildNumber
+    version
+    createdAt
+    status
+    gitMetadata {
+      commit
+      author
+      branch
+      commitInfo {
+        sha
+        link
+        message
+      }
+      pullRequest {
+        number
+        link
+      }
+      comparisonLinks {
+        toPreviousVersion
+        toCurrentVersion
+      }
+    }
+    deployedAt
+    lifecycleSteps {
+      startedAt
+      completedAt
+      type
+      status
+      link
+    }
+    constraints {
+      type
+      status
+      judgedBy
+      judgedAt
+      attributes
+    }
+    verifications {
+      id
+      type
+      status
+      startedAt
+      completedAt
+      link
+    }
+    postDeploy {
+      id
+      type
+      status
+      startedAt
+      completedAt
+      link
+    }
+    veto {
+      vetoedBy
+      vetoedAt
+      comment
+    }
+  }
+`;
 export const FetchApplicationDocument = gql`
   query fetchApplication($appName: String!, $statuses: [MdArtifactStatusInEnvironment!]) {
     application(appName: $appName) {
@@ -606,60 +622,7 @@ export const FetchApplicationDocument = gql`
             type
             reference
             versions(statuses: $statuses) {
-              id
-              buildNumber
-              version
-              createdAt
-              status
-              gitMetadata {
-                commit
-                author
-                branch
-                commitInfo {
-                  sha
-                  link
-                  message
-                }
-                pullRequest {
-                  number
-                  link
-                }
-                comparisonLinks {
-                  toPreviousVersion
-                  toCurrentVersion
-                }
-              }
-              deployedAt
-              lifecycleSteps {
-                startedAt
-                completedAt
-                type
-                status
-                link
-              }
-              constraints {
-                type
-                status
-                judgedBy
-                judgedAt
-                attributes
-              }
-              verifications {
-                id
-                type
-                status
-                startedAt
-                completedAt
-                link
-              }
-              postDeploy {
-                id
-                type
-                status
-                startedAt
-                completedAt
-                link
-              }
+              ...detailedVersionFields
             }
             pinnedVersion {
               id
@@ -693,6 +656,7 @@ export const FetchApplicationDocument = gql`
       }
     }
   }
+  ${DetailedVersionFieldsFragmentDoc}
 `;
 
 /**
@@ -728,7 +692,7 @@ export type FetchApplicationQueryHookResult = ReturnType<typeof useFetchApplicat
 export type FetchApplicationLazyQueryHookResult = ReturnType<typeof useFetchApplicationLazyQuery>;
 export type FetchApplicationQueryResult = Apollo.QueryResult<FetchApplicationQuery, FetchApplicationQueryVariables>;
 export const FetchVersionsHistoryDocument = gql`
-  query fetchVersionsHistory($appName: String!) {
+  query fetchVersionsHistory($appName: String!, $limit: Int) {
     application(appName: $appName) {
       id
       name
@@ -744,7 +708,7 @@ export const FetchVersionsHistoryDocument = gql`
             environment
             type
             reference
-            versions {
+            versions(limit: $limit) {
               id
               buildNumber
               version
@@ -763,6 +727,10 @@ export const FetchVersionsHistoryDocument = gql`
                   number
                   link
                 }
+              }
+              lifecycleSteps {
+                type
+                status
               }
             }
             pinnedVersion {
@@ -793,6 +761,7 @@ export const FetchVersionsHistoryDocument = gql`
  * const { data, loading, error } = useFetchVersionsHistoryQuery({
  *   variables: {
  *      appName: // value for 'appName'
+ *      limit: // value for 'limit'
  *   },
  * });
  */
@@ -838,66 +807,14 @@ export const FetchVersionDocument = gql`
             type
             reference
             versions(versions: $versions) {
-              id
-              buildNumber
-              version
-              createdAt
-              status
-              gitMetadata {
-                commit
-                author
-                branch
-                commitInfo {
-                  sha
-                  link
-                  message
-                }
-                pullRequest {
-                  number
-                  link
-                }
-                comparisonLinks {
-                  toPreviousVersion
-                  toCurrentVersion
-                }
-              }
-              deployedAt
-              lifecycleSteps {
-                startedAt
-                completedAt
-                type
-                status
-                link
-              }
-              constraints {
-                type
-                status
-                judgedBy
-                judgedAt
-                attributes
-              }
-              verifications {
-                id
-                type
-                status
-                startedAt
-                completedAt
-                link
-              }
-              postDeploy {
-                id
-                type
-                status
-                startedAt
-                completedAt
-                link
-              }
+              ...detailedVersionFields
             }
           }
         }
       }
     }
   }
+  ${DetailedVersionFieldsFragmentDoc}
 `;
 
 /**
