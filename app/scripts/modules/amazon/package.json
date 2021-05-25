@@ -18,7 +18,7 @@
     "@uirouter/core": "6.0.5",
     "@uirouter/react": "1.0.3",
     "@uirouter/react-hybrid": "1.0.2",
-    "angular": "1.6.10",
+    "angular": "1.8.0",
     "angular-ui-bootstrap": "^2.5.0",
     "angular2react": "^3.0.2",
     "bootstrap": "3.4.1",
