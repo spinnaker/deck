@@ -38,7 +38,7 @@ const rule = function(context) {
   };
 };
 
-module.exports = {
+export default {
   meta: {
     type: 'problem',
     docs: {

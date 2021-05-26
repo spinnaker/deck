@@ -222,7 +222,7 @@ function reportAPIDeprecatedUseREST(node, context, callChain) {
  */
 
 /** @type {RuleModule} */
-module.exports = {
+export default {
   create(context) {
     return {
       /**

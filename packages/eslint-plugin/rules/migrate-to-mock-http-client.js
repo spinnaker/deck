@@ -13,7 +13,7 @@ import _ from 'lodash/fp';
 import { getProgram } from '../utils/utils';
 
 /** @type {RuleModule} */
-module.exports = {
+export default {
   create(context) {
     const text = (node) => context.getSourceCode().getText(node);
 
