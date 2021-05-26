@@ -84,7 +84,7 @@ function getFixForAngularModule(angularDotModuleNode, importStatement) {
   };
 }
 
-module.exports = {
+export default {
   meta: {
     type: 'problem',
     docs: {

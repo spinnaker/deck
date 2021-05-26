@@ -98,7 +98,7 @@ function getAngularModuleNameNode(node) {
   }
 }
 
-module.exports = {
+export default {
   meta: {
     type: 'problem',
     docs: {
