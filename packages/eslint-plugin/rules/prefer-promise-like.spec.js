@@ -1,5 +1,3 @@
-'use strict';
-
 import ruleTester from '../utils/ruleTester';
 import rule from '../rules/prefer-promise-like';
 const errorMessage = `Prefer using PromiseLike type instead of AngularJS IPromise.`;

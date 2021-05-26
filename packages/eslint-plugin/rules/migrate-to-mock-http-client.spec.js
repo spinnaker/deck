@@ -1,5 +1,3 @@
-'use strict';
-
 import ruleTester from '../utils/ruleTester';
 import rule from '../rules/migrate-to-mock-http-client';
 

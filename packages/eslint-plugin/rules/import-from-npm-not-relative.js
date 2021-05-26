@@ -1,4 +1,3 @@
-'use strict';
 import { getSourceFileDetails, getRelativeImport } from '../utils/import-aliases';
 
 /**

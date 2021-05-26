@@ -1,4 +1,3 @@
-'use strict';
 import mockModule from '../utils/mockModule';
 const mock = mockModule('../utils/import-aliases');
 mock.getAllSpinnakerPackages.mockImplementation(() => ['core', 'amazon', 'kubernetes']);

@@ -1,4 +1,3 @@
-'use strict';
 import { getSourceFileDetails, getImportFromNpm } from '../utils/import-aliases';
 
 /**

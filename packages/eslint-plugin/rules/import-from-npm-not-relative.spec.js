@@ -1,5 +1,3 @@
-'use strict';
-
 import ruleTester from '../utils/ruleTester';
 import rule from '../rules/import-from-npm-not-relative';
 

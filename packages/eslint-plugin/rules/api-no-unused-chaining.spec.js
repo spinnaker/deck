@@ -1,5 +1,3 @@
-'use strict';
-
 import ruleTester from '../utils/ruleTester';
 import rule from '../rules/api-no-unused-chaining';
 const errorMessage = (text) => `Unused API.xyz() method chaining no longer works. Re-assign the result of: ${text}`;

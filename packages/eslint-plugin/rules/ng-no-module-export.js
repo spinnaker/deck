@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Prefer exporting a module's NAME instead of the entire angular.module()
  *

@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * @typedef {import('estree').CallExpression} CallExpression
  * @typedef {import('estree').ImportSpecifier} ImportSpecifier

@@ -1,5 +1,3 @@
-'use strict';
-
 import _ from 'lodash/fp';
 
 const isApiConfigCall = _.overSome([

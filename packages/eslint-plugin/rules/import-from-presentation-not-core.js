@@ -1,5 +1,3 @@
-'use strict';
-
 const migratedPresentationModules = ['Icon', 'IconNames', 'Illustration', 'IllustrationName'];
 
 const removeImportFromCore = (context, importSpecifierNode, fixer) => {

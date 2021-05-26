@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * require a consistent DI syntax
  *

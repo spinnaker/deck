@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Prefer:
  * import { module } from 'angular';
