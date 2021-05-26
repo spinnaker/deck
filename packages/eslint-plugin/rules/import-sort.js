@@ -1,4 +1,3 @@
-'use strict';
 // @ts-check
 
 const CSS_IMPORT = /\.(css|less|scss|sass)$/;

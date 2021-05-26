@@ -1,4 +1,3 @@
-'use strict';
 import { getCallingIdentifier, getVariableInScope } from '../utils/utils';
 import { get } from 'lodash';
 
