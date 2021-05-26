@@ -1,4 +1,5 @@
 'use strict';
+
 // @ts-check
 
 /**
@@ -7,9 +8,9 @@
  * @typedef {import('estree').ImportSpecifier} ImportSpecifier
  */
 
-const _ = require('lodash/fp');
+import _ from 'lodash/fp';
 
-const { getProgram } = require('../utils/utils');
+import { getProgram } from '../utils/utils';
 
 /** @type {RuleModule} */
 module.exports = {

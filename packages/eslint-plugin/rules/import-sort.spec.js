@@ -1,7 +1,7 @@
 'use strict';
 
-const ruleTester = require('../utils/ruleTester');
-const rule = require('../rules/import-sort');
+import ruleTester from '../utils/ruleTester';
+import rule from '../rules/import-sort';
 
 ruleTester.run('import-sort', rule, {
   valid: [

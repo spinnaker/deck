@@ -1,5 +1,5 @@
 'use strict';
-const _ = require('lodash');
+import _ from 'lodash';
 
 /**
  * No slashes in string literals passed to API.one() / API.all()
