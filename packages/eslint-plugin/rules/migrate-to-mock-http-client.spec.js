@@ -1,7 +1,7 @@
 'use strict';
 
-const ruleTester = require('../utils/ruleTester');
-const rule = require('../rules/migrate-to-mock-http-client');
+import ruleTester from '../utils/ruleTester';
+import rule from '../rules/migrate-to-mock-http-client';
 
 ruleTester.run('migrate-to-mock-http-client', rule, {
   valid: [

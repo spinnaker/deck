@@ -1,7 +1,7 @@
 'use strict';
 
-const ruleTester = require('../utils/ruleTester');
-const rule = require('../rules/rest-prefer-static-strings-in-initializer');
+import ruleTester from '../utils/ruleTester';
+import rule from '../rules/rest-prefer-static-strings-in-initializer';
 
 ruleTester.run('rest-prefer-static-strings-in-initializer', rule, {
   valid: [

@@ -9,9 +9,10 @@
  * @category conventions
  * @sinceAngularVersion 1.x
  */
-const angularRule = require('../utils/angular-rule/angular-rule');
-const utils = require('../utils/angular-rule/utils');
-const isEqual = require('lodash').isEqual;
+import angularRule from '../utils/angular-rule/angular-rule';
+
+import utils from '../utils/angular-rule/utils';
+import { isEqual } from 'lodash';
 const stripUnderscores = true;
 
 function normalizeParameter(param) {

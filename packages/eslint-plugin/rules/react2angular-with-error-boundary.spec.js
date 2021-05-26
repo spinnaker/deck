@@ -1,7 +1,7 @@
 'use strict';
 
-const ruleTester = require('../utils/ruleTester');
-const rule = require('../rules/react2angular-with-error-boundary');
+import ruleTester from '../utils/ruleTester';
+import rule from '../rules/react2angular-with-error-boundary';
 const errorMessage = `Wrap react2angular components in an error boundary using 'withErrorBoundary()'`;
 
 ruleTester.run('api-no-slashes', rule, {

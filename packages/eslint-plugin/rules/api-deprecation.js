@@ -4,14 +4,15 @@
  * @typedef {import('estree').CallExpression} CallExpression
  * @typedef {import('estree').ImportSpecifier} ImportSpecifier
  */
-const _ = require('lodash/fp');
-const {
+import _ from 'lodash/fp';
+
+import {
   getProgram,
   getCallChain,
   getCallingIdentifier,
   getVariableInScope,
   getVariableInitializer,
-} = require('../utils/utils');
+} from '../utils/utils';
 
 /**
  * @param context {RuleContext}

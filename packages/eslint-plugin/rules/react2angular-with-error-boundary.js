@@ -1,5 +1,5 @@
 'use strict';
-const _ = require('lodash');
+import _ from 'lodash';
 
 /**
  * react2angular: Always wrap react components in an error boundary

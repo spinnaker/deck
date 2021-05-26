@@ -1,6 +1,6 @@
 'use strict';
-const { getCallingIdentifier, getVariableInScope } = require('../utils/utils');
-const { get } = require('lodash');
+import { getCallingIdentifier, getVariableInScope } from '../utils/utils';
+import { get } from 'lodash';
 
 /**
  * No slashes in string literals passed to API.one() / API.all()

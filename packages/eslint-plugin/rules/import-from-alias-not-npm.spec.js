@@ -1,7 +1,7 @@
 'use strict';
 
-const ruleTester = require('../utils/ruleTester');
-const rule = require('../rules/import-from-alias-not-npm');
+import ruleTester from '../utils/ruleTester';
+import rule from '../rules/import-from-alias-not-npm';
 
 ruleTester.run('import-from-alias-not-npm', rule, {
   valid: [

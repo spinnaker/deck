@@ -1,6 +1,6 @@
 'use strict';
 
-const _ = require('lodash/fp');
+import _ from 'lodash/fp';
 
 const isApiConfigCall = _.overSome([
   { property: { type: 'Identifier', name: 'one' } },
