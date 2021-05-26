@@ -1,4 +1,3 @@
-'use strict';
 import { getAliasImport, getSourceFileDetails, getAllSpinnakerPackages } from '../utils/import-aliases';
 
 /**

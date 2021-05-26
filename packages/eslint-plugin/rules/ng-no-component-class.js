@@ -1,4 +1,3 @@
-'use strict';
 import camelCase from 'lodash/camelCase';
 
 const findParentNodeByType = (node, type) =>

@@ -1,5 +1,3 @@
-'use strict';
-
 import ruleTester from '../utils/ruleTester';
 import rule from '../rules/react2angular-with-error-boundary';
 const errorMessage = `Wrap react2angular components in an error boundary using 'withErrorBoundary()'`;
