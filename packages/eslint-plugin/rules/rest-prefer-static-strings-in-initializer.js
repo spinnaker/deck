@@ -1,4 +1,5 @@
 'use strict';
+
 // @ts-check
 
 /**
@@ -9,9 +10,9 @@
  * @typedef {import('estree').ImportSpecifier} ImportSpecifier
  */
 
-const _ = require('lodash/fp');
+import _ from 'lodash/fp';
 
-const { getNodeType, getCallChain, getCallingIdentifierName } = require('../utils/utils');
+import { getNodeType, getCallChain, getCallingIdentifierName } from '../utils/utils';
 const getCallName = _.get('callee.property.name');
 
 /** @type {RuleModule} */

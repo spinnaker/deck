@@ -1,7 +1,7 @@
 'use strict';
 
-const ruleTester = require('../utils/ruleTester');
-const rule = require('../rules/ng-no-module-export');
+import ruleTester from '../utils/ruleTester';
+import rule from '../rules/ng-no-module-export';
 
 ruleTester.run('ng-no-module-export', rule, {
   valid: [

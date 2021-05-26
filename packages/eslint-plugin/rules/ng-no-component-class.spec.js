@@ -1,7 +1,7 @@
 'use strict';
 
-const ruleTester = require('../utils/ruleTester');
-const rule = require('../rules/ng-no-component-class');
+import ruleTester from '../utils/ruleTester';
+import rule from '../rules/ng-no-component-class';
 
 ruleTester.run('ng-no-component-class', rule, {
   valid: [

@@ -1,7 +1,7 @@
 'use strict';
 
-const ruleTester = require('../utils/ruleTester');
-const rule = require('../rules/prefer-promise-like');
+import ruleTester from '../utils/ruleTester';
+import rule from '../rules/prefer-promise-like';
 const errorMessage = `Prefer using PromiseLike type instead of AngularJS IPromise.`;
 const unusedImportErrorMessage = `Unused IPromise import`;
 

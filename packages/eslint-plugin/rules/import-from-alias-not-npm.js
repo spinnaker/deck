@@ -1,5 +1,5 @@
 'use strict';
-const { getSourceFileDetails, getImportFromNpm } = require('../utils/import-aliases');
+import { getSourceFileDetails, getImportFromNpm } from '../utils/import-aliases';
 
 /**
  * A group of rules that enforce spinnaker ES6 import alias conventions.

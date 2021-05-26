@@ -1,7 +1,7 @@
 'use strict';
 
-const ruleTester = require('../utils/ruleTester');
-const rule = require('../rules/api-no-unused-chaining');
+import ruleTester from '../utils/ruleTester';
+import rule from '../rules/api-no-unused-chaining';
 const errorMessage = (text) => `Unused API.xyz() method chaining no longer works. Re-assign the result of: ${text}`;
 
 ruleTester.run('api-no-slashes', rule, {

@@ -1,7 +1,7 @@
 'use strict';
 
-const ruleTester = require('../utils/ruleTester');
-const rule = require('../rules/import-from-presentation-not-core');
+import ruleTester from '../utils/ruleTester';
+import rule from '../rules/import-from-presentation-not-core';
 const errorMessage = (moduleName) => `${moduleName} must be imported from @spinnaker/presentation`;
 
 ruleTester.run('import-from-presentation-not-core', rule, {
