@@ -16,7 +16,7 @@ import { getNodeType, getCallChain, getCallingIdentifierName } from '../utils/ut
 const getCallName = _.get('callee.property.name');
 
 /** @type {RuleModule} */
-module.exports = {
+export default {
   create(context) {
     return {
       /**

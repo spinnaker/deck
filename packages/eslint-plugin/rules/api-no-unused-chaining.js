@@ -32,7 +32,7 @@ const create = function (context) {
   };
 };
 
-module.exports = {
+export default {
   create,
   meta: {
     docs: {

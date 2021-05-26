@@ -194,7 +194,7 @@ function isInAngularModuleCall(arrayExpression) {
   return false;
 }
 
-module.exports = {
+export default {
   meta: {
     type: 'problem',
     docs: {

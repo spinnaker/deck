@@ -41,7 +41,7 @@ const rule = function(context) {
   };
 };
 
-const importAliasesRule = (module.exports = {
+const importAliasesRule = {
   meta: {
     type: 'problem',
     docs: {
@@ -50,4 +50,5 @@ const importAliasesRule = (module.exports = {
     fixable: 'code',
   },
   create: rule,
-});
+};
+export default importAliasesRule;
