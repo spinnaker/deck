@@ -8,8 +8,9 @@ import { Environments } from './Environments';
 import { featureFlag } from './Environments2';
 import { Configuration } from './config/Configuration';
 import { EnvironmentsOverview } from './overview/EnvironmentsOverview';
+import { VersionsHistory } from './versionsHistory/VersionsHistory';
 
-export type Routes = 'overview' | 'config';
+export type Routes = 'overview' | 'config' | 'history';
 
 const routes: Array<INestedState & { name: Routes }> = [
   {
@@ -23,6 +24,13 @@ const routes: Array<INestedState & { name: Routes }> = [
     name: 'config',
     url: '/config',
     component: Configuration,
+    $type: 'react',
+    children: [],
+  },
+  {
+    name: 'history',
+    url: '/history',
+    component: VersionsHistory,
     $type: 'react',
     children: [],
   },
@@ -60,9 +68,8 @@ module(MANAGED_STATES, [APPLICATION_STATE_PROVIDER]).config([
         children: [artifactVersion, ...routes],
         redirectTo: (transition) => {
           const { new_ui } = transition.params();
-          localStorage.setItem(featureFlag, '1');
-
-          if (new_ui) {
+          if (new_ui === '1') {
+            localStorage.setItem(featureFlag, '1');
             return 'home.applications.application.environments.overview';
           }
           return undefined;

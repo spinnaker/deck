@@ -1,3 +1,65 @@
+fragment detailedVersionFields on MdArtifactVersionInEnvironment {
+  id
+  buildNumber
+  version
+  createdAt
+  status
+  gitMetadata {
+    commit
+    author
+    branch
+    commitInfo {
+      sha
+      link
+      message
+    }
+    pullRequest {
+      number
+      link
+    }
+    comparisonLinks {
+      toPreviousVersion
+      toCurrentVersion
+    }
+  }
+  deployedAt
+  lifecycleSteps {
+    startedAt
+    completedAt
+    type
+    status
+    link
+  }
+  constraints {
+    type
+    status
+    judgedBy
+    judgedAt
+    attributes
+  }
+  verifications {
+    id
+    type
+    status
+    startedAt
+    completedAt
+    link
+  }
+  postDeploy {
+    id
+    type
+    status
+    startedAt
+    completedAt
+    link
+  }
+  veto {
+    vetoedBy
+    vetoedAt
+    comment
+  }
+}
+
 query fetchApplication($appName: String!, $statuses: [MdArtifactStatusInEnvironment!]) {
   application(appName: $appName) {
     id
@@ -15,51 +77,7 @@ query fetchApplication($appName: String!, $statuses: [MdArtifactStatusInEnvironm
           type
           reference
           versions(statuses: $statuses) {
-            id
-            buildNumber
-            version
-            createdAt
-            status
-            gitMetadata {
-              commit
-              author
-              branch
-              commitInfo {
-                sha
-                link
-                message
-              }
-              pullRequest {
-                number
-                link
-              }
-              comparisonLinks {
-                toPreviousVersion
-                toCurrentVersion
-              }
-            }
-            deployedAt
-            lifecycleSteps {
-              startedAt
-              completedAt
-              type
-              status
-              link
-            }
-            constraints {
-              type
-              status
-              judgedBy
-              attributes
-            }
-            verifications {
-              id
-              type
-              status
-              startedAt
-              completedAt
-              link
-            }
+            ...detailedVersionFields
           }
           pinnedVersion {
             id
@@ -87,6 +105,86 @@ query fetchApplication($appName: String!, $statuses: [MdArtifactStatusInEnvironm
           location {
             account
             regions
+          }
+        }
+      }
+    }
+  }
+}
+
+query fetchVersionsHistory($appName: String!, $limit: Int) {
+  application(appName: $appName) {
+    id
+    name
+    account
+    environments {
+      id
+      name
+      state {
+        id
+        artifacts {
+          id
+          name
+          environment
+          type
+          reference
+          versions(limit: $limit) {
+            id
+            buildNumber
+            version
+            createdAt
+            status
+            gitMetadata {
+              commit
+              author
+              branch
+              commitInfo {
+                sha
+                link
+                message
+              }
+              pullRequest {
+                number
+                link
+              }
+            }
+            lifecycleSteps {
+              type
+              status
+            }
+          }
+          pinnedVersion {
+            id
+            version
+            buildNumber
+            pinnedAt
+            pinnedBy
+            comment
+          }
+        }
+      }
+    }
+  }
+}
+
+query fetchVersion($appName: String!, $versions: [String!]) {
+  application(appName: $appName) {
+    id
+    name
+    account
+    environments {
+      id
+      name
+      state {
+        id
+        artifacts {
+          id
+          name
+          environment
+          type
+          reference
+          versions(versions: $versions) {
+            ...detailedVersionFields
           }
         }
       }

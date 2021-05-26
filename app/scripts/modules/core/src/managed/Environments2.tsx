@@ -8,10 +8,11 @@ import { Routes } from './managed.states';
 import './Environments2.less';
 import './overview/baseStyles.less';
 
-export const featureFlag = 'newMD_UI';
+export const featureFlag = 'MD_new_ui';
 
 const tabsInternal: { [key in Routes]: string } = {
   overview: 'Overview',
+  history: 'History',
   config: 'Configuration',
 };
 

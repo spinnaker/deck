@@ -6,14 +6,12 @@ import { timeDiffToString } from 'core/utils';
 
 import { MarkAsBadActionModal, PinActionModal, UnpinActionModal } from './ArtifactActionModal';
 import { ManagedWriter } from '../../ManagedWriter';
-import { VersionAction } from './VersionMetadata';
-import { actionStatusUtils } from './VersionOperation';
+import { ACTION_DISPLAY_NAMES, getActionStatusData } from './VersionOperation';
 import { useFetchApplicationLazyQuery } from '../../graphql/graphql-sdk';
 import { QueryArtifactVersion, QueryConstraint, QueryLifecycleStep } from '../types';
 import { OVERVIEW_VERSION_STATUSES } from '../utils';
 import { MODAL_MAX_WIDTH } from '../../utils/defaults';
-
-const ALL_CONSTRAINT_STATUSES: Array<QueryConstraint['status']> = ['PASS', 'FORCE_PASS', 'PENDING', 'FAIL'];
+import { VersionAction } from '../../versionMetadata/MetadataComponents';
 
 export const getConstraintsStatusSummary = (constraints: QueryConstraint[]) => {
   let finalStatus: QueryConstraint['status'] = 'PASS';
@@ -21,17 +19,17 @@ export const getConstraintsStatusSummary = (constraints: QueryConstraint[]) => {
     if (status === 'FAIL') {
       finalStatus = 'FAIL';
       break;
-    } else if (status === 'PENDING') {
+    } else if (status === 'PENDING' || status === 'BLOCKED') {
       finalStatus = 'PENDING';
     } else if (status === 'FORCE_PASS' && finalStatus !== 'PENDING') {
       finalStatus = 'FORCE_PASS';
     }
   }
 
-  const byStatus = groupBy(constraints, (c) => c.status);
-  const summary = ALL_CONSTRAINT_STATUSES.map((status) => {
-    const constraintsOfStatus = byStatus[status];
-    return constraintsOfStatus ? `${constraintsOfStatus.length} ${actionStatusUtils[status].displayName}` : undefined;
+  const byStatus = groupBy(constraints, (c) => getActionStatusData(c.status)?.displayName || 'pending');
+  const summary = ACTION_DISPLAY_NAMES.map((displayName) => {
+    const constraintsOfStatus = byStatus[displayName];
+    return constraintsOfStatus ? `${constraintsOfStatus.length} ${displayName}` : undefined;
   })
     .filter(Boolean)
     .join(', ');
@@ -39,11 +37,18 @@ export const getConstraintsStatusSummary = (constraints: QueryConstraint[]) => {
   return { text: summary, status: finalStatus };
 };
 
+export const getLifecycleEventByType = (
+  version: QueryArtifactVersion | undefined,
+  type: QueryLifecycleStep['type'],
+): QueryLifecycleStep | undefined => {
+  return version?.lifecycleSteps?.find((step) => step.type === type);
+};
+
 export const getLifecycleEventDuration = (
   version: QueryArtifactVersion | undefined,
   type: QueryLifecycleStep['type'],
 ) => {
-  const event = version?.lifecycleSteps?.find((step) => step.type === type);
+  const event = getLifecycleEventByType(version, type);
   if (!event) return undefined;
   const { startedAt, completedAt } = event;
   if (startedAt && completedAt) {
@@ -53,7 +58,32 @@ export const getLifecycleEventDuration = (
 };
 
 export const getLifecycleEventLink = (version: QueryArtifactVersion | undefined, type: QueryLifecycleStep['type']) => {
-  return version?.lifecycleSteps?.find((step) => step.type === type)?.link;
+  return getLifecycleEventByType(version, type)?.link;
+};
+
+export const isBaking = (version: QueryArtifactVersion) => {
+  return getLifecycleEventByType(version, 'BAKE')?.status === 'RUNNING';
+};
+
+export interface LifecycleEventSummary {
+  startedAt?: DateTime;
+  duration?: string;
+  link?: string;
+  isRunning: boolean;
+}
+
+export const getLifecycleEventSummary = (
+  version: QueryArtifactVersion | undefined,
+  type: QueryLifecycleStep['type'],
+): LifecycleEventSummary | undefined => {
+  const event = getLifecycleEventByType(version, type);
+  if (!event) return undefined;
+  return {
+    startedAt: event.startedAt ? DateTime.fromISO(event.startedAt) : undefined,
+    duration: getLifecycleEventDuration(version, type),
+    isRunning: event.status === 'RUNNING',
+    link: event.link,
+  };
 };
 
 interface ICreateVersionActionsProps {
