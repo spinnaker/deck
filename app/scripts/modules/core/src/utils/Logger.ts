@@ -13,7 +13,7 @@ type Level = keyof typeof LEVELS;
 
 interface Event {
   level?: Level;
-  message: string;
+  action: string;
   category?: string;
   error?: Error;
   data?: Record<string, any>;

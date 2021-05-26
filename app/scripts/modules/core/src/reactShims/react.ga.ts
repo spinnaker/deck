@@ -8,7 +8,7 @@ if (SETTINGS.analytics.ga) {
   logger.subscribe({
     key: 'googleAnalytics',
     onEvent: (event) => {
-      ReactGA.event({ category: event.category, action: event.message, label: event.data?.label });
+      ReactGA.event({ category: event.category, action: event.action, label: event.data?.label });
     },
   });
 }
