@@ -1,11 +1,24 @@
 import { Rule, Scope } from 'eslint';
-import { CallExpression, Expression, Identifier, MemberExpression, Node, Program, SpreadElement } from 'estree';
+import {
+  CallExpression,
+  Expression,
+  Identifier,
+  Literal,
+  MemberExpression,
+  NewExpression,
+  Node,
+  Program,
+  SpreadElement,
+} from 'estree';
 import * as _ from 'lodash/fp';
 
-export const getNodeType = (obj: Node) => obj && obj.type;
-const isIdentifier = (obj: Node): obj is Identifier => obj?.type === 'Identifier';
-const isCallExpression = (obj: Node): obj is CallExpression => obj?.type === 'CallExpression';
-const isMemberExpression = (obj: Node): obj is MemberExpression => obj?.type === 'MemberExpression';
+export const getNodeType = (obj: Node) => obj?.type;
+export const isType = <T extends Node>(type: string) => (obj: Node): obj is T => getNodeType(obj) === type;
+export const isIdentifier = isType<Identifier>('Identifier');
+export const isCallExpression = isType<CallExpression>('CallExpression');
+export const isMemberExpression = isType<MemberExpression>('MemberExpression');
+export const isLiteral = isType<Literal>('Literal');
+export const isNewExpression = isType<NewExpression>('NewExpression');
 
 /**
  * Recursively grab the callee until an Identifier is found.
