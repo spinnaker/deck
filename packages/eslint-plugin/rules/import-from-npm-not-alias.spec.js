@@ -1,7 +1,4 @@
-import mockModule from '../utils/mockModule';
-const mock = mockModule('../utils/import-aliases');
-mock.getAllSpinnakerPackages.mockImplementation(() => ['core', 'amazon', 'titus', 'docker']);
-
+import '../utils/import-aliases.mock';
 import ruleTester from '../utils/ruleTester';
 import rule from '../rules/import-from-npm-not-alias';
 
