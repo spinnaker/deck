@@ -1,10 +1,10 @@
 import React from 'react';
 
 import { Icon, useApplicationContextSafe } from 'core/presentation';
-import spinner from 'core/widgets/spinners/loadingIndicator.svg';
 
 import { EnvironmentItem } from '../environmentBaseElements/EnvironmentItem';
 import { MdResourceActuationState, useFetchResourceStatusQuery } from '../graphql/graphql-sdk';
+import spinner from './loadingIndicator.svg';
 import { showManagedResourceHistoryModal } from '../resourceHistory/ManagedResourceHistoryModal';
 import { ResourceTitle } from '../resources/ResourceTitle';
 import { IResourceLinkProps, resourceManager } from '../resources/resourceRegistry';

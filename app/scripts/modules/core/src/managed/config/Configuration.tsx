@@ -4,9 +4,9 @@ import React from 'react';
 import { Illustration } from '@spinnaker/presentation';
 import { showModal, useApplicationContextSafe } from 'core/presentation';
 import { Spinner } from 'core/widgets';
-import spinner from 'core/widgets/spinners/loadingIndicator.svg';
 
 import { useFetchApplicationManagementStatusQuery, useToggleManagementMutation } from '../graphql/graphql-sdk';
+import spinner from '../overview/loadingIndicator.svg';
 import { ActionModal, IArtifactActionModalProps } from '../utils/ActionModal';
 import { MODAL_MAX_WIDTH, spinnerProps } from '../utils/defaults';
 

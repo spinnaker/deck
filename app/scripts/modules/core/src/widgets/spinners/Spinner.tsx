@@ -1,16 +1,23 @@
 import classnames from 'classnames';
 import React from 'react';
 
-import loadingIndicator from './loadingIndicator.svg';
+import { ReactComponent as LoadingIndicator } from './loadingIndicator.svg';
 
 export interface ISpinnerProps {
+  color?: string;
   message?: string;
   mode?: 'circular' | 'horizontal';
   fullWidth?: boolean;
   size?: 'nano' | 'small' | 'medium' | 'large';
 }
 
-export const Spinner = ({ fullWidth, message, mode = 'horizontal', size = 'small' }: ISpinnerProps) => {
+export const Spinner = ({
+  color = '#ffffff',
+  fullWidth,
+  message,
+  mode = 'horizontal',
+  size = 'small',
+}: ISpinnerProps) => {
   if (mode === 'circular') {
     const sizeToHeight = {
       nano: 12,
@@ -18,7 +25,8 @@ export const Spinner = ({ fullWidth, message, mode = 'horizontal', size = 'small
       medium: 24,
       large: 32,
     };
-    return <img src={loadingIndicator} height={sizeToHeight[size]} />;
+
+    return <LoadingIndicator style={{ height: sizeToHeight[size], fill: color }} />;
   }
 
   const getBarRows = (): React.ReactNode[] => {
@@ -54,3 +62,9 @@ export const Spinner = ({ fullWidth, message, mode = 'horizontal', size = 'small
     </div>
   );
 };
+
+/**
+ * Note: This is a temporary component for backwards compatibility in NgReact.
+ * Once core is bumped, the `ButtonBusyIndicator` and `LegacySpinner` from NgReact can be replaced with `Spinner` in the other modules and removed.
+ */
+export const ButtonBusyIndicator = () => <Spinner mode="circular" />;
