@@ -1,8 +1,4 @@
-import mockModule from '../utils/mockModule';
-const mock = mockModule('../utils/import-aliases');
-mock.getAllSpinnakerPackages.mockImplementation(() => ['core', 'amazon', 'kubernetes']);
-
-import path from 'path';
+import '../utils/import-aliases.mock';
 import ruleTester from '../utils/ruleTester';
 import rule from '../rules/import-relative-within-subpackage';
 

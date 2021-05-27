@@ -1,8 +1,8 @@
-const path = require('path');
-const fs = require('fs');
-const { flattenDeep, memoize } = require('lodash');
+import * as fs from 'fs';
+import { flattenDeep, memoize } from 'lodash';
+import * as path from 'path';
 
-function locateSourceFile(modulesPath, moduleName, importPath = '') {
+export function locateSourceFile(modulesPath: string, moduleName: string, importPath = '') {
   const srcPrefixes = ['src', ''];
   const indexFiles = ['', 'index'];
   const extensions = ['.ts', '.tsx', '.js', '.jsx'];
@@ -18,7 +18,7 @@ function locateSourceFile(modulesPath, moduleName, importPath = '') {
   return flattenDeep(paths).find((p) => fs.existsSync(p));
 }
 
-function _getAllSpinnakerPackages(modulesPath) {
+function _getAllSpinnakerPackages(modulesPath: string) {
   const paths = fs.readdirSync(modulesPath);
   return paths
     .map((file) => path.join(modulesPath, file))
@@ -26,9 +26,9 @@ function _getAllSpinnakerPackages(modulesPath) {
     .map((packagePath) => packagePath.split('/').pop());
 }
 
-const getAllSpinnakerPackages = memoize(_getAllSpinnakerPackages);
+export const getAllSpinnakerPackages = memoize(_getAllSpinnakerPackages);
 
-function makeResult(pkg, importPath) {
+function makeResult(pkg: string, importPath: string) {
   const subPkg = getSubPackage(pkg, importPath);
   importPath = importPath || '';
   const importPathWithSlash = importPath ? '/' + importPath : '';
@@ -40,7 +40,7 @@ function makeResult(pkg, importPath) {
  * Given '@spinnaker/core/deep/import', returns { pkg: 'core', path: 'deep/import' };
  * Given 'anythingelse', returns undefined
  */
-function getImportFromNpm(importString) {
+export function getImportFromNpm(importString: string) {
   const regexp = new RegExp(`^@spinnaker/([^/]+)(/.*)?$`);
   const [, pkg, importPath] = regexp.exec(importString) || [];
   return makeResult(pkg, importPath);
@@ -52,7 +52,7 @@ function getImportFromNpm(importString) {
  * Given 'core/deep/import', returns { pkg: 'core', path: 'deep/import' };
  * Given 'nonspinnakerpackage/deep/import', returns undefined
  */
-function getAliasImport(allSpinnakerPackages, importString) {
+export function getAliasImport(allSpinnakerPackages: string[], importString: string) {
   const [, pkg, importPath] = /^([^/]+)\/(.*)$/.exec(importString) || [];
   return allSpinnakerPackages.includes(pkg) ? makeResult(pkg, importPath) : undefined;
 }
@@ -64,7 +64,7 @@ function getAliasImport(allSpinnakerPackages, importString) {
  * Given '../widgets/button', returns { pkg: 'core', path: 'widgets/button' };
  * Given './file2', returns { pkg: 'core', path: 'subdir/file2' };
  */
-function getRelativeImport(sourceFileName, modulesPath, importString) {
+export function getRelativeImport(sourceFileName: string, modulesPath: string, importString: string) {
   if (!importString.startsWith('../')) {
     return undefined;
   }
@@ -76,25 +76,16 @@ function getRelativeImport(sourceFileName, modulesPath, importString) {
   return pkg ? makeResult(pkg, rest.join('/')) : undefined;
 }
 
-function _getSourceFileDetails(sourceFile) {
+function _getSourceFileDetails(sourceFile: string) {
   const [, modulesPath, ownPackage, filePath] = /^(.*packages)\/([^/]+)\/(?:src\/)?(.*)$/.exec(sourceFile) || [];
   const ownSubPackage = getSubPackage(ownPackage, filePath);
   const sourceDirectory = path.resolve(sourceFile, '..');
   return { modulesPath, sourceDirectory, ownPackage, ownSubPackage, filePath };
 }
 
-function getSubPackage(packageName, filePath) {
+function getSubPackage(_packageName: string, filePath: string) {
   const [, subPkg] = /^([^/]+)\/?.*/.exec(filePath) || [];
   return subPkg;
 }
 
-const getSourceFileDetails = memoize(_getSourceFileDetails);
-
-module.exports = {
-  getAliasImport,
-  getAllSpinnakerPackages,
-  getImportFromNpm,
-  getRelativeImport,
-  getSourceFileDetails,
-  locateSourceFile,
-};
+export const getSourceFileDetails = memoize(_getSourceFileDetails);
