@@ -4,12 +4,12 @@ import React from 'react';
 
 import { CollapsibleSection, useApplicationContextSafe } from 'core/presentation';
 import { NotifierService } from 'core/widgets';
+import spinner from 'core/widgets/spinners/loadingIndicator.svg';
 
 import { RelativeTimestamp } from '../../RelativeTimestamp';
 import { VersionOperationIcon } from './VersionOperation';
 import { constraintsManager } from '../../constraints/registry';
 import { FetchVersionDocument, useUpdateConstraintMutation } from '../../graphql/graphql-sdk';
-import spinner from '../loadingIndicator.svg';
 import { ArtifactVersionProps, QueryConstraint } from '../types';
 import { getConstraintsStatusSummary } from './utils';
 
