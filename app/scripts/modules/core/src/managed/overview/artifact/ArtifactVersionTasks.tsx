@@ -2,10 +2,10 @@ import React from 'react';
 
 import { Tooltip } from 'core/presentation';
 
-import { DurationRender } from '../../RelativeTimestamp';
+import { DurationRender, RelativeTimestamp } from '../../RelativeTimestamp';
 import { VersionOperationIcon } from './VersionOperation';
 import { QueryArtifactVersionTask, QueryVerificationStatus } from '../types';
-import { TOOLTIP_DELAY } from '../../utils/defaults';
+import { TOOLTIP_DELAY_SHOW } from '../../utils/defaults';
 
 import './ArtifactVersionTasks.less';
 
@@ -32,9 +32,14 @@ const ArtifactVersionTask = ({ type, task }: IArtifactVersionTaskProps) => {
       <VersionOperationIcon status={status} />
       <div className="task-content">
         {type} {task.id} {statusToText[status]}{' '}
+        {startedAt && completedAt && (
+          <>
+            (<RelativeTimestamp timestamp={completedAt} withSuffix />)
+          </>
+        )}
         {startedAt && (
           <span className="task-metadata task-runtime">
-            <Tooltip value="Runtime duration" delayShow={TOOLTIP_DELAY}>
+            <Tooltip value="Runtime duration" delayShow={TOOLTIP_DELAY_SHOW}>
               <i className="far fa-clock" />
             </Tooltip>
             <DurationRender {...{ startedAt, completedAt }} />
@@ -54,10 +59,11 @@ const ArtifactVersionTask = ({ type, task }: IArtifactVersionTaskProps) => {
 
 interface IVerificationsProps {
   type: string;
-  tasks: QueryArtifactVersionTask[];
+  tasks?: QueryArtifactVersionTask[];
 }
 
 export const ArtifactVersionTasks = ({ type, tasks }: IVerificationsProps) => {
+  if (!tasks || !tasks.length) return null;
   return (
     <div className="ArtifactVersionTasks">
       {tasks.map((task) => (

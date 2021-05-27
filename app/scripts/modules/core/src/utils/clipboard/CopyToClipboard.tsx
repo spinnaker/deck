@@ -1,7 +1,6 @@
 import React from 'react';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
-import ReactGA from 'react-ga';
-
+import { logger } from '../Logger';
 import './CopyToClipboard.less';
 
 export interface ICopyToClipboardProps {
@@ -11,6 +10,7 @@ export interface ICopyToClipboardProps {
   text: string;
   toolTip?: string;
   className?: string;
+  stopPropagation?: boolean;
 }
 
 interface ICopyToClipboardState {
@@ -59,12 +59,15 @@ export class CopyToClipboard extends React.Component<ICopyToClipboardProps, ICop
    */
   public handleClick = (e: React.SyntheticEvent): void => {
     e.preventDefault();
+    if (this.props.stopPropagation) {
+      e.stopPropagation();
+    }
 
     const { analyticsLabel, text } = this.props;
-    ReactGA.event({
+    logger.log({
       category: 'Copy to Clipboard',
       action: 'copy',
-      label: analyticsLabel || text,
+      data: { label: analyticsLabel || text },
     });
 
     const node: HTMLTextAreaElement = this.inputRef.current;

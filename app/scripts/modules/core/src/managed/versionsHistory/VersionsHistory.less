@@ -1,0 +1,109 @@
+.VersionsHistory {
+  width: 100%;
+  .version-item {
+    background-color: var(--color-white);
+    padding: var(--m-spacing);
+    margin-bottom: var(--xl-spacing);
+    box-shadow: 1px 3px 6px 0 rgba(0, 0, 0, 0.05);
+
+    .copy-version-link {
+      display: none;
+    }
+    &:hover {
+      .copy-version-link {
+        display: block;
+      }
+    }
+
+    .version-heading {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+
+      .section-heading-chevron {
+        border-radius: 999px;
+        padding: 4px;
+      }
+
+      &:hover {
+        .section-heading-chevron {
+          background-color: var(--color-cirrus);
+        }
+      }
+    }
+
+    .version-body {
+      margin-top: var(--l-spacing);
+    }
+  }
+
+  .version-toggle {
+    &:hover {
+      text-decoration: none;
+    }
+  }
+
+  .version-environments {
+    display: flex;
+    flex-direction: row;
+    margin-top: var(--s-spacing);
+
+    .chip {
+      min-width: 100px;
+      justify-content: center;
+      margin-right: var(--m-spacing);
+      position: relative;
+    }
+
+    .environment-pinned {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      padding: 2px;
+      box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.5);
+      border-radius: 999px;
+      background-color: var(--color-status-warning-light);
+    }
+  }
+
+  .chip {
+    border-radius: 999px;
+    padding: var(~'--3xs-spacing') var(--l-spacing);
+    display: flex;
+    flex-direction: row;
+    color: var(--color-mineshaft);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+
+    &.chip-outlined {
+      border: 1px solid var(--color-silver);
+    }
+
+    &.approved {
+      background-color: var(--color-status-progress);
+    }
+
+    &.pending {
+      background-color: var(--color-status-progress);
+    }
+
+    &.vetoed {
+      background-color: var(--color-status-error);
+    }
+
+    &.current {
+      background-color: var(--color-status-success);
+    }
+
+    &.previous {
+      background-color: var(--color-status-neutral);
+    }
+
+    &.deploying {
+      color: var(--color-white);
+      background-color: var(--color-accent);
+    }
+  }
+}
