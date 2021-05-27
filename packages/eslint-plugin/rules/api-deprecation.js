@@ -2,7 +2,7 @@
  * @typedef {import('estree').CallExpression} CallExpression
  * @typedef {import('estree').ImportSpecifier} ImportSpecifier
  */
-import _ from 'lodash/fp';
+import * as _ from 'lodash/fp';
 
 import {
   getProgram,

@@ -1,4 +1,4 @@
-import _ from 'lodash/fp';
+import * as _ from 'lodash/fp';
 
 const isApiConfigCall = _.overSome([
   { property: { type: 'Identifier', name: 'one' } },

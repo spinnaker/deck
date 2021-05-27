@@ -6,7 +6,7 @@
  * @typedef {import('estree').ImportSpecifier} ImportSpecifier
  */
 
-import _ from 'lodash/fp';
+import * as _ from 'lodash/fp';
 
 import { getProgram } from '../utils/utils';
 
