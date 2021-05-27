@@ -38,6 +38,11 @@ ruleTester.run('ng-strictdi', rule, {
         angular.module('foo', [])
           .controller('myController', function($scope) {});
       `,
+      output: `
+        const angular = require('angular');
+        angular.module('foo', [])
+          .controller('myController', ['$scope', function($scope) {}]);
+      `,
     },
     {
       errors: [
@@ -49,8 +54,17 @@ ruleTester.run('ng-strictdi', rule, {
         class MyClass {
           constructor($scope) {
           }
-        };
-
+        }
+        module('foo', []).controller('myClassController', MyClass);
+      `,
+      output: `
+        import { module } from 'angular';
+        // Do not rename this to MyClassController or the checkDi rule will fire twice
+        class MyClass {
+          constructor($scope) {
+          }
+        }
+MyClass.$inject = ['$scope'];
         module('foo', []).controller('myClassController', MyClass);
       `,
     },
@@ -61,6 +75,11 @@ ruleTester.run('ng-strictdi', rule, {
         angular.module('foo', [])
           .directive('myDirective', { controller: function namedFunction($scope) {} });
       `,
+      output: `
+        const angular = require('angular');
+        angular.module('foo', [])
+          .directive('myDirective', { controller: ['$scope', function namedFunction($scope) {}] });
+      `,
     },
     {
       errors: [
@@ -70,6 +89,11 @@ ruleTester.run('ng-strictdi', rule, {
         const angular = require('angular');
         angular.module('foo', [])
           .directive('myDirective', { controller: function ($scope, $location) {} });
+      `,
+      output: `
+        const angular = require('angular');
+        angular.module('foo', [])
+          .directive('myDirective', { controller: ['$scope', '$location', function ($scope, $location) {}] });
       `,
     },
   ],

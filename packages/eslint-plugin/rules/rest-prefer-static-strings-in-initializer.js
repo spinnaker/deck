@@ -91,7 +91,6 @@ export default {
     type: 'problem',
     docs: {
       description: 'Migrate from API.xyz() to REST(path)',
-      recommended: 'error',
     },
   },
 };
