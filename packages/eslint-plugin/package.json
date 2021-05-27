@@ -35,5 +35,10 @@
     "eslint",
     "eslint-config-prettier",
     "eslint-plugin-react-hooks"
-  ]
+  ],
+  "jest": {
+    "testPathIgnorePatterns": [
+      "<rootDir>/template"
+    ]
+  }
 }
