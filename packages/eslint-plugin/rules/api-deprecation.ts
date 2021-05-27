@@ -1,22 +1,16 @@
-/**
- * @typedef {import('estree').CallExpression} CallExpression
- * @typedef {import('estree').ImportSpecifier} ImportSpecifier
- */
+import { Rule } from 'eslint';
+import { CallExpression, ImportDeclaration, ImportSpecifier, MemberExpression, Node } from 'estree';
 import * as _ from 'lodash/fp';
 
 import {
-  getProgram,
   getCallChain,
   getCallingIdentifier,
-  getVariableInScope,
+  getProgram,
   getVariableInitializer,
+  getVariableInScope,
 } from '../utils/utils';
 
-/**
- * @param context {RuleContext}
- * @param node {CallExpression}
- */
-function isAPICall(context, node) {
+function isAPICall(context: Rule.RuleContext, node: CallExpression) {
   // Find the call chain Identifier:
   // API.one().all().get()
   // ^^^
@@ -39,10 +33,8 @@ function isAPICall(context, node) {
 
 const getCallName = _.get('callee.property.name');
 
-/** @param callNames {string} */
-function isCallNamed(...callNames) {
-  /** @param callExpression {CallExpression[]} */
-  return function (callExpression) {
+function isCallNamed(...callNames: string[]) {
+  return function (callExpression: CallExpression) {
     const callName = getCallName(callExpression);
     return callNames.includes(callName);
   };
@@ -50,9 +42,8 @@ function isCallNamed(...callNames) {
 
 /**
  * Returns a list of deprecated methods that need to be renamed and fixers to do so.
- * @param callChain {CallExpression[]}
  */
-function findMethodsToRename(callChain) {
+function findMethodsToRename(callChain: CallExpression[]) {
   const renames = {
     getList: 'get',
     withParams: 'query',
@@ -62,10 +53,9 @@ function findMethodsToRename(callChain) {
   };
 
   const calls = callChain.map((call) => {
-    const from = getCallName(call);
+    const from = getCallName(call) as keyof typeof renames;
     const to = renames[from];
-    /** @param fixer {RuleFixer} */
-    const fix = (fixer) => fixer.replaceText(call.callee.property, to);
+    const fix = (fixer: Rule.RuleFixer) => fixer.replaceText((call.callee as MemberExpression).property, to);
     return { call, fix, from, to };
   });
 
@@ -73,11 +63,13 @@ function findMethodsToRename(callChain) {
   return calls.filter((tuple) => !!tuple.to);
 }
 
-/**
- * @param context {RuleContext}
- * @param node {CallExpression}
- */
-function reportSimpleRenames(context, node, renames) {
+interface IRename {
+  from: string;
+  to: string;
+  fix: (fixer: Rule.RuleFixer) => Rule.Fix;
+}
+
+function reportSimpleRenames(context: Rule.RuleContext, node: Node, renames: IRename[]) {
   // Strings for the message
   const froms = [...new Set(renames.map((tuple) => tuple.from))].join('/');
   const tos = [...new Set(renames.map((tuple) => tuple.to))].join('/');
@@ -89,17 +81,12 @@ function reportSimpleRenames(context, node, renames) {
   });
 }
 
-/**
- * @param context {RuleContext}
- * @param node {CallExpression}
- * @param callChain {CallExpression[]}
- */
-function reportDataMethod(context, node, callChain) {
+function reportDataMethod(context: Rule.RuleContext, node: Node, callChain: CallExpression[]) {
   // Just the .data() calls
   const dataCalls = callChain.filter(isCallNamed('data'));
 
   // Find the corresponding put/post
-  const putOrPost = callChain.find((n) => ['put', 'post'].includes(n.callee.property.name));
+  const putOrPost = callChain.find((n) => ['put', 'post'].includes((n.callee as any).property.name));
   const message = `API.data() is deprecated.  Migrate from .data({}) to .put({}) or .post({})`;
 
   // If there is a single .data() and a .put() or .post() in the chain...
@@ -111,9 +98,9 @@ function reportDataMethod(context, node, callChain) {
   const call = dataCalls[0];
   // get the text of the arguments passed to .data(ARGS)
   const argsText = call.arguments.map((arg) => context.getSourceCode().getText(arg)).join(', ');
-  // find the spot between the parentheses in -> post()
+  // @ts-ignore find the spot between the parentheses in -> post()
   const putOrPostRangeEnd = putOrPost.callee.property.range[1] + 1;
-  // Just after ".one()" in `.one().data(value)`
+  // @ts-ignore Just after ".one()" in `.one().data(value)`
   const previousCalleeRangeEnd = call.callee.object.range[1];
   // The end of `.data(value)`
   const dataRangeEnd = call.range[1];
@@ -128,12 +115,8 @@ function reportDataMethod(context, node, callChain) {
     ],
   });
 }
-/**
- * @param context {RuleContext}
- * @param node {CallExpression}
- * @param getsAndDeletes {CallExpression[]}
- */
-function reportGetsAndDeletesWithArgs(context, node, getsAndDeletes) {
+
+function reportGetsAndDeletesWithArgs(context: Rule.RuleContext, node: Node, getsAndDeletes: CallExpression[]) {
   const callNames = [...new Set(getsAndDeletes.map(getCallName))].join('/');
   const message = `Passing parameters to API.${callNames}() is deprecated.  Migrate from .${callNames}(queryparams) to .query(queryparams).${callNames}()`;
 
@@ -142,22 +125,21 @@ function reportGetsAndDeletesWithArgs(context, node, getsAndDeletes) {
     return context.report({ node, message });
   }
 
-  /** @type {CallExpression} */
   const call = getsAndDeletes[0];
   const type = getCallName(call);
   const argsText = call.arguments.map((arg) => context.getSourceCode().getText(arg)).join(', ');
-  const getCallStart = call.callee.property.range[0];
+  const getCallStart = (call.callee as MemberExpression).property.range[0];
   const getCallEnd = call.range[1];
-  const fix = (fixer) => fixer.replaceTextRange([getCallStart, getCallEnd], `query(${argsText}).${type}()`);
+  const fix = (fixer: Rule.RuleFixer) =>
+    fixer.replaceTextRange([getCallStart, getCallEnd], `query(${argsText}).${type}()`);
 
   return context.report({ node, message, fix });
 }
 
-function reportChainedPathAsVarargs(callChain, context, node) {
+function reportChainedPathAsVarargs(callChain: CallExpression[], context: Rule.RuleContext, node: Node) {
   const message = `Prefer API.path('foo', 'bar') over API.path('foo').path('bar')`;
 
-  /** @param fixer {RuleFixer} */
-  const fix = (fixer) => {
+  const fix = (fixer: Rule.RuleFixer) => {
     const [firstPathCall, secondPathCall] = callChain;
 
     const firstPathLastArg = firstPathCall['arguments'].slice().pop();
@@ -178,22 +160,18 @@ function reportChainedPathAsVarargs(callChain, context, node) {
   return context.report({ message, node, fix });
 }
 
-/**
- * @param context {RuleContext}
- * @param node {CallExpression}
- * @param callChain {CallExpression[]}
- */
-function reportAPIDeprecatedUseREST(node, context, callChain) {
+function reportAPIDeprecatedUseREST(node: Node, context: Rule.RuleContext, callChain: CallExpression[]) {
   // Everything else is migrated, now migrate from API.path() to REST().path()
   const message = 'API is deprecated, switch to REST()';
-  const API = callChain[0].callee.object;
+  const API = (callChain[0].callee as MemberExpression).object;
   const program = getProgram(node);
-  const allImports = program.body.filter((item) => item.type === 'ImportDeclaration');
-  /** @type {Array<ImportSpecifier>} */
-  const importSpecifiers = allImports.map((decl) => decl.specifiers).reduce((acc, x) => acc.concat(x), []);
+  const allImports = program.body.filter((item) => item.type === 'ImportDeclaration') as ImportDeclaration[];
+  const importSpecifiers = allImports
+    .map((decl) => decl.specifiers)
+    .reduce((acc, x) => acc.concat(x), []) as ImportSpecifier[]; //flatten
 
   const apiImport = importSpecifiers.find((specifier) => {
-    return specifier.imported && specifier.imported.name === 'API';
+    return specifier.imported && specifier.imported?.name === 'API';
   });
 
   return context.report({
@@ -214,13 +192,7 @@ function reportAPIDeprecatedUseREST(node, context, callChain) {
   });
 }
 
-/**
- * @param context {RuleContext}
- * @param node {CallExpression}
- */
-
-/** @type {RuleModule} */
-export default {
+const rule: Rule.RuleModule = {
   create(context) {
     return {
       /**
@@ -275,7 +247,8 @@ export default {
     type: 'problem',
     docs: {
       description: 'Migrate from API.xyz() to REST(path)',
-      recommended: 'error',
     },
   },
 };
+
+export default rule;
