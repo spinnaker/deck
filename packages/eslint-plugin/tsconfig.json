@@ -6,5 +6,9 @@
     "module": "CommonJS",
     "skipLibCheck": true,
     "types": []
+  },
+  "ts-node": {
+    "transpileOnly": true,
+    "transpiler": "ts-node/transpilers/swc-experimental"
   }
 }
