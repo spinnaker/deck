@@ -8,7 +8,7 @@
  * @typedef {import('estree').ImportSpecifier} ImportSpecifier
  */
 
-import _ from 'lodash/fp';
+import * as _ from 'lodash/fp';
 
 import { getNodeType, getCallChain, getCallingIdentifierName } from '../utils/utils';
 const getCallName = _.get('callee.property.name');
