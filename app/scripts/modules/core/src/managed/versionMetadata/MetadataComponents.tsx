@@ -5,6 +5,7 @@ import { Dropdown, MenuItem } from 'react-bootstrap';
 
 import { Icon, IconNames } from '@spinnaker/presentation';
 import { Tooltip } from 'core/presentation';
+import { CopyToClipboard } from 'core/utils';
 
 import { RelativeTimestamp } from '../RelativeTimestamp';
 import { LifecycleEventSummary } from '../overview/artifact/utils';
@@ -206,7 +207,7 @@ export const VersionBuild = ({ build, withPrefix }: IVersionBuildProps) => {
 
   return build.version ? (
     <Tooltip value={build.version} delayShow={TOOLTIP_DELAY_SHOW}>
-      {content}
+      <span>{content}</span>
     </Tooltip>
   ) : (
     <>{content}</>
@@ -232,6 +233,23 @@ export const VersionBuilds = ({ builds }: IVersionBuildsProps) => {
           ))}
         </>
       )}
+    </MetadataElement>
+  );
+};
+
+export const ShareLink = ({ link }: { link: string }) => {
+  return (
+    <MetadataElement className="copy-version-link">
+      <CopyToClipboard
+        text={link}
+        className="as-link"
+        stopPropagation
+        buttonInnerNode={
+          <span>
+            <span className="glyphicon glyphicon-copy" /> Copy link
+          </span>
+        }
+      />
     </MetadataElement>
   );
 };
