@@ -1,13 +1,14 @@
-import { sortBy } from 'lodash';
+import { orderBy } from 'lodash';
 import React from 'react';
 
 import { HoverablePopover, Markdown } from 'core/presentation';
 
 import { CurrentVersion } from './CurrentVersion';
-import { PendingVersion } from './PendingVersion';
+import { PendingVersions } from './PendingVersion';
 import { EnvironmentItem } from '../../environmentBaseElements/EnvironmentItem';
 import { QueryArtifact, QueryArtifactVersion } from '../types';
-import { TOOLTIP_DELAY } from '../../utils/defaults';
+import { tooltipShowHideProps } from '../../utils/defaults';
+import { toPinnedMetadata } from '../../versionMetadata/MetadataComponents';
 
 import './Artifact.less';
 
@@ -17,17 +18,23 @@ const hasCreatedAt = (version?: QueryArtifactVersion): version is RequiredKeys<Q
   return Boolean(version?.createdAt);
 };
 
+const sortVersions = (versions: QueryArtifact['versions']) => {
+  return orderBy(versions || [], (version) => (version.createdAt ? new Date(version.createdAt).getTime() : 0), [
+    'desc',
+  ]);
+};
+
 const filterPendingVersions = (versions: QueryArtifact['versions'], currentVersion?: QueryArtifactVersion) => {
   if (!hasCreatedAt(currentVersion)) {
     // Everything is newer than current
-    return versions;
+    return sortVersions(versions);
   }
   const currentVersionCreatedAt = new Date(currentVersion.createdAt);
   const newerVersions = versions
     ?.filter(hasCreatedAt)
     ?.filter((version) => new Date(version.createdAt) > currentVersionCreatedAt || version.status === 'DEPLOYING');
-  // Sort from newest to oldest
-  return sortBy(newerVersions || [], (version) => -1 * new Date(version.createdAt).getTime());
+
+  return sortVersions(newerVersions);
 };
 
 export const PinnedVersion = ({ version }: { version: NonNullable<QueryArtifact['pinnedVersion']> }) => {
@@ -38,7 +45,7 @@ export const PinnedVersion = ({ version }: { version: NonNullable<QueryArtifact[
       <i className="fas fa-exclamation-triangle" /> Version{' '}
       {commitMessage ? (
         <HoverablePopover
-          delayHide={TOOLTIP_DELAY}
+          {...tooltipShowHideProps}
           placement="top"
           Component={() => <Markdown className="git-commit-tooltip" message={commitMessage} />}
         >
@@ -75,7 +82,7 @@ export const Artifact = ({ artifact }: IArtifactProps) => {
           environment={artifact.environment}
           reference={artifact.reference}
           numNewerVersions={newerVersions?.length}
-          isPinned={pinnedVersion?.version === currentVersion.version}
+          pinned={pinnedVersion?.version === currentVersion.version ? toPinnedMetadata(pinnedVersion) : undefined}
         />
       ) : (
         <div>No version is deployed</div>
@@ -83,23 +90,7 @@ export const Artifact = ({ artifact }: IArtifactProps) => {
       {pinnedVersion && pinnedVersion.buildNumber !== currentVersion?.buildNumber && (
         <PinnedVersion version={pinnedVersion} />
       )}
-      {newerVersions?.length ? (
-        <section className="artifact-pending-versions">
-          <div className="artifact-versions-title">Pending Versions</div>
-          <div className="artifact-pending-versions-list">
-            {newerVersions?.map((version, index) => (
-              <PendingVersion
-                key={version.version}
-                index={index}
-                environment={artifact.environment}
-                reference={artifact.reference}
-                data={version}
-                isPinned={pinnedVersion?.version === version.version}
-              />
-            ))}
-          </div>
-        </section>
-      ) : undefined}
+      <PendingVersions artifact={artifact} pendingVersions={newerVersions} />
     </EnvironmentItem>
   );
 };

@@ -1,16 +1,24 @@
 import { useApolloClient } from '@apollo/client';
+import { useSref } from '@uirouter/react';
+
 import classnames from 'classnames';
 import { sortBy, toNumber } from 'lodash';
 import React from 'react';
 
-import { Tooltip, useApplicationContextSafe } from 'core/presentation';
+import { Icon, Tooltip, useApplicationContextSafe } from 'core/presentation';
 
-import { FetchVersionDocument, FetchVersionQueryVariables } from '../graphql/graphql-sdk';
+import {
+  FetchVersionDocument,
+  FetchVersionQueryVariables,
+  MdArtifactStatusInEnvironment,
+} from '../graphql/graphql-sdk';
 import { GitLink } from '../overview/artifact/GitLink';
 import { HistoryArtifactVersion, VersionData } from './types';
-import { TOOLTIP_DELAY } from '../utils/defaults';
+import { TOOLTIP_DELAY_SHOW } from '../utils/defaults';
 import {
   BaseVersionMetadata,
+  MetadataBadge,
+  ShareLink,
   VersionAuthor,
   VersionBuilds,
   VersionCreatedAt,
@@ -18,14 +26,14 @@ import {
 
 import './VersionsHistory.less';
 
-type VersionStatus = NonNullable<HistoryArtifactVersion['status']>;
+type VersionStatus = MdArtifactStatusInEnvironment;
 
 // TODO: could we have vetoed + current in the same env? unlikely
 const getEnvStatusSummary = (artifacts: HistoryArtifactVersion[]): VersionStatus => {
   // We sort from the newest to the oldest
   const sortedArtifacts = sortBy(artifacts, (artifact) => -1 * toNumber(artifact.buildNumber || 0));
 
-  let status: HistoryArtifactVersion['status'] = 'SKIPPED';
+  let status: MdArtifactStatusInEnvironment = 'SKIPPED';
   for (const artifact of sortedArtifacts) {
     switch (artifact.status) {
       case 'CURRENT':
@@ -79,6 +87,7 @@ export const VersionHeading = ({ group, chevron }: IVersionHeadingProps) => {
   const gitMetadata = group.gitMetadata;
   const client = useApolloClient();
   const app = useApplicationContextSafe();
+  const { href } = useSref('home.applications.application.environments.history', { sha: group.key });
 
   const prefetchData = () => {
     // This function is pre-loading the content of the version and caching it before mounting the VersionContent component
@@ -89,30 +98,35 @@ export const VersionHeading = ({ group, chevron }: IVersionHeadingProps) => {
   };
   return (
     <div className="version-heading" onMouseOver={prefetchData}>
-      <div>
+      <div className="version-heading-content">
         {gitMetadata ? (
           <GitLink gitMetadata={gitMetadata} asLink={false} />
         ) : (
           <div>Build {Array.from(group.buildNumbers).join(', ')}</div>
         )}
         <BaseVersionMetadata>
+          {group.isBaking && <MetadataBadge type="baking" />}
           <VersionAuthor author={gitMetadata?.author} />
           <VersionBuilds builds={Array.from(group.buildNumbers).map((buildNumber) => ({ buildNumber }))} />
           <VersionCreatedAt createdAt={group.createdAt} />
+          {href && <ShareLink link={window.location.host + '/' + href} />}
         </BaseVersionMetadata>
         {/* Shows a badge for each environment with the status of the artifacts in it */}
         <div className="version-environments">
-          {Object.entries(group.environments).map(([env, artifacts]) => {
-            const statusSummary = getEnvStatusSummary(artifacts);
-            const statusClassName = statusToClassName[statusSummary];
-            return (
-              <Tooltip delayShow={TOOLTIP_DELAY} value={statusToText[statusSummary]}>
-                <div key={env} className={classnames('chip', statusClassName)}>
-                  {env}
-                </div>
-              </Tooltip>
-            );
-          })}
+          {Object.entries(group.environments)
+            .reverse()
+            .map(([env, artifacts]) => {
+              const statusSummary = getEnvStatusSummary(artifacts.versions);
+              const statusClassName = statusToClassName[statusSummary];
+              return (
+                <Tooltip key={env} delayShow={TOOLTIP_DELAY_SHOW} value={statusToText[statusSummary]}>
+                  <div className={classnames('chip', statusClassName)}>
+                    {artifacts.isPinned && <Icon name="pin" size="16px" className="environment-pinned" color="black" />}{' '}
+                    {env}
+                  </div>
+                </Tooltip>
+              );
+            })}
         </div>
       </div>
       <div>{chevron}</div>

@@ -41,6 +41,8 @@ const helpContents: { [key: string]: string } = {
   'titus.serverGroup.traffic': `
       <p>Enables the "inService" scaling process, which is used by Spinnaker and discovery services to determine if the server group is enabled.</p>
       <p>Will be automatically enabled when any non "custom" deployment strategy is selected.</p>`,
+  'titus.deploy.imageId':
+    'This value has been manually overridden. To edit this value, please update the <b><i>imageId</i></b> attribute in the stage JSON. Spinnaker expects this to follow the <b><i>name:tag</i></b> format, or the <b><i>imageName</i></b> directly from Jenkins',
   'titus.deploy.securityGroups':
     'AWS Security Groups to assign to this service. Security groups are set only if <samp>Allocate IP?</samp> has been selected and are assigned to the Titus AWS Elastic Network Interface.',
   'titus.job.capacityGroup': 'Capacity Group will default to application name if not specified.',
@@ -75,7 +77,7 @@ const helpContents: { [key: string]: string } = {
   'titus.disruptionbudget.description': `
     <p>
       The Job Disruption Budget is part of the job descriptor, and defines the behavior of how containers of the
-      job can be relocated.{' '}
+      job can be relocated.
       <a href="http://manuals.test.netflix.net/view/titus-docs/mkdocs/master/disruption_budget/" target="_blank">
         Read the full documentation
       </a>

@@ -1,5 +1,4 @@
 const { nodeResolve } = require('@rollup/plugin-node-resolve');
-
 const commonjs = require('@rollup/plugin-commonjs');
 const json = require('@rollup/plugin-json');
 const postCss = require('rollup-plugin-postcss');
@@ -7,6 +6,10 @@ const replace = require('@rollup/plugin-replace');
 const { terser } = require('rollup-plugin-terser');
 const typescript = require('@rollup/plugin-typescript');
 const url = require('@rollup/plugin-url');
+const svgr = require('@svgr/rollup').default;
+const autoPrefixer = require('autoprefixer');
+const postCssNested = require('postcss-nested');
+const postCssUrl = require('postcss-url');
 const { visualizer } = require('rollup-plugin-visualizer');
 
 const ROLLUP_STATS = !!process.env.ROLLUP_STATS;
@@ -35,8 +38,17 @@ const plugins = [
     // In watch mode, always emit javascript even with errors (otherwise rollup will terminate)
     noEmitOnError: !ROLLUP_WATCH,
   }),
+  svgr(),
   // import from .css, .less, and inject into the document <head></head>
-  postCss(),
+  postCss({
+    plugins: [
+      autoPrefixer(),
+      postCssNested(),
+      postCssUrl({
+        url: 'inline',
+      }),
+    ],
+  }),
 ];
 
 if (ROLLUP_MINIFY) {

@@ -17,17 +17,32 @@
     margin-top: var(--l-spacing);
     position: relative;
     --circle-shift: 6px;
+    --left-padding: 20px;
+
+    @media (max-width: 768px) {
+      --left-padding: 10px;
+    }
 
     .artifact-pending-versions-list {
       padding-left: var(--l-spacing);
+
+      .show-more-versions {
+        display: flex;
+        padding: 0;
+        flex-direction: row;
+        width: fit-content;
+      }
 
       .artifact-pending-version {
         display: flex;
         flex-direction: column;
         padding-right: var(--l-spacing);
-        border-radius: 5px;
         position: relative;
-        padding-left: 48px;
+        padding-left: calc(var(--left-padding) + 28px);
+
+        @media (max-width: 768px) {
+          padding-left: calc(var(--left-padding) + 20px);
+        }
 
         &:not(:last-of-type) {
           padding-bottom: 32px;
@@ -38,7 +53,7 @@
           content: '';
           position: absolute;
           top: 0;
-          left: 24px;
+          left: calc(var(--left-padding) + 4px);
           height: 100%;
           border-left: 2px solid var(--color-accent-g2);
         }
@@ -48,7 +63,7 @@
           content: '';
           position: absolute;
           top: var(--circle-shift);
-          left: 20px;
+          left: var(--left-padding);
           width: 10px;
           height: 10px;
           background: var(--color-accent-g2);
@@ -74,6 +89,10 @@
           top: 0px;
           white-space: nowrap;
           color: var(--color-concrete);
+
+          @media (max-width: 768px) {
+            right: calc(100% - 2px);
+          }
         }
 
         .artifact-pending-version-commit {
@@ -84,26 +103,6 @@
         }
       }
     }
-  }
-
-  .version-badge {
-    border-radius: 3px;
-    padding: 0 var(--s-spacing);
-    display: flex;
-    flex-direction: row;
-    & > svg {
-      margin-right: 4px;
-    }
-  }
-
-  .version-deploying {
-    background-color: var(--color-accent);
-    color: var(--color-white);
-  }
-
-  .version-pinned {
-    background-color: var(--color-warning);
-    color: var(--color-black);
   }
 
   .another-version-pinned-warning {

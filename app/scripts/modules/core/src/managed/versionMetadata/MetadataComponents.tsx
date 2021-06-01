@@ -3,11 +3,13 @@ import { DateTime } from 'luxon';
 import React from 'react';
 import { Dropdown, MenuItem } from 'react-bootstrap';
 
-import { Icon } from '@spinnaker/presentation';
+import { Icon, IconNames } from '@spinnaker/presentation';
 import { Tooltip } from 'core/presentation';
+import { CopyToClipboard } from 'core/utils';
 
 import { RelativeTimestamp } from '../RelativeTimestamp';
-import { TOOLTIP_DELAY } from '../utils/defaults';
+import { LifecycleEventSummary } from '../overview/artifact/utils';
+import { TOOLTIP_DELAY_SHOW } from '../utils/defaults';
 
 import './VersionMetadata.less';
 
@@ -22,16 +24,43 @@ export interface VersionAction {
   disabled?: boolean;
 }
 
+export interface VersionMessageData {
+  by?: string;
+  at?: string;
+  comment?: string;
+}
+
+export const toPinnedMetadata = (data: {
+  pinnedAt?: string;
+  pinnedBy?: string;
+  comment?: string;
+}): VersionMessageData => ({
+  by: data.pinnedBy,
+  at: data.pinnedAt,
+  comment: data.comment,
+});
+
+export const toVetoedMetadata = (data: {
+  vetoedAt?: string;
+  vetoedBy?: string;
+  comment?: string;
+}): VersionMessageData => ({
+  by: data.vetoedBy,
+  at: data.vetoedAt,
+  comment: data.comment,
+});
+
 export interface IVersionMetadataProps {
-  buildNumber?: string;
-  buildLink?: string;
+  build?: IVersionBuildProps['build'];
   author?: string;
   deployedAt?: string;
   createdAt?: IVersionCreatedAtProps['createdAt'];
   buildDuration?: string;
   buildsBehind?: number;
   isDeploying?: boolean;
-  isPinned?: boolean;
+  baking?: LifecycleEventSummary;
+  pinned?: VersionMessageData;
+  vetoed?: VersionMessageData;
   actions?: VersionAction[];
 }
 
@@ -71,29 +100,85 @@ export const VersionCreatedAt = ({ createdAt }: IVersionCreatedAtProps) => {
   if (!createdAt) return null;
   return (
     <MetadataElement>
-      <Tooltip delayShow={TOOLTIP_DELAY} value="Created at">
+      <Tooltip delayShow={TOOLTIP_DELAY_SHOW} value="Created at">
         <i className="far fa-calendar-alt metadata-icon" />
       </Tooltip>
-      <RelativeTimestamp timestamp={createdAt} delayShow={TOOLTIP_DELAY} removeStyles withSuffix />
+      <RelativeTimestamp timestamp={createdAt} delayShow={TOOLTIP_DELAY_SHOW} removeStyles withSuffix />
     </MetadataElement>
   );
 };
 
-export const DeployingBadge = () => {
+const badgeTypeToDetails = {
+  deploying: { className: 'version-deploying', text: 'Deploying' },
+  baking: { className: 'version-baking', text: 'Baking' },
+};
+
+interface IMetadataBadgeProps {
+  type: keyof typeof badgeTypeToDetails;
+  tooltip?: string;
+  link?: string;
+}
+
+export const MetadataBadge = ({ type, link, tooltip }: IMetadataBadgeProps) => {
+  const details = badgeTypeToDetails[type];
+  const className = classnames('version-badge', details.className);
+  const baseBadge = link ? (
+    <a href={link} className={className}>
+      {details.text}
+    </a>
+  ) : (
+    <span className={className}>{details.text}</span>
+  );
   return (
     <MetadataElement>
-      <span className="version-deploying version-badge">Deploying</span>
+      {tooltip ? (
+        <Tooltip value={tooltip} delayShow={TOOLTIP_DELAY_SHOW}>
+          {baseBadge}
+        </Tooltip>
+      ) : (
+        baseBadge
+      )}
     </MetadataElement>
   );
 };
 
-export const PinnedBadge = () => {
+interface IVersionMessage {
+  data: VersionMessageData;
+  type: 'pinned' | 'vetoed';
+  newRow?: boolean;
+}
+
+const versionTypeProps: { [key in IVersionMessage['type']]: { text: string; className: string; icon: IconNames } } = {
+  pinned: {
+    text: 'Pinned by',
+    className: 'version-pinned',
+    icon: 'pin',
+  },
+  vetoed: {
+    text: 'Marked as bad by',
+    className: 'version-vetoed',
+    icon: 'artifactBad',
+  },
+};
+
+export const VersionMessage = ({ data, type, newRow = true }: IVersionMessage) => {
+  const typeProps = versionTypeProps[type];
   return (
-    <MetadataElement>
-      <span className="version-pinned version-badge">
-        <Icon name="pin" size="12px" color="black" /> Pinned
-      </span>
-    </MetadataElement>
+    <>
+      {newRow && <div className="flex-break sp-margin-s-top" />}
+      <div className={classnames('version-message', typeProps.className)}>
+        <Icon name={typeProps.icon} size="12px" color="black" className="sp-margin-s-right sp-margin-2xs-top" />
+        <div>
+          <div>
+            {typeProps.text} {data.by},{' '}
+            {data.at && (
+              <RelativeTimestamp timestamp={data.at} delayShow={TOOLTIP_DELAY_SHOW} withSuffix removeStyles />
+            )}
+          </div>
+          {data.comment && <div>Reason: {data.comment}</div>}
+        </div>
+      </div>
+    </>
   );
 };
 
@@ -107,21 +192,25 @@ export const VersionAuthor = ({ author }: IVersionAuthorProps) => {
 };
 
 interface IVersionBuildProps {
-  build: { buildNumber?: string; buildLink?: string };
+  build: { buildNumber?: string; buildLink?: string; version?: string };
   withPrefix?: boolean;
 }
 
 export const VersionBuild = ({ build, withPrefix }: IVersionBuildProps) => {
-  return (
-    <>
-      {build.buildLink ? (
-        <a href={build.buildLink}>
-          {withPrefix ? `Build ` : ''}#{build.buildNumber}
-        </a>
-      ) : (
-        `Build #${build.buildNumber}`
-      )}
-    </>
+  const content = build.buildLink ? (
+    <a href={build.buildLink}>
+      {withPrefix ? `Build ` : ''}#{build.buildNumber}
+    </a>
+  ) : (
+    `Build #${build.buildNumber}`
+  );
+
+  return build.version ? (
+    <Tooltip value={build.version} delayShow={TOOLTIP_DELAY_SHOW}>
+      <span>{content}</span>
+    </Tooltip>
+  ) : (
+    <>{content}</>
   );
 };
 
@@ -144,6 +233,23 @@ export const VersionBuilds = ({ builds }: IVersionBuildsProps) => {
           ))}
         </>
       )}
+    </MetadataElement>
+  );
+};
+
+export const ShareLink = ({ link }: { link: string }) => {
+  return (
+    <MetadataElement className="copy-version-link">
+      <CopyToClipboard
+        text={link}
+        className="as-link"
+        stopPropagation
+        buttonInnerNode={
+          <span>
+            <span className="glyphicon glyphicon-copy" /> Copy link
+          </span>
+        }
+      />
     </MetadataElement>
   );
 };

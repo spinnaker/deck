@@ -3,7 +3,7 @@ import React from 'react';
 import { HoverablePopover, Markdown } from 'core/presentation';
 
 import { QueryGitMetadata } from '../types';
-import { TOOLTIP_DELAY } from '../../utils/defaults';
+import { tooltipShowHideProps } from '../../utils/defaults';
 
 import './GitLink.less';
 
@@ -14,18 +14,24 @@ interface IGitLinkProps {
 
 export const GitLink = ({ gitMetadata: { commit, commitInfo, pullRequest }, asLink = true }: IGitLinkProps) => {
   const link = pullRequest?.link || commitInfo?.link;
-  const sha = commit ? `SHA: ${commit}` : undefined;
-  const tooltip = [sha, commitInfo?.message].filter(Boolean).join('\n\n');
   let message = commitInfo?.message || commit;
-  message = message?.split('\n')[0];
+  message = (commit ? `[${commit}] ` : ``) + message?.split('\n')[0];
   return (
     <div className="GitLink">
       <HoverablePopover
-        wrapperClassName="git-link-inner"
-        delayShow={TOOLTIP_DELAY}
-        delayHide={0}
+        {...tooltipShowHideProps}
+        wrapperClassName="git-link-inner no-underline"
         placement="top"
-        Component={() => <Markdown className="git-commit-tooltip" message={tooltip} />}
+        Component={() => (
+          <div className="git-commit-tooltip">
+            {commit && (
+              <a href={link} target="_blank" className="">
+                Open commit {commit}
+              </a>
+            )}
+            {commitInfo?.message && <Markdown className="sp-margin-m-top" message={commitInfo?.message} />}
+          </div>
+        )}
       >
         {asLink ? (
           <a href={link || '#'} className="commit-message" target="_blank" rel="noopener noreferrer">

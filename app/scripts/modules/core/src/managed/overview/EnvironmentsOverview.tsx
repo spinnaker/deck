@@ -34,12 +34,16 @@ export const EnvironmentsOverview = () => {
     );
   }
 
+  const environments = data?.application?.environments || [];
+
   return (
     <div className="EnvironmentsOverview">
       <ManagementWarning appName={app.name} />
-      {data?.application?.environments.map((env) => (
-        <EnvironmentOverview key={env.name} environment={env} appName={app.name} />
-      ))}
+      {environments.length ? (
+        environments.map((env) => <EnvironmentOverview key={env.name} environment={env} appName={app.name} />)
+      ) : (
+        <div className="error-message">No environments found</div>
+      )}
     </div>
   );
 };
@@ -63,9 +67,11 @@ const EnvironmentOverview = ({ appName, environment }: IEnvironmentProps) => {
   return (
     <BaseEnvironment title={environment.name}>
       <CollapsibleSection heading="Artifacts" {...sectionProps} defaultExpanded enableCaching={false}>
-        {state.artifacts?.map((artifact) => (
-          <Artifact key={artifact.reference} artifact={artifact} />
-        ))}
+        {state.artifacts?.length ? (
+          state.artifacts.map((artifact) => <Artifact key={artifact.reference} artifact={artifact} />)
+        ) : (
+          <ErrorMessage>No artifacts found</ErrorMessage>
+        )}
       </CollapsibleSection>
       <CollapsibleSection
         heading="Resources"
@@ -74,10 +80,20 @@ const EnvironmentOverview = ({ appName, environment }: IEnvironmentProps) => {
         enableCaching={false}
         defaultExpanded={hasResourcesWithIssues}
       >
-        {state.resources?.map((resource) => (
-          <Resource key={resource.id} resource={resource} environment={environment.name} />
-        ))}
+        {state.resources?.length ? (
+          state.resources.map((resource) => (
+            <Resource key={resource.id} resource={resource} environment={environment.name} />
+          ))
+        ) : (
+          <ErrorMessage>No resources found</ErrorMessage>
+        )}
       </CollapsibleSection>
     </BaseEnvironment>
   );
 };
+
+const ErrorMessage: React.FC = ({ children }) => (
+  <div className="environment-row-element">
+    <div className="error-message">{children}</div>
+  </div>
+);

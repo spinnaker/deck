@@ -1,3 +1,81 @@
+fragment detailedVersionFields on MdArtifactVersionInEnvironment {
+  id
+  buildNumber
+  version
+  createdAt
+  status
+  gitMetadata {
+    commit
+    author
+    branch
+    commitInfo {
+      sha
+      link
+      message
+    }
+    pullRequest {
+      number
+      link
+    }
+    comparisonLinks {
+      toPreviousVersion
+      toCurrentVersion
+    }
+  }
+  deployedAt
+  lifecycleSteps {
+    startedAt
+    completedAt
+    type
+    status
+    link
+  }
+  constraints {
+    type
+    status
+    judgedBy
+    judgedAt
+    attributes
+  }
+  verifications {
+    id
+    type
+    status
+    startedAt
+    completedAt
+    link
+  }
+  postDeploy {
+    id
+    type
+    status
+    startedAt
+    completedAt
+    link
+  }
+  veto {
+    vetoedBy
+    vetoedAt
+    comment
+  }
+}
+
+fragment artifactPinnedVersionFields on MdArtifact {
+  pinnedVersion {
+    id
+    version
+    buildNumber
+    pinnedAt
+    pinnedBy
+    comment
+    gitMetadata {
+      commitInfo {
+        message
+      }
+    }
+  }
+}
+
 query fetchApplication($appName: String!, $statuses: [MdArtifactStatusInEnvironment!]) {
   application(appName: $appName) {
     id
@@ -15,73 +93,9 @@ query fetchApplication($appName: String!, $statuses: [MdArtifactStatusInEnvironm
           type
           reference
           versions(statuses: $statuses) {
-            id
-            buildNumber
-            version
-            createdAt
-            status
-            gitMetadata {
-              commit
-              author
-              branch
-              commitInfo {
-                sha
-                link
-                message
-              }
-              pullRequest {
-                number
-                link
-              }
-              comparisonLinks {
-                toPreviousVersion
-                toCurrentVersion
-              }
-            }
-            deployedAt
-            lifecycleSteps {
-              startedAt
-              completedAt
-              type
-              status
-              link
-            }
-            constraints {
-              type
-              status
-              judgedBy
-              attributes
-            }
-            verifications {
-              id
-              type
-              status
-              startedAt
-              completedAt
-              link
-            }
-            postDeploy {
-              id
-              type
-              status
-              startedAt
-              completedAt
-              link
-            }
+            ...detailedVersionFields
           }
-          pinnedVersion {
-            id
-            version
-            buildNumber
-            pinnedAt
-            pinnedBy
-            comment
-            gitMetadata {
-              commitInfo {
-                message
-              }
-            }
-          }
+          ...artifactPinnedVersionFields
         }
         resources {
           id
@@ -102,7 +116,7 @@ query fetchApplication($appName: String!, $statuses: [MdArtifactStatusInEnvironm
   }
 }
 
-query fetchVersionsHistory($appName: String!) {
+query fetchVersionsHistory($appName: String!, $limit: Int) {
   application(appName: $appName) {
     id
     name
@@ -118,7 +132,7 @@ query fetchVersionsHistory($appName: String!) {
           environment
           type
           reference
-          versions {
+          versions(limit: $limit) {
             id
             buildNumber
             version
@@ -138,15 +152,35 @@ query fetchVersionsHistory($appName: String!) {
                 link
               }
             }
+            lifecycleSteps {
+              type
+              status
+            }
           }
-          pinnedVersion {
-            id
-            version
-            buildNumber
-            pinnedAt
-            pinnedBy
-            comment
-          }
+          ...artifactPinnedVersionFields
+        }
+      }
+    }
+  }
+}
+
+query fetchPinnedVersions($appName: String!) {
+  application(appName: $appName) {
+    id
+    name
+    account
+    environments {
+      id
+      name
+      state {
+        id
+        artifacts {
+          id
+          name
+          environment
+          type
+          reference
+          ...artifactPinnedVersionFields
         }
       }
     }
@@ -170,59 +204,7 @@ query fetchVersion($appName: String!, $versions: [String!]) {
           type
           reference
           versions(versions: $versions) {
-            id
-            buildNumber
-            version
-            createdAt
-            status
-            gitMetadata {
-              commit
-              author
-              branch
-              commitInfo {
-                sha
-                link
-                message
-              }
-              pullRequest {
-                number
-                link
-              }
-              comparisonLinks {
-                toPreviousVersion
-                toCurrentVersion
-              }
-            }
-            deployedAt
-            lifecycleSteps {
-              startedAt
-              completedAt
-              type
-              status
-              link
-            }
-            constraints {
-              type
-              status
-              judgedBy
-              attributes
-            }
-            verifications {
-              id
-              type
-              status
-              startedAt
-              completedAt
-              link
-            }
-            postDeploy {
-              id
-              type
-              status
-              startedAt
-              completedAt
-              link
-            }
+            ...detailedVersionFields
           }
         }
       }
@@ -267,4 +249,20 @@ mutation UpdateConstraint($payload: MdConstraintStatusPayload!) {
 
 mutation ToggleManagement($application: String!, $isPaused: Boolean!) {
   toggleManagement(application: $application, isPaused: $isPaused)
+}
+
+mutation PinVersion($payload: MdArtifactVersionActionPayload!) {
+  pinArtifactVersion(payload: $payload)
+}
+
+mutation UnpinVersion($payload: MdUnpinArtifactVersionPayload!) {
+  unpinArtifactVersion(payload: $payload)
+}
+
+mutation MarkVersionAsBad($payload: MdArtifactVersionActionPayload!) {
+  markArtifactVersionAsBad(payload: $payload)
+}
+
+mutation MarkVersionAsGood($payload: MdMarkArtifactVersionAsGoodPayload!) {
+  markArtifactVersionAsGood(payload: $payload)
 }
