@@ -27,8 +27,6 @@ import { IAccountRegionClusterSelectorProps } from 'core/widgets/AccountRegionCl
 import { accountRegionClusterSelectorWrapperComponent } from 'core/widgets/accountRegionClusterSelectorWrapper.component';
 import { ButtonBusyIndicator as ButtonBusyIndicatorComponent } from 'core/widgets/spinners/Spinner';
 
-import { IButtonBusyIndicatorProps } from '../forms/buttonBusyIndicator/ButtonBusyIndicator';
-import { buttonBusyIndicatorComponent } from '../forms/buttonBusyIndicator/buttonBusyIndicator.component';
 import { ReactInject } from './react.injector';
 
 import IInjectorService = angular.auto.IInjectorService;
