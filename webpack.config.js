@@ -4,8 +4,10 @@ const md5 = require('md5');
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
+const ESLintPlugin = require('eslint-webpack-plugin');
 const webpack = require('webpack');
 
 const CACHE_INVALIDATE = getCacheInvalidateString();
@@ -25,6 +27,7 @@ function configure(env, webpackOpts) {
   console.log('Webpack mode: ' + WEBPACK_MODE);
 
   const plugins = [
+    new ESLintPlugin({ failOnError: ESLINT_FAIL_ON_ERROR, threads: 4 }),
     new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true }),
     new CopyWebpackPlugin([
       { from: `${NODE_MODULE_PATH}/@spinnaker/styleguide/public/styleguide.html`, to: `./styleguide.html` },
@@ -55,7 +58,7 @@ function configure(env, webpackOpts) {
     entry: {
       settings: SETTINGS_PATH,
       'settings-local': './settings-local.js',
-      app: './app/scripts/app.ts',
+      app: './app/scripts/modules/app.ts',
     },
     output: {
       path: path.join(__dirname, 'build', 'webpack', process.env.SPINNAKER_ENV || ''),
@@ -95,23 +98,8 @@ function configure(env, webpackOpts) {
     },
     resolve: {
       extensions: ['.json', '.ts', '.tsx', '.js', '.jsx', '.css', '.less', '.html'],
-      modules: [NODE_MODULE_PATH, path.join(__dirname, 'app', 'scripts', 'modules')],
       alias: {
         root: __dirname,
-        core: path.join(__dirname, 'app', 'scripts', 'modules', 'core', 'src'),
-        '@spinnaker/core': path.join(__dirname, 'app', 'scripts', 'modules', 'core', 'src'),
-        docker: path.join(__dirname, 'app', 'scripts', 'modules', 'docker', 'src'),
-        '@spinnaker/docker': path.join(__dirname, 'app', 'scripts', 'modules', 'docker', 'src'),
-        amazon: path.join(__dirname, 'app', 'scripts', 'modules', 'amazon', 'src'),
-        '@spinnaker/amazon': path.join(__dirname, 'app', 'scripts', 'modules', 'amazon', 'src'),
-        google: path.join(__dirname, 'app', 'scripts', 'modules', 'google', 'src'),
-        '@spinnaker/google': path.join(__dirname, 'app', 'scripts', 'modules', 'google', 'src'),
-        kubernetes: path.join(__dirname, 'app', 'scripts', 'modules', 'kubernetes', 'src'),
-        '@spinnaker/kubernetes': path.join(__dirname, 'app', 'scripts', 'modules', 'kubernetes', 'src'),
-        ecs: path.join(__dirname, 'app', 'scripts', 'modules', 'ecs', 'src'),
-        '@spinnaker/ecs': path.join(__dirname, 'app', 'scripts', 'modules', 'ecs', 'src'),
-        huaweicloud: path.join(__dirname, 'app', 'scripts', 'modules', 'huaweicloud', 'src'),
-        '@spinnaker/huaweicloud': path.join(__dirname, 'app', 'scripts', 'modules', 'huaweicloud', 'src'),
         coreImports: path.resolve(
           __dirname,
           'app',
@@ -124,19 +112,8 @@ function configure(env, webpackOpts) {
           'imports',
           'commonImports.less',
         ),
-        appengine: path.join(__dirname, 'app', 'scripts', 'modules', 'appengine', 'src'),
-        '@spinnaker/appengine': path.join(__dirname, 'app', 'scripts', 'modules', 'appengine', 'src'),
-        oracle: path.join(__dirname, 'app', 'scripts', 'modules', 'oracle', 'src'),
-        '@spinnaker/oracle': path.join(__dirname, 'app', 'scripts', 'modules', 'oracle', 'src'),
-        cloudfoundry: path.join(__dirname, 'app', 'scripts', 'modules', 'cloudfoundry', 'src'),
-        '@spinnaker/cloudfoundry': path.join(__dirname, 'app', 'scripts', 'modules', 'cloudfoundry', 'src'),
-        titus: path.join(__dirname, 'app', 'scripts', 'modules', 'titus', 'src'),
-        '@spinnaker/titus': path.join(__dirname, 'app', 'scripts', 'modules', 'titus', 'src'),
-        azure: path.join(__dirname, 'app', 'scripts', 'modules', 'azure', 'src'),
-        '@spinnaker/azure': path.join(__dirname, 'app', 'scripts', 'modules', 'azure', 'src'),
-        tencentcloud: path.join(__dirname, 'app', 'scripts', 'modules', 'tencentcloud', 'src'),
-        '@spinnaker/tencentcloud': path.join(__dirname, 'app', 'scripts', 'modules', 'tencentcloud', 'src'),
       },
+      plugins: [new TsconfigPathsPlugin({ logLevel: 'info', extensions: ['.ts', '.tsx', '.js', '.jsx'] })],
     },
     module: {
       rules: [
@@ -150,7 +127,6 @@ function configure(env, webpackOpts) {
             { loader: 'cache-loader', options: { cacheIdentifier: CACHE_INVALIDATE } },
             { loader: 'thread-loader', options: { workers: THREADS } },
             { loader: 'babel-loader' },
-            { loader: 'eslint-loader', options: { failOnError: ESLINT_FAIL_ON_ERROR } },
           ],
           exclude: /(node_modules(?!\/clipboard)|settings\.js)/,
         },
@@ -160,7 +136,6 @@ function configure(env, webpackOpts) {
             { loader: 'cache-loader', options: { cacheIdentifier: CACHE_INVALIDATE } },
             { loader: 'thread-loader', options: { workers: THREADS } },
             { loader: 'ts-loader', options: { happyPackMode: true } },
-            { loader: 'eslint-loader', options: { failOnError: ESLINT_FAIL_ON_ERROR } },
           ],
           exclude: /node_modules/,
         },
@@ -204,7 +179,20 @@ function configure(env, webpackOpts) {
         {
           test: /\.js$/,
           enforce: 'pre',
-          use: ['source-map-loader'],
+          use: [
+            {
+              loader: 'source-map-loader',
+              options: {
+                filterSourceMappingUrl: (url, resourcePath) => {
+                  if (IS_PRODUCTION) return true;
+                  if (/.*\/node_modules\/(rxjs-compat|graphql-tag)\/.*/.test(resourcePath)) {
+                    return false;
+                  }
+                  return true;
+                },
+              },
+            },
+          ],
         },
       ],
     },

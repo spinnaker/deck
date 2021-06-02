@@ -1,7 +1,14 @@
 import { $q } from 'ngimport';
 import React from 'react';
 import { HandlerRendererResult, MenuRendererProps, Option, OptionValues, ReactSelectProps } from 'react-select';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import {
+  BehaviorSubject,
+  combineLatest as observableCombineLatest,
+  from as observableFrom,
+  of as observableOf,
+  Subject,
+} from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, map, switchMap, takeUntil, tap } from 'rxjs/operators';
 
 import { Application, HelpField, TetheredSelect, ValidationMessage } from '@spinnaker/core';
 import { AwsImageReader, IAmazonImage } from 'amazon/image';
@@ -116,45 +123,50 @@ export class AmazonImageSelectInput extends React.Component<IAmazonImageSelector
   }
 
   public componentDidMount() {
-    const region$ = this.props$.map((x) => x.region).distinctUntilChanged();
+    const region$ = this.props$.pipe(
+      map((x) => x.region),
+      distinctUntilChanged(),
+    );
     const { value, region, credentials, application } = this.props;
 
     this.setState({ isLoadingPackageImages: true });
     const fetchPromise = this.fetchPackageImages(value, region, credentials, application);
 
-    const packageImages$ = Observable.fromPromise(fetchPromise)
-      .catch((err) => {
+    const packageImages$ = observableFrom(fetchPromise).pipe(
+      catchError((err) => {
         console.error(err);
         this.setState({ errorMessage: 'Unable to load package images' });
-        return Observable.of([] as IAmazonImage[]);
-      })
-      .do(() => this.setState({ isLoadingPackageImages: false }));
+        return observableOf([] as IAmazonImage[]);
+      }),
+      tap(() => this.setState({ isLoadingPackageImages: false })),
+    );
 
-    const packageImagesInRegion$ = packageImages$
-      .combineLatest(region$, this.sortImagesBy$)
-      .map(([packageImages, latestRegion, sortImagesBy]) => {
+    const packageImagesInRegion$ = observableCombineLatest([packageImages$, region$, this.sortImagesBy$]).pipe(
+      map(([packageImages, latestRegion, sortImagesBy]) => {
         const images = packageImages.filter((img) => !!img.amis[latestRegion]);
         return this.sortImages(images, sortImagesBy);
-      });
+      }),
+    );
 
-    const searchString$ = this.searchInput$
-      .do((searchString) => this.setState({ searchString }))
-      .distinctUntilChanged()
-      .debounceTime(250);
+    const searchString$ = this.searchInput$.pipe(
+      tap((searchString) => this.setState({ searchString })),
+      distinctUntilChanged(),
+      debounceTime(250),
+    );
 
-    const searchImages$ = searchString$
-      .do(() => this.setState({ isSearching: true }))
-      .switchMap((searchString) => this.searchForImages(searchString))
-      .catch((err) => {
+    const searchImages$ = searchString$.pipe(
+      tap(() => this.setState({ isSearching: true })),
+      switchMap((searchString) => this.searchForImages(searchString)),
+      catchError((err) => {
         console.error(err);
         this.setState({ errorMessage: 'Unable to search for images' });
-        return Observable.of([] as IAmazonImage[]);
-      })
-      .do(() => this.setState({ isSearching: false }));
+        return observableOf([] as IAmazonImage[]);
+      }),
+      tap(() => this.setState({ isSearching: false })),
+    );
 
-    const searchImagesInRegion$ = searchImages$
-      .combineLatest(region$, this.sortImagesBy$)
-      .map(([searchResults, latestRegion, sortImagesBy]) => {
+    const searchImagesInRegion$ = observableCombineLatest([searchImages$, region$, this.sortImagesBy$]).pipe(
+      map(([searchResults, latestRegion, sortImagesBy]) => {
         const { searchString } = this.state;
         // allow 'advanced' users to continue with just an ami id (backing image may not have been indexed yet)
         if (searchResults.length === 0 && !!/ami-[0-9a-f]{8,17}/.exec(searchString)) {
@@ -165,28 +177,31 @@ export class AmazonImageSelectInput extends React.Component<IAmazonImageSelector
         // Filter down to only images which have an ami in the currently selected region
         const images = searchResults.filter((img) => !!img.amis[latestRegion]);
         return this.sortImages(images, sortImagesBy);
-      });
+      }),
+    );
 
-    searchImagesInRegion$.takeUntil(this.destroy$).subscribe((searchResults) => this.setState({ searchResults }));
-    packageImagesInRegion$.takeUntil(this.destroy$).subscribe((packageImages) => {
+    searchImagesInRegion$.pipe(takeUntil(this.destroy$)).subscribe((searchResults) => this.setState({ searchResults }));
+    packageImagesInRegion$.pipe(takeUntil(this.destroy$)).subscribe((packageImages) => {
       this.setState({ packageImages });
       this.selectImage(this.findMatchingImage(packageImages, this.props.value));
     });
 
     // Clear out the selected image if the region changes and the image is not found in the new region
     region$
-      .switchMap((selectedRegion) => {
-        const image = this.props.value;
-        if (this.state.selectionMode === 'packageImages') {
-          // in packageImages mode, wait for the packageImages to load then find the matching one, or undefined
-          return packageImagesInRegion$.map((images) => this.findMatchingImage(images, image));
-        } else {
-          // in searchImages mode, return undefined if the selected image is not found in the new region
-          const hasAmiInRegion = !!(image && image.amis && image.amis[selectedRegion]);
-          return Observable.of(hasAmiInRegion ? image : undefined);
-        }
-      })
-      .takeUntil(this.destroy$)
+      .pipe(
+        switchMap((selectedRegion) => {
+          const image = this.props.value;
+          if (this.state.selectionMode === 'packageImages') {
+            // in packageImages mode, wait for the packageImages to load then find the matching one, or undefined
+            return packageImagesInRegion$.pipe(map((images) => this.findMatchingImage(images, image)));
+          } else {
+            // in searchImages mode, return undefined if the selected image is not found in the new region
+            const hasAmiInRegion = !!(image && image.amis && image.amis[selectedRegion]);
+            return observableOf(hasAmiInRegion ? image : undefined);
+          }
+        }),
+        takeUntil(this.destroy$),
+      )
       .subscribe((image) => this.selectImage(image));
   }
 
@@ -333,6 +348,7 @@ export class AmazonImageSelectInput extends React.Component<IAmazonImageSelector
 
       return (
         <div className="col-md-9">
+          {/* @ts-ignore */}
           <TetheredSelect
             {...commonReactSelectProps}
             menuRenderer={this.buildImageMenu}
@@ -354,6 +370,7 @@ export class AmazonImageSelectInput extends React.Component<IAmazonImageSelector
       // User can pick an image from the preloaded 'packageImages' using the typeahead
       return (
         <div className="col-md-9">
+          {/* @ts-ignore */}
           <TetheredSelect
             {...commonReactSelectProps}
             menuRenderer={this.buildImageMenu}
@@ -374,6 +391,7 @@ export class AmazonImageSelectInput extends React.Component<IAmazonImageSelector
       // Show a disabled react-select while waiting for 'packageImages' to load
       return (
         <div className="col-md-9">
+          {/* @ts-ignore */}
           <TetheredSelect
             {...commonReactSelectProps}
             isLoading={isLoadingPackageImages}

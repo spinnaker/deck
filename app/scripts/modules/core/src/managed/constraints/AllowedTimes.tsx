@@ -64,7 +64,7 @@ const timeWindowToString = (window: AllowedTimeWindow, timeZone = 'PST') => {
 
 const DeploymentWindow = ({ allowedTimes, timezone }: IAllowedTimesConstraint['attributes']) => {
   return (
-    <ul className="sp-margin-xs-top sp-padding-l-left">
+    <ul className="sp-margin-xs-top sp-padding-l-left sp-margin-2xs-bottom">
       {allowedTimes.map((window, index) => (
         <li key={index}>{timeWindowToString(window, timezone)}</li>
       ))}
@@ -76,14 +76,14 @@ const getTitle = (constraint: IAllowedTimesConstraint) => {
   switch (constraint.status) {
     case 'FAIL':
       return 'Failed to deploy within the allowed windows';
-    case 'OVERRIDE_PASS':
+    case 'FORCE_PASS':
       return 'Deployment window constraint was overridden';
     case 'PASS':
-      return 'Deployed during one of the previous open windows';
+      return 'Deployed during one of the allowed windows';
     case 'PENDING':
-      return `Deployment can only occur during the following window${
+      return `Deployment can only occur during the provided window${
         constraint.attributes.allowedTimes.length > 1 ? 's' : ''
-      }:`;
+      }`;
     default:
       return `Allowed times constraint - ${constraint.status}:`;
   }

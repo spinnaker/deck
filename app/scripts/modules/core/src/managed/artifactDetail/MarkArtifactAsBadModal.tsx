@@ -1,8 +1,8 @@
 import React, { memo, useCallback, useEffect } from 'react';
-import ReactGA from 'react-ga';
 import { Option } from 'react-select';
 
 import { Illustration } from '@spinnaker/presentation';
+import { logger } from 'core/utils';
 
 import { Button } from '../Button';
 import { EnvironmentBadge } from '../EnvironmentBadge';
@@ -28,10 +28,10 @@ import { useEnvironmentTypeFromResources } from '../useEnvironmentTypeFromResour
 const MARK_BAD_DOCS_URL = 'https://www.spinnaker.io/guides/user/managed-delivery/marking-as-bad/';
 
 const logEvent = (label: string, application: string, environment?: string, reference?: string) =>
-  ReactGA.event({
+  logger.log({
     category: 'Environments - mark version as bad modal',
     action: label,
-    label: environment ? `${application}:${environment}:${reference}` : application,
+    data: { label: environment ? `${application}:${environment}:${reference}` : application },
   });
 
 type IEnvironmentOptionProps = Required<Option<string>> & {
@@ -55,6 +55,28 @@ const EnvironmentOption = memo(({ label, disabled, disabledReason, allResources 
     </span>
   );
 });
+
+export const MarkAsBadIntro = ({ application }: { application: string }) => (
+  <div className="flex-container-h middle sp-margin-xl-bottom">
+    <span className="sp-margin-m-right" style={{ minWidth: 145 }}>
+      <Illustration name="markArtifactVersionAsBad" />
+    </span>
+    <span>
+      <p>
+        If you mark a version as bad in an environment, Spinnaker will never deploy it there. If the version is already
+        deployed there, Spinnaker will immediately replace it with the latest good version approved for deployment.
+      </p>{' '}
+      <a
+        target="_blank"
+        onClick={() => logEvent('Mark as bad docs link clicked', application)}
+        href={MARK_BAD_DOCS_URL}
+      >
+        Check out our documentation
+      </a>{' '}
+      for more information.
+    </span>
+  </div>
+);
 
 export interface IMarkArtifactAsBadModalProps extends IModalComponentProps {
   application: Application;
@@ -126,26 +148,7 @@ export const MarkArtifactAsBadModal = memo(
               <>
                 <ModalBody>
                   <div className="flex-container-v middle sp-padding-xl-yaxis">
-                    <div className="flex-container-h middle sp-margin-xl-bottom">
-                      <span className="sp-margin-m-right" style={{ minWidth: 145 }}>
-                        <Illustration name="markArtifactVersionAsBad" />
-                      </span>
-                      <span>
-                        <p>
-                          If you mark a version as bad in an environment, Spinnaker will never deploy it there. If the
-                          version is already deployed there, Spinnaker will immediately replace it with the latest good
-                          version approved for deployment.
-                        </p>{' '}
-                        <a
-                          target="_blank"
-                          onClick={() => logEvent('Mark as bad docs link clicked', application.name)}
-                          href={MARK_BAD_DOCS_URL}
-                        >
-                          Check out our documentation
-                        </a>{' '}
-                        for more information.
-                      </span>
-                    </div>
+                    <MarkAsBadIntro application={application.name} />
                     <FormikFormField
                       name="environment"
                       label="Environment"
