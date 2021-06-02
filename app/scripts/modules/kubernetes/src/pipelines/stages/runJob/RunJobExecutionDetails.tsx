@@ -1,4 +1,4 @@
-import { get, sortBy } from 'lodash';
+import { get, isEmpty, sortBy } from 'lodash';
 import React from 'react';
 
 import {
@@ -25,7 +25,10 @@ export class RunJobExecutionDetails extends React.Component<IExecutionDetailsSec
     const namespace = get(stage, ['context', 'jobStatus', 'location'], '');
     const deployedName = namespace ? get<string[]>(context, ['deploy.jobs', namespace])[0] : '';
     const externalLink = get<string>(stage, ['context', 'execution', 'logs']);
-    const podNames = this.createdPodNames(get(stage.context, ['jobStatus', 'pods'], []));
+    const pods = get(stage.context, 'jobStatus.pods', []);
+    const podNames = !isEmpty(pods)
+      ? this.createdPodNames(pods)
+      : [get(stage, ['context', 'jobStatus', 'mostRecentPodName'], '')];
     const podNamesProviders = podNames.map((p) => new DefaultPodNameProvider(p));
 
     return (
