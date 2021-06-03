@@ -18,6 +18,5 @@ Registry.pipeline.registerStage({
     { type: 'requiredField', preventSave: true, fieldName: 'credentials', fieldLabel: 'account' },
     { type: 'requiredField', preventSave: true, fieldName: 'region' },
     { type: 'requiredField', preventSave: true, fieldName: 'target' },
-    //{ type: 'cfRequiredRoutesField', preventSave: true, fieldName: 'loadBalancerNames' },
   ],
 });
