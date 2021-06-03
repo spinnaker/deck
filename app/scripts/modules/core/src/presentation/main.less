@@ -1,4 +1,4 @@
-@import '~core/presentation/less/imports/commonImports.less';
+@import './less/imports/commonImports.less';
 @import 'stickyHeader';
 
 @fixed-header-z-index: 1030;
@@ -958,6 +958,9 @@ select:invalid {
     margin-left: 4px;
   }
   display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
 }
 
 @rotate-transition: transform 0.15s ease;
@@ -1591,5 +1594,16 @@ div.modal-header.has-sticky-headers {
   .fixed-footer-button {
     padding: 0;
     margin-left: auto;
+  }
+}
+
+button.as-link {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
   }
 }
