@@ -12,6 +12,7 @@ import { FetchVersionDocument, useUpdateConstraintMutation } from '../../graphql
 import spinner from '../loadingIndicator.svg';
 import { ArtifactVersionProps, QueryConstraint } from '../types';
 import { getConstraintsStatusSummary } from './utils';
+import { useLogEvent } from '../../utils/logging';
 
 import './Constraints.less';
 
@@ -24,6 +25,7 @@ const ConstraintContent = ({ constraint, versionProps }: IConstraintContentProps
   const description = constraintsManager.renderDescription(constraint);
   const actions = constraintsManager.getActions(constraint)?.sort((action) => (action.pass ? -1 : 1)); // positive actions first
   const application = useApplicationContextSafe();
+  const logEvent = useLogEvent('ArtifactConstraints', 'UpdateStatus');
 
   const [updateConstraint, { loading, error }] = useUpdateConstraintMutation({
     refetchQueries: [
@@ -46,13 +48,14 @@ const ConstraintContent = ({ constraint, versionProps }: IConstraintContentProps
     <dl className="constraint-content">
       {description && <dd>{description}</dd>}
       {!isEmpty(actions) && (
-        <dd>
+        <dd className={description ? 'sp-margin-s-top' : undefined}>
           {actions?.map(({ title, pass }) => (
             <button
               className={classnames('btn md-btn constraint-action-button', pass ? 'md-btn-success' : 'md-btn-danger')}
               key={title}
               disabled={loading}
               onClick={() => {
+                logEvent({ data: { newStatus: pass } });
                 updateConstraint({
                   variables: {
                     payload: {
