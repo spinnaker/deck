@@ -5,7 +5,7 @@ import { SETTINGS } from 'core/config';
 import { INestedState } from 'core/navigation/state.provider';
 
 import { Environments } from './Environments';
-import { getIsNewUI, uiFeatureFlag } from './Environments2';
+import { getIsNewUI } from './Environments2';
 import { Configuration } from './config/Configuration';
 import { EnvironmentsOverview } from './overview/EnvironmentsOverview';
 import { VersionsHistory } from './versionsHistory/VersionsHistory';
@@ -60,16 +60,6 @@ module(MANAGED_STATES, [APPLICATION_STATE_PROVIDER]).config([
   'applicationStateProvider',
   (applicationStateProvider: ApplicationStateProvider) => {
     if (SETTINGS.feature.managedDelivery) {
-      const isNewUI = () => {
-        const isNew = getIsNewUI();
-        if (isNew) {
-          localStorage.setItem(uiFeatureFlag.key, uiFeatureFlag.value);
-        } else {
-          localStorage.removeItem(uiFeatureFlag.key);
-        }
-        return isNew;
-      };
-
       const artifactVersion: INestedState = {
         name: 'artifactVersion',
         url: `/{reference}/{version}`,
@@ -79,13 +69,8 @@ module(MANAGED_STATES, [APPLICATION_STATE_PROVIDER]).config([
         },
         children: [],
         redirectTo: (transition) => {
-          if (isNewUI()) {
-            return {
-              state: 'home.applications.application.environments.history',
-              params: {
-                version: transition.params().version,
-              },
-            };
+          if (getIsNewUI()) {
+            return transition.targetState().withState('home.applications.application.environments.history');
           }
           return undefined;
         },
@@ -103,9 +88,9 @@ module(MANAGED_STATES, [APPLICATION_STATE_PROVIDER]).config([
           },
         },
         children: [artifactVersion, ...routes],
-        redirectTo: () => {
-          if (isNewUI()) {
-            return 'home.applications.application.environments.overview';
+        redirectTo: (transition) => {
+          if (getIsNewUI()) {
+            return transition.targetState().withState('home.applications.application.environments.overview');
           }
           return undefined;
         },
