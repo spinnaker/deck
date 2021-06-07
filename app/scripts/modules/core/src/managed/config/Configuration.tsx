@@ -5,10 +5,12 @@ import { Illustration } from '@spinnaker/presentation';
 import { showModal, useApplicationContextSafe } from 'core/presentation';
 import { Spinner } from 'core/widgets';
 
+import { DeliveryConfig } from './DeliveryConfig';
 import { useFetchApplicationManagementStatusQuery, useToggleManagementMutation } from '../graphql/graphql-sdk';
 import spinner from '../overview/loadingIndicator.svg';
 import { ActionModal, IArtifactActionModalProps } from '../utils/ActionModal';
 import { MODAL_MAX_WIDTH, spinnerProps } from '../utils/defaults';
+import { useLogEvent } from '../utils/logging';
 
 const BTN_CLASSNAMES = 'btn md-btn sp-margin-s-top';
 
@@ -26,12 +28,23 @@ const managementStatusToContent = {
 };
 
 export const Configuration = () => {
+  return (
+    <div className="full-width">
+      <ManagementToggle />
+      <DeliveryConfig />
+    </div>
+  );
+};
+
+const ManagementToggle = () => {
   const app = useApplicationContextSafe();
   const appName = app.name;
+  const logEvent = useLogEvent('Management');
   const { data, loading, refetch } = useFetchApplicationManagementStatusQuery({ variables: { appName } });
   const [toggleManagement, { loading: mutationInFlight }] = useToggleManagementMutation();
 
   const onShowToggleManagementModal = React.useCallback((shouldPause: boolean) => {
+    logEvent({ action: 'OpenModal', data: { shouldPause } });
     showModal(
       shouldPause ? DisableManagementModal : ResumeManagementModal,
       {
@@ -40,7 +53,7 @@ export const Configuration = () => {
           await toggleManagement({ variables: { application: appName, isPaused: shouldPause } });
           refetch();
         },
-        logCategory: 'App::Management',
+        logCategory: 'Management',
         onSuccess: refetch,
         withComment: false,
       },
@@ -61,17 +74,15 @@ export const Configuration = () => {
   return (
     <div>
       <div>
-        <div>
-          {state.title} {mutationInFlight && <img src={spinner} height={14} />}
-        </div>
-        <div>
-          <button
-            className={classnames(BTN_CLASSNAMES, state.btnClassName)}
-            onClick={() => onShowToggleManagementModal(!isPaused)}
-          >
-            {state.btnText}
-          </button>
-        </div>
+        {state.title} {mutationInFlight && <img src={spinner} height={14} />}
+      </div>
+      <div>
+        <button
+          className={classnames(BTN_CLASSNAMES, state.btnClassName)}
+          onClick={() => onShowToggleManagementModal(!isPaused)}
+        >
+          {state.btnText}
+        </button>
       </div>
     </div>
   );
