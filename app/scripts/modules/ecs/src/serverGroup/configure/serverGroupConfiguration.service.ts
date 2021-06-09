@@ -141,6 +141,7 @@ export interface IEcsServerGroupCommand extends IServerGroupCommand {
   subnetType: string;
   subnetTypes: string[];
   securityGroups: string[];
+  securityGroupNames: string[];
   viewState: IEcsServerGroupCommandViewState;
   taskDefinitionArtifact: IEcsTaskDefinitionArtifact;
   taskDefinitionArtifactAccount: string;
