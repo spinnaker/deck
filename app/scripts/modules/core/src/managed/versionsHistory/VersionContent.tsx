@@ -5,11 +5,12 @@ import { useApplicationContextSafe } from 'core/presentation';
 
 import { BaseEnvironment } from '../environmentBaseElements/BaseEnvironment';
 import { EnvironmentItem } from '../environmentBaseElements/EnvironmentItem';
+import { EnvironmentsRender, useOrderedEnvironment } from '../environmentBaseElements/EnvironmentsRender';
 import { useFetchVersionQuery } from '../graphql/graphql-sdk';
 import { ArtifactVersionTasks } from '../overview/artifact/ArtifactVersionTasks';
 import { Constraints } from '../overview/artifact/Constraints';
 import { useCreateVersionActions } from '../overview/artifact/utils';
-import { PinnedVersions, VersionData, VersionInEnvironment } from './types';
+import { HistoryArtifactVersionExtended, PinnedVersions, VersionData } from './types';
 import { toPinnedMetadata, VersionMessageData } from '../versionMetadata/MetadataComponents';
 import { getBaseMetadata, VersionMetadata } from '../versionMetadata/VersionMetadata';
 
@@ -17,7 +18,7 @@ import './VersionsHistory.less';
 
 interface IVersionInEnvironmentProps {
   environment: string;
-  version: VersionInEnvironment;
+  version: HistoryArtifactVersionExtended;
   envPinnedVersions?: PinnedVersions[keyof PinnedVersions];
 }
 
@@ -70,6 +71,7 @@ const VersionInEnvironment = ({ environment, version, envPinnedVersions }: IVers
       <VersionMetadata
         key={version.id}
         author={version.gitMetadata?.author}
+        version={version.version}
         {...(detailedVersionData ? getBaseMetadata(detailedVersionData) : undefined)}
         actions={actions}
         pinned={pinnedData}
@@ -93,9 +95,11 @@ interface IVersionContentProps {
 }
 
 export const VersionContent = ({ versionData, pinnedVersions }: IVersionContentProps) => {
+  const ref = React.useRef<HTMLDivElement | null>(null);
+  const { environments, ...renderProps } = useOrderedEnvironment(ref, Object.entries(versionData.environments));
   return (
-    <React.Fragment>
-      {Object.entries(versionData.environments).map(([env, { versions }]) => {
+    <EnvironmentsRender {...renderProps} ref={ref}>
+      {environments.map(([env, { versions }]) => {
         return (
           <BaseEnvironment key={env} title={env} size="small">
             {versions.map((version) => (
@@ -109,6 +113,6 @@ export const VersionContent = ({ versionData, pinnedVersions }: IVersionContentP
           </BaseEnvironment>
         );
       })}
-    </React.Fragment>
+    </EnvironmentsRender>
   );
 };

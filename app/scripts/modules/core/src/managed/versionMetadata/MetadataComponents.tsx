@@ -1,15 +1,17 @@
+import { useSref } from '@uirouter/react';
 import classnames from 'classnames';
+import { sortBy } from 'lodash';
 import { DateTime } from 'luxon';
 import React from 'react';
 import { Dropdown, MenuItem } from 'react-bootstrap';
 
 import { Icon, IconNames } from '@spinnaker/presentation';
 import { Tooltip } from 'core/presentation';
-import { CopyToClipboard } from 'core/utils';
 
 import { RelativeTimestamp } from '../RelativeTimestamp';
 import { LifecycleEventSummary } from '../overview/artifact/utils';
 import { TOOLTIP_DELAY_SHOW } from '../utils/defaults';
+import { useLogEvent } from '../utils/logging';
 
 import './VersionMetadata.less';
 
@@ -20,7 +22,7 @@ export const MetadataElement: React.FC<{ className?: string }> = ({ className, c
 export interface VersionAction {
   onClick?: () => void;
   href?: string;
-  content: React.ReactNode;
+  content: string;
   disabled?: boolean;
 }
 
@@ -52,6 +54,8 @@ export const toVetoedMetadata = (data: {
 
 export interface IVersionMetadataProps {
   build?: IVersionBuildProps['build'];
+  version: string;
+  sha?: string;
   author?: string;
   deployedAt?: string;
   createdAt?: IVersionCreatedAtProps['createdAt'];
@@ -70,6 +74,7 @@ export interface IVersionMetadataActionsProps {
 }
 
 export const VersionMetadataActions = ({ id, actions }: IVersionMetadataActionsProps) => {
+  const logEvent = useLogEvent('ArtifactActions');
   return (
     <MetadataElement>
       <Dropdown id={id}>
@@ -79,7 +84,10 @@ export const VersionMetadataActions = ({ id, actions }: IVersionMetadataActionsP
             <MenuItem
               key={index}
               disabled={action.disabled}
-              onClick={action.onClick}
+              onClick={() => {
+                action.onClick?.();
+                logEvent({ action: `OpenModal - ${action.content}` });
+              }}
               href={action.href}
               target="_blank"
             >
@@ -94,16 +102,21 @@ export const VersionMetadataActions = ({ id, actions }: IVersionMetadataActionsP
 
 interface IVersionCreatedAtProps {
   createdAt?: string | DateTime;
+  linkProps: Record<string, string>;
 }
 
-export const VersionCreatedAt = ({ createdAt }: IVersionCreatedAtProps) => {
+export const VersionCreatedAt = ({ createdAt, linkProps }: IVersionCreatedAtProps) => {
+  const { href, onClick } = useSref('home.applications.application.environments.history', linkProps);
   if (!createdAt) return null;
+
   return (
-    <MetadataElement>
+    <MetadataElement className="created-at">
       <Tooltip delayShow={TOOLTIP_DELAY_SHOW} value="Created at">
         <i className="far fa-calendar-alt metadata-icon" />
       </Tooltip>
-      <RelativeTimestamp timestamp={createdAt} delayShow={TOOLTIP_DELAY_SHOW} removeStyles withSuffix />
+      <a href={href} onClick={onClick}>
+        <RelativeTimestamp timestamp={createdAt} delayShow={TOOLTIP_DELAY_SHOW} removeStyles withSuffix />
+      </a>
     </MetadataElement>
   );
 };
@@ -191,18 +204,33 @@ export const VersionAuthor = ({ author }: IVersionAuthorProps) => {
   return <MetadataElement>By {author}</MetadataElement>;
 };
 
+interface IVersionBranchProps {
+  branch?: string;
+}
+
+export const VersionBranch = ({ branch }: IVersionBranchProps) => {
+  if (!branch) return null;
+  return (
+    <MetadataElement>
+      <Icon name="spCIBranch" size="11px" className="sp-margin-xs-right" color="concrete" /> {branch}
+    </MetadataElement>
+  );
+};
+
 interface IVersionBuildProps {
   build: { buildNumber?: string; buildLink?: string; version?: string };
   withPrefix?: boolean;
 }
 
 export const VersionBuild = ({ build, withPrefix }: IVersionBuildProps) => {
+  const logEvent = useLogEvent('ArtifactBuild', 'OpenBuild');
+  const text = `${withPrefix ? `Build ` : ''}#${build.buildNumber}`;
   const content = build.buildLink ? (
-    <a href={build.buildLink}>
-      {withPrefix ? `Build ` : ''}#{build.buildNumber}
+    <a href={build.buildLink} onClick={() => logEvent({ data: { build: build.buildNumber } })}>
+      {text}
     </a>
   ) : (
-    `Build #${build.buildNumber}`
+    text
   );
 
   return build.version ? (
@@ -228,28 +256,14 @@ export const VersionBuilds = ({ builds }: IVersionBuildsProps) => {
       ) : (
         <>
           Builds{' '}
-          {builds.map((build, index) => (
-            <VersionBuild key={index} build={build} />
+          {sortBy(builds, (build) => build.buildNumber).map((build, index) => (
+            <React.Fragment key={index}>
+              <VersionBuild build={build} withPrefix={false} />
+              {Boolean(index < builds.length - 1) && ', '}
+            </React.Fragment>
           ))}
         </>
       )}
-    </MetadataElement>
-  );
-};
-
-export const ShareLink = ({ link }: { link: string }) => {
-  return (
-    <MetadataElement className="copy-version-link">
-      <CopyToClipboard
-        text={link}
-        className="as-link"
-        stopPropagation
-        buttonInnerNode={
-          <span>
-            <span className="glyphicon glyphicon-copy" /> Copy link
-          </span>
-        }
-      />
     </MetadataElement>
   );
 };
