@@ -1,5 +1,4 @@
 import { useApolloClient } from '@apollo/client';
-import { useSref } from '@uirouter/react';
 
 import classnames from 'classnames';
 import { sortBy, toNumber } from 'lodash';
@@ -18,8 +17,8 @@ import { TOOLTIP_DELAY_SHOW } from '../utils/defaults';
 import {
   BaseVersionMetadata,
   MetadataBadge,
-  ShareLink,
   VersionAuthor,
+  VersionBranch,
   VersionBuilds,
   VersionCreatedAt,
 } from '../versionMetadata/MetadataComponents';
@@ -87,7 +86,6 @@ export const VersionHeading = ({ group, chevron }: IVersionHeadingProps) => {
   const gitMetadata = group.gitMetadata;
   const client = useApolloClient();
   const app = useApplicationContextSafe();
-  const { href } = useSref('home.applications.application.environments.history', { sha: group.key });
 
   const prefetchData = () => {
     // This function is pre-loading the content of the version and caching it before mounting the VersionContent component
@@ -108,8 +106,8 @@ export const VersionHeading = ({ group, chevron }: IVersionHeadingProps) => {
           {group.isBaking && <MetadataBadge type="baking" />}
           <VersionAuthor author={gitMetadata?.author} />
           <VersionBuilds builds={Array.from(group.buildNumbers).map((buildNumber) => ({ buildNumber }))} />
-          <VersionCreatedAt createdAt={group.createdAt} />
-          {href && <ShareLink link={window.location.host + '/' + href} />}
+          <VersionBranch branch={gitMetadata?.branch} />
+          <VersionCreatedAt createdAt={group.createdAt} linkProps={{ sha: group.key }} />
         </BaseVersionMetadata>
         {/* Shows a badge for each environment with the status of the artifacts in it */}
         <div className="version-environments">
