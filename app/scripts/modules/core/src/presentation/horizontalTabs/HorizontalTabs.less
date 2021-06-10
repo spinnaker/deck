@@ -24,6 +24,10 @@
       min-width: 80px;
     }
 
+    &:focus:active {
+      text-decoration: none;
+    }
+
     &:hover {
       text-decoration: none;
       color: var(--color-dovegray);
@@ -34,5 +38,10 @@
   .tab.selected-tab {
     border-bottom: @tab-border-width solid var(--color-accent);
     color: var(--color-black);
+  }
+
+  .right-element {
+    margin-left: auto;
+    align-self: center;
   }
 }
