@@ -1,7 +1,7 @@
 {
   "name": "@spinnaker/amazon",
   "license": "Apache-2.0",
-  "version": "0.0.316",
+  "version": "0.0.318",
   "module": "dist/index.js",
   "typings": "dist/index.d.ts",
   "scripts": {
@@ -13,7 +13,7 @@
     "lib": "npm run build"
   },
   "dependencies": {
-    "@spinnaker/core": "^0.0.595",
+    "@spinnaker/core": "*",
     "@uirouter/angularjs": "1.0.26",
     "@uirouter/core": "6.0.5",
     "@uirouter/react": "1.0.3",

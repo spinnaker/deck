@@ -19,7 +19,7 @@ const storedDirection = localStorage.getItem(STORAGE_KEY);
 
 const environmentsDirectionState = atom<Direction>({
   key: 'environmentsDisplay',
-  default: isDirection(storedDirection) ? storedDirection : 'listView',
+  default: isDirection(storedDirection) ? storedDirection : 'gridView',
 });
 
 // The goal of this hook is to store the value in an atom to be shared across the app but also update the local storage
@@ -52,7 +52,7 @@ export const EnvironmentsDirectionController = () => {
       onClick={() => setDirection((state) => (state === 'listView' ? 'gridView' : 'listView'))}
     >
       {direction === 'listView' ? 'Grid view' : 'List view'}
-      <i className={classnames(direction === 'listView' ? 'far fa-list-alt' : 'fas fa-columns', 'sp-margin-xs-left')} />
+      <i className={classnames(direction === 'listView' ? 'fas fa-columns' : 'far fa-list-alt', 'sp-margin-xs-left')} />
     </button>
   );
 };
