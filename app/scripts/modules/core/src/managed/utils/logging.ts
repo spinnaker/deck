@@ -1,26 +1,30 @@
-import { logger } from 'core/utils';
+import React from 'react';
+
+import { logger, LoggerEvent } from 'core/utils';
+
 import { useApplicationContext } from '../../presentation/hooks/useApplicationContext.hook';
 
-interface LogProps {
-  category: string;
-  action: string;
+interface LogProps extends LoggerEvent {
   application?: string;
   label?: string;
 }
 
-export const logEvent = ({ category, action, application, label }: LogProps) => {
-  logger.log({
-    category,
-    action: action,
-    data: { label: (application ? `${application}:` : ``) + label },
-  });
-};
+const CATEGORY_PREFIX = 'MD__';
 
-export const useLogEvent = (category: string) => {
+export const useLogEvent = (category: string, action?: string) => {
   const app = useApplicationContext();
-  return (props: Omit<LogProps, 'application' | 'category'>) => {
-    logEvent({ ...props, category, application: app?.name });
-  };
+  const logFn = React.useCallback(
+    (props?: Omit<Partial<LogProps>, 'application' | 'category'>) => {
+      logger.log({
+        ...props,
+        category: `${CATEGORY_PREFIX}${category}`,
+        action: props?.action || action || '',
+        data: { label: props?.label, application: app?.name, ...props?.data },
+      });
+    },
+    [app?.name, category, action],
+  );
+  return logFn;
 };
 
 export const logCategories = {

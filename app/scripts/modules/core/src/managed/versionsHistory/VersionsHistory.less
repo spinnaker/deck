@@ -11,15 +11,6 @@
       margin-bottom: var(--l-spacing);
     }
 
-    .copy-version-link {
-      display: none;
-    }
-    &:hover {
-      .copy-version-link {
-        display: block;
-      }
-    }
-
     .version-heading {
       display: flex;
       flex-direction: row;
@@ -58,7 +49,7 @@
   .version-environments {
     display: flex;
     flex-direction: row;
-    margin-top: var(--s-spacing);
+    padding-top: var(--m-spacing);
     overflow: auto;
 
     .environment-pinned {
@@ -105,7 +96,7 @@
     }
 
     &.vetoed {
-      background-color: var(--color-status-error);
+      background-color: var(--color-status-error-light);
     }
 
     &.current {
@@ -117,8 +108,7 @@
     }
 
     &.deploying {
-      color: var(--color-white);
-      background-color: var(--color-accent);
+      animation: deployingAnimation 2s infinite;
     }
   }
 }

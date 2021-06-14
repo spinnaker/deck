@@ -1,5 +1,4 @@
 import { useApolloClient } from '@apollo/client';
-import { useSref } from '@uirouter/react';
 
 import classnames from 'classnames';
 import { sortBy, toNumber } from 'lodash';
@@ -18,8 +17,8 @@ import { TOOLTIP_DELAY_SHOW } from '../utils/defaults';
 import {
   BaseVersionMetadata,
   MetadataBadge,
-  ShareLink,
   VersionAuthor,
+  VersionBranch,
   VersionBuilds,
   VersionCreatedAt,
 } from '../versionMetadata/MetadataComponents';
@@ -87,7 +86,6 @@ export const VersionHeading = ({ group, chevron }: IVersionHeadingProps) => {
   const gitMetadata = group.gitMetadata;
   const client = useApolloClient();
   const app = useApplicationContextSafe();
-  const { href } = useSref('home.applications.application.environments.history', { sha: group.key });
 
   const prefetchData = () => {
     // This function is pre-loading the content of the version and caching it before mounting the VersionContent component
@@ -108,28 +106,36 @@ export const VersionHeading = ({ group, chevron }: IVersionHeadingProps) => {
           {group.isBaking && <MetadataBadge type="baking" />}
           <VersionAuthor author={gitMetadata?.author} />
           <VersionBuilds builds={Array.from(group.buildNumbers).map((buildNumber) => ({ buildNumber }))} />
-          <VersionCreatedAt createdAt={group.createdAt} />
-          {href && <ShareLink link={window.location.host + '/' + href} />}
+          <VersionBranch branch={gitMetadata?.branch} />
+          <VersionCreatedAt createdAt={group.createdAt} linkProps={{ sha: group.key }} />
         </BaseVersionMetadata>
         {/* Shows a badge for each environment with the status of the artifacts in it */}
         <div className="version-environments">
           {Object.entries(group.environments)
             .reverse()
-            .map(([env, artifacts]) => {
-              const statusSummary = getEnvStatusSummary(artifacts.versions);
-              const statusClassName = statusToClassName[statusSummary];
-              return (
-                <Tooltip key={env} delayShow={TOOLTIP_DELAY_SHOW} value={statusToText[statusSummary]}>
-                  <div className={classnames('chip', statusClassName)}>
-                    {artifacts.isPinned && <Icon name="pin" size="16px" className="environment-pinned" color="black" />}{' '}
-                    {env}
-                  </div>
-                </Tooltip>
-              );
-            })}
+            .map(([env, artifacts]) => (
+              <EnvironmentBadge key={env} env={env} data={artifacts} />
+            ))}
         </div>
       </div>
       <div>{chevron}</div>
     </div>
+  );
+};
+
+interface IEnvironmentBadgeProps {
+  env: string;
+  data: VersionData['environments'][keyof VersionData['environments']];
+}
+
+const EnvironmentBadge = ({ env, data }: IEnvironmentBadgeProps) => {
+  const statusSummary = getEnvStatusSummary(data.versions);
+  const statusClassName = statusToClassName[statusSummary];
+  return (
+    <Tooltip delayShow={TOOLTIP_DELAY_SHOW} value={statusToText[statusSummary]}>
+      <div className={classnames('chip', statusClassName)}>
+        {data.isPinned && <Icon name="pin" size="16px" className="environment-pinned" color="black" />} {env}
+      </div>
+    </Tooltip>
   );
 };

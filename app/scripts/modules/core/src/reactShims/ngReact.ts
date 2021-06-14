@@ -16,10 +16,6 @@ import { IInstanceArchetypeSelectorProps } from 'core/serverGroup/configure/comm
 import { IInstanceTypeSelectorProps } from 'core/serverGroup/configure/common/InstanceTypeSelector';
 import { v2InstanceTypeSelector } from 'core/serverGroup/configure/common/v2InstanceTypeSelector.component';
 import { v2InstanceArchetypeSelector } from 'core/serverGroup/configure/common/v2instanceArchetypeSelector.component';
-import {
-  IViewScalingActivitiesLinkProps,
-  ViewScalingActivitiesLink as ViewScalingActivitiesLinkComponent,
-} from 'core/serverGroup/details/scalingActivities/ViewScalingActivitiesLink';
 
 import { ITaskMonitorProps } from 'core/task/monitor/TaskMonitorWrapper';
 import { TaskMonitorWrapper } from 'core/task/monitor/TaskMonitorWrapper';
@@ -27,8 +23,6 @@ import { IAccountRegionClusterSelectorProps } from 'core/widgets/AccountRegionCl
 import { accountRegionClusterSelectorWrapperComponent } from 'core/widgets/accountRegionClusterSelectorWrapper.component';
 import { ButtonBusyIndicator as ButtonBusyIndicatorComponent } from 'core/widgets/spinners/Spinner';
 
-import { IHelpFieldProps } from '../help/HelpField';
-import { helpFieldWrapperComponent } from '../help/helpField.component';
 import { ReactInject } from './react.injector';
 
 import IInjectorService = angular.auto.IInjectorService;
@@ -41,7 +35,6 @@ export class NgReactInjector extends ReactInject {
   public AccountRegionClusterSelector: React.ComponentClass<IAccountRegionClusterSelectorProps> = angular2react('accountRegionClusterSelectorWrapper', accountRegionClusterSelectorWrapperComponent, this.$injectorProxy) as any;
   public ButtonBusyIndicator: React.FunctionComponent<{}>                               = ButtonBusyIndicatorComponent;
   public EntitySource: React.ComponentClass<IEntitySourceProps>                                 = angular2react('entitySource', entitySourceComponent, this.$injectorProxy) as any;
-  public HelpField: React.ComponentClass<IHelpFieldProps>                                       = angular2react('helpFieldWrapper', helpFieldWrapperComponent, this.$injectorProxy) as any;
   public InstanceArchetypeSelector: React.ComponentClass<IInstanceArchetypeSelectorProps>       = angular2react('v2InstanceArchetypeSelector', v2InstanceArchetypeSelector, this.$injectorProxy) as any;
   public InstanceTypeSelector: React.ComponentClass<IInstanceTypeSelectorProps>                 = angular2react('v2InstanceTypeSelector', v2InstanceTypeSelector, this.$injectorProxy);
   public LegacySpinner: React.FunctionComponent<{}>                               = ButtonBusyIndicatorComponent;
@@ -52,7 +45,6 @@ export class NgReactInjector extends ReactInject {
   public TaskMonitorWrapper: React.FunctionComponent<ITaskMonitorProps>                         = TaskMonitorWrapper;
   public UserMenu: React.ComponentClass<{}>                                                     = angular2react('userMenu', {}, this.$injectorProxy) as any;
   public ViewChangesLink: React.ComponentClass<IViewChangesLinkProps>                           = angular2react('viewChangesLinkWrapper', viewChangesLinkWrapper, this.$injectorProxy) as any;
-  public ViewScalingActivitiesLink: React.FunctionComponent<IViewScalingActivitiesLinkProps> = ViewScalingActivitiesLinkComponent;
 
   public initialize($injector: IInjectorService) {
     const realInjector: { [key: string]: Function } = $injector as any;
