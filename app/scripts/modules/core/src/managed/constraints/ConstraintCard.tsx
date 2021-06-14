@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 import React, { memo, useState } from 'react';
-import ReactGA from 'react-ga';
+
+import { logger } from 'core/utils';
 
 import { Button } from '../Button';
 import { IUpdateConstraintStatusRequest, ManagedWriter } from '../ManagedWriter';
@@ -19,27 +20,31 @@ import './ConstraintCard.less';
 
 const constraintCardAppearanceByStatus: { [key in ConstraintStatus]: IStatusCardProps['appearance'] } = {
   NOT_EVALUATED: 'future',
+  BLOCKED: 'future',
   PENDING: 'info',
   PASS: 'neutral',
   FAIL: 'error',
   OVERRIDE_PASS: 'neutral',
   OVERRIDE_FAIL: 'error',
+  FORCE_PASS: 'neutral',
 } as const;
 
 const skippedConstraintCardAppearanceByStatus: { [key in ConstraintStatus]: IStatusCardProps['appearance'] } = {
   NOT_EVALUATED: 'future',
+  BLOCKED: 'future',
   PENDING: 'future',
   PASS: 'neutral',
   FAIL: 'neutral',
   OVERRIDE_PASS: 'neutral',
   OVERRIDE_FAIL: 'neutral',
+  FORCE_PASS: 'neutral',
 } as const;
 
 const logEvent = (label: string, application: string, environment: string, reference: string) =>
-  ReactGA.event({
+  logger.log({
     category: 'Environments - version details',
     action: label,
-    label: `${application}:${environment}:${reference}`,
+    data: { label: `${application}:${environment}:${reference}` },
   });
 
 // TODO: improve this logic below
@@ -84,7 +89,7 @@ export const ConstraintCard = memo(
 
     const [actionStatus, setActionStatus] = useState<IRequestStatus>('NONE');
 
-    const actions = constraintsManager.getOverrideActions(constraint, environment);
+    const actions = constraintsManager.getActions(constraint, environment.state);
 
     if (!constraintsManager.isSupported(type)) {
       console.warn(
