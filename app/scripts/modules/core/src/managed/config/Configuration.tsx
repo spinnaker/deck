@@ -5,14 +5,14 @@ import { Illustration } from '@spinnaker/presentation';
 import { showModal, useApplicationContextSafe } from 'core/presentation';
 import { Spinner } from 'core/widgets';
 
+import { ApplicationQueryError } from '../ApplicationQueryError';
 import { DeliveryConfig } from './DeliveryConfig';
 import { useFetchApplicationManagementStatusQuery, useToggleManagementMutation } from '../graphql/graphql-sdk';
-import spinner from '../overview/loadingIndicator.svg';
 import { ActionModal, IArtifactActionModalProps } from '../utils/ActionModal';
 import { MODAL_MAX_WIDTH, spinnerProps } from '../utils/defaults';
 import { useLogEvent } from '../utils/logging';
 
-const BTN_CLASSNAMES = 'btn md-btn sp-margin-s-top';
+const BTN_CLASSNAMES = 'btn md-btn';
 
 const managementStatusToContent = {
   PAUSED: {
@@ -40,7 +40,7 @@ const ManagementToggle = () => {
   const app = useApplicationContextSafe();
   const appName = app.name;
   const logEvent = useLogEvent('Management');
-  const { data, loading, refetch } = useFetchApplicationManagementStatusQuery({ variables: { appName } });
+  const { data, error, loading, refetch } = useFetchApplicationManagementStatusQuery({ variables: { appName } });
   const [toggleManagement, { loading: mutationInFlight }] = useToggleManagementMutation();
 
   const onShowToggleManagementModal = React.useCallback((shouldPause: boolean) => {
@@ -64,25 +64,29 @@ const ManagementToggle = () => {
   if (loading) {
     return <Spinner {...spinnerProps} message="Loading settings..." />;
   }
-  if (!data) {
-    return <div>Failed to load app config</div>;
+
+  if (error) {
+    return <ApplicationQueryError hasApplicationData={Boolean(data?.application)} error={error} />;
   }
 
-  const isPaused = Boolean(data.application?.isPaused);
+  const isPaused = Boolean(data?.application?.isPaused);
   const state = managementStatusToContent[isPaused ? 'PAUSED' : 'ENABLED'];
 
   return (
     <div>
-      <div>
-        {state.title} {mutationInFlight && <img src={spinner} height={14} />}
-      </div>
-      <div>
+      <div>{state.title}</div>
+      <div className="horizontal middle sp-margin-s-top">
         <button
           className={classnames(BTN_CLASSNAMES, state.btnClassName)}
           onClick={() => onShowToggleManagementModal(!isPaused)}
         >
           {state.btnText}
         </button>
+        {mutationInFlight && (
+          <span className="sp-margin-s-left">
+            <Spinner mode="circular" size="nano" color="var(--color-accent)" />
+          </span>
+        )}
       </div>
     </div>
   );
