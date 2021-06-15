@@ -1,3 +1,4 @@
+import { UISref } from '@uirouter/react';
 import React from 'react';
 
 import { Icon, useApplicationContextSafe } from 'core/presentation';
@@ -61,6 +62,17 @@ const Status = ({
         <div>
           <div>{state.reason || statusUtils[state.status].defaultReason}</div>
           {state.event && state.event !== state.reason && <div>{state.event}</div>}
+          {Boolean(state.tasks?.length) && (
+            <ul className="tasks-list">
+              {state.tasks?.map(({ id, name }) => (
+                <li key={id}>
+                  <UISref to="home.applications.application.tasks.taskDetails" params={{ taskId: id }}>
+                    <a>{name}</a>
+                  </UISref>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
     );
