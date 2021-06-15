@@ -96,6 +96,14 @@ const baseHandlers: Array<IConstraintHandler<IConstraint['type']>> = [
     iconName: { DEFAULT: 'mdConstraintAllowedTimes' },
     titleRender: AllowedTimesTitle,
     descriptionRender: AllowedTimesDescription,
+    overrideActions: {
+      FAIL: [
+        {
+          title: 'Ignore time window',
+          pass: true,
+        },
+      ],
+    },
   },
   {
     kind: 'depends-on',
