@@ -38,20 +38,15 @@ export const EntitySource = ({ metadata, relativePath = '^.^.^' }: IEntitySource
   const srefParams =
     executionType === 'pipeline' ? { application, executionId, stageId } : { application, taskId: executionId };
 
-  const PopoverContent = React.useCallback(
-    () => (
-      <EntitySourcePopover
-        comments={comments}
-        execution={execution as IExecution}
-        executionType={executionType}
-        metadata={metadata.value}
-      />
-    ),
-    [executionId],
+  const PopoverContent = () => (
+    <EntitySourcePopover
+      comments={comments}
+      execution={execution as IExecution}
+      executionType={executionType}
+      metadata={metadata.value}
+    />
   );
 
-  // eslint-disable-next-line
-  console.log(executionType, status, isLoading, metadata);
   if (!metadata || (executionType === 'pipeline' && isLoading)) {
     return null;
   }
