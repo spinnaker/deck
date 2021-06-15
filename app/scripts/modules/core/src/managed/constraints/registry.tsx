@@ -99,7 +99,7 @@ const baseHandlers: Array<IConstraintHandler<IConstraint['type']>> = [
     overrideActions: {
       FAIL: [
         {
-          title: 'Ignore time window',
+          title: 'Skip constraint',
           pass: true,
         },
       ],
