@@ -25,7 +25,7 @@ export const CommitHistory = ({ commits }: ICommitHistoryProps) => (
           <th>Author</th>
         </tr>
         {commits.map((commit) => (
-          <tr>
+          <tr key={commit.id}>
             <td>{DateTime.fromMillis(commit.timestamp).toFormat('MM/dd')}</td>
             <td>
               <a target="_blank" href={commit.commitUrl}>

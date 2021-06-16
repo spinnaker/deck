@@ -31,7 +31,7 @@ export const JarDiffTable = ({ heading, jars }: IJarDiffTableProps) => (
         <th>{heading}</th>
       </tr>
       {jars.map((jar) => (
-        <tr>
+        <tr key={jar.displayDiff}>
           <td>{jar.displayDiff}</td>
         </tr>
       ))}
