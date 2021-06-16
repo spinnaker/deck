@@ -15,7 +15,7 @@ export interface IJarDiff {
   upgraded: IJarDiffItem[];
 }
 
-export interface IJarDiffProps {
+export interface IJarDiffsProps {
   jarDiffs: IJarDiff;
 }
 
@@ -26,18 +26,20 @@ export interface IJarDiffTableProps {
 
 export const JarDiffTable = ({ heading, jars }: IJarDiffTableProps) => (
   <table className="table table-condensed no-lines">
-    <tr>
-      <th>{heading}</th>
-    </tr>
-    {jars.map((jar) => (
+    <tbody>
       <tr>
-        <td>{jar.displayDiff}</td>
+        <th>{heading}</th>
       </tr>
-    ))}
+      {jars.map((jar) => (
+        <tr>
+          <td>{jar.displayDiff}</td>
+        </tr>
+      ))}
+    </tbody>
   </table>
 );
 
-export const JarDiff = ({ jarDiffs }: IJarDiffProps) => {
+export const JarDiffs = ({ jarDiffs }: IJarDiffsProps) => {
   const hasJarDiffs = Object.keys(jarDiffs).some((key: string) => jarDiffs[key].length > 0);
 
   if (!hasJarDiffs) {

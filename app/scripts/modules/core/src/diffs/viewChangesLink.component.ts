@@ -5,8 +5,8 @@ import { extend } from 'lodash';
 import { IBuildDiffInfo, ICreationMetadata, ICreationMetadataTag, IJenkinsInfo } from 'core/domain';
 import { EXECUTION_SERVICE, ExecutionService } from 'core/pipeline/service/execution.service';
 
-import { COMMIT_HISTORY_COMPONENT, ICommit } from './commitHistory.component';
-import { IJarDiff, JAR_DIFF_COMPONENT } from './jarDiff.component';
+import { ICommit } from './CommitHistory';
+import { IJarDiff } from './JarDiffs';
 
 export interface IViewChangesConfig {
   buildInfo?: IBuildDiffInfo;
@@ -165,6 +165,6 @@ export const viewChangesLinkWrapper: IComponentOptions = {
 };
 
 export const VIEW_CHANGES_LINK = 'spinnaker.diffs.view.changes.link';
-module(VIEW_CHANGES_LINK, [COMMIT_HISTORY_COMPONENT, JAR_DIFF_COMPONENT, EXECUTION_SERVICE])
+module(VIEW_CHANGES_LINK, [EXECUTION_SERVICE])
   .component('viewChangesLink', viewChangesLink)
   .component('viewChangesLinkWrapper', viewChangesLinkWrapper);
