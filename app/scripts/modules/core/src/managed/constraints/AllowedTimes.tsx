@@ -57,7 +57,7 @@ const timeWindowToString = (window: AllowedTimeWindow, timeZone = 'PST') => {
   const hoursString = groupHours(window.hours);
   const daysString = groupDays(window.days);
   // A special treatment for PST as it's the most common timezone
-  const prettyTimezone = timeZone === 'America/Los_Angeles' ? 'PST' : timeZone;
+  const prettyTimezone = timeZone === 'America/Los_Angeles' ? 'PST' : timeZone || 'PST';
 
   return `${hoursString.join(', ')} on ${daysString.join(', ')} (${prettyTimezone})`;
 };
@@ -74,12 +74,12 @@ const DeploymentWindow = ({ allowedTimes, timezone }: IAllowedTimesConstraint['a
 
 const getTitle = (constraint: IAllowedTimesConstraint) => {
   switch (constraint.status) {
-    case 'FAIL':
-      return 'Failed to deploy within the allowed windows';
+    case 'OVERRIDE_PASS':
     case 'FORCE_PASS':
       return 'Deployment window constraint was overridden';
     case 'PASS':
       return 'Deployed during one of the allowed windows';
+    case 'FAIL':
     case 'PENDING':
       return `Deployment can only occur during the provided window${
         constraint.attributes.allowedTimes.length > 1 ? 's' : ''

@@ -4,10 +4,12 @@
     "baseUrl": "./src",
     "outDir": "dist",
     "paths": {
-      "titus/*": ["*"]
+      "core/*": ["../node_modules/@spinnaker/core/dist/*"],
+      "titus/*": ["*"],
+      "titus": ["."]
     },
     "rootDir": "./src"
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],
-  "exclude": ["./lib", "./dist", "**/*.spec.*"]
+  "exclude": ["./dist", "**/*.spec.*"]
 }

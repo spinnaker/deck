@@ -3,6 +3,9 @@
   "compilerOptions": {
     "baseUrl": "./src",
     "outDir": "dist",
+    "paths": {
+      "core/*": ["../node_modules/@spinnaker/core/dist/*"]
+    },
     "rootDir": "./src"
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],

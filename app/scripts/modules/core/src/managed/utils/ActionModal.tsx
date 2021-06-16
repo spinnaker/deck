@@ -12,7 +12,7 @@ import {
 } from 'core/presentation';
 
 import { Button } from '../Button';
-import { logEvent } from './logging';
+import { useLogEvent } from './logging';
 
 export interface IArtifactActionModalProps extends IModalComponentProps {
   title: string;
@@ -21,6 +21,7 @@ export interface IArtifactActionModalProps extends IModalComponentProps {
   logCategory?: string;
   onAction: (comment?: string) => Promise<void> | PromiseLike<void>;
   onSuccess?: () => void;
+  error?: string;
 }
 
 export const ActionModal: React.FC<IArtifactActionModalProps> = ({
@@ -34,6 +35,7 @@ export const ActionModal: React.FC<IArtifactActionModalProps> = ({
   logCategory,
   children,
 }) => {
+  const logEvent = useLogEvent(logCategory || 'ActionModal', actionName);
   return (
     <>
       <ModalHeader className="truncate">{title}</ModalHeader>
@@ -41,30 +43,18 @@ export const ActionModal: React.FC<IArtifactActionModalProps> = ({
         initialValues={{}}
         onSubmit={async ({ comment }, { setSubmitting, setStatus }) => {
           if (withComment && !comment) return;
+          logEvent();
           try {
             await onAction(comment);
             onSuccess?.();
-            logCategory &&
-              logEvent({
-                category: [logCategory, actionName].join('::'),
-                action: actionName,
-              });
             closeModal?.();
           } catch (error) {
-            setStatus({ error: error.data });
-            logCategory &&
-              logEvent({
-                category: [logCategory, actionName].join('::'),
-                action: `${actionName} - Failed`,
-              });
+            setStatus({ error });
           } finally {
             setSubmitting(false);
           }
         }}
         render={({ status, isValid, isSubmitting, submitForm }) => {
-          const errorTitle = status?.error?.error;
-          const errorMessage = status?.error?.message;
-
           return (
             <>
               <ModalBody>
@@ -92,8 +82,7 @@ export const ActionModal: React.FC<IArtifactActionModalProps> = ({
                         message={
                           <span className="flex-container-v">
                             <span className="text-bold">Something went wrong:</span>
-                            {errorTitle && <span className="text-semibold">{errorTitle}</span>}
-                            {errorMessage && <span>{errorMessage}</span>}
+                            {status.error.message && <span>{status.error.message}</span>}
                           </span>
                         }
                       />

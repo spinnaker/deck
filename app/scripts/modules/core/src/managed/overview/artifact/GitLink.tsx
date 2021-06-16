@@ -3,7 +3,8 @@ import React from 'react';
 import { HoverablePopover, Markdown } from 'core/presentation';
 
 import { QueryGitMetadata } from '../types';
-import { TOOLTIP_DELAY } from '../../utils/defaults';
+import { tooltipShowHideProps } from '../../utils/defaults';
+import { useLogEvent } from '../../utils/logging';
 
 import './GitLink.less';
 
@@ -16,26 +17,42 @@ export const GitLink = ({ gitMetadata: { commit, commitInfo, pullRequest }, asLi
   const link = pullRequest?.link || commitInfo?.link;
   let message = commitInfo?.message || commit;
   message = (commit ? `[${commit}] ` : ``) + message?.split('\n')[0];
+  const logEvent = useLogEvent('Artifact', 'OpenCommit');
+
   return (
     <div className="GitLink">
       <HoverablePopover
-        wrapperClassName="git-link-inner"
-        delayShow={TOOLTIP_DELAY}
-        delayHide={0}
+        {...tooltipShowHideProps}
+        wrapperClassName="git-link-inner no-underline"
         placement="top"
         Component={() => (
           <div className="git-commit-tooltip">
-            {commit && (
-              <a href={link} target="_blank" className="">
+            {commit && !asLink && (
+              <a
+                href={link}
+                target="_blank"
+                className="horizontal sp-margin-m-bottom"
+                onClick={() => {
+                  logEvent();
+                }}
+              >
                 Open commit {commit}
               </a>
             )}
-            {commitInfo?.message && <Markdown className="sp-margin-m-top" message={commitInfo?.message} />}
+            {commitInfo?.message && <Markdown message={commitInfo?.message} />}
           </div>
         )}
       >
         {asLink ? (
-          <a href={link || '#'} className="commit-message" target="_blank" rel="noopener noreferrer">
+          <a
+            href={link || '#'}
+            className="commit-message"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => {
+              logEvent();
+            }}
+          >
             {message}
           </a>
         ) : (

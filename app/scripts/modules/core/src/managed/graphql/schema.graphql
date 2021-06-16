@@ -17,6 +17,7 @@ type MdEnvironment {
   id: String!
   name: String!
   state: MdEnvironmentState!
+  isPreview: Boolean
 }
 
 type MdEnvironmentState {
@@ -43,7 +44,11 @@ type MdArtifact {
   name: String!
   type: String!
   reference: String!
-  versions(statuses: [MdArtifactStatusInEnvironment!], versions: [String!]): [MdArtifactVersionInEnvironment!]
+  versions(
+    statuses: [MdArtifactStatusInEnvironment!]
+    versions: [String!]
+    limit: Int
+  ): [MdArtifactVersionInEnvironment!]
   pinnedVersion: MdPinnedVersion
 }
 
@@ -55,6 +60,7 @@ type MdArtifactVersionInEnvironment {
   deployedAt: InstantTime
   resources: [MdResource!]
   gitMetadata: MdGitMetadata
+  packageDiff: MdPackageDiff
   environment: String
   reference: String!
   status: MdArtifactStatusInEnvironment
@@ -62,6 +68,13 @@ type MdArtifactVersionInEnvironment {
   constraints: [MdConstraint!]
   verifications: [MdAction!]
   postDeploy: [MdAction!]
+  veto: MdVersionVeto
+}
+
+type MdVersionVeto {
+  vetoedBy: String
+  vetoedAt: InstantTime
+  comment: String
 }
 
 enum MdLifecycleEventScope {
@@ -119,6 +132,23 @@ type MdCommitInfo {
   sha: String
   link: String
   message: String
+}
+
+type MdPackageDiff {
+  added: [MdPackageAndVersion!]
+  removed: [MdPackageAndVersion!]
+  changed: [MdPackageAndVersionChange!]
+}
+
+type MdPackageAndVersion {
+  package: String!
+  version: String!
+}
+
+type MdPackageAndVersionChange {
+  package: String!
+  oldVersion: String!
+  newVersion: String!
 }
 
 enum MdResourceActuationStatus {
@@ -199,7 +229,8 @@ enum MdActionType {
 
 type MdAction {
   id: String!
-  type: String!
+  actionId: String!
+  type: String! # Deprecated
   status: MdActionStatus!
   startedAt: InstantTime
   completedAt: InstantTime
@@ -214,6 +245,16 @@ type Mutation {
   markArtifactVersionAsBad(payload: MdArtifactVersionActionPayload!): Boolean
   unpinArtifactVersion(payload: MdUnpinArtifactVersionPayload!): Boolean
   markArtifactVersionAsGood(payload: MdMarkArtifactVersionAsGoodPayload!): Boolean
+  retryArtifactVersionAction(payload: MdRetryArtifactActionPayload): MdAction
+}
+
+input MdRetryArtifactActionPayload {
+  application: String!
+  environment: String!
+  reference: String!
+  version: String!
+  actionId: String!
+  actionType: MdActionType!
 }
 
 input MdConstraintStatusPayload {

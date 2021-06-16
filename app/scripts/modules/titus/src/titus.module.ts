@@ -5,7 +5,7 @@ import { CloudProviderRegistry, DeploymentStrategyRegistry } from '@spinnaker/co
 
 import './help/titus.help';
 import { TitusInstanceDetails } from './instance/details/TitusInstanceDetails';
-import logo from './logo/titus.logo.png';
+import titusLogo from './logo/titus.logo.png';
 import { TITUS_PIPELINE_STAGES_BAKE_TITUSBAKESTAGE } from './pipeline/stages/bake/titusBakeStage';
 import { TITUS_PIPELINE_STAGES_CLONESERVERGROUP_TITUSCLONESERVERGROUPSTAGE } from './pipeline/stages/cloneServerGroup/titusCloneServerGroupStage';
 import { TITUS_PIPELINE_STAGES_DESTROYASG_TITUSDESTROYASGSTAGE } from './pipeline/stages/destroyAsg/titusDestroyAsgStage';
@@ -29,6 +29,14 @@ import { TITUS_SERVERGROUP_SERVERGROUP_TRANSFORMER } from './serverGroup/serverG
 import './validation/ApplicationNameValidator';
 
 import './logo/titus.logo.less';
+
+/* Start - Rollup Remove */
+// load all templates into the $templateCache
+const templates = require.context('./', true, /\.html$/);
+templates.keys().forEach(function (key) {
+  templates(key);
+});
+/* End - Rollup Remove */
 
 export const TITUS_MODULE = 'spinnaker.titus';
 module(TITUS_MODULE, [
@@ -54,7 +62,7 @@ module(TITUS_MODULE, [
   CloudProviderRegistry.registerProvider('titus', {
     name: 'Titus',
     logo: {
-      path: logo,
+      path: titusLogo,
     },
     serverGroup: {
       transformer: 'titusServerGroupTransformer',

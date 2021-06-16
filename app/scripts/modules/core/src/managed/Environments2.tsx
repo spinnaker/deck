@@ -1,14 +1,59 @@
-import { UIView, useSref } from '@uirouter/react';
+import { UIView, useCurrentStateAndParams, useSref } from '@uirouter/react';
 import React from 'react';
 
 import { HorizontalTabs } from 'core/presentation/horizontalTabs/HorizontalTabs';
 
+import { EnvironmentsDirectionController } from './environmentBaseElements/EnvironmentsRender';
 import { Routes } from './managed.states';
+import { useLogEvent } from './utils/logging';
 
 import './Environments2.less';
 import './overview/baseStyles.less';
 
-export const featureFlag = 'MD_new_ui';
+export const uiFeatureFlag = {
+  key: 'MD_old_ui',
+  value: '1',
+};
+
+export const getIsNewUI = () => {
+  return localStorage.getItem(uiFeatureFlag.key) !== uiFeatureFlag.value;
+};
+
+export const toggleIsNewUI = () => {
+  const isNew = getIsNewUI();
+  if (isNew) {
+    localStorage.setItem(uiFeatureFlag.key, uiFeatureFlag.value);
+  } else {
+    localStorage.removeItem(uiFeatureFlag.key);
+  }
+};
+
+export const UISwitcher = () => {
+  const { state, params } = useCurrentStateAndParams();
+  const isNewUI = getIsNewUI();
+  const logEvent = useLogEvent('uiSwitcher');
+
+  const newUIstate =
+    'home.applications.application.environments' +
+    (state.name?.endsWith('.artifactVersion') ? '.history' : '.overview');
+
+  const { href, onClick } = useSref(isNewUI ? 'home.applications.application.environments' : newUIstate || '', params, {
+    reload: true,
+  });
+  return (
+    <a
+      href={href}
+      onClick={(e) => {
+        toggleIsNewUI();
+        logEvent({ action: isNewUI ? 'SwitchToOld' : 'SwitchToNew' });
+        onClick(e);
+      }}
+      className="ui-switcher"
+    >
+      {isNewUI ? 'Switch to old view' : 'Try out our new UI'}
+    </a>
+  );
+};
 
 const tabsInternal: { [key in Routes]: string } = {
   overview: 'Overview',
@@ -20,22 +65,21 @@ const tabs = Object.entries(tabsInternal).map(([key, title]) => ({ title, path: 
 
 // TODO: this is a temporary name until we remove the old view
 export const Environments2 = () => {
-  const { href } = useSref('home.applications.application.environments', { new_ui: '0' });
+  const logEvent = useLogEvent('EnvironmentsTab');
+  const { state } = useCurrentStateAndParams();
+
   return (
     <div className="vertical Environments2">
-      <HorizontalTabs tabs={tabs} />
+      <HorizontalTabs
+        tabs={tabs}
+        rightElement={!state.name?.endsWith('.config') ? <EnvironmentsDirectionController /> : undefined}
+        onClick={({ title, path }) => {
+          logEvent({ action: `Open_${title}`, data: { path } });
+        }}
+      />
       <UIView />
       {/* Some padding at the bottom */}
       <div style={{ minHeight: 32, minWidth: 32 }} />
-      <a
-        href={href}
-        onClick={() => {
-          localStorage.removeItem(featureFlag);
-        }}
-        style={{ position: 'absolute', bottom: 4, right: 36 }}
-      >
-        Switch to old view
-      </a>
     </div>
   );
 };

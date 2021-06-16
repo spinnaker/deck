@@ -4,9 +4,9 @@ import { Modal } from 'react-bootstrap';
 import { PlatformHealthOverride } from 'core/application/modal/PlatformHealthOverride';
 import { ModalClose } from 'core/modal';
 import { IModalComponentProps, Markdown, useEscapeKeyPressed } from 'core/presentation';
-import { NgReact } from 'core/reactShims';
-import { TaskMonitor, TaskReason, UserVerification } from 'core/task';
+import { TaskMonitor, TaskMonitorWrapper, TaskReason, UserVerification } from 'core/task';
 import { MultiTaskMonitor } from 'core/task/monitor/MultiTaskMonitor';
+import { Spinner } from 'core/widgets/spinners/Spinner';
 
 import { IConfirmationModalPassthroughProps } from './confirmationModal.service';
 
@@ -77,7 +77,6 @@ export const ConfirmModal = (props: IConfirmModalProps) => {
     }
   };
 
-  const { TaskMonitorWrapper, ButtonBusyIndicator } = NgReact;
   const showReasonInput = ((taskMonitor || taskMonitors) && props.askForReason) || props.submitJustWithReason;
   const showBody =
     (isRetry && props.retryBody) ||
@@ -133,7 +132,7 @@ export const ConfirmModal = (props: IConfirmModalProps) => {
           {props.cancelButtonText}
         </button>
         <button className="btn btn-primary" type="button" onClick={submit} disabled={isDisabled}>
-          {isSubmitting && <ButtonBusyIndicator />}
+          {isSubmitting && <Spinner mode="circular" />}
           {props.buttonText}
         </button>
       </Modal.Footer>

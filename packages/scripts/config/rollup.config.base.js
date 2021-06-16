@@ -1,3 +1,4 @@
+const colorMap = require('@spinnaker/styleguide/src/colorMap');
 const { nodeResolve } = require('@rollup/plugin-node-resolve');
 const commonjs = require('@rollup/plugin-commonjs');
 const json = require('@rollup/plugin-json');
@@ -6,7 +7,9 @@ const replace = require('@rollup/plugin-replace');
 const { terser } = require('rollup-plugin-terser');
 const typescript = require('@rollup/plugin-typescript');
 const url = require('@rollup/plugin-url');
+const svgr = require('@svgr/rollup').default;
 const autoPrefixer = require('autoprefixer');
+const postCssColorFix = require('postcss-colorfix');
 const postCssNested = require('postcss-nested');
 const postCssUrl = require('postcss-url');
 const { visualizer } = require('rollup-plugin-visualizer');
@@ -26,7 +29,8 @@ const plugins = [
   json(),
   url({
     include: ['**/*.html', '**/*.svg', '**/*.png', '**/*.jp(e)?g', '**/*.gif', '**/*.webp'],
-    fileName: '[dirname][hash][extname]',
+    fileName: '[name][hash][extname]',
+    limit: 24000,
   }),
   // Replace literal string 'process.env.NODE_ENV' with the current NODE_ENV
   replace({
@@ -37,10 +41,14 @@ const plugins = [
     // In watch mode, always emit javascript even with errors (otherwise rollup will terminate)
     noEmitOnError: !ROLLUP_WATCH,
   }),
+  svgr(),
   // import from .css, .less, and inject into the document <head></head>
   postCss({
     plugins: [
       autoPrefixer(),
+      postCssColorFix({
+        colors: colorMap,
+      }),
       postCssNested(),
       postCssUrl({
         url: 'inline',

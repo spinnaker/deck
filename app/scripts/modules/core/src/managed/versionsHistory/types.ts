@@ -1,11 +1,15 @@
 import { DateTime } from 'luxon';
-import { FetchVersionsHistoryQuery } from '../graphql/graphql-sdk';
+import { FetchVersionQuery, FetchVersionsHistoryQuery } from '../graphql/graphql-sdk';
 
 export type HistoryEnvironment = NonNullable<FetchVersionsHistoryQuery['application']>['environments'][number];
 export type HistoryArtifact = NonNullable<HistoryEnvironment['state']['artifacts']>[number];
 export type HistoryArtifactVersion = NonNullable<HistoryArtifact['versions']>[number];
 
-export interface VersionInEnvironment extends HistoryArtifactVersion {
+export type SingleVersionEnvironment = NonNullable<FetchVersionQuery['application']>['environments'][number];
+export type SingleVersionArtifact = NonNullable<SingleVersionEnvironment['state']['artifacts']>[number];
+export type SingleVersionArtifactVersion = NonNullable<SingleVersionArtifact['versions']>[number];
+
+export interface HistoryArtifactVersionExtended extends HistoryArtifactVersion {
   reference: string;
   type: string;
 }
@@ -15,7 +19,9 @@ export interface VersionData {
   buildNumbers: Set<string>;
   versions: Set<string>;
   createdAt?: DateTime;
-  environments: { [env: string]: VersionInEnvironment[] };
+  isBaking?: boolean;
+  isFocused?: boolean;
+  environments: { [env: string]: { versions: HistoryArtifactVersionExtended[]; isPinned?: boolean } };
   gitMetadata?: HistoryArtifactVersion['gitMetadata'];
   key: string;
 }

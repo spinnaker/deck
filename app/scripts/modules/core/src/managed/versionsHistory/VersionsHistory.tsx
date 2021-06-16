@@ -1,3 +1,4 @@
+import { RawParams, useCurrentStateAndParams, useRouter } from '@uirouter/react';
 import { sortBy } from 'lodash';
 import { DateTime } from 'luxon';
 import React from 'react';
@@ -5,11 +6,13 @@ import React from 'react';
 import { CollapsibleSection, useApplicationContextSafe } from 'core/presentation';
 import { Spinner } from 'core/widgets';
 
+import { ApplicationQueryError } from '../ApplicationQueryError';
 import { VersionContent } from './VersionContent';
 import { VersionHeading } from './VersionHeading';
 import { ManagementWarning } from '../config/ManagementWarning';
 import { useFetchVersionsHistoryQuery } from '../graphql/graphql-sdk';
-import { HistoryEnvironment, PinnedVersions, VersionData } from './types';
+import { isBaking } from '../overview/artifact/utils';
+import { HistoryArtifactVersion, HistoryEnvironment, PinnedVersions, VersionData } from './types';
 import { spinnerProps } from '../utils/defaults';
 
 import './VersionsHistory.less';
@@ -33,8 +36,17 @@ const setValueIfMissing = <Obj extends Record<string, any>, Key extends keyof Ob
   }
 };
 
-// TODO: write tests
-const groupVersionsByShaOrBuild = (environments: HistoryEnvironment[]) => {
+const getIsFocused = (version: HistoryArtifactVersion, params: RawParams) => {
+  if (params.sha && params.sha === version.gitMetadata?.commit) {
+    return true;
+  }
+  if (params.version?.includes(version.version)) {
+    return true;
+  }
+  return false;
+};
+
+const groupVersionsByShaOrBuild = (environments: HistoryEnvironment[], params: RawParams) => {
   const groupedVersions: GroupedVersions = {};
   for (const env of environments) {
     for (const artifact of env.state.artifacts || []) {
@@ -49,6 +61,15 @@ const groupVersionsByShaOrBuild = (environments: HistoryEnvironment[]) => {
         if (version.buildNumber) {
           groupedVersions[key].buildNumbers.add(version.buildNumber);
         }
+
+        if (isBaking(version)) {
+          groupedVersions[key].isBaking = true;
+        }
+
+        if (getIsFocused(version, params)) {
+          groupedVersions[key].isFocused = true;
+        }
+
         groupedVersions[key].versions.add(version.version);
 
         setValueIfMissing(groupedVersions[key], 'createdAt', undefined, () =>
@@ -58,9 +79,12 @@ const groupVersionsByShaOrBuild = (environments: HistoryEnvironment[]) => {
 
         const buildEnvironments = groupedVersions[key].environments;
         if (!buildEnvironments[env.name]) {
-          buildEnvironments[env.name] = [];
+          buildEnvironments[env.name] = { versions: [] };
         }
-        buildEnvironments[env.name].push({ ...version, reference: artifact.reference, type: artifact.type });
+        if (artifact.pinnedVersion?.version === version.version) {
+          buildEnvironments[env.name].isPinned = true;
+        }
+        buildEnvironments[env.name].versions.push({ ...version, reference: artifact.reference, type: artifact.type });
       }
     }
   }
@@ -82,9 +106,10 @@ const getPinnedVersions = (environments: HistoryEnvironment[]) => {
 
 export const VersionsHistory = () => {
   const app = useApplicationContextSafe();
+  const { params } = useCurrentStateAndParams();
 
   const { data, error, loading } = useFetchVersionsHistoryQuery({
-    variables: { appName: app.name },
+    variables: { appName: app.name, limit: 100 }, // Fetch the last 100 versions
   });
 
   if (loading && !data) {
@@ -92,31 +117,53 @@ export const VersionsHistory = () => {
   }
 
   if (error) {
-    console.warn(error);
-    return <div style={{ width: '100%' }}>Failed to load history, please refresh and try again.</div>;
+    return <ApplicationQueryError hasApplicationData={Boolean(data?.application)} error={error} />;
   }
 
-  const groupedVersions = groupVersionsByShaOrBuild(data?.application?.environments || []);
+  const groupedVersions = groupVersionsByShaOrBuild(data?.application?.environments || [], params);
   const pinnedVersions = getPinnedVersions(data?.application?.environments || []);
 
   return (
     <main className="VersionsHistory">
       <ManagementWarning appName={app.name} />
       {groupedVersions.map((group) => {
-        return (
-          <div key={group.key}>
-            <CollapsibleSection
-              outerDivClassName="version-item"
-              toggleClassName="version-toggle"
-              bodyClassName="version-body"
-              expandIconType="plus"
-              heading={({ chevron }) => <VersionHeading group={group} chevron={chevron} />}
-            >
-              <VersionContent versionData={group} pinnedVersions={pinnedVersions} />
-            </CollapsibleSection>
-          </div>
-        );
+        return <SingleVersion key={group.key} versionData={group} pinnedVersions={pinnedVersions} />;
       })}
     </main>
+  );
+};
+
+interface ISingleVersionProps {
+  versionData: VersionData;
+  pinnedVersions?: PinnedVersions;
+}
+
+const SingleVersion = ({ versionData, pinnedVersions }: ISingleVersionProps) => {
+  const ref = React.useRef<HTMLDivElement>(null);
+  const routerState = useRouter().stateService;
+
+  React.useEffect(() => {
+    if (versionData.isFocused && ref.current) {
+      ref.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, []);
+
+  return (
+    <div ref={ref}>
+      <CollapsibleSection
+        outerDivClassName="version-item"
+        toggleClassName="version-toggle"
+        bodyClassName="version-body"
+        expandIconType="arrowCross"
+        defaultExpanded={versionData.isFocused}
+        heading={({ chevron }) => <VersionHeading group={versionData} chevron={chevron} />}
+        onToggle={(isExpanded) => {
+          if (!isExpanded) return;
+          routerState.go('.', { sha: versionData.key }, { location: 'replace' });
+        }}
+      >
+        <VersionContent versionData={versionData} pinnedVersions={pinnedVersions} />
+      </CollapsibleSection>
+    </div>
   );
 };

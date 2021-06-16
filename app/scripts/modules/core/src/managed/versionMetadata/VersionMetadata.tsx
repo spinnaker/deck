@@ -4,36 +4,69 @@ import { IconTooltip } from 'core/presentation';
 
 import {
   BaseVersionMetadata,
-  DeployingBadge,
   IVersionMetadataProps,
+  MetadataBadge,
   MetadataElement,
-  PinnedBadge,
+  toVetoedMetadata,
   VersionAuthor,
   VersionBuilds,
   VersionCreatedAt,
+  VersionMessage,
   VersionMetadataActions,
 } from './MetadataComponents';
-import { RelativeTimestamp } from '../RelativeTimestamp';
-import { TOOLTIP_DELAY } from '../utils/defaults';
+import { formatToRelativeTimestamp, RelativeTimestamp } from '../RelativeTimestamp';
+import { getLifecycleEventDuration, getLifecycleEventLink, getLifecycleEventSummary } from '../overview/artifact/utils';
+import { QueryArtifactVersion } from '../overview/types';
+import { TOOLTIP_DELAY_SHOW } from '../utils/defaults';
+import { SingleVersionArtifactVersion } from '../versionsHistory/types';
+
+export const getBaseMetadata = (
+  version: QueryArtifactVersion | SingleVersionArtifactVersion,
+): Omit<Partial<IVersionMetadataProps>, 'version'> & Pick<IVersionMetadataProps, 'version'> => {
+  return {
+    version: version.version,
+    sha: version.gitMetadata?.commit,
+    build: {
+      buildNumber: version.buildNumber,
+      buildLink: getLifecycleEventLink(version, 'BUILD'),
+      version: version.version,
+    },
+    author: version.gitMetadata?.author,
+    deployedAt: version.deployedAt,
+    buildDuration: getLifecycleEventDuration(version, 'BUILD'),
+    isDeploying: version.status === 'DEPLOYING',
+    baking: getLifecycleEventSummary(version, 'BAKE'),
+    vetoed: version.veto ? toVetoedMetadata(version.veto) : undefined,
+  };
+};
 
 export const VersionMetadata = ({
-  buildNumber,
-  buildLink,
+  version,
+  sha,
+  build,
   author,
   deployedAt,
   createdAt,
   buildDuration,
   buildsBehind,
+  baking,
   isDeploying,
-  isPinned,
+  pinned,
+  vetoed,
   actions,
 }: IVersionMetadataProps) => {
   return (
     <BaseVersionMetadata>
-      {isDeploying && <DeployingBadge />}
-      {isPinned && <PinnedBadge />}
-
-      {buildNumber && <VersionBuilds builds={[{ buildNumber, buildLink }]} />}
+      {isDeploying && <MetadataBadge type="deploying" />}
+      {baking?.isRunning && (
+        <MetadataBadge
+          type="baking"
+          link={baking.link}
+          tooltip={`${baking.startedAt ? formatToRelativeTimestamp(baking.startedAt, true) : ''} (Click to view task)`}
+        />
+      )}
+      {build?.buildNumber && <VersionBuilds builds={[build]} />}
+      <VersionCreatedAt createdAt={createdAt} linkProps={sha ? { sha } : { version }} />
       <VersionAuthor author={author} />
       {deployedAt && (
         <MetadataElement>
@@ -42,12 +75,11 @@ export const VersionMetadata = ({
             name="cloudDeployed"
             size="12px"
             wrapperClassName="metadata-icon"
-            delayShow={TOOLTIP_DELAY}
+            delayShow={TOOLTIP_DELAY_SHOW}
           />
-          <RelativeTimestamp timestamp={deployedAt} delayShow={TOOLTIP_DELAY} removeStyles withSuffix />
+          <RelativeTimestamp timestamp={deployedAt} delayShow={TOOLTIP_DELAY_SHOW} removeStyles withSuffix />
         </MetadataElement>
       )}
-      <VersionCreatedAt createdAt={createdAt} />
       {buildDuration && (
         <MetadataElement>
           <IconTooltip
@@ -55,7 +87,7 @@ export const VersionMetadata = ({
             name="build"
             size="12px"
             wrapperClassName="metadata-icon"
-            delayShow={TOOLTIP_DELAY}
+            delayShow={TOOLTIP_DELAY_SHOW}
           />
           {buildDuration}
         </MetadataElement>
@@ -65,7 +97,9 @@ export const VersionMetadata = ({
           {buildsBehind} build{buildsBehind > 1 ? 's' : ''} behind
         </MetadataElement>
       ) : null}
-      {actions && <VersionMetadataActions id={`${buildNumber}-actions`} actions={actions} />}
+      {actions && <VersionMetadataActions id={`${build?.buildNumber}-actions`} actions={actions} />}
+      {pinned && <VersionMessage type="pinned" data={pinned} />}
+      {vetoed && <VersionMessage type="vetoed" data={vetoed} />}
     </BaseVersionMetadata>
   );
 };
