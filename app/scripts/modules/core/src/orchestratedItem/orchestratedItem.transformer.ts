@@ -1,4 +1,5 @@
 import { formatDistance } from 'date-fns';
+import { isNil } from 'lodash';
 import { $log } from 'ngimport';
 
 import { IOrchestratedItem, IOrchestratedItemVariable, ITask, ITaskStep } from 'core/domain';
@@ -18,6 +19,10 @@ export class OrchestratedItemTransformer {
     });
   }
 
+  private static shouldReplace(previousValue: any, currentValue: any): boolean {
+    return (isNil(previousValue) || previousValue === '') && !(isNil(currentValue) || currentValue === '');
+  }
+
   public static defineProperties(item: any): void {
     // Don't try to add properties more than once - but also don't blow up if something tries to do so
     const testDescriptor: PropertyDescriptor = Object.getOwnPropertyDescriptor(item, 'runningTime');
@@ -29,9 +34,23 @@ export class OrchestratedItemTransformer {
       if (item.context) {
         return item.context[key];
       }
+
+      // Relying on stage contexts and not variables can reduce task payload significantly
+      const stages = item.execution?.stages;
+      if (stages && Array.isArray(stages)) {
+        const maybeValue = (stages as any[])
+          .map((stage) => stage.context && stage.context[key])
+          .reduce((prev, curr) => (OrchestratedItemTransformer.shouldReplace(prev, curr) ? curr : prev));
+
+        if (!isNil(maybeValue) && maybeValue !== '') {
+          return maybeValue;
+        }
+      }
+
       if (!item.variables) {
         return null;
       }
+
       const match: IOrchestratedItemVariable = item.variables.find(
         (variable: IOrchestratedItemVariable) => variable.key === key,
       );
