@@ -1,5 +1,5 @@
 import { formatDistance } from 'date-fns';
-import { isNil } from 'lodash';
+import { get, isNil } from 'lodash';
 import { $log } from 'ngimport';
 
 import { IOrchestratedItem, IOrchestratedItemVariable, ITask, ITaskStep } from 'core/domain';
@@ -35,18 +35,6 @@ export class OrchestratedItemTransformer {
         return item.context[key];
       }
 
-      // Relying on stage contexts and not variables can reduce task payload significantly
-      const stages = item.execution?.stages;
-      if (stages && Array.isArray(stages)) {
-        const maybeValue = (stages as any[])
-          .map((stage) => stage.context && stage.context[key])
-          .reduce((prev, curr) => (OrchestratedItemTransformer.shouldReplace(prev, curr) ? curr : prev));
-
-        if (!isNil(maybeValue) && maybeValue !== '') {
-          return maybeValue;
-        }
-      }
-
       if (!item.variables) {
         return null;
       }
@@ -54,6 +42,24 @@ export class OrchestratedItemTransformer {
       const match: IOrchestratedItemVariable = item.variables.find(
         (variable: IOrchestratedItemVariable) => variable.key === key,
       );
+      if (match) {
+        return match.value;
+      }
+
+      // Fallback to stage context if not found in variables
+      const stages = item.execution?.stages;
+      if (stages && Array.isArray(stages)) {
+        const maybeValue = (stages as any[])
+          .map((stage) => stage.context && get(stage.context, key))
+          .reduce((prev, curr) => (OrchestratedItemTransformer.shouldReplace(prev, curr) ? curr : prev));
+
+        if (!isNil(maybeValue) && maybeValue !== '') {
+          // Memoize back into variables
+          item.variables.push({ key, value: maybeValue } as IOrchestratedItemVariable);
+          return maybeValue;
+        }
+      }
+
       return match ? match.value : null;
     };
 
