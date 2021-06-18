@@ -105,7 +105,7 @@ export const Resource = ({ resource, environment }: { resource: QueryResource; e
       className="Resource"
       title={<ResourceTitle props={resourceLinkProps} />}
     >
-      <div className="resource-metadata">
+      <div className="resource-metadata delimited-elements">
         <span>
           {regions.map((region, index) => (
             <span key={region}>
