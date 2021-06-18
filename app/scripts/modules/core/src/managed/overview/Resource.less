@@ -16,9 +16,25 @@
 
     .tasks-list {
       margin-top: var(--xs-spacing);
-      padding-left: 18px;
+      padding-left: 0;
       margin-bottom: 0;
-      list-style: circle;
+      list-style-type: none;
+    }
+
+    .task-runtime {
+      font-size: 12px;
+      margin-right: var(--xs-spacing);
+    }
+
+    .resource-task {
+      display: grid;
+      grid-template-columns: 14px auto;
+      column-gap: 6px;
+      align-items: flex-start;
+
+      & > i {
+        margin-top: 2px;
+      }
     }
   }
 }

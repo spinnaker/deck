@@ -1,9 +1,9 @@
-import { UISref } from '@uirouter/react';
 import React from 'react';
 
 import { Icon, useApplicationContextSafe } from 'core/presentation';
 import { Spinner } from 'core/widgets';
 
+import { ResourceTask } from './ResourceTask';
 import { EnvironmentItem } from '../environmentBaseElements/EnvironmentItem';
 import { MdResourceActuationState, useFetchResourceStatusQuery } from '../graphql/graphql-sdk';
 import { showManagedResourceHistoryModal } from '../resourceHistory/ManagedResourceHistoryModal';
@@ -65,11 +65,7 @@ const Status = ({
           {Boolean(state.tasks?.length) && (
             <ul className="tasks-list">
               {state.tasks?.map(({ id, name }) => (
-                <li key={id}>
-                  <UISref to="home.applications.application.tasks.taskDetails" params={{ taskId: id }}>
-                    <a>{name}</a>
-                  </UISref>
-                </li>
+                <ResourceTask key={id} id={id} name={name} />
               ))}
             </ul>
           )}
