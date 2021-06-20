@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@spinnaker/core": "^0.0.599",
-    "angular": "1.6.10"
+    "angular": "1.8.0"
   },
   "devDependencies": {
     "@spinnaker/eslint-plugin": "1.0.13",
