@@ -1,15 +1,18 @@
 import React from 'react';
 
-import { showModal } from 'core/presentation';
+import { useApplicationContextSafe, useShowModal } from 'core/presentation';
 
 import { ResumeManagementModal } from './Configuration';
 import { useFetchApplicationManagementStatusQuery, useToggleManagementMutation } from '../graphql/graphql-sdk';
 import { MODAL_MAX_WIDTH } from '../utils/defaults';
+
 import './ManagementWarning.less';
 
-export const ManagementWarning = ({ appName }: { appName: string }) => {
+export const ManagementWarning = () => {
+  const appName = useApplicationContextSafe().name;
   const { data, refetch } = useFetchApplicationManagementStatusQuery({ variables: { appName } });
   const [toggleManagement] = useToggleManagementMutation();
+  const showModal = useShowModal();
 
   const onClick = React.useCallback(() => {
     showModal(
