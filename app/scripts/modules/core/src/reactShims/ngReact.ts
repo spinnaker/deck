@@ -3,8 +3,7 @@ import React from 'react';
 
 import { IViewChangesLinkProps } from 'core/diffs/ViewChangesLink';
 import { viewChangesLinkWrapper } from 'core/diffs/viewChangesLink.component';
-import { IEntitySourceProps } from 'core/entityTag/EntitySource';
-import { entitySourceComponent } from 'core/entityTag/entitySource.component';
+import { EntitySource as EntitySourceComponent, IEntitySourceProps } from 'core/entityTag/EntitySource';
 import { INumberListProps } from 'core/forms/numberList/NumberList';
 import { numberListWrapperComponent } from 'core/forms/numberList/numberList.component';
 import { ITargetSelectProps, targetSelectComponent } from 'core/pipeline/config/targetSelect.component';
@@ -21,7 +20,6 @@ import { ITaskMonitorProps } from 'core/task/monitor/TaskMonitorWrapper';
 import { TaskMonitorWrapper } from 'core/task/monitor/TaskMonitorWrapper';
 import { IAccountRegionClusterSelectorProps } from 'core/widgets/AccountRegionClusterSelector';
 import { accountRegionClusterSelectorWrapperComponent } from 'core/widgets/accountRegionClusterSelectorWrapper.component';
-import { ButtonBusyIndicator as ButtonBusyIndicatorComponent } from 'core/widgets/spinners/Spinner';
 
 import { ReactInject } from './react.injector';
 
@@ -33,17 +31,14 @@ export class NgReactInjector extends ReactInject {
 
   // Reactified components
   public AccountRegionClusterSelector: React.ComponentClass<IAccountRegionClusterSelectorProps> = angular2react('accountRegionClusterSelectorWrapper', accountRegionClusterSelectorWrapperComponent, this.$injectorProxy) as any;
-  public ButtonBusyIndicator: React.FunctionComponent<{}>                               = ButtonBusyIndicatorComponent;
-  public EntitySource: React.ComponentClass<IEntitySourceProps>                                 = angular2react('entitySource', entitySourceComponent, this.$injectorProxy) as any;
+  public EntitySource: React.FunctionComponent<IEntitySourceProps>                                 = EntitySourceComponent;
   public InstanceArchetypeSelector: React.ComponentClass<IInstanceArchetypeSelectorProps>       = angular2react('v2InstanceArchetypeSelector', v2InstanceArchetypeSelector, this.$injectorProxy) as any;
   public InstanceTypeSelector: React.ComponentClass<IInstanceTypeSelectorProps>                 = angular2react('v2InstanceTypeSelector', v2InstanceTypeSelector, this.$injectorProxy);
-  public LegacySpinner: React.FunctionComponent<{}>                               = ButtonBusyIndicatorComponent;
   public NumberList: React.ComponentClass<INumberListProps>                                     = angular2react('numberListWrapper', numberListWrapperComponent, this.$injectorProxy) as any;
   public StageSummaryWrapper: React.ComponentClass<IStageSummaryWrapperProps>                   = angular2react('stageSummary', stageSummaryComponent, this.$injectorProxy) as any;
   public StepExecutionDetailsWrapper: React.ComponentClass<IStepExecutionDetailsWrapperProps>   = angular2react('stepExecutionDetails', stepExecutionDetailsComponent, this.$injectorProxy) as any;
   public TargetSelect: React.ComponentClass<ITargetSelectProps>                                 = angular2react('targetSelect', targetSelectComponent, this.$injectorProxy) as any;
   public TaskMonitorWrapper: React.FunctionComponent<ITaskMonitorProps>                         = TaskMonitorWrapper;
-  public UserMenu: React.ComponentClass<{}>                                                     = angular2react('userMenu', {}, this.$injectorProxy) as any;
   public ViewChangesLink: React.ComponentClass<IViewChangesLinkProps>                           = angular2react('viewChangesLinkWrapper', viewChangesLinkWrapper, this.$injectorProxy) as any;
 
   public initialize($injector: IInjectorService) {
