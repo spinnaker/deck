@@ -3,12 +3,12 @@ import React from 'react';
 import './MessageBox.less';
 
 interface IMessageBoxProps {
-  type?: 'warning' | 'error';
+  type?: 'SUCCESS' | 'INFO' | 'WARNING' | 'ERROR';
 }
 
-const typeToClassName: { [key in Required<IMessageBoxProps>['type']]: string } = {
-  error: 'fas fa-times',
-  warning: 'fas fa-exclamation',
+const typeToClassName: { [key in Required<IMessageBoxProps>['type']]?: string } = {
+  ERROR: 'fas fa-times',
+  WARNING: 'fas fa-exclamation',
 };
 
 export const MessageBox: React.FC<IMessageBoxProps> = ({ children, type }) => {

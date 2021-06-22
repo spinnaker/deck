@@ -30,7 +30,7 @@ export const ManagementWarning = ({ appName }: { appName: string }) => {
 
   if (data?.application?.isPaused) {
     return (
-      <MessageBox type="warning">
+      <MessageBox type="WARNING">
         Application management is disabled.{' '}
         <a
           href="#"
