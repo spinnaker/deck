@@ -3,6 +3,7 @@ import React from 'react';
 import { useApplicationContextSafe } from 'core/presentation';
 
 import { MessageBox, MessagesSection } from './MessageBox';
+import { RelativeTimestamp } from '../RelativeTimestamp';
 import { ManagementWarning } from '../config/ManagementWarning';
 import { useFetchNotificationsQuery } from '../graphql/graphql-sdk';
 import { useLogEvent } from '../utils/logging';
@@ -24,13 +25,16 @@ const AppNotifications = () => {
 
   return (
     <MessagesSection>
-      {notifications.map((notification) =>
-        notification ? (
-          <MessageBox key={notification.id} type={notification.level}>
-            {notification.message}
-          </MessageBox>
-        ) : null,
-      )}
+      {notifications.map((notification) => (
+        <MessageBox key={notification.id} type={notification.level}>
+          {notification.message}{' '}
+          {notification.triggeredAt && (
+            <>
+              (<RelativeTimestamp timestamp={notification.triggeredAt} />)
+            </>
+          )}
+        </MessageBox>
+      ))}
     </MessagesSection>
   );
 };
@@ -39,6 +43,7 @@ export const Messages = () => {
   const app = useApplicationContextSafe();
   return (
     <>
+      <AppNotifications />
       <MessagesSection sticky>
         <ManagementWarning appName={app.name} />
       </MessagesSection>
