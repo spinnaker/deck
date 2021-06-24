@@ -22,14 +22,14 @@ export interface IViewChangesLinkProps {
 
 export const ViewChangesLink = ({ changeConfig, linkText, nameItem, viewType }: IViewChangesLinkProps) => {
   const changeConfigValue = changeConfig.metadata.value;
-  const isExecution = changeConfigValue.executionType === 'pipeline';
 
   const fetchExecution = () => {
+    const isExecution = changeConfigValue.executionType === 'pipeline';
     if (isExecution) {
       return ReactInjector.executionService.getExecution(changeConfigValue.executionId);
     }
     /** A noop promise so `useData` can be utilized */
-    return (new Promise(() => {}) as unknown) as PromiseLike<IExecution>;
+    return (Promise.resolve({}) as unknown) as PromiseLike<IExecution>;
   };
 
   const { result: executionDetails, status } = useData(fetchExecution, {} as IExecution, [
@@ -39,7 +39,7 @@ export const ViewChangesLink = ({ changeConfig, linkText, nameItem, viewType }: 
 
   const stage = (executionDetails.stages || []).find((s: IExecutionStage) => s.id === changeConfigValue.stageId);
   const commits = stage?.context?.commits || changeConfig.commits || [];
-  const jarDiffs = stage ? stage.context.jarDiffs : changeConfig.jarDiffs;
+  const jarDiffs = stage?.context?.jarDiffs || changeConfig.jarDiffs;
   const buildInfo = stage
     ? {
         ...changeConfig.buildInfo,
@@ -47,7 +47,7 @@ export const ViewChangesLink = ({ changeConfig, linkText, nameItem, viewType }: 
       }
     : changeConfig.buildInfo;
 
-  const isLoading = status !== 'RESOLVED';
+  const isLoaded = status === 'RESOLVED';
   const hasJarDiffs = Object.keys(jarDiffs || {}).some((key: string) => jarDiffs[key].length > 0);
   const hasChanges = hasJarDiffs || commits.length;
 
@@ -66,7 +66,7 @@ export const ViewChangesLink = ({ changeConfig, linkText, nameItem, viewType }: 
     </a>
   );
 
-  if (isLoading || !hasChanges) {
+  if (!isLoaded || !hasChanges) {
     return null;
   }
 
