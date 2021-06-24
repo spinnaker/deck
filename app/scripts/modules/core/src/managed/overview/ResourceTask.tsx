@@ -6,6 +6,7 @@ import { robotToHuman, Tooltip } from 'core/presentation';
 import { LoadingAnimation } from 'core/presentation/LoadingAnimation';
 import { useDataWithRefresh } from 'core/presentation/hooks/useDataWithRefresh.hook';
 import { TaskReader } from 'core/task';
+import { TaskProgressBar } from 'core/task/TaskProgressBar';
 
 import { RelativeTimestamp } from '../RelativeTimestamp';
 import { TOOLTIP_DELAY_SHOW } from '../utils/defaults';
@@ -35,12 +36,13 @@ export const ResourceTask = ({ id, name }: IResourceTaskProps) => {
   return (
     <li key={id} className="resource-task">
       <i className={iconClassnames} />
-      <div className="delimited-elements">
+      <div>
         <UISref to="home.applications.application.tasks.taskDetails" params={{ taskId: id }}>
           <a>{name}</a>
         </UISref>
+        {result && <TaskProgressBar task={result} className="task-progress" />}
         {result && (
-          <>
+          <div className="delimited-elements task-metadata">
             <span>
               <Tooltip value="Started at" delayShow={TOOLTIP_DELAY_SHOW}>
                 <i className="far fa-clock task-runtime" />
@@ -53,7 +55,7 @@ export const ResourceTask = ({ id, name }: IResourceTaskProps) => {
                 <RelativeTimestamp timestamp={currentStage.startTime} withSuffix />)
               </span>
             )}
-          </>
+          </div>
         )}
       </div>
     </li>
