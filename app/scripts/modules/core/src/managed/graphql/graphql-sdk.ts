@@ -587,7 +587,11 @@ export type FetchResourceStatusQuery = { __typename?: 'Query' } & {
                             { __typename?: 'MdResourceActuationState' } & Pick<
                               MdResourceActuationState,
                               'status' | 'reason' | 'event'
-                            >
+                            > & {
+                                tasks?: Maybe<
+                                  Array<{ __typename?: 'MdResourceTask' } & Pick<MdResourceTask, 'id' | 'name'>>
+                                >;
+                              }
                           >;
                         }
                     >
@@ -1065,6 +1069,10 @@ export const FetchResourceStatusDocument = gql`
               status
               reason
               event
+              tasks {
+                id
+                name
+              }
             }
           }
         }
