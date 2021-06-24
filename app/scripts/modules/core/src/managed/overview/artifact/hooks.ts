@@ -1,4 +1,4 @@
-import { showModal } from 'core/presentation';
+import { useShowModal } from 'core/presentation';
 
 import { MarkAsBadActionModal, MarkAsGoodActionModal, PinActionModal, UnpinActionModal } from './ArtifactActionModal';
 import {
@@ -23,6 +23,7 @@ export const useUnpinVersion = ({ version, ...payload }: ActionBasePayload, moda
     variables: { payload: payload },
     refetchQueries: [{ query: FetchPinnedVersionsDocument, variables: { appName: payload.application } }],
   });
+  const showModal = useShowModal();
 
   return () => {
     showModal(
@@ -46,6 +47,7 @@ export const usePinVersion = (payload: ActionBasePayload, modalTitle: string) =>
   const [onPin] = usePinVersionMutation({
     refetchQueries: [{ query: FetchPinnedVersionsDocument, variables: { appName: payload.application } }],
   });
+  const showModal = useShowModal();
 
   return () => {
     showModal(
@@ -71,6 +73,7 @@ export const useMarkVersionAsBad = (payload: ActionBasePayload, modalTitle: stri
       { query: FetchVersionDocument, variables: { appName: payload.application, versions: [payload.version] } },
     ],
   });
+  const showModal = useShowModal();
 
   return () => {
     showModal(
@@ -96,6 +99,7 @@ export const useMarkVersionAsGood = (payload: ActionBasePayload, modalTitle: str
       { query: FetchVersionDocument, variables: { appName: payload.application, versions: [payload.version] } },
     ],
   });
+  const showModal = useShowModal();
 
   return () => {
     showModal(

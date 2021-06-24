@@ -2,6 +2,8 @@ import { UIRouterContextComponent } from '@uirouter/react-hybrid';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+import { Application, ApplicationContextProvider } from 'core/application';
+
 import { IModalProps, Modal } from './Modal';
 
 /** The Modal content Component will be passed these two props */
@@ -51,6 +53,7 @@ export const showModal = <P, C = any, D = any>(
   ModalComponent: React.ComponentType<P & IModalComponentProps<C, D>>,
   componentProps?: P,
   modalProps?: Omit<IModalProps, 'isOpen' | 'onRequestClose' | 'onAfterClose' | 'children'>,
+  application?: Application,
 ): Promise<IModalResult<C, D>> =>
   new Promise<IModalResult<C, D>>((resolve) => {
     let mountNode = document.createElement('div');
@@ -81,11 +84,14 @@ export const showModal = <P, C = any, D = any>(
     const handleRequestClose = () => handleDismiss(null);
 
     function render() {
+      const content = (
+        <UIRouterContextComponent>
+          <ModalComponent {...componentProps} dismissModal={handleDismiss} closeModal={handleClose} />
+        </UIRouterContextComponent>
+      );
       ReactDOM.render(
         <Modal isOpen={show} onRequestClose={handleRequestClose} onAfterClose={onAfterClose} {...modalProps}>
-          <UIRouterContextComponent>
-            <ModalComponent {...componentProps} dismissModal={handleDismiss} closeModal={handleClose} />
-          </UIRouterContextComponent>
+          {application ? <ApplicationContextProvider app={application}>{content}</ApplicationContextProvider> : content}
         </Modal>,
         mountNode,
       );

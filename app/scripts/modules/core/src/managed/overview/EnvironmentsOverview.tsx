@@ -39,7 +39,7 @@ export const EnvironmentsOverview = () => {
   } else {
     content = (
       <>
-        <ManagementWarning appName={app.name} />
+        <ManagementWarning />
         {environments.length ? (
           <>
             <EnvironmentsRender {...regularEnvironmentsProps}>

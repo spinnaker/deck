@@ -2,7 +2,7 @@ import classnames from 'classnames';
 import React from 'react';
 
 import { Illustration } from '@spinnaker/presentation';
-import { showModal, useApplicationContextSafe } from 'core/presentation';
+import { useApplicationContextSafe, useShowModal } from 'core/presentation';
 import { Spinner } from 'core/widgets';
 
 import { ApplicationQueryError } from '../ApplicationQueryError';
@@ -42,6 +42,7 @@ const ManagementToggle = () => {
   const logEvent = useLogEvent('Management');
   const { data, error, loading, refetch } = useFetchApplicationManagementStatusQuery({ variables: { appName } });
   const [toggleManagement, { loading: mutationInFlight }] = useToggleManagementMutation();
+  const showModal = useShowModal();
 
   const onShowToggleManagementModal = React.useCallback((shouldPause: boolean) => {
     logEvent({ action: 'OpenModal', data: { shouldPause } });

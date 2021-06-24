@@ -125,7 +125,7 @@ export const VersionsHistory = () => {
 
   return (
     <main className="VersionsHistory">
-      <ManagementWarning appName={app.name} />
+      <ManagementWarning />
       {groupedVersions.map((group) => {
         return <SingleVersion key={group.key} versionData={group} pinnedVersions={pinnedVersions} />;
       })}

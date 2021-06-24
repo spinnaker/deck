@@ -17,3 +17,4 @@ export * from './useObservable.hook';
 export * from './useObservableValue.hook';
 export * from './usePollingData.hook';
 export * from './usePrevious.hook';
+export * from './useShowModal.hook';
