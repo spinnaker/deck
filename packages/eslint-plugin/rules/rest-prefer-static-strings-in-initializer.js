@@ -1,4 +1,3 @@
-'use strict';
 // @ts-check
 
 /**
@@ -9,13 +8,13 @@
  * @typedef {import('estree').ImportSpecifier} ImportSpecifier
  */
 
-const _ = require('lodash/fp');
+import * as _ from 'lodash/fp';
 
-const { getNodeType, getCallChain, getCallingIdentifierName } = require('../utils/utils');
+import { getNodeType, getCallChain, getCallingIdentifierName } from '../utils/utils';
 const getCallName = _.get('callee.property.name');
 
 /** @type {RuleModule} */
-module.exports = {
+export default {
   create(context) {
     return {
       /**
@@ -92,7 +91,6 @@ module.exports = {
     type: 'problem',
     docs: {
       description: 'Migrate from API.xyz() to REST(path)',
-      recommended: 'error',
     },
   },
 };

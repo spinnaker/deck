@@ -1,10 +1,6 @@
-'use strict';
-const mockModule = require('../utils/mockModule');
-const mock = mockModule('../utils/import-aliases');
-mock.getAllSpinnakerPackages.mockImplementation(() => ['core', 'amazon', 'titus', 'docker']);
-
-const ruleTester = require('../utils/ruleTester');
-const rule = require('../rules/import-from-npm-not-alias');
+import '../utils/import-aliases.mock';
+import ruleTester from '../utils/ruleTester';
+import rule from '../rules/import-from-npm-not-alias';
 
 ruleTester.run('import-from-npm-not-alias', rule, {
   valid: [

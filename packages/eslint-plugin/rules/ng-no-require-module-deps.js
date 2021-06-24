@@ -1,6 +1,5 @@
-'use strict';
-const path = require('path');
-const fs = require('fs');
+import path from 'path';
+import fs from 'fs';
 
 /**
  * Prefer exporting a module's NAME instead of the entire angular.module()
@@ -194,7 +193,7 @@ function isInAngularModuleCall(arrayExpression) {
   return false;
 }
 
-module.exports = {
+export default {
   meta: {
     type: 'problem',
     docs: {

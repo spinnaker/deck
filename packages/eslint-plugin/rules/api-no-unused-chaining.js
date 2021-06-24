@@ -1,6 +1,4 @@
-'use strict';
-
-const _ = require('lodash/fp');
+import * as _ from 'lodash/fp';
 
 const isApiConfigCall = _.overSome([
   { property: { type: 'Identifier', name: 'one' } },
@@ -32,7 +30,7 @@ const create = function (context) {
   };
 };
 
-module.exports = {
+export default {
   create,
   meta: {
     docs: {

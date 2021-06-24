@@ -1,6 +1,5 @@
-'use strict';
-const path = require('path');
-const { getAliasImport, getSourceFileDetails, getAllSpinnakerPackages } = require('../utils/import-aliases');
+import path from 'path';
+import { getAliasImport, getSourceFileDetails, getAllSpinnakerPackages } from '../utils/import-aliases';
 
 /**
  * A group of rules that enforce spinnaker ES6 import alias conventions.
@@ -56,7 +55,7 @@ const rule = function(context) {
   };
 };
 
-const importAliasesRule = (module.exports = {
+const importAliasesRule = {
   meta: {
     type: 'problem',
     docs: {
@@ -65,4 +64,5 @@ const importAliasesRule = (module.exports = {
     fixable: 'code',
   },
   create: rule,
-});
+};
+export default importAliasesRule;

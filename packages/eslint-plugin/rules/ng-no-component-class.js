@@ -1,8 +1,8 @@
-'use strict';
-const camelCase = require('lodash/camelCase');
+import camelCase from 'lodash/camelCase';
 
 const findParentNodeByType = (node, type) =>
   !node ? null : node.type === type ? node : findParentNodeByType(node.parent, type);
+
 /**
  * Use object literal when declaring AngularJS components
  * Do not use new ComponentClass()
@@ -10,7 +10,8 @@ const findParentNodeByType = (node, type) =>
  * @version 0.1.0
  * @category conventions
  */
-const angularRule = require('../utils/angular-rule/angular-rule');
+import angularRule from '../utils/angular-rule/angular-rule';
+
 const useObjectLiteral = function (context) {
   return {
     'angular?component': function (callee, thisGuy) {
@@ -50,7 +51,7 @@ const useObjectLiteral = function (context) {
   };
 };
 
-module.exports = {
+export default {
   meta: {
     type: 'problem',
     fixable: 'code',

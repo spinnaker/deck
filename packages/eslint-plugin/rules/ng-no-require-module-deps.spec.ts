@@ -1,7 +1,5 @@
-'use strict';
-
-const ruleTester = require('../utils/ruleTester');
-const rule = require('../rules/ng-no-require-module-deps');
+import ruleTester from '../utils/ruleTester';
+import rule from '../rules/ng-no-require-module-deps';
 
 ruleTester.run('ng-no-require-module-deps', rule, {
   valid: [
@@ -24,6 +22,11 @@ ruleTester.run('ng-no-require-module-deps', rule, {
       code: `
         import angular from 'angular';
         angular.module('foo', [ require('./foo') ]);
+      `,
+      output: `
+        import angular from 'angular';
+import __FOO from './foo';
+        angular.module('foo', [ __FOO ]);
       `,
     },
   ],

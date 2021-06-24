@@ -1,5 +1,3 @@
-'use strict';
-
 const migratedPresentationModules = ['Icon', 'IconNames', 'Illustration', 'IllustrationName'];
 
 const removeImportFromCore = (context, importSpecifierNode, fixer) => {
@@ -78,7 +76,7 @@ const rule = (context) => {
   };
 };
 
-module.exports = {
+export default {
   meta: {
     type: 'problem',
     docs: {

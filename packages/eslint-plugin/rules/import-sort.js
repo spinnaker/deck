@@ -1,4 +1,3 @@
-'use strict';
 // @ts-check
 
 const CSS_IMPORT = /\.(css|less|scss|sass)$/;
@@ -179,7 +178,7 @@ const getAllNonImportDeclarationNodes = (body) => {
  *  NOTE: `ImportDeclaration` refers to the entire import statement. i.e `import foo from './foo';`. `ImportSpecifier`
  *  refers to the members that are imported from the module. i.e `foo` in `import foo from './foo';`
  */
-module.exports = {
+export default {
   create(context) {
     return {
       Program(program) {

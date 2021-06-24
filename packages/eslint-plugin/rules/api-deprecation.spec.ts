@@ -1,7 +1,5 @@
-'use strict';
-
-const ruleTester = require('../utils/ruleTester');
-const rule = require('../rules/api-deprecation');
+import ruleTester from '../utils/ruleTester';
+import rule from './api-deprecation';
 
 ruleTester.run('api-deprecation', rule, {
   valid: [

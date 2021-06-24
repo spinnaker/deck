@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Prefer exporting a module's NAME instead of the entire angular.module()
  *
@@ -98,7 +96,7 @@ function getAngularModuleNameNode(node) {
   }
 }
 
-module.exports = {
+export default {
   meta: {
     type: 'problem',
     docs: {

@@ -1,11 +1,6 @@
-'use strict';
-const mockModule = require('../utils/mockModule');
-const mock = mockModule('../utils/import-aliases');
-mock.getAllSpinnakerPackages.mockImplementation(() => ['core', 'amazon', 'kubernetes']);
-
-const path = require('path');
-const ruleTester = require('../utils/ruleTester');
-const rule = require('../rules/import-relative-within-subpackage');
+import '../utils/import-aliases.mock';
+import ruleTester from '../utils/ruleTester';
+import rule from '../rules/import-relative-within-subpackage';
 
 ruleTester.run('import-relative-within-subpackage', rule, {
   valid: [

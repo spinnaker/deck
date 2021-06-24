@@ -1,5 +1,4 @@
-'use strict';
-const _ = require('lodash');
+import _ from 'lodash';
 
 /**
  * No slashes in string literals passed to API.one() / API.all()
@@ -91,7 +90,7 @@ const rule = function (context) {
   };
 };
 
-module.exports = {
+export default {
   meta: {
     type: 'problem',
     docs: {

@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Prefer:
  * import { module } from 'angular';
@@ -79,12 +77,12 @@ function getFixForAngularModule(angularDotModuleNode, importStatement) {
   return function(fixer) {
     return [
       fixer.replaceText(angularDotModuleNode, 'module'),
-      fixer.replaceText(importStatement, `import { module } from 'angular'`),
+      fixer.replaceText(importStatement, `import { module } from 'angular';`),
     ];
   };
 }
 
-module.exports = {
+export default {
   meta: {
     type: 'problem',
     docs: {

@@ -1,7 +1,5 @@
-'use strict';
-
-const ruleTester = require('../utils/ruleTester');
-const rule = require('../rules/api-no-slashes');
+import ruleTester from '../utils/ruleTester';
+import rule from '../rules/api-no-slashes';
 const errorMessage =
   `Do not include slashes in API.one() or API.all() calls because arguments to .one() and .all() get url encoded.` +
   `Instead, of API.one('foo/bar'), split into multiple arguments: API.one('foo', 'bar').`;
@@ -72,13 +70,15 @@ ruleTester.run('api-no-slashes', rule, {
     },
     // Detectable but unfixable
     {
-      code: 'API.one(`foo/${cantfix}`);',
+      code: 'API.one(`foo/${expressions}`);',
       errors: [errorMessage], // two errors
+      output: "API.one(...(`foo/${expressions}`).split('/'));",
     },
     // Detectable but unfixable
     {
-      code: 'API.one("foo/" + cantfix);',
+      code: 'API.one("foo/" + expressions);',
       errors: [errorMessage], // two errors
+      output: `API.one(...("foo/" + expressions).split('/'));`,
     },
   ],
 });
