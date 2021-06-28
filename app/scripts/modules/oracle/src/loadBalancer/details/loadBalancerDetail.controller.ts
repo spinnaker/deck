@@ -1,19 +1,19 @@
+import UIROUTER_ANGULARJS, { StateService } from '@uirouter/angularjs';
 import angular, { IController, module } from 'angular';
+import ANGULAR_UI_BOOTSTRAP, { IModalService } from 'angular-ui-bootstrap';
+import { sortBy } from 'lodash';
 
 import {
   Application,
   ConfirmationModalService,
+  FirewallLabels,
   ISecurityGroup,
   LoadBalancerReader,
   LoadBalancerWriter,
   SecurityGroupReader,
-  FirewallLabels,
 } from '@spinnaker/core';
+import { ILoadBalancerDetails, IOracleLoadBalancer } from 'oracle/domain/IOracleLoadBalancer';
 
-import UIROUTER_ANGULARJS, { StateService } from '@uirouter/angularjs';
-import ANGULAR_UI_BOOTSTRAP, { IModalService } from 'angular-ui-bootstrap';
-import { IOracleLoadBalancer, ILoadBalancerDetails } from 'oracle/domain/IOracleLoadBalancer';
-import { sortBy } from 'lodash';
 import { OracleLoadBalancerController } from '../configure/createLoadBalancer.controller';
 
 export class OracleLoadBalancerDetailController implements IController {
@@ -42,7 +42,7 @@ export class OracleLoadBalancerDetailController implements IController {
     };
     $scope.firewallsLabel = FirewallLabels.get('Firewalls');
 
-    const extractLoadBalancer = () => {
+    const extractLoadBalancer = (): PromiseLike<any> => {
       $scope.loadBalancer = app.loadBalancers.data.filter((test: IOracleLoadBalancer) => {
         return (
           test.name === loadBalancer.name &&
@@ -111,7 +111,7 @@ export class OracleLoadBalancerDetailController implements IController {
 
   public editLoadBalancer() {
     this.$uibModal.open({
-      templateUrl: require('oracle/loadBalancer/configure/editLoadBalancer.html'),
+      templateUrl: require('../configure/editLoadBalancer.html'),
       controller: OracleLoadBalancerController,
       controllerAs: 'ctrl',
       size: 'lg',

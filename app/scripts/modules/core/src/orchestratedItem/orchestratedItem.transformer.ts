@@ -1,4 +1,5 @@
-import { distanceInWords } from 'date-fns';
+import { formatDistance } from 'date-fns';
+import { get, isNil } from 'lodash';
 import { $log } from 'ngimport';
 
 import { IOrchestratedItem, IOrchestratedItemVariable, ITask, ITaskStep } from 'core/domain';
@@ -18,6 +19,10 @@ export class OrchestratedItemTransformer {
     });
   }
 
+  private static shouldReplace(previousValue: any, currentValue: any): boolean {
+    return (isNil(previousValue) || previousValue === '') && !(isNil(currentValue) || currentValue === '');
+  }
+
   public static defineProperties(item: any): void {
     // Don't try to add properties more than once - but also don't blow up if something tries to do so
     const testDescriptor: PropertyDescriptor = Object.getOwnPropertyDescriptor(item, 'runningTime');
@@ -29,12 +34,32 @@ export class OrchestratedItemTransformer {
       if (item.context) {
         return item.context[key];
       }
+
       if (!item.variables) {
         return null;
       }
+
       const match: IOrchestratedItemVariable = item.variables.find(
         (variable: IOrchestratedItemVariable) => variable.key === key,
       );
+      if (match) {
+        return match.value;
+      }
+
+      // Fallback to stage context if not found in variables
+      const stages = item.execution?.stages;
+      if (stages && Array.isArray(stages)) {
+        const maybeValue = (stages as any[])
+          .map((stage) => stage.context && get(stage.context, key))
+          .reduce((prev, curr) => (OrchestratedItemTransformer.shouldReplace(prev, curr) ? curr : prev));
+
+        if (!isNil(maybeValue) && maybeValue !== '') {
+          // Memoize back into variables
+          item.variables.push({ key, value: maybeValue } as IOrchestratedItemVariable);
+          return maybeValue;
+        }
+      }
+
       return match ? match.value : null;
     };
 
@@ -95,7 +120,7 @@ export class OrchestratedItemTransformer {
         get: () => {
           const now = Date.now();
           const start = new Date(now - this.calculateRunningTime(item)());
-          return distanceInWords(start, now, { includeSeconds: true });
+          return formatDistance(start, now, { includeSeconds: true });
         },
         configurable: true,
       },

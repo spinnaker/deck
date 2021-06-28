@@ -1,9 +1,9 @@
 import React from 'react';
-import ReactGA from 'react-ga';
 
+import { IconNames } from '@spinnaker/presentation';
 import { Application } from 'core/application';
 import { IManagedResourceSummary, ManagedResourceStatus } from 'core/domain';
-import { IconNames } from 'core/presentation';
+import { logger } from 'core/utils';
 
 interface IViewConfiguration {
   appearance: 'info' | 'warning' | 'error';
@@ -12,10 +12,10 @@ interface IViewConfiguration {
 }
 
 const logClick = (label: string, resourceId: string, status: ManagedResourceStatus) =>
-  ReactGA.event({
+  logger.log({
     category: 'Managed Resource Status Indicator',
     action: `${label} clicked`,
-    label: `${resourceId},${status}`,
+    data: { label: `${resourceId},${status}` },
   });
 
 const LearnMoreLink = ({ resourceSummary }: { resourceSummary: IManagedResourceSummary }) => (
@@ -71,6 +71,21 @@ export const viewConfigurationByStatus: { [status in ManagedResourceStatus]: IVi
         <p>
           In a moment, Spinnaker will take action to bring this resource back to its desired state. You can click
           History to see more. <LearnMoreLink resourceSummary={resourceSummary} />
+        </p>
+      </>
+    ),
+  },
+  DIFF_NOT_ACTIONABLE: {
+    appearance: 'warning',
+    iconName: 'mdDiff',
+    popoverContents: (resourceSummary: IManagedResourceSummary) => (
+      <>
+        <p>
+          <b>Spinnaker detected a difference from the desired state, but can't take action to resolve it.</b>
+        </p>
+        <p>
+          Spinnaker doesn't have a way of resolving this kind of difference. Manual action might be required. You can
+          click History to see more. <LearnMoreLink resourceSummary={resourceSummary} />
         </p>
       </>
     ),
@@ -204,6 +219,23 @@ export const viewConfigurationByStatus: { [status in ManagedResourceStatus]: IVi
         <p>
           Spinnaker is configured to manage this resource, but can't calculate its current status.{' '}
           <LearnMoreLink resourceSummary={resourceSummary} />
+        </p>
+      </>
+    ),
+  },
+  WAITING: {
+    appearance: 'info',
+    iconName: 'mdCreated',
+    popoverContents: (resourceSummary: IManagedResourceSummary) => (
+      <>
+        <p>
+          <b>Waiting for information.</b>
+        </p>
+        <p>
+          This resource is part of a brand new environment. Spinnaker is waiting for an artifact to become available to
+          deploy. It normally takes less than 5 minutes for a newly created artifact to be seen, and after that all
+          constraints need to pass in order for it to start deploying. You can click History to see a more detailed
+          message. <LearnMoreLink resourceSummary={resourceSummary} />
         </p>
       </>
     ),

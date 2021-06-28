@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Icon, IconNames } from '../presentation';
+import { Icon, IconNames } from '@spinnaker/presentation';
 
 import './ColumnHeader.less';
 

@@ -4,10 +4,9 @@ import { module } from 'angular';
 import _ from 'lodash';
 
 import { AuthenticationService } from '@spinnaker/core';
-
+import { BakeExecutionLabel, BakeryReader, PipelineTemplates, Registry, SETTINGS } from '@spinnaker/core';
 import { AWSProviderSettings } from 'amazon/aws.settings';
 
-import { PipelineTemplates, BakeExecutionLabel, BakeryReader, Registry, SETTINGS } from '@spinnaker/core';
 import { AMAZON_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER } from './bakeExecutionDetails.controller';
 
 export const AMAZON_PIPELINE_STAGES_BAKE_AWSBAKESTAGE = 'spinnaker.amazon.pipeline.stage.bakeStage';
@@ -62,17 +61,19 @@ module(AMAZON_PIPELINE_STAGES_BAKE_AWSBAKESTAGE, [AMAZON_PIPELINE_STAGES_BAKE_BA
           (typeof SETTINGS.feature.roscoSelector === 'function' && SETTINGS.feature.roscoSelector($scope.stage)),
         minRootVolumeSize: AWSProviderSettings.minRootVolumeSize,
         showVmTypeSelector: true,
+        bakeWarning: AWSProviderSettings.bakeWarning,
+        showMigrationFields: $scope.pipeline.migrationStatus !== 'Started',
       };
 
       function initialize() {
-        $q.all({
-          regions: BakeryReader.getRegions('aws'),
-          baseOsOptions: BakeryReader.getBaseOsOptions('aws'),
-          baseLabelOptions: BakeryReader.getBaseLabelOptions(),
-          storeTypes: ['ebs', 'docker'],
-        }).then(function (results) {
-          $scope.regions = [...results.regions].sort();
-          $scope.storeTypes = results.storeTypes;
+        $q.all([
+          BakeryReader.getRegions('aws'),
+          BakeryReader.getBaseOsOptions('aws'),
+          BakeryReader.getBaseLabelOptions(),
+          ['ebs', 'docker'],
+        ]).then(function ([regions, baseOsOptions, baseLabelOptions, storeTypes]) {
+          $scope.regions = [...regions].sort();
+          $scope.storeTypes = storeTypes;
           if (!$scope.stage.storeType && $scope.storeTypes && $scope.storeTypes.length) {
             $scope.stage.storeType = $scope.storeTypes[0];
           }
@@ -84,8 +85,8 @@ module(AMAZON_PIPELINE_STAGES_BAKE_AWSBAKESTAGE, [AMAZON_PIPELINE_STAGES_BAKE_BA
           if (!$scope.stage.regions.length && $scope.application.defaultRegions.aws) {
             $scope.stage.regions.push(...Object.keys($scope.application.defaultRegions.aws).sort());
           }
-          $scope.baseOsOptions = results.baseOsOptions.baseImages;
-          $scope.baseLabelOptions = results.baseLabelOptions;
+          $scope.baseOsOptions = baseOsOptions.baseImages;
+          $scope.baseLabelOptions = baseLabelOptions;
 
           if (!$scope.stage.baseOs && $scope.baseOsOptions && $scope.baseOsOptions.length) {
             $scope.stage.baseOs = $scope.baseOsOptions[0].id;

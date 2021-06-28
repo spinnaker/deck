@@ -1,15 +1,14 @@
-import { IPromise } from 'angular';
-
-import { API } from 'core/api';
+import { REST } from 'core/api';
 import { SchedulerFactory } from 'core/scheduler';
-import { Application } from '../application.model';
-import { ApplicationDataSource } from '../service/applicationDataSource';
+
 import { ApplicationDataSourceRegistry } from './ApplicationDataSourceRegistry';
 import { InferredApplicationWarningService } from './InferredApplicationWarningService';
+import { Application } from '../application.model';
+import { ApplicationDataSource } from '../service/applicationDataSource';
 
 export interface IApplicationDataSourceAttribute {
   enabled: string[];
-  disabled: string[];
+  disabled: string[]; ///./app/scripts/modules/core/src/pipeline/service/execution.service.ts;
 }
 
 export interface IApplicationSummary {
@@ -21,17 +20,19 @@ export interface IApplicationSummary {
   email?: string;
   name: string;
   pdApiKey?: string;
+  slackChannel?: { name: string };
   updateTs?: string;
 }
 
 export class ApplicationReader {
-  public static listApplications(): IPromise<IApplicationSummary[]> {
-    return API.all('applications').useCache().getList();
+  public static listApplications(): PromiseLike<IApplicationSummary[]> {
+    return REST('/applications').useCache().get();
   }
 
-  public static getApplicationAttributes(name: string): IPromise<any> {
-    return API.one('applications', name)
-      .withParams({ expand: false })
+  public static getApplicationAttributes(name: string): PromiseLike<any> {
+    return REST('/applications')
+      .path(name)
+      .query({ expand: false })
       .get()
       .then((fromServer: Application) => {
         this.splitAttributes(fromServer.attributes, ['accounts', 'cloudProviders']);
@@ -39,9 +40,22 @@ export class ApplicationReader {
       });
   }
 
-  public static getApplication(name: string, expand = true): IPromise<Application> {
-    return API.one('applications', name)
-      .withParams({ expand: expand })
+  public static getApplicationPermissions(applicationName: string): PromiseLike<any> {
+    return REST('/applications')
+      .path(applicationName)
+      .query({
+        expand: false,
+      })
+      .get()
+      .then((application: Application) => {
+        return application.attributes.permissions;
+      });
+  }
+
+  public static getApplication(name: string, expand = true): PromiseLike<Application> {
+    return REST('/applications')
+      .path(name)
+      .query({ expand: expand })
       .get()
       .then((fromServer: Application) => {
         const configs = ApplicationDataSourceRegistry.getDataSources();
@@ -58,7 +72,7 @@ export class ApplicationReader {
     fields.forEach((field) => {
       if (attributes[field]) {
         if (!Array.isArray(attributes[field])) {
-          attributes[field] = attributes[field].split(',');
+          attributes[field] = attributes[field].split(',').map((s: string) => s.trim());
         }
       } else {
         attributes[field] = [];

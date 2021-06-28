@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
-import { IPromise } from 'angular';
+
 import { SchedulerFactory } from 'core/scheduler';
 
+import { useData } from './useData.hook';
 import { useLatestCallback } from './useLatestCallback.hook';
 import { IUseLatestPromiseResult } from './useLatestPromise.hook';
-import { useData } from './useData.hook';
 
 /**
  * A react hook which invokes a promise factory callback whenever any of its dependencies
@@ -24,7 +24,7 @@ import { useData } from './useData.hook';
  * @returns an object with the result and current status of the promise
  */
 export function usePollingData<T>(
-  callback: () => IPromise<T>,
+  callback: () => PromiseLike<T>,
   defaultResult: T,
   pollingInterval: number,
   deps: any[],

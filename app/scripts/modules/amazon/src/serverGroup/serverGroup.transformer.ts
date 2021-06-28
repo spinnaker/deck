@@ -1,16 +1,16 @@
-import { module, IPromise } from 'angular';
+import { module } from 'angular';
 import { defaults } from 'lodash';
 
 import { IVpc } from '@spinnaker/core';
 
 import {
-  IScalingAdjustmentView,
-  IScalingPolicyView,
-  IScalingPolicyAlarmView,
   IAmazonServerGroup,
-  IStepAdjustmentView,
-  IScalingPolicy,
   IAmazonServerGroupView,
+  IScalingAdjustmentView,
+  IScalingPolicy,
+  IScalingPolicyAlarmView,
+  IScalingPolicyView,
+  IStepAdjustmentView,
   ITargetTrackingPolicy,
 } from '../domain';
 import { VpcReader } from '../vpc/VpcReader';
@@ -69,7 +69,7 @@ export class AwsServerGroupTransformer {
     return view;
   }
 
-  public normalizeServerGroup(serverGroup: IAmazonServerGroup): IPromise<IAmazonServerGroup> {
+  public normalizeServerGroup(serverGroup: IAmazonServerGroup): PromiseLike<IAmazonServerGroup> {
     serverGroup.instances.forEach((instance) => {
       instance.vpcId = serverGroup.vpcId;
     });

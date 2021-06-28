@@ -1,21 +1,21 @@
 'use strict';
 
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 import { module } from 'angular';
 
 import {
+  ModalWizard,
   OVERRIDE_REGISTRY,
   SERVER_GROUP_COMMAND_REGISTRY_PROVIDER,
   SERVER_GROUP_WRITER,
-  TaskMonitor,
-  ModalWizard,
   STAGE_ARTIFACT_SELECTOR_COMPONENT_REACT,
+  TaskMonitor,
 } from '@spinnaker/core';
 
-import { ECS_SERVER_GROUP_CONFIGURATION_SERVICE } from '../serverGroupConfiguration.service';
 import { ECS_CLUSTER_READ_SERVICE } from '../../../ecsCluster/ecsCluster.read.service';
 import { IAM_ROLE_READ_SERVICE } from '../../../iamRoles/iamRole.read.service';
 import { ECS_SECRET_READ_SERVICE } from '../../../secrets/secret.read.service';
-import UIROUTER_ANGULARJS from '@uirouter/angularjs';
+import { ECS_SERVER_GROUP_CONFIGURATION_SERVICE } from '../serverGroupConfiguration.service';
 
 export const ECS_SERVERGROUP_CONFIGURE_WIZARD_CLONESERVERGROUP_ECS_CONTROLLER =
   'spinnaker.ecs.cloneServerGroup.controller';
@@ -240,6 +240,20 @@ module(ECS_SERVERGROUP_CONFIGURE_WIZARD_CLONESERVERGROUP_ECS_CONTROLLER, [
     // used by react components to configure command for image queries
     $scope.configureCommand = function (query) {
       return ecsServerGroupConfigurationService.configureCommand($scope.command, query);
+    };
+
+    // TODO: Migrate horizontalScaling component to react and move this logic there
+    $scope.capacityProviderState = {
+      useCapacityProviders:
+        $scope.command.capacityProviderStrategy && $scope.command.capacityProviderStrategy.length > 0,
+      updateComputeOption: function (chosenOption) {
+        if (chosenOption == 'launchType') {
+          $scope.command.capacityProviderStrategy = [];
+        } else if (chosenOption == 'capacityProviders') {
+          $scope.command.launchType = '';
+          $scope.command.capacityProviderStrategy = $scope.command.capacityProviderStrategy || [];
+        }
+      },
     };
   },
 ]);

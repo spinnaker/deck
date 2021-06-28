@@ -1,23 +1,24 @@
+import { ILogService, IQService, module } from 'angular';
 import { filter, forOwn, has, uniq } from 'lodash';
-import { module, IPromise, ILogService, IQService } from 'angular';
+import { cloneDeep } from 'lodash';
 
-import { API } from 'core/api/ApiService';
-import { IComponentName, NameUtils } from 'core/naming';
-import { InfrastructureCaches } from 'core/cache';
+import { REST } from 'core/api/ApiService';
 import { Application } from 'core/application/application.model';
-import { ISecurityGroup, ILoadBalancer, IServerGroup, IServerGroupUsage } from 'core/domain';
+import { InfrastructureCaches } from 'core/cache';
+import { PROVIDER_SERVICE_DELEGATE, ProviderServiceDelegate } from 'core/cloudProvider/providerService.delegate';
+import { SETTINGS } from 'core/config/settings';
+import { ILoadBalancer, ISecurityGroup, IServerGroup, IServerGroupUsage } from 'core/domain';
+import { IEntityTags } from 'core/domain/IEntityTags';
+import { EntityTagsReader } from 'core/entityTag/EntityTagsReader';
+import { IComponentName, NameUtils } from 'core/naming';
+import { IMoniker } from 'core/naming/IMoniker';
+import { ISearchResults, SearchService } from 'core/search/search.service';
+
+import { ISecurityGroupSearchResult } from './securityGroupSearchResultType';
 import {
   SECURITY_GROUP_TRANSFORMER_SERVICE,
   SecurityGroupTransformerService,
 } from './securityGroupTransformer.service';
-import { EntityTagsReader } from 'core/entityTag/EntityTagsReader';
-import { SETTINGS } from 'core/config/settings';
-import { SearchService, ISearchResults } from 'core/search/search.service';
-import { ISecurityGroupSearchResult } from './securityGroupSearchResultType';
-import { ProviderServiceDelegate, PROVIDER_SERVICE_DELEGATE } from 'core/cloudProvider/providerService.delegate';
-import { IMoniker } from 'core/naming/IMoniker';
-import { IEntityTags } from 'core/domain/IEntityTags';
-import { cloneDeep } from 'lodash';
 
 export interface ISecurityGroupsByAccount {
   [account: string]: {
@@ -218,7 +219,7 @@ export class SecurityGroupReader {
   private clearCacheAndRetryAttachingSecurityGroups(
     application: Application,
     nameBasedSecurityGroups: ISecurityGroup[],
-  ): IPromise<any[]> {
+  ): PromiseLike<any[]> {
     InfrastructureCaches.clearCache('securityGroups');
     return this.loadSecurityGroups().then((refreshedSecurityGroups: ISecurityGroupsByAccount) => {
       application['securityGroupsIndex'] = refreshedSecurityGroups;
@@ -238,7 +239,7 @@ export class SecurityGroupReader {
     application: Application,
     nameBasedSecurityGroups: ISecurityGroup[],
     retryIfNotFound: boolean,
-  ): IPromise<any[]> {
+  ): PromiseLike<any[]> {
     let data: ISecurityGroup[] = [];
     let notFoundCaught = false;
     if (nameBasedSecurityGroups) {
@@ -294,20 +295,30 @@ export class SecurityGroupReader {
     private providerServiceDelegate: ProviderServiceDelegate,
   ) {}
 
-  public getAllSecurityGroups(): IPromise<ISecurityGroupsByAccountSourceData> {
+  private getAllSecurityGroupsPromise: PromiseLike<ISecurityGroupsByAccountSourceData>;
+
+  public getAllSecurityGroups(): PromiseLike<ISecurityGroupsByAccountSourceData> {
     const cache = InfrastructureCaches.get('securityGroups');
     const cached = cache ? cache.get('allGroups') : null;
     if (cached) {
       return this.$q.resolve(this.decompress(cloneDeep(cached)));
+    } else if (this.getAllSecurityGroupsPromise) {
+      return this.getAllSecurityGroupsPromise;
     }
-    return API.one('securityGroups')
+
+    this.getAllSecurityGroupsPromise = REST('/securityGroups')
       .get()
       .then((groupsByAccount: ISecurityGroupsByAccountSourceData) => {
         if (cache) {
           cache.put('allGroups', this.compress(groupsByAccount));
         }
         return groupsByAccount;
+      })
+      .finally(() => {
+        delete this.getAllSecurityGroupsPromise;
       });
+
+    return this.getAllSecurityGroupsPromise;
   }
 
   private compress(data: ISecurityGroupsByAccountSourceData): any {
@@ -371,7 +382,7 @@ export class SecurityGroupReader {
   public getApplicationSecurityGroups(
     application: Application,
     nameBasedSecurityGroups: ISecurityGroup[],
-  ): IPromise<any> {
+  ): PromiseLike<any> {
     return this.loadSecurityGroups()
       .then((allSecurityGroups: ISecurityGroupsByAccount) => {
         application['securityGroupsIndex'] = allSecurityGroups;
@@ -390,12 +401,10 @@ export class SecurityGroupReader {
     region: string,
     vpcId: string,
     id: string,
-  ): IPromise<ISecurityGroupDetail> {
-    return API.one('securityGroups')
-      .one(account)
-      .one(region)
-      .one(id)
-      .withParams({ provider, vpcId })
+  ): PromiseLike<ISecurityGroupDetail> {
+    return REST('/securityGroups')
+      .path(account, region, id)
+      .query({ provider, vpcId })
       .get()
       .then((details: ISecurityGroupDetail) => {
         if (details && details.inboundRules) {
@@ -434,7 +443,7 @@ export class SecurityGroupReader {
       });
   }
 
-  public loadSecurityGroups(): IPromise<ISecurityGroupsByAccount> {
+  public loadSecurityGroups(): PromiseLike<ISecurityGroupsByAccount> {
     return this.getAllSecurityGroups().then((groupsByAccount: ISecurityGroupsByAccountSourceData) => {
       const securityGroups: IReaderSecurityGroup[] = [];
       forOwn(groupsByAccount, (groupsByProvider, account) => {
@@ -453,7 +462,7 @@ export class SecurityGroupReader {
     });
   }
 
-  public loadSecurityGroupsByApplicationName(applicationName: string): IPromise<ISecurityGroup[]> {
+  public loadSecurityGroupsByApplicationName(applicationName: string): PromiseLike<ISecurityGroup[]> {
     return SearchService.search<ISecurityGroupSearchResult>({
       q: applicationName,
       type: 'securityGroups',

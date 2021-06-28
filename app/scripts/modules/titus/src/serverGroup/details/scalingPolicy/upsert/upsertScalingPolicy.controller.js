@@ -2,8 +2,8 @@
 
 import { module } from 'angular';
 
-import { TaskMonitor } from '@spinnaker/core';
 import { ScalingPolicyWriter } from '@spinnaker/amazon';
+import { TaskMonitor } from '@spinnaker/core';
 
 export const TITUS_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_UPSERTSCALINGPOLICY_CONTROLLER =
   'spinnaker.titus.serverGroup.details.scalingPolicy.upsertScalingPolicy.controller';
@@ -47,6 +47,7 @@ module(TITUS_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_UPSERTSCALINGPOLICY_CONTRO
           region: serverGroup.region,
           comparisonOperator: alarm.comparisonOperator,
           dimensions: alarm.dimensions,
+          disableEditingDimensions: alarm.disableEditingDimensions,
           evaluationPeriods: alarm.evaluationPeriods,
           period: alarm.period,
           threshold: alarm.threshold,

@@ -1,23 +1,23 @@
-import { IController, IPromise, IQService, IScope, module } from 'angular';
 import { StateService } from '@uirouter/angularjs';
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
+import { IController, IQService, IScope, module } from 'angular';
 import { head, sortBy } from 'lodash';
 
 import {
   Application,
+  FirewallLabels,
   IApplicationSecurityGroup,
   ILoadBalancer,
   ISecurityGroup,
   ISubnet,
   LOAD_BALANCER_READ_SERVICE,
   LoadBalancerReader,
-  SETTINGS,
+  MANAGED_RESOURCE_DETAILS_INDICATOR,
   SECURITY_GROUP_READER,
   SecurityGroupReader,
+  SETTINGS,
   SubnetReader,
-  FirewallLabels,
-  MANAGED_RESOURCE_DETAILS_INDICATOR,
 } from '@spinnaker/core';
-
 import {
   IAmazonApplicationLoadBalancer,
   IAmazonLoadBalancer,
@@ -29,7 +29,6 @@ import {
 } from 'amazon/domain';
 
 import { LOAD_BALANCER_ACTIONS } from './loadBalancerActions.component';
-import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
 export interface ILoadBalancerFromStateParams {
   accountId: string;
@@ -94,7 +93,7 @@ export class AwsLoadBalancerDetailsController implements IController {
     this.$state.go('^', null, { location: 'replace' });
   }
 
-  public extractLoadBalancer(): IPromise<void> {
+  public extractLoadBalancer(): PromiseLike<void> {
     const appLoadBalancer = this.app.loadBalancers.data.find((test: ILoadBalancer) => {
       return (
         test.name === this.loadBalancerFromParams.name &&

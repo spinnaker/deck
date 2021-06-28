@@ -1,18 +1,20 @@
+import { module } from 'angular';
 import React from 'react';
-import { module, IPromise } from 'angular';
-import { react2angular } from 'react2angular';
 import { Alert } from 'react-bootstrap';
 import { Option } from 'react-select';
+import { react2angular } from 'react2angular';
+
+import { HelpField, TetheredSelect, withErrorBoundary } from '@spinnaker/core';
+
 import {
   IEcsServerGroupCommand,
   IEcsServiceDiscoveryRegistryAssociation,
 } from '../../serverGroupConfiguration.service';
-import { HelpField, TetheredSelect, withErrorBoundary } from '@spinnaker/core';
 
 export interface IServiceDiscoveryProps {
   command: IEcsServerGroupCommand;
   notifyAngular: (key: string, value: any) => void;
-  configureCommand: (query: string) => IPromise<void>;
+  configureCommand: (query: string) => PromiseLike<void>;
 }
 
 export interface IEcsServiceDiscoveryRegistry {

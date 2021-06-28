@@ -52,7 +52,7 @@
               application="ctrl.application"
               entity-type="serverGroup"
               owner-options="ctrl.entityTagTargets"
-              on-update="ctrl.application.serverGroups.refresh()"
+              on-update="ctrl.application.serverGroups.refresh"
             ></add-entity-tag-links>
           </ul>
         </div>
@@ -154,7 +154,12 @@
           cloud-provider="'titus'"
         ></config-bin-link>
       </div>
+      <titus-custom-scaling-policy
+        application="ctrl.application"
+        server-group="serverGroup"
+      ></titus-custom-scaling-policy>
     </collapsible-section>
+    <titus-package-details-section build-info="buildInfo"></titus-package-details-section>
     <collapsible-section heading="Job Disruption Budget">
       <titus-disruption-budget-section
         app="ctrl.application"

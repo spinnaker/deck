@@ -1,5 +1,3 @@
-import { IPromise } from 'angular';
-
 import { Application } from 'core/application/application.model';
 import { ITask } from 'core/domain';
 import { IJob, TaskExecutor } from 'core/task/taskExecutor';
@@ -23,7 +21,7 @@ export interface IFunctionDeleteCommand extends IJob {
 }
 
 export class FunctionWriter {
-  public static deleteFunction(command: IFunctionDeleteCommand, application: Application): ng.IPromise<ITask> {
+  public static deleteFunction(command: IFunctionDeleteCommand, application: Application): PromiseLike<ITask> {
     command.type = 'lambdaFunction';
     command.operation = 'deleteLambdaFunction';
     return TaskExecutor.executeTask({
@@ -38,7 +36,7 @@ export class FunctionWriter {
     application: Application,
     descriptor: string,
     params: any = {},
-  ): IPromise<ITask> {
+  ): PromiseLike<ITask> {
     Object.assign(command, params);
     return TaskExecutor.executeTask({
       job: [command],

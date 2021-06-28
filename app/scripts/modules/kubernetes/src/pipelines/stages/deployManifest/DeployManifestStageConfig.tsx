@@ -1,6 +1,7 @@
-import React from 'react';
 import { cloneDeep } from 'lodash';
-import { Observable, Subject } from 'rxjs';
+import React from 'react';
+import { from as observableFrom, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import { AccountService, FormikStageConfig, IAccountDetails, IStage, IStageConfigProps } from '@spinnaker/core';
 
@@ -51,8 +52,8 @@ export class DeployManifestStageConfig extends React.Component<IStageConfigProps
   }
 
   private fetchAccounts = (): void => {
-    Observable.fromPromise(AccountService.getAllAccountDetailsForProvider('kubernetes'))
-      .takeUntil(this.destroy$)
+    observableFrom(AccountService.getAllAccountDetailsForProvider('kubernetes'))
+      .pipe(takeUntil(this.destroy$))
       .subscribe((accounts: IAccountDetails[]) => {
         this.setState({ accounts });
       });

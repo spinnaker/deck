@@ -1,13 +1,12 @@
-import { IPromise, module } from 'angular';
-
+import { module } from 'angular';
+import { PROVIDER_SERVICE_DELEGATE, ProviderServiceDelegate } from 'core/cloudProvider/providerService.delegate';
 import { ISecurityGroup } from 'core/domain';
-import { ProviderServiceDelegate, PROVIDER_SERVICE_DELEGATE } from 'core/cloudProvider/providerService.delegate';
 
 export class SecurityGroupTransformerService {
   public static $inject = ['providerServiceDelegate'];
   constructor(private providerServiceDelegate: ProviderServiceDelegate) {}
 
-  public normalizeSecurityGroup(securityGroup: ISecurityGroup): IPromise<ISecurityGroup> {
+  public normalizeSecurityGroup(securityGroup: ISecurityGroup): PromiseLike<ISecurityGroup> {
     return this.providerServiceDelegate
       .getDelegate<any>(securityGroup.provider || securityGroup.type, 'securityGroup.transformer')
       .normalizeSecurityGroup(securityGroup);

@@ -1,6 +1,4 @@
-import { IPromise } from 'angular';
-
-import { padStart, isNil, pickBy } from 'lodash';
+import { isNil, padStart, pickBy } from 'lodash';
 
 import { Application } from 'core/application';
 import { ILoadBalancer, IServerGroup } from 'core/domain';
@@ -111,7 +109,11 @@ export class NameUtils {
     return pickBy({ app, stack, detail });
   }
 
-  public static getMonikerForInstance(cloudProvider: string, instanceId: string, app: Application): IPromise<IMoniker> {
+  public static getMonikerForInstance(
+    cloudProvider: string,
+    instanceId: string,
+    app: Application,
+  ): PromiseLike<IMoniker> {
     return app.ready().then(() => {
       const serverGroups = app.getDataSource('serverGroups').data as IServerGroup[];
       const loadBalancers = app.getDataSource('loadBalancers').data as ILoadBalancer[];

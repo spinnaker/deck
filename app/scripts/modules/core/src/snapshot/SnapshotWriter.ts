@@ -1,15 +1,13 @@
-import { IPromise } from 'angular';
-import { TaskExecutor } from 'core/task/taskExecutor';
-import { $q } from 'ngimport';
 import { isString } from 'lodash';
+import { $q } from 'ngimport';
 
-import { AccountService } from 'core/account/AccountService';
-import { CloudProviderRegistry } from 'core/cloudProvider';
-
-import { Application } from 'core/application';
 import { IAccountDetails } from 'core/account';
-import { IJob } from 'core/task';
+import { AccountService } from 'core/account/AccountService';
+import { Application } from 'core/application';
+import { CloudProviderRegistry } from 'core/cloudProvider';
 import { ITask } from 'core/domain';
+import { IJob } from 'core/task';
+import { TaskExecutor } from 'core/task/taskExecutor';
 
 export class SnapshotWriter {
   private static buildSaveSnapshotJobs(app: Application, accountDetails: IAccountDetails[]): IJob[] {
@@ -41,13 +39,13 @@ export class SnapshotWriter {
     return jobs;
   }
 
-  private static loadAccountDetails(app: Application): IPromise<IAccountDetails[]> {
+  private static loadAccountDetails(app: Application): PromiseLike<IAccountDetails[]> {
     const accounts = isString(app.accounts) ? app.accounts.split(',') : [];
     const accountDetailPromises = accounts.map((account) => AccountService.getAccountDetails(account));
     return $q.all(accountDetailPromises);
   }
 
-  public static takeSnapshot(app: Application): IPromise<ITask> {
+  public static takeSnapshot(app: Application): PromiseLike<ITask> {
     return this.loadAccountDetails(app).then((accountDetails) => {
       const jobs = this.buildSaveSnapshotJobs(app, accountDetails);
       return TaskExecutor.executeTask({
@@ -58,7 +56,7 @@ export class SnapshotWriter {
     });
   }
 
-  public static restoreSnapshot(app: Application, account: string, timestamp: number): IPromise<ITask> {
+  public static restoreSnapshot(app: Application, account: string, timestamp: number): PromiseLike<ITask> {
     return AccountService.getAccountDetails(account).then((accountDetail) => {
       const jobs = this.buildRestoreSnapshotJob(app, accountDetail, timestamp);
       return TaskExecutor.executeTask({

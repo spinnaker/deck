@@ -1,6 +1,4 @@
-import { IPromise } from 'angular';
-
-import { API } from 'core/api/ApiService';
+import { REST } from 'core/api/ApiService';
 
 export interface ICertificate {
   expiration: number;
@@ -11,11 +9,11 @@ export interface ICertificate {
 }
 
 export class CertificateReader {
-  public static listCertificates(): IPromise<ICertificate[]> {
-    return API.one('certificates').getList();
+  public static listCertificates(): PromiseLike<ICertificate[]> {
+    return REST('/certificates').get();
   }
 
-  public static listCertificatesByProvider(cloudProvider: string): IPromise<ICertificate[]> {
-    return API.one('certificates').one(cloudProvider).getList();
+  public static listCertificatesByProvider(cloudProvider: string): PromiseLike<ICertificate[]> {
+    return REST('/certificates').path(cloudProvider).get();
   }
 }

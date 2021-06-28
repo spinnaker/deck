@@ -1,11 +1,11 @@
 import { module } from 'angular';
 
-import { API } from '@spinnaker/core';
+import { REST } from '@spinnaker/core';
 import { ISecretDescriptor } from './ISecret';
 
 export class SecretReader {
-  public listSecrets(): ng.IPromise<ISecretDescriptor[]> {
-    return API.all('ecs').all('secrets').getList();
+  public listSecrets(): PromiseLike<ISecretDescriptor[]> {
+    return REST('/ecs/secrets').get();
   }
 }
 

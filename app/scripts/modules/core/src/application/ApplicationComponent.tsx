@@ -1,10 +1,14 @@
-import { ApplicationNavigation } from './nav/ApplicationNavigation';
-import React from 'react';
+import { ApolloProvider } from '@apollo/client';
 import { UIView } from '@uirouter/react';
+import React from 'react';
 
-import { Application } from './application.model';
 import { RecentHistoryService } from 'core/history';
+import { createApolloClient } from 'core/managed/graphql/client';
 import { DebugWindow } from 'core/utils/consoleDebug';
+
+import { ApplicationContextProvider } from './ApplicationContext';
+import { Application } from './application.model';
+import { ApplicationNavigation } from './nav/ApplicationNavigation';
 
 import './application.less';
 
@@ -13,6 +17,9 @@ export interface IApplicationComponentProps {
 }
 
 export class ApplicationComponent extends React.Component<IApplicationComponentProps> {
+  private apolloClient = createApolloClient();
+  private unsubscribeAppRefresh?: () => void;
+
   constructor(props: IApplicationComponentProps) {
     super(props);
     this.mountApplication(props.app);
@@ -35,7 +42,10 @@ export class ApplicationComponent extends React.Component<IApplicationComponentP
 
     DebugWindow.application = app;
     // KLUDGE: warning, do not use, this is temporarily and will be removed very soon.
-    !app.attributes?.disableAutoRefresh && app.enableAutoRefresh();
+    if (!app.attributes?.disableAutoRefresh) {
+      this.unsubscribeAppRefresh = this.props.app.subscribeToRefresh(this.apolloClient.onRefresh);
+      app.enableAutoRefresh();
+    }
   }
 
   private unmountApplication(app: Application) {
@@ -43,6 +53,8 @@ export class ApplicationComponent extends React.Component<IApplicationComponentP
       return;
     }
     DebugWindow.application = undefined;
+    this.unsubscribeAppRefresh?.();
+    this.unsubscribeAppRefresh = undefined;
     app.disableAutoRefresh();
   }
 
@@ -68,9 +80,13 @@ export class ApplicationComponent extends React.Component<IApplicationComponentP
             </p>
           </div>
         )}
-        <div className="container scrollable-columns">
-          <UIView className="secondary-panel" name="insight" />
-        </div>
+        <ApplicationContextProvider app={app}>
+          <ApolloProvider client={this.apolloClient.client}>
+            <div className="container scrollable-columns">
+              <UIView className="secondary-panel" name="insight" />
+            </div>
+          </ApolloProvider>
+        </ApplicationContextProvider>
       </div>
     );
   }

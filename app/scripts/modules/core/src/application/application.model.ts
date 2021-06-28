@@ -1,7 +1,8 @@
-import { IPromise, IScope } from 'angular';
+import { IScope } from 'angular';
 import { map, union, uniq } from 'lodash';
 import { $log, $q } from 'ngimport';
-import { Observable, ReplaySubject, Subject, Subscription } from 'rxjs';
+import { combineLatest as observableCombineLatest, Observable, ReplaySubject, Subject, Subscription } from 'rxjs';
+import { map as rxMap } from 'rxjs/operators';
 
 import { ICluster } from '../domain/ICluster';
 import { ApplicationDataSource, IDataSourceConfig, IFetchStatus } from './service/applicationDataSource';
@@ -93,6 +94,8 @@ export class Application {
    */
   public activeState: ApplicationDataSource = null;
 
+  private refreshListeners: Array<() => void> = [];
+
   public activeDataSource$ = new ReplaySubject<ApplicationDataSource>(1);
   /** @deprecated use activeDataSource$ */
   public activeStateChangeStream: Subject<any> = new Subject();
@@ -111,8 +114,8 @@ export class Application {
     dataSourceConfigs: Array<IDataSourceConfig<any>>,
   ) {
     dataSourceConfigs.forEach((config) => this.addDataSource(config));
-    this.status$ = Observable.combineLatest(this.dataSources.map((ds) => ds.status$)).map((statuses) =>
-      this.getDerivedApplicationStatus(statuses),
+    this.status$ = observableCombineLatest(this.dataSources.map((ds) => ds.status$)).pipe(
+      rxMap((statuses: IFetchStatus[]) => this.getDerivedApplicationStatus(statuses)),
     );
   }
 
@@ -155,12 +158,13 @@ export class Application {
    * Refreshes all dataSources for the application
    * @param forceRefresh if true, will trigger a refresh on all data sources, even if the data source is currently
    * loading
-   * @returns {IPromise<void>} a promise that resolves when the application finishes loading, rejecting with an error if
+   * @returns {PromiseLike<void>} a promise that resolves when the application finishes loading, rejecting with an error if
    * one of the data sources fails to refresh
    */
-  public refresh(forceRefresh?: boolean): IPromise<any> {
+  public refresh(forceRefresh?: boolean): PromiseLike<any> {
     // refresh hidden data sources but do not consider their results when determining when the refresh completes
     this.dataSources.filter((ds) => !ds.visible).forEach((ds) => ds.refresh(forceRefresh));
+    this.refreshListeners.forEach((cb) => cb());
     return $q.all(this.dataSources.filter((ds) => ds.visible).map((source) => source.refresh(forceRefresh))).then(
       () => this.applicationLoadSuccess(),
       (error) => this.applicationLoadError(error),
@@ -170,10 +174,10 @@ export class Application {
   /**
    * A promise that resolves immediately if all data sources are ready (i.e. loaded), or once all data sources have
    * loaded
-   * @returns {IPromise<any>} the return value is a promise, but its value is
+   * @returns {PromiseLike<any>} the return value is a promise, but its value is
    * not useful - it's only useful to watch the promise itself
    */
-  public ready(): IPromise<any> {
+  public ready(): PromiseLike<any> {
     return $q.all(
       this.dataSources.filter((ds) => ds.onLoad !== undefined && ds.visible).map((dataSource) => dataSource.ready()),
     );
@@ -278,5 +282,13 @@ export class Application {
   private setDefaults(): void {
     this.defaultCredentials = this.extractProviderDefault('credentialsField');
     this.defaultRegions = this.extractProviderDefault('regionField');
+  }
+
+  public subscribeToRefresh(onRefreshCb: () => void) {
+    this.refreshListeners.push(onRefreshCb);
+    const unsubscribeCb = () => {
+      this.refreshListeners.filter((cb) => cb !== onRefreshCb);
+    };
+    return unsubscribeCb;
   }
 }

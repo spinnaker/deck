@@ -1,35 +1,34 @@
-import { IPromise, module } from 'angular';
-import { chain, flatten, intersection, xor, cloneDeep } from 'lodash';
+import { module } from 'angular';
+import { chain, cloneDeep, flatten, intersection, xor } from 'lodash';
 import { $q } from 'ngimport';
 import { Subject } from 'rxjs';
 
-import {
-  AccountService,
-  Application,
-  IServerGroupCommand,
-  IServerGroupCommandViewState,
-  IDeploymentStrategy,
-  IServerGroupCommandBackingData,
-  CacheInitializerService,
-  CACHE_INITIALIZER_SERVICE,
-  LoadBalancerReader,
-  LOAD_BALANCER_READ_SERVICE,
-  ICluster,
-  IAccountDetails,
-  SECURITY_GROUP_READER,
-  SecurityGroupReader,
-  IVpc,
-  ISecurityGroup,
-  NameUtils,
-  setMatchingResourceSummary,
-} from '@spinnaker/core';
 import {
   IAmazonApplicationLoadBalancer,
   IAmazonLoadBalancer,
   IAmazonServerGroupCommandDirty,
   VpcReader,
 } from '@spinnaker/amazon';
-
+import {
+  AccountService,
+  Application,
+  CACHE_INITIALIZER_SERVICE,
+  CacheInitializerService,
+  IAccountDetails,
+  ICluster,
+  IDeploymentStrategy,
+  ISecurityGroup,
+  IServerGroupCommand,
+  IServerGroupCommandBackingData,
+  IServerGroupCommandViewState,
+  IVpc,
+  LOAD_BALANCER_READ_SERVICE,
+  LoadBalancerReader,
+  NameUtils,
+  SECURITY_GROUP_READER,
+  SecurityGroupReader,
+  setMatchingResourceSummary,
+} from '@spinnaker/core';
 import { IJobDisruptionBudget, ITitusResources } from 'titus/domain';
 import { ITitusServiceJobProcesses } from 'titus/domain/ITitusServiceJobProcesses';
 
@@ -156,7 +155,7 @@ export class TitusServerGroupConfigurationService {
     };
   }
 
-  public configureCommand(cmd: ITitusServerGroupCommand) {
+  public configureCommand(cmd: ITitusServerGroupCommand): PromiseLike<void> {
     cmd.viewState.accountChangedStream = new Subject();
     cmd.viewState.regionChangedStream = new Subject();
     cmd.viewState.groupsRemovedStream = new Subject();
@@ -169,24 +168,30 @@ export class TitusServerGroupConfigurationService {
     };
     cmd.image = cmd.viewState.imageId;
     return $q
-      .all({
-        credentialsKeyedByAccount: AccountService.getCredentialsKeyedByAccount('titus'),
-        securityGroups: this.securityGroupReader.getAllSecurityGroups(),
-        vpcs: VpcReader.listVpcs(),
-        images: [],
-      })
-      .then((backingData: any) => {
-        backingData.accounts = Object.keys(backingData.credentialsKeyedByAccount);
+      .all([
+        AccountService.getCredentialsKeyedByAccount('titus'),
+        this.securityGroupReader.getAllSecurityGroups(),
+        VpcReader.listVpcs(),
+      ])
+      .then(([credentialsKeyedByAccount, securityGroups, vpcs]) => {
+        const backingData: any = {
+          credentialsKeyedByAccount,
+          securityGroups,
+          vpcs,
+        };
+        backingData.images = [];
+        backingData.accounts = Object.keys(credentialsKeyedByAccount);
         backingData.filtered = {};
         if (cmd.credentials.includes('${')) {
           // If our dependency is an expression, the only thing we can really do is to just preserve current selections
           backingData.filtered.regions = [{ name: cmd.region }];
         } else {
-          backingData.filtered.regions = (backingData.credentialsKeyedByAccount[cmd.credentials] || []).regions || [];
+          backingData.filtered.regions = credentialsKeyedByAccount[cmd.credentials]?.regions ?? [];
         }
         cmd.backingData = backingData;
         backingData.filtered.securityGroups = this.getRegionalSecurityGroups(cmd);
-        let securityGroupRefresher = $q.when();
+
+        let securityGroupRefresher: PromiseLike<any> = $q.when();
         if (cmd.securityGroups && cmd.securityGroups.length) {
           const regionalSecurityGroupIds = backingData.filtered.securityGroups.map((g: ISecurityGroup) => g.id);
           if (intersection(cmd.securityGroups, regionalSecurityGroupIds).length < cmd.securityGroups.length) {
@@ -263,7 +268,10 @@ export class TitusServerGroupConfigurationService {
     }
   }
 
-  public refreshSecurityGroups(command: ITitusServerGroupCommand, skipCommandReconfiguration: boolean): IPromise<void> {
+  public refreshSecurityGroups(
+    command: ITitusServerGroupCommand,
+    skipCommandReconfiguration: boolean,
+  ): PromiseLike<void> {
     return this.cacheInitializer.refreshCache('securityGroups').then(() => {
       return this.securityGroupReader.getAllSecurityGroups().then((securityGroups: any) => {
         command.backingData.securityGroups = securityGroups;

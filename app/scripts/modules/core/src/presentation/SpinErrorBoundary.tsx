@@ -1,8 +1,10 @@
-import ReactGA from 'react-ga';
-import React, { ErrorInfo } from 'react';
-import { module } from 'angular';
-import { UIRouter, StateObject } from '@uirouter/core';
+import { StateObject, UIRouter } from '@uirouter/core';
 import { ReactViewDeclaration } from '@uirouter/react';
+import { module } from 'angular';
+import React, { ErrorInfo } from 'react';
+
+import { logger } from 'core/utils/Logger';
+
 import { CollapsibleSection } from './collapsibleSection/CollapsibleSection';
 import { ValidationMessage } from './forms/validation/ValidationMessage';
 
@@ -36,10 +38,12 @@ export class SpinErrorBoundary extends React.Component<ISpinErrorBoundaryProps, 
   }
 
   componentDidCatch(error: Error, _errorInfo: ErrorInfo) {
-    ReactGA.event({
+    logger.log({
+      level: 'ERROR',
       category: `SpinErrorBoundary - ${this.props.category}`,
-      action: 'React Error Boundary Caught',
-      label: error.message,
+      action: error.message,
+      error,
+      data: { label: error.message, componentStack: _errorInfo?.componentStack },
     });
   }
 

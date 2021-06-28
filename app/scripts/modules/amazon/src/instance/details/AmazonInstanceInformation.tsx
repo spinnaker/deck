@@ -1,8 +1,10 @@
 import React from 'react';
+
 import { CollapsibleSection, LabeledValue, SubnetTag } from '@spinnaker/core';
-import { VpcTag } from '../../vpc/VpcTag';
-import { InstanceInformation } from './InstanceInformation';
 import { IAmazonInstance } from 'amazon/domain';
+
+import { InstanceInformation } from './InstanceInformation';
+import { VpcTag } from '../../vpc/VpcTag';
 
 export interface IAmazonInstanceInformationProps {
   instance: IAmazonInstance;
@@ -17,6 +19,7 @@ export const AmazonInstanceInformation = ({ instance }: IAmazonInstanceInformati
           account={instance.account}
           availabilityZone={instance.availabilityZone}
           instanceType={instance.instanceType}
+          capacityType={instance.capacityType}
           launchTime={instance.launchTime}
           provider={instance.provider}
           region={instance.region}

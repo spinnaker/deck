@@ -1,3 +1,4 @@
+/* eslint-disable @spinnaker/import-sort */
 import { module } from 'angular';
 
 import 'bootstrap/dist/css/bootstrap.css';
@@ -13,18 +14,16 @@ import 'react-virtualized/styles.css';
 import 'react-virtualized-select/styles.css';
 import 'ui-select/dist/select.css';
 import '@spinnaker/styleguide/public/styleguide.min.css';
+import 'Select2/select2.css';
+import 'select2-bootstrap-css/select2-bootstrap.css';
+import 'source-sans-pro/source-sans-pro.css';
+import 'root/app/fonts/spinnaker/icons.css';
 
 import UI_ROUTER from '@uirouter/angularjs';
-const UI_ROUTER_STATE_EVENTS_SHIM = 'ui.router.state.events';
-require('@uirouter/angularjs/release/stateEvents');
+import '@uirouter/angularjs/release/stateEvents';
 import { UI_ROUTER_REACT_HYBRID } from '@uirouter/react-hybrid';
 
-// use require instead of import to ensure insertion order is preserved
-require('Select2/select2.css');
-require('select2-bootstrap-css/select2-bootstrap.css');
-import 'source-sans-pro/source-sans-pro.css';
 import { RECENT_HISTORY_SERVICE } from './history/recentHistory.service';
-require('root/app/fonts/spinnaker/icons.css');
 
 import './analytics/GoogleAnalyticsInitializer';
 import { UI_ROUTER_REACT_ERROR_BOUNDARY } from './presentation/SpinErrorBoundary';
@@ -33,6 +32,7 @@ import { APPLICATION_BOOTSTRAP_MODULE } from './bootstrap';
 import { APPLICATION_MODULE } from './application/application.module';
 import { ARTIFACT_MODULE } from './artifact/artifact.module';
 import { AUTHENTICATION_MODULE } from './authentication/authentication.module';
+import { CI_MODULE } from './ci/ci.module';
 import { CLOUD_PROVIDER_MODULE } from './cloudProvider/cloudProvider.module';
 import { CLUSTER_MODULE } from './cluster/cluster.module';
 import { CUSTOM_BANNER_CONFIG } from './application/config/customBanner/customBannerConfig.component';
@@ -84,18 +84,22 @@ import { CORE_SECURITYGROUP_SECURITYGROUP_MODULE } from './securityGroup/securit
 import { CORE_TASK_TASK_MODULE } from './task/task.module';
 import { CORE_UTILS_UTILS_MODULE } from './utils/utils.module';
 import { CORE_VALIDATION_VALIDATION_MODULE } from './validation/validation.module';
+import { CORE_BANNER_CONTAINER_MODULE } from './banner/bannerContainer.module';
 import ANGULAR_MESSAGES from 'angular-messages';
 import ANGULAR_SANITIZE from 'angular-sanitize';
 import { angularSpinner } from 'angular-spinner';
 import ANGULAR_UI_BOOTSTRAP from 'angular-ui-bootstrap';
 import UI_SELECT from 'ui-select';
 
+/* Start - Rollup Remove */
 // load all templates into the $templateCache
 const templates = require.context('./', true, /\.html$/);
 templates.keys().forEach(function (key) {
   templates(key);
 });
+/* End - Rollup Remove */
 
+const UI_ROUTER_STATE_EVENTS_SHIM = 'ui.router.state.events';
 export const CORE_MODULE = 'spinnaker.core';
 module(CORE_MODULE, [
   ANGULAR_MESSAGES,
@@ -115,6 +119,7 @@ module(CORE_MODULE, [
   ARTIFACT_MODULE,
   AUTHENTICATION_MODULE,
 
+  CI_MODULE,
   CLOUD_PROVIDER_MODULE,
   CLUSTER_MODULE,
   CUSTOM_BANNER_CONFIG,
@@ -174,6 +179,7 @@ module(CORE_MODULE, [
   WIDGETS_MODULE,
 
   CORE_VALIDATION_VALIDATION_MODULE,
+  CORE_BANNER_CONTAINER_MODULE,
 ]).run(() => {
   // initialize all the stateful services
   State.initialize();

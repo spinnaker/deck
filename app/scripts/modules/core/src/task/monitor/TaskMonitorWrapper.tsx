@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
-import { CSSTransition } from 'react-transition-group';
 import { Modal } from 'react-bootstrap';
+import { CSSTransition } from 'react-transition-group';
 
-import { TaskMonitor } from './TaskMonitor';
 import { useForceUpdate } from 'core/presentation/hooks';
 
-import { TaskMonitorStatus } from './TaskMonitorStatus';
+import { TaskMonitor } from './TaskMonitor';
 import { TaskMonitorError } from './TaskMonitorError';
+import { TaskMonitorStatus } from './TaskMonitorStatus';
 
 export interface ITaskMonitorProps {
   monitor: TaskMonitor;
@@ -16,7 +16,7 @@ export const TaskMonitorWrapper = ({ monitor }: ITaskMonitorProps) => {
   const forceUpdate = useForceUpdate();
 
   useEffect(() => {
-    const subscription = monitor?.statusUpdatedStream.subscribe(() => forceUpdate());
+    const subscription = monitor?.statusUpdatedStream?.subscribe(() => forceUpdate());
     return () => subscription?.unsubscribe();
   }, [monitor]);
 

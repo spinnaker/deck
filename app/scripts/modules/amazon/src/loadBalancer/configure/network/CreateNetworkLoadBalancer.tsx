@@ -1,26 +1,24 @@
-import React from 'react';
-import { cloneDeep, get } from 'lodash';
 import { FormikErrors } from 'formik';
-import { IPromise } from 'angular';
+import { cloneDeep, every, get } from 'lodash';
+import React from 'react';
 
 import {
   AccountService,
   ILoadBalancerModalProps,
   LoadBalancerWriter,
+  noop,
   ReactInjector,
   ReactModal,
   TaskMonitor,
   WizardModal,
   WizardPage,
-  noop,
 } from '@spinnaker/core';
-
 import { AWSProviderSettings } from 'amazon/aws.settings';
 import { IAmazonNetworkLoadBalancer, IAmazonNetworkLoadBalancerUpsertCommand } from 'amazon/domain';
 
+import { NLBAdvancedSettings } from './NLBAdvancedSettings';
 import { NLBListeners } from './NLBListeners';
 import { TargetGroups } from './TargetGroups';
-import { NLBAdvancedSettings } from './NLBAdvancedSettings';
 import { LoadBalancerLocation } from '../common/LoadBalancerLocation';
 import { AwsLoadBalancerTransformer } from '../../loadBalancer.transformer';
 
@@ -89,7 +87,7 @@ export class CreateNetworkLoadBalancer extends React.Component<
     return certificateId;
   }
 
-  private formatListeners(command: IAmazonNetworkLoadBalancerUpsertCommand): IPromise<void> {
+  private formatListeners(command: IAmazonNetworkLoadBalancerUpsertCommand): PromiseLike<void> {
     return AccountService.getAccountDetails(command.credentials).then((account) => {
       command.listeners.forEach((listener) => {
         if (listener.protocol === 'TCP') {
@@ -196,6 +194,9 @@ export class CreateNetworkLoadBalancer extends React.Component<
 
     const descriptor = isNew ? 'Create' : 'Update';
     const loadBalancerCommandFormatted = cloneDeep(values);
+    loadBalancerCommandFormatted.ipAddressType = loadBalancerCommandFormatted.dualstack ? 'dualstack' : 'ipv4';
+    delete loadBalancerCommandFormatted.dualstack;
+
     if (forPipelineConfig) {
       // don't submit to backend for creation. Just return the loadBalancerCommand object
       this.formatListeners(loadBalancerCommandFormatted).then(() => {
@@ -285,7 +286,14 @@ export class CreateNetworkLoadBalancer extends React.Component<
               label="Advanced Settings"
               wizard={wizard}
               order={nextIdx()}
-              render={({ innerRef }) => <NLBAdvancedSettings ref={innerRef} formik={formik} />}
+              render={({ innerRef }) => (
+                <NLBAdvancedSettings
+                  ref={innerRef}
+                  showDualstack={
+                    !formik.values.isInternal && every(formik.values.targetGroups, { targetType: 'instance' })
+                  }
+                />
+              )}
             />
           </>
         )}

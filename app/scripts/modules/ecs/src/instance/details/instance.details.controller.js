@@ -1,18 +1,19 @@
 'use strict';
 
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 import { module } from 'angular';
+import ANGULAR_UI_BOOTSTRAP from 'angular-ui-bootstrap';
 import _ from 'lodash';
-import { getAllTargetGroups, applyHealthCheckInfoToTargetGroups } from '@spinnaker/amazon';
 
+import { applyHealthCheckInfoToTargetGroups, getAllTargetGroups } from '@spinnaker/amazon';
 import {
   CloudProviderRegistry,
   ConfirmationModalService,
   InstanceReader,
+  InstanceWriter,
   RecentHistoryService,
   SETTINGS,
 } from '@spinnaker/core';
-import UIROUTER_ANGULARJS from '@uirouter/angularjs';
-import ANGULAR_UI_BOOTSTRAP from 'angular-ui-bootstrap';
 
 export const ECS_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER = 'spinnaker.ecs.instance.details.controller';
 export const name = ECS_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER; // for backwards compatibility
@@ -22,14 +23,13 @@ module(ECS_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [UIROUTER_ANGULARJS, AN
     '$scope',
     '$state',
     '$uibModal',
-    'instanceWriter',
     'instance',
     'app',
     'moniker',
     'environment',
     '$q',
     'overrides',
-    function ($scope, $state, $uibModal, instanceWriter, instance, app, moniker, environment, $q, overrides) {
+    function ($scope, $state, $uibModal, instance, app, moniker, environment, $q, overrides) {
       // needed for standalone instances
       $scope.detailsTemplateUrl = CloudProviderRegistry.getValue('ecs', 'instance.detailsTemplateUrl');
 
@@ -248,7 +248,7 @@ module(ECS_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [UIROUTER_ANGULARJS, AN
         };
 
         const submitMethod = function () {
-          return instanceWriter.terminateInstance(instance, app, defaultRequestParams);
+          return InstanceWriter.terminateInstance(instance, app, defaultRequestParams);
         };
 
         ConfirmationModalService.confirm({
@@ -274,7 +274,7 @@ module(ECS_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [UIROUTER_ANGULARJS, AN
         };
 
         const submitMethod = function () {
-          return instanceWriter.terminateInstanceAndShrinkServerGroup(instance, app, defaultRequestParams);
+          return InstanceWriter.terminateInstanceAndShrinkServerGroup(instance, app, defaultRequestParams);
         };
 
         ConfirmationModalService.confirm({
@@ -295,7 +295,7 @@ module(ECS_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [UIROUTER_ANGULARJS, AN
         };
 
         const submitMethod = function () {
-          return instanceWriter.enableInstanceInDiscovery(instance, app, defaultRequestParams);
+          return InstanceWriter.enableInstanceInDiscovery(instance, app, defaultRequestParams);
         };
 
         ConfirmationModalService.confirm({
@@ -316,7 +316,7 @@ module(ECS_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER, [UIROUTER_ANGULARJS, AN
         };
 
         const submitMethod = function () {
-          return instanceWriter.disableInstanceInDiscovery(instance, app, defaultRequestParams);
+          return InstanceWriter.disableInstanceInDiscovery(instance, app, defaultRequestParams);
         };
 
         ConfirmationModalService.confirm({

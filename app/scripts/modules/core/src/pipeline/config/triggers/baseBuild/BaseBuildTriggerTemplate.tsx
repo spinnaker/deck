@@ -1,20 +1,19 @@
-import React from 'react';
-
 import { capitalize, get } from 'lodash';
-import { Option } from 'react-select';
 import { $q } from 'ngimport';
-import { IPromise } from 'angular';
+import React from 'react';
+import { Option } from 'react-select';
+import { from as observableFrom, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
-import { Observable, Subject } from 'rxjs';
-
+import { BuildServiceType, IgorService } from 'core/ci';
 import { IBuild, IBuildInfo, IBuildTrigger, IPipelineCommand } from 'core/domain';
-import { ITriggerTemplateComponentProps } from '../../../manualExecution/TriggerTemplate';
-import { IgorService, BuildServiceType } from 'core/ci';
-import { Spinner } from 'core/widgets/spinners/Spinner';
-import { buildDisplayName } from '../../../executionBuild/buildDisplayName.filter';
-import { timestamp } from 'core/utils/timeFormatters';
-import { TetheredSelect } from 'core/presentation/TetheredSelect';
 import { TextInput } from 'core/presentation';
+import { TetheredSelect } from 'core/presentation/TetheredSelect';
+import { timestamp } from 'core/utils/timeFormatters';
+import { Spinner } from 'core/widgets/spinners/Spinner';
+
+import { buildDisplayName } from '../../../executionBuild/buildDisplayName.filter';
+import { ITriggerTemplateComponentProps } from '../../../manualExecution/TriggerTemplate';
 
 export interface IBaseBuildTriggerTemplateProps extends ITriggerTemplateComponentProps {
   buildTriggerType: BuildServiceType;
@@ -35,7 +34,7 @@ export class BaseBuildTriggerTemplate extends React.Component<
 > {
   private destroy$ = new Subject();
 
-  public static formatLabel(trigger: IBuildTrigger): IPromise<string> {
+  public static formatLabel(trigger: IBuildTrigger): PromiseLike<string> {
     return $q.when(`(${capitalize(trigger.type)}) ${trigger.master}: ${trigger.job}`);
   }
 
@@ -103,8 +102,8 @@ export class BaseBuildTriggerTemplate extends React.Component<
       return;
     }
 
-    Observable.fromPromise(IgorService.listBuildsForJob(trigger.master, trigger.job))
-      .takeUntil(this.destroy$)
+    observableFrom(IgorService.listBuildsForJob(trigger.master, trigger.job))
+      .pipe(takeUntil(this.destroy$))
       .subscribe(this.buildLoadSuccess, this.buildLoadFailure);
   };
 

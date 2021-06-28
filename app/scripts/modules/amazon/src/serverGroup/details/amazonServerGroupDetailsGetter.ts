@@ -1,14 +1,13 @@
-import { IPromise } from 'angular';
 import { isEmpty } from 'lodash';
 import { Observable } from 'rxjs';
 
 import { AccountService, IServerGroupDetailsProps, ISubnet, ServerGroupReader, SubnetReader } from '@spinnaker/core';
-
-import { AwsReactInjector } from 'amazon/reactShims';
-import { AutoScalingProcessService } from './scalingProcesses/AutoScalingProcessService';
 import { IAmazonLoadBalancer, IAmazonServerGroup, IAmazonServerGroupView } from 'amazon/domain';
+import { AwsReactInjector } from 'amazon/reactShims';
 
-function extractServerGroupSummary(props: IServerGroupDetailsProps): IPromise<IAmazonServerGroup> {
+import { AutoScalingProcessService } from './scalingProcesses/AutoScalingProcessService';
+
+function extractServerGroupSummary(props: IServerGroupDetailsProps): PromiseLike<IAmazonServerGroup> {
   const { app, serverGroup } = props;
   return app.ready().then(() => {
     let summary: IAmazonServerGroup = app.serverGroups.data.find((toCheck: IAmazonServerGroup) => {

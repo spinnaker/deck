@@ -1,18 +1,18 @@
-import { IPromise, IQService, module } from 'angular';
+import { IQService, module } from 'angular';
 
 import {
   AccountService,
-  StorageAccountReader,
   Application,
   IArtifact,
+  IArtifactAccountPair,
   IBuildTrigger,
   IExpectedArtifact,
   IGitTrigger,
   IPipeline,
   IStage,
-  IArtifactAccountPair,
+  StorageAccountReader,
 } from '@spinnaker/core';
-
+import { AppengineProviderSettings } from 'appengine/appengine.settings';
 import {
   GitCredentialType,
   IAppengineAccount,
@@ -21,7 +21,6 @@ import {
   IAppengineServerGroup,
 } from 'appengine/domain';
 
-import { AppengineProviderSettings } from 'appengine/appengine.settings';
 import { AppengineDeployDescription } from '../transformer';
 
 export interface IAppengineServerGroupCommand {
@@ -103,7 +102,7 @@ export class AppengineServerGroupCommandBuilder {
     app: Application,
     selectedProvider: string,
     mode = 'create',
-  ): IPromise<IAppengineServerGroupCommand> {
+  ): PromiseLike<IAppengineServerGroupCommand> {
     if (selectedProvider == null) {
       selectedProvider = 'appengine';
     }
@@ -139,7 +138,7 @@ export class AppengineServerGroupCommandBuilder {
   public buildServerGroupCommandFromExisting(
     app: Application,
     serverGroup: IAppengineServerGroup,
-  ): IPromise<IAppengineServerGroupCommand> {
+  ): PromiseLike<IAppengineServerGroupCommand> {
     return this.buildNewServerGroupCommand(app, 'appengine', 'clone').then((command) => {
       command.stack = serverGroup.stack;
       command.freeFormDetails = serverGroup.detail;
@@ -150,7 +149,7 @@ export class AppengineServerGroupCommandBuilder {
   public buildNewServerGroupCommandForPipeline(
     _stage: IStage,
     pipeline: IPipeline,
-  ): IPromise<{
+  ): PromiseLike<{
     viewState: {
       stage: IStage;
       pipeline: IPipeline;
@@ -179,7 +178,7 @@ export class AppengineServerGroupCommandBuilder {
     cluster: AppengineDeployDescription,
     _stage: IStage,
     pipeline: IPipeline,
-  ): ng.IPromise<IAppengineServerGroupCommand> {
+  ): PromiseLike<IAppengineServerGroupCommand> {
     return this.buildNewServerGroupCommand(app, 'appengine', 'editPipeline').then(
       (command: IAppengineServerGroupCommand) => {
         command = {

@@ -3,8 +3,8 @@ import Select, { Option } from 'react-select';
 
 import { SystemTimezone } from 'core/utils/SystemTimezone';
 
-import { HOURS, MINUTES, WEEKDAYS } from './cronSelectOptions';
 import { ICronTriggerConfigProps } from './cronConfig';
+import { HOURS, MINUTES, WEEKDAYS } from './cronSelectOptions';
 
 export interface ICronWeeklyState {
   weekly: string[];
@@ -23,7 +23,7 @@ export class CronWeekly extends React.Component<ICronTriggerConfigProps, ICronWe
   }
 
   public componentDidMount() {
-    const regex = /0 (\d+) (\d+) \? \*\s?([SUN,MON,TUE, WED, THU, FRI, SAT]*) \*/g;
+    const regex = /^0 (\d+) (\d+) \? \* ((?:MON|TUE|WED|THU|FRI|SAT|SUN)(?:,(?:MON|TUE|WED|THU|FRI|SAT|SUN))*) \*$/g;
     const matches = regex.exec(this.props.trigger.cronExpression);
     if (matches) {
       this.setState({

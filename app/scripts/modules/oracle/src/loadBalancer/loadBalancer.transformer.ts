@@ -1,8 +1,7 @@
-import { module, IPromise } from 'angular';
+import { module } from 'angular';
+import { $q } from 'ngimport';
 
-import { OracleProviderSettings } from 'oracle/oracle.settings';
 import { Application } from '@spinnaker/core';
-
 import {
   IOracleBackEndSet,
   IOracleListener,
@@ -12,11 +11,11 @@ import {
   IOracleLoadBalancerUpsertCommand,
   LoadBalancingPolicy,
 } from 'oracle/domain/IOracleLoadBalancer';
-
-import { $q } from 'ngimport';
+import { OracleProviderSettings } from 'oracle/oracle.settings';
+import { OracleDefaultProviderSettings } from 'oracle/oracle.settings';
 
 export class OracleLoadBalancerTransformer {
-  public normalizeLoadBalancer(loadBalancer: IOracleLoadBalancer): IPromise<IOracleLoadBalancer> {
+  public normalizeLoadBalancer(loadBalancer: IOracleLoadBalancer): PromiseLike<IOracleLoadBalancer> {
     /*loadBalancer.serverGroups.forEach(function(serverGroup) {
       serverGroup.account = loadBalancer.account;
       serverGroup.region = loadBalancer.region;
@@ -72,8 +71,16 @@ export class OracleLoadBalancerTransformer {
   }
 
   public constructNewLoadBalancerTemplate(application: Application): IOracleLoadBalancerUpsertCommand {
-    const defaultCredentials = application.defaultCredentials.oracle || OracleProviderSettings.defaults.account;
-    const defaultRegion = application.defaultRegions.oracle || OracleProviderSettings.defaults.region;
+    const defaultCredentials =
+      application.defaultCredentials.oracle ||
+      (OracleProviderSettings.defaults
+        ? OracleProviderSettings.defaults.account
+        : OracleDefaultProviderSettings.defaults.account);
+    const defaultRegion =
+      application.defaultRegions.oracle ||
+      (OracleProviderSettings.defaults
+        ? OracleProviderSettings.defaults.region
+        : OracleDefaultProviderSettings.defaults.region);
     return {
       name: undefined,
       cloudProvider: 'oracle',

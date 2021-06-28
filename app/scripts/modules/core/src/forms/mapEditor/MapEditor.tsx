@@ -1,7 +1,10 @@
+import { isEqual, isString } from 'lodash';
 import React from 'react';
+
 import { IPipeline } from 'core/domain';
-import { isString } from 'lodash';
+
 import { IMapPair, MapPair } from './MapPair';
+import './MapEditor.less';
 
 export interface IMapEditorProps {
   addButtonLabel?: string;
@@ -39,6 +42,13 @@ export class MapEditor extends React.Component<IMapEditorProps, IMapEditorState>
     this.state = {
       backingModel: !isParameterized ? this.mapModel(props.model as { [key: string]: string }) : null,
     };
+  }
+
+  componentDidUpdate(prevProps: IMapEditorProps) {
+    const isModelObj = !isString(this.props.model);
+    if (isModelObj && !isEqual(prevProps.model, this.props.model)) {
+      this.setState({ backingModel: this.mapModel(this.props.model as { [key: string]: string }) });
+    }
   }
 
   private mapModel(model: { [key: string]: string }): IMapPair[] {
@@ -114,7 +124,7 @@ export class MapEditor extends React.Component<IMapEditorProps, IMapEditorState>
     const isParameterized = isString(this.props.model);
 
     return (
-      <div>
+      <div className="MapEditor">
         {label && (
           <div className="sm-label-left">
             <b>{label}</b>

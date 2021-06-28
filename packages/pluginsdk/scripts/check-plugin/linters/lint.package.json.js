@@ -35,8 +35,7 @@ function checkPackageJson(report) {
     },
   );
 
-  // const latestPeerDepsVersion = getLatestPackageVersion(PEER_DEPS);
-  const latestPeerDepsVersion = getLatestPackageVersion(PLUGIN_SDK);
+  const latestPeerDepsVersion = getLatestPackageVersion(PEER_DEPS);
   const installedPeerDepsVersion = getInstalledPackageVersion(pkgJson, PEER_DEPS);
 
   report(
@@ -52,10 +51,15 @@ function checkPackageJson(report) {
 
   const checkPackageJsonField = assertJsonFile(report, 'package.json', pkgJson);
 
-  checkPackageJsonField('scripts.build', 'npm run clean && rollup -c');
+  checkPackageJsonField('devDependencies.husky', undefined);
+  checkPackageJsonField('dependencies.husky', undefined);
+  checkPackageJsonField('scripts.build', 'npm run clean && NODE_ENV=production rollup -c');
   checkPackageJsonField('scripts.clean', 'npx shx rm -rf build');
+  checkPackageJsonField('scripts.lint', 'eslint --ext js,jsx,ts,tsx src');
   checkPackageJsonField('scripts.develop', 'npm run clean && run-p watch proxy');
   checkPackageJsonField('scripts.postinstall', 'check-plugin && check-peer-dependencies || true');
+  checkPackageJsonField('scripts.prepare', 'husky-install');
+  checkPackageJsonField('scripts.prettier', "prettier --write 'src/**/*.{js,jsx,ts,tsx,html,css,less,json}'");
   checkPackageJsonField('scripts.proxy', 'dev-proxy');
   checkPackageJsonField('scripts.watch', 'rollup -c -w --no-watch.clearScreen');
 }

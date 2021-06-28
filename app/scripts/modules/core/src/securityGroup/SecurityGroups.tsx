@@ -1,17 +1,19 @@
 import * as React from 'react';
 
 import { Application } from 'core/application/application.model';
-import { FilterTags, IFilterTag } from 'core/filterModel/FilterTags';
-import { ISecurityGroupGroup } from 'core/domain';
-import { SecurityGroupState } from 'core/state';
-import { Spinner } from 'core/widgets/spinners/Spinner';
-import { ISortFilter } from 'core/filterModel';
+import { BannerContainer } from 'core/banner';
 import { SETTINGS } from 'core/config';
-
-import { FirewallLabels } from './label/FirewallLabels';
-import { SecurityGroupPod } from './SecurityGroupPod';
-import { CreateSecurityGroupButton } from './CreateSecurityGroupButton';
+import { ISecurityGroupGroup } from 'core/domain';
+import { ISortFilter } from 'core/filterModel';
+import { FilterTags, IFilterTag } from 'core/filterModel/FilterTags';
+import { SecurityGroupState } from 'core/state';
 import { noop } from 'core/utils';
+import { Spinner } from 'core/widgets/spinners/Spinner';
+
+import { CreateSecurityGroupButton } from './CreateSecurityGroupButton';
+import { SecurityGroupPod } from './SecurityGroupPod';
+import { ProviderSelectionService } from '../cloudProvider/providerSelection/ProviderSelectionService';
+import { FirewallLabels } from './label/FirewallLabels';
 
 const { useEffect, useState } = React;
 
@@ -82,7 +84,7 @@ const Filters = () => {
 export const SecurityGroups = ({ app }: ISecurityGroupsProps) => {
   const [filterModel, setFilterModel] = useState<IFilterModel>({ groups: [], tags: [] });
   const [initialized, setInitialized] = useState(false);
-
+  const [buttonDisable, setButtonDisable] = useState(false);
   const groupsUpdated = () => {
     setFilterModel({
       groups: SecurityGroupState.filterModel.asFilterModel.groups,
@@ -120,7 +122,9 @@ export const SecurityGroups = ({ app }: ISecurityGroupsProps) => {
     });
     app.setActiveState(app.securityGroups);
     SecurityGroupState.filterModel.asFilterModel.activate();
-
+    ProviderSelectionService.isDisabled(app).then((val) => {
+      setButtonDisable(val);
+    });
     return () => {
       groupsUpdatedListener.unsubscribe();
       securityGroupsRefreshUnsubscribe();
@@ -140,14 +144,15 @@ export const SecurityGroups = ({ app }: ISecurityGroupsProps) => {
       <div className="header row header-clusters">
         <Filters />
         <div className="col-lg-4 col-md-2">
-          <div className="application-actions">
-            <CreateSecurityGroupButton app={app} />
-          </div>
+          <div className="application-actions">{buttonDisable ? <div /> : <CreateSecurityGroupButton app={app} />}</div>
         </div>
         <FilterTags tags={filterModel.tags} tagCleared={updateSecurityGroupGroups} clearFilters={clearFilters} />
       </div>
 
-      <div className="content">{groupings}</div>
+      <div className="content">
+        <BannerContainer app={app} />
+        {groupings}
+      </div>
     </div>
   );
 };

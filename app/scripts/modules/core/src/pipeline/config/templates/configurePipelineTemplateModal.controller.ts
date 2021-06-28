@@ -1,20 +1,20 @@
-import { module, IController, IScope, IHttpPromiseCallbackArg, IPromise } from 'angular';
+import { IController, IHttpPromiseCallbackArg, IScope, module } from 'angular';
 import { IModalInstanceService } from 'angular-ui-bootstrap';
-import { load, dump } from 'js-yaml';
-import { without, chain, has } from 'lodash';
+import { dump, load } from 'js-yaml';
+import { chain, has, without } from 'lodash';
 
 import { Application } from 'core/application/application.model';
-import { VariableValidatorService } from './validators/variableValidator.service';
 
 import {
-  PipelineTemplateReader,
-  IVariableMetadata,
-  IPipelineTemplateConfig,
-  IPipelineTemplatePlanResponse,
   IPipelineTemplate,
+  IPipelineTemplateConfig,
   IPipelineTemplatePlanError,
+  IPipelineTemplatePlanResponse,
+  IVariableMetadata,
+  PipelineTemplateReader,
 } from './PipelineTemplateReader';
 import { IVariable } from './inputs/variableInput.service';
+import { VariableValidatorService } from './validators/variableValidator.service';
 
 export interface IVariableMetadataGroup {
   name: string;
@@ -104,7 +104,7 @@ export class ConfigurePipelineTemplateModalController implements IController {
     return this.variables.every((v) => v.errors.length === 0);
   }
 
-  public submit(): IPromise<void> {
+  public submit(): PromiseLike<void> {
     const config = this.buildConfig();
     return PipelineTemplateReader.getPipelinePlan(config)
       .then((plan) => {
@@ -154,7 +154,7 @@ export class ConfigurePipelineTemplateModalController implements IController {
     };
   }
 
-  private loadTemplate(): IPromise<void> {
+  private loadTemplate(): PromiseLike<void> {
     return PipelineTemplateReader.getPipelineTemplateFromSourceUrl(this.source, this.executionId, this.pipelineId).then(
       (template) => {
         this.template = template;

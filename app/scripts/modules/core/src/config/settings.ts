@@ -27,6 +27,7 @@ export interface IFeatures {
   [key: string]: any;
   canary?: boolean;
   chaosMonkey?: boolean;
+  ci?: boolean;
   displayTimestampsInUserLocalTime?: boolean;
   dockerBake?: boolean;
   entityTags?: boolean;
@@ -46,11 +47,18 @@ export interface IFeatures {
   snapshots?: boolean;
   savePipelinesStageEnabled?: boolean;
   functions?: boolean;
+  kubernetesRawResources?: boolean;
 }
 
 export interface IDockerInsightSettings {
   enabled: boolean;
   url: string;
+}
+
+export interface IBannerSettings {
+  key: string;
+  active: boolean;
+  routes: string[];
 }
 
 export interface INewApplicationDefaults {
@@ -70,12 +78,15 @@ export interface ISpinnakerSettings {
   authEndpoint: string;
   authTtl: number;
   bakeryDetailUrl: string;
+  banners?: IBannerSettings[];
   checkForUpdates: boolean;
   debugEnabled: boolean;
+  maxRunningExecutionsToRetrieve: number;
   defaultInstancePort: number;
   defaultProviders: string[];
   defaultTimeZone: string; // see http://momentjs.com/timezone/docs/#/data-utilities/
   dockerInsights: IDockerInsightSettings;
+  disabledImages?: string[];
   entityTags?: {
     maxUrlLength?: number;
     maxResults?: number;
@@ -114,6 +125,7 @@ export interface ISpinnakerSettings {
   slack?: {
     baseUrl: string;
   };
+  stashTriggerInfo?: string;
   pollSchedule: number;
   providers?: {
     [key: string]: IProviderSettings; // allows custom providers not typed in here (good for testing too)
@@ -125,6 +137,8 @@ export interface ISpinnakerSettings {
   searchVersion: 1 | 2;
   triggerTypes: string[];
   useClassicFirewallLabels: boolean;
+  kubernetesAdHocInfraWritesEnabled: boolean;
+  changelogUrl: string;
 }
 
 export const SETTINGS: ISpinnakerSettings = (window as any).spinnakerSettings || {};
@@ -136,6 +150,8 @@ SETTINGS.analytics = SETTINGS.analytics || {};
 SETTINGS.providers = SETTINGS.providers || {};
 SETTINGS.defaultTimeZone = SETTINGS.defaultTimeZone || 'America/Los_Angeles';
 SETTINGS.dockerInsights = SETTINGS.dockerInsights || { enabled: false, url: '' };
+SETTINGS.changelogUrl =
+  SETTINGS.changelogUrl || 'https://www.spinnaker.io/community/releases/versions/:version-changelog';
 SETTINGS.managedDelivery = SETTINGS.managedDelivery || {
   defaultManifest: 'spinnaker.yml',
   manifestBasePath: '.spinnaker',

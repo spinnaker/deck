@@ -1,13 +1,13 @@
-import { IPromise } from 'angular';
-import { sortBy, uniq, cloneDeep } from 'lodash';
+import { cloneDeep, sortBy, uniq } from 'lodash';
 import { $q } from 'ngimport';
 
-import { API } from 'core/api/ApiService';
+import { REST } from 'core/api/ApiService';
 import { AuthenticationService } from 'core/authentication/AuthenticationService';
-import { PipelineTemplateV2Service } from '../templates/v2/pipelineTemplateV2.service';
 import { ViewStateCache } from 'core/cache';
-import { IStage } from 'core/domain/IStage';
 import { IPipeline } from 'core/domain/IPipeline';
+import { IStage } from 'core/domain/IStage';
+
+import { PipelineTemplateV2Service } from '../templates/v2/pipelineTemplateV2.service';
 
 export interface ITriggerPipelineResponse {
   eventId: string;
@@ -20,40 +20,37 @@ export class PipelineConfigService {
     return `${applicationName}:${pipelineName}`;
   }
 
-  public static getPipelinesForApplication(applicationName: string): IPromise<IPipeline[]> {
-    return API.one('applications')
-      .one(applicationName)
-      .all('pipelineConfigs')
-      .getList()
+  public static getPipelinesForApplication(applicationName: string): PromiseLike<IPipeline[]> {
+    return REST('/applications')
+      .path(applicationName, 'pipelineConfigs')
+      .get()
       .then((pipelines: IPipeline[]) => {
         pipelines.forEach((p) => (p.stages = p.stages || []));
         return this.sortPipelines(pipelines);
       });
   }
 
-  public static getStrategiesForApplication(applicationName: string): IPromise<IPipeline[]> {
-    return API.one('applications')
-      .one(applicationName)
-      .all('strategyConfigs')
-      .getList()
+  public static getStrategiesForApplication(applicationName: string): PromiseLike<IPipeline[]> {
+    return REST('/applications')
+      .path(applicationName, 'strategyConfigs')
+      .get()
       .then((pipelines: IPipeline[]) => {
         pipelines.forEach((p) => (p.stages = p.stages || []));
         return this.sortPipelines(pipelines);
       });
   }
 
-  public static getHistory(id: string, isStrategy: boolean, count = 20): IPromise<IPipeline[]> {
+  public static getHistory(id: string, isStrategy: boolean, count = 20): PromiseLike<IPipeline[]> {
     const endpoint = isStrategy ? 'strategyConfigs' : 'pipelineConfigs';
-    return API.one(endpoint, id).all('history').withParams({ limit: count }).getList();
+    return REST(endpoint).path(id, 'history').query({ limit: count }).get();
   }
 
-  public static deletePipeline(applicationName: string, pipeline: IPipeline, pipelineName: string): IPromise<void> {
-    return API.one(pipeline.strategy ? 'strategies' : 'pipelines')
-      .one(applicationName, encodeURIComponent(pipelineName.trim()))
-      .remove();
+  public static deletePipeline(applicationName: string, pipeline: IPipeline, pipelineName: string): PromiseLike<void> {
+    const endpoint = pipeline.strategy ? 'strategies' : 'pipelines';
+    return REST(endpoint).path(applicationName, pipelineName.trim()).delete();
   }
 
-  public static savePipeline(toSave: IPipeline): IPromise<void> {
+  public static savePipeline(toSave: IPipeline): PromiseLike<void> {
     let pipeline = cloneDeep(toSave);
     delete pipeline.isNew;
     pipeline.name = pipeline.name.trim();
@@ -69,22 +66,20 @@ export class PipelineConfigService {
       pipeline = PipelineTemplateV2Service.filterInheritedConfig(pipeline) as IPipeline;
     }
 
-    return API.one(pipeline.strategy ? 'strategies' : 'pipelines')
-      .data(pipeline)
-      .post();
+    const endpoint = pipeline.strategy ? 'strategies' : 'pipelines';
+    return REST(endpoint).query({ staleCheck: true }).post(pipeline);
   }
 
   public static reorderPipelines(
     application: string,
     idsToIndices: { [key: string]: number },
     isStrategy = false,
-  ): IPromise<void> {
-    return API.one(`actions/${isStrategy ? 'strategies' : 'pipelines'}/reorder`)
-      .data({
-        application,
-        idsToIndices,
-      })
-      .post();
+  ): PromiseLike<void> {
+    const type = isStrategy ? 'strategies' : 'pipelines';
+    return REST('/actions').path(type, 'reorder').post({
+      application,
+      idsToIndices,
+    });
   }
 
   public static renamePipeline(
@@ -92,23 +87,18 @@ export class PipelineConfigService {
     pipeline: IPipeline,
     currentName: string,
     newName: string,
-  ): IPromise<void> {
+  ): PromiseLike<void> {
     this.configViewStateCache.remove(this.buildViewStateCacheKey(applicationName, currentName));
     pipeline.name = newName.trim();
-    return API.one(pipeline.strategy ? 'strategies' : 'pipelines')
-      .one(pipeline.id)
-      .data(pipeline)
-      .put();
+    const endpoint = pipeline.strategy ? 'strategies' : 'pipelines';
+    return REST(endpoint).path(pipeline.id).put(pipeline);
   }
 
-  public static triggerPipeline(applicationName: string, pipelineName: string, body: any = {}): IPromise<string> {
+  public static triggerPipeline(applicationName: string, pipelineName: string, body: any = {}): PromiseLike<string> {
     body.user = AuthenticationService.getAuthenticatedUser().name;
-    return API.one('pipelines')
-      .one('v2')
-      .one(applicationName)
-      .one(encodeURIComponent(pipelineName))
-      .data(body)
-      .post()
+    return REST('/pipelines/v2')
+      .path(applicationName, pipelineName)
+      .post(body)
       .then((result: ITriggerPipelineResponse) => {
         return result.ref.split('/').pop();
       });
@@ -157,11 +147,11 @@ export class PipelineConfigService {
     return uniq(upstreamStages);
   }
 
-  private static sortPipelines(pipelines: IPipeline[]): IPromise<IPipeline[]> {
+  private static sortPipelines(pipelines: IPipeline[]): PromiseLike<IPipeline[]> {
     const sorted = sortBy(pipelines, ['index', 'name']);
 
     // if there are pipelines with a bad index, fix that
-    const toReindex: Array<IPromise<void>> = [];
+    const toReindex: Array<PromiseLike<void>> = [];
     if (sorted && sorted.length) {
       sorted.forEach((pipeline, index) => {
         if (pipeline.index !== index) {

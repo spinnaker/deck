@@ -1,5 +1,6 @@
-import { IManifest, IManifestEvent } from 'core/domain';
 import { trim } from 'lodash';
+
+import { IManifest, IManifestEvent } from 'core/domain';
 
 // when fetching logs from Pods there are some instances
 // where we know the name of the Pod ahead of time and some
@@ -34,7 +35,7 @@ export class JobEventBasedPodNameProvider implements IPodNameProvider {
 
   public getPodName(): string {
     const { manifestEvent } = this;
-    return this.canParsePodName() ? trim(manifestEvent.message.split(':')[1]) : '';
+    return this.canParsePodName() ? trim(manifestEvent.message?.split(':')[1]) : '';
   }
 
   private canParsePodName(): boolean {
@@ -43,7 +44,7 @@ export class JobEventBasedPodNameProvider implements IPodNameProvider {
       !!manifest.manifest &&
       !!manifest.manifest.status &&
       !!manifestEvent &&
-      !!manifestEvent.message.startsWith('Created pod') &&
+      !!manifestEvent.message?.startsWith('Created pod') &&
       manifest.manifest.kind.toLowerCase() === 'job'
     );
   }

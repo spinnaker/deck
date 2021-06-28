@@ -1,30 +1,34 @@
+import { module } from 'angular';
+import { isEqual, uniqWith } from 'lodash';
 import React from 'react';
-import { module, IPromise } from 'angular';
-import { uniqWith, isEqual } from 'lodash';
-import { react2angular } from 'react2angular';
 import { Alert } from 'react-bootstrap';
 import { Option } from 'react-select';
-import {
-  IEcsContainerMapping,
-  IEcsDockerImage,
-  IEcsServerGroupCommand,
-  IEcsTaskDefinitionArtifact,
-  IEcsTargetGroupMapping,
-} from '../../serverGroupConfiguration.service';
+import { react2angular } from 'react2angular';
+
 import {
   ArtifactTypePatterns,
+  CheckboxInput,
   HelpField,
   IArtifact,
   IExpectedArtifact,
   StageArtifactSelectorDelegate,
+  StageConfigField,
   TetheredSelect,
   withErrorBoundary,
 } from '@spinnaker/core';
 
+import {
+  IEcsContainerMapping,
+  IEcsDockerImage,
+  IEcsServerGroupCommand,
+  IEcsTargetGroupMapping,
+  IEcsTaskDefinitionArtifact,
+} from '../../serverGroupConfiguration.service';
+
 export interface ITaskDefinitionProps {
   command: IEcsServerGroupCommand;
   notifyAngular: (key: string, value: any) => void;
-  configureCommand: (query: string) => IPromise<void>;
+  configureCommand: (query: string) => PromiseLike<void>;
 }
 
 interface ITaskDefinitionState {
@@ -35,6 +39,7 @@ interface ITaskDefinitionState {
   dockerImages: IEcsDockerImage[];
   targetGroupsAvailable: string[];
   loadBalancedContainer: string;
+  evaluateTaskDefinitionArtifactExpressions: boolean;
 }
 
 export class TaskDefinition extends React.Component<ITaskDefinitionProps, ITaskDefinitionState> {
@@ -71,6 +76,7 @@ export class TaskDefinition extends React.Component<ITaskDefinitionProps, ITaskD
       dockerImages: cmd.backingData && cmd.backingData.filtered ? cmd.backingData.filtered.images : [],
       loadBalancedContainer: cmd.loadBalancedContainer || defaultContainer,
       taskDefArtifactAccount: cmd.taskDefinitionArtifactAccount,
+      evaluateTaskDefinitionArtifactExpressions: cmd.evaluateTaskDefinitionArtifactExpressions,
     };
   }
 
@@ -198,6 +204,16 @@ export class TaskDefinition extends React.Component<ITaskDefinitionProps, ITaskD
     this.setState({ targetGroupMappings: currentMappings });
   };
 
+  private updateEvaluateTaskDefArtifactFlag = () => {
+    this.props.notifyAngular(
+      'evaluateTaskDefinitionArtifactExpressions',
+      !this.props.command.evaluateTaskDefinitionArtifactExpressions,
+    );
+    this.setState({
+      evaluateTaskDefinitionArtifactExpressions: !this.props.command.evaluateTaskDefinitionArtifactExpressions,
+    });
+  };
+
   public render(): React.ReactElement<TaskDefinition> {
     const { command } = this.props;
     const removeMapping = this.removeMapping;
@@ -207,6 +223,7 @@ export class TaskDefinition extends React.Component<ITaskDefinitionProps, ITaskD
     const updateTargetGroupMappingContainer = this.updateTargetGroupMappingContainer;
     const updateTargetGroupMappingTargetGroup = this.updateTargetGroupMappingTargetGroup;
     const updateTargetGroupMappingPort = this.updateTargetGroupMappingPort;
+    const updateEvaluateTaskDefArtifactFlag = this.updateEvaluateTaskDefArtifactFlag;
 
     const dockerImageOptions = this.state.dockerImages.map(function (image) {
       let msg = '';
@@ -340,6 +357,23 @@ export class TaskDefinition extends React.Component<ITaskDefinitionProps, ITaskD
             />
           </div>
         </div>
+
+        <StageConfigField
+          groupClassName="form-group evaluateTaskDef"
+          label="Expression Evaluation"
+          helpKey="ecs.evaluateExpression"
+          labelColumns={5}
+          fieldColumns={7}
+        >
+          <CheckboxInput
+            checked={command.evaluateTaskDefinitionArtifactExpressions === true}
+            onChange={() => {
+              updateEvaluateTaskDefArtifactFlag();
+            }}
+            text="Evaluate SpEL expressions in artifact"
+          />
+        </StageConfigField>
+
         <div className="form-group">
           <div className="sm-label-left">
             <b>Container Mappings</b>

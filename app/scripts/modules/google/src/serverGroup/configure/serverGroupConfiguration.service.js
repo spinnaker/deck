@@ -11,16 +11,16 @@ import {
   SECURITY_GROUP_READER,
   SubnetReader,
 } from '@spinnaker/core';
-
 import { GCEProviderSettings } from 'google/gce.settings';
 import { GCE_HEALTH_CHECK_READER } from 'google/healthCheck/healthCheck.read.service';
 import { getHealthCheckOptions } from 'google/healthCheck/healthCheckUtils';
+import { GceImageReader } from 'google/image';
 import { GCE_HTTP_LOAD_BALANCER_UTILS } from 'google/loadBalancer/httpLoadBalancerUtils.service';
 import { LOAD_BALANCER_SET_TRANSFORMER } from 'google/loadBalancer/loadBalancer.setTransformer';
-import { GceImageReader } from 'google/image';
-import { GceAcceleratorService } from './wizard/advancedSettings/gceAccelerator.service';
-import { GOOGLE_INSTANCE_GCEINSTANCETYPE_SERVICE } from '../../instance/gceInstanceType.service';
+
 import { GOOGLE_INSTANCE_CUSTOM_CUSTOMINSTANCEBUILDER_GCE_SERVICE } from './../../instance/custom/customInstanceBuilder.gce.service';
+import { GOOGLE_INSTANCE_GCEINSTANCETYPE_SERVICE } from '../../instance/gceInstanceType.service';
+import { GceAcceleratorService } from './wizard/advancedSettings/gceAccelerator.service';
 import { GOOGLE_SERVERGROUP_CONFIGURE_WIZARD_SECURITYGROUPS_TAGMANAGER_SERVICE } from './wizard/securityGroups/tagManager.service';
 
 export const GOOGLE_SERVERGROUP_CONFIGURE_SERVERGROUPCONFIGURATION_SERVICE =
@@ -90,20 +90,45 @@ angular
 
       function configureCommand(application, command) {
         return $q
-          .all({
-            credentialsKeyedByAccount: AccountService.getCredentialsKeyedByAccount('gce'),
-            securityGroups: securityGroupReader.getAllSecurityGroups(),
-            networks: NetworkReader.listNetworksByProvider('gce'),
-            subnets: SubnetReader.listSubnetsByProvider('gce'),
-            loadBalancers: loadBalancerReader.listLoadBalancers('gce'),
-            allImages: loadAllImages(command.credentials),
-            instanceTypes: gceInstanceTypeService.getAllTypesByRegion(),
-            persistentDiskTypes: $q.when(angular.copy(persistentDiskTypes)),
-            authScopes: $q.when(angular.copy(authScopes)),
-            healthChecks: gceHealthCheckReader.listHealthChecks(),
-            accounts: AccountService.listAccounts('gce'),
-          })
-          .then(function (backingData) {
+          .all([
+            AccountService.getCredentialsKeyedByAccount('gce'),
+            securityGroupReader.getAllSecurityGroups(),
+            NetworkReader.listNetworksByProvider('gce'),
+            SubnetReader.listSubnetsByProvider('gce'),
+            loadBalancerReader.listLoadBalancers('gce'),
+            loadAllImages(command.credentials),
+            gceInstanceTypeService.getAllTypesByRegion(),
+            $q.when(angular.copy(persistentDiskTypes)),
+            $q.when(angular.copy(authScopes)),
+            gceHealthCheckReader.listHealthChecks(),
+            AccountService.listAccounts('gce'),
+          ])
+          .then(function ([
+            credentialsKeyedByAccount,
+            securityGroups,
+            networks,
+            subnets,
+            loadBalancers,
+            allImages,
+            instanceTypes,
+            persistentDiskTypes,
+            authScopes,
+            healthChecks,
+            accounts,
+          ]) {
+            const backingData = {
+              credentialsKeyedByAccount,
+              securityGroups,
+              networks,
+              subnets,
+              loadBalancers,
+              allImages,
+              instanceTypes,
+              persistentDiskTypes,
+              authScopes,
+              healthChecks,
+              accounts,
+            };
             let securityGroupReloader = $q.when(null);
             let networkReloader = $q.when(null);
             let healthCheckReloader = $q.when(null);
@@ -150,7 +175,7 @@ angular
 
       function configureDistributionPolicyTargetShape(command) {
         const accountDetails = command.backingData.credentialsKeyedByAccount[command.credentials];
-        if (accountDetails.computeVersion === 'ALPHA' && !command.distributionPolicy.targetShape) {
+        if (!command.distributionPolicy.targetShape) {
           command.distributionPolicy.targetShape = 'EVEN';
         }
       }

@@ -1,7 +1,5 @@
-import { module, IPromise } from 'angular';
+import { module } from 'angular';
 import { defaults } from 'lodash';
-
-import { IVpc, IInstance } from '@spinnaker/core';
 
 import {
   IAmazonServerGroup,
@@ -13,6 +11,7 @@ import {
   IStepAdjustmentView,
   VpcReader,
 } from '@spinnaker/amazon';
+import { IInstance, IVpc } from '@spinnaker/core';
 
 export class EcsServerGroupTransformer {
   private addComparator(alarm: IScalingPolicyAlarmView): void {
@@ -71,7 +70,7 @@ export class EcsServerGroupTransformer {
     return view;
   }
 
-  public normalizeServerGroup(serverGroup: IAmazonServerGroup): IPromise<IAmazonServerGroup> {
+  public normalizeServerGroup(serverGroup: IAmazonServerGroup): PromiseLike<IAmazonServerGroup> {
     serverGroup.instances.forEach((instance: IInstance) => {
       instance.vpcId = serverGroup.vpcId;
     });

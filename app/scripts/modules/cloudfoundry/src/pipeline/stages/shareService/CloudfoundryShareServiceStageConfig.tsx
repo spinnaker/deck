@@ -1,8 +1,7 @@
 import React from 'react';
-
-import { Observable, Subject } from 'rxjs';
-
 import Select, { Option } from 'react-select';
+import { from as observableFrom, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import {
   AccountService,
@@ -37,8 +36,8 @@ export class CloudfoundryShareServiceStageConfig extends React.Component<
   }
 
   public componentDidMount(): void {
-    Observable.fromPromise(AccountService.listAccounts('cloudfoundry'))
-      .takeUntil(this.destroy$)
+    observableFrom(AccountService.listAccounts('cloudfoundry'))
+      .pipe(takeUntil(this.destroy$))
       .subscribe((accounts) => this.setState({ accounts }));
     if (this.props.stage.credentials) {
       this.clearAndReloadRegions();
@@ -51,8 +50,8 @@ export class CloudfoundryShareServiceStageConfig extends React.Component<
 
   private clearAndReloadRegions = () => {
     this.setState({ regions: [] });
-    Observable.fromPromise(AccountService.getRegionsForAccount(this.props.stage.credentials))
-      .takeUntil(this.destroy$)
+    observableFrom(AccountService.getRegionsForAccount(this.props.stage.credentials))
+      .pipe(takeUntil(this.destroy$))
       .subscribe((regionList: IRegion[]) => {
         const { region } = this.props.stage;
         const regions = regionList.map((r) => r.name);

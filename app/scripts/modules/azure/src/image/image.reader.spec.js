@@ -1,53 +1,46 @@
 'use strict';
-
-import { API } from '@spinnaker/core';
+import { mockHttpClient } from 'core/api/mock/jasmine';
 
 describe('Service: Azure Image Reader', function () {
-  var service, $http;
+  var service;
 
   beforeEach(window.module(require('./image.reader').name));
 
   beforeEach(
-    window.inject(function (azureImageReader, $httpBackend) {
+    window.inject(function (azureImageReader) {
       service = azureImageReader;
-      $http = $httpBackend;
     }),
   );
-
-  afterEach(function () {
-    $http.verifyNoOutstandingRequest();
-    $http.verifyNoOutstandingExpectation();
-  });
 
   describe('findImages', function () {
     var query = 'abc',
       region = 'usw';
 
-    function buildQueryString() {
-      return API.baseUrl + '/images/find?provider=azure&q=' + query + '&region=' + region;
-    }
+    const buildQueryString = () => `/images/find?provider=azure&q=${query}&region=${region}`;
 
-    it('queries gate when 3 characters are supplied', function () {
+    it('queries gate when 3 characters are supplied', async function () {
+      const http = mockHttpClient();
       var result = null;
 
-      $http.when('GET', buildQueryString()).respond(200, [{ success: true }]);
+      http.expectGET(buildQueryString()).respond(200, [{ success: true }]);
 
       service.findImages({ provider: 'azure', q: query, region: region }).then(function (results) {
         result = results;
       });
 
-      $http.flush();
+      await http.flush();
 
       expect(result.length).toBe(1);
       expect(result[0].success).toBe(true);
     });
 
-    it('queries gate when more than 3 characters are supplied', function () {
+    it('queries gate when more than 3 characters are supplied', async function () {
+      const http = mockHttpClient();
       var result = null;
 
       query = 'abcd';
 
-      $http.when('GET', buildQueryString()).respond(200, [{ success: true }]);
+      http.expectGET(buildQueryString()).respond(200, [{ success: true }]);
 
       var promise = service.findImages({ provider: 'azure', q: query, region: region });
 
@@ -55,23 +48,24 @@ describe('Service: Azure Image Reader', function () {
         result = results;
       });
 
-      $http.flush();
+      await http.flush();
 
       expect(result.length).toBe(1);
       expect(result[0].success).toBe(true);
     });
 
-    it('returns an empty array when server errors', function () {
+    it('returns an empty array when server errors', async function () {
+      const http = mockHttpClient();
       query = 'abc';
       var result = null;
 
-      $http.when('GET', buildQueryString()).respond(404, {});
+      http.expectGET(buildQueryString()).respond(404, {});
 
       service.findImages({ provider: 'azure', q: query, region: region }).then(function (results) {
         result = results;
       });
 
-      $http.flush();
+      await http.flush();
 
       expect(result.length).toBe(0);
     });
@@ -82,32 +76,31 @@ describe('Service: Azure Image Reader', function () {
       region = 'usw',
       credentials = 'test';
 
-    function buildQueryString() {
-      return [API.baseUrl, 'images', credentials, region, imageName].join('/') + '?provider=azure';
-    }
+    const buildQueryString = () => `/images/${credentials}/${region}/${imageName}?provider=azure`;
 
-    it('returns null if server returns 404 or an empty list', function () {
+    it('returns null if server returns 404 or an empty list', async function () {
+      const http = mockHttpClient();
       var result = 'not null';
 
-      $http.when('GET', buildQueryString()).respond(404, {});
+      http.expectGET(buildQueryString()).respond(404, {});
 
       service.getImage(imageName, region, credentials).then(function (results) {
         result = results;
       });
 
-      $http.flush();
+      await http.flush();
 
       expect(result).toBe(null);
 
       result = 'not null';
 
-      $http.when('GET', buildQueryString()).respond(200, []);
+      http.expectGET(buildQueryString()).respond(200, []);
 
       service.getImage(imageName, region, credentials).then(function (results) {
         result = results;
       });
 
-      $http.flush();
+      await http.flush();
 
       expect(result).toBe(null);
     });

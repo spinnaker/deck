@@ -1,30 +1,31 @@
-import { IPromise } from 'angular';
 import { $log, $q, $timeout } from 'ngimport';
 import { Subject } from 'rxjs';
 
-import { API } from 'core/api/ApiService';
-import { OrchestratedItemTransformer } from 'core/orchestratedItem/orchestratedItem.transformer';
+import { REST } from 'core/api/ApiService';
 import { ITask } from 'core/domain';
+import { OrchestratedItemTransformer } from 'core/orchestratedItem/orchestratedItem.transformer';
 
 export class TaskReader {
   private static activeStatuses: string[] = ['RUNNING', 'SUSPENDED', 'NOT_STARTED'];
 
-  public static getTasks(applicationName: string, statuses: string[] = []): IPromise<ITask[]> {
-    return API.one('applications', applicationName)
-      .all('tasks')
-      .getList({ statuses: statuses.join(',') })
+  public static getTasks(applicationName: string, statuses: string[] = []): PromiseLike<ITask[]> {
+    return REST('/applications')
+      .path(applicationName, 'tasks')
+      .query({ statuses: statuses.join(',') })
+      .get()
       .then((tasks: ITask[]) => {
         tasks.forEach((task) => this.setTaskProperties(task));
         return tasks.filter((task) => !task.getValueFor('dryRun'));
       });
   }
 
-  public static getRunningTasks(applicationName: string): IPromise<ITask[]> {
+  public static getRunningTasks(applicationName: string): PromiseLike<ITask[]> {
     return this.getTasks(applicationName, this.activeStatuses);
   }
 
-  public static getTask(taskId: string): IPromise<ITask> {
-    return API.one('tasks', taskId)
+  public static getTask(taskId: string): PromiseLike<ITask> {
+    return REST('/tasks')
+      .path(taskId)
       .get()
       .then((task: ITask) => {
         this.setTaskProperties(task);
@@ -36,7 +37,10 @@ export class TaskReader {
         }
         return task;
       })
-      .catch((error: any) => $log.warn('There was an issue retrieving taskId: ', taskId, error));
+      .catch((error: any): undefined => {
+        $log.warn('There was an issue retrieving taskId: ', taskId, error);
+        return undefined;
+      });
   }
 
   public static waitUntilTaskMatches(
@@ -45,7 +49,7 @@ export class TaskReader {
     failureClosure?: (task: ITask) => boolean,
     interval = 1000,
     notifier?: Subject<void>,
-  ): IPromise<ITask> {
+  ): PromiseLike<ITask> {
     const deferred = $q.defer<ITask>();
     if (!task) {
       deferred.reject(null);
@@ -68,7 +72,7 @@ export class TaskReader {
     return deferred.promise;
   }
 
-  public static waitUntilTaskCompletes(task: ITask, interval = 1000, notifier?: Subject<void>): IPromise<ITask> {
+  public static waitUntilTaskCompletes(task: ITask, interval = 1000, notifier?: Subject<void>): PromiseLike<ITask> {
     return this.waitUntilTaskMatches(
       task,
       (t) => t.isCompleted,

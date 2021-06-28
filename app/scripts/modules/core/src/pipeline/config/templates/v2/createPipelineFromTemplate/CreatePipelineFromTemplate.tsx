@@ -1,15 +1,17 @@
 import React from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import { Option } from 'react-select';
-import { Observable, Subject } from 'rxjs';
+import { from as observableFrom, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import { Application, ApplicationReader, IApplicationSummary } from 'core/application';
-import ApplicationSelector from '../ApplicationSelector';
-import { CreatePipelineModal } from '../../../../create';
 import { IPipelineTemplateV2 } from 'core/domain/IPipelineTemplateV2';
+import { SubmitButton } from 'core/modal/buttons/SubmitButton';
 import { ReactInjector } from 'core/reactShims';
 import { Spinner } from 'core/widgets/spinners/Spinner';
-import { SubmitButton } from 'core/modal/buttons/SubmitButton';
+
+import ApplicationSelector from '../ApplicationSelector';
+import { CreatePipelineModal } from '../../../../create';
 
 import './createPipelineFromTemplate.less';
 
@@ -45,8 +47,8 @@ export class CreatePipelineFromTemplate extends React.Component<
   private destroy$ = new Subject();
 
   public componentDidMount() {
-    Observable.fromPromise(ApplicationReader.listApplications())
-      .takeUntil(this.destroy$)
+    observableFrom(ApplicationReader.listApplications())
+      .pipe(takeUntil(this.destroy$))
       .subscribe(
         (applications) => this.setState({ applications, loading: false }),
         () => {
@@ -81,8 +83,8 @@ export class CreatePipelineFromTemplate extends React.Component<
     } = this.state;
 
     this.setState({ submitting: true });
-    Observable.fromPromise(ApplicationReader.getApplication(name))
-      .takeUntil(this.destroy$)
+    observableFrom(ApplicationReader.getApplication(name))
+      .pipe(takeUntil(this.destroy$))
       .subscribe(
         (loadedApplication) => {
           loadedApplication.getDataSource('pipelineConfigs').activate();

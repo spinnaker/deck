@@ -1,8 +1,7 @@
-import React from 'react';
-
-import { Observable, Subject } from 'rxjs';
-
 import { FormikErrors, FormikProps } from 'formik';
+import React from 'react';
+import { from as observableFrom, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import {
   AccountService,
@@ -15,9 +14,9 @@ import {
   ReactSelectInput,
   StageConstants,
 } from '@spinnaker/core';
+import { FormikAccountRegionClusterSelector } from 'cloudfoundry/presentation';
 
 import { ICloudFoundryCreateServerGroupCommand } from '../../../serverGroupConfigurationModel.cf';
-import { FormikAccountRegionClusterSelector } from 'cloudfoundry/presentation';
 
 import 'cloudfoundry/common/cloudFoundry.less';
 
@@ -39,8 +38,8 @@ export class CloudFoundryServerGroupCloneSettings
   };
 
   public componentDidMount(): void {
-    Observable.fromPromise(AccountService.listAccounts('cloudfoundry'))
-      .takeUntil(this.destroy$)
+    observableFrom(AccountService.listAccounts('cloudfoundry'))
+      .pipe(takeUntil(this.destroy$))
       .subscribe((accounts) => this.setState({ accounts }));
   }
 

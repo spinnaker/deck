@@ -1,6 +1,5 @@
-import { IPromise } from 'angular';
-import { Observable, Subject, Subscription } from 'rxjs';
-import { $log, $window, $timeout } from 'ngimport';
+import { $log, $timeout, $window } from 'ngimport';
+import { Subject, Subscription, timer as observableTimer } from 'rxjs';
 
 import { SETTINGS } from 'core/config/settings';
 
@@ -15,12 +14,12 @@ export class SchedulerFactory {
     let scheduler = new Subject();
 
     let lastRunTimestamp = new Date().getTime();
-    let pendingRun: IPromise<void> = null;
+    let pendingRun: PromiseLike<void> = null;
     let suspended = false;
 
     // When creating the timer, use last run as the dueTime (first arg); zero can lead to concurrency issues
     // where the scheduler will fire shortly after being subscribed to, resulting in surprising immediate refreshes
-    let source = Observable.timer(pollSchedule, pollSchedule);
+    let source = observableTimer(pollSchedule, pollSchedule);
 
     const run = (): void => {
       if (suspended) {

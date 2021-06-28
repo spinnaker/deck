@@ -1,10 +1,11 @@
-import React from 'react';
-import ReactGA from 'react-ga';
 import { isUndefined } from 'lodash';
+import React from 'react';
 
-import { HelpContentsRegistry } from './helpContents.registry';
-import { HelpTextExpandedContext } from './HelpTextExpandedContext';
 import { HoverablePopover, Markdown, Placement } from 'core/presentation';
+import { logger } from 'core/utils';
+
+import { HelpTextExpandedContext } from './HelpTextExpandedContext';
+import { HelpContentsRegistry } from './helpContents.registry';
 
 export interface IHelpFieldProps {
   id?: string;
@@ -29,18 +30,22 @@ function HelpFieldContents(props: Pick<IHelpFieldProps, 'id' | 'fallback' | 'con
 
 export function HelpField(props: IHelpFieldProps) {
   const { content, expand, fallback, id, label, placement } = props;
-
   const [popoverShownStart, setPopoverShownStart] = React.useState<number>();
+
   const onShow = (): void => setPopoverShownStart(Date.now());
   const onHide = (): void => {
     if (Date.now() - popoverShownStart > 500) {
-      ReactGA.event({ action: 'Help contents viewed', category: 'Help', label: props.id || props.content });
+      logger.log({ action: 'Help contents viewed', category: 'Help', data: { label: props.id || props.content } });
     }
   };
 
   const icon = <i className="small glyphicon glyphicon-question-sign" />;
   const shouldExpandFromContext = React.useContext(HelpTextExpandedContext);
   const expandHelpText = isUndefined(expand) ? shouldExpandFromContext : expand;
+
+  if (!id && !content) {
+    return null;
+  }
 
   const contents = <HelpFieldContents content={content} fallback={fallback} id={id} />;
   const popover = (

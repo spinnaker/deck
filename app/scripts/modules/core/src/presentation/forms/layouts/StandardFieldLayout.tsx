@@ -1,8 +1,10 @@
-import React from 'react';
 import { isUndefined } from 'lodash';
-import { ValidationMessage } from '../validation';
+import React from 'react';
+
 import { IFormInputValidation } from '../inputs';
 import { ILayoutProps } from './interface';
+import { ValidationMessage } from '../validation';
+
 import './StandardFieldLayout.css';
 
 export function StandardFieldLayout(props: ILayoutProps) {
@@ -20,7 +22,7 @@ export function StandardFieldLayout(props: ILayoutProps) {
 
       <div className="flex-grow">
         <div className="flex-container-v margin-between-md">
-          <div className="flex-container-h baseline margin-between-lg StandardFieldLayout_Contents">
+          <div className="flex-container-h baseline space-between margin-between-lg StandardFieldLayout_Contents">
             {input} {actions}
           </div>
 

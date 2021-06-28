@@ -1,12 +1,13 @@
-import React from 'react';
 import { get } from 'lodash';
+import React from 'react';
 
-import { IExecution, IExecutionStage } from 'core/domain';
 import { Application } from 'core/application/application.model';
 import { ConfirmationModalService } from 'core/confirmationModal';
+import { IExecution, IExecutionStage } from 'core/domain';
 import { ReactInjector } from 'core/reactShims';
-import { timePickerTime } from 'core/utils/timeFormatters';
 import { SystemTimezone } from 'core/utils/SystemTimezone';
+import { timePickerTime } from 'core/utils/timeFormatters';
+
 import { DAYS_OF_WEEK } from './daysOfWeek';
 
 export interface IExecutionWindowActionsProps {
@@ -35,7 +36,7 @@ export class ExecutionWindowActions extends React.Component<
 > {
   constructor(props: IExecutionWindowActionsProps) {
     super(props);
-    const days = props.stage.context.restrictedExecutionWindow.days;
+    const days = props.stage.context.restrictedExecutionWindow?.days;
     let dayText = 'Everyday';
     if (days && days.length > 0) {
       dayText = this.replaceDays(days).join(', ');

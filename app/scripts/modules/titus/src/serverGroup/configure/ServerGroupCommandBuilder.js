@@ -48,9 +48,12 @@ angular.module(TITUS_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER, []).factor
           max: 1,
           desired: 1,
         },
+        targetHealthyDeployPercentage: 100,
         env: {},
         labels: {},
-        containerAttributes: {},
+        containerAttributes: {
+          'titusParameter.agent.assignIPv6Address': 'true',
+        },
         cloudProvider: 'titus',
         selectedProvider: 'titus',
         iamProfile: defaultIamProfile,
@@ -92,6 +95,23 @@ angular.module(TITUS_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER, []).factor
 
       const serverGroupName = NameUtils.parseServerGroupName(serverGroup.name);
 
+      const isTestEnv = serverGroup.awsAccount === 'test';
+      const isIPv6Set =
+        serverGroup.containerAttributes &&
+        serverGroup.containerAttributes['titusParameter.agent.assignIPv6Address'] !== undefined;
+
+      // If IPv6 hasn't been explicitly set by the user, auto-assign based on the environment.
+      const assignIPv6Address = isIPv6Set
+        ? serverGroup.containerAttributes['titusParameter.agent.assignIPv6Address']
+        : isTestEnv
+        ? 'true'
+        : 'false';
+
+      const containerAttributes = {
+        ...serverGroup.containerAttributes,
+        'titusParameter.agent.assignIPv6Address': assignIPv6Address,
+      };
+
       const command = {
         application: application.name,
         disruptionBudget: serverGroup.disruptionBudget,
@@ -103,7 +123,7 @@ angular.module(TITUS_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER, []).factor
         region: serverGroup.region,
         env: serverGroup.env,
         labels: serverGroup.labels,
-        containerAttributes: serverGroup.containerAttributes,
+        containerAttributes,
         entryPoint: serverGroup.entryPoint,
         iamProfile: serverGroup.iamProfile,
         capacityGroup: serverGroup.capacityGroup,
@@ -133,6 +153,7 @@ angular.module(TITUS_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER, []).factor
           max: serverGroup.capacity.max,
           desired: serverGroup.capacity.desired,
         },
+        targetHealthyDeployPercentage: 100,
         cloudProvider: 'titus',
         selectedProvider: 'titus',
         viewState: {
@@ -178,11 +199,8 @@ angular.module(TITUS_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER, []).factor
         imageId: pipelineCluster.imageId,
         region: pipelineCluster.region,
       };
-      const asyncLoader = $q.all({ command: buildNewServerGroupCommand(application, commandOptions) });
 
-      return asyncLoader.then(function (asyncData) {
-        const command = asyncData.command;
-
+      return buildNewServerGroupCommand(application, commandOptions).then(function (command) {
         command.constraints = {
           hard:
             (originalCluster.constraints && originalCluster.constraints.hard) ||

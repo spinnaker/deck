@@ -1,7 +1,6 @@
-import { IController, IPromise } from 'angular';
+import { IController } from 'angular';
 
 import { AccountService, StageConstants } from '@spinnaker/core';
-
 import { AppengineHealth } from 'appengine/common/appengineHealth';
 import { IAppengineAccount, IAppengineStageScope } from 'appengine/domain';
 
@@ -24,7 +23,7 @@ export class AppengineStageCtrl implements IController {
     this.$scope.stage.cloudProvider = 'appengine';
   }
 
-  protected setAccounts(): IPromise<void> {
+  protected setAccounts(): PromiseLike<void> {
     return AccountService.listAccounts('appengine').then((accounts: IAppengineAccount[]) => {
       this.$scope.accounts = accounts;
     });

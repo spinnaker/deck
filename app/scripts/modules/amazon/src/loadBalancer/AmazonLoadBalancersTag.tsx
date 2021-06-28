@@ -1,23 +1,23 @@
 // This is all mercilessly copied from LoadBalancersTag.tsx. This should be cleaned up at some point
 // Probably when we convert clusters view to React.
 
-import React from 'react';
-import ReactGA from 'react-ga';
 import { sortBy } from 'lodash';
+import React from 'react';
 
 import {
   HealthCounts,
+  HoverablePopover,
   ILoadBalancer,
   ILoadBalancersTagProps,
   LoadBalancerDataUtils,
+  logger,
   ReactInjector,
-  Tooltip,
-  HoverablePopover,
   Spinner,
+  Tooltip,
 } from '@spinnaker/core';
+import { IAmazonServerGroup, ITargetGroup } from 'amazon/domain';
 
 import { AmazonLoadBalancerDataUtils } from './amazonLoadBalancerDataUtils';
-import { IAmazonServerGroup, ITargetGroup } from 'amazon/domain';
 
 interface ILoadBalancerListItemProps {
   loadBalancer: ILoadBalancer | ITargetGroup;
@@ -87,7 +87,7 @@ export class AmazonLoadBalancersTag extends React.Component<ILoadBalancersTagPro
   private showLoadBalancerDetails = (loadBalancer: ILoadBalancer): void => {
     const { $state } = ReactInjector;
     const serverGroup = this.props.serverGroup;
-    ReactGA.event({ category: 'Cluster Pod', action: `Load Load Balancer Details (multiple menu)` });
+    logger.log({ category: 'Cluster Pod', action: `Load Load Balancer Details (multiple menu)` });
     const nextState = $state.current.name.endsWith('.clusters') ? '.loadBalancerDetails' : '^.loadBalancerDetails';
     $state.go(nextState, {
       region: serverGroup.region,
@@ -99,7 +99,7 @@ export class AmazonLoadBalancersTag extends React.Component<ILoadBalancersTagPro
 
   private showTargetGroupDetails = (targetGroup: ITargetGroup): void => {
     const { $state } = ReactInjector;
-    ReactGA.event({ category: 'Cluster Pod', action: `Load Target Group Details (multiple menu)` });
+    logger.log({ category: 'Cluster Pod', action: `Load Target Group Details (multiple menu)` });
     const nextState = $state.current.name.endsWith('.clusters') ? '.targetGroupDetails' : '^.targetGroupDetails';
     $state.go(nextState, {
       region: targetGroup.region,
@@ -111,7 +111,7 @@ export class AmazonLoadBalancersTag extends React.Component<ILoadBalancersTagPro
   };
 
   private handleShowPopover = () => {
-    ReactGA.event({ category: 'Cluster Pod', action: `Show Load Balancers Menu` });
+    logger.log({ category: 'Cluster Pod', action: `Show Load Balancers Menu` });
   };
 
   private handleClick = (e: React.MouseEvent<HTMLElement>): void => {

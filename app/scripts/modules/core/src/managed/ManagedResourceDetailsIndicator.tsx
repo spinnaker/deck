@@ -1,17 +1,17 @@
 import React from 'react';
-import ReactGA from 'react-ga';
 import { Dropdown, MenuItem } from 'react-bootstrap';
 
-import { SETTINGS } from 'core/config/settings';
-import { HoverablePopover } from 'core/presentation';
-import { HelpField } from 'core/help';
 import { Application } from 'core/application';
+import { SETTINGS } from 'core/config/settings';
 import { IManagedResourceSummary } from 'core/domain';
+import { HelpField } from 'core/help';
+import { HoverablePopover } from 'core/presentation';
 import { ReactInjector } from 'core/reactShims';
 
-import { toggleResourcePause } from './toggleResourceManagement';
-import { showManagedResourceHistoryModal } from './ManagedResourceHistoryModal';
+import { logger } from '..';
 import managedDeliveryLogo from './icons/md-logo-color.svg';
+import { showManagedResourceHistoryModal } from './resourceHistory/ManagedResourceHistoryModal';
+import { toggleResourcePause } from './toggleResourceManagement';
 
 import './ManagedResourceDetailsIndicator.css';
 
@@ -21,10 +21,10 @@ export interface IManagedResourceDetailsIndicatorProps {
 }
 
 const logClick = (label: string, resourceId: string) =>
-  ReactGA.event({
+  logger.log({
     category: 'Managed Resource Menu',
     action: `${label} clicked`,
-    label: resourceId,
+    data: { label: resourceId },
   });
 
 export const ManagedResourceDetailsIndicator = ({
@@ -58,8 +58,9 @@ export const ManagedResourceDetailsIndicator = ({
   // events are getting trapped by React bootstrap menu
   const allowNavigation = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
-    if (target && target.hasAttribute('href')) {
-      window.location.href = target.getAttribute('href');
+    const href = target?.getAttribute('href');
+    if (href) {
+      window.location.href = href;
     }
   };
 
@@ -103,7 +104,7 @@ export const ManagedResourceDetailsIndicator = ({
             <li>
               <a
                 onClick={() => {
-                  showManagedResourceHistoryModal({ resourceSummary });
+                  showManagedResourceHistoryModal(resourceSummary);
                   logClick('History', id);
                 }}
               >

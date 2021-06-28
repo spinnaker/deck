@@ -1,16 +1,19 @@
+import classnames from 'classnames';
 import React from 'react';
-import ReactDOM from 'react-dom';
 import { Overlay, Popover, PopoverProps } from 'react-bootstrap';
-import { Observable, Subject } from 'rxjs';
+import ReactDOM from 'react-dom';
+import { merge as observableMerge, of as observableOf, Subject } from 'rxjs';
+import { delay, filter, map, switchMap, takeUntil } from 'rxjs/operators';
+
+import { UUIDGenerator } from 'core/utils';
 
 import { Placement } from './Placement';
-import { UUIDGenerator } from 'core/utils';
 
 import './HoverablePopover.css';
 
 export interface IHoverablePopoverContentsProps extends IHoverablePopoverProps {
   // The popover contents can forcibly hide the popover by calling this function
-  hidePopover: () => void;
+  hidePopover?: () => void;
 }
 
 export interface IHoverablePopoverProps extends React.HTMLProps<any> {
@@ -30,6 +33,8 @@ export interface IHoverablePopoverProps extends React.HTMLProps<any> {
   hOffsetPercent?: string;
   /** class to put on the popover content */
   className?: string;
+  /** class to put on the wrapper element */
+  wrapperClassName?: string;
   /** Rendered on the top of the popover content */
   title?: string;
   id?: string;
@@ -76,21 +81,27 @@ export class HoverablePopover extends React.Component<IHoverablePopoverProps, IH
 
   public componentDidMount() {
     const shouldShowEvents = ['mouseenter', 'mouseover'];
-    const showHideMouseEvents$ = this.mouseEvents$.map((event: React.MouseEvent<any>) => {
-      const shouldOpen = shouldShowEvents.includes(event.type);
-      const eventDelay = shouldOpen ? this.props.delayShow : this.props.delayHide;
-      return { shouldOpen, eventDelay, animation: true };
-    });
+    const showHideMouseEvents$ = this.mouseEvents$.pipe(
+      map((event: React.MouseEvent<any>) => {
+        const shouldOpen = shouldShowEvents.includes(event.type);
+        const eventDelay = shouldOpen ? this.props.delayShow : this.props.delayHide;
+        return { shouldOpen, eventDelay, animation: true };
+      }),
+    );
 
-    const hideProgramatically$ = this.hidePopoverEvents$.map(() => {
-      return { shouldOpen: false, eventDelay: 0, animation: false };
-    });
+    const hideProgramatically$ = this.hidePopoverEvents$.pipe(
+      map(() => {
+        return { shouldOpen: false, eventDelay: 0, animation: false };
+      }),
+    );
 
-    Observable.merge(showHideMouseEvents$, hideProgramatically$)
-      .map(({ shouldOpen, eventDelay, animation }) => Observable.of({ shouldOpen, animation }).delay(eventDelay))
-      .switchMap((result) => result)
-      .filter(({ shouldOpen }) => shouldOpen !== this.state.popoverIsOpen)
-      .takeUntil(this.destroy$)
+    observableMerge(showHideMouseEvents$, hideProgramatically$)
+      .pipe(
+        map(({ shouldOpen, eventDelay, animation }) => observableOf({ shouldOpen, animation }).pipe(delay(eventDelay))),
+        switchMap((result) => result),
+        filter(({ shouldOpen }) => shouldOpen !== this.state.popoverIsOpen),
+        takeUntil(this.destroy$),
+      )
       .subscribe(({ shouldOpen, animation }) => this.setPopoverOpen(shouldOpen, animation));
   }
 
@@ -158,7 +169,11 @@ export class HoverablePopover extends React.Component<IHoverablePopoverProps, IH
     );
 
     return (
-      <Wrapper className="HoverablePopover" onMouseEnter={this.handleMouseEvent} onMouseLeave={this.handleMouseEvent}>
+      <Wrapper
+        className={classnames('HoverablePopover', this.props.wrapperClassName)}
+        onMouseEnter={this.handleMouseEvent}
+        onMouseLeave={this.handleMouseEvent}
+      >
         {this.props.children}
         <Overlay
           show={popoverIsOpen}

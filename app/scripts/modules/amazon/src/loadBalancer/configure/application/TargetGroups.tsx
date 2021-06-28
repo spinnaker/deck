@@ -1,22 +1,23 @@
-import React from 'react';
-import { filter, flatten, groupBy, set, uniq } from 'lodash';
 import { FormikErrors, FormikProps } from 'formik';
-import { Observable, Subject } from 'rxjs';
+import { filter, flatten, groupBy, set, uniq } from 'lodash';
+import React from 'react';
+import { from as observableFrom, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import {
   Application,
+  FormValidator,
   HelpField,
   IWizardPageComponent,
-  SpInput,
-  SpelNumberInput,
-  ValidationMessage,
-  FormValidator,
-  Validators,
   spelNumberCheck,
+  SpelNumberInput,
+  SpInput,
+  ValidationMessage,
+  Validators,
 } from '@spinnaker/core';
-import { isNameLong, isNameInUse, isValidTimeout, isValidHealthCheckInterval } from '../common/targetGroupValidators';
-
 import { IAmazonApplicationLoadBalancer, IAmazonApplicationLoadBalancerUpsertCommand } from 'amazon/domain';
+
+import { isNameInUse, isNameLong, isValidHealthCheckInterval, isValidTimeout } from '../common/targetGroupValidators';
 
 export interface ITargetGroupsProps {
   app: Application;
@@ -138,8 +139,8 @@ export class TargetGroups
     const { app, loadBalancer } = props;
 
     const targetGroupsByAccountAndRegion: { [account: string]: { [region: string]: string[] } } = {};
-    Observable.fromPromise(app.getDataSource('loadBalancers').refresh(true))
-      .takeUntil(this.destroy$)
+    observableFrom(app.getDataSource('loadBalancers').refresh(true))
+      .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
         app.getDataSource('loadBalancers').data.forEach((lb: IAmazonApplicationLoadBalancer) => {
           if (lb.loadBalancerType !== 'classic') {

@@ -1,9 +1,10 @@
 import React from 'react';
 
-import { ExecutionDetailsSection, IExecutionDetailsSectionProps } from '../common';
-import { StageExecutionLogs, StageFailureMessage } from '../../../details';
 import { AccountTag } from 'core/account';
+
+import { ExecutionDetailsSection, IExecutionDetailsSectionProps } from '../common';
 import { ServerGroupStageContext } from '../common/ServerGroupStageContext';
+import { StageExecutionLogs, StageFailureMessage } from '../../../details';
 
 export function ShrinkClusterExecutionDetails(props: IExecutionDetailsSectionProps) {
   const { stage } = props;
@@ -27,8 +28,7 @@ export function ShrinkClusterExecutionDetails(props: IExecutionDetailsSectionPro
           </dl>
         </div>
       </div>
-      <ServerGroupStageContext serverGroups={stage.context['deploy.server.groups']} />
-
+      <ServerGroupStageContext status="Shrunk" serverGroups={stage.context['deploy.server.groups']} />
       <StageFailureMessage stage={props.stage} message={props.stage.failureMessage} />
       <StageExecutionLogs stage={props.stage} />
     </ExecutionDetailsSection>

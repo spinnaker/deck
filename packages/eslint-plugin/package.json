@@ -1,6 +1,6 @@
 {
   "name": "@spinnaker/eslint-plugin",
-  "version": "1.0.8",
+  "version": "1.0.13",
   "main": "eslint-plugin.js",
   "license": "Apache-2.0",
   "scripts": {
@@ -8,16 +8,26 @@
     "test:debug": "node --inspect ./node_modules/.bin/jest --runInBand --watch"
   },
   "dependencies": {
-    "lodash": "^4.17.15"
+    "lodash": "^4.17.20"
   },
   "devDependencies": {
-    "jest": "^25.2.4"
+    "@types/eslint": "^7.2.5",
+    "@types/estree": "^0.0.45",
+    "@types/lodash": "^4.14.165",
+    "jest": "^26.6.3"
   },
   "peerDependencies": {
-    "@typescript-eslint/eslint-plugin": "^4.1.0",
-    "@typescript-eslint/parser": "^4.1.0",
-    "eslint": ">=5",
-    "eslint-config-prettier": "^6.10.1",
-    "eslint-plugin-react-hooks": "^3.0.0"
-  }
+    "@typescript-eslint/eslint-plugin": "4.4.0",
+    "@typescript-eslint/parser": "4.4.0",
+    "eslint": "7.10.0",
+    "eslint-config-prettier": "6.12.0",
+    "eslint-plugin-react-hooks": "4.1.2"
+  },
+  "peerDevDependencies": [
+    "@typescript-eslint/eslint-plugin",
+    "@typescript-eslint/parser",
+    "eslint",
+    "eslint-config-prettier",
+    "eslint-plugin-react-hooks"
+  ]
 }

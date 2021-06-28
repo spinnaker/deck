@@ -1,20 +1,19 @@
+import { pick, uniq } from 'lodash';
 import React from 'react';
-import ReactGA from 'react-ga';
-import { uniq, pick } from 'lodash';
 
 import { Application } from 'core/application';
-import { IEntityTags, IEntityTag } from 'core/domain';
-import { EntityTagEditor, IEntityTagEditorProps } from '../EntityTagEditor';
-import { EntityTagWriter } from '../entityTags.write.service';
-import { GroupedNotificationList } from './GroupedNotificationList';
-import { NotificationList } from './NotificationList';
-import { Placement, HoverablePopover, IHoverablePopoverContentsProps } from 'core/presentation';
 import { ConfirmationModalService } from 'core/confirmationModal';
-import { noop } from 'core/utils';
+import { IEntityTag, IEntityTags } from 'core/domain';
+import { HoverablePopover, IHoverablePopoverContentsProps, Placement } from 'core/presentation';
 import { ITaskMonitorConfig } from 'core/task';
+import { logger, noop } from 'core/utils';
 
 import { CategorizedNotifications } from './CategorizedNotifications';
-import { NotificationCategories, INotificationCategory } from './notificationCategories';
+import { EntityTagEditor, IEntityTagEditorProps } from '../EntityTagEditor';
+import { GroupedNotificationList } from './GroupedNotificationList';
+import { NotificationList } from './NotificationList';
+import { EntityTagWriter } from '../entityTags.write.service';
+import { INotificationCategory, NotificationCategories } from './notificationCategories';
 
 import './notifications.less';
 import './notifications.popover.less';
@@ -154,7 +153,7 @@ export class NotificationsPopover extends React.Component<INotificationsPopoverP
 
   public fireGAEvent = (): void => {
     const analyticsLabel = this.props.gaLabelFn(this.props);
-    ReactGA.event({ action: 'SPAN', category: 'Alerts hovered', label: analyticsLabel });
+    logger.log({ action: 'SPAN', category: 'Alerts hovered', data: { label: analyticsLabel } });
   };
 
   private PopoverContent = ({ hidePopover }: IHoverablePopoverContentsProps) => {

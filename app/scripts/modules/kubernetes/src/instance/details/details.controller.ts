@@ -1,20 +1,20 @@
-import { IController, IPromise, IQService, IScope, module } from 'angular';
+import { StateService } from '@uirouter/angularjs';
+import { IController, IQService, IScope, module } from 'angular';
 import { IModalService } from 'angular-ui-bootstrap';
 import { flattenDeep } from 'lodash';
-import { StateService } from '@uirouter/angularjs';
 
 import {
   Application,
-  InstanceReader,
-  RecentHistoryService,
-  IManifest,
   ILoadBalancer,
+  IManifest,
+  InstanceReader,
   ManifestReader,
+  RecentHistoryService,
 } from '@spinnaker/core';
 
 import { IKubernetesInstance } from '../../interfaces';
-import { ManifestWizard } from '../../manifest/wizard/ManifestWizard';
 import { KubernetesManifestCommandBuilder } from '../../manifest/manifestCommandBuilder.service';
+import { ManifestWizard } from '../../manifest/wizard/ManifestWizard';
 
 interface InstanceFromStateParams {
   instanceId: string;
@@ -121,7 +121,7 @@ class KubernetesInstanceDetailsController implements IController {
       });
   }
 
-  private fetchInstance(instance: InstanceIdentifier): IPromise<IKubernetesInstance> {
+  private fetchInstance(instance: InstanceIdentifier): PromiseLike<IKubernetesInstance> {
     return InstanceReader.getInstanceDetails(instance.account, instance.namespace, instance.name).then(
       (instanceDetails: IKubernetesInstance) => {
         instanceDetails.id = instance.id;

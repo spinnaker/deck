@@ -1,11 +1,11 @@
-import { IPromise, IQService, module } from 'angular';
-import { flatten, forOwn, groupBy, has, head, keys, values, keyBy } from 'lodash';
+import { IQService, module } from 'angular';
+import { flatten, forOwn, groupBy, has, head, keyBy, keys, values } from 'lodash';
 
-import { ArtifactReferenceService } from 'core/artifact';
-import { API } from 'core/api';
+import { REST } from 'core/api';
 import { Application } from 'core/application';
-import { NameUtils } from 'core/naming';
-import { FilterModelService } from 'core/filterModel';
+import { ArtifactReferenceService } from 'core/artifact';
+import { ProviderServiceDelegate } from 'core/cloudProvider';
+import { SETTINGS } from 'core/config/settings';
 import {
   IArtifactExtractor,
   ICluster,
@@ -15,12 +15,12 @@ import {
   IServerGroup,
   ITask,
 } from 'core/domain';
+import { FilterModelService } from 'core/filterModel';
+import { NameUtils } from 'core/naming';
 import { ClusterState } from 'core/state';
-import { ProviderServiceDelegate } from 'core/cloudProvider';
-import { SETTINGS } from 'core/config/settings';
 
-import { taskMatcher } from './task.matcher';
 import { CORE_SERVERGROUP_SERVERGROUP_TRANSFORMER } from '../serverGroup/serverGroup.transformer';
+import { taskMatcher } from './task.matcher';
 
 export class ClusterService {
   public static $inject = ['$q', 'serverGroupTransformer', 'providerServiceDelegate'];
@@ -32,14 +32,14 @@ export class ClusterService {
 
   // Retrieves and normalizes all server groups. If a server group for an unsupported cloud provider (i.e. one that does
   // not have a server group transformer) is encountered, it will be omitted from the result.
-  public loadServerGroups(application: Application): IPromise<IServerGroup[]> {
+  public loadServerGroups(application: Application): PromiseLike<IServerGroup[]> {
     return this.getClusters(application.name).then((clusters: IClusterSummary[]) => {
       const dataSource = application.getDataSource('serverGroups');
-      const serverGroupLoader = API.one('applications').one(application.name).all('serverGroups');
+      let serverGroupLoader = REST('/applications').path(application.name, 'serverGroups');
       dataSource.fetchOnDemand = clusters.length > SETTINGS.onDemandClusterThreshold;
       if (dataSource.fetchOnDemand) {
         dataSource.clusters = clusters;
-        serverGroupLoader.withParams({
+        serverGroupLoader = serverGroupLoader.query({
           clusters: FilterModelService.getCheckValues(
             ClusterState.filterModel.asFilterModel.sortFilter.clusters,
           ).join(),
@@ -47,7 +47,7 @@ export class ClusterService {
       } else {
         this.reconcileClusterDeepLink();
       }
-      return serverGroupLoader.getList().then((serverGroups: IServerGroup[]) => {
+      return serverGroupLoader.get().then((serverGroups: IServerGroup[]) => {
         serverGroups.forEach((sg) => this.addHealthStatusCheck(sg));
         serverGroups.forEach((sg) => this.addNameParts(sg));
         return this.$q
@@ -110,8 +110,22 @@ export class ClusterService {
         }
       });
 
-      // splice is necessary to preserve referential equality
-      toRemove.forEach((idx) => data.splice(idx, 1));
+      // IMPORTANT!!! - toRemove must be forEach'ed in decending order, so that we splice backwards.
+      // For example, if we started with [0, 1, 2, 3, 4, 5] and wanted toRemove [0, 1],
+      // Blindly forEach'ing and splicing like so: toRemove.forEach(idx => data.splice(idx, 1))
+      // would result in the following at each step:
+      // data              // [0, 1, 2, 3, 4, 5]
+      // data.splice(0,1); // [1, 2, 3, 4, 5]
+      // data.splice(1,1); // [1, 3, 4, 5]           wait, what??
+      // If toRemove is in ascending order, every splice will cause everything to shift left
+      // and every remaning index will no longer be correct (off by 1 for every iteration)
+      // Works perfect in descending order though.
+      toRemove
+        // ensure indices are in descending order so splice can work properly
+        .sort()
+        .reverse()
+        // splice is necessary to preserve referential equality
+        .forEach((idx) => data.splice(idx, 1));
 
       // add any new ones
       serverGroups.forEach((serverGroup) => {
@@ -222,10 +236,9 @@ export class ClusterService {
     this.getArtifactExtractor(cluster.cloudProvider).removeArtifact(cluster, artifactId);
   }
 
-  private getClusters(application: string): IPromise<IClusterSummary[]> {
-    return API.one('applications')
-      .one(application)
-      .one('clusters')
+  private getClusters(application: string): PromiseLike<IClusterSummary[]> {
+    return REST('/applications')
+      .path(application, 'clusters')
       .get()
       .then((clustersMap: { [account: string]: string[] }) => {
         const clusters: IClusterSummary[] = [];

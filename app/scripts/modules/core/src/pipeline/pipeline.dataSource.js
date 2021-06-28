@@ -1,12 +1,12 @@
 import { module } from 'angular';
-
-import { ApplicationDataSourceRegistry } from 'core/application/service/ApplicationDataSourceRegistry';
 import { DELIVERY_KEY } from 'core/application/nav/defaultCategories';
-import { EntityTagsReader } from 'core/entityTag/EntityTagsReader';
-import { EXECUTION_SERVICE } from './service/execution.service';
-import { PipelineConfigService } from './config/services/PipelineConfigService';
-import { SETTINGS } from 'core/config/settings';
+import { ApplicationDataSourceRegistry } from 'core/application/service/ApplicationDataSourceRegistry';
 import { CLUSTER_SERVICE } from 'core/cluster/cluster.service';
+import { SETTINGS } from 'core/config/settings';
+import { EntityTagsReader } from 'core/entityTag/EntityTagsReader';
+
+import { PipelineConfigService } from './config/services/PipelineConfigService';
+import { EXECUTION_SERVICE } from './service/execution.service';
 
 export const CORE_PIPELINE_PIPELINE_DATASOURCE = 'spinnaker.core.pipeline.dataSource';
 export const name = CORE_PIPELINE_PIPELINE_DATASOURCE; // for backwards compatibility
@@ -27,7 +27,9 @@ module(CORE_PIPELINE_PIPELINE_DATASOURCE, [EXECUTION_SERVICE, CLUSTER_SERVICE]).
     const loadPipelineConfigs = (application) => {
       const pipelineLoader = PipelineConfigService.getPipelinesForApplication(application.name);
       const strategyLoader = PipelineConfigService.getStrategiesForApplication(application.name);
-      return $q.all({ pipelineConfigs: pipelineLoader, strategyConfigs: strategyLoader });
+      return $q
+        .all([pipelineLoader, strategyLoader])
+        .then(([pipelineConfigs, strategyConfigs]) => ({ pipelineConfigs, strategyConfigs }));
     };
 
     const addPipelineConfigs = (application, data) => {

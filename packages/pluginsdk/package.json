@@ -1,45 +1,43 @@
 {
   "name": "@spinnaker/pluginsdk",
   "description": "Provides blessed opinions (rollup, code format, lint) and packages (react, etc) to plugin developers",
-  "version": "0.0.21",
+  "version": "0.0.32",
   "module": "dist/index.js",
   "typings": "dist/index.d.ts",
   "license": "Apache-2.0",
   "scripts": {
     "clean": "npx shx rm -rf dist",
-    "build": "rollup -c",
-    "watch": "rollup -c -w",
+    "build": "spinnaker-scripts build",
+    "watch": "spinnaker-scripts start",
     "prepublishOnly": "npm run build"
   },
   "bin": {
     "check-plugin": "scripts/check-plugin.js",
     "dev-proxy": "scripts/dev-proxy/server.js",
+    "husky-install": "scripts/husky-install.sh",
     "restore-scaffold-file": "scripts/restore-scaffold-file.js",
     "scaffold": "scripts/scaffold.js",
     "write-json": "scripts/write-json.js"
   },
   "dependencies": {
-    "check-peer-dependencies": "^2.0.6",
-    "chokidar": "^3.4.2",
+    "@spinnaker/scripts": "0.0.14",
+    "check-peer-dependencies": "^4.0.0",
+    "chokidar": "^3.5.1",
     "express": "^4.17.1",
-    "http-proxy-middleware": "^1.0.5",
+    "http-proxy-middleware": "^1.0.6",
+    "husky": "^6.0.0",
+    "lint-staged": "^10.5.4",
     "lodash": "^4.17.20",
     "readline-sync": "^1.4.10",
+    "selfsigned": "^1.10.11",
     "strip-json-comments": "^3.1.1",
-    "ws": "^7.3.1",
-    "yargs": "^16.0.3"
+    "ws": "^7.4.3",
+    "yargs": "^16.2.0"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "15.1.0",
-    "@rollup/plugin-node-resolve": "9.0.0",
-    "@rollup/plugin-typescript": "6.0.0",
-    "@spinnaker/core": "0.0.517",
-    "@types/yargs": "^15.0.7",
-    "rollup": "2.28.2",
-    "rollup-plugin-external-globals": "0.6.0",
-    "rollup-plugin-less": "1.1.2",
-    "rollup-plugin-postcss": "3.1.8",
-    "typescript": "4.0.3"
+    "@spinnaker/core": "0.0.549",
+    "@types/yargs": "^16.0.0",
+    "typescript": "4.1.5"
   },
   "files": [
     "dist",

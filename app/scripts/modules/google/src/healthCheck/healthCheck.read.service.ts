@@ -2,7 +2,6 @@ import { module } from 'angular';
 import { uniqWith } from 'lodash';
 
 import { InfrastructureCaches, ISearchResults, SearchService } from '@spinnaker/core';
-
 import { IGceHealthCheck } from 'google/domain';
 
 interface IHealthCheckSearchResults {
@@ -16,7 +15,7 @@ interface IHealthCheckSearchResults {
 }
 
 export class GceHealthCheckReader {
-  public listHealthChecks(type?: string): ng.IPromise<IGceHealthCheck[]> {
+  public listHealthChecks(type?: string): PromiseLike<IGceHealthCheck[]> {
     if (type) {
       return this.listHealthChecks().then((healthChecks) =>
         healthChecks.filter((healthCheck) => healthCheck.healthCheckType === type),

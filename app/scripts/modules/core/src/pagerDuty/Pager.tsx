@@ -1,10 +1,9 @@
-import React, { ReactNode } from 'react';
 import { UISref } from '@uirouter/react';
 import SearchApi from 'js-worker-search';
 import { groupBy } from 'lodash';
 import { Debounce } from 'lodash-decorators';
 import { DateTime } from 'luxon';
-import { Observable } from 'rxjs';
+import React, { ReactNode } from 'react';
 import {
   AutoSizer,
   CellMeasurer,
@@ -16,21 +15,21 @@ import {
   TableCellProps,
   TableHeaderProps,
 } from 'react-virtualized';
-
-// defined in react-virtualized but TS complains about not finding it so we duplicate it here
-type SortDirectionType = 'ASC' | 'DESC';
+import { forkJoin as observableForkJoin, from as observableFrom } from 'rxjs';
 
 import { ApplicationReader, IApplicationSummary } from 'core/application';
-import { relativeTime } from 'core/utils/timeFormatters';
-import { IOnCall, IPagerDutyService, PagerDutyReader } from './pagerDuty.read.service';
-import { ReactInjector } from 'core/reactShims';
 import { SETTINGS } from 'core/config';
-import { Markdown } from 'core/presentation';
 import { Overridable } from 'core/overrideRegistry';
+import { Markdown } from 'core/presentation';
+import { ReactInjector } from 'core/reactShims';
+import { relativeTime } from 'core/utils/timeFormatters';
+
+import { PageButton } from './PageButton';
+import { IOnCall, IPagerDutyService, PagerDutyReader } from './pagerDuty.read.service';
 
 import './pager.less';
 
-import { PageButton } from './PageButton';
+type SortDirectionType = 'ASC' | 'DESC';
 
 export interface IUserDisplay {
   level: number;
@@ -121,8 +120,8 @@ export class Pager extends React.Component<IPagerProps, IPagerState> {
 
   public componentDidMount(): void {
     // Get the data from all the necessary sources before rendering
-    Observable.forkJoin(
-      Observable.fromPromise(ApplicationReader.listApplications()),
+    observableForkJoin(
+      observableFrom(ApplicationReader.listApplications()),
       PagerDutyReader.listOnCalls(),
       PagerDutyReader.listServices(),
     ).subscribe((results: [IApplicationSummary[], { [id: string]: IOnCall[] }, IPagerDutyService[]]) => {
@@ -239,18 +238,18 @@ export class Pager extends React.Component<IPagerProps, IPagerState> {
     });
   }
 
-  public componentWillUpdate(_nextProps: IPagerProps, nextState: IPagerState): void {
-    if (nextState.filterString !== this.state.filterString || nextState.hideNoApps !== this.state.hideNoApps) {
+  public componentDidUpdate(_prevProps: IPagerProps, prevState: IPagerState): void {
+    if (prevState.filterString !== this.state.filterString || prevState.hideNoApps !== this.state.hideNoApps) {
       this.runFilter(
-        nextState.app,
-        nextState.initialKeys,
-        nextState.filterString,
-        nextState.sortBy,
-        nextState.sortDirection,
-        nextState.hideNoApps,
+        this.state.app,
+        this.state.initialKeys,
+        this.state.filterString,
+        this.state.sortBy,
+        this.state.sortDirection,
+        this.state.hideNoApps,
       );
     } else {
-      this.sort({ sortBy: nextState.sortBy, sortDirection: nextState.sortDirection });
+      this.sort({ sortBy: this.state.sortBy, sortDirection: this.state.sortDirection });
     }
   }
 

@@ -1,7 +1,7 @@
-import { module, IQService, IPromise } from 'angular';
-import { chain, camelCase } from 'lodash';
+import { IQService, module } from 'angular';
+import { camelCase, chain } from 'lodash';
 
-import { IServerGroup, IInstanceCounts } from '@spinnaker/core';
+import { IInstanceCounts, IServerGroup } from '@spinnaker/core';
 
 import { IKubernetesLoadBalancer } from '../interfaces';
 
@@ -9,7 +9,7 @@ class KubernetesV2LoadBalancerTransformer {
   public static $inject = ['$q'];
   constructor(private $q: IQService) {}
 
-  public normalizeLoadBalancer(loadBalancer: IKubernetesLoadBalancer): IPromise<IKubernetesLoadBalancer> {
+  public normalizeLoadBalancer(loadBalancer: IKubernetesLoadBalancer): PromiseLike<IKubernetesLoadBalancer> {
     loadBalancer.provider = loadBalancer.type;
     loadBalancer.instances = [];
     loadBalancer.instanceCounts = this.buildInstanceCounts(loadBalancer.serverGroups);

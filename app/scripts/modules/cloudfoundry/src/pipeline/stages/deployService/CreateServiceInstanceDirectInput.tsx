@@ -1,13 +1,13 @@
 import React from 'react';
-
 import { Option } from 'react-select';
-import { Observable, Subject } from 'rxjs';
+import { from as observableFrom, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import {
   IService,
   IServicePlan,
-  ServicesReader,
   ReactSelectInput,
+  ServicesReader,
   StageConfigField,
   TextAreaInput,
   TextInput,
@@ -54,8 +54,8 @@ export class CreateServiceInstanceDirectInput extends React.Component<
 
   private loadServices(credentials: string, region: string) {
     if (credentials && region) {
-      Observable.fromPromise(ServicesReader.getServices(credentials, region))
-        .takeUntil(this.destroy$)
+      observableFrom(ServicesReader.getServices(credentials, region))
+        .pipe(takeUntil(this.destroy$))
         .subscribe((serviceNamesAndPlans) => this.setState({ serviceNamesAndPlans }));
     }
   }

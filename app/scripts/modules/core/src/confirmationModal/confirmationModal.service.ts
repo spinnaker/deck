@@ -1,9 +1,9 @@
-import { IPromise } from 'angular';
 import { $q } from 'ngimport';
 
-import { ConfirmModal, IConfirmModalProps } from './ConfirmModal';
 import { ReactModal, toMarkdown } from 'core/presentation';
 import { ITaskMonitorConfig, TaskMonitor } from 'core/task';
+
+import { ConfirmModal, IConfirmModalProps } from './ConfirmModal';
 
 export interface IConfirmationModalPassthroughProps {
   account?: string;
@@ -18,7 +18,7 @@ export interface IConfirmationModalPassthroughProps {
   platformHealthType?: string;
   retryBody?: string;
   submitJustWithReason?: boolean;
-  submitMethod?: (args?: any) => IPromise<any>;
+  submitMethod?: (args?: any) => PromiseLike<any>;
   textToVerify?: string;
   verificationLabel?: string;
 }
@@ -35,7 +35,7 @@ export class ConfirmationModalService {
     cancelButtonText: 'Cancel',
   };
 
-  public static confirm(params: IConfirmationModalParams): IPromise<any> {
+  public static confirm(params: IConfirmationModalParams): PromiseLike<any> {
     const extendedParams: IConfirmModalProps = { ...this.defaults, ...params };
 
     if (params.body) {

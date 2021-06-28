@@ -1,23 +1,23 @@
 'use strict';
 
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 import * as angular from 'angular';
-import { Observable, Subject } from 'rxjs';
-import { extend } from 'lodash';
+import ANGULAR_UI_BOOTSTRAP from 'angular-ui-bootstrap';
+import { from as observableFrom, Subject } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 import {
   ArtifactTypePatterns,
-  ExpectedArtifactSelectorViewController,
   excludeAllTypesExcept,
+  ExpectedArtifactSelectorViewController,
   IMAGE_READER,
   NgGCEImageArtifactDelegate,
 } from '@spinnaker/core';
-
 import { GceImageReader } from 'google/image';
-import { GOOGLE_GCEREGIONSELECTFIELD_DIRECTIVE } from '../../../../gceRegionSelectField.directive';
+
 import { GOOGLE_GCENETWORKSELECTFIELD_DIRECTIVE } from '../../../../gceNetworkSelectField.directive';
+import { GOOGLE_GCEREGIONSELECTFIELD_DIRECTIVE } from '../../../../gceRegionSelectField.directive';
 import { GOOGLE_SUBNET_SUBNETSELECTFIELD_DIRECTIVE } from '../../../../subnet/subnetSelectField.directive';
-import UIROUTER_ANGULARJS from '@uirouter/angularjs';
-import ANGULAR_UI_BOOTSTRAP from 'angular-ui-bootstrap';
 
 export const GOOGLE_SERVERGROUP_CONFIGURE_WIZARD_LOCATION_BASICSETTINGS_CONTROLLER =
   'spinnaker.google.serverGroup.configure.wizard.basicSettings.controller';
@@ -38,7 +38,7 @@ angular
     '$state',
     function ($scope, $controller, $uibModalStack, $state) {
       function fetchImagesForAccount() {
-        return Observable.fromPromise(
+        return observableFrom(
           GceImageReader.findImages({
             account: $scope.command.credentials,
             provider: $scope.command.selectedProvider,
@@ -48,7 +48,7 @@ angular
       }
 
       const imageSearchResultsStream = new Subject();
-      imageSearchResultsStream.switchMap(fetchImagesForAccount).subscribe((images) => {
+      imageSearchResultsStream.pipe(switchMap(fetchImagesForAccount)).subscribe((images) => {
         $scope.command.backingData.allImages = images;
       });
 

@@ -1,15 +1,14 @@
+import { Form } from 'formik';
+import { flatten, isEmpty } from 'lodash';
 import React from 'react';
 import { Modal } from 'react-bootstrap';
-import { Form } from 'formik';
-import { IPromise } from 'angular';
-import { flatten, isEmpty } from 'lodash';
 import { Option } from 'react-select';
 
-import { API } from 'core/api/ApiService';
+import { REST } from 'core/api/ApiService';
 import { Application } from 'core/application';
 import { ApplicationReader } from 'core/application/service/ApplicationReader';
-import { ModalClose } from 'core/modal';
 import { IPipeline, IStage, IStrategy } from 'core/domain';
+import { ModalClose } from 'core/modal';
 import {
   FormikFormField,
   IModalComponentProps,
@@ -18,7 +17,8 @@ import {
   useData,
   useLatestPromise,
 } from 'core/presentation';
-import { ICopyStageCardProps, CopyStageCard } from './CopyStageCard';
+
+import { CopyStageCard, ICopyStageCardProps } from './CopyStageCard';
 
 import './copyStageModal.less';
 
@@ -43,13 +43,12 @@ export function CopyStageModal(props: ICopyStageModalProps) {
 
   const error = fetchApplications.status === 'REJECTED' || fetchStages.status === 'REJECTED';
 
-  function getStagesForApplication(applicationName: string): IPromise<ICopyStageCardProps[]> {
+  function getStagesForApplication(applicationName: string): PromiseLike<ICopyStageCardProps[]> {
     const configType = forStrategyConfig ? 'strategyConfigs' : 'pipelineConfigs';
 
-    return API.one('applications')
-      .one(applicationName)
-      .all(configType)
-      .getList()
+    return REST('/applications')
+      .path(applicationName, configType)
+      .get()
       .then((configs: Array<IPipeline | IStrategy>) => {
         const nestedStageWrappers = configs.map((config) => {
           return (config.stages || [])

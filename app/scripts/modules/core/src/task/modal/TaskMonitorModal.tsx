@@ -1,14 +1,14 @@
-import React from 'react';
 import { Form, FormikProps } from 'formik';
+import React from 'react';
 import { Modal } from 'react-bootstrap';
 
-import { IModalComponentProps, LayoutProvider, ResponsiveFieldLayout, SpinFormik } from 'core/presentation';
 import { Application } from 'core/application';
-import { NgReact } from 'core/reactShims';
-import { SubmitButton, ModalClose } from 'core/modal';
+import { ModalClose, SubmitButton } from 'core/modal';
+import { IModalComponentProps, LayoutProvider, ResponsiveFieldLayout, SpinFormik } from 'core/presentation';
 
-import { ITaskCommand, TaskExecutor } from '../taskExecutor';
 import { TaskMonitor } from '../monitor/TaskMonitor';
+import { TaskMonitorWrapper } from '../monitor/TaskMonitorWrapper';
+import { ITaskCommand, TaskExecutor } from '../taskExecutor';
 
 interface ITaskMonitorModalProps<T> extends IModalComponentProps {
   application: Application;
@@ -66,7 +66,6 @@ export class TaskMonitorModal<T> extends React.Component<ITaskMonitorModalProps<
 
   public render() {
     const { isSubmitting } = this.state;
-    const { TaskMonitorWrapper } = NgReact;
 
     return (
       <div>

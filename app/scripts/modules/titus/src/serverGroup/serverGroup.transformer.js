@@ -1,8 +1,7 @@
 'use strict';
 
-import _ from 'lodash';
-
 import { module } from 'angular';
+import _ from 'lodash';
 
 import { AccountService } from '@spinnaker/core';
 
@@ -48,6 +47,7 @@ module(TITUS_SERVERGROUP_SERVERGROUP_TRANSFORMER, []).factory('titusServerGroupT
             statistic: 'Average',
             comparisonOperator: 'GreaterThanThreshold',
             evaluationPeriods: 1,
+            disableEditingDimensions: true,
             dimensions: [{ name: 'AutoScalingGroupName', value: serverGroup.name }],
             period: 60,
           },

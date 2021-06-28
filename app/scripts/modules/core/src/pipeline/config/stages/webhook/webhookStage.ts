@@ -1,9 +1,8 @@
 import { IController, module } from 'angular';
 import { IModalService } from 'angular-ui-bootstrap';
-
-import { API } from 'core/api/ApiService';
-import { JsonUtils } from 'core/utils';
+import { REST } from 'core/api/ApiService';
 import { Registry } from 'core/registry';
+import { JsonUtils } from 'core/utils';
 
 export interface IWebhookStageViewState {
   waitForCompletion?: boolean;
@@ -210,9 +209,8 @@ module(WEBHOOK_STAGE, [])
     });
   })
   .run(() => {
-    API.one('webhooks')
-      .all('preconfigured')
-      .getList()
+    REST('/webhooks/preconfigured')
+      .get()
       .then((preconfiguredWebhooks: IPreconfiguredWebhook[]) => {
         preconfiguredWebhooks.forEach((preconfiguredWebhook: IPreconfiguredWebhook) =>
           Registry.pipeline.registerStage({

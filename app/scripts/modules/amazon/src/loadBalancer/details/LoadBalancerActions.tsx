@@ -1,22 +1,21 @@
+import { get, values } from 'lodash';
 import React from 'react';
 import { Dropdown } from 'react-bootstrap';
-import { get, values } from 'lodash';
 
 import {
+  AddEntityTagLinks,
   Application,
   ApplicationReader,
   ConfirmationModalService,
+  HelpField,
   LoadBalancerWriter,
   ManagedMenuItem,
   SETTINGS,
-  NgReact,
-  HelpField,
 } from '@spinnaker/core';
-
 import { IAmazonLoadBalancer, IAmazonLoadBalancerDeleteCommand } from 'amazon/domain';
 
-import { ILoadBalancerFromStateParams } from './loadBalancerDetails.controller';
 import { LoadBalancerTypes } from '../configure/LoadBalancerTypes';
+import { ILoadBalancerFromStateParams } from './loadBalancerDetails.controller';
 
 export interface ILoadBalancerActionsProps {
   app: Application;
@@ -105,7 +104,6 @@ export class LoadBalancerActions extends React.Component<ILoadBalancerActionsPro
   public render() {
     const { app, loadBalancer } = this.props;
     const { application } = this.state;
-    const { AddEntityTagLinks } = NgReact;
 
     const { loadBalancerType, instances, instanceCounts } = loadBalancer;
     const loadBalancerAppName = loadBalancer.name.split('-')[0];

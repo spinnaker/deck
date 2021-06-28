@@ -2,14 +2,13 @@ import React from 'react';
 import { Dropdown } from 'react-bootstrap';
 
 import {
+  AddEntityTagLinks,
   Application,
   ApplicationReader,
+  ConfirmationModalService,
   FunctionWriter,
   SETTINGS,
-  NgReact,
-  ConfirmationModalService,
 } from '@spinnaker/core';
-
 import { IAmazonFunction, IAmazonFunctionDeleteCommand } from 'amazon/domain';
 
 import { IFunctionFromStateParams } from './AmazonFunctionDetails';
@@ -28,9 +27,10 @@ export interface IFunctionActionsState {
 export class FunctionActions extends React.Component<IFunctionActionsProps, IFunctionActionsState> {
   constructor(props: IFunctionActionsProps) {
     super(props);
+    this.state = { application: props.app };
   }
 
-  public componentWillMount(): void {
+  public componentDidMount(): void {
     const { app, functionDef } = this.props;
     let application: Application;
 
@@ -93,8 +93,6 @@ export class FunctionActions extends React.Component<IFunctionActionsProps, IFun
   public render() {
     const { app, functionDef } = this.props;
     const { application } = this.state;
-
-    const { AddEntityTagLinks } = NgReact;
 
     return (
       <div style={{ display: 'inline-block' }}>

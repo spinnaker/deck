@@ -2,10 +2,12 @@ import React from 'react';
 import { Subscription } from 'rxjs';
 
 import { Application } from 'core/application/application.model';
-import { ExecutionGroup } from './ExecutionGroup';
+import { BannerContainer } from 'core/banner';
 import { IExecutionGroup } from 'core/domain';
 import { ReactInjector } from 'core/reactShims';
 import { ExecutionState } from 'core/state';
+
+import { ExecutionGroup } from './ExecutionGroup';
 import { ExecutionFilterService } from '../../filter/executionFilter.service';
 
 import './executionGroups.less';
@@ -88,7 +90,11 @@ export class ExecutionGroups extends React.Component<IExecutionGroupsProps, IExe
     const { groups = [], container, showingDetails } = this.state;
     const hasGroups = groups.length > 0;
     const className = `row pipelines executions ${showingDetails ? 'showing-details' : ''}`;
-    const executionGroups = groups.map((group: IExecutionGroup) => (
+    const allGroups = (groups || [])
+      .filter((g: IExecutionGroup) => g?.config?.migrationStatus === 'Started')
+      .concat(groups.filter((g) => g?.config?.migrationStatus !== 'Started'));
+
+    const executionGroups = allGroups.map((group: IExecutionGroup) => (
       <ExecutionGroup parent={container} key={group.heading} group={group} application={this.props.application} />
     ));
 
@@ -101,6 +107,7 @@ export class ExecutionGroups extends React.Component<IExecutionGroupsProps, IExe
             </div>
           )}
           <div className="execution-groups all-execution-groups" ref={this.setContainer}>
+            <BannerContainer app={this.props.application} />
             {container && executionGroups}
           </div>
         </div>

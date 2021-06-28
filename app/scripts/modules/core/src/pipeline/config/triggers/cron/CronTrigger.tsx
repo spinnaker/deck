@@ -2,12 +2,12 @@ import React from 'react';
 
 import { FormField, ReactSelectInput } from 'core/presentation';
 
-import { CronMinutes } from './CronMinutes';
-import { CronHourly } from './CronHourly';
-import { CronDaily } from './CronDaily';
-import { CronWeekly } from './CronWeekly';
-import { CronMonthly } from './CronMonthly';
 import { CronAdvance } from './CronAdvance';
+import { CronDaily } from './CronDaily';
+import { CronHourly } from './CronHourly';
+import { CronMinutes } from './CronMinutes';
+import { CronMonthly } from './CronMonthly';
+import { CronWeekly } from './CronWeekly';
 import { ICronTriggerConfigProps } from './cronConfig';
 
 import './cronTrigger.less';
@@ -21,7 +21,11 @@ export class CronTrigger extends React.Component<ICronTriggerConfigProps, ICronT
     { label: 'minutes', value: 'minutes', regex: [/^(0 0\/\d+ \* 1\/1 \* \? \*)$/g] },
     { label: 'hourly', value: 'hourly', regex: [/^(0 \d+ 0\/\d+ 1\/1 \* \? \*)$/g] },
     { label: 'daily', value: 'daily', regex: [/^(0 \d+ \d+ 1\/\d+ \* \? \*)$/g, /^(0 \d+ \d+ \? \* MON-FRI \*)$/g] },
-    { label: 'weekly', value: 'weekly', regex: [/^(0 \d+ \d+ \? \*\s?([SUN,MON,TUE, WED, THU, FRI, SAT]*) \*)$/g] },
+    {
+      label: 'weekly',
+      value: 'weekly',
+      regex: [/^(0 \d+ \d+ \? \* (MON|TUE|WED|THU|FRI|SAT|SUN)(,(MON|TUE|WED|THU|FRI|SAT|SUN))* \*)$/g],
+    },
     {
       label: 'monthly',
       value: 'monthly',
