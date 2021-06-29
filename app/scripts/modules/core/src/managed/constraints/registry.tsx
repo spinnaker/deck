@@ -13,6 +13,7 @@ import { BasePluginManager } from '../plugins/BasePluginManager';
 const UNKNOWN_CONSTRAINT_ICON = 'mdConstraintGeneric';
 
 const constraintHasNotStarted: ConstraintStatus[] = ['PENDING', 'NOT_EVALUATED'];
+const constraintBlocked: ConstraintStatus[] = ['BLOCKED', 'NOT_EVALUATED'];
 interface IConstraintOverrideAction {
   title: string;
   pass: boolean;
@@ -81,7 +82,7 @@ class ConstraintsManager extends BasePluginManager<IConstraintHandler> {
   }
 
   getActions(constraint: IConstraint, environmentState?: IManagedArtifactVersionEnvironment['state']) {
-    if (environmentState === 'skipped') {
+    if (environmentState === 'skipped' || constraintBlocked.includes(constraint.status)) {
       return undefined;
     }
     const actions = this.getHandler(constraint.type)?.overrideActions;
@@ -95,6 +96,14 @@ const baseHandlers: Array<IConstraintHandler<IConstraint['type']>> = [
     iconName: { DEFAULT: 'mdConstraintAllowedTimes' },
     titleRender: AllowedTimesTitle,
     descriptionRender: AllowedTimesDescription,
+    overrideActions: {
+      FAIL: [
+        {
+          title: 'Skip constraint',
+          pass: true,
+        },
+      ],
+    },
   },
   {
     kind: 'depends-on',

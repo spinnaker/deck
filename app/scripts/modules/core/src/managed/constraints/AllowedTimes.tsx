@@ -57,14 +57,16 @@ const timeWindowToString = (window: AllowedTimeWindow, timeZone = 'PST') => {
   const hoursString = groupHours(window.hours);
   const daysString = groupDays(window.days);
   // A special treatment for PST as it's the most common timezone
-  const prettyTimezone = timeZone === 'America/Los_Angeles' ? 'PST' : timeZone;
+  const prettyTimezone = timeZone === 'America/Los_Angeles' ? 'PST' : timeZone || 'PST';
 
   return `${hoursString.join(', ')} on ${daysString.join(', ')} (${prettyTimezone})`;
 };
 
-const DeploymentWindow = ({ allowedTimes, timezone }: IAllowedTimesConstraint['attributes']) => {
+const DeploymentWindow = ({ attributes }: { attributes: IAllowedTimesConstraint['attributes'] }) => {
+  if (!attributes) return null;
+  const { allowedTimes, timezone } = attributes;
   return (
-    <ul className="sp-margin-xs-top sp-padding-l-left">
+    <ul className="sp-margin-xs-top sp-padding-l-left sp-margin-2xs-bottom">
       {allowedTimes.map((window, index) => (
         <li key={index}>{timeWindowToString(window, timezone)}</li>
       ))}
@@ -74,15 +76,15 @@ const DeploymentWindow = ({ allowedTimes, timezone }: IAllowedTimesConstraint['a
 
 const getTitle = (constraint: IAllowedTimesConstraint) => {
   switch (constraint.status) {
-    case 'FAIL':
-      return 'Failed to deploy within the allowed windows';
+    case 'OVERRIDE_PASS':
     case 'FORCE_PASS':
       return 'Deployment window constraint was overridden';
     case 'PASS':
       return 'Deployed during one of the allowed windows';
+    case 'FAIL':
     case 'PENDING':
       return `Deployment can only occur during the provided window${
-        constraint.attributes.allowedTimes.length > 1 ? 's' : ''
+        (constraint.attributes?.allowedTimes.length ?? 0) > 1 ? 's' : ''
       }`;
     default:
       return `Allowed times constraint - ${constraint.status}:`;
@@ -94,5 +96,5 @@ export const AllowedTimesTitle = ({ constraint }: { constraint: IAllowedTimesCon
 };
 
 export const AllowedTimesDescription = ({ constraint }: { constraint: IAllowedTimesConstraint }) => {
-  return <DeploymentWindow {...constraint.attributes} />;
+  return <DeploymentWindow attributes={constraint.attributes} />;
 };

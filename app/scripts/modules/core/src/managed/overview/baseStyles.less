@@ -1,7 +1,15 @@
 .environment-row-element {
   display: grid;
-  grid-template-columns: [icon] 40px [details] 1fr;
+  grid-template-columns: [icon] var(--row-element-icon-width) [details] 1fr;
   padding: var(--l-spacing) var(--base-horizontal-padding) var(--s-spacing) var(--base-horizontal-padding);
+
+  @media (max-width: 768px) {
+    grid-template-columns: [icon] 30px [details] 1fr;
+  }
+
+  .error-message {
+    grid-column: ~'1 / 3';
+  }
 
   .row-details {
     grid-column: details;
@@ -9,12 +17,21 @@
     flex-direction: column;
     min-width: 0;
     margin-right: var(--xl-spacing);
+
+    @media (max-width: 768px) {
+      margin-right: var(--m-spacing);
+    }
   }
 
   .row-icon {
     grid-column: icon;
     display: flex;
     align-self: flex-start;
+    padding-top: var(~'--2xs-spacing');
+
+    &.small {
+      padding-top: var(~'--3xs-spacing');
+    }
   }
 
   .row-title {
@@ -23,9 +40,41 @@
     line-height: 1.3;
     color: var(--color-charcoal);
 
+    &.small {
+      font-size: 14px;
+    }
+
     & > a {
       color: inherit;
     }
+  }
+}
+
+.md-icon-success {
+  color: var(--color-status-success);
+}
+
+.md-icon-pending {
+  color: var(--color-titanium);
+}
+
+.md-icon-fail {
+  color: var(--color-status-error);
+}
+
+.delimited-element {
+  &:not(:last-child) {
+    margin-right: 6px;
+  }
+  &:not(:first-child)::before {
+    content: '•';
+    margin-right: 6px;
+  }
+}
+
+.delimited-elements {
+  > * {
+    .delimited-element();
   }
 }
 
@@ -37,7 +86,6 @@
 
 button.md-btn {
   background-color: transparent;
-  font-weight: 600;
   &:hover {
     background-color: var(--color-cirrus);
   }
@@ -53,4 +101,20 @@ button.md-btn-danger,
 button.md-btn-danger:hover {
   color: var(--color-danger);
   border: 1px solid var(--color-danger);
+}
+
+.no-underline {
+  text-decoration: none;
+}
+
+@keyframes deployingAnimation {
+  0% {
+    background-color: var(--color-status-success);
+  }
+  50% {
+    background-color: var(--color-status-success-light);
+  }
+  100% {
+    background-color: var(--color-status-success);
+  }
 }
