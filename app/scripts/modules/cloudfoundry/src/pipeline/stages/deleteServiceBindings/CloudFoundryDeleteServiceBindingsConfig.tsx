@@ -61,5 +61,8 @@ export function validateCloudFoundryDeleteServiceBindingsStage(stage: IStage): F
 }
 
 export function validateServiceUnbindingRequests(serviceUnbindingRequests: ServiceUnbindingRequests[]): boolean {
+  if (serviceUnbindingRequests?.length < 1) {
+    return false;
+  }
   return serviceUnbindingRequests.every((req) => req.serviceInstanceName);
 }

@@ -1,5 +1,6 @@
 import React from 'react';
-import { Observable, Subject } from 'rxjs';
+import { from as observableFrom, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import {
   AccountService,
@@ -34,8 +35,8 @@ export class CloudFoundryDeleteServiceBindingsStageConfigForm extends React.Comp
       regions: [],
       application: props.application,
     };
-    Observable.fromPromise(AccountService.listAccounts('cloudfoundry'))
-      .takeUntil(this.destroy$)
+    observableFrom(AccountService.listAccounts('cloudfoundry'))
+      .pipe(takeUntil(this.destroy$))
       .subscribe((rawAccounts: IAccount[]) => this.setState({ accounts: rawAccounts }));
   }
 
@@ -61,8 +62,8 @@ export class CloudFoundryDeleteServiceBindingsStageConfigForm extends React.Comp
 
   private loadRegions = (creds: string) => {
     this.setState({ regions: [] });
-    Observable.fromPromise(AccountService.getRegionsForAccount(creds))
-      .takeUntil(this.destroy$)
+    observableFrom(AccountService.getRegionsForAccount(creds))
+      .pipe(takeUntil(this.destroy$))
       .subscribe((regionList: IRegion[]) => {
         const regions = regionList.map((r) => r.name);
         regions.sort((a, b) => a.localeCompare(b));
@@ -108,7 +109,7 @@ export class CloudFoundryDeleteServiceBindingsStageConfigForm extends React.Comp
 
     return (
       <>
-        <h4>Basic Settings Borrar</h4>
+        <h4>Basic Settings</h4>
         <div className="form-horizontal">
           <AccountRegionClusterSelector
             accounts={accounts}
