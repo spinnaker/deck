@@ -25,9 +25,9 @@ describe('<CloudFoundryDeleteServiceBindingsStageConfigForm/>', function () {
     } as any;
   };
 
-  it('loads component correctly with 2 serviceBindingRequests', function () {
+  it('loads component correctly with 2 serviceUnbindingRequests', function () {
     const stage = ({
-      serviceBindingRequests: [{ serviceInstanceName: 'service1' }, { serviceInstanceName: 'service2' }],
+      serviceUnbindingRequests: [{ serviceInstanceName: 'service1' }, { serviceInstanceName: 'service2' }],
     } as unknown) as IStage;
 
     const props = getProps();
