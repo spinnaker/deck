@@ -1,3 +1,4 @@
+import { MdConstraintStatus } from 'core/managed/graphql/graphql-sdk';
 import { IMoniker } from 'core/naming';
 
 export enum ManagedResourceStatus {
@@ -16,7 +17,8 @@ export enum ManagedResourceStatus {
   WAITING = 'WAITING',
 }
 
-export type ConstraintStatus = 'NOT_EVALUATED' | 'PENDING' | 'PASS' | 'FAIL' | 'OVERRIDE_PASS' | 'OVERRIDE_FAIL';
+type DeprecatedStatus = 'OVERRIDE_PASS' | 'OVERRIDE_FAIL' | 'NOT_EVALUATED'; // will be removed in future versions
+export type ConstraintStatus = DeprecatedStatus | MdConstraintStatus;
 
 // Warning! Chaning this interface might affect existing plugins. Please make sure you don't break the API
 export interface IBaseConstraint {
@@ -39,14 +41,14 @@ export interface AllowedTimeWindow {
 }
 export interface IAllowedTimesConstraint extends IBaseConstraint {
   type: 'allowed-times';
-  attributes: { allowedTimes: AllowedTimeWindow[] };
+  attributes: { allowedTimes: AllowedTimeWindow[]; timezone?: string } | null;
 }
 
 export interface IManualJudgementConstraint extends IBaseConstraint {
   type: 'manual-judgement';
 }
 
-export type IConstraint = IManualJudgementConstraint | IDependsOnConstraint | IAllowedTimesConstraint;
+export type IConstraint = IBaseConstraint | IManualJudgementConstraint | IDependsOnConstraint | IAllowedTimesConstraint;
 
 export interface IManagedResourceSummary {
   id: string;

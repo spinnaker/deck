@@ -1,3 +1,5 @@
+/* eslint-disable @spinnaker/import-sort */
+
 import { ReactComponent as accordionCollapse } from './vectors/accordionCollapse.svg';
 import { ReactComponent as accordionExpand } from './vectors/accordionExpand.svg';
 import { ReactComponent as accordionExpandAll } from './vectors/accordionExpandAll.svg';
@@ -49,7 +51,10 @@ import { ReactComponent as servergroupAws } from './vectors/servergroupAws.svg';
 import { ReactComponent as spel } from './vectors/spel.svg';
 import { ReactComponent as toggleOff } from './vectors/toggleOff.svg';
 import { ReactComponent as toggleOn } from './vectors/toggleOn.svg';
+import { ReactComponent as trash } from './vectors/trash.svg';
 import { ReactComponent as unpin } from './vectors/unpin.svg';
+import { ReactComponent as minus } from './vectors/minus.svg';
+import { ReactComponent as plus } from './vectors/plus.svg';
 
 // Icons prefixed sp* are intended for use with the current Spinnaker UI design. They are visually heavier.
 import { ReactComponent as spCIBranch } from './vectors/spCIBranch.svg';
@@ -75,6 +80,7 @@ import { ReactComponent as spMenuProperties } from './vectors/spMenuProperties.s
 import { ReactComponent as spMenuSecurityGroups } from './vectors/spMenuSecurityGroups.svg';
 import { ReactComponent as spMenuTasks } from './vectors/spMenuTasks.svg';
 import { ReactComponent as spMenuTimeline } from './vectors/spMenuTimeline.svg';
+import { ReactComponent as spMenuZuul } from './vectors/spMenuZuul.svg';
 
 // Kayenta
 import { ReactComponent as canaryConfig } from './vectors/canaryConfig.svg';
@@ -198,9 +204,11 @@ export const iconsByName = {
   mdVerification,
   menu,
   menuClose,
+  minus,
   pin,
   placeholder,
   play,
+  plus,
   resourceT,
   securityGroup,
   servergroupAws,
@@ -227,11 +235,13 @@ export const iconsByName = {
   spMenuSecurityGroups,
   spMenuTasks,
   spMenuTimeline,
+  spMenuZuul,
   spel,
   templateFull,
   templateS,
   templateWorkflow,
   toggleOff,
   toggleOn,
+  trash,
   unpin,
 } as const;

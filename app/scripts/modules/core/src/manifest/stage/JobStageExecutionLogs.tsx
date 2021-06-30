@@ -1,6 +1,7 @@
 import { isEmpty, template } from 'lodash';
 import React from 'react';
-import { Observable, Subject } from 'rxjs';
+import { from as observableFrom, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import { Application } from 'core/application';
 import { IManifest } from 'core/domain/IManifest';
@@ -14,7 +15,7 @@ interface IJobStageExecutionLogsProps {
   account: string;
   application: Application;
   externalLink: string;
-  podNameProvider: IPodNameProvider;
+  podNamesProviders: IPodNameProvider[];
   location: string;
 }
 
@@ -31,8 +32,8 @@ export class JobStageExecutionLogs extends React.Component<IJobStageExecutionLog
 
   public componentDidMount() {
     const { account, location, deployedName } = this.props;
-    Observable.from(ManifestReader.getManifest(account, location, deployedName))
-      .takeUntil(this.destroy$)
+    observableFrom(ManifestReader.getManifest(account, location, deployedName))
+      .pipe(takeUntil(this.destroy$))
       .subscribe(
         (manifest) => this.setState({ manifest }),
         () => {},
@@ -50,8 +51,7 @@ export class JobStageExecutionLogs extends React.Component<IJobStageExecutionLog
 
   public render() {
     const { manifest } = this.state;
-    const { externalLink, podNameProvider, location, account } = this.props;
-
+    const { externalLink, podNamesProviders, location, account } = this.props;
     // prefer links to external logging platforms
     if (!isEmpty(manifest) && externalLink) {
       return (
@@ -67,7 +67,7 @@ export class JobStageExecutionLogs extends React.Component<IJobStageExecutionLog
           <JobManifestPodLogs
             account={account}
             location={location}
-            podNameProvider={podNameProvider}
+            podNamesProviders={podNamesProviders}
             linkName="Console Output"
           />
         )}

@@ -140,6 +140,7 @@ export interface IEcsServerGroupCommand extends IServerGroupCommand {
   subnetType: string;
   subnetTypes: string[];
   securityGroups: string[];
+  securityGroupNames: string[];
   viewState: IEcsServerGroupCommandViewState;
   taskDefinitionArtifact: IEcsTaskDefinitionArtifact;
   taskDefinitionArtifactAccount: string;
@@ -148,6 +149,7 @@ export interface IEcsServerGroupCommand extends IServerGroupCommand {
   targetGroupMappings: IEcsTargetGroupMapping[];
   serviceDiscoveryAssociations: IEcsServiceDiscoveryRegistryAssociation[];
   useTaskDefinitionArtifact: boolean;
+  evaluateTaskDefinitionArtifactExpressions: boolean;
 
   capacityProviderStrategy: IEcsCapacityProviderStrategyItem[];
   useDefaultCapacityProviders: boolean;

@@ -10,14 +10,14 @@ import {
   ManagedResourceStatus,
 } from 'core/domain';
 
-const KIND_NAME_MATCHER = /.*\/(.*?)@/i;
+import { resourceManager } from './resources/resourceRegistry';
+import { sortEnvironments } from './utils/sortEnvironments';
+
 const RESOURCE_DIFF_LIST_MATCHER = /^(.*)\[(.*)\]$/i;
 
+// TODO: remove this function
 export const getKindName = (kind: string) => {
-  const match = kind.match(KIND_NAME_MATCHER);
-  const extractedKind = match && match[1];
-
-  return extractedKind || kind;
+  return resourceManager.getSpinnakerType(kind);
 };
 
 export const getResourceKindForLoadBalancerType = (type: string) => {
@@ -86,12 +86,17 @@ export class ManagedReader {
     return REST('/managed/application').path(app).query({ entities: 'resources' }).get().then(this.decorateResources);
   }
 
+  public static getDeliveryConfig(app: string): PromiseLike<string> {
+    return REST('/managed/application').path(app).path('config').headers({ Accept: 'application/x-yaml' }).get();
+  }
+
   public static getEnvironmentsSummary(app: string): PromiseLike<IManagedApplicationSummary> {
     return REST('/managed/application')
       .path(app)
       .query({ entities: ['resources', 'artifacts', 'environments'], maxArtifactVersions: 30 })
       .get()
-      .then(this.decorateResources);
+      .then(this.decorateResources)
+      .then(sortEnvironments);
   }
 
   public static getResourceHistory(resourceId: string): PromiseLike<IManagedResourceEventHistory> {

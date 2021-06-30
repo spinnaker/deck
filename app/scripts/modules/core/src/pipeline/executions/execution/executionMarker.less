@@ -1,4 +1,4 @@
-@import (reference) '~core/presentation/less/imports/commonImports.less';
+@import (reference) '../../../presentation/less/imports/commonImports.less';
 
 .execution-marker.stage {
   margin-top: 0;
@@ -40,5 +40,17 @@
     margin-left: 3px;
     font-size: 0.7em;
     position: relative;
+  }
+}
+
+.execution-marker-waiting {
+  color: var(--color-black);
+  background-color: var(--color-alert) !important;
+  .execution-waiting-link {
+    text-decoration: none;
+    color: var(--color-black);
+    .execution-waiting-fa {
+      color: var(--color-black);
+    }
   }
 }

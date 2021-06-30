@@ -11,9 +11,9 @@ import { HealthCounts } from 'core/healthCounts';
 import { LoadBalancersTagWrapper } from 'core/loadBalancer';
 import { NameUtils } from 'core/naming';
 import { Overridable } from 'core/overrideRegistry';
-import { NgReact } from 'core/reactShims';
 
 import { IDockerViewModel, IJenkinsViewModel } from './ServerGroup';
+import { RunningTasksTag } from './pod/RunningTasksTag';
 
 export interface IServerGroupHeaderProps {
   application: Application;
@@ -124,7 +124,7 @@ export class SequenceAndBuildAndImages extends React.Component<IServerGroupHeade
         {!!serverGroupSequence && <span className="server-group-sequence"> {serverGroupSequence}</span>}
         {!!serverGroupSequence && (!!jenkins || !!images) && <span>: </span>}
         {!!jenkins && (
-          <a className="build-link" href={jenkins.href} target="_blank">
+          <a className="build-link sp-margin-xs-right" href={jenkins.href} target="_blank">
             Build: #{jenkins.number}
           </a>
         )}
@@ -195,17 +195,12 @@ export class Health extends React.Component<IServerGroupHeaderProps> {
 
 export class RunningTasks extends React.Component<IServerGroupHeaderProps> {
   public render() {
-    const { application, serverGroup } = this.props;
-    const { RunningTasksTag } = NgReact;
+    const { serverGroup } = this.props;
     const hasRunningExecutions = !!serverGroup.runningExecutions.length || !!serverGroup.runningTasks.length;
 
     return (
       hasRunningExecutions && (
-        <RunningTasksTag
-          application={application}
-          tasks={serverGroup.runningTasks}
-          executions={serverGroup.runningExecutions}
-        />
+        <RunningTasksTag tasks={serverGroup.runningTasks} executions={serverGroup.runningExecutions} />
       )
     );
   }

@@ -4,11 +4,12 @@ import React from 'react';
 import {
   AccountTag,
   CollapsibleSection,
+  EntitySource,
   IEntityTags,
   IViewChangesConfig,
-  NgReact,
   SETTINGS,
   timestamp,
+  ViewChangesLink,
 } from '@spinnaker/core';
 import { IAmazonServerGroupView } from 'amazon/domain';
 import { VpcTag } from 'amazon/vpc/VpcTag';
@@ -50,7 +51,6 @@ export class AmazonInfoDetailsSection extends React.Component<
   public render(): JSX.Element {
     const { serverGroup } = this.props;
     const { changeConfig } = this.state;
-    const { EntitySource, ViewChangesLink } = NgReact;
 
     const showEntityTags = SETTINGS.feature && SETTINGS.feature.entityTags;
     const entityTags = serverGroup.entityTags || ({} as IEntityTags);
@@ -78,8 +78,8 @@ export class AmazonInfoDetailsSection extends React.Component<
           <dd>
             <VpcTag vpcId={serverGroup.vpcId} />
           </dd>
-          {serverGroup.vpcId && <dt>Subnet</dt>}
-          {serverGroup.vpcId && <dd>{serverGroup.subnetType || 'None (EC2 Classic)'}</dd>}
+          {serverGroup.vpcId && serverGroup.subnetType && <dt>Subnet</dt>}
+          {serverGroup.vpcId && serverGroup.subnetType && <dd>{serverGroup.subnetType}</dd>}
           {serverGroup.asg && <dt>Zones</dt>}
           {serverGroup.asg && (
             <dd>

@@ -1,8 +1,8 @@
 import classnames from 'classnames';
 import { flatten, uniq, without } from 'lodash';
 import React from 'react';
-import ReactGA from 'react-ga';
-import { Observable, Subject, Subscription } from 'rxjs';
+import { from as observableFrom, Subject, Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import { AccountTag } from 'core/account';
 import { Application } from 'core/application/application.model';
@@ -21,6 +21,7 @@ import { Placement } from 'core/presentation/Placement';
 import { Popover } from 'core/presentation/Popover';
 import { ReactInjector } from 'core/reactShims';
 import { ExecutionState } from 'core/state';
+import { logger } from 'core/utils';
 import { RenderWhenVisible } from 'core/utils/RenderWhenVisible';
 import { IRetryablePromise } from 'core/utils/retryablePromise';
 import { Spinner } from 'core/widgets/spinners/Spinner';
@@ -35,7 +36,7 @@ import { TriggersTag } from '../../triggers/TriggersTag';
 
 import './executionGroup.less';
 
-const ACCOUNT_TAG_OVERFLOW_LIMIT = 2;
+const ACCOUNT_TAG_OVERFLOW_LIMIT = 1;
 
 export interface IExecutionGroupProps {
   group: IExecutionGroup;
@@ -144,7 +145,7 @@ export class ExecutionGroup extends React.PureComponent<IExecutionGroupProps, IE
   }
 
   public triggerPipeline(trigger: IExecutionTrigger = null, config = this.state.pipelineConfig): void {
-    Observable.fromPromise(
+    observableFrom(
       new Promise((resolve) => {
         if (PipelineTemplateV2Service.isV2PipelineConfig(config)) {
           PipelineTemplateReader.getPipelinePlan(config as IPipelineTemplateConfigV2)
@@ -155,7 +156,7 @@ export class ExecutionGroup extends React.PureComponent<IExecutionGroupProps, IE
         }
       }),
     )
-      .takeUntil(this.destroy$)
+      .pipe(takeUntil(this.destroy$))
       .subscribe((pipeline) =>
         ManualExecutionModal.show({
           pipeline,
@@ -202,32 +203,36 @@ export class ExecutionGroup extends React.PureComponent<IExecutionGroupProps, IE
   }
 
   private handleHeadingClicked = (): void => {
-    ReactGA.event({
+    logger.log({
       category: 'Pipeline',
       action: `Group ${this.state.open ? 'collapsed' : 'expanded'}`,
-      label: this.props.group.heading,
+      data: { label: this.props.group.heading },
     });
     this.toggle();
   };
 
   private handleConfigureClicked = (e: React.MouseEvent<HTMLElement>): void => {
-    ReactGA.event({
+    logger.log({
       category: 'Pipeline',
       action: 'Configure pipeline button clicked',
-      label: this.props.group.heading,
+      data: { label: this.props.group.heading },
     });
     this.configure(this.props.group.config.id);
     e.stopPropagation();
   };
 
   private handleTriggerClicked = (e: React.MouseEvent<HTMLElement>): void => {
-    ReactGA.event({ category: 'Pipeline', action: 'Trigger pipeline button clicked', label: this.props.group.heading });
+    logger.log({
+      category: 'Pipeline',
+      action: 'Trigger pipeline button clicked',
+      data: { label: this.props.group.heading },
+    });
     this.triggerPipeline();
     e.stopPropagation();
   };
 
   private rerunExecutionClicked = (execution: IExecution, config: IPipeline): void => {
-    ReactGA.event({ category: 'Pipeline', action: 'Rerun pipeline button clicked', label: config.name });
+    logger.log({ category: 'Pipeline', action: 'Rerun pipeline button clicked', data: { label: config.name } });
     this.triggerPipeline(execution.trigger, config);
   };
 
@@ -279,7 +284,7 @@ export class ExecutionGroup extends React.PureComponent<IExecutionGroupProps, IE
     let groupTargetAccountLabelsExtra: React.ReactNode[] = [];
     if (group.targetAccounts && group.targetAccounts.length > 0) {
       group.targetAccounts.slice(0, ACCOUNT_TAG_OVERFLOW_LIMIT).map((account) => {
-        groupTargetAccountLabels.push(<AccountTag key={account} account={account} />);
+        groupTargetAccountLabels.push(<AccountTag key={account} account={account} className="account-tag-wrapper" />);
       });
     }
     if (group.targetAccounts && group.targetAccounts.length > ACCOUNT_TAG_OVERFLOW_LIMIT) {

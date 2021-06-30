@@ -1,30 +1,29 @@
 import { module } from 'angular';
 import classNames from 'classnames';
 import React from 'react';
-import ReactGA from 'react-ga';
 import { react2angular } from 'react2angular';
 
 import { ManagedWriter } from 'core/managed';
 import { useLatestCallback, ValidationMessage } from 'core/presentation';
 import { withErrorBoundary } from 'core/presentation/SpinErrorBoundary';
-import { NgReact } from 'core/reactShims';
+import { logger } from 'core/utils';
+import { Spinner } from 'core/widgets/spinners/Spinner';
 
 import { Application } from '../../application.model';
 
 import './ManagedResourceConfig.less';
 
 const { useState, useEffect } = React;
-const { ButtonBusyIndicator } = NgReact;
 
 export interface IManagedResourceConfigProps {
   application: Application;
 }
 
 const logClick = (label: string, application: string) =>
-  ReactGA.event({
+  logger.log({
     category: 'Managed Resource Config',
     action: `${label} clicked`,
-    label: application,
+    data: { label: application },
   });
 
 const getManagementStatus = (paused: boolean) => {
@@ -105,7 +104,9 @@ const ManagedResourceConfig = ({ application }: IManagedResourceConfigProps) => 
         onClick={paused ? resumeManagement : pauseManagement}
         type="button"
       >
-        {(!pausePending && <i className={classNames('fa sp-margin-xs-right', iconClass)} />) || <ButtonBusyIndicator />}{' '}
+        {(!pausePending && <i className={classNames('fa sp-margin-xs-right', iconClass)} />) || (
+          <Spinner mode="circular" />
+        )}{' '}
         {paused ? 'Resume Management' : 'Pause Management'}
       </button>
       {pauseFailed && (
