@@ -41,8 +41,6 @@ describe('<CloudFoundryDeleteServiceBindingsStageConfigForm/>', function () {
       />,
     );
     expect(component.find(StageConfigField).findWhere((x) => x.text() === 'Target').length).toBe(1);
-    expect(component.find(StageConfigField).findWhere((x) => x.text() === 'Restage Required').length).toBe(1);
-    expect(component.find(StageConfigField).findWhere((x) => x.text() === 'Restart Required').length).toBe(1);
     expect(component.find(StageConfigField).findWhere((x) => x.text() === 'Service Instance Name').length).toBe(2);
   });
 });
