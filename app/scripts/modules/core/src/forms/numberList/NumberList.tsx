@@ -52,7 +52,7 @@ export const NumberList = ({ constraints, label, model, onChange }: INumberListP
     updateModel(newNumList);
   };
   const removeNumber = (index: number) => {
-    const newNumListModel = numListModel.filter((num, i) => i !== index);
+    const newNumListModel = numListModel.filter((_, i) => i !== index);
     updateModel(newNumListModel);
   };
 
