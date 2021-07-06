@@ -229,9 +229,28 @@ query fetchResourceStatus($appName: String!) {
             status
             reason
             event
+            tasks {
+              id
+              name
+            }
           }
         }
       }
+    }
+  }
+}
+
+query fetchNotifications($appName: String!) {
+  application(appName: $appName) {
+    id
+    name
+    notifications {
+      id
+      level
+      message
+      triggeredAt
+      link
+      id
     }
   }
 }

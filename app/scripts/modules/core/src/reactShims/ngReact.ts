@@ -1,9 +1,6 @@
 import { angular2react } from 'angular2react';
 import React from 'react';
 
-import { IViewChangesLinkProps } from 'core/diffs/ViewChangesLink';
-import { viewChangesLinkWrapper } from 'core/diffs/viewChangesLink.component';
-import { EntitySource as EntitySourceComponent, IEntitySourceProps } from 'core/entityTag/EntitySource';
 import { INumberListProps } from 'core/forms/numberList/NumberList';
 import { numberListWrapperComponent } from 'core/forms/numberList/numberList.component';
 import { ITargetSelectProps, targetSelectComponent } from 'core/pipeline/config/targetSelect.component';
@@ -31,7 +28,6 @@ export class NgReactInjector extends ReactInject {
 
   // Reactified components
   public AccountRegionClusterSelector: React.ComponentClass<IAccountRegionClusterSelectorProps> = angular2react('accountRegionClusterSelectorWrapper', accountRegionClusterSelectorWrapperComponent, this.$injectorProxy) as any;
-  public EntitySource: React.FunctionComponent<IEntitySourceProps>                                 = EntitySourceComponent;
   public InstanceArchetypeSelector: React.ComponentClass<IInstanceArchetypeSelectorProps>       = angular2react('v2InstanceArchetypeSelector', v2InstanceArchetypeSelector, this.$injectorProxy) as any;
   public InstanceTypeSelector: React.ComponentClass<IInstanceTypeSelectorProps>                 = angular2react('v2InstanceTypeSelector', v2InstanceTypeSelector, this.$injectorProxy);
   public NumberList: React.ComponentClass<INumberListProps>                                     = angular2react('numberListWrapper', numberListWrapperComponent, this.$injectorProxy) as any;
@@ -39,7 +35,6 @@ export class NgReactInjector extends ReactInject {
   public StepExecutionDetailsWrapper: React.ComponentClass<IStepExecutionDetailsWrapperProps>   = angular2react('stepExecutionDetails', stepExecutionDetailsComponent, this.$injectorProxy) as any;
   public TargetSelect: React.ComponentClass<ITargetSelectProps>                                 = angular2react('targetSelect', targetSelectComponent, this.$injectorProxy) as any;
   public TaskMonitorWrapper: React.FunctionComponent<ITaskMonitorProps>                         = TaskMonitorWrapper;
-  public ViewChangesLink: React.ComponentClass<IViewChangesLinkProps>                           = angular2react('viewChangesLinkWrapper', viewChangesLinkWrapper, this.$injectorProxy) as any;
 
   public initialize($injector: IInjectorService) {
     const realInjector: { [key: string]: Function } = $injector as any;
