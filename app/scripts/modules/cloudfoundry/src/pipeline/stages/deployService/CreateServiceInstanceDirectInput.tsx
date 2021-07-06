@@ -100,6 +100,24 @@ export class CreateServiceInstanceDirectInput extends React.Component<
     this.props.onServiceChanged({
       ...this.props.service,
       updatable: event.target.checked,
+      versioned: false,
+      deletePreviousVersion: false,
+    });
+  };
+
+  private versionedUpdated = (event: React.ChangeEvent<HTMLInputElement>) => {
+    this.props.onServiceChanged({
+      ...this.props.service,
+      versioned: event.target.checked,
+      updatable: false,
+      deletePreviousVersion: true,
+    });
+  };
+
+  private deletePreviousVersionUpdated = (event: React.ChangeEvent<HTMLInputElement>) => {
+    this.props.onServiceChanged({
+      ...this.props.service,
+      deletePreviousVersion: event.target.checked,
     });
   };
 
@@ -141,7 +159,12 @@ export class CreateServiceInstanceDirectInput extends React.Component<
           <TextAreaInput className="form-control" onChange={this.parametersUpdated} value={service.parameters || ''} />
         </StageConfigField>
         <StageConfigField label="Updatable">
-          <input type="checkbox" checked={!!service.updatable} onChange={this.updatableUpdated} />
+          <input
+            type="checkbox"
+            disabled={!!service.versioned}
+            checked={!!service.updatable}
+            onChange={this.updatableUpdated}
+          />
           {!service.updatable && (
             <div>
               If a service instance with the name '{service.serviceInstanceName}' is already present then it will not be
@@ -149,6 +172,23 @@ export class CreateServiceInstanceDirectInput extends React.Component<
             </div>
           )}
         </StageConfigField>
+        <StageConfigField label="Versioned">
+          <input
+            type="checkbox"
+            disabled={!!service.updatable}
+            checked={!!service.versioned}
+            onChange={this.versionedUpdated}
+          />
+        </StageConfigField>
+        {service.versioned && (
+          <StageConfigField label="Delete previous version">
+            <input
+              type="checkbox"
+              checked={!!service.deletePreviousVersion}
+              onChange={this.deletePreviousVersionUpdated}
+            />
+          </StageConfigField>
+        )}
       </div>
     );
   }

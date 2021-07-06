@@ -7,6 +7,8 @@ export interface ICloudfoundryServiceManifestDirectSource {
   servicePlan: string;
   tags?: string[];
   updatable: boolean;
+  versioned: boolean;
+  deletePreviousVersion: boolean;
 }
 
 export interface ICloudFoundryServiceUserProvidedSource {
@@ -16,6 +18,8 @@ export interface ICloudFoundryServiceUserProvidedSource {
   syslogDrainUrl?: string;
   tags?: string[];
   updatable: boolean;
+  versioned: boolean;
+  deletePreviousVersion: boolean;
 }
 
 export interface ICloudFoundryServiceManifestSource {
