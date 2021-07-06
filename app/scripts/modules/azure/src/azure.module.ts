@@ -6,9 +6,11 @@ import './help/azure.help';
 import { AZURE_IMAGE_IMAGE_READER } from './image/image.reader';
 import { AZURE_INSTANCE_AZUREINSTANCETYPE_SERVICE } from './instance/azureInstanceType.service';
 import { AZURE_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER } from './instance/details/instance.details.controller';
+import { AzureLoadBalancerChoiceModal } from './loadBalancer/configure/AzureLoadBalancerChoiceModal';
 import { AZURE_LOADBALANCER_CONFIGURE_CREATELOADBALANCER_CONTROLLER } from './loadBalancer/configure/createLoadBalancer.controller';
 import { AZURE_LOADBALANCER_DETAILS_LOADBALANCERDETAIL_CONTROLLER } from './loadBalancer/details/loadBalancerDetail.controller';
 import { AZURE_LOADBALANCER_LOADBALANCER_TRANSFORMER } from './loadBalancer/loadBalancer.transformer';
+import logo from './logo/logo_azure.png';
 import { AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE } from './pipeline/stages/bake/azureBakeStage';
 import { AZURE_PIPELINE_STAGES_DESTROYASG_AZUREDESTROYASGSTAGE } from './pipeline/stages/destroyAsg/azureDestroyAsgStage';
 import { AZURE_PIPELINE_STAGES_DISABLEASG_AZUREDISABLEASGSTAGE } from './pipeline/stages/disableAsg/azureDisableAsgStage';
@@ -25,12 +27,6 @@ import { AZURE_SERVERGROUP_SERVERGROUP_TRANSFORMER } from './serverGroup/serverG
 import { AZURE_VALIDATION_APPLICATIONNAME_VALIDATOR } from './validation/applicationName.validator';
 
 import './logo/azure.logo.less';
-
-// load all templates into the $templateCache
-const templates = require.context('./', true, /\.html$/);
-templates.keys().forEach(function (key) {
-  templates(key);
-});
 
 export const AZURE_MODULE = 'spinnaker.azure';
 module(AZURE_MODULE, [
@@ -58,7 +54,7 @@ module(AZURE_MODULE, [
   CloudProviderRegistry.registerProvider('azure', {
     name: 'Azure',
     logo: {
-      path: require('./logo/logo_azure.png'),
+      path: logo,
     },
     image: {
       reader: 'azureImageReader',
@@ -83,8 +79,7 @@ module(AZURE_MODULE, [
       detailsController: 'azureLoadBalancerDetailsCtrl',
       createLoadBalancerTemplateUrl: require('./loadBalancer/configure/createLoadBalancer.html'),
       createLoadBalancerController: 'azureCreateLoadBalancerCtrl',
-      CreateLoadBalancerModal: require('./loadBalancer/configure/AzureLoadBalancerChoiceModal')
-        .AzureLoadBalancerChoiceModal,
+      CreateLoadBalancerModal: AzureLoadBalancerChoiceModal,
     },
     securityGroup: {
       transformer: 'azureSecurityGroupTransformer',

@@ -1,0 +1,78 @@
+.VersionMetadata {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-top: var(--xs-spacing);
+  color: var(--color-concrete);
+  white-space: pre-wrap;
+  font-size: 13px;
+  flex-wrap: wrap;
+
+  .metadata-icon {
+    margin-right: 6px;
+    display: flex;
+
+    & > svg {
+      height: 16px;
+    }
+  }
+
+  i.metadata-icon {
+    font-size: 12px;
+  }
+
+  .element-actions-menu-toggle {
+    padding: 0 var(--xs-spacing);
+    border: none;
+    font-size: inherit;
+    &:not(:hover) {
+      background-color: transparent;
+    }
+  }
+
+  .version-badge {
+    border-radius: 3px;
+    padding: 0 var(--s-spacing);
+    display: flex;
+    min-width: 60px;
+    justify-content: center;
+    flex-direction: row;
+    & > svg {
+      margin-right: 4px;
+    }
+  }
+
+  .version-deploying {
+    animation: deployingAnimation 2s infinite;
+    color: var(--color-mineshaft);
+  }
+
+  .version-baking {
+    background-color: var(--color-accent-g1);
+    color: var(--color-black);
+  }
+
+  .version-pinned {
+    background-color: var(--color-status-warning-light);
+  }
+
+  .version-vetoed {
+    background-color: var(--color-status-error-light);
+  }
+
+  .version-message {
+    color: var(--color-mineshaft);
+    border-radius: 4px;
+    padding: var(--s-spacing);
+    padding-right: var(--xl-spacing);
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .created-at {
+    a {
+      color: inherit;
+    }
+  }
+}

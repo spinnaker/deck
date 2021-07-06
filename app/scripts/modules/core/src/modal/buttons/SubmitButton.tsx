@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { NgReact } from 'core/reactShims';
 import { noop } from 'core/utils';
+import { Spinner } from 'core/widgets/spinners/Spinner';
 
 export interface ISubmitButtonProps {
   className?: string;
@@ -24,14 +24,14 @@ export class SubmitButton extends React.Component<ISubmitButtonProps> {
 
   public render() {
     const { className, isDisabled, isFormSubmit, isNew, label, onClick, submitting } = this.props;
-    const { ButtonBusyIndicator } = NgReact;
     const type = isFormSubmit ? 'submit' : 'button';
 
     return (
       <button className={className} disabled={isDisabled} onClick={onClick} type={type}>
-        {(!submitting && <i className="far fa-check-circle" />) || <ButtonBusyIndicator />}
-        &nbsp;
-        {label || (isNew ? 'Create' : 'Update')}
+        <div className="flex-container-h horizontal middle">
+          {(!submitting && <i className="far fa-check-circle" />) || <Spinner mode="circular" />}
+          <span className="sp-margin-xs-left">{label || (isNew ? 'Create' : 'Update')}</span>
+        </div>
       </button>
     );
   }

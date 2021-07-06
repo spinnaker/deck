@@ -8,6 +8,7 @@ import { APPENGINE_LOAD_BALANCER_CREATE_MESSAGE } from './common/loadBalancerMes
 import './helpContents/appengineHelpContents';
 import { APPENGINE_INSTANCE_DETAILS_CTRL } from './instance/details/details.controller';
 import { APPENGINE_LOAD_BALANCER_MODULE } from './loadBalancer/loadBalancer.module';
+import logo from './logo/appengine.logo.png';
 import { APPENGINE_PIPELINE_MODULE } from './pipeline/pipeline.module';
 import './pipeline/stages/deployAppengineConfig/deployAppengineConfigStage';
 import { APPENGINE_SERVER_GROUP_COMMAND_BUILDER } from './serverGroup/configure/serverGroupCommandBuilder.service';
@@ -20,11 +21,6 @@ import { APPENGINE_SERVER_GROUP_WRITER } from './serverGroup/writer/serverGroup.
 import './validation/ApplicationNameValidator';
 
 import './logo/appengine.logo.less';
-
-const templates = require.context('./', true, /\.html$/);
-templates.keys().forEach(function (key) {
-  templates(key);
-});
 
 export const APPENGINE_MODULE = 'spinnaker.appengine';
 
@@ -66,7 +62,7 @@ module(APPENGINE_MODULE, [
       detailsController: 'appengineLoadBalancerDetailsCtrl',
     },
     logo: {
-      path: require('./logo/appengine.logo.png'),
+      path: logo,
     },
   });
 });

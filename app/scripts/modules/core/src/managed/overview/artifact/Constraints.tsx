@@ -2,16 +2,16 @@ import classnames from 'classnames';
 import { isEmpty } from 'lodash';
 import React from 'react';
 
-import { Icon } from '@spinnaker/presentation';
-import { useApplicationContextSafe } from 'core/presentation';
-import { NotifierService } from 'core/widgets';
+import { CollapsibleSection, useApplicationContextSafe } from 'core/presentation';
+import { NotifierService, Spinner } from 'core/widgets';
 
+import { RelativeTimestamp } from '../../RelativeTimestamp';
 import { VersionOperationIcon } from './VersionOperation';
 import { constraintsManager } from '../../constraints/registry';
-import { FetchApplicationDocument, useUpdateConstraintMutation } from '../../graphql/graphql-sdk';
-import spinner from '../loadingIndicator.svg';
+import { FetchVersionDocument, useUpdateConstraintMutation } from '../../graphql/graphql-sdk';
 import { ArtifactVersionProps, QueryConstraint } from '../types';
 import { getConstraintsStatusSummary } from './utils';
+import { useLogEvent } from '../../utils/logging';
 
 import './Constraints.less';
 
@@ -24,9 +24,12 @@ const ConstraintContent = ({ constraint, versionProps }: IConstraintContentProps
   const description = constraintsManager.renderDescription(constraint);
   const actions = constraintsManager.getActions(constraint)?.sort((action) => (action.pass ? -1 : 1)); // positive actions first
   const application = useApplicationContextSafe();
+  const logEvent = useLogEvent('ArtifactConstraints', 'UpdateStatus');
 
   const [updateConstraint, { loading, error }] = useUpdateConstraintMutation({
-    refetchQueries: [{ query: FetchApplicationDocument, variables: { appName: application?.name } }],
+    refetchQueries: [
+      { query: FetchVersionDocument, variables: { appName: application?.name, versions: [versionProps.version] } },
+    ],
   });
 
   React.useEffect(() => {
@@ -44,13 +47,14 @@ const ConstraintContent = ({ constraint, versionProps }: IConstraintContentProps
     <dl className="constraint-content">
       {description && <dd>{description}</dd>}
       {!isEmpty(actions) && (
-        <dd>
+        <dd className={classnames(description ? 'sp-margin-s-top' : undefined, 'horizontal middle')}>
           {actions?.map(({ title, pass }) => (
             <button
               className={classnames('btn md-btn constraint-action-button', pass ? 'md-btn-success' : 'md-btn-danger')}
               key={title}
               disabled={loading}
               onClick={() => {
+                logEvent({ data: { newStatus: pass } });
                 updateConstraint({
                   variables: {
                     payload: {
@@ -68,7 +72,7 @@ const ConstraintContent = ({ constraint, versionProps }: IConstraintContentProps
               {title}
             </button>
           ))}
-          {loading && <img src={spinner} height={14} />}
+          {loading && <Spinner mode="circular" size="nano" color="var(--color-accent)" />}
         </dd>
       )}
     </dl>
@@ -82,27 +86,33 @@ interface IConstraintProps {
 
 const Constraint = ({ constraint, versionProps }: IConstraintProps) => {
   const hasContent = constraintsManager.hasContent(constraint);
-  const [isExpanded, setIsExpanded] = React.useState(hasContent);
   const title = constraintsManager.renderTitle(constraint);
   return (
-    <div className="pending-version-constraint">
+    <div className="version-constraint single-constraint">
       <VersionOperationIcon status={constraint.status} />
-      <div>
-        {hasContent ? (
-          <button
-            className="btn-link constraint-title"
-            onClick={() => {
-              setIsExpanded((state) => !state);
-            }}
-          >
-            {title}
-            <Icon name="accordionExpand" size="12px" className={isExpanded ? 'rotated-90' : undefined} />
-          </button>
-        ) : (
-          <span className="constraint-title">{title}</span>
+      <CollapsibleSection
+        outerDivClassName=""
+        defaultExpanded
+        toggleClassName="constraint-toggle"
+        enableCaching={false}
+        expandIconSize="12px"
+        expandIconPosition="right"
+        heading={({ chevron }) => (
+          <div className="constraint-title">
+            <div>
+              {title}
+              {constraint.judgedAt && (
+                <span className="sp-margin-xs-left">
+                  (<RelativeTimestamp timestamp={constraint.judgedAt} withSuffix />)
+                </span>
+              )}
+            </div>
+            {chevron}
+          </div>
         )}
-        {isExpanded && hasContent && <ConstraintContent constraint={constraint} versionProps={versionProps} />}
-      </div>
+      >
+        {hasContent ? <ConstraintContent constraint={constraint} versionProps={versionProps} /> : undefined}
+      </CollapsibleSection>
     </div>
   );
 };
@@ -112,36 +122,35 @@ export const Constraints = ({
   versionProps,
   expandedByDefault,
 }: {
-  constraints: QueryConstraint[];
+  constraints?: QueryConstraint[];
   versionProps: ArtifactVersionProps;
   expandedByDefault?: boolean;
 }) => {
-  const [showSummary, setShowSummary] = React.useState(Boolean(expandedByDefault));
+  if (!constraints || !constraints.length) return null;
   const summary = getConstraintsStatusSummary(constraints);
   return (
     <div className="Constraints">
-      {showSummary ? (
-        constraints?.map((constraint, index) => (
-          <Constraint key={index} constraint={constraint} versionProps={versionProps} />
-        ))
-      ) : (
-        <div className="pending-version-constraint">
-          <VersionOperationIcon status={summary.status} />
-          <span className="constraint-title">
-            Constraints: {summary.text} (
-            <a
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                setShowSummary(true);
-              }}
-            >
-              expand
-            </a>
-            )
-          </span>
-        </div>
-      )}
+      <div className="version-constraint">
+        <VersionOperationIcon status={summary.status} />
+        <CollapsibleSection
+          heading={({ chevron }) => (
+            <div className="horizontal">
+              Constraints: {summary.text} {chevron}
+            </div>
+          )}
+          outerDivClassName=""
+          toggleClassName="constraint-toggle"
+          bodyClassName="sp-margin-xs-top sp-margin-xs-bottom"
+          expandIconSize="12px"
+          expandIconPosition="right"
+          defaultExpanded={expandedByDefault}
+          enableCaching={false}
+        >
+          {constraints?.map((constraint, index) => (
+            <Constraint key={index} constraint={constraint} versionProps={versionProps} />
+          ))}
+        </CollapsibleSection>
+      </div>
     </div>
   );
 };

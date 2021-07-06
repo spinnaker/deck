@@ -51,12 +51,6 @@ import './validation/applicationName.validator';
 
 import './logo/kubernetes.logo.less';
 
-// load all templates into the $templateCache
-const templates = require.context('./', true, /\.html$/);
-templates.keys().forEach(function (key) {
-  templates(key);
-});
-
 export const KUBERNETES_MODULE = 'spinnaker.kubernetes';
 
 const requires = [

@@ -1,15 +1,16 @@
 import React from 'react';
 
 import { Icon, useApplicationContextSafe } from 'core/presentation';
-import { IconTooltip } from 'core/presentation/IconTooltip';
+import { Spinner } from 'core/widgets';
 
+import { ResourceTask } from './ResourceTask';
+import { EnvironmentItem } from '../environmentBaseElements/EnvironmentItem';
 import { MdResourceActuationState, useFetchResourceStatusQuery } from '../graphql/graphql-sdk';
-import spinner from './loadingIndicator.svg';
 import { showManagedResourceHistoryModal } from '../resourceHistory/ManagedResourceHistoryModal';
 import { ResourceTitle } from '../resources/ResourceTitle';
 import { IResourceLinkProps, resourceManager } from '../resources/resourceRegistry';
 import { QueryResource } from './types';
-import { TOOLTIP_DELAY } from '../utils/defaults';
+import { useLogEvent } from '../utils/logging';
 
 import './Resource.less';
 
@@ -60,23 +61,33 @@ const Status = ({
         />
         <div>
           <div>{state.reason || statusUtils[state.status].defaultReason}</div>
-          {state.event && <div>{state.event}</div>}
+          {state.event && state.event !== state.reason && <div>{state.event}</div>}
+          {Boolean(state.tasks?.length) && (
+            <ul className="tasks-list">
+              {state.tasks?.map(({ id, name }) => (
+                <ResourceTask key={id} id={id} name={name} />
+              ))}
+            </ul>
+          )}
         </div>
       </div>
     );
   }
 
-  return <img src={spinner} height={14} />;
+  return <Spinner className="sp-margin-xs-top" mode="circular" size="nano" color="var(--color-accent)" />;
 };
 
 export const Resource = ({ resource, environment }: { resource: QueryResource; environment: string }) => {
   const icon = resourceManager.getIcon(resource.kind);
   const app = useApplicationContextSafe();
+  const logEvent = useLogEvent('Resource');
+
+  const account = resource.location?.account;
 
   const resourceLinkProps: IResourceLinkProps = {
     kind: resource.kind,
     displayName: resource.displayName,
-    account: resource.location?.account,
+    account,
     detail: resource.moniker?.detail,
     stack: resource.moniker?.stack,
   };
@@ -84,39 +95,38 @@ export const Resource = ({ resource, environment }: { resource: QueryResource; e
   const regions = resource.location?.regions || [];
 
   return (
-    <div className="Resource environment-row-element">
-      <div className="row-icon">
-        <IconTooltip tooltip={resource.kind} name={icon} color="primary-g1" delayShow={TOOLTIP_DELAY} />
+    <EnvironmentItem
+      iconName={icon}
+      iconTooltip={resource.kind}
+      className="Resource"
+      title={<ResourceTitle props={resourceLinkProps} />}
+    >
+      <div className="resource-metadata delimited-elements">
+        <span>
+          {regions.map((region, index) => (
+            <span key={region}>
+              {region}
+              {index < regions.length - 1 && ', '}
+            </span>
+          ))}
+        </span>
+        {account && <span>{account}</span>}
+        <span>
+          <a
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              showManagedResourceHistoryModal({ id: resource.id, displayName: resource.displayName || resource.id });
+              logEvent({ action: 'ViewHistory' });
+            }}
+          >
+            View history
+          </a>
+        </span>
       </div>
-      <div className="row-details">
-        <div className="row-title">
-          <ResourceTitle props={resourceLinkProps} />
-        </div>
-        <div className="resource-metadata">
-          <span>
-            {regions.map((region, index) => (
-              <span key={region}>
-                {region}
-                {index < regions.length - 1 && ', '}
-              </span>
-            ))}
-          </span>
-          <span>
-            <a
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                showManagedResourceHistoryModal({ id: resource.id, displayName: resource.displayName || resource.id });
-              }}
-            >
-              View logs
-            </a>
-          </span>
-        </div>
-        <div>
-          <Status appName={app.name} environmentName={environment} resourceId={resource.id} />
-        </div>
+      <div>
+        <Status appName={app.name} environmentName={environment} resourceId={resource.id} />
       </div>
-    </div>
+    </EnvironmentItem>
   );
 };

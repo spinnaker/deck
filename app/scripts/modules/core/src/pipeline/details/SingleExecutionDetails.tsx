@@ -1,14 +1,14 @@
 import { UISref, useCurrentStateAndParams } from '@uirouter/react';
 import { set } from 'lodash';
 import React, { useEffect, useState } from 'react';
-import ReactGA from 'react-ga';
 
 import { Application } from 'core/application/application.model';
 import { IExecution, IPipeline } from 'core/domain';
-import { Tooltip, useData, useLatestPromise } from 'core/presentation';
+import { useData, useLatestPromise } from 'core/presentation';
 import { IStateChange, ReactInjector } from 'core/reactShims';
 import { SchedulerFactory } from 'core/scheduler';
 import { ExecutionState } from 'core/state';
+import { logger } from 'core/utils';
 
 import { Execution } from '../executions/execution/Execution';
 import { ManualExecutionModal } from '../manualExecution';
@@ -125,7 +125,7 @@ export function SingleExecutionDetails(props: ISingleExecutionDetailsProps) {
     const checked = event.target.checked;
     setShowDurations(checked);
     ExecutionState.filterModel.asFilterModel.sortFilter.showDurations = showDurations;
-    ReactGA.event({ category: 'Pipelines', action: 'Toggle Durations', label: checked.toString() });
+    logger.log({ category: 'Pipelines', action: 'Toggle Durations', data: { label: checked.toString() } });
   };
 
   const rerunExecution = (execution: IExecution, application: Application, pipeline: IPipeline) => {
@@ -139,9 +139,6 @@ export function SingleExecutionDetails(props: ISingleExecutionDetailsProps) {
       ReactInjector.$state.go('^.^.executions');
     });
   };
-
-  const defaultExecutionParams = { application: app.name, executionId: execution?.id || '' };
-  const executionParams = ReactInjector.$state.params.executionParams || defaultExecutionParams;
 
   let truncateAncestry = ancestry.length - 1;
   if (executionId && execution && executionId !== execution.id) {
@@ -169,14 +166,13 @@ export function SingleExecutionDetails(props: ISingleExecutionDetailsProps) {
             <div className="single-execution-details">
               <div className="flex-container-h baseline">
                 <h3>
-                  <Tooltip value="Back to Executions">
-                    <UISref to="^.executions.execution" params={executionParams}>
-                      <a className="btn btn-configure">
-                        <span className="glyphicon glyphicon glyphicon-circle-arrow-left" />
-                      </a>
-                    </UISref>
-                  </Tooltip>
-                  {execution.name}
+                  <UISref to="^.executions">
+                    <a className="clickable">{app.name}</a>
+                  </UISref>
+                  {' - '}
+                  <UISref to="^.executions" params={{ pipeline: execution.name }}>
+                    <a className="clickable">{execution.name}</a>
+                  </UISref>
                 </h3>
 
                 <div className="form-group checkbox flex-pull-right">

@@ -25,11 +25,6 @@ import { ORACLE_SERVERGROUP_CONFIGURE_WIZARD_CLONESERVERGROUP_CONTROLLER } from 
 import { ORACLE_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_CONTROLLER } from './serverGroup/details/serverGroupDetails.controller';
 import { ORACLE_SERVERGROUP_SERVERGROUP_TRANSFORMER } from './serverGroup/serverGroup.transformer';
 
-const templates = require.context('./', true, /\.html$/);
-templates.keys().forEach(function (key) {
-  templates(key);
-});
-
 export const ORACLE_MODULE = 'spinnaker.oracle';
 module(ORACLE_MODULE, [
   // Pipeline
